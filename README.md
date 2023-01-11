@@ -23,6 +23,10 @@ the [DPP](https://dpp.oeaw.ac.at/) project.
 
 Please refer to [install.md](install.md) for requirements and installation.
 
+# Contributing
+
+Please refer to our [contributing guidelines](CONTRIBUTING.md)
+
 # Team
 
 **Stefan Eichert** - Idea, Concept and Data Modelling

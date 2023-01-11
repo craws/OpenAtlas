@@ -5,8 +5,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Archaeological data &mdash; OpenAtlas 7.9.0 documentation</title>
@@ -26,9 +25,6 @@
   
 
   
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -97,10 +93,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../features.html">Features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../entity/index.html">Entity</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ui/index.html">UI Elements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../model/index.html">Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technical/index.html">Technical</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Examples</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="index.html#general">General</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="index.html#archaeological">Archaeological</a></li>
@@ -109,6 +105,9 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../troubleshooting/index.html">Troubleshooting</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ui/index.html">UI Elements</a></li>
 </ul>
 
             
@@ -176,7 +175,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="archaeological-data">
+  <div class="section" id="archaeological-data">
 <h1>Archaeological data<a class="headerlink" href="#archaeological-data" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
@@ -193,7 +192,7 @@ The following elements are involved in the procedure:</p>
 <li><p><a class="reference internal" href="../entity/file.html"><span class="doc">File</span></a>: an image or other file concerning the site or any of its subunits</p></li>
 </ul>
 <img alt="../_images/sub_unit.jpg" src="../_images/sub_unit.jpg" />
-<section id="adding-a-new-place">
+<div class="section" id="adding-a-new-place">
 <h2>Adding a new place<a class="headerlink" href="#adding-a-new-place" title="Permalink to this headline">¶</a></h2>
 <p>In order to store new archaeological information in the database, the first necessary step is to create a new
 <a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a>. In the OpenAtlas database a place is a physical thing that has a certain position and or extend in
@@ -208,8 +207,8 @@ space that can be connected to various other information (temporal, spatial, eve
 <li><p>To add a citation click the <strong>Reference tab</strong></p></li>
 <li><p>If you want to add an image e.g. a plot or photo of the site use the <strong>File tab</strong></p></li>
 </ul>
-</section>
-<section id="adding-a-feature-to-the-site">
+</div>
+<div class="section" id="adding-a-feature-to-the-site">
 <h2>Adding a feature to the site<a class="headerlink" href="#adding-a-feature-to-the-site" title="Permalink to this headline">¶</a></h2>
 <p>Next, a <a class="reference internal" href="../entity/feature.html"><span class="doc">Feature</span></a> connected to the <a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a> will be created.
 This feature can be a grave of a graveyard, a building of a settlement, etc.</p>
@@ -223,8 +222,8 @@ This feature can be a grave of a graveyard, a building of a settlement, etc.</p>
 <p>If you want to link the created feature to a different citation or add an image you can use <strong>Insert</strong> and add those
 information or go back later and do it then. In this case you would have to click the <strong>Stratigraphic unit Tab</strong> and the
 <strong>+ Stratigraphic unit</strong> button to go on with the workflow.</p>
-</section>
-<section id="adding-a-stratigraphic-unit-to-the-feature">
+</div>
+<div class="section" id="adding-a-stratigraphic-unit-to-the-feature">
 <h2>Adding a stratigraphic unit to the feature<a class="headerlink" href="#adding-a-stratigraphic-unit-to-the-feature" title="Permalink to this headline">¶</a></h2>
 <p>Every <a class="reference internal" href="../entity/feature.html"><span class="doc">Feature</span></a> can consist of one or more <a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>.
 For a grave this would be the burial or a burial and the backfilling.</p>
@@ -235,8 +234,8 @@ For a grave this would be the burial or a burial and the backfilling.</p>
 <li><p>Add additional information on the stratigraphic unit if available</p></li>
 <li><p>Press <strong>Insert and add artifact</strong> or <strong>Insert an add human remains</strong> to go on with the workflow</p></li>
 </ul>
-</section>
-<section id="adding-an-artifact-to-the-stratigraphic-unit">
+</div>
+<div class="section" id="adding-an-artifact-to-the-stratigraphic-unit">
 <h2>Adding an artifact to the stratigraphic unit<a class="headerlink" href="#adding-an-artifact-to-the-stratigraphic-unit" title="Permalink to this headline">¶</a></h2>
 <p>The following steps add a <a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a> to the before created <a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>. You can now add grave goods to a burial or
 artifacts to a certain layer of the feature.</p>
@@ -250,8 +249,8 @@ artifacts to a certain layer of the feature.</p>
 </ul>
 <p>You can also enter an artifact by going to the stratigraphic unit you want to link the artifact to. Click the <strong>Artifact tab</strong> and
 <strong>+ Artifact</strong> afterwards.</p>
-</section>
-<section id="adding-human-remains-to-the-stratigraphic-unit">
+</div>
+<div class="section" id="adding-human-remains-to-the-stratigraphic-unit">
 <h2>Adding human remains to the stratigraphic unit<a class="headerlink" href="#adding-human-remains-to-the-stratigraphic-unit" title="Permalink to this headline">¶</a></h2>
 <p>Anthropological data can be entered into OpenAtlas by adding <a class="reference internal" href="../entity/human_remains.html"><span class="doc">Human remains</span></a>. You can do so by connecting a
 certain bone to a <a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a> and add all the relevant information, e.g. pathological changes,
@@ -268,8 +267,8 @@ and age of an individual.</p>
 </ul>
 <p>You can also enter <a class="reference internal" href="../entity/human_remains.html"><span class="doc">Human remains</span></a> by going to the stratigraphic unit you want to link the information to. Click the
 <strong>Human remains tab</strong> and <strong>+ Human remains button</strong> afterwards.</p>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>

@@ -62,7 +62,6 @@ def ext_references(links: list[Link]) -> str:
         html += link(
             f'{system.resolver_url}{link_.description}',
             f'{system.resolver_url}{link_.description}',
-            uc_first_=False,
             external=True) if system.resolver_url else link_.description
         html += \
             f' ({ g.types[link_.type.id].name } ' + _('at') + \
@@ -530,7 +529,8 @@ def link(
     html = ''
     if isinstance(object_, (str, LazyString)):
         js = f'onclick="{js}"' if js else ''
-        label = uc_first(str(object_)) if uc_first_ else object_
+        label = uc_first(str(object_)) if uc_first_ and not \
+            str(object_).startswith('http') else object_
         class_ = f'class="{class_}"' if class_ else ''
         ext = 'target="_blank" rel="noopener noreferrer"' if external else ''
         html = f'<a href="{url}" {class_} {js} {ext}>{label}</a>'
