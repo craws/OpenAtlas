@@ -5,8 +5,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>API &mdash; OpenAtlas 7.9.0 documentation</title>
@@ -26,9 +25,6 @@
   
 
   
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -40,7 +36,7 @@
 
     
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Anthropological Analyses" href="anthropological_analyses.html" />
+    <link rel="next" title="Version 0.3" href="api_version0_3.html" />
     <link rel="prev" title="Network visualization" href="network.html" /> 
 </head>
 
@@ -180,11 +176,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="api">
+  <div class="section" id="api">
 <h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<section id="introduction">
+<div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>This page provides an overview of the OpenAtlas Application Programming
 Interface (<a class="reference external" href="https://en.wikipedia.org/wiki/API">API</a>). The API is
@@ -193,8 +189,8 @@ to provide easy access to the data included.
 For an complete overview of possible endpoints and usage of the OpenAtlas API
 also visit our
 <a class="reference external" href="https://app.swaggerhub.com/apis/ctot-nondef/OpenAtlas/">Swagger documentation</a>.</p>
-</section>
-<section id="quick-start-guide">
+</div>
+<div class="section" id="quick-start-guide">
 <h2>Quick Start Guide<a class="headerlink" href="#quick-start-guide" title="Permalink to this headline">¶</a></h2>
 <p>The API can be accessed via the following schema:
 <strong>{domain}/api/{api version}/{endpoint}?{parameter}&amp;{parameter}</strong>
@@ -207,7 +203,7 @@ version (demo.openatlas.eu/api/entity/5117). If another version of the API is
 to be used, the version number can be specified
 (demo.openatlas.eu/api/<strong>0.3</strong>/entity/5117 or
 demo.openatlas.eu/api/<strong>1</strong>/entity/5117). A version overview can be found
-above under point versioning</p></li>
+under point versioning</p></li>
 <li><p><strong>Endpoint</strong>: Specific data can be queried by attaching an endpoint
 (demo.openatlas.eu/api/0.3/<strong>entity</strong>/5117). The information is provided in a
 human - and machine-readable form, for possible endpoints, see below</p></li>
@@ -400,8 +396,8 @@ yields the following result:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-</section>
-<section id="versioning">
+</div>
+<div class="section" id="versioning">
 <h2>Versioning<a class="headerlink" href="#versioning" title="Permalink to this headline">¶</a></h2>
 <p>The OpenAtlas API follows the notion of
 <a class="reference external" href="https://en.wikipedia.org/wiki/Software_versioning#Sequence-based_identifiers">sequenced based versioning</a>
@@ -415,8 +411,8 @@ warning will be posted in the
 <a class="reference external" href="https://redmine.openatlas.eu/projects/uni/news">release notes</a> before
 these versions will be discontinued. <strong>Unstable</strong> versions are currently
 developed, so breaking changes may occur at any time without prior notice.</p>
-</section>
-<section id="endpoint-definition">
+</div>
+<div class="section" id="endpoint-definition">
 <h2>Endpoint definition<a class="headerlink" href="#endpoint-definition" title="Permalink to this headline">¶</a></h2>
 <p>Two different methods are provided to access the OpenAtlas API:</p>
 <ul class="simple">
@@ -427,20 +423,16 @@ developed, so breaking changes may occur at any time without prior notice.</p>
 instance. The requested information is provided in Linked Places format
 (<a class="reference external" href="https://github.com/LinkedPasts/linked-places-format">LPF</a>). Alternatively,
 GeoJSON or RDFs, derived from the LPF data, can be accessed.</p>
-</section>
-<section id="version-0-3-stable">
-<h2><a class="reference internal" href="api_version0_3.html"><span class="doc">Version 0.3 Stable</span></a><a class="headerlink" href="#version-0-3-stable" title="Permalink to this headline">¶</a></h2>
-</section>
-<section id="version-1-0-unstable">
-<h2><a class="reference internal" href="api_version1_0.html"><span class="doc">Version 1.0 Unstable</span></a><a class="headerlink" href="#version-1-0-unstable" title="Permalink to this headline">¶</a></h2>
-</section>
-<section id="version-0-2">
-<h2><a class="reference internal" href="api_version0_2.html"><span class="doc">Version 0.2</span></a><a class="headerlink" href="#version-0-2" title="Permalink to this headline">¶</a></h2>
-</section>
-<section id="version-0-1">
-<h2><a class="reference internal" href="api_version0_1.html"><span class="doc">Version 0.1</span></a><a class="headerlink" href="#version-0-1" title="Permalink to this headline">¶</a></h2>
-</section>
-<section id="parameter-definition">
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api_version0_3.html">Version 0.3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_version1_0.html">Version 1.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_version0_2.html">Version 0.2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_version0_1.html">Version 0.1</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="parameter-definition">
 <h2>Parameter definition<a class="headerlink" href="#parameter-definition" title="Permalink to this headline">¶</a></h2>
 <table class="colwidths-given docutils align-default">
 <colgroup>
@@ -683,8 +675,8 @@ GeoJSON or RDFs, derived from the LPF data, can be accessed.</p>
 </tr>
 </tbody>
 </table>
-</section>
-<section id="error-handling">
+</div>
+<div class="section" id="error-handling">
 <h2>Error handling<a class="headerlink" href="#error-handling" title="Permalink to this headline">¶</a></h2>
 <p>OpenAtlas uses conventional HTTP response codes to indicate the success or
 failure of an API request. Codes in the 2xx range indicate a successful request
@@ -706,12 +698,12 @@ entered, Flask catches this via its own
 <a class="reference external" href="https://flask-restful.readthedocs.io/en/latest/">Flask-RESTful</a> extension.
 An error message is provided by its own error handler
 <a class="reference external" href="https://flask-restful.readthedocs.io/en/latest/reqparse.html#error-handling">error handler</a></p>
-</section>
-<section id="authentication-guide">
+</div>
+<div class="section" id="authentication-guide">
 <h2>Authentication guide<a class="headerlink" href="#authentication-guide" title="Permalink to this headline">¶</a></h2>
 <p>No authentication is needed to use the OpenAtlas API.</p>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>
@@ -719,7 +711,7 @@ An error message is provided by its own error handler
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="anthropological_analyses.html" class="btn btn-neutral float-right" title="Anthropological Analyses" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="api_version0_3.html" class="btn btn-neutral float-right" title="Version 0.3" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
         <a href="network.html" class="btn btn-neutral float-left" title="Network visualization" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 

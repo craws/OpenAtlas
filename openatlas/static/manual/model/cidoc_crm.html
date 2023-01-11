@@ -5,8 +5,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>CIDOC CRM &mdash; OpenAtlas 7.9.0 documentation</title>
@@ -26,9 +25,6 @@
   
 
   
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -178,7 +174,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="cidoc-crm">
+  <div class="section" id="cidoc-crm">
 <h1>CIDOC CRM<a class="headerlink" href="#cidoc-crm" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
@@ -196,7 +192,7 @@ A script is used to parse the specification and import it into a
 <a class="reference external" href="https://www.postgresql.org/">PostgreSQL</a> database (more information is
 available on <a class="reference external" href="https://github.com/craws/OpenAtlas/tree/main/install">GitHub</a>)</p>
 <p>The ontology consists of classes, linked together by properties.</p>
-<section id="cidoc-classes">
+<div class="section" id="cidoc-classes">
 <h2>CIDOC classes<a class="headerlink" href="#cidoc-classes" title="Permalink to this headline">¶</a></h2>
 <p>Classes are indicated by a preceding <strong>E</strong> followed by a numeric code-e.g.
 “<a class="reference external" href="https://www.cidoc-crm.org/Entity/e39-actor/version-7.1.1">E39 - Actor</a>” or
@@ -208,8 +204,8 @@ indicates how many times each class has been used in this database instance.
 A click on the class name will get you to an overview of the class with
 detailed information, such as a short description, sub- and super classes as
 well as possible properties.</p>
-</section>
-<section id="cidoc-properties">
+</div>
+<div class="section" id="cidoc-properties">
 <h2>CIDOC Properties<a class="headerlink" href="#cidoc-properties" title="Permalink to this headline">¶</a></h2>
 <p>CIDOC entities are indicated by a combination of “P” and a numerical sequence -
 think “<a class="reference external" href="https://www.cidoc-crm.org/Property/p11-had-participant/version-7.1.1">P11 - had participant</a>” or
@@ -239,8 +235,8 @@ We don’t import them because of technical reasons, e.g. they are missing some
 definitions that “normal” properties have and the import script would have
 troubles to deal with them. E.g. they have no defined range but this is a
 foreign key in our database that can’t be empty.</p>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>

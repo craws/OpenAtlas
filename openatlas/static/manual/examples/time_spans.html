@@ -5,8 +5,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Time Spans &mdash; OpenAtlas 7.9.0 documentation</title>
@@ -26,9 +25,6 @@
   
 
   
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -176,13 +172,13 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="time-spans">
+  <div class="section" id="time-spans">
 <h1>Time Spans<a class="headerlink" href="#time-spans" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
 <p>This section is focused on how the <a class="reference internal" href="../ui/date.html"><span class="doc">Date</span></a> input fields work
 and how to put in time spans correctly.</p>
-<section id="where-to-find-the-input-fields">
+<div class="section" id="where-to-find-the-input-fields">
 <h2>Where to find the input fields<a class="headerlink" href="#where-to-find-the-input-fields" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="../ui/date.html"><span class="doc">Date</span></a> input fields can be found on the following:</p>
 <ul class="simple">
@@ -201,8 +197,8 @@ and how to put in time spans correctly.</p>
 </ul>
 <p>The <strong>Date</strong> field itself can be found at the bottom of the form, its input
 field is initially hidden. It can be used by clicking the <strong>Show</strong> button.</p>
-</section>
-<section id="how-to-enter-dates-and-time-spans">
+</div>
+<div class="section" id="how-to-enter-dates-and-time-spans">
 <h2>How to enter dates and time spans<a class="headerlink" href="#how-to-enter-dates-and-time-spans" title="Permalink to this headline">¶</a></h2>
 <img alt="../_images/date.png" src="../_images/date.png" />
 <p>The form consists of two parts:</p>
@@ -226,7 +222,7 @@ due to software restrictions by <a class="reference external" href="https://www.
 Furthermore, as PostgreSQL uses the
 <a class="reference external" href="https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar">Proleptic Gregorian calendar</a>,
 the year 0 can not be entered either.</p>
-<section id="precise-dates">
+<div class="section" id="precise-dates">
 <h3>Precise dates<a class="headerlink" href="#precise-dates" title="Permalink to this headline">¶</a></h3>
 <p>If precise dates are known, enter the beginning into the first line of
 <strong>Begin</strong> and the end date into the first line of <strong>End</strong>. You can add comments
@@ -243,8 +239,8 @@ signed in 1648 in Osnabrück (15th of May 1648) and Münster (24th of October
 War. To track those dates add 1648 - 05 - 15 into the first row of <strong>Begin</strong>
 and 1648 - 10 - 24 into the first row of <strong>End</strong>.</p>
 <img alt="../_images/date_westphalia.png" src="../_images/date_westphalia.png" />
-</section>
-<section id="id1">
+</div>
+<div class="section" id="id1">
 <h3>Time spans<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <p>If dating is uncertain, time spans for the beginning, end or beginning and end
 of the time span can be given.
@@ -266,9 +262,9 @@ possible start of the time span, 975 - 01 - 01 should be entered. The second
 line corresponds to the latest possible end of the time span, in this case 975
 - 12 - 31.</p>
 <img alt="../_images/date_stephen.png" src="../_images/date_stephen.png" />
-</section>
-</section>
-<section id="activate-hours-minutes-and-seconds">
+</div>
+</div>
+<div class="section" id="activate-hours-minutes-and-seconds">
 <h2>Activate hours, minutes, and seconds<a class="headerlink" href="#activate-hours-minutes-and-seconds" title="Permalink to this headline">¶</a></h2>
 <p>By default, years, months and days can be entered into the date input field.
 However, some projects might want to also track hours, minutes, and seconds.
@@ -278,8 +274,8 @@ Those additional input fields can be activated in your
 <strong>“Time”</strong> to turn it on. You might have to refresh your page for it to show in
 the form.</p>
 <img alt="../_images/date_hours.png" src="../_images/date_hours.png" />
-</section>
-</section>
+</div>
+</div>
 
 
            </div>

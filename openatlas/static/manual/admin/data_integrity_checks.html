@@ -5,8 +5,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Data integrity checks &mdash; OpenAtlas 7.9.0 documentation</title>
@@ -26,9 +25,6 @@
   
 
   
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -185,7 +181,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="data-integrity-checks">
+  <div class="section" id="data-integrity-checks">
 <h1>Data integrity checks<a class="headerlink" href="#data-integrity-checks" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
@@ -199,62 +195,62 @@ e.g. when importing data from other projects or deleting files outside of the
 application. Because data integrity is important for the quality of research we
 implemented functions to check possible inconsistencies which are described in
 detail below.</p>
-<section id="orphans">
+<div class="section" id="orphans">
 <h2>Orphans<a class="headerlink" href="#orphans" title="Permalink to this headline">¶</a></h2>
-<section id="id1">
+<div class="section" id="id1">
 <h3>Orphans<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <p>In this tab entries like dates which are not linked are shown. They could be
 artifacts from imports or bugs and can be deleted. If they seem to appear
 regularly again (without imports or known bugs) please report that issue.</p>
-</section>
-<section id="entities-without-links">
+</div>
+<div class="section" id="entities-without-links">
 <h3>Entities without links<a class="headerlink" href="#entities-without-links" title="Permalink to this headline">¶</a></h3>
 <p>Entries shown have no relation to other entities. That could be ok but maybe
 they are artifacts or were forgotten to link.</p>
-</section>
-<section id="type">
+</div>
+<div class="section" id="type">
 <h3>Type<a class="headerlink" href="#type" title="Permalink to this headline">¶</a></h3>
 <p>These types were created but have no sub types or associated data. Maybe they
 originate from thefirst install or were never used.</p>
-</section>
-<section id="missing-files">
+</div>
+<div class="section" id="missing-files">
 <h3>Missing files<a class="headerlink" href="#missing-files" title="Permalink to this headline">¶</a></h3>
 <p>Here are listed file entities which have no corresponding file, most likely
 because the file itself doesn’t exist anymore.</p>
-</section>
-<section id="orphaned-files">
+</div>
+<div class="section" id="orphaned-files">
 <h3>Orphaned files<a class="headerlink" href="#orphaned-files" title="Permalink to this headline">¶</a></h3>
 <p>Files that have no corresponding entity are listed here.</p>
-</section>
-<section id="orphaned-subunits">
+</div>
+<div class="section" id="orphaned-subunits">
 <h3>Orphaned subunits<a class="headerlink" href="#orphaned-subunits" title="Permalink to this headline">¶</a></h3>
 <p>Subunits that are missing a connection to the level above. E.g. a feature
 without a connection to a place.</p>
-</section>
-<section id="circular-dependencies">
+</div>
+<div class="section" id="circular-dependencies">
 <h3>Circular dependencies<a class="headerlink" href="#circular-dependencies" title="Permalink to this headline">¶</a></h3>
 <p>A check if an entity is linked to itself. This could happen e.g. if a person is
 married to herself or a type has itself as super. It shouldn’t be possible to
 create circular dependencies within the application. Nevertheless it’s a useful
 check for e.g. if data is imported from other systems.</p>
-</section>
-</section>
-<section id="check-dates">
+</div>
+</div>
+<div class="section" id="check-dates">
 <h2>Check dates<a class="headerlink" href="#check-dates" title="Permalink to this headline">¶</a></h2>
 <p>In this tab invalid date combinations are shown, e.g. begin dates which are
 later than end dates. These entries should be cleared up otherwise they cannot
 be updated because the user interface won’t allow saving entries with invalid
 date combinations.</p>
-</section>
-<section id="check-links">
+</div>
+<div class="section" id="check-links">
 <h2>Check links<a class="headerlink" href="#check-links" title="Permalink to this headline">¶</a></h2>
 <p>With this function every link will be checked for CIDOC validity. Depending on
 the amount of data this could take some time. Data entered with the OpenAtlas
 user interface should always be CIDOC valid but in case of e.g. imported
 data this check should be used afterwards. If invalid links are found they
 should be dealt with outside the application.</p>
-</section>
-<section id="check-link-duplicates">
+</div>
+<div class="section" id="check-link-duplicates">
 <h2>Check link duplicates<a class="headerlink" href="#check-link-duplicates" title="Permalink to this headline">¶</a></h2>
 <p>There are actually two checks:</p>
 <p>The first one checks for duplicate links which are identically and can be
@@ -267,8 +263,8 @@ entry. Here you have the option to look at these and remove the wrong ones
 clicking on the <strong>Remove</strong> link beside the entries in the last column.</p>
 <p>Both checks shouldn’t find anything wrong with data entered with the
 application but nevertheless it could happen because of imports or unknown bugs.</p>
-</section>
-<section id="check-similar-names">
+</div>
+<div class="section" id="check-similar-names">
 <h2>Check similar names<a class="headerlink" href="#check-similar-names" title="Permalink to this headline">¶</a></h2>
 <p>Here you can search for similar names. Depending on selection and data volume
 this might take some time.</p>
@@ -280,8 +276,8 @@ means absolute identical</p></li>
 <p>The function uses the <a class="reference external" href="https://pypi.org/project/fuzzywuzzy/">fuzzywuzzy</a>
 package is used which in turn uses the
 <a class="reference external" href="https://en.wikipedia.org/wiki/Levenshtein_distance">Levenshtein Distance</a>.</p>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>

@@ -28,7 +28,7 @@ Example: **demo.openatlas.eu/api/0.3/entity/5117**
   to be used, the version number can be specified
   (demo.openatlas.eu/api/**0.3**/entity/5117 or
   demo.openatlas.eu/api/**1**/entity/5117). A version overview can be found
-  above under point versioning
+  under point versioning
 * **Endpoint**: Specific data can be queried by attaching an endpoint
   (demo.openatlas.eu/api/0.3/**entity**/5117). The information is provided in a
   human - and machine-readable form, for possible endpoints, see below
@@ -252,18 +252,14 @@ instance. The requested information is provided in Linked Places format
 (`LPF <https://github.com/LinkedPasts/linked-places-format>`_). Alternatively,
 GeoJSON or RDFs, derived from the LPF data, can be accessed.
 
+.. toctree::
+   :maxdepth: 1
 
-:doc:`Version 0.3 Stable<api_version0_3>`
------------------------------------------
+   api_version0_3
+   api_version1_0
+   api_version0_2
+   api_version0_1
 
-:doc:`Version 1.0 Unstable<api_version1_0>`
--------------------------------------------
-
-:doc:`Version 0.2<api_version0_2>`
-----------------------------------
-
-:doc:`Version 0.1<api_version0_1>`
-----------------------------------
 
 Parameter definition
 --------------------
@@ -475,6 +471,3 @@ An error message is provided by its own error handler
 Authentication guide
 --------------------
 No authentication is needed to use the OpenAtlas API.
-
-
-
