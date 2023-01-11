@@ -77,7 +77,7 @@ def sex(id_: int) -> Union[str, Response]:
             'option_value': SexEstimation.options[item['description']],
             'value': item['description']})
     return render_template(
-        'anthropology_sex.html',
+        'tools/sex.html',
         entity=entity,
         buttons=buttons,
         data=data,
