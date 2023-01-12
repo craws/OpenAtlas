@@ -14,8 +14,8 @@ Feedback is always appreciated and can be done by
 ## Code contribution
 
 We also welcome code contributions via GitHub pull requests to the develop
-branch. Please be sure to read our
-[Development Standards](https://redmine.openatlas.eu/projects/uni/wiki/Standards)
+branch. Please be sure to read about our
+[development standards](https://redmine.openatlas.eu/projects/uni/wiki/Standards)
 before.
 
 ### Submitting changes via GitHub pull requests:
