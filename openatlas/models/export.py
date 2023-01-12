@@ -38,7 +38,8 @@ def sql_export(postfix: Optional[str] = '') -> bool:
         with open(os.devnull, 'w') as null:
             subprocess.Popen(
                 ['7z', 'a', f'{file}.7z', file],
-                stdout=null).wait()
+                stdout=null,
+                shell=False if os.name == 'posix' else True).wait()
         file.unlink()
     except Exception:  # pragma: no cover
         return False

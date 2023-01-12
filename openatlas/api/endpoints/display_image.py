@@ -26,7 +26,7 @@ class DisplayImage(Resource):
                 as_attachment=True)
         directory = app.config['UPLOAD_DIR']
         if parser['image_size'] \
-                and check_processed_image(filename):  # pragma: no cover
+                and check_processed_image(filename):
             size = app.config['IMAGE_SIZE'][parser['image_size']]
             directory = f"{app.config['RESIZED_IMAGES']}/{size}"
         return send_from_directory(directory, filename)
