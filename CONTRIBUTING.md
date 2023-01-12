@@ -4,25 +4,22 @@ Thank you for considering to contribute to OpenAtlas and reading this document.
 
 ## Feedback, reporting bugs and feature requests
 
-Feedback is always appreciated, preferable in a constructive way. E.g.
+Feedback is always appreciated and can be done by
 
-
-* Using our issue tracker
+* using our issue tracker
   [Redmine](https://redmine.openaltas.eu/wiki/uni) after reading
   [how to report an issue](https://redmine.openatlas.eu/projects/uni/wiki/Issues_howto)
-* Contacting us at <openatlas@oeaw.ac.at>
+* contacting us at <openatlas@oeaw.ac.at>
 
 ## Code contribution
 
-We also welcome code contributions via a GitHub pull requests to the develop
-branch.<br>
-Please be sure to read our
-[Development Standards](https://redmine.openatlas.eu/projects/uni/wiki/Standards)
-to avoid complications.
+We also welcome code contributions via GitHub pull requests to the develop
+branch after reading about our
+[development standards](https://redmine.openatlas.eu/projects/uni/wiki/Standards).
 
-### Submitting changes via a GitHub pull request:
+### Submitting changes via GitHub pull requests
 
-Clone the repository and make a new branch from the develop branch:
+Clone the repository and make a new branch from the develop branch.
 
     git checkout develop
     git checkout -b feature_example
