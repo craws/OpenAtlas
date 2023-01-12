@@ -12,7 +12,7 @@ from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.util import (
     button, display_form, is_authorized, manual, required_group, uc_first)
-from openatlas.models.tools import SexEstimation, get_types, update_carbon
+from openatlas.models.tools import SexEstimation, get_sex_types, update_carbon
 from openatlas.models.entity import Entity
 
 
@@ -111,7 +111,7 @@ def sex_update(id_: int) -> Union[str, Response]:
                description=description))
     setattr(Form, 'save', SubmitField(_('save')))
     form = Form()
-    types = get_types(entity.id)
+    types = get_sex_types(entity.id)
     if form.validate_on_submit():
         data = form.data
         data.pop('save', None)

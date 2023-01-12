@@ -6,7 +6,7 @@ from flask import g
 class Tools:
 
     @staticmethod
-    def get_types(id_: int) -> list[dict[str, Any]]:
+    def get_sex_types(id_: int) -> list[dict[str, Any]]:
         g.cursor.execute(
             """
             SELECT e.id, l.id AS link_id, l.description
@@ -14,7 +14,8 @@ class Tools:
             JOIN model.link l ON l.range_id = e.id
                 AND l.domain_id = %(id)s
                 AND l.property_code = 'P2'
-                AND e.openatlas_class_name = 'type_anthropology';
+                AND e.openatlas_class_name = 'type_anthropology'
+                AND e.name != 'Radiocarbon';
             """,
             {'id': id_})
         return [dict(row) for row in g.cursor.fetchall()]

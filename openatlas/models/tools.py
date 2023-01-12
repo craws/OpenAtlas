@@ -8,12 +8,13 @@ from openatlas.models.link import Link
 from openatlas.models.type import Type
 
 
-def get_types(id_: int) -> list[dict[str, Any]]:
-    return Db.get_types(id_)
+def get_sex_types(id_: int) -> list[dict[str, Any]]:
+    return Db.get_sex_types(id_)
 
-def update_carbon(entity: Entity, data: dict[str,Any]):
-    # Entity.insert('string', 'carbon_string', json.dumps(data))
-    pass
+
+def update_carbon(entity: Entity, data: dict[str, Any]):
+    entity.link('P2', Type.get_hierarchy('Radiocarbon'), json.dumps(data))
+
 
 class SexEstimation:
 
@@ -210,7 +211,7 @@ class SexEstimation:
 
     @staticmethod
     def calculate(entity: Entity) -> Union[float, None]:
-        types = get_types(entity.id)
+        types = get_sex_types(entity.id)
         if not types:
             return None
         SexEstimation.prepare_feature_types()
@@ -239,4 +240,4 @@ class SexEstimation:
 
     @staticmethod
     def get_types(entity: Entity) -> list[dict[str, Any]]:
-        return get_types(entity.id)
+        return get_sex_types(entity.id)
