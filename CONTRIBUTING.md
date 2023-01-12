@@ -18,7 +18,7 @@ branch. Please be sure to read about our
 [development standards](https://redmine.openatlas.eu/projects/uni/wiki/Standards)
 before.
 
-### Submitting changes via GitHub pull requests:
+### Submitting changes via GitHub pull requests
 
 Clone the repository and make a new branch from the develop branch.
 
