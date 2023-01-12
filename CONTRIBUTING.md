@@ -6,10 +6,10 @@ Thank you for considering to contribute to OpenAtlas and reading this document.
 
 Feedback is always appreciated and can be done by
 
-* Using our issue tracker
+* using our issue tracker
   [Redmine](https://redmine.openaltas.eu/wiki/uni) after reading
   [how to report an issue](https://redmine.openatlas.eu/projects/uni/wiki/Issues_howto)
-* Contacting us at <openatlas@oeaw.ac.at>
+* contacting us at <openatlas@oeaw.ac.at>
 
 ## Code contribution
 
