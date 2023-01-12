@@ -1,6 +1,6 @@
 from typing import Any, Union
-
-from flask import g, json
+import json
+from flask import g
 
 from openatlas.database.tools import Tools as Db
 from openatlas.models.entity import Entity

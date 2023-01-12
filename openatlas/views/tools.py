@@ -1,6 +1,7 @@
+
 from typing import Union
 
-from flask import flash, g, render_template, url_for
+from flask import flash, json, g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
@@ -10,10 +11,12 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.database.connect import Transaction
+from openatlas.display.tab import Tab
 from openatlas.display.util import (
-    button, display_form, is_authorized, manual, required_group, uc_first)
-from openatlas.models.tools import SexEstimation, get_sex_types, update_carbon
+    button, display_form, display_info, is_authorized, manual, required_group,
+    uc_first)
 from openatlas.models.entity import Entity
+from openatlas.models.tools import SexEstimation, get_sex_types, update_carbon
 
 
 def name_result(result: float) -> str:
@@ -35,27 +38,43 @@ def print_sex_result(entity: Entity) -> str:
     if calculation is None:
         return ''
     return \
+        '<h1>' + uc_first(_('sex estimation')) + '</h1>' \
         'Ferembach et al. 1979: ' \
         f'<span class="anthro-result">{calculation}</span>' \
         f' - {_("corresponds to")} "{name_result(calculation)}"'
+
+
+def print_radio_carbon_result(entity: Entity) -> str:
+    radiocarbon = ''
+    for link_ in entity.get_links('P2'):
+        if link_.range.name == 'Radiocarbon':
+            radiocarbon = link_.description
+    html = ''
+    if radiocarbon:
+        html = '<h1>' + uc_first(_('radiocarbon dating')) + '</h1>' + \
+               display_info(json.loads(radiocarbon))
+    return html
 
 
 @app.route('/anthropology/index/<int:id_>')
 @required_group('readonly')
 def tools_index(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_)
-    dating_buttons = [
-        button(
-            _('radiocarbon dating'),
-            url_for('carbon_update', id_=entity.id))]
-    sex_buttons = [
-        manual('tools/anthropological_analyses'),
-        button(_('sex estimation'), url_for('sex', id_=entity.id)),
-        print_sex_result(entity)]
+    tabs = {
+        'info': Tab(
+            'info',
+            content=
+            print_radio_carbon_result(entity) + print_sex_result(entity),
+            buttons=[
+                manual('tools/anthropological_analyses'),
+                button(
+                    _('radiocarbon dating'),
+                    url_for('carbon_update', id_=entity.id)),
+                button(_('sex estimation'), url_for('sex', id_=entity.id))])}
     return render_template(
-        'content.html',
+        'tabs.html',
+        tabs=tabs,
         entity=entity,
-        buttons=dating_buttons + sex_buttons,
         crumbs=[entity, _('anthropological analyses')])
 
 
@@ -175,6 +194,8 @@ def carbon_update(id_: int) -> Union[str, Response]:
                 'radiocarbonYear': form.radiocarbon_year.data,
                 'range': form.range.data,
                 'timeScale': 'BP'})
+        flash(_('entity updated'), 'info')
+        return redirect(url_for('tools_index', id_=entity.id))
 
     return render_template(
         'content.html',
