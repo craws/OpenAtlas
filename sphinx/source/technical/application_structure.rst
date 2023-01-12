@@ -5,7 +5,7 @@ Application Structure
 
 The website's software is written in `Python <https://www.python.org/>`_ and
 uses the `Flask <https://palletsprojects.com/p/flask/>`_ framework.
-It is build by using the following components:
+Below you find an overview of the file structure:
 
 * **config** - default configuration
 * **files**:
@@ -14,11 +14,10 @@ It is build by using the following components:
     * **processed images** - smaller generated files which are more suitable
       for web browsers
     * **uploads** - files uploaded by users
-    * **install** - contains e.g. SQL files for installation
 
 * **install** - contains e.g. SQL files for installation:
 
-    * **crm** - for importing the CIDOC CRM, not needed for application to run
+    * **crm** - used to import the CIDOC CRM, not needed for application to run
     * **upgrade** - SQL upgrade files and information how to upgrade
 
 * **instance** - configuration files
@@ -27,9 +26,9 @@ It is build by using the following components:
     * **api**
     * **database** - the SQL code lives here
     * **display** - display manager and utility functions
-    * **forms** - a collection of form related files
+    * **forms** - form manager and other forms related files
     * **models** - classes used in the application
-    * **static** - the "web root" containing CSS, JavaScript, layout images,
+    * **static** - the web root containing CSS, JavaScript, layout images,
       etc.
     * **templates** - HTML template files
     * **translations** - source and compiled files for translations
