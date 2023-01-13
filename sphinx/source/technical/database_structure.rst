@@ -3,7 +3,7 @@ Database Structure
 
 .. toctree::
 
-Regarding the database structure, the following schema is used:
+Regarding the database structure, the following PostgreSQL schemas are used:
 
 * **import** - to track entities imported via the backend
 * **model** - CIDOC specifications (classes, properties) and OpenAtlas classed

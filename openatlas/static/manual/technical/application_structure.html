@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../features.html">Features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../entity/index.html">Entity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../model/index.html">Model</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Technical</a><ul class="current">
@@ -101,13 +102,10 @@
 <li class="toctree-l2"><a class="reference internal" href="database_structure.html">Database Structure</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ui/index.html">UI Elements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../troubleshooting/index.html">Troubleshooting</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../ui/index.html">UI Elements</a></li>
 </ul>
 
             
@@ -181,7 +179,7 @@
 </div>
 <p>The website’s software is written in <a class="reference external" href="https://www.python.org/">Python</a> and
 uses the <a class="reference external" href="https://palletsprojects.com/p/flask/">Flask</a> framework.
-It is build by using the following components:</p>
+Below you find an overview of the file structure:</p>
 <ul>
 <li><p><strong>config</strong> - default configuration</p></li>
 <li><p><strong>files</strong>:</p>
@@ -191,14 +189,13 @@ It is build by using the following components:</p>
 <li><p><strong>processed images</strong> - smaller generated files which are more suitable
 for web browsers</p></li>
 <li><p><strong>uploads</strong> - files uploaded by users</p></li>
-<li><p><strong>install</strong> - contains e.g. SQL files for installation</p></li>
 </ul>
 </div></blockquote>
 </li>
 <li><p><strong>install</strong> - contains e.g. SQL files for installation:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p><strong>crm</strong> - for importing the CIDOC CRM, not needed for application to run</p></li>
+<li><p><strong>crm</strong> - used to import the CIDOC CRM, not needed for application to run</p></li>
 <li><p><strong>upgrade</strong> - SQL upgrade files and information how to upgrade</p></li>
 </ul>
 </div></blockquote>
@@ -210,9 +207,9 @@ for web browsers</p></li>
 <li><p><strong>api</strong></p></li>
 <li><p><strong>database</strong> - the SQL code lives here</p></li>
 <li><p><strong>display</strong> - display manager and utility functions</p></li>
-<li><p><strong>forms</strong> - a collection of form related files</p></li>
+<li><p><strong>forms</strong> - form manager and other forms related files</p></li>
 <li><p><strong>models</strong> - classes used in the application</p></li>
-<li><p><strong>static</strong> - the “web root” containing CSS, JavaScript, layout images,
+<li><p><strong>static</strong> - the web root containing CSS, JavaScript, layout images,
 etc.</p></li>
 <li><p><strong>templates</strong> - HTML template files</p></li>
 <li><p><strong>translations</strong> - source and compiled files for translations</p></li>
