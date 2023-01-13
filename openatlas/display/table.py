@@ -31,7 +31,7 @@ class Table:
 
     def display(self, name: str = 'default') -> str:
         if not self.rows:
-            return f"<p>{uc_first(_('no entries'))}</p>"
+            return '<p>' + uc_first(_('no entries')) + '</p>'
         self.defs.append({
             'className': 'dt-body-right',
             'targets': [

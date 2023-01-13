@@ -98,23 +98,20 @@ def resolve_entity(
         parser: dict[str, Any]) \
         -> Union[Response, dict[str, Any], tuple[Any, int]]:
     if parser['export'] == 'csv':
-        return export_entities_csv(entity, entity.name)
+        export_entities_csv(entity, entity.name)
     if parser['export'] == 'csvNetwork':
-        return export_csv_for_network_analysis([entity], parser)
+        export_csv_for_network_analysis([entity], parser)
     result = get_entity_formatted(entity, parser)
     if parser['format'] in app.config['RDF_FORMATS']:
         return Response(
             rdf_output(result, parser),
             mimetype=app.config['RDF_FORMATS'][parser['format']])
+    template = geojson_collection_template() \
+        if parser['format'] in ['geojson', 'geojson-v2'] \
+        else linked_places_template(parser['show'])
     if parser['download']:
-        return download(result, get_entity_template(parser), entity.id)
-    return marshal(result, get_entity_template(parser)), 200
-
-
-def get_entity_template(parser: dict[str, Any]) -> dict[str, Any]:
-    if parser['format'] in ['geojson', 'geojson-v2']:
-        return geojson_collection_template()
-    return linked_places_template(parser['show'])
+        download(result, template, entity.id)
+    return marshal(result, template), 200
 
 
 def resolve_subunits(
@@ -135,7 +132,7 @@ def resolve_subunits(
             subunit_xml(out),
             mimetype=app.config['RDF_FORMATS'][parser['format']])
     if parser['download']:
-        return download(out, subunit_template(name), name)
+        download(out, subunit_template(name), name)
     return marshal(out, subunit_template(name)), 200
 
 

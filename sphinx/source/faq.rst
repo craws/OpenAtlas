@@ -49,8 +49,8 @@ Tag: design decision
 For formatting longer texts, e.g. entity descriptions, only linebreaks can
 be used. The main reason for not implementing formatting systems like HTML or
 Markdown for e.g. bold font, underline, lists and similar is that data may
-be used by other systems via the :doc:`/tools/api`, and these systems are not
-necessarily able to handle these formats.
+be used by other systems via the :doc:`/technical/api`, and these systems are
+not necessarily able to handle these formats.
 
 Another reason is that these formats might change over time. All in all it is
 more important for us that acquired data is as interoperable, as long as

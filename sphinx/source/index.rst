@@ -17,8 +17,11 @@ development specific documentation in our Redmine
    entity/index
    tools/index
    admin/index
-   ui/index
+
    model/index
+   technical/index
+   ui/index
+
    examples/index
    troubleshooting/index
    faq

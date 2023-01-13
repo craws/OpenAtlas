@@ -53,28 +53,31 @@ def get_geometries_thanados(
     if parser['format'] == 'xml' and geom:
         if geom['type'] == 'GeometryCollection':
             geometries = []
-            for item in geom['geometries']:  # pragma: no cover
-                item['coordinates'] = check_geometries(item)
+            for item in geom['geometries']:
+                item['coordinates'] = transform_geometries_for_xml(item)
                 geometries.append(item)
             geom['geometries'] = [{'geom': item} for item in geometries]
         else:
-            geom['coordinates'] = check_geometries(geom)
+            geom['coordinates'] = transform_geometries_for_xml(geom)
     return geom
 
 
-def check_geometries(geom: dict[str, Any]) \
-        -> Union[list[list[dict[str, Any]]], list[dict[str, Any]], None]:
-    if geom['type'] == 'Polygon':  # pragma: no cover
-        return [
-            transform_coordinates(k) for i in geom['coordinates'] for k in i]
-    if geom['type'] == 'LineString':  # pragma: no cover
-        return [transform_coordinates(k) for k in geom['coordinates']]
+def transform_geometries_for_xml(geom: dict[str, Any]) \
+        -> Union[list[list[dict[str, Any]]], list[dict[str, Any]]]:
+    output = []
+    if geom['type'] == 'Polygon':
+        output = [transform_coordinates_for_xml(k)
+                  for i in geom['coordinates'] for k in i]
+    if geom['type'] == 'LineString':
+        output = [
+            transform_coordinates_for_xml(k) for k in geom['coordinates']]
     if geom['type'] == 'Point':
-        return transform_coordinates(geom['coordinates'])
-    return None  # pragma: no cover
+        output = transform_coordinates_for_xml(geom['coordinates'])
+    return output
 
 
-def transform_coordinates(coordinates: list[float]) -> list[dict[str, Any]]:
+def transform_coordinates_for_xml(
+        coordinates: list[float]) -> list[dict[str, Any]]:
     return [
         {'coordinate':
             {'longitude': coordinates[0], 'latitude': coordinates[1]}}]

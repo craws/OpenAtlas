@@ -47,8 +47,13 @@ project.
 * :doc:`/tools/notes` and bookmarks
 * :doc:`User manual </index>` (English) with :doc:`examples </examples/index>`
   and context specific links in the application
-* User interface internationalization (currently English and German)
-  using `gettext <https://www.gnu.org/software/gettext/>`_
+* User interface internationalization using
+  `gettext <https://www.gnu.org/software/gettext/>`_, currently implemented:
+
+   * Catalan
+   * English
+   * German
+   * Spanish
 
 .. image:: /ui.png
 
@@ -58,7 +63,7 @@ Data exchange
 OpenAtlas offers various possibilities to exchange data with other systems or
 to import data into the database system.
 
-* :doc:`/tools/api` for easier exchange with other information system
+* :doc:`/technical/api` for easier exchange with other information system
 * :doc:`/admin/export` functions for multiple formats
 * :doc:`/admin/import` of CSV files
 

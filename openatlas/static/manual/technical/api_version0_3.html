@@ -1,0 +1,486 @@
+
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Version 0.3 &mdash; OpenAtlas 7.9.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Version 0.2" href="api_version0_2.html" />
+    <link rel="prev" title="API" href="api.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> OpenAtlas
+          
+
+          
+            
+            <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                7.9.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../entity/index.html">Entity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../model/index.html">Model</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Technical</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="application_structure.html">Application Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database_structure.html">Database Structure</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ui/index.html">UI Elements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting/index.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAtlas</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content style-external-links">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Technical</a> &raquo;</li>
+        
+          <li><a href="api.html">API</a> &raquo;</li>
+        
+      <li>Version 0.3</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="version-0-3">
+<h1>Version 0.3<a class="headerlink" href="#version-0-3" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<div class="section" id="entity-endpoint">
+<h2>Entity endpoint<a class="headerlink" href="#entity-endpoint" title="Permalink to this headline">¶</a></h2>
+<p><strong>Single entities</strong></p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>API endpoint</p></th>
+<th class="head"><p>Possible parameters</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>/api/0.3/entity/{id}</p></td>
+<td><p>show, download,export,format</p></td>
+<td><p>Retrieves all information about a single entity</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Query</strong> - Combine several or all entity endpoints in one query</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>API endpoint</p></th>
+<th class="head"><p>Possible parameters</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>api/0.3/entities/query/</p></td>
+<td><p><strong>ids</strong>, <strong>cidoc-classes</strong>, <strong>menu-item</strong>, <strong>classes</strong>,
+<strong>linked-to-entity</strong>, <strong>linked-to-type</strong>,
+<strong>linked-to-type-including-subtypes</strong>, limit, column, sort, search,
+first, last, show, relation_type, type_id, count, download, format,
+export, page</p></td>
+<td><p>Retrieves a list with entity ID, CIDOC CRM code, system class, or menu
+item. Combine up to four of the aforementioned endpoints in a single
+query; each request has to be a new parameter; Possible parameters are:
+?entities={id}, ?classes={cidoc_class_code}, ?codes={view_name},
+?system_classes={system_class}(2)</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="simple">
+<dt><strong>Multiple entities</strong> - Results in list form include related entities and</dt><dd><p>pagination</p>
+</dd>
+</dl>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>API endpoint</p></th>
+<th class="head"><p>Possible parameters</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>/api/0.3/view_class/{view_class}</p></td>
+<td><p>limit, column, sort, search, first, last, show, relation_type, type_id,
+count, download, format, export, page</p></td>
+<td><p>Used to retrieve a JSON list of entities based on their OpenAtlas class
+view</p></td>
+</tr>
+<tr class="row-odd"><td><p>/api/0.3/system_class/{system_class}</p></td>
+<td><p>limit, column, sort, search, first, last, show, relation_type, count,
+download, format, export, page</p></td>
+<td><p>Retrieves a list of entities, based on their OpenAtlas system class name
+as JSON (1)(2)</p></td>
+</tr>
+<tr class="row-even"><td><p>/api/0.3/latest/{n} (n represents a number between 1 and 100)</p></td>
+<td><p>show, relation_type, download, format, export</p></td>
+<td><p>Used to retrieve the last entry/entries made; the number {latest}/{n}
+represents the amount of entities retrieved and can be between 1 and
+100. The pagination information is always <strong>null</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p>/api/0.3/entities_linked_to_entity/{id}</p></td>
+<td><p>limit, column, sort, search, first, last, show, relation_type, type_id,
+count, download, format, export, page</p></td>
+<td><p>Used to retrieve a JSON list of entities linked to the entity with the
+stated <strong>ID</strong> (2)</p></td>
+</tr>
+<tr class="row-even"><td><p>/api/0.3/type_entities/{id}</p></td>
+<td><p>limit, column, sort, search, first, last, show, relation_type, type_id,
+count, download, format, export, page</p></td>
+<td><p>Used to retrieve a JSON list of entities, based on their OpenAtlas
+<strong>type</strong> (2)(3)</p></td>
+</tr>
+<tr class="row-odd"><td><p>/api/0.3/type_entities_all/{id}</p></td>
+<td><p>limit, column, sort, search, first, last, show, relation_type, type_id,
+count, download, format, export, page</p></td>
+<td><p>Used to retrieve a JSON list of entities, based on their OpenAtlas
+<strong>type</strong> and includes all connected entities (2)(3)</p></td>
+</tr>
+<tr class="row-even"><td><p>/api/3.0/cidoc_class/{cidoc_class}</p></td>
+<td><p>limit, column, sort, search, first, last, show, relation_type, type_id,
+count, download, format, export, page</p></td>
+<td><p>Retrieves a JSON list of entities based on their CIDOC CRM class(1)(2)</p></td>
+</tr>
+</tbody>
+</table>
+<p>(1) All codes available in OpenAtlas can be found under
+<a class="reference external" href="https://redmine.openatlas.eu/projects/uni/wiki/OpenAtlas_and_CIDOC_CRM_class_mapping?parent=Endpoints">OpenAtlas and CIDOC CRM class mapping</a>
+(2) The result can be filtered, sorted, and manipulated through different
+parameters. By default 20 entities in alphabetical order are shown.
+(3) Available IDs can be obtained by using the type-tree or node-overview
+endpoint.
+Required parameters are shown as <strong>bold</strong>.</p>
+</div>
+<div class="section" id="nodes-endpoints">
+<h2>Nodes endpoints<a class="headerlink" href="#nodes-endpoints" title="Permalink to this headline">¶</a></h2>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>API endpoint</p></th>
+<th class="head"><p>Possible parameters</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>/api/0.3/subunits/{id}</p></td>
+<td><p><strong>id</strong>, count, download, format</p></td>
+<td><p>Displays all subunits of a place in a special format used by the
+THANADOS project</p></td>
+</tr>
+<tr class="row-odd"><td><p>/api/0.3/type_by_view_class/</p></td>
+<td><p>download</p></td>
+<td><p>Retrieves a list of all types sorted by view class</p></td>
+</tr>
+<tr class="row-even"><td><p>/api/0.3/type_overview/</p></td>
+<td><p>download</p></td>
+<td><p>Retrieves a list of all types</p></td>
+</tr>
+<tr class="row-odd"><td><p>/api/0.3/type_tree/</p></td>
+<td><p>download</p></td>
+<td><p>Shows every <em>type</em> in an OpenAtlas instance, with its root and subs, so
+a tree can be build</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="content-endpoints">
+<h2>Content endpoints<a class="headerlink" href="#content-endpoints" title="Permalink to this headline">¶</a></h2>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>API endpoint</p></th>
+<th class="head"><p>Possible parameters</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>/api/0.3/export_database/{format}</p></td>
+<td><p>none</p></td>
+<td><p>Downloads all information in an OpenAtlas instance as CSV, XML, or JSON</p></td>
+</tr>
+<tr class="row-odd"><td><p>/api/0.3/classes/</p></td>
+<td><p>none</p></td>
+<td><p>Retrieves a detailed list of all available system classes, their CIDOC
+CRM mapping, which view they belong to, which icon is used, and their
+English name</p></td>
+</tr>
+<tr class="row-even"><td><p>/api/0.3/content/</p></td>
+<td><p>download, lang</p></td>
+<td><p>Retrieves a detailed list of information on available content in an
+OpenAtlas instance - intro, legal notice, contact, and size of processed
+images</p></td>
+</tr>
+<tr class="row-odd"><td><p>/api/0.3/geometric_entities/</p></td>
+<td><p>count, download</p></td>
+<td><p>Retrieves a detailed GeoJSON list of all chosen geometries in an
+OpenAtlas instance; this was implemented for map usage</p></td>
+</tr>
+<tr class="row-even"><td><p>/api0.3/system_class_count/</p></td>
+<td><p>none</p></td>
+<td><p>Retrieves a list of the numbers of entries connected to a system class</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="subunit-endpoints">
+<h2>Subunit endpoints<a class="headerlink" href="#subunit-endpoints" title="Permalink to this headline">¶</a></h2>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>API endpoint</p></th>
+<th class="head"><p>Possible parameters</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>/api/0.3/subunits/{id}</p></td>
+<td><p>count, download</p></td>
+<td><p>Retrieves a list of the given place and all of its subunits, provided
+in a format used by the THANADOS project
+(<a class="reference external" href="https://redmine.openatlas.eu/projects/uni/wiki/Thanados_Format">THANADOS output format</a>).
+With the format=xml parameter, a XML can be created. Takes only a valid
+place ID (E18) as parameter</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="image-endpoints">
+<h2>Image endpoints<a class="headerlink" href="#image-endpoints" title="Permalink to this headline">¶</a></h2>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">:widths: 25 25 50
+ :header-rows: 1</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>API endpoint</p></td>
+<td><p>Possible parameters</p></td>
+<td><p>Description</p></td>
+</tr>
+<tr class="row-even"><td><p>/api/0.3/display/{id}</p></td>
+<td><p>image size</p></td>
+<td><p>Provides the image connected to the requested ID. Be aware, the image
+will only be displayed if the request comes from a <strong>logged-in</strong> user or
+API public setting is set to on and the image has a <strong>license</strong></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="api_version0_2.html" class="btn btn-neutral float-right" title="Version 0.2" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="api.html" class="btn btn-neutral float-left" title="API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+        <p>CC-BY 4.0, Alexander Watzinger and the OpenAtlas team</p>
+        <script type="text/javascript">
+            <!-- Adds target=_blank to external links -->
+            $(document).ready(function () {
+                $('a[href^="http://"], a[href^="https://"]').not('a[class*=internal]').attr('target', '_blank');
+            });
+        </script>
+
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
