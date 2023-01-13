@@ -3,7 +3,7 @@ from typing import Any
 import rdflib
 import requests
 from flask import g, flash
-from requests import Response
+from requests import Response, HTTPError
 from werkzeug.exceptions import abort
 
 from openatlas import app
@@ -24,8 +24,8 @@ def fetch_arche_data() -> dict[int, Any]:
             proxies={'http': 'http://fifi.arz.oeaw.ac.at:8080'})
         try:
             collections[id_] = get_metadata(n_triples_to_json(req))
-        except:
-            flash('ARCHE fetch failed', 'error')
+        except HTTPError as http_error:
+            flash(f'ARCHE fetch failed: {http_error}', 'error')
             abort(404)
     return collections
 
@@ -55,14 +55,46 @@ def get_metadata(data: dict[str, Any]) -> dict[str, Any]:
                     'description': json_['XMP:Description']
                     if 'XMP:Description' in json_ else '',
                     'name': json_['IPTC:ObjectName'],
+                    'license': json_['EXIF:Copyright'],
                     'date': json_['EXIF:CreateDate']}
     return metadata
 
 
 def get_linked_image(data: list[dict[str, Any]]) -> str:
-    for image in data:
-        if str(image['mime'][0]) == 'image/jpeg':
-            return image['__uri__']
+    return [image['__uri__']
+            for image in data if str(image['mime'][0]) == 'image/jpeg'][0]
+
+
+def get_or_create_type(license_: str, type_name: str) -> Type:
+    super_ = get_type_by_name(license_)
+    type_ = get_type_by_name(type_name)
+    if not type_:
+        type_ = Entity.insert('type', type_name)
+        type_.link('P127', super_)
+    return type_
+
+
+def get_type_by_name(type_name: str) -> Type:
+    type_ = None
+    for type_id in g.types:
+        if g.types[type_id].name == type_name:
+            type_ = g.types[type_id]
+    return type_
+
+
+def get_license_types(entries: dict[str, Any]) -> list[Type]:
+    license_ids = [metadata['license'] for metadata in entries.values()]
+    return [get_or_create_type('License', license_)
+            for license_ in list(set(license_ids))]
+
+
+def link_arche_entity_to_type(
+        entity: Entity,
+        types: list[Type],
+        type_name: str) -> None:
+    for type_ in types:
+        if type_.name == type_name:
+            entity.link('P2', type_)
 
 
 def import_arche_data() -> list[Entity]:
@@ -75,6 +107,8 @@ def import_arche_data() -> list[Entity]:
         if g.types[sub_id].name == 'exact match':
             exact_match_id = sub_id
     for entries in fetch_arche_data().values():
+        licenses = get_license_types(entries)
+        types = licenses
         for metadata in entries.values():
             name = metadata['name']
 
@@ -112,6 +146,7 @@ def import_arche_data() -> list[Entity]:
                 name,
                 f"Created by {metadata['creator']}"
                 if metadata['creator'] else '')
+            link_arche_entity_to_type(file, types, metadata['license'])
             file_response = requests.get(metadata['image_link_thumbnail'])
             filename = f"{file.id}.{name.rsplit('.', 1)[1].lower()}"
             open(str(app.config['UPLOAD_DIR'] / filename), "wb") \

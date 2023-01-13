@@ -1,5 +1,6 @@
-from flask import render_template, url_for, flash, g
+from flask import render_template, url_for, flash, g, Response
 from werkzeug.utils import redirect
+from flask_babel import lazy_gettext as _
 
 from openatlas import app
 from openatlas.api.arche.function import fetch_arche_data, import_arche_data
@@ -8,7 +9,6 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
     required_group, is_authorized, display_info, button, uc_first)
-from flask_babel import lazy_gettext as _
 
 
 @app.route('/arche')
@@ -34,7 +34,7 @@ def arche_fetch() -> str:
         header=[
             'ID', _('name'), _('image link'), _('image thumbnail link'),
             _('creator'), _('latitude'), _('longitude'), _('description'),
-            _('date')])
+            _('license'), _('date')])
     for entries in data.values():
         for metadata in entries.values():
             table.rows.append([
@@ -46,6 +46,7 @@ def arche_fetch() -> str:
                 metadata['latitude'],
                 metadata['longitude'],
                 metadata['description'],
+                metadata['license'],
                 metadata['date']])
     tabs = {
         'fetched_entities': Tab(
@@ -63,7 +64,7 @@ def arche_fetch() -> str:
 
 @app.route('/arche/import', methods=['POST', 'GET'])
 @required_group('manager')
-def arche_import_data() -> str:
+def arche_import_data() -> Response:
     Transaction.begin()
     try:
         entities = import_arche_data()
