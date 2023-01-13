@@ -56,7 +56,7 @@ def print_radio_carbon_result(entity: Entity) -> str:
     return html
 
 
-@app.route('/anthropology/index/<int:id_>')
+@app.route('/tools/index/<int:id_>')
 @required_group('readonly')
 def tools_index(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_)
@@ -107,7 +107,7 @@ def sex(id_: int) -> Union[str, Response]:
             _('sex estimation')])
 
 
-@app.route('/anthropology/sex/update/<int:id_>', methods=['POST', 'GET'])
+@app.route('/tools/sex/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def sex_update(id_: int) -> Union[str, Response]:
 
