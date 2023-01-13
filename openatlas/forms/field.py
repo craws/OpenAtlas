@@ -270,7 +270,7 @@ class TreeMultiField(HiddenField):
     widget = TreeMultiSelect()
 
 
-class TreeSelect(Input):
+class TreeSelect(HiddenInput):
 
     def __call__(self, field: TreeField, **kwargs: Any) -> TreeSelect:
         selection = ''
@@ -280,7 +280,7 @@ class TreeSelect(Input):
                 if isinstance(field.data, list) else field.data
             selection = g.types[int(field.data)].name
             selected_ids.append(g.types[int(field.data)].id)
-        return render_template(
+        return super().__call__(field, **kwargs) + render_template(
             'forms/tree_select.html',
             field=field,
             selection=selection,
@@ -291,7 +291,7 @@ class TreeSelect(Input):
                 field.filters_ids))
 
 
-class TreeField(Field):
+class TreeField(HiddenField):
 
     def __init__(
             self,

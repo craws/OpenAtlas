@@ -253,7 +253,7 @@ function fillTreeSelect(id,d,minimum_jstree_search){
 
 function selectFromTree(name, id, text) {
   $('#' + name).val(id)
-  $('#' + name).val(text.replace(/&apos;/g, "'"));
+  $('#' + name + '-button').val(text.replace(/&apos;/g, "'"));
   $('#' + name + '-modal').modal('hide');
   $('#' + name + '-clear').show();
 }
@@ -311,7 +311,7 @@ function selectFromTableMulti(name) {
 
 function clearSelect(name) {
   $('#' + name).attr('value', '');
-  $('#' + name).val('');
+  $('#' + name + '-button').val('');
   $('#' + name + '-tree').jstree('deselect_all');
   $('#' + name + '-clear').hide();
 }
