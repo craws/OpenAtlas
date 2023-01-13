@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Union
 
 import rdflib
 import requests
@@ -65,8 +65,9 @@ def get_linked_image(data: list[dict[str, Any]]) -> str:
             for image in data if str(image['mime'][0]) == 'image/jpeg'][0]
 
 
-def get_or_create_type(license_: str, type_name: str) -> Type:
-    super_ = get_type_by_name(license_)
+def get_or_create_type(super_: Union[str, Type], type_name: str) -> Type:
+    super_ = get_hierarchy_by_name(super_) \
+        if isinstance(super_, str) else super_
     type_ = get_type_by_name(type_name)
     if not type_:
         type_ = Entity.insert('type', type_name)
@@ -82,10 +83,29 @@ def get_type_by_name(type_name: str) -> Type:
     return type_
 
 
+def get_hierarchy_by_name(type_name: str) -> Type:
+    type_ = None
+    for type_id in g.types:
+        if g.types[type_id].name == type_name:
+            if not g.types[type_id].root:
+                type_ = g.types[type_id]
+    return type_
+
+
 def get_license_types(entries: dict[str, Any]) -> list[Type]:
     license_ids = [metadata['license'] for metadata in entries.values()]
     return [get_or_create_type('License', license_)
             for license_ in list(set(license_ids))]
+
+
+def get_creators(entries: dict[str, Any]) -> list[Type]:
+    hierarchy = 'Creator'
+    if not get_hierarchy_by_name('Creator'):
+        hierarchy = Entity.insert('type', 'Creator')
+        Type.insert_hierarchy(hierarchy, 'custom', ['file'], False)
+    creator_ids = [metadata['creator'] for metadata in entries.values()]
+    return [get_or_create_type(hierarchy, creator)
+            for creator in list(set(creator_ids))]
 
 
 def link_arche_entity_to_type(
@@ -108,7 +128,8 @@ def import_arche_data() -> list[Entity]:
             exact_match_id = sub_id
     for entries in fetch_arche_data().values():
         licenses = get_license_types(entries)
-        types = licenses
+        creator = get_creators(entries)
+        types = licenses + creator
         for metadata in entries.values():
             name = metadata['name']
 
@@ -147,6 +168,7 @@ def import_arche_data() -> list[Entity]:
                 f"Created by {metadata['creator']}"
                 if metadata['creator'] else '')
             link_arche_entity_to_type(file, types, metadata['license'])
+            link_arche_entity_to_type(file, types, metadata['creator'])
             file_response = requests.get(metadata['image_link_thumbnail'])
             filename = f"{file.id}.{name.rsplit('.', 1)[1].lower()}"
             open(str(app.config['UPLOAD_DIR'] / filename), "wb") \
