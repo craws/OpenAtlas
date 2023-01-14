@@ -201,7 +201,7 @@ class Link:
         if entity.class_.name == 'stratigraphic_unit' \
                 and 'P2' in codes \
                 and not inverse:
-            if anthropological_data := Tools.get_types(entity.id):
+            if anthropological_data := Tools.get_sex_types(entity.id):
                 Db.remove_types(
                     entity.id,
                     [row['link_id'] for row in anthropological_data])

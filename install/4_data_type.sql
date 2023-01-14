@@ -351,7 +351,7 @@ INSERT INTO web.hierarchy (id, name, category, multiple, directional) VALUES
   ((SELECT id FROM model.entity WHERE name='External reference'), 'External reference', 'standard', False, False),
   ((SELECT id FROM model.entity WHERE name='External reference match'), 'External reference match', 'system', False, False),
   ((SELECT id FROM model.entity WHERE name='Feature'), 'Feature', 'standard', False, False),
-  ((SELECT id FROM model.entity WHERE name='Features for sexing'), 'Features for sexing', 'anthropology', False, False),
+  ((SELECT id FROM model.entity WHERE name='Features for sexing'), 'Features for sexing', 'tools', False, False),
   ((SELECT id FROM model.entity WHERE name='Historical place'), 'Historical place', 'place', True, False),
   ((SELECT id FROM model.entity WHERE name='Human remains' AND cidoc_class_code = 'E55'), 'Human remains', 'standard', False, False),
   ((SELECT id FROM model.entity WHERE name='Involvement'), 'Involvement', 'standard', False, False),

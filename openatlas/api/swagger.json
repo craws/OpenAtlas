@@ -848,7 +848,7 @@
         "required" : true,
         "in" : "path",
         "schema" : {
-          "enum" : [ "all", "acquisition", "activity", "administrative_unit", "appellation", "artifact", "bibliography", "edition", "event", "external_reference", "feature", "file", "group", "human_remains", "move", "object_location", "person", "place", "production", "reference_system", "source", "source_translation", "stratigraphic_unit", "type", "type_anthropology" ]
+          "enum" : [ "all", "acquisition", "activity", "administrative_unit", "appellation", "artifact", "bibliography", "edition", "event", "external_reference", "feature", "file", "group", "human_remains", "move", "object_location", "person", "place", "production", "reference_system", "source", "source_translation", "stratigraphic_unit", "type", "tools"]
         },
         "example" : "acquisition"
       },
@@ -1054,7 +1054,7 @@
         "schema" : {
           "type" : "array",
           "items" : {
-            "enum" : [ "all", "acquisition", "activity", "administrative_unit", "appellation", "artifact", "bibliography", "edition", "event", "external_reference", "feature", "file", "group", "human_remains", "move", "object_location", "person", "place", "production", "reference_system", "source", "source_translation", "stratigraphic_unit", "type", "type_anthropology" ]
+            "enum" : [ "all", "acquisition", "activity", "administrative_unit", "appellation", "artifact", "bibliography", "edition", "event", "external_reference", "feature", "file", "group", "human_remains", "move", "object_location", "person", "place", "production", "reference_system", "source", "source_translation", "stratigraphic_unit", "type", "tools"]
           }
         }
       },
