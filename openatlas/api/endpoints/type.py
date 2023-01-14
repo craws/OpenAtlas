@@ -64,7 +64,7 @@ class GetTypeOverview(Resource):
             'place': [],
             'value': [],
             'system': [],
-            'anthropology': []}
+            'tools': []}
         for type_ in g.types.values():
             if type_.root:
                 continue

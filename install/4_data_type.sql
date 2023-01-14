@@ -260,7 +260,6 @@ INSERT INTO model.link (property_code, domain_id, range_id) VALUES
   ('P127', (SELECT id FROM model.entity WHERE name='Pelvis'), (SELECT id FROM model.entity WHERE name='Features for sexing')),
   ('P127', (SELECT id FROM model.entity WHERE name='Robusticity'), (SELECT id FROM model.entity WHERE name='Features for sexing'));
 
-
 INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name) VALUES
   ('E55', 'type_anthropology', 'Glabella'),
   ('E55', 'type_anthropology', 'Arcus superciliaris'),
