@@ -24,7 +24,7 @@ class GetContent(Resource):
             'imageSizes': app.config['IMAGE_SIZE'],
             'legalNotice': get_translation('legal_notice_for_frontend', lang)}
         if parser['download']:
-            return download(content, content_template(), 'content')
+            download(content, content_template(), 'content')
         return marshal(content, content_template()), 200
 
 
