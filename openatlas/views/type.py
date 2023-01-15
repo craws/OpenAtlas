@@ -103,7 +103,7 @@ def type_delete_recursive(id_: int) -> Union[str, Response]:
     tabs = {
         'info': Tab(
             'info',
-            content=_(
+            _(
                 'Warning: this type has subs and/or links to entities '
                 '(see tabs). Please check if you want to delete these subs '
                 'and links too.'),

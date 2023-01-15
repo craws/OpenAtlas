@@ -1,7 +1,7 @@
 
 from typing import Union
 
-from flask import flash, json, g, render_template, url_for
+from flask import flash, g, json, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
