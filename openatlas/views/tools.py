@@ -41,8 +41,7 @@ def start_crumbs(entity: Entity):
     return crumbs
 
 
-
-def print_sex_result(entity: Entity) -> str:
+def sex_result(entity: Entity) -> str:
     calculation = SexEstimation.calculate(entity)
     if calculation is None:
         return ''
@@ -53,7 +52,7 @@ def print_sex_result(entity: Entity) -> str:
         f' - {_("corresponds to")} "{name_result(calculation)}"'
 
 
-def print_radio_carbon_result(entity: Entity) -> str:
+def carbon_result(entity: Entity) -> str:
     radiocarbon = ''
     for link_ in entity.get_links('P2'):
         if link_.range.name == 'Radiocarbon':
@@ -72,13 +71,12 @@ def tools_index(id_: int) -> Union[str, Response]:
     tabs = {
         'info': Tab(
             'info',
-            content=
-            print_radio_carbon_result(entity) + print_sex_result(entity),
+            carbon_result(entity) + sex_result(entity),
             buttons=[
                 manual('tools/anthropological_analyses'),
                 button(
                     _('radiocarbon dating'),
-                    url_for('carbon_update', id_=entity.id)),
+                    url_for('carbon', id_=entity.id)),
                 button(_('sex estimation'), url_for('sex', id_=entity.id))])}
     return render_template(
         'tabs.html',
@@ -109,7 +107,7 @@ def sex(id_: int) -> Union[str, Response]:
         entity=entity,
         buttons=buttons,
         data=data,
-        result=print_sex_result(entity),
+        result=sex_result(entity),
         crumbs=start_crumbs(entity) + [
             [_('tools'), url_for('tools_index', id_=entity.id)],
             _('sex estimation')])
@@ -165,6 +163,23 @@ def sex_update(id_: int) -> Union[str, Response]:
             [_('tools'), url_for('tools_index', id_=entity.id)],
             [_('sex estimation'), url_for('sex', id_=entity.id)],
             _('edit')])
+
+
+@app.route('/tools/carbon/<int:id_>')
+@required_group('readonly')
+def carbon(id_: int) -> Union[str, Response]:
+    entity = Entity.get_by_id(id_, types=True)
+    buttons = []  # Needs manual link
+    if is_authorized('contributor'):
+        buttons.append(
+            button(_('edit'), url_for('carbon_update', id_=entity.id)))
+    return render_template(
+        'tabs.html',
+        entity=entity,
+        tabs={'info': Tab('info', carbon_result(entity), buttons=buttons)},
+        crumbs=start_crumbs(entity) + [
+            [_('tools'), url_for('tools_index', id_=entity.id)],
+            _('radiocarbon dating')])
 
 
 @app.route('/tools/carbon/update/<int:id_>', methods=['POST', 'GET'])

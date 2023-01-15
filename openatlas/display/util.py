@@ -622,11 +622,11 @@ def display_info(data: dict[str, Union[str, list[str]]]) -> str:
 @app.template_filter()
 def description(entity: Union[Entity, Project, User]) -> str:
     from openatlas.models.entity import Entity
-    from openatlas.views.tools import print_sex_result
+    from openatlas.views.tools import sex_result
     html = ''
     if isinstance(entity, Entity) \
             and entity.class_.name == 'stratigraphic_unit':
-        if result := print_sex_result(entity):
+        if result := sex_result(entity):
             html += f"<p>{result}</p>"
     if not entity.description:
         return html
