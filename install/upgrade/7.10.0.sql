@@ -1,8 +1,10 @@
-
-
-
+-- Upgrade 7.9.x to 7.10.0
+-- Be sure to backup the database and read the upgrade notes before executing.
 
 BEGIN;
+
+-- Raise database version
+UPDATE web.settings SET value = '7.10.0' WHERE name = 'database_version';
 
 -- #1090 Radiocarbon Dating
 UPDATE model.openatlas_class SET name = 'type_tools' WHERE name = 'type_anthropology';
