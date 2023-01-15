@@ -3,7 +3,7 @@
 INSERT INTO model.openatlas_class (name, cidoc_class_code, alias_allowed, reference_system_allowed, new_types_allowed, write_access_group_name, layout_color, layout_icon, standard_type_id) VALUES
   ('administrative_unit',  'E53', false, false, false, 'contributor', NULL,      'mdi-map-marker', NULL),
   ('type',                 'E55', false, true,  false, 'editor',      NULL,      NULL,             NULL),
-  ('type_anthropology',    'E55', false, false, false, 'admin',       NULL,      NULL,             NULL);
+  ('type_tools',    'E55', false, false, false, 'admin',       NULL,      NULL,             NULL);
 
 INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name, description) VALUES
   ('E55', 'type', 'Bibliography', 'Categories for bibliographical entries as used for example in BibTeX, e.g. Book, Inbook, Article etc.'),
@@ -248,11 +248,11 @@ INSERT INTO model.link (property_code, range_id, domain_id) VALUES
   ('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Weight'));
 
 INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name, description) VALUES
-  ('E55', 'type_anthropology', 'Features for sexing', 'Bone features used for biological sex estimation of human remains.'),
-  ('E55', 'type_anthropology', 'Skull', NULL),
-  ('E55', 'type_anthropology', 'Mandible', NULL),
-  ('E55', 'type_anthropology', 'Pelvis', NULL),
-  ('E55', 'type_anthropology', 'Robusticity', NULL);
+  ('E55', 'type_tools', 'Features for sexing', 'Bone features used for biological sex estimation of human remains.'),
+  ('E55', 'type_tools', 'Skull', NULL),
+  ('E55', 'type_tools', 'Mandible', NULL),
+  ('E55', 'type_tools', 'Pelvis', NULL),
+  ('E55', 'type_tools', 'Robusticity', NULL);
 
 INSERT INTO model.link (property_code, domain_id, range_id) VALUES
   ('P127', (SELECT id FROM model.entity WHERE name='Skull'), (SELECT id FROM model.entity WHERE name='Features for sexing')),
@@ -261,18 +261,18 @@ INSERT INTO model.link (property_code, domain_id, range_id) VALUES
   ('P127', (SELECT id FROM model.entity WHERE name='Robusticity'), (SELECT id FROM model.entity WHERE name='Features for sexing'));
 
 INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name) VALUES
-  ('E55', 'type_anthropology', 'Glabella'),
-  ('E55', 'type_anthropology', 'Arcus superciliaris'),
-  ('E55', 'type_anthropology', 'Tuber frontalis and parietalis'),
-  ('E55', 'type_anthropology', 'Inclinatio frontalis'),
-  ('E55', 'type_anthropology', 'Processus mastoideus'),
-  ('E55', 'type_anthropology', 'Relief of planum nuchale'),
-  ('E55', 'type_anthropology', 'Protuberantia occipitalis externa'),
-  ('E55', 'type_anthropology', 'Processus zygomaticus'),
-  ('E55', 'type_anthropology', 'Os zygomaticum'),
-  ('E55', 'type_anthropology', 'Crista supramastoideum'),
-  ('E55', 'type_anthropology', 'Margo supraorbitalis'),
-  ('E55', 'type_anthropology', 'Shape of orbita');
+  ('E55', 'type_tools', 'Glabella'),
+  ('E55', 'type_tools', 'Arcus superciliaris'),
+  ('E55', 'type_tools', 'Tuber frontalis and parietalis'),
+  ('E55', 'type_tools', 'Inclinatio frontalis'),
+  ('E55', 'type_tools', 'Processus mastoideus'),
+  ('E55', 'type_tools', 'Relief of planum nuchale'),
+  ('E55', 'type_tools', 'Protuberantia occipitalis externa'),
+  ('E55', 'type_tools', 'Processus zygomaticus'),
+  ('E55', 'type_tools', 'Os zygomaticum'),
+  ('E55', 'type_tools', 'Crista supramastoideum'),
+  ('E55', 'type_tools', 'Margo supraorbitalis'),
+  ('E55', 'type_tools', 'Shape of orbita');
 
 INSERT INTO model.link (property_code, domain_id, range_id) VALUES
   ('P127', (SELECT id FROM model.entity WHERE name='Glabella'), (SELECT id FROM model.entity WHERE name='Skull')),
@@ -289,11 +289,11 @@ INSERT INTO model.link (property_code, domain_id, range_id) VALUES
   ('P127', (SELECT id FROM model.entity WHERE name='Shape of orbita'), (SELECT id FROM model.entity WHERE name='Skull'));
 
 INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name) VALUES
-  ('E55', 'type_anthropology', 'Overall apperence'),
-  ('E55', 'type_anthropology', 'Mentum'),
-  ('E55', 'type_anthropology', 'Angulus'),
-  ('E55', 'type_anthropology', 'Margo inferior (M2)'),
-  ('E55', 'type_anthropology', 'Angle');
+  ('E55', 'type_tools', 'Overall apperence'),
+  ('E55', 'type_tools', 'Mentum'),
+  ('E55', 'type_tools', 'Angulus'),
+  ('E55', 'type_tools', 'Margo inferior (M2)'),
+  ('E55', 'type_tools', 'Angle');
 
 INSERT INTO model.link (property_code, domain_id, range_id) VALUES
   ('P127', (SELECT id FROM model.entity WHERE name='Overall apperence'), (SELECT id FROM model.entity WHERE name='Mandible')),
@@ -303,19 +303,19 @@ INSERT INTO model.link (property_code, domain_id, range_id) VALUES
   ('P127', (SELECT id FROM model.entity WHERE name='Angle'), (SELECT id FROM model.entity WHERE name='Mandible'));
 
 INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name) VALUES
-  ('E55', 'type_anthropology', 'Sulcus praeauricularis'),
-  ('E55', 'type_anthropology', 'Incisura ischiadica major'),
-  ('E55', 'type_anthropology', 'Angulus pubis'),
-  ('E55', 'type_anthropology', 'Arc composé'),
-  ('E55', 'type_anthropology', 'Os coxae'),
-  ('E55', 'type_anthropology', 'Foramen obturatum'),
-  ('E55', 'type_anthropology', 'Corpus ossis ischii'),
-  ('E55', 'type_anthropology', 'Crista iliaca'),
-  ('E55', 'type_anthropology', 'Fossa iliaca'),
-  ('E55', 'type_anthropology', 'Pelvis major'),
-  ('E55', 'type_anthropology', 'Auricular area'),
-  ('E55', 'type_anthropology', 'Sacrum'),
-  ('E55', 'type_anthropology', 'Fossa acetabuli');
+  ('E55', 'type_tools', 'Sulcus praeauricularis'),
+  ('E55', 'type_tools', 'Incisura ischiadica major'),
+  ('E55', 'type_tools', 'Angulus pubis'),
+  ('E55', 'type_tools', 'Arc composé'),
+  ('E55', 'type_tools', 'Os coxae'),
+  ('E55', 'type_tools', 'Foramen obturatum'),
+  ('E55', 'type_tools', 'Corpus ossis ischii'),
+  ('E55', 'type_tools', 'Crista iliaca'),
+  ('E55', 'type_tools', 'Fossa iliaca'),
+  ('E55', 'type_tools', 'Pelvis major'),
+  ('E55', 'type_tools', 'Auricular area'),
+  ('E55', 'type_tools', 'Sacrum'),
+  ('E55', 'type_tools', 'Fossa acetabuli');
 
 INSERT INTO model.link (property_code, domain_id, range_id) VALUES
   ('P127', (SELECT id FROM model.entity WHERE name='Sulcus praeauricularis'), (SELECT id FROM model.entity WHERE name='Pelvis')),
@@ -333,8 +333,8 @@ INSERT INTO model.link (property_code, domain_id, range_id) VALUES
   ('P127', (SELECT id FROM model.entity WHERE name='Fossa acetabuli'), (SELECT id FROM model.entity WHERE name='Pelvis'));
 
 INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name) VALUES
-  ('E55', 'type_anthropology', 'Humerus'),
-  ('E55', 'type_anthropology', 'Femur');
+  ('E55', 'type_tools', 'Humerus'),
+  ('E55', 'type_tools', 'Femur');
 
 INSERT INTO model.link (property_code, domain_id, range_id) VALUES
   ('P127', (SELECT id FROM model.entity WHERE name='Humerus'), (SELECT id FROM model.entity WHERE name='Robusticity')),

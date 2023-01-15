@@ -14,7 +14,7 @@ class Tools:
             JOIN model.link l ON l.range_id = e.id
                 AND l.domain_id = %(id)s
                 AND l.property_code = 'P2'
-                AND e.openatlas_class_name = 'type_anthropology'
+                AND e.openatlas_class_name = 'type_tools'
                 AND e.name != 'Radiocarbon';
             """,
             {'id': id_})
