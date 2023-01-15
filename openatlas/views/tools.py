@@ -13,8 +13,8 @@ from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.util import (
-    button, display_form, display_info, is_authorized, manual, required_group,
-    uc_first)
+    button, display_form, display_info, is_authorized, link, manual,
+    required_group, uc_first)
 from openatlas.models.entity import Entity
 from openatlas.models.tools import SexEstimation, get_sex_types, update_carbon
 
@@ -31,6 +31,15 @@ def name_result(result: float) -> str:
         if result < value:
             return _(label)
     return ''  # pragma: no cover
+
+
+def start_crumbs(entity: Entity):
+    crumbs = [[_('place'), url_for('index', view='place')]]
+    for super_ in entity.get_structure()['supers']:
+        crumbs.append(link(super_))
+    crumbs.append(entity)
+    return crumbs
+
 
 
 def print_sex_result(entity: Entity) -> str:
@@ -75,7 +84,7 @@ def tools_index(id_: int) -> Union[str, Response]:
         'tabs.html',
         tabs=tabs,
         entity=entity,
-        crumbs=[entity, _('anthropological analyses')])
+        crumbs=start_crumbs(entity) + [_('tools')])
 
 
 @app.route('/tools/sex/<int:id_>')
@@ -101,8 +110,7 @@ def sex(id_: int) -> Union[str, Response]:
         buttons=buttons,
         data=data,
         result=print_sex_result(entity),
-        crumbs=[
-            entity,
+        crumbs=start_crumbs(entity) + [
             [_('tools'), url_for('tools_index', id_=entity.id)],
             _('sex estimation')])
 
@@ -153,8 +161,7 @@ def sex_update(id_: int) -> Union[str, Response]:
             form,
             manual_page='tools/anthropological_analyses'),
         entity=entity,
-        crumbs=[
-            entity,
+        crumbs=start_crumbs(entity) + [
             [_('tools'), url_for('tools_index', id_=entity.id)],
             [_('sex estimation'), url_for('sex', id_=entity.id)],
             _('edit')])
@@ -201,8 +208,7 @@ def carbon_update(id_: int) -> Union[str, Response]:
         'content.html',
         entity=entity,
         content=display_form(form),
-        crumbs=[
-            entity,
+        crumbs=start_crumbs(entity) + [
             [_('tools'), url_for('tools_index', id_=entity.id)],
             [_('radiocarbon dating'), url_for('carbon_update', id_=entity.id)],
             _('edit')])

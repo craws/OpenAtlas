@@ -627,9 +627,7 @@ def description(entity: Union[Entity, Project, User]) -> str:
     if isinstance(entity, Entity) \
             and entity.class_.name == 'stratigraphic_unit':
         if result := print_sex_result(entity):
-            html += \
-                "<h2>" + uc_first(_('anthropological analyses')) + '</h2>' \
-                f"<p>{result}</p>"
+            html += f"<p>{result}</p>"
     if not entity.description:
         return html
     label = _('description')
