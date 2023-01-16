@@ -3,7 +3,7 @@ from typing import Any, Optional
 from flask import g, render_template
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
-from wtforms import Field, IntegerField, StringField, FileField
+from wtforms import Field, IntegerField, StringField, FileField, SelectField
 from wtforms.validators import Email
 
 from openatlas import app
@@ -52,7 +52,7 @@ def html_form(
 
         if field.id == 'save':
             field.label.text = uc_first(field.label.text)
-            class_ = app.config['CSS']['button']['primary']
+            class_ = app.config['CSS']['button']['primary'] + ' text-wrap'
             buttons = []
             if manual_page:
                 buttons.append(manual(manual_page))
@@ -64,10 +64,11 @@ def html_form(
             if 'insert_continue_human_remains' in form:
                 buttons.append(
                     form.insert_continue_human_remains(class_=class_))
+            buttons = list(map(lambda x: f'<div class="col-auto">{x}</div>', buttons))
             html += add_row(
                 field,
                 '',  # Setting label to '' keeps the button row label empty
-                f'<div class="toolbar text-wrap">{" ".join(buttons)}</div>')
+                f'<div class="row g-1 align-items-center ">{"".join(buttons)}</div>')
             continue
         if field.type in ['TableField', 'TableMultiField']:
             field.label.text = _(field.label.text.lower())
@@ -86,7 +87,8 @@ def add_row(
         field.label.text += ' *'
     field_css = 'required' if field.flags.required else ''
     field_css += ' integer' if isinstance(field, IntegerField) else ''
-    field_css += f' {app.config["CSS"]["string_field"]}' if isinstance(field, (StringField, FileField)) else ''
+    field_css += f' {app.config["CSS"]["string_field"]}' if isinstance(field, (StringField, SelectField, FileField)) \
+        else ''
 
     for validator in field.validators:
         field_css += ' email' if isinstance(validator, Email) else ''
