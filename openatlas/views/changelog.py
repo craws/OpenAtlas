@@ -17,9 +17,13 @@ def index_changelog() -> str:
 versions = {
     '7.10.0': ['TBA', {
         'feature': {
-            '1921': 'Additional UI translations - Spanish and Catalan'
+            '1921': 'Additional UI translations - Spanish and Catalan',
+            '1701': 'API: documentation in manual'
         }
     }],
+    '7.9.2': ['2023-01-09', {
+        'fix': {
+            '1926': 'Broken external reference system links'}}],
     '7.9.1': ['2023-01-02', {
         'fix': {
             '1919': 'Minor display issues'}}],

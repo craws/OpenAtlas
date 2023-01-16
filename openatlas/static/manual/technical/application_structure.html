@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Form &mdash; OpenAtlas 7.7.0 documentation</title>
+  <title>Application Structure &mdash; OpenAtlas 7.9.0 documentation</title>
   
 
   
@@ -36,8 +36,8 @@
 
     
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Name" href="name.html" />
-    <link rel="prev" title="Reference System" href="../entity/reference_system.html" /> 
+    <link rel="next" title="Database Structure" href="database_structure.html" />
+    <link rel="prev" title="Version 1.0" href="api_version1_0.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                7.7.0
+                7.9.0
               </div>
             
           
@@ -91,18 +91,18 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">Features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../entity/index.html">Entity</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Form</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="name.html">Name</a></li>
-<li class="toctree-l2"><a class="reference internal" href="alias.html">Alias</a></li>
-<li class="toctree-l2"><a class="reference internal" href="date.html">Date</a></li>
-<li class="toctree-l2"><a class="reference internal" href="description.html">Description</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ui/index.html">UI Elements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../model/index.html">Model</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Technical</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Application Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database_structure.html">Database Structure</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ui/index.html">UI Elements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../troubleshooting/index.html">Troubleshooting</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
@@ -154,7 +154,9 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Form</li>
+          <li><a href="index.html">Technical</a> &raquo;</li>
+        
+      <li>Application Structure</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -171,25 +173,69 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="form">
-<h1>Form<a class="headerlink" href="#form" title="Permalink to this headline">¶</a></h1>
-<p>Forms are used for data entry. asterisk. Required fields are marked with an asterisk *.</p>
+  <div class="section" id="application-structure">
+<h1>Application Structure<a class="headerlink" href="#application-structure" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="name.html">Name</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="alias.html">Alias</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="date.html">Date</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="description.html">Description</a><ul class="simple">
-</ul>
-</li>
-</ul>
 </div>
+<p>The website’s software is written in <a class="reference external" href="https://www.python.org/">Python</a> and
+uses the <a class="reference external" href="https://palletsprojects.com/p/flask/">Flask</a> framework.
+Below you find an overview of the file structure:</p>
+<ul>
+<li><p><strong>config</strong> - default configuration</p></li>
+<li><p><strong>files</strong>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>export</strong> - files generated from SQL</p></li>
+<li><p><strong>processed images</strong> - smaller generated files which are more suitable
+for web browsers</p></li>
+<li><p><strong>uploads</strong> - files uploaded by users</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>install</strong> - contains e.g. SQL files for installation:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>crm</strong> - used to import the CIDOC CRM, not needed for application to run</p></li>
+<li><p><strong>upgrade</strong> - SQL upgrade files and information how to upgrade</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>instance</strong> - configuration files</p></li>
+<li><p><strong>openatlas</strong>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>api</strong></p></li>
+<li><p><strong>database</strong> - the SQL code lives here</p></li>
+<li><p><strong>display</strong> - display manager and utility functions</p></li>
+<li><p><strong>forms</strong> - form manager and other forms related files</p></li>
+<li><p><strong>models</strong> - classes used in the application</p></li>
+<li><p><strong>static</strong> - the web root containing CSS, JavaScript, layout images,
+etc.</p></li>
+<li><p><strong>templates</strong> - HTML template files</p></li>
+<li><p><strong>translations</strong> - source and compiled files for translations</p></li>
+<li><p><strong>views</strong> - files concerning routing, redirects, etc.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>sphinx</strong> - source files for the user manual, used with
+<a class="reference external" href="https://www.sphinx-doc.org/en/master/">Sphinx</a></p></li>
+<li><p><strong>test</strong></p></li>
+</ul>
+<p>To retrace for example a call that was made from a web browser such as
+/entity/15883</p>
+<ul class="simple">
+<li><p><strong>openatlas/init.py</strong> is processed and <strong>before_request()</strong> is executed</p></li>
+<li><p>The URL is resolved and a function in <strong>views</strong> is called, in this case
+<strong>view()</strong> from <strong>openatlas/views/entity.py</strong></p></li>
+<li><p>Most often some model information is needed, in this case <strong>get_by_id()</strong>
+in <strong>openatlas/models/entity.py</strong></p></li>
+<li><p>All SQL is located in database, so in this case <strong>get_by_id()</strong> in
+<strong>openatlas/database/entity.py</strong> is called</p></li>
+<li><p>A template is called from the view, in this case
+<strong>openatlas/templates/entity/view.html</strong></p></li>
+<li><p>The template may use filters defined in <strong>openatlas/display/util.py</strong>
+like: some_data|some_filter</p></li>
+</ul>
 </div>
 
 
@@ -198,8 +244,8 @@
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="name.html" class="btn btn-neutral float-right" title="Name" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="../entity/reference_system.html" class="btn btn-neutral float-left" title="Reference System" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="database_structure.html" class="btn btn-neutral float-right" title="Database Structure" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="api_version1_0.html" class="btn btn-neutral float-left" title="Version 1.0" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

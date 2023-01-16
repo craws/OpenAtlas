@@ -73,6 +73,10 @@ class FilterDelimiterError(Exception):
     pass
 
 
+class DisplayFileNotFoundError(Exception):
+    pass
+
+
 class FilterLogicalOperatorError(Exception):
     pass
 
@@ -236,6 +240,11 @@ errors = {
         "message": "The give ID is not a place. Please provide a valid place "
                    "ID",
         "title": "ID is not a place",
+        "timestamp": datetime.datetime.now(),
+        "status": 404},
+    "DisplayFileNotFoundError": {
+        "message": "For the given ID not file could be retrieved",
+        "title": "File not found",
         "timestamp": datetime.datetime.now(),
         "status": 404}
 }

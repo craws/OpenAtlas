@@ -15,11 +15,12 @@ from openatlas.models.link import Link
 from openatlas.models.reference_system import ReferenceSystem
 
 
-def get_license(entity: Entity) -> Optional[str]:
+def get_license_name(entity: Entity) -> Optional[str]:
+    license_ = ''
     for type_ in entity.types:
         if g.types[type_.root[0]].name == 'License':
-            return type_.name
-    return None
+            license_ = type_.name
+    return license_
 
 
 def to_camel_case(i: str) -> str:
