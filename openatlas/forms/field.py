@@ -44,7 +44,7 @@ class ValueTypeRoot(Input):
             *args: Any,
             **kwargs: Any) -> RemovableListInput:
         type_ = g.types[field.type_id]
-        return HTMLString(f'{ value_type_expand_icon(type_)}')
+        return HTMLString(f'{value_type_expand_icon(type_)}')
 
 
 class ValueTypeRootField(FloatField):
@@ -73,11 +73,12 @@ class ValueTypeInput(TextInput):
         return HTMLString(f'''
         <div class="d-flex align-items-end" >
                 <div class="text-end d-flex justify-content-end align-items-end pe-2" style="width:{padding}rem">
-                { value_type_expand_icon(type_) if type_.subs else ''}</div>
+                {value_type_expand_icon(type_) if type_.subs else ''}</div>
                   <div class="width-full">
                     <label class="mb-1" for="{field.id}">{type_.name}</label>
                     <div class="input-group">
-                      <input type="text" class="{ app.config['CSS']['string_field'] } value-type" name="{field.id}" id="{field.id}" 
+                      <input type="text" class="{app.config['CSS']['string_field']} 
+                        value-type" name="{field.id}" id="{field.id}" 
                              value="{field.data or ''}" />
                       {unit_text if type_.description else ''}
                     </div>
@@ -180,6 +181,7 @@ class TableMultiField(HiddenField):
             **kwargs: Any) -> None:
         super().__init__(label, validators, **kwargs)
         self.filter_ids = filter_ids or []
+
     widget = TableMultiSelect()
 
 
@@ -240,6 +242,7 @@ class TableField(HiddenField):
         self.related_tables = related_tables or []
         self.add_dynamical = \
             (add_dynamic or []) if is_authorized('editor') else []
+
     widget = TableSelect()
 
 
@@ -342,6 +345,5 @@ class CustomField(Field):
 
 
 def generate_password_field() -> CustomField:
-    return CustomField('',
-             content=f'''<span class="uc-first {app.config["CSS"]["button"]["primary"]}" 
+    return CustomField('', content=f'''<span class="uc-first {app.config["CSS"]["button"]["primary"]}" 
              id="generate-password">{_("generate password")}</span>''')

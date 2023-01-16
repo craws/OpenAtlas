@@ -38,9 +38,8 @@ def populate_reference_systems(manager: Any) -> None:
         if field.id.startswith('reference_system_id_'):
             system_id = int(field.id.replace('reference_system_id_', ''))
             if system_id in system_links:
-                field.data = {}
-                field.data['value'] = system_links[system_id].description
-                field.data['precision'] = str(system_links[system_id].type.id)
+                field.data = {'value': system_links[system_id].description,
+                              'precision': str(system_links[system_id].type.id)}
 
 
 def populate_dates(manager: Any) -> None:
