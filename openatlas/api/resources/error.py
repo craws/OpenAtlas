@@ -178,12 +178,6 @@ errors = {
         "title": "Access Denied Error",
         "timestamp": datetime.datetime.now(),
         "status": 403},
-    "MethodNotAllowedError": {
-        "message": "This method is not allowed for this path."
-                   " Please confer the manual.",
-        "title": "Method not Allowed Error",
-        "timestamp": datetime.datetime.now(),
-        "status": 405},
     "QueryEmptyError": {
         "message": "Query path needs one or more parameter:"
                    " classes, codes or entities.",
