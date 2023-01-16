@@ -327,3 +327,21 @@ class DragNDropField(FileField):
 
     def process_formdata(self, valuelist: list[str]) -> None:
         self.data = valuelist
+
+
+class CustomField(Field):
+
+    def __init__(
+            self,
+            label: str,
+            content: str,
+            validators: Any = None,
+            **kwargs: Any) -> None:
+        super().__init__(label, validators, **kwargs)
+        self.content = content
+
+
+def generate_password_field() -> CustomField:
+    return CustomField('',
+             content=f'''<span class="uc-first {app.config["CSS"]["button"]["primary"]}" 
+             id="generate-password">{_("generate password")}</span>''')

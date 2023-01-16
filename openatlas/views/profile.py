@@ -16,6 +16,7 @@ from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.util import (
     button, display_form, display_info, manual, uc_first)
+from openatlas.forms.field import generate_password_field
 from openatlas.forms.setting import DisplayForm, ModulesForm, ProfileForm
 from openatlas.forms.util import get_form_settings, set_form_settings
 
@@ -24,6 +25,7 @@ class PasswordForm(FlaskForm):
     password_old = PasswordField(_('old password'), [InputRequired()])
     password = PasswordField(_('password'), [InputRequired()])
     password2 = PasswordField(_('repeat password'), [InputRequired()])
+    generate_password = generate_password_field()
     show_passwords = BooleanField(_('show passwords'))
     save = SubmitField(_('save'))
 
