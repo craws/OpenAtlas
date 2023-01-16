@@ -1,5 +1,6 @@
 <tr class="table-row {{ row_css }}">
-  <td class="fit-width pt-3 text-end">
+  <td class="fit-width">
+  <div style="height:31px" class="d-flex align-items-center justify-content-end text-end">
     <label>
       {% if label is string %}
         {{ label|safe }}
@@ -8,13 +9,14 @@
       {% endif %}
       {{ field.description|tooltip|safe }}
     </label>
+  </div>
   </td>
-  <td>
+  <td class="align-middle">
     <div>
       {% if value %}
         {{ value|safe }}
       {% else %}
-        {{ field(class_=field_css + ' mb-2')|safe }}
+        {{ field(class_=field_css)|safe }}
       {% endif %}
       {% if field.errors %}
         <span class="error">

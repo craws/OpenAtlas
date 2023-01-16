@@ -66,7 +66,7 @@ $(document).ready(function () {
     /* Hide value type fields with class* wildcard selector */
     $('[class*="value-type-switch"]').addClass('display-none');
 
-    $('label[for="show_passwords"]').css('display', 'block');
+    // $('label[for="show_passwords"]').css('display', 'block');
     $('#show_passwords').show()
 
     .change(function () {

@@ -5,6 +5,9 @@ a{
     font-weight: bold;
     text-decoration: none;
 }
+h1, h2, h3 {
+    font-size: 100%;
+}
 
 h1 {
     font-weight: bold;
@@ -17,9 +20,7 @@ h2 {
     margin: 1em 0;
 }
 
-p {
-    margin: 0.5em 0 1em;
-}
+
 .toolbar{
     margin-bottom: 1rem;
 }
