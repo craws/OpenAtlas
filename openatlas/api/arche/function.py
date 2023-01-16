@@ -71,8 +71,6 @@ def get_or_create_type(super_: Union[str, Type], type_name: str) -> Type:
     type_ = get_type_by_name(type_name)
     if not type_:
         type_ = Entity.insert('type', type_name)
-        print(type_.name)
-        print(super_.name)
         type_.link('P127', super_)
     return type_
 
