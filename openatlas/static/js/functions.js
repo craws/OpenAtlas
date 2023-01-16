@@ -278,7 +278,7 @@ function selectFromTreeMulti(name, value_type = false) {
       checkedNames.push(type_['text']);
     }
   });
-  $("#" + name + "-selection").html(checkedNames.map(x => `<span class="badge bg-gray text-black me-1"> ${x}</span>`));
+  $("#" + name + "-selection").html(checkedNames.map(x => `<span class="badge bg-gray text-black col-auto ms-1"> ${x}</span>`));
   if (ids.length > 0) {
     $("#" + name).val('[' + ids + ']');
   } else {
@@ -305,7 +305,7 @@ function selectFromTableMulti(name) {
         ids.push($(this).attr('id'));
       }
     });
-  $('#' + name + '-selection').html(checkedNames.map(x => `<span class="badge bg-gray text-black  mt-1 me-1"> ${x}</span>`));
+  $('#' + name + '-selection').html(checkedNames.map(x => `<span class="badge bg-gray text-black col-auto ms-1"> ${x}</span>`));
   $('#' + name).val(ids.length > 0 ? '[' + ids + ']' : '').trigger('change');
 }
 
@@ -425,7 +425,7 @@ function addListElement(id){
       newField.innerHTML = `
                             <div class="d-flex">
                                 <input id="${id}-${lastId + 1}"  name="${id}-${lastId + 1}" class="form-control form-control-sm" type="text"/>
-                                <button onclick="removeListField('${id}-${lastId + 1}')" type="button" class="btn btn-sm btn-secondary ms-1"><icon class="fa fa-minus"></icon></button>
+                                <button onclick="removeListField('${id}-${lastId + 1}')" type="button" class="${style.button.secondary} ms-1"><icon class="fa fa-minus"></icon></button>
                             </div>`
       list.appendChild(newField)
 }
@@ -438,6 +438,6 @@ function removeListField(id){
 
 function addGeneratePasswordButton(){
        $("#show_passwords").after(function() {
-        return`<span class="${css.button.primary} ms-1" id="generate-password">${generatePassword}</span>`;
+        return`<span class="${style.button.primary} ms-1" id="generate-password">${generatePassword}</span>`;
       });
 }

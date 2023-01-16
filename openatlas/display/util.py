@@ -579,8 +579,10 @@ def button(
 
 @app.template_filter()
 def button_bar(buttons: list[Any]) -> str:
+    def add_col (input:str):
+        return f'<div class="col-auto d-flex align-items-center">{input}</div>'
     return \
-        f'<div class="toolbar">{" ".join([str(b) for b in buttons])}</div>' \
+        f'<div class="row my-2 g-1">{" ".join([str(b) for b in list(map(add_col,buttons))])}</div>' \
         if buttons else ''
 
 
@@ -663,7 +665,7 @@ def manual(site: str) -> str:
         return ''
     return \
         '<a title="' + uc_first("manual") + '" ' \
-        f'href="/static/manual/{site}.html" class="manual" target="_blank" ' \
+        f'href="/static/manual/{site}.html" class="manual d-flex align-items-center" target="_blank" ' \
         'rel="noopener noreferrer"><i class="fs-4 fas fa-book"></i></a>'
 
 

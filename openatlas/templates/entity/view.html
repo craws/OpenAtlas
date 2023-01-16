@@ -7,12 +7,13 @@
         {{ _('Please consult the manual about link duplicates') }}: {{'admin/data_integrity_checks'|manual|safe }}
       </div>
     {% endif %}
-    <h1>{{ entity.name }}</h1>
-    <div class="row g-0">
-      <div class="col-12 col-sm-auto me-sm-2">
+    <div class="row g-1">
+      <div class="col-12"><h1>{{ entity.name }}</h1></div>
+
+      <div class="col-12 col-sm-auto">
       {{ profile_image|safe }}
       </div>
-      <div class="col" style="float:left;">
+      <div class="col">
         {{ info_data|display_info|safe }}
       </div>
     </div>

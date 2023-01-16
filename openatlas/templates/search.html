@@ -37,10 +37,9 @@
             </a>)
             </p>
             {{ form.classes }}
-
-            <div class="toolbar">
-              {{ 'tools/search'|manual|safe }}
-              {{ form.search(class_=config.CSS.button.primary)|safe }}
+            <div class="row g-2 d-flex align-items-center">
+              <div class="col-auto">{{ 'tools/search'|manual|safe }}</div>
+              {{ form.search(class_=config.CSS.button.primary + " col")|safe }}
             </div>
           </div>
         </div>

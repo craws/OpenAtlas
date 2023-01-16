@@ -13,7 +13,7 @@
     {% if view_name == 'file' and not writable %}
       <span class="error">{{ _('directory not writable')|uc_first }}</span>
     {% else %}
-      {{ form|display_form(manual_page='entity/' + view_name)|safe }}
+      <div class="container">{{ form|display_form(manual_page='entity/' + view_name)|safe }}</div>
     {% endif %}
   {% else %}
     <div class="row">

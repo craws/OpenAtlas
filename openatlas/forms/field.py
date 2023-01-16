@@ -77,7 +77,7 @@ class ValueTypeInput(TextInput):
                   <div class="width-full">
                     <label class="mb-1" for="{field.id}">{type_.name}</label>
                     <div class="input-group">
-                      <input type="text" class="{ app.config['CSS']['string_field'] }" name="{field.id}" id="{field.id}" 
+                      <input type="text" class="{ app.config['CSS']['string_field'] } value-type" name="{field.id}" id="{field.id}" 
                              value="{field.data or ''}" />
                       {unit_text if type_.description else ''}
                     </div>

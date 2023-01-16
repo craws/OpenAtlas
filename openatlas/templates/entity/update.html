@@ -9,8 +9,10 @@
     </p>
   {% endif %}
   {% if entity.class_.view not in ['artifact', 'place'] %}
+    <div class="container">
     {{ form|display_form(manual_page='entity/' + entity.class_.view)|safe }}
     {{ entity.class_.view|display_citation_example|safe }}
+    </div>
   {% else %}
     <div class="row">
       <div class="col-lg-4">

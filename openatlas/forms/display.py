@@ -127,38 +127,6 @@ def add_reference_systems(form: Any) -> str:
     return html
 
 
-def add_value_type(
-        form: Any,
-        type_: Type,
-        root: Optional[Type] = None,
-        level: int = 0) -> str:
-    html = ''
-    root = root or type_
-    for sub_id in type_.subs:
-        sub = g.types[sub_id]
-        field = getattr(form, str(sub_id))
-        html += f"""
-        <div class="mt-2 table-row value-type-switch{type_.id}">
-          <div></div>
-          <div class="table-cell">
-            <div class="d-flex">
-              <div
-                  class="d-flex justify-content-between"
-                  style="width:16.15em;">
-                <div class="ms-{level} position-relative text-wrap">
-                  <div class="value-type-expander">{button_icon(sub)}</div>
-                  {sub.name}
-                </div>
-                {field(class_='value-type')}
-              </div>
-              <span class="ms-1">{sub.description or ''}</span>
-            </div>
-            {add_value_type(form, sub, root, level + 1)}
-          </div>
-        </div>"""
-    return html
-
-
 def button_icon(type_: Type) -> str:
     if not type_.subs:
         return ''

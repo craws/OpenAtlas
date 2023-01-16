@@ -4,8 +4,8 @@
     onclick="$('#{{ field.id }}-modal').modal('show')">
     {{ _('change')|uc_first }}
 </span>
-<div id="{{ field.id }}-selection" class="pt-1">
-  {% for s in selection %}<span class="badge bg-gray text-black me-1">{{ s }}</span>{% endfor %}
+<div id="{{ field.id }}-selection" class="pt-1 g-1 row">
+  {% for s in selection %}<span class="badge col-auto bg-gray text-black ms-1">{{ s }}</span>{% endfor %}
 </div>
 <div
     id="{{ field.id }}-modal"
