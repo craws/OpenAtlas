@@ -122,14 +122,14 @@ def import_arche_data() -> int:
             filename = f"{file.id}.{name.rsplit('.', 1)[1].lower()}"
             open(str(app.config['UPLOAD_DIR'] / filename), "wb") \
                 .write(requests.get(item['image_link_thumbnail']).content)
-            file.link('P67', range_=artifact)
+            file.link('P67', artifact)
             count += 1
     return count
 
 
 def get_linked_image(data: list[dict[str, Any]]) -> str:
-    return [image['__uri__']
-            for image in data if str(image['mime'][0]) == 'image/jpeg'][0]
+    return [image['__uri__'] for image in data
+            if str(image['mime'][0]) == 'image/jpeg'][0]
 
 
 def get_or_create_type(hierarchy: Type, type_name: str) -> Type:
@@ -170,29 +170,14 @@ def get_or_create_person(name: str, relevance: Type) -> Entity:
     return entity
 
 
-def get_entries(entries: dict[str, Any], key: str) -> list[str]:
-    return list(set(metadata[key] for metadata in entries.values()))
-
-
-def link_arche_entity_to_type(
-        entity: Entity,
-        types: list[Type],
-        type_name: str) -> None:
-    for type_ in types:
-        if type_.name == type_name:
-            entity.link('P2', type_)
-
-
 def get_or_create_person_types() -> dict[str, Any]:
     hierarchy = get_hierarchy_by_name('Relevance')
     if not hierarchy:
         hierarchy = Entity.insert('type', 'Relevance')
         Type.insert_hierarchy(hierarchy, 'custom', ['person'], True)
-    photographer_type = get_or_create_type(hierarchy, 'Photographer')
-    artist_type = get_or_create_type(hierarchy, 'Graffito artist')
     return {
-        'photographer_type': photographer_type,
-        'artist_type': artist_type}
+        'photographer_type': get_or_create_type(hierarchy, 'Photographer'),
+        'artist_type': get_or_create_type(hierarchy, 'Graffito artist')}
 
 
 def get_arche_reference_system() -> ReferenceSystem:
