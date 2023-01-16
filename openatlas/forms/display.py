@@ -21,10 +21,13 @@ def html_form(
         if field.id.startswith('insert_'):
             continue  # These will be added in combination with other fields
         if isinstance(field, ValueTypeField):
-            html += add_row(field, '', field, row_css=field.selectors)
+            html += add_row(field, '', field(), row_css=field.selectors)
             continue
         if field.type in ['CSRFTokenField', 'HiddenField']:
             html += str(field)
+            continue
+        if field.type in ['CustomField']:
+            html += add_row(field, value=field.content)
             continue
         if field.id.split('_', 1)[0] in ('begin', 'end'):
             if field.id == 'begin_year_from':
@@ -45,8 +48,7 @@ def html_form(
             if 'is_type_form' not in form:
                 tooltip_ = type_.description or ''
                 tooltip_ += "&#013;" + str(_('tooltip_required_type')) \
-                    if field.flags.required \
-                       and current_user.group == 'contributor' else ''
+                    if field.flags.required and current_user.group == 'contributor' else ''
             html += add_row(field, label + tooltip(tooltip_))
             continue
 
@@ -87,8 +89,8 @@ def add_row(
         field.label.text += ' *'
     field_css = 'required' if field.flags.required else ''
     field_css += ' integer' if isinstance(field, IntegerField) else ''
-    field_css += f' {app.config["CSS"]["string_field"]}' if isinstance(field, (StringField, SelectField, FileField)) \
-        else ''
+    field_css += f' {app.config["CSS"]["string_field"]}' \
+        if isinstance(field, (StringField, SelectField, FileField, IntegerField)) else ''
 
     for validator in field.validators:
         field_css += ' email' if isinstance(validator, Email) else ''
@@ -99,32 +101,6 @@ def add_row(
         value=value,
         field_css=field_css,
         row_css=row_css)
-
-
-def add_reference_systems(form: Any) -> str:
-    html = ''
-    switch_class = ''
-    errors = False
-    fields = []
-    for field in form:
-        if field.id.startswith('reference_system_id_'):
-            fields.append(field)
-            if field.errors:
-                errors = True
-    if len(fields) > 3 and not errors:
-        switch_class = 'reference-system-switch'
-        html = render_template('util/reference_system_switch.html')
-    for field in fields:
-        precision_field = getattr(form, field.id.replace('id_', 'precision_'))
-        class_ = field.label.text \
-            if field.label.text in ['GeoNames', 'Wikidata'] else ''
-        html += add_row(
-            field,
-            field.label,
-            f'{field(class_=class_)} {precision_field.label} '
-            f'{precision_field}',
-            row_css=f'external-reference {switch_class}')
-    return html
 
 
 def button_icon(type_: Type) -> str:
