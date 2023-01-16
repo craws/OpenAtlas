@@ -8,7 +8,7 @@ from openatlas.api.resources.model_mapper import (
     get_all_links_of_entities_inverse, get_entities_by_ids)
 from openatlas.api.resources.util import (
     filter_link_list_by_property_codes, get_geometric_collection,
-    get_license, get_reference_systems, remove_duplicate_entities,
+    get_license_name, get_reference_systems, remove_duplicate_entities,
     replace_empty_list_values_in_dict_with_none)
 from openatlas.display.util import get_file_path
 from openatlas.models.entity import Entity
@@ -149,7 +149,7 @@ def get_file(data: dict[str, Any]) -> list[dict[str, Any]]:
             'id': link.domain.id,
             'name': link.domain.name,
             'fileName': path.name if path else None,
-            'license': get_license(link.domain),
+            'license': get_license_name(link.domain),
             'source': link.domain.description or None})
     if data['parser']['format'] == 'xml':
         return [{'file': file} for file in files]
