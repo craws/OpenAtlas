@@ -140,18 +140,19 @@ $(document).ready(function () {
         $("#password2").val(random_password);
     })
 
-    // Adding a generic submit handler to form validation
-    .each(function () {
-        $(this).validate({
-            submitHandler: function (form) {
-                if (this.submitButton.id === "insert_and_continue") $('#continue_').val('yes');
-                if (this.submitButton.id === "insert_continue_sub") $('#continue_').val('sub');
-                if (this.submitButton.id === "insert_continue_human_remains") $('#continue_').val('human_remains');
-                $('input[type="submit"]').prop("disabled", true).val('... in progress');
-                form.submit();
-            },
+        // Adding a generic submit handler to form validation
+        .each(function () {
+            if (!!this.submitButton)
+                $(this).validate({
+                    submitHandler: function (form) {
+                        if (this.submitButton.id === "insert_and_continue") $('#continue_').val('yes');
+                        if (this.submitButton.id === "insert_continue_sub") $('#continue_').val('sub');
+                        if (this.submitButton.id === "insert_continue_human_remains") $('#continue_').val('human_remains');
+                        $('input[type="submit"]').prop("disabled", true).val('... in progress');
+                        form.submit();
+                    },
+                });
         });
-    });
 
     //add required to reference precision if reference is set
     $("[id^=reference_system_value]").on('change', function () {
