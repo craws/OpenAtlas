@@ -59,11 +59,12 @@ form ul, form ol, form li {
     padding: 0;
     margin-bottom: 0.2rem ;
 }
-form li svg.svg-inline--fa{
-    font-size: 0.9rem!important;
-}
 
 /* utilities */
+.uc-first::first-letter {
+    text-transform: uppercase;
+}
+
 .bg-gray{
    background-color: #e9ecef !important
 }
@@ -163,4 +164,22 @@ table.table-no-style tr td{
 /* model */
 img.schema_image {
     width: 500px;
+}
+
+/* js tree */
+.jstree li > a > .jstree-icon {
+    display: none;
+}
+
+.jstree li > a {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* modals */
+.modal-body {
+    overflow: auto;
+    max-height: calc(100vh - 200px);
+    width: 100%;
 }

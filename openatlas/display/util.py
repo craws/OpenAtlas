@@ -663,7 +663,7 @@ def manual(site: str) -> str:
     return \
         '<a title="' + uc_first("manual") + '" ' \
         f'href="/static/manual/{site}.html" class="manual" target="_blank" ' \
-        'rel="noopener noreferrer"><i class="fas fa-book"></i></a>'
+        'rel="noopener noreferrer"><i class="fs-4 fas fa-book"></i></a>'
 
 
 @app.template_filter()
@@ -676,7 +676,7 @@ def display_form(
     multipart = 'enctype="multipart/form-data"' if 'file' in form else ''
     return \
         f'<form method="post" {form_id} {multipart}>' \
-        f'<table class="table table-no-style container">{html_form(form, form_id, manual_page)}' \
+        f'<table class="table table-no-style">{html_form(form, form_id, manual_page)}' \
         f'</table></form>'
 
 

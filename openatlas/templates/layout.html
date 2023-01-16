@@ -74,7 +74,7 @@
           {{ entity|display_menu(origin=origin)|safe }}
         {% endif %}
       </div>
-      <div class="navbar-nav">
+      <div class="navbar">
         {% if current_user.is_authenticated %}
           <div id="index-search" class="d-flex items-align-center my-1">
             <form
@@ -85,7 +85,7 @@
               {{ search_form.csrf_token }}
               {{ search_form.term(placeholder=_('search term')|uc_first, class_=config.CSS.string_field) }}
               <button class="btn btn-sm btn-link text-secondary">
-                <i type="submit" class="fas fa-search"></i>
+                <i type="submit" class="fas fa-search fs-4"></i>
               </button>
             </form>
           </div>
