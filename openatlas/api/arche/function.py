@@ -71,6 +71,8 @@ def get_or_create_type(super_: Union[str, Type], type_name: str) -> Type:
     type_ = get_type_by_name(type_name)
     if not type_:
         type_ = Entity.insert('type', type_name)
+        print(type_.name)
+        print(super_.name)
         type_.link('P127', super_)
     return type_
 
@@ -92,20 +94,35 @@ def get_hierarchy_by_name(type_name: str) -> Type:
     return type_
 
 
-def get_license_types(entries: dict[str, Any]) -> list[Type]:
-    license_ids = [metadata['license'] for metadata in entries.values()]
-    return [get_or_create_type('License', license_)
-            for license_ in list(set(license_ids))]
+def get_license_types(licenses: list[str]) -> list[Type]:
+    return [get_or_create_type('License', license_) for license_ in licenses]
 
 
-def get_creators(entries: dict[str, Any]) -> list[Type]:
+def get_creator_type(creators: list[str]) -> list[Type]:
     hierarchy = 'Creator'
     if not get_hierarchy_by_name('Creator'):
         hierarchy = Entity.insert('type', 'Creator')
         Type.insert_hierarchy(hierarchy, 'custom', ['file'], False)
-    creator_ids = [metadata['creator'] for metadata in entries.values()]
-    return [get_or_create_type(hierarchy, creator)
-            for creator in list(set(creator_ids))]
+    return [get_or_create_type(hierarchy, creator) for creator in creators]
+
+
+def get_photographers(creators: list[str]) -> list[Entity]:
+    creator_entities = []
+    for entity in Entity.get_by_cidoc_class('E21', types=True):
+        if entity.name in creators:
+            creator_entities.append(entity)
+            creators.remove(entity.name)
+    if creators:
+        for creator in creators:
+            creator_entities.append(Entity.insert(
+                'person',
+                creator,
+                'Automatically created by ARCHE import'))
+    return creator_entities
+
+
+def get_list_of_entries(entries: dict[str, Any], key: str) -> list[str]:
+    return list(set(metadata[key] for metadata in entries.values()))
 
 
 def link_arche_entity_to_type(
@@ -126,10 +143,16 @@ def import_arche_data() -> list[Entity]:
     for sub_id in Type.get_hierarchy('External reference match').subs:
         if g.types[sub_id].name == 'exact match':
             exact_match_id = sub_id
+    photograph_type = get_or_create_type('Event', 'photograph')
+    photographers = []
+    types = []
     for entries in fetch_arche_data().values():
-        licenses = get_license_types(entries)
-        creator = get_creators(entries)
-        types = licenses + creator
+        licenses = get_license_types(get_list_of_entries(entries, 'license'))
+        creators_list = get_list_of_entries(entries, 'creator')
+        creator_types = get_creator_type(creators_list)
+        photographers = get_photographers(creators_list)
+        types = licenses + creator_types
+    for entries in fetch_arche_data().values():
         for metadata in entries.values():
             name = metadata['name']
 
@@ -161,6 +184,17 @@ def import_arche_data() -> list[Entity]:
                             f'{{"type":"Point", "coordinates": '
                             f'[{metadata["longitude"]},'
                             f'{metadata["latitude"]}]}}'})
+
+            for creator in photographers:
+                if creator.name == metadata['creator']:
+                    event = Entity.insert(
+                        'production',
+                        f'Creation of photography from {name}')
+                    event.link('P7', location)
+                    event.update({'attributes': dates})
+                    event.link('P2', photograph_type)
+                    event.link('P11', creator)
+                    event.link('P108', artifact)
 
             file = Entity.insert(
                 'file',
