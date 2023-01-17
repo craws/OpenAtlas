@@ -16,8 +16,7 @@ class DateTest(TestBaseCase):
                 'begin_year_to': -1948,
                 'end_year_from': 1996,
                 'end_year_to': 1996,
-                self.precision_geonames: '',
-                self.precision_wikidata: ''}
+                }
             rv = self.app.post(
                 url_for('insert', class_='place'),
                 data=data,

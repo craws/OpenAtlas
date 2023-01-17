@@ -16,8 +16,7 @@ class EventTest(TestBaseCase):
                 url_for('insert', class_='place'),
                 data={
                     'name': place_name,
-                    self.precision_geonames: '',
-                    self.precision_wikidata: ''})
+                    })
             residence_id = rv.location.split('/')[-1]
             actor_name = 'Captain Miller'
             with app.test_request_context():
@@ -36,7 +35,7 @@ class EventTest(TestBaseCase):
             data = {
                 'name': 'Event Horizon',
                 'place': residence_id,
-                self.precision_wikidata: ''}
+                }
             rv = self.app.post(
                 url_for('insert', class_='activity', origin_id=reference.id),
                 data=data,
@@ -75,8 +74,8 @@ class EventTest(TestBaseCase):
                     'begin_month_from': '10',
                     'begin_day_from': '8',
                     'end_year_from': '1951',
-                    self.wikidata: 'Q123',
-                    self.precision_wikidata: self.precision_type.subs[0]})
+                    self.wikidata: ['Q123', self.precision_type.subs[0]]
+                })
             event_id = rv.location.split('/')[-1]
 
             rv = self.app.get(url_for('view', id_=event_id))
@@ -90,7 +89,7 @@ class EventTest(TestBaseCase):
                     'place_from': residence_id,
                     'artifact': artifact.id,
                     'person': actor.id,
-                    self.precision_wikidata: ''})
+                    })
             move_id = rv.location.split('/')[-1]
 
             rv = self.app.get(url_for('view', id_=move_id))
@@ -107,7 +106,7 @@ class EventTest(TestBaseCase):
                 data={
                     'name': 'A very productive event',
                     'artifact': artifact.id,
-                    self.precision_wikidata: ''})
+                    })
             production_id = rv.location.split('/')[-1]
             rv = self.app.get(url_for('view', id_=production_id))
             assert b'Artifact' in rv.data
@@ -122,8 +121,7 @@ class EventTest(TestBaseCase):
             self.app.post(url_for('insert', class_='acquisition'), data={
                 'name': event_name3,
                 'given_place': [residence_id],
-                self.precision_geonames: '',
-                self.precision_wikidata: ''})
+                })
             rv = self.app.get(url_for('view', id_=residence_id))
             assert bytes(place_name, 'utf-8') in rv.data
 
@@ -136,8 +134,7 @@ class EventTest(TestBaseCase):
                 data={
                     'name': 'Event Horizon',
                     'continue_': 'yes',
-                    self.precision_geonames: '',
-                    self.precision_wikidata: ''})
+                    })
             assert b'An entry has been created' in rv.data
 
             rv = self.app.get(url_for('index', view='event'))

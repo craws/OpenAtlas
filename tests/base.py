@@ -57,12 +57,8 @@ class TestBaseCase(unittest.TestCase):
                 Type.get_hierarchy('External reference match')
             self.geonames = \
                 f'reference_system_id_{g.reference_system_geonames.id}'
-            self.precision_geonames = \
-                f'reference_system_precision_{g.reference_system_geonames.id}'
             self.wikidata = \
                 f'reference_system_id_{g.reference_system_wikidata.id}'
-            self.precision_wikidata = \
-                f'reference_system_precision_{g.reference_system_wikidata.id}'
 
 
 class ApiTestCase(TestBaseCase):

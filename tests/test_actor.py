@@ -17,8 +17,7 @@ class ActorTests(TestBaseCase):
 
             rv = self.app.post(url_for('insert', class_='place'), data={
                 'name': 'Captain Miller',
-                self.precision_geonames: '',
-                self.precision_wikidata: ''})
+                })
             residence_id = rv.location.split('/')[-1]
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
@@ -60,8 +59,7 @@ class ActorTests(TestBaseCase):
                 'end_hour_to': '13',
                 'end_minute_to': '33',
                 'end_second_to': '37',
-                self.precision_geonames: '',
-                self.precision_wikidata: ''}
+                }
             rv = self.app.post(url_for('insert', class_='person'), data=data)
             actor_id = rv.location.split('/')[-1]
             self.app.post(url_for('insert', class_='group'), data=data)

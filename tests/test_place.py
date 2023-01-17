@@ -34,15 +34,13 @@ class PlaceTest(TestBaseCase):
                 'name': 'Asgard',
                 'alias-0': 'Valhöll',
                 unit_type.id: str([unit_sub1.id, unit_sub2.id]),
-                self.geonames: '123456',
-                self.precision_geonames: self.precision_type.subs[0],
-                self.precision_wikidata: ''}
+                self.geonames: ['123456', self.precision_type.subs[0]]
+            }
             rv = self.app.post(
                 url_for('insert', class_='place', origin_id=reference.id),
                 data=data,
                 follow_redirects=True)
             assert b'Asgard' in rv.data and b'An entry has been' in rv.data
-
             rv = self.app.get(url_for('view', id_=self.precision_type.subs[0]))
             assert b'Asgard' in rv.data
 
@@ -280,9 +278,7 @@ class PlaceTest(TestBaseCase):
             # Subunits
             data = {
                 'name': "Try continue",
-                'continue_': 'sub',
-                self.precision_geonames: self.precision_type.subs[0],
-                self.precision_wikidata: ''}
+                'continue_': 'sub'}
             rv = self.app.post(
                 url_for('insert', class_='place'),
                 data=data,
@@ -332,9 +328,7 @@ class PlaceTest(TestBaseCase):
             data = {
                 'name': 'You never find me',
                 'artifact_super': strati_id,
-                Type.get_hierarchy('Dimensions').subs[0]: 50,
-                self.precision_geonames: self.precision_type.subs[0],
-                self.precision_wikidata: ''}
+                Type.get_hierarchy('Dimensions').subs[0]: 50}
             rv = self.app.post(
                 url_for('insert', class_='artifact', origin_id=strati_id),
                 data=data)
@@ -358,9 +352,8 @@ class PlaceTest(TestBaseCase):
                 'name': 'My human remains',
                 'actor': actor.id,
                 'human_remains_super': strati_id,
-                human_remains_type.id: str([human_remains_type_sub.id]),
-                self.precision_geonames: self.precision_type.subs[0],
-                self.precision_wikidata: ''}
+                human_remains_type.id: str([human_remains_type_sub.id])
+            }
             rv = self.app.post(
                 url_for('insert', class_='human_remains', origin_id=strati_id),
                 data=data)
