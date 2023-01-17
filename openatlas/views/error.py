@@ -4,7 +4,6 @@ from typing import Any
 from flask import jsonify, render_template, request
 
 from openatlas import app
-from openatlas.api.resources.error import MethodNotAllowedError
 
 
 @app.errorhandler(400)
@@ -35,11 +34,6 @@ def page_not_found(e: Exception) -> tuple[Any, int]:
         'error/404.html',
         crumbs=['404 - File not found'],
         e=e), 404
-
-
-@app.errorhandler(405)
-def method_not_allowed(_e: Exception) -> tuple[Any, int]:
-    raise MethodNotAllowedError  # pragma: no cover
 
 
 @app.errorhandler(418)

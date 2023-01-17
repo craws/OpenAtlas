@@ -9,7 +9,7 @@ from openatlas.api.resources.error import (
     InvalidCodeError, InvalidLimitError, InvalidSearchSyntax,
     InvalidSubunitError, InvalidSystemClassError, LastEntityError,
     NoEntityAvailable, NoSearchStringError, NotAPlaceError, QueryEmptyError,
-    TypeIDError, ValueNotIntegerError)
+    TypeIDError, ValueNotIntegerError, DisplayFileNotFoundError)
 from openatlas.api.resources.model_mapper import get_by_cidoc_classes
 from tests.base import ApiTestCase
 
@@ -76,6 +76,10 @@ class Api(ApiTestCase):
                         height = entity
                     if entity.name == 'Change of Property':
                         change_of_property = entity
+                    if entity.name == 'Picture with a License':
+                        file_ = entity
+                    if entity.name == 'File without license':
+                        file_without_licences = entity
 
             # ---Content Endpoints---
             rv = self.app.get(url_for('api_03.class_mapping')).get_json()
@@ -147,9 +151,11 @@ class Api(ApiTestCase):
             assert self.get_bool(
                 links, 'identifier', 'https://www.geonames.org/2761369')
             assert self.get_bool(links, 'referenceSystem', 'GeoNames')
-            assert self.get_bool(rv['geometry'], 'type', 'Point')
+            assert self.get_bool(rv['geometry'], 'type', 'GeometryCollection')
             assert self.get_bool(
-                rv['geometry'], 'coordinates', [16.37069611, 48.208571233])
+                rv['geometry']['geometries'][1],
+                'coordinates',
+                [16.37069611, 48.208571233])
             assert self.get_bool(rv['depictions'][0], '@id')
             assert self.get_bool(
                 rv['depictions'][0], 'title', 'Picture with a License')
@@ -165,7 +171,8 @@ class Api(ApiTestCase):
                     'api_03.entity', id_=place.id, format='geojson-v2'))]:
                 rv = rv.get_json()['features'][0]
             assert self.get_bool(rv['geometry'], 'type')
-            assert self.get_bool(rv['geometry'], 'coordinates')
+            assert self.get_bool(
+                rv['geometry']['geometries'][0], 'coordinates')
             assert self.get_bool(rv['properties'], '@id')
             assert self.get_bool(rv['properties'], 'systemClass')
             assert self.get_bool(rv['properties'], 'name')
@@ -307,7 +314,7 @@ class Api(ApiTestCase):
             assert bool(rv.get_json() == 8)
 
             rv = self.app.get(url_for('api_03.geometric_entities', count=True))
-            assert bool(rv.get_json() == 4)
+            assert bool(rv.get_json() == 6)
 
             # Test entities with GeoJSON Format
             for rv in [
@@ -763,6 +770,15 @@ class Api(ApiTestCase):
                     search='"beginFrom":[{"operator":"lesserThan",'
                            '"values":["2000-1-1"],'
                            '"logicalOperator":"or"}]}'))
+            with self.assertRaises(DisplayFileNotFoundError):
+                self.app.get(url_for(
+                    'api_03.display',
+                    filename=f'{file_.id}.jpg',
+                    download=True))
+            with self.assertRaises(AccessDeniedError):
+                self.app.get(url_for(
+                    'api_03.display',
+                    filename=f'{file_without_licences.id}.jpg'))
 
             assert b'Endpoint not found' in self.app.get('/api/entity2').data
 

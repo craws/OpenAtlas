@@ -8,7 +8,7 @@ from openatlas.api.resources.model_mapper import (
     get_all_links_of_entities_inverse, get_entities_by_ids)
 from openatlas.api.resources.util import (
     filter_link_list_by_property_codes, get_geometric_collection,
-    get_license, get_reference_systems, remove_duplicate_entities,
+    get_license_name, get_reference_systems, remove_duplicate_entities,
     replace_empty_list_values_in_dict_with_none)
 from openatlas.display.util import get_file_path
 from openatlas.models.entity import Entity
@@ -53,29 +53,31 @@ def get_geometries_thanados(
     if parser['format'] == 'xml' and geom:
         if geom['type'] == 'GeometryCollection':
             geometries = []
-            for item in geom['geometries']:  # pragma: no cover
-                item['coordinates'] = check_geometries(item)
+            for item in geom['geometries']:
+                item['coordinates'] = transform_geometries_for_xml(item)
                 geometries.append(item)
             geom['geometries'] = [{'geom': item} for item in geometries]
-            return geom
-        geom['coordinates'] = check_geometries(geom)
-        return geom
+        else:
+            geom['coordinates'] = transform_geometries_for_xml(geom)
     return geom
 
 
-def check_geometries(geom: dict[str, Any]) \
-        -> Union[list[list[dict[str, Any]]], list[dict[str, Any]], None]:
-    if geom['type'] == 'Polygon':  # pragma: no cover
-        return [
-            transform_coordinates(k) for i in geom['coordinates'] for k in i]
-    if geom['type'] == 'LineString':  # pragma: no cover
-        return [transform_coordinates(k) for k in geom['coordinates']]
+def transform_geometries_for_xml(geom: dict[str, Any]) \
+        -> Union[list[list[dict[str, Any]]], list[dict[str, Any]]]:
+    output = []
+    if geom['type'] == 'Polygon':
+        output = [transform_coordinates_for_xml(k)
+                  for i in geom['coordinates'] for k in i]
+    if geom['type'] == 'LineString':
+        output = [
+            transform_coordinates_for_xml(k) for k in geom['coordinates']]
     if geom['type'] == 'Point':
-        return transform_coordinates(geom['coordinates'])
-    return None  # pragma: no cover
+        output = transform_coordinates_for_xml(geom['coordinates'])
+    return output
 
 
-def transform_coordinates(coordinates: list[float]) -> list[dict[str, Any]]:
+def transform_coordinates_for_xml(
+        coordinates: list[float]) -> list[dict[str, Any]]:
     return [
         {'coordinate':
             {'longitude': coordinates[0], 'latitude': coordinates[1]}}]
@@ -147,7 +149,7 @@ def get_file(data: dict[str, Any]) -> list[dict[str, Any]]:
             'id': link.domain.id,
             'name': link.domain.name,
             'fileName': path.name if path else None,
-            'license': get_license(link.domain),
+            'license': get_license_name(link.domain),
             'source': link.domain.description or None})
     if data['parser']['format'] == 'xml':
         return [{'file': file} for file in files]

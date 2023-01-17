@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Name &mdash; OpenAtlas 7.7.0 documentation</title>
+  <title>Database Structure &mdash; OpenAtlas 7.9.0 documentation</title>
   
 
   
@@ -36,8 +36,8 @@
 
     
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Alias" href="alias.html" />
-    <link rel="prev" title="Form" href="index.html" /> 
+    <link rel="next" title="UI Elements" href="../ui/index.html" />
+    <link rel="prev" title="Application Structure" href="application_structure.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                7.7.0
+                7.9.0
               </div>
             
           
@@ -91,18 +91,18 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">Features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../entity/index.html">Entity</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">Form</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Name</a></li>
-<li class="toctree-l2"><a class="reference internal" href="alias.html">Alias</a></li>
-<li class="toctree-l2"><a class="reference internal" href="date.html">Date</a></li>
-<li class="toctree-l2"><a class="reference internal" href="description.html">Description</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ui/index.html">UI Elements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../model/index.html">Model</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Technical</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="application_structure.html">Application Structure</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Database Structure</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ui/index.html">UI Elements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../troubleshooting/index.html">Troubleshooting</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
@@ -154,9 +154,9 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-          <li><a href="index.html">Form</a> &raquo;</li>
+          <li><a href="index.html">Technical</a> &raquo;</li>
         
-      <li>Name</li>
+      <li>Database Structure</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -173,14 +173,19 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="name">
-<h1>Name<a class="headerlink" href="#name" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="database-structure">
+<h1>Database Structure<a class="headerlink" href="#database-structure" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>The name field is one of the few required fields which are marked with an asterisk.</p>
-<p>It’s quite important since it is used to find entries in tables or with the global <a class="reference internal" href="../tools/search.html"><span class="doc">Search</span></a>.</p>
-<p>Duplicate names are allowed but if they don’t differ in e.g. the standard type, it could be
-difficult to find the right one in a table.</p>
+<p>Regarding the database structure, the following PostgreSQL schemas are used:</p>
+<ul class="simple">
+<li><p><strong>import</strong> - to track entities imported via the backend</p></li>
+<li><p><strong>model</strong> - CIDOC specifications (classes, properties) and OpenAtlas classed
+base on them, entities and links</p></li>
+<li><p><strong>public</strong> - general PostgreSQL functionality, e.g. PostGIS functions</p></li>
+<li><p><strong>web</strong> - none model data related to the website, e.g. users with their
+preferences and permissions</p></li>
+</ul>
 </div>
 
 
@@ -189,8 +194,8 @@ difficult to find the right one in a table.</p>
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="alias.html" class="btn btn-neutral float-right" title="Alias" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="index.html" class="btn btn-neutral float-left" title="Form" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../ui/index.html" class="btn btn-neutral float-right" title="UI Elements" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="application_structure.html" class="btn btn-neutral float-left" title="Application Structure" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Description &mdash; OpenAtlas 7.7.0 documentation</title>
+  <title>Version 0.1 &mdash; OpenAtlas 7.9.0 documentation</title>
   
 
   
@@ -36,8 +36,8 @@
 
     
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Tools" href="../tools/index.html" />
-    <link rel="prev" title="Date" href="date.html" /> 
+    <link rel="next" title="Version 1.0" href="api_version1_0.html" />
+    <link rel="prev" title="Version 0.2" href="api_version0_2.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                7.7.0
+                7.9.0
               </div>
             
           
@@ -91,18 +91,18 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">Features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../entity/index.html">Entity</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">Form</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="name.html">Name</a></li>
-<li class="toctree-l2"><a class="reference internal" href="alias.html">Alias</a></li>
-<li class="toctree-l2"><a class="reference internal" href="date.html">Date</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Description</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ui/index.html">UI Elements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../model/index.html">Model</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Technical</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="application_structure.html">Application Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database_structure.html">Database Structure</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ui/index.html">UI Elements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../troubleshooting/index.html">Troubleshooting</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
@@ -154,9 +154,11 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-          <li><a href="index.html">Form</a> &raquo;</li>
+          <li><a href="index.html">Technical</a> &raquo;</li>
         
-      <li>Description</li>
+          <li><a href="api.html">API</a> &raquo;</li>
+        
+      <li>Version 0.1</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -173,19 +175,75 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="description">
-<h1>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="version-0-1">
+<h1>Version 0.1<a class="headerlink" href="#version-0-1" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>CIDOC documentation: <a class="reference external" href="https://www.cidoc-crm.org/Entity/e62-string/version-7.1.1">E62 String</a></p>
-<p>Used to add additional information.</p>
-<ul class="simple">
-<li><p>A description can be searched for in the advanced <a class="reference internal" href="../tools/search.html"><span class="doc">Search</span></a>.</p></li>
-<li><p>Almost all special characters are supported like e.g. Cyrillic characters or
-mathematical symbols.</p></li>
-<li><p>There are no formatting options (except line breaks) to keep data usable for
-different systems.</p></li>
-</ul>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>API endpoint</p></th>
+<th class="head"><p>Possible parameters</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>/api/0.1/entity/{id}</p></td>
+<td></td>
+<td><p>Retrieves all information about a single entity</p></td>
+</tr>
+<tr class="row-odd"><td><p>/api/0.1/entity/download/{id}</p></td>
+<td></td>
+<td><p>Triggers a download function for the specific entity</p></td>
+</tr>
+<tr class="row-even"><td><p>/api/0.1/query/</p></td>
+<td><p>entities, classes, items, limit, column, sort, filter, first, last,
+show, count, download</p></td>
+<td><p>Retrieves a list based on multiple query parameters</p></td>
+</tr>
+<tr class="row-odd"><td><p>/api/0.1/code/{code}</p></td>
+<td><p>limit, column, sort, filter, first, last, show, count, download</p></td>
+<td><p>Retrieves a list of geojson representations which share a menu item</p></td>
+</tr>
+<tr class="row-even"><td><p>/api/0.1/class/{class}</p></td>
+<td><p>limit, column, sort, filter, string, first, last, show, count, download</p></td>
+<td><p>Retrieves a list of geojson representations which share a specified
+class code</p></td>
+</tr>
+<tr class="row-odd"><td><p>/api/0.1/latest/{limit}</p></td>
+<td><p>download</p></td>
+<td><p>Retrieves a list of geojson representations which were edited last</p></td>
+</tr>
+<tr class="row-even"><td><p>/api/0.1/node_entities/{id}</p></td>
+<td><p>count, download</p></td>
+<td><p>Retrieves a list of entities linked to that node</p></td>
+</tr>
+<tr class="row-odd"><td><p>/api/0.1/node_entities_all/{id}</p></td>
+<td><p>count, download</p></td>
+<td><p>Retrieves a list of entities linked to that node and subnode</p></td>
+</tr>
+<tr class="row-even"><td><p>/api/0.1/stratographic_node/{id}</p></td>
+<td><p>count, download</p></td>
+<td><p>Retrieves a list of entities linked to that place as stratigraphy,
+feature, find etc.</p></td>
+</tr>
+<tr class="row-odd"><td><p>/api/0.1/stratographic_node_all/{id}</p></td>
+<td><p>count, download</p></td>
+<td><p>Retrieves a list of all entities and sub entities linked to that place
+as stratigraphy, feature, find etc.</p></td>
+</tr>
+<tr class="row-even"><td><p>/api/0.1/content</p></td>
+<td><p>download, lang</p></td>
+<td><p>Retrieves a detailed list of information on available content
+in an OpenAtlas instance - intro, legal notice, contact, and size of
+processed images</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 
 
@@ -194,8 +252,8 @@ different systems.</p></li>
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="../tools/index.html" class="btn btn-neutral float-right" title="Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="date.html" class="btn btn-neutral float-left" title="Date" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api_version1_0.html" class="btn btn-neutral float-right" title="Version 1.0" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="api_version0_2.html" class="btn btn-neutral float-left" title="Version 0.2" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>
