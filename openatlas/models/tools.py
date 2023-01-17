@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any, Optional, Union
 import json
 from flask import g
 
@@ -12,8 +12,15 @@ def get_sex_types(id_: int) -> list[dict[str, Any]]:
     return Db.get_sex_types(id_)
 
 
-def update_carbon(entity: Entity, data: dict[str, Any]):
-    entity.link('P2', Type.get_hierarchy('Radiocarbon'), json.dumps(data))
+def update_carbon(
+        entity: Entity,
+        data: dict[str, Any],
+        link_: Optional[Link]) -> None:
+    if link_:
+        link_.description = json.dumps(data)
+        link_.update()
+    else:
+        entity.link('P2', Type.get_hierarchy('Radiocarbon'), json.dumps(data))
 
 
 class SexEstimation:

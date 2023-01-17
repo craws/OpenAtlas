@@ -1,7 +1,7 @@
 
-from typing import Union
+from typing import Optional, Union
 
-from flask import flash, g, json, render_template, url_for
+from flask import flash, g, json, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
@@ -14,8 +14,9 @@ from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.util import (
     button, display_form, display_info, is_authorized, link, manual,
-    required_group, uc_first)
+    remove_link, required_group, uc_first)
 from openatlas.models.entity import Entity
+from openatlas.models.link import Link
 from openatlas.models.tools import SexEstimation, get_sex_types, update_carbon
 
 
@@ -52,16 +53,18 @@ def sex_result(entity: Entity) -> str:
         f' - {_("corresponds to")} "{name_result(calculation)}"'
 
 
-def carbon_result(entity: Entity) -> str:
-    radiocarbon = ''
+def get_carbon_result(entity: Entity) -> str:
+    if link_ := get_carbon_link(entity):
+        return '<h1>' + uc_first(_('radiocarbon dating')) + '</h1>' + \
+               display_info(json.loads(link_.description))
+    return ''
+
+
+def get_carbon_link(entity: Entity) -> Optional[Link]:
     for link_ in entity.get_links('P2'):
         if link_.range.name == 'Radiocarbon':
-            radiocarbon = link_.description
-    html = ''
-    if radiocarbon:
-        html = '<h1>' + uc_first(_('radiocarbon dating')) + '</h1>' + \
-               display_info(json.loads(radiocarbon))
-    return html
+            return link_
+    return
 
 
 @app.route('/tools/index/<int:id_>')
@@ -71,7 +74,7 @@ def tools_index(id_: int) -> Union[str, Response]:
     tabs = {
         'info': Tab(
             'info',
-            carbon_result(entity) + sex_result(entity),
+            get_carbon_result(entity) + sex_result(entity),
             buttons=[
                 manual('tools/anthropological_analyses'),
                 button(
@@ -90,10 +93,16 @@ def tools_index(id_: int) -> Union[str, Response]:
 def sex(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_, types=True)
     buttons = [manual('tools/anthropological_analyses')]
+    types = SexEstimation.get_types(entity)
     if is_authorized('contributor'):
         buttons.append(button(_('edit'), url_for('sex_update', id_=entity.id)))
+        if types:
+            buttons.append(button(
+                _('delete'),
+                url_for('sex_delete', id_=id_),
+                onclick="return confirm('" + uc_first(_('delete')) + "?')"))
     data = []
-    for item in SexEstimation.get_types(entity):
+    for item in types:
         type_ = g.types[item['id']]
         feature = SexEstimation.features[type_.name]
         data.append({
@@ -103,14 +112,33 @@ def sex(id_: int) -> Union[str, Response]:
             'option_value': SexEstimation.options[item['description']],
             'value': item['description']})
     return render_template(
-        'tools/sex.html',
+        'tabs.html',
         entity=entity,
-        buttons=buttons,
-        data=data,
-        result=sex_result(entity),
+        tabs={'info': Tab(
+            _('sex estimation'),
+            render_template(
+                'tools/sex.html',
+                data=data,
+                result=sex_result(entity)),
+            buttons=buttons)},
         crumbs=start_crumbs(entity) + [
             [_('tools'), url_for('tools_index', id_=entity.id)],
             _('sex estimation')])
+
+
+@app.route('/tools/sex/delete/<int:id_>')
+@required_group('contributor')
+def sex_delete(id_: int) -> Union[str, Response]:
+    try:
+        Transaction.begin()
+        for dict_ in get_sex_types(id_):
+            Link.delete_(dict_['link_id'])
+        Transaction.commit()
+    except Exception as e:  # pragma: no cover
+        Transaction.rollback()
+        g.logger.log('error', 'database', 'transaction failed', e)
+        flash(_('error transaction'), 'error')
+    return redirect(url_for('tools_index', id_=id_))
 
 
 @app.route('/tools/sex/update/<int:id_>', methods=['POST', 'GET'])
@@ -154,10 +182,10 @@ def sex_update(id_: int) -> Union[str, Response]:
     for dict_ in types:
         getattr(form, g.types[dict_['id']].name).data = dict_['description']
     return render_template(
-        'content.html',
-        content=display_form(
-            form,
-            manual_page='tools/anthropological_analyses'),
+        'tabs.html',
+        tabs={'info': Tab(
+            _('sex estimation'),
+            display_form(form, manual_page='tools/anthropological_analyses'))},
         entity=entity,
         crumbs=start_crumbs(entity) + [
             [_('tools'), url_for('tools_index', id_=entity.id)],
@@ -169,14 +197,20 @@ def sex_update(id_: int) -> Union[str, Response]:
 @required_group('readonly')
 def carbon(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_, types=True)
-    buttons = []  # Needs manual link
+    buttons = []  # Todo: add manual link
     if is_authorized('contributor'):
         buttons.append(
             button(_('edit'), url_for('carbon_update', id_=entity.id)))
+        if link_ := get_carbon_link(entity):
+            buttons.append(remove_link(_('radiocarbon dating'), link_, entity))
     return render_template(
         'tabs.html',
         entity=entity,
-        tabs={'info': Tab('info', carbon_result(entity), buttons=buttons)},
+        tabs={
+            'info': Tab(
+                _('radiocarbon dating'),
+                get_carbon_result(entity),
+                buttons=buttons)},
         crumbs=start_crumbs(entity) + [
             [_('tools'), url_for('tools_index', id_=entity.id)],
             _('radiocarbon dating')])
@@ -207,6 +241,7 @@ def carbon_update(id_: int) -> Union[str, Response]:
 
     entity = Entity.get_by_id(id_)
     form = Form()
+    carbon_link = get_carbon_link(entity)
     if form.validate_on_submit():
         update_carbon(
             entity,
@@ -215,14 +250,20 @@ def carbon_update(id_: int) -> Union[str, Response]:
                 'specId': form.spec_id.data,
                 'radiocarbonYear': form.radiocarbon_year.data,
                 'range': form.range.data,
-                'timeScale': 'BP'})
+                'timeScale': 'BP'},
+            link_=carbon_link)
         flash(_('entity updated'), 'info')
         return redirect(url_for('tools_index', id_=entity.id))
-
+    if request.method == 'GET' and carbon_link:
+        data = json.loads(carbon_link.description)
+        form.lab_id.data = data['labId']
+        form.spec_id.data = data['specId']
+        form.radiocarbon_year.data = data['radiocarbonYear']
+        form.range.data = data['range']
     return render_template(
-        'content.html',
+        'tabs.html',
         entity=entity,
-        content=display_form(form),
+        tabs={'info': Tab(_('radiocarbon dating'), display_form(form))},
         crumbs=start_crumbs(entity) + [
             [_('tools'), url_for('tools_index', id_=entity.id)],
             [_('radiocarbon dating'), url_for('carbon_update', id_=entity.id)],
