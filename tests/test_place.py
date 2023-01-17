@@ -410,6 +410,27 @@ class PlaceTest(TestBaseCase):
             assert b'Glabella' in rv.data
 
             rv = self.app.post(
+                url_for('carbon_update', id_=strati_id),
+                data={
+                    'lab_id': 'VERA',
+                    'spec_id': 'S',
+                    'radiocarbon_year': 1,
+                    'range': 1},
+                follow_redirects=True)
+            assert b'Entity updated' in rv.data
+
+            rv = self.app.get(url_for('carbon_update', id_=strati_id))
+            assert b'VERA' in rv.data
+
+            rv = self.app.get(url_for('carbon', id_=strati_id))
+            assert b'VERA' in rv.data
+
+            rv = self.app.get(
+                url_for('sex_delete', id_=strati_id),
+                follow_redirects=True)
+            assert b'Tools' in rv.data
+
+            rv = self.app.post(
                 url_for('update', id_=strati_id),
                 data={'name': 'New name'},
                 follow_redirects=True)
