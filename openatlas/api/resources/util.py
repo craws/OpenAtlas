@@ -124,6 +124,9 @@ def remove_duplicate_entities(entities: list[Entity]) -> list[Entity]:
         if not (entity.id in seen or seen_add(entity.id))]
 
 
+def remove_spaces_dashes(string: str) -> str:
+    return string.replace(' ', '').replace('-', '')
+
 def link_parser_check(
         entities: list[Entity],
         parser: dict[str, Any]) -> list[Link]:
