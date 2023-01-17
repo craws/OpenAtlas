@@ -4,7 +4,7 @@ from flask import g, url_for
 
 from openatlas import app
 from openatlas.api.resources.util import (
-    get_geometric_collection, get_license, get_reference_systems,
+    get_geometric_collection, get_license_name, get_reference_systems,
     replace_empty_list_values_in_dict_with_none, to_camel_case)
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -97,7 +97,7 @@ def get_lp_file(links_inverse: list[Link]) -> list[dict[str, str]]:
                 id_=link.domain.id,
                 _external=True),
             'title': link.domain.name,
-            'license': get_license(link.domain),
+            'license': get_license_name(link.domain),
             'url': url_for(
                 'api.display',
                 filename=path.name,
