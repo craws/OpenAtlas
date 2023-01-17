@@ -18,6 +18,8 @@ def html_form(
         manual_page: Optional[str] = None) -> str:
     html = ''
     reference_systems_added = False
+    reference_systems_fields = list(filter(lambda x: x.id.startswith('reference_system_id_'), form))
+    reference_systems_fields_errors = any([f.errors for f in reference_systems_fields])
     for field in form:
         if field.id.startswith('insert_'):
             continue  # These will be added in combination with other fields
@@ -30,14 +32,15 @@ def html_form(
         if field.type in ['CustomField']:
             html += add_row(field, value=field.content)
             continue
-        if field.id.startswith("reference_system") and not reference_systems_added:
-            reference_systems_added = True
-            reference_systems_fields = list(filter(lambda x: x.id.startswith('reference_system_id_'), form))
-            err = any([f.errors for f in reference_systems_fields])
-            if len(reference_systems_fields) > 3 and not err:
-                html += add_row(None, uc_first(_('reference system')),
-                                f'''<span id="reference-system-switcher" 
-                                class="uc-first {app.config["CSS"]["button"]["secondary"]}"> {_("show")} </span>''')
+        if field.id.startswith("reference_system"):
+            if len(reference_systems_fields) > 3 and not reference_systems_fields_errors:
+                if not reference_systems_added:
+                    reference_systems_added = True
+                    html += add_row(None, uc_first(_('reference system')),
+                                    f'''<span id="reference-system-switcher" 
+                                    class="uc-first {app.config["CSS"]["button"]["secondary"]}"> {_("show")} </span>''')
+                html += add_row(field, row_css="d-none")
+                continue
         if field.id.split('_', 1)[0] in ('begin', 'end'):
             if field.id == 'begin_year_from':
                 html += add_dates(form)

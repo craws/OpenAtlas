@@ -47,7 +47,6 @@ $(document).ready(function () {
             return $.trim(text) === show ? hide : show;
         })
     });
-    $('.reference-system-switch').addClass('d-none');
 
     /* Show and hide function for date input fields */
     $("#date-switcher").click(function () {
