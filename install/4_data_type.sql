@@ -249,6 +249,7 @@ INSERT INTO model.link (property_code, range_id, domain_id) VALUES
 
 INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name, description) VALUES
   ('E55', 'type_tools', 'Features for sexing', 'Bone features used for biological sex estimation of human remains.'),
+  ('E55', 'type_tools', 'Radiocarbon', 'Used for radiocarbon dating'),
   ('E55', 'type_tools', 'Skull', NULL),
   ('E55', 'type_tools', 'Mandible', NULL),
   ('E55', 'type_tools', 'Pelvis', NULL),
@@ -346,6 +347,7 @@ INSERT INTO web.hierarchy (id, name, category, multiple, directional) VALUES
   ((SELECT id FROM model.entity WHERE name='Administrative unit'), 'Administrative unit', 'place', True, False),
   ((SELECT id FROM model.entity WHERE name='Artifact'), 'Artifact', 'standard', False, False),
   ((SELECT id FROM model.entity WHERE name='Bibliography'), 'Bibliography', 'standard', False, False),
+  ((SELECT id FROM model.entity WHERE name='Dimensions'), 'Dimensions', 'value', True, False),
   ((SELECT id FROM model.entity WHERE name='Edition'), 'Edition', 'standard', False, False),
   ((SELECT id FROM model.entity WHERE name='Event'), 'Event', 'standard', False, False),
   ((SELECT id FROM model.entity WHERE name='External reference'), 'External reference', 'standard', False, False),
@@ -356,12 +358,13 @@ INSERT INTO web.hierarchy (id, name, category, multiple, directional) VALUES
   ((SELECT id FROM model.entity WHERE name='Human remains' AND cidoc_class_code = 'E55'), 'Human remains', 'standard', False, False),
   ((SELECT id FROM model.entity WHERE name='Involvement'), 'Involvement', 'standard', False, False),
   ((SELECT id FROM model.entity WHERE name='License'), 'License', 'standard', False, False),
-  ((SELECT id FROM model.entity WHERE name='Source'), 'Source', 'standard', False, False),
   ((SELECT id FROM model.entity WHERE name='Place'), 'Place', 'standard', False, False),
-  ((SELECT id FROM model.entity WHERE name='Stratigraphic unit'), 'Stratigraphic unit', 'standard', False, False),
+  ((SELECT id FROM model.entity WHERE name='Radiocarbon'), 'Radiocarbon', 'tools', False, False),
+  ((SELECT id FROM model.entity WHERE name='Sex'), 'Sex', 'custom', False, False),
+  ((SELECT id FROM model.entity WHERE name='Source'), 'Source', 'standard', False, False),
   ((SELECT id FROM model.entity WHERE name='Source translation'), 'Source translation', 'standard', False, False),
-  ((SELECT id FROM model.entity WHERE name='Dimensions'), 'Dimensions', 'value', True, False),
-  ((SELECT id FROM model.entity WHERE name='Sex'), 'Sex', 'custom', False, False);
+  ((SELECT id FROM model.entity WHERE name='Stratigraphic unit'), 'Stratigraphic unit', 'standard', False, False);
+
 
 INSERT INTO model.openatlas_class (name, cidoc_class_code, alias_allowed, reference_system_allowed, new_types_allowed, write_access_group_name, layout_color, layout_icon, standard_type_id) VALUES
   ('acquisition',          'E8',  false, true,  true,  'contributor', '#0000FF', 'mdi-calendar',   (SELECT id FROM model.entity WHERE name = 'Event' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),

@@ -1,5 +1,5 @@
 
-from typing import Optional, Union
+from typing import Union
 
 from flask import flash, g, json, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -17,7 +17,8 @@ from openatlas.display.util import (
     remove_link, required_group, uc_first)
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.models.tools import SexEstimation, get_sex_types, update_carbon
+from openatlas.models.tools import (
+    SexEstimation, get_carbon_link, get_sex_types, update_carbon)
 
 
 def name_result(result: float) -> str:
@@ -58,13 +59,6 @@ def get_carbon_result(entity: Entity) -> str:
         return '<h1>' + uc_first(_('radiocarbon dating')) + '</h1>' + \
                display_info(json.loads(link_.description))
     return ''
-
-
-def get_carbon_link(entity: Entity) -> Optional[Link]:
-    for link_ in entity.get_links('P2'):
-        if link_.range.name == 'Radiocarbon':
-            return link_
-    return
 
 
 @app.route('/tools/index/<int:id_>')

@@ -1,5 +1,6 @@
-from typing import Any, Optional, Union
 import json
+from typing import Any, Optional, Union
+
 from flask import g
 
 from openatlas.database.tools import Tools as Db
@@ -10,6 +11,13 @@ from openatlas.models.type import Type
 
 def get_sex_types(id_: int) -> list[dict[str, Any]]:
     return Db.get_sex_types(id_)
+
+
+def get_carbon_link(entity: Entity) -> Optional[Link]:
+    for link_ in entity.get_links('P2'):
+        if link_.range.name == 'Radiocarbon':
+            return link_
+    return
 
 
 def update_carbon(
