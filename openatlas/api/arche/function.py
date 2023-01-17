@@ -135,7 +135,8 @@ def get_linked_image(data: list[dict[str, Any]]) -> str:
 def get_or_create_type(hierarchy: Type, type_name: str) -> Type:
     g.types = Type.get_all()
     if type_ := get_type_by_name(type_name):
-        return type_
+        if type_.root[0] == hierarchy.id:
+            return type_
     type_ = Entity.insert('type', type_name)
     type_.link('P127', hierarchy)
     return type_
