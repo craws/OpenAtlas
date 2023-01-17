@@ -126,6 +126,7 @@ class ReferenceField(Field):
         self.choices = choices
         self.reference_system_id = reference_system_id
         self.data = {"value": "", "precision": ""}
+        self.row_css = "reference-system-switch"
 
     def _value(self):
         return self.data

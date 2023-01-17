@@ -42,12 +42,12 @@ $(document).ready(function () {
 
     /* Show and hide function for reference systems */
     $("#reference-system-switcher").click(function () {
-        $(".reference-system-switch").toggleClass('display-none');
+        $(".reference-system-switch").toggleClass('d-none');
         $(this).text(function (i, text) {
             return $.trim(text) === show ? hide : show;
         })
     });
-    $('.reference-system-switch').addClass('display-none');
+    $('.reference-system-switch').addClass('d-none');
 
     /* Show and hide function for date input fields */
     $("#date-switcher").click(function () {

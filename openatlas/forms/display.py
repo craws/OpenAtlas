@@ -17,6 +17,7 @@ def html_form(
         form_id: Optional[str] = None,
         manual_page: Optional[str] = None) -> str:
     html = ''
+    reference_systems_added = False
     for field in form:
         if field.id.startswith('insert_'):
             continue  # These will be added in combination with other fields
@@ -29,6 +30,14 @@ def html_form(
         if field.type in ['CustomField']:
             html += add_row(field, value=field.content)
             continue
+        if field.id.startswith("reference_system") and not reference_systems_added:
+            reference_systems_added = True
+            reference_systems_fields = list(filter(lambda x: x.id.startswith('reference_system_id_'), form))
+            err = any([f.errors for f in reference_systems_fields])
+            if len(reference_systems_fields) > 3 and not err:
+                html += add_row(None, uc_first(_('reference system')),
+                                f'''<span id="reference-system-switcher" 
+                                class="uc-first {app.config["CSS"]["button"]["secondary"]}"> {_("show")} </span>''')
         if field.id.split('_', 1)[0] in ('begin', 'end'):
             if field.id == 'begin_year_from':
                 html += add_dates(form)
@@ -79,21 +88,23 @@ def html_form(
 
 
 def add_row(
-        field: Field,
+        field: Optional[Field],
         label: Optional[str] = None,
         value: Optional[str] = None,
         form_id: Optional[str] = None,
         row_css: Optional[str] = '') -> str:
-    field.label.text = uc_first(field.label.text)
-    if field.flags.required and field.label.text and form_id != 'login-form':
-        field.label.text += ' *'
-    field_css = 'required' if field.flags.required else ''
-    field_css += ' integer' if isinstance(field, IntegerField) else ''
-    field_css += f' {app.config["CSS"]["string_field"]}' \
-        if isinstance(field, (StringField, SelectField, FileField, IntegerField)) else ''
-
-    for validator in field.validators:
-        field_css += ' email' if isinstance(validator, Email) else ''
+    field_css = ""
+    if field:
+        field.label.text = uc_first(field.label.text)
+        if field.flags.required and field.label.text and form_id != 'login-form':
+            field.label.text += ' *'
+        field_css = 'required' if field.flags.required else ''
+        field_css += ' integer' if isinstance(field, IntegerField) else ''
+        field_css += f' {app.config["CSS"]["string_field"]}' \
+            if isinstance(field, (StringField, SelectField, FileField, IntegerField)) else ''
+        row_css += f' {field.row_css if hasattr(field, "row_css") else ""}'
+        for validator in field.validators:
+            field_css += ' email' if isinstance(validator, Email) else ''
     return render_template(
         'forms/form_row.html',
         field=field,
