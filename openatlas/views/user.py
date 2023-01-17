@@ -171,8 +171,8 @@ def user_view(id_: int) -> str:
         tabs={
             'info': Tab(
                 'info',
-                buttons=buttons,
-                content=display_info(info) + description(user))},
+                display_info(info) + description(user),
+                buttons=buttons)},
         title=user.username,
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-user"],

@@ -42,8 +42,8 @@ def note_view(id_: int) -> str:
                 url_for('note_set_private', id_=note['id']))]
     tabs = {'info': Tab(
         'info',
-        buttons=buttons,
-        content=f"<h1>{uc_first(_('note'))}</h1>{note['text']}")}
+        '<h1>' + uc_first(_('note')) + f"</h1>{note['text']}",
+        buttons=buttons)}
     return render_template(
         'tabs.html',
         tabs=tabs,

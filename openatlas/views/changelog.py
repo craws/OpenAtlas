@@ -17,10 +17,14 @@ def index_changelog() -> str:
 versions = {
     '7.10.0': ['TBA', {
         'feature': {
+            '1090': 'Radiocarbon Dating',
             '1921': 'Additional UI translations - Spanish and Catalan',
-            '1701': 'API: documentation in manual'
-        }
-    }],
+            '1933': 'API: Display images without extension in URL',
+            '1814': 'API: more compact API buttons in user interface',
+            '1701': 'Manual: added API documentation',
+            '1929': 'Manual: add database file structure'},
+        'fix': {
+            '1922': 'Missing user interface translations'}}],
     '7.9.2': ['2023-01-09', {
         'fix': {
             '1926': 'Broken external reference system links'}}],

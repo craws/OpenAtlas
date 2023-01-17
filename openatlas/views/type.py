@@ -47,8 +47,8 @@ def type_index() -> str:
         'value': {},
         'system': {}}
     for type_ in [type_ for type_ in g.types.values() if not type_.root]:
-        if type_.category not in types:
-            continue  # remove after anthropology features
+        if type_.category not in types:  # e.g. special types for tools
+            continue  # pragma: no cover
         types[type_.category][type_] = render_template(
             'forms/tree_select_item.html',
             name=sanitize(type_.name),
@@ -103,7 +103,7 @@ def type_delete_recursive(id_: int) -> Union[str, Response]:
     tabs = {
         'info': Tab(
             'info',
-            content=_(
+            _(
                 'Warning: this type has subs and/or links to entities '
                 '(see tabs). Please check if you want to delete these subs '
                 'and links too.'),

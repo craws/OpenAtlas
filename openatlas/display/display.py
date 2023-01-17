@@ -283,7 +283,7 @@ class StratigraphicUnitDisplay(PlaceBaseDisplay):
         super().add_buttons()
         self.buttons.append(button(
             _('tools'),
-            url_for('anthropology_index', id_=self.entity.id)))
+            url_for('tools_index', id_=self.entity.id)))
 
 
 class TypeDisplay(TypeBaseDisplay):

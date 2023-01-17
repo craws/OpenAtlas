@@ -93,9 +93,7 @@ def import_project_view(id_: int) -> str:
     tabs = {
         'info': Tab(
             'info',
-            content=render_template(
-                'import/project_view.html',
-                project=project)),
+            render_template('import/project_view.html', project=project)),
         'entities': Tab(
             'entities',
             table=Table([

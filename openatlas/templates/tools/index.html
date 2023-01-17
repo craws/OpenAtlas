@@ -1,0 +1,8 @@
+{% extends "layout.html" %}
+{% block content %}
+  <h1>{{ _('tools')|uc_first }}: {{ entity.name }}</h1>
+  <h2>{{ _('radiocarbon dating')|uc_first }}</h2>
+  {{ dating_buttons|button_bar }}
+  <h2>{{ _('anthropological analyses')|uc_first }}</h2>
+  {{ sex_buttons|button_bar }}
+{% endblock %}

@@ -38,13 +38,13 @@ def remove_link(
         name: str,
         link_: Link,
         origin: Entity,
-        tab: str) -> Optional[str]:
+        tab: Optional[str] = '') -> Optional[str]:
     if not is_authorized('contributor'):
         return None
     url = url_for('link_delete', id_=link_.id, origin_id=origin.id)
     return link(
         _('remove'),
-        f'{url}#tab-{tab}',
+        f'{url}#tab-{tab}' if tab else url,
         js="return confirm('{x}')".format(
             x=_('Remove %(name)s?', name=name.replace("'", ''))))
 
@@ -64,8 +64,8 @@ def ext_references(links: list[Link]) -> str:
             f'{system.resolver_url}{link_.description}',
             external=True) if system.resolver_url else link_.description
         html += \
-            f' ({g.types[link_.type.id].name} ' + _('at') + \
-            f' {link(link_.domain)})<br>'
+            f' ({ g.types[link_.type.id].name } ' + _('at') + \
+            f' { link(link_.domain) })<br>'
     return html
 
 
@@ -265,8 +265,8 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
         view_name = origin.class_.view
     html = ''
     for item in [
-        'source', 'event', 'actor', 'place', 'artifact', 'reference',
-        'type']:
+            'source', 'event', 'actor', 'place', 'artifact', 'reference',
+            'type']:
         active = ''
         request_parts = request.path.split('/')
         if (view_name == item) or request.path.startswith('/index/' + item):
@@ -341,7 +341,7 @@ def get_backup_file_data() -> dict[str, Any]:
     latest_file_date = None
     for file in [
         f for f in path.iterdir()
-        if (path / f).is_file() and f.name != '.gitignore']:
+            if (path / f).is_file() and f.name != '.gitignore']:
         file_date = datetime.utcfromtimestamp((path / file).stat().st_ctime)
         if not latest_file_date or file_date > latest_file_date:
             latest_file = file
@@ -359,7 +359,7 @@ def get_backup_file_data() -> dict[str, Any]:
 def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
     data: list[Any] = [format_name_and_aliases(entity, show_links)]
     if entity.class_.view in [
-        'actor', 'artifact', 'event', 'place', 'reference']:
+            'actor', 'artifact', 'event', 'place', 'reference']:
         data.append(entity.class_.label)
     if entity.class_.standard_type_id:
         data.append(entity.standard_type.name if entity.standard_type else '')
@@ -625,14 +625,12 @@ def display_info(data: dict[str, Union[str, list[str]]]) -> str:
 @app.template_filter()
 def description(entity: Union[Entity, Project, User]) -> str:
     from openatlas.models.entity import Entity
+    from openatlas.views.tools import sex_result
     html = ''
     if isinstance(entity, Entity) \
             and entity.class_.name == 'stratigraphic_unit':
-        from openatlas.views.anthropology import print_result
-        if result := print_result(entity):
-            html += \
-                "<h2>" + uc_first(_('anthropological analyses')) + '</h2>' \
-                                                                   f"<p>{result}</p>"
+        if result := sex_result(entity):
+            html += f"<p>{result}</p>"
     if not entity.description:
         return html
     label = _('description')
@@ -666,8 +664,8 @@ def manual(site: str) -> str:
         return ''
     return \
         '<a title="' + uc_first("manual") + '" ' \
-                                            f'href="/static/manual/{site}.html" class="manual d-flex align-items-center" target="_blank" ' \
-                                            'rel="noopener noreferrer"><i class="fs-4 fas fa-book"></i></a>'
+        f'href="/static/manual/{site}.html" class="manual" target="_blank" ' \
+        'rel="noopener noreferrer"><i class="fas fa-book"></i></a>'
 
 
 @app.template_filter()

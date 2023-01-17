@@ -18,9 +18,17 @@ def loop_resize_image(name: str, file_format: str) -> None:
 
 
 def safe_resize_image(name: str, file_format: str, size: str) -> bool:
-    if check_if_folder_exist(size, app.config['RESIZED_IMAGES']):
-        return image_resizing(name, file_format, size)
-    return False
+    try:
+        if check_if_folder_exist(size, app.config['RESIZED_IMAGES']):
+            return image_resizing(name, file_format, size)
+        return False  # pragma: no cover
+    except OSError as e:
+        g.logger.log(
+            'info',
+            'image processing',
+            'failed to save resized image',
+            e)
+        return False
 
 
 def image_resizing(name: str, format_: str, size: str) -> bool:
