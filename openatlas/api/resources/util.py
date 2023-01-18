@@ -179,23 +179,26 @@ def get_reference_systems(
 def get_geometric_collection(
         entity: Entity,
         links: list[Link]) -> Union[dict[str, Any], None]:
+    data = None
     if entity.class_.view == 'place' or entity.class_.name == 'artifact':
-        return get_geoms_by_entity(get_location_id(links))
-    if entity.class_.name == 'object_location':
-        return get_geoms_by_entity(entity.id)
-    if entity.class_.view == 'actor':
-        geoms = [Gis.get_by_id(link_.range.id) for link_ in links
-                 if link_.property.code in ['P74', 'OA8', 'OA9']]
-        return {
+        data = get_geoms_by_entity(get_location_id(links))
+    elif entity.class_.name == 'object_location':
+        data = get_geoms_by_entity(entity.id)
+    elif entity.class_.view == 'actor':
+        geoms = [
+            Gis.get_by_id(link_.range.id) for link_ in links
+            if link_.property.code in ['P74', 'OA8', 'OA9']]
+        data = {
             'type': 'GeometryCollection',
             'geometries': [geom for sublist in geoms for geom in sublist]}
-    if entity.class_.view == 'event':
-        geoms = [Gis.get_by_id(link_.range.id) for link_ in links
-                 if link_.property.code in ['P7', 'P26', 'P27']]
-        return {
+    elif entity.class_.view == 'event':
+        geoms = [
+            Gis.get_by_id(link_.range.id) for link_ in links
+            if link_.property.code in ['P7', 'P26', 'P27']]
+        data = {
             'type': 'GeometryCollection',
             'geometries': [geom for sublist in geoms for geom in sublist]}
-    return None
+    return data
 
 
 def get_location_id(links: list[Link]) -> int:
