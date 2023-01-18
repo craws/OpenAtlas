@@ -172,9 +172,13 @@ class User(UserMixin):
                 string.ascii_uppercase + string.digits) for _ in range(length))
 
     @staticmethod
-    def insert_note(entity_id: int, note: str, public: bool) -> None:
-        Db.insert_note(
-            current_user.id,
+    def insert_note(
+            entity_id: int,
+            user_id: int,
+            note: str,
+            public: bool) -> id:
+        return Db.insert_note(
+            user_id,
             entity_id,
             sanitize(note, 'text'),
             public)

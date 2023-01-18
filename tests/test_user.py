@@ -3,7 +3,6 @@ from typing import Any
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.models.type import Type
 from tests.base import TestBaseCase, insert_entity
 
 
@@ -84,6 +83,10 @@ class UserTests(TestBaseCase):
                     id_=self.alice_id))
             assert b'403 - Forbidden' in rv.data
 
+            with app.test_request_context():
+                app.preprocess_request()  # type: ignore
+                person = insert_entity('Hugo', 'person')
+
             self.app.get(url_for('logout'))
             rv = self.app.get(url_for('user_insert'), follow_redirects=True)
             assert b'Forgot your password?' not in rv.data
@@ -108,15 +111,12 @@ class UserTests(TestBaseCase):
             self.app.post(
                 '/login',
                 data={'username': 'Manager', 'password': 'test'})
+
             rv = self.app.get(url_for('admin_settings', category='mail'))
             assert b'403 - Forbidden' in rv.data
 
             rv = self.app.get(url_for('user_update', id_=self.alice_id))
             assert b'403 - Forbidden' in rv.data
-
-            with app.test_request_context():
-                app.preprocess_request()  # type: ignore
-                person = insert_entity('Hugo', 'person')
 
             self.app.get(url_for('logout'))
             self.app.post(

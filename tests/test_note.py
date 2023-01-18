@@ -33,17 +33,47 @@ class NoteTest(TestBaseCase):
 
             rv = self.app.post(
                 url_for('note_update', id_=note_id),
-                data={'description': 'A very nice description'},
+                data={'description': 'A sad description', 'public': True},
                 follow_redirects=True)
-            assert b'Note updated' in rv.data and b'A very nice' in rv.data
+            assert b'Note updated' in rv.data
 
             rv = self.app.get(url_for('note_view', id_=note_id))
-            assert b'A very nice description' in rv.data
+            assert b'A sad description' in rv.data
+
+            self.app.get(url_for('logout'))
+            self.app.post(
+                '/login',
+                data={'username': 'Manager', 'password': 'test'})
+
+            rv = self.app.get(url_for('note_view', id_=note_id))
+            assert b'Set private' in rv.data
 
             rv = self.app.get(
                 url_for('note_set_private', id_=note_id),
                 follow_redirects=True)
             assert b'Note updated' in rv.data
+
+            rv = self.app.get(url_for('note_view', id_=note_id))
+            assert b'403 - Forbidden' in rv.data
+
+            self.app.get(url_for('logout'))
+            self.app.post(
+                '/login',
+                data={'username': 'Editor', 'password': 'test'})
+
+            rv = self.app.get(url_for('note_set_private', id_=note_id))
+            assert b'403 - Forbidden' in rv.data
+
+            rv = self.app.get(url_for('note_update', id_=note_id))
+            assert b'403 - Forbidden' in rv.data
+
+            rv = self.app.get(url_for('note_delete', id_=note_id))
+            assert b'403 - Forbidden' in rv.data
+
+            self.app.get(url_for('logout'))
+            self.app.post(
+                '/login',
+                data={'username': 'Alice', 'password': 'test'})
 
             rv = self.app.get(
                 url_for('note_delete', id_=note_id),
