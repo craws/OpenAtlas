@@ -22,11 +22,7 @@ from openatlas.models.reference_system import ReferenceSystem
 @app.route('/index/<view>/<int:delete_id>')
 @required_group('readonly')
 def index(view: str, delete_id: Optional[int] = None) -> Union[str, Response]:
-    if delete_id:  # Delete before showing index to prevent additional redirect
-        if current_user.group == 'contributor':
-            info = g.logger.get_log_info(delete_id)
-            if not info['creator'] or info['creator'].id != current_user.id:
-                abort(403)
+    if delete_id:  # Delete before showing index to prevent redirects
         if url := delete_entity(delete_id):
             return redirect(url)
     return render_template(
@@ -106,10 +102,14 @@ def file_preview(entity_id: int) -> str:
 
 
 def delete_entity(id_: int) -> Optional[str]:
-    url = None
+    if current_user.group == 'contributor':
+        info = g.logger.get_log_info(id_)
+        if not info['creator'] or info['creator'].id != current_user.id:
+            abort(403)
     entity = Entity.get_by_id(id_)
     if not is_authorized(entity.class_.write_access):
         abort(403)
+    url = None
     if isinstance(entity, ReferenceSystem):
         if entity.system:
             abort(403)
@@ -132,7 +132,7 @@ def delete_entity(id_: int) -> Optional[str]:
     elif entity.class_.name == 'file':
         try:
             delete_files(id_)
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             g.logger.log('error', 'file', 'file deletion failed', e)
             flash(_('error file delete'), 'error')
             return url_for('view', id_=id_)

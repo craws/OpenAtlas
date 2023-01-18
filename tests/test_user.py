@@ -1,9 +1,10 @@
 from typing import Any
 
-from flask import url_for
+from flask import g, url_for
 
 from openatlas import app
-from tests.base import TestBaseCase
+from openatlas.models.type import Type
+from tests.base import TestBaseCase, insert_entity
 
 
 class UserTests(TestBaseCase):
@@ -96,6 +97,13 @@ class UserTests(TestBaseCase):
             rv = self.app.post(url_for('insert', class_='reference_system'))
             assert b'403 - Forbidden' in rv.data
 
+            rv = self.app.get(
+                url_for(
+                    'index',
+                    view='actor',
+                    delete_id=g.reference_system_wikidata.id))
+            assert b'403 - Forbidden' in rv.data
+
             self.app.get(url_for('logout'))
             self.app.post(
                 '/login',
@@ -104,4 +112,17 @@ class UserTests(TestBaseCase):
             assert b'403 - Forbidden' in rv.data
 
             rv = self.app.get(url_for('user_update', id_=self.alice_id))
+            assert b'403 - Forbidden' in rv.data
+
+            with app.test_request_context():
+                app.preprocess_request()  # type: ignore
+                person = insert_entity('Hugo', 'person')
+
+            self.app.get(url_for('logout'))
+            self.app.post(
+                '/login',
+                data={'username': 'Contributor', 'password': 'test'})
+
+            rv = self.app.get(
+                url_for('index', view='actor', delete_id=person.id))
             assert b'403 - Forbidden' in rv.data
