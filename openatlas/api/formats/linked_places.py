@@ -5,7 +5,8 @@ from flask import g, url_for
 from openatlas import app
 from openatlas.api.resources.util import (
     get_geometric_collection, get_license_name, get_reference_systems,
-    replace_empty_list_values_in_dict_with_none, to_camel_case, date_to_str)
+    replace_empty_list_values_in_dict_with_none, to_camel_case, date_to_str,
+    get_crm_relation)
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.display.util import get_file_path
@@ -44,13 +45,6 @@ def get_linked_places_entity(
             if 'relations' in parser['show'] else None})]}
 
 
-def relation_type(link_: Link, inverse: bool = False) -> str:
-    property_ = f"i {link_.property.i18n_inverse['en']}" \
-        if inverse and link_.property.i18n_inverse['en'] \
-        else f" {link_.property.i18n['en']}"
-    return f"crm:{link_.property.code}{property_}"
-
-
 def link_dict(link_: Link, inverse: bool = False) -> dict[str, Any]:
     return {
         'label': link_.domain.name if inverse else link_.range.name,
@@ -59,7 +53,7 @@ def link_dict(link_: Link, inverse: bool = False) -> dict[str, Any]:
                 'api_03.entity',
                 id_=link_.domain.id if inverse else link_.range.id,
                 _external=True),
-        'relationType': relation_type(link_, inverse),
+        'relationType': get_crm_relation(link_, inverse),
         'relationSystemClass':
             link_.domain.class_.name if inverse else link_.range.class_.name,
         'type': to_camel_case(link_.type.name) if link_.type else None,
