@@ -396,8 +396,8 @@ class PlaceTest(TestBaseCase):
 
             rv = self.app.post(
                 url_for('sex_update', id_=strati_id),
-                follow_redirects=True,
-                data={'Glabella': 'Female'})
+                data={'Glabella': 'Female'},
+                follow_redirects=True)
             assert b'-2.0' in rv.data
 
             rv = self.app.post(
@@ -418,6 +418,10 @@ class PlaceTest(TestBaseCase):
                     'range': 1},
                 follow_redirects=True)
             assert b'Entity updated' in rv.data
+
+            rv = self.app.get(url_for('view', id_=strati_id))
+            assert b'Radiocarbon dating' in rv.data
+            assert b'Sex estimation' in rv.data
 
             rv = self.app.get(url_for('carbon_update', id_=strati_id))
             assert b'VERA' in rv.data

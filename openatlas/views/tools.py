@@ -54,7 +54,7 @@ def sex_result(entity: Entity) -> str:
         f' - {_("corresponds to")} "{name_result(calculation)}"'
 
 
-def get_carbon_result(entity: Entity) -> str:
+def carbon_result(entity: Entity) -> str:
     if link_ := get_carbon_link(entity):
         return '<h1>' + uc_first(_('radiocarbon dating')) + '</h1>' + \
                display_info(json.loads(link_.description))
@@ -68,7 +68,7 @@ def tools_index(id_: int) -> Union[str, Response]:
     tabs = {
         'info': Tab(
             'info',
-            get_carbon_result(entity) + sex_result(entity),
+            carbon_result(entity) + sex_result(entity),
             buttons=[
                 manual('tools/anthropological_analyses'),
                 button(
@@ -203,7 +203,7 @@ def carbon(id_: int) -> Union[str, Response]:
         tabs={
             'info': Tab(
                 _('radiocarbon dating'),
-                get_carbon_result(entity),
+                carbon_result(entity),
                 buttons=buttons)},
         crumbs=start_crumbs(entity) + [
             [_('tools'), url_for('tools_index', id_=entity.id)],
