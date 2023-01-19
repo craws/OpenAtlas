@@ -6,7 +6,6 @@ from flask import url_for
 from openatlas.api.resources.util import remove_spaces_dashes, date_to_str, \
     get_crm_relation, get_crm_code
 from openatlas.models.entity import Entity
-from openatlas.models.link import Link
 from openatlas.models.type import Type
 
 
@@ -16,8 +15,6 @@ def get_loud_entities(
         loud: dict[str, str]) -> Any:
     properties_set = defaultdict(list)
     properties_unique = {}
-
-    # Set name to properties
 
     def base_entity_dict() -> dict[str, Any]:
         return {
@@ -48,10 +45,6 @@ def get_loud_entities(
         if type_ := get_standard_type_loud(link_.domain.types):
             property_['classified_as'] = get_type_property(type_)
         return property_
-
-    properties_set['identified_by'] = [{
-        "type": "Name",
-        "content": data['entity'].name}]
 
     for link_ in data['links']:
         if link_.property.code in ['OA7', 'OA8', 'OA9']:
