@@ -100,7 +100,7 @@ def import_arche_data() -> int:
 
             event = Entity.insert(
                 'production',
-                f'Creation of photography from {name}')
+                f'Creation of graffito from {name}')
             event.update({'attributes': {'begin_from': item['date']}})
             event.link('P108', artifact)
             event.link(
