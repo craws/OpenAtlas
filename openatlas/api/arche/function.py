@@ -20,8 +20,7 @@ def fetch_arche_data() -> dict[int, Any]:
     for id_ in app.config['ARCHE']['collection_ids']:
         req = requests.get(
             f"{app.config['ARCHE']['base_url']}/api/{id_}/metadata",
-            headers={'Accept': 'application/n-triples'},
-            proxies={'http': 'http://fifi.arz.oeaw.ac.at:8080'})
+            headers={'Accept': 'application/n-triples'})
         try:
             collections[id_] = get_metadata(n_triples_to_json(req))
         except HTTPError as http_error:
@@ -108,10 +107,10 @@ def import_arche_data() -> int:
                 'P11',
                 range_=get_or_create_person(
                     item['creator'],
-                    person_types['photographer_type']),
+                    person_types['artist_type']),
                 type_id=get_or_create_type(
                     get_hierarchy_by_name('Involvement'),
-                    'Photographer').id)
+                    'Graffiti Artist').id)
 
             file = Entity.insert('file', name, f"Created by {item['creator']}")
             file.link(
