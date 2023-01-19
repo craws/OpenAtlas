@@ -238,3 +238,7 @@ def filter_link_list_by_property_codes(
                 'domain_id': link_['domain_id'],
                 'range_id': link_['range_id']})
     return data
+
+
+def date_to_str(date: Any) -> str:
+    return str(date) if date else None

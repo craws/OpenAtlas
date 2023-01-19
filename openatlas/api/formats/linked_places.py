@@ -5,7 +5,7 @@ from flask import g, url_for
 from openatlas import app
 from openatlas.api.resources.util import (
     get_geometric_collection, get_license_name, get_reference_systems,
-    replace_empty_list_values_in_dict_with_none, to_camel_case)
+    replace_empty_list_values_in_dict_with_none, to_camel_case, date_to_str)
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.display.util import get_file_path
@@ -126,10 +126,10 @@ def get_lp_types(entity: Entity, links: list[Link]) -> list[dict[str, Any]]:
 def get_lp_time(entity: Union[Entity, Link]) -> Optional[dict[str, Any]]:
     return {
         'start': {
-            'earliest': entity.begin_from,
-            'latest': entity.begin_to,
+            'earliest': date_to_str(entity.begin_from),
+            'latest': date_to_str(entity.begin_to),
             'comment': entity.begin_comment},
         'end': {
-            'earliest': entity.end_from,
-            'latest': entity.end_to,
+            'earliest': date_to_str(entity.end_from),
+            'latest': date_to_str(entity.end_to),
             'comment': entity.end_comment}}
