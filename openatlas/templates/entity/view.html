@@ -9,7 +9,7 @@
     {% endif %}
     <h1>{{ entity.name }}</h1>
     <div>
-      {{ profile_image|safe }}
+      {{ entity|profile_image|safe }}
       <div style="float:left;">
         {{ info_data|display_info|safe }}
       </div>

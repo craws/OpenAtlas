@@ -18,6 +18,7 @@
           <div id='map-info-display'>
             {{ form|display_form(manual_page='entity/' + entity.class_.view)|safe }}
           </div>
+          {{ entity|profile_image|safe }}
         </div>
       </div>
       <div class="col-xl-8 d-flex align-items-center">

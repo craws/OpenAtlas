@@ -106,7 +106,6 @@ class BaseDisplay:
         self.tabs['info'].content = render_template(
             'entity/view.html',
             entity=self.entity,
-            profile_image=profile_image(self.entity),
             info_data=self.data,
             gis_data=self.gis_data,
             overlays=self.overlays,
