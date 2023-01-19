@@ -40,11 +40,7 @@ class NoteTest(TestBaseCase):
             rv = self.app.get(url_for('note_view', id_=note_id))
             assert b'A sad description' in rv.data
 
-            self.app.get(url_for('logout'))
-            self.app.post(
-                '/login',
-                data={'username': 'Manager', 'password': 'test'})
-
+            self.login('Manager')
             rv = self.app.get(url_for('note_view', id_=note_id))
             assert b'Set private' in rv.data
 
@@ -56,11 +52,7 @@ class NoteTest(TestBaseCase):
             rv = self.app.get(url_for('note_view', id_=note_id))
             assert b'403 - Forbidden' in rv.data
 
-            self.app.get(url_for('logout'))
-            self.app.post(
-                '/login',
-                data={'username': 'Editor', 'password': 'test'})
-
+            self.login('Editor')
             rv = self.app.get(url_for('note_set_private', id_=note_id))
             assert b'403 - Forbidden' in rv.data
 
@@ -70,11 +62,7 @@ class NoteTest(TestBaseCase):
             rv = self.app.get(url_for('note_delete', id_=note_id))
             assert b'403 - Forbidden' in rv.data
 
-            self.app.get(url_for('logout'))
-            self.app.post(
-                '/login',
-                data={'username': 'Alice', 'password': 'test'})
-
+            self.login('Alice')
             rv = self.app.get(
                 url_for('note_delete', id_=note_id),
                 follow_redirects=True)

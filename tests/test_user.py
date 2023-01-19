@@ -91,9 +91,7 @@ class UserTests(TestBaseCase):
             rv = self.app.get(url_for('user_insert'), follow_redirects=True)
             assert b'Forgot your password?' not in rv.data
 
-            self.app.post(
-                '/login',
-                data={'username': 'Editor', 'password': 'test'})
+            self.login('Editor')
             rv = self.app.get(url_for('user_insert'))
             assert b'403 - Forbidden' in rv.data
 
@@ -107,22 +105,20 @@ class UserTests(TestBaseCase):
                     delete_id=g.reference_system_wikidata.id))
             assert b'403 - Forbidden' in rv.data
 
-            self.app.get(url_for('logout'))
-            self.app.post(
-                '/login',
-                data={'username': 'Manager', 'password': 'test'})
-
+            self.login('Manager')
             rv = self.app.get(url_for('admin_settings', category='mail'))
             assert b'403 - Forbidden' in rv.data
 
             rv = self.app.get(url_for('user_update', id_=self.alice_id))
             assert b'403 - Forbidden' in rv.data
 
-            self.app.get(url_for('logout'))
-            self.app.post(
-                '/login',
-                data={'username': 'Contributor', 'password': 'test'})
-
+            self.login('Contributor')
             rv = self.app.get(
                 url_for('index', view='actor', delete_id=person.id))
             assert b'403 - Forbidden' in rv.data
+
+            rv = self.app.get(url_for('insert', class_='person'))
+            assert b'Person' in rv.data
+
+            rv = self.app.get(url_for('update', id_=person.id))
+            assert b'Hugo' in rv.data

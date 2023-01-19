@@ -409,13 +409,15 @@ class PlaceTest(TestBaseCase):
             rv = self.app.get(url_for('sex_update', id_=strati_id))
             assert b'Glabella' in rv.data
 
+            data = {
+                'lab_id': 'VERA',
+                'spec_id': 'S',
+                'radiocarbon_year': 1,
+                'range': 1}
+            self.app.post(url_for('carbon_update', id_=strati_id), data=data)
             rv = self.app.post(
                 url_for('carbon_update', id_=strati_id),
-                data={
-                    'lab_id': 'VERA',
-                    'spec_id': 'S',
-                    'radiocarbon_year': 1,
-                    'range': 1},
+                data=data,
                 follow_redirects=True)
             assert b'Entity updated' in rv.data
 
