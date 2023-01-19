@@ -67,10 +67,10 @@ def arche_fetch() -> str:
 def arche_import_data() -> Response:
     Transaction.begin()
     try:
-        entities = import_arche_data()
+        count = import_arche_data()
         Transaction.commit()
-        g.logger.log('info', 'import', f'import: {len(entities)}')
-        flash(f"{_('import of')}: {len(entities)}", 'info')
+        g.logger.log('info', 'import', f'import: {count}')
+        flash(f"{_('import of')}: {count}", 'info')
     except Exception as e:  # pragma: no cover
         Transaction.rollback()
         g.logger.log('error', 'import', 'import failed', e)

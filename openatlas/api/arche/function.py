@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any
 
 import rdflib
 import requests
@@ -47,7 +47,7 @@ def get_metadata(data: dict[str, Any]) -> dict[str, Any]:
                     'image_id': image_id,
                     'image_link': image_url,
                     'image_link_thumbnail':
-                        f"{app.config['ARCHE']['thumbnail_url']}"
+                        app.config['ARCHE']['thumbnail_url'] +
                         f"{image_url.replace('https://', '')}?width=1200",
                     'creator': json_['EXIF:Artist'],
                     'latitude': json_['EXIF:GPSLatitude'],
@@ -60,18 +60,85 @@ def get_metadata(data: dict[str, Any]) -> dict[str, Any]:
     return metadata
 
 
+def import_arche_data() -> int:
+    count = 0
+    person_types = get_or_create_person_types()
+    arche_ref = \
+        [i for i in g.reference_systems.values() if i.name == 'ARCHE'][0]
+    exact_match_id = \
+        get_or_create_type(
+            get_hierarchy_by_name('External reference match'),
+            'exact match').id
+    for entries in fetch_arche_data().values():
+        for item in entries.values():
+            name = item['name']
+
+            artifact = Entity.insert(
+                'artifact',
+                name.rsplit('.', 1)[0],
+                item['description'])
+
+            arche_ref.link(
+                'P67',
+                artifact,
+                item['image_id'],
+                type_id=exact_match_id)
+
+            location = Entity.insert('object_location', f"Location of {name}")
+            artifact.link('P53', location)
+            if is_float(item['longitude']) and is_float(item['latitude']):
+                Db_gis.insert(
+                    shape='Point',
+                    data={
+                        'entity_id': location.id,
+                        'name': name,
+                        'description': '',
+                        'type': 'centerpoint',
+                        'geojson':
+                            f'{{"type":"Point", "coordinates": '
+                            f'[{item["longitude"]},'
+                            f'{item["latitude"]}]}}'})
+
+            event = Entity.insert(
+                'production',
+                f'Creation of photography from {name}')
+            event.update({'attributes': {'begin_from': item['date']}})
+            event.link('P108', artifact)
+            event.link(
+                'P11',
+                range_=get_or_create_person(
+                    item['creator'],
+                    person_types['photographer_type']),
+                type_id=get_or_create_type(
+                    get_hierarchy_by_name('Involvement'),
+                    'Photographer').id)
+
+            file = Entity.insert('file', name, f"Created by {item['creator']}")
+            file.link(
+                'P2',
+                get_or_create_type(
+                    get_hierarchy_by_name('License'),
+                    item['license']))
+            filename = f"{file.id}.{name.rsplit('.', 1)[1].lower()}"
+            open(str(app.config['UPLOAD_DIR'] / filename), "wb") \
+                .write(requests.get(item['image_link_thumbnail']).content)
+            file.link('P67', artifact)
+            count += 1
+    return count
+
+
 def get_linked_image(data: list[dict[str, Any]]) -> str:
-    return [image['__uri__']
-            for image in data if str(image['mime'][0]) == 'image/jpeg'][0]
+    return [image['__uri__'] for image in data
+            if str(image['mime'][0]) == 'image/jpeg'][0]
 
 
-def get_or_create_type(super_: Union[str, Type], type_name: str) -> Type:
-    super_ = get_hierarchy_by_name(super_) \
-        if isinstance(super_, str) else super_
-    type_ = get_type_by_name(type_name)
-    if not type_:
-        type_ = Entity.insert('type', type_name)
-        type_.link('P127', super_)
+def get_or_create_type(hierarchy: Type, type_name: str) -> Type:
+    g.types = Type.get_all()
+    if type_ := get_type_by_name(type_name):
+        if type_.root[0] == hierarchy.id:
+            return type_
+    type_ = Entity.insert('type', type_name)
+    type_.link('P127', hierarchy)
     return type_
 
 
@@ -84,99 +151,34 @@ def get_type_by_name(type_name: str) -> Type:
 
 
 def get_hierarchy_by_name(type_name: str) -> Type:
-    type_ = None
+    hierarchy = None
     for type_id in g.types:
         if g.types[type_id].name == type_name:
             if not g.types[type_id].root:
-                type_ = g.types[type_id]
-    return type_
+                hierarchy = g.types[type_id]
+    return hierarchy
 
 
-def get_license_types(entries: dict[str, Any]) -> list[Type]:
-    license_ids = [metadata['license'] for metadata in entries.values()]
-    return [get_or_create_type('License', license_)
-            for license_ in list(set(license_ids))]
+def get_or_create_person(name: str, relevance: Type) -> Entity:
+    for entity in Entity.get_by_cidoc_class('E21'):
+        if entity.name == name:
+            return entity
+    entity = Entity.insert(
+        'person',
+        name,
+        'Automatically created by ARCHE import')
+    entity.link('P2', relevance)
+    return entity
 
 
-def get_creators(entries: dict[str, Any]) -> list[Type]:
-    hierarchy = 'Creator'
-    if not get_hierarchy_by_name('Creator'):
-        hierarchy = Entity.insert('type', 'Creator')
-        Type.insert_hierarchy(hierarchy, 'custom', ['file'], False)
-    creator_ids = [metadata['creator'] for metadata in entries.values()]
-    return [get_or_create_type(hierarchy, creator)
-            for creator in list(set(creator_ids))]
-
-
-def link_arche_entity_to_type(
-        entity: Entity,
-        types: list[Type],
-        type_name: str) -> None:
-    for type_ in types:
-        if type_.name == type_name:
-            entity.link('P2', type_)
-
-
-def import_arche_data() -> list[Entity]:
-    entities = []
-    arche_ref = [
-        system for system in g.reference_systems.values()
-        if system.name == 'ARCHE'][0]
-    exact_match_id = None
-    for sub_id in Type.get_hierarchy('External reference match').subs:
-        if g.types[sub_id].name == 'exact match':
-            exact_match_id = sub_id
-    for entries in fetch_arche_data().values():
-        licenses = get_license_types(entries)
-        creator = get_creators(entries)
-        types = licenses + creator
-        for metadata in entries.values():
-            name = metadata['name']
-
-            artifact = Entity.insert(
-                'artifact',
-                name.rsplit('.', 1)[0],
-                metadata['description'])
-            dates = {'begin_from': metadata['date']}
-            artifact.update({'attributes': dates})
-
-            arche_ref.link(
-                'P67',
-                artifact,
-                metadata['image_id'],
-                type_id=exact_match_id)
-
-            location = Entity.insert('object_location', f"Location of {name}")
-            artifact.link('P53', location)
-            if is_float(metadata['longitude']) \
-                    and is_float(metadata['latitude']):
-                Db_gis.insert(
-                    shape='Point',
-                    data={
-                        'entity_id': location.id,
-                        'name': name,
-                        'description': '',
-                        'type': 'centerpoint',
-                        'geojson':
-                            f'{{"type":"Point", "coordinates": '
-                            f'[{metadata["longitude"]},'
-                            f'{metadata["latitude"]}]}}'})
-
-            file = Entity.insert(
-                'file',
-                name,
-                f"Created by {metadata['creator']}"
-                if metadata['creator'] else '')
-            link_arche_entity_to_type(file, types, metadata['license'])
-            link_arche_entity_to_type(file, types, metadata['creator'])
-            file_response = requests.get(metadata['image_link_thumbnail'])
-            filename = f"{file.id}.{name.rsplit('.', 1)[1].lower()}"
-            open(str(app.config['UPLOAD_DIR'] / filename), "wb") \
-                .write(file_response.content)
-            file.link('P67', range_=artifact)
-            entities.append(artifact)
-            entities.append(file)
-    return entities
+def get_or_create_person_types() -> dict[str, Any]:
+    hierarchy = get_hierarchy_by_name('Relevance')
+    if not hierarchy:
+        hierarchy = Entity.insert('type', 'Relevance')
+        Type.insert_hierarchy(hierarchy, 'custom', ['person'], True)
+    return {
+        'photographer_type': get_or_create_type(hierarchy, 'Photographer'),
+        'artist_type': get_or_create_type(hierarchy, 'Graffito artist')}
 
 
 def get_arche_reference_system() -> ReferenceSystem:
@@ -197,15 +199,13 @@ def get_arche_reference_system() -> ReferenceSystem:
 
 # Script from
 # https://acdh-oeaw.github.io/arche-docs/aux/rdf_compacting_and_framing.html
-
-
 def n_triples_to_json(req: Response) -> dict[str, Any]:
     context = get_arche_context()
     data = rdflib.Graph()
     data.parse(data=req.text, format="nt")
 
     # create Python-native data model based on dictionaries
-    nodes = {}
+    nodes: dict[str, Any] = {}
     for (sbj, prop, obj) in data:
         sbj = str(sbj)
         prop = str(prop)
