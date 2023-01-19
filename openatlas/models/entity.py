@@ -41,7 +41,7 @@ class Entity:
         if 'types' in data and data['types']:
             for item in data['types']:  # f1 = type id, f2 = value
                 type_ = g.types[item['f1']]
-                if type_.class_.name == 'type_anthropology':
+                if type_.class_.name == 'type_tools':
                     continue
                 self.types[type_] = item['f2']
                 if type_.category == 'standard':

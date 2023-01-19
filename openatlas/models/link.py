@@ -4,9 +4,9 @@ from typing import Any, Optional, TYPE_CHECKING, Union
 
 from flask import abort, g
 
-from openatlas.database.anthropology import Anthropology
 from openatlas.database.date import Date
 from openatlas.database.link import Link as Db
+from openatlas.database.tools import Tools
 from openatlas.display.util import (
     datetime64_to_timestamp, format_date_part, timestamp_to_datetime64)
 
@@ -198,13 +198,16 @@ class Link:
             entity: Entity,
             codes: list[str],
             inverse: bool = False) -> None:
+        from openatlas.models.tools import get_carbon_link
+        from openatlas.models.type import Type
         if entity.class_.name == 'stratigraphic_unit' \
                 and 'P2' in codes \
                 and not inverse:
-            if anthropological_data := Anthropology.get_types(entity.id):
-                Db.remove_types(
-                    entity.id,
-                    [row['link_id'] for row in anthropological_data])
+            exclude_ids = Type.get_sub_ids_recursive(
+                Type.get_hierarchy('Features for sexing'))
+            exclude_ids.append(Type.get_hierarchy('Radiocarbon').id)
+            if Tools.get_sex_types(entity.id) or get_carbon_link(entity):
+                Db.remove_types(entity.id, exclude_ids)
                 codes.remove('P2')
                 if not codes:
                     return

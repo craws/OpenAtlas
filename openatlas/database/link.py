@@ -12,7 +12,7 @@ class Link:
             DELETE FROM model.link
             WHERE property_code = 'P2'
                 AND domain_id = %(id)s
-                AND id NOT IN %(exclude_ids)s;
+                AND range_id NOT IN %(exclude_ids)s;
             """,
             {'id': id_, 'exclude_ids': tuple(exclude_ids)})
 

@@ -38,13 +38,13 @@ def remove_link(
         name: str,
         link_: Link,
         origin: Entity,
-        tab: str) -> Optional[str]:
+        tab: Optional[str] = '') -> Optional[str]:
     if not is_authorized('contributor'):
         return None
     url = url_for('link_delete', id_=link_.id, origin_id=origin.id)
     return link(
         _('remove'),
-        f'{url}#tab-{tab}',
+        f'{url}#tab-{tab}' if tab else url,
         js="return confirm('{x}')".format(
             x=_('Remove %(name)s?', name=name.replace("'", ''))))
 
@@ -493,7 +493,7 @@ def get_file_path(
     ext = g.file_stats[id_]['ext']
     if size:
         if ext in app.config['NONE_DISPLAY_EXT']:
-            ext = app.config['PROCESSED_EXT']
+            ext = app.config['PROCESSED_EXT']  # pragma: no cover
         path = app.config['RESIZED_IMAGES'] / size / f"{id_}{ext}"
         return path if os.path.exists(path) else None
     return app.config['UPLOAD_DIR'] / f"{id_}{ext}"
@@ -510,7 +510,7 @@ def format_date(value: Union[datetime, numpy.datetime64]) -> str:
 
 def convert_size(size_bytes: int) -> str:
     if size_bytes == 0:
-        return "0 B"
+        return "0 B"  # pragma: no cover
     size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
     i = int(math.floor(math.log(size_bytes, 1024)))
     return f"{int(size_bytes / math.pow(1024, i))} {size_name[i]}"
@@ -622,14 +622,14 @@ def display_info(data: dict[str, Union[str, list[str]]]) -> str:
 @app.template_filter()
 def description(entity: Union[Entity, Project, User]) -> str:
     from openatlas.models.entity import Entity
+    from openatlas.views.tools import carbon_result, sex_result
     html = ''
     if isinstance(entity, Entity) \
             and entity.class_.name == 'stratigraphic_unit':
-        from openatlas.views.anthropology import print_result
-        if result := print_result(entity):
-            html += \
-                "<h2>" + uc_first(_('anthropological analyses')) + '</h2>' \
-                f"<p>{result}</p>"
+        if radiocarbon := carbon_result(entity):
+            html += f"<p>{radiocarbon}</p>"
+        if sex_estimation := sex_result(entity):
+            html += f"<p>{sex_estimation}</p>"
     if not entity.description:
         return html
     label = _('description')

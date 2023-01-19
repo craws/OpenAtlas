@@ -3,7 +3,7 @@ import unittest
 from typing import Optional
 
 import psycopg2
-from flask import g
+from flask import g, url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
@@ -19,14 +19,16 @@ class TestBaseCase(unittest.TestCase):
         app.config['WTF_CSRF_METHODS'] = []  # Disable CSRF in tests
         self.setup_database()
         self.app = app.test_client()
-        self.login()  # Login on default because needed almost everywhere
+        self.login('Alice', logout=False)
         self.prepare_reference_system_form_data()
 
-    def login(self) -> None:
+    def login(self, name: str, logout: bool = True) -> None:
         with app.app_context():
+            if logout:
+                self.app.get(url_for('logout'))
             self.app.post(
-                '/login',
-                data={'username': 'Alice', 'password': 'test'})
+                url_for('login'),
+                data={'username': name, 'password': 'test'})
 
     def setup_database(self) -> None:
         connection = psycopg2.connect(

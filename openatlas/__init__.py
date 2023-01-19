@@ -31,9 +31,9 @@ from openatlas.models.logger import Logger
 from openatlas.api import api
 from openatlas.display.util import convert_size
 from openatlas.views import (
-    admin, ajax, anthropology, changelog, entity, entity_index, entity_form,
-    error, export, file, hierarchy, index, imports, link, login, model, note,
-    overlay, profile, reference, search, sql, type as type_, user)
+    admin, ajax, tools, changelog, entity, entity_index, entity_form, error,
+    export, file, hierarchy, index, imports, link, login, model, note, overlay,
+    profile, reference, search, sql, type as type_, user)
 
 
 @babel.localeselector

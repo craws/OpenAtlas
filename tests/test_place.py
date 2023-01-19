@@ -388,16 +388,16 @@ class PlaceTest(TestBaseCase):
             assert b'The entry has been deleted.' in rv.data
 
             # Anthropological features
-            rv = self.app.get(url_for('anthropology_index', id_=strati_id))
+            rv = self.app.get(url_for('tools_index', id_=strati_id))
             assert b'Sex estimation' in rv.data
 
             rv = self.app.get(url_for('sex', id_=strati_id))
-            assert b'Anthropological analyses' in rv.data
+            assert b'Sex estimation' in rv.data
 
             rv = self.app.post(
                 url_for('sex_update', id_=strati_id),
-                follow_redirects=True,
-                data={'Glabella': 'Female'})
+                data={'Glabella': 'Female'},
+                follow_redirects=True)
             assert b'-2.0' in rv.data
 
             rv = self.app.post(
@@ -408,6 +408,33 @@ class PlaceTest(TestBaseCase):
 
             rv = self.app.get(url_for('sex_update', id_=strati_id))
             assert b'Glabella' in rv.data
+
+            data = {
+                'lab_id': 'VERA',
+                'spec_id': 'S',
+                'radiocarbon_year': 1,
+                'range': 1}
+            self.app.post(url_for('carbon_update', id_=strati_id), data=data)
+            rv = self.app.post(
+                url_for('carbon_update', id_=strati_id),
+                data=data,
+                follow_redirects=True)
+            assert b'Entity updated' in rv.data
+
+            rv = self.app.get(url_for('view', id_=strati_id))
+            assert b'Radiocarbon dating' in rv.data
+            assert b'Sex estimation' in rv.data
+
+            rv = self.app.get(url_for('carbon_update', id_=strati_id))
+            assert b'VERA' in rv.data
+
+            rv = self.app.get(url_for('carbon', id_=strati_id))
+            assert b'VERA' in rv.data
+
+            rv = self.app.get(
+                url_for('sex_delete', id_=strati_id),
+                follow_redirects=True)
+            assert b'Tools' in rv.data
 
             rv = self.app.post(
                 url_for('update', id_=strati_id),

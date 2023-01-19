@@ -55,15 +55,15 @@ def profile_index() -> str:
     tabs = {
         'profile': Tab(
             'profile',
-            content=display_info(get_form_settings(ProfileForm(), True)),
+            display_info(get_form_settings(ProfileForm(), True)),
             buttons=[manual('tools/profile')]),
         'modules': Tab(
             'modules',
-            content=display_info(get_form_settings(ModulesForm(), True)),
+            display_info(get_form_settings(ModulesForm(), True)),
             buttons=[manual('tools/profile')]),
         'display': Tab(
             'display',
-            content=display_info(get_form_settings(DisplayForm(), True)),
+            display_info(get_form_settings(DisplayForm(), True)),
             buttons=[manual('tools/profile')])}
     if not app.config['DEMO_MODE']:
         tabs['profile'].buttons += [
