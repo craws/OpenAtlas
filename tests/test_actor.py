@@ -145,6 +145,7 @@ class ActorTests(TestBaseCase):
                 follow_redirects=True)
             assert b'777' in rv.data
 
+            self.login('manager')
             rv = self.app.get(url_for('update', id_=actor_id))
             assert b'American actress' in rv.data
 

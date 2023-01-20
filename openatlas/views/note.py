@@ -71,7 +71,11 @@ def note_insert(entity_id: int) -> Union[str, Response]:
     entity = Entity.get_by_id(entity_id)
     form = NoteForm()
     if form.validate_on_submit():
-        User.insert_note(entity_id, form.description.data, form.public.data)
+        User.insert_note(
+            entity_id,
+            current_user.id,
+            form.description.data,
+            form.public.data)
         flash(_('note added'), 'info')
         return redirect(f"{url_for('view', id_=entity.id)}#tab-note")
     return render_template(

@@ -126,38 +126,6 @@ def format_entity_date(
     return html + (f" ({comment})" if comment else '')
 
 
-def profile_image(entity: Entity) -> str:
-    if not entity.image_id:
-        return ''
-    path = get_file_path(entity.image_id)
-    if not path:
-        return ''
-    resized = None
-    size = app.config['IMAGE_SIZE']['thumbnail']
-    if g.settings['image_processing'] and check_processed_image(path.name):
-        if path_ := get_file_path(entity.image_id, size):
-            resized = url_for('display_file', filename=path_.name, size=size)
-    url = url_for('display_file', filename=path.name)
-    src = resized or url
-    style = f'max-width:{g.settings["profile_image_width"]}px;'
-    ext = app.config["DISPLAY_FILE_EXTENSIONS"]
-    if resized:
-        style = f'max-width:{app.config["IMAGE_SIZE"]["thumbnail"]}px;'
-        ext = app.config["ALLOWED_IMAGE_EXT"]
-    if entity.class_.view == 'file':
-        html = uc_first(_('no preview available'))
-        if path.suffix.lower() in ext:
-            html = link(
-                f'<img style="{style}" alt="image" src="{src}">',
-                url,
-                external=True)
-    else:
-        html = link(
-            f'<img style="{style}" alt="image" src="{src}">',
-            url_for('view', id_=entity.image_id))
-    return f'{html}'
-
-
 def profile_image_table_link(
         entity: Entity,
         file: Entity,
@@ -287,6 +255,39 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
                 f'class="nav-item nav-link fw-bold {active}">' + uc_first(_(item)) + \
                 '</a>'
     return html
+
+
+@app.template_filter()
+def profile_image(entity: Entity) -> str:
+    if not entity.image_id:
+        return ''
+    path = get_file_path(entity.image_id)
+    if not path:
+        return ''
+    resized = None
+    size = app.config['IMAGE_SIZE']['thumbnail']
+    if g.settings['image_processing'] and check_processed_image(path.name):
+        if path_ := get_file_path(entity.image_id, size):
+            resized = url_for('display_file', filename=path_.name, size=size)
+    url = url_for('display_file', filename=path.name)
+    src = resized or url
+    style = f'max-width:{g.settings["profile_image_width"]}px;'
+    ext = app.config["DISPLAY_FILE_EXTENSIONS"]
+    if resized:
+        style = f'max-width:{app.config["IMAGE_SIZE"]["thumbnail"]}px;'
+        ext = app.config["ALLOWED_IMAGE_EXT"]
+    if entity.class_.view == 'file':
+        html = uc_first(_('no preview available'))
+        if path.suffix.lower() in ext:
+            html = link(
+                f'<img style="{style}" alt="image" src="{src}">',
+                url,
+                external=True)
+    else:
+        html = link(
+            f'<img style="{style}" alt="image" src="{src}">',
+            url_for('view', id_=entity.image_id))
+    return f'{html}'
 
 
 @app.template_filter()
@@ -471,7 +472,7 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
             if hash_ == user.password.encode('utf-8'):
                 warnings.append(
                     "User OpenAtlas with default password is still active!")
-    return f'<p class="alert alert-danger">{"<br>".join(warnings)}<p>' if warnings else ''
+    return f'<p class="error">{"<br>".join(warnings)}<p>' if warnings else ''
 
 
 @app.template_filter()
@@ -579,12 +580,9 @@ def button(
 
 @app.template_filter()
 def button_bar(buttons: list[Any]) -> str:
-    def add_col(input: str):
-        return f'<div class="col-auto d-flex align-items-center">{input}</div>'
-
     return \
-        f'<div class="row my-2 g-1">{" ".join([str(b) for b in list(map(add_col, buttons))])}</div>' \
-            if buttons else ''
+        f'<div class="toolbar">{" ".join([str(b) for b in buttons])}</div>' \
+        if buttons else ''
 
 
 @app.template_filter()
@@ -638,7 +636,7 @@ def description(entity: Union[Entity, Project, User]) -> str:
         label = _('content')
     return f"""
         {html}
-        <p><strong>{uc_first(label)}</strong></h2>
+        <h2>{uc_first(label)}</h2>
         <div class="description more">
             {'<br>'.join(entity.description.splitlines())}
         </div>"""
@@ -678,8 +676,8 @@ def display_form(
     multipart = 'enctype="multipart/form-data"' if 'file' in form else ''
     return \
         f'<form method="post" {form_id} {multipart}>' \
-        f'<table class="table table-no-style">{html_form(form, form_id, manual_page)}' \
-        f'</table></form>'
+        f'<div class="data-table">{html_form(form, form_id, manual_page)}' \
+        f'</div></form>'
 
 
 class MLStripper(HTMLParser):
