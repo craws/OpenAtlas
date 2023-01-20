@@ -128,9 +128,6 @@ class ReferenceField(Field):
         self.data = {"value": "", "precision": ""}
         self.row_css = "reference-system-switch"
 
-    def _value(self):
-        return self.data
-
     def process_formdata(self, valuelist):
         self.data = {"value": valuelist[0] if len(valuelist) == 2 else '',
                      "precision": valuelist[1] if len(valuelist) == 2 else ''

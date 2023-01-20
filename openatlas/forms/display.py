@@ -117,15 +117,6 @@ def add_row(
         row_css=row_css)
 
 
-def button_icon(type_: Type) -> str:
-    if not type_.subs:
-        return ''
-    onclick = f'switch_value_type({type_.id})' if len(type_.subs) != 0 else ''
-    return \
-        f'<span id="value-type-switcher-{type_.id}" class="btn btn-xsm" ' \
-        f'onclick="{onclick}"><i class="fa fa-chevron-right"></i></span>'
-
-
 def add_dates(form: Any) -> str:
     errors = {}
     valid_dates = True
