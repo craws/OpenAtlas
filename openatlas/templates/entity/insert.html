@@ -1,20 +1,22 @@
 {% extends 'layout.html' %}
 {% block content %}
   {% if view_name not in ['artifact', 'place'] %}
-    {% if view_name == 'file' %}
-      <p>
-        {{ _('max size')|uc_first }}:
-        <span style="font-weight: bold;">{{ g.settings.file_upload_max_size }} MB</span>.
-        {{ _('if exceeded you will receive a connection error')|uc_first }}.
-        {{ _('allowed extensions')|uc_first }}:
-        <span style="font-weight: bold;">{{ ', '.join(g.settings.file_upload_allowed_extension) }}</span>
-      </p>
-    {% endif %}
-    {% if view_name == 'file' and not writable %}
-      <span class="error">{{ _('directory not writable')|uc_first }}</span>
-    {% else %}
-      <div class="container">{{ form|display_form(manual_page='entity/' + view_name)|safe }}</div>
-    {% endif %}
+    <div class="container">
+      {% if view_name == 'file' %}
+        <p>
+          {{ _('max size')|uc_first }}:
+          <span style="font-weight: bold;">{{ g.settings.file_upload_max_size }} MB</span>.
+          {{ _('if exceeded you will receive a connection error')|uc_first }}.
+          {{ _('allowed extensions')|uc_first }}:
+          <span style="font-weight: bold;">{{ ', '.join(g.settings.file_upload_allowed_extension) }}</span>
+        </p>
+      {% endif %}
+      {% if view_name == 'file' and not writable %}
+        <span class="error">{{ _('directory not writable')|uc_first }}</span>
+      {% else %}
+        {{ form|display_form(manual_page='entity/' + view_name)|safe }}
+      {% endif %}
+    </div>
   {% else %}
     <div class="row">
       <div class="col-lg-4">
@@ -33,5 +35,5 @@
     <script src="/static/js/map/map.js"></script>
     <script src="/static/js/map/draw.js"></script>
   {% endif %}
-  {{ view_name|display_citation_example|safe }}
+  <div class="container">{{ view_name|display_citation_example|safe }}</div>
 {% endblock %}

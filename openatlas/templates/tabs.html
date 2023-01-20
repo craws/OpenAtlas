@@ -4,18 +4,18 @@
     <div class="col-12">
       <ul class="nav nav-pills bg-gray  p-1" role="tablist">
         {% for tab in tabs.values() if tab.content or tab.buttons or tab.table.rows or tab.form %}
-          <li class="nav-item"  role="presentation">
+          <li class="nav-item" role="presentation">
             <button
-              class="py-1 nav-link {% if loop.first %}active{% endif %}"
-              data-bs-toggle="tab"
-              role="tab"
-              type="button"
-              aria-selected="{% if active %}true{% else %}false{% endif %}"
-              href="#tab-{{ tab.name|replace('_', '-') }}">
-                {{ _(tab.name|replace('_', ' '))|uc_first }}
-                {% if tab.table.rows|length %}
-                  <span class="tab-counter">{{ '{0:,}'.format(tab.table.rows|length) }}</span>
-                {% endif %}
+                class="py-1 nav-link {% if loop.first %}active{% endif %}"
+                data-bs-toggle="tab"
+                role="tab"
+                type="button"
+                aria-selected="{% if active %}true{% else %}false{% endif %}"
+                href="#tab-{{ tab.name|replace('_', '-') }}">
+              {{ _(tab.name|replace('_', ' '))|uc_first }}
+              {% if tab.table.rows|length %}
+                <span class="tab-counter">{{ '{0:,}'.format(tab.table.rows|length) }}</span>
+              {% endif %}
             </button>
           </li>
         {% endfor %}
@@ -23,19 +23,19 @@
       <div class="tab-content bg-light p-3">
         {% for tab in tabs.values() if tab.content or tab.buttons or tab.table.rows or tab.form %}
           <div
-            class="tab-pane fade {% if loop.index == 1 %}show active{% endif %}"
-            role="tabpanel"
-            id="tab-{{ tab.name|replace('_', '-')}}">
-              {{ tab.buttons|button_bar|safe }}
-              {% if tab.content %}
-                {{ tab.content|safe }}
-              {% endif %}
-              {% if tab.form %}
-                {{ tab.form|display_form |safe}}
-              {% endif %}
-              {% if tab.table.rows %}
-                {{ tab.table.display(tab.name)|safe }}
-              {% endif %}
+              class="tab-pane fade {% if loop.index == 1 %}show active{% endif %}"
+              role="tabpanel"
+              id="tab-{{ tab.name|replace('_', '-') }}">
+            {{ tab.buttons|button_bar|safe }}
+            {% if tab.content %}
+              {{ tab.content|safe }}
+            {% endif %}
+            {% if tab.form %}
+              {{ tab.form|display_form |safe }}
+            {% endif %}
+            {% if tab.table.rows %}
+              {{ tab.table.display(tab.name)|safe }}
+            {% endif %}
           </div>
         {% endfor %}
       </div>

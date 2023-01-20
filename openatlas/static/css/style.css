@@ -39,8 +39,6 @@ img#logo {
     margin: 0.2rem 0 0.2rem 0;
 }
 .table tr {
-    line-height: 0.9;
-    height: 2rem;
 }
 table td {
     white-space: nowrap;
