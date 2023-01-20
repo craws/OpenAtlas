@@ -1,33 +1,27 @@
 <div class="row g-1">
-  <div class="col-auto">{{ ('<i class="fas fa-book"></i> ' + _('manual')|uc_first)|
-        link("/static/manual/index.html", class_=config.CSS.button.primary, external=True)|safe }}</div>
+  <div class="col-auto">{{ ('<i class="fas fa-book"></i> ' + _('manual')|uc_first)|link("/static/manual/index.html", class_=config.CSS.button.primary, external=True)|safe }}</div>
   <div class="col-auto">{{ _('model')|button(url_for('model_index'))|safe }}</div>
-  <div
-      class="col-auto">{{ (_('reference systems')|uc_first)|link(url_for('index', view='reference_system'), class_=config.CSS.button.primary)|safe }}</div>
+  <div class="col-auto">{{ (_('reference systems')|uc_first)|link(url_for('index', view='reference_system'), class_=config.CSS.button.primary)|safe }}</div>
   <div class="col-auto">{{ _('network visualization')|button(url_for('model_network'))|safe }}</div>
 </div>
 
 <p class="mt-3">
   {{ _('hello')|uc_first }} <strong>{{ current_user.username }}</strong>.
   {% if session.login_previous_success %}
-    {{ _('last login')|uc_first }}: {{ session.login_previous_success }}
+    {{ _('last login')|uc_first }}: {{ session.login_previous_success }}.
     {% if session.login_previous_failures > 0 %}
       - {{ _('failed logins')|uc_first }}: {{ session.login_previous_failures }}
     {% endif %}
   {% else %}
     {{ _('first login') }}
   {% endif %}
-</p>
-<p>
   {{ _('want a new feature or experience any problems')|uc_first }}:
-  <a href="{{ url_for('index_feedback') }}">{{ _('tell us about it') }}</a>
-</p>
-{% if g.settings.mail and not current_user.settings.newsletter %}
-  <p>
+  <a href="{{ url_for('index_feedback') }}">{{ _('tell us about it') }}</a>.
+  {% if g.settings.mail and not current_user.settings.newsletter %}
     {{ _('want to receive updates? Activate the newsletter in your')|uc_first }}
     {{ _('profile')|button(url_for('profile_index'))|safe }}
-  </p>
-{% endif %}
+  {% endif %}
+</p>
 
 <div class="row">
   {% if tables.overview.rows %}
