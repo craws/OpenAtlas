@@ -252,8 +252,8 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
         else:
             html += \
                 f'<a href="{url_for("index", view=item)}" ' \
-                f'class="nav-item nav-link fw-bold {active}">' + uc_first(_(item)) + \
-                '</a>'
+                f'class="nav-item nav-link fw-bold {active}">' + \
+                uc_first(_(item)) + '</a>'
     return html
 
 
@@ -263,7 +263,7 @@ def profile_image(entity: Entity) -> str:
         return ''
     path = get_file_path(entity.image_id)
     if not path:
-        return ''
+        return ''  # pragma: no cover
     resized = None
     size = app.config['IMAGE_SIZE']['thumbnail']
     if g.settings['image_processing'] and check_processed_image(path.name):
@@ -404,7 +404,7 @@ def send_mail(
     """
     recipients = recipients if isinstance(recipients, list) else [recipients]
     if not g.settings['mail'] or not recipients:
-        return False
+        return False  # pragma: no cover
     from_ = f"{g.settings['mail_from_name']} <{g.settings['mail_from_email']}>"
     if app.config['IS_UNIT_TEST']:
         return True  # To test mail functions w/o sending them
@@ -472,7 +472,9 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
             if hash_ == user.password.encode('utf-8'):
                 warnings.append(
                     "User OpenAtlas with default password is still active!")
-    return f'<p class="alert alert-danger">{"<br>".join(warnings)}<p>' if warnings else ''
+    return \
+        '<p class="alert alert-danger">' \
+        f'{"<br>".join(warnings)}<p>' if warnings else ''
 
 
 @app.template_filter()
@@ -494,7 +496,7 @@ def get_file_path(
     ext = g.file_stats[id_]['ext']
     if size:
         if ext in app.config['NONE_DISPLAY_EXT']:
-            ext = app.config['PROCESSED_EXT'] # pragma: no cover
+            ext = app.config['PROCESSED_EXT']  # pragma: no cover
         path = app.config['RESIZED_IMAGES'] / size / f"{id_}{ext}"
         return path if os.path.exists(path) else None
     return app.config['UPLOAD_DIR'] / f"{id_}{ext}"
@@ -511,7 +513,7 @@ def format_date(value: Union[datetime, numpy.datetime64]) -> str:
 
 def convert_size(size_bytes: int) -> str:
     if size_bytes == 0:
-        return "0 B" # pragma: no cover
+        return "0 B"  # pragma: no cover
     size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
     i = int(math.floor(math.log(size_bytes, 1024)))
     return f"{int(size_bytes / math.pow(1024, i))} {size_name[i]}"
@@ -580,11 +582,14 @@ def button(
 
 @app.template_filter()
 def button_bar(buttons: list[Any]) -> str:
-    def add_col(input: str):
-        return f'<div class="col-auto d-flex align-items-center">{input}</div>'
+    def add_col(input_: str):
+        return \
+            f'<div class="col-auto d-flex align-items-center">{input_}</div>'
 
     return \
-        f'<div class="row my-2 g-1">{" ".join([str(b) for b in list(map(add_col, buttons))])}</div>' if buttons else ''
+        '<div class="row my-2 g-1">' \
+        f'{" ".join([str(b) for b in list(map(add_col, buttons))])}' \
+        '</div>' if buttons else ''
 
 
 @app.template_filter()
@@ -680,7 +685,8 @@ def display_form(
     multipart = 'enctype="multipart/form-data"' if 'file' in form else ''
     return \
         f'<form method="post" {form_id} {multipart}>' \
-        f'<table class="table table-no-style">{html_form(form, form_id, manual_page)}' \
+        '<table class="table table-no-style">' \
+        f'{html_form(form, form_id, manual_page)}' \
         f'</table></form>'
 
 
