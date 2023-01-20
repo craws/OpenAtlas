@@ -94,7 +94,7 @@ class Link:
                     'range_class_code',
                     range_.class_.cidoc_class.code):
                 range_error = False
-            if domain_error or range_error:
+            if domain_error or range_error:  # pragma: no cover
                 text = \
                     f"invalid CIDOC link {domain.class_.cidoc_class.code}" \
                     f" > {property_code} > {range_.class_.cidoc_class.code}"
@@ -120,7 +120,7 @@ class Link:
             code,
             inverse=inverse,
             types=types)
-        if len(result) > 1:
+        if len(result) > 1:  # pragma: no cover
             g.logger.log(
                 'error',
                 'model',
@@ -159,7 +159,7 @@ class Link:
             inverse: bool = False,
             types: bool = False) -> Entity:
         entity = Link.get_linked_entity(id_, code, inverse, types)
-        if not entity:
+        if not entity:  # pragma: no cover
             g.logger.log(
                 'error',
                 'model',
@@ -289,16 +289,15 @@ class Link:
         from openatlas.models.entity import Entity
         data = []
         for type_ in g.types.values():
-            if type_.root or type_.multiple or type_.category == 'value':
-                continue
-            if type_ids := type_.get_sub_ids_recursive():
+            if not type_.multiple \
+                    and type_.category not in  ['value', 'tools'] \
+                    and (type_ids := type_.get_sub_ids_recursive()):
                 for id_ in Db.check_single_type_duplicates(type_ids):
                     offending_types = []
                     entity = Entity.get_by_id(id_, types=True)
-                    for entity_types in entity.types:
-                        if g.types[entity_types.root[0]].id != type_.id:
-                            continue
-                        offending_types.append(entity_types)
+                    for entity_type in entity.types:
+                        if g.types[entity_type.root[0]].id == type_.id:
+                            offending_types.append(entity_type)
                     data.append({
                         'entity': entity,
                         'type': type_,
