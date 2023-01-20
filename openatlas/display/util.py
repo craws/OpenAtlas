@@ -663,7 +663,7 @@ def manual(site: str) -> str:
     return \
         '<a title="' + uc_first("manual") + '" ' \
         f'href="/static/manual/{site}.html" class="manual" target="_blank" ' \
-        'rel="noopener noreferrer"><i class="fas fa-book"></i></a>'
+        'rel="noopener noreferrer"><i class="fas fs-4 fa-book"></i></a>'
 
 
 @app.template_filter()
