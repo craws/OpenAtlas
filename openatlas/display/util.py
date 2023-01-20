@@ -247,12 +247,12 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
         if item == 'type':
             html += \
                 f'<a href="{url_for("type_index")}" ' \
-                f'class="nav-item nav-link fw-bold {active}">' + \
+                f'class="nav-item nav-link {active}">' + \
                 uc_first(_("types")) + '</a>'
         else:
             html += \
                 f'<a href="{url_for("index", view=item)}" ' \
-                f'class="nav-item nav-link fw-bold {active}">' + uc_first(_(item)) + \
+                f'class="nav-item nav-link {active}">' + uc_first(_(item)) + \
                 '</a>'
     return html
 
@@ -472,7 +472,7 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
             if hash_ == user.password.encode('utf-8'):
                 warnings.append(
                     "User OpenAtlas with default password is still active!")
-    return f'<p class="error">{"<br>".join(warnings)}<p>' if warnings else ''
+    return f'<p class="alert alert-danger">{"<br>".join(warnings)}<p>' if warnings else ''
 
 
 @app.template_filter()
@@ -494,7 +494,7 @@ def get_file_path(
     ext = g.file_stats[id_]['ext']
     if size:
         if ext in app.config['NONE_DISPLAY_EXT']:
-            ext = app.config['PROCESSED_EXT']
+            ext = app.config['PROCESSED_EXT'] # pragma: no cover
         path = app.config['RESIZED_IMAGES'] / size / f"{id_}{ext}"
         return path if os.path.exists(path) else None
     return app.config['UPLOAD_DIR'] / f"{id_}{ext}"
@@ -511,7 +511,7 @@ def format_date(value: Union[datetime, numpy.datetime64]) -> str:
 
 def convert_size(size_bytes: int) -> str:
     if size_bytes == 0:
-        return "0 B"
+        return "0 B" # pragma: no cover
     size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
     i = int(math.floor(math.log(size_bytes, 1024)))
     return f"{int(size_bytes / math.pow(1024, i))} {size_name[i]}"
@@ -580,9 +580,11 @@ def button(
 
 @app.template_filter()
 def button_bar(buttons: list[Any]) -> str:
+    def add_col(input: str):
+        return f'<div class="col-auto d-flex align-items-center">{input}</div>'
+
     return \
-        f'<div class="toolbar">{" ".join([str(b) for b in buttons])}</div>' \
-        if buttons else ''
+        f'<div class="row my-2 g-1">{" ".join([str(b) for b in list(map(add_col, buttons))])}</div>' if buttons else ''
 
 
 @app.template_filter()
@@ -623,12 +625,14 @@ def display_info(data: dict[str, Union[str, list[str]]]) -> str:
 @app.template_filter()
 def description(entity: Union[Entity, Project, User]) -> str:
     from openatlas.models.entity import Entity
-    from openatlas.views.tools import sex_result
+    from openatlas.views.tools import carbon_result, sex_result
     html = ''
     if isinstance(entity, Entity) \
             and entity.class_.name == 'stratigraphic_unit':
-        if result := sex_result(entity):
-            html += f"<p>{result}</p>"
+        if radiocarbon := carbon_result(entity):
+            html += f"<p>{radiocarbon}</p>"
+        if sex_estimation := sex_result(entity):
+            html += f"<p>{sex_estimation}</p>"
     if not entity.description:
         return html
     label = _('description')
@@ -636,7 +640,7 @@ def description(entity: Union[Entity, Project, User]) -> str:
         label = _('content')
     return f"""
         {html}
-        <h2>{uc_first(label)}</h2>
+        <p><strong>{uc_first(label)}</strong></p>
         <div class="description more">
             {'<br>'.join(entity.description.splitlines())}
         </div>"""
@@ -676,8 +680,8 @@ def display_form(
     multipart = 'enctype="multipart/form-data"' if 'file' in form else ''
     return \
         f'<form method="post" {form_id} {multipart}>' \
-        f'<div class="data-table">{html_form(form, form_id, manual_page)}' \
-        f'</div></form>'
+        f'<table class="table table-no-style">{html_form(form, form_id, manual_page)}' \
+        f'</table></form>'
 
 
 class MLStripper(HTMLParser):
