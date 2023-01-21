@@ -332,7 +332,7 @@ def format_name_and_aliases(entity: Entity, show_links: bool) -> str:
     if not entity.aliases or not current_user.settings['table_show_aliases']:
         return name
     return \
-        f'<p>{name}</p>' \
+        f'{name}' \
         f'{"".join(f"<p>{alias}</p>" for alias in entity.aliases.values())}'
 
 
