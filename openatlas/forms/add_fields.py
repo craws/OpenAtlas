@@ -9,7 +9,9 @@ from wtforms.validators import (
     InputRequired, NoneOf, NumberRange, Optional as OptionalValidator)
 
 from openatlas.display.util import is_authorized, uc_first
-from openatlas.forms.field import TreeField, TreeMultiField, ReferenceField, ValueTypeRootField, ValueTypeField
+from openatlas.forms.field import (
+    ReferenceField, TreeField, TreeMultiField, ValueTypeField,
+    ValueTypeRootField)
 from openatlas.models.openatlas_class import OpenatlasClass
 from openatlas.models.type import Type
 
@@ -222,8 +224,7 @@ def add_types(manager: Any) -> None:
         types = OrderedDict({
             id_: g.types[id_] for id_ in
             g.classes[manager.class_.name].hierarchies})
-        if g.classes[
-                manager.class_.name].standard_type_id in types:
+        if g.classes[manager.class_.name].standard_type_id in types:
             types.move_to_end(  # Standard type to top
                 g.classes[manager.class_.name].standard_type_id,
                 last=False)

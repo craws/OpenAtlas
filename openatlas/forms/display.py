@@ -36,16 +36,19 @@ def html_form(
             if len(reference_systems_fields) > 3 and not reference_systems_fields_errors:
                 if not reference_systems_added:
                     reference_systems_added = True
-                    html += add_row(None, uc_first(_('reference system')),
-                                    f'''<span id="reference-system-switcher" 
-                                    class="uc-first {app.config["CSS"]["button"]["secondary"]}"> {_("show")} </span>''')
+                    html += add_row(
+                        None,
+                        uc_first(_('reference system')),
+                        '<span id="reference-system-switcher" class="uc-first '
+                        f'{app.config["CSS"]["button"]["secondary"]}"> '
+                        f'{_("show")}</span>')
                 html += add_row(field, row_css="d-none")
                 continue
         if field.id.split('_', 1)[0] in ('begin', 'end'):
             if field.id == 'begin_year_from':
                 html += add_dates(form)
             continue
-        if field.type in ['TreeField', 'TreeMultiField']:
+        if field.type in ['TreeField', 'TreeMultiField', 'ValueTypeRootField']:
             type_ = g.types[int(field.type_id)]
             if not type_.subs:
                 continue
