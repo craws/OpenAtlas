@@ -3,43 +3,40 @@ from typing import Any
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.models.entity import Entity
 from openatlas.models.type import Type
-from tests.base import TestBaseCase
+from tests.base import TestBaseCase, insert_entity
 
 
 class ActorTests(TestBaseCase):
 
     def test_actor(self) -> None:
         with app.app_context():
-            rv: Any = self.app.get(url_for('index', view='actor'))
-            assert b'No entries' in rv.data
 
-            rv = self.app.post(url_for('insert', class_='place'), data={
-                'name': 'Captain Miller',
-                })
-            residence_id = rv.location.split('/')[-1]
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
+                place = insert_entity('place', 'Vienna')
+                event = insert_entity('acquisition', 'Event Horizon')
+                source = insert_entity('source', 'Necronomicon')
                 sex_type = Type.get_hierarchy('Sex')
                 sex_type_sub_1 = g.types[sex_type.subs[0]]
                 sex_type_sub_2 = g.types[sex_type.subs[1]]
-                event = Entity.insert('acquisition', 'Event Horizon')
-                source = Entity.insert('source', 'Necronomicon')
                 artifact_type_id = Type.get_hierarchy('Artifact').id
+
+            rv: Any = self.app.get(url_for('index', view='actor'))
+            assert b'No entries' in rv.data
 
             rv = self.app.get(url_for('insert', class_='person'))
             assert b'+ Person' in rv.data
 
             self.app.get(
-                url_for('insert', class_='person', origin_id=residence_id))
+                url_for('insert', class_='person', origin_id=place.id))
             data = {
                 sex_type.id: sex_type_sub_1.id,
                 'name': 'Sigourney Weaver',
                 'alias-1': 'Ripley',
-                'residence': residence_id,
-                'begins_in': residence_id,
-                'ends_in': residence_id,
+                'residence': place.id,
+                'begins_in': place.id,
+                'ends_in': place.id,
                 'description': 'Susan Alexandra Weaver is an American actress',
                 'begin_year_from': '-1949',
                 'begin_month_from': '10',
@@ -58,13 +55,12 @@ class ActorTests(TestBaseCase):
                 'end_year_to': '2050',
                 'end_hour_to': '13',
                 'end_minute_to': '33',
-                'end_second_to': '37',
-                }
+                'end_second_to': '37'}
             rv = self.app.post(url_for('insert', class_='person'), data=data)
             actor_id = rv.location.split('/')[-1]
             self.app.post(url_for('insert', class_='group'), data=data)
             rv = self.app.post(
-                url_for('insert', class_='person', origin_id=residence_id),
+                url_for('insert', class_='person', origin_id=place.id),
                 data=data,
                 follow_redirects=True)
             assert b'An entry has been created' in rv.data

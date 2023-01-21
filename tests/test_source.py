@@ -21,7 +21,7 @@ class SourceTest(TestBaseCase):
                     'person',
                     'Gillian Anderson Gillian Anderson',
                     'person')
-                artifact = insert_entity('I care for you', 'artifact')
+                artifact = insert_entity('artifact', 'I care for you')
                 inscribed_artifact = Entity.insert(
                     'artifact',
                     'Artifact with text')

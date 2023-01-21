@@ -75,8 +75,8 @@ class ApiTestCase(TestBaseCase):
 
 
 def insert_entity(
-        name: str,
         class_: str,
+        name: str,
         description: Optional[str] = None) -> Entity:
     entity = Entity.insert(class_, name, description)
     if class_ in ['artifact', 'feature', 'place', 'stratigraphic_unit']:

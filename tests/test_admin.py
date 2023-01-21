@@ -16,9 +16,9 @@ class AdminTests(TestBaseCase):
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                person = insert_entity('Oliver Twist', 'person')
-                insert_entity('Forsaken file', 'file')
-                insert_entity('Forsaken subunit', 'feature')
+                person = insert_entity('person', 'Oliver Twist')
+                insert_entity('file', 'Forsaken file')
+                insert_entity('feature', 'Forsaken subunit')
                 id_ = DbEntity.insert({
                     'name': 'Invalid linked entity',
                     'openatlas_class_name': 'artifact',
@@ -62,7 +62,7 @@ class AdminTests(TestBaseCase):
 
             with app.test_request_context():  # Create invalid dates
                 app.preprocess_request()  # type: ignore
-                event = insert_entity('Event Horizon', 'acquisition')
+                event = insert_entity('acquisition', 'Event Horizon')
                 person.update({
                     'attributes': {
                         'begin_from': '2018-01-31',
@@ -77,7 +77,7 @@ class AdminTests(TestBaseCase):
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                source = insert_entity('Tha source', 'source')
+                source = insert_entity('source', 'Tha source')
                 source.link('P67', event)
                 source.link('P67', event)
                 source_type = Type.get_hierarchy('Source')
@@ -101,7 +101,7 @@ class AdminTests(TestBaseCase):
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                insert_entity('Oliver Twist', 'person')
+                insert_entity('person', 'Oliver Twist')
             rv = self.app.post(
                 url_for('admin_check_similar'),
                 follow_redirects=True,

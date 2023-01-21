@@ -13,7 +13,7 @@ class ArtifactTest(TestBaseCase):
                 app.preprocess_request()  # type: ignore
                 source = Entity.insert('source', 'Necronomicon')
                 actor = Entity.insert('person', 'Conan')
-                place = insert_entity('Home', 'place')
+                place = insert_entity('place', 'Home')
 
             rv = self.app.get(
                 url_for('insert', class_='artifact', origin_id=place.id))

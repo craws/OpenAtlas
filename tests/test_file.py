@@ -14,7 +14,7 @@ class FileTest(TestBaseCase):
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                place = insert_entity('File keeper', 'place')
+                place = insert_entity('place', 'File keeper')
                 reference = Entity.insert('edition', 'Ancient Books')
                 type_id = Type.get_hierarchy('Sex').subs[0]
 

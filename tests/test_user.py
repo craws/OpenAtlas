@@ -85,8 +85,8 @@ class UserTests(TestBaseCase):
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                person = insert_entity('Hugo', 'person')
-                event = insert_entity('Event Horizon', 'activity')
+                person = insert_entity('person', 'Hugo')
+                event = insert_entity('activity', 'Event Horizon')
                 event.link('P11', person)
 
             self.app.get(url_for('logout'))

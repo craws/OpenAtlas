@@ -18,7 +18,7 @@ class TypeTest(TestBaseCase):
                 dimension_type = Type.get_hierarchy('Dimensions')
                 historical_type = Type.get_hierarchy('Historical place')
                 sex_type = Type.get_hierarchy('Sex')
-                place = insert_entity('Home', 'place')
+                place = insert_entity('place', 'Home')
                 place.link('P2', g.types[dimension_type.subs[0]], '46')
                 location = place.get_linked_entity_safe('P53')
                 location.link('P89', g.types[historical_type.subs[0]])
@@ -166,7 +166,7 @@ class TypeTest(TestBaseCase):
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                frodo = insert_entity('Frodo', 'person')
+                frodo = insert_entity('person', 'Frodo')
                 frodo.link(
                     'P2',
                     Entity.get_by_id(Type.get_hierarchy('Sex').subs[0]))
