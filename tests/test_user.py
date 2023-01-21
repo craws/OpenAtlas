@@ -86,6 +86,8 @@ class UserTests(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 person = insert_entity('Hugo', 'person')
+                event = insert_entity('Event Horizon', 'activity')
+                event.link('P11', person)
 
             self.app.get(url_for('logout'))
             rv = self.app.get(url_for('user_insert'), follow_redirects=True)
@@ -121,4 +123,11 @@ class UserTests(TestBaseCase):
             assert b'Person' in rv.data
 
             rv = self.app.get(url_for('update', id_=person.id))
+            assert b'Hugo' in rv.data
+
+            rv = self.app.get(url_for('view', id_=person.id))
+            assert b'Hugo' in rv.data
+
+            self.login('Readonly')
+            rv = self.app.get(url_for('view', id_=person.id))
             assert b'Hugo' in rv.data
