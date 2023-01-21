@@ -5,8 +5,8 @@
       <ul class="nav nav-pills bg-gray  p-1" role="tablist">
         {% for tab in tabs.values() if tab.content or tab.buttons or tab.table.rows or tab.form %}
           <li class="nav-item" role="presentation">
-            <button
-                class="py-1 nav-link {% if loop.first %}active{% endif %}"
+            <a
+                class="fw-normal py-1 nav-link {% if loop.first %}active{% endif %}"
                 data-bs-toggle="tab"
                 role="tab"
                 type="button"
@@ -16,7 +16,7 @@
               {% if tab.table.rows|length %}
                 <span class="tab-counter">{{ '{0:,}'.format(tab.table.rows|length) }}</span>
               {% endif %}
-            </button>
+            </a>
           </li>
         {% endfor %}
       </ul>
