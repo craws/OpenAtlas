@@ -89,6 +89,17 @@ class UserTests(TestBaseCase):
                 event = insert_entity('activity', 'Event Horizon')
                 event.link('P11', person)
 
+            rv = self.app.post(
+                url_for('ajax_bookmark'),
+                data={'entity_id': person.id})
+            assert b'Remove bookmark' in rv.data
+            assert b'Hugo' in self.app.get('/').data
+
+            rv = self.app.post(
+                url_for('ajax_bookmark'),
+                data={'entity_id': person.id})
+            assert b'Bookmark' in rv.data
+
             self.app.get(url_for('logout'))
             rv = self.app.get(url_for('user_insert'), follow_redirects=True)
             assert b'Forgot your password?' not in rv.data

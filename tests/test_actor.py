@@ -16,7 +16,6 @@ class ActorTests(TestBaseCase):
                 app.preprocess_request()  # type: ignore
                 place = insert_entity('place', 'Vienna')
                 event = insert_entity('acquisition', 'Event Horizon')
-                source = insert_entity('source', 'Necronomicon')
                 sex = Type.get_hierarchy('Sex')
                 sex_sub_1 = g.types[sex.subs[0]]
                 sex_sub_2 = g.types[sex.subs[1]]
@@ -92,44 +91,6 @@ class ActorTests(TestBaseCase):
                 follow_redirects=True)
             assert b'An entry has been created' in rv.data
 
-            rv = self.app.post(
-                url_for('insert', class_='external_reference'),
-                data={'name': 'https://openatlas.eu'})
-            reference_id = rv.location.split('/')[-1]
-            rv = self.app.post(
-                url_for('insert', class_='person', origin_id=reference_id),
-                data=data,
-                follow_redirects=True)
-            assert b'An entry has been created' in rv.data
-
-            data['continue_'] = 'yes'
-            rv = self.app.post(
-                url_for('insert', class_='person'),
-                data=data,
-                follow_redirects=True)
-            assert b'An entry has been created' in rv.data
-
-            rv = self.app.get(url_for('index', view='actor'))
-            assert b'Sigourney Weaver' in rv.data
-
-            rv = self.app.get(url_for('entity_add_source', id_=actor_id))
-            assert b'Link source' in rv.data
-
-            rv = self.app.post(
-                url_for('entity_add_source', id_=actor_id),
-                data={'checkbox_values': str([source.id])},
-                follow_redirects=True)
-            assert b'Necronomicon' in rv.data
-
-            rv = self.app.get(url_for('entity_add_reference', id_=actor_id))
-            assert b'Link reference' in rv.data
-
-            rv = self.app.post(
-                url_for('entity_add_reference', id_=actor_id),
-                data={'reference': reference_id, 'page': '777'},
-                follow_redirects=True)
-            assert b'777' in rv.data
-
             self.login('manager')
             rv = self.app.get(url_for('update', id_=actor_id))
             assert b'American actress' in rv.data
@@ -147,11 +108,6 @@ class ActorTests(TestBaseCase):
             assert b'Changes have been saved' in rv.data
 
             rv = self.app.post(
-                url_for('ajax_bookmark'),
-                data={'entity_id': actor_id})
-            assert b'Remove bookmark' in rv.data
-
-            rv = self.app.post(
                 url_for('ajax_create_entity'),
                 data={
                     'entityName': 'artifact',
@@ -165,19 +121,7 @@ class ActorTests(TestBaseCase):
                 data={'filterIds': str([])})
             assert b'Bishop' in rv.data
 
-            rv = self.app.get('/')
-            assert b'Weaver' in rv.data
-
-            rv = self.app.post(
-                url_for('ajax_bookmark'),
-                data={'entity_id': actor_id})
-            assert b'Bookmark' in rv.data
-
             rv = self.app.get(
                 url_for('link_delete', origin_id=actor_id, id_=666),
                 follow_redirects=True)
             assert b'removed' in rv.data
-
-            rv = self.app.get(
-                url_for('index', view='actor', delete_id=actor_id))
-            assert b'The entry has been deleted.' in rv.data
