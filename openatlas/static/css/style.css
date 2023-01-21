@@ -38,14 +38,17 @@ img#logo {
 .table tr p {
     margin: 0.2rem 0 0.2rem 0;
 }
-.table tr {
-}
-table td {
+
+.data-table td {
     white-space: nowrap;
-    overflow-x: hidden;
+    overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100px;
 }
+tbody {
+    border-top: 0px solid !important;
+  }
+
 /* map */
 .map{
     position:sticky !important;
