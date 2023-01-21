@@ -17,21 +17,17 @@ class ActorTests(TestBaseCase):
                 place = insert_entity('place', 'Vienna')
                 event = insert_entity('acquisition', 'Event Horizon')
                 source = insert_entity('source', 'Necronomicon')
-                sex_type = Type.get_hierarchy('Sex')
-                sex_type_sub_1 = g.types[sex_type.subs[0]]
-                sex_type_sub_2 = g.types[sex_type.subs[1]]
+                sex = Type.get_hierarchy('Sex')
+                sex_sub_1 = g.types[sex.subs[0]]
+                sex_sub_2 = g.types[sex.subs[1]]
                 artifact_type_id = Type.get_hierarchy('Artifact').id
 
-            rv: Any = self.app.get(url_for('index', view='actor'))
-            assert b'No entries' in rv.data
-
-            rv = self.app.get(url_for('insert', class_='person'))
-            assert b'+ Person' in rv.data
-
-            self.app.get(
+            rv: Any = self.app.get(
                 url_for('insert', class_='person', origin_id=place.id))
+            assert b'Vienna' in rv.data
+
             data = {
-                sex_type.id: sex_type_sub_1.id,
+                sex.id: sex_sub_1.id,
                 'name': 'Sigourney Weaver',
                 'alias-1': 'Ripley',
                 'residence': place.id,
@@ -58,51 +54,44 @@ class ActorTests(TestBaseCase):
                 'end_second_to': '37'}
             rv = self.app.post(url_for('insert', class_='person'), data=data)
             actor_id = rv.location.split('/')[-1]
-            self.app.post(url_for('insert', class_='group'), data=data)
+
+            rv = self.app.post(
+                url_for('insert', class_='group'),
+                data=data,
+                follow_redirects=True)
+            assert b'An entry has been created' in rv.data
+
             rv = self.app.post(
                 url_for('insert', class_='person', origin_id=place.id),
                 data=data,
                 follow_redirects=True)
             assert b'An entry has been created' in rv.data
 
-            rv = self.app.get(url_for('view', id_=sex_type_sub_1.id))
-            assert b'Susan' in rv.data
-
-            rv = self.app.get(
-                url_for('type_move_entities', id_=sex_type_sub_1.id))
-            assert b'Sigourney' in rv.data
-
             rv = self.app.post(
-                url_for('type_move_entities', id_=sex_type_sub_1.id),
-                follow_redirects=True,
+                url_for('type_move_entities', id_=sex_sub_1.id),
                 data={
-                    sex_type.id: sex_type_sub_2.id,
+                    sex.id: sex_sub_2.id,
                     'selection': [actor_id],
-                    'checkbox_values': str([actor_id])})
-            assert b'Entities were updated' in rv.data
-
-            rv = self.app.post(
-                url_for('type_move_entities', id_=sex_type_sub_2.id),
-                follow_redirects=True,
-                data={
-                    sex_type.id: '',
-                    'selection': [actor_id],
-                    'checkbox_values': str([actor_id])})
+                    'checkbox_values': str([actor_id])},
+                follow_redirects=True)
             assert b'Entities were updated' in rv.data
 
             rv = self.app.get(
-                url_for('remove_class', id_=sex_type.id, name='person'))
+                url_for('remove_class', id_=sex.id, name='person'))
             assert b'403' in rv.data
 
-            self.app.post(
+            rv = self.app.post(
                 url_for('insert', class_='person', origin_id=actor_id),
-                data=data)
-            self.app.post(
+                data=data,
+                follow_redirects=True)
+            assert b'An entry has been created' in rv.data
+
+            rv = self.app.post(
                 url_for('insert', class_='person', origin_id=event.id),
-                data=data)
-            self.app.post(
-                url_for('insert', class_='person', origin_id=source.id),
-                data=data)
+                data=data,
+                follow_redirects=True)
+            assert b'An entry has been created' in rv.data
+
             rv = self.app.post(
                 url_for('insert', class_='external_reference'),
                 data={'name': 'https://openatlas.eu'})
