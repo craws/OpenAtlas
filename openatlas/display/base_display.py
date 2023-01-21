@@ -10,8 +10,8 @@ from openatlas.display.tab import Tab
 from openatlas.display.util import (
     bookmark_toggle, button, delete_link, edit_link, ext_references,
     format_date, format_entity_date, get_appearance, get_base_table_data,
-    get_system_data, is_authorized, link, manual, profile_image,
-    profile_image_table_link, remove_link, siblings_pager, uc_first)
+    get_system_data, is_authorized, link, manual, profile_image_table_link,
+    remove_link, siblings_pager)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -91,7 +91,7 @@ class BaseDisplay:
         if 'file' in self.tabs \
                 and current_user.settings['table_show_icons'] \
                 and g.settings['image_processing']:
-            self.tabs['file'].table.header.insert(1, uc_first(_('icon')))
+            self.tabs['file'].table.header.insert(1, _('icon'))
             for row in self.tabs['file'].table.rows:
                 row.insert(1, file_preview(
                     int(row[0]
@@ -117,12 +117,10 @@ class BaseDisplay:
         for note in current_user.get_notes_by_entity_id(self.entity.id):
             data = [
                 format_date(note['created']),
-                uc_first(_('public'))
-                if note['public'] else uc_first(_('private')),
+                _('public') if note['public'] else _('private'),
                 link(User.get_by_id(note['user_id'])),
                 note['text'],
-                f'<a href="{url_for("note_view", id_=note["id"])}">' +
-                uc_first(_("view")) + '</a>']
+                link(_("view"), url_for("note_view", id_=note["id"]))]
             self.tabs['note'].table.rows.append(data)
 
     def add_buttons(self) -> None:
@@ -287,7 +285,8 @@ class EventsDisplay(BaseDisplay):
                 link(link_.range),
                 link_.range.class_.label,
                 link_.type.name if link_.type else '',
-                link_.first or f'<span class="text-muted">{entity.first}</span>'
+                link_.first
+                or f'<span class="text-muted">{entity.first}</span>'
                 if entity.first else '',
                 link_.last or f'<span class="text-muted">{entity.last}</span>'
                 if entity.last else '',
@@ -326,7 +325,7 @@ class PlaceBaseDisplay(BaseDisplay):
         if entity.class_.view == 'place' \
                 and is_authorized('editor') \
                 and current_user.settings['module_map_overlay']:
-            self.tabs['file'].table.header.append(uc_first(_('overlay')))
+            self.tabs['file'].table.header.append(_('overlay'))
 
         for link_ in entity.get_links('P67', inverse=True):
             domain = link_.domain

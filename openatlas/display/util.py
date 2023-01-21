@@ -213,9 +213,8 @@ def get_system_data(entity: Entity) -> dict[str, Any]:
 
 
 def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
-    label = uc_first(
-        _('bookmark remove')
-        if entity_id in current_user.bookmarks else _('bookmark'))
+    label = _('bookmark remove') \
+        if entity_id in current_user.bookmarks else _('bookmark')
     onclick = f"ajaxBookmark('{entity_id}');"
     if for_table:
         return \
