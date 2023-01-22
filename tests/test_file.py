@@ -60,7 +60,8 @@ class FileTest(TestBaseCase):
 
             filename = f'{file_id}.png'
             with self.app.get(url_for('display_logo', filename=filename)):
-                pass  # Test logo with "with" to prevent unclosed files warning
+                pass
+
             rv = self.app.get(
                 url_for('admin_logo', id_=file_id),
                 follow_redirects=True)

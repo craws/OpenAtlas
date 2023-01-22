@@ -15,6 +15,10 @@ class ArtifactTest(TestBaseCase):
                 actor = insert_entity('person', 'Conan')
                 place = insert_entity('place', 'Home')
 
+            rv = self.app.get(
+                url_for('insert', class_='artifact', origin_id=place.id))
+            assert b'+ Artifact' in rv.data
+
             rv = self.app.post(
                 url_for('insert', class_='artifact'),
                 data={
