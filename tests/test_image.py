@@ -80,7 +80,7 @@ class ImageTest(TestBaseCase):
             assert b'No preview available' in rv.data
 
             rv = self.app.get(url_for('view', id_=file_pathless.id))
-            assert b'Missing file' in rv.data
+            assert b'missing file' in rv.data
 
             rv = self.app.get(url_for('index', view='file'))
             assert b'Test_File' in rv.data

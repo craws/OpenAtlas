@@ -148,7 +148,7 @@ class TypeTest(TestBaseCase):
                 actor.link('P2', g.types[sex_type.subs[0]])
             rv = self.app.get(
                 url_for('show_untyped_entities', id_=sex_type.id))
-            assert b'No entries' in rv.data
+            assert b'no entries' in rv.data
 
             rv = self.app.get(
                 url_for('show_untyped_entities', id_=admin_unit_id))

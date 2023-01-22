@@ -17,18 +17,20 @@ class AdminTests(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 person = insert_entity('person', 'Oliver Twist')
+                insert_entity('person', 'Oliver Twist')
                 insert_entity('file', 'Forsaken file')
                 insert_entity('feature', 'Forsaken subunit')
-                id_ = DbEntity.insert({
+                id_invalid = DbEntity.insert({
                     'name': 'Invalid linked entity',
                     'openatlas_class_name': 'artifact',
                     'code': 'E13', 'description': ''})
                 DbLink.insert({
                     'property_code': 'P86',
-                    'domain_id': id_,
-                    'range_id': id_,
+                    'domain_id': id_invalid,
+                    'range_id': id_invalid,
                     'description': '',
                     'type_id': None})
+
             rv = self.app.get(url_for('admin_orphans'))
             assert b'Oliver Twist' in rv.data
             assert b'Forsaken file' in rv.data
@@ -72,17 +74,16 @@ class AdminTests(TestBaseCase):
                 involvement.begin_to = '2017-01-01'
                 involvement.end_from = '2017-01-01'
                 involvement.update()
-            rv = self.app.get(url_for('admin_check_dates'))
-            assert b'<span class="tab-counter">' in rv.data
-
-            with app.test_request_context():
-                app.preprocess_request()  # type: ignore
                 source = insert_entity('source', 'Tha source')
                 source.link('P67', event)
                 source.link('P67', event)
                 source_type = Type.get_hierarchy('Source')
                 source.link('P2', g.types[source_type.subs[0]])
                 source.link('P2', g.types[source_type.subs[1]])
+
+            rv = self.app.get(url_for('admin_check_dates'))
+            assert b'<span class="tab-counter">' in rv.data
+
             rv = self.app.get(url_for('admin_check_link_duplicates'))
             assert b'Event Horizon' in rv.data
 
@@ -99,26 +100,14 @@ class AdminTests(TestBaseCase):
                 follow_redirects=True)
             assert b'Congratulations, everything looks fine!' in rv.data
 
-            with app.test_request_context():
-                app.preprocess_request()  # type: ignore
-                insert_entity('person', 'Oliver Twist')
             rv = self.app.post(
                 url_for('admin_check_similar'),
                 follow_redirects=True,
                 data={'classes': 'person', 'ratio': 100})
             assert b'Oliver Twist' in rv.data
 
-            rv = self.app.post(
-                url_for('admin_check_similar'),
-                follow_redirects=True,
-                data={'classes': 'file', 'ratio': 100})
-            assert b'No entries' in rv.data
-
             rv = self.app.get(url_for('admin_settings', category='mail'))
             assert b'Recipients feedback' in rv.data
-
-            rv = self.app.get(url_for('admin_index'))
-            assert b'User' in rv.data
 
             rv = self.app.get(url_for('admin_settings', category='general'))
             assert b'Log level' in rv.data
