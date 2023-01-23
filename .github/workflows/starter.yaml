@@ -60,14 +60,14 @@ jobs:
 
       - name: Create postgis container
         run: |
-          docker run --rm -d -e POSTGRES_PASSWORD=verysecret -e POSTGRES_DB=openatlas_test -e POSTGRES_USER=openatlas --name postgres --network openatlas postgis/postgis:13-3.3
+          docker run -d -e POSTGRES_PASSWORD=verysecret -e POSTGRES_DB=openatlas_test -e POSTGRES_USER=openatlas --name postgres --network openatlas postgis/postgis:13-3.3
 
       - name: Wait
         run: sleep 8
 
       - name: Create openatlas container
         run: |
-          docker create --rm -e POSTGRES_PASSWORD=verysecret -e POSTGRES_DB=openatlas_test -e POSTGRES_USER=openatlas -e POSTGRES_HOST=postgres --name openatlas --network openatlas ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')/container-preview:${{ github.ref_name }}
+          docker create -e POSTGRES_PASSWORD=verysecret -e POSTGRES_DB=openatlas_test -e POSTGRES_USER=openatlas -e POSTGRES_HOST=postgres --name openatlas --network openatlas ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')/container-preview:${{ github.ref_name }}
           set -x
           cat <<EOF > testing.py
           DATABASE_NAME='openatlas_test'
@@ -89,8 +89,9 @@ jobs:
           MAIL_PASSWORD='asdQWEtzu123'
           SECRET_KEY='$COOKIE_KEY'  # Used for cookies
           EOF
-          docker cp production.py openatlas:/var/www/openatlas/instance/
-          docker cp testing.py openatlas:/var/www/openatlas/instance/
+          sudo chown 33:33 production.py testing.py
+          docker cp -a production.py openatlas:/var/www/openatlas/instance/
+          docker cp -a testing.py openatlas:/var/www/openatlas/instance/
           docker start openatlas
           docker ps --all
           until [ "$(docker inspect -f {{.State.Running}} openatlas)"=="true" ]; do
