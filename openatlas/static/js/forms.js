@@ -141,11 +141,12 @@ $(document).ready(function () {
 
         // Adding a generic submit handler to form validation
         .each(function () {
-                $(this).validate({
-                    submitHandler: function (form) {
-                        if (this.submitButton?.id === "insert_and_continue") $('#continue_').val('yes');
-                        if (this.submitButton?.id === "insert_continue_sub") $('#continue_').val('sub');
-                        if (this.submitButton?.id === "insert_continue_human_remains") $('#continue_').val('human_remains');
+            $(this).validate({
+                errorClass: "d-block error",
+                submitHandler: function (form) {
+                    if (this.submitButton?.id === "insert_and_continue") $('#continue_').val('yes');
+                    if (this.submitButton?.id === "insert_continue_sub") $('#continue_').val('sub');
+                    if (this.submitButton?.id === "insert_continue_human_remains") $('#continue_').val('human_remains');
                         $('input[type="submit"]').prop("disabled", true).val('... in progress');
                         form.submit();
                     },

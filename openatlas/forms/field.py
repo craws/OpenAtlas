@@ -163,11 +163,11 @@ class TableMultiSelect(HiddenInput):
                 <input type="checkbox" id="{entity.id}" value="{entity.name}"
                 {'checked' if entity.id in data else ''}>""")
             table.rows.append(row)
-        return super().__call__(field, **kwargs) + render_template(
+        return render_template(
             'forms/table_multi_select.html',
             field=field,
             selection=[e.name for e in entities if e.id in data],
-            table=table)
+            table=table) + super().__call__(field, **kwargs)
 
 
 class TableMultiField(HiddenField):
@@ -248,12 +248,12 @@ class TreeMultiSelect(HiddenInput):
     def __call__(self, field: TreeField, **kwargs: Any) -> TreeMultiSelect:
         data = field.data or []
         data = ast.literal_eval(data) if isinstance(data, str) else data
-        return super().__call__(field, **kwargs) + render_template(
+        return render_template(
             'forms/tree_multi_select.html',
             field=field,
             root=g.types[int(field.type_id)],
             selection=sorted([g.types[id_].name for id_ in data]),
-            data=Type.get_tree_data(int(field.id), data))
+            data=Type.get_tree_data(int(field.id), data)) + super().__call__(field, **kwargs)
 
 
 class TreeMultiField(HiddenField):
@@ -281,7 +281,7 @@ class TreeSelect(HiddenInput):
                 if isinstance(field.data, list) else field.data
             selection = g.types[int(field.data)].name
             selected_ids.append(g.types[int(field.data)].id)
-        return super().__call__(field, **kwargs) + render_template(
+        return render_template(
             'forms/tree_select.html',
             field=field,
             selection=selection,
@@ -289,7 +289,7 @@ class TreeSelect(HiddenInput):
             data=Type.get_tree_data(
                 int(field.type_id),
                 selected_ids,
-                field.filters_ids))
+                field.filters_ids)) + super().__call__(field, **kwargs)
 
 
 class TreeField(HiddenField):
