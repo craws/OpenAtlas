@@ -9,7 +9,7 @@ create_database () {
 
     echo "Import database dumps"
     pushd /var/www/openatlas/install || exit
-    cat 1_structure.sql 2_data_model.sql 3_data_web.sql  4_data_node.sql | psql "$DB_URL" -f -
+    cat 1_structure.sql 2_data_model.sql 3_data_web.sql  4_data_type.sql | psql "$DB_URL" -f -
     popd || exit
 }
 
