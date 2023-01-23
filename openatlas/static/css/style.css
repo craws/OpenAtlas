@@ -38,7 +38,9 @@ img#logo {
 .table tr p {
     margin: 0.2rem 0 0.2rem 0;
 }
-
+.dataTables_info{
+    white-space: nowrap;
+}
 .data-table td {
     white-space: nowrap;
     overflow: hidden;
@@ -46,7 +48,7 @@ img#logo {
     max-width: 100px;
 }
 tbody {
-    border-top: 0px solid !important;
+    border-top: 0 solid !important;
   }
 
 /* map */
