@@ -2,7 +2,7 @@
   {% for label, value in data.items() %}
     {% if value or value == 0 %}
       <tr>
-        <td class="fit-width">{{ label|uc_first }}</td>
+        <td class="text-nowrap fit-width">{{ label|uc_first }}</td>
         <td class="table-cell">
           {% if value is iterable and value is not string %}
             {{ '<br>'.join(value)|safe }}
