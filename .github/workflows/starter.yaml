@@ -92,6 +92,7 @@ jobs:
           docker cp production.py openatlas:/var/www/openatlas/instance/
           docker cp testing.py openatlas:/var/www/openatlas/instance/
           docker start openatlas
+          sleep 3
           docker ps --all
           docker exec -i openatlas /bin/bash -c "cd /var/www/openatlas/tests && nosetests3 --config=.noserc && echo passed"
 
