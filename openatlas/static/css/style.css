@@ -65,10 +65,14 @@ form ul, form ol, form li {
 }
 
 /* utilities */
-.uc-first::first-letter {
+.uc-first:first-letter {
     text-transform: uppercase;
 }
-
+@-moz-document url-prefix() {
+    .uc-first:first-letter {
+        text-transform: none!important;
+    }
+}
 .bg-gray{
    background-color: #e9ecef !important
 }

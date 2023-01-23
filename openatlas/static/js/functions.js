@@ -11,7 +11,12 @@ tinymce.init({
 });
 
 $(document).ready(function () {
-
+  if (navigator.userAgent.indexOf("Firefox") != -1) {
+    $(".uc-first").each(function (i, obj) {
+      obj.innerText = capitalizeFirstLetter(obj.innerText)
+    });
+    document.body.style.display = '';
+  }
   $('[data-bs-toggle="popover"]').popover(); // Popovers init
 
   /* DataTables - sort for checkbox columns */
@@ -434,4 +439,8 @@ function removeListField(id){
   console.log(id)
         const el = document.getElementById(id);
         el.parentElement?.closest('li')?.remove();
+}
+
+function capitalizeFirstLetter(text){
+  return text.charAt(0).toUpperCase() + text.slice(1);
 }

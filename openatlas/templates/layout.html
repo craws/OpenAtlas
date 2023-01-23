@@ -59,6 +59,9 @@
   {% block script %}{% endblock %}
 </head>
 <body>
+<script type="text/javascript">
+    if (navigator.userAgent.indexOf("Firefox") != -1) document.body.style.display = 'none';
+</script>
 <nav class="navbar navbar-expand-md navbar-light bg-light">
   <div class="container-fluid">
     <a class="navbar-brand" href="/"><img src="{{ get_logo|safe }}" id="logo" alt="Logo"></a>
