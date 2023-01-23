@@ -68,18 +68,18 @@ $(document).ready(function () {
   $('.more').each(function () {
     var content = $(this).html();
     if (this.scrollHeight - 1 > this.clientHeight) {
-      more = '<a href="" class="more-link">' + moreText + '</a></span>';
+      more = '<a href="" class="more-link">' + translate.moreText + '</a></span>';
       $(more).insertAfter(this);
     }
   });
   $(".more-link").click(function () {
     if ($(this).hasClass("less")) {
       $(this).removeClass("less");
-      $(this).html(moreText);
+      $(this).html(translate.moreText);
       $(this).prev().css('line-clamp', "10");
     } else {
       $(this).addClass("less");
-      $(this).html(lessText);
+      $(this).html(translate.lessText);
       $(this).prev().css('line-clamp', "1000");
     }
     return false;

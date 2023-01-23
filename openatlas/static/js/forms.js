@@ -44,7 +44,7 @@ $(document).ready(function () {
     $("#reference-system-switcher").click(function () {
         $(".reference-system-switch").toggleClass('d-none');
         $(this).text(function (i, text) {
-            return $.trim(text) === show ? hide : show;
+            return $.trim(text) === translate.show ? translate.hide : translate.show;
         })
     });
 
@@ -52,7 +52,7 @@ $(document).ready(function () {
     $("#date-switcher").click(function () {
         $(".date-switch").toggleClass('d-none');
         $(this).text(function (i, text) {
-            return $.trim(text) === show ? hide : show;
+            return $.trim(text) === translate.show ? translate.hide : translate.show;
         })
     });
 
@@ -186,3 +186,26 @@ $(document).ready(function () {
     });
 
 });
+
+/*
+ * Translated default messages for the jQuery validation plugin.
+ * Locale: DE (German, Deutsch)
+ */
+(function ($) {
+    $.extend($.validator.messages, {
+        required: translate.validate_required,
+        maxlength: $.validator.format(translate.validate_maxlength),
+        minlength: $.validator.format(translate.validate_minlength),
+        rangelength: $.validator.format(translate.validate_rangelength),
+        email: translate.validate_email,
+        url: translate.validate_url,
+        date: translate.validate_date,
+        number: translate.validate_number,
+        digits: translate.validate_digits,
+        equalTo: translate.validate_equalTo,
+        fileSize: translate.validate_fileSize,
+        range: $.validator.format(translate.validate_range),
+        max: $.validator.format(translate.validate_max),
+        min: $.validator.format(translate.validate_min),
+    });
+}(jQuery));
