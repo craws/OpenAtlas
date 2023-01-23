@@ -98,35 +98,4 @@ jobs:
               sleep 0.1;
           done;
           docker ps --all
-          docker exec -i openatlas /bin/bash -c "cd /var/www/openatlas/tests && nosetests3 --config=.noserc && echo passed"
-
-#
-#      - name: Execute tests
-#        run: |
-#          set -x
-#          cat <<EOF > testing.py
-#          DATABASE_NAME='openatlas_test'
-#          DATABASE_USER='openatlas'
-#          DATABASE_HOST='postgres'
-#          DATABASE_PORT=5432
-#          DATABASE_PASS='verysecret'
-#          MAIL_PASSWORD='asdQWEtzu123'
-#          SECRET_KEY='$COOKIE_KEY'  # Used for cookies
-#          IS_UNIT_TEST = True
-#          DEBUG = True
-#          EOF
-#          cat <<EOF > production.py
-#          DATABASE_NAME='openatlas'
-#          DATABASE_USER='openatlas'
-#          DATABASE_HOST='postgres'
-#          DATABASE_PORT=5432
-#          DATABASE_PASS='verysecret'
-#          MAIL_PASSWORD='asdQWEtzu123'
-#          SECRET_KEY='$COOKIE_KEY'  # Used for cookies
-#          EOF
-#          cat testing.py
-#          cat production.py
-#          docker cp production.py openatlas:/var/www/openatlas/instance/
-#          docker cp testing.py openatlas:/var/www/openatlas/instance/
-#          docker ps --all
-#          docker exec -i openatlas /bin/bash -c "cd /var/www/openatlas/ && python3 -m nose"
+          docker exec -i openatlas /bin/bash -c "cd /var/www/openatlas/tests && nosetests3 --config=.noserc --verbosity=2 --nologcapture --nocapture && echo passed"
