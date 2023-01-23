@@ -9,12 +9,12 @@ from wtforms import (
 from wtforms.validators import InputRequired
 
 from openatlas import app
+from openatlas.display.table import Table
+from openatlas.display.util import link, manual, required_group, uc_first
 from openatlas.forms.field import TableField
 from openatlas.models.entity import Entity
 from openatlas.models.network import Network
 from openatlas.models.openatlas_class import OpenatlasClass
-from openatlas.util.table import Table
-from openatlas.util.util import link, manual, required_group, uc_first
 
 
 class LinkCheckForm(FlaskForm):
@@ -45,12 +45,10 @@ def model_index() -> str:
             'domain': domain,
             'property': property_,
             'range': range_,
-            'domain_valid': property_.find_object(
-                'domain_class_code',
-                domain.code),
-            'range_valid': property_.find_object(
-                'range_class_code',
-                range_.code)}
+            'domain_valid':
+                property_.find_object('domain_class_code', domain.code),
+            'range_valid':
+                property_.find_object('range_class_code', range_.code)}
     return render_template(
         'model/index.html',
         form=form,
@@ -261,7 +259,7 @@ def model_network(dimensions: Optional[int] = None) -> str:
     for class_ in classes:
         setattr(NetworkForm, class_.name, StringField(
             default=class_.network_color,
-            render_kw={'data-huebee': True, 'class': 'data-huebee'}))
+            render_kw={'data-huebee': True, 'class': f'data-huebee {app.config["CSS"]["string_field"]}'}))
     setattr(NetworkForm, 'save', SubmitField(_('apply')))
     form = NetworkForm()
     form.classes.choices = []

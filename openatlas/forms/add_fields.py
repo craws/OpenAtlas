@@ -4,14 +4,16 @@ from typing import Any
 from flask import g
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
-from wtforms import IntegerField, SelectField, StringField, TextAreaField
+from wtforms import IntegerField, StringField, TextAreaField
 from wtforms.validators import (
     InputRequired, NoneOf, NumberRange, Optional as OptionalValidator)
 
-from openatlas.forms.field import TreeField, TreeMultiField, ValueFloatField
+from openatlas.display.util import is_authorized, uc_first
+from openatlas.forms.field import (
+    ReferenceField, TreeField, TreeMultiField, ValueTypeField,
+    ValueTypeRootField)
 from openatlas.models.openatlas_class import OpenatlasClass
 from openatlas.models.type import Type
-from openatlas.util.util import is_authorized, uc_first
 
 
 def add_reference_systems(class_: OpenatlasClass, form: Any) -> None:
@@ -28,19 +30,12 @@ def add_reference_systems(class_: OpenatlasClass, form: Any) -> None:
         setattr(
             form,
             f'reference_system_id_{system.id}',
-            StringField(
+            ReferenceField(
                 uc_first(system.name),
-                [OptionalValidator()],
                 description=system.description,
-                render_kw={
-                    'autocomplete': 'off',
-                    'placeholder': system.placeholder}))
-        setattr(
-            form,
-            f'reference_system_precision_{system.id}',
-            SelectField(
-                _('precision'),
+                placeholder=system.placeholder,
                 choices=precisions,
+                reference_system_id=system.id,
                 default=system.precision_default_id))
 
 
@@ -219,7 +214,7 @@ def add_value_type_fields(form_class: FlaskForm, subs: list[int]) -> None:
         setattr(
             form_class,
             str(sub.id),
-            ValueFloatField(sub.name, [OptionalValidator()]))
+            ValueTypeField(sub.name, sub.id, [OptionalValidator()]))
         add_value_type_fields(form_class, sub.subs)
 
 
@@ -229,8 +224,7 @@ def add_types(manager: Any) -> None:
         types = OrderedDict({
             id_: g.types[id_] for id_ in
             g.classes[manager.class_.name].hierarchies})
-        if g.classes[
-                manager.class_.name].standard_type_id in types:
+        if g.classes[manager.class_.name].standard_type_id in types:
             types.move_to_end(  # Standard type to top
                 g.classes[manager.class_.name].standard_type_id,
                 last=False)
@@ -252,7 +246,13 @@ def add_types(manager: Any) -> None:
             if form:
                 getattr(form, f'{type_.id}-dynamic').label.text = 'super'
             validators = [InputRequired()] if type_.required else []
-            if type_.multiple:
+            if type_.category == 'value':
+                setattr(
+                    manager.form_class,
+                    str(type_.id),
+                    ValueTypeRootField(str(type_.name), type_.id))
+                add_value_type_fields(manager.form_class, type_.subs)
+            elif type_.multiple:
                 setattr(
                     manager.form_class,
                     str(type_.id),
@@ -262,5 +262,3 @@ def add_types(manager: Any) -> None:
                     manager.form_class,
                     str(type_.id),
                     TreeField(str(type_.id), validators, form=form))
-            if type_.category == 'value':
-                add_value_type_fields(manager.form_class, type_.subs)

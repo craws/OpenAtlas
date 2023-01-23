@@ -24,20 +24,96 @@ class Type(Entity):
         self.subs: list[int] = []
         self.classes: list[str] = []
 
-    @staticmethod
-    def hierarchy_required_add(id_: int) -> None:
-        Db.hierarchy_required_add(id_)
+    def get_sub_ids_recursive(
+            self,
+            subs: Optional[list[int]] = None) -> list[int]:
+        subs = subs or []
+        for sub_id in self.subs:
+            subs.append(sub_id)
+            Type.get_sub_ids_recursive(g.types[sub_id], subs)
+        return subs
 
-    @staticmethod
-    def hierarchy_required_remove(id_: int) -> None:
-        Db.hierarchy_required_remove(id_)
+    def get_count_by_class(self, name: str) -> Optional[int]:
+        if type_ids := self.get_sub_ids_recursive():
+            return Db.get_class_count(name, type_ids)
+        return None
+
+    def set_required(self) -> None:
+        Db.set_required(self.id)
+
+    def unset_required(self) -> None:
+        Db.unset_required(self.id)
+
+    def remove_class(self, name: str) -> None:
+        Db.remove_class(self.id, name)
+
+    def remove_entity_links(self, entity_id: int) -> None:
+        Db.remove_entity_links(self.id, entity_id)
+
+    def get_untyped(self) -> list[Entity]:
+        untyped = []
+        for entity in Entity.get_by_class(self.classes, types=True):
+            linked = False
+            to_check = entity
+            if self.name in ('Administrative unit', 'Historical place'):
+                to_check = entity.get_linked_entity_safe('P53', types=True)
+            for type_ in to_check.types:
+                if type_.root[0] == self.id:
+                    linked = True
+                    break
+            if not linked:
+                untyped.append(entity)
+        return untyped
+
+    def update_hierarchy(
+            self,
+            name: str,
+            classes: list[str],
+            multiple: bool) -> None:
+        Db.update_hierarchy({
+            'id': self.id,
+            'name': name,
+            'multiple': multiple})
+        Db.add_classes_to_hierarchy(self.id, classes)
+
+    def move_entities(self, new_type_id: int, checkbox_values: str) -> None:
+        root = g.types[self.root[0]]
+        entity_ids = ast.literal_eval(checkbox_values)
+        delete_ids = []
+        if new_type_id:  # A new type was selected
+            if root.multiple:
+                cleaned_entity_ids = []
+                for entity in Entity.get_by_ids(entity_ids, types=True):
+                    if any(type_.id == int(new_type_id)
+                           for type_ in entity.types):
+                        delete_ids.append(entity.id)
+                    else:
+                        cleaned_entity_ids.append(entity.id)
+                entity_ids = cleaned_entity_ids
+            if entity_ids:
+                data = {
+                    'old_type_id': self.id,
+                    'new_type_id': new_type_id,
+                    'entity_ids': tuple(entity_ids)}
+                if root.name in app.config['PROPERTY_TYPES']:
+                    Db.move_link_type(data)
+                else:
+                    Db.move_entity_type(data)
+        else:
+            delete_ids = entity_ids  # No new type selected so delete all links
+
+        if delete_ids:
+            if root.name in app.config['PROPERTY_TYPES']:
+                Db.remove_link_type(self.id, delete_ids)
+            else:
+                Db.remove_entity_type(self.id, delete_ids)
 
     @staticmethod
     def get_all() -> dict[int, Type]:
         types = {}
         for row in \
                 Db.get_types('type', 'P127') + \
-                Db.get_types('type_anthropology', 'P127') + \
+                Db.get_types('type_tools', 'P127') + \
                 Db.get_types('administrative_unit', 'P89'):
             type_ = Type(row)
             types[type_.id] = type_
@@ -82,13 +158,6 @@ class Type(Entity):
             return root
         type_.root.insert(0, super_.root[-1])
         return Type.get_root_path(types, type_, super_.root[-1], root)
-
-    @staticmethod
-    def get_types(name: str) -> list[int]:
-        for type_ in g.types.values():
-            if type_.name == name and not type_.root:
-                return type_.subs
-        return []  # pragma: no cover
 
     @staticmethod
     def check_hierarchy_exists(name: str) -> list[Type]:
@@ -154,99 +223,7 @@ class Type(Entity):
         Db.add_classes_to_hierarchy(type_.id, classes)
 
     @staticmethod
-    def update_hierarchy(
-            type_: Type,
-            name: str,
-            classes: list[str],
-            multiple: bool) -> None:
-        Db.update_hierarchy({
-            'id': type_.id,
-            'name': name,
-            'multiple': multiple})
-        Db.add_classes_to_hierarchy(type_.id, classes)
-
-    @staticmethod
     def get_type_orphans() -> list[Type]:
         return [
             n for key, n in g.types.items()
             if n.root and n.count < 1 and not n.subs]
-
-    @staticmethod
-    def move_entities(
-            old_type: Type,
-            new_type_id: int,
-            checkbox_values: str) -> None:
-        root = g.types[old_type.root[0]]
-        entity_ids = ast.literal_eval(checkbox_values)
-        delete_ids = []
-        if new_type_id:  # A new type was selected
-            if root.multiple:
-                cleaned_entity_ids = []
-                for entity in Entity.get_by_ids(entity_ids, types=True):
-                    if any(type_.id == int(new_type_id)
-                           for type_ in entity.types):
-                        delete_ids.append(entity.id)
-                    else:
-                        cleaned_entity_ids.append(entity.id)
-                entity_ids = cleaned_entity_ids
-            if entity_ids:
-                data = {
-                    'old_type_id': old_type.id,
-                    'new_type_id': new_type_id,
-                    'entity_ids': tuple(entity_ids)}
-                if root.name in app.config['PROPERTY_TYPES']:
-                    Db.move_link_type(data)
-                else:
-                    Db.move_entity_type(data)
-        else:
-            delete_ids = entity_ids  # No new type selected so delete all links
-
-        if delete_ids:
-            if root.name in app.config['PROPERTY_TYPES']:
-                Db.remove_link_type(old_type.id, delete_ids)
-            else:
-                Db.remove_entity_type(old_type.id, delete_ids)
-
-    @staticmethod
-    def get_all_sub_ids(
-            type_: Type,
-            subs: Optional[list[int]] = None) -> list[int]:
-        subs = subs or []
-        for sub_id in type_.subs:
-            subs.append(sub_id)
-            Type.get_all_sub_ids(g.types[sub_id], subs)
-        return subs
-
-    @staticmethod
-    def get_form_count(root_type: Type, class_name: str) -> Optional[int]:
-        if type_ids := Type.get_all_sub_ids(root_type):
-            return Db.get_form_count(class_name, type_ids)
-        return None
-
-    @staticmethod
-    def remove_class_from_hierarchy(
-            class_name: str, hierarchy_id: int) -> None:
-        Db.remove_class_from_hierarchy(class_name, hierarchy_id)
-
-    @staticmethod
-    def remove_by_entity_and_type(entity_id: int, type_id: int) -> None:
-        Db.remove_by_entity_and_type(entity_id, type_id)
-
-    @staticmethod
-    def get_untyped(hierarchy_id: int) -> list[Entity]:
-        hierarchy = g.types[hierarchy_id]
-        classes = hierarchy.classes
-        untyped = []
-        for entity in Entity.get_by_class(classes, types=True):
-            linked = False
-            entity_to_check = entity
-            if hierarchy.name in ('Administrative unit', 'Historical place'):
-                entity_to_check = \
-                    entity.get_linked_entity_safe('P53', types=True)
-            for type_ in entity_to_check.types:
-                if type_.root[0] == hierarchy_id:
-                    linked = True
-                    break
-            if not linked:
-                untyped.append(entity)
-        return untyped

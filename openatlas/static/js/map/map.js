@@ -244,7 +244,7 @@ const allSelected = [
     ...gisPointSibling,
     ...gisPointSubs,
 ];
-if (allSelected.filter(pointFilter)?.length > 0)
+if (allSelected?.length > 0)
     map.fitBounds(L.featureGroup(allSelectedLayer).getBounds(), {
         maxZoom: mapDefaultZoom,
     });
@@ -437,15 +437,18 @@ function buildPopup(feature, action = "view", selected = false) {
             window.location.href.includes("insert"))
             ? `<button
                id="editButton"
+               class="${style.button.primary}"
                onclick="editGeometry(${feature.properties.id})">
                  ${translate["edit"]}
                </button>
                <button
                id="deleteButton"
+               class="${style.button.primary}"
                onclick="deleteGeometry(${feature.properties.id})">
                  ${translate["delete"]}
                </button>`
             : `<button
+               class="${style.button.primary}"
                onclick="window.location.href='/entity/${feature.properties.objectId}'">
                  ${translate["details"]}
                </button>`

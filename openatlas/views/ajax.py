@@ -10,7 +10,7 @@ from openatlas.forms.util import get_table_content
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 from openatlas.models.user import User
-from openatlas.util.util import required_group, uc_first
+from openatlas.display.util import required_group, uc_first
 
 
 @app.route('/ajax/bookmark', methods=['POST'])
@@ -34,10 +34,12 @@ def ajax_add_type() -> str:
             request.form['name'],
             request.form['description'])
         entity.link(link[cidoc_code], g.types[int(request.form['superType'])])
+        g.logger.log_user(entity.id, 'insert')
         Transaction.commit()
         return str(entity.id)
     except Exception as _e:  # pragma: no cover
         Transaction.rollback()
+        g.logger.log('error', 'ajax', _e)
         abort(400)
 
 
@@ -50,6 +52,7 @@ def ajax_get_type_tree(root_id: Optional[int] = None) -> str:
 @app.route('/ajax/add_entity', methods=['POST'])
 @required_group('editor')
 def ajax_create_entity() -> str:
+    Transaction.begin()
     try:
         entity = Entity.insert(
             request.form['entityName'],
@@ -63,11 +66,12 @@ def ajax_create_entity() -> str:
                     'object_location',
                     f'Location of {request.form["name"]}'))
         if 'standardType' in request.form and request.form['standardType']:
-            entity.link(
-                'P2',
-                g.types[int(request.form['standardType'])])
+            entity.link('P2', g.types[int(request.form['standardType'])])
+        g.logger.log_user(entity.id, 'insert')
+        Transaction.commit()
         return str(entity.id)
     except Exception as _e:  # pragma: no cover
+        Transaction.rollback()
         g.logger.log('error', 'ajax', _e)
         abort(400)
 
@@ -75,10 +79,6 @@ def ajax_create_entity() -> str:
 @app.route('/ajax/get_entity_table/<string:content_domain>', methods=['POST'])
 @required_group('readonly')
 def ajax_get_entity_table(content_domain: str) -> str:
-    try:
-        filter_ids = json.loads(request.form['filterIds']) or []
-        table, _selection = get_table_content(content_domain, None, filter_ids)
-        return table.display(content_domain)
-    except Exception as _e:  # pragma: no cover
-        g.logger.log('error', 'ajax', _e)
-        abort(400)
+    filter_ids = json.loads(request.form['filterIds']) or []
+    table, _selection = get_table_content(content_domain, None, filter_ids)
+    return table.display(content_domain)

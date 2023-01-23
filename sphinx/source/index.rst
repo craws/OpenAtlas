@@ -13,11 +13,15 @@ development specific documentation in our Redmine
    :maxdepth: 2
 
    overview
+   features
    entity/index
    tools/index
    admin/index
-   ui/index
+
    model/index
+   technical/index
+   ui/index
+
    examples/index
    troubleshooting/index
    faq

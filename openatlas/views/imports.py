@@ -1,4 +1,5 @@
 import collections
+import pathlib
 from typing import Optional, Union
 
 import numpy
@@ -14,16 +15,14 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.database.connect import Transaction
+from openatlas.display.tab import Tab
+from openatlas.display.table import Table
+from openatlas.display.util import (
+    button, datetime64_to_timestamp, display_form, format_date,
+    get_backup_file_data, is_authorized, link, manual, required_group,
+    uc_first)
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Import, is_float
-from openatlas.util.tab import Tab
-from openatlas.util.table import Table
-from openatlas.util.util import (
-    button, datetime64_to_timestamp, display_form, format_date,
-    get_backup_file_data,
-    is_authorized,
-    link,
-    manual, required_group, uc_first)
 
 
 class ProjectForm(FlaskForm):
@@ -94,9 +93,7 @@ def import_project_view(id_: int) -> str:
     tabs = {
         'info': Tab(
             'info',
-            content=render_template(
-                'import/project_view.html',
-                project=project)),
+            render_template('import/project_view.html', project=project)),
         'entities': Tab(
             'entities',
             table=Table([
@@ -161,13 +158,8 @@ class ImportForm(FlaskForm):
 
     def validate(self) -> bool:
         valid = FlaskForm.validate(self)
-        file_ = request.files['file']
-        if not file_:  # pragma: no cover
-            self.file.errors.append(_('no file to upload'))
-            valid = False
-        elif not (
-                '.' in file_.filename
-                and file_.filename.rsplit('.', 1)[1].lower() == 'csv'):
+        if pathlib.Path(request.files['file'].filename) \
+                .suffix.lower() != '.csv':
             self.file.errors.append(_('file type not allowed'))
             valid = False
         return valid
@@ -201,14 +193,14 @@ def import_data(project_id: int, class_: str) -> str:
             file_.save(str(file_path))
             data_frame = pd.read_csv(file_path, keep_default_na=False)
             headers = list(data_frame.columns.values)
-            if 'name' not in headers:  # pragma: no cover
+            if 'name' not in headers:
                 messages['error'].append(_('missing name column'))
                 raise Exception()
-            for item in headers:  # pragma: no cover
+            for item in headers:
                 if item not in columns['allowed']:
                     columns['invalid'].append(item)
                     del data_frame[item]
-            if columns['invalid']:  # pragma: no cover
+            if columns['invalid']:
                 messages['warn'].append(
                     f"{_('invalid columns')}: {','.join(columns['invalid'])}")
             headers = list(data_frame.columns.values)  # Get clean headers
@@ -220,18 +212,18 @@ def import_data(project_id: int, class_: str) -> str:
             invalid_type_ids = False
             invalid_geoms = False
             for _index, row in data_frame.iterrows():
-                if not row['name']:  # pragma: no cover
+                if not row['name']:
                     missing_name_count += 1
                     continue
                 table_row = []
                 checked_row = {}
                 for item in headers:
                     value = row[item]
-                    if item == 'type_ids':  # pragma: no cover
+                    if item == 'type_ids':
                         type_ids = []
                         for type_id in str(value).split():
                             if Import.check_type_id(type_id, class_):
-                                type_ids.append(type_id)
+                                type_ids.append(type_id)  # pragma: no cover
                             else:
                                 type_ids.append(
                                     f'<span class="error">{type_id}</span>')
@@ -239,9 +231,9 @@ def import_data(project_id: int, class_: str) -> str:
                         value = ' '.join(type_ids)
                     if item in ['northing', 'easting'] \
                             and row[item] \
-                            and not is_float(row[item]):  # pragma: no cover
+                            and not is_float(row[item]):
                         value = f'<span class="error">{value}</span>'
-                        invalid_geoms = True  # pragma: no cover
+                        invalid_geoms = True
                     if item in [
                             'begin_from',
                             'begin_to',
@@ -254,13 +246,10 @@ def import_data(project_id: int, class_: str) -> str:
                                 value = datetime64_to_timestamp(
                                     numpy.datetime64(value))
                                 row[item] = value
-                            except ValueError:  # pragma: no cover
+                            except ValueError:
                                 row[item] = ''
-                                if str(value) == 'NaT':
-                                    value = ''
-                                else:
-                                    value = \
-                                        f'<span class="error">{value}</span>'
+                                value = '' if str(value) == 'NaT' else \
+                                    f'<span class="error">{value}</span>'
                     table_row.append(str(value))
                     checked_row[item] = row[item]
                     if item == 'name' and form.duplicate.data:
@@ -269,19 +258,18 @@ def import_data(project_id: int, class_: str) -> str:
                         origin_ids.append(str(row['id']))
                 table_data.append(table_row)
                 checked_data.append(checked_row)
-            if invalid_type_ids:  # pragma: no cover
+            if invalid_type_ids:
                 messages['warn'].append(_('invalid type ids'))
-            if invalid_geoms:  # pragma: no cover
+            if invalid_geoms:
                 messages['warn'].append(_('invalid coordinates'))
             table = Table(headers, rows=table_data)
-            # Checking for data inconsistency
-            if missing_name_count:  # pragma: no cover
+            if missing_name_count:
                 messages['warn'].append(
                     f"{_('empty names')}: {missing_name_count}")
             doubles = [
                 item for item, count in collections.Counter(origin_ids).items()
                 if count > 1]
-            if doubles:  # pragma: no cover
+            if doubles:
                 messages['error'].append(
                     f"{_('double IDs in import')}: {', '.join(doubles)}")
             existing = Import.get_origin_ids(project, origin_ids) \
@@ -291,12 +279,12 @@ def import_data(project_id: int, class_: str) -> str:
                     f"{_('IDs already in database')}: {', '.join(existing)}")
             if form.duplicate.data:  # Check for possible duplicates
                 duplicates = Import.check_duplicates(class_, names)
-                if duplicates:  # pragma: no cover
+                if duplicates:
                     messages['warn'].append(
                         f"{_('possible duplicates')}: {', '.join(duplicates)}")
             if messages['error']:
                 raise Exception()
-        except Exception as e:  # pragma: no cover
+        except Exception as e:
             g.logger.log('error', 'import', 'import check failed', e)
             flash(_('error at import'), 'error')
             return render_template(

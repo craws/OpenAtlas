@@ -1,1359 +1,2276 @@
 {
-  "components": {
-    "parameters": {
-      "columnParam": {
-        "description": "The result will be sorted by the given column",
-        "in": "query",
-        "name": "column",
-        "schema": {
-          "enum": [
-            "id",
-            "classCode",
-            "name",
-            "description",
-            "created",
-            "modified",
-            "systemClass",
-            "beginFrom",
-            "beginTo",
-            "endFrom",
-            "endTo"
-          ],
-          "type": "string"
-        }
-      },
-      "countParam": {
-        "description": "Returns a integer which represents the total count of the result",
-        "in": "query",
-        "name": "count",
-        "schema": {
-          "type": "boolean"
-        }
-      },
-      "downloadParam": {
-        "description": "Triggers the file download of the given request",
-        "in": "query",
-        "name": "download",
-        "schema": {
-          "type": "boolean"
-        }
-      },
-      "filterParam": {
-        "description": "Specify request with custom SQL filter method. ",
-        "deprecated": true,
-        "in": "query",
-        "name": "filter",
-        "schema": {
-          "type": "string"
-        }
-      },
-      "searchParam": {
-        "description": "Search request with AND/OR logic. Confer https://redmine.craws.net/projects/uni/wiki/API_03#Search",
-        "in": "query",
-        "name": "search",
-        "schema": {
-          "type": "string"
-        }
-      },
-      "firstParam": {
-        "description": "List of results start with given ID",
-        "in": "query",
-        "name": "first",
-        "schema": {
-          "type": "integer"
-        }
-      },
-      "pageParam": {
-        "description": "Jump to given page",
-        "in": "query",
-        "name": "page",
-        "schema": {
-          "type": "integer"
-        }
-      },
-      "formatParam": {
-        "description": "Select to which output format is prefered",
-        "in": "query",
-        "name": "format",
-        "schema": {
-          "enum": [
-            "linked_places",
-            "geojson"
-          ],
-          "type": "string"
-        }
-      },
-      "geometryParam": {
-        "description": "Filter, which geometric entities will be retrieved through /geometric_entities",
-        "in": "query",
-        "name": "geometry",
-        "schema": {
-          "enum": [
-            "gisAll",
-            "gisPointAll",
-            "gisPointSupers",
-            "gisPointSubs",
-            "gisPointSibling",
-            "gisLineAll",
-            "gisPolygonAll"
-          ],
-          "type": "string"
-        }
-      },
-      "langParam": {
-        "description": "Select output language",
-        "in": "query",
-        "name": "lang",
-        "schema": {
-          "enum": [
-            "en",
-            "de"
-          ],
-          "type": "string"
-        }
-      },
-      "lastParam": {
-        "description": "List of results start with entity after given ID",
-        "in": "query",
-        "name": "last",
-        "schema": {
-          "type": "integer"
-        }
-      },
-      "limitParam": {
-        "description": "Integer of entities returned per page. 0 means no limit is set. Default is 20.",
-        "in": "query",
-        "name": "limit",
-        "schema": {
-          "type": "integer"
-        }
-      },
-      "showParam": {
-        "description": "Select which key should be shown. If 'not' is used, no other keys will be shown",
-        "in": "query",
-        "name": "show",
-        "schema": {
-          "enum": [
-            "when",
-            "types",
-            "relations",
-            "names",
-            "links",
-            "geometry",
-            "depictions",
-            "not"
-          ],
-          "type": "string"
-        }
-      },
-      "relationTypeParam": {
-        "description": "Select which relations are shown",
-        "in": "query",
-        "name": "relation_type",
-        "schema": {
-          "example": "P2",
-          "type": "string"
-        }
-      },
-      "sortParam": {
-        "description": "Result will be sorted asc/desc (default column is name)",
-        "in": "query",
-        "name": "sort",
-        "schema": {
-          "enum": [
-            "asc",
-            "desc"
-          ],
-          "type": "string"
-        }
-      },
-      "exportParam": {
-        "description": "Result will be downloaded in the given format.",
-        "in": "query",
-        "name": "export",
-        "schema": {
-          "enum": [
-            "csv",
-            "csvNetwork"
-          ],
-          "type": "string"
-        }
-      },
-      "typeParam": {
-        "description": "The output will be filtered by the type_id. Only entities with this type ids will be display. The relation is in logical OR.",
-        "in": "query",
-        "name": "type_id",
-        "schema": {
-          "type": "integer"
+  "openapi" : "3.0.2",
+  "info" : {
+    "title" : "OpenAtlas API",
+    "description" : "An API that allows user to access data from an OpenAtlas instance.",
+    "version" : "0.4.1",
+    "contact" : {
+      "name" : "OpenAtlas",
+      "url" : "https://openatlas.eu",
+      "email" : "bernhard.koschicek-krombholz@oeaw.ac.at"
+    },
+    "license" : {
+      "name" : "GPL-2.0",
+      "url" : "https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html"
+    }
+  },
+  "servers" : [ {
+    "url" : "https://demo.openatlas.eu/api/{version}",
+    "description" : "Demo Server",
+    "variables" : {
+      "version" : {
+        "default" : "0.3",
+        "enum" : [ "0.3" ]
+      }
+    }
+  }, {
+    "url" : "https://demo-dev.openatlas.eu/api/{version}",
+    "description" : "Demo Dev Server",
+    "variables" : {
+      "version" : {
+        "default" : "0.3",
+        "enum" : [ "0.3" ]
+      }
+    }
+  }, {
+    "url" : "http://localhost:5000/api/{version}",
+    "description" : "Used directly in an OpenAtlas instance",
+    "variables" : {
+      "version" : {
+        "default" : "0.3",
+        "enum" : [ "0.3" ]
+      }
+    }
+  } ],
+  "externalDocs" : {
+    "description" : "OpenAtlas Manual",
+    "url" : "https://manual.openatlas.eu/"
+  },
+  "tags" : [ {
+    "name" : "Entity Endpoint",
+    "description" : "Endpoint provide information about one entity in the OpenAtlas instance. The requested information is provided in Linked Places format (LPF). Alternatively, GeoJSON or RDFs, derived from the LPF data, can be accessed."
+  }, {
+    "name" : "Entity Query Endpoint",
+    "description" : "Endpoint provide information about one entity in the OpenAtlas instance. The requested information is provided in Linked Places format (LPF). Alternatively, GeoJSON or RDFs, derived from the LPF data, can be accessed. Combine several or all entities endpoints in one query."
+  }, {
+    "name" : "Entities Endpoint",
+    "description" : "Endpoints provide information about entities in the OpenAtlas instance. The requested information is provided in Linked Places format (LPF). Alternatively, GeoJSON or RDFs, derived from the LPF data, can be accessed."
+  }, {
+    "name" : "Type Endpoints",
+    "description" : "Provide information about Types of an OpenAtlas instance. The results are in JSON and in a custom format."
+  }, {
+    "name" : "Administrative Endpoints",
+    "description" : "Provide metadata of the OpenAtlas instance for presentation sites."
+  }, {
+    "name" : "Special Endpoints",
+    "description" : "Provides project-specific formats."
+  }, {
+    "name" : "Image Endpoints",
+    "description" : "Provides image files"
+  } ],
+  "paths" : {
+    "/entity/{entityId}" : {
+      "get" : {
+        "tags" : [ "Entity Endpoint" ],
+        "description" : "Retrieves all information about a single entity",
+        "summary" : "Get entity by ID",
+        "operationId" : "GetEntity",
+        "parameters" : [ {
+          "$ref" : "#/components/parameters/entityId"
+        }, {
+          "$ref" : "#/components/parameters/download"
+        }, {
+          "$ref" : "#/components/parameters/show"
+        }, {
+          "$ref" : "#/components/parameters/format"
+        }, {
+          "$ref" : "#/components/parameters/export"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "/entity response",
+            "content" : {
+              "application/ld+json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/LinkedPlacesModel"
+                  }, {
+                    "$ref" : "#/components/schemas/GeoJSONModel"
+                  } ]
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Something went wrong. Please consult the error message."
+          }
         }
       }
     },
-    "schemas": {
-      "ClassMappingModel": {
-        "properties": {
-          "crmClass": {
-            "type": "string"
-          },
-          "en": {
-            "type": "string"
-          },
-          "icon": {
-            "type": "string"
-          },
-          "systemClass": {
-            "type": "string"
-          },
-          "view": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "ContentModel": {
-        "properties": {
-          "contact": {
-            "type": "string"
-          },
-          "imageSized": {
-            "properties": {
-              "table": {
-                "type": "string"
-              },
-              "thumbnail": {
-                "type": "string"
-              }
-            },
-            "type": "object"
-          },
-          "intro": {
-            "type": "string"
-          },
-          "legalNotice": {
-            "type": "string"
-          },
-          "siteName": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "DepictionModel": {
-        "properties": {
-          "@id": {
-            "type": "string"
-          },
-          "license": {
-            "type": "string"
-          },
-          "title": {
-            "type": "string"
-          },
-          "url": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "DescriptionModel": {
-        "properties": {
-          "value": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "FeatureGeoJSON": {
-        "properties": {
-          "@id": {
-            "type": "string"
-          },
-          "crmClass": {
-            "type": "string"
-          },
-          "systemClass": {
-            "type": "string"
-          },
-          "depictions": {
-            "items": {
-              "$ref": "#/components/schemas/DepictionModel"
-            },
-            "type": "array"
-          },
-          "description": {
-            "items": {
-              "$ref": "#/components/schemas/DescriptionModel"
-            },
-            "type": "array"
-          },
-          "links": {
-            "items": {
-              "$ref": "#/components/schemas/LinkModel"
-            },
-            "type": "array"
-          },
-          "names": {
-            "items": {
-              "$ref": "#/components/schemas/NamesModel"
-            },
-            "type": "array"
-          },
-          "properties": {
-            "properties": {
-              "title": {
-                "type": "string"
-              }
-            },
-            "type": "object"
-          },
-          "relations": {
-            "items": {
-              "$ref": "#/components/schemas/RelationModel"
-            },
-            "type": "array"
-          },
-          "type": {
-            "type": "string"
-          },
-          "types": {
-            "items": {
-              "$ref": "#/components/schemas/TypeModel"
-            },
-            "type": "array"
-          },
-          "when": {
-            "$ref": "#/components/schemas/WhenModel"
-          },
-          "geometry": {
-            "$ref": "#/components/schemas/GeometryModel"
-          }
-        },
-        "required": [
-          "@id",
-          "geometry",
-          "type"
-        ],
-        "type": "object"
-      },
-      "GeometryModel": {
-        "properties": {
-          "type": {
-            "type": "string"
-          },
-          "title": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "coordinates": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "array",
-                  "items": {
-                    "type": "integer"
-                  }
+    "/query/" : {
+      "get" : {
+        "tags" : [ "Entities Endpoint", "Entity Query Endpoint" ],
+        "description" : "Retrieves a list with entity ID, CIDOC CRM code, system class, or menu item. Combine up to four of the Entities Endpoints in a single query. Each request has to be a new parameter.",
+        "summary" : "Combine several or all entities endpoints in one query",
+        "operationId" : "GetQuery",
+        "parameters" : [ {
+          "$ref" : "#/components/parameters/entities"
+        }, {
+          "$ref" : "#/components/parameters/view_classes"
+        }, {
+          "$ref" : "#/components/parameters/system_classes"
+        }, {
+          "$ref" : "#/components/parameters/cidoc_classes"
+        }, {
+          "$ref" : "#/components/parameters/download"
+        }, {
+          "$ref" : "#/components/parameters/count"
+        }, {
+          "$ref" : "#/components/parameters/show"
+        }, {
+          "$ref" : "#/components/parameters/format"
+        }, {
+          "$ref" : "#/components/parameters/export"
+        }, {
+          "$ref" : "#/components/parameters/column"
+        }, {
+          "$ref" : "#/components/parameters/sort"
+        }, {
+          "$ref" : "#/components/parameters/search"
+        }, {
+          "$ref" : "#/components/parameters/first"
+        }, {
+          "$ref" : "#/components/parameters/last"
+        }, {
+          "$ref" : "#/components/parameters/page"
+        }, {
+          "$ref" : "#/components/parameters/limit"
+        }, {
+          "$ref" : "#/components/parameters/type_id"
+        }, {
+          "$ref" : "#/components/parameters/relation_type"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Results of query",
+            "content" : {
+              "application/ld+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/EntitiesOutputModel"
                 }
-              ]
-            }
-          }
-        },
-        "type": "object"
-      },
-      "GeometricEntries": {
-        "properties": {
-          "features": {
-            "items": {
-              "$ref": "#/components/schemas/GeometricEntry"
-            },
-            "type": "array"
-          },
-          "type": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "GeometricEntry": {
-        "properties": {
-          "geometry": {
-            "properties": {
-              "coordinates": {
-                "items": {
-                  "items": {
-                    "type": "number"
-                  },
-                  "type": "array"
-                },
-                "type": "array"
-              },
-              "type": {
-                "type": "string"
               }
-            },
-            "type": "object"
-          },
-          "properties": {
-            "properties": {
-              "description": {
-                "type": "string"
-              },
-              "id": {
-                "type": "number"
-              },
-              "name": {
-                "type": "string"
-              },
-              "objectDescription": {
-                "type": "string"
-              },
-              "objectId": {
-                "type": "integer"
-              },
-              "objectName": {
-                "type": "string"
-              },
-              "objectType": {
-                "type": "string"
-              },
-              "shapeType": {
-                "type": "string"
-              }
-            },
-            "type": "object"
-          },
-          "type": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "Geometries": {
-        "properties": {
-          "geometry": {
-            "properties": {
-              "coordinates": {
-                "items": {
-                  "items": {
-                    "type": "integer"
-                  },
-                  "type": "array"
-                },
-                "type": "array"
-              },
-              "type": {
-                "type": "string"
-              }
-            },
-            "type": "object"
-          },
-          "properties": {
-            "properties": {
-              "begin_from": {
-                "type": "string"
-              },
-              "begin_to": {
-                "type": "string"
-              },
-              "description": {
-                "type": "string"
-              },
-              "end_from": {
-                "type": "string"
-              },
-              "end_to": {
-                "type": "string"
-              },
-              "id": {
-                "type": "integer"
-              },
-              "name": {
-                "type": "string"
-              },
-              "place": {
-                "properties": {
-                  "id": {
-                    "type": "integer"
-                  },
-                  "name": {
-                    "type": "string"
-                  },
-                  "types": {
-                    "items": {
-                      "properties": {
-                        "id": {
-                          "type": "integer"
-                        },
-                        "name": {
-                          "type": "string"
-                        }
-                      },
-                      "type": "object"
-                    },
-                    "type": "array"
-                  }
-                },
-                "type": "object"
-              },
-              "type": {
-                "type": "string"
-              }
-            },
-            "type": "object"
-          },
-          "type": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "GeometryOutModel": {
-        "properties": {
-          "features": {
-            "items": {
-              "$ref": "#/components/schemas/Geometries"
-            },
-            "type": "array"
-          },
-          "type": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "LinkModel": {
-        "properties": {
-          "identifier": {
-            "type": "string"
-          },
-          "referenceSystem": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "LinkedPlaceModel": {
-        "properties": {
-          "@context": {
-            "type": "string"
-          },
-          "features": {
-            "items": {
-              "$ref": "#/components/schemas/FeatureGeoJSON"
-            },
-            "type": "array"
-          },
-          "type": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "type",
-          "features"
-        ],
-        "type": "object"
-      },
-      "NamesModel": {
-        "properties": {
-          "alias": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "NodeAllModel": {
-        "properties": {
-          "nodes": {
-            "items": {
-              "$ref": "#/components/schemas/NodeModel"
-            },
-            "type": "array"
-          }
-        },
-        "type": "object"
-      },
-      "NodeCategoryModel": {
-        "properties": {
-          "custom": {
-            "items": {
-              "type": "string"
-            },
-            "type": "object"
-          },
-          "places": {
-            "items": {
-              "type": "string"
-            },
-            "type": "object"
-          },
-          "standard": {
-            "items": {
-              "type": "string"
-            },
-            "type": "object"
-          },
-          "value": {
-            "items": {
-              "type": "string"
-            },
-            "type": "object"
-          },
-          "system": {
-            "items": {
-              "type": "string"
-            },
-            "type": "object"
-          }
-        },
-        "type": "object"
-      },
-      "NodeModel": {
-        "properties": {
-          "id": {
-            "type": "integer"
-          },
-          "label": {
-            "type": "string"
-          },
-          "url": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "NodeOverviewModel": {
-        "properties": {
-          "types": {
-            "$ref": "#/components/schemas/NodeCategoryModel"
-          }
-        },
-        "type": "object"
-      },
-      "TypesByViewClassModel": {
-        "properties": {
-          "actor_relation": {
-            "items": {
-              "$ref": "#/components/schemas/TypesByViewClassEntry"
-            },
-            "type": "array"
-          },
-          "actor_function": {
-            "items": {
-              "$ref": "#/components/schemas/TypesByViewClassEntry"
-            },
-            "type": "array"
-          },
-          "artifact": {
-            "items": {
-              "$ref": "#/components/schemas/TypesByViewClassEntry"
-            },
-            "type": "array"
-          },
-          "bibliography": {
-            "items": {
-              "$ref": "#/components/schemas/TypesByViewClassEntry"
-            },
-            "type": "array"
-          },
-          "stratigraphic_unit": {
-            "items": {
-              "$ref": "#/components/schemas/TypesByViewClassEntry"
-            },
-            "type": "array"
-          },
-          "human_remains": {
-            "items": {
-              "$ref": "#/components/schemas/TypesByViewClassEntry"
-            },
-            "type": "array"
-          },
-          "acquisition": {
-            "items": {
-              "$ref": "#/components/schemas/TypesByViewClassEntry"
-            },
-            "type": "array"
-          },
-          "activity": {
-            "items": {
-              "$ref": "#/components/schemas/TypesByViewClassEntry"
-            },
-            "type": "array"
-          },
-          "edition": {
-            "items": {
-              "$ref": "#/components/schemas/TypesByViewClassEntry"
-            },
-            "type": "array"
-          },
-          "feature": {
-            "items": {
-              "$ref": "#/components/schemas/TypesByViewClassEntry"
-            },
-            "type": "array"
-          },
-          "file": {
-            "items": {
-              "$ref": "#/components/schemas/TypesByViewClassEntry"
-            },
-            "type": "array"
-          },
-          "group": {
-            "items": {
-              "$ref": "#/components/schemas/TypesByViewClassEntry"
-            },
-            "type": "array"
-          },
-          "move": {
-            "items": {
-              "$ref": "#/components/schemas/TypesByViewClassEntry"
-            },
-            "type": "array"
-          },
-          "person": {
-            "items": {
-              "$ref": "#/components/schemas/TypesByViewClassEntry"
-            },
-            "type": "array"
-          },
-          "place": {
-            "items": {
-              "$ref": "#/components/schemas/TypesByViewClassEntry"
-            },
-            "type": "array"
-          },
-          "source": {
-            "items": {
-              "$ref": "#/components/schemas/TypesByViewClassEntry"
-            },
-            "type": "array"
-          },
-          "event": {
-            "items": {
-              "$ref": "#/components/schemas/TypesByViewClassEntry"
-            },
-            "type": "array"
-          },
-          "production": {
-            "items": {
-              "$ref": "#/components/schemas/TypesByViewClassEntry"
-            },
-            "type": "array"
-          },
-          "external_reference": {
-            "items": {
-              "$ref": "#/components/schemas/TypesByViewClassEntry"
-            },
-            "type": "array"
-          },
-          "involvement": {
-            "items": {
-              "$ref": "#/components/schemas/TypesByViewClassEntry"
-            },
-            "type": "array"
-          },
-          "source_translation": {
-            "items": {
-              "$ref": "#/components/schemas/TypesByViewClassEntry"
-            },
-            "type": "array"
-          }
-        },
-        "type": "object"
-      },
-      "TypesByViewClassEntry": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer"
-          },
-          "name": {
-            "type": "string"
-          },
-          "viewClass": {
-            "type": "array",
-            "items": {
-              "type": "string"
             }
           },
-          "children": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TypeOverviewChildren"
-            }
+          "404" : {
+            "description" : "Something went wrong. Please consult the error message."
           }
         }
-      },
-      "TypeOverviewModel": {
-        "properties": {
-          "custom": {
-            "items": {
-              "$ref": "#/components/schemas/TypeOverviewEntry"
-            },
-            "type": "array"
-          },
-          "places": {
-            "items": {
-              "$ref": "#/components/schemas/TypeOverviewEntry"
-            },
-            "type": "array"
-          },
-          "standard": {
-            "items": {
-              "$ref": "#/components/schemas/TypeOverviewEntry"
-            },
-            "type": "array"
-          },
-          "value": {
-            "items": {
-              "$ref": "#/components/schemas/TypeOverviewEntry"
-            },
-            "type": "array"
-          },
-          "system": {
-            "items": {
-              "$ref": "#/components/schemas/TypeOverviewEntry"
-            },
-            "type": "array"
-          }
-        },
-        "type": "object"
-      },
-      "TypeOverviewEntry": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer"
-          },
-          "name": {
-            "type": "string"
-          },
-          "viewClass": {
-            "type": "array",
-            "items": {
-              "type": "string"
+      }
+    },
+    "/system_class/{system_class}" : {
+      "get" : {
+        "tags" : [ "Entities Endpoint" ],
+        "description" : "Retrieves a list of entities, based on their OpenAtlas class name.",
+        "operationId" : "GetBySystemClass",
+        "parameters" : [ {
+          "$ref" : "#/components/parameters/system_class"
+        }, {
+          "$ref" : "#/components/parameters/download"
+        }, {
+          "$ref" : "#/components/parameters/count"
+        }, {
+          "$ref" : "#/components/parameters/show"
+        }, {
+          "$ref" : "#/components/parameters/format"
+        }, {
+          "$ref" : "#/components/parameters/export"
+        }, {
+          "$ref" : "#/components/parameters/column"
+        }, {
+          "$ref" : "#/components/parameters/sort"
+        }, {
+          "$ref" : "#/components/parameters/search"
+        }, {
+          "$ref" : "#/components/parameters/first"
+        }, {
+          "$ref" : "#/components/parameters/last"
+        }, {
+          "$ref" : "#/components/parameters/page"
+        }, {
+          "$ref" : "#/components/parameters/limit"
+        }, {
+          "$ref" : "#/components/parameters/type_id"
+        }, {
+          "$ref" : "#/components/parameters/relation_type"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Results of system class",
+            "content" : {
+              "application/ld+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/EntitiesOutputModel"
+                }
+              }
             }
           },
-          "children": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TypeOverviewChildren"
-            }
+          "404" : {
+            "description" : "Something went wrong. Please consult the error message."
           }
         }
-      },
-      "TypeOverviewChildren": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
+      }
+    },
+    "/view_class/{view_class}" : {
+      "get" : {
+        "tags" : [ "Entities Endpoint" ],
+        "description" : "Retrieves a list of entities based on their OpenAtlas menu items.",
+        "operationId" : "GetByViewClass",
+        "parameters" : [ {
+          "$ref" : "#/components/parameters/view_class"
+        }, {
+          "$ref" : "#/components/parameters/download"
+        }, {
+          "$ref" : "#/components/parameters/count"
+        }, {
+          "$ref" : "#/components/parameters/show"
+        }, {
+          "$ref" : "#/components/parameters/format"
+        }, {
+          "$ref" : "#/components/parameters/export"
+        }, {
+          "$ref" : "#/components/parameters/column"
+        }, {
+          "$ref" : "#/components/parameters/sort"
+        }, {
+          "$ref" : "#/components/parameters/search"
+        }, {
+          "$ref" : "#/components/parameters/first"
+        }, {
+          "$ref" : "#/components/parameters/last"
+        }, {
+          "$ref" : "#/components/parameters/page"
+        }, {
+          "$ref" : "#/components/parameters/limit"
+        }, {
+          "$ref" : "#/components/parameters/type_id"
+        }, {
+          "$ref" : "#/components/parameters/relation_type"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Results of view class",
+            "content" : {
+              "application/ld+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/EntitiesOutputModel"
+                }
+              }
+            }
           },
-          "url": {
-            "type": "string"
-          },
-          "label": {
-            "type": "string"
+          "404" : {
+            "description" : "Something went wrong. Please consult the error message."
           }
         }
-      },
-      "OutputModelGeojson": {
-        "properties": {
-          "pagination": {
-            "$ref": "#/components/schemas/PaginationModel"
-          },
-          "results": {
-            "items": {
-              "$ref": "#/components/schemas/GeometryOutModel"
-            },
-            "type": "array"
-          }
-        },
-        "type": "object"
-      },
-      "OutputModelLPF": {
-        "properties": {
-          "pagination": {
-            "$ref": "#/components/schemas/PaginationModel"
-          },
-          "results": {
-            "items": {
-              "$ref": "#/components/schemas/LinkedPlaceModel"
-            },
-            "type": "array"
-          }
-        },
-        "type": "object"
-      },
-      "OverviewCountModel": {
-        "properties": {
-          "count": {
-            "type": "integer"
-          },
-          "systemClass": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "PaginationIndexModel": {
-        "properties": {
-          "page": {
-            "type": "integer"
-          },
-          "startId": {
-            "type": "integer"
-          }
-        },
-        "type": "object"
-      },
-      "PaginationModel": {
-        "properties": {
-          "entities": {
-            "type": "integer"
-          },
-          "entitiesPerPage": {
-            "type": "integer"
-          },
-          "index": {
-            "items": {
-              "$ref": "#/components/schemas/PaginationIndexModel"
-            },
-            "type": "array"
-          },
-          "totalPages": {
-            "type": "integer"
-          }
-        },
-        "type": "object"
-      },
-      "RelationModel": {
-        "properties": {
-          "label": {
-            "type": "string"
-          },
-          "relationTo": {
-            "type": "string"
-          },
-          "relationType": {
-            "type": "string"
-          },
-          "relationSystemClass": {
-            "type": "string"
-          },
-          "relationDescription": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "when": {
-            "$ref": "#/components/schemas/WhenModel"
-          }
-        },
-        "type": "object"
-      },
-      "SystemClassCountModel": {
-        "properties": {
-          "acquisition": {
-            "type": "integer"
-          },
-          "activity": {
-            "type": "integer"
-          },
-          "administrative_unit": {
-            "type": "integer"
-          },
-          "artifact": {
-            "type": "integer"
-          },
-          "bibliography": {
-            "type": "integer"
-          },
-          "edition": {
-            "type": "integer"
-          },
-          "feature": {
-            "type": "integer"
-          },
-          "file": {
-            "type": "integer"
-          },
-          "group": {
-            "type": "integer"
-          },
-          "move": {
-            "type": "integer"
-          },
-          "person": {
-            "type": "integer"
-          },
-          "place": {
-            "type": "integer"
-          },
-          "reference_system": {
-            "type": "integer"
-          },
-          "source": {
-            "type": "integer"
-          },
-          "source_translation": {
-            "type": "integer"
-          },
-          "stratigraphic_unit": {
-            "type": "integer"
-          },
-          "type": {
-            "type": "integer"
-          }
-        },
-        "type": "object"
-      },
-      "TimeDetailModel": {
-        "properties": {
-          "earliest": {
-            "type": "string"
-          },
-          "latest": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "TimeStartEndModel": {
-        "properties": {
-          "start": {
-            "$ref": "#/components/schemas/TimeDetailModel"
-          },
-          "end": {
-            "$ref": "#/components/schemas/TimeDetailModel"
-          }
-        },
-        "type": "object"
-      },
-      "TimespansModel": {
-        "items": {
-          "$ref": "#/components/schemas/TimeStartEndModel"
-        },
-        "type": "array"
-      },
-      "TypeModel": {
-        "properties": {
-          "hierarchy": {
-            "type": "string"
-          },
-          "identifier": {
-            "type": "string"
-          },
-          "label": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "value": {
-            "type": "number"
-          },
-          "unit": {
-            "type": "number"
-          }
-        },
-        "type": "object"
-      },
-      "TypeTreeModel": {
-        "properties": {
-          "type_tree": {
-            "items": {
-              "$ref": "#/components/schemas/TypeTreeSubModel"
-            },
-            "type": "array"
-          }
-        },
-        "type": "object"
-      },
-      "TypeTreeSubModel": {
-        "properties": {
-          "Type_IDs": {
-            "properties": {
-              "count": {
-                "type": "integer"
-              },
-              "count_subs": {
-                "type": "integer"
-              },
-              "description": {
-                "type": "string"
-              },
-              "first": {
-                "type": "integer"
-              },
-              "id": {
-                "type": "integer"
-              },
-              "last": {
-                "type": "integer"
-              },
-              "locked": {
-                "type": "boolean"
-              },
-              "name": {
-                "type": "string"
-              },
-              "note": {
-                "type": "string"
-              },
-              "origin_id": {
-                "type": "integer"
-              },
-              "root": {
-                "items": {
-                  "type": "integer"
-                },
-                "type": "array"
-              },
-              "standard": {
-                "type": "boolean"
-              },
-              "subs": {
-                "items": {
-                  "type": "integer"
-                },
-                "type": "array"
-              }
-            },
-            "type": "object"
-          }
-        },
-        "type": "object"
-      },
-      "WhenModel": {
-        "properties": {
-          "timespans": {
-            "$ref": "#/components/schemas/TimespansModel"
-          }
-        },
-        "type": "object"
-      },
-      "SubunitsModel": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer"
-          },
-          "parentId": {
-            "type": "integer"
-          },
-          "rootId": {
-            "type": "integer"
-          },
-          "openatlasClassName": {
-            "type": "string"
-          },
-          "crmClass": {
-            "type": "string"
-          },
-          "created": {
-            "type": "string"
-          },
-          "modified": {
-            "type": "string"
-          },
-          "latestModRec": {
-            "type": "string"
-          },
-          "children": {
-            "type": "array",
-            "items": {
-              "type": "integer"
-            }
-          },
-          "geometry": {
-            "type": "object",
-            "properties": {
-              "type": {
-                "type": "string"
-              },
-              "geometries": {
-                "$ref": "#/components/schemas/GeometryModel"
-              }
-            }
-          },
-          "properties": {
-            "type": "object",
-            "properties": {
-              "name": {
-                "type": "string"
-              },
-              "aliases": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
-              "description": {
-                "type": "string"
-              },
-              "standardType": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string"
-                  },
-                  "id": {
-                    "type": "integer"
-                  },
-                  "rootId": {
-                    "type": "integer"
-                  },
-                  "path": {
-                    "type": "string"
-                  }
-                }
-              },
-              "timespan": {
-                "type": "object",
-                "properties": {
-                  "earliestBegin": {
-                    "type": "string"
-                  },
-                  "latestBegin": {
-                    "type": "string"
-                  },
-                  "earliestEnd": {
-                    "type": "string"
-                  },
-                  "latestEnd": {
-                    "type": "string"
-                  }
-                }
-              },
-              "externalReferences": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string"
-                    },
-                    "identifier": {
-                      "type": "string"
-                    },
-                    "referenceSystem": {
-                      "type": "string"
-                    }
-                  }
-                }
-              },
-              "references": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "integer"
-                    },
-                    "abbreviation": {
-                      "type": "string"
-                    },
-                    "title": {
-                      "type": "string"
-                    },
-                    "pages": {
-                      "type": "string"
-                    }
-                  }
-                }
-              },
-              "files": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "integer"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "fileName": {
-                      "type": "string"
-                    },
-                    "license": {
-                      "type": "string"
-                    },
-                    "source": {
-                      "type": "string"
-                    }
-                  }
-                }
-              },
-              "types": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "integer"
-                    },
-                    "rootId": {
-                      "type": "integer"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "path": {
-                      "type": "string"
-                    },
-                    "value": {
-                      "type": "number"
-                    },
-                    "unit": {
-                      "type": "string"
-                    }
-                  }
+      }
+    },
+    "/cidoc_class/{cidoc_class}" : {
+      "get" : {
+        "tags" : [ "Entities Endpoint" ],
+        "description" : "Retrieve a list of entities, based on their CIDOC CRM class code.",
+        "operationId" : "GetByCidocClass",
+        "parameters" : [ {
+          "$ref" : "#/components/parameters/cidoc_class"
+        }, {
+          "$ref" : "#/components/parameters/download"
+        }, {
+          "$ref" : "#/components/parameters/count"
+        }, {
+          "$ref" : "#/components/parameters/show"
+        }, {
+          "$ref" : "#/components/parameters/format"
+        }, {
+          "$ref" : "#/components/parameters/export"
+        }, {
+          "$ref" : "#/components/parameters/column"
+        }, {
+          "$ref" : "#/components/parameters/sort"
+        }, {
+          "$ref" : "#/components/parameters/search"
+        }, {
+          "$ref" : "#/components/parameters/first"
+        }, {
+          "$ref" : "#/components/parameters/last"
+        }, {
+          "$ref" : "#/components/parameters/page"
+        }, {
+          "$ref" : "#/components/parameters/limit"
+        }, {
+          "$ref" : "#/components/parameters/type_id"
+        }, {
+          "$ref" : "#/components/parameters/relation_type"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Results of CIDOC class",
+            "content" : {
+              "application/ld+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/EntitiesOutputModel"
                 }
               }
             }
+          },
+          "404" : {
+            "description" : "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
+    "/latest/{limit}" : {
+      "get" : {
+        "tags" : [ "Entities Endpoint" ],
+        "description" : "Retrieve the last entered entities. n represents the amount of entities retrieved (between 1 and 100). The pagination information is always null.",
+        "operationId" : "GetLatest",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "limit",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "maximum" : 100,
+            "minimum" : 1
+          }
+        }, {
+          "$ref" : "#/components/parameters/download"
+        }, {
+          "$ref" : "#/components/parameters/show"
+        }, {
+          "$ref" : "#/components/parameters/format"
+        }, {
+          "$ref" : "#/components/parameters/export"
+        }, {
+          "$ref" : "#/components/parameters/column"
+        }, {
+          "$ref" : "#/components/parameters/sort"
+        }, {
+          "$ref" : "#/components/parameters/search"
+        }, {
+          "$ref" : "#/components/parameters/type_id"
+        }, {
+          "$ref" : "#/components/parameters/relation_type"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Last entered entities.",
+            "content" : {
+              "application/ld+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/EntitiesOutputModel"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
+    "/type_entities/{entityId}" : {
+      "get" : {
+        "tags" : [ "Entities Endpoint" ],
+        "description" : "Used to retrieve a list of entities, based on their OpenAtlas type ID. For an endpoint that lists all available types click confer Types Endpoints",
+        "operationId" : "GetTypeEntities",
+        "parameters" : [ {
+          "$ref" : "#/components/parameters/entityId"
+        }, {
+          "$ref" : "#/components/parameters/download"
+        }, {
+          "$ref" : "#/components/parameters/count"
+        }, {
+          "$ref" : "#/components/parameters/show"
+        }, {
+          "$ref" : "#/components/parameters/format"
+        }, {
+          "$ref" : "#/components/parameters/export"
+        }, {
+          "$ref" : "#/components/parameters/column"
+        }, {
+          "$ref" : "#/components/parameters/sort"
+        }, {
+          "$ref" : "#/components/parameters/search"
+        }, {
+          "$ref" : "#/components/parameters/first"
+        }, {
+          "$ref" : "#/components/parameters/last"
+        }, {
+          "$ref" : "#/components/parameters/page"
+        }, {
+          "$ref" : "#/components/parameters/limit"
+        }, {
+          "$ref" : "#/components/parameters/type_id"
+        }, {
+          "$ref" : "#/components/parameters/relation_type"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Results of type entities",
+            "content" : {
+              "application/ld+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/EntitiesOutputModel"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
+    "/type_entities_all/{entityId}" : {
+      "get" : {
+        "tags" : [ "Entities Endpoint" ],
+        "description" : "Used to retrieve a list of entities, based on their OpenAtlas type ID including all connected subtypes.. For an endpoint that lists all available types click confer Type Endpoints",
+        "operationId" : "GetTypeEntitiesAll",
+        "parameters" : [ {
+          "$ref" : "#/components/parameters/entityId"
+        }, {
+          "$ref" : "#/components/parameters/download"
+        }, {
+          "$ref" : "#/components/parameters/count"
+        }, {
+          "$ref" : "#/components/parameters/show"
+        }, {
+          "$ref" : "#/components/parameters/format"
+        }, {
+          "$ref" : "#/components/parameters/export"
+        }, {
+          "$ref" : "#/components/parameters/column"
+        }, {
+          "$ref" : "#/components/parameters/sort"
+        }, {
+          "$ref" : "#/components/parameters/search"
+        }, {
+          "$ref" : "#/components/parameters/first"
+        }, {
+          "$ref" : "#/components/parameters/last"
+        }, {
+          "$ref" : "#/components/parameters/page"
+        }, {
+          "$ref" : "#/components/parameters/limit"
+        }, {
+          "$ref" : "#/components/parameters/type_id"
+        }, {
+          "$ref" : "#/components/parameters/relation_type"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Results of type entities all",
+            "content" : {
+              "application/ld+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/EntitiesOutputModel"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
+    "/entities_linked_to_entity/{entityId}" : {
+      "get" : {
+        "tags" : [ "Entities Endpoint" ],
+        "description" : "Retrieves a list of entities linked to the entity with the stated ID.",
+        "operationId" : "GetEntitiesLinkedToEntity",
+        "parameters" : [ {
+          "$ref" : "#/components/parameters/entityId"
+        }, {
+          "$ref" : "#/components/parameters/download"
+        }, {
+          "$ref" : "#/components/parameters/count"
+        }, {
+          "$ref" : "#/components/parameters/show"
+        }, {
+          "$ref" : "#/components/parameters/format"
+        }, {
+          "$ref" : "#/components/parameters/export"
+        }, {
+          "$ref" : "#/components/parameters/column"
+        }, {
+          "$ref" : "#/components/parameters/sort"
+        }, {
+          "$ref" : "#/components/parameters/search"
+        }, {
+          "$ref" : "#/components/parameters/first"
+        }, {
+          "$ref" : "#/components/parameters/last"
+        }, {
+          "$ref" : "#/components/parameters/page"
+        }, {
+          "$ref" : "#/components/parameters/limit"
+        }, {
+          "$ref" : "#/components/parameters/type_id"
+        }, {
+          "$ref" : "#/components/parameters/relation_type"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Results of entities linked to entity",
+            "content" : {
+              "application/ld+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/EntitiesOutputModel"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
+    "/type_overview/" : {
+      "get" : {
+        "tags" : [ "Type Endpoints" ],
+        "description" : "Retrieves a list of all OpenAtlas types sorted by custom, places, standard and value",
+        "operationId" : "GetTypeOverview",
+        "parameters" : [ {
+          "$ref" : "#/components/parameters/download"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "List of all OpenAtlas types",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TypeOverviewModel"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
+    "/type_tree/" : {
+      "get" : {
+        "tags" : [ "Type Endpoints" ],
+        "description" : "Retrieves a list of all OpenAtlas types, including their information sorted by their IDs",
+        "operationId" : "GetTypeTree",
+        "parameters" : [ {
+          "$ref" : "#/components/parameters/download"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "List of all OpenAtlas types",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TypeTreeModel"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
+    "/type_by_view_class/" : {
+      "get" : {
+        "tags" : [ "Type Endpoints" ],
+        "description" : "Retrieves a list of all system types",
+        "operationId" : "GetTypeByViewClass",
+        "parameters" : [ {
+          "$ref" : "#/components/parameters/download"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "List of all OpenAtlas types",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TypesByViewClassModel"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
+    "/classes/" : {
+      "get" : {
+        "tags" : [ "Administrative Endpoints" ],
+        "description" : "Retrieves a list of all available classes, their CIDOC CRM mapping, their view, which icon can be used, if alias and references systems are allowed and which standard type it has.",
+        "operationId" : "ClassMapping",
+        "responses" : {
+          "200" : {
+            "description" : "List of all classes for presentation sites",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ClassesModel"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
+    "/content/" : {
+      "get" : {
+        "tags" : [ "Administrative Endpoints" ],
+        "description" : "Retrieves a detailed list of information on available frontend content in an OpenAtlas instance - intro, legal notice, contact, and size of processed image",
+        "operationId" : "GetContent",
+        "parameters" : [ {
+          "$ref" : "#/components/parameters/lang"
+        }, {
+          "$ref" : "#/components/parameters/download"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OpenAtlas Content",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ContentModel"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
+    "/system_class_count/" : {
+      "get" : {
+        "tags" : [ "Administrative Endpoints" ],
+        "description" : "Retrieves a detailed list of the numbers of entries connected to a system class",
+        "operationId" : "SystemClassCount",
+        "responses" : {
+          "200" : {
+            "description" : "System class count",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SystemClassCountModel"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
+    "/subunits/" : {
+      "get" : {
+        "tags" : [ "Special Endpoints" ],
+        "description" : "Displays all subunits of a place in a special format as used by the THANADOS project. Can only be used for “places”. As format only XML can be chosen",
+        "operationId" : "GetSubunits",
+        "parameters" : [ {
+          "$ref" : "#/components/parameters/format"
+        }, {
+          "$ref" : "#/components/parameters/download"
+        }, {
+          "$ref" : "#/components/parameters/count"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "One Place with all subunits",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SubunitsModel"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
+    "/geometric_entities/" : {
+      "get" : {
+        "tags" : [ "Special Endpoints" ],
+        "description" : "Retrieve a GeoJSON of all chosen geometries in an OpenAtlas instance",
+        "operationId" : "GetGeometricEntities",
+        "parameters" : [ {
+          "$ref" : "#/components/parameters/geometry"
+        }, {
+          "$ref" : "#/components/parameters/download"
+        }, {
+          "$ref" : "#/components/parameters/count"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "All geometric entities",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/GeometricEntitiesModel"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
+    "/export_database/{format}" : {
+      "get" : {
+        "tags" : [ "Special Endpoints" ],
+        "description" : "Downloads all information in an OpenAtlas instance as CSV, XML, or JSON.",
+        "operationId" : "ExportDatabase",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "format",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "json", "csv", "xml" ]
+          },
+          "example" : "json"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Downloads complete database",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "string",
+                  "format" : "binary"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
+    "/display/{filename}" : {
+      "get" : {
+        "tags" : [ "Image Endpoints" ],
+        "description" : "Retrieves the respective image if it has a licence.",
+        "operationId" : "DisplayImage",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "filename",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Retrieves the respective image if it has a licence",
+            "content" : {
+              "image/jpeg" : {
+                "schema" : {
+                  "type" : "string",
+                  "format" : "binary"
+                }
+              },
+              "image/png" : {
+                "schema" : {
+                  "type" : "string",
+                  "format" : "binary"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Something went wrong. Please consult the error message."
           }
         }
       }
     }
   },
-  "servers": [
-    {
-      "description": "Local Host",
-      "url": "http://localhost:5000/"
+  "components" : {
+    "parameters" : {
+      "entityId" : {
+        "name" : "entityId",
+        "in" : "path",
+        "description" : "Specific entity ID",
+        "required" : true,
+        "schema" : {
+          "type" : "integer"
+        },
+        "example" : 40
+      },
+      "cidoc_class" : {
+        "name" : "cidoc_class",
+        "description" : "CIDOC class to be requested",
+        "required" : true,
+        "in" : "path",
+        "schema" : {
+          "enum" : [ "E6", "E7", "E8", "E9", "E12", "E18", "E20", "E21", "E22", "E31", "E32", "E33", "E41", "E53", "E54", "E55", "E74" ]
+        },
+        "example" : "E18"
+      },
+      "view_class" : {
+        "name" : "view_class",
+        "description" : "View class to be requested",
+        "required" : true,
+        "in" : "path",
+        "schema" : {
+          "enum" : [ "all", "actor", "artifact", "event", "place", "reference", "source", "artifact", "type", "file", "source_translation", "reference_system" ]
+        },
+        "example" : "actor"
+      },
+      "system_class" : {
+        "name" : "system_class",
+        "description" : "System class to be requested",
+        "required" : true,
+        "in" : "path",
+        "schema" : {
+          "enum" : [ "all", "acquisition", "activity", "administrative_unit", "appellation", "artifact", "bibliography", "edition", "event", "external_reference", "feature", "file", "group", "human_remains", "move", "object_location", "person", "place", "production", "reference_system", "source", "source_translation", "stratigraphic_unit", "type", "tools"]
+        },
+        "example" : "acquisition"
+      },
+      "download" : {
+        "name" : "download",
+        "description" : "Download results",
+        "in" : "query",
+        "schema" : {
+          "type" : "boolean"
+        }
+      },
+      "count" : {
+        "name" : "count",
+        "description" : "Just show count of how many entities would the result give back",
+        "in" : "query",
+        "schema" : {
+          "type" : "boolean"
+        }
+      },
+      "lang" : {
+        "name" : "lang",
+        "description" : "Choose language",
+        "in" : "query",
+        "schema" : {
+          "type" : "string",
+          "enum" : [ "en", "de" ],
+          "example" : "de"
+        }
+      },
+      "show" : {
+        "name" : "show",
+        "description" : "Select which keys should not be displayed. This can improve performance",
+        "in" : "query",
+        "explode" : true,
+        "schema" : {
+          "type" : "array",
+          "items" : {
+            "enum" : [ "when", "types", "relations", "names", "links", "geometry", "depictions", "geonames", "description", "none" ]
+          }
+        }
+      },
+      "sort" : {
+        "name" : "sort",
+        "description" : "Sorting result ascending or descending of the given column. Default value is asc.",
+        "in" : "query",
+        "schema" : {
+          "type" : "string",
+          "enum" : [ "asc", "desc" ]
+        },
+        "example" : "asc"
+      },
+      "column" : {
+        "name" : "column",
+        "description" : "Choose one column to sort the results by. Default value is name.",
+        "in" : "query",
+        "schema" : {
+          "type" : "string",
+          "enum" : [ "id", "name", "cidoc_class", "system_class", "begin_from", "begin_to", "end_from", "end_to" ]
+        },
+        "example" : "name"
+      },
+      "search" : {
+        "name" : "search",
+        "description" : "Search query for specific results.",
+        "in" : "query",
+        "schema" : {
+          "type" : "array",
+          "items" : {
+            "type" : "string"
+          }
+        },
+        "explode" : true
+      },
+      "limit" : {
+        "name" : "limit",
+        "description" : "Limits the entities displayed. Influences the performance of the request. Default value is 20. 0 means all available entities will be displayed.",
+        "in" : "query",
+        "schema" : {
+          "type" : "integer"
+        }
+      },
+      "first" : {
+        "name" : "first",
+        "description" : "Begin results at the given entity id.",
+        "in" : "query",
+        "schema" : {
+          "type" : "integer"
+        }
+      },
+      "last" : {
+        "name" : "last",
+        "description" : "Begin results after the given entity id.",
+        "in" : "query",
+        "schema" : {
+          "type" : "integer"
+        }
+      },
+      "page" : {
+        "name" : "page",
+        "description" : "Jump to page number.",
+        "in" : "query",
+        "schema" : {
+          "type" : "integer"
+        }
+      },
+      "export" : {
+        "name" : "export",
+        "description" : "Export the entities into either a simple CSV representation or a zip file of CSV's especially designed for network analyses.",
+        "in" : "query",
+        "schema" : {
+          "type" : "string",
+          "enum" : [ "csv", "csvNetwork" ]
+        }
+      },
+      "format" : {
+        "name" : "format",
+        "description" : "Choose the format for the results.",
+        "in" : "query",
+        "schema" : {
+          "type" : "string",
+          "enum" : [ "lp", "geojson", "geojson-v2", "pretty-xml", "n3", "turtle", "nt", "xml" ]
+        },
+        "example" : "lp"
+      },
+      "type_id" : {
+        "name" : "type_id",
+        "description" : "Show only entities with the given type id.",
+        "in" : "query",
+        "schema" : {
+          "type" : "array",
+          "items" : {
+            "type" : "integer"
+          }
+        },
+        "explode" : true
+      },
+      "relation_type" : {
+        "name" : "relation_type",
+        "description" : "Displays only connections connected by the selected CIDOC CRM code.",
+        "in" : "query",
+        "schema" : {
+          "type" : "array",
+          "items" : {
+            "type" : "string"
+          }
+        },
+        "explode" : true
+      },
+      "geometry" : {
+        "name" : "geometry",
+        "description" : "Filters which geometries will be received. Default is gisAll",
+        "in" : "query",
+        "schema" : {
+          "type" : "array",
+          "items" : {
+            "enum" : [ "gisAll", "gisPointAll", "gisPointSupers", "gisPointSubs", "gisPointSibling", "gisLineAll", "gisPolygonAll" ]
+          }
+        },
+        "explode" : true
+      },
+      "entities" : {
+        "name" : "entities",
+        "description" : "Entity ids which will be requested",
+        "in" : "query",
+        "schema" : {
+          "type" : "array",
+          "items" : {
+            "type" : "integer"
+          }
+        },
+        "explode" : true
+      },
+      "cidoc_classes" : {
+        "name" : "cidoc_classes",
+        "description" : "CIDOC classes to be requested",
+        "in" : "query",
+        "schema" : {
+          "type" : "array",
+          "items" : {
+            "enum" : [ "E6", "E7", "E8", "E9", "E12", "E18", "E20", "E21", "E22", "E31", "E32", "E33", "E41", "E53", "E54", "E55", "E74" ]
+          }
+        },
+        "explode" : true,
+        "example" : "E18"
+      },
+      "view_classes" : {
+        "name" : "view_classes",
+        "description" : "View classes to be requested",
+        "in" : "query",
+        "schema" : {
+          "type" : "array",
+          "items" : {
+            "enum" : [ "all", "actor", "artifact", "event", "place", "reference", "source", "artifact", "type", "file", "source_translation", "reference_system" ]
+          }
+        },
+        "explode" : true,
+        "example" : "actor"
+      },
+      "system_classes" : {
+        "name" : "system_classes",
+        "description" : "System classes to be requested",
+        "in" : "query",
+        "schema" : {
+          "type" : "array",
+          "items" : {
+            "enum" : [ "all", "acquisition", "activity", "administrative_unit", "appellation", "artifact", "bibliography", "edition", "event", "external_reference", "feature", "file", "group", "human_remains", "move", "object_location", "person", "place", "production", "reference_system", "source", "source_translation", "stratigraphic_unit", "type", "tools"]
+          }
+        }
+      },
+      "image_size" : {
+        "name" : "image_size",
+        "description" : "Select which size of the image you want to display. Values are fixed but can be changed for each OpenAtlas instance. Thumbnail is 200px and table 100px.",
+        "in" : "query",
+        "schema" : {
+          "type" : "string",
+          "enum" : [ "thumbnail", "table" ]
+        },
+        "example" : "table"
+      }
     },
-    {
-      "description": "Demo Server",
-      "url": "https://demo.openatlas.eu"
-    },
-    {
-      "description": "Demo Dev Server",
-      "url": "https://demo-dev.openatlas.eu"
-    },
-    {
-      "description": "Connec Production Server",
-      "url": "https://connec.acdh.oeaw.ac.at"
+    "schemas" : {
+      "EntitiesOutputModel" : {
+        "type" : "object",
+        "properties" : {
+          "pagination" : {
+            "$ref" : "#/components/schemas/PaginationModel"
+          },
+          "results" : {
+            "type" : "array",
+            "items" : {
+              "oneOf" : [ {
+                "$ref" : "#/components/schemas/LinkedPlacesModel"
+              }, {
+                "$ref" : "#/components/schemas/GeoJSONModel"
+              } ]
+            }
+          }
+        }
+      },
+      "PaginationModel" : {
+        "type" : "object",
+        "properties" : {
+          "entities" : {
+            "type" : "integer"
+          },
+          "entitiesPerPage" : {
+            "type" : "integer"
+          },
+          "index" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/PaginationIndexModel"
+            }
+          },
+          "totalPages" : {
+            "type" : "integer"
+          }
+        }
+      },
+      "PaginationIndexModel" : {
+        "type" : "object",
+        "properties" : {
+          "page" : {
+            "type" : "integer"
+          },
+          "startId" : {
+            "type" : "integer"
+          }
+        }
+      },
+      "LinkedPlacesModel" : {
+        "properties" : {
+          "@context" : {
+            "type" : "string"
+          },
+          "type" : {
+            "type" : "string"
+          },
+          "features" : {
+            "type" : "array",
+            "items" : {
+              "type" : "object",
+              "properties" : {
+                "@id" : {
+                  "type" : "string"
+                },
+                "type" : {
+                  "type" : "string"
+                },
+                "crmClass" : {
+                  "type" : "string"
+                },
+                "systemClass" : {
+                  "type" : "string"
+                },
+                "properties" : {
+                  "type" : "object",
+                  "properties" : {
+                    "title" : {
+                      "type" : "string"
+                    }
+                  }
+                },
+                "descriptions" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "object",
+                    "properties" : {
+                      "value" : {
+                        "type" : "string"
+                      }
+                    }
+                  }
+                },
+                "when" : {
+                  "type" : "object",
+                  "properties" : {
+                    "timespans" : {
+                      "type" : "array",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "start" : {
+                            "type" : "object",
+                            "properties" : {
+                              "earliest" : {
+                                "type" : "string",
+                                "format" : "nullable"
+                              },
+                              "latest" : {
+                                "type" : "string",
+                                "format" : "nullable"
+                              },
+                              "comment" : {
+                                "type" : "string",
+                                "format" : "nullable"
+                              }
+                            }
+                          },
+                          "end" : {
+                            "type" : "object",
+                            "properties" : {
+                              "earliest" : {
+                                "type" : "string",
+                                "format" : "nullable"
+                              },
+                              "latest" : {
+                                "type" : "string",
+                                "format" : "nullable"
+                              },
+                              "comment" : {
+                                "type" : "string",
+                                "format" : "nullable"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "types" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "object",
+                    "properties" : {
+                      "identifier" : {
+                        "type" : "string"
+                      },
+                      "label" : {
+                        "type" : "string"
+                      },
+                      "descriptions" : {
+                        "type" : "string",
+                        "format" : "nullable"
+                      },
+                      "hierarchy" : {
+                        "type" : "string"
+                      },
+                      "value" : {
+                        "type" : "number",
+                        "format" : "float"
+                      },
+                      "unit" : {
+                        "type" : "string",
+                        "format" : "nullable"
+                      }
+                    }
+                  }
+                },
+                "relations" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "object",
+                    "properties" : {
+                      "label" : {
+                        "type" : "string"
+                      },
+                      "relationTo" : {
+                        "type" : "string"
+                      },
+                      "relationType" : {
+                        "type" : "string"
+                      },
+                      "relationSystemClass" : {
+                        "type" : "string"
+                      },
+                      "relationDescription" : {
+                        "type" : "string",
+                        "format" : "nullable"
+                      },
+                      "type" : {
+                        "type" : "string",
+                        "format" : "nullable"
+                      },
+                      "when" : {
+                        "type" : "object",
+                        "properties" : {
+                          "timespans" : {
+                            "type" : "array",
+                            "items" : {
+                              "type" : "object",
+                              "properties" : {
+                                "start" : {
+                                  "type" : "object",
+                                  "properties" : {
+                                    "earliest" : {
+                                      "type" : "string",
+                                      "format" : "nullable"
+                                    },
+                                    "latest" : {
+                                      "type" : "string",
+                                      "format" : "nullable"
+                                    },
+                                    "comment" : {
+                                      "type" : "string",
+                                      "format" : "nullable"
+                                    }
+                                  }
+                                },
+                                "end" : {
+                                  "type" : "object",
+                                  "properties" : {
+                                    "earliest" : {
+                                      "type" : "string",
+                                      "format" : "nullable"
+                                    },
+                                    "latest" : {
+                                      "type" : "string",
+                                      "format" : "nullable"
+                                    },
+                                    "comment" : {
+                                      "type" : "string",
+                                      "format" : "nullable"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "names" : {
+                  "type" : "string",
+                  "format" : "nullable"
+                },
+                "links" : {
+                  "type" : "string",
+                  "format" : "nullable"
+                },
+                "depictions" : {
+                  "type" : "string",
+                  "format" : "nullable"
+                },
+                "geometry" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/Polygon"
+                  }, {
+                    "$ref" : "#/components/schemas/Point"
+                  }, {
+                    "$ref" : "#/components/schemas/LineString"
+                  }, {
+                    "$ref" : "#/components/schemas/GeometryCollection"
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "GeoJSONModel" : {
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "type" : "string",
+            "enum" : [ "FeatureCollection" ]
+          },
+          "features" : {
+            "type" : "array",
+            "items" : {
+              "type" : "object",
+              "properties" : {
+                "type" : {
+                  "type" : "string"
+                },
+                "geometry" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/Polygon"
+                  }, {
+                    "$ref" : "#/components/schemas/Point"
+                  }, {
+                    "$ref" : "#/components/schemas/LineString"
+                  }, {
+                    "$ref" : "#/components/schemas/GeometryCollection"
+                  } ]
+                },
+                "properties" : {
+                  "type" : "object",
+                  "properties" : {
+                    "@id" : {
+                      "type" : "integer"
+                    },
+                    "systemClass" : {
+                      "type" : "string"
+                    },
+                    "name" : {
+                      "type" : "string"
+                    },
+                    "description" : {
+                      "type" : "string"
+                    },
+                    "begin_earliest" : {
+                      "type" : "string"
+                    },
+                    "begin_latest" : {
+                      "type" : "string",
+                      "format" : "nullable"
+                    },
+                    "begin_comment" : {
+                      "type" : "string",
+                      "format" : "nullable"
+                    },
+                    "end_earliest" : {
+                      "type" : "string"
+                    },
+                    "end_latest" : {
+                      "type" : "string",
+                      "format" : "nullable"
+                    },
+                    "end_comment" : {
+                      "type" : "string",
+                      "format" : "nullable"
+                    },
+                    "types" : {
+                      "type" : "array",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "typeName" : {
+                            "type" : "string"
+                          },
+                          "typeId" : {
+                            "type" : "integer"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "Point" : {
+        "type" : "object",
+        "required" : [ "type", "coordinates" ],
+        "properties" : {
+          "type" : {
+            "type" : "string",
+            "enum" : [ "Point" ]
+          },
+          "coordinates" : {
+            "$ref" : "#/components/schemas/Position"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "shapeType" : {
+            "type" : "string",
+            "enum" : [ "centerpoint" ]
+          }
+        }
+      },
+      "Position" : {
+        "type" : "array",
+        "minItems" : 2,
+        "maxItems" : 3,
+        "items" : {
+          "type" : "number"
+        }
+      },
+      "LineString" : {
+        "type" : "object",
+        "required" : [ "type", "coordinates" ],
+        "properties" : {
+          "type" : {
+            "type" : "string",
+            "enum" : [ "LineString" ]
+          },
+          "coordinates" : {
+            "$ref" : "#/components/schemas/LineStringCoordinates"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "shapeType" : {
+            "type" : "string",
+            "enum" : [ "polyline" ]
+          }
+        }
+      },
+      "LineStringCoordinates" : {
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/Position"
+        },
+        "minItems" : 2
+      },
+      "LinearRing" : {
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/Position"
+        },
+        "minItems" : 4
+      },
+      "Polygon" : {
+        "type" : "object",
+        "required" : [ "type", "coordinates" ],
+        "properties" : {
+          "type" : {
+            "type" : "string",
+            "enum" : [ "Polygon" ]
+          },
+          "coordinates" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/LinearRing"
+            }
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "shapeType" : {
+            "type" : "string",
+            "enum" : [ "area", "shape" ]
+          }
+        }
+      },
+      "GeometryCollection" : {
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "type" : "string",
+            "enum" : [ "GeometryCollection" ]
+          },
+          "geometries" : {
+            "type" : "array",
+            "items" : {
+              "anyOf" : [ {
+                "$ref" : "#/components/schemas/Polygon"
+              }, {
+                "$ref" : "#/components/schemas/Point"
+              }, {
+                "$ref" : "#/components/schemas/LineString"
+              } ]
+            }
+          }
+        },
+        "required" : [ "type" ],
+        "discriminator" : {
+          "propertyName" : "type"
+        }
+      },
+      "TypeOverviewEntryModel" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "viewClass" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "children" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TypeOverviewEntryModel"
+            }
+          }
+        }
+      },
+      "TypeOverviewModel" : {
+        "type" : "object",
+        "properties" : {
+          "standard" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TypeOverviewEntryModel"
+            }
+          },
+          "place" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TypeOverviewEntryModel"
+            }
+          },
+          "custom" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TypeOverviewEntryModel"
+            }
+          },
+          "value" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TypeOverviewEntryModel"
+            }
+          },
+          "system" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TypeOverviewEntryModel"
+            }
+          }
+        }
+      },
+      "TypeTreeModel" : {
+        "type" : "object",
+        "properties" : {
+          "type_tree" : {
+            "type" : "object",
+            "properties" : {
+              "type_ids" : {
+                "type" : "object",
+                "properties" : {
+                  "id" : {
+                    "type" : "integer"
+                  },
+                  "name" : {
+                    "type" : "string"
+                  },
+                  "description" : {
+                    "type" : "string"
+                  },
+                  "origin_id" : {
+                    "type" : "integer"
+                  },
+                  "first" : {
+                    "type" : "integer"
+                  },
+                  "last" : {
+                    "type" : "integer"
+                  },
+                  "root" : {
+                    "type" : "array",
+                    "items" : {
+                      "type" : "integer"
+                    }
+                  },
+                  "subs" : {
+                    "type" : "array",
+                    "items" : {
+                      "type" : "integer"
+                    }
+                  },
+                  "count" : {
+                    "type" : "integer"
+                  },
+                  "count_subs" : {
+                    "type" : "integer"
+                  },
+                  "category" : {
+                    "type" : "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "TypeViewClassChildren" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string"
+          },
+          "label" : {
+            "type" : "string"
+          },
+          "url" : {
+            "type" : "string"
+          },
+          "children" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TypeViewClassChildren"
+            }
+          }
+        }
+      },
+      "TypesByViewClassEntry" : {
+        "properties" : {
+          "children" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TypeViewClassChildren"
+            }
+          },
+          "id" : {
+            "type" : "integer"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "category" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "TypesByViewClassModel" : {
+        "type" : "object",
+        "properties" : {
+          "acquisition" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TypesByViewClassEntry"
+            }
+          },
+          "activity" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TypesByViewClassEntry"
+            }
+          },
+          "actor_actor_relation" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TypesByViewClassEntry"
+            }
+          },
+          "actor_function" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TypesByViewClassEntry"
+            }
+          },
+          "artifact" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TypesByViewClassEntry"
+            }
+          },
+          "bibliography" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TypesByViewClassEntry"
+            }
+          },
+          "edition" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TypesByViewClassEntry"
+            }
+          },
+          "event" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TypesByViewClassEntry"
+            }
+          },
+          "external_reference" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TypesByViewClassEntry"
+            }
+          },
+          "feature" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TypesByViewClassEntry"
+            }
+          },
+          "file" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TypesByViewClassEntry"
+            }
+          },
+          "group" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TypesByViewClassEntry"
+            }
+          },
+          "human_remains" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TypesByViewClassEntry"
+            }
+          },
+          "involvement" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TypesByViewClassEntry"
+            }
+          },
+          "move" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TypesByViewClassEntry"
+            }
+          },
+          "person" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TypesByViewClassEntry"
+            }
+          },
+          "place" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TypesByViewClassEntry"
+            }
+          },
+          "production" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TypesByViewClassEntry"
+            }
+          },
+          "source" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TypesByViewClassEntry"
+            }
+          },
+          "source_translation" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TypesByViewClassEntry"
+            }
+          },
+          "stratigraphic_unit" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TypesByViewClassEntry"
+            }
+          }
+        }
+      },
+      "ClassesModel" : {
+        "type" : "array",
+        "items" : {
+          "type" : "object",
+          "properties" : {
+            "systemClass" : {
+              "type" : "string"
+            },
+            "crmClass" : {
+              "type" : "string"
+            },
+            "view" : {
+              "type" : "string"
+            },
+            "icon" : {
+              "type" : "string"
+            },
+            "en" : {
+              "type" : "string"
+            }
+          }
+        }
+      },
+      "ContentModel" : {
+        "type" : "object",
+        "properties" : {
+          "intro" : {
+            "type" : "string"
+          },
+          "contact" : {
+            "type" : "string"
+          },
+          "legalNotice" : {
+            "type" : "string"
+          },
+          "siteName" : {
+            "type" : "string"
+          },
+          "imageSizes" : {
+            "type" : "object",
+            "properties" : {
+              "thumbnail" : {
+                "type" : "string"
+              },
+              "table" : {
+                "type" : "string"
+              }
+            }
+          }
+        }
+      },
+      "SystemClassCountModel" : {
+        "type" : "object",
+        "properties" : {
+          "move" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "bibliography" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "person" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "acquisition" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "reference_system" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "feature" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "file" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "activity" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "type" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "administrative_unit" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "artifact" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "source_translation" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "place" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "stratigraphic_unit" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "edition" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "group" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "source" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }
+      },
+      "SubunitsModel" : {
+        "type" : "array",
+        "items" : {
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "type" : "integer",
+              "format" : "int32"
+            },
+            "parentId" : {
+              "type" : "integer",
+              "format" : "int32"
+            },
+            "rootId" : {
+              "type" : "integer",
+              "format" : "int32"
+            },
+            "openatlasClassName" : {
+              "type" : "string"
+            },
+            "crmClass" : {
+              "type" : "string"
+            },
+            "created" : {
+              "type" : "string"
+            },
+            "modified" : {
+              "type" : "string"
+            },
+            "latestModRec" : {
+              "type" : "string"
+            },
+            "geometry" : {
+              "type" : "object",
+              "properties" : {
+                "type" : {
+                  "type" : "string"
+                },
+                "coordinates" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "number"
+                  }
+                },
+                "title" : {
+                  "type" : "string"
+                },
+                "description" : {
+                  "type" : "string"
+                },
+                "shapeType" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "children" : {
+              "type" : "array",
+              "items" : {
+                "type" : "integer",
+                "format" : "int32"
+              }
+            },
+            "properties" : {
+              "type" : "object",
+              "properties" : {
+                "name" : {
+                  "type" : "string"
+                },
+                "aliases" : {
+                  "type" : "string",
+                  "format" : "nullable"
+                },
+                "description" : {
+                  "type" : "string"
+                },
+                "standardType" : {
+                  "type" : "object",
+                  "properties" : {
+                    "name" : {
+                      "type" : "string"
+                    },
+                    "id" : {
+                      "type" : "integer",
+                      "format" : "int32"
+                    },
+                    "rootId" : {
+                      "type" : "integer",
+                      "format" : "int32"
+                    },
+                    "path" : {
+                      "type" : "string"
+                    },
+                    "externalReferences" : {
+                      "type" : "array",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "type" : {
+                            "type" : "string"
+                          },
+                          "identifier" : {
+                            "type" : "string"
+                          },
+                          "referenceSystem" : {
+                            "type" : "string"
+                          },
+                          "resolverURL" : {
+                            "type" : "string"
+                          },
+                          "referenceURL" : {
+                            "type" : "string"
+                          },
+                          "id" : {
+                            "type" : "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "timespan" : {
+                  "type" : "object",
+                  "properties" : {
+                    "earliestBegin" : {
+                      "type" : "string"
+                    },
+                    "latestBegin" : {
+                      "type" : "string"
+                    },
+                    "earliestEnd" : {
+                      "type" : "string"
+                    },
+                    "latestEnd" : {
+                      "type" : "string"
+                    }
+                  }
+                },
+                "externalReferences" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "object",
+                    "properties" : {
+                      "type" : {
+                        "type" : "string"
+                      },
+                      "identifier" : {
+                        "type" : "string"
+                      },
+                      "referenceSystem" : {
+                        "type" : "string"
+                      },
+                      "resolverURL" : {
+                        "type" : "string"
+                      },
+                      "referenceURL" : {
+                        "type" : "string"
+                      },
+                      "id" : {
+                        "type" : "string"
+                      }
+                    }
+                  }
+                },
+                "references" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "object",
+                    "properties" : {
+                      "id" : {
+                        "type" : "integer",
+                        "format" : "int32"
+                      },
+                      "abbreviation" : {
+                        "type" : "string"
+                      },
+                      "title" : {
+                        "type" : "string"
+                      },
+                      "pages" : {
+                        "type" : "string",
+                        "format" : "nullable"
+                      }
+                    }
+                  }
+                },
+                "files" : {
+                  "type" : "string",
+                  "format" : "nullable"
+                },
+                "types" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "object",
+                    "properties" : {
+                      "id" : {
+                        "type" : "integer",
+                        "format" : "int32"
+                      },
+                      "rootId" : {
+                        "type" : "integer",
+                        "format" : "int32"
+                      },
+                      "name" : {
+                        "type" : "string"
+                      },
+                      "path" : {
+                        "type" : "string"
+                      },
+                      "value" : {
+                        "type" : "string",
+                        "format" : "nullable"
+                      },
+                      "unit" : {
+                        "type" : "string",
+                        "format" : "nullable"
+                      },
+                      "externalReferences" : {
+                        "type" : "array",
+                        "items" : {
+                          "type" : "object",
+                          "properties" : {
+                            "type" : {
+                              "type" : "string"
+                            },
+                            "identifier" : {
+                              "type" : "string"
+                            },
+                            "referenceSystem" : {
+                              "type" : "string"
+                            },
+                            "resolverURL" : {
+                              "type" : "string"
+                            },
+                            "referenceURL" : {
+                              "type" : "string"
+                            },
+                            "id" : {
+                              "type" : "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "GeometricEntitiesModel" : {
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "type" : "string"
+          },
+          "features" : {
+            "type" : "array",
+            "items" : {
+              "type" : "object",
+              "properties" : {
+                "type" : {
+                  "type" : "string"
+                },
+                "geometry" : {
+                  "type" : "object",
+                  "properties" : {
+                    "coordinates" : {
+                      "type" : "array",
+                      "items" : {
+                        "type" : "number"
+                      }
+                    },
+                    "type" : {
+                      "type" : "string"
+                    }
+                  }
+                },
+                "properties" : {
+                  "type" : "object",
+                  "properties" : {
+                    "id" : {
+                      "type" : "integer",
+                      "format" : "int32"
+                    },
+                    "name" : {
+                      "type" : "string"
+                    },
+                    "description" : {
+                      "type" : "string"
+                    },
+                    "locationId" : {
+                      "type" : "integer",
+                      "format" : "int32"
+                    },
+                    "objectId" : {
+                      "type" : "integer",
+                      "format" : "int32"
+                    },
+                    "objectDescription" : {
+                      "type" : "string"
+                    },
+                    "objectName" : {
+                      "type" : "string"
+                    },
+                    "objectType" : {
+                      "type" : "string"
+                    },
+                    "shapeType" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
-  ],
-  "tags": [
-    {
-      "description": "Requesting entities through different means.",
-      "name": "Entities"
-    },
-    {
-      "description": "Requesting nodes and subunits",
-      "name": "Nodes"
-    },
-    {
-      "description": "Requesting content of the OpenAtlas instance.",
-      "name": "Content"
-    }
-  ]
+  }
 }

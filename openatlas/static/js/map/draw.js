@@ -67,24 +67,24 @@ mapInputForm.onAdd = () => {
               onclick="closeForm()" class="fad">X</span>
             <span id="inputFormTitle"></span>
             <p id="inputFormInfo"></p>
-            <input type="text" id="nameField" 
-              placeholder="Enter a name if desired">
-            <textarea rows="3" cols="70" id="descriptionField" 
+            <input type="text" id="nameField" class="${style.stringField}" 
+              placeholder="${translate["map_info_name"]}">
+            <textarea rows="3" cols="70" id="descriptionField"  class="${style.stringField}"
               placeholder="${translate["map_info_description"]}"/></textarea>
             <div id="coordinatesDiv">
             <div class="markerInput">
-                <label for='easting'>Easting</label>
-                <input type="text" oninput="check_coordinates_input_marker()" 
+                <label for='easting'>${translate["map_info_easting"]}</label>
+                <input type="text" oninput="check_coordinates_input_marker()" class="${style.stringField}"
                  id="easting" placeholder="decimal degrees">
             </div>
             <div class="markerInput">
-                <label for='northing'>Northing</label>
-                <input type="text" oninput="check_coordinates_input_marker()" 
+                <label for='northing'>${translate["map_info_northing"]}</label>
+                <input type="text" oninput="check_coordinates_input_marker()" class="${style.stringField}"
                   id="northing" placeholder="decimal degrees">
             </div>
             <div class="polygonInput">
-                <label for='polyInput'>Points</label>
-                <input type="text" oninput="check_coordinates_input_polygon()" 
+                <label for='polyInput'>${translate["map_info_points"]}</label>
+                <input type="text" oninput="check_coordinates_input_polygon()" class="${style.stringField}"
                   id="polyInput"  placeholder="[[lon1,lat1],[lon2,lat2],...]">
             </div>
         </div>

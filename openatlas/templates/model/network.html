@@ -15,11 +15,11 @@
       <svg id="network-svg"></svg>
     </div>
     <script>
-      var graph = {{ json_data|safe }};
-      var width = {{ network_params.options.width }};
-      var height = {{ network_params.options.height }};
-      var charge = {{ network_params.options.charge * 10 }};
-      var distance = {{ network_params.options.distance }};
+        var graph = {{ json_data|safe }};
+        var width = {{ network_params.options.width }};
+        var height = {{ network_params.options.height }};
+        var charge = {{ network_params.options.charge * 10 }};
+        var distance = {{ network_params.options.distance }};
     </script>
     <script src="/static/js/network.js"></script>
     <script src="/static/node_modules/save-svg-as-png/lib/saveSvgAsPng.js"></script>
@@ -29,29 +29,50 @@
     </div>
     <h2>{{ _('no data to display')|uc_first }}</h2>
   {% endif %}
-  <form method="post" id="network-form">
+  <form method="post" id="network-form" style="margin-right:1em;">
     {{ form.csrf_token }}
-    <h2>{{ _('classes')|uc_first }}</h2>
-    <div>
-      <div id="classes" style="float:left">
-        {% for item in form.classes %}
-        {{ form[item.data] }} {{ item.label }}<br>
-        {% endfor %}
+    <div class="row">
+      <div class="col-auto">
+        <h2>{{ _('classes')|uc_first }}</h2>
+        <div>
+          <div id="classes" style="float:left">
+            {% for item in form.classes %}
+              <div class="input-group mb-3">
+                {{ form[item.data] }}
+                <span class="input-group-text" style="min-width: 40%"> {{ item.label }}</span>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+        <div style="clear:both;"></div>
+        <p>{{ form.orphans }} {{ _('show orphans')|uc_first }}</p>
       </div>
-    </div>
-    <div style="clear:both;"></div>
-    <p>{{ form.orphans }} {{ _('show orphans')|uc_first }}</p>
-    <h2>{{ _('network options')|uc_first }}</h2>
-    {{ form.width }} {{ form.width.label }}<br>
-    {{ form.height }} {{ form.height.label }}<br>
-    {{ form.charge }} {{ form.charge.label }}<br>
-    {{ form.distance }} {{ form.distance.label }}<br>
-    <div class="toolbar" style="margin-top: 1em;">
-      <input
-        class="{{ config.CSS.button.primary }}"
-        id="save" name="save"
-        value="{{ _('apply')|uc_first }}"
-        type="submit">
+      <div class="col-auto">
+        <h2>{{ _('network options')|uc_first }}</h2>
+        <div class="input-group mb-3">
+          {{ form.width(class_=config.CSS.string_field) }}
+          <span class="input-group-text" style="min-width: 30%"> {{ form.width.label }}</span>
+        </div>
+        <div class="input-group mb-3">
+          {{ form.height(class_=config.CSS.string_field) }}
+          <span class="input-group-text" style="min-width: 30%"> {{ form.height.label }}</span>
+        </div>
+        <div class="input-group mb-3">
+          {{ form.charge(class_=config.CSS.string_field) }}
+          <span class="input-group-text" style="min-width: 30%"> {{ form.charge.label }}</span>
+        </div>
+        <div class="input-group mb-3">
+          {{ form.distance(class_=config.CSS.string_field) }}
+          <span class="input-group-text" style="min-width: 30%"> {{ form.distance.label }}</span>
+        </div>
+        <input
+            class="{{ config.CSS.button.primary }}"
+            id="save"
+            name="save"
+            value="{{ _('apply')|uc_first }}"
+            type="submit">
+
+      </div>
     </div>
   </form>
 {% endblock %}

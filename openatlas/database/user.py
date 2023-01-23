@@ -135,7 +135,7 @@ class User:
                 {'AND user_id = %(id)s' if int(user_id) else ''}
                 {'AND action = %(action)s' if action != 'all' else ''}
             ORDER BY created DESC
-            {'LIMIT %(limit)s' if int(limit) else ''}
+            {'LIMIT %(limit)s' if int(limit) else ''};
             """,
             {'limit': limit, 'id': user_id, 'action': action})
         return g.cursor.fetchall()
@@ -254,16 +254,18 @@ class User:
             user_id: int,
             entity_id: int,
             note: str,
-            public: bool) -> None:
+            public: bool) -> int:
         g.cursor.execute(
             """
             INSERT INTO web.user_notes (user_id, entity_id, text, public)
-            VALUES (%(user_id)s, %(entity_id)s, %(text)s, %(public)s);
+            VALUES (%(user_id)s, %(entity_id)s, %(text)s, %(public)s)
+            RETURNING id;
             """, {
                 'user_id': user_id,
                 'entity_id': entity_id,
                 'text': note,
                 'public': public})
+        return g.cursor.fetchone()['id']
 
     @staticmethod
     def update_note(id_: int, note: str, public: bool) -> None:

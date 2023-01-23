@@ -1,10 +1,10 @@
 {% extends "layout.html" %}
 {% block content %}
   {% for release, version in versions.items() %}
-    <div class="changelog-version">
+    <div class="fs-6 fw-bold">
       {{ _('version')|uc_first }} {{ release }}
     </div>
-    <div class="changelog-date">
+    <div class="my-1">
       {{ version[0] }}
     </div>
     <ul>
@@ -13,12 +13,7 @@
           <li class="changelog">
             {% if issue_number %}
               {{ issue_type|uc_first }}
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                href="https://redmine.openatlas.eu/issues/{{ issue_number }}">
-                  #{{ issue_number }}
-              </a>
+              {{ (issue_number)|link("https://redmine.openatlas.eu/issues/" + issue_number, external=True)|safe }}
               {{ issue_text|safe }}
             {% else %}
               {{ issue_text|safe }}

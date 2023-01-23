@@ -38,7 +38,7 @@ about the current city and not the historical one.
 
 Configuration
 -------------
-Admins and manager can add, updated and delete external reference systems.
+Admins and manager can add, update and delete external reference systems.
 
 * **Name** - e.g. Wikipedia; can not be changed for Wikidata or GeoNames
 * **Website URL** - an URL to the project site of the reference system

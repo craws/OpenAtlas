@@ -2,7 +2,7 @@ from typing import Any
 
 from flask import g
 
-from openatlas.util.util import format_date_part
+from openatlas.display.util import format_date_part
 
 
 def populate_types(manager: Any) -> None:
@@ -38,11 +38,8 @@ def populate_reference_systems(manager: Any) -> None:
         if field.id.startswith('reference_system_id_'):
             system_id = int(field.id.replace('reference_system_id_', ''))
             if system_id in system_links:
-                field.data = system_links[system_id].description
-                precision_field = getattr(
-                    manager.form,
-                    f'reference_system_precision_{system_id}')
-                precision_field.data = str(system_links[system_id].type.id)
+                field.data = {'value': system_links[system_id].description,
+                              'precision': str(system_links[system_id].type.id)}
 
 
 def populate_dates(manager: Any) -> None:

@@ -4,10 +4,10 @@ from typing import Any, Optional, TYPE_CHECKING, Union
 
 from flask import abort, g
 
-from openatlas.database.anthropology import Anthropology
 from openatlas.database.date import Date
 from openatlas.database.link import Link as Db
-from openatlas.util.util import (
+from openatlas.database.tools import Tools
+from openatlas.display.util import (
     datetime64_to_timestamp, format_date_part, timestamp_to_datetime64)
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -198,13 +198,16 @@ class Link:
             entity: Entity,
             codes: list[str],
             inverse: bool = False) -> None:
+        from openatlas.models.tools import get_carbon_link
+        from openatlas.models.type import Type
         if entity.class_.name == 'stratigraphic_unit' \
                 and 'P2' in codes \
                 and not inverse:
-            if anthropological_data := Anthropology.get_types(entity.id):
-                Db.remove_types(
-                    entity.id,
-                    [row['link_id'] for row in anthropological_data])
+            exclude_ids = Type.get_sub_ids_recursive(
+                Type.get_hierarchy('Features for sexing'))
+            exclude_ids.append(Type.get_hierarchy('Radiocarbon').id)
+            if Tools.get_sex_types(entity.id) or get_carbon_link(entity):
+                Db.remove_types(entity.id, exclude_ids)
                 codes.remove('P2')
                 if not codes:
                     return
@@ -238,7 +241,7 @@ class Link:
     @staticmethod
     def get_invalid_cidoc_links() -> list[dict[str, str]]:
         from openatlas.models.entity import Entity
-        from openatlas.util.util import link
+        from openatlas.display.util import link
         invalid_linking = []
         for row in Db.get_cidoc_links():
             property_ = g.properties[row['property_code']]
@@ -283,24 +286,20 @@ class Link:
 
     @staticmethod
     def check_single_type_duplicates() -> list[dict[str, Any]]:
-        from openatlas.models.type import Type
         from openatlas.models.entity import Entity
         data = []
         for type_ in g.types.values():
-            if type_.root or type_.multiple or type_.category == 'value':
-                continue  # pragma: no cover
-            type_ids = Type.get_all_sub_ids(type_)
-            if not type_ids:
-                continue  # pragma: no cover
-            for id_ in Db.check_single_type_duplicates(type_ids):
-                offending_types = []
-                entity = Entity.get_by_id(id_, types=True)
-                for entity_types in entity.types:
-                    if g.types[entity_types.root[0]].id != type_.id:
-                        continue  # pragma: no cover
-                    offending_types.append(entity_types)
-                data.append({
-                    'entity': entity,
-                    'type': type_,
-                    'offending_types': offending_types})
+            if not type_.multiple \
+                    and type_.category not in  ['value', 'tools'] \
+                    and (type_ids := type_.get_sub_ids_recursive()):
+                for id_ in Db.check_single_type_duplicates(type_ids):
+                    offending_types = []
+                    entity = Entity.get_by_id(id_, types=True)
+                    for entity_type in entity.types:
+                        if g.types[entity_type.root[0]].id == type_.id:
+                            offending_types.append(entity_type)
+                    data.append({
+                        'entity': entity,
+                        'type': type_,
+                        'offending_types': offending_types})
         return data

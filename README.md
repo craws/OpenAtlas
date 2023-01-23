@@ -7,6 +7,7 @@ information is mapped as a network using classes and properties of the
 
 Documentation:
 [Manual](https://manual.openatlas.eu),
+[Features](https://manual.openatlas.eu/features.html),
 [Wiki](https://redmine.openatlas.eu/projects/uni/wiki),
 [Issues](https://redmine.openatlas.eu/projects/uni/issues)
 
@@ -22,6 +23,10 @@ the [DPP](https://dpp.oeaw.ac.at/) project.
 
 Please refer to [install.md](install.md) for requirements and installation.
 
+# Contributing
+
+Please refer to our [contributing guidelines](CONTRIBUTING.md)
+
 # Team
 
 **Stefan Eichert** - Idea, Concept and Data Modelling
@@ -30,7 +35,7 @@ Please refer to [install.md](install.md) for requirements and installation.
 **Alexander Watzinger** - Lead Developer and Concept
 ([alexander.watzinger@oeaw.ac.at](mailto:alexander.watzinger@oeaw.ac.at))
 
-**Bernhard Koschiček-Krombholz** - Software Development, API
+**Bernhard Koschiček-Krombholz** - Backend Development, API
 ([bernhard.koschicek-krombholz@oeaw.ac.at](mailto:bernhard.koschicek-krombholz@oeaw.ac.at))
 
 **Nina Richards** - Bioarchaeological Expertise
@@ -41,9 +46,6 @@ Please refer to [install.md](install.md) for requirements and installation.
 
 **Moritz Großfurtner** - Frontend Development
 ([moritz.großfurtner@oeaw.ac.at](mailto:moritz.großfurtner@oeaw.ac.at)
-
-**Veronika Gründhammer** - Project Administration
-([veronika.gruendhammer@oeaw.ac.at](mailto:veronika.gruendhammer@oeaw.ac.at))
 
 **Jan Belik** - Logo Design and Design Consulting
 ([buero@janbelik.com](mailto:buero@janbelik.com))

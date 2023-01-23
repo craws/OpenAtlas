@@ -7,13 +7,13 @@ from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.database.connect import Transaction
+from openatlas.display.table import Table
+from openatlas.display.util import (
+    display_form, get_entities_linked_to_type_recursive, link,
+    required_group, sanitize, uc_first)
 from openatlas.forms.form import get_manager
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
-from openatlas.util.table import Table
-from openatlas.util.util import (
-    display_form, get_entities_linked_to_type_recursive, link, required_group,
-    sanitize, uc_first)
 
 
 @app.route('/hierarchy/insert/<category>', methods=['POST', 'GET'])
@@ -68,8 +68,7 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
     if manager.form.validate_on_submit():
         Transaction.begin()
         try:
-            Type.update_hierarchy(
-                hierarchy,
+            hierarchy.update_hierarchy(
                 sanitize(manager.form.name.data, 'text'),
                 manager.form.classes.data,
                 multiple=(
@@ -95,34 +94,35 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
         manager.form.multiple.render_kw = {'disabled': 'disabled'}
     table = Table(paging=False)
     for name in hierarchy.classes:
-        count = Type.get_form_count(hierarchy, name)
+        count = hierarchy.get_count_by_class(name)
         table.rows.append([
             g.classes[name].label,
             format_number(count) if count else link(
                 _('remove'),
-                url_for('remove_class', id_=hierarchy.id, class_name=name))])
+                url_for('remove_class', id_=hierarchy.id, name=name))])
     return render_template(
         'content.html',
-        content=display_form(manager.form, manual_page='entity/type')
-        + table.display(),
+        content=f'''
+            <div class="row">
+              <div class="col-12 col-sm-6">
+                {display_form(manager.form, manual_page='entity/type')}
+              </div>
+              <div class="col-12 col-sm-6">{table.display()}</div>
+            </div>''',
         title=_('types'),
         crumbs=[[_('types'), url_for('type_index')], hierarchy, _('edit')])
 
 
-@app.route('/hierarchy/remove_class/<int:id_>/<class_name>')
+@app.route('/hierarchy/remove_class/<int:id_>/<name>')
 @required_group('manager')
-def remove_class(id_: int, class_name: str) -> Response:
-    root = g.types[id_]
-    if Type.get_form_count(root, class_name):
-        abort(403)  # pragma: no cover
+def remove_class(id_: int, name: str) -> Response:
+    if g.types[id_].get_count_by_class(name):
+        abort(403)
     try:
-        Type.remove_class_from_hierarchy(class_name, root.id)
+        g.types[id_].remove_class(name)
         flash(_('info update'), 'info')
     except Exception as e:  # pragma: no cover
-        g.logger.log(
-            'error',
-            'database',
-            'remove class from hierarchy failed', e)
+        g.logger.log('error', 'database', 'remove hierarchy class failed', e)
         flash(_('error database'), 'error')
     return redirect(url_for('hierarchy_update', id_=id_))
 
@@ -148,14 +148,14 @@ def required_risk(id_: int) -> str:
         'type/required.html',
         id_=id_,
         entity=entity,
-        untyped_count=format_number(len(Type.get_untyped(id_))),
+        untyped_count=format_number(len(g.types[id_].get_untyped())),
         crumbs=[[_('types'), url_for('type_index')], entity, _('required')])
 
 
 @app.route('/hierarchy/required_add/<int:id_>')
 @required_group('manager')
 def required_add(id_: int) -> Response:
-    Type.hierarchy_required_add(id_)
+    g.types[id_].set_required()
     g.logger.log('info', 'types', f'Setting hierarchy {id_} to required')
     flash(_('info update'), 'info')
     return redirect(url_for('view', id_=id_))
@@ -164,7 +164,7 @@ def required_add(id_: int) -> Response:
 @app.route('/hierarchy/required_remove/<int:id_>')
 @required_group('manager')
 def required_remove(id_: int) -> Response:
-    Type.hierarchy_required_remove(id_)
+    g.types[id_].unset_required()
     g.logger.log('info', 'types', f'Setting hierarchy {id_} to not required')
     flash(_('info update'), 'info')
     return redirect(url_for('view', id_=id_))

@@ -11,9 +11,9 @@ from openatlas import app
 from openatlas.database.date import Date
 from openatlas.database.entity import Entity as Db
 from openatlas.models.link import Link
-from openatlas.util.util import (
-    datetime64_to_timestamp, format_date_part, get_base_table_data, sanitize,
-    timestamp_to_datetime64)
+from openatlas.display.util import datetime64_to_timestamp, format_date_part, \
+    get_base_table_data, \
+    sanitize, timestamp_to_datetime64
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.type import Type
@@ -34,16 +34,14 @@ class Entity:
         self.reference_systems: list[Link] = []
         self.origin_id: Optional[int] = None  # When coming from another entity
         self.image_id: Optional[int] = None  # Profile image
-        self.linked_places: list[Entity] = []  # Related places for map
         self.location: Optional[Entity] = None  # Respective location if place
-        self.info_data: dict[str, Union[str, list[str], None]]
 
         self.standard_type = None
         self.types: dict[Type, str] = {}
         if 'types' in data and data['types']:
             for item in data['types']:  # f1 = type id, f2 = value
                 type_ = g.types[item['f1']]
-                if type_.class_.name == 'type_anthropology':
+                if type_.class_.name == 'type_tools':
                     continue
                 self.types[type_] = item['f2']
                 if type_.category == 'standard':
@@ -131,16 +129,11 @@ class Entity:
     def link_string(
             self,
             code: str,
-            range_: str,
+            range_: str,  # int or list[int] form string value, e.g. '1', '[1]'
             description: Optional[str] = None,
             inverse: bool = False) -> None:
-        if not range_:
-            return  # pragma: no cover
-        # range_ = string value from a form, can be empty, int or int list
-        # e.g. '', '1', '[]', '[1, 2]'
         ids = ast.literal_eval(range_)
-        ids = [int(id_) for id_ in ids] \
-            if isinstance(ids, list) else [int(ids)]
+        ids = [int(i) for i in ids] if isinstance(ids, list) else [int(ids)]
         Link.insert(self, code, Entity.get_by_ids(ids), description, inverse)
 
     def get_links(
@@ -189,7 +182,7 @@ class Entity:
             setattr(self, key, value)
         Db.update({
             'id': self.id,
-            'name': str(self.name).strip(),
+            'name': self.name.strip(),
             'begin_from': datetime64_to_timestamp(self.begin_from),
             'begin_to': datetime64_to_timestamp(self.begin_to),
             'end_from': datetime64_to_timestamp(self.end_from),
@@ -273,11 +266,11 @@ class Entity:
         if not self.image_id:
             for link_ in self.get_links('P67', inverse=True):
                 domain = link_.domain
-                if domain.class_.view == 'file':  # pragma: no cover
-                    data = get_base_table_data(domain)
-                    if data[3] in app.config['DISPLAY_FILE_EXTENSIONS']:
-                        self.image_id = domain.id
-                        break
+                if domain.class_.view == 'file' \
+                        and get_base_table_data(domain)[3] \
+                        in app.config['DISPLAY_FILE_EXTENSIONS']:
+                    self.image_id = domain.id
+                    break
 
     def get_profile_image_id(self) -> Optional[int]:
         return Db.get_profile_image_id(self.id)
@@ -288,11 +281,13 @@ class Entity:
     def get_name_directed(self, inverse: bool = False) -> str:
         """Returns name part of a directed type e.g. parent of (child of)"""
         name_parts = self.name.split(' (')
-        if inverse and len(name_parts) > 1:  # pragma: no cover
-            return sanitize(name_parts[1][:-1], 'text')  # Remove close bracket
+        if inverse and len(name_parts) > 1:
+            return sanitize(
+                name_parts[1][:-1],  # Remove closing bracket
+                'text')  # pragma: no cover
         return name_parts[0]
 
-    def check_too_many_single_type_links(self) -> Optional[int]:
+    def check_too_many_single_type_links(self) -> bool:
         type_dict: dict[int, int] = {}
         for type_ in self.types:
             if type_.root[0] in type_dict:
@@ -301,8 +296,8 @@ class Entity:
                 type_dict[type_.root[0]] = 1
         for id_, count in type_dict.items():
             if count > 1 and not g.types[id_].multiple:
-                return id_
-        return None
+                return True
+        return False
 
     def get_structure(self) -> dict[str, list[Entity]]:
         structure: dict[str, list[Entity]] = {
@@ -375,11 +370,8 @@ class Entity:
             class_name: str,
             name: str,
             description: Optional[str] = None) -> Union[Entity, Type]:
-        if not name:  # pragma: no cover
-            g.logger.log('error', 'model', 'Insert entity without name')
-            abort(422)
         id_ = Db.insert({
-            'name': str(name).strip(),
+            'name': name.strip(),
             'code': g.classes[class_name].cidoc_class.code,
             'openatlas_class_name': class_name,
             'description':
@@ -406,7 +398,7 @@ class Entity:
         data = Db.get_by_id(id_, types, aliases)
         if not data:
             if 'activity' in request.path:  # Re-raise if in user activity view
-                raise AttributeError  # pragma: no cover
+                raise AttributeError
             abort(418)
         return Entity(data)
 

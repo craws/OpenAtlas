@@ -13,12 +13,14 @@ from wtforms import (
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app
-from openatlas.models.entity import Entity
-from openatlas.models.user import User
-from openatlas.util.table import Table
-from openatlas.util.util import (
+from openatlas.display.tab import Tab
+from openatlas.display.table import Table
+from openatlas.display.util import (
     button, description, display_form, display_info, format_date,
     is_authorized, link, manual, required_group, send_mail, uc_first)
+from openatlas.forms.field import generate_password_field
+from openatlas.models.entity import Entity
+from openatlas.models.user import User
 
 
 class UserForm(FlaskForm):
@@ -32,6 +34,7 @@ class UserForm(FlaskForm):
     email = StringField(_('email'), [InputRequired(), Email()])
     password = PasswordField(_('password'), [InputRequired()])
     password2 = PasswordField(_('repeat password'), [InputRequired()])
+    generate_password = generate_password_field()
     show_passwords = BooleanField(_('show passwords'))
     real_name = StringField(_('full name'), description=_('tooltip full name'))
     description = TextAreaField(_('info'))
@@ -44,10 +47,7 @@ class UserForm(FlaskForm):
         valid = FlaskForm.validate(self)
         username = ''
         user_email = ''
-        if self.user_id:
-            user = User.get_by_id(self.user_id)
-            if not user:
-                abort(404)  # pragma: no cover
+        if self.user_id and (user := User.get_by_id(self.user_id)):
             username = user.username
             user_email = user.email
         if username != self.username.data \
@@ -95,24 +95,21 @@ class ActivityForm(FlaskForm):
 def user_activity(user_id: int = 0) -> str:
     form = ActivityForm()
     form.user.choices = [(0, _('all'))] + User.get_users_for_form()
+    limit = 100
+    user_id = user_id or 0
+    action = 'all'
     if form.validate_on_submit():
-        activity = User.get_activities(
-            int(form.limit.data),
-            int(form.user.data),
-            form.action.data)
-    elif user_id:
-        form.user.data = user_id
-        activity = User.get_activities(100, user_id, 'all')
-    else:
-        activity = User.get_activities(100, 0, 'all')
+        limit = int(form.limit.data)
+        user_id = int(form.user.data)
+    form.user.data = user_id
     table = Table(
         ['date', 'user', 'action', 'class', 'entity'],
         order=[[0, 'desc']])
-    for row in activity:
+    for row in User.get_activities(limit, user_id, action):
         try:
             entity = Entity.get_by_id(row['entity_id'])
             entity_name = link(entity)
-        except AttributeError:  # pragma: no cover - entity already deleted
+        except AttributeError:  # Entity already deleted
             entity = None  # type: ignore
             entity_name = f"id {row['entity_id']}"
         user = User.get_by_id(row['user_id'])
@@ -134,7 +131,7 @@ def user_activity(user_id: int = 0) -> str:
 def user_view(id_: int) -> str:
     user = User.get_by_id(id_)
     if not user:
-        abort(404)  # pragma: no cover
+        abort(404)
     entities_count = ''
     if count := User.get_created_entities_count(user.id):
         entities_count = \
@@ -158,7 +155,7 @@ def user_view(id_: int) -> str:
             buttons.append(
                 button(_('edit'), url_for('user_update', id_=user.id)))
         if user.id != current_user.id and (
-                    user.group != 'admin' or current_user.group == 'admin'):
+                user.group != 'admin' or current_user.group == 'admin'):
             name = user.username.replace('"', '').replace("'", '')
             buttons.append(
                 button(
@@ -170,9 +167,12 @@ def user_view(id_: int) -> str:
         buttons.append(
             button(_('activity'), url_for('user_activity', user_id=user.id)))
     return render_template(
-        'content.html',
-        content=display_info(info) + description(user),
-        buttons=buttons,
+        'tabs.html',
+        tabs={
+            'info': Tab(
+                'info',
+                display_info(info) + description(user),
+                buttons=buttons)},
         title=user.username,
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-user"],
@@ -213,16 +213,16 @@ def user_entities(id_: int) -> str:
 def user_update(id_: int) -> Union[str, Response]:
     user = User.get_by_id(id_)
     if not user:
-        abort(404)  # pragma: no cover
+        abort(404)
     if user.group == 'admin' and current_user.group != 'admin':
-        abort(403)  # pragma: no cover
+        abort(403)
     form = UserForm(obj=user)
     form.user_id = id_
     del form.password, form.password2, form.send_info, \
         form.insert_and_continue, form.show_passwords
     form.group.choices = get_groups()
     if user and form.validate_on_submit():
-        # Active is always true for current user to prevent self deactivation
+        # Active is always True for current user to prevent self deactivation
         user.active = True if user.id == current_user.id else form.active.data
         user.real_name = form.real_name.data
         user.username = form.username.data
@@ -263,7 +263,7 @@ def user_insert() -> Union[str, Response]:
                 form.password.data.encode('utf-8'),
                 bcrypt.gensalt()).decode('utf-8')})
         flash(_('user created'), 'info')
-        if g.settings['mail'] and form.send_info.data:  # pragma: no cover
+        if g.settings['mail'] and form.send_info.data:
             subject = _(
                 'Your account information for %(sitename)s',
                 sitename=g.settings['site_name'])
@@ -279,7 +279,7 @@ def user_insert() -> Union[str, Response]:
                     _('Sent account information mail to %(email)s.',
                       email=form.email.data),
                     'info')
-            else:
+            else:  # pragma: no cover
                 flash(
                     _('Failed to send account details to %(email)s.',
                       email=form.email.data),

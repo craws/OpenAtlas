@@ -10,10 +10,10 @@ from werkzeug.wrappers import Response
 from wtforms import SubmitField
 
 from openatlas import app
+from openatlas.display.table import Table
+from openatlas.display.util import (
+    convert_size, is_authorized, link, required_group, uc_first)
 from openatlas.models.export import sql_export
-from openatlas.util.table import Table
-from openatlas.util.util import (
-    convert_size, delete_link, is_authorized, link, required_group, uc_first)
 
 
 class ExportSqlForm(FlaskForm):
@@ -24,7 +24,7 @@ class ExportSqlForm(FlaskForm):
 @required_group('manager')
 def download_sql(filename: str) -> Response:
     return send_from_directory(
-        app.config['EXPORT_DIR'] / 'sql',
+        app.config['EXPORT_DIR'],
         filename,
         as_attachment=True)
 
@@ -32,7 +32,7 @@ def download_sql(filename: str) -> Response:
 @app.route('/export/sql', methods=['POST', 'GET'])
 @required_group('manager')
 def export_sql() -> Union[str, Response]:
-    path = app.config['EXPORT_DIR'] / 'sql'
+    path = app.config['EXPORT_DIR']
     writable = os.access(path, os.W_OK)
     form = ExportSqlForm()
     if form.validate_on_submit() and writable:
@@ -46,7 +46,7 @@ def export_sql() -> Union[str, Response]:
     return render_template(
         'export.html',
         form=form,
-        table=get_table('sql', path, writable),
+        table=get_table(path, writable),
         writable=writable,
         title=_('export SQL'),
         crumbs=[
@@ -54,7 +54,7 @@ def export_sql() -> Union[str, Response]:
              f"{url_for('admin_index')}#tab-data"], _('export SQL')])
 
 
-def get_table(type_: str, path: Path, writable: bool) -> Table:
+def get_table(path: Path, writable: bool) -> Table:
     table = Table(['name', 'size'], order=[[0, 'desc']])
     for file in [
             f for f in path.iterdir()
@@ -64,24 +64,26 @@ def get_table(type_: str, path: Path, writable: bool) -> Table:
             convert_size(file.stat().st_size),
             link(
                 _('download'),
-                url_for(f'download_{type_}', filename=file.name))]
+                url_for(f'download_sql', filename=file.name))]
         if is_authorized('admin') and writable:
+            confirm = _('Delete %(name)s?', name=file.name.replace("'", ''))
             data.append(
-                delete_link(
-                    file.name,
-                    url_for('delete_export', type_=type_, filename=file.name)))
+                link(
+                    _('delete'),
+                    url_for('delete_export', filename=file.name),
+                    js=f"return confirm('{confirm}')"))
         table.rows.append(data)
     return table
 
 
-@app.route('/delete_export/<type_>/<filename>')
+@app.route('/delete_export/<filename>')
 @required_group('admin')
-def delete_export(type_: str, filename: str) -> Response:
+def delete_export(filename: str) -> Response:
     try:
-        (app.config['EXPORT_DIR'] / type_ / filename).unlink()
-        g.logger.log('info', 'file', f'{type_} file deleted')
+        (app.config['EXPORT_DIR'] / filename).unlink()
+        g.logger.log('info', 'file', f'SQL file deleted')
         flash(_('file deleted'), 'info')
     except Exception as e:
-        g.logger.log('error', 'file', f'{type_} file deletion failed', e)
+        g.logger.log('error', 'file', f'SQL file deletion failed', e)
         flash(_('error file delete'), 'error')
-    return redirect(url_for(f'export_{type_}'))
+    return redirect(url_for(f'export_sql'))

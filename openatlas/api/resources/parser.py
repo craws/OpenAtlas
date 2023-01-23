@@ -160,7 +160,7 @@ query.add_argument(
         'feature', 'group', 'human_remains', 'move', 'object_location',
         'person', 'place', 'production', 'source', 'reference_system',
         'stratigraphic_unit', 'source_translation', 'type',
-        'type_anthropology'))
+        'tools'))
 
 image = default.copy()
 image.add_argument(

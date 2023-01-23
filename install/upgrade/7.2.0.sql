@@ -106,7 +106,7 @@ INSERT INTO model.link (property_code, domain_id, range_id) VALUES
     ('P127', (SELECT id FROM model.entity WHERE name='#-remove-#Femur'), (SELECT id FROM model.entity WHERE name='#-remove-#Robusticity'));
 
 INSERT INTO web.hierarchy (id, name, multiple, category, directional) VALUES
-((SELECT id FROM model.entity WHERE name='Features for sexing'), 'Features for sexing', False, 'anthropology', False);
+((SELECT id FROM model.entity WHERE name='Features for sexing'), 'Features for sexing', False, 'tools', False);
 
 UPDATE model.entity SET name = substr(name, 11, length(name)) WHERE name LIKE '#-remove-#%';
 

@@ -1,7 +1,6 @@
 from collections import defaultdict
 from typing import Any, Union
 
-from flasgger import swag_from
 from flask import Response, g, url_for
 from flask_restful import Resource, marshal
 
@@ -28,8 +27,6 @@ def walk_type_tree(types: list[int]) -> list[dict[str, Any]]:
 
 class GetTypeByViewClass(Resource):
     @staticmethod
-    @swag_from("../swagger/type_by_view_class.yml",
-               endpoint="api_03.type_by_view_class")
     def get() -> Union[tuple[Resource, int], Response]:
         types = GetTypeByViewClass.get_type_by_view()
         if default.parse_args()['download']:
@@ -47,13 +44,12 @@ class GetTypeByViewClass(Resource):
                     "id": type_.id,
                     "name": type_.name,
                     "category": type_.category,
-                    "children": walk_type_tree(Type.get_types(type_.name))})
+                    "children": walk_type_tree(type_.subs)})
         return types
 
 
 class GetTypeOverview(Resource):
     @staticmethod
-    @swag_from("../swagger/type_overview.yml", endpoint="api_03.type_overview")
     def get() -> Union[tuple[Resource, int], Response]:
         types = GetTypeOverview.get_type_overview()
         if default.parse_args()['download']:
@@ -68,7 +64,7 @@ class GetTypeOverview(Resource):
             'place': [],
             'value': [],
             'system': [],
-            'anthropology': []}
+            'tools': []}
         for type_ in g.types.values():
             if type_.root:
                 continue
@@ -76,13 +72,12 @@ class GetTypeOverview(Resource):
                 "id": type_.id,
                 "name": type_.name,
                 "viewClass": type_.classes,
-                "children": walk_type_tree(Type.get_types(type_.name))})
+                "children": walk_type_tree(type_.subs)})
         return types
 
 
 class GetTypeTree(Resource):
     @staticmethod
-    @swag_from("../swagger/type_tree.yml", endpoint="api_03.type_tree")
     def get() -> Union[tuple[Resource, int], Response]:
         type_tree = {'typeTree': GetTypeTree.get_type_tree()}
         if entity_.parse_args()['download']:

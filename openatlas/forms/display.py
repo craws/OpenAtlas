@@ -1,67 +1,75 @@
-from __future__ import annotations
-
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Any, Optional
 
 from flask import g, render_template
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
-from wtforms import Field, IntegerField
+from wtforms import Field, IntegerField, StringField, FileField, SelectField
 from wtforms.validators import Email
 
 from openatlas import app
-from openatlas.forms.field import ValueFloatField
-from openatlas.util.util import manual, tooltip, uc_first
-
-if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.models.type import Type
+from openatlas.display.util import manual, tooltip, uc_first
+from openatlas.models.type import Type
+from openatlas.forms.field import ValueTypeField
 
 
 def html_form(
         form: Any,
         form_id: Optional[str] = None,
         manual_page: Optional[str] = None) -> str:
-    reference_systems_added = False
     html = ''
+    reference_systems_added = False
+    reference_systems_fields = list(filter(lambda x: x.id.startswith('reference_system_id_'), form))
+    reference_systems_fields_errors = any([f.errors for f in reference_systems_fields])
     for field in form:
-        if isinstance(field, ValueFloatField) or field.id.startswith(
-                ('insert_', 'reference_system_precision')):
+        if field.id.startswith('insert_'):
             continue  # These will be added in combination with other fields
+        if isinstance(field, ValueTypeField):
+            html += add_row(field, '', field(), row_css=field.selectors)
+            continue
         if field.type in ['CSRFTokenField', 'HiddenField']:
             html += str(field)
             continue
+        if field.type in ['CustomField']:
+            html += add_row(field, value=field.content)
+            continue
+        if field.id.startswith("reference_system"):
+            if len(reference_systems_fields) > 3 and not reference_systems_fields_errors:
+                if not reference_systems_added:
+                    reference_systems_added = True
+                    html += add_row(
+                        None,
+                        uc_first(_('reference system')),
+                        '<span id="reference-system-switcher" class="uc-first '
+                        f'{app.config["CSS"]["button"]["secondary"]}"> '
+                        f'{_("show")}</span>')
+                html += add_row(field, row_css="d-none")
+                continue
         if field.id.split('_', 1)[0] in ('begin', 'end'):
             if field.id == 'begin_year_from':
                 html += add_dates(form)
             continue
-
-        if field.type in ['TreeField', 'TreeMultiField']:
+        if field.type in ['TreeField', 'TreeMultiField', 'ValueTypeRootField']:
             type_ = g.types[int(field.type_id)]
             if not type_.subs:
-                continue  # pragma: no cover
+                continue
             label = type_.name
             if type_.category == 'standard' and type_.name != 'License':
                 label = uc_first(_('type'))
             if field.label.text == 'super':
                 label = uc_first(_('super'))
-            if type_.category == 'value' and 'is_type_form' not in form:
-                field.description = type_.description
-                html += add_row(field, label, button_icon(type_))
-                html += add_value_type(form, type_)
-                continue
             if field.flags.required and field.label.text:
                 label += ' *'
             tooltip_ = ''
-            if 'is_type_form' not in form:  # pragma: no cover
+            if 'is_type_form' not in form:
                 tooltip_ = type_.description or ''
-                if field.flags.required \
-                        and current_user.group == 'contributor':
-                    tooltip_ += "&#013;" + str(_('tooltip_required_type'))
+                tooltip_ += "&#013;" + str(_('tooltip_required_type')) \
+                    if field.flags.required and current_user.group == 'contributor' else ''
             html += add_row(field, label + tooltip(tooltip_))
             continue
 
         if field.id == 'save':
             field.label.text = uc_first(field.label.text)
-            class_ = app.config['CSS']['button']['primary']
+            class_ = app.config['CSS']['button']['primary'] + ' text-wrap'
             buttons = []
             if manual_page:
                 buttons.append(manual(manual_page))
@@ -73,34 +81,36 @@ def html_form(
             if 'insert_continue_human_remains' in form:
                 buttons.append(
                     form.insert_continue_human_remains(class_=class_))
+            buttons = list(map(lambda x: f'<div class="col-auto">{x}</div>', buttons))
             html += add_row(
                 field,
                 '',  # Setting label to '' keeps the button row label empty
-                f'<div class="toolbar text-wrap">{" ".join(buttons)}</div>')
+                f'<div class="row g-1 align-items-center ">{"".join(buttons)}</div>')
             continue
-
-        if field.id.startswith('reference_system_id_'):
-            if not reference_systems_added:
-                html += add_reference_systems(form)
-                reference_systems_added = True
-            continue
+        if field.type in ['TableField', 'TableMultiField']:
+            field.label.text = _(field.label.text.lower())
         html += add_row(field, form_id=form_id)
     return html
 
 
 def add_row(
-        field: Field,
+        field: Optional[Field],
         label: Optional[str] = None,
         value: Optional[str] = None,
         form_id: Optional[str] = None,
         row_css: Optional[str] = '') -> str:
-    field.label.text = uc_first(field.label.text)
-    if field.flags.required and field.label.text and form_id != 'login-form':
-        field.label.text += ' *'
-    field_css = 'required' if field.flags.required else ''
-    field_css += ' integer' if isinstance(field, IntegerField) else ''
-    for validator in field.validators:
-        field_css += ' email' if isinstance(validator, Email) else ''
+    field_css = ""
+    if field:
+        field.label.text = uc_first(field.label.text)
+        if field.flags.required and field.label.text and form_id != 'login-form':
+            field.label.text += ' *'
+        field_css = 'required' if field.flags.required else ''
+        field_css += ' integer' if isinstance(field, IntegerField) else ''
+        field_css += f' {app.config["CSS"]["string_field"]}' \
+            if isinstance(field, (StringField, SelectField, FileField, IntegerField)) else ''
+        row_css += f' {field.row_css if hasattr(field, "row_css") else ""}'
+        for validator in field.validators:
+            field_css += ' email' if isinstance(validator, Email) else ''
     return render_template(
         'forms/form_row.html',
         field=field,
@@ -108,73 +118,6 @@ def add_row(
         value=value,
         field_css=field_css,
         row_css=row_css)
-
-
-def add_reference_systems(form: Any) -> str:
-    html = ''
-    switch_class = ''
-    errors = False
-    fields = []
-    for field in form:
-        if field.id.startswith('reference_system_id_'):
-            fields.append(field)
-            if field.errors:
-                errors = True  # pragma: no cover
-    if len(fields) > 3 and not errors:  # pragma: no cover
-        switch_class = 'reference-system-switch'
-        html = render_template('util/reference_system_switch.html')
-    for field in fields:
-        precision_field = getattr(form, field.id.replace('id_', 'precision_'))
-        class_ = field.label.text \
-            if field.label.text in ['GeoNames', 'Wikidata'] else ''
-        html += add_row(
-            field,
-            field.label,
-            f'{field(class_=class_)} {precision_field.label} '
-            f'{precision_field}',
-            row_css=f'external-reference {switch_class}')
-    return html
-
-
-def add_value_type(
-        form: Any,
-        type_: Type,
-        root: Optional[Type] = None,
-        level: int = 0) -> str:
-    html = ''
-    root = root or type_
-    for sub_id in type_.subs:
-        sub = g.types[sub_id]
-        field = getattr(form, str(sub_id))
-        html += f"""
-        <div class="mt-2 table-row value-type-switch{type_.id}">
-          <div></div>
-          <div class="table-cell">
-            <div class="d-flex">
-              <div
-                  class="d-flex justify-content-between"
-                  style="width:16.15em;">
-                <div class="ms-{level} position-relative text-wrap">
-                  <div class="value-type-expander">{button_icon(sub)}</div>
-                  {sub.name}
-                </div>
-                {field(class_='value-type')}
-              </div>
-              <span class="ms-1">{sub.description or ''}</span>
-            </div>
-            {add_value_type(form, sub, root, level + 1)}
-          </div>
-        </div>"""
-    return html
-
-
-def button_icon(type_: Type) -> str:
-    if not type_.subs:
-        return ''
-    onclick = f'switch_value_type({type_.id})' if len(type_.subs) != 0 else ''
-    return \
-        f'<span id="value-type-switcher-{type_.id}" class="btn btn-xsm" ' \
-        f'onclick="{onclick}"><i class="fa fa-chevron-right"></i></span>'
 
 
 def add_dates(form: Any) -> str:

@@ -1,21 +1,19 @@
 from typing import Union
 
-from flasgger import swag_from
 from flask import Response, g
 from flask_restful import Resource, marshal
 
 from openatlas import app
+from openatlas.api.resources.model_mapper import get_overview_counts
 from openatlas.api.resources.parser import language
 from openatlas.api.resources.resolve_endpoints import download
 from openatlas.api.resources.templates import (
     class_overview_template, content_template, overview_template)
-from openatlas.api.resources.model_mapper import get_overview_counts
 from openatlas.models.content import get_translation
 
 
 class GetContent(Resource):
     @staticmethod
-    @swag_from("../swagger/content.yml", endpoint="api_03.content")
     def get() -> Union[tuple[Resource, int], Response]:
         parser = language.parse_args()
         lang = parser['lang']
@@ -26,13 +24,12 @@ class GetContent(Resource):
             'imageSizes': app.config['IMAGE_SIZE'],
             'legalNotice': get_translation('legal_notice_for_frontend', lang)}
         if parser['download']:
-            return download(content, content_template(), 'content')
+            download(content, content_template(), 'content')
         return marshal(content, content_template()), 200
 
 
 class ClassMapping(Resource):
     @staticmethod
-    @swag_from("../swagger/class_mapping.yml", endpoint="api_03.class_mapping")
     def get() -> Union[tuple[Resource, int], Response]:
         return marshal([{
             "systemClass": class_.name,
@@ -46,8 +43,5 @@ class ClassMapping(Resource):
 
 class SystemClassCount(Resource):
     @staticmethod
-    @swag_from(
-        "../swagger/system_class_count.yml",
-        endpoint="api_03.system_class_count")
     def get() -> Union[tuple[Resource, int], Response]:
         return marshal(get_overview_counts(), overview_template()), 200

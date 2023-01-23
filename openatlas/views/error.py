@@ -4,7 +4,6 @@ from typing import Any
 from flask import jsonify, render_template, request
 
 from openatlas import app
-from openatlas.api.resources.error import MethodNotAllowedError
 
 
 @app.errorhandler(400)
@@ -25,7 +24,7 @@ def forbidden(e: Exception) -> tuple[str, int]:
 
 @app.errorhandler(404)
 def page_not_found(e: Exception) -> tuple[Any, int]:
-    if request.path.startswith('/api/'):  # pragma: no cover
+    if request.path.startswith('/api/'):
         return jsonify({
             'message': 'Endpoint not found',
             "url": request.url,
@@ -37,11 +36,6 @@ def page_not_found(e: Exception) -> tuple[Any, int]:
         e=e), 404
 
 
-@app.errorhandler(405)  # pragma: no cover
-def method_not_allowed(_e: Exception) -> tuple[Any, int]:
-    raise MethodNotAllowedError
-
-
 @app.errorhandler(418)
 def invalid_id(e: Exception) -> tuple[str, int]:
     return render_template(
@@ -51,7 +45,7 @@ def invalid_id(e: Exception) -> tuple[str, int]:
 
 
 @app.errorhandler(422)
-def unprocessable_entity(e: Exception) -> tuple[str, int]:  # pragma: no cover
+def unprocessable_entity(e: Exception) -> tuple[str, int]:
     return render_template(
         'error/422.html',
         crumbs=['422 - Unprocessable entity'],

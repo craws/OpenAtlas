@@ -1,62 +1,37 @@
 <div class="btn-toolbar">
   <div class="btn-group me-2">
-    <a class="{{ config.CSS.button.primary }}"
-       href=" {{ url_for('api.entity', id_=entity.id, format='lp') }}"
-       target="_blank">
-      Linked Places
-    </a>
-    <a class="{{ config.CSS.button.primary }}"
-       href="{{ url_for('api.entity', id_=entity.id, format='lp', download=True) }}">
-      <i class="fas fa-download"></i>
-    </a>
+    {{ 'technical/api'|manual|safe }}
   </div>
   <div class="btn-group me-2">
-    <a class="{{ config.CSS.button.primary }}"
-       href=" {{ url_for('api.entity', id_=entity.id, format='geojson') }}"
-       target="_blank">
-      Geojson
-    </a>
-    <a class="{{ config.CSS.button.primary }}"
-       href="{{ url_for('api.entity', id_=entity.id, format='geojson', download=True) }}">
-      <i class="fas fa-download"></i>
-    </a>
+    <button type="button" class="{{ config.CSS.button.primary }} dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+      JSON
+    </button>
+    <ul class="dropdown-menu p-2">
+      <li>{{ "Linked Places"|link(url_for('api.entity', id_=entity.id, format='lp'), external=True)|safe }}</li>
+      <li>{{ "GeoJSON"|link(url_for('api.entity', id_=entity.id, format='geojson'), external=True)|safe }}</li>
+      <li>{{ "GeoJSON v2"|link(url_for('api.entity', id_=entity.id, format='geojson-v2'), external=True)|safe }}</li>
+    </ul>
   </div>
 
   <div class="btn-group me-2">
-    <a class="{{ config.CSS.button.primary }}"
-       href=" {{ url_for('api.entity', id_=entity.id, format='xml') }}"
-       target="_blank">
-      RDF-XML
-    </a>
-    <a class="{{ config.CSS.button.primary }}"
-       href=" {{ url_for('api.entity', id_=entity.id, format='pretty-xml') }}"
-       target="_blank">
-      Pretty-XML
-    </a>
-    <a class="{{ config.CSS.button.primary }}"
-       href=" {{ url_for('api.entity', id_=entity.id, format='turtle') }}"
-       target="_blank">
-      Turtle
-    </a>
-    <a class="{{ config.CSS.button.primary }}"
-       href=" {{ url_for('api.entity', id_=entity.id, format='n3') }}"
-       target="_blank">
-      Notion 3
-    </a>
-    <a class="{{ config.CSS.button.primary }}"
-       href=" {{ url_for('api.entity', id_=entity.id, format='nt') }}"
-       target="_blank">
-      N-Triples
-    </a>
+    <button type="button" class="{{ config.CSS.button.primary }} dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+      RDF
+    </button>
+    <ul class="dropdown-menu p-2">
+      <li>{{ "RDF-XML"|link(url_for('api.entity', id_=entity.id, format='xml'), external=True)|safe }}</li>
+      <li>{{ "Pretty-XML"|link(url_for('api.entity', id_=entity.id, format='pretty-xml'), external=True)|safe }}</li>
+      <li>{{ "Turtle"|link(url_for('api.entity', id_=entity.id, format='turtle'), external=True)|safe }}</li>
+      <li>{{ "Notion 3"|link(url_for('api.entity', id_=entity.id, format='n3'), external=True)|safe }}</li>
+      <li>{{ "N-Triples"|link(url_for('api.entity', id_=entity.id, format='nt'),  external=True)|safe }}</li>
+    </ul>
   </div>
-
   <div class="btn-group me-2">
-    <a class="{{ config.CSS.button.primary }}" href="{{ url_for('api.entity', id_=entity.id, export='csv') }}">
+    <button type="button" class="{{ config.CSS.button.primary }} dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
       CSV
-    </a>
-    <a class="{{ config.CSS.button.primary }}"
-       href="{{ url_for('api_03.entity', id_=entity.id, export='csvNetwork') }}">
-      CSV Network Analysis
-    </a>
+    </button>
+    <ul class="dropdown-menu p-2">
+      <li>{{ "CSV"|link(url_for('api.entity', id_=entity.id, export='csv'))|safe }}</li>
+      <li>  {{ "CSV Network Analysis"|link(url_for('api_03.entity', id_=entity.id, export='csvNetwork'))|safe }}</li>
+    </ul>
   </div>
 </div>

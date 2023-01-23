@@ -9,5 +9,4 @@ Tools
    notes
    map
    network
-   api
    anthropological_analyses

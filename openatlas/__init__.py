@@ -1,5 +1,4 @@
 import locale
-import os
 import sys
 from pathlib import Path
 from typing import Any, Optional
@@ -24,18 +23,17 @@ app.config.from_object('config.default')
 app.config.from_pyfile(f'{INSTANCE}.py')
 app.config['WTF_CSRF_TIME_LIMIT'] = None  # Set CSRF token valid for session
 
-if os.name == "posix":
-    locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
+locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
 babel = Babel(app)
 
 # pylint: disable=wrong-import-position, import-outside-toplevel
 from openatlas.models.logger import Logger
 from openatlas.api import api
-from openatlas.util.util import convert_size
+from openatlas.display.util import convert_size
 from openatlas.views import (
-    admin, ajax, anthropology, entity, entity_index, entity_form, error,
+    admin, ajax, tools, changelog, entity, entity_index, entity_form, error,
     export, file, hierarchy, index, imports, link, login, model, note, overlay,
-    profile, reference, reference_system, search, sql, type as type_, user)
+    profile, reference, search, sql, type as type_, user)
 
 
 @babel.localeselector
@@ -83,7 +81,7 @@ def before_request() -> None:
         if not current_user.is_authenticated \
                 and not g.settings['api_public'] \
                 and ip not in app.config['ALLOWED_IPS']:
-            raise AccessDeniedError  # pragma: no cover
+            raise AccessDeniedError
 
 
 @app.after_request

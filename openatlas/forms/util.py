@@ -1,9 +1,7 @@
-from __future__ import annotations
-
 import ast
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional, TYPE_CHECKING, Union
+from typing import Any, Optional, Union
 
 import numpy
 from flask import g, url_for
@@ -13,15 +11,12 @@ from flask_wtf import FlaskForm
 from wtforms import StringField
 
 from openatlas import app
+from openatlas.display.table import Table
 from openatlas.forms.setting import ProfileForm
 from openatlas.models.entity import Entity
+from openatlas.models.link import Link
 from openatlas.models.type import Type
-from openatlas.util.table import Table
-from openatlas.util.util import get_base_table_data, get_file_extension, \
-    uc_first
-
-if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.models.link import Link
+from openatlas.display.util import get_base_table_data, get_file_path, uc_first
 
 
 def get_form_settings(form: Any, profile: bool = False) -> dict[str, str]:
@@ -42,8 +37,8 @@ def get_form_settings(form: Any, profile: bool = False) -> dict[str, str]:
             value = current_user.settings[field.name]
         elif field.name in g.settings:
             value = g.settings[field.name]
-        else:  # pragma: no cover
-            value = ''  # In case of a missing setting after an update
+        else:
+            value = ''  # pragma: no cover - if missing setting after an update
         if field.type in ['StringField', 'IntegerField']:
             settings[label] = value
         if field.type == 'BooleanField':  # str() needed for templates
@@ -87,7 +82,7 @@ def set_form_settings(form: Any, profile: bool = False) -> None:
             field.data = ' '.join(g.settings[field.name])
             continue
         if field.name not in g.settings:  # pragma: no cover
-            field.data = ''  # In case of a missing setting after an update
+            field.data = ''  # If missing setting after an update
             continue
         field.data = g.settings[field.name]
 
@@ -121,13 +116,14 @@ def populate_insert_form(
             if origin.id != root_id else None
 
 
-def was_modified(form: FlaskForm, entity: Entity) -> bool:  # pragma: no cover
+def was_modified(form: FlaskForm, entity: Entity) -> bool:
     if not entity.modified or not form.opened.data:
         return False
-    if entity.modified < datetime.fromtimestamp(float(form.opened.data)):
+    if entity.modified < datetime.fromtimestamp(
+            float(form.opened.data)):  # pragma: no cover
         return False
-    g.logger.log('info', 'multi user', 'Multi user overwrite prevented.')
-    return True
+    g.logger.log('info', 'multi user', 'Overwrite denied')  # pragma: no cover
+    return True  # pragma: no cover
 
 
 def form_to_datetime64(
@@ -188,28 +184,25 @@ def form_to_datetime64(
 
 
 class GlobalSearchForm(FlaskForm):
-    term = StringField('', render_kw={"placeholder": _('search term')})
+    term = StringField('')
 
 
 @app.context_processor
 def inject_template_functions() -> dict[str, Union[str, GlobalSearchForm]]:
     def get_logo() -> str:
         if g.settings['logo_file_id']:
-            ext = get_file_extension(int(g.settings['logo_file_id']))
-            if ext != 'N/A':
+            if path := get_file_path(int(g.settings['logo_file_id'])):
                 return url_for(
                     'display_logo',
-                    filename=f"{g.settings['logo_file_id']}{ext}")
+                    filename=f"{g.settings['logo_file_id']}{path.suffix}")
         return str(Path('/static') / 'images' / 'layout' / 'logo.png')
-
     return dict(
         get_logo=get_logo(),
         search_form=GlobalSearchForm(prefix='global'))
 
 
 def check_if_entity_has_time(
-        entity: Optional[Union[Entity, Link, Type]]
-) -> bool:   # pragma: no cover
+        entity: Optional[Union[Entity, Link, Type]]) -> bool:
     if not entity:
         return False
     for item in [
@@ -294,9 +287,16 @@ def format_name_and_aliases(entity: Entity, field_id: str) -> str:
     link = \
         f"""<a value="{entity.name}"  href='#' onclick="selectFromTable(this,
         '{field_id}', {entity.id})">{entity.name}</a>"""
-    if entity.aliases:  # pragma: no cover
+    if entity.aliases:
         html = f'<p>{link}</p>'
         for i, alias in enumerate(entity.aliases.values()):
             html += alias if i else f'<p>{alias}</p>'
         return html
     return link
+
+
+def value_type_expand_icon(type_: Type) -> str:
+    return f'''<i onclick="switch_value_type({type_.id},this)" 
+                role="button" 
+                id="value-type-switcher-{type_.id}" 
+                class="fa fa-chevron-right value-type-switcher input-height-sm"></i>'''

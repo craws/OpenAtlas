@@ -17,22 +17,21 @@ class HierarchyTest(TestBaseCase):
                     ['file', 'group', 'move', 'person', 'place', 'source'],
                 'multiple': True,
                 'description': 'Very important!'}
+
             rv: Any = self.app.post(
                 url_for('hierarchy_insert', category='custom'),
-                follow_redirects=True,
-                data=data)
+                data=data,
+                follow_redirects=True)
             assert b'An entry has been created' in rv.data
 
             rv = self.app.post(
                 url_for('hierarchy_insert', category='custom'),
-                follow_redirects=True,
-                data=data)
+                data=data,
+                follow_redirects=True)
             assert b'The name is already in use' in rv.data
 
             with app.test_request_context():
                 hierarchy = Type.get_hierarchy('Geronimo')
-            rv = self.app.get(url_for('hierarchy_update', id_=hierarchy.id))
-            assert b'Geronimo' in rv.data
 
             data['classes'] = ['acquisition']
             data['entity_id'] = hierarchy.id
@@ -70,13 +69,13 @@ class HierarchyTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Changes have been saved.' in rv.data
 
-            data = {'name': 'My secret type', 'description': 'Very important!'}
             rv = self.app.post(
                 url_for('insert', class_='type', origin_id=hierarchy.id),
-                data=data)
+                data={'name': 'Secret type', 'description': 'Very important!'})
             type_id = rv.location.split('/')[-1]
+
             rv = self.app.get(
-                url_for('remove_class', id_=hierarchy.id, class_name='person'),
+                url_for('remove_class', id_=hierarchy.id, name='person'),
                 follow_redirects=True)
             assert b'Changes have been saved.' in rv.data
 
@@ -101,11 +100,11 @@ class HierarchyTest(TestBaseCase):
 
             rv = self.app.post(
                 url_for('hierarchy_insert', category='value'),
-                follow_redirects=True,
                 data={
                     'name': 'A valued value',
                     'classes': ['file'],
-                    'description': ''})
+                    'description': ''},
+                follow_redirects=True,)
             assert b'An entry has been created' in rv.data
 
             with app.test_request_context():

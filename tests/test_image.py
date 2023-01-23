@@ -5,10 +5,10 @@ from shutil import copyfile
 from flask import g, url_for
 
 from openatlas import app
+from openatlas.display.image_processing import safe_resize_image
+from openatlas.display.util import profile_image
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
-from openatlas.util.image_processing import safe_resize_image
-from openatlas.util.util import display_profile_image
 from tests.base import TestBaseCase, insert_entity
 
 
@@ -19,10 +19,7 @@ class ImageTest(TestBaseCase):
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                place = insert_entity(
-                    'Nostromos',
-                    'place',
-                    'That is the Nostromos')
+                place = insert_entity('place', 'Nostromos')
                 logo = pathlib.Path(app.root_path) \
                     / 'static' / 'images' / 'layout' / 'logo.png'
 
@@ -47,8 +44,8 @@ class ImageTest(TestBaseCase):
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                file_pathless = insert_entity('Pathless_File', 'file')
-                file = insert_entity('Test_File', 'file')
+                file_pathless = insert_entity('file', 'Pathless_File')
+                file = insert_entity('file', 'Test_File', )
                 file.link('P2', g.types[Type.get_hierarchy('License').subs[0]])
                 file_name = f'{file.id}.jpeg'
                 src_png = \
@@ -57,7 +54,7 @@ class ImageTest(TestBaseCase):
                 dst_png = \
                     pathlib.Path(app.config['UPLOAD_DIR'] / file_name)
                 copyfile(src_png, dst_png)
-                file2 = insert_entity('Test_File2', 'file')
+                file2 = insert_entity('file', 'Test_File2')
                 file2.link(
                     'P2',
                     g.types[Type.get_hierarchy('License').subs[0]])
@@ -67,13 +64,13 @@ class ImageTest(TestBaseCase):
                     / 'static' / 'images' / 'layout' / 'logo.png'
                 dst2_png = pathlib.Path(app.config['UPLOAD_DIR'] / file2_name)
                 copyfile(src2_png, dst2_png)
-                file_py = insert_entity('Test_Py', 'file')
+                file_py = insert_entity('file', 'Test_Py')
                 file_name_py = f'{file_py.id}.py'
                 src_py = pathlib.Path(app.root_path) / 'views' / 'index.py'
                 dst_py = pathlib.Path(app.config['UPLOAD_DIR'] / file_name_py)
                 copyfile(src_py, dst_py)
                 safe_resize_image(file2.id, '.png', size="???")
-                display_profile_image(file_pathless)
+                profile_image(file_pathless)
 
             # Resizing images (don't change order!)
             rv = self.app.get(url_for('view', id_=file.id))
@@ -83,7 +80,7 @@ class ImageTest(TestBaseCase):
             assert b'No preview available' in rv.data
 
             rv = self.app.get(url_for('view', id_=file_pathless.id))
-            assert b'Missing file' in rv.data
+            assert b'missing file' in rv.data
 
             rv = self.app.get(url_for('index', view='file'))
             assert b'Test_File' in rv.data
@@ -116,6 +113,13 @@ class ImageTest(TestBaseCase):
             # Make directory if not exist
             rv = self.app.get(url_for('view', id_=file.id))
             assert b'Test_File' in rv.data
+
+            # API display image
+            rv = self.app.get(url_for(
+                'api_03.display',
+                filename=file_name,
+                image_size='thumbnail'))
+            assert b'\xff' in rv.data
 
             # Exception
             app.config['IMAGE_SIZE']['tmp'] = '<'

@@ -1,16 +1,16 @@
-<div class="data-table">
+<table class="table table-no-style">
   {% for label, value in data.items() %}
     {% if value or value == 0 %}
-      <div class="table-row">
-        <div>{{ label|uc_first }}</div>
-        <div class="table-cell">
+      <tr>
+        <td class="text-nowrap fit-width">{{ label|uc_first }}</td>
+        <td class="table-cell">
           {% if value is iterable and value is not string %}
             {{ '<br>'.join(value)|safe }}
           {% else %}
             {{ value|safe }}
           {% endif %}
-        </div>
-      </div>
+        </td>
+      </tr>
     {% endif %}
   {% endfor %}
-</div>
+</table>

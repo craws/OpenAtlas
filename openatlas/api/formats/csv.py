@@ -10,8 +10,8 @@ from flask import Response, g
 from openatlas.api.resources.util import (
     get_linked_entities_api,
     link_parser_check, link_parser_check_inverse, remove_duplicate_entities)
-from openatlas.api.resources.model_mapper import get_all_links_of_entities, \
-    get_all_links_of_entities_inverse
+from openatlas.api.resources.model_mapper import (
+    get_all_links_of_entities, get_all_links_of_entities_inverse)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -20,8 +20,9 @@ from openatlas.models.link import Link
 def export_entities_csv(
         entities: Union[Entity, list[Entity]],
         name: Union[int, str]) -> Response:
-    frames = [build_entity_dataframe(entity, True) for entity in
-              (entities if isinstance(entities, list) else [entities])]
+    frames = [
+        build_entity_dataframe(entity, True) for entity in
+        (entities if isinstance(entities, list) else [entities])]
     return Response(
         pd.DataFrame(data=frames).to_csv(),
         mimetype='text/csv',
@@ -52,7 +53,7 @@ def build_entity_dataframe(
         'coordinates': geom['coordinates']}
     if relations:
         for key, value in get_csv_links(entity).items():
-            data[key] = ' | '.join(list(map(str, value)))  # pragma: no cover
+            data[key] = ' | '.join(list(map(str, value)))
         for key, value in get_csv_types(entity).items():
             data[key] = ' | '.join(list(map(str, value)))
     return data
@@ -117,12 +118,11 @@ def get_csv_geom_entry(entity: Entity) -> dict[str, None]:
 
 
 def get_csv_geometry(entity: Entity) -> dict[str, Any]:
-    if entity.cidoc_class.code != 'E53':
-        return {'type': None, 'coordinates': None}  # pragma: no cover
-    geoms = Gis.get_by_id(entity.id)
-    if geoms:
-        return {key: [geom[key] for geom in geoms] for key in geoms[0]}
-    return {'type': None, 'coordinates': None}
+    dict_ = {'type': None, 'coordinates': None}
+    if (geoms := Gis.get_by_id(entity.id)) \
+            and entity.cidoc_class.code == 'E53':
+        dict_ = {key: [geom[key] for geom in geoms] for key in geoms[0]}
+    return dict_
 
 
 def export_csv_for_network_analysis(
@@ -135,9 +135,10 @@ def export_csv_for_network_analysis(
                 file.write(bytes(
                     pd.DataFrame(data=frame).to_csv(), encoding='utf8'))
         with zipped_file.open('links.csv', 'w') as file:
-            link_frame = [build_link_dataframe(link_) for link_ in
-                          (link_parser_check(entities, parser) +
-                           link_parser_check_inverse(entities, parser))]
+            link_frame = [
+                build_link_dataframe(link_) for link_ in
+                (link_parser_check(entities, parser) +
+                 link_parser_check_inverse(entities, parser))]
             file.write(bytes(
                 pd.DataFrame(data=link_frame).to_csv(), encoding='utf8'))
     return Response(
@@ -165,7 +166,7 @@ def get_grouped_entities(entities: list[dict[str, Any]]) -> dict[str, Any]:
                 entities,
                 key=lambda entity: entity['openatlas_class_name']),
             key=lambda entity: entity['openatlas_class_name']):
-        grouped_entities[class_] = entities_
+        grouped_entities[class_] = list(entities_)
     return grouped_entities
 
 

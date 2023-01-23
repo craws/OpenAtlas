@@ -18,7 +18,7 @@ class TypeTest(TestBaseCase):
                 dimension_type = Type.get_hierarchy('Dimensions')
                 historical_type = Type.get_hierarchy('Historical place')
                 sex_type = Type.get_hierarchy('Sex')
-                place = insert_entity('Home', 'place')
+                place = insert_entity('place', 'Home')
                 place.link('P2', g.types[dimension_type.subs[0]], '46')
                 location = place.get_linked_entity_safe('P53')
                 location.link('P89', g.types[historical_type.subs[0]])
@@ -148,7 +148,7 @@ class TypeTest(TestBaseCase):
                 actor.link('P2', g.types[sex_type.subs[0]])
             rv = self.app.get(
                 url_for('show_untyped_entities', id_=sex_type.id))
-            assert b'No entries' in rv.data
+            assert b'no entries' in rv.data
 
             rv = self.app.get(
                 url_for('show_untyped_entities', id_=admin_unit_id))
@@ -166,7 +166,7 @@ class TypeTest(TestBaseCase):
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                frodo = insert_entity('Frodo', 'person')
+                frodo = insert_entity('person', 'Frodo')
                 frodo.link(
                     'P2',
                     Entity.get_by_id(Type.get_hierarchy('Sex').subs[0]))
@@ -175,7 +175,11 @@ class TypeTest(TestBaseCase):
                     Entity.get_by_id(Type.get_hierarchy('Sex').subs[1]))
 
             rv = self.app.get(url_for('update', id_=frodo.id))
-            assert b'422' in rv.data  # Check invalid multiple type links
+            assert b'422' in rv.data  # Invalid multiple type links
+
+            rv = self.app.post(
+                url_for('type_move_entities', id_=dimension_type.subs[0]))
+            assert b'403' in rv.data  # Can't move value types
 
             rv = self.app.get(
                 url_for('show_multiple_linked_entities', id_=sex_type.id))
@@ -221,6 +225,5 @@ class TypeTest(TestBaseCase):
 
             rv = self.app.post(
                 url_for('type_delete_recursive', id_=actor_type.id),
-                data={'confirm_delete': True},
-                follow_redirects=True)
+                data={'confirm_delete': True})
             assert b'403 - Forbidden' in rv.data

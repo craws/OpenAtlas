@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import Any, Optional, Union
 
 from flask import g
@@ -54,22 +52,23 @@ class Import:
 
     @staticmethod
     def update_project(project: Project) -> None:
-        from openatlas.util.util import sanitize
+        from openatlas.display.util import sanitize
         Db.update_project(
             project.id,
             project.name,
             sanitize(project.description, 'text'))
 
     @staticmethod
-    def check_type_id(type_id: str, class_: str) -> bool:  # pragma: no cover
+    def check_type_id(type_id: str, class_: str) -> bool:
         if not type_id.isdigit() or int(type_id) not in g.types:
             return False
-        if class_ not in g.types[g.types[int(type_id)].root[-1]].classes:
+        if class_ not in g.types[
+                g.types[int(type_id)].root[-1]].classes:  # pragma: no cover
             return False
-        return True
+        return True  # pragma: no cover
 
     @staticmethod
-    def import_data(project: 'Project', class_: str, data: list[Any]) -> None:
+    def import_data(project: Project, class_: str, data: list[Any]) -> None:
         from openatlas.models.entity import Entity
         from openatlas.models.gis import Gis
         for row in data:
@@ -102,11 +101,11 @@ class Import:
             entity.update({'attributes': dates})
 
             # Types
-            if 'type_ids' in row and row['type_ids']:  # pragma: no cover
+            if 'type_ids' in row and row['type_ids']:
                 for type_id in str(row['type_ids']).split():
                     if not Import.check_type_id(type_id, class_):
                         continue
-                    entity.link('P2', g.types[int(type_id)])
+                    entity.link('P2', g.types[int(type_id)])  # pragma no cover
 
             # GIS
             if class_ == 'place':
