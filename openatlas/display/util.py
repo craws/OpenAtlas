@@ -289,6 +289,14 @@ def profile_image(entity: Entity) -> str:
     return f'{html}'
 
 
+@app.template_filter()
+def get_js_messages(lang: str) -> str:
+    js_message_file = Path('static') / 'js' / f'messages_{lang}.js'
+    if not (Path(app.root_path) / js_message_file).is_file():
+        return ''
+    return f'<script src="/{js_message_file}"></script>'
+
+
 @contextfilter  # Prevent Jinja2 context caching
 @app.template_filter()
 def is_authorized(context: str, group: Optional[str] = None) -> bool:

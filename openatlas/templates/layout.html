@@ -44,6 +44,7 @@
   </script>
   <script src="/static/js/functions.js"></script>
   <script src="/static/js/forms.js"></script>
+  {{ session.language|get_js_messages|safe }}
   <title>
     {{ g.settings.site_name }}
     {% if title %}
