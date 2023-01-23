@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    field.cattle.io/containerDefaultResourceLimit: '{}'
+    field.cattle.io/description: Container for OpenAtlas
+  labels:
+    kubernetes.io/metadata.name: openatlas
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+  name: {{ template "fullname" . }}
+spec:
+  finalizers:
+    - kubernetes
