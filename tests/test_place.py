@@ -412,7 +412,7 @@ class PlaceTest(TestBaseCase):
                 url_for('carbon_update', id_=strati_id),
                 data=data,
                 follow_redirects=True)
-            assert b'Entity updated' in rv.data
+            assert b'Changes have been saved' in rv.data
 
             rv = self.app.get(url_for('view', id_=strati_id))
             assert b'Radiocarbon dating' in rv.data

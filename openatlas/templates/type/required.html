@@ -3,7 +3,7 @@
 {% block content %}
   {{ buttons|button_bar|safe }}
   <p>
-    {{ _('Attention: be careful with setting types to required') }}
+    {{ _('Attention: be careful with setting types to required')|uc_first }}
   </p>
   {% if untyped_count != '0' %}
     {{ untyped_count }}
