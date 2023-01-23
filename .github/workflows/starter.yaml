@@ -92,7 +92,7 @@ jobs:
           sudo chown 33:33 production.py testing.py
           docker cp -a production.py openatlas:/var/www/openatlas/instance/
           docker cp -a testing.py openatlas:/var/www/openatlas/instance/
-          docker start openatlas
+          docker start -a openatlas
           docker ps --all
           until [ "$(docker inspect -f {{.State.Running}} openatlas)"=="true" ]; do
               sleep 0.1;
