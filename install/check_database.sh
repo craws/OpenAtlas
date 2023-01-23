@@ -5,7 +5,7 @@ pushd /var/www/openatlas || exit
 create_database () {
     echo "Database does not exist"
     echo "Install necessary postgres extensions"
-    psql "$DB_URL" -c "CREATE EXTENSION postgis; CREATE EXTENSION unaccent;"
+    psql "$DB_URL" -c "CREATE EXTENSION IF NOT EXISTS postgis; CREATE EXTENSION IF NOT EXISTS unaccent;"
 
     echo "Import database dumps"
     pushd /var/www/openatlas/install || exit
