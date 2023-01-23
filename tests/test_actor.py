@@ -3,8 +3,7 @@ from typing import Any
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.models.type import Type
-from tests.base import TestBaseCase, insert_entity
+from tests.base import TestBaseCase, get_hierarchy, insert_entity
 
 
 class ActorTests(TestBaseCase):
@@ -16,10 +15,11 @@ class ActorTests(TestBaseCase):
                 app.preprocess_request()  # type: ignore
                 place = insert_entity('place', 'Vienna')
                 event = insert_entity('acquisition', 'Event Horizon')
-                sex = Type.get_hierarchy('Sex')
-                sex_sub_1 = g.types[sex.subs[0]]
-                sex_sub_2 = g.types[sex.subs[1]]
-                artifact_type_id = Type.get_hierarchy('Artifact').id
+
+            sex = get_hierarchy('Sex')
+            sex_sub_1 = g.types[sex.subs[0]]
+            sex_sub_2 = g.types[sex.subs[1]]
+            artifact_type_id = get_hierarchy('Artifact').id
 
             rv: Any = self.app.get(
                 url_for('insert', class_='person', origin_id=place.id))

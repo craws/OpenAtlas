@@ -6,8 +6,7 @@ from openatlas import app
 from openatlas.database.entity import Entity as DbEntity
 from openatlas.database.link import Link as DbLink
 from openatlas.models.link import Link
-from openatlas.models.type import Type
-from tests.base import TestBaseCase, insert_entity
+from tests.base import TestBaseCase, get_hierarchy, insert_entity
 
 
 class AdminTests(TestBaseCase):
@@ -77,7 +76,7 @@ class AdminTests(TestBaseCase):
                 source = insert_entity('source', 'Tha source')
                 source.link('P67', event)
                 source.link('P67', event)
-                source_type = Type.get_hierarchy('Source')
+                source_type = get_hierarchy('Source')
                 source.link('P2', g.types[source_type.subs[0]])
                 source.link('P2', g.types[source_type.subs[1]])
 

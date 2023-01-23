@@ -84,3 +84,7 @@ def insert_entity(
             'P53',
             Entity.insert('object_location', f'Location of {name}'))
     return entity
+
+
+def get_hierarchy(name: str) -> Type:
+    return Type.get_hierarchy(name)

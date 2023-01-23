@@ -8,8 +8,7 @@ from openatlas import app
 from openatlas.display.image_processing import safe_resize_image
 from openatlas.display.util import profile_image
 from openatlas.models.entity import Entity
-from openatlas.models.type import Type
-from tests.base import TestBaseCase, insert_entity
+from tests.base import TestBaseCase, get_hierarchy, insert_entity
 
 
 class ImageTest(TestBaseCase):
@@ -46,21 +45,16 @@ class ImageTest(TestBaseCase):
                 app.preprocess_request()  # type: ignore
                 file_pathless = insert_entity('file', 'Pathless_File')
                 file = insert_entity('file', 'Test_File', )
-                file.link('P2', g.types[Type.get_hierarchy('License').subs[0]])
+                file.link('P2', g.types[get_hierarchy('License').subs[0]])
                 file_name = f'{file.id}.jpeg'
-                src_png = \
-                    pathlib.Path(app.root_path) \
+                src_png = pathlib.Path(app.root_path) \
                     / 'static' / 'images' / 'layout' / 'logo.png'
-                dst_png = \
-                    pathlib.Path(app.config['UPLOAD_DIR'] / file_name)
+                dst_png = pathlib.Path(app.config['UPLOAD_DIR'] / file_name)
                 copyfile(src_png, dst_png)
                 file2 = insert_entity('file', 'Test_File2')
-                file2.link(
-                    'P2',
-                    g.types[Type.get_hierarchy('License').subs[0]])
+                file2.link('P2', g.types[get_hierarchy('License').subs[0]])
                 file2_name = f'{file2.id}.jpeg'
-                src2_png = \
-                    pathlib.Path(app.root_path) \
+                src2_png = pathlib.Path(app.root_path) \
                     / 'static' / 'images' / 'layout' / 'logo.png'
                 dst2_png = pathlib.Path(app.config['UPLOAD_DIR'] / file2_name)
                 copyfile(src2_png, dst2_png)

@@ -7,8 +7,7 @@ from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.overlay import Overlay
-from openatlas.models.type import Type
-from tests.base import TestBaseCase
+from tests.base import TestBaseCase, get_hierarchy
 
 
 class PlaceTest(TestBaseCase):
@@ -20,22 +19,21 @@ class PlaceTest(TestBaseCase):
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                unit_type = Type.get_hierarchy('Administrative unit')
+                unit_type = get_hierarchy('Administrative unit')
                 unit_sub1 = g.types[unit_type.subs[0]]
                 unit_sub2 = g.types[unit_type.subs[1]]
-                human_remains_type = Type.get_hierarchy('Human remains')
+                human_remains_type = get_hierarchy('Human remains')
                 human_remains_type_sub = g.types[human_remains_type.subs[0]]
                 reference = Entity.insert(
                     'external_reference',
                     'https://openatlas.eu')
-                place_type = Type.get_hierarchy('Place')
+                place_type = get_hierarchy('Place')
                 source = Entity.insert('source', 'Necronomicon')
             data = {
                 'name': 'Asgard',
                 'alias-0': 'Valhöll',
                 unit_type.id: str([unit_sub1.id, unit_sub2.id]),
-                self.geonames: ['123456', self.precision_type.subs[0]]
-            }
+                self.geonames: ['123456', self.precision_type.subs[0]]}
             rv = self.app.post(
                 url_for('insert', class_='place', origin_id=reference.id),
                 data=data,
@@ -328,7 +326,7 @@ class PlaceTest(TestBaseCase):
             data = {
                 'name': 'You never find me',
                 'artifact_super': strati_id,
-                Type.get_hierarchy('Dimensions').subs[0]: 50}
+                get_hierarchy('Dimensions').subs[0]: 50}
             rv = self.app.post(
                 url_for('insert', class_='artifact', origin_id=strati_id),
                 data=data)
