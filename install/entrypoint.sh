@@ -8,7 +8,7 @@ set -o pipefail
 # set -o xtrace # Uncomment this line for debugging purposes
 
 export DB_URL="postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DB"
-psql $DB_URL -c "CREATE EXTENSION IF NOT EXISTS postgis; CREATE EXTENSION IF NOT EXISTS unaccent;"
+# psql $DB_URL -c "CREATE EXTENSION IF NOT EXISTS postgis; CREATE EXTENSION IF NOT EXISTS unaccent;"
 
 source /etc/apache2/envvars
 
