@@ -255,7 +255,7 @@ function selectFromTree(name, id, text) {
   $('#' + name).val(id)
   $('#' + name + '-button').val(text.replace(/&apos;/g, "'"));
   $('#' + name + '-modal').modal('hide');
-  $('#' + name + '-clear').show();
+  $('#' + name + '-clear-field').show();
 }
 
 function selectFromTreeMulti(name, value_type = false) {
@@ -291,7 +291,7 @@ function selectFromTable(element, table, id,label= undefined) {
   $("#" + table).attr('value', id);
   $("#" + table + "-button").val(label || element?.innerText );
   $("#" + table + "-button").focus(); /* to refresh/fill button and remove validation errors */
-  $("#" + table + "-clear").show();
+  $("#" + table + "-clear-field").show();
   $('#' + table + '-modal').modal('hide');
 }
 
@@ -313,7 +313,7 @@ function clearSelect(name) {
   $('#' + name).attr('value', '');
   $('#' + name + '-button').val('');
   $('#' + name + '-tree').jstree('deselect_all');
-  $('#' + name + '-clear').hide();
+  $('#' + name + '-clear-field').hide();
 }
 
 function overflow() {

@@ -1,37 +1,41 @@
-<span
-  id="{{ field.id }}-button"
-  class="{{ config.CSS.button.secondary }}"
-  onclick="$('#{{ field.id }}-modal').modal('show')">
-    {{ _('change')|uc_first }}
-</span>
-<br>
-
-<div id="{{ field.id }}-selection" class="selection row g-1 pt-1" style="text-align:left;">
-  {% for s in selection %}
-  <span class="badge bg-gray text-black col-auto ms-1">{{ s }}</span>
-{% endfor %}
+<div class="row g-1">
+  <div class="col" style="padding-top:4px;padding-left:4px;">
+    <div id="{{ field.id }}-selection" class="g-1 row {{ config.CSS.string_field }}">
+      {% for s in selection %}<span class="badge col-auto bg-gray text-black">{{ s }}</span>{% endfor %}
+    </div>
+  </div>
+  <div class="col-auto">
+    <span
+        id="{{ field.id }}-button"
+        class="{{ config.CSS.button.secondary }}"
+        onclick="$('#{{ field.id }}-modal').modal('show')">
+        {{ _('change')|uc_first }}
+    </span>
+  </div>
 </div>
+
+
 <div id="{{ field.id }}-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog" role="document" style="max-width: 100%!important;">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">{{ _(field.id.replace('_', ' '))|uc_first }}</h5>
         <button
-          type="button"
-          class="{{ config.CSS.button.primary }}"
-          data-bs-dismiss="modal"
-          aria-label="Close">
-            <span aria-hidden="true">&times;</span>
+            type="button"
+            class="{{ config.CSS.button.primary }}"
+            data-bs-dismiss="modal"
+            aria-label="Close">
+          <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">{{ table.display(field.id)|safe }}</div>
       <div class="modal-footer">
         <button
-          type="button"
-          class="{{ config.CSS.button.primary }}"
-          data-bs-dismiss="modal"
-          onclick="selectFromTableMulti('{{ field.id }}')">
-            {{ _('close')|uc_first }}
+            type="button"
+            class="{{ config.CSS.button.primary }}"
+            data-bs-dismiss="modal"
+            onclick="selectFromTableMulti('{{ field.id }}')">
+          {{ _('close')|uc_first }}
         </button>
       </div>
     </div>
@@ -40,5 +44,5 @@
 <script>
     $("#{{ field.id }}-modal").on("hidden.bs.modal", function (e) {
         selectFromTableMulti('{{ field.id }}');
-})
+    })
 </script>
