@@ -110,7 +110,9 @@ table.table-no-style tr td{
 .more-link {
     display: block;
 }
-
+.error {
+    color: #dc3545;
+}
 /* drop-field */
 .drag-n-drop {
     min-height: 120px;
