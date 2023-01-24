@@ -95,9 +95,11 @@ jobs:
           docker cp -a production.py openatlas:/var/www/openatlas/instance/
           docker cp -a testing.py openatlas:/var/www/openatlas/instance/
           docker start openatlas
-          docker ps --all
           until [ "$(docker inspect -f {{.State.Running}} openatlas)"=="true" ]; do
               sleep 0.1;
           done;
-          docker ps --all
+          docker exec -i openatlas /bin/bash -c "cd /var/www/openatlas/instance/ && ls -la && less production.py && less testing.py"
+
+      - name: Run tests
+        run: |
           docker exec -i openatlas /bin/bash -c "cd /var/www/openatlas/tests && nosetests3 --config=.noserc --verbosity=2 --nologcapture --nocapture && echo passed"
