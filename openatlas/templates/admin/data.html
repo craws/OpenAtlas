@@ -21,7 +21,7 @@
       <div class="col-auto">{{ _('execute SQL')|button(url_for('sql_index'))|safe }}</div>
     {% endif %}
     {% if config.ARCHE['id'] %}
-      {{ 'ARCHE'|button(url_for('arche_index'))|safe }}
+       <div class="col-auto">{{ 'ARCHE'|button(url_for('arche_index'))|safe }}</div>
     {% endif %}
   </div>
 {% endif %}

@@ -22,7 +22,8 @@ def fetch_arche_data() -> dict[int, Any]:
             f"{app.config['ARCHE']['base_url']}/api/{id_}/metadata",
             headers={'Accept': 'application/n-triples'})
         try:
-            collections[id_] = get_metadata(n_triples_to_json(req))
+            if req:
+                collections[id_] = get_metadata(n_triples_to_json(req))
         except HTTPError as http_error:
             flash(f'ARCHE fetch failed: {http_error}', 'error')
             abort(404)
