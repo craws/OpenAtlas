@@ -10,9 +10,9 @@ services:
         - POSTGRES_PASSWORD=verysecret
         - POSTGRES_USER=openatlas
     volumes:
-      - ./openatlas/uploads:/var/www/openatlas/openatlas/uploads
-      - ./openatlas/processed_images/resized:/var/www/openatlas/openatlas/processed_images/resized
-      - ./openatlas/export/sql:/var/www/openatlas/openatlas/export/sql
+      - ./files/uploads:/var/www/openatlas/files/uploads
+      - ./files/processed_images/resized:/var/www/openatlas/files/processed_images/resized
+      - ./files/export/sql:/var/www/openatlas/files/export/sql
     depends_on:
       - postgres
   postgres:
