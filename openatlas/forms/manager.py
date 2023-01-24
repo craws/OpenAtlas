@@ -201,6 +201,23 @@ class BibliographyManager(BaseManager):
     fields = ['name', 'description', 'continue']
 
 
+class CreationManager(EventBaseManager):
+
+    def additional_fields(self) -> dict[str, Any]:
+        return dict(super().additional_fields(), **{
+            'file': TableMultiField(_('document'))})
+
+    def populate_update(self) -> None:
+        super().populate_update()
+        self.form.file.data = [
+            entity.id for entity in self.entity.get_linked_entities('P94')]
+
+    def process_form(self) -> None:
+        super().process_form()
+        self.data['links']['delete'].add('P94')
+        self.add_link('P94', self.form.file.data)
+
+
 class EditionManager(BaseManager):
     fields = ['name', 'description', 'continue']
 
@@ -320,7 +337,7 @@ class InvolvementManager(BaseManager):
         elif self.origin and self.origin.class_.view != 'actor':
             event_class_name = self.origin.class_.name
         choices = [('P11', g.properties['P11'].name)]
-        if event_class_name in ['acquisition', 'activity']:
+        if event_class_name in ['acquisition', 'activity', 'creation']:
             choices.append(('P14', g.properties['P14'].name))
             if event_class_name == 'acquisition':
                 choices.append(('P22', g.properties['P22'].name))

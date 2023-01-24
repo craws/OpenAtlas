@@ -8,7 +8,6 @@ from wtforms.validators import Email
 
 from openatlas import app
 from openatlas.display.util import manual, tooltip, uc_first
-from openatlas.models.type import Type
 from openatlas.forms.field import ValueTypeField
 
 

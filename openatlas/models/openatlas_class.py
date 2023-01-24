@@ -9,7 +9,8 @@ from openatlas.database.openatlas_class import OpenAtlasClass as Db
 
 view_class_mapping = {
     'actor': ['person', 'group'],
-    'event': ['activity', 'acquisition', 'event', 'move', 'production'],
+    'event': [
+        'activity', 'acquisition', 'creation', 'event', 'move', 'production'],
     'file': ['file'],
     'artifact': ['artifact', 'human_remains'],
     'place': ['feature', 'place', 'stratigraphic_unit'],
