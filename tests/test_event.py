@@ -13,25 +13,18 @@ class EventTest(TestBaseCase):
         with app.app_context():
             place_name = 'Lewis and Clark'
             actor_name = 'Captain Miller'
-
-            rv: Any = self.app.post(
-                url_for('insert', class_='place'),
-                data={'name': place_name})
-            residence_id = rv.location.split('/')[-1]
-
-            with app.test_request_context():
-                app.preprocess_request()  # type: ignore
-                actor = insert_entity('person', actor_name)
-                file = insert_entity('file', 'X-Files')
-                source = insert_entity('source', 'Necronomicon')
-                artifact = insert_entity('artifact', 'artifact')
-                reference = \
-                    insert_entity('external_reference', 'https://openatlas.eu')
+            actor = insert_entity('person', actor_name)
+            file = insert_entity('file', 'X-Files')
+            source = insert_entity('source', 'Necronomicon')
+            artifact = insert_entity('artifact', 'artifact')
+            residence = insert_entity('place', place_name)
+            reference = \
+                insert_entity('external_reference', 'https://openatlas.eu')
 
             rv = self.app.get(url_for('insert', class_='activity'))
             assert b'+ Activity' in rv.data
 
-            data = {'name': 'Event Horizon', 'place': residence_id}
+            data = {'name': 'Event Horizon', 'place': residence.id}
 
             rv = self.app.post(
                 url_for('insert', class_='activity', origin_id=reference.id),
@@ -62,11 +55,11 @@ class EventTest(TestBaseCase):
             assert b'An entry has been created' in rv.data
 
             rv = self.app.get(
-                url_for('insert', class_='activity', origin_id=residence_id))
+                url_for('insert', class_='activity', origin_id=residence.id))
             assert b'Location' in rv.data
 
             rv = self.app.get(
-                url_for('insert', class_='move', origin_id=residence_id))
+                url_for('insert', class_='move', origin_id=residence.id))
             assert b'Location' not in rv.data
 
             event_name2 = 'Second event'
@@ -74,8 +67,8 @@ class EventTest(TestBaseCase):
                 url_for('insert', class_='acquisition'),
                 data={
                     'name': event_name2,
-                    'given_place': [residence_id],
-                    'place': residence_id,
+                    'given_place': [residence.id],
+                    'place': residence.id,
                     'event': activity_id,
                     'begin_year_from': '1949',
                     'begin_month_from': '10',
@@ -91,8 +84,8 @@ class EventTest(TestBaseCase):
                 url_for('insert', class_='move'),
                 data={
                     'name': 'Keep it moving',
-                    'place_to': residence_id,
-                    'place_from': residence_id,
+                    'place_to': residence.id,
+                    'place_from': residence.id,
                     'artifact': artifact.id,
                     'person': actor.id})
             move_id = rv.location.split('/')[-1]
@@ -122,11 +115,11 @@ class EventTest(TestBaseCase):
 
             rv = self.app.post(
                 url_for('insert', class_='acquisition'),
-                data={'name': 'Third event', 'given_place': [residence_id]},
+                data={'name': 'Third event', 'given_place': [residence.id]},
                 follow_redirects=True)
             assert b'An entry has been created' in rv.data
 
-            rv = self.app.get(url_for('view', id_=residence_id))
+            rv = self.app.get(url_for('view', id_=residence.id))
             assert bytes(place_name, 'utf-8') in rv.data
 
             rv = self.app.get(url_for('view', id_=actor.id))

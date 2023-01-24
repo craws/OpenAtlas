@@ -16,11 +16,9 @@ class ImageTest(TestBaseCase):
     def test_image(self) -> None:
         app.config['IMAGE_SIZE']['tmp'] = '1'
         with app.app_context():
-            with app.test_request_context():
-                app.preprocess_request()  # type: ignore
-                place = insert_entity('place', 'Nostromos')
-                logo = pathlib.Path(app.root_path) \
-                    / 'static' / 'images' / 'layout' / 'logo.png'
+            place = insert_entity('place', 'Nostromos')
+            logo = pathlib.Path(app.root_path) \
+                / 'static' / 'images' / 'layout' / 'logo.png'
 
             # Resizing through UI insert
             with open(logo, 'rb') as img:

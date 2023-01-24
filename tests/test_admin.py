@@ -12,13 +12,13 @@ from tests.base import TestBaseCase, get_hierarchy, insert_entity
 class AdminTests(TestBaseCase):
 
     def test_admin(self) -> None:
+        person = insert_entity('person', 'Oliver Twist')
+        insert_entity('person', 'Oliver Twist')
+        insert_entity('file', 'Forsaken file')
+        insert_entity('feature', 'Forsaken subunit')
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                person = insert_entity('person', 'Oliver Twist')
-                insert_entity('person', 'Oliver Twist')
-                insert_entity('file', 'Forsaken file')
-                insert_entity('feature', 'Forsaken subunit')
                 id_invalid = DbEntity.insert({
                     'name': 'Invalid linked entity',
                     'openatlas_class_name': 'artifact',
@@ -61,9 +61,9 @@ class AdminTests(TestBaseCase):
                 follow_redirects=True)
             assert b'An error occurred when trying to delete' in rv.data
 
+            event = insert_entity('acquisition', 'Event Horizon')
             with app.test_request_context():  # Create invalid dates
                 app.preprocess_request()  # type: ignore
-                event = insert_entity('acquisition', 'Event Horizon')
                 person.update({
                     'attributes': {
                         'begin_from': '2018-01-31',
