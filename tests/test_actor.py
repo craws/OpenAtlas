@@ -3,6 +3,7 @@ from typing import Any
 from flask import g, url_for
 
 from openatlas import app
+from openatlas.models.link import Link
 from tests.base import TestBaseCase, get_hierarchy, insert_entity
 
 
@@ -14,6 +15,7 @@ class ActorTests(TestBaseCase):
                 app.preprocess_request()  # type: ignore
                 place = insert_entity('place', 'Vienna')
                 event = insert_entity('acquisition', 'Event Horizon')
+                group = insert_entity('group', 'LV-426 colony')
                 sex = get_hierarchy('Sex')
                 sex_sub_1 = g.types[sex.subs[0]]
                 sex_sub_2 = g.types[sex.subs[1]]
@@ -122,3 +124,36 @@ class ActorTests(TestBaseCase):
                 url_for('link_delete', origin_id=actor_id, id_=666),
                 follow_redirects=True)
             assert b'removed' in rv.data
+
+            rv = self.app.get(
+                url_for('insert_relation', origin_id=group.id, type_='member'))
+            assert b'Actor function' in rv.data
+
+            rv = self.app.post(
+                url_for(
+                    'insert_relation',
+                    origin_id=actor_id,
+                    type_='membership'),
+                data={'group': str([group.id])},
+                follow_redirects=True)
+            assert b'LV-426 colony' in rv.data
+
+            rv = self.app.post(
+                url_for('insert_relation', origin_id=group.id, type_='member'),
+                data={'actor': str([actor_id]), 'continue_': 'yes'},
+                follow_redirects=True)
+            assert b'Ripley' in rv.data
+
+            with app.test_request_context():
+                app.preprocess_request()  # type: ignore
+                link_ = Link.get_links(group.id, 'P107')[0]
+
+            rv = self.app.get(
+                url_for('link_update', id_=link_.id, origin_id=group.id))
+            assert b'Susan' in rv.data
+
+            rv = self.app.post(
+                url_for('link_update', id_=link_.id, origin_id=group.id),
+                data={'description': 'We are here to help you'},
+                follow_redirects=True)
+            assert b'We are here to help you' in rv.data
