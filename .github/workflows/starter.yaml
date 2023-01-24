@@ -78,7 +78,6 @@ jobs:
           DATABASE_PASS='verysecret'
           MAIL_PASSWORD='asdQWEtzu123'
           SECRET_KEY='$COOKIE_KEY'  # Used for cookies
-          IS_UNIT_TEST = True
           DEBUG = True
           WTF_CSRF_ENABLED = False
           WTF_CSRF_METHODS = []

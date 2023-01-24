@@ -19,6 +19,18 @@ class ActorTests(TestBaseCase):
                 sex_sub_1 = g.types[sex.subs[0]]
                 sex_sub_2 = g.types[sex.subs[1]]
 
+            print(app.config['SERVER_NAME'])
+            print(app.config['DATABASE_NAME'])
+            print(app.config['DATABASE_USER'])
+            print(app.config['DATABASE_HOST'])
+            print(app.config['DATABASE_PORT'])
+            print(app.config['DATABASE_PASS'])
+            print(app.config['MAIL_PASSWORD'])
+            print(app.config['SECRET_KEY'])
+            print(app.config['DEBUG'])
+            print(app.config['WTF_CSRF_ENABLED'])
+            print(app.config['WTF_CSRF_METHODS'])
+
             rv: Any = self.app.get(
                 url_for('insert', class_='person', origin_id=place.id))
             assert b'Vienna' in rv.data
