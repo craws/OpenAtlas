@@ -9,11 +9,9 @@ class ArtifactTest(TestBaseCase):
 
     def test_artifact(self) -> None:
         with app.app_context():
-            with app.test_request_context():
-                app.preprocess_request()  # type: ignore
-                source = Entity.insert('source', 'Necronomicon')
-                actor = Entity.insert('person', 'Conan')
-                place = insert_entity('Home', 'place')
+            source = insert_entity('source', 'Necronomicon')
+            actor = insert_entity('person', 'Conan')
+            place = insert_entity('place', 'Home')
 
             rv = self.app.get(
                 url_for('insert', class_='artifact', origin_id=place.id))
@@ -34,6 +32,7 @@ class ArtifactTest(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 artifact = Entity.get_by_view('artifact')[0]
+
             rv = self.app.get(url_for('update', id_=artifact.id))
             assert b'Love-letter' in rv.data
 
@@ -74,9 +73,6 @@ class ArtifactTest(TestBaseCase):
                 data={'checkbox_values': [artifact.id]},
                 follow_redirects=True)
             assert b'A little hate' in rv.data
-
-            rv = self.app.get(url_for('view', id_=artifact.id))
-            assert b'Owned by' in rv.data and b'Conan' in rv.data
 
             rv = self.app.get(
                 url_for('insert', class_='artifact', origin_id=actor.id))

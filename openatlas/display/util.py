@@ -126,38 +126,6 @@ def format_entity_date(
     return html + (f" ({comment})" if comment else '')
 
 
-def profile_image(entity: Entity) -> str:
-    if not entity.image_id:
-        return ''
-    path = get_file_path(entity.image_id)
-    if not path:
-        return ''
-    resized = None
-    size = app.config['IMAGE_SIZE']['thumbnail']
-    if g.settings['image_processing'] and check_processed_image(path.name):
-        if path_ := get_file_path(entity.image_id, size):
-            resized = url_for('display_file', filename=path_.name, size=size)
-    url = url_for('display_file', filename=path.name)
-    src = resized or url
-    style = f'max-width:{g.settings["profile_image_width"]}px;'
-    ext = app.config["DISPLAY_FILE_EXTENSIONS"]
-    if resized:
-        style = f'max-width:{app.config["IMAGE_SIZE"]["thumbnail"]}px;'
-        ext = app.config["ALLOWED_IMAGE_EXT"]
-    if entity.class_.view == 'file':
-        html = uc_first(_('no preview available'))
-        if path.suffix.lower() in ext:
-            html = link(
-                f'<img style="{style}" alt="image" src="{src}">',
-                url,
-                external=True)
-    else:
-        html = link(
-            f'<img style="{style}" alt="image" src="{src}">',
-            url_for('view', id_=entity.image_id))
-    return f'<div id="profile-image-div">{html}</div>'
-
-
 def profile_image_table_link(
         entity: Entity,
         file: Entity,
@@ -245,9 +213,8 @@ def get_system_data(entity: Entity) -> dict[str, Any]:
 
 
 def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
-    label = uc_first(
-        _('bookmark remove')
-        if entity_id in current_user.bookmarks else _('bookmark'))
+    label = _('bookmark remove') \
+        if entity_id in current_user.bookmarks else _('bookmark')
     onclick = f"ajaxBookmark('{entity_id}');"
     if for_table:
         return \
@@ -279,14 +246,47 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
         if item == 'type':
             html += \
                 f'<a href="{url_for("type_index")}" ' \
-                f'class="nav-item nav-link {active}">' + \
+                f'class="nav-item nav-link fw-bold {active}">' + \
                 uc_first(_("types")) + '</a>'
         else:
             html += \
                 f'<a href="{url_for("index", view=item)}" ' \
-                f'class="nav-item nav-link {active}">' + uc_first(_(item)) + \
-                '</a>'
+                f'class="nav-item nav-link fw-bold {active}">' + \
+                uc_first(_(item)) + '</a>'
     return html
+
+
+@app.template_filter()
+def profile_image(entity: Entity) -> str:
+    if not entity.image_id:
+        return ''
+    path = get_file_path(entity.image_id)
+    if not path:
+        return ''  # pragma: no cover
+    resized = None
+    size = app.config['IMAGE_SIZE']['thumbnail']
+    if g.settings['image_processing'] and check_processed_image(path.name):
+        if path_ := get_file_path(entity.image_id, size):
+            resized = url_for('display_file', filename=path_.name, size=size)
+    url = url_for('display_file', filename=path.name)
+    src = resized or url
+    style = f'max-width:{g.settings["profile_image_width"]}px;'
+    ext = app.config["DISPLAY_FILE_EXTENSIONS"]
+    if resized:
+        style = f'max-width:{app.config["IMAGE_SIZE"]["thumbnail"]}px;'
+        ext = app.config["ALLOWED_IMAGE_EXT"]
+    if entity.class_.view == 'file':
+        html = uc_first(_('no preview available'))
+        if path.suffix.lower() in ext:
+            html = link(
+                f'<img style="{style}" alt="image" src="{src}">',
+                url,
+                external=True)
+    else:
+        html = link(
+            f'<img style="{style}" alt="image" src="{src}">',
+            url_for('view', id_=entity.image_id))
+    return f'{html}'
 
 
 @app.template_filter()
@@ -331,7 +331,7 @@ def format_name_and_aliases(entity: Entity, show_links: bool) -> str:
     if not entity.aliases or not current_user.settings['table_show_aliases']:
         return name
     return \
-        f'<p>{name}</p>' \
+        f'{name}' \
         f'{"".join(f"<p>{alias}</p>" for alias in entity.aliases.values())}'
 
 
@@ -403,7 +403,7 @@ def send_mail(
     """
     recipients = recipients if isinstance(recipients, list) else [recipients]
     if not g.settings['mail'] or not recipients:
-        return False
+        return False  # pragma: no cover
     from_ = f"{g.settings['mail_from_name']} <{g.settings['mail_from_email']}>"
     if app.config['IS_UNIT_TEST']:
         return True  # To test mail functions w/o sending them
@@ -471,7 +471,9 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
             if hash_ == user.password.encode('utf-8'):
                 warnings.append(
                     "User OpenAtlas with default password is still active!")
-    return f'<p class="error">{"<br>".join(warnings)}<p>' if warnings else ''
+    return \
+        '<p class="alert alert-danger">' \
+        f'{"<br>".join(warnings)}<p>' if warnings else ''
 
 
 @app.template_filter()
@@ -579,9 +581,14 @@ def button(
 
 @app.template_filter()
 def button_bar(buttons: list[Any]) -> str:
+    def add_col(input_: str):
+        return \
+            f'<div class="col-auto d-flex align-items-center">{input_}</div>'
+
     return \
-        f'<div class="toolbar">{" ".join([str(b) for b in buttons])}</div>' \
-        if buttons else ''
+        '<div class="row my-2 g-1">' \
+        f'{" ".join([str(b) for b in list(map(add_col, buttons))])}' \
+        '</div>' if buttons else ''
 
 
 @app.template_filter()
@@ -637,7 +644,7 @@ def description(entity: Union[Entity, Project, User]) -> str:
         label = _('content')
     return f"""
         {html}
-        <h2>{uc_first(label)}</h2>
+        <p><strong>{uc_first(label)}</strong></p>
         <div class="description more">
             {'<br>'.join(entity.description.splitlines())}
         </div>"""
@@ -664,7 +671,7 @@ def manual(site: str) -> str:
     return \
         '<a title="' + uc_first("manual") + '" ' \
         f'href="/static/manual/{site}.html" class="manual" target="_blank" ' \
-        'rel="noopener noreferrer"><i class="fas fa-book"></i></a>'
+        'rel="noopener noreferrer"><i class="fas fs-4 fa-book"></i></a>'
 
 
 @app.template_filter()
@@ -677,8 +684,9 @@ def display_form(
     multipart = 'enctype="multipart/form-data"' if 'file' in form else ''
     return \
         f'<form method="post" {form_id} {multipart}>' \
-        f'<div class="data-table">{html_form(form, form_id, manual_page)}' \
-        f'</div></form>'
+        '<table class="table table-no-style">' \
+        f'{html_form(form, form_id, manual_page)}' \
+        f'</table></form>'
 
 
 class MLStripper(HTMLParser):

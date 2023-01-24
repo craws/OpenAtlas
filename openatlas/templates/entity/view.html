@@ -1,16 +1,18 @@
 <div class="row">
-  <div class="col-6">
+  <div class="{{ 'col-lg-6' if gis_data else 'col' }}">
     {% if problematic_type_id %}
       <div class="error">
         {{ _('Editing is disabled because of multiple links to the single type') }}
         {{ g.types[problematic_type_id]|link|safe }}.
-        {{ _('Please consult the manual about link duplicates') }}: {{'admin/data_integrity_checks'|manual|safe }}
+        {{ _('Please consult the manual about link duplicates') }}: {{ 'admin/data_integrity_checks'|manual|safe }}
       </div>
     {% endif %}
-    <h1>{{ entity.name }}</h1>
-    <div>
-      {{ profile_image|safe }}
-      <div style="float:left;">
+    <div class="row g-1">
+      <div class="col-12"><h1>{{ entity.name }}</h1></div>
+      <div class="col-12 col-sm-auto">
+        {{ entity|profile_image|safe }}
+      </div>
+      <div class="col">
         {{ info_data|display_info|safe }}
       </div>
     </div>
@@ -19,7 +21,7 @@
     {{ entity|description|safe }}
   </div>
   {% if gis_data %}
-    <div class="col-6">
+    <div class="col-lg-6">
       <div id="map" class="map"></div>
       <script src="/static/js/map/map.js"></script>
     </div>

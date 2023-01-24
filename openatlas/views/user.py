@@ -18,6 +18,7 @@ from openatlas.display.table import Table
 from openatlas.display.util import (
     button, description, display_form, display_info, format_date,
     is_authorized, link, manual, required_group, send_mail, uc_first)
+from openatlas.forms.field import generate_password_field
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
 
@@ -33,6 +34,7 @@ class UserForm(FlaskForm):
     email = StringField(_('email'), [InputRequired(), Email()])
     password = PasswordField(_('password'), [InputRequired()])
     password2 = PasswordField(_('repeat password'), [InputRequired()])
+    generate_password = generate_password_field()
     show_passwords = BooleanField(_('show passwords'))
     real_name = StringField(_('full name'), description=_('tooltip full name'))
     description = TextAreaField(_('info'))

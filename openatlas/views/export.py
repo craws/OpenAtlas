@@ -46,7 +46,7 @@ def export_sql() -> Union[str, Response]:
     return render_template(
         'export.html',
         form=form,
-        table=get_table('sql', path, writable),
+        table=get_table(path, writable),
         writable=writable,
         title=_('export SQL'),
         crumbs=[
@@ -54,7 +54,7 @@ def export_sql() -> Union[str, Response]:
              f"{url_for('admin_index')}#tab-data"], _('export SQL')])
 
 
-def get_table(type_: str, path: Path, writable: bool) -> Table:
+def get_table(path: Path, writable: bool) -> Table:
     table = Table(['name', 'size'], order=[[0, 'desc']])
     for file in [
             f for f in path.iterdir()
@@ -64,26 +64,26 @@ def get_table(type_: str, path: Path, writable: bool) -> Table:
             convert_size(file.stat().st_size),
             link(
                 _('download'),
-                url_for(f'download_{type_}', filename=file.name))]
+                url_for(f'download_sql', filename=file.name))]
         if is_authorized('admin') and writable:
             confirm = _('Delete %(name)s?', name=file.name.replace("'", ''))
             data.append(
                 link(
                     _('delete'),
-                    url_for('delete_export', type_=type_, filename=file.name),
+                    url_for('delete_export', filename=file.name),
                     js=f"return confirm('{confirm}')"))
         table.rows.append(data)
     return table
 
 
-@app.route('/delete_export/<type_>/<filename>')
+@app.route('/delete_export/<filename>')
 @required_group('admin')
-def delete_export(type_: str, filename: str) -> Response:
+def delete_export(filename: str) -> Response:
     try:
         (app.config['EXPORT_DIR'] / filename).unlink()
-        g.logger.log('info', 'file', f'{type_} file deleted')
+        g.logger.log('info', 'file', f'SQL file deleted')
         flash(_('file deleted'), 'info')
     except Exception as e:
-        g.logger.log('error', 'file', f'{type_} file deletion failed', e)
+        g.logger.log('error', 'file', f'SQL file deletion failed', e)
         flash(_('error file delete'), 'error')
-    return redirect(url_for(f'export_{type_}'))
+    return redirect(url_for(f'export_sql'))

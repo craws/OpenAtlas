@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 13.8 (Debian 13.8-0+deb11u1)
--- Dumped by pg_dump version 13.8 (Debian 13.8-0+deb11u1)
+-- Dumped from database version 13.9 (Debian 13.9-0+deb11u1)
+-- Dumped by pg_dump version 13.9 (Debian 13.9-0+deb11u1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -514,7 +514,8 @@ CREATE TABLE model.entity (
     end_from timestamp without time zone,
     end_to timestamp without time zone,
     end_comment text,
-    openatlas_class_name text NOT NULL
+    openatlas_class_name text NOT NULL,
+    CONSTRAINT no_empty_name CHECK ((name <> ''::text))
 );
 
 

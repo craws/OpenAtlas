@@ -3,8 +3,7 @@ from flask import g, url_for
 from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.models.type import Type
-from tests.base import TestBaseCase
+from tests.base import TestBaseCase, get_hierarchy
 
 
 class RelationTests(TestBaseCase):
@@ -23,7 +22,7 @@ class RelationTests(TestBaseCase):
                     type_='actor_relation'))
             assert b'Actor relation' in rv.data
 
-            relation_id = Type.get_hierarchy('Actor relation').id
+            relation_id = get_hierarchy('Actor relation').id
             sub_id = g.types[relation_id].subs[0]
             sub_id2 = g.types[relation_id].subs[1]
             data = {

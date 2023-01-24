@@ -159,7 +159,7 @@ def admin_index(
     if is_authorized('manager'):
         tabs['modules'] = Tab(
             _('modules'),
-            '<h1>' + _('Defaults for new user') + '</h1>'
+            '<h1>' + uc_first(_('defaults for new user')) + '</h1>'
             + display_info(get_form_settings(ModulesForm())),
             buttons=[
                 manual('admin/modules'),

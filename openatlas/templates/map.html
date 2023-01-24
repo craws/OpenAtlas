@@ -22,29 +22,11 @@
   const gisPolygonPointSelected = {{ gis_data.gisPolygonPointSelected|safe }};
   const gisAllSelected =     {{ gis_data.gisAllSelected|safe }};
   const jsonSearch = [];
-  const translate = [];
   const mapMaxZoom             =  {{ current_user.settings.map_zoom_max }}
   const mapDefaultZoom         =  {{ current_user.settings.map_zoom_default }}
   const map_update_mode = false;  // enables e.g. edit buttons in popup ups if true
   const maxClusterRadius        = {{ g.settings.map_cluster_max_radius }};
   const disableClusteringAtZoom = {{ g.settings.map_cluster_disable_at_zoom }};
-  translate.save    = '{{ _('save')|uc_first|safe }}';
-  translate.edit    = '{{ _('edit')|uc_first|safe }}';
-  translate.delete  = '{{ _('delete')|uc_first|safe }}';
-  translate.details = '{{ _('details')|uc_first|safe }}';
-  translate.import  = '{{ _('import')|uc_first|safe }}';
-  translate.map_clear =                '{{ _('map_clear')|uc_first|safe }}';
-  translate.map_info_reedit =          '{{ _('map_info_reedit')|uc_first|safe }}';
-  translate.map_info_shape =           '{{ _('map_info_shape')|uc_first|safe }}';
-  translate.map_info_area =            '{{ _('map_info_area')|uc_first|safe }}';
-  translate.map_info_centerpoint =     '{{ _('map_info_point')|uc_first|safe }}';
-  translate.map_info_linestring =      '{{ _('map_info_linestring')|uc_first|safe }}';
-  translate.map_info_close =           '{{ _('map_info_close')|uc_first|safe }}';
-  translate.map_info_description =     '{{ _('map_info_description')|safe }}';
-  translate.map_geonames_title =       '{{ _('Search by location name or postcode')|safe }}';
-  translate.map_geonames_placeholder = '{{ _('Enter a location name')|safe }}';
-  translate.map_overlapping_places =   '{{ _('There are multiple places overlapping')|safe }}';
-
   overlays = [];
   {% if current_user.settings.module_map_overlay and overlays is defined and overlays and overlays|length %}
     overlays = [

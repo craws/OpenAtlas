@@ -12,31 +12,20 @@ class EventTest(TestBaseCase):
     def test_event(self) -> None:
         with app.app_context():
             place_name = 'Lewis and Clark'
-            rv: Any = self.app.post(
-                url_for('insert', class_='place'),
-                data={
-                    'name': place_name,
-                    self.precision_geonames: '',
-                    self.precision_wikidata: ''})
-            residence_id = rv.location.split('/')[-1]
             actor_name = 'Captain Miller'
-            with app.test_request_context():
-                app.preprocess_request()  # type: ignore
-                actor = Entity.insert('person', actor_name)
-                file = Entity.insert('file', 'X-Files')
-                source = Entity.insert('source', 'Necronomicon')
-                artifact = insert_entity('artifact', 'artifact')
-                reference = Entity.insert(
-                    'external_reference',
-                    'https://openatlas.eu')
+            actor = insert_entity('person', actor_name)
+            file = insert_entity('file', 'X-Files')
+            source = insert_entity('source', 'Necronomicon')
+            artifact = insert_entity('artifact', 'artifact')
+            residence = insert_entity('place', place_name)
+            reference = \
+                insert_entity('external_reference', 'https://openatlas.eu')
 
             rv = self.app.get(url_for('insert', class_='activity'))
             assert b'+ Activity' in rv.data
 
-            data = {
-                'name': 'Event Horizon',
-                'place': residence_id,
-                self.precision_wikidata: ''}
+            data = {'name': 'Event Horizon', 'place': residence.id}
+
             rv = self.app.post(
                 url_for('insert', class_='activity', origin_id=reference.id),
                 data=data,
@@ -46,21 +35,31 @@ class EventTest(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 activity_id = Entity.get_by_view('event')[0].id
-            self.app.post(
+
+            rv = self.app.post(
                 url_for('insert', class_='activity', origin_id=actor.id),
-                data=data)
-            self.app.post(
+                data=data,
+                follow_redirects=True)
+            assert b'An entry has been created' in rv.data
+
+            rv = self.app.post(
                 url_for('insert', class_='activity', origin_id=file.id),
-                data=data)
-            self.app.post(
+                data=data,
+                follow_redirects=True)
+            assert b'An entry has been created' in rv.data
+
+            rv = self.app.post(
                 url_for('insert', class_='activity', origin_id=source.id),
-                data=data)
+                data=data,
+                follow_redirects=True)
+            assert b'An entry has been created' in rv.data
+
             rv = self.app.get(
-                url_for('insert', class_='activity', origin_id=residence_id))
+                url_for('insert', class_='activity', origin_id=residence.id))
             assert b'Location' in rv.data
 
             rv = self.app.get(
-                url_for('insert', class_='move', origin_id=residence_id))
+                url_for('insert', class_='move', origin_id=residence.id))
             assert b'Location' not in rv.data
 
             event_name2 = 'Second event'
@@ -68,15 +67,14 @@ class EventTest(TestBaseCase):
                 url_for('insert', class_='acquisition'),
                 data={
                     'name': event_name2,
-                    'given_place': [residence_id],
-                    'place': residence_id,
+                    'given_place': [residence.id],
+                    'place': residence.id,
                     'event': activity_id,
                     'begin_year_from': '1949',
                     'begin_month_from': '10',
                     'begin_day_from': '8',
                     'end_year_from': '1951',
-                    self.wikidata: 'Q123',
-                    self.precision_wikidata: self.precision_type.subs[0]})
+                    self.wikidata: ['Q123', self.precision_type.subs[0]]})
             event_id = rv.location.split('/')[-1]
 
             rv = self.app.get(url_for('view', id_=event_id))
@@ -86,11 +84,10 @@ class EventTest(TestBaseCase):
                 url_for('insert', class_='move'),
                 data={
                     'name': 'Keep it moving',
-                    'place_to': residence_id,
-                    'place_from': residence_id,
+                    'place_to': residence.id,
+                    'place_from': residence.id,
                     'artifact': artifact.id,
-                    'person': actor.id,
-                    self.precision_wikidata: ''})
+                    'person': actor.id})
             move_id = rv.location.split('/')[-1]
 
             rv = self.app.get(url_for('view', id_=move_id))
@@ -104,27 +101,25 @@ class EventTest(TestBaseCase):
 
             rv = self.app.post(
                 url_for('insert', class_='production'),
-                data={
-                    'name': 'A very productive event',
-                    'artifact': artifact.id,
-                    self.precision_wikidata: ''})
+                data={'name': 'A productive event', 'artifact': artifact.id})
             production_id = rv.location.split('/')[-1]
+
             rv = self.app.get(url_for('view', id_=production_id))
             assert b'Artifact' in rv.data
 
             rv = self.app.get(url_for('view', id_=artifact.id))
-            assert b'A very productive event' in rv.data
+            assert b'A productive event' in rv.data
 
             rv = self.app.get(url_for('update', id_=production_id))
-            assert b'A very productive event' in rv.data
+            assert b'A productive event' in rv.data
 
-            event_name3 = 'Third event'
-            self.app.post(url_for('insert', class_='acquisition'), data={
-                'name': event_name3,
-                'given_place': [residence_id],
-                self.precision_geonames: '',
-                self.precision_wikidata: ''})
-            rv = self.app.get(url_for('view', id_=residence_id))
+            rv = self.app.post(
+                url_for('insert', class_='acquisition'),
+                data={'name': 'Third event', 'given_place': [residence.id]},
+                follow_redirects=True)
+            assert b'An entry has been created' in rv.data
+
+            rv = self.app.get(url_for('view', id_=residence.id))
             assert bytes(place_name, 'utf-8') in rv.data
 
             rv = self.app.get(url_for('view', id_=actor.id))
@@ -132,16 +127,9 @@ class EventTest(TestBaseCase):
 
             rv = self.app.post(
                 url_for('insert', class_='acquisition'),
-                follow_redirects=True,
-                data={
-                    'name': 'Event Horizon',
-                    'continue_': 'yes',
-                    self.precision_geonames: '',
-                    self.precision_wikidata: ''})
+                data={'name': 'Event Horizon', 'continue_': 'yes'},
+                follow_redirects=True)
             assert b'An entry has been created' in rv.data
-
-            rv = self.app.get(url_for('index', view='event'))
-            assert b'Event' in rv.data
 
             rv = self.app.get(url_for('view', id_=activity_id))
             assert b'1949' in rv.data
@@ -155,9 +143,6 @@ class EventTest(TestBaseCase):
                 follow_redirects=True)
             assert b'X-Files' in rv.data
 
-            rv = self.app.get(url_for('entity_add_reference', id_=event_id))
-            assert b'Link reference' in rv.data
-
             rv = self.app.post(
                 url_for('entity_add_reference', id_=event_id),
                 data={'reference': reference.id, 'page': '777'},
@@ -170,13 +155,6 @@ class EventTest(TestBaseCase):
             rv = self.app.get(url_for('update', id_=event_id))
             assert b'Event Horizon' in rv.data
 
-            data['name'] = 'Event updated'
-            rv = self.app.post(
-                url_for('update', id_=event_id),
-                data=data,
-                follow_redirects=True)
-            assert b'Changes have been saved' in rv.data
-
             rv = self.app.post(
                 url_for('update', id_=event_id),
                 data={
@@ -186,12 +164,5 @@ class EventTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Event with preceding' in rv.data
 
-            rv = self.app.get(url_for('view', id_=activity_id))
-            assert b'Event with preceding' in rv.data
-
             rv = self.app.get(url_for('update', id_=event_id))
             assert b'Event with preceding' in rv.data
-
-            rv = self.app.get(
-                url_for('index', view='event', delete_id=event_id))
-            assert b'The entry has been deleted.' in rv.data

@@ -1,10 +1,10 @@
 {% extends "layout.html" %}
 {% block content %}
   {% for release, version in versions.items() %}
-    <div class="changelog-version">
+    <div class="fs-6 fw-bold">
       {{ _('version')|uc_first }} {{ release }}
     </div>
-    <div class="changelog-date">
+    <div class="my-1">
       {{ version[0] }}
     </div>
     <ul>

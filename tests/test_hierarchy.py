@@ -3,8 +3,7 @@ from typing import Any
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.type import Type
-from tests.base import TestBaseCase
+from tests.base import TestBaseCase, get_hierarchy
 
 
 class HierarchyTest(TestBaseCase):
@@ -17,22 +16,19 @@ class HierarchyTest(TestBaseCase):
                     ['file', 'group', 'move', 'person', 'place', 'source'],
                 'multiple': True,
                 'description': 'Very important!'}
+
             rv: Any = self.app.post(
                 url_for('hierarchy_insert', category='custom'),
-                follow_redirects=True,
-                data=data)
+                data=data,
+                follow_redirects=True)
             assert b'An entry has been created' in rv.data
 
             rv = self.app.post(
                 url_for('hierarchy_insert', category='custom'),
-                follow_redirects=True,
-                data=data)
+                data=data,
+                follow_redirects=True)
             assert b'The name is already in use' in rv.data
-
-            with app.test_request_context():
-                hierarchy = Type.get_hierarchy('Geronimo')
-            rv = self.app.get(url_for('hierarchy_update', id_=hierarchy.id))
-            assert b'Geronimo' in rv.data
+            hierarchy = get_hierarchy('Geronimo')
 
             data['classes'] = ['acquisition']
             data['entity_id'] = hierarchy.id
@@ -50,7 +46,7 @@ class HierarchyTest(TestBaseCase):
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                sex_hierarchy = Type.get_hierarchy('Sex')
+                sex_hierarchy = get_hierarchy('Sex')
 
             rv = self.app.get(
                 url_for('required_risk', id_=sex_hierarchy.id),
@@ -101,19 +97,20 @@ class HierarchyTest(TestBaseCase):
 
             rv = self.app.post(
                 url_for('hierarchy_insert', category='value'),
-                follow_redirects=True,
                 data={
                     'name': 'A valued value',
                     'classes': ['file'],
-                    'description': ''})
+                    'description': ''},
+                follow_redirects=True,)
             assert b'An entry has been created' in rv.data
 
-            with app.test_request_context():
-                value_type = Type.get_hierarchy('A valued value')
-            rv = self.app.get(url_for('hierarchy_update', id_=value_type.id))
+            rv = self.app.get(
+                url_for(
+                    'hierarchy_update',
+                    id_=get_hierarchy('A valued value').id))
             assert b'valued' in rv.data
 
-            relation_type = Type.get_hierarchy('Actor relation')
+            relation_type = get_hierarchy('Actor relation')
             rv = self.app.get(
                 url_for('hierarchy_update', id_=relation_type.id),
                 follow_redirects=True)

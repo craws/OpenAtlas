@@ -1,8 +1,20 @@
 const variables = {}
 /* Show and hide function for value type input fields. Has to be outside of $(document).ready() */
-function switch_value_type(id) {
-    $(".value-type-switch" + id).toggleClass('display-none');
-    $("#value-type-switcher-" + id).toggleClass('rotate-90');
+function switch_value_type(id, el) {
+    if (el.hasAttribute('show')) {
+        el.removeAttribute('show');
+        $(`.value-type-field.sub-of-${id}`).each(function () {
+            this.classList.add('d-none');
+        });
+        $(`.value-type-field.sub-of-${id} .value-type-switcher`).each(function () {
+            this.removeAttribute('show');
+        });
+    } else {
+        $(`.value-type-field.direct-sub-of-${id}`).each(function () {
+            this.classList.remove('d-none');
+        });
+        el.setAttribute('show', '');
+    }
 }
 
 $(document).ready(function () {
@@ -30,31 +42,30 @@ $(document).ready(function () {
 
     /* Show and hide function for reference systems */
     $("#reference-system-switcher").click(function () {
-        $(".reference-system-switch").toggleClass('display-none');
+        $(".reference-system-switch").toggleClass('d-none');
         $(this).text(function (i, text) {
-            return $.trim(text) === show ? hide : show;
+            return $.trim(text) === translate.show ? translate.hide : translate.show;
         })
     });
-    $('.reference-system-switch').addClass('display-none');
 
     /* Show and hide function for date input fields */
     $("#date-switcher").click(function () {
-        $(".date-switch").toggleClass('display-none');
+        $(".date-switch").toggleClass('d-none');
         $(this).text(function (i, text) {
-            return $.trim(text) === show ? hide : show;
+            return $.trim(text) === translate.show ? translate.hide : translate.show;
         })
     });
 
     /* Hide date fields if there are any and if they are empty */
     if ($('#begin_year_from').length &&
         $('#begin_year_from').val() == '' && $('#end_year_from').val() == '') {
-        $('.date-switch').addClass('display-none');
+        $('.date-switch').addClass('d-none');
     }
 
     /* Hide value type fields with class* wildcard selector */
     $('[class*="value-type-switch"]').addClass('display-none');
 
-    $('label[for="show_passwords"]').css('display', 'block');
+    // $('label[for="show_passwords"]').css('display', 'block');
     $('#show_passwords').show()
 
     .change(function () {
@@ -128,21 +139,23 @@ $(document).ready(function () {
         $("#password2").val(random_password);
     })
 
-    // Adding a generic submit handler to form validation
-    .each(function () {
-        $(this).validate({
-            submitHandler: function (form) {
-                if (this.submitButton.id === "insert_and_continue") $('#continue_').val('yes');
-                if (this.submitButton.id === "insert_continue_sub") $('#continue_').val('sub');
-                if (this.submitButton.id === "insert_continue_human_remains") $('#continue_').val('human_remains');
-                $('input[type="submit"]').prop("disabled", true).val('... in progress');
-                form.submit();
-            },
+        // Adding a generic submit handler to form validation
+        .each(function () {
+            $(this).validate({
+                errorClass: "d-block error",
+                submitHandler: function (form) {
+                    if (this.submitButton?.id === "insert_and_continue") $('#continue_').val('yes');
+                    if (this.submitButton?.id === "insert_continue_sub") $('#continue_').val('sub');
+                    if (this.submitButton?.id === "insert_continue_human_remains") $('#continue_').val('human_remains');
+                        $('input[type="submit"]').prop("disabled", true).val('... in progress');
+                        form.submit();
+                    },
+                });
         });
-    });
 
     //add required to reference precision if reference is set
-    $("[id^=reference_system_id]").on('change', function () {
+    $("[id^=reference_system_value]").on('keyup', function () {
+        console.log('hallo',this.value)
         const select = $(`#reference_system_precision_${this.id.split('_').pop()}`);
         if (!this.value?.length)
             select.removeClass('required');

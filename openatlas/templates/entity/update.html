@@ -9,26 +9,21 @@
     </p>
   {% endif %}
   {% if entity.class_.view not in ['artifact', 'place'] %}
+    <div class="container">
     {{ form|display_form(manual_page='entity/' + entity.class_.view)|safe }}
     {{ entity.class_.view|display_citation_example|safe }}
+    </div>
   {% else %}
     <div class="row">
-      <div class="col-xl-4">
+      <div class="col-lg-4">
         <div class="row">
           <div id='map-info-display'>
             {{ form|display_form(manual_page='entity/' + entity.class_.view)|safe }}
           </div>
+          {{ entity|profile_image|safe }}
         </div>
       </div>
-      <div class="col-xl-8 d-flex align-items-center">
-        <div class="pe-4 d-none d-lg-inline">
-          <span class="extend-icon" id="extend-form-icon">
-            <i class="fas fa-arrow-right" title="Enlarge Form"></i>
-          </span>
-          <span class="extend-icon" id="extend-map-icon" style="display: none;">
-            <i class="fas fa-arrow-left " title="Enlarge Map"></i>
-          </span>
-        </div>
+      <div class="col-lg-8">
         <div id="map" class="map"></div>
       </div>
     </div>

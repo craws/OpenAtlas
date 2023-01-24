@@ -1,11 +1,11 @@
 {% extends "layout.html" %}
 {% block content %}
   {{ buttons|button_bar|safe }}
-  <ul class="nav nav-tabs" role="tablist">
+  <ul class="nav nav-pills bg-gray p-1" role="tablist">
     {% for category in types %}
       <li class="nav-item">
         <a
-            class="nav-link"
+            class="py-1 nav-link"
             data-bs-toggle="tab"
             role="tab"
             aria-selected="{% if loop.index == 1 %}true{% else %}false{% endif %}"
@@ -15,7 +15,7 @@
       </li>
     {% endfor %}
   </ul>
-  <div class="tab-content" id="menuTabContent">
+  <div class="tab-content py-2" id="menuTabContent">
     {% for category in types %}
       <div class="tab-pane fade" role="tabpanel" id="menu-tab-{{ category }}" style="padding: 0;">
         <div class="accordion accordion-flush" id="TypeAccordion-{{ category }}">
@@ -28,53 +28,58 @@
             <div class="accordion-item">
               <div class="accordionheader" id="heading-{{ type_.id }}">
                 <button
-                  class="accordion-button {{ 'collapsed' if (types[category].items()|length != 1)}}"
-                  type="button"
-                  data-bs-toggle="collapse"
-                  data-bs-target="#collapse-{{ type_.id }}"
-                  aria-expanded="{{types[category].items()|length == 1}}"
-                  aria-controls="collapse-{{ type_.id }}">
-                    {{ type_.name }}
+                    style="padding-top:5px; padding-bottom: 5px"
+                    class="accordion-button {{ 'collapsed' if (types[category].items()|length != 1) }}"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapse-{{ type_.id }}"
+                    aria-expanded="{{ types[category].items()|length == 1 }}"
+                    aria-controls="collapse-{{ type_.id }}">
+                  {{ type_.name }}
                 </button>
               </div>
               <div id="collapse-{{ type_.id }}"
-                   class="accordion-collapse collapse {{ 'show' if (types[category].items()|length == 1)}}"
+                   class="accordion-collapse collapse {{ 'show' if (types[category].items()|length == 1) }}"
                    aria-labelledby="headingOne"
                    data-bs-parent="#TypeAccordion-{{ category }}">
                 <div class="accordion-body">
                   <div class="row">
-                    <div class="col-6 contentbox">
-                      <div class="toolbar">
-                        <input
-                          class="tree-filter"
-                          id="{{ type_.name|sanitize }}-tree-search"
-                          placeholder="{{ _('type to search')|uc_first }}"
-                          name="name_search"
-                          style="width:8em;"
-                          type="text">
+                    <div class="col-12 col-sm-6 contentbox">
+                      <div class="row g-1">
+                        <div class="col"><input
+                            class="tree-filter {{ config.CSS.string_field }}"
+                            id="{{ type_.name|sanitize }}-tree-search"
+                            placeholder="{{ _('type to search')|uc_first }}"
+                            name="name_search"
+                            type="text"></div>
                         {% if 'editor'|is_authorized and type_.category != 'system' %}
-                          {% if category == 'place' %}
-                            {{ _('place')|button(url_for('insert', class_='administrative_unit', origin_id=type_.id))|safe }}
-                          {% else %}
-                            {{ _('type')|button(url_for('insert', class_='type', origin_id=type_.id))|safe }}
-                          {% endif %}
+                          <div class="col-auto">
+                            {% if category == 'place' %}
+                              {{ _('place')|button(url_for('insert', class_='administrative_unit', origin_id=type_.id))|safe }}
+                            {% else %}
+                              {{ _('type')|button(url_for('insert', class_='type', origin_id=type_.id))|safe }}
+                            {% endif %}
+                          </div>
                         {% endif %}
                         {% if category in ['custom', 'value'] and 'manager'|is_authorized %}
-                          {{ _('edit')|button(url_for('hierarchy_update', id_=type_.id))|safe }}
+                          <div
+                              class="col-auto">{{ _('edit')|button(url_for('hierarchy_update', id_=type_.id))|safe }}</div>
                           {% if not type_.system %}
-                            {% if type_.count > 0 or type_.subs %}
-                              {{ _('delete')|button(url_for('hierarchy_delete', id_=type_.id))|safe }}
-                            {% else %}
-                              {{ _('delete')|button(
+                            <div class="col-auto">
+                              {% if type_.count > 0 or type_.subs %}
+                                {{ _('delete')|button(url_for('hierarchy_delete', id_=type_.id))|safe }}
+                              {% else %}
+                                {{ _('delete')|button(
                               url_for('hierarchy_delete', id_=type_.id),
                               onclick="return confirm('" + _('delete')|uc_first + " " + type_.name.replace("'", '').replace('"', '') + "?');")|safe }}
-                            {% endif %}
+                              {% endif %}
+                            </div>
                           {% endif %}
                         {% endif %}
                       </div>
                       {{ tree|safe }}
                     </div>
-                    <div class="col-5 contentbox">
+                    <div class="col-12 col-sm-6 contentbox">
                       {% if category != 'value' %}
                         <p>
                           <strong>{{ _('selection')|uc_first }}</strong>:
@@ -86,9 +91,10 @@
                             {{ _('true') if type_.required else _('false') }}
                             {% if 'manager'|is_authorized %}
                               {% if type_.required %}
-                                {{ _('remove required')|button(url_for('required_remove', id_=type_.id))|safe }}
+                                (<a href="{{ url_for('required_remove', id_=type_.id) }}">{{ _('remove required') }}</a>
+                                )
                               {% else %}
-                                {{ _('make required')|button(url_for('required_risk', id_=type_.id))|safe }}
+                                (<a href="{{ url_for('required_risk', id_=type_.id) }}">{{ _('make required') }}</a>)
                               {% endif %}
                             {% endif %}
                           </p>
@@ -121,7 +127,7 @@
                       {% endif %}
                       {% if type_.description %}
                         <div class="description">
-                          <h2>{{ _('description')|uc_first }}</h2>
+                          <strong>{{ _('description')|uc_first }}</strong>
                           <p>{{ type_.description }}</p>
                         </div>
                       {% endif %}

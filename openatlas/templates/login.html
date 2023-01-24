@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
+  <div class="container">
   {{ form|display_form('login-form')|safe }}
   {% if config.DEMO_MODE %}
     <p>User: Demolina, Pass: Demolina</p>
@@ -9,20 +10,19 @@
     </p>
   {% endif %}
   <p>
-    {{
-      ('<i class="fas fa-book"></i> ' + _('troubleshooting')|uc_first)|
-      link("/static/manual/troubleshooting/login.html", class_=config.CSS.button.primary, external=True)|safe
-    }}
+    {{ ('<i class="fas fa-book"></i> ' + _('troubleshooting')|uc_first)|
+      link("/static/manual/troubleshooting/login.html", class_=config.CSS.button.primary, external=True)|safe }}
   </p>
 {% endblock %}
 
 {% block script %}
   {% if config.DEMO_MODE %}
     <script>
-      $(document).ready(function () {
-        $("#username").val('Demolina');
-        $("#password").val('Demolina');
-      });
+        $(document).ready(function () {
+            $("#username").val('Demolina');
+            $("#password").val('Demolina');
+        });
     </script>
   {% endif %}
+  </div>
 {% endblock %}

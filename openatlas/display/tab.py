@@ -5,7 +5,7 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 
 from openatlas.display.table import Table
-from openatlas.display.util import button, is_authorized, uc_first
+from openatlas.display.util import button, is_authorized
 from openatlas.models.entity import Entity
 
 # Needed for translations of tab titles
@@ -34,7 +34,6 @@ class Tab:
 
         self.name = name
         self.content = content
-        self.title = uc_first(_(name.replace('_', ' ')))
         self.entity = entity
         self.table = table or Table()
         self.set_table_headers(name, entity)

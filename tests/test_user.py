@@ -85,7 +85,20 @@ class UserTests(TestBaseCase):
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                person = insert_entity('Hugo', 'person')
+                person = insert_entity('person', 'Hugo')
+                event = insert_entity('activity', 'Event Horizon')
+                event.link('P11', person)
+
+            rv = self.app.post(
+                url_for('ajax_bookmark'),
+                data={'entity_id': person.id})
+            assert b'Remove bookmark' in rv.data
+            assert b'Hugo' in self.app.get('/').data
+
+            rv = self.app.post(
+                url_for('ajax_bookmark'),
+                data={'entity_id': person.id})
+            assert b'Bookmark' in rv.data
 
             self.app.get(url_for('logout'))
             rv = self.app.get(url_for('user_insert'), follow_redirects=True)
@@ -121,4 +134,11 @@ class UserTests(TestBaseCase):
             assert b'Person' in rv.data
 
             rv = self.app.get(url_for('update', id_=person.id))
+            assert b'Hugo' in rv.data
+
+            rv = self.app.get(url_for('view', id_=person.id))
+            assert b'Hugo' in rv.data
+
+            self.login('Readonly')
+            rv = self.app.get(url_for('view', id_=person.id))
             assert b'Hugo' in rv.data

@@ -18,7 +18,9 @@ versions = {
     '7.10.0': ['TBA', {
         'feature': {
             '1090': 'Radiocarbon Dating',
+            '1866': 'Complete Bootstrap layout',
             '1921': 'Additional UI translations - Spanish and Catalan',
+            '1906': 'Unify placement of form error messages',
             '1933': 'API: Display images without extension in URL',
             '1814': 'API: more compact API buttons in user interface',
             '1701': 'Manual: added API documentation',
