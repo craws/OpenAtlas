@@ -79,27 +79,16 @@ jobs:
           SECRET_KEY='$COOKIE_KEY'  # Used for cookies
           IS_UNIT_TEST = True
           DEBUG = True
+          WTF_CSRF_ENABLED = False
+          WTF_CSRF_METHODS = []
           EOF
-          cat <<EOF > production.py
-          DATABASE_NAME='openatlas_test'
-          DATABASE_USER='openatlas'
-          DATABASE_HOST='postgres'
-          DATABASE_PORT=5432
-          DATABASE_PASS='verysecret'
-          MAIL_PASSWORD='asdQWEtzu123'
-          SECRET_KEY='$COOKIE_KEY'  # Used for cookies
-          IS_UNIT_TEST = True
-          DEBUG = True
-          EOF
-          sudo chown 33:33 production.py testing.py
-          docker exec openatlas rm -rf /var/www/openatlas/instance/production.py
-          docker cp -a production.py openatlas:/var/www/openatlas/instance/
+          sudo chown 33:33 testing.py
           docker cp -a testing.py openatlas:/var/www/openatlas/instance/
           docker start openatlas
           until [ "$(docker inspect -f {{.State.Running}} openatlas)"=="true" ]; do
               sleep 0.1;
           done;
-          docker exec -i openatlas /bin/bash -c "cd /var/www/openatlas/instance/ && ls -la && cat production.py && cat testing.py"
+          docker exec -i openatlas /bin/bash -c "cd /var/www/openatlas/instance/ && ls -la && cat testing.py"
 
       - name: Run tests
         run: |
