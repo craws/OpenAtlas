@@ -1,5 +1,4 @@
 import pathlib
-import shutil
 from shutil import copyfile
 
 from flask import g, url_for
@@ -108,10 +107,3 @@ class ImageTest(TestBaseCase):
                 url_for('admin_delete_orphaned_resized_images'),
                 follow_redirects=True)
             assert b'Resized orphaned images were deleted' in rv.data
-
-            shutil.rmtree(
-                pathlib.Path(
-                    app.config['RESIZED_IMAGES'] /
-                    app.config['IMAGE_SIZE']['tmp']))
-            dst_py.unlink()
-            del app.config['IMAGE_SIZE']['tmp']
