@@ -65,7 +65,7 @@ jobs:
       - name: Wait
         run: sleep 8
 
-      - name: Create openatlas container
+      - name: Create openatlas container and run tests
         run: |
           docker create -e OVERWRITE_DATABASE=TRUE -e POSTGRES_PASSWORD=verysecret -e POSTGRES_DB=openatlas_test -e POSTGRES_USER=openatlas -e POSTGRES_HOST=postgres --name openatlas --network openatlas ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')/container-preview:${{ github.ref_name }}
           set -x
