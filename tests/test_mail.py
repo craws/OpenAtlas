@@ -40,7 +40,6 @@ class MailTests(TestBaseCase):
                 url_for('admin_index'),
                 data={'receiver': 'test@example.com'},
                 follow_redirects=True)
-            print(rv.data)
             assert b'A test mail was sent' in rv.data
 
             rv = self.app.get(url_for('admin_newsletter'))

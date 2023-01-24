@@ -49,7 +49,6 @@ class ImportTest(TestBaseCase):
 
             rv = self.app.get(
                 url_for('import_data', class_='person', project_id=project.id))
-            print(rv.data)
             assert b'File *' in rv.data
 
             with open(static_path / 'example.csv', 'rb') as file:

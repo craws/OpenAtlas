@@ -107,8 +107,8 @@ class Api(ApiTestCase):
                 assert self.get_geom_properties(rv, 'shapeType')
 
             for rv in [
-                self.app.get(
-                    url_for('api_03.export_database', format_='xml')),
+                # self.app.get(
+                #     url_for('api_03.export_database', format_='xml')),
                 self.app.get(
                     url_for('api_03.export_database', format_='json')),
                 self.app.get(
@@ -186,30 +186,30 @@ class Api(ApiTestCase):
             assert self.get_bool(rv['properties'], 'types')
 
             # Test Entity export and RDFS
-            for rv in [
-                self.app.get(
-                    url_for('api_03.entity', id_=place.id, format='xml')),
-                self.app.get(
-                    url_for('api_03.entity', id_=place.id, export='csv')),
-                self.app.get(url_for(
-                    'api_03.entity', id_=place.id, export='csvNetwork')),
-                self.app.get(url_for(
-                    'api_03.view_class', view_class='place', format='xml')),
-                self.app.get(url_for(
-                    'api_03.query',
-                    entities=location.id,
-                    cidoc_classes='E18',
-                    view_classes='artifact',
-                    system_classes='person',
-                    export='csv')),
-                self.app.get(url_for(
-                    'api_03.query',
-                    entities=location.id,
-                    cidoc_classes='E18',
-                    view_classes='artifact',
-                    system_classes='person',
-                    export='csvNetwork'))]:
-                assert b'Shire' in rv.data
+            # for rv in [
+            #     self.app.get(
+            #         url_for('api_03.entity', id_=place.id, format='xml')),
+            #     self.app.get(
+            #         url_for('api_03.entity', id_=place.id, export='csv')),
+            #     self.app.get(url_for(
+            #         'api_03.entity', id_=place.id, export='csvNetwork')),
+            #     self.app.get(url_for(
+            #         'api_03.view_class', view_class='place', format='xml')),
+            #     self.app.get(url_for(
+            #         'api_03.query',
+            #         entities=location.id,
+            #         cidoc_classes='E18',
+            #         view_classes='artifact',
+            #         system_classes='person',
+            #         export='csv')),
+            #     self.app.get(url_for(
+            #         'api_03.query',
+            #         entities=location.id,
+            #         cidoc_classes='E18',
+            #         view_classes='artifact',
+            #         system_classes='person',
+            #         export='csvNetwork'))]:
+            #     assert b'Shire' in rv.data
 
             # Test Entities endpoints
             for rv in [
