@@ -14,9 +14,7 @@ class TestBaseCase(unittest.TestCase):
 
     def setUp(self) -> None:
         app.testing = True
-        app.config['SERVER_NAME'] = 'local.host'
-        app.config['WTF_CSRF_ENABLED'] = False
-        app.config['WTF_CSRF_METHODS'] = []  # Disable CSRF in tests
+        app.config.from_pyfile('testing.py')
         self.setup_database()
         self.app = app.test_client()
         self.login('Alice', logout=False)
