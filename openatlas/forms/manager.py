@@ -177,10 +177,10 @@ class ArtifactManager(ArtifactBaseManager):
                 [entity.id] + \
                 [e.id for e in entity.get_linked_entities_recursive('P46')]
         return dict(super().additional_fields(), **{
-                'artifact_super': TableField(
-                    _('super'),
-                    filter_ids=filter_ids,
-                    add_dynamic=['place'])})
+            'artifact_super': TableField(
+                _('super'),
+                filter_ids=filter_ids,
+                add_dynamic=['place'])})
 
     def populate_insert(self) -> None:
         if self.origin and self.origin.class_.view in ['artifact', 'place']:
@@ -206,6 +206,10 @@ class CreationManager(EventBaseManager):
     def additional_fields(self) -> dict[str, Any]:
         return dict(super().additional_fields(), **{
             'file': TableMultiField(_('document'))})
+
+    def populate_insert(self) -> None:
+        if self.origin and self.origin.class_.name == 'file':
+            self.form.file.data = [self.origin.id]
 
     def populate_update(self) -> None:
         super().populate_update()
