@@ -23,12 +23,9 @@ DATABASE_PORT=5432
 DATABASE_PASS='$POSTGRES_PASSWORD'
 MAIL_PASSWORD='$MAIL_PASSWORD'
 SECRET_KEY='$COOKIE_KEY'  # Used for cookies
-# Delete all after here
-SERVER_NAME = 'local.host'
-DEBUG = True
-WTF_CSRF_ENABLED = False
-WTF_CSRF_METHODS = []
 EOF
+
+
 
 source check_database.sh
 
