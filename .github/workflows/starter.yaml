@@ -70,6 +70,7 @@ jobs:
           docker create -e OVERWRITE_DATABASE=TRUE -e POSTGRES_PASSWORD=verysecret -e POSTGRES_DB=openatlas_test -e POSTGRES_USER=openatlas -e POSTGRES_HOST=postgres --name openatlas --network openatlas ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')/container-preview:${{ github.ref_name }}
           set -x
           cat <<EOF > testing.py
+          SERVER_NAME = 'local.host'
           DATABASE_NAME='openatlas_test'
           DATABASE_USER='openatlas'
           DATABASE_HOST='postgres'
