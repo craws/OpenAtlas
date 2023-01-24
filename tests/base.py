@@ -78,9 +78,16 @@ def insert_entity(
         class_: str,
         name: str,
         description: Optional[str] = None) -> Entity:
-    entity = Entity.insert(class_, name, description)
-    if class_ in ['artifact', 'feature', 'place', 'stratigraphic_unit']:
-        entity.link(
-            'P53',
-            Entity.insert('object_location', f'Location of {name}'))
+    with app.app_context():
+        with app.test_request_context():
+            app.preprocess_request()  # type: ignore
+            entity = Entity.insert(class_, name, description)
+            if class_ in ['artifact', 'feature', 'place', 'stratigraphic_unit']:
+                entity.link(
+                    'P53',
+                    Entity.insert('object_location', f'Location of {name}'))
     return entity
+
+
+def get_hierarchy(name: str) -> Type:
+    return Type.get_hierarchy(name)

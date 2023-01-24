@@ -4,8 +4,7 @@ from flask import g, url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
-from openatlas.models.type import Type
-from tests.base import TestBaseCase, insert_entity
+from tests.base import TestBaseCase, get_hierarchy, insert_entity
 
 
 class TypeTest(TestBaseCase):
@@ -14,10 +13,10 @@ class TypeTest(TestBaseCase):
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                actor_type = Type.get_hierarchy('Actor relation')
-                dimension_type = Type.get_hierarchy('Dimensions')
-                historical_type = Type.get_hierarchy('Historical place')
-                sex_type = Type.get_hierarchy('Sex')
+                actor_type = get_hierarchy('Actor relation')
+                dimension_type = get_hierarchy('Dimensions')
+                historical_type = get_hierarchy('Historical place')
+                sex_type = get_hierarchy('Sex')
                 place = insert_entity('place', 'Home')
                 place.link('P2', g.types[dimension_type.subs[0]], '46')
                 location = place.get_linked_entity_safe('P53')
@@ -93,7 +92,7 @@ class TypeTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Male' in rv.data
 
-            admin_unit_id = Type.get_hierarchy('Administrative unit').id
+            admin_unit_id = get_hierarchy('Administrative unit').id
             rv = self.app.get(
                 url_for('view', id_=admin_unit_id), follow_redirects=True)
             assert b'Austria' in rv.data
@@ -166,15 +165,11 @@ class TypeTest(TestBaseCase):
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                frodo = insert_entity('person', 'Frodo')
-                frodo.link(
-                    'P2',
-                    Entity.get_by_id(Type.get_hierarchy('Sex').subs[0]))
-                frodo.link(
-                    'P2',
-                    Entity.get_by_id(Type.get_hierarchy('Sex').subs[1]))
+                frog = insert_entity('person', 'Frog')
+                frog.link('P2', Entity.get_by_id(get_hierarchy('Sex').subs[0]))
+                frog.link('P2', Entity.get_by_id(get_hierarchy('Sex').subs[1]))
 
-            rv = self.app.get(url_for('update', id_=frodo.id))
+            rv = self.app.get(url_for('update', id_=frog.id))
             assert b'422' in rv.data  # Invalid multiple type links
 
             rv = self.app.post(
@@ -183,7 +178,7 @@ class TypeTest(TestBaseCase):
 
             rv = self.app.get(
                 url_for('show_multiple_linked_entities', id_=sex_type.id))
-            assert b'Frodo' in rv.data
+            assert b'Frog' in rv.data
 
             self.app.post(
                 url_for('hierarchy_update', id_=sex_type.id),

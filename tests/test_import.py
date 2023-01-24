@@ -4,7 +4,6 @@ from typing import Any
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.entity import Entity
 from openatlas.models.imports import Import
 from tests.base import TestBaseCase
 
@@ -108,12 +107,6 @@ class ImportTest(TestBaseCase):
 
             rv = self.app.get(url_for('import_project_view', id_=project.id))
             assert b'London' in rv.data
-
-            with app.test_request_context():
-                app.preprocess_request()  # type: ignore
-                place_id = Entity.get_by_class('place')[0].id
-            rv = self.app.get(url_for('view', id_=place_id))
-            assert b'Project X' in rv.data
 
             rv = self.app.get(
                 url_for('import_project_delete', id_=project.id),

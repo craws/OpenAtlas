@@ -9,11 +9,9 @@ class ArtifactTest(TestBaseCase):
 
     def test_artifact(self) -> None:
         with app.app_context():
-            with app.test_request_context():
-                app.preprocess_request()  # type: ignore
-                source = insert_entity('source', 'Necronomicon')
-                actor = insert_entity('person', 'Conan')
-                place = insert_entity('place', 'Home')
+            source = insert_entity('source', 'Necronomicon')
+            actor = insert_entity('person', 'Conan')
+            place = insert_entity('place', 'Home')
 
             rv = self.app.get(
                 url_for('insert', class_='artifact', origin_id=place.id))
