@@ -22,6 +22,10 @@ base, then run the database upgrade script, then restart Apache:
 ### 7.9.x to 7.10.0
 7.10.0.sql is needed but will be taken care of by the database upgrade script.
 
+#### For developers
+In case you are using tests you should take a look at 
+instance/example_testing.py and adapt your instance/testing.py accordingly.
+
 ### 7.8.x to 7.9.0
 7.9.0.sql is needed but will be taken care of by the database upgrade script.
 

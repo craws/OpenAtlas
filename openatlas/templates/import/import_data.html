@@ -6,7 +6,7 @@
       {{ _('download')|button(url_for('download_sql', filename=file_data.file))|safe }}
     </div>
   {% endif %}
-  {% if file_data.backup_too_old and not config.IS_UNIT_TEST %}
+  {% if file_data.backup_too_old %}
     <p>
       {{ _('There seems to be no recent backup, please make one') }}
       <a href="{{ url_for('export_sql') }}">{{ _('here') }}</a>.
