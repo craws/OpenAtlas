@@ -92,6 +92,7 @@ jobs:
           DEBUG = True
           EOF
           sudo chown 33:33 production.py testing.py
+          docker exec openatlas rm -rf /var/www/openatlas/instance/production.py
           docker cp -a production.py openatlas:/var/www/openatlas/instance/
           docker cp -a testing.py openatlas:/var/www/openatlas/instance/
           docker start openatlas
