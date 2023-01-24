@@ -11,6 +11,11 @@ class InvolvementTests(TestBaseCase):
 
     def test_involvement(self) -> None:
         with app.app_context():
+
+            with app.test_request_context():  # Create invalid dates
+                app.preprocess_request()  # type: ignore
+                actor = insert_entity('person', 'Captain Miller')
+
             rv: Any = self.app.post(
                 url_for('insert', class_='acquisition'),
                 data={
@@ -21,7 +26,6 @@ class InvolvementTests(TestBaseCase):
                     'end_year_from': '1951'})
             event_id = int(rv.location.split('/')[-1])
 
-            actor = insert_entity('person', 'Captain Miller')
             rv = self.app.post(
                 url_for(
                     'insert_relation',

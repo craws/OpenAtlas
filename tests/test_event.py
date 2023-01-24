@@ -11,15 +11,17 @@ class EventTest(TestBaseCase):
 
     def test_event(self) -> None:
         with app.app_context():
-            place_name = 'Lewis and Clark'
-            actor_name = 'Captain Miller'
-            actor = insert_entity('person', actor_name)
-            file = insert_entity('file', 'X-Files')
-            source = insert_entity('source', 'Necronomicon')
-            artifact = insert_entity('artifact', 'artifact')
-            residence = insert_entity('place', place_name)
-            reference = \
-                insert_entity('external_reference', 'https://openatlas.eu')
+            with app.test_request_context():  # Create invalid dates
+                app.preprocess_request()  # type: ignore
+                place_name = 'Lewis and Clark'
+                actor_name = 'Captain Miller'
+                actor = insert_entity('person', actor_name)
+                file = insert_entity('file', 'X-Files')
+                source = insert_entity('source', 'Necronomicon')
+                artifact = insert_entity('artifact', 'artifact')
+                residence = insert_entity('place', place_name)
+                reference = \
+                    insert_entity('external_reference', 'https://openatlas.eu')
 
             rv = self.app.get(url_for('insert', class_='activity'))
             assert b'+ Activity' in rv.data

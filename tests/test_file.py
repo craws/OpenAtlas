@@ -13,11 +13,11 @@ class FileTest(TestBaseCase):
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-            place = insert_entity('place', 'File keeper')
-            reference = insert_entity('edition', 'Ancient Books')
-            type_id = get_hierarchy('Sex').subs[0]
-            logo = pathlib.Path(app.root_path) \
-                / 'static' / 'images' / 'layout' / 'logo.png'
+                place = insert_entity('place', 'File keeper')
+                reference = insert_entity('edition', 'Ancient Books')
+                type_id = get_hierarchy('Sex').subs[0]
+                logo = pathlib.Path(app.root_path) \
+                    / 'static' / 'images' / 'layout' / 'logo.png'
 
             with open(logo, 'rb') as img_1, open(logo, 'rb') as img_2:
                 rv = self.app.post(

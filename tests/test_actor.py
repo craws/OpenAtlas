@@ -10,11 +10,10 @@ class ActorTests(TestBaseCase):
 
     def test_actor(self) -> None:
         with app.app_context():
-            place = insert_entity('place', 'Vienna')
-            event = insert_entity('acquisition', 'Event Horizon')
-            with app.app_context():
-                with app.test_request_context():
-                    app.preprocess_request()  # type: ignore
+            with app.test_request_context():
+                app.preprocess_request()  # type: ignore
+                place = insert_entity('place', 'Vienna')
+                event = insert_entity('acquisition', 'Event Horizon')
                 sex = get_hierarchy('Sex')
                 sex_sub_1 = g.types[sex.subs[0]]
                 sex_sub_2 = g.types[sex.subs[1]]
