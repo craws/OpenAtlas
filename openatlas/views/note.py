@@ -42,8 +42,8 @@ def note_view(id_: int) -> str:
                 url_for('note_set_private', id_=note['id']))]
     tabs = {'info': Tab(
         'info',
-        buttons=buttons,
-        content=f"<h1>{uc_first(_('note'))}</h1>{note['text']}")}
+        '<h1>' + uc_first(_('note')) + f"</h1>{note['text']}",
+        buttons=buttons)}
     return render_template(
         'tabs.html',
         tabs=tabs,
@@ -71,7 +71,11 @@ def note_insert(entity_id: int) -> Union[str, Response]:
     entity = Entity.get_by_id(entity_id)
     form = NoteForm()
     if form.validate_on_submit():
-        User.insert_note(entity_id, form.description.data, form.public.data)
+        User.insert_note(
+            entity_id,
+            current_user.id,
+            form.description.data,
+            form.public.data)
         flash(_('note added'), 'info')
         return redirect(f"{url_for('view', id_=entity.id)}#tab-note")
     return render_template(

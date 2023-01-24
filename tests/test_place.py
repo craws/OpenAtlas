@@ -7,8 +7,7 @@ from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.overlay import Overlay
-from openatlas.models.type import Type
-from tests.base import TestBaseCase
+from tests.base import TestBaseCase, get_hierarchy
 
 
 class PlaceTest(TestBaseCase):
@@ -20,29 +19,26 @@ class PlaceTest(TestBaseCase):
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                unit_type = Type.get_hierarchy('Administrative unit')
+                unit_type = get_hierarchy('Administrative unit')
                 unit_sub1 = g.types[unit_type.subs[0]]
                 unit_sub2 = g.types[unit_type.subs[1]]
-                human_remains_type = Type.get_hierarchy('Human remains')
+                human_remains_type = get_hierarchy('Human remains')
                 human_remains_type_sub = g.types[human_remains_type.subs[0]]
                 reference = Entity.insert(
                     'external_reference',
                     'https://openatlas.eu')
-                place_type = Type.get_hierarchy('Place')
+                place_type = get_hierarchy('Place')
                 source = Entity.insert('source', 'Necronomicon')
             data = {
                 'name': 'Asgard',
                 'alias-0': 'Valhöll',
                 unit_type.id: str([unit_sub1.id, unit_sub2.id]),
-                self.geonames: '123456',
-                self.precision_geonames: self.precision_type.subs[0],
-                self.precision_wikidata: ''}
+                self.geonames: ['123456', self.precision_type.subs[0]]}
             rv = self.app.post(
                 url_for('insert', class_='place', origin_id=reference.id),
                 data=data,
                 follow_redirects=True)
             assert b'Asgard' in rv.data and b'An entry has been' in rv.data
-
             rv = self.app.get(url_for('view', id_=self.precision_type.subs[0]))
             assert b'Asgard' in rv.data
 
@@ -280,9 +276,7 @@ class PlaceTest(TestBaseCase):
             # Subunits
             data = {
                 'name': "Try continue",
-                'continue_': 'sub',
-                self.precision_geonames: self.precision_type.subs[0],
-                self.precision_wikidata: ''}
+                'continue_': 'sub'}
             rv = self.app.post(
                 url_for('insert', class_='place'),
                 data=data,
@@ -332,9 +326,7 @@ class PlaceTest(TestBaseCase):
             data = {
                 'name': 'You never find me',
                 'artifact_super': strati_id,
-                Type.get_hierarchy('Dimensions').subs[0]: 50,
-                self.precision_geonames: self.precision_type.subs[0],
-                self.precision_wikidata: ''}
+                get_hierarchy('Dimensions').subs[0]: 50}
             rv = self.app.post(
                 url_for('insert', class_='artifact', origin_id=strati_id),
                 data=data)
@@ -358,9 +350,8 @@ class PlaceTest(TestBaseCase):
                 'name': 'My human remains',
                 'actor': actor.id,
                 'human_remains_super': strati_id,
-                human_remains_type.id: str([human_remains_type_sub.id]),
-                self.precision_geonames: self.precision_type.subs[0],
-                self.precision_wikidata: ''}
+                human_remains_type.id: str([human_remains_type_sub.id])
+            }
             rv = self.app.post(
                 url_for('insert', class_='human_remains', origin_id=strati_id),
                 data=data)
@@ -388,16 +379,16 @@ class PlaceTest(TestBaseCase):
             assert b'The entry has been deleted.' in rv.data
 
             # Anthropological features
-            rv = self.app.get(url_for('anthropology_index', id_=strati_id))
+            rv = self.app.get(url_for('tools_index', id_=strati_id))
             assert b'Sex estimation' in rv.data
 
             rv = self.app.get(url_for('sex', id_=strati_id))
-            assert b'Anthropological analyses' in rv.data
+            assert b'Sex estimation' in rv.data
 
             rv = self.app.post(
                 url_for('sex_update', id_=strati_id),
-                follow_redirects=True,
-                data={'Glabella': 'Female'})
+                data={'Glabella': 'Female'},
+                follow_redirects=True)
             assert b'-2.0' in rv.data
 
             rv = self.app.post(
@@ -408,6 +399,33 @@ class PlaceTest(TestBaseCase):
 
             rv = self.app.get(url_for('sex_update', id_=strati_id))
             assert b'Glabella' in rv.data
+
+            data = {
+                'lab_id': 'VERA',
+                'spec_id': 'S',
+                'radiocarbon_year': 1,
+                'range': 1}
+            self.app.post(url_for('carbon_update', id_=strati_id), data=data)
+            rv = self.app.post(
+                url_for('carbon_update', id_=strati_id),
+                data=data,
+                follow_redirects=True)
+            assert b'Changes have been saved' in rv.data
+
+            rv = self.app.get(url_for('view', id_=strati_id))
+            assert b'Radiocarbon dating' in rv.data
+            assert b'Sex estimation' in rv.data
+
+            rv = self.app.get(url_for('carbon_update', id_=strati_id))
+            assert b'VERA' in rv.data
+
+            rv = self.app.get(url_for('carbon', id_=strati_id))
+            assert b'VERA' in rv.data
+
+            rv = self.app.get(
+                url_for('sex_delete', id_=strati_id),
+                follow_redirects=True)
+            assert b'Tools' in rv.data
 
             rv = self.app.post(
                 url_for('update', id_=strati_id),

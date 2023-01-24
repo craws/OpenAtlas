@@ -3,7 +3,7 @@ import unittest
 from typing import Optional
 
 import psycopg2
-from flask import g
+from flask import g, url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
@@ -19,14 +19,16 @@ class TestBaseCase(unittest.TestCase):
         app.config['WTF_CSRF_METHODS'] = []  # Disable CSRF in tests
         self.setup_database()
         self.app = app.test_client()
-        self.login()  # Login on default because needed almost everywhere
+        self.login('Alice', logout=False)
         self.prepare_reference_system_form_data()
 
-    def login(self) -> None:
+    def login(self, name: str, logout: bool = True) -> None:
         with app.app_context():
+            if logout:
+                self.app.get(url_for('logout'))
             self.app.post(
-                '/login',
-                data={'username': 'Alice', 'password': 'test'})
+                url_for('login'),
+                data={'username': name, 'password': 'test'})
 
     def setup_database(self) -> None:
         connection = psycopg2.connect(
@@ -57,12 +59,8 @@ class TestBaseCase(unittest.TestCase):
                 Type.get_hierarchy('External reference match')
             self.geonames = \
                 f'reference_system_id_{g.reference_system_geonames.id}'
-            self.precision_geonames = \
-                f'reference_system_precision_{g.reference_system_geonames.id}'
             self.wikidata = \
                 f'reference_system_id_{g.reference_system_wikidata.id}'
-            self.precision_wikidata = \
-                f'reference_system_precision_{g.reference_system_wikidata.id}'
 
 
 class ApiTestCase(TestBaseCase):
@@ -77,12 +75,19 @@ class ApiTestCase(TestBaseCase):
 
 
 def insert_entity(
-        name: str,
         class_: str,
+        name: str,
         description: Optional[str] = None) -> Entity:
-    entity = Entity.insert(class_, name, description)
-    if class_ in ['artifact', 'feature', 'place', 'stratigraphic_unit']:
-        entity.link(
-            'P53',
-            Entity.insert('object_location', f'Location of {name}'))
+    with app.app_context():
+        with app.test_request_context():
+            app.preprocess_request()  # type: ignore
+            entity = Entity.insert(class_, name, description)
+            if class_ in ['artifact', 'feature', 'place', 'stratigraphic_unit']:
+                entity.link(
+                    'P53',
+                    Entity.insert('object_location', f'Location of {name}'))
     return entity
+
+
+def get_hierarchy(name: str) -> Type:
+    return Type.get_hierarchy(name)

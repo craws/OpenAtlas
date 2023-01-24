@@ -1,24 +1,24 @@
-<h1>{{ _('data integrity checks')|uc_first }}</h1>
-<div class="toolbar">
-  {{ 'admin/data_integrity_checks'|manual|safe }}
-  {{ _('orphans')|button(url_for('admin_orphans'))|safe }}
-  {{ _('dates')|button(url_for('admin_check_dates'))|safe }}
-  {{ _('similar names')|button(url_for('admin_check_similar'))|safe }}
-  {{ _('links')|button(url_for('admin_check_links'))|safe }}
-  {{ _('link duplicates')|button(url_for('admin_check_link_duplicates'))|safe }}
+<h1 class="mb-1">{{ _('data integrity checks')|uc_first }}</h1>
+<div class="row g-1 d-flex align-items-center">
+  <div class="col-auto">{{ 'admin/data_integrity_checks'|manual|safe }}</div>
+  <div class="col-auto">{{ _('orphans')|button(url_for('admin_orphans'))|safe }}</div>
+  <div class="col-auto">{{ _('dates')|button(url_for('admin_check_dates'))|safe }}</div>
+  <div class="col-auto">{{ _('similar names')|button(url_for('admin_check_similar'))|safe }}</div>
+  <div class="col-auto">{{ _('links')|button(url_for('admin_check_links'))|safe }}</div>
+  <div class="col-auto">{{ _('link duplicates')|button(url_for('admin_check_link_duplicates'))|safe }}</div>
 </div>
 {% if 'manager'|is_authorized or imports %}
-  <h1>{{ _('data transfer')|uc_first }}</h1>
-  <div class="toolbar">
-    {{ _('import')|button(url_for('import_index'))|safe }}
-    {{ ('CSV ' + _('export'))|button(url_for('api_03.export_database', format_='csv'))|safe }}
-    {{ ('JSON ' + _('export'))|button(url_for('api_03.export_database', format_='json'))|safe }}
-    {{ ('XML ' + _('export'))|button(url_for('api_03.export_database', format_='xml'))|safe }}
+  <h1 class="mb-1">{{ _('data transfer')|uc_first }}</h1>
+  <div class="row g-1 d-flex align-items-center">
+    <div class="col-auto">{{ _('import')|button(url_for('import_index'))|safe }}</div>
+    <div class="col-auto">{{ ('CSV ' + _('export'))|button(url_for('api_03.export_database', format_='csv'))|safe }}</div>
+    <div class="col-auto">{{ ('JSON ' + _('export'))|button(url_for('api_03.export_database', format_='json'))|safe }}</div>
+    <div class="col-auto">{{ ('XML ' + _('export'))|button(url_for('api_03.export_database', format_='xml'))|safe }}</div>
     {% if 'manager'|is_authorized %}
-      {{ ('SQL ' + _('export'))|button(url_for('export_sql'))|safe }}
+      <div class="col-auto">{{ ('SQL ' + _('export'))|button(url_for('export_sql'))|safe }}</div>
     {% endif %}
     {% if 'admin'|is_authorized %}
-      {{ _('execute SQL')|button(url_for('sql_index'))|safe }}
+      <div class="col-auto">{{ _('execute SQL')|button(url_for('sql_index'))|safe }}</div>
     {% endif %}
     {% if config.ARCHE['id'] %}
       {{ 'ARCHE'|button(url_for('arche_index'))|safe }}
@@ -26,19 +26,19 @@
   </div>
 {% endif %}
 {% if 'admin'|is_authorized and g.settings.image_processing %}
-  <div class="toolbar">
-    <h1>{{ _('image processing')|uc_first }}</h1>
-    {{ 'admin/file'|manual|safe }}
-    {{ _('create resized images')|button(url_for('admin_resize_images'))|safe }}
-    {{ _('delete orphaned resized images')|button(url_for('admin_delete_orphaned_resized_images'))|safe }}
+  <div class="row g-1 d-flex align-items-center mt-3">
+    <h1 class="mb-1">{{ _('image processing')|uc_first }}</h1>
+    <div class="col-auto">{{ 'admin/file'|manual|safe }}</div>
+    <div class="col-auto">{{ _('create resized images')|button(url_for('admin_resize_images'))|safe }}</div>
+    <div class="col-auto">{{ _('delete orphaned resized images')|button(url_for('admin_delete_orphaned_resized_images'))|safe }}</div>
   </div>
 {% endif %}
 {% if 'manager'|is_authorized %}
-  <div class="toolbar">
-    <h1>{{ 'API'|uc_first }}</h1>
-      {{ 'admin/api'|manual|safe }}
+  <div class="row g-1 d-flex align-items-center mt-3">
+    <h1 class="mb-1">{{ 'API'|uc_first }}</h1>
+      <div class="col-auto">{{ 'admin/api'|manual|safe }}</div>
       {% if 'manager'|is_authorized %}
-        {{ _('edit')|button(url_for('admin_settings', category='api'))|safe }}
+        <div class="col-auto">{{ _('edit')|button(url_for('admin_settings', category='api'))|safe }}</div>
       {% endif %}
   </div>
   {{ info|display_info|safe }}

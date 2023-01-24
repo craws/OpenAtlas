@@ -8,7 +8,7 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
     button, delete_link, edit_link, format_entity_date, get_base_table_data,
-    get_file_path, is_authorized, link, remove_link, uc_first)
+    get_file_path, is_authorized, link, remove_link)
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
 
@@ -63,7 +63,7 @@ class FileDisplay(BaseDisplay):
                 url_for('download_file', filename=path.name)))
             return
         self.buttons.append(
-            '<span class="error">' + uc_first(_("missing file")) + '</span>')
+            '<span class="error">' + _("missing file") + '</span>')
 
     def add_tabs(self) -> None:
         super().add_tabs()
@@ -283,7 +283,7 @@ class StratigraphicUnitDisplay(PlaceBaseDisplay):
         super().add_buttons()
         self.buttons.append(button(
             _('tools'),
-            url_for('anthropology_index', id_=self.entity.id)))
+            url_for('tools_index', id_=self.entity.id)))
 
 
 class TypeDisplay(TypeBaseDisplay):

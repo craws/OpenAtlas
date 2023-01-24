@@ -1,27 +1,32 @@
-<input
-  id="{{ field.id }}-button"
-  name="{{ field.id }}-button"
-  type="text"
-  class="table-select {% if field.flags.required %}required{% endif %}"
-  onfocus="this.blur()"
-  onclick="$('#{{ field.id }}-modal').modal('show')"
-  readonly="readonly"
-  value="{{ selection|safe }}"
-  placeholder="{{ _('change')|uc_first }}">
-<a
-  href="#"
-  id="{{ field.id }}-clear"
-  {% if not selection %}style="display: none;"{% endif %}
-  class="{{ config.CSS.button.secondary }}"
-  onclick="clearSelect('{{ field.id }}');">
-  {{ _('clear')|uc_first }}
-</a>
+<div class="row g-1">
+  <div class="col">
+    <input
+        id="{{ field.id }}-button"
+        name="{{ field.id }}-button"
+        type="text"
+        class="{{ config.CSS.string_field }} table-select "
+        onfocus="this.blur()"
+        onclick="$('#{{ field.id }}-modal').modal('show')"
+        readonly="readonly"
+        value="{{ selection|safe }}"
+        placeholder="{{ _('change')|uc_first }}">
+  </div>
+  <div id="{{ field.id }}-clear-field" class="col-auto" {% if not selection %}style="display: none;"{% endif %}>
+    <a
+        href="#"
+        id="{{ field.id }}-clear"
+        class="{{ config.CSS.button.secondary }}"
+        onclick="clearSelect('{{ field.id }}');">
+      {{ _('clear')|uc_first }}
+    </a>
+  </div>
+</div>
 <div
-  id="{{ field.id }}-modal"
-  class="modal fade"
-  tabindex="-1"
-  role="dialog"
-  aria-hidden="true">
+    id="{{ field.id }}-modal"
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -29,36 +34,37 @@
           {{ root.name|uc_first }}
         </h5>
         <button
-          type="button"
-          class="{{ config.CSS.button.primary }}"
-          data-bs-dismiss="modal"
-          aria-label="Close">
+            type="button"
+            class="{{ config.CSS.button.primary }}"
+            data-bs-dismiss="modal"
+            aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        <input
-          class="tree-filter"
-          id="{{ field.id }}-tree-search"
-          placeholder="{{ _('type to search')|uc_first }}"
-          type="text">
-        {% if field.form %}
-          <button type="button" id="add-{{ type }}--{{ field.id }}"
-                  class="btn-outline-primary btn-xsm btn"
-                  data-bs-toggle="modal"
-                  data-bs-target="#add-type-modal-{{ field.id }}">
-            + {{  _('type')|uc_first if root.category == 'standard' else root.name }}
-          </button>
-        {% endif %}
-
+        <div class="d-flex">
+          <input
+              class="tree-filter {{ config.CSS.string_field }}"
+              id="{{ field.id }}-tree-search"
+              placeholder="{{ _('type to search')|uc_first }}"
+              type="text">
+          {% if field.form %}
+            <button type="button" id="add-{{ type }}--{{ field.id }}"
+                    class="btn-outline-primary btn text-nowrap ms-1"
+                    data-bs-toggle="modal"
+                    data-bs-target="#add-type-modal-{{ field.id }}">
+              + {{ _('type')|uc_first if root.category == 'standard' else root.name }}
+            </button>
+          {% endif %}
+        </div>
         <div id="{{ field.id }}-tree"
              style="text-align: left!important;"></div>
       </div>
       <div class="modal-footer">
         <button
-          type="button"
-          class="{{ config.CSS.button.primary }}"
-          data-bs-dismiss="modal">
+            type="button"
+            class="{{ config.CSS.button.primary }}"
+            data-bs-dismiss="modal">
           {{ _('close')|uc_first }}
         </button>
       </div>
@@ -72,12 +78,12 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5
-            class="modal-title">{{ _('Add Type to %(hierarchy)s', hierarchy= _(root.name)|uc_first|safe) }}</h5>
+              class="modal-title">{{ _('Add Type to %(hierarchy)s', hierarchy= _(root.name)|uc_first|safe) }}</h5>
           <button
-            type="button"
-            class="{{ config.CSS.button.primary }}"
-            data-bs-dismiss="modal"
-            aria-label="Close">
+              type="button"
+              class="{{ config.CSS.button.primary }}"
+              data-bs-dismiss="modal"
+              aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -95,27 +101,27 @@
     </div>
   </div>
   <script>
-    $("#add-type-modal-{{field.id}} #name-dynamic").on('keyup change', function () {
-      if ($(this).val() === '')
-        $('#{{field.id}}-add-type').attr('disabled', '')
-      else
-        $('#{{field.id}}-add-type').removeAttr('disabled')
-    });
+      $("#add-type-modal-{{field.id}} #name-dynamic").on('keyup change', function () {
+          if ($(this).val() === '')
+              $('#{{field.id}}-add-type').attr('disabled', '')
+          else
+              $('#{{field.id}}-add-type').removeAttr('disabled')
+      });
 
-    $('#{{field.id}}-add-type').on('click', async function (e) {
-      const name = $("#add-type-modal-{{field.id}} #name-dynamic").val();
-      const superType = $("#{{field.id}}-dynamic").val() ||{{field.type_id}};
-      const description = $("#add-type-modal-{{field.id}} #description-dynamic").val();
-      const data = {name, superType, description};
-      const typeId = await ajaxAddType(data, {{field.id}}, {{field.type_id}});
-      selectFromTree('{{field.type_id}}', typeId, name);
-      e.preventDefault();
-    });
+      $('#{{field.id}}-add-type').on('click', async function (e) {
+          const name = $("#add-type-modal-{{field.id}} #name-dynamic").val();
+          const superType = $("#{{field.id}}-dynamic").val() ||{{field.type_id}};
+          const description = $("#add-type-modal-{{field.id}} #description-dynamic").val();
+          const data = {name, superType, description};
+          const typeId = await ajaxAddType(data, {{field.id}}, {{field.type_id}});
+          selectFromTree('{{field.type_id}}', typeId, name);
+          e.preventDefault();
+      });
   </script>
 {% endif %}
 <script>
-  variables['{{field.id}}-isAddDynamicall'] = '{{field.form}}' !== 'None';
-  if (variables['{{field.id}}-isAddDynamicall'])
-    $("#{{ field.id }}-modal .toolbar").hide()
-  fillTreeSelect('{{field.id}}', {{data |safe}}, {{ g.settings.minimum_jstree_search }})
+    variables['{{field.id}}-isAddDynamicall'] = '{{field.form}}' !== 'None';
+    if (variables['{{field.id}}-isAddDynamicall'])
+        $("#{{ field.id }}-modal .toolbar").hide()
+    fillTreeSelect('{{field.id}}', {{data |safe}}, {{ g.settings.minimum_jstree_search }})
 </script>

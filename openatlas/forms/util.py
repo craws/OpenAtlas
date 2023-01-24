@@ -38,7 +38,7 @@ def get_form_settings(form: Any, profile: bool = False) -> dict[str, str]:
         elif field.name in g.settings:
             value = g.settings[field.name]
         else:
-            value = ''  # In case of a missing setting after an update
+            value = ''  # pragma: no cover - if missing setting after an update
         if field.type in ['StringField', 'IntegerField']:
             settings[label] = value
         if field.type == 'BooleanField':  # str() needed for templates
@@ -82,7 +82,7 @@ def set_form_settings(form: Any, profile: bool = False) -> None:
             field.data = ' '.join(g.settings[field.name])
             continue
         if field.name not in g.settings:  # pragma: no cover
-            field.data = ''  # In case of a missing setting after an update
+            field.data = ''  # If missing setting after an update
             continue
         field.data = g.settings[field.name]
 
@@ -293,3 +293,10 @@ def format_name_and_aliases(entity: Entity, field_id: str) -> str:
             html += alias if i else f'<p>{alias}</p>'
         return html
     return link
+
+
+def value_type_expand_icon(type_: Type) -> str:
+    return f'''<i onclick="switch_value_type({type_.id},this)" 
+                role="button" 
+                id="value-type-switcher-{type_.id}" 
+                class="fa fa-chevron-right value-type-switcher input-height-sm"></i>'''

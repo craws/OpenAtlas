@@ -1,69 +1,82 @@
 {% extends 'layout.html' %}
 {% block content %}
-<div class="row">
-  <div class="col-2">
-    <form method="post">
-      {{ form.csrf_token }}
-      {{ form.term(placeholder=_('search term')|uc_first) }}<br><br>
-      {{ form.own }} {{ form.own.label }}<br>
-      {{ form.desc }} {{ form.desc.label }}<br>
-
-      <h2>{{ _('date')|uc_first }}</h2>
-      <span style="display:inline-block;width:3em;">{{ _('from')|uc_first }}</span>
-      {{ form.begin_year(class_='year') }}
-      {{ form.begin_month(class_='month') }}
-      {{ form.begin_day(class_='day') }}
-      {% if form.errors.begin_year %}
-        <span class="error">{{ form.errors.begin_year[0]|safe }}</span>
-      {% endif %}
-      <br>
-
-      <span style="display:inline-block;width:3em;">{{ _('to')|uc_first }}</span>
-      {{ form.end_year(class_='year') }}
-      {{ form.end_month(class_='month') }}
-      {{ form.end_day(class_='day') }} <br>
-      {{ form.include_dateless }} {{ form.include_dateless.label }}
-
-      <h2>{{ _('classes')|uc_first }}</h2>
-      <p id="select_all" class="select_all">
-        {{ _('deselect all')|uc_first }}
-      </p>
-      {{ form.classes }}
-
-      <div class="toolbar">
-        {{ 'tools/search'|manual|safe }}
-        {{ form.search(class_=config.CSS.button.primary)|safe }}
-      </div>
-    </form>
+  <div class="row">
+    <div class="col-3">
+      <form method="post">
+        {{ form.csrf_token }}
+        <div class="row">
+          <div
+              class="col-12">{{ form.term(placeholder=_('search term')|uc_first, class_=config.CSS.string_field) }}</div>
+          <div class="col-12">{{ form.own }} {{ form.own.label }}</div>
+          <div class="col-12">{{ form.desc }} {{ form.desc.label }}</div>
+          <div class="col-12">
+            <p class="fs-5 mb-0">{{ _('date')|uc_first }}</p>
+            <span style="display:inline-block;width:3em;">{{ _('from')|uc_first }}</span>
+            <div class="row g-1">
+              <div class="col-4">{{ form.begin_year(class_='year ' + config.CSS.string_field) }}</div>
+              <div class="col-4">{{ form.begin_month(class_='month ' + config.CSS.string_field) }}</div>
+              <div class="col-4">{{ form.begin_day(class_='day ' + config.CSS.string_field) }}</div>
+              {% if form.errors.begin_year %}
+                <span class="error">{{ form.errors.begin_year[0]|safe }}</span>
+              {% endif %}
+            </div>
+            <span style="display:inline-block;width:3em;">{{ _('to')|uc_first }}</span>
+            <div class="row g-1">
+              <div class="col-4">{{ form.end_year(class_='year ' + config.CSS.string_field) }}</div>
+              <div class="col-4">{{ form.end_month(class_='month ' + config.CSS.string_field) }}</div>
+              <div class="col-4">{{ form.end_day(class_='day ' + config.CSS.string_field) }}</div>
+              <div
+                  class="col-12 d-flex">{{ form.include_dateless(class_="me-1") }} {{ form.include_dateless.label }}</div>
+            </div>
+          </div>
+          <div class="col-12">
+            <p class="mb-0">
+              <span class="fs-5 mb-0">{{ _('classes')|uc_first }}</span>
+              (<a role="button" id="select_all" class="select_all">
+              {{ _('deselect all') }}
+            </a>)
+            </p>
+            {{ form.classes }}
+            <div class="row g-2 d-flex align-items-center">
+              <div class="col-auto">{{ 'tools/search'|manual|safe }}</div>
+              {{ form.search(class_=config.CSS.button.primary + " col")|safe }}
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="col-9">
+      {{ table.display()|safe }}
+    </div>
   </div>
-  <div class="col-10">
-    {{ table.display()|safe }}
-  </div>
-</div>
 {% endblock %}
 
 {% block script %}
   <script>
-    $(document).ready(function () {
-      $("#classes :checkbox").change(function() {
-        if ($("#classes :checkbox").length == $("#classes :checkbox:checked").length) {
-          $("#select_all").html('{{ _('deselect all')|uc_first }}');
-        } else {
-          $("#select_all").html('{{ _('select all')|uc_first }}');
-        }
-      });
+      $(document).ready(function () {
+          $("#classes :checkbox").change(function () {
+              if ($("#classes :checkbox").length == $("#classes :checkbox:checked").length) {
+                  $("#select_all").html('{{ _('deselect all')|uc_first }}');
+              } else {
+                  $("#select_all").html('{{ _('select all')|uc_first }}');
+              }
+          });
 
-      $("#select_all").click(function() {
-        if ($("#classes :checkbox").length == $("#classes :checkbox:checked").length) {
-          $("#classes :checkbox").each(function(){this.checked = false;});
-          $("#select_all").html('{{ _('select all')|uc_first }}');
-        } else {
-          $("#classes :checkbox").each(function(){this.checked = true;});
-          $("#select_all").html('{{ _('deselect all')|uc_first }}');
-        }
-      });
+          $("#select_all").click(function () {
+              if ($("#classes :checkbox").length == $("#classes :checkbox:checked").length) {
+                  $("#classes :checkbox").each(function () {
+                      this.checked = false;
+                  });
+                  $("#select_all").html('{{ _('select all')|uc_first }}');
+              } else {
+                  $("#classes :checkbox").each(function () {
+                      this.checked = true;
+                  });
+                  $("#select_all").html('{{ _('deselect all')|uc_first }}');
+              }
+          });
 
-      $("#classes-0").trigger("change");
-    })
+          $("#classes-0").trigger("change");
+      })
   </script>
 {% endblock %}

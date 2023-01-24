@@ -32,18 +32,18 @@ def validate(form: FlaskForm) -> bool:
         if not validate_dates(form):
             valid = False
     for field_id, field in form.__dict__.items():  # External reference systems
-        if field_id.startswith('reference_system_id_') and field.data:
-            if not getattr(form, field_id.replace('id_', 'precision_')).data:
+        if field_id.startswith('reference_system_id_') and field.data and field.data['value']:
+            if not field.data['precision']:
                 valid = False
                 field.errors.append(uc_first(_('precision required')))
             if field.label.text == 'Wikidata':
-                if field.data[0].upper() != 'Q' \
-                        or not field.data[1:].isdigit():
+                if field.data['value'][0].upper() != 'Q' \
+                        or not field.data['value'][1:].isdigit():
                     field.errors.append(uc_first(_('wrong id format')))
                     valid = False
                 else:
-                    field.data = uc_first(field.data)
-            if field.label.text == 'GeoNames' and not field.data.isnumeric():
+                    field.data['value'] = uc_first(field.data['value'])
+            if field.label.text == 'GeoNames' and not field.data['value'].isnumeric():
                 field.errors.append(uc_first(_('wrong id format')))
                 valid = False
     return valid
@@ -83,11 +83,11 @@ def validate_dates(form: FlaskForm) -> bool:
             if f'{prefix}_from' in dates \
                     and f'{prefix}_to' in dates \
                     and dates[f'{prefix}_from'] > dates[f'{prefix}_to']:
-                field = getattr(form, f'{prefix}_day_from')
+                field = getattr(form, f'{prefix}_year_from')
                 field.errors.append(_('First date cannot be after second.'))
                 valid = False
     if 'begin_from' in dates and 'end_from' in dates:
-        field = getattr(form, 'begin_day_from')
+        field = getattr(form, 'begin_year_from')
         if len(dates) == 4:  # All dates are used
             if dates['begin_from'] > dates['end_from'] \
                     or dates['begin_to'] > dates['end_to']:

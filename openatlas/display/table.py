@@ -31,7 +31,7 @@ class Table:
 
     def display(self, name: str = 'default') -> str:
         if not self.rows:
-            return '<p>' + uc_first(_('no entries')) + '</p>'
+            return '<p class="uc-first">' + _('no entries') + '</p>'
         self.defs.append({
             'className': 'dt-body-right',
             'targets': [
@@ -41,8 +41,7 @@ class Table:
             'data': self.rows,
             'stateSave': 'true',
             'columns':
-                [{'title': uc_first(_(item)) if item else ''}
-                 for item in self.header] +
+                [{'title': uc_first(_(i)) if i else ''} for i in self.header] +
                 [{'title': ''}  # Add empty
                  for _item in range(len(self.rows[0]) - len(self.header))],
             'paging': self.paging,

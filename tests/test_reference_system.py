@@ -88,9 +88,8 @@ class ReferenceSystemTest(TestBaseCase):
                 url_for('insert', class_='person'),
                 data={
                     'name': 'Actor test',
-                    self.wikidata: 'Q123',
-                    self.precision_geonames: '',
-                    self.precision_wikidata: self.precision_type.subs[0]})
+                    self.wikidata: ['Q123', self.precision_type.subs[0]],
+                    })
             person_id = rv.location.split('/')[-1]
             rv = self.app.get(
                 url_for('view', id_=g.reference_system_wikidata.id))
@@ -119,9 +118,8 @@ class ReferenceSystemTest(TestBaseCase):
                 url_for('insert', class_='person'),
                 data={
                     'name': 'Actor with Wikidata but without precision',
-                    self.wikidata: 'Q123',
-                    self.precision_geonames: '',
-                    self.precision_wikidata: ''})
+                    self.wikidata: ['Q123', ''],
+                    })
             assert b'required' in rv.data
 
             rv = self.app.get(
@@ -136,18 +134,16 @@ class ReferenceSystemTest(TestBaseCase):
                 url_for('insert', class_='person'),
                 data={
                     'name': 'Actor with invalid Wikidata id',
-                    self.wikidata: 'invalid id',
-                    self.precision_geonames: '',
-                    self.precision_wikidata: self.precision_type.subs[0]})
+                    self.wikidata: ['invalid id', ''],
+                })
             assert b'Wrong id format' in rv.data
 
             rv = self.app.post(
                 url_for('insert', class_='place'),
                 data={
                     'name': 'Reference test',
-                    self.geonames: 'invalid id',
-                    self.precision_geonames: '',
-                    self.precision_wikidata: ''})
+                    self.geonames: ['invalid id', ''],
+                    })
             assert b'Wrong id format' in rv.data
 
             rv = self.app.get(

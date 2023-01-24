@@ -20,6 +20,8 @@ base, then run the database upgrade script, then restart Apache:
     sudo service apache2 restart
 
 ### 7.9.x to 7.10.0
+7.10.0.sql is needed but will be taken care of by the database upgrade script.
+
 Install python3-requests for new feature API: fetch data from ARCHE (#1848):
 
     # apt install python3-requests

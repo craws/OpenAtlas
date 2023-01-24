@@ -102,8 +102,13 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
                 url_for('remove_class', id_=hierarchy.id, name=name))])
     return render_template(
         'content.html',
-        content=display_form(manager.form, manual_page='entity/type')
-        + table.display(),
+        content=f'''
+            <div class="row">
+              <div class="col-12 col-sm-6">
+                {display_form(manager.form, manual_page='entity/type')}
+              </div>
+              <div class="col-12 col-sm-6">{table.display()}</div>
+            </div>''',
         title=_('types'),
         crumbs=[[_('types'), url_for('type_index')], hierarchy, _('edit')])
 

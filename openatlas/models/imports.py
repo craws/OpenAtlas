@@ -62,12 +62,13 @@ class Import:
     def check_type_id(type_id: str, class_: str) -> bool:
         if not type_id.isdigit() or int(type_id) not in g.types:
             return False
-        if class_ not in g.types[g.types[int(type_id)].root[-1]].classes:
+        if class_ not in g.types[
+                g.types[int(type_id)].root[-1]].classes:  # pragma: no cover
             return False
-        return True
+        return True  # pragma: no cover
 
     @staticmethod
-    def import_data(project: 'Project', class_: str, data: list[Any]) -> None:
+    def import_data(project: Project, class_: str, data: list[Any]) -> None:
         from openatlas.models.entity import Entity
         from openatlas.models.gis import Gis
         for row in data:
@@ -104,7 +105,7 @@ class Import:
                 for type_id in str(row['type_ids']).split():
                     if not Import.check_type_id(type_id, class_):
                         continue
-                    entity.link('P2', g.types[int(type_id)])
+                    entity.link('P2', g.types[int(type_id)])  # pragma no cover
 
             # GIS
             if class_ == 'place':

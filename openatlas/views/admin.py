@@ -115,17 +115,17 @@ def admin_index(
     tabs = {
         'files': Tab(
             _('files'),
+            render_template(
+                'admin/file.html',
+                info=get_form_settings(FilesForm()),
+                disk_space_info=get_disk_space_info()),
             buttons=[
                 manual('entity/file'),
                 button(_('edit'), url_for('admin_settings', category='files'))
                 if is_authorized('manager') else '',
                 button(_('list'), url_for('index', view='file')),
                 button(_('file'), url_for('insert', class_='file'))
-                if is_authorized('contributor') else ''],
-            content=render_template(
-                'admin/file.html',
-                info=get_form_settings(FilesForm()),
-                disk_space_info=get_disk_space_info())),
+                if is_authorized('contributor') else '']),
         'user': Tab(
             _('user'),
             table=tables['user'],
@@ -141,7 +141,7 @@ def admin_index(
     if is_authorized('admin'):
         tabs['general'] = Tab(
             'general',
-            content=display_info(get_form_settings(GeneralForm())),
+            display_info(get_form_settings(GeneralForm())),
             buttons=[
                 manual('admin/general'),
                 button(
@@ -150,7 +150,7 @@ def admin_index(
                 button(_('system log'), url_for('admin_log'))])
         tabs['email'] = Tab(
             'email',
-            content=display_info(get_form_settings(MailForm())),
+            display_info(get_form_settings(MailForm())),
             buttons=[
                 manual('admin/mail'),
                 button(_('edit'), url_for('admin_settings', category='mail'))])
@@ -159,9 +159,8 @@ def admin_index(
     if is_authorized('manager'):
         tabs['modules'] = Tab(
             _('modules'),
-            content=f"""
-                <h1>{_('Defaults for new user')}</h1>
-                {display_info(get_form_settings(ModulesForm()))}""",
+            '<h1>' + uc_first(_('defaults for new user')) + '</h1>'
+            + display_info(get_form_settings(ModulesForm())),
             buttons=[
                 manual('admin/modules'),
                 button(
@@ -169,16 +168,16 @@ def admin_index(
                     url_for('admin_settings', category='modules'))])
         tabs['map'] = Tab(
             'map',
-            content=display_info(get_form_settings(MapForm())),
+            display_info(get_form_settings(MapForm())),
             buttons=[
                 manual('admin/map'),
                 button(_('edit'), url_for('admin_settings', category='map'))])
         tabs['content'] = Tab(
             'content',
-            content=tables['content'].display(),
+            tables['content'].display(),
             buttons=[manual('admin/content')])
     if is_authorized('contributor'):
-        tabs['data'] = Tab('data', content=render_template(
+        tabs['data'] = Tab('data', render_template(
             'admin/data.html',
             imports=Import.get_all_projects(),
             info=get_form_settings(ApiForm())))
@@ -388,7 +387,7 @@ def admin_check_similar() -> str:
     content += uc_first(_('no entries')) if table and not table.rows else ''
     return render_template(
         'tabs.html',
-        tabs={'similar': Tab('similar', table=table, content=content)},
+        tabs={'similar': Tab('similar', content, table=table)},
         title=_('admin'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],

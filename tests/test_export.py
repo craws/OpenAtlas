@@ -14,12 +14,11 @@ class ExportTest(TestBaseCase):
             rv = self.app.get(url_for('export_sql'))
             assert b'Export SQL' in rv.data
 
-            date_string = current_date_for_filename()  # Less error before
+            date_ = current_date_for_filename()
             rv = self.app.post(url_for('export_sql'), follow_redirects=True)
             assert b'Data was exported as SQL' in rv.data
 
-            self.app.get(
-                url_for('download_sql', filename=f'{date_string}_dump.sql'))
+            self.app.get(url_for('download_sql', filename=f'{date_}_dump.sql'))
             rv = self.app.get(url_for('sql_index'))
             assert b'Warning' in rv.data
 
@@ -37,15 +36,12 @@ class ExportTest(TestBaseCase):
             assert b'relation "fail" does not exist' in rv.data
 
             rv = self.app.get(
-                url_for(
-                    'delete_export',
-                    type_='sql',
-                    filename=f'{date_string}_dump.sql.7z'),
+                url_for('delete_export', filename=f'{date_}_dump.sql.7z'),
                 follow_redirects=True)
             if os.name == 'posix':
                 assert b'File deleted' in rv.data
 
             rv = self.app.get(
-                url_for('delete_export', type_='sql', filename='non_existing'),
+                url_for('delete_export', filename='non_existing'),
                 follow_redirects=True)
             assert b'An error occurred when trying to delete the f' in rv.data

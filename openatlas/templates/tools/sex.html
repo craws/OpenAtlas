@@ -1,7 +1,4 @@
-{% extends "layout.html" %}
-{% block content %}
-  {{ buttons|button_bar|safe }}
-  <h1>{{ _('sex estimation')|uc_first }} - {{ entity.name }}</h1>
+
   <p>
     {{ result|safe }}
   </p>
@@ -34,4 +31,3 @@
       </div>
     {% endfor %}
   </div>
-{% endblock %}

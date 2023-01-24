@@ -8,16 +8,15 @@ class DateTest(TestBaseCase):
 
     def test_date(self) -> None:
         with app.app_context():
-            data = {  # don't change year values, they also leap years
+            data = {  # Don't change year values, needed for leap years
                 'name': 'Date place',
                 'begin_year_from': -1949,
                 'begin_month_from': 2,
                 'begin_day_from': 8,
                 'begin_year_to': -1948,
                 'end_year_from': 1996,
-                'end_year_to': 1996,
-                self.precision_geonames: '',
-                self.precision_wikidata: ''}
+                'end_year_to': 1996}
+
             rv = self.app.post(
                 url_for('insert', class_='place'),
                 data=data,

@@ -10,6 +10,13 @@ class MailTests(TestBaseCase):
 
     def test_mail(self) -> None:
         with app.app_context():
+
+            rv = self.app.post(
+                url_for('admin_newsletter'),
+                data={'subject': 'test', 'body': 'test', 'recipient': []},
+                follow_redirects=True)
+            assert b'Newsletter send: 0' in rv.data
+
             rv: Any = self.app.post(
                 url_for('admin_settings', category='mail'),
                 follow_redirects=True,

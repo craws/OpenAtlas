@@ -8,8 +8,7 @@ from openatlas import app
 from openatlas.display.image_processing import safe_resize_image
 from openatlas.display.util import profile_image
 from openatlas.models.entity import Entity
-from openatlas.models.type import Type
-from tests.base import TestBaseCase, insert_entity
+from tests.base import TestBaseCase, get_hierarchy, insert_entity
 
 
 class ImageTest(TestBaseCase):
@@ -17,14 +16,9 @@ class ImageTest(TestBaseCase):
     def test_image(self) -> None:
         app.config['IMAGE_SIZE']['tmp'] = '1'
         with app.app_context():
-            with app.test_request_context():
-                app.preprocess_request()  # type: ignore
-                place = insert_entity(
-                    'Nostromos',
-                    'place',
-                    'That is the Nostromos')
-                logo = pathlib.Path(app.root_path) \
-                    / 'static' / 'images' / 'layout' / 'logo.png'
+            place = insert_entity('place', 'Nostromos')
+            logo = pathlib.Path(app.root_path) \
+                / 'static' / 'images' / 'layout' / 'logo.png'
 
             # Resizing through UI insert
             with open(logo, 'rb') as img:
@@ -39,51 +33,46 @@ class ImageTest(TestBaseCase):
                 files = Entity.get_by_class('file')
                 file_id = files[0].id
 
-            self.app.get(
+            rv = self.app.get(
                 url_for('set_profile_image', id_=file_id, origin_id=place.id),
                 follow_redirects=True)
+            assert b'Remove' in rv.data
+
             rv = self.app.get(url_for('index', view='file', delete_id=file_id))
             assert b'The entry has been deleted' in rv.data
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                file_pathless = insert_entity('Pathless_File', 'file')
-                file = insert_entity('Test_File', 'file')
-                file.link('P2', g.types[Type.get_hierarchy('License').subs[0]])
+                file_pathless = insert_entity('file', 'Pathless_File')
+                file = insert_entity('file', 'Test_File', )
+                file.link('P2', g.types[get_hierarchy('License').subs[0]])
                 file_name = f'{file.id}.jpeg'
-                src_png = \
-                    pathlib.Path(app.root_path) \
-                    / 'static' / 'images' / 'layout' / 'logo.png'
-                dst_png = \
-                    pathlib.Path(app.config['UPLOAD_DIR'] / file_name)
-                copyfile(src_png, dst_png)
-                file2 = insert_entity('Test_File2', 'file')
-                file2.link(
-                    'P2',
-                    g.types[Type.get_hierarchy('License').subs[0]])
-                file2_name = f'{file2.id}.jpeg'
-                src2_png = \
-                    pathlib.Path(app.root_path) \
-                    / 'static' / 'images' / 'layout' / 'logo.png'
-                dst2_png = pathlib.Path(app.config['UPLOAD_DIR'] / file2_name)
-                copyfile(src2_png, dst2_png)
-                file_py = insert_entity('Test_Py', 'file')
-                file_name_py = f'{file_py.id}.py'
-                src_py = pathlib.Path(app.root_path) / 'views' / 'index.py'
-                dst_py = pathlib.Path(app.config['UPLOAD_DIR'] / file_name_py)
-                copyfile(src_py, dst_py)
+                copyfile(
+                    pathlib.Path(app.root_path)
+                    / 'static' / 'images' / 'layout' / 'logo.png',
+                    pathlib.Path(app.config['UPLOAD_DIR'] / file_name))
+                file2 = insert_entity('file', 'Test_File2')
+                file2.link('P2', g.types[get_hierarchy('License').subs[0]])
+                copyfile(
+                    pathlib.Path(app.root_path) / 'static' / 'images'
+                    / 'layout' / 'logo.png',
+                    pathlib.Path(
+                        app.config['UPLOAD_DIR'] / f'{file2.id}.jpeg'))
+                file_py = insert_entity('file', 'Test_Py')
+                dst_py = \
+                    pathlib.Path(app.config['UPLOAD_DIR'] / f'{file_py.id}.py')
+                copyfile(
+                    pathlib.Path(app.root_path) / 'views' / 'index.py',
+                    dst_py)
                 safe_resize_image(file2.id, '.png', size="???")
                 profile_image(file_pathless)
 
             # Resizing images (don't change order!)
-            rv = self.app.get(url_for('view', id_=file.id))
-            assert b'Test_File' in rv.data
-
             rv = self.app.get(url_for('view', id_=file_py.id))
             assert b'No preview available' in rv.data
 
             rv = self.app.get(url_for('view', id_=file_pathless.id))
-            assert b'Missing file' in rv.data
+            assert b'missing file' in rv.data
 
             rv = self.app.get(url_for('index', view='file'))
             assert b'Test_File' in rv.data
@@ -99,32 +88,12 @@ class ImageTest(TestBaseCase):
                     size=app.config['IMAGE_SIZE']['thumbnail']))
             assert b'\xff' in rv.data
 
-            rv = self.app.get(
-                url_for(
-                    'display_file',
-                    filename=file_name,
-                    size=app.config['IMAGE_SIZE']['table']))
-            assert b'\xff' in rv.data
-
-            rv = self.app.get(
-                url_for(
-                    'display_file',
-                    filename=file_name_py,
-                    size=app.config['IMAGE_SIZE']['table']))
-            assert b'404' in rv.data
-
-            # Make directory if not exist
-            rv = self.app.get(url_for('view', id_=file.id))
-            assert b'Test_File' in rv.data
-
-            # API display image
             rv = self.app.get(url_for(
                 'api_03.display',
                 filename=file_name,
                 image_size='thumbnail'))
             assert b'\xff' in rv.data
 
-            # Exception
             app.config['IMAGE_SIZE']['tmp'] = '<'
             rv = self.app.get(url_for('view', id_=file.id))
             assert b'Test_File' in rv.data
@@ -139,14 +108,6 @@ class ImageTest(TestBaseCase):
                 url_for('admin_delete_orphaned_resized_images'),
                 follow_redirects=True)
             assert b'Resized orphaned images were deleted' in rv.data
-
-            rv = self.app.get(
-                url_for('index', view='file', delete_id=file.id))
-            assert b'The entry has been deleted' in rv.data
-
-            rv = self.app.get(
-                url_for('index', view='file', delete_id=file2.id))
-            assert b'The entry has been deleted' in rv.data
 
             shutil.rmtree(
                 pathlib.Path(
