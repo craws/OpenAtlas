@@ -2,13 +2,19 @@
   {{ info|display_info|safe }}
   {% if disk_space_info %}
     <p class="mb-1">
-      {{ _('total disk space')|uc_first }} <strong>{{ disk_space_info.total }}</strong> -
+      {{ _('total disk space')|uc_first }} <strong>{{ disk_space_info.total }}</strong><br>
+      {{ _('project disk space')|uc_first }} <strong>{{ disk_space_info.project }}</strong><br>
       {{ _('free disk space')|uc_first }} <strong>{{ disk_space_info.free }}</strong>
     </p>
     <div class="progress">
-      <div class="progress-bar" role="progressbar" style="width: {{ disk_space_info.percent }}%"
-           aria-valuenow="{{ disk_space_info.percent }}" aria-valuemin="0"
-           aria-valuemax="100">{{ disk_space_info.percent }}%
+      <div
+        class="progress-bar"
+        role="progressbar"
+        style="width: {{ disk_space_info.percent_free }}%"
+        aria-valuenow="{{ disk_space_info.percent_free }}"
+        aria-valuemin="0"
+        aria-valuemax="100">
+          {{ disk_space_info.percent_free }}%
       </div>
     </div>
   {% endif %}
