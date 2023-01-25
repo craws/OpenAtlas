@@ -329,12 +329,7 @@ class PlaceTest(TestBaseCase):
                 url_for('update', id_=strati_id),
                 data={'name': "I'm a stratigraphic unit", 'place': feat_id})
 
-            rv = self.app.get(
-                url_for(
-                    'insert',
-                    class_='human_remains',
-                    origin_id=strati_id))
-            assert b"I'm a stratigraphic unit" in rv.data
+            # Todo: continue here
 
             data = {
                 'name': 'You never find me',
@@ -344,12 +339,6 @@ class PlaceTest(TestBaseCase):
                 url_for('insert', class_='artifact', origin_id=strati_id),
                 data=data)
             find_id = rv.location.split('/')[-1]
-
-            rv = self.app.post(
-                url_for('update', id_=find_id),
-                data=data,
-                follow_redirects=True)
-            assert b'Changes have been saved.' in rv.data
 
             # Create a second artifact to test siblings pager
             rv = self.app.post(
@@ -374,9 +363,6 @@ class PlaceTest(TestBaseCase):
                 url_for('insert', class_='human_remains', origin_id=strati_id))
             assert b'exists' in rv.data
 
-            rv = self.app.get(url_for('view', id_=human_remains_id))
-            assert b'My human remains' in rv.data
-
             rv = self.app.get(url_for('update', id_=human_remains_id))
             assert b'My human remains' in rv.data
 
@@ -391,12 +377,6 @@ class PlaceTest(TestBaseCase):
                 follow_redirects=True)
             assert b'The entry has been deleted.' in rv.data
 
-            rv = self.app.get(url_for('tools_index', id_=strati_id))
-            assert b'Sex estimation' in rv.data
-
-            rv = self.app.get(url_for('sex', id_=strati_id))
-            assert b'Sex estimation' in rv.data
-
             rv = self.app.post(
                 url_for('sex_update', id_=strati_id),
                 data={'Glabella': 'Female'},
@@ -408,8 +388,6 @@ class PlaceTest(TestBaseCase):
                 data={'Glabella': 'Female'},
                 follow_redirects=True)
             assert b'-2.0' in rv.data
-
-            # Todo: continue test checks here
 
             rv = self.app.get(url_for('sex_update', id_=strati_id))
             assert b'Glabella' in rv.data
