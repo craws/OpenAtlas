@@ -11,7 +11,7 @@ class EventTest(TestBaseCase):
 
     def test_event(self) -> None:
         with app.app_context():
-            with app.test_request_context():  # Create invalid dates
+            with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 place_name = 'Lewis and Clark'
                 actor_name = 'Captain Miller'
@@ -22,7 +22,7 @@ class EventTest(TestBaseCase):
                 residence = insert('place', place_name)
                 reference = insert('external_reference', 'https://d-nb.info')
 
-            rv = self.app.get(url_for('insert', class_='activity'))
+            rv: Any = self.app.get(url_for('insert', class_='activity'))
             assert b'+ Activity' in rv.data
 
             data = {'name': 'Event Horizon', 'place': residence.id}

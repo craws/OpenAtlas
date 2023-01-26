@@ -15,7 +15,7 @@ class ImageTest(TestBaseCase):
     def test_image(self) -> None:
         app.config['IMAGE_SIZE']['tmp'] = '1'
         with app.app_context():
-            with app.test_request_context():  # Create invalid dates
+            with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 place = insert('place', 'Nostromos')
                 logo = pathlib.Path(app.root_path) \
@@ -78,7 +78,6 @@ class ImageTest(TestBaseCase):
             rv = self.app.get(url_for('index', view='file'))
             assert b'Test_File' in rv.data
 
-            # Display file
             rv = self.app.get(url_for('display_file', filename=file_name))
             assert b'\xff' in rv.data
 

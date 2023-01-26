@@ -42,6 +42,7 @@ class TypeTest(TestBaseCase):
                 url_for('insert', class_='type', origin_id=actor_type.id),
                 data=data)
             type_id = rv.location.split('/')[-1]
+
             rv = self.app.get(url_for('update', id_=type_id))
             assert b'My secret type' in rv.data and b'Super' in rv.data
 
@@ -170,11 +171,11 @@ class TypeTest(TestBaseCase):
                 frog.link('P2', Entity.get_by_id(get_hierarchy('Sex').subs[1]))
 
             rv = self.app.get(url_for('update', id_=frog.id))
-            assert b'422' in rv.data  # Invalid multiple type links
+            assert b'422' in rv.data
 
             rv = self.app.post(
                 url_for('type_move_entities', id_=dimension_type.subs[0]))
-            assert b'403' in rv.data  # Can't move value types
+            assert b'403' in rv.data
 
             rv = self.app.get(
                 url_for('show_multiple_linked_entities', id_=sex_type.id))

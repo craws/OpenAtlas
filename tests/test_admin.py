@@ -61,7 +61,7 @@ class AdminTests(TestBaseCase):
                 follow_redirects=True)
             assert b'An error occurred when trying to delete' in rv.data
 
-            with app.test_request_context():  # Create invalid dates
+            with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 event = insert('acquisition', 'Event Horizon')
                 person.update({

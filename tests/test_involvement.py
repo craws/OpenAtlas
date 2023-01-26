@@ -11,7 +11,7 @@ class InvolvementTests(TestBaseCase):
 
     def test_involvement(self) -> None:
         with app.app_context():
-            with app.test_request_context():  # Create invalid dates
+            with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 actor = insert('person', 'Captain Miller')
 

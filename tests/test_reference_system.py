@@ -82,6 +82,7 @@ class ReferenceSystemTest(TestBaseCase):
                     'name': 'Actor test',
                     self.wikidata: ['Q123', self.precision_type.subs[0]]})
             person_id = rv.location.split('/')[-1]
+
             rv = self.app.get(
                 url_for('view', id_=g.reference_system_wikidata.id))
             assert b'Actor test' in rv.data

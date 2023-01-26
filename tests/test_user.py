@@ -24,6 +24,7 @@ class UserTests(TestBaseCase):
                 'name': 'Ripley Weaver'}
             rv = self.app.post(url_for('user_insert'), data=data)
             user_id = rv.location.split('/')[-1]
+
             data['password'] = 'too short'
             rv = self.app.post(url_for('user_insert'), data=data)
             assert b'match' in rv.data
