@@ -1,7 +1,7 @@
 from flask import url_for
 
 from openatlas import app
-from tests.base import TestBaseCase, insert_entity
+from tests.base import TestBaseCase, insert
 
 
 class ModelTests(TestBaseCase):
@@ -28,9 +28,9 @@ class ModelTests(TestBaseCase):
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                actor = insert_entity('person', 'King Arthur')
-                event = insert_entity('activity', 'Battle of Camlann')
-                source = insert_entity('source', 'The source')
+                actor = insert('person', 'King Arthur')
+                event = insert('activity', 'Battle of Camlann')
+                source = insert('source', 'The source')
                 event.link('P11', actor)
                 source.link('P67', event)
 

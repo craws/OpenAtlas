@@ -7,7 +7,7 @@ from openatlas import app
 from openatlas.display.image_processing import safe_resize_image
 from openatlas.display.util import profile_image
 from openatlas.models.entity import Entity
-from tests.base import TestBaseCase, get_hierarchy, insert_entity
+from tests.base import TestBaseCase, get_hierarchy, insert
 
 
 class ImageTest(TestBaseCase):
@@ -17,7 +17,7 @@ class ImageTest(TestBaseCase):
         with app.app_context():
             with app.test_request_context():  # Create invalid dates
                 app.preprocess_request()  # type: ignore
-                place = insert_entity('place', 'Nostromos')
+                place = insert('place', 'Nostromos')
                 logo = pathlib.Path(app.root_path) \
                     / 'static' / 'images' / 'layout' / 'logo.png'
 
@@ -44,22 +44,22 @@ class ImageTest(TestBaseCase):
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                file_pathless = insert_entity('file', 'Pathless_File')
-                file = insert_entity('file', 'Test_File', )
+                file_pathless = insert('file', 'Pathless_File')
+                file = insert('file', 'Test_File', )
                 file.link('P2', g.types[get_hierarchy('License').subs[0]])
                 file_name = f'{file.id}.jpeg'
                 copyfile(
                     pathlib.Path(app.root_path)
                     / 'static' / 'images' / 'layout' / 'logo.png',
                     pathlib.Path(app.config['UPLOAD_DIR'] / file_name))
-                file2 = insert_entity('file', 'Test_File2')
+                file2 = insert('file', 'Test_File2')
                 file2.link('P2', g.types[get_hierarchy('License').subs[0]])
                 copyfile(
                     pathlib.Path(app.root_path) / 'static' / 'images'
                     / 'layout' / 'logo.png',
                     pathlib.Path(
                         app.config['UPLOAD_DIR'] / f'{file2.id}.jpeg'))
-                file_py = insert_entity('file', 'Test_Py')
+                file_py = insert('file', 'Test_Py')
                 dst_py = \
                     pathlib.Path(app.config['UPLOAD_DIR'] / f'{file_py.id}.py')
                 copyfile(

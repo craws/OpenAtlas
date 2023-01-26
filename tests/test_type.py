@@ -4,7 +4,7 @@ from flask import g, url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
-from tests.base import TestBaseCase, get_hierarchy, insert_entity
+from tests.base import TestBaseCase, get_hierarchy, insert
 
 
 class TypeTest(TestBaseCase):
@@ -17,7 +17,7 @@ class TypeTest(TestBaseCase):
                 dimension_type = get_hierarchy('Dimensions')
                 historical_type = get_hierarchy('Historical place')
                 sex_type = get_hierarchy('Sex')
-                place = insert_entity('place', 'Home')
+                place = insert('place', 'Home')
                 place.link('P2', g.types[dimension_type.subs[0]], '46')
                 location = place.get_linked_entity_safe('P53')
                 location.link('P89', g.types[historical_type.subs[0]])
@@ -165,7 +165,7 @@ class TypeTest(TestBaseCase):
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                frog = insert_entity('person', 'Frog')
+                frog = insert('person', 'Frog')
                 frog.link('P2', Entity.get_by_id(get_hierarchy('Sex').subs[0]))
                 frog.link('P2', Entity.get_by_id(get_hierarchy('Sex').subs[1]))
 

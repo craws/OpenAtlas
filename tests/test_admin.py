@@ -6,7 +6,7 @@ from openatlas import app
 from openatlas.database.entity import Entity as DbEntity
 from openatlas.database.link import Link as DbLink
 from openatlas.models.link import Link
-from tests.base import TestBaseCase, get_hierarchy, insert_entity
+from tests.base import TestBaseCase, get_hierarchy, insert
 
 
 class AdminTests(TestBaseCase):
@@ -15,10 +15,10 @@ class AdminTests(TestBaseCase):
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                person = insert_entity('person', 'Oliver Twist')
-                insert_entity('person', 'Oliver Twist')
-                insert_entity('file', 'Forsaken file')
-                insert_entity('feature', 'Forsaken subunit')
+                person = insert('person', 'Oliver Twist')
+                insert('person', 'Oliver Twist')
+                insert('file', 'Forsaken file')
+                insert('feature', 'Forsaken subunit')
                 id_invalid = DbEntity.insert({
                     'name': 'Invalid linked entity',
                     'openatlas_class_name': 'artifact',
@@ -63,7 +63,7 @@ class AdminTests(TestBaseCase):
 
             with app.test_request_context():  # Create invalid dates
                 app.preprocess_request()  # type: ignore
-                event = insert_entity('acquisition', 'Event Horizon')
+                event = insert('acquisition', 'Event Horizon')
                 person.update({
                     'attributes': {
                         'begin_from': '2018-01-31',
@@ -73,7 +73,7 @@ class AdminTests(TestBaseCase):
                 involvement.begin_to = '2017-01-01'
                 involvement.end_from = '2017-01-01'
                 involvement.update()
-                source = insert_entity('source', 'Tha source')
+                source = insert('source', 'Tha source')
                 source.link('P67', event)
                 source.link('P67', event)
                 source_type = get_hierarchy('Source')

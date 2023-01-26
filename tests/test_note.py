@@ -2,7 +2,7 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.user import User
-from tests.base import TestBaseCase, insert_entity
+from tests.base import TestBaseCase, insert
 
 
 class NoteTest(TestBaseCase):
@@ -11,7 +11,7 @@ class NoteTest(TestBaseCase):
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                actor = insert_entity('person', 'Ripley')
+                actor = insert('person', 'Ripley')
 
             rv = self.app.get(url_for('note_insert', entity_id=actor.id))
             assert b'Description' in rv.data

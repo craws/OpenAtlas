@@ -4,7 +4,7 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
-from tests.base import TestBaseCase, insert_entity
+from tests.base import TestBaseCase, insert
 
 
 class EventTest(TestBaseCase):
@@ -15,13 +15,12 @@ class EventTest(TestBaseCase):
                 app.preprocess_request()  # type: ignore
                 place_name = 'Lewis and Clark'
                 actor_name = 'Captain Miller'
-                actor = insert_entity('person', actor_name)
-                file = insert_entity('file', 'X-Files')
-                source = insert_entity('source', 'Necronomicon')
-                artifact = insert_entity('artifact', 'artifact')
-                residence = insert_entity('place', place_name)
-                reference = \
-                    insert_entity('external_reference', 'https://openatlas.eu')
+                actor = insert('person', actor_name)
+                file = insert('file', 'X-Files')
+                source = insert('source', 'Necronomicon')
+                artifact = insert('artifact', 'artifact')
+                residence = insert('place', place_name)
+                reference = insert('external_reference', 'https://d-nb.info')
 
             rv = self.app.get(url_for('insert', class_='activity'))
             assert b'+ Activity' in rv.data

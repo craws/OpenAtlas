@@ -4,7 +4,7 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.link import Link
-from tests.base import TestBaseCase, insert_entity
+from tests.base import TestBaseCase, insert
 
 
 class InvolvementTests(TestBaseCase):
@@ -14,7 +14,7 @@ class InvolvementTests(TestBaseCase):
 
             with app.test_request_context():  # Create invalid dates
                 app.preprocess_request()  # type: ignore
-                actor = insert_entity('person', 'Captain Miller')
+                actor = insert('person', 'Captain Miller')
 
             rv: Any = self.app.post(
                 url_for('insert', class_='acquisition'),

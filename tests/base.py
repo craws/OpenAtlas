@@ -72,7 +72,7 @@ class ApiTestCase(TestBaseCase):
             self.cursor.execute(sql_file.read())
 
 
-def insert_entity(
+def insert(
         class_: str,
         name: str,
         description: Optional[str] = None) -> Entity:

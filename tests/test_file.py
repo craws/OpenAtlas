@@ -4,7 +4,7 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
-from tests.base import TestBaseCase, get_hierarchy, insert_entity
+from tests.base import TestBaseCase, get_hierarchy, insert
 
 
 class FileTest(TestBaseCase):
@@ -13,8 +13,8 @@ class FileTest(TestBaseCase):
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                place = insert_entity('place', 'File keeper')
-                reference = insert_entity('edition', 'Ancient Books')
+                place = insert('place', 'File keeper')
+                reference = insert('edition', 'Ancient Books')
                 type_id = get_hierarchy('Sex').subs[0]
                 logo = pathlib.Path(app.root_path) \
                     / 'static' / 'images' / 'layout' / 'logo.png'

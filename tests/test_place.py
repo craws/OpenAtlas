@@ -7,7 +7,7 @@ from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.overlay import Overlay
-from tests.base import TestBaseCase, get_hierarchy, insert_entity
+from tests.base import TestBaseCase, get_hierarchy, insert
 
 
 class PlaceTest(TestBaseCase):
@@ -25,11 +25,9 @@ class PlaceTest(TestBaseCase):
                 unit_sub2 = g.types[unit_type.subs[1]]
                 human_remains_type = get_hierarchy('Human remains')
                 human_remains_type_sub = g.types[human_remains_type.subs[0]]
-                reference = insert_entity(
-                    'external_reference',
-                    'https://openatlas.eu')
+                reference = insert('external_reference', 'https://d-nb.info')
                 place_type = get_hierarchy('Place')
-                source = insert_entity('source', 'Necronomicon')
+                source = insert('source', 'Necronomicon')
 
             data = {
                 'name': 'Asgard',
@@ -94,7 +92,7 @@ class PlaceTest(TestBaseCase):
                 place = places[0]
                 place2 = places[1]
                 location = place2.get_linked_entity_safe('P53')
-                actor = insert_entity('person', 'Milla Jovovich')
+                actor = insert('person', 'Milla Jovovich')
                 actor.link('P74', location)
             assert b'Necronomicon' in rv.data
 
@@ -138,7 +136,7 @@ class PlaceTest(TestBaseCase):
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                event = insert_entity('acquisition', 'Valhalla rising')
+                event = insert('acquisition', 'Valhalla rising')
                 event.link('P7', location)
 
             rv = self.app.get(url_for('view', id_=place2.id))

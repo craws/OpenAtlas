@@ -4,7 +4,7 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
-from tests.base import TestBaseCase, insert_entity
+from tests.base import TestBaseCase, insert
 
 
 class SourceTest(TestBaseCase):
@@ -21,7 +21,7 @@ class SourceTest(TestBaseCase):
                     'person',
                     'Gillian Anderson Gillian Anderson',
                     'person')
-                artifact = insert_entity('artifact', 'I care for you')
+                artifact = insert('artifact', 'I care for you')
                 inscribed_artifact = Entity.insert(
                     'artifact',
                     'Artifact with text')

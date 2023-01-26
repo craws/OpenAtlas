@@ -39,12 +39,12 @@ class ReferenceTest(TestBaseCase):
             rv = self.app.get(url_for('update', id_=reference.id))
             assert b'https://openatlas.eu' in rv.data
 
-            data['name'] = 'http://updated.openatlas.eu'
+            data['name'] = 'https://updated.openatlas.eu'
             rv = self.app.post(
                 url_for('update', id_=reference.id),
                 data=data,
                 follow_redirects=True)
-            assert b'http://updated.openatlas.eu' in rv.data
+            assert b'https://updated.openatlas.eu' in rv.data
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
@@ -57,7 +57,7 @@ class ReferenceTest(TestBaseCase):
                 url_for('reference_add', id_=reference.id, view='actor'),
                 data={'actor': batman.id},
                 follow_redirects=True)
-            assert b'http://updated.openatlas.eu' in rv.data
+            assert b'https://updated.openatlas.eu' in rv.data
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore

@@ -4,7 +4,7 @@ from flask import g, url_for
 
 from openatlas import app
 from openatlas.models.link import Link
-from tests.base import TestBaseCase, get_hierarchy, insert_entity
+from tests.base import TestBaseCase, get_hierarchy, insert
 
 
 class ActorTests(TestBaseCase):
@@ -13,9 +13,9 @@ class ActorTests(TestBaseCase):
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                place = insert_entity('place', 'Vienna')
-                event = insert_entity('acquisition', 'Event Horizon')
-                group = insert_entity('group', 'LV-426 colony')
+                place = insert('place', 'Vienna')
+                event = insert('acquisition', 'Event Horizon')
+                group = insert('group', 'LV-426 colony')
                 sex = get_hierarchy('Sex')
                 sex_sub_1 = g.types[sex.subs[0]]
                 sex_sub_2 = g.types[sex.subs[1]]
