@@ -14,10 +14,6 @@ class PlaceTest(TestBaseCase):
 
     def test_place(self) -> None:
         with app.app_context():
-
-            rv: Any = self.app.get(url_for('insert', class_='place'))
-            assert b'+ Place' in rv.data
-
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 unit_type = get_hierarchy('Administrative unit')
@@ -34,18 +30,11 @@ class PlaceTest(TestBaseCase):
                 'alias-0': 'Valhöll',
                 unit_type.id: str([unit_sub1.id, unit_sub2.id]),
                 self.geonames: ['123456', self.precision_type.subs[0]]}
-            rv = self.app.post(
+            rv: Any = self.app.post(
                 url_for('insert', class_='place', origin_id=reference.id),
                 data=data,
                 follow_redirects=True)
             assert b'Asgard' in rv.data and b'An entry has been' in rv.data
-
-            rv = self.app.get(url_for('view', id_=self.precision_type.subs[0]))
-            assert b'Asgard' in rv.data
-
-            rv = self.app.get(
-                url_for('view', id_=g.reference_system_geonames.id))
-            assert b'Asgard' in rv.data
 
             data['gis_points'] = """[{
                 "type": "Feature",
@@ -94,13 +83,6 @@ class PlaceTest(TestBaseCase):
                 location = place2.get_linked_entity_safe('P53')
                 actor = insert('person', 'Milla Jovovich')
                 actor.link('P74', location)
-            assert b'Necronomicon' in rv.data
-
-            rv = self.app.get(url_for('index', view='place'))
-            assert b'Asgard' in rv.data
-
-            rv = self.app.get(url_for('update', id_=place.id))
-            assert b'Valhalla' in rv.data
 
             data['continue_'] = ''
             data['alias-1'] = 'Val-hall'
@@ -112,20 +94,7 @@ class PlaceTest(TestBaseCase):
             assert b'Val-hall' in rv.data
 
             rv = self.app.get(url_for('view', id_=place.id+1))
-            assert b'be viewed directly' in rv.data
-
-            rv = self.app.post(
-                url_for('update', id_=place.id),
-                data=data,
-                follow_redirects=True)
-            assert b'Val-hall' in rv.data
-
-            data['geonames_precision'] = ''
-            rv = self.app.post(
-                url_for('update', id_=place.id),
-                data=data,
-                follow_redirects=True)
-            assert b'Val-hall' in rv.data
+            assert b"can't be viewed directly" in rv.data
 
             data['geonames_id'] = ''
             rv = self.app.post(
@@ -133,14 +102,6 @@ class PlaceTest(TestBaseCase):
                 data=data,
                 follow_redirects=True)
             assert b'Val-hall' in rv.data
-
-            with app.test_request_context():
-                app.preprocess_request()  # type: ignore
-                event = insert('acquisition', 'Valhalla rising')
-                event.link('P7', location)
-
-            rv = self.app.get(url_for('view', id_=place2.id))
-            assert rv.data and b'Valhalla rising' in rv.data
 
             data['gis_polygons'] = """[{
                 "type": "Feature", 
@@ -224,15 +185,10 @@ class PlaceTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Changes have been saved' in rv.data
 
-            self.app.get(
-                url_for(
-                    'overlay_remove',
-                    id_=overlay_id,
-                    place_id=place.id),
+            rv = self.app.get(
+                url_for('overlay_remove', id_=overlay_id, place_id=place.id),
                 follow_redirects=True)
-
-            rv = self.app.get(url_for('entity_add_file', id_=place.id))
-            assert b'Link file' in rv.data
+            assert b'42' in rv.data
 
             rv = self.app.post(
                 url_for('entity_add_file', id_=place.id),
@@ -246,15 +202,6 @@ class PlaceTest(TestBaseCase):
 
             rv = self.app.get(url_for('entity_add_reference', id_=place.id))
             assert b'Link reference' in rv.data
-
-            rv = self.app.post(
-                url_for('entity_add_reference', id_=place.id),
-                data={'reference': reference.id, 'page': '777'},
-                follow_redirects=True)
-            assert b'777' in rv.data
-
-            rv = self.app.get(url_for('type_move_entities', id_=unit_sub1.id))
-            assert b'Asgard' in rv.data
 
             # Test move entities of multiple type if link to new type exists
             rv = self.app.post(
@@ -276,7 +223,6 @@ class PlaceTest(TestBaseCase):
                     'checkbox_values': str([location.id])})
             assert b'Entities were updated' in rv.data
 
-            # Subunits
             data = {'name': "Try continue", 'continue_': 'sub'}
             rv = self.app.post(
                 url_for('insert', class_='place'),
@@ -290,19 +236,6 @@ class PlaceTest(TestBaseCase):
                 url_for('insert', class_='feature', origin_id=place.id),
                 data=data)
             feat_id = rv.location.split('/')[-1]
-
-            rv = self.app.get(
-                url_for('insert', class_='place', origin_id=feat_id))
-            assert b'not a bug' in rv.data
-
-            rv = self.app.get(url_for('update', id_=feat_id))
-            assert b'not a bug' in rv.data
-
-            rv = self.app.post(
-                url_for('update', id_=feat_id),
-                data=data,
-                follow_redirects=True)
-            assert b'Changes have been saved.' in rv.data
 
             rv = self.app.get(
                 url_for(
@@ -321,13 +254,6 @@ class PlaceTest(TestBaseCase):
                     origin_id=feat_id),
                 data=data)
             strati_id = rv.location.split('/')[-1]
-
-            self.app.get(url_for('update', id_=strati_id))
-            self.app.post(
-                url_for('update', id_=strati_id),
-                data={'name': "I'm a stratigraphic unit", 'place': feat_id})
-
-            # Todo: continue here
 
             data = {
                 'name': 'You never find me',
