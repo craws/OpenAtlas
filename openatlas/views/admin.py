@@ -756,7 +756,8 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
         process = run(
             ['du', '-sb', app.config['FILES_PATH']],
             capture_output=True,
-            text=True)
+            text=True,
+            check=True)
         files_size = int(process.stdout.split()[0])
     else:
         files_size = 0  # pragma: no cover

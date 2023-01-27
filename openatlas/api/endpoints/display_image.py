@@ -28,4 +28,4 @@ class DisplayImage(Resource):
             raise DisplayFileNotFoundError  # pragma: no cover
         return send_file(
             filepath,
-            as_attachment=True if parser['download'] else False)
+            as_attachment=bool(parser['download']))

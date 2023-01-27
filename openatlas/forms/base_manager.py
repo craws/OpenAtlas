@@ -102,7 +102,9 @@ class BaseManager:
         if 'alias' in self.fields:
             setattr(
                 self.form_class,
-                'alias', FieldList(RemovableListField(), render_kw={'class': 'no-label'},))
+                'alias', FieldList(
+                    RemovableListField(),
+                    render_kw={'class': 'no-label'},))
 
     def update_entity(self, new: bool = False) -> None:
         self.continue_link_id = self.entity.update(self.data, new)

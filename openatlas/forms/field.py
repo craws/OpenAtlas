@@ -9,7 +9,8 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (
     Field, FileField, FloatField, HiddenField, StringField, TextAreaField)
-from wtforms.widgets import FileInput, HiddenInput, TextInput, Input, HTMLString
+from wtforms.widgets import (
+    FileInput, HiddenInput, TextInput, Input, HTMLString)
 
 from openatlas.display.table import Table
 from openatlas import app
@@ -68,20 +69,29 @@ class ValueTypeInput(TextInput):
             **kwargs: Any) -> RemovableListInput:
         type_ = g.types[field.type_id]
         padding = len(type_.root)
-        expand_col = f' <div class="me-1">{ value_type_expand_icon(type_)}</div>'
+        expand_col = \
+            f' <div class="me-1">{ value_type_expand_icon(type_)}</div>'
         return HTMLString(f'''
-                <div class="row g-1" >
-                  <div class="col-4  d-flex" style="padding-left:{padding}rem"> 
-                    {expand_col if type_.subs else ''}
-                    <label class="text-truncate mt-1" title="{type_.name}" for="{field.id}">{type_.name}</label>
-                  </div>
-                  <div class="col"> 
-                    <input type="text" class="{app.config['CSS']['string_field']} 
-                         value-type" name="{field.id}" id="{field.id}" 
-                          value="{field.data or ''}" />
-                  </div>
-                  <div class="col-2 text-truncate" title="{type_.description or ''}">{type_.description or ''}</div>
-                </div>''')
+            <div class="row g-1" >
+              <div class="col-4  d-flex" style="padding-left:{padding}rem">
+                {expand_col if type_.subs else ''}
+                <label
+                  class="text-truncate mt-1"
+                  title="{type_.name}"
+                  for="{field.id}">{type_.name}</label>
+              </div>
+              <div class="col">
+                <input
+                  type="text"
+                  class="{app.config['CSS']['string_field']} value-type"
+                  name="{field.id}" id="{field.id}"
+                  value="{field.data or ''}" />
+              </div>
+              <div
+                class="col-2 text-truncate"
+                title="{type_.description or ''}">{type_.description or ''}
+              </div>
+            </div>''')
 
 
 class ValueTypeField(FloatField):
@@ -94,8 +104,9 @@ class ValueTypeField(FloatField):
         super().__init__(label, validators, **kwargs)
         type_ = g.types[type_id]
         sub_of = ' '.join([f'sub-of-{i}' for i in type_.root])
-        self.selectors = f'value-type-field {sub_of} direct-sub-of-{type_.root[-1]} d-none'
-        self.field_data = f'data-show'
+        self.selectors = \
+            f'value-type-field {sub_of} direct-sub-of-{type_.root[-1]} d-none'
+        self.field_data = 'data-show'
         self.type_id = type_id
 
     widget = ValueTypeInput()
