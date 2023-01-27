@@ -62,8 +62,7 @@ def get_geometries_thanados(
     return geom
 
 
-def transform_geometries_for_xml(geom: dict[str, Any]) \
-        -> Union[list[list[dict[str, Any]]], list[dict[str, Any]]]:
+def transform_geometries_for_xml(geom: dict[str, Any]) -> list[Any]:
     output = []
     if geom['type'] == 'Polygon':
         output = [transform_coordinates_for_xml(k)
@@ -76,8 +75,7 @@ def transform_geometries_for_xml(geom: dict[str, Any]) \
     return output
 
 
-def transform_coordinates_for_xml(
-        coordinates: list[float]) -> list[dict[str, Any]]:
+def transform_coordinates_for_xml(coordinates: list[float]) -> list[Any]:
     return [
         {'coordinate':
             {'longitude': coordinates[0], 'latitude': coordinates[1]}}]

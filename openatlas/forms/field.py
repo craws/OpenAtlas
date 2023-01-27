@@ -24,7 +24,7 @@ class RemovableListInput(HiddenInput):
             self,
             field: RemovableListField,
             *args: Any,
-            **kwargs: Any) -> RemovableListInput:
+            **kwargs: Any) -> str:
         [name, index] = field.id.split('-')
         return render_template(
             'forms/removable_list_field.html',
@@ -106,7 +106,7 @@ class ReferenceInput(Input):
             self,
             field: ReferenceField,
             *args: Any,
-            **kwargs: Any) -> RemovableListInput:
+            **kwargs: Any) -> str:
         return render_template('forms/reference_field.html', field=field)
 
 
@@ -126,10 +126,10 @@ class ReferenceField(Field):
         self.data = {"value": "", "precision": ""}
         self.row_css = "reference-system-switch"
 
-    def process_formdata(self, valuelist):
-        self.data = {"value": valuelist[0] if len(valuelist) == 2 else '',
-                     "precision": valuelist[1] if len(valuelist) == 2 else ''
-                     }
+    def process_formdata(self, valuelist: list[str]) -> None:
+        self.data = {
+            'value': valuelist[0] if len(valuelist) == 2 else '',
+            'precision': valuelist[1] if len(valuelist) == 2 else ''}
 
     widget = ReferenceInput()
 
@@ -251,7 +251,8 @@ class TreeMultiSelect(HiddenInput):
             field=field,
             root=g.types[int(field.type_id)],
             selection=sorted([g.types[id_].name for id_ in data]),
-            data=Type.get_tree_data(int(field.id), data)) + super().__call__(field, **kwargs)
+            data=Type.get_tree_data(int(field.id), data)) \
+            + super().__call__(field, **kwargs)
 
 
 class TreeMultiField(HiddenField):
@@ -341,5 +342,8 @@ class CustomField(Field):
 
 
 def generate_password_field() -> CustomField:
-    return CustomField('', content=f'''<span class="uc-first {app.config["CSS"]["button"]["primary"]}" 
-             id="generate-password">{_("generate password")}</span>''')
+    return CustomField(
+        '',
+        content=
+        f'<span class="uc-first {app.config["CSS"]["button"]["primary"]}" '
+        f'id="generate-password">{_("generate password")}</span>')

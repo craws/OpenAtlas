@@ -11,7 +11,8 @@ class ReferenceSystemTest(TestBaseCase):
     def test_reference_system(self) -> None:
         with app.app_context():
 
-            rv = self.app.get(url_for('insert', class_='reference_system'))
+            rv: Any = self.app.get(
+                url_for('insert', class_='reference_system'))
             assert b'Resolver URL' in rv.data
 
             rv = self.app.post(

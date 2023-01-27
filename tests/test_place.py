@@ -25,7 +25,7 @@ class PlaceTest(TestBaseCase):
                 place_type = get_hierarchy('Place')
                 source = insert('source', 'Necronomicon')
 
-            data = {
+            data: dict[Any, Any] = {
                 'name': 'Asgard',
                 'alias-0': 'Valhöll',
                 unit_type.id: str([unit_sub1.id, unit_sub2.id]),

@@ -1,6 +1,7 @@
-from flask import render_template, url_for, flash, g, Response
-from werkzeug.utils import redirect
+from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
+from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.api.arche.function import fetch_arche_data, import_arche_data
@@ -8,7 +9,7 @@ from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    required_group, is_authorized, display_info, button, uc_first)
+    button, display_info, is_authorized, required_group, uc_first)
 
 
 @app.route('/arche')

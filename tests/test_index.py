@@ -31,7 +31,7 @@ class IndexTests(TestBaseCase):
             app.config['WRITABLE_DIRS'].append(Path(app.root_path) / 'error')
             app.config['DATABASE_VERSION'] = 'error'
             rv = self.app.get(url_for('view', id_=666), follow_redirects=True)
-            assert b'teapot' in rv.data  # Id not found error
+            assert b'teapot' in rv.data
             assert b'OpenAtlas with default password is still' in rv.data
             assert b'Database version error is needed but current' in rv.data
             assert b'Directory not writable' in rv.data

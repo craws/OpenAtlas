@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 import rdflib
 import requests
@@ -67,7 +67,7 @@ def import_arche_data() -> int:
         [i for i in g.reference_systems.values() if i.name == 'ARCHE'][0]
     exact_match_id = \
         get_or_create_type(
-            get_hierarchy_by_name('External reference match'),
+            Type.get_hierarchy('External reference match'),
             'exact match').id
     for entries in fetch_arche_data().values():
         for item in entries.values():
@@ -129,23 +129,15 @@ def get_linked_image(data: list[dict[str, Any]]) -> str:
 
 
 def get_or_create_type(hierarchy: Type, type_name: str) -> Type:
-    if type_ := get_type_by_name(type_name):
+    if type_ := Type.get_hierarchy(type_name):
         if type_.root[0] == hierarchy.id:
             return type_
-    type_ = Entity.insert('type', type_name)
-    type_.link('P127', hierarchy)
-    return type_
+    type_entity = Entity.insert('type', type_name)
+    type_entity.link('P127', hierarchy)
+    return type_entity
 
 
-def get_type_by_name(type_name: str) -> Type:
-    type_ = None
-    for type_id in g.types:
-        if g.types[type_id].name == type_name:
-            type_ = g.types[type_id]
-    return type_
-
-
-def get_hierarchy_by_name(type_name: str) -> Type:
+def get_hierarchy_by_name(type_name: str) -> Optional[Type]:
     hierarchy = None
     for type_id in g.types:
         if g.types[type_id].name == type_name:
@@ -167,7 +159,7 @@ def get_or_create_person(name: str, relevance: Type) -> Entity:
 
 
 def get_or_create_person_types() -> dict[str, Any]:
-    hierarchy = get_hierarchy_by_name('Relevance')
+    hierarchy: Type = get_hierarchy_by_name('Relevance')
     if not hierarchy:
         hierarchy = Entity.insert('type', 'Relevance')
         Type.insert_hierarchy(hierarchy, 'custom', ['person'], True)
@@ -234,9 +226,9 @@ def get_arche_context() -> dict[str, Any]:
     context = requests.get(
         'https://arche.acdh.oeaw.ac.at/api/describe',
         headers={'Accept': 'application/json'})
-    context = context.json()['schema']
-    # adding isMetadataFor because it is not in /describe
-    context['isMetadataFor'] = \
+    result: dict[str, Any] = context.json()['schema']
+    # Adding isMetadataFor because it is not in /describe
+    result['isMetadataFor'] = \
         'https://vocabs.acdh.oeaw.ac.at/schema#isMetadataFor'
-    # flip the context so it's uri->shortName
-    return {v: k for k, v in context.items() if isinstance(v, str)}
+    # Flip the context so it's uri->shortName
+    return {v: k for k, v in result.items() if isinstance(v, str)}

@@ -5,7 +5,7 @@ DEBUG = True
 
 # Disable CSRF
 WTF_CSRF_ENABLED = False
-WTF_CSRF_METHODS = []
+WTF_CSRF_METHODS: list[str] = []
 
 ARCHE = {
     'id': 0,
