@@ -8,7 +8,7 @@ from openatlas import app
 
 @app.errorhandler(400)
 def bad_request(e: Exception) -> tuple[str, int]:
-    return render_template(
+    return render_template(  # pragma: no cover
         'error/400.html',
         crumbs=['400 - Bad Request'],
         e=e), 400

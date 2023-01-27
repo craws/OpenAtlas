@@ -39,7 +39,7 @@ class IndexTests(TestBaseCase):
             rv = self.app.get(url_for('logout'), follow_redirects=True)
             assert b'Password' in rv.data
 
-            rv = self.app.get('/')  # Test intro when not logged in
+            rv = self.app.get('/')
             assert b'Overview' in rv.data
 
             rv = self.app.get(url_for('login'))

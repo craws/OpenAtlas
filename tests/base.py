@@ -14,9 +14,7 @@ class TestBaseCase(unittest.TestCase):
 
     def setUp(self) -> None:
         app.testing = True
-        app.config['SERVER_NAME'] = 'local.host'
-        app.config['WTF_CSRF_ENABLED'] = False
-        app.config['WTF_CSRF_METHODS'] = []  # Disable CSRF in tests
+        app.config.from_pyfile('testing.py')
         self.setup_database()
         self.app = app.test_client()
         self.login('Alice', logout=False)
@@ -74,18 +72,15 @@ class ApiTestCase(TestBaseCase):
             self.cursor.execute(sql_file.read())
 
 
-def insert_entity(
+def insert(
         class_: str,
         name: str,
         description: Optional[str] = None) -> Entity:
-    with app.app_context():
-        with app.test_request_context():
-            app.preprocess_request()  # type: ignore
-            entity = Entity.insert(class_, name, description)
-            if class_ in ['artifact', 'feature', 'place', 'stratigraphic_unit']:
-                entity.link(
-                    'P53',
-                    Entity.insert('object_location', f'Location of {name}'))
+    entity = Entity.insert(class_, name, description)
+    if class_ in ['artifact', 'feature', 'place', 'stratigraphic_unit']:
+        entity.link(
+            'P53',
+            Entity.insert('object_location', f'Location of {name}'))
     return entity
 
 

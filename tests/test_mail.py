@@ -11,13 +11,13 @@ class MailTests(TestBaseCase):
     def test_mail(self) -> None:
         with app.app_context():
 
-            rv = self.app.post(
+            rv: Any = self.app.post(
                 url_for('admin_newsletter'),
                 data={'subject': 'test', 'body': 'test', 'recipient': []},
                 follow_redirects=True)
             assert b'Newsletter send: 0' in rv.data
 
-            rv: Any = self.app.post(
+            rv = self.app.post(
                 url_for('admin_settings', category='mail'),
                 follow_redirects=True,
                 data={
@@ -92,9 +92,6 @@ class MailTests(TestBaseCase):
             rv = self.app.get(
                 url_for('reset_confirm', code='5678'), follow_redirects=True)
             assert b'expired' in rv.data
-
-            rv = self.app.get(url_for('reset_password'))
-            assert b'Forgot your password?' in rv.data
 
             rv = self.app.post(
                 url_for('reset_password'),

@@ -4,7 +4,7 @@ from flask import g, url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
-from tests.base import TestBaseCase, get_hierarchy, insert_entity
+from tests.base import TestBaseCase, get_hierarchy, insert
 
 
 class TypeTest(TestBaseCase):
@@ -17,7 +17,7 @@ class TypeTest(TestBaseCase):
                 dimension_type = get_hierarchy('Dimensions')
                 historical_type = get_hierarchy('Historical place')
                 sex_type = get_hierarchy('Sex')
-                place = insert_entity('place', 'Home')
+                place = insert('place', 'Home')
                 place.link('P2', g.types[dimension_type.subs[0]], '46')
                 location = place.get_linked_entity_safe('P53')
                 location.link('P89', g.types[historical_type.subs[0]])
@@ -42,6 +42,7 @@ class TypeTest(TestBaseCase):
                 url_for('insert', class_='type', origin_id=actor_type.id),
                 data=data)
             type_id = rv.location.split('/')[-1]
+
             rv = self.app.get(url_for('update', id_=type_id))
             assert b'My secret type' in rv.data and b'Super' in rv.data
 
@@ -165,16 +166,16 @@ class TypeTest(TestBaseCase):
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                frog = insert_entity('person', 'Frog')
+                frog = insert('person', 'Frog')
                 frog.link('P2', Entity.get_by_id(get_hierarchy('Sex').subs[0]))
                 frog.link('P2', Entity.get_by_id(get_hierarchy('Sex').subs[1]))
 
             rv = self.app.get(url_for('update', id_=frog.id))
-            assert b'422' in rv.data  # Invalid multiple type links
+            assert b'422' in rv.data
 
             rv = self.app.post(
                 url_for('type_move_entities', id_=dimension_type.subs[0]))
-            assert b'403' in rv.data  # Can't move value types
+            assert b'403' in rv.data
 
             rv = self.app.get(
                 url_for('show_multiple_linked_entities', id_=sex_type.id))

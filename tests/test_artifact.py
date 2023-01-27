@@ -2,16 +2,18 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
-from tests.base import TestBaseCase, insert_entity
+from tests.base import TestBaseCase, insert
 
 
 class ArtifactTest(TestBaseCase):
 
     def test_artifact(self) -> None:
         with app.app_context():
-            source = insert_entity('source', 'Necronomicon')
-            actor = insert_entity('person', 'Conan')
-            place = insert_entity('place', 'Home')
+            with app.test_request_context():
+                app.preprocess_request()  # type: ignore
+                source = insert('source', 'Necronomicon')
+                actor = insert('person', 'Conan')
+                place = insert('place', 'Home')
 
             rv = self.app.get(
                 url_for('insert', class_='artifact', origin_id=place.id))

@@ -26,11 +26,9 @@ Install python3-requests for new feature API: fetch data from ARCHE (#1848):
 
     # apt install python3-requests
 
-### 7.9.x to 7.9.2
-A code base update (e.g. with git pull) and a webserver restart is sufficient.
-
-### 7.9.0 to 7.9.1
-A code base update (e.g. with git pull) and a webserver restart is sufficient.
+#### For developers
+In case you are using tests you should take a look at 
+instance/example_testing.py and adapt your instance/testing.py accordingly.
 
 ### 7.8.x to 7.9.0
 7.9.0.sql is needed but will be taken care of by the database upgrade script.
