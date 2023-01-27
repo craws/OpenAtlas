@@ -21,6 +21,7 @@ versions = {
             '1866': 'Complete Bootstrap layout',
             '1921': 'Additional UI translations - Spanish and Catalan',
             '1906': 'Unify placement of form error messages',
+            '1848': 'API: fetch data from ARCHE',
             '1933': 'API: Display images without extension in URL',
             '1814': 'API: more compact API buttons in user interface',
             '1701': 'Manual: added API documentation',
