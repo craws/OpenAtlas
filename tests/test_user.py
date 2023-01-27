@@ -3,7 +3,7 @@ from typing import Any
 from flask import g, url_for
 
 from openatlas import app
-from tests.base import TestBaseCase, insert_entity
+from tests.base import TestBaseCase, insert
 
 
 class UserTests(TestBaseCase):
@@ -24,6 +24,7 @@ class UserTests(TestBaseCase):
                 'name': 'Ripley Weaver'}
             rv = self.app.post(url_for('user_insert'), data=data)
             user_id = rv.location.split('/')[-1]
+
             data['password'] = 'too short'
             rv = self.app.post(url_for('user_insert'), data=data)
             assert b'match' in rv.data
@@ -85,8 +86,8 @@ class UserTests(TestBaseCase):
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                person = insert_entity('person', 'Hugo')
-                event = insert_entity('activity', 'Event Horizon')
+                person = insert('person', 'Hugo')
+                event = insert('activity', 'Event Horizon')
                 event.link('P11', person)
 
             rv = self.app.post(

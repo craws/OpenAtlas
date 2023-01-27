@@ -1,5 +1,4 @@
 import pathlib
-import shutil
 from shutil import copyfile
 
 from flask import g, url_for
@@ -8,7 +7,7 @@ from openatlas import app
 from openatlas.display.image_processing import safe_resize_image
 from openatlas.display.util import profile_image
 from openatlas.models.entity import Entity
-from tests.base import TestBaseCase, get_hierarchy, insert_entity
+from tests.base import TestBaseCase, get_hierarchy, insert
 
 
 class ImageTest(TestBaseCase):
@@ -16,9 +15,11 @@ class ImageTest(TestBaseCase):
     def test_image(self) -> None:
         app.config['IMAGE_SIZE']['tmp'] = '1'
         with app.app_context():
-            place = insert_entity('place', 'Nostromos')
-            logo = pathlib.Path(app.root_path) \
-                / 'static' / 'images' / 'layout' / 'logo.png'
+            with app.test_request_context():
+                app.preprocess_request()  # type: ignore
+                place = insert('place', 'Nostromos')
+                logo = pathlib.Path(app.root_path) \
+                    / 'static' / 'images' / 'layout' / 'logo.png'
 
             # Resizing through UI insert
             with open(logo, 'rb') as img:
@@ -43,22 +44,22 @@ class ImageTest(TestBaseCase):
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                file_pathless = insert_entity('file', 'Pathless_File')
-                file = insert_entity('file', 'Test_File', )
+                file_pathless = insert('file', 'Pathless_File')
+                file = insert('file', 'Test_File', )
                 file.link('P2', g.types[get_hierarchy('License').subs[0]])
                 file_name = f'{file.id}.jpeg'
                 copyfile(
                     pathlib.Path(app.root_path)
                     / 'static' / 'images' / 'layout' / 'logo.png',
                     pathlib.Path(app.config['UPLOAD_DIR'] / file_name))
-                file2 = insert_entity('file', 'Test_File2')
+                file2 = insert('file', 'Test_File2')
                 file2.link('P2', g.types[get_hierarchy('License').subs[0]])
                 copyfile(
                     pathlib.Path(app.root_path) / 'static' / 'images'
                     / 'layout' / 'logo.png',
                     pathlib.Path(
                         app.config['UPLOAD_DIR'] / f'{file2.id}.jpeg'))
-                file_py = insert_entity('file', 'Test_Py')
+                file_py = insert('file', 'Test_Py')
                 dst_py = \
                     pathlib.Path(app.config['UPLOAD_DIR'] / f'{file_py.id}.py')
                 copyfile(
@@ -77,7 +78,6 @@ class ImageTest(TestBaseCase):
             rv = self.app.get(url_for('index', view='file'))
             assert b'Test_File' in rv.data
 
-            # Display file
             rv = self.app.get(url_for('display_file', filename=file_name))
             assert b'\xff' in rv.data
 
@@ -108,10 +108,3 @@ class ImageTest(TestBaseCase):
                 url_for('admin_delete_orphaned_resized_images'),
                 follow_redirects=True)
             assert b'Resized orphaned images were deleted' in rv.data
-
-            shutil.rmtree(
-                pathlib.Path(
-                    app.config['RESIZED_IMAGES'] /
-                    app.config['IMAGE_SIZE']['tmp']))
-            dst_py.unlink()
-            del app.config['IMAGE_SIZE']['tmp']

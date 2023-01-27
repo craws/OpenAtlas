@@ -300,7 +300,7 @@ def import_data(project_id: int, class_: str) -> str:
                     class_label])
 
         if not form.preview.data and checked_data and (
-                not file_data['backup_too_old'] or app.config['IS_UNIT_TEST']):
+                not file_data['backup_too_old'] or app.testing):
             Transaction.begin()
             try:
                 Import.import_data(project, class_, checked_data)

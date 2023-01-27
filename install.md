@@ -141,3 +141,11 @@ As postgres:
 Copy instance/example_testing.py to instance/testing.py and adapt as needed:
 
     $ cp instance/example_testing.py instance/testing.py
+
+Run tests
+
+    $ nosetest3
+
+Run tests with coverage
+
+    $ nosetests3 -c tests/.noserc
