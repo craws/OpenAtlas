@@ -1,30 +1,35 @@
 <script>
 
-  const translate = {}
-  translate.save = '{{ _('save')|uc_first|safe }}';
-  translate.edit = '{{ _('edit')|uc_first|safe }}';
-  translate.delete = '{{ _('delete')|uc_first|safe }}';
-  translate.details = '{{ _('details')|uc_first|safe }}';
-  translate.import = '{{ _('import')|uc_first|safe }}';
-  translate.show = '{{ _('show')|uc_first }}';
-  translate.hide = '{{ _('hide')|uc_first }}';
-  translate.moreText = '{{ _('show more')|uc_first }}';
-  translate.lessText = '{{ _('show less')|uc_first }}';
+    const translate = {}
+    translate.save = '{{ _('save')|uc_first|safe }}';
+    translate.edit = '{{ _('edit')|uc_first|safe }}';
+    translate.delete = '{{ _('delete')|uc_first|safe }}';
+    translate.details = '{{ _('details')|uc_first|safe }}';
+    translate.import = '{{ _('import')|uc_first|safe }}';
+    translate.show = '{{ _('show')|uc_first }}';
+    translate.hide = '{{ _('hide')|uc_first }}';
+    translate.moreText = '{{ _('show more')|uc_first }}';
+    translate.lessText = '{{ _('show less')|uc_first }}';
 
-  // Map
-  translate.map_clear = '{{ _('map_clear')|uc_first|safe }}';
-  translate.map_info_reedit = '{{ _('map_info_reedit')|uc_first|safe }}';
-  translate.map_info_shape = '{{ _('map_info_shape')|uc_first|safe }}';
-  translate.map_info_area = '{{ _('map_info_area')|uc_first|safe }}';
-  translate.map_info_centerpoint = '{{ _('map_info_point')|uc_first|safe }}';
-  translate.map_info_linestring = '{{ _('map_info_linestring')|uc_first|safe }}';
-  translate.map_info_close = '{{ _('map_info_close')|uc_first|safe }}';
-  translate.map_info_description = '{{ _('map_info_description')|uc_first|safe }}';
-  translate.map_info_name = '{{ _('map_info_name')|uc_first|safe }}';
-  translate.map_info_easting = '{{ _('map_info_easting')|uc_first|safe }}';
-  translate.map_info_northing = '{{ _('map_info_northing')|uc_first|safe }}';
-  translate.map_info_points = '{{ _('map_info_points')|uc_first|safe }}';
-  translate.map_geonames_title = '{{ _('search by location name or postcode')|uc_first|safe }}';
-  translate.map_geonames_placeholder = '{{ _('enter a location name')|uc_first|safe }}';
+    // Map
+    translate.map_clear = '{{ _('map_clear')|uc_first|safe }}';
+    translate.map_info_reedit = '{{ _('map_info_reedit')|uc_first|safe }}';
+    translate.map_info_shape = '{{ _('map_info_shape')|uc_first|safe }}';
+    translate.map_info_area = '{{ _('map_info_area')|uc_first|safe }}';
+    translate.map_info_centerpoint = '{{ _('map_info_point')|uc_first|safe }}';
+    translate.map_info_linestring = '{{ _('map_info_linestring')|uc_first|safe }}';
+    translate.map_info_close = '{{ _('map_info_close')|uc_first|safe }}';
+    translate.map_info_description = '{{ _('map_info_description')|uc_first|safe }}';
+    translate.map_info_name = '{{ _('map_info_name')|uc_first|safe }}';
+    translate.map_info_easting = '{{ _('map_info_easting')|uc_first|safe }}';
+    translate.map_info_northing = '{{ _('map_info_northing')|uc_first|safe }}';
+    translate.map_info_points = '{{ _('map_info_points')|uc_first|safe }}';
+    translate.map_geonames_title = '{{ _('search by location name or postcode')|uc_first|safe }}';
+    translate.map_geonames_placeholder = '{{ _('enter a location name')|uc_first|safe }}';
 
+    $.extend($.fn.dataTable.defaults, {
+        language: {
+            url: '/static/assets/data_table_translations/{{ session.language | safe}}.json'
+        }
+    });
 </script>
