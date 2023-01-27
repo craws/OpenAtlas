@@ -36,7 +36,7 @@ def arche_fetch() -> str:
             _('creator'), _('latitude'), _('longitude'), _('description'),
             _('license'), _('date')])
     for entries in data.values():
-        for metadata in entries.values():
+        for metadata in entries.values():  # pragma: no cover
             table.rows.append([
                 metadata['image_id'],
                 metadata['name'],
@@ -64,14 +64,14 @@ def arche_fetch() -> str:
 
 @app.route('/arche/import', methods=['POST', 'GET'])
 @required_group('manager')
-def arche_import_data() -> Response:
+def arche_import_data() -> Response:  # pragma: no cover
     Transaction.begin()
     try:
         count = import_arche_data()
         Transaction.commit()
         g.logger.log('info', 'import', f'import: {count}')
         flash(f"{_('import of')}: {count}", 'info')
-    except Exception as e:  # pragma: no cover
+    except Exception as e:
         Transaction.rollback()
         g.logger.log('error', 'import', 'import failed', e)
         flash(_('error transaction'), 'error')

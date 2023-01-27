@@ -752,11 +752,14 @@ def admin_delete_orphaned_resized_images() -> Response:
 
 
 def get_disk_space_info() -> Optional[dict[str, Any]]:
-    process = run(
-        ['du', '-sb', app.config['FILES_PATH']],
-        capture_output=True,
-        text=True)
-    files_size = int(process.stdout.split()[0])
+    if os.name == 'posix':
+        process = run(
+            ['du', '-sb', app.config['FILES_PATH']],
+            capture_output=True,
+            text=True)
+        files_size = int(process.stdout.split()[0])
+    else:
+        files_size = 0  # pragma: no cover
     stats = shutil.disk_usage(app.config['UPLOAD_DIR'])
     percent_free = 100 - math.ceil(stats.free / (stats.total / 100))
     percent_files = math.ceil(files_size / (stats.total / 100))

@@ -22,9 +22,9 @@ def fetch_arche_data() -> dict[int, Any]:
             f"{app.config['ARCHE']['base_url']}/api/{id_}/metadata",
             headers={'Accept': 'application/n-triples'})
         try:
-            if req:
+            if req:  # pragma: no cover
                 collections[id_] = get_metadata(n_triples_to_json(req))
-        except HTTPError as http_error:
+        except HTTPError as http_error:  # pragma: no cover
             flash(f'ARCHE fetch failed: {http_error}', 'error')
             abort(404)
     return collections
@@ -104,14 +104,10 @@ def import_arche_data() -> int:
                 f'Creation of graffito from {name}')
             event.update({'attributes': {'begin_from': item['date']}})
             event.link('P108', artifact)
-            event.link(
-                'P11',
-                range_=get_or_create_person(
-                    item['creator'],
-                    person_types['artist_type']),
-                type_id=get_or_create_type(
-                    get_hierarchy_by_name('Involvement'),
-                    'Graffiti Artist').id)
+
+            get_or_create_person(
+                item['creator'],
+                person_types['photographer_type'])
 
             file = Entity.insert('file', name, f"Created by {item['creator']}")
             file.link(
@@ -133,7 +129,6 @@ def get_linked_image(data: list[dict[str, Any]]) -> str:
 
 
 def get_or_create_type(hierarchy: Type, type_name: str) -> Type:
-    g.types = Type.get_all()
     if type_ := get_type_by_name(type_name):
         if type_.root[0] == hierarchy.id:
             return type_

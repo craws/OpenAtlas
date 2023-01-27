@@ -68,6 +68,7 @@ JSON_FORMATS = {
     'geojson': 'application/json',
     'geojson-v2': 'application/json'}
 API_FORMATS = RDF_FORMATS | JSON_FORMATS
+
 # Used to connect to ACDH-CH ARCHE systems
 ARCHE = {
     'id': None,

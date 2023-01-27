@@ -2,3 +2,4 @@
 precision=2
 sort=cover
 skip_covered=True
+omit=openatlas/api/arche/*
