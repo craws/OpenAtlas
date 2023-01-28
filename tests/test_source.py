@@ -27,8 +27,7 @@ class SourceTest(TestBaseCase):
 
             rv = self.app.get(
                 url_for('link_insert', id_=source_id, view='actor'),
-                data={'checkbox_values': [gillian.id]},
-                follow_redirects=True)
+                data={'checkbox_values': [gillian.id]})
             assert b'Gillian' in rv.data
 
             rv = self.app.get(url_for('update', id_=source_id))
@@ -39,7 +38,7 @@ class SourceTest(TestBaseCase):
                 data={
                     'name': 'Source updated',
                     'description': 'some description',
-                    'artifact': str([artifact.id])},
+                    'artifact': [artifact.id]},
                 follow_redirects=True)
             assert b'Source updated' in rv.data
 
@@ -91,4 +90,4 @@ class SourceTest(TestBaseCase):
                     view='source_translation',
                     delete_id=translation_id),
                 follow_redirects=True)
-            assert b'The entry has been deleted.' in rv.data
+            assert b'The entry has been deleted' in rv.data

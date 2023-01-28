@@ -80,15 +80,14 @@ class UserTests(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 person = insert('person', 'Hugo')
-                event = insert('activity', 'Event Horizon')
-                event.link('P11', person)
+                insert('activity', 'Event Horizon').link('P11', person)
 
             rv = self.app.post(
                 url_for('ajax_bookmark'),
                 data={'entity_id': person.id})
             assert b'Remove bookmark' in rv.data
 
-            rv = self.app.get('/').data
+            rv = self.app.get('/')
             assert b'Hugo' in rv.data
 
             rv = self.app.post(

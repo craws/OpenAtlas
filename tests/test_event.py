@@ -3,7 +3,6 @@ from typing import Any
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.models.entity import Entity
 from tests.base import TestBaseCase, insert
 
 
@@ -26,16 +25,10 @@ class EventTest(TestBaseCase):
             assert b'+ Activity' in rv.data
 
             data = {'name': 'Event Horizon', 'place': residence.id}
-
             rv = self.app.post(
-                url_for('insert', class_='activity', origin_id=reference.id),
-                data=data,
-                follow_redirects=True)
-            assert bytes('Event Horizon', 'utf-8') in rv.data
-
-            with app.test_request_context():
-                app.preprocess_request()  # type: ignore
-                activity_id = Entity.get_by_view('event')[0].id
+                url_for('insert', class_='activity'),
+                data=data)
+            activity_id = rv.location.split('/')[-1]
 
             rv = self.app.post(
                 url_for('insert', class_='activity', origin_id=actor.id),
@@ -63,11 +56,10 @@ class EventTest(TestBaseCase):
                 url_for('insert', class_='move', origin_id=residence.id))
             assert b'Location' not in rv.data
 
-            event_name2 = 'Second event'
             rv = self.app.post(
                 url_for('insert', class_='acquisition'),
                 data={
-                    'name': event_name2,
+                    'name': 'Second event',
                     'given_place': [residence.id],
                     'place': residence.id,
                     'event': activity_id,

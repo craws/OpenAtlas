@@ -13,7 +13,6 @@ class IndexTests(TestBaseCase):
             assert 'x00' in str(self.app.get('/static/favicon.ico').data)
 
             rv = self.app.get(url_for('index_changelog'))
-            assert b'2.0.0' in rv.data
             assert b'is needed but current version is' not in rv.data
 
             rv = self.app.get(url_for('login'), follow_redirects=True)

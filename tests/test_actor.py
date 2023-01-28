@@ -1,6 +1,6 @@
 from typing import Any
 
-from flask import g, url_for
+from flask import url_for
 
 from openatlas import app
 from openatlas.models.link import Link
@@ -16,16 +16,14 @@ class ActorTests(TestBaseCase):
                 place = insert('place', 'Vienna')
                 event = insert('acquisition', 'Event Horizon')
                 group = insert('group', 'LV-426 colony')
-                sex = get_hierarchy('Sex')
-                sex_sub_1 = g.types[sex.subs[0]]
-                sex_sub_2 = g.types[sex.subs[1]]
 
             rv: Any = self.app.get(
                 url_for('insert', class_='person', origin_id=place.id))
             assert b'Vienna' in rv.data
 
+            sex = get_hierarchy('Sex')
             data = {
-                sex.id: sex_sub_1.id,
+                sex.id: sex.subs[0],
                 'name': 'Sigourney Weaver',
                 'alias-1': 'Ripley',
                 'residence': place.id,
@@ -66,9 +64,9 @@ class ActorTests(TestBaseCase):
             assert b'An entry has been created' in rv.data
 
             rv = self.app.post(
-                url_for('type_move_entities', id_=sex_sub_1.id),
+                url_for('type_move_entities', id_=sex.subs[0]),
                 data={
-                    sex.id: sex_sub_2.id,
+                    sex.id: sex.subs[1],
                     'selection': [actor_id],
                     'checkbox_values': str([actor_id])},
                 follow_redirects=True)

@@ -74,7 +74,7 @@ class ReferenceSystemTest(TestBaseCase):
                 url_for('update', id_=g.geonames.id),
                 data=data,
                 follow_redirects=True)
-            assert b'Changes have been saved.' in rv.data
+            assert b'Changes have been saved' in rv.data
 
             rv = self.app.post(
                 url_for('insert', class_='person'),
@@ -126,5 +126,6 @@ class ReferenceSystemTest(TestBaseCase):
                 url_for('insert', class_='place'),
                 data={
                     'name': 'Test',
-                    f'reference_system_id_{g.geonames.id}': ['invalid id', '']})
+                    f'reference_system_id_{g.geonames.id}':
+                        ['invalid id', '']})
             assert b'Wrong id format' in rv.data

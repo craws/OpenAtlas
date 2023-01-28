@@ -15,7 +15,6 @@ class TypeTest(TestBaseCase):
                 actor_type = get_hierarchy('Actor relation')
                 dimension_type = get_hierarchy('Dimensions')
                 historical_type = get_hierarchy('Historical place')
-                sex_type = get_hierarchy('Sex')
                 place = insert('place', 'Home')
                 place.link('P2', g.types[dimension_type.subs[0]], '46')
                 location = place.get_linked_entity_safe('P53')
@@ -46,7 +45,7 @@ class TypeTest(TestBaseCase):
                 url_for('update', id_=type_id),
                 data=data,
                 follow_redirects=True)
-            assert b'Changes have been saved.' in rv.data
+            assert b'Changes have been saved' in rv.data
 
             data['continue_'] = 'yes'
             rv = self.app.post(
@@ -72,34 +71,33 @@ class TypeTest(TestBaseCase):
                 data=data)
             assert b'Forbidden' in rv.data
 
-            admin_unit_id = get_hierarchy('Administrative unit').id
+            admin_unit = get_hierarchy('Administrative unit')
             rv = self.app.post(
                 url_for(
                     'insert',
                     class_='administrative_unit',
-                    origin_id=g.types[admin_unit_id].subs[0]),
+                    origin_id=admin_unit.subs[0]),
                 data={'name': 'admin unit'},
                 follow_redirects=True)
             assert b'An entry has been created' in rv.data
 
-            rv = self.app.get(
-                url_for('update', id_=g.types[admin_unit_id].subs[0]))
+            rv = self.app.get(url_for('update', id_=admin_unit.subs[0]))
             assert b'admin unit' in rv.data
 
             rv = self.app.get(url_for('view', id_=dimension_type.subs[0]))
             assert b'Unit' in rv.data
 
+            sex = get_hierarchy('Sex')
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 actor = insert('person', 'Connor MacLeod')
-                actor.link('P2', g.types[sex_type.subs[0]])
+                actor.link('P2', g.types[sex.subs[0]])
 
-            rv = self.app.get(
-                url_for('show_untyped_entities', id_=sex_type.id))
+            rv = self.app.get(url_for('show_untyped_entities', id_=sex.id))
             assert b'no entries' in rv.data
 
             rv = self.app.get(
-                url_for('show_untyped_entities', id_=admin_unit_id))
+                url_for('show_untyped_entities', id_=admin_unit.id))
             assert b'Home' in rv.data
 
             rv = self.app.get(
@@ -109,7 +107,7 @@ class TypeTest(TestBaseCase):
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                actor.link('P2', g.types[sex_type.subs[1]])
+                actor.link('P2', g.types[sex.subs[1]])
 
             rv = self.app.get(url_for('update', id_=actor.id))
             assert b'422' in rv.data
@@ -119,34 +117,30 @@ class TypeTest(TestBaseCase):
             assert b'403' in rv.data
 
             rv = self.app.get(
-                url_for('show_multiple_linked_entities', id_=sex_type.id))
+                url_for('show_multiple_linked_entities', id_=sex.id))
             assert b'Connor' in rv.data
 
             self.app.post(
-                url_for('hierarchy_update', id_=sex_type.id),
+                url_for('hierarchy_update', id_=sex.id),
                 data={'multiple': True})
-            rv = self.app.get(url_for('hierarchy_update', id_=sex_type.id))
+            rv = self.app.get(url_for('hierarchy_update', id_=sex.id))
             assert b'disabled="disabled" id="multiple"' in rv.data
 
             rv = self.app.get(
-                url_for('hierarchy_delete', id_=sex_type.id),
+                url_for('hierarchy_delete', id_=sex.id),
                 follow_redirects=True)
             assert b'Warning' in rv.data
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                actor.link(
-                    'P74',
-                    location,
-                    type_id=g.types[actor_type.subs[0]].id)
+                actor.link('P74', location, type_id=actor_type.subs[0])
+
             rv = self.app.get(
-                url_for(
-                    'type_delete_recursive',
-                    id_=g.types[actor_type.subs[0]].id))
+                url_for('type_delete_recursive', id_=actor_type.subs[0]))
             assert b'Warning' in rv.data
 
             rv = self.app.post(
-                url_for('type_delete_recursive', id_=sex_type.id),
+                url_for('type_delete_recursive', id_=sex.id),
                 data={'confirm_delete': True},
                 follow_redirects=True)
             assert b'Types deleted' in rv.data

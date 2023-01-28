@@ -19,7 +19,6 @@ class MailTests(TestBaseCase):
 
             rv = self.app.post(
                 url_for('admin_settings', category='mail'),
-                follow_redirects=True,
                 data={
                     'mail': True,
                     'mail_transport_username': 'whatever',
@@ -27,7 +26,8 @@ class MailTests(TestBaseCase):
                     'mail_transport_port': '23',
                     'mail_from_email': 'max@example.com',
                     'mail_from_name': 'Max Headroom',
-                    'mail_recipients_feedback': 'headroom@example.com'})
+                    'mail_recipients_feedback': 'headroom@example.com'},
+                follow_redirects=True)
             assert b'Max Headroom' in rv.data
 
             rv = self.app.get(url_for('index_unsubscribe', code='666'))
@@ -81,16 +81,15 @@ class MailTests(TestBaseCase):
             assert b'Forgot your password?' not in rv.data
 
             self.app.get(url_for('logout'))
-            rv = self.app.get(
-                url_for('reset_confirm', code='6666'), follow_redirects=True)
+            rv = self.app.get(url_for('reset_confirm', code='6666'))
             assert b'Invalid' in rv.data
 
             rv = self.app.get(
-                url_for('reset_confirm', code='1234'), follow_redirects=True)
+                url_for('reset_confirm', code='1234'),
+                follow_redirects=True)
             assert b'A new password was sent to' in rv.data
 
-            rv = self.app.get(
-                url_for('reset_confirm', code='5678'), follow_redirects=True)
+            rv = self.app.get(url_for('reset_confirm', code='5678'))
             assert b'expired' in rv.data
 
             rv = self.app.post(
@@ -101,6 +100,5 @@ class MailTests(TestBaseCase):
 
             rv = self.app.post(
                 url_for('reset_password'),
-                data={'email': 'non-exising@example.com'},
-                follow_redirects=True)
+                data={'email': 'non-exising@example.com'})
             assert b'this email address is unknown to us' in rv.data

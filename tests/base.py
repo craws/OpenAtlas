@@ -1,5 +1,5 @@
-import pathlib
 import unittest
+from pathlib import Path
 from typing import Optional
 
 import psycopg2
@@ -18,7 +18,12 @@ class TestBaseCase(unittest.TestCase):
         self.setup_database()
         self.app = app.test_client()
         self.login('Alice', logout=False)
-        self.prepare_reference_system_form_data()
+        with app.app_context():
+            with app.test_request_context():
+                app.preprocess_request()  # type: ignore
+                self.alice_id = 2
+                self.precision_type = \
+                    Type.get_hierarchy('External reference match')
 
     def login(self, name: str, logout: bool = True) -> None:
         with app.app_context():
@@ -44,18 +49,9 @@ class TestBaseCase(unittest.TestCase):
                 '4_data_type',
                 'data_test']:
             with open(
-                    pathlib.Path(app.root_path).parent / 'install' /
-                    f'{file_name}.sql',
-                    encoding='utf8') as sql_file:
+                    Path(app.root_path).parent / 'install' /
+                    f'{file_name}.sql', encoding='utf8') as sql_file:
                 self.cursor.execute(sql_file.read())
-
-    def prepare_reference_system_form_data(self) -> None:
-        with app.app_context():
-            with app.test_request_context():
-                app.preprocess_request()  # type: ignore
-                self.alice_id = 2
-                self.precision_type = \
-                    Type.get_hierarchy('External reference match')
 
 
 class ApiTestCase(TestBaseCase):
@@ -63,8 +59,7 @@ class ApiTestCase(TestBaseCase):
     def setUp(self) -> None:
         super().setUp()
         with open(
-                pathlib.Path(app.root_path).parent / 'install' /
-                'data_test_api.sql',
+                Path(app.root_path).parent / 'install' / 'data_test_api.sql',
                 encoding='utf8') as sql_file:
             self.cursor.execute(sql_file.read())
 
