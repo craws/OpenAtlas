@@ -127,10 +127,7 @@ def type_delete_recursive(id_: int) -> Union[str, Response]:
     if root:
         crumbs += [g.types[type_id] for type_id in type_.root]
     crumbs += [type_, _('delete')]
-    return render_template(
-        'tabs.html',
-        tabs=tabs,
-        crumbs=crumbs)
+    return render_template('tabs.html', tabs=tabs, crumbs=crumbs)
 
 
 @app.route('/type/move/<int:id_>', methods=['POST', 'GET'])

@@ -28,8 +28,8 @@ class HierarchyTest(TestBaseCase):
                 data=data,
                 follow_redirects=True)
             assert b'The name is already in use' in rv.data
-            hierarchy = get_hierarchy('Geronimo')
 
+            hierarchy = get_hierarchy('Geronimo')
             data['classes'] = ['acquisition']
             data['entity_id'] = hierarchy.id
             rv = self.app.post(
@@ -44,10 +44,7 @@ class HierarchyTest(TestBaseCase):
             rv = self.app.get(url_for('hierarchy_insert', category='custom'))
             assert b'+ Custom' in rv.data
 
-            with app.test_request_context():
-                app.preprocess_request()  # type: ignore
-                sex_hierarchy = get_hierarchy('Sex')
-
+            sex_hierarchy = get_hierarchy('Sex')
             rv = self.app.get(
                 url_for('required_risk', id_=sex_hierarchy.id),
                 follow_redirects=True)
