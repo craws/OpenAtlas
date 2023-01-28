@@ -61,8 +61,7 @@ class ReferenceSystemTest(TestBaseCase):
                 follow_redirects=True)
             assert b'The entry has been deleted' in rv.data
 
-            rv = self.app.get(
-                url_for('update', id_=g.reference_system_geonames.id))
+            rv = self.app.get(url_for('update', id_=g.geonames.id))
             assert b'Website URL' in rv.data
 
             data: dict[Any, Any] = {
@@ -72,7 +71,7 @@ class ReferenceSystemTest(TestBaseCase):
                 'resolver_url': 'https://www.geonames2.org/',
                 'placeholder': ''}
             rv = self.app.post(
-                url_for('update', id_=g.reference_system_geonames.id),
+                url_for('update', id_=g.geonames.id),
                 data=data,
                 follow_redirects=True)
             assert b'Changes have been saved.' in rv.data
@@ -81,11 +80,11 @@ class ReferenceSystemTest(TestBaseCase):
                 url_for('insert', class_='person'),
                 data={
                     'name': 'Actor test',
-                    self.wikidata: ['Q123', self.precision_type.subs[0]]})
+                    f'reference_system_id_{g.wikidata.id}':
+                        ['Q123', self.precision_type.subs[0]]})
             person_id = rv.location.split('/')[-1]
 
-            rv = self.app.get(
-                url_for('view', id_=g.reference_system_wikidata.id))
+            rv = self.app.get(url_for('view', id_=g.wikidata.id))
             assert b'Actor test' in rv.data
 
             rv = self.app.get(url_for('view', id_=person_id))
@@ -104,23 +103,28 @@ class ReferenceSystemTest(TestBaseCase):
                 url_for(
                     'index',
                     view='reference_system',
-                    delete_id=g.reference_system_geonames.id))
+                    delete_id=g.geonames.id))
             assert b'403 - Forbidden' in rv.data
 
             rv = self.app.get(
                 url_for(
                     'reference_system_remove_class',
-                    system_id=g.reference_system_wikidata.id,
+                    system_id=g.wikidata.id,
                     class_name='person'),
                 follow_redirects=True)
             assert b'403 - Forbidden' in rv.data
 
             rv = self.app.post(
                 url_for('insert', class_='person'),
-                data={'name': 'Test',  self.wikidata: ['invalid id', '']})
+                data={
+                    'name': 'Test',
+                    f'reference_system_id_{g.wikidata.id}':
+                        ['invalid id', '']})
             assert b'Wrong id format' in rv.data
 
             rv = self.app.post(
                 url_for('insert', class_='place'),
-                data={'name': 'Test', self.geonames: ['invalid id', '']})
+                data={
+                    'name': 'Test',
+                    f'reference_system_id_{g.geonames.id}': ['invalid id', '']})
             assert b'Wrong id format' in rv.data

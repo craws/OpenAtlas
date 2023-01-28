@@ -3,7 +3,7 @@ import unittest
 from typing import Optional
 
 import psycopg2
-from flask import g, url_for
+from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
@@ -51,14 +51,11 @@ class TestBaseCase(unittest.TestCase):
 
     def prepare_reference_system_form_data(self) -> None:
         with app.app_context():
-            self.app.get('/')  # Needed to initialise g
-            self.alice_id = 2
-            self.precision_type = \
-                Type.get_hierarchy('External reference match')
-            self.geonames = \
-                f'reference_system_id_{g.reference_system_geonames.id}'
-            self.wikidata = \
-                f'reference_system_id_{g.reference_system_wikidata.id}'
+            with app.test_request_context():
+                app.preprocess_request()  # type: ignore
+                self.alice_id = 2
+                self.precision_type = \
+                    Type.get_hierarchy('External reference match')
 
 
 class ApiTestCase(TestBaseCase):

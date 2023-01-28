@@ -1,6 +1,6 @@
 from typing import Any
 
-from flask import url_for
+from flask import g, url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
@@ -75,7 +75,8 @@ class EventTest(TestBaseCase):
                     'begin_month_from': '10',
                     'begin_day_from': '8',
                     'end_year_from': '1951',
-                    self.wikidata: ['Q123', self.precision_type.subs[0]]})
+                    f'reference_system_id_{g.wikidata.id}':
+                        ['Q123', self.precision_type.subs[0]]})
             event_id = rv.location.split('/')[-1]
 
             rv = self.app.get(url_for('view', id_=event_id))

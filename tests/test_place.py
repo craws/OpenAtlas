@@ -29,7 +29,8 @@ class PlaceTest(TestBaseCase):
                 'name': 'Asgard',
                 'alias-0': 'Valhöll',
                 unit_type.id: str([unit_sub1.id, unit_sub2.id]),
-                self.geonames: ['123456', self.precision_type.subs[0]]}
+                f'reference_system_id_{g.geonames.id}':
+                    ['123456', self.precision_type.subs[0]]}
             rv: Any = self.app.post(
                 url_for('insert', class_='place', origin_id=reference.id),
                 data=data,
