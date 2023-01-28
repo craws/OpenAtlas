@@ -9,12 +9,12 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.display.table import Table
+from openatlas.display.util import get_base_table_data, uc_first
 from openatlas.forms import base_manager, manager
 from openatlas.forms.field import TableMultiField, TreeField
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.type import Type
-from openatlas.display.util import get_base_table_data, uc_first
 
 
 def get_manager(
@@ -45,21 +45,19 @@ def get_add_reference_form(class_: str) -> FlaskForm:
 
 
 def get_table_form(class_: str, linked_entities: list[Entity]) -> str:
-    """ Returns a form with a list of entities with checkboxes."""
     entities = Entity.get_by_view(class_, types=True, aliases=True)
     linked_ids = [entity.id for entity in linked_entities]
     table = Table([''] + g.table_headers[class_], order=[[1, 'asc']])
     for entity in entities:
-        if entity.id in linked_ids:
-            continue  # Don't show already linked entries
-        input_ = f"""
-            <input
-                id="selection-{entity.id}"
-                name="values"
-                type="checkbox"
-                value="{entity.id}">"""
-        table.rows.append(
-            [input_] + get_base_table_data(entity, show_links=False))
+        if entity.id not in linked_ids:
+            input_ = f"""
+                <input
+                    id="selection-{entity.id}"
+                    name="values"
+                    type="checkbox"
+                    value="{entity.id}">"""
+            table.rows.append(
+                [input_] + get_base_table_data(entity, show_links=False))
     if not table.rows:
         return uc_first(_('no entries'))
     return render_template(
