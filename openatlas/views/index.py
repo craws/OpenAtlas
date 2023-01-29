@@ -24,9 +24,11 @@ from openatlas.models.user import User
 def overview() -> str:
     if not current_user.is_authenticated:
         tabs = {
-            'info': Tab('info', render_template(
-                'index/index_guest.html',
-                intro=get_translation('intro')))}
+            'info': Tab(
+                'info',
+                render_template(
+                    'index/index_guest.html',
+                    intro=get_translation('intro')))}
         return render_template('tabs.html', tabs=tabs, crumbs=['overview'])
     tabs = {
         'info': Tab('info'),
