@@ -41,7 +41,7 @@ class Table:
             'data': self.rows,
             'stateSave': 'true',
             'columns':
-                [{'title': uc_first(_(i)) if i else ''} for i in self.header] +
+                [{'title': _(i) if i else ''} for i in self.header] +
                 [{'title': ''}  # Add empty
                  for _item in range(len(self.rows[0]) - len(self.header))],
             'paging': self.paging,

@@ -1,195 +1,209 @@
 html, body, input, select, textarea {
-    font-family: helvetica, arial, sans-serif;
+  font-family: helvetica, arial, sans-serif;
 }
+
 a{
-    font-weight: bold;
-    text-decoration: none;
+  font-weight: bold;
+  text-decoration: none;
 }
+
 h1, h2, h3 {
-    font-size: 100%;
+  font-size: 100%;
 }
 
 h1 {
-    font-weight: bold;
-    margin: 1em 0;
-    font-size: 1.1em;
+  font-weight: bold;
+  margin: 1em 0;
+  font-size: 1.1em;
 }
 
 h2 {
-    font-weight: bold;
-    margin: 1em 0;
+  font-weight: bold;
+  margin: 1em 0;
 }
 
 
 .toolbar{
-    margin-bottom: 1rem;
+  margin-bottom: 1rem;
 }
-/*header*/
+
+/* Header */
 img#logo {
-    height: 40px;
+  height: 40px;
 }
 
-/* form `*/
+/* Form */
 #content {
-    font-size: 0.9em;
+  font-size: 0.9em;
 }
 
-/*table*/
+/* Table */
 .table tr p {
-    margin: 0.2rem 0 0.2rem 0;
+  margin: 0.2rem 0 0.2rem 0;
 }
-.dataTables_info{
-    white-space: nowrap;
-}
-.data-table td {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100px;
-}
-tbody {
-    border-top: 0 solid !important;
-  }
 
-/* map */
+.dataTables_info{
+  white-space: nowrap;
+}
+
+.data-table td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px;
+}
+
+tbody {
+  border-top: 0 solid !important;
+}
+
+/* Map */
 .map{
-    position:sticky !important;
-    top:1rem;
+  position:sticky !important;
+  top:1rem;
 }
 
 /* Forms */
 form ul, form ol, form li {
-    list-style: none;
-    padding: 0;
-    margin-bottom: 0.2rem ;
+  list-style: none;
+  padding: 0;
+  margin-bottom: 0.2rem ;
 }
 
-/* utilities */
+/* Utilities */
 .uc-first:first-letter {
-    text-transform: uppercase;
+  text-transform: uppercase;
 }
+
 @-moz-document url-prefix() {
-    .uc-first:first-letter {
-        text-transform: none!important;
-    }
+  .uc-first:first-letter {
+    text-transform: none!important;
+  }
 }
+
 .bg-gray{
-   background-color: #e9ecef !important
+  background-color: #e9ecef !important
 }
 
 .no-label label{
-    display:none
+  display:none
 }
 
 .input-height-sm{
-    min-height: calc(1.5em + .5rem + 2px);
+  min-height: calc(1.5em + .5rem + 2px);
 }
 
 .width-full{
-    width:100%;
+  width:100%;
 }
 
 .value-type-switcher[show]{
-    rotate:90deg;
+  rotate:90deg;
 }
+
 .value-type-switcher{
-    transition:all ease-in 100ms;
+  transition:all ease-in 100ms;
 }
 
 td.fit-width{
-    width:1px;
-    max-width: initial!important;
+  width:1px;
+  max-width: initial!important;
+}
 
-}
 table.table-no-style tr td{
-    border-bottom-width: 0!important;;
+  border-bottom-width: 0!important;;
 }
+
 .more {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 10;
-    -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 10;
+  -webkit-box-orient: vertical;
 }
+
 .more-link {
-    display: block;
+  display: block;
 }
+
 .error {
-    color: #dc3545;
+  color: #dc3545;
 }
-/* drop-field */
+
+/* Drop-field */
 .drag-n-drop {
-    min-height: 120px;
-    width: 100%;
-    border: grey 2px dashed;
-    border-radius: 2px;
-    flex-wrap: wrap;
-    margin-top: 5px;
-    white-space: normal;
-    padding:5px;
-    color: rgba(var(--bs-secondary-rgb),1) !important;
+  min-height: 120px;
+  width: 100%;
+  border: grey 2px dashed;
+  border-radius: 2px;
+  flex-wrap: wrap;
+  margin-top: 5px;
+  white-space: normal;
+  padding:5px;
+  color: rgba(var(--bs-secondary-rgb),1) !important;
 }
 
 .drag-n-drop.highlight {
-    border: 2px #007bff dashed;
-    color:#007bff !important;
+  border: 2px #007bff dashed;
+  color:#007bff !important;
 }
 
 .drag-n-drop .drag-drop-item {
-    width: 150px;
-    margin: 5px;
-    height: 54px;
-    display: inline-block;
+  width: 150px;
+  margin: 5px;
+  height: 54px;
+  display: inline-block;
 }
 
 .drag-n-drop .drag-drop-item .card-body {
-    white-space: nowrap;
-    overflow: hidden;
-    color:black;
-    text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  color:black;
+  text-overflow: ellipsis;
 }
 
 .drag-n-drop .drag-drop-item .card-body .card-icon {
-    font-size: 1.4rem;
-    color: grey;
-    margin-right: 4px;
+  font-size: 1.4rem;
+  color: grey;
+  margin-right: 4px;
 }
 
 .drag-n-drop .instruction-text {
-    min-height: 100px;
-    display: grid;
-    place-content: center;
+  min-height: 100px;
+  display: grid;
+  place-content: center;
 }
 
 .drag-n-drop .drag-drop-item .card-body .close-icon {
-    position:absolute;
-    top:5px;
-    right:5px;
-    color:grey;
-    cursor: pointer;
+  position:absolute;
+  top:5px;
+  right:5px;
+  color:grey;
+  cursor: pointer;
 }
 .drag-n-drop .drag-drop-item .card-body .close-icon:hover {
-    color:black;
+  color:black;
 }
-/* model */
+
+/* Model */
 img.schema_image {
-    width: 500px;
+  width: 500px;
 }
 
 /* js tree */
 .jstree li > a > .jstree-icon {
-    display: none;
+  display: none;
 }
 
 .jstree li > a {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* modals */
+/* Modals */
 .modal-body {
-    overflow: auto;
-    max-height: calc(100vh - 200px);
-    width: 100%;
+  overflow: auto;
+  max-height: calc(100vh - 200px);
+  width: 100%;
 }
