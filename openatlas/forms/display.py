@@ -71,8 +71,8 @@ def html_form(
             continue
 
         if field.id == 'save':
-            field.label.text = uc_first(field.label.text)
-            class_ = app.config['CSS']['button']['primary'] + ' text-wrap'
+            class_ = \
+                f"{app.config['CSS']['button']['primary']} text-wrap uc-first"
             buttons = []
             if manual_page:
                 buttons.append(manual(manual_page))
@@ -106,7 +106,6 @@ def add_row(
         row_css: Optional[str] = '') -> str:
     field_css = ""
     if field:
-        field.label.text = uc_first(field.label.text)
         if field.flags.required \
                 and field.label.text \
                 and form_id != 'login-form':
@@ -149,9 +148,9 @@ def add_dates(form: Any) -> str:
             valid_dates = False
             errors[field_name] = ''
             for error in getattr(form, field_name).errors:
-                errors[field_name] += uc_first(error)
+                errors[field_name] += error
             errors[field_name] = \
-                f'<label class="error">{errors[field_name]}</label>'
+                f'<label class="error uc-first">{errors[field_name]}</label>'
     return render_template(
         'util/dates.html',
         form=form,

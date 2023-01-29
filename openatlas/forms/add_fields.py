@@ -8,7 +8,7 @@ from wtforms import IntegerField, StringField, TextAreaField
 from wtforms.validators import (
     InputRequired, NoneOf, NumberRange, Optional as OptionalValidator)
 
-from openatlas.display.util import is_authorized, uc_first
+from openatlas.display.util import is_authorized
 from openatlas.forms.field import (
     ReferenceField, TreeField, TreeMultiField, ValueTypeField,
     ValueTypeRootField)
@@ -31,7 +31,7 @@ def add_reference_systems(class_: OpenatlasClass, form: Any) -> None:
             form,
             f'reference_system_id_{system.id}',
             ReferenceField(
-                uc_first(system.name),
+                system.name,
                 description=system.description,
                 placeholder=system.placeholder,
                 choices=precisions,

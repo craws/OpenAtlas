@@ -2,29 +2,14 @@
   <td class="text-nowrap fit-width">
   <div style="height:31px" class="d-flex align-items-center justify-content-end text-end">
     <label>
-      {% if label is string %}
-        {{ label|safe }}
-      {% else %}
-        {{ field.label|safe }}
-      {% endif %}
+      {{ label|safe if label is string else field.label|safe }}
       {{ field.description|tooltip|safe }}
     </label>
   </div>
   </td>
   <td class="align-middle">
     <div>
-      {% if value %}
-        {{ value|safe }}
-      {% else %}
-        {{ field(class_=field_css)|safe }}
-      {% endif %}
-      {% if field.errors %}
-        <span class="error">
-        {% for error in field.errors %}
-          {{ error|uc_first }}
-        {% endfor %}
-      </span>
-      {% endif %}
+      {{ value|safe if value else field(class_=field_css)|safe }}
     </div>
   </td>
 </tr>

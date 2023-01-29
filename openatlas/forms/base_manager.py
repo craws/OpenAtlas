@@ -127,7 +127,7 @@ class BaseManager:
             setattr(
                 self.form_class,
                 'insert_and_continue',
-                SubmitField(uc_first(_('insert and continue'))))
+                SubmitField(_('insert and continue')))
             setattr(self.form_class, 'continue_', HiddenField())
 
     def additional_fields(self) -> dict[str, Any]:
