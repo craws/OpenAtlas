@@ -3,11 +3,9 @@ from pathlib import Path
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.database.entity import Entity as DbEntity
 from openatlas.database.link import Link as DbLink
 from openatlas.models.link import Link
-from openatlas.models.type import Type
-from tests.base import TestBaseCase, insert_entity
+from tests.base import TestBaseCase, get_hierarchy, insert
 
 
 class AdminTests(TestBaseCase):
@@ -16,18 +14,15 @@ class AdminTests(TestBaseCase):
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                person = insert_entity('person', 'Oliver Twist')
-                insert_entity('person', 'Oliver Twist')
-                insert_entity('file', 'Forsaken file')
-                insert_entity('feature', 'Forsaken subunit')
-                id_invalid = DbEntity.insert({
-                    'name': 'Invalid linked entity',
-                    'openatlas_class_name': 'artifact',
-                    'code': 'E13', 'description': ''})
+                person = insert('person', 'Oliver Twist')
+                insert('person', 'Oliver Twist')
+                insert('file', 'Forsaken file')
+                insert('feature', 'Forsaken subunit')
+                invalid = insert('artifact', 'Invalid linked entity')
                 DbLink.insert({
                     'property_code': 'P86',
-                    'domain_id': id_invalid,
-                    'range_id': id_invalid,
+                    'domain_id': invalid.id,
+                    'range_id': invalid.id,
                     'description': '',
                     'type_id': None})
 
@@ -62,9 +57,9 @@ class AdminTests(TestBaseCase):
                 follow_redirects=True)
             assert b'An error occurred when trying to delete' in rv.data
 
-            with app.test_request_context():  # Create invalid dates
+            with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                event = insert_entity('acquisition', 'Event Horizon')
+                event = insert('acquisition', 'Event Horizon')
                 person.update({
                     'attributes': {
                         'begin_from': '2018-01-31',
@@ -74,10 +69,10 @@ class AdminTests(TestBaseCase):
                 involvement.begin_to = '2017-01-01'
                 involvement.end_from = '2017-01-01'
                 involvement.update()
-                source = insert_entity('source', 'Tha source')
+                source = insert('source', 'Tha source')
                 source.link('P67', event)
                 source.link('P67', event)
-                source_type = Type.get_hierarchy('Source')
+                source_type = get_hierarchy('Source')
                 source.link('P2', g.types[source_type.subs[0]])
                 source.link('P2', g.types[source_type.subs[1]])
 
@@ -102,8 +97,8 @@ class AdminTests(TestBaseCase):
 
             rv = self.app.post(
                 url_for('admin_check_similar'),
-                follow_redirects=True,
-                data={'classes': 'person', 'ratio': 100})
+                data={'classes': 'person', 'ratio': 100},
+                follow_redirects=True)
             assert b'Oliver Twist' in rv.data
 
             rv = self.app.get(url_for('admin_settings', category='mail'))
@@ -123,6 +118,12 @@ class AdminTests(TestBaseCase):
 
             rv = self.app.get(url_for('admin_content', item='legal_notice'))
             assert b'Save' in rv.data
+
+            rv = self.app.get(url_for('arche_index'))
+            assert b'https://arche-curation.acdh-dev.oeaw.ac.at/' in rv.data
+
+            rv = self.app.get(url_for('arche_fetch'))
+            assert b'No entities to retrieve' in rv.data
 
             rv = self.app.post(
                 url_for('admin_content', item='legal_notice'),

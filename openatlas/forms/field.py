@@ -9,7 +9,8 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (
     Field, FileField, FloatField, HiddenField, StringField, TextAreaField)
-from wtforms.widgets import FileInput, HiddenInput, TextInput, Input, HTMLString
+from wtforms.widgets import (
+    FileInput, HiddenInput, TextInput, Input, HTMLString)
 
 from openatlas.display.table import Table
 from openatlas import app
@@ -24,7 +25,7 @@ class RemovableListInput(HiddenInput):
             self,
             field: RemovableListField,
             *args: Any,
-            **kwargs: Any) -> RemovableListInput:
+            **kwargs: Any) -> str:
         [name, index] = field.id.split('-')
         return render_template(
             'forms/removable_list_field.html',
@@ -67,23 +68,30 @@ class ValueTypeInput(TextInput):
             *args: Any,
             **kwargs: Any) -> RemovableListInput:
         type_ = g.types[field.type_id]
-        unit_text = f'''<div class="input-group-text d-inline-block text-truncate"
-                    title="{type_.description}" style="max-width:80px;font-size:0.8rem">{type_.description}</div>'''
         padding = len(type_.root)
+        expand_col = \
+            f' <div class="me-1">{ value_type_expand_icon(type_)}</div>'
         return HTMLString(f'''
-        <div class="d-flex align-items-end" >
-                <div class="text-end d-flex justify-content-end align-items-end pe-2" style="width:{padding}rem">
-                {value_type_expand_icon(type_) if type_.subs else ''}</div>
-                  <div class="width-full">
-                    <label class="mb-1" for="{field.id}">{type_.name}</label>
-                    <div class="input-group">
-                      <input type="text" class="{app.config['CSS']['string_field']} 
-                        value-type" name="{field.id}" id="{field.id}" 
-                             value="{field.data or ''}" />
-                      {unit_text if type_.description else ''}
-                    </div>
-                    </div>
-                </div>''')
+            <div class="row g-1" >
+              <div class="col-4  d-flex" style="padding-left:{padding}rem">
+                {expand_col if type_.subs else ''}
+                <label
+                  class="text-truncate mt-1"
+                  title="{type_.name}"
+                  for="{field.id}">{type_.name}</label>
+              </div>
+              <div class="col">
+                <input
+                  type="text"
+                  class="{app.config['CSS']['string_field']} value-type"
+                  name="{field.id}" id="{field.id}"
+                  value="{field.data or ''}" />
+              </div>
+              <div
+                class="col-2 text-truncate"
+                title="{type_.description or ''}">{type_.description or ''}
+              </div>
+            </div>''')
 
 
 class ValueTypeField(FloatField):
@@ -96,8 +104,9 @@ class ValueTypeField(FloatField):
         super().__init__(label, validators, **kwargs)
         type_ = g.types[type_id]
         sub_of = ' '.join([f'sub-of-{i}' for i in type_.root])
-        self.selectors = f'value-type-field {sub_of} direct-sub-of-{type_.root[-1]} d-none'
-        self.field_data = f'data-show'
+        self.selectors = \
+            f'value-type-field {sub_of} direct-sub-of-{type_.root[-1]} d-none'
+        self.field_data = 'data-show'
         self.type_id = type_id
 
     widget = ValueTypeInput()
@@ -108,7 +117,7 @@ class ReferenceInput(Input):
             self,
             field: ReferenceField,
             *args: Any,
-            **kwargs: Any) -> RemovableListInput:
+            **kwargs: Any) -> str:
         return render_template('forms/reference_field.html', field=field)
 
 
@@ -128,10 +137,10 @@ class ReferenceField(Field):
         self.data = {"value": "", "precision": ""}
         self.row_css = "reference-system-switch"
 
-    def process_formdata(self, valuelist):
-        self.data = {"value": valuelist[0] if len(valuelist) == 2 else '',
-                     "precision": valuelist[1] if len(valuelist) == 2 else ''
-                     }
+    def process_formdata(self, valuelist: list[str]) -> None:
+        self.data = {
+            'value': valuelist[0] if len(valuelist) == 2 else '',
+            'precision': valuelist[1] if len(valuelist) == 2 else ''}
 
     widget = ReferenceInput()
 
@@ -163,11 +172,11 @@ class TableMultiSelect(HiddenInput):
                 <input type="checkbox" id="{entity.id}" value="{entity.name}"
                 {'checked' if entity.id in data else ''}>""")
             table.rows.append(row)
-        return super().__call__(field, **kwargs) + render_template(
+        return render_template(
             'forms/table_multi_select.html',
             field=field,
             selection=[e.name for e in entities if e.id in data],
-            table=table)
+            table=table) + super().__call__(field, **kwargs)
 
 
 class TableMultiField(HiddenField):
@@ -219,11 +228,11 @@ class TableSelect(HiddenInput):
             field.id,
             field.data,
             field.filter_ids)
-        return super().__call__(field, **kwargs) + render_template(
+        return render_template(
             'forms/table_select.html',
             field=field,
             table=table.display(field.id),
-            selection=selection)
+            selection=selection) + super().__call__(field, **kwargs)
 
 
 class TableField(HiddenField):
@@ -248,12 +257,13 @@ class TreeMultiSelect(HiddenInput):
     def __call__(self, field: TreeField, **kwargs: Any) -> TreeMultiSelect:
         data = field.data or []
         data = ast.literal_eval(data) if isinstance(data, str) else data
-        return super().__call__(field, **kwargs) + render_template(
+        return render_template(
             'forms/tree_multi_select.html',
             field=field,
             root=g.types[int(field.type_id)],
             selection=sorted([g.types[id_].name for id_ in data]),
-            data=Type.get_tree_data(int(field.id), data))
+            data=Type.get_tree_data(int(field.id), data)) \
+            + super().__call__(field, **kwargs)
 
 
 class TreeMultiField(HiddenField):
@@ -281,7 +291,7 @@ class TreeSelect(HiddenInput):
                 if isinstance(field.data, list) else field.data
             selection = g.types[int(field.data)].name
             selected_ids.append(g.types[int(field.data)].id)
-        return super().__call__(field, **kwargs) + render_template(
+        return render_template(
             'forms/tree_select.html',
             field=field,
             selection=selection,
@@ -289,7 +299,7 @@ class TreeSelect(HiddenInput):
             data=Type.get_tree_data(
                 int(field.type_id),
                 selected_ids,
-                field.filters_ids))
+                field.filters_ids)) + super().__call__(field, **kwargs)
 
 
 class TreeField(HiddenField):
@@ -343,5 +353,8 @@ class CustomField(Field):
 
 
 def generate_password_field() -> CustomField:
-    return CustomField('', content=f'''<span class="uc-first {app.config["CSS"]["button"]["primary"]}" 
-             id="generate-password">{_("generate password")}</span>''')
+    return CustomField(
+        '',
+        content=
+        f'<span class="uc-first {app.config["CSS"]["button"]["primary"]}" '
+        f'id="generate-password">{_("generate password")}</span>')

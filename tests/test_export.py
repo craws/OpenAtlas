@@ -18,7 +18,10 @@ class ExportTest(TestBaseCase):
             rv = self.app.post(url_for('export_sql'), follow_redirects=True)
             assert b'Data was exported as SQL' in rv.data
 
-            self.app.get(url_for('download_sql', filename=f'{date_}_dump.sql'))
+            rv = self.app.get(
+                url_for('download_sql', filename=f'{date_}_dump.sql.7z'))
+            assert b'7z' in rv.data
+
             rv = self.app.get(url_for('sql_index'))
             assert b'Warning' in rv.data
 
@@ -27,13 +30,11 @@ class ExportTest(TestBaseCase):
 
             rv = self.app.post(
                 url_for('sql_execute'),
-                data={'statement': 'SELECT * FROM web.user'})
+                data={'statement': 'SELECT * FROM web.user;'})
             assert b'Alice' in rv.data
 
-            rv = self.app.post(
-                url_for('sql_execute'),
-                data={'statement': 'SELECT * FROM fail;'})
-            assert b'relation "fail" does not exist' in rv.data
+            rv = self.app.post(url_for('sql_execute'), data={'statement': 'e'})
+            assert b'syntax error' in rv.data
 
             rv = self.app.get(
                 url_for('delete_export', filename=f'{date_}_dump.sql.7z'),

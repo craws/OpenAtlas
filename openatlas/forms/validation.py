@@ -32,7 +32,9 @@ def validate(form: FlaskForm) -> bool:
         if not validate_dates(form):
             valid = False
     for field_id, field in form.__dict__.items():  # External reference systems
-        if field_id.startswith('reference_system_id_') and field.data and field.data['value']:
+        if field_id.startswith('reference_system_id_') \
+                and field.data \
+                and field.data['value']:
             if not field.data['precision']:
                 valid = False
                 field.errors.append(uc_first(_('precision required')))
@@ -43,7 +45,8 @@ def validate(form: FlaskForm) -> bool:
                     valid = False
                 else:
                     field.data['value'] = uc_first(field.data['value'])
-            if field.label.text == 'GeoNames' and not field.data['value'].isnumeric():
+            if field.label.text == 'GeoNames' \
+                    and not field.data['value'].isnumeric():
                 field.errors.append(uc_first(_('wrong id format')))
                 valid = False
     return valid

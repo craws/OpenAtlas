@@ -73,18 +73,18 @@ $(document).ready(function () {
   $('.more').each(function () {
     var content = $(this).html();
     if (this.scrollHeight - 1 > this.clientHeight) {
-      more = '<a href="" class="more-link">' + moreText + '</a></span>';
+      more = '<a href="" class="more-link">' + translate.moreText + '</a></span>';
       $(more).insertAfter(this);
     }
   });
   $(".more-link").click(function () {
     if ($(this).hasClass("less")) {
       $(this).removeClass("less");
-      $(this).html(moreText);
+      $(this).html(translate.moreText);
       $(this).prev().css('line-clamp', "10");
     } else {
       $(this).addClass("less");
-      $(this).html(lessText);
+      $(this).html(translate.lessText);
       $(this).prev().css('line-clamp', "1000");
     }
     return false;
@@ -260,7 +260,7 @@ function selectFromTree(name, id, text) {
   $('#' + name).val(id)
   $('#' + name + '-button').val(text.replace(/&apos;/g, "'"));
   $('#' + name + '-modal').modal('hide');
-  $('#' + name + '-clear').show();
+  $('#' + name + '-clear-field').show();
 }
 
 function selectFromTreeMulti(name, value_type = false) {
@@ -296,7 +296,7 @@ function selectFromTable(element, table, id,label= undefined) {
   $("#" + table).attr('value', id);
   $("#" + table + "-button").val(label || element?.innerText );
   $("#" + table + "-button").focus(); /* to refresh/fill button and remove validation errors */
-  $("#" + table + "-clear").show();
+  $("#" + table + "-clear-field").show();
   $('#' + table + '-modal').modal('hide');
 }
 
@@ -318,7 +318,7 @@ function clearSelect(name) {
   $('#' + name).attr('value', '');
   $('#' + name + '-button').val('');
   $('#' + name + '-tree').jstree('deselect_all');
-  $('#' + name + '-clear').hide();
+  $('#' + name + '-clear-field').hide();
 }
 
 function overflow() {

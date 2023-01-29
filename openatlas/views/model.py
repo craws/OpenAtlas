@@ -259,7 +259,9 @@ def model_network(dimensions: Optional[int] = None) -> str:
     for class_ in classes:
         setattr(NetworkForm, class_.name, StringField(
             default=class_.network_color,
-            render_kw={'data-huebee': True, 'class': f'data-huebee {app.config["CSS"]["string_field"]}'}))
+            render_kw={
+                'data-huebee': True,
+                'class': f'data-huebee {app.config["CSS"]["string_field"]}'}))
     setattr(NetworkForm, 'save', SubmitField(_('apply')))
     form = NetworkForm()
     form.classes.choices = []

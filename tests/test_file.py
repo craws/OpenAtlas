@@ -1,11 +1,10 @@
-import pathlib
+from pathlib import Path
 
 from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
-from openatlas.models.type import Type
-from tests.base import TestBaseCase, insert_entity
+from tests.base import TestBaseCase, get_hierarchy, insert
 
 
 class FileTest(TestBaseCase):
@@ -14,11 +13,10 @@ class FileTest(TestBaseCase):
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                place = insert_entity('place', 'File keeper')
-                reference = insert_entity('edition', 'Ancient Books')
-                type_id = Type.get_hierarchy('Sex').subs[0]
+                place = insert('place', 'File keeper')
+                reference = insert('edition', 'Ancient Books')
 
-            logo = pathlib.Path(app.root_path) \
+            logo = Path(app.root_path) \
                 / 'static' / 'images' / 'layout' / 'logo.png'
 
             with open(logo, 'rb') as img_1, open(logo, 'rb') as img_2:
@@ -47,10 +45,7 @@ class FileTest(TestBaseCase):
             with self.app.get(url_for('download_file', filename=filename)):
                 pass
 
-            rv = self.app.get(
-                url_for('admin_logo'),
-                data={'file': file_id},
-                follow_redirects=True)
+            rv = self.app.get(url_for('admin_logo'), data={'file': file_id})
             assert b'OpenAtlas logo' in rv.data
 
             rv = self.app.get(
@@ -63,8 +58,7 @@ class FileTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Logo' in rv.data
 
-            with open(
-                    pathlib.Path(app.root_path) / 'views' / 'index.py', 'rb') \
+            with open(Path(app.root_path) / 'views' / 'index.py', 'rb') \
                     as invalid_file:
                 rv = self.app.post(
                     url_for('insert', class_='file', origin_id=place.id),
@@ -102,7 +96,7 @@ class FileTest(TestBaseCase):
             assert b'alt="image"' in rv.data
 
             rv = self.app.post(
-                url_for('entity_add_file', id_=type_id),
+                url_for('entity_add_file', id_=get_hierarchy('Sex').subs[0]),
                 data={'checkbox_values': str([file_id])},
                 follow_redirects=True)
             assert b'Updated file' in rv.data

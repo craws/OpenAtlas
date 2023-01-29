@@ -64,7 +64,7 @@ def get_table(path: Path, writable: bool) -> Table:
             convert_size(file.stat().st_size),
             link(
                 _('download'),
-                url_for(f'download_sql', filename=file.name))]
+                url_for('download_sql', filename=file.name))]
         if is_authorized('admin') and writable:
             confirm = _('Delete %(name)s?', name=file.name.replace("'", ''))
             data.append(
@@ -81,9 +81,9 @@ def get_table(path: Path, writable: bool) -> Table:
 def delete_export(filename: str) -> Response:
     try:
         (app.config['EXPORT_DIR'] / filename).unlink()
-        g.logger.log('info', 'file', f'SQL file deleted')
+        g.logger.log('info', 'file', 'SQL file deleted')
         flash(_('file deleted'), 'info')
     except Exception as e:
-        g.logger.log('error', 'file', f'SQL file deletion failed', e)
+        g.logger.log('error', 'file', 'SQL file deletion failed', e)
         flash(_('error file delete'), 'error')
-    return redirect(url_for(f'export_sql'))
+    return redirect(url_for('export_sql'))

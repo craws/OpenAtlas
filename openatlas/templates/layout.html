@@ -25,16 +25,13 @@
   <script src="/static/node_modules/jquery-ui-dist/jquery-ui.min.js"></script>
   <script src="/static/node_modules/@fortawesome/fontawesome-free/js/all.min.js"></script>
   <script src="/static/node_modules/bootstrap-autocomplete/dist/latest/bootstrap-autocomplete.min.js"></script>
+  {% include "util/translations.html" %}
   {% if gis_data %}
     {% include "map.html" %}
   {% endif %}
   <script>
     bookmark_csrf_token = '{{ csrf_token() }}';
     minimumPasswordLength = {{ g.settings.minimum_password_length }};
-    show = '{{ _('show')|uc_first }}';
-    hide = '{{ _('hide')|uc_first }}';
-    moreText = '{{ _('show more')|uc_first }}';
-    lessText = '{{ _('show less')|uc_first }}';
     maxFileSize = {{ g.settings.file_upload_max_size }}
     generatePassword = '{{ _('generate password')|uc_first }}';
     const style = {

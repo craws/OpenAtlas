@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-01-08 22:05+0100\n"
+"POT-Creation-Date: 2023-01-23 17:51+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,166 +17,169 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.8.0\n"
 
-#: openatlas/display/base_display.py:94 openatlas/views/entity_index.py:59
+#: openatlas/display/base_display.py:94 openatlas/views/entity_index.py:55
 #: openatlas/views/model.py:91
 msgid "icon"
 msgstr ""
 
-#: openatlas/display/base_display.py:121 openatlas/views/index.py:57
+#: openatlas/display/base_display.py:120 openatlas/views/index.py:57
 #: openatlas/views/note.py:22
 msgid "public"
 msgstr ""
 
-#: openatlas/display/base_display.py:122 openatlas/views/index.py:57
+#: openatlas/display/base_display.py:120 openatlas/views/index.py:57
 msgid "private"
 msgstr ""
 
-#: openatlas/display/base_display.py:126 openatlas/views/index.py:62
+#: openatlas/display/base_display.py:123 openatlas/views/index.py:62
 #: openatlas/views/model.py:85
 msgid "view"
 msgstr ""
 
-#: openatlas/display/base_display.py:133 openatlas/display/base_display.py:311
-#: openatlas/display/base_display.py:438 openatlas/display/display.py:210
+#: openatlas/display/base_display.py:130 openatlas/display/base_display.py:309
+#: openatlas/display/base_display.py:436 openatlas/display/display.py:210
 #: openatlas/display/util.py:53 openatlas/templates/admin/data.html:38
 #: openatlas/templates/import/project_view.html:4
-#: openatlas/templates/map.html:32 openatlas/templates/type/index.html:63
-#: openatlas/views/admin.py:97 openatlas/views/admin.py:120
-#: openatlas/views/admin.py:148 openatlas/views/admin.py:156
-#: openatlas/views/admin.py:168 openatlas/views/admin.py:175
-#: openatlas/views/admin.py:443 openatlas/views/anthropology.py:62
-#: openatlas/views/anthropology.py:137 openatlas/views/entity_form.py:115
-#: openatlas/views/hierarchy.py:108 openatlas/views/imports.py:144
-#: openatlas/views/link.py:104 openatlas/views/link.py:170
-#: openatlas/views/note.py:36 openatlas/views/profile.py:70
-#: openatlas/views/profile.py:74 openatlas/views/profile.py:77
-#: openatlas/views/user.py:154 openatlas/views/user.py:242
+#: openatlas/templates/type/index.html:66
+#: openatlas/templates/util/translations.html:5 openatlas/views/admin.py:97
+#: openatlas/views/admin.py:124 openatlas/views/admin.py:148
+#: openatlas/views/admin.py:156 openatlas/views/admin.py:167
+#: openatlas/views/admin.py:174 openatlas/views/admin.py:442
+#: openatlas/views/entity_form.py:115 openatlas/views/hierarchy.py:113
+#: openatlas/views/imports.py:142 openatlas/views/link.py:104
+#: openatlas/views/link.py:170 openatlas/views/note.py:36
+#: openatlas/views/profile.py:72 openatlas/views/profile.py:76
+#: openatlas/views/profile.py:79 openatlas/views/tools.py:92
+#: openatlas/views/tools.py:187 openatlas/views/tools.py:197
+#: openatlas/views/tools.py:264 openatlas/views/user.py:156
+#: openatlas/views/user.py:244
 msgid "edit"
 msgstr ""
 
-#: openatlas/display/base_display.py:138
+#: openatlas/display/base_display.py:135
 msgid "alias"
 msgstr ""
 
-#: openatlas/display/base_display.py:139 openatlas/display/base_display.py:179
-#: openatlas/display/display.py:135 openatlas/templates/util/dates.html:11
+#: openatlas/display/base_display.py:136 openatlas/display/base_display.py:176
+#: openatlas/display/display.py:135 openatlas/templates/util/dates.html:13
 msgid "begin"
 msgstr ""
 
-#: openatlas/display/base_display.py:140 openatlas/display/base_display.py:184
-#: openatlas/display/display.py:140 openatlas/templates/util/dates.html:38
+#: openatlas/display/base_display.py:137 openatlas/display/base_display.py:181
+#: openatlas/display/display.py:140 openatlas/templates/util/dates.html:64
 msgid "end"
 msgstr ""
 
-#: openatlas/display/base_display.py:144 openatlas/forms/display.py:38
-#: openatlas/templates/forms/tree_select.html:50
+#: openatlas/display/base_display.py:141 openatlas/forms/display.py:57
+#: openatlas/templates/forms/tree_select.html:56
 #: openatlas/templates/type/index.html:24
-#: openatlas/templates/type/index.html:59
+#: openatlas/templates/type/index.html:60
 msgid "type"
 msgstr ""
 
-#: openatlas/display/base_display.py:189 openatlas/forms/manager.py:255
+#: openatlas/display/base_display.py:186 openatlas/forms/manager.py:255
 #: openatlas/forms/manager.py:420
 msgid "residence"
 msgstr ""
 
-#: openatlas/display/base_display.py:192
+#: openatlas/display/base_display.py:189
 msgid "appears first"
 msgstr ""
 
-#: openatlas/display/base_display.py:193
+#: openatlas/display/base_display.py:190
 msgid "appears last"
 msgstr ""
 
-#: openatlas/display/base_display.py:215
+#: openatlas/display/base_display.py:212
 msgid "moved"
 msgstr ""
 
-#: openatlas/display/base_display.py:266 openatlas/forms/base_manager.py:301
+#: openatlas/display/base_display.py:263 openatlas/forms/base_manager.py:301
 msgid "sub event of"
 msgstr ""
 
-#: openatlas/display/base_display.py:268 openatlas/forms/base_manager.py:312
+#: openatlas/display/base_display.py:265 openatlas/forms/base_manager.py:312
 msgid "preceding event"
 msgstr ""
 
-#: openatlas/display/base_display.py:270
+#: openatlas/display/base_display.py:267
 msgid "succeeding event"
 msgstr ""
 
-#: openatlas/display/base_display.py:274 openatlas/forms/base_manager.py:322
+#: openatlas/display/base_display.py:271 openatlas/forms/base_manager.py:322
 msgid "location"
 msgstr ""
 
-#: openatlas/display/base_display.py:285 openatlas/forms/manager.py:328
-#: openatlas/views/admin.py:134 openatlas/views/user.py:124
-#: openatlas/views/user.py:166
+#: openatlas/display/base_display.py:282 openatlas/forms/manager.py:328
+#: openatlas/views/admin.py:134 openatlas/views/user.py:126
+#: openatlas/views/user.py:168
 msgid "activity"
 msgstr ""
 
-#: openatlas/display/base_display.py:330 openatlas/views/overlay.py:59
+#: openatlas/display/base_display.py:328 openatlas/views/overlay.py:59
 msgid "overlay"
 msgstr ""
 
-#: openatlas/display/base_display.py:355 openatlas/display/tab.py:248
-#: openatlas/display/util.py:569 openatlas/templates/forms/form_table.html:5
+#: openatlas/display/base_display.py:353 openatlas/display/tab.py:247
+#: openatlas/display/util.py:572 openatlas/templates/forms/form_table.html:5
 #: openatlas/views/link.py:63 openatlas/views/reference.py:34
 msgid "link"
 msgstr ""
 
-#: openatlas/display/base_display.py:429 openatlas/forms/display.py:40
+#: openatlas/display/base_display.py:427 openatlas/forms/display.py:59
 #: openatlas/forms/manager.py:181 openatlas/forms/manager.py:278
 #: openatlas/templates/model/cidoc_class_view.html:13
 #: openatlas/templates/model/property_view.html:13
 msgid "super"
 msgstr ""
 
-#: openatlas/display/base_display.py:431 openatlas/forms/base_manager.py:79
+#: openatlas/display/base_display.py:429 openatlas/forms/base_manager.py:79
 msgid "unit"
 msgstr ""
 
-#: openatlas/display/base_display.py:432
+#: openatlas/display/base_display.py:430
 msgid "ID for imports"
 msgstr ""
 
-#: openatlas/display/base_display.py:442 openatlas/display/util.py:283
+#: openatlas/display/base_display.py:440 openatlas/display/util.py:250
 #: openatlas/templates/type/index.html:13 openatlas/views/entity_form.py:108
 #: openatlas/views/hierarchy.py:48 openatlas/views/hierarchy.py:50
-#: openatlas/views/hierarchy.py:107 openatlas/views/hierarchy.py:108
-#: openatlas/views/hierarchy.py:147 openatlas/views/type.py:60
+#: openatlas/views/hierarchy.py:112 openatlas/views/hierarchy.py:113
+#: openatlas/views/hierarchy.py:152 openatlas/views/type.py:60
 #: openatlas/views/type.py:61 openatlas/views/type.py:126
 #: openatlas/views/type.py:164 openatlas/views/type.py:186
 #: openatlas/views/type.py:213
 msgid "types"
 msgstr ""
 
-#: openatlas/display/base_display.py:460 openatlas/display/tab.py:85
-#: openatlas/forms/add_fields.py:242 openatlas/forms/base_manager.py:94
-#: openatlas/forms/field.py:97 openatlas/forms/util.py:25
+#: openatlas/display/base_display.py:458 openatlas/display/tab.py:84
+#: openatlas/forms/add_fields.py:236 openatlas/forms/base_manager.py:94
+#: openatlas/forms/field.py:194 openatlas/forms/util.py:25
 #: openatlas/views/imports.py:31
 msgid "name"
 msgstr ""
 
-#: openatlas/display/base_display.py:460
+#: openatlas/display/base_display.py:458
 msgid "value"
 msgstr ""
 
-#: openatlas/display/base_display.py:460 openatlas/display/util.py:227
+#: openatlas/display/base_display.py:458 openatlas/display/util.py:195
 #: openatlas/forms/setting.py:94
 msgid "class"
 msgstr ""
 
-#: openatlas/display/base_display.py:460 openatlas/display/tab.py:85
+#: openatlas/display/base_display.py:458 openatlas/display/tab.py:84
 #: openatlas/templates/model/cidoc_class_view.html:6
-#: openatlas/templates/model/property_view.html:6 openatlas/views/user.py:38
+#: openatlas/templates/model/property_view.html:6 openatlas/views/user.py:40
 msgid "info"
 msgstr ""
 
-#: openatlas/display/base_display.py:470 openatlas/views/type.py:118
+#: openatlas/display/base_display.py:468 openatlas/views/type.py:118
 msgid "domain"
 msgstr ""
 
-#: openatlas/display/base_display.py:470 openatlas/views/type.py:118
+#: openatlas/display/base_display.py:468 openatlas/views/tools.py:231
+#: openatlas/views/type.py:118
 msgid "range"
 msgstr ""
 
@@ -213,7 +216,7 @@ msgstr ""
 #: openatlas/display/display.py:62
 #: openatlas/templates/import/import_data.html:6
 #: openatlas/templates/model/network.html:12
-#: openatlas/templates/sql/execute.html:6 openatlas/views/admin.py:530
+#: openatlas/templates/sql/execute.html:6 openatlas/views/admin.py:529
 #: openatlas/views/export.py:66
 msgid "download"
 msgstr ""
@@ -251,17 +254,21 @@ msgstr ""
 msgid "entity"
 msgstr ""
 
-#: openatlas/display/display.py:220 openatlas/forms/add_fields.py:42
+#: openatlas/display/display.py:220
+#: openatlas/templates/forms/reference_field.html:11
 msgid "precision"
 msgstr ""
 
 #: openatlas/display/display.py:234 openatlas/display/util.py:46
-#: openatlas/views/admin.py:298 openatlas/views/hierarchy.py:101
+#: openatlas/views/admin.py:297 openatlas/views/hierarchy.py:101
 #: openatlas/views/overlay.py:97
 msgid "remove"
 msgstr ""
 
-#: openatlas/display/display.py:285
+#: openatlas/display/display.py:285 openatlas/templates/tools/index.html:3
+#: openatlas/views/tools.py:82 openatlas/views/tools.py:119
+#: openatlas/views/tools.py:185 openatlas/views/tools.py:209
+#: openatlas/views/tools.py:262
 msgid "tools"
 msgstr ""
 
@@ -305,25 +312,25 @@ msgstr ""
 msgid "circular dependencies"
 msgstr ""
 
-#: openatlas/display/tab.py:83
+#: openatlas/display/tab.py:82
 msgid "main image"
 msgstr ""
 
-#: openatlas/display/tab.py:85 openatlas/views/admin.py:379
+#: openatlas/display/tab.py:84 openatlas/views/admin.py:378
 msgid "count"
 msgstr ""
 
-#: openatlas/display/tab.py:143 openatlas/forms/form.py:80
+#: openatlas/display/tab.py:142 openatlas/forms/form.py:80
 #: openatlas/views/type.py:167
 msgid "move entities"
 msgstr ""
 
-#: openatlas/display/tab.py:209 openatlas/views/index.py:39
-#: openatlas/views/note.py:54
+#: openatlas/display/tab.py:208 openatlas/views/index.py:39
+#: openatlas/views/note.py:45 openatlas/views/note.py:54
 msgid "note"
 msgstr ""
 
-#: openatlas/display/tab.py:269
+#: openatlas/display/tab.py:268
 msgid "text"
 msgstr ""
 
@@ -335,10 +342,10 @@ msgstr ""
 msgid "next"
 msgstr ""
 
-#: openatlas/display/table.py:12 openatlas/forms/display.py:206
-#: openatlas/templates/layout.html:34 openatlas/templates/type/index.html:107
+#: openatlas/display/table.py:12 openatlas/forms/display.py:152
 #: openatlas/templates/type/index.html:113
-#: openatlas/templates/util/reference_system_switch.html:6
+#: openatlas/templates/type/index.html:119
+#: openatlas/templates/util/translations.html:9
 msgid "show"
 msgstr ""
 
@@ -349,6 +356,11 @@ msgstr ""
 #: openatlas/display/table.py:14
 #, python-format
 msgid "showing %(first)s to %(last)s of %(all)s entries"
+msgstr ""
+
+#: openatlas/display/table.py:34 openatlas/forms/form.py:64
+#: openatlas/views/admin.py:387
+msgid "no entries"
 msgstr ""
 
 #: openatlas/display/util.py:49
@@ -373,56 +385,58 @@ msgstr ""
 msgid "between %(begin)s and %(end)s"
 msgstr ""
 
-#: openatlas/display/util.py:148
-msgid "no preview available"
-msgstr ""
-
-#: openatlas/display/util.py:167
+#: openatlas/display/util.py:135
 msgid "unset"
 msgstr ""
 
-#: openatlas/display/util.py:173 openatlas/views/admin.py:613
+#: openatlas/display/util.py:141 openatlas/views/admin.py:612
 msgid "set"
 msgstr ""
 
-#: openatlas/display/util.py:191 openatlas/views/admin.py:522
+#: openatlas/display/util.py:159 openatlas/views/admin.py:521
 #: openatlas/views/export.py:69
 #, python-format
 msgid "Delete %(name)s?"
 msgstr ""
 
-#: openatlas/display/util.py:193 openatlas/templates/import/project_view.html:5
-#: openatlas/templates/map.html:33 openatlas/templates/type/index.html:66
-#: openatlas/templates/type/index.html:68
-#: openatlas/templates/type/index.html:70 openatlas/views/admin.py:533
+#: openatlas/display/util.py:161 openatlas/templates/import/project_view.html:5
+#: openatlas/templates/type/index.html:70
+#: openatlas/templates/type/index.html:72
+#: openatlas/templates/type/index.html:74
+#: openatlas/templates/util/translations.html:6 openatlas/views/admin.py:532
 #: openatlas/views/export.py:72 openatlas/views/note.py:37
-#: openatlas/views/type.py:129 openatlas/views/user.py:75
-#: openatlas/views/user.py:160
+#: openatlas/views/tools.py:95 openatlas/views/tools.py:97
+#: openatlas/views/type.py:129 openatlas/views/user.py:77
+#: openatlas/views/user.py:162
 msgid "delete"
 msgstr ""
 
-#: openatlas/display/util.py:231
+#: openatlas/display/util.py:199
 msgid "created"
 msgstr ""
 
-#: openatlas/display/util.py:234
+#: openatlas/display/util.py:202
 msgid "modified"
 msgstr ""
 
-#: openatlas/display/util.py:238
+#: openatlas/display/util.py:206
 msgid "imported from"
 msgstr ""
 
-#: openatlas/display/util.py:239
+#: openatlas/display/util.py:207
 msgid "imported by"
 msgstr ""
 
-#: openatlas/display/util.py:249 openatlas/views/ajax.py:20
+#: openatlas/display/util.py:216 openatlas/views/ajax.py:20
 msgid "bookmark remove"
 msgstr ""
 
-#: openatlas/display/util.py:250 openatlas/views/ajax.py:20
+#: openatlas/display/util.py:217 openatlas/views/ajax.py:20
 msgid "bookmark"
+msgstr ""
+
+#: openatlas/display/util.py:279
+msgid "no preview available"
 msgstr ""
 
 #: openatlas/display/util.py:437
@@ -433,63 +447,58 @@ msgstr ""
 msgid "error mail send"
 msgstr ""
 
-#: openatlas/display/util.py:590
+#: openatlas/display/util.py:598
 msgid "citation_example"
 msgstr ""
 
-#: openatlas/display/util.py:630 openatlas/views/anthropology.py:53
-#: openatlas/views/anthropology.py:81 openatlas/views/anthropology.py:134
-msgid "anthropological analyses"
-msgstr ""
-
-#: openatlas/display/util.py:634 openatlas/forms/add_fields.py:250
-#: openatlas/forms/base_manager.py:72 openatlas/forms/field.py:112
+#: openatlas/display/util.py:642 openatlas/forms/add_fields.py:244
+#: openatlas/forms/base_manager.py:72 openatlas/forms/field.py:209
 #: openatlas/templates/model/cidoc_class_view.html:8
 #: openatlas/templates/model/property_view.html:8
-#: openatlas/templates/type/index.html:124 openatlas/views/imports.py:34
+#: openatlas/templates/type/index.html:130 openatlas/views/imports.py:34
 #: openatlas/views/imports.py:51 openatlas/views/index.py:107
 #: openatlas/views/note.py:23
 msgid "description"
 msgstr ""
 
-#: openatlas/display/util.py:636 openatlas/forms/base_manager.py:72
-#: openatlas/forms/manager.py:519 openatlas/views/admin.py:224
-#: openatlas/views/admin.py:693
+#: openatlas/display/util.py:644 openatlas/forms/base_manager.py:72
+#: openatlas/forms/manager.py:519 openatlas/views/admin.py:223
+#: openatlas/views/admin.py:692
 msgid "content"
 msgstr ""
 
-#: openatlas/forms/add_fields.py:62 openatlas/forms/add_fields.py:99
-#: openatlas/forms/add_fields.py:140 openatlas/forms/add_fields.py:177
+#: openatlas/forms/add_fields.py:57 openatlas/forms/add_fields.py:94
+#: openatlas/forms/add_fields.py:135 openatlas/forms/add_fields.py:172
 #: openatlas/views/search.py:40 openatlas/views/search.py:49
 msgid "YYYY"
 msgstr ""
 
-#: openatlas/forms/add_fields.py:68 openatlas/forms/add_fields.py:105
-#: openatlas/forms/add_fields.py:146 openatlas/forms/add_fields.py:183
+#: openatlas/forms/add_fields.py:63 openatlas/forms/add_fields.py:100
+#: openatlas/forms/add_fields.py:141 openatlas/forms/add_fields.py:178
 msgid "MM"
 msgstr ""
 
-#: openatlas/forms/add_fields.py:74 openatlas/forms/add_fields.py:111
-#: openatlas/forms/add_fields.py:152 openatlas/forms/add_fields.py:189
+#: openatlas/forms/add_fields.py:69 openatlas/forms/add_fields.py:106
+#: openatlas/forms/add_fields.py:147 openatlas/forms/add_fields.py:184
 msgid "DD"
 msgstr ""
 
-#: openatlas/forms/add_fields.py:81 openatlas/forms/add_fields.py:118
-#: openatlas/forms/add_fields.py:159 openatlas/forms/add_fields.py:196
+#: openatlas/forms/add_fields.py:76 openatlas/forms/add_fields.py:113
+#: openatlas/forms/add_fields.py:154 openatlas/forms/add_fields.py:191
 msgid "hh"
 msgstr ""
 
-#: openatlas/forms/add_fields.py:87 openatlas/forms/add_fields.py:124
-#: openatlas/forms/add_fields.py:165 openatlas/forms/add_fields.py:202
+#: openatlas/forms/add_fields.py:82 openatlas/forms/add_fields.py:119
+#: openatlas/forms/add_fields.py:160 openatlas/forms/add_fields.py:197
 msgid "mm"
 msgstr ""
 
-#: openatlas/forms/add_fields.py:93 openatlas/forms/add_fields.py:130
-#: openatlas/forms/add_fields.py:171 openatlas/forms/add_fields.py:208
+#: openatlas/forms/add_fields.py:88 openatlas/forms/add_fields.py:125
+#: openatlas/forms/add_fields.py:166 openatlas/forms/add_fields.py:203
 msgid "ss"
 msgstr ""
 
-#: openatlas/forms/add_fields.py:135 openatlas/forms/add_fields.py:213
+#: openatlas/forms/add_fields.py:130 openatlas/forms/add_fields.py:208
 msgid "comment"
 msgstr ""
 
@@ -501,32 +510,32 @@ msgstr ""
 #: openatlas/forms/setting.py:41 openatlas/forms/setting.py:57
 #: openatlas/forms/setting.py:78 openatlas/forms/setting.py:83
 #: openatlas/forms/setting.py:90 openatlas/forms/setting.py:111
-#: openatlas/forms/setting.py:133 openatlas/templates/map.html:31
-#: openatlas/views/admin.py:207 openatlas/views/anthropology.py:107
-#: openatlas/views/link.py:157 openatlas/views/note.py:24
-#: openatlas/views/note.py:99 openatlas/views/profile.py:28
-#: openatlas/views/user.py:40
+#: openatlas/forms/setting.py:133 openatlas/templates/util/translations.html:4
+#: openatlas/views/admin.py:206 openatlas/views/link.py:157
+#: openatlas/views/note.py:24 openatlas/views/note.py:103
+#: openatlas/views/profile.py:30 openatlas/views/tools.py:159
+#: openatlas/views/tools.py:234 openatlas/views/user.py:42
 msgid "save"
 msgstr ""
 
 #: openatlas/forms/base_manager.py:123 openatlas/forms/form.py:43
-#: openatlas/templates/forms/table_select.html:89
-#: openatlas/templates/forms/tree_multi_select.html:85
-#: openatlas/templates/forms/tree_select.html:92 openatlas/views/imports.py:35
-#: openatlas/views/link.py:23 openatlas/views/user.py:73
+#: openatlas/templates/forms/table_select.html:94
+#: openatlas/templates/forms/tree_multi_select.html:94
+#: openatlas/templates/forms/tree_select.html:98 openatlas/views/imports.py:35
+#: openatlas/views/link.py:23 openatlas/views/user.py:75
 msgid "insert"
 msgstr ""
 
-#: openatlas/forms/base_manager.py:128 openatlas/views/user.py:41
+#: openatlas/forms/base_manager.py:128 openatlas/views/user.py:43
 msgid "insert and continue"
 msgstr ""
 
 #: openatlas/forms/base_manager.py:362 openatlas/forms/manager.py:477
 #: openatlas/templates/model/index.html:9
 #: openatlas/templates/model/index.html:11
-#: openatlas/templates/model/network.html:34
-#: openatlas/templates/model/network2.html:51
-#: openatlas/templates/search.html:27 openatlas/templates/type/index.html:99
+#: openatlas/templates/model/network.html:36
+#: openatlas/templates/model/network2.html:54
+#: openatlas/templates/search.html:34 openatlas/templates/type/index.html:105
 #: openatlas/views/model.py:73 openatlas/views/model.py:143
 #: openatlas/views/model.py:207 openatlas/views/model.py:250
 #: openatlas/views/search.py:25
@@ -537,20 +546,20 @@ msgstr ""
 msgid "tooltip hierarchy forms"
 msgstr ""
 
-#: openatlas/forms/display.py:51
+#: openatlas/forms/display.py:41 openatlas/views/model.py:88
+msgid "reference system"
+msgstr ""
+
+#: openatlas/forms/display.py:65
 msgid "tooltip_required_type"
 msgstr ""
 
-#: openatlas/forms/display.py:205 openatlas/templates/layout.html:35
+#: openatlas/forms/display.py:151 openatlas/templates/util/translations.html:10
 msgid "hide"
 msgstr ""
 
 #: openatlas/forms/form.py:42 openatlas/views/link.py:22
 msgid "page"
-msgstr ""
-
-#: openatlas/forms/form.py:64 openatlas/views/admin.py:388
-msgid "no entries"
 msgstr ""
 
 #: openatlas/forms/manager.py:28
@@ -578,8 +587,8 @@ msgstr ""
 msgid "stratigraphic unit"
 msgstr ""
 
-#: openatlas/forms/manager.py:241 openatlas/views/admin.py:123
-#: openatlas/views/entity_index.py:39 openatlas/views/imports.py:156
+#: openatlas/forms/manager.py:241 openatlas/views/admin.py:127
+#: openatlas/views/entity_index.py:35 openatlas/views/imports.py:154
 msgid "file"
 msgstr ""
 
@@ -595,15 +604,15 @@ msgstr ""
 msgid "tooltip hierarchy multiple"
 msgstr ""
 
-#: openatlas/forms/manager.py:305 openatlas/templates/type/index.html:81
+#: openatlas/forms/manager.py:305 openatlas/templates/type/index.html:86
 msgid "multiple"
 msgstr ""
 
-#: openatlas/forms/manager.py:373 openatlas/templates/search.html:12
+#: openatlas/forms/manager.py:373 openatlas/templates/search.html:14
 msgid "from"
 msgstr ""
 
-#: openatlas/forms/manager.py:374 openatlas/templates/search.html:21
+#: openatlas/forms/manager.py:374 openatlas/templates/search.html:23
 msgid "to"
 msgstr ""
 
@@ -715,14 +724,14 @@ msgstr ""
 msgid "mail recipients feedback"
 msgstr ""
 
-#: openatlas/forms/setting.py:62 openatlas/views/user.py:77
+#: openatlas/forms/setting.py:62 openatlas/views/user.py:79
 msgid "limit"
 msgstr ""
 
 #: openatlas/forms/setting.py:63 openatlas/forms/setting.py:68
-#: openatlas/views/admin.py:636 openatlas/views/user.py:72
-#: openatlas/views/user.py:78 openatlas/views/user.py:83
-#: openatlas/views/user.py:95
+#: openatlas/views/admin.py:635 openatlas/views/user.py:74
+#: openatlas/views/user.py:80 openatlas/views/user.py:85
+#: openatlas/views/user.py:97
 msgid "all"
 msgstr ""
 
@@ -731,14 +740,14 @@ msgid "priority"
 msgstr ""
 
 #: openatlas/forms/setting.py:68 openatlas/views/admin.py:130
-#: openatlas/views/admin.py:139 openatlas/views/user.py:82
-#: openatlas/views/user.py:123 openatlas/views/user.py:291
+#: openatlas/views/admin.py:139 openatlas/views/user.py:84
+#: openatlas/views/user.py:125 openatlas/views/user.py:293
 msgid "user"
 msgstr ""
 
-#: openatlas/forms/setting.py:69 openatlas/templates/model/network.html:53
-#: openatlas/templates/model/network2.html:71 openatlas/views/model.py:263
-#: openatlas/views/user.py:87
+#: openatlas/forms/setting.py:69 openatlas/templates/model/network.html:72
+#: openatlas/templates/model/network2.html:90 openatlas/views/model.py:263
+#: openatlas/views/user.py:89
 msgid "apply"
 msgstr ""
 
@@ -759,7 +768,7 @@ msgid "max cluster radius"
 msgstr ""
 
 #: openatlas/forms/setting.py:77 openatlas/views/login.py:32
-#: openatlas/views/user.py:29 openatlas/views/user.py:139
+#: openatlas/views/user.py:30 openatlas/views/user.py:141
 msgid "username"
 msgstr ""
 
@@ -781,18 +790,18 @@ msgstr ""
 msgid "search"
 msgstr ""
 
-#: openatlas/forms/setting.py:100 openatlas/views/user.py:37
-#: openatlas/views/user.py:141
+#: openatlas/forms/setting.py:100 openatlas/views/user.py:39
+#: openatlas/views/user.py:143
 msgid "full name"
 msgstr ""
 
-#: openatlas/forms/setting.py:100 openatlas/views/user.py:37
+#: openatlas/forms/setting.py:100 openatlas/views/user.py:39
 msgid "tooltip full name"
 msgstr ""
 
 #: openatlas/forms/setting.py:102 openatlas/forms/util.py:26
-#: openatlas/views/login.py:41 openatlas/views/user.py:33
-#: openatlas/views/user.py:142
+#: openatlas/views/login.py:41 openatlas/views/user.py:34
+#: openatlas/views/user.py:144
 msgid "email"
 msgstr ""
 
@@ -809,8 +818,8 @@ msgid "tooltip show email"
 msgstr ""
 
 #: openatlas/forms/setting.py:109 openatlas/forms/util.py:29
-#: openatlas/views/admin.py:135 openatlas/views/admin.py:732
-#: openatlas/views/admin.py:735
+#: openatlas/views/admin.py:135 openatlas/views/admin.py:731
+#: openatlas/views/admin.py:734
 msgid "newsletter"
 msgstr ""
 
@@ -818,7 +827,7 @@ msgstr ""
 msgid "tooltip newsletter"
 msgstr ""
 
-#: openatlas/forms/setting.py:116 openatlas/views/user.py:146
+#: openatlas/forms/setting.py:116 openatlas/views/user.py:148
 msgid "language"
 msgstr ""
 
@@ -864,7 +873,7 @@ msgstr ""
 msgid "off"
 msgstr ""
 
-#: openatlas/forms/validation.py:19 openatlas/views/imports.py:165
+#: openatlas/forms/validation.py:19 openatlas/views/imports.py:163
 msgid "file type not allowed"
 msgstr ""
 
@@ -926,150 +935,82 @@ msgstr ""
 msgid "source translation"
 msgstr ""
 
-#: openatlas/templates/anthropology_sex.html:4
-#: openatlas/views/anthropology.py:47 openatlas/views/anthropology.py:83
-#: openatlas/views/anthropology.py:136
-msgid "sex estimation"
-msgstr ""
-
-#: openatlas/templates/entity/insert.html:14 openatlas/templates/export.html:8
+#: openatlas/templates/entity/insert.html:15 openatlas/templates/export.html:8
 msgid "directory not writable"
 msgstr ""
 
 #: openatlas/templates/layout.html:36
-msgid "show more"
+msgid "generate password"
 msgstr ""
 
-#: openatlas/templates/layout.html:37
-msgid "show less"
-msgstr ""
-
-#: openatlas/templates/layout.html:84 openatlas/templates/search.html:7
+#: openatlas/templates/layout.html:87 openatlas/templates/search.html:9
 msgid "search term"
 msgstr ""
 
-#: openatlas/templates/index/index.html:24 openatlas/templates/layout.html:115
-#: openatlas/views/profile.py:81 openatlas/views/profile.py:82
-#: openatlas/views/profile.py:121 openatlas/views/profile.py:123
-#: openatlas/views/profile.py:141 openatlas/views/profile.py:143
+#: openatlas/templates/index/index.html:22 openatlas/templates/layout.html:120
+#: openatlas/views/profile.py:83 openatlas/views/profile.py:84
+#: openatlas/views/profile.py:123 openatlas/views/profile.py:125
+#: openatlas/views/profile.py:143 openatlas/views/profile.py:145
 msgid "profile"
 msgstr ""
 
-#: openatlas/templates/layout.html:118 openatlas/views/admin.py:188
-#: openatlas/views/admin.py:189 openatlas/views/admin.py:226
-#: openatlas/views/admin.py:245 openatlas/views/admin.py:247
-#: openatlas/views/admin.py:310 openatlas/views/admin.py:312
-#: openatlas/views/admin.py:361 openatlas/views/admin.py:364
-#: openatlas/views/admin.py:392 openatlas/views/admin.py:394
-#: openatlas/views/admin.py:453 openatlas/views/admin.py:455
-#: openatlas/views/admin.py:563 openatlas/views/admin.py:565
-#: openatlas/views/admin.py:627 openatlas/views/admin.py:666
-#: openatlas/views/admin.py:668 openatlas/views/admin.py:734
-#: openatlas/views/entity_index.py:39 openatlas/views/export.py:53
+#: openatlas/templates/layout.html:123 openatlas/views/admin.py:187
+#: openatlas/views/admin.py:188 openatlas/views/admin.py:225
+#: openatlas/views/admin.py:244 openatlas/views/admin.py:246
+#: openatlas/views/admin.py:309 openatlas/views/admin.py:311
+#: openatlas/views/admin.py:360 openatlas/views/admin.py:363
+#: openatlas/views/admin.py:391 openatlas/views/admin.py:393
+#: openatlas/views/admin.py:452 openatlas/views/admin.py:454
+#: openatlas/views/admin.py:562 openatlas/views/admin.py:564
+#: openatlas/views/admin.py:626 openatlas/views/admin.py:665
+#: openatlas/views/admin.py:667 openatlas/views/admin.py:733
+#: openatlas/views/entity_index.py:35 openatlas/views/export.py:53
 #: openatlas/views/imports.py:66 openatlas/views/imports.py:84
-#: openatlas/views/imports.py:119 openatlas/views/imports.py:141
-#: openatlas/views/imports.py:299 openatlas/views/imports.py:325
+#: openatlas/views/imports.py:117 openatlas/views/imports.py:139
+#: openatlas/views/imports.py:297 openatlas/views/imports.py:323
 #: openatlas/views/sql.py:27 openatlas/views/sql.py:58
-#: openatlas/views/user.py:124 openatlas/views/user.py:176
-#: openatlas/views/user.py:204 openatlas/views/user.py:240
-#: openatlas/views/user.py:293
+#: openatlas/views/user.py:126 openatlas/views/user.py:178
+#: openatlas/views/user.py:206 openatlas/views/user.py:242
+#: openatlas/views/user.py:295
 msgid "admin"
 msgstr ""
 
-#: openatlas/templates/layout.html:122 openatlas/templates/layout.html:139
+#: openatlas/templates/layout.html:127 openatlas/templates/layout.html:144
 msgid "contact"
 msgstr ""
 
-#: openatlas/templates/layout.html:127 openatlas/templates/layout.html:151
+#: openatlas/templates/layout.html:132 openatlas/templates/layout.html:156
 msgid "legal_notice"
 msgstr ""
 
-#: openatlas/templates/layout.html:130
+#: openatlas/templates/layout.html:135
 msgid "logout"
 msgstr ""
 
-#: openatlas/templates/layout.html:158 openatlas/views/login.py:37
+#: openatlas/templates/layout.html:163 openatlas/views/login.py:37
 #: openatlas/views/login.py:99 openatlas/views/login.py:101
 #: openatlas/views/login.py:149
 msgid "login"
 msgstr ""
 
-#: openatlas/templates/forms/table_multi_select.html:31
-#: openatlas/templates/forms/table_select.html:56
-#: openatlas/templates/forms/tree_multi_select.html:50
-#: openatlas/templates/forms/tree_select.html:62
-#: openatlas/templates/layout.html:177
+#: openatlas/templates/forms/table_multi_select.html:38
+#: openatlas/templates/forms/table_select.html:61
+#: openatlas/templates/forms/tree_multi_select.html:59
+#: openatlas/templates/forms/tree_select.html:68
+#: openatlas/templates/layout.html:183
 msgid "close"
 msgstr ""
 
-#: openatlas/templates/layout.html:195
+#: openatlas/templates/layout.html:201
 msgid "warning no js"
 msgstr ""
 
-#: openatlas/templates/login.html:8 openatlas/views/login.py:149
+#: openatlas/templates/login.html:9 openatlas/views/login.py:149
 msgid "Forgot your password?"
 msgstr ""
 
 #: openatlas/templates/login.html:13
 msgid "troubleshooting"
-msgstr ""
-
-#: openatlas/templates/map.html:34
-msgid "details"
-msgstr ""
-
-#: openatlas/templates/admin/data.html:13 openatlas/templates/map.html:35
-#: openatlas/views/imports.py:64 openatlas/views/imports.py:68
-#: openatlas/views/imports.py:82 openatlas/views/imports.py:85
-#: openatlas/views/imports.py:117 openatlas/views/imports.py:120
-#: openatlas/views/imports.py:139 openatlas/views/imports.py:142
-#: openatlas/views/imports.py:159 openatlas/views/imports.py:297
-#: openatlas/views/imports.py:300 openatlas/views/imports.py:326
-msgid "import"
-msgstr ""
-
-#: openatlas/templates/map.html:36
-msgid "map_clear"
-msgstr ""
-
-#: openatlas/templates/map.html:37
-msgid "map_info_reedit"
-msgstr ""
-
-#: openatlas/templates/map.html:38
-msgid "map_info_shape"
-msgstr ""
-
-#: openatlas/templates/map.html:39
-msgid "map_info_area"
-msgstr ""
-
-#: openatlas/templates/map.html:40
-msgid "map_info_point"
-msgstr ""
-
-#: openatlas/templates/map.html:41
-msgid "map_info_linestring"
-msgstr ""
-
-#: openatlas/templates/map.html:42
-msgid "map_info_close"
-msgstr ""
-
-#: openatlas/templates/map.html:43
-msgid "map_info_description"
-msgstr ""
-
-#: openatlas/templates/map.html:44
-msgid "Search by location name or postcode"
-msgstr ""
-
-#: openatlas/templates/map.html:45
-msgid "Enter a location name"
-msgstr ""
-
-#: openatlas/templates/map.html:46
-msgid "There are multiple places overlapping"
 msgstr ""
 
 #: openatlas/templates/overlay.html:9
@@ -1092,16 +1033,16 @@ msgstr ""
 msgid "bottom left"
 msgstr ""
 
-#: openatlas/templates/search.html:11 openatlas/templates/util/dates.html:3
+#: openatlas/templates/search.html:13 openatlas/templates/util/dates.html:3
 msgid "date"
 msgstr ""
 
-#: openatlas/templates/search.html:29 openatlas/templates/search.html:50
-#: openatlas/templates/search.html:62 openatlas/templates/type/move.html:11
+#: openatlas/templates/search.html:36 openatlas/templates/search.html:59
+#: openatlas/templates/search.html:75 openatlas/templates/type/move.html:11
 msgid "deselect all"
 msgstr ""
 
-#: openatlas/templates/search.html:52 openatlas/templates/search.html:59
+#: openatlas/templates/search.html:61 openatlas/templates/search.html:70
 #: openatlas/templates/type/move.html:10
 msgid "select all"
 msgstr ""
@@ -1110,7 +1051,7 @@ msgstr ""
 msgid "data integrity checks"
 msgstr ""
 
-#: openatlas/templates/admin/data.html:4 openatlas/views/admin.py:566
+#: openatlas/templates/admin/data.html:4 openatlas/views/admin.py:565
 msgid "orphans"
 msgstr ""
 
@@ -1134,6 +1075,17 @@ msgstr ""
 msgid "data transfer"
 msgstr ""
 
+#: openatlas/templates/admin/data.html:13
+#: openatlas/templates/util/translations.html:8 openatlas/views/imports.py:64
+#: openatlas/views/imports.py:68 openatlas/views/imports.py:82
+#: openatlas/views/imports.py:85 openatlas/views/imports.py:115
+#: openatlas/views/imports.py:118 openatlas/views/imports.py:137
+#: openatlas/views/imports.py:140 openatlas/views/imports.py:157
+#: openatlas/views/imports.py:295 openatlas/views/imports.py:298
+#: openatlas/views/imports.py:324
+msgid "import"
+msgstr ""
+
 #: openatlas/templates/admin/data.html:14
 #: openatlas/templates/admin/data.html:15
 #: openatlas/templates/admin/data.html:16
@@ -1153,31 +1105,31 @@ msgstr ""
 msgid "delete orphaned resized images"
 msgstr ""
 
-#: openatlas/templates/admin/file.html:6
+#: openatlas/templates/admin/file.html:5
 msgid "total disk space"
 msgstr ""
 
-#: openatlas/templates/admin/file.html:7
+#: openatlas/templates/admin/file.html:6
 msgid "free disk space"
 msgstr ""
 
-#: openatlas/templates/admin/file.html:23
+#: openatlas/templates/admin/file.html:21
 msgid "remove custom logo"
 msgstr ""
 
-#: openatlas/templates/admin/file.html:25
+#: openatlas/templates/admin/file.html:23
 msgid "choose custom logo"
 msgstr ""
 
-#: openatlas/templates/entity/insert.html:6
+#: openatlas/templates/entity/insert.html:7
 msgid "max size"
 msgstr ""
 
-#: openatlas/templates/entity/insert.html:8
+#: openatlas/templates/entity/insert.html:9
 msgid "if exceeded you will receive a connection error"
 msgstr ""
 
-#: openatlas/templates/entity/insert.html:9
+#: openatlas/templates/entity/insert.html:10
 #: openatlas/templates/import/import_data.html:16
 msgid "allowed extensions"
 msgstr ""
@@ -1237,32 +1189,32 @@ msgstr ""
 msgid "Drop your files here!"
 msgstr ""
 
-#: openatlas/templates/forms/table_multi_select.html:5
-#: openatlas/templates/forms/table_select.html:6
-#: openatlas/templates/forms/tree_multi_select.html:5
-#: openatlas/templates/forms/tree_select.html:10
+#: openatlas/templates/forms/table_multi_select.html:12
+#: openatlas/templates/forms/table_select.html:8
+#: openatlas/templates/forms/tree_multi_select.html:12
+#: openatlas/templates/forms/tree_select.html:12
 msgid "change"
 msgstr ""
 
-#: openatlas/templates/forms/table_select.html:17
-#: openatlas/templates/forms/tree_select.html:17
+#: openatlas/templates/forms/table_select.html:20
+#: openatlas/templates/forms/tree_select.html:20
 msgid "clear"
 msgstr ""
 
-#: openatlas/templates/forms/table_select.html:84
-#: openatlas/templates/forms/tree_multi_select.html:81
-#: openatlas/templates/forms/tree_select.html:90
+#: openatlas/templates/forms/table_select.html:89
+#: openatlas/templates/forms/tree_multi_select.html:90
+#: openatlas/templates/forms/tree_select.html:96
 msgid "back"
 msgstr ""
 
-#: openatlas/templates/forms/tree_multi_select.html:32
-#: openatlas/templates/forms/tree_select.html:43
-#: openatlas/templates/type/index.html:51
+#: openatlas/templates/forms/tree_multi_select.html:40
+#: openatlas/templates/forms/tree_select.html:49
+#: openatlas/templates/type/index.html:52
 msgid "type to search"
 msgstr ""
 
-#: openatlas/templates/forms/tree_multi_select.html:65
-#: openatlas/templates/forms/tree_select.html:75
+#: openatlas/templates/forms/tree_multi_select.html:74
+#: openatlas/templates/forms/tree_select.html:81
 #, python-format
 msgid "Add Type to %(hierarchy)s"
 msgstr ""
@@ -1312,8 +1264,8 @@ msgid "new import"
 msgstr ""
 
 #: openatlas/templates/import/project_view.html:15
-#: openatlas/templates/type/index.html:57 openatlas/views/overlay.py:56
-#: openatlas/views/overlay.py:101
+#: openatlas/templates/type/index.html:58 openatlas/views/overlay.py:56
+#: openatlas/views/overlay.py:101 openatlas/views/tools.py:39
 msgid "place"
 msgstr ""
 
@@ -1341,11 +1293,11 @@ msgstr ""
 msgid "feedback_form"
 msgstr ""
 
-#: openatlas/templates/index/index.html:10
+#: openatlas/templates/index/index.html:2
 msgid "manual"
 msgstr ""
 
-#: openatlas/templates/index/index.html:13 openatlas/views/model.py:56
+#: openatlas/templates/index/index.html:3 openatlas/views/model.py:56
 #: openatlas/views/model.py:58 openatlas/views/model.py:70
 #: openatlas/views/model.py:72 openatlas/views/model.py:115
 #: openatlas/views/model.py:117 openatlas/views/model.py:142
@@ -1356,13 +1308,28 @@ msgstr ""
 msgid "model"
 msgstr ""
 
-#: openatlas/templates/index/index.html:14
-#: openatlas/templates/util/reference_system_switch.html:3
+#: openatlas/templates/index/index.html:4
 msgid "reference systems"
 msgstr ""
 
-#: openatlas/templates/index/index.html:15 openatlas/views/model.py:288
+#: openatlas/templates/index/index.html:5 openatlas/views/model.py:288
 msgid "network visualization"
+msgstr ""
+
+#: openatlas/templates/index/index.html:9
+msgid "hello"
+msgstr ""
+
+#: openatlas/templates/index/index.html:11 openatlas/views/user.py:149
+msgid "last login"
+msgstr ""
+
+#: openatlas/templates/index/index.html:13 openatlas/views/user.py:150
+msgid "failed logins"
+msgstr ""
+
+#: openatlas/templates/index/index.html:16
+msgid "first login"
 msgstr ""
 
 #: openatlas/templates/index/index.html:18
@@ -1373,31 +1340,19 @@ msgstr ""
 msgid "tell us about it"
 msgstr ""
 
-#: openatlas/templates/index/index.html:23
+#: openatlas/templates/index/index.html:21
 msgid "want to receive updates? Activate the newsletter in your"
 msgstr ""
 
 #: openatlas/templates/index/index.html:29
-msgid "hello"
-msgstr ""
-
-#: openatlas/templates/index/index.html:31 openatlas/views/user.py:147
-msgid "last login"
-msgstr ""
-
-#: openatlas/templates/index/index.html:33 openatlas/views/user.py:148
-msgid "failed logins"
+msgid "overview"
 msgstr ""
 
 #: openatlas/templates/index/index.html:36
-msgid "first login"
-msgstr ""
-
-#: openatlas/templates/index/index.html:40
 msgid "latest"
 msgstr ""
 
-#: openatlas/templates/index/index.html:43
+#: openatlas/templates/index/index.html:39
 msgid "Show all activity"
 msgstr ""
 
@@ -1453,17 +1408,17 @@ msgid "wrong range"
 msgstr ""
 
 #: openatlas/templates/model/network.html:30
-#: openatlas/templates/model/network2.html:47
+#: openatlas/templates/model/network2.html:48
 msgid "no data to display"
 msgstr ""
 
-#: openatlas/templates/model/network.html:43
-#: openatlas/templates/model/network2.html:60
+#: openatlas/templates/model/network.html:48
+#: openatlas/templates/model/network2.html:66
 msgid "show orphans"
 msgstr ""
 
-#: openatlas/templates/model/network.html:44
-#: openatlas/templates/model/network2.html:61
+#: openatlas/templates/model/network.html:51
+#: openatlas/templates/model/network2.html:69
 msgid "network options"
 msgstr ""
 
@@ -1486,52 +1441,64 @@ msgstr ""
 msgid "proceed"
 msgstr ""
 
+#: openatlas/templates/tools/carbon.html:4
+#: openatlas/templates/tools/index.html:4 openatlas/views/tools.py:59
+#: openatlas/views/tools.py:75 openatlas/views/tools.py:199
+#: openatlas/views/tools.py:205 openatlas/views/tools.py:210
+#: openatlas/views/tools.py:260 openatlas/views/tools.py:263
+msgid "radiocarbon dating"
+msgstr ""
+
+#: openatlas/templates/tools/index.html:6
+msgid "anthropological analyses"
+msgstr ""
+
 #: openatlas/templates/type/index.html:24
 msgid "hierarchy"
 msgstr ""
 
-#: openatlas/templates/type/index.html:80 openatlas/views/type.py:158
+#: openatlas/templates/type/index.html:85 openatlas/views/type.py:158
 msgid "selection"
 msgstr ""
 
-#: openatlas/templates/type/index.html:81
+#: openatlas/templates/type/index.html:86
 msgid "single"
 msgstr ""
 
-#: openatlas/templates/type/index.html:85 openatlas/views/hierarchy.py:147
+#: openatlas/templates/type/index.html:90 openatlas/views/hierarchy.py:152
 msgid "required"
 msgstr ""
 
-#: openatlas/templates/type/index.html:86
+#: openatlas/templates/type/index.html:91
 msgid "true"
 msgstr ""
 
-#: openatlas/templates/type/index.html:86
+#: openatlas/templates/type/index.html:91
 msgid "false"
 msgstr ""
 
-#: openatlas/templates/type/index.html:89
+#: openatlas/templates/type/index.html:94
 msgid "remove required"
 msgstr ""
 
-#: openatlas/templates/type/index.html:91
+#: openatlas/templates/type/index.html:97
 msgid "make required"
 msgstr ""
 
-#: openatlas/templates/type/index.html:106
+#: openatlas/templates/type/index.html:112
 msgid "multiple linked entities"
 msgstr ""
 
-#: openatlas/templates/type/index.html:112 openatlas/views/type.py:188
+#: openatlas/templates/type/index.html:118 openatlas/views/type.py:188
 #: openatlas/views/type.py:215
 msgid "untyped entities"
 msgstr ""
 
-#: openatlas/templates/type/index.html:117
+#: openatlas/templates/type/index.html:123
 msgid "this type has no classes and won't show in forms"
 msgstr ""
 
-#: openatlas/templates/type/index.html:120
+#: openatlas/templates/type/index.html:126
 msgid "this type has no subs and won't show in forms"
 msgstr ""
 
@@ -1549,13 +1516,76 @@ msgstr ""
 msgid "I'm aware of the risk."
 msgstr ""
 
-#: openatlas/templates/user/insert.html:11
-#: openatlas/templates/user/password.html:9
-msgid "generate password"
-msgstr ""
-
 #: openatlas/templates/util/dates.html:3
 msgid "tooltip date"
+msgstr ""
+
+#: openatlas/templates/util/translations.html:7
+msgid "details"
+msgstr ""
+
+#: openatlas/templates/util/translations.html:11
+msgid "show more"
+msgstr ""
+
+#: openatlas/templates/util/translations.html:12
+msgid "show less"
+msgstr ""
+
+#: openatlas/templates/util/translations.html:15
+msgid "map_clear"
+msgstr ""
+
+#: openatlas/templates/util/translations.html:16
+msgid "map_info_reedit"
+msgstr ""
+
+#: openatlas/templates/util/translations.html:17
+msgid "map_info_shape"
+msgstr ""
+
+#: openatlas/templates/util/translations.html:18
+msgid "map_info_area"
+msgstr ""
+
+#: openatlas/templates/util/translations.html:19
+msgid "map_info_point"
+msgstr ""
+
+#: openatlas/templates/util/translations.html:20
+msgid "map_info_linestring"
+msgstr ""
+
+#: openatlas/templates/util/translations.html:21
+msgid "map_info_close"
+msgstr ""
+
+#: openatlas/templates/util/translations.html:22
+msgid "map_info_description"
+msgstr ""
+
+#: openatlas/templates/util/translations.html:23
+msgid "map_info_name"
+msgstr ""
+
+#: openatlas/templates/util/translations.html:24
+msgid "map_info_easting"
+msgstr ""
+
+#: openatlas/templates/util/translations.html:25
+msgid "map_info_northing"
+msgstr ""
+
+#: openatlas/templates/util/translations.html:26
+msgid "map_info_points"
+msgstr ""
+
+#: openatlas/templates/util/translations.html:27
+msgid "search by location name or postcode"
+msgstr ""
+
+#: openatlas/templates/util/translations.html:28
+msgid "enter a location name"
 msgstr ""
 
 #: openatlas/views/admin.py:57
@@ -1585,11 +1615,11 @@ msgstr ""
 msgid "files"
 msgstr ""
 
-#: openatlas/views/admin.py:122
+#: openatlas/views/admin.py:126
 msgid "list"
 msgstr ""
 
-#: openatlas/views/admin.py:150 openatlas/views/admin.py:669
+#: openatlas/views/admin.py:150 openatlas/views/admin.py:668
 msgid "system log"
 msgstr ""
 
@@ -1597,133 +1627,114 @@ msgstr ""
 msgid "modules"
 msgstr ""
 
-#: openatlas/views/admin.py:196
+#: openatlas/views/admin.py:162
+msgid "defaults for new user"
+msgstr ""
+
+#: openatlas/views/admin.py:195
 msgid "intro_for_frontend"
 msgstr ""
 
-#: openatlas/views/admin.py:197
+#: openatlas/views/admin.py:196
 msgid "legal_notice_for_frontend"
 msgstr ""
 
-#: openatlas/views/admin.py:198
+#: openatlas/views/admin.py:197
 msgid "contact_for_frontend"
 msgstr ""
 
-#: openatlas/views/admin.py:199
+#: openatlas/views/admin.py:198
 msgid "site_name_for_frontend"
 msgstr ""
 
-#: openatlas/views/admin.py:217 openatlas/views/admin.py:349
+#: openatlas/views/admin.py:216 openatlas/views/admin.py:348
 #: openatlas/views/entity.py:123 openatlas/views/entity_form.py:213
-#: openatlas/views/hierarchy.py:87 openatlas/views/hierarchy.py:118
-#: openatlas/views/hierarchy.py:155 openatlas/views/hierarchy.py:164
+#: openatlas/views/hierarchy.py:87 openatlas/views/hierarchy.py:123
+#: openatlas/views/hierarchy.py:160 openatlas/views/hierarchy.py:169
 #: openatlas/views/link.py:153 openatlas/views/overlay.py:77
-#: openatlas/views/profile.py:111 openatlas/views/user.py:231
+#: openatlas/views/profile.py:113 openatlas/views/tools.py:249
+#: openatlas/views/user.py:233
 msgid "info update"
 msgstr ""
 
-#: openatlas/views/admin.py:240 openatlas/views/admin.py:306
-#: openatlas/views/admin.py:449 openatlas/views/admin.py:551
+#: openatlas/views/admin.py:239 openatlas/views/admin.py:305
+#: openatlas/views/admin.py:448 openatlas/views/admin.py:550
 msgid "Congratulations, everything looks fine!"
 msgstr ""
 
-#: openatlas/views/admin.py:248
+#: openatlas/views/admin.py:247
 msgid "check links"
 msgstr ""
 
-#: openatlas/views/admin.py:285
+#: openatlas/views/admin.py:284
 msgid "delete link duplicates"
 msgstr ""
 
-#: openatlas/views/admin.py:313
+#: openatlas/views/admin.py:312
 msgid "check link duplicates"
 msgstr ""
 
-#: openatlas/views/admin.py:322 openatlas/views/link.py:30
+#: openatlas/views/admin.py:321 openatlas/views/link.py:30
 msgid "link removed"
 msgstr ""
 
-#: openatlas/views/admin.py:353 openatlas/views/anthropology.py:121
-#: openatlas/views/entity_form.py:197 openatlas/views/entity_form.py:228
-#: openatlas/views/hierarchy.py:41 openatlas/views/hierarchy.py:85
-#: openatlas/views/imports.py:316 openatlas/views/link.py:93
-#: openatlas/views/link.py:123 openatlas/views/profile.py:115
-#: openatlas/views/sql.py:50
+#: openatlas/views/admin.py:352 openatlas/views/entity_form.py:197
+#: openatlas/views/entity_form.py:228 openatlas/views/hierarchy.py:41
+#: openatlas/views/hierarchy.py:85 openatlas/views/imports.py:314
+#: openatlas/views/link.py:93 openatlas/views/link.py:123
+#: openatlas/views/profile.py:117 openatlas/views/sql.py:50
+#: openatlas/views/tools.py:134 openatlas/views/tools.py:173
 msgid "error transaction"
 msgstr ""
 
-#: openatlas/views/admin.py:395
+#: openatlas/views/admin.py:394
 msgid "check similar names"
 msgstr ""
 
-#: openatlas/views/admin.py:456
+#: openatlas/views/admin.py:455
 msgid "check dates"
 msgstr ""
 
-#: openatlas/views/admin.py:554
+#: openatlas/views/admin.py:553
 msgid "delete all files without corresponding entities?"
 msgstr ""
 
-#: openatlas/views/admin.py:557
+#: openatlas/views/admin.py:556
 msgid "delete all files"
 msgstr ""
 
-#: openatlas/views/admin.py:578 openatlas/views/admin.py:591
+#: openatlas/views/admin.py:577 openatlas/views/admin.py:590
 #: openatlas/views/entity_index.py:137 openatlas/views/export.py:88
 msgid "error file delete"
 msgstr ""
 
-#: openatlas/views/admin.py:625 openatlas/views/admin.py:629
+#: openatlas/views/admin.py:624 openatlas/views/admin.py:628
 msgid "logo"
 msgstr ""
 
-#: openatlas/views/admin.py:659
+#: openatlas/views/admin.py:658
 msgid "delete all logs"
 msgstr ""
 
-#: openatlas/views/admin.py:676
+#: openatlas/views/admin.py:675
 msgid "Logs deleted"
 msgstr ""
 
-#: openatlas/views/admin.py:688 openatlas/views/index.py:101
+#: openatlas/views/admin.py:687 openatlas/views/index.py:101
 msgid "subject"
 msgstr ""
 
-#: openatlas/views/admin.py:694 openatlas/views/admin.py:697
+#: openatlas/views/admin.py:693 openatlas/views/admin.py:696
 #: openatlas/views/index.py:108
 msgid "send"
 msgstr ""
 
-#: openatlas/views/admin.py:742
+#: openatlas/views/admin.py:741
 msgid "images were created"
 msgstr ""
 
-#: openatlas/views/admin.py:750
+#: openatlas/views/admin.py:749
 msgid "resized orphaned images were deleted"
-msgstr ""
-
-#: openatlas/views/anthropology.py:18
-msgid "female"
-msgstr ""
-
-#: openatlas/views/anthropology.py:19
-msgid "likely female"
-msgstr ""
-
-#: openatlas/views/anthropology.py:20
-msgid "indifferent"
-msgstr ""
-
-#: openatlas/views/anthropology.py:21
-msgid "likely male"
-msgstr ""
-
-#: openatlas/views/anthropology.py:22
-msgid "male"
-msgstr ""
-
-#: openatlas/views/anthropology.py:37
-msgid "corresponds to"
 msgstr ""
 
 #: openatlas/views/changelog.py:12 openatlas/views/changelog.py:13
@@ -1738,7 +1749,7 @@ msgstr ""
 msgid "page / link text"
 msgstr ""
 
-#: openatlas/views/entity.py:126 openatlas/views/hierarchy.py:121
+#: openatlas/views/entity.py:126 openatlas/views/hierarchy.py:126
 msgid "error database"
 msgstr ""
 
@@ -1763,7 +1774,7 @@ msgstr ""
 msgid "Deletion not possible if subunits exists"
 msgstr ""
 
-#: openatlas/views/entity_index.py:141 openatlas/views/hierarchy.py:134
+#: openatlas/views/entity_index.py:141 openatlas/views/hierarchy.py:139
 #: openatlas/views/type.py:72
 msgid "entity deleted"
 msgstr ""
@@ -1797,35 +1808,35 @@ msgstr ""
 msgid "project inserted"
 msgstr ""
 
-#: openatlas/views/imports.py:134
+#: openatlas/views/imports.py:132
 msgid "project updated"
 msgstr ""
 
-#: openatlas/views/imports.py:151
+#: openatlas/views/imports.py:149
 msgid "project deleted"
 msgstr ""
 
-#: openatlas/views/imports.py:157
+#: openatlas/views/imports.py:155
 msgid "preview only"
 msgstr ""
 
-#: openatlas/views/imports.py:158
+#: openatlas/views/imports.py:156
 msgid "check for duplicates"
 msgstr ""
 
-#: openatlas/views/imports.py:199
+#: openatlas/views/imports.py:197
 msgid "missing name column"
 msgstr ""
 
-#: openatlas/views/imports.py:264
+#: openatlas/views/imports.py:262
 msgid "invalid type ids"
 msgstr ""
 
-#: openatlas/views/imports.py:266
+#: openatlas/views/imports.py:264
 msgid "invalid coordinates"
 msgstr ""
 
-#: openatlas/views/imports.py:291
+#: openatlas/views/imports.py:289
 msgid "error at import"
 msgstr ""
 
@@ -1872,8 +1883,8 @@ msgstr ""
 msgid "link text"
 msgstr ""
 
-#: openatlas/views/login.py:35 openatlas/views/profile.py:25
-#: openatlas/views/user.py:34
+#: openatlas/views/login.py:35 openatlas/views/profile.py:26
+#: openatlas/views/user.py:35
 msgid "password"
 msgstr ""
 
@@ -1893,7 +1904,7 @@ msgstr ""
 msgid "error inactive"
 msgstr ""
 
-#: openatlas/views/login.py:90 openatlas/views/profile.py:36
+#: openatlas/views/login.py:90 openatlas/views/profile.py:38
 msgid "error wrong password"
 msgstr ""
 
@@ -1965,10 +1976,6 @@ msgstr ""
 msgid "write access"
 msgstr ""
 
-#: openatlas/views/model.py:88
-msgid "reference system"
-msgstr ""
-
 #: openatlas/views/model.py:90
 msgid "color"
 msgstr ""
@@ -1982,19 +1989,19 @@ msgstr ""
 msgid "set private"
 msgstr ""
 
-#: openatlas/views/note.py:64 openatlas/views/note.py:97
+#: openatlas/views/note.py:64 openatlas/views/note.py:101
 msgid "note updated"
 msgstr ""
 
-#: openatlas/views/note.py:75
+#: openatlas/views/note.py:79
 msgid "note added"
 msgstr ""
 
-#: openatlas/views/note.py:109
+#: openatlas/views/note.py:113
 msgid "edit note"
 msgstr ""
 
-#: openatlas/views/note.py:119
+#: openatlas/views/note.py:123
 msgid "note deleted"
 msgstr ""
 
@@ -2002,36 +2009,36 @@ msgstr ""
 msgid "update overlay"
 msgstr ""
 
-#: openatlas/views/profile.py:24
+#: openatlas/views/profile.py:25
 msgid "old password"
 msgstr ""
 
-#: openatlas/views/profile.py:26 openatlas/views/user.py:35
+#: openatlas/views/profile.py:27 openatlas/views/user.py:36
 msgid "repeat password"
 msgstr ""
 
-#: openatlas/views/profile.py:27 openatlas/views/user.py:36
+#: openatlas/views/profile.py:29 openatlas/views/user.py:38
 msgid "show passwords"
 msgstr ""
 
-#: openatlas/views/profile.py:39 openatlas/views/profile.py:40
-#: openatlas/views/user.py:61 openatlas/views/user.py:62
+#: openatlas/views/profile.py:41 openatlas/views/profile.py:42
+#: openatlas/views/user.py:63 openatlas/views/user.py:64
 msgid "error passwords must match"
 msgstr ""
 
-#: openatlas/views/profile.py:44
+#: openatlas/views/profile.py:46
 msgid "error new password like old password"
 msgstr ""
 
-#: openatlas/views/profile.py:47 openatlas/views/user.py:65
+#: openatlas/views/profile.py:49 openatlas/views/user.py:67
 msgid "error password too short"
 msgstr ""
 
-#: openatlas/views/profile.py:71 openatlas/views/profile.py:144
+#: openatlas/views/profile.py:73 openatlas/views/profile.py:146
 msgid "change password"
 msgstr ""
 
-#: openatlas/views/profile.py:136
+#: openatlas/views/profile.py:138
 msgid "info password updated"
 msgstr ""
 
@@ -2060,6 +2067,40 @@ msgstr ""
 msgid "SQL executed"
 msgstr ""
 
+#: openatlas/views/tools.py:26
+msgid "female"
+msgstr ""
+
+#: openatlas/views/tools.py:27
+msgid "likely female"
+msgstr ""
+
+#: openatlas/views/tools.py:28
+msgid "indifferent"
+msgstr ""
+
+#: openatlas/views/tools.py:29
+msgid "likely male"
+msgstr ""
+
+#: openatlas/views/tools.py:30
+msgid "male"
+msgstr ""
+
+#: openatlas/views/tools.py:31
+msgid "corresponds to"
+msgstr ""
+
+#: openatlas/views/tools.py:51 openatlas/views/tools.py:77
+#: openatlas/views/tools.py:112 openatlas/views/tools.py:120
+#: openatlas/views/tools.py:181 openatlas/views/tools.py:186
+msgid "sex estimation"
+msgstr ""
+
+#: openatlas/views/tools.py:227
+msgid "radiocarbon year"
+msgstr ""
+
 #: openatlas/views/type.py:83
 msgid "I'm sure to delete this type, it's subs and links"
 msgstr ""
@@ -2082,58 +2123,58 @@ msgstr ""
 msgid "Entities were updated"
 msgstr ""
 
-#: openatlas/views/user.py:27
+#: openatlas/views/user.py:28
 msgid "active"
 msgstr ""
 
-#: openatlas/views/user.py:32 openatlas/views/user.py:140
+#: openatlas/views/user.py:33 openatlas/views/user.py:142
 msgid "group"
 msgstr ""
 
-#: openatlas/views/user.py:39
+#: openatlas/views/user.py:41
 msgid "send account information"
 msgstr ""
 
-#: openatlas/views/user.py:53
+#: openatlas/views/user.py:55
 msgid "error username exists"
 msgstr ""
 
-#: openatlas/views/user.py:57
+#: openatlas/views/user.py:59
 msgid "error email exists"
 msgstr ""
 
-#: openatlas/views/user.py:74
+#: openatlas/views/user.py:76
 msgid "update"
 msgstr ""
 
-#: openatlas/views/user.py:86 openatlas/views/user.py:117
+#: openatlas/views/user.py:88 openatlas/views/user.py:119
 msgid "action"
 msgstr ""
 
-#: openatlas/views/user.py:145 openatlas/views/user.py:206
+#: openatlas/views/user.py:147 openatlas/views/user.py:208
 msgid "created entities"
 msgstr ""
 
-#: openatlas/views/user.py:263
+#: openatlas/views/user.py:265
 msgid "user created"
 msgstr ""
 
-#: openatlas/views/user.py:265
+#: openatlas/views/user.py:267
 #, python-format
 msgid "Your account information for %(sitename)s"
 msgstr ""
 
-#: openatlas/views/user.py:269
+#: openatlas/views/user.py:271
 #, python-format
 msgid "Account information for %(username)s"
 msgstr ""
 
-#: openatlas/views/user.py:277
+#: openatlas/views/user.py:279
 #, python-format
 msgid "Sent account information mail to %(email)s."
 msgstr ""
 
-#: openatlas/views/user.py:282
+#: openatlas/views/user.py:284
 #, python-format
 msgid "Failed to send account details to %(email)s."
 msgstr ""

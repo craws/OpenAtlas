@@ -350,7 +350,8 @@ def get_backup_file_data() -> dict[str, Any]:
     if latest_file and latest_file_date:
         yesterday = datetime.today() - timedelta(days=1)
         file_data['file'] = latest_file.name
-        file_data['backup_too_old'] = yesterday > latest_file_date
+        file_data['backup_too_old'] = \
+            bool(yesterday > latest_file_date and not app.testing)
         file_data['size'] = convert_size(latest_file.stat().st_size)
         file_data['date'] = format_date(latest_file_date)
     return file_data
@@ -405,8 +406,8 @@ def send_mail(
     if not g.settings['mail'] or not recipients:
         return False  # pragma: no cover
     from_ = f"{g.settings['mail_from_name']} <{g.settings['mail_from_email']}>"
-    if app.config['IS_UNIT_TEST']:
-        return True  # To test mail functions w/o sending them
+    if app.testing:
+        return True  # To test mail functions without sending them
     try:  # pragma: no cover
         with smtplib.SMTP(
                 g.settings['mail_transport_host'],
@@ -581,7 +582,7 @@ def button(
 
 @app.template_filter()
 def button_bar(buttons: list[Any]) -> str:
-    def add_col(input_: str):
+    def add_col(input_: str) -> str:
         return \
             f'<div class="col-auto d-flex align-items-center">{input_}</div>'
 

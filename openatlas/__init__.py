@@ -1,5 +1,4 @@
 import locale
-import sys
 from pathlib import Path
 from typing import Any, Optional
 
@@ -14,13 +13,8 @@ from openatlas.database.connect import close_connection, open_connection
 
 app: Flask = Flask(__name__, instance_relative_config=True)
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
-
-INSTANCE = 'production'
-if 'test_runner.py' in sys.argv[0] or 'nose2' in sys.argv[0]:
-    INSTANCE = 'testing'  # Use test database if running tests
-
 app.config.from_object('config.default')
-app.config.from_pyfile(f'{INSTANCE}.py')
+app.config.from_pyfile('production.py')
 app.config['WTF_CSRF_TIME_LIMIT'] = None  # Set CSRF token valid for session
 
 locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
@@ -31,9 +25,9 @@ from openatlas.models.logger import Logger
 from openatlas.api import api
 from openatlas.display.util import convert_size
 from openatlas.views import (
-    admin, ajax, tools, changelog, entity, entity_index, entity_form, error,
-    export, file, hierarchy, index, imports, link, login, model, note, overlay,
-    profile, reference, search, sql, type as type_, user)
+    admin, ajax, arche, tools, changelog, entity, entity_index, entity_form,
+    error, export, file, hierarchy, index, imports, link, login, model, note,
+    overlay, profile, reference, search, sql, type as type_, user)
 
 
 @babel.localeselector

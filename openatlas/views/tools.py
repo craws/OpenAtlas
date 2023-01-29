@@ -1,5 +1,5 @@
 
-from typing import Union
+from typing import Any, Union
 
 from flask import flash, g, json, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -35,8 +35,8 @@ def name_result(result: float) -> str:
     return ''  # pragma: no cover
 
 
-def start_crumbs(entity: Entity):
-    crumbs = [[_('place'), url_for('index', view='place')]]
+def start_crumbs(entity: Entity) -> list[Any]:
+    crumbs: list[Any] = [[_('place'), url_for('index', view='place')]]
     for super_ in entity.get_structure()['supers']:
         crumbs.append(link(super_))
     crumbs.append(entity)
@@ -246,7 +246,7 @@ def carbon_update(id_: int) -> Union[str, Response]:
                 'range': form.range.data,
                 'timeScale': 'BP'},
             link_=carbon_link)
-        flash(_('entity updated'), 'info')
+        flash(_('info update'), 'info')
         return redirect(url_for('tools_index', id_=entity.id))
     if request.method == 'GET' and carbon_link:
         data = json.loads(carbon_link.description)

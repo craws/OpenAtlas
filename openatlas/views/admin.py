@@ -3,6 +3,7 @@ import importlib
 import math
 import os
 import shutil
+from subprocess import run
 from typing import Any, Optional, Union
 
 from flask import flash, g, render_template, request, url_for
@@ -159,7 +160,7 @@ def admin_index(
     if is_authorized('manager'):
         tabs['modules'] = Tab(
             _('modules'),
-            '<h1>' + _('Defaults for new user') + '</h1>'
+            '<h1>' + uc_first(_('defaults for new user')) + '</h1>'
             + display_info(get_form_settings(ModulesForm())),
             buttons=[
                 manual('admin/modules'),
@@ -751,8 +752,22 @@ def admin_delete_orphaned_resized_images() -> Response:
 
 
 def get_disk_space_info() -> Optional[dict[str, Any]]:
+    if os.name == 'posix':
+        process = run(
+            ['du', '-sb', app.config['FILES_PATH']],
+            capture_output=True,
+            text=True,
+            check=True)
+        files_size = int(process.stdout.split()[0])
+    else:
+        files_size = 0  # pragma: no cover
     stats = shutil.disk_usage(app.config['UPLOAD_DIR'])
+    percent_free = 100 - math.ceil(stats.free / (stats.total / 100))
+    percent_files = math.ceil(files_size / (stats.total / 100))
     return {
         'total': convert_size(stats.total),
+        'project': convert_size(files_size),
         'free': convert_size(stats.free),
-        'percent': 100 - math.ceil(stats.free / (stats.total / 100))}
+        'percent_free': percent_free,
+        'percent_project': percent_files,
+        'percent_other': 100 - (percent_files + percent_free)}

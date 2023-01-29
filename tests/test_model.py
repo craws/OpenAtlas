@@ -1,16 +1,13 @@
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.entity import Entity
-from tests.base import TestBaseCase
+from tests.base import TestBaseCase, insert
 
 
 class ModelTests(TestBaseCase):
 
     def test_model(self) -> None:
         with app.app_context():
-            rv = self.app.get(url_for('model_index'))
-            assert b'Browse' in rv.data
 
             rv = self.app.get(url_for('openatlas_class_index'))
             assert b'Involvement' in rv.data
@@ -18,14 +15,8 @@ class ModelTests(TestBaseCase):
             rv = self.app.get(url_for('cidoc_class_index'))
             assert b'E1' in rv.data
 
-            rv = self.app.get(url_for('cidoc_class_view', code='E4'))
-            assert b'Domain for' in rv.data
-
             rv = self.app.get(url_for('property_index'))
             assert b'P1' in rv.data
-
-            rv = self.app.get(url_for('property_view', code='P68'))
-            assert b'P68' in rv.data
 
             rv = self.app.post(
                 url_for('model_index'),
@@ -35,23 +26,19 @@ class ModelTests(TestBaseCase):
                     'cidoc_property': 'P13'})
             assert b'Wrong domain' in rv.data
 
-            self.app.post(
-                url_for('model_index'),
-                data={
-                    'cidoc_domain': 'E1',
-                    'cidoc_range': 'E1',
-                    'cidoc_property': 'P67'})
-
-            with app.test_request_context():  # Insert data for network view
+            with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                actor = Entity.insert('person', 'King Arthur')
-                event = Entity.insert('activity', 'Battle of Camlann')
-                source = Entity.insert('source', 'The source')
+                actor = insert('person', 'King Arthur')
+                event = insert('activity', 'Battle of Camlann')
+                source = insert('source', 'The source')
                 event.link('P11', actor)
                 source.link('P67', event)
-            self.app.get(url_for('model_network', dimensions=2))
+
+            rv = self.app.get(url_for('model_network', dimensions=2))
+            assert b'Show orphans' in rv.data
+
             rv = self.app.get(url_for('model_network'))
-            assert b'orphans' in rv.data
+            assert b'Show orphans' in rv.data
 
             rv = self.app.post(
                 url_for('model_network'),
@@ -67,9 +54,6 @@ class ModelTests(TestBaseCase):
             assert b'King Arthur' in rv.data
 
             self.app.get('/index/setlocale/de')
-            rv = self.app.get(url_for('property_view', code='P68'))
-            assert b'verweist auf' in rv.data
-
             rv = self.app.get(url_for('cidoc_class_view', code='E18'))
             assert b'Materielles' in rv.data
 

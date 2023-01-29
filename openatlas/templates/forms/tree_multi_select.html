@@ -1,12 +1,19 @@
-<span
-    id="{{ field.id }}-button"
-    class="{{ config.CSS.button.secondary }}"
-    onclick="$('#{{ field.id }}-modal').modal('show')">
-    {{ _('change')|uc_first }}
-</span>
-<div id="{{ field.id }}-selection" class="pt-1 g-1 row">
-  {% for s in selection %}<span class="badge col-auto bg-gray text-black ms-1">{{ s }}</span>{% endfor %}
+<div class="row g-1">
+  <div class="col" style="padding-top:4px;padding-left:4px;">
+    <div id="{{ field.id }}-selection" class="g-1 row {{ config.CSS.string_field }}">
+      {% for s in selection %}<span class="badge col-auto bg-gray text-black">{{ s }}</span>{% endfor %}
+    </div>
+  </div>
+  <div class="col-auto">
+    <span
+        id="{{ field.id }}-button"
+        class="{{ config.CSS.button.secondary }}"
+        onclick="$('#{{ field.id }}-modal').modal('show')">
+        {{ _('change')|uc_first }}
+    </span>
+  </div>
 </div>
+
 <div
     id="{{ field.id }}-modal"
     class="modal fade"
