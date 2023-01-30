@@ -42,6 +42,10 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
   test_openatlas:
+    env:
+      POSTGRES_PASSWORD: verysecret
+      POSTGRES_DB: openatlas_test
+      POSTGRES_USER: openatlas
     runs-on: ubuntu-latest
     needs: [build_openatlas]
     steps:
@@ -61,16 +65,28 @@ jobs:
 
       - name: Create postgis container
         run: |
-          docker run -d -e POSTGRES_PASSWORD=verysecret -e POSTGRES_DB=openatlas_test -e POSTGRES_USER=openatlas --name postgres --network openatlas postgis/postgis:13-3.3
+          docker run -d -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD\
+                        -e POSTGRES_DB=$POSTGRES_DB\
+                        -e POSTGRES_USER=$POSTGRES_USER\
+                        --name postgres --network openatlas\
+                        postgis/postgis:13-3.3
 
       - name: Wait
         run: sleep 8
 
       - name: Create openatlas container and run tests
         run: |
-          docker create -e OVERWRITE_DATABASE=TRUE -e POSTGRES_PASSWORD=verysecret -e POSTGRES_DB=openatlas_test -e POSTGRES_USER=openatlas -e POSTGRES_HOST=postgres --name openatlas --network openatlas ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')/container-preview:${{ github.ref_name }}
+          COOKIE_KEY=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c 32;echo;)
+          echo "COOKIE_KEY=$COOKIE_KEY"
+          docker create -e OVERWRITE_DATABASE=TRUE\
+                        -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD\
+                        -e POSTGRES_DB=$POSTGRES_DB\
+                        -e POSTGRES_USER=$POSTGRES_USER\
+                        -e POSTGRES_HOST=postgres\
+                        -e COOKIE_KEY=$COOKIE_KEY\
+                        --name openatlas --network openatlas\
+                        ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')/container-preview:${{ github.ref_name }}
           set -x
-          $COOKIE_KEY
           cat <<EOF > testing.py
           SERVER_NAME = 'local.host'
           DATABASE_NAME='openatlas_test'
@@ -89,24 +105,15 @@ jobs:
               'base_url': 'https://arche-curation.acdh-dev.oeaw.ac.at/',
               'thumbnail_url': 'https://arche-thumbnails.acdh.oeaw.ac.at/'}
           EOF
-          cat <<EOF > production.py
-          SERVER_NAME = 'local.host'
-          DATABASE_NAME='openatlas_test'
-          DATABASE_USER='openatlas'
-          DATABASE_HOST='postgres'
-          DATABASE_PORT=5432
-          DATABASE_PASS='verysecret'
-          MAIL_PASSWORD='asdQWEtzu123'
-          SECRET_KEY='$COOKIE_KEY'  # Used for cookies
-          DEBUG = True
-          EOF
-          sudo chown 33:33 testing.py production.py
+          # production.py is recreated on every start
+          sudo chown 33:33 testing.py
           docker cp -a testing.py openatlas:/var/www/openatlas/instance/
-          docker cp -a production.py openatlas:/var/www/openatlas/instance/
           docker start openatlas
           until [ "$(docker inspect -f {{.State.Running}} openatlas)"=="true" ]; do
               sleep 0.1;
           done;
+          docker cp openatlas:/var/www/openatlas/instance/production.py .
+          cat production.py
           docker exec -i openatlas /bin/bash -c "cd /var/www/openatlas/instance/ && ls -la && cat testing.py && cat production.py"
 
       - name: Run tests
