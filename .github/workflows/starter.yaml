@@ -78,7 +78,7 @@ jobs:
           DATABASE_PORT=5432
           DATABASE_PASS='verysecret'
           MAIL_PASSWORD='asdQWEtzu123'
-          SECRET_KEY='asdada3r3t4343543523423'  # Used for cookies
+          SECRET_KEY='$COOKIE_KEY'  # Used for cookies
           DEBUG = True
           WTF_CSRF_ENABLED = False
           WTF_CSRF_METHODS: list[str] = []

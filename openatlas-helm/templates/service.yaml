@@ -1,15 +1,32 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "openatlas-helm.fullname" . }}
+  annotations:
+    field.cattle.io/targetWorkloadIds: '["openatlas/openatlas"]'
+    management.cattle.io/ui-managed: 'true'
+  name: {{ template "fullname" . }}
+  ownerReferences:
+    - apiVersion: apps/v1
+      controller: true
+      kind: Deployment
+      name: openatlas
+      uid: 7b5aa742-15bb-452d-b32b-002c2e2a4902
   labels:
-    {{- include "openatlas-helm.labels" . | nindent 4 }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
 spec:
-  type: {{ .Values.service.type }}
+  clusterIP: 10.43.154.161
+  clusterIPs:
+    - 10.43.154.161
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+    - IPv4
+  ipFamilyPolicy: SingleStack
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
+    - name: http
+      port: 8080
       protocol: TCP
-      name: http
+      targetPort: 8080
   selector:
-    {{- include "openatlas-helm.selectorLabels" . | nindent 4 }}
+    workload.user.cattle.io/workloadselector: apps.deployment-openatlas-openatlas
+  sessionAffinity: None
+  type: ClusterIP

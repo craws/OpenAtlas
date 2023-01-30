@@ -1,61 +1,25 @@
-{{- if .Values.ingress.enabled -}}
-{{- $fullName := include "openatlas-helm.fullname" . -}}
-{{- $svcPort := .Values.service.port -}}
-{{- if and .Values.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
-  {{- if not (hasKey .Values.ingress.annotations "kubernetes.io/ingress.class") }}
-  {{- $_ := set .Values.ingress.annotations "kubernetes.io/ingress.class" .Values.ingress.className}}
-  {{- end }}
-{{- end }}
-{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
 apiVersion: networking.k8s.io/v1
-{{- else if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
-apiVersion: networking.k8s.io/v1beta1
-{{- else -}}
-apiVersion: extensions/v1beta1
-{{- end }}
 kind: Ingress
 metadata:
-  name: {{ $fullName }}
-  labels:
-    {{- include "openatlas-helm.labels" . | nindent 4 }}
-  {{- with .Values.ingress.annotations }}
   annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+    field.cattle.io/publicEndpoints: >-
+      [{"addresses":["10.3.6.61","10.3.6.63","10.3.6.65"],"port":80,"protocol":"HTTP","serviceName":"openatlas:openatlas","ingressName":"openatlas:openatlas","hostname":"openatlas.acdh-cluster-2.arz.oeaw.ac.at","path":"/","allNodes":false}]
+    objectset.rio.cattle.io/applied: >-
+      H4sIAAAAAAAA/3yQsW7jMAyG34WzrdiODct6g9tuONxyuIGSmFi1IwkSk7Q1/O6FkqUFigIaxJ/k95PcAKP7Sym74EGBJ76HtDh/FovMwoXDrYUKFuctKPjlz4lyhgouxGiREdQG6H1gZBd8LmHQL2Q4E4vkgjDIvFIBuUJA0/bU26nWwyTrnsjWEvWxNpI6PWpqcNSwV7CipvVH3Ix5BgVGT0dju7Y1cjC2wVPX6b61U4tjK21/olEP2A+yQD1eCBSESB55xbJHkXJE81XfK8iRTLFP15UyqH8bzCHz5yqBxs61Wa+ZKdWdwPQuAuFdoBHIUMHMHAsiIs9PhEazULnkBpnSzRXb7buxYkj8SF0vmhIo2chm3/fqwQIFB3h+/7zF0vo70cm9wv5/L+8jAAD//9dl+YrTAQAA
+    objectset.rio.cattle.io/id: ac14e4d9-b598-4eed-8ab3-c8e2b7be0a7b
+  labels:
+    objectset.rio.cattle.io/hash: cb93cd211c85cd0af22b41d91a718d4fe7b5a458
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+  name: {{ template "fullname" . }}
 spec:
-  {{- if and .Values.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
-  ingressClassName: {{ .Values.ingress.className }}
-  {{- end }}
-  {{- if .Values.ingress.tls }}
-  tls:
-    {{- range .Values.ingress.tls }}
-    - hosts:
-        {{- range .hosts }}
-        - {{ . | quote }}
-        {{- end }}
-      secretName: {{ .secretName }}
-    {{- end }}
-  {{- end }}
   rules:
-    {{- range .Values.ingress.hosts }}
-    - host: {{ .host | quote }}
+    - host: openatlas.acdh-cluster-2.arz.oeaw.ac.at
       http:
         paths:
-          {{- range .paths }}
-          - path: {{ .path }}
-            {{- if and .pathType (semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion) }}
-            pathType: {{ .pathType }}
-            {{- end }}
-            backend:
-              {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
+          - backend:
               service:
-                name: {{ $fullName }}
+                name: openatlas
                 port:
-                  number: {{ $svcPort }}
-              {{- else }}
-              serviceName: {{ $fullName }}
-              servicePort: {{ $svcPort }}
-              {{- end }}
-          {{- end }}
-    {{- end }}
-{{- end }}
+                  number: 8080
+            path: /
+            pathType: Prefix
