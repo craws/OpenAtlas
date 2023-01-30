@@ -1,3 +1,4 @@
+{{- $_ := set . "namePrefix" "postgres" -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -68,3 +69,4 @@ spec:
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30
+{{- $_ := unset . "namePrefix" -}}
