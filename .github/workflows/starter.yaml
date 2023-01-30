@@ -69,7 +69,26 @@ jobs:
         run: |
           docker create -e OVERWRITE_DATABASE=TRUE -e POSTGRES_PASSWORD=verysecret -e POSTGRES_DB=openatlas_test -e POSTGRES_USER=openatlas -e POSTGRES_HOST=postgres --name openatlas --network openatlas ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')/container-preview:${{ github.ref_name }}
           set -x
+          $COOKIE_KEY
           cat <<EOF > testing.py
+          SERVER_NAME = 'local.host'
+          DATABASE_NAME='openatlas_test'
+          DATABASE_USER='openatlas'
+          DATABASE_HOST='postgres'
+          DATABASE_PORT=5432
+          DATABASE_PASS='verysecret'
+          MAIL_PASSWORD='asdQWEtzu123'
+          SECRET_KEY='asdada3r3t4343543523423'  # Used for cookies
+          DEBUG = True
+          WTF_CSRF_ENABLED = False
+          WTF_CSRF_METHODS: list[str] = []
+          ARCHE = {
+              'id': 0,
+              'collection_ids': [0],
+              'base_url': 'https://arche-curation.acdh-dev.oeaw.ac.at/',
+              'thumbnail_url': 'https://arche-thumbnails.acdh.oeaw.ac.at/'}
+          EOF
+          cat <<EOF > production.py
           SERVER_NAME = 'local.host'
           DATABASE_NAME='openatlas_test'
           DATABASE_USER='openatlas'
@@ -79,11 +98,10 @@ jobs:
           MAIL_PASSWORD='asdQWEtzu123'
           SECRET_KEY='$COOKIE_KEY'  # Used for cookies
           DEBUG = True
-          WTF_CSRF_ENABLED = False
-          WTF_CSRF_METHODS = []
           EOF
-          sudo chown 33:33 testing.py
+          sudo chown 33:33 testing.py production.py
           docker cp -a testing.py openatlas:/var/www/openatlas/instance/
+          docker cp -a production.py openatlas:/var/www/openatlas/instance/
           docker start openatlas
           until [ "$(docker inspect -f {{.State.Running}} openatlas)"=="true" ]; do
               sleep 0.1;
