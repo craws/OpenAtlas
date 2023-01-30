@@ -2,18 +2,25 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+databaseHost: postgres
+databaseName: openatlas-test
+postgresUser: openatlas
+postgresPassword: openatlas
+overwriteDatabase: "TRUE"
+hostName: openatlas.acdh-cluster-2.arz.oeaw.ac.at
+
+
 replicaCount: 1
 
 image:
-  repository: nginx
+  repository: ghcr.io/acdh-oeaw/openatlas/container-preview
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "2611a64"
 
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
-fullname: "XYZ"
 
 serviceAccount:
   # Specifies whether a service account should be created
