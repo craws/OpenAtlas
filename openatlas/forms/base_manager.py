@@ -6,14 +6,13 @@ from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (
-    FieldList, HiddenField, SelectMultipleField, StringField, SubmitField,
+    FieldList, HiddenField, SelectMultipleField, StringField,
     TextAreaField, widgets)
 from wtforms.validators import InputRequired, URL
 
-from openatlas.display.util import uc_first
 from openatlas.forms.add_fields import (
     add_date_fields, add_reference_systems, add_types)
-from openatlas.forms.field import RemovableListField, TableField, TreeField
+from openatlas.forms.field import RemovableListField, TableField, TreeField, SubmitField
 from openatlas.forms.populate import (
     populate_dates, populate_reference_systems, populate_types)
 from openatlas.forms.process import (
@@ -127,7 +126,7 @@ class BaseManager:
             setattr(
                 self.form_class,
                 'insert_and_continue',
-                SubmitField(uc_first(_('insert and continue'))))
+                SubmitField(_('insert and continue')))
             setattr(self.form_class, 'continue_', HiddenField())
 
     def additional_fields(self) -> dict[str, Any]:

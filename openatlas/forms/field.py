@@ -8,7 +8,7 @@ from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (
-    Field, FileField, FloatField, HiddenField, StringField, TextAreaField)
+    Field, FileField, FloatField, HiddenField, StringField, TextAreaField, BooleanField)
 from wtforms.widgets import (
     FileInput, HiddenInput, TextInput, Input, HTMLString)
 
@@ -352,9 +352,19 @@ class CustomField(Field):
         self.content = content
 
 
+class SubmitInput(Input):
+    input_type = 'submit'
+
+    def __call__(self, field, **kwargs):
+        return HTMLString(f'<button {self.html_params(name=field.name, **kwargs)}>{field.label.text}</button>')
+
+
+class SubmitField(BooleanField):
+    widget = SubmitInput()
+
+
 def generate_password_field() -> CustomField:
     return CustomField(
         '',
-        content=
-        f'<span class="uc-first {app.config["CSS"]["button"]["primary"]}" '
+        content=f'<span class="uc-first {app.config["CSS"]["button"]["primary"]}" '
         f'id="generate-password">{_("generate password")}</span>')

@@ -291,7 +291,7 @@ def profile_image(entity: Entity) -> str:
 
 @app.template_filter()
 def get_js_messages(lang: str) -> str:
-    js_message_file = Path('static') / 'js' / f'messages_{lang}.js'
+    js_message_file = Path('static') / 'vendor' / 'jquery_validation_plugin' / f'messages_{lang}.js'
     if not (Path(app.root_path) / js_message_file).is_file():
         return ''
     return f'<script src="/{js_message_file}"></script>'
@@ -611,9 +611,10 @@ def breadcrumb(crumbs: list[Any]) -> str:
         if isinstance(item, (Entity, Project, User)):
             items.append(link(item))
         elif isinstance(item, list):
-            items.append(f'<a href="{item[1]}">{uc_first(str(item[0]))}</a>')
+            items.append(
+                f'<a href="{item[1]}" class="uc-first">{str(item[0])}</a>')
         else:
-            items.append(uc_first(item))
+            items.append(f'<span class="uc-first">{item}</span>')
     return '&nbsp;>&nbsp; '.join(items)
 
 
