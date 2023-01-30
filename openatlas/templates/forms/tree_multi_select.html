@@ -7,10 +7,8 @@
   <div class="col-auto">
     <span
         id="{{ field.id }}-button"
-        class="{{ config.CSS.button.secondary }}"
-        onclick="$('#{{ field.id }}-modal').modal('show')">
-        {{ _('change')|uc_first }}
-    </span>
+        class="{{ config.CSS.button.secondary }} uc-first"
+        onclick="$('#{{ field.id }}-modal').modal('show')">{{ _('change') }}</span>
   </div>
 </div>
 

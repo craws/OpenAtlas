@@ -1,11 +1,13 @@
 <tr class="table-row {{ row_css }}">
   <td class="text-nowrap fit-width">
-  <div style="height:31px" class="d-flex align-items-center justify-content-end text-end">
-    <label>
-      {{ label|safe if label is string else field.label|safe }}
+    <div style="height:31px" class="d-flex align-items-center justify-content-end text-end">
+      {% if label is string %}
+        <label class="uc-first">{{ label|safe }}</label>
+      {% else %}
+        {{ field.label(class_="uc-first")|safe }}
+      {% endif %}
       {{ field.description|tooltip|safe }}
-    </label>
-  </div>
+    </div>
   </td>
   <td class="align-middle">
     <div>

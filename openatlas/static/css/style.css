@@ -71,12 +71,17 @@ form ul, form ol, form li {
 }
 
 /* Utilities */
-.uc-first:first-letter {
+.uc-first::first-letter {
   text-transform: uppercase;
+}
+select option.uc-first {text-transform:capitalize}
+select.uc-first {text-transform:capitalize}
+.uc-first::placeholder {
+  text-transform: capitalize !important;
 }
 
 @-moz-document url-prefix() {
-  .uc-first:first-letter {
+  .uc-first::first-letter {
     text-transform: none!important;
   }
 }
