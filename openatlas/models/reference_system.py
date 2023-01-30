@@ -38,9 +38,9 @@ class ReferenceSystem(Entity):
                     system.classes.append(class_.name)
             systems[system.id] = system
             if system.name == 'GeoNames':
-                g.reference_system_geonames = system
+                g.geonames = system
             elif system.name == 'Wikidata':
-                g.reference_system_wikidata = system
+                g.wikidata = system
         return systems
 
     def remove_class(self, class_name: str) -> None:
@@ -76,7 +76,7 @@ class ReferenceSystem(Entity):
         return choices
 
     @staticmethod
-    def insert_system(data: dict[str, str]) -> Entity:
+    def insert_system(data: dict[str, str]) -> ReferenceSystem:
         entity = Entity.insert(
             'reference_system',
             data['name'],

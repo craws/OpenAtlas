@@ -96,12 +96,8 @@ def import_project_view(id_: int) -> str:
             render_template('import/project_view.html', project=project)),
         'entities': Tab(
             'entities',
-            table=Table([
-                'name',
-                'class',
-                'description',
-                'origin ID',
-                'date']))}
+            table=Table(
+                ['name', 'class', 'description', 'origin ID', 'date']))}
     for entity in Entity.get_by_project_id(id_):
         tabs['entities'].table.rows.append([
             link(entity),

@@ -21,6 +21,7 @@ we use to set up new Debian servers for OpenAtlas installations.
     # apt install python3-flask-babel python3-flask-login python3-flaskext.wtf python3-markdown python3-numpy
     # apt install python3-pandas python3-jinja2 python3-flask-cors python3-flask-restful p7zip-full
     # apt install python3-wand python3-rdflib python3-dicttoxml python3-rdflib-jsonld python3-flasgger
+    # apt install python3-requests
 
 ### Apache 2.4
 
@@ -146,3 +147,11 @@ As postgres:
 Copy instance/example_testing.py to instance/testing.py and adapt as needed:
 
     $ cp instance/example_testing.py instance/testing.py
+
+Run tests
+
+    $ nosetest3
+
+Run tests with coverage
+
+    $ nosetests3 -c tests/.noserc

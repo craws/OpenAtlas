@@ -582,7 +582,7 @@ def button(
 
 @app.template_filter()
 def button_bar(buttons: list[Any]) -> str:
-    def add_col(input_: str):
+    def add_col(input_: str) -> str:
         return \
             f'<div class="col-auto d-flex align-items-center">{input_}</div>'
 

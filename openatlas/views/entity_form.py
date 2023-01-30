@@ -11,7 +11,8 @@ from werkzeug.wrappers import Response
 from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.image_processing import resize_image
-from openatlas.display.util import is_authorized, link, required_group
+from openatlas.display.util import (
+    get_base_table_data, is_authorized, link, required_group)
 from openatlas.forms.base_manager import BaseManager
 from openatlas.forms.form import get_manager
 from openatlas.forms.util import populate_insert_form, was_modified
@@ -76,7 +77,15 @@ def update(id_: int) -> Union[str, Response]:
     if not manager.form.is_submitted():
         manager.populate_update()
     if entity.class_.view in ['artifact', 'place']:
-        entity.set_image_for_places()
+        manager.entity.image_id = manager.entity.get_profile_image_id()
+        if not manager.entity.image_id:
+            for link_ in manager.entity.get_links('P67', inverse=True):
+                domain = link_.domain
+                if domain.class_.view == 'file' \
+                        and get_base_table_data(domain)[3] \
+                        in app.config['DISPLAY_FILE_EXTENSIONS']:
+                    manager.entity.image_id = domain.id
+                    break
     return render_template(
         'entity/update.html',
         form=manager.form,

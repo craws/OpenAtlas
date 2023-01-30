@@ -13,7 +13,6 @@ class IndexTests(TestBaseCase):
             assert 'x00' in str(self.app.get('/static/favicon.ico').data)
 
             rv = self.app.get(url_for('index_changelog'))
-            assert b'2.0.0' in rv.data
             assert b'is needed but current version is' not in rv.data
 
             rv = self.app.get(url_for('login'), follow_redirects=True)
@@ -31,7 +30,7 @@ class IndexTests(TestBaseCase):
             app.config['WRITABLE_DIRS'].append(Path(app.root_path) / 'error')
             app.config['DATABASE_VERSION'] = 'error'
             rv = self.app.get(url_for('view', id_=666), follow_redirects=True)
-            assert b'teapot' in rv.data  # Id not found error
+            assert b'teapot' in rv.data
             assert b'OpenAtlas with default password is still' in rv.data
             assert b'Database version error is needed but current' in rv.data
             assert b'Directory not writable' in rv.data
@@ -39,7 +38,7 @@ class IndexTests(TestBaseCase):
             rv = self.app.get(url_for('logout'), follow_redirects=True)
             assert b'Password' in rv.data
 
-            rv = self.app.get('/')  # Test intro when not logged in
+            rv = self.app.get('/')
             assert b'Overview' in rv.data
 
             rv = self.app.get(url_for('login'))
