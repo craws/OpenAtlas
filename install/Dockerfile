@@ -1,6 +1,7 @@
 FROM debian:11
 
-RUN export DEBIAN_FRONTEND=noninteractive &&\
+RUN --mount=type=cache,target=/var/cache/apt \
+    export DEBIAN_FRONTEND=noninteractive &&\
     apt update && apt dist-upgrade -y --no-install-recommends &&\
     apt install -y --no-install-recommends python3 python3-bcrypt python3-dateutil python3-psycopg2 python3-fuzzywuzzy python3-flask &&\
     apt install -y --no-install-recommends python3-flask-babel python3-flask-login python3-flaskext.wtf python3-markdown python3-numpy &&\
