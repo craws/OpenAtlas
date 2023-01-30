@@ -10,19 +10,18 @@ RUN export DEBIAN_FRONTEND=noninteractive &&\
     apt install -y --no-install-recommends gettext npm python3-pip git postgresql-client-13 &&\
     apt install -y --no-install-recommends dos2unix locales locales-all &&\
     mkdir -p /var/www/openatlas /var/www/.cache /var/www/.local /var/www/.npm &&\
-    chown -R www-data:www-data /var/www/openatlas /var/www/.cache /var/www/.local /var/www/.npm /var/log/apache2 /var/run/apache2
-COPY entrypoint.sh /entrypoint.sh
-COPY check_database.sh /check_database.sh
-COPY example_apache.conf /etc/apache2/sites-available/000-default.conf
-RUN chmod a+x /entrypoint.sh /check_database.sh &&\
+    chown -R www-data:www-data /var/www/.cache /var/www/.local /var/www/.npm /var/log/apache2 /var/run/apache2
+COPY --chown=www-data:www-data / /var/www/openatlas/
+RUN cd /var/www/openatlas && cp install/entrypoint.sh /entrypoint.sh &&\
+    cp install/check_database.sh /check_database.sh &&\
+    cp install/example_apache.conf /etc/apache2/sites-available/000-default.conf &&\
+    chmod a+x /entrypoint.sh /check_database.sh &&\
     dos2unix /entrypoint.sh /check_database.sh &&\
     sed -i 's~^Listen.*~Listen 8080~' /etc/apache2/ports.conf &&\
     sed -i 's~^<VirtualHost \*:80>~<VirtualHost *:8080>~' /etc/apache2/sites-available/000-default.conf &&\
     sed -i 's~ServerName.*~~' /etc/apache2/sites-available/000-default.conf
 USER www-data
-RUN cd /var/www &&\
-    git clone -b feature_docker_k8s_github_tests https://github.com/craws/OpenAtlas.git openatlas &&\
-    cd openatlas &&\
+RUN cd /var/www/openatlas &&\
     pip3 install calmjs &&\
     cd openatlas/static &&\
     pip3 install -e ./ &&\
