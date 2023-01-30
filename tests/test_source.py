@@ -43,7 +43,7 @@ class SourceTest(TestBaseCase):
             assert b'Source updated' in rv.data
 
             rv = self.app.get(url_for('entity_add_reference', id_=source_id))
-            assert b'Link reference' in rv.data
+            assert b'link reference' in rv.data
 
             rv = self.app.post(
                 url_for('entity_add_reference', id_=source_id),

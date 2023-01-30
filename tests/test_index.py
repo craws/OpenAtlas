@@ -39,7 +39,7 @@ class IndexTests(TestBaseCase):
             assert b'Password' in rv.data
 
             rv = self.app.get('/')
-            assert b'Overview' in rv.data
+            assert b'overview' in rv.data
 
             rv = self.app.get(url_for('login'))
             assert b'Password' in rv.data
