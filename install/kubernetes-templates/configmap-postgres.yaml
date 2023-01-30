@@ -1,0 +1,15 @@
+apiVersion: v1
+data:
+  POSTGRES_DB: openatlas_test
+kind: ConfigMap
+metadata:
+  annotations:
+    objectset.rio.cattle.io/applied: H4sIAAAAAAAA/3zPT0vEMBAF8O8y57Y2/d8c/YMnUVzxurykk91oNynN4GXpd5cigiePM/B+j3clLP6d1+RjIE1fijKaICB9pZfnw9vj68PheH9LmuLCATIjHYWT0JbRpw8TabqLwfnTExbK6MKC3zhCiALxMaT9jOaDrSSWYvWxsBCZufDxxu8GjBssepObqm/ypoTNB1P2eTu1VWfasbU19soZhud/uTPSmTR1XaOGsTRt75RCzeNQYVBd7VD2llXjptqMbqx3NODCpGmJSU4rJ/r5pAWW/+6mbfsOAAD//3EWymEuAQAA
+    objectset.rio.cattle.io/id: abf8ca7b-b274-40ac-8b07-5d526b595c3a
+  creationTimestamp: "2023-01-23T16:20:43Z"
+  labels:
+    objectset.rio.cattle.io/hash: 6641890b57f11a3e982a8163fa07ce14fd3b9f93
+  name: postgres
+  namespace: openatlas
+  resourceVersion: "72809244"
+  uid: 920cac59-5604-4a32-86ad-3f0e649fa736

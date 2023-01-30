@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    field.cattle.io/targetWorkloadIds: '["openatlas/openatlas"]'
+    management.cattle.io/ui-managed: "true"
+  creationTimestamp: "2023-01-23T16:33:14Z"
+  name: openatlas
+  namespace: openatlas
+  ownerReferences:
+  - apiVersion: apps/v1
+    controller: true
+    kind: Deployment
+    name: openatlas
+    uid: 7b5aa742-15bb-452d-b32b-002c2e2a4902
+  resourceVersion: "72815744"
+  uid: 553fdcd7-c5c8-4465-ade4-0274780e1493
+spec:
+  clusterIP: 10.43.154.161
+  clusterIPs:
+  - 10.43.154.161
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    workload.user.cattle.io/workloadselector: apps.deployment-openatlas-openatlas
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
