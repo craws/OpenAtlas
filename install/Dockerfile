@@ -21,7 +21,7 @@ RUN chmod a+x /entrypoint.sh /check_database.sh &&\
     sed -i 's~ServerName.*~~' /etc/apache2/sites-available/000-default.conf
 USER www-data
 RUN cd /var/www &&\
-    git clone https://github.com/craws/OpenAtlas.git openatlas &&\
+    git clone -b feature_docker_k8s_github_tests https://github.com/craws/OpenAtlas.git openatlas &&\
     cd openatlas &&\
     pip3 install calmjs &&\
     cd openatlas/static &&\
