@@ -6,7 +6,7 @@ from wtforms import Field, FileField, IntegerField, SelectField, StringField
 from wtforms.validators import Email
 
 from openatlas import app
-from openatlas.display.util import manual, uc_first
+from openatlas.display.util import manual
 from openatlas.forms.field import ValueTypeField
 
 
@@ -39,9 +39,9 @@ def html_form(
                     reference_systems_added = True
                     html += add_row(
                         None,
-                        uc_first(_('reference system')),
+                        _('reference system'),
                         '<span id="reference-system-switcher" class="uc-first '
-                        f'{app.config["CSS"]["button"]["secondary"]}"> '
+                        f'{app.config["CSS"]["button"]["secondary"]}">'
                         f'{_("show")}</span>')
                 html += add_row(field, row_css="d-none")
                 continue
@@ -55,9 +55,9 @@ def html_form(
                 continue
             label = type_.name
             if type_.category == 'standard' and type_.name != 'License':
-                label = uc_first(_('type'))
+                label = _('type')
             if field.label.text == 'super':
-                label = uc_first(_('super'))
+                label = _('super')
             if field.flags.required and field.label.text:
                 label += ' *'
             if 'is_type_form' not in form:

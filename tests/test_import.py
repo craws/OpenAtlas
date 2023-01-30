@@ -13,7 +13,7 @@ class ImportTest(TestBaseCase):
         with app.app_context():
 
             rv: Any = self.app.get(url_for('import_project_insert'))
-            assert b'Name *' in rv.data
+            assert b'name *' in rv.data
 
             rv = self.app.post(
                 url_for('import_project_insert'),
@@ -21,7 +21,7 @@ class ImportTest(TestBaseCase):
             p_id = rv.location.split('/')[-1]
 
             rv = self.app.get(url_for('import_project_update', id_=p_id))
-            assert b'Name *' in rv.data
+            assert b'name *' in rv.data
 
             rv = self.app.post(
                 url_for('import_project_update', id_=p_id),
@@ -39,7 +39,7 @@ class ImportTest(TestBaseCase):
 
             rv = self.app.get(
                 url_for('import_data', class_='person', project_id=p_id))
-            assert b'File *' in rv.data
+            assert b'file *' in rv.data
 
             static_path = Path(app.root_path) / 'static'
             with open(static_path / 'example.csv', 'rb') as file:

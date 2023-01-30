@@ -68,7 +68,7 @@ class UserTests(TestBaseCase):
             rv = self.app.post(
                 url_for('user_activity', user_id=user_id),
                 data={'limit': 100, 'user': 0, 'action': 'all'})
-            assert b'Activity' in rv.data
+            assert b'activity' in rv.data
 
             rv = self.app.get(
                 url_for(

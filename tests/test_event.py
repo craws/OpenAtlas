@@ -50,7 +50,7 @@ class EventTest(TestBaseCase):
 
             rv = self.app.get(
                 url_for('insert', class_='activity', origin_id=residence.id))
-            assert b'Location' in rv.data
+            assert b'location' in rv.data
 
             rv = self.app.get(
                 url_for('insert', class_='move', origin_id=residence.id))
@@ -129,7 +129,7 @@ class EventTest(TestBaseCase):
             assert b'1949' in rv.data
 
             rv = self.app.get(url_for('entity_add_file', id_=event_id))
-            assert b'Link file' in rv.data
+            assert b'link file' in rv.data
 
             rv = self.app.post(
                 url_for('entity_add_file', id_=event_id),

@@ -6,7 +6,7 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import SelectField, SubmitField, TextAreaField
+from wtforms import SelectField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app
@@ -14,6 +14,7 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
     bookmark_toggle, format_date, link, required_group, send_mail, uc_first)
+from openatlas.forms.field import SubmitField
 from openatlas.models.content import get_translation
 from openatlas.models.entity import Entity
 from openatlas.models.user import User

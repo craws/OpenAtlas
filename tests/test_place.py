@@ -197,9 +197,8 @@ class PlaceTest(TestBaseCase):
             assert b'Val-hall' in rv.data
 
             rv = self.app.get(url_for('entity_add_reference', id_=place.id))
-            assert b'Link reference' in rv.data
+            assert b'link reference' in rv.data
 
-            # Test move entities of multiple type if link to new type exists
             rv = self.app.post(
                 url_for('type_move_entities', id_=unit_type.subs[0]),
                 data={
@@ -209,7 +208,6 @@ class PlaceTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Entities were updated' in rv.data
 
-            # Test move entities of multiple type
             rv = self.app.post(
                 url_for('type_move_entities', id_=unit_type.subs[1]),
                 data={
@@ -343,7 +341,7 @@ class PlaceTest(TestBaseCase):
             rv = self.app.get(
                 url_for('sex_delete', id_=strati_id),
                 follow_redirects=True)
-            assert b'Tools' in rv.data
+            assert b'tools' in rv.data
 
             rv = self.app.post(
                 url_for('update', id_=strati_id),

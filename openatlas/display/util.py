@@ -291,7 +291,8 @@ def profile_image(entity: Entity) -> str:
 
 @app.template_filter()
 def get_js_messages(lang: str) -> str:
-    js_message_file = Path('static') / 'vendor' / 'jquery_validation_plugin' / f'messages_{lang}.js'
+    js_message_file = Path('static') / 'vendor' / 'jquery_validation_plugin' \
+        / f'messages_{lang}.js'
     if not (Path(app.root_path) / js_message_file).is_file():
         return ''
     return f'<script src="/{js_message_file}"></script>'
@@ -569,14 +570,13 @@ def button(
         id_: Optional[str] = None,
         onclick: Optional[str] = None) -> str:
     tag = 'a' if url else 'span'
-    label = uc_first(label)
-    if url and '/insert' in url and label != uc_first(_('link')):
+    if url and '/insert' in url and label != _('link'):
         label = f'+ {label}'
     return f"""
         <{tag}
             {f'href="{url}"' if url else ''}
             {f'id="{id_}"' if id_ else ''}
-            class="{app.config['CSS']['button'][css]}"
+            class="{app.config['CSS']['button'][css]} uc-first"
             {f'onclick="{onclick}"' if onclick else ''}>{label}</{tag}>"""
 
 
@@ -646,7 +646,7 @@ def description(entity: Union[Entity, Project, User]) -> str:
         label = _('content')
     return f"""
         {html}
-        <p><strong>{uc_first(label)}</strong></p>
+        <p><strong class="uc-first">{label}</strong></p>
         <div class="description more">
             {'<br>'.join(entity.description.splitlines())}
         </div>"""
