@@ -178,10 +178,12 @@ def admin_index(
             tables['content'].display(),
             buttons=[manual('admin/content')])
     if is_authorized('contributor'):
-        tabs['data'] = Tab('data', render_template(
-            'admin/data.html',
-            imports=Import.get_all_projects(),
-            info=get_form_settings(ApiForm())))
+        tabs['data'] = Tab(
+            'data',
+            render_template(
+                'admin/data.html',
+                imports=Import.get_all_projects(),
+                info=get_form_settings(ApiForm())))
     return render_template(
         'tabs.html',
         tabs=tabs,
@@ -470,10 +472,12 @@ def admin_orphans() -> str:
     tabs = {
         'orphans': Tab('orphans', table=Table(header)),
         'unlinked': Tab('unlinked', table=Table(header)),
-        'types': Tab('type', table=Table(
-            ['name', 'root'],
-            [[link(type_), link(g.types[type_.root[0]])]
-             for type_ in Type.get_type_orphans()])),
+        'types': Tab(
+            'type',
+            table=Table(
+                ['name', 'root'],
+                [[link(type_), link(g.types[type_.root[0]])]
+                 for type_ in Type.get_type_orphans()])),
         'missing_files': Tab('missing_files', table=Table(header)),
         'orphaned_files': Tab(
             'orphaned_files',

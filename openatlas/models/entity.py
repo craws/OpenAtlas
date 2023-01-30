@@ -10,10 +10,10 @@ from werkzeug.exceptions import abort
 from openatlas import app
 from openatlas.database.date import Date
 from openatlas.database.entity import Entity as Db
+from openatlas.display.util import (
+    datetime64_to_timestamp, format_date_part, sanitize,
+    timestamp_to_datetime64)
 from openatlas.models.link import Link
-from openatlas.display.util import datetime64_to_timestamp, format_date_part, \
-    get_base_table_data, \
-    sanitize, timestamp_to_datetime64
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.type import Type
@@ -260,17 +260,6 @@ class Entity:
                 'description': None})
             Gis.delete_by_entity(self.location)
         Gis.insert(self.location, gis_data)
-
-    def set_image_for_places(self) -> None:
-        self.image_id = self.get_profile_image_id()
-        if not self.image_id:
-            for link_ in self.get_links('P67', inverse=True):
-                domain = link_.domain
-                if domain.class_.view == 'file' \
-                        and get_base_table_data(domain)[3] \
-                        in app.config['DISPLAY_FILE_EXTENSIONS']:
-                    self.image_id = domain.id
-                    break
 
     def get_profile_image_id(self) -> Optional[int]:
         return Db.get_profile_image_id(self.id)

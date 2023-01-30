@@ -22,7 +22,7 @@ def arche_index() -> str:
         'tabs.html',
         tabs={'info': Tab(
             'info',
-            content=display_info({
+            display_info({
                 k: str(v) for k, v in app.config['ARCHE'].items()}))},
         crumbs=['ARCHE'])
 
@@ -54,7 +54,7 @@ def arche_fetch() -> str:
             'fetched_entities',
             table=table,
             buttons=[
-                button(_('import arche data'), url_for('arche_import_data'))]
+                button(_('import ARCHE data'), url_for('arche_import_data'))]
             if table.rows else [uc_first(_('no entities to retrieve'))])}
 
     return render_template(
@@ -67,13 +67,13 @@ def arche_fetch() -> str:
 @required_group('manager')
 def arche_import_data() -> Response:  # pragma: no cover
     Transaction.begin()
-    #try:
-    count = import_arche_data()
-    Transaction.commit()
-    g.logger.log('info', 'import', f'import: {count}')
-    flash(f"{_('import of')}: {count}", 'info')
-    #except Exception as e:
-    #    Transaction.rollback()
-    #    g.logger.log('error', 'import', 'import failed', e)
-    #    flash(_('error transaction'), 'error')
+    try:
+        count = import_arche_data()
+        Transaction.commit()
+        g.logger.log('info', 'import', f'import: {count}')
+        flash(f"{_('import of')}: {count}", 'info')
+    except Exception as e:
+        Transaction.rollback()
+        g.logger.log('error', 'import', 'import failed', e)
+        flash(_('error transaction'), 'error')
     return redirect(url_for('arche_fetch'))
