@@ -6,7 +6,7 @@
       {% else %}
         {{ field.label(class_="uc-first")|safe }}
       {% endif %}
-      {{ field.description|tooltip|safe }}
+      <div class="ms-1">{{ field.description|tooltip|safe }}</div>
     </div>
   </td>
   <td class="align-middle">
