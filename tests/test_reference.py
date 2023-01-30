@@ -37,7 +37,9 @@ class ReferenceTest(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 link_id = batman.get_links('P67', True)[0].id
+
             rv = self.app.post(
                 url_for('link_update', id_=link_id, origin_id=reference_id),
-                data={'page': '666'}, follow_redirects=True)
+                data={'page': '666'},
+                follow_redirects=True)
             assert b'Changes have been saved' in rv.data

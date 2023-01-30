@@ -17,7 +17,7 @@ def get_carbon_link(entity: Entity) -> Optional[Link]:
     for link_ in entity.get_links('P2'):
         if link_.range.name == 'Radiocarbon':
             return link_
-    return
+    return None
 
 
 def update_carbon(

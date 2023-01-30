@@ -1,4 +1,4 @@
-import pathlib
+from pathlib import Path
 from shutil import copyfile
 
 from flask import g, url_for
@@ -18,11 +18,10 @@ class ImageTest(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 place = insert('place', 'Nostromos')
-                logo = pathlib.Path(app.root_path) \
-                    / 'static' / 'images' / 'layout' / 'logo.png'
 
             # Resizing through UI insert
-            with open(logo, 'rb') as img:
+            with open(Path(app.root_path) / 'static'
+                      / 'images' / 'layout' / 'logo.png', 'rb') as img:
                 rv = self.app.post(
                     url_for('insert', class_='file', origin_id=place.id),
                     data={'name': 'OpenAtlas logo', 'file': img},
@@ -49,22 +48,19 @@ class ImageTest(TestBaseCase):
                 file.link('P2', g.types[get_hierarchy('License').subs[0]])
                 file_name = f'{file.id}.jpeg'
                 copyfile(
-                    pathlib.Path(app.root_path)
+                    Path(app.root_path)
                     / 'static' / 'images' / 'layout' / 'logo.png',
-                    pathlib.Path(app.config['UPLOAD_DIR'] / file_name))
+                    Path(app.config['UPLOAD_DIR'] / file_name))
                 file2 = insert('file', 'Test_File2')
                 file2.link('P2', g.types[get_hierarchy('License').subs[0]])
                 copyfile(
-                    pathlib.Path(app.root_path) / 'static' / 'images'
-                    / 'layout' / 'logo.png',
-                    pathlib.Path(
-                        app.config['UPLOAD_DIR'] / f'{file2.id}.jpeg'))
+                    Path(app.root_path)
+                    / 'static' / 'images' / 'layout' / 'logo.png',
+                    Path(app.config['UPLOAD_DIR'] / f'{file2.id}.jpeg'))
                 file_py = insert('file', 'Test_Py')
-                dst_py = \
-                    pathlib.Path(app.config['UPLOAD_DIR'] / f'{file_py.id}.py')
                 copyfile(
-                    pathlib.Path(app.root_path) / 'views' / 'index.py',
-                    dst_py)
+                    Path(app.root_path) / 'views' / 'index.py',
+                    Path(app.config['UPLOAD_DIR'] / f'{file_py.id}.py'))
                 safe_resize_image(file2.id, '.png', size="???")
                 profile_image(file_pathless)
 
