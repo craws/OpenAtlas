@@ -611,9 +611,10 @@ def breadcrumb(crumbs: list[Any]) -> str:
         if isinstance(item, (Entity, Project, User)):
             items.append(link(item))
         elif isinstance(item, list):
-            items.append(f'<a href="{item[1]}">{uc_first(str(item[0]))}</a>')
+            items.append(
+                f'<a href="{item[1]}" class="uc-first">{str(item[0])}</a>')
         else:
-            items.append(uc_first(item))
+            items.append(f'<span class="uc-first">{item}</span>')
     return '&nbsp;>&nbsp; '.join(items)
 
 

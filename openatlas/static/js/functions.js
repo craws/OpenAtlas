@@ -12,6 +12,8 @@ tinymce.init({
 
 $(document).ready(function () {
 
+  processUcFirst()
+
   $('[data-bs-toggle="popover"]').popover(); // Popovers init
 
   /* DataTables - sort for checkbox columns */
@@ -136,6 +138,10 @@ $(document).ready(function () {
 });
 
 $.jstree.defaults.core.themes.dots = false;
+
+$.extend(true, $.fn.dataTable.defaults, {
+     "initComplete": processUcFirst
+});
 
 /**
  * Sets default text size to a multiple of 0.2em via body stylesheet
@@ -434,4 +440,18 @@ function removeListField(id){
   console.log(id)
         const el = document.getElementById(id);
         el.parentElement?.closest('li')?.remove();
+}
+
+function capitalizeFirstLetter(text){
+  return text?.charAt(0)?.toUpperCase() + text?.slice(1);
+}
+
+function processUcFirst(){
+  if (navigator.userAgent.indexOf("Firefox") != -1) {
+    $(".uc-first").each(function (i, obj) {
+      if (obj!=NaN && !!obj?.firstChild && obj?.firstChild?.nodeType === 3 && obj?.firstChild?.data)
+        obj.firstChild.data = capitalizeFirstLetter(obj.firstChild.data)
+    });
+    document.body.style.display = '';
+  }
 }
