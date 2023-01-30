@@ -2,11 +2,14 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-databaseHost: postgres
-databaseName: openatlas-test
-postgresUser: openatlas
-postgresPassword: openatlas
-overwriteDatabase: "TRUE"
+postgis:
+  host: postgres
+  name: openatlas-test
+  user: openatlas
+  password: openatlas
+  version: "13-3.3"
+  overwriteDatabase: "TRUE"
+
 hostName: openatlas.acdh-cluster-2.arz.oeaw.ac.at
 
 
