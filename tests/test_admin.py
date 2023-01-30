@@ -3,7 +3,6 @@ from pathlib import Path
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.database.entity import Entity as DbEntity
 from openatlas.database.link import Link as DbLink
 from openatlas.models.link import Link
 from tests.base import TestBaseCase, get_hierarchy, insert
@@ -19,14 +18,11 @@ class AdminTests(TestBaseCase):
                 insert('person', 'Oliver Twist')
                 insert('file', 'Forsaken file')
                 insert('feature', 'Forsaken subunit')
-                id_invalid = DbEntity.insert({
-                    'name': 'Invalid linked entity',
-                    'openatlas_class_name': 'artifact',
-                    'code': 'E13', 'description': ''})
+                invalid = insert('artifact', 'Invalid linked entity')
                 DbLink.insert({
                     'property_code': 'P86',
-                    'domain_id': id_invalid,
-                    'range_id': id_invalid,
+                    'domain_id': invalid.id,
+                    'range_id': invalid.id,
                     'description': '',
                     'type_id': None})
 
@@ -101,15 +97,15 @@ class AdminTests(TestBaseCase):
 
             rv = self.app.post(
                 url_for('admin_check_similar'),
-                follow_redirects=True,
-                data={'classes': 'person', 'ratio': 100})
+                data={'classes': 'person', 'ratio': 100},
+                follow_redirects=True)
             assert b'Oliver Twist' in rv.data
 
             rv = self.app.get(url_for('admin_settings', category='mail'))
-            assert b'Recipients feedback' in rv.data
+            assert b'recipients feedback' in rv.data
 
             rv = self.app.get(url_for('admin_settings', category='general'))
-            assert b'Log level' in rv.data
+            assert b'log level' in rv.data
 
             rv = self.app.post(
                 url_for('admin_content', item='citation_example'),
@@ -122,6 +118,12 @@ class AdminTests(TestBaseCase):
 
             rv = self.app.get(url_for('admin_content', item='legal_notice'))
             assert b'Save' in rv.data
+
+            rv = self.app.get(url_for('arche_index'))
+            assert b'https://arche-curation.acdh-dev.oeaw.ac.at/' in rv.data
+
+            rv = self.app.get(url_for('arche_fetch'))
+            assert b'No entities to retrieve' in rv.data
 
             rv = self.app.post(
                 url_for('admin_content', item='legal_notice'),

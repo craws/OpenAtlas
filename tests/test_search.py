@@ -41,6 +41,5 @@ class SearchTest(TestBaseCase):
 
             rv = self.app.post(
                 url_for('search_index'),
-                follow_redirects=True,
                 data={'term': 'x', 'begin_year': 2, 'end_year': -1})
             assert b'cannot start after' in rv.data

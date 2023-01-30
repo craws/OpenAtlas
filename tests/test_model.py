@@ -54,7 +54,6 @@ class ModelTests(TestBaseCase):
             assert b'King Arthur' in rv.data
 
             self.app.get('/index/setlocale/de')
-
             rv = self.app.get(url_for('cidoc_class_view', code='E18'))
             assert b'Materielles' in rv.data
 

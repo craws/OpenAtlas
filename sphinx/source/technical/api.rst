@@ -382,7 +382,7 @@ Parameter definition
         * geometry
         * links
         * names
-        * not
+        * none
         * relations
         * types
         * when

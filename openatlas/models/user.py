@@ -176,7 +176,7 @@ class User(UserMixin):
             entity_id: int,
             user_id: int,
             note: str,
-            public: bool) -> id:
+            public: bool) -> int:
         return Db.insert_note(
             user_id,
             entity_id,

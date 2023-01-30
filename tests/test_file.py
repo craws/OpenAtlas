@@ -1,4 +1,4 @@
-import pathlib
+from pathlib import Path
 
 from flask import url_for
 
@@ -15,9 +15,9 @@ class FileTest(TestBaseCase):
                 app.preprocess_request()  # type: ignore
                 place = insert('place', 'File keeper')
                 reference = insert('edition', 'Ancient Books')
-                type_id = get_hierarchy('Sex').subs[0]
-                logo = pathlib.Path(app.root_path) \
-                    / 'static' / 'images' / 'layout' / 'logo.png'
+
+            logo = Path(app.root_path) \
+                / 'static' / 'images' / 'layout' / 'logo.png'
 
             with open(logo, 'rb') as img_1, open(logo, 'rb') as img_2:
                 rv = self.app.post(
@@ -45,29 +45,26 @@ class FileTest(TestBaseCase):
             with self.app.get(url_for('download_file', filename=filename)):
                 pass
 
-            rv = self.app.get(
-                url_for('admin_logo'),
-                data={'file': file_id},
-                follow_redirects=True)
+            rv = self.app.get(url_for('admin_logo'), data={'file': file_id})
             assert b'OpenAtlas logo' in rv.data
 
             rv = self.app.get(
                 url_for('admin_logo', id_=file_id),
                 follow_redirects=True)
-            assert b'Remove custom logo' in rv.data
+            assert b'remove custom logo' in rv.data
 
             rv = self.app.get(
                 url_for('admin_index', action="remove_logo", id_=0),
                 follow_redirects=True)
             assert b'Logo' in rv.data
 
-            with open(
-                    pathlib.Path(app.root_path) / 'views' / 'index.py', 'rb') \
+            with open(Path(app.root_path) / 'views' / 'index.py', 'rb') \
                     as invalid_file:
                 rv = self.app.post(
                     url_for('insert', class_='file', origin_id=place.id),
                     data={'name': 'Invalid file', 'file': invalid_file},
                     follow_redirects=True)
+            print(rv.data)
             assert b'File type not allowed' in rv.data
 
             rv = self.app.get(
@@ -88,7 +85,7 @@ class FileTest(TestBaseCase):
             assert b'Changes have been saved' in rv.data
 
             rv = self.app.get(url_for('file_add', id_=file_id, view='actor'))
-            assert b'Link actor' in rv.data
+            assert b'link actor' in rv.data
 
             rv = self.app.post(
                 url_for('file_add', id_=file_id, view='actor'),
@@ -100,7 +97,7 @@ class FileTest(TestBaseCase):
             assert b'alt="image"' in rv.data
 
             rv = self.app.post(
-                url_for('entity_add_file', id_=type_id),
+                url_for('entity_add_file', id_=get_hierarchy('Sex').subs[0]),
                 data={'checkbox_values': str([file_id])},
                 follow_redirects=True)
             assert b'Updated file' in rv.data

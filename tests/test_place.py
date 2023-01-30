@@ -1,4 +1,4 @@
-import pathlib
+from pathlib import Path
 from typing import Any
 
 from flask import g, url_for
@@ -16,26 +16,24 @@ class PlaceTest(TestBaseCase):
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                unit_type = get_hierarchy('Administrative unit')
-                unit_sub1 = g.types[unit_type.subs[0]]
-                unit_sub2 = g.types[unit_type.subs[1]]
-                human_remains_type = get_hierarchy('Human remains')
-                human_remains_type_sub = g.types[human_remains_type.subs[0]]
                 reference = insert('external_reference', 'https://d-nb.info')
-                place_type = get_hierarchy('Place')
                 source = insert('source', 'Necronomicon')
 
-            data = {
+            unit_type = get_hierarchy('Administrative unit')
+            data: dict[Any, Any] = {
                 'name': 'Asgard',
                 'alias-0': 'Valhöll',
-                unit_type.id: str([unit_sub1.id, unit_sub2.id]),
-                self.geonames: ['123456', self.precision_type.subs[0]]}
+                unit_type.id: str([unit_type.subs[0], unit_type.subs[1]]),
+                f'reference_system_id_{g.geonames.id}':
+                    ['123456', self.precision_type.subs[0]]}
             rv: Any = self.app.post(
                 url_for('insert', class_='place', origin_id=reference.id),
                 data=data,
                 follow_redirects=True)
             assert b'Asgard' in rv.data and b'An entry has been' in rv.data
 
+            place_type = get_hierarchy('Place')
+            data[place_type.id] = place_type.subs
             data['gis_points'] = """[{
                 "type": "Feature",
                 "geometry": {"type":"Point","coordinates":[9,17]},
@@ -68,7 +66,6 @@ class PlaceTest(TestBaseCase):
                     "name": "",
                     "description": "",
                     "shapeType": "shape"}}]"""
-            data[place_type.id] = place_type.subs
             rv = self.app.post(
                 url_for('insert', class_='place', origin_id=source.id),
                 data=data,
@@ -123,9 +120,8 @@ class PlaceTest(TestBaseCase):
                 follow_redirects=True)
             assert b'An invalid geometry was entered' in rv.data
 
-            path = pathlib.Path(app.root_path) \
-                / 'static' / 'images' / 'layout' / 'logo.png'
-            with open(path, 'rb') as img:
+            with open(Path(app.root_path) / 'static' / 'images' / 'layout'
+                      / 'logo.png', 'rb') as img:
                 rv = self.app.post(
                     url_for('insert', class_='file', origin_id=place.id),
                     data={'name': 'X-Files', 'file': img},
@@ -201,26 +197,24 @@ class PlaceTest(TestBaseCase):
             assert b'Val-hall' in rv.data
 
             rv = self.app.get(url_for('entity_add_reference', id_=place.id))
-            assert b'Link reference' in rv.data
+            assert b'link reference' in rv.data
 
-            # Test move entities of multiple type if link to new type exists
             rv = self.app.post(
-                url_for('type_move_entities', id_=unit_sub1.id),
-                follow_redirects=True,
+                url_for('type_move_entities', id_=unit_type.subs[0]),
                 data={
-                    unit_type.id: unit_sub2.id,
+                    unit_type.id: unit_type.subs[1],
                     'selection': location.id,
-                    'checkbox_values': str([location.id])})
+                    'checkbox_values': str([location.id])},
+                follow_redirects=True)
             assert b'Entities were updated' in rv.data
 
-            # Test move entities of multiple type
             rv = self.app.post(
-                url_for('type_move_entities', id_=unit_sub2.id),
-                follow_redirects=True,
+                url_for('type_move_entities', id_=unit_type.subs[1]),
                 data={
-                    unit_type.id: unit_sub1.id,
+                    unit_type.id: unit_type.subs[0],
                     'selection': location.id,
-                    'checkbox_values': str([location.id])})
+                    'checkbox_values': str([location.id])},
+                follow_redirects=True)
             assert b'Entities were updated' in rv.data
 
             data = {'name': "Try continue", 'continue_': 'sub'}
@@ -267,20 +261,21 @@ class PlaceTest(TestBaseCase):
             # Create a second artifact to test siblings pager
             rv = self.app.post(
                 url_for('insert', class_='artifact', origin_id=strati_id),
-                follow_redirects=True,
-                data=data)
+                data=data,
+                follow_redirects=True)
             assert b'An entry has been created' in rv.data
 
             rv = self.app.get(url_for('update', id_=find_id))
             assert b'You never find me' in rv.data
 
+            remains_type = get_hierarchy('Human remains')
             rv = self.app.post(
                 url_for('insert', class_='human_remains', origin_id=strati_id),
                 data={
                     'name': 'My human remains',
                     'actor': actor.id,
                     'human_remains_super': strati_id,
-                    human_remains_type.id: str([human_remains_type_sub.id])})
+                    remains_type.id: str([remains_type.subs[0]])})
             human_remains_id = rv.location.split('/')[-1]
 
             rv = self.app.get(
@@ -293,13 +288,13 @@ class PlaceTest(TestBaseCase):
             rv = self.app.get('/')
             assert b'My human remains' in rv.data
 
-            rv = self.app.get(url_for('view', id_=human_remains_type_sub.id))
+            rv = self.app.get(url_for('view', id_=remains_type.subs[0]))
             assert b'My human remains' in rv.data
 
             rv = self.app.get(
                 url_for('index', view='artifact', delete_id=human_remains_id),
                 follow_redirects=True)
-            assert b'The entry has been deleted.' in rv.data
+            assert b'The entry has been deleted' in rv.data
 
             rv = self.app.post(
                 url_for('sex_update', id_=strati_id),
@@ -346,13 +341,13 @@ class PlaceTest(TestBaseCase):
             rv = self.app.get(
                 url_for('sex_delete', id_=strati_id),
                 follow_redirects=True)
-            assert b'Tools' in rv.data
+            assert b'tools' in rv.data
 
             rv = self.app.post(
                 url_for('update', id_=strati_id),
                 data={'name': 'New name'},
                 follow_redirects=True)
-            assert b'Changes have been saved.' in rv.data
+            assert b'Changes have been saved' in rv.data
 
             rv = self.app.get(url_for('view', id_=feat_id))
             assert b'not a bug' in rv.data

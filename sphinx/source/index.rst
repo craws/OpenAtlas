@@ -11,16 +11,26 @@ development specific documentation in our Redmine
 
 .. toctree::
    :maxdepth: 2
+   :caption: User interface
 
-   overview
    features
+   overview
    entity/index
    tools/index
    admin/index
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Documentation
+
    model/index
-   technical/index
-   ui/index
+   technical/api
+   technical/database_structure
+   technical/application_structure
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Help
 
    examples/index
    troubleshooting/index

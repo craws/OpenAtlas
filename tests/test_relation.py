@@ -54,11 +54,11 @@ class RelationTests(TestBaseCase):
 
             rv = self.app.post(
                 url_for('type_move_entities', id_=sub_id),
-                follow_redirects=True,
                 data={
                     relation.id: relation.subs[1],
                     'selection': [link_.id],
-                    'checkbox_values': str([link_.id])})
+                    'checkbox_values': str([link_.id])},
+                follow_redirects=True)
             assert b'Entities were updated' in rv.data
 
             rv = self.app.post(
