@@ -5,7 +5,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>API &mdash; OpenAtlas 7.9.0 documentation</title>
@@ -25,6 +26,9 @@
   
 
   
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -89,7 +93,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">User interface</span></p>
+              <p><span class="caption-text">User interface</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../features.html">Features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
@@ -97,7 +101,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Documentation</span></p>
+<p><span class="caption-text">Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../model/index.html">Model</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
@@ -110,10 +114,10 @@
 <li class="toctree-l2"><a class="reference internal" href="#authentication-guide">Authentication guide</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="application_structure.html">Application Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="database_structure.html">Database Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="application_structure.html">Application Structure</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Help</span></p>
+<p><span class="caption-text">Help</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../troubleshooting/index.html">Troubleshooting</a></li>
@@ -183,11 +187,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="api">
+  <section id="api">
 <h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<div class="section" id="introduction">
+<section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>This page provides an overview of the OpenAtlas Application Programming
 Interface (<a class="reference external" href="https://en.wikipedia.org/wiki/API">API</a>). The API is
@@ -196,8 +200,8 @@ to provide easy access to the data included.
 For an complete overview of possible endpoints and usage of the OpenAtlas API
 also visit our
 <a class="reference external" href="https://app.swaggerhub.com/apis/ctot-nondef/OpenAtlas/">Swagger documentation</a>.</p>
-</div>
-<div class="section" id="quick-start-guide">
+</section>
+<section id="quick-start-guide">
 <h2>Quick Start Guide<a class="headerlink" href="#quick-start-guide" title="Permalink to this headline">¶</a></h2>
 <p>The API can be accessed via the following schema:
 <strong>{domain}/api/{api version}/{endpoint}?{parameter}&amp;{parameter}</strong>
@@ -403,8 +407,8 @@ yields the following result:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="versioning">
+</section>
+<section id="versioning">
 <h2>Versioning<a class="headerlink" href="#versioning" title="Permalink to this headline">¶</a></h2>
 <p>The OpenAtlas API follows the notion of
 <a class="reference external" href="https://en.wikipedia.org/wiki/Software_versioning#Sequence-based_identifiers">sequenced based versioning</a>
@@ -418,8 +422,8 @@ warning will be posted in the
 <a class="reference external" href="https://redmine.openatlas.eu/projects/uni/news">release notes</a> before
 these versions will be discontinued. <strong>Unstable</strong> versions are currently
 developed, so breaking changes may occur at any time without prior notice.</p>
-</div>
-<div class="section" id="endpoint-definition">
+</section>
+<section id="endpoint-definition">
 <h2>Endpoint definition<a class="headerlink" href="#endpoint-definition" title="Permalink to this headline">¶</a></h2>
 <p>Two different methods are provided to access the OpenAtlas API:</p>
 <ul class="simple">
@@ -438,8 +442,8 @@ GeoJSON or RDFs, derived from the LPF data, can be accessed.</p>
 <li class="toctree-l1"><a class="reference internal" href="api_version1_0.html">Version 1.0 (in development)</a></li>
 </ul>
 </div>
-</div>
-<div class="section" id="parameter-definition">
+</section>
+<section id="parameter-definition">
 <h2>Parameter definition<a class="headerlink" href="#parameter-definition" title="Permalink to this headline">¶</a></h2>
 <table class="colwidths-given docutils align-default">
 <colgroup>
@@ -682,8 +686,8 @@ GeoJSON or RDFs, derived from the LPF data, can be accessed.</p>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="error-handling">
+</section>
+<section id="error-handling">
 <h2>Error handling<a class="headerlink" href="#error-handling" title="Permalink to this headline">¶</a></h2>
 <p>OpenAtlas uses conventional HTTP response codes to indicate the success or
 failure of an API request. Codes in the 2xx range indicate a successful request
@@ -705,12 +709,12 @@ entered, Flask catches this via its own
 <a class="reference external" href="https://flask-restful.readthedocs.io/en/latest/">Flask-RESTful</a> extension.
 An error message is provided by its own error handler
 <a class="reference external" href="https://flask-restful.readthedocs.io/en/latest/reqparse.html#error-handling">error handler</a></p>
-</div>
-<div class="section" id="authentication-guide">
+</section>
+<section id="authentication-guide">
 <h2>Authentication guide<a class="headerlink" href="#authentication-guide" title="Permalink to this headline">¶</a></h2>
 <p>No authentication is needed to use the OpenAtlas API.</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
