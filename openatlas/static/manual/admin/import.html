@@ -5,8 +5,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Import &mdash; OpenAtlas 7.9.0 documentation</title>
@@ -26,9 +25,6 @@
   
 
   
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -93,7 +89,7 @@
               
             
             
-              <p><span class="caption-text">User interface</span></p>
+              <p class="caption"><span class="caption-text">User interface</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../features.html">Features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
@@ -115,14 +111,14 @@
 </ul>
 </li>
 </ul>
-<p><span class="caption-text">Documentation</span></p>
+<p class="caption"><span class="caption-text">Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../model/index.html">Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technical/api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technical/database_structure.html">Database Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technical/application_structure.html">Application Structure</a></li>
 </ul>
-<p><span class="caption-text">Help</span></p>
+<p class="caption"><span class="caption-text">Help</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../troubleshooting/index.html">Troubleshooting</a></li>
@@ -194,7 +190,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="import">
+  <div class="section" id="import">
 <h1>Import<a class="headerlink" href="#import" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
@@ -209,7 +205,7 @@ Currently lists can be imported containing:</p>
 <li><p>Types</p></li>
 <li><p>origin_id</p></li>
 </ul>
-<section id="preparations">
+<div class="section" id="preparations">
 <h2>Preparations<a class="headerlink" href="#preparations" title="Permalink to this headline">¶</a></h2>
 <p>Automatic imports can be dangerous for data integrity and it may be very time consuming to reverse them so we strongly advise:</p>
 <ul class="simple">
@@ -226,18 +222,18 @@ nothing will be imported.</p>
 <li><p>Each following line is one data set. Values are separated by commas</p></li>
 <li><p>Text can be enclosed in double quotes, especially if the contain commas</p></li>
 </ul>
-</section>
-<section id="projects">
+</div>
+<div class="section" id="projects">
 <h2>Projects<a class="headerlink" href="#projects" title="Permalink to this headline">¶</a></h2>
 <p>To retrace imported entities they have to be associated with a project. If there is none (or not
 the right one) available you’ll have to create a new one. The name and description can be updated
 later.</p>
-</section>
-<section id="import-class">
+</div>
+<div class="section" id="import-class">
 <h2>Import class<a class="headerlink" href="#import-class" title="Permalink to this headline">¶</a></h2>
 <p>Only one class can be imported at a time so you have to choose one of the available classes.</p>
-</section>
-<section id="import-fields">
+</div>
+<div class="section" id="import-fields">
 <h2>Import fields<a class="headerlink" href="#import-fields" title="Permalink to this headline">¶</a></h2>
 <p>The header can contain following titles. Columns with other titles won’t get imported but shown as
 an error message.</p>
@@ -253,7 +249,7 @@ an error message.</p>
 <li><p><strong>northing</strong> - only available for places, see below</p></li>
 <li><p><strong>easting</strong> - only available for places, see below</p></li>
 </ul>
-<section id="dates">
+<div class="section" id="dates">
 <h3>Dates<a class="headerlink" href="#dates" title="Permalink to this headline">¶</a></h3>
 <p>Dates can be entered in the format <strong>YYYY-MM-DD</strong> in the fields <strong>begin_from</strong> and <strong>end_from</strong>.
 You can also use time spans in combinations with the fields <strong>begin_to</strong> and <strong>end_to</strong>,
@@ -263,8 +259,8 @@ see: <a class="reference internal" href="../ui/date.html"><span class="doc">Date
 <li><p>Missing values for time spans will be discarded silently, e.g. a valid value in <strong>begin_to</strong> but an empty value in <strong>begin_from</strong></p></li>
 <li><p>There are no advanced checks between dates e.g. end dates can be before begin dates. You should check them after the import at <a class="reference internal" href="data_integrity_checks.html"><span class="doc">Data integrity checks</span></a></p></li>
 </ul>
-</section>
-<section id="types">
+</div>
+<div class="section" id="types">
 <h3>Types<a class="headerlink" href="#types" title="Permalink to this headline">¶</a></h3>
 <p>It is possible to link entities to types at the import which can be very useful e.g. if you have
 a custom type <strong>Case studies</strong> to link them all in one go.</p>
@@ -273,8 +269,8 @@ a custom type <strong>Case studies</strong> to link them all in one go.</p>
 <li><p>You can enter multiple separated with a space</p></li>
 <li><p>The id of a type can be looked up at the detail view of a type</p></li>
 </ul>
-</section>
-<section id="places">
+</div>
+<div class="section" id="places">
 <h3>Places<a class="headerlink" href="#places" title="Permalink to this headline">¶</a></h3>
 <p>If importing places, point coordinates can be imported too. Keep in mind to use
 the <a class="reference external" href="https://gisgeography.com/wgs84-world-geodetic-system/">WGS84</a> geodetic system.
@@ -284,17 +280,17 @@ is present and rows contain number values.</p>
 <li><p><strong>northing</strong> - number value</p></li>
 <li><p><strong>easting</strong> - number value</p></li>
 </ul>
-</section>
-</section>
-<section id="import-options">
+</div>
+</div>
+<div class="section" id="import-options">
 <h2>Import options<a class="headerlink" href="#import-options" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p><strong>File</strong> - select the file you’ll want to import</p></li>
 <li><p><strong>Preview</strong> - if this option is selected, nothing will be imported and you see a preview</p></li>
 <li><p><strong>Check for duplicates</strong> - if selected the chosen class e.g. person will be searched for already existing names. The search is not case sensitive e.g. “King Arthur” would be found even it is spelled “KiNg ArThUr”. If duplicates are found a warning is printed but this doesn’t stop the import so check it before with the preview.</p></li>
 </ul>
-</section>
-<section id="after-the-import">
+</div>
+<div class="section" id="after-the-import">
 <h2>After the import<a class="headerlink" href="#after-the-import" title="Permalink to this headline">¶</a></h2>
 <p>When the import went through you’ll see a summary which data was imported (like the preview).
 Also you can browse the projects to see which imported entities are associated with them.
@@ -302,8 +298,8 @@ If you enabled the advanced layout you can also see in the detail view of an ent
 project it was imported, which user did the import and the origin_id value.</p>
 <p>Although the script makes a lot of validation checks it’s always a good idea to run
 <a class="reference internal" href="data_integrity_checks.html"><span class="doc">Data integrity checks</span></a> after each import.</p>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>
