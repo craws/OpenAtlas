@@ -40,7 +40,7 @@ class ImportTest(TestBaseCase):
             rv = self.app.get(
                 url_for('import_data', class_='person', project_id=p_id))
             print(rv.data)
-            # assert b'file *' in rv.data
+            assert b'file *' in rv.data
 
             static_path = Path(app.root_path) / 'static'
             with open(static_path / 'example.csv', 'rb') as file:
@@ -48,21 +48,21 @@ class ImportTest(TestBaseCase):
                     url_for('import_data', class_='place', project_id=p_id),
                     data={'file': file, 'duplicate': True},
                     follow_redirects=True)
-            # assert b'Vienna' in rv.data
+            assert b'Vienna' in rv.data
 
             with open(static_path / 'example.csv', 'rb') as file:
                 rv = self.app.post(
                     url_for('import_data', class_='place', project_id=p_id),
                     data={'file': file, 'duplicate': True},
                     follow_redirects=True)
-            # assert b'IDs already in database' in rv.data
+            assert b'IDs already in database' in rv.data
 
             with open(static_path / 'favicon.ico', 'rb') as file:
                 rv = self.app.post(
                     url_for('import_data', class_='place', project_id=p_id),
                     data={'file': file},
                     follow_redirects=True)
-            # assert b'File type not allowed' in rv.data
+            assert b'File type not allowed' in rv.data
 
             test_path = Path(app.root_path).parent / 'tests'
             with open(test_path / 'invalid_1.csv', 'rb') as file:
@@ -70,23 +70,23 @@ class ImportTest(TestBaseCase):
                     url_for('import_data', class_='place', project_id=p_id),
                     data={'file': file},
                     follow_redirects=True)
-            # assert b'missing name column' in rv.data
+            assert b'missing name column' in rv.data
 
             with open(test_path / 'invalid_2.csv', 'rb') as file:
                 rv = self.app.post(
                     url_for('import_data', class_='place', project_id=p_id),
                     data={'file': file},
                     follow_redirects=True)
-            # assert b'invalid columns: not_existing_column' in rv.data
-            # assert b'invalid type ids' in rv.data
-            # assert b'invalid coordinates' in rv.data
-            # assert b'empty names' in rv.data
-            # assert b'double IDs in import' in rv.data
+            assert b'invalid columns: not_existing_column' in rv.data
+            assert b'invalid type ids' in rv.data
+            assert b'invalid coordinates' in rv.data
+            assert b'empty names' in rv.data
+            assert b'double IDs in import' in rv.data
 
             rv = self.app.get(url_for('import_project_view', id_=p_id))
-            # assert b'London' in rv.data
+            assert b'London' in rv.data
 
             rv = self.app.get(
                 url_for('import_project_delete', id_=p_id),
                 follow_redirects=True)
-            # assert b'Project deleted' in rv.data
+            assert b'Project deleted' in rv.data
