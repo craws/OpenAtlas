@@ -14,7 +14,7 @@ services:
     volumes:
       - ./files/uploads:/var/www/openatlas/files/uploads
       - ./files/processed_images/resized:/var/www/openatlas/files/processed_images/resized
-      - ./files/export/sql:/var/www/openatlas/files/export/sql
+      - ./files/export/:/var/www/openatlas/files/export/
     depends_on:
       - postgres
   postgres:
