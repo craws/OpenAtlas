@@ -51,7 +51,7 @@ class FileTest(TestBaseCase):
             rv = self.app.get(
                 url_for('admin_logo', id_=file_id),
                 follow_redirects=True)
-            assert b'Remove custom logo' in rv.data
+            assert b'remove custom logo' in rv.data
 
             rv = self.app.get(
                 url_for('admin_index', action="remove_logo", id_=0),
@@ -64,6 +64,7 @@ class FileTest(TestBaseCase):
                     url_for('insert', class_='file', origin_id=place.id),
                     data={'name': 'Invalid file', 'file': invalid_file},
                     follow_redirects=True)
+            print(rv.data)
             assert b'File type not allowed' in rv.data
 
             rv = self.app.get(
@@ -84,7 +85,7 @@ class FileTest(TestBaseCase):
             assert b'Changes have been saved' in rv.data
 
             rv = self.app.get(url_for('file_add', id_=file_id, view='actor'))
-            assert b'Link actor' in rv.data
+            assert b'link actor' in rv.data
 
             rv = self.app.post(
                 url_for('file_add', id_=file_id, view='actor'),

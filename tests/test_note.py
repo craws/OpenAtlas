@@ -14,7 +14,7 @@ class NoteTest(TestBaseCase):
                 actor = insert('person', 'Ripley')
 
             rv = self.app.get(url_for('note_insert', entity_id=actor.id))
-            assert b'Description' in rv.data
+            assert b'description' in rv.data
 
             rv = self.app.post(
                 url_for('note_insert', entity_id=actor.id),
@@ -43,7 +43,7 @@ class NoteTest(TestBaseCase):
 
             self.login('Manager')
             rv = self.app.get(url_for('note_view', id_=note_id))
-            assert b'Set private' in rv.data
+            assert b'set private' in rv.data
 
             rv = self.app.get(
                 url_for('note_set_private', id_=note_id),

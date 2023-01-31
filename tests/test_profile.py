@@ -32,7 +32,7 @@ class ProfileTests(TestBaseCase):
             assert b'saved' in rv.data
 
             rv = self.app.get(url_for('profile_password'))
-            assert b'Old password' in rv.data
+            assert b'old password' in rv.data
 
             new_pass = 'you_never_guess_this'
             data = {

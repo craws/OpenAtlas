@@ -26,7 +26,7 @@ class ExportTest(TestBaseCase):
             assert b'Warning' in rv.data
 
             rv = self.app.get(url_for('sql_execute'))
-            assert b'Execute' in rv.data
+            assert b'execute' in rv.data
 
             rv = self.app.post(
                 url_for('sql_execute'),

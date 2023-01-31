@@ -39,7 +39,8 @@ class TypeTest(TestBaseCase):
             type_id = rv.location.split('/')[-1]
 
             rv = self.app.get(url_for('update', id_=type_id))
-            assert b'My secret type' in rv.data and b'Super' in rv.data
+            assert b'My secret type' in rv.data
+            assert b'super' in rv.data
 
             rv = self.app.post(
                 url_for('update', id_=type_id),

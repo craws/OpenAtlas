@@ -8,8 +8,7 @@ from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wtforms import (
-    BooleanField, HiddenField, PasswordField, SelectField, StringField,
-    SubmitField, TextAreaField)
+    BooleanField, HiddenField, PasswordField, SelectField, StringField, TextAreaField)
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app
@@ -18,7 +17,7 @@ from openatlas.display.table import Table
 from openatlas.display.util import (
     button, description, display_form, display_info, format_date,
     is_authorized, link, manual, required_group, send_mail, uc_first)
-from openatlas.forms.field import generate_password_field
+from openatlas.forms.field import generate_password_field, SubmitField
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
 
@@ -162,8 +161,7 @@ def user_view(id_: int) -> str:
                     _('delete'),
                     url_for('admin_index', action='delete_user', id_=user.id)
                     + '#tab-user',
-                    onclick=
-                    f"return confirm('{_('Delete %(name)s?', name=name)}')"))
+                    onclick=f"return confirm('{_('Delete %(name)s?', name=name)}')"))
         buttons.append(
             button(_('activity'), url_for('user_activity', user_id=user.id)))
     return render_template(

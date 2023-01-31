@@ -13,7 +13,7 @@ class ReferenceSystemTest(TestBaseCase):
 
             rv: Any = self.app.get(
                 url_for('insert', class_='reference_system'))
-            assert b'Resolver URL' in rv.data
+            assert b'resolver URL' in rv.data
 
             rv = self.app.post(
                 url_for('insert', class_='reference_system'),
@@ -62,7 +62,7 @@ class ReferenceSystemTest(TestBaseCase):
             assert b'The entry has been deleted' in rv.data
 
             rv = self.app.get(url_for('update', id_=g.geonames.id))
-            assert b'Website URL' in rv.data
+            assert b'website URL' in rv.data
 
             data: dict[Any, Any] = {
                 'name': 'GeoNames',

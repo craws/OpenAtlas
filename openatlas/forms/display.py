@@ -2,12 +2,11 @@ from typing import Any, Optional
 
 from flask import g, render_template
 from flask_babel import lazy_gettext as _
-from flask_login import current_user
 from wtforms import Field, FileField, IntegerField, SelectField, StringField
 from wtforms.validators import Email
 
 from openatlas import app
-from openatlas.display.util import manual, tooltip, uc_first
+from openatlas.display.util import manual
 from openatlas.forms.field import ValueTypeField
 
 
@@ -40,9 +39,9 @@ def html_form(
                     reference_systems_added = True
                     html += add_row(
                         None,
-                        uc_first(_('reference system')),
+                        _('reference system'),
                         '<span id="reference-system-switcher" class="uc-first '
-                        f'{app.config["CSS"]["button"]["secondary"]}"> '
+                        f'{app.config["CSS"]["button"]["secondary"]}">'
                         f'{_("show")}</span>')
                 html += add_row(field, row_css="d-none")
                 continue
@@ -56,23 +55,19 @@ def html_form(
                 continue
             label = type_.name
             if type_.category == 'standard' and type_.name != 'License':
-                label = uc_first(_('type'))
+                label = _('type')
             if field.label.text == 'super':
-                label = uc_first(_('super'))
+                label = _('super')
             if field.flags.required and field.label.text:
                 label += ' *'
-            tooltip_ = ''
             if 'is_type_form' not in form:
-                tooltip_ = type_.description or ''
-                tooltip_ += "&#013;" + str(_('tooltip_required_type')) \
-                    if field.flags.required \
-                    and current_user.group == 'contributor' else ''
-            html += add_row(field, label + tooltip(tooltip_))
+                field.description = type_.description
+            html += add_row(field, label)
             continue
 
         if field.id == 'save':
-            field.label.text = uc_first(field.label.text)
-            class_ = app.config['CSS']['button']['primary'] + ' text-wrap'
+            class_ = \
+                f"{app.config['CSS']['button']['primary']} text-wrap uc-first"
             buttons = []
             if manual_page:
                 buttons.append(manual(manual_page))
@@ -106,7 +101,6 @@ def add_row(
         row_css: Optional[str] = '') -> str:
     field_css = ""
     if field:
-        field.label.text = uc_first(field.label.text)
         if field.flags.required \
                 and field.label.text \
                 and form_id != 'login-form':
@@ -149,9 +143,9 @@ def add_dates(form: Any) -> str:
             valid_dates = False
             errors[field_name] = ''
             for error in getattr(form, field_name).errors:
-                errors[field_name] += uc_first(error)
+                errors[field_name] += error
             errors[field_name] = \
-                f'<label class="error">{errors[field_name]}</label>'
+                f'<label class="error uc-first">{errors[field_name]}</label>'
     return render_template(
         'util/dates.html',
         form=form,

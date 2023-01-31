@@ -28,7 +28,7 @@ class DateTest(TestBaseCase):
                 url_for('insert', class_='place'),
                 data=data,
                 follow_redirects=True)
-            assert b'Not a valid date' in rv.data
+            assert b'not a valid date' in rv.data
 
             data['begin_day_from'] = 5
             data['begin_year_from'] = 20

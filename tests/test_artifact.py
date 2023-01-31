@@ -42,7 +42,7 @@ class ArtifactTest(TestBaseCase):
             assert b'Changes have been saved' in rv.data
 
             rv = self.app.get(url_for('entity_add_source', id_=artifact_id))
-            assert b'Link source' in rv.data
+            assert b'link source' in rv.data
 
             rv = self.app.post(
                 url_for('entity_add_source', id_=artifact_id),
