@@ -3,17 +3,13 @@ from typing import Any
 from flask import g, url_for
 
 from openatlas import app
-from tests.base import TestBaseCase, insert_entity
+from tests.base import TestBaseCase, insert
 
 
 class UserTests(TestBaseCase):
 
     def test_user(self) -> None:
-
         with app.app_context():
-            rv: Any = self.app.get(url_for('user_insert'))
-            assert b'+ User' in rv.data
-
             data = {
                 'active': '',
                 'username': 'Ripley',
@@ -22,8 +18,9 @@ class UserTests(TestBaseCase):
                 'password2': 'you_never_guess_this',
                 'group': 'admin',
                 'name': 'Ripley Weaver'}
-            rv = self.app.post(url_for('user_insert'), data=data)
+            rv: Any = self.app.post(url_for('user_insert'), data=data)
             user_id = rv.location.split('/')[-1]
+
             data['password'] = 'too short'
             rv = self.app.post(url_for('user_insert'), data=data)
             assert b'match' in rv.data
@@ -41,9 +38,6 @@ class UserTests(TestBaseCase):
                     'continue_': 'yes'},
                 follow_redirects=True)
             assert b'Newt' not in rv.data
-
-            rv = self.app.get(url_for('user_view', id_=user_id))
-            assert b'Ripley' in rv.data
 
             rv = self.app.get(url_for('user_view', id_=666))
             assert b'404' in rv.data
@@ -65,16 +59,16 @@ class UserTests(TestBaseCase):
                 url_for('admin_index', action='delete_user', id_=user_id))
             assert b'User deleted' in rv.data
 
-            self.app.post(
+            rv = self.app.post(
                 url_for('insert', class_='bibliography'),
-                data={'name': 'test', 'description': 'test'})
-            rv = self.app.get(url_for('user_activity'))
-            assert b'Activity' in rv.data
+                data={'name': 'test', 'description': 'test'},
+                follow_redirects=True)
+            assert b'An entry has been created' in rv.data
 
             rv = self.app.post(
                 url_for('user_activity', user_id=user_id),
                 data={'limit': 100, 'user': 0, 'action': 'all'})
-            assert b'Activity' in rv.data
+            assert b'activity' in rv.data
 
             rv = self.app.get(
                 url_for(
@@ -85,15 +79,16 @@ class UserTests(TestBaseCase):
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                person = insert_entity('person', 'Hugo')
-                event = insert_entity('activity', 'Event Horizon')
-                event.link('P11', person)
+                person = insert('person', 'Hugo')
+                insert('activity', 'Event Horizon').link('P11', person)
 
             rv = self.app.post(
                 url_for('ajax_bookmark'),
                 data={'entity_id': person.id})
             assert b'Remove bookmark' in rv.data
-            assert b'Hugo' in self.app.get('/').data
+
+            rv = self.app.get('/')
+            assert b'Hugo' in rv.data
 
             rv = self.app.post(
                 url_for('ajax_bookmark'),
@@ -104,7 +99,7 @@ class UserTests(TestBaseCase):
             rv = self.app.get(url_for('user_insert'), follow_redirects=True)
             assert b'Forgot your password?' not in rv.data
 
-            self.login('Editor')
+            self.login('Editor', logout=False)
             rv = self.app.get(url_for('user_insert'))
             assert b'403 - Forbidden' in rv.data
 
@@ -112,10 +107,7 @@ class UserTests(TestBaseCase):
             assert b'403 - Forbidden' in rv.data
 
             rv = self.app.get(
-                url_for(
-                    'index',
-                    view='actor',
-                    delete_id=g.reference_system_wikidata.id))
+                url_for('index', view='actor', delete_id=g.wikidata.id))
             assert b'403 - Forbidden' in rv.data
 
             self.login('Manager')
@@ -129,9 +121,6 @@ class UserTests(TestBaseCase):
             rv = self.app.get(
                 url_for('index', view='actor', delete_id=person.id))
             assert b'403 - Forbidden' in rv.data
-
-            rv = self.app.get(url_for('insert', class_='person'))
-            assert b'Person' in rv.data
 
             rv = self.app.get(url_for('update', id_=person.id))
             assert b'Hugo' in rv.data

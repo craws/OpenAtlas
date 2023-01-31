@@ -4,13 +4,17 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.link import Link
-from tests.base import TestBaseCase, insert_entity
+from tests.base import TestBaseCase, insert
 
 
 class InvolvementTests(TestBaseCase):
 
     def test_involvement(self) -> None:
         with app.app_context():
+            with app.test_request_context():
+                app.preprocess_request()  # type: ignore
+                actor = insert('person', 'Captain Miller')
+
             rv: Any = self.app.post(
                 url_for('insert', class_='acquisition'),
                 data={
@@ -21,7 +25,6 @@ class InvolvementTests(TestBaseCase):
                     'end_year_from': '1951'})
             event_id = int(rv.location.split('/')[-1])
 
-            actor = insert_entity('person', 'Captain Miller')
             rv = self.app.post(
                 url_for(
                     'insert_relation',

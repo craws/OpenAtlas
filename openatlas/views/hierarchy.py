@@ -137,7 +137,7 @@ def hierarchy_delete(id_: int) -> Response:
         return redirect(url_for('type_delete_recursive', id_=id_))
     type_.delete()
     flash(_('entity deleted'), 'info')
-    return redirect(url_for('type_index'))
+    return redirect(f"{url_for('type_index')}#menu-tab-{type_.category}")
 
 
 @app.route('/hierarchy/required_risk/<int:id_>')

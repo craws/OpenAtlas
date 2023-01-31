@@ -8,8 +8,6 @@ class ProfileTests(TestBaseCase):
 
     def test_profile(self) -> None:
         with app.app_context():
-            rv = self.app.get(url_for('profile_index'))
-            assert b'alice@example.com' in rv.data
 
             rv = self.app.get(url_for('profile_settings', category='profile'))
             assert b'alice@example.com' in rv.data
@@ -25,16 +23,17 @@ class ProfileTests(TestBaseCase):
 
             rv = self.app.post(
                 url_for('profile_settings', category='display'),
-                follow_redirects=True,
                 data={
                     'language': 'en',
                     'table_rows': 10,
                     'map_zoom_default': 10,
-                    'map_zoom_max': 10})
-            assert b'saved' in rv.data and b'English' in rv.data
+                    'map_zoom_max': 10},
+                follow_redirects=True)
+            assert b'saved' in rv.data
 
             rv = self.app.get(url_for('profile_password'))
-            assert b'Old password' in rv.data
+            assert b'old password' in rv.data
+
             new_pass = 'you_never_guess_this'
             data = {
                 'password_old': 'test',

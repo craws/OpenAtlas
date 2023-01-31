@@ -1,30 +1,29 @@
 from typing import Any
 
-from flask import g, url_for
+from flask import url_for
 
 from openatlas import app
-from tests.base import TestBaseCase, get_hierarchy, insert_entity
+from openatlas.models.link import Link
+from tests.base import TestBaseCase, get_hierarchy, insert
 
 
 class ActorTests(TestBaseCase):
 
     def test_actor(self) -> None:
         with app.app_context():
-            place = insert_entity('place', 'Vienna')
-            event = insert_entity('acquisition', 'Event Horizon')
-            with app.app_context():
-                with app.test_request_context():
-                    app.preprocess_request()  # type: ignore
-                sex = get_hierarchy('Sex')
-                sex_sub_1 = g.types[sex.subs[0]]
-                sex_sub_2 = g.types[sex.subs[1]]
+            with app.test_request_context():
+                app.preprocess_request()  # type: ignore
+                place = insert('place', 'Vienna')
+                event = insert('acquisition', 'Event Horizon')
+                group = insert('group', 'LV-426 colony')
 
             rv: Any = self.app.get(
                 url_for('insert', class_='person', origin_id=place.id))
             assert b'Vienna' in rv.data
 
+            sex = get_hierarchy('Sex')
             data = {
-                sex.id: sex_sub_1.id,
+                sex.id: sex.subs[0],
                 'name': 'Sigourney Weaver',
                 'alias-1': 'Ripley',
                 'residence': place.id,
@@ -65,9 +64,9 @@ class ActorTests(TestBaseCase):
             assert b'An entry has been created' in rv.data
 
             rv = self.app.post(
-                url_for('type_move_entities', id_=sex_sub_1.id),
+                url_for('type_move_entities', id_=sex.subs[0]),
                 data={
-                    sex.id: sex_sub_2.id,
+                    sex.id: sex.subs[1],
                     'selection': [actor_id],
                     'checkbox_values': str([actor_id])},
                 follow_redirects=True)
@@ -123,3 +122,36 @@ class ActorTests(TestBaseCase):
                 url_for('link_delete', origin_id=actor_id, id_=666),
                 follow_redirects=True)
             assert b'removed' in rv.data
+
+            rv = self.app.get(
+                url_for('insert_relation', origin_id=group.id, type_='member'))
+            assert b'Actor function' in rv.data
+
+            rv = self.app.post(
+                url_for(
+                    'insert_relation',
+                    origin_id=actor_id,
+                    type_='membership'),
+                data={'group': str([group.id])},
+                follow_redirects=True)
+            assert b'LV-426 colony' in rv.data
+
+            rv = self.app.post(
+                url_for('insert_relation', origin_id=group.id, type_='member'),
+                data={'actor': str([actor_id]), 'continue_': 'yes'},
+                follow_redirects=True)
+            assert b'Ripley' in rv.data
+
+            with app.test_request_context():
+                app.preprocess_request()  # type: ignore
+                link_ = Link.get_links(group.id, 'P107')[0]
+
+            rv = self.app.get(
+                url_for('link_update', id_=link_.id, origin_id=group.id))
+            assert b'Susan' in rv.data
+
+            rv = self.app.post(
+                url_for('link_update', id_=link_.id, origin_id=group.id),
+                data={'description': 'We are here to help you'},
+                follow_redirects=True)
+            assert b'We are here to help you' in rv.data

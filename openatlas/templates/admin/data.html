@@ -20,6 +20,9 @@
     {% if 'admin'|is_authorized %}
       <div class="col-auto">{{ _('execute SQL')|button(url_for('sql_index'))|safe }}</div>
     {% endif %}
+    {% if config.ARCHE['id'] %}
+       <div class="col-auto">{{ 'ARCHE'|button(url_for('arche_index'))|safe }}</div>
+    {% endif %}
   </div>
 {% endif %}
 {% if 'admin'|is_authorized and g.settings.image_processing %}

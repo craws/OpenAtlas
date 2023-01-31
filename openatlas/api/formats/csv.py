@@ -118,7 +118,7 @@ def get_csv_geom_entry(entity: Entity) -> dict[str, None]:
 
 
 def get_csv_geometry(entity: Entity) -> dict[str, Any]:
-    dict_ = {'type': None, 'coordinates': None}
+    dict_: dict[str, Any] = {'type': None, 'coordinates': None}
     if (geoms := Gis.get_by_id(entity.id)) \
             and entity.cidoc_class.code == 'E53':
         dict_ = {key: [geom[key] for geom in geoms] for key in geoms[0]}

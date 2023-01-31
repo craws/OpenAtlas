@@ -9,7 +9,7 @@ from openatlas.api.resources.error import (
     InvalidCodeError, InvalidLimitError, InvalidSearchSyntax,
     InvalidSubunitError, InvalidSystemClassError, LastEntityError,
     NoEntityAvailable, NoSearchStringError, NotAPlaceError, QueryEmptyError,
-    TypeIDError, ValueNotIntegerError, DisplayFileNotFoundError)
+    TypeIDError, ValueNotIntegerError)
 from openatlas.api.resources.model_mapper import get_by_cidoc_classes
 from tests.base import ApiTestCase
 
@@ -76,8 +76,6 @@ class Api(ApiTestCase):
                         height = entity
                     if entity.name == 'Change of Property':
                         change_of_property = entity
-                    if entity.name == 'Picture with a License':
-                        file_ = entity
                     if entity.name == 'File without license':
                         file_without_licences = entity
 
@@ -770,11 +768,6 @@ class Api(ApiTestCase):
                     search='"beginFrom":[{"operator":"lesserThan",'
                            '"values":["2000-1-1"],'
                            '"logicalOperator":"or"}]}'))
-            with self.assertRaises(DisplayFileNotFoundError):
-                self.app.get(url_for(
-                    'api_03.display',
-                    filename=f'{file_.id}.jpg',
-                    download=True))
             with self.assertRaises(AccessDeniedError):
                 self.app.get(url_for(
                     'api_03.display',

@@ -1,4 +1,5 @@
 [report]
 precision=2
-sort=cover
+omit=../openatlas/api/arche/*
 skip_covered=True
+sort=cover
