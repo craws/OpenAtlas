@@ -115,6 +115,7 @@ jobs:
               sleep 0.1;
           done;
           docker exec -i openatlas /bin/bash -c "cd /var/www/openatlas/instance/ && ls -la && cat testing.py && cat production.py"
+          docker exec -i openatlas /bin/bash -c "cd /var/www/openatlas/ls -la && ls -la files/export/"
 
       - name: Run tests
         run: |
