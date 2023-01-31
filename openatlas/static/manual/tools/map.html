@@ -5,8 +5,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Map &mdash; OpenAtlas 7.9.0 documentation</title>
@@ -26,9 +25,6 @@
   
 
   
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -93,7 +89,7 @@
               
             
             
-              <p><span class="caption-text">User interface</span></p>
+              <p class="caption"><span class="caption-text">User interface</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../features.html">Features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
@@ -110,14 +106,14 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
 </ul>
-<p><span class="caption-text">Documentation</span></p>
+<p class="caption"><span class="caption-text">Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../model/index.html">Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technical/api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technical/database_structure.html">Database Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technical/application_structure.html">Application Structure</a></li>
 </ul>
-<p><span class="caption-text">Help</span></p>
+<p class="caption"><span class="caption-text">Help</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../troubleshooting/index.html">Troubleshooting</a></li>
@@ -189,14 +185,14 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="map">
+  <div class="section" id="map">
 <h1>Map<a class="headerlink" href="#map" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
 <p>The interactive map (based on <a class="reference external" href="https://leafletjs.com/">Leaflet</a>) is a tool
 to present and enter the location of places. <a class="reference external" href="https://postgis.net/">PostGIS</a>
 is used for creating and manipulating spatial data.</p>
-<section id="navigation">
+<div class="section" id="navigation">
 <h2>Navigation<a class="headerlink" href="#navigation" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>You can zoom in/out with the mousewheel or the <strong>+</strong>/<strong>-</strong> buttons in the
@@ -205,13 +201,13 @@ upper left corner.</p></li>
 <li><p>Change the basemap at the layer button in the upper right corner.</p></li>
 <li><p>Switch to full screen with the rectangle in the upper left.</p></li>
 </ul>
-</section>
-<section id="search">
+</div>
+<div class="section" id="search">
 <h2>Search<a class="headerlink" href="#search" title="Permalink to this headline">¶</a></h2>
 <p>With the magnifying glass icon in the upper left you can search for (current)
 places at <a class="reference external" href="https://www.geonames.org/">GeoNames</a>.</p>
-</section>
-<section id="adding-new-geometries">
+</div>
+<div class="section" id="adding-new-geometries">
 <h2>Adding new geometries<a class="headerlink" href="#adding-new-geometries" title="Permalink to this headline">¶</a></h2>
 <p>When in insert or update mode of a place you have following options available
 (can be combined):</p>
@@ -223,8 +219,8 @@ the course of a road.</p></li>
 <li><p>Draw the area in which the physical thing is located. E.g. if its precise
 shape is not known but known to be within a certain area.</p></li>
 </ul>
-</section>
-<section id="id1">
+</div>
+<div class="section" id="id1">
 <h2>GeoNames<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>The <em>GeoNames ID</em> field can either be manually entered or imported from a map
 search result.</p>
@@ -234,8 +230,8 @@ it is a <strong>close match</strong>, which means that the concepts are sufficie
 that they can be used interchangeably in some information retrieval
 applications. Please refer to <a class="reference external" href="https://www.w3.org/TR/skos-reference/">SKOS</a>
 for further information.</p>
-</section>
-<section id="map-overlay">
+</div>
+<div class="section" id="map-overlay">
 <h2>Map Overlay<a class="headerlink" href="#map-overlay" title="Permalink to this headline">¶</a></h2>
 <p>If you have the module map overlay activated in your <a class="reference internal" href="profile.html"><span class="doc">Profile</span></a>, added
 overlays for places will be visible on the map by default and can be toggled
@@ -250,8 +246,8 @@ of a specific place. After adding an image file in the file tab you can click
 </ul>
 <p>of the image to position it on the map.
 The coordinates need to be in <strong>WGS84</strong> decimal degrees (EPSG 4326).</p>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>

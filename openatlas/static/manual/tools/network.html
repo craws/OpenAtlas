@@ -5,8 +5,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Network visualization &mdash; OpenAtlas 7.9.0 documentation</title>
@@ -26,9 +25,6 @@
   
 
   
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -93,7 +89,7 @@
               
             
             
-              <p><span class="caption-text">User interface</span></p>
+              <p class="caption"><span class="caption-text">User interface</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../features.html">Features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
@@ -110,14 +106,14 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
 </ul>
-<p><span class="caption-text">Documentation</span></p>
+<p class="caption"><span class="caption-text">Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../model/index.html">Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technical/api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technical/database_structure.html">Database Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technical/application_structure.html">Application Structure</a></li>
 </ul>
-<p><span class="caption-text">Help</span></p>
+<p class="caption"><span class="caption-text">Help</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../troubleshooting/index.html">Troubleshooting</a></li>
@@ -189,7 +185,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="network-visualization">
+  <div class="section" id="network-visualization">
 <h1>Network visualization<a class="headerlink" href="#network-visualization" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
@@ -197,47 +193,41 @@
 a network graph available at the <strong>Network visualization</strong> button at the
 <a class="reference internal" href="../overview.html"><span class="doc">Overview</span></a>. <strong>Classic</strong> is the default view but it can be switched to
 other types at the top of the visualization pages.</p>
-<figure class="align-left" id="id2">
+<div class="figure align-left" id="id2">
 <img alt="../_images/network_classic.png" src="../_images/network_classic.png" />
-<figcaption>
-<p><span class="caption-text">Classic</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
-</figcaption>
-</figure>
-<figure class="align-left" id="id3">
+<p class="caption"><span class="caption-text">Classic</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-left" id="id3">
 <img alt="../_images/network_2d.png" src="../_images/network_2d.png" />
-<figcaption>
-<p><span class="caption-text">2D</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
-</figcaption>
-</figure>
-<figure class="align-left" id="id4">
+<p class="caption"><span class="caption-text">2D</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-left" id="id4">
 <img alt="../_images/network_3d.png" src="../_images/network_3d.png" />
-<figcaption>
-<p><span class="caption-text">3D</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
-</figcaption>
-</figure>
-<section id="navigation">
+<p class="caption"><span class="caption-text">3D</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+</div>
+<div class="section" id="navigation">
 <h2>Navigation<a class="headerlink" href="#navigation" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Zoom with mouse wheel</p></li>
 <li><p>Drag and drop one node with the left mouse button to move the node</p></li>
 <li><p>Drag and drop the background with the left mouse button to move around</p></li>
 </ul>
-<section id="d">
+<div class="section" id="d">
 <h3>2D<a class="headerlink" href="#d" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Select a node with the left mouse button to only show its direct connections</p></li>
 </ul>
-</section>
-<section id="id1">
+</div>
+<div class="section" id="id1">
 <h3>3D<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Select a node with the left mouse button to only show its direct connections</p></li>
 <li><p>Drag and drop the background with the left mouse button to rotate</p></li>
 <li><p>Drag and drop the background with the right mouse button to pan</p></li>
 </ul>
-</section>
-</section>
-<section id="options">
+</div>
+</div>
+<div class="section" id="options">
 <h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p><strong>Classes</strong> - you can change the node color of classes</p></li>
@@ -248,23 +238,23 @@ other types at the top of the visualization pages.</p>
 connected</p></li>
 <li><p><strong>Distance</strong> - a parameter for the distance between connected entries</p></li>
 </ul>
-</section>
-<section id="in-case-of-performance-issues">
+</div>
+<div class="section" id="in-case-of-performance-issues">
 <h2>In case of performance issues<a class="headerlink" href="#in-case-of-performance-issues" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Check if your browser has hardware acceleration enabled</p></li>
 <li><p>Try different browsers, some are faster than others when dealing with large
 data sets</p></li>
 </ul>
-</section>
-<section id="download">
+</div>
+<div class="section" id="download">
 <h2>Download<a class="headerlink" href="#download" title="Permalink to this headline">¶</a></h2>
 <p>If an image is available (classic mode only) you can download it as PNG.
 Be aware that the resulting image is exactly what you see in this moment so
 you may want to change width and height in the options before. Also you may
 want to choose a zoom level where labels are readable.</p>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>
