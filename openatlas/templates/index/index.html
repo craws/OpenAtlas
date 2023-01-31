@@ -19,7 +19,7 @@
   <a href="{{ url_for('index_feedback') }}">{{ _('tell us about it') }}</a>.
   {% if g.settings.mail and not current_user.settings.newsletter %}
     {{ _('want to receive updates? Activate the newsletter in your')|uc_first }}
-    {{ _('profile')|button(url_for('profile_index'))|safe }}
+    {{ _('profile')|link(url_for('profile_index'))|safe }}
   {% endif %}
 </p>
 

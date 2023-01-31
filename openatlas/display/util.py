@@ -571,7 +571,7 @@ def button(
         onclick: Optional[str] = None) -> str:
     tag = 'a' if url else 'span'
     if url and '/insert' in url and label != _('link'):
-        label = f'+ {label}'
+        label = f'+ {uc_first(label)}'
     return f"""
         <{tag}
             {f'href="{url}"' if url else ''}

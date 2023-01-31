@@ -8,6 +8,7 @@ from wtforms import (
     SelectMultipleField, StringField, SubmitField, TextAreaField, widgets)
 from wtforms.validators import InputRequired, Optional, URL
 
+from openatlas.display.util import uc_first
 from openatlas.forms.base_manager import (
     ActorBaseManager, ArtifactBaseManager, BaseManager, EventBaseManager,
     HierarchyBaseManager)
@@ -16,7 +17,6 @@ from openatlas.forms.field import (
 from openatlas.forms.validation import file
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.models.openatlas_class import uc_first
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 
