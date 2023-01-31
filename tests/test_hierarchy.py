@@ -41,7 +41,7 @@ class HierarchyTest(TestBaseCase):
             assert b'checked class="" id="multiple"' in rv.data
 
             rv = self.app.get(url_for('hierarchy_insert', category='custom'))
-            assert b'+ Custom' in rv.data
+            assert b'+ <span class="uc-first">custom' in rv.data
 
             sex = get_hierarchy('Sex')
             rv = self.app.get(url_for('required_risk', id_=sex.id))
