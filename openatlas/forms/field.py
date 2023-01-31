@@ -8,7 +8,8 @@ from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (
-    Field, FileField, FloatField, HiddenField, StringField, TextAreaField, BooleanField)
+    Field, FileField, FloatField, HiddenField, StringField, TextAreaField,
+    BooleanField)
 from wtforms.widgets import (
     FileInput, HiddenInput, TextInput, Input, HTMLString)
 
@@ -70,7 +71,7 @@ class ValueTypeInput(TextInput):
         type_ = g.types[field.type_id]
         padding = len(type_.root)
         expand_col = \
-            f' <div class="me-1">{ value_type_expand_icon(type_)}</div>'
+            f' <div class="me-1">{value_type_expand_icon(type_)}</div>'
         return HTMLString(f'''
             <div class="row g-1" >
               <div class="col-4  d-flex" style="padding-left:{padding}rem">
@@ -326,8 +327,10 @@ class DragNDrop(FileInput):
             field: RemovableListField,
             *args: Any,
             **kwargs: Any) -> RemovableListInput:
-        return super().__call__(field, **kwargs) + \
-               render_template('forms/drag_n_drop_field.html')
+        accept = ', '.join([f'.{filename}' for filename
+                            in g.settings['file_upload_allowed_extension']])
+        return super().__call__(field, accept=accept, **kwargs) \
+        + render_template('forms/drag_n_drop_field.html')
 
 
 class DragNDropField(FileField):
@@ -356,7 +359,10 @@ class SubmitInput(Input):
     input_type = 'submit'
 
     def __call__(self, field, **kwargs):
-        return HTMLString(f'<button {self.html_params(name=field.name, **kwargs)}>{field.label.text}</button>')
+        return HTMLString(
+            f'''<button
+             {self.html_params(name=field.name, **kwargs)}
+             >{field.label.text}</button>''')
 
 
 class SubmitField(BooleanField):
@@ -366,5 +372,6 @@ class SubmitField(BooleanField):
 def generate_password_field() -> CustomField:
     return CustomField(
         '',
-        content=f'<span class="uc-first {app.config["CSS"]["button"]["primary"]}" '
-        f'id="generate-password">{_("generate password")}</span>')
+        content=f'''<span 
+                class="uc-first {app.config["CSS"]["button"]["primary"]}" 
+                id="generate-password">{_("generate password")}</span>''')
