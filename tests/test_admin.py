@@ -121,9 +121,8 @@ class AdminTests(TestBaseCase):
 
             rv = self.app.get(url_for('arche_index'))
             assert b'https://arche-curation.acdh-dev.oeaw.ac.at/' in rv.data
-            #
-            # rv = self.app.get(url_for('arche_fetch'))
-            # assert b'No entities to retrieve' in rv.data
+
+            self.app.get(url_for('arche_fetch'))
 
             rv = self.app.post(
                 url_for('admin_content', item='legal_notice'),
