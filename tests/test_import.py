@@ -4,7 +4,6 @@ from typing import Any
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.export import current_date_for_filename
 from tests.base import TestBaseCase
 
 
@@ -38,11 +37,9 @@ class ImportTest(TestBaseCase):
             rv = self.app.get(url_for('import_index'))
             assert b'Project X' in rv.data
 
-            self.app.post(url_for('export_sql'), follow_redirects=True)
             rv = self.app.get(
                 url_for('import_data', class_='person', project_id=p_id))
             assert b'file *' in rv.data
-
 
             static_path = Path(app.root_path) / 'static'
             with open(static_path / 'example.csv', 'rb') as file:
@@ -92,8 +89,3 @@ class ImportTest(TestBaseCase):
                 url_for('import_project_delete', id_=p_id),
                 follow_redirects=True)
             assert b'Project deleted' in rv.data
-
-            date_ = current_date_for_filename()
-            self.app.get(
-                url_for('delete_export', filename=f'{date_}_dump.sql.7z'),
-                follow_redirects=True)
