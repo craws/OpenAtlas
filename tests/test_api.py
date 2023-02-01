@@ -183,6 +183,10 @@ class Api(ApiTestCase):
             assert self.get_bool(rv['properties'], 'end_comment')
             assert self.get_bool(rv['properties'], 'types')
 
+            rv = self.app.get(
+                url_for('api_03.entity', id_=place.id, format='n3'))
+            print(rv.data)
+
             # Test Entity export and RDFS
             for rv in [
                 self.app.get(
