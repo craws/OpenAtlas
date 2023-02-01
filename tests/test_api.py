@@ -185,14 +185,14 @@ class Api(ApiTestCase):
 
             # Test Entity export and RDFS
             for rv in [
-                # self.app.get(
-                #     url_for('api_03.entity', id_=place.id, format='xml')),
+                self.app.get(
+                    url_for('api_03.entity', id_=place.id, format='n3')),
                 self.app.get(
                     url_for('api_03.entity', id_=place.id, export='csv')),
                 self.app.get(url_for(
                     'api_03.entity', id_=place.id, export='csvNetwork')),
-                # self.app.get(url_for(
-                #     'api_03.view_class', view_class='place', format='xml')),
+                self.app.get(url_for(
+                    'api_03.view_class', view_class='place', format='n3')),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=location.id,
