@@ -176,7 +176,7 @@ class TableMultiSelect(HiddenInput):
         return render_template(
             'forms/table_multi_select.html',
             field=field,
-            selection=[e.name for e in entities if e.id in data],
+            selection=[e for e in entities if e.id in data],
             table=table) + super().__call__(field, **kwargs)
 
 
@@ -262,7 +262,7 @@ class TreeMultiSelect(HiddenInput):
             'forms/tree_multi_select.html',
             field=field,
             root=g.types[int(field.type_id)],
-            selection=sorted([g.types[id_].name for id_ in data]),
+            selection=sorted(data, key=lambda k: g.types[k].name),
             data=Type.get_tree_data(int(field.id), data)) \
             + super().__call__(field, **kwargs)
 
