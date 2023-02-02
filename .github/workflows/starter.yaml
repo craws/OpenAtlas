@@ -114,11 +114,8 @@ jobs:
           until [ "$(docker inspect -f {{.State.Running}} openatlas)"=="true" ]; do
               sleep 0.1;
           done;
-          docker exec -i openatlas /bin/bash \
-                      -c "cd /var/www/openatlas/instance/ && cat testing.py && cat production.py"
+          docker exec -i openatlas /bin/bash -c "cd /var/www/openatlas/instance/ && ls -la && cat testing.py && cat production.py"
 
       - name: Run tests
         run: |
-          docker exec -i openatlas /bin/bash \
-                      -c "cd /var/www/openatlas/tests && nosetests3 --verbosity=2 --nologcapture --nocapture \
-                          && echo passed"
+          docker exec -i openatlas /bin/bash -c "cd /var/www/openatlas/tests && nosetests3 --verbosity=2 --nologcapture --nocapture && echo passed"
