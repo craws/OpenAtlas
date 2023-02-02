@@ -6,12 +6,12 @@
       {{ _('total disk space')|uc_first }} <strong>{{ disk_space_info.total }}</strong>
     </p>
     <p class="mb-1">
-      {{ _('project disk space')|uc_first }} <strong>{{ disk_space_info.project }}</strong>
-      <span class="bg-warning d-inline-block ml-2" style="height: inherit; width: 0.75em; height: 0.75em;"/>
-    </p>
-    <p class="mb-1">
       {{ _('non project files')|uc_first }} <strong>{{ disk_space_info.other_files }}</strong>
       <span class="bg-primary d-inline-block ml-2" style="height: inherit; width: 0.75em; height: 0.75em;"/>
+    </p>
+    <p class="mb-1">
+      {{ _('project files')|uc_first }} <strong>{{ disk_space_info.project }}</strong>
+      <span class="bg-warning d-inline-block ml-2" style="height: inherit; width: 0.75em; height: 0.75em;"/>
     </p>
     <p class="mb-1">
       {{ _('free disk space')|uc_first }} <strong>{{ disk_space_info.free }}</strong>
@@ -21,15 +21,6 @@
   <div class="progress"
     style="height: 30px;">
     <div
-      class="progress-bar bg-warning"
-      role="progressbar"
-      style="width: {{ disk_space_info.percent_project }}%"
-      aria-valuenow="{{ disk_space_info.percent_project }}"
-      aria-valuemin="0"
-      aria-valuemax="100">
-      <b>{{ disk_space_info.percent_project }}%</b>
-    </div>
-    <div
       class="progress-bar bg-primary"
       role="progressbar"
       style="width: {{ disk_space_info.percent_used - disk_space_info.percent_project }}%"
@@ -37,6 +28,15 @@
       aria-valuemin="0"
       aria-valuemax="100">
         <b>{{ disk_space_info.percent_used - disk_space_info.percent_project }}%</b>
+    </div>
+    <div
+      class="progress-bar bg-warning"
+      role="progressbar"
+      style="width: {{ disk_space_info.percent_project }}%"
+      aria-valuenow="{{ disk_space_info.percent_project }}"
+      aria-valuemin="0"
+      aria-valuemax="100">
+      <b>{{ disk_space_info.percent_project }}%</b>
     </div>
     <div
       class="progress-bar bg-gray"
