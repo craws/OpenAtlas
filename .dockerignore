@@ -1,5 +1,3 @@
 docker-compose.yaml
-openatlas-helm/**
 .idea/**
 .github/**
-install/kubernetes-templates/**
