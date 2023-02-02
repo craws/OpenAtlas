@@ -1,4 +1,4 @@
-![tests](https://github.com/craws/OpenAtlas/actions/workflows/test.yaml/badge.svg)
+![tests](https://github.com/craws/OpenAtlas/actions/workflows/starter.yaml/badge.svg)
 
 # About
 
