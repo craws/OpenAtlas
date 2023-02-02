@@ -20,6 +20,7 @@ versions = {
             '1090': 'Radiocarbon Dating',
             '1866': 'Complete Bootstrap layout',
             '1921': 'Additional UI translations - Spanish and Catalan',
+            '1940': 'Show disk space used by project',
             '1906': 'Unify placement of form error messages',
             '1924': 'Unify translations, add missing table translations',
             '1917': 'Improved tests',
