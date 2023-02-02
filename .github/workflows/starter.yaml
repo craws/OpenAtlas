@@ -118,4 +118,4 @@ jobs:
 
       - name: Run tests
         run: |
-          docker exec -i openatlas /bin/bash -c "cd /var/www/openatlas/tests && nosetests3 --verbosity=2 --nologcapture --nocapture && echo passed"
+          docker exec -i openatlas /bin/bash -c "cd /var/www/openatlas/tests && nosetests3 -c .noserc --verbosity=2 --nologcapture --nocapture && echo passed"
