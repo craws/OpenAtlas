@@ -764,14 +764,16 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
             check=True)
         files_size = int(process.stdout.split()[0])
     else:
-        files_size = 0  # pragma: no cover
+        files_size = 40999999999  # pragma: no cover
     stats = shutil.disk_usage(app.config['UPLOAD_DIR'])
     percent_free = 100 - math.ceil(stats.free / (stats.total / 100))
     percent_files = math.ceil(files_size / (stats.total / 100))
+    other_files = stats.total - stats.free - files_size
     return {
         'total': convert_size(stats.total),
         'project': convert_size(files_size),
+        'other_files': convert_size(other_files),
         'free': convert_size(stats.free),
-        'percent_free': percent_free,
+        'percent_used': percent_free,
         'percent_project': percent_files,
         'percent_other': 100 - (percent_files + percent_free)}
