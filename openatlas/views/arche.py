@@ -29,7 +29,7 @@ def arche_index() -> str:
 
 @app.route('/arche/fetch')
 @required_group('manager')
-def arche_fetch() -> str:
+def arche_fetch() -> str:  # pragma: no cover
     data = fetch_arche_data()
     table = Table(
         header=[
@@ -37,7 +37,7 @@ def arche_fetch() -> str:
             _('creator'), _('latitude'), _('longitude'), _('description'),
             _('license'), _('date')])
     for entries in data.values():
-        for metadata in entries.values():  # pragma: no cover
+        for metadata in entries.values():
             table.rows.append([
                 metadata['image_id'],
                 metadata['name'],
