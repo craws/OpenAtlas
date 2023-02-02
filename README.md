@@ -1,3 +1,5 @@
+![tests](https://github.com/craws/OpenAtlas/actions/workflows/test.yaml/badge.svg)
+
 # About
 
 [OpenAtlas](https://openatlas.eu) is an open source, web based database system
