@@ -57,6 +57,16 @@ tbody {
   border-top: 0 solid !important;
 }
 
+div.data-table > div {
+  display: table-row;
+}
+
+div.data-table > div > div {
+    display: table-cell;
+    padding: 0.2em 0.6em 0.2em 0;
+    white-space: nowrap;
+}
+
 /* Map */
 .map{
   position:sticky !important;
