@@ -13,11 +13,12 @@ class ExportImportTest(TestBaseCase):
 
     def test_export(self) -> None:
         with app.app_context():
+
             rv: Any = self.app.get(url_for('export_sql'))
             assert b'Export SQL' in rv.data
 
             date_ = current_date_for_filename()
-            rv = self.app.post(url_for('export_sql'), follow_redirects=True)
+            rv = self.app.get(url_for('export_execute'), follow_redirects=True)
             assert b'Data was exported as SQL' in rv.data
 
             rv = self.app.get(

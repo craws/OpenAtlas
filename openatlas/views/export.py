@@ -1,10 +1,7 @@
 import os
-from pathlib import Path
-from typing import Union
 
 from flask import flash, g, render_template, send_from_directory, url_for
 from flask_babel import lazy_gettext as _
-from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
@@ -12,8 +9,7 @@ from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    convert_size, display_form, is_authorized, link, required_group)
-from openatlas.forms.field import SubmitField
+    button, convert_size, is_authorized, link, manual, required_group)
 from openatlas.models.export import sql_export
 
 
@@ -26,56 +22,53 @@ def download_sql(filename: str) -> Response:
         as_attachment=True)
 
 
-@app.route('/export/sql', methods=['POST', 'GET'])
+@app.route('/export/execute')
 @required_group('manager')
-def export_sql() -> Union[str, Response]:
-
-    class ExportSqlForm(FlaskForm):
-        save = SubmitField(_('export SQL'))
-
-    path = app.config['EXPORT_DIR']
-    writable = os.access(path, os.W_OK)
-    form = ExportSqlForm()
-    if form.validate_on_submit() and writable:
+def export_execute() -> Response:
+    if os.access(app.config['EXPORT_DIR'], os.W_OK):
         if sql_export():
             g.logger.log('info', 'database', 'SQL export')
             flash(_('data was exported as SQL'), 'info')
         else:  # pragma: no cover
             g.logger.log('error', 'database', 'SQL export failed')
             flash(_('SQL export failed'), 'error')
-        return redirect(url_for('export_sql'))
-    return render_template(
-        'tabs.html',
-        tabs={'export': Tab(
-            _('export'),
-            content=(display_form(form) if writable else '') +
-            get_table(path, writable).display())},
-        title=_('export SQL'),
-        crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-data"],
-            _('export SQL')])
+    return redirect(url_for('export_sql'))
 
 
-def get_table(path: Path, writable: bool) -> Table:
+@app.route('/export/sql')
+@required_group('manager')
+def export_sql() -> str:
+    path = app.config['EXPORT_DIR']
     table = Table(['name', 'size'], order=[[0, 'desc']])
-    for file in [
-            f for f in path.iterdir()
-            if (path / f).is_file() and f.name != '.gitignore']:
+    for file in [f for f in path.iterdir()
+                 if (path / f).is_file() and f.name != '.gitignore']:
         data = [
             file.name,
             convert_size(file.stat().st_size),
             link(
                 _('download'),
                 url_for('download_sql', filename=file.name))]
-        if is_authorized('admin') and writable:
+        if is_authorized('admin') \
+                and os.access(app.config['EXPORT_DIR'], os.W_OK):
             confirm = _('Delete %(name)s?', name=file.name.replace("'", ''))
             data.append(
                 link(
                     _('delete'),
                     url_for('delete_export', filename=file.name),
                     js=f"return confirm('{confirm}')"))
-        table.rows.append(data)
-    return table
+            table.rows.append(data)
+    return render_template(
+        'tabs.html',
+        tabs={'export': Tab(
+            _('export'),
+            table.display(),
+            buttons=[
+                manual('admin/export'),
+                button(_('export SQL'), url_for('export_execute'))])},
+        title=_('export SQL'),
+        crumbs=[
+            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            _('export SQL')])
 
 
 @app.route('/delete_export/<filename>')
