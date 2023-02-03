@@ -1,4 +1,3 @@
-$(document).ready(function () {
     map = L.map("map", {maxZoom: mapMaxZoom, fullscreenControl: true});
     map.createPane('pointsPane');
     map.createPane('linesPane');
@@ -462,4 +461,3 @@ $(document).ready(function () {
     $('.leaflet-geonames-icon').click(function ($e) {
         $e.preventDefault();
     });
-})
