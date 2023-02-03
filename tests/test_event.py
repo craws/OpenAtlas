@@ -95,7 +95,7 @@ class EventTest(TestBaseCase):
 
             rv = self.app.get(
                 url_for('insert', class_='creation', origin_id=file.id))
-            assert b'+ Creation' in rv.data
+            assert b'+ <span class="uc-first">creation' in rv.data
 
             rv = self.app.post(
                 url_for('insert', class_='creation'),
