@@ -20,7 +20,7 @@ CIDOC documentation: :cidoc_entity:`E5 Event<e5-event>`,
   movement of artifacts or persons
 * **Production** (:cidoc_entity:`E12 Production<e12-production>`)
   - creation of artifacts
-* **Production** (:cidoc_entity:`E65 Creation<e65-creation>`)
+* **Creation** (:cidoc_entity:`E65 Creation<e65-creation>`)
   - creation of documents (files)
 
 .. include:: navigation.rst
