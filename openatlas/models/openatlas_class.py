@@ -20,10 +20,6 @@ view_class_mapping = {
     'source_translation': ['source_translation']}
 
 
-def uc_first(string: str) -> str:
-    return str(string)[0].upper() + str(string)[1:] if string else ''
-
-
 class OpenatlasClass:
 
     # Needed class label translations
@@ -49,7 +45,7 @@ class OpenatlasClass:
             write_access: str = 'contributor',
             icon: Optional[str] = None) -> None:
         self.name = name
-        self.label = uc_first(_(name.replace('_', ' ')))
+        self.label = _(name.replace('_', ' '))
         self.cidoc_class = g.cidoc_classes[cidoc_class] \
             if cidoc_class else None
         self.hierarchies = hierarchies

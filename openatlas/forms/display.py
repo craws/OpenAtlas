@@ -64,7 +64,6 @@ def html_form(
                 field.description = type_.description
             html += add_row(field, label)
             continue
-
         if field.id == 'save':
             class_ = \
                 f"{app.config['CSS']['button']['primary']} text-wrap uc-first"

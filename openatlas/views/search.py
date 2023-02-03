@@ -2,13 +2,13 @@ from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (
-    BooleanField, IntegerField, SelectMultipleField, StringField, SubmitField,
-    widgets)
+    BooleanField, IntegerField, SelectMultipleField, StringField, widgets)
 from wtforms.validators import InputRequired, NoneOf, NumberRange, Optional
 
 from openatlas import app
 from openatlas.display.table import Table
 from openatlas.display.util import link, required_group
+from openatlas.forms.field import SubmitField
 from openatlas.forms.util import form_to_datetime64
 from openatlas.models.entity import Entity
 from openatlas.models.search import search

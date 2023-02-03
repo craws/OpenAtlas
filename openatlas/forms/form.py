@@ -3,15 +3,14 @@ from typing import Optional
 from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
-from wtforms import (
-    HiddenField, SelectMultipleField, StringField, SubmitField, widgets)
+from wtforms import HiddenField, SelectMultipleField, StringField, widgets
 from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.display.table import Table
-from openatlas.display.util import get_base_table_data, uc_first
+from openatlas.display.util import get_base_table_data
 from openatlas.forms import base_manager, manager
-from openatlas.forms.field import TableMultiField, TreeField
+from openatlas.forms.field import SubmitField, TableMultiField, TreeField
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.type import Type
@@ -40,7 +39,7 @@ def get_add_reference_form(class_: str) -> FlaskForm:
 
     setattr(Form, class_, TableMultiField(_(class_), [InputRequired()]))
     setattr(Form, 'page', StringField(_('page')))
-    setattr(Form, 'save', SubmitField(uc_first(_('insert'))))
+    setattr(Form, 'save', SubmitField(_('insert')))
     return Form()
 
 
@@ -59,7 +58,7 @@ def get_table_form(class_: str, linked_entities: list[Entity]) -> str:
             table.rows.append(
                 [input_] + get_base_table_data(entity, show_links=False))
     if not table.rows:
-        return uc_first(_('no entries'))
+        return '<span class="uc-first">' + _('no entries') + '</span>'
     return render_template(
         'forms/form_table.html',
         table=table.display(class_))
@@ -75,7 +74,7 @@ def get_move_form(type_: Type) -> FlaskForm:
             coerce=int,
             option_widget=widgets.CheckboxInput(),
             widget=widgets.ListWidget(prefix_label=False))
-        save = SubmitField(uc_first(_('move entities')))
+        save = SubmitField(_('move entities'))
 
     root = g.types[type_.root[0]]
     setattr(Form, str(root.id), TreeField(str(root.id)))

@@ -5,13 +5,13 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import StringField, SubmitField
+from wtforms import StringField
 from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.database.connect import Transaction
-from openatlas.display.util import display_form, required_group, uc_first
-from openatlas.forms.field import TableField
+from openatlas.display.util import display_form, required_group
+from openatlas.forms.field import SubmitField, TableField
 from openatlas.forms.form import get_manager, get_table_form
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -157,7 +157,7 @@ def reference_link_update(link_: Link, origin: Entity) -> Union[str, Response]:
     form.save.label.text = _('save')
     form.page.data = link_.description
     if link_.domain.class_.name == 'external_reference':
-        form.page.label.text = uc_first(_('link text'))
+        form.page.label.text = _('link text')
     return render_template(
         'content.html',
         content=display_form(form),

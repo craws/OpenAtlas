@@ -10,11 +10,12 @@ from flask_login import (
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import BooleanField, PasswordField, StringField, SubmitField
+from wtforms import BooleanField, PasswordField, StringField
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app
 from openatlas.display.util import display_form, send_mail, uc_first
+from openatlas.forms.field import SubmitField
 from openatlas.models.user import User
 
 login_manager = LoginManager()

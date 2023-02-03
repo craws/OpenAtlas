@@ -22,7 +22,7 @@ class EventTest(TestBaseCase):
                 reference = insert('external_reference', 'https://d-nb.info')
 
             rv: Any = self.app.get(url_for('insert', class_='activity'))
-            assert b'+ Activity' in rv.data
+            assert b'+ <span class="uc-first">activity' in rv.data
 
             data = {'name': 'Event Horizon', 'place': residence.id}
             rv = self.app.post(
@@ -99,7 +99,7 @@ class EventTest(TestBaseCase):
             production_id = rv.location.split('/')[-1]
 
             rv = self.app.get(url_for('view', id_=production_id))
-            assert b'Artifact' in rv.data
+            assert b'artifact' in rv.data
 
             rv = self.app.get(url_for('view', id_=artifact.id))
             assert b'A productive event' in rv.data

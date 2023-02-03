@@ -16,14 +16,14 @@ def file(_form: FlaskForm, field: MultipleFileField) -> None:
     for file_ in request.files.getlist('file'):
         if not file_ or Path(file_.filename).suffix[1:] not in \
                 g.settings['file_upload_allowed_extension']:
-            field.errors.append(uc_first(_('file type not allowed')))
+            field.errors.append(_('file type not allowed'))
 
 
 def hierarchy_name_exists(form: FlaskForm, field: TreeField) -> None:
     if not hasattr(form, 'entity_id') or \
             Entity.get_by_id(int(form.entity_id.data)).name != form.name.data:
         if Type.check_hierarchy_exists(form.name.data):
-            field.errors.append(uc_first(_('error name exists')))
+            field.errors.append(_('error name exists'))
 
 
 def validate(form: FlaskForm) -> bool:
@@ -37,17 +37,17 @@ def validate(form: FlaskForm) -> bool:
                 and field.data['value']:
             if not field.data['precision']:
                 valid = False
-                field.errors.append(uc_first(_('precision required')))
+                field.errors.append(_('precision required'))
             if field.label.text == 'Wikidata':
                 if field.data['value'][0].upper() != 'Q' \
                         or not field.data['value'][1:].isdigit():
-                    field.errors.append(uc_first(_('wrong id format')))
+                    field.errors.append(_('wrong id format'))
                     valid = False
                 else:
                     field.data['value'] = uc_first(field.data['value'])
             if field.label.text == 'GeoNames' \
                     and not field.data['value'].isnumeric():
-                field.errors.append(uc_first(_('wrong id format')))
+                field.errors.append(_('wrong id format'))
                 valid = False
     return valid
 
