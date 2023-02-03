@@ -1,0 +1,305 @@
+
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>CIDOC CRM &mdash; OpenAtlas 7.10.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="OpenAtlas classes" href="openatlas_classes.html" />
+    <link rel="prev" title="Model" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> OpenAtlas
+          
+
+          
+            
+            <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                7.10.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User interface</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../entity/index.html">Entity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Model</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">CIDOC CRM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="openatlas_classes.html">OpenAtlas classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="openatlas_shortcuts.html">OpenAtlas shortcuts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="references.html">References</a></li>
+<li class="toctree-l2"><a class="reference internal" href="link_checker.html">Link checker</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../technical/api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technical/database_structure.html">Database Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technical/application_structure.html">Application Structure</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Help</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting/index.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAtlas</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content style-external-links">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Model</a> &raquo;</li>
+        
+      <li>CIDOC CRM</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="cidoc-crm">
+<h1>CIDOC CRM<a class="headerlink" href="#cidoc-crm" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<p>The <a class="reference external" href="https://www.cidoc-crm.org/">CIDOC Conceptual reference model</a> is a
+widely used ontology in the digital humanities as well as an
+<a class="reference external" href="https://www.iso.org/standard/57832.html">ISO standard</a>.
+It is a formal ontology, developed by an developed by an interdisciplinary team
+in connection with the International Council of Museums
+(<a class="reference external" href="https://icom.museum/en/">ICOM</a>).</p>
+<p>It is used as basis for the underlying data model of OpenAtlas and the
+currently used version is
+<a class="reference external" href="https://cidoc-crm.org/Version/version-7.1.1">CIDOC CRM v7.1.1</a> published in
+May 2021.
+A script is used to parse the specification and import it into a
+<a class="reference external" href="https://www.postgresql.org/">PostgreSQL</a> database (more information is
+available on <a class="reference external" href="https://github.com/craws/OpenAtlas/tree/main/install">GitHub</a>)</p>
+<p>The ontology consists of classes, linked together by properties.</p>
+<div class="section" id="cidoc-classes">
+<h2>CIDOC classes<a class="headerlink" href="#cidoc-classes" title="Permalink to this headline">¶</a></h2>
+<p>Classes are indicated by a preceding <strong>E</strong> followed by a numeric code-e.g.
+“<a class="reference external" href="https://www.cidoc-crm.org/Entity/e39-actor/version-7.1.1">E39 - Actor</a>” or
+“<a class="reference external" href="https://www.cidoc-crm.org/Entity/e67-birth/version-7.1.1">E67 - Birth</a>”.
+All entities used within OpenAtlas can be characterised as CIDOC classes.
+An overview of all CIDOC CRM classes can be found on this
+<a class="reference external" href="https://demo.openatlas.eu/overview/model/cidoc_class_index">page</a>. The count
+indicates how many times each class has been used in this database instance.
+A click on the class name will get you to an overview of the class with
+detailed information, such as a short description, sub- and super classes as
+well as possible properties.</p>
+</div>
+<div class="section" id="cidoc-properties">
+<h2>CIDOC Properties<a class="headerlink" href="#cidoc-properties" title="Permalink to this headline">¶</a></h2>
+<p>CIDOC entities are indicated by a combination of “P” and a numerical sequence -
+think “<a class="reference external" href="https://www.cidoc-crm.org/Property/p11-had-participant/version-7.1.1">P11 - had participant</a>” or
+“<a class="reference external" href="https://www.cidoc-crm.org/Property/p2-has-type/version-7.1.1">P2 - has type</a>“. They are used to link classes
+to other classes. So when an activity to place at a certain location, this can
+be modelled in the following way</p>
+<img alt="../_images/properties.png" src="../_images/properties.png" />
+<p>An overview of all CIDOC CRM properties can be found
+<a class="reference external" href="https://demo.openatlas.eu/overview/model/property">here</a>. The count
+indicates how many times each property has been used in this database instance.
+A click on the property name will get you to an overview of the property with
+detailed information, such as a short description.</p>
+<p>OpenAtlas does not import nor use inverse properties (ending with i) since our
+links are directed anyway. Nevertheless their labels are imported for more
+convenient browsing possibilities of relations.
+Properties with URLs as domain/range are ignored because the system used here
+has a foreign key on domain which must match an existing class.
+Also some properties are linked as sub_properties_of properties with the i
+suffix. Since we don’t use inverse properties in the database
+(direction is determined through domain/range selection)they are linked to
+their counterpart without i.</p>
+<p>There are some “special” properties we ignore, e.g.
+<a class="reference external" href="https://www.cidoc-crm.org/Property/P3-has-note/version-7.1.1">P3 - has note</a>, you can look them up in the
+OpenAtlas CIDOC parser script where they are defined at the top:
+<a class="reference external" href="https://github.com/craws/OpenAtlas/blob/main/install/crm/cidoc_rtfs_parser.py">https://github.com/craws/OpenAtlas/blob/main/install/crm/cidoc_rtfs_parser.py</a>
+We don’t import them because of technical reasons, e.g. they are missing some
+definitions that “normal” properties have and the import script would have
+troubles to deal with them. E.g. they have no defined range but this is a
+foreign key in our database that can’t be empty.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="openatlas_classes.html" class="btn btn-neutral float-right" title="OpenAtlas classes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Model" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+        <p>CC-BY 4.0, Alexander Watzinger and the OpenAtlas team</p>
+        <script type="text/javascript">
+            <!-- Adds target=_blank to external links -->
+            $(document).ready(function () {
+                $('a[href^="http://"], a[href^="https://"]').not('a[class*=internal]').attr('target', '_blank');
+            });
+        </script>
+
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
