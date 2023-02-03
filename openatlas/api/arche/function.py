@@ -99,15 +99,10 @@ def import_arche_data() -> int:
                             f'[{item["longitude"]},'
                             f'{item["latitude"]}]}}'})
 
-            event = Entity.insert(
+            production = Entity.insert(
                 'production',
-                f'Creation of graffito from {name}')
-            event.update({'attributes': {'begin_from': item['date']}})
-            event.link('P108', artifact)
-
-            get_or_create_person(
-                item['creator'],
-                person_types['photographer_type'])
+                f'Production of graffito from {name}')
+            production.link('P108', artifact)
 
             file = Entity.insert('file', name, f"Created by {item['creator']}")
             file.link(
@@ -119,6 +114,18 @@ def import_arche_data() -> int:
             open(str(app.config['UPLOAD_DIR'] / filename), "wb") \
                 .write(requests.get(item['image_link_thumbnail']).content)
             file.link('P67', artifact)
+
+            creator = get_or_create_person(
+                item['creator'],
+                person_types['photographer_type'])
+
+            creation = Entity.insert(
+                'creation',
+                f'Creation of photograph from {name}')
+            creation.update({'attributes': {'begin_from': item['date']}})
+            creation.link('P94', file)
+            creation.link('P14', creator)
+
             count += 1
     return count
 

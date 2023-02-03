@@ -344,9 +344,9 @@
                   <a href='https://www.geonames.org/${e.geoname.geonameId}' target='_blank'>${e.geoname.name}</a><br>
                   <div id="buttonBar" style="white-space:nowrap;">
                     <p>
-                        <button id="ImportGeonamesID">Import ID</button>
-                        <button id="ImportCoordinates">Import Coordinates</button><br><br>
-                        <button id="ImportAll">Import ID and Coordinates</button>
+                        <button class="${style.button.primary}" id="ImportGeonamesID">Import ID</button>
+                        <button class="${style.button.primary}" id="ImportCoordinates">Import Coordinates</button><br><br>
+                        <button class="${style.button.primary}" id="ImportAll">Import ID and Coordinates</button>
                     </p>
                 </div>
             </div>`;

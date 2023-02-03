@@ -8,6 +8,7 @@ CIDOC documentation: :cidoc_entity:`E5 Event<e5-event>`,
 :cidoc_entity:`E8 Acquisition<e8-acquisition>`,
 :cidoc_entity:`E9 Move<e9-move>` and
 :cidoc_entity:`E12 Production<e12-production>`
+:cidoc_entity:`E65 Creation<e65-creation>`
 
 * **Activity** (:cidoc_entity:`E7 Activity<e7-activity>`)
   - the most common, e.g. a battle, a meeting or a wedding
@@ -19,6 +20,8 @@ CIDOC documentation: :cidoc_entity:`E5 Event<e5-event>`,
   movement of artifacts or persons
 * **Production** (:cidoc_entity:`E12 Production<e12-production>`)
   - creation of artifacts
+* **Creation** (:cidoc_entity:`E65 Creation<e65-creation>`)
+  - creation of documents (files)
 
 .. include:: navigation.rst
 
@@ -69,4 +72,11 @@ Production
 * :doc:`artifact` - to select artifacts that were produced
 
 The creators can be added via the **Actor** tab and selecting the **performed**
+activity while linking them.
+
+Creation
+**********
+* Document (:doc:`file`) - to select files that were created
+
+The creators can be added via the **Actor** tab and selecting the **carried out by**
 activity while linking them.

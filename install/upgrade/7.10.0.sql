@@ -19,4 +19,11 @@ INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name, descript
 INSERT INTO web.hierarchy (id, name, category, multiple, directional) VALUES
   ((SELECT id FROM model.entity WHERE name='Radiocarbon'), 'Radiocarbon', 'tools', False, False);
 
+-- #1934 Add creation event class
+INSERT INTO model.openatlas_class (name, cidoc_class_code, alias_allowed, reference_system_allowed, new_types_allowed, write_access_group_name, layout_color, layout_icon, standard_type_id) VALUES
+  ('creation', 'E65',  false, true,  true,  'contributor', '#0000FF', 'mdi-calendar',   (SELECT id FROM model.entity WHERE name = 'Event' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1));
+
+INSERT INTO web.hierarchy_openatlas_class (hierarchy_id, openatlas_class_name) VALUES
+  ((SELECT id FROM web.hierarchy WHERE name='Event'), 'creation');
+
 END;
