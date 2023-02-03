@@ -24,13 +24,15 @@ from openatlas.models.user import User
 @app.route('/overview')
 def overview() -> str:
     if not current_user.is_authenticated:
-        tabs = {
-            'info': Tab(
-                'info',
-                render_template(
-                    'index/index_guest.html',
-                    intro=get_translation('intro')))}
-        return render_template('tabs.html', tabs=tabs, crumbs=['overview'])
+        return render_template(
+            'tabs.html',
+            tabs={
+                'info': Tab(
+                    'info',
+                    render_template(
+                        'index/index_guest.html',
+                        intro=get_translation('intro')))},
+            crumbs=['overview'])
     tabs = {
         'info': Tab('info'),
         'bookmarks': Tab(
@@ -77,7 +79,7 @@ def overview() -> str:
         tables['latest'].rows.append([
             format_date(entity.created),
             link(entity),
-            entity.class_.label,
+            '<span class="uc-first">' + entity.class_.label + '</span>',
             entity.first,
             entity.last,
             link(g.logger.get_log_info(entity.id)['creator'])])
