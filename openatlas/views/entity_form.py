@@ -90,7 +90,7 @@ def update(id_: int) -> Union[str, Response]:
         'entity/update.html',
         form=manager.form,
         entity=entity,
-        class_name=entity.name,
+        class_name=entity.class_.view,
         gis_data=place_info['gis_data'],
         overlays=place_info['overlays'],
         title=entity.name,
