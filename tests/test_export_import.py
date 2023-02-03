@@ -13,7 +13,7 @@ class ExportImportTest(TestBaseCase):
 
     def test_export(self) -> None:
         with app.app_context():
-            rv = self.app.get(url_for('export_sql'))
+            rv: Any = self.app.get(url_for('export_sql'))
             assert b'Export SQL' in rv.data
 
             date_ = current_date_for_filename()
@@ -38,7 +38,7 @@ class ExportImportTest(TestBaseCase):
             rv = self.app.post(url_for('sql_execute'), data={'statement': 'e'})
             assert b'syntax error' in rv.data
 
-            rv: Any = self.app.get(url_for('import_project_insert'))
+            rv = self.app.get(url_for('import_project_insert'))
             assert b'name *' in rv.data
 
             rv = self.app.post(

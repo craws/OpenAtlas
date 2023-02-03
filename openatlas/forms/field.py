@@ -357,12 +357,9 @@ class CustomField(Field):
 class SubmitInput(Input):
     input_type = 'submit'
 
-    def __call__(self, field, **kwargs):
-        if 'class_' in kwargs:
-            kwargs['class_'] = kwargs['class_'] + ' uc-first'
-        else:
-            kwargs['class_'] = 'uc-first'
-
+    def __call__(self, field: Field, **kwargs: Any) -> str:
+        kwargs['class_'] = (kwargs['class_'] + ' uc-first') \
+            if 'class_' in kwargs else 'uc-first'
         return HTMLString(
             f'''<button
              {self.html_params(name=field.name, **kwargs)}

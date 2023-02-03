@@ -98,7 +98,7 @@ def add_row(
         value: Optional[str] = None,
         form_id: Optional[str] = None,
         row_css: Optional[str] = '') -> str:
-    field_css = ""
+    field_css = ''
     if field:
         if field.flags.required \
                 and field.label.text \
