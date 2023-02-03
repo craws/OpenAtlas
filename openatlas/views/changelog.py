@@ -17,6 +17,7 @@ def index_changelog() -> str:
 versions = {
     '7.10.0': ['TBA', {
         'feature': {
+            '1934': 'New creation event class',
             '1090': 'Radiocarbon Dating',
             '1866': 'Complete Bootstrap layout',
             '1921': 'Additional UI translations - Spanish and Catalan',
@@ -30,7 +31,8 @@ versions = {
             '1933': 'API: Display images without extension in URL',
             '1814': 'API: more compact API buttons in user interface',
             '1701': 'Manual: added API documentation',
-            '1929': 'Manual: add database file structure'},
+            '1929': 'Manual: add database file structure',
+            '1944': 'Manual: ARCHE import'},
         'fix': {
             '1922': 'Missing user interface translations'}}],
     '7.9.2': ['2023-01-09', {
