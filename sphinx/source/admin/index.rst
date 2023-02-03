@@ -15,3 +15,4 @@ Admin
    export
    execute_sql
    api
+   arche
