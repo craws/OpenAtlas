@@ -8,7 +8,7 @@ from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.display import display
-from openatlas.display.util import display_form, required_group, uc_first
+from openatlas.display.util import display_form, required_group
 from openatlas.forms.form import get_table_form
 from openatlas.models.entity import Entity
 from openatlas.views.link import AddReferenceForm
@@ -99,7 +99,7 @@ def entity_add_reference(id_: int) -> Union[str, Response]:
             description=form.page.data,
             inverse=True)
         return redirect(f"{url_for('view', id_=id_)}#tab-reference")
-    form.page.label.text = uc_first(_('page / link text'))
+    form.page.label.text = _('page / link text')
     return render_template(
         'content.html',
         content=display_form(form),

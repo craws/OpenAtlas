@@ -12,7 +12,7 @@ from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.image_processing import resize_image
 from openatlas.display.util import (
-    get_base_table_data, is_authorized, link, required_group, uc_first)
+    get_base_table_data, is_authorized, link, required_group)
 from openatlas.forms.base_manager import BaseManager
 from openatlas.forms.form import get_manager
 from openatlas.forms.util import populate_insert_form, was_modified
@@ -127,7 +127,8 @@ def add_crumbs(
         if count := len(
                 [i for i in structure['siblings'] if i.class_.name == class_]):
             siblings = f" ({count} {_('exists')})" if count else ''
-    return crumbs + [f'+ {uc_first(g.classes[class_].label)}{siblings}']
+    return crumbs + [
+        f'+ <span class="uc-first">{g.classes[class_].label}{siblings}</span>']
 
 
 def check_insert_access(class_: str) -> None:

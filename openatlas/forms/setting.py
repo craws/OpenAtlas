@@ -1,10 +1,10 @@
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
-from wtforms import (
-    BooleanField, IntegerField, SelectField, StringField, SubmitField)
+from wtforms import BooleanField, IntegerField, SelectField, StringField
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app
+from openatlas.forms.field import SubmitField
 
 
 class ContentForm(FlaskForm):

@@ -222,7 +222,7 @@ class PlaceTest(TestBaseCase):
                 url_for('insert', class_='place'),
                 data=data,
                 follow_redirects=True)
-            assert b'Insert and add strati' in rv.data
+            assert b'insert and add strati' in rv.data
 
             data['name'] = "It's not a bug, it's a feature!"
             data['place'] = place.id
@@ -237,7 +237,7 @@ class PlaceTest(TestBaseCase):
                     class_='stratigraphic_unit',
                     origin_id=feat_id),
                 data=data)
-            assert b'Insert and add human remains' in rv.data
+            assert b'insert and add human remains' in rv.data
 
             data['name'] = "I'm a stratigraphic unit"
             data['place'] = feat_id
@@ -329,8 +329,8 @@ class PlaceTest(TestBaseCase):
             assert b'Changes have been saved' in rv.data
 
             rv = self.app.get(url_for('view', id_=strati_id))
-            assert b'Radiocarbon dating' in rv.data
-            assert b'Sex estimation' in rv.data
+            assert b'radiocarbon dating' in rv.data
+            assert b'sex estimation' in rv.data
 
             rv = self.app.get(url_for('carbon_update', id_=strati_id))
             assert b'VERA' in rv.data

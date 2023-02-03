@@ -23,6 +23,7 @@ versions = {
             '1940': 'Show disk space used by project',
             '1906': 'Unify placement of form error messages',
             '1924': 'Unify translations, add missing table translations',
+            '1950': 'Improved multi select',
             '1917': 'Improved tests',
             '1848': 'API: fetch data from ARCHE',
             '1933': 'API: Display images without extension in URL',

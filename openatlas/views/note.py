@@ -7,13 +7,13 @@ from flask_wtf import FlaskForm
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import BooleanField, SubmitField, TextAreaField
+from wtforms import BooleanField, TextAreaField
 
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.util import (
-    button, display_form, is_authorized, link, manual, required_group,
-    uc_first)
+    button, display_form, is_authorized, link, manual, required_group)
+from openatlas.forms.field import SubmitField
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
 
@@ -42,7 +42,7 @@ def note_view(id_: int) -> str:
                 url_for('note_set_private', id_=note['id']))]
     tabs = {'info': Tab(
         'info',
-        '<h1>' + uc_first(_('note')) + f"</h1>{note['text']}",
+        '<h1 class="uc-first">' + _('note') + f"</h1>{note['text']}",
         buttons=buttons)}
     return render_template(
         'tabs.html',
@@ -85,7 +85,7 @@ def note_insert(entity_id: int) -> Union[str, Response]:
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],
             entity,
-            f"+ {uc_first(_('note'))}"])
+            '+ <span class="uc-first">' + _('note') + '</span>'])
 
 
 @app.route('/note/update/<int:id_>', methods=['POST', 'GET'])
