@@ -281,10 +281,11 @@ function selectFromTreeMulti(name, value_type = false) {
         }));
       $('#' + name + '-button').after($('<br>'));
     } else {
-      checkedNames.push(type_['text']);
+      checkedNames.push(type_);
     }
   });
-  $("#" + name + "-selection").html(checkedNames.map(x => `<span class="badge bg-gray text-black col-auto ms-1"> ${x}</span>`));
+  $("#" + name + "-selection")
+      .html(checkedNames.map(x => closableBadge(x['text'],`deselectNode('${ name }', ${x['id']})`)));
   if (ids.length > 0) {
     $("#" + name).val('[' + ids + ']');
   } else {
@@ -292,7 +293,10 @@ function selectFromTreeMulti(name, value_type = false) {
   }
   $("#" + name).trigger('change');
 }
-
+function deselectNode(fieldId,nodeId){
+ $(`#${fieldId}-tree`).jstree('deselect_node', nodeId); 
+ selectFromTreeMulti(fieldId)
+}
 function selectFromTable(element, table, id,label= undefined) {
   $("#" + table).attr('value', id);
   $("#" + table + "-button").val(label || element?.innerText );
@@ -300,18 +304,22 @@ function selectFromTable(element, table, id,label= undefined) {
   $("#" + table + "-clear-field").show();
   $('#' + table + '-modal').modal('hide');
 }
-
+function deselectFromTable(tableName, nodeId) {
+  $(`#${tableName}_table`)?.find(`#${nodeId}[type="checkbox"]`)?.prop( "checked", false )
+  selectFromTableMulti(tableName)
+}
 function selectFromTableMulti(name) {
   let checkedNames = [];
   let ids = [];
   $('#' + name + '_table').DataTable().rows().nodes().to$().find('input[type="checkbox"]').each(
     function () {
       if ($(this).is(':checked')) {
-        checkedNames.push($(this).val());
+        checkedNames.push({name:$(this).val(),id:$(this).attr('id')});
         ids.push($(this).attr('id'));
       }
     });
-  $('#' + name + '-selection').html(checkedNames.map(x => `<span class="badge bg-gray text-black col-auto ms-1"> ${x}</span>`));
+  $('#' + name + '-selection')
+      .html(checkedNames.map(x => closableBadge(x.name,`deselectFromTable('${name}',${x.id})`)));
   $('#' + name).val(ids.length > 0 ? '[' + ids + ']' : '').trigger('change');
 }
 

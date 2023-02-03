@@ -187,3 +187,16 @@ $(document).ready(function () {
     });
 
 });
+
+const closableBadge = (name, onclick='') => `
+      <div onclick="event.stopPropagation()" class="badge col-auto bg-gray">
+        <div class="d-flex align-items-center">
+          <span class="text-black">${name}</span>
+          <button
+            onclick="${onclick}"
+            type="button"
+            class="btn-close p-0 ms-1"
+            aria-label="Close"
+          ></button>
+        </div>
+      </div>`

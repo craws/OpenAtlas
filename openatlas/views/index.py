@@ -24,13 +24,15 @@ from openatlas.models.user import User
 @app.route('/overview')
 def overview() -> str:
     if not current_user.is_authenticated:
-        tabs = {
-            'info': Tab(
-                'info',
-                render_template(
-                    'index/index_guest.html',
-                    intro=get_translation('intro')))}
-        return render_template('tabs.html', tabs=tabs, crumbs=['overview'])
+        return render_template(
+            'tabs.html',
+            tabs={
+                'info': Tab(
+                    'info',
+                    render_template(
+                        'index/index_guest.html',
+                        intro=get_translation('intro')))},
+            crumbs=['overview'])
     tabs = {
         'info': Tab('info'),
         'bookmarks': Tab(
@@ -57,12 +59,11 @@ def overview() -> str:
         entity = Entity.get_by_id(note['entity_id'])
         tabs['notes'].table.rows.append([
             format_date(note['created']),
-            uc_first(_('public') if note['public'] else _('private')),
+            _('public') if note['public'] else _('private'),
             link(entity),
             entity.class_.label,
             note['text'],
-            f'<a href="{url_for("note_view", id_=note["id"])}">' +
-            uc_first(_("view")) + '</a>'])
+            link(_("view"), url_for("note_view", id_=note["id"]))])
     for name, count in Entity.get_overview_counts().items():
         url = url_for('index', view=g.class_view_mapping[name])
         if name == 'administrative_unit':
@@ -74,11 +75,11 @@ def overview() -> str:
         tables['overview'].rows.append([
             link(g.classes[name].label, url) if url else g.classes[name].label,
             format_number(count)])
-    for entity in Entity.get_latest(10):
+    for entity in Entity.get_latest(15):
         tables['latest'].rows.append([
             format_date(entity.created),
             link(entity),
-            entity.class_.label,
+            '<span class="uc-first">' + entity.class_.label + '</span>',
             entity.first,
             entity.last,
             link(g.logger.get_log_info(entity.id)['creator'])])
@@ -118,8 +119,7 @@ def index_feedback() -> Union[str, Response]:
             f'{request.headers["Host"]}\n\n' \
             f'{form.description.data}'
         if send_mail(
-                f"{uc_first(form.subject.data)} "
-                f"from {g.settings['site_name']}",
+                form.subject.data + f" from {g.settings['site_name']}",
                 body,
                 g.settings['mail_recipients_feedback']):
             flash(_('info feedback thanks'), 'info')

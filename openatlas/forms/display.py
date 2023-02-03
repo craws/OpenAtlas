@@ -18,8 +18,8 @@ def html_form(
     reference_systems_added = False
     reference_systems_fields = list(
         filter(lambda x: x.id.startswith('reference_system_id_'), form))
-    reference_systems_fields_errors = any(
-        [f.errors for f in reference_systems_fields])
+    reference_systems_fields_errors = \
+        any(f.errors for f in reference_systems_fields)
     for field in form:
         if field.id.startswith('insert_'):
             continue  # These will be added in combination with other fields
@@ -64,7 +64,6 @@ def html_form(
                 field.description = type_.description
             html += add_row(field, label)
             continue
-
         if field.id == 'save':
             class_ = \
                 f"{app.config['CSS']['button']['primary']} text-wrap uc-first"
@@ -99,7 +98,7 @@ def add_row(
         value: Optional[str] = None,
         form_id: Optional[str] = None,
         row_css: Optional[str] = '') -> str:
-    field_css = ""
+    field_css = ''
     if field:
         if field.flags.required \
                 and field.label.text \

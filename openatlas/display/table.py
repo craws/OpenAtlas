@@ -4,8 +4,6 @@ from flask import json, render_template
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 
-from openatlas.display.util import uc_first
-
 # Needed for translations
 _('previous')
 _('next')
@@ -41,8 +39,9 @@ class Table:
             'data': self.rows,
             'stateSave': 'true',
             'columns':
-                [{'title': _(i) if i else '', 'className': 'uc-first'} for i in self.header] +
-                [{'title': ''}  # Add empty
+                [{'title': _(i) if i else '', 'className': 'uc-first'}
+                 for i in self.header] +
+                [{'title': ''}
                  for _item in range(len(self.rows[0]) - len(self.header))],
             'paging': self.paging,
             'pageLength': current_user.settings['table_rows'],

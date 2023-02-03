@@ -56,7 +56,7 @@ class SourceTest(TestBaseCase):
                     'insert',
                     class_='source_translation',
                     origin_id=source_id))
-            assert b'+ Source translation' in rv.data
+            assert b'+ <span class="uc-first">source translation' in rv.data
 
             rv = self.app.post(
                 url_for(
@@ -65,7 +65,7 @@ class SourceTest(TestBaseCase):
                     origin_id=source_id),
                 data={'name': 'Translation continued', 'continue_': 'yes'},
                 follow_redirects=True)
-            assert b'+ Source translation' in rv.data
+            assert b'+ <span class="uc-first">source translation' in rv.data
 
             rv = self.app.post(
                 url_for(

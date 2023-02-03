@@ -6,7 +6,7 @@ from flask_babel import lazy_gettext as _
 
 from openatlas import app
 from openatlas.database.connect import Transaction
-from openatlas.forms.util import get_table_content
+from openatlas.forms.field import get_table_content
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 from openatlas.models.user import User

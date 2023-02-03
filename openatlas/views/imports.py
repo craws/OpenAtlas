@@ -9,8 +9,7 @@ from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect, secure_filename
 from werkzeug.wrappers import Response
-from wtforms import (
-    BooleanField, FileField, StringField, SubmitField, TextAreaField)
+from wtforms import BooleanField, FileField, StringField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app
@@ -19,8 +18,8 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
     button, datetime64_to_timestamp, display_form, format_date,
-    get_backup_file_data, is_authorized, link, manual, required_group,
-    uc_first)
+    get_backup_file_data, is_authorized, link, manual, required_group)
+from openatlas.forms.field import SubmitField
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Import, is_float
 
@@ -83,7 +82,7 @@ def import_project_insert() -> Union[str, Response]:
         crumbs=[
             [_('admin'), url_for('admin_index') + '#tab-data'],
             [_('import'), url_for('import_index')],
-            f"+ {uc_first(_('project'))}"])
+            '+ <span class="uc-first">' + _('project') + '</span>'])
 
 
 @app.route('/import/project/view/<int:id_>')

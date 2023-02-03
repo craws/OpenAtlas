@@ -8,7 +8,8 @@ from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wtforms import (
-    BooleanField, HiddenField, PasswordField, SelectField, StringField, TextAreaField)
+    BooleanField, HiddenField, PasswordField, SelectField, StringField,
+    TextAreaField)
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app
@@ -161,7 +162,8 @@ def user_view(id_: int) -> str:
                     _('delete'),
                     url_for('admin_index', action='delete_user', id_=user.id)
                     + '#tab-user',
-                    onclick=f"return confirm('{_('Delete %(name)s?', name=name)}')"))
+                    onclick=
+                    f"return confirm('{_('Delete %(name)s?', name=name)}')"))
         buttons.append(
             button(_('activity'), url_for('user_activity', user_id=user.id)))
     return render_template(
@@ -291,7 +293,7 @@ def user_insert() -> Union[str, Response]:
         title=_('user'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-user"],
-            f"+ {uc_first(_('user'))}"])
+            '+ <span class="uc-first">' + _('user') + '</span>'])
 
 
 def get_groups() -> list[tuple[str, str]]:
