@@ -1,4 +1,4 @@
-name: 'OpenAtlas Github Tests'
+name: 'Tests'
 on:
   push: {}
 jobs:
