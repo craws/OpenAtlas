@@ -362,6 +362,7 @@ class SubmitInput(Input):
             if 'class_' in kwargs else 'uc-first'
         return HTMLString(
             f'''<button
+             id="{field.id}"
              {self.html_params(name=field.name, **kwargs)}
              >{field.label.text}</button>''')
 
