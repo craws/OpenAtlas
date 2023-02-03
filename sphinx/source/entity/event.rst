@@ -73,3 +73,10 @@ Production
 
 The creators can be added via the **Actor** tab and selecting the **performed**
 activity while linking them.
+
+Creation
+**********
+* Document (:doc:`file`) - to select files that were created
+
+The creators can be added via the **Actor** tab and selecting the **carried out by**
+activity while linking them.
