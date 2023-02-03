@@ -39,8 +39,9 @@ class Table:
             'data': self.rows,
             'stateSave': 'true',
             'columns':
-                [{'title': _(i) if i else '', 'className': 'uc-first'} for i in self.header] +
-                [{'title': ''}  # Add empty
+                [{'title': _(i) if i else '', 'className': 'uc-first'}
+                 for i in self.header] +
+                [{'title': ''}
                  for _item in range(len(self.rows[0]) - len(self.header))],
             'paging': self.paging,
             'pageLength': current_user.settings['table_rows'],

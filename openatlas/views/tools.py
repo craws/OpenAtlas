@@ -192,7 +192,7 @@ def sex_update(id_: int) -> Union[str, Response]:
 @required_group('readonly')
 def carbon(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_, types=True)
-    buttons = []  # Todo: add manual link
+    buttons = [manual('tools/radiocarbon_dating')]
     if is_authorized('contributor'):
         buttons.append(
             button(_('edit'), url_for('carbon_update', id_=entity.id)))

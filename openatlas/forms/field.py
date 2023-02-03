@@ -373,9 +373,9 @@ class SubmitField(BooleanField):
 def generate_password_field() -> CustomField:
     return CustomField(
         '',
-        content=f'''<span 
-                class="uc-first {app.config["CSS"]["button"]["primary"]}" 
-                id="generate-password">{_("generate password")}</span>''')
+        content=
+        f'''<span class="uc-first {app.config["CSS"]["button"]["primary"]}"
+            id="generate-password">{_("generate password")}</span>''')
 
 
 def value_type_expand_icon(type_: Type) -> str:
