@@ -37,3 +37,4 @@ openatlas/static/package-lock.json
 # SonarQube
 .scannerwork/*
 
+.vscode

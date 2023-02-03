@@ -5,7 +5,7 @@ from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import BooleanField, SubmitField
+from wtforms import BooleanField
 from wtforms.validators import InputRequired
 
 from openatlas import app
@@ -15,6 +15,7 @@ from openatlas.display.table import Table
 from openatlas.display.util import (
     get_entities_linked_to_type_recursive, link, manual, required_group,
     sanitize)
+from openatlas.forms.field import SubmitField
 from openatlas.forms.form import get_move_form
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link

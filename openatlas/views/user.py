@@ -291,7 +291,7 @@ def user_insert() -> Union[str, Response]:
         title=_('user'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-user"],
-            f"+ {uc_first(_('user'))}"])
+            '+ <span class="uc-first">' + _('user') + '</span>'])
 
 
 def get_groups() -> list[tuple[str, str]]:

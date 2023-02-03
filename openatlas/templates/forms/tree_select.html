@@ -4,12 +4,12 @@
         id="{{ field.id }}-button"
         name="{{ field.id }}-button"
         type="text"
-        class="{{ config.CSS.string_field }} uc-first table-select "
+        class="{{ config.CSS.string_field }} bg-white table-select "
         onfocus="this.blur()"
         onclick="$('#{{ field.id }}-modal').modal('show')"
         readonly="readonly"
         value="{{ selection|safe }}"
-        placeholder="{{ _('change') }}">
+        placeholder="{{ _('change') | uc_first }}">
   </div>
   <div id="{{ field.id }}-clear-field" class="col-auto" {% if not selection %}style="display: none;"{% endif %}>
     <a

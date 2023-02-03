@@ -1,7 +1,23 @@
 <div class="row g-1">
-  <div class="col" style="padding-top:4px;padding-left:4px;">
-    <div id="{{ field.id }}-selection" class="g-1 row {{ config.CSS.string_field }}">
-      {% for s in selection %}<span class="badge col-auto bg-gray text-black">{{ s }}</span>{% endfor %}
+  <div class="col" style="padding-top: 4px; padding-left: 4px">
+    <div
+      id="{{ field.id }}-selection"
+      class="g-1 row {{ config.CSS.string_field }}"
+      onclick="$('#{{ field.id }}-modal').modal('show')"
+    >
+      {% for s in selection %}
+      <div onclick="event.stopPropagation()" class="badge col-auto bg-gray">
+        <div class="d-flex align-items-center">
+          <span class="text-black">{{ g.types[s].name }}</span>
+          <button
+            onclick="deselectNode('{{ field.id }}',{{s}})"
+            type="button"
+            class="btn-close p-0 ms-1"
+            aria-label="Close"
+          ></button>
+        </div>
+      </div>
+      {% endfor %}
     </div>
   </div>
   <div class="col-auto">

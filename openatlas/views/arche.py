@@ -9,7 +9,7 @@ from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, display_info, is_authorized, required_group, uc_first)
+    button, display_info, is_authorized, required_group)
 
 
 @app.route('/arche')
@@ -55,7 +55,9 @@ def arche_fetch() -> str:  # pragma: no cover
             table=table,
             buttons=[
                 button(_('import ARCHE data'), url_for('arche_import_data'))]
-            if table.rows else [uc_first(_('no entities to retrieve'))])}
+            if table.rows else [
+                '<span class="uc-first">' + _('no entities to retrieve') +
+                '<span>'])}
 
     return render_template(
         'tabs.html',

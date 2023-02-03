@@ -6,7 +6,7 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import IntegerField, SelectField, StringField, SubmitField
+from wtforms import IntegerField, SelectField, StringField
 from wtforms.validators import InputRequired
 
 from openatlas import app
@@ -15,6 +15,7 @@ from openatlas.display.tab import Tab
 from openatlas.display.util import (
     button, display_form, display_info, is_authorized, link, manual,
     remove_link, required_group, uc_first)
+from openatlas.forms.field import SubmitField
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.tools import (
@@ -48,16 +49,16 @@ def sex_result(entity: Entity) -> str:
     if calculation is None:
         return ''
     return \
-        '<h1>' + uc_first(_('sex estimation')) + '</h1>' \
+        '<h1 class="uc-first">' + _('sex estimation') + '</h1>' \
         'Ferembach et al. 1979: ' \
-        f'<span class="anthro-result">{calculation}</span>' \
-        f' - {_("corresponds to")} "{name_result(calculation)}"'
+        f'<span class="anthro-result">{calculation}</span> - ' + \
+        _('corresponds to') + f' "{name_result(calculation)}"'
 
 
 def carbon_result(entity: Entity) -> str:
     if link_ := get_carbon_link(entity):
-        return '<h1>' + uc_first(_('radiocarbon dating')) + '</h1>' + \
-               display_info(json.loads(link_.description))
+        return '<h1 class="uc-first">' + _('radiocarbon dating') + '</h1>' + \
+            display_info(json.loads(link_.description))
     return ''
 
 
@@ -152,7 +153,7 @@ def sex_update(id_: int) -> Union[str, Response]:
            Form,
            feature,
            SelectField(
-               f"{uc_first(feature.replace('_', ' '))} ({values['category']})",
+               f"{feature} ({values['category']})",
                choices=choices,
                default='Not preserved',
                description=description))

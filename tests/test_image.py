@@ -57,16 +57,16 @@ class ImageTest(TestBaseCase):
                     Path(app.root_path)
                     / 'static' / 'images' / 'layout' / 'logo.png',
                     Path(app.config['UPLOAD_DIR'] / f'{file2.id}.jpeg'))
-                file_py = insert('file', 'Test_Py')
+                file_json = insert('file', 'Test')
                 copyfile(
-                    Path(app.root_path) / 'views' / 'index.py',
-                    Path(app.config['UPLOAD_DIR'] / f'{file_py.id}.py'))
+                    Path(app.root_path) / 'static' / 'manifest.json',
+                    Path(app.config['UPLOAD_DIR'] / f'{file_json.id}.json'))
                 safe_resize_image(file2.id, '.png', size="???")
                 profile_image(file_pathless)
 
             # Resizing images (don't change order!)
-            rv = self.app.get(url_for('view', id_=file_py.id))
-            assert b'No preview available' in rv.data
+            rv = self.app.get(url_for('view', id_=file_json.id))
+            assert b'no preview available' in rv.data
 
             rv = self.app.get(url_for('view', id_=file_pathless.id))
             assert b'missing file' in rv.data

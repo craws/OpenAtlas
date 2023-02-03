@@ -7,7 +7,7 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
-from openatlas.display.util import display_form, required_group, uc_first
+from openatlas.display.util import display_form, required_group
 from openatlas.forms.form import get_add_reference_form
 from openatlas.models.entity import Entity
 
@@ -23,7 +23,7 @@ def reference_add(id_: int, view: str) -> Union[str, Response]:
         reference.link('P67', Entity.get_by_ids(ids), form.page.data)
         return redirect(f"{url_for('view', id_=reference.id)}#tab-{view}")
     if reference.class_.name == 'external_reference':
-        form.page.label.text = uc_first(_('link text'))
+        form.page.label.text = _('link text')
     return render_template(
         'content.html',
         content=display_form(form),

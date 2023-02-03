@@ -85,7 +85,7 @@ class AdminTests(TestBaseCase):
             rv = self.app.get(
                 url_for('admin_check_link_duplicates', delete='delete'),
                 follow_redirects=True)
-            assert b'Remove' in rv.data
+            assert b'remove' in rv.data
 
             rv = self.app.get(
                 url_for(

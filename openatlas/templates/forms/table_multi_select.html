@@ -1,19 +1,35 @@
 <div class="row g-1">
-  <div class="col" style="padding-top:4px;padding-left:4px;">
-    <div id="{{ field.id }}-selection" class="g-1 row {{ config.CSS.string_field }}">
-      {% for s in selection %}<span class="badge col-auto bg-gray text-black">{{ s }}</span>{% endfor %}
+  <div class="col" style="padding-top: 4px; padding-left: 4px">
+    <div
+      id="{{ field.id }}-selection"
+      class="g-1 row {{ config.CSS.string_field }}"
+      onclick="$('#{{ field.id }}-modal').modal('show')"
+    >
+    {% for s in selection %}
+    <div onclick="event.stopPropagation()" class="badge col-auto bg-gray">
+      <div class="d-flex align-items-center">
+        <span class="text-black">{{ s.name }}</span>
+        <button
+          onclick="deselectFromTable('{{ field.id }}',{{s.id}})"
+          type="button"
+          class="btn-close p-0 ms-1"
+          aria-label="Close"
+        ></button>
+      </div>
+    </div>
+    {% endfor %}
     </div>
   </div>
   <div class="col-auto">
     <span
-        id="{{ field.id }}-button"
-        class="{{ config.CSS.button.secondary }}"
-        onclick="$('#{{ field.id }}-modal').modal('show')">
-        {{ _('change')|uc_first }}
+      id="{{ field.id }}-button"
+      class="{{ config.CSS.button.secondary }}"
+      onclick="$('#{{ field.id }}-modal').modal('show')"
+    >
+      {{ _('change')|uc_first }}
     </span>
   </div>
 </div>
-
 
 <div id="{{ field.id }}-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog" role="document" style="max-width: 100%!important;">
