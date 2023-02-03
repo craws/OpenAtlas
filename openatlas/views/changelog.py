@@ -25,6 +25,7 @@ versions = {
             '1924': 'Unify translations, add missing table translations',
             '1950': 'Improved multi select',
             '1917': 'Improved tests',
+            '1918': 'Capitalization of first letter with CSS',
             '1848': 'API: fetch data from ARCHE',
             '1933': 'API: Display images without extension in URL',
             '1814': 'API: more compact API buttons in user interface',
