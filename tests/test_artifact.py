@@ -1,3 +1,5 @@
+from typing import Any
+
 from flask import url_for
 
 from openatlas import app
@@ -14,7 +16,7 @@ class ArtifactTest(TestBaseCase):
                 actor = insert('person', 'Conan')
                 place = insert('place', 'Home')
 
-            rv = self.app.get(
+            rv: Any = self.app.get(
                 url_for('insert', class_='artifact', origin_id=place.id))
             assert b'+ <span class="uc-first">artifact' in rv.data
 

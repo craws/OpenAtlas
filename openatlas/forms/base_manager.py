@@ -12,7 +12,8 @@ from wtforms.validators import InputRequired, URL
 
 from openatlas.forms.add_fields import (
     add_date_fields, add_reference_systems, add_types)
-from openatlas.forms.field import RemovableListField, TableField, TreeField, SubmitField
+from openatlas.forms.field import (
+    RemovableListField, TableField, TreeField, SubmitField)
 from openatlas.forms.populate import (
     populate_dates, populate_reference_systems, populate_types)
 from openatlas.forms.process import (

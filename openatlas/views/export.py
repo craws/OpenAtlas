@@ -9,15 +9,12 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
+from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    convert_size, is_authorized, link, required_group)
+    convert_size, display_form, is_authorized, link, required_group)
 from openatlas.forms.field import SubmitField
 from openatlas.models.export import sql_export
-
-
-class ExportSqlForm(FlaskForm):
-    save = SubmitField(_('export SQL'))
 
 
 @app.route('/download/sql/<filename>')
@@ -32,6 +29,10 @@ def download_sql(filename: str) -> Response:
 @app.route('/export/sql', methods=['POST', 'GET'])
 @required_group('manager')
 def export_sql() -> Union[str, Response]:
+
+    class ExportSqlForm(FlaskForm):
+        save = SubmitField(_('export SQL'))
+
     path = app.config['EXPORT_DIR']
     writable = os.access(path, os.W_OK)
     form = ExportSqlForm()
@@ -44,14 +45,15 @@ def export_sql() -> Union[str, Response]:
             flash(_('SQL export failed'), 'error')
         return redirect(url_for('export_sql'))
     return render_template(
-        'export.html',
-        form=form,
-        table=get_table(path, writable),
-        writable=writable,
+        'tabs.html',
+        tabs={'export': Tab(
+            _('export'),
+            content=(display_form(form) if writable else '') +
+            get_table(path, writable).display())},
         title=_('export SQL'),
         crumbs=[
-            [_('admin'),
-             f"{url_for('admin_index')}#tab-data"], _('export SQL')])
+            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            _('export SQL')])
 
 
 def get_table(path: Path, writable: bool) -> Table:

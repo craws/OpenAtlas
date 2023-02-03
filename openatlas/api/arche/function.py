@@ -137,7 +137,7 @@ def get_or_create_type(hierarchy: Type, type_name: str) -> Type:
     return type_entity
 
 
-def get_type_by_name(type_name: str) -> Type:
+def get_type_by_name(type_name: str) -> Optional[Type]:
     type_ = None
     for type_id in g.types:
         if g.types[type_id].name == type_name:
