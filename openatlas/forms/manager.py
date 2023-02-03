@@ -4,16 +4,15 @@ from typing import Any
 from flask import g, request
 from flask_babel import lazy_gettext as _
 from wtforms import (
-    BooleanField, HiddenField, SelectField,
-    SelectMultipleField, StringField, SubmitField, TextAreaField, widgets)
+    BooleanField, HiddenField, SelectField, SelectMultipleField, StringField,
+    TextAreaField, widgets)
 from wtforms.validators import InputRequired, Optional, URL
 
-from openatlas.display.util import uc_first
 from openatlas.forms.base_manager import (
     ActorBaseManager, ArtifactBaseManager, BaseManager, EventBaseManager,
     HierarchyBaseManager)
 from openatlas.forms.field import (
-    DragNDropField, TableField, TableMultiField, TreeField)
+    DragNDropField, SubmitField, TableField, TableMultiField, TreeField)
 from openatlas.forms.validation import file
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -228,8 +227,7 @@ class FeatureManager(BaseManager):
                 self.form_class,
                 'insert_continue_sub',
                 SubmitField(
-                    uc_first(_('insert and add')) + ' '
-                    + _('stratigraphic unit')))
+                    _('insert and add') + ' ' + _('stratigraphic unit')))
 
 
 class FileManager(BaseManager):
@@ -439,8 +437,7 @@ class PlaceManager(BaseManager):
             setattr(
                 self.form_class,
                 'insert_continue_sub',
-                SubmitField(
-                    uc_first(_('insert and add')) + ' ' + _('feature')))
+                SubmitField(_('insert and add') + ' ' + _('feature')))
 
 
 class ProductionManager(EventBaseManager):
@@ -538,13 +535,11 @@ class StratigraphicUnitManager(BaseManager):
             setattr(
                 self.form_class,
                 'insert_continue_sub',
-                SubmitField(
-                    uc_first(_('insert and add') + ' ' + _('artifact'))))
+                SubmitField(_('insert and add') + ' ' + _('artifact')))
             setattr(
                 self.form_class,
                 'insert_continue_human_remains',
-                SubmitField(
-                    uc_first(_('insert and add') + ' ' + _('human remains'))))
+                SubmitField(_('insert and add') + ' ' + _('human remains')))
 
 
 class TypeManager(BaseManager):

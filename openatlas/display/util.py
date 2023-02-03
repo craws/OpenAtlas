@@ -56,7 +56,7 @@ def edit_link(url: str) -> Optional[str]:
 def ext_references(links: list[Link]) -> str:
     if not links:
         return ''
-    html = '<h2>' + uc_first(_("external reference systems")) + '</h2>'
+    html = '<h2 class="uc-first">' + _("external reference systems") + '</h2>'
     for link_ in links:
         system = g.reference_systems[link_.domain.id]
         html += link(
@@ -181,10 +181,10 @@ def siblings_pager(
             break
     parts = []
     if prev_id:
-        parts.append(button('<', url_for('view', id_=prev_id)))
+        parts.append(button('<', url_for('view', id_=prev_id)) + '&nbsp;')
     if next_id:
-        parts.append(button('>', url_for('view', id_=next_id)))
-    parts.append(f"{position} {_('of')} {len(structure['siblings'])}")
+        parts.append(button('>', url_for('view', id_=next_id)) + '&nbsp;')
+    parts.append(f'{position} ' + _('of') + f" {len(structure['siblings'])}")
     return ' '.join(parts)
 
 
@@ -246,13 +246,13 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
         if item == 'type':
             html += \
                 f'<a href="{url_for("type_index")}" ' \
-                f'class="nav-item nav-link fw-bold {active}">' + \
-                uc_first(_("types")) + '</a>'
+                f'class="nav-item nav-link fw-bold uc-first {active}">' + \
+                _('types') + '</a>'
         else:
             html += \
                 f'<a href="{url_for("index", view=item)}" ' \
-                f'class="nav-item nav-link fw-bold {active}">' + \
-                uc_first(_(item)) + '</a>'
+                f'class="nav-item nav-link fw-bold uc-first {active}">' + \
+                _(item) + '</a>'
     return html
 
 
@@ -276,7 +276,8 @@ def profile_image(entity: Entity) -> str:
         style = f'max-width:{app.config["IMAGE_SIZE"]["thumbnail"]}px;'
         ext = app.config["ALLOWED_IMAGE_EXT"]
     if entity.class_.view == 'file':
-        html = uc_first(_('no preview available'))
+        html = \
+            '<span class="uc-first">' + _('no preview available') + '</span>'
         if path.suffix.lower() in ext:
             html = link(
                 f'<img style="{style}" alt="image" src="{src}">',
@@ -461,8 +462,8 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
     for path in app.config['WRITABLE_DIRS']:
         if not os.access(path, os.W_OK):
             warnings.append(
-                f"{uc_first(_('directory not writable'))}: "
-                f"{str(path).replace(app.root_path, '')}")
+                '<span class="uc-first">' + _('directory not writable') +
+                f"</span> {str(path).replace(app.root_path, '')}")
     if is_authorized('admin'):
         from openatlas.models.user import User
         user = User.get_by_username('OpenAtlas')
@@ -472,7 +473,9 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
                 user.password.encode('utf-8'))
             if hash_ == user.password.encode('utf-8'):
                 warnings.append(
-                    "User OpenAtlas with default password is still active!")
+                    '<span class="uc-first">' +
+                    _('user OpenAtlas with default password is still active') +
+                    '</span>')
     return \
         '<p class="alert alert-danger">' \
         f'{"<br>".join(warnings)}<p>' if warnings else ''
@@ -533,11 +536,12 @@ def link(
     html = ''
     if isinstance(object_, (str, LazyString)):
         js = f'onclick="{js}"' if js else ''
-        label = uc_first(str(object_)) if uc_first_ and not \
-            str(object_).startswith('http') else object_
-        class_ = f'class="{class_}"' if class_ else ''
+        uc_fist = 'uc-first' if uc_first_ and not \
+            str(object_).startswith('http') else ''
         ext = 'target="_blank" rel="noopener noreferrer"' if external else ''
-        html = f'<a href="{url}" {class_} {js} {ext}>{label}</a>'
+        html = \
+            f'<a href="{url}" class="{class_} {uc_fist}" {js} ' \
+            f'{ext}>{object_}</a>'
     elif isinstance(object_, Entity):
         html = link(
             object_.name,
@@ -596,7 +600,7 @@ def button_bar(buttons: list[Any]) -> str:
 def display_citation_example(code: str) -> str:
     html = ''
     if code == 'reference' and (text := get_translation('citation_example')):
-        html = '<h1>' + uc_first(_('citation_example')) + f'</h1>{text}'
+        html = '<h1 class="uc-first">' + _('citation_example') + f'</h1>{text}'
     return html
 
 
@@ -671,7 +675,7 @@ def manual(site: str) -> str:
         # print(f'Missing manual link: {path}')
         return ''
     return \
-        '<a title="' + uc_first("manual") + '" ' \
+        '<a title="' + uc_first(_('manual')) + '" ' \
         f'href="/static/manual/{site}.html" class="manual" target="_blank" ' \
         'rel="noopener noreferrer"><i class="fas fs-4 fa-book"></i></a>'
 

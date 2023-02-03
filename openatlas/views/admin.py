@@ -13,7 +13,7 @@ from flask_wtf import FlaskForm
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import StringField, SubmitField, TextAreaField
+from wtforms import StringField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app
@@ -26,6 +26,7 @@ from openatlas.display.util import (
     button, convert_size, display_form, display_info, format_date,
     get_file_path, is_authorized, link, manual, required_group, sanitize,
     send_mail, uc_first)
+from openatlas.forms.field import SubmitField
 from openatlas.forms.setting import (
     ApiForm, ContentForm, FilesForm, GeneralForm, LogForm, MailForm, MapForm,
     ModulesForm, SimilarForm, TestMailForm)
@@ -92,7 +93,7 @@ def admin_index(
             format_date(user.login_last_success),
             user_entities])
     for item, languages in get_content().items():
-        content = [uc_first(_(item))]
+        content = [_(item)]
         for language in app.config['LANGUAGES']:
             content.append(sanitize(languages[language], 'text'))
         content.append(link(_('edit'), url_for('admin_content', item=item)))
@@ -160,7 +161,7 @@ def admin_index(
     if is_authorized('manager'):
         tabs['modules'] = Tab(
             _('modules'),
-            '<h1>' + uc_first(_('defaults for new user')) + '</h1>'
+            '<h1 class="uc-first">' + _('defaults for new user') + '</h1>'
             + display_info(get_form_settings(ModulesForm())),
             buttons=[
                 manual('admin/modules'),
@@ -206,7 +207,7 @@ def admin_content(item: str) -> Union[str, Response]:
             StringField()
             if item == 'site_name_for_frontend'
             else TextAreaField(render_kw={'class': 'tinymce'}))
-    setattr(ContentForm, 'save', SubmitField(uc_first(_('save'))))
+    setattr(ContentForm, 'save', SubmitField(_('save')))
     form = ContentForm()
     if form.validate_on_submit():
         data = []
@@ -297,7 +298,7 @@ def admin_check_link_duplicates(
                     entity_id=row['entity'].id,
                     type_id=type_.id)
                 remove_links.append(
-                    f'<a href="{url}">' + uc_first(_("remove")) + '</a> '
+                    f'<a href="{url}" class="uc-fist">*' + _("remove") + '</a> '
                     f'{type_.name}')
             tab.table.rows.append([
                 link(row['entity']),
@@ -387,7 +388,8 @@ def admin_check_similar() -> str:
                 f"{link(sample['entity'])}<br><br>{'<br><br>'.join(similar)}",
                 len(sample['entities']) + 1])
     content = display_form(form, manual_page='admin/data_integrity_checks')
-    content += uc_first(_('no entries')) if table and not table.rows else ''
+    content += ('<span class="uc-first">' + _('no entries') + '</span>') \
+        if table and not table.rows else ''
     return render_template(
         'tabs.html',
         tabs={'similar': Tab('similar', content, table=table)},
@@ -698,7 +700,6 @@ def admin_newsletter() -> Union[str, Response]:
         save = SubmitField(_('send'))
 
     form = NewsLetterForm()
-    form.save.label.text = uc_first(_('send'))
     if form.validate_on_submit():
         count = 0
         for user_id in request.form.getlist('recipient'):

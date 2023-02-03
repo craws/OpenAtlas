@@ -1,12 +1,13 @@
 from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
-from wtforms import SubmitField, TextAreaField
+from wtforms import TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.util import get_backup_file_data, manual, required_group
+from openatlas.forms.field import SubmitField
 
 
 class SqlForm(FlaskForm):

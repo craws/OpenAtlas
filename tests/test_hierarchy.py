@@ -87,7 +87,7 @@ class HierarchyTest(TestBaseCase):
             assert b'deleted' in rv.data
 
             rv = self.app.get(url_for('hierarchy_insert', category='value'))
-            assert b'+ Value' in rv.data
+            assert b'+ <span class="uc-first">value' in rv.data
 
             rv = self.app.post(
                 url_for('hierarchy_insert', category='value'),

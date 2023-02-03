@@ -99,7 +99,7 @@ class EventTest(TestBaseCase):
             production_id = rv.location.split('/')[-1]
 
             rv = self.app.get(url_for('view', id_=production_id))
-            assert b'Artifact' in rv.data
+            assert b'artifact' in rv.data
 
             rv = self.app.get(url_for('view', id_=artifact.id))
             assert b'A productive event' in rv.data

@@ -4,14 +4,13 @@ from flask import g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (
-    BooleanField, IntegerField, SelectMultipleField, StringField, SubmitField,
-    widgets)
+    BooleanField, IntegerField, SelectMultipleField, StringField, widgets)
 from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.display.table import Table
-from openatlas.display.util import link, manual, required_group, uc_first
-from openatlas.forms.field import TableField
+from openatlas.display.util import link, manual, required_group
+from openatlas.forms.field import SubmitField, TableField
 from openatlas.models.entity import Entity
 from openatlas.models.network import Network
 from openatlas.models.openatlas_class import OpenatlasClass
@@ -21,7 +20,7 @@ class LinkCheckForm(FlaskForm):
     cidoc_domain = TableField('Domain', [InputRequired()])
     cidoc_property = TableField('Property', [InputRequired()])
     cidoc_range = TableField('Range', [InputRequired()])
-    save = SubmitField(uc_first(_('test')))
+    save = SubmitField(_('test'))
 
 
 @app.route('/overview/model', methods=["GET", "POST"])
@@ -100,7 +99,8 @@ def openatlas_class_index() -> str:
             link(class_.cidoc_class),
             link(g.types[class_.standard_type_id])
             if class_.standard_type_id else '',
-            uc_first(class_.view).replace('_', ' '),
+            f'<span class="uc-first">{_(class_.view.replace("_", " "))}</span>'
+            if class_.view else '',
             class_.write_access,
             _('allowed') if class_.alias_allowed else '',
             _('allowed') if class_.reference_system_allowed else '',

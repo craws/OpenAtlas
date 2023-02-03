@@ -66,7 +66,7 @@ class ImageTest(TestBaseCase):
 
             # Resizing images (don't change order!)
             rv = self.app.get(url_for('view', id_=file_json.id))
-            assert b'No preview available' in rv.data
+            assert b'no preview available' in rv.data
 
             rv = self.app.get(url_for('view', id_=file_pathless.id))
             assert b'missing file' in rv.data

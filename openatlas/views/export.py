@@ -7,17 +7,17 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import SubmitField
 
 from openatlas import app
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    convert_size, is_authorized, link, required_group, uc_first)
+    convert_size, is_authorized, link, required_group)
+from openatlas.forms.field import SubmitField
 from openatlas.models.export import sql_export
 
 
 class ExportSqlForm(FlaskForm):
-    save = SubmitField(uc_first(_('export SQL')))
+    save = SubmitField(_('export SQL'))
 
 
 @app.route('/download/sql/<filename>')

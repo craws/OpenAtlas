@@ -85,7 +85,7 @@ class AdminTests(TestBaseCase):
             rv = self.app.get(
                 url_for('admin_check_link_duplicates', delete='delete'),
                 follow_redirects=True)
-            assert b'Remove' in rv.data
+            assert b'remove' in rv.data
 
             rv = self.app.get(
                 url_for(
@@ -123,7 +123,7 @@ class AdminTests(TestBaseCase):
             assert b'https://arche-curation.acdh-dev.oeaw.ac.at/' in rv.data
 
             rv = self.app.get(url_for('arche_fetch'))
-            assert b'No entities to retrieve' in rv.data
+            assert b'no entities to retrieve' in rv.data
 
             rv = self.app.post(
                 url_for('admin_content', item='legal_notice'),

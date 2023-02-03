@@ -263,7 +263,6 @@ class SourceDisplay(BaseDisplay):
             data = get_base_table_data(range_)
             data.append(
                 remove_link(range_.name, link_, entity, range_.class_.view))
-            print(range_.class_.name)
             self.tabs[range_.class_.view].table.rows.append(data)
         self.add_reference_tables_data()
         self.add_note_tab()

@@ -10,7 +10,7 @@ from openatlas.database.connect import Transaction
 from openatlas.display.table import Table
 from openatlas.display.util import (
     display_form, get_entities_linked_to_type_recursive, link,
-    required_group, sanitize, uc_first)
+    required_group, sanitize)
 from openatlas.forms.form import get_manager
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
@@ -48,7 +48,7 @@ def hierarchy_insert(category: str) -> Union[str, Response]:
         title=_('types'),
         crumbs=[
             [_('types'), url_for('type_index')],
-            f'+ {uc_first(_(category))}'])
+            '+ <span class="uc-first">' + _(category) + '</span>'])
 
 
 @app.route('/hierarchy/update/<int:id_>', methods=['POST', 'GET'])
