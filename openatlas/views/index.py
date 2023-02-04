@@ -44,9 +44,13 @@ def overview() -> str:
                 ['date', _('visibility'), 'entity', 'class', _('note')]))}
     tables = {
         'overview': Table(
+            [_('class'), _('count')],
             paging=False,
             defs=[{'className': 'dt-body-right', 'targets': 1}]),
-        'latest': Table(paging=False, order=[[0, 'desc']])}
+        'latest': Table(
+            [_('latest'), _('name'), _('class'), _('from'), _('to'), _('user')],
+            paging=False,
+            order=[[0, 'desc']])}
     for entity_id in current_user.bookmarks:
         entity = Entity.get_by_id(entity_id)
         tabs['bookmarks'].table.rows.append([
@@ -79,7 +83,7 @@ def overview() -> str:
         tables['latest'].rows.append([
             format_date(entity.created),
             link(entity),
-            '<span class="uc-first">' + entity.class_.label + '</span>',
+            entity.class_.label,
             entity.first,
             entity.last,
             link(g.logger.get_log_info(entity.id)['creator'])])

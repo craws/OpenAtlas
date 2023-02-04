@@ -26,14 +26,11 @@
 <div class="row">
   {% if tables.overview.rows %}
     <div class="col-12 col-sm-6" style="max-width: 500px">
-      <h1>{{ _('overview')|uc_first }}</h1>
       {{ tables.overview.display('overview')|safe }}
     </div>
   {% endif %}
-
   {% if tables.latest.rows %}
     <div class="col-12 col-sm-6">
-      <h1>{{ _('latest')|uc_first }}</h1>
       {{ tables.latest.display('latest')|safe }}
       <div class="toolbar">
         {{ _('Show all activity')|button(url_for('user_activity'))|safe }}
