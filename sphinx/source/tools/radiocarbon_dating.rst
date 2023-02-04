@@ -12,7 +12,7 @@ button displayed on the level of stratigraphic units.
 After then pressing the **Radiocarbon dating** button, you can add and/or edit
 the following information:
 
-* **Laboratory ID** - an alphanumerical abbreviation of thge lab that conducted
+* **Laboratory ID** - an alphanumerical abbreviation of the lab that conducted
   the analyses, e.g. VERA for Vienna Environmental Research Accelerator
 * **Specimen ID** - a numeric ID given to the sample by the conducting
   laboratory

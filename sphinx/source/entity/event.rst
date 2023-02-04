@@ -14,14 +14,14 @@ CIDOC documentation: :cidoc_entity:`E5 Event<e5-event>`,
   - the most common, e.g. a battle, a meeting or a wedding
 * **Acquisition** (:cidoc_entity:`E8 Acquisition<e8-acquisition>`)
   - mapping a change of property
-* **Event** (:cidoc_entity:`E5 Event<e5-event>`)-
-  used for events not performed by actors, e.g. a natural disaster
-* **Move** (:cidoc_entity:`E9 Move<e9-move>`) -
-  movement of artifacts or persons
-* **Production** (:cidoc_entity:`E12 Production<e12-production>`)
-  - creation of artifacts
 * **Creation** (:cidoc_entity:`E65 Creation<e65-creation>`)
   - creation of documents (files)
+* **Event** (:cidoc_entity:`E5 Event<e5-event>`)
+  - used for events not performed by actors, e.g. a natural disaster
+* **Move** (:cidoc_entity:`E9 Move<e9-move>`)
+  - movement of artifacts or persons
+* **Production** (:cidoc_entity:`E12 Production<e12-production>`)
+  - creation of artifacts
 
 .. include:: navigation.rst
 
@@ -45,14 +45,6 @@ Can be linked via tabs to
 * :doc:`reference`
 * :doc:`file`
 
-Move
-****
-
-* **From** - a :doc:`place` as a start point
-* **To** - a :doc:`place` as a destination point
-* :doc:`artifact` - to select artifacts that were moved
-* :doc:`Person <actor>` - to select persons that were moved
-
 For step by step instructions have a look at our :doc:`/examples/index`.
 
 Acquisition
@@ -67,16 +59,24 @@ select as activity:
 * **acquired title through** for **recipients**
 * **surrendered title through** for **donors**
 
+Creation
+********
+* Document (:doc:`file`) - to select files that were created
+
+The creators of the document can be added via the **Actor** tab and selecting
+the **carried out by** activity while linking them.
+
+Move
+****
+
+* **From** - a :doc:`place` as a start point
+* **To** - a :doc:`place` as a destination point
+* :doc:`artifact` - to select artifacts that were moved
+* :doc:`Person <actor>` - to select persons that were moved
+
 Production
 **********
 * :doc:`artifact` - to select artifacts that were produced
 
 The creators can be added via the **Actor** tab and selecting the **performed**
-activity while linking them.
-
-Creation
-**********
-* Document (:doc:`file`) - to select files that were created
-
-The creators can be added via the **Actor** tab and selecting the **carried out by**
 activity while linking them.
