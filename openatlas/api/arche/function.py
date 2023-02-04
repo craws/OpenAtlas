@@ -152,13 +152,12 @@ def get_type_by_name(type_name: str) -> Optional[Type]:
     return type_
 
 
-def get_hierarchy_by_name(type_name: str) -> Optional[Type]:
-    hierarchy = None
+def get_hierarchy_by_name(name: str) -> Type:
     for type_id in g.types:
-        if g.types[type_id].name == type_name:
+        if g.types[type_id].name == name:
             if not g.types[type_id].root:
-                hierarchy = g.types[type_id]
-    return hierarchy
+                return g.types[type_id]
+    abort(404)
 
 
 def get_or_create_person(name: str, relevance: Type) -> Entity:
@@ -174,7 +173,7 @@ def get_or_create_person(name: str, relevance: Type) -> Entity:
 
 
 def get_or_create_person_types() -> dict[str, Any]:
-    hierarchy: Type = get_hierarchy_by_name('Relevance')
+    hierarchy = get_hierarchy_by_name('Relevance')
     if not hierarchy:
         hierarchy = Entity.insert('type', 'Relevance')
         Type.insert_hierarchy(hierarchy, 'custom', ['person'], True)
