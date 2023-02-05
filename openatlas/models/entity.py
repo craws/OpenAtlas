@@ -354,16 +354,12 @@ class Entity:
         return entities
 
     @staticmethod
-    def insert(
-            class_name: str,
-            name: str,
-            description: Optional[str] = None) -> Union[Entity, Type]:
+    def insert(class_: str, name: str, desc: Optional[str] = None) -> Entity:
         id_ = Db.insert({
             'name': name.strip(),
-            'code': g.classes[class_name].cidoc_class.code,
-            'openatlas_class_name': class_name,
-            'description':
-                sanitize(description, 'text') if description else None})
+            'code': g.classes[class_].cidoc_class.code,
+            'openatlas_class_name': class_,
+            'description': sanitize(desc, 'text') if desc else None})
         return Entity.get_by_id(id_)
 
     @staticmethod
@@ -378,7 +374,7 @@ class Entity:
     def get_by_id(
             id_: int,
             types: bool = False,
-            aliases: bool = False) -> Union[Entity, Type, ReferenceSystem]:
+            aliases: bool = False) -> Entity:
         if id_ in g.types:
             return g.types[id_]
         if id_ in g.reference_systems:

@@ -41,9 +41,9 @@ class BaseManager:
     def __init__(
             self,
             class_: OpenatlasClass,
-            entity: Union[Entity, None],
-            origin: Union[Entity, None],
-            link_: Union[Link, None]):
+            entity: Optional[Entity],
+            origin: Optional[Entity],
+            link_: Optional[Link]):
 
         self.class_ = class_
         self.entity = entity
@@ -66,7 +66,7 @@ class BaseManager:
         if 'date' in self.fields:
             add_date_fields(self.form_class, bool(
                 current_user.settings['module_time']
-                or check_if_entity_has_time(entity)))
+                or (entity and check_if_entity_has_time(entity))))
         if 'description' in self.fields:
             setattr(Form, 'description', TextAreaField(
                 _('content') if class_.name == 'source' else _('description')))
