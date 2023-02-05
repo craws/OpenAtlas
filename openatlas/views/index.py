@@ -47,8 +47,9 @@ def overview() -> str:
             [_('class'), _('count')],
             paging=False,
             defs=[{'className': 'dt-body-right', 'targets': 1}]),
-        'latest': Table(
-            [_('latest'), _('name'), _('class'), _('from'), _('to'), _('user')],
+        'latest': Table([
+                _('latest'), _('name'), _('class'), _('begin'), _('end'),
+                _('user')],
             paging=False,
             order=[[0, 'desc']])}
     for entity_id in current_user.bookmarks:
