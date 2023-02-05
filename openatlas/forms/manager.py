@@ -246,21 +246,7 @@ class FileManager(BaseManager):
 
 
 class GroupManager(ActorBaseManager):
-
-    def additional_fields(self) -> dict[str, Any]:
-        return {
-            'residence': TableField(
-                _('residence'),
-                add_dynamic=['place'],
-                related_tables=['begins_in', 'ends_in']),
-            'begins_in': TableField(
-                _('begins in'),
-                add_dynamic=['place'],
-                related_tables=['residence', 'ends_in']),
-            'ends_in': TableField(
-                _('ends in'),
-                add_dynamic=['place'],
-                related_tables=['begins_in', 'residence'])}
+    pass
 
 
 class HumanRemainsManager(ArtifactBaseManager):
@@ -412,20 +398,9 @@ class MoveManager(EventBaseManager):
 
 class PersonManager(ActorBaseManager):
 
-    def additional_fields(self) -> dict[str, Any]:
-        return {
-            'residence': TableField(
-                _('residence'),
-                add_dynamic=['place'],
-                related_tables=['begins_in', 'ends_in']),
-            'begins_in': TableField(
-                _('born in'),
-                add_dynamic=['place'],
-                related_tables=['residence', 'ends_in']),
-            'ends_in': TableField(_(
-                'died in'),
-                add_dynamic=['place'],
-                related_tables=['begins_in', 'residence'])}
+    def customize_labels(self) -> None:
+        self.form.begins_in.label.text = _('born in')
+        self.form.ends_in.label.text = _('died in')
 
 
 class PlaceManager(BaseManager):
