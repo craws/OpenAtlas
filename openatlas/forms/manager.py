@@ -388,12 +388,14 @@ class MoveManager(EventBaseManager):
             self.add_link(
                 'P27',
                 Link.get_linked_entity_safe(
-                    int(self.form.place_from.data), 'P53'))
+                    int(self.form.place_from.data),
+                    'P53'))
         if self.form.place_to.data:
             self.add_link(
                 'P26',
                 Link.get_linked_entity_safe(
-                    int(self.form.place_to.data), 'P53'))
+                    int(self.form.place_to.data),
+                    'P53'))
 
 
 class PersonManager(ActorBaseManager):
