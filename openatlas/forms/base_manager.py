@@ -110,12 +110,7 @@ class BaseManager:
         self.continue_link_id = self.entity.update(self.data, new)
 
     def customize_labels(self) -> None:
-        if self.class_.name in ('administrative_unit', 'type') \
-                and 'classes' not in self.form:
-            type_ = self.entity or self.origin
-            if isinstance(type_, Type):
-                root = g.types[type_.root[0]] if type_.root else type_
-                getattr(self.form, str(root.id)).label.text = 'super'
+        pass
 
     def add_buttons(self) -> None:
         setattr(
@@ -367,3 +362,38 @@ class HierarchyBaseManager(BaseManager):
                 choices=Type.get_class_choices(self.entity),
                 option_widget=widgets.CheckboxInput(),
                 widget=widgets.ListWidget(prefix_label=False))}
+
+
+class TypeBaseManager(BaseManager):
+    fields = ['name', 'date', 'description', 'continue']
+
+    def additional_fields(self) -> dict[str, Any]:
+        root = self.get_root_type()
+        fields = {
+            'is_type_form': HiddenField(),
+            str(root.id): TreeField(
+                str(root.id),
+                filter_ids=[self.entity.id] if self.entity else [])}
+        if root.directional:
+            fields['name_inverse'] = StringField(_('inverse'))
+        return fields
+
+    def customize_labels(self) -> None:
+        if 'classes' not in self.form:
+            type_ = self.entity or self.origin
+            if isinstance(type_, Type):
+                root = g.types[type_.root[0]] if type_.root else type_
+                getattr(self.form, str(root.id)).label.text = 'super'
+
+    def populate_update(self) -> None:
+        super().populate_update()
+        if hasattr(self.form, 'name_inverse'):  # e.g. actor relation
+            name_parts = self.entity.name.split(' (')
+            self.form.name.data = name_parts[0]
+            if len(name_parts) > 1:
+                self.form.name_inverse.data = name_parts[1][:-1]  # remove ")"
+        if isinstance(self.entity, Type):  # Set super if it isn't the root
+            super_ = g.types[self.entity.root[-1]]
+            root = g.types[self.entity.root[0]]
+            if super_.id != root.id:
+                getattr(self.form, str(root.id)).data = super_.id

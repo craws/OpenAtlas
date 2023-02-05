@@ -10,7 +10,7 @@ from wtforms.validators import InputRequired, Optional, URL
 
 from openatlas.forms.base_manager import (
     ActorBaseManager, ArtifactBaseManager, BaseManager, EventBaseManager,
-    HierarchyBaseManager)
+    HierarchyBaseManager, TypeBaseManager)
 from openatlas.forms.field import (
     DragNDropField, SubmitField, TableField, TableMultiField, TreeField)
 from openatlas.forms.validation import file
@@ -132,28 +132,7 @@ class ActivityManager(EventBaseManager):
     pass
 
 
-class AdministrativeUnitManager(BaseManager):
-    fields = ['name', 'description', 'continue']
-
-    def additional_fields(self) -> dict[str, Any]:
-        root = self.get_root_type()
-        return {
-            'is_type_form': HiddenField(),
-            str(root.id): TreeField(
-                str(root.id),
-                filter_ids=[self.entity.id] if self.entity else [])}
-
-    def populate_update(self) -> None:
-        super().populate_update()
-        if isinstance(self.entity, Type):
-            root = g.types[self.entity.root[0]] \
-                if self.entity.root else self.entity
-            if root:  # Set super if exists and is not same as root
-                super_ = g.types[self.entity.root[-1]]
-                getattr(
-                    self.form,
-                    str(root.id)).data = super_.id \
-                    if super_.id != root.id else None
+class AdministrativeUnitManager(TypeBaseManager):
 
     def process_form(self) -> None:
         super().process_form()
@@ -563,33 +542,7 @@ class StratigraphicUnitManager(BaseManager):
                 SubmitField(_('insert and add') + ' ' + _('human remains')))
 
 
-class TypeManager(BaseManager):
-    fields = ['name', 'date', 'description', 'continue']
-
-    def additional_fields(self) -> dict[str, Any]:
-        root = self.get_root_type()
-        fields = {
-            'is_type_form': HiddenField(),
-            str(root.id): TreeField(
-                str(root.id),
-                filter_ids=[self.entity.id] if self.entity else []
-            ) if root else None}
-        if root.directional:
-            fields['name_inverse'] = StringField(_('inverse'))
-        return fields
-
-    def populate_update(self) -> None:
-        super().populate_update()
-        if hasattr(self.form, 'name_inverse'):  # e.g. actor relation
-            name_parts = self.entity.name.split(' (')
-            self.form.name.data = name_parts[0]
-            if len(name_parts) > 1:
-                self.form.name_inverse.data = name_parts[1][:-1]  # remove ")"
-        if isinstance(self.entity, Type):  # Set super if it isn't the root
-            super_ = g.types[self.entity.root[-1]]
-            root = g.types[self.entity.root[0]]
-            if super_.id != root.id:
-                getattr(self.form, str(root.id)).data = super_.id
+class TypeManager(TypeBaseManager):
 
     def process_form(self) -> None:
         super().process_form()
