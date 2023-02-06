@@ -11,7 +11,6 @@ from openatlas.models.type import Type
 
 def get_loud_entities(
         data: dict[str, Any],
-        parser: dict[str, Any],
         loud: dict[str, str]) -> Any:
     properties_set = defaultdict(list)
     properties_unique = {}
@@ -62,7 +61,8 @@ def get_loud_entities(
         if link_.property.code == 'P127':
             property_name = 'broader'
         else:
-            property_name = loud[get_crm_relation(link_, True).replace(' ', '_')]
+            property_name = \
+                loud[get_crm_relation(link_, True).replace(' ', '_')]
         base_property = get_domain_links()
 
         if link_.property.code == 'P108':

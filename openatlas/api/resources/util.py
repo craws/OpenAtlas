@@ -127,6 +127,7 @@ def remove_duplicate_entities(entities: list[Entity]) -> list[Entity]:
 def remove_spaces_dashes(string: str) -> str:
     return string.replace(' ', '').replace('-', '')
 
+
 def link_parser_check(
         entities: list[Entity],
         parser: dict[str, Any]) -> list[Link]:
@@ -257,4 +258,3 @@ def get_crm_code(link_: Link, inverse: bool = False) -> str:
     code = link_.domain.cidoc_class.code \
         if inverse else link_.range.cidoc_class.code
     return f"crm:{code} {name}"
-
