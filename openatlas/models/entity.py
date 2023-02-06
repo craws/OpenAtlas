@@ -47,13 +47,12 @@ class Entity:
                 if type_.category == 'standard':
                     self.standard_type = type_
 
-        self.aliases: dict[int, str] = {}
+        self.aliases = {}
         if 'aliases' in data and data['aliases']:
             for alias in data['aliases']:  # f1 = alias id, f2 = alias name
                 self.aliases[alias['f1']] = alias['f2']
-            self.aliases = {k: v for k, v in sorted(
-                self.aliases.items(),
-                key=lambda item_: item_[1])}
+            self.aliases = dict(
+                sorted(self.aliases.items(), key=lambda item_: item_[1]))
 
         # Dates
         self.begin_from = None
@@ -355,16 +354,12 @@ class Entity:
         return entities
 
     @staticmethod
-    def insert(
-            class_name: str,
-            name: str,
-            description: Optional[str] = None) -> Union[Entity, Type]:
+    def insert(class_: str, name: str, desc: Optional[str] = None) -> Entity:
         id_ = Db.insert({
             'name': name.strip(),
-            'code': g.classes[class_name].cidoc_class.code,
-            'openatlas_class_name': class_name,
-            'description':
-                sanitize(description, 'text') if description else None})
+            'code': g.classes[class_].cidoc_class.code,
+            'openatlas_class_name': class_,
+            'description': sanitize(desc, 'text') if desc else None})
         return Entity.get_by_id(id_)
 
     @staticmethod
@@ -379,7 +374,7 @@ class Entity:
     def get_by_id(
             id_: int,
             types: bool = False,
-            aliases: bool = False) -> Union[Entity, Type, ReferenceSystem]:
+            aliases: bool = False) -> Entity:
         if id_ in g.types:
             return g.types[id_]
         if id_ in g.reference_systems:
@@ -426,8 +421,9 @@ class Entity:
         entities = Entity.get_by_class(class_)
         for sample in filter(lambda x: x.id not in already_added, entities):
             similar[sample.id] = {'entity': sample, 'entities': []}
-            for entity in filter(lambda y: y.id != sample.id, entities):
-                if fuzz.ratio(sample.name, entity.name) >= ratio:
+            for entity in entities:
+                if entity.id != sample.id \
+                        and fuzz.ratio(sample.name, entity.name) >= ratio:
                     already_added.add(sample.id)
                     already_added.add(entity.id)
                     similar[sample.id]['entities'].append(entity)

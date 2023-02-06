@@ -99,15 +99,10 @@ def import_arche_data() -> int:
                             f'[{item["longitude"]},'
                             f'{item["latitude"]}]}}'})
 
-            event = Entity.insert(
+            production = Entity.insert(
                 'production',
-                f'Creation of graffito from {name}')
-            event.update({'attributes': {'begin_from': item['date']}})
-            event.link('P108', artifact)
-
-            get_or_create_person(
-                item['creator'],
-                person_types['photographer_type'])
+                f'Production of graffito from {name}')
+            production.link('P108', artifact)
 
             file = Entity.insert('file', name, f"Created by {item['creator']}")
             file.link(
@@ -119,6 +114,18 @@ def import_arche_data() -> int:
             open(str(app.config['UPLOAD_DIR'] / filename), "wb") \
                 .write(requests.get(item['image_link_thumbnail']).content)
             file.link('P67', artifact)
+
+            creator = get_or_create_person(
+                item['creator'],
+                person_types['photographer_type'])
+
+            creation = Entity.insert(
+                'creation',
+                f'Creation of photograph from {name}')
+            creation.update({'attributes': {'begin_from': item['date']}})
+            creation.link('P94', file)
+            creation.link('P14', creator)
+
             count += 1
     return count
 
@@ -137,7 +144,7 @@ def get_or_create_type(hierarchy: Type, type_name: str) -> Type:
     return type_entity
 
 
-def get_type_by_name(type_name: str) -> Type:
+def get_type_by_name(type_name: str) -> Optional[Type]:
     type_ = None
     for type_id in g.types:
         if g.types[type_id].name == type_name:
@@ -145,13 +152,12 @@ def get_type_by_name(type_name: str) -> Type:
     return type_
 
 
-def get_hierarchy_by_name(type_name: str) -> Optional[Type]:
-    hierarchy = None
+def get_hierarchy_by_name(name: str) -> Type:
     for type_id in g.types:
-        if g.types[type_id].name == type_name:
+        if g.types[type_id].name == name:
             if not g.types[type_id].root:
-                hierarchy = g.types[type_id]
-    return hierarchy
+                return g.types[type_id]
+    abort(404)
 
 
 def get_or_create_person(name: str, relevance: Type) -> Entity:
@@ -167,7 +173,7 @@ def get_or_create_person(name: str, relevance: Type) -> Entity:
 
 
 def get_or_create_person_types() -> dict[str, Any]:
-    hierarchy: Type = get_hierarchy_by_name('Relevance')
+    hierarchy = get_hierarchy_by_name('Relevance')
     if not hierarchy:
         hierarchy = Entity.insert('type', 'Relevance')
         Type.insert_hierarchy(hierarchy, 'custom', ['person'], True)

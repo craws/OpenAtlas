@@ -46,6 +46,14 @@ class BibliographyDisplay(ReferenceBaseDisplay):
     pass
 
 
+class CreationDisplay(EventsDisplay):
+
+    def add_data(self) -> None:
+        super().add_data()
+        self.data[_('document')] = \
+            [link(file_) for file_ in self.entity.get_linked_entities('P94')]
+
+
 class FileDisplay(BaseDisplay):
 
     def add_data(self) -> None:
@@ -69,8 +77,8 @@ class FileDisplay(BaseDisplay):
         super().add_tabs()
         entity = self.entity
         for name in [
-                'source', 'event', 'actor', 'place', 'feature',
-                'stratigraphic_unit', 'artifact', 'reference', 'type']:
+            'source', 'event', 'actor', 'place', 'feature',
+            'stratigraphic_unit', 'artifact', 'reference', 'type']:
             self.tabs[name] = Tab(name, entity=entity)
         entity.image_id = entity.id if get_file_path(entity.id) else None
         for link_ in entity.get_links('P67'):
@@ -79,14 +87,17 @@ class FileDisplay(BaseDisplay):
             data.append(
                 remove_link(range_.name, link_, entity, range_.class_.view))
             self.tabs[range_.class_.view].table.rows.append(data)
-        for link_ in entity.get_links('P67', True):
+        for link_ in entity.get_links(['P67', 'P94'], True):
             data = get_base_table_data(link_.domain)
             data.append(link_.description)
             data.append(edit_link(
                 url_for('link_update', id_=link_.id, origin_id=entity.id)))
-            data.append(
-                remove_link(link_.domain.name, link_, entity, 'reference'))
-            self.tabs['reference'].table.rows.append(data)
+            data.append(remove_link(
+                link_.domain.name,
+                link_,
+                entity,
+                link_.domain.class_.view))
+            self.tabs[link_.domain.class_.view].table.rows.append(data)
 
 
 class EditionDisplay(ReferenceBaseDisplay):
@@ -189,7 +200,6 @@ class ProductionDisplay(EventsDisplay):
 
 
 class ReferenceSystemDisplay(BaseDisplay):
-
     entity: ReferenceSystem
 
     def add_data(self) -> None:
@@ -250,8 +260,8 @@ class SourceDisplay(BaseDisplay):
         super().add_tabs()
         entity = self.entity
         for name in [
-                'actor', 'artifact', 'feature', 'event', 'place',
-                'stratigraphic_unit', 'text', 'reference', 'file']:
+            'actor', 'artifact', 'feature', 'event', 'place',
+            'stratigraphic_unit', 'text', 'reference', 'file']:
             self.tabs[name] = Tab(name, entity=entity)
         for text in entity.get_linked_entities('P73', types=True):
             self.tabs['text'].table.rows.append([

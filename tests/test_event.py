@@ -93,6 +93,22 @@ class EventTest(TestBaseCase):
             rv = self.app.get(url_for('update', id_=move_id))
             assert b'Keep it moving' in rv.data
 
+            rv = self.app.get(
+                url_for('insert', class_='creation', origin_id=file.id))
+            assert b'+ <span class="uc-first">creation' in rv.data
+
+            rv = self.app.post(
+                url_for('insert', class_='creation'),
+                data={'name': 'A creation event', 'file': file.id})
+            creation_id = rv.location.split('/')[-1]
+
+            rv = self.app.get(
+                url_for('view', id_=creation_id, origin_id=file.id))
+            assert b'File' in rv.data
+
+            rv = self.app.get(url_for('update', id_=creation_id))
+            assert b'A creation event' in rv.data
+
             rv = self.app.post(
                 url_for('insert', class_='production'),
                 data={'name': 'A productive event', 'artifact': artifact.id})

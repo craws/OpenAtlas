@@ -298,8 +298,8 @@ def admin_check_link_duplicates(
                     entity_id=row['entity'].id,
                     type_id=type_.id)
                 remove_links.append(
-                    f'<a href="{url}" class="uc-fist">*' + _("remove") + '</a> '
-                    f'{type_.name}')
+                    f'<a href="{url}" class="uc-fist">*' + _("remove") + '</a>'
+                    f' {type_.name}')
             tab.table.rows.append([
                 link(row['entity']),
                 row['entity'].class_.label,
@@ -375,8 +375,8 @@ def admin_settings(category: str) -> Union[str, Response]:
 def admin_check_similar() -> str:
     form = SimilarForm()
     form.classes.choices = [
-        (class_.name, class_.label) for name, class_ in g.classes.items()
-        if class_.label and class_.view]
+        (class_.name, uc_first(class_.label))
+        for name, class_ in g.classes.items() if class_.label and class_.view]
     table = None
     if form.validate_on_submit():
         table = Table(['name', _('count')])

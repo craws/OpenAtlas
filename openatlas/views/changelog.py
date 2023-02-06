@@ -15,8 +15,14 @@ def index_changelog() -> str:
 
 
 versions = {
-    '7.10.0': ['TBA', {
+    '7.11.0': ['TBA', {
         'feature': {
+            '#1957': 'Dates for administrative units',
+        }
+    }],
+    '7.10.0': ['2023-02-04', {
+        'feature': {
+            '1934': 'New creation event class',
             '1090': 'Radiocarbon Dating',
             '1866': 'Complete Bootstrap layout',
             '1921': 'Additional UI translations - Spanish and Catalan',
@@ -25,11 +31,13 @@ versions = {
             '1924': 'Unify translations, add missing table translations',
             '1950': 'Improved multi select',
             '1917': 'Improved tests',
+            '1918': 'Capitalization of first letter with CSS',
             '1848': 'API: fetch data from ARCHE',
             '1933': 'API: Display images without extension in URL',
             '1814': 'API: more compact API buttons in user interface',
             '1701': 'Manual: added API documentation',
-            '1929': 'Manual: add database file structure'},
+            '1929': 'Manual: add database file structure',
+            '1944': 'Manual: ARCHE import'},
         'fix': {
             '1922': 'Missing user interface translations'}}],
     '7.9.2': ['2023-01-09', {

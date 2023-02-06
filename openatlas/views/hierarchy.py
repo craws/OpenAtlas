@@ -9,8 +9,8 @@ from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    display_form, get_entities_linked_to_type_recursive, link,
-    required_group, sanitize)
+    display_form, get_entities_linked_to_type_recursive, link, required_group,
+    sanitize)
 from openatlas.forms.form import get_manager
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type

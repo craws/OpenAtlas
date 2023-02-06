@@ -120,8 +120,11 @@ def process_origin(manager: Any) -> None:
             'P67',
             manager.origin,
             return_link_id=bool(manager.entity.class_.view == 'reference'))
-    elif manager.origin.class_.view in ['source', 'file'] \
+    elif manager.origin.class_.name == 'source' \
             and manager.entity.class_.name != 'source_translation':
+        manager.add_link('P67', manager.origin, inverse=True)
+    elif manager.origin.class_.name == 'file' \
+            and manager.entity.class_.name != 'creation':
         manager.add_link('P67', manager.origin, inverse=True)
     return
 
