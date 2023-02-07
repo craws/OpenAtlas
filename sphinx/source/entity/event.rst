@@ -78,5 +78,5 @@ Production
 **********
 * :doc:`artifact` - to select artifacts that were produced
 
-The creators can be added via the **Actor** tab and selecting the **performed**
-activity while linking them.
+The creators if the artifact can be added via the **Actor** tab and selecting
+the **carried out by** activity while linking them.
