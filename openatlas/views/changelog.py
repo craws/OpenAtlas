@@ -18,6 +18,7 @@ versions = {
     '7.11.0': ['TBA', {
         'feature': {
             '#1957': 'Dates for administrative units',
+            '#1932': 'Manual: radiocarbon dating',
         }
     }],
     '7.10.0': ['2023-02-04', {
