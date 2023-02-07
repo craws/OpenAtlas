@@ -386,6 +386,26 @@ Years’ War (<a class="reference external" href="https://www.cidoc-crm.org/Enti
 (<a class="reference external" href="https://www.cidoc-crm.org/Property/p81-ongoing-throughout/version-7.1.1">P81</a>) [1648-10-24
 (<a class="reference external" href="https://www.cidoc-crm.org/Property/e61-time-primitive/version-7.1.1">E61</a>)]</p>
 </div>
+<div class="section" id="radiocarbon-dating-type">
+<h3>Radiocarbon dating type<a class="headerlink" href="#radiocarbon-dating-type" title="Permalink to this headline">¶</a></h3>
+<p>To track <a class="reference internal" href="../tools/radiocarbon_dating.html"><span class="doc">radiocarbon dating</span></a>, OpenAtlas links
+a stratigraphic unit (E18) to a type (E55) based on CIDOC CRM classes and
+properties:</p>
+<p>Domain: Stratigraphic Unit as
+<a class="reference external" href="https://www.cidoc-crm.org/Entity/e18-physical-thing/version-7.1.1">E18 - Physical thing</a>
+Range: <a class="reference external" href="https://www.cidoc-crm.org/Entity/e55-type/version-7.1.1">E55 - Type</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">E18</span> <span class="p">(</span><span class="n">Stratigraphic</span> <span class="n">Unit</span><span class="p">)</span> <span class="o">-</span> <span class="n">P2</span> <span class="p">(</span><span class="n">has</span> <span class="nb">type</span><span class="p">)</span> <span class="o">-</span> <span class="n">E55</span> <span class="p">(</span><span class="n">Type</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This specific type is named <strong>radiocarbon dating</strong> and is only used for this
+purpose.
+At the same time, the property (<a class="reference external" href="https://www.cidoc-crm.org/Property/p2-has-type/version-7.1.1">P2</a>) has a
+description linked to it via:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">P2</span> <span class="p">(</span><span class="n">has</span> <span class="nb">type</span><span class="p">)</span> <span class="o">-</span> <span class="n">P3</span> <span class="p">(</span><span class="n">has</span> <span class="n">note</span><span class="p">)</span> <span class="o">-</span> <span class="n">E62</span> <span class="p">(</span><span class="n">String</span><span class="p">)</span>
+<span class="n">P2</span> <span class="p">(</span><span class="n">has</span> <span class="nb">type</span><span class="p">)</span> <span class="o">-</span> <span class="n">P43</span> <span class="p">(</span><span class="n">has</span> <span class="n">dimension</span><span class="p">)</span> <span class="o">-</span> <span class="n">E54</span> <span class="p">(</span><span class="n">Dimension</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
 </div>
 </div>
 
