@@ -9,7 +9,7 @@ from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, display_info, is_authorized, required_group)
+    button, display_info, is_authorized, manual, required_group)
 
 
 @app.route('/arche')
@@ -23,7 +23,8 @@ def arche_index() -> str:
         tabs={'info': Tab(
             'info',
             display_info({
-                k: str(v) for k, v in app.config['ARCHE'].items()}))},
+                k: str(v) for k, v in app.config['ARCHE'].items()}),
+            buttons=[manual('admin/arche')])},
         crumbs=['ARCHE'])
 
 

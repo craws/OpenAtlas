@@ -30,17 +30,16 @@ class Table:
     def display(self, name: str = 'default') -> str:
         if not self.rows:
             return '<p class="uc-first">' + _('no entries') + '</p>'
-        self.defs.append({
-            'className': 'dt-body-right',
-            'targets': [
-                i for i, name in enumerate(self.header)
-                if name in ['begin', 'end', 'count', 'size']]})
         data = {
             'data': self.rows,
             'stateSave': 'true',
             'columns':
-                [{'title': _(i) if i else '', 'className': 'uc-first'} for i in self.header] +
-                [{'title': ''}  # Add empty
+                [{
+                    'title': _(name) if name else '',
+                    'className': 'uc-first' + (
+                        ' dt-body-right' if name in ['count', 'size'] else '')}
+                 for name in self.header] +
+                [{'title': '', 'className': 'uc-first'}
                  for _item in range(len(self.rows[0]) - len(self.header))],
             'paging': self.paging,
             'pageLength': current_user.settings['table_rows'],

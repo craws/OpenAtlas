@@ -1,5 +1,5 @@
 import json
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 from flask import g
 
@@ -225,7 +225,7 @@ class SexEstimation:
                     g.types[id_].id
 
     @staticmethod
-    def calculate(entity: Entity) -> Union[float, None]:
+    def calculate(entity: Entity) -> Optional[float]:
         types = get_sex_types(entity.id)
         if not types:
             return None

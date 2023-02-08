@@ -746,8 +746,7 @@ def timestamp_to_datetime64(string: str) -> Optional[numpy.datetime64]:
     return numpy.datetime64(f'{string_list[0]}T{string_list[1]}')
 
 
-def datetime64_to_timestamp(
-        date: Union[numpy.datetime64, None]) -> Optional[str]:
+def datetime64_to_timestamp(date: Optional[numpy.datetime64]) -> Optional[str]:
     if not date:
         return None
     string = str(date)

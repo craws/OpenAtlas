@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Event &mdash; OpenAtlas 7.9.0 documentation</title>
+  <title>Event &mdash; OpenAtlas 7.10.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                7.9.0
+                7.10.0
               </div>
             
           
@@ -198,16 +198,19 @@
 <a class="reference external" href="https://www.cidoc-crm.org/Entity/e7-activity/version-7.1.1">E7 Activity</a>,
 <a class="reference external" href="https://www.cidoc-crm.org/Entity/e8-acquisition/version-7.1.1">E8 Acquisition</a>,
 <a class="reference external" href="https://www.cidoc-crm.org/Entity/e9-move/version-7.1.1">E9 Move</a> and
-<a class="reference external" href="https://www.cidoc-crm.org/Entity/e12-production/version-7.1.1">E12 Production</a></p>
+<a class="reference external" href="https://www.cidoc-crm.org/Entity/e12-production/version-7.1.1">E12 Production</a>
+<a class="reference external" href="https://www.cidoc-crm.org/Entity/e65-creation/version-7.1.1">E65 Creation</a></p>
 <ul class="simple">
 <li><p><strong>Activity</strong> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e7-activity/version-7.1.1">E7 Activity</a>)
 - the most common, e.g. a battle, a meeting or a wedding</p></li>
 <li><p><strong>Acquisition</strong> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e8-acquisition/version-7.1.1">E8 Acquisition</a>)
 - mapping a change of property</p></li>
-<li><p><strong>Event</strong> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e5-event/version-7.1.1">E5 Event</a>)-
-used for events not performed by actors, e.g. a natural disaster</p></li>
-<li><p><strong>Move</strong> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e9-move/version-7.1.1">E9 Move</a>) -
-movement of artifacts or persons</p></li>
+<li><p><strong>Creation</strong> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e65-creation/version-7.1.1">E65 Creation</a>)
+- creation of documents (files)</p></li>
+<li><p><strong>Event</strong> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e5-event/version-7.1.1">E5 Event</a>)
+- used for events not performed by actors, e.g. a natural disaster</p></li>
+<li><p><strong>Move</strong> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e9-move/version-7.1.1">E9 Move</a>)
+- movement of artifacts or persons</p></li>
 <li><p><strong>Production</strong> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e12-production/version-7.1.1">E12 Production</a>)
 - creation of artifacts</p></li>
 </ul>
@@ -240,16 +243,7 @@ entering a journey</p></li>
 <li><p><a class="reference internal" href="reference.html"><span class="doc">Reference</span></a></p></li>
 <li><p><a class="reference internal" href="file.html"><span class="doc">File</span></a></p></li>
 </ul>
-<div class="section" id="move">
-<h3>Move<a class="headerlink" href="#move" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li><p><strong>From</strong> - a <a class="reference internal" href="place.html"><span class="doc">Place</span></a> as a start point</p></li>
-<li><p><strong>To</strong> - a <a class="reference internal" href="place.html"><span class="doc">Place</span></a> as a destination point</p></li>
-<li><p><a class="reference internal" href="artifact.html"><span class="doc">Artifact</span></a> - to select artifacts that were moved</p></li>
-<li><p><a class="reference internal" href="actor.html"><span class="doc">Person</span></a> - to select persons that were moved</p></li>
-</ul>
 <p>For step by step instructions have a look at our <a class="reference internal" href="../examples/index.html"><span class="doc">Examples</span></a>.</p>
-</div>
 <div class="section" id="acquisition">
 <h3>Acquisition<a class="headerlink" href="#acquisition" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
@@ -264,13 +258,30 @@ select as activity:</p>
 <li><p><strong>surrendered title through</strong> for <strong>donors</strong></p></li>
 </ul>
 </div>
+<div class="section" id="creation">
+<h3>Creation<a class="headerlink" href="#creation" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Document (<a class="reference internal" href="file.html"><span class="doc">File</span></a>) - to select files that were created</p></li>
+</ul>
+<p>The creators of the document can be added via the <strong>Actor</strong> tab and selecting
+the <strong>carried out by</strong> activity while linking them.</p>
+</div>
+<div class="section" id="move">
+<h3>Move<a class="headerlink" href="#move" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>From</strong> - a <a class="reference internal" href="place.html"><span class="doc">Place</span></a> as a start point</p></li>
+<li><p><strong>To</strong> - a <a class="reference internal" href="place.html"><span class="doc">Place</span></a> as a destination point</p></li>
+<li><p><a class="reference internal" href="artifact.html"><span class="doc">Artifact</span></a> - to select artifacts that were moved</p></li>
+<li><p><a class="reference internal" href="actor.html"><span class="doc">Person</span></a> - to select persons that were moved</p></li>
+</ul>
+</div>
 <div class="section" id="production">
 <h3>Production<a class="headerlink" href="#production" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="artifact.html"><span class="doc">Artifact</span></a> - to select artifacts that were produced</p></li>
 </ul>
-<p>The creators can be added via the <strong>Actor</strong> tab and selecting the <strong>performed</strong>
-activity while linking them.</p>
+<p>The creators if the artifact can be added via the <strong>Actor</strong> tab and selecting
+the <strong>carried out by</strong> activity while linking them.</p>
 </div>
 </div>
 </div>

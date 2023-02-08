@@ -90,3 +90,9 @@ according to Ferembach et al. is the first step in this direction.
 
 * :doc:`Sex estimation </tools/anthropological_analyses>` based on the method
   given by Ferembach et al. 1979
+
+Radiocarbon Dating
+------------------
+
+This tool is ment to track results of radiocarbon dating, see
+:doc:`here </tools/radiocarbon_dating>`.

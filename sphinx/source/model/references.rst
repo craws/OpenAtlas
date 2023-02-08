@@ -67,7 +67,7 @@ model.link table in the following way:
 * range_id: ID of the entity
 * description: delimiter (alphanumeric)
 
-This combination of :cidoc_entity:`E32<EE32-Authority-Document>` and delimiter
+This combination of :cidoc_entity:`E32<E32-Authority-Document>` and delimiter
 could furthermore be resolved as :cidoc_entity:`E31 Document<E31-Document>` as
 it is a unique reference documenting the entity while the E32 alone is the
 container for all possible references from this authority document.
@@ -85,7 +85,7 @@ Example:
 [`Q46248 <https://www.wikidata.org/wiki/Q46248>`_
 (:cidoc_entity:`E31 Document<E31-Document>`)] is listed in
 (:cidoc_property:`P71i<P71-lists>`)[`WikiData <https://www.wikidata.org/wiki/>`_
-(:cidoc_entity:`E32<EE32-Authority-Document>`)]
+(:cidoc_entity:`E32<E32-Authority-Document>`)]
 
 
 References and Files

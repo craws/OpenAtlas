@@ -144,9 +144,9 @@ $(document).ready(function () {
             $(this).validate({
                 errorClass: "d-block error",
                 submitHandler: function (form) {
-                    if (this.submitButton?.id === "insert_and_continue") $('#continue_').val('yes');
-                    if (this.submitButton?.id === "insert_continue_sub") $('#continue_').val('sub');
-                    if (this.submitButton?.id === "insert_continue_human_remains") $('#continue_').val('human_remains');
+                    if (this.submitButton.id === "insert_and_continue") $('#continue_').val('yes');
+                    if (this.submitButton.id === "insert_continue_sub") $('#continue_').val('sub');
+                    if (this.submitButton.id === "insert_continue_human_remains") $('#continue_').val('human_remains');
                         $('input[type="submit"]').prop("disabled", true).val('... in progress');
                         form.submit();
                     },
@@ -154,14 +154,15 @@ $(document).ready(function () {
         });
 
     //add required to reference precision if reference is set
-    $("[id^=reference_system_value]").on('keyup', function () {
-        console.log('hallo',this.value)
-        const select = $(`#reference_system_precision_${this.id.split('_').pop()}`);
-        if (!this.value?.length)
-            select.removeClass('required');
-        else
-            select.addClass('required');
-    });
+    ['keyup','change'].forEach((listener) =>{
+        $("[id^=reference_system_value]").on(listener, function () {
+            const select = $(`#reference_system_precision_${this.id.split('_').pop()}`);
+            if (!this.value?.length)
+                select.removeClass('required');
+            else
+                select.addClass('required');
+        });
+    })
 
     $("div[id*='-modal']").on('shown.bs.modal', function () {
         $("input[id*='-tree-search']").focus();

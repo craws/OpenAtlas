@@ -460,6 +460,6 @@ function processUcFirst(){
       if (obj!=NaN && !!obj?.firstChild && obj?.firstChild?.nodeType === 3 && obj?.firstChild?.data)
         obj.firstChild.data = capitalizeFirstLetter(obj.firstChild.data)
     });
-    document.body.style.display = '';
+    document.body.style.opacity = 1;
   }
 }

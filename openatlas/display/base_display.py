@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 from flask import g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -16,7 +16,6 @@ from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.models.overlay import Overlay
-from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.models.user import User
 from openatlas.views.entity_index import file_preview
@@ -24,7 +23,7 @@ from openatlas.views.entity_index import file_preview
 
 class BaseDisplay:
 
-    entity: Union[Entity, ReferenceSystem, Type]
+    entity: Entity
     tabs: dict[str, Tab]
     events: list[Entity]
     event_links: Optional[list[Link]]  # Needed for actor and info data
@@ -37,7 +36,7 @@ class BaseDisplay:
     problematic_type: bool = False
     data: dict[str, Any]
 
-    def __init__(self, entity: Union[Entity, Type]) -> None:
+    def __init__(self, entity: Entity) -> None:
         self.entity = entity
         self.events = []
         self.event_links = []

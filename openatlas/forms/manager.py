@@ -10,7 +10,7 @@ from wtforms.validators import InputRequired, Optional, URL
 
 from openatlas.forms.base_manager import (
     ActorBaseManager, ArtifactBaseManager, BaseManager, EventBaseManager,
-    HierarchyBaseManager)
+    HierarchyBaseManager, TypeBaseManager)
 from openatlas.forms.field import (
     DragNDropField, SubmitField, TableField, TableMultiField, TreeField)
 from openatlas.forms.validation import file
@@ -132,28 +132,7 @@ class ActivityManager(EventBaseManager):
     pass
 
 
-class AdministrativeUnitManager(BaseManager):
-    fields = ['name', 'description', 'continue']
-
-    def additional_fields(self) -> dict[str, Any]:
-        root = self.get_root_type()
-        return {
-            'is_type_form': HiddenField(),
-            str(root.id): TreeField(
-                str(root.id),
-                filter_ids=[self.entity.id] if self.entity else [])}
-
-    def populate_update(self) -> None:
-        super().populate_update()
-        if isinstance(self.entity, Type):
-            root = g.types[self.entity.root[0]] \
-                if self.entity.root else self.entity
-            if root:  # Set super if exists and is not same as root
-                super_ = g.types[self.entity.root[-1]]
-                getattr(
-                    self.form,
-                    str(root.id)).data = super_.id \
-                    if super_.id != root.id else None
+class AdministrativeUnitManager(TypeBaseManager):
 
     def process_form(self) -> None:
         super().process_form()
@@ -176,10 +155,10 @@ class ArtifactManager(ArtifactBaseManager):
                 [entity.id] + \
                 [e.id for e in entity.get_linked_entities_recursive('P46')]
         return dict(super().additional_fields(), **{
-                'artifact_super': TableField(
-                    _('super'),
-                    filter_ids=filter_ids,
-                    add_dynamic=['place'])})
+            'artifact_super': TableField(
+                _('super'),
+                filter_ids=filter_ids,
+                add_dynamic=['place'])})
 
     def populate_insert(self) -> None:
         if self.origin and self.origin.class_.view in ['artifact', 'place']:
@@ -198,6 +177,27 @@ class ArtifactManager(ArtifactBaseManager):
 
 class BibliographyManager(BaseManager):
     fields = ['name', 'description', 'continue']
+
+
+class CreationManager(EventBaseManager):
+
+    def additional_fields(self) -> dict[str, Any]:
+        return dict(super().additional_fields(), **{
+            'file': TableMultiField(_('document'))})
+
+    def populate_insert(self) -> None:
+        if self.origin and self.origin.class_.name == 'file':
+            self.form.file.data = [self.origin.id]
+
+    def populate_update(self) -> None:
+        super().populate_update()
+        self.form.file.data = [
+            entity.id for entity in self.entity.get_linked_entities('P94')]
+
+    def process_form(self) -> None:
+        super().process_form()
+        self.data['links']['delete'].add('P94')
+        self.add_link('P94', self.form.file.data)
 
 
 class EditionManager(BaseManager):
@@ -246,21 +246,7 @@ class FileManager(BaseManager):
 
 
 class GroupManager(ActorBaseManager):
-
-    def additional_fields(self) -> dict[str, Any]:
-        return {
-            'residence': TableField(
-                _('residence'),
-                add_dynamic=['place'],
-                related_tables=['begins_in', 'ends_in']),
-            'begins_in': TableField(
-                _('begins in'),
-                add_dynamic=['place'],
-                related_tables=['residence', 'ends_in']),
-            'ends_in': TableField(
-                _('ends in'),
-                add_dynamic=['place'],
-                related_tables=['begins_in', 'residence'])}
+    pass
 
 
 class HumanRemainsManager(ArtifactBaseManager):
@@ -318,7 +304,8 @@ class InvolvementManager(BaseManager):
         elif self.origin and self.origin.class_.view != 'actor':
             event_class_name = self.origin.class_.name
         choices = [('P11', g.properties['P11'].name)]
-        if event_class_name in ['acquisition', 'activity']:
+        if event_class_name in \
+                ['acquisition', 'activity', 'creation', 'production']:
             choices.append(('P14', g.properties['P14'].name))
             if event_class_name == 'acquisition':
                 choices.append(('P22', g.properties['P22'].name))
@@ -402,30 +389,21 @@ class MoveManager(EventBaseManager):
             self.add_link(
                 'P27',
                 Link.get_linked_entity_safe(
-                    int(self.form.place_from.data), 'P53'))
+                    int(self.form.place_from.data),
+                    'P53'))
         if self.form.place_to.data:
             self.add_link(
                 'P26',
                 Link.get_linked_entity_safe(
-                    int(self.form.place_to.data), 'P53'))
+                    int(self.form.place_to.data),
+                    'P53'))
 
 
 class PersonManager(ActorBaseManager):
 
-    def additional_fields(self) -> dict[str, Any]:
-        return {
-            'residence': TableField(
-                _('residence'),
-                add_dynamic=['place'],
-                related_tables=['begins_in', 'ends_in']),
-            'begins_in': TableField(
-                _('born in'),
-                add_dynamic=['place'],
-                related_tables=['residence', 'ends_in']),
-            'ends_in': TableField(_(
-                'died in'),
-                add_dynamic=['place'],
-                related_tables=['begins_in', 'residence'])}
+    def customize_labels(self) -> None:
+        self.form.begins_in.label.text = _('born in')
+        self.form.ends_in.label.text = _('died in')
 
 
 class PlaceManager(BaseManager):
@@ -542,33 +520,7 @@ class StratigraphicUnitManager(BaseManager):
                 SubmitField(_('insert and add') + ' ' + _('human remains')))
 
 
-class TypeManager(BaseManager):
-    fields = ['name', 'date', 'description', 'continue']
-
-    def additional_fields(self) -> dict[str, Any]:
-        root = self.get_root_type()
-        fields = {
-            'is_type_form': HiddenField(),
-            str(root.id): TreeField(
-                str(root.id),
-                filter_ids=[self.entity.id] if self.entity else []
-            ) if root else None}
-        if root.directional:
-            fields['name_inverse'] = StringField(_('inverse'))
-        return fields
-
-    def populate_update(self) -> None:
-        super().populate_update()
-        if hasattr(self.form, 'name_inverse'):  # e.g. actor relation
-            name_parts = self.entity.name.split(' (')
-            self.form.name.data = name_parts[0]
-            if len(name_parts) > 1:
-                self.form.name_inverse.data = name_parts[1][:-1]  # remove ")"
-        if isinstance(self.entity, Type):  # Set super if it isn't the root
-            super_ = g.types[self.entity.root[-1]]
-            root = g.types[self.entity.root[0]]
-            if super_.id != root.id:
-                getattr(self.form, str(root.id)).data = super_.id
+class TypeManager(TypeBaseManager):
 
     def process_form(self) -> None:
         super().process_form()

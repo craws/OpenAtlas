@@ -233,3 +233,30 @@ Example: [Thirty Years' War
 Years' War (:cidoc_entity:`E52<e52-time-span>`)] ongoing throughout
 (:cidoc_property:`P81<p81-ongoing-throughout>`) [1648-10-24
 (:cidoc_property:`E61<e61-time-primitive>`)]
+
+Radiocarbon dating type
++++++++++++++++++++++++
+
+To track :doc:`radiocarbon dating </tools/radiocarbon_dating>`, OpenAtlas links
+a stratigraphic unit (E18) to a type (E55) based on CIDOC CRM classes and
+properties:
+
+Domain: Stratigraphic Unit as
+:cidoc_entity:`E18 - Physical thing <e18-physical-thing>`
+Range: :cidoc_entity:`E55 - Type<e55-type>`
+
+::
+
+   E18 (Stratigraphic Unit) - P2 (has type) - E55 (Type)
+
+This specific type is named **radiocarbon dating** and is only used for this
+purpose.
+At the same time, the property (:cidoc_property:`P2<p2-has-type>`) has a
+description linked to it via:
+
+::
+
+   P2 (has type) - P3 (has note) - E62 (String)
+   P2 (has type) - P43 (has dimension) - E54 (Dimension)
+
+

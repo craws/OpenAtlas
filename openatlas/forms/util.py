@@ -40,7 +40,8 @@ def get_form_settings(form: Any, profile: bool = False) -> dict[str, str]:
         if field.type in ['StringField', 'IntegerField']:
             settings[field.label.text] = value
         if field.type == 'BooleanField':  # str() needed for templates
-            settings[field.label.text] = str(_('on')) if value else str(_('off'))
+            settings[field.label.text] = \
+                str(_('on')) if value else str(_('off'))
         if field.type == 'SelectField':
             if isinstance(value, str) and value.isdigit():
                 value = int(value)
@@ -199,15 +200,8 @@ def inject_template_functions() -> dict[str, Union[str, GlobalSearchForm]]:
         search_form=GlobalSearchForm(prefix='global'))
 
 
-def check_if_entity_has_time(
-        entity: Optional[Union[Entity, Link, Type]]) -> bool:
-    if not entity:
-        return False
-    for item in [
-            entity.begin_from,
-            entity.begin_to,
-            entity.end_from,
-            entity.end_to]:
-        if '00:00:00' not in str(item) and item:
+def check_if_entity_has_time(item: Union[Entity, Link]) -> bool:
+    for date_ in [item.begin_from, item.begin_to, item.end_from, item.end_to]:
+        if date_ and '00:00:00' not in str(date_):
             return True
     return False

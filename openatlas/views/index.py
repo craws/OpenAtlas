@@ -24,13 +24,15 @@ from openatlas.models.user import User
 @app.route('/overview')
 def overview() -> str:
     if not current_user.is_authenticated:
-        tabs = {
-            'info': Tab(
-                'info',
-                render_template(
-                    'index/index_guest.html',
-                    intro=get_translation('intro')))}
-        return render_template('tabs.html', tabs=tabs, crumbs=['overview'])
+        return render_template(
+            'tabs.html',
+            tabs={
+                'info': Tab(
+                    'info',
+                    render_template(
+                        'index/index_guest.html',
+                        intro=get_translation('intro')))},
+            crumbs=['overview'])
     tabs = {
         'info': Tab('info'),
         'bookmarks': Tab(
@@ -42,9 +44,14 @@ def overview() -> str:
                 ['date', _('visibility'), 'entity', 'class', _('note')]))}
     tables = {
         'overview': Table(
+            [_('class'), _('count')],
             paging=False,
             defs=[{'className': 'dt-body-right', 'targets': 1}]),
-        'latest': Table(paging=False, order=[[0, 'desc']])}
+        'latest': Table([
+                _('latest'), _('name'), _('class'), _('begin'), _('end'),
+                _('user')],
+            paging=False,
+            order=[[0, 'desc']])}
     for entity_id in current_user.bookmarks:
         entity = Entity.get_by_id(entity_id)
         tabs['bookmarks'].table.rows.append([
