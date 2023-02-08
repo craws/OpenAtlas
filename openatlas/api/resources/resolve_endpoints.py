@@ -182,7 +182,7 @@ def get_entities_formatted(
     for link_ in link_parser_check_inverse(entities, parser):
         entities_dict[link_.range.id]['links_inverse'].append(link_)
     if parser['format'] == 'loud':
-        return [get_loud_entities(item, parser, parse_loud_contex())
+        return [get_loud_entities(item, parse_loud_contex())
                 for item in entities_dict.values()]
     result = []
     for item in entities_dict.values():

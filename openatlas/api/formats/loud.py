@@ -29,7 +29,7 @@ def get_loud_entities(
 
     def get_range_links() -> dict[str, Any]:
         property_ = {
-            'id': url_for('view', id_=link_.range.id, _external=True),
+            'id': url_for('api.entity', id_=link_.range.id, _external=True),
             'type': loud[get_crm_code(link_).replace(' ', '_')],
             '_label': link_.range.name}
         if type_ := get_standard_type_loud(link_.range.types):
@@ -38,7 +38,7 @@ def get_loud_entities(
 
     def get_domain_links() -> dict[str, Any]:
         property_ = {
-            'id': url_for('view', id_=link_.domain.id, _external=True),
+            'id': url_for('api.entity', id_=link_.domain.id, _external=True),
             'type': loud[get_crm_code(link_, True).replace(' ', '_')],
             '_label': link_.domain.name, }
         if type_ := get_standard_type_loud(link_.domain.types):
@@ -87,7 +87,7 @@ def get_loud_timespan(entity: Entity) -> dict[str, Any]:
 
 def get_type_property(type_: Type) -> dict[str, Any]:
     return {
-        'id': url_for('view', id_=type_.id, _external=True),
+        'id': url_for('api.entity', id_=type_.id, _external=True),
         'type': remove_spaces_dashes(type_.cidoc_class.i18n['en']),
         '_label': type_.name}
 
