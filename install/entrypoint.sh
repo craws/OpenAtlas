@@ -1,4 +1,5 @@
 #!/bin/bash
+# This is only needed in case of a docker installation
 
 # shellcheck disable=SC1091
 
@@ -24,7 +25,6 @@ DATABASE_PASS='$POSTGRES_PASSWORD'
 MAIL_PASSWORD='$MAIL_PASSWORD'
 SECRET_KEY='$COOKIE_KEY'  # Used for cookies
 EOF
-
 
 source check_database.sh
 

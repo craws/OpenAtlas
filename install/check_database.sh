@@ -1,4 +1,5 @@
 #!/bin/bash
+# This is only needed in case of a docker installation
 
 pushd /var/www/openatlas || exit
 
@@ -33,6 +34,5 @@ then
 else
   create_database
 fi
-
 
 popd || exit
