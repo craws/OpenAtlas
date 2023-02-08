@@ -18,6 +18,8 @@ versions = {
     '7.11.0': ['TBA', {
         'feature': {
             '#1957': 'Dates for administrative units',
+            '#1961': 'Installation via Docker',
+            '#1582': 'GitHub test actions',
             '#1932': 'Manual: radiocarbon dating',
         },
         'fix': {

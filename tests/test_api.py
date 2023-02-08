@@ -192,7 +192,7 @@ class Api(ApiTestCase):
                         view_class='place',
                         format='n3'))]:
                     assert b'Shire' in rv.data
-            except OSError:
+            except OSError:  # pragma: no cover
                 pass
 
             # Test Entity export and RDFS
