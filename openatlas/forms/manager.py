@@ -304,7 +304,8 @@ class InvolvementManager(BaseManager):
         elif self.origin and self.origin.class_.view != 'actor':
             event_class_name = self.origin.class_.name
         choices = [('P11', g.properties['P11'].name)]
-        if event_class_name in ['acquisition', 'activity', 'creation']:
+        if event_class_name in \
+                ['acquisition', 'activity', 'creation', 'production']:
             choices.append(('P14', g.properties['P14'].name))
             if event_class_name == 'acquisition':
                 choices.append(('P22', g.properties['P22'].name))
