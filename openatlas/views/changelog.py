@@ -18,8 +18,10 @@ versions = {
     '7.11.0': ['TBA', {
         'feature': {
             '#1957': 'Dates for administrative units',
+            '#1963': 'Show API download buttons by default',
             '#1961': 'Installation via Docker',
             '#1582': 'GitHub test actions',
+            '#1964': 'Deletion of old system logs',
             '#1932': 'Manual: radiocarbon dating',
         },
         'fix': {
