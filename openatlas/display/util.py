@@ -206,9 +206,6 @@ def get_system_data(entity: Entity) -> dict[str, Any]:
         data[_('imported from')] = link(info['project'])
         data[_('imported by')] = link(info['importer'])
         data['origin ID'] = info['origin_id']
-    if 'entity_show_api' in current_user.settings \
-            and current_user.settings['entity_show_api']:
-        data['API'] = render_template('util/api_links.html', entity=entity)
     return data
 
 

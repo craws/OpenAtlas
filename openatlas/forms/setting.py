@@ -127,7 +127,6 @@ class DisplayForm(FlaskForm):
         _('show created and modified information'))
     entity_show_import = BooleanField(_('show import information'))
     entity_show_class = BooleanField(_('show CIDOC class'))
-    entity_show_api = BooleanField(_('show API links'))
     map_zoom_default = IntegerField(_('default map zoom'), [InputRequired()])
     map_zoom_max = IntegerField(_('max map zoom'), [InputRequired()])
     save = SubmitField(_('save'))

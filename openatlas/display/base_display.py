@@ -51,7 +51,6 @@ class BaseDisplay:
         self.add_crumbs()
         self.buttons = [manual(f'entity/{self.entity.class_.view}')]
         self.add_buttons()
-        self.buttons.append(bookmark_toggle(self.entity.id))
         self.buttons.append(siblings_pager(self.entity, self.structure))
         if self.linked_places:
             self.gis_data = Gis.get_all(self.linked_places)
@@ -123,11 +122,16 @@ class BaseDisplay:
             self.tabs['note'].table.rows.append(data)
 
     def add_buttons(self) -> None:
+
         if is_authorized(self.entity.class_.write_access):
             if not self.problematic_type:
                 self.buttons.append(
                     button(_('edit'), url_for('update', id_=self.entity.id)))
             self.buttons.append(delete_link(self.entity))
+        self.buttons.append(bookmark_toggle(self.entity.id))
+        self.buttons.append(
+            render_template('util/api_links.html', entity=self.entity))
+
 
     def add_data(self) -> None:
         self.data = {
