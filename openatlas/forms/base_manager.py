@@ -398,7 +398,7 @@ class TypeBaseManager(BaseManager):
         return fields
 
     def customize_labels(self) -> None:
-        if hasattr(self.form, 'classes'):
+        if not hasattr(self.form, 'classes'):
             type_ = self.entity or self.origin
             if isinstance(type_, Type):
                 root = g.types[type_.root[0]] if type_.root else type_

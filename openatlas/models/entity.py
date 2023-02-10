@@ -17,7 +17,7 @@ from openatlas.models.link import Link
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.type import Type
-    from openatlas.models.reference_system import ReferenceSystem
+
 
 
 class Entity:
@@ -208,6 +208,7 @@ class Entity:
                 self.link('P1', Entity.insert('appellation', alias))
 
     def update_links(self, data: dict[str, Any], new: bool) -> Optional[int]:
+        from openatlas.models.reference_system import ReferenceSystem
         if not new:
             if 'delete' in data['links'] and data['links']['delete']:
                 self.delete_links(data['links']['delete'])
