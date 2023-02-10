@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from flask import g, url_for
 from flask_babel import lazy_gettext as _
 
@@ -10,8 +14,9 @@ from openatlas.display.util import (
     button, delete_link, edit_link, format_entity_date, get_base_table_data,
     get_file_path, is_authorized, link, remove_link)
 from openatlas.models.entity import Entity
-from openatlas.models.reference_system import ReferenceSystem
 
+if TYPE_CHECKING:  # pragma: no cover
+    from openatlas.models.reference_system import ReferenceSystem
 
 class AcquisitionDisplay(EventsDisplay):
 

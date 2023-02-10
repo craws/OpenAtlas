@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Any, Optional, TYPE_CHECKING
 
 from flask import g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -16,10 +18,11 @@ from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.models.overlay import Overlay
-from openatlas.models.type import Type
 from openatlas.models.user import User
 from openatlas.views.entity_index import file_preview
 
+if TYPE_CHECKING:  # pragma: no cover
+    from openatlas.models.type import Type
 
 class BaseDisplay:
 

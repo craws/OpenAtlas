@@ -135,7 +135,7 @@ def get_linked_image(data: list[dict[str, Any]]) -> str:
             if str(image['mime'][0]) == 'image/jpeg'][0]
 
 
-def get_or_create_type(hierarchy: Type, type_name: str) -> Type:
+def get_or_create_type(hierarchy: Entity, type_name: str) -> Entity:
     if type_ := get_type_by_name(type_name):
         if type_.root[0] == hierarchy.id:
             return type_
@@ -173,7 +173,7 @@ def get_or_create_person(name: str, relevance: Type) -> Entity:
 
 
 def get_or_create_person_types() -> dict[str, Any]:
-    hierarchy = get_hierarchy_by_name('Relevance')
+    hierarchy: Entity = get_hierarchy_by_name('Relevance')
     if not hierarchy:
         hierarchy = Entity.insert('type', 'Relevance')
         Type.insert_hierarchy(hierarchy, 'custom', ['person'], True)

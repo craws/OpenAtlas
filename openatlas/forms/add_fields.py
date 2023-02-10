@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from collections import OrderedDict
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from flask import g
 from flask_babel import lazy_gettext as _
@@ -12,8 +14,10 @@ from openatlas.display.util import is_authorized
 from openatlas.forms.field import (
     ReferenceField, TreeField, TreeMultiField, ValueTypeField,
     ValueTypeRootField)
-from openatlas.models.openatlas_class import OpenatlasClass
 from openatlas.models.type import Type
+
+if TYPE_CHECKING:  # pragma: no cover
+    from openatlas.models.openatlas_class import OpenatlasClass
 
 
 def add_reference_systems(class_: OpenatlasClass, form: Any) -> None:
