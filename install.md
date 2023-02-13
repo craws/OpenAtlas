@@ -154,7 +154,8 @@ Run tests with coverage
 
 ## Docker 
 
-Be aware, Docker installation is in an experimental state. It is **NOT** meant for usage as productive system!
+Be aware, Docker installation is in an experimental state. 
+It is **NOT** meant for usage as productive system!
 To run OpenAtlas as Docker container clone the repository
 
     $ git clone https://github.com/craws/OpenAtlas.git
@@ -171,7 +172,8 @@ Now an OpenAtlas instance is available under **localhost:8080**.
 
 ### Restore database dump
 
-To restore a database dump uncomment following command in ./docker-compose.yml and modify the first path. 
-Make sure that no previous database is installed (e.g. delete ./data/db/), as the dump will not be executed. 
+To restore a database dump uncomment following command in ./docker-compose.yml 
+and modify the first path. Make sure that no previous database is installed 
+(e.g. delete ./data/db/), as the dump will not be executed. 
 
     $ - ./files/export/dump.sql:/docker-entrypoint-initdb.d/dump.sql
