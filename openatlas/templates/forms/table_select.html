@@ -108,6 +108,7 @@
 
       $('#{{field.id}}-add-{{ add_dynamical }}')
           .on('click', async function (e) {
+              $(this).prop("disabled", true).text('{{ _("in progress") }}');
               const name = $("#add-{{ add_dynamical }}-modal-{{field.id}} #name_dynamic").val();
               const description = $("#add-{{ add_dynamical }}-modal-{{field.id}} #description_dynamic").val();
               const entityName = '{{ add_dynamical }}';
@@ -119,6 +120,7 @@
               relatedTables
                   ?.forEach(x => refillTable(x, {{ field.filter_ids }}));
               await refillTable('{{ field.id }}', {{ field.filter_ids }});
+              $(this).prop("disabled", false).text('{{ _('insert')|uc_first }}');
               $('.modal').modal('hide');
               selectFromTable(undefined, '{{ field.id }}', entityId, name)
           });
