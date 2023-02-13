@@ -1,4 +1,5 @@
 const variables = {}
+
 /* Show and hide function for value type input fields. Has to be outside of $(document).ready() */
 function switch_value_type(id, el) {
     if (el.hasAttribute('show')) {
@@ -68,13 +69,13 @@ $(document).ready(function () {
     // $('label[for="show_passwords"]').css('display', 'block');
     $('#show_passwords').show()
 
-    .change(function () {
-        $('#password')[0].type = this.checked ? 'text' : 'password';
-        $('#password2')[0].type = this.checked ? 'text' : 'password';
-        if (document.getElementById('password_old')) {
-            $('#password_old')[0].type = this.checked ? 'text' : 'password';
-        }
-    });
+        .change(function () {
+            $('#password')[0].type = this.checked ? 'text' : 'password';
+            $('#password2')[0].type = this.checked ? 'text' : 'password';
+            if (document.getElementById('password_old')) {
+                $('#password_old')[0].type = this.checked ? 'text' : 'password';
+            }
+        });
 
     /* Below section sets up validation for various forms */
     // Enable validation for hidden fields
@@ -147,14 +148,14 @@ $(document).ready(function () {
                     if (this.submitButton.id === "insert_and_continue") $('#continue_').val('yes');
                     if (this.submitButton.id === "insert_continue_sub") $('#continue_').val('sub');
                     if (this.submitButton.id === "insert_continue_human_remains") $('#continue_').val('human_remains');
-                        $('input[type="submit"]').prop("disabled", true).val('... in progress');
-                        form.submit();
-                    },
-                });
+                    $('button[type="submit"]').prop("disabled", true).text(translate.inProgress);
+                    form.submit();
+                },
+            });
         });
 
     //add required to reference precision if reference is set
-    ['keyup','change'].forEach((listener) =>{
+    ['keyup', 'change'].forEach((listener) => {
         $("[id^=reference_system_value]").on(listener, function () {
             const select = $(`#reference_system_precision_${this.id.split('_').pop()}`);
             if (!this.value?.length)
@@ -170,7 +171,7 @@ $(document).ready(function () {
     });
 
     $('.extend-icon').click((a) => {
-        if(a.currentTarget.id === 'extend-form-icon') {
+        if (a.currentTarget.id === 'extend-form-icon') {
             $('#extend-form-icon').hide();
             $('#extend-map-icon').show();
             $('.col-xl-4').toggleClass("col-xl-4").toggleClass("col-xl-10");
@@ -183,13 +184,13 @@ $(document).ready(function () {
         $('.col-xl-2').toggleClass("col-xl-2").toggleClass("col-xl-8");
     });
 
-    $( ".modal" ).on('shown.bs.modal', function(){
-        $(`#${this.id} input`)?.get(0)?.focus() 
+    $(".modal").on('shown.bs.modal', function () {
+        $(`#${this.id} input`)?.get(0)?.focus()
     });
 
 });
 
-const closableBadge = (name, onclick='') => `
+const closableBadge = (name, onclick = '') => `
       <div onclick="event.stopPropagation()" class="badge col-auto bg-gray">
         <div class="d-flex align-items-center">
           <span class="text-black">${name}</span>
