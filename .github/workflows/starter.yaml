@@ -80,8 +80,7 @@ jobs:
         run: |
           COOKIE_KEY=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c 32;echo;)
           echo "COOKIE_KEY=$COOKIE_KEY"
-          docker create -e OVERWRITE_DATABASE=TRUE\
-                        -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD\
+          docker create -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD\
                         -e POSTGRES_DB=$POSTGRES_DB\
                         -e POSTGRES_USER=$POSTGRES_USER\
                         -e POSTGRES_HOST=postgres\

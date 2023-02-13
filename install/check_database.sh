@@ -21,12 +21,7 @@ then
     then
       echo "Database has already data"
     else
-      if [ "$OVERWRITE_DATABASE" == "TRUE" ]
-      then
-        create_database
-      else
-        echo "Database is empty. Please install backup manually"
-      fi
+      create_database
     fi
     pushd install/upgrade/ || exit
     python3 ./database_upgrade.py || exit

@@ -1,5 +1,15 @@
 version: "3.9"
 services:
+  postgres:
+    image: "postgis/postgis:13-3.3"
+    environment:
+      - POSTGRES_DB=openatlas
+      - POSTGRES_PASSWORD=verysecret
+      - POSTGRES_USER=openatlas
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+      # Uncomment to import SQL dump
+      # - ./files/export/dump.sql:/docker-entrypoint-initdb.d/dump.sql
   openatlas:
     build:
       context: .
@@ -17,12 +27,3 @@ services:
       - ./files/export/:/var/www/openatlas/files/export/
     depends_on:
       - postgres
-  postgres:
-    image: "postgis/postgis:13-3.3"
-    environment:
-      - POSTGRES_DB=openatlas
-      - POSTGRES_PASSWORD=verysecret
-      - POSTGRES_USER=openatlas
-      - OVERWRITE_DATABASE=TRUE
-    volumes:
-      - ./data/db:/var/lib/postgresql/data

@@ -1,4 +1,4 @@
-# Installation Notes
+`# Installation Notes
 Some knowledge about package installation, web server and database configuration
 will be needed.
 
@@ -8,8 +8,6 @@ system following these instructions. It may work on other Linux distributions
 or even on non Linux systems, and we provided a
 [requirements.txt](requirements.txt). But it is experimental and would need
 substantially more knowledge about server administration.
-
-You could also try to install it via docker, see docker-compose.yaml
 
 Feel free to also consult our own
 [documentation](https://redmine.openatlas.eu/projects/uni/wiki/Debian_server_installation)
@@ -152,3 +150,28 @@ Run tests
 Run tests with coverage
 
     $ nosetests3 -c tests/.noserc
+
+
+## Docker 
+
+Be aware, Docker installation is in an experimental state. It is **NOT** meant for usage as productive system!
+To run OpenAtlas as Docker container clone the repository
+
+    $ git clone https://github.com/craws/OpenAtlas.git
+
+Open an CLI in the directory where you cloned OpenAtlas and run
+    
+    $ docker compose up --detach
+
+After the container are build and the database is installed run 
+    
+    $ docker compose start
+
+Now an OpenAtlas instance is available under **localhost:8080**. 
+
+### Restore database dump
+
+To restore a database dump uncomment following command in ./docker-compose.yml and modify the first path. 
+Make sure that no previous database is installed (e.g. delete ./data/db/), as the dump will not be executed. 
+
+    $ - ./files/export/dump.sql:/docker-entrypoint-initdb.d/dump.sql

@@ -34,6 +34,5 @@ ENV LC_ALL en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
 
-ENV OVERWRITE_DATABASE=FALSE
 ENTRYPOINT [ "/entrypoint.sh" ]
 CMD [ "/usr/sbin/apache2", "-D", "FOREGROUND" ]
