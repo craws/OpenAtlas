@@ -23,5 +23,6 @@ services:
       - POSTGRES_DB=openatlas
       - POSTGRES_PASSWORD=verysecret
       - POSTGRES_USER=openatlas
+      - OVERWRITE_DATABASE=TRUE
     volumes:
       - ./data/db:/var/lib/postgresql/data
