@@ -263,7 +263,7 @@ class TreeMultiSelect(HiddenInput):
             root=g.types[int(field.type_id)],
             selection=sorted(data, key=lambda k: g.types[k].name),
             data=Type.get_tree_data(int(field.id), data)) \
-            + super().__call__(field, **kwargs)
+               + super().__call__(field, **kwargs)
 
 
 class TreeMultiField(HiddenField):
@@ -329,7 +329,7 @@ class DragNDrop(FileInput):
         accept = ', '.join([f'.{filename}' for filename
                             in g.settings['file_upload_allowed_extension']])
         return super().__call__(field, accept=accept, **kwargs) \
-            + render_template('forms/drag_n_drop_field.html')
+               + render_template('forms/drag_n_drop_field.html')
 
 
 class DragNDropField(FileField):
@@ -362,6 +362,7 @@ class SubmitInput(Input):
             if 'class_' in kwargs else 'uc-first'
         return HTMLString(
             f'''<button
+             type="submit"
              id="{field.id}"
              {self.html_params(name=field.name, **kwargs)}
              >{field.label.text}</button>''')
@@ -402,8 +403,8 @@ def get_table_content(
                 {'orderDataType': 'cidoc-model', 'targets': [0]},
                 {'sType': 'numeric', 'targets': [0]}])
         for id_, entity in (
-          g.properties if class_name == 'cidoc_property'
-          else g.cidoc_classes).items():
+                g.properties if class_name == 'cidoc_property'
+                else g.cidoc_classes).items():
             onclick = f'''
                 onclick="selectFromTable(
                     this,
@@ -448,7 +449,8 @@ def get_table_content(
                 aliases=aliases)
         table = Table(g.table_headers[class_])
         for entity in list(
-          filter(lambda x: x.id not in filter_ids, entities)):  # type: ignore
+                filter(lambda x: x.id not in filter_ids,
+                       entities)):  # type: ignore
             if selected_data and entity.id == int(selected_data):
                 selection = entity.name
             data = get_base_table_data(entity, show_links=False)

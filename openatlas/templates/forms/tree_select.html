@@ -109,12 +109,14 @@
       });
 
       $('#{{field.id}}-add-type').on('click', async function (e) {
+          $(this).prop("disabled", true).text('{{ _("in progress") }}');
           const name = $("#add-type-modal-{{field.id}} #name-dynamic").val();
           const superType = $("#{{field.id}}-dynamic").val() ||{{field.type_id}};
           const description = $("#add-type-modal-{{field.id}} #description-dynamic").val();
           const data = {name, superType, description};
           const typeId = await ajaxAddType(data, {{field.id}}, {{field.type_id}});
           selectFromTree('{{field.type_id}}', typeId, name);
+          $(this).prop("disabled", false).text('{{ _('insert')|uc_first }}');
           e.preventDefault();
       });
   </script>
