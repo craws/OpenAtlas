@@ -389,7 +389,7 @@ function setFile(fileInput, fileList) {
   fileInput.files = newFiles.files;
 }
 
-function addDragNDropListeners(dropContainer) {
+function addDragNDropListeners(dropContainer,allowedTypes) {
   dropContainer.addEventListener("dragenter", function (e) {
     dropContainer.classList.add('highlight')
 
@@ -410,8 +410,10 @@ function addDragNDropListeners(dropContainer) {
   });
 
   dropContainer.addEventListener("drop", function (e) {
-    const allowedTypes = ["gif", "jpeg", "jpg", "pdf", "png", "txt", "zip"]
-    const allowedFiles = [...e.dataTransfer.files].filter(x => allowedTypes.includes(x.name.split(('.')).at(-1)))
+    e.preventDefault();
+    e.stopPropagation();
+    const allowedFiles = [...e.dataTransfer.files]
+        .filter(x => allowedTypes.map(y=>y.toLowerCase()).includes(x.name.split(('.')).at(-1).toLowerCase()))
     if (allowedFiles.length > 0) {
       const fileInput = document.getElementById('file')
       setFile(fileInput, [...fileInput.files, ...allowedFiles]);
@@ -423,8 +425,6 @@ function addDragNDropListeners(dropContainer) {
       }
     }
     dropContainer.classList.remove('highlight')
-    e.preventDefault();
-    e.stopPropagation();
   });
 }
 
