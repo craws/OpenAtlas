@@ -25,6 +25,7 @@ versions = {
             '#1932': 'Manual: radiocarbon dating',
         },
         'fix': {
+            '#1958': 'Multiple submits at dynamic add entity function',
             '#1959': 'Missing activity for production'}
     }],
     '7.10.0': ['2023-02-04', {
