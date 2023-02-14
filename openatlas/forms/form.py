@@ -61,7 +61,7 @@ def get_table_form(class_: str, linked_entities: list[Entity]) -> str:
             table.rows.append(
                 [input_] + get_base_table_data(entity, show_links=False))
     if not table.rows:
-        return '<span class="uc-first">' + _('no entries') + '</span>'
+        return '<p class="uc-first">' + _('no entries') + '</p>'
     return render_template(
         'forms/form_table.html',
         table=table.display(class_))

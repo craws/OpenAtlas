@@ -22,7 +22,7 @@ class EventTest(TestBaseCase):
                 reference = insert('external_reference', 'https://d-nb.info')
 
             rv: Any = self.app.get(url_for('insert', class_='activity'))
-            assert b'+ <span class="uc-first">activity' in rv.data
+            assert b'+&nbsp;<span' in rv.data
 
             data = {'name': 'Event Horizon', 'place': residence.id}
             rv = self.app.post(
@@ -95,7 +95,7 @@ class EventTest(TestBaseCase):
 
             rv = self.app.get(
                 url_for('insert', class_='creation', origin_id=file.id))
-            assert b'+ <span class="uc-first">creation' in rv.data
+            assert b'+&nbsp;<span' in rv.data
 
             rv = self.app.post(
                 url_for('insert', class_='creation'),

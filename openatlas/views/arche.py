@@ -57,8 +57,8 @@ def arche_fetch() -> str:  # pragma: no cover
             buttons=[
                 button(_('import ARCHE data'), url_for('arche_import_data'))]
             if table.rows else [
-                '<span class="uc-first">' + _('no entities to retrieve') +
-                '<span>'])}
+                '<p class="uc-first">' + _('no entities to retrieve') +
+                '</p>'])}
 
     return render_template(
         'tabs.html',
