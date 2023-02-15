@@ -20,6 +20,8 @@ storage:
     size: 10Gi
   uploads:
     size: 10Gi
+  postgis:
+    size: 10Gi
 
 replicaCount: 1
 
