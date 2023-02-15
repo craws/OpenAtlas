@@ -1,4 +1,4 @@
-name: 'Tests'
+name: 'Build, test and deploy OpenAtlas'
 on:
   push: {}
 jobs:
@@ -9,7 +9,7 @@ jobs:
       image_name: container-preview
       registry_root: ghcr.io/${{ github.repository }}/
       default_port: "5000"
-      APP_NAME: openatlas
+      APP_NAME: oa
       APP_ROOT: "/"
     steps:
       - name: Get environment from git ref
@@ -149,7 +149,7 @@ jobs:
     with:
       environment: ${{ needs.setup_workflow_env.outputs.environment}}
       DOCKER_TAG: ${{ needs.setup_workflow_env.outputs.registry_root }}${{ needs.setup_workflow_env.outputs.image_name }}
-      APP_NAME: ${{ needs.setup_workflow_env.outputs.APP_NAME }}
+      APP_NAME: ${{ needs.setup_workflow_env.outputs.APP_NAME }}-${{ needs.setup_workflow_env.outputs.environment }}
       APP_ROOT: ${{ needs.setup_workflow_env.outputs.APP_ROOT }}
       default_port: ${{ needs.setup_workflow_env.outputs.default_port}}
 
