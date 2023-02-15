@@ -27,7 +27,7 @@ spec:
       containers:
         - env:
             - name: POSTGRES_HOST
-              value: {{ .Values.postgis.host | default "postgres" | quote }}
+              value: {{ .Values.postgis.host | default ( print ( include "fullname" . ) "-postgres" ) | quote }}
             - name: OVERWRITE_DATABASE
               value: {{ .Values.postgis.overwriteDatabase | default "TRUE" | quote }}
           envFrom:

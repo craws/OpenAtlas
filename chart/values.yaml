@@ -3,14 +3,15 @@
 # Declare variables to be passed into your templates.
 
 postgis:
-  host: postgres
+  # Set host if database is external
+  #  host: postgres
   name: openatlas-test
   user: openatlas
   password: openatlas
   version: "13-3.3"
   overwriteDatabase: "TRUE"
 
-hostName: openatlas.acdh-cluster-2.arz.oeaw.ac.at
+hostName: oa-helm.acdh-cluster-2.arz.oeaw.ac.at
 
 
 replicaCount: 1
