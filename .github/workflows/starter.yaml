@@ -2,7 +2,30 @@ name: 'Tests'
 on:
   push: {}
 jobs:
+  setup_workflow_env:
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.get_environment_from_git_ref.outputs.environment }}
+      image_name: container-preview
+      registry_root: ghcr.io/${{ github.repository }}/
+      default_port: "5000"
+      APP_NAME: openatlas
+      APP_ROOT: "/"
+    steps:
+      - name: Get environment from git ref
+        id: get_environment_from_git_ref
+        run: |
+          echo "Running on branch ${{ github.ref_name }}"
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "environment=production"
+            echo "environment=production" >> $GITHUB_OUTPUT
+          else
+            echo "environment=review/${{ github.ref_name }}"
+            echo "environment=review/${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          fi
   build_openatlas:
+    needs: [setup_workflow_env]
+    environment: ${{ needs.setup_workflow_env.outputs.environment }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -20,7 +43,7 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: |
-            ghcr.io/${{ github.repository }}/container-preview
+            ${{ inputs.registry_root }}${{ inputs.image_name }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -49,7 +72,8 @@ jobs:
       POSTGRES_DB: openatlas_test
       POSTGRES_USER: openatlas
     runs-on: ubuntu-latest
-    needs: [build_openatlas]
+    needs: [setup_workflow_env, build_openatlas]
+    environment: ${{ needs.setup_workflow_env.outputs.environment }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -86,7 +110,7 @@ jobs:
                         -e POSTGRES_HOST=postgres\
                         -e COOKIE_KEY=$COOKIE_KEY\
                         --name openatlas --network openatlas\
-                        ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')/container-preview:${{ github.ref_name }}
+                        $(echo "${{ inputs.registry_root }}${{ inputs.image_name }}| tr '[:upper:]' '[:lower:]'):${{ github.ref_name }}
           set -x
           cat <<EOF > testing.py
           SERVER_NAME = 'local.host'
@@ -118,3 +142,15 @@ jobs:
       - name: Run tests
         run: |
           docker exec -i openatlas /bin/bash -c "cd /var/www/openatlas/tests && nosetests3 -c .noserc --verbosity=2 --nologcapture --nocapture && echo passed"
+  _3:
+    needs: [setup_workflow_env, test_openatlas]
+    uses: acdh-oeaw/gl-autodevops-minimal-port/.github/workflows/deploy-cluster-2.yml@main
+    secrets: inherit
+    with:
+      environment: ${{ needs.setup_workflow_env.outputs.environment}}
+      DOCKER_TAG: ${{ inputs.registry_root }}${{ inputs.image_name }}
+      APP_NAME: ${{ needs.setup_workflow_env.outputs.APP_NAME }}
+      APP_ROOT: ${{ needs.setup_workflow_env.outputs.APP_ROOT }}
+      default_port: ${{ needs.setup_workflow_env.outputs.default_port}}
+
+
