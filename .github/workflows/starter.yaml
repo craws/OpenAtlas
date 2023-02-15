@@ -110,7 +110,7 @@ jobs:
                         -e POSTGRES_HOST=postgres\
                         -e COOKIE_KEY=$COOKIE_KEY\
                         --name openatlas --network openatlas\
-                        $(echo "${{ needs.setup_workflow_env.outputs.registry_root }}${{ needs.setup_workflow_env.outputs.image_name }}| tr '[:upper:]' '[:lower:]'):${{ github.ref_name }}
+                        $(echo "${{ needs.setup_workflow_env.outputs.registry_root }}${{ needs.setup_workflow_env.outputs.image_name }}"| tr '[:upper:]' '[:lower:]'):${{ github.ref_name }}
           set -x
           cat <<EOF > testing.py
           SERVER_NAME = 'local.host'
