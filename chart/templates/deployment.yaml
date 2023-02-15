@@ -74,8 +74,44 @@ spec:
             timeoutSeconds: 1
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /var/www/openatlas/files/uploads
+              name: uploads
+            - mountPath: /var/www/openatlas/files/processed_images/resized
+              name: processed-images
+            - mountPath: /var/www/openatlas/files/export/
+              name: export
       dnsPolicy: ClusterFirst
+      initContainers:
+        - args:
+            - chown  -R 33:33 /var/www/openatlas/files/
+          command:
+            - /bin/sh
+            - '-c'
+          image: busybox
+          imagePullPolicy: IfNotPresent
+          name: chown
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /var/www/openatlas/files/export/
+              name: export
+            - mountPath: /var/www/openatlas/files/processed_images/resized
+              name: processed-images
+            - mountPath: /var/www/openatlas/files/uploads
+              name: uploads
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30
+      volumes:
+        - name: uploads
+          persistentVolumeClaim:
+            claimName: {{ print ( include "fullname" . ) "-uploads"| quote }}
+        - name: processed-images
+          persistentVolumeClaim:
+            claimName: {{ print ( include "fullname" . ) "-processed-images"| quote }}
+        - name: export
+          persistentVolumeClaim:
+            claimName: {{ print ( include "fullname" . ) "-export"| quote }}

@@ -13,6 +13,13 @@ postgis:
 
 hostName: oa-helm.acdh-cluster-2.arz.oeaw.ac.at
 
+storage:
+  export:
+    size: 1Gi
+  processed-images:
+    size: 10Gi
+  uploads:
+    size: 10Gi
 
 replicaCount: 1
 
