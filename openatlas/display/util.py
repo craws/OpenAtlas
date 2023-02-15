@@ -647,7 +647,7 @@ def description(entity: Union[Entity, Project, User]) -> str:
         label = _('content')
     return f"""
         {html}
-        <p><strong class="uc-first">{label}</strong></p>
+        <h2 class="uc-first fw-bold">{label}</h2>
         <div class="description more">
             {'<br>'.join(entity.description.splitlines())}
         </div>"""
