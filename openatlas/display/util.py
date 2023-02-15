@@ -274,7 +274,7 @@ def profile_image(entity: Entity) -> str:
         ext = app.config["ALLOWED_IMAGE_EXT"]
     if entity.class_.view == 'file':
         html = \
-            '<span class="uc-first">' + _('no preview available') + '</span>'
+            '<p class="uc-first">' + _('no preview available') + '</p>'
         if path.suffix.lower() in ext:
             html = link(
                 f'<img style="{style}" alt="image" src="{src}">',
@@ -459,8 +459,8 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
     for path in app.config['WRITABLE_DIRS']:
         if not os.access(path, os.W_OK):
             warnings.append(
-                '<span class="uc-first">' + _('directory not writable') +
-                f"</span> {str(path).replace(app.root_path, '')}")
+                '<p class="uc-first">' + _('directory not writable') +
+                f" {str(path).replace(app.root_path, '')}</p>")
     if is_authorized('admin'):
         from openatlas.models.user import User
         user = User.get_by_username('OpenAtlas')
@@ -470,9 +470,9 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
                 user.password.encode('utf-8'))
             if hash_ == user.password.encode('utf-8'):
                 warnings.append(
-                    '<span class="uc-first">' +
+                    '<p class="uc-first">' +
                     _('user OpenAtlas with default password is still active') +
-                    '</span>')
+                    '</p>')
     return \
         '<p class="alert alert-danger">' \
         f'{"<br>".join(warnings)}<p>' if warnings else ''
@@ -572,7 +572,7 @@ def button(
         onclick: Optional[str] = None) -> str:
     tag = 'a' if url else 'span'
     if url and '/insert' in url and label != _('link'):
-        label = f'+ <span class="uc-first">{label}</a>'
+        label = f'+ <span class="uc-first d-inline-block">{label}</span>'
     return f"""
         <{tag}
             {f'href="{url}"' if url else ''}

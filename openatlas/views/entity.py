@@ -245,7 +245,8 @@ def add_crumbs(
                 [i for i in structure['siblings'] if i.class_.name == class_]):
             siblings = f" ({count} {_('exists')})" if count else ''
     return crumbs + [
-        f'+ <span class="uc-first">{g.classes[class_].label}{siblings}</span>']
+        f'+&nbsp;<span class="uc-first">' +
+        f'{g.classes[class_].label}{siblings}</span>']
 
 
 def check_insert_access(class_: str) -> None:

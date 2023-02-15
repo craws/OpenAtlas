@@ -388,7 +388,7 @@ def admin_check_similar() -> str:
                 f"{link(sample['entity'])}<br><br>{'<br><br>'.join(similar)}",
                 len(sample['entities']) + 1])
     content = display_form(form, manual_page='admin/data_integrity_checks')
-    content += ('<span class="uc-first">' + _('no entries') + '</span>') \
+    content += ('<p class="uc-first">' + _('no entries') + '</p>') \
         if table and not table.rows else ''
     return render_template(
         'tabs.html',
