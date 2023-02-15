@@ -43,7 +43,7 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: |
-            ${{ inputs.registry_root }}${{ inputs.image_name }}
+            ${{ needs.setup_workflow_env.outputs.registry_root }}${{ needs.setup_workflow_env.outputs.image_name }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -110,7 +110,7 @@ jobs:
                         -e POSTGRES_HOST=postgres\
                         -e COOKIE_KEY=$COOKIE_KEY\
                         --name openatlas --network openatlas\
-                        $(echo "${{ inputs.registry_root }}${{ inputs.image_name }}| tr '[:upper:]' '[:lower:]'):${{ github.ref_name }}
+                        $(echo "${{ needs.setup_workflow_env.outputs.registry_root }}${{ needs.setup_workflow_env.outputs.image_name }}| tr '[:upper:]' '[:lower:]'):${{ github.ref_name }}
           set -x
           cat <<EOF > testing.py
           SERVER_NAME = 'local.host'
@@ -148,7 +148,7 @@ jobs:
     secrets: inherit
     with:
       environment: ${{ needs.setup_workflow_env.outputs.environment}}
-      DOCKER_TAG: ${{ inputs.registry_root }}${{ inputs.image_name }}
+      DOCKER_TAG: ${{ needs.setup_workflow_env.outputs.registry_root }}${{ needs.setup_workflow_env.outputs.image_name }}
       APP_NAME: ${{ needs.setup_workflow_env.outputs.APP_NAME }}
       APP_ROOT: ${{ needs.setup_workflow_env.outputs.APP_ROOT }}
       default_port: ${{ needs.setup_workflow_env.outputs.default_port}}
