@@ -9,7 +9,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     apt install -y --no-install-recommends python3-wand python3-rdflib python3-requests python3-dicttoxml python3-rdflib-jsonld python3-flasgger &&\
     apt install -y --no-install-recommends apache2 libapache2-mod-wsgi-py3 python3-coverage python3-nose &&\
     apt install -y --no-install-recommends gettext npm python3-pip git postgresql-client-13 &&\
-    apt install -y --no-install-recommends dos2unix locales locales-all &&\
+    apt install -y --no-install-recommends dos2unix locales locales-all w3c-sgml-lib &&\
     mkdir -p /var/www/openatlas /var/www/.cache /var/www/.local /var/www/.npm &&\
     chown -R www-data:www-data /var/www/.cache /var/www/.local /var/www/.npm /var/log/apache2 /var/run/apache2
 COPY --chown=www-data:www-data / /var/www/openatlas/
