@@ -1,0 +1,19 @@
+{{- $_ := set . "namePrefix" "postgres" -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "fullname" . }}-postgres
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+spec:
+  internalTrafficPolicy: Cluster
+  ports:
+    - name: postgres
+      port: 5432
+      protocol: TCP
+      targetPort: 5432
+  selector:
+    {{- include "selectorLabels" . | nindent 4 }}
+  sessionAffinity: None
+  type: ClusterIP
+{{- $_ := unset . "namePrefix" -}}
