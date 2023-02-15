@@ -64,9 +64,16 @@ spec:
             timeoutSeconds: 1
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgis
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30
+      volumes:
+        - name: postgis
+          persistentVolumeClaim:
+            claimName: {{ print ( include "fullname" . ) "-postgis"| quote }}
 {{- $_ := unset . "namePrefix" -}}
