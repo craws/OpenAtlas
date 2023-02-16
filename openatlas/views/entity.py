@@ -245,7 +245,7 @@ def add_crumbs(
                 [i for i in structure['siblings'] if i.class_.name == class_]):
             siblings = f" ({count} {_('exists')})" if count else ''
     return crumbs + [
-        f'+&nbsp;<span class="uc-first">' +
+        f'+&nbsp;<span class="uc-first d-inline-block">' +
         f'{g.classes[class_].label}{siblings}</span>']
 
 

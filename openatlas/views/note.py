@@ -85,7 +85,8 @@ def note_insert(entity_id: int) -> Union[str, Response]:
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],
             entity,
-            '+ <span class="uc-first">' + _('note') + '</span>'])
+            '+ <span class="uc-first d-inline-block">'
+            + _('note') + '</span>'])
 
 
 @app.route('/note/update/<int:id_>', methods=['POST', 'GET'])
