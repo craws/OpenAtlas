@@ -25,6 +25,7 @@ versions = {
             '#1932': 'Manual: radiocarbon dating',
         },
         'fix': {
+            '#1968': 'Missing external reference default precision',
             '#1958': 'Multiple submits at dynamic add entity function',
             '#1959': 'Missing activity for production'}
     }],

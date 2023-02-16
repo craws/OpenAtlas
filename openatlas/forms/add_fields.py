@@ -40,7 +40,9 @@ def add_reference_systems(class_: OpenatlasClass, form: Any) -> None:
                 placeholder=system.placeholder,
                 choices=precisions,
                 reference_system_id=system.id,
-                default=system.precision_default_id))
+                default={
+                    'value': '',
+                    'precision': str(system.precision_default_id)}))
 
 
 def add_date_fields(form_class: Any, has_time: bool) -> None:
