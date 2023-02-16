@@ -35,6 +35,11 @@ spec:
                 optional: false
           image: 'postgis/postgis:{{ .Values.postgis.version }}'
           imagePullPolicy: IfNotPresent
+          name: postgres
+          ports:
+            - containerPort: 5432
+              name: postgres
+              protocol: TCP
           livenessProbe:
             failureThreshold: 3
             periodSeconds: 10
@@ -42,11 +47,6 @@ spec:
             tcpSocket:
               port: 5432
             timeoutSeconds: 1
-          name: postgres
-          ports:
-            - containerPort: 5432
-              name: postgres
-              protocol: TCP
           readinessProbe:
             failureThreshold: 3
             periodSeconds: 10
