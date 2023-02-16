@@ -470,12 +470,12 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
                 user.password.encode('utf-8'))
             if hash_ == user.password.encode('utf-8'):
                 warnings.append(
-                    '<p class="uc-first">' +
+                    '<p class="uc-first mb-0">' +
                     _('user OpenAtlas with default password is still active') +
                     '</p>')
     return \
-        '<p class="alert alert-danger">' \
-        f'{"<br>".join(warnings)}<p>' if warnings else ''
+        '<div class="alert alert-danger">' \
+        f'{"<br>".join(warnings)}</div>' if warnings else ''
 
 
 @app.template_filter()
