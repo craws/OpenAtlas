@@ -1,17 +1,21 @@
-`# Installation Notes
+# Installation Notes
 Some knowledge about package installation, web server and database configuration
 will be needed.
 
 This software was developed and tested on Linux/Debian 11.5
 (codename "bullseye") and the easiest way to install would be on a Debian 11.5
-system following these instructions. It may work on other Linux distributions
-or even on non Linux systems, and we provided a
-[requirements.txt](requirements.txt). But it is experimental and would need
-substantially more knowledge about server administration.
+system following these instructions.
+
+It may work on other Linux distributions or even on non Linux systems, and we
+provided a [requirements.txt](requirements.txt). But it is experimental and
+would need substantially more knowledge about server administration.
+
+Another (also experimental) way to install it would be via Docker. For more
+information take a look at the end of this document.
 
 Feel free to also consult our own
 [documentation](https://redmine.openatlas.eu/projects/uni/wiki/Debian_server_installation)
-we use to set up new Debian servers for OpenAtlas installations.
+that we are using to set up Debian servers for OpenAtlas installations.
 
 ## Requirements
 
@@ -151,12 +155,12 @@ Run tests with coverage
 
     $ nosetests3 -c tests/.noserc
 
-
 ## Docker 
 
-Be aware, Docker installation is in an experimental state. 
-It is **NOT** meant for usage as productive system!
-To run OpenAtlas as Docker container clone the repository
+Be aware, the Docker installation is experimental and is **not** meant for
+usage on a productive system.
+
+To run OpenAtlas as a Docker container clone the repository
 
     $ git clone https://github.com/craws/OpenAtlas.git
 
