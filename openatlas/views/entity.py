@@ -1,4 +1,5 @@
 import os
+from subprocess import call
 from typing import Any, Optional, Union
 
 from flask import flash, g, render_template, request, url_for
@@ -304,7 +305,11 @@ def insert_files(manager: BaseManager) -> Union[str, Response]:
             # Add 'a' to prevent emtpy temporary filename, has no side effects
             filename = secure_filename(f'a{file.filename}')
             name = f"{manager.entity.id}.{filename.rsplit('.', 1)[1].lower()}"
-            file.save(str(app.config['UPLOAD_DIR'] / name))
+            ext = secure_filename(file.filename).rsplit('.', 1)[1].lower()
+            path = app.config['UPLOAD_DIR'] / name
+            file.save(str(path))
+            if f'.{ext}' in app.config['DISPLAY_FILE_EXTENSIONS']:
+                call(f'exiftran -ai {path}', shell=True)  # Fix rotation
             filenames.append(name)
             if g.settings['image_processing']:
                 resize_image(name)

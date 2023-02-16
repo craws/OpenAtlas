@@ -19,6 +19,7 @@ versions = {
         'feature': {
             '#1957': 'Dates for administrative units',
             '#1963': 'Show API download buttons by default',
+            '#1943': 'Auto rotate image',
             '#1961': 'Installation via Docker',
             '#1582': 'GitHub test actions',
             '#1964': 'Deletion of old system logs',
