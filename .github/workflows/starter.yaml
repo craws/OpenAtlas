@@ -72,6 +72,13 @@ jobs:
                         -e POSTGRES_USER=$POSTGRES_USER\
                         --name postgres --network openatlas\
                         postgis/postgis:13-3.3
+      - name: Create postgis container
+        run: |
+          docker run -d -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD\
+                        -e POSTGRES_DB=$POSTGRES_DB\
+                        -e POSTGRES_USER=$POSTGRES_USER\
+                        --name postgres --network openatlas\
+                        postgis/postgis:13-3.3
 
       - name: Wait
         run: sleep 8
@@ -80,9 +87,9 @@ jobs:
         run: |
           COOKIE_KEY=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c 32;echo;)
           echo "COOKIE_KEY=$COOKIE_KEY"
-          docker create -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD\
-                        -e POSTGRES_DB=$POSTGRES_DB\
-                        -e POSTGRES_USER=$POSTGRES_USER\
+          docker create -e POSTGRES_PASSWORD=verysecret
+                        -e POSTGRES_DB=openatlas_test
+                        -e POSTGRES_USER=openatlas
                         -e POSTGRES_HOST=postgres\
                         -e COOKIE_KEY=$COOKIE_KEY\
                         --name openatlas --network openatlas\
