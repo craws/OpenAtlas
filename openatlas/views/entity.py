@@ -2,7 +2,7 @@ import os
 from subprocess import call
 from typing import Any, Optional, Union
 
-from flask import flash, g, render_template, request, url_for
+from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from werkzeug.exceptions import abort
@@ -14,15 +14,14 @@ from openatlas.database.connect import Transaction
 from openatlas.display import display
 from openatlas.display.image_processing import resize_image
 from openatlas.display.util import (
-    display_form, get_base_table_data, is_authorized, link, required_group)
+    get_base_table_data, is_authorized, link, required_group)
 from openatlas.forms.base_manager import BaseManager
-from openatlas.forms.form import get_manager, get_table_form
+from openatlas.forms.form import get_manager
 from openatlas.forms.util import populate_insert_form, was_modified
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.overlay import Overlay
 from openatlas.models.type import Type
-from openatlas.views.link import AddReferenceForm
 
 
 @app.route('/entity/<int:id_>')
@@ -50,75 +49,6 @@ def view(id_: int) -> Union[str, Response]:
         entity=entity,
         gis_data=manager.gis_data,
         crumbs=manager.crumbs)
-
-
-@app.route('/entity/add/file/<int:id_>', methods=['GET', 'POST'])
-@required_group('contributor')
-def entity_add_file(id_: int) -> Union[str, Response]:
-    entity = Entity.get_by_id(id_)
-    if request.method == 'POST':
-        if request.form['checkbox_values']:
-            entity.link_string(
-                'P67',
-                request.form['checkbox_values'], inverse=True)
-        return redirect(f"{url_for('view', id_=id_)}#tab-file")
-    return render_template(
-        'content.html',
-        content=get_table_form(
-            'file',
-            entity.get_linked_entities('P67', inverse=True)),
-        entity=entity,
-        title=entity.name,
-        crumbs=[
-            [_(entity.class_.view), url_for('index', view=entity.class_.view)],
-            entity,
-            f"{_('link')} {_('file')}"])
-
-
-@app.route('/entity/add/source/<int:id_>', methods=['POST', 'GET'])
-@required_group('contributor')
-def entity_add_source(id_: int) -> Union[str, Response]:
-    entity = Entity.get_by_id(id_)
-    if request.method == 'POST':
-        if request.form['checkbox_values']:
-            entity.link_string(
-                'P67',
-                request.form['checkbox_values'],
-                inverse=True)
-        return redirect(f"{url_for('view', id_=id_)}#tab-source")
-    return render_template(
-        'content.html',
-        content=get_table_form(
-            'source',
-            entity.get_linked_entities('P67', inverse=True)),
-        title=entity.name,
-        crumbs=[
-            [_(entity.class_.view), url_for('index', view=entity.class_.view)],
-            entity,
-            f"{_('link')} {_('source')}"])
-
-
-@app.route('/entity/add/reference/<int:id_>', methods=['POST', 'GET'])
-@required_group('contributor')
-def entity_add_reference(id_: int) -> Union[str, Response]:
-    entity = Entity.get_by_id(id_)
-    form = AddReferenceForm()
-    if form.validate_on_submit():
-        entity.link_string(
-            'P67',
-            form.reference.data,
-            description=form.page.data,
-            inverse=True)
-        return redirect(f"{url_for('view', id_=id_)}#tab-reference")
-    form.page.label.text = _('page / link text')
-    return render_template(
-        'content.html',
-        content=display_form(form),
-        entity=entity,
-        crumbs=[
-            [_(entity.class_.view), url_for('index', view=entity.class_.view)],
-            entity,
-            f"{_('link')} {_('reference')}"])
 
 
 @app.route(
