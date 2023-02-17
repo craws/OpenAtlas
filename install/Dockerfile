@@ -14,10 +14,9 @@ RUN --mount=type=cache,target=/var/cache/apt \
     chown -R www-data:www-data /var/www/.cache /var/www/.local /var/www/.npm /var/log/apache2 /var/run/apache2
 COPY --chown=www-data:www-data / /var/www/openatlas/
 RUN cd /var/www/openatlas && cp install/entrypoint.sh /entrypoint.sh &&\
-    cp install/check_database.sh /check_database.sh &&\
     cp install/example_apache.conf /etc/apache2/sites-available/000-default.conf &&\
-    chmod a+x /entrypoint.sh /check_database.sh &&\
-    dos2unix /entrypoint.sh /check_database.sh &&\
+    chmod a+x /entrypoint.sh &&\
+    dos2unix /entrypoint.sh &&\
     sed -i 's~^Listen.*~Listen 8080~' /etc/apache2/ports.conf &&\
     sed -i 's~^<VirtualHost \*:80>~<VirtualHost *:8080>~' /etc/apache2/sites-available/000-default.conf &&\
     sed -i 's~ServerName.*~~' /etc/apache2/sites-available/000-default.conf

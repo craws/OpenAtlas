@@ -174,6 +174,11 @@ After the container are build and the database is installed run
 
 Now an OpenAtlas instance is available under **localhost:8080**. 
 
+Login with username "OpenAtlas" and password "change_me_PLEASE!" and change the
+password in profile. You may want to check the admin area to set up default 
+site settings, email and similar.
+
+
 ### Restore database dump
 
 To restore a database dump uncomment following command in ./docker-compose.yml 
