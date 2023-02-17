@@ -13,7 +13,7 @@ services:
       - ./install/3_data_web.sql:/docker-entrypoint-initdb.d/3_data_web.sql
       - ./install/4_data_type.sql:/docker-entrypoint-initdb.d/4_data_type.sql
       # Uncomment to import SQL dump
-      # - ./files/export/dump.sql:/docker-entrypoint-initdb.d/2022-08-11_0936_dump_before_database_upgrade_script.sql
+      # - ./files/export/dump.sql:/docker-entrypoint-initdb.d/dump.sql
     healthcheck:
       test: ["CMD-SHELL", "sh -c 'pg_isready -U openatlas -d openatlas'"]
       interval: 40s
