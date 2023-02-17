@@ -123,6 +123,8 @@ class Tab:
                         g.classes[item].label,
                         url_for('insert', class_=item, origin_id=id_)))
         elif name == 'artifact':
+            self.buttons.append(
+                button(_('add subunit'), url_for('add_subunit', super_id=id_)))
             if entity and entity.class_.name != 'human_remains':
                 self.buttons.append(
                     button(

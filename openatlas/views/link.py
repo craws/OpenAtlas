@@ -194,6 +194,33 @@ def reference_add(id_: int, view: str) -> Union[str, Response]:
             _('link')])
 
 
+@app.route('/add/subunit/<int:super_id>', methods=['POST', 'GET'])
+@required_group('contributor')
+def add_subunit(super_id: int) -> Union[str, Response]:
+    super_ = Entity.get_by_id(super_id)
+    excluded = []
+    for entity in Entity.get_by_view('artifact'):
+        if super_.class_.name == 'artifact' \
+                and entity.class_.name == 'human_remains':
+            excluded.append(entity)
+        elif super_.class_.name == 'human_remains' \
+                and entity.class_.name == 'artifact':
+            excluded.append(entity)
+        elif entity.get_linked_entity('P46', inverse=True):
+            excluded.append(entity)
+    # form = get_table_form('artifact', excluded)
+
+    return render_template(
+        'content.html',
+        content=get_table_form('artifact', excluded),
+        entity=super_,
+        title=super_.name,
+        crumbs=[
+            [_(super_.class_.view), url_for('index', view=super_.class_.view)],
+            super_,
+            _('add subunit')])
+
+
 @app.route('/entity/add/file/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
 def entity_add_file(id_: int) -> Union[str, Response]:

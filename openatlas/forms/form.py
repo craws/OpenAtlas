@@ -46,12 +46,12 @@ def get_add_reference_form(class_: str) -> FlaskForm:
     return Form()
 
 
-def get_table_form(class_: str, linked_entities: list[Entity]) -> str:
+def get_table_form(class_: str, excluded: list[Entity]) -> str:
     entities = Entity.get_by_view(class_, types=True, aliases=True)
-    linked_ids = [entity.id for entity in linked_entities]
+    excluded_ids = [entity.id for entity in excluded]
     table = Table([''] + g.table_headers[class_], order=[[1, 'asc']])
     for entity in entities:
-        if entity.id not in linked_ids:
+        if entity.id not in excluded_ids:
             input_ = f"""
                 <input
                     id="selection-{entity.id}"
