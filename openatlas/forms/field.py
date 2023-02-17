@@ -448,9 +448,8 @@ def get_table_content(
                 types=True,
                 aliases=aliases)
         table = Table(g.table_headers[class_])
-        for entity in list(
-                filter(lambda x: x.id not in filter_ids,
-                       entities)):  # type: ignore
+        for entity in list(filter(
+                lambda x: x.id not in filter_ids, entities)):  # type: ignore
             if selected_data and entity.id == int(selected_data):
                 selection = entity.name
             data = get_base_table_data(entity, show_links=False)
