@@ -8,8 +8,18 @@ services:
       - POSTGRES_USER=openatlas
     volumes:
       - ./data/db:/var/lib/postgresql/data
+#      - ./install/1_structure.sql:/docker-entrypoint-initdb.d/1_structure.sql
+#      - ./install/2_data_model.sql:/docker-entrypoint-initdb.d/2_data_model.sql
+#      - ./install/3_data_web.sql:/docker-entrypoint-initdb.d/3_data_web.sql
+#      - ./install/4_data_type.sql:/docker-entrypoint-initdb.d/4_data_type.sql
       # Uncomment to import SQL dump
-      # - ./files/export/dump.sql:/docker-entrypoint-initdb.d/dump.sql
+      - ./files/export/dump.sql:/docker-entrypoint-initdb.d/2022-08-11_0936_dump_before_database_upgrade_script.sql
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
   openatlas:
     build:
       context: .
@@ -26,4 +36,5 @@ services:
       - ./files/processed_images/resized:/var/www/openatlas/files/processed_images/resized
       - ./files/export/:/var/www/openatlas/files/export/
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
