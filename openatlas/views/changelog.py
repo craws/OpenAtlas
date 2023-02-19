@@ -15,7 +15,7 @@ def index_changelog() -> str:
 
 
 versions = {
-    '7.11.0': ['TBA', {
+    '7.11.0': ['2023-02-19', {
         'feature': {
             '#1957': 'Dates for administrative units',
             '#1963': 'Show API download buttons by default',
@@ -23,13 +23,11 @@ versions = {
             '#1961': 'Installation via Docker',
             '#1582': 'GitHub test actions',
             '#1964': 'Deletion of old system logs',
-            '#1932': 'Manual: radiocarbon dating',
-        },
+            '#1932': 'Manual: radiocarbon dating'},
         'fix': {
             '#1968': 'Missing external reference default precision',
             '#1958': 'Multiple submits at dynamic add entity function',
-            '#1959': 'Missing activity for production'}
-    }],
+            '#1959': 'Missing activity for production'}}],
     '7.10.0': ['2023-02-04', {
         'feature': {
             '1934': 'New creation event class',
