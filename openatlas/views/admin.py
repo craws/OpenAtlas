@@ -343,6 +343,8 @@ def admin_settings(category: str) -> Union[str, Response]:
             value = field.data
             if field.name == 'mail_recipients_feedback':
                 value = ' '.join(list(filter(None, field.data)))
+            if field.name == 'file_upload_allowed_extension':
+                value = ' '.join(list(filter(None, field.data)))
             if field.type == 'BooleanField':
                 value = 'True' if field.data else ''
             data[field.name] = value

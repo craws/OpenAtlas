@@ -89,7 +89,9 @@ class ApiForm(FlaskForm):
 class FilesForm(FlaskForm):
     file_upload_max_size = IntegerField(_('maximum file size in MB'))
     profile_image_width = IntegerField(_('profile image width in pixel'))
-    file_upload_allowed_extension = StringField(_('allowed file extensions'))
+    file_upload_allowed_extension = FieldList(
+        RemovableListField(),
+        render_kw={'class': 'no-label'})
     save = SubmitField(_('save'))
 
 
