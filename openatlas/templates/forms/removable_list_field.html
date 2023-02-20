@@ -1,12 +1,20 @@
 <div class="d-flex">
-<input value="{{ value }}" id="{{ name }}-{{ id }}" name="{{ name }}-{{ id }}" class="{{ config.CSS.string_field }}" type="text"/>
-{% if id == '0' %}
-  <button onClick=addListElement('{{ name }}') type="button" id="add-{{ name }}-{{ id }}" class="add-{{ name }} {{ config.CSS.button.secondary }} ms-1">
-  <icon class="fa fa-plus"></icon>
-  </button>
-{% else %}
-  <button onClick=removeListField('{{ name }}-{{ id }}') type="button" id="remove-{{ name }}-{{ id }}" class="remove-{{ name }} {{ config.CSS.button.secondary }} ms-1">
-    <icon class="fa fa-minus"></icon>
-  </button>
-{% endif %}
+  <div class="w-100">
+    <input value="{{ value }}" id="{{ name }}-{{ id }}" name="{{ name }}-{{ id }}"
+           class="{{ classes }} {{ config.CSS.string_field }}"
+           type="text"/>
+  </div>
+  <div>
+    {% if id == '0' %}
+      <button onClick="addListElement('{{ name }}', '{{ classes }}')" type="button" id="add-{{ name }}-{{ id }}"
+              class="add-{{ name }} {{ config.CSS.button.secondary }} ms-1">
+        <icon class="fa fa-plus"></icon>
+      </button>
+    {% else %}
+      <button onClick=removeListField('{{ name }}-{{ id }}') type="button" id="remove-{{ name }}-{{ id }}"
+              class="remove-{{ name }} {{ config.CSS.button.secondary }} ms-1">
+        <icon class="fa fa-minus"></icon>
+      </button>
+    {% endif %}
+  </div>
 </div>

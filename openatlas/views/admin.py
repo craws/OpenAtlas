@@ -341,6 +341,8 @@ def admin_settings(category: str) -> Union[str, Response]:
             if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
                 continue
             value = field.data
+            if field.name == 'mail_recipients_feedback':
+                value = ' '.join(list(filter(None, field.data)))
             if field.type == 'BooleanField':
                 value = 'True' if field.data else ''
             data[field.name] = value

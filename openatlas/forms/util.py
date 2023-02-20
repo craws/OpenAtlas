@@ -79,10 +79,12 @@ def set_form_settings(form: Any, profile: bool = False) -> None:
         if field.name in ['log_level']:
             field.data = int(g.settings[field.name])
             continue
-        if field.name in [
-                'mail_recipients_feedback',
-                'file_upload_allowed_extension']:
+        if field.name == 'file_upload_allowed_extension':
             field.data = ' '.join(g.settings[field.name])
+            continue
+        if field.name == 'mail_recipients_feedback':
+            for mail in g.settings[field.name]:
+                field.append_entry(mail)
             continue
         if field.name not in g.settings:  # pragma: no cover
             field.data = ''  # If missing setting after an update
