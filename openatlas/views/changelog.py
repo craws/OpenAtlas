@@ -15,6 +15,9 @@ def index_changelog() -> str:
 
 
 versions = {
+    '7.11.1': ['2023-02-20', {
+        'fix': {
+            '#1971': 'Validation for "Inventory number" is broken'}}],
     '7.11.0': ['2023-02-19', {
         'feature': {
             '#1957': 'Dates for administrative units',
