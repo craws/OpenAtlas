@@ -1,6 +1,7 @@
 apiVersion: v2
 name: openatlas
 description: A Helm chart for Kubernetes
+icon: https://openatlas.eu/static/images/layout/logo.png
 
 # A chart can be either an 'application' or a 'library' chart.
 #
