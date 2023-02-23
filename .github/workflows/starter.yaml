@@ -92,6 +92,7 @@ jobs:
         uses: isbang/compose-action@v1.4.1
         with:
           compose-file: "./docker-compose.yaml"
+          up-flags: "--detach"
 
       - name: Docker Services
         run: |
