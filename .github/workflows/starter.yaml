@@ -104,7 +104,9 @@ jobs:
         run: sleep 10
 
       - name: Docker Services
-        run: docker ps
+        run: |
+          docker ps
+          docker network ls
 
       - name: Initialize db
         run: |
@@ -114,9 +116,10 @@ jobs:
               -e POSTGRES_HOST=postgres\
               --name initdb --network openatlas\
               $(echo "${{ needs.setup_workflow_env.outputs.registry_root }}${{ needs.setup_workflow_env.outputs.image_name }}"| tr '[:upper:]' '[:lower:]'):${{ github.ref_name }}
-                    
+          
+          docker start initdb 
           docker exec -i initdb /bin/bash -c "if [ "$( psql postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DB -tAc $'SELECT 1 FROM web.settings WHERE id = 1' )" == 1 ]; then echo $'Database has already data'; else echo $'Database has no data' && cd /var/www/openatlas/install && cat [0-9]_*.sql | psql postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DB -f -; fi" 
-          docker start initdb
+
 
       - name: Wait
         run: sleep 10
@@ -158,7 +161,6 @@ jobs:
           until [ "$(docker inspect -f {{.State.Running}} openatlas)"=="true" ]; do
               sleep 0.1;
           done;
-          docker exec -i openatlas /bin/bash -c 'psql postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DB -tAc "SELECT 1 FROM web.settings WHERE id = 1"'
           docker exec -i openatlas /bin/bash -c "cd /var/www/openatlas/instance/ && ls -la && cat testing.py && cat production.py"
 
       - name: Run tests
