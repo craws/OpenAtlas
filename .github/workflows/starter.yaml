@@ -113,7 +113,7 @@ jobs:
               $(echo "${{ needs.setup_workflow_env.outputs.registry_root }}${{ needs.setup_workflow_env.outputs.image_name }}"| tr '[:upper:]' '[:lower:]'):${{ github.ref_name }}
           
           docker start initdb
-          docker exec -i initdb /bin/bash -c 'if [ "$( psql postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DB -tAc "SELECT 1 FROM web.settings WHERE id = 1" )" == $'1' ]; then echo $'Database has already data'; else echo $'Database has no data' && cd /var/www/openatlas/install && cat [0-9]_*.sql | psql postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DB -f -; fi' 
+          docker exec -i initdb /bin/bash -c "if [ "$( psql postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DB -tAc "SELECT 1 FROM web.settings WHERE id = 1" )" == $'1' ]; then echo $'Database has already data'; else echo $'Database has no data' && cd /var/www/openatlas/install && cat [0-9]_*.sql | psql postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DB -f -; fi" 
 
       - name: Wait
         run: sleep 8
