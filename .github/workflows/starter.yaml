@@ -151,7 +151,7 @@ jobs:
           until [ "$(docker inspect -f {{.State.Running}} openatlas)"=="true" ]; do
               sleep 0.1;
           done;
-          docker exec -i openatlas /bin/bash -c 'psql postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DB -tAc "SELECT 1 FROM web.settings WHERE id = 1" )" == '"'"'1'"'"''
+          docker exec -i openatlas /bin/bash -c 'psql postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DB -tAc "SELECT 1 FROM web.settings WHERE id = 1"'
           docker exec -i openatlas /bin/bash -c "cd /var/www/openatlas/instance/ && ls -la && cat testing.py && cat production.py"
 
       - name: Run tests
