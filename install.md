@@ -122,7 +122,6 @@ Install required packages:
 As postgres:
 
     $ createdb openatlas_test -O openatlas
-    $ psql openatlas_test -c "CREATE EXTENSION postgis; CREATE EXTENSION unaccent;"
 
 Copy instance/example_testing.py to instance/testing.py and adapt as needed:
 
