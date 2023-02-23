@@ -43,6 +43,7 @@ class TestBaseCase(unittest.TestCase):
         connection.autocommit = True
         self.cursor = connection.cursor()
         for file_name in [
+                '0_extensions'
                 '1_structure',
                 '2_data_model',
                 '3_data_web',
