@@ -1,22 +1,22 @@
 <div class="row g-1">
   <div class="col" style="padding-top: 4px; padding-left: 4px">
     <div
-      id="{{ field.id }}-selection"
-      class="g-1 row {{ config.CSS.string_field }}"
-      onclick="$('#{{ field.id }}-modal').modal('show')"
+        id="{{ field.id }}-selection"
+        class="g-1 row {{ config.CSS.string_field }}"
+        onclick="$('#{{ field.id }}-modal').modal('show')"
     >
       {% for s in selection %}
-      <div onclick="event.stopPropagation()" class="badge col-auto bg-gray">
-        <div class="d-flex align-items-center">
-          <span class="text-black">{{ g.types[s].name }}</span>
-          <button
-            onclick="deselectNode('{{ field.id }}',{{s}})"
-            type="button"
-            class="btn-close p-0 ms-1"
-            aria-label="Close"
-          ></button>
+        <div onclick="event.stopPropagation()" class="badge col-auto bg-gray">
+          <div class="d-flex align-items-center">
+            <span class="text-black">{{ g.types[s].name }}</span>
+            <button
+                onclick="deselectNode('{{ field.id }}',{{ s }})"
+                type="button"
+                class="btn-close p-0 ms-1"
+                aria-label="Close"
+            ></button>
+          </div>
         </div>
-      </div>
       {% endfor %}
     </div>
   </div>
@@ -119,12 +119,14 @@
       });
 
       $('#{{field.id}}-add-type').on('click', async function (e) {
+          $(this).prop("disabled", true).text('{{ _("in progress") }}');
           const name = $("#add-type-modal-{{field.id}} #name-dynamic").val();
           const superType = $("#{{field.id}}-dynamic").val() ||{{field.type_id}};
           const description = $("#add-type-modal-{{field.id}} #description-dynamic").val();
           const data = {name, superType, description};
           const typeId = await ajaxAddType(data, {{field.id}}, {{field.type_id}}, true);
           $(`#{{field.type_id}}-modal`).modal('show');
+          $(this).prop("disabled", false).text('{{ _('insert')|uc_first }}');
           e.preventDefault();
       });
   </script>

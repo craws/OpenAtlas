@@ -1,3 +1,8 @@
+[![License: GPL v2](https://img.shields.io/badge/License-GPL_v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
+[![Python 3.9](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/release/python-390/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7605689.svg)](https://doi.org/10.5281/zenodo.7605689)
+![tests](https://github.com/craws/OpenAtlas/actions/workflows/starter.yaml/badge.svg)
+
 # About
 
 [OpenAtlas](https://openatlas.eu) is an open source, web based database system
@@ -29,25 +34,19 @@ Please refer to our [contributing guidelines](CONTRIBUTING.md)
 
 # Team
 
-**Stefan Eichert** - Idea, Concept and Data Modelling
+- **Stefan Eichert** - Idea, Concept and Data Modelling
 ([stefan.eichert@nhm-wien.ac.at](mailto:stefan.eichert@nhm-wien.ac.at))
-
-**Alexander Watzinger** - Lead Developer and Concept
+- **Alexander Watzinger** - Lead Developer and Concept
 ([alexander.watzinger@oeaw.ac.at](mailto:alexander.watzinger@oeaw.ac.at))
-
-**Bernhard Koschiček-Krombholz** - Backend Development, API
+- **Bernhard Koschiček-Krombholz** - Backend Development, API
 ([bernhard.koschicek-krombholz@oeaw.ac.at](mailto:bernhard.koschicek-krombholz@oeaw.ac.at))
-
-**Nina Richards** - Bioarchaeological Expertise
+- **Nina Richards** - Bioarchaeological Expertise
 ([nina.richards@oeaw.ac.at](mailto:nina.richards@oeaw.ac.at))
-
-**Andreas Olschnögger** - Frontend Development
+- **Andreas Olschnögger** - Frontend Development
 ([andreas.olschnoegger@oeaw.ac.at](mailto:andreas.olschnoegger@oeaw.ac.at)
-
-**Moritz Großfurtner** - Frontend Development
+- **Moritz Großfurtner** - Frontend Development
 ([moritz.großfurtner@oeaw.ac.at](mailto:moritz.großfurtner@oeaw.ac.at)
-
-**Jan Belik** - Logo Design and Design Consulting
+- **Jan Belik** - Logo Design and Design Consulting
 ([buero@janbelik.com](mailto:buero@janbelik.com))
 
 # Licensing

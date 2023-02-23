@@ -1,12 +1,16 @@
+from __future__ import annotations
+
 import json
-from typing import Any, Optional
+from typing import Any, Optional, TYPE_CHECKING
 
 from flask import g
 
 from openatlas.database.tools import Tools as Db
-from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.type import Type
+
+if TYPE_CHECKING:  # pragma: no cover
+    from openatlas.models.entity import Entity
 
 
 def get_sex_types(id_: int) -> list[dict[str, Any]]:

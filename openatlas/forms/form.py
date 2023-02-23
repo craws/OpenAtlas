@@ -1,4 +1,6 @@
-from typing import Optional
+from __future__ import annotations
+
+from typing import Optional, TYPE_CHECKING
 
 from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
@@ -13,8 +15,9 @@ from openatlas.forms import base_manager, manager
 from openatlas.forms.field import SubmitField, TableMultiField, TreeField
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.models.type import Type
 
+if TYPE_CHECKING:  # pragma: no cover
+    from openatlas.models.type import Type
 
 def get_manager(
         class_name: Optional[str] = None,
@@ -58,7 +61,7 @@ def get_table_form(class_: str, linked_entities: list[Entity]) -> str:
             table.rows.append(
                 [input_] + get_base_table_data(entity, show_links=False))
     if not table.rows:
-        return '<span class="uc-first">' + _('no entries') + '</span>'
+        return '<p class="uc-first">' + _('no entries') + '</p>'
     return render_template(
         'forms/form_table.html',
         table=table.display(class_))

@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Any, Optional, TYPE_CHECKING
 
 from flask import g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -16,10 +18,11 @@ from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.models.overlay import Overlay
-from openatlas.models.type import Type
 from openatlas.models.user import User
 from openatlas.views.entity_index import file_preview
 
+if TYPE_CHECKING:  # pragma: no cover
+    from openatlas.models.type import Type
 
 class BaseDisplay:
 
@@ -52,6 +55,8 @@ class BaseDisplay:
         self.buttons = [manual(f'entity/{self.entity.class_.view}')]
         self.add_buttons()
         self.buttons.append(bookmark_toggle(self.entity.id))
+        self.buttons.append(
+            render_template('util/api_links.html', entity=self.entity))
         self.buttons.append(siblings_pager(self.entity, self.structure))
         if self.linked_places:
             self.gis_data = Gis.get_all(self.linked_places)
@@ -123,11 +128,13 @@ class BaseDisplay:
             self.tabs['note'].table.rows.append(data)
 
     def add_buttons(self) -> None:
+
         if is_authorized(self.entity.class_.write_access):
             if not self.problematic_type:
                 self.buttons.append(
                     button(_('edit'), url_for('update', id_=self.entity.id)))
             self.buttons.append(delete_link(self.entity))
+
 
     def add_data(self) -> None:
         self.data = {

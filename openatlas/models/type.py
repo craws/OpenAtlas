@@ -211,7 +211,7 @@ class Type(Entity):
 
     @staticmethod
     def insert_hierarchy(
-            type_: Type,
+            type_: Entity,
             category: str,
             classes: list[str],
             multiple: bool) -> None:

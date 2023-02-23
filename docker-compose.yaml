@@ -1,0 +1,44 @@
+version: "3.9"
+services:
+  postgres:
+    image: "postgis/postgis:13-3.3"
+    environment:
+      - POSTGRES_DB=openatlas
+      - POSTGRES_PASSWORD=verysecret
+      - POSTGRES_USER=openatlas
+#    ports:
+#     - "25432:5432"
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+#     Installation of an empty database
+      - ./install/extensions.sql:/docker-entrypoint-initdb.d/dump.sql
+      - ./install/1_structure.sql:/docker-entrypoint-initdb.d/1_structure.sql
+      - ./install/2_data_model.sql:/docker-entrypoint-initdb.d/2_data_model.sql
+      - ./install/3_data_web.sql:/docker-entrypoint-initdb.d/3_data_web.sql
+      - ./install/4_data_type.sql:/docker-entrypoint-initdb.d/4_data_type.sql
+#      Import dump (comment install section above out)
+#      - ./files/export/dump.sql:/docker-entrypoint-initdb.d/dump.sql
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U openatlas -d openatlas'"]
+      interval: 40s
+      timeout: 5s
+      retries: 3
+
+  openatlas:
+    build:
+      context: .
+      dockerfile: install/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+        - POSTGRES_DB=openatlas
+        - POSTGRES_HOST=postgres
+        - POSTGRES_PASSWORD=verysecret
+        - POSTGRES_USER=openatlas
+    volumes:
+      - ./files/uploads:/var/www/openatlas/files/uploads
+      - ./files/processed_images/resized:/var/www/openatlas/files/processed_images/resized
+      - ./files/export/:/var/www/openatlas/files/export/
+    depends_on:
+      postgres:
+        condition: service_healthy

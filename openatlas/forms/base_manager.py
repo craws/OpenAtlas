@@ -1,19 +1,21 @@
+from __future__ import annotations
+
 import time
-from typing import Any, Optional, Union
+from typing import Any, Optional, TYPE_CHECKING, Union
 
 from flask import g
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (
-    FieldList, HiddenField, SelectMultipleField, StringField,
-    TextAreaField, widgets)
+    FieldList, HiddenField, SelectMultipleField, StringField, TextAreaField,
+    widgets)
 from wtforms.validators import InputRequired, URL
 
 from openatlas.forms.add_fields import (
     add_date_fields, add_reference_systems, add_types)
 from openatlas.forms.field import (
-    RemovableListField, TableField, TreeField, SubmitField)
+    RemovableListField, SubmitField, TableField, TreeField)
 from openatlas.forms.populate import (
     populate_dates, populate_reference_systems, populate_types)
 from openatlas.forms.process import (
@@ -23,9 +25,11 @@ from openatlas.forms.util import (
 from openatlas.forms.validation import hierarchy_name_exists, validate
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.models.openatlas_class import OpenatlasClass
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
+
+if TYPE_CHECKING:  # pragma: no cover
+    from openatlas.models.openatlas_class import OpenatlasClass
 
 
 class BaseManager:
@@ -43,7 +47,7 @@ class BaseManager:
             class_: OpenatlasClass,
             entity: Optional[Entity],
             origin: Optional[Entity],
-            link_: Optional[Link]):
+            link_: Optional[Link]) -> None:
 
         self.class_ = class_
         self.entity = entity
@@ -394,7 +398,7 @@ class TypeBaseManager(BaseManager):
         return fields
 
     def customize_labels(self) -> None:
-        if 'classes' not in self.form:
+        if not hasattr(self.form, 'classes'):
             type_ = self.entity or self.origin
             if isinstance(type_, Type):
                 root = g.types[type_.root[0]] if type_.root else type_

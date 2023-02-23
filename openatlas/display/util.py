@@ -206,9 +206,6 @@ def get_system_data(entity: Entity) -> dict[str, Any]:
         data[_('imported from')] = link(info['project'])
         data[_('imported by')] = link(info['importer'])
         data['origin ID'] = info['origin_id']
-    if 'entity_show_api' in current_user.settings \
-            and current_user.settings['entity_show_api']:
-        data['API'] = render_template('util/api_links.html', entity=entity)
     return data
 
 
@@ -277,7 +274,7 @@ def profile_image(entity: Entity) -> str:
         ext = app.config["ALLOWED_IMAGE_EXT"]
     if entity.class_.view == 'file':
         html = \
-            '<span class="uc-first">' + _('no preview available') + '</span>'
+            '<p class="uc-first">' + _('no preview available') + '</p>'
         if path.suffix.lower() in ext:
             html = link(
                 f'<img style="{style}" alt="image" src="{src}">',
@@ -462,8 +459,8 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
     for path in app.config['WRITABLE_DIRS']:
         if not os.access(path, os.W_OK):
             warnings.append(
-                '<span class="uc-first">' + _('directory not writable') +
-                f"</span> {str(path).replace(app.root_path, '')}")
+                '<p class="uc-first">' + _('directory not writable') +
+                f" {str(path).replace(app.root_path, '')}</p>")
     if is_authorized('admin'):
         from openatlas.models.user import User
         user = User.get_by_username('OpenAtlas')
@@ -473,12 +470,12 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
                 user.password.encode('utf-8'))
             if hash_ == user.password.encode('utf-8'):
                 warnings.append(
-                    '<span class="uc-first">' +
+                    '<p class="uc-first mb-0">' +
                     _('user OpenAtlas with default password is still active') +
-                    '</span>')
+                    '</p>')
     return \
-        '<p class="alert alert-danger">' \
-        f'{"<br>".join(warnings)}<p>' if warnings else ''
+        '<div class="alert alert-danger">' \
+        f'{"<br>".join(warnings)}</div>' if warnings else ''
 
 
 @app.template_filter()
@@ -575,7 +572,7 @@ def button(
         onclick: Optional[str] = None) -> str:
     tag = 'a' if url else 'span'
     if url and '/insert' in url and label != _('link'):
-        label = f'+ <span class="uc-first">{label}</a>'
+        label = f'+ <span class="uc-first d-inline-block">{label}</span>'
     return f"""
         <{tag}
             {f'href="{url}"' if url else ''}
@@ -650,7 +647,7 @@ def description(entity: Union[Entity, Project, User]) -> str:
         label = _('content')
     return f"""
         {html}
-        <p><strong class="uc-first">{label}</strong></p>
+        <h2 class="uc-first fw-bold">{label}</h2>
         <div class="description more">
             {'<br>'.join(entity.description.splitlines())}
         </div>"""

@@ -397,9 +397,9 @@
                        ${match
                             .map(x => `<a
                                       role='button'
-                                      class="mb-1"
+                                      class="mb-1 uc-first"
                                       onclick="dispatchPopup(${x._leaflet_id},[${e.latlng.lat},${e.latlng.lng}])">
-                                               ${x.feature?.properties?.name || x.feature?.properties?.objectName}
+                                               ${x.feature?.properties?.name || x.feature?.properties?.objectName || translate['polygon'] + x._leaflet_id }
                                    </a>`).join("")}
                      </div>`;
                     L.popup()

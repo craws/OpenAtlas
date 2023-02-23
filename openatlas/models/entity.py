@@ -17,7 +17,7 @@ from openatlas.models.link import Link
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.type import Type
-    from openatlas.models.reference_system import ReferenceSystem
+
 
 
 class Entity:

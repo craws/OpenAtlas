@@ -10,7 +10,6 @@ VALUES
 
 INSERT INTO web.user_settings (user_id, name, value)
 VALUES
-  ((SELECT id FROM web.user WHERE username = 'Alice'), 'entity_show_api', 'True'),
   ((SELECT id FROM web.user WHERE username = 'Alice'), 'entity_show_class', 'True'),
   ((SELECT id FROM web.user WHERE username = 'Alice'), 'entity_show_dates', 'True'),
   ((SELECT id FROM web.user WHERE username = 'Alice'), 'entity_show_import', 'True'),
