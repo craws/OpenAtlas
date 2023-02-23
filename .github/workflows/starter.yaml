@@ -106,7 +106,15 @@ jobs:
       - name: Initialize db
         run: |
           docker cp install/ postgres:/install/
-          docker exec -i postgres /bin/bash -c "cd install && cat 0_extensions.sql 1_structure.sql 2_data_model.sql 3_data_web.sql 4_data_type.sql | psql -U $POSTGRES_USER -d $POSTGRES_DB -f -"
+#          docker exec -i postgres /bin/bash -c "cd install && cat 0_extensions.sql 1_structure.sql 2_data_model.sql 3_data_web.sql 4_data_type.sql | psql -U $POSTGRES_USER -d $POSTGRES_DB -f -"
+          docker create -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD\
+              -e POSTGRES_DB=$POSTGRES_DB\
+              -e POSTGRES_USER=$POSTGRES_USER\
+              -e POSTGRES_HOST=postgres\
+              --name initdb --network openatlas\
+              $(echo "${{ needs.setup_workflow_env.outputs.registry_root }}${{ needs.setup_workflow_env.outputs.image_name }}"| tr '[:upper:]' '[:lower:]'):${{ github.ref_name }} \
+              /bin/bash -c 'if [ "$( psql postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DB -tAc "SELECT 1 FROM web.settings WHERE id = 1" )" == '"'"'1'"'"' ]; then echo '"'"'Database has already data'"'"'; else cd /var/www/openatlas/install && cat *.sql | psql postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DB -f -; fi' 
+          docker start initdb
 
       - name: Create openatlas container and run tests
         run: |
