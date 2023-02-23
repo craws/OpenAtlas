@@ -91,7 +91,7 @@ jobs:
       - name: Create openatlas network
         run: |
           docker network create --internal openatlas
-
+          
       - name: Create postgis container
         run: |
           docker run -d -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD\
@@ -102,6 +102,11 @@ jobs:
 
       - name: Wait
         run: sleep 8
+
+      - name: Initialize db
+        run: |
+          docker cp install/ postgres:/install/
+          docker exec -i postgres /bin/bash -c "cd install && cat 0_extensions.sql 1_structure.sql 2_data_model.sql 3_data_web.sql 4_data_type.sql | psql -U $POSTGRES_USER -d $POSTGRES_DB -f -"
 
       - name: Create openatlas container and run tests
         run: |
@@ -116,7 +121,7 @@ jobs:
                         $(echo "${{ needs.setup_workflow_env.outputs.registry_root }}${{ needs.setup_workflow_env.outputs.image_name }}"| tr '[:upper:]' '[:lower:]'):${{ github.ref_name }}
           set -x
           cat <<EOF > testing.py
-          SERVER_NAME = 'local.host'
+          SERVER_NAME='local.host'
           DATABASE_NAME='openatlas_test'
           DATABASE_USER='openatlas'
           DATABASE_HOST='postgres'
@@ -141,7 +146,7 @@ jobs:
               sleep 0.1;
           done;
           docker exec -i openatlas /bin/bash -c "cd /var/www/openatlas/instance/ && ls -la && cat testing.py && cat production.py"
-
+      
       - name: Run tests
         run: |
           docker exec -i openatlas /bin/bash -c "cd /var/www/openatlas/tests && nosetests3 -c .noserc --verbosity=2 --nologcapture --nocapture && echo passed"

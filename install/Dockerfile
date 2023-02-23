@@ -7,17 +7,16 @@ RUN --mount=type=cache,target=/var/cache/apt \
     apt install -y --no-install-recommends python3-flask-babel python3-flask-login python3-flaskext.wtf python3-markdown python3-numpy &&\
     apt install -y --no-install-recommends python3-pandas python3-jinja2 python3-flask-cors python3-flask-restful p7zip-full &&\
     apt install -y --no-install-recommends python3-wand python3-rdflib python3-requests python3-dicttoxml python3-rdflib-jsonld python3-flasgger &&\
-    apt install -y --no-install-recommends apache2 libapache2-mod-wsgi-py3 python3-coverage python3-nose &&\
+    apt install -y --no-install-recommends apache2 libapache2-mod-wsgi-py3 python3-coverage python3-nose exiftran &&\
     apt install -y --no-install-recommends gettext npm python3-pip git postgresql-client-13 &&\
     apt install -y --no-install-recommends dos2unix locales locales-all w3c-sgml-lib &&\
     mkdir -p /var/www/openatlas /var/www/.cache /var/www/.local /var/www/.npm &&\
     chown -R www-data:www-data /var/www/.cache /var/www/.local /var/www/.npm /var/log/apache2 /var/run/apache2
 COPY --chown=www-data:www-data / /var/www/openatlas/
 RUN cd /var/www/openatlas && cp install/entrypoint.sh /entrypoint.sh &&\
-    cp install/check_database.sh /check_database.sh &&\
     cp install/example_apache.conf /etc/apache2/sites-available/000-default.conf &&\
-    chmod a+x /entrypoint.sh /check_database.sh &&\
-    dos2unix /entrypoint.sh /check_database.sh &&\
+    chmod a+x /entrypoint.sh &&\
+    dos2unix /entrypoint.sh &&\
     sed -i 's~^Listen.*~Listen 8080~' /etc/apache2/ports.conf &&\
     sed -i 's~^<VirtualHost \*:80>~<VirtualHost *:8080>~' /etc/apache2/sites-available/000-default.conf &&\
     sed -i 's~ServerName.*~~' /etc/apache2/sites-available/000-default.conf

@@ -99,8 +99,7 @@ def openatlas_class_index() -> str:
             link(class_.cidoc_class),
             link(g.types[class_.standard_type_id])
             if class_.standard_type_id else '',
-            f'<span class="uc-first">{_(class_.view.replace("_", " "))}</span>'
-            if class_.view else '',
+            (class_.view.replace("_", " ")) if class_.view else '',
             class_.write_access,
             _('allowed') if class_.alias_allowed else '',
             _('allowed') if class_.reference_system_allowed else '',

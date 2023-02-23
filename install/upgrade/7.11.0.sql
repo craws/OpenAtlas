@@ -3,15 +3,13 @@
 
 BEGIN;
 
--- For now there are only some cleanup statements so need to raise version
-
 -- Raise database version
--- UPDATE web.settings SET value = '7.11.0' WHERE name = 'database_version';
+UPDATE web.settings SET value = '7.11.0' WHERE name = 'database_version';
 
--- Remove setting for show API buttons (#)
+-- Remove setting for show API buttons (#1963)
 DELETE FROM web.user_settings WHERE name = 'entity_show_api';
 
--- Remove old logs
+-- Remove system logs before 2022, delete this if you want to keep them (#1964)
 DELETE FROM web.system_log WHERE created < '2022-01-01';
 
 END;

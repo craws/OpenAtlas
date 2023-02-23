@@ -22,12 +22,10 @@ Form fields
   artifact, which it is a part of
 * **Owned by** - the :doc:`actor` who owns the artifact
 
-
 Can be linked via tabs to
 -------------------------
 * :doc:`source` - when it is referenced there
-* :doc:`event` - about movement with a **Move** event or creation with
-  a **Production** event
+* :doc:`event` - acquisition, move or production
 * :doc:`reference`
 * :doc:`file`
 
