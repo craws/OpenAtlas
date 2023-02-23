@@ -104,7 +104,6 @@ jobs:
         run: sleep 10
 
       - name: Initialize db
-        entrypoint:
         run: |
           docker create -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD\
               -e POSTGRES_DB=$POSTGRES_DB\
