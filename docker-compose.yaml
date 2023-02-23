@@ -11,18 +11,31 @@ services:
     volumes:
       - ./data/db:/var/lib/postgresql/data
 #     Installation of an empty database
-      - ./install/0_extensions.sql:/docker-entrypoint-initdb.d/0_extensions.sql
-      - ./install/1_structure.sql:/docker-entrypoint-initdb.d/1_structure.sql
-      - ./install/2_data_model.sql:/docker-entrypoint-initdb.d/2_data_model.sql
-      - ./install/3_data_web.sql:/docker-entrypoint-initdb.d/3_data_web.sql
-      - ./install/4_data_type.sql:/docker-entrypoint-initdb.d/4_data_type.sql
+#      - ./install/0_extensions.sql:/docker-entrypoint-initdb.d/0_extensions.sql
+#      - ./install/1_structure.sql:/docker-entrypoint-initdb.d/1_structure.sql
+#      - ./install/2_data_model.sql:/docker-entrypoint-initdb.d/2_data_model.sql
+#      - ./install/3_data_web.sql:/docker-entrypoint-initdb.d/3_data_web.sql
+#      - ./install/4_data_type.sql:/docker-entrypoint-initdb.d/4_data_type.sql
 #      Import dump (comment install section above)
 #      - ./files/export/dump.sql:/docker-entrypoint-initdb.d/dump.sql
     healthcheck:
       test: ["CMD-SHELL", "sh -c 'pg_isready -U openatlas -d openatlas'"]
-      interval: 40s
+      interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 30
+
+  initdb:
+    image: openatlas_openatlas
+    environment:
+      - POSTGRES_DB=openatlas
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PASSWORD=verysecret
+      - POSTGRES_USER=openatlas
+    entrypoint: >
+      /bin/bash -c 'if [ "$$( psql postgres://$$POSTGRES_USER:$$POSTGRES_PASSWORD@$$POSTGRES_HOST:5432/$$POSTGRES_DB -tAc "SELECT 1 FROM web.settings WHERE id = 1" )" == '"'"'1'"'"' ]; then echo '"'"'Database has already data'"'"'; else cd /var/www/openatlas/install && cat [0-9]_*.sql | psql postgres://$$POSTGRES_USER:$$POSTGRES_PASSWORD@$$POSTGRES_HOST:5432/$$POSTGRES_DB -f -; fi'
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   openatlas:
     build:
@@ -42,3 +55,5 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      initdb:
+        condition: service_completed_successfully

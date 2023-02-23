@@ -105,7 +105,7 @@ spec:
               postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DB
               -tAc "SELECT 1 FROM web.settings WHERE id = 1" )" == '1' ]; then
               echo 'Database has already data';  else cd
-              /var/www/openatlas/install && cat *.sql | psql
+              /var/www/openatlas/install && cat [0-9]_*.sql | psql
               postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DB
               -f -; fi
           command:
