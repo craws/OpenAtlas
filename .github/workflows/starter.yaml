@@ -183,7 +183,7 @@ jobs:
           DATABASE_PORT=5432
           DATABASE_PASS='verysecret'
           MAIL_PASSWORD='asdQWEtzu123'
-          SECRET_KEY='$COOKIE_KEY'  # Used for cookies
+          SECRET_KEY='$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c 32;echo;)'  # Used for cookies
           DEBUG = True
           WTF_CSRF_ENABLED = False
           WTF_CSRF_METHODS: list[str] = []
