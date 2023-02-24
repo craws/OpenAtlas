@@ -172,9 +172,34 @@ jobs:
           docker ps
           docker network ls
 
+      - name: Write testing.py
+        run: |
+          set -x
+          cat <<EOF > testing.py
+          SERVER_NAME='local.host'
+          DATABASE_NAME='openatlas'
+          DATABASE_USER='openatlas'
+          DATABASE_HOST='postgres'
+          DATABASE_PORT=5432
+          DATABASE_PASS='verysecret'
+          MAIL_PASSWORD='asdQWEtzu123'
+          SECRET_KEY='$COOKIE_KEY'  # Used for cookies
+          DEBUG = True
+          WTF_CSRF_ENABLED = False
+          WTF_CSRF_METHODS: list[str] = []
+          ARCHE = {
+              'id': 0,
+              'collection_ids': [0],
+              'base_url': 'https://arche-curation.acdh-dev.oeaw.ac.at/',
+              'thumbnail_url': 'https://arche-thumbnails.acdh.oeaw.ac.at/'}
+          EOF
+          sudo chown 33:33 testing.py
+          docker cp -a testing.py openatlas-openatlas-1:/var/www/openatlas/instance/
+          docker exec -i openatlas-openatlas-1 /bin/bash -c "cd /var/www/openatlas/instance/ && ls -la && cat testing.py"
+
       - name: Run tests
         run: |
-          docker exec -i openatlas_openatlas /bin/bash -c "cd /var/www/openatlas/tests && nosetests3 -c .noserc --verbosity=2 --nologcapture --nocapture && echo passed"
+          docker exec -i openatlas-openatlas-1 /bin/bash -c "cd /var/www/openatlas/tests && nosetests3 -c .noserc --verbosity=2 --nologcapture --nocapture && echo passed"
   _3:
     needs: [setup_workflow_env, test_openatlas]
     uses: acdh-oeaw/gl-autodevops-minimal-port/.github/workflows/deploy-cluster-2.yml@main
