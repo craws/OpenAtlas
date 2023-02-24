@@ -172,6 +172,13 @@ jobs:
           docker ps
           docker network ls
 
+      - name: File folders
+        run: |
+          ls -la
+          sudo chown -R 33:33 ./files/uploads
+          sudo chown -R 33:33 ./files/processed_images/resized
+          sudo chown -R 33:33 ./files/export
+
       - name: Write testing.py
         run: |
           set -x
