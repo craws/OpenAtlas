@@ -19,14 +19,15 @@
     </div>
   {% else %}
     <div class="row">
-      <div class="col-lg-5">
+      <div class="col">
         <div class="row">
           <div id='map-info-display' style="float:left;">
             {{ form|display_form(manual_page='entity/' + view_name)|safe }}
           </div>
         </div>
       </div>
-      <div class="col-lg-7">
+      <div class="col-lg-7 d-flex align-items-stretch">
+        <div onclick="toggleMapWidth(this)" class="d-none btn btn-light d-lg-flex align-items-center"><i class="fas fa-chevron-right"></i></div>
         <div id="map" class="map"></div>
       </div>
     </div>
