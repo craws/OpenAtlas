@@ -153,6 +153,10 @@ def loud_pagination() -> dict[str, Any]:
         "pagination": fields.Nested(pagination())}
 
 
+def loud_template() -> dict[str, Any]:
+    return {'': fields.Raw}
+
+
 def subunit_template(id_: str) -> dict[str, List]:
     timespan = {
         'earliestBegin': fields.String,
