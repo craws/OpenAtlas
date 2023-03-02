@@ -162,12 +162,26 @@ class Api(ApiTestCase):
             assert self.get_bool(rv['depictions'][0], 'url')
 
             # Test entity in GeoJSON format
-            for rv in [
-                self.app.get(url_for(
-                    'api_03.entity', id_=place.id, format='geojson')),
-                self.app.get(url_for(
-                    'api_03.entity', id_=place.id, format='geojson-v2'))]:
-                rv = rv.get_json()['features'][0]
+            rv = self.app.get(url_for(
+                'api_03.entity', id_=place.id, format='geojson'))
+            rv = rv.get_json()['features'][0]
+            assert self.get_bool(rv['geometry'], 'type')
+            assert self.get_bool(rv['geometry'], 'coordinates')
+            assert self.get_bool(rv['properties'], '@id')
+            assert self.get_bool(rv['properties'], 'systemClass')
+            assert self.get_bool(rv['properties'], 'name')
+            assert self.get_bool(rv['properties'], 'description')
+            assert self.get_bool(rv['properties'], 'begin_earliest')
+            assert self.get_bool(rv['properties'], 'begin_latest')
+            assert self.get_bool(rv['properties'], 'begin_comment')
+            assert self.get_bool(rv['properties'], 'end_earliest')
+            assert self.get_bool(rv['properties'], 'end_latest')
+            assert self.get_bool(rv['properties'], 'end_comment')
+            assert self.get_bool(rv['properties'], 'types')
+
+            rv = self.app.get(url_for(
+                'api_03.entity', id_=place.id, format='geojson-v2'))
+            rv = rv.get_json()['features'][0]
             assert self.get_bool(rv['geometry'], 'type')
             assert self.get_bool(
                 rv['geometry']['geometries'][0], 'coordinates')
