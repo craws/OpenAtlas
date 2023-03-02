@@ -33,8 +33,6 @@ def get_loud_entities(
             'id': url_for('api.entity', id_=link_.range.id, _external=True),
             'type': loud[get_crm_code(link_).replace(' ', '_')],
             '_label': link_.range.name}
-        if type_ := get_standard_type_loud(link_.range.types):
-            property_['classified_as'] = get_type_property(type_)
         return property_
 
     def get_domain_links() -> dict[str, Any]:

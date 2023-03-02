@@ -162,12 +162,26 @@ class Api(ApiTestCase):
             assert self.get_bool(rv['depictions'][0], 'url')
 
             # Test entity in GeoJSON format
-            for rv in [
-                self.app.get(url_for(
-                    'api_03.entity', id_=place.id, format='geojson')),
-                self.app.get(url_for(
-                    'api_03.entity', id_=place.id, format='geojson-v2'))]:
-                rv = rv.get_json()['features'][0]
+            rv = self.app.get(url_for(
+                'api_03.entity', id_=place.id, format='geojson'))
+            rv = rv.get_json()['features'][0]
+            assert self.get_bool(rv['geometry'], 'type')
+            assert self.get_bool(rv['geometry'], 'coordinates')
+            assert self.get_bool(rv['properties'], '@id')
+            assert self.get_bool(rv['properties'], 'systemClass')
+            assert self.get_bool(rv['properties'], 'name')
+            assert self.get_bool(rv['properties'], 'description')
+            assert self.get_bool(rv['properties'], 'begin_earliest')
+            assert self.get_bool(rv['properties'], 'begin_latest')
+            assert self.get_bool(rv['properties'], 'begin_comment')
+            assert self.get_bool(rv['properties'], 'end_earliest')
+            assert self.get_bool(rv['properties'], 'end_latest')
+            assert self.get_bool(rv['properties'], 'end_comment')
+            assert self.get_bool(rv['properties'], 'types')
+
+            rv = self.app.get(url_for(
+                'api_03.entity', id_=place.id, format='geojson-v2'))
+            rv = rv.get_json()['features'][0]
             assert self.get_bool(rv['geometry'], 'type')
             assert self.get_bool(
                 rv['geometry']['geometries'][0], 'coordinates')
@@ -182,6 +196,26 @@ class Api(ApiTestCase):
             assert self.get_bool(rv['properties'], 'end_latest')
             assert self.get_bool(rv['properties'], 'end_comment')
             assert self.get_bool(rv['properties'], 'types')
+
+            # Test entity in Linked Open Usable Data
+            rv = self.app.get(
+                url_for('api_03.entity', id_=place.id, format='loud'))
+            rv = rv.get_json()
+            assert bool(rv['type'] == 'PhysicalThing')
+            assert bool(rv['_label'] == 'Shire')
+            assert bool(rv['content']
+                        == 'The Shire was the homeland of the hobbits.')
+            assert bool(rv['timespan']['begin_of_the_begin']
+                        == '2018-01-31T00:00:00')
+            assert bool(rv['identified_by'][0]['_label'] == 'Sûza')
+            assert bool(rv['classified_as'][0]['_label'] == 'Boundary Mark')
+            assert bool(rv['former_or_current_location'][0]['_label']
+                        == 'Location of Shire')
+            assert bool(rv['former_or_current_location'][0]['defined_by']
+                        == 'POLYGON((28.9389559878606 41.0290525580955,'
+                           '28.9409293485759 41.0273124142771,28.941969652866 '
+                           '41.0284940983463,28.9399641177912 41.0297647897435'
+                           ',28.9389559878606 41.0290525580955))')
 
             try:
                 for rv in [
@@ -341,6 +375,19 @@ class Api(ApiTestCase):
                 rv = rv.get_json()['results'][0]['features'][0]
                 assert self.get_bool(rv['properties'], '@id')
                 assert self.get_bool(rv['properties'], 'systemClass')
+
+            # Test entities with Linked Open Usable Data Format
+            rv = self.app.get(url_for(
+                'api_03.query',
+                entities=location.id,
+                cidoc_classes=['E18', 'E53'],
+                view_classes='artifact',
+                system_classes=['person', 'type'],
+                format='loud',
+                limit=0))
+            rv = rv.get_json()['results'][0]
+            assert bool(rv['type'] == 'Type')
+            assert bool(rv['_label'] == 'Abbot')
 
             # ---Type Endpoints---
             for rv in [
