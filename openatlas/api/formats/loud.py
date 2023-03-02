@@ -3,6 +3,7 @@ from typing import Any
 
 from flask import url_for
 
+from models.gis import Gis
 from openatlas.api.resources.util import remove_spaces_dashes, date_to_str, \
     get_crm_relation, get_crm_code
 from openatlas.models.entity import Entity
@@ -52,8 +53,14 @@ def get_loud_entities(
             property_name = 'broader'
         else:
             property_name = loud[get_crm_relation(link_).replace(' ', '_')]
-        base_property = get_range_links()
-        properties_set[property_name].append(base_property)
+
+        if link_.property.code == 'P53':
+            for geom in Gis.get_wkt_by_id(link_.range.id):
+                base_property = get_range_links() | geom
+                properties_set[property_name].append(base_property)
+        else:
+            base_property = get_range_links()
+            properties_set[property_name].append(base_property)
 
     for link_ in data['links_inverse']:
         if link_.property.code in ['OA7', 'OA8', 'OA9']:
@@ -63,11 +70,13 @@ def get_loud_entities(
         else:
             property_name = \
                 loud[get_crm_relation(link_, True).replace(' ', '_')]
-        base_property = get_domain_links()
 
-        if link_.property.code == 'P108':
-            properties_unique[property_name] = base_property
+        if link_.property.code == 'P53':
+            for geom in Gis.get_wkt_by_id(link_.range.id):
+                base_property = get_domain_links() | geom
+                properties_set[property_name].append(base_property)
         else:
+            base_property = get_domain_links()
             properties_set[property_name].append(base_property)
 
     return {'@context': "https://linked.art/ns/v1/linked-art.json"} | \
