@@ -120,7 +120,7 @@ def resolve_entity(
     if parser['format'] in ['geojson', 'geojson-v2']:
         template = geojson_collection_template()
     if parser['format'] == 'loud':
-        template = loud_template()
+        template = loud_template(result)
     if parser['download']:
         download(result, template, entity.id)
     return marshal(result, template), 200
