@@ -23,7 +23,7 @@ from openatlas.api.resources.search_validation import (
     iterate_validation)
 from openatlas.api.resources.templates import (
     geojson_collection_template, geojson_pagination, linked_place_pagination,
-    linked_places_template, subunit_template, loud_pagination)
+    linked_places_template, subunit_template, loud_pagination, loud_template)
 from openatlas.api.resources.util import (
     get_entities_by_type, get_key, link_parser_check,
     link_parser_check_inverse, parser_str_to_dict, remove_duplicate_entities)
@@ -90,6 +90,12 @@ def get_entity_formatted(
         return get_geojson([entity], parser)
     if parser['format'] == 'geojson-v2':
         return get_geojson_v2([entity], parser)
+    entity_dict = {
+            'entity': entity,
+            'links': get_all_links_of_entities(entity.id),
+            'links_inverse': get_all_links_of_entities_inverse(entity.id)}
+    if parser['format'] == 'loud':
+        return get_loud_entities(entity_dict, parse_loud_context())
     return get_linked_places_entity(
         entity,
         get_all_links_of_entities(entity.id),
@@ -110,9 +116,11 @@ def resolve_entity(
         return Response(
             rdf_output(result, parser),
             mimetype=app.config['RDF_FORMATS'][parser['format']])
-    template = geojson_collection_template() \
-        if parser['format'] in ['geojson', 'geojson-v2'] \
-        else linked_places_template(parser['show'])
+    template = linked_places_template(parser['show'])
+    if parser['format'] in ['geojson', 'geojson-v2']:
+        template = geojson_collection_template()
+    if parser['format'] == 'loud':
+        template = loud_template(result)
     if parser['download']:
         download(result, template, entity.id)
     return marshal(result, template), 200
