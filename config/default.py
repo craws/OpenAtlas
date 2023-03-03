@@ -64,7 +64,8 @@ RDF_FORMATS = {
     'nt': 'text/plain',
     'xml': 'application/xml'}
 JSON_FORMATS = {
-    'lp': 'application/json',
+    'lp': 'application/ld+json',
+    'loud': 'application/ld+json',
     'geojson': 'application/json',
     'geojson-v2': 'application/json'}
 API_FORMATS = RDF_FORMATS | JSON_FORMATS

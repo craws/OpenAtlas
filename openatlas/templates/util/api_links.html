@@ -4,6 +4,7 @@
   </button>
   <ul class="dropdown-menu p-2">
     <li>{{ "Linked Places"|link(url_for('api.entity', id_=entity.id, format='lp'), external=True)|safe }}</li>
+    <li>{{ "Linked Open Art"|link(url_for('api.entity', id_=entity.id, format='loud'), external=True)|safe }}</li>
     <li>{{ "GeoJSON"|link(url_for('api.entity', id_=entity.id, format='geojson'), external=True)|safe }}</li>
     <li>{{ "GeoJSON v2"|link(url_for('api.entity', id_=entity.id, format='geojson-v2'), external=True)|safe }}</li>
   </ul>
