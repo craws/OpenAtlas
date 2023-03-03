@@ -95,7 +95,7 @@ def get_entity_formatted(
             'links': get_all_links_of_entities(entity.id),
             'links_inverse': get_all_links_of_entities_inverse(entity.id)}
     if parser['format'] == 'loud':
-        return get_loud_entities(entity_dict, parse_loud_contex())
+        return get_loud_entities(entity_dict, parse_loud_context())
     return get_linked_places_entity(
         entity,
         get_all_links_of_entities(entity.id),
@@ -190,7 +190,7 @@ def get_entities_formatted(
     for link_ in link_parser_check_inverse(entities, parser):
         entities_dict[link_.range.id]['links_inverse'].append(link_)
     if parser['format'] == 'loud':
-        return [get_loud_entities(item, parse_loud_contex())
+        return [get_loud_entities(item, parse_loud_context())
                 for item in entities_dict.values()]
     result = []
     for item in entities_dict.values():
@@ -203,17 +203,16 @@ def get_entities_formatted(
     return result
 
 
-# Todo: This is just for test reasons, make code prettier
-def parse_loud_contex() -> dict[str, str]:
-    file = pathlib.Path(app.root_path) / 'api' / 'linked-art.json'
-    with open(file) as file:
+def parse_loud_context() -> dict[str, str]:
+    file_path = pathlib.Path(app.root_path) / 'api' / 'linked-art.json'
+    with open(file_path) as f:
         output = {}
-        for key, value in json.load(file)['@context'].items():
+        for key, value in json.load(f)['@context'].items():
             if isinstance(value, dict):
                 output[value['@id']] = key
                 if '@context' in value.keys():
                     for key2, value2 in value['@context'].items():
-                        if isinstance(value, dict):
+                        if isinstance(value2, dict):
                             output[value2['@id']] = key2
     return output
 

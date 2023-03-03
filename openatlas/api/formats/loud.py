@@ -3,7 +3,7 @@ from typing import Any
 
 from flask import url_for
 
-from models.gis import Gis
+from openatlas.models.gis import Gis
 from openatlas.api.resources.util import remove_spaces_dashes, date_to_str, \
     get_crm_relation, get_crm_code
 from openatlas.models.entity import Entity

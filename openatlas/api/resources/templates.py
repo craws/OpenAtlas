@@ -149,7 +149,7 @@ def geojson_pagination() -> dict[str, Any]:
 
 def loud_pagination() -> dict[str, Any]:
     return {
-        "results": fields.Raw,
+        "results": fields.List(fields.Raw),
         "pagination": fields.Nested(pagination())}
 
 
