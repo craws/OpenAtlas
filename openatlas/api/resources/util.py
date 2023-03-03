@@ -124,6 +124,10 @@ def remove_duplicate_entities(entities: list[Entity]) -> list[Entity]:
         if not (entity.id in seen or seen_add(entity.id))]
 
 
+def remove_spaces_dashes(string: str) -> str:
+    return string.replace(' ', '').replace('-', '')
+
+
 def link_parser_check(
         entities: list[Entity],
         parser: dict[str, Any]) -> list[Link]:
@@ -235,3 +239,22 @@ def filter_link_list_by_property_codes(
                 'domain_id': link_['domain_id'],
                 'range_id': link_['range_id']})
     return data
+
+
+def date_to_str(date: Any) -> str:
+    return str(date) if date else None
+
+
+def get_crm_relation(link_: Link, inverse: bool = False) -> str:
+    property_ = f"i {link_.property.i18n_inverse['en']}" \
+        if inverse and link_.property.i18n_inverse['en'] \
+        else f" {link_.property.i18n['en']}"
+    return f"crm:{link_.property.code}{property_}"
+
+
+def get_crm_code(link_: Link, inverse: bool = False) -> str:
+    name = link_.domain.cidoc_class.i18n['en'] \
+        if inverse else link_.range.cidoc_class.i18n['en']
+    code = link_.domain.cidoc_class.code \
+        if inverse else link_.range.cidoc_class.code
+    return f"crm:{code} {name}"
