@@ -69,6 +69,8 @@ def resolve_entities(
 def get_entities_template(parser: dict[str, str]) -> dict[str, Any]:
     if parser['format'] in ['geojson', 'geojson-v2']:
         return geojson_pagination()
+    if parser['format'] == 'loud':
+        return loud_pagination()
     return linked_place_pagination(parser)
 
 
