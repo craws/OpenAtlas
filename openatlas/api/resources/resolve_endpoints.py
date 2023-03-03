@@ -23,7 +23,7 @@ from openatlas.api.resources.search_validation import (
     iterate_validation)
 from openatlas.api.resources.templates import (
     geojson_collection_template, geojson_pagination, linked_place_pagination,
-    linked_places_template, subunit_template)
+    linked_places_template, subunit_template, loud_pagination)
 from openatlas.api.resources.util import (
     get_entities_by_type, get_key, link_parser_check,
     link_parser_check_inverse, parser_str_to_dict, remove_duplicate_entities)
