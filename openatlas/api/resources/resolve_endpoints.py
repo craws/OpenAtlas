@@ -69,8 +69,6 @@ def resolve_entities(
 def get_entities_template(parser: dict[str, str]) -> dict[str, Any]:
     if parser['format'] in ['geojson', 'geojson-v2']:
         return geojson_pagination()
-    if parser['format'] == 'loud':
-        return loud_pagination()
     return linked_place_pagination(parser)
 
 
@@ -83,8 +81,6 @@ def sorting(entities: list[Entity], parser: dict[str, Any]) -> list[Entity]:
         reverse=bool(parser['sort'] == 'desc'))
 
 
-
-
 def get_entity_formatted(
         entity: Entity,
         parser: dict[str, Any]) -> dict[str, Any]:
@@ -92,12 +88,6 @@ def get_entity_formatted(
         return get_geojson([entity], parser)
     if parser['format'] == 'geojson-v2':
         return get_geojson_v2([entity], parser)
-    entity_dict = {
-            'entity': entity,
-            'links': get_all_links_of_entities(entity.id),
-            'links_inverse': get_all_links_of_entities_inverse(entity.id)}
-    if parser['format'] == 'loud':
-        return get_loud_entities(entity_dict, parse_loud_context)
     return get_linked_places_entity(
         entity,
         get_all_links_of_entities(entity.id),
@@ -118,11 +108,9 @@ def resolve_entity(
         return Response(
             rdf_output(result, parser),
             mimetype=app.config['RDF_FORMATS'][parser['format']])
-    template = linked_places_template(parser['show'])
-    if parser['format'] in ['geojson', 'geojson-v2']:
-        template = geojson_collection_template()
-    if parser['format'] == 'loud':
-        template = loud_template(result)
+    template = geojson_collection_template() \
+        if parser['format'] in ['geojson', 'geojson-v2'] \
+        else linked_places_template(parser['show'])
     if parser['download']:
         download(result, template, entity.id)
     return marshal(result, template), 200
@@ -191,9 +179,6 @@ def get_entities_formatted(
         entities_dict[link_.domain.id]['links'].append(link_)
     for link_ in link_parser_check_inverse(entities, parser):
         entities_dict[link_.range.id]['links_inverse'].append(link_)
-    if parser['format'] == 'loud':
-        return [get_loud_entities(item, parse_loud_context)
-                for item in entities_dict.values()]
     result = []
     for item in entities_dict.values():
         result.append(
