@@ -356,6 +356,19 @@ class Api(ApiTestCase):
                 assert self.get_bool(rv['properties'], '@id')
                 assert self.get_bool(rv['properties'], 'systemClass')
 
+            # Test entities with Linked Open Usable Data Format
+            rv = self.app.get(url_for(
+                'api_03.query',
+                entities=location.id,
+                cidoc_classes=['E18', 'E53'],
+                view_classes='artifact',
+                system_classes=['person', 'type'],
+                format='loud',
+                limit=0))
+            rv = rv.get_json()['results'][0]
+            assert bool(rv['type'] == 'Type')
+            assert bool(rv['_label'] == 'Abbot')
+
             # ---Type Endpoints---
             for rv in [
                 self.app.get(url_for('api_03.type_overview')),
