@@ -4,7 +4,6 @@ from typing import Any
 import dicttoxml
 from flask import Response
 
-dicttoxml.set_debug(debug=False)
 dicttoxml.LOG.setLevel(logging.ERROR)
 
 
