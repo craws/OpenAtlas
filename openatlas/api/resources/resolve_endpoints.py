@@ -11,6 +11,7 @@ from openatlas.api.formats.csv import (
     export_csv_for_network_analysis, export_entities_csv)
 from openatlas.api.formats.geojson import get_geojson, get_geojson_v2
 from openatlas.api.formats.linked_places import get_linked_places_entity
+from openatlas.api.formats.loud import get_loud_entities
 from openatlas.api.formats.rdf import rdf_output
 from openatlas.api.formats.xml import subunit_xml
 from openatlas.api.resources.error import (
@@ -178,6 +179,9 @@ def get_entities_formatted(
         entities_dict[link_.domain.id]['links'].append(link_)
     for link_ in link_parser_check_inverse(entities, parser):
         entities_dict[link_.range.id]['links_inverse'].append(link_)
+    if parser['format'] == 'loud':
+        return [get_loud_entities(item, parse_loud_context())
+                for item in entities_dict.values()]
     result = []
     for item in entities_dict.values():
         result.append(
