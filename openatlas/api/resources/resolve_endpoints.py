@@ -88,6 +88,12 @@ def get_entity_formatted(
         return get_geojson([entity], parser)
     if parser['format'] == 'geojson-v2':
         return get_geojson_v2([entity], parser)
+    entity_dict = {
+            'entity': entity,
+            'links': get_all_links_of_entities(entity.id),
+            'links_inverse': get_all_links_of_entities_inverse(entity.id)}
+    if parser['format'] == 'loud':
+        return get_loud_entities(entity_dict, parse_loud_context())
     return get_linked_places_entity(
         entity,
         get_all_links_of_entities(entity.id),
