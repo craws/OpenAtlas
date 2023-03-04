@@ -182,7 +182,7 @@ def get_reference_systems(
 
 def get_geometric_collection(
         entity: Entity,
-        links: list[Link]) -> Union[dict[str, Any], None]:
+        links: list[Link]) -> Optional[dict[str, Any]]:
     data = None
     if entity.class_.view == 'place' or entity.class_.name == 'artifact':
         data = get_geoms_by_entity(get_location_id(links))
@@ -241,7 +241,7 @@ def filter_link_list_by_property_codes(
     return data
 
 
-def date_to_str(date: Any) -> str:
+def date_to_str(date: Any) -> Optional[str]:
     return str(date) if date else None
 
 

@@ -1,4 +1,4 @@
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 from flask import g
 
@@ -25,7 +25,7 @@ def get_geojson(
     return {'type': 'FeatureCollection', 'features': out}
 
 
-def get_geom(entity: Entity) -> Union[list[dict[str, Any]], list[Any]]:
+def get_geom(entity: Entity) -> list[Any]:
     if entity.class_.view == 'place' or entity.class_.name == 'artifact':
         return Gis.get_by_id(
             Link.get_linked_entity_safe(entity.id, 'P53').id)

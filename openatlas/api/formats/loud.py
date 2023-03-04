@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any
+from typing import Any, Optional
 
 from flask import url_for
 
@@ -14,7 +14,7 @@ def get_loud_entities(
         data: dict[str, Any],
         loud: dict[str, str]) -> Any:
     properties_set = defaultdict(list)
-    properties_unique = {}
+    properties_unique: Any = {}
 
     def base_entity_dict() -> dict[str, Any]:
         return {
@@ -78,9 +78,7 @@ def get_loud_entities(
             properties_set[property_name].append(base_property)
 
     return {'@context': "https://linked.art/ns/v1/linked-art.json"} | \
-        base_entity_dict() | \
-        properties_set | \
-        properties_unique
+        base_entity_dict() | properties_set | properties_unique  # type: ignore
 
 
 def get_loud_timespan(entity: Entity) -> dict[str, Any]:
@@ -99,7 +97,7 @@ def get_type_property(type_: Type) -> dict[str, Any]:
         '_label': type_.name}
 
 
-def get_standard_type_loud(types: dict[Type, Any]) -> Type:
+def get_standard_type_loud(types: dict[Type, Any]) -> Optional[Type]:
     standard = None
     for type_ in types:
         if type_.category == 'standard':
