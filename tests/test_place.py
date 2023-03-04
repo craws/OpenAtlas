@@ -5,7 +5,6 @@ from flask import g, url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
-from openatlas.models.link import Link
 from openatlas.models.overlay import Overlay
 from tests.base import TestBaseCase, get_hierarchy, insert
 
@@ -131,7 +130,7 @@ class PlaceTest(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 file = Entity.get_by_class('file')[0]
-                link_id = Link.insert(file, 'P67', place)[0]
+                link_id = file.link('P67', place)[0]
 
             rv = self.app.get(
                 url_for(
