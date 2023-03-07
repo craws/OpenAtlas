@@ -14,7 +14,6 @@ def get_loud_entities(
         data: dict[str, Any],
         loud: dict[str, str]) -> Any:
     properties_set = defaultdict(list)
-    properties_unique: Any = {}
 
     def base_entity_dict() -> dict[str, Any]:
         return {
@@ -78,7 +77,7 @@ def get_loud_entities(
             properties_set[property_name].append(base_property)
 
     return {'@context': "https://linked.art/ns/v1/linked-art.json"} | \
-        base_entity_dict() | properties_set | properties_unique  # type: ignore
+        base_entity_dict() | properties_set  # type: ignore
 
 
 def get_loud_timespan(entity: Entity) -> dict[str, Any]:
