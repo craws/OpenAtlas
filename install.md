@@ -61,10 +61,14 @@ Create an openatlas database, make openatlas the owner of it
 
     $ createdb openatlas -O openatlas
 
+Add postgis and unaccent extension to the database
+
+    $ psql openatlas -c "CREATE EXTENSION postgis; CREATE EXTENSION unaccent;"
+
 Import the SQL files:
 
     $ cd install
-    $ cat 0_extensions.sql 1_structure.sql 2_data_model.sql 3_data_web.sql 4_data_type.sql | psql -d openatlas -f -
+    $ cat 1_structure.sql 2_data_model.sql 3_data_web.sql 4_data_type.sql | psql -d openatlas -f -
 
 A user with username **OpenAtlas** is created with the password
 **change_me_PLEASE!**
