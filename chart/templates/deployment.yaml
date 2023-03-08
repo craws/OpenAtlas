@@ -34,7 +34,10 @@ spec:
                 optional: false
             - secretRef:
                 name: {{ template "fullname" . }}-secret
-                optional: false
+                optional: true
+            - secretRef:
+                name: {{ .Release.Name }}
+                optional: true
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" | quote }}
           livenessProbe:

@@ -9,7 +9,6 @@ postgis:
   user: openatlas
   password: openatlas
   version: "13-3.3"
-  overwriteDatabase: "TRUE"
 
 hostName: oa-helm.acdh-cluster-2.arz.oeaw.ac.at
 
