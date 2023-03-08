@@ -29,14 +29,14 @@ spec:
             - name: POSTGRES_HOST
               value: {{ .Values.postgis.host | default ( print ( include "fullname" . ) "-postgres" ) | quote }}
           envFrom:
-            {{ if eq .Values.postgis.deploy true }}
+{{- if eq .Values.postgis.deploy true -}}
             - configMapRef:
                 name: {{ template "fullname" . }}-configmap
                 optional: false
             - secretRef:
                 name: {{ template "fullname" . }}-secret
                 optional: false
-            {{ end }}
+{{- end }}
             - secretRef:
                 name: {{ .Release.Name }}
                 optional: true
@@ -120,12 +120,17 @@ spec:
             - name: POSTGRES_HOST
               value: {{ .Values.postgis.host | default ( print ( include "fullname" . ) "-postgres" ) | quote }}
           envFrom:
+{{- if eq .Values.postgis.deploy true -}}
             - configMapRef:
                 name: {{ template "fullname" . }}-configmap
                 optional: false
             - secretRef:
                 name: {{ template "fullname" . }}-secret
                 optional: false
+{{- end }}
+            - secretRef:
+                name: {{ .Release.Name }}
+                optional: true
           image: ghcr.io/acdh-oeaw/openatlas/container-preview:49b8d39
           imagePullPolicy: IfNotPresent
           name: initdb
