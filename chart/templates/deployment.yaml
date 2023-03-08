@@ -29,12 +29,14 @@ spec:
             - name: POSTGRES_HOST
               value: {{ .Values.postgis.host | default ( print ( include "fullname" . ) "-postgres" ) | quote }}
           envFrom:
+            {{ if eq .Values.postgis.deploy true }}
             - configMapRef:
                 name: {{ template "fullname" . }}-configmap
                 optional: false
             - secretRef:
                 name: {{ template "fullname" . }}-secret
-                optional: true
+                optional: false
+            {{ end }}
             - secretRef:
                 name: {{ .Release.Name }}
                 optional: true

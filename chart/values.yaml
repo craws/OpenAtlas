@@ -3,6 +3,7 @@
 # Declare variables to be passed into your templates.
 
 postgis:
+  deploy: true
   # Set host if database is external
   #  host: postgres
   name: openatlas-test

@@ -1,3 +1,4 @@
+{{- if eq .Values.postgis.deploy true -}}
 apiVersion: v1
 data:
   POSTGRES_DB: {{ .Values.postgis.name | default (printf "%s" (include "fullname" .)) | quote }}
@@ -6,3 +7,4 @@ metadata:
   labels:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
   name: {{ template "fullname" . }}-configmap
+{{- end -}}
