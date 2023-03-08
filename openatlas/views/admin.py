@@ -691,12 +691,16 @@ def admin_newsletter() -> Union[str, Response]:
             '',
             [InputRequired()],
             render_kw={
+                'class': 'w-100',
                 'placeholder': uc_first(_('subject')),
                 'autofocus': True})
         body = TextAreaField(
             '',
             [InputRequired()],
-            render_kw={'placeholder': uc_first(_('content'))})
+            render_kw={
+                'class': 'w-100',
+                'rows': '8',
+                'placeholder': uc_first(_('content'))})
         save = SubmitField(_('send'))
 
     form = NewsLetterForm()

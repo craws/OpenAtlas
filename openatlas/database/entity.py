@@ -279,3 +279,24 @@ class Entity:
                 'user_id': user_id,
                 'classes': tuple(classes)})
         return [dict(row) for row in g.cursor.fetchall()]
+
+    @staticmethod
+    def link(data: dict[str, Any]) -> int:
+        g.cursor.execute(
+            """
+            INSERT INTO model.link (
+                property_code,
+                domain_id,
+                range_id,
+                description,
+                type_id
+            ) VALUES (
+                %(property_code)s,
+                %(domain_id)s,
+                %(range_id)s,
+                %(description)s,
+                %(type_id)s)
+            RETURNING id;
+            """,
+            data)
+        return g.cursor.fetchone()['id']

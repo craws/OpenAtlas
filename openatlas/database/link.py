@@ -41,27 +41,6 @@ class Link:
             data)
 
     @staticmethod
-    def insert(data: dict[str, Any]) -> int:
-        g.cursor.execute(
-            """
-            INSERT INTO model.link (
-                property_code,
-                domain_id,
-                range_id,
-                description,
-                type_id
-            ) VALUES (
-                %(property_code)s,
-                %(domain_id)s,
-                %(range_id)s,
-                %(description)s,
-                %(type_id)s)
-            RETURNING id;
-            """,
-            data)
-        return g.cursor.fetchone()['id']
-
-    @staticmethod
     def get_linked_entities(id_: int, codes: list[str]) -> list[int]:
         g.cursor.execute(
             """

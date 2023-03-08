@@ -93,7 +93,7 @@ def set_form_settings(form: Any, profile: bool = False) -> None:
 def populate_insert_form(
         form: FlaskForm,
         class_: str,
-        origin: Union[Entity, Type, None]) -> None:
+        origin: Optional[Entity]) -> None:
     if hasattr(form, 'alias'):
         form.alias.append_entry('')
     if not origin:

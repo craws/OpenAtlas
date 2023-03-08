@@ -91,6 +91,10 @@ form ul, form ol, form li {
   }
 }
 
+.rotate-180{
+  rotate: 180deg;
+}
+
 .bg-gray{
   background-color: #e9ecef !important
 }

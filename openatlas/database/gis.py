@@ -41,6 +41,39 @@ class Gis:
         return geometries
 
     @staticmethod
+    def get_wkt_by_id(id_: int) -> list[dict[str, Any]]:
+        geometries = []
+        g.cursor.execute(
+            """
+            SELECT
+                g.id,
+                g.name,
+                g.description,
+                g.type,
+                public.ST_AsText(geom_point) AS point,
+                public.ST_AsText(geom_linestring) AS linestring,
+                public.ST_AsText(geom_polygon) AS polygon
+            FROM model.entity place
+            JOIN model.gis g ON place.id = g.entity_id
+            WHERE place.id = %(id_)s;
+            """,
+            {'id_': id_})
+        for row in g.cursor.fetchall():
+            geometry = {}
+            if row['point']:
+                geometry['defined_by'] = row['point']
+            elif row['linestring']:
+                geometry['defined_by'] = row['linestring']
+            else:
+                geometry['defined_by'] = row['polygon']
+            geometry['content'] = row['description'].replace('"', '\"') \
+                if row['description'] else ''
+            geometry['shape_type'] = row['type'].replace('"', '\"') \
+                if row['type'] else ''
+            geometries.append(geometry)
+        return geometries
+
+    @staticmethod
     def get_all(extra_ids: list[int]) -> list[dict[str, Any]]:
         g.cursor.execute(
             """

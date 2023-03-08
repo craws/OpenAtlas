@@ -71,45 +71,6 @@ class Link:
         self.end_comment = data['end_comment']
 
     @staticmethod
-    def insert(
-            entity: Entity,
-            property_code: str,
-            range_: Union[Entity, list[Entity]],
-            description: Optional[str] = None,
-            inverse: bool = False,
-            type_id: Optional[int] = None) -> list[int]:
-        property_ = g.properties[property_code]
-        entities = range_ if isinstance(range_, list) else [range_]
-        new_link_ids = []
-        for linked_entity in entities:
-            domain = linked_entity if inverse else entity
-            range_ = entity if inverse else linked_entity
-            domain_error = True
-            range_error = True
-            if property_.find_object(
-                    'domain_class_code',
-                    domain.class_.cidoc_class.code):
-                domain_error = False
-            if property_.find_object(
-                    'range_class_code',
-                    range_.class_.cidoc_class.code):
-                range_error = False
-            if domain_error or range_error:  # pragma: no cover
-                text = \
-                    f"invalid CIDOC link {domain.class_.cidoc_class.code}" \
-                    f" > {property_code} > {range_.class_.cidoc_class.code}"
-                g.logger.log('error', 'model', text)
-                abort(400, text)
-            id_ = Db.insert({
-                'property_code': property_code,
-                'domain_id': domain.id,
-                'range_id': range_.id,
-                'description': description,
-                'type_id': type_id})
-            new_link_ids.append(id_)
-        return new_link_ids
-
-    @staticmethod
     def get_linked_entity(
             id_: int,
             code: str,
@@ -290,7 +251,7 @@ class Link:
         data = []
         for type_ in g.types.values():
             if not type_.multiple \
-                    and type_.category not in  ['value', 'tools'] \
+                    and type_.category not in ['value', 'tools'] \
                     and (type_ids := type_.get_sub_ids_recursive()):
                 for id_ in Db.check_single_type_duplicates(type_ids):
                     offending_types = []

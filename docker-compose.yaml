@@ -6,14 +6,18 @@ services:
       - POSTGRES_DB=openatlas
       - POSTGRES_PASSWORD=verysecret
       - POSTGRES_USER=openatlas
+#    ports:
+#     - "25432:5432"
     volumes:
       - ./data/db:/var/lib/postgresql/data
+#     Installation of an empty database
+      - ./install/0_extensions.sql:/docker-entrypoint-initdb.d/0_extensions.sql
       - ./install/1_structure.sql:/docker-entrypoint-initdb.d/1_structure.sql
       - ./install/2_data_model.sql:/docker-entrypoint-initdb.d/2_data_model.sql
       - ./install/3_data_web.sql:/docker-entrypoint-initdb.d/3_data_web.sql
       - ./install/4_data_type.sql:/docker-entrypoint-initdb.d/4_data_type.sql
-      # Uncomment to import SQL dump
-      # - ./files/export/dump.sql:/docker-entrypoint-initdb.d/dump.sql
+#      Import dump (comment install section above out)
+#      - ./files/export/dump.sql:/docker-entrypoint-initdb.d/dump.sql
     healthcheck:
       test: ["CMD-SHELL", "sh -c 'pg_isready -U openatlas -d openatlas'"]
       interval: 40s

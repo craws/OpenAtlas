@@ -26,6 +26,12 @@ Install exiftran to support rotation correction of images (#1943)
 
     # apt install exiftran
 
+#### Purging database system logs before 2022
+Database system logs before 2022 will be deleted. They aren't that relevant
+and should be still available via backups. But in case you like to keep them
+you can delete this SQL statement in 7.11.0.sql before running the database
+upgrade script.
+
 ### 7.9.x to 7.10.0
 7.10.0.sql is needed but will be taken care of by the database upgrade script.
 

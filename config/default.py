@@ -3,7 +3,7 @@ from pathlib import Path
 
 from config.database_versions import DATABASE_VERSIONS
 
-VERSION = '7.11.0'
+VERSION = '7.12.0'
 DATABASE_VERSION = DATABASE_VERSIONS[0]
 DEMO_MODE = False  # If activated some options are disabled, login is prefilled
 
@@ -64,7 +64,8 @@ RDF_FORMATS = {
     'nt': 'text/plain',
     'xml': 'application/xml'}
 JSON_FORMATS = {
-    'lp': 'application/json',
+    'lp': 'application/ld+json',
+    'loud': 'application/ld+json',
     'geojson': 'application/json',
     'geojson-v2': 'application/json'}
 API_FORMATS = RDF_FORMATS | JSON_FORMATS
