@@ -57,7 +57,7 @@ def link_insert(id_: int, view: str) -> Union[str, Response]:
         excluded = entity.get_linked_entities(property_code, inverse=inverse)
     return render_template(
         'content.html',
-        content=get_table_form(view, excluded),
+        content=get_table_form(g.view_class_mapping[view], excluded),
         title=_(entity.class_.view),
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],
@@ -213,7 +213,7 @@ def add_subunit(super_id: int) -> Union[str, Response]:
             excluded.append(entity)
     return render_template(
         'content.html',
-        content=get_table_form('artifact', excluded),
+        content=get_table_form(['artifact'], excluded),
         entity=super_,
         title=super_.name,
         crumbs=[
@@ -235,7 +235,7 @@ def entity_add_file(id_: int) -> Union[str, Response]:
     return render_template(
         'content.html',
         content=get_table_form(
-            'file',
+            ['file'],
             entity.get_linked_entities('P67', inverse=True)),
         entity=entity,
         title=entity.name,
@@ -259,7 +259,7 @@ def entity_add_source(id_: int) -> Union[str, Response]:
     return render_template(
         'content.html',
         content=get_table_form(
-            'source',
+            ['source'],
             entity.get_linked_entities('P67', inverse=True)),
         title=entity.name,
         crumbs=[

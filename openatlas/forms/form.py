@@ -46,10 +46,10 @@ def get_add_reference_form(class_: str) -> FlaskForm:
     return Form()
 
 
-def get_table_form(class_: str, excluded: list[Entity]) -> str:
-    entities = Entity.get_by_view(class_, types=True, aliases=True)
+def get_table_form(classes: list[str], excluded: list[Entity]) -> str:
+    entities = Entity.get_by_class(classes, types=True, aliases=True)
     excluded_ids = [entity.id for entity in excluded]
-    table = Table([''] + g.table_headers[class_], order=[[1, 'asc']])
+    table = Table([''] + g.table_headers[classes[0]], order=[[1, 'asc']])
     for entity in entities:
         if entity.id not in excluded_ids:
             input_ = f"""
@@ -64,7 +64,7 @@ def get_table_form(class_: str, excluded: list[Entity]) -> str:
         return '<p class="uc-first">' + _('no entries') + '</p>'
     return render_template(
         'forms/form_table.html',
-        table=table.display(class_))
+        table=table.display(classes[0]))
 
 
 def get_move_form(type_: Type) -> FlaskForm:
