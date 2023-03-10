@@ -201,19 +201,24 @@ def add_subunit(super_id: int) -> Union[str, Response]:
     if request.method == 'POST':
         super_.link_string('P46', request.form['checkbox_values'])
         return redirect(f"{url_for('view', id_=super_.id)}#tab-artifact")
+    classes = []
+    if super_.class_.name != 'human_remains':
+        classes.append('artifact')
+    if super_.class_.name != 'artifact':
+        classes.append('human_remains')
     excluded = [super_]
-    for entity in Entity.get_by_view('artifact'):
-        if super_.class_.name == 'artifact' \
-                and entity.class_.name == 'human_remains':
-            excluded.append(entity)
-        elif super_.class_.name == 'human_remains' \
-                and entity.class_.name == 'artifact':
-            excluded.append(entity)
-        elif entity.get_linked_entities('P46', inverse=True):
-            excluded.append(entity)
+    # for entity in Entity.get_by_view('artifact'):
+    #     if super_.class_.name == 'artifact' \
+    #             and entity.class_.name == 'human_remains':
+    #         excluded.append(entity)
+    #     elif super_.class_.name == 'human_remains' \
+    #             and entity.class_.name == 'artifact':
+    #         excluded.append(entity)
+    #     elif entity.get_linked_entities('P46', inverse=True):
+    #         excluded.append(entity)
     return render_template(
         'content.html',
-        content=get_table_form(['artifact'], excluded),
+        content=get_table_form(classes, excluded),
         entity=super_,
         title=super_.name,
         crumbs=[
