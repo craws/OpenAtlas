@@ -300,3 +300,16 @@ class Entity:
             """,
             data)
         return g.cursor.fetchone()['id']
+
+    @staticmethod
+    def get_subunits_without_super(classes: list[str]) -> list[int]:
+        g.cursor.execute(
+            """
+            SELECT e.id
+            FROM model.entity e
+            JOIN model.link l
+                ON e.id = l.range_id AND l.property_code = 'P46'
+            WHERE e.openatlas_class_name IN %(classes)s;
+            """,
+            {'classes': tuple(classes)})
+        return [row['id'] for row in g.cursor.fetchall()]

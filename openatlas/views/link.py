@@ -17,6 +17,7 @@ from openatlas.forms.form import (
     get_add_reference_form, get_manager, get_table_form)
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
+from openatlas.models.search import get_subunits_without_super
 
 
 class AddReferenceForm(FlaskForm):
@@ -206,19 +207,11 @@ def add_subunit(super_id: int) -> Union[str, Response]:
         classes.append('artifact')
     if super_.class_.name != 'artifact':
         classes.append('human_remains')
-    excluded = [super_]
-    # for entity in Entity.get_by_view('artifact'):
-    #     if super_.class_.name == 'artifact' \
-    #             and entity.class_.name == 'human_remains':
-    #         excluded.append(entity)
-    #     elif super_.class_.name == 'human_remains' \
-    #             and entity.class_.name == 'artifact':
-    #         excluded.append(entity)
-    #     elif entity.get_linked_entities('P46', inverse=True):
-    #         excluded.append(entity)
     return render_template(
         'content.html',
-        content=get_table_form(classes, excluded),
+        content=get_table_form(
+            classes,
+            [super_.id] + get_subunits_without_super(classes)),
         entity=super_,
         title=super_.name,
         crumbs=[

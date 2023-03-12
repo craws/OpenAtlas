@@ -17,6 +17,7 @@ def index_changelog() -> str:
 versions = {
     '7.12.0': ['TBA', {
         'feature': {
+            '1946': 'Adding sub artifacts',
             '1975': 'Make description field wider',
             '1770': 'API: Adding linked.art format'}
     }],
