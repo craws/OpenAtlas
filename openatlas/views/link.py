@@ -200,7 +200,8 @@ def reference_add(id_: int, view: str) -> Union[str, Response]:
 def add_subunit(super_id: int) -> Union[str, Response]:
     super_ = Entity.get_by_id(super_id)
     if request.method == 'POST':
-        super_.link_string('P46', request.form['checkbox_values'])
+        if request.form['checkbox_values']:
+            super_.link_string('P46', request.form['checkbox_values'])
         return redirect(f"{url_for('view', id_=super_.id)}#tab-artifact")
     classes = []
     if super_.class_.name != 'human_remains':
