@@ -94,7 +94,7 @@ def get_lp_file(links_inverse: list[Link]) -> list[dict[str, str]]:
             'license': get_license_name(link.domain),
             'url': url_for(
                 'api.display',
-                filename=path.name,
+                filename=path.stem,
                 _external=True) if path else "N/A"})
     return files
 
