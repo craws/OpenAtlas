@@ -360,7 +360,7 @@ def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
     data: list[Any] = [format_name_and_aliases(entity, show_links)]
     if entity.class_.view in [
             'actor', 'artifact', 'event', 'place', 'reference']:
-        data.append(entity.class_.label)
+        data.append(uc_first(entity.class_.label))
     if entity.class_.standard_type_id:
         data.append(entity.standard_type.name if entity.standard_type else '')
     if entity.class_.name == 'file':

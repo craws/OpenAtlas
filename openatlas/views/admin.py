@@ -302,7 +302,7 @@ def admin_check_link_duplicates(
                     f' {type_.name}')
             tab.table.rows.append([
                 link(row['entity']),
-                row['entity'].class_.label,
+                uc_first(row['entity'].class_.label),
                 link(g.types[row['type'].id]),
                 '<br><br>'.join(remove_links)])
     if not tab.table.rows:
@@ -422,7 +422,7 @@ def admin_check_dates() -> str:
     for entity in Entity.get_invalid_dates():
         tabs['dates'].table.rows.append([
             link(entity),
-            entity.class_.label,
+            uc_first(entity.class_.label),
             link(entity.standard_type),
             format_date(entity.created),
             format_date(entity.modified),
@@ -440,7 +440,7 @@ def admin_check_dates() -> str:
         data = [
             link(actor),
             link(event),
-            event.class_.label,
+            uc_first(event.class_.label),
             link_.type.name if link_.type else '',
             link_.description,
             link(
@@ -501,7 +501,7 @@ def admin_orphans() -> str:
                 link(entity),
                 link(entity.class_),
                 link(entity.standard_type),
-                entity.class_.label,
+                uc_first(entity.class_.label),
                 format_date(entity.created),
                 format_date(entity.modified),
                 entity.description])
@@ -515,7 +515,7 @@ def admin_orphans() -> str:
                 link(entity),
                 link(entity.class_),
                 link(entity.standard_type),
-                entity.class_.label,
+                uc_first(entity.class_.label),
                 format_date(entity.created),
                 format_date(entity.modified),
                 entity.description])
@@ -546,7 +546,7 @@ def admin_orphans() -> str:
         tabs['orphaned_subunits'].table.rows.append([
             entity.id,
             entity.name,
-            entity.class_.label,
+            uc_first(entity.class_.label),
             format_date(entity.created),
             format_date(entity.modified),
             entity.description])

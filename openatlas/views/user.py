@@ -18,7 +18,7 @@ from openatlas.display.table import Table
 from openatlas.display.util import (
     button, description, display_form, display_info, format_date,
     is_authorized, link, manual, required_group, send_mail, uc_first)
-from openatlas.forms.field import generate_password_field, SubmitField
+from openatlas.forms.field import SubmitField, generate_password_field
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
 
@@ -117,7 +117,7 @@ def user_activity(user_id: int = 0) -> str:
             format_date(row['created']),
             link(user) if user else f"id {row['user_id']}",
             _(row['action']),
-            _(entity.class_.label) if entity else '',
+            uc_first(entity.class_.label) if entity else '',
             entity_name])
     return render_template(
         'content.html',
@@ -194,7 +194,7 @@ def user_entities(id_: int) -> str:
         for entity in user.get_entities():
             table.rows.append([
                 link(entity),
-                entity.class_.label,
+                uc_first(entity.class_.label),
                 link(entity.standard_type),
                 entity.first,
                 entity.last,

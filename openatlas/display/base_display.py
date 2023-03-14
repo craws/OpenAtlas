@@ -13,7 +13,7 @@ from openatlas.display.util import (
     bookmark_toggle, button, delete_link, edit_link, ext_references,
     format_date, format_entity_date, get_appearance, get_base_table_data,
     get_system_data, is_authorized, link, manual, profile_image_table_link,
-    remove_link, siblings_pager)
+    remove_link, siblings_pager, uc_first)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -214,7 +214,7 @@ class ActorDisplay(BaseDisplay):
                 self.linked_places.append(link_.object_)
             self.tabs['event'].table.rows.append([
                 link(event),
-                event.class_.label,
+                uc_first(event.class_.label),
                 _('moved')
                 if link_.property.code == 'P25' else link(link_.type),
                 link_.first or (
@@ -255,7 +255,7 @@ class ActorDisplay(BaseDisplay):
         for link_ in entity.get_links('P52', True):
             self.tabs['artifact'].table.rows.append([
                 link(link_.domain),
-                link_.domain.class_.label,
+                uc_first(link_.domain.class_.label),
                 link(link_.domain.standard_type),
                 link_.domain.first,
                 link_.domain.last,
@@ -289,7 +289,7 @@ class EventsDisplay(BaseDisplay):
         for link_ in entity.get_links(['P11', 'P14', 'P22', 'P23']):
             self.tabs['actor'].table.rows.append([
                 link(link_.range),
-                link_.range.class_.label,
+                uc_first(link_.range.class_.label),
                 link_.type.name if link_.type else '',
                 link_.first
                 or f'<span class="text-muted">{entity.first}</span>'
@@ -483,7 +483,7 @@ class TypeBaseDisplay(BaseDisplay):
                 data = [link(item)]
                 if entity.category == 'value':
                     data.append(format_number(item.types[entity]))
-                data.append(item.class_.label)
+                data.append(uc_first(item.class_.label))
                 data.append(item.description)
                 root_place = ''
                 if item.class_.name in classes_:
