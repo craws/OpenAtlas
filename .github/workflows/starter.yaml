@@ -29,6 +29,9 @@ jobs:
   build_openatlas:
     needs: [setup_workflow_env]
     environment: ${{ needs.setup_workflow_env.outputs.environment }}
+    permissions:
+      packages: write
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
