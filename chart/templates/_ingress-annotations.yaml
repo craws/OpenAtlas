@@ -1,0 +1,28 @@
+{{/* We set the annotation value regardless of API versions, because the user may have an old controller that still works */}}
+kubernetes.io/ingress.class: {{ .Values.ingress.className | default "nginx" | quote }}
+{{- if .Values.ingress.tls.enabled }}
+kubernetes.io/tls-acme: {{ .Values.ingress.tls.acme | quote }}
+{{- end }}
+{{- if eq .Values.application.track "canary" }}
+nginx.ingress.kubernetes.io/canary: "true"
+nginx.ingress.kubernetes.io/canary-by-header: "canary"
+{{-   if .Values.ingress.canary.weight }}
+nginx.ingress.kubernetes.io/canary-weight: {{ .Values.ingress.canary.weight | quote }}
+{{-   end }}
+{{- end }}
+{{- with .Values.ingress.modSecurity }}
+{{-   if .enabled }}
+nginx.ingress.kubernetes.io/modsecurity-transaction-id: "$server_name-$request_id"
+nginx.ingress.kubernetes.io/modsecurity-snippet: |
+  SecRuleEngine {{ .secRuleEngine | default "DetectionOnly" | title }}
+{{-     range $rule := .secRules }}
+{{        (include "secrule" $rule) | indent 2 }}
+{{-     end }}
+{{-   end }}
+{{- end }}
+{{- if .Values.prometheus.metrics }}
+nginx.ingress.kubernetes.io/server-snippet: |-
+  location /metrics {
+      deny all;
+  }
+{{- end }}

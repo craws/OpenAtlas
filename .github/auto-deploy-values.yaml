@@ -1,28 +1,35 @@
-replicaCount: 1
-image:
-  repository: $repository
-  tag: "$tag"
-  pullPolicy: Always
 
-extraLabels:
-  "ID": "$service_id"
-gitlab:
-  app: "$app_name"
-  envURL: "$repo_url"
+postgis:
+  deploy: ${DEPLOY_DATABASE}
+  host: "${POSTGRES_HOST}"
+  name: "${POSTGRES_DB}"
+  user: "${POSTGRES_USER}"
+  password: "${POSTGRES_PASSWORD}"
+  version: "13-3.3"
+
 service:
-  enabled: true
   name: "web"
-  url: "$public_url"
   additionalHosts:
     - ${app_name_in_url}-${ref_name}.${kube_ingress_base_domain}
   type: ClusterIP
   externalPort: 8080
   internalPort: 8080
+  enabled: true
+  url: "$public_url"
+
 ingress:
   enabled: true
   path: "/"
   annotations:
     kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/proxy-body-size: 1m
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "30"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "30"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "30"
+    nginx.ingress.kubernetes.io/proxy-next-upstream-timeout: "30"
+  tls:
+    enabled: true
+    acme: true
 livenessProbe:
   path: "/"
   initialDelaySeconds: 15
@@ -35,13 +42,6 @@ readinessProbe:
   timeoutSeconds: 3
   scheme: "HTTP"
   probeType: "httpGet"
-postgis:
-  deploy: ${DEPLOY_DATABASE}
-  host: "${POSTGRES_HOST}"
-  name: "${POSTGRES_DB}"
-  user: "${POSTGRES_USER}"
-  password: "${POSTGRES_PASSWORD}"
-  version: 13-3.3
 
 storage:
   export:
@@ -52,3 +52,20 @@ storage:
     size: 10Gi
   postgis:
     size: 10Gi
+
+replicaCount: 1
+
+image:
+  repository: $repository
+  tag: "$tag"
+  pullPolicy: Always
+
+application: {}
+
+prometheus: {}
+
+extraLabels:
+  "ID": "$service_id"
+gitlab:
+  app: "$app_name"
+  envURL: "$repo_url"
