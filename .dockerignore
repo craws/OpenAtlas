@@ -1,3 +1,5 @@
 docker-compose.yaml
 .idea/**
 .github/**
+.git/**
+chart/**
