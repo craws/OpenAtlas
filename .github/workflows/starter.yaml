@@ -10,7 +10,7 @@ jobs:
       image_name: container-preview
       registry_root: ghcr.io/${{ github.repository }}/
       default_port: "5000"
-      APP_NAME: oa
+      APP_NAME: OpenAtlas
       APP_ROOT: "/"
     steps:
       - name: Get environment from git ref
@@ -134,8 +134,9 @@ jobs:
           docker exec -i openatlas-openatlas-1 /bin/bash -c "cd /var/www/openatlas/tests && nosetests3 -c .noserc --verbosity=2 --nologcapture --nocapture && echo passed"
   _3:
     needs: [setup_workflow_env, test_openatlas]
-    uses: acdh-oeaw/gl-autodevops-minimal-port/.github/workflows/deploy-cluster-2.yml@main
+    uses: acdh-oeaw/gl-autodevops-minimal-port/.github/workflows/deploy.yml@main
     secrets: inherit
+    if: ${{ vars.KUBE_INGRESS_BASE_DOMAIN != '' }}
     with:
       environment: ${{ needs.setup_workflow_env.outputs.environment}}
       DOCKER_TAG: ${{ needs.setup_workflow_env.outputs.registry_root }}${{ needs.setup_workflow_env.outputs.image_name }}
