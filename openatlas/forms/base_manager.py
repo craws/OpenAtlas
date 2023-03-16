@@ -239,6 +239,11 @@ class ActorBaseManager(BaseManager):
                 add_dynamic=['place'],
                 related_tables=['begins_in', 'residence'])}
 
+    def populate_insert(self) -> None:
+        self.form.alias.append_entry('')
+        if self.origin and self.origin.class_.name == 'place':
+            self.form.residence.data = self.origin.id
+
     def populate_update(self) -> None:
         super().populate_update()
         if residence := self.entity.get_linked_entity('P74'):
@@ -285,6 +290,10 @@ class ArtifactBaseManager(BaseManager):
         return {
             'actor':
                 TableField(_('owned by'), add_dynamic=['person', 'group'])}
+
+    def populate_insert(self) -> None:
+        if self.origin and self.origin.class_.view == 'actor':
+            self.form.actor.data = self.origin.id
 
     def populate_update(self) -> None:
         super().populate_update()
@@ -337,6 +346,16 @@ class EventBaseManager(BaseManager):
             fields['place'] = \
                 TableField(_('location'), add_dynamic=['place'])
         return fields
+
+    def populate_insert(self) -> None:
+        if self.origin:
+            if self.origin.class_.view == 'artifact':
+                self.form.artifact.data = [self.origin.id]
+            elif self.origin.class_.view == 'place':
+                if self.class_.name == 'move':
+                    self.form.place_from.data = self.origin.id
+                else:
+                    self.form.place.data = self.origin.id
 
     def populate_update(self) -> None:
         super().populate_update()
@@ -403,6 +422,13 @@ class TypeBaseManager(BaseManager):
             if isinstance(type_, Type):
                 root = g.types[type_.root[0]] if type_.root else type_
                 getattr(self.form, str(root.id)).label.text = 'super'
+
+    def populate_insert(self) -> None:
+        if isinstance(self.origin, Type):
+            root_id = self.origin.root[0] \
+                if self.origin.root else self.origin.id
+            getattr(self.form, str(root_id)).data = self.origin.id \
+                if self.origin.id != root_id else None
 
     def populate_update(self) -> None:
         super().populate_update()

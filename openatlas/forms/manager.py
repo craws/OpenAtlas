@@ -161,6 +161,7 @@ class ArtifactManager(ArtifactBaseManager):
                 add_dynamic=['place'])})
 
     def populate_insert(self) -> None:
+        super().populate_insert()
         if self.origin and self.origin.class_.view in ['artifact', 'place']:
             self.form.artifact_super.data = str(self.origin.id)
 
@@ -186,6 +187,7 @@ class CreationManager(EventBaseManager):
             'file': TableMultiField(_('document'))})
 
     def populate_insert(self) -> None:
+        super().populate_insert()
         if self.origin and self.origin.class_.name == 'file':
             self.form.file.data = [self.origin.id]
 
@@ -264,6 +266,7 @@ class HumanRemainsManager(ArtifactBaseManager):
                 add_dynamic=['place'])})
 
     def populate_insert(self) -> None:
+        super().populate_insert()
         if self.origin and self.origin.class_.view in ['artifact', 'place']:
             self.form.human_remains_super.data = str(self.origin.id)
 
@@ -417,6 +420,9 @@ class PlaceManager(BaseManager):
                 'insert_continue_sub',
                 SubmitField(_('insert and add') + ' ' + _('feature')))
 
+    def populate_insert(self) -> None:
+        self.form.alias.append_entry('')
+
 
 class ProductionManager(EventBaseManager):
 
@@ -472,6 +478,10 @@ class SourceManager(BaseManager):
         return {
             'artifact': TableMultiField(description=_(
                 'Link artifacts as the information carrier of the source'))}
+
+    def populate_insert(self) -> None:
+        if self.origin and self.origin.class_.name == 'artifact':
+            self.form.artifact.data = [self.origin.id]
 
     def populate_update(self) -> None:
         super().populate_update()
