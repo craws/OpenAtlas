@@ -139,7 +139,7 @@ jobs:
     needs: [setup_workflow_env, test_openatlas]
     uses: acdh-oeaw/gl-autodevops-minimal-port/.github/workflows/deploy.yml@main
     secrets: inherit
-    if: ${{ github.repository_owner != 'acdh-oeaw' }}
+    if: ${{ github.repository_owner == 'acdh-oeaw' }}
     with:
       environment: ${{ needs.setup_workflow_env.outputs.environment}}
       DOCKER_TAG: ${{ needs.setup_workflow_env.outputs.registry_root }}${{ needs.setup_workflow_env.outputs.image_name }}
