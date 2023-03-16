@@ -70,13 +70,18 @@ def reference_system_remove_class(system_id: int, class_name: str) -> Response:
 
 @app.route('/insert/<class_>', methods=['POST', 'GET'])
 @app.route('/insert/<class_>/<int:origin_id>', methods=['POST', 'GET'])
+@app.route('/insert/<class_>/<int:copy_id>', methods=['POST', 'GET'])
 @required_group('contributor')
 def insert(
         class_: str,
-        origin_id: Optional[int] = None) -> Union[str, Response]:
+        origin_id: Optional[int] = None,
+        copy_id: Optional[int] = None) -> Union[str, Response]:
     check_insert_access(class_)
     origin = Entity.get_by_id(origin_id) if origin_id else None
-    manager = get_manager(class_, origin=origin)
+    if copy_id:
+        manager = get_manager(class_, copy_id=copy_id)
+    else:
+        manager = get_manager(class_, origin=origin)
     if manager.form.validate_on_submit():
         if class_ == 'file':
             return redirect(insert_files(manager))

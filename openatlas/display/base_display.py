@@ -132,7 +132,9 @@ class BaseDisplay:
         if is_authorized(self.entity.class_.write_access):
             if not self.problematic_type:
                 self.buttons.append(
-                    button(_('edit'), url_for('update', id_=self.entity.id)))
+                    button(_('edit'),url_for('update', id_=self.entity.id)))
+            self.buttons.append(
+                button(_('copy'), url_for('insert', copy_id=self.entity.id)))
             self.buttons.append(delete_link(self.entity))
 
 

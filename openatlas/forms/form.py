@@ -24,7 +24,8 @@ def get_manager(
         class_name: Optional[str] = None,
         entity: Optional[Entity] = None,
         origin: Optional[Entity] = None,
-        link_: Optional[Link] = None) -> base_manager.BaseManager:
+        link_: Optional[Link] = None,
+        copy_id: Optional[int] = None) -> base_manager.BaseManager:
     name = entity.class_.name if entity and not class_name else class_name
     manager_name = ''.join(i.capitalize() for i in name.split('_'))
     manager_instance = getattr(manager, f'{manager_name}Manager')(
