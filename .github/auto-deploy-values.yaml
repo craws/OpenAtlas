@@ -36,7 +36,7 @@ readinessProbe:
   scheme: "HTTP"
   probeType: "httpGet"
 postgis:
-  deploy: "${DEPLOY_DATABASE}"
+  deploy: ${DEPLOY_DATABASE}
   host: "${POSTGRES_HOST}"
   name: "${POSTGRES_DB}"
   user: "${POSTGRES_USER}"
