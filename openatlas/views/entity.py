@@ -17,7 +17,7 @@ from openatlas.display.util import (
     get_base_table_data, is_authorized, link, required_group)
 from openatlas.forms.base_manager import BaseManager
 from openatlas.forms.form import get_manager
-from openatlas.forms.util import populate_insert_form, was_modified
+from openatlas.forms.util import was_modified
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.overlay import Overlay
@@ -81,7 +81,6 @@ def insert(
         if class_ == 'file':
             return redirect(insert_files(manager))
         return redirect(save(manager))
-    populate_insert_form(manager.form, class_, origin)
     place_info = {'structure': None, 'gis_data': None, 'overlays': None}
     if g.classes[class_].view in ['artifact', 'place']:
         place_info = get_place_info_for_insert(origin)
