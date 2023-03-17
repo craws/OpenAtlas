@@ -47,12 +47,14 @@ class BaseManager:
             class_: OpenatlasClass,
             entity: Optional[Entity],
             origin: Optional[Entity],
-            link_: Optional[Link]) -> None:
+            link_: Optional[Link],
+            copy: Optional[Entity]) -> None:
 
         self.class_ = class_
         self.entity = entity
         self.origin = origin
         self.link_ = link_
+        self.copy = copy
 
         class Form(FlaskForm):
             opened = HiddenField()
@@ -148,7 +150,7 @@ class BaseManager:
 
     def populate_update(self) -> None:
         self.form.opened.data = time.time()
-        if self.entity:
+        if self.entity and not self.copy:
             self.form.entity_id.data = self.entity.id
         populate_types(self)
         populate_reference_systems(self)

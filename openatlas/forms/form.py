@@ -25,16 +25,22 @@ def get_manager(
         entity: Optional[Entity] = None,
         origin: Optional[Entity] = None,
         link_: Optional[Link] = None,
-        copy_id: Optional[int] = None) -> base_manager.BaseManager:
+        copy: Optional[Entity] = None) -> base_manager.BaseManager:
     name = entity.class_.name if entity and not class_name else class_name
     manager_name = ''.join(i.capitalize() for i in name.split('_'))
     manager_instance = getattr(manager, f'{manager_name}Manager')(
         class_=g.classes['type' if name.startswith('hierarchy') else name],
         entity=entity,
         origin=origin,
-        link_=link_)
+        link_=link_,
+        copy=copy)
     if request.method != 'POST' and not entity and not link_:
-        manager_instance.populate_insert()
+        if copy:
+            manager_instance.entity = copy
+            manager_instance.populate_update()
+            manager_instance.entity = None
+        else:
+            manager_instance.populate_insert()
     return manager_instance
 
 
