@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Any, Optional
 
 from flask import g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -18,14 +18,13 @@ from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.models.overlay import Overlay
+from openatlas.models.reference_system import ReferenceSystem
+from openatlas.models.type import Type
 from openatlas.models.user import User
 from openatlas.views.entity_index import file_preview
 
-if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.models.type import Type
 
 class BaseDisplay:
-
     entity: Entity
     tabs: dict[str, Tab]
     events: list[Entity]
@@ -52,7 +51,6 @@ class BaseDisplay:
         self.add_note_tab()
         self.add_file_tab_thumbnails()
         self.add_crumbs()
-        self.buttons = [manual(f'entity/{self.entity.class_.view}')]
         self.add_buttons()
         self.buttons.append(bookmark_toggle(self.entity.id))
         self.buttons.append(
@@ -128,15 +126,23 @@ class BaseDisplay:
             self.tabs['note'].table.rows.append(data)
 
     def add_buttons(self) -> None:
-
-        if is_authorized(self.entity.class_.write_access):
-            if not self.problematic_type:
-                self.buttons.append(
-                    button(_('edit'),url_for('update', id_=self.entity.id)))
+        self.buttons = [manual(f'entity/{self.entity.class_.view}')]
+        if not is_authorized(self.entity.class_.write_access) or (
+                isinstance(self.entity, Type)
+                and self.entity.category == 'system'):
+            return
+        if not self.problematic_type:
+            self.buttons.append(
+                button(_('edit'), url_for('update', id_=self.entity.id)))
             self.buttons.append(
                 button(_('copy'), url_for('insert', copy_id=self.entity.id)))
-            self.buttons.append(delete_link(self.entity))
-
+        if self.entity.class_.view == 'place' and \
+                self.entity.get_linked_entities('P46'):
+            return
+        if isinstance(self.entity, ReferenceSystem) and \
+                (self.entity.classes or self.entity.system):
+            return
+        self.buttons.append(delete_link(self.entity))
 
     def add_data(self) -> None:
         self.data = {
@@ -310,14 +316,6 @@ class EventsDisplay(BaseDisplay):
 
 class PlaceBaseDisplay(BaseDisplay):
 
-    def add_buttons(self) -> None:
-        if is_authorized(self.entity.class_.write_access):
-            if not self.problematic_type:
-                self.buttons.append(
-                    button(_('edit'), url_for('update', id_=self.entity.id)))
-            if not self.entity.get_linked_entities('P46'):
-                self.buttons.append(delete_link(self.entity))
-
     def add_tabs(self) -> None:
         super().add_tabs()
         entity = self.entity
@@ -436,13 +434,6 @@ class TypeBaseDisplay(BaseDisplay):
         if self.entity.category == 'value':
             self.data[_('unit')] = self.entity.description
         self.data[_('ID for imports')] = self.entity.id
-
-    def add_buttons(self) -> None:
-        if is_authorized(self.entity.class_.write_access) \
-                and self.entity.root and self.entity.category != 'system':
-            self.buttons.append(
-                button(_('edit'), url_for('update', id_=self.entity.id)))
-            self.buttons.append(delete_link(self.entity))
 
     def add_crumbs(self) -> None:
         self.crumbs = [[_('types'), url_for('type_index')]]
