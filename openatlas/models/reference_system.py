@@ -11,7 +11,6 @@ from openatlas.models.entity import Entity
 class ReferenceSystem(Entity):
 
     def __init__(self, row: dict[str, Any]) -> None:
-
         super().__init__(row)
         self.website_url = row['website_url']
         self.resolver_url = row['resolver_url']
@@ -22,9 +21,7 @@ class ReferenceSystem(Entity):
         self.system = row['system']
         self.classes: list[str] = []
 
-    def update(
-            self,
-            data: dict[str, Any], new: bool = False,) -> Optional[int]:
+    def update(self, data: dict[str, Any], new: bool = False) -> Optional[int]:
         self.update_system(data)
         return super().update(data, new)
 

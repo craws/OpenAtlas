@@ -25,32 +25,25 @@ from openatlas.views.entity_index import file_preview
 
 
 class BaseDisplay:
-    entity: Entity
     tabs: dict[str, Tab]
-    events: list[Entity]
-    event_links: Optional[list[Link]]  # Needed for actor and info data
-    linked_places: list[Entity]  # Related places for map
-    gis_data: dict[str, Any]
-    structure: dict[str, list[Entity]]
     overlays = None
     crumbs: list[Any]
-    buttons: list[str]
-    problematic_type: bool = False
     data: dict[str, Any]
 
     def __init__(self, entity: Entity) -> None:
         self.entity = entity
-        self.events = []
-        self.event_links = []
-        self.linked_places = []
-        self.structure = {}
-        self.gis_data = {}
+        self.events: list[Entity] = []
+        self.event_links: Optional[list[Link]] = []
+        self.linked_places: list[Entity] = []
+        self.structure: dict[str, list[Entity]] = {}
+        self.gis_data: dict[str, Any] = {}
         self.problematic_type = self.entity.check_too_many_single_type_links()
         self.entity.image_id = entity.get_profile_image_id()
         self.add_tabs()
         self.add_note_tab()
         self.add_file_tab_thumbnails()
         self.add_crumbs()
+        self.buttons = [manual(f'entity/{self.entity.class_.view}')]
         self.add_buttons()
         self.buttons.append(bookmark_toggle(self.entity.id))
         self.buttons.append(
@@ -126,7 +119,6 @@ class BaseDisplay:
             self.tabs['note'].table.rows.append(data)
 
     def add_buttons(self) -> None:
-        self.buttons = [manual(f'entity/{self.entity.class_.view}')]
         if not is_authorized(self.entity.class_.write_access) or (
                 isinstance(self.entity, Type)
                 and self.entity.category == 'system'):
