@@ -20,7 +20,8 @@ versions = {
             '1946': 'Adding sub artifacts',
             '1975': 'Make description field wider',
             '1770': 'API: Adding linked.art format',
-            '1988': 'API: Depiction URL without extension, like *.png'}
+            '1988': 'API: Depiction URL without extension, like *.png',
+            '1990': 'Refactor and minor improvements'}
     }],
     '7.11.1': ['2023-02-20', {
         'fix': {

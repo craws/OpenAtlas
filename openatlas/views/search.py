@@ -7,7 +7,7 @@ from wtforms.validators import InputRequired, NoneOf, NumberRange, Optional
 
 from openatlas import app
 from openatlas.display.table import Table
-from openatlas.display.util import link, required_group
+from openatlas.display.util import link, required_group, uc_first
 from openatlas.forms.field import SubmitField
 from openatlas.forms.util import form_to_datetime64
 from openatlas.models.entity import Entity
@@ -28,8 +28,6 @@ class SearchForm(FlaskForm):
         option_widget=widgets.CheckboxInput(),
         widget=widgets.ListWidget(prefix_label=False))
     search = SubmitField(_('search'))
-
-    # Date fields
     validator_day = [Optional(), NumberRange(min=1, max=31)]
     validator_month = [Optional(), NumberRange(min=1, max=12)]
     validator_year = [
@@ -80,7 +78,8 @@ def search_index() -> str:
     classes = [
         name for name, count in Entity.get_overview_counts().items() if count]
     form = SearchForm()
-    form.classes.choices = [(name, g.classes[name].label) for name in classes]
+    form.classes.choices = \
+        [(name, uc_first(g.classes[name].label)) for name in classes]
     form.classes.default = classes
     form.classes.process(request.form)
     table = Table()
