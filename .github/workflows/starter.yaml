@@ -168,3 +168,15 @@ jobs:
       APP_NAME: ${{ needs.setup_workflow_env.outputs.APP_NAME }}-with_db_demo_deploy
       APP_ROOT: ${{ needs.setup_workflow_env.outputs.APP_ROOT }}
       default_port: ${{ needs.setup_workflow_env.outputs.default_port}}
+  openatlas_demo:
+    needs: [setup_workflow_env, test_openatlas]
+    uses: acdh-oeaw/gl-autodevops-minimal-port/.github/workflows/deploy.yml@main
+    secrets: inherit
+    if: ${{ github.repository_owner == 'acdh-oeaw' }}
+    with:
+      environment: review/openatlas_demo
+      do_deploy: ${{ needs.setup_workflow_env.outputs.environment == 'review/feature_docker_k8s' }}
+      DOCKER_TAG: ${{ needs.setup_workflow_env.outputs.registry_root }}${{ needs.setup_workflow_env.outputs.image_name }}
+      APP_NAME: ${{ needs.setup_workflow_env.outputs.APP_NAME }}-openatlas_demo
+      APP_ROOT: ${{ needs.setup_workflow_env.outputs.APP_ROOT }}
+      default_port: ${{ needs.setup_workflow_env.outputs.default_port}}
