@@ -104,6 +104,12 @@ entity_.add_argument(
     type=str,
     help='{error_msg}',
     action='append')
+entity_.add_argument(
+    'centroid',
+    type=str,
+    case_sensitive=False,
+    default=False,
+    choices=('true', 'false'))
 
 gis = default.copy()
 gis.add_argument(
