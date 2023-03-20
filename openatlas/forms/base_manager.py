@@ -43,7 +43,7 @@ class BaseManager:
             entity: Optional[Entity],
             origin: Optional[Entity],
             link_: Optional[Link],
-            copy: Optional[Entity]) -> None:
+            copy: Optional[bool] = False) -> None:
 
         self.class_ = class_
         self.entity: Any = entity
@@ -192,7 +192,7 @@ class BaseManager:
                 for shape in ['point', 'line', 'polygon']}
 
     def insert_entity(self) -> None:
-        if self.entity:
+        if self.entity and not self.copy:
             return
         if self.class_.name == 'reference_system':
             self.entity = ReferenceSystem.insert_system({

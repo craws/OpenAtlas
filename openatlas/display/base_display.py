@@ -126,14 +126,11 @@ class BaseDisplay:
         if not self.problematic_type:
             self.buttons.append(
                 button(_('edit'), url_for('update', id_=self.entity.id)))
-            self.buttons.append(
-                button(
-                    _('copy'),
-                    url_for(
-                        'insert',
-                        class_=self.entity.class_.name,
-                        origin_id=self.entity.id,
-                        copy='copy')))
+            if type(self.entity) is Entity:
+                self.buttons.append(
+                    button(
+                        _('copy'),
+                        url_for('update', id_=self.entity.id, copy='copy_')))
         if self.entity.class_.view == 'place' and \
                 self.entity.get_linked_entities('P46'):
             return

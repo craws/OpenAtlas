@@ -2,7 +2,7 @@ import os
 from subprocess import call
 from typing import Any, Optional, Union
 
-from flask import flash, g, render_template, url_for
+from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from werkzeug.exceptions import abort
@@ -70,18 +70,13 @@ def reference_system_remove_class(system_id: int, class_name: str) -> Response:
 
 @app.route('/insert/<class_>', methods=['POST', 'GET'])
 @app.route('/insert/<class_>/<int:origin_id>', methods=['POST', 'GET'])
-@app.route('/insert/<class_>/<int:origin_id>/<copy>', methods=['POST', 'GET'])
 @required_group('contributor')
 def insert(
         class_: str,
-        origin_id: Optional[int] = None,
-        copy: Optional[str] = None) -> Union[str, Response]:
+        origin_id: Optional[int] = None) -> Union[str, Response]:
     check_insert_access(class_)
     origin = Entity.get_by_id(origin_id) if origin_id else None
-    manager = get_manager(
-        class_,
-        origin=origin if not copy else None,
-        copy=origin if copy else None)
+    manager = get_manager(class_, origin=origin)
     if manager.form.validate_on_submit():
         if class_ == 'file':
             return redirect(insert_files(manager))
@@ -99,21 +94,21 @@ def insert(
         overlays=place_info['overlays'],
         title=_(g.classes[class_].view),
         crumbs=add_crumbs(
-            class_,
-            origin,
+            class_, origin,
             place_info['structure'],
             insert_=True))
 
 
 @app.route('/update/<int:id_>', methods=['POST', 'GET'])
+@app.route('/update/<int:id_>/<copy>', methods=['POST', 'GET'])
 @required_group('contributor')
-def update(id_: int) -> Union[str, Response]:
+def update(id_: int, copy: Optional[str] = None) -> Union[str, Response]:
     entity = Entity.get_by_id(id_, types=True, aliases=True)
     check_update_access(entity)
     if entity.check_too_many_single_type_links():
         abort(422)
     place_info = get_place_info_for_update(entity)
-    manager = get_manager(entity=entity)
+    manager = get_manager(entity=entity, copy=bool(copy))
     if manager.form.validate_on_submit():
         if was_modified(manager.form, entity):  # pragma: no cover
             del manager.form.save
@@ -173,7 +168,7 @@ def add_crumbs(
         crumbs += structure['supers']
     crumbs.append(origin if not insert_ else None)
     if not insert_:
-        return crumbs + [_('edit')]
+        return crumbs + [_('copy') if 'copy_' in request.path else _('edit')]
     siblings = ''
     if structure and origin and origin.class_.name == 'stratigraphic_unit':
         if count := len(
