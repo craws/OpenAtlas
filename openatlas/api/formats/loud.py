@@ -3,6 +3,7 @@ from typing import Any, Optional
 
 from flask import url_for
 
+from openatlas.display.util import get_file_path
 from openatlas.models.gis import Gis
 from openatlas.api.resources.util import remove_spaces_dashes, date_to_str, \
     get_crm_relation, get_crm_code
@@ -75,6 +76,17 @@ def get_loud_entities(
         else:
             base_property = get_domain_links()
             properties_set[property_name].append(base_property)
+
+    if image_id := Entity.get_profile_image_id(data['entity']):
+        path = get_file_path(image_id)
+        properties_set['representation'].append({
+            "type": "VisualItem",
+            "digitally_shown_by": [{
+                "id": url_for(
+                    'api.display',
+                    filename=path.stem,
+                    _external=True) if path else "N/A",
+                "type": "DigitalObject"}]})
 
     return {'@context': "https://linked.art/ns/v1/linked-art.json"} | \
         base_entity_dict() | properties_set  # type: ignore
