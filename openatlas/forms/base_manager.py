@@ -33,12 +33,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 class BaseManager:
-    class_: OpenatlasClass
     fields: list[str] = []
-    form: Any = None
-    entity: Any = None
-    origin: Any = None
-    link_: Any = None
     continue_link_id: Optional[int] = None
     data: dict[str, Any] = {}
 
@@ -51,9 +46,9 @@ class BaseManager:
             copy: Optional[Entity]) -> None:
 
         self.class_ = class_
-        self.entity = entity
-        self.origin = origin
-        self.link_ = link_
+        self.entity: Any = entity
+        self.origin: Any = origin
+        self.link_: Any = link_
         self.copy = copy
 
         class Form(FlaskForm):
@@ -108,9 +103,10 @@ class BaseManager:
         if 'alias' in self.fields:
             setattr(
                 self.form_class,
-                'alias', FieldList(
+                'alias',
+                FieldList(
                     RemovableListField(),
-                    render_kw={'class': 'no-label'},))
+                    render_kw={'class': 'no-label'}))
 
     def update_entity(self, new: bool = False) -> None:
         self.continue_link_id = self.entity.update(self.data, new)
