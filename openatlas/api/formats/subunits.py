@@ -27,7 +27,10 @@ def get_subunit(data: dict[str, Any]) -> dict[str, Any]:
         'latestModRec': data['latest_modified'],
         'geometry':
             get_geometries_thanados(
-                get_geometric_collection(data['entity'], data['links']),
+                get_geometric_collection(
+                    data['entity'],
+                    data['links'],
+                    data['parser']),
                 data['parser']),
         'children': get_children(data),
         'properties': get_properties(data)})

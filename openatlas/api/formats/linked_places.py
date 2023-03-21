@@ -39,7 +39,7 @@ def get_linked_places_entity(
             if 'description' in parser['show'] else None,
             'names': [{"alias": value} for value in entity.aliases.values()]
             if entity.aliases and 'names' in parser['show'] else None,
-            'geometry': get_geometric_collection(entity, links)
+            'geometry': get_geometric_collection(entity, links, parser)
             if 'geometry' in parser['show'] else None,
             'relations': get_lp_links(links, links_inverse, parser)
             if 'relations' in parser['show'] else None})]}
