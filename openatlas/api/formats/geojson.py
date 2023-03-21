@@ -18,19 +18,25 @@ def get_geojson(
     out = []
     for entity in entities:
         if geoms := [get_geojson_dict(entity, parser, geom)
-                     for geom in get_geom(entity)]:
+                     for geom in get_geom(entity, parser)]:
             out.extend(geoms)
         else:
             out.append(get_geojson_dict(entity, parser))
     return {'type': 'FeatureCollection', 'features': out}
 
 
-def get_geom(entity: Entity) -> list[Any]:
+def get_geom(entity: Entity, parser: dict[str, Any]) -> list[Any]:
     if entity.class_.view == 'place' or entity.class_.name == 'artifact':
-        return Gis.get_by_id(
-            Link.get_linked_entity_safe(entity.id, 'P53').id)
+        id_ = Link.get_linked_entity_safe(entity.id, 'P53').id
+        geoms = Gis.get_by_id(id_)
+        if parser['centroid']:
+            geoms.extend(Gis.get_centroids_by_id(id_))
+        return geoms
     if entity.class_.name == 'object_location':
-        return Gis.get_by_id(entity.id)
+        geoms = Gis.get_by_id(entity.id)
+        if parser['centroid']:
+            geoms.extend(Gis.get_centroids_by_id(entity.id))
+        return geoms
     return []
 
 
