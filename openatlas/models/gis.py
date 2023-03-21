@@ -25,6 +25,10 @@ class Gis:
         return Db.get_by_id(id_)
 
     @staticmethod
+    def get_centroids_by_id(id_: int) -> list[dict[str, Any]]:
+        return Db.get_centroids_by_id(id_)
+
+    @staticmethod
     def get_wkt_by_id(id_: int) -> list[dict[str, Any]]:
         return Db.get_wkt_by_id(id_)
 

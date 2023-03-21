@@ -182,16 +182,21 @@ def get_reference_systems(
 
 def get_geometric_collection(
         entity: Entity,
-        links: list[Link]) -> Optional[dict[str, Any]]:
+        links: list[Link],
+        parser: dict[str, Any]) -> Optional[dict[str, Any]]:
     data = None
     if entity.class_.view == 'place' or entity.class_.name == 'artifact':
-        data = get_geoms_by_entity(get_location_id(links))
+        data = get_geoms_by_entity(get_location_id(links), parser['centroid'])
     elif entity.class_.name == 'object_location':
-        data = get_geoms_by_entity(entity.id)
+        data = get_geoms_by_entity(entity.id, parser['centroid'])
     elif entity.class_.view == 'actor':
         geoms = [
             Gis.get_by_id(link_.range.id) for link_ in links
             if link_.property.code in ['P74', 'OA8', 'OA9']]
+        if parser['centroid']:
+            geoms.extend(
+                [Gis.get_centroids_by_id(link_.range.id) for link_ in links
+                 if link_.property.code in ['P74', 'OA8', 'OA9']])
         data = {
             'type': 'GeometryCollection',
             'geometries': [geom for sublist in geoms for geom in sublist]}
@@ -199,6 +204,10 @@ def get_geometric_collection(
         geoms = [
             Gis.get_by_id(link_.range.id) for link_ in links
             if link_.property.code in ['P7', 'P26', 'P27']]
+        if parser['centroid']:
+            geoms.extend(
+                [Gis.get_centroids_by_id(link_.range.id) for link_ in links
+                 if link_.property.code in ['P7', 'P26', 'P27']])
         data = {
             'type': 'GeometryCollection',
             'geometries': [geom for sublist in geoms for geom in sublist]}
@@ -209,8 +218,12 @@ def get_location_id(links: list[Link]) -> int:
     return [l_.range.id for l_ in links if l_.property.code == 'P53'][0]
 
 
-def get_geoms_by_entity(location_id: int) -> dict[str, Any]:
+def get_geoms_by_entity(
+        location_id: int,
+        centroid: Optional[bool] = False) -> dict[str, Any]:
     geoms = Gis.get_by_id(location_id)
+    if centroid:
+        geoms.extend(Gis.get_centroids_by_id(location_id))
     if len(geoms) == 1:
         return geoms[0]
     return {'type': 'GeometryCollection', 'geometries': geoms}
