@@ -78,6 +78,10 @@ def get_loud_entities(
             properties_set[property_name].append(base_property)
 
     if image_id := Entity.get_profile_image_id(data['entity']):
+        label = ''
+        for item in properties_set["referred_to_by"]:
+            if int(item['id'].split("/")[-1]) == image_id:
+                label = item['_label']
         path = get_file_path(image_id)
         properties_set['representation'].append({
             "type": "VisualItem",
@@ -86,6 +90,7 @@ def get_loud_entities(
                     'api.display',
                     filename=path.stem,
                     _external=True) if path else "N/A",
+                "_label": label,
                 "type": "DigitalObject"}]})
 
     return {'@context': "https://linked.art/ns/v1/linked-art.json"} | \
