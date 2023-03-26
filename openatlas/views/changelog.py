@@ -18,6 +18,7 @@ versions = {
     '7.12.0': ['TBA', {
         'feature': {
             '1946': 'Adding sub artifacts',
+            '1993': 'Functionality to change super of subunits',
             '1975': 'Make description field wider',
             '1770': 'API: Adding linked.art format',
             '1987': 'API: Add centroid points of geometries',
