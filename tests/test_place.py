@@ -216,7 +216,10 @@ class PlaceTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Entities were updated' in rv.data
 
-            data = {'name': "Try continue", 'continue_': 'sub'}
+            data = {
+                'name': "Try continue",
+                'continue_': 'sub',
+                'feature_super': place.id}
             rv = self.app.post(
                 url_for('insert', class_='place'),
                 data=data,
@@ -224,11 +227,13 @@ class PlaceTest(TestBaseCase):
             assert b'insert and add strati' in rv.data
 
             data['name'] = "It's not a bug, it's a feature!"
-            data['place'] = place.id
             rv = self.app.post(
                 url_for('insert', class_='feature', origin_id=place.id),
                 data=data)
             feat_id = rv.location.split('/')[-1]
+
+            rv = self.app.get(url_for('update', id_=feat_id))
+            assert b'Val-hall' in rv.data
 
             rv = self.app.get(
                 url_for(
@@ -239,7 +244,7 @@ class PlaceTest(TestBaseCase):
             assert b'insert and add human remains' in rv.data
 
             data['name'] = "I'm a stratigraphic unit"
-            data['place'] = feat_id
+            data['stratigraphic_super'] = feat_id
             rv = self.app.post(
                 url_for(
                     'insert',
@@ -247,6 +252,9 @@ class PlaceTest(TestBaseCase):
                     origin_id=feat_id),
                 data=data)
             strati_id = rv.location.split('/')[-1]
+
+            rv = self.app.get(url_for('update', id_=strati_id))
+            assert b'a stratigraphic unit' in rv.data
 
             data = {
                 'name': 'You never find me',
@@ -344,7 +352,7 @@ class PlaceTest(TestBaseCase):
 
             rv = self.app.post(
                 url_for('update', id_=strati_id),
-                data={'name': 'New name'},
+                data={'name': 'New name', 'stratigraphic_super': feat_id},
                 follow_redirects=True)
             assert b'Changes have been saved' in rv.data
 
