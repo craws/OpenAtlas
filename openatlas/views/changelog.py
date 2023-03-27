@@ -23,6 +23,7 @@ versions = {
             '1770': 'API: Adding linked.art format',
             '1987': 'API: Add centroid points of geometries',
             '1988': 'API: Depiction URL without extension',
+            '1973': 'Manual: document linking artifact with places',
             '1990': 'Refactor and minor improvements'}
     }],
     '7.11.1': ['2023-02-20', {
