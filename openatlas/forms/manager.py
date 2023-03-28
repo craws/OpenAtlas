@@ -217,11 +217,6 @@ class ExternalReferenceManager(BaseManager):
 class FeatureManager(BaseManager):
     fields = ['name', 'date', 'description', 'continue', 'map']
 
-    def process_form(self) -> None:
-        super().process_form()
-        if self.origin and self.origin.class_.name == 'place':
-            self.add_link('P46', self.origin, inverse=True)
-
     def add_buttons(self) -> None:
         super().add_buttons()
         if not self.entity:
@@ -230,6 +225,31 @@ class FeatureManager(BaseManager):
                 'insert_continue_sub',
                 SubmitField(
                     _('insert and add') + ' ' + _('stratigraphic unit')))
+
+    def additional_fields(self) -> dict[str, Any]:
+        return dict(super().additional_fields(), **{
+            'feature_super': TableField(
+                _('super'),
+                [InputRequired()],
+                add_dynamic=['place'])})
+
+    def populate_insert(self) -> None:
+        super().populate_insert()
+        if self.origin and self.origin.class_.name == 'place':
+            self.form.feature_super.data = str(self.origin.id)
+
+    def populate_update(self) -> None:
+        super().populate_update()
+        self.form.feature_super.data = \
+            self.entity.get_linked_entity_safe('P46', inverse=True).id
+
+    def process_form(self) -> None:
+        super().process_form()
+        self.data['links']['delete_inverse'].add('P46')
+        self.add_link(
+            'P46',
+            Entity.get_by_id(int(self.form.feature_super.data)),
+            inverse=True)
 
 
 class FileManager(BaseManager):
@@ -512,11 +532,6 @@ class SourceTranslationManager(BaseManager):
 class StratigraphicUnitManager(BaseManager):
     fields = ['name', 'date', 'description', 'continue', 'map']
 
-    def process_form(self) -> None:
-        super().process_form()
-        if self.origin and self.origin.class_.name == 'feature':
-            self.add_link('P46', self.origin, inverse=True)
-
     def add_buttons(self) -> None:
         super().add_buttons()
         if not self.entity:
@@ -528,6 +543,30 @@ class StratigraphicUnitManager(BaseManager):
                 self.form_class,
                 'insert_continue_human_remains',
                 SubmitField(_('insert and add') + ' ' + _('human remains')))
+
+    def additional_fields(self) -> dict[str, Any]:
+        return dict(super().additional_fields(), **{
+            'stratigraphic_super': TableField(
+                _('super'),
+                [InputRequired()])})
+
+    def populate_insert(self) -> None:
+        super().populate_insert()
+        if self.origin and self.origin.class_.name == 'feature':
+            self.form.stratigraphic_super.data = str(self.origin.id)
+
+    def populate_update(self) -> None:
+        super().populate_update()
+        self.form.stratigraphic_super.data = \
+            self.entity.get_linked_entity_safe('P46', inverse=True).id
+
+    def process_form(self) -> None:
+        super().process_form()
+        self.data['links']['delete_inverse'].add('P46')
+        self.add_link(
+            'P46',
+            Entity.get_by_id(int(self.form.stratigraphic_super.data)),
+            inverse=True)
 
 
 class TypeManager(TypeBaseManager):
