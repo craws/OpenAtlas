@@ -35,12 +35,7 @@ def get_manager(
         link_=link_,
         copy=copy)
     if request.method != 'POST' and not entity and not link_:
-        if copy:
-            manager_instance.entity = copy
-            manager_instance.populate_update()
-            manager_instance.entity = None
-        else:
-            manager_instance.populate_insert()
+        manager_instance.populate_insert()
     return manager_instance
 
 

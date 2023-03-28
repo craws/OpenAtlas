@@ -94,7 +94,8 @@ def insert(
         overlays=place_info['overlays'],
         title=_(g.classes[class_].view),
         crumbs=add_crumbs(
-            class_, origin,
+            class_,
+            origin,
             place_info['structure'],
             insert_=True))
 
@@ -268,11 +269,14 @@ def save(manager: BaseManager) -> Union[str, Response]:
         manager.insert_entity()
         manager.process_form()
         manager.update_entity(new=(action == 'insert'))
-        g.logger.log_user(manager.entity.id, action)
+        g.logger.log_user(
+            manager.entity.id,
+            'insert' if manager.copy else action)
         Transaction.commit()
         url = get_redirect_url(manager)
         flash(
-            _('entity created') if action == 'insert' else _('info update'),
+            _('entity created') if action == 'insert' or manager.copy
+            else _('info update'),
             'info')
     except InvalidGeomException as e:
         Transaction.rollback()
