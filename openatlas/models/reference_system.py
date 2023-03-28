@@ -58,21 +58,6 @@ class ReferenceSystem(Entity):
         Db.delete_links_from_entity(entity.id)
 
     @staticmethod
-    def get_class_choices(
-            entity: Optional[ReferenceSystem]) -> list[tuple[int, str]]:
-        choices = []
-        for class_ in g.classes.values():
-            if not class_.reference_system_allowed \
-                    or (entity and class_.name in entity.classes)\
-                    or (
-                        entity
-                        and entity.name == 'GeoNames'
-                        and class_.name != 'Place'):
-                continue
-            choices.append((class_.name, g.classes[class_.name].label))
-        return choices
-
-    @staticmethod
     def insert_system(data: dict[str, str]) -> ReferenceSystem:
         entity = Entity.insert(
             'reference_system',
