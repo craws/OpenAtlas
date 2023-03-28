@@ -44,7 +44,7 @@ class ImageTest(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 file_pathless = insert('file', 'Pathless_File')
-                file = insert('file', 'Test_File', )
+                file = insert('file', 'Test_File')
                 file.link('P2', g.types[get_hierarchy('License').subs[0]])
                 file_name = f'{file.id}.jpeg'
                 copyfile(

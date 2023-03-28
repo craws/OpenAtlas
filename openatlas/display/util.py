@@ -360,7 +360,7 @@ def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
     data: list[Any] = [format_name_and_aliases(entity, show_links)]
     if entity.class_.view in [
             'actor', 'artifact', 'event', 'place', 'reference']:
-        data.append(entity.class_.label)
+        data.append(uc_first(entity.class_.label))
     if entity.class_.standard_type_id:
         data.append(entity.standard_type.name if entity.standard_type else '')
     if entity.class_.name == 'file':
@@ -533,11 +533,11 @@ def link(
     html = ''
     if isinstance(object_, (str, LazyString)):
         js = f'onclick="{js}"' if js else ''
-        uc_fist = 'uc-first' if uc_first_ and not \
+        uc_first_class = 'uc-first' if uc_first_ and not \
             str(object_).startswith('http') else ''
         ext = 'target="_blank" rel="noopener noreferrer"' if external else ''
         html = \
-            f'<a href="{url}" class="{class_} {uc_fist}" {js} ' \
+            f'<a href="{url}" class="{class_} {uc_first_class}" {js} ' \
             f'{ext}>{object_}</a>'
     elif isinstance(object_, Entity):
         html = link(

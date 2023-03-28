@@ -14,7 +14,7 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
     get_entities_linked_to_type_recursive, link, manual, required_group,
-    sanitize)
+    sanitize, uc_first)
 from openatlas.forms.field import SubmitField
 from openatlas.forms.form import get_move_form
 from openatlas.models.entity import Entity
@@ -122,7 +122,7 @@ def type_delete_recursive(id_: int) -> Union[str, Response]:
                 link(Entity.get_by_id(row['range_id']))])
     else:
         for item in get_entities_linked_to_type_recursive(type_.id, []):
-            data = [link(item), item.class_.label, item.description]
+            data = [link(item), uc_first(item.class_.label), item.description]
             tabs['entities'].table.rows.append(data)
     crumbs = [[_('types'), url_for('type_index')]]
     if root:
@@ -172,7 +172,7 @@ def show_untyped_entities(id_: int) -> str:
     for entity in g.types[id_].get_untyped():
         table.rows.append([
             link(entity),
-            entity.class_.label,
+            uc_first(entity.class_.label),
             entity.first,
             entity.last,
             entity.description])
@@ -199,7 +199,7 @@ def show_multiple_linked_entities(id_: int) -> str:
     for entity in multiple_linked_entities:
         table.rows.append([
             link(entity),
-            entity.class_.label,
+            uc_first(entity.class_.label),
             entity.first,
             entity.last,
             entity.description])

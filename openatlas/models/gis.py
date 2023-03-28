@@ -13,6 +13,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
     from openatlas.models.imports import Project
 
+
 class InvalidGeomException(Exception):
     pass
 
@@ -22,6 +23,14 @@ class Gis:
     @staticmethod
     def get_by_id(id_: int) -> list[dict[str, Any]]:
         return Db.get_by_id(id_)
+
+    @staticmethod
+    def get_centroids_by_id(id_: int) -> list[dict[str, Any]]:
+        return Db.get_centroids_by_id(id_)
+
+    @staticmethod
+    def get_wkt_by_id(id_: int) -> list[dict[str, Any]]:
+        return Db.get_wkt_by_id(id_)
 
     @staticmethod
     def get_all(

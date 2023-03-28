@@ -76,14 +76,14 @@ jobs:
       - name: Wait
         run: sleep 8
 
-      - name: Add extensions to db
-        run: | 
-          docker exec -i postgres psql -U $POSTGRES_USER -d $POSTGRES_DB -c 'CREATE EXTENSION IF NOT EXISTS postgis; CREATE EXTENSION IF NOT EXISTS unaccent;'
+#      - name: Add extensions to db
+#        run: |
+#          docker exec -i postgres psql -U $POSTGRES_USER -d $POSTGRES_DB -c 'CREATE EXTENSION IF NOT EXISTS postgis; CREATE EXTENSION IF NOT EXISTS unaccent;'
 
       - name: Initialize db
         run: |
           docker cp install/ postgres:/install/
-          docker exec -i postgres /bin/bash -c "cd install && cat 1_structure.sql 2_data_model.sql 3_data_web.sql 4_data_type.sql | psql -U $POSTGRES_USER -d $POSTGRES_DB -f -"
+          docker exec -i postgres /bin/bash -c "cd install && cat 0_extensions.sql 1_structure.sql 2_data_model.sql 3_data_web.sql 4_data_type.sql | psql -U $POSTGRES_USER -d $POSTGRES_DB -f -"
 
       - name: Create openatlas container and run tests
         run: |

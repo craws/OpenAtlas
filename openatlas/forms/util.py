@@ -16,7 +16,6 @@ from openatlas import app
 from openatlas.display.util import get_file_path
 from openatlas.forms.setting import ProfileForm
 from openatlas.models.entity import Entity
-from openatlas.models.type import Type
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.link import Link
@@ -89,35 +88,6 @@ def set_form_settings(form: Any, profile: bool = False) -> None:
             field.data = ''  # If missing setting after an update
             continue
         field.data = g.settings[field.name]
-
-
-def populate_insert_form(
-        form: FlaskForm,
-        class_: str,
-        origin: Union[Entity, Type, None]) -> None:
-    if hasattr(form, 'alias'):
-        form.alias.append_entry('')
-    if not origin:
-        return
-    view = g.classes[class_].view
-    if view == 'actor' and origin.class_.name == 'place':
-        form.residence.data = origin.id
-    if view == 'artifact' and origin.class_.view == 'actor':
-        form.actor.data = origin.id
-    if view == 'event':
-        if origin.class_.view == 'artifact':
-            form.artifact.data = [origin.id]
-        elif origin.class_.view in ['artifact', 'place']:
-            if class_ == 'move':
-                form.place_from.data = origin.id
-            else:
-                form.place.data = origin.id
-    if view == 'source' and origin.class_.name == 'artifact':
-        form.artifact.data = [origin.id]
-    if view == 'type' and isinstance(origin, Type):
-        root_id = origin.root[0] if origin.root else origin.id
-        getattr(form, str(root_id)).data = origin.id \
-            if origin.id != root_id else None
 
 
 def was_modified(form: FlaskForm, entity: Entity) -> bool:

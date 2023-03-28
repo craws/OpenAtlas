@@ -56,7 +56,7 @@ def overview() -> str:
         entity = Entity.get_by_id(entity_id)
         tabs['bookmarks'].table.rows.append([
             link(entity),
-            entity.class_.label,
+            uc_first(entity.class_.label),
             entity.first,
             entity.last,
             bookmark_toggle(entity.id, True)])
@@ -66,7 +66,7 @@ def overview() -> str:
             format_date(note['created']),
             _('public') if note['public'] else _('private'),
             link(entity),
-            entity.class_.label,
+            uc_first(entity.class_.label),
             note['text'],
             link(_("view"), url_for("note_view", id_=note["id"]))])
     for name, count in Entity.get_overview_counts().items():
@@ -84,7 +84,7 @@ def overview() -> str:
         tables['latest'].rows.append([
             format_date(entity.created),
             link(entity),
-            entity.class_.label,
+            uc_first(entity.class_.label),
             entity.first,
             entity.last,
             link(g.logger.get_log_info(entity.id)['creator'])])

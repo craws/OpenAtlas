@@ -1,4 +1,4 @@
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 from flask import g
 
@@ -18,19 +18,25 @@ def get_geojson(
     out = []
     for entity in entities:
         if geoms := [get_geojson_dict(entity, parser, geom)
-                     for geom in get_geom(entity)]:
+                     for geom in get_geom(entity, parser)]:
             out.extend(geoms)
         else:
             out.append(get_geojson_dict(entity, parser))
     return {'type': 'FeatureCollection', 'features': out}
 
 
-def get_geom(entity: Entity) -> Union[list[dict[str, Any]], list[Any]]:
+def get_geom(entity: Entity, parser: dict[str, Any]) -> list[Any]:
     if entity.class_.view == 'place' or entity.class_.name == 'artifact':
-        return Gis.get_by_id(
-            Link.get_linked_entity_safe(entity.id, 'P53').id)
+        id_ = Link.get_linked_entity_safe(entity.id, 'P53').id
+        geoms = Gis.get_by_id(id_)
+        if parser['centroid']:
+            geoms.extend(Gis.get_centroids_by_id(id_))
+        return geoms
     if entity.class_.name == 'object_location':
-        return Gis.get_by_id(entity.id)
+        geoms = Gis.get_by_id(entity.id)
+        if parser['centroid']:
+            geoms.extend(Gis.get_centroids_by_id(entity.id))
+        return geoms
     return []
 
 
@@ -45,19 +51,26 @@ def get_geojson_v2(
         if geom := get_geoms_as_collection(
                 entity,
                 [link_.range.id for link_ in links
-                 if link_.domain.id == entity.id]):
+                 if link_.domain.id == entity.id],
+                parser):
             out.append(get_geojson_dict(entity, parser, geom))
     return {'type': 'FeatureCollection', 'features': out}
 
 
 def get_geoms_as_collection(
         entity: Entity,
-        links: list[int]) -> Optional[dict[str, Any]]:
+        links: list[int],
+        parser: dict[str, Any]) -> Optional[dict[str, Any]]:
     if entity.class_.name == 'object_location':
-        return get_geoms_dict(Gis.get_by_id(entity.id))
+        geoms = Gis.get_by_id(entity.id)
+        if parser['centroid']:
+            geoms.extend(Gis.get_centroids_by_id(entity.id))
+        return get_geoms_dict(geoms)
     if links:
-        return get_geoms_dict(flatten_list_and_remove_duplicates(
-            [Gis.get_by_id(location) for location in links]))
+        geoms = [Gis.get_by_id(id_) for id_ in links]
+        if parser['centroid']:
+            geoms.extend([Gis.get_centroids_by_id(id_) for id_ in links])
+        return get_geoms_dict(flatten_list_and_remove_duplicates(geoms))
     return None
 
 

@@ -1,6 +1,6 @@
 from typing import Any, Union
 
-from flask import render_template, request, send_from_directory, url_for
+from flask import g, render_template, request, send_from_directory, url_for
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
@@ -58,7 +58,9 @@ def file_add(id_: int, view: str) -> Union[str, Response]:
         return redirect(f"{url_for('view', id_=entity.id)}#tab-{view}")
     return render_template(
         'content.html',
-        content=get_table_form(view, entity.get_linked_entities('P67')),
+        content=get_table_form(
+            g.view_class_mapping[view],
+            entity.get_linked_entities('P67')),
         title=entity.name,
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],

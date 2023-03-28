@@ -265,7 +265,7 @@ class TreeMultiSelect(HiddenInput):
             root=g.types[int(field.type_id)],
             selection=sorted(data, key=lambda k: g.types[k].name),
             data=Type.get_tree_data(int(field.id), data)) \
-               + super().__call__(field, **kwargs)
+            + super().__call__(field, **kwargs)
 
 
 class TreeMultiField(HiddenField):
@@ -328,10 +328,11 @@ class DragNDrop(FileInput):
             field: RemovableListField,
             *args: Any,
             **kwargs: Any) -> RemovableListInput:
-        accept = ', '.join([f'.{filename}' for filename
-                            in g.settings['file_upload_allowed_extension']])
+        accept = ', '.join([
+            f'.{filename}' for filename
+            in g.settings['file_upload_allowed_extension']])
         return super().__call__(field, accept=accept, **kwargs) \
-               + render_template('forms/drag_n_drop_field.html')
+            + render_template('forms/drag_n_drop_field.html')
 
 
 class DragNDropField(FileField):
@@ -377,8 +378,8 @@ class SubmitField(BooleanField):
 def generate_password_field() -> CustomField:
     return CustomField(
         '',
-        content=
-        f'''<span class="uc-first {app.config["CSS"]["button"]["primary"]}"
+        content=f'''
+            <span class="uc-first {app.config["CSS"]["button"]["primary"]}"
             id="generate-password">{_("generate password")}</span>''')
 
 
@@ -429,6 +430,18 @@ def get_table_content(
             class_ = 'event'
             entities = Entity.get_by_class(
                 ['activity', 'acquisition', 'move', 'production'],
+                types=True,
+                aliases=aliases)
+        elif class_name == 'feature_super':
+            class_ = 'place'
+            entities = Entity.get_by_class(
+                'place',
+                types=True,
+                aliases=aliases)
+        elif class_name == 'stratigraphic_super':
+            class_ = 'place'
+            entities = Entity.get_by_class(
+                'feature',
                 types=True,
                 aliases=aliases)
         elif class_name == 'artifact_super':

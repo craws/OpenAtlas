@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Any, Optional
 
 from flask import g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -13,39 +13,30 @@ from openatlas.display.util import (
     bookmark_toggle, button, delete_link, edit_link, ext_references,
     format_date, format_entity_date, get_appearance, get_base_table_data,
     get_system_data, is_authorized, link, manual, profile_image_table_link,
-    remove_link, siblings_pager)
+    remove_link, siblings_pager, uc_first)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.models.overlay import Overlay
+from openatlas.models.reference_system import ReferenceSystem
+from openatlas.models.type import Type
 from openatlas.models.user import User
 from openatlas.views.entity_index import file_preview
 
-if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.models.type import Type
 
 class BaseDisplay:
-
-    entity: Entity
     tabs: dict[str, Tab]
-    events: list[Entity]
-    event_links: Optional[list[Link]]  # Needed for actor and info data
-    linked_places: list[Entity]  # Related places for map
-    gis_data: dict[str, Any]
-    structure: dict[str, list[Entity]]
     overlays = None
     crumbs: list[Any]
-    buttons: list[str]
-    problematic_type: bool = False
     data: dict[str, Any]
 
     def __init__(self, entity: Entity) -> None:
         self.entity = entity
-        self.events = []
-        self.event_links = []
-        self.linked_places = []
-        self.structure = {}
-        self.gis_data = {}
+        self.events: list[Entity] = []
+        self.event_links: Optional[list[Link]] = []
+        self.linked_places: list[Entity] = []
+        self.structure: dict[str, list[Entity]] = {}
+        self.gis_data: dict[str, Any] = {}
         self.problematic_type = self.entity.check_too_many_single_type_links()
         self.entity.image_id = entity.get_profile_image_id()
         self.add_tabs()
@@ -128,13 +119,20 @@ class BaseDisplay:
             self.tabs['note'].table.rows.append(data)
 
     def add_buttons(self) -> None:
-
-        if is_authorized(self.entity.class_.write_access):
-            if not self.problematic_type:
-                self.buttons.append(
-                    button(_('edit'), url_for('update', id_=self.entity.id)))
-            self.buttons.append(delete_link(self.entity))
-
+        if not is_authorized(self.entity.class_.write_access) or (
+                isinstance(self.entity, Type)
+                and self.entity.category == 'system'):
+            return
+        if not self.problematic_type:
+            self.buttons.append(
+                button(_('edit'), url_for('update', id_=self.entity.id)))
+        if self.entity.class_.view == 'place' and \
+                self.entity.get_linked_entities('P46'):
+            return
+        if isinstance(self.entity, ReferenceSystem) and \
+                (self.entity.classes or self.entity.system):
+            return
+        self.buttons.append(delete_link(self.entity))
 
     def add_data(self) -> None:
         self.data = {
@@ -214,7 +212,7 @@ class ActorDisplay(BaseDisplay):
                 self.linked_places.append(link_.object_)
             self.tabs['event'].table.rows.append([
                 link(event),
-                event.class_.label,
+                uc_first(event.class_.label),
                 _('moved')
                 if link_.property.code == 'P25' else link(link_.type),
                 link_.first or (
@@ -255,7 +253,7 @@ class ActorDisplay(BaseDisplay):
         for link_ in entity.get_links('P52', True):
             self.tabs['artifact'].table.rows.append([
                 link(link_.domain),
-                link_.domain.class_.label,
+                uc_first(link_.domain.class_.label),
                 link(link_.domain.standard_type),
                 link_.domain.first,
                 link_.domain.last,
@@ -289,7 +287,7 @@ class EventsDisplay(BaseDisplay):
         for link_ in entity.get_links(['P11', 'P14', 'P22', 'P23']):
             self.tabs['actor'].table.rows.append([
                 link(link_.range),
-                link_.range.class_.label,
+                uc_first(link_.range.class_.label),
                 link_.type.name if link_.type else '',
                 link_.first
                 or f'<span class="text-muted">{entity.first}</span>'
@@ -307,14 +305,6 @@ class EventsDisplay(BaseDisplay):
 
 
 class PlaceBaseDisplay(BaseDisplay):
-
-    def add_buttons(self) -> None:
-        if is_authorized(self.entity.class_.write_access):
-            if not self.problematic_type:
-                self.buttons.append(
-                    button(_('edit'), url_for('update', id_=self.entity.id)))
-            if not self.entity.get_linked_entities('P46'):
-                self.buttons.append(delete_link(self.entity))
 
     def add_tabs(self) -> None:
         super().add_tabs()
@@ -435,13 +425,6 @@ class TypeBaseDisplay(BaseDisplay):
             self.data[_('unit')] = self.entity.description
         self.data[_('ID for imports')] = self.entity.id
 
-    def add_buttons(self) -> None:
-        if is_authorized(self.entity.class_.write_access) \
-                and self.entity.root and self.entity.category != 'system':
-            self.buttons.append(
-                button(_('edit'), url_for('update', id_=self.entity.id)))
-            self.buttons.append(delete_link(self.entity))
-
     def add_crumbs(self) -> None:
         self.crumbs = [[_('types'), url_for('type_index')]]
         self.crumbs += [g.types[type_id] for type_id in self.entity.root]
@@ -483,7 +466,7 @@ class TypeBaseDisplay(BaseDisplay):
                 data = [link(item)]
                 if entity.category == 'value':
                     data.append(format_number(item.types[entity]))
-                data.append(item.class_.label)
+                data.append(uc_first(item.class_.label))
                 data.append(item.description)
                 root_place = ''
                 if item.class_.name in classes_:

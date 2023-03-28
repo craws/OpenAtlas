@@ -463,3 +463,10 @@ function processUcFirst(){
     document.body.style.opacity = 1;
   }
 }
+
+function toggleMapWidth(element){
+  const parent = element.parentElement
+    parent.classList.toggle("col-lg-3")
+    parent.classList.toggle("col-lg-7")
+    element.classList.toggle("rotate-180")
+}

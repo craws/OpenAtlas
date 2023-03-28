@@ -5,7 +5,8 @@ from flask import g, url_for
 from openatlas import app
 from openatlas.api.resources.util import (
     get_geometric_collection, get_license_name, get_reference_systems,
-    replace_empty_list_values_in_dict_with_none, to_camel_case)
+    replace_empty_list_values_in_dict_with_none, to_camel_case, date_to_str,
+    get_crm_relation)
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.display.util import get_file_path
@@ -38,17 +39,10 @@ def get_linked_places_entity(
             if 'description' in parser['show'] else None,
             'names': [{"alias": value} for value in entity.aliases.values()]
             if entity.aliases and 'names' in parser['show'] else None,
-            'geometry': get_geometric_collection(entity, links)
+            'geometry': get_geometric_collection(entity, links, parser)
             if 'geometry' in parser['show'] else None,
             'relations': get_lp_links(links, links_inverse, parser)
             if 'relations' in parser['show'] else None})]}
-
-
-def relation_type(link_: Link, inverse: bool = False) -> str:
-    property_ = f"i {link_.property.i18n_inverse['en']}" \
-        if inverse and link_.property.i18n_inverse['en'] \
-        else f" {link_.property.i18n['en']}"
-    return f"crm:{link_.property.code}{property_}"
 
 
 def link_dict(link_: Link, inverse: bool = False) -> dict[str, Any]:
@@ -59,7 +53,7 @@ def link_dict(link_: Link, inverse: bool = False) -> dict[str, Any]:
                 'api_03.entity',
                 id_=link_.domain.id if inverse else link_.range.id,
                 _external=True),
-        'relationType': relation_type(link_, inverse),
+        'relationType': get_crm_relation(link_, inverse),
         'relationSystemClass':
             link_.domain.class_.name if inverse else link_.range.class_.name,
         'type': to_camel_case(link_.type.name) if link_.type else None,
@@ -100,7 +94,7 @@ def get_lp_file(links_inverse: list[Link]) -> list[dict[str, str]]:
             'license': get_license_name(link.domain),
             'url': url_for(
                 'api.display',
-                filename=path.name,
+                filename=path.stem,
                 _external=True) if path else "N/A"})
     return files
 
@@ -126,10 +120,10 @@ def get_lp_types(entity: Entity, links: list[Link]) -> list[dict[str, Any]]:
 def get_lp_time(entity: Union[Entity, Link]) -> Optional[dict[str, Any]]:
     return {
         'start': {
-            'earliest': str(entity.begin_from) if entity.begin_from else None,
-            'latest': str(entity.begin_to) if entity.begin_to else None,
-            'comment': entity.begin_comment or None},
+            'earliest': date_to_str(entity.begin_from),
+            'latest': date_to_str(entity.begin_to),
+            'comment': entity.begin_comment},
         'end': {
-            'earliest': str(entity.end_from) if entity.end_from else None,
-            'latest': str(entity.end_to) if entity.end_to else None,
-            'comment': entity.end_comment or None}}
+            'earliest': date_to_str(entity.end_from),
+            'latest': date_to_str(entity.end_to),
+            'comment': entity.end_comment}}

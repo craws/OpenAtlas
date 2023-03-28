@@ -15,6 +15,7 @@ class ArtifactTest(TestBaseCase):
                 source = insert('source', 'Necronomicon')
                 actor = insert('person', 'Conan')
                 place = insert('place', 'Home')
+                sub_artifact = insert('artifact', 'Sub artifact')
 
             rv: Any = self.app.get(
                 url_for('insert', class_='artifact', origin_id=place.id))
@@ -27,6 +28,15 @@ class ArtifactTest(TestBaseCase):
                     'actor': actor.id,
                     'artifact_super': place.id})
             artifact_id = rv.location.split('/')[-1]
+
+            rv = self.app.get(url_for('add_subunit', super_id=place.id))
+            assert b'Love-letter' not in rv.data
+
+            rv = self.app.post(
+                url_for('add_subunit', super_id=place.id),
+                data={'checkbox_values': [sub_artifact.id]},
+                follow_redirects=True)
+            assert b'Sub artifact' in rv.data
 
             rv = self.app.get(url_for('index', view='artifact'))
             assert b'Love-letter' in rv.data

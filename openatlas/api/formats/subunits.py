@@ -27,7 +27,10 @@ def get_subunit(data: dict[str, Any]) -> dict[str, Any]:
         'latestModRec': data['latest_modified'],
         'geometry':
             get_geometries_thanados(
-                get_geometric_collection(data['entity'], data['links']),
+                get_geometric_collection(
+                    data['entity'],
+                    data['links'],
+                    data['parser']),
                 data['parser']),
         'children': get_children(data),
         'properties': get_properties(data)})
@@ -48,8 +51,8 @@ def get_children(data: dict[str, Any]) -> list[Union[int, dict[str, Any]]]:
 
 
 def get_geometries_thanados(
-        geom: Union[dict[str, Any], None],
-        parser: dict[str, Any]) -> Union[list[Any], None, dict[str, Any]]:
+        geom: Optional[dict[str, Any]],
+        parser: dict[str, Any]) -> Union[list[Any], dict[str, Any], None]:
     if parser['format'] == 'xml' and geom:
         if geom['type'] == 'GeometryCollection':
             geometries = []

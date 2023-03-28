@@ -1,15 +1,16 @@
 {% extends 'layout.html' %}
 {% block content %}
   <div class="row">
-    <div class="col-3">
+    <div class="col-2">
       <form method="post">
         {{ form.csrf_token }}
         <div class="row">
-          <div
-              class="col-12">{{ form.term(placeholder=_('search term')|uc_first, class_=config.CSS.string_field) }}</div>
-          <div class="col-12">{{ form.own }} {{ form.own.label }}</div>
-          <div class="col-12">{{ form.desc }} {{ form.desc.label }}</div>
           <div class="col-12">
+            {{ form.term(placeholder=_('search term')|uc_first, class_=config.CSS.string_field) }}
+          </div>
+          <div class="col-12 mt-2">{{ form.own }} {{ form.own.label }}</div>
+          <div class="col-12">{{ form.desc }} {{ form.desc.label }}</div>
+          <div class="col-12 mt-2">
             <p class="fs-5 mb-0">{{ _('date')|uc_first }}</p>
             <span style="display:inline-block;width:3em;">{{ _('from')|uc_first }}</span>
             <div class="row g-1">
@@ -25,27 +26,26 @@
               <div class="col-4">{{ form.end_year(class_='year ' + config.CSS.string_field) }}</div>
               <div class="col-4">{{ form.end_month(class_='month ' + config.CSS.string_field) }}</div>
               <div class="col-4">{{ form.end_day(class_='day ' + config.CSS.string_field) }}</div>
-              <div
-                  class="col-12 d-flex">{{ form.include_dateless(class_="me-1") }} {{ form.include_dateless.label }}</div>
+              <div class="col-12 d-flex">
+                {{ form.include_dateless(class_="me-1") }} {{ form.include_dateless.label }}
+              </div>
             </div>
           </div>
-          <div class="col-12">
+          <div class="col-12 mt-2">
             <p class="mb-0">
-              <span class="fs-5 mb-0">{{ _('classes')|uc_first }}</span>
-              (<a role="button" id="select_all" class="select_all">
-              {{ _('deselect all') }}
-            </a>)
+              <span class="fs-5">{{ _('classes')|uc_first }}</span>
+              (<a role="button" id="select_all" class="select_all">{{ _('deselect all') }}</a>)
             </p>
             {{ form.classes }}
-            <div class="row g-2 d-flex align-items-center">
-              <div class="col-auto">{{ 'tools/search'|manual|safe }}</div>
+            <div class="button-bar mt-2">
+              {{ 'tools/search'|manual|safe }}
               {{ form.search(class_=config.CSS.button.primary + " col")|safe }}
             </div>
           </div>
         </div>
       </form>
     </div>
-    <div class="col-9">
+    <div class="col-10">
       {{ table.display()|safe }}
     </div>
   </div>

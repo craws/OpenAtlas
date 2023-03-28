@@ -1,5 +1,6 @@
 from typing import Any
 
+from flask import g
 from flask_login import current_user
 
 from openatlas.database.entity import Entity as Db
@@ -10,10 +11,10 @@ from openatlas.models.link import Link
 def search(data: dict[str, Any]) -> list[Entity]:
     if not data['term']:
         return []
-    if 'person' in data['classes'] \
-            or 'place' in data['classes'] \
-            or 'group' in data['classes']:
-        data['classes'].append('appellation')
+    for class_ in data['classes']:
+        if g.classes[class_].alias_allowed:
+            data['classes'].append('appellation')
+            break
     entities = []
     for row in Db.search(
             data['term'],
@@ -60,3 +61,7 @@ def check_dates(entity: Entity, data: dict[str, Any]) -> bool:
             if date and date <= data['to_date']:
                 end_ok = True
     return bool(begin_ok and end_ok)
+
+
+def get_subunits_without_super(classes: list[str]) -> list[int]:
+    return Db.get_subunits_without_super(classes)
