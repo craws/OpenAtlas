@@ -52,7 +52,7 @@ def get_form_settings(form: Any, profile: bool = False) -> dict[str, str]:
         if field.name in [
                 'mail_recipients_feedback',
                 'file_upload_allowed_extension']:
-            settings[field.label.text] = ' '.join(value)
+            settings[field.label.text] = '<br>'.join(value)
     return settings
 
 

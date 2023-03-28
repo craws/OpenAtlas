@@ -341,10 +341,8 @@ def admin_settings(category: str) -> Union[str, Response]:
             if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
                 continue
             value = field.data
-            if field.name == 'mail_recipients_feedback':
-                value = ' '.join(list(filter(None, field.data)))
-            if field.name == 'file_upload_allowed_extension':
-                value = ' '.join(list(filter(None, field.data)))
+            if field.type == 'FieldList':
+                value = ' '.join(set(filter(None, field.data)))
             if field.type == 'BooleanField':
                 value = 'True' if field.data else ''
             data[field.name] = value
@@ -362,16 +360,12 @@ def admin_settings(category: str) -> Union[str, Response]:
             f"{url_for('admin_index')}"
             f"#tab-{category.replace('api', 'data').replace('mail', 'email')}")
     set_form_settings(form)
+    tab = f"#tab-{category.replace('api', 'data').replace('mail', 'email')}"
     return render_template(
         'content.html',
         content=display_form(form, manual_page=f"admin/{category}"),
         title=_('admin'),
-        crumbs=[
-            [
-                _('admin'),
-                f"{url_for('admin_index')}"
-                f"#tab-{category.replace('api', 'data')}"],
-            _(category)])
+        crumbs=[[ _('admin'), f"{url_for('admin_index')}{tab}"], _(category)])
 
 
 @app.route('/admin/similar', methods=['POST', 'GET'])
