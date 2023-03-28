@@ -27,9 +27,11 @@ class RemovableListInput(HiddenInput):
             *args: Any,
             **kwargs: Any) -> str:
         [name, index] = field.id.split('-')
+        classes = kwargs['class'] if 'class' in kwargs else ''
         return render_template(
             'forms/removable_list_field.html',
             value=field.data,
+            classes=classes,
             name=name,
             id=index)
 

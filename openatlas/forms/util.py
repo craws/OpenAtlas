@@ -52,7 +52,7 @@ def get_form_settings(form: Any, profile: bool = False) -> dict[str, str]:
         if field.name in [
                 'mail_recipients_feedback',
                 'file_upload_allowed_extension']:
-            settings[field.label.text] = ' '.join(value)
+            settings[field.label.text] = '<br>'.join(value)
     return settings
 
 
@@ -81,7 +81,8 @@ def set_form_settings(form: Any, profile: bool = False) -> None:
         if field.name in [
                 'mail_recipients_feedback',
                 'file_upload_allowed_extension']:
-            field.data = ' '.join(g.settings[field.name])
+            for item in g.settings[field.name]:
+                field.append_entry(item)
             continue
         if field.name not in g.settings:  # pragma: no cover
             field.data = ''  # If missing setting after an update

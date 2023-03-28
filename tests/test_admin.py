@@ -102,7 +102,7 @@ class AdminTests(TestBaseCase):
             assert b'Oliver Twist' in rv.data
 
             rv = self.app.get(url_for('admin_settings', category='mail'))
-            assert b'recipients feedback' in rv.data
+            assert b'mail from' in rv.data
 
             rv = self.app.get(url_for('admin_settings', category='general'))
             assert b'log level' in rv.data

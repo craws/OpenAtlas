@@ -8,6 +8,7 @@ from wtforms import (
     TextAreaField, widgets)
 from wtforms.validators import InputRequired, Optional, URL
 
+from openatlas.display.util import uc_first
 from openatlas.forms.base_manager import (
     ActorBaseManager, ArtifactBaseManager, BaseManager, EventBaseManager,
     HierarchyBaseManager, TypeBaseManager)
@@ -16,7 +17,6 @@ from openatlas.forms.field import (
 from openatlas.forms.validation import file
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 
 
@@ -466,7 +466,17 @@ class ReferenceSystemManager(BaseManager):
 
     def additional_fields(self) -> dict[str, Any]:
         precision_id = str(Type.get_hierarchy('External reference match').id)
-        choices = ReferenceSystem.get_class_choices(self.entity)
+        choices = []
+        for class_ in g.classes.values():
+            if not class_.reference_system_allowed \
+                    or (self.entity and class_.name in self.entity.classes) \
+                    or (
+                    self.entity
+                    and self.entity.name == 'GeoNames'
+                    and class_.name != 'Place'):
+                continue
+            choices.append(
+                (class_.name, uc_first(g.classes[class_.name].label)))
         return {
             'website_url': StringField(_('website URL'), [Optional(), URL()]),
             'resolver_url': StringField(

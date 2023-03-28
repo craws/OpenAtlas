@@ -294,7 +294,7 @@ function selectFromTreeMulti(name, value_type = false) {
   $("#" + name).trigger('change');
 }
 function deselectNode(fieldId,nodeId){
- $(`#${fieldId}-tree`).jstree('deselect_node', nodeId); 
+ $(`#${fieldId}-tree`).jstree('deselect_node', nodeId);
  selectFromTreeMulti(fieldId)
 }
 function selectFromTable(element, table, id,label= undefined) {
@@ -430,18 +430,17 @@ function addDragNDropListeners(dropContainer,allowedTypes) {
 
 // removable list field
 
-function addListElement(id){
-      const list = document.getElementById(id);
-      const lastIndex = list.lastChild?.getElementsByTagName('input')?.item(0)?.id;
-      const lastId = parseInt(lastIndex.split('-').pop(),10)
-
-      const newField = document.createElement('li')
-      newField.innerHTML = `
-                            <div class="d-flex">
-                                <input id="${id}-${lastId + 1}"  name="${id}-${lastId + 1}" class="form-control form-control-sm" type="text"/>
-                                <button onclick="removeListField('${id}-${lastId + 1}')" type="button" class="${style.button.secondary} ms-1"><icon class="fa fa-minus"></icon></button>
-                            </div>`
-      list.appendChild(newField)
+function addListElement(id, classes=""){
+  const list = document.getElementById(id);
+  const lastIndex = list.lastChild?.getElementsByTagName('input')?.item(0)?.id;
+  const lastId = parseInt(lastIndex.split('-').pop(),10)
+  const newField = document.createElement('li')
+  newField.innerHTML = `
+    <div class="d-flex">
+        <div class="w-100"><input id="${id}-${lastId + 1}"  name="${id}-${lastId + 1}" class="${classes} form-control form-control-sm" type="text"/></div>
+        <div><button onclick="removeListField('${id}-${lastId + 1}')" type="button" class="${style.button.secondary} ms-1"><icon class="fa fa-minus"></icon></button></div>
+    </div>`
+  list.appendChild(newField)
 }
 
 function removeListField(id){
