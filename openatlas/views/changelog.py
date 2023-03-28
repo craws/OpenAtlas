@@ -26,7 +26,9 @@ versions = {
             '1987': 'API: Add centroid points of geometries',
             '1988': 'API: Depiction URL without extension',
             '1973': 'Manual: document linking artifact with places',
-            '1990': 'Refactor and minor improvements'}}],
+            '1990': 'Refactor and minor improvements',
+            '1908': 'New website layout',
+            '1868': 'Mission statement'}}],
     '7.11.1': ['2023-02-20', {
         'fix': {
             '1971': 'Validation for "Inventory number" is broken'}}],
