@@ -455,8 +455,8 @@ class TypeBaseDisplay(BaseDisplay):
             'stratigraphic_unit',
             'artifact',
             'human_remains']
-        if any(item in g.types[entity.root[0]].classes for item in classes_):
-            self.tabs['entities'].table.header.append('place')
+        # if any(item in g.types[entity.root[0]].classes for item in classes_):
+        #    self.tabs['entities'].table.header.append('place')
         root = g.types[entity.root[0]] if entity.root else entity
         if root.name in app.config['PROPERTY_TYPES']:
             self.tabs['entities'].table.header = [_('domain'), _('range')]
@@ -474,9 +474,9 @@ class TypeBaseDisplay(BaseDisplay):
                 data.append(uc_first(item.class_.label))
                 data.append(item.description)
                 root_place = ''
-                if item.class_.name in classes_:
-                    if roots := \
-                            item.get_linked_entities_recursive('P46', True):
-                        root_place = link(roots[0])
-                data.append(root_place)
+                #if item.class_.name in classes_:
+                #    if roots := \
+                #            item.get_linked_entities_recursive('P46', True):
+                #        root_place = link(roots[0])
+                #data.append(root_place)
                 self.tabs['entities'].table.rows.append(data)
