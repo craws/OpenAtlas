@@ -78,7 +78,8 @@ def overview() -> str:
         elif name in ['feature', 'stratigraphic_unit', 'source_translation']:
             url = ''
         tables['overview'].rows.append([
-            link(g.classes[name].label, url) if url else g.classes[name].label,
+            link(g.classes[name].label, url) if url
+            else uc_first(g.classes[name].label),
             format_number(count)])
     for entity in Entity.get_latest(15):
         tables['latest'].rows.append([
