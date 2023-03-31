@@ -313,3 +313,51 @@ class Entity:
             """,
             {'classes': tuple(classes)})
         return [row['id'] for row in g.cursor.fetchall()]
+
+    @staticmethod
+    def get_root_place(
+            ids: list[int],
+            property_code: Optional[str] = 'P46') -> dict[int, Any]:
+        g.cursor.execute(
+            """
+            WITH RECURSIVE parent_tree AS (
+                SELECT
+                    p.parent_id,
+                    p.child_id,
+                    ARRAY [p.child_id] AS path,
+                    1 AS depth
+                FROM (
+                    SELECT domain_id AS parent_id, range_id AS child_id
+                    FROM model.link WHERE property_code = %(property_code)s
+                ) p
+                WHERE p.child_id IN %(ids)s
+                UNION ALL
+                SELECT
+                    t.parent_id,
+                    t.child_id,
+                    pt.path || ARRAY [t.child_id],
+                    pt.depth + 1
+                FROM (
+                    SELECT domain_id as parent_id, range_id as child_id
+                    FROM model.link WHERE property_code = %(property_code)s
+                ) t
+                JOIN parent_tree pt ON pt.parent_id = t.child_id
+            ),
+            root_nodes AS (
+                SELECT DISTINCT ON (path[1]) path[1] AS child_id,
+                    parent_id AS top_level
+                FROM parent_tree
+                WHERE parent_id IS NOT NULL
+                ORDER BY path[1], depth DESC
+            )
+            SELECT DISTINCT a.child_id AS start_node, r.top_level, e.name
+            FROM root_nodes r
+            JOIN parent_tree a ON a.child_id = r.child_id
+            JOIN model.entity e ON e.id = r.top_level
+            ORDER BY a.child_id
+            """,
+            {'ids': tuple(ids), 'property_code': property_code})
+        return {
+            row['start_node']: {
+                'id': row['top_level'],
+                'name': row['name']} for row in g.cursor.fetchall()}

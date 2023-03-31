@@ -479,3 +479,7 @@ class Entity:
     def get_entities_linked_to_itself() -> list[Entity]:
         return [
             Entity.get_by_id(row['domain_id']) for row in Db.get_circular()]
+
+    @staticmethod
+    def get_root_place(ids: list[int]) -> dict[int, Any]:
+        return Db.get_root_place(ids)

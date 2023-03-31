@@ -455,8 +455,10 @@ class TypeBaseDisplay(BaseDisplay):
             'stratigraphic_unit',
             'artifact',
             'human_remains']
-        # if any(item in g.types[entity.root[0]].classes for item in classes_):
-        #    self.tabs['entities'].table.header.append('place')
+        possible_sub_unit = False
+        if any(item in g.types[entity.root[0]].classes for item in classes_):
+            possible_sub_unit = True
+            self.tabs['entities'].table.header.append('place')
         root = g.types[entity.root[0]] if entity.root else entity
         if root.name in app.config['PROPERTY_TYPES']:
             self.tabs['entities'].table.header = [_('domain'), _('range')]
@@ -465,7 +467,11 @@ class TypeBaseDisplay(BaseDisplay):
                     link(Entity.get_by_id(row['domain_id'])),
                     link(Entity.get_by_id(row['range_id']))])
         else:
-            for item in entity.get_linked_entities(['P2', 'P89'], True, True):
+            entities = entity.get_linked_entities(['P2', 'P89'], True, True)
+            root_places = {}
+            if possible_sub_unit:
+                root_places = Entity.get_root_place([e.id for e in entities])
+            for item in entities:
                 if item.class_.name == 'object_location':
                     item = item.get_linked_entity_safe('P53', inverse=True)
                 data = [link(item)]
@@ -473,10 +479,9 @@ class TypeBaseDisplay(BaseDisplay):
                     data.append(format_number(item.types[entity]))
                 data.append(item.class_.label)
                 data.append(item.description)
-                root_place = ''
-                #if item.class_.name in classes_:
-                #    if roots := \
-                #            item.get_linked_entities_recursive('P46', True):
-                #        root_place = link(roots[0])
-                #data.append(root_place)
+                data.append(
+                    link(
+                        root_places[item.id]['name'],
+                        url_for('view', id_=root_places[item.id]['id']))
+                    if item.id in root_places else '')
                 self.tabs['entities'].table.rows.append(data)
