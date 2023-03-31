@@ -62,7 +62,7 @@ def get_geoms_as_collection(
         links: list[int],
         parser: dict[str, Any]) -> Optional[dict[str, Any]]:
     if entity.class_.name == 'object_location':
-        geoms = Gis.get_by_id(entity.id)
+        geoms: list[Any] = Gis.get_by_id(entity.id)
         if parser['centroid']:
             geoms.extend(Gis.get_centroids_by_id(entity.id))
         return get_geoms_dict(geoms)
@@ -74,8 +74,7 @@ def get_geoms_as_collection(
     return None
 
 
-def get_geoms_dict(
-        geoms: list[dict[str, Any]]) -> Optional[dict[str, Any]]:
+def get_geoms_dict(geoms: list[dict[str, Any]]) -> Optional[dict[str, Any]]:
     if len(geoms) == 0:
         return None
     if len(geoms) == 1:
