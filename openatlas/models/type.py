@@ -7,7 +7,6 @@ from flask import g
 
 from openatlas import app
 from openatlas.database.type import Type as Db
-from openatlas.display.util import uc_first
 from openatlas.models.entity import Entity
 
 
@@ -207,7 +206,7 @@ class Type(Entity):
         for class_ in g.classes.values():
             if class_.new_types_allowed \
                     and (not root or class_.name not in root.classes):
-                choices.append((class_.name, uc_first(class_.label)))
+                choices.append((class_.name, class_.label))
         return choices
 
     @staticmethod

@@ -302,7 +302,7 @@ def admin_check_link_duplicates(
                     f' {type_.name}')
             tab.table.rows.append([
                 link(row['entity']),
-                uc_first(row['entity'].class_.label),
+                row['entity'].class_.label,
                 link(g.types[row['type'].id]),
                 '<br><br>'.join(remove_links)])
     if not tab.table.rows:
@@ -373,7 +373,7 @@ def admin_settings(category: str) -> Union[str, Response]:
 def admin_check_similar() -> str:
     form = SimilarForm()
     form.classes.choices = [
-        (class_.name, uc_first(class_.label))
+        (class_.name, class_.label)
         for name, class_ in g.classes.items() if class_.label and class_.view]
     table = None
     if form.validate_on_submit():
@@ -420,7 +420,7 @@ def admin_check_dates() -> str:
     for entity in Entity.get_invalid_dates():
         tabs['dates'].table.rows.append([
             link(entity),
-            uc_first(entity.class_.label),
+            entity.class_.label,
             link(entity.standard_type),
             format_date(entity.created),
             format_date(entity.modified),
@@ -438,7 +438,7 @@ def admin_check_dates() -> str:
         data = [
             link(actor),
             link(event),
-            uc_first(event.class_.label),
+            event.class_.label,
             link_.type.name if link_.type else '',
             link_.description,
             link(
@@ -499,7 +499,7 @@ def admin_orphans() -> str:
                 link(entity),
                 link(entity.class_),
                 link(entity.standard_type),
-                uc_first(entity.class_.label),
+                entity.class_.label,
                 format_date(entity.created),
                 format_date(entity.modified),
                 entity.description])
@@ -513,7 +513,7 @@ def admin_orphans() -> str:
                 link(entity),
                 link(entity.class_),
                 link(entity.standard_type),
-                uc_first(entity.class_.label),
+                entity.class_.label,
                 format_date(entity.created),
                 format_date(entity.modified),
                 entity.description])
@@ -544,7 +544,7 @@ def admin_orphans() -> str:
         tabs['orphaned_subunits'].table.rows.append([
             entity.id,
             entity.name,
-            uc_first(entity.class_.label),
+            entity.class_.label,
             format_date(entity.created),
             format_date(entity.modified),
             entity.description])

@@ -8,7 +8,6 @@ from wtforms import (
     TextAreaField, widgets)
 from wtforms.validators import InputRequired, Optional, URL
 
-from openatlas.display.util import uc_first
 from openatlas.forms.base_manager import (
     ActorBaseManager, ArtifactBaseManager, BaseManager, EventBaseManager,
     HierarchyBaseManager, TypeBaseManager)
@@ -475,8 +474,7 @@ class ReferenceSystemManager(BaseManager):
                     and self.entity.name == 'GeoNames'
                     and class_.name != 'Place'):
                 continue
-            choices.append(
-                (class_.name, uc_first(g.classes[class_.name].label)))
+            choices.append((class_.name, g.classes[class_.name].label))
         return {
             'website_url': StringField(_('website URL'), [Optional(), URL()]),
             'resolver_url': StringField(

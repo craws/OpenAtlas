@@ -7,7 +7,7 @@ from wtforms.validators import InputRequired, NoneOf, NumberRange, Optional
 
 from openatlas import app
 from openatlas.display.table import Table
-from openatlas.display.util import link, required_group, uc_first
+from openatlas.display.util import link, required_group
 from openatlas.forms.field import SubmitField
 from openatlas.forms.util import form_to_datetime64
 from openatlas.models.entity import Entity
@@ -78,8 +78,7 @@ def search_index() -> str:
     classes = [
         name for name, count in Entity.get_overview_counts().items() if count]
     form = SearchForm()
-    form.classes.choices = \
-        [(name, uc_first(g.classes[name].label)) for name in classes]
+    form.classes.choices = [(name, g.classes[name].label) for name in classes]
     form.classes.default = classes
     form.classes.process(request.form)
     table = Table()

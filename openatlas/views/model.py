@@ -9,7 +9,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.display.table import Table
-from openatlas.display.util import link, manual, required_group, uc_first
+from openatlas.display.util import link, manual, required_group
 from openatlas.forms.field import SubmitField, TableField
 from openatlas.models.entity import Entity
 from openatlas.models.network import Network
@@ -267,7 +267,7 @@ def model_network(dimensions: Optional[int] = None) -> str:
     for class_ in classes:
         if class_.name == 'object_location':
             continue
-        form.classes.choices.append((class_.name, uc_first(class_.label)))
+        form.classes.choices.append((class_.name, class_.label))
     return render_template(
         'model/network2.html' if dimensions else 'model/network.html',
         form=form,

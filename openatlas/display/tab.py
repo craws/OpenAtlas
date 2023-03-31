@@ -224,9 +224,10 @@ class Tab:
             elif view == 'source':
                 self.buttons.append(
                     button('link', url_for('link_insert', id_=id_, view=name)))
-            self.buttons.append(button(
-                g.classes[name].label,
-                url_for('insert', class_=name, origin_id=id_)))
+            self.buttons.append(
+                button(
+                    g.classes[name].label,
+                    url_for('insert', class_=name, origin_id=id_)))
         elif name == 'reference':
             self.buttons.append(
                 button('link', url_for('entity_add_reference', id_=id_)))

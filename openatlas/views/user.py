@@ -117,7 +117,7 @@ def user_activity(user_id: int = 0) -> str:
             format_date(row['created']),
             link(user) if user else f"id {row['user_id']}",
             _(row['action']),
-            uc_first(entity.class_.label) if entity else '',
+            entity.class_.label if entity else '',
             entity_name])
     return render_template(
         'content.html',
@@ -194,7 +194,7 @@ def user_entities(id_: int) -> str:
         for entity in user.get_entities():
             table.rows.append([
                 link(entity),
-                uc_first(entity.class_.label),
+                entity.class_.label,
                 link(entity.standard_type),
                 entity.first,
                 entity.last,

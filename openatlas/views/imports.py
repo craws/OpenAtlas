@@ -18,8 +18,7 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
     button, datetime64_to_timestamp, display_form, format_date,
-    get_backup_file_data, is_authorized, link, manual, required_group,
-    uc_first)
+    get_backup_file_data, is_authorized, link, manual, required_group)
 from openatlas.forms.field import SubmitField
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Import, is_float
@@ -101,7 +100,7 @@ def import_project_view(id_: int) -> str:
     for entity in Entity.get_by_project_id(id_):
         tabs['entities'].table.rows.append([
             link(entity),
-            uc_first(entity.class_.label),
+            entity.class_.label,
             entity.description,
             entity.origin_id,
             format_date(entity.created)])
