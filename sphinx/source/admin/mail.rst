@@ -13,6 +13,5 @@ their passwords.
 * **Port** - e.g. 587
 * **Email from** - displayed in emails
 * **From name** - displayed in emails
-* **Recipients feedback** - email addresses (use space as separator) to receive
-  mails from the feedback form. The first address is also displayed as feedback
-  contact.
+* **Recipients feedback** - email addresses to receive mails from the feedback
+  form. The first address is also displayed as feedback contact.

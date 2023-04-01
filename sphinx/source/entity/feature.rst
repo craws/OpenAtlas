@@ -14,6 +14,7 @@ Form fields
 * :doc:`type`
 * :doc:`/ui/date`
 * :doc:`/ui/description`
+* Super - a :doc:`place` which it is a part of
 * :doc:`/tools/map`
 
 Can be linked via tabs to
