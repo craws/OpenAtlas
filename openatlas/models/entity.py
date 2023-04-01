@@ -481,5 +481,8 @@ class Entity:
             Entity.get_by_id(row['domain_id']) for row in Db.get_circular()]
 
     @staticmethod
-    def get_root_place(ids: list[int]) -> dict[int, Any]:
-        return Db.get_root_place(ids)
+    def get_roots(
+            property_code: str,
+            ids: list[int],
+            inverse: bool = False) -> dict[int, Any]:
+        return Db.get_roots(property_code, ids, inverse)

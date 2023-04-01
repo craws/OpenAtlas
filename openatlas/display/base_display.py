@@ -470,7 +470,10 @@ class TypeBaseDisplay(BaseDisplay):
             entities = entity.get_linked_entities(['P2', 'P89'], True, True)
             root_places = {}
             if possible_sub_unit:
-                root_places = Entity.get_root_place([e.id for e in entities])
+                root_places = Entity.get_roots(
+                    'P46',
+                    [e.id for e in entities],
+                    inverse=True)
             for item in entities:
                 if item.class_.name == 'object_location':
                     item = item.get_linked_entity_safe('P53', inverse=True)

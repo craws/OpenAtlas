@@ -315,11 +315,14 @@ class Entity:
         return [row['id'] for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_root_place(
+    def get_roots(
+            property_code: str,
             ids: list[int],
-            property_code: Optional[str] = 'P46') -> dict[int, Any]:
+            inverse: bool = False) -> dict[int, Any]:
+        first = 'domain_id' if inverse else 'range_id'
+        second = 'range_id' if inverse else 'domain_id'
         g.cursor.execute(
-            """
+            f"""
             WITH RECURSIVE parent_tree AS (
                 SELECT
                     p.parent_id,
@@ -327,7 +330,7 @@ class Entity:
                     ARRAY [p.child_id] AS path,
                     1 AS depth
                 FROM (
-                    SELECT domain_id AS parent_id, range_id AS child_id
+                    SELECT {first} AS parent_id, {second} AS child_id
                     FROM model.link WHERE property_code = %(property_code)s
                 ) p
                 WHERE p.child_id IN %(ids)s
@@ -338,7 +341,7 @@ class Entity:
                     pt.path || ARRAY [t.child_id],
                     pt.depth + 1
                 FROM (
-                    SELECT domain_id as parent_id, range_id as child_id
+                    SELECT {first} AS parent_id, {second} as child_id
                     FROM model.link WHERE property_code = %(property_code)s
                 ) t
                 JOIN parent_tree pt ON pt.parent_id = t.child_id
