@@ -126,8 +126,8 @@ class BaseDisplay:
         if not self.problematic_type:
             self.buttons.append(
                 button(_('edit'), url_for('update', id_=self.entity.id)))
-            if type(self.entity) \
-                    is Entity:  # pylint: disable=unidiomatic-typecheck
+            if type(self.entity) is Entity \
+                    and self.entity.class_.name != 'source_translation':
                 self.buttons.append(
                     button(
                         _('copy'),
