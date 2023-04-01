@@ -83,7 +83,7 @@ class BaseManager:
             setattr(Form, 'gis_polygons', HiddenField(default='[]'))
             setattr(Form, 'gis_lines', HiddenField(default='[]'))
         self.add_buttons()
-        self.form = Form(obj=self.link_ or self.entity)
+        self.form: Any = Form(obj=self.link_ or self.entity)
         self.customize_labels()
 
     def add_name_fields(self) -> None:
@@ -127,6 +127,7 @@ class BaseManager:
                 SubmitField(_('insert and continue')))
             setattr(self.form_class, 'continue_', HiddenField())
 
+    # pylint: disable=no-self-use
     def additional_fields(self) -> dict[str, Any]:
         return {}
 
