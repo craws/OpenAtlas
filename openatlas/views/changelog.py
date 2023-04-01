@@ -15,7 +15,7 @@ def index_changelog() -> str:
 
 
 versions = {
-    '7.12.0': ['TBA', {
+    '7.12.0': ['2023-04-01', {
         'feature': {
             '1753': 'Make a copy of an entry',
             '1946': 'Adding sub artifacts',
