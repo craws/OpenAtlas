@@ -1,10 +1,11 @@
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, IntegerField, SelectField, StringField
+from wtforms import (
+    BooleanField, IntegerField, SelectField, StringField, FieldList)
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app
-from openatlas.forms.field import SubmitField
+from openatlas.forms.field import SubmitField, RemovableListField
 
 
 class ContentForm(FlaskForm):
@@ -53,7 +54,9 @@ class MailForm(FlaskForm):
     mail_transport_port = StringField(_('mail transport port'))
     mail_from_email = StringField(_('mail from email'), [Email()])
     mail_from_name = StringField(_('mail from name'))
-    mail_recipients_feedback = StringField(_('mail recipients feedback'))
+    mail_recipients_feedback = FieldList(
+        RemovableListField(render_kw={'class': 'email'}),
+        render_kw={'class': 'no-label'})
     save = SubmitField(_('save'))
 
 
@@ -86,7 +89,9 @@ class ApiForm(FlaskForm):
 class FilesForm(FlaskForm):
     file_upload_max_size = IntegerField(_('maximum file size in MB'))
     profile_image_width = IntegerField(_('profile image width in pixel'))
-    file_upload_allowed_extension = StringField(_('allowed file extensions'))
+    file_upload_allowed_extension = FieldList(
+        RemovableListField(),
+        render_kw={'class': 'no-label'})
     save = SubmitField(_('save'))
 
 

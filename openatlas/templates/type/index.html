@@ -104,7 +104,7 @@
                         <p>
                           <strong>{{ _('classes')|uc_first }}</strong>:
                           {% for class_ in type_.classes %}
-                            {{ g.classes[class_].label }}{{ "," if not loop.last }}
+                            {{ g.classes[class_].label|uc_first }}{{ "," if not loop.last }}
                           {% endfor %}
                         </p>
                         {% if type_.multiple and type_.subs %}

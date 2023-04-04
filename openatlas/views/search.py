@@ -28,8 +28,6 @@ class SearchForm(FlaskForm):
         option_widget=widgets.CheckboxInput(),
         widget=widgets.ListWidget(prefix_label=False))
     search = SubmitField(_('search'))
-
-    # Date fields
     validator_day = [Optional(), NumberRange(min=1, max=31)]
     validator_month = [Optional(), NumberRange(min=1, max=12)]
     validator_year = [

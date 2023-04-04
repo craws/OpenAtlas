@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                7.11.0
+                7.12.0
               </div>
             
           
@@ -282,6 +282,29 @@ below). You can now add the following information:</p>
 </ul>
 <p>With the above steps you have created an artifact connected to a creation event
 and actor as creator.</p>
+</div>
+<div class="section" id="add-multiple-locations-to-an-artifact">
+<h2>Add multiple locations to an artifact<a class="headerlink" href="#add-multiple-locations-to-an-artifact" title="Permalink to this headline">¶</a></h2>
+<p>First of all, adding an artifact to more than one <a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a> or
+<a class="reference internal" href="../entity/feature.html"><span class="doc">Feature</span></a> is not possible. If an artifact has a link to multiple
+locations, it is possible to keep track of that in the following way:</p>
+<ul class="simple">
+<li><p>Choose the <a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a> the artifact has it’s first occurrence at -
+e.g. the production site or a place an artifact was found at during
+archaeological excavation.</p></li>
+<li><p>link any other place the artifact is linked to by adding a move event
+- e.g. when an artifact is transfered to a place where it is later found
+during an archaeological excavation after the production event or when it is
+moved to a museum or sold to a new owner. Click here to see a short tutorial
+on adding a <a class="reference internal" href="move_event.html"><span class="doc">Move events</span></a></p></li>
+</ul>
+<p><strong>Example:</strong> Leonardo painted the Mona Lisa in his workshop in Florence,
+therefore Florence would be linked to the artifact as place. It was then
+acquired by King Francis of France and exhibited in Château d’Amboise. This
+change of location can also be tracked in the database by a <a class="reference internal" href="move_event.html"><span class="doc">Move events</span></a>.
+Another <a class="reference internal" href="move_event.html"><span class="doc">Move events</span></a> maps the transfer of the image to Fountainebleau.
+By adding further move events the way of the picture to the Louvre in Paris
+can be documented.</p>
 </div>
 </div>
 

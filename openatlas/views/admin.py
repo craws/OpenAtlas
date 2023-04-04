@@ -298,7 +298,7 @@ def admin_check_link_duplicates(
                     entity_id=row['entity'].id,
                     type_id=type_.id)
                 remove_links.append(
-                    f'<a href="{url}" class="uc-fist">*' + _("remove") + '</a>'
+                    f'<a href="{url}" class="uc-first">' + _("remove") + '</a>'
                     f' {type_.name}')
             tab.table.rows.append([
                 link(row['entity']),
@@ -341,6 +341,8 @@ def admin_settings(category: str) -> Union[str, Response]:
             if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
                 continue
             value = field.data
+            if field.type == 'FieldList':
+                value = ' '.join(set(filter(None, field.data)))
             if field.type == 'BooleanField':
                 value = 'True' if field.data else ''
             data[field.name] = value
@@ -358,16 +360,12 @@ def admin_settings(category: str) -> Union[str, Response]:
             f"{url_for('admin_index')}"
             f"#tab-{category.replace('api', 'data').replace('mail', 'email')}")
     set_form_settings(form)
+    tab = f"#tab-{category.replace('api', 'data').replace('mail', 'email')}"
     return render_template(
         'content.html',
         content=display_form(form, manual_page=f"admin/{category}"),
         title=_('admin'),
-        crumbs=[
-            [
-                _('admin'),
-                f"{url_for('admin_index')}"
-                f"#tab-{category.replace('api', 'data')}"],
-            _(category)])
+        crumbs=[[ _('admin'), f"{url_for('admin_index')}{tab}"], _(category)])
 
 
 @app.route('/admin/similar', methods=['POST', 'GET'])
@@ -375,7 +373,7 @@ def admin_settings(category: str) -> Union[str, Response]:
 def admin_check_similar() -> str:
     form = SimilarForm()
     form.classes.choices = [
-        (class_.name, uc_first(class_.label))
+        (class_.name, class_.label)
         for name, class_ in g.classes.items() if class_.label and class_.view]
     table = None
     if form.validate_on_submit():

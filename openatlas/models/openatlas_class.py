@@ -46,7 +46,8 @@ class OpenatlasClass:
             write_access: str = 'contributor',
             icon: Optional[str] = None) -> None:
         self.name = name
-        self.label = _(name.replace('_', ' '))
+        label = _(name.replace('_', ' '))
+        self.label = str(label)[0].upper() + str(label)[1:]
         self.cidoc_class = g.cidoc_classes[cidoc_class] \
             if cidoc_class else None
         self.hierarchies = hierarchies

@@ -55,7 +55,7 @@ def get_entities_by_system_classes(system_classes: list[str]) -> list[Entity]:
 
 def get_all_links_of_entities(
         entities: Union[int, list[int]],
-        codes: Optional[Union[str, list[str]]] = None) -> list[Link]:
+        codes: Union[str, list[str], None] = None) -> list[Link]:
     codes = list(g.properties) if not codes else codes
     return Link.get_links(entities, codes)
 

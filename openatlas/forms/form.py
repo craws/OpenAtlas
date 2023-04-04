@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING, Union
 
 from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
@@ -19,18 +19,21 @@ from openatlas.models.link import Link
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.type import Type
 
+
 def get_manager(
         class_name: Optional[str] = None,
         entity: Optional[Entity] = None,
         origin: Optional[Entity] = None,
-        link_: Optional[Link] = None) -> base_manager.BaseManager:
+        link_: Optional[Link] = None,
+        copy: Optional[bool] = False) -> base_manager.BaseManager:
     name = entity.class_.name if entity and not class_name else class_name
     manager_name = ''.join(i.capitalize() for i in name.split('_'))
     manager_instance = getattr(manager, f'{manager_name}Manager')(
         class_=g.classes['type' if name.startswith('hierarchy') else name],
         entity=entity,
         origin=origin,
-        link_=link_)
+        link_=link_,
+        copy=copy)
     if request.method != 'POST' and not entity and not link_:
         manager_instance.populate_insert()
     return manager_instance
@@ -46,12 +49,15 @@ def get_add_reference_form(class_: str) -> FlaskForm:
     return Form()
 
 
-def get_table_form(class_: str, linked_entities: list[Entity]) -> str:
-    entities = Entity.get_by_view(class_, types=True, aliases=True)
-    linked_ids = [entity.id for entity in linked_entities]
-    table = Table([''] + g.table_headers[class_], order=[[1, 'asc']])
+def get_table_form(
+        classes: list[str],
+        excluded: Union[list[int], list[Entity]]) -> str:
+    entities = Entity.get_by_class(classes, types=True, aliases=True)
+    if excluded and isinstance(excluded[0], Entity):
+        excluded = [entity.id for entity in excluded]  # type: ignore
+    table = Table([''] + g.table_headers[classes[0]], order=[[1, 'asc']])
     for entity in entities:
-        if entity.id not in linked_ids:
+        if entity.id not in excluded:
             input_ = f"""
                 <input
                     id="selection-{entity.id}"
@@ -64,7 +70,7 @@ def get_table_form(class_: str, linked_entities: list[Entity]) -> str:
         return '<p class="uc-first">' + _('no entries') + '</p>'
     return render_template(
         'forms/form_table.html',
-        table=table.display(class_))
+        table=table.display(classes[0]))
 
 
 def get_move_form(type_: Type) -> FlaskForm:

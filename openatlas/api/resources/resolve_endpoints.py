@@ -1,5 +1,6 @@
 import itertools
 import json
+import pathlib
 from typing import Any, Union
 
 from flask import Response, jsonify, request
@@ -10,6 +11,7 @@ from openatlas.api.formats.csv import (
     export_csv_for_network_analysis, export_entities_csv)
 from openatlas.api.formats.geojson import get_geojson, get_geojson_v2
 from openatlas.api.formats.linked_places import get_linked_places_entity
+from openatlas.api.formats.loud import get_loud_entities
 from openatlas.api.formats.rdf import rdf_output
 from openatlas.api.formats.xml import subunit_xml
 from openatlas.api.resources.error import (
@@ -21,7 +23,7 @@ from openatlas.api.resources.search_validation import (
     iterate_validation)
 from openatlas.api.resources.templates import (
     geojson_collection_template, geojson_pagination, linked_place_pagination,
-    linked_places_template, subunit_template)
+    linked_places_template, subunit_template, loud_pagination, loud_template)
 from openatlas.api.resources.util import (
     get_entities_by_type, get_key, link_parser_check,
     link_parser_check_inverse, parser_str_to_dict, remove_duplicate_entities)
@@ -67,6 +69,8 @@ def resolve_entities(
 def get_entities_template(parser: dict[str, str]) -> dict[str, Any]:
     if parser['format'] in ['geojson', 'geojson-v2']:
         return geojson_pagination()
+    if parser['format'] == 'loud':
+        return loud_pagination()
     return linked_place_pagination(parser)
 
 
@@ -86,6 +90,12 @@ def get_entity_formatted(
         return get_geojson([entity], parser)
     if parser['format'] == 'geojson-v2':
         return get_geojson_v2([entity], parser)
+    entity_dict = {
+            'entity': entity,
+            'links': get_all_links_of_entities(entity.id),
+            'links_inverse': get_all_links_of_entities_inverse(entity.id)}
+    if parser['format'] == 'loud':
+        return get_loud_entities(entity_dict, parse_loud_context())
     return get_linked_places_entity(
         entity,
         get_all_links_of_entities(entity.id),
@@ -106,9 +116,11 @@ def resolve_entity(
         return Response(
             rdf_output(result, parser),
             mimetype=app.config['RDF_FORMATS'][parser['format']])
-    template = geojson_collection_template() \
-        if parser['format'] in ['geojson', 'geojson-v2'] \
-        else linked_places_template(parser['show'])
+    template = linked_places_template(parser['show'])
+    if parser['format'] in ['geojson', 'geojson-v2']:
+        template = geojson_collection_template()
+    if parser['format'] == 'loud':
+        template = loud_template(result)
     if parser['download']:
         download(result, template, entity.id)
     return marshal(result, template), 200
@@ -177,6 +189,9 @@ def get_entities_formatted(
         entities_dict[link_.domain.id]['links'].append(link_)
     for link_ in link_parser_check_inverse(entities, parser):
         entities_dict[link_.range.id]['links_inverse'].append(link_)
+    if parser['format'] == 'loud':
+        return [get_loud_entities(item, parse_loud_context())
+                for item in entities_dict.values()]
     result = []
     for item in entities_dict.values():
         result.append(
@@ -186,6 +201,20 @@ def get_entities_formatted(
                 item['links_inverse'],
                 parser))
     return result
+
+
+def parse_loud_context() -> dict[str, str]:
+    file_path = pathlib.Path(app.root_path) / 'api' / 'linked-art.json'
+    with open(file_path) as f:
+        output = {}
+        for key, value in json.load(f)['@context'].items():
+            if isinstance(value, dict):
+                output[value['@id']] = key
+                if '@context' in value.keys():
+                    for key2, value2 in value['@context'].items():
+                        if isinstance(value2, dict):
+                            output[value2['@id']] = key2
+    return output
 
 
 def get_start_entity(total: list[int], parser: dict[str, Any]) -> list[Any]:

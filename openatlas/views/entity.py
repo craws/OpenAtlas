@@ -2,7 +2,7 @@ import os
 from subprocess import call
 from typing import Any, Optional, Union
 
-from flask import flash, g, render_template, url_for
+from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from werkzeug.exceptions import abort
@@ -17,7 +17,7 @@ from openatlas.display.util import (
     get_base_table_data, is_authorized, link, required_group)
 from openatlas.forms.base_manager import BaseManager
 from openatlas.forms.form import get_manager
-from openatlas.forms.util import populate_insert_form, was_modified
+from openatlas.forms.util import was_modified
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.overlay import Overlay
@@ -81,7 +81,6 @@ def insert(
         if class_ == 'file':
             return redirect(insert_files(manager))
         return redirect(save(manager))
-    populate_insert_form(manager.form, class_, origin)
     place_info = {'structure': None, 'gis_data': None, 'overlays': None}
     if g.classes[class_].view in ['artifact', 'place']:
         place_info = get_place_info_for_insert(origin)
@@ -102,14 +101,15 @@ def insert(
 
 
 @app.route('/update/<int:id_>', methods=['POST', 'GET'])
+@app.route('/update/<int:id_>/<copy>', methods=['POST', 'GET'])
 @required_group('contributor')
-def update(id_: int) -> Union[str, Response]:
+def update(id_: int, copy: Optional[str] = None) -> Union[str, Response]:
     entity = Entity.get_by_id(id_, types=True, aliases=True)
     check_update_access(entity)
     if entity.check_too_many_single_type_links():
         abort(422)
     place_info = get_place_info_for_update(entity)
-    manager = get_manager(entity=entity)
+    manager = get_manager(entity=entity, copy=bool(copy))
     if manager.form.validate_on_submit():
         if was_modified(manager.form, entity):  # pragma: no cover
             del manager.form.save
@@ -169,7 +169,7 @@ def add_crumbs(
         crumbs += structure['supers']
     crumbs.append(origin if not insert_ else None)
     if not insert_:
-        return crumbs + [_('edit')]
+        return crumbs + [_('copy') if 'copy_' in request.path else _('edit')]
     siblings = ''
     if structure and origin and origin.class_.name == 'stratigraphic_unit':
         if count := len(
@@ -269,11 +269,14 @@ def save(manager: BaseManager) -> Union[str, Response]:
         manager.insert_entity()
         manager.process_form()
         manager.update_entity(new=(action == 'insert'))
-        g.logger.log_user(manager.entity.id, action)
+        g.logger.log_user(
+            manager.entity.id,
+            'insert' if manager.copy else action)
         Transaction.commit()
         url = get_redirect_url(manager)
         flash(
-            _('entity created') if action == 'insert' else _('info update'),
+            _('entity created') if action == 'insert' or manager.copy
+            else _('info update'),
             'info')
     except InvalidGeomException as e:
         Transaction.rollback()

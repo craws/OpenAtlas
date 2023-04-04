@@ -533,11 +533,11 @@ def link(
     html = ''
     if isinstance(object_, (str, LazyString)):
         js = f'onclick="{js}"' if js else ''
-        uc_fist = 'uc-first' if uc_first_ and not \
+        uc_first_class = 'uc-first' if uc_first_ and not \
             str(object_).startswith('http') else ''
         ext = 'target="_blank" rel="noopener noreferrer"' if external else ''
         html = \
-            f'<a href="{url}" class="{class_} {uc_fist}" {js} ' \
+            f'<a href="{url}" class="{class_} {uc_first_class}" {js} ' \
             f'{ext}>{object_}</a>'
     elif isinstance(object_, Entity):
         html = link(

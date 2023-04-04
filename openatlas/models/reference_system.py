@@ -11,7 +11,6 @@ from openatlas.models.entity import Entity
 class ReferenceSystem(Entity):
 
     def __init__(self, row: dict[str, Any]) -> None:
-
         super().__init__(row)
         self.website_url = row['website_url']
         self.resolver_url = row['resolver_url']
@@ -22,9 +21,7 @@ class ReferenceSystem(Entity):
         self.system = row['system']
         self.classes: list[str] = []
 
-    def update(
-            self,
-            data: dict[str, Any], new: bool = False,) -> Optional[int]:
+    def update(self, data: dict[str, Any], new: bool = False) -> Optional[int]:
         self.update_system(data)
         return super().update(data, new)
 
@@ -59,21 +56,6 @@ class ReferenceSystem(Entity):
     @staticmethod
     def delete_links_from_entity(entity: Entity) -> None:
         Db.delete_links_from_entity(entity.id)
-
-    @staticmethod
-    def get_class_choices(
-            entity: Optional[ReferenceSystem]) -> list[tuple[int, str]]:
-        choices = []
-        for class_ in g.classes.values():
-            if not class_.reference_system_allowed \
-                    or (entity and class_.name in entity.classes)\
-                    or (
-                        entity
-                        and entity.name == 'GeoNames'
-                        and class_.name != 'Place'):
-                continue
-            choices.append((class_.name, g.classes[class_.name].label))
-        return choices
 
     @staticmethod
     def insert_system(data: dict[str, str]) -> ReferenceSystem:

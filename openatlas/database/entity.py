@@ -279,3 +279,88 @@ class Entity:
                 'user_id': user_id,
                 'classes': tuple(classes)})
         return [dict(row) for row in g.cursor.fetchall()]
+
+    @staticmethod
+    def link(data: dict[str, Any]) -> int:
+        g.cursor.execute(
+            """
+            INSERT INTO model.link (
+                property_code,
+                domain_id,
+                range_id,
+                description,
+                type_id
+            ) VALUES (
+                %(property_code)s,
+                %(domain_id)s,
+                %(range_id)s,
+                %(description)s,
+                %(type_id)s)
+            RETURNING id;
+            """,
+            data)
+        return g.cursor.fetchone()['id']
+
+    @staticmethod
+    def get_subunits_without_super(classes: list[str]) -> list[int]:
+        g.cursor.execute(
+            """
+            SELECT e.id
+            FROM model.entity e
+            JOIN model.link l
+                ON e.id = l.range_id AND l.property_code = 'P46'
+            WHERE e.openatlas_class_name IN %(classes)s;
+            """,
+            {'classes': tuple(classes)})
+        return [row['id'] for row in g.cursor.fetchall()]
+
+    @staticmethod
+    def get_roots(
+            property_code: str,
+            ids: list[int],
+            inverse: bool = False) -> dict[int, Any]:
+        first = 'domain_id' if inverse else 'range_id'
+        second = 'range_id' if inverse else 'domain_id'
+        g.cursor.execute(
+            f"""
+            WITH RECURSIVE parent_tree AS (
+                SELECT
+                    p.parent_id,
+                    p.child_id,
+                    ARRAY [p.child_id] AS path,
+                    1 AS depth
+                FROM (
+                    SELECT {first} AS parent_id, {second} AS child_id
+                    FROM model.link WHERE property_code = %(property_code)s
+                ) p
+                WHERE p.child_id IN %(ids)s
+                UNION ALL
+                SELECT
+                    t.parent_id,
+                    t.child_id,
+                    pt.path || ARRAY [t.child_id],
+                    pt.depth + 1
+                FROM (
+                    SELECT {first} AS parent_id, {second} as child_id
+                    FROM model.link WHERE property_code = %(property_code)s
+                ) t
+                JOIN parent_tree pt ON pt.parent_id = t.child_id
+            ),
+            root_nodes AS (
+                SELECT DISTINCT ON (path[1]) path[1] AS child_id,
+                    parent_id AS top_level
+                FROM parent_tree
+                WHERE parent_id IS NOT NULL
+                ORDER BY path[1], depth DESC
+            )
+            SELECT DISTINCT a.child_id AS start_node, r.top_level, e.name
+            FROM root_nodes r
+            JOIN parent_tree a ON a.child_id = r.child_id
+            JOIN model.entity e ON e.id = r.top_level
+            ORDER BY a.child_id
+            """,
+            {'ids': tuple(ids), 'property_code': property_code})
+        return {
+            row['start_node']: {
+                'id': row['top_level'],
+                'name': row['name']} for row in g.cursor.fetchall()}

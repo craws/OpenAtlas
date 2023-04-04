@@ -16,7 +16,6 @@ from openatlas.forms.field import (
 from openatlas.forms.validation import file
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 
 
@@ -161,6 +160,7 @@ class ArtifactManager(ArtifactBaseManager):
                 add_dynamic=['place'])})
 
     def populate_insert(self) -> None:
+        super().populate_insert()
         if self.origin and self.origin.class_.view in ['artifact', 'place']:
             self.form.artifact_super.data = str(self.origin.id)
 
@@ -186,6 +186,7 @@ class CreationManager(EventBaseManager):
             'file': TableMultiField(_('document'))})
 
     def populate_insert(self) -> None:
+        super().populate_insert()
         if self.origin and self.origin.class_.name == 'file':
             self.form.file.data = [self.origin.id]
 
@@ -215,11 +216,6 @@ class ExternalReferenceManager(BaseManager):
 class FeatureManager(BaseManager):
     fields = ['name', 'date', 'description', 'continue', 'map']
 
-    def process_form(self) -> None:
-        super().process_form()
-        if self.origin and self.origin.class_.name == 'place':
-            self.add_link('P46', self.origin, inverse=True)
-
     def add_buttons(self) -> None:
         super().add_buttons()
         if not self.entity:
@@ -228,6 +224,31 @@ class FeatureManager(BaseManager):
                 'insert_continue_sub',
                 SubmitField(
                     _('insert and add') + ' ' + _('stratigraphic unit')))
+
+    def additional_fields(self) -> dict[str, Any]:
+        return dict(super().additional_fields(), **{
+            'feature_super': TableField(
+                _('super'),
+                [InputRequired()],
+                add_dynamic=['place'])})
+
+    def populate_insert(self) -> None:
+        super().populate_insert()
+        if self.origin and self.origin.class_.name == 'place':
+            self.form.feature_super.data = str(self.origin.id)
+
+    def populate_update(self) -> None:
+        super().populate_update()
+        self.form.feature_super.data = \
+            self.entity.get_linked_entity_safe('P46', inverse=True).id
+
+    def process_form(self) -> None:
+        super().process_form()
+        self.data['links']['delete_inverse'].add('P46')
+        self.add_link(
+            'P46',
+            Entity.get_by_id(int(self.form.feature_super.data)),
+            inverse=True)
 
 
 class FileManager(BaseManager):
@@ -264,6 +285,7 @@ class HumanRemainsManager(ArtifactBaseManager):
                 add_dynamic=['place'])})
 
     def populate_insert(self) -> None:
+        super().populate_insert()
         if self.origin and self.origin.class_.view in ['artifact', 'place']:
             self.form.human_remains_super.data = str(self.origin.id)
 
@@ -417,6 +439,9 @@ class PlaceManager(BaseManager):
                 'insert_continue_sub',
                 SubmitField(_('insert and add') + ' ' + _('feature')))
 
+    def populate_insert(self) -> None:
+        self.form.alias.append_entry('')
+
 
 class ProductionManager(EventBaseManager):
 
@@ -440,7 +465,16 @@ class ReferenceSystemManager(BaseManager):
 
     def additional_fields(self) -> dict[str, Any]:
         precision_id = str(Type.get_hierarchy('External reference match').id)
-        choices = ReferenceSystem.get_class_choices(self.entity)
+        choices = []
+        for class_ in g.classes.values():
+            if not class_.reference_system_allowed \
+                    or (self.entity and class_.name in self.entity.classes) \
+                    or (
+                    self.entity
+                    and self.entity.name == 'GeoNames'
+                    and class_.name != 'Place'):
+                continue
+            choices.append((class_.name, g.classes[class_.name].label))
         return {
             'website_url': StringField(_('website URL'), [Optional(), URL()]),
             'resolver_url': StringField(
@@ -473,6 +507,10 @@ class SourceManager(BaseManager):
             'artifact': TableMultiField(description=_(
                 'Link artifacts as the information carrier of the source'))}
 
+    def populate_insert(self) -> None:
+        if self.origin and self.origin.class_.name == 'artifact':
+            self.form.artifact.data = [self.origin.id]
+
     def populate_update(self) -> None:
         super().populate_update()
         self.form.artifact.data = [
@@ -502,11 +540,6 @@ class SourceTranslationManager(BaseManager):
 class StratigraphicUnitManager(BaseManager):
     fields = ['name', 'date', 'description', 'continue', 'map']
 
-    def process_form(self) -> None:
-        super().process_form()
-        if self.origin and self.origin.class_.name == 'feature':
-            self.add_link('P46', self.origin, inverse=True)
-
     def add_buttons(self) -> None:
         super().add_buttons()
         if not self.entity:
@@ -518,6 +551,30 @@ class StratigraphicUnitManager(BaseManager):
                 self.form_class,
                 'insert_continue_human_remains',
                 SubmitField(_('insert and add') + ' ' + _('human remains')))
+
+    def additional_fields(self) -> dict[str, Any]:
+        return dict(super().additional_fields(), **{
+            'stratigraphic_super': TableField(
+                _('super'),
+                [InputRequired()])})
+
+    def populate_insert(self) -> None:
+        super().populate_insert()
+        if self.origin and self.origin.class_.name == 'feature':
+            self.form.stratigraphic_super.data = str(self.origin.id)
+
+    def populate_update(self) -> None:
+        super().populate_update()
+        self.form.stratigraphic_super.data = \
+            self.entity.get_linked_entity_safe('P46', inverse=True).id
+
+    def process_form(self) -> None:
+        super().process_form()
+        self.data['links']['delete_inverse'].add('P46')
+        self.add_link(
+            'P46',
+            Entity.get_by_id(int(self.form.stratigraphic_super.data)),
+            inverse=True)
 
 
 class TypeManager(TypeBaseManager):

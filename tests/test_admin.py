@@ -3,7 +3,7 @@ from pathlib import Path
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.database.link import Link as DbLink
+from openatlas.database.entity import Entity
 from openatlas.models.link import Link
 from tests.base import TestBaseCase, get_hierarchy, insert
 
@@ -19,7 +19,7 @@ class AdminTests(TestBaseCase):
                 insert('file', 'Forsaken file')
                 insert('feature', 'Forsaken subunit')
                 invalid = insert('artifact', 'Invalid linked entity')
-                DbLink.insert({
+                Entity.link({
                     'property_code': 'P86',
                     'domain_id': invalid.id,
                     'range_id': invalid.id,
@@ -102,7 +102,7 @@ class AdminTests(TestBaseCase):
             assert b'Oliver Twist' in rv.data
 
             rv = self.app.get(url_for('admin_settings', category='mail'))
-            assert b'recipients feedback' in rv.data
+            assert b'mail from' in rv.data
 
             rv = self.app.get(url_for('admin_settings', category='general'))
             assert b'log level' in rv.data

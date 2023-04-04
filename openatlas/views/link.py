@@ -17,6 +17,7 @@ from openatlas.forms.form import (
     get_add_reference_form, get_manager, get_table_form)
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
+from openatlas.models.search import get_subunits_without_super
 
 
 class AddReferenceForm(FlaskForm):
@@ -57,7 +58,7 @@ def link_insert(id_: int, view: str) -> Union[str, Response]:
         excluded = entity.get_linked_entities(property_code, inverse=inverse)
     return render_template(
         'content.html',
-        content=get_table_form(view, excluded),
+        content=get_table_form(g.view_class_mapping[view], excluded),
         title=_(entity.class_.view),
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],
@@ -194,6 +195,32 @@ def reference_add(id_: int, view: str) -> Union[str, Response]:
             _('link')])
 
 
+@app.route('/add/subunit/<int:super_id>', methods=['POST', 'GET'])
+@required_group('contributor')
+def add_subunit(super_id: int) -> Union[str, Response]:
+    super_ = Entity.get_by_id(super_id)
+    if request.method == 'POST':
+        if request.form['checkbox_values']:
+            super_.link_string('P46', request.form['checkbox_values'])
+        return redirect(f"{url_for('view', id_=super_.id)}#tab-artifact")
+    classes = []
+    if super_.class_.name != 'human_remains':
+        classes.append('artifact')
+    if super_.class_.name != 'artifact':
+        classes.append('human_remains')
+    return render_template(
+        'content.html',
+        content=get_table_form(
+            classes,
+            [super_.id] + get_subunits_without_super(classes)),
+        entity=super_,
+        title=super_.name,
+        crumbs=[
+            [_(super_.class_.view), url_for('index', view=super_.class_.view)],
+            super_,
+            _('add subunit')])
+
+
 @app.route('/entity/add/file/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
 def entity_add_file(id_: int) -> Union[str, Response]:
@@ -207,7 +234,7 @@ def entity_add_file(id_: int) -> Union[str, Response]:
     return render_template(
         'content.html',
         content=get_table_form(
-            'file',
+            ['file'],
             entity.get_linked_entities('P67', inverse=True)),
         entity=entity,
         title=entity.name,
@@ -231,7 +258,7 @@ def entity_add_source(id_: int) -> Union[str, Response]:
     return render_template(
         'content.html',
         content=get_table_form(
-            'source',
+            ['source'],
             entity.get_linked_entities('P67', inverse=True)),
         title=entity.name,
         crumbs=[

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Any, Optional
 
 from flask import g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -18,34 +18,25 @@ from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.models.overlay import Overlay
+from openatlas.models.reference_system import ReferenceSystem
+from openatlas.models.type import Type
 from openatlas.models.user import User
 from openatlas.views.entity_index import file_preview
 
-if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.models.type import Type
 
 class BaseDisplay:
-
-    entity: Entity
     tabs: dict[str, Tab]
-    events: list[Entity]
-    event_links: Optional[list[Link]]  # Needed for actor and info data
-    linked_places: list[Entity]  # Related places for map
-    gis_data: dict[str, Any]
-    structure: dict[str, list[Entity]]
     overlays = None
     crumbs: list[Any]
-    buttons: list[str]
-    problematic_type: bool = False
     data: dict[str, Any]
 
     def __init__(self, entity: Entity) -> None:
         self.entity = entity
-        self.events = []
-        self.event_links = []
-        self.linked_places = []
-        self.structure = {}
-        self.gis_data = {}
+        self.events: list[Entity] = []
+        self.event_links: Optional[list[Link]] = []
+        self.linked_places: list[Entity] = []
+        self.structure: dict[str, list[Entity]] = {}
+        self.gis_data: dict[str, Any] = {}
         self.problematic_type = self.entity.check_too_many_single_type_links()
         self.entity.image_id = entity.get_profile_image_id()
         self.add_tabs()
@@ -128,13 +119,26 @@ class BaseDisplay:
             self.tabs['note'].table.rows.append(data)
 
     def add_buttons(self) -> None:
-
-        if is_authorized(self.entity.class_.write_access):
-            if not self.problematic_type:
+        if not is_authorized(self.entity.class_.write_access) or (
+                isinstance(self.entity, Type)
+                and self.entity.category == 'system'):
+            return
+        if not self.problematic_type:
+            self.buttons.append(
+                button(_('edit'), url_for('update', id_=self.entity.id)))
+            if type(self.entity) is Entity \
+                    and self.entity.class_.name != 'source_translation':
                 self.buttons.append(
-                    button(_('edit'), url_for('update', id_=self.entity.id)))
-            self.buttons.append(delete_link(self.entity))
-
+                    button(
+                        _('copy'),
+                        url_for('update', id_=self.entity.id, copy='copy_')))
+        if self.entity.class_.view == 'place' and \
+                self.entity.get_linked_entities('P46'):
+            return
+        if isinstance(self.entity, ReferenceSystem) and \
+                (self.entity.classes or self.entity.system):
+            return
+        self.buttons.append(delete_link(self.entity))
 
     def add_data(self) -> None:
         self.data = {
@@ -308,14 +312,6 @@ class EventsDisplay(BaseDisplay):
 
 class PlaceBaseDisplay(BaseDisplay):
 
-    def add_buttons(self) -> None:
-        if is_authorized(self.entity.class_.write_access):
-            if not self.problematic_type:
-                self.buttons.append(
-                    button(_('edit'), url_for('update', id_=self.entity.id)))
-            if not self.entity.get_linked_entities('P46'):
-                self.buttons.append(delete_link(self.entity))
-
     def add_tabs(self) -> None:
         super().add_tabs()
         entity = self.entity
@@ -435,13 +431,6 @@ class TypeBaseDisplay(BaseDisplay):
             self.data[_('unit')] = self.entity.description
         self.data[_('ID for imports')] = self.entity.id
 
-    def add_buttons(self) -> None:
-        if is_authorized(self.entity.class_.write_access) \
-                and self.entity.root and self.entity.category != 'system':
-            self.buttons.append(
-                button(_('edit'), url_for('update', id_=self.entity.id)))
-            self.buttons.append(delete_link(self.entity))
-
     def add_crumbs(self) -> None:
         self.crumbs = [[_('types'), url_for('type_index')]]
         self.crumbs += [g.types[type_id] for type_id in self.entity.root]
@@ -467,7 +456,9 @@ class TypeBaseDisplay(BaseDisplay):
             'stratigraphic_unit',
             'artifact',
             'human_remains']
+        possible_sub_unit = False
         if any(item in g.types[entity.root[0]].classes for item in classes_):
+            possible_sub_unit = True
             self.tabs['entities'].table.header.append('place')
         root = g.types[entity.root[0]] if entity.root else entity
         if root.name in app.config['PROPERTY_TYPES']:
@@ -477,7 +468,14 @@ class TypeBaseDisplay(BaseDisplay):
                     link(Entity.get_by_id(row['domain_id'])),
                     link(Entity.get_by_id(row['range_id']))])
         else:
-            for item in entity.get_linked_entities(['P2', 'P89'], True, True):
+            entities = entity.get_linked_entities(['P2', 'P89'], True, True)
+            root_places = {}
+            if possible_sub_unit:
+                root_places = Entity.get_roots(
+                    'P46',
+                    [e.id for e in entities],
+                    inverse=True)
+            for item in entities:
                 if item.class_.name == 'object_location':
                     item = item.get_linked_entity_safe('P53', inverse=True)
                 data = [link(item)]
@@ -485,10 +483,9 @@ class TypeBaseDisplay(BaseDisplay):
                     data.append(format_number(item.types[entity]))
                 data.append(item.class_.label)
                 data.append(item.description)
-                root_place = ''
-                if item.class_.name in classes_:
-                    if roots := \
-                            item.get_linked_entities_recursive('P46', True):
-                        root_place = link(roots[0])
-                data.append(root_place)
+                data.append(
+                    link(
+                        root_places[item.id]['name'],
+                        url_for('view', id_=root_places[item.id]['id']))
+                    if item.id in root_places else '')
                 self.tabs['entities'].table.rows.append(data)

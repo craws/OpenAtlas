@@ -19,7 +19,6 @@ if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.type import Type
 
 
-
 class Entity:
 
     def __init__(self, data: dict[str, Any]) -> None:
@@ -123,7 +122,36 @@ class Entity:
              description: Optional[str] = None,
              inverse: bool = False,
              type_id: Optional[int] = None) -> list[int]:
-        return Link.insert(self, code, range_, description, inverse, type_id)
+        property_ = g.properties[code]
+        entities = range_ if isinstance(range_, list) else [range_]
+        new_link_ids = []
+        for linked_entity in entities:
+            domain = linked_entity if inverse else self
+            range_ = self if inverse else linked_entity
+            domain_error = True
+            range_error = True
+            if property_.find_object(
+                    'domain_class_code',
+                    domain.class_.cidoc_class.code):
+                domain_error = False
+            if property_.find_object(
+                    'range_class_code',
+                    range_.class_.cidoc_class.code):
+                range_error = False
+            if domain_error or range_error:  # pragma: no cover
+                text = \
+                    f"invalid CIDOC link {domain.class_.cidoc_class.code}" \
+                    f" > {code} > {range_.class_.cidoc_class.code}"
+                g.logger.log('error', 'model', text)
+                abort(400, text)
+            id_ = Db.link({
+                'property_code': code,
+                'domain_id': domain.id,
+                'range_id': range_.id,
+                'description': description,
+                'type_id': type_id})
+            new_link_ids.append(id_)
+        return new_link_ids
 
     def link_string(
             self,
@@ -133,7 +161,7 @@ class Entity:
             inverse: bool = False) -> None:
         ids = ast.literal_eval(range_)
         ids = [int(i) for i in ids] if isinstance(ids, list) else [int(ids)]
-        Link.insert(self, code, Entity.get_by_ids(ids), description, inverse)
+        self.link(code, Entity.get_by_ids(ids), description, inverse)
 
     def get_links(
             self,
@@ -451,3 +479,10 @@ class Entity:
     def get_entities_linked_to_itself() -> list[Entity]:
         return [
             Entity.get_by_id(row['domain_id']) for row in Db.get_circular()]
+
+    @staticmethod
+    def get_roots(
+            property_code: str,
+            ids: list[int],
+            inverse: bool = False) -> dict[int, Any]:
+        return Db.get_roots(property_code, ids, inverse)

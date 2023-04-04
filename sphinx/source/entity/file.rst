@@ -43,14 +43,8 @@ Settings
 
 * **Maximum file size in MB** - this limits also the total size of multiple
   file upload
-* **Profile image width in pixel** - this only influences the layout of info
-  tabs
-* **Allowed file extensions** - enter file extensions without a dot and
-  separated with a space e.g.
-
-.. code-block:: python
-
-  gif jpg jpeg
+* **Profile image width in pixel** - related to the layout of info tabs
+* **Allowed file extensions**
 
 Images that can be displayed in the browser are defined through their
 extensions and can be changed in the configuration file
