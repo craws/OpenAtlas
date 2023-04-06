@@ -23,6 +23,12 @@ CIDOC documentation: :cidoc_entity:`E5 Event<e5-event>`,
 * **Production** (:cidoc_entity:`E12 Production<e12-production>`)
   - creation of artifacts
 
+.. image:: event_hierarchy.png
+
+`CIDOC CRM <https://www.cidoc-crm.org/>`_ hierarchy for the different types of
+events included in OpenAtlas.
+
+
 .. include:: navigation.rst
 
 Form fields
