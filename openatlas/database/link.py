@@ -236,15 +236,19 @@ class Link:
                 l.domain_id,
                 l.range_id,
                 l.description,
-                l.created,
-                l.modified,
+                COALESCE(to_char(l.created, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                    AS created,
+                COALESCE(to_char(l.modified, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                    AS modified,
                 l.type_id,
                 COALESCE(to_char(l.begin_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
-                    AS begin_from, l.begin_comment,
+                    AS begin_from,
+                l.begin_comment,
                 COALESCE(to_char(l.begin_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
                     AS begin_to,
                 COALESCE(to_char(l.end_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
-                    AS end_from, l.end_comment,
+                    AS end_from,
+                l.end_comment,
                 COALESCE(to_char(l.end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
                     AS end_to
             FROM model.link l
