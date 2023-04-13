@@ -138,7 +138,29 @@ class Entity:
 
     @staticmethod
     def get_all_entities() -> list[dict[str, Any]]:
-        g.cursor.execute(Entity.select_sql())
+        sql = """
+            SELECT
+                e.id,
+                e.cidoc_class_code,
+                e.name,
+                e.description,
+                COALESCE(to_char(e.created, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                    AS created,
+                COALESCE(to_char(e.modified, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                    AS modified,
+                e.openatlas_class_name,
+                COALESCE(to_char(e.begin_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                    AS begin_from,
+                e.begin_comment,
+                COALESCE(to_char(e.begin_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                    AS begin_to,
+                COALESCE(to_char(e.end_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                    AS end_from,
+                e.end_comment,
+                COALESCE(to_char(e.end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                    AS end_to 
+                FROM model.entity e"""
+        g.cursor.execute(sql)
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
