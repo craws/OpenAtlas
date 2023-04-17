@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block content %}
+  {% if json_data %}
+    <link rel="stylesheet" href="/static/css/network.css">
+    <script src="/static/node_modules/d3/dist/d3.min.js"></script>
+    <div class="toolbar">
+      {{ 'tools/network'|manual|safe }}
+      {{ _('download')|button('#', onclick="saveSvgAsPng(d3.select('#network-svg').node(), 'network.png')")|safe }}
+    </div>
+    <div>
+      <svg id="network-svg"></svg>
+    </div>
+    <script>
+        var graph = {{ json_data|safe }};
+        var width = {{ network_params.options.width }};
+        var height = {{ network_params.options.height }};
+        var charge = {{ network_params.options.charge * 10 }};
+        var distance = {{ network_params.options.distance }};
+    </script>
+    <script src="/static/js/network.js"></script>
+    <script src="/static/node_modules/save-svg-as-png/lib/saveSvgAsPng.js"></script>
+  {% else %}
+    <div class="toolbar">
+      {{ 'tools/network'|manual|safe }}
+    </div>
+    <h2>{{ _('no data to display')|uc_first }}</h2>
+  {% endif %}
+{% endblock %}
