@@ -249,6 +249,44 @@ class NetworkForm(FlaskForm):
         _('classes'),
         widget=widgets.ListWidget(prefix_label=False))
 
+@app.route('/ego_network/<int:id_>')
+@required_group('readonly')
+def ego_network(id_: int) -> str:
+    entity = Entity.get_by_id(id_)
+    classes = [c for c in g.classes.values() if c.network_color]
+    for class_ in classes:
+        setattr(NetworkForm, class_.name, StringField(
+            default=class_.network_color,
+            render_kw={
+                'data-huebee': True,
+                'class': f'data-huebee {app.config["CSS"]["string_field"]}'}))
+    setattr(NetworkForm, 'save', SubmitField(_('apply')))
+    form = NetworkForm()
+    form.classes.choices = []
+    for class_ in classes:
+        if class_.name == 'object_location':
+            continue
+        form.classes.choices.append((class_.name, class_.label))
+    return render_template(
+        'model/ego_network.html',
+        form=form,
+        content='Ego network',
+        crumbs= [
+            [_(entity.class_.view.replace('_', ' ')),
+            url_for('index', view=entity.class_.view)],
+            entity,
+            _('ego network')],
+        network_params={
+            'classes': {},
+            'options': {
+                'width': form.width.data,
+                'height': form.height.data,
+                'charge': form.charge.data,
+                'distance': form.distance.data}},
+        json_data=Network.get_ego_network_json(
+            {c.name: getattr(form, c.name).data for c in classes},
+            id_))
+
 
 @app.route('/overview/network/', methods=["GET", "POST"])
 @app.route('/overview/network/<int:dimensions>', methods=["GET", "POST"])

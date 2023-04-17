@@ -6,6 +6,16 @@ from flask import g
 class Network:
 
     @staticmethod
+    def get_ego_network(id_:int) -> list[dict[str, Any]]:
+        g.cursor.execute(
+            """
+            SELECT domain_id, property_code, range_id
+            FROM model.link
+            WHERE domain_id = %(id)s or range_id = %(id)s
+            """, {'id': id_})
+        return [dict(row) for row in g.cursor.fetchall()]
+
+    @staticmethod
     def get_edges(
             classes: list[str],
             properties: list[str]) -> list[dict[str, int]]:
