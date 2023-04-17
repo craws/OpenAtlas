@@ -470,7 +470,7 @@ class TypeBaseDisplay(BaseDisplay):
         else:
             entities = entity.get_linked_entities(['P2', 'P89'], True, True)
             root_places = {}
-            if possible_sub_unit:
+            if possible_sub_unit and entities:
                 root_places = Entity.get_roots(
                     'P46',
                     [e.id for e in entities],
