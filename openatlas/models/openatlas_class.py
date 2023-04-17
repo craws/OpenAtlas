@@ -64,6 +64,18 @@ class OpenatlasClass:
             if name in classes:
                 self.view = item
 
+    def get_tooltip(self):
+        tooltips = {
+            'E5': _('events not performed by actors, e.g. a natural disaster'),
+            'E7': _('the most common, e.g. a battle, a meeting or a wedding'),
+            'E8': _('mapping a change of property'),
+            'E9': _('movement of artifacts or persons'),
+            'E12': _('creation of artifacts'),
+            'E65': _('creation of documents (files)')}
+        if self.cidoc_class.code in tooltips:
+            return tooltips[self.cidoc_class.code]
+        return None
+
     @staticmethod
     def get_class_count() -> dict[str, int]:
         return Db.get_class_count()
