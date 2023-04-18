@@ -64,7 +64,7 @@ class OpenatlasClass:
             if name in classes:
                 self.view = item
 
-    def get_tooltip(self):
+    def get_tooltip(self) -> Optional[str]:
         tooltips = {
             'E5': _('events not performed by actors, e.g. a natural disaster'),
             'E7': _('the most common, e.g. a battle, a meeting or a wedding'),

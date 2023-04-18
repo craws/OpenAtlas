@@ -174,13 +174,15 @@ class Tab:
                     self.buttons.append(
                         button(
                             g.classes[item].label,
-                            url_for('insert', class_=item, origin_id=id_),tooltip_text=g.classes[item].get_tooltip()))
+                            url_for('insert', class_=item, origin_id=id_),
+                            tooltip_text=g.classes[item].get_tooltip()))
             else:
                 for item in g.view_class_mapping['event']:
                     self.buttons.append(
                         button(
                             g.classes[item].label,
-                            url_for('insert', class_=item, origin_id=id_),tooltip_text=g.classes[item].get_tooltip()))
+                            url_for('insert', class_=item, origin_id=id_),
+                            tooltip_text=g.classes[item].get_tooltip()))
         elif name == 'feature':
             if class_ and class_.name == 'place':
                 self.buttons.append(
