@@ -196,6 +196,13 @@
     </div>
   </div>
 </main>
+<script>
+  // Load all tooltips, needs to be at 2end of file
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
+  });
+</script>
 
 <noscript>
   <style>nav,main,.navbar{display:none;!important;}</style>

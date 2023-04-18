@@ -569,16 +569,23 @@ def button(
         url: Optional[str] = None,
         css: Optional[str] = 'primary',
         id_: Optional[str] = None,
-        onclick: Optional[str] = None) -> str:
+        onclick: Optional[str] = None,
+        tooltip_text: Optional[str] = None) -> str:
     tag = 'a' if url else 'span'
     if url and '/insert' in url and label != _('link'):
         label = f'+ <span class="uc-first d-inline-block">{label}</span>'
+    tooltip_ = ''
+    if tooltip_text:
+        tooltip_ = \
+            'data-bs-toggle="tooltip" data-bs-placement="top" ' \
+            f'title="{uc_first(tooltip_text)}"'
     return f"""
         <{tag}
             {f'href="{url}"' if url else ''}
             {f'id="{id_}"' if id_ else ''}
             class="{app.config['CSS']['button'][css]} uc-first"
-            {f'onclick="{onclick}"' if onclick else ''}>{label}</{tag}>"""
+            {f'onclick="{onclick}"' if onclick else ''}
+            {tooltip_}>{label}</{tag}>"""
 
 
 @app.template_filter()
