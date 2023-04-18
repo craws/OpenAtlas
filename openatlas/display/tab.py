@@ -138,15 +138,6 @@ class Tab:
                             'insert',
                             class_='human_remains',
                             origin_id=id_)))
-        elif name == 'entities':
-            if id_ and id_ in g.types:
-                type_ = g.types[id_]
-                root = g.types[type_.root[0]] if type_.root else type_
-                if root.category not in ['system', 'value']:
-                    self.buttons.append(
-                        button(
-                            _('move entities'),
-                            url_for('type_move_entities', id_=id_)))
         elif name == 'event':
             if view == 'file':
                 self.buttons.append(

@@ -489,3 +489,9 @@ class TypeBaseDisplay(BaseDisplay):
                         url_for('view', id_=root_places[item.id]['id']))
                     if item.id in root_places else '')
                 self.tabs['entities'].table.rows.append(data)
+        if root.category not in ['system', 'value'] \
+                and self.tabs['entities'].table.rows:
+            self.tabs['entities'].buttons.append(
+                button(
+                    _('move entities'),
+                    url_for('type_move_entities', id_=entity.id)))
