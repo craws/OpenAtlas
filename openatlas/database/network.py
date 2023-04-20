@@ -6,13 +6,13 @@ from flask import g
 class Network:
 
     @staticmethod
-    def get_ego_network(id_:int) -> list[dict[str, Any]]:
+    def get_ego_network(ids: set[int]) -> list[dict[str, Any]]:
         g.cursor.execute(
             """
-            SELECT domain_id, property_code, range_id
+            SELECT id, domain_id, property_code, range_id
             FROM model.link
-            WHERE domain_id = %(id)s or range_id = %(id)s
-            """, {'id': id_})
+            WHERE domain_id IN %(ids)s or range_id IN %(ids)s
+            """, {'ids': tuple(ids)})
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod

@@ -9,29 +9,44 @@ from openatlas.models.entity import Entity
 class Network:
 
     properties = [
-        'P7', 'P11', 'P14', 'P22', 'P23', 'P24', 'P25', 'P52', 'P67',
-        'P74', 'P107', 'OA7', 'OA8', 'OA9']
+        'P7', 'P11', 'P14', 'P22', 'P23', 'P24', 'P25', 'P27', 'P52', 'P74',
+        'P107', 'OA7', 'OA8', 'OA9']
 
     @staticmethod
     def get_ego_network_json(
             colors: dict[str, str],
             id_: int) -> Optional[str]:
         mapping = Db.get_object_mapping()
-        print(mapping)
-        entity_ids: set[int] = set()
+        entity_ids = {id_}
+        location_id = 0
+        if id_ in mapping.values():
+            location_id = \
+                list(mapping.keys())[list(mapping.values()).index(id_)]
+            entity_ids.add(location_id)
+        edges = []
+        depth = 2
+        for _ in range(depth):
+            for row in Db.get_ego_network(entity_ids):
+                if row['property_code'] in Network.properties:
+                    domain_id = mapping[row['domain_id']] \
+                        if row['domain_id'] in mapping else row['domain_id']
+                    range_id = mapping[row['range_id']] \
+                        if row['range_id'] in mapping else row['range_id']
+                    entity_ids.add(domain_id)
+                    entity_ids.add(range_id)
+                    edges.append({
+                        'id': row['id'],
+                        'source': domain_id,
+                        'target': range_id})
         nodes = []
-        for row in Db.get_ego_network(id_):
-            if row['property_code'] in Network.properties:
-                if row['domain_id'] not in mapping:
-                    entity_ids.add(row['domain_id'])
-                if row['range_id'] not in mapping:
-                    entity_ids.add(row['range_id'])
+        if location_id in entity_ids:
+            entity_ids.remove(location_id)
         for entity in Entity.get_by_ids(entity_ids):
             nodes.append({
                 'id': entity.id,
                 'name': Network.truncate(entity.name.replace("'", "")),
-                'color': colors[entity.class_.name]})
-        edges = []
+                'color': colors[entity.class_.name]
+                if entity.class_.name in colors else '#333333'})
         return str({
             'nodes': nodes,
             'links': edges}) if nodes else None
@@ -42,7 +57,6 @@ class Network:
             show_orphans: bool,
             dimensions: Optional[int]) -> Optional[str]:
         mapping = Db.get_object_mapping()
-        print(mapping)
         classes = [c.name for c in g.classes.values() if c.network_color]
         entities: set[int] = set()
         nodes = []
@@ -56,6 +70,7 @@ class Network:
                 entities.add(row['id'])
         edges = []
         edge_entity_ids = set()
+        Network.properties.append('P67')
         for row in Db.get_edges(classes, Network.properties):
             domain_id = mapping[row['domain_id']] \
                 if row['domain_id'] in mapping else row['domain_id']
