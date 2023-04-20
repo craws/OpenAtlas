@@ -27,7 +27,6 @@ class Network:
                     'name': Network.truncate(row['name'].replace("'", "")),
                     'color': colors[row['openatlas_class_name']]})
                 entities.add(row['id'])
-        linked_entity_ids = set()
         edges = []
         edge_entity_ids = set()
         for row in Db.get_edges(classes, properties):
@@ -35,8 +34,6 @@ class Network:
                 if row['domain_id'] in mapping else row['domain_id']
             range_id = mapping[row['range_id']] \
                 if row['range_id'] in mapping else row['range_id']
-            linked_entity_ids.add(domain_id)
-            linked_entity_ids.add(range_id)
             edges.append({
                 'id': int(row['id']),
                 'source': domain_id,
