@@ -50,7 +50,7 @@ class Network:
             SELECT e.id, l.range_id
             FROM model.entity e
             JOIN model.link l ON e.id = l.domain_id AND l.property_code = 'P53'
-            JOIN model.entity e2 ON l.range_id = e2.id
-                AND e2.openatlas_class_name = 'place';
+            JOIN model.entity e2 ON l.range_id = e2.id 
+                AND e.openatlas_class_name = 'place';
             """)
         return {row['range_id']: row['id'] for row in g.cursor.fetchall()}

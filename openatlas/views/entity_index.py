@@ -41,9 +41,11 @@ def get_buttons(view: str) -> list[str]:
     for name in g.view_class_mapping[view] if view != 'place' else ['place']:
         if is_authorized(g.classes[name].write_access):
             buttons.append(
-                button(g.classes[name].label, url_for('insert', class_=name)))
+                button(
+                    g.classes[name].label,
+                    url_for('insert', class_=name),
+                    tooltip_text=g.classes[name].get_tooltip()))
     return buttons
-
 
 def get_table(view: str) -> Table:
     table = Table(g.table_headers[view])

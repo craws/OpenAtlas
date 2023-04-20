@@ -474,7 +474,7 @@ class TypeBaseDisplay(BaseDisplay):
         else:
             entities = entity.get_linked_entities(['P2', 'P89'], True, True)
             root_places = {}
-            if possible_sub_unit:
+            if possible_sub_unit and entities:
                 root_places = Entity.get_roots(
                     'P46',
                     [e.id for e in entities],
@@ -493,3 +493,9 @@ class TypeBaseDisplay(BaseDisplay):
                         url_for('view', id_=root_places[item.id]['id']))
                     if item.id in root_places else '')
                 self.tabs['entities'].table.rows.append(data)
+        if root.category not in ['system', 'value'] \
+                and self.tabs['entities'].table.rows:
+            self.tabs['entities'].buttons.append(
+                button(
+                    _('move entities'),
+                    url_for('type_move_entities', id_=entity.id)))

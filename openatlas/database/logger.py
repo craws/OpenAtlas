@@ -11,7 +11,6 @@ class Logger:
             """
             INSERT INTO web.system_log (priority, type, message, user_id, info)
             VALUES (%(priority)s, %(type)s, %(message)s, %(user_id)s, %(info)s)
-            RETURNING id;
             """,
             data)
 
