@@ -1,4 +1,4 @@
--- Upgrade 7.11.x to 7.12.0
+-- Upgrade 7.12.0 to 7.13.0
 -- Be sure to backup the database and read the upgrade notes before executing.
 
 -- So far the database version wasn't raised for 7.12.0 so the database upgrade
