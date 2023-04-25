@@ -15,11 +15,11 @@
       <svg id="network-svg"></svg>
     </div>
     <script>
-        var graph = {{ json_data|safe }};
-        var width = {{ network_params.options.width }};
-        var height = {{ network_params.options.height }};
-        var charge = {{ network_params.options.charge * 10 }};
-        var distance = {{ network_params.options.distance }};
+      var graph = {{ json_data|safe }};
+      var width = {{ network_params.options.width }};
+      var height = {{ network_params.options.height }};
+      var charge = {{ network_params.options.charge * 10 }};
+      var distance = {{ network_params.options.distance }};
     </script>
     <script src="/static/js/network.js"></script>
     <script src="/static/node_modules/save-svg-as-png/lib/saveSvgAsPng.js"></script>

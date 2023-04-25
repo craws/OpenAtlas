@@ -15,7 +15,8 @@ class Network:
     @staticmethod
     def get_ego_network_json(
             colors: dict[str, str],
-            id_: int) -> Optional[str]:
+            id_: int,
+            depth: int) -> Optional[str]:
         mapping = Db.get_object_mapping()
         entity_ids = {id_}
         location_id = 0
@@ -24,7 +25,6 @@ class Network:
                 list(mapping.keys())[list(mapping.values()).index(id_)]
             entity_ids.add(location_id)
         edges = []
-        depth = 2
         for _ in range(depth):
             for row in Db.get_ego_network(entity_ids):
                 if row['property_code'] in Network.properties:

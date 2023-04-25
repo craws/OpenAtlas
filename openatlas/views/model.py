@@ -4,12 +4,13 @@ from flask import g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (
-    BooleanField, IntegerField, SelectMultipleField, StringField, widgets)
+    BooleanField, IntegerField, SelectField, SelectMultipleField, StringField,
+    widgets)
 from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.display.table import Table
-from openatlas.display.util import link, manual, required_group
+from openatlas.display.util import link, manual, required_group, uc_first
 from openatlas.forms.field import SubmitField, TableField
 from openatlas.models.entity import Entity
 from openatlas.models.network import Network
@@ -240,16 +241,32 @@ def property_view(code: str) -> str:
 
 
 class NetworkForm(FlaskForm):
-    width = IntegerField(default=1200, validators=[InputRequired()])
-    height = IntegerField(default=600, validators=[InputRequired()])
-    charge = StringField(default=-80, validators=[InputRequired()])
-    distance = IntegerField(default=80, validators=[InputRequired()])
-    orphans = BooleanField(default=False)
+    width = IntegerField(
+        _('width'),
+        default=1200,
+        validators=[InputRequired()])
+    height = IntegerField(
+        _('height'),
+        default=600,
+        validators=[InputRequired()])
+    charge = StringField(
+        _('charge'),
+        default=-80,
+        validators=[InputRequired()])
+    distance = IntegerField(
+        _('distance'),
+        default=80,
+        validators=[InputRequired()])
+    orphans = BooleanField(_('orphans'), default=False)
+    depth = SelectField(
+        _('depth'),
+        default=3,
+        choices=[(2, 2), (3, 3), (4, 4), (5, 5)])
     classes = SelectMultipleField(
         _('classes'),
         widget=widgets.ListWidget(prefix_label=False))
 
-@app.route('/ego_network/<int:id_>')
+@app.route('/ego_network/<int:id_>', methods=["GET", "POST"])
 @required_group('readonly')
 def ego_network(id_: int) -> str:
     entity = Entity.get_by_id(id_)
@@ -285,7 +302,8 @@ def ego_network(id_: int) -> str:
                 'distance': form.distance.data}},
         json_data=Network.get_ego_network_json(
             {c.name: getattr(form, c.name).data for c in classes},
-            id_))
+            id_,
+            int(form.depth.data)))
 
 
 @app.route('/overview/network/', methods=["GET", "POST"])
