@@ -360,7 +360,7 @@ class EventBaseManager(BaseManager):
         super().populate_update()
         if super_ := self.entity.get_linked_entity('P9'):
             self.form.event.data = super_.id
-        if preceding_ := self.entity.get_linked_entity('P134', True):
+        if preceding_ := self.entity.get_linked_entity('P134'):
             self.form.event_preceding.data = preceding_.id
         if self.class_.name != 'move':
             if place := self.entity.get_linked_entity('P7'):
@@ -372,8 +372,8 @@ class EventBaseManager(BaseManager):
         self.data['links']['delete'].add('P9')
         self.add_link('P9', self.form.event.data)
         if self.class_.name != 'event':
-            self.data['links']['delete_inverse'].add('P134')
-            self.add_link('P134', self.form.event_preceding.data, inverse=True)
+            self.data['links']['delete'].add('P134')
+            self.add_link('P134', self.form.event_preceding.data)
         if self.class_.name != 'move':
             self.data['links']['delete'].add('P7')
             if self.form.place.data:
