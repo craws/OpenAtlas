@@ -10,7 +10,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.display.table import Table
-from openatlas.display.util import link, manual, required_group, uc_first
+from openatlas.display.util import button, link, manual, required_group
 from openatlas.forms.field import SubmitField, TableField
 from openatlas.models.entity import Entity
 from openatlas.models.network import Network
@@ -261,55 +261,28 @@ class NetworkForm(FlaskForm):
     depth = SelectField(
         _('depth'),
         default=3,
-        choices=[(2, 2), (3, 3), (4, 4), (5, 5)])
+        choices=[(x, x) for x in range(2, 13)])
     classes = SelectMultipleField(
         _('classes'),
         widget=widgets.ListWidget(prefix_label=False))
 
 @app.route('/ego_network/<int:id_>', methods=["GET", "POST"])
+@app.route('/ego_network/<int:id_>/<int:dimensions>', methods=["GET", "POST"])
 @required_group('readonly')
-def ego_network(id_: int) -> str:
-    entity = Entity.get_by_id(id_)
-    classes = [c for c in g.classes.values() if c.network_color]
-    for class_ in classes:
-        setattr(NetworkForm, class_.name, StringField(
-            default=class_.network_color,
-            render_kw={
-                'data-huebee': True,
-                'class': f'data-huebee {app.config["CSS"]["string_field"]}'}))
-    setattr(NetworkForm, 'save', SubmitField(_('apply')))
-    form = NetworkForm()
-    form.classes.choices = []
-    for class_ in classes:
-        if class_.name == 'object_location':
-            continue
-        form.classes.choices.append((class_.name, class_.label))
-    return render_template(
-        'model/ego_network.html',
-        form=form,
-        content='Ego network',
-        crumbs= [
-            [_(entity.class_.view.replace('_', ' ')),
-            url_for('index', view=entity.class_.view)],
-            entity,
-            _('ego network')],
-        network_params={
-            'classes': {},
-            'options': {
-                'width': form.width.data,
-                'height': form.height.data,
-                'charge': form.charge.data,
-                'distance': form.distance.data}},
-        json_data=Network.get_ego_network_json(
-            {c.name: getattr(form, c.name).data for c in classes},
-            id_,
-            int(form.depth.data)))
+def ego_network(id_: int, dimensions: Optional[int] = None) -> str:
+    return network(dimensions, id_)
 
 
 @app.route('/overview/network/', methods=["GET", "POST"])
 @app.route('/overview/network/<int:dimensions>', methods=["GET", "POST"])
 @required_group('readonly')
 def model_network(dimensions: Optional[int] = None) -> str:
+    return network(dimensions)
+
+def network(
+        dimensions: Optional[int] = None,
+        entity_id: Optional[int] = None):
+    entity = Entity.get_by_id(entity_id) if entity_id else None
     classes = [c for c in g.classes.values() if c.network_color]
     for class_ in classes:
         setattr(NetworkForm, class_.name, StringField(
@@ -324,23 +297,59 @@ def model_network(dimensions: Optional[int] = None) -> str:
         if class_.name == 'object_location':
             continue
         form.classes.choices.append((class_.name, class_.label))
+    buttons = [manual('tools/network')]
+    if entity:
+        json_data = Network.get_ego_network_json(
+            {c.name: getattr(form, c.name).data for c in classes},
+            entity.id,
+            int(form.depth.data))
+        crumbs = [
+            [_(entity.class_.view.replace('_', ' ')),
+             url_for('index', view=entity.class_.view)],
+            entity,
+            _('ego network')]
+        if json_data:
+            buttons.append(
+                button(
+                    '2D',
+                    url_for('ego_network', id_=entity.id, dimensions=2)))
+            buttons.append(
+                button(
+                    '3D',
+                    url_for('ego_network', id_=entity.id, dimensions=3)))
+    else:
+        json_data = Network.get_network_json(
+            {c.name: getattr(form, c.name).data for c in classes},
+            bool(form.orphans.data),
+            dimensions)
+        crumbs = [
+            _('network visualization'),
+            f'{dimensions}D' if dimensions else _('classic')]
+        if json_data:
+            buttons.append(
+                button('2D', url_for('model_network', dimensions=2)))
+            buttons.append(
+                button('3D', url_for('model_network', dimensions=3)))
+    if json_data:
+        buttons.append(
+            button(
+                _('download'),
+                '#',
+                onclick="saveSvgAsPng("
+                "d3.select('#network-svg').node(), 'network.png')"))
     return render_template(
         'model/network2.html' if dimensions else 'model/network.html',
         form=form,
         dimensions=dimensions,
+        entity=entity,
+        buttons=buttons,
         network_params={
             'classes': {},
             'options': {
-                'orphans': form.orphans.data,
                 'width': form.width.data,
                 'height': form.height.data,
                 'charge': form.charge.data,
                 'distance': form.distance.data}},
-        json_data=Network.get_network_json(
-            {c.name: getattr(form, c.name).data for c in classes},
-            bool(form.orphans.data),
-            dimensions),
+        json_data=json_data,
         title=_('model'),
-        crumbs=[
-            _('network visualization'),
-            f'{dimensions}D' if dimensions else _('classic')])
+        crumbs=crumbs)

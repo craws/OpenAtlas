@@ -48,11 +48,13 @@ class BaseDisplay:
         self.buttons.append(bookmark_toggle(self.entity.id))
         self.buttons.append(
             render_template('util/api_links.html', entity=self.entity))
+        if self.entity and self.entity.class_.view not in \
+                ['source', 'reference', 'reference_system', 'type']:
+            self.buttons.append(
+                button(
+                    _('ego network'),
+                    url_for('ego_network', id_=self.entity.id)))
         self.buttons.append(siblings_pager(self.entity, self.structure))
-        self.buttons.append(
-            button(
-                _('ego network'),
-                url_for('ego_network', id_=self.entity.id)))
         if self.linked_places:
             self.gis_data = Gis.get_all(self.linked_places)
         self.add_info_tab_content()  # Call later because of profile image
