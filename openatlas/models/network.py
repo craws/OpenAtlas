@@ -16,7 +16,8 @@ class Network:
     def get_ego_network_json(
             colors: dict[str, str],
             id_: int,
-            depth: int) -> Optional[str]:
+            depth: int,
+            dimensions: int) -> str:
         mapping = Db.get_object_mapping()
         entity_ids = {id_}
         location_id = 0
@@ -44,12 +45,13 @@ class Network:
         for entity in Entity.get_by_ids(entity_ids):
             nodes.append({
                 'id': entity.id,
+                'label' if dimensions else
                 'name': Network.truncate(entity.name.replace("'", "")),
                 'color': colors[entity.class_.name]
                 if entity.class_.name in colors else '#333333'})
         return str({
             'nodes': nodes,
-            'links': edges}) if nodes else None
+            'edges' if dimensions else 'links': edges}) if nodes else None
 
     @staticmethod
     def get_network_json(
@@ -61,7 +63,9 @@ class Network:
         entities: set[int] = set()
         nodes = []
         for row in Db.get_entities(classes):
-            if row['id'] not in mapping and row['id'] not in entities:
+            if row['id'] not in mapping \
+                    and row['id'] not in entities \
+                    and row['openatlas_class_name'] != 'source':
                 nodes.append({
                     'id': row['id'],
                     'label' if dimensions else
@@ -70,7 +74,6 @@ class Network:
                 entities.add(row['id'])
         edges = []
         edge_entity_ids = set()
-        Network.properties.append('P67')
         for row in Db.get_edges(classes, Network.properties):
             domain_id = mapping[row['domain_id']] \
                 if row['domain_id'] in mapping else row['domain_id']
@@ -84,6 +87,10 @@ class Network:
             edge_entity_ids.add(range_id)
         if not show_orphans:
             nodes[:] = [d for d in nodes if int(d['id']) in edge_entity_ids]
+        else:
+            nodes[:] = [
+                d for d in nodes if int(d['id']) in edge_entity_ids
+                or (not d['name'].startswith('Location of'))]
         return str({
             'nodes': nodes,
             'edges' if dimensions else 'links': edges}) if nodes else None

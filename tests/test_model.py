@@ -30,18 +30,23 @@ class ModelTests(TestBaseCase):
                 app.preprocess_request()  # type: ignore
                 actor = insert('person', 'King Arthur')
                 event = insert('activity', 'Battle of Camlann')
-                source = insert('source', 'The source')
                 event.link('P11', actor)
+                source = insert('source', 'The source')
                 source.link('P67', event)
+                place = insert('place', 'Camelot')
+                actor.link('P74', place.get_linked_entity_safe('P53'))
 
-            rv = self.app.get(url_for('model_network', dimensions=2))
+            rv = self.app.get(url_for('network', dimensions=0, id_=place.id))
+            assert b'Depth' in rv.data
+
+            rv = self.app.get(url_for('network', dimensions=2))
             assert b'Show orphans' in rv.data
 
-            rv = self.app.get(url_for('model_network'))
+            rv = self.app.get(url_for('network', dimensions=0))
             assert b'Show orphans' in rv.data
 
             rv = self.app.post(
-                url_for('model_network'),
+                url_for('network', dimensions=0),
                 data={
                     'orphans': True,
                     'width': 100,

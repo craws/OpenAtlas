@@ -260,29 +260,17 @@ class NetworkForm(FlaskForm):
     orphans = BooleanField(_('orphans'), default=False)
     depth = SelectField(
         _('depth'),
-        default=3,
-        choices=[(x, x) for x in range(2, 13)])
+        default=1,
+        choices=[(x, x) for x in range(1, 13)])
     classes = SelectMultipleField(
-        _('classes'),
+        _('colors'),
         widget=widgets.ListWidget(prefix_label=False))
 
-@app.route('/ego_network/<int:id_>', methods=["GET", "POST"])
-@app.route('/ego_network/<int:id_>/<int:dimensions>', methods=["GET", "POST"])
-@required_group('readonly')
-def ego_network(id_: int, dimensions: Optional[int] = None) -> str:
-    return network(dimensions, id_)
 
-
-@app.route('/overview/network/', methods=["GET", "POST"])
-@app.route('/overview/network/<int:dimensions>', methods=["GET", "POST"])
-@required_group('readonly')
-def model_network(dimensions: Optional[int] = None) -> str:
-    return network(dimensions)
-
-def network(
-        dimensions: Optional[int] = None,
-        entity_id: Optional[int] = None):
-    entity = Entity.get_by_id(entity_id) if entity_id else None
+@app.route('/network/<int:dimensions>', methods=["GET", "POST"])
+@app.route('/network/<int:dimensions>/<int:id_>', methods=["GET", "POST"])
+def network(dimensions: int, id_: Optional[int] = None) -> str:
+    entity = Entity.get_by_id(id_) if id_ else None
     classes = [c for c in g.classes.values() if c.network_color]
     for class_ in classes:
         setattr(NetworkForm, class_.name, StringField(
@@ -297,26 +285,17 @@ def network(
         if class_.name == 'object_location':
             continue
         form.classes.choices.append((class_.name, class_.label))
-    buttons = [manual('tools/network')]
     if entity:
         json_data = Network.get_ego_network_json(
             {c.name: getattr(form, c.name).data for c in classes},
             entity.id,
-            int(form.depth.data))
+            int(form.depth.data),
+            dimensions)
         crumbs = [
             [_(entity.class_.view.replace('_', ' ')),
              url_for('index', view=entity.class_.view)],
             entity,
-            _('ego network')]
-        if json_data:
-            buttons.append(
-                button(
-                    '2D',
-                    url_for('ego_network', id_=entity.id, dimensions=2)))
-            buttons.append(
-                button(
-                    '3D',
-                    url_for('ego_network', id_=entity.id, dimensions=3)))
+            _('network')]
     else:
         json_data = Network.get_network_json(
             {c.name: getattr(form, c.name).data for c in classes},
@@ -325,20 +304,26 @@ def network(
         crumbs = [
             _('network visualization'),
             f'{dimensions}D' if dimensions else _('classic')]
-        if json_data:
-            buttons.append(
-                button('2D', url_for('model_network', dimensions=2)))
-            buttons.append(
-                button('3D', url_for('model_network', dimensions=3)))
+    buttons = [manual('tools/network')]
     if json_data:
-        buttons.append(
-            button(
-                _('download'),
-                '#',
-                onclick="saveSvgAsPng("
-                "d3.select('#network-svg').node(), 'network.png')"))
+        if dimensions:
+            buttons.append(
+                button('classic', url_for('network', dimensions=0, id_=id_)))
+        if dimensions != 2:
+            buttons.append(
+                button('2D', url_for('network', dimensions=2, id_=id_)))
+        if dimensions != 3:
+            buttons.append(
+                button('3D', url_for('network', dimensions=3, id_=id_)))
+        if not dimensions:
+            buttons.append(
+                button(
+                    _('download'),
+                    '#',
+                    onclick="saveSvgAsPng("
+                    "d3.select('#network-svg').node(), 'network.png')"))
     return render_template(
-        'model/network2.html' if dimensions else 'model/network.html',
+        'model/network.html',
         form=form,
         dimensions=dimensions,
         entity=entity,

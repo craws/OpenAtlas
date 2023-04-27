@@ -52,8 +52,8 @@ class BaseDisplay:
                 ['source', 'reference', 'reference_system', 'type']:
             self.buttons.append(
                 button(
-                    _('ego network'),
-                    url_for('ego_network', id_=self.entity.id)))
+                    _('network'),
+                    url_for('network', dimensions=0, id_=self.entity.id)))
         self.buttons.append(siblings_pager(self.entity, self.structure))
         if self.linked_places:
             self.gis_data = Gis.get_all(self.linked_places)

@@ -4,20 +4,54 @@
   <script src="/static/node_modules/huebee/dist/huebee.pkgd.min.js"></script>
   {{ buttons|button_bar|safe }}
   {% if json_data %}
-    <link rel="stylesheet" href="/static/css/network.css">
-    <script src="/static/node_modules/d3/dist/d3.min.js"></script>
-    <div>
-      <svg id="network-svg"></svg>
-    </div>
-    <script>
-      var graph = {{ json_data|safe }};
-      var width = {{ network_params.options.width }};
-      var height = {{ network_params.options.height }};
-      var charge = {{ network_params.options.charge * 10 }};
-      var distance = {{ network_params.options.distance }};
-    </script>
-    <script src="/static/js/network.js"></script>
-    <script src="/static/node_modules/save-svg-as-png/lib/saveSvgAsPng.js"></script>
+    {% if dimensions %}
+      <script src="/static/vendor/network/preact.umd.js"></script>
+      <script src="/static/vendor/network/hooks.umd.js"></script>
+      <script src="/static/vendor/network/compat.umd.js"></script>
+      <script src="/static/vendor/network/three.min.js"></script>
+      <script>var React = preactCompat</script>
+      <script src="/static/vendor/network/network-visualization.umd.js"></script>
+      <div id="visualization" style="position: relative; height: 600px;"></div>
+      <script>
+          const graph =
+          {{ json_data|safe }}
+          const graphSizeFactor = Math.floor(graph.edges.length / 500)
+          React.render(
+              React.createElement(NetworkVisualization.SelectionControls, {
+                  dimensions: {{ dimensions }},
+                  showNeighborsOnly: true,
+                  nodeRelativeSize: 1,
+                  graph,
+                  nodeSize: node => 3 + node.neighbors.size * 0.1,
+                  showDirectionality: true,
+                  showLabels: (node, selectedNodeIds) =>
+                      selectedNodeIds.size > 0 || node.neighbors.size > 2 + graphSizeFactor,
+                  width: {{ network_params.options.width }},
+                  height: {{ network_params.options.height }},
+                  simulation: {
+                      charge: {{ network_params.options.charge }},
+                      distance: {{ network_params.options.distance }},
+                  }
+              }),
+              document.getElementById('visualization')
+          )
+      </script>
+    {% else %}
+      <link rel="stylesheet" href="/static/css/network.css">
+      <script src="/static/node_modules/d3/dist/d3.min.js"></script>
+      <div>
+        <svg id="network-svg"></svg>
+      </div>
+      <script>
+        var graph = {{ json_data|safe }};
+        var width = {{ network_params.options.width }};
+        var height = {{ network_params.options.height }};
+        var charge = {{ network_params.options.charge * 10 }};
+        var distance = {{ network_params.options.distance }};
+      </script>
+      <script src="/static/js/network.js"></script>
+      <script src="/static/node_modules/save-svg-as-png/lib/saveSvgAsPng.js"></script>
+    {% endif %}
   {% else %}
     <h2>{{ _('no data to display')|uc_first }}</h2>
   {% endif %}
