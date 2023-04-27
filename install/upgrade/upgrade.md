@@ -19,8 +19,8 @@ base, then run the database upgrade script, then restart Apache:
     sudo python3 install/upgrade/database_upgrade.py
     sudo service apache2 restart
 
-### 1.12.0 to 7.13.0
-There is already a 7.12.0 database_upgrade script but because the database
+### 7.12.0 to 7.13.0
+There is already a 7.13.0 database_upgrade script but because the database
 version isn't raised yet, it won't be executed. See for more details there
 but the database version will be raised before the release.
 
