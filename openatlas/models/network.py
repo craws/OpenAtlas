@@ -17,7 +17,7 @@ class Network:
             colors: dict[str, str],
             id_: int,
             depth: int,
-            dimensions: int) -> str:
+            dimensions: int) -> Optional[str]:
         mapping = Db.get_object_mapping()
         entity_ids = {id_}
         location_id = 0
