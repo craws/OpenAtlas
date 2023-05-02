@@ -3,7 +3,7 @@ from typing import Any
 
 from flask import jsonify, render_template, request
 
-from openatlas import app, AccessDeniedError, NoLicenseError
+from openatlas import app, error
 
 
 @app.errorhandler(400)
@@ -57,8 +57,8 @@ def internal_server_error(e):
     return jsonify({'msg': 'General Error'}), 500
 
 
-@app.errorhandler(AccessDeniedError)
-def access_denied_error(e):
+@app.errorhandler(error.AccessDeniedError)
+def access_denied(e: Exception):
     return jsonify({
         "title": "Access Denied",
         "message": "You do not have access to the API. "
@@ -67,14 +67,23 @@ def access_denied_error(e):
         "status": 403}), 403
 
 
-@app.errorhandler(NoLicenseError)
-def no_license_error(e):
+@app.errorhandler(error.NoLicenseError)
+def no_license(e: Exception):
     return jsonify({
-        "title": "Access Denied",
-        "message": "You do not have access to the API. "
-                   "Please ask the data provider for permission.",
+        "title": "No License",
+        "message": f"The requested file has no license, "
+                   "therefore cannot be displayed.",
         "timestamp": datetime.datetime.now(),
         "status": 409}), 409
+
+
+@app.errorhandler(error.EntityDoesNotExistError)
+def entity_does_not_exist(e: Exception):
+    return jsonify({
+        "title": "Entity does not exist",
+        "message": f"The requested entity does not exist in the database.",
+        "timestamp": datetime.datetime.now(),
+        "status": 404}), 404
 
 # @app.errorhandler(500)
 # def internal_server_error_500(e):

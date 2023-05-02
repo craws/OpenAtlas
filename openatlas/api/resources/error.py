@@ -11,13 +11,10 @@ class NoLicenseError(Exception):
     pass
 
 
-
-class InternalServerError(Exception):
-    pass
-
-
 class EntityDoesNotExistError(Exception):
     pass
+
+
 
 
 class FilterOperatorError(Exception):
