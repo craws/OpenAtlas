@@ -1,6 +1,17 @@
 import datetime
 
 
+
+class AccessDeniedError(Exception):
+    pass
+
+
+
+class NoLicenseError(Exception):
+    pass
+
+
+
 class InternalServerError(Exception):
     pass
 
@@ -42,10 +53,6 @@ class InvalidSystemClassError(Exception):
 
 
 class NoSearchStringError(Exception):
-    pass
-
-
-class AccessDeniedError(Exception):
     pass
 
 

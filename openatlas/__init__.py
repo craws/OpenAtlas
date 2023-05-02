@@ -8,7 +8,7 @@ from flask_login import current_user
 from flask_wtf.csrf import CSRFProtect
 from psycopg2 import extras
 
-from openatlas.api.resources.error import AccessDeniedError
+from openatlas.api.resources.error import AccessDeniedError, NoLicenseError
 from openatlas.database.connect import close_connection, open_connection
 
 app: Flask = Flask(__name__, instance_relative_config=True)

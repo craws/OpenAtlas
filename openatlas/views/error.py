@@ -3,7 +3,7 @@ from typing import Any
 
 from flask import jsonify, render_template, request
 
-from openatlas import app
+from openatlas import app, AccessDeniedError, NoLicenseError
 
 
 @app.errorhandler(400)
@@ -50,3 +50,32 @@ def unprocessable_entity(e: Exception) -> tuple[str, int]:
         'error/422.html',
         crumbs=['422 - Unprocessable entity'],
         e=e), 422
+
+
+@app.errorhandler(Exception)
+def internal_server_error(e):
+    return jsonify({'msg': 'General Error'}), 500
+
+
+@app.errorhandler(AccessDeniedError)
+def access_denied_error(e):
+    return jsonify({
+        "title": "Access Denied",
+        "message": "You do not have access to the API. "
+                   "Please ask the data provider for permission.",
+        "timestamp": datetime.datetime.now(),
+        "status": 403}), 403
+
+
+@app.errorhandler(NoLicenseError)
+def no_license_error(e):
+    return jsonify({
+        "title": "Access Denied",
+        "message": "You do not have access to the API. "
+                   "Please ask the data provider for permission.",
+        "timestamp": datetime.datetime.now(),
+        "status": 409}), 409
+
+# @app.errorhandler(500)
+# def internal_server_error_500(e):
+#     return jsonify({'msg': 'Internal server error'}), 500
