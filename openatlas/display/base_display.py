@@ -48,6 +48,12 @@ class BaseDisplay:
         self.buttons.append(bookmark_toggle(self.entity.id))
         self.buttons.append(
             render_template('util/api_links.html', entity=self.entity))
+        if self.entity and self.entity.class_.view not in \
+                ['source', 'reference', 'reference_system', 'type']:
+            self.buttons.append(
+                button(
+                    _('network'),
+                    url_for('network', dimensions=0, id_=self.entity.id)))
         self.buttons.append(siblings_pager(self.entity, self.structure))
         if self.linked_places:
             self.gis_data = Gis.get_all(self.linked_places)

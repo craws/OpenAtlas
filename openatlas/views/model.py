@@ -4,12 +4,13 @@ from flask import g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (
-    BooleanField, IntegerField, SelectMultipleField, StringField, widgets)
+    BooleanField, IntegerField, SelectField, SelectMultipleField, StringField,
+    widgets)
 from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.display.table import Table
-from openatlas.display.util import link, manual, required_group
+from openatlas.display.util import button, link, manual, required_group
 from openatlas.forms.field import SubmitField, TableField
 from openatlas.models.entity import Entity
 from openatlas.models.network import Network
@@ -240,20 +241,36 @@ def property_view(code: str) -> str:
 
 
 class NetworkForm(FlaskForm):
-    width = IntegerField(default=1200, validators=[InputRequired()])
-    height = IntegerField(default=600, validators=[InputRequired()])
-    charge = StringField(default=-80, validators=[InputRequired()])
-    distance = IntegerField(default=80, validators=[InputRequired()])
-    orphans = BooleanField(default=False)
+    width = IntegerField(
+        _('width'),
+        default=1200,
+        validators=[InputRequired()])
+    height = IntegerField(
+        _('height'),
+        default=600,
+        validators=[InputRequired()])
+    charge = StringField(
+        _('charge'),
+        default=-80,
+        validators=[InputRequired()])
+    distance = IntegerField(
+        _('distance'),
+        default=80,
+        validators=[InputRequired()])
+    orphans = BooleanField(_('orphans'), default=False)
+    depth = SelectField(
+        _('depth'),
+        default=1,
+        choices=[(x, x) for x in range(1, 13)])
     classes = SelectMultipleField(
-        _('classes'),
+        _('colors'),
         widget=widgets.ListWidget(prefix_label=False))
 
 
-@app.route('/overview/network/', methods=["GET", "POST"])
-@app.route('/overview/network/<int:dimensions>', methods=["GET", "POST"])
-@required_group('readonly')
-def model_network(dimensions: Optional[int] = None) -> str:
+@app.route('/network/<int:dimensions>', methods=["GET", "POST"])
+@app.route('/network/<int:dimensions>/<int:id_>', methods=["GET", "POST"])
+def network(dimensions: int, id_: Optional[int] = None) -> str:
+    entity = Entity.get_by_id(id_) if id_ else None
     classes = [c for c in g.classes.values() if c.network_color]
     for class_ in classes:
         setattr(NetworkForm, class_.name, StringField(
@@ -268,23 +285,56 @@ def model_network(dimensions: Optional[int] = None) -> str:
         if class_.name == 'object_location':
             continue
         form.classes.choices.append((class_.name, class_.label))
+    if entity:
+        json_data = Network.get_ego_network_json(
+            {c.name: getattr(form, c.name).data for c in classes},
+            entity.id,
+            int(form.depth.data),
+            dimensions)
+        crumbs = [
+            [_(entity.class_.view.replace('_', ' ')),
+             url_for('index', view=entity.class_.view)],
+            entity,
+            _('network')]
+    else:
+        json_data = Network.get_network_json(
+            {c.name: getattr(form, c.name).data for c in classes},
+            bool(form.orphans.data),
+            dimensions)
+        crumbs = [
+            _('network visualization'),
+            f'{dimensions}D' if dimensions else _('classic')]
+    buttons = [manual('tools/network')]
+    if json_data:
+        if dimensions:
+            buttons.append(
+                button('classic', url_for('network', dimensions=0, id_=id_)))
+        if dimensions != 2:
+            buttons.append(
+                button('2D', url_for('network', dimensions=2, id_=id_)))
+        if dimensions != 3:
+            buttons.append(
+                button('3D', url_for('network', dimensions=3, id_=id_)))
+        if not dimensions:
+            buttons.append(
+                button(
+                    _('download'),
+                    '#',
+                    onclick="saveSvgAsPng("
+                    "d3.select('#network-svg').node(), 'network.png')"))
     return render_template(
-        'model/network2.html' if dimensions else 'model/network.html',
+        'model/network.html',
         form=form,
         dimensions=dimensions,
+        entity=entity,
+        buttons=buttons,
         network_params={
             'classes': {},
             'options': {
-                'orphans': form.orphans.data,
                 'width': form.width.data,
                 'height': form.height.data,
                 'charge': form.charge.data,
                 'distance': form.distance.data}},
-        json_data=Network.get_network_json(
-            {c.name: getattr(form, c.name).data for c in classes},
-            bool(form.orphans.data),
-            dimensions),
+        json_data=json_data,
         title=_('model'),
-        crumbs=[
-            _('network visualization'),
-            f'{dimensions}D' if dimensions else _('classic')])
+        crumbs=crumbs)

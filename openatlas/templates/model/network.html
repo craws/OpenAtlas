@@ -2,31 +2,57 @@
 {% block content %}
   <link rel="stylesheet" href="/static/node_modules/huebee/dist/huebee.min.css">
   <script src="/static/node_modules/huebee/dist/huebee.pkgd.min.js"></script>
+  {{ buttons|button_bar|safe }}
   {% if json_data %}
-    <link rel="stylesheet" href="/static/css/network.css">
-    <script src="/static/node_modules/d3/dist/d3.min.js"></script>
-    <div class="toolbar">
-      {{ 'tools/network'|manual|safe }}
-      {{ '2D'|button(url_for('model_network', dimensions=2))|safe }}
-      {{ '3D'|button(url_for('model_network', dimensions=3))|safe }}
-      {{ _('download')|button('#', onclick="saveSvgAsPng(d3.select('#network-svg').node(), 'network.png')")|safe }}
-    </div>
-    <div>
-      <svg id="network-svg"></svg>
-    </div>
-    <script>
+    {% if dimensions %}
+      <script src="/static/vendor/network/preact.umd.js"></script>
+      <script src="/static/vendor/network/hooks.umd.js"></script>
+      <script src="/static/vendor/network/compat.umd.js"></script>
+      <script src="/static/vendor/network/three.min.js"></script>
+      <script>var React = preactCompat</script>
+      <script src="/static/vendor/network/network-visualization.umd.js"></script>
+      <div id="visualization" style="position: relative; height: 600px;"></div>
+      <script>
+          const graph =
+          {{ json_data|safe }}
+          const graphSizeFactor = Math.floor(graph.edges.length / 500)
+          React.render(
+              React.createElement(NetworkVisualization.SelectionControls, {
+                  dimensions: {{ dimensions }},
+                  showNeighborsOnly: true,
+                  nodeRelativeSize: 1,
+                  graph,
+                  nodeSize: node => 3 + node.neighbors.size * 0.1,
+                  showDirectionality: true,
+                  showLabels: (node, selectedNodeIds) =>
+                      selectedNodeIds.size > 0 || node.neighbors.size > 2 + graphSizeFactor,
+                  width: {{ network_params.options.width }},
+                  height: {{ network_params.options.height }},
+                  simulation: {
+                      charge: {{ network_params.options.charge }},
+                      distance: {{ network_params.options.distance }},
+                  }
+              }),
+              document.getElementById('visualization')
+          )
+      </script>
+    {% else %}
+      <link rel="stylesheet" href="/static/css/network.css">
+      <script src="/static/node_modules/d3/dist/d3.min.js"></script>
+      <div>
+        <svg id="network-svg"></svg>
+      </div>
+      <script>
         var graph = {{ json_data|safe }};
         var width = {{ network_params.options.width }};
         var height = {{ network_params.options.height }};
         var charge = {{ network_params.options.charge * 10 }};
         var distance = {{ network_params.options.distance }};
-    </script>
-    <script src="/static/js/network.js"></script>
-    <script src="/static/node_modules/save-svg-as-png/lib/saveSvgAsPng.js"></script>
+      </script>
+      <script src="/static/js/network.js"></script>
+      <script src="/static/node_modules/save-svg-as-png/lib/saveSvgAsPng.js"></script>
+    {% endif %}
   {% else %}
-    <div class="toolbar">
-      {{ 'tools/network'|manual|safe }}
-    </div>
     <h2>{{ _('no data to display')|uc_first }}</h2>
   {% endif %}
   <form method="post" id="network-form" style="margin-right:1em;">
@@ -44,26 +70,32 @@
             {% endfor %}
           </div>
         </div>
-        <div style="clear:both;"></div>
-        <p>{{ form.orphans }} {{ _('show orphans')|uc_first }}</p>
       </div>
       <div class="col-auto">
         <h2>{{ _('network options')|uc_first }}</h2>
         <div class="input-group mb-3">
+          {% if entity %}
+            {{ form.depth(class_=config.CSS.string_field) }}
+            <span class="input-group-text" style="min-width: 30%"> {{ form.depth.label.text|uc_first }}</span>
+          {% else %}
+            {{ form.orphans }} {{ _('show orphans')|uc_first }}
+          {% endif %}
+        </div>
+        <div class="input-group mb-3">
           {{ form.width(class_=config.CSS.string_field) }}
-          <span class="input-group-text" style="min-width: 30%"> {{ form.width.label }}</span>
+          <span class="input-group-text" style="min-width: 30%"> {{ form.width.label.text|uc_first }}</span>
         </div>
         <div class="input-group mb-3">
           {{ form.height(class_=config.CSS.string_field) }}
-          <span class="input-group-text" style="min-width: 30%"> {{ form.height.label }}</span>
+          <span class="input-group-text" style="min-width: 30%"> {{ form.height.label.text|uc_first }}</span>
         </div>
         <div class="input-group mb-3">
           {{ form.charge(class_=config.CSS.string_field) }}
-          <span class="input-group-text" style="min-width: 30%"> {{ form.charge.label }}</span>
+          <span class="input-group-text" style="min-width: 30%"> {{ form.charge.label.text|uc_first }}</span>
         </div>
         <div class="input-group mb-3">
           {{ form.distance(class_=config.CSS.string_field) }}
-          <span class="input-group-text" style="min-width: 30%"> {{ form.distance.label }}</span>
+          <span class="input-group-text" style="min-width: 30%"> {{ form.distance.label.text|uc_first }}</span>
         </div>
         <input
             class="{{ config.CSS.button.primary }}"
@@ -71,7 +103,6 @@
             name="save"
             value="{{ _('apply')|uc_first }}"
             type="submit">
-
       </div>
     </div>
   </form>

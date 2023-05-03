@@ -22,7 +22,8 @@
             {{ result.range|link|safe }}
           </p>
           {% if result.domain_valid and result.range_valid %}
-            <p>{{ _('valid link')|uc_first }}<br>
+            <p>
+              {{ _('valid link')|uc_first }}<br>
               {% elif not result.domain_valid %}
             <p>
               <span class="error">{{ _('wrong domain')|uc_first }}</span>
@@ -40,7 +41,6 @@
       </div>
       <div class="col">
         <div class="row g-5">
-
           <div class="col">
             <a href="/static/images/model/openatlas_schema.png">
               <img class="schema_image" src="/static/images/model/openatlas_schema.png" alt="Schema" class="img-fluid">

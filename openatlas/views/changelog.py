@@ -16,7 +16,12 @@ def index_changelog() -> str:
 
 versions = {
     '7.13.0': ['TBA', {
-        'fix': {'2002': "API: export_database doesn't export correct json"}
+        'feature': {
+            '2005': 'Egocentric network display for entities',
+            '2006': 'Refactor and minor improvements',
+        },
+        'fix': {
+            '2002': "API: export_database doesn't export correct json"}
     }],
     '7.12.0': ['2023-04-01', {
         'feature': {
