@@ -372,6 +372,22 @@ class InvolvementManager(BaseManager):
         self.link_.type = g.types[int(type_id)] if type_id else None
         self.link_.property = g.properties[self.form.activity.data]
 
+class ModificationManager(EventBaseManager):
+
+    def additional_fields(self) -> dict[str, Any]:
+        return dict(super().additional_fields(), **{
+            'artifact': TableMultiField()})
+
+    def populate_update(self) -> None:
+        super().populate_update()
+        self.form.artifact.data = \
+            [item.id for item in self.entity.get_linked_entities('P31')]
+
+    def process_form(self) -> None:
+        super().process_form()
+        self.data['links']['delete'].add('P31')
+        if self.form.artifact.data:
+            self.add_link('P31', self.form.artifact.data)
 
 class MoveManager(EventBaseManager):
 

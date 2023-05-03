@@ -328,6 +328,7 @@ class EventBaseManager(BaseManager):
                     'activity',
                     'acquisition',
                     'event',
+                    'modification',
                     'move',
                     'production'],
                 related_tables=['event_preceding'])}
@@ -338,6 +339,7 @@ class EventBaseManager(BaseManager):
                 add_dynamic=[
                     'activity',
                     'acquisition',
+                    'modification'
                     'move',
                     'production'],
                 related_tables=['event'])

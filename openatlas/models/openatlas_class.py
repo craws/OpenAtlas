@@ -10,7 +10,8 @@ from openatlas.database.openatlas_class import OpenAtlasClass as Db
 view_class_mapping = {
     'actor': ['person', 'group'],
     'event': [
-        'activity', 'acquisition', 'creation', 'event', 'move', 'production'],
+        'activity', 'acquisition', 'creation', 'event', 'modification', 'move',
+        'production'],
     'file': ['file'],
     'artifact': ['artifact', 'human_remains'],
     'place': ['feature', 'place', 'stratigraphic_unit'],
@@ -70,6 +71,7 @@ class OpenatlasClass:
             'E7': _('the most common, e.g. a battle, a meeting or a wedding'),
             'E8': _('mapping a change of property'),
             'E9': _('movement of artifacts or persons'),
+            'E11': _('modification of an object'),
             'E12': _('creation of artifacts'),
             'E65': _('creation of documents (files)')}
         if self.cidoc_class.code in tooltips:
