@@ -74,14 +74,13 @@ def access_denied(e: Exception):
         'status': 403}), 403
 
 
-@app.errorhandler(NoLicenseError)
-def no_license(e: Exception):
+@app.errorhandler(DisplayFileNotFoundError)
+def file_not_found(e: Exception):
     return jsonify({
-        'title': 'No license',
-        'message':
-            'The requested file has no license and cannot be displayed.',
+        'title': 'File not found',
+        'message': 'No file was found for the requested ID.',
         'timestamp': datetime.datetime.now(),
-        'status': 409}), 409
+        'status': 404}), 404
 
 
 @app.errorhandler(EntityDoesNotExistError)
@@ -93,39 +92,6 @@ def entity_does_not_exist(e: Exception):
         'status': 404}), 404
 
 
-@app.errorhandler(OperatorError)
-def invalid_operator(e: Exception):
-    return jsonify({
-        'title': 'Wrong compare operator',
-        'message':
-            'The compare operator is invalid. '
-            f'Please use: {app.config["COMPARE_OPERATORS"]}',
-        'timestamp': datetime.datetime.now(),
-        'status': 400}), 400
-
-
-@app.errorhandler(LogicalOperatorError)
-def invalid_logical_operator(e: Exception):
-    return jsonify({
-        'title': 'Wrong logical operator',
-        'message':
-            'The logical operator is invalid. Please use: '
-            f'{app.config["LOGICAL_OPERATOR"]}',
-        'timestamp': datetime.datetime.now(),
-        'status': 400}), 400
-
-
-@app.errorhandler(SearchCategoriesError)
-def invalid_search_category(e: Exception):
-    return jsonify({
-        'title': 'Wrong search category',
-        'message':
-            'The search category is invalid. Please use: '
-            f'{app.config["VALID_CATEGORIES"]}',
-        'timestamp': datetime.datetime.now(),
-        'status': 400}), 400
-
-
 @app.errorhandler(InvalidCidocClassCodeError)
 def invalid_cidoc_class_code(e: Exception):
     return jsonify({
@@ -133,6 +99,27 @@ def invalid_cidoc_class_code(e: Exception):
         'message':
             'The CIDOC class value is invalid, use "all" or '
             + str(list(g.cidoc_classes)),
+        'timestamp': datetime.datetime.now(),
+        'status': 400}), 400
+
+
+@app.errorhandler(InvalidLimitError)
+def invalid_limit(e: Exception):
+    return jsonify({
+        'title': 'Invalid limit value',
+        'message':
+            'Only integers between 1 and 100 are allowed for the limit.',
+        'timestamp': datetime.datetime.now(),
+        'status': 400}), 400
+
+
+@app.errorhandler(InvalidSearchSyntax)
+def invalid_search_syntax(e: Exception):
+    return jsonify({
+        'title': 'Invalid search syntax',
+        'message':
+            'The search request contains major errors. '
+            'Please confer the manual.',
         'timestamp': datetime.datetime.now(),
         'status': 400}), 400
 
@@ -159,35 +146,44 @@ def invalid_view_class(e: Exception):
         'status': 400}), 400
 
 
-@app.errorhandler(InvalidLimitError)
-def invalid_limit(e: Exception):
+@app.errorhandler(LastEntityError)
+def last_entity_error(e: Exception):
     return jsonify({
-        'title': 'Invalid limit value',
+        'title': 'ID is last entity',
         'message':
-            'Only integers between 1 and 100 are allowed for the limit.',
+            'The requested ID is the last entity, please choose another ID.',
         'timestamp': datetime.datetime.now(),
         'status': 400}), 400
 
 
-@app.errorhandler(InvalidSearchSyntax)
-def invalid_search_syntax(e: Exception):
+@app.errorhandler(LogicalOperatorError)
+def invalid_logical_operator(e: Exception):
     return jsonify({
-        'title': 'Invalid search syntax',
+        'title': 'Invalid logical operator',
         'message':
-            'The search request contains major errors. '
-            'Please confer the manual.',
+            'The logical operator is invalid. Please use: '
+            f'{app.config["LOGICAL_OPERATOR"]}',
         'timestamp': datetime.datetime.now(),
         'status': 400}), 400
 
 
-@app.errorhandler(ValueNotIntegerError)
-def value_not_an_integer(e: Exception):
+@app.errorhandler(NoEntityAvailable)
+def no_entity_available(e: Exception):
     return jsonify({
-        'title': 'Invalid search value',
-        'message':
-            'The search values need to be an integer for the chosen category.',
+        'title': 'No entity available',
+        'message': 'No entity exist for this request.',
         'timestamp': datetime.datetime.now(),
-        'status': 400}), 400
+        'status': 404}), 404
+
+
+@app.errorhandler(NoLicenseError)
+def no_license(e: Exception):
+    return jsonify({
+        'title': 'No license',
+        'message':
+            'The requested file has no license and cannot be displayed.',
+        'timestamp': datetime.datetime.now(),
+        'status': 409}), 409
 
 
 @app.errorhandler(NoSearchStringError)
@@ -195,6 +191,15 @@ def no_search_string(e: Exception):
     return jsonify({
         'title': 'No search values',
         'message': 'Search values are empty.',
+        'timestamp': datetime.datetime.now(),
+        'status': 400}), 400
+
+
+@app.errorhandler(NotATypeError)
+def not_a_type(e: Exception):
+    return jsonify({
+        'title': 'Entity is not a type',
+        'message': 'Requested ID either does not exist or is not a Type.',
         'timestamp': datetime.datetime.now(),
         'status': 400}), 400
 
@@ -208,10 +213,21 @@ def not_a_place(e: Exception):
         'status': 400}), 400
 
 
+@app.errorhandler(OperatorError)
+def invalid_operator(e: Exception):
+    return jsonify({
+        'title': 'Invalid compare operator',
+        'message':
+            'The compare operator is invalid. '
+            f'Please use: {app.config["COMPARE_OPERATORS"]}',
+        'timestamp': datetime.datetime.now(),
+        'status': 400}), 400
+
+
 @app.errorhandler(QueryEmptyError)
 def empty_query(e: Exception):
     return jsonify({
-        'title': 'No query parameters give',
+        'title': 'No query parameters given',
         'message':
             'The /query endpoint requires at least one of the following '
             'parameters: entities, cidoc_classes, view_classes, '
@@ -220,11 +236,13 @@ def empty_query(e: Exception):
         'status': 400}), 400
 
 
-@app.errorhandler(NotATypeError)
-def not_a_type(e: Exception):
+@app.errorhandler(SearchCategoriesError)
+def invalid_search_category(e: Exception):
     return jsonify({
-        'title': 'Entity is not a type',
-        'message': 'Requested ID either does not exist or is not a Type.',
+        'title': 'Invalid search category',
+        'message':
+            'The search category is invalid. Please use: '
+            f'{app.config["VALID_CATEGORIES"]}',
         'timestamp': datetime.datetime.now(),
         'status': 400}), 400
 
@@ -239,29 +257,11 @@ def one_id_is_not_a_type(e: Exception):
         'status': 400}), 400
 
 
-@app.errorhandler(LastEntityError)
-def last_entity_error(e: Exception):
+@app.errorhandler(ValueNotIntegerError)
+def value_not_an_integer(e: Exception):
     return jsonify({
-        'title': 'ID is last entity',
+        'title': 'Invalid search value',
         'message':
-            'The requested ID is the last entity, please choose another ID.',
+            'The search values need to be an integer for the chosen category.',
         'timestamp': datetime.datetime.now(),
         'status': 400}), 400
-
-
-@app.errorhandler(NoEntityAvailable)
-def no_entity_available(e: Exception):
-    return jsonify({
-        'title': 'No entity available',
-        'message': 'No entity exist for this request.',
-        'timestamp': datetime.datetime.now(),
-        'status': 404}), 404
-
-
-@app.errorhandler(DisplayFileNotFoundError)
-def file_not_found(e: Exception):
-    return jsonify({
-        'title': 'File not found',
-        'message': 'No file was found for the requested ID.',
-        'timestamp': datetime.datetime.now(),
-        'status': 404}), 404
