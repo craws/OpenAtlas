@@ -4,7 +4,6 @@ from flask_cors import CORS
 from flask_restful import Api
 
 from openatlas import app
-from openatlas.api.resources.error import errors
 from openatlas.api.routes import add_routes_v03
 
 app.config['SWAGGER'] = {
@@ -20,16 +19,17 @@ app.config['SWAGGER'] = {
         "rule_filter": lambda rule: rule.endpoint.startswith('api_03')}],
     "specs_route": "/swagger/"}
 
+app.config['PROPAGATE_EXCEPTIONS'] = True
 CORS(app, resources={r"/api/*": {"origins": app.config['CORS_ALLOWANCE']}})
 
 Swagger(app, parse=False, template_file="api/swagger.json")
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
-api = Api(api_bp, catch_all_404s=False, errors=errors)
+api = Api(api_bp)
 add_routes_v03(api)
 app.register_blueprint(api_bp)
 
 api_bp_03 = Blueprint('api_03', __name__, url_prefix='/api/0.3')
-api_03 = Api(api_bp_03, catch_all_404s=False, errors=errors)
+api_03 = Api(api_bp_03)
 add_routes_v03(api_03)
 app.register_blueprint(api_bp_03)

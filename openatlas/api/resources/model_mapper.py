@@ -3,7 +3,7 @@ from typing import Union, Optional, Any
 from flask import g
 
 from openatlas.api.resources.error import EntityDoesNotExistError, \
-    InvalidCidocClassCode, InvalidCodeError, InvalidSystemClassError
+    InvalidCidocClassCodeError, InvalidViewClassError, InvalidSystemClassError
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 
@@ -32,14 +32,14 @@ def get_by_cidoc_classes(class_codes: list[str]) -> list[Entity]:
     class_codes = list(g.cidoc_classes) \
         if 'all' in class_codes else class_codes
     if not all(cc in g.cidoc_classes for cc in class_codes):
-        raise InvalidCidocClassCode
+        raise InvalidCidocClassCodeError
     return Entity.get_by_cidoc_class(class_codes, types=True, aliases=True)
 
 
 def get_entities_by_view_classes(codes: list[str]) -> list[Entity]:
     codes = list(g.view_class_mapping) if 'all' in codes else codes
     if not all(c in g.view_class_mapping for c in codes):
-        raise InvalidCodeError
+        raise InvalidViewClassError
     view_classes = flatten_list_and_remove_duplicates(
         [g.view_class_mapping[view] for view in codes])
     return Entity.get_by_class(view_classes, types=True, aliases=True)
