@@ -60,7 +60,7 @@ def unprocessable_entity(e: Exception) -> tuple[str, int]:
 
 
 @app.errorhandler(AccessDeniedError)
-def access_denied(e: Exception):
+def access_denied(e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'Access denied',
         'message': 'You do not have access to the API. '
@@ -70,7 +70,7 @@ def access_denied(e: Exception):
 
 
 @app.errorhandler(DisplayFileNotFoundError)
-def file_not_found(e: Exception):
+def file_not_found(e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'File not found',
         'message': 'No file was found for the requested ID.',
@@ -79,7 +79,7 @@ def file_not_found(e: Exception):
 
 
 @app.errorhandler(EntityDoesNotExistError)
-def entity_does_not_exist(e: Exception):
+def entity_does_not_exist(e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'Entity does not exist',
         'message': 'The requested entity does not exist in the database.',
@@ -88,7 +88,7 @@ def entity_does_not_exist(e: Exception):
 
 
 @app.errorhandler(InvalidCidocClassCodeError)
-def invalid_cidoc_class_code(e: Exception):
+def invalid_cidoc_class_code(e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'Invalid cidoc_classes value',
         'message':
@@ -99,7 +99,7 @@ def invalid_cidoc_class_code(e: Exception):
 
 
 @app.errorhandler(InvalidLimitError)
-def invalid_limit(e: Exception):
+def invalid_limit(e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'Invalid limit value',
         'message':
@@ -109,7 +109,7 @@ def invalid_limit(e: Exception):
 
 
 @app.errorhandler(InvalidSearchSyntax)
-def invalid_search_syntax(e: Exception):
+def invalid_search_syntax(e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'Invalid search syntax',
         'message':
@@ -120,7 +120,7 @@ def invalid_search_syntax(e: Exception):
 
 
 @app.errorhandler(InvalidSystemClassError)
-def invalid_system_class(e: Exception):
+def invalid_system_class(e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'Invalid system_classes value',
         'message':
@@ -131,7 +131,7 @@ def invalid_system_class(e: Exception):
 
 
 @app.errorhandler(InvalidViewClassError)
-def invalid_view_class(e: Exception):
+def invalid_view_class(e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'Invalid view_classes value',
         'message':
@@ -142,7 +142,7 @@ def invalid_view_class(e: Exception):
 
 
 @app.errorhandler(LastEntityError)
-def last_entity_error(e: Exception):
+def last_entity_error(e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'ID is last entity',
         'message':
@@ -152,7 +152,7 @@ def last_entity_error(e: Exception):
 
 
 @app.errorhandler(LogicalOperatorError)
-def invalid_logical_operator(e: Exception):
+def invalid_logical_operator(e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'Invalid logical operator',
         'message':
@@ -163,7 +163,7 @@ def invalid_logical_operator(e: Exception):
 
 
 @app.errorhandler(NoEntityAvailable)
-def no_entity_available(e: Exception):
+def no_entity_available(e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'No entity available',
         'message': 'No entity exist for this request.',
@@ -172,7 +172,7 @@ def no_entity_available(e: Exception):
 
 
 @app.errorhandler(NoLicenseError)
-def no_license(e: Exception):
+def no_license(e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'No license',
         'message':
@@ -182,7 +182,7 @@ def no_license(e: Exception):
 
 
 @app.errorhandler(NoSearchStringError)
-def no_search_string(e: Exception):
+def no_search_string(e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'No search values',
         'message': 'Search values are empty.',
@@ -191,7 +191,7 @@ def no_search_string(e: Exception):
 
 
 @app.errorhandler(NotATypeError)
-def not_a_type(e: Exception):
+def not_a_type(e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'Entity is not a type',
         'message': 'Requested ID either does not exist or is not a Type.',
@@ -200,7 +200,7 @@ def not_a_type(e: Exception):
 
 
 @app.errorhandler(NotAPlaceError)
-def not_a_place(e: Exception):
+def not_a_place(e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'ID is not a valid place',
         'message': 'This endpoint requires a valid ID of a place entity.',
@@ -209,7 +209,7 @@ def not_a_place(e: Exception):
 
 
 @app.errorhandler(OperatorError)
-def invalid_operator(e: Exception):
+def invalid_operator(e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'Invalid compare operator',
         'message':
@@ -220,7 +220,7 @@ def invalid_operator(e: Exception):
 
 
 @app.errorhandler(QueryEmptyError)
-def empty_query(e: Exception):
+def empty_query(e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'No query parameters given',
         'message':
@@ -232,7 +232,7 @@ def empty_query(e: Exception):
 
 
 @app.errorhandler(SearchCategoriesError)
-def invalid_search_category(e: Exception):
+def invalid_search_category(e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'Invalid search category',
         'message':
@@ -243,7 +243,7 @@ def invalid_search_category(e: Exception):
 
 
 @app.errorhandler(TypeIDError)
-def one_id_is_not_a_type(e: Exception):
+def one_id_is_not_a_type(e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'One entity ID is not a type',
         'message':
@@ -253,7 +253,7 @@ def one_id_is_not_a_type(e: Exception):
 
 
 @app.errorhandler(ValueNotIntegerError)
-def value_not_an_integer(e: Exception):
+def value_not_an_integer(e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'Invalid search value',
         'message':
