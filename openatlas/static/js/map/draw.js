@@ -61,13 +61,13 @@ let mapInputForm = L.control();
 mapInputForm.onAdd = () => {
     let div = L.DomUtil.create('div');
     div.innerHTML = `
-    <div class="mapFormDiv" onmouseover="interactionOff()" 
+    <div class="mapFormDiv" onmouseover="interactionOff()"
       onmouseout="interactionOn()">
-            <span id="closeButton" title="${translate["map_info_close"]}" 
+            <span id="closeButton" title="${translate["map_info_close"]}"
               onclick="closeForm()" class="fad">X</span>
             <span id="inputFormTitle"></span>
             <p id="inputFormInfo"></p>
-            <input type="text" id="nameField" class="${style.stringField}" 
+            <input type="text" id="nameField" class="${style.stringField}"
               placeholder="${translate["map_info_name"]}">
             <textarea rows="3" cols="70" id="descriptionField"  class="${style.stringField}"
               placeholder="${translate["map_info_description"]}"/></textarea>
@@ -345,14 +345,14 @@ function updateHiddenInputFields() {
         .filter(x => x.geometry.type.toLowerCase() === 'polygon')));
 }
 
-function importGeonamesID(geo, popup) {
-    $('.GeoNames').val(geo.geonameId).change();
-    popup._close();
+function importGeonamesID(geo, popup, map) {
+    $('[data-reference-system="GeoNames"]').val(geo.geonameId).change();
+    map.closePopup(popup);
 }
 
-function importNewPoint(geo, popup) {
+function importNewPoint(geo, popup, map) {
     saveCurrentEditLayer();
-    popup._close();
+    map.closePopup(popup);
     point =
         {
             type: "Feature",
@@ -374,9 +374,9 @@ function importNewPoint(geo, popup) {
     setPopup(true)(currentEditLayer.feature, currentEditLayer);
 }
 
-function importAll(geo, popup) {
-    importGeonamesID(geo, popup);
-    importNewPoint(geo, popup);
+function importAll(geo, popup, map) {
+    importGeonamesID(geo, popup, map);
+    importNewPoint(geo, popup, map);
 }
 
 $(document).ready(function () {
