@@ -154,4 +154,4 @@ image.add_argument(
     type=str,
     help="{error_msg}",
     case_sensitive=False,
-    choices=(list(size for size in app.config['IMAGE_SIZE'])))
+    choices=list(size for size in app.config['IMAGE_SIZE']))

@@ -19,6 +19,7 @@ versions = {
         'feature': {
             '2005': 'Egocentric network display for entities',
             '2006': 'Refactor and minor improvements',
+            '2008': 'API: better error messages'
         },
         'fix': {
             '2002': "API: export_database doesn't export correct json"}
