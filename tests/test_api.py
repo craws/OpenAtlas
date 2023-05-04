@@ -4,10 +4,10 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.api.resources.error import (
-    AccessDeniedError, EntityDoesNotExistError, FilterColumnError,
-    FilterLogicalOperatorError, FilterOperatorError, InvalidCidocClassCode,
-    InvalidCodeError, InvalidLimitError, InvalidSearchSyntax,
-    InvalidSubunitError, InvalidSystemClassError, LastEntityError,
+    AccessDeniedError, EntityDoesNotExistError, SearchCategoriesError,
+    LogicalOperatorError, OperatorError, InvalidCidocClassCodeError,
+    InvalidViewClassError, InvalidLimitError, InvalidSearchSyntax,
+    NotATypeError, InvalidSystemClassError, LastEntityError,
     NoEntityAvailable, NoSearchStringError, NotAPlaceError, QueryEmptyError,
     TypeIDError, ValueNotIntegerError)
 from openatlas.api.resources.model_mapper import get_by_cidoc_classes
@@ -779,14 +779,14 @@ class Api(ApiTestCase):
                     url_for('api_03.system_class', system_class='Wrong'))
             with self.assertRaises(QueryEmptyError):
                 self.app.get(url_for('api_03.query'))
-            with self.assertRaises(InvalidSubunitError):
+            with self.assertRaises(NotATypeError):
                 self.app.get(url_for('api_03.type_entities', id_=1234))
-            with self.assertRaises(InvalidSubunitError):
+            with self.assertRaises(NotATypeError):
                 self.app.get(url_for('api_03.type_entities_all', id_=1234))
-            with self.assertRaises(InvalidCidocClassCode):
+            with self.assertRaises(InvalidCidocClassCodeError):
                 self.app.get(
                     url_for('api_03.cidoc_class', cidoc_class='e99999999'))
-            with self.assertRaises(InvalidCodeError):
+            with self.assertRaises(InvalidViewClassError):
                 self.app.get(
                     url_for('api_03.view_class', view_class='Invalid'))
             with self.assertRaises(InvalidLimitError):
@@ -805,21 +805,21 @@ class Api(ApiTestCase):
                     search='{"typeName":[{"operator":"equal",'
                            '"values":["Boundary Mark", "Height", "Dimension"],'
                            '"logicalOperator":"and"}]}'))
-            with self.assertRaises(FilterOperatorError):
+            with self.assertRaises(OperatorError):
                 self.app.get(url_for(
                     'api_03.view_class',
                     view_class='place',
                     search='{"typeName":[{"operator":"notEqualT",'
                            '"values":["Boundary Mark", "Height"],'
                            '"logicalOperator":"and"}]}'))
-            with self.assertRaises(FilterLogicalOperatorError):
+            with self.assertRaises(LogicalOperatorError):
                 self.app.get(url_for(
                     'api_03.view_class',
                     view_class='place',
                     search='{"typeName":[{"operator":"notEqual",'
                            '"values":["Boundary Mark", "Height"],'
                            '"logicalOperator":"xor"}]}'))
-            with self.assertRaises(FilterColumnError):
+            with self.assertRaises(SearchCategoriesError):
                 self.app.get(url_for(
                     'api_03.view_class',
                     view_class='place',

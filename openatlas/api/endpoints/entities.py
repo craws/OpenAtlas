@@ -4,7 +4,7 @@ from flask import Response, g
 from flask_restful import Resource
 
 from openatlas.api.resources.error import (
-    InvalidLimitError, InvalidSubunitError, QueryEmptyError)
+    InvalidLimitError, NotATypeError, QueryEmptyError)
 from openatlas.api.resources.model_mapper import (
     get_by_cidoc_classes, get_entities_by_ids, get_entities_by_system_classes,
     get_entities_by_view_classes, get_entity_by_id, get_latest_entities)
@@ -71,7 +71,7 @@ class GetTypeEntities(Resource):
     @staticmethod
     def get(id_: int) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         if id_ not in g.types:
-            raise InvalidSubunitError
+            raise NotATypeError
         if not (entities := g.types[id_].get_linked_entities(
                 ['P2', 'P89'],
                 inverse=True,
@@ -84,7 +84,7 @@ class GetTypeEntitiesAll(Resource):
     @staticmethod
     def get(id_: int) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         if id_ not in g.types:
-            raise InvalidSubunitError
+            raise NotATypeError
         if not (entities := get_entities_from_type_with_subs(id_)):
             entities = get_entities_by_ids(
                 get_entities_linked_to_special_type_recursive(id_, []))

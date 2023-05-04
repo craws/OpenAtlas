@@ -8,7 +8,7 @@ from flask_login import current_user
 from flask_wtf.csrf import CSRFProtect
 from psycopg2 import extras
 
-from openatlas.api.resources import error
+from openatlas.api.resources.error import AccessDeniedError
 from openatlas.database.connect import close_connection, open_connection
 
 app: Flask = Flask(__name__, instance_relative_config=True)
@@ -28,7 +28,6 @@ from openatlas.views import (
     admin, ajax, arche, tools, changelog, entity, entity_index, error, export,
     file, hierarchy, index, imports, link, login, model, note, overlay,
     profile, search, sql, type as type_, user)
-
 
 @babel.localeselector
 def get_locale() -> str:
@@ -75,7 +74,7 @@ def before_request() -> None:
         if not current_user.is_authenticated \
                 and not g.settings['api_public'] \
                 and ip not in app.config['ALLOWED_IPS']:
-            raise error.AccessDeniedError
+            raise AccessDeniedError
 
 
 @app.after_request
