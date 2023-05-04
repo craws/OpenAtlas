@@ -59,11 +59,6 @@ def unprocessable_entity(e: Exception) -> tuple[str, int]:
         e=e), 422
 
 
-@app.errorhandler(Exception)
-def internal_server_error(e):
-    return jsonify({'msg': 'General Error'}), 500
-
-
 @app.errorhandler(AccessDeniedError)
 def access_denied(e: Exception):
     return jsonify({

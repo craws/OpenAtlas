@@ -71,6 +71,8 @@ class Api(ApiTestCase):
                         change_of_property = entity
                     if entity.name == 'File without license':
                         file_without_licences = entity
+                    if entity.name == 'File without file':
+                        file_without_file = entity
 
             # ---Content Endpoints---
             rv = self.app.get(url_for('api_03.class_mapping')).get_json()
@@ -870,8 +872,13 @@ class Api(ApiTestCase):
 
             rv = self.app.get(url_for(
                 'api_03.display',
-                filename=f'{file_without_licences.id}.jpg'))
+                filename=f'{file_without_licences.id}'))
             assert 'No license' in rv.get_json()['title']
+
+            rv = self.app.get(url_for(
+                'api_03.display',
+                filename=f'{file_without_file.id}'))
+            assert 'File not found' in rv.get_json()['title']
 
             assert b'Endpoint not found' in self.app.get('/api/entity2').data
 
