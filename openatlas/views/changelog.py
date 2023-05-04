@@ -22,7 +22,8 @@ versions = {
             '2008': 'API: better error messages'
         },
         'fix': {
-            '2002': "API: export_database doesn't export correct json"}
+            '2002': "API: export_database doesn't export correct json",
+            '2012': 'GeoNames import ID not working'}
     }],
     '7.12.0': ['2023-04-01', {
         'feature': {
