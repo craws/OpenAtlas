@@ -9,7 +9,7 @@ def fetch_top_level(id_: str) -> list[dict[str, str]]:
     req = requests.get(
         f"{app.config['VOCABS']['api_uri']}{app.config['VOCABS']['id']}/{id_}",
         timeout=60,
-        auth=('test', 'fH8gL1NEjryt')  # Todo: auth can be deleted if public
+        auth=(app.config['VOCABS_USER'], app.config['VOCABS_PW'])  # Todo: auth can be deleted if public
     )
     data = []
     for entry in req.json()[id_.lower()]:
