@@ -27,7 +27,7 @@ from openatlas.display.util import convert_size
 from openatlas.views import (
     admin, ajax, arche, tools, changelog, entity, entity_index, error, export,
     file, hierarchy, index, imports, link, login, model, note, overlay,
-    profile, search, sql, type as type_, user)
+    profile, search, sql, type as type_, user, vocabs)
 
 @babel.localeselector
 def get_locale() -> str:
