@@ -20,9 +20,7 @@ base, then run the database upgrade script, then restart Apache:
     sudo service apache2 restart
 
 ### 7.12.0 to 7.13.0
-There is already a 7.13.0 database_upgrade script but because the database
-version isn't raised yet, it won't be executed. See for more details there
-but the database version will be raised before the release.
+7.13.0.sql is needed but will be taken care of by the database upgrade script.
 
 ### 7.11.x to 7.12.0
 A code base update (e.g. with git pull) and a webserver restart is sufficient.
