@@ -20,7 +20,7 @@ def fetch_arche_data() -> dict[int, Any]:
     for id_ in app.config['ARCHE']['collection_ids']:
         req = requests.get(
             f"{app.config['ARCHE']['base_url']}/api/{id_}/metadata",
-            headers={'Accept': 'application/n-triples'})
+            headers={'Accept': 'application/n-triples'}, timeout=60)
         try:
             if req:  # pragma: no cover
                 collections[id_] = get_metadata(n_triples_to_json(req))
@@ -38,7 +38,7 @@ def get_metadata(data: dict[str, Any]) -> dict[str, Any]:
     for uri, node in data.items():
         for value in node.values():
             if '_metadata.json' in str(value[0]):
-                json_ = requests.get(uri).json()
+                json_ = requests.get(uri, timeout=60).json()
                 image_url = get_linked_image(node['isMetadataFor'])
                 image_id = int(image_url.rsplit('/', 1)[1])
                 if image_id in existing_ids:
@@ -111,8 +111,11 @@ def import_arche_data() -> int:
                     get_hierarchy_by_name('License'),
                     item['license']))
             filename = f"{file.id}.{name.rsplit('.', 1)[1].lower()}"
-            open(str(app.config['UPLOAD_DIR'] / filename), "wb") \
-                .write(requests.get(item['image_link_thumbnail']).content)
+            open(str(
+                app.config['UPLOAD_DIR'] / filename), "wb", encoding='utf-8')\
+                .write(requests.get(
+                    item['image_link_thumbnail'],
+                    timeout=60).content)
             file.link('P67', artifact)
 
             creator = get_or_create_person(
@@ -239,7 +242,7 @@ def n_triples_to_json(req: Response) -> dict[str, Any]:
 def get_arche_context() -> dict[str, Any]:
     context = requests.get(
         'https://arche.acdh.oeaw.ac.at/api/describe',
-        headers={'Accept': 'application/json'})
+        headers={'Accept': 'application/json'}, timeout=60)
     result: dict[str, Any] = context.json()['schema']
     # Adding isMetadataFor because it is not in /describe
     result['isMetadataFor'] = \

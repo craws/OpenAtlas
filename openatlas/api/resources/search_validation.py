@@ -1,23 +1,10 @@
 from typing import Any, Union
 
 from openatlas.api.resources.error import (
-    FilterColumnError, FilterLogicalOperatorError, FilterOperatorError,
+    SearchCategoriesError, LogicalOperatorError, OperatorError,
     NoSearchStringError, ValueNotIntegerError)
 
-logical_operators: list[str] = ['and', 'or']
-str_categories: list[str] = [
-    "entityName", "entityDescription", "entityAliases", "entityCidocClass",
-    "entitySystemClass", "typeName", "typeNameWithSubs",
-    "beginFrom", "beginTo", "endFrom", "endTo"]
-int_categories: list[str] = [
-    "entityID", "typeID", "typeIDWithSubs", "relationToID"]
-set_categories: list[str] = ["valueTypeID"]
-valid_categories: list[str] = [
-    *str_categories, *int_categories, *set_categories]
-compare_operators: list[str] = [
-    'equal', 'notEqual', 'greaterThan', 'lesserThan', 'greaterThanEqual',
-    'lesserThanEqual', 'like']
-
+from openatlas import app
 
 def iterate_validation(parameters: list[dict[str, Any]]) -> list[list[bool]]:
     return [[call_validation(search_key, values) for values in value_list]
@@ -39,15 +26,15 @@ def parameter_validation(
         operator_: str,
         search_values: list[Any],
         logical_operator: str) -> bool:
-    if logical_operator not in logical_operators:
-        raise FilterLogicalOperatorError
-    if categories not in valid_categories:
-        raise FilterColumnError
-    if operator_ not in compare_operators:
-        raise FilterOperatorError
+    if logical_operator not in app.config['LOGICAL_OPERATOR']:
+        raise LogicalOperatorError
+    if categories not in app.config['VALID_CATEGORIES']:
+        raise SearchCategoriesError
+    if operator_ not in app.config['COMPARE_OPERATORS']:
+        raise OperatorError
     if not search_values:
         raise NoSearchStringError
-    if categories in int_categories:
+    if categories in app.config['INT_CATEGORIES']:
         if not bool(any(isinstance(value, int) for value in search_values)):
             raise ValueNotIntegerError
     return True

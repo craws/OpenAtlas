@@ -29,7 +29,6 @@ from openatlas.views import (
     file, hierarchy, index, imports, link, login, model, note, overlay,
     profile, search, sql, type as type_, user)
 
-
 @babel.localeselector
 def get_locale() -> str:
     if 'language' in session:

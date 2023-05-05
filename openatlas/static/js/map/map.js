@@ -354,10 +354,10 @@
                 p.popup.setContent(popup);
                 p.popup.update();
                 $("#ImportCoordinates")
-                    .click(() => importNewPoint(e.geoname, p.popup));
+                    .click(() => importNewPoint(e.geoname, p.popup, map));
                 $("#ImportGeonamesID")
-                    .click(() => importGeonamesID(e.geoname, p.popup));
-                $("#ImportAll").click(() => importAll(e.geoname, p.popup));
+                    .click(() => importGeonamesID(e.geoname, p.popup, map));
+                $("#ImportAll").click(() => importAll(e.geoname, p.popup, map));
             });
         }
     });

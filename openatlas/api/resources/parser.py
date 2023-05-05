@@ -141,32 +141,12 @@ query.add_argument(
     'view_classes',
     type=str,
     action='append',
-    help="{error_msg}",
-    case_sensitive=False,
-    choices=(
-        'all',
-        'actor',
-        'event',
-        'place',
-        'reference',
-        'source',
-        'artifact',
-        'type',
-        'file',
-        'source_translation'))
+    help="{error_msg}")
 query.add_argument(
     'system_classes',
     type=str,
     action='append',
-    help="{error_msg}",
-    case_sensitive=False,
-    choices=(
-        'all', 'acquisition', 'activity', 'administrative_unit', 'appellation',
-        'artifact', 'bibliography', 'creation', 'edition', 'file',
-        'external_reference', 'feature', 'group', 'human_remains', 'move',
-        'object_location', 'person', 'place', 'production', 'source',
-        'reference_system', 'stratigraphic_unit', 'source_translation', 'type',
-        'tools'))
+    help="{error_msg}")
 
 image = default.copy()
 image.add_argument(
@@ -174,4 +154,4 @@ image.add_argument(
     type=str,
     help="{error_msg}",
     case_sensitive=False,
-    choices=(list(size for size in app.config['IMAGE_SIZE'])))
+    choices=list(size for size in app.config['IMAGE_SIZE']))

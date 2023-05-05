@@ -5,8 +5,7 @@ import numpy
 from flask import g, json
 from numpy import datetime64
 
-from openatlas.api.resources.error import (
-    InvalidSearchSyntax)
+from openatlas.api.resources.error import InvalidSearchSyntax
 from openatlas.api.resources.model_mapper import get_entities_by_ids, \
     get_all_links_of_entities, get_all_links_of_entities_inverse
 from openatlas.models.entity import Entity
