@@ -161,7 +161,8 @@ class Tab:
                         'link',
                         url_for('reference_add', id_=id_, view='event')))
             if view == 'artifact':
-                for item in ['acquisition', 'move', 'production']:
+                for item in \
+                        ['acquisition', 'modification', 'move', 'production']:
                     self.buttons.append(
                         button(
                             g.classes[item].label,

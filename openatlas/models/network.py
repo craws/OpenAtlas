@@ -9,8 +9,8 @@ from openatlas.models.entity import Entity
 class Network:
 
     properties = [
-        'P7', 'P11', 'P14', 'P22', 'P23', 'P24', 'P25', 'P27', 'P52', 'P74',
-        'P107', 'OA7', 'OA8', 'OA9']
+        'P7', 'P11', 'P14', 'P22', 'P23', 'P24', 'P25', 'P27', 'P31', 'P52',
+        'P74', 'P107', 'OA7', 'OA8', 'OA9']
 
     @staticmethod
     def get_ego_network_json(
