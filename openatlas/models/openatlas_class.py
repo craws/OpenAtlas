@@ -71,7 +71,7 @@ class OpenatlasClass:
             'E7': _('the most common, e.g. a battle, a meeting or a wedding'),
             'E8': _('mapping a change of property'),
             'E9': _('movement of artifacts or persons'),
-            'E11': _('modification of an object'),
+            'E11': _('modification of artifacts'),
             'E12': _('creation of artifacts'),
             'E65': _('creation of documents (files)')}
         if self.cidoc_class.code in tooltips:
