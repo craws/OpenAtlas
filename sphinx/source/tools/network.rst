@@ -5,8 +5,10 @@ Network visualization
 
 With the integration of `D3.js <https://d3js.org/>`_ data can be visualized as
 a network graph available at the **Network visualization** button at the
-:doc:`/overview`. **Classic** is the default view but it can be switched to
-other types at the top of the visualization pages.
+:doc:`/overview` or as an egocentric network at the entity detail view.
+
+**Classic** is the default but it can be switched to other types at the top of
+the visualization pages.
 
 .. figure:: network_classic.png
    :align: left
@@ -39,8 +41,9 @@ Navigation
 
 Options
 -------
-* **Classes** - you can change the node color of classes
-* **Show orphans** - if selected nodes without any connections are shown too
+* **Colors** - you can change the node color of classes
+* **Depth** - in egocentric networks you can define the link depth
+* **Show orphans** - if nodes without connections should be shown too
 * **Width** - the width of the resulting image in pixel
 * **Height** - the height of the resulting image in pixel
 * **Charge** - a parameter for the distance between entries which are not
