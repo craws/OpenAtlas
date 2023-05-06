@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2023-05-06 11:51+0200\n"
-"PO-Revision-Date: 2023-05-06 11:52+0200\n"
+"PO-Revision-Date: 2023-05-06 13:25+0200\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: de\n"
 "Language-Team: de <LL@li.org>\n"
@@ -2112,7 +2112,7 @@ msgstr "erlaubt"
 
 #: openatlas/views/model.py:247
 msgid "width"
-msgstr "Width"
+msgstr "Breite"
 
 #: openatlas/views/model.py:251
 msgid "height"
