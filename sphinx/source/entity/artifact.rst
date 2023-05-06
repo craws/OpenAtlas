@@ -25,7 +25,7 @@ Form fields
 Can be linked via tabs to
 -------------------------
 * :doc:`source` - when it is referenced there
-* :doc:`event` - acquisition, move or production
+* :doc:`event` - acquisition, modification, move or production
 * :doc:`reference`
 * :doc:`file`
 

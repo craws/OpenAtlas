@@ -15,7 +15,7 @@ Model
 While the model uses `CIDOC CRM <https://www.cidoc-crm.org/>`_ as
 ontology, it can be used without prior knowledge of data models, ontologies,
 etc. The software automatically maps information to the model. As the
-definitions of the CIDOC Conceptual Refernece Model was imported into the
+definitions of the CIDOC Conceptual Reference Model was imported into the
 system, its
 `classes <https://demo.openatlas.eu/overview/model/cidoc_class_index>`_
 and `properties <https://demo.openatlas.eu/overview/model/property>`_ can be

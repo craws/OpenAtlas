@@ -3,11 +3,13 @@ Event
 
 .. toctree::
 
-CIDOC documentation: :cidoc_entity:`E5 Event<e5-event>`,
+CIDOC documentation:
 :cidoc_entity:`E7 Activity<e7-activity>`,
 :cidoc_entity:`E8 Acquisition<e8-acquisition>`,
-:cidoc_entity:`E9 Move<e9-move>` and
-:cidoc_entity:`E12 Production<e12-production>`
+:cidoc_entity:`E5 Event<e5-event>`,
+:cidoc_entity:`E11 Modification<e11-modification>`,
+:cidoc_entity:`E9 Move<e9-move>`,
+:cidoc_entity:`E12 Production<e12-production>` and
 :cidoc_entity:`E65 Creation<e65-creation>`
 
 * **Activity** (:cidoc_entity:`E7 Activity<e7-activity>`)
@@ -16,8 +18,10 @@ CIDOC documentation: :cidoc_entity:`E5 Event<e5-event>`,
   - mapping a change of property
 * **Creation** (:cidoc_entity:`E65 Creation<e65-creation>`)
   - creation of documents (files)
-* **Event** (:cidoc_entity:`E5 Event<e5-event>`)
+* **Event** (:cidoc_entity:`E5 Event<e11-modification>`)
   - used for events not performed by actors, e.g. a natural disaster
+* **Modification** (:cidoc_entity:`E11 Event<e5-event>`)
+  - used for modification of artifacts, e.g. a conservation treatment
 * **Move** (:cidoc_entity:`E9 Move<e9-move>`)
   - movement of artifacts or persons
 * **Production** (:cidoc_entity:`E12 Production<e12-production>`)
@@ -72,6 +76,13 @@ Creation
 The creators of the document can be added via the **Actor** tab and selecting
 the **carried out by** activity while linking them.
 
+Modification
+************
+* :doc:`artifact` - to select artifacts that were modified
+
+The creators of the artifact can be added via the **Actor** tab and selecting
+the **carried out by** activity while linking them.
+
 Move
 ****
 
@@ -84,5 +95,5 @@ Production
 **********
 * :doc:`artifact` - to select artifacts that were produced
 
-The creators if the artifact can be added via the **Actor** tab and selecting
+The creators of the artifact can be added via the **Actor** tab and selecting
 the **carried out by** activity while linking them.
