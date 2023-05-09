@@ -278,11 +278,11 @@ class EventsDisplay(BaseDisplay):
         super().add_data()
         self.data[_('sub event of')] = \
             link(self.entity.get_linked_entity('P9'))
-        self.data[_('preceding event')] = link(
-            self.entity.get_linked_entity('P134', True))
+        self.data[_('preceding event')] = \
+            link(self.entity.get_linked_entity('P134'))
         self.data[_('succeeding event')] = \
-            '<br>'.join(
-                [link(e) for e in self.entity.get_linked_entities('P134')])
+            '<br>'.join([link(e) for e in
+                self.entity.get_linked_entities('P134', True)])
         if place := self.entity.get_linked_entity('P7'):
             self.data[_('location')] = \
                 link(place.get_linked_entity_safe('P53', True))

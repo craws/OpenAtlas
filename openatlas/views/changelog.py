@@ -15,16 +15,18 @@ def index_changelog() -> str:
 
 
 versions = {
-    '7.13.0': ['TBA', {
+    '7.14.0': ['TBA', {}],
+    '7.13.0': ['2023-05-06', {
         'feature': {
+            '1952': 'E11 Modification',
             '2005': 'Egocentric network display for entities',
-            '2006': 'Refactor and minor improvements',
-            '2008': 'API: better error messages'
-        },
+            '2008': 'API: better error messages',
+            '2010': 'Manual: document missing +Link button for event at place',
+            '2006': 'Refactor and minor improvements'},
         'fix': {
             '2002': "API: export_database doesn't export correct json",
-            '2012': 'GeoNames import ID not working'}
-    }],
+            '2007': 'Wrong direction for P134',
+            '2012': 'GeoNames import ID not working'}}],
     '7.12.0': ['2023-04-01', {
         'feature': {
             '1753': 'Make a copy of an entry',

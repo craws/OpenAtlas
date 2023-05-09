@@ -40,7 +40,8 @@ which the place is located e.g. Duchy of Bavaria or Lombard Kingdom.
 Can be linked via tabs to
 -------------------------
 * :doc:`source` - when it is referenced there
-* :doc:`event` - as an event location
+* :doc:`event` - link new events. It's not possible to link to existing events
+  from here, this has to be done from the events itself
 * :doc:`feature` - its subunit
 * :doc:`reference`
 * :doc:`file`

@@ -10,7 +10,8 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.display.table import Table
-from openatlas.display.util import button, link, manual, required_group
+from openatlas.display.util import button, link, manual, required_group, \
+    uc_first
 from openatlas.forms.field import SubmitField, TableField
 from openatlas.models.entity import Entity
 from openatlas.models.network import Network
@@ -100,7 +101,8 @@ def openatlas_class_index() -> str:
             link(class_.cidoc_class),
             link(g.types[class_.standard_type_id])
             if class_.standard_type_id else '',
-            (class_.view.replace("_", " ")) if class_.view else '',
+            uc_first(_((class_.view.replace("_", " "))))
+            if class_.view else '',
             class_.write_access,
             _('allowed') if class_.alias_allowed else '',
             _('allowed') if class_.reference_system_allowed else '',
