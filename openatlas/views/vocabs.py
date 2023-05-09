@@ -3,8 +3,8 @@ from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
-from api.vocabs.functions import fetch_top_level, import_vocabs_data
-from database.connect import Transaction
+from openatlas.api.vocabs.functions import fetch_top_level, import_vocabs_data
+from openatlas.database.connect import Transaction
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
@@ -36,7 +36,7 @@ def vocabs_fetch(id_: str) -> str:
     data = fetch_top_level(id_)
     table = Table(
         header=[_('name'), _('uri')])
-    for entry in data:
+    for entry in data.values():
         table.rows.append([entry['name'], entry['uri']])
     tabs = {
         f'fetched_{id_}': Tab(

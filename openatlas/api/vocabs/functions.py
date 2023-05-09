@@ -5,30 +5,57 @@ import requests
 from openatlas import app
 
 
-def fetch_top_level(id_: str) -> list[dict[str, str]]:
+def fetch_top_level(id_: str) -> dict[str, Any]:
     req = requests.get(
         f"{app.config['VOCABS']['api_uri']}{app.config['VOCABS']['id']}/{id_}",
         timeout=60,
         auth=(app.config['VOCABS_USER'], app.config['VOCABS_PW'])  # Todo: auth can be deleted if public
     )
-    data = []
+    hierarchies = {}
     for entry in req.json()[id_.lower()]:
-        data.append({
-            'name': entry['prefLabel'] if id_ == 'groups' else entry[
-                'label'],
+        hierarchies[entry['uri'].rsplit('/', 1)[-1]] = {
+            'label': entry['prefLabel'] if id_ == 'groups' else entry['label'],
+            'name': entry['uri'].rsplit('/', 1)[-1],
             'uri': f"{app.config['VOCABS']['uri']}{app.config['VOCABS']['id']}"
-                   f"/{entry['uri'].rsplit('/', 1)[-1]}"
+                   f"/{entry['uri'].rsplit('/', 1)[-1]}",
+            'hasMembers': entry['hasMembers'], # only for groups
+            'subs': {}
             # Todo: if public: 'uri': entry['uri']
-        })
-    return data
+        }
+    return hierarchies
 
 
 def import_vocabs_data(id_: str) -> int:
-    top_level = fetch_top_level(id_)
+    hierarchies = fetch_top_level(id_)
     if id_ == 'groups':
-        get_group_children(top_level)
+        out = add_group_members(hierarchies)
+    print(out)
     return 1
 
 
-def get_group_children(data: list[dict[str, str]]) -> dict[str, Any]:
-    return None
+def add_group_members(hierarchies: dict[str, Any]) -> list[dict[str, Any]]:
+    print(len(hierarchies))
+    for hierarchy in hierarchies:
+        print(fetch_group_subs(hierarchy))
+
+    return 1
+
+
+def fetch_group_subs(id_: str):
+    req = requests.get(
+        f"{app.config['VOCABS']['api_uri']}{app.config['VOCABS']['id']}/groupMembers",
+        params={'uri': id_},
+        timeout=60,
+        auth=(app.config['VOCABS_USER'], app.config['VOCABS_PW']))   # Todo: auth can be deleted if public
+    member = {}
+    for entry in req.json()['members']:
+        member[entry['uri'].rsplit('/', 1)[-1]] = {
+            'label': entry['prefLabel'],
+            'name': entry['uri'].rsplit('/', 1)[-1],
+            'uri': f"{app.config['VOCABS']['uri']}{app.config['VOCABS']['id']}"
+                   f"/{entry['uri'].rsplit('/', 1)[-1]}",
+            'hasMembers': entry['hasMembers'],
+            'subs': {}
+            # Todo: if public: 'uri': entry['uri']
+        }
+    return member
