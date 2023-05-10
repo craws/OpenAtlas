@@ -16,8 +16,6 @@ from openatlas.display.util import (
 @required_group('readonly')
 def vocabs_index() -> str:
     if is_authorized('manager'):
-        app.config['VOCABS']['collections'] = \
-            button(_('collections'), url_for('vocabs_fetch', id_='groups'))
         app.config['VOCABS']['concepts'] = \
             button(_('concepts'), url_for('vocabs_fetch', id_='topConcepts'))
     return render_template(
@@ -36,7 +34,7 @@ def vocabs_fetch(id_: str) -> str:
     data = fetch_top_level(id_)
     table = Table(
         header=[_('name'), _('uri')])
-    for entry in data.values():
+    for entry in data:
         table.rows.append([entry['name'], entry['uri']])
     tabs = {
         f'fetched_{id_}': Tab(
@@ -59,11 +57,11 @@ def vocabs_fetch(id_: str) -> str:
 def vocabs_import_data(id_: str) -> Response:
     try:
         count = import_vocabs_data(id_)
-        # Transaction.commit()
+        Transaction.commit()
         g.logger.log('info', 'import', f'import: {count}')
         flash(f"{_('import of')}: {count}", 'info')
     except Exception as e:
-        # Transaction.rollback()
+        Transaction.rollback()
         g.logger.log('error', 'import', 'import failed', e)
         flash(_('error transaction'), 'error')
     return redirect(url_for('vocabs_fetch', id_=id_))
