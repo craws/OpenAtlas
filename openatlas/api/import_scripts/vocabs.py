@@ -12,17 +12,16 @@ from openatlas.models.type import Type
 from openatlas.database.reference_system import ReferenceSystem as Db
 
 
-def import_vocabs_data(id_: str) -> int:
-    hierarchies = fetch_top_level(id_, get_vocabs_reference_system())
-    print(hierarchies)
-    return 1
+def import_vocabs_data(concept: str) -> int:
+    return len(fetch_top_level(concept, get_vocabs_reference_system()))
 
 
 def fetch_top_level(
-        id_: str,
+        concept: str,
         ref: Optional[ReferenceSystem] = None) -> list[dict[str, Any]]:
     req = requests.get(
-        f"{app.config['VOCABS']['api_uri']}{app.config['VOCABS']['id']}/{id_}",
+        f"{app.config['VOCABS']['api_uri']}{app.config['VOCABS']['id']}"
+        f"/{concept}",
         timeout=60,
         auth=(app.config['VOCABS_USER'], app.config['VOCABS_PW'])
         # Todo: auth can be deleted if public
@@ -30,10 +29,13 @@ def fetch_top_level(
     exact_match_id = get_exact_match().id
     hierarchies = []
     hierarchy = None
-    for entry in req.json()[id_.lower()]:
+    for entry in req.json()[concept.lower()]:
         name = entry['uri'].rsplit('/', 1)[-1]
         if ref:
-            hierarchy = Entity.insert('type', entry['label'])
+            hierarchy = Entity.insert(
+                'type',
+                entry['label'],
+                'Automatically imported by VOCABS')
             Type.insert_hierarchy(hierarchy, 'custom', ['artifact'], True)
             ref.link(
                 'P67',
@@ -85,3 +87,4 @@ def get_vocabs_reference_system() -> ReferenceSystem:
     if 'artifact' not in system.classes:
         Db.add_classes(system.id, ['artifact'])
     return system
+
