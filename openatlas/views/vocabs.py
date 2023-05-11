@@ -3,7 +3,7 @@ from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
-from openatlas.api.vocabs.functions import import_vocabs_data
+from api.import_scripts.vocabs import import_vocabs_data
 from openatlas.database.connect import Transaction
 from openatlas import app
 from openatlas.display.tab import Tab

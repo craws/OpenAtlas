@@ -4,7 +4,7 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
-from openatlas.api.arche.function import fetch_arche_data, import_arche_data
+from api.import_scripts.arche import fetch_arche_data, import_arche_data
 from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
