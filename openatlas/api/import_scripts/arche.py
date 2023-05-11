@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 import rdflib
 import requests
@@ -7,6 +7,8 @@ from requests import Response, HTTPError
 from werkzeug.exceptions import abort
 
 from openatlas import app
+from openatlas.api.import_scripts.util import get_or_create_type, \
+    get_exact_match, get_reference_system
 from openatlas.models.entity import Entity
 from openatlas.models.imports import is_float
 from openatlas.database.gis import Gis as Db_gis
@@ -63,12 +65,8 @@ def get_metadata(data: dict[str, Any]) -> dict[str, Any]:
 def import_arche_data() -> int:
     count = 0
     person_types = get_or_create_person_types()
-    arche_ref = \
-        [i for i in g.reference_systems.values() if i.name == 'ARCHE'][0]
-    exact_match_id = \
-        get_or_create_type(
-            Type.get_hierarchy('External reference match'),
-            'exact match').id
+    arche_ref = get_reference_system('ARCHE')
+    exact_match_id = get_exact_match().id
     for entries in fetch_arche_data().values():
         for item in entries.values():
             name = item['name']
@@ -136,23 +134,6 @@ def import_arche_data() -> int:
 def get_linked_image(data: list[dict[str, Any]]) -> str:
     return [image['__uri__'] for image in data
             if str(image['mime'][0]) == 'image/jpeg'][0]
-
-
-def get_or_create_type(hierarchy: Entity, type_name: str) -> Entity:
-    if type_ := get_type_by_name(type_name):
-        if type_.root[0] == hierarchy.id:
-            return type_
-    type_entity = Entity.insert('type', type_name)
-    type_entity.link('P127', hierarchy)
-    return type_entity
-
-
-def get_type_by_name(type_name: str) -> Optional[Type]:
-    type_ = None
-    for type_id in g.types:
-        if g.types[type_id].name == type_name:
-            type_ = g.types[type_id]
-    return type_
 
 
 def get_hierarchy_by_name(name: str) -> Type:
