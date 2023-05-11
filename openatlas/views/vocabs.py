@@ -3,7 +3,7 @@ from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
-from api.import_scripts.vocabs import import_vocabs_data
+from openatlas.api.import_scripts.vocabs import import_vocabs_data
 from openatlas.database.connect import Transaction
 from openatlas import app
 from openatlas.display.tab import Tab
@@ -15,8 +15,9 @@ from openatlas.display.util import (
 @required_group('readonly')
 def vocabs_index() -> str:
     if is_authorized('manager'):
-        app.config['VOCABS']['concepts'] = \
-            button(_('concepts'), url_for('vocabs_import_data', id_='topConcepts'))
+        app.config['VOCABS']['concepts'] = button(
+            _('show concepts'),
+            url_for('vocabs_import_data', id_='topConcepts'))
     return render_template(
         'tabs.html',
         tabs={'info': Tab(
