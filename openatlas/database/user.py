@@ -9,7 +9,7 @@ class User:
             u.id, u.username, u.password, u.active, u.real_name, u.info,
             u.created, u.modified, u.login_last_success, u.login_last_failure,
             u.login_failed_count, u.password_reset_code, u.password_reset_date,
-            u.email, r.name as group_name, u.unsubscribe_code
+            u.email, r.name AS group_name, u.unsubscribe_code
         FROM web."user" u
         LEFT JOIN web.group r ON u.group_id = r.id """
 
@@ -43,7 +43,7 @@ class User:
             """
             INSERT INTO web.user_settings (user_id, "name", "value")
             VALUES (%(user_id)s, %(name)s, %(value)s)
-            ON CONFLICT (user_id, name) DO UPDATE SET "value" = excluded.value;
+            ON CONFLICT (user_id, name) DO UPDATE SET "value" = %(value)s;
             """,
             {'user_id': user_id, 'name': name, 'value': value})
 
@@ -62,7 +62,7 @@ class User:
             """
             INSERT INTO web.user_settings (user_id, "name", "value")
             VALUES (%(user_id)s, 'language', %(value)s)
-            ON CONFLICT (user_id, name) DO UPDATE SET "value" = excluded.value;
+            ON CONFLICT (user_id, name) DO UPDATE SET "value" = %(value)s;
             """,
             {'user_id': user_id, 'value': value})
 
