@@ -1,15 +1,17 @@
 # This script is for developing purposes and not needed to install OpenAtlas.
 #
 # CIDOC CRM is used as basis for the underlying data model of OpenAtlas.
-# Currently we are using CIDOC CRM 7.7.1 (October 2021) from
-# http://www.cidoc-crm.org/versions-of-the-cidoc-crm
+# Currently, we are using CIDOC CRM 7.1.2 (June 2022):
+# https://cidoc-crm.org/rdfs/7.1.2/CIDOC_CRM_v7.1.2.rdf
 #
 # The script parses the rdfs file and imports it to a PostgreSQL database.
 # Installation of needed package: # apt-get install python3-rdflib
 #
-# Once run table data can be extracted with e.g.
+# After executing the script in install/crm: $ python3 cidoc_rtfs_parser.py
+# table data can than be extracted with e.g.
 # pg_dump --column-inserts --data-only --rows-per-insert=1000
 # --table=model.cidoc_class cidoc > class.sql
+#
 
 import time
 from typing import Dict, List, Optional
@@ -18,7 +20,7 @@ import psycopg2.extras
 from rdflib import URIRef
 from rdflib.graph import Graph
 
-FILENAME = 'CIDOC_CRM_v7.1.1.rdfs'
+FILENAME = 'CIDOC_CRM_v7.1.2.rdf'
 CRM_URL = 'http://www.cidoc-crm.org/cidoc-crm/'
 
 EXCLUDE_PROPERTIES = [
@@ -161,7 +163,7 @@ def import_cidoc() -> None:
         'de': 'hat Beziehung zu'}
     properties['OA8'] = Item(
         'OA8',
-        ' begins in',
+        'begins in',
         "OA8 is used to link the beginning of a persistent item's (E77) life "
         "span (or time of usage) with a certain place. E.g to document the "
         "birthplace of a person. E77 Persistent Item linked with a E53 Place: "
@@ -175,7 +177,7 @@ def import_cidoc() -> None:
 
     properties['OA9'] = Item(
         'OA9',
-        ' begins in',
+        'ends in',
         "OA9 is used to link the end of a persistent item's (E77) life span "
         "(or time of usage) with a certain place. E.g to document a person's "
         "place of death. E77 Persistent Item linked with a E53 Place: E77 "
@@ -191,31 +193,6 @@ def import_cidoc() -> None:
     cursor = connection.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
     cursor.execute("""
         BEGIN;
-
-        UPDATE model.entity SET (cidoc_class_code, openatlas_class_name) = 
-            ('E41', 'appellation') WHERE cidoc_class_code = 'E82';
-        UPDATE model.link SET property_code = 'P1' 
-            WHERE property_code = 'P131';
-        DELETE FROM model.openatlas_class WHERE cidoc_class_code = 'E82';
-        ALTER TABLE model.cidoc_class DROP COLUMN IF EXISTS created, 
-            DROP COLUMN IF EXISTS modified;
-        ALTER TABLE model.cidoc_class_inheritance 
-            DROP COLUMN IF EXISTS created, DROP COLUMN IF EXISTS modified;
-        ALTER TABLE model.cidoc_class_i18n DROP COLUMN IF EXISTS created, 
-            DROP COLUMN IF EXISTS modified;
-        ALTER TABLE model.property DROP COLUMN IF EXISTS created, 
-            DROP COLUMN IF EXISTS modified;
-        ALTER TABLE model.property_inheritance DROP COLUMN IF EXISTS created, 
-            DROP COLUMN IF EXISTS modified;
-        ALTER TABLE model.property_i18n DROP COLUMN IF EXISTS created, 
-            DROP COLUMN IF EXISTS modified;
-        DROP TRIGGER IF EXISTS update_modified ON model.cidoc_class;
-        DROP TRIGGER IF EXISTS update_modified 
-            ON model.cidoc_class_inheritance;
-        DROP TRIGGER IF EXISTS update_modified ON model.cidoc_class_i18n;
-        DROP TRIGGER IF EXISTS update_modified ON model.property;
-        DROP TRIGGER IF EXISTS update_modified ON model.property_inheritance;
-        DROP TRIGGER IF EXISTS update_modified ON model.property_i18n;
 
         ALTER TABLE model.entity 
             DROP CONSTRAINT IF EXISTS entity_class_code_fkey;
@@ -246,9 +223,12 @@ def import_cidoc() -> None:
                 reference_system_openatlas_class_openatlas_class_name_fkey;
 
         TRUNCATE 
-            model.cidoc_class_inheritance, model.cidoc_class_i18n, 
-            model.cidoc_class, model.property_inheritance, 
-            model.property_i18n, model.property;
+            model.cidoc_class_inheritance,
+            model.cidoc_class_i18n,
+            model.cidoc_class,
+            model.property_inheritance,
+            model.property_i18n,
+            model.property;
 
         ALTER SEQUENCE model.cidoc_class_id_seq RESTART;
         ALTER SEQUENCE model.cidoc_class_inheritance_id_seq RESTART;
@@ -259,6 +239,7 @@ def import_cidoc() -> None:
 
     # Classes
     for code, class_ in classes.items():
+        print(code)
         sql = """
             INSERT INTO model.cidoc_class (code, name, comment)
             VALUES (%(code)s, %(name)s, %(comment)s);"""
@@ -398,7 +379,7 @@ def import_cidoc() -> None:
             ON UPDATE CASCADE ON DELETE CASCADE;
         """)
     cursor.execute("COMMIT")
-    print('Execution time: ' + str(int(time.time() - start)) + ' seconds')
+    print(f'Execution time: {int(time.time() - start)} seconds')
 
 
 import_cidoc()
