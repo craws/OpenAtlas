@@ -10,26 +10,48 @@ from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, display_info, is_authorized, manual, required_group)
+    button, display_info, is_authorized, required_group, display_form)
+from openatlas.forms.form import get_vocabs_form
 
 
 @app.route('/vocabs')
 @required_group('readonly')
 def vocabs_index() -> str:
-    if is_authorized('manager'):
-        app.config['VOCABS']['concepts'] = button(
-            _('show concepts'),
-            url_for('vocabs_fetch', concept='topConcepts'))
+    # if is_authorized('manager'):
+    #     app.config['VOCABS']['concepts'] = button(
+    #         _('show concepts'),
+    #         url_for('vocabs_fetch', concept='topConcepts'))
+    print(g.settings)
     return render_template(
         'tabs.html',
         tabs={'info': Tab(
             'info',
             display_info({
-                k: str(v) for k, v in app.config['VOCABS'].items()}),
-            buttons=[manual('admin/vocabs')])},
+                _('base url'): g.settings['vocabs_base_url'],
+                _('endpoint'): g.settings['vocabs_endpoint'],
+                _('user'): g.settings['vocabs_user']}),
+            buttons=[
+                button(_('edit'), url_for('vocabs_update'))
+                if is_authorized('manager') else ''])},
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
             'VOCABS'])
+
+
+@app.route('/vocabs/update', methods=['GET', 'POST'])
+@required_group('manager')
+def vocabs_update() -> str:
+    form = get_vocabs_form()
+    if form.validate_on_submit():
+        return redirect(url_for('vocabs_index'))
+    return render_template(
+        'content.html',
+        title='VOCABS',
+        content=display_form(form),
+        crumbs=[
+            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            ['VOCABS', f"{url_for('vocabs_index')}"],
+            _('edit')])
 
 
 @app.route('/vocabs/<concept>')
@@ -55,7 +77,7 @@ def vocabs_fetch(concept: str) -> str:
         crumbs=[['VOCABS', url_for('vocabs_index')], _('fetch')])
 
 
-@app.route('/vocabs/import/<concept>', methods=['POST', 'GET'])
+@app.route('/vocabs/import/<concept>', methods=['GET', 'POST'])
 @required_group('manager')
 def vocabs_import_data(concept: str) -> Response:
     try:

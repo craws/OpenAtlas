@@ -45,4 +45,7 @@ INSERT INTO web.settings (name, value) VALUES
   ('profile_image_width', '200'),
   ('random_password_length', '16'),
   ('reset_confirm_hours', '24'),
-  ('site_name', 'OpenAtlas');
+  ('site_name', 'OpenAtlas'),
+  ('vocabs_base_url', 'https://vocabs.acdh.oeaw.ac.at/'),
+  ('vocabs_endpoint', 'rest/v1/'),
+  ('vocabs_user', '');
