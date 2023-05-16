@@ -44,7 +44,8 @@ class Link:
     def get_linked_entities(id_: int, codes: list[str]) -> list[int]:
         g.cursor.execute(
             """
-            SELECT range_id AS result_id FROM model.link
+            SELECT range_id AS result_id
+            FROM model.link
             WHERE domain_id = %(id_)s AND property_code IN %(codes)s;
             """,
             {'id_': id_, 'codes': tuple(codes)})
@@ -77,7 +78,8 @@ class Link:
     def get_linked_entities_inverse(id_: int, codes: list[str]) -> list[int]:
         g.cursor.execute(
             """
-            SELECT domain_id AS result_id FROM model.link
+            SELECT domain_id AS result_id
+            FROM model.link
             WHERE range_id = %(id_)s AND property_code IN %(codes)s;
             """,
             {'id_': id_, 'codes': tuple(codes)})
@@ -113,7 +115,7 @@ class Link:
             codes = codes if isinstance(codes, list) else [codes]
             sql += ' AND l.property_code IN %(codes)s '
         sql += f"""
-            WHERE l.{'range' if inverse else 'domain'}_id in %(entities)s
+            WHERE l.{'range' if inverse else 'domain'}_id IN %(entities)s
             GROUP BY l.id, e.name
             ORDER BY e.name;"""
         g.cursor.execute(
@@ -179,9 +181,9 @@ class Link:
             """
             SELECT domain_id
             FROM model.link
-            WHERE range_id IN %(type_ids)s
-            AND property_code in ('P2', 'P89')
-            GROUP BY id ORDER BY id;
+            WHERE range_id IN %(type_ids)s AND property_code IN ('P2', 'P89')
+            GROUP BY id
+            ORDER BY id;
             """,
             {'type_ids': tuple(type_ids)})
         return [row[0] for row in g.cursor.fetchall()]
@@ -216,7 +218,8 @@ class Link:
                 l.domain_id,
                 l.range_id,
                 l.description,
-                l.created, l.modified
+                l.created,
+                l.modified
             FROM model.link l
             JOIN model.entity d ON l.domain_id = d.id
             JOIN model.entity r ON l.range_id = r.id
@@ -229,7 +232,8 @@ class Link:
 
     @staticmethod
     def get_all_links() -> list[dict[str, Any]]:
-        g.cursor.execute("""
+        g.cursor.execute(
+            """
             SELECT
                 l.id,
                 l.property_code,
@@ -251,7 +255,7 @@ class Link:
                 l.end_comment,
                 COALESCE(to_char(l.end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
                     AS end_to
-            FROM model.link l
+            FROM model.link l;
             """)
         return [dict(row) for row in g.cursor.fetchall()]
 
@@ -277,7 +281,7 @@ class Link:
                 type_id,
                 begin_from, begin_to, begin_comment,
                 end_from, end_to, end_comment
-            HAVING COUNT(*) > 1
+            HAVING COUNT(*) > 1;
             """)
         return [dict(row) for row in g.cursor.fetchall()]
 

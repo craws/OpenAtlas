@@ -27,20 +27,20 @@ class Import:
 
     @staticmethod
     def get_all_projects() -> list[dict[str, Any]]:
-        g.cursor.execute(f'{Import.sql} GROUP by p.id ORDER BY name;')
+        g.cursor.execute(f'{Import.sql} GROUP BY p.id ORDER BY name;')
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_project_by_id(id_: int) -> dict[str, Any]:
         g.cursor.execute(
-            f'{Import.sql} WHERE p.id = %(id)s GROUP by p.id;',
+            f'{Import.sql} WHERE p.id = %(id)s GROUP BY p.id;',
             {'id': id_})
         return dict(g.cursor.fetchone())
 
     @staticmethod
     def get_project_by_name(name: str) -> Optional[dict[str, Any]]:
         g.cursor.execute(
-            f'{Import.sql} WHERE p.name = %(name)s GROUP by p.id;',
+            f'{Import.sql} WHERE p.name = %(name)s GROUP BY p.id;',
             {'name': name})
         return dict(g.cursor.fetchone()) if g.cursor.rowcount else None
 
@@ -90,11 +90,17 @@ class Import:
         g.cursor.execute(
             """
             INSERT INTO import.entity (
-                project_id, origin_id, entity_id, user_id)
+                project_id,
+                origin_id,
+                entity_id,
+                user_id)
             VALUES (
-                %(project_id)s, %(origin_id)s, %(entity_id)s, %(user_id)s);
+                %(project_id)s,
+                %(origin_id)s,
+                %(entity_id)s,
+                %(user_id)s);
             """, {
                 'project_id': project_id,
+                'origin_id': origin_id,
                 'entity_id': entity_id,
-                'user_id': user_id,
-                'origin_id': origin_id})
+                'user_id': user_id})

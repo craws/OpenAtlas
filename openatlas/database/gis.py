@@ -140,7 +140,7 @@ class Gis:
             WHERE place.cidoc_class_code = 'E53'
                 AND l.property_code = 'P53'
                 AND (object.openatlas_class_name = 'place'
-                OR object.id IN %(extra_ids)s)
+                    OR object.id IN %(extra_ids)s)
             GROUP BY object.id, g.id;
             """,
             {'extra_ids': tuple(extra_ids)})

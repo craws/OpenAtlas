@@ -53,9 +53,8 @@ class Type:
     def get_hierarchies() -> list[dict[str, Any]]:
         g.cursor.execute(
             """
-            SELECT
-                h.id, h.name, h.category, h.multiple, h.directional, h.required
-            FROM web.hierarchy h;
+            SELECT id, name, category, multiple, directional, required
+            FROM web.hierarchy;
             """)
         return [dict(row) for row in g.cursor.fetchall()]
 
