@@ -23,7 +23,8 @@ def fetch_top_level(
         f"{app.config['VOCABS']['api_uri']}{app.config['VOCABS']['id']}"
         f"/{concept}",
         timeout=60,
-        auth=(app.config['VOCABS_USER'], app.config['VOCABS_PW']))
+        auth=(app.config['VOCABS_USER'], app.config['VOCABS_PW'])
+    )
     exact_match_id = get_exact_match().id
     hierarchies = []
     hierarchy = None

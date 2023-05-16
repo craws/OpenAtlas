@@ -3,8 +3,8 @@ from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
-from openatlas.api.import_scripts.vocabs import import_vocabs_data, \
-    fetch_top_level, get_vocabularies
+from openatlas.api.import_scripts.vocabs import (
+    import_vocabs_data, fetch_top_level)
 from openatlas.database.connect import Transaction
 from openatlas import app
 from openatlas.display.tab import Tab
@@ -16,7 +16,6 @@ from openatlas.display.util import (
 @app.route('/vocabs')
 @required_group('readonly')
 def vocabs_index() -> str:
-    print(get_vocabularies('acdh-ch'))
     if is_authorized('manager'):
         app.config['VOCABS']['concepts'] = button(
             _('show concepts'),
@@ -28,7 +27,9 @@ def vocabs_index() -> str:
             display_info({
                 k: str(v) for k, v in app.config['VOCABS'].items()}),
             buttons=[manual('admin/vocabs')])},
-        crumbs=['VOCABS'])
+        crumbs=[
+            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            'VOCABS'])
 
 
 @app.route('/vocabs/<concept>')
