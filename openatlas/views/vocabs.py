@@ -1,4 +1,4 @@
-from flask import render_template, url_for, g, flash
+from flask import render_template, url_for, g, flash, request
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
@@ -12,16 +12,12 @@ from openatlas.display.table import Table
 from openatlas.display.util import (
     button, display_info, is_authorized, required_group, display_form)
 from openatlas.forms.form import get_vocabs_form
+from openatlas.models.settings import Settings
 
 
 @app.route('/vocabs')
 @required_group('readonly')
 def vocabs_index() -> str:
-    # if is_authorized('manager'):
-    #     app.config['VOCABS']['concepts'] = button(
-    #         _('show concepts'),
-    #         url_for('vocabs_fetch', concept='topConcepts'))
-    print(g.settings)
     return render_template(
         'tabs.html',
         tabs={'info': Tab(
@@ -43,7 +39,16 @@ def vocabs_index() -> str:
 def vocabs_update() -> str:
     form = get_vocabs_form()
     if form.validate_on_submit():
+        Settings.update({
+            'vocabs_base_url': form.base_url.data,
+            'vocabs_endpoint': form.endpoint.data,
+            'vocabs_user': form.vocabs_user.data})
+        flash(_('info update'), 'info')
         return redirect(url_for('vocabs_index'))
+    if request.method != 'POST':
+        form.base_url.data = g.settings['vocabs_base_url']
+        form.endpoint.data = g.settings['vocabs_endpoint']
+        form.vocabs_user.data = g.settings['vocabs_user']
     return render_template(
         'content.html',
         title='VOCABS',
