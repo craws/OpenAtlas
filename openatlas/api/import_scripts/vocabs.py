@@ -23,9 +23,7 @@ def fetch_top_level(
         f"{app.config['VOCABS']['api_uri']}{app.config['VOCABS']['id']}"
         f"/{concept}",
         timeout=60,
-        auth=(app.config['VOCABS_USER'], app.config['VOCABS_PW'])
-        # Todo: auth can be deleted if public
-    )
+        auth=(app.config['VOCABS_USER'], app.config['VOCABS_PW']))
     exact_match_id = get_exact_match().id
     hierarchies = []
     hierarchy = None
@@ -87,4 +85,33 @@ def get_vocabs_reference_system() -> ReferenceSystem:
     if 'artifact' not in system.classes:
         Db.add_classes(system.id, ['artifact'])
     return system
+
+
+def get_vocabularies(vocabs_code: str):
+    out = []
+    for voc in fetch_vocabularies(vocabs_code):
+        out.append(voc | fetch_vocabulary_details(vocabs_code, voc['uri']))
+    return out
+
+
+def fetch_vocabulary_details(vocabs_code: str, id_: str) -> dict[str, str]:
+    req = requests.get(
+        f"{app.config['VOCABS_URI'][vocabs_code]['api']}{id_}",
+        params={'lang': 'en'},
+        timeout=60,
+        auth=(app.config['VOCABS_USER'], app.config['VOCABS_PW']))
+    data = req.json()
+    return {
+        'defaultLanguage': data['defaultLanguage'],
+        'languages': data['languages']}
+
+
+def fetch_vocabularies(vocabs_code: str) -> list[dict[str, str]]:
+    req = requests.get(
+        f"{app.config['VOCABS_URI'][vocabs_code]['api']}vocabularies",
+        params={'lang': 'en'},
+        timeout=60,
+        auth=(app.config['VOCABS_USER'], app.config['VOCABS_PW']))
+    return req.json()['vocabularies']
+
 
