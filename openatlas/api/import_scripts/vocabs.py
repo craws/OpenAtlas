@@ -88,31 +88,32 @@ def get_vocabs_reference_system() -> ReferenceSystem:
     return system
 
 
-def get_vocabularies(vocabs_code: str):
+def get_vocabularies():
     out = []
-    for voc in fetch_vocabularies(vocabs_code):
-        out.append(voc | fetch_vocabulary_details(vocabs_code, voc['uri']))
+    for voc in fetch_vocabularies():
+        out.append(voc | fetch_vocabulary_details(voc['uri']))
     return out
 
 
-def fetch_vocabulary_details(vocabs_code: str, id_: str) -> dict[str, str]:
+def fetch_vocabulary_details(id_: str) -> dict[str, str]:
     req = requests.get(
-        f"{app.config['VOCABS_URI'][vocabs_code]['api']}{id_}",
+        f"{g.settings['vocabs_base_url']}{g.settings['vocabs_endpoint']}{id_}",
         params={'lang': 'en'},
         timeout=60,
         auth=(app.config['VOCABS_USER'], app.config['VOCABS_PW']))
     data = req.json()
     return {
+        'id': data['id'],
+        'title': data['title'],
         'defaultLanguage': data['defaultLanguage'],
         'languages': data['languages']}
 
 
-def fetch_vocabularies(vocabs_code: str) -> list[dict[str, str]]:
+def fetch_vocabularies() -> list[dict[str, str]]:
     req = requests.get(
-        f"{app.config['VOCABS_URI'][vocabs_code]['api']}vocabularies",
+        f"{g.settings['vocabs_base_url']}{g.settings['vocabs_endpoint']}"
+        "vocabularies",
         params={'lang': 'en'},
         timeout=60,
         auth=(app.config['VOCABS_USER'], app.config['VOCABS_PW']))
     return req.json()['vocabularies']
-
-

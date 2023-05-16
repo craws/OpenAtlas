@@ -1,16 +1,19 @@
+from typing import Optional
+
 from flask import render_template, url_for, g, flash, request
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas.api.import_scripts.vocabs import (
-    import_vocabs_data, fetch_top_level)
+    import_vocabs_data, fetch_top_level, get_vocabularies,
+    fetch_vocabulary_details)
 from openatlas.database.connect import Transaction
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, display_info, is_authorized, required_group, display_form)
+    button, display_info, is_authorized, required_group, display_form, link)
 from openatlas.forms.form import get_vocabs_form
 from openatlas.models.settings import Settings
 
@@ -28,7 +31,9 @@ def vocabs_index() -> str:
                 _('user'): g.settings['vocabs_user']}),
             buttons=[
                 button(_('edit'), url_for('vocabs_update'))
-                if is_authorized('manager') else ''])},
+                if is_authorized('manager') else '',
+                button(_('show vocabularies'), url_for('show_vocabularies'))
+            ])},
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
             'VOCABS'])
@@ -57,6 +62,49 @@ def vocabs_update() -> str:
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
             ['VOCABS', f"{url_for('vocabs_index')}"],
             _('edit')])
+
+
+@app.route('/vocabs/vocabularies')
+@required_group('manager')
+def show_vocabularies() -> str:
+    vocabularies = get_vocabularies()
+    table = Table(
+        header=[_('name'), 'ID', _('default language'), _('languages')])
+    for entry in vocabularies:
+        table.rows.append([
+            entry['title'],
+            entry['id'],
+            entry['defaultLanguage'],
+            ' '.join(entry['languages']),
+            vocabulary_detail(
+                url_for('vocabulary_detail_view', id_=entry['id']))])
+    tabs = {'vocabularies': Tab(_('vocabularies'), table=table)}
+    return render_template(
+        'tabs.html',
+        tabs=tabs,
+        title='VOCABS',
+        crumbs=[
+            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            ['VOCABS', f"{url_for('vocabs_index')}"],
+            _('vocabularies')])
+
+
+def vocabulary_detail(url: str) -> Optional[str]:
+    return link(_('details'), url) if is_authorized('manager') else None
+
+
+@app.route('/vocabs/<id_>')
+@required_group('manager')
+def vocabulary_detail_view(id_: str) -> str:
+    data = fetch_vocabulary_details(id_)
+
+    return render_template(
+        'content.html',
+        title=data['title'],
+        crumbs=[
+            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            ['VOCABS', f"{url_for('vocabs_index')}"],
+            data['title']])
 
 
 @app.route('/vocabs/<concept>')
