@@ -6,6 +6,16 @@ from flask import g
 class Network:
 
     @staticmethod
+    def get_ego_network(ids: set[int]) -> list[dict[str, Any]]:
+        g.cursor.execute(
+            """
+            SELECT id, domain_id, property_code, range_id
+            FROM model.link
+            WHERE domain_id IN %(ids)s or range_id IN %(ids)s;
+            """, {'ids': tuple(ids)})
+        return [dict(row) for row in g.cursor.fetchall()]
+
+    @staticmethod
     def get_edges(
             classes: list[str],
             properties: list[str]) -> list[dict[str, int]]:
@@ -28,7 +38,7 @@ class Network:
             """
             SELECT e.id, e.name, e.openatlas_class_name
             FROM model.entity e
-            WHERE openatlas_class_name IN %(classes)s
+            WHERE openatlas_class_name IN %(classes)s;
             """,
             {'classes': tuple(classes)})
         return [dict(row) for row in g.cursor.fetchall()]
@@ -41,6 +51,6 @@ class Network:
             FROM model.entity e
             JOIN model.link l ON e.id = l.domain_id AND l.property_code = 'P53'
             JOIN model.entity e2 ON l.range_id = e2.id
-                AND e2.openatlas_class_name = 'place';
+                AND e.openatlas_class_name = 'place';
             """)
         return {row['range_id']: row['id'] for row in g.cursor.fetchall()}

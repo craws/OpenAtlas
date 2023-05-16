@@ -138,15 +138,6 @@ class Tab:
                             'insert',
                             class_='human_remains',
                             origin_id=id_)))
-        elif name == 'entities':
-            if id_ and id_ in g.types:
-                type_ = g.types[id_]
-                root = g.types[type_.root[0]] if type_.root else type_
-                if root.category not in ['system', 'value']:
-                    self.buttons.append(
-                        button(
-                            _('move entities'),
-                            url_for('type_move_entities', id_=id_)))
         elif name == 'event':
             if view == 'file':
                 self.buttons.append(
@@ -170,17 +161,20 @@ class Tab:
                         'link',
                         url_for('reference_add', id_=id_, view='event')))
             if view == 'artifact':
-                for item in ['acquisition', 'move', 'production']:
+                for item in \
+                        ['acquisition', 'modification', 'move', 'production']:
                     self.buttons.append(
                         button(
                             g.classes[item].label,
-                            url_for('insert', class_=item, origin_id=id_)))
+                            url_for('insert', class_=item, origin_id=id_),
+                            tooltip_text=g.classes[item].get_tooltip()))
             else:
                 for item in g.view_class_mapping['event']:
                     self.buttons.append(
                         button(
                             g.classes[item].label,
-                            url_for('insert', class_=item, origin_id=id_)))
+                            url_for('insert', class_=item, origin_id=id_),
+                            tooltip_text=g.classes[item].get_tooltip()))
         elif name == 'feature':
             if class_ and class_.name == 'place':
                 self.buttons.append(

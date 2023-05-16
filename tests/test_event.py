@@ -110,6 +110,17 @@ class EventTest(TestBaseCase):
             assert b'A creation event' in rv.data
 
             rv = self.app.post(
+                url_for('insert', class_='modification'),
+                data={'name': 'A modification event', 'artifact': artifact.id})
+            modification_id = rv.location.split('/')[-1]
+
+            rv = self.app.get(url_for('view', id_=modification_id))
+            assert b'A modification event' in rv.data
+
+            rv = self.app.get(url_for('update', id_=modification_id))
+            assert b'A modification event' in rv.data
+
+            rv = self.app.post(
                 url_for('insert', class_='production'),
                 data={'name': 'A productive event', 'artifact': artifact.id})
             production_id = rv.location.split('/')[-1]

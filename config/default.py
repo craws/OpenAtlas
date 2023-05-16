@@ -3,7 +3,7 @@ from pathlib import Path
 
 from config.database_versions import DATABASE_VERSIONS
 
-VERSION = '7.12.0'
+VERSION = '7.14.0'
 DATABASE_VERSION = DATABASE_VERSIONS[0]
 DEMO_MODE = False  # If activated some options are disabled, login is prefilled
 
@@ -69,6 +69,20 @@ JSON_FORMATS = {
     'geojson': 'application/json',
     'geojson-v2': 'application/json'}
 API_FORMATS = RDF_FORMATS | JSON_FORMATS
+
+LOGICAL_OPERATOR: list[str] = ['and', 'or']
+STR_CATEGORIES: list[str] = [
+    "entityName", "entityDescription", "entityAliases", "entityCidocClass",
+    "entitySystemClass", "typeName", "typeNameWithSubs",
+    "beginFrom", "beginTo", "endFrom", "endTo"]
+INT_CATEGORIES: list[str] = [
+    "entityID", "typeID", "typeIDWithSubs", "relationToID"]
+SET_CATEGORIES: list[str] = ["valueTypeID"]
+VALID_CATEGORIES: list[str] = [
+    *STR_CATEGORIES, *INT_CATEGORIES, *SET_CATEGORIES]
+COMPARE_OPERATORS: list[str] = [
+    'equal', 'notEqual', 'greaterThan', 'lesserThan', 'greaterThanEqual',
+    'lesserThanEqual', 'like']
 
 # Used to connect to ACDH-CH ARCHE systems
 ARCHE = {

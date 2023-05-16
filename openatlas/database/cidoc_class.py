@@ -26,7 +26,8 @@ class CidocClass:
     def get_translations(language_codes: list[str]) -> list[dict[str, Any]]:
         g.cursor.execute(
             """
-            SELECT class_code, language_code, text FROM model.cidoc_class_i18n
+            SELECT class_code, language_code, text
+            FROM model.cidoc_class_i18n
             WHERE language_code IN %(language_codes)s;
             """,
             {'language_codes': tuple(language_codes)})

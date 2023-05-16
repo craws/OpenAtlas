@@ -52,9 +52,9 @@ settings = Settings.get_settings(cursor)
 
 def database_upgrade() -> None:
     print(f"{VERSION} OpenAtlas version")
-    print(f"{DATABASE_VERSION} Database version required")
     check_database_version_exist()
-    print(f"{settings['database_version']} Installed database version")
+    print(f"{settings['database_version']} Database version")
+    print(f"{DATABASE_VERSION} Database version required")
     check_database_version_supported()
     check_upgrade_needed()
     backup_database()

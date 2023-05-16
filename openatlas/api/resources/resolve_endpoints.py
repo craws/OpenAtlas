@@ -205,7 +205,7 @@ def get_entities_formatted(
 
 def parse_loud_context() -> dict[str, str]:
     file_path = pathlib.Path(app.root_path) / 'api' / 'linked-art.json'
-    with open(file_path) as f:
+    with open(file_path, encoding='utf-8') as f:
         output = {}
         for key, value in json.load(f)['@context'].items():
             if isinstance(value, dict):

@@ -48,6 +48,12 @@ class BaseDisplay:
         self.buttons.append(bookmark_toggle(self.entity.id))
         self.buttons.append(
             render_template('util/api_links.html', entity=self.entity))
+        if self.entity and self.entity.class_.view not in \
+                ['source', 'reference', 'reference_system', 'type']:
+            self.buttons.append(
+                button(
+                    _('network'),
+                    url_for('network', dimensions=0, id_=self.entity.id)))
         self.buttons.append(siblings_pager(self.entity, self.structure))
         if self.linked_places:
             self.gis_data = Gis.get_all(self.linked_places)
@@ -272,11 +278,11 @@ class EventsDisplay(BaseDisplay):
         super().add_data()
         self.data[_('sub event of')] = \
             link(self.entity.get_linked_entity('P9'))
-        self.data[_('preceding event')] = link(
-            self.entity.get_linked_entity('P134', True))
+        self.data[_('preceding event')] = \
+            link(self.entity.get_linked_entity('P134'))
         self.data[_('succeeding event')] = \
-            '<br>'.join(
-                [link(e) for e in self.entity.get_linked_entities('P134')])
+            '<br>'.join([link(e) for e in
+                self.entity.get_linked_entities('P134', True)])
         if place := self.entity.get_linked_entity('P7'):
             self.data[_('location')] = \
                 link(place.get_linked_entity_safe('P53', True))
@@ -470,7 +476,7 @@ class TypeBaseDisplay(BaseDisplay):
         else:
             entities = entity.get_linked_entities(['P2', 'P89'], True, True)
             root_places = {}
-            if possible_sub_unit:
+            if possible_sub_unit and entities:
                 root_places = Entity.get_roots(
                     'P46',
                     [e.id for e in entities],
@@ -489,3 +495,9 @@ class TypeBaseDisplay(BaseDisplay):
                         url_for('view', id_=root_places[item.id]['id']))
                     if item.id in root_places else '')
                 self.tabs['entities'].table.rows.append(data)
+        if root.category not in ['system', 'value'] \
+                and self.tabs['entities'].table.rows:
+            self.tabs['entities'].buttons.append(
+                button(
+                    _('move entities'),
+                    url_for('type_move_entities', id_=entity.id)))

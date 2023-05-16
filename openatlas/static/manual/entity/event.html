@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Event &mdash; OpenAtlas 7.11.0 documentation</title>
+  <title>Event &mdash; OpenAtlas 7.13.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                7.12.0
+                7.13.0
               </div>
             
           
@@ -194,11 +194,13 @@
 <h1>Event<a class="headerlink" href="#event" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>CIDOC documentation: <a class="reference external" href="https://www.cidoc-crm.org/Entity/e5-event/version-7.1.1">E5 Event</a>,
+<p>CIDOC documentation:
 <a class="reference external" href="https://www.cidoc-crm.org/Entity/e7-activity/version-7.1.1">E7 Activity</a>,
 <a class="reference external" href="https://www.cidoc-crm.org/Entity/e8-acquisition/version-7.1.1">E8 Acquisition</a>,
-<a class="reference external" href="https://www.cidoc-crm.org/Entity/e9-move/version-7.1.1">E9 Move</a> and
-<a class="reference external" href="https://www.cidoc-crm.org/Entity/e12-production/version-7.1.1">E12 Production</a>
+<a class="reference external" href="https://www.cidoc-crm.org/Entity/e5-event/version-7.1.1">E5 Event</a>,
+<a class="reference external" href="https://www.cidoc-crm.org/Entity/e11-modification/version-7.1.1">E11 Modification</a>,
+<a class="reference external" href="https://www.cidoc-crm.org/Entity/e9-move/version-7.1.1">E9 Move</a>,
+<a class="reference external" href="https://www.cidoc-crm.org/Entity/e12-production/version-7.1.1">E12 Production</a> and
 <a class="reference external" href="https://www.cidoc-crm.org/Entity/e65-creation/version-7.1.1">E65 Creation</a></p>
 <ul class="simple">
 <li><p><strong>Activity</strong> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e7-activity/version-7.1.1">E7 Activity</a>)
@@ -207,13 +209,18 @@
 - mapping a change of property</p></li>
 <li><p><strong>Creation</strong> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e65-creation/version-7.1.1">E65 Creation</a>)
 - creation of documents (files)</p></li>
-<li><p><strong>Event</strong> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e5-event/version-7.1.1">E5 Event</a>)
+<li><p><strong>Event</strong> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e11-modification/version-7.1.1">E5 Event</a>)
 - used for events not performed by actors, e.g. a natural disaster</p></li>
+<li><p><strong>Modification</strong> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e5-event/version-7.1.1">E11 Event</a>)
+- used for modification of artifacts, e.g. a conservation treatment</p></li>
 <li><p><strong>Move</strong> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e9-move/version-7.1.1">E9 Move</a>)
 - movement of artifacts or persons</p></li>
 <li><p><strong>Production</strong> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e12-production/version-7.1.1">E12 Production</a>)
 - creation of artifacts</p></li>
 </ul>
+<img alt="../_images/event_hierarchy.png" src="../_images/event_hierarchy.png" />
+<p><a class="reference external" href="https://www.cidoc-crm.org/">CIDOC CRM</a> hierarchy for the different types of
+events included in OpenAtlas.</p>
 <p>On the index page already entered entities are listed in a <a class="reference internal" href="../ui/table.html"><span class="doc">Table</span></a>.</p>
 <ul class="simple">
 <li><p>Click on the <strong>+</strong> button to enter a new one.</p></li>
@@ -266,6 +273,14 @@ select as activity:</p>
 <p>The creators of the document can be added via the <strong>Actor</strong> tab and selecting
 the <strong>carried out by</strong> activity while linking them.</p>
 </div>
+<div class="section" id="modification">
+<h3>Modification<a class="headerlink" href="#modification" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><a class="reference internal" href="artifact.html"><span class="doc">Artifact</span></a> - to select artifacts that were modified</p></li>
+</ul>
+<p>The creators of the artifact can be added via the <strong>Actor</strong> tab and selecting
+the <strong>carried out by</strong> activity while linking them.</p>
+</div>
 <div class="section" id="move">
 <h3>Move<a class="headerlink" href="#move" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
@@ -280,7 +295,7 @@ the <strong>carried out by</strong> activity while linking them.</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="artifact.html"><span class="doc">Artifact</span></a> - to select artifacts that were produced</p></li>
 </ul>
-<p>The creators if the artifact can be added via the <strong>Actor</strong> tab and selecting
+<p>The creators of the artifact can be added via the <strong>Actor</strong> tab and selecting
 the <strong>carried out by</strong> activity while linking them.</p>
 </div>
 </div>

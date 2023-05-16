@@ -144,6 +144,14 @@ class HumanRemainsDisplay(ArtifactDisplay):
     pass
 
 
+class ModificationDisplay(EventsDisplay):
+
+    def add_data(self) -> None:
+        super().add_data()
+        self.data[_('artifact')] = \
+            [link(entity) for entity in self.entity.get_linked_entities('P31')]
+
+
 class MoveDisplay(EventsDisplay):
 
     def add_data(self) -> None:
