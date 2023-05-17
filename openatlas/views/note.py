@@ -65,7 +65,7 @@ def note_set_private(id_: int) -> Union[str, Response]:
     return redirect(f"{url_for('view', id_=note['entity_id'])}#tab-note")
 
 
-@app.route('/note/insert/<int:entity_id>', methods=['POST', 'GET'])
+@app.route('/note/insert/<int:entity_id>', methods=['GET', 'POST'])
 @required_group('contributor')
 def note_insert(entity_id: int) -> Union[str, Response]:
     entity = Entity.get_by_id(entity_id)
@@ -89,7 +89,7 @@ def note_insert(entity_id: int) -> Union[str, Response]:
             + _('note') + '</span>'])
 
 
-@app.route('/note/update/<int:id_>', methods=['POST', 'GET'])
+@app.route('/note/update/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
 def note_update(id_: int) -> Union[str, Response]:
     note = User.get_note_by_id(id_)
@@ -114,7 +114,7 @@ def note_update(id_: int) -> Union[str, Response]:
             _('edit note')])
 
 
-@app.route('/note/delete/<int:id_>', methods=['POST', 'GET'])
+@app.route('/note/delete/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
 def note_delete(id_: int) -> Response:
     note = User.get_note_by_id(id_)

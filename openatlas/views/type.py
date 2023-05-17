@@ -75,7 +75,7 @@ def type_delete(id_: int) -> Response:
         url_for('view', id_=root.id) if root else url_for('type_index'))
 
 
-@app.route('/type/delete_recursive/<int:id_>', methods=['POST', 'GET'])
+@app.route('/type/delete_recursive/<int:id_>', methods=['GET', 'POST'])
 @required_group('editor')
 def type_delete_recursive(id_: int) -> Union[str, Response]:
 
@@ -131,7 +131,7 @@ def type_delete_recursive(id_: int) -> Union[str, Response]:
     return render_template('tabs.html', tabs=tabs, crumbs=crumbs)
 
 
-@app.route('/type/move/<int:id_>', methods=['POST', 'GET'])
+@app.route('/type/move/<int:id_>', methods=['GET', 'POST'])
 @required_group('editor')
 def type_move_entities(id_: int) -> Union[str, Response]:
     type_ = g.types[id_]

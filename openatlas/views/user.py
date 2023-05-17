@@ -89,8 +89,8 @@ class ActivityForm(FlaskForm):
     save = SubmitField(_('apply'))
 
 
-@app.route('/admin/user/activity', methods=['POST', 'GET'])
-@app.route('/admin/user/activity/<int:user_id>', methods=['POST', 'GET'])
+@app.route('/admin/user/activity', methods=['GET', 'POST'])
+@app.route('/admin/user/activity/<int:user_id>', methods=['GET', 'POST'])
 @required_group('readonly')
 def user_activity(user_id: int = 0) -> str:
     form = ActivityForm()
@@ -208,7 +208,7 @@ def user_entities(id_: int) -> str:
             _('created entities')])
 
 
-@app.route('/admin/user/update/<int:id_>', methods=['POST', 'GET'])
+@app.route('/admin/user/update/<int:id_>', methods=['GET', 'POST'])
 @required_group('manager')
 def user_update(id_: int) -> Union[str, Response]:
     user = User.get_by_id(id_)
@@ -244,7 +244,7 @@ def user_update(id_: int) -> Union[str, Response]:
             _('edit')])
 
 
-@app.route('/admin/user/insert', methods=['POST', 'GET'])
+@app.route('/admin/user/insert', methods=['GET', 'POST'])
 @required_group('manager')
 def user_insert() -> Union[str, Response]:
     form = UserForm()

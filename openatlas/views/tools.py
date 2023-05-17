@@ -136,7 +136,7 @@ def sex_delete(id_: int) -> Union[str, Response]:
     return redirect(url_for('tools_index', id_=id_))
 
 
-@app.route('/tools/sex/update/<int:id_>', methods=['POST', 'GET'])
+@app.route('/tools/sex/update/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
 def sex_update(id_: int) -> Union[str, Response]:
 
@@ -211,7 +211,7 @@ def carbon(id_: int) -> Union[str, Response]:
             _('radiocarbon dating')])
 
 
-@app.route('/tools/carbon/update/<int:id_>', methods=['POST', 'GET'])
+@app.route('/tools/carbon/update/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
 def carbon_update(id_: int) -> Union[str, Response]:
 
