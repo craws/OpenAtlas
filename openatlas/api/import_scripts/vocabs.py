@@ -106,7 +106,20 @@ def fetch_vocabulary_details(id_: str) -> dict[str, str]:
         'id': data['id'],
         'title': data['title'],
         'defaultLanguage': data['defaultLanguage'],
-        'languages': data['languages']}
+        'languages': data['languages'],
+        'conceptUri': data['conceptschemes'][0]['uri'] if data['conceptschemes'] else ''
+    }
+
+
+def fetch_vocabulary_metadata(id_: str, uri: str) -> dict[str, str]:
+    req = requests.get(
+        f"{g.settings['vocabs_base_url']}{g.settings['vocabs_endpoint']}"
+        f"{id_}/data",
+        params={'uri': uri, 'format': 'application/ld+json'},
+        timeout=60,
+        auth=(app.config['VOCABS_USER'], app.config['VOCABS_PW']))
+    data = req.json()
+    return data['graph'][0]
 
 
 def fetch_vocabularies() -> list[dict[str, str]]:

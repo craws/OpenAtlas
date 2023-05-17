@@ -7,7 +7,7 @@ from werkzeug.wrappers import Response
 
 from openatlas.api.import_scripts.vocabs import (
     import_vocabs_data, fetch_top_level, get_vocabularies,
-    fetch_vocabulary_details)
+    fetch_vocabulary_details, fetch_vocabulary_metadata)
 from openatlas.database.connect import Transaction
 from openatlas import app
 from openatlas.display.tab import Tab
@@ -93,18 +93,41 @@ def vocabulary_detail(url: str) -> Optional[str]:
     return link(_('details'), url) if is_authorized('manager') else None
 
 
+
+
+
+
 @app.route('/vocabs/<id_>')
 @required_group('manager')
 def vocabulary_detail_view(id_: str) -> str:
-    data = fetch_vocabulary_details(id_)
-
+    details = fetch_vocabulary_details(id_)
+    data = fetch_vocabulary_metadata(id_, details['conceptUri'])
+    print(data)
+    tabs = {'vocabularies': Tab(
+        _('vocabularies'),
+        display_info({
+            _('title'): details['title'],
+            _('contributor'): data['dc11:contributor'],
+            _('relation'): data['dc11:relation'],
+            _('creator'): data['dc11:creator'],
+            _('description'): data['dc11:description']['value'],
+            _('languages'): '<br>'.join(data['dc11:language']),
+            _('subject'): '<br>'.join(data['dc11:subject']),
+            _('publisher'): data['dc11:publisher'],
+            _('license'): data['dct:license'],
+            _('rights_holder'): data['dct:rightsHolder'],
+            _('version'): data['owl:versionInfo'],
+        }),
+        )}
     return render_template(
-        'content.html',
-        title=data['title'],
+        'tabs.html',
+        tabs=tabs,
+        title=details['title'],
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
             ['VOCABS', f"{url_for('vocabs_index')}"],
-            data['title']])
+            [_('vocabularies'), f"{url_for('show_vocabularies')}"],
+            details['title']])
 
 
 @app.route('/vocabs/<concept>')
