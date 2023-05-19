@@ -6,10 +6,11 @@
         class="table-select bg-white {{ config.CSS.string_field }}"
         type="text"
         placeholder="{{ _('change')|uc_first }}"
-        onfocus="this.blur()"
         readonly="readonly"
         value="{{ selection }}"
-        onclick="$('#{{ field.id }}-modal').modal('show');">
+        onclick="openSelectionModal()"
+        tabindex="0"
+        >
   </div>
   <div id="{{ field.id }}-clear-field" class="col-auto" {% if not selection %}style="display: none;"{% endif %}>
     <a
@@ -98,6 +99,19 @@
   </div>
 
   <script>
+      function openSelectionModal() {
+        $('#{{ field.id }}-modal').modal('show');
+      }
+
+      $("#{{ field.id }}-button")
+          .on('keydown', function (event) {
+              if (event.keyCode === 13) {
+                event.stopPropagation();
+                console.log(event);
+                openSelectionModal();
+              }
+          });
+
       $("#add-{{ add_dynamical }}-modal-{{field.id}} #name_dynamic")
           .on('keyup change', function () {
               if ($(this).val() === '')
