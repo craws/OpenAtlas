@@ -107,7 +107,7 @@
           .on('keydown', function (event) {
               if (event.keyCode === 13) {
                 event.stopPropagation();
-                console.log(event);
+                event.preventDefault();
                 openSelectionModal();
               }
           });
