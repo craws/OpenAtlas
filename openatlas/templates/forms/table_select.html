@@ -105,7 +105,7 @@
 
       $("#{{ field.id }}-button")
           .on('keydown', function (event) {
-              if (event.keyCode === 13) {
+              if (event.keyCode === 13 && event.target.id === $("#{{ field.id }}-button")[0].id) {
                 event.stopPropagation();
                 event.preventDefault();
                 openSelectionModal();
