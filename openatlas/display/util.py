@@ -585,6 +585,8 @@ def button(
             {f'id="{id_}"' if id_ else ''}
             class="{app.config['CSS']['button'][css]} uc-first"
             {f'onclick="{onclick}"' if onclick else ''}
+            tabindex="0"
+            role="button"
             {tooltip_}>{label}</{tag}>"""
 
 
