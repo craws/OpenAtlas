@@ -28,7 +28,7 @@ def sql_index() -> str:
         crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-data"], _('SQL')])
 
 
-@app.route('/sql/execute', methods=['POST', 'GET'])
+@app.route('/sql/execute', methods=['GET', 'POST'])
 @required_group('admin')
 def sql_execute() -> str:
     file_data = get_backup_file_data()

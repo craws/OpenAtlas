@@ -66,7 +66,7 @@ def arche_fetch() -> str:  # pragma: no cover
         crumbs=[['ARCHE', url_for('arche_index')], _('fetch')])
 
 
-@app.route('/arche/import', methods=['POST', 'GET'])
+@app.route('/arche/import', methods=['GET', 'POST'])
 @required_group('manager')
 def arche_import_data() -> Response:  # pragma: no cover
     Transaction.begin()

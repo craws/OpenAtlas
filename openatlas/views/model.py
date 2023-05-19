@@ -25,7 +25,7 @@ class LinkCheckForm(FlaskForm):
     save = SubmitField(_('test'))
 
 
-@app.route('/overview/model', methods=["GET", "POST"])
+@app.route('/overview/model', methods=['GET', 'POST'])
 @required_group('readonly')
 def model_index() -> str:
     form = LinkCheckForm()
@@ -269,11 +269,11 @@ class NetworkForm(FlaskForm):
         widget=widgets.ListWidget(prefix_label=False))
 
 
-@app.route('/overview/network/', methods=["GET", "POST"])
-@app.route('/overview/network/<int:dimensions>', methods=["GET", "POST"])
+@app.route('/overview/network/', methods=['GET', 'POST'])
+@app.route('/overview/network/<int:dimensions>', methods=['GET', 'POST'])
 @app.route(
     '/overview/network/<int:dimensions>/<int:id_>',
-    methods=["GET", "POST"])
+    methods=['GET', 'POST'])
 @required_group('readonly')
 def network(dimensions: Optional[int] = 0, id_: Optional[int] = None) -> str:
     entity = Entity.get_by_id(id_) if id_ else None

@@ -53,7 +53,7 @@ def view(id_: int) -> Union[str, Response]:
 
 @app.route(
     '/reference_system/remove_class/<int:system_id>/<class_name>',
-    methods=['POST', 'GET'])
+    methods=['GET', 'POST'])
 @required_group('manager')
 def reference_system_remove_class(system_id: int, class_name: str) -> Response:
     for link_ in g.reference_systems[system_id].get_links('P67'):
@@ -68,8 +68,8 @@ def reference_system_remove_class(system_id: int, class_name: str) -> Response:
     return redirect(url_for('view', id_=system_id))
 
 
-@app.route('/insert/<class_>', methods=['POST', 'GET'])
-@app.route('/insert/<class_>/<int:origin_id>', methods=['POST', 'GET'])
+@app.route('/insert/<class_>', methods=['GET', 'POST'])
+@app.route('/insert/<class_>/<int:origin_id>', methods=['GET', 'POST'])
 @required_group('contributor')
 def insert(
         class_: str,
@@ -100,8 +100,8 @@ def insert(
             insert_=True))
 
 
-@app.route('/update/<int:id_>', methods=['POST', 'GET'])
-@app.route('/update/<int:id_>/<copy>', methods=['POST', 'GET'])
+@app.route('/update/<int:id_>', methods=['GET', 'POST'])
+@app.route('/update/<int:id_>/<copy>', methods=['GET', 'POST'])
 @required_group('contributor')
 def update(id_: int, copy: Optional[str] = None) -> Union[str, Response]:
     entity = Entity.get_by_id(id_, types=True, aliases=True)
