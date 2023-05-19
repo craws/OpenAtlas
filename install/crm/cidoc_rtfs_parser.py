@@ -17,8 +17,14 @@
 # Execute the script in install/crm:
 # $ python3 cidoc_rtfs_parser.py
 #
-# Table data can than be extracted with e.g.
+# Table data can than be extracted to be joined in an upgrade SQL with e.g.
 # pg_dump --column-inserts --data-only --rows-per-insert=1000 --table=model.cidoc_class cidoc > class.sql
+#
+# Following has to be added manually to the upgrade SQL
+# UPDATE model.property_i18n set text_inverse = 'ist erster Ort von' WHERE property_code = 'OA8' AND language_code = 'de';
+# UPDATE model.property_i18n set text_inverse = 'is first appearance of' WHERE property_code = 'OA8' AND language_code = 'en';
+# UPDATE model.property_i18n set text_inverse = 'ist letzter Ort von' WHERE property_code = 'OA9' AND language_code = 'de';
+# UPDATE model.property_i18n set text_inverse = 'is last appearance of' WHERE property_code = 'OA9' AND language_code = 'en';
 #
 
 import time
@@ -33,13 +39,14 @@ CRM_URL = 'http://www.cidoc-crm.org/cidoc-crm/'
 
 EXCLUDE_PROPERTIES = [
     'P3', 'P57', 'P79', 'P80', 'P81', 'P81a', 'P81b', 'P82', 'P82a', 'P82b',
-    'P90', 'P90a', 'P90b', 'P171', 'P172', 'P190', 'P168']
+    'P90', 'P90a', 'P90b', 'P168', 'P169', 'P170', 'P171', 'P172', 'P190']
 
 DATABASE_NAME = 'cidoc'
 DATABASE_USER = 'openatlas'
 DATABASE_PORT = '5432'
 DATABASE_HOST = 'localhost'
 DATABASE_PASS = 'CHANGE ME'
+
 
 def connect() -> psycopg2.connect:
     return psycopg2.connect(
@@ -51,7 +58,6 @@ def connect() -> psycopg2.connect:
 
 
 class Item:
-
     domain_code: str
     range_code: str
 
@@ -178,6 +184,7 @@ def import_cidoc() -> None:
         "(Beginning of Existence) - P7 (took place at) - E53 (Place) Example: "
         "[Albert Einstein (E21)] was brought into existence by [Birth of "
         "Albert Einstein (E12)] took place at [Ulm (E53)]")
+    properties['OA8'].name_inverse = 'is first appearance of'
     properties['OA8'].domain_code = 'E77'
     properties['OA8'].range_code = 'E53'
     properties['OA8'].label = {'en': 'begins in', 'de': 'beginnt in'}
@@ -192,6 +199,7 @@ def import_cidoc() -> None:
         "(End of Existence) - P7 (took place at) - E53 (Place) Example: "
         "[Albert Einstein (E21)] was taken out of by [Death of Albert "
         "Einstein (E12)] took place at [Princeton (E53)]")
+    properties['OA9'].name_inverse = 'is last appearance of'
     properties['OA9'].domain_code = 'E77'
     properties['OA9'].range_code = 'E53'
     properties['OA9'].label = {'en': 'ends in', 'de': 'endet in'}
