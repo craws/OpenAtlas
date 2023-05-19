@@ -72,7 +72,7 @@ class SearchForm(FlaskForm):
         return valid
 
 
-@app.route('/overview/search', mmethods=['GET', 'POST'])
+@app.route('/overview/search', methods=['GET', 'POST'])
 @required_group('readonly')
 def search_index() -> str:
     classes = [
