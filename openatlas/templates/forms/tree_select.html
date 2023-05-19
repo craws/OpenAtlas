@@ -5,7 +5,7 @@
         name="{{ field.id }}-button"
         type="text"
         class="{{ config.CSS.string_field }} bg-white table-select "
-        onfocus="this.blur()"
+        tabindex="0"
         onclick="$('#{{ field.id }}-modal').modal('show')"
         readonly="readonly"
         value="{{ selection|safe }}"
@@ -101,6 +101,15 @@
     </div>
   </div>
   <script>
+      $("#{{ field.id }}-button")
+          .on('keydown', function (event) {
+              if (event.keyCode === 13) {
+                event.stopPropagation();
+                event.preventDefault();
+                $('#{{ field.id }}-modal').modal('show');
+              }
+          });
+
       $("#add-type-modal-{{field.id}} #name-dynamic").on('keyup change', function () {
           if ($(this).val() === '')
               $('#{{field.id}}-add-type').attr('disabled', '')
