@@ -56,6 +56,20 @@ $(document).ready(function () {
             return $.trim(text) === translate.show ? translate.hide : translate.show;
         })
     });
+    $("#date-switcher").on('keydown', function (event) {
+        if (
+            event.key !== "Enter" &&
+            event.key !== " "
+        ) {
+            return;
+        }
+        event.stopPropagation();
+        event.preventDefault();
+        $(".date-switch").toggleClass('d-none');
+        $(this).text(function (i, text) {
+            return $.trim(text) === translate.show ? translate.hide : translate.show;
+        })
+    });
 
     /* Hide date fields if there are any and if they are empty */
     if ($('#begin_year_from').length &&
