@@ -5,12 +5,20 @@
 # https://cidoc-crm.org/rdfs/7.1.2/CIDOC_CRM_v7.1.2.rdf
 #
 # The script parses the rdfs file and imports it to a PostgreSQL database.
-# Installation of needed package: # apt-get install python3-rdflib
+# Installation of needed package:
+# apt-get install python3-rdflib
 #
-# After executing the script in install/crm: $ python3 cidoc_rtfs_parser.py
-# table data can than be extracted with e.g.
-# pg_dump --column-inserts --data-only --rows-per-insert=1000
-# --table=model.cidoc_class cidoc > class.sql
+# Create a database named cidoc
+# $ createdb cidoc -O openatlas
+# $ psql cidoc -c "CREATE EXTENSION postgis; CREATE EXTENSION unaccent;"
+# $ cd install
+# $ cat 1_structure.sql 2_data_model.sql | psql -d cidoc -f -
+#
+# Execute the script in install/crm:
+# $ python3 cidoc_rtfs_parser.py
+#
+# Table data can than be extracted with e.g.
+# pg_dump --column-inserts --data-only --rows-per-insert=1000 --table=model.cidoc_class cidoc > class.sql
 #
 
 import time
@@ -32,7 +40,6 @@ DATABASE_USER = 'openatlas'
 DATABASE_PORT = '5432'
 DATABASE_HOST = 'localhost'
 DATABASE_PASS = 'CHANGE ME'
-
 
 def connect() -> psycopg2.connect:
     return psycopg2.connect(
