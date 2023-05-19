@@ -8,7 +8,7 @@
         placeholder="{{ _('change')|uc_first }}"
         readonly="readonly"
         value="{{ selection }}"
-        onclick="openSelectionModal()"
+        onclick="$('#{{ field.id }}-modal').modal('show')"
         tabindex="0"
         >
   </div>
@@ -105,10 +105,10 @@
 
       $("#{{ field.id }}-button")
           .on('keydown', function (event) {
-              if (event.keyCode === 13 && event.target.id === $("#{{ field.id }}-button")[0].id) {
+              if (event.keyCode === 13) {
                 event.stopPropagation();
                 event.preventDefault();
-                openSelectionModal();
+                $('#{{ field.id }}-modal').modal('show');
               }
           });
 
