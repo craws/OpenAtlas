@@ -146,7 +146,7 @@ def update(id_: int, copy: Optional[str] = None) -> Union[str, Response]:
 
 @app.route('/delete/<int:id_>')
 @required_group('contributor')
-def delete_entity(id_: int) -> Response:
+def delete(id_: int) -> Response:
     if current_user.group == 'contributor':
         info = g.logger.get_log_info(id_)
         if not info['creator'] or info['creator'].id != current_user.id:

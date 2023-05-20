@@ -102,5 +102,7 @@ class FileTest(TestBaseCase):
             assert b'Updated file' in rv.data
 
             for file in files:
-                rv = self.app.get(url_for('delete', id_=file.id))
+                rv = self.app.get(
+                    url_for('delete', id_=file.id),
+                    follow_redirects=True)
                 assert b'The entry has been deleted' in rv.data
