@@ -70,20 +70,20 @@ $(document).ready(function () {
         );
 
     $("#date-switcher").click(function () {
-        toggleDateFieldVisible();
+        toggleDateFieldVisible(this);
     });
     $("#date-switcher").on('keydown', function (event) {
         if (!onActivateKeyInput(event)) return;
-        toggleDateFieldVisible();
+        toggleDateFieldVisible(this);
     });
 
-    function toggleDateFieldVisible() {
+    function toggleDateFieldVisible(el) {
         $(".date-switch").toggleClass('d-none');
         $("#date-switcher").attr(
                 "aria-pressed",
                 !$(".date-switch").hasClass('d-none')
             );
-        $(this).text(function (i, text) {
+        $(el).text(function (i, text) {
             return $.trim(text) === translate.show ? translate.hide : translate.show;
         })
     }
