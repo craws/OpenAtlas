@@ -105,11 +105,15 @@
 
       $("#{{ field.id }}-button")
           .on('keydown', function (event) {
-              if (event.keyCode === 13) {
-                event.stopPropagation();
-                event.preventDefault();
-                $('#{{ field.id }}-modal').modal('show');
-              }
+            if (
+                event.key !== "Enter" &&
+                event.key !== " "
+            ) {
+                return;
+            }
+            event.stopPropagation();
+            event.preventDefault();
+            $('#{{ field.id }}-modal').modal('show');
           });
 
       $("#add-{{ add_dynamical }}-modal-{{field.id}} #name_dynamic")
