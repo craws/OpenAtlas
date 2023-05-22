@@ -1,5 +1,18 @@
 const variables = {}
 
+/* Handle Accessibility Inputs */
+function onActivateKeyInput(event) {
+    if (
+        event.key !== "Enter" &&
+        event.key !== " "
+    ) {
+        return false;
+    }
+    event.stopPropagation();
+    event.preventDefault();
+    return true;
+}
+
 /* Show and hide function for value type input fields. Has to be outside of $(document).ready() */
 function switch_value_type(id, el) {
     if (el.hasAttribute('show')) {
@@ -59,14 +72,7 @@ $(document).ready(function () {
         toggleDateFieldVisible();
     });
     $("#date-switcher").on('keydown', function (event) {
-        if (
-            event.key !== "Enter" &&
-            event.key !== " "
-        ) {
-            return;
-        }
-        event.stopPropagation();
-        event.preventDefault();
+        if (!onActivateKeyInput(event)) return;
         toggleDateFieldVisible();
     });
 
