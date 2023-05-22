@@ -50,11 +50,10 @@ $(document).ready(function () {
     });
 
     /* Show and hide function for date input fields */
+    $("#date-switcher").attr("aria-pressed", !$(".date-switch").hasClass('d-none'));
+
     $("#date-switcher").click(function () {
-        $(".date-switch").toggleClass('d-none');
-        $(this).text(function (i, text) {
-            return $.trim(text) === translate.show ? translate.hide : translate.show;
-        })
+        toggleDateFieldVisible();
     });
     $("#date-switcher").on('keydown', function (event) {
         if (
@@ -65,11 +64,20 @@ $(document).ready(function () {
         }
         event.stopPropagation();
         event.preventDefault();
+        toggleDateFieldVisible();
+    });
+
+    function toggleDateFieldVisible() {
         $(".date-switch").toggleClass('d-none');
+        $("#date-switcher").attr(
+                "aria-pressed",
+                !$(".date-switch").hasClass('d-none')
+            );
         $(this).text(function (i, text) {
             return $.trim(text) === translate.show ? translate.hide : translate.show;
         })
-    });
+    }
+
 
     /* Hide date fields if there are any and if they are empty */
     if ($('#begin_year_from').length &&
