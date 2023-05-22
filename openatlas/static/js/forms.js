@@ -29,6 +29,7 @@ function switch_value_type(id, el) {
         });
         el.setAttribute('show', '');
     }
+    el.setAttribute("aria-pressed", el.hasAttribute('show'));
 }
 
 $(document).ready(function () {
