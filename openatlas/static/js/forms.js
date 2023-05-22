@@ -50,7 +50,10 @@ $(document).ready(function () {
     });
 
     /* Show and hide function for date input fields */
-    $("#date-switcher").attr("aria-pressed", !$(".date-switch").hasClass('d-none'));
+    $("#date-switcher").attr(
+            "aria-pressed",
+            !$(".date-switch").hasClass('d-none')
+        );
 
     $("#date-switcher").click(function () {
         toggleDateFieldVisible();
