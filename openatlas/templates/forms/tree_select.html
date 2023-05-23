@@ -50,9 +50,9 @@
               type="text">
           {% if field.form %}
             <button type="button" id="add-{{ type }}--{{ field.id }}"
-                    class="btn-outline-primary btn text-nowrap ms-1"
-                    data-bs-toggle="modal"
-                    data-bs-target="#add-type-modal-{{ field.id }}">
+                class="btn-outline-primary btn text-nowrap ms-1"
+                data-bs-toggle="modal"
+                data-bs-target="#add-type-modal-{{ field.id }}">
               + {{ _('type')|uc_first if root.category == 'standard' else root.name }}
             </button>
           {% endif %}
@@ -72,13 +72,11 @@
   </div>
 </div>
 {% if field.form %}
-  <div class="modal fade" id="add-type-modal-{{ field.id }}" tabindex="-1"
-       aria-hidden="true">
+  <div class="modal fade" id="add-type-modal-{{ field.id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5
-              class="modal-title">{{ _('Add Type to %(hierarchy)s', hierarchy= _(root.name)|uc_first|safe) }}</h5>
+          <h5 class="modal-title">{{ _('Add Type to %(hierarchy)s', hierarchy= _(root.name)|uc_first|safe) }}</h5>
           <button
               type="button"
               class="{{ config.CSS.button.primary }}"
@@ -91,45 +89,50 @@
           {{ field.form|display_form()|safe }}
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-outline-secondary btn-sm"
-                  data-bs-dismiss="modal"
-                  onclick="$('#{{ field.id }}-modal').modal('show')">{{ _('back')|uc_first }}</button>
-          <button id="{{ field.id }}-add-type" disabled type="button"
-                  class="btn btn-outline-primary btn-sm">{{ _('insert')|uc_first }}</button>
+          <button
+            type="button" class="btn btn-outline-secondary btn-sm"
+            data-bs-dismiss="modal"
+            onclick="$('#{{ field.id }}-modal').modal('show')">{{ _('back')|uc_first }}
+          </button>
+          <button
+            id="{{ field.id }}-add-type"
+            disabled type="button"
+            class="btn btn-outline-primary btn-sm">{{ _('insert')|uc_first }}
+          </button>
         </div>
       </div>
     </div>
   </div>
   <script>
-      $("#{{ field.id }}-button")
-          .on('keydown', function (event) {
-            if (onActivateKeyInput(event))
-              $('#{{ field.id }}-modal').modal('show');
-          });
+    $("#{{ field.id }}-button")
+        .on('keydown', function (event) {
+          if (onActivateKeyInput(event))
+            $('#{{ field.id }}-modal').modal('show');
+    });
 
-      $("#add-type-modal-{{field.id}} #name-dynamic").on('keyup change', function () {
-          if ($(this).val() === '')
-              $('#{{field.id}}-add-type').attr('disabled', '')
-          else
-              $('#{{field.id}}-add-type').removeAttr('disabled')
-      });
+    $("#add-type-modal-{{field.id}} #name-dynamic").on('keyup change', function () {
+      if ($(this).val() === '')
+        $('#{{field.id}}-add-type').attr('disabled', '')
+      else
+        $('#{{field.id}}-add-type').removeAttr('disabled')
+    });
 
-      $('#{{field.id}}-add-type').on('click', async function (e) {
-          $(this).prop("disabled", true).text('{{ _("in progress") }}');
-          const name = $("#add-type-modal-{{field.id}} #name-dynamic").val();
-          const superType = $("#{{field.id}}-dynamic").val() ||{{field.type_id}};
-          const description = $("#add-type-modal-{{field.id}} #description-dynamic").val();
-          const data = {name, superType, description};
-          const typeId = await ajaxAddType(data, {{field.id}}, {{field.type_id}});
-          selectFromTree('{{field.type_id}}', typeId, name);
-          $(this).prop("disabled", false).text('{{ _('insert')|uc_first }}');
-          e.preventDefault();
-      });
+    $('#{{field.id}}-add-type').on('click', async function (e) {
+        $(this).prop("disabled", true).text('{{ _("in progress") }}');
+        const name = $("#add-type-modal-{{field.id}} #name-dynamic").val();
+        const superType = $("#{{field.id}}-dynamic").val() ||{{field.type_id}};
+        const description = $("#add-type-modal-{{field.id}} #description-dynamic").val();
+        const data = {name, superType, description};
+        const typeId = await ajaxAddType(data, {{field.id}}, {{field.type_id}});
+        selectFromTree('{{field.type_id}}', typeId, name);
+        $(this).prop("disabled", false).text('{{ _('insert')|uc_first }}');
+        e.preventDefault();
+    });
   </script>
 {% endif %}
 <script>
-    variables['{{field.id}}-isAddDynamicall'] = '{{field.form}}' !== 'None';
-    if (variables['{{field.id}}-isAddDynamicall'])
-        $("#{{ field.id }}-modal .toolbar").hide()
-    fillTreeSelect('{{field.id}}', {{data |safe}}, {{ g.settings.minimum_jstree_search }})
+  variables['{{field.id}}-isAddDynamicall'] = '{{field.form}}' !== 'None';
+  if (variables['{{field.id}}-isAddDynamicall'])
+    $("#{{ field.id }}-modal .toolbar").hide()
+  fillTreeSelect('{{field.id}}', {{data |safe}}, {{ g.settings.minimum_jstree_search }})
 </script>
