@@ -38,7 +38,9 @@ class ImageTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Remove' in rv.data
 
-            rv = self.app.get(url_for('index', view='file', delete_id=file_id))
+            rv = self.app.get(
+                url_for('delete', id_=file_id),
+                follow_redirects=True)
             assert b'The entry has been deleted' in rv.data
 
             with app.test_request_context():

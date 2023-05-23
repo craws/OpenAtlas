@@ -14,13 +14,14 @@ from openatlas.database.connect import Transaction
 from openatlas.display import display
 from openatlas.display.image_processing import resize_image
 from openatlas.display.util import (
-    get_base_table_data, is_authorized, link, required_group)
+    get_base_table_data, get_file_path, is_authorized, link, required_group)
 from openatlas.forms.base_manager import BaseManager
 from openatlas.forms.form import get_manager
 from openatlas.forms.util import was_modified
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.overlay import Overlay
+from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 
 
@@ -141,6 +142,49 @@ def update(id_: int, copy: Optional[str] = None) -> Union[str, Response]:
         overlays=place_info['overlays'],
         title=entity.name,
         crumbs=add_crumbs(entity.class_.name, entity, place_info['structure']))
+
+
+@app.route('/delete/<int:id_>')
+@required_group('contributor')
+def delete(id_: int) -> Response:
+    if current_user.group == 'contributor':
+        info = g.logger.get_log_info(id_)
+        if not info['creator'] or info['creator'].id != current_user.id:
+            abort(403)
+    entity = Entity.get_by_id(id_)
+    if not is_authorized(entity.class_.write_access):
+        abort(403)
+    url = url_for('index', view=entity.class_.view)
+    if isinstance(entity, ReferenceSystem):
+        if entity.system:
+            abort(403)
+        if entity.classes:
+            flash(_('Deletion not possible if classes are attached'), 'error')
+            return redirect(url_for('view', id_=id_))
+        url = url_for('index', view='reference_system')
+    elif entity.class_.view in ['artifact', 'place']:
+        if entity.get_linked_entities('P46'):
+            flash(_('Deletion not possible if subunits exists'), 'error')
+            return redirect(url_for('view', id_=id_))
+        if entity.class_.name != 'place':
+            if parent := entity.get_linked_entity('P46', True):
+                url = \
+                    f"{url_for('view', id_=parent.id)}" \
+                    f"#tab-{entity.class_.name.replace('_', '-')}"
+    elif entity.class_.name == 'source_translation':
+        source = entity.get_linked_entity_safe('P73', inverse=True)
+        url = f"{url_for('view', id_=source.id)}#tab-text"
+    elif entity.class_.name == 'file':
+        try:
+            delete_files(id_)
+        except Exception as e:  # pragma: no cover
+            g.logger.log('error', 'file', 'file deletion failed', e)
+            flash(_('error file delete'), 'error')
+            return redirect(url_for('view', id_=id_))
+    entity.delete()
+    g.logger.log_user(id_, 'delete')
+    flash(_('entity deleted'), 'info')
+    return redirect(url)
 
 
 def add_crumbs(
@@ -350,3 +394,10 @@ def get_redirect_url(manager: BaseManager) -> str:
                 class_ = 'artifact'
         url = url_for('insert', class_=class_, origin_id=manager.entity.id)
     return url
+
+
+def delete_files(id_: int) -> None:
+    if path := get_file_path(id_):  # Prevent missing file warning
+        path.unlink()
+    for resized_path in app.config['RESIZED_IMAGES'].glob(f'**/{id_}.*'):
+        resized_path.unlink()

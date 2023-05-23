@@ -155,7 +155,7 @@ def delete_link(entity: Entity) -> str:
             info = g.logger.get_log_info(entity.id)
             if not info['creator'] or info['creator'].id != current_user.id:
                 return ''
-        url = url_for('index', view=entity.class_.view, delete_id=entity.id)
+        url = url_for('delete', id_=entity.id)
         confirm = _('Delete %(name)s?', name=entity.name.replace('\'', ''))
     return button(
         _('delete'),

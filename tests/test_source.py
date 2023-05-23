@@ -85,9 +85,6 @@ class SourceTest(TestBaseCase):
             assert b'Translation updated' in rv.data
 
             rv = self.app.get(
-                url_for(
-                    'index',
-                    view='source_translation',
-                    delete_id=translation_id),
+                url_for('delete', id_=translation_id),
                 follow_redirects=True)
             assert b'The entry has been deleted' in rv.data
