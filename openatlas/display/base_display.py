@@ -18,7 +18,6 @@ from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.models.overlay import Overlay
-from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.models.user import User
 from openatlas.views.entity_index import file_preview
@@ -125,25 +124,22 @@ class BaseDisplay:
             self.tabs['note'].table.rows.append(data)
 
     def add_buttons(self) -> None:
-        if not is_authorized(self.entity.class_.write_access) or (
-                isinstance(self.entity, Type)
-                and self.entity.category == 'system'):
-            return
-        if not self.problematic_type:
-            self.buttons.append(
-                button(_('edit'), url_for('update', id_=self.entity.id)))
-            if type(self.entity) is Entity \
-                    and self.entity.class_.name != 'source_translation':
+        if is_authorized(self.entity.class_.write_access):
+            if not self.problematic_type:
+                self.add_update_button()
+            if type(self.entity) is Entity:
                 self.buttons.append(
                     button(
                         _('copy'),
                         url_for('update', id_=self.entity.id, copy='copy_')))
-        if self.entity.class_.view == 'place' and \
-                self.entity.get_linked_entities('P46'):
-            return
-        if isinstance(self.entity, ReferenceSystem) and \
-                (self.entity.classes or self.entity.system):
-            return
+            if self.entity:
+                self.add_delete_button()
+
+    def add_update_button(self) -> None:
+        self.buttons.append(
+            button(_('edit'), url_for('update', id_=self.entity.id)))
+
+    def add_delete_button(self) -> None:
         self.buttons.append(delete_link(self.entity))
 
     def add_data(self) -> None:
@@ -281,8 +277,9 @@ class EventsDisplay(BaseDisplay):
         self.data[_('preceding event')] = \
             link(self.entity.get_linked_entity('P134'))
         self.data[_('succeeding event')] = \
-            '<br>'.join([link(e) for e in
-                self.entity.get_linked_entities('P134', True)])
+            '<br>'.join([
+                link(e)
+                for e in self.entity.get_linked_entities('P134', True)])
         if place := self.entity.get_linked_entity('P7'):
             self.data[_('location')] = \
                 link(place.get_linked_entity_safe('P53', True))
@@ -401,6 +398,10 @@ class PlaceBaseDisplay(BaseDisplay):
                 and (not self.structure or not self.structure['supers']):
             self.gis_data = {}
 
+    def add_delete_button(self) -> None:
+        if not self.entity.get_linked_entities('P46'):
+            super().add_delete_button()
+
 
 class ReferenceBaseDisplay(BaseDisplay):
 
@@ -427,7 +428,6 @@ class ReferenceBaseDisplay(BaseDisplay):
 
 
 class TypeBaseDisplay(BaseDisplay):
-
     entity: Type
 
     def add_data(self) -> None:
@@ -501,3 +501,11 @@ class TypeBaseDisplay(BaseDisplay):
                 button(
                     _('move entities'),
                     url_for('type_move_entities', id_=entity.id)))
+
+    def add_update_button(self) -> None:
+        if self.entity.category != 'system':
+            super().add_update_button()
+
+    def add_delete_button(self) -> None:
+        if self.entity.category != 'system':
+            super().add_delete_button()

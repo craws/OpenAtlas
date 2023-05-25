@@ -254,6 +254,10 @@ class ReferenceSystemDisplay(BaseDisplay):
                         system_id=self.entity.id,
                         class_name=name))]
 
+    def add_delete_button(self) -> None:
+        if not self.entity.classes and not self.entity.system:
+            super().add_delete_button()
+
 
 class SourceDisplay(BaseDisplay):
 
@@ -298,9 +302,8 @@ class StratigraphicUnitDisplay(PlaceBaseDisplay):
 
     def add_buttons(self) -> None:
         super().add_buttons()
-        self.buttons.append(button(
-            _('tools'),
-            url_for('tools_index', id_=self.entity.id)))
+        self.buttons.append(
+            button(_('tools'), url_for('tools_index', id_=self.entity.id)))
 
 
 class TypeDisplay(TypeBaseDisplay):
