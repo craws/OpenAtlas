@@ -385,12 +385,20 @@ def generate_password_field() -> CustomField:
 
 def value_type_expand_icon(type_: Type) -> str:
     return f'''
-        <i
-          onclick="switch_value_type({type_.id},this)"
-          role="button"
-          id="value-type-switcher-{type_.id}"
-          class="fa fa-chevron-right value-type-switcher input-height-sm">
-        </i>'''
+        <span
+        onkeydown="
+            if (onActivateKeyInput(event))
+                switch_value_type({type_.id},this.children[0])"
+        >
+            <i
+            aria-pressed=false
+            role="button"
+            tabindex="0"
+            onclick="switch_value_type({type_.id},this)"
+            id="value-type-switcher-{type_.id}"
+            class="fa fa-chevron-right value-type-switcher input-height-sm">
+            </i>
+        </span>'''
 
 
 def get_table_content(

@@ -42,17 +42,17 @@ $(document).ready(function () {
   var searchType = jQuery.fn.DataTable.ext.type.search;
   searchType.string = function (data) {
     return !data ?
-        '' :
-        typeof data === 'string' ?
-            removeAccents(data) :
-            data;
+      '' :
+      typeof data === 'string' ?
+        removeAccents(data) :
+          data;
   };
   searchType.html = function (data) {
     return !data ?
-        '' :
-        typeof data === 'string' ?
-            removeAccents(data.replace(/<.*?>/g, '')) :
-            data;
+      '' :
+      typeof data === 'string' ?
+        removeAccents(data.replace(/<.*?>/g, '')) :
+          data;
   };
 
   /* When selecting a file for upload: if name is empty, fill with filename without extension */
@@ -140,7 +140,7 @@ $(document).ready(function () {
 $.jstree.defaults.core.themes.dots = false;
 
 $.extend(true, $.fn.dataTable.defaults, {
-     "initComplete": processUcFirst
+  "initComplete": processUcFirst
 });
 
 /**
@@ -293,10 +293,12 @@ function selectFromTreeMulti(name, value_type = false) {
   }
   $("#" + name).trigger('change');
 }
+
 function deselectNode(fieldId,nodeId){
  $(`#${fieldId}-tree`).jstree('deselect_node', nodeId);
  selectFromTreeMulti(fieldId)
 }
+
 function selectFromTable(element, table, id,label= undefined) {
   $("#" + table).attr('value', id);
   $("#" + table + "-button").val(label || element?.innerText );
@@ -304,10 +306,12 @@ function selectFromTable(element, table, id,label= undefined) {
   $("#" + table + "-clear-field").show();
   $('#' + table + '-modal').modal('hide');
 }
+
 function deselectFromTable(tableName, nodeId) {
   $(`#${tableName}_table`)?.find(`#${nodeId}[type="checkbox"]`)?.prop( "checked", false )
   selectFromTableMulti(tableName)
 }
+
 function selectFromTableMulti(name) {
   let checkedNames = [];
   let ids = [];
@@ -361,12 +365,12 @@ function setFilesOfDropField(files) {
     const fileDiv = document.createElement('div');
     fileDiv.classList.add('drag-drop-item');
     fileDiv.innerHTML = `
-                            <div class="card" data-bs-toggle="tooltip" data-bs-placement="top" title="${file.name}">
-                                <div class="card-body">
-                                <i class="card-icon fa fa-file"></i>
-                                <i onclick="removeFile(${index})" class="close-icon fa fa-times"></i>
-                                ${file.name}
-                            </div>`
+      <div class="card" data-bs-toggle="tooltip" data-bs-placement="top" title="${file.name}">
+          <div class="card-body">
+          <i class="card-icon fa fa-file"></i>
+          <i onclick="removeFile(${index})" class="close-icon fa fa-times"></i>
+          ${file.name}
+      </div>`
     dropContainer.children[1].appendChild(fileDiv)
   })
 }
@@ -377,10 +381,9 @@ function removeFile(index) {
   filesList.splice(index, 1);
   setFile(fileInput, filesList)
   setFilesOfDropField(filesList)
-  if(filesList.length === 0){
+  if(filesList.length === 0) {
     document.getElementById('drag-n-drop').children[0].style.display = "";
   }
-
 }
 
 function setFile(fileInput, fileList) {
@@ -413,7 +416,7 @@ function addDragNDropListeners(dropContainer,allowedTypes) {
     e.preventDefault();
     e.stopPropagation();
     const allowedFiles = [...e.dataTransfer.files]
-        .filter(x => allowedTypes.map(y=>y.toLowerCase()).includes(x.name.split(('.')).at(-1).toLowerCase()))
+      .filter(x => allowedTypes.map(y=>y.toLowerCase()).includes(x.name.split(('.')).at(-1).toLowerCase()))
     if (allowedFiles.length > 0) {
       const fileInput = document.getElementById('file')
       setFile(fileInput, [...fileInput.files, ...allowedFiles]);
@@ -428,7 +431,7 @@ function addDragNDropListeners(dropContainer,allowedTypes) {
   });
 }
 
-// removable list field
+// Removable list field
 
 function addListElement(id, classes=""){
   const list = document.getElementById(id);
@@ -465,7 +468,7 @@ function processUcFirst(){
 
 function toggleMapWidth(element){
   const parent = element.parentElement
-    parent.classList.toggle("col-lg-3")
-    parent.classList.toggle("col-lg-7")
-    element.classList.toggle("rotate-180")
+  parent.classList.toggle("col-lg-3")
+  parent.classList.toggle("col-lg-7")
+  element.classList.toggle("rotate-180")
 }
