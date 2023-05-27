@@ -131,10 +131,6 @@ class BaseManager:
     def additional_fields(self) -> dict[str, Any]:
         return {}
 
-    def get_root_type(self) -> Type:
-        type_ = self.entity if isinstance(self.entity, Type) else self.origin
-        return g.types[type_.root[0]] if type_.root else type_
-
     def get_link_type(self) -> Optional[Entity]:
         # Returns base type of link, e.g. involvement between actor and event
         for field in self.form:
@@ -418,28 +414,25 @@ class TypeBaseManager(BaseManager):
         return fields
 
     def customize_labels(self) -> None:
-        if not hasattr(self.form, 'classes'):
-            type_ = self.entity or self.origin
-            if isinstance(type_, Type):
-                root = g.types[type_.root[0]] if type_.root else type_
-                getattr(self.form, str(root.id)).label.text = 'super'
+        getattr(self.form, str(self.get_root_type().id)).label.text = 'super'
+
+    def get_root_type(self) -> Type:
+        type_ = self.entity if isinstance(self.entity, Type) else self.origin
+        return g.types[type_.root[0]] if type_.root else type_
 
     def populate_insert(self) -> None:
-        if isinstance(self.origin, Type):
-            root_id = self.origin.root[0] \
-                if self.origin.root else self.origin.id
-            getattr(self.form, str(root_id)).data = self.origin.id \
-                if self.origin.id != root_id else None
+        root_id = self.origin.root[0] if self.origin.root else self.origin.id
+        getattr(self.form, str(root_id)).data = self.origin.id \
+            if self.origin.id != root_id else None
 
     def populate_update(self) -> None:
         super().populate_update()
-        if hasattr(self.form, 'name_inverse'):  # e.g. actor relation
+        if hasattr(self.form, 'name_inverse'):
             name_parts = self.entity.name.split(' (')
             self.form.name.data = name_parts[0]
             if len(name_parts) > 1:
-                self.form.name_inverse.data = name_parts[1][:-1]  # remove ")"
-        if isinstance(self.entity, Type):  # Set super if it isn't the root
-            super_ = g.types[self.entity.root[-1]]
-            root = g.types[self.entity.root[0]]
-            if super_.id != root.id:
-                getattr(self.form, str(root.id)).data = super_.id
+                self.form.name_inverse.data = name_parts[1][:-1]
+        super_ = g.types[self.entity.root[-1]]
+        root = g.types[self.entity.root[0]]
+        if super_.id != root.id:
+            getattr(self.form, str(root.id)).data = super_.id
