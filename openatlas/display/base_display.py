@@ -10,10 +10,10 @@ from flask_login import current_user
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.util import (
-    bookmark_toggle, button, delete_link, edit_link, ext_references,
-    format_date, format_entity_date, get_appearance, get_base_table_data,
-    get_system_data, is_authorized, link, manual, profile_image_table_link,
-    remove_link, siblings_pager)
+    bookmark_toggle, button, edit_link, ext_references, format_date,
+    format_entity_date, get_appearance, get_base_table_data, get_system_data,
+    is_authorized, link, manual, profile_image_table_link, remove_link,
+    siblings_pager)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -140,7 +140,15 @@ class BaseDisplay:
             button(_('edit'), url_for('update', id_=self.entity.id)))
 
     def add_delete_button(self) -> None:
-        self.buttons.append(delete_link(self.entity))
+        if current_user.group == 'contributor':
+            info = g.logger.get_log_info(self.entity.id)
+            if not info['creator'] or info['creator'].id != current_user.id:
+                return
+        msg = _('Delete %(name)s?', name=self.entity.name.replace('\'', ''))
+        self.buttons.append(button(
+            _('delete'),
+            url_for('delete', id_=self.entity.id),
+            onclick=f"return confirm('{msg}')"))
 
     def add_data(self) -> None:
         self.data = {
@@ -430,17 +438,24 @@ class ReferenceBaseDisplay(BaseDisplay):
 class TypeBaseDisplay(BaseDisplay):
     entity: Type
 
+    def add_crumbs(self) -> None:
+        self.crumbs = [[_('types'), url_for('type_index')]]
+        self.crumbs += [g.types[type_id] for type_id in self.entity.root]
+        self.crumbs.append(self.entity.name)
+
+    def add_delete_button(self) -> None:
+        if self.entity.category != 'system':
+            url = url_for('type_delete', id_=self.entity.id)
+            if self.entity.count or self.entity.subs:
+                url = url_for('type_delete_recursive', id_=self.entity.id)
+            self.buttons.append(button(_('delete'), url))
+
     def add_data(self) -> None:
         super().add_data()
         self.data[_('super')] = link(g.types[self.entity.root[-1]])
         if self.entity.category == 'value':
             self.data[_('unit')] = self.entity.description
         self.data[_('ID for imports')] = self.entity.id
-
-    def add_crumbs(self) -> None:
-        self.crumbs = [[_('types'), url_for('type_index')]]
-        self.crumbs += [g.types[type_id] for type_id in self.entity.root]
-        self.crumbs.append(self.entity.name)
 
     def add_tabs(self) -> None:
         super().add_tabs()
@@ -505,7 +520,3 @@ class TypeBaseDisplay(BaseDisplay):
     def add_update_button(self) -> None:
         if self.entity.category != 'system':
             super().add_update_button()
-
-    def add_delete_button(self) -> None:
-        if self.entity.category != 'system':
-            super().add_delete_button()

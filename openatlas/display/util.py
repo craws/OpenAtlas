@@ -143,26 +143,6 @@ def profile_image_table_link(
     return ''
 
 
-def delete_link(entity: Entity) -> str:
-    from openatlas.models.type import Type
-    confirm = ''
-    if isinstance(entity, Type):
-        url = url_for('type_delete', id_=entity.id)
-        if entity.count or entity.subs:
-            url = url_for('type_delete_recursive', id_=entity.id)
-    else:
-        if current_user.group == 'contributor':
-            info = g.logger.get_log_info(entity.id)
-            if not info['creator'] or info['creator'].id != current_user.id:
-                return ''
-        url = url_for('delete', id_=entity.id)
-        confirm = _('Delete %(name)s?', name=entity.name.replace('\'', ''))
-    return button(
-        _('delete'),
-        url,
-        onclick=f"return confirm('{confirm}')" if confirm else '')
-
-
 def siblings_pager(
         entity: Entity,
         structure: Optional[dict[str, list[Entity]]] = None) -> str:
