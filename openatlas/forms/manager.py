@@ -521,6 +521,9 @@ class ReferenceSystemManager(BaseManager):
 class SourceManager(BaseManager):
     fields = ['name', 'continue', 'description']
 
+    def add_description(self) -> None:
+        setattr(self.form_class, 'description', TextAreaField(_('content')))
+
     def additional_fields(self) -> dict[str, Any]:
         return {
             'artifact': TableMultiField(description=_(
@@ -597,6 +600,12 @@ class StratigraphicUnitManager(BaseManager):
 
 
 class TypeManager(TypeBaseManager):
+
+    def add_description(self) -> None:
+        super().add_description()
+        if self.get_root_type().category == 'value':
+            del self.form_class.description
+            setattr(self.form_class, 'description', StringField(_('unit')))
 
     def process_form(self) -> None:
         super().process_form()

@@ -69,15 +69,7 @@ class BaseManager:
                 current_user.settings['module_time']
                 or (entity and check_if_entity_has_time(entity))))
         if 'description' in self.fields:
-            setattr(Form, 'description', TextAreaField(
-                _('content') if class_.name == 'source' else _('description')))
-            if class_.name == 'type':
-                type_ = entity or origin
-                if isinstance(type_, Type):
-                    root = g.types[type_.root[0]] if type_.root else type_
-                    if root.category == 'value':
-                        del Form.description
-                        setattr(Form, 'description', StringField(_('unit')))
+            self.add_description()
         if 'map' in self.fields:
             setattr(Form, 'gis_points', HiddenField(default='[]'))
             setattr(Form, 'gis_polygons', HiddenField(default='[]'))
@@ -85,6 +77,12 @@ class BaseManager:
         self.add_buttons()
         self.form: Any = Form(obj=self.link_ or self.entity)
         self.customize_labels()
+
+    def add_description(self) -> None:
+        setattr(
+            self.form_class,
+            'description',
+            TextAreaField(_('description')))
 
     def add_name_fields(self) -> None:
         if 'name' in self.fields:
