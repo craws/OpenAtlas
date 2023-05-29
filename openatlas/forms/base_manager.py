@@ -61,7 +61,7 @@ class BaseManager:
         add_types(self)
         for id_, field in self.additional_fields().items():
             setattr(Form, id_, field)
-        add_reference_systems(self.class_, self.form_class)
+        add_reference_systems(self)
         if self.entity:
             setattr(Form, 'entity_id', HiddenField())
         if 'date' in self.fields:
