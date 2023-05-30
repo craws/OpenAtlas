@@ -642,6 +642,13 @@ def description(entity: Union[Entity, Project, User]) -> str:
         </div>"""
 
 
+@app.template_filter()
+def description2(text: str, label: Optional[str] = '') -> str:
+    return '' if not text else \
+        f'<h2 class="uc-first fw-bold">{label or _("description")}</h2>' \
+        f'<div class="description more">{"<br>".join(text.splitlines())}</div>'
+
+
 @contextfilter
 @app.template_filter()
 def display_content_translation(_context: str, text: str) -> str:
