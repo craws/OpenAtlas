@@ -22,9 +22,11 @@ from openatlas.models.type import Type
 class AcquisitionManager(EventBaseManager):
 
     def additional_fields(self) -> dict[str, Any]:
-        return dict(super().additional_fields(), **{
-            'given_place': TableMultiField(_('given place')),
-            'artifact': TableMultiField(_('given artifact'))})
+        return dict(
+            super().additional_fields(),
+            **{
+                'given_place': TableMultiField(_('given place')),
+                'artifact': TableMultiField(_('given artifact'))})
 
     def populate_update(self) -> None:
         super().populate_update()
@@ -153,8 +155,9 @@ class ArtifactManager(ArtifactBaseManager):
             filter_ids = \
                 [entity.id] + \
                 [e.id for e in entity.get_linked_entities_recursive('P46')]
-        return dict(super().additional_fields(), **{
-            'artifact_super': TableField(
+        return dict(
+            super().additional_fields(),
+            **{'artifact_super': TableField(
                 _('super'),
                 filter_ids=filter_ids,
                 add_dynamic=['place'])})
@@ -182,8 +185,9 @@ class BibliographyManager(BaseManager):
 class CreationManager(EventBaseManager):
 
     def additional_fields(self) -> dict[str, Any]:
-        return dict(super().additional_fields(), **{
-            'file': TableMultiField(_('document'))})
+        return dict(
+            super().additional_fields(),
+            **{'file': TableMultiField(_('document'))})
 
     def populate_insert(self) -> None:
         super().populate_insert()
@@ -235,8 +239,9 @@ class FeatureManager(BaseManager):
                     _('insert and add') + ' ' + _('stratigraphic unit')))
 
     def additional_fields(self) -> dict[str, Any]:
-        return dict(super().additional_fields(), **{
-            'feature_super': TableField(
+        return dict(
+            super().additional_fields(),
+            **{'feature_super': TableField(
                 _('super'),
                 [InputRequired()],
                 add_dynamic=['place'])})
@@ -287,8 +292,9 @@ class HumanRemainsManager(ArtifactBaseManager):
             filter_ids = \
                 [entity.id] + \
                 [e.id for e in entity.get_linked_entities_recursive('P46')]
-        return dict(super().additional_fields(), **{
-            'human_remains_super': TableField(
+        return dict(
+            super().additional_fields(),
+            **{'human_remains_super': TableField(
                 _('super'),
                 filter_ids=filter_ids,
                 add_dynamic=['place'])})
@@ -386,8 +392,9 @@ class InvolvementManager(BaseManager):
 class ModificationManager(EventBaseManager):
 
     def additional_fields(self) -> dict[str, Any]:
-        return dict(super().additional_fields(), **{
-            'artifact': TableMultiField()})
+        return dict(
+            super().additional_fields(),
+            **{'artifact': TableMultiField()})
 
     def populate_update(self) -> None:
         super().populate_update()
@@ -404,11 +411,13 @@ class ModificationManager(EventBaseManager):
 class MoveManager(EventBaseManager):
 
     def additional_fields(self) -> dict[str, Any]:
-        return dict(super().additional_fields(), **{
-            'place_from': TableField(_('from'), add_dynamic=['place']),
-            'place_to': TableField(_('to'), add_dynamic=['place']),
-            'artifact': TableMultiField(),
-            'person': TableMultiField()})
+        return dict(
+            super().additional_fields(),
+            **{
+                'place_from': TableField(_('from'), add_dynamic=['place']),
+                'place_to': TableField(_('to'), add_dynamic=['place']),
+                'artifact': TableMultiField(),
+                'person': TableMultiField()})
 
     def populate_update(self) -> None:
         super().populate_update()
@@ -474,8 +483,9 @@ class PlaceManager(BaseManager):
 class ProductionManager(EventBaseManager):
 
     def additional_fields(self) -> dict[str, Any]:
-        return dict(super().additional_fields(), **{
-            'artifact': TableMultiField()})
+        return dict(
+            super().additional_fields(),
+            **{'artifact': TableMultiField()})
 
     def populate_update(self) -> None:
         super().populate_update()
@@ -594,8 +604,9 @@ class StratigraphicUnitManager(BaseManager):
                 SubmitField(_('insert and add') + ' ' + _('human remains')))
 
     def additional_fields(self) -> dict[str, Any]:
-        return dict(super().additional_fields(), **{
-            'stratigraphic_super': TableField(
+        return dict(
+            super().additional_fields(),
+            **{'stratigraphic_super': TableField(
                 _('super'),
                 [InputRequired()])})
 
