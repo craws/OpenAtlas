@@ -212,6 +212,15 @@ class EventManager(EventBaseManager):
 class ExternalReferenceManager(BaseManager):
     fields = ['url', 'description', 'continue']
 
+    def add_name_fields(self) -> None:
+        setattr(
+            self.form_class,
+            'name',
+            StringField(
+                _('URL'),
+                [InputRequired(), URL()],
+                render_kw={'autofocus': True}))
+
 
 class FeatureManager(BaseManager):
     fields = ['name', 'date', 'description', 'continue', 'map']
@@ -481,6 +490,16 @@ class ProductionManager(EventBaseManager):
 
 class ReferenceSystemManager(BaseManager):
     fields = ['name', 'description']
+
+    def add_name_fields(self) -> None:
+        super().add_name_fields()
+        if self.entity and self.entity.system:
+            setattr(
+                self.form_class,
+                'name',
+                StringField(
+                    _('name'),
+                    render_kw={'autofocus': True, 'readonly': True}))
 
     def additional_fields(self) -> dict[str, Any]:
         precision_id = str(Type.get_hierarchy('External reference match').id)

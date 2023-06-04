@@ -10,7 +10,7 @@ from flask_wtf import FlaskForm
 from wtforms import (
     FieldList, HiddenField, SelectMultipleField, StringField, TextAreaField,
     widgets)
-from wtforms.validators import InputRequired, URL
+from wtforms.validators import InputRequired
 
 from openatlas.forms.add_fields import (
     add_date_fields, add_reference_systems, add_types)
@@ -86,18 +86,13 @@ class BaseManager:
 
     def add_name_fields(self) -> None:
         if 'name' in self.fields:
-            readonly = bool(
-                isinstance(self.entity, ReferenceSystem)
-                and self.entity.system)
-            setattr(self.form_class, 'name', StringField(
-                _('name'),
-                [InputRequired()],
-                render_kw={'autofocus': True, 'readonly': readonly}))
-        if 'url' in self.fields:
-            setattr(self.form_class, 'name', StringField(
-                _('URL'),
-                [InputRequired(), URL()],
-                render_kw={'autofocus': True}))
+            setattr(
+                self.form_class,
+                'name',
+                StringField(
+                    _('name'),
+                    [InputRequired()],
+                    render_kw={'autofocus': True}))
         if 'alias' in self.fields:
             setattr(
                 self.form_class,
