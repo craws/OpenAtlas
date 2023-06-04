@@ -592,19 +592,15 @@ def display_citation_example(code: str) -> str:
 
 @app.template_filter()
 def breadcrumb(crumbs: list[Any]) -> str:
-    from openatlas.models.entity import Entity
-    from openatlas.models.user import User
     items = []
     for item in crumbs:
-        if not item:
-            continue  # e.g. if a dynamic generated URL has no origin parameter
-        if isinstance(item, (Entity, Project, User)):
-            items.append(link(item))
-        elif isinstance(item, list):
+        if isinstance(item, list):
             items.append(
                 f'<a href="{item[1]}" class="uc-first">{str(item[0])}</a>')
-        else:
+        elif isinstance(item, str):
             items.append(f'<span class="uc-first">{item}</span>')
+        elif item:
+            items.append(link(item))
     return '&nbsp;>&nbsp; '.join(items)
 
 
