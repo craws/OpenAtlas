@@ -619,31 +619,7 @@ def display_info(data: dict[str, Union[str, list[str]]]) -> str:
 
 
 @app.template_filter()
-def description(entity: Union[Entity, Project, User]) -> str:
-    from openatlas.models.entity import Entity
-    from openatlas.views.tools import carbon_result, sex_result
-    html = ''
-    if isinstance(entity, Entity) \
-            and entity.class_.name == 'stratigraphic_unit':
-        if radiocarbon := carbon_result(entity):
-            html += f"<p>{radiocarbon}</p>"
-        if sex_estimation := sex_result(entity):
-            html += f"<p>{sex_estimation}</p>"
-    if not entity.description:
-        return html
-    label = _('description')
-    if isinstance(entity, Entity) and entity.class_.name == 'source':
-        label = _('content')
-    return f"""
-        {html}
-        <h2 class="uc-first fw-bold">{label}</h2>
-        <div class="description more">
-            {'<br>'.join(entity.description.splitlines())}
-        </div>"""
-
-
-@app.template_filter()
-def description2(text: str, label: Optional[str] = '') -> str:
+def description(text: str, label: Optional[str] = '') -> str:
     return '' if not text else \
         f'<h2 class="uc-first fw-bold">{label or _("description")}</h2>' \
         f'<div class="description more">{"<br>".join(text.splitlines())}</div>'

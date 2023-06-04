@@ -10,10 +10,10 @@ from flask_login import current_user
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.util import (
-    bookmark_toggle, button, edit_link, ext_references, format_date,
-    format_entity_date, get_appearance, get_base_table_data, get_system_data,
-    is_authorized, link, manual, profile_image_table_link, remove_link,
-    siblings_pager)
+    bookmark_toggle, button, description, edit_link, ext_references,
+    format_date, format_entity_date, get_appearance, get_base_table_data,
+    get_system_data, is_authorized, link, manual, profile_image_table_link,
+    remove_link, siblings_pager)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -109,8 +109,12 @@ class BaseDisplay:
             info_data=self.data,
             gis_data=self.gis_data,
             overlays=self.overlays,
+            description_html=self.description_html(),
             ext_references=ext_references(self.entity.reference_systems),
             problematic_type_id=self.problematic_type)
+
+    def description_html(self) -> str:
+        return description(self.entity.description)
 
     def add_note_tab(self) -> None:
         self.tabs['note'] = Tab('note', entity=self.entity)

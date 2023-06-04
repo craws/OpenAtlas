@@ -11,9 +11,10 @@ from openatlas.display.base_display import (
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, edit_link, format_entity_date, get_base_table_data, get_file_path,
-    is_authorized, link, remove_link)
+    button, description, edit_link, format_entity_date, get_base_table_data,
+    get_file_path, is_authorized, link, remove_link)
 from openatlas.models.entity import Entity
+from openatlas.views.tools import carbon_result, sex_result
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.reference_system import ReferenceSystem
@@ -288,6 +289,9 @@ class SourceDisplay(BaseDisplay):
         self.add_reference_tables_data()
         self.add_note_tab()
 
+    def description_html(self) -> str:
+        return description(self.entity.description, _('content'))
+
 
 class SourceTranslationDisplay(BaseDisplay):
 
@@ -304,6 +308,15 @@ class StratigraphicUnitDisplay(PlaceBaseDisplay):
         super().add_buttons()
         self.buttons.append(
             button(_('tools'), url_for('tools_index', id_=self.entity.id)))
+
+    def description_html(self) -> str:
+        html = ''
+        if self.entity.class_.name == 'stratigraphic_unit':
+            if radiocarbon := carbon_result(self.entity):
+                html += f"<p>{radiocarbon}</p>"
+            if sex_estimation := sex_result(self.entity):
+                html += f"<p>{sex_estimation}</p>"
+        return html + description(self.entity.description)
 
 
 class TypeDisplay(TypeBaseDisplay):
