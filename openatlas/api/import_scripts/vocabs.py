@@ -8,6 +8,7 @@ from openatlas.api.import_scripts.util import get_exact_match
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
 
+
 def import_vocabs_data(id_: str) -> int:
     return len(fetch_top_level(id_, get_vocabs_reference_system(id_)))
 
@@ -30,7 +31,7 @@ def fetch_top_level(
                 'type',
                 entry['label'],
                 'Automatically imported by VOCABS')
-            #Type.insert_hierarchy(hierarchy, 'custom', ['artifact'], True)
+            # Type.insert_hierarchy(hierarchy, 'custom', ['artifact'], True)
             ref.link(
                 'P67',
                 hierarchy,
