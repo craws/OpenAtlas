@@ -4,7 +4,7 @@ from flask import render_template, url_for, g, flash, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
-from wtforms import BooleanField
+from wtforms import BooleanField, SelectMultipleField, widgets
 from wtforms.validators import InputRequired
 
 from openatlas.api.import_scripts.vocabs import (
@@ -18,6 +18,7 @@ from openatlas.display.util import (
 from openatlas.forms.field import SubmitField
 from openatlas.forms.form import get_vocabs_form
 from openatlas.models.settings import Settings
+from openatlas.models.type import Type
 
 
 @app.route('/vocabs')
@@ -99,6 +100,16 @@ def vocabulary_detail(url: str) -> Optional[str]:
 @required_group('manager')
 def vocabulary_import_view(id_: str) -> str:
     class ImportVocabsHierarchyForm(FlaskForm):
+        multiple = BooleanField(
+            _('multiple'),
+            description=_('tooltip hierarchy multiple'))
+        classes = SelectMultipleField(
+                _('classes'),
+                render_kw={'disabled': True},
+                description=_('tooltip hierarchy forms'),
+                choices=Type.get_class_choices(),
+                option_widget=widgets.CheckboxInput(),
+                widget=widgets.ListWidget(prefix_label=False))
         confirm_import = BooleanField(
             _("I'm sure to import this hierarchy"),
             default=False,
@@ -110,8 +121,11 @@ def vocabulary_import_view(id_: str) -> str:
     form = ImportVocabsHierarchyForm()
 
     if form.validate_on_submit() and form.confirm_import.data:
+        form_data = {
+            'classes': form.classes.data,
+            'multiple': form.multiple.data}
         try:
-            count = import_vocabs_data(id_)
+            count = import_vocabs_data(id_, form_data)
             Transaction.commit()
             g.logger.log('info', 'import', f'import: {count} top concepts')
             flash(f"{_('import of')}: {count} {_('top concepts')}", 'info')
@@ -124,7 +138,7 @@ def vocabulary_import_view(id_: str) -> str:
         'tabs.html',
         tabs={'info': Tab(
             'info',
-            _('Warning: you are about to import following hierarchy: ') +
+            _('You are about to import following hierarchy: ') +
             link(details['title'], details['conceptUri'], external=True),
             form=form)},
         title=id_,

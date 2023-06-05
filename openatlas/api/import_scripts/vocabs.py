@@ -7,14 +7,17 @@ from openatlas import app
 from openatlas.api.import_scripts.util import get_exact_match
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
+from openatlas.models.type import Type
 
 
-def import_vocabs_data(id_: str) -> int:
-    return len(fetch_top_level(id_, get_vocabs_reference_system(id_)))
+def import_vocabs_data(id_: str, form_data: dict[str, Any]) -> int:
+    return len(
+        fetch_top_level(id_, form_data, get_vocabs_reference_system(id_)))
 
 
 def fetch_top_level(
         id_: str,
+        form_data: dict[str, Any],
         ref: Optional[ReferenceSystem] = None) -> list[dict[str, Any]]:
     req = requests.get(
         f"{g.settings['vocabs_base_url']}{g.settings['vocabs_endpoint']}{id_}"
@@ -31,7 +34,10 @@ def fetch_top_level(
                 'type',
                 entry['label'],
                 'Automatically imported by VOCABS')
-            # Type.insert_hierarchy(hierarchy, 'custom', ['artifact'], True)
+            Type.insert_hierarchy(
+                hierarchy,
+                'custom', form_data['classes'],
+                form_data['multiple'])
             ref.link(
                 'P67',
                 hierarchy,
