@@ -25,7 +25,9 @@ def arche_index() -> str:
             display_info({
                 k: str(v) for k, v in app.config['ARCHE'].items()}),
             buttons=[manual('admin/arche')])},
-        crumbs=['ARCHE'])
+        crumbs=[
+            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            'ARCHE'])
 
 
 @app.route('/arche/fetch')

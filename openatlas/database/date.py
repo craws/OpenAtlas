@@ -9,8 +9,9 @@ class Date:
     def get_invalid_dates() -> list[dict[str, Any]]:
         g.cursor.execute(
             """
-            SELECT id FROM model.entity WHERE
-                begin_from > begin_to OR end_from > end_to
+            SELECT id
+            FROM model.entity
+            WHERE begin_from > begin_to OR end_from > end_to
                 OR (
                     begin_from IS NOT NULL
                     AND end_from IS NOT NULL
@@ -26,8 +27,9 @@ class Date:
     def get_invalid_link_dates() -> list[dict[str, Any]]:
         g.cursor.execute(
             """
-            SELECT id FROM model.link WHERE
-                begin_from > begin_to OR end_from > end_to
+            SELECT id
+            FROM model.link
+            WHERE begin_from > begin_to OR end_from > end_to
                 OR (
                     begin_from IS NOT NULL
                     AND end_from IS NOT NULL

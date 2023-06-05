@@ -24,7 +24,7 @@ class Logger:
             SELECT id, priority, type, message, user_id, info, created
             FROM web.system_log
             WHERE priority <= %(priority)s
-            {' AND user_id = %(user_id)s' if int(user_id) > 0 else ''}
+                {' AND user_id = %(user_id)s' if int(user_id) > 0 else ''}
             ORDER BY created DESC
             {' LIMIT %(limit)s' if int(limit) > 0 else ''};
             """,
@@ -51,7 +51,9 @@ class Logger:
             FROM web.user_log ul
             JOIN web.user u ON ul.user_id = u.id
             WHERE ul.entity_id = %(entity_id)s AND ul.action = %(action)s
-            ORDER BY ul.created DESC LIMIT 1;"""
+            ORDER BY ul.created
+            DESC LIMIT 1;
+            """
         g.cursor.execute(sql, {'entity_id': entity_id, 'action': 'insert'})
         row_insert = g.cursor.fetchone()
         g.cursor.execute(sql, {'entity_id': entity_id, 'action': 'update'})

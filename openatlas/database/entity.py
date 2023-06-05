@@ -39,27 +39,29 @@ class Entity:
             FROM model.entity e
             JOIN model.link l ON e.id = l.domain_id
                 AND l.property_code = %(code)s
-            WHERE e.openatlas_class_name = %(class)s
+            WHERE e.openatlas_class_name = %(class)s;
             """,
             {'code': code, 'class': class_})
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_by_project_id(project_id: int) -> list[dict[str, Any]]:
-        sql = """
+        g.cursor.execute(
+            """
             SELECT
                 e.id, ie.origin_id, e.cidoc_class_code, e.name, e.description,
                 e.created, e.modified, e.openatlas_class_name,
                 array_to_json(
                     array_agg((t.range_id, t.description))
                         FILTER (WHERE t.range_id IS NOT NULL)
-                ) as types
+                ) AS types
             FROM model.entity e
             LEFT JOIN model.link t ON e.id = t.domain_id
                 AND t.property_code IN ('P2', 'P89')
             JOIN import.entity ie ON e.id = ie.entity_id
-            WHERE ie.project_id = %(id)s GROUP BY e.id, ie.origin_id;"""
-        g.cursor.execute(sql, {'id': project_id})
+            WHERE ie.project_id = %(id)s
+            GROUP BY e.id, ie.origin_id;
+            """, {'id': project_id})
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
@@ -102,26 +104,28 @@ class Entity:
     def get_orphaned_subunits() -> list[dict[str, Any]]:
         g.cursor.execute(
             """
-            SELECT e.id FROM model.entity e
+            SELECT e.id
+            FROM model.entity e
             LEFT JOIN model.link l
-                ON e.id = l.range_id
-                AND l.property_code = 'P46'
+                ON e.id = l.range_id AND l.property_code = 'P46'
             WHERE l.domain_id IS NULL
-                AND e.openatlas_class_name
-                    IN ('feature', 'stratigraphic_unit');""")
+                AND e.openatlas_class_name IN ('feature', 'stratigraphic_unit')
+            """)
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_orphans() -> list[dict[str, Any]]:
         g.cursor.execute(
             """
-            SELECT e.id FROM model.entity e
+            SELECT e.id
+            FROM model.entity e
             LEFT JOIN model.link l1 ON e.id = l1.domain_id
                 AND l1.range_id NOT IN
                 (SELECT id FROM model.entity WHERE cidoc_class_code = 'E55')
-            LEFT JOIN model.link l2 on e.id = l2.range_id
+            LEFT JOIN model.link l2 ON e.id = l2.range_id
             WHERE l1.domain_id IS NULL
-                AND l2.range_id IS NULL AND e.cidoc_class_code != 'E55';
+                AND l2.range_id IS NULL
+                AND e.cidoc_class_code != 'E55';
             """)
         return [dict(row) for row in g.cursor.fetchall()]
 
@@ -130,15 +134,18 @@ class Entity:
         g.cursor.execute(
             f"""
             {Entity.select_sql()}
-            WHERE e.openatlas_class_name IN %(codes)s GROUP BY e.id
-            ORDER BY e.created DESC LIMIT %(limit)s;
+            WHERE e.openatlas_class_name IN %(codes)s
+            GROUP BY e.id
+            ORDER BY e.created
+            DESC LIMIT %(limit)s;
             """,
             {'codes': tuple(classes), 'limit': limit})
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_all_entities() -> list[dict[str, Any]]:
-        sql = """
+        g.cursor.execute(
+            """
             SELECT
                 e.id,
                 e.cidoc_class_code,
@@ -158,9 +165,9 @@ class Entity:
                     AS end_from,
                 e.end_comment,
                 COALESCE(to_char(e.end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
-                    AS end_to 
-                FROM model.entity e"""
-        g.cursor.execute(sql)
+                    AS end_to
+            FROM model.entity e;
+            """)
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
@@ -329,8 +336,8 @@ class Entity:
             """
             SELECT e.id
             FROM model.entity e
-            JOIN model.link l
-                ON e.id = l.range_id AND l.property_code = 'P46'
+            JOIN model.link l ON e.id = l.range_id
+                AND l.property_code = 'P46'
             WHERE e.openatlas_class_name IN %(classes)s;
             """,
             {'classes': tuple(classes)})
@@ -363,7 +370,7 @@ class Entity:
                     pt.path || ARRAY [t.child_id],
                     pt.depth + 1
                 FROM (
-                    SELECT {first} AS parent_id, {second} as child_id
+                    SELECT {first} AS parent_id, {second} AS child_id
                     FROM model.link WHERE property_code = %(property_code)s
                 ) t
                 JOIN parent_tree pt ON pt.parent_id = t.child_id
@@ -379,7 +386,7 @@ class Entity:
             FROM root_nodes r
             JOIN parent_tree a ON a.child_id = r.child_id
             JOIN model.entity e ON e.id = r.top_level
-            ORDER BY a.child_id
+            ORDER BY a.child_id;
             """,
             {'ids': tuple(ids), 'property_code': property_code})
         return {

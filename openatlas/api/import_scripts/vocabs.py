@@ -24,7 +24,6 @@ def fetch_top_level(
         f"/{concept}",
         timeout=60,
         auth=(app.config['VOCABS_USER'], app.config['VOCABS_PW'])
-        # Todo: auth can be deleted if public
     )
     exact_match_id = get_exact_match().id
     hierarchies = []
@@ -88,3 +87,46 @@ def get_vocabs_reference_system() -> ReferenceSystem:
         Db.add_classes(system.id, ['artifact'])
     return system
 
+
+def get_vocabularies():
+    out = []
+    for voc in fetch_vocabularies():
+        out.append(voc | fetch_vocabulary_details(voc['uri']))
+    return out
+
+
+def fetch_vocabulary_details(id_: str) -> dict[str, str]:
+    req = requests.get(
+        f"{g.settings['vocabs_base_url']}{g.settings['vocabs_endpoint']}{id_}",
+        params={'lang': 'en'},
+        timeout=60,
+        auth=(app.config['VOCABS_USER'], app.config['VOCABS_PW']))
+    data = req.json()
+    return {
+        'id': data['id'],
+        'title': data['title'],
+        'defaultLanguage': data['defaultLanguage'],
+        'languages': data['languages'],
+        'conceptUri': data['conceptschemes'][0]['uri'] if data['conceptschemes'] else ''
+    }
+
+
+def fetch_vocabulary_metadata(id_: str, uri: str) -> dict[str, str]:
+    req = requests.get(
+        f"{g.settings['vocabs_base_url']}{g.settings['vocabs_endpoint']}"
+        f"{id_}/data",
+        params={'uri': uri, 'format': 'application/ld+json'},
+        timeout=60,
+        auth=(app.config['VOCABS_USER'], app.config['VOCABS_PW']))
+    data = req.json()
+    return data['graph'][0]
+
+
+def fetch_vocabularies() -> list[dict[str, str]]:
+    req = requests.get(
+        f"{g.settings['vocabs_base_url']}{g.settings['vocabs_endpoint']}"
+        "vocabularies",
+        params={'lang': 'en'},
+        timeout=60,
+        auth=(app.config['VOCABS_USER'], app.config['VOCABS_PW']))
+    return req.json()['vocabularies']
