@@ -345,9 +345,8 @@ class Entity:
 
     @staticmethod
     def delete_(id_: Union[int, list[int]]) -> None:
-        if not id_:
-            return
-        Db.delete(id_ if isinstance(id_, list) else [id_])
+        if id_:
+            Db.delete(id_ if isinstance(id_, list) else [id_])
 
     @staticmethod
     def get_by_class(

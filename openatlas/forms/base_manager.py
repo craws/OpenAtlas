@@ -182,7 +182,6 @@ class BaseManager:
 
     def insert_entity(self) -> None:
         self.entity = Entity.insert(self.class_.name, self.form.name.data)
-        return
 
     def update_link(self) -> None:
         self.data['attributes_link'] = self.data['attributes']
@@ -264,7 +263,6 @@ class PlaceBaseManager(BaseManager):
             Entity.insert(
                 'object_location',
                 f'Location of {self.form.name.data}'))
-        return
 
 
 class ArtifactBaseManager(PlaceBaseManager):

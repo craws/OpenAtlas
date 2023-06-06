@@ -540,7 +540,6 @@ class ReferenceSystemManager(BaseManager):
             'description': self.form.description.data,
             'website_url': self.form.website_url.data,
             'resolver_url': self.form.resolver_url.data})
-        return
 
     def process_form(self) -> None:
         super().process_form()

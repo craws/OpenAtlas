@@ -126,7 +126,6 @@ def process_origin(manager: Any) -> None:
     elif manager.origin.class_.name == 'file' \
             and manager.entity.class_.name != 'creation':
         manager.add_link('P67', manager.origin, inverse=True)
-    return
 
 
 def process_dates(manager: Any) -> dict[str, Any]:
