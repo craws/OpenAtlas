@@ -10,7 +10,7 @@ from wtforms.validators import InputRequired, Optional, URL
 
 from openatlas.forms.base_manager import (
     ActorBaseManager, ArtifactBaseManager, BaseManager, EventBaseManager,
-    HierarchyBaseManager, TypeBaseManager)
+    HierarchyBaseManager, PlaceBaseManager, TypeBaseManager)
 from openatlas.forms.field import (
     DragNDropField, SubmitField, TableField, TableMultiField, TreeField)
 from openatlas.forms.validation import file
@@ -166,7 +166,7 @@ class ArtifactManager(ArtifactBaseManager):
     def populate_insert(self) -> None:
         super().populate_insert()
         if self.origin and self.origin.class_.view in ['artifact', 'place']:
-            self.form.artifact_super.data = str(self.origin.id)
+            self.form.artifact_super.data = self.origin.id
 
     def populate_update(self) -> None:
         super().populate_update()
@@ -227,7 +227,7 @@ class ExternalReferenceManager(BaseManager):
                 render_kw={'autofocus': True}))
 
 
-class FeatureManager(BaseManager):
+class FeatureManager(PlaceBaseManager):
     fields = ['name', 'date', 'description', 'continue', 'map']
 
     def add_buttons(self) -> None:
@@ -250,7 +250,7 @@ class FeatureManager(BaseManager):
     def populate_insert(self) -> None:
         super().populate_insert()
         if self.origin and self.origin.class_.name == 'place':
-            self.form.feature_super.data = str(self.origin.id)
+            self.form.feature_super.data = self.origin.id
 
     def populate_update(self) -> None:
         super().populate_update()
@@ -303,7 +303,7 @@ class HumanRemainsManager(ArtifactBaseManager):
     def populate_insert(self) -> None:
         super().populate_insert()
         if self.origin and self.origin.class_.view in ['artifact', 'place']:
-            self.form.human_remains_super.data = str(self.origin.id)
+            self.form.human_remains_super.data = self.origin.id
 
     def populate_update(self) -> None:
         super().populate_update()
@@ -466,7 +466,7 @@ class PersonManager(ActorBaseManager):
         self.form.ends_in.label.text = _('died in')
 
 
-class PlaceManager(BaseManager):
+class PlaceManager(PlaceBaseManager):
     fields = ['name', 'alias', 'date', 'description', 'continue', 'map']
 
     def add_buttons(self) -> None:
@@ -597,7 +597,7 @@ class SourceTranslationManager(BaseManager):
             self.add_link('P73', self.origin, inverse=True)
 
 
-class StratigraphicUnitManager(BaseManager):
+class StratigraphicUnitManager(PlaceBaseManager):
     fields = ['name', 'date', 'description', 'continue', 'map']
 
     def add_buttons(self) -> None:
@@ -622,7 +622,7 @@ class StratigraphicUnitManager(BaseManager):
     def populate_insert(self) -> None:
         super().populate_insert()
         if self.origin and self.origin.class_.name == 'feature':
-            self.form.stratigraphic_super.data = str(self.origin.id)
+            self.form.stratigraphic_super.data = self.origin.id
 
     def populate_update(self) -> None:
         super().populate_update()

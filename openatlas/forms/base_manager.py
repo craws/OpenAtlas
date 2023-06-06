@@ -182,12 +182,6 @@ class BaseManager:
 
     def insert_entity(self) -> None:
         self.entity = Entity.insert(self.class_.name, self.form.name.data)
-        if self.class_.view in ['artifact', 'place']:
-            self.entity.link(
-                'P53',
-                Entity.insert(
-                    'object_location',
-                    f'Location of {self.form.name.data}'))
         return
 
     def update_link(self) -> None:
@@ -261,7 +255,19 @@ class ActorBaseManager(BaseManager):
                     inverse=True)
 
 
-class ArtifactBaseManager(BaseManager):
+class PlaceBaseManager(BaseManager):
+
+    def insert_entity(self) -> None:
+        super().insert_entity()
+        self.entity.link(
+            'P53',
+            Entity.insert(
+                'object_location',
+                f'Location of {self.form.name.data}'))
+        return
+
+
+class ArtifactBaseManager(PlaceBaseManager):
     fields = ['name', 'date', 'description', 'continue', 'map']
 
     def additional_fields(self) -> dict[str, Any]:
