@@ -310,7 +310,8 @@ def save(manager: BaseManager) -> Union[str, Response]:
     Transaction.begin()
     action = 'update' if manager.entity else 'insert'
     try:
-        manager.insert_entity()
+        if not manager.entity or manager.copy:
+            manager.insert_entity()
         manager.process_form()
         manager.update_entity(new=(action == 'insert'))
         g.logger.log_user(

@@ -25,7 +25,6 @@ from openatlas.forms.util import (
 from openatlas.forms.validation import hierarchy_name_exists, validate
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -182,15 +181,6 @@ class BaseManager:
                 for shape in ['point', 'line', 'polygon']}
 
     def insert_entity(self) -> None:
-        if self.entity and not self.copy:
-            return
-        if self.class_.name == 'reference_system':
-            self.entity = ReferenceSystem.insert_system({
-                'name': self.form.name.data,
-                'description': self.form.description.data,
-                'website_url': self.form.website_url.data,
-                'resolver_url': self.form.resolver_url.data})
-            return
         self.entity = Entity.insert(self.class_.name, self.form.name.data)
         if self.class_.view in ['artifact', 'place']:
             self.entity.link(

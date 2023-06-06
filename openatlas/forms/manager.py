@@ -16,6 +16,7 @@ from openatlas.forms.field import (
 from openatlas.forms.validation import file
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
+from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 
 
@@ -537,6 +538,14 @@ class ReferenceSystemManager(BaseManager):
                 option_widget=widgets.CheckboxInput(),
                 widget=widgets.ListWidget(prefix_label=False))
             if choices else None}
+
+    def insert_entity(self) -> None:
+        self.entity = ReferenceSystem.insert_system({
+            'name': self.form.name.data,
+            'description': self.form.description.data,
+            'website_url': self.form.website_url.data,
+            'resolver_url': self.form.resolver_url.data})
+        return
 
     def process_form(self) -> None:
         super().process_form()
