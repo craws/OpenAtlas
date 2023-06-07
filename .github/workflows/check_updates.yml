@@ -12,9 +12,8 @@ jobs:
     steps:
       - name: check OpenAtlas container
         run: |
-          docker run --rm -u 0:0 --entrypoint /bin/bash ghcr.io/acdh-oeaw/openatlas/container-preview \
-          -c 'apt update; if [ $(apt list --upgradable 2>/dev/null | wc -l) != 1 ]; then echo need to upgrade; exit 1; else echo everything fine ; fi'
-          if [ $? == 1 ]
+          if [[ "$(docker run --rm -u 0:0 --entrypoint //bin/bash ghcr.io/acdh-oeaw/openatlas/container-preview \
+            -c 'apt update 2>/dev/null; if [ $(apt list --upgradable 2>/dev/null | wc -l) != 1 ]; then echo -n need to upgrade; else echo -n everything fine ; fi')" == *need\ to\ upgrade ]]
           then curl -L \
           -X POST \
           -H "Accept: application/vnd.github+json" \
