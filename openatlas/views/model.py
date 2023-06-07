@@ -269,9 +269,13 @@ class NetworkForm(FlaskForm):
         widget=widgets.ListWidget(prefix_label=False))
 
 
-@app.route('/network/<int:dimensions>', methods=["GET", "POST"])
-@app.route('/network/<int:dimensions>/<int:id_>', methods=["GET", "POST"])
-def network(dimensions: int, id_: Optional[int] = None) -> str:
+@app.route('/overview/network/', methods=["GET", "POST"])
+@app.route('/overview/network/<int:dimensions>', methods=["GET", "POST"])
+@app.route(
+    '/overview/network/<int:dimensions>/<int:id_>',
+    methods=["GET", "POST"])
+@required_group('readonly')
+def network(dimensions: Optional[int] = 0, id_: Optional[int] = None) -> str:
     entity = Entity.get_by_id(id_) if id_ else None
     classes = [c for c in g.classes.values() if c.network_color]
     for class_ in classes:
