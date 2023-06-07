@@ -1,0 +1,14 @@
+name:
+  daily security update
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "5 4 * * *"
+
+jobs:
+  cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run a one-line script
+        run: echo Hello, world!
