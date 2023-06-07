@@ -1,5 +1,5 @@
 import ast
-from typing import Any, Optional as OptionalType
+from typing import Any
 
 from flask import g, request, url_for
 from flask_babel import lazy_gettext as _
@@ -584,15 +584,13 @@ class SourceTranslationManager(BaseManager):
     def additional_fields(self) -> dict[str, Any]:
         return {'description': TextAreaField(_('content'))}
 
-    def get_crumbs(
-            self,
-            structure: OptionalType[dict[str, Any]] = None) -> list[Any]:
+    def get_crumbs(self) -> list[Any]:
         if not self.origin:
             self.crumbs = [
                 [_('source'), url_for('index', view='source')],
                 self.entity.get_linked_entity('P73', True),
                 self.entity]
-        return super().get_crumbs(structure)
+        return super().get_crumbs()
 
     def process_form(self) -> None:
         super().process_form()

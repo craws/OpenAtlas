@@ -24,7 +24,9 @@ from openatlas.forms.util import (
     check_if_entity_has_time, string_to_entity_list)
 from openatlas.forms.validation import hierarchy_name_exists, validate
 from openatlas.models.entity import Entity
+from openatlas.models.gis import Gis
 from openatlas.models.link import Link
+from openatlas.models.overlay import Overlay
 from openatlas.models.type import Type
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -51,6 +53,12 @@ class BaseManager:
         self.copy = copy
         self.crumbs: list[Any] = []
         self.insert = bool(not self.entity and not self.link_)
+        self.place_info: dict[str, Any] = {}
+
+        if self.insert:
+            self.get_place_info_for_insert()
+        else:
+            self.get_place_info_for_update()
 
         class Form(FlaskForm):
             opened = HiddenField()
@@ -79,9 +87,20 @@ class BaseManager:
         self.form: Any = Form(obj=self.link_ or self.entity)
         self.customize_labels()
 
-    def get_crumbs(
-            self,
-            structure: Optional[dict[str, Any]] = None) -> list[Any]:
+    def get_place_info_for_insert(self):
+        self.place_info = {
+            'structure': None,
+            'gis_data': None,
+            'overlays': None}
+
+    def get_place_info_for_update(self):
+        self.place_info = {
+            'structure': None,
+            'gis_data': None,
+            'overlays': None,
+            'location': None}
+
+    def get_crumbs(self) -> list[Any]:
         if not self.crumbs:
             label = self.origin.class_.name if self.origin \
                 else g.classes[self.class_.name].view
@@ -95,8 +114,8 @@ class BaseManager:
                     else g.classes[self.class_.name].view)]]
         if self.origin:
             self.crumbs.append(self.origin)
-        if structure:
-            self.crumbs += structure['supers']
+        if self.place_info['structure']:
+            self.crumbs += self.place_info['structure']['supers']
         if not self.insert:
             return self.crumbs + [
                 _('copy') if 'copy_' in request.path else _('edit')]
@@ -289,6 +308,26 @@ class PlaceBaseManager(BaseManager):
                 'object_location',
                 f'Location of {self.form.name.data}'))
 
+    def get_place_info_for_insert(self):
+        super().get_place_info_for_insert()
+        if self.origin:
+            structure = self.origin.get_structure_for_insert()
+            self.place_info['structure'] = structure
+            self.place_info['gis_data'] = Gis.get_all([self.origin], structure)
+            if current_user.settings['module_map_overlay'] \
+                    and self.origin.class_.view == 'place':
+                self.place_info['overlay'] = Overlay.get_by_object(self.origin)
+
+    def get_place_info_for_update(self):
+        super().get_place_info_for_update()
+        structure = self.entity.get_structure()
+        self.place_info['structure'] = structure
+        self.place_info['gis_data'] = Gis.get_all([self.entity], structure)
+        if current_user.settings['module_map_overlay']:
+            self.place_info['overlays'] = Overlay.get_by_object(self.entity)
+        self.place_info['location'] = \
+            self.entity.get_linked_entity_safe('P53', types=True)
+
 
 class ArtifactBaseManager(PlaceBaseManager):
     fields = ['name', 'date', 'description', 'continue', 'map']
@@ -298,14 +337,12 @@ class ArtifactBaseManager(PlaceBaseManager):
             'actor':
                 TableField(_('owned by'), add_dynamic=['person', 'group'])}
 
-    def get_crumbs(
-            self,
-            structure: Optional[dict[str, Any]] = None) -> list[Any]:
-        crumbs = super().get_crumbs(structure)
-        if structure and self.origin:
-            if count := len(
-                    [i for i in structure['siblings'] if
-                     i.class_.name == self.class_.name]):
+    def get_crumbs(self) -> list[Any]:
+        crumbs = super().get_crumbs()
+        if self.place_info['structure'] and self.origin:
+            if count := len([
+                    i for i in self.place_info['structure']['siblings'] if
+                    i.class_.name == self.class_.name]):
                 crumbs[-1] = crumbs[-1] + f' ({count} {_("exists")})'
         return crumbs
 
@@ -440,13 +477,11 @@ class TypeBaseManager(BaseManager):
     def customize_labels(self) -> None:
         getattr(self.form, str(self.get_root().id)).label.text = 'super'
 
-    def get_crumbs(
-            self,
-            structure: Optional[dict[str, Any]] = None) -> list[Any]:
+    def get_crumbs(self) -> list[Any]:
         self.crumbs = [[_('types'), url_for('type_index')]]
         type_ = self.origin or self.entity
         self.crumbs += [g.types[type_id] for type_id in type_.root]
-        return super().get_crumbs(structure)
+        return super().get_crumbs()
 
     def get_root(self) -> Type:
         type_ = self.origin or self.entity

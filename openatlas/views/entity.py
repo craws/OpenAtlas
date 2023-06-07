@@ -1,6 +1,6 @@
 import os
 from subprocess import call
-from typing import Any, Optional, Union
+from typing import Optional, Union
 
 from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
@@ -19,8 +19,7 @@ from openatlas.forms.base_manager import BaseManager
 from openatlas.forms.form import get_manager
 from openatlas.forms.util import was_modified
 from openatlas.models.entity import Entity
-from openatlas.models.gis import Gis, InvalidGeomException
-from openatlas.models.overlay import Overlay
+from openatlas.models.gis import InvalidGeomException
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 
@@ -82,19 +81,16 @@ def insert(
         if class_ == 'file':
             return redirect(insert_files(manager))
         return redirect(save(manager))
-    place_info = {'structure': None, 'gis_data': None, 'overlays': None}
-    if g.classes[class_].view in ['artifact', 'place']:
-        place_info = get_place_info_for_insert(origin)
     return render_template(
         'entity/insert.html',
         form=manager.form,
         class_name=class_,
         view_name=g.classes[class_].view,
-        gis_data=place_info['gis_data'],
+        gis_data=manager.place_info['gis_data'],
         writable=os.access(app.config['UPLOAD_DIR'], os.W_OK),
-        overlays=place_info['overlays'],
+        overlays=manager.place_info['overlays'],
         title=_(g.classes[class_].view),
-        crumbs=manager.get_crumbs(place_info['structure']))
+        crumbs=manager.get_crumbs())
 
 
 @app.route('/update/<int:id_>', methods=['GET', 'POST'])
@@ -105,7 +101,6 @@ def update(id_: int, copy: Optional[str] = None) -> Union[str, Response]:
     check_update_access(entity)
     if entity.check_too_many_single_type_links():
         abort(422)
-    place_info = get_place_info_for_update(entity)
     manager = get_manager(entity=entity, copy=bool(copy))
     if manager.form.validate_on_submit():
         if was_modified(manager.form, entity):  # pragma: no cover
@@ -134,10 +129,10 @@ def update(id_: int, copy: Optional[str] = None) -> Union[str, Response]:
         form=manager.form,
         entity=entity,
         class_name=entity.class_.view,
-        gis_data=place_info['gis_data'],
-        overlays=place_info['overlays'],
+        gis_data=manager.place_info['gis_data'],
+        overlays=manager.place_info['overlays'],
         title=entity.name,
-        crumbs=manager.get_crumbs(place_info['structure']))
+        crumbs=manager.get_crumbs())
 
 
 @app.route('/delete/<int:id_>')
@@ -196,36 +191,6 @@ def check_update_access(entity: Entity) -> None:
             entity.category == 'system'
             or entity.category == 'standard' and not entity.root):
         abort(403)
-
-
-def get_place_info_for_insert(origin: Optional[Entity]) -> dict[str, Any]:
-    structure = origin.get_structure_for_insert() if origin else None
-    overlay = None
-    if current_user.settings['module_map_overlay'] \
-            and origin \
-            and origin.class_.view == 'place':
-        overlay = Overlay.get_by_object(origin)
-    return {
-        'structure': structure,
-        'gis_data': Gis.get_all([origin] if origin else None, structure),
-        'overlays': overlay}
-
-
-def get_place_info_for_update(entity: Entity) -> dict[str, Any]:
-    data: dict[str, Any] = {
-        'structure': None,
-        'gis_data': None,
-        'overlays': None,
-        'location': None}
-    if entity.class_.view in ['artifact', 'place']:
-        structure = entity.get_structure()
-        data = {
-            'structure': structure,
-            'gis_data': Gis.get_all([entity], structure),
-            'overlays': Overlay.get_by_object(entity)
-            if current_user.settings['module_map_overlay'] else None,
-            'location': entity.get_linked_entity_safe('P53', types=True)}
-    return data
 
 
 def insert_files(manager: BaseManager) -> Union[str, Response]:
