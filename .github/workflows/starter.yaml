@@ -1,6 +1,7 @@
 name: 'Build, test and deploy OpenAtlas'
 on:
   push: {}
+  workflow_call: {}
   repository_dispatch:
     types: [run]
   workflow_dispatch: {}
@@ -93,7 +94,7 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: Fetch container image built above
         run: |
           container_name_tag="$(echo -n '${{ needs.setup_workflow_env.outputs.registry_root }}${{ needs.setup_workflow_env.outputs.image_name }}' | tr '_' '-' | tr '[:upper:]' '[:lower:]'):$(git rev-parse --short HEAD)"

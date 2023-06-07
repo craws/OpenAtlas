@@ -7,8 +7,17 @@ on:
     - cron: "5 4 * * *"
 
 jobs:
-  cron:
+  check_for_updates:
     runs-on: ubuntu-latest
     steps:
-      - name: Run a one-line script
-        run: echo Hello, world!
+      - name: check OpenAtlas container
+        run: |
+          check_result="$(docker run --rm -u 0:0 --entrypoint /bin/bash ghcr.io/acdh-oeaw/openatlas/container-preview \
+            -c 'apt-get update >/dev/null; if [ $(apt list --upgradable 2>/dev/null | wc -l) != 1 ]; then echo -n need to upgrade; else echo -n everything fine ; fi')"
+          echo "$check_result"
+          echo "check_result=$check_result" >> $GITHUB_OUTPUT
+  call_delploy:
+    needs: [check_for_updates]
+    if: ${{ needs.check_for_updates.outputs.check_result == 'need to upgrade' }}
+    uses: ./.github/workflows/starter.yaml
+    secrets: inherit
