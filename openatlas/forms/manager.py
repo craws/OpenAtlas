@@ -1,7 +1,7 @@
 import ast
-from typing import Any
+from typing import Any, Optional as OptionalType
 
-from flask import g, request
+from flask import g, request, url_for
 from flask_babel import lazy_gettext as _
 from wtforms import (
     BooleanField, HiddenField, SelectField, SelectMultipleField, StringField,
@@ -583,6 +583,16 @@ class SourceTranslationManager(BaseManager):
 
     def additional_fields(self) -> dict[str, Any]:
         return {'description': TextAreaField(_('content'))}
+
+    def get_crumbs(
+            self,
+            structure: OptionalType[dict[str, Any]] = None) -> list[Any]:
+        if not self.origin:
+            self.crumbs = [
+                [_('source'), url_for('index', view='source')],
+                self.entity.get_linked_entity('P73', True),
+                self.entity]
+        return super().get_crumbs(structure)
 
     def process_form(self) -> None:
         super().process_form()

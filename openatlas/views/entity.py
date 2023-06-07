@@ -2,7 +2,7 @@ import os
 from subprocess import call
 from typing import Any, Optional, Union
 
-from flask import flash, g, render_template, request, url_for
+from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from werkzeug.exceptions import abort
@@ -94,11 +94,7 @@ def insert(
         writable=os.access(app.config['UPLOAD_DIR'], os.W_OK),
         overlays=place_info['overlays'],
         title=_(g.classes[class_].view),
-        crumbs=add_crumbs(
-            class_,
-            origin,
-            place_info['structure'],
-            insert_=True))
+        crumbs=manager.get_crumbs(place_info['structure']))
 
 
 @app.route('/update/<int:id_>', methods=['GET', 'POST'])
@@ -141,7 +137,7 @@ def update(id_: int, copy: Optional[str] = None) -> Union[str, Response]:
         gis_data=place_info['gis_data'],
         overlays=place_info['overlays'],
         title=entity.name,
-        crumbs=add_crumbs(entity.class_.name, entity, place_info['structure']))
+        crumbs=manager.get_crumbs(place_info['structure']))
 
 
 @app.route('/delete/<int:id_>')
@@ -185,43 +181,6 @@ def delete(id_: int) -> Response:
     g.logger.log_user(id_, 'delete')
     flash(_('entity deleted'), 'info')
     return redirect(url)
-
-
-def add_crumbs(
-        class_: str,
-        origin: Union[Entity, None],
-        structure: Optional[dict[str, Any]],
-        insert_: Optional[bool] = False) -> list[Any]:
-    label = origin.class_.name if origin else g.classes[class_].view
-    if label in g.class_view_mapping:
-        label = g.class_view_mapping[label]
-    label = _(label.replace('_', ' '))
-    crumbs: list[Any] = [[
-        label,
-        url_for(
-            'index',
-            view=origin.class_.view if origin else g.classes[class_].view)]]
-    if class_ == 'source_translation' and origin and not insert_:
-        crumbs = [
-            [_('source'), url_for('index', view='source')],
-            origin.get_linked_entity('P73', True)]
-    if g.classes[class_].view == 'type':
-        crumbs = [[_('types'), url_for('type_index')]]
-        if isinstance(origin, Type) and origin.root:
-            crumbs += [g.types[type_id] for type_id in origin.root]
-    if structure:
-        crumbs += structure['supers']
-    crumbs.append(origin if not insert_ else None)
-    if not insert_:
-        return crumbs + [_('copy') if 'copy_' in request.path else _('edit')]
-    siblings = ''
-    if structure and origin and origin.class_.name == 'stratigraphic_unit':
-        if count := len(
-                [i for i in structure['siblings'] if i.class_.name == class_]):
-            siblings = f" ({count} {_('exists')})" if count else ''
-    return crumbs + [
-        '+&nbsp;<span class="uc-first d-inline-block">' +
-        f'{g.classes[class_].label}{siblings}</span>']
 
 
 def check_insert_access(class_: str) -> None:

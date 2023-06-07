@@ -56,7 +56,7 @@ class SourceTest(TestBaseCase):
                     'insert',
                     class_='source_translation',
                     origin_id=source_id))
-            assert b'+&nbsp;<span' in rv.data
+            assert b'+ Source translation' in rv.data
 
             rv = self.app.post(
                 url_for(

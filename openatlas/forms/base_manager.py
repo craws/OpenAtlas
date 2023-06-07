@@ -3,7 +3,7 @@ from __future__ import annotations
 import time
 from typing import Any, Optional, TYPE_CHECKING, Union
 
-from flask import g
+from flask import g, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
@@ -49,6 +49,8 @@ class BaseManager:
         self.origin: Any = origin
         self.link_: Any = link_
         self.copy = copy
+        self.crumbs: list[Any] = []
+        self.insert = bool(not self.entity and not self.link_)
 
         class Form(FlaskForm):
             opened = HiddenField()
@@ -76,6 +78,30 @@ class BaseManager:
         self.add_buttons()
         self.form: Any = Form(obj=self.link_ or self.entity)
         self.customize_labels()
+
+    def get_crumbs(
+            self,
+            structure: Optional[dict[str, Any]] = None) -> list[Any]:
+        if not self.crumbs:
+            label = self.origin.class_.name if self.origin \
+                else g.classes[self.class_.name].view
+            if label in g.class_view_mapping:
+                label = g.class_view_mapping[label]
+            self.crumbs = [[
+                _(label.replace('_', ' ')),
+                url_for(
+                    'index',
+                    view=self.origin.class_.view if self.origin
+                    else g.classes[self.class_.name].view)]]
+        if self.origin:
+            self.crumbs.append(self.origin)
+        if structure:
+            self.crumbs += structure['supers']
+        if not self.insert:
+            return self.crumbs + [
+                _('copy') if 'copy_' in request.path else _('edit')]
+        self.crumbs.append(f'+ {g.classes[self.class_.name].label}')
+        return self.crumbs
 
     def add_description(self) -> None:
         setattr(
@@ -110,9 +136,8 @@ class BaseManager:
         setattr(
             self.form_class,
             'save',
-            SubmitField(
-                _('save') if self.entity or self.link_ else _('insert')))
-        if not self.entity and not self.link_ and 'continue' in self.fields:
+            SubmitField(_('insert') if self.insert else _('save')))
+        if self.insert and 'continue' in self.fields:
             setattr(
                 self.form_class,
                 'insert_and_continue',
@@ -273,6 +298,17 @@ class ArtifactBaseManager(PlaceBaseManager):
             'actor':
                 TableField(_('owned by'), add_dynamic=['person', 'group'])}
 
+    def get_crumbs(
+            self,
+            structure: Optional[dict[str, Any]] = None) -> list[Any]:
+        crumbs = super().get_crumbs(structure)
+        if structure and self.origin:
+            if count := len(
+                    [i for i in structure['siblings'] if
+                     i.class_.name == self.class_.name]):
+                crumbs[-1] = crumbs[-1] + f' ({count} {_("exists")})'
+        return crumbs
+
     def populate_insert(self) -> None:
         if self.origin and self.origin.class_.view == 'actor':
             self.form.actor.data = self.origin.id
@@ -403,6 +439,14 @@ class TypeBaseManager(BaseManager):
 
     def customize_labels(self) -> None:
         getattr(self.form, str(self.get_root().id)).label.text = 'super'
+
+    def get_crumbs(
+            self,
+            structure: Optional[dict[str, Any]] = None) -> list[Any]:
+        self.crumbs = [[_('types'), url_for('type_index')]]
+        type_ = self.origin or self.entity
+        self.crumbs += [g.types[type_id] for type_id in type_.root]
+        return super().get_crumbs(structure)
 
     def get_root(self) -> Type:
         type_ = self.origin or self.entity
