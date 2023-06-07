@@ -1,6 +1,7 @@
 name: 'Tests'
 on:
   push: {}
+  workflow_call: {}
 jobs:
   build_openatlas:
     runs-on: ubuntu-latest
