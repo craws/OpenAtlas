@@ -392,7 +392,7 @@ class TypeBaseManager(BaseManager):
     new_super: Type
 
     def additional_fields(self) -> dict[str, Any]:
-        root = self.get_root_type()
+        root = self.get_root()
         fields = {
             'is_type_form': HiddenField(),
             str(root.id): TreeField(
@@ -403,10 +403,10 @@ class TypeBaseManager(BaseManager):
         return fields
 
     def customize_labels(self) -> None:
-        getattr(self.form, str(self.get_root_type().id)).label.text = 'super'
+        getattr(self.form, str(self.get_root().id)).label.text = 'super'
 
-    def get_root_type(self) -> Type:
-        type_ = self.entity if isinstance(self.entity, Type) else self.origin
+    def get_root(self) -> Type:
+        type_ = self.origin or self.entity
         return g.types[type_.root[0]] if type_.root else type_
 
     def populate_insert(self) -> None:
@@ -429,7 +429,7 @@ class TypeBaseManager(BaseManager):
     def process_form(self) -> None:
         super().process_form()
         type_ = self.origin if isinstance(self.origin, Type) else self.entity
-        root = self.get_root_type()
+        root = self.get_root()
         self.super_id = g.types[type_.root[-1]] if type_.root else type_
         self.new_super = root
         if new_id := getattr(self.form, str(root.id)).data:

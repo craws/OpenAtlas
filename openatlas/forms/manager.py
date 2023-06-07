@@ -636,7 +636,7 @@ class TypeManager(TypeBaseManager):
 
     def add_description(self) -> None:
         super().add_description()
-        if self.get_root_type().category == 'value':
+        if self.get_root().category == 'value':
             del self.form_class.description
             setattr(self.form_class, 'description', StringField(_('unit')))
 
