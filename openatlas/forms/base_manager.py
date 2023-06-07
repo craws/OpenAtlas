@@ -87,13 +87,13 @@ class BaseManager:
         self.form: Any = Form(obj=self.link_ or self.entity)
         self.customize_labels()
 
-    def get_place_info_for_insert(self):
+    def get_place_info_for_insert(self) -> None:
         self.place_info = {
             'structure': None,
             'gis_data': None,
             'overlays': None}
 
-    def get_place_info_for_update(self):
+    def get_place_info_for_update(self) -> None:
         self.place_info = {
             'structure': None,
             'gis_data': None,
@@ -308,7 +308,7 @@ class PlaceBaseManager(BaseManager):
                 'object_location',
                 f'Location of {self.form.name.data}'))
 
-    def get_place_info_for_insert(self):
+    def get_place_info_for_insert(self) -> None:
         super().get_place_info_for_insert()
         if self.origin:
             structure = self.origin.get_structure_for_insert()
@@ -318,7 +318,7 @@ class PlaceBaseManager(BaseManager):
                     and self.origin.class_.view == 'place':
                 self.place_info['overlay'] = Overlay.get_by_object(self.origin)
 
-    def get_place_info_for_update(self):
+    def get_place_info_for_update(self) -> None:
         super().get_place_info_for_update()
         structure = self.entity.get_structure()
         self.place_info['structure'] = structure
