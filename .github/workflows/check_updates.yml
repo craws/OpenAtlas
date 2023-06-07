@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: check OpenAtlas container
         run: |
-          docker run --rm -i -t -u 0:0 --entrypoint /bin/bash ghcr.io/acdh-oeaw/openatlas/container-preview \
+          docker run --rm -u 0:0 --entrypoint /bin/bash ghcr.io/acdh-oeaw/openatlas/container-preview \
           -c 'apt update; if [ $(apt list --upgradable 2>/dev/null | wc -l) != 1 ]; then echo need to upgrade; exit 1; else echo everything fine ; fi'
           if [ $? == 1 ]
           then curl -L \
