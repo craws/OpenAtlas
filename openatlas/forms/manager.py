@@ -138,9 +138,8 @@ class AdministrativeUnitManager(TypeBaseManager):
 
     def process_form(self) -> None:
         super().process_form()
-        if self.super_id != self.new_super.id:
-            self.data['links']['delete'].add('P89')
-            self.add_link('P89', self.new_super)
+        self.data['links']['delete'].add('P89')
+        self.add_link('P89', g.types[self.super_id])
 
 
 class ArtifactManager(ArtifactBaseManager):
@@ -642,6 +641,5 @@ class TypeManager(TypeBaseManager):
 
     def process_form(self) -> None:
         super().process_form()
-        if self.super_id != self.new_super.id:
-            self.data['links']['delete'].add('P127')
-            self.add_link('P127', self.new_super)
+        self.data['links']['delete'].add('P127')
+        self.add_link('P127', g.types[self.super_id])

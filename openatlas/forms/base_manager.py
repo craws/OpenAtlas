@@ -389,7 +389,6 @@ class HierarchyBaseManager(BaseManager):
 class TypeBaseManager(BaseManager):
     fields = ['name', 'date', 'description', 'continue']
     super_id: int
-    new_super: Type
 
     def additional_fields(self) -> dict[str, Any]:
         root = self.get_root()
@@ -428,9 +427,6 @@ class TypeBaseManager(BaseManager):
 
     def process_form(self) -> None:
         super().process_form()
-        type_ = self.origin if isinstance(self.origin, Type) else self.entity
-        root = self.get_root()
-        self.super_id = g.types[type_.root[-1]] if type_.root else type_
-        self.new_super = root
-        if new_id := getattr(self.form, str(root.id)).data:
-            self.new_super = g.types[int(new_id)]
+        self.super_id = self.get_root().id
+        if new_id := getattr(self.form, str(self.super_id)).data:
+            self.super_id = int(new_id)
