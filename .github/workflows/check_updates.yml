@@ -7,18 +7,17 @@ on:
     - cron: "5 4 * * *"
 
 jobs:
-  cron:
+  check_for_updates:
     runs-on: ubuntu-latest
     steps:
       - name: check OpenAtlas container
         run: |
-          if [[ "$(docker run --rm -u 0:0 --entrypoint //bin/bash ghcr.io/acdh-oeaw/openatlas/container-preview \
-            -c 'apt update 2>/dev/null; if [ $(apt list --upgradable 2>/dev/null | wc -l) != 1 ]; then echo -n need to upgrade; else echo -n everything fine ; fi')" == *need\ to\ upgrade ]]
-          then curl -L \
-          -X POST \
-          -H "Accept: application/vnd.github+json" \
-          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}"\
-          -H "X-GitHub-Api-Version: 2022-11-28" \
-          https://api.github.com/repos/${{ github.repository }}/actions/workflows/starter.yaml/dispatches \
-          -d '{"ref":"${{ env.GITHUB_REF }}"}'
-          fi
+          check_result="$(docker run --rm -u 0:0 --entrypoint //bin/bash ghcr.io/acdh-oeaw/openatlas/container-preview \
+            -c 'apt update 2>&1 >/dev/null; if [ $(apt list --upgradable 2>/dev/null | wc -l) != 1 ]; then echo -n need to upgrade; else echo -n everything fine ; fi')"
+          echo "$check_result"
+          echo "check_result=$check_result" >> $GITHUB_OUTPUT
+  call_delploy:
+    needs: [check_for_updates]
+    if: ${{ needs.check_for_updates.outputs.check_result == 'need to upgrade' }}
+    uses: starter.yaml
+    secrets: inherit
