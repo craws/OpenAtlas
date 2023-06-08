@@ -94,10 +94,10 @@ def was_modified(form: FlaskForm, entity: Entity) -> bool:
     if not entity.modified or not form.opened.data:
         return False
     if entity.modified < datetime.fromtimestamp(
-            float(form.opened.data)):  # pragma: no cover
+            float(form.opened.data)):
         return False
-    g.logger.log('info', 'multi user', 'Overwrite denied')  # pragma: no cover
-    return True  # pragma: no cover
+    g.logger.log('info', 'multi user', 'Overwrite denied')
+    return True
 
 
 def form_to_datetime64(

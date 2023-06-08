@@ -104,8 +104,7 @@ def update(id_: int, copy: Optional[str] = None) -> Union[str, Response]:
         abort(422)
     manager = get_manager(entity=entity, copy=bool(copy))
     if manager.form.validate_on_submit():
-        if was_modified(manager.form, entity):  # pragma: no cover
-            1/0
+        if was_modified(manager.form, entity):
             del manager.form.save
             modifier = link(
                 g.logger.get_log_info(entity.id)['modifier'],
