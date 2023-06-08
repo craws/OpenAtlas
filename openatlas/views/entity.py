@@ -105,8 +105,11 @@ def update(id_: int, copy: Optional[str] = None) -> Union[str, Response]:
     manager = get_manager(entity=entity, copy=bool(copy))
     if manager.form.validate_on_submit():
         if was_modified(manager.form, entity):  # pragma: no cover
+            1/0
             del manager.form.save
-            modifier = link(g.logger.get_log_info(entity.id)['modifier'])
+            modifier = link(
+                g.logger.get_log_info(entity.id)['modifier'],
+                external=True)
             flash(
                 _('error modified by %(username)s', username=modifier) +
                 button(_('reload'), url_for('update', id_=entity.id)),
