@@ -14,7 +14,8 @@ from openatlas.database.connect import Transaction
 from openatlas.display import display
 from openatlas.display.image_processing import resize_image
 from openatlas.display.util import (
-    get_base_table_data, get_file_path, is_authorized, link, required_group)
+    button, get_base_table_data, get_file_path, is_authorized, link,
+    required_group)
 from openatlas.forms.base_manager import BaseManager
 from openatlas.forms.form import get_manager
 from openatlas.forms.util import was_modified
@@ -105,12 +106,15 @@ def update(id_: int, copy: Optional[str] = None) -> Union[str, Response]:
     if manager.form.validate_on_submit():
         if was_modified(manager.form, entity):  # pragma: no cover
             del manager.form.save
-            flash(_('error modified'), 'error')
+            modifier = link(g.logger.get_log_info(entity.id)['modifier'])
+            flash(
+                _('error modified by %(username)s', username=modifier) +
+                button(_('reload'), url_for('update', id_=entity.id)),
+                'error')
             return render_template(
                 'entity/update.html',
                 form=manager.form,
-                entity=entity,
-                modifier=link(g.logger.get_log_info(entity.id)['modifier']))
+                entity=entity)
         return redirect(save(manager))
     if not manager.form.is_submitted():
         manager.populate_update()
