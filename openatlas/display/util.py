@@ -213,7 +213,9 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
             'type']:
         active = ''
         request_parts = request.path.split('/')
-        if (view_name == item) or request.path.startswith('/index/' + item):
+        if view_name == item \
+                or request.path.startswith(f'/{item}') \
+                or request.path.startswith(f'/index/{item}'):
             active = 'active'
         elif len(request_parts) > 2 and request.path.startswith('/insert/'):
             name = request_parts[2]

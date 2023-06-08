@@ -42,9 +42,8 @@ def get_form_settings(form: Any, profile: bool = False) -> dict[str, str]:
             value = ''  # pragma: no cover - if missing setting after an update
         if field.type in ['StringField', 'IntegerField']:
             settings[field.label.text] = value
-        if field.type == 'BooleanField':  # str() needed for templates
-            settings[field.label.text] = \
-                str(_('on')) if value else str(_('off'))
+        if field.type == 'BooleanField':
+            settings[field.label.text] = str(_('on') if value else _('off'))
         if field.type == 'SelectField':
             if isinstance(value, str) and value.isdigit():
                 value = int(value)
