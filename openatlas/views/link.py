@@ -165,11 +165,9 @@ def reference_link_update(link_: Link, origin: Entity) -> Union[str, Response]:
         'content.html',
         content=display_form(form),
         crumbs=[
-            [_(origin.class_.view),
-             url_for('index', view=origin.class_.view)],
+            [_(origin.class_.view), url_for('index', view=origin.class_.view)],
             origin,
-            link_.domain if link_.domain.id != origin.id else
-            link_.range,
+            link_.domain if link_.domain.id != origin.id else link_.range,
             _('edit')])
 
 
