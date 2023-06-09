@@ -10,7 +10,7 @@ from flask_login import current_user
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.util import (
-    bookmark_toggle, button, delete_link, edit_link, ext_references,
+    bookmark_toggle, button, description, edit_link, ext_references,
     format_date, format_entity_date, get_appearance, get_base_table_data,
     get_system_data, is_authorized, link, manual, profile_image_table_link,
     remove_link, siblings_pager)
@@ -18,7 +18,6 @@ from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.models.overlay import Overlay
-from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.models.user import User
 from openatlas.views.entity_index import file_preview
@@ -110,8 +109,12 @@ class BaseDisplay:
             info_data=self.data,
             gis_data=self.gis_data,
             overlays=self.overlays,
+            description_html=self.description_html(),
             ext_references=ext_references(self.entity.reference_systems),
             problematic_type_id=self.problematic_type)
+
+    def description_html(self) -> str:
+        return description(self.entity.description)
 
     def add_note_tab(self) -> None:
         self.tabs['note'] = Tab('note', entity=self.entity)
@@ -125,26 +128,31 @@ class BaseDisplay:
             self.tabs['note'].table.rows.append(data)
 
     def add_buttons(self) -> None:
-        if not is_authorized(self.entity.class_.write_access) or (
-                isinstance(self.entity, Type)
-                and self.entity.category == 'system'):
-            return
-        if not self.problematic_type:
-            self.buttons.append(
-                button(_('edit'), url_for('update', id_=self.entity.id)))
-            if type(self.entity) is Entity \
-                    and self.entity.class_.name != 'source_translation':
+        if is_authorized(self.entity.class_.write_access):
+            if not self.problematic_type:
+                self.add_update_button()
+            if type(self.entity) is Entity:
                 self.buttons.append(
                     button(
                         _('copy'),
                         url_for('update', id_=self.entity.id, copy='copy_')))
-        if self.entity.class_.view == 'place' and \
-                self.entity.get_linked_entities('P46'):
-            return
-        if isinstance(self.entity, ReferenceSystem) and \
-                (self.entity.classes or self.entity.system):
-            return
-        self.buttons.append(delete_link(self.entity))
+            if self.entity:
+                self.add_delete_button()
+
+    def add_update_button(self) -> None:
+        self.buttons.append(
+            button(_('edit'), url_for('update', id_=self.entity.id)))
+
+    def add_delete_button(self) -> None:
+        if current_user.group == 'contributor':
+            info = g.logger.get_log_info(self.entity.id)
+            if not info['creator'] or info['creator'].id != current_user.id:
+                return
+        msg = _('Delete %(name)s?', name=self.entity.name.replace('\'', ''))
+        self.buttons.append(button(
+            _('delete'),
+            url_for('delete', id_=self.entity.id),
+            onclick=f"return confirm('{msg}')"))
 
     def add_data(self) -> None:
         self.data = {
@@ -281,8 +289,9 @@ class EventsDisplay(BaseDisplay):
         self.data[_('preceding event')] = \
             link(self.entity.get_linked_entity('P134'))
         self.data[_('succeeding event')] = \
-            '<br>'.join([link(e) for e in
-                self.entity.get_linked_entities('P134', True)])
+            '<br>'.join([
+                link(e)
+                for e in self.entity.get_linked_entities('P134', True)])
         if place := self.entity.get_linked_entity('P7'):
             self.data[_('location')] = \
                 link(place.get_linked_entity_safe('P53', True))
@@ -401,6 +410,10 @@ class PlaceBaseDisplay(BaseDisplay):
                 and (not self.structure or not self.structure['supers']):
             self.gis_data = {}
 
+    def add_delete_button(self) -> None:
+        if not self.entity.get_linked_entities('P46'):
+            super().add_delete_button()
+
 
 class ReferenceBaseDisplay(BaseDisplay):
 
@@ -427,8 +440,19 @@ class ReferenceBaseDisplay(BaseDisplay):
 
 
 class TypeBaseDisplay(BaseDisplay):
-
     entity: Type
+
+    def add_crumbs(self) -> None:
+        self.crumbs = [[_('types'), url_for('type_index')]]
+        self.crumbs += [g.types[type_id] for type_id in self.entity.root]
+        self.crumbs.append(self.entity.name)
+
+    def add_delete_button(self) -> None:
+        if self.entity.category != 'system':
+            url = url_for('type_delete', id_=self.entity.id)
+            if self.entity.count or self.entity.subs:
+                url = url_for('type_delete_recursive', id_=self.entity.id)
+            self.buttons.append(button(_('delete'), url))
 
     def add_data(self) -> None:
         super().add_data()
@@ -436,11 +460,6 @@ class TypeBaseDisplay(BaseDisplay):
         if self.entity.category == 'value':
             self.data[_('unit')] = self.entity.description
         self.data[_('ID for imports')] = self.entity.id
-
-    def add_crumbs(self) -> None:
-        self.crumbs = [[_('types'), url_for('type_index')]]
-        self.crumbs += [g.types[type_id] for type_id in self.entity.root]
-        self.crumbs.append(self.entity.name)
 
     def add_tabs(self) -> None:
         super().add_tabs()
@@ -501,3 +520,7 @@ class TypeBaseDisplay(BaseDisplay):
                 button(
                     _('move entities'),
                     url_for('type_move_entities', id_=entity.id)))
+
+    def add_update_button(self) -> None:
+        if self.entity.category != 'system':
+            super().add_update_button()

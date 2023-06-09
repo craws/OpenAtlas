@@ -19,7 +19,7 @@ class ArtifactTest(TestBaseCase):
 
             rv: Any = self.app.get(
                 url_for('insert', class_='artifact', origin_id=place.id))
-            assert b'+&nbsp;<span' in rv.data
+            assert b'+ Artifact' in rv.data
 
             rv = self.app.post(
                 url_for('insert', class_='artifact'),

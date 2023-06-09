@@ -345,9 +345,8 @@ class Entity:
 
     @staticmethod
     def delete_(id_: Union[int, list[int]]) -> None:
-        if not id_:
-            return
-        Db.delete(id_ if isinstance(id_, list) else [id_])
+        if id_:
+            Db.delete(id_ if isinstance(id_, list) else [id_])
 
     @staticmethod
     def get_by_class(
@@ -447,7 +446,7 @@ class Entity:
         similar: dict[int, Any] = {}
         already_added: set[int] = set()
         entities = Entity.get_by_class(class_)
-        for sample in filter(lambda x: x.id not in already_added, entities):
+        for sample in [e for e in entities if e.id not in already_added]:
             similar[sample.id] = {'entity': sample, 'entities': []}
             for entity in entities:
                 if entity.id != sample.id \

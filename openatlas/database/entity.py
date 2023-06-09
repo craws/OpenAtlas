@@ -125,7 +125,8 @@ class Entity:
             LEFT JOIN model.link l2 ON e.id = l2.range_id
             WHERE l1.domain_id IS NULL
                 AND l2.range_id IS NULL
-                AND e.cidoc_class_code != 'E55';
+                AND e.cidoc_class_code != 'E55'
+                AND e.openatlas_class_name != 'reference_system';
             """)
         return [dict(row) for row in g.cursor.fetchall()]
 

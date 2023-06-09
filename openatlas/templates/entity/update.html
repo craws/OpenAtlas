@@ -1,13 +1,5 @@
 {% extends 'layout.html' %}
 {% block content %}
-  {% if modifier %}
-    <p class="error">
-      {{ _('error modified by %(username)s', username=modifier)|safe }}
-    </p>
-    <p>
-      {{ _('reload')|button(url_for('update', id_=entity.id))|safe }}
-    </p>
-  {% endif %}
   {% if entity.class_.view not in ['artifact', 'place'] %}
     <div class="container">
     {{ form|display_form(manual_page='entity/' + entity.class_.view)|safe }}
