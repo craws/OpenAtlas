@@ -264,13 +264,14 @@ def import_cidoc() -> None:
             'comment': class_.comment})
     for code, class_ in classes.items():
         for sub_code_of in class_.sub_class_of:
-            sql = """
-                INSERT INTO model.cidoc_class_inheritance 
-                    (super_code, sub_code)
-                VALUES (%(super_code)s, %(sub_code)s);"""
-            cursor.execute(sql, {
-                'super_code': sub_code_of,
-                'sub_code': class_.code})
+            if sub_code_of != class_.code:  # Prevent circular relations
+                sql = """
+                    INSERT INTO model.cidoc_class_inheritance
+                        (super_code, sub_code)
+                    VALUES (%(super_code)s, %(sub_code)s);"""
+                cursor.execute(sql, {
+                    'super_code': sub_code_of,
+                    'sub_code': class_.code})
         for language, label in class_.label.items():
             sql = """
                 INSERT INTO model.cidoc_class_i18n
