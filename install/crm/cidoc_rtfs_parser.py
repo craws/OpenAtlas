@@ -1,3 +1,5 @@
+# pylint: disable=C,R
+#
 # This script is for developing purposes and not needed to install OpenAtlas.
 #
 # CIDOC CRM is used as basis for the underlying data model of OpenAtlas.
