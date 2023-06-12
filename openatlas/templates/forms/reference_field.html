@@ -1,7 +1,15 @@
 <div class="row g-1">
   <div class="col-6">
-    <input autocomplete="off" style="position: relative" value="{{ field.data['value'] or '' }}" id="reference_system_value_{{ field.reference_system_id }}" placeholder="{{ field.placeholder }}" name="reference_system_id_{{ field.reference_system_id }}"
-           type="text" class="{{ config.CSS.string_field }}" data-reference-system="{{ field.label.text.replace(' ','-') }}"/>
+    <input
+      autocomplete="off"
+      style="position: relative"
+      value="{{ field.data['value'] or '' }}"
+      id="reference_system_value_{{ field.reference_system_id }}"
+      placeholder="{{ field.placeholder }}"
+      name="reference_system_id_{{ field.reference_system_id }}"
+      type="text"
+      class="{{ config.CSS.string_field }}"
+      data-reference-system="{{ field.label.text.replace(' ','-') }}"/>
 
   </div>
   <div class="col-6">

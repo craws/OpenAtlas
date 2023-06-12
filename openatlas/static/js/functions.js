@@ -120,7 +120,7 @@ $(document).ready(function () {
     formatResult: function (item) {
       return {
         value: item.id,
-        text: `${item.id} - ${item.label} - ${item.description}`
+        text: `${item.label} - ${item.description}<br/><small>${item.id}</small>`
       };
     },
     events: {
