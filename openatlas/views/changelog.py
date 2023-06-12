@@ -19,7 +19,9 @@ versions = {
         'feature': {
             '1898': 'Update CIDOC CRM from 7.1.1 to 7.1.2',
             '2020': 'Accessibility: Tab navigation for forms',
-            '2017': 'Refactor and minor improvements'}}],
+            '2017': 'Refactor and minor improvements'},
+        'fix': {
+            '2023': 'Autocomplete at Wikidata is too short'}}],
     '7.13.1': ['2023-05-09', {
             'fix': {'2014': "Former network URL isn't working anymore"}}],
     '7.13.0': ['2023-05-06', {
