@@ -10,8 +10,8 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.display.table import Table
-from openatlas.display.util import button, link, manual, required_group, \
-    uc_first
+from openatlas.display.util import (
+    button, link, manual, required_group, uc_first)
 from openatlas.forms.field import SubmitField, TableField
 from openatlas.models.entity import Entity
 from openatlas.models.network import Network
@@ -19,6 +19,7 @@ from openatlas.models.openatlas_class import OpenatlasClass
 
 
 class LinkCheckForm(FlaskForm):
+
     cidoc_domain = TableField('Domain', [InputRequired()])
     cidoc_property = TableField('Property', [InputRequired()])
     cidoc_range = TableField('Range', [InputRequired()])

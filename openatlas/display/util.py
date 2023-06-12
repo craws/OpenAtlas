@@ -606,7 +606,7 @@ def breadcrumb(crumbs: list[Any]) -> str:
         if isinstance(item, list):
             items.append(
                 f'<a href="{item[1]}" class="uc-first">{str(item[0])}</a>')
-        elif isinstance(item, str):
+        elif isinstance(item, str) or isinstance(item, LazyString):
             items.append(f'<span class="uc-first">{item}</span>')
         elif item:
             items.append(link(item))

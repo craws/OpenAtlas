@@ -423,6 +423,8 @@ def get_table_content(
             table.rows.append([
                 f'<a href="#" {onclick}>{entity.code}</a>',
                 entity.name])
+            if entity.code == selected_data:
+                selection = f'{entity.code} {entity.name}'
     else:
         aliases = current_user.settings['table_show_aliases']
         if 'place' in class_name or class_name in \

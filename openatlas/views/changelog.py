@@ -21,6 +21,7 @@ versions = {
             '2020': 'Accessibility: Tab navigation for forms',
             '2017': 'Refactor and minor improvements'},
         'fix': {
+            '1930': 'CIDOC CRM link checker: keep form values after submit',
             '2023': 'Autocomplete at Wikidata is too short'}}],
     '7.13.1': ['2023-05-09', {
             'fix': {'2014': "Former network URL isn't working anymore"}}],
