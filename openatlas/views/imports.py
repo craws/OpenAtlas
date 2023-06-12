@@ -62,8 +62,7 @@ def import_index() -> str:
         buttons=buttons,
         title=_('import'),
         crumbs=[
-            [_('admin'),
-             f"{url_for('admin_index')}#tab-data"],
+            [_('admin'), f"{url_for('admin_index')}#tab-data"],
             _('import')])
 
 

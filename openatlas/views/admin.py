@@ -35,7 +35,6 @@ from openatlas.models.content import get_content, update_content
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Import
 from openatlas.models.link import Link
-from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.settings import Settings
 from openatlas.models.type import Type
 from openatlas.models.user import User
@@ -490,9 +489,7 @@ def admin_orphans() -> str:
             ['entity'],
             [[link(e)] for e in Entity.get_entities_linked_to_itself()]))}
 
-    for entity in filter(
-            lambda x: not isinstance(x, ReferenceSystem),
-            Entity.get_orphans()):
+    for entity in Entity.get_orphans():
         tabs[
             'unlinked'
             if entity.class_.view else 'orphans'].table.rows.append([

@@ -171,7 +171,7 @@ def user_view(id_: int) -> str:
         tabs={
             'info': Tab(
                 'info',
-                display_info(info) + description(user),
+                display_info(info) + description(user.description),
                 buttons=buttons)},
         title=user.username,
         crumbs=[

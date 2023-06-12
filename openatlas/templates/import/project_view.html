@@ -17,4 +17,4 @@
   {{ _('edition')|button(url_for('import_data', project_id=project.id, class_='edition'))|safe }}
 </div>
 {% endif %}
-{{ project|description|safe }}
+{{ project.description|description|safe }}

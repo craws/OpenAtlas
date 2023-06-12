@@ -56,7 +56,7 @@ class SourceTest(TestBaseCase):
                     'insert',
                     class_='source_translation',
                     origin_id=source_id))
-            assert b'+&nbsp;<span' in rv.data
+            assert b'+ Source translation' in rv.data
 
             rv = self.app.post(
                 url_for(
@@ -80,9 +80,15 @@ class SourceTest(TestBaseCase):
 
             rv = self.app.post(
                 url_for('update', id_=translation_id),
-                data={'name': 'Translation updated'},
+                data={'name': 'Translation updated', 'opened': '9999999999'},
                 follow_redirects=True)
             assert b'Translation updated' in rv.data
+
+            rv = self.app.post(
+                url_for('update', id_=translation_id),
+                data={'name': 'Translation updated', 'opened': '1000000000'},
+                follow_redirects=True)
+            assert b'because it has been modified' in rv.data
 
             rv = self.app.get(
                 url_for('delete', id_=translation_id),

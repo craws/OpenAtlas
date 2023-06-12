@@ -165,14 +165,12 @@ class TableMultiSelect(HiddenInput):
             [''] + g.table_headers[class_],
             order=[[0, 'desc'], [1, 'asc']],
             defs=[{'orderDataType': 'dom-checkbox', 'targets': 0}])
-        for entity in list(
-                filter(
-                    lambda x: x.id not in field.filter_ids,
-                    entities)):  # type: Entity
+        for entity in [e for e in entities if e.id not in field.filter_ids]:
             row = get_base_table_data(entity, show_links=False)
-            row.insert(0, f"""
-                <input type="checkbox" id="{entity.id}" value="{entity.name}"
-                {'checked' if entity.id in data else ''}>""")
+            row.insert(
+                0,
+                f'<input type="checkbox" value="{entity.name}"'
+                f' id="{entity.id}{" checked" if entity.id in data else ""}>')
             table.rows.append(row)
         return render_template(
             'forms/table_multi_select.html',
@@ -430,10 +428,7 @@ def get_table_content(
         if 'place' in class_name or class_name in \
                 ['begins_in', 'ends_in', 'residence']:
             class_ = 'place'
-            entities = Entity.get_by_view(
-                'place',
-                types=True,
-                aliases=aliases)
+            entities = Entity.get_by_view('place', types=True, aliases=aliases)
         elif class_name == 'event_preceding':
             class_ = 'event'
             entities = Entity.get_by_class(
@@ -442,16 +437,12 @@ def get_table_content(
                 aliases=aliases)
         elif class_name == 'feature_super':
             class_ = 'place'
-            entities = Entity.get_by_class(
-                'place',
-                types=True,
-                aliases=aliases)
+            entities = \
+                Entity.get_by_class('place', types=True, aliases=aliases)
         elif class_name == 'stratigraphic_super':
             class_ = 'place'
-            entities = Entity.get_by_class(
-                'feature',
-                types=True,
-                aliases=aliases)
+            entities = \
+                Entity.get_by_class('feature', types=True, aliases=aliases)
         elif class_name == 'artifact_super':
             class_ = 'place'
             entities = Entity.get_by_class(
@@ -466,13 +457,9 @@ def get_table_content(
                 aliases=aliases)
         else:
             class_ = class_name
-            entities = Entity.get_by_view(
-                class_,
-                types=True,
-                aliases=aliases)
+            entities = Entity.get_by_view(class_, types=True, aliases=aliases)
         table = Table(g.table_headers[class_])
-        for entity in list(filter(
-                lambda x: x.id not in filter_ids, entities)):  # type: ignore
+        for entity in [e for e in entities if e.id not in filter_ids]:
             if selected_data and entity.id == int(selected_data):
                 selection = entity.name
             data = get_base_table_data(entity, show_links=False)

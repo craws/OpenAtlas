@@ -286,11 +286,9 @@ def network(dimensions: Optional[int] = 0, id_: Optional[int] = None) -> str:
                 'class': f'data-huebee {app.config["CSS"]["string_field"]}'}))
     setattr(NetworkForm, 'save', SubmitField(_('apply')))
     form = NetworkForm()
-    form.classes.choices = []
-    for class_ in classes:
-        if class_.name == 'object_location':
-            continue
-        form.classes.choices.append((class_.name, class_.label))
+    form.classes.choices = [
+        (class_.name, class_.label)
+        for class_ in [x for x in classes if x.name != 'object_location']]
     if entity:
         json_data = Network.get_ego_network_json(
             {c.name: getattr(form, c.name).data for c in classes},

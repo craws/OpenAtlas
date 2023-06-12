@@ -1,26 +1,35 @@
---
--- PostgreSQL database dump
---
+-- Upgrade 7.13.x to 7.14.0
+-- Be sure to backup the database and read the upgrade notes before executing.
 
--- Dumped from database version 13.10 (Debian 13.10-0+deb11u1)
--- Dumped by pg_dump version 13.10 (Debian 13.10-0+deb11u1)
+BEGIN;
 
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
+-- Raise database version
+UPDATE web.settings SET value = '7.14.0' WHERE name = 'database_version';
 
---
--- Data for Name: cidoc_class; Type: TABLE DATA; Schema: model; Owner: openatlas
---
+-------------------------------------------------
+-- #1898: Update CIDOC CRM from 7.1.1 to 7.1.2 --
+-------------------------------------------------
 
-INSERT INTO model.cidoc_class VALUES
+-- Drop foreign keys of model tables (recreated below after CIDOC update)
+ALTER TABLE model.entity DROP CONSTRAINT IF EXISTS entity_class_code_fkey;
+ALTER TABLE model.entity DROP CONSTRAINT IF EXISTS entity_openatlas_class_name_fkey;
+ALTER TABLE model.link DROP CONSTRAINT IF EXISTS link_property_code_fkey;
+ALTER TABLE model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_code_fkey;
+ALTER TABLE model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_sub_code_fkey;
+ALTER TABLE model.cidoc_class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_fkey;
+ALTER TABLE model.property DROP CONSTRAINT IF EXISTS property_domain_class_code_fkey;
+ALTER TABLE model.property DROP CONSTRAINT IF EXISTS property_range_class_code_fkey;
+ALTER TABLE model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_super_code_fkey;
+ALTER TABLE model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_sub_code_fkey;
+ALTER TABLE model.property_i18n DROP CONSTRAINT IF EXISTS property_i18n_property_code_fkey;
+ALTER TABLE model.openatlas_class DROP CONSTRAINT IF EXISTS openatlas_class_cidoc_class_code_fkey;
+ALTER TABLE web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_openatlas_class_openatlas_class_name_fkey;
+
+-- Remove former CIDOC
+TRUNCATE model.cidoc_class_inheritance, model.cidoc_class_i18n, model.cidoc_class, model.property_inheritance, model.property_i18n, model.property RESTART IDENTITY;
+
+-- Enter new CIDOC
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES
 	(1, 'E9', 'Move', 'This class comprises changes of the physical location of the instances of E19 Physical Object.
 Note, that the class E9 Move inherits the property P7 took place at (witnessed): E53 Place. This property should be used to describe the trajectory or a larger area within which a move takes place, whereas the properties P26 moved to (was destination of), P27 moved from (was origin of) describe the start and end points only. Moves may also be documented to consist of other moves (via P9 consists of (forms part of)), in order to describe intermediate stages on a trajectory. In that case, start and end points of the partial moves should match appropriately between each other and with the overall event.'),
 	(2, 'E32', 'Authority Document', 'This class comprises encyclopaedia, thesauri, authority lists and other documents that define terminology or conceptual systems for consistent use.'),
@@ -254,12 +263,102 @@ Instances of E41 Appellation may be used to identify any instance of E1 CRM Enti
 Even numerically expressed identifiers for extents in space or time are also regarded as instances of E41 Appellation, such as Gregorian dates or spatial coordinates, even though they allow for determining some time or location by a known procedure starting from a reference point and by virtue of that fact play a double role as instances of E59 Primitive Value.
 E41 Appellation should not be confused with the act of naming something. Cf. E15 Identifier Assignment');
 
+SELECT pg_catalog.setval('model.cidoc_class_id_seq', 75, true);
 
---
--- Data for Name: cidoc_class_i18n; Type: TABLE DATA; Schema: model; Owner: openatlas
---
+INSERT INTO model.cidoc_class_inheritance (id, super_code, sub_code) VALUES
+	(1, 'E18', 'E19'),
+	(2, 'E73', 'E33'),
+	(3, 'E41', 'E33'),
+	(4, 'E70', 'E72'),
+	(5, 'E55', 'E56'),
+	(6, 'E7', 'E13'),
+	(7, 'E89', 'E73'),
+	(8, 'E90', 'E73'),
+	(9, 'E1', 'E2'),
+	(10, 'E54', 'E97'),
+	(11, 'E92', 'E4'),
+	(12, 'E2', 'E4'),
+	(13, 'E89', 'E30'),
+	(14, 'E55', 'E58'),
+	(15, 'E11', 'E12'),
+	(16, 'E63', 'E12'),
+	(17, 'E31', 'E32'),
+	(18, 'E28', 'E90'),
+	(19, 'E72', 'E90'),
+	(20, 'E8', 'E96'),
+	(21, 'E39', 'E21'),
+	(22, 'E20', 'E21'),
+	(23, 'E65', 'E83'),
+	(24, 'E1', 'E52'),
+	(25, 'E73', 'E31'),
+	(26, 'E7', 'E87'),
+	(27, 'E63', 'E65'),
+	(28, 'E7', 'E65'),
+	(29, 'E5', 'E64'),
+	(30, 'E41', 'E35'),
+	(31, 'E33', 'E35'),
+	(32, 'E19', 'E20'),
+	(33, 'E73', 'E29'),
+	(34, 'E77', 'E39'),
+	(35, 'E2', 'E3'),
+	(36, 'E11', 'E80'),
+	(37, 'E90', 'E41'),
+	(38, 'E4', 'E5'),
+	(39, 'E36', 'E37'),
+	(40, 'E18', 'E26'),
+	(41, 'E7', 'E8'),
+	(42, 'E63', 'E81'),
+	(43, 'E64', 'E81'),
+	(44, 'E11', 'E79'),
+	(45, 'E73', 'E36'),
+	(46, 'E13', 'E17'),
+	(47, 'E63', 'E67'),
+	(48, 'E7', 'E10'),
+	(49, 'E63', 'E66'),
+	(50, 'E7', 'E66'),
+	(51, 'E72', 'E18'),
+	(52, 'E1', 'E77'),
+	(53, 'E13', 'E14'),
+	(54, 'E13', 'E15'),
+	(55, 'E64', 'E69'),
+	(56, 'E26', 'E27'),
+	(57, 'E77', 'E70'),
+	(58, 'E24', 'E78'),
+	(59, 'E7', 'E9'),
+	(60, 'E41', 'E42'),
+	(61, 'E13', 'E16'),
+	(62, 'E28', 'E55'),
+	(63, 'E55', 'E57'),
+	(64, 'E64', 'E6'),
+	(65, 'E7', 'E11'),
+	(66, 'E39', 'E74'),
+	(67, 'E33', 'E34'),
+	(68, 'E37', 'E34'),
+	(69, 'E28', 'E89'),
+	(70, 'E70', 'E71'),
+	(71, 'E64', 'E68'),
+	(72, 'E7', 'E86'),
+	(73, 'E5', 'E63'),
+	(74, 'E5', 'E7'),
+	(75, 'E1', 'E53'),
+	(76, 'E1', 'E54'),
+	(77, 'E24', 'E25'),
+	(78, 'E26', 'E25'),
+	(79, 'E71', 'E24'),
+	(80, 'E18', 'E24'),
+	(81, 'E71', 'E28'),
+	(82, 'E7', 'E85'),
+	(83, 'E19', 'E22'),
+	(84, 'E24', 'E22'),
+	(85, 'E1', 'E92'),
+	(86, 'E58', 'E98'),
+	(87, 'E92', 'E93'),
+	(88, 'E55', 'E99');
 
-INSERT INTO model.cidoc_class_i18n VALUES
+SELECT pg_catalog.setval('model.cidoc_class_inheritance_id_seq', 89, true);
+
+
+INSERT INTO model.cidoc_class_i18n (id, class_code, language_code, text) VALUES
 	(1, 'E9', 'de', 'Objektbewegung'),
 	(2, 'E9', 'en', 'Move'),
 	(3, 'E9', 'fr', 'Déplacement'),
@@ -700,106 +799,9 @@ INSERT INTO model.cidoc_class_i18n VALUES
 	(438, 'E41', 'pt', 'Designação'),
 	(439, 'E41', 'zh', '称谓');
 
+SELECT pg_catalog.setval('model.cidoc_class_i18n_id_seq', 439, true);
 
---
--- Data for Name: cidoc_class_inheritance; Type: TABLE DATA; Schema: model; Owner: openatlas
---
-
-INSERT INTO model.cidoc_class_inheritance (id, super_code, sub_code) VALUES
-	(1, 'E18', 'E19'),
-	(2, 'E73', 'E33'),
-	(3, 'E41', 'E33'),
-	(4, 'E70', 'E72'),
-	(5, 'E55', 'E56'),
-	(6, 'E7', 'E13'),
-	(7, 'E89', 'E73'),
-	(8, 'E90', 'E73'),
-	(9, 'E1', 'E2'),
-	(10, 'E54', 'E97'),
-	(11, 'E92', 'E4'),
-	(12, 'E2', 'E4'),
-	(13, 'E89', 'E30'),
-	(14, 'E55', 'E58'),
-	(15, 'E11', 'E12'),
-	(16, 'E63', 'E12'),
-	(17, 'E31', 'E32'),
-	(18, 'E28', 'E90'),
-	(19, 'E72', 'E90'),
-	(20, 'E8', 'E96'),
-	(21, 'E39', 'E21'),
-	(22, 'E20', 'E21'),
-	(23, 'E65', 'E83'),
-	(24, 'E1', 'E52'),
-	(25, 'E73', 'E31'),
-	(26, 'E7', 'E87'),
-	(27, 'E63', 'E65'),
-	(28, 'E7', 'E65'),
-	(29, 'E5', 'E64'),
-	(30, 'E41', 'E35'),
-	(31, 'E33', 'E35'),
-	(32, 'E19', 'E20'),
-	(33, 'E73', 'E29'),
-	(34, 'E77', 'E39'),
-	(35, 'E2', 'E3'),
-	(36, 'E11', 'E80'),
-	(37, 'E90', 'E41'),
-	(38, 'E4', 'E5'),
-	(39, 'E36', 'E37'),
-	(40, 'E18', 'E26'),
-	(41, 'E7', 'E8'),
-	(42, 'E63', 'E81'),
-	(43, 'E64', 'E81'),
-	(44, 'E11', 'E79'),
-	(45, 'E73', 'E36'),
-	(46, 'E13', 'E17'),
-	(47, 'E63', 'E67'),
-	(48, 'E7', 'E10'),
-	(49, 'E63', 'E66'),
-	(50, 'E7', 'E66'),
-	(51, 'E72', 'E18'),
-	(52, 'E1', 'E77'),
-	(53, 'E13', 'E14'),
-	(54, 'E13', 'E15'),
-	(55, 'E64', 'E69'),
-	(56, 'E26', 'E27'),
-	(57, 'E77', 'E70'),
-	(58, 'E24', 'E78'),
-	(59, 'E7', 'E9'),
-	(60, 'E41', 'E42'),
-	(61, 'E13', 'E16'),
-	(62, 'E28', 'E55'),
-	(63, 'E55', 'E57'),
-	(64, 'E64', 'E6'),
-	(65, 'E7', 'E11'),
-	(66, 'E39', 'E74'),
-	(67, 'E33', 'E34'),
-	(68, 'E37', 'E34'),
-	(69, 'E28', 'E89'),
-	(70, 'E70', 'E71'),
-	(71, 'E64', 'E68'),
-	(72, 'E7', 'E86'),
-	(73, 'E5', 'E63'),
-	(74, 'E5', 'E7'),
-	(75, 'E1', 'E53'),
-	(76, 'E1', 'E54'),
-	(77, 'E24', 'E25'),
-	(78, 'E26', 'E25'),
-	(79, 'E71', 'E24'),
-	(80, 'E18', 'E24'),
-	(81, 'E71', 'E28'),
-	(82, 'E7', 'E85'),
-	(83, 'E19', 'E22'),
-	(84, 'E24', 'E22'),
-	(85, 'E1', 'E92'),
-	(86, 'E58', 'E98'),
-	(87, 'E92', 'E93'),
-	(88, 'E55', 'E99');
-
---
--- Data for Name: property; Type: TABLE DATA; Schema: model; Owner: openatlas
---
-
-INSERT INTO model.property VALUES
+INSERT INTO model.property (id, code, range_class_code, domain_class_code, name, name_inverse, comment) VALUES
 	(1, 'P185', 'E2', 'E2', 'ends before the end of', 'ends after the end of', 'This property specifies that the temporal extent of the domain instance A of E2 Temporal Entity ends definitely before the end of the temporal extent of the range instance B of E2 Temporal Entity.
 In other words, if A = [A-start, A-end] and B = [B-start, B-end], we mean A-end &lt; B-end is true.
 This property is part of the set of temporal primitives P173 – P176, P182 – P185.
@@ -1210,12 +1212,98 @@ Included in this spacetime volume are both the spaces filled by the matter of th
 	(149, 'OA8', 'E53', 'E77', 'begins in', 'is first appearance of', 'OA8 is used to link the beginning of a persistent item''s (E77) life span (or time of usage) with a certain place. E.g to document the birthplace of a person. E77 Persistent Item linked with a E53 Place: E77 (Persistent Item) - P92i (was brought into existence by) - E63 (Beginning of Existence) - P7 (took place at) - E53 (Place) Example: [Albert Einstein (E21)] was brought into existence by [Birth of Albert Einstein (E12)] took place at [Ulm (E53)]'),
 	(150, 'OA9', 'E53', 'E77', 'ends in', 'is last appearance of', 'OA9 is used to link the end of a persistent item''s (E77) life span (or time of usage) with a certain place. E.g to document a person''s place of death. E77 Persistent Item linked with a E53 Place: E77 (Persistent Item) - P93i (was taken out of existence by) - E64 (End of Existence) - P7 (took place at) - E53 (Place) Example: [Albert Einstein (E21)] was taken out of by [Death of Albert Einstein (E12)] took place at [Princeton (E53)]');
 
+SELECT pg_catalog.setval('model.property_id_seq', 150, true);
 
---
--- Data for Name: property_i18n; Type: TABLE DATA; Schema: model; Owner: openatlas
---
+INSERT INTO model.property_inheritance (id, super_code, sub_code) VALUES
+	(1, 'P174', 'P184'),
+	(2, 'P94', 'P135'),
+	(3, 'P141', 'P35'),
+	(4, 'P182', 'P183'),
+	(5, 'P67', 'P71'),
+	(6, 'P128', 'P65'),
+	(7, 'P1', 'P48'),
+	(8, 'P11', 'P145'),
+	(9, 'P53', 'P156'),
+	(10, 'P157', 'P156'),
+	(11, 'P160', 'P164'),
+	(12, 'P157', 'P59'),
+	(13, 'P93', 'P13'),
+	(14, 'P49', 'P50'),
+	(15, 'P14', 'P22'),
+	(16, 'P12', 'P93'),
+	(17, 'P92', 'P123'),
+	(18, 'P11', 'P146'),
+	(19, 'P31', 'P110'),
+	(20, 'P106', 'P165'),
+	(21, 'P184', 'P185'),
+	(22, 'P130', 'P73'),
+	(23, 'P12', 'P113'),
+	(24, 'P12', 'P92'),
+	(25, 'P2', 'P177'),
+	(26, 'P15', 'P134'),
+	(27, 'P176', 'P134'),
+	(28, 'P130', 'P128'),
+	(29, 'P10', 'P9'),
+	(30, 'P67', 'P70'),
+	(31, 'P31', 'P108'),
+	(32, 'P92', 'P108'),
+	(33, 'P93', 'P124'),
+	(34, 'P16', 'P111'),
+	(35, 'P67', 'P138'),
+	(36, 'P92', 'P98'),
+	(37, 'P1', 'P102'),
+	(38, 'P14', 'P28'),
+	(39, 'P92', 'P95'),
+	(40, 'P93', 'P100'),
+	(41, 'P14', 'P23'),
+	(42, 'P67', 'P68'),
+	(43, 'P15', 'P136'),
+	(44, 'P141', 'P37'),
+	(45, 'P92', 'P94'),
+	(46, 'P132', 'P10'),
+	(47, 'P11', 'P144'),
+	(48, 'P15', 'P17'),
+	(49, 'P46', 'P56'),
+	(50, 'P16', 'P33'),
+	(51, 'P140', 'P34'),
+	(52, 'P12', 'P11'),
+	(53, 'P11', 'P14'),
+	(54, 'P31', 'P112'),
+	(55, 'P11', 'P96'),
+	(56, 'P175', 'P176'),
+	(57, 'P53', 'P55'),
+	(58, 'P2', 'P137'),
+	(59, 'P125', 'P32'),
+	(60, 'P51', 'P52'),
+	(61, 'P105', 'P52'),
+	(62, 'P49', 'P109'),
+	(63, 'P12', 'P25'),
+	(64, 'P141', 'P40'),
+	(65, 'P140', 'P39'),
+	(66, 'P67', 'P129'),
+	(67, 'P141', 'P38'),
+	(68, 'P185', 'P182'),
+	(69, 'P176', 'P182'),
+	(70, 'P11', 'P143'),
+	(71, 'P173', 'P174'),
+	(72, 'P91', 'P180'),
+	(73, 'P93', 'P99'),
+	(74, 'P11', 'P99'),
+	(75, 'P11', 'P151'),
+	(76, 'P12', 'P31'),
+	(77, 'P140', 'P41'),
+	(78, 'P15', 'P16'),
+	(79, 'P12', 'P16'),
+	(80, 'P161', 'P7'),
+	(81, 'P10', 'P166'),
+	(82, 'P14', 'P29'),
+	(83, 'P174', 'P175'),
+	(84, 'P141', 'P42'),
+	(85, 'P16', 'P142');
 
-INSERT INTO model.property_i18n VALUES
+SELECT pg_catalog.setval('model.property_inheritance_id_seq', 85, true);
+
+INSERT INTO model.property_i18n (id, property_code, language_code, text, text_inverse) VALUES
 	(1, 'P2', 'de', 'hat den Typus', 'ist Typus von'),
 	(2, 'P2', 'en', 'has type', 'is type of'),
 	(3, 'P2', 'fr', 'est de type', 'est le type de'),
@@ -2021,147 +2109,31 @@ INSERT INTO model.property_i18n VALUES
 	(803, 'P157', 'en', 'is at rest relative to', 'provides reference space for'),
 	(804, 'OA7', 'en', 'has relationship to', NULL),
 	(805, 'OA7', 'de', 'hat Beziehung zu', NULL),
-	(807, 'OA8', 'de', 'beginnt in', 'ist erster Ort von'),
-	(806, 'OA8', 'en', 'begins in', 'is first appearance of'),
-	(809, 'OA9', 'de', 'endet in', 'ist letzter Ort von'),
-	(808, 'OA9', 'en', 'ends in', 'is last appearance of');
-
-
---
--- Data for Name: property_inheritance; Type: TABLE DATA; Schema: model; Owner: openatlas
---
-
-INSERT INTO model.property_inheritance VALUES
-	(1, 'P174', 'P184'),
-	(2, 'P94', 'P135'),
-	(3, 'P141', 'P35'),
-	(4, 'P182', 'P183'),
-	(5, 'P67', 'P71'),
-	(6, 'P128', 'P65'),
-	(7, 'P1', 'P48'),
-	(8, 'P11', 'P145'),
-	(9, 'P53', 'P156'),
-	(10, 'P157', 'P156'),
-	(11, 'P160', 'P164'),
-	(12, 'P157', 'P59'),
-	(13, 'P93', 'P13'),
-	(14, 'P49', 'P50'),
-	(15, 'P14', 'P22'),
-	(16, 'P12', 'P93'),
-	(17, 'P92', 'P123'),
-	(18, 'P11', 'P146'),
-	(19, 'P31', 'P110'),
-	(20, 'P106', 'P165'),
-	(21, 'P184', 'P185'),
-	(22, 'P130', 'P73'),
-	(23, 'P12', 'P113'),
-	(24, 'P12', 'P92'),
-	(25, 'P2', 'P177'),
-	(26, 'P15', 'P134'),
-	(27, 'P176', 'P134'),
-	(28, 'P130', 'P128'),
-	(29, 'P10', 'P9'),
-	(30, 'P67', 'P70'),
-	(31, 'P31', 'P108'),
-	(32, 'P92', 'P108'),
-	(33, 'P93', 'P124'),
-	(34, 'P16', 'P111'),
-	(35, 'P67', 'P138'),
-	(36, 'P92', 'P98'),
-	(37, 'P1', 'P102'),
-	(38, 'P14', 'P28'),
-	(39, 'P92', 'P95'),
-	(40, 'P93', 'P100'),
-	(41, 'P14', 'P23'),
-	(42, 'P67', 'P68'),
-	(43, 'P15', 'P136'),
-	(44, 'P141', 'P37'),
-	(45, 'P92', 'P94'),
-	(46, 'P132', 'P10'),
-	(47, 'P11', 'P144'),
-	(48, 'P15', 'P17'),
-	(49, 'P46', 'P56'),
-	(50, 'P16', 'P33'),
-	(51, 'P140', 'P34'),
-	(52, 'P12', 'P11'),
-	(53, 'P11', 'P14'),
-	(54, 'P31', 'P112'),
-	(55, 'P11', 'P96'),
-	(56, 'P175', 'P176'),
-	(57, 'P53', 'P55'),
-	(58, 'P2', 'P137'),
-	(59, 'P125', 'P32'),
-	(60, 'P51', 'P52'),
-	(61, 'P105', 'P52'),
-	(62, 'P49', 'P109'),
-	(63, 'P12', 'P25'),
-	(64, 'P141', 'P40'),
-	(65, 'P140', 'P39'),
-	(66, 'P67', 'P129'),
-	(67, 'P141', 'P38'),
-	(68, 'P185', 'P182'),
-	(69, 'P176', 'P182'),
-	(70, 'P11', 'P143'),
-	(71, 'P173', 'P174'),
-	(72, 'P91', 'P180'),
-	(73, 'P93', 'P99'),
-	(74, 'P11', 'P99'),
-	(75, 'P11', 'P151'),
-	(76, 'P12', 'P31'),
-	(77, 'P140', 'P41'),
-	(78, 'P15', 'P16'),
-	(79, 'P12', 'P16'),
-	(80, 'P161', 'P7'),
-	(81, 'P10', 'P166'),
-	(82, 'P14', 'P29'),
-	(83, 'P174', 'P175'),
-	(84, 'P141', 'P42'),
-	(85, 'P16', 'P142');
-
-
---
--- Name: cidoc_class_i18n_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas
---
-
-SELECT pg_catalog.setval('model.cidoc_class_i18n_id_seq', 439, true);
-
-
---
--- Name: cidoc_class_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas
---
-
-SELECT pg_catalog.setval('model.cidoc_class_id_seq', 75, true);
-
-
---
--- Name: cidoc_class_inheritance_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas
---
-
-SELECT pg_catalog.setval('model.cidoc_class_inheritance_id_seq', 89, true);
-
-
---
--- Name: property_i18n_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas
---
+	(806, 'OA8', 'en', 'begins in', NULL),
+	(807, 'OA8', 'de', 'beginnt in', NULL),
+	(808, 'OA9', 'en', 'ends in', NULL),
+	(809, 'OA9', 'de', 'endet in', NULL);
 
 SELECT pg_catalog.setval('model.property_i18n_id_seq', 809, true);
 
+UPDATE model.property_i18n set text_inverse = 'ist erster Ort von' WHERE property_code = 'OA8' AND language_code = 'de';
+UPDATE model.property_i18n set text_inverse = 'is first appearance of' WHERE property_code = 'OA8' AND language_code = 'en';
+UPDATE model.property_i18n set text_inverse = 'ist letzter Ort von' WHERE property_code = 'OA9' AND language_code = 'de';
+UPDATE model.property_i18n set text_inverse = 'is last appearance of' WHERE property_code = 'OA9' AND language_code = 'en';
 
---
--- Name: property_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas
---
+-- Recreate foreign keys
+ALTER TABLE ONLY model.entity ADD CONSTRAINT entity_class_code_fkey FOREIGN KEY (cidoc_class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.link ADD CONSTRAINT link_property_code_fkey FOREIGN KEY (property_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.cidoc_class_inheritance ADD CONSTRAINT class_inheritance_super_code_fkey FOREIGN KEY (super_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.cidoc_class_inheritance ADD CONSTRAINT class_inheritance_sub_code_fkey FOREIGN KEY (sub_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.cidoc_class_i18n ADD CONSTRAINT class_i18n_class_code_fkey FOREIGN KEY (class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.property ADD CONSTRAINT property_domain_class_code_fkey FOREIGN KEY (domain_class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.property ADD CONSTRAINT property_range_class_code_fkey FOREIGN KEY (range_class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.property_inheritance ADD CONSTRAINT property_inheritance_super_code_fkey FOREIGN KEY (super_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.property_inheritance ADD CONSTRAINT property_inheritance_sub_code_fkey FOREIGN KEY (sub_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.property_i18n ADD CONSTRAINT property_i18n_property_code_fkey FOREIGN KEY (property_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.entity ADD CONSTRAINT entity_openatlas_class_name_fkey FOREIGN KEY (openatlas_class_name) REFERENCES model.openatlas_class(name) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.openatlas_class ADD CONSTRAINT openatlas_class_cidoc_class_code_fkey FOREIGN KEY (cidoc_class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY web.reference_system_openatlas_class ADD CONSTRAINT reference_system_openatlas_class_openatlas_class_name_fkey FOREIGN KEY (openatlas_class_name) REFERENCES model.openatlas_class(name) ON UPDATE CASCADE ON DELETE CASCADE;
 
-SELECT pg_catalog.setval('model.property_id_seq', 150, true);
-
-
---
--- Name: property_inheritance_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas
---
-
-SELECT pg_catalog.setval('model.property_inheritance_id_seq', 85, true);
-
-
---
--- PostgreSQL database dump complete
---
-
+END;

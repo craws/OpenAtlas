@@ -1,7 +1,7 @@
 import ast
 from typing import Any
 
-from flask import g, request
+from flask import g, request, url_for
 from flask_babel import lazy_gettext as _
 from wtforms import (
     BooleanField, HiddenField, SelectField, SelectMultipleField, StringField,
@@ -10,21 +10,24 @@ from wtforms.validators import InputRequired, Optional, URL
 
 from openatlas.forms.base_manager import (
     ActorBaseManager, ArtifactBaseManager, BaseManager, EventBaseManager,
-    HierarchyBaseManager, TypeBaseManager)
+    HierarchyBaseManager, PlaceBaseManager, TypeBaseManager)
 from openatlas.forms.field import (
     DragNDropField, SubmitField, TableField, TableMultiField, TreeField)
 from openatlas.forms.validation import file
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
+from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 
 
 class AcquisitionManager(EventBaseManager):
 
     def additional_fields(self) -> dict[str, Any]:
-        return dict(super().additional_fields(), **{
-            'given_place': TableMultiField(_('given place')),
-            'artifact': TableMultiField(_('given artifact'))})
+        return dict(
+            super().additional_fields(),
+            **{
+                'given_place': TableMultiField(_('given place')),
+                'artifact': TableMultiField(_('given artifact'))})
 
     def populate_update(self) -> None:
         super().populate_update()
@@ -135,14 +138,8 @@ class AdministrativeUnitManager(TypeBaseManager):
 
     def process_form(self) -> None:
         super().process_form()
-        type_ = self.origin if isinstance(self.origin, Type) else self.entity
-        root = self.get_root_type()
-        super_id = g.types[type_.root[-1]] if type_.root else type_
-        new_super_id = getattr(self.form, str(root.id)).data
-        new_super = g.types[int(new_super_id)] if new_super_id else root
-        if super_id != new_super.id:
-            self.data['links']['delete'].add('P89')
-            self.add_link('P89', new_super)
+        self.data['links']['delete'].add('P89')
+        self.add_link('P89', g.types[self.super_id])
 
 
 class ArtifactManager(ArtifactBaseManager):
@@ -153,8 +150,9 @@ class ArtifactManager(ArtifactBaseManager):
             filter_ids = \
                 [entity.id] + \
                 [e.id for e in entity.get_linked_entities_recursive('P46')]
-        return dict(super().additional_fields(), **{
-            'artifact_super': TableField(
+        return dict(
+            super().additional_fields(),
+            **{'artifact_super': TableField(
                 _('super'),
                 filter_ids=filter_ids,
                 add_dynamic=['place'])})
@@ -162,7 +160,7 @@ class ArtifactManager(ArtifactBaseManager):
     def populate_insert(self) -> None:
         super().populate_insert()
         if self.origin and self.origin.class_.view in ['artifact', 'place']:
-            self.form.artifact_super.data = str(self.origin.id)
+            self.form.artifact_super.data = self.origin.id
 
     def populate_update(self) -> None:
         super().populate_update()
@@ -182,8 +180,9 @@ class BibliographyManager(BaseManager):
 class CreationManager(EventBaseManager):
 
     def additional_fields(self) -> dict[str, Any]:
-        return dict(super().additional_fields(), **{
-            'file': TableMultiField(_('document'))})
+        return dict(
+            super().additional_fields(),
+            **{'file': TableMultiField(_('document'))})
 
     def populate_insert(self) -> None:
         super().populate_insert()
@@ -212,8 +211,17 @@ class EventManager(EventBaseManager):
 class ExternalReferenceManager(BaseManager):
     fields = ['url', 'description', 'continue']
 
+    def add_name_fields(self) -> None:
+        setattr(
+            self.form_class,
+            'name',
+            StringField(
+                _('URL'),
+                [InputRequired(), URL()],
+                render_kw={'autofocus': True}))
 
-class FeatureManager(BaseManager):
+
+class FeatureManager(PlaceBaseManager):
     fields = ['name', 'date', 'description', 'continue', 'map']
 
     def add_buttons(self) -> None:
@@ -226,8 +234,9 @@ class FeatureManager(BaseManager):
                     _('insert and add') + ' ' + _('stratigraphic unit')))
 
     def additional_fields(self) -> dict[str, Any]:
-        return dict(super().additional_fields(), **{
-            'feature_super': TableField(
+        return dict(
+            super().additional_fields(),
+            **{'feature_super': TableField(
                 _('super'),
                 [InputRequired()],
                 add_dynamic=['place'])})
@@ -235,7 +244,7 @@ class FeatureManager(BaseManager):
     def populate_insert(self) -> None:
         super().populate_insert()
         if self.origin and self.origin.class_.name == 'place':
-            self.form.feature_super.data = str(self.origin.id)
+            self.form.feature_super.data = self.origin.id
 
     def populate_update(self) -> None:
         super().populate_update()
@@ -278,8 +287,9 @@ class HumanRemainsManager(ArtifactBaseManager):
             filter_ids = \
                 [entity.id] + \
                 [e.id for e in entity.get_linked_entities_recursive('P46')]
-        return dict(super().additional_fields(), **{
-            'human_remains_super': TableField(
+        return dict(
+            super().additional_fields(),
+            **{'human_remains_super': TableField(
                 _('super'),
                 filter_ids=filter_ids,
                 add_dynamic=['place'])})
@@ -287,7 +297,7 @@ class HumanRemainsManager(ArtifactBaseManager):
     def populate_insert(self) -> None:
         super().populate_insert()
         if self.origin and self.origin.class_.view in ['artifact', 'place']:
-            self.form.human_remains_super.data = str(self.origin.id)
+            self.form.human_remains_super.data = self.origin.id
 
     def populate_update(self) -> None:
         super().populate_update()
@@ -373,11 +383,13 @@ class InvolvementManager(BaseManager):
         self.link_.type = g.types[int(type_id)] if type_id else None
         self.link_.property = g.properties[self.form.activity.data]
 
+
 class ModificationManager(EventBaseManager):
 
     def additional_fields(self) -> dict[str, Any]:
-        return dict(super().additional_fields(), **{
-            'artifact': TableMultiField()})
+        return dict(
+            super().additional_fields(),
+            **{'artifact': TableMultiField()})
 
     def populate_update(self) -> None:
         super().populate_update()
@@ -390,14 +402,17 @@ class ModificationManager(EventBaseManager):
         if self.form.artifact.data:
             self.add_link('P31', self.form.artifact.data)
 
+
 class MoveManager(EventBaseManager):
 
     def additional_fields(self) -> dict[str, Any]:
-        return dict(super().additional_fields(), **{
-            'place_from': TableField(_('from'), add_dynamic=['place']),
-            'place_to': TableField(_('to'), add_dynamic=['place']),
-            'artifact': TableMultiField(),
-            'person': TableMultiField()})
+        return dict(
+            super().additional_fields(),
+            **{
+                'place_from': TableField(_('from'), add_dynamic=['place']),
+                'place_to': TableField(_('to'), add_dynamic=['place']),
+                'artifact': TableMultiField(),
+                'person': TableMultiField()})
 
     def populate_update(self) -> None:
         super().populate_update()
@@ -445,7 +460,7 @@ class PersonManager(ActorBaseManager):
         self.form.ends_in.label.text = _('died in')
 
 
-class PlaceManager(BaseManager):
+class PlaceManager(PlaceBaseManager):
     fields = ['name', 'alias', 'date', 'description', 'continue', 'map']
 
     def add_buttons(self) -> None:
@@ -463,8 +478,9 @@ class PlaceManager(BaseManager):
 class ProductionManager(EventBaseManager):
 
     def additional_fields(self) -> dict[str, Any]:
-        return dict(super().additional_fields(), **{
-            'artifact': TableMultiField()})
+        return dict(
+            super().additional_fields(),
+            **{'artifact': TableMultiField()})
 
     def populate_update(self) -> None:
         super().populate_update()
@@ -479,6 +495,16 @@ class ProductionManager(EventBaseManager):
 
 class ReferenceSystemManager(BaseManager):
     fields = ['name', 'description']
+
+    def add_name_fields(self) -> None:
+        super().add_name_fields()
+        if self.entity and self.entity.system:
+            setattr(
+                self.form_class,
+                'name',
+                StringField(
+                    _('name'),
+                    render_kw={'autofocus': True, 'readonly': True}))
 
     def additional_fields(self) -> dict[str, Any]:
         precision_id = str(Type.get_hierarchy('External reference match').id)
@@ -507,6 +533,13 @@ class ReferenceSystemManager(BaseManager):
                 widget=widgets.ListWidget(prefix_label=False))
             if choices else None}
 
+    def insert_entity(self) -> None:
+        self.entity = ReferenceSystem.insert_system({
+            'name': self.form.name.data,
+            'description': self.form.description.data,
+            'website_url': self.form.website_url.data,
+            'resolver_url': self.form.resolver_url.data})
+
     def process_form(self) -> None:
         super().process_form()
         self.data['reference_system'] = {
@@ -518,6 +551,9 @@ class ReferenceSystemManager(BaseManager):
 
 class SourceManager(BaseManager):
     fields = ['name', 'continue', 'description']
+
+    def add_description(self) -> None:
+        setattr(self.form_class, 'description', TextAreaField(_('content')))
 
     def additional_fields(self) -> dict[str, Any]:
         return {
@@ -548,13 +584,21 @@ class SourceTranslationManager(BaseManager):
     def additional_fields(self) -> dict[str, Any]:
         return {'description': TextAreaField(_('content'))}
 
+    def get_crumbs(self) -> list[Any]:
+        if not self.origin:
+            self.crumbs = [
+                [_('source'), url_for('index', view='source')],
+                self.entity.get_linked_entity('P73', True),
+                self.entity]
+        return super().get_crumbs()
+
     def process_form(self) -> None:
         super().process_form()
         if self.origin:
             self.add_link('P73', self.origin, inverse=True)
 
 
-class StratigraphicUnitManager(BaseManager):
+class StratigraphicUnitManager(PlaceBaseManager):
     fields = ['name', 'date', 'description', 'continue', 'map']
 
     def add_buttons(self) -> None:
@@ -570,15 +614,16 @@ class StratigraphicUnitManager(BaseManager):
                 SubmitField(_('insert and add') + ' ' + _('human remains')))
 
     def additional_fields(self) -> dict[str, Any]:
-        return dict(super().additional_fields(), **{
-            'stratigraphic_super': TableField(
+        return dict(
+            super().additional_fields(),
+            **{'stratigraphic_super': TableField(
                 _('super'),
                 [InputRequired()])})
 
     def populate_insert(self) -> None:
         super().populate_insert()
         if self.origin and self.origin.class_.name == 'feature':
-            self.form.stratigraphic_super.data = str(self.origin.id)
+            self.form.stratigraphic_super.data = self.origin.id
 
     def populate_update(self) -> None:
         super().populate_update()
@@ -596,13 +641,13 @@ class StratigraphicUnitManager(BaseManager):
 
 class TypeManager(TypeBaseManager):
 
+    def add_description(self) -> None:
+        super().add_description()
+        if self.get_root().category == 'value':
+            del self.form_class.description
+            setattr(self.form_class, 'description', StringField(_('unit')))
+
     def process_form(self) -> None:
         super().process_form()
-        type_ = self.origin if isinstance(self.origin, Type) else self.entity
-        root = self.get_root_type()
-        super_id = g.types[type_.root[-1]] if type_.root else type_
-        new_super_id = getattr(self.form, str(root.id)).data
-        new_super = g.types[int(new_super_id)] if new_super_id else root
-        if super_id != new_super.id:
-            self.data['links']['delete'].add('P127')
-            self.add_link('P127', new_super)
+        self.data['links']['delete'].add('P127')
+        self.add_link('P127', g.types[self.super_id])

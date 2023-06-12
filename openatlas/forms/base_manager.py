@@ -3,14 +3,14 @@ from __future__ import annotations
 import time
 from typing import Any, Optional, TYPE_CHECKING, Union
 
-from flask import g
+from flask import g, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (
     FieldList, HiddenField, SelectMultipleField, StringField, TextAreaField,
     widgets)
-from wtforms.validators import InputRequired, URL
+from wtforms.validators import InputRequired
 
 from openatlas.forms.add_fields import (
     add_date_fields, add_reference_systems, add_types)
@@ -24,8 +24,9 @@ from openatlas.forms.util import (
     check_if_entity_has_time, string_to_entity_list)
 from openatlas.forms.validation import hierarchy_name_exists, validate
 from openatlas.models.entity import Entity
+from openatlas.models.gis import Gis
 from openatlas.models.link import Link
-from openatlas.models.reference_system import ReferenceSystem
+from openatlas.models.overlay import Overlay
 from openatlas.models.type import Type
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -50,6 +51,14 @@ class BaseManager:
         self.origin: Any = origin
         self.link_: Any = link_
         self.copy = copy
+        self.crumbs: list[Any] = []
+        self.insert = bool(not self.entity and not self.link_)
+        self.place_info: dict[str, Any] = {}
+
+        if self.insert:
+            self.get_place_info_for_insert()
+        else:
+            self.get_place_info_for_update()
 
         class Form(FlaskForm):
             opened = HiddenField()
@@ -61,7 +70,7 @@ class BaseManager:
         add_types(self)
         for id_, field in self.additional_fields().items():
             setattr(Form, id_, field)
-        add_reference_systems(self.class_, self.form_class)
+        add_reference_systems(self)
         if self.entity:
             setattr(Form, 'entity_id', HiddenField())
         if 'date' in self.fields:
@@ -69,15 +78,7 @@ class BaseManager:
                 current_user.settings['module_time']
                 or (entity and check_if_entity_has_time(entity))))
         if 'description' in self.fields:
-            setattr(Form, 'description', TextAreaField(
-                _('content') if class_.name == 'source' else _('description')))
-            if class_.name == 'type':
-                type_ = entity or origin
-                if isinstance(type_, Type):
-                    root = g.types[type_.root[0]] if type_.root else type_
-                    if root.category == 'value':
-                        del Form.description
-                        setattr(Form, 'description', StringField(_('unit')))
+            self.add_description()
         if 'map' in self.fields:
             setattr(Form, 'gis_points', HiddenField(default='[]'))
             setattr(Form, 'gis_polygons', HiddenField(default='[]'))
@@ -86,20 +87,56 @@ class BaseManager:
         self.form: Any = Form(obj=self.link_ or self.entity)
         self.customize_labels()
 
+    def get_place_info_for_insert(self) -> None:
+        self.place_info = {
+            'structure': None,
+            'gis_data': None,
+            'overlays': None}
+
+    def get_place_info_for_update(self) -> None:
+        self.place_info = {
+            'structure': None,
+            'gis_data': None,
+            'overlays': None,
+            'location': None}
+
+    def get_crumbs(self) -> list[Any]:
+        if not self.crumbs:
+            label = self.origin.class_.name if self.origin \
+                else g.classes[self.class_.name].view
+            if label in g.class_view_mapping:
+                label = g.class_view_mapping[label]
+            self.crumbs = [[
+                _(label.replace('_', ' ')),
+                url_for(
+                    'index',
+                    view=self.origin.class_.view if self.origin
+                    else g.classes[self.class_.name].view)]]
+        if self.origin:
+            self.crumbs.append(self.origin)
+        if self.place_info['structure']:
+            self.crumbs += self.place_info['structure']['supers']
+        if not self.insert:
+            return self.crumbs + [
+                _('copy') if 'copy_' in request.path else _('edit')]
+        self.crumbs.append(f'+ {g.classes[self.class_.name].label}')
+        return self.crumbs
+
+    def add_description(self) -> None:
+        setattr(
+            self.form_class,
+            'description',
+            TextAreaField(_('description')))
+
     def add_name_fields(self) -> None:
         if 'name' in self.fields:
-            readonly = bool(
-                isinstance(self.entity, ReferenceSystem)
-                and self.entity.system)
-            setattr(self.form_class, 'name', StringField(
-                _('name'),
-                [InputRequired()],
-                render_kw={'autofocus': True, 'readonly': readonly}))
-        if 'url' in self.fields:
-            setattr(self.form_class, 'name', StringField(
-                _('URL'),
-                [InputRequired(), URL()],
-                render_kw={'autofocus': True}))
+            setattr(
+                self.form_class,
+                'name',
+                StringField(
+                    _('name'),
+                    [InputRequired()],
+                    render_kw={'autofocus': True}))
         if 'alias' in self.fields:
             setattr(
                 self.form_class,
@@ -118,9 +155,8 @@ class BaseManager:
         setattr(
             self.form_class,
             'save',
-            SubmitField(
-                _('save') if self.entity or self.link_ else _('insert')))
-        if not self.entity and not self.link_ and 'continue' in self.fields:
+            SubmitField(_('insert') if self.insert else _('save')))
+        if self.insert and 'continue' in self.fields:
             setattr(
                 self.form_class,
                 'insert_and_continue',
@@ -130,10 +166,6 @@ class BaseManager:
     # pylint: disable=no-self-use
     def additional_fields(self) -> dict[str, Any]:
         return {}
-
-    def get_root_type(self) -> Type:
-        type_ = self.entity if isinstance(self.entity, Type) else self.origin
-        return g.types[type_.root[0]] if type_.root else type_
 
     def get_link_type(self) -> Optional[Entity]:
         # Returns base type of link, e.g. involvement between actor and event
@@ -193,23 +225,7 @@ class BaseManager:
                 for shape in ['point', 'line', 'polygon']}
 
     def insert_entity(self) -> None:
-        if self.entity and not self.copy:
-            return
-        if self.class_.name == 'reference_system':
-            self.entity = ReferenceSystem.insert_system({
-                'name': self.form.name.data,
-                'description': self.form.description.data,
-                'website_url': self.form.website_url.data,
-                'resolver_url': self.form.resolver_url.data})
-            return
         self.entity = Entity.insert(self.class_.name, self.form.name.data)
-        if self.class_.view in ['artifact', 'place']:
-            self.entity.link(
-                'P53',
-                Entity.insert(
-                    'object_location',
-                    f'Location of {self.form.name.data}'))
-        return
 
     def update_link(self) -> None:
         self.data['attributes_link'] = self.data['attributes']
@@ -282,13 +298,53 @@ class ActorBaseManager(BaseManager):
                     inverse=True)
 
 
-class ArtifactBaseManager(BaseManager):
+class PlaceBaseManager(BaseManager):
+
+    def insert_entity(self) -> None:
+        super().insert_entity()
+        self.entity.link(
+            'P53',
+            Entity.insert(
+                'object_location',
+                f'Location of {self.form.name.data}'))
+
+    def get_place_info_for_insert(self) -> None:
+        super().get_place_info_for_insert()
+        if self.origin:
+            structure = self.origin.get_structure_for_insert()
+            self.place_info['structure'] = structure
+            self.place_info['gis_data'] = Gis.get_all([self.origin], structure)
+            if current_user.settings['module_map_overlay'] \
+                    and self.origin.class_.view == 'place':
+                self.place_info['overlay'] = Overlay.get_by_object(self.origin)
+
+    def get_place_info_for_update(self) -> None:
+        super().get_place_info_for_update()
+        structure = self.entity.get_structure()
+        self.place_info['structure'] = structure
+        self.place_info['gis_data'] = Gis.get_all([self.entity], structure)
+        if current_user.settings['module_map_overlay']:
+            self.place_info['overlays'] = Overlay.get_by_object(self.entity)
+        self.place_info['location'] = \
+            self.entity.get_linked_entity_safe('P53', types=True)
+
+
+class ArtifactBaseManager(PlaceBaseManager):
     fields = ['name', 'date', 'description', 'continue', 'map']
 
     def additional_fields(self) -> dict[str, Any]:
         return {
             'actor':
                 TableField(_('owned by'), add_dynamic=['person', 'group'])}
+
+    def get_crumbs(self) -> list[Any]:
+        crumbs = super().get_crumbs()
+        if self.place_info['structure'] and self.origin:
+            if count := len([
+                    i for i in self.place_info['structure']['siblings'] if
+                    i.class_.name == self.class_.name]):
+                crumbs[-1] = crumbs[-1] + f' ({count} {_("exists")})'
+        return crumbs
 
     def populate_insert(self) -> None:
         if self.origin and self.origin.class_.view == 'actor':
@@ -405,9 +461,10 @@ class HierarchyBaseManager(BaseManager):
 
 class TypeBaseManager(BaseManager):
     fields = ['name', 'date', 'description', 'continue']
+    super_id: int
 
     def additional_fields(self) -> dict[str, Any]:
-        root = self.get_root_type()
+        root = self.get_root()
         fields = {
             'is_type_form': HiddenField(),
             str(root.id): TreeField(
@@ -418,28 +475,37 @@ class TypeBaseManager(BaseManager):
         return fields
 
     def customize_labels(self) -> None:
-        if not hasattr(self.form, 'classes'):
-            type_ = self.entity or self.origin
-            if isinstance(type_, Type):
-                root = g.types[type_.root[0]] if type_.root else type_
-                getattr(self.form, str(root.id)).label.text = 'super'
+        getattr(self.form, str(self.get_root().id)).label.text = 'super'
+
+    def get_crumbs(self) -> list[Any]:
+        self.crumbs = [[_('types'), url_for('type_index')]]
+        type_ = self.origin or self.entity
+        self.crumbs += [g.types[type_id] for type_id in type_.root]
+        return super().get_crumbs()
+
+    def get_root(self) -> Type:
+        type_ = self.origin or self.entity
+        return g.types[type_.root[0]] if type_.root else type_
 
     def populate_insert(self) -> None:
-        if isinstance(self.origin, Type):
-            root_id = self.origin.root[0] \
-                if self.origin.root else self.origin.id
-            getattr(self.form, str(root_id)).data = self.origin.id \
-                if self.origin.id != root_id else None
+        root_id = self.origin.root[0] if self.origin.root else self.origin.id
+        getattr(self.form, str(root_id)).data = self.origin.id \
+            if self.origin.id != root_id else None
 
     def populate_update(self) -> None:
         super().populate_update()
-        if hasattr(self.form, 'name_inverse'):  # e.g. actor relation
+        if hasattr(self.form, 'name_inverse'):
             name_parts = self.entity.name.split(' (')
             self.form.name.data = name_parts[0]
             if len(name_parts) > 1:
-                self.form.name_inverse.data = name_parts[1][:-1]  # remove ")"
-        if isinstance(self.entity, Type):  # Set super if it isn't the root
-            super_ = g.types[self.entity.root[-1]]
-            root = g.types[self.entity.root[0]]
-            if super_.id != root.id:
-                getattr(self.form, str(root.id)).data = super_.id
+                self.form.name_inverse.data = name_parts[1][:-1]
+        super_ = g.types[self.entity.root[-1]]
+        root = g.types[self.entity.root[0]]
+        if super_.id != root.id:
+            getattr(self.form, str(root.id)).data = super_.id
+
+    def process_form(self) -> None:
+        super().process_form()
+        self.super_id = self.get_root().id
+        if new_id := getattr(self.form, str(self.super_id)).data:
+            self.super_id = int(new_id)

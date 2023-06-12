@@ -32,7 +32,7 @@ def populate_reference_systems(manager: Any) -> None:
         # Can't use isinstance for class check here
         link_.domain.id:
             link_ for link_ in manager.entity.get_links('P67', True)
-        if link_.domain.class_.name == 'reference_system'}
+            if link_.domain.class_.name == 'reference_system'}
     for key in manager.form.data:
         field = getattr(manager.form, key)
         if field.id.startswith('reference_system_id_'):
