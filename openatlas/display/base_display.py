@@ -44,16 +44,6 @@ class BaseDisplay:
         self.add_crumbs()
         self.buttons = [manual(f'entity/{self.entity.class_.view}')]
         self.add_buttons()
-        self.buttons.append(bookmark_toggle(self.entity.id))
-        self.buttons.append(
-            render_template('util/api_links.html', entity=self.entity))
-        if self.entity and self.entity.class_.view not in \
-                ['source', 'reference', 'reference_system', 'type']:
-            self.buttons.append(
-                button(
-                    _('network'),
-                    url_for('network', dimensions=0, id_=self.entity.id)))
-        self.buttons.append(siblings_pager(self.entity, self.structure))
         if self.linked_places:
             self.gis_data = Gis.get_all(self.linked_places)
         self.add_info_tab_content()  # Call later because of profile image
@@ -130,20 +120,22 @@ class BaseDisplay:
     def add_buttons(self) -> None:
         if is_authorized(self.entity.class_.write_access):
             if not self.problematic_type:
-                self.add_update_button()
-            if type(self.entity) is Entity:
-                self.buttons.append(
-                    button(
-                        _('copy'),
-                        url_for('update', id_=self.entity.id, copy='copy_')))
-            if self.entity:
-                self.add_delete_button()
-
-    def add_update_button(self) -> None:
+                self.add_button_update()
+                self.add_button_copy()
+            self.add_button_delete()
+        self.buttons.append(bookmark_toggle(self.entity.id))
+        self.add_button_network()
+        self.buttons.append(siblings_pager(self.entity, self.structure))
         self.buttons.append(
-            button(_('edit'), url_for('update', id_=self.entity.id)))
+            render_template('util/api_links.html', entity=self.entity))
 
-    def add_delete_button(self) -> None:
+    def add_button_copy(self) -> None:
+        self.buttons.append(
+            button(
+                _('copy'),
+                url_for('update', id_=self.entity.id, copy='copy_')))
+
+    def add_button_delete(self) -> None:
         if current_user.group == 'contributor':
             info = g.logger.get_log_info(self.entity.id)
             if not info['creator'] or info['creator'].id != current_user.id:
@@ -153,6 +145,16 @@ class BaseDisplay:
             _('delete'),
             url_for('delete', id_=self.entity.id),
             onclick=f"return confirm('{msg}')"))
+
+    def add_button_update(self) -> None:
+        self.buttons.append(
+            button(_('edit'), url_for('update', id_=self.entity.id)))
+
+    def add_button_network(self) -> None:
+        self.buttons.append(
+            button(
+                _('network'),
+                url_for('network', dimensions=0, id_=self.entity.id)))
 
     def add_data(self) -> None:
         self.data = {
@@ -327,6 +329,10 @@ class EventsDisplay(BaseDisplay):
 
 class PlaceBaseDisplay(BaseDisplay):
 
+    def add_button_delete(self) -> None:
+        if not self.entity.get_linked_entities('P46'):
+            super().add_button_delete()
+
     def add_tabs(self) -> None:
         super().add_tabs()
         entity = self.entity
@@ -410,12 +416,11 @@ class PlaceBaseDisplay(BaseDisplay):
                 and (not self.structure or not self.structure['supers']):
             self.gis_data = {}
 
-    def add_delete_button(self) -> None:
-        if not self.entity.get_linked_entities('P46'):
-            super().add_delete_button()
-
 
 class ReferenceBaseDisplay(BaseDisplay):
+
+    def add_button_network(self) -> None:
+        pass
 
     def add_tabs(self) -> None:
         super().add_tabs()
@@ -447,12 +452,22 @@ class TypeBaseDisplay(BaseDisplay):
         self.crumbs += [g.types[type_id] for type_id in self.entity.root]
         self.crumbs.append(self.entity.name)
 
-    def add_delete_button(self) -> None:
+    def add_button_copy(self) -> None:
+        pass
+
+    def add_button_delete(self) -> None:
         if self.entity.category != 'system':
             url = url_for('type_delete', id_=self.entity.id)
             if self.entity.count or self.entity.subs:
                 url = url_for('type_delete_recursive', id_=self.entity.id)
             self.buttons.append(button(_('delete'), url))
+
+    def add_button_network(self) -> None:
+        pass
+
+    def add_button_update(self) -> None:
+        if self.entity.category != 'system':
+            super().add_button_update()
 
     def add_data(self) -> None:
         super().add_data()
@@ -520,7 +535,3 @@ class TypeBaseDisplay(BaseDisplay):
                 button(
                     _('move entities'),
                     url_for('type_move_entities', id_=entity.id)))
-
-    def add_update_button(self) -> None:
-        if self.entity.category != 'system':
-            super().add_update_button()

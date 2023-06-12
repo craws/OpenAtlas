@@ -66,12 +66,11 @@ class ImageTest(TestBaseCase):
                 safe_resize_image(file2.id, '.png', size="???")
                 profile_image(file_pathless)
 
-            # Resizing images (don't change order!)
             rv = self.app.get(url_for('view', id_=file_json.id))
             assert b'no preview available' in rv.data
 
             rv = self.app.get(url_for('view', id_=file_pathless.id))
-            assert b'missing file' in rv.data
+            assert b'Missing file' in rv.data
 
             rv = self.app.get(url_for('index', view='file'))
             assert b'Test_File' in rv.data

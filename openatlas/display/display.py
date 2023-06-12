@@ -12,7 +12,7 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
     button, description, edit_link, format_entity_date, get_base_table_data,
-    get_file_path, is_authorized, link, remove_link)
+    get_file_path, is_authorized, link, remove_link, uc_first)
 from openatlas.models.entity import Entity
 from openatlas.views.tools import carbon_result, sex_result
 
@@ -78,7 +78,13 @@ class FileDisplay(BaseDisplay):
                 url_for('download_file', filename=path.name)))
             return
         self.buttons.append(
-            '<span class="error">' + _("missing file") + '</span>')
+            '<span class="error">' + uc_first(_("missing file")) + '</span>')
+
+    def add_button_copy(self) -> None:
+        pass
+
+    def add_button_network(self) -> None:
+        pass
 
     def add_tabs(self) -> None:
         super().add_tabs()
@@ -217,6 +223,16 @@ class ProductionDisplay(EventsDisplay):
 class ReferenceSystemDisplay(BaseDisplay):
     entity: ReferenceSystem
 
+    def add_button_copy(self) -> None:
+        pass
+
+    def add_button_delete(self) -> None:
+        if not self.entity.classes and not self.entity.system:
+            super().add_button_delete()
+
+    def add_button_network(self) -> None:
+        pass
+
     def add_data(self) -> None:
         super().add_data()
         self.data[_('website URL')] = link(
@@ -255,12 +271,11 @@ class ReferenceSystemDisplay(BaseDisplay):
                         system_id=self.entity.id,
                         class_name=name))]
 
-    def add_delete_button(self) -> None:
-        if not self.entity.classes and not self.entity.system:
-            super().add_delete_button()
-
 
 class SourceDisplay(BaseDisplay):
+
+    def add_button_network(self) -> None:
+        pass
 
     def add_data(self) -> None:
         super().add_data()
@@ -294,6 +309,12 @@ class SourceDisplay(BaseDisplay):
 
 
 class SourceTranslationDisplay(BaseDisplay):
+
+    def add_button_copy(self) -> None:
+        pass
+
+    def add_button_network(self) -> None:
+        pass
 
     def add_crumbs(self) -> None:
         self.crumbs = [
