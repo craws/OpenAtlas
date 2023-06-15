@@ -4,7 +4,7 @@ from flask import render_template, url_for, g, flash, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
-from wtforms import BooleanField, SelectMultipleField, widgets
+from wtforms import BooleanField, SelectMultipleField, widgets, SelectField
 from wtforms.validators import InputRequired
 
 from openatlas.api.import_scripts.vocabs import (
@@ -99,6 +99,8 @@ def vocabulary_detail(url: str) -> Optional[str]:
 @app.route('/vocabs/import/<id_>', methods=['GET', 'POST'])
 @required_group('manager')
 def vocabulary_import_view(id_: str) -> str:
+
+    details = fetch_vocabulary_details(id_)
     class ImportVocabsHierarchyForm(FlaskForm):
         multiple = BooleanField(
             _('multiple'),
@@ -110,20 +112,23 @@ def vocabulary_import_view(id_: str) -> str:
                 choices=Type.get_class_choices(),
                 option_widget=widgets.CheckboxInput(),
                 widget=widgets.ListWidget(prefix_label=False))
+        language = SelectField(
+            _('language'),
+            choices=[(lang, lang) for lang in details['languages']],
+            default=details['defaultLanguage'])
         confirm_import = BooleanField(
             _("I'm sure to import this hierarchy"),
             default=False,
             validators=[InputRequired()])
         save = SubmitField(_('import hierarchy'))
 
-    details = fetch_vocabulary_details(id_)
-
     form = ImportVocabsHierarchyForm()
 
     if form.validate_on_submit() and form.confirm_import.data:
         form_data = {
             'classes': form.classes.data,
-            'multiple': form.multiple.data}
+            'multiple': form.multiple.data,
+            'language': form.language.data}
         try:
             count = import_vocabs_data(id_, form_data)
             Transaction.commit()
