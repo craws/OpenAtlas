@@ -131,11 +131,12 @@ def vocabulary_import_view(id_: str) -> str:
             'multiple': form.multiple.data,
             'language': form.language.data}
         try:
-            count = import_vocabs_data(id_, form_data, details['title'])
+            count = import_vocabs_data(id_, form_data, details)
             Transaction.commit()
             g.logger.log('info', 'import', f'import: {count} top concepts')
             flash(f"{_('import of')}: {count} {_('top concepts')}", 'info')
         except Exception as e:
+            print(e)
             Transaction.rollback()
             g.logger.log('error', 'import', 'import failed', e)
             flash(_('error transaction'), 'error')
