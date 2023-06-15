@@ -76,7 +76,8 @@ def execute_upgrade() -> None:
             if not sql_file_path:
                 finish(f'{filename} not found in {upgrade_sql_path}. Aborting')
             try:
-                with open(str(sql_file_path), 'r') as sql_file:
+                with open(str(sql_file_path), 'r', encoding='utf-8') \
+                        as sql_file:
                     cursor.execute(sql_file.read())
             except Exception as e:
                 finish(f'Import of {sql_file_path} failed.\n{e}')
