@@ -101,6 +101,7 @@ def vocabulary_detail(url: str) -> Optional[str]:
 def vocabulary_import_view(id_: str) -> str:
 
     details = fetch_vocabulary_details(id_)
+
     class ImportVocabsHierarchyForm(FlaskForm):
         multiple = BooleanField(
             _('multiple'),
@@ -130,7 +131,7 @@ def vocabulary_import_view(id_: str) -> str:
             'multiple': form.multiple.data,
             'language': form.language.data}
         try:
-            count = import_vocabs_data(id_, form_data)
+            count = import_vocabs_data(id_, form_data, details['title'])
             Transaction.commit()
             g.logger.log('info', 'import', f'import: {count} top concepts')
             flash(f"{_('import of')}: {count} {_('top concepts')}", 'info')
