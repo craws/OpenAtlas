@@ -10,8 +10,8 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.display.table import Table
-from openatlas.display.util import button, link, manual, required_group, \
-    uc_first
+from openatlas.display.util import (
+    button, link, manual, required_group, uc_first)
 from openatlas.forms.field import SubmitField, TableField
 from openatlas.models.entity import Entity
 from openatlas.models.network import Network
@@ -19,13 +19,14 @@ from openatlas.models.openatlas_class import OpenatlasClass
 
 
 class LinkCheckForm(FlaskForm):
+
     cidoc_domain = TableField('Domain', [InputRequired()])
     cidoc_property = TableField('Property', [InputRequired()])
     cidoc_range = TableField('Range', [InputRequired()])
     save = SubmitField(_('test'))
 
 
-@app.route('/overview/model', methods=["GET", "POST"])
+@app.route('/overview/model', methods=['GET', 'POST'])
 @required_group('readonly')
 def model_index() -> str:
     form = LinkCheckForm()
@@ -269,11 +270,11 @@ class NetworkForm(FlaskForm):
         widget=widgets.ListWidget(prefix_label=False))
 
 
-@app.route('/overview/network/', methods=["GET", "POST"])
-@app.route('/overview/network/<int:dimensions>', methods=["GET", "POST"])
+@app.route('/overview/network/', methods=['GET', 'POST'])
+@app.route('/overview/network/<int:dimensions>', methods=['GET', 'POST'])
 @app.route(
     '/overview/network/<int:dimensions>/<int:id_>',
-    methods=["GET", "POST"])
+    methods=['GET', 'POST'])
 @required_group('readonly')
 def network(dimensions: Optional[int] = 0, id_: Optional[int] = None) -> str:
     entity = Entity.get_by_id(id_) if id_ else None
@@ -286,11 +287,9 @@ def network(dimensions: Optional[int] = 0, id_: Optional[int] = None) -> str:
                 'class': f'data-huebee {app.config["CSS"]["string_field"]}'}))
     setattr(NetworkForm, 'save', SubmitField(_('apply')))
     form = NetworkForm()
-    form.classes.choices = []
-    for class_ in classes:
-        if class_.name == 'object_location':
-            continue
-        form.classes.choices.append((class_.name, class_.label))
+    form.classes.choices = [
+        (class_.name, class_.label)
+        for class_ in [x for x in classes if x.name != 'object_location']]
     if entity:
         json_data = Network.get_ego_network_json(
             {c.name: getattr(form, c.name).data for c in classes},

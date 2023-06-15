@@ -24,7 +24,9 @@
     <span
         id="{{ field.id }}-button"
         class="{{ config.CSS.button.secondary }} uc-first"
-        onclick="$('#{{ field.id }}-modal').modal('show')">{{ _('change') }}</span>
+        onclick="$('#{{ field.id }}-modal').modal('show')"
+        tabindex="0">{{ _('change') }}
+    </span>
   </div>
 </div>
 
@@ -132,6 +134,12 @@
   </script>
 {% endif %}
 <script>
+    $('#{{ field.id }}-button')
+        .on('keydown', function (event) {
+            if (onActivateKeyInput(event))
+                $('#{{ field.id }}-modal').modal('show')
+        });
+
     $("#{{ field.id }}-tree").jstree({
         "core": {"check_callback": true, "data": {{ data|safe }}},
         "plugins": ["search", "checkbox"],

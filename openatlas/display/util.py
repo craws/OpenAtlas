@@ -143,26 +143,6 @@ def profile_image_table_link(
     return ''
 
 
-def delete_link(entity: Entity) -> str:
-    from openatlas.models.type import Type
-    confirm = ''
-    if isinstance(entity, Type):
-        url = url_for('type_delete', id_=entity.id)
-        if entity.count or entity.subs:
-            url = url_for('type_delete_recursive', id_=entity.id)
-    else:
-        if current_user.group == 'contributor':
-            info = g.logger.get_log_info(entity.id)
-            if not info['creator'] or info['creator'].id != current_user.id:
-                return ''
-        url = url_for('index', view=entity.class_.view, delete_id=entity.id)
-        confirm = _('Delete %(name)s?', name=entity.name.replace('\'', ''))
-    return button(
-        _('delete'),
-        url,
-        onclick=f"return confirm('{confirm}')" if confirm else '')
-
-
 def siblings_pager(
         entity: Entity,
         structure: Optional[dict[str, list[Entity]]] = None) -> str:
@@ -233,7 +213,9 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
             'type']:
         active = ''
         request_parts = request.path.split('/')
-        if (view_name == item) or request.path.startswith('/index/' + item):
+        if view_name == item \
+                or request.path.startswith(f'/{item}') \
+                or request.path.startswith(f'/index/{item}'):
             active = 'active'
         elif len(request_parts) > 2 and request.path.startswith('/insert/'):
             name = request_parts[2]
@@ -543,23 +525,30 @@ def link(
         html = link(
             object_.name,
             url_for('view', id_=object_.id),
-            uc_first_=False)
+            uc_first_=False,
+            external=external)
     elif isinstance(object_, CidocClass):
         html = link(
             object_.code,
-            url_for('cidoc_class_view', code=object_.code))
+            url_for('cidoc_class_view', code=object_.code),
+            external=external)
     elif isinstance(object_, CidocProperty):
-        html = link(object_.code, url_for('property_view', code=object_.code))
+        html = link(
+            object_.code,
+            url_for('property_view', code=object_.code),
+            external=external)
     elif isinstance(object_, Project):
         html = link(
             object_.name,
-            url_for('import_project_view', id_=object_.id))
+            url_for('import_project_view', id_=object_.id),
+            external=external)
     elif isinstance(object_, User):
         html = link(
             object_.username,
             url_for('user_view', id_=object_.id),
             class_='' if object_.active else 'inactive',
-            uc_first_=False)
+            uc_first_=False,
+            external=external)
     return html
 
 
@@ -585,6 +574,8 @@ def button(
             {f'id="{id_}"' if id_ else ''}
             class="{app.config['CSS']['button'][css]} uc-first"
             {f'onclick="{onclick}"' if onclick else ''}
+            tabindex="0"
+            role="button"
             {tooltip_}>{label}</{tag}>"""
 
 
@@ -610,19 +601,15 @@ def display_citation_example(code: str) -> str:
 
 @app.template_filter()
 def breadcrumb(crumbs: list[Any]) -> str:
-    from openatlas.models.entity import Entity
-    from openatlas.models.user import User
     items = []
     for item in crumbs:
-        if not item:
-            continue  # e.g. if a dynamic generated URL has no origin parameter
-        if isinstance(item, (Entity, Project, User)):
-            items.append(link(item))
-        elif isinstance(item, list):
+        if isinstance(item, list):
             items.append(
                 f'<a href="{item[1]}" class="uc-first">{str(item[0])}</a>')
-        else:
+        elif isinstance(item, str) or isinstance(item, LazyString):
             items.append(f'<span class="uc-first">{item}</span>')
+        elif item:
+            items.append(link(item))
     return '&nbsp;>&nbsp; '.join(items)
 
 
@@ -637,27 +624,10 @@ def display_info(data: dict[str, Union[str, list[str]]]) -> str:
 
 
 @app.template_filter()
-def description(entity: Union[Entity, Project, User]) -> str:
-    from openatlas.models.entity import Entity
-    from openatlas.views.tools import carbon_result, sex_result
-    html = ''
-    if isinstance(entity, Entity) \
-            and entity.class_.name == 'stratigraphic_unit':
-        if radiocarbon := carbon_result(entity):
-            html += f"<p>{radiocarbon}</p>"
-        if sex_estimation := sex_result(entity):
-            html += f"<p>{sex_estimation}</p>"
-    if not entity.description:
-        return html
-    label = _('description')
-    if isinstance(entity, Entity) and entity.class_.name == 'source':
-        label = _('content')
-    return f"""
-        {html}
-        <h2 class="uc-first fw-bold">{label}</h2>
-        <div class="description more">
-            {'<br>'.join(entity.description.splitlines())}
-        </div>"""
+def description(text: str, label: Optional[str] = '') -> str:
+    return '' if not text else \
+        f'<h2 class="uc-first fw-bold">{label or _("description")}</h2>' \
+        f'<div class="description more">{"<br>".join(text.splitlines())}</div>'
 
 
 @contextfilter

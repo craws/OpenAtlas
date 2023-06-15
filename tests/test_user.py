@@ -106,8 +106,7 @@ class UserTests(TestBaseCase):
             rv = self.app.post(url_for('insert', class_='reference_system'))
             assert b'403 - Forbidden' in rv.data
 
-            rv = self.app.get(
-                url_for('index', view='actor', delete_id=g.wikidata.id))
+            rv = self.app.get(url_for('delete', id_=g.wikidata.id))
             assert b'403 - Forbidden' in rv.data
 
             self.login('Manager')
@@ -118,8 +117,7 @@ class UserTests(TestBaseCase):
             assert b'403 - Forbidden' in rv.data
 
             self.login('Contributor')
-            rv = self.app.get(
-                url_for('index', view='actor', delete_id=person.id))
+            rv = self.app.get(url_for('delete', id_=person.id))
             assert b'403 - Forbidden' in rv.data
 
             rv = self.app.get(url_for('update', id_=person.id))

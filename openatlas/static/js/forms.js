@@ -1,204 +1,236 @@
 const variables = {}
 
+/* Handle Accessibility Inputs */
+function onActivateKeyInput(event) {
+  if (
+    event.key !== "Enter" &&
+    event.key !== " "
+  ) {
+    return false;
+  }
+  event.stopPropagation();
+  event.preventDefault();
+  return true;
+}
+
 /* Show and hide function for value type input fields. Has to be outside of $(document).ready() */
 function switch_value_type(id, el) {
-    if (el.hasAttribute('show')) {
-        el.removeAttribute('show');
-        $(`.value-type-field.sub-of-${id}`).each(function () {
-            this.classList.add('d-none');
-        });
-        $(`.value-type-field.sub-of-${id} .value-type-switcher`).each(function () {
-            this.removeAttribute('show');
-        });
-    } else {
-        $(`.value-type-field.direct-sub-of-${id}`).each(function () {
-            this.classList.remove('d-none');
-        });
-        el.setAttribute('show', '');
-    }
+  if (el.hasAttribute('show')) {
+    el.removeAttribute('show');
+    $(`.value-type-field.sub-of-${id}`).each(function () {
+      this.classList.add('d-none');
+    });
+    $(`.value-type-field.sub-of-${id} .value-type-switcher`).each(function () {
+      this.removeAttribute('show');
+    });
+  } else {
+    $(`.value-type-field.direct-sub-of-${id}`).each(function () {
+      this.classList.remove('d-none');
+    });
+    el.setAttribute('show', '');
+  }
+  el.setAttribute("aria-pressed", el.hasAttribute('show'));
 }
 
 $(document).ready(function () {
 
-    /* Write selected DataTables checkboxes to hidden input */
-    $('#checkbox-form').submit((a) => {
-        ids = [];
-        $('#checkbox-form .dataTable').DataTable().rows().nodes().to$().find('input[type="checkbox"]').each(
-            function () {
-                if ($(this).is(':checked')) {
-                    ids.push($(this).attr('value'));
-                }
-            });
-        $('#checkbox_values').val(ids.length > 0 ? '[' + ids + ']' : '');
-    });
-
-    /* Needed for ajax bookmark functionality */
-    $.ajaxSetup({
-        beforeSend: function (xhr, settings) {
-            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", bookmark_csrf_token);
-            }
+  /* Write selected DataTables checkboxes to hidden input */
+  $('#checkbox-form').submit((a) => {
+    ids = [];
+    $('#checkbox-form .dataTable').DataTable().rows().nodes().to$().find('input[type="checkbox"]').each(
+      function () {
+        if ($(this).is(':checked')) {
+          ids.push($(this).attr('value'));
         }
-    });
+      });
+    $('#checkbox_values').val(ids.length > 0 ? '[' + ids + ']' : '');
+  });
 
-    /* Show and hide function for reference systems */
-    $("#reference-system-switcher").click(function () {
-        $(".reference-system-switch").toggleClass('d-none');
-        $(this).text(function (i, text) {
-            return $.trim(text) === translate.show ? translate.hide : translate.show;
-        })
-    });
-
-    /* Show and hide function for date input fields */
-    $("#date-switcher").click(function () {
-        $(".date-switch").toggleClass('d-none');
-        $(this).text(function (i, text) {
-            return $.trim(text) === translate.show ? translate.hide : translate.show;
-        })
-    });
-
-    /* Hide date fields if there are any and if they are empty */
-    if ($('#begin_year_from').length &&
-        $('#begin_year_from').val() == '' && $('#end_year_from').val() == '') {
-        $('.date-switch').addClass('d-none');
+  /* Needed for ajax bookmark functionality */
+  $.ajaxSetup({
+    beforeSend: function (xhr, settings) {
+      if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+        xhr.setRequestHeader("X-CSRFToken", bookmark_csrf_token);
+      }
     }
+  });
 
-    /* Hide value type fields with class* wildcard selector */
-    $('[class*="value-type-switch"]').addClass('display-none');
+  /* Show and hide function for reference systems */
+  $("#reference-system-switcher").click(function () {
+    $(".reference-system-switch").toggleClass('d-none');
+    $(this).text(function (i, text) {
+      return $.trim(text) === translate.show ? translate.hide : translate.show;
+    })
+  });
 
-    // $('label[for="show_passwords"]').css('display', 'block');
-    $('#show_passwords').show()
+  /* Show and hide function for date input fields */
+  $("#date-switcher").attr(
+      "aria-pressed",
+      !$(".date-switch").hasClass('d-none')
+    );
 
-        .change(function () {
-            $('#password')[0].type = this.checked ? 'text' : 'password';
-            $('#password2')[0].type = this.checked ? 'text' : 'password';
-            if (document.getElementById('password_old')) {
-                $('#password_old')[0].type = this.checked ? 'text' : 'password';
-            }
-        });
+  $("#date-switcher").click(function () {
+    toggleDateFieldVisible(this);
+  });
+  $("#date-switcher").on('keydown', function (event) {
+    if (!onActivateKeyInput(event)) return;
+    toggleDateFieldVisible(this);
+  });
 
-    /* Below section sets up validation for various forms */
-    // Enable validation for hidden fields
-    let v = $.validator;
-    v.setDefaults({
-        ignore: [],
+  function toggleDateFieldVisible(el) {
+    $(".date-switch").toggleClass('d-none');
+    $("#date-switcher").attr(
+        "aria-pressed",
+        !$(".date-switch").hasClass('d-none')
+      );
+    $(el).text(function (i, text) {
+      return $.trim(text) === translate.show ? translate.hide : translate.show;
+    })
+  }
+
+
+  /* Hide date fields if there are any and if they are empty */
+  if ($('#begin_year_from').length &&
+    $('#begin_year_from').val() == '' && $('#end_year_from').val() == '') {
+    $('.date-switch').addClass('d-none');
+  }
+
+  /* Hide value type fields with class* wildcard selector */
+  $('[class*="value-type-switch"]').addClass('display-none');
+
+  // $('label[for="show_passwords"]').css('display', 'block');
+  $('#show_passwords').show()
+
+    .change(function () {
+      $('#password')[0].type = this.checked ? 'text' : 'password';
+      $('#password2')[0].type = this.checked ? 'text' : 'password';
+      if (document.getElementById('password_old')) {
+        $('#password_old')[0].type = this.checked ? 'text' : 'password';
+      }
     });
 
-    v.addClassRules({
-        year: {number: true, min: -4713, max: 9999},
-        month: {digits: true, min: 1, max: 12},
-        day: {digits: true, min: 1, max: 31},
-        hour: {digits: true, min: 0, max: 23},
-        minute: {digits: true, min: 0, max: 59},
-        second: {digits: true, min: 0, max: 59},
-        integer: {digits: true},
-        signed_integer: {signedInteger: true},
-        email: {email: true},
-        "value-type": {number: true}
-    });
+  /* Below section sets up validation for various forms */
+  // Enable validation for hidden fields
+  let v = $.validator;
+  v.setDefaults({
+    ignore: [],
+  });
 
-    v.addMethod('notEqual', function (value, element, param) {
-        return this.optional(element) || value != $(param).val();
-    }, 'This has to be different');
+  v.addClassRules({
+    year: {number: true, min: -4713, max: 9999},
+    month: {digits: true, min: 1, max: 12},
+    day: {digits: true, min: 1, max: 31},
+    hour: {digits: true, min: 0, max: 23},
+    minute: {digits: true, min: 0, max: 59},
+    second: {digits: true, min: 0, max: 59},
+    integer: {digits: true},
+    signed_integer: {signedInteger: true},
+    email: {email: true},
+    "value-type": {number: true}
+  });
 
-    v.addMethod('fileSize', function (value, element, param) {
-        return this.optional(element) || element.files[0].size <= param;
-    }, 'This file it too large, allowed are ' + maxFileSize + ' MB');
+  v.addMethod('notEqual', function (value, element, param) {
+    return this.optional(element) || value != $(param).val();
+  }, 'This has to be different');
 
-    v.addMethod("signedInteger", function (value, element) {
-        return /^-?\d+$/i.test(value);
-    }, 'Please enter a valid integer.');
+  v.addMethod('fileSize', function (value, element, param) {
+    return this.optional(element) || element.files[0].size <= param;
+  }, 'This file it too large, allowed are ' + maxFileSize + ' MB');
 
-    $("#password-form").validate({
-        rules: {
-            password: {minlength: minimumPasswordLength, notEqual: "#password_old"},
-            password2: {equalTo: "#password"},
-        }
-    });
+  v.addMethod("signedInteger", function (value, element) {
+    return /^-?\d+$/i.test(value);
+  }, 'Please enter a valid integer.');
 
-    $('#user-form').validate({
-        rules: {
-            password: {minlength: minimumPasswordLength},
-            password2: {equalTo: '#password'}
-        }
-    });
+  $("#password-form").validate({
+    rules: {
+      password: {minlength: minimumPasswordLength, notEqual: "#password_old"},
+      password2: {equalTo: "#password"},
+    }
+  });
 
-    $('#file-form').validate({
-        rules: {
-            file: {fileSize: maxFileSize * 1024 * 1024}
+  $('#user-form').validate({
+    rules: {
+      password: {minlength: minimumPasswordLength},
+      password2: {equalTo: '#password'}
+    }
+  });
+
+  $('#file-form').validate({
+    rules: {
+      file: {fileSize: maxFileSize * 1024 * 1024}
+    },
+  });
+
+  $("form").on('click', '#generate-password', function () {
+    charset = '123456789abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ';
+    random_password = '';
+    for (var i = 0; i < minimumPasswordLength; i++) {
+      index = Math.floor(Math.random() * (charset.length));
+      random_password += charset[index];
+    }
+    $("#password").val(random_password);
+    $("#password2").val(random_password);
+  })
+
+    // Adding a generic submit handler to form validation
+    .each(function () {
+      $(this).validate({
+        errorClass: "d-block error",
+        submitHandler: function (form) {
+          if (this.submitButton.id === "insert_and_continue") $('#continue_').val('yes');
+          if (this.submitButton.id === "insert_continue_sub") $('#continue_').val('sub');
+          if (this.submitButton.id === "insert_continue_human_remains") $('#continue_').val('human_remains');
+          $('button[type="submit"]').prop("disabled", true).text(translate.inProgress);
+          form.submit();
         },
+      });
     });
 
-    $("form").on('click', '#generate-password', function () {
-        charset = '123456789abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ';
-        random_password = '';
-        for (var i = 0; i < minimumPasswordLength; i++) {
-            index = Math.floor(Math.random() * (charset.length));
-            random_password += charset[index];
-        }
-        $("#password").val(random_password);
-        $("#password2").val(random_password);
-    })
-
-        // Adding a generic submit handler to form validation
-        .each(function () {
-            $(this).validate({
-                errorClass: "d-block error",
-                submitHandler: function (form) {
-                    if (this.submitButton.id === "insert_and_continue") $('#continue_').val('yes');
-                    if (this.submitButton.id === "insert_continue_sub") $('#continue_').val('sub');
-                    if (this.submitButton.id === "insert_continue_human_remains") $('#continue_').val('human_remains');
-                    $('button[type="submit"]').prop("disabled", true).text(translate.inProgress);
-                    form.submit();
-                },
-            });
-        });
-
-    //add required to reference precision if reference is set
-    ['keyup', 'change'].forEach((listener) => {
-        $("[id^=reference_system_value]").on(listener, function () {
-            const select = $(`#reference_system_precision_${this.id.split('_').pop()}`);
-            if (!this.value?.length)
-                select.removeClass('required');
-            else
-                select.addClass('required');
-        });
-    })
-
-    $("div[id*='-modal']").on('shown.bs.modal', function () {
-        $("input[id*='-tree-search']").focus();
-        $("input[type='search']").focus();
+  // Add required to reference precision if reference is set
+  ['keyup', 'change'].forEach((listener) => {
+    $("[id^=reference_system_value]").on(listener, function () {
+      const select = $(`#reference_system_precision_${this.id.split('_').pop()}`);
+      if (!this.value?.length)
+        select.removeClass('required');
+      else
+        select.addClass('required');
     });
+  })
 
-    $('.extend-icon').click((a) => {
-        if (a.currentTarget.id === 'extend-form-icon') {
-            $('#extend-form-icon').hide();
-            $('#extend-map-icon').show();
-            $('.col-xl-4').toggleClass("col-xl-4").toggleClass("col-xl-10");
-            $('.col-xl-8').toggleClass("col-xl-8").toggleClass("col-xl-2");
-            return;
-        }
-        $('#extend-form-icon').show();
-        $('#extend-map-icon').hide();
-        $('.col-xl-10').toggleClass("col-xl-10").toggleClass("col-xl-4");
-        $('.col-xl-2').toggleClass("col-xl-2").toggleClass("col-xl-8");
-    });
+  $("div[id*='-modal']").on('shown.bs.modal', function () {
+    $("input[id*='-tree-search']").focus();
+    $("input[type='search']").focus();
+  });
 
-    $(".modal").on('shown.bs.modal', function () {
-        $(`#${this.id} input`)?.get(0)?.focus()
-    });
+  $('.extend-icon').click((a) => {
+    if (a.currentTarget.id === 'extend-form-icon') {
+      $('#extend-form-icon').hide();
+      $('#extend-map-icon').show();
+      $('.col-xl-4').toggleClass("col-xl-4").toggleClass("col-xl-10");
+      $('.col-xl-8').toggleClass("col-xl-8").toggleClass("col-xl-2");
+      return;
+    }
+    $('#extend-form-icon').show();
+    $('#extend-map-icon').hide();
+    $('.col-xl-10').toggleClass("col-xl-10").toggleClass("col-xl-4");
+    $('.col-xl-2').toggleClass("col-xl-2").toggleClass("col-xl-8");
+  });
+
+  $(".modal").on('shown.bs.modal', function () {
+    $(`#${this.id} input`)?.get(0)?.focus()
+  });
 
 });
 
 const closableBadge = (name, onclick = '') => `
-      <div onclick="event.stopPropagation()" class="badge col-auto bg-gray">
-        <div class="d-flex align-items-center">
-          <span class="text-black">${name}</span>
-          <button
-            onclick="${onclick}"
-            type="button"
-            class="btn-close p-0 ms-1"
-            aria-label="Close"
-          ></button>
-        </div>
-      </div>`
+  <div onclick="event.stopPropagation()" class="badge col-auto bg-gray">
+    <div class="d-flex align-items-center">
+      <span class="text-black">${name}</span>
+      <button
+      onclick="${onclick}"
+      type="button"
+      class="btn-close p-0 ms-1"
+      aria-label="Close"
+      ></button>
+    </div>
+  </div>`

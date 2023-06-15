@@ -13,7 +13,6 @@ from openatlas.display.util import get_file_path
 
 
 class DisplayImage(Resource):
-
     @staticmethod
     def get(filename: str) -> Response:
         entity = get_entity_by_id(int(Pathlib_path(filename).stem))

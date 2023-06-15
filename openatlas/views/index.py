@@ -101,7 +101,7 @@ def set_locale(language: str) -> Response:
     return redirect(request.referrer)
 
 
-@app.route('/overview/feedback', methods=['POST', 'GET'])
+@app.route('/overview/feedback', methods=['GET', 'POST'])
 @required_group('readonly')
 def index_feedback() -> Union[str, Response]:
 

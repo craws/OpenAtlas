@@ -784,7 +784,17 @@
           "schema" : {
             "type" : "string"
           }
-        } ],
+        }, {
+          "in": "query",
+          "name": "image_size",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "thumbnail",
+              "table"]
+          }
+        }],
         "responses" : {
           "200" : {
             "description" : "Retrieves the respective image if it has a licence",

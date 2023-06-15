@@ -38,10 +38,7 @@ class ReferenceSystemTest(TestBaseCase):
             assert b'reference-system-switch' in rv.data
 
             rv = self.app.get(
-                url_for(
-                    'index',
-                    view='reference_system',
-                    delete_id=wikipedia_id),
+                url_for('delete', id_=wikipedia_id),
                 follow_redirects=True)
             assert b'Deletion not possible if classes are attached' in rv.data
 
@@ -54,10 +51,7 @@ class ReferenceSystemTest(TestBaseCase):
             assert b'Changes have been saved' in rv.data
 
             rv = self.app.get(
-                url_for(
-                    'index',
-                    view='reference_system',
-                    delete_id=wikipedia_id),
+                url_for('delete', id_=wikipedia_id),
                 follow_redirects=True)
             assert b'The entry has been deleted' in rv.data
 
@@ -99,11 +93,7 @@ class ReferenceSystemTest(TestBaseCase):
                 follow_redirects=True)
             assert b'A transaction error occurred' in rv.data
 
-            rv = self.app.get(
-                url_for(
-                    'index',
-                    view='reference_system',
-                    delete_id=g.geonames.id))
+            rv = self.app.get(url_for('delete', id_=g.geonames.id))
             assert b'403 - Forbidden' in rv.data
 
             rv = self.app.get(

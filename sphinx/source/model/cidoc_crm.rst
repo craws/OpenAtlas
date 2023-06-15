@@ -12,7 +12,7 @@ in connection with the International Council of Museums
 
 It is used as basis for the underlying data model of OpenAtlas and the
 currently used version is
-`CIDOC CRM v7.1.1 <https://cidoc-crm.org/Version/version-7.1.1>`_ published in
+`CIDOC CRM v7.1.2 <https://cidoc-crm.org/Version/version-7.1.2>`_ published in
 May 2021.
 A script is used to parse the specification and import it into a
 `PostgreSQL <https://www.postgresql.org/>`_ database (more information is

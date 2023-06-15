@@ -62,12 +62,11 @@ def import_index() -> str:
         buttons=buttons,
         title=_('import'),
         crumbs=[
-            [_('admin'),
-             f"{url_for('admin_index')}#tab-data"],
+            [_('admin'), f"{url_for('admin_index')}#tab-data"],
             _('import')])
 
 
-@app.route('/import/project/insert', methods=['POST', 'GET'])
+@app.route('/import/project/insert', methods=['GET', 'POST'])
 @required_group('manager')
 def import_project_insert() -> Union[str, Response]:
     form = ProjectForm()
@@ -114,7 +113,7 @@ def import_project_view(id_: int) -> str:
             project.name])
 
 
-@app.route('/import/project/update/<int:id_>', methods=['POST', 'GET'])
+@app.route('/import/project/update/<int:id_>', methods=['GET', 'POST'])
 @required_group('manager')
 def import_project_update(id_: int) -> Union[str, Response]:
     project = Import.get_project_by_id(id_)
@@ -160,7 +159,7 @@ class ImportForm(FlaskForm):
         return valid
 
 
-@app.route('/import/data/<int:project_id>/<class_>', methods=['POST', 'GET'])
+@app.route('/import/data/<int:project_id>/<class_>', methods=['GET', 'POST'])
 @required_group('manager')
 def import_data(project_id: int, class_: str) -> str:
     project = Import.get_project_by_id(project_id)

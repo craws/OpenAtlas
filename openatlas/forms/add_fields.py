@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections import OrderedDict
-from typing import Any, TYPE_CHECKING
+from typing import Any
 
 from flask import g
 from flask_babel import lazy_gettext as _
@@ -16,12 +16,9 @@ from openatlas.forms.field import (
     ValueTypeRootField)
 from openatlas.models.type import Type
 
-if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.models.openatlas_class import OpenatlasClass
 
-
-def add_reference_systems(class_: OpenatlasClass, form: Any) -> None:
-    if hasattr(form, 'classes'):
+def add_reference_systems(manager: Any) -> None:
+    if hasattr(manager.form_class, 'classes'):
         return  # Skip hierarchies
     precisions = [('', '')] + [
         (str(g.types[id_].id), g.types[id_].name)
@@ -29,10 +26,10 @@ def add_reference_systems(class_: OpenatlasClass, form: Any) -> None:
     systems = list(g.reference_systems.values())
     systems.sort(key=lambda x: x.name.casefold())
     for system in systems:
-        if class_.name not in system.classes:
+        if manager.class_.name not in system.classes:
             continue
         setattr(
-            form,
+            manager.form_class,
             f'reference_system_id_{system.id}',
             ReferenceField(
                 system.name,

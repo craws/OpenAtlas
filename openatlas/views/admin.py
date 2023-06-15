@@ -35,14 +35,13 @@ from openatlas.models.content import get_content, update_content
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Import
 from openatlas.models.link import Link
-from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.settings import Settings
 from openatlas.models.type import Type
 from openatlas.models.user import User
 
 
-@app.route('/admin', methods=["GET", "POST"], strict_slashes=False)
-@app.route('/admin/', methods=["GET", "POST"], strict_slashes=False)
+@app.route('/admin', methods=['GET', 'POST'], strict_slashes=False)
+@app.route('/admin/', methods=['GET', 'POST'], strict_slashes=False)
 @app.route('/admin/<action>/<int:id_>', strict_slashes=False)
 @required_group('readonly')
 def admin_index(
@@ -192,7 +191,7 @@ def admin_index(
         crumbs=[_('admin')])
 
 
-@app.route('/admin/content/<string:item>', methods=["GET", "POST"])
+@app.route('/admin/content/<string:item>', methods=['GET', 'POST'])
 @required_group('manager')
 def admin_content(item: str) -> Union[str, Response]:
     # Translations of content items
@@ -326,7 +325,7 @@ def admin_delete_single_type_duplicate(
     return redirect(url_for('admin_check_link_duplicates'))
 
 
-@app.route('/admin/settings/<category>', methods=['POST', 'GET'])
+@app.route('/admin/settings/<category>', methods=['GET', 'POST'])
 @required_group('manager')
 def admin_settings(category: str) -> Union[str, Response]:
     if category in ['general', 'mail'] and not is_authorized('admin'):
@@ -365,10 +364,10 @@ def admin_settings(category: str) -> Union[str, Response]:
         'content.html',
         content=display_form(form, manual_page=f"admin/{category}"),
         title=_('admin'),
-        crumbs=[[ _('admin'), f"{url_for('admin_index')}{tab}"], _(category)])
+        crumbs=[[_('admin'), f"{url_for('admin_index')}{tab}"], _(category)])
 
 
-@app.route('/admin/similar', methods=['POST', 'GET'])
+@app.route('/admin/similar', methods=['GET', 'POST'])
 @required_group('contributor')
 def admin_check_similar() -> str:
     form = SimilarForm()
@@ -490,9 +489,7 @@ def admin_orphans() -> str:
             ['entity'],
             [[link(e)] for e in Entity.get_entities_linked_to_itself()]))}
 
-    for entity in filter(
-            lambda x: not isinstance(x, ReferenceSystem),
-            Entity.get_orphans()):
+    for entity in Entity.get_orphans():
         tabs[
             'unlinked'
             if entity.class_.view else 'orphans'].table.rows.append([
@@ -633,7 +630,7 @@ def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
             _('logo')])
 
 
-@app.route('/admin/log', methods=['POST', 'GET'])
+@app.route('/admin/log', methods=['GET', 'POST'])
 @required_group('admin')
 def admin_log() -> str:
     form = LogForm()
@@ -681,7 +678,7 @@ def admin_log_delete() -> Response:
     return redirect(url_for('admin_log'))
 
 
-@app.route('/admin/newsletter', methods=['POST', 'GET'])
+@app.route('/admin/newsletter', methods=['GET', 'POST'])
 @required_group('manager')
 def admin_newsletter() -> Union[str, Response]:
     class NewsLetterForm(FlaskForm):

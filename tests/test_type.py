@@ -42,6 +42,9 @@ class TypeTest(TestBaseCase):
             assert b'My secret type' in rv.data
             assert b'super' in rv.data
 
+            rv = self.app.get(url_for('update', id_=dimension_type.subs[0]))
+            assert b'unit' in rv.data
+
             rv = self.app.post(
                 url_for('update', id_=type_id),
                 data=data,
