@@ -136,7 +136,6 @@ def vocabulary_import_view(id_: str) -> str:
             g.logger.log('info', 'import', f'import: {count} top concepts')
             flash(f"{_('import of')}: {count} {_('top concepts')}", 'info')
         except Exception as e:
-            print(e)
             Transaction.rollback()
             g.logger.log('error', 'import', 'import failed', e)
             flash(_('error transaction'), 'error')

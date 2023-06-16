@@ -28,30 +28,23 @@ def fetch_top_level(
         params={'lang': form_data['language']},
         timeout=60,
         auth=(app.config['VOCABS_USER'], app.config['VOCABS_PW']))
-    exact_match_id = get_exact_match().id
     count = []
-    hierarchy = Entity.insert(
-        'type',
-        details['title'],
-        f'Automatically imported from {details["title"]}')
-    Type.insert_hierarchy(
-        hierarchy,
-        'custom', form_data['classes'],
-        form_data['multiple'])
     if ref := get_vocabs_reference_system(details):
         for entry in req.json()['topconcepts']:
-            name = entry['uri'].rsplit('/', 1)[-1]
-            child = Entity.insert(
+            hierarchy = Entity.insert(
                 'type',
                 entry['label'],
                 f'Automatically imported from {details["title"]}')
-            child.link('P127', hierarchy)
-            ref.link('P67', child, name, type_id=exact_match_id)
+            Type.insert_hierarchy(
+                hierarchy,
+                'custom', form_data['classes'],
+                form_data['multiple'])
             entry['subs'] = import_children(
-                entry['uri'], id_,
+                entry['uri'],
+                id_,
                 form_data['language'],
                 ref,
-                child)
+                hierarchy)
             count.append(entry)
     return count
 
