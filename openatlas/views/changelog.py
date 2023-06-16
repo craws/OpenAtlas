@@ -20,6 +20,7 @@ versions = {
         'feature': {
             '1898': 'Update CIDOC CRM from 7.1.1 to 7.1.2',
             '2020': 'Accessibility: Tab navigation for forms',
+            '2025': 'Daily Debian security updates for GitHub containers',
             '2017': 'Refactor and minor improvements'},
         'fix': {
             '1930': 'CIDOC CRM link checker: keep form values after submit',
