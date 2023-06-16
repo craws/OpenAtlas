@@ -12,8 +12,8 @@ information.
 
 **How to upgrade**
 
-This upgrade example is written for a Linux system. First you update the code
-base, then run the database upgrade script, then restart Apache:
+This upgrade example is written for a Linux system. First update the code base,
+then run the database upgrade script, then restart Apache:
 
     git pull origin main
     sudo python3 install/upgrade/database_upgrade.py
