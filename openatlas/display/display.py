@@ -256,8 +256,8 @@ class ReferenceSystemDisplay(BaseDisplay):
             self.tabs[link_.range.class_.name].table.rows.append([
                 link(link_.range),
                 link(
-                    f'{self.entity.resolver_url}{link_.description}',
                     link_.description,
+                    f'{self.entity.resolver_url}{link_.description}',
                     external=True)
                 if self.entity.resolver_url else link_.description,
                 link_.type.name])
