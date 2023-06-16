@@ -42,7 +42,7 @@ Please refer to our [contributing guidelines](CONTRIBUTING.md)
 ([bernhard.koschicek-krombholz@oeaw.ac.at](mailto:bernhard.koschicek-krombholz@oeaw.ac.at))
 - **Nina Richards** - Bioarchaeological Expertise
 ([nina.richards@oeaw.ac.at](mailto:nina.richards@oeaw.ac.at))
-- **Andreas Olschnögger** - Frontend Development
+- **Moritz Großfurtner** - Frontend Development
 ([moritz.großfurtner@oeaw.ac.at](mailto:moritz.großfurtner@oeaw.ac.at)
 - **Jan Belik** - Logo Design and Design Consulting
 ([buero@janbelik.com](mailto:buero@janbelik.com))
