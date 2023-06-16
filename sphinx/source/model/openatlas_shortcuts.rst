@@ -119,14 +119,14 @@ E77 Persistent Item **begin** linked with a E61 Time Primitive:
    E77(Persistent Item) - P92i(was brought into existence by) - E63(Beginning of Existence) -
    P4(has time span) - E52(Time Span) - P81(ongoing throughout) - E61(Time Primitive)
 
-Example: [Holy Lance (:cidoc_entity:`E22<e61-human-made-object>`)] was
+Example: [Holy Lance (:cidoc_entity:`E22<e22-human-made-object>`)] was
 brought into existence by :cidoc_property:`P92i<p92-brought-into-existence>`
 [forging of Holy Lance
 (:cidoc_entity:`E12<e12-production>`)] has time span
 (:cidoc_property:`P4<P4-has-time-span>`) [Moment/Duration of Forging of Holy
 Lance (:cidoc_entity:`E52<e52-Time-Span>`)] ongoing throughout
 (:cidoc_property:`P81<p81-ongoing-throughout>`) [0770-12-24
-(:cidoc_entity:`E61<61-Time-Primitive>`)]
+(:cidoc_entity:`E61<e61-Time-Primitive>`)]
 
 E77 Persistent Item **end** linked with a E61 Time Primitive:
 
@@ -147,7 +147,7 @@ Example: [The one ring
 (:cidoc_property:`P4<P4-has-time-span>`) [Moment of throwing it into the lava
 (:cidoc_entity:`E52<e52-Time-Span>`)] ongoing throughout
 (:cidoc_property:`P81<p81-ongoing-throughout>`) [3019-03-25
-(:cidoc_entity:`E61<61-Time-Primitive>`)]
+(:cidoc_entity:`E61<e61-Time-Primitive>`)]
 
 E21 Person
 ++++++++++

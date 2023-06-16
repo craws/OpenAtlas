@@ -40,7 +40,7 @@ Reference Systems
 
 Reference systems include sources such as vocabularies, gazetteers, etc.
 They are considered authority documents
-(:cidoc_entity:`E32<EE32-Authority-Document>`).
+(:cidoc_entity:`E32<E32-Authority-Document>`).
 
 Users can define a reference system respectively authority document by defining
 a name, class, and description.
