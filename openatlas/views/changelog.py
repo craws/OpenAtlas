@@ -16,6 +16,9 @@ def index_changelog() -> str:
 
 versions = {
     '7.15.0': ['TBA', {}],
+    '7.14.1': ['2023-06-19', {
+        'fix': {
+            '2027': 'Missing checkboxes for input tables'}}],
     '7.14.0': ['2023-06-16', {
         'feature': {
             '1898': 'Update CIDOC CRM from 7.1.1 to 7.1.2',
