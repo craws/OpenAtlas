@@ -13,7 +13,7 @@ from openatlas.display.util import (
     bookmark_toggle, button, description, edit_link, ext_references,
     format_date, format_entity_date, get_appearance, get_base_table_data,
     get_system_data, is_authorized, link, manual, profile_image_table_link,
-    remove_link, siblings_pager)
+    remove_link)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -24,10 +24,11 @@ from openatlas.views.entity_index import file_preview
 
 
 class BaseDisplay:
-    tabs: dict[str, Tab]
-    overlays = None
+    buttons: list[str]
     crumbs: list[Any]
     data: dict[str, Any]
+    overlays = None
+    tabs: dict[str, Tab]
 
     def __init__(self, entity: Entity) -> None:
         self.entity = entity
@@ -42,7 +43,6 @@ class BaseDisplay:
         self.add_note_tab()
         self.add_file_tab_thumbnails()
         self.add_crumbs()
-        self.buttons = [manual(f'entity/{self.entity.class_.view}')]
         self.add_buttons()
         if self.linked_places:
             self.gis_data = Gis.get_all(self.linked_places)
@@ -118,6 +118,7 @@ class BaseDisplay:
             self.tabs['note'].table.rows.append(data)
 
     def add_buttons(self) -> None:
+        self.buttons = [manual(f'entity/{self.entity.class_.view}')]
         if is_authorized(self.entity.class_.write_access):
             if not self.problematic_type:
                 self.add_button_update()
@@ -125,9 +126,11 @@ class BaseDisplay:
             self.add_button_delete()
         self.buttons.append(bookmark_toggle(self.entity.id))
         self.add_button_network()
-        self.buttons.append(siblings_pager(self.entity, self.structure))
         self.buttons.append(
             render_template('util/api_links.html', entity=self.entity))
+        self.add_button_others()
+        if self.structure and len(self.structure['siblings']) > 1:
+            self.add_button_sibling_pager()
 
     def add_button_copy(self) -> None:
         self.buttons.append(
@@ -155,6 +158,28 @@ class BaseDisplay:
             button(
                 _('network'),
                 url_for('network', dimensions=0, id_=self.entity.id)))
+
+    def add_button_others(self) -> None:
+        pass
+
+    def add_button_sibling_pager(self) -> None:
+        prev_id = None
+        next_id = None
+        position = None
+        self.structure['siblings'].sort(key=lambda x: x.id)
+        for counter, sibling in enumerate(self.structure['siblings']):
+            position = counter + 1
+            prev_id = sibling.id if sibling.id < self.entity.id else prev_id
+            if sibling.id > self.entity.id:
+                next_id = sibling.id
+                position = counter
+                break
+        if prev_id:
+            self.buttons.append(button('<', url_for('view', id_=prev_id)))
+        if next_id:
+            self.buttons.append(button('>', url_for('view', id_=next_id)))
+        self.buttons.append(
+            f'{position} ' + _('of') + f" {len(self.structure['siblings'])}")
 
     def add_data(self) -> None:
         self.data = {

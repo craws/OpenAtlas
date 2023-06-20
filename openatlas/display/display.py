@@ -70,8 +70,7 @@ class FileDisplay(BaseDisplay):
         self.data[_('extension')] = g.file_stats[self.entity.id]['ext'] \
             if self.entity.id in g.file_stats else 'N/A'
 
-    def add_buttons(self) -> None:
-        super().add_buttons()
+    def add_button_others(self) -> None:
         if path := get_file_path(self.entity.id):
             self.buttons.append(button(
                 _('download'),
@@ -325,8 +324,7 @@ class SourceTranslationDisplay(BaseDisplay):
 
 class StratigraphicUnitDisplay(PlaceBaseDisplay):
 
-    def add_buttons(self) -> None:
-        super().add_buttons()
+    def add_button_others(self) -> None:
         self.buttons.append(
             button(_('tools'), url_for('tools_index', id_=self.entity.id)))
 

@@ -170,7 +170,8 @@ class TableMultiSelect(HiddenInput):
             row.insert(
                 0,
                 f'<input type="checkbox" value="{entity.name}"'
-                f' id="{entity.id}{" checked" if entity.id in data else ""}>')
+                f' id="{entity.id}" '
+                f'{" checked" if entity.id in data else ""}>')
             table.rows.append(row)
         return render_template(
             'forms/table_multi_select.html',

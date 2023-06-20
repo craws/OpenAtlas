@@ -143,31 +143,6 @@ def profile_image_table_link(
     return ''
 
 
-def siblings_pager(
-        entity: Entity,
-        structure: Optional[dict[str, list[Entity]]] = None) -> str:
-    if not structure or len(structure['siblings']) < 2:
-        return ''
-    structure['siblings'].sort(key=lambda x: x.id)
-    prev_id = None
-    next_id = None
-    position = None
-    for counter, sibling in enumerate(structure['siblings']):
-        position = counter + 1
-        prev_id = sibling.id if sibling.id < entity.id else prev_id
-        if sibling.id > entity.id:
-            next_id = sibling.id
-            position = counter
-            break
-    parts = []
-    if prev_id:
-        parts.append(button('<', url_for('view', id_=prev_id)) + '&nbsp;')
-    if next_id:
-        parts.append(button('>', url_for('view', id_=next_id)) + '&nbsp;')
-    parts.append(f'{position} ' + _('of') + f" {len(structure['siblings'])}")
-    return ' '.join(parts)
-
-
 def get_system_data(entity: Entity) -> dict[str, Any]:
     data = {}
     if 'entity_show_class' in current_user.settings \
