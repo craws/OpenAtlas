@@ -1,7 +1,9 @@
-from typing import Optional
+from typing import Optional, Any
 
+import requests
 from flask import g
 
+from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 
@@ -31,3 +33,16 @@ def get_exact_match() -> Entity:
 
 def get_reference_system(name: str) -> Entity:
     return [i for i in g.reference_systems.values() if i.name == name][0]
+
+
+def vocabs_requests(
+        id_: Optional[str] = '',
+        endpoint: Optional[str] = '',
+        parameter: Optional[dict[str, str]] = '') -> dict[str, Any]:
+    req = requests.get(
+        f"{g.settings['vocabs_base_url']}{g.settings['vocabs_endpoint']}{id_}/"
+        f"{endpoint}",
+        params=parameter,
+        timeout=60,
+        auth=(app.config['VOCABS_USER'], app.config['VOCABS_PW']))
+    return req.json()

@@ -1,10 +1,8 @@
 from typing import Any, Optional
 
-import requests
 from flask import g
 
-from openatlas import app
-from openatlas.api.import_scripts.util import get_exact_match
+from openatlas.api.import_scripts.util import get_exact_match, vocabs_requests
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.database.reference_system import ReferenceSystem as Db
@@ -22,15 +20,10 @@ def fetch_top_level(
         id_: str,
         details: dict[str, Any],
         form_data: dict[str, Any]) -> list[dict[str, Any]]:
-    req = requests.get(
-        f"{g.settings['vocabs_base_url']}{g.settings['vocabs_endpoint']}{id_}"
-        "/topConcepts",
-        params={'lang': form_data['language']},
-        timeout=60,
-        auth=(app.config['VOCABS_USER'], app.config['VOCABS_PW']))
+    req = vocabs_requests(id_, 'topConcepts', {'lang': form_data['language']})
     count = []
     if ref := get_vocabs_reference_system(details):
-        for entry in req.json()['topconcepts']:
+        for entry in req['topconcepts']:
             hierarchy = Entity.insert(
                 'type',
                 entry['label'],
@@ -55,16 +48,11 @@ def import_children(
         lang: str,
         ref: ReferenceSystem,
         super_: Optional[Entity],) -> list[dict[str, Any]]:
-    req = requests.get(
-        f"{g.settings['vocabs_base_url']}{g.settings['vocabs_endpoint']}{id_}"
-        "/narrower",
-        params={'uri': uri, 'lang': lang},
-        timeout=60,
-        auth=(app.config['VOCABS_USER'], app.config['VOCABS_PW']))
+    req = vocabs_requests(id_, 'narrower', {'uri': uri, 'lang': lang})
     exact_match_id = get_exact_match().id
     children = []
     child = None
-    for entry in req.json()['narrower']:
+    for entry in req['narrower']:
         name = entry['uri'].rsplit('/', 1)[-1]
         if super_:
             child = Entity.insert(
@@ -79,14 +67,8 @@ def import_children(
 
 def get_pref_label(label: str, id_: str, uri: str) -> str:
     if not label:
-        req = requests.get(
-            f"{g.settings['vocabs_base_url']}{g.settings['vocabs_endpoint']}"
-            f"{id_}"
-            "/label",
-            params={'uri': uri},
-            timeout=60,
-            auth=(app.config['VOCABS_USER'], app.config['VOCABS_PW']))
-        label = req.json()['prefLabel']
+        req = vocabs_requests(id_, 'label', {'uri': uri})
+        label = req['prefLabel']
     return label
 
 
@@ -107,45 +89,21 @@ def get_vocabs_reference_system(details: dict[str, Any],) -> ReferenceSystem:
 
 
 def get_vocabularies():
+    req = vocabs_requests(endpoint='vocabularies', parameter={'lang': 'en'})
     out = []
-    for voc in fetch_vocabularies():
+    for voc in req['vocabularies']:
         out.append(voc | fetch_vocabulary_details(voc['uri']))
     return out
 
 
 def fetch_vocabulary_details(id_: str) -> dict[str, str]:
-    req = requests.get(
-        f"{g.settings['vocabs_base_url']}{g.settings['vocabs_endpoint']}{id_}",
-        params={'lang': 'en'},
-        timeout=60,
-        auth=(app.config['VOCABS_USER'], app.config['VOCABS_PW']))
-    data = req.json()
+    data = vocabs_requests(id_, parameter={'lang': 'en'})
     return {
         'id': data['id'],
         'title': data['title'],
         'defaultLanguage': data['defaultLanguage'],
         'languages': data['languages'],
-        'conceptUri': data['conceptschemes'][0]['uri'] if data[
-            'conceptschemes'] else ''
-    }
+        'conceptUri':
+            data['conceptschemes'][0]['uri'] if data['conceptschemes'] else ''}
 
 
-def fetch_vocabulary_metadata(id_: str, uri: str) -> dict[str, str]:
-    req = requests.get(
-        f"{g.settings['vocabs_base_url']}{g.settings['vocabs_endpoint']}{id_}"
-        "/data",
-        params={'uri': uri, 'format': 'application/ld+json'},
-        timeout=60,
-        auth=(app.config['VOCABS_USER'], app.config['VOCABS_PW']))
-    data = req.json()
-    return data['graph'][0]
-
-
-def fetch_vocabularies() -> list[dict[str, str]]:
-    req = requests.get(
-        f"{g.settings['vocabs_base_url']}{g.settings['vocabs_endpoint']}"
-        "vocabularies",
-        params={'lang': 'en'},
-        timeout=60,
-        auth=(app.config['VOCABS_USER'], app.config['VOCABS_PW']))
-    return req.json()['vocabularies']

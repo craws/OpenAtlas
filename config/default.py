@@ -91,19 +91,9 @@ ARCHE = {
     'base_url': None,
     'thumbnail_url': 'https://arche-thumbnails.acdh.oeaw.ac.at/'}
 
-# Todo: to be deleted if not necessary anymore
-VOCABS = {
-    'id': None,
-    'api_uri': 'https://vocabs.acdh.oeaw.ac.at/rest/v1/',
-    'uri': 'https://vocabs.acdh.oeaw.ac.at/'}
-
-# Used to connect to ACDH-CH VOCABS systems
-VOCABS_URI = {
-    'default': {
-        'uri': 'https://base.uri/',
-        'api': 'https://api.base.uri/v1/',
-        'user': '',
-        'password': ''}}
+# Used to connect to password protected Vocabs systems
+VOCABS_USER = ''
+VOCABS_PW = ''
 
 # Table options
 TABLE_ROWS = {10: '10', 25: '25', 50: '50', 100: '100'}

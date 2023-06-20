@@ -130,6 +130,7 @@ def vocabulary_import_view(id_: str) -> str:
             'classes': form.classes.data,
             'multiple': form.multiple.data,
             'language': form.language.data}
+
         try:
             count = import_vocabs_data(id_, form_data, details)
             Transaction.commit()
