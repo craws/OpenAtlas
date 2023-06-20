@@ -99,12 +99,16 @@ class BaseDisplay:
             info_data=self.data,
             gis_data=self.gis_data,
             overlays=self.overlays,
+            chart_data=self.get_chart_data(),
             description_html=self.description_html(),
             ext_references=ext_references(self.entity.reference_systems),
             problematic_type_id=self.problematic_type)
 
     def description_html(self) -> str:
         return description(self.entity.description)
+
+    def get_chart_data(self) -> Optional[dict[str, Any]]:
+        return None
 
     def add_note_tab(self) -> None:
         self.tabs['note'] = Tab('note', entity=self.entity)
@@ -560,3 +564,19 @@ class TypeBaseDisplay(BaseDisplay):
                 button(
                     _('move entities'),
                     url_for('type_move_entities', id_=entity.id)))
+
+    def get_chart_data(self) -> Optional[dict[str, Any]]:
+        if not self.entity.subs:
+            return None
+        labels = []
+        data = []
+        for id_ in self.entity.subs:
+            sub = g.types[id_]
+            labels.append(sub.name)
+            data.append(sub.count + sub.count_subs)
+        return {
+            'labels': labels,
+            'datasets': [{
+              'data': data
+            }]
+          }

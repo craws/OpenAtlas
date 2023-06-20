@@ -22,8 +22,12 @@ h2 {
   margin: 1em 0;
 }
 
+.chart-wrapper {
+  height: 40vh;
+  width: 40vw;
+}
 
-.toolbar{
+.toolbar {
   margin-bottom: 1rem;
 }
 
