@@ -568,15 +568,11 @@ class TypeBaseDisplay(BaseDisplay):
     def get_chart_data(self) -> Optional[dict[str, Any]]:
         if not self.entity.subs:
             return None
-        labels = []
-        data = []
+        result = {}
         for id_ in self.entity.subs:
             sub = g.types[id_]
-            labels.append(sub.name)
-            data.append(sub.count + sub.count_subs)
+            result[sub.name] = sub.count + sub.count_subs
+
         return {
-            'labels': labels,
-            'datasets': [{
-              'data': data
-            }]
-          }
+            'labels': list(result.keys()),
+            'datasets': [{'data': list(result.values())}]}
