@@ -113,5 +113,6 @@ def fetch_vocabulary_details(id_: str) -> dict[str, str]:
 
 def fetch_top_concept_details(id_: str) -> list[tuple]:
     req = vocabs_requests(id_, 'topConcepts', parameter={'lang': 'en'})
-    return [(concept['uri'], concept['label']) for concept in req['topconcepts']]
+    return [
+        (concept['uri'], concept['label']) for concept in req['topconcepts']]
 

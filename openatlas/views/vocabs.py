@@ -136,15 +136,20 @@ def vocabulary_import_view(id_: str) -> str:
             'classes': form.classes.data,
             'multiple': form.multiple.data,
             'language': form.language.data}
-
         try:
             results = import_vocabs_data(id_, form_data, details)
             count = len(results[0])
             Transaction.commit()
             g.logger.log('info', 'import', f'import: {count} top concepts')
             for duplicate in results[1]:
-                g.logger.log('info', 'import', f'Did not import {duplicate["label"]}, duplicate.')
-            flash(f"{_('import of')}: {count} {_('top concepts')}", 'info')
+                g.logger.log(
+                    'info',
+                    'import',
+                    f'Did not import {duplicate["label"]}, duplicate.')
+            import_str = f"{_('import of')}: {count} {_('top concepts')}"
+            if results[1]:
+                import_str += f'. {_("Check log for not imported concepts")}'
+            flash(import_str, 'info')
         except Exception as e:
             Transaction.rollback()
             g.logger.log('error', 'import', 'import failed', e)
