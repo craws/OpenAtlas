@@ -14,10 +14,19 @@ class ExportImportTest(TestBaseCase):
             rv = self.app.get(url_for('vocabs_update'))
             assert b'https://vocabs.acdh.oeaw.ac.at/' in rv.data
 
+            rv = self.app.post(
+                url_for('vocabs_update'),
+                follow_redirects=True,
+                data={
+                    'vocabs_base_url': 'https://vocabs.acdh.oeaw.ac.at/',
+                    'vocabs_endpoint': 'rest/v1/',
+                    'vocabs_user': 'test'})
+            assert b'test' in rv.data
+
             rv = self.app.get(url_for('show_vocabularies'))
             assert b'Backbone Thesaurus' in rv.data
 
-            rv = self.app.get(url_for('vocabulary_import_view',  id_='bbt'))
+            rv = self.app.get(url_for('vocabulary_import_view', id_='bbt'))
             assert b'Backbone Thesaurus' in rv.data
 
             rv = self.app.post(

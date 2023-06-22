@@ -57,23 +57,26 @@ def import_children(
     children = []
     child = None
     for entry in req['narrower']:
+        if not entry['prefLabel']:
+            continue
         name = entry['uri'].rsplit('/', 1)[-1]
         if super_:
             child = Entity.insert(
                 'type',
-                get_pref_label(entry['prefLabel'], id_, entry['uri']))
+                entry['prefLabel'])
+                # get_pref_label(entry['prefLabel'], id_, entry['uri']))
             child.link('P127', super_)
             ref.link('P67', child, name, type_id=exact_match_id)
         entry['subs'] = import_children(entry['uri'], id_, lang, ref, child)
         children.append(entry)
     return children
 
-
-def get_pref_label(label: str, id_: str, uri: str) -> str:
-    if not label:
-        req = vocabs_requests(id_, 'label', {'uri': uri})
-        label = req['prefLabel']
-    return label
+# Skosmos API has a problem, this code will work if bug is closed
+# def get_pref_label(label: str, id_: str, uri: str) -> str:
+#     if not label:
+#         req = vocabs_requests(id_, 'label', {'uri': uri})
+#         label = req['prefLabel']
+#     return label
 
 
 def get_vocabs_reference_system(details: dict[str, Any],) -> ReferenceSystem:

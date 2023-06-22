@@ -150,7 +150,7 @@ def vocabulary_import_view(id_: str) -> str:
             if results[1]:
                 import_str += f'. {_("Check log for not imported concepts")}'
             flash(import_str, 'info')
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             Transaction.rollback()
             g.logger.log('error', 'import', 'import failed', e)
             flash(_('error transaction'), 'error')
