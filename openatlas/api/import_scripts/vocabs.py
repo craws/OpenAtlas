@@ -1,5 +1,4 @@
 from typing import Any, Optional
-
 from flask import g
 
 from openatlas.api.import_scripts.util import get_exact_match, vocabs_requests
@@ -12,34 +11,39 @@ from openatlas.models.type import Type
 def import_vocabs_data(
         id_: str,
         form_data: dict[str, Any],
-        details: dict[str, Any]) -> int:
-    return len(fetch_top_level(id_, details, form_data))
+        details: dict[str, Any]) -> tuple[list, list]:
+    return fetch_top_level(id_, details, form_data)
 
 
 def fetch_top_level(
         id_: str,
         details: dict[str, Any],
-        form_data: dict[str, Any]) -> list[dict[str, Any]]:
+        form_data: dict[str, Any]) -> tuple[list, list]:
     req = vocabs_requests(id_, 'topConcepts', {'lang': form_data['language']})
     count = []
+    duplicates = []
     if ref := get_vocabs_reference_system(details):
         for entry in req['topconcepts']:
-            hierarchy = Entity.insert(
-                'type',
-                entry['label'],
-                f'Automatically imported from {details["title"]}')
-            Type.insert_hierarchy(
-                hierarchy,
-                'custom', form_data['classes'],
-                form_data['multiple'])
-            entry['subs'] = import_children(
-                entry['uri'],
-                id_,
-                form_data['language'],
-                ref,
-                hierarchy)
-            count.append(entry)
-    return count
+            if entry['uri'] in form_data['top_concepts'] \
+                    and not Type.check_hierarchy_exists(entry['label']):
+                hierarchy = Entity.insert(
+                    'type',
+                    entry['label'],
+                    f'Automatically imported from {details["title"]}')
+                Type.insert_hierarchy(
+                    hierarchy,
+                    'custom', form_data['classes'],
+                    form_data['multiple'])
+                entry['subs'] = import_children(
+                    entry['uri'],
+                    id_,
+                    form_data['language'],
+                    ref,
+                    hierarchy)
+                count.append(entry)
+            if Type.check_hierarchy_exists(entry['label']):
+                duplicates.append(entry)
+    return count, duplicates
 
 
 def import_children(
@@ -106,4 +110,8 @@ def fetch_vocabulary_details(id_: str) -> dict[str, str]:
         'conceptUri':
             data['conceptschemes'][0]['uri'] if data['conceptschemes'] else ''}
 
+
+def fetch_top_concept_details(id_: str) -> list[tuple]:
+    req = vocabs_requests(id_, 'topConcepts', parameter={'lang': 'en'})
+    return [(concept['uri'], concept['label']) for concept in req['topconcepts']]
 

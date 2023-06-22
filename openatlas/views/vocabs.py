@@ -8,7 +8,7 @@ from wtforms import BooleanField, SelectMultipleField, widgets, SelectField
 from wtforms.validators import InputRequired
 
 from openatlas.api.import_scripts.vocabs import (
-    import_vocabs_data, get_vocabularies, fetch_vocabulary_details)
+    import_vocabs_data, get_vocabularies, fetch_vocabulary_details, fetch_top_concept_details)
 from openatlas.database.connect import Transaction
 from openatlas import app
 from openatlas.display.tab import Tab
@@ -98,13 +98,16 @@ def vocabulary_detail(url: str) -> Optional[str]:
 @app.route('/vocabs/import/<id_>', methods=['GET', 'POST'])
 @required_group('manager')
 def vocabulary_import_view(id_: str) -> str:
-
     details = fetch_vocabulary_details(id_)
 
     class ImportVocabsHierarchyForm(FlaskForm):
-        multiple = BooleanField(
-            _('multiple'),
-            description=_('tooltip hierarchy multiple'))
+        concepts = SelectMultipleField(
+                _('top concepts'),
+                render_kw={'disabled': True},
+                description=_('tooltip vocabs top concepts forms'),
+                choices=fetch_top_concept_details(id_),
+                option_widget=widgets.CheckboxInput(),
+                widget=widgets.ListWidget(prefix_label=False))
         classes = SelectMultipleField(
                 _('classes'),
                 render_kw={'disabled': True},
@@ -112,6 +115,9 @@ def vocabulary_import_view(id_: str) -> str:
                 choices=Type.get_class_choices(),
                 option_widget=widgets.CheckboxInput(),
                 widget=widgets.ListWidget(prefix_label=False))
+        multiple = BooleanField(
+            _('multiple'),
+            description=_('tooltip hierarchy multiple'))
         language = SelectField(
             _('language'),
             choices=[(lang, lang) for lang in details['languages']],
@@ -126,14 +132,18 @@ def vocabulary_import_view(id_: str) -> str:
 
     if form.validate_on_submit() and form.confirm_import.data:
         form_data = {
+            'top_concepts': form.concepts.data,
             'classes': form.classes.data,
             'multiple': form.multiple.data,
             'language': form.language.data}
 
         try:
-            count = import_vocabs_data(id_, form_data, details)
+            results = import_vocabs_data(id_, form_data, details)
+            count = len(results[0])
             Transaction.commit()
             g.logger.log('info', 'import', f'import: {count} top concepts')
+            for duplicate in results[1]:
+                g.logger.log('info', 'import', f'Did not import {duplicate["label"]}, duplicate.')
             flash(f"{_('import of')}: {count} {_('top concepts')}", 'info')
         except Exception as e:
             Transaction.rollback()
