@@ -317,6 +317,8 @@ class PlaceBaseManager(BaseManager):
             if current_user.settings['module_map_overlay'] \
                     and self.origin.class_.view == 'place':
                 self.place_info['overlay'] = Overlay.get_by_object(self.origin)
+        else:
+            self.place_info['gis_data'] = Gis.get_all()
 
     def get_place_info_for_update(self) -> None:
         super().get_place_info_for_update()

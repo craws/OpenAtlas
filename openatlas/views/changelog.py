@@ -15,6 +15,9 @@ def index_changelog() -> str:
 
 
 versions = {
+    '7.14.2': ['2023-06-22', {
+        'fix': {
+            '2034': 'At place insert the map is not shown'}}],
     '7.14.1': ['2023-06-19', {
         'fix': {
             '2027': 'Missing checkboxes for input tables'}}],
