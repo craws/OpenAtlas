@@ -70,10 +70,9 @@ def vocabs_update() -> str:
 @app.route('/vocabs/vocabularies')
 @required_group('manager')
 def show_vocabularies() -> str:
-    vocabularies = get_vocabularies()
     table = Table(
         header=[_('name'), 'ID', _('default language'), _('languages')])
-    for entry in vocabularies:
+    for entry in get_vocabularies():
         table.rows.append([
             link(entry['title'], entry['conceptUri'], external=True),
             entry['id'],

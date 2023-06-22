@@ -88,7 +88,7 @@ def get_vocabs_reference_system(details: dict[str, Any],) -> ReferenceSystem:
     return system
 
 
-def get_vocabularies():
+def get_vocabularies() -> list[dict[str, Any]]:
     req = vocabs_requests(endpoint='vocabularies', parameter={'lang': 'en'})
     out = []
     for voc in req['vocabularies']:
