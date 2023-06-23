@@ -8,7 +8,8 @@ from wtforms import BooleanField, SelectMultipleField, widgets, SelectField
 from wtforms.validators import InputRequired
 
 from openatlas.api.import_scripts.vocabs import (
-    import_vocabs_data, get_vocabularies, fetch_vocabulary_details, fetch_top_concept_details)
+    import_vocabs_data, get_vocabularies, fetch_vocabulary_details,
+    fetch_top_concept_details)
 from openatlas.database.connect import Transaction
 from openatlas import app
 from openatlas.display.tab import Tab

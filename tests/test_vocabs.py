@@ -14,12 +14,13 @@ class ExportImportTest(TestBaseCase):
             rv = self.app.get(url_for('vocabs_update'))
             assert b'https://vocabs.acdh.oeaw.ac.at/' in rv.data
 
+            self.login('Manager')
             rv = self.app.post(
                 url_for('vocabs_update'),
                 follow_redirects=True,
                 data={
-                    'vocabs_base_url': 'https://vocabs.acdh.oeaw.ac.at/',
-                    'vocabs_endpoint': 'rest/v1/',
+                    'base_url': 'https://vocabs.acdh.oeaw.ac.at/',
+                    'endpoint': 'rest/v1/',
                     'vocabs_user': 'test'})
             assert b'test' in rv.data
 
@@ -52,3 +53,16 @@ class ExportImportTest(TestBaseCase):
                     'multiple': True,
                     'language': 'en'})
             assert b'Check log for not imported concepts' in rv.data
+
+            rv = self.app.post(
+                url_for('vocabulary_import_view', id_='dyas'),
+                follow_redirects=True,
+                data={
+                    'confirm_import': True,
+                    'concepts':
+                        ['https://humanitiesthesaurus.academyofathens.gr'
+                         '/dyas-resource/Concept/22'],
+                    'classes': 'place',
+                    'multiple': True,
+                    'language': 'en'})
+            assert b'Import of: 1' in rv.data

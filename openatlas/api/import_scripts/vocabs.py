@@ -51,7 +51,7 @@ def import_children(
         id_: str,
         lang: str,
         ref: ReferenceSystem,
-        super_: Optional[Entity],) -> list[dict[str, Any]]:
+        super_: Optional[Entity], ) -> list[dict[str, Any]]:
     req = vocabs_requests(id_, 'narrower', {'uri': uri, 'lang': lang})
     exact_match_id = get_exact_match().id
     children = []
@@ -63,15 +63,18 @@ def import_children(
         if super_:
             child = Entity.insert(
                 'type',
-                entry['prefLabel'])
-                # get_pref_label(entry['prefLabel'], id_, entry['uri']))
+                entry['prefLabel']  # Switch if bug is solved
+                # get_pref_label(entry['prefLabel'], id_, entry['uri'])
+            )
             child.link('P127', super_)
             ref.link('P67', child, name, type_id=exact_match_id)
         entry['subs'] = import_children(entry['uri'], id_, lang, ref, child)
         children.append(entry)
     return children
 
+
 # Skosmos API has a problem, this code will work if bug is closed
+#
 # def get_pref_label(label: str, id_: str, uri: str) -> str:
 #     if not label:
 #         req = vocabs_requests(id_, 'label', {'uri': uri})
@@ -79,7 +82,7 @@ def import_children(
 #     return label
 
 
-def get_vocabs_reference_system(details: dict[str, Any],) -> ReferenceSystem:
+def get_vocabs_reference_system(details: dict[str, Any], ) -> ReferenceSystem:
     title = details['title']
     system = None
     for system_ in g.reference_systems.values():
@@ -118,4 +121,3 @@ def fetch_top_concept_details(id_: str) -> list[tuple]:
     req = vocabs_requests(id_, 'topConcepts', parameter={'lang': 'en'})
     return [
         (concept['uri'], concept['label']) for concept in req['topconcepts']]
-
