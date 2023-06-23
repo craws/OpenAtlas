@@ -144,7 +144,7 @@ def vocabulary_import_view(id_: str) -> str:
             g.logger.log('info', 'import', f'import: {count} top concepts')
             for duplicate in results[1]:
                 g.logger.log(
-                    'info',
+                    'notice',
                     'import',
                     f'Did not import {duplicate["label"]}, duplicate.')
             import_str = f"{_('import of')}: {count} {_('top concepts')}"

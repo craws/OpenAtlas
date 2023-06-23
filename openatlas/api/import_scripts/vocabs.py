@@ -58,6 +58,10 @@ def import_children(
     child = None
     for entry in req['narrower']:
         if not entry['prefLabel']:
+            g.logger.log(
+                'warn',
+                'import',
+                f'{entry["uri"]} has no prefLabel assigned to it')
             continue
         name = entry['uri'].rsplit('/', 1)[-1]
         if super_:
