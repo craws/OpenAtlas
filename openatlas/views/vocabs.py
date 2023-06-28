@@ -1,21 +1,21 @@
 from typing import Optional
 
-from flask import render_template, url_for, g, flash, request
+from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
-from wtforms import BooleanField, SelectMultipleField, widgets, SelectField
+from wtforms import BooleanField, SelectField, SelectMultipleField, widgets
 from wtforms.validators import InputRequired
 
-from openatlas.api.import_scripts.vocabs import (
-    import_vocabs_data, get_vocabularies, fetch_vocabulary_details,
-    fetch_top_concept_details)
-from openatlas.database.connect import Transaction
 from openatlas import app
+from openatlas.api.import_scripts.vocabs import (
+    fetch_top_concept_details, fetch_vocabulary_details,
+    get_vocabularies, import_vocabs_data)
+from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, display_info, is_authorized, required_group, display_form, link)
+    button, display_form, display_info, is_authorized, link, required_group)
 from openatlas.forms.field import SubmitField
 from openatlas.forms.form import get_vocabs_form
 from openatlas.models.settings import Settings
@@ -103,19 +103,19 @@ def vocabulary_import_view(id_: str) -> str:
 
     class ImportVocabsHierarchyForm(FlaskForm):
         concepts = SelectMultipleField(
-                _('top concepts'),
-                render_kw={'disabled': True},
-                description=_('tooltip vocabs top concepts forms'),
-                choices=fetch_top_concept_details(id_),
-                option_widget=widgets.CheckboxInput(),
-                widget=widgets.ListWidget(prefix_label=False))
+            _('top concepts'),
+            render_kw={'disabled': True},
+            description=_('tooltip vocabs top concepts forms'),
+            choices=fetch_top_concept_details(id_),
+            option_widget=widgets.CheckboxInput(),
+            widget=widgets.ListWidget(prefix_label=False))
         classes = SelectMultipleField(
-                _('classes'),
-                render_kw={'disabled': True},
-                description=_('tooltip hierarchy forms'),
-                choices=Type.get_class_choices(),
-                option_widget=widgets.CheckboxInput(),
-                widget=widgets.ListWidget(prefix_label=False))
+            _('classes'),
+            render_kw={'disabled': True},
+            description=_('tooltip hierarchy forms'),
+            choices=Type.get_class_choices(),
+            option_widget=widgets.CheckboxInput(),
+            widget=widgets.ListWidget(prefix_label=False))
         multiple = BooleanField(
             _('multiple'),
             description=_('tooltip hierarchy multiple'))

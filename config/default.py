@@ -79,7 +79,9 @@ INT_CATEGORIES: list[str] = [
     "entityID", "typeID", "typeIDWithSubs", "relationToID"]
 SET_CATEGORIES: list[str] = ["valueTypeID"]
 VALID_CATEGORIES: list[str] = [
-    *STR_CATEGORIES, *INT_CATEGORIES, *SET_CATEGORIES]
+    *STR_CATEGORIES,
+    *INT_CATEGORIES,
+    *SET_CATEGORIES]
 COMPARE_OPERATORS: list[str] = [
     'equal', 'notEqual', 'greaterThan', 'lesserThan', 'greaterThanEqual',
     'lesserThanEqual', 'like']

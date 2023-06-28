@@ -1,10 +1,11 @@
 from typing import Any, Optional
+
 from flask import g
 
 from openatlas.api.import_scripts.util import get_exact_match, vocabs_requests
+from openatlas.database.reference_system import ReferenceSystem as Db
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
-from openatlas.database.reference_system import ReferenceSystem as Db
 from openatlas.models.type import Type
 
 

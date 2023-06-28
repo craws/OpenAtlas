@@ -2,18 +2,18 @@ from typing import Any
 
 import rdflib
 import requests
-from flask import g, flash
-from requests import Response, HTTPError
+from flask import flash, g
+from requests import HTTPError, Response
 from werkzeug.exceptions import abort
 
 from openatlas import app
-from openatlas.api.import_scripts.util import get_or_create_type, \
-    get_exact_match, get_reference_system
+from openatlas.api.import_scripts.util import (
+    get_exact_match, get_or_create_type, get_reference_system)
+from openatlas.database.gis import Gis as Db_gis
+from openatlas.database.reference_system import ReferenceSystem as Db
 from openatlas.models.entity import Entity
 from openatlas.models.imports import is_float
-from openatlas.database.gis import Gis as Db_gis
 from openatlas.models.reference_system import ReferenceSystem
-from openatlas.database.reference_system import ReferenceSystem as Db
 from openatlas.models.type import Type
 
 

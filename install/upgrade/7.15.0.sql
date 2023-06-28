@@ -1,4 +1,4 @@
--- Upgrade 7.14.0 to 7.15.0
+-- Upgrade 7.14.x to 7.15.0
 -- Be sure to backup the database and read the upgrade notes before executing.
 
 BEGIN;
