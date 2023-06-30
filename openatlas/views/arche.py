@@ -4,7 +4,8 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
-from openatlas.api.arche.function import fetch_arche_data, import_arche_data
+from openatlas.api.import_scripts.arche import (
+    fetch_arche_data, import_arche_data)
 from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
@@ -25,7 +26,9 @@ def arche_index() -> str:
             display_info({
                 k: str(v) for k, v in app.config['ARCHE'].items()}),
             buttons=[manual('admin/arche')])},
-        crumbs=['ARCHE'])
+        crumbs=[
+            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            'ARCHE'])
 
 
 @app.route('/arche/fetch')

@@ -6,7 +6,7 @@ from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import HiddenField, SelectMultipleField, StringField, widgets
-from wtforms.validators import InputRequired
+from wtforms.validators import InputRequired, URL
 
 from openatlas import app
 from openatlas.display.table import Table
@@ -104,3 +104,14 @@ def get_move_form(type_: Type) -> FlaskForm:
     form = Form(obj=type_)
     form.selection.choices = choices
     return form
+
+
+def get_vocabs_form() -> FlaskForm:
+    class Form(FlaskForm):
+        base_url = StringField(
+            _('base URL'),
+            validators=[InputRequired(), URL()])
+        endpoint = StringField(_('endpoint'), validators=[InputRequired()])
+        vocabs_user = StringField(_('user'))
+        save = SubmitField(_('save'))
+    return Form()

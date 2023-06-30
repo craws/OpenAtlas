@@ -19,8 +19,8 @@ then run the database upgrade script, then restart Apache:
     sudo python3 install/upgrade/database_upgrade.py
     sudo service apache2 restart
 
-### 7.14.x to 7.14.2
-A code base update (e.g. with git pull) and a webserver restart is sufficient.
+### 7.14.x to 7.15.0
+7.15.0.sql is needed but will be taken care of by the database upgrade script.
 
 ### 7.13.x to 7.14.0
 7.14.0.sql is needed but will be taken care of by the database upgrade script.
