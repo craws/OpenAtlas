@@ -1290,7 +1290,7 @@ msgstr "Ajoutez un Type à %(hierarchy)s"
 #: openatlas/templates/import/import_data.html:5
 #: openatlas/templates/sql/execute.html:5
 msgid "latest backup"
-msgstr "dernière backup"
+msgstr "dernier backup"
 
 #: openatlas/templates/import/import_data.html:11
 #: openatlas/templates/sql/execute.html:11
