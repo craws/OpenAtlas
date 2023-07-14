@@ -72,13 +72,13 @@ msgstr "alias"
 #: openatlas/display/display.py:160 openatlas/templates/util/dates.html:13
 #: openatlas/views/index.py:51
 msgid "begin"
-msgstr "commencer"
+msgstr "début"
 
 #: openatlas/display/base_display.py:153 openatlas/display/base_display.py:197
 #: openatlas/display/display.py:165 openatlas/templates/util/dates.html:64
 #: openatlas/views/index.py:51
 msgid "end"
-msgstr "terminer"
+msgstr "fin"
 
 #: openatlas/display/base_display.py:157 openatlas/forms/display.py:58
 #: openatlas/templates/forms/tree_select.html:56
@@ -478,7 +478,7 @@ msgstr "impossible d'écrire dans le dossier"
 
 #: openatlas/display/util.py:474
 msgid "user OpenAtlas with default password is still active"
-msgstr "l'utilisateur OpenAtlas avec le mot de passe par défaut est toujours actif"
+msgstr "l'utilisateur OpenAtlas a encore son mot de passe qui est celui par défaut"
 
 #: openatlas/display/util.py:607
 msgid "citation_example"
@@ -970,7 +970,7 @@ msgstr "le plus courant, par exemple une bataille, une réunion ou un mariage"
 
 #: openatlas/models/openatlas_class.py:72
 msgid "mapping a change of property"
-msgstr "faire corresponde un changement de propriété"
+msgstr "faire correspondre un changement de propriété"
 
 #: openatlas/models/openatlas_class.py:73
 msgid "movement of artifacts or persons"
@@ -1255,12 +1255,12 @@ msgstr "Placez vos fichiers ici !"
 #: openatlas/templates/forms/tree_multi_select.html:27
 #: openatlas/templates/forms/tree_select.html:12
 msgid "change"
-msgstr "changez"
+msgstr "changer"
 
 #: openatlas/templates/forms/table_select.html:20
 #: openatlas/templates/forms/tree_select.html:20
 msgid "clear"
-msgstr "nettoyez"
+msgstr "effacer"
 
 #: openatlas/templates/forms/table_select.html:89
 #: openatlas/templates/forms/tree_multi_select.html:104
@@ -1394,7 +1394,7 @@ msgstr "échecs de connexion"
 
 #: openatlas/templates/index/index.html:16
 msgid "first login"
-msgstr "première connexion"
+msgstr "C'est votre toute première connexion. Bienvenue !"
 
 #: openatlas/templates/index/index.html:18
 msgid "want a new feature or experience any problems"
@@ -1470,7 +1470,7 @@ msgstr "aucune donnée à afficher"
 
 #: openatlas/templates/model/network.html:75
 msgid "network options"
-msgstr "options réseau"
+msgstr "options du graphe"
 
 #: openatlas/templates/model/network.html:81
 msgid "show orphans"
@@ -1555,7 +1555,7 @@ msgstr "ce type n'a pas de subs et ne sera pas affiché dans les formulaires"
 
 #: openatlas/templates/type/required.html:6
 msgid "Attention: be careful with setting types to required"
-msgstr "Attention en rendant les types obligatoire, surtout quand il y a des utilisateurs "
+msgstr "Attention en rendant les types obligatoires, surtout quand il y a des utilisateurs "
 "qui ne sont pas autorisées à en créer de nouveaux. "
 "Cela peut les mettre dans une mauvaise situation au moment d'entrer "
 "des données et ainsi réduire la qualité de vos données."
@@ -2313,3 +2313,34 @@ msgstr "Informations du compte envoyées par email à %(email)s."
 msgid "Failed to send account details to %(email)s."
 msgstr "Echec de l'envoi des informations du compte à %(email)s"
 
+#~ msgid "no file to upload"
+#~ msgstr "aucun fichier à téléverser"
+
+#~ msgid "There are multiple places overlapping"
+#~ msgstr "Il y a plusieurs lieux qui se superposent"
+
+#~ msgid "Search by location name or postcode"
+#~ msgstr "Recherche par le nom du lieu ou par le code postal"
+
+#~ msgid "Enter a location name"
+#~ msgstr "Entrez un nom de lieu"
+
+#~ msgid "tooltip_required_type"
+#~ msgstr ""
+#~ "Ce champ de type est obligatoire mais vous n'avez pas le droit de créer des types. If "
+#~ "Si cela vous met dans une position inconfortable, vous devez en discuter avec le responsable du projet."
+
+#~ msgid "show API links"
+#~ msgstr "montrer les liens de l'API"
+
+#~ msgid "overview"
+#~ msgstr "vue principale"
+
+#~ msgid "mail recipients feedback"
+#~ msgstr "retour des destinataires"
+
+#~ msgid "allowed file extensions"
+#~ msgstr "extensions de fichiers acceptées"
+
+#~ msgid "modification of an artifact"
+#~ msgstr "modification de l'artefact"

@@ -2084,7 +2084,7 @@ msgstr "Failed to send password mail to %(email)s."
 
 #: openatlas/views/model.py:25
 msgid "test"
-msgstr "test"
+msgstr "tester"
 
 #: openatlas/views/model.py:85
 msgid "standard type"
