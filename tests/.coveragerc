@@ -1,5 +1,5 @@
 [report]
 precision=2
-omit=../openatlas/api/arche/*
+omit=../openatlas/api/import_scripts/arche.py
 skip_covered=True
 sort=cover
