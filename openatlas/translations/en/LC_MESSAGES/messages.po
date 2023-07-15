@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2023-05-06 11:51+0200\n"
-"PO-Revision-Date: 2023-05-06 11:52+0200\n"
+"PO-Revision-Date: 2023-07-15 13:02+0200\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -362,8 +362,7 @@ msgid "next"
 msgstr "next"
 
 #: openatlas/display/table.py:12 openatlas/forms/display.py:155
-#: openatlas/templates/type/index.html:113
-#: openatlas/templates/type/index.html:119
+#: openatlas/templates/type/index.html:113 openatlas/templates/type/index.html:119
 #: openatlas/templates/util/translations.html:9
 msgid "show"
 msgstr "show"
@@ -1015,10 +1014,9 @@ msgstr "profile"
 #: openatlas/views/imports.py:65 openatlas/views/imports.py:83
 #: openatlas/views/imports.py:112 openatlas/views/imports.py:134
 #: openatlas/views/imports.py:292 openatlas/views/imports.py:318
-#: openatlas/views/sql.py:28 openatlas/views/sql.py:59
-#: openatlas/views/user.py:126 openatlas/views/user.py:178
-#: openatlas/views/user.py:206 openatlas/views/user.py:242
-#: openatlas/views/user.py:295
+#: openatlas/views/sql.py:28 openatlas/views/sql.py:59 openatlas/views/user.py:126
+#: openatlas/views/user.py:178 openatlas/views/user.py:206
+#: openatlas/views/user.py:242 openatlas/views/user.py:295
 msgid "admin"
 msgstr "admin"
 
@@ -1051,8 +1049,7 @@ msgstr "close"
 #: openatlas/templates/layout.html:211
 msgid "warning no js"
 msgstr ""
-"JavaScript seems to be disabled. The functionality of this site will be "
-"limited."
+"JavaScript seems to be disabled. The functionality of this site will be limited."
 
 #: openatlas/templates/login.html:9 openatlas/views/login.py:150
 msgid "Forgot your password?"
@@ -1239,11 +1236,11 @@ msgstr "We are so sorry!"
 
 #: openatlas/templates/error/404.html:9
 msgid ""
-"We searched a long time but this document does not exist. Maybe you mistyped "
-"or followed a broken link."
+"We searched a long time but this document does not exist. Maybe you mistyped or "
+"followed a broken link."
 msgstr ""
-"We searched a long time but this document does not exist. Maybe you mistyped "
-"or followed a broken link."
+"We searched a long time but this document does not exist. Maybe you mistyped or "
+"followed a broken link."
 
 #: openatlas/templates/error/418.html:8
 msgid "This entry doesn't exist. Maybe you followed an obsolete link."
@@ -1351,8 +1348,8 @@ msgstr "version"
 #: openatlas/templates/index/feedback.html:4
 msgid "feedback intro"
 msgstr ""
-"Thank you for your interest. Please use one of the following methods to "
-"provide feedback"
+"Thank you for your interest. Please use one of the following methods to provide "
+"feedback"
 
 #: openatlas/templates/index/feedback.html:9
 msgid "feedback redmine"
@@ -1461,8 +1458,7 @@ msgstr "valid link"
 msgid "wrong domain"
 msgstr "wrong domain"
 
-#: openatlas/templates/model/index.html:30
-#: openatlas/templates/model/index.html:36
+#: openatlas/templates/model/index.html:30 openatlas/templates/model/index.html:36
 msgid "for"
 msgstr "for"
 
@@ -1494,8 +1490,7 @@ msgstr ""
 msgid "I'm aware of the risk and have read the documentation."
 msgstr "I'm aware of the risks and have read the documentation."
 
-#: openatlas/templates/sql/index.html:13
-#: openatlas/templates/type/required.html:16
+#: openatlas/templates/sql/index.html:13 openatlas/templates/type/required.html:16
 msgid "proceed"
 msgstr "proceed"
 
@@ -1564,8 +1559,8 @@ msgstr "this type has no subs and won't show in forms"
 msgid "Attention: be careful with setting types to required"
 msgstr ""
 "be careful with making types required, especially when there are users who "
-"aren't permitted to create new ones. It may put them in an awkward situation "
-"at data entry and, as a result, may even reduce the data quality."
+"aren't permitted to create new ones. It may put them in an awkward situation at "
+"data entry and, as a result, may even reduce the data quality."
 
 #: openatlas/templates/type/required.html:10
 msgid ""
@@ -1610,8 +1605,8 @@ msgstr "Draw the shape of a physical thing if the precise extent is known"
 #: openatlas/templates/util/translations.html:19
 msgid "map_info_area"
 msgstr ""
-"Draw the area in which the physical thing is located. E.g. if its precise "
-"shape is not known but known to be within a certain area."
+"Draw the area in which the physical thing is located. E.g. if its precise shape "
+"is not known but known to be within a certain area."
 
 #: openatlas/templates/util/translations.html:20
 msgid "map_info_point"
@@ -2084,7 +2079,7 @@ msgstr "Failed to send password mail to %(email)s."
 
 #: openatlas/views/model.py:25
 msgid "test"
-msgstr "tester"
+msgstr "test"
 
 #: openatlas/views/model.py:85
 msgid "standard type"
