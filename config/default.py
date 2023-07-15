@@ -7,7 +7,7 @@ VERSION = '7.15.0'
 DATABASE_VERSION = DATABASE_VERSIONS[0]
 DEMO_MODE = False  # If activated some options are disabled, login is prefilled
 
-LANGUAGES = {'ca': 'Català', 'de': 'Deutsch', 'en': 'English', 'es': 'Español'}
+LANGUAGES = {'ca': 'Català', 'de': 'Deutsch', 'en': 'English', 'es': 'Español', 'fr': 'Français'}
 DEBUG = False
 
 DATABASE_NAME = 'openatlas'
