@@ -13,7 +13,7 @@ from openatlas.display.util import (
     bookmark_toggle, button, description, edit_link, ext_references,
     format_date, format_entity_date, get_appearance, get_base_table_data,
     get_system_data, is_authorized, link, manual, profile_image_table_link,
-    remove_link)
+    remove_link, get_chart_data)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -566,13 +566,4 @@ class TypeBaseDisplay(BaseDisplay):
                     url_for('type_move_entities', id_=entity.id)))
 
     def get_chart_data(self) -> Optional[dict[str, Any]]:
-        if not self.entity.subs:
-            return None
-        result = {}
-        for id_ in self.entity.subs:
-            sub = g.types[id_]
-            result[sub.name] = sub.count + sub.count_subs
-
-        return {
-            'labels': list(result.keys()),
-            'datasets': [{'data': list(result.values())}]}
+        return get_chart_data(self.entity)

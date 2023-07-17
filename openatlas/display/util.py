@@ -143,6 +143,19 @@ def profile_image_table_link(
     return ''
 
 
+def get_chart_data(entity) -> Optional[dict[str, Any]]:
+    if not entity.subs:
+        return None
+    result = {}
+    for id_ in entity.subs:
+        sub = g.types[id_]
+        result[sub.name] = sub.count + sub.count_subs
+    result = dict(
+        sorted(result.items(), key=lambda item: item[1], reverse=True))
+    return {
+        'labels': list(result.keys()),
+        'datasets': [{'data': list(result.values())}]}
+
 def get_system_data(entity: Entity) -> dict[str, Any]:
     data = {}
     if 'entity_show_class' in current_user.settings \

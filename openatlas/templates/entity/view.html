@@ -18,33 +18,6 @@
     </div>
     <div style="clear:both;"></div>
     {{ ext_references|safe }}
-    {% if chart_data %}
-      <div class="chart-wrapper">
-        <canvas id="typeChart"></canvas>
-      </div>
-      <script src="/static/node_modules/chart.js/dist/chart.umd.js"></script>
-      <script src="/static/node_modules/chartjs-plugin-autocolors/dist/chartjs-plugin-autocolors.min.js"></script>
-      <script>
-        const ctx = document.getElementById('typeChart');
-        const autocolors = window['chartjs-plugin-autocolors'];
-        Chart.register(autocolors);
-        new Chart(ctx, {
-          type : 'bar',
-          data: {{ chart_data|safe }},
-          options: {
-            plugins: {
-              autocolors: {
-                mode: 'data',
-                offset: 3
-              },
-              legend: {
-                position: 'top',
-              },
-            }
-          },
-        });
-      </script>
-    {% endif %}
     {{ description_html|safe }}
   </div>
   {% if gis_data %}
@@ -52,5 +25,30 @@
       <div id="map" class="map"></div>
       <script src="/static/js/map/map.js"></script>
     </div>
+  {% endif %}
+  {% if chart_data %}
+    <div class="col-lg-6">
+      <div class="chart-wrapper">
+        <canvas id="type-chart"></canvas>
+      </div>
+    </div>
+    <script src="/static/node_modules/chart.js/dist/chart.umd.js"></script>
+    <script src="/static/node_modules/chartjs-plugin-autocolors/dist/chartjs-plugin-autocolors.min.js"></script>
+    <script>
+      const ctx = document.getElementById('type-chart');
+      const autocolors = window['chartjs-plugin-autocolors'];
+      Chart.register(autocolors);
+      new Chart(ctx, {
+        type : 'bar',
+        data: {{ chart_data|safe }},
+        options: {
+          animation: {duration: 0},
+          plugins: {
+            autocolors: {mode: 'data', offset: 3},
+            legend: {display: false}
+          }
+        },
+      });
+    </script>
   {% endif %}
 </div>
