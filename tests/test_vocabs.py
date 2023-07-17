@@ -55,15 +55,15 @@ class ExportImportTest(TestBaseCase):
             assert b'Check log for not imported concepts' in rv.data
 
             # Test below is commented because of time out issues
-            # rv = self.app.post(
-            #    url_for('vocabulary_import_view', id_='dyas'),
-            #    follow_redirects=True,
-            #    data={
-            #        'confirm_import': True,
-            #        'concepts':
-            #            ['https://humanitiesthesaurus.academyofathens.gr'
-            #             '/dyas-resource/Concept/22'],
-            #        'classes': 'place',
-            #        'multiple': True,
-            #        'language': 'en'})
-            # assert b'Import of: 1' in rv.data
+            rv = self.app.post(
+               url_for('vocabulary_import_view', id_='dyas'),
+               follow_redirects=True,
+               data={
+                   'confirm_import': True,
+                   'concepts':
+                       ['https://humanitiesthesaurus.academyofathens.gr'
+                        '/dyas-resource/Concept/22'],
+                   'classes': 'place',
+                   'multiple': True,
+                   'language': 'en'})
+            assert b'Import of: 1' in rv.data
