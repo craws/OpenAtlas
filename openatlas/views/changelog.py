@@ -18,6 +18,7 @@ versions = {
     '7.15.0': ['TBA', {
         'feature': {
             '1991': 'Import controlled vocabularies via API',
+            '2004': 'Visualization for type distribution',
             '2036': 'Add French language to the web user interface'
         }
     }],
