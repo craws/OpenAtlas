@@ -106,7 +106,7 @@ def get_move_form(type_: Type) -> FlaskForm:
     return form
 
 
-def get_vocabs_form() -> FlaskForm:
+def get_vocabs_form() -> FlaskForm:  # pragma: no cover
     class Form(FlaskForm):
         base_url = StringField(
             _('base URL'),
