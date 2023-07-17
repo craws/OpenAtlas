@@ -58,7 +58,7 @@ def import_children(
     children = []
     child = None
     for entry in req['narrower']:
-        if not entry['prefLabel']:
+        if not entry['prefLabel']:  # pragma: no cover
             g.logger.log(
                 'warn',
                 'import',
