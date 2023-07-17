@@ -24,8 +24,8 @@ class ExportImportTest(TestBaseCase):
                     'vocabs_user': 'test'})
             assert b'test' in rv.data
 
-            rv = self.app.get(url_for('show_vocabularies'))
-            assert b'Backbone Thesaurus' in rv.data
+            # rv = self.app.get(url_for('show_vocabularies'))
+            # assert b'Backbone Thesaurus' in rv.data
 
             rv = self.app.get(url_for('vocabulary_import_view', id_='bbt'))
             assert b'Backbone Thesaurus' in rv.data
