@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-07-18 15:33+0200\n"
+"POT-Creation-Date: 2023-07-18 16:29+0200\n"
 "PO-Revision-Date: 2023-01-09 10:20+0100\n"
 "Last-Translator: Enric Rodellas <enricrodellas@gmail.com>\n"
 "Language: ca\n"
@@ -582,11 +582,11 @@ msgstr "acaba en"
 #: openatlas/templates/model/index.html:11 openatlas/templates/search.html:36
 #: openatlas/templates/type/index.html:108 openatlas/views/model.py:75
 #: openatlas/views/model.py:146 openatlas/views/model.py:210
-#: openatlas/views/search.py:25 openatlas/views/vocabs.py:113
+#: openatlas/views/search.py:25 openatlas/views/vocabs.py:112
 msgid "classes"
 msgstr "classes"
 
-#: openatlas/forms/base_manager.py:458 openatlas/views/vocabs.py:115
+#: openatlas/forms/base_manager.py:458 openatlas/views/vocabs.py:114
 msgid "tooltip hierarchy forms"
 msgstr "Triï en quins formularis estarà disponible aquest tipus."
 
@@ -652,12 +652,12 @@ msgstr "unitat estratigràfica"
 msgid "file"
 msgstr "arxiu"
 
-#: openatlas/forms/manager.py:319 openatlas/views/vocabs.py:121
+#: openatlas/forms/manager.py:319 openatlas/views/vocabs.py:120
 msgid "tooltip hierarchy multiple"
 msgstr "Si està marcada, es poden usar múltiples opcions per a una entitat."
 
 #: openatlas/forms/manager.py:321 openatlas/templates/type/index.html:90
-#: openatlas/views/vocabs.py:120
+#: openatlas/views/vocabs.py:119
 msgid "multiple"
 msgstr "múltiple"
 
@@ -870,7 +870,7 @@ msgstr ""
 " mes sobre actualitzacions i temps d inactivitat per manteniment."
 
 #: openatlas/forms/setting.py:121 openatlas/views/user.py:148
-#: openatlas/views/vocabs.py:123
+#: openatlas/views/vocabs.py:122
 msgid "language"
 msgstr "idioma"
 
@@ -1038,7 +1038,7 @@ msgstr "compte"
 #: openatlas/views/user.py:178 openatlas/views/user.py:206
 #: openatlas/views/user.py:242 openatlas/views/user.py:295
 #: openatlas/views/vocabs.py:42 openatlas/views/vocabs.py:66
-#: openatlas/views/vocabs.py:90 openatlas/views/vocabs.py:168
+#: openatlas/views/vocabs.py:90 openatlas/views/vocabs.py:167
 msgid "admin"
 msgstr "administració"
 
@@ -1778,7 +1778,7 @@ msgstr "enllaç eliminat"
 #: openatlas/views/imports.py:308 openatlas/views/link.py:96
 #: openatlas/views/link.py:126 openatlas/views/profile.py:117
 #: openatlas/views/sql.py:51 openatlas/views/tools.py:135
-#: openatlas/views/tools.py:174 openatlas/views/vocabs.py:157
+#: openatlas/views/tools.py:174 openatlas/views/vocabs.py:156
 msgid "error transaction"
 msgstr "Ha ocorregut un error de transacció. Si us plau, informeu-ho."
 
@@ -2365,7 +2365,7 @@ msgid "languages"
 msgstr ""
 
 #: openatlas/views/vocabs.py:84 openatlas/views/vocabs.py:92
-#: openatlas/views/vocabs.py:170
+#: openatlas/views/vocabs.py:169
 msgid "vocabularies"
 msgstr ""
 
@@ -2373,19 +2373,15 @@ msgstr ""
 msgid "top concepts"
 msgstr ""
 
-#: openatlas/views/vocabs.py:108
-msgid "tooltip vocabs top concepts forms"
-msgstr ""
-
-#: openatlas/views/vocabs.py:127
+#: openatlas/views/vocabs.py:126
 msgid "I'm sure to import this hierarchy"
 msgstr ""
 
-#: openatlas/views/vocabs.py:130
+#: openatlas/views/vocabs.py:129
 msgid "import hierarchy"
 msgstr ""
 
-#: openatlas/views/vocabs.py:163
+#: openatlas/views/vocabs.py:162
 msgid "You are about to import following hierarchy"
 msgstr ""
 
@@ -2430,5 +2426,8 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "You are about to import following hierarchy: "
+#~ msgstr ""
+
+#~ msgid "tooltip vocabs top concepts forms"
 #~ msgstr ""
 

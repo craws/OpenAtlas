@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-07-18 15:33+0200\n"
-"PO-Revision-Date: 2023-07-18 15:37+0200\n"
+"POT-Creation-Date: 2023-07-18 16:29+0200\n"
+"PO-Revision-Date: 2023-07-18 16:29+0200\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: de\n"
 "Language-Team: de <LL@li.org>\n"
@@ -576,11 +576,11 @@ msgstr "endet in"
 #: openatlas/templates/search.html:36 openatlas/templates/type/index.html:108
 #: openatlas/views/model.py:75 openatlas/views/model.py:146
 #: openatlas/views/model.py:210 openatlas/views/search.py:25
-#: openatlas/views/vocabs.py:113
+#: openatlas/views/vocabs.py:112
 msgid "classes"
 msgstr "Klassen"
 
-#: openatlas/forms/base_manager.py:458 openatlas/views/vocabs.py:115
+#: openatlas/forms/base_manager.py:458 openatlas/views/vocabs.py:114
 msgid "tooltip hierarchy forms"
 msgstr "Auswahl für Formulare in denen dieser Typ verwendet werden kann"
 
@@ -602,7 +602,7 @@ msgstr "Seite"
 
 #: openatlas/forms/form.py:112 openatlas/views/vocabs.py:33
 msgid "base URL"
-msgstr ""
+msgstr "base URL"
 
 #: openatlas/forms/form.py:114 openatlas/views/vocabs.py:34
 msgid "endpoint"
@@ -646,12 +646,12 @@ msgstr "stratigraphische Einheit"
 msgid "file"
 msgstr "Datei"
 
-#: openatlas/forms/manager.py:319 openatlas/views/vocabs.py:121
+#: openatlas/forms/manager.py:319 openatlas/views/vocabs.py:120
 msgid "tooltip hierarchy multiple"
 msgstr "Aktivieren wenn mehrfach Verwendung für ein Objekt möglich sein soll"
 
 #: openatlas/forms/manager.py:321 openatlas/templates/type/index.html:90
-#: openatlas/views/vocabs.py:120
+#: openatlas/views/vocabs.py:119
 msgid "multiple"
 msgstr "mehrfach"
 
@@ -863,7 +863,7 @@ msgstr ""
 "Wartungsarbeiten verschickt"
 
 #: openatlas/forms/setting.py:121 openatlas/views/user.py:148
-#: openatlas/views/vocabs.py:123
+#: openatlas/views/vocabs.py:122
 msgid "language"
 msgstr "Sprache"
 
@@ -1030,7 +1030,7 @@ msgstr "Profil"
 #: openatlas/views/user.py:178 openatlas/views/user.py:206
 #: openatlas/views/user.py:242 openatlas/views/user.py:295
 #: openatlas/views/vocabs.py:42 openatlas/views/vocabs.py:66
-#: openatlas/views/vocabs.py:90 openatlas/views/vocabs.py:168
+#: openatlas/views/vocabs.py:90 openatlas/views/vocabs.py:167
 msgid "admin"
 msgstr "admin"
 
@@ -1770,7 +1770,7 @@ msgstr "Verbindung gelöscht"
 #: openatlas/views/imports.py:308 openatlas/views/link.py:96
 #: openatlas/views/link.py:126 openatlas/views/profile.py:117
 #: openatlas/views/sql.py:51 openatlas/views/tools.py:135
-#: openatlas/views/tools.py:174 openatlas/views/vocabs.py:157
+#: openatlas/views/tools.py:174 openatlas/views/vocabs.py:156
 msgid "error transaction"
 msgstr "Es gab einen Datenbank-Transaktions-Fehler. Bitte melde diesen Fehler."
 
@@ -2356,7 +2356,7 @@ msgid "languages"
 msgstr "languages"
 
 #: openatlas/views/vocabs.py:84 openatlas/views/vocabs.py:92
-#: openatlas/views/vocabs.py:170
+#: openatlas/views/vocabs.py:169
 msgid "vocabularies"
 msgstr "Vokabulare"
 
@@ -2364,19 +2364,15 @@ msgstr "Vokabulare"
 msgid "top concepts"
 msgstr "top concepts"
 
-#: openatlas/views/vocabs.py:108
-msgid "tooltip vocabs top concepts forms"
-msgstr ""
-
-#: openatlas/views/vocabs.py:127
+#: openatlas/views/vocabs.py:126
 msgid "I'm sure to import this hierarchy"
 msgstr "Ich bin mir sicher diese Hierarchie zu importieren"
 
-#: openatlas/views/vocabs.py:130
+#: openatlas/views/vocabs.py:129
 msgid "import hierarchy"
 msgstr "Hierarchie importieren"
 
-#: openatlas/views/vocabs.py:163
+#: openatlas/views/vocabs.py:162
 msgid "You are about to import following hierarchy"
 msgstr "Du bist dabei folgende Hierarchien zu importieren"
 

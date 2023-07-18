@@ -105,7 +105,6 @@ def vocabulary_import_view(id_: str) -> str:
         concepts = SelectMultipleField(
             _('top concepts'),
             render_kw={'disabled': True},
-            description=_('tooltip vocabs top concepts forms'),
             choices=fetch_top_concept_details(id_),
             option_widget=widgets.CheckboxInput(),
             widget=widgets.ListWidget(prefix_label=False))
