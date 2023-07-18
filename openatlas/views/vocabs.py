@@ -30,7 +30,7 @@ def vocabs_index() -> str:
         tabs={'info': Tab(
             'info',
             display_info({
-                _('base url'): g.settings['vocabs_base_url'],
+                _('base URL'): g.settings['vocabs_base_url'],
                 _('endpoint'): g.settings['vocabs_endpoint'],
                 _('user'): g.settings['vocabs_user']}),
             buttons=[
@@ -160,7 +160,7 @@ def vocabulary_import_view(id_: str) -> str:
         'tabs.html',
         tabs={'info': Tab(
             'info',
-            _('You are about to import following hierarchy: ') +
+            _('You are about to import following hierarchy') + ' :' +
             link(details['title'], details['conceptUri'], external=True),
             form=form)},
         title=id_,
