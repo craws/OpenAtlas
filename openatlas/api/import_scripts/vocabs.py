@@ -12,14 +12,14 @@ from openatlas.models.type import Type
 def import_vocabs_data(
         id_: str,
         form_data: dict[str, Any],
-        details: dict[str, Any]) -> tuple[list, list]:
+        details: dict[str, Any]) -> tuple[list[Any], list[Any]]:
     return fetch_top_level(id_, details, form_data)
 
 
 def fetch_top_level(
         id_: str,
         details: dict[str, Any],
-        form_data: dict[str, Any]) -> tuple[list, list]:
+        form_data: dict[str, Any]) -> tuple[list[Any], list[Any]]:
     req = vocabs_requests(id_, 'topConcepts', {'lang': form_data['language']})
     count = []
     duplicates = []
@@ -122,7 +122,7 @@ def fetch_vocabulary_details(id_: str) -> dict[str, str]:
             data['conceptschemes'][0]['uri'] if data['conceptschemes'] else ''}
 
 
-def fetch_top_concept_details(id_: str) -> list[tuple]:
+def fetch_top_concept_details(id_: str) -> list[Any]:
     req = vocabs_requests(id_, 'topConcepts', parameter={'lang': 'en'})
     return [
         (concept['uri'], concept['label']) for concept in req['topconcepts']]

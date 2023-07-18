@@ -1,16 +1,17 @@
-from typing import Optional
+from typing import Optional, Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 from wtforms import BooleanField, SelectField, SelectMultipleField, widgets
 from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.api.import_scripts.vocabs import (
-    fetch_top_concept_details, fetch_vocabulary_details,
-    get_vocabularies, import_vocabs_data)
+    fetch_top_concept_details, fetch_vocabulary_details, get_vocabularies,
+    import_vocabs_data)
 from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
@@ -45,7 +46,7 @@ def vocabs_index() -> str:
 
 @app.route('/vocabs/update', methods=['GET', 'POST'])
 @required_group('manager')
-def vocabs_update() -> str:
+def vocabs_update() -> Union[str, Response]:
     form = get_vocabs_form()
     if form.validate_on_submit():
         Settings.update({
@@ -98,7 +99,7 @@ def vocabulary_detail(url: str) -> Optional[str]:
 
 @app.route('/vocabs/import/<id_>', methods=['GET', 'POST'])
 @required_group('manager')
-def vocabulary_import_view(id_: str) -> str:
+def vocabulary_import_view(id_: str) -> Union[str, Response]:
     details = fetch_vocabulary_details(id_)
 
     class ImportVocabsHierarchyForm(FlaskForm):

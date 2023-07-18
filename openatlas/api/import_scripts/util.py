@@ -37,11 +37,11 @@ def get_reference_system(name: str) -> Entity:  # pragma: no cover
 def vocabs_requests(
         id_: Optional[str] = '',
         endpoint: Optional[str] = '',
-        parameter: Optional[dict[str, str]] = '') -> dict[str, Any]:
+        parameter: Optional[dict[str, str]] = None) -> dict[str, Any]:
     req = requests.get(
         f"{g.settings['vocabs_base_url']}{g.settings['vocabs_endpoint']}{id_}/"
         f"{endpoint}",
-        params=parameter,
+        params=parameter or '',
         timeout=60,
         auth=(app.config['VOCABS_USER'], app.config['VOCABS_PW']))
     return req.json()

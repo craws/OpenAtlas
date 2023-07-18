@@ -32,6 +32,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
     from openatlas.models.user import User
     from openatlas.models.link import Link
+    from openatlas.models.type import Type
 
 
 def remove_link(
@@ -143,7 +144,7 @@ def profile_image_table_link(
     return ''
 
 
-def get_chart_data(entity) -> Optional[dict[str, Any]]:
+def get_chart_data(entity: Type) -> Optional[dict[str, Any]]:
     if not entity.subs:
         return None
     result = {}
@@ -155,6 +156,7 @@ def get_chart_data(entity) -> Optional[dict[str, Any]]:
     return {
         'labels': list(result.keys()),
         'datasets': [{'data': list(result.values())}]}
+
 
 def get_system_data(entity: Entity) -> dict[str, Any]:
     data = {}
