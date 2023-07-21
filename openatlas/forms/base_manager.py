@@ -112,14 +112,16 @@ class BaseManager:
                     'index',
                     view=self.origin.class_.view if self.origin
                     else g.classes[self.class_.name].view)]]
-        if self.origin:
-            self.crumbs.append(self.origin)
         if self.place_info['structure']:
             self.crumbs += self.place_info['structure']['supers']
-        if not self.insert:
-            return self.crumbs + [
-                _('copy') if 'copy_' in request.path else _('edit')]
-        self.crumbs.append(f'+ {g.classes[self.class_.name].label}')
+        elif self.origin:
+            self.crumbs.append(self.origin)
+        if self.insert:
+            self.crumbs.append(f'+ {g.classes[self.class_.name].label}')
+        else:
+            self.crumbs.append(self.entity)
+            self.crumbs.append(
+                _('copy') if 'copy_' in request.path else _('edit'))
         return self.crumbs
 
     def add_description(self) -> None:
