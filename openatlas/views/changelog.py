@@ -15,6 +15,7 @@ def index_changelog() -> str:
 
 
 versions = {
+    '7.16.0': ['TBA', {}],
     '7.15.0': ['2023-07-22', {
         'feature': {
             '1991': 'Import controlled vocabularies via API',
