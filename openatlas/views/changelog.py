@@ -15,13 +15,11 @@ def index_changelog() -> str:
 
 
 versions = {
-    '7.15.0': ['TBA', {
+    '7.15.0': ['2023-07-22', {
         'feature': {
             '1991': 'Import controlled vocabularies via API',
             '2004': 'Visualization for type distribution',
-            '2036': 'Add French language to the web user interface'
-        }
-    }],
+            '2036': 'Add French language to the web user interface'}}],
     '7.14.2': ['2023-06-22', {
         'fix': {
             '2034': 'At place insert the map is not shown'}}],
