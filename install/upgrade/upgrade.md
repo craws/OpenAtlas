@@ -22,6 +22,7 @@ then run the database upgrade script, then restart Apache:
 ### 7.14.x to 7.15.0
 7.15.0.sql is needed but will be taken care of by the database upgrade script.
 For type charts new NPM packages are needed:
+
     $ cd openatlas/static
     $ rm package.json
     $ pip3 install -e ./
