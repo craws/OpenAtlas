@@ -20,7 +20,8 @@ def sql_export(postfix: Optional[str] = '') -> bool:
     pg_dump = "pg_dump" if os.name == 'posix' \
         else f'"{shutil.which("pg_dump.exe")}"'
     command = \
-        f"{pg_dump} " \
+        f"{pg_dump} -O " \
+        f"{'' if os.name == 'posix' else '-Fc'} " \
         f"-h {app.config['DATABASE_HOST']} " \
         f"-d {app.config['DATABASE_NAME']} " \
         f"-U {app.config['DATABASE_USER']} " \
