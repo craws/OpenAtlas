@@ -24,7 +24,7 @@ from openatlas.models.type import Type
 
 
 @app.route('/vocabs')
-@required_group('readonly')
+@required_group('manager')
 def vocabs_index() -> str:
     return render_template(
         'tabs.html',

@@ -99,8 +99,7 @@ ARCHE = {
     'thumbnail_url': 'https://arche-thumbnails.acdh.oeaw.ac.at/'}
 
 # Used to connect to password protected Vocabs systems
-VOCABS_USER = ''
-VOCABS_PW = ''
+VOCABS_PASS = ''
 
 # Table options
 TABLE_ROWS = {10: '10', 25: '25', 50: '50', 100: '100'}
