@@ -160,7 +160,7 @@ def vocabulary_import_view(id_: str) -> Union[str, Response]:
         'tabs.html',
         tabs={'info': Tab(
             'info',
-            _('You are about to import following hierarchy') + ' :' +
+            _('You are about to import following hierarchy') + ': ' +
             link(details['title'], details['conceptUri'], external=True),
             form=form)},
         title=id_,

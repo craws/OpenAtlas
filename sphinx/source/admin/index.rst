@@ -16,3 +16,4 @@ Admin
    execute_sql
    api
    arche
+   vocabs
