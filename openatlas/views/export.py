@@ -22,11 +22,11 @@ def download_sql(filename: str) -> Response:
         as_attachment=True)
 
 
-@app.route('/export/execute')
+@app.route('/export/execute/<format_>')
 @required_group('manager')
-def export_execute() -> Response:
+def export_execute(format_: str) -> Response:
     if os.access(app.config['EXPORT_DIR'], os.W_OK):
-        if sql_export():
+        if sql_export(custom=True if format_ == 'custom' else False):
             g.logger.log('info', 'database', 'SQL export')
             flash(_('data was exported as SQL'), 'info')
         else:  # pragma: no cover
@@ -64,7 +64,12 @@ def export_sql() -> str:
             table.display(),
             buttons=[
                 manual('admin/export'),
-                button(_('export SQL'), url_for('export_execute'))])},
+                button(
+                    _('export SQL'),
+                    url_for('export_execute', format_='plain')),
+                button(
+                    _('export custom SQL'),
+                    url_for('export_execute', format_='custom'))])},
         title=_('export SQL'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
