@@ -16,7 +16,8 @@ from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, display_form, display_info, is_authorized, link, required_group)
+    button, display_form, display_info, is_authorized, link, required_group,
+    manual)
 from openatlas.forms.field import SubmitField
 from openatlas.forms.form import get_vocabs_form
 from openatlas.models.settings import Settings
@@ -35,6 +36,7 @@ def vocabs_index() -> str:
                 _('endpoint'): g.settings['vocabs_endpoint'],
                 _('user'): g.settings['vocabs_user']}),
             buttons=[
+                manual('admin/vocabs'),
                 button(_('edit'), url_for('vocabs_update'))
                 if is_authorized('manager') else '',
                 button(_('show vocabularies'), url_for('show_vocabularies'))
@@ -62,6 +64,7 @@ def vocabs_update() -> Union[str, Response]:
     return render_template(
         'content.html',
         title='VOCABS',
+        buttons=[manual('admin/vocabs')],
         content=display_form(form),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
@@ -82,10 +85,12 @@ def show_vocabularies() -> str:
             ' '.join(entry['languages']),
             vocabulary_detail(
                 url_for('vocabulary_import_view', id_=entry['id']))])
-    tabs = {'vocabularies': Tab(_('vocabularies'), table=table)}
+    tabs = {'vocabularies': Tab(
+        _('vocabularies'), table=table, buttons=[manual('admin/vocabs')])}
     return render_template(
         'tabs.html',
         tabs=tabs,
+        buttons=[manual('admin/vocabs')],
         title='VOCABS',
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
@@ -162,7 +167,8 @@ def vocabulary_import_view(id_: str) -> Union[str, Response]:
             'info',
             _('You are about to import following hierarchy') + ': ' +
             link(details['title'], details['conceptUri'], external=True),
-            form=form)},
+            form=form,
+            buttons=[manual('admin/vocabs')])},
         title=id_,
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
