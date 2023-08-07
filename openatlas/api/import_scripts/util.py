@@ -43,5 +43,5 @@ def vocabs_requests(
         f"{endpoint}",
         params=parameter or '',
         timeout=60,
-        auth=(app.config['VOCABS_USER'], app.config['VOCABS_PW']))
+        auth=(g.settings['vocabs_user'], app.config['VOCABS_PASS']))
     return req.json()
