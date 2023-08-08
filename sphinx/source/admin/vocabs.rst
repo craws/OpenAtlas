@@ -1,5 +1,5 @@
 Vocabs
-====
+======
 
 .. toctree::
 
