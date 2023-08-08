@@ -14,17 +14,14 @@ def current_date_for_filename() -> str:
         f'{today.hour:02}{today.minute:02}'
 
 
-def sql_export(
-        postfix: Optional[str] = '',
-        custom: Optional[bool] = False) -> bool:
+def sql_export(format_: str, postfix: Optional[str] = '') -> bool:
     file = app.config['EXPORT_DIR'] \
-           / (f'{current_date_for_filename()}_dump_'
-              f'{"custom" if custom else "plain"}{postfix}.sql')
+           / f'{current_date_for_filename()}_export{postfix}.{format_}'
     pg_dump = "pg_dump" if os.name == 'posix' \
         else f'"{shutil.which("pg_dump.exe")}"'
     command = \
         f"{pg_dump} -O " \
-        f"{'-Fc' if custom else ''} " \
+        f"{'-Fc' if format_ == 'dump' else ''} " \
         f"-h {app.config['DATABASE_HOST']} " \
         f"-d {app.config['DATABASE_NAME']} " \
         f"-U {app.config['DATABASE_USER']} " \

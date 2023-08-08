@@ -26,12 +26,12 @@ def download_sql(filename: str) -> Response:
 @required_group('manager')
 def export_execute(format_: str) -> Response:
     if os.access(app.config['EXPORT_DIR'], os.W_OK):
-        if sql_export(custom=True if format_ == 'custom' else False):
+        if sql_export(format_):
             g.logger.log('info', 'database', 'SQL export')
-            flash(_('data was exported as SQL'), 'info')
+            flash(_('data was exported'), 'info')
         else:  # pragma: no cover
             g.logger.log('error', 'database', 'SQL export failed')
-            flash(_('SQL export failed'), 'error')
+            flash(_('export failed'), 'error')
     return redirect(url_for('export_sql'))
 
 
@@ -66,10 +66,10 @@ def export_sql() -> str:
                 manual('admin/export'),
                 button(
                     _('export SQL'),
-                    url_for('export_execute', format_='plain')),
+                    url_for('export_execute', format_='sql')),
                 button(
-                    _('export custom SQL'),
-                    url_for('export_execute', format_='custom'))])},
+                    _('export database dump'),
+                    url_for('export_execute', format_='dump'))])},
         title=_('export SQL'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
