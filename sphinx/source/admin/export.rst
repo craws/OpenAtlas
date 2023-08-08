@@ -8,7 +8,11 @@ Available for admins and managers
 Export SQL
 ----------
 When clicking the **Export SQL** button a new SQL dump will be created with
-pg_dump.
+pg_dump in plain text format.
+
+When clicking the **Export custom SQL** button a new SQL dump will be created with
+pg_dump in custom archiving format (-Fc). `pg_restore` is used to restore the database
+regardless of which operating system and line breaks are used.
 
 * Be aware, especially when sharing, that **user data**, e.g. email addresses,
   is included.
@@ -16,7 +20,7 @@ pg_dump.
   (only admins can delete)
 * If the directory isn't writable, a warning will be shown
 * SQL dumps are saved in the **files/export** folder
-* File names begin with date and time e.g. 2018-08-23_1533_dump.sql.
+* File names begin with date and time e.g. 2018-08-23_1533_dump_plain.sql.
 
 
 Export CSV
