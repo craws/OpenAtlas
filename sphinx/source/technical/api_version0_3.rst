@@ -6,55 +6,103 @@ Version 0.3
 Entity endpoint
 ***************
 
-**Single entities**
+Single entities
+^^^^^^^^^^^^^^^
+
+/api/0.3/entity/{id}
+""""""""""""""""""""
+
+Retrieves all information about a single entity
 
 .. list-table::
-   :widths: 25 25 50
-   :header-rows: 1
+   :widths: 25 75
+   :stub-columns: 1
 
-   * - API endpoint
-     - Possible parameters
-     - Description
-   * - /api/0.3/entity/{id}
+   * - Possible parameters
      - show, download,export,format
-     - Retrieves all information about a single entity
 
-**Query** - Combine several or all entity endpoints in one query
+
+Query
+^^^^^
+
+/api/0.3/entities/query/
+""""""""""""""""""""""""
+
+Combine several or all entity endpoints in one query.
+
+Retrieves a list with entity ID, CIDOC CRM code, system class, or menu
+item. Combine up to four of the aforementioned endpoints in a single
+query; each request has to be a new parameter.
+
+
+.. list-table::
+   :widths: 30 70
+   :stub-columns: 1
+
+   * - Needed
+     - * ids
+       * cidoc-classes
+       * menu-item
+       * classes
+       * linked-to-entity
+       * linked-to-type
+       * linked-to-type-including-subtypes
+
+
+ ===================== ========== ======== ======= =============== ======== =========
+  **Possible Parameters**
+ ------------------------------------------------------------------------------------
+        column          download   first    last        page        search    sort
+         count           export    format   limit   relation_type    show    type_id
+ ===================== ========== ======== ======= =============== ======== =========
+
+
+
+
+
+
+
+Multiple entities
+^^^^^^^^^^^^^^^^^
+
+Results in list form include related entities and pagination
+
+/api/0.3/view_class/{view_class}
+""""""""""""""""""""""""""""""""
+
+Used to retrieve a JSON list of entities based on their OpenAtlas class view
+
+.. list-table::
+   :widths: 25 75
+   :stub-columns: 1
+
+   * - Possible parameters
+     - * limit
+        * column
+        * sort
+        * search
+        * first
+        * last
+        * show
+        * relation_type
+        * type_id
+        * count
+        * download
+        * format
+        * export
+        * page
+
+
 
 .. list-table::
    :widths: 25 25 50
    :header-rows: 1
 
-   * - API endpoint
-     - Possible parameters
-     - Description
-   * - api/0.3/entities/query/
-     - **ids**, **cidoc-classes**, **menu-item**, **classes**,
-       **linked-to-entity**, **linked-to-type**,
-       **linked-to-type-including-subtypes**, limit, column, sort, search,
-       first, last, show, relation_type, type_id, count, download, format,
-       export, page
-     - Retrieves a list with entity ID, CIDOC CRM code, system class, or menu
-       item. Combine up to four of the aforementioned endpoints in a single
-       query; each request has to be a new parameter; Possible parameters are:
-       ?entities={id}, ?classes={cidoc_class_code}, ?codes={view_name},
-       ?system_classes={system_class}(2)
 
-**Multiple entities** - Results in list form include related entities and
-       pagination
-
-.. list-table::
-   :widths: 25 25 50
-   :header-rows: 1
-
-   * - API endpoint
-     - Possible parameters
-     - Description
    * - /api/0.3/view_class/{view_class}
      - limit, column, sort, search, first, last, show, relation_type, type_id,
        count, download, format, export, page
-     - Used to retrieve a JSON list of entities based on their OpenAtlas class
-       view
+     -
    * - /api/0.3/system_class/{system_class}
      - limit, column, sort, search, first, last, show, relation_type, count,
        download, format, export, page

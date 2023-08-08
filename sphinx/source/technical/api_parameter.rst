@@ -9,7 +9,7 @@ API parameter definition
    :stub-columns: 1
 
    * - Format
-     - string
+     - string, multiple
    * - Description
      - CIDOC CRM class code (e.g. E21)
    * - Values
@@ -55,7 +55,7 @@ API parameter definition
    * - Format
      - boolean
    * - Description
-     - riggers file download of the requested data in a file
+     - Triggers file download of the requested data in a file
    * - Values
      - True/False
 
@@ -64,7 +64,7 @@ API parameter definition
    :stub-columns: 1
 
    * - Format
-     - integer
+     - integer, multiple
    * - Description
      - Specific entity ID
    * - Values
@@ -227,24 +227,12 @@ API parameter definition
      - e.g. 2
 
 
-.. list-table:: **page**
-   :widths: 10 80
-   :stub-columns: 1
-
-   * - Format
-     - integer
-   * - Description
-     - Jump to chosen page
-   * - Values
-     - e.g. 2
-
-
 .. list-table:: **relation_type/relation-type**
    :widths: 10 80
    :stub-columns: 1
 
    * - Format
-     - string
+     - string, multiple
    * - Description
      - Select which relations are shown
    * - Values
@@ -255,7 +243,7 @@ API parameter definition
    :stub-columns: 1
 
    * - Format
-     - string
+     - string, multiple
    * - Description
      - Search request with AND/OR logic
    * - Values
@@ -266,7 +254,7 @@ API parameter definition
    :stub-columns: 1
 
    * - Format
-     - string
+     - string, multiple
    * - Description
      - Select a key to be shown. If using "not", no other keys will be displayed.
    * - Values
@@ -297,7 +285,7 @@ API parameter definition
    :stub-columns: 1
 
    * - Format
-     - string
+     - string, multiple
    * - Description
      - Needs to be one of the OpenAtlas system classes
    * - Values
@@ -334,10 +322,11 @@ API parameter definition
    :stub-columns: 1
 
    * - Format
-     - integer
+     - integer, multiple
    * - Description
-     - * Output will be filtered by chosen type ID and only entities with this type ID will be displayed.
-       * The relation is in logical OR.
+     - | Output will be filtered by chosen type ID.
+       | Only entities with this type ID will be displayed.
+       | The relation is in logical OR.
    * - Values
      - e.g. 90
 
@@ -346,7 +335,7 @@ API parameter definition
    :stub-columns: 1
 
    * - Format
-     - string
+     - string, multiple
    * - Description
      - Needs to be one of the OpenAtlas menu items
    * - Values
