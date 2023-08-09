@@ -1,4 +1,5 @@
 [nosetests]
+cover-html=1
 cover-erase=1
 cover-package=openatlas,tests
 cover-tests=1
