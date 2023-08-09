@@ -3,10 +3,10 @@ Version 0.3
 
 .. toctree::
 
-Entity endpoint
-***************
+Entity endpoints
+****************
 
-Single entities
+Single entity
 ^^^^^^^^^^^^^^^
 
 /api/0.3/entity/{id}
@@ -14,18 +14,18 @@ Single entities
 
 Retrieves all information about a single entity
 
-.. list-table::
-   :widths: 25 75
-   :stub-columns: 1
 
-   * - Possible parameters
-     - show, download,export,format
+ ======================== ====================== ====================== ====================
+  **Optional Parameters**
+ -------------------------------------------------------------------------------------------
+ :ref:`download-para-0.3` :ref:`export-para-0.3` :ref:`format-para-0.3` :ref:`show-para-0.3`
+ ======================== ====================== ====================== ====================
 
 
 Query
 ^^^^^
 
-/api/0.3/entities/query/
+/api/0.3/query/
 """"""""""""""""""""""""
 
 Combine several or all entity endpoints in one query.
@@ -34,32 +34,19 @@ Retrieves a list with entity ID, CIDOC CRM code, system class, or menu
 item. Combine up to four of the aforementioned endpoints in a single
 query; each request has to be a new parameter.
 
+ ============================= ======================== ============================== ============================
+  **Required Parameters** - At least one is required for a successful request
+ ------------------------------------------------------------------------------------------------------------------
+ :ref:`cidoc-classes-para-0.3` :ref:`entities-para-0.3` :ref:`system-classes-para-0.3` :ref:`view-classes-para-0.3`
+ ============================= ======================== ============================== ============================
 
-.. list-table::
-   :widths: 30 70
-   :stub-columns: 1
-
-   * - Needed
-     - * ids
-       * cidoc-classes
-       * menu-item
-       * classes
-       * linked-to-entity
-       * linked-to-type
-       * linked-to-type-including-subtypes
-
-
- ===================== ========== ======== ======= =============== ======== =========
-  **Possible Parameters**
- ------------------------------------------------------------------------------------
-        column          download   first    last        page        search    sort
-         count           export    format   limit   relation_type    show    type_id
- ===================== ========== ======== ======= =============== ======== =========
-
-
-
-
-
+ ======================== ======================= ======================== ============================= ====================== ======================
+  **Optional Parameters**
+ -----------------------------------------------------------------------------------------------------------------------------------------------------
+   :ref:`column-para-0.3` :ref:`count-para-0.3`   :ref:`download-para-0.3` :ref:`export-para-0.3`        :ref:`first-para-0.3`  :ref:`format-para-0.3`
+   :ref:`last-para-0.3`   :ref:`limit-para-0.3`   :ref:`page-para-0.3`     :ref:`relation_type-para-0.3` :ref:`search-para-0.3` :ref:`show-para-0.3`
+   :ref:`sort-para-0.3`   :ref:`type_id-para-0.3`
+ ======================== ======================= ======================== ============================= ====================== ======================
 
 
 Multiple entities
@@ -67,79 +54,102 @@ Multiple entities
 
 Results in list form include related entities and pagination
 
+/api/3.0/cidoc_class/{cidoc_class}
+""""""""""""""""""""""""""""""""""
+
+Retrieves a JSON list of entities based on their CIDOC CRM class [1]_ [2]_
+
+ ======================== ======================= ======================== ============================= ====================== ======================
+  **Optional Parameters**
+ -----------------------------------------------------------------------------------------------------------------------------------------------------
+   :ref:`column-para-0.3` :ref:`count-para-0.3`   :ref:`download-para-0.3` :ref:`export-para-0.3`        :ref:`first-para-0.3`  :ref:`format-para-0.3`
+   :ref:`last-para-0.3`   :ref:`limit-para-0.3`   :ref:`page-para-0.3`     :ref:`relation_type-para-0.3` :ref:`search-para-0.3` :ref:`show-para-0.3`
+   :ref:`sort-para-0.3`   :ref:`type_id-para-0.3`
+ ======================== ======================= ======================== ============================= ====================== ======================
+
+/api/0.3/entities_linked_to_entity/{id}
+"""""""""""""""""""""""""""""""""""""""
+
+Used to retrieve a JSON list of entities linked to the entity with the stated **ID** [2]_
+
+ ======================== ======================= ======================== ============================= ====================== ======================
+  **Optional Parameters**
+ -----------------------------------------------------------------------------------------------------------------------------------------------------
+   :ref:`column-para-0.3` :ref:`count-para-0.3`   :ref:`download-para-0.3` :ref:`export-para-0.3`        :ref:`first-para-0.3`  :ref:`format-para-0.3`
+   :ref:`last-para-0.3`   :ref:`limit-para-0.3`   :ref:`page-para-0.3`     :ref:`relation_type-para-0.3` :ref:`search-para-0.3` :ref:`show-para-0.3`
+   :ref:`sort-para-0.3`   :ref:`type_id-para-0.3`
+ ======================== ======================= ======================== ============================= ====================== ======================
+
+/api/0.3/latest/{n}
+"""""""""""""""""""
+
+Used to retrieve the last entry/entries made. The number {n} represents the amount of entities retrieved.
+{n} can be between 1 and 100. The pagination information is always **null**
+
+ ======================== ======================== ====================== ======================= =============================
+  **Optional Parameters**
+ ------------------------------------------------------------------------------------------------------------------------------
+   :ref:`column-para-0.3` :ref:`download-para-0.3` :ref:`export-para-0.3` :ref:`format-para-0.3`  :ref:`relation_type-para-0.3`
+   :ref:`search-para-0.3` :ref:`show-para-0.3`     :ref:`sort-para-0.3`   :ref:`type_id-para-0.3`
+ ======================== ======================== ====================== ======================= =============================
+
+/api/0.3/system_class/{system_class}
+""""""""""""""""""""""""""""""""""""
+
+Retrieves a list of entities, based on their OpenAtlas system class name as JSON [1]_ [2]_
+
+ ======================== ======================= ======================== ============================= ====================== ======================
+  **Optional Parameters**
+ -----------------------------------------------------------------------------------------------------------------------------------------------------
+   :ref:`column-para-0.3` :ref:`count-para-0.3`   :ref:`download-para-0.3` :ref:`export-para-0.3`        :ref:`first-para-0.3`  :ref:`format-para-0.3`
+   :ref:`last-para-0.3`   :ref:`limit-para-0.3`   :ref:`page-para-0.3`     :ref:`relation_type-para-0.3` :ref:`search-para-0.3` :ref:`show-para-0.3`
+   :ref:`sort-para-0.3`   :ref:`type_id-para-0.3`
+ ======================== ======================= ======================== ============================= ====================== ======================
+
+/api/0.3/type_entities/{id}
+"""""""""""""""""""""""""""
+
+Used to retrieve a JSON list of entities, based on their OpenAtlas **type** [2]_ [3]_
+
+ ======================== ======================= ======================== ============================= ====================== ======================
+  **Optional Parameters**
+ -----------------------------------------------------------------------------------------------------------------------------------------------------
+   :ref:`column-para-0.3` :ref:`count-para-0.3`   :ref:`download-para-0.3` :ref:`export-para-0.3`        :ref:`first-para-0.3`  :ref:`format-para-0.3`
+   :ref:`last-para-0.3`   :ref:`limit-para-0.3`   :ref:`page-para-0.3`     :ref:`relation_type-para-0.3` :ref:`search-para-0.3` :ref:`show-para-0.3`
+   :ref:`sort-para-0.3`   :ref:`type_id-para-0.3`
+ ======================== ======================= ======================== ============================= ====================== ======================
+
+/api/0.3/type_entities_all/{id}
+"""""""""""""""""""""""""""""""
+
+Used to retrieve a JSON list of entities, based on their OpenAtlas **type** and includes all connected entities [2]_ [3]_
+
+ ======================== ======================= ======================== ============================= ====================== ======================
+  **Optional Parameters**
+ -----------------------------------------------------------------------------------------------------------------------------------------------------
+   :ref:`column-para-0.3` :ref:`count-para-0.3`   :ref:`download-para-0.3` :ref:`export-para-0.3`        :ref:`first-para-0.3`  :ref:`format-para-0.3`
+   :ref:`last-para-0.3`   :ref:`limit-para-0.3`   :ref:`page-para-0.3`     :ref:`relation_type-para-0.3` :ref:`search-para-0.3` :ref:`show-para-0.3`
+   :ref:`sort-para-0.3`   :ref:`type_id-para-0.3`
+ ======================== ======================= ======================== ============================= ====================== ======================
+
 /api/0.3/view_class/{view_class}
 """"""""""""""""""""""""""""""""
 
 Used to retrieve a JSON list of entities based on their OpenAtlas class view
 
-.. list-table::
-   :widths: 25 75
-   :stub-columns: 1
-
-   * - Possible parameters
-     - * limit
-        * column
-        * sort
-        * search
-        * first
-        * last
-        * show
-        * relation_type
-        * type_id
-        * count
-        * download
-        * format
-        * export
-        * page
+ ======================== ======================= ======================== ============================= ====================== ======================
+  **Optional Parameters**
+ -----------------------------------------------------------------------------------------------------------------------------------------------------
+   :ref:`column-para-0.3` :ref:`count-para-0.3`   :ref:`download-para-0.3` :ref:`export-para-0.3`        :ref:`first-para-0.3`  :ref:`format-para-0.3`
+   :ref:`last-para-0.3`   :ref:`limit-para-0.3`   :ref:`page-para-0.3`     :ref:`relation_type-para-0.3` :ref:`search-para-0.3` :ref:`show-para-0.3`
+   :ref:`sort-para-0.3`   :ref:`type_id-para-0.3`
+ ======================== ======================= ======================== ============================= ====================== ======================
 
 
+.. [1] All codes available in OpenAtlas can be found under `OpenAtlas and CIDOC CRM class mapping <https://redmine.openatlas.eu/projects/uni/wiki/OpenAtlas_and_CIDOC_CRM_class_mapping?parent=Endpoints>`_
+.. [2] The result can be filtered, sorted, and manipulated through different parameters. By default 20 entities in alphabetical order are shown.
+.. [3] Available IDs can be obtained by using the type-tree or node-overview endpoint.
 
-.. list-table::
-   :widths: 25 25 50
-   :header-rows: 1
-
-
-   * - /api/0.3/view_class/{view_class}
-     - limit, column, sort, search, first, last, show, relation_type, type_id,
-       count, download, format, export, page
-     -
-   * - /api/0.3/system_class/{system_class}
-     - limit, column, sort, search, first, last, show, relation_type, count,
-       download, format, export, page
-     - Retrieves a list of entities, based on their OpenAtlas system class name
-       as JSON (1)(2)
-   * - /api/0.3/latest/{n} (n represents a number between 1 and 100)
-     - show, relation_type, download, format, export
-     - Used to retrieve the last entry/entries made; the number {latest}/{n}
-       represents the amount of entities retrieved and can be between 1 and
-       100. The pagination information is always **null**
-   * - /api/0.3/entities_linked_to_entity/{id}
-     - limit, column, sort, search, first, last, show, relation_type, type_id,
-       count, download, format, export, page
-     - Used to retrieve a JSON list of entities linked to the entity with the
-       stated **ID** (2)
-   * - /api/0.3/type_entities/{id}
-     - limit, column, sort, search, first, last, show, relation_type, type_id,
-       count, download, format, export, page
-     - Used to retrieve a JSON list of entities, based on their OpenAtlas
-       **type** (2)(3)
-   * - /api/0.3/type_entities_all/{id}
-     - limit, column, sort, search, first, last, show, relation_type, type_id,
-       count, download, format, export, page
-     - Used to retrieve a JSON list of entities, based on their OpenAtlas
-       **type** and includes all connected entities (2)(3)
-   * - /api/3.0/cidoc_class/{cidoc_class}
-     - limit, column, sort, search, first, last, show, relation_type, type_id,
-       count, download, format, export, page
-     - Retrieves a JSON list of entities based on their CIDOC CRM class(1)(2)
-
-(1) All codes available in OpenAtlas can be found under
-`OpenAtlas and CIDOC CRM class mapping <https://redmine.openatlas.eu/projects/uni/wiki/OpenAtlas_and_CIDOC_CRM_class_mapping?parent=Endpoints>`_
-(2) The result can be filtered, sorted, and manipulated through different
-parameters. By default 20 entities in alphabetical order are shown.
-(3) Available IDs can be obtained by using the type-tree or node-overview
-endpoint.
-Required parameters are shown as **bold**.
 
 Nodes endpoints
 ***************
