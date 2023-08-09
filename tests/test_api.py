@@ -224,6 +224,15 @@ class Api(ApiTestCase):
             # except OSError:  # pragma: no cover
             #     pass
 
+            for rv in [
+                self.app.get(
+                    url_for('api_03.entity', id_=place.id, format='n3')),
+                self.app.get(url_for(
+                    'api_03.view_class',
+                    view_class='place',
+                    format='n3'))]:
+                assert b'Shire' in rv.data
+
             # Test Entity export and RDFS
             for rv in [
                 self.app.get(
