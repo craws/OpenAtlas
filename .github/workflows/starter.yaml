@@ -96,7 +96,7 @@ jobs:
                         -e POSTGRES_HOST=postgres\
                         -e COOKIE_KEY=$COOKIE_KEY\
                         --name openatlas --network openatlas\
-                        ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')/container-preview:${{ github.ref_type == 'tag' }}
+                        ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')/container-preview:$(echo ${{ github.ref_name }} | sed 's/\//-/')
           set -x
           cat <<EOF > testing.py
           SERVER_NAME='local.host'
