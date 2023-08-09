@@ -5,7 +5,7 @@ API parameter 0.3
 
 .. _cidoc-classes-para-0.3:
 
-.. list-table:: **cidoc_class / cidoc_classes**
+.. list-table:: **cidoc_classes**
    :widths: 10 80
    :stub-columns: 1
 
@@ -27,17 +27,17 @@ API parameter 0.3
    * - Description
      - Results will be sorted by the given column
    * - Values
-     - * ID
-       * classCode
-       * name
-       * description
-       * created
-       * modified
-       * systemClass
-       * beginFrom
-       * beginTo
-       * endFrom
-       * endTo
+     - | ID
+       | classCode
+       | name
+       | description
+       | created
+       | modified
+       | systemClass
+       | beginFrom
+       | beginTo
+       | endFrom
+       | endTo
 
 .. _count-para-0.3:
 
@@ -89,8 +89,8 @@ API parameter 0.3
    * - Description
      - Results will be downloaded in the given format
    * - Values
-     - * csv
-       * csvNetwork
+     - | csv
+       | csvNetwork
 
 .. _first-para-0.3:
 
@@ -116,15 +116,15 @@ API parameter 0.3
    * - Description
      - Select a preferred output format
    * - Values
-     -  * lp
-        * loud
-        * geojson
-        * geojson-v2
-        * pretty-xml
-        * n3
-        * turtle
-        * nt
-        * xml (subunits endpoint can only handle xml)
+     -  | lp
+        | loud
+        | geojson
+        | geojson-v2
+        | pretty-xml
+        | n3
+        | turtle
+        | nt
+        | xml (subunits endpoint can only handle xml)
 
 .. _geometry-para-0.3:
 
@@ -137,13 +137,13 @@ API parameter 0.3
    * - Description
      - Select a preferred geometry
    * - Values
-     -  * gisAll
-        * gisPointAll
-        * gisPointSupers
-        * gisPointSubs
-        * gisPointSibling
-        * gisLineAll
-        * gisPolygonAll
+     -  | gisAll
+        | gisPointAll
+        | gisPointSupers
+        | gisPointSubs
+        | gisPointSibling
+        | gisLineAll
+        | gisPolygonAll
 
 .. _id-para-0.3:
 
@@ -169,8 +169,8 @@ API parameter 0.3
    * - Description
      - Select the size category for the displayed image (can be modified in production.py)
    * - Values
-     - * thumbnail
-       * table
+     - | table
+       | thumbnail
 
 .. _lang-para-0.3:
 
@@ -183,8 +183,8 @@ API parameter 0.3
    * - Description
      - Select an output language
    * - Values
-     - * en
-       * de
+     - | en
+       | de
 
 .. _last-para-0.3:
 
@@ -208,8 +208,8 @@ API parameter 0.3
    * - Format
      - integer
    * - Description
-     - * Number of last database entries to be returned.
-       * Only numbers between 1 and 100 are valid.
+     - | Number of last database entries to be returned.
+       | Only numbers between 1 and 100 are valid.
    * - Values
      - 1 - 100
 
@@ -224,8 +224,8 @@ API parameter 0.3
    * - Description
      - Number of entities returned per page
    * - Values
-     - * 0 corresponds to "no limit set"
-       * Default is set to 20 entities
+     - | 0 corresponds to "no limit set"
+       | Default is set to 20 entities
 
 .. _none-para-0.3:
 
@@ -290,15 +290,15 @@ API parameter 0.3
    * - Description
      - Select a key to be shown. If using "not", no other keys will be displayed.
    * - Values
-     - * description
-       * depictions
-       * geometry
-       * links
-       * names
-       * none
-       * relations
-       * types
-       * when
+     - | description
+       | depictions
+       | geometry
+       | links
+       | names
+       | none
+       | relations
+       | types
+       | when
 
 .. _sort-para-0.3:
 
@@ -311,12 +311,12 @@ API parameter 0.3
    * - Description
      - Results will be sorted asc/desc (default column is name)
    * - Values
-     - * asc
-       * desc
+     - | asc
+       | desc
 
 .. _system-classes-para-0.3:
 
-.. list-table:: **system_class / system_classes**
+.. list-table:: **system_classes**
    :widths: 10 80
    :stub-columns: 1
 
@@ -325,32 +325,32 @@ API parameter 0.3
    * - Description
      - Needs to be one of the OpenAtlas system classes
    * - Values
-     - * all
-       * administrative_unit
-       * type
-       * acquisition
-       * activity
-       * actor_actor_relation
-       * actor_function
-       * appellation
-       * artifact
-       * bibliography
-       * edition
-       * external_reference
-       * feature
-       * file
-       * group
-       * human_remains
-       * involvement
-       * move
-       * object_location
-       * person
-       * place
-       * production
-       * reference_system
-       * source
-       * source_translation
-       * stratigraphic_unit
+     - | all
+       | administrative_unit
+       | type
+       | acquisition
+       | activity
+       | actor_actor_relation
+       | actor_function
+       | appellation
+       | artifact
+       | bibliography
+       | edition
+       | external_reference
+       | feature
+       | file
+       | group
+       | human_remains
+       | involvement
+       | move
+       | object_location
+       | person
+       | place
+       | production
+       | reference_system
+       | source
+       | source_translation
+       | stratigraphic_unit
 
 .. _type_id-para-0.3:
 
@@ -369,7 +369,7 @@ API parameter 0.3
 
 .. _view-classes-para-0.3:
 
-.. list-table:: **view_class / view_classes**
+.. list-table:: **view_classes**
    :widths: 10 80
    :stub-columns: 1
 
@@ -378,15 +378,15 @@ API parameter 0.3
    * - Description
      - Needs to be one of the OpenAtlas menu items
    * - Values
-     - * actor
-       * all
-       * artifact
-       * event
-       * file
-       * object
-       * place
-       * reference
-       * source
-       * source_translation
-       * type
+     - | actor
+       | all
+       | artifact
+       | event
+       | file
+       | object
+       | place
+       | reference
+       | source
+       | source_translation
+       | type
 
