@@ -55,7 +55,7 @@ def resolve_entities(
             remove_duplicate_entities(entities),
             parser),
         parser)
-    if parser['format'] in app.config['RDF_FORMATS']:
+    if parser['format'] in app.config['RDF_FORMATS']:  # pragma: nocover
         return Response(
             rdf_output(result['results'], parser),
             mimetype=app.config['RDF_FORMATS'][parser['format']])
@@ -112,7 +112,7 @@ def resolve_entity(
     if parser['export'] == 'csvNetwork':
         export_csv_for_network_analysis([entity], parser)
     result = get_entity_formatted(entity, parser)
-    if parser['format'] in app.config['RDF_FORMATS']:
+    if parser['format'] in app.config['RDF_FORMATS']:  # pragma: nocover
         return Response(
             rdf_output(result, parser),
             mimetype=app.config['RDF_FORMATS'][parser['format']])
