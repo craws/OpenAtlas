@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Export &mdash; OpenAtlas 7.15.0 documentation</title>
+  <title>Export &mdash; OpenAtlas 7.16.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                7.15.0
+                7.16.0
               </div>
             
           
@@ -109,6 +109,7 @@
 <li class="toctree-l2"><a class="reference internal" href="execute_sql.html">Execute SQL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html">API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="arche.html">ARCHE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vocabs.html">Vocabs</a></li>
 </ul>
 </li>
 </ul>
@@ -199,7 +200,10 @@
 <div class="section" id="export-sql">
 <h2>Export SQL<a class="headerlink" href="#export-sql" title="Permalink to this headline">¶</a></h2>
 <p>When clicking the <strong>Export SQL</strong> button a new SQL dump will be created with
-pg_dump.</p>
+pg_dump in plain text format.</p>
+<p>When clicking the <strong>Export custom SQL</strong> button a new SQL dump will be created with
+pg_dump in custom archiving format (-Fc). <cite>pg_restore</cite> is used to restore the database
+regardless of which operating system and line breaks are used.</p>
 <ul class="simple">
 <li><p>Be aware, especially when sharing, that <strong>user data</strong>, e.g. email addresses,
 is included.</p></li>
@@ -207,7 +211,7 @@ is included.</p></li>
 (only admins can delete)</p></li>
 <li><p>If the directory isn’t writable, a warning will be shown</p></li>
 <li><p>SQL dumps are saved in the <strong>files/export</strong> folder</p></li>
-<li><p>File names begin with date and time e.g. 2018-08-23_1533_dump.sql.</p></li>
+<li><p>File names begin with date and time e.g. 2018-08-23_1533_dump_plain.sql.</p></li>
 </ul>
 </div>
 <div class="section" id="export-csv">
