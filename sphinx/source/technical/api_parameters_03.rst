@@ -275,9 +275,124 @@ API parameters 0.3
    * - Format
      - string, multiple
    * - Description
-     - Search request with AND/OR logic
+     - Search request with complex AND/OR logic
    * - Values
      -
+
+The search parameter provides a tool to filter and search the request with logical operators.
+
+**Example**
+    The search parameter takes a JSON as value. A key has to be a *filterable category* followed by a list/array.
+    This list need to have again JSON values as items. There can be multiple search parameters. E.g:
+
+.. code-block::
+
+    {domain}/api/{api version}/{endpoint}?search={
+        "typeID": [{"operator": "equal", "values": [123456]}],
+        "typeName": [{"operator": "like", "values": ["Chain", "Bracelet", "Amule"], "logicalOperator": "and"}]
+    }& search = {
+        "typeName": [{"operator": "equal", "values": ["Gold"]}],
+        "beginFrom": [{"operator": "lesserThan", "values": ["0850-05-12"],"logicalOperator": "and"}]}
+
+Every JSON in a search parameter field is logical connected with AND. E.g:
+
+.. code-block::
+
+    ?search={A:[{X}, {Y}], B: [M]} => Entities containing A(X and Y) and B(M)
+
+To build an search start with following parameter:
+
+    ``?search={}``
+
+Now a `categories`_ after which the results are search, has to be selected:
+
+    ``?search={"typeName"}``
+
+After the `categories`_ are selected, next make a list with possible multiple JSONs (JSONs are connected with *OR*)
+
+    ``?search={"typeName": [{},{}]}``
+
+Next a list of `values`_ has to be provided:
+
+    ``?search={"typeName": [{"values": ["Gold", "Silver"]}]}``
+
+Then an `operators`_ has to be selected, how the `values`_ should be treated:
+
+    ``?search={"typeName": [{"operator": "equal", "values": ["Gold", "Silver"]}]}``
+
+At last a `logical`_ operator can be assigned, if the values will be treated with *OR* or *AND*:
+
+    ``?search={"typeName": [{"operator": "equal", "values": ["Gold", "Silver"], "logicalOperator": "and"}]}``
+
+.. _categories:
+
+Filterable categories
+^^^^^^^^^^^^^^^^^^^^^
+
+.. hlist::
+   :columns: 5
+
+   - entityName
+   - entityDescription
+   - entityAliases
+   - entityCidocClass
+   - entitySystemClass
+   - entityID
+   - typeID
+   - valueTypeID
+   - typeIDWithSubs
+   - typeName
+   - beginFrom
+   - beginTo
+   - endFrom
+   - endTo
+   - relationToID
+
+.. _values:
+
+Values
+^^^^^^
+
+Values has to be a list of items. The items can be either a string, an integer or a tuple (see Note). Strings need to
+be marked with "" or '', while integers doesn't allow this.
+
+*Note*: the category valueTypeID can search for values of a type ID. But it takes one or more two valued Tuple as list
+entry: (x,y). x is the type id and y is the searched value. This can be an int or a float, e.g:
+
+     ``{"operator":"lesserThan","values":[(3142,543.3)],"logicalOperator":"and"}``
+
+.. _operators:
+
+Compare operators
+^^^^^^^^^^^^^^^^^
+
+.. hlist::
+   :columns: 4
+
+   - equal
+   - notEqual
+   - like [1]_
+   - greaterThan [2]_
+   - greaterThanEqual [2]_
+   - lesserThan [2]_
+   - lesserThanEqual [2]_
+
+The compare operators work like the mathematical operators.
+equal x=y, notEqual x!=y, greaterThan x>y , greaterThanEqual x>=y, lesserThan x<y, lesserThanEqual x<=y.
+The like operator searches for occurrence of the string, so a match can also occur in the middle of a word.
+
+.. [1] Only for string based categories
+.. [2] Only for beginFrom, beginTo, endFrom, endTo, valueTypeID
+
+.. _logical:
+
+Logical operators
+^^^^^^^^^^^^^^^^^
+
+Not mandatory, *OR* is the default value. Logical operators handles, if the `values`_ are treated as *OR* or *AND*.
+
+ ``and, or``
+
 
 .. _show-para-0.3:
 

@@ -20,6 +20,9 @@ Places format (LPF). Alternatively, Linked Open Art (LOUD), GeoJSON or RDFs, der
 :ref:`download-para-0.3` :ref:`export-para-0.3` :ref:`format-para-0.3` :ref:`show-para-0.3`
 ======================== ====================== ====================== ====================
 
+**Example**
+    https://demo.openatlas.eu/api/0.3/entity/4840?format=loud
+
 Query
 *****
 
@@ -50,6 +53,8 @@ query; each request has to be a new parameter.
   :ref:`sort-para-0.3`   :ref:`type_id-para-0.3`
 ======================== ======================= ======================== ============================= ====================== ======================
 
+**Example**
+    https://demo.openatlas.eu/api/0.3/query?cidoc_classes=E18&cidoc_classes=E31&system_classes=person&limit=120
 
 Multiple entities
 *****************
@@ -74,6 +79,9 @@ Retrieves a JSON list of entities based on their CIDOC CRM class [1]_ [2]_
   :ref:`sort-para-0.3`   :ref:`type_id-para-0.3`
 ======================== ======================= ======================== ============================= ====================== ======================
 
+**Example**
+    https://demo.openatlas.eu/api/0.3/cidoc_class/E18
+
 Entities linked to entity
 """""""""""""""""""""""""
 
@@ -90,6 +98,9 @@ Used to retrieve a JSON list of entities linked to the entity with the stated **
   :ref:`last-para-0.3`   :ref:`limit-para-0.3`   :ref:`page-para-0.3`     :ref:`relation_type-para-0.3` :ref:`search-para-0.3` :ref:`show-para-0.3`
   :ref:`sort-para-0.3`   :ref:`type_id-para-0.3`
 ======================== ======================= ======================== ============================= ====================== ======================
+
+**Example**
+    https://demo.openatlas.eu/api/0.3/entities_linked_to_entity/4840
 
 Latest
 """"""
@@ -108,6 +119,9 @@ Used to retrieve the last entry/entries made. The number {n} represents the amou
   :ref:`search-para-0.3` :ref:`show-para-0.3`     :ref:`sort-para-0.3`   :ref:`type_id-para-0.3`
 ======================== ======================== ====================== ======================= =============================
 
+**Example**
+    https://demo.openatlas.eu/api/0.3/latest/25
+
 System class
 """"""""""""
 
@@ -124,6 +138,9 @@ Retrieves a list of entities, based on their OpenAtlas system class name as JSON
   :ref:`last-para-0.3`   :ref:`limit-para-0.3`   :ref:`page-para-0.3`     :ref:`relation_type-para-0.3` :ref:`search-para-0.3` :ref:`show-para-0.3`
   :ref:`sort-para-0.3`   :ref:`type_id-para-0.3`
 ======================== ======================= ======================== ============================= ====================== ======================
+
+**Example**
+    https://demo.openatlas.eu/api/0.3/system_class/person
 
 Type entities
 """""""""""""
@@ -142,6 +159,9 @@ Used to retrieve a JSON list of entities, based on their OpenAtlas **type** [2]_
   :ref:`sort-para-0.3`   :ref:`type_id-para-0.3`
 ======================== ======================= ======================== ============================= ====================== ======================
 
+**Example**
+    https://demo.openatlas.eu/api/0.3/type_entities/47
+
 Type entities all
 """""""""""""""""
 
@@ -159,6 +179,9 @@ Used to retrieve a JSON list of entities, based on their OpenAtlas **type** and 
   :ref:`sort-para-0.3`   :ref:`type_id-para-0.3`
 ======================== ======================= ======================== ============================= ====================== ======================
 
+**Example**
+    https://demo.openatlas.eu/api/0.3/type_entities_all/47
+
 View class
 """"""""""
 
@@ -175,6 +198,9 @@ Used to retrieve a JSON list of entities based on their OpenAtlas class view
   :ref:`last-para-0.3`   :ref:`limit-para-0.3`   :ref:`page-para-0.3`     :ref:`relation_type-para-0.3` :ref:`search-para-0.3` :ref:`show-para-0.3`
   :ref:`sort-para-0.3`   :ref:`type_id-para-0.3`
 ======================== ======================= ======================== ============================= ====================== ======================
+
+**Example**
+    https://demo.openatlas.eu/api/0.3/view_class/actor
 
 
 .. [1] All codes available in OpenAtlas can be found under `OpenAtlas and CIDOC CRM class mapping <https://redmine.openatlas.eu/projects/uni/wiki/OpenAtlas_and_CIDOC_CRM_class_mapping?parent=Endpoints>`_
@@ -202,6 +228,9 @@ Retrieves a list of all types sorted by view class
 :ref:`download-para-0.3`
 ======================== ==
 
+**Example**
+    https://demo.openatlas.eu/api/0.3/type_by_view_class/
+
 Type overview
 """"""""""""""""""
 
@@ -216,6 +245,9 @@ Retrieves a list of all type
 ---------------------------
 :ref:`download-para-0.3`
 ======================== ==
+
+**Example**
+    https://demo.openatlas.eu/api/0.3/type_overview/
 
 Type tree
 """"""""""""""""""
@@ -232,7 +264,8 @@ Shows every *type* in an OpenAtlas instance in hierarchical order.
 :ref:`download-para-0.3`
 ======================== ==
 
-
+**Example**
+    https://demo.openatlas.eu/api/0.3/type_tree/
 
 Administrative endpoints
 ************************
@@ -248,6 +281,9 @@ Classes
 
 Retrieves a detailed list of all available system classes, their CIDOC CRM mapping, which view they belong to,
 which icon is used, and their english name.
+
+**Example**
+    https://demo.openatlas.eu/api/0.3/classes/
 
 Content
 """"""""""""""""""
@@ -265,6 +301,9 @@ intro, legal notice, contact, and size of processed images.
 :ref:`download-para-0.3` :ref:`lang-para-0.3`
 ======================== ====================
 
+**Example**
+    https://demo.openatlas.eu/api/0.3/content/
+
 System class count
 """"""""""""""""""
 
@@ -274,6 +313,8 @@ System class count
 
 Retrieves a list of the numbers of entries connected to a system class
 
+**Example**
+    https://demo.openatlas.eu/api/0.3/system_class_count/
 
 Special endpoints
 *****************
@@ -289,6 +330,9 @@ Export database
 
 Downloads all information in an OpenAtlas instance as CSV, XML, or JSON
 
+**Example**
+    https://demo.openatlas.eu/api/0.3/export_database/json
+
 Geometric entities
 """"""""""""""""""
 
@@ -298,11 +342,14 @@ Geometric entities
 
 Retrieves a detailed GeoJSON list of all chosen geometries in an OpenAtlas instance; this was implemented for map usage
 
-======================== ========================
+======================== ======================== ========================
  **Optional Parameters**
--------------------------------------------------
-:ref:`count-para-0.3`    :ref:`download-para-0.3`
-======================== ========================
+--------------------------------------------------------------------------
+:ref:`count-para-0.3`    :ref:`download-para-0.3` :ref:`geometry-para-0.3`
+======================== ======================== ========================
+
+**Example**
+    https://demo.openatlas.eu/api/0.3/geometric_entities/
 
 Subunits
 """"""""""""""""""
@@ -318,7 +365,6 @@ Displays all subunits of a place in a special format used by the `THANADOS <http
 -------------------------------------------------
 :ref:`count-para-0.3`    :ref:`download-para-0.3`
 ======================== ========================
-
 
 Image endpoints
 ***************
