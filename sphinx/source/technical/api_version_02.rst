@@ -1,7 +1,10 @@
+.. _version_0_2:
+
 Version 0.2
 ===========
 
-.. toctree::
+.. warning:: This version is deprecated and not used anymore (last version was 7.7.0)
+
 
 Entity endpoint
 ***************

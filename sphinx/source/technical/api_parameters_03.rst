@@ -1,5 +1,5 @@
-API parameter 0.3
-========================
+API parameters 0.3
+==================
 
 .. toctree::
 

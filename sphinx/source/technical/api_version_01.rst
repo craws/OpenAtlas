@@ -1,7 +1,12 @@
+.. _version_0_1:
+
 Version 0.1
 ===========
 
-.. toctree::
+.. warning:: This version is deprecated and not used anymore (last version was 5.6.0)
+
+
+
 
 .. list-table::
    :widths: 25 25 50

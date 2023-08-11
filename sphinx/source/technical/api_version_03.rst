@@ -1,7 +1,7 @@
+.. _version_0_3:
+
 Version 0.3
 ===========
-
-.. toctree::
 
 Entity endpoint
 ****************
