@@ -147,15 +147,17 @@ def profile_image_table_link(
 def get_chart_data(entity: Type) -> Optional[dict[str, Any]]:
     if not entity.subs:
         return None
-    result = {}
+    data = {}
     for id_ in entity.subs:
-        sub = g.types[id_]
-        result[sub.name] = sub.count + sub.count_subs
-    result = dict(
-        sorted(result.items(), key=lambda item: item[1], reverse=True))
-    return {
-        'labels': list(result.keys()),
-        'datasets': [{'data': list(result.values())}]}
+        if count := g.types[id_].count + g.types[id_].count_subs:
+            data[g.types[id_].name] = count
+    if data:
+        data = dict(
+            sorted(data.items(), key=lambda item: item[1], reverse=True))
+        return {
+            'labels': list(data.keys()),
+            'datasets': [{'data': list(data.values())}]}
+    return None
 
 
 def get_system_data(entity: Entity) -> dict[str, Any]:
