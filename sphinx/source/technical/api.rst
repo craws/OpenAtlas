@@ -22,14 +22,14 @@ Quick Start Guide
 
 The API can be accessed via the OpenAtlas user interface or through URL GET requests.
 
-UI access
----------
+1. UI access
+------------
 
 Each detail view of an entity provide two buttons (JSON and RDF) where the formats, in which the entity should
 be exported, can be selected. If the buttons are not visible, please change the **Show API links**
 at the :ref:`display` tab in your :doc:`/tools/profile`.
 
-Through the UI only a single entity can be accessed.
+Through the UI, only a single entity can be accessed.
 
 .. figure:: api_ui_json.jpg
    :align: center
@@ -42,11 +42,11 @@ Through the UI only a single entity can be accessed.
 
    Possible RDF API formats
 
-URL / GET access
-----------------
+2. URL / GET access
+-------------------
 
 The most common way to communicate with the OpenAtlas API is through GET request, either manually from the local
-browser or through other applications with the following URL schema:
+browser or with other applications following a specific URL schema:
 
 .. code-block::
 
@@ -54,22 +54,21 @@ browser or through other applications with the following URL schema:
 
 **Example URL**
     https://demo.openatlas.eu/api/0.3/entity/5117
-
 **Domain**
     Location of the OpenAtlas instance from which information should be retrieved; e.g. https://demo-openatlas.eu/
-    for the demo-version
+    for the demo version.
 **API Version**
     Input without version number leads to the current stable version
     (`https://demo.openatlas.eu/api/entity/5117 <https://demo.openatlas.eu/api/entity/5117>`_). If another version of
     the API is to be used, the version number can be specified (demo.openatlas.eu/api/**0.3**/entity/5117).
-    A version overview can be found under point Versioning_
+    A version overview can be found under point Versioning_.
 **Endpoints**
     Specific data can be queried by attaching an endpoint (demo.openatlas.eu/api/0.3/**entity**/5117).
-    The information is provided in a human - and machine-readable form. Further information under Endpoints_
+    The information is provided in a human - and machine-readable form. Further information under Endpoints_.
 **Required path values**
     Must be included to create a valid URL. Different endpoints require different values
     (demo.openatlas.eu/api/0.3/entity/**5117**. **5117** is an ID as required by the
-    entity endpoint) - all required values are state in **{** **}** at the Endpoints_ definition
+    entity endpoint) - all required values are state in **{** **}** at the Endpoints_ definition.
 **Parameters**
     Used to structure additional information for a given URL. They are added to the end of an URL after
     the "?" symbol (demo.openatlas.eu/api/0.3/entity/5117**?**download=true). All available Parameters can be found
