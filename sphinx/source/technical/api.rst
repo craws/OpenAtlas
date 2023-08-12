@@ -11,22 +11,21 @@ Interface (`API <https://en.wikipedia.org/wiki/API>`_). The API is
 `RESTlike <https://restfulapi.net/rest-architectural-constraints/>`_
 to provide easy access to the data.
 
-To try out the API first hand, visit https://demo.openatlas.eu/swagger.
-
-For developers a complete `Swagger documentation <https://app.swaggerhub.com/apis/ctot-nondef/OpenAtlas/>`_
-is provided.
-
+* To try out the API first hand, visit https://demo.openatlas.eu/swagger
+* For developers a complete
+  `Swagger documentation <https://app.swaggerhub.com/apis/ctot-nondef/OpenAtlas/>`_
+  is provided.
 
 Quick Start Guide
 =================
-
-The API can be accessed via the OpenAtlas user interface or through URL GET requests.
+The API can be accessed via the OpenAtlas user interface or through URL GET
+requests.
 
 1. UI access
 ------------
-
-Each detail view of an entity provide two buttons (JSON and RDF) where the formats, in which the entity should
-be exported, can be selected. If the buttons are not visible, please change the **Show API links**
+Each detail view of an entity provide two buttons (JSON and RDF) where the
+formats, in which the entity should be exported, can be selected. If the
+buttons are not visible, please change the **Show API links**
 at the :ref:`display` tab in your :doc:`/tools/profile`.
 
 Through the UI, only a single entity can be accessed.
@@ -36,7 +35,6 @@ Through the UI, only a single entity can be accessed.
 
    Possible JSON API formats
 
-
 .. figure:: api_ui_rdf.jpg
    :align: center
 
@@ -44,9 +42,9 @@ Through the UI, only a single entity can be accessed.
 
 2. URL / GET access
 -------------------
-
-The most common way to communicate with the OpenAtlas API is through GET request, either manually from the local
-browser or with other applications following a specific URL schema:
+The most common way to communicate with the OpenAtlas API is through GET
+request, either manually from the local browser or with other applications
+following a specific URL schema:
 
 .. code-block::
 
@@ -55,29 +53,34 @@ browser or with other applications following a specific URL schema:
 **Example URL**
     https://demo.openatlas.eu/api/0.3/entity/5117
 **Domain**
-    Location of the OpenAtlas instance from which information should be retrieved; e.g. https://demo-openatlas.eu/
-    for the demo version.
+    Location of the OpenAtlas instance from which information should be
+    retrieved; e.g. https://demo-openatlas.eu/ for the demo version.
 **API Version**
     Input without version number leads to the current stable version
-    (`https://demo.openatlas.eu/api/entity/5117 <https://demo.openatlas.eu/api/entity/5117>`_). If another version of
-    the API is to be used, the version number can be specified (demo.openatlas.eu/api/**0.3**/entity/5117).
-    A version overview can be found under point Versioning_.
+    (`https://demo.openatlas.eu/api/entity/5117 <https://demo.openatlas.eu/api/entity/5117>`_).
+    If another version of the API is to be used, the version number can be
+    specified (demo.openatlas.eu/api/**0.3**/entity/5117). A version overview
+    can be found under point Versioning_.
 **Endpoints**
-    Specific data can be queried by attaching an endpoint (demo.openatlas.eu/api/0.3/**entity**/5117).
-    The information is provided in a human - and machine-readable form. Further information under Endpoints_.
+    Specific data can be queried by attaching an endpoint
+    (demo.openatlas.eu/api/0.3/**entity**/5117). The information is provided
+    in a human - and machine-readable form. Further information under
+    Endpoints_.
 **Required path values**
-    Must be included to create a valid URL. Different endpoints require different values
-    (demo.openatlas.eu/api/0.3/entity/**5117**. **5117** is an ID as required by the
-    entity endpoint) - all required values are state in **{** **}** at the Endpoints_ definition.
+    Must be included to create a valid URL. Different endpoints require
+    different values (demo.openatlas.eu/api/0.3/entity/**5117**. **5117** is
+    an ID as required by the entity endpoint) - all required values are state
+    in **{** **}** at the Endpoints_ definition.
 **Parameters**
-    Used to structure additional information for a given URL. They are added to the end of an URL after
-    the "?" symbol (demo.openatlas.eu/api/0.3/entity/5117**?**download=true). All available Parameters can be found
-    under Parameters_. For more general information see this
+    Used to structure additional information for a given URL. They are added
+    to the end of an URL after the "?" symbol
+    (demo.openatlas.eu/api/0.3/entity/5117**?**download=true). All available
+    Parameters can be found under Parameters_. For more general information
+    see this
     `article <https://www.botify.com/learn/basics/what-are-url-parameters#:~:text=URL%20parameters%20(also%20known%20as,by%20the%20'%26'%20symbol.>`_.
 
 Versioning
 ==========
-
 .. list-table::
    :header-rows: 1
    :widths: 20 20 20
@@ -105,8 +108,8 @@ developed, so breaking changes may occur at any time without prior notice.
 Endpoints
 =========
 
-Through different endpoints, data can be retrieved from OpenAtlas. Each version has a own set of endpoints, be
-sure to use the right one.
+Through different endpoints, data can be retrieved from OpenAtlas. Each version
+has a own set of endpoints, be sure to use the right one.
 
 .. toctree::
    :maxdepth: 1
@@ -124,16 +127,19 @@ or RDFs, derived from the `LPF <https://github.com/LinkedPasts/linked-places-for
 Parameters
 ==========
 
-With parameters the result of the requested endpoint can be manipulated (filtered, searched, sorted, etc.).
-Each endpoint provide another set of parameters which can be used. So please consult the `Endpoints`_ listing for
+With parameters the result of the requested endpoint can be manipulated
+(filtered, searched, sorted, etc.). Each endpoint provide another set of
+parameters which can be used. So please consult the `Endpoints`_ listing for
 more details.
 
 Parameters are added to the end of an URL after the "**?**" symbol
-(e.g. demo.openatlas.eu/api/0.3/entity/5117**?download=true**) and are connected with the "**&**" sign.
+(e.g. demo.openatlas.eu/api/0.3/entity/5117**?download=true**) and are
+connected with the "**&**" sign.
 For more general information on this topic see this
 `article <https://www.botify.com/learn/basics/what-are-url-parameters#:~:text=URL%20parameters%20(also%20known%20as,by%20the%20'%26'%20symbol.>`_.
 
-At the moment only the :ref:`stable version 0.3<version_0_3>` of the API can be provided by an detailed parameter list.
+At the moment only the :ref:`stable version 0.3<version_0_3>` of the API can
+be provided by an detailed parameter list.
 
 
 .. toctree::
@@ -143,7 +149,6 @@ At the moment only the :ref:`stable version 0.3<version_0_3>` of the API can be 
 
 Error handling
 ==============
-
 OpenAtlas uses conventional HTTP response codes to indicate the success or
 failure of an API request. Codes in the 2xx range indicate a successful request
 while those in the 4xx range signal an error - providing the information was
@@ -167,7 +172,6 @@ entered, Flask catches this via its own
 `Flask-RESTful <https://flask-restful.readthedocs.io/en/latest/>`_ extension.
 An error message is provided by its own error handler
 `error handler <https://flask-restful.readthedocs.io/en/latest/reqparse.html#error-handling>`_
-
 
 Authentication guide
 ====================

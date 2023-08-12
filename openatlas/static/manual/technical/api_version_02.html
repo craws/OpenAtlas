@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Version 0.3 &mdash; OpenAtlas 7.16.0 documentation</title>
+  <title>Version 0.2 &mdash; OpenAtlas 7.16.0 documentation</title>
   
 
   
@@ -36,8 +36,8 @@
 
     
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Version 0.2" href="api_version0_2.html" />
-    <link rel="prev" title="API" href="api.html" /> 
+    <link rel="next" title="Version 0.1" href="api_version_01.html" />
+    <link rel="prev" title="Version 0.3" href="api_version_03.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -104,8 +104,8 @@
 <li class="toctree-l2"><a class="reference internal" href="api.html#introduction">Introduction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#quick-start-guide">Quick Start Guide</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#versioning">Versioning</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="api.html#endpoint-definition">Endpoint definition</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#parameter-definition">Parameter definition</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="api.html#endpoints">Endpoints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#parameters">Parameters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#error-handling">Error handling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#authentication-guide">Authentication guide</a></li>
 </ul>
@@ -168,7 +168,7 @@
         
           <li><a href="api.html">API</a> &raquo;</li>
         
-      <li>Version 0.3</li>
+      <li>Version 0.2</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -185,9 +185,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="version-0-3">
-<h1>Version 0.3<a class="headerlink" href="#version-0-3" title="Permalink to this headline">¶</a></h1>
-<div class="toctree-wrapper compound">
+  <div class="section" id="version-0-2">
+<span id="id1"></span><h1>Version 0.2<a class="headerlink" href="#version-0-2" title="Permalink to this headline">¶</a></h1>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This version is deprecated and not used anymore (last version was 7.7.0)</p>
 </div>
 <div class="section" id="entity-endpoint">
 <h2>Entity endpoint<a class="headerlink" href="#entity-endpoint" title="Permalink to this headline">¶</a></h2>
@@ -205,7 +207,7 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>/api/0.3/entity/{id}</p></td>
+<tr class="row-even"><td><p>/api/0.2/entity/{id}</p></td>
 <td><p>show, download,export,format</p></td>
 <td><p>Retrieves all information about a single entity</p></td>
 </tr>
@@ -225,12 +227,10 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>api/0.3/entities/query/</p></td>
-<td><p><strong>ids</strong>, <strong>cidoc-classes</strong>, <strong>menu-item</strong>, <strong>classes</strong>,
-<strong>linked-to-entity</strong>, <strong>linked-to-type</strong>,
-<strong>linked-to-type-including-subtypes</strong>, limit, column, sort, search,
-first, last, show, relation_type, type_id, count, download, format,
-export, page</p></td>
+<tr class="row-even"><td><p>/api/0.2/query/</p></td>
+<td><p><strong>ids</strong>, <strong>cidoc_classes</strong>, <strong>view_classes</strong>, <strong>system_classes</strong>, limit,
+column, sort, search, first, last, show, relation_type, type_id, count,
+download, format, export, page</p></td>
 <td><p>Retrieves a list with entity ID, CIDOC CRM code, system class, or menu
 item. Combine up to four of the aforementioned endpoints in a single
 query; each request has to be a new parameter; Possible parameters are:
@@ -256,46 +256,44 @@ query; each request has to be a new parameter; Possible parameters are:
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>/api/0.3/view_class/{view_class}</p></td>
+<tr class="row-even"><td><p>/api/0.2/class/{cidoc_class}</p></td>
 <td><p>limit, column, sort, search, first, last, show, relation_type, type_id,
 count, download, format, export, page</p></td>
-<td><p>Used to retrieve a JSON list of entities based on their OpenAtlas class
-view</p></td>
+<td><p>Retrieves a list of entities, based on their CIDOC CRM class code,
+including results and pagination key (1)(2)</p></td>
 </tr>
-<tr class="row-odd"><td><p>/api/0.3/system_class/{system_class}</p></td>
+<tr class="row-odd"><td><p>/api/0.2/code/{view_class}</p></td>
+<td><p>limit, column, sort, filter, first, last, show, count, download, format,
+export, page</p></td>
+<td><p>Retrieves a list of entities, based on their OpenAtlas view name</p></td>
+</tr>
+<tr class="row-even"><td><p>/api/0.2/system_class/{system_class}</p></td>
 <td><p>limit, column, sort, search, first, last, show, relation_type, count,
 download, format, export, page</p></td>
-<td><p>Retrieves a list of entities, based on their OpenAtlas system class name
-as JSON (1)(2)</p></td>
+<td><p>Retrieves a list of entities, based on their OpenAtlas system class name</p></td>
 </tr>
-<tr class="row-even"><td><p>/api/0.3/latest/{n} (n represents a number between 1 and 100)</p></td>
+<tr class="row-odd"><td><p>/api/0.2/latest/{n} (n represents a number between 1 and 100)</p></td>
 <td><p>show, relation_type, download, format, export</p></td>
-<td><p>Used to retrieve the last entry/entries made; the number {latest}/{n}
-represents the amount of entities retrieved and can be between 1 and
-100. The pagination information is always <strong>null</strong></p></td>
+<td><p>Retrieve the last entered entities. n represents the amount of entities
+retrieved (between 1 and 100). The pagination information is always
+<strong>null</strong></p></td>
 </tr>
-<tr class="row-odd"><td><p>/api/0.3/entities_linked_to_entity/{id}</p></td>
+<tr class="row-even"><td><p>/api/0.2/entities_linked_to_entity/{id}</p></td>
 <td><p>limit, column, sort, search, first, last, show, relation_type, type_id,
 count, download, format, export, page</p></td>
-<td><p>Used to retrieve a JSON list of entities linked to the entity with the
-stated <strong>ID</strong> (2)</p></td>
+<td><p>Retrieves a list of entities linked to the entity with the stated <strong>ID</strong>
+(2)</p></td>
 </tr>
-<tr class="row-even"><td><p>/api/0.3/type_entities/{id}</p></td>
+<tr class="row-odd"><td><p>/api/0.2/node_entities/{id}</p></td>
 <td><p>limit, column, sort, search, first, last, show, relation_type, type_id,
 count, download, format, export, page</p></td>
-<td><p>Used to retrieve a JSON list of entities, based on their OpenAtlas
-<strong>type</strong> (2)(3)</p></td>
+<td><p>Retrieves list of entities, based on their OpenAtlas <strong>type</strong> (2)(3)</p></td>
 </tr>
-<tr class="row-odd"><td><p>/api/0.3/type_entities_all/{id}</p></td>
+<tr class="row-even"><td><p>/api/0.2/node_entities_all/{id}</p></td>
 <td><p>limit, column, sort, search, first, last, show, relation_type, type_id,
 count, download, format, export, page</p></td>
-<td><p>Used to retrieve a JSON list of entities, based on their OpenAtlas
-<strong>type</strong> and includes all connected entities (2)(3)</p></td>
-</tr>
-<tr class="row-even"><td><p>/api/3.0/cidoc_class/{cidoc_class}</p></td>
-<td><p>limit, column, sort, search, first, last, show, relation_type, type_id,
-count, download, format, export, page</p></td>
-<td><p>Retrieves a JSON list of entities based on their CIDOC CRM class(1)(2)</p></td>
+<td><p>Retrieves a list of entities, based on their OpenAtlas type and includes
+all connected entities (2)(3)</p></td>
 </tr>
 </tbody>
 </table>
@@ -322,26 +320,33 @@ Required parameters are shown as <strong>bold</strong>.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>/api/0.3/subunits/{id}</p></td>
-<td><p><strong>id</strong>, count, download, format</p></td>
-<td><p>Displays all subunits of a place in a special format used by the
-THANADOS project</p></td>
-</tr>
-<tr class="row-odd"><td><p>/api/0.3/type_by_view_class/</p></td>
+<tr class="row-even"><td><p>/api/0.2/type_by_view_class/</p></td>
 <td><p>download</p></td>
 <td><p>Retrieves a list of all types sorted by view class</p></td>
 </tr>
-<tr class="row-even"><td><p>/api/0.3/type_overview/</p></td>
-<td><p>download</p></td>
-<td><p>Retrieves a list of all types</p></td>
+<tr class="row-odd"><td><p>/api/0.2/type_tree/</p></td>
+<td></td>
+<td><p>Retrieves a detailed list of all OpenAtlas types, including any of their
+children</p></td>
 </tr>
-<tr class="row-odd"><td><p>/api/0.3/type_tree/</p></td>
-<td><p>download</p></td>
-<td><p>Shows every <em>type</em> in an OpenAtlas instance, with its root and subs, so
-a tree can be build</p></td>
+<tr class="row-even"><td><p>/api/0.2/node_entities/{id}</p></td>
+<td></td>
+<td><p>Retrieves a list of entity names, IDs, and URLs, based on their
+OpenAtlas type(4)</p></td>
+</tr>
+<tr class="row-odd"><td><p>/api/0.2/node_entities_all/{id}</p></td>
+<td></td>
+<td><p>Retrieves a list of entity names, IDs, and URLs, based on their
+OpenAtlas type(4)</p></td>
+</tr>
+<tr class="row-even"><td><p>/api/0.2/node_overview/</p></td>
+<td></td>
+<td><p>Has been modified to /api/type_overview/</p></td>
 </tr>
 </tbody>
 </table>
+<p>(4) Note: “Historical Place” and “Administrative Units” cannot be retrieved in
+this way.</p>
 </div>
 <div class="section" id="content-endpoints">
 <h2>Content endpoints<a class="headerlink" href="#content-endpoints" title="Permalink to this headline">¶</a></h2>
@@ -358,30 +363,27 @@ a tree can be build</p></td>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>/api/0.3/export_database/{format}</p></td>
-<td><p>none</p></td>
-<td><p>Downloads all information in an OpenAtlas instance as CSV, XML, or JSON</p></td>
-</tr>
-<tr class="row-odd"><td><p>/api/0.3/classes/</p></td>
+<tr class="row-even"><td><p>/api/0.2/classes/</p></td>
 <td><p>none</p></td>
 <td><p>Retrieves a detailed list of all available system classes, their CIDOC
 CRM mapping, which view they belong to, which icon is used, and their
 English name</p></td>
 </tr>
-<tr class="row-even"><td><p>/api/0.3/content/</p></td>
+<tr class="row-odd"><td><p>/api/0.2/content/</p></td>
 <td><p>download, lang</p></td>
 <td><p>Retrieves a detailed list of information on available content in an
 OpenAtlas instance - intro, legal notice, contact, and size of processed
 images</p></td>
 </tr>
-<tr class="row-odd"><td><p>/api/0.3/geometric_entities/</p></td>
+<tr class="row-even"><td><p>/api/0.2/geometric_entities/</p></td>
 <td><p>count, download</p></td>
 <td><p>Retrieves a detailed GeoJSON list of all chosen geometries in an
 OpenAtlas instance; this was implemented for map usage</p></td>
 </tr>
-<tr class="row-even"><td><p>/api0.3/system_class_count/</p></td>
+<tr class="row-odd"><td><p>/api/0.2/system_class_count/</p></td>
 <td><p>none</p></td>
-<td><p>Retrieves a list of the numbers of entries connected to a system class</p></td>
+<td><p>Retrieves a detailed list of the numbers of entries connected to a
+system class</p></td>
 </tr>
 </tbody>
 </table>
@@ -401,22 +403,27 @@ OpenAtlas instance; this was implemented for map usage</p></td>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>/api/0.3/subunits/{id}</p></td>
-<td><p>count, download</p></td>
+<tr class="row-even"><td><p>/api/0.2/subunit/{id}</p></td>
+<td><p>count, download, format</p></td>
 <td><p>Retrieves a list of the given place and all of its subunits, provided
 in a format used by the THANADOS project
 (<a class="reference external" href="https://redmine.openatlas.eu/projects/uni/wiki/Thanados_Format">THANADOS output format</a>).
 With the format=xml parameter, a XML can be created. Takes only a valid
 place ID (E18) as parameter</p></td>
 </tr>
+<tr class="row-odd"><td><p>/api/0.2/subunit_hierarchy{id}</p></td>
+<td></td>
+<td><p>Retrieves a list of entity names, IDs, and URLs based on an entity’s ID
+including all subunits</p></td>
+</tr>
 </tbody>
 </table>
 </div>
 <div class="section" id="image-endpoints">
 <h2>Image endpoints<a class="headerlink" href="#image-endpoints" title="Permalink to this headline">¶</a></h2>
-<table class="docutils align-default" id="id1">
+<table class="docutils align-default" id="id2">
 <caption><span class="caption-text">:widths: 25 25 50
- :header-rows: 1</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
+ :header-rows: 1</span><a class="headerlink" href="#id2" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col style="width: 33%" />
 <col style="width: 33%" />
@@ -427,8 +434,8 @@ place ID (E18) as parameter</p></td>
 <td><p>Possible parameters</p></td>
 <td><p>Description</p></td>
 </tr>
-<tr class="row-even"><td><p>/api/0.3/display/{id}</p></td>
-<td><p>image size</p></td>
+<tr class="row-even"><td><p>/api/0.2/display/{id}</p></td>
+<td></td>
 <td><p>Provides the image connected to the requested ID. Be aware, the image
 will only be displayed if the request comes from a <strong>logged-in</strong> user or
 API public setting is set to on and the image has a <strong>license</strong></p></td>
@@ -444,8 +451,8 @@ API public setting is set to on and the image has a <strong>license</strong></p>
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="api_version0_2.html" class="btn btn-neutral float-right" title="Version 0.2" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="api.html" class="btn btn-neutral float-left" title="API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api_version_01.html" class="btn btn-neutral float-right" title="Version 0.1" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="api_version_03.html" class="btn btn-neutral float-left" title="Version 0.3" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

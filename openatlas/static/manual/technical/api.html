@@ -36,7 +36,7 @@
 
     
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Version 0.3" href="api_version0_3.html" />
+    <link rel="next" title="Version 0.3" href="api_version_03.html" />
     <link rel="prev" title="Link checker" href="../model/link_checker.html" /> 
 </head>
 
@@ -104,8 +104,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#quick-start-guide">Quick Start Guide</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#versioning">Versioning</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#endpoint-definition">Endpoint definition</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#parameter-definition">Parameter definition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#endpoints">Endpoints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#parameters">Parameters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#error-handling">Error handling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#authentication-guide">Authentication guide</a></li>
 </ul>
@@ -192,220 +192,95 @@
 <p>This page provides an overview of the OpenAtlas Application Programming
 Interface (<a class="reference external" href="https://en.wikipedia.org/wiki/API">API</a>). The API is
 <a class="reference external" href="https://restfulapi.net/rest-architectural-constraints/">RESTlike</a>
-to provide easy access to the data included.
-For an complete overview of possible endpoints and usage of the OpenAtlas API
-also visit our
-<a class="reference external" href="https://app.swaggerhub.com/apis/ctot-nondef/OpenAtlas/">Swagger documentation</a>.</p>
+to provide easy access to the data.</p>
+<ul class="simple">
+<li><p>To try out the API first hand, visit <a class="reference external" href="https://demo.openatlas.eu/swagger">https://demo.openatlas.eu/swagger</a></p></li>
+<li><p>For developers a complete
+<a class="reference external" href="https://app.swaggerhub.com/apis/ctot-nondef/OpenAtlas/">Swagger documentation</a>
+is provided.</p></li>
+</ul>
 </div>
 <div class="section" id="quick-start-guide">
 <h2>Quick Start Guide<a class="headerlink" href="#quick-start-guide" title="Permalink to this headline">¶</a></h2>
-<p>The API can be accessed via the following schema:
-<strong>{domain}/api/{api version}/{endpoint}?{parameter}&amp;{parameter}</strong>
-Example: <strong>demo.openatlas.eu/api/0.3/entity/5117</strong></p>
-<ul class="simple">
-<li><p><strong>Domain</strong>: Location of the OpenAtlas instance from which information should
-be retrieved; e.g. <strong>demo-openatlas.eu/</strong> for the demo-version</p></li>
-<li><p><strong>API Version</strong>: Input without version number leads to the current stable
-version (demo.openatlas.eu/api/entity/5117). If another version of the API is
-to be used, the version number can be specified
-(demo.openatlas.eu/api/<strong>0.3</strong>/entity/5117 or
-demo.openatlas.eu/api/<strong>1</strong>/entity/5117). A version overview can be found
-under point versioning</p></li>
-<li><p><strong>Endpoint</strong>: Specific data can be queried by attaching an endpoint
-(demo.openatlas.eu/api/0.3/<strong>entity</strong>/5117). The information is provided in a
-human - and machine-readable form, for possible endpoints, see below</p></li>
-<li><p><strong>Required values</strong>: Must be included to create a valid URL; different
-endpoints require different values
-(demo.openatlas.eu/api/0.3/entity/<strong>5117</strong>; 5117 is an ID as required by the
-entity endpoint) - all required values are stated in the list below</p></li>
-<li><p><strong>Parameters</strong>: Used to structure additional information for a given URL;
-they are added to the end of an URL after the “?” symbol
-(demo.openatlas.eu/api/0.3/entity/5117?download=true). For more
-information see this <a class="reference external" href="https://www.botify.com/learn/basics/what-are-url-parameters#:~:text=URL%20parameters%20(also%20known%20as,by%20the%20'%26'%20symbol.">article</a>.</p></li>
-</ul>
-<p>Using the above-mentioned <strong>https://demo.openatlas.eu/api/1/entity/5117</strong>
-yields the following result:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-  <span class="s2">&quot;@context&quot;</span><span class="p">:</span> <span class="s2">&quot;https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld&quot;</span><span class="p">,</span>
-  <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;FeatureCollection&quot;</span><span class="p">,</span>
-  <span class="s2">&quot;features&quot;</span><span class="p">:</span> <span class="p">[</span>
-    <span class="p">{</span>
-      <span class="s2">&quot;@id&quot;</span><span class="p">:</span> <span class="s2">&quot;https://demo.openatlas.eu/entity/5117&quot;</span><span class="p">,</span>
-      <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Feature&quot;</span><span class="p">,</span>
-      <span class="s2">&quot;crmClass&quot;</span><span class="p">:</span> <span class="s2">&quot;crm:E21 Person&quot;</span><span class="p">,</span>
-      <span class="s2">&quot;systemClass&quot;</span><span class="p">:</span> <span class="s2">&quot;person&quot;</span><span class="p">,</span>
-      <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Albrecht, Herzog von Sachsen&quot;</span>
-      <span class="p">},</span>
-      <span class="s2">&quot;descriptions&quot;</span><span class="p">:</span> <span class="p">[</span>
-        <span class="p">{</span>
-          <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;OGV 96&quot;</span>
-        <span class="p">}</span>
-      <span class="p">],</span>
-      <span class="s2">&quot;when&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;timespans&quot;</span><span class="p">:</span> <span class="p">[</span>
-          <span class="p">{</span>
-            <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="p">{</span>
-              <span class="s2">&quot;earliest&quot;</span><span class="p">:</span> <span class="s2">&quot;1443-07-31T00:00:00&quot;</span><span class="p">,</span>
-              <span class="s2">&quot;latest&quot;</span><span class="p">:</span> <span class="s2">&quot;None&quot;</span>
-            <span class="p">},</span>
-            <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="p">{</span>
-              <span class="s2">&quot;earliest&quot;</span><span class="p">:</span> <span class="s2">&quot;1500-09-12T00:00:00&quot;</span><span class="p">,</span>
-              <span class="s2">&quot;latest&quot;</span><span class="p">:</span> <span class="s2">&quot;None&quot;</span>
-            <span class="p">}</span>
-          <span class="p">}</span>
-        <span class="p">]</span>
-      <span class="p">},</span>
-      <span class="s2">&quot;types&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
-      <span class="s2">&quot;relations&quot;</span><span class="p">:</span> <span class="p">[</span>
-        <span class="p">{</span>
-          <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;de Smedt, Chevaliers&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;relationTo&quot;</span><span class="p">:</span> <span class="s2">&quot;https://demo.openatlas.eu/api/0.3/entity/2525&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;relationType&quot;</span><span class="p">:</span> <span class="s2">&quot;crm:P67i is referred to by&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;relationSystemClass&quot;</span><span class="p">:</span> <span class="s2">&quot;bibliography&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;relationDescription&quot;</span><span class="p">:</span> <span class="s2">&quot;Nr. 96&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
-          <span class="s2">&quot;when&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;timespans&quot;</span><span class="p">:</span> <span class="p">[</span>
-              <span class="p">{</span>
-                <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="p">{</span>
-                  <span class="s2">&quot;earliest&quot;</span><span class="p">:</span> <span class="s2">&quot;None&quot;</span><span class="p">,</span>
-                  <span class="s2">&quot;latest&quot;</span><span class="p">:</span> <span class="s2">&quot;None&quot;</span>
-                <span class="p">},</span>
-                <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="p">{</span>
-                  <span class="s2">&quot;earliest&quot;</span><span class="p">:</span> <span class="s2">&quot;None&quot;</span><span class="p">,</span>
-                  <span class="s2">&quot;latest&quot;</span><span class="p">:</span> <span class="s2">&quot;None&quot;</span>
-                <span class="p">}</span>
-              <span class="p">}</span>
-            <span class="p">]</span>
-          <span class="p">}</span>
-        <span class="p">},</span>
-        <span class="p">{</span>
-          <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Fest des Ordens vom Goldenen Vlies 1478&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;relationTo&quot;</span><span class="p">:</span> <span class="s2">&quot;https://demo.openatlas.eu/api/0.3/entity/5646&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;relationType&quot;</span><span class="p">:</span> <span class="s2">&quot;crm:P11i participated in&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;relationSystemClass&quot;</span><span class="p">:</span> <span class="s2">&quot;activity&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;relationDescription&quot;</span><span class="p">:</span> <span class="s2">&quot;Wahl zum Mitglied&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Recipient&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;when&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;timespans&quot;</span><span class="p">:</span> <span class="p">[</span>
-              <span class="p">{</span>
-                <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="p">{</span>
-                  <span class="s2">&quot;earliest&quot;</span><span class="p">:</span> <span class="s2">&quot;1478-04-29T00:00:00&quot;</span><span class="p">,</span>
-                  <span class="s2">&quot;latest&quot;</span><span class="p">:</span> <span class="s2">&quot;None&quot;</span>
-                <span class="p">},</span>
-                <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="p">{</span>
-                  <span class="s2">&quot;earliest&quot;</span><span class="p">:</span> <span class="s2">&quot;None&quot;</span><span class="p">,</span>
-                  <span class="s2">&quot;latest&quot;</span><span class="p">:</span> <span class="s2">&quot;None&quot;</span>
-                <span class="p">}</span>
-              <span class="p">}</span>
-            <span class="p">]</span>
-          <span class="p">}</span>
-        <span class="p">},</span>
-        <span class="p">{</span>
-          <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Fest des Ordens vom Goldenen Vlies 1481&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;relationTo&quot;</span><span class="p">:</span> <span class="s2">&quot;https://demo.openatlas.eu/api/0.3/entity/5659&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;relationType&quot;</span><span class="p">:</span> <span class="s2">&quot;crm:P11i participated in&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;relationSystemClass&quot;</span><span class="p">:</span> <span class="s2">&quot;activity&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;relationDescription&quot;</span><span class="p">:</span> <span class="s2">&quot;Tag der Wahl&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Recipient&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;when&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;timespans&quot;</span><span class="p">:</span> <span class="p">[</span>
-              <span class="p">{</span>
-                <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="p">{</span>
-                  <span class="s2">&quot;earliest&quot;</span><span class="p">:</span> <span class="s2">&quot;1481-05-01T00:00:00&quot;</span><span class="p">,</span>
-                  <span class="s2">&quot;latest&quot;</span><span class="p">:</span> <span class="s2">&quot;1481-05-20T00:00:00&quot;</span>
-                <span class="p">},</span>
-                <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="p">{</span>
-                  <span class="s2">&quot;earliest&quot;</span><span class="p">:</span> <span class="s2">&quot;None&quot;</span><span class="p">,</span>
-                  <span class="s2">&quot;latest&quot;</span><span class="p">:</span> <span class="s2">&quot;None&quot;</span>
-                <span class="p">}</span>
-              <span class="p">}</span>
-            <span class="p">]</span>
-          <span class="p">}</span>
-        <span class="p">},</span>
-        <span class="p">{</span>
-          <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Fest des Ordens vom Goldenen Vlies 1491&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;relationTo&quot;</span><span class="p">:</span> <span class="s2">&quot;https://demo.openatlas.eu/api/0.3/entity/5570&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;relationType&quot;</span><span class="p">:</span> <span class="s2">&quot;crm:P11i participated in&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;relationSystemClass&quot;</span><span class="p">:</span> <span class="s2">&quot;activity&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;relationDescription&quot;</span><span class="p">:</span> <span class="s2">&quot;Wahl zum neuen Mitglied&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Recipient&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;when&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;timespans&quot;</span><span class="p">:</span> <span class="p">[</span>
-              <span class="p">{</span>
-                <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="p">{</span>
-                  <span class="s2">&quot;earliest&quot;</span><span class="p">:</span> <span class="s2">&quot;1491-05-19T00:00:00&quot;</span><span class="p">,</span>
-                  <span class="s2">&quot;latest&quot;</span><span class="p">:</span> <span class="s2">&quot;None&quot;</span>
-                <span class="p">},</span>
-                <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="p">{</span>
-                  <span class="s2">&quot;earliest&quot;</span><span class="p">:</span> <span class="s2">&quot;1491-05-31T00:00:00&quot;</span><span class="p">,</span>
-                  <span class="s2">&quot;latest&quot;</span><span class="p">:</span> <span class="s2">&quot;None&quot;</span>
-                <span class="p">}</span>
-              <span class="p">}</span>
-            <span class="p">]</span>
-          <span class="p">}</span>
-        <span class="p">},</span>
-        <span class="p">{</span>
-          <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;First appearance of Albrecht, Herzog von Sachsen&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;relationTo&quot;</span><span class="p">:</span> <span class="s2">&quot;https://demo.openatlas.eu/api/0.3/entity/15852&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;relationType&quot;</span><span class="p">:</span> <span class="s2">&quot;crm:P11i participated in&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;relationSystemClass&quot;</span><span class="p">:</span> <span class="s2">&quot;activity&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;relationDescription&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
-          <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
-          <span class="s2">&quot;when&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;timespans&quot;</span><span class="p">:</span> <span class="p">[</span>
-              <span class="p">{</span>
-                <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="p">{</span>
-                  <span class="s2">&quot;earliest&quot;</span><span class="p">:</span> <span class="s2">&quot;None&quot;</span><span class="p">,</span>
-                  <span class="s2">&quot;latest&quot;</span><span class="p">:</span> <span class="s2">&quot;None&quot;</span>
-                <span class="p">},</span>
-                <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="p">{</span>
-                  <span class="s2">&quot;earliest&quot;</span><span class="p">:</span> <span class="s2">&quot;None&quot;</span><span class="p">,</span>
-                  <span class="s2">&quot;latest&quot;</span><span class="p">:</span> <span class="s2">&quot;None&quot;</span>
-                <span class="p">}</span>
-              <span class="p">}</span>
-            <span class="p">]</span>
-          <span class="p">}</span>
-        <span class="p">},</span>
-        <span class="p">{</span>
-          <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Orden vom Goldenen Vlies&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;relationTo&quot;</span><span class="p">:</span> <span class="s2">&quot;https://demo.openatlas.eu/api/0.3/entity/553&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;relationType&quot;</span><span class="p">:</span> <span class="s2">&quot;crm:P107i is current or former member of&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;relationSystemClass&quot;</span><span class="p">:</span> <span class="s2">&quot;group&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;relationDescription&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
-          <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Member&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;when&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;timespans&quot;</span><span class="p">:</span> <span class="p">[</span>
-              <span class="p">{</span>
-                <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="p">{</span>
-                  <span class="s2">&quot;earliest&quot;</span><span class="p">:</span> <span class="s2">&quot;1430-01-10T00:00:00&quot;</span><span class="p">,</span>
-                  <span class="s2">&quot;latest&quot;</span><span class="p">:</span> <span class="s2">&quot;None&quot;</span>
-                <span class="p">},</span>
-                <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="p">{</span>
-                  <span class="s2">&quot;earliest&quot;</span><span class="p">:</span> <span class="s2">&quot;None&quot;</span><span class="p">,</span>
-                  <span class="s2">&quot;latest&quot;</span><span class="p">:</span> <span class="s2">&quot;None&quot;</span>
-                <span class="p">}</span>
-              <span class="p">}</span>
-            <span class="p">]</span>
-          <span class="p">}</span>
-        <span class="p">}</span>
-      <span class="p">],</span>
-      <span class="s2">&quot;names&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
-      <span class="s2">&quot;links&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
-      <span class="s2">&quot;depictions&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
-      <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;GeometryCollection&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;geometries&quot;</span><span class="p">:</span> <span class="p">[]</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">]</span>
-<span class="p">}</span>
+<p>The API can be accessed via the OpenAtlas user interface or through URL GET
+requests.</p>
+<div class="section" id="ui-access">
+<h3>1. UI access<a class="headerlink" href="#ui-access" title="Permalink to this headline">¶</a></h3>
+<p>Each detail view of an entity provide two buttons (JSON and RDF) where the
+formats, in which the entity should be exported, can be selected. If the
+buttons are not visible, please change the <strong>Show API links</strong>
+at the <a class="reference internal" href="../tools/profile.html#display"><span class="std std-ref">Display</span></a> tab in your <a class="reference internal" href="../tools/profile.html"><span class="doc">Profile</span></a>.</p>
+<p>Through the UI, only a single entity can be accessed.</p>
+<div class="figure align-center" id="id3">
+<img alt="../_images/api_ui_json.jpg" src="../_images/api_ui_json.jpg" />
+<p class="caption"><span class="caption-text">Possible JSON API formats</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-center" id="id4">
+<img alt="../_images/api_ui_rdf.jpg" src="../_images/api_ui_rdf.jpg" />
+<p class="caption"><span class="caption-text">Possible RDF API formats</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+</div>
+</div>
+<div class="section" id="url-get-access">
+<h3>2. URL / GET access<a class="headerlink" href="#url-get-access" title="Permalink to this headline">¶</a></h3>
+<p>The most common way to communicate with the OpenAtlas API is through GET
+request, either manually from the local browser or with other applications
+following a specific URL schema:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>{domain}/api/{api version}/{endpoint}?{parameter}&amp;{parameter}
 </pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Example URL</strong></dt><dd><p><a class="reference external" href="https://demo.openatlas.eu/api/0.3/entity/5117">https://demo.openatlas.eu/api/0.3/entity/5117</a></p>
+</dd>
+<dt><strong>Domain</strong></dt><dd><p>Location of the OpenAtlas instance from which information should be
+retrieved; e.g. <a class="reference external" href="https://demo-openatlas.eu/">https://demo-openatlas.eu/</a> for the demo version.</p>
+</dd>
+<dt><strong>API Version</strong></dt><dd><p>Input without version number leads to the current stable version
+(<a class="reference external" href="https://demo.openatlas.eu/api/entity/5117">https://demo.openatlas.eu/api/entity/5117</a>).
+If another version of the API is to be used, the version number can be
+specified (demo.openatlas.eu/api/<strong>0.3</strong>/entity/5117). A version overview
+can be found under point <a class="reference internal" href="#versioning">Versioning</a>.</p>
+</dd>
+<dt><strong>Endpoints</strong></dt><dd><p>Specific data can be queried by attaching an endpoint
+(demo.openatlas.eu/api/0.3/<strong>entity</strong>/5117). The information is provided
+in a human - and machine-readable form. Further information under
+<a class="reference internal" href="#endpoints">Endpoints</a>.</p>
+</dd>
+<dt><strong>Required path values</strong></dt><dd><p>Must be included to create a valid URL. Different endpoints require
+different values (demo.openatlas.eu/api/0.3/entity/<strong>5117</strong>. <strong>5117</strong> is
+an ID as required by the entity endpoint) - all required values are state
+in <strong>{</strong> <strong>}</strong> at the <a class="reference internal" href="#endpoints">Endpoints</a> definition.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><p>Used to structure additional information for a given URL. They are added
+to the end of an URL after the “?” symbol
+(demo.openatlas.eu/api/0.3/entity/5117**?**download=true). All available
+Parameters can be found under <a class="reference internal" href="#parameters">Parameters</a>. For more general information
+see this
+<a class="reference external" href="https://www.botify.com/learn/basics/what-are-url-parameters#:~:text=URL%20parameters%20(also%20known%20as,by%20the%20'%26'%20symbol.">article</a>.</p>
+</dd>
+</dl>
 </div>
 </div>
 <div class="section" id="versioning">
 <h2>Versioning<a class="headerlink" href="#versioning" title="Permalink to this headline">¶</a></h2>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>stable</p></th>
+<th class="head"><p>unstable</p></th>
+<th class="head"><p>deprecated</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="api_version_03.html#version-0-3"><span class="std std-ref">0.3</span></a></p></td>
+<td><p><a class="reference internal" href="api_version_01.html#version-0-1"><span class="std std-ref">0.1</span></a>, <a class="reference internal" href="api_version_02.html#version-0-2"><span class="std std-ref">0.2</span></a></p></td>
+<td><p><a class="reference internal" href="api_version_1.html#version-1-0"><span class="std std-ref">1.0</span></a></p></td>
+</tr>
+</tbody>
+</table>
 <p>The OpenAtlas API follows the notion of
 <a class="reference external" href="https://en.wikipedia.org/wiki/Software_versioning#Sequence-based_identifiers">sequenced based versioning</a>
 and reflects the significance: <strong>major.minor.fix</strong> e.g. <strong>3.11.1</strong>. Only the
@@ -419,269 +294,41 @@ warning will be posted in the
 these versions will be discontinued. <strong>Unstable</strong> versions are currently
 developed, so breaking changes may occur at any time without prior notice.</p>
 </div>
-<div class="section" id="endpoint-definition">
-<h2>Endpoint definition<a class="headerlink" href="#endpoint-definition" title="Permalink to this headline">¶</a></h2>
-<p>Two different methods are provided to access the OpenAtlas API:</p>
-<ul class="simple">
-<li><p>Access via an OpenAtlas instance’s user interface</p></li>
-<li><p>Access via another application if settings allow for it</p></li>
-</ul>
-<p>Endpoints provide information about one or more entities in the OpenAtlas
-instance. The requested information is provided in Linked Places format
-(<a class="reference external" href="https://github.com/LinkedPasts/linked-places-format">LPF</a>). Alternatively,
-GeoJSON or RDFs, derived from the LPF data, can be accessed.</p>
+<div class="section" id="endpoints">
+<h2>Endpoints<a class="headerlink" href="#endpoints" title="Permalink to this headline">¶</a></h2>
+<p>Through different endpoints, data can be retrieved from OpenAtlas. Each version
+has a own set of endpoints, be sure to use the right one.</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="api_version0_3.html">Version 0.3 (current)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api_version0_2.html">Version 0.2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api_version0_1.html">Version 0.1</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api_version1_0.html">Version 1.0 (in development)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_version_03.html">Version 0.3 (stable, current)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_version_02.html">Version 0.2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_version_01.html">Version 0.1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_version_1.html">Version 1.0 (whitepaper)</a></li>
 </ul>
 </div>
+<p>The requested information is provided in Linked Places format
+<a class="reference external" href="https://github.com/LinkedPasts/linked-places-format">Linked Places format (LPF)</a>. Alternatively,
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc7946">GeoJSON</a>, <a class="reference external" href="https://linked.art/">Linked Open Usable Data</a>
+or RDFs, derived from the <a class="reference external" href="https://github.com/LinkedPasts/linked-places-format">LPF</a> data, can be accessed.</p>
 </div>
-<div class="section" id="parameter-definition">
-<h2>Parameter definition<a class="headerlink" href="#parameter-definition" title="Permalink to this headline">¶</a></h2>
-<table class="colwidths-given docutils align-default">
-<colgroup>
-<col style="width: 20%" />
-<col style="width: 15%" />
-<col style="width: 45%" />
-<col style="width: 20%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Parameter</p></th>
-<th class="head"><p>Format</p></th>
-<th class="head"><p>Description</p></th>
-<th class="head"><p>Values</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>cidoc_class/cidoc_classes/cidoc-class/cidoc-classes</p></td>
-<td><p>string</p></td>
-<td><p>CIDOC CRM class code (e.g. E21)</p></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><p>column</p></td>
-<td><p>string</p></td>
-<td><p>Results will be sorted by the given column</p></td>
-<td><ul class="simple">
-<li><p>ID</p></li>
-<li><p>classCode</p></li>
-<li><p>name</p></li>
-<li><p>description</p></li>
-<li><p>created</p></li>
-<li><p>modified</p></li>
-<li><p>systemClass</p></li>
-<li><p>beginFrom</p></li>
-<li><p>beginTo</p></li>
-<li><p>endFrom</p></li>
-<li><p>endTo</p></li>
+<div class="section" id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<p>With parameters the result of the requested endpoint can be manipulated
+(filtered, searched, sorted, etc.). Each endpoint provide another set of
+parameters which can be used. So please consult the <a class="reference internal" href="#endpoints">Endpoints</a> listing for
+more details.</p>
+<p>Parameters are added to the end of an URL after the “<strong>?</strong>” symbol
+(e.g. demo.openatlas.eu/api/0.3/entity/5117**?download=true**) and are
+connected with the “<strong>&amp;</strong>” sign.
+For more general information on this topic see this
+<a class="reference external" href="https://www.botify.com/learn/basics/what-are-url-parameters#:~:text=URL%20parameters%20(also%20known%20as,by%20the%20'%26'%20symbol.">article</a>.</p>
+<p>At the moment only the <a class="reference internal" href="api_version_03.html#version-0-3"><span class="std std-ref">stable version 0.3</span></a> of the API can
+be provided by an detailed parameter list.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api_parameters_03.html">API parameters 0.3</a></li>
 </ul>
-</td>
-</tr>
-<tr class="row-even"><td><p>count</p></td>
-<td><p>boolean</p></td>
-<td><p>Returns the total count of results as integer</p></td>
-<td><p>True/False</p></td>
-</tr>
-<tr class="row-odd"><td><p>download</p></td>
-<td><p>boolean</p></td>
-<td><p>Triggers file download of the requested data in a file</p></td>
-<td><p>True/False</p></td>
-</tr>
-<tr class="row-even"><td><p>entities</p></td>
-<td><p>integer</p></td>
-<td><p>Specific entity ID</p></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><p>export</p></td>
-<td><p>string</p></td>
-<td><p>Results will be downloaded in the given format</p></td>
-<td><ul class="simple">
-<li><p>csv</p></li>
-<li><p>csvNetwork</p></li>
-</ul>
-</td>
-</tr>
-<tr class="row-even"><td><p>first</p></td>
-<td><p>integer</p></td>
-<td><p>List of results starting with given ID</p></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><p>format</p></td>
-<td><p>string</p></td>
-<td><p>Select a preferred output format</p></td>
-<td><ul class="simple">
-<li><p>lp</p></li>
-<li><p>geojson</p></li>
-<li><p>geojson-v2</p></li>
-<li><p>pretty-xml</p></li>
-<li><p>n3</p></li>
-<li><p>turtle</p></li>
-<li><p>nt</p></li>
-<li><p>xml (subunits endpoint can only handle xml)</p></li>
-</ul>
-</td>
-</tr>
-<tr class="row-even"><td><p>geometry</p></td>
-<td><p>string</p></td>
-<td><p>Select a preferred geometry</p></td>
-<td><ul class="simple">
-<li><p>gisAll</p></li>
-<li><p>gisPointAll</p></li>
-<li><p>gisPointSupers</p></li>
-<li><p>gisPointSubs</p></li>
-<li><p>gisPointSibling</p></li>
-<li><p>gisLineAll</p></li>
-<li><p>gisPolygonAll</p></li>
-</ul>
-</td>
-</tr>
-<tr class="row-odd"><td><p>id</p></td>
-<td><p>integer</p></td>
-<td><p>Specific entity ID in OpenAtlas instance</p></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><p>image-size/image_size</p></td>
-<td><p>string</p></td>
-<td><p>Select the size category for the displayed image (can be modified in production.py)</p></td>
-<td><ul class="simple">
-<li><p>thumbnail</p></li>
-<li><p>table</p></li>
-</ul>
-</td>
-</tr>
-<tr class="row-odd"><td><p>lang</p></td>
-<td><p>string</p></td>
-<td><p>Select an output language</p></td>
-<td><ul class="simple">
-<li><p>en</p></li>
-<li><p>de</p></li>
-</ul>
-</td>
-</tr>
-<tr class="row-even"><td><p>last</p></td>
-<td><p>integer</p></td>
-<td><p>JSON list of results start with entity after given ID</p></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><p>latest</p></td>
-<td><p>integer</p></td>
-<td><p>Number of last database entries to be returned; only numbers between 1 and 100 are valid</p></td>
-<td><p>1 - 100</p></td>
-</tr>
-<tr class="row-even"><td><p>limit</p></td>
-<td><p>integer</p></td>
-<td><p>Number of entities returned per page</p></td>
-<td><ul class="simple">
-<li><p>0 corresponds to “no limit set”</p></li>
-<li><p>Default is set to 20 entities</p></li>
-</ul>
-</td>
-</tr>
-<tr class="row-odd"><td><p>none</p></td>
-<td></td>
-<td><p>No parameters are required</p></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><p>page</p></td>
-<td><p>integer</p></td>
-<td><p>Jump to chosen page</p></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><p>relation_type/relation-type</p></td>
-<td><p>string</p></td>
-<td><p>Select which relations are shown</p></td>
-<td><p>E.g. P53</p></td>
-</tr>
-<tr class="row-even"><td><p>search</p></td>
-<td><p>string</p></td>
-<td><p>Search request with AND/OR logic</p></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><p>show</p></td>
-<td><p>string</p></td>
-<td><p>Select a key to be shown. If using “not”, no other keys will be displayed.</p></td>
-<td><ul class="simple">
-<li><p>description</p></li>
-<li><p>depictions</p></li>
-<li><p>geometry</p></li>
-<li><p>links</p></li>
-<li><p>names</p></li>
-<li><p>none</p></li>
-<li><p>relations</p></li>
-<li><p>types</p></li>
-<li><p>when</p></li>
-</ul>
-</td>
-</tr>
-<tr class="row-even"><td><p>sort</p></td>
-<td><p>string</p></td>
-<td><p>Results will be sorted asc/desc (default column is name)</p></td>
-<td><ul class="simple">
-<li><p>asc</p></li>
-<li><p>desc</p></li>
-</ul>
-</td>
-</tr>
-<tr class="row-odd"><td><p>system_class/system_classes/system-class/system-classes</p></td>
-<td><p>string</p></td>
-<td><p>Needs to be one of the OpenAtlas system classes</p></td>
-<td><ul class="simple">
-<li><p>all</p></li>
-<li><p>administrative_unit</p></li>
-<li><p>type</p></li>
-<li><p>acquisition</p></li>
-<li><p>activity</p></li>
-<li><p>actor_actor_relation</p></li>
-<li><p>actor_function</p></li>
-<li><p>appellation</p></li>
-<li><p>artifact</p></li>
-<li><p>bibliography</p></li>
-<li><p>edition</p></li>
-<li><p>external_reference</p></li>
-<li><p>feature</p></li>
-<li><p>file</p></li>
-<li><p>group</p></li>
-<li><p>human_remains</p></li>
-<li><p>involvement</p></li>
-<li><p>move</p></li>
-<li><p>object_location</p></li>
-<li><p>person</p></li>
-<li><p>place</p></li>
-<li><p>production</p></li>
-<li><p>reference_system</p></li>
-<li><p>source</p></li>
-<li><p>source_translation</p></li>
-<li><p>stratigraphic_unit</p></li>
-</ul>
-</td>
-</tr>
-<tr class="row-even"><td><p>type_id/type-id</p></td>
-<td><p>integer</p></td>
-<td><p>Output will be filtered by chosen type ID and only entities with this type ID will be displayed; the relation is in logical OR</p></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><p>view_class/view_classes/view-class/view-classes</p></td>
-<td><p>string</p></td>
-<td><p>Needs to be one of the OpenAtlas menu items</p></td>
-<td><ul class="simple">
-<li><p>actor</p></li>
-<li><p>all</p></li>
-<li><p>artifact</p></li>
-<li><p>event</p></li>
-<li><p>file</p></li>
-<li><p>object</p></li>
-<li><p>place</p></li>
-<li><p>reference</p></li>
-<li><p>source</p></li>
-<li><p>source_translation</p></li>
-<li><p>type</p></li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
+</div>
 </div>
 <div class="section" id="error-handling">
 <h2>Error handling<a class="headerlink" href="#error-handling" title="Permalink to this headline">¶</a></h2>
@@ -718,7 +365,7 @@ An error message is provided by its own error handler
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="api_version0_3.html" class="btn btn-neutral float-right" title="Version 0.3" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="api_version_03.html" class="btn btn-neutral float-right" title="Version 0.3" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
         <a href="../model/link_checker.html" class="btn btn-neutral float-left" title="Link checker" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
