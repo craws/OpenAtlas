@@ -12,8 +12,61 @@ from openatlas.models.type import Type
 def import_vocabs_data(
         id_: str,
         form_data: dict[str, Any],
-        details: dict[str, Any]) -> tuple[list[Any], list[Any]]:
-    return fetch_top_level(id_, details, form_data)
+        details: dict[str, Any],
+        category) -> tuple[list[Any], list[Any]]:
+    return fetch_top_level(id_, details, form_data) \
+        if category == 'hierarchy' else (
+        fetch_top_groups(id_, details, form_data))
+
+
+def fetch_top_groups(
+        id_: str,
+        details: dict[str, Any],
+        form_data: dict[str, Any]) -> tuple[list[Any], list[Any]]:
+    count = []
+    duplicates = []
+    if ref := get_vocabs_reference_system(details):
+        for group in form_data['choices']:
+            if (not Type.check_hierarchy_exists(group[1]) and
+                    group[0] in form_data['top_concepts']):
+                hierarchy = Entity.insert(
+                    'type',
+                    group[1],
+                    f'Automatically imported from {details["title"]}')
+                Type.insert_hierarchy(
+                    hierarchy,
+                    'custom', form_data['classes'],
+                    form_data['multiple'])
+                import_member(
+                    group[0],
+                    id_,
+                    form_data['language'],
+                    ref,
+                    hierarchy)
+                count.append(group[0])
+            if Type.check_hierarchy_exists(group[1]):
+                duplicates.append(group[0])
+    return count, duplicates
+
+
+def import_member(
+        uri: str,
+        id_: str,
+        lang: str,
+        ref: ReferenceSystem,
+        super_: Optional[Entity], ) -> bool:
+    exact_match_id = get_exact_match().id
+    req = vocabs_requests(id_, 'groupMembers', {'uri': uri, 'lang': lang})
+    child = None
+    for member in req['members']:
+        name = member['uri'].rsplit('/', 1)[-1]
+        if super_:
+            child = Entity.insert('type', member['prefLabel'])
+            child.link('P127', super_)
+            ref.link('P67', child, name, type_id=exact_match_id)
+        if member['hasMembers']:
+            import_member(member['uri'], id_, lang, ref, child)
+    return True
 
 
 def fetch_top_level(
@@ -126,3 +179,15 @@ def fetch_top_concept_details(id_: str) -> list[Any]:
     req = vocabs_requests(id_, 'topConcepts', parameter={'lang': 'en'})
     return [
         (concept['uri'], concept['label']) for concept in req['topconcepts']]
+
+
+def fetch_top_group_details(id_: str) -> list[Any]:
+    req = vocabs_requests(id_, 'groups', parameter={'lang': 'en'})
+    all_groups = []
+    child_groups = []
+
+    for group in req['groups']:
+        all_groups.append((group['uri'], group['prefLabel']))
+        if 'childGroups' in group:
+            child_groups.extend(group['childGroups'])
+    return [group for group in all_groups if group[0] not in child_groups]

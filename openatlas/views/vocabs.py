@@ -11,7 +11,7 @@ from wtforms.validators import InputRequired
 from openatlas import app
 from openatlas.api.import_scripts.vocabs import (
     fetch_top_concept_details, fetch_vocabulary_details, get_vocabularies,
-    import_vocabs_data)
+    import_vocabs_data, fetch_top_group_details)
 from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
@@ -76,7 +76,13 @@ def vocabs_update() -> Union[str, Response]:
 @required_group('manager')
 def show_vocabularies() -> str:
     table = Table(
-        header=[_('name'), 'ID', _('default language'), _('languages')])
+        header=[
+            _('name'),
+            'ID',
+            _('default language'),
+            _('languages'),
+            _('import'),
+            _('import')])
     for entry in get_vocabularies():
         table.rows.append([
             link(entry['title'], entry['conceptUri'], external=True),
@@ -84,7 +90,17 @@ def show_vocabularies() -> str:
             entry['defaultLanguage'],
             ' '.join(entry['languages']),
             vocabulary_detail(
-                url_for('vocabulary_import_view', id_=entry['id']))])
+                'hierarchy',
+                url_for(
+                    'vocabulary_import_view',
+                    category="hierarchy",
+                    id_=entry['id'])),
+            vocabulary_detail(
+                'groups',
+                url_for(
+                    'vocabulary_import_view',
+                    category="groups",
+                    id_=entry['id']))])
     tabs = {'vocabularies': Tab(
         _('vocabularies'), table=table, buttons=[manual('admin/vocabs')])}
     return render_template(
@@ -98,20 +114,21 @@ def show_vocabularies() -> str:
             _('vocabularies')])
 
 
-def vocabulary_detail(url: str) -> Optional[str]:
-    return link(_('import'), url) if is_authorized('manager') else None
+def vocabulary_detail(category: str, url: str) -> Optional[str]:
+    return link(_(category), url) if is_authorized('manager') else None
 
 
-@app.route('/vocabs/import/<id_>', methods=['GET', 'POST'])
+@app.route('/vocabs/import/<category>/<id_>', methods=['GET', 'POST'])
 @required_group('manager')
-def vocabulary_import_view(id_: str) -> Union[str, Response]:
+def vocabulary_import_view(category: str, id_: str) -> Union[str, Response]:
     details = fetch_vocabulary_details(id_)
 
     class ImportVocabsHierarchyForm(FlaskForm):
         concepts = SelectMultipleField(
-            _('top concepts'),
+            _('top concepts') if category == 'hierarchy' else _('groups'),
             render_kw={'disabled': True},
-            choices=fetch_top_concept_details(id_),
+            choices=fetch_top_concept_details(id_) if category == 'hierarchy'
+            else fetch_top_group_details(id_),
             option_widget=widgets.CheckboxInput(),
             widget=widgets.ListWidget(prefix_label=False))
         classes = SelectMultipleField(
@@ -138,12 +155,14 @@ def vocabulary_import_view(id_: str) -> Union[str, Response]:
 
     if form.validate_on_submit() and form.confirm_import.data:
         form_data = {
+            'choices': form.concepts.choices,
             'top_concepts': form.concepts.data,
             'classes': form.classes.data,
             'multiple': form.multiple.data,
             'language': form.language.data}
+
         try:
-            results = import_vocabs_data(id_, form_data, details)
+            results = import_vocabs_data(id_, form_data, details, category)
             count = len(results[0])
             Transaction.commit()
             g.logger.log('info', 'import', f'import: {count} top concepts')
