@@ -30,7 +30,10 @@ _________________
 Here all available vocabularies of the given service URL are displayed as table. The name is
 linked to the vocabulary at the provided service.
 
-To import a vocabulary, click *import*
+You can choose to import the *hierarchy* or the *collection* of a vocabulary. For the difference please confer
+https://www.w3.org/TR/skos-primer/.
+
+To import a vocabulary, click either on **hierarchy** or **groups**.
 
 Import
 ______
