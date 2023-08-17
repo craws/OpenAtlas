@@ -105,6 +105,7 @@ def get_lp_types(entity: Entity, links: list[Link]) -> list[dict[str, Any]]:
         type_dict = {
             'identifier': url_for(
                 'api_03.entity', id_=type_.id, _external=True),
+            'descriptions': type_.description,
             'label': type_.name,
             'hierarchy': ' > '.join(map(
                 str, [g.types[root].name for root in type_.root]))}
