@@ -13,10 +13,11 @@ from openatlas.display.util import get_file_path
 
 
 def get_linked_places_entity(
-        entity: Entity,
-        links: list[Link],
-        links_inverse: list[Link],
+        entity_dict: dict[str, Any],
         parser: dict[str, Any]) -> dict[str, Any]:
+    entity = entity_dict['entity']
+    links = entity_dict['links']
+    links_inverse = entity_dict['links_inverse']
     return {
         'type': 'FeatureCollection',
         '@context': app.config['API_SCHEMA'],

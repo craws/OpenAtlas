@@ -91,16 +91,12 @@ def get_entity_formatted(
     if parser['format'] == 'geojson-v2':
         return get_geojson_v2([entity], parser)
     entity_dict = {
-            'entity': entity,
-            'links': get_all_links_of_entities(entity.id),
-            'links_inverse': get_all_links_of_entities_inverse(entity.id)}
+        'entity': entity,
+        'links': get_all_links_of_entities(entity.id),
+        'links_inverse': get_all_links_of_entities_inverse(entity.id)}
     if parser['format'] == 'loud':
         return get_loud_entities(entity_dict, parse_loud_context())
-    return get_linked_places_entity(
-        entity,
-        get_all_links_of_entities(entity.id),
-        get_all_links_of_entities_inverse(entity.id),
-        parser)
+    return get_linked_places_entity(entity_dict, parser)
 
 
 def resolve_entity(
@@ -192,15 +188,8 @@ def get_entities_formatted(
     if parser['format'] == 'loud':
         return [get_loud_entities(item, parse_loud_context())
                 for item in entities_dict.values()]
-    result = []
-    for item in entities_dict.values():
-        result.append(
-            get_linked_places_entity(
-                item['entity'],
-                item['links'],
-                item['links_inverse'],
-                parser))
-    return result
+    return [get_linked_places_entity(item, parser)
+            for item in entities_dict.values()]
 
 
 def parse_loud_context() -> dict[str, str]:
