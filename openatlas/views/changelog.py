@@ -18,8 +18,12 @@ versions = {
     '7.16.0': ['TBA', {
         'feature': {
             '2022': 'Additional database export option (dump)',
+            '2048': 'Import Vocabs collection',
             '1981': 'Manual: API',
-            '2037': 'Manual: Vocabs import'}}],
+            '2037': 'Manual: Vocabs import'},
+        'fix': {
+            '2049': 'Link from Source to Artifact broken'
+        }}],
     '7.15.0': ['2023-07-22', {
         'feature': {
             '1991': 'Import controlled vocabularies via API',
