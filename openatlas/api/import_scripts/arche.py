@@ -22,10 +22,11 @@ def fetch_arche_data() -> dict[int, Any]:
     for id_ in app.config['ARCHE']['collection_ids']:
         req = requests.get(
             f"{app.config['ARCHE']['base_url']}/api/{id_}/metadata",
-            headers={'Accept': 'application/n-triples'}, timeout=60)
+            headers={'Accept': 'application/ld+json'}, timeout=60)
         try:
             if req:  # pragma: no cover
-                collections[id_] = get_metadata(n_triples_to_json(req))
+                collections[id_] = get_metadata(req.json())
+                # collections[id_] = get_metadata_(n_triples_to_json(req))
         except HTTPError as http_error:  # pragma: no cover
             flash(f'ARCHE fetch failed: {http_error}', 'error')
             abort(404)
@@ -33,11 +34,36 @@ def fetch_arche_data() -> dict[int, Any]:
 
 
 def get_metadata(data: dict[str, Any]) -> dict[str, Any]:
+    existing_ids = get_existing_ids()  # will not work, change method
+    metadata = {}
+    for collection in data['@graph']:
+        if collection['@type'] == "n1:Collection":
+            if collection["n1:hasFilename"] == "2_JPEGs":
+                continue
+            id_ = collection['@id'].replace('n0:', '')
+            if id_ in existing_ids:
+                continue
+
+            collection_url = (data['@context']['n0'] + id_)
+            metadata[collection_url] = {
+                'collection_id': id_,
+                'filename': collection['n1:hasFilename']}
+    print(metadata)
+    return metadata
+
+
+def get_existing_ids():
+    system = get_arche_reference_system()
+    return [int(link_.description) for link_ in system.get_links('P67')]
+
+
+def get_metadata_(data: dict[str, Any]) -> dict[str, Any]:
     system = get_arche_reference_system()
     existing_ids = \
         [int(link_.description) for link_ in system.get_links('P67')]
     metadata = {}
     for uri, node in data.items():
+        print(node)
         for value in node.values():
             if '_metadata.json' in str(value[0]):
                 json_ = requests.get(uri, timeout=60).json()
@@ -110,10 +136,10 @@ def import_arche_data() -> int:
                     item['license']))
             filename = f"{file.id}.{name.rsplit('.', 1)[1].lower()}"
             open(str(
-                app.config['UPLOAD_DIR'] / filename), "wb", encoding='utf-8')\
+                app.config['UPLOAD_DIR'] / filename), "wb", encoding='utf-8') \
                 .write(requests.get(
-                    item['image_link_thumbnail'],
-                    timeout=60).content)
+                item['image_link_thumbnail'],
+                timeout=60).content)
             file.link('P67', artifact)
 
             creator = get_or_create_person(
@@ -184,7 +210,7 @@ def get_arche_reference_system() -> ReferenceSystem:
 
 
 # Script from
-# https://acdh-oeaw.github.io/arche-docs/aux/rdf_compacting_and_framing.html
+# https://acdh-oeaw.github.io/arche-docs/aux/rdf_compacting.html
 def n_triples_to_json(req: Response) -> dict[str, Any]:
     context = get_arche_context()
     data = rdflib.Graph()

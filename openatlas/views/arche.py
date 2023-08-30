@@ -34,25 +34,14 @@ def arche_index() -> str:
 @app.route('/arche/fetch')
 @required_group('manager')
 def arche_fetch() -> str:  # pragma: no cover
-    data = fetch_arche_data()
     table = Table(
         header=[
-            'ID', _('name'), _('image link'), _('image thumbnail link'),
-            _('creator'), _('latitude'), _('longitude'), _('description'),
-            _('license'), _('date')])
-    for entries in data.values():
+            'ID', _('name')])
+    for entries in fetch_arche_data().values():
         for metadata in entries.values():
             table.rows.append([
-                metadata['image_id'],
-                metadata['name'],
-                metadata['image_link'],
-                metadata['image_link_thumbnail'],
-                metadata['creator'],
-                metadata['latitude'],
-                metadata['longitude'],
-                metadata['description'],
-                metadata['license'],
-                metadata['date']])
+                metadata['collection_id'],
+                metadata['filename']])
     tabs = {
         'fetched_entities': Tab(
             'fetched_entities',
