@@ -45,3 +45,11 @@ def vocabs_requests(
         timeout=60,
         auth=(g.settings['vocabs_user'], app.config['VOCABS_PASS']))
     return req.json()
+
+
+def request_arche_metadata(id_: int) -> dict[str, Any]:
+    req = requests.get(
+        f"{app.config['ARCHE']['base_url']}/api/{id_}/metadata",
+        headers={'Accept': 'application/ld+json'},
+        timeout=60)
+    return req.json()

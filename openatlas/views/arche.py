@@ -5,7 +5,7 @@ from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.api.import_scripts.arche import (
-    fetch_arche_data, import_arche_data)
+    fetch_collection_data, import_arche_data)
 from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
@@ -34,14 +34,10 @@ def arche_index() -> str:
 @app.route('/arche/fetch')
 @required_group('manager')
 def arche_fetch() -> str:  # pragma: no cover
-    table = Table(
-        header=[
-            'ID', _('name')])
-    for entries in fetch_arche_data().values():
-        for metadata in entries.values():
-            table.rows.append([
-                metadata['collection_id'],
-                metadata['filename']])
+    table = Table(header=['ID', _('name')])
+    for entries in fetch_collection_data().values():
+        table.rows.append([entries['collection_id'], entries['filename']])
+
     tabs = {
         'fetched_entities': Tab(
             'fetched_entities',

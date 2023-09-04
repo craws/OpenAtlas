@@ -6,6 +6,7 @@ from flask import flash, g
 from requests import HTTPError, Response
 from werkzeug.exceptions import abort
 
+from api.import_scripts.util import request_arche_metadata
 from openatlas import app
 from openatlas.api.import_scripts.util import (
     get_exact_match, get_or_create_type, get_reference_system)
@@ -17,20 +18,29 @@ from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 
 
-def fetch_arche_data() -> dict[int, Any]:
-    collections = {}
-    for id_ in app.config['ARCHE']['collection_ids']:
-        req = requests.get(
-            f"{app.config['ARCHE']['base_url']}/api/{id_}/metadata",
-            headers={'Accept': 'application/ld+json'}, timeout=60)
-        try:
-            if req:  # pragma: no cover
-                collections[id_] = get_metadata(req.json())
-                # collections[id_] = get_metadata_(n_triples_to_json(req))
-        except HTTPError as http_error:  # pragma: no cover
-            flash(f'ARCHE fetch failed: {http_error}', 'error')
-            abort(404)
-    return collections
+def fetch_collection_data() -> dict[str, Any]:
+    collections = get_collections()
+    collection_jpgs = request_arche_metadata(collections['2_JPEGs'])
+    files = {}
+    try:
+        if collection_jpgs:  # pragma: no cover
+            print(collection_jpgs)
+            files = get_metadata(collection_jpgs)
+            # collections[id_] = get_metadata_(n_triples_to_json(req))
+    except HTTPError as http_error:  # pragma: no cover
+        flash(f'ARCHE fetch failed: {http_error}', 'error')
+        abort(404)
+    return files
+
+
+def get_collections() -> dict[str, Any]:
+    project_id=app.config['ARCHE']['id']
+    collections_dict = {}
+    for collection in request_arche_metadata(project_id)['@graph']:
+        if collection['@type'] == 'n1:Collection':
+            title = collection['n1:hasTitle']['@value']
+            collections_dict[title] = collection['@id'].replace('n0:', '')
+    return collections_dict
 
 
 def get_metadata(data: dict[str, Any]) -> dict[str, Any]:
@@ -43,16 +53,14 @@ def get_metadata(data: dict[str, Any]) -> dict[str, Any]:
             id_ = collection['@id'].replace('n0:', '')
             if id_ in existing_ids:
                 continue
-
             collection_url = (data['@context']['n0'] + id_)
             metadata[collection_url] = {
                 'collection_id': id_,
                 'filename': collection['n1:hasFilename']}
-    print(metadata)
     return metadata
 
 
-def get_existing_ids():
+def get_existing_ids() -> list[int]:
     system = get_arche_reference_system()
     return [int(link_.description) for link_ in system.get_links('P67')]
 
@@ -93,7 +101,7 @@ def import_arche_data() -> int:
     person_types = get_or_create_person_types()
     arche_ref = get_reference_system('ARCHE')
     exact_match_id = get_exact_match().id
-    for entries in fetch_arche_data().values():
+    for entries in fetch_collection_data().values():
         for item in entries.values():
             name = item['name']
 
