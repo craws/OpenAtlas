@@ -1,19 +1,15 @@
 from typing import Any
 
-import rdflib
 import requests
-from flask import flash, g
-from requests import HTTPError, Response
+from flask import g
 from werkzeug.exceptions import abort
 
 from api.import_scripts.util import request_arche_metadata
 from openatlas import app
 from openatlas.api.import_scripts.util import (
     get_exact_match, get_or_create_type, get_reference_system)
-from openatlas.database.gis import Gis as Db_gis
 from openatlas.database.reference_system import ReferenceSystem as Db
 from openatlas.models.entity import Entity
-from openatlas.models.imports import is_float
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 
@@ -21,20 +17,11 @@ from openatlas.models.type import Type
 def fetch_collection_data() -> dict[str, Any]:
     collections = get_collections()
     collection_jpgs = request_arche_metadata(collections['2_JPEGs'])
-    files = {}
-    try:
-        if collection_jpgs:  # pragma: no cover
-            print(collection_jpgs)
-            files = get_metadata(collection_jpgs)
-            # collections[id_] = get_metadata_(n_triples_to_json(req))
-    except HTTPError as http_error:  # pragma: no cover
-        flash(f'ARCHE fetch failed: {http_error}', 'error')
-        abort(404)
-    return files
+    return get_metadata(collection_jpgs)
 
 
 def get_collections() -> dict[str, Any]:
-    project_id=app.config['ARCHE']['id']
+    project_id = app.config['ARCHE']['id']
     collections_dict = {}
     for collection in request_arche_metadata(project_id)['@graph']:
         if collection['@type'] == 'n1:Collection':
@@ -65,35 +52,39 @@ def get_existing_ids() -> list[int]:
     return [int(link_.description) for link_ in system.get_links('P67')]
 
 
-def get_metadata_(data: dict[str, Any]) -> dict[str, Any]:
-    system = get_arche_reference_system()
-    existing_ids = \
-        [int(link_.description) for link_ in system.get_links('P67')]
-    metadata = {}
-    for uri, node in data.items():
-        print(node)
-        for value in node.values():
-            if '_metadata.json' in str(value[0]):
-                json_ = requests.get(uri, timeout=60).json()
-                image_url = get_linked_image(node['isMetadataFor'])
-                image_id = int(image_url.rsplit('/', 1)[1])
-                if image_id in existing_ids:
-                    continue
-                metadata[uri.rsplit('/', 1)[1]] = {
-                    'image_id': image_id,
-                    'image_link': image_url,
-                    'image_link_thumbnail':
-                        app.config['ARCHE']['thumbnail_url'] +
-                        f"{image_url.replace('https://', '')}?width=1200",
-                    'creator': json_['EXIF:Artist'],
-                    'latitude': json_['EXIF:GPSLatitude'],
-                    'longitude': json_['EXIF:GPSLongitude'],
-                    'description': json_['XMP:Description']
-                    if 'XMP:Description' in json_ else '',
-                    'name': json_['IPTC:ObjectName'],
-                    'license': json_['EXIF:Copyright'],
-                    'date': json_['EXIF:CreateDate']}
-    return metadata
+def fetch_exif(id_: str) -> dict[str, Any]:
+    req = requests.get(
+        'https://arche-exif.acdh.oeaw.ac.at/',
+        params={'id': id_})
+    return req.json()
+
+
+def get_single_image_of_collection(id_: int) -> str:
+    file_collection = request_arche_metadata(id_)
+    return_id = 'string'
+    for resource in file_collection['@graph']:
+        if resource['@type'] == 'n1:Resource':
+            return_id = file_collection['@context']['n0'] + resource[
+                '@id'].replace('n0:', '')
+            break
+    return return_id
+
+
+def get_orthophoto(filename: str) -> str:
+    collections = get_collections()
+    collection_ortho = request_arche_metadata(collections['4_Orthophotos'])
+    id_ = ''
+    for entry in collection_ortho['@graph']:
+        if entry['@type'] == 'n1:Collection' and \
+                entry['n1:hasTitle']['@value'] == filename:
+            folder = request_arche_metadata(entry['@id'].replace('n0:', ''))
+            for item in folder['@graph']:
+                if item['@type'] == 'n1:Resource':
+                    if item['n1:hasFormat'] == 'image/png':
+                        id_ = collection_ortho['@context']['n0'] \
+                              + item['@id'].replace('n0:', '')
+                        break
+    return id_
 
 
 def import_arche_data() -> int:
@@ -101,68 +92,70 @@ def import_arche_data() -> int:
     person_types = get_or_create_person_types()
     arche_ref = get_reference_system('ARCHE')
     exact_match_id = get_exact_match().id
-    for entries in fetch_collection_data().values():
-        for item in entries.values():
-            name = item['name']
+    for id_, entries in fetch_collection_data().items():
+        exif = get_exif(entries)
+        name = entries['filename']
+        artifact = Entity.insert('artifact', name)
 
-            artifact = Entity.insert(
-                'artifact',
-                name.rsplit('.', 1)[0],
-                item['description'])
+        arche_ref.link(
+            'P67',
+            artifact,
+            entries['collection_id'],
+            type_id=exact_match_id)
 
-            arche_ref.link(
-                'P67',
-                artifact,
-                item['image_id'],
-                type_id=exact_match_id)
+        location = Entity.insert('object_location', f"Location of {name}")
+        artifact.link('P53', location)
+        # if is_float(item['longitude']) and is_float(item['latitude']):
+        #     Db_gis.insert(
+        #         shape='Point',
+        #         data={
+        #             'entity_id': location.id,
+        #             'name': name,
+        #             'description': '',
+        #             'type': 'centerpoint',
+        #             'geojson':
+        #                 f'{{"type":"Point", "coordinates": '
+        #                 f'[{item["longitude"]},'
+        #                 f'{item["latitude"]}]}}'})
+        #
+        # production = Entity.insert(
+        #     'production',
+        #     f'Production of graffito from {name}')
+        # production.link('P108', artifact)
+        #
+        file = Entity.insert('file', name, f"Created by {exif['Creator']}")
+        file.link(
+            'P2',
+            get_or_create_type(
+                get_hierarchy_by_name('License'),
+                exif['Copyright']))
+        filename = f"{file.id}.png"
+        ortho_photo = get_orthophoto(entries['filename'])
+        thumb_req = requests.get(
+            app.config['ARCHE']['thumbnail_url'],
+            params={'id': ortho_photo, 'width': 1200},
+            timeout=60).content
+        open(str(app.config['UPLOAD_DIR'] / filename), "wb").write(thumb_req)
+        file.link('P67', artifact)
 
-            location = Entity.insert('object_location', f"Location of {name}")
-            artifact.link('P53', location)
-            if is_float(item['longitude']) and is_float(item['latitude']):
-                Db_gis.insert(
-                    shape='Point',
-                    data={
-                        'entity_id': location.id,
-                        'name': name,
-                        'description': '',
-                        'type': 'centerpoint',
-                        'geojson':
-                            f'{{"type":"Point", "coordinates": '
-                            f'[{item["longitude"]},'
-                            f'{item["latitude"]}]}}'})
+        creator = get_or_create_person(
+            exif['Creator'],
+            person_types['photographer_type'])
 
-            production = Entity.insert(
-                'production',
-                f'Production of graffito from {name}')
-            production.link('P108', artifact)
+        creation = Entity.insert(
+            'creation',
+            f'Creation of photograph from {name}')
+        creation.update({'attributes': {'begin_from': exif['CreateDate']}})
+        creation.link('P94', file)
+        creation.link('P14', creator)
 
-            file = Entity.insert('file', name, f"Created by {item['creator']}")
-            file.link(
-                'P2',
-                get_or_create_type(
-                    get_hierarchy_by_name('License'),
-                    item['license']))
-            filename = f"{file.id}.{name.rsplit('.', 1)[1].lower()}"
-            open(str(
-                app.config['UPLOAD_DIR'] / filename), "wb", encoding='utf-8') \
-                .write(requests.get(
-                item['image_link_thumbnail'],
-                timeout=60).content)
-            file.link('P67', artifact)
-
-            creator = get_or_create_person(
-                item['creator'],
-                person_types['photographer_type'])
-
-            creation = Entity.insert(
-                'creation',
-                f'Creation of photograph from {name}')
-            creation.update({'attributes': {'begin_from': item['date']}})
-            creation.link('P94', file)
-            creation.link('P14', creator)
-
-            count += 1
+        count += 1
     return count
+
+
+def get_exif(entries: dict[str, Any]) -> dict[str, Any]:
+    single_img_id = get_single_image_of_collection(entries['collection_id'])
+    return fetch_exif(single_img_id)
 
 
 def get_linked_image(data: list[dict[str, Any]]) -> str:
@@ -215,52 +208,3 @@ def get_arche_reference_system() -> ReferenceSystem:
     if 'artifact' not in system.classes:
         Db.add_classes(system.id, ['artifact'])
     return system
-
-
-# Script from
-# https://acdh-oeaw.github.io/arche-docs/aux/rdf_compacting.html
-def n_triples_to_json(req: Response) -> dict[str, Any]:
-    context = get_arche_context()
-    data = rdflib.Graph()
-    data.parse(data=req.text, format="nt")
-
-    # create Python-native data model based on dictionaries
-    nodes: dict[str, Any] = {}
-    for (sbj, prop, obj) in data:
-        sbj = str(sbj)
-        prop = str(prop)
-        # skip RDF properties for which we don't know the mapping
-        if prop not in context:
-            continue
-
-        # map prop name according to the context
-        prop = context[prop]
-
-        # if the triple points to another node in the graph,
-        # maintain the reference
-        if not isinstance(obj, rdflib.term.Literal):
-            if str(obj) not in nodes:
-                nodes[str(obj)] = {'__uri__': str(obj)}
-            obj = nodes[str(obj.toPython())]
-
-        # manage the data
-        if sbj not in nodes:
-            nodes[sbj] = {'__uri__': sbj}
-        if prop not in nodes[sbj]:
-            nodes[sbj][prop] = []
-        nodes[sbj][prop].append(
-            obj if not isinstance(obj, rdflib.term.Literal)
-            else obj.toPython())
-    return nodes
-
-
-def get_arche_context() -> dict[str, Any]:
-    context = requests.get(
-        'https://arche.acdh.oeaw.ac.at/api/describe',
-        headers={'Accept': 'application/json'}, timeout=60)
-    result: dict[str, Any] = context.json()['schema']
-    # Adding isMetadataFor because it is not in /describe
-    result['isMetadataFor'] = \
-        'https://vocabs.acdh.oeaw.ac.at/schema#isMetadataFor'
-    # Flip the context so it's uri->shortName
-    return {v: k for k, v in result.items() if isinstance(v, str)}
