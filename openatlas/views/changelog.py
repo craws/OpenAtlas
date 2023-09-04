@@ -22,7 +22,8 @@ versions = {
             '1981': 'Manual: API',
             '2037': 'Manual: Vocabs import'},
         'fix': {
-            '2049': 'Link from Source to Artifact broken'
+            '2049': 'Link from Source to Artifact broken',
+            '2051': 'Wrong direction for P9'
         }}],
     '7.15.0': ['2023-07-22', {
         'feature': {
