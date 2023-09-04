@@ -316,7 +316,7 @@ class EventsDisplay(BaseDisplay):
     def add_data(self) -> None:
         super().add_data()
         self.data[_('sub event of')] = \
-            link(self.entity.get_linked_entity('P9'))
+            link(self.entity.get_linked_entity('P9', inverse=True))
         self.data[_('preceding event')] = \
             link(self.entity.get_linked_entity('P134'))
         self.data[_('succeeding event')] = \
@@ -333,7 +333,7 @@ class EventsDisplay(BaseDisplay):
         for name in ['subs', 'source', 'actor', 'reference', 'file']:
             self.tabs[name] = Tab(name, entity=entity)
         self.add_reference_tables_data()
-        for sub in entity.get_linked_entities('P9', inverse=True, types=True):
+        for sub in entity.get_linked_entities('P9', types=True):
             self.tabs['subs'].table.rows.append(get_base_table_data(sub))
         self.tabs['actor'].table.header.insert(5, _('activity'))
         for link_ in entity.get_links(['P11', 'P14', 'P22', 'P23']):

@@ -371,7 +371,7 @@ class EventBaseManager(BaseManager):
     fields = ['name', 'date', 'description', 'continue']
 
     def get_sub_ids(self, entity: Entity, ids: list[int]) -> list[int]:
-        for sub in entity.get_linked_entities('P9', inverse=True):
+        for sub in entity.get_linked_entities('P9'):
             ids.append(sub.id)
             self.get_sub_ids(sub, ids)
         return ids
@@ -420,7 +420,7 @@ class EventBaseManager(BaseManager):
 
     def populate_update(self) -> None:
         super().populate_update()
-        if super_ := self.entity.get_linked_entity('P9'):
+        if super_ := self.entity.get_linked_entity('P9', inverse=True):
             self.form.event.data = super_.id
         if preceding_ := self.entity.get_linked_entity('P134'):
             self.form.event_preceding.data = preceding_.id
@@ -431,8 +431,8 @@ class EventBaseManager(BaseManager):
 
     def process_form(self) -> None:
         super().process_form()
-        self.data['links']['delete'].add('P9')
-        self.add_link('P9', self.form.event.data)
+        self.data['links']['delete_inverse'].add('P9')
+        self.add_link('P9', self.form.event.data, inverse=True)
         if self.class_.name != 'event':
             self.data['links']['delete'].add('P134')
             self.add_link('P134', self.form.event_preceding.data)
