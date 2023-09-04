@@ -42,8 +42,12 @@ Can be linked via tabs to
 * :doc:`source` - when it is referenced there
 * :doc:`event` - link new events. It's not possible to link to existing events
   from here, this has to be done from the events itself
-* :doc:`feature` - its subunit
 * :doc:`reference`
+* :doc:`artifact`
+* :doc:`actor` - only creation of new actors (using the place as a residence)
+  is supported here because for linking to existing actors there would be too
+  much possibilities
+* :doc:`feature` - its subunit
 * :doc:`file`
 
 Places and their subunits
