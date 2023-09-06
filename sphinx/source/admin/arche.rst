@@ -3,20 +3,20 @@ ARCHE
 
 .. toctree::
 
-**Be aware** this feature is experimental and only usable for a specific dataset.
+**Be aware** this feature is only usable for a specific dataset.
 
-`ARCHE <https://arche.acdh.oeaw.ac.at/>`_ (A Resource Centre for the HumanitiEs) is a service aimed at offering stable and persistent hosting as well as dissemination of digital research data and resources.
+`ARCHE <https://arche.acdh.oeaw.ac.at/>`_ (A Resource Centre for the HumanitiEs) is a service aimed at offering stable
+and persistent hosting as well as dissemination of digital research data and resources.
 
-In order to import data from ARCHE to OpenAtlas changes to instance/production.py are needed (ask your OpenAtlas administrator for further details):
+In order to import data from ARCHE to OpenAtlas changes to instance/production.py are needed (ask your OpenAtlas
+administrator for further details):
 
 .. code-block::
    :caption: instance/production.py
 
    ARCHE = {
-    'id': 0,    # Top collection ID (acdh:TopCollection)
-    'collection_ids': [0],  # Sub collections ID containing metadata.json files (acdh:Collection)
-    'base_url': 'https://arche-curation.acdh-dev.oeaw.ac.at/',  # Base URL to get data from
-    'thumbnail_url': 'https://arche-thumbnails.acdh.oeaw.ac.at/'    # URL of ARCHE thumbnail service
+    'id': 0,    # Top collection of the project (acdh:TopCollection)
+    'url': 'https://arche-curation.acdh-dev.oeaw.ac.at/',  # Base URL to get data from
     }}
 
 The **ARCHE** button is displayed in the Admin/Data menu only if above data is provided.
@@ -25,7 +25,8 @@ Click on the **ARCHE** button to get to the overview section.
 Overview
 --------
 
-Data provided in the production.py is displayed. If user belongs to the **manager** user group, a button called **Fetch** is displayed. Click **Fetch** to fetch data from ARCHE.
+Data provided in the production.py is displayed. If user belongs to the **manager** user group, a button called
+**Fetch** is displayed. Click **Fetch** to fetch data from ARCHE.
 
 
 Fetch
@@ -39,20 +40,8 @@ Click on **Import ARCHE data** to import data.
 Data from ARCHE
 ---------------
 
-All data is gathered from [IMAGE_NAME]_metadata.json:
-
-.. code-block::
-
-    'image_id': image_id (ARCHE)
-    'image_link': image_url (ARCHE)
-    'image_link_thumbnail': thumbnail_url (ARCHE)
-    'creator': EXIF:Artist
-    'latitude': EXIF:GPSLatitude
-    'longitude': EXIF:GPSLongitude
-    'description': XMP:Description
-    'name': IPTC:ObjectName
-    'license': EXIF:Copyright
-    'date': EXIF:CreateDate
+All metadata is gathered from the EXIF endpoint of the first image in the "2_JPGs" collection. Additionally the
+corresponded .png from "4_Orthophotos" is taken as reference file.
 
 Automatically created entities
 ------------------------------
