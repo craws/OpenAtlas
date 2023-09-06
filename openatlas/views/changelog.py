@@ -20,7 +20,9 @@ versions = {
             '2022': 'Additional database export option (dump)',
             '2048': 'Import Vocabs collection',
             '1981': 'Manual: API',
-            '2037': 'Manual: Vocabs import'},
+            '2037': 'Manual: Vocabs import',
+            '2047': 'Manual: information about actor buttons at place view',
+            '2028': 'Refactor and minor improvements'},
         'fix': {
             '2049': 'Link from Source to Artifact broken',
             '2051': 'Wrong direction for P9'

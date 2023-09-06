@@ -199,20 +199,31 @@
 <p>Available for admins and managers</p>
 <div class="section" id="export-sql">
 <h2>Export SQL<a class="headerlink" href="#export-sql" title="Permalink to this headline">¶</a></h2>
-<p>When clicking the <strong>Export SQL</strong> button a new SQL dump will be created with
-pg_dump in plain text format.</p>
-<p>When clicking the <strong>Export custom SQL</strong> button a new SQL dump will be created with
-pg_dump in custom archiving format (-Fc). <cite>pg_restore</cite> is used to restore the database
-regardless of which operating system and line breaks are used.</p>
 <ul class="simple">
 <li><p>Be aware, especially when sharing, that <strong>user data</strong>, e.g. email addresses,
-is included.</p></li>
-<li><p>Existing files are shown in a list and can be downloaded or deleted
-(only admins can delete)</p></li>
-<li><p>If the directory isn’t writable, a warning will be shown</p></li>
+are included in the database backups</p></li>
 <li><p>SQL dumps are saved in the <strong>files/export</strong> folder</p></li>
-<li><p>File names begin with date and time e.g. 2018-08-23_1533_dump_plain.sql.</p></li>
+<li><p>A warning will be shown if the directory isn’t writable</p></li>
+<li><p>File names begin with date and time e.g. 2018-08-23_1533_export.sql</p></li>
+<li><p>Existing backups are shown in a list and can be downloaded or deleted</p></li>
 </ul>
+<div class="section" id="id1">
+<h3>Export SQL<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>A SQL dump will be created with <strong>pg_dump</strong> in a plain text format. The
+resulting file could be used to fill an existing empty database, e.g.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">psql</span> <span class="n">openatlas</span> <span class="o">&lt;</span> <span class="n">export</span><span class="o">.</span><span class="n">sql</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="export-database-dump">
+<h3>Export database dump<a class="headerlink" href="#export-database-dump" title="Permalink to this headline">¶</a></h3>
+<p>A SQL dump will be created with <strong>pg_dump</strong> in custom archiving format (-Fc).
+With this format <strong>pg_restore</strong> can be used to restore the database regardless
+of which operating system and line breaks are used e.g.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pg_restore</span> <span class="o">-</span><span class="n">d</span> <span class="n">openatlas</span> <span class="o">-</span><span class="mi">1</span> <span class="n">export</span><span class="o">.</span><span class="n">dump</span>
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="export-csv">
 <h2>Export CSV<a class="headerlink" href="#export-csv" title="Permalink to this headline">¶</a></h2>

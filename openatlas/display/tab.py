@@ -7,7 +7,7 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 
 from openatlas.display.table import Table
-from openatlas.display.util import button, is_authorized
+from openatlas.display.util import button, is_authorized, manual
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
@@ -39,12 +39,12 @@ class Tab:
         self.name = name
         self.content = content
         self.entity = entity
+        self.form = form
         self.table = table or Table()
         self.set_table_headers(name, entity)
-        self.buttons: list[str] = []
-        self.form = form
+        self.buttons: list[str] = buttons or [manual(f'entity/{name}')]
         if is_authorized('contributor') or name == 'files':
-            self.set_buttons(name, buttons, entity)
+            self.set_buttons(name, entity)
 
     def set_table_headers(
             self,
@@ -89,15 +89,10 @@ class Tab:
             if view == 'event':
                 self.table.header = g.table_headers['event']
 
-    def set_buttons(
-            self,
-            name: str,
-            buttons: Optional[list[str]],
-            entity: Optional[Entity] = None) -> None:
+    def set_buttons(self, name: str, entity: Optional[Entity] = None) -> None:
         view = entity.class_.view if entity else None
         id_ = entity.id if entity else None
         class_ = entity.class_ if entity else None
-        self.buttons = buttons or []
         if name == 'actor':
             if view == 'file':
                 self.buttons.append(
