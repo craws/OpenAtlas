@@ -49,7 +49,7 @@ def vocabs_requests(
 
 def request_arche_metadata(id_: int) -> dict[str, Any]:
     req = requests.get(
-        f"{app.config['ARCHE']['base_url']}/api/{id_}/metadata",
+        f"{app.config['ARCHE']['url']}/api/{id_}/metadata",
         headers={'Accept': 'application/ld+json'},
         timeout=60)
     return req.json()

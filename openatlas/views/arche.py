@@ -26,9 +26,7 @@ def arche_index() -> str:
             display_info({
                 k: str(v) for k, v in app.config['ARCHE'].items()}),
             buttons=[manual('admin/arche')])},
-        crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-data"],
-            'ARCHE'])
+        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-data"], 'ARCHE'])
 
 
 @app.route('/arche/fetch')
@@ -37,7 +35,6 @@ def arche_fetch() -> str:  # pragma: no cover
     table = Table(header=['ID', _('name')])
     for entries in fetch_collection_data().values():
         table.rows.append([entries['collection_id'], entries['filename']])
-
     tabs = {
         'fetched_entities': Tab(
             'fetched_entities',
@@ -47,7 +44,6 @@ def arche_fetch() -> str:  # pragma: no cover
             if table.rows else [
                 '<p class="uc-first">' + _('no entities to retrieve') +
                 '</p>'])}
-
     return render_template(
         'tabs.html',
         tabs=tabs,

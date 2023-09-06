@@ -92,11 +92,7 @@ COMPARE_OPERATORS: list[str] = [
     'lesserThanEqual', 'like']
 
 # Used to connect to ACDH-CH ARCHE systems
-ARCHE = {
-    'id': None,
-    'collection_ids': None,
-    'base_url': None,
-    'thumbnail_url': 'https://arche-thumbnails.acdh.oeaw.ac.at/'}
+ARCHE = {'id': None, 'url': None}
 
 # Used to connect to password protected Vocabs systems
 VOCABS_PASS = ''
