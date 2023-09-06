@@ -18,6 +18,7 @@ versions = {
     '7.16.0': ['TBA', {
         'feature': {
             '2022': 'Additional database export option (dump)',
+            '2040': 'ARCHE import script',
             '2048': 'Import Vocabs collection',
             '1981': 'Manual: API',
             '2037': 'Manual: Vocabs import',
