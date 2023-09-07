@@ -6,7 +6,7 @@ from openatlas import app
 from openatlas.api.resources.util import (
     get_geometric_collection, get_license_name, get_reference_systems,
     replace_empty_list_values_in_dict_with_none, to_camel_case, date_to_str,
-    get_crm_relation)
+    get_crm_relation, get_location_id)
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.display.util import get_file_path
@@ -102,6 +102,10 @@ def get_lp_file(links_inverse: list[Link]) -> list[dict[str, str]]:
 
 def get_lp_types(entity: Entity, links: list[Link]) -> list[dict[str, Any]]:
     types = []
+    if entity.class_.view == 'place':
+        location = Entity.get_by_id(get_location_id(links), types=True)
+        entity.types.update(location.types)
+        print("yes")
     for type_ in entity.types:
         type_dict = {
             'identifier': url_for(

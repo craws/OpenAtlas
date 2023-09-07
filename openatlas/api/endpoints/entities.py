@@ -55,6 +55,12 @@ class GetEntitiesLinkedToEntity(Resource):
             'linkedEntities')
 
 
+class GetEntity(Resource):
+    @staticmethod
+    def get(id_: int) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
+        return resolve_entity(get_entity_by_id(id_), entity_.parse_args())
+
+
 class GetLatest(Resource):
     @staticmethod
     def get(limit: int) \
@@ -112,9 +118,3 @@ class GetQuery(Resource):
         if parser['cidoc_classes']:
             entities.extend(get_by_cidoc_classes(parser['cidoc_classes']))
         return resolve_entities(entities, parser, 'query')
-
-
-class GetEntity(Resource):
-    @staticmethod
-    def get(id_: int) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
-        return resolve_entity(get_entity_by_id(id_), entity_.parse_args())

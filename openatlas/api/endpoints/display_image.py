@@ -25,6 +25,4 @@ class DisplayImage(Resource):
             if parser['image_size'] else None)
         if not filepath:
             raise DisplayFileNotFoundError
-        return send_file(
-            filepath,
-            as_attachment=bool(parser['download']))
+        return send_file(filepath, as_attachment=bool(parser['download']))
