@@ -75,7 +75,7 @@ JSON_FORMATS = {
     'geojson-v2': 'application/json'}
 API_FORMATS = RDF_FORMATS | JSON_FORMATS
 
-API_RDF_PROXY = ''
+API_PROXY = ''
 
 LOGICAL_OPERATOR: list[str] = ['and', 'or']
 STR_CATEGORIES: list[str] = [

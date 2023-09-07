@@ -173,6 +173,16 @@ entered, Flask catches this via its own
 An error message is provided by its own error handler
 `error handler <https://flask-restful.readthedocs.io/en/latest/reqparse.html#error-handling>`_
 
+Proxy
+=====
+
+If the server is behind a proxy, there are some issues with the RDF export of entities.
+To provide the OpenAtlas API with a proxy server, add following line to **instance/production.py**
+
+.. code-block:: python
+
+    API_PROXY = 'http://proxy.example:8899'
+
 Authentication guide
 ====================
 No authentication is needed to use the OpenAtlas API.
