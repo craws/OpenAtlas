@@ -105,7 +105,6 @@ def get_lp_types(entity: Entity, links: list[Link]) -> list[dict[str, Any]]:
     if entity.class_.view == 'place':
         location = Entity.get_by_id(get_location_id(links), types=True)
         entity.types.update(location.types)
-        print("yes")
     for type_ in entity.types:
         type_dict = {
             'identifier': url_for(
