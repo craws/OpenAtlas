@@ -23,10 +23,12 @@ versions = {
             '1981': 'Manual: API',
             '2037': 'Manual: Vocabs import',
             '2047': 'Manual: information about actor buttons at place view',
-            '2028': 'Refactor and minor improvements'},
+            '2028': 'Refactor and minor improvements',
+            '2050': 'API: Add place types to LPF'},
         'fix': {
             '2049': 'Link from Source to Artifact broken',
-            '2051': 'Wrong direction for P9'
+            '2051': 'Wrong direction for P9',
+            '2057': 'API: proxy for rdflib'
         }}],
     '7.15.0': ['2023-07-22', {
         'feature': {
