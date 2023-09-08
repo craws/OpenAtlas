@@ -121,6 +121,7 @@ def import_arche_data() -> int:
         # production.link('P108', artifact)
         #
         file = Entity.insert('file', name, f"Created by {exif['Creator']}")
+
         file.link(
             'P2',
             get_or_create_type(
@@ -130,7 +131,7 @@ def import_arche_data() -> int:
         ortho_photo: str = get_orthophoto(entries['filename'])
         thumb_req = requests.get(
             'https://arche-thumbnails.acdh.oeaw.ac.at/',
-            params={'id': ortho_photo, 'width': 1200},
+            params={'id': ortho_photo, 'width': 1200},  # type: ignore
             timeout=60).content
         open(str(app.config['UPLOAD_DIR'] / filename), "wb").write(thumb_req)
         file.link('P67', artifact)
@@ -177,10 +178,11 @@ def get_or_create_person(name: str, relevance: Type) -> Entity:
 
 
 def get_or_create_person_types() -> dict[str, Any]:
-    hierarchy: Entity = get_hierarchy_by_name('Relevance')
+    hierarchy = get_hierarchy_by_name('Relevance')
     if not hierarchy:
-        hierarchy = Entity.insert('type', 'Relevance')
-        Type.insert_hierarchy(hierarchy, 'custom', ['person'], True)
+        hierarchy = Entity.insert('type', 'Relevance')  # type: ignore
+        Type.insert_hierarchy(
+            hierarchy, 'custom', ['person'], True)  # type: ignore
     return {
         'photographer_type': get_or_create_type(hierarchy, 'Photographer'),
         'artist_type': get_or_create_type(hierarchy, 'Graffito artist')}

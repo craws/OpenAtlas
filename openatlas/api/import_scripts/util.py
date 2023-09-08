@@ -8,7 +8,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 
 
-def get_or_create_type(hierarchy: Entity, type_name: str) -> Entity:
+def get_or_create_type(hierarchy: Any, type_name: str) -> Entity:
     if type_ := get_type_by_name(type_name):
         if type_.root[0] == hierarchy.id:
             return type_

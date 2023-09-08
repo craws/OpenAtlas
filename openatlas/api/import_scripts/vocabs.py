@@ -13,10 +13,10 @@ def import_vocabs_data(
         id_: str,
         form_data: dict[str, Any],
         details: dict[str, Any],
-        category) -> tuple[list[Any], list[Any]]:
+        category: str) -> tuple[list[Any], list[Any]]:
     return fetch_top_level(id_, details, form_data) \
-        if category == 'hierarchy' else (
-        fetch_top_groups(id_, details, form_data))
+        if category == 'hierarchy' \
+        else (fetch_top_groups(id_, details, form_data))
 
 
 def fetch_top_groups(

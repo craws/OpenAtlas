@@ -20,16 +20,15 @@ versions = {
             '2022': 'Additional database export option (dump)',
             '2040': 'ARCHE import script',
             '2048': 'Import Vocabs collection',
+            '2050': 'API: Add place types to LPF',
             '1981': 'Manual: API',
             '2037': 'Manual: Vocabs import',
             '2047': 'Manual: information about actor buttons at place view',
-            '2028': 'Refactor and minor improvements',
-            '2050': 'API: Add place types to LPF'},
+            '2028': 'Refactor and minor improvements'},
         'fix': {
             '2049': 'Link from Source to Artifact broken',
             '2051': 'Wrong direction for P9',
-            '2057': 'API: proxy for rdflib'
-        }}],
+            '2057': 'API: proxy for rdflib'}}],
     '7.15.0': ['2023-07-22', {
         'feature': {
             '1991': 'Import controlled vocabularies via API',
