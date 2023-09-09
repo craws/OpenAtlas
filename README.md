@@ -44,6 +44,8 @@ Please refer to our [contributing guidelines](CONTRIBUTING.md)
 ([nina.richards@oeaw.ac.at](mailto:nina.richards@oeaw.ac.at))
 - **Moritz Großfurtner** - Frontend Development
 ([moritz.großfurtner@oeaw.ac.at](mailto:moritz.großfurtner@oeaw.ac.at)
+- **Olivia Reichl** - Frontend Development
+([Olivia.Reichl@oeaw.ac.at](mailto:Olivia.Reichl@oeaw.ac.at)
 - **Jan Belik** - Logo Design and Design Consulting
 ([buero@janbelik.com](mailto:buero@janbelik.com))
 
