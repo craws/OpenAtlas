@@ -45,11 +45,17 @@ NONE_DISPLAY_EXT = ['.tiff', '.tif']
 ALLOWED_IMAGE_EXT = DISPLAY_FILE_EXTENSIONS + NONE_DISPLAY_EXT
 PROCESSED_EXT = '.jpeg'
 
+IIIF_ACTIVATE = False
+IIIF_DIR = ''
+
 # For system checks
 WRITABLE_DIRS = [
     UPLOAD_DIR,
     EXPORT_DIR,
     RESIZED_IMAGES]
+
+if IIIF_ACTIVATE:
+    WRITABLE_DIRS.append(IIIF_DIR)
 
 # Security
 SESSION_COOKIE_SECURE = False  # Should be True in production.py if using HTTPS

@@ -1,3 +1,4 @@
+from subprocess import call, run
 from typing import Any, Union
 
 from flask import g, render_template, request, send_from_directory, url_for
@@ -6,7 +7,7 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
-from openatlas.display.util import required_group
+from openatlas.display.util import required_group, get_file_path
 from openatlas.forms.form import get_table_form
 from openatlas.models.entity import Entity
 
@@ -66,3 +67,12 @@ def file_add(id_: int, view: str) -> Union[str, Response]:
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],
             entity,
             f"{_('link')} {_(view)}"])
+
+
+@app.route('/file/iiif/<int:id_>', methods=['GET', 'POST'])
+@required_group('contributor')
+def make_iiif_available(id_: int):
+    call(f"convert {get_file_path(id_)} "
+         f"-define tiff:tile-geometry=256x256 -compress jpeg "
+         f"'ptif:{app.config['IIIF_DIR']}/{id_}.tiff'", shell=True)
+    return redirect(url_for('view', id_=id_))

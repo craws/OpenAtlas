@@ -746,3 +746,10 @@ def get_entities_linked_to_type_recursive(
     for sub_id in g.types[id_].subs:
         get_entities_linked_to_type_recursive(sub_id, data)
     return data
+
+
+def check_iiif() -> bool:
+    return True \
+        if (app.config['IIIF_ACTIVATE']
+            and os.access(Path(app.config['IIIF_DIR']), os.W_OK)) \
+        else False
