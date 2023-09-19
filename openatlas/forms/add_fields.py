@@ -18,8 +18,6 @@ from openatlas.models.type import Type
 
 
 def add_reference_systems(manager: Any) -> None:
-    if hasattr(manager.form_class, 'classes'):
-        return  # Skip hierarchies
     precisions = [('', '')] + [
         (str(g.types[id_].id), g.types[id_].name)
         for id_ in Type.get_hierarchy('External reference match').subs]

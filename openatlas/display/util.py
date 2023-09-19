@@ -54,6 +54,7 @@ def edit_link(url: str) -> Optional[str]:
     return link(_('edit'), url) if is_authorized('contributor') else None
 
 
+@app.template_filter()
 def ext_references(links: list[Link]) -> str:
     if not links:
         return ''

@@ -1,6 +1,6 @@
 from typing import Any
 
-from flask import url_for
+from flask import url_for, g
 
 from openatlas import app
 from tests.base import TestBaseCase, get_hierarchy
@@ -29,6 +29,8 @@ class HierarchyTest(TestBaseCase):
             assert b'The name is already in use' in rv.data
 
             hierarchy = get_hierarchy('Geronimo')
+            data[f'reference_system_id_{g.wikidata.id}'] \
+                = ['Q123', self.precision_type.subs[0]]
             data['classes'] = ['acquisition']
             data['entity_id'] = hierarchy.id
             rv = self.app.post(

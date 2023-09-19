@@ -128,6 +128,9 @@
                       {% if not type_.subs %}
                         <p class="error">{{ _("this type has no subs and won't show in forms")|uc_first }}.</p>
                       {% endif %}
+                      {% if type_.reference_systems %}
+                        <p>{{ type_.reference_systems|ext_references|safe }}</p>
+                      {% endif %}
                       {% if type_.description %}
                         <div class="description">
                           <strong>{{ _('description')|uc_first }}</strong>
