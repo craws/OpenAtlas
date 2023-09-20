@@ -399,7 +399,7 @@ class EventBaseManager(BaseManager):
                 add_dynamic=[
                     'activity',
                     'acquisition',
-                    'modification'
+                    'modification',
                     'move',
                     'production'],
                 related_tables=['event'])
