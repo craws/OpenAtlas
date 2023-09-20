@@ -250,6 +250,7 @@ class TableField(HiddenField):
         self.related_tables = related_tables or []
         self.add_dynamical = \
             (add_dynamic or []) if is_authorized('editor') else []
+        self.add_dynamical.reverse()  # Reverse needed (CSS .float-end)
 
     widget = TableSelect()
 
