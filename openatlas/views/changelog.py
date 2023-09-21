@@ -15,7 +15,12 @@ def index_changelog() -> str:
 
 
 versions = {
-    '7.17.0': ['TBA', {}],
+    '7.17.0': ['TBA', {
+        'feature': {
+            '2026': 'External reference systems for type hierarchies'}}],
+    '7.16.1': ['2023-09-20', {
+        'fix': {
+            '2069': 'Broken buttons for preceding event'}}],
     '7.16.0': ['2023-09-09', {
         'feature': {
             '2022': 'Additional database export option (dump)',

@@ -22,3 +22,7 @@ INSERT INTO web.i18n (name, language, text) VALUES ('citation_example', 'en', 'c
 
 -- Log entry for none existing entity
 INSERT INTO web.user_log (user_id, entity_id, action) VALUES (2, 6666, 'insert');
+
+-- Needed to test external reference systems for hierarchies
+INSERT INTO web.reference_system_openatlas_class (reference_system_id, openatlas_class_name) VALUES
+  ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), 'type');
