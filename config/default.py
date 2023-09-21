@@ -54,9 +54,6 @@ WRITABLE_DIRS = [
     EXPORT_DIR,
     RESIZED_IMAGES]
 
-if IIIF_ACTIVATE:
-    WRITABLE_DIRS.append(IIIF_DIR)
-
 # Security
 SESSION_COOKIE_SECURE = False  # Should be True in production.py if using HTTPS
 REMEMBER_COOKIE_SECURE = True

@@ -431,6 +431,8 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
         warnings.append(
             f"Database version {app.config['DATABASE_VERSION']} is needed but "
             f"current version is {g.settings['database_version']}")
+    if app.config['IIIF_ACTIVATE']:
+        app.config['WRITABLE_DIRS'].append(app.config['IIIF_DIR'])
     for path in app.config['WRITABLE_DIRS']:
         if not os.access(path, os.W_OK):
             warnings.append(
