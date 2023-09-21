@@ -751,8 +751,13 @@ def get_entities_linked_to_type_recursive(
     return data
 
 
-def check_iiif() -> bool:
+def check_iiif_activation() -> bool:
     return True \
         if (app.config['IIIF_ACTIVATE']
             and os.access(Path(app.config['IIIF_DIR']), os.W_OK)) \
         else False
+
+
+def check_iiif_file_exist(id_: int) -> bool:
+    file_to_check = Path(app.config['IIIF_DIR']) / str(id_)
+    return file_to_check.is_file()

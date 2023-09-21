@@ -72,7 +72,8 @@ def file_add(id_: int, view: str) -> Union[str, Response]:
 @app.route('/file/iiif/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
 def make_iiif_available(id_: int):
-    call(f"convert {get_file_path(id_)} "
+    call_ = call(f"convert {get_file_path(id_)} "
          f"-define tiff:tile-geometry=256x256 -compress jpeg "
          f"'ptif:{app.config['IIIF_DIR']}/{id_}.tiff'", shell=True)
+    print(call_)
     return redirect(url_for('view', id_=id_))
