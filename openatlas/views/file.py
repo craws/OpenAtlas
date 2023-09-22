@@ -1,3 +1,4 @@
+import subprocess
 from subprocess import call, run
 from typing import Any, Union
 
@@ -72,8 +73,9 @@ def file_add(id_: int, view: str) -> Union[str, Response]:
 @app.route('/file/iiif/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
 def make_iiif_available(id_: int):
-    call_ = call(f"convert {get_file_path(id_)} "
-         f"-define tiff:tile-geometry=256x256 -compress jpeg "
-         f"'ptif:{app.config['IIIF_DIR']}/{id_}.tiff'", shell=True)
-    print(call_)
+    command =f"convert {get_file_path(id_)} -define tiff:tile-geometry=256x256 -compress jpeg 'ptif:{app.config['IIIF_DIR'] / str(id_)}'"
+    # call_ = call(f"convert {get_file_path(id_)} "
+    #     f"-define tiff:tile-geometry=256x256 -compress jpeg "
+    #     f"'ptif:{app.config['IIIF_DIR'] / str(id_)}'", shell=True)
+    subprocess.Popen(        command, shell=True)
     return redirect(url_for('view', id_=id_))
