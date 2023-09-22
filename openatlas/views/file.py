@@ -1,11 +1,10 @@
-import json
 import subprocess
 from pathlib import Path
 from typing import Any, Union, Optional
 
-from iiif_prezi import factory
-from iiif_prezi.factory import ManifestFactory
-from flask import g, render_template, request, send_from_directory, url_for
+from iiif_prezi3 import Manifest, config
+from flask import g, render_template, request, send_from_directory, url_for, \
+    session
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
@@ -88,28 +87,28 @@ def convert_image_to_iiif(id_):
          f"--tile-width 256 --tile-height 256")
     subprocess.Popen(command, shell=True)
 
+def getManifest(img_id):
+
+    path = request.base_url
+
+
+    config.configs['helpers.auto_fields.AutoLang'].auto_lang = session['language']
+
+    manifest = Manifest(
+        id=path,
+        label=str(img_id))
+    canvas = manifest.make_canvas_from_iiif(
+        url=app.config['IIIF_URL'] + str(img_id))
+
+    return manifest.json(indent=2)
+
+@app.route('/iiif/<int:img_id>.json')
+def iiif(img_id: int):
+    return getManifest(img_id)
 
 @app.route('/iiif/<int:id_>', methods=['GET'])
 @app.route('/iiif/<prefix>/<int:id_>', methods=['GET'])
 @required_group('contributor')
 def view_iiif(id_: int, prefix: Optional[str] = None):
-    fac = ManifestFactory()
-    # Where the resources live on the web
-    fac.set_base_prezi_uri(request.url)
-    # Where the resources live on disk
-    image_path = Path(app.config['IIIF_DIR']) / app.config['IIIF_PREFIX']
-    fac.set_base_prezi_dir(image_path)
 
-    # Default Image API information
-    fac.set_base_image_uri(request.url)
-    fac.set_iiif_image_info(2.0, 2)  # Version, ComplianceLevel
-
-    # 'warn' will print warnings, default level
-    # 'error' will turn off warnings
-    # 'error_on_warning' will make warnings into errors
-    fac.set_debug("warn")
-    entity = Entity.get_by_id(id_)
-    manifest = fac.manifest(label=entity.name)
-    manifest.description = entity.description
-    mfst = manifest.toJSON(top=True)
-    return json.dumps(mfst)
+    return redirect(url_for('view', id_=id_))
