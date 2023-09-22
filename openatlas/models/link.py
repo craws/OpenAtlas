@@ -103,17 +103,6 @@ class Link:
             types=types)
 
     @staticmethod
-    def get_linked_entities_recursive(
-            id_: int,
-            code: str,
-            inverse: bool = False,
-            types: bool = False) -> list[Entity]:
-        from openatlas.models.entity import Entity
-        return Entity.get_by_ids(
-            Db.get_linked_entities_recursive(id_, code, inverse),
-            types=types)
-
-    @staticmethod
     def get_linked_entity_safe(
             id_: int,
             code: str,

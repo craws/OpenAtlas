@@ -394,3 +394,26 @@ class Entity:
             row['start_node']: {
                 'id': row['top_level'],
                 'name': row['name']} for row in g.cursor.fetchall()}
+
+    @staticmethod
+    def get_linked_entities_recursive(
+            id_: int,
+            code: str,
+            inverse: bool) -> list[int]:
+        first = 'domain_id' if inverse else 'range_id'
+        second = 'range_id' if inverse else 'domain_id'
+        g.cursor.execute(
+            f"""
+            WITH RECURSIVE items AS (
+                SELECT {first}
+                FROM model.link
+                WHERE {second} = %(id_)s AND property_code = %(code)s
+                UNION
+                    SELECT l.{first} FROM model.link l
+                    INNER JOIN items i ON
+                        l.{second} = i.{first}
+                        AND l.property_code = %(code)s
+                ) SELECT {first} FROM items;
+            """,
+            {'id_': id_, 'code': code})
+        return [row[first] for row in g.cursor.fetchall()]

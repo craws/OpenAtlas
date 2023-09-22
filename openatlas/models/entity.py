@@ -110,10 +110,8 @@ class Entity:
             code: str,
             inverse: bool = False,
             types: bool = False) -> list[Entity]:
-        return Link.get_linked_entities_recursive(
-            self.id,
-            code,
-            inverse=inverse,
+        return Entity.get_by_ids(
+            Db.get_linked_entities_recursive(self.id, code, inverse),
             types=types)
 
     def link(self,
