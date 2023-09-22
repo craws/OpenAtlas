@@ -26,7 +26,6 @@ from openatlas.display.image_processing import check_processed_image
 from openatlas.models.cidoc_class import CidocClass
 from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.content import get_translation
-from openatlas.models.imports import Project
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
@@ -505,6 +504,7 @@ def link(
         external: bool = False) -> str:
     from openatlas.models.entity import Entity
     from openatlas.models.user import User
+    from openatlas.models.imports import Project
     html = ''
     if isinstance(object_, (str, LazyString)):
         js = f'onclick="{js}"' if js else ''
