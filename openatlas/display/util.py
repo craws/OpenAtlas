@@ -765,5 +765,6 @@ def check_iiif_activation() -> bool:
 
 
 def check_iiif_file_exist(id_: int) -> bool:
-    file_to_check = Path(app.config['IIIF_DIR']) / str(id_)
+    file_to_check = (Path(app.config['IIIF_DIR'])
+                     / app.config['IIIF_PREFIX'] / str(id_))
     return file_to_check.is_file()

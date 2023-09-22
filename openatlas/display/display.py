@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from flask import g, url_for
 from flask_babel import lazy_gettext as _
 
+from openatlas import app
 from openatlas.display.base_display import (
     ActorDisplay, BaseDisplay, EventsDisplay, PlaceBaseDisplay,
     ReferenceBaseDisplay, TypeBaseDisplay)
@@ -12,7 +13,8 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
     button, description, edit_link, format_entity_date, get_base_table_data,
-    get_file_path, is_authorized, link, remove_link, uc_first, check_iiif_activation,
+    get_file_path, is_authorized, link, remove_link, uc_first,
+    check_iiif_activation,
     check_iiif_file_exist)
 from openatlas.models.entity import Entity
 from openatlas.views.tools import carbon_result, sex_result
@@ -80,7 +82,9 @@ class FileDisplay(BaseDisplay):
                 if check_iiif_file_exist(self.entity.id):
                     self.buttons.append(button(
                         _('iiif'),
-                        url_for('view_iiif', id_=self.entity.id)))
+                        url_for('view_iiif',
+                                prefix=app.config['IIIF_PREFIX'],
+                                id_=self.entity.id)))
                 else:
                     self.buttons.append(button(
                         _('make_iiif_available'),
@@ -99,8 +103,8 @@ class FileDisplay(BaseDisplay):
         super().add_tabs()
         entity = self.entity
         for name in [
-                'source', 'event', 'actor', 'place', 'feature',
-                'stratigraphic_unit', 'artifact', 'reference', 'type']:
+            'source', 'event', 'actor', 'place', 'feature',
+            'stratigraphic_unit', 'artifact', 'reference', 'type']:
             self.tabs[name] = Tab(name, entity=entity)
         entity.image_id = entity.id if get_file_path(entity.id) else None
         for link_ in entity.get_links('P67'):
@@ -296,8 +300,8 @@ class SourceDisplay(BaseDisplay):
         super().add_tabs()
         entity = self.entity
         for name in [
-                'actor', 'artifact', 'feature', 'event', 'place',
-                'stratigraphic_unit', 'text', 'reference', 'file']:
+            'actor', 'artifact', 'feature', 'event', 'place',
+            'stratigraphic_unit', 'text', 'reference', 'file']:
             self.tabs[name] = Tab(name, entity=entity)
         for text in entity.get_linked_entities('P73', types=True):
             self.tabs['text'].table.rows.append([
