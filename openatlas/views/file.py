@@ -96,7 +96,7 @@ def getManifest(img_id):
     # Where the resources live on the web
     fac.set_base_prezi_uri(path)
     # Where the resources live on disk
-    fac.set_base_prezi_dir(Path(app.config['IIIF_DIR']))
+    fac.set_base_prezi_dir(app.config['IIIF_DIR'])
 
     # Default Image API information
     fac.set_base_image_uri("http://www.example.org/path/to/image/api/")
