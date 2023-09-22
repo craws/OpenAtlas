@@ -3,7 +3,6 @@ import subprocess
 from pathlib import Path
 from typing import Any, Union, Optional
 
-from iiif_prezi.factory import ManifestFactory
 from flask import g, render_template, request, send_from_directory, url_for
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
@@ -90,38 +89,69 @@ def convert_image_to_iiif(id_):
 
 
 def getManifest(img_id):
-    path = request.base_url
-
-    fac = ManifestFactory()
-    # Where the resources live on the web
-    fac.set_base_prezi_uri(path)
-    # Where the resources live on disk
-    fac.set_base_prezi_dir(app.config['IIIF_DIR'])
-
-    # Default Image API information
-    fac.set_base_image_uri("http://www.example.org/path/to/image/api/")
-    fac.set_iiif_image_info(2.0, 2)  # Version, ComplianceLevel
-
-    # 'warn' will print warnings, default level
-    # 'error' will turn off warnings
-    # 'error_on_warning' will make warnings into errors
-
     entity = Entity.get_by_id(img_id)
-    fac.set_debug("warn")
-    manifest = fac.manifest(label="Example Manifest")
-    manifest.set_metadata({
-        "Title": entity.name,
-        "Author": "John Doe",
-        "Date": "2023-09-22"
-    })
-    sequence = manifest.sequence(label="Example Sequence")
-    canvas = sequence.canvas(ident="canvas1")
-    image = canvas.image(ident=img_id, iiif=True)
-    image.set_hw(2000, 1500)
+    path = request.base_url
+    manifest = {
+        "@context": "http://iiif.io/api/presentation/2/context.json",
+        "@id": f"{path}{img_id}.json",
+        "@type": "sc:Manifest",
+        "label": entity.name,
+        "metadata": [],
+        "description": [{
+            "@value": entity.description,
+            "@language": "en"}],
+        "license": "https://creativecommons.org/licenses/by/3.0/",
+        "attribution": "By OpenAtlas",
+        "sequences": [{
+            "@id": "http://c8b09ce6-df6d-4d5e-9eba-17507dc5c185",
+            "@type": "sc:Sequence",
+            "label": [{
+                "@value": "Normal Sequence",
+                "@language": "en"}],
+            "canvases": [{
+                "@id": "http://251a31df-761d-46df-85c3-66cb967b8a67",
+                "@type": "sc:Canvas",
+                "label": "Ring",
+                "height": 450,
+                "width": "0",
+                "images": [{
+                    "@context": "http://iiif.io/api/presentation/2/context.json",
+                    "@id": "http://a0a3ec3e-2084-4253-b0f9-a5f87645e15d",
+                    "@type": "oa:Annotation",
+                    "motivation": "sc:painting",
+                    "resource": {
+                        "@id": f"{path}/iiif/{img_id}/full/full/0/default.jpg",
+                        "@type": "dctypes:Image",
+                        "format": "image/jpeg",
+                        "service": {
+                            "@context": "http://iiif.io/api/image/2/context.json",
+                            "@id": "{path}/iiif/{img_id}",
+                            "profile": [
+                                "http://iiif.io/api/image/2/level1.json",
+                                {"formats": [
+                                    "jpg"],
+                                    "qualities": [
+                                        "native",
+                                        "color",
+                                        "gray",
+                                        "bitonal"],
+                                    "supports": [
+                                        "regionByPct",
+                                        "regionSquare",
+                                        "sizeByForcedWh",
+                                        "sizeByWh",
+                                        "sizeAboveFull",
+                                        "rotationBy90s",
+                                        "mirroring"],
+                                    "maxWidth": 5000,
+                                    "maxHeight": 5000}]},
+                        "height": 450,
+                        "width": 600},
+                    "on": "http://251a31df-761d-46df-85c3-66cb967b8a67"}],
+                "related": ""}]}],
+        "structures": []}
 
-    manifest_json = manifest.toJSON()
-
-    return manifest_json
+    return manifest
 
 
 @app.route('/iiif_/<int:img_id>.json')
