@@ -154,7 +154,7 @@ def getManifest(img_id):
     return manifest
 
 
-@app.route('/iiif_/<int:img_id>.json')
+@app.route('/iiif/<int:img_id>.json')
 def iiif(img_id: int):
     return getManifest(img_id)
 
