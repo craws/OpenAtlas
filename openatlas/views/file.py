@@ -1,3 +1,4 @@
+import os
 import subprocess
 from pathlib import Path
 from typing import Any, Union, Optional
@@ -81,8 +82,9 @@ def make_iiif_available(id_: int):
 
 def convert_image_to_iiif(id_):
     path = Path(app.config['IIIF_DIR']) / app.config['IIIF_PREFIX'] / str(id_)
+    vips = "vips" if os.name == 'posix' else "vips.exe"
     command = \
-        (f"vips.exe tiffsave {get_file_path(id_)} {path} "
+        (f"{vips} tiffsave {get_file_path(id_)} {path} "
          f"--tile --pyramid --compression deflate "
          f"--tile-width 256 --tile-height 256")
     subprocess.Popen(command, shell=True)
