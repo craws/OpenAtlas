@@ -1,9 +1,6 @@
-from typing import Any
-
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.link import Link
 from tests.base import TestBaseCase, insert
 
 
@@ -14,16 +11,18 @@ class InvolvementTests(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 actor = insert('person', 'Captain Miller')
+                event = insert('acquisition', 'Event Horizon')
 
-            rv: Any = self.app.post(
-                url_for('insert', class_='acquisition'),
+            rv = self.app.post(
+                url_for('update', id_=event.id),
                 data={
-                    'name': 'Event Horizon',
-                    'begin_year_from': '949',
-                    'begin_month_from': '10',
-                    'begin_day_from': '8',
-                    'end_year_from': '1951'})
-            event_id = int(rv.location.split('/')[-1])
+                     'name': 'Event Horizon',
+                     'begin_year_from': '949',
+                     'begin_month_from': '10',
+                     'begin_day_from': '8',
+                     'end_year_from': '1951'},
+                follow_redirects=True)
+            assert b'Event Horizon' in rv.data
 
             rv = self.app.post(
                 url_for(
@@ -31,7 +30,7 @@ class InvolvementTests(TestBaseCase):
                     type_='involvement',
                     origin_id=actor.id),
                 data={
-                    'event': str([event_id]),
+                    'event': str([event.id]),
                     'activity': 'P11',
                     'begin_year_from': '950',
                     'end_year_from': '1950'},
@@ -42,7 +41,7 @@ class InvolvementTests(TestBaseCase):
                 url_for(
                     'insert_relation',
                     type_='involvement',
-                    origin_id=event_id),
+                    origin_id=event.id),
                 data={
                     'actor': str([actor.id]),
                     'continue_': 'yes',
@@ -50,12 +49,12 @@ class InvolvementTests(TestBaseCase):
                 follow_redirects=True)
             assert b'Event Horizon' in rv.data
 
-            rv = self.app.get(url_for('view', id_=event_id))
+            rv = self.app.get(url_for('view', id_=event.id))
             assert b'Event Horizon' in rv.data
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                link_ = Link.get_links(event_id, 'P22')[0]
+                link_ = event.get_links('P22')[0]
 
             rv = self.app.post(
                 url_for('link_update', id_=link_.id, origin_id=actor.id),
