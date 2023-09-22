@@ -160,20 +160,19 @@ def vocabulary_import_view(category: str, id_: str) -> Union[str, Response]:
             'classes': form.classes.data,
             'multiple': form.multiple.data,
             'language': form.language.data}
-
         try:
             results = import_vocabs_data(id_, form_data, details, category)
             count = len(results[0])
             Transaction.commit()
             g.logger.log('info', 'import', f'import: {count} top concepts')
-            for duplicate in results[1]:
-                g.logger.log(
-                    'notice',
-                    'import',
-                    f'Did not import {duplicate["label"]}, duplicate.')
             import_str = f"{_('import of')}: {count} {_('top concepts')}"
             if results[1]:
                 import_str += f'. {_("Check log for not imported concepts")}'
+                for duplicate in results[1]:
+                    g.logger.log(
+                        'info',
+                        'import',
+                        f'Did not import "{duplicate}", duplicate.')
             flash(import_str, 'info')
         except Exception as e:  # pragma: no cover
             Transaction.rollback()
