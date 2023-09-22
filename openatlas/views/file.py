@@ -74,20 +74,18 @@ def file_add(id_: int, view: str) -> Union[str, Response]:
 @app.route('/file/iiif/<int:id_>', methods=['GET'])
 @required_group('contributor')
 def make_iiif_available(id_: int):
-    command = f"vips tiffsave {get_file_path(id_)} {Path(app.config['IIIF_DIR']) / str(id_)} --tile --pyramid --compression deflate --tile-width 256 --tile-height 256"
-    # command =f"convert {get_file_path(id_)} -define tiff:tile-geometry=256x256 -compress jpeg 'ptif:{Path(app.config['IIIF_DIR']) / str(id_)}'"
-    # call_ = call(f"convert {get_file_path(id_)} "
-    #     f"-define tiff:tile-geometry=256x256 -compress jpeg "
-    #     f"'ptif:{app.config['IIIF_DIR'] / str(id_)}'", shell=True)
+    command = \
+        (f"vips.exe tiffsave "
+         f"{get_file_path(id_)} {Path(app.config['IIIF_DIR']) / str(id_)} "
+         f"--tile --pyramid --compression deflate "
+         f"--tile-width 256 --tile-height 256")
     subprocess.Popen(command, shell=True)
     return redirect(url_for('view', id_=id_))
-
 
 
 @app.route('/iiif/<int:id_>', methods=['GET'])
 @required_group('contributor')
 def view_iiif(id_: int):
-
     return redirect(url_for('view', id_=id_))
 
 
