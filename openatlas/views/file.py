@@ -74,7 +74,7 @@ def file_add(id_: int, view: str) -> Union[str, Response]:
 @app.route('/file/iiif/<int:id_>', methods=['GET'])
 @required_group('contributor')
 def make_iiif_available(id_: int):
-    command = f"vips {get_file_path(id_)} {Path(app.config['IIIF_DIR']) / str(id_)} --tile --pyramid --compression deflate --tile-width 256 --tile-height 256"
+    command = f"vips tiffsave {get_file_path(id_)} {Path(app.config['IIIF_DIR']) / str(id_)} --tile --pyramid --compression deflate --tile-width 256 --tile-height 256"
     # command =f"convert {get_file_path(id_)} -define tiff:tile-geometry=256x256 -compress jpeg 'ptif:{Path(app.config['IIIF_DIR']) / str(id_)}'"
     # call_ = call(f"convert {get_file_path(id_)} "
     #     f"-define tiff:tile-geometry=256x256 -compress jpeg "
