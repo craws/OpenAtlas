@@ -90,10 +90,10 @@ def convert_image_to_iiif(id_):
 
 def getManifest(img_id):
     entity = Entity.get_by_id(img_id)
-    path = request.base_url
+    path = request.url_root
     manifest = {
         "@context": "http://iiif.io/api/presentation/2/context.json",
-        "@id": f"{path}{img_id}.json",
+        "@id": f"{request.base_url}",
         "@type": "sc:Manifest",
         "label": entity.name,
         "metadata": [],
@@ -120,12 +120,12 @@ def getManifest(img_id):
                     "@type": "oa:Annotation",
                     "motivation": "sc:painting",
                     "resource": {
-                        "@id": f"{path}/iiif/{img_id}/full/full/0/default.jpg",
+                        "@id": f"{path}iiif/{img_id}/full/full/0/default.jpg",
                         "@type": "dctypes:Image",
                         "format": "image/jpeg",
                         "service": {
                             "@context": "http://iiif.io/api/image/2/context.json",
-                            "@id": "{path}/iiif/{img_id}",
+                            "@id": f"{path}iiif/{img_id}",
                             "profile": [
                                 "http://iiif.io/api/image/2/level1.json",
                                 {"formats": [
