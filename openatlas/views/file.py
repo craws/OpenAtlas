@@ -1,6 +1,5 @@
 import subprocess
 from pathlib import Path
-from subprocess import call, run
 from typing import Any, Union
 
 from flask import g, render_template, request, send_from_directory, url_for
@@ -74,18 +73,20 @@ def file_add(id_: int, view: str) -> Union[str, Response]:
 @app.route('/file/iiif/<int:id_>', methods=['GET'])
 @required_group('contributor')
 def make_iiif_available(id_: int):
+    convert_image_to_iiif(id_)
+    return redirect(url_for('view', id_=id_))
+
+
+def convert_image_to_iiif(id_):
+    path = Path(app.config['IIIF_DIR']) / app.config['IIIF_PREFIX'] / str(id_)
     command = \
-        (f"vips.exe tiffsave "
-         f"{get_file_path(id_)} {Path(app.config['IIIF_DIR']) / str(id_)} "
+        (f"vips.exe tiffsave {get_file_path(id_)} {path} "
          f"--tile --pyramid --compression deflate "
          f"--tile-width 256 --tile-height 256")
     subprocess.Popen(command, shell=True)
-    return redirect(url_for('view', id_=id_))
 
 
 @app.route('/iiif/<int:id_>', methods=['GET'])
 @required_group('contributor')
 def view_iiif(id_: int):
     return redirect(url_for('view', id_=id_))
-
-

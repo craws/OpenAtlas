@@ -38,6 +38,7 @@ from openatlas.models.link import Link
 from openatlas.models.settings import Settings
 from openatlas.models.type import Type
 from openatlas.models.user import User
+from openatlas.views.file import convert_image_to_iiif
 
 
 @app.route('/admin', methods=['GET', 'POST'], strict_slashes=False)
@@ -777,3 +778,14 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
         'percent_used': percent_free,
         'percent_project': percent_files,
         'percent_other': 100 - (percent_files + percent_free)}
+
+
+@app.route('/admin/admin_convert_all_to_iiif')
+@required_group('admin')
+def admin_convert_all_to_iiif() -> Response:
+    for entity in Entity.get_by_class('file'):
+        if entity.id in g.file_stats \
+                and g.file_stats[entity.id]['ext'] \
+                in app.config['ALLOWED_IMAGE_EXT']:
+            convert_image_to_iiif(entity.id)
+    return redirect(url_for('admin_index') + '#tab-data')

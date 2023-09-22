@@ -32,6 +32,7 @@
     <div class="col-auto">{{ 'admin/file'|manual|safe }}</div>
     <div class="col-auto">{{ _('create resized images')|button(url_for('admin_resize_images'))|safe }}</div>
     <div class="col-auto">{{ _('delete orphaned resized images')|button(url_for('admin_delete_orphaned_resized_images'))|safe }}</div>
+    <div class="col-auto">{{ _('convert all images to iiif')|button(url_for('admin_convert_all_to_iiif'))|safe }}</div>
   </div>
 {% endif %}
 {% if 'manager'|is_authorized %}

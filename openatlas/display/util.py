@@ -431,13 +431,11 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
         warnings.append(
             f"Database version {app.config['DATABASE_VERSION']} is needed but "
             f"current version is {g.settings['database_version']}")
-    if app.config['IIIF_ACTIVATE']:
-        app.config['WRITABLE_DIRS'].append(app.config['IIIF_DIR'])
+    if app.config['IIIF_ACTIVATE'] and app.config['IIIF_DIR']:
+        path = Path(app.config['IIIF_DIR']) / app.config['IIIF_PREFIX']
+        check_write_access(path, warnings)
     for path in app.config['WRITABLE_DIRS']:
-        if not os.access(path, os.W_OK):
-            warnings.append(
-                '<p class="uc-first">' + _('directory not writable') +
-                f" {str(path).replace(app.root_path, '')}</p>")
+        check_write_access(path, warnings)
     if is_authorized('admin'):
         from openatlas.models.user import User
         user = User.get_by_username('OpenAtlas')
@@ -453,6 +451,14 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
     return \
         '<div class="alert alert-danger">' \
         f'{"<br>".join(warnings)}</div>' if warnings else ''
+
+
+def check_write_access(path, warnings):
+    if not os.access(path, os.W_OK):
+        warnings.append(
+            '<p class="uc-first">' + _('directory not writable') +
+            f" {str(path).replace(app.root_path, '')}</p>")
+    return warnings
 
 
 @app.template_filter()
