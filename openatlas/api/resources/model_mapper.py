@@ -2,8 +2,9 @@ from typing import Union, Optional, Any
 
 from flask import g
 
-from openatlas.api.resources.error import EntityDoesNotExistError, \
-    InvalidCidocClassCodeError, InvalidViewClassError, InvalidSystemClassError
+from openatlas.api.resources.error import (
+    EntityDoesNotExistError, InvalidCidocClassCodeError, InvalidViewClassError,
+    InvalidSystemClassError)
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 
@@ -28,12 +29,12 @@ def get_overview_counts() -> dict[str, int]:
     return Entity.get_overview_counts()
 
 
-def get_by_cidoc_classes(class_codes: list[str]) -> list[Entity]:
-    class_codes = list(g.cidoc_classes) \
-        if 'all' in class_codes else class_codes
-    if not all(cc in g.cidoc_classes for cc in class_codes):
+def get_by_cidoc_classes(codes: list[str]) -> list[Entity]:
+    if 'all' in codes:
+        codes = list(g.cidoc_classes)
+    elif not set(codes).issubset(g.cidoc_classes):
         raise InvalidCidocClassCodeError
-    return Entity.get_by_cidoc_class(class_codes, types=True, aliases=True)
+    return Entity.get_by_cidoc_class(codes, types=True, aliases=True)
 
 
 def get_entities_by_view_classes(codes: list[str]) -> list[Entity]:
@@ -57,14 +58,14 @@ def get_all_links_of_entities(
         entities: Union[int, list[int]],
         codes: Union[str, list[str], None] = None) -> list[Link]:
     codes = list(g.properties) if not codes else codes
-    return Link.get_links(entities, codes)
+    return Entity.get_links_of_entities(entities, codes)
 
 
 def get_all_links_of_entities_inverse(
         entities: Union[int, list[int]],
         codes: Optional[Union[str, list[str]]] = None) -> list[Link]:
     codes = list(g.properties) if not codes else codes
-    return Link.get_links(entities, codes, inverse=True)
+    return Entity.get_links_of_entities(entities, codes, inverse=True)
 
 
 def flatten_list_and_remove_duplicates(list_: list[Any]) -> list[Any]:

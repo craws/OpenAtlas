@@ -165,7 +165,7 @@ class Entity:
             self,
             codes: Union[str, list[str]],
             inverse: bool = False) -> list[Link]:
-        return Link.get_links(self.id, codes, inverse)
+        return Entity.get_links_of_entities(self.id, codes, inverse)
 
     def delete(self) -> None:
         Entity.delete_(self.id)
@@ -483,3 +483,27 @@ class Entity:
             ids: list[int],
             inverse: bool = False) -> dict[int, Any]:
         return Db.get_roots(property_code, ids, inverse)
+
+    @staticmethod
+    def get_links_of_entities(
+            entities: Union[int, list[int]],
+            codes: Union[str, list[str], None] = None,
+            inverse: bool = False) -> list[Link]:
+        entity_ids = set()
+        result = Db.get_links_of_entities(
+            entities,
+            codes if isinstance(codes, list) else [str(codes)],
+            inverse)
+        for row in result:
+            entity_ids.add(row['domain_id'])
+            entity_ids.add(row['range_id'])
+        linked_entities = {
+            e.id: e for e in Entity.get_by_ids(entity_ids, types=True)}
+        links = []
+        for row in result:
+            links.append(
+                Link(
+                    row,
+                    domain=linked_entities[row['domain_id']],
+                    range_=linked_entities[row['range_id']]))
+        return links
