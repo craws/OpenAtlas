@@ -3,9 +3,8 @@ import subprocess
 from pathlib import Path
 from typing import Any, Union, Optional
 
-from iiif_prezi3 import Manifest, config
-from flask import g, render_template, request, send_from_directory, url_for, \
-    session
+from iiif_prezi.factory import ManifestFactory
+from flask import g, render_template, request, send_from_directory, url_for
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
@@ -89,28 +88,48 @@ def convert_image_to_iiif(id_):
          f"--tile-width 256 --tile-height 256")
     subprocess.Popen(command, shell=True)
 
-def getManifest(img_id):
 
+def getManifest(img_id):
     path = request.base_url
 
+    fac = ManifestFactory()
+    # Where the resources live on the web
+    fac.set_base_prezi_uri(path)
+    # Where the resources live on disk
+    fac.set_base_prezi_dir(Path(app.config['IIIF_DIR']))
 
-    config.configs['helpers.auto_fields.AutoLang'].auto_lang = session['language']
+    # Default Image API information
+    fac.set_base_image_uri("http://www.example.org/path/to/image/api/")
+    fac.set_iiif_image_info(2.0, 2)  # Version, ComplianceLevel
 
-    manifest = Manifest(
-        id=path,
-        label=str(img_id))
-    canvas = manifest.make_canvas_from_iiif(
-        url=app.config['IIIF_URL'] + str(img_id))
+    # 'warn' will print warnings, default level
+    # 'error' will turn off warnings
+    # 'error_on_warning' will make warnings into errors
 
-    return manifest.json(indent=2)
+    entity = Entity.get_by_id(img_id)
+    fac.set_debug("warn")
+    manifest = fac.manifest(label="Example Manifest")
+    manifest.set_metadata({
+        "Title": entity.name,
+        "Author": "John Doe",
+        "Date": "2023-09-22"
+    })
+    canvas = manifest.canvas(ident="canvas1")
+    image = canvas.image(ident=img_id, iiif=True)
+    image.set_hw(2000, 1500)
+
+    manifest_json = manifest.toJSON()
+
+    return manifest_json
+
 
 @app.route('/iiif_/<int:img_id>.json')
 def iiif(img_id: int):
     return getManifest(img_id)
 
+
 @app.route('/iiif/<int:id_>', methods=['GET'])
 @app.route('/iiif/<prefix>/<int:id_>', methods=['GET'])
 @required_group('contributor')
 def view_iiif(id_: int, prefix: Optional[str] = None):
-
     return redirect(url_for('view', id_=id_))
