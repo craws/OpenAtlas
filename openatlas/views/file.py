@@ -114,7 +114,8 @@ def getManifest(img_id):
         "Author": "John Doe",
         "Date": "2023-09-22"
     })
-    canvas = manifest.canvas(ident="canvas1")
+    sequence = manifest.sequence(label="Example Sequence")
+    canvas = sequence.canvas(ident="canvas1")
     image = canvas.image(ident=img_id, iiif=True)
     image.set_hw(2000, 1500)
 
