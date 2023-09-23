@@ -3,6 +3,7 @@ import subprocess
 from pathlib import Path
 from typing import Any, Union, Optional
 
+import requests
 from flask import g, render_template, request, send_from_directory, url_for
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
@@ -88,9 +89,14 @@ def convert_image_to_iiif(id_):
     subprocess.Popen(command, shell=True)
 
 
-def getManifest(img_id):
-    entity = Entity.get_by_id(img_id)
-    path = request.url_root
+def getManifest(id_):
+    entity = Entity.get_by_id(id_)
+    url_root = request.url_root
+
+    # get metadata from the image api
+    req = requests.get(
+        f"{url_root}iiif/{app.config['IIIF_PREFIX']}/{id_}/info.json")
+    image_api = req.json()
     manifest = {
         "@context": "http://iiif.io/api/presentation/2/context.json",
         "@id": f"{request.base_url}",
@@ -120,12 +126,12 @@ def getManifest(img_id):
                     "@type": "oa:Annotation",
                     "motivation": "sc:painting",
                     "resource": {
-                        "@id": f"{path}iiif/{img_id}/full/full/0/default.jpg",
+                        "@id": f"{url_root}iiif/{id_}/full/full/0/default.jpg",
                         "@type": "dctypes:Image",
                         "format": "image/jpeg",
                         "service": {
                             "@context": "http://iiif.io/api/image/2/context.json",
-                            "@id": f"{path}iiif/{img_id}",
+                            "@id": f"{url_root}iiif/{id_}",
                             "profile": [
                                 "http://iiif.io/api/image/2/level1.json",
                                 {"formats": [
@@ -144,7 +150,8 @@ def getManifest(img_id):
                                         "rotationBy90s",
                                         "mirroring"],
                                     "maxWidth": 5000,
-                                    "maxHeight": 5000}]},
+                                    "maxHeight": 5000}
+                            ]},
                         "height": 450,
                         "width": 600},
                     "on": "http://251a31df-761d-46df-85c3-66cb967b8a67"}],
@@ -154,9 +161,9 @@ def getManifest(img_id):
     return manifest
 
 
-@app.route('/iiif/<int:img_id>.json')
-def iiif(img_id: int):
-    return getManifest(img_id)
+@app.route('/iiif_manifest/<int:id_>.json')
+def iiif_manifest(id_: int):
+    return getManifest(id_)
 
 
 @app.route('/iiif/<int:id_>', methods=['GET'])
