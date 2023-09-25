@@ -94,9 +94,9 @@ def getManifest(id_):
     url_root = request.url_root
 
     # get metadata from the image api
-    req = requests.get(
-        f"{url_root}iiif/{app.config['IIIF_PREFIX']}/{id_}/info.json")
-    image_api = req.json()
+    # req = requests.get(
+    #     f"{url_root}iiif/{app.config['IIIF_PREFIX']}/{id_}/")
+    # image_api = req.json()
     manifest = {
         "@context": "http://iiif.io/api/presentation/2/context.json",
         "@id": f"{request.base_url}",
