@@ -168,10 +168,10 @@ def getManifest(id_):
 @cross_origin()
 def iiif_manifest(id_: int):
     content = gzip.compress(json.dumps(getManifest(id_)).encode('utf8'), 5)
-    response = jsonify(content)
+    response = Response(content)
     response.headers['Content-length'] = len(content)
     response.headers['Content-Encoding'] = 'gzip'
-    return response
+    return jsonify(getManifest(id_))
 
 
 @app.route('/iiif/<int:id_>', methods=['GET'])
