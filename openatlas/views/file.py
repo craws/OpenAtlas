@@ -1,3 +1,4 @@
+import json
 import os
 import subprocess
 from pathlib import Path
@@ -6,6 +7,7 @@ from typing import Any, Union, Optional
 import requests
 from flask import g, render_template, request, send_from_directory, url_for
 from flask_babel import lazy_gettext as _
+from flask_cors import cross_origin
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
@@ -162,8 +164,9 @@ def getManifest(id_):
 
 
 @app.route('/iiif_manifest/<int:id_>.json')
+@cross_origin()
 def iiif_manifest(id_: int):
-    return getManifest(id_)
+    return json.dumps(getManifest(id_))
 
 
 @app.route('/iiif/<int:id_>', methods=['GET'])
