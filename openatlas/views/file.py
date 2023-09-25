@@ -5,6 +5,7 @@ import subprocess
 from pathlib import Path
 from typing import Any, Union, Optional
 
+import requests
 from flask import g, render_template, request, send_from_directory, url_for, \
     jsonify
 from flask_babel import lazy_gettext as _
@@ -94,12 +95,13 @@ def convert_image_to_iiif(id_):
 
 def getManifest(id_):
     entity = Entity.get_by_id(id_)
-    url_root = request.url_root
+    url_root = app.config['IIIF_SERVER'] or request.url_root
 
     # get metadata from the image api
-    # req = requests.get(
-    #     f"{url_root}iiif/{app.config['IIIF_PREFIX']}/{id_}/")
-    # image_api = req.json()
+    req = requests.get(
+        f"{url_root}iiif/{app.config['IIIF_PREFIX']}{id_}/info.json")
+    image_api = req.json()
+    print(image_api)
     manifest = {
         "@context": "http://iiif.io/api/presentation/2/context.json",
         "@id": f"{request.base_url}",
@@ -120,9 +122,12 @@ def getManifest(id_):
             "canvases": [{
                 "@id": "http://251a31df-761d-46df-85c3-66cb967b8a67",
                 "@type": "sc:Canvas",
-                "label": "Ring",
+                "label": entity.name,
                 "height": 450,
                 "width": 600,
+                "description": {
+                    "@value": entity.description,
+                    "@language": "en"},
                 "images": [{
                     "@context": "http://iiif.io/api/presentation/2/context.json",
                     "@id": "http://a0a3ec3e-2084-4253-b0f9-a5f87645e15d",
@@ -135,26 +140,8 @@ def getManifest(id_):
                         "service": {
                             "@context": "http://iiif.io/api/image/2/context.json",
                             "@id": f"{url_root}iiif/{id_}",
-                            "profile": [
-                                "http://iiif.io/api/image/2/level1.json",
-                                {"formats": [
-                                    "jpg"],
-                                    "qualities": [
-                                        "native",
-                                        "color",
-                                        "gray",
-                                        "bitonal"],
-                                    "supports": [
-                                        "regionByPct",
-                                        "regionSquare",
-                                        "sizeByForcedWh",
-                                        "sizeByWh",
-                                        "sizeAboveFull",
-                                        "rotationBy90s",
-                                        "mirroring"],
-                                    "maxWidth": 5000,
-                                    "maxHeight": 5000}
-                            ]},
+                            "profile": image_api['profile']
+                        },
                         "height": 450,
                         "width": 600},
                     "on": "http://251a31df-761d-46df-85c3-66cb967b8a67"}],
@@ -164,13 +151,13 @@ def getManifest(id_):
     return manifest
 
 
-@app.route('/iiif_manifest/<int:id_>.json')
+@app.route('/iiif_manifest/<int:id_>')
 @cross_origin()
 def iiif_manifest(id_: int):
-    content = gzip.compress(json.dumps(getManifest(id_)).encode('utf8'), 5)
-    response = Response(content)
-    response.headers['Content-length'] = len(content)
-    response.headers['Content-Encoding'] = 'gzip'
+    # content = gzip.compress(json.dumps(getManifest(id_)).encode('utf8'), 5)
+    # response = Response(content)
+    # response.headers['Content-length'] = len(content)
+    # response.headers['Content-Encoding'] = 'gzip'
     return jsonify(getManifest(id_))
 
 
