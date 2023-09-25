@@ -119,7 +119,7 @@ def getManifest(id_):
                 "@type": "sc:Canvas",
                 "label": "Ring",
                 "height": 450,
-                "width": "0",
+                "width": 600,
                 "images": [{
                     "@context": "http://iiif.io/api/presentation/2/context.json",
                     "@id": "http://a0a3ec3e-2084-4253-b0f9-a5f87645e15d",
