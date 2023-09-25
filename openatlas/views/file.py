@@ -1,3 +1,5 @@
+import gzip
+import json
 import os
 import subprocess
 from pathlib import Path
@@ -165,7 +167,11 @@ def getManifest(id_):
 @app.route('/iiif_manifest/<int:id_>.json')
 @cross_origin()
 def iiif_manifest(id_: int):
-    return jsonify(getManifest(id_))
+    content = gzip.compress(json.dumps(getManifest(id_)).encode('utf8'), 5)
+    response = jsonify(content)
+    response.headers['Content-length'] = len(content)
+    response.headers['Content-Encoding'] = 'gzip'
+    return response
 
 
 @app.route('/iiif/<int:id_>', methods=['GET'])
