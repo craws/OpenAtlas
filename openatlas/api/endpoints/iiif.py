@@ -2,13 +2,13 @@ import requests
 from flask import request, jsonify, Response
 from flask_restful import Resource
 
+from openatlas.api.resources.model_mapper import get_entity_by_id
 from openatlas.api.resources.util import get_license_name
-from openatlas.models.entity import Entity
 from openatlas import app
 
 
 def getManifest(id_):
-    entity = Entity.get_by_id(id_)
+    entity = get_entity_by_id(id_)
     url_root = app.config['IIIF_URL'] or f"{request.url_root}iiif/"
     # get metadata from the image api
     req = requests.get(
