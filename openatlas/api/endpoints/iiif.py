@@ -24,7 +24,7 @@ def getManifest(id_):
         "description": [{
             "@value": entity.description,
             "@language": "en"}],
-        "license": get_license_name(entity),
+        "license": "http://rightsstatements.org/vocab/NoC-NC/1.0/",
         "attribution": "By OpenAtlas",
         "sequences": [{
             "@id": "http://c8b09ce6-df6d-4d5e-9eba-17507dc5c185",
