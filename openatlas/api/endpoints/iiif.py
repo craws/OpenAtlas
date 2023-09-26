@@ -9,7 +9,7 @@ from openatlas import app
 
 def getManifest(id_):
     entity = get_entity_by_id(id_)
-    url_root = app.config['IIIF_URL'] or f"{request.headers.get('Host')}iiif/"
+    url_root = app.config['IIIF_URL'] or f"{request.url_root}iiif/"
     # get metadata from the image api
     req = requests.get(
         f"{url_root}{app.config['IIIF_PREFIX']}{id_}/info.json")
