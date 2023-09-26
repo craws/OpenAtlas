@@ -1,20 +1,14 @@
-import gzip
-import json
-import os
-import subprocess
-from pathlib import Path
 from typing import Any, Union, Optional
 
-import requests
 from flask import g, render_template, request, send_from_directory, url_for, \
-    jsonify
+    redirect
 from flask_babel import lazy_gettext as _
-from flask_cors import cross_origin
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
+from display.util import convert_image_to_iiif, required_group
 from openatlas import app
-from openatlas.display.util import required_group, get_file_path
+from openatlas.display.util import required_group
 from openatlas.forms.form import get_table_form
 from openatlas.models.entity import Entity
 
@@ -76,93 +70,15 @@ def file_add(id_: int, view: str) -> Union[str, Response]:
             f"{_('link')} {_(view)}"])
 
 
-@app.route('/file/iiif/<int:id_>', methods=['GET'])
+@app.route('/file/convert_iiif/<int:id_>', methods=['GET'])
 @required_group('contributor')
 def make_iiif_available(id_: int):
     convert_image_to_iiif(id_)
     return redirect(url_for('view', id_=id_))
 
 
-def convert_image_to_iiif(id_):
-    path = Path(app.config['IIIF_DIR']) / app.config['IIIF_PREFIX'] / str(id_)
-    vips = "vips" if os.name == 'posix' else "vips.exe"
-    command = \
-        (f"{vips} tiffsave {get_file_path(id_)} {path} "
-         f"--tile --pyramid --compression deflate "
-         f"--tile-width 256 --tile-height 256")
-    subprocess.Popen(command, shell=True)
-
-
-def getManifest(id_):
-    entity = Entity.get_by_id(id_)
-    url_root = app.config['IIIF_SERVER'] or request.url_root
-
-    # get metadata from the image api
-    req = requests.get(
-        f"{url_root}iiif/{app.config['IIIF_PREFIX']}{id_}/info.json")
-    image_api = req.json()
-    print(image_api)
-    manifest = {
-        "@context": "http://iiif.io/api/presentation/2/context.json",
-        "@id": f"{request.base_url}",
-        "@type": "sc:Manifest",
-        "label": entity.name,
-        "metadata": [],
-        "description": [{
-            "@value": entity.description,
-            "@language": "en"}],
-        "license": "https://creativecommons.org/licenses/by/3.0/",
-        "attribution": "By OpenAtlas",
-        "sequences": [{
-            "@id": "http://c8b09ce6-df6d-4d5e-9eba-17507dc5c185",
-            "@type": "sc:Sequence",
-            "label": [{
-                "@value": "Normal Sequence",
-                "@language": "en"}],
-            "canvases": [{
-                "@id": "http://251a31df-761d-46df-85c3-66cb967b8a67",
-                "@type": "sc:Canvas",
-                "label": entity.name,
-                "height": 450,
-                "width": 600,
-                "description": {
-                    "@value": entity.description,
-                    "@language": "en"},
-                "images": [{
-                    "@context": "http://iiif.io/api/presentation/2/context.json",
-                    "@id": "http://a0a3ec3e-2084-4253-b0f9-a5f87645e15d",
-                    "@type": "oa:Annotation",
-                    "motivation": "sc:painting",
-                    "resource": {
-                        "@id": f"{url_root}iiif/{id_}/full/full/0/default.jpg",
-                        "@type": "dctypes:Image",
-                        "format": "image/jpeg",
-                        "service": {
-                            "@context": "http://iiif.io/api/image/2/context.json",
-                            "@id": f"{url_root}iiif/{id_}",
-                            "profile": image_api['profile']
-                        },
-                        "height": 450,
-                        "width": 600},
-                    "on": "http://251a31df-761d-46df-85c3-66cb967b8a67"}],
-                "related": ""}]}],
-        "structures": []}
-
-    return manifest
-
-
-@app.route('/iiif_manifest/<int:id_>')
-@cross_origin()
-def iiif_manifest(id_: int):
-    # content = gzip.compress(json.dumps(getManifest(id_)).encode('utf8'), 5)
-    # response = Response(content)
-    # response.headers['Content-length'] = len(content)
-    # response.headers['Content-Encoding'] = 'gzip'
-    return jsonify(getManifest(id_))
-
-
 @app.route('/iiif/<int:id_>', methods=['GET'])
 @app.route('/iiif/<prefix>/<int:id_>', methods=['GET'])
 @required_group('contributor')
 def view_iiif(id_: int, prefix: Optional[str] = None):
-    return redirect(url_for('view', id_=id_))
+    return redirect(url_for('api.iiif_manifest', id_=id_))

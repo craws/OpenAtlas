@@ -4,6 +4,7 @@ import math
 import os
 import re
 import smtplib
+import subprocess
 from datetime import datetime, timedelta
 from email.header import Header
 from email.mime.text import MIMEText
@@ -768,3 +769,13 @@ def check_iiif_file_exist(id_: int) -> bool:
     file_to_check = (Path(app.config['IIIF_DIR'])
                      / app.config['IIIF_PREFIX'] / str(id_))
     return file_to_check.is_file()
+
+
+def convert_image_to_iiif(id_):
+    path = Path(app.config['IIIF_DIR']) / app.config['IIIF_PREFIX'] / str(id_)
+    vips = "vips" if os.name == 'posix' else "vips.exe"
+    command = \
+        (f"{vips} tiffsave {get_file_path(id_)} {path} "
+         f"--tile --pyramid --compression deflate "
+         f"--tile-width 256 --tile-height 256")
+    subprocess.Popen(command, shell=True)
