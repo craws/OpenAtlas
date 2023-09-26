@@ -24,13 +24,6 @@ def getManifest(id_):
         "description": [{
             "@value": entity.description,
             "@language": "en"}],
-        "thumbnail": {
-            "@id": f"{iiif_id}/full/250,250/0/default.jpg",
-            "service": {
-                "@context": "http://iiif.io/api/image/2/context.json",
-                "@id": iiif_id,
-                "profile": "http://iiif.io/api/image/2/level1.json"
-            }},
         "license": get_license_name(entity),
         "attribution": "By OpenAtlas",
         "sequences": [{
@@ -43,8 +36,8 @@ def getManifest(id_):
                 "@id": "http://251a31df-761d-46df-85c3-66cb967b8a67",
                 "@type": "sc:Canvas",
                 "label": entity.name,
-                "height": image_api['height'],
-                "width": image_api['width'],
+                "height": int(image_api['height']),
+                "width": int(image_api['width']),
                 "description": {
                     "@value": entity.description,
                     "@language": "en"},
@@ -64,8 +57,8 @@ def getManifest(id_):
                             "@id": iiif_id,
                             "profile": image_api['profile']
                         },
-                        "height": image_api['height'],
-                        "width": image_api['width']},
+                        "height": int(image_api['height']),
+                        "width": int(image_api['width'])},
                     "on": "http://251a31df-761d-46df-85c3-66cb967b8a67"}],
                 "related": ""}]}],
         "structures": []}
