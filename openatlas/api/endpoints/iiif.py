@@ -8,13 +8,69 @@ from openatlas import app
 
 
 def getManifest(id_):
+    # entity = get_entity_by_id(id_)
+    # url_root = app.config['IIIF_URL'] or f"{request.url_root}iiif/"
+    # # get metadata from the image api
+    # req = requests.get(
+    #     f"{url_root}{app.config['IIIF_PREFIX']}{id_}/info.json")
+    # image_api = req.json()
+    # iiif_id = f"{url_root}{id_}"
+    # manifest = {
+    #     "@context": "http://iiif.io/api/presentation/2/context.json",
+    #     "@id": f"{request.base_url}",
+    #     "@type": "sc:Manifest",
+    #     "label": entity.name,
+    #     "metadata": [],
+    #     "description": [{
+    #         "@value": entity.description,
+    #         "@language": "en"}],
+    #     "license": "http://rightsstatements.org/vocab/NoC-NC/1.0/",
+    #     "attribution": "By OpenAtlas",
+    #     "sequences": [{
+    #         "@id": "http://c8b09ce6-df6d-4d5e-9eba-17507dc5c185",
+    #         "@type": "sc:Sequence",
+    #         "label": [{
+    #             "@value": "Normal Sequence",
+    #             "@language": "en"}],
+    #         "canvases": [{
+    #             "@id": "http://251a31df-761d-46df-85c3-66cb967b8a67",
+    #             "@type": "sc:Canvas",
+    #             "label": entity.name,
+    #             "height": int(image_api['height']),
+    #             "width": int(image_api['width']),
+    #             "description": {
+    #                 "@value": entity.description,
+    #                 "@language": "en"},
+    #             "images": [{
+    #                 "@context":
+    #                     "http://iiif.io/api/presentation/2/context.json",
+    #                 "@id": "http://a0a3ec3e-2084-4253-b0f9-a5f87645e15d",
+    #                 "@type": "oa:Annotation",
+    #                 "motivation": "sc:painting",
+    #                 "resource": {
+    #                     "@id": f"{iiif_id}/full/full/0/default.jpg",
+    #                     "@type": "dctypes:Image",
+    #                     "format": "image/jpeg",
+    #                     "service": {
+    #                         "@context":
+    #                             "http://iiif.io/api/image/2/context.json",
+    #                         "@id": iiif_id,
+    #                         "profile": image_api['profile']
+    #                     },
+    #                     "height": int(image_api['height']),
+    #                     "width": int(image_api['width'])},
+    #                 "on": "http://251a31df-761d-46df-85c3-66cb967b8a67"}],
+    #             "related": ""}]}],
+    #     "structures": []}
+    #
     entity = get_entity_by_id(id_)
-    url_root = app.config['IIIF_URL'] or f"{request.url_root}iiif/"
+    url_root = app.config['IIIF_SERVER'] or request.url_root
+
     # get metadata from the image api
     req = requests.get(
-        f"{url_root}{app.config['IIIF_PREFIX']}{id_}/info.json")
+        f"{url_root}iiif/{app.config['IIIF_PREFIX']}{id_}/info.json")
     image_api = req.json()
-    iiif_id = f"{url_root}{id_}"
+    print(image_api)
     manifest = {
         "@context": "http://iiif.io/api/presentation/2/context.json",
         "@id": f"{request.base_url}",
@@ -24,7 +80,7 @@ def getManifest(id_):
         "description": [{
             "@value": entity.description,
             "@language": "en"}],
-        "license": "http://rightsstatements.org/vocab/NoC-NC/1.0/",
+        "license": "https://creativecommons.org/licenses/by/3.0/",
         "attribution": "By OpenAtlas",
         "sequences": [{
             "@id": "http://c8b09ce6-df6d-4d5e-9eba-17507dc5c185",
@@ -36,32 +92,31 @@ def getManifest(id_):
                 "@id": "http://251a31df-761d-46df-85c3-66cb967b8a67",
                 "@type": "sc:Canvas",
                 "label": entity.name,
-                "height": int(image_api['height']),
-                "width": int(image_api['width']),
+                "height": 450,
+                "width": 600,
                 "description": {
                     "@value": entity.description,
                     "@language": "en"},
                 "images": [{
-                    "@context":
-                        "http://iiif.io/api/presentation/2/context.json",
+                    "@context": "http://iiif.io/api/presentation/2/context.json",
                     "@id": "http://a0a3ec3e-2084-4253-b0f9-a5f87645e15d",
                     "@type": "oa:Annotation",
                     "motivation": "sc:painting",
                     "resource": {
-                        "@id": f"{iiif_id}/full/full/0/default.jpg",
+                        "@id": f"{url_root}iiif/{id_}/full/full/0/default.jpg",
                         "@type": "dctypes:Image",
                         "format": "image/jpeg",
                         "service": {
-                            "@context":
-                                "http://iiif.io/api/image/2/context.json",
-                            "@id": iiif_id,
+                            "@context": "http://iiif.io/api/image/2/context.json",
+                            "@id": f"{url_root}iiif/{id_}",
                             "profile": image_api['profile']
                         },
-                        "height": int(image_api['height']),
-                        "width": int(image_api['width'])},
+                        "height": 450,
+                        "width": 600},
                     "on": "http://251a31df-761d-46df-85c3-66cb967b8a67"}],
                 "related": ""}]}],
         "structures": []}
+
     return manifest
 
 
