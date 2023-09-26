@@ -14,7 +14,7 @@ def getManifest(id_):
     req = requests.get(
         f"{url_root}{app.config['IIIF_PREFIX']}{id_}/info.json")
     image_api = req.json()
-    iiif_id = f"{url_root}iiif/{id_}"
+    iiif_id = f"{url_root}{id_}"
     manifest = {
         "@context": "http://iiif.io/api/presentation/2/context.json",
         "@id": f"{request.base_url}",
