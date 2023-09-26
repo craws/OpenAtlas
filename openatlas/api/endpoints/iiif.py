@@ -1,3 +1,5 @@
+from typing import Any
+
 import requests
 from flask import request, jsonify, Response
 from flask_restful import Resource
@@ -7,7 +9,7 @@ from openatlas.api.resources.util import get_license_name
 from openatlas import app
 
 
-def getManifest(id_):
+def get_manifest(id_: int) -> dict[str, Any]:
     entity = get_entity_by_id(id_)
     url_root = app.config['IIIF_URL'] or f"{request.url_root}iiif/"
     # get metadata from the image api
@@ -55,14 +57,12 @@ def getManifest(id_):
                             "@context":
                                 "http://iiif.io/api/image/2/context.json",
                             "@id": iiif_id,
-                            "profile": image_api['profile']
-                        },
+                            "profile": image_api['profile']},
                         "height": image_api['height'],
                         "width": image_api['width']},
                     "on": "http://251a31df-761d-46df-85c3-66cb967b8a67"}],
                 "related": ""}]}],
         "structures": []}
-
 
     return manifest
 
@@ -70,9 +70,4 @@ def getManifest(id_):
 class IIIFManifest(Resource):
     @staticmethod
     def get(id_: int) -> Response:
-        # content = gzip.compress(json.dumps(getManifest(id_)).encode(
-        # 'utf8'), 5)
-        # response = Response(content)
-        # response.headers['Content-length'] = len(content)
-        # response.headers['Content-Encoding'] = 'gzip'
-        return jsonify(getManifest(id_))
+        return jsonify(get_manifest(id_))
