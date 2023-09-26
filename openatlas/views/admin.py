@@ -25,7 +25,7 @@ from openatlas.display.table import Table
 from openatlas.display.util import (
     button, convert_size, display_form, display_info, format_date,
     get_file_path, is_authorized, link, manual, required_group, sanitize,
-    send_mail, uc_first)
+    send_mail, uc_first, convert_image_to_iiif)
 from openatlas.forms.field import SubmitField
 from openatlas.forms.setting import (
     ApiForm, ContentForm, FilesForm, GeneralForm, LogForm, MailForm, MapForm,
@@ -38,7 +38,6 @@ from openatlas.models.link import Link
 from openatlas.models.settings import Settings
 from openatlas.models.type import Type
 from openatlas.models.user import User
-from display.util import convert_image_to_iiif
 
 
 @app.route('/admin', methods=['GET', 'POST'], strict_slashes=False)
