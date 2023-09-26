@@ -36,8 +36,8 @@ def getManifest(id_):
                 "@id": "http://251a31df-761d-46df-85c3-66cb967b8a67",
                 "@type": "sc:Canvas",
                 "label": entity.name,
-                "height": int(image_api['height']),
-                "width": int(image_api['width']),
+                "height": image_api['height'],
+                "width": image_api['width'],
                 "description": {
                     "@value": entity.description,
                     "@language": "en"},
@@ -57,8 +57,8 @@ def getManifest(id_):
                             "@id": iiif_id,
                             "profile": image_api['profile']
                         },
-                        "height": int(image_api['height']),
-                        "width": int(image_api['width'])},
+                        "height": image_api['height'],
+                        "width": image_api['width']},
                     "on": "http://251a31df-761d-46df-85c3-66cb967b8a67"}],
                 "related": ""}]}],
         "structures": []}
