@@ -48,7 +48,7 @@ PROCESSED_EXT = '.jpeg'
 IIIF_ACTIVATE = False
 IIIF_DIR = ''
 IIIF_PREFIX = ''  # has to end with /
-IIIF_SERVER = ''
+IIIF_URL = ''
 
 # For system checks
 WRITABLE_DIRS = [
