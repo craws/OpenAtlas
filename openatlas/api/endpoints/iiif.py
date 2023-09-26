@@ -2,7 +2,7 @@ import requests
 from flask import request, jsonify, Response
 from flask_restful import Resource
 
-from api.resources.util import get_license_name
+from openatlas.api.resources.util import get_license_name
 from models.entity import Entity
 from openatlas import app
 

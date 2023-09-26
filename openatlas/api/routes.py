@@ -1,6 +1,6 @@
 from flask_restful import Api
 
-from api.endpoints.iiif import IIIFManifest
+from openatlas.api.endpoints.iiif import IIIFManifest
 from openatlas.api.endpoints.content import ClassMapping, \
     GetContent, SystemClassCount
 from openatlas.api.endpoints.special import GetGeometricEntities, \

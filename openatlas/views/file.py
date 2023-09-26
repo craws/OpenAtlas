@@ -1,12 +1,11 @@
 from typing import Any, Union, Optional
 
-from flask import g, render_template, request, send_from_directory, url_for, \
-    redirect
+from flask import g, render_template, request, send_from_directory, url_for
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
-from display.util import convert_image_to_iiif, required_group
+from display.util import convert_image_to_iiif
 from openatlas import app
 from openatlas.display.util import required_group
 from openatlas.forms.form import get_table_form
