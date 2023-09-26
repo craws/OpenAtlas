@@ -5,9 +5,8 @@ from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
-from display.util import convert_image_to_iiif
 from openatlas import app
-from openatlas.display.util import required_group
+from openatlas.display.util import required_group, convert_image_to_iiif
 from openatlas.forms.form import get_table_form
 from openatlas.models.entity import Entity
 
