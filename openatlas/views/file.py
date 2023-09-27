@@ -75,7 +75,7 @@ def make_iiif_available(id_: int):
     return redirect(url_for('view', id_=id_))
 
 
-@app.route('/iiif/<int:id_>', methods=['GET'])
+@app.route('/view_iiif/<int:id_>', methods=['GET'])
 @required_group('contributor')
 def view_iiif(id_: int):
     return redirect(url_for('api.iiif_manifest', id_=id_))
