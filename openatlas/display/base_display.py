@@ -13,7 +13,7 @@ from openatlas.display.util import (
     bookmark_toggle, button, description, edit_link, format_date,
     format_entity_date, get_appearance, get_base_table_data, get_system_data,
     is_authorized, link, manual, profile_image_table_link, remove_link,
-    get_chart_data)
+    get_chart_data, check_iiif_file_exist)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -101,7 +101,8 @@ class BaseDisplay:
             overlays=self.overlays,
             chart_data=self.get_chart_data(),
             description_html=self.description_html(),
-            problematic_type_id=self.problematic_type)
+            problematic_type_id=self.problematic_type,
+            iiif_image=check_iiif_file_exist(self.entity.image_id))
 
     def description_html(self) -> str:
         return description(self.entity.description)

@@ -16,19 +16,15 @@
               "defaultSideBarPanel": 'attribution',
               "sideBarOpenByDefault": true,
           },
-          "language": "{{ session.language }}", // Set default language display here.
-          "availableLanguages": { // All the languages available in the language switcher
-              "ca": "Català",
+          "language": "{{ session.language }}",
+          "availableLanguages": {
               "de": "Deutsch",
               "en": "English",
-              "es": "Español",
               "fr": "Français"
           },
-          "windows": [
-              {
-                  "loadedManifest": "{{ manifest_url }}"
-              }
-          ]
+          "windows": [{
+              "loadedManifest": "{{ manifest_url }}"
+          }]
       };
       Mirador.viewer(config);
   </script>

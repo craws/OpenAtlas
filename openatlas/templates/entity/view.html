@@ -20,9 +20,9 @@
     {{ entity.reference_systems|ext_references|safe }}
     {{ description_html|safe }}
   </div>
-  {% if config.IIIF_ACTIVATE and entity.class_.name == 'file' %}
+  {% if iiif_image and entity.class_.name == 'file' %}
     <div class="col-lg-6">
-  <iframe src="{{ url_for('view_iiif', id_=entity.id) }}" width="100%" height="100%"></iframe>
+      <iframe src="{{ url_for('view_iiif', id_=entity.id) }}" width="100%" height="100%"></iframe>
     </div>
   {% endif %}
   {% if gis_data %}
@@ -40,20 +40,20 @@
     <script src="/static/node_modules/chart.js/dist/chart.umd.js"></script>
     <script src="/static/node_modules/chartjs-plugin-autocolors/dist/chartjs-plugin-autocolors.min.js"></script>
     <script>
-      const ctx = document.getElementById('type-chart');
-      const autocolors = window['chartjs-plugin-autocolors'];
-      Chart.register(autocolors);
-      new Chart(ctx, {
-        type : 'bar',
-        data: {{ chart_data|safe }},
-        options: {
-          animation: {duration: 0},
-          plugins: {
-            autocolors: {mode: 'data', offset: 3},
-            legend: {display: false}
-          }
-        },
-      });
+        const ctx = document.getElementById('type-chart');
+        const autocolors = window['chartjs-plugin-autocolors'];
+        Chart.register(autocolors);
+        new Chart(ctx, {
+            type: 'bar',
+            data: {{ chart_data|safe }},
+            options: {
+                animation: {duration: 0},
+                plugins: {
+                    autocolors: {mode: 'data', offset: 3},
+                    legend: {display: false}
+                }
+            },
+        });
     </script>
   {% endif %}
 </div>
