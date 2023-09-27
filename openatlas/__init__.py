@@ -29,6 +29,7 @@ from openatlas.views import (
     file, hierarchy, index, imports, link, login, model, note, overlay,
     profile, search, sql, type as type_, user, vocabs)
 
+
 @babel.localeselector
 def get_locale() -> str:
     if 'language' in session:
@@ -55,8 +56,8 @@ def before_request() -> None:
     g.cursor = g.db.cursor(cursor_factory=extras.DictCursor)
     g.settings = Settings.get_settings()
     session['language'] = get_locale()
-    g.cidoc_classes = CidocClass.get_all()
-    g.properties = CidocProperty.get_all()
+    g.cidoc_classes = CidocClass.get_all(session['language'])
+    g.properties = CidocProperty.get_all(session['language'])
     g.classes = OpenatlasClass.get_all()
     g.types = Type.get_all()
     g.reference_systems = ReferenceSystem.get_all()

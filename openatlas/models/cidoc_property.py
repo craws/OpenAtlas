@@ -12,8 +12,8 @@ class CidocProperty:
 
     def __init__(self, data: dict[str, Any]) -> None:
         self.id = data['id']
-        self._name = data['name']
-        self._name_inverse = data['name_inverse']
+        self.name = data['name']
+        self.name_inverse = data['name_inverse']
         self.code = data['code']
         self.comment = data['comment']
         self.domain_class_code = data['domain_class_code']
@@ -23,28 +23,6 @@ class CidocProperty:
         self.super: list[int] = []
         self.i18n: dict[str, str] = {}
         self.i18n_inverse: dict[str, str] = {}
-
-    @property
-    def name(self) -> str:
-        from openatlas import get_locale
-        locale_session = get_locale()
-        name = getattr(self, '_name')
-        if locale_session in self.i18n:
-            name = self.i18n[locale_session]
-        elif g.settings['default_language'] in self.i18n:
-            name = self.i18n[g.settings['default_language']]
-        return name
-
-    @property
-    def name_inverse(self) -> str:
-        from openatlas import get_locale
-        locale_session = get_locale()
-        name = getattr(self, '_name_inverse')
-        if locale_session in self.i18n_inverse:
-            name = self.i18n_inverse[locale_session]
-        elif g.settings['default_language'] in self.i18n_inverse:
-            name = self.i18n_inverse[g.settings['default_language']]
-        return name
 
     def find_object(self, attr: str, class_id: int) -> bool:
         valid_domain_id = getattr(self, attr)
@@ -70,7 +48,7 @@ class CidocProperty:
         return False
 
     @staticmethod
-    def get_all() -> dict[str, CidocProperty]:
+    def get_all(language: str) -> dict[str, CidocProperty]:
         properties = {
             row['code']: CidocProperty(row) for row in Db.get_properties()}
         for row in Db.get_hierarchy():
@@ -81,4 +59,14 @@ class CidocProperty:
                 row['text']
             properties[row['property_code']].i18n_inverse[
                 row['language_code']] = row['text_inverse']
+        for property_ in properties.values():
+            default = g.settings['default_language']
+            if language in property_.i18n:
+                property_.name = property_.i18n[language]
+            elif default in property_.i18n:
+                property_.name = property_.i18n[default]
+            if language in property_.i18n_inverse:
+                property_.name_inverse = property_.i18n_inverse[language]
+            elif default in property_.i18n_inverse:
+                property_.name_inverse = property_.i18n_inverse[default]
         return properties

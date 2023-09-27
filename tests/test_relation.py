@@ -1,7 +1,6 @@
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.link import Link
 from tests.base import TestBaseCase, get_hierarchy, insert
 
 
@@ -50,7 +49,7 @@ class RelationTests(TestBaseCase):
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                link_ = Link.get_links(actor.id, 'OA7')[0]
+                link_ = actor.get_links('OA7')[0]
 
             rv = self.app.post(
                 url_for('type_move_entities', id_=sub_id),

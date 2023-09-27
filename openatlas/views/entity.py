@@ -123,12 +123,11 @@ def update(id_: int, copy: Optional[str] = None) -> Union[str, Response]:
     if entity.class_.view in ['artifact', 'place']:
         manager.entity.image_id = manager.entity.get_profile_image_id()
         if not manager.entity.image_id:
-            for link_ in manager.entity.get_links('P67', inverse=True):
-                domain = link_.domain
-                if domain.class_.view == 'file' \
-                        and get_base_table_data(domain)[3] \
+            for l in manager.entity.get_links('P67', inverse=True):
+                if l.domain.class_.view == 'file' \
+                        and get_base_table_data(l.domain)[3] \
                         in app.config['DISPLAY_FILE_EXTENSIONS']:
-                    manager.entity.image_id = domain.id
+                    manager.entity.image_id = l.domain.id
                     break
     return render_template(
         'entity/update.html',

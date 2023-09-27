@@ -27,7 +27,6 @@ from openatlas.display.image_processing import check_processed_image
 from openatlas.models.cidoc_class import CidocClass
 from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.content import get_translation
-from openatlas.models.imports import Project
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
@@ -514,6 +513,7 @@ def link(
         external: bool = False) -> str:
     from openatlas.models.entity import Entity
     from openatlas.models.user import User
+    from openatlas.models.imports import Project
     html = ''
     if isinstance(object_, (str, LazyString)):
         js = f'onclick="{js}"' if js else ''
@@ -748,10 +748,7 @@ def datetime64_to_timestamp(date: Optional[numpy.datetime64]) -> Optional[str]:
 def get_entities_linked_to_type_recursive(
         id_: int,
         data: list[Entity]) -> list[Entity]:
-    for entity in g.types[id_].get_linked_entities(
-            ['P2', 'P89'],
-            inverse=True,
-            types=True):
+    for entity in g.types[id_].get_linked_entities(['P2', 'P89'], True, True):
         data.append(entity)
     for sub_id in g.types[id_].subs:
         get_entities_linked_to_type_recursive(sub_id, data)

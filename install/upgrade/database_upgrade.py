@@ -21,6 +21,7 @@ from psycopg2 import extras
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
+# pylint: disable=wrong-import-position
 from config.database_versions import DATABASE_VERSIONS
 from config.default import (
     DATABASE_PASS, VERSION, DATABASE_VERSION, DATABASE_NAME, DATABASE_USER,

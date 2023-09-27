@@ -104,9 +104,9 @@ def resolve_entity(
         parser: dict[str, Any]) \
         -> Union[Response, dict[str, Any], tuple[Any, int]]:
     if parser['export'] == 'csv':
-        export_entities_csv(entity, entity.name)
+        return export_entities_csv(entity, entity.name)
     if parser['export'] == 'csvNetwork':
-        export_csv_for_network_analysis([entity], parser)
+        return export_csv_for_network_analysis([entity], parser)
     result = get_entity_formatted(entity, parser)
     if parser['format'] in app.config['RDF_FORMATS']:  # pragma: nocover
         return Response(

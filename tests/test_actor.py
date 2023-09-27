@@ -3,7 +3,6 @@ from typing import Any
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.link import Link
 from tests.base import TestBaseCase, get_hierarchy, insert
 
 
@@ -144,7 +143,7 @@ class ActorTests(TestBaseCase):
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                link_ = Link.get_links(group.id, 'P107')[0]
+                link_ = group.get_links('P107')[0]
 
             rv = self.app.get(
                 url_for('link_update', id_=link_.id, origin_id=group.id))

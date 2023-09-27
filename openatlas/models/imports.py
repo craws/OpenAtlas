@@ -4,6 +4,7 @@ from flask import g
 from flask_login import current_user
 
 from openatlas.database.imports import Import as Db
+from openatlas.display.util import sanitize
 
 
 class Project:
@@ -52,7 +53,6 @@ class Import:
 
     @staticmethod
     def update_project(project: Project) -> None:
-        from openatlas.display.util import sanitize
         Db.update_project(
             project.id,
             project.name,
