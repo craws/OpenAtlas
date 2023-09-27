@@ -82,9 +82,7 @@ class FileDisplay(BaseDisplay):
                 if check_iiif_file_exist(self.entity.id):
                     self.buttons.append(button(
                         _('iiif'),
-                        url_for('view_iiif',
-                                prefix=app.config['IIIF_PREFIX'],
-                                id_=self.entity.id)))
+                        url_for('view_iiif', id_=self.entity.id)))
                 else:
                     self.buttons.append(button(
                         _('make_iiif_available'),
