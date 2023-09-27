@@ -1,0 +1,35 @@
+<div class="row">
+  <div id="viewer" style="width: 50%;"></div>
+  <script src="/static/node_modules/mirador/dist/mirador.min.js"></script>
+  <script>
+      var config = {
+          "id": "viewer",
+          "layout": "1x1",
+          "mainMenuSettings": {
+              "show": false
+          },
+          "workspaceControlPanel": {
+              "enabled": false,
+          },
+          "window": {
+              "allowClose": false,
+              "defaultSideBarPanel": 'attribution',
+              "sideBarOpenByDefault": true,
+          },
+          "language": "{{ session.language }}", // Set default language display here.
+          "availableLanguages": { // All the languages available in the language switcher
+              "ca": "Català",
+              "de": "Deutsch",
+              "en": "English",
+              "es": "Español",
+              "fr": "Français"
+          },
+          "windows": [
+              {
+                  "loadedManifest": "{{ manifest_url }}"
+              }
+          ]
+      };
+      Mirador.viewer(config);
+  </script>
+</div>

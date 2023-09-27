@@ -26,6 +26,7 @@ package_json = {
         "leaflet.fullscreen": "2.2.0",
         "leaflet.markercluster": "^1.5.3",
         "leaflet": "^1.7.1",
+        "mirador": "^3.3.0",
         "save-svg-as-png": "^1.4.17",
         "tinymce": "^5.10.3",
     }

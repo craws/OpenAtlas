@@ -1,4 +1,4 @@
-from typing import Any, Union, Optional
+from typing import Any, Union
 
 from flask import g, render_template, request, send_from_directory, url_for
 from flask_babel import lazy_gettext as _
@@ -78,4 +78,7 @@ def make_iiif_available(id_: int):
 @app.route('/view_iiif/<int:id_>', methods=['GET'])
 @required_group('contributor')
 def view_iiif(id_: int):
-    return redirect(url_for('api.iiif_manifest', id_=id_))
+    #return redirect(url_for('api.iiif_manifest', id_=id_))
+    return render_template(
+            'iiif.html',
+            manifest_url = url_for('api.iiif_manifest', id_=id_, _external=True))
