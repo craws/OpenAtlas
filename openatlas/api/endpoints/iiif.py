@@ -13,6 +13,7 @@ def get_manifest(id_: int) -> dict[str, Any]:
     entity = get_entity_by_id(id_)
     url_root = app.config['IIIF_URL'] or f"{request.url_root}iiif/"
     # get metadata from the image api
+    print(f"{url_root}{app.config['IIIF_PREFIX']}{id_}/info.json")
     req = requests.get(
         f"{url_root}{app.config['IIIF_PREFIX']}{id_}/info.json")
     image_api = req.json()
