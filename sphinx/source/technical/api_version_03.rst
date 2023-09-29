@@ -352,7 +352,7 @@ Retrieves a detailed GeoJSON list of all chosen geometries in an OpenAtlas insta
     https://demo.openatlas.eu/api/0.3/geometric_entities/
 
 Subunits
-""""""""""""""""""
+""""""""
 
 .. code::
 
@@ -369,6 +369,9 @@ Displays all subunits of a place in a special format used by the `THANADOS <http
 Image endpoints
 ***************
 
+Display
+"""""""
+
 .. code::
 
   /api/0.3/display/{id}
@@ -381,3 +384,20 @@ from a **logged-in** user or API public setting is set to on and the image has a
 ----------------------------------------------------
 :ref:`image_size-para-0.3`
 =========================== ========================
+
+
+Licensed file overview
+""""""""""""""""""""""
+
+.. code::
+
+  /api/0.3/licensed_file_overview/
+
+Provides a list of all images, or images provided by:ref:`file_id-para-0.3`, with their data used to implement in a
+presentation site (display URL, thumbnail URL, file extension, license).
+
+======================== ======================== ========================
+ **Optional Parameters**
+--------------------------------------------------------------------------
+:ref:`count-para-0.3`    :ref:`download-para-0.3` :ref:`file_id-para-0.3`
+======================== ======================== ========================
