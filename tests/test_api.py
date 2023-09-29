@@ -761,7 +761,7 @@ class Api(ApiTestCase):
             rv = self.app.get(url_for('api_03.licensed_file_overview'))
             assert '152' in rv.get_json()
             rv = self.app.get(url_for(
-                'api_03.licensed_file_overview'), file_id=154)
+                'api_03.licensed_file_overview', file_id='154'))
             assert '154' in rv.get_json()
 
             # Test Error Handling
