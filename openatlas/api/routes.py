@@ -4,7 +4,7 @@ from openatlas.api.endpoints.content import ClassMapping, \
     GetContent, SystemClassCount
 from openatlas.api.endpoints.special import GetGeometricEntities, \
     ExportDatabase, GetSubunits
-from openatlas.api.endpoints.display_image import DisplayImage
+from openatlas.api.endpoints.display_image import DisplayImage, LicensedFileOverview
 from openatlas.api.endpoints.entities import GetByCidocClass, \
     GetBySystemClass, GetByViewClass, GetEntitiesLinkedToEntity, GetEntity, \
     GetLatest, GetQuery, GetTypeEntities, GetTypeEntitiesAll
@@ -93,3 +93,7 @@ def add_routes_v03(api: Api) -> None:
         DisplayImage,
         '/display/<path:filename>',
         endpoint='display')
+    api.add_resource(
+        LicensedFileOverview,
+        '/licensed_file_overview/',
+        endpoint='licensed_file_overview')
