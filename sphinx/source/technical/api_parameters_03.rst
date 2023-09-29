@@ -92,6 +92,20 @@ API parameters 0.3
      - | csv
        | csvNetwork
 
+.. _file_id-para-0.3:
+
+.. list-table:: **file_id**
+   :widths: 10 80
+   :stub-columns: 1
+
+   * - Format
+     - integer
+   * - Description
+     - ID of a file. This parameter can be used multiple times to query more IDs.
+   * - Values
+     - e.g. 89
+
+
 .. _first-para-0.3:
 
 .. list-table:: **first**

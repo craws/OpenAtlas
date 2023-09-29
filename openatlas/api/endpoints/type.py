@@ -1,7 +1,7 @@
 from collections import defaultdict
 from typing import Any, Union
 
-from flask import Response, g, url_for
+from flask import Response, g, url_for, jsonify
 from flask_restful import Resource, marshal
 
 from openatlas.api.resources.parser import default, entity_
@@ -79,9 +79,12 @@ class GetTypeOverview(Resource):
 class GetTypeTree(Resource):
     @staticmethod
     def get() -> Union[tuple[Resource, int], Response]:
+        parser = entity_.parse_args()
         type_tree = {'typeTree': GetTypeTree.get_type_tree()}
-        if entity_.parse_args()['download']:
+        if parser['download']:
             return download(type_tree, type_tree_template(), 'type_tree')
+        if parser['count'] == 'true':
+            return jsonify(len(type_tree['typeTree']))
         return marshal(type_tree, type_tree_template()), 200
 
     @staticmethod
