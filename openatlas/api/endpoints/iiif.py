@@ -29,13 +29,13 @@ def get_manifest(id_: int) -> dict[str, Any]:
         "license": get_license_name(entity),
         "attribution": "By OpenAtlas",
         "sequences": [{
-            "@id": "http://c8b09ce6-df6d-4d5e-9eba-17507dc5c185",
+            "@id": "https://c8b09ce6-df6d-4d5e-9eba-17507dc5c185",
             "@type": "sc:Sequence",
             "label": [{
                 "@value": "Normal Sequence",
                 "@language": "en"}],
             "canvases": [{
-                "@id": "http://251a31df-761d-46df-85c3-66cb967b8a67",
+                "@id": "https://251a31df-761d-46df-85c3-66cb967b8a67",
                 "@type": "sc:Canvas",
                 "label": entity.name,
                 "height": image_api['height'],
@@ -45,7 +45,7 @@ def get_manifest(id_: int) -> dict[str, Any]:
                     "@language": "en"},
                 "images": [{
                     "@context":
-                        "http://iiif.io/api/presentation/2/context.json",
+                        "https://iiif.io/api/presentation/2/context.json",
                     "@id": "http://a0a3ec3e-2084-4253-b0f9-a5f87645e15d",
                     "@type": "oa:Annotation",
                     "motivation": "sc:painting",
