@@ -166,7 +166,7 @@ def get_reference_systems(
         links_inverse: list[Link]) -> list[dict[str, Any]]:
     ref = []
     for link_ in links_inverse:
-        if not isinstance(link_.domain, ReferenceSystem):
+        if not isinstance(link_.domain, ReferenceSystem) or not link_.type:
             continue
         system = g.reference_systems[link_.domain.id]
         ref.append({
