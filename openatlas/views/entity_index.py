@@ -10,7 +10,7 @@ from openatlas.display.image_processing import check_processed_image
 from openatlas.display.table import Table
 from openatlas.display.util import (
     button, format_date, get_base_table_data, get_file_path, is_authorized,
-    link, manual, required_group)
+    link, manual, required_group, convert_size)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 
@@ -50,10 +50,8 @@ def get_table(view: str) -> Table:
                 format_date(entity.created),
                 link(entity),
                 link(entity.standard_type),
-                g.file_stats[entity.id]['size']
-                if entity.id in g.file_stats else 'N/A',
-                g.file_stats[entity.id]['ext']
-                if entity.id in g.file_stats else 'N/A',
+                entity.get_file_size(),
+                entity.get_file_extension(),
                 entity.description]
             if g.settings['image_processing'] \
                     and current_user.settings['table_show_icons']:

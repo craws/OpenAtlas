@@ -91,14 +91,13 @@ def delete_orphaned_resized_images() -> None:
         path = Path(app.config['RESIZED_IMAGES']) / size
         for file in path.glob('**/*'):
             file_name = file.name.rsplit('.', 1)[0].lower()
-            if not file_name.isdigit() or int(file_name) not in g.file_stats:
+            if not file_name.isdigit() or int(file_name) not in g.files:
                 file.unlink()  # pragma: no cover
 
 
 def create_resized_images() -> None:
     from openatlas.models.entity import Entity
     for entity in Entity.get_by_class('file'):
-        if entity.id in g.file_stats \
-                and g.file_stats[entity.id]['ext'] \
-                in app.config['ALLOWED_IMAGE_EXT']:
-            resize_image(f"{entity.id}{g.file_stats[entity.id]['ext']}")
+        if entity.id in g.files:
+            if entity.get_file_extension() in app.config['ALLOWED_IMAGE_EXT']:
+                resize_image(f"{entity.id}{entity.get_file_extension()}")

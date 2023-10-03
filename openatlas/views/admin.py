@@ -519,6 +519,7 @@ def admin_orphans() -> str:
     for file in app.config['UPLOAD_DIR'].iterdir():
         if file.name != '.gitignore' \
                 and os.path.isfile(file) \
+                and file.stem.isdigit() \
                 and int(file.stem) not in entity_file_ids:
             confirm = _('Delete %(name)s?', name=file.name.replace("'", ''))
             tabs['orphaned_files'].table.rows.append([
@@ -606,18 +607,16 @@ def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
     table = Table([''] + g.table_headers['file'] + ['date'])
     for entity in Entity.get_display_files():
         date = 'N/A'
-        if entity.id in g.file_stats:
+        if entity.id in g.files:
             date = format_date(
                 datetime.datetime.utcfromtimestamp(
-                    g.file_stats[entity.id]['date']))
+                    g.files[entity.id].stat().st_ctime))
         table.rows.append([
             link(_('set'), url_for('admin_logo', id_=entity.id)),
             entity.name,
             link(entity.standard_type),
-            g.file_stats[entity.id]['size']
-            if entity.id in g.file_stats else 'N/A',
-            g.file_stats[entity.id]['ext']
-            if entity.id in g.file_stats else 'N/A',
+            entity.get_file_size(),
+            entity.get_file_extension(),
             entity.description,
             date])
     return render_template(
