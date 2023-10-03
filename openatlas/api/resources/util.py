@@ -235,7 +235,7 @@ def get_geometries(parser: dict[str, Any]) -> list[dict[str, Any]]:
     all_geoms = Gis.get_all()
     out = []
     for item in choices \
-            if parser['geometry'] == 'gisAll' else parser['geometry']:
+            if 'gisAll' in parser['geometry'] else parser['geometry']:
         for geom in json.loads(all_geoms[item]):
             out.append(geom)
     return out
