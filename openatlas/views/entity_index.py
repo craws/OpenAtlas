@@ -10,7 +10,7 @@ from openatlas.display.image_processing import check_processed_image
 from openatlas.display.table import Table
 from openatlas.display.util import (
     button, format_date, get_base_table_data, get_file_path, is_authorized,
-    link, manual, required_group, convert_size)
+    link, manual, required_group)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 

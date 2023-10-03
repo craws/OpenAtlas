@@ -166,16 +166,16 @@ def get_reference_systems(
         links_inverse: list[Link]) -> list[dict[str, Any]]:
     ref = []
     for link_ in links_inverse:
-        if not isinstance(link_.domain, ReferenceSystem) or not link_.type:
-            continue
-        system = g.reference_systems[link_.domain.id]
-        ref.append({
-            'referenceURL': system.website_url,
-            'id': link_.description,
-            'resolverURL': system.resolver_url,
-            'identifier': f"{system.resolver_url or ''}{link_.description}",
-            'type': to_camel_case(g.types[link_.type.id].name),
-            'referenceSystem': system.name})
+        if isinstance(link_.domain, ReferenceSystem) and link_.type:
+            system = g.reference_systems[link_.domain.id]
+            ref.append({
+                'referenceURL': system.website_url,
+                'id': link_.description,
+                'resolverURL': system.resolver_url,
+                'identifier':
+                    f"{system.resolver_url or ''}{link_.description}",
+                'type': to_camel_case(g.types[link_.type.id].name),
+                'referenceSystem': system.name})
     return ref
 
 
