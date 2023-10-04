@@ -13,8 +13,7 @@ from openatlas.display.table import Table
 from openatlas.display.util import (
     button, description, edit_link, format_entity_date, get_base_table_data,
     get_file_path, is_authorized, link, remove_link, uc_first,
-    check_iiif_activation,
-    check_iiif_file_exist)
+    check_iiif_activation, check_iiif_file_exist)
 from openatlas.models.entity import Entity
 from openatlas.views.tools import carbon_result, sex_result
 
