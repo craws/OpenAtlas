@@ -235,25 +235,28 @@ def profile_image(entity: Entity) -> str:
     path = get_file_path(entity.image_id)
     if not path:
         return ''  # pragma: no cover
-    resized = None
-    size = app.config['IMAGE_SIZE']['thumbnail']
-    if g.settings['image_processing'] and check_processed_image(path.name):
-        if path_ := get_file_path(entity.image_id, size):
-            resized = url_for('display_file', filename=path_.name, size=size)
-    url = url_for('display_file', filename=path.name)
-    src = resized or url
-    style = f'max-width:{g.settings["profile_image_width"]}px;'
     ext = app.config["DISPLAY_FILE_EXTENSIONS"]
-    if resized:
-        style = f'max-width:{app.config["IMAGE_SIZE"]["thumbnail"]}px;'
-        ext = app.config["ALLOWED_IMAGE_EXT"]
+    src = url_for('display_file', filename=path.name)
+    style = f'max-width:{g.settings["profile_image_width"]}px;'
+    if app.config['IIIF']['activate'] and check_iiif_file_exist(entity.id):
+        style = f'max-width:200px;'
+        ext = app.config["DISPLAY_FILE_EXTENSIONS"]
+        src = \
+            (f"{app.config['IIIF']['url']}{entity.id}"
+             f"/full/!200,200/0/default.png")
+    elif g.settings['image_processing'] and check_processed_image(path.name):
+        size = app.config['IMAGE_SIZE']['thumbnail']
+        if path_ := get_file_path(entity.image_id, size):
+            src = url_for('display_file', filename=path_.name, size=size)
+            style = f'max-width:{app.config["IMAGE_SIZE"]["thumbnail"]}px;'
+            ext = app.config["ALLOWED_IMAGE_EXT"]
     if entity.class_.view == 'file':
         html = \
             '<p class="uc-first">' + _('no preview available') + '</p>'
         if path.suffix.lower() in ext:
             html = link(
                 f'<img style="{style}" alt="image" src="{src}">',
-                url,
+                src,
                 external=True)
     else:
         html = link(
