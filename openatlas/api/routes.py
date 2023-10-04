@@ -1,6 +1,7 @@
 from flask_restful import Api
 
-from openatlas.api.endpoints.iiif import IIIFManifest, IIIFImage, IIIFCanvas
+from openatlas.api.endpoints.iiif import IIIFManifest, IIIFImage, IIIFCanvas, \
+    IIIFSequence
 from openatlas.api.endpoints.content import ClassMapping, \
     GetContent, SystemClassCount
 from openatlas.api.endpoints.special import GetGeometricEntities, \
@@ -106,13 +107,13 @@ def add_routes_v03(api: Api) -> None:
         endpoint='iiif_manifest')
     api.add_resource(
         IIIFImage,
-        '/iiif_image/<int:id_>',
+        '/iiif_image/<int:id_>.json',
         endpoint='iiif_image')
     api.add_resource(
         IIIFCanvas,
-        '/iiif_canvas/<int:id_>',
+        '/iiif_canvas/<int:id_>.json',
         endpoint='iiif_canvas')
-    # api.add_resource(
-    #     IIIFSequence,
-    #     '/iiif_sequence/<int:id_>',
-    #     endpoint='iiif_sequence')
+    api.add_resource(
+        IIIFSequence,
+        '/iiif_sequence/<int:id_>.json',
+        endpoint='iiif_sequence')

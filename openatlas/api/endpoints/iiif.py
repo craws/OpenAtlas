@@ -1,13 +1,39 @@
 from typing import Any
 
 import requests
-from flask import request, jsonify, Response, url_for
+from flask import jsonify, Response, url_for
 from flask_restful import Resource
 
 from openatlas.api.resources.model_mapper import get_entity_by_id
 from openatlas.api.resources.util import get_license_name
 from openatlas import app
 from openatlas.models.entity import Entity
+
+
+class IIIFSequence(Resource):
+    @staticmethod
+    def get(id_: int) -> Response:
+        img_url = f"{app.config['IIIF']['url']}{id_}"
+        req = requests.get(f"{img_url}/info.json")
+        img_api = req.json()
+        entity = get_entity_by_id(id_)
+        return jsonify(
+            {"@context": "https://iiif.io/api/presentation/2/context.json"} |
+            IIIFSequence.build_sequence(entity, img_url, img_api))
+
+    @staticmethod
+    def build_sequence(entity: Entity, img_url: str, img_api: dict[str, Any]):
+        return {
+            "@id": url_for(
+                'api.iiif_sequence',
+                id_=entity.id,
+                _external=True),
+            "@type": "sc:Sequence",
+            "label": [{
+                "@value": "Normal Sequence",
+                "@language": "en"}],
+            "canvases": [
+                IIIFCanvas.build_canvas(entity, img_url, img_api)]}
 
 
 class IIIFCanvas(Resource):
@@ -25,22 +51,16 @@ class IIIFCanvas(Resource):
     def build_canvas(entity: Entity, img_url: str, img_api: dict[str, Any]):
         return {
             "@id": url_for('api.iiif_canvas', id_=entity.id, _external=True),
-            "@type": "sc:Sequence",
-            "label": [{
-                "@value": "Normal Sequence",
-                "@language": "en"}],
-            "canvases": [{
-                "@id": "https://id.canvas",
-                "@type": "sc:Canvas",
-                "label": entity.name,
-                "height": img_api['height'],
-                "width": img_api['width'],
-                "description": {
-                    "@value": entity.description,
-                    "@language": "en"},
-                "images": [
-                    IIIFImage.build_image(entity.id, img_url, img_api)],
-                "related": ""}]}
+            "@type": "sc:Canvas",
+            "label": entity.name,
+            "height": img_api['height'],
+            "width": img_api['width'],
+            "description": {
+                "@value": entity.description,
+                "@language": "en"},
+            "images": [
+                IIIFImage.build_image(entity.id, img_url, img_api)],
+            "related": ""}
 
 
 class IIIFImage(Resource):
@@ -68,7 +88,7 @@ class IIIFImage(Resource):
                     "profile": img_api['profile']},
                 "height": img_api['height'],
                 "width": img_api['width']},
-            "on": url_for('api.iiif_canvas', id_=id_, _external=True)        }
+            "on": url_for('api.iiif_canvas', id_=id_, _external=True)}
 
 
 class IIIFManifest(Resource):
@@ -81,12 +101,11 @@ class IIIFManifest(Resource):
     def get_manifest_version_2(id_: int) -> dict[str, Any]:
         entity = get_entity_by_id(id_)
         image_url = f"{app.config['IIIF']['url']}{id_}"
-        # get metadata from the image api
         req = requests.get(f"{image_url}/info.json")
         image_api = req.json()
-        manifest = {
+        return {
             "@context": "http://iiif.io/api/presentation/2/context.json",
-            "@id": f"{request.base_url}",
+            "@id": url_for('api.iiif_manifest', id_=id_, version=2),
             "@type": "sc:Manifest",
             "label": entity.name,
             "metadata": [],
@@ -96,8 +115,5 @@ class IIIFManifest(Resource):
             "license": get_license_name(entity),
             "attribution": "By OpenAtlas",
             "sequences": [
-                IIIFCanvas.build_canvas(entity, image_url, image_api)
-            ],
+                IIIFSequence.build_sequence(entity, image_url, image_api)],
             "structures": []}
-
-        return manifest
