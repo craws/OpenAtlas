@@ -12,7 +12,7 @@ from openatlas.models.entity import Entity
 
 class IIIFSequence(Resource):
     @staticmethod
-    def get(id_: int) -> Response:
+    def get(version: int, id_: int) -> Response:
         img_url = f"{app.config['IIIF']['url']}{id_}"
         req = requests.get(f"{img_url}/info.json")
         img_api = req.json()
@@ -27,6 +27,7 @@ class IIIFSequence(Resource):
             "@id": url_for(
                 'api.iiif_sequence',
                 id_=entity.id,
+                version=2,
                 _external=True),
             "@type": "sc:Sequence",
             "label": [{
@@ -38,7 +39,7 @@ class IIIFSequence(Resource):
 
 class IIIFCanvas(Resource):
     @staticmethod
-    def get(id_: int) -> Response:
+    def get(version: int, id_: int) -> Response:
         img_url = f"{app.config['IIIF']['url']}{id_}"
         req = requests.get(f"{img_url}/info.json")
         img_api = req.json()
@@ -50,7 +51,8 @@ class IIIFCanvas(Resource):
     @staticmethod
     def build_canvas(entity: Entity, img_url: str, img_api: dict[str, Any]):
         return {
-            "@id": url_for('api.iiif_canvas', id_=entity.id, _external=True),
+            "@id": url_for(
+                'api.iiif_canvas', id_=entity.id, version=2, _external=True),
             "@type": "sc:Canvas",
             "label": entity.name,
             "height": img_api['height'],
@@ -60,12 +62,24 @@ class IIIFCanvas(Resource):
                 "@language": "en"},
             "images": [
                 IIIFImage.build_image(entity.id, img_url, img_api)],
-            "related": ""}
+            "related": "",
+            "thumbnail": {
+                "@id": f'{img_url}/full/!200,200/0/default.jpg',
+                "@type": "dctypes:Image",
+                "format": "image/jpeg",
+                "height": 200,
+                "width": 200,
+                "service": {
+                    "@context": "http://iiif.io/api/image/2/context.json",
+                    "@id": img_url,
+                    "profile": img_api['profile']},
+            },
+        }
 
 
 class IIIFImage(Resource):
     @staticmethod
-    def get(id_: int) -> Response:
+    def get(version: int, id_: int) -> Response:
         image_url = f"{app.config['IIIF']['url']}{id_}"
         req = requests.get(f"{image_url}/info.json")
         image_api = req.json()
@@ -75,7 +89,8 @@ class IIIFImage(Resource):
     def build_image(id_: int, img_url: str, img_api: dict[str, Any]):
         return {
             "@context": "https://iiif.io/api/presentation/2/context.json",
-            "@id": url_for('api.iiif_image', id_=id_, _external=True),
+            "@id":
+                url_for('api.iiif_image', id_=id_, version=2, _external=True),
             "@type": "oa:Annotation",
             "motivation": "sc:painting",
             "resource": {
@@ -88,7 +103,8 @@ class IIIFImage(Resource):
                     "profile": img_api['profile']},
                 "height": img_api['height'],
                 "width": img_api['width']},
-            "on": url_for('api.iiif_canvas', id_=id_, _external=True)}
+            "on":
+                url_for('api.iiif_canvas', id_=id_, version=2, _external=True)}
 
 
 class IIIFManifest(Resource):

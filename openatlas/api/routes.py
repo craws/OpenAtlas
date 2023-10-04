@@ -107,13 +107,13 @@ def add_routes_v03(api: Api) -> None:
         endpoint='iiif_manifest')
     api.add_resource(
         IIIFImage,
-        '/iiif_image/<int:id_>.json',
+        '/iiif_image/<int:version>/<int:id_>.json',
         endpoint='iiif_image')
     api.add_resource(
         IIIFCanvas,
-        '/iiif_canvas/<int:id_>.json',
+        '/iiif_canvas/<int:version>/<int:id_>.json',
         endpoint='iiif_canvas')
     api.add_resource(
         IIIFSequence,
-        '/iiif_sequence/<int:id_>.json',
+        '/iiif_sequence/<int:version>/<int:id_>.json',
         endpoint='iiif_sequence')
