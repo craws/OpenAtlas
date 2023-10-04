@@ -1,72 +1,103 @@
 from typing import Any
 
 import requests
-from flask import request, jsonify, Response
+from flask import request, jsonify, Response, url_for
 from flask_restful import Resource
 
 from openatlas.api.resources.model_mapper import get_entity_by_id
 from openatlas.api.resources.util import get_license_name
 from openatlas import app
+from openatlas.models.entity import Entity
 
 
-def get_manifest(id_: int, version: int) -> dict[str, Any]:
-    entity = get_entity_by_id(id_)
-    url_root = app.config['IIIF']['URL']
-    # get metadata from the image api
-    req = requests.get(f"{url_root}{id_}/info.json")
-    image_api = req.json()
-    iiif_id = f"{url_root}{id_}"
-    manifest = {
-        "@context": "http://iiif.io/api/presentation/2/context.json",
-        "@id": f"{request.base_url}",
-        "@type": "sc:Manifest",
-        "label": entity.name,
-        "metadata": [],
-        "description": [{
-            "@value": entity.description,
-            "@language": "en"}],
-        "license": get_license_name(entity),
-        "attribution": "By OpenAtlas",
-        "sequences": [{
-            "@id": "https://c8b09ce6-df6d-4d5e-9eba-17507dc5c185",
+class IIIFCanvas(Resource):
+    @staticmethod
+    def get(id_: int) -> Response:
+        img_url = f"{app.config['IIIF']['url']}{id_}"
+        req = requests.get(f"{img_url}/info.json")
+        img_api = req.json()
+        entity = get_entity_by_id(id_)
+        return jsonify(
+            {"@context": "https://iiif.io/api/presentation/2/context.json"} |
+            IIIFCanvas.build_canvas(entity, img_url, img_api))
+
+    @staticmethod
+    def build_canvas(entity: Entity, img_url: str, img_api: dict[str, Any]):
+        return {
+            "@id": url_for('api.iiif_canvas', id_=entity.id, _external=True),
             "@type": "sc:Sequence",
             "label": [{
                 "@value": "Normal Sequence",
                 "@language": "en"}],
             "canvases": [{
-                "@id": "https://251a31df-761d-46df-85c3-66cb967b8a67",
+                "@id": "https://id.canvas",
                 "@type": "sc:Canvas",
                 "label": entity.name,
-                "height": image_api['height'],
-                "width": image_api['width'],
+                "height": img_api['height'],
+                "width": img_api['width'],
                 "description": {
                     "@value": entity.description,
                     "@language": "en"},
-                "images": [{
-                    "@context":
-                        "https://iiif.io/api/presentation/2/context.json",
-                    "@id": "http://a0a3ec3e-2084-4253-b0f9-a5f87645e15d",
-                    "@type": "oa:Annotation",
-                    "motivation": "sc:painting",
-                    "resource": {
-                        "@id": f"{iiif_id}/full/full/0/default.jpg",
-                        "@type": "dctypes:Image",
-                        "format": "image/jpeg",
-                        "service": {
-                            "@context":
-                                "http://iiif.io/api/image/2/context.json",
-                            "@id": iiif_id,
-                            "profile": image_api['profile']},
-                        "height": image_api['height'],
-                        "width": image_api['width']},
-                    "on": "http://251a31df-761d-46df-85c3-66cb967b8a67"}],
-                "related": ""}]}],
-        "structures": []}
+                "images": [
+                    IIIFImage.build_image(entity.id, img_url, img_api)],
+                "related": ""}]}
 
-    return manifest
+
+class IIIFImage(Resource):
+    @staticmethod
+    def get(id_: int) -> Response:
+        image_url = f"{app.config['IIIF']['url']}{id_}"
+        req = requests.get(f"{image_url}/info.json")
+        image_api = req.json()
+        return jsonify(IIIFImage.build_image(id_, image_url, image_api))
+
+    @staticmethod
+    def build_image(id_: int, img_url: str, img_api: dict[str, Any]):
+        return {
+            "@context": "https://iiif.io/api/presentation/2/context.json",
+            "@id": url_for('api.iiif_image', id_=id_, _external=True),
+            "@type": "oa:Annotation",
+            "motivation": "sc:painting",
+            "resource": {
+                "@id": img_url,
+                "@type": "dctypes:Image",
+                "format": "image/jpeg",
+                "service": {
+                    "@context": "http://iiif.io/api/image/2/context.json",
+                    "@id": img_url,
+                    "profile": img_api['profile']},
+                "height": img_api['height'],
+                "width": img_api['width']},
+            "on": url_for('api.iiif_canvas', id_=id_, _external=True)        }
 
 
 class IIIFManifest(Resource):
     @staticmethod
     def get(version: int, id_: int) -> Response:
-        return jsonify(get_manifest(id_, version))
+        operation = getattr(IIIFManifest, f'get_manifest_version_{version}')
+        return jsonify(operation(id_))
+
+    @staticmethod
+    def get_manifest_version_2(id_: int) -> dict[str, Any]:
+        entity = get_entity_by_id(id_)
+        image_url = f"{app.config['IIIF']['url']}{id_}"
+        # get metadata from the image api
+        req = requests.get(f"{image_url}/info.json")
+        image_api = req.json()
+        manifest = {
+            "@context": "http://iiif.io/api/presentation/2/context.json",
+            "@id": f"{request.base_url}",
+            "@type": "sc:Manifest",
+            "label": entity.name,
+            "metadata": [],
+            "description": [{
+                "@value": entity.description,
+                "@language": "en"}],
+            "license": get_license_name(entity),
+            "attribution": "By OpenAtlas",
+            "sequences": [
+                IIIFCanvas.build_canvas(entity, image_url, image_api)
+            ],
+            "structures": []}
+
+        return manifest

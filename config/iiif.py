@@ -1,4 +1,5 @@
 IIIF = {
     'activate': False,
     'path': '',
-    'url': ''}
+    'url': '',
+    'version': 2}

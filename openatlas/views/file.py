@@ -79,5 +79,9 @@ def make_iiif_available(id_: int):
 @required_group('contributor')
 def view_iiif(id_: int):
     return render_template(
-            'iiif.html',
-            manifest_url=url_for('api.iiif_manifest', id_=id_, _external=True))
+        'iiif.html',
+        manifest_url=url_for(
+            'api.iiif_manifest',
+            id_=id_,
+            version=app.config['IIIF']['version'],
+            _external=True))
