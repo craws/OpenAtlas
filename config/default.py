@@ -31,13 +31,13 @@ DISPLAY_FILE_EXTENSIONS = \
 # To override them (in instance/production.py) either use them like here
 # or use absolute paths like e.g. pathlib.Path('/some/location/somewhere')
 FILES_PATH = Path(__file__).parent.parent / 'files'
-EXPORT_DIR = Path(FILES_PATH) / 'export'
-UPLOAD_DIR = Path(FILES_PATH) / 'uploads'
-TMP_DIR = Path('/tmp')  # used e.g. for processing imports and export files
+EXPORT_PATH = Path(FILES_PATH) / 'export'
+UPLOAD_PATH = Path(FILES_PATH) / 'uploads'
+TMP_PATH = Path('/tmp')  # used e.g. for processing imports and export files
 
 # Image processing
-PROCESSED_IMAGE_DIR = Path(FILES_PATH) / 'processed_images'
-RESIZED_IMAGES = Path(PROCESSED_IMAGE_DIR) / 'resized'
+PROCESSED_IMAGE_PATH = Path(FILES_PATH) / 'processed_images'
+RESIZED_IMAGES = Path(PROCESSED_IMAGE_PATH) / 'resized'
 IMAGE_SIZE = {
     'thumbnail': '200',
     'table': '100'}
@@ -46,9 +46,9 @@ ALLOWED_IMAGE_EXT = DISPLAY_FILE_EXTENSIONS + NONE_DISPLAY_EXT
 PROCESSED_EXT = '.jpeg'
 
 # For system checks
-WRITABLE_DIRS = [
-    UPLOAD_DIR,
-    EXPORT_DIR,
+WRITABLE_PATHS = [
+    UPLOAD_PATH,
+    EXPORT_PATH,
     RESIZED_IMAGES]
 
 # Security

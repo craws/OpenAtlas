@@ -52,17 +52,17 @@ class ImageTest(TestBaseCase):
                 copyfile(
                     Path(app.root_path)
                     / 'static' / 'images' / 'layout' / 'logo.png',
-                    Path(app.config['UPLOAD_DIR'] / file_name))
+                    Path(app.config['UPLOAD_PATH'] / file_name))
                 file2 = insert('file', 'Test_File2')
                 file2.link('P2', g.types[get_hierarchy('License').subs[0]])
                 copyfile(
                     Path(app.root_path)
                     / 'static' / 'images' / 'layout' / 'logo.png',
-                    Path(app.config['UPLOAD_DIR'] / f'{file2.id}.jpeg'))
+                    Path(app.config['UPLOAD_PATH'] / f'{file2.id}.jpeg'))
                 file_json = insert('file', 'Test')
                 copyfile(
                     Path(app.root_path) / 'static' / 'manifest.json',
-                    Path(app.config['UPLOAD_DIR'] / f'{file_json.id}.json'))
+                    Path(app.config['UPLOAD_PATH'] / f'{file_json.id}.json'))
                 safe_resize_image(file2.id, '.png', size="???")
                 profile_image(file_pathless)
 

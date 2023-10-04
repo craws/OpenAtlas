@@ -65,7 +65,7 @@ def before_request() -> None:
     g.class_view_mapping = OpenatlasClass.get_class_view_mapping()
     g.table_headers = OpenatlasClass.get_table_headers()
     g.files = {}
-    for file_ in app.config['UPLOAD_DIR'].iterdir():
+    for file_ in app.config['UPLOAD_PATH'].iterdir():
         if file_.stem.isdigit():
             g.files[int(file_.stem)] = file_
     # Set max file upload in MB

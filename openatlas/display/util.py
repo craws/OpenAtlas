@@ -309,7 +309,7 @@ def format_name_and_aliases(entity: Entity, show_links: bool) -> str:
 
 
 def get_backup_file_data() -> dict[str, Any]:
-    path = app.config['EXPORT_DIR']
+    path = app.config['EXPORT_PATH']
     latest_file = None
     latest_file_date = None
     for file in [
@@ -426,7 +426,7 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
         warnings.append(
             f"Database version {app.config['DATABASE_VERSION']} is needed but "
             f"current version is {g.settings['database_version']}")
-    for path in app.config['WRITABLE_DIRS']:
+    for path in app.config['WRITABLE_PATHS']:
         if not os.access(path, os.W_OK):
             warnings.append(
                 '<p class="uc-first">' + _('directory not writable') +
@@ -470,7 +470,7 @@ def get_file_path(
             ext = app.config['PROCESSED_EXT']  # pragma: no cover
         path = app.config['RESIZED_IMAGES'] / size / f"{id_}{ext}"
         return path if os.path.exists(path) else None
-    return app.config['UPLOAD_DIR'] / f"{id_}{ext}"
+    return app.config['UPLOAD_PATH'] / f"{id_}{ext}"
 
 
 def format_date(value: Union[datetime, numpy.datetime64]) -> str:
