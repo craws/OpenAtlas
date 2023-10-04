@@ -12,7 +12,7 @@ from openatlas.database.date import Date
 from openatlas.database.entity import Entity as Db
 from openatlas.display.util import (
     datetime64_to_timestamp, format_date_part, sanitize,
-    timestamp_to_datetime64)
+    timestamp_to_datetime64, convert_size)
 from openatlas.models.link import Link
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -331,6 +331,13 @@ class Entity:
                 self.get_linked_entities_recursive('P46', inverse=True) +
                 [self]}
 
+    def get_file_size(self) -> str:
+        return convert_size(g.files[self.id].stat().st_size) \
+            if self.id in g.files else 'N/A'
+
+    def get_file_extension(self) -> str:
+        return g.files[self.id].suffix if self.id in g.files else 'N/A'
+
     @staticmethod
     def get_invalid_dates() -> list[Entity]:
         return [
@@ -372,8 +379,8 @@ class Entity:
     def get_display_files() -> list[Entity]:
         entities = []
         for row in Db.get_by_class('file', types=True):
-            ext = g.file_stats[row['id']]['ext'] \
-                if row['id'] in g.file_stats else 'N/A'
+            ext = g.files[row['id']].suffix  \
+                if row['id'] in g.files else 'N/A'
             if ext in app.config['DISPLAY_FILE_EXTENSIONS']:
                 entities.append(Entity(row))
         return entities

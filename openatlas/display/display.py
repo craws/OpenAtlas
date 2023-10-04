@@ -67,10 +67,8 @@ class FileDisplay(BaseDisplay):
 
     def add_data(self) -> None:
         super().add_data()
-        self.data[_('size')] = g.file_stats[self.entity.id]['size'] \
-            if self.entity.id in g.file_stats else 'N/A'
-        self.data[_('extension')] = g.file_stats[self.entity.id]['ext'] \
-            if self.entity.id in g.file_stats else 'N/A'
+        self.data[_('size')] = self.entity.get_file_size()
+        self.data[_('extension')] = self.entity.get_file_extension()
 
     def add_button_others(self) -> None:
         if path := get_file_path(self.entity.id):

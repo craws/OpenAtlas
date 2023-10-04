@@ -339,12 +339,8 @@ def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
     if entity.class_.standard_type_id:
         data.append(entity.standard_type.name if entity.standard_type else '')
     if entity.class_.name == 'file':
-        data.append(
-            g.file_stats[entity.id]['size']
-            if entity.id in g.file_stats else 'N/A')
-        data.append(
-            g.file_stats[entity.id]['ext']
-            if entity.id in g.file_stats else 'N/A')
+        data.append(entity.get_file_size())
+        data.append(entity.get_file_extension())
     if entity.class_.view in ['actor', 'artifact', 'event', 'place']:
         data.append(entity.first)
         data.append(entity.last)
@@ -475,9 +471,9 @@ def get_file_path(
         entity: Union[int, Entity],
         size: Optional[str] = None) -> Optional[Path]:
     id_ = entity if isinstance(entity, int) else entity.id
-    if id_ not in g.file_stats:
+    if id_ not in g.files:
         return None
-    ext = g.file_stats[id_]['ext']
+    ext = g.files[id_].suffix
     if size:
         if ext in app.config['NONE_DISPLAY_EXT']:
             ext = app.config['PROCESSED_EXT']  # pragma: no cover

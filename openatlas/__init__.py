@@ -1,6 +1,5 @@
 import locale
-from pathlib import Path
-from typing import Any, Optional
+from typing import Optional
 
 from flask import Flask, Response, g, request, session
 from flask_babel import Babel
@@ -50,6 +49,7 @@ def before_request() -> None:
 
     if request.path.startswith('/static'):
         return  # Avoid files overhead if not using Apache with static alias
+
     g.logger = Logger()
     g.db = open_connection(app.config)
     g.db.autocommit = True
@@ -64,8 +64,10 @@ def before_request() -> None:
     g.view_class_mapping = view_class_mapping
     g.class_view_mapping = OpenatlasClass.get_class_view_mapping()
     g.table_headers = OpenatlasClass.get_table_headers()
-    g.file_stats = get_file_stats()
-
+    g.files = {}
+    for file_ in app.config['UPLOAD_DIR'].iterdir():
+        if file_.stem.isdigit():
+            g.files[int(file_.stem)] = file_
     # Set max file upload in MB
     app.config['MAX_CONTENT_LENGTH'] = \
         g.settings['file_upload_max_size'] * 1024 * 1024
@@ -91,14 +93,3 @@ def apply_caching(response: Response) -> Response:
 @app.teardown_request
 def teardown_request(_exception: Optional[Exception]) -> None:
     close_connection()
-
-
-def get_file_stats(
-        path: Path = app.config['UPLOAD_DIR']) -> dict[int, dict[str, Any]]:
-    stats: dict[int, dict[str, Any]] = {}
-    for file_ in filter(lambda x: x.stem.isdigit(), path.iterdir()):
-        stats[int(file_.stem)] = {
-            'ext': file_.suffix,
-            'size': convert_size(file_.stat().st_size),
-            'date': file_.stat().st_ctime}
-    return stats

@@ -874,7 +874,7 @@
         }
       }
     },
-    "/subunits/": {
+    "/subunits/{entityId}": {
       "get": {
         "tags": [
           "Special Endpoints"
@@ -883,13 +883,10 @@
         "operationId": "GetSubunits",
         "parameters": [
           {
-            "$ref": "#/components/parameters/format"
+            "$ref": "#/components/parameters/entityId"
           },
           {
             "$ref": "#/components/parameters/download"
-          },
-          {
-            "$ref": "#/components/parameters/count"
           }
         ],
         "responses": {
