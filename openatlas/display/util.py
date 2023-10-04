@@ -427,8 +427,8 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
         warnings.append(
             f"Database version {app.config['DATABASE_VERSION']} is needed but "
             f"current version is {g.settings['database_version']}")
-    if app.config['IIIF_ACTIVATE'] and app.config['IIIF_DIR']:
-        path = Path(app.config['IIIF_DIR']) / app.config['IIIF_PREFIX']
+    if app.config['IIIF_ACTIVATE'] and app.config['IIIF_PATH']:
+        path = Path(app.config['IIIF_PATH']) / app.config['IIIF_PREFIX']
         check_write_access(path, warnings)
     for path in app.config['WRITABLE_PATHS']:
         check_write_access(path, warnings)
@@ -754,18 +754,18 @@ def get_entities_linked_to_type_recursive(
 def check_iiif_activation() -> bool:
     return True \
         if (app.config['IIIF_ACTIVATE']
-            and os.access(Path(app.config['IIIF_DIR']), os.W_OK)) \
+            and os.access(Path(app.config['IIIF_PATH']), os.W_OK)) \
         else False
 
 
 def check_iiif_file_exist(id_: int) -> bool:
     file_to_check = \
-        Path(app.config['IIIF_DIR']) / app.config['IIIF_PREFIX'] / str(id_)
+        Path(app.config['IIIF_PATH']) / app.config['IIIF_PREFIX'] / str(id_)
     return file_to_check.is_file()
 
 
 def convert_image_to_iiif(id_: int) -> None:
-    path = Path(app.config['IIIF_DIR']) / app.config['IIIF_PREFIX'] / str(id_)
+    path = Path(app.config['IIIF_PATH']) / app.config['IIIF_PREFIX'] / str(id_)
     vips = "vips" if os.name == 'posix' else "vips.exe"
     command = \
         (f"{vips} tiffsave {get_file_path(id_)} {path} "
