@@ -6,13 +6,6 @@ from config.database_versions import DATABASE_VERSIONS
 VERSION = '7.17.0'
 DATABASE_VERSION = DATABASE_VERSIONS[0]
 DEMO_MODE = False  # If activated some options are disabled, login is prefilled
-
-LANGUAGES = {
-    'ca': 'Català',
-    'de': 'Deutsch',
-    'en': 'English',
-    'es': 'Español',
-    'fr': 'Français'}
 DEBUG = False
 
 DATABASE_NAME = 'openatlas'
@@ -22,6 +15,13 @@ DATABASE_PORT = 5432
 DATABASE_PASS = 'CHANGE ME'
 MAIL_PASSWORD = 'CHANGE ME'
 SECRET_KEY = 'CHANGE ME'  # Used for cookies
+
+LANGUAGES = {
+    'ca': 'Català',
+    'de': 'Deutsch',
+    'en': 'English',
+    'es': 'Español',
+    'fr': 'Français'}
 
 # Files with these extensions are can be displayed in the browser
 DISPLAY_FILE_EXTENSIONS = \
@@ -105,25 +105,8 @@ TABLE_ROWS = {10: '10', 25: '25', 50: '50', 100: '100'}
 # Minimum required characters for table filters
 MIN_CHARS_JSTREE_SEARCH = 1
 
-LOG_LEVELS = {
-    0: 'emergency',
-    1: 'alert',
-    2: 'critical',
-    3: 'error',
-    4: 'warn',
-    5: 'notice',
-    6: 'info',
-    7: 'debug'}
-
 CSS = {
     'string_field': 'form-control form-control-sm',
     'button': {
         'primary': 'btn btn-outline-primary btn-sm',
         'secondary': 'btn btn-outline-secondary btn-sm'}}
-
-# Property types work differently, e.g. no move functionality
-PROPERTY_TYPES = [
-    'Actor relation',
-    'Actor function',
-    'External reference match',
-    'Involvement']
