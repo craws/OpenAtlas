@@ -427,9 +427,9 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
         warnings.append(
             f"Database version {app.config['DATABASE_VERSION']} is needed but "
             f"current version is {g.settings['database_version']}")
-    if app.config['IIIF_ACTIVATE'] and app.config['IIIF_PATH']:
-        path = Path(app.config['IIIF_PATH']) / app.config['IIIF_PREFIX']
-        check_write_access(path, warnings)
+    if app.config['IIIF']['activate']:
+        if path := app.config['IIIF']['path']:
+            check_write_access(path, warnings)
     for path in app.config['WRITABLE_PATHS']:
         check_write_access(path, warnings)
     if is_authorized('admin'):
