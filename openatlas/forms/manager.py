@@ -389,19 +389,29 @@ class ModificationManager(EventBaseManager):
     def additional_fields(self) -> dict[str, Any]:
         return dict(
             super().additional_fields(),
-            **{'artifact': TableMultiField()})
+            **{
+                'artifact': TableMultiField(),
+                'modified_place': TableMultiField('place')})
 
     def populate_update(self) -> None:
         super().populate_update()
-        self.form.artifact.data = \
-            [item.id for item in self.entity.get_linked_entities('P31')]
+        artifact_data = []
+        place_data = []
+        for item in self.entity.get_linked_entities('P31'):
+            if item.class_.name == 'artifact':
+                artifact_data.append(item.id)
+            elif item.cidoc_class.code == 'E18':
+                place_data.append(item.id)
+        self.form.artifact.data = artifact_data
+        self.form.modified_place.data = place_data
 
     def process_form(self) -> None:
         super().process_form()
         self.data['links']['delete'].add('P31')
         if self.form.artifact.data:
             self.add_link('P31', self.form.artifact.data)
-
+        if self.form.modified_place.data:
+            self.add_link('P31', self.form.modified_place.data)
 
 class MoveManager(EventBaseManager):
 
