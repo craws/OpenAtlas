@@ -44,7 +44,7 @@ class AdminTests(TestBaseCase):
             assert b'Invalid linked entity' in rv.data
 
             file_ = 'Test77.txt'
-            with open(Path(app.config['UPLOAD_DIR'] / file_), 'w') as _file:
+            with open(Path(app.config['UPLOAD_PATH'] / file_), 'w') as _file:
                 pass
 
             rv = self.app.get(

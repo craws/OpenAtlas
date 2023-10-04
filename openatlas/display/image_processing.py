@@ -33,7 +33,7 @@ def safe_resize_image(name: str, file_format: str, size: str) -> bool:
 
 def image_resizing(name: str, format_: str, size: str) -> bool:
     conf = app.config
-    filename = Path(conf['UPLOAD_DIR']) / f"{name}{format_}[0]"
+    filename = Path(conf['UPLOAD_PATH']) / f"{name}{format_}[0]"
     with Image(filename=filename) as src:
         ext = conf['PROCESSED_EXT'] \
             if format_ in conf['NONE_DISPLAY_EXT'] else format_

@@ -310,7 +310,7 @@ def format_name_and_aliases(entity: Entity, show_links: bool) -> str:
 
 
 def get_backup_file_data() -> dict[str, Any]:
-    path = app.config['EXPORT_DIR']
+    path = app.config['EXPORT_PATH']
     latest_file = None
     latest_file_date = None
     for file in [
@@ -430,7 +430,7 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
     if app.config['IIIF_ACTIVATE'] and app.config['IIIF_DIR']:
         path = Path(app.config['IIIF_DIR']) / app.config['IIIF_PREFIX']
         check_write_access(path, warnings)
-    for path in app.config['WRITABLE_DIRS']:
+    for path in app.config['WRITABLE_PATHS']:
         check_write_access(path, warnings)
     if is_authorized('admin'):
         from openatlas.models.user import User
@@ -479,7 +479,7 @@ def get_file_path(
             ext = app.config['PROCESSED_EXT']  # pragma: no cover
         path = app.config['RESIZED_IMAGES'] / size / f"{id_}{ext}"
         return path if os.path.exists(path) else None
-    return app.config['UPLOAD_DIR'] / f"{id_}{ext}"
+    return app.config['UPLOAD_PATH'] / f"{id_}{ext}"
 
 
 def format_date(value: Union[datetime, numpy.datetime64]) -> str:

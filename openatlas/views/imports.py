@@ -171,7 +171,7 @@ def import_data(project_id: int, class_: str) -> str:
     class_label = g.classes[class_].label
     if form.validate_on_submit():
         file_ = request.files['file']
-        file_path = app.config['TMP_DIR'] / secure_filename(file_.filename)
+        file_path = app.config['TMP_PATH'] / secure_filename(file_.filename)
         columns: dict[str, list[str]] = {
             'allowed': ['name', 'id', 'description'],
             'valid': [],
