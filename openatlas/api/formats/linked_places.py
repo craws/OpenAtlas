@@ -20,7 +20,7 @@ def get_linked_places_entity(
     links_inverse = entity_dict['links_inverse']
     return {
         'type': 'FeatureCollection',
-        '@context': app.config['API_SCHEMA'],
+        '@context': app.config['API_CONTEXT']['LPF'],
         'features': [replace_empty_list_values_in_dict_with_none({
             '@id': url_for('view', id_=entity.id, _external=True),
             'type': 'Feature',

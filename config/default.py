@@ -6,13 +6,6 @@ from config.database_versions import DATABASE_VERSIONS
 VERSION = '7.17.0'
 DATABASE_VERSION = DATABASE_VERSIONS[0]
 DEMO_MODE = False  # If activated some options are disabled, login is prefilled
-
-LANGUAGES = {
-    'ca': 'Català',
-    'de': 'Deutsch',
-    'en': 'English',
-    'es': 'Español',
-    'fr': 'Français'}
 DEBUG = False
 
 DATABASE_NAME = 'openatlas'
@@ -22,6 +15,13 @@ DATABASE_PORT = 5432
 DATABASE_PASS = 'CHANGE ME'
 MAIL_PASSWORD = 'CHANGE ME'
 SECRET_KEY = 'CHANGE ME'  # Used for cookies
+
+LANGUAGES = {
+    'ca': 'Català',
+    'de': 'Deutsch',
+    'en': 'English',
+    'es': 'Español',
+    'fr': 'Français'}
 
 # Files with these extensions are can be displayed in the browser
 DISPLAY_FILE_EXTENSIONS = \
@@ -61,74 +61,14 @@ SESSION_COOKIE_SECURE = False  # Should be True in production.py if using HTTPS
 REMEMBER_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 
-# API
-API_SCHEMA = \
-    'https://raw.githubusercontent.com/LinkedPasts/linked-places' \
-    '/master/linkedplaces-context-v1.1.jsonld'
-CORS_ALLOWANCE = '*'  # Cross-Origin source (CORS)
-ALLOWED_IPS = ['127.0.0.1']
-RDF_FORMATS = {
-    'pretty-xml': 'application/rdf+xml',
-    'n3': 'text/rdf+n3',
-    'turtle': 'application/x-turtle',
-    'nt': 'text/plain',
-    'xml': 'application/xml'}
-JSON_FORMATS = {
-    'lp': 'application/ld+json',
-    'loud': 'application/ld+json',
-    'geojson': 'application/json',
-    'geojson-v2': 'application/json'}
-API_FORMATS = RDF_FORMATS | JSON_FORMATS
-
-API_PROXY = ''
-
-LOGICAL_OPERATOR: list[str] = ['and', 'or']
-STR_CATEGORIES: list[str] = [
-    "entityName", "entityDescription", "entityAliases", "entityCidocClass",
-    "entitySystemClass", "typeName", "typeNameWithSubs",
-    "beginFrom", "beginTo", "endFrom", "endTo"]
-INT_CATEGORIES: list[str] = [
-    "entityID", "typeID", "typeIDWithSubs", "relationToID"]
-SET_CATEGORIES: list[str] = ["valueTypeID"]
-VALID_CATEGORIES: list[str] = [
-    *STR_CATEGORIES,
-    *INT_CATEGORIES,
-    *SET_CATEGORIES]
-COMPARE_OPERATORS: list[str] = [
-    'equal', 'notEqual', 'greaterThan', 'lesserThan', 'greaterThanEqual',
-    'lesserThanEqual', 'like']
-
-# Used to connect to ACDH-CH ARCHE systems
-ARCHE = {'id': None, 'url': None}
-
-# Used to connect to password protected Vocabs systems
-VOCABS_PASS = ''
-
 # Table options
 TABLE_ROWS = {10: '10', 25: '25', 50: '50', 100: '100'}
 
 # Minimum required characters for table filters
 MIN_CHARS_JSTREE_SEARCH = 1
 
-LOG_LEVELS = {
-    0: 'emergency',
-    1: 'alert',
-    2: 'critical',
-    3: 'error',
-    4: 'warn',
-    5: 'notice',
-    6: 'info',
-    7: 'debug'}
-
 CSS = {
     'string_field': 'form-control form-control-sm',
     'button': {
         'primary': 'btn btn-outline-primary btn-sm',
         'secondary': 'btn btn-outline-secondary btn-sm'}}
-
-# Property types work differently, e.g. no move functionality
-PROPERTY_TYPES = [
-    'Actor relation',
-    'Actor function',
-    'External reference match',
-    'Involvement']

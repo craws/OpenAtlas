@@ -10,6 +10,14 @@ from openatlas.database.type import Type as Db
 from openatlas.models.entity import Entity
 
 
+# Property types work differently, e.g. no move functionality
+app.config['PROPERTY_TYPES'] = [
+    'Actor relation',
+    'Actor function',
+    'External reference match',
+    'Involvement']
+
+
 class Type(Entity):
     count = 0
     count_subs = 0
