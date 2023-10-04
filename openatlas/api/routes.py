@@ -102,5 +102,5 @@ def add_routes_v03(api: Api) -> None:
 
     api.add_resource(
         IIIFManifest,
-        '/iiif_manifest/<int:id_>',
+        '/iiif_manifest/<int:version>/<int:id_>',
         endpoint='iiif_manifest')

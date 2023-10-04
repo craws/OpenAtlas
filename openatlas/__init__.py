@@ -13,7 +13,8 @@ from openatlas.database.connect import close_connection, open_connection
 app: Flask = Flask(__name__, instance_relative_config=True)
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
 app.config.from_object('config.default')
-app.config.from_object('config.api_config')
+app.config.from_object('config.api')
+app.config.from_object('config.iiif')
 app.config.from_pyfile('production.py')
 app.config['WTF_CSRF_TIME_LIMIT'] = None  # Set CSRF token valid for session
 

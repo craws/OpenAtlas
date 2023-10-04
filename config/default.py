@@ -45,11 +45,6 @@ NONE_DISPLAY_EXT = ['.tiff', '.tif']
 ALLOWED_IMAGE_EXT = DISPLAY_FILE_EXTENSIONS + NONE_DISPLAY_EXT
 PROCESSED_EXT = '.jpeg'
 
-IIIF_ACTIVATE = False
-IIIF_PATH = ''
-IIIF_PREFIX = ''  # has to end with /
-IIIF_URL = ''
-
 # For system checks
 WRITABLE_PATHS = [
     UPLOAD_PATH,

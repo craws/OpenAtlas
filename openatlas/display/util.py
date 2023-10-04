@@ -752,20 +752,18 @@ def get_entities_linked_to_type_recursive(
 
 
 def check_iiif_activation() -> bool:
+    iiif = app.config['IIIF']
     return True \
-        if (app.config['IIIF_ACTIVATE']
-            and os.access(Path(app.config['IIIF_PATH']), os.W_OK)) \
+        if (iiif['activate'] and os.access(Path(iiif['path']), os.W_OK)) \
         else False
 
 
 def check_iiif_file_exist(id_: int) -> bool:
-    file_to_check = \
-        Path(app.config['IIIF_PATH']) / app.config['IIIF_PREFIX'] / str(id_)
-    return file_to_check.is_file()
+    return (Path(app.config['IIIF']['path']) / str(id_)).is_file()
 
 
 def convert_image_to_iiif(id_: int) -> None:
-    path = Path(app.config['IIIF_PATH']) / app.config['IIIF_PREFIX'] / str(id_)
+    path = Path(app.config['IIIF']['path']) / str(id_)
     vips = "vips" if os.name == 'posix' else "vips.exe"
     command = \
         (f"{vips} tiffsave {get_file_path(id_)} {path} "

@@ -9,12 +9,11 @@ from openatlas.api.resources.util import get_license_name
 from openatlas import app
 
 
-def get_manifest(id_: int) -> dict[str, Any]:
+def get_manifest(id_: int, version: int) -> dict[str, Any]:
     entity = get_entity_by_id(id_)
-    url_root = app.config['IIIF_URL'] or f"{request.url_root}iiif/"
+    url_root = app.config['IIIF']['URL']
     # get metadata from the image api
-    req = requests.get(
-        f"{url_root}{app.config['IIIF_PREFIX']}{id_}/info.json")
+    req = requests.get(f"{url_root}{id_}/info.json")
     image_api = req.json()
     iiif_id = f"{url_root}{id_}"
     manifest = {
@@ -69,5 +68,5 @@ def get_manifest(id_: int) -> dict[str, Any]:
 
 class IIIFManifest(Resource):
     @staticmethod
-    def get(id_: int) -> Response:
-        return jsonify(get_manifest(id_))
+    def get(version: int, id_: int) -> Response:
+        return jsonify(get_manifest(id_, version))
