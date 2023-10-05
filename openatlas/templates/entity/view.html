@@ -20,6 +20,7 @@
     {{ entity.reference_systems|ext_references|safe }}
     {{ description_html|safe }}
   </div>
+{# todo: delete after development #}
   {% if iiif_image and entity.class_.name == 'file' %}
     <div class="col-lg-6">
       <iframe src="{{ url_for('view_iiif', id_=entity.id, version=config.IIIF['version']) }}" width="100%" height="100%"></iframe>
