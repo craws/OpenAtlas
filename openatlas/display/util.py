@@ -242,7 +242,7 @@ def profile_image(entity: Entity) -> str:
         style = f'max-width:200px;'
         ext = app.config["DISPLAY_FILE_EXTENSIONS"]
         src = \
-            (f"{app.config['IIIF']['url']}{entity.id}"
+            (f"{app.config['IIIF']['url']}{entity.id}.tiff"
              f"/full/!200,200/0/default.png")
     elif g.settings['image_processing'] and check_processed_image(path.name):
         size = app.config['IMAGE_SIZE']['thumbnail']
@@ -762,14 +762,14 @@ def check_iiif_activation() -> bool:
 
 
 def check_iiif_file_exist(id_: int) -> bool:
-    return (Path(app.config['IIIF']['path']) / str(id_)).is_file()
+    return (Path(app.config['IIIF']['path']) / f'{id_}.tiff').is_file()
 
 
 def convert_image_to_iiif(id_: int) -> None:
     path = Path(app.config['IIIF']['path']) / str(id_)
     vips = "vips" if os.name == 'posix' else "vips.exe"
     command = \
-        (f"{vips} tiffsave {get_file_path(id_)} {path} "
+        (f"{vips} tiffsave {get_file_path(id_)} {path}.tiff "
          f"--tile --pyramid --compression jpeg "
          f"--tile-width 256 --tile-height 256")
     try:
