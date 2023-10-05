@@ -243,7 +243,7 @@ def profile_image(entity: Entity) -> str:
         ext = app.config["DISPLAY_FILE_EXTENSIONS"]
         src = \
             (f"{app.config['IIIF']['url']}{entity.id}.tiff"
-             f"/full/!200,200/0/default.png")
+             f"/full/!200,200/0/default.jpg")
     elif g.settings['image_processing'] and check_processed_image(path.name):
         size = app.config['IMAGE_SIZE']['thumbnail']
         if path_ := get_file_path(entity.image_id, size):
