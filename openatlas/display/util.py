@@ -237,6 +237,7 @@ def profile_image(entity: Entity) -> str:
         return ''  # pragma: no cover
     ext = app.config["DISPLAY_FILE_EXTENSIONS"]
     src = url_for('display_file', filename=path.name)
+    url = src
     style = f'max-width:{g.settings["profile_image_width"]}px;'
     if app.config['IIIF']['activate'] and check_iiif_file_exist(entity.id):
         style = f'max-width:200px;'
@@ -245,12 +246,17 @@ def profile_image(entity: Entity) -> str:
         src = \
             (f"{app.config['IIIF']['url']}{entity.id}{ext}"
              f"/full/!200,200/0/default.jpg")
+        url = url_for(
+            'view_iiif',
+            id_=entity.id,
+            version=app.config['IIIF']['version'])
         ext = app.config["ALLOWED_IMAGE_EXT"]
     elif g.settings['image_processing'] and check_processed_image(path.name):
         size = app.config['IMAGE_SIZE']['thumbnail']
         if path_ := get_file_path(entity.image_id, size):
             src = url_for('display_file', filename=path_.name, size=size)
             style = f'max-width:{app.config["IMAGE_SIZE"]["thumbnail"]}px;'
+            url = url_for('display_file', filename=path_.name, size=size)
             ext = app.config["ALLOWED_IMAGE_EXT"]
     if entity.class_.view == 'file':
         html = \
@@ -260,7 +266,7 @@ def profile_image(entity: Entity) -> str:
                  and path.suffix.lower() == '.pdf')):
             html = link(
                 f'<img style="{style}" alt="image" src="{src}">',
-                src,
+                url,
                 external=True)
     else:
         html = link(

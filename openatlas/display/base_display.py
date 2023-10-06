@@ -101,8 +101,7 @@ class BaseDisplay:
             overlays=self.overlays,
             chart_data=self.get_chart_data(),
             description_html=self.description_html(),
-            problematic_type_id=self.problematic_type,
-            iiif_image=check_iiif_file_exist(self.entity.id))
+            problematic_type_id=self.problematic_type)
 
     def description_html(self) -> str:
         return description(self.entity.description)
