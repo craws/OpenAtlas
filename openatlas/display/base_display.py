@@ -102,7 +102,7 @@ class BaseDisplay:
             chart_data=self.get_chart_data(),
             description_html=self.description_html(),
             problematic_type_id=self.problematic_type,
-            iiif_image=check_iiif_file_exist(self.entity.image_id))
+            iiif_image=check_iiif_file_exist(self.entity.id))
 
     def description_html(self) -> str:
         return description(self.entity.description)

@@ -84,7 +84,8 @@ def file_preview(entity_id: int) -> str:
             else g.files[entity_id].suffix
         url = (f"{app.config['IIIF']['url']}{entity_id}{ext}"
                f"/full/!100,100/0/default.jpg")
-        return f"<img src='{url}' {parameter}>"
+        return f"<img src='{url}' {parameter}>" \
+            if ext in app.config["IIIF_IMAGE_EXT"] else ''
     if icon_path := get_file_path(
             entity_id,
             app.config['IMAGE_SIZE']['table']):

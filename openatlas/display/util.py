@@ -255,7 +255,9 @@ def profile_image(entity: Entity) -> str:
     if entity.class_.view == 'file':
         html = \
             '<p class="uc-first">' + _('no preview available') + '</p>'
-        if path.suffix.lower() in ext:
+        if (path.suffix.lower() in ext or
+                (app.config['IIIF']['activate']
+                 and path.suffix.lower() == '.pdf')):
             html = link(
                 f'<img style="{style}" alt="image" src="{src}">',
                 src,
@@ -764,11 +766,16 @@ def check_iiif_activation() -> bool:
 
 
 def check_iiif_file_exist(id_: int) -> bool:
-    return (Path(app.config['IIIF']['path']) / f'{id_}.tiff').is_file()
+    if app.config['IIIF']['conversion']:
+        return get_iiif_file_path(id_).is_file()
+    else:
+        return bool(get_file_path(id_))
 
 
 def get_iiif_file_path(id_: int) -> Path:
-    return Path(app.config['IIIF']['path']) / f'{id_}.tiff'
+    ext = '.tiff' if app.config['IIIF']['conversion'] \
+        else g.files[id_].suffix
+    return Path(app.config['IIIF']['path']) / f'{id_}{ext}'
 
 
 def convert_image_to_iiif(id_: int) -> None:
