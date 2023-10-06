@@ -10,7 +10,7 @@ from openatlas.display.image_processing import check_processed_image
 from openatlas.display.table import Table
 from openatlas.display.util import (
     button, format_date, get_base_table_data, get_file_path, is_authorized,
-    link, manual, required_group)
+    link, manual, required_group, check_iiif_file_exist)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 
@@ -42,7 +42,7 @@ def get_table(view: str) -> Table:
     if view == 'file':
         table.order = [[0, 'desc']]
         table.header = ['date'] + table.header
-        if g.settings['image_processing'] \
+        if (g.settings['image_processing'] or app.config['IIIF']['activate']) \
                 and current_user.settings['table_show_icons']:
             table.header.insert(1, _('icon'))
         for entity in Entity.get_by_class('file', types=True):
@@ -53,7 +53,8 @@ def get_table(view: str) -> Table:
                 entity.get_file_size(),
                 entity.get_file_extension(),
                 entity.description]
-            if g.settings['image_processing'] \
+            if (g.settings['image_processing']
+                or app.config['IIIF']['activate']) \
                     and current_user.settings['table_show_icons']:
                 data.insert(1, file_preview(entity.id))
             table.rows.append(data)
@@ -77,7 +78,13 @@ def get_table(view: str) -> Table:
 
 def file_preview(entity_id: int) -> str:
     size = app.config['IMAGE_SIZE']['table']
-    parameter = f"loading='lazy' alt='image' width='{size}'"
+    parameter = f"loading='lazy' alt='image' width='100px'"
+    if app.config['IIIF']['activate'] and check_iiif_file_exist(entity_id):
+        ext = '.tiff' if app.config['IIIF']['conversion'] \
+            else g.files[entity_id].suffix
+        url = (f"{app.config['IIIF']['url']}{entity_id}{ext}"
+               f"/full/!100,100/0/default.jpg")
+        return f"<img src='{url}' {parameter}>"
     if icon_path := get_file_path(
             entity_id,
             app.config['IMAGE_SIZE']['table']):

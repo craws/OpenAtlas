@@ -240,10 +240,10 @@ def profile_image(entity: Entity) -> str:
     style = f'max-width:{g.settings["profile_image_width"]}px;'
     if app.config['IIIF']['activate'] and check_iiif_file_exist(entity.id):
         style = f'max-width:200px;'
-        ext = app.config["DISPLAY_FILE_EXTENSIONS"]
         src = \
             (f"{app.config['IIIF']['url']}{entity.id}.tiff"
              f"/full/!200,200/0/default.jpg")
+        ext = app.config["ALLOWED_IMAGE_EXT"]
     elif g.settings['image_processing'] and check_processed_image(path.name):
         size = app.config['IMAGE_SIZE']['thumbnail']
         if path_ := get_file_path(entity.image_id, size):
@@ -770,8 +770,8 @@ def convert_image_to_iiif(id_: int) -> None:
     vips = "vips" if os.name == 'posix' else "vips.exe"
     command = \
         (f"{vips} tiffsave {get_file_path(id_)} {path}.tiff "
-         f"--tile --pyramid --compression jpeg "
-         f"--tile-width 256 --tile-height 256")
+         f"--tile --pyramid --compression deflate --premultiply "
+         f"--tile-width 128 --tile-height 128")
     try:
         process = subprocess.Popen(command, shell=True)
         process.wait()

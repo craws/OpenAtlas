@@ -78,15 +78,15 @@ class BaseDisplay:
         return {key: data[key] for key in sorted(data.keys())}
 
     def add_file_tab_thumbnails(self) -> None:
-        if 'file' in self.tabs \
-                and current_user.settings['table_show_icons'] \
-                and g.settings['image_processing']:
-            self.tabs['file'].table.header.insert(1, _('icon'))
-            for row in self.tabs['file'].table.rows:
-                row.insert(1, file_preview(
-                    int(row[0]
-                        .replace('<a href="/entity/', '')
-                        .split('"')[0])))
+        if 'file' in self.tabs and current_user.settings['table_show_icons']:
+            if (app.config['IIIF']['activate']
+                    or g.settings['image_processing']):
+                self.tabs['file'].table.header.insert(1, _('icon'))
+                for row in self.tabs['file'].table.rows:
+                    row.insert(1, file_preview(
+                        int(row[0]
+                            .replace('<a href="/entity/', '')
+                            .split('"')[0])))
 
     def add_info_tab_content(self) -> None:
         self.add_data()
