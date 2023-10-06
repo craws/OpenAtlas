@@ -66,8 +66,8 @@ def ext_references(links: list[Link]) -> str:
             f'{system.resolver_url}{link_.description}',
             external=True) if system.resolver_url else link_.description
         html += \
-            f' ({ g.types[link_.type.id].name } ' + _('at') + \
-            f' { link(link_.domain) })<br>'
+            f' ({g.types[link_.type.id].name} ' + _('at') + \
+            f' {link(link_.domain)})<br>'
     return html
 
 
@@ -246,10 +246,7 @@ def profile_image(entity: Entity) -> str:
         src = \
             (f"{app.config['IIIF']['url']}{entity.id}{ext}"
              f"/full/!200,200/0/default.jpg")
-        url = url_for(
-            'view_iiif',
-            id_=entity.id,
-            version=app.config['IIIF']['version'])
+        url = url_for('view_iiif', id_=entity.id)
         ext = app.config["ALLOWED_IMAGE_EXT"]
     elif g.settings['image_processing'] and check_processed_image(path.name):
         size = app.config['IMAGE_SIZE']['thumbnail']
@@ -797,6 +794,5 @@ def convert_image_to_iiif(id_: int) -> None:
         process = subprocess.Popen(command, shell=True)
         process.wait()
         flash(_('iiif converted'), 'info')
-    except Exception:
-        flash(_('failed to convert image'), 'error')
-
+    except subprocess.CalledProcessError as e:
+        flash(f"{_('failed to convert image')}: {e}", 'error')
