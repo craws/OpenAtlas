@@ -769,11 +769,14 @@ def check_iiif_file_exist(id_: int) -> bool:
 
 def convert_image_to_iiif(id_: int) -> None:
     path = Path(app.config['IIIF']['path']) / str(id_)
+    compression = app.config['IIIF']['compression'] \
+        if app.config['IIIF']['compression'] in ['deflate', 'jpeg'] \
+        else 'deflate'
     vips = "vips" if os.name == 'posix' else "vips.exe"
     command = \
         (f"{vips} tiffsave {get_file_path(id_)} {path}.tiff "
-         f"--tile --pyramid --compression deflate --premultiply "
-         f"--tile-width 128 --tile-height 128")
+         f"--tile --pyramid --compression {compression} "
+         f"--premultiply --tile-width 128 --tile-height 128")
     try:
         process = subprocess.Popen(command, shell=True)
         process.wait()

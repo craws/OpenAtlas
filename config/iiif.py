@@ -3,4 +3,6 @@ IIIF = {
     'path': '',
     'url': '',
     'version': 2,
-    'conversion': True}
+    'conversion': True,
+    'compression': 'deflate'  # 'deflate' or 'jpeg'
+}
