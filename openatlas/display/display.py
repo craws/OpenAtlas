@@ -75,7 +75,9 @@ class FileDisplay(BaseDisplay):
             self.buttons.append(button(
                 _('download'),
                 url_for('download_file', filename=path.name)))
-            if check_iiif_activation():
+            if (check_iiif_activation()
+                    and self.entity.get_file_extension()
+                    in app.config['IIIF_IMAGE_EXT']):
                 if (check_iiif_file_exist(self.entity.id)
                         or not app.config['IIIF']['conversion']):
                     self.buttons.append(button(
