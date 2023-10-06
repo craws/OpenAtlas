@@ -787,12 +787,12 @@ def convert_image_to_iiif(id_: int) -> None:
         else 'deflate'
     vips = "vips" if os.name == 'posix' else "vips.exe"
     command = \
-        (f"{vips} tiffsave {get_file_path(id_)} {get_iiif_file_path} "
+        (f"{vips} tiffsave {get_file_path(id_)} {get_iiif_file_path(id_)} "
          f"--tile --pyramid --compression {compression} "
          f"--premultiply --tile-width 128 --tile-height 128")
     try:
         process = subprocess.Popen(command, shell=True)
         process.wait()
         flash(_('iiif converted'), 'info')
-    except subprocess.CalledProcessError as e:
+    except Exception as e:
         flash(f"{_('failed to convert image')}: {e}", 'error')

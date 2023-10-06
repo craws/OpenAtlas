@@ -78,22 +78,22 @@ def get_table(view: str) -> Table:
 
 def file_preview(entity_id: int) -> str:
     size = app.config['IMAGE_SIZE']['table']
-    parameter = f"loading='lazy' alt='image' width='100px'"
+    param = f"loading='lazy' alt='image' max-width='100px' max-height='100px'"
     if app.config['IIIF']['activate'] and check_iiif_file_exist(entity_id):
         ext = '.tiff' if app.config['IIIF']['conversion'] \
             else g.files[entity_id].suffix
         url = (f"{app.config['IIIF']['url']}{entity_id}{ext}"
                f"/full/!100,100/0/default.jpg")
-        return f"<img src='{url}' {parameter}>" \
+        return f"<img src='{url}' {param}>" \
             if ext in app.config["IIIF_IMAGE_EXT"] else ''
     if icon_path := get_file_path(
             entity_id,
             app.config['IMAGE_SIZE']['table']):
         url = url_for('display_file', filename=icon_path.name, size=size)
-        return f"<img src='{url}' {parameter}>"
+        return f"<img src='{url}' {param}>"
     path = get_file_path(entity_id)
     if path and check_processed_image(path.name):
         if icon := get_file_path(entity_id, app.config['IMAGE_SIZE']['table']):
             url = url_for('display_file', filename=icon.name, size=size)
-            return f"<img src='{url}' {parameter}>"
+            return f"<img src='{url}' {param}>"
     return ''

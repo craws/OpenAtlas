@@ -110,7 +110,12 @@ class IIIFManifest(Resource):
         entity = get_entity_by_id(id_)
         return {
             "@context": "https://iiif.io/api/presentation/2/context.json",
-            "@id": url_for('api.iiif_manifest', id_=id_, version=2),
+            "@id":
+                url_for(
+                    'api.iiif_manifest',
+                    id_=id_,
+                    version=2,
+                    _external=True),
             "@type": "sc:Manifest",
             "label": entity.name,
             "metadata": [],
