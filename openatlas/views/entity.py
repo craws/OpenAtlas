@@ -15,7 +15,7 @@ from openatlas.display import display
 from openatlas.display.image_processing import resize_image
 from openatlas.display.util import (
     button, get_base_table_data, get_file_path, is_authorized, link,
-    required_group)
+    required_group, get_iiif_file_path, check_iiif_file_exist)
 from openatlas.forms.base_manager import BaseManager
 from openatlas.forms.form import get_manager
 from openatlas.forms.util import was_modified
@@ -331,3 +331,6 @@ def delete_files(id_: int) -> None:
         path.unlink()
     for resized_path in app.config['RESIZED_IMAGES'].glob(f'**/{id_}.*'):
         resized_path.unlink()
+    if app.config['IIIF']['activate'] and check_iiif_file_exist(id_):
+        if path := get_iiif_file_path(id_):
+            path.unlink()
