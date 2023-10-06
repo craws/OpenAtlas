@@ -240,8 +240,10 @@ def profile_image(entity: Entity) -> str:
     style = f'max-width:{g.settings["profile_image_width"]}px;'
     if app.config['IIIF']['activate'] and check_iiif_file_exist(entity.id):
         style = f'max-width:200px;'
+        ext = '.tiff' if app.config['IIIF']['conversion'] \
+            else g.files[entity.id].suffix
         src = \
-            (f"{app.config['IIIF']['url']}{entity.id}.tiff"
+            (f"{app.config['IIIF']['url']}{entity.id}{ext}"
              f"/full/!200,200/0/default.jpg")
         ext = app.config["ALLOWED_IMAGE_EXT"]
     elif g.settings['image_processing'] and check_processed_image(path.name):
