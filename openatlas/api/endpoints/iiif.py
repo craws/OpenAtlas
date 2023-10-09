@@ -1,7 +1,7 @@
 from typing import Any
 
 import requests
-from flask import jsonify, Response, url_for
+from flask import jsonify, Response, url_for, g, request
 from flask_restful import Resource
 
 from openatlas import app
@@ -124,6 +124,7 @@ class IIIFManifest(Resource):
                 "@language": "en"}],
             "license": get_license_name(entity),
             "attribution": "By OpenAtlas",
+            "logo": get_logo(),
             "sequences": [
                 IIIFSequence.build_sequence(get_metadata(entity))],
             "structures": []}
@@ -136,3 +137,17 @@ def get_metadata(entity: Entity) -> dict[str, Any]:
     req = requests.get(f"{image_url}/info.json")
     image_api = req.json()
     return {'entity': entity, 'img_url': image_url, 'img_api': image_api}
+
+
+def get_logo() -> dict[str, Any]:
+    return {
+        "@id": url_for(
+            'api.display',
+            filename=g.settings['logo_file_id'],
+            _external=True),
+        "service": {
+            "@context": "http://iiif.io/api/image/2/context.json",
+            "@id": url_for('overview', _external=True),
+            "profile": "http://iiif.io/api/image/2/level2.json"
+        }
+    }
