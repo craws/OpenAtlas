@@ -1,7 +1,7 @@
 from typing import Any
 
 import requests
-from flask import jsonify, Response, url_for, g, request
+from flask import jsonify, Response, url_for, g
 from flask_restful import Resource
 
 from openatlas import app
@@ -10,12 +10,12 @@ from openatlas.api.resources.util import get_license_name
 from openatlas.models.entity import Entity
 
 
-class IIIFSequence(Resource):
+class IIIFSequenceV2(Resource):
     @staticmethod
-    def get(version: int, id_: int) -> Response:
+    def get(id_: int) -> Response:
         return jsonify(
             {"@context": "https://iiif.io/api/presentation/2/context.json"} |
-            IIIFSequence.build_sequence(get_metadata(get_entity_by_id(id_))))
+            IIIFSequenceV2.build_sequence(get_metadata(get_entity_by_id(id_))))
 
     @staticmethod
     def build_sequence(metadata: dict[str, Any]):
@@ -30,15 +30,15 @@ class IIIFSequence(Resource):
                 "@value": "Normal Sequence",
                 "@language": "en"}],
             "canvases": [
-                IIIFCanvas.build_canvas(metadata)]}
+                IIIFCanvasV2.build_canvas(metadata)]}
 
 
-class IIIFCanvas(Resource):
+class IIIFCanvasV2(Resource):
     @staticmethod
-    def get(version: int, id_: int) -> Response:
+    def get(id_: int) -> Response:
         return jsonify(
             {"@context": "https://iiif.io/api/presentation/2/context.json"} |
-            IIIFCanvas.build_canvas(get_metadata(get_entity_by_id(id_))))
+            IIIFCanvasV2.build_canvas(get_metadata(get_entity_by_id(id_))))
 
     @staticmethod
     def build_canvas(metadata: dict[str, Any]):
@@ -54,7 +54,7 @@ class IIIFCanvas(Resource):
                 "@value": entity.description,
                 "@language": "en"},
             "images": [
-                IIIFImage.build_image(metadata)],
+                IIIFImageV2.build_image(metadata)],
             "related": "",
             "thumbnail": {
                 "@id": f'{metadata["img_url"]}/full/!200,200/0/default.jpg',
@@ -70,11 +70,11 @@ class IIIFCanvas(Resource):
         }
 
 
-class IIIFImage(Resource):
+class IIIFImageV2(Resource):
     @staticmethod
-    def get(version: int, id_: int) -> Response:
+    def get(id_: int) -> Response:
         return jsonify(
-            IIIFImage.build_image(get_metadata(get_entity_by_id(id_))))
+            IIIFImageV2.build_image(get_metadata(get_entity_by_id(id_))))
 
     @staticmethod
     def build_image(metadata: dict[str, Any]):
@@ -126,7 +126,7 @@ class IIIFManifest(Resource):
             "attribution": "By OpenAtlas",
             "logo": get_logo(),
             "sequences": [
-                IIIFSequence.build_sequence(get_metadata(entity))],
+                IIIFSequenceV2.build_sequence(get_metadata(entity))],
             "structures": []}
 
 
@@ -146,8 +146,6 @@ def get_logo() -> dict[str, Any]:
             filename=g.settings['logo_file_id'],
             _external=True),
         "service": {
-            "@context": "http://iiif.io/api/image/2/context.json",
+            "@context": "https://iiif.io/api/image/2/context.json",
             "@id": url_for('overview', _external=True),
-            "profile": "http://iiif.io/api/image/2/level2.json"
-        }
-    }
+            "profile": "https://iiif.io/api/image/2/level2.json"}}

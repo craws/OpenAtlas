@@ -1,19 +1,18 @@
 from flask_restful import Api
 
-from openatlas.api.endpoints.iiif import IIIFManifest, IIIFImage, IIIFCanvas, \
-    IIIFSequence
+from openatlas.api.endpoints.iiif import \
+    (IIIFManifest, IIIFImageV2, IIIFCanvasV2, IIIFSequenceV2)
 from openatlas.api.endpoints.content import ClassMapping, \
     GetContent, SystemClassCount
 from openatlas.api.endpoints.special import GetGeometricEntities, \
     ExportDatabase, GetSubunits
-from openatlas.api.endpoints.display_image import (DisplayImage,
-                                                   LicensedFileOverview)
+from openatlas.api.endpoints.display_image import \
+    (DisplayImage, LicensedFileOverview)
 from openatlas.api.endpoints.entities import GetByCidocClass, \
     GetBySystemClass, GetByViewClass, GetEntitiesLinkedToEntity, GetEntity, \
     GetLatest, GetQuery, GetTypeEntities, GetTypeEntitiesAll
-from openatlas.api.endpoints.type import GetTypeByViewClass, \
-    GetTypeOverview, \
-    GetTypeTree
+from openatlas.api.endpoints.type import \
+    (GetTypeByViewClass, GetTypeOverview, GetTypeTree)
 
 
 def add_routes_v03(api: Api) -> None:
@@ -106,14 +105,14 @@ def add_routes_v03(api: Api) -> None:
         '/iiif_manifest/<int:version>/<int:id_>',
         endpoint='iiif_manifest')
     api.add_resource(
-        IIIFImage,
+        IIIFImageV2,
         '/iiif_image/<int:version>/<int:id_>.json',
         endpoint='iiif_image')
     api.add_resource(
-        IIIFCanvas,
+        IIIFCanvasV2,
         '/iiif_canvas/<int:version>/<int:id_>.json',
         endpoint='iiif_canvas')
     api.add_resource(
-        IIIFSequence,
+        IIIFSequenceV2,
         '/iiif_sequence/<int:version>/<int:id_>.json',
         endpoint='iiif_sequence')
