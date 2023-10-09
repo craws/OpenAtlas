@@ -235,47 +235,44 @@ def profile_image(entity: Entity) -> str:
     path = get_file_path(entity.image_id)
     if not path:
         return ''  # pragma: no cover
-    ext = app.config["DISPLAY_FILE_EXTENSIONS"]
+    display_ext = app.config["DISPLAY_FILE_EXTENSIONS"]
     src = url_for('display_file', filename=path.name)
     url = src
-    style = f'max-width:{g.settings["profile_image_width"]}px;'
+    width = g.settings["profile_image_width"]
     if app.config['IIIF']['activate'] and check_iiif_file_exist(entity.id):
-        style = f'max-width:200px;'
-        ext = '.tiff' if app.config['IIIF']['conversion'] \
+        url = url_for('view_iiif', id_=entity.id)
+        display_ext = app.config["IIIF_IMAGE_EXT"]
+        iiif_ext = '.tiff' if app.config['IIIF']['conversion'] \
             else g.files[entity.id].suffix
         src = \
-            (f"{app.config['IIIF']['url']}{entity.id}{ext}"
-             f"/full/!200,200/0/default.jpg")
-        url = url_for('view_iiif', id_=entity.id)
-        ext = app.config["ALLOWED_IMAGE_EXT"]
+            f"{app.config['IIIF']['url']}{entity.id}{iiif_ext}" \
+            f"/full/!{width},{width}/0/default.jpg"
     elif g.settings['image_processing'] and check_processed_image(path.name):
-        size = app.config['IMAGE_SIZE']['thumbnail']
-        if path_ := get_file_path(entity.image_id, size):
-            src = url_for('display_file', filename=path_.name, size=size)
-            style = f'max-width:{app.config["IMAGE_SIZE"]["thumbnail"]}px;'
-            url = url_for('display_file', filename=path_.name, size=size)
-            ext = app.config["ALLOWED_IMAGE_EXT"]
+        display_ext = app.config["ALLOWED_IMAGE_EXT"]
+        src = url_for(
+            'display_file',
+            size=app.config['IMAGE_SIZE']['thumbnail'],
+            filename=get_file_path(
+                entity.image_id,
+                app.config['IMAGE_SIZE']['thumbnail']).name)
+    external = False
     if entity.class_.view == 'file':
-        html = \
-            '<p class="uc-first">' + _('no preview available') + '</p>'
-        if (path.suffix.lower() in ext or
-                (app.config['IIIF']['activate']
-                 and path.suffix.lower() == '.pdf')):
-            html = link(
-                f'<img style="{style}" alt="image" src="{src}">',
-                url,
-                external=True)
+        external = True
+        if path.suffix.lower() not in display_ext:
+            return '<p class="uc-first">' + _('no preview available') + '</p>'
     else:
-        html = link(
-            f'<img style="{style}" alt="image" src="{src}">',
-            url_for('view', id_=entity.image_id))
-    return f'{html}'
+        url = url_for('view', id_=entity.image_id)
+    html = link(
+        f'<img style="max-width:{width}px" alt="{entity.name}" src="{src}">',
+        url,
+        external=external)
+    return html
 
 
 @app.template_filter()
 def get_js_messages(lang: str) -> str:
     js_message_file = Path('static') / 'vendor' / 'jquery_validation_plugin' \
-        / f'messages_{lang}.js'
+                      / f'messages_{lang}.js'
     if not (Path(app.root_path) / js_message_file).is_file():
         return ''
     return f'<script src="/{js_message_file}"></script>'
@@ -324,7 +321,7 @@ def get_backup_file_data() -> dict[str, Any]:
     latest_file = None
     latest_file_date = None
     for file in [
-        f for f in path.iterdir()
+            f for f in path.iterdir()
             if (path / f).is_file() and f.name != '.gitignore']:
         file_date = datetime.utcfromtimestamp((path / file).stat().st_ctime)
         if not latest_file_date or file_date > latest_file_date:
@@ -658,8 +655,9 @@ def manual(site: str) -> str:
         return ''
     return \
         '<a title="' + uc_first(_('manual')) + '" ' \
-        f'href="/static/manual/{site}.html" class="manual" target="_blank" ' \
-        'rel="noopener noreferrer"><i class="fas fs-4 fa-book"></i></a>'
+        f'href="/static/manual/{site}.html" class="manual" ' \
+        f'target="_blank" rel="noopener noreferrer">' \
+        f'<i class="fas fs-4 fa-book"></i></a>'
 
 
 @app.template_filter()
