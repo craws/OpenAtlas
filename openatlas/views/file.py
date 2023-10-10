@@ -70,14 +70,14 @@ def file_add(id_: int, view: str) -> Union[str, Response]:
 
 @app.route('/file/convert_iiif/<int:id_>', methods=['GET'])
 @required_group('contributor')
-def make_iiif_available(id_: int):
+def make_iiif_available(id_: int) -> Response:
     convert_image_to_iiif(id_)
     return redirect(url_for('view', id_=id_))
 
 
 @app.route('/view_iiif/<int:id_>', methods=['GET'])
 @required_group('contributor')
-def view_iiif(id_: int):
+def view_iiif(id_: int) -> str:
     return render_template(
         'iiif.html',
         manifest_url=url_for(
