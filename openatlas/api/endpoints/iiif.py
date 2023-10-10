@@ -18,7 +18,7 @@ class IIIFSequenceV2(Resource):
             IIIFSequenceV2.build_sequence(get_metadata(get_entity_by_id(id_))))
 
     @staticmethod
-    def build_sequence(metadata: dict[str, Any]) -> dict[str, str]:
+    def build_sequence(metadata: dict[str, Any]) -> dict[str, Any]:
         return {
             "@id": url_for(
                 'api.iiif_sequence',
@@ -41,7 +41,7 @@ class IIIFCanvasV2(Resource):
             IIIFCanvasV2.build_canvas(get_metadata(get_entity_by_id(id_))))
 
     @staticmethod
-    def build_canvas(metadata: dict[str, Any])  -> dict[str, str]:
+    def build_canvas(metadata: dict[str, Any])  -> dict[str, Any]:
         entity = metadata['entity']
         return {
             "@id": url_for(
@@ -77,7 +77,7 @@ class IIIFImageV2(Resource):
             IIIFImageV2.build_image(get_metadata(get_entity_by_id(id_))))
 
     @staticmethod
-    def build_image(metadata: dict[str, Any]) -> dict[str, str]:
+    def build_image(metadata: dict[str, Any]) -> dict[str, Any]:
         id_ = metadata['entity'].id
         return {
             "@context": "https://iiif.io/api/presentation/2/context.json",
