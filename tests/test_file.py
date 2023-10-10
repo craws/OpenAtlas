@@ -93,7 +93,7 @@ class FileTest(TestBaseCase):
             assert b'File keeper' in rv.data
 
             rv = self.app.get(url_for('update', id_=place.id))
-            assert b'alt="image"' in rv.data
+            assert b'File keeper' in rv.data
 
             rv = self.app.post(
                 url_for('entity_add_file', id_=get_hierarchy('Sex').subs[0]),

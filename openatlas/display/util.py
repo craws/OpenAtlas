@@ -232,8 +232,7 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
 def profile_image(entity: Entity) -> str:
     if not entity.image_id:
         return ''
-    path = get_file_path(entity.image_id)
-    if not path:
+    if not (path := get_file_path(entity.image_id)):
         return ''  # pragma: no cover
     display_ext = app.config["DISPLAY_FILE_EXTENSIONS"]
     src = url_for('display_file', filename=path.name)
