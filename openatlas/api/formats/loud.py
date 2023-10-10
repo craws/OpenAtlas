@@ -95,7 +95,7 @@ def get_loud_entities(
                 "type": "DigitalObject"}]})
 
     return {'@context': app.config['API_CONTEXT']['LOUD']} | \
-        base_entity_dict() | properties_set  # type: ignore
+        base_entity_dict() | properties_set
 
 
 def get_loud_timespan(entity: Entity) -> dict[str, Any]:

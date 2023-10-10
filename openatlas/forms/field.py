@@ -155,7 +155,8 @@ class TableMultiSelect(HiddenInput):
             **kwargs: Any) -> TableMultiSelect:
         data = field.data or []
         data = ast.literal_eval(data) if isinstance(data, str) else data
-        class_ = field.id if field.id != 'given_place' else 'place'
+        class_ = field.id \
+            if field.id not in ['given_place', 'modified_place'] else 'place'
         aliases = current_user.settings['table_show_aliases']
         if class_ in ['group', 'person']:
             entities = Entity.get_by_class(class_, types=True, aliases=aliases)

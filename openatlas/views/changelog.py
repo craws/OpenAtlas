@@ -18,6 +18,7 @@ versions = {
     '7.17.0': ['TBA', {
         'feature': {
             '2026': 'External reference systems for type hierarchies',
+            '2070': 'Modification (E11) for Place (E18)',
             '2083': 'API: List of images'},
         'fix': {
             '2078': 'API: CSV export not working'

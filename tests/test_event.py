@@ -111,7 +111,10 @@ class EventTest(TestBaseCase):
 
             rv = self.app.post(
                 url_for('insert', class_='modification'),
-                data={'name': 'A modification event', 'artifact': artifact.id})
+                data={
+                    'name': 'A modification event',
+                    'artifact': artifact.id,
+                    'modified_place': residence.id})
             modification_id = rv.location.split('/')[-1]
 
             rv = self.app.get(url_for('view', id_=modification_id))
