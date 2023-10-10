@@ -51,7 +51,7 @@ def get_table(view: str) -> Table:
                 link(entity),
                 link(entity.standard_type),
                 entity.get_file_size(),
-                entity.get_file_extension(),
+                entity.get_file_ext(),
                 entity.description]
             if (g.settings['image_processing']
                 or app.config['IIIF']['activate']) \

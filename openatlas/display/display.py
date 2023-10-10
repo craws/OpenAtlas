@@ -68,18 +68,17 @@ class FileDisplay(BaseDisplay):
     def add_data(self) -> None:
         super().add_data()
         self.data[_('size')] = self.entity.get_file_size()
-        self.data[_('extension')] = self.entity.get_file_extension()
+        self.data[_('extension')] = self.entity.get_file_ext()
 
     def add_button_others(self) -> None:
         if path := get_file_path(self.entity.id):
             self.buttons.append(button(
                 _('download'),
                 url_for('download_file', filename=path.name)))
-            if (check_iiif_activation()
-                    and self.entity.get_file_extension()
-                    in app.config['IIIF_IMAGE_EXT']):
-                if (check_iiif_file_exist(self.entity.id)
-                        or not app.config['IIIF']['conversion']):
+            if check_iiif_activation() \
+                    and self.entity.get_file_ext() in g.display_image_ext:
+                if check_iiif_file_exist(self.entity.id) \
+                        or not app.config['IIIF']['conversion']:
                     self.buttons.append(button(
                         _('iiif'),
                         url_for('view_iiif', id_=self.entity.id)))

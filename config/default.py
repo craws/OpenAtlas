@@ -23,9 +23,6 @@ LANGUAGES = {
     'es': 'Español',
     'fr': 'Français'}
 
-# Files with these extensions are can be displayed in the browser
-DISPLAY_FILE_EXTENSIONS = \
-    ['.bmp', '.gif', '.ico', '.jpeg', '.jpg', '.png', '.svg']
 
 # Paths are implemented operating system independent using pathlib.
 # To override them (in instance/production.py) either use them like here
@@ -36,14 +33,22 @@ UPLOAD_PATH = Path(FILES_PATH) / 'uploads'
 TMP_PATH = Path('/tmp')  # used e.g. for processing imports and export files
 
 # Image processing
+DISPLAY_FILE_EXT = ['.bmp', '.gif', '.ico', '.jpeg', '.jpg', '.png', '.svg']
+PROCESSABLE_EXT = ['.tiff', '.tif']
+PROCESSED_EXT = '.jpeg'
+
 PROCESSED_IMAGE_PATH = Path(FILES_PATH) / 'processed_images'
 RESIZED_IMAGES = Path(PROCESSED_IMAGE_PATH) / 'resized'
 IMAGE_SIZE = {
     'thumbnail': '200',
     'table': '100'}
-NONE_DISPLAY_EXT = ['.tiff', '.tif']
-ALLOWED_IMAGE_EXT = DISPLAY_FILE_EXTENSIONS + NONE_DISPLAY_EXT
-PROCESSED_EXT = '.jpeg'
+IIIF = {
+    'activate': False,
+    'path': '',
+    'url': '',
+    'version': 2,
+    'conversion': True,
+    'compression': 'deflate'}  # 'deflate' or 'jpeg'
 
 # For system checks
 WRITABLE_PATHS = [

@@ -128,17 +128,12 @@ def format_entity_date(
     return html + (f" ({comment})" if comment else '')
 
 
-def profile_image_table_link(
-        entity: Entity,
-        file: Entity,
-        extension: str) -> str:
+def profile_image_table_link(entity: Entity, file: Entity, ext: str) -> str:
     if file.id == entity.image_id:
         return link(
             _('unset'),
             url_for('file_remove_profile_image', entity_id=entity.id))
-    if extension in app.config['DISPLAY_FILE_EXTENSIONS'] or (
-            g.settings['image_processing']
-            and extension in app.config['ALLOWED_IMAGE_EXT']):
+    if ext in g.display_file_ext:
         return link(
             _('set'),
             url_for('set_profile_image', id_=file.id, origin_id=entity.id))
@@ -234,20 +229,18 @@ def profile_image(entity: Entity) -> str:
         return ''
     if not (path := get_file_path(entity.image_id)):
         return ''  # pragma: no cover
-    display_ext = app.config["DISPLAY_FILE_EXTENSIONS"]
+
     src = url_for('display_file', filename=path.name)
     url = src
     width = g.settings["profile_image_width"]
     if app.config['IIIF']['activate'] and check_iiif_file_exist(entity.id):
         url = url_for('view_iiif', id_=entity.id)
-        display_ext = app.config["IIIF_IMAGE_EXT"]
         iiif_ext = '.tiff' if app.config['IIIF']['conversion'] \
             else g.files[entity.id].suffix
         src = \
             f"{app.config['IIIF']['url']}{entity.id}{iiif_ext}" \
             f"/full/!{width},{width}/0/default.jpg"
     elif g.settings['image_processing'] and check_processed_image(path.name):
-        display_ext = app.config["ALLOWED_IMAGE_EXT"]
         if path_ := get_file_path(
                 entity.image_id,
                 app.config['IMAGE_SIZE']['thumbnail']):
@@ -258,7 +251,7 @@ def profile_image(entity: Entity) -> str:
     external = False
     if entity.class_.view == 'file':
         external = True
-        if path.suffix.lower() not in display_ext:
+        if path.suffix.lower() not in g.display_file_ext:
             return '<p class="uc-first">' + _('no preview available') + '</p>'
     else:
         url = url_for('view', id_=entity.image_id)
@@ -347,7 +340,7 @@ def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
         data.append(entity.standard_type.name if entity.standard_type else '')
     if entity.class_.name == 'file':
         data.append(entity.get_file_size())
-        data.append(entity.get_file_extension())
+        data.append(entity.get_file_ext())
     if entity.class_.view in ['actor', 'artifact', 'event', 'place']:
         data.append(entity.first)
         data.append(entity.last)
@@ -482,7 +475,7 @@ def get_file_path(
         return None
     ext = g.files[id_].suffix
     if size:
-        if ext in app.config['NONE_DISPLAY_EXT']:
+        if ext in app.config['PROCESSABLE_EXT']:
             ext = app.config['PROCESSED_EXT']  # pragma: no cover
         path = app.config['RESIZED_IMAGES'] / size / f"{id_}{ext}"
         return path if os.path.exists(path) else None
@@ -761,9 +754,7 @@ def get_entities_linked_to_type_recursive(
 
 def check_iiif_activation() -> bool:
     iiif = app.config['IIIF']
-    return True \
-        if (iiif['activate'] and os.access(Path(iiif['path']), os.W_OK)) \
-        else False
+    return bool(iiif['activate'] and os.access(Path(iiif['path']), os.W_OK))
 
 
 def check_iiif_file_exist(id_: int) -> bool:

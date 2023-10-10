@@ -8,13 +8,11 @@ from openatlas import app
 
 def resize_image(filename: str) -> None:
     file_format = '.' + filename.split('.', 1)[1].lower()
-    if file_format in app.config['ALLOWED_IMAGE_EXT']:
-        loop_resize_image(filename.rsplit('.', 1)[0].lower(), file_format)
-
-
-def loop_resize_image(name: str, file_format: str) -> None:
-    for size in app.config['IMAGE_SIZE'].values():
-        safe_resize_image(name, file_format, size)
+    if file_format in g.display_file_ext:
+        for size in app.config['IMAGE_SIZE'].values():
+            safe_resize_image(
+                filename.rsplit('.', 1)[0].lower(),
+                file_format, size)
 
 
 def safe_resize_image(name: str, file_format: str, size: str) -> bool:
@@ -32,23 +30,23 @@ def safe_resize_image(name: str, file_format: str, size: str) -> bool:
 
 
 def image_resizing(name: str, format_: str, size: str) -> bool:
-    conf = app.config
-    filename = Path(conf['UPLOAD_PATH']) / f"{name}{format_}[0]"
+    filename = Path(app.config['UPLOAD_PATH']) / f"{name}{format_}[0]"
     with Image(filename=filename) as src:
-        ext = conf['PROCESSED_EXT'] \
-            if format_ in conf['NONE_DISPLAY_EXT'] else format_
-        with src.convert(ext.replace('.', '')) as img:
+        if format_ in app.config['PROCESSABLE_EXT']:
+            format_ = app.config['PROCESSED_EXT']
+        with src.convert(format_.replace('.', '')) as img:
             img.transform(resize=f"{size}x{size}>")
             img.compression_quality = 75
             img.save(
-                filename=Path(conf['RESIZED_IMAGES']) / size / f"{name}{ext}")
+                filename=Path(
+                    app.config['RESIZED_IMAGES']) / size / f"{name}{format_}")
             return True
 
 
 def check_processed_image(filename: str) -> bool:
     file_format = '.' + filename.split('.', 1)[1].lower()
     try:
-        if file_format in app.config['ALLOWED_IMAGE_EXT']:
+        if file_format in g.display_file_ext:
             return loop_through_processed_folders(
                 filename.rsplit('.', 1)[0].lower(),
                 file_format)
@@ -62,8 +60,9 @@ def check_processed_image(filename: str) -> bool:
 
 
 def loop_through_processed_folders(name: str, file_format: str) -> bool:
-    ext = app.config['PROCESSED_EXT'] \
-        if file_format in app.config['NONE_DISPLAY_EXT'] else file_format
+    ext = file_format
+    if file_format in app.config['PROCESSABLE_EXT']:
+        ext = app.config['PROCESSED_EXT']
     for size in app.config['IMAGE_SIZE'].values():
         path = Path(app.config['RESIZED_IMAGES']) / size / f"{name}{ext}"
         if not path.is_file() \
@@ -97,7 +96,6 @@ def delete_orphaned_resized_images() -> None:
 
 def create_resized_images() -> None:
     from openatlas.models.entity import Entity
-    for entity in Entity.get_by_class('file'):
-        if entity.id in g.files:
-            if entity.get_file_extension() in app.config['ALLOWED_IMAGE_EXT']:
-                resize_image(f"{entity.id}{entity.get_file_extension()}")
+    for e in Entity.get_by_class('file'):
+        if e.id in g.files and e.get_file_ext() in g.display_file_ext:
+            resize_image(f"{e.id}{e.get_file_ext()}")

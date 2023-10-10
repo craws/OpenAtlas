@@ -123,11 +123,11 @@ def update(id_: int, copy: Optional[str] = None) -> Union[str, Response]:
     if entity.class_.view in ['artifact', 'place']:
         manager.entity.image_id = manager.entity.get_profile_image_id()
         if not manager.entity.image_id:
-            for l in manager.entity.get_links('P67', inverse=True):
-                if l.domain.class_.view == 'file' \
-                        and get_base_table_data(l.domain)[3] \
-                        in app.config['DISPLAY_FILE_EXTENSIONS']:
-                    manager.entity.image_id = l.domain.id
+            for link_ in manager.entity.get_links('P67', inverse=True):
+                if link_.domain.class_.view == 'file' \
+                        and get_base_table_data(link_.domain)[3] \
+                        in g.display_file_ext:
+                    manager.entity.image_id = link_.domain.id
                     break
     return render_template(
         'entity/update.html',
@@ -211,7 +211,7 @@ def insert_files(manager: BaseManager) -> Union[str, Response]:
             ext = secure_filename(file.filename).rsplit('.', 1)[1].lower()
             path = app.config['UPLOAD_PATH'] / name
             file.save(str(path))
-            if f'.{ext}' in app.config['DISPLAY_FILE_EXTENSIONS']:
+            if f'.{ext}' in g.display_file_ext:
                 call(f'exiftran -ai {path}', shell=True)  # Fix rotation
             filenames.append(name)
             if g.settings['image_processing']:

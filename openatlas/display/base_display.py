@@ -79,8 +79,8 @@ class BaseDisplay:
 
     def add_file_tab_thumbnails(self) -> None:
         if 'file' in self.tabs and current_user.settings['table_show_icons']:
-            if (app.config['IIIF']['activate']
-                    or g.settings['image_processing']):
+            if app.config['IIIF']['activate'] \
+                    or g.settings['image_processing']:
                 self.tabs['file'].table.header.insert(1, _('icon'))
                 for row in self.tabs['file'].table.rows:
                     row.insert(1, file_preview(
@@ -202,11 +202,9 @@ class BaseDisplay:
             domain = link_.domain
             data = get_base_table_data(domain)
             if domain.class_.view == 'file':
-                extension = data[3]
-                data.append(
-                    profile_image_table_link(entity, domain, extension))
-                if not entity.image_id \
-                        and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
+                ext = data[3]
+                data.append(profile_image_table_link(entity, domain, ext))
+                if not entity.image_id and ext in g.display_file_ext:
                     entity.image_id = domain.id
             elif domain.class_.view != 'source':
                 data.append(link_.description)
@@ -382,17 +380,15 @@ class PlaceBaseDisplay(BaseDisplay):
             domain = link_.domain
             data = get_base_table_data(domain)
             if domain.class_.view == 'file':
-                extension = data[3]
-                data.append(
-                    profile_image_table_link(entity, domain, extension))
-                if not entity.image_id \
-                        and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
+                ext = data[3]
+                data.append(profile_image_table_link(entity, domain, ext))
+                if not entity.image_id and ext in g.display_file_ext:
                     entity.image_id = domain.id
                 if entity.class_.view == 'place' \
                         and is_authorized('editor') \
                         and current_user.settings['module_map_overlay']:
                     content = ''
-                    if extension in app.config['DISPLAY_FILE_EXTENSIONS']:
+                    if ext in app.config['DISPLAY_FILE_EXT']:
                         overlays = Overlay.get_by_object(entity)
                         if domain.id in overlays and (html_link := edit_link(
                                 url_for(

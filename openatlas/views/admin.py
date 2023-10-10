@@ -616,7 +616,7 @@ def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
             entity.name,
             link(entity.standard_type),
             entity.get_file_size(),
-            entity.get_file_extension(),
+            entity.get_file_ext(),
             entity.description,
             date])
     return render_template(
@@ -783,7 +783,6 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
 def admin_convert_all_to_iiif() -> Response:
     for entity in Entity.get_by_class('file'):
         if entity.id in g.files \
-                and entity.get_file_extension() \
-                in app.config['ALLOWED_IMAGE_EXT']:
+                and entity.get_file_ext() in g.display_file_ext:
             convert_image_to_iiif(entity.id)
     return redirect(url_for('admin_index') + '#tab-data')

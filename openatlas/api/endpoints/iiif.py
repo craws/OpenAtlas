@@ -132,7 +132,7 @@ class IIIFManifest(Resource):
 
 def get_metadata(entity: Entity) -> dict[str, Any]:
     ext = '.tiff' if app.config['IIIF']['conversion'] \
-        else entity.get_file_extension()
+        else entity.get_file_ext()
     image_url = f"{app.config['IIIF']['url']}{entity.id}{ext}"
     req = requests.get(f"{image_url}/info.json")
     image_api = req.json()
