@@ -378,7 +378,7 @@ class PlaceBaseDisplay(BaseDisplay):
                 and current_user.settings['module_map_overlay']:
             self.tabs['file'].table.header.append(_('overlay'))
 
-        for link_ in entity.get_links('P67', inverse=True):
+        for link_ in entity.get_links(['P31', 'P67'], inverse=True):
             domain = link_.domain
             data = get_base_table_data(domain)
             if domain.class_.view == 'file':

@@ -152,7 +152,7 @@ class ModificationDisplay(EventsDisplay):
 
     def add_data(self) -> None:
         super().add_data()
-        self.data[_('artifact')] = \
+        self.data[_('object')] = \
             [link(entity) for entity in self.entity.get_linked_entities('P31')]
 
 
