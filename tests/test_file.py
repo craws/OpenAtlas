@@ -17,7 +17,7 @@ class FileTest(TestBaseCase):
                 reference = insert('edition', 'Ancient Books')
 
             logo = Path(app.root_path) \
-                / 'static' / 'images' / 'layout' / 'logo.png'
+                   / 'static' / 'images' / 'layout' / 'logo.png'
 
             with open(logo, 'rb') as img_1, open(logo, 'rb') as img_2:
                 rv = self.app.post(
@@ -101,8 +101,21 @@ class FileTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Updated file' in rv.data
 
+            rv = self.app.get(
+                url_for('make_iiif_available', id_=file_id),
+                follow_redirects=True)
+            assert b'IIIF converted' in rv.data
+
+            rv = self.app.get(url_for('view', id_=file_id))
+            assert b'Logo' in rv.data
+
+            rv = self.app.get(url_for('view_iiif', id_=file_id))
+            assert b'Mirador' in rv.data
+
             for file in files:
                 rv = self.app.get(
                     url_for('delete', id_=file.id),
                     follow_redirects=True)
                 assert b'The entry has been deleted' in rv.data
+
+

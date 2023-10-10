@@ -776,13 +776,3 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
         'percent_used': percent_free,
         'percent_project': percent_files,
         'percent_other': 100 - (percent_files + percent_free)}
-
-
-@app.route('/admin/admin_convert_all_to_iiif')
-@required_group('manager')
-def admin_convert_all_to_iiif() -> Response:
-    for entity in Entity.get_by_class('file'):
-        if entity.id in g.files \
-                and entity.get_file_ext() in g.display_file_ext:
-            convert_image_to_iiif(entity.id)
-    return redirect(url_for('admin_index') + '#tab-data')
