@@ -783,5 +783,5 @@ def convert_image_to_iiif(id_: int) -> None:
         process = subprocess.Popen(command, shell=True)
         process.wait()
         flash(_('IIIF converted'), 'info')
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         flash(f"{_('failed to convert image')}: {e}", 'error')
