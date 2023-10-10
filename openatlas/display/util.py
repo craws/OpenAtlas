@@ -249,12 +249,13 @@ def profile_image(entity: Entity) -> str:
             f"/full/!{width},{width}/0/default.jpg"
     elif g.settings['image_processing'] and check_processed_image(path.name):
         display_ext = app.config["ALLOWED_IMAGE_EXT"]
-        src = url_for(
-            'display_file',
-            size=app.config['IMAGE_SIZE']['thumbnail'],
-            filename=get_file_path(
+        if path_ := get_file_path(
                 entity.image_id,
-                app.config['IMAGE_SIZE']['thumbnail']).name)
+                app.config['IMAGE_SIZE']['thumbnail']):
+            src = url_for(
+                'display_file',
+                size=app.config['IMAGE_SIZE']['thumbnail'],
+                filename=path_.name)
     external = False
     if entity.class_.view == 'file':
         external = True
@@ -456,7 +457,7 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
         f'{"<br>".join(warnings)}</div>' if warnings else ''
 
 
-def check_write_access(path, warnings):
+def check_write_access(path: Path, warnings: list[str]) -> list[str]:
     if not os.access(path, os.W_OK):
         warnings.append(
             '<p class="uc-first">' + _('directory not writable') +
