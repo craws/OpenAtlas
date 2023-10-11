@@ -77,6 +77,11 @@ def before_request() -> None:
     if g.settings['image_processing']:
         g.display_file_ext += app.config['PROCESSABLE_EXT']
 
+    g.writable_paths = [
+        app.config['UPLOAD_PATH'],
+        app.config['EXPORT_PATH'],
+        app.config['RESIZED_IMAGES']]  # For system checks
+
     if request.path.startswith('/api/'):
         ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
         if not current_user.is_authenticated \
