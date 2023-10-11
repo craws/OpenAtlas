@@ -1,6 +1,11 @@
 {% extends "layout.html" %}
 {% block content %}
   {{ buttons|button_bar|safe }}
+  <script src="/static/node_modules/chart.js/dist/chart.umd.js"></script>
+  <script src="/static/node_modules/chartjs-plugin-autocolors/dist/chartjs-plugin-autocolors.min.js"></script>
+  <script>
+    const autocolors = window['chartjs-plugin-autocolors'];
+  </script>
   <ul class="nav nav-pills bg-gray p-1" role="tablist">
     {% for category in types %}
       <li class="nav-item">
@@ -62,8 +67,7 @@
                           </div>
                         {% endif %}
                         {% if category in ['custom', 'value'] and 'manager'|is_authorized %}
-                          <div
-                              class="col-auto">{{ _('edit')|button(url_for('hierarchy_update', id_=type_.id))|safe }}</div>
+                          <div class="col-auto">{{ _('edit')|button(url_for('hierarchy_update', id_=type_.id))|safe }}</div>
                           {% if not type_.system %}
                             <div class="col-auto">
                               {% if type_.count > 0 or type_.subs %}
@@ -91,8 +95,7 @@
                             {{ _('true') if type_.required else _('false') }}
                             {% if 'manager'|is_authorized %}
                               {% if type_.required %}
-                                (<a href="{{ url_for('required_remove', id_=type_.id) }}">{{ _('remove required') }}</a>
-                                )
+                                (<a href="{{ url_for('required_remove', id_=type_.id) }}">{{ _('remove required') }}</a>)
                               {% else %}
                                 (<a href="{{ url_for('required_risk', id_=type_.id) }}">{{ _('make required') }}</a>)
                               {% endif %}
@@ -130,6 +133,28 @@
                           <strong>{{ _('description')|uc_first }}</strong>
                           <p>{{ type_.description }}</p>
                         </div>
+                      {% endif %}
+                      {% if type_.chart_data %}
+                        <div class="col-lg-6">
+                          <div class="chart-wrapper">
+                            <canvas id="type-chart{{ type_.id }}"></canvas>
+                          </div>
+                        </div>
+                        <script>
+                          const ctx{{ type_.id }} = document.getElementById('type-chart{{ type_.id }}');
+                          Chart.register(autocolors);
+                          new Chart(ctx{{ type_.id }}, {
+                            type : 'bar',
+                            data: {{ type_.chart_data|safe }},
+                            options: {
+                              animation: {duration: 0},
+                              plugins: {
+                                autocolors: {mode: 'data', offset: 3},
+                                legend: {display: false}
+                              }
+                            },
+                          });
+                        </script>
                       {% endif %}
                     </div>
                   </div>

@@ -22,8 +22,12 @@ h2 {
   margin: 1em 0;
 }
 
+.chart-wrapper {
+  height: 40vh;
+  width: 40vw;
+}
 
-.toolbar{
+.toolbar {
   margin-bottom: 1rem;
 }
 
@@ -221,3 +225,9 @@ img.schema_image {
   max-height: calc(100vh - 200px);
   width: 100%;
 }
+
+/* Reference Field Autocomplete (Wikidata & Co) */
+[data-reference-system] + .bootstrap-autocomplete {
+  min-width: 12.25rem;
+}
+

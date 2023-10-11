@@ -784,7 +784,17 @@
           "schema" : {
             "type" : "string"
           }
-        } ],
+        }, {
+          "in": "query",
+          "name": "image_size",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "thumbnail",
+              "table"]
+          }
+        }],
         "responses" : {
           "200" : {
             "description" : "Retrieves the respective image if it has a licence",
@@ -828,7 +838,7 @@
         "required" : true,
         "in" : "path",
         "schema" : {
-          "enum" : [ "E6", "E7", "E8", "E9", "E12", "E18", "E20", "E21", "E22", "E31", "E32", "E33", "E41", "E53", "E54", "E55", "E74" ]
+          "enum" : [ "E5", "E7", "E8", "E9", "E12", "E18", "E20", "E21", "E22", "E31", "E32", "E33", "E41", "E53", "E54", "E55", "E65","E74" ]
         },
         "example" : "E18"
       },

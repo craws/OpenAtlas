@@ -31,7 +31,7 @@ class OverlayForm(FlaskForm):
 
 @app.route(
     '/overlay/insert/<int:image_id>/<int:place_id>/<int:link_id>',
-    methods=['POST', 'GET'])
+    methods=['GET', 'POST'])
 @required_group('editor')
 def overlay_insert(
         image_id: int,
@@ -60,7 +60,7 @@ def overlay_insert(
             _('overlay')])
 
 
-@app.route('/overlay/update/<int:id_>', methods=['POST', 'GET'])
+@app.route('/overlay/update/<int:id_>', methods=['GET', 'POST'])
 @required_group('editor')
 def overlay_update(id_: int) -> Union[str, Response]:
     overlay = Overlay.get_by_id(id_)

@@ -14,7 +14,7 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
     get_entities_linked_to_type_recursive, link, manual, required_group,
-    sanitize)
+    sanitize, get_chart_data)
 from openatlas.forms.field import SubmitField
 from openatlas.forms.form import get_move_form
 from openatlas.models.entity import Entity
@@ -48,12 +48,12 @@ def type_index() -> str:
         'value': {},
         'system': {}}
     for type_ in [type_ for type_ in g.types.values() if not type_.root]:
-        if type_.category not in types:  # e.g. special types for tools
-            continue  # pragma: no cover
-        types[type_.category][type_] = render_template(
-            'forms/tree_select_item.html',
-            name=sanitize(type_.name),
-            data=walk_tree(type_.subs))
+        if type_.category in types:
+            type_.chart_data = get_chart_data(type_)
+            types[type_.category][type_] = render_template(
+                'forms/tree_select_item.html',
+                name=sanitize(type_.name),
+                data=walk_tree(type_.subs))
     return render_template(
         'type/index.html',
         buttons=[manual('entity/type')],
@@ -75,7 +75,7 @@ def type_delete(id_: int) -> Response:
         url_for('view', id_=root.id) if root else url_for('type_index'))
 
 
-@app.route('/type/delete_recursive/<int:id_>', methods=['POST', 'GET'])
+@app.route('/type/delete_recursive/<int:id_>', methods=['GET', 'POST'])
 @required_group('editor')
 def type_delete_recursive(id_: int) -> Union[str, Response]:
 
@@ -131,7 +131,7 @@ def type_delete_recursive(id_: int) -> Union[str, Response]:
     return render_template('tabs.html', tabs=tabs, crumbs=crumbs)
 
 
-@app.route('/type/move/<int:id_>', methods=['POST', 'GET'])
+@app.route('/type/move/<int:id_>', methods=['GET', 'POST'])
 @required_group('editor')
 def type_move_entities(id_: int) -> Union[str, Response]:
     type_ = g.types[id_]

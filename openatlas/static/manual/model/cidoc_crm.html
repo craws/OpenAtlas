@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>CIDOC CRM &mdash; OpenAtlas 7.13.0 documentation</title>
+  <title>CIDOC CRM &mdash; OpenAtlas 7.16.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                7.13.0
+                7.16.0
               </div>
             
           
@@ -195,7 +195,7 @@ in connection with the International Council of Museums
 (<a class="reference external" href="https://icom.museum/en/">ICOM</a>).</p>
 <p>It is used as basis for the underlying data model of OpenAtlas and the
 currently used version is
-<a class="reference external" href="https://cidoc-crm.org/Version/version-7.1.1">CIDOC CRM v7.1.1</a> published in
+<a class="reference external" href="https://cidoc-crm.org/Version/version-7.1.2">CIDOC CRM v7.1.2</a> published in
 May 2021.
 A script is used to parse the specification and import it into a
 <a class="reference external" href="https://www.postgresql.org/">PostgreSQL</a> database (more information is
@@ -204,8 +204,8 @@ available on <a class="reference external" href="https://github.com/craws/OpenAt
 <div class="section" id="cidoc-classes">
 <h2>CIDOC classes<a class="headerlink" href="#cidoc-classes" title="Permalink to this headline">¶</a></h2>
 <p>Classes are indicated by a preceding <strong>E</strong> followed by a numeric code-e.g.
-“<a class="reference external" href="https://www.cidoc-crm.org/Entity/e39-actor/version-7.1.1">E39 - Actor</a>” or
-“<a class="reference external" href="https://www.cidoc-crm.org/Entity/e67-birth/version-7.1.1">E67 - Birth</a>”.
+“<a class="reference external" href="https://www.cidoc-crm.org/Entity/e39-actor/version-7.1">E39 - Actor</a>” or
+“<a class="reference external" href="https://www.cidoc-crm.org/Entity/e67-birth/version-7.1">E67 - Birth</a>”.
 All entities used within OpenAtlas can be characterised as CIDOC classes.
 An overview of all CIDOC CRM classes can be found on this
 <a class="reference external" href="https://demo.openatlas.eu/overview/model/cidoc_class_index">page</a>. The count
@@ -217,8 +217,8 @@ well as possible properties.</p>
 <div class="section" id="cidoc-properties">
 <h2>CIDOC Properties<a class="headerlink" href="#cidoc-properties" title="Permalink to this headline">¶</a></h2>
 <p>CIDOC entities are indicated by a combination of “P” and a numerical sequence -
-think “<a class="reference external" href="https://www.cidoc-crm.org/Property/p11-had-participant/version-7.1.1">P11 - had participant</a>” or
-“<a class="reference external" href="https://www.cidoc-crm.org/Property/p2-has-type/version-7.1.1">P2 - has type</a>“. They are used to link classes
+think “<a class="reference external" href="https://www.cidoc-crm.org/Property/p11-had-participant/version-7.1">P11 - had participant</a>” or
+“<a class="reference external" href="https://www.cidoc-crm.org/Property/p2-has-type/version-7.1">P2 - has type</a>“. They are used to link classes
 to other classes. So when an activity to place at a certain location, this can
 be modelled in the following way</p>
 <img alt="../_images/properties.png" src="../_images/properties.png" />
@@ -237,7 +237,7 @@ suffix. Since we don’t use inverse properties in the database
 (direction is determined through domain/range selection)they are linked to
 their counterpart without i.</p>
 <p>There are some “special” properties we ignore, e.g.
-<a class="reference external" href="https://www.cidoc-crm.org/Property/P3-has-note/version-7.1.1">P3 - has note</a>, you can look them up in the
+<a class="reference external" href="https://www.cidoc-crm.org/Property/P3-has-note/version-7.1">P3 - has note</a>, you can look them up in the
 OpenAtlas CIDOC parser script where they are defined at the top:
 <a class="reference external" href="https://github.com/craws/OpenAtlas/blob/main/install/crm/cidoc_rtfs_parser.py">https://github.com/craws/OpenAtlas/blob/main/install/crm/cidoc_rtfs_parser.py</a>
 We don’t import them because of technical reasons, e.g. they are missing some

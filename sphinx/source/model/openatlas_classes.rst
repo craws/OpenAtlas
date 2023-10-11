@@ -7,8 +7,8 @@ These special classes are used within the software to further refine
 `CIDOC CRM <https://www.cidoc-crm.org/>`_ classes for the user interface.
 
 All OpenAtlas classes can be mapped directly to the corresponding CIDOC CRM
-classes. For all available classes and properties of CIDOC CRM (version 7.1.1)
-`see here <https://cidoc-crm.org/Version/version-7.1.1>`_.
+classes. For all available classes and properties of CIDOC CRM (version 7.1.2)
+`see here <https://cidoc-crm.org/Version/version-7.1.2>`_.
 
 Example:
 The CIDOC class :cidoc_entity:`E18 - Physical Thing<e18-physical-thing>`

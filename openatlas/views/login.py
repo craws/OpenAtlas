@@ -43,7 +43,7 @@ class PasswordResetForm(FlaskForm):
     save = SubmitField(_('submit'))
 
 
-@app.route('/login', methods=["GET", "POST"])
+@app.route('/login', methods=['GET', 'POST'])
 def login() -> Union[str, Response]:
     if current_user.is_authenticated:
         return redirect('/')
@@ -102,7 +102,7 @@ def login() -> Union[str, Response]:
         crumbs=[_('login')])
 
 
-@app.route('/password_reset', methods=["GET", "POST"])
+@app.route('/password_reset', methods=['GET', 'POST'])
 def reset_password() -> Union[str, Response]:
     if current_user.is_authenticated:  # Prevent password reset if logged in
         return redirect(url_for('overview'))

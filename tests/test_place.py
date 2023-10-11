@@ -299,7 +299,7 @@ class PlaceTest(TestBaseCase):
             assert b'My human remains' in rv.data
 
             rv = self.app.get(
-                url_for('index', view='artifact', delete_id=human_remains_id),
+                url_for('delete', id_=human_remains_id),
                 follow_redirects=True)
             assert b'The entry has been deleted' in rv.data
 
@@ -363,6 +363,6 @@ class PlaceTest(TestBaseCase):
             assert b'You never' in rv.data
 
             rv = self.app.get(
-                url_for('index', view='place', delete_id=place.id),
+                url_for('delete', id_=place.id),
                 follow_redirects=True)
             assert b'not possible if subunits' in rv.data

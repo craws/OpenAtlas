@@ -26,7 +26,7 @@ class AddReferenceForm(FlaskForm):
     save = SubmitField(_('insert'))
 
 
-@app.route('/link/delete/<int:id_>/<int:origin_id>', methods=['POST', 'GET'])
+@app.route('/link/delete/<int:id_>/<int:origin_id>', methods=['GET', 'POST'])
 @required_group('contributor')
 def link_delete(id_: int, origin_id: int) -> Response:
     Link.delete_(id_)
@@ -34,7 +34,7 @@ def link_delete(id_: int, origin_id: int) -> Response:
     return redirect(url_for('view', id_=origin_id))
 
 
-@app.route('/link/insert/<int:id_>/<view>', methods=['POST', 'GET'])
+@app.route('/link/insert/<int:id_>/<view>', methods=['GET', 'POST'])
 @required_group('contributor')
 def link_insert(id_: int, view: str) -> Union[str, Response]:
     entity = Entity.get_by_id(id_)
@@ -66,7 +66,7 @@ def link_insert(id_: int, view: str) -> Union[str, Response]:
             _('link')])
 
 
-@app.route('/link/update/<int:id_>/<int:origin_id>', methods=['POST', 'GET'])
+@app.route('/link/update/<int:id_>/<int:origin_id>', methods=['GET', 'POST'])
 @required_group('contributor')
 def link_update(id_: int, origin_id: int) -> Union[str, Response]:
     link_ = Link.get_by_id(id_)
@@ -107,7 +107,7 @@ def link_update(id_: int, origin_id: int) -> Union[str, Response]:
             _('edit')])
 
 
-@app.route('/insert/relation/<type_>/<int:origin_id>', methods=['POST', 'GET'])
+@app.route('/insert/relation/<type_>/<int:origin_id>', methods=['GET', 'POST'])
 @required_group('contributor')
 def insert_relation(type_: str, origin_id: int) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id)
@@ -165,15 +165,13 @@ def reference_link_update(link_: Link, origin: Entity) -> Union[str, Response]:
         'content.html',
         content=display_form(form),
         crumbs=[
-            [_(origin.class_.view),
-             url_for('index', view=origin.class_.view)],
+            [_(origin.class_.view), url_for('index', view=origin.class_.view)],
             origin,
-            link_.domain if link_.domain.id != origin.id else
-            link_.range,
+            link_.domain if link_.domain.id != origin.id else link_.range,
             _('edit')])
 
 
-@app.route('/reference/add/<int:id_>/<view>', methods=['POST', 'GET'])
+@app.route('/reference/add/<int:id_>/<view>', methods=['GET', 'POST'])
 @required_group('contributor')
 def reference_add(id_: int, view: str) -> Union[str, Response]:
     reference = Entity.get_by_id(id_)
@@ -195,7 +193,7 @@ def reference_add(id_: int, view: str) -> Union[str, Response]:
             _('link')])
 
 
-@app.route('/add/subunit/<int:super_id>', methods=['POST', 'GET'])
+@app.route('/add/subunit/<int:super_id>', methods=['GET', 'POST'])
 @required_group('contributor')
 def add_subunit(super_id: int) -> Union[str, Response]:
     super_ = Entity.get_by_id(super_id)
@@ -244,7 +242,7 @@ def entity_add_file(id_: int) -> Union[str, Response]:
             f"{_('link')} {_('file')}"])
 
 
-@app.route('/entity/add/source/<int:id_>', methods=['POST', 'GET'])
+@app.route('/entity/add/source/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
 def entity_add_source(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_)
@@ -267,7 +265,7 @@ def entity_add_source(id_: int) -> Union[str, Response]:
             f"{_('link')} {_('source')}"])
 
 
-@app.route('/entity/add/reference/<int:id_>', methods=['POST', 'GET'])
+@app.route('/entity/add/reference/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
 def entity_add_reference(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_)

@@ -32,6 +32,8 @@ but the interface elements to add them will disappear.
   (editor or above)
 * **Time** - show time fields in forms, see :doc:`/ui/date`
 
+.. _display:
+
 Display
 -------
 * **Language** - select your language for the user interface

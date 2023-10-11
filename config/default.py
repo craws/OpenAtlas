@@ -3,11 +3,16 @@ from pathlib import Path
 
 from config.database_versions import DATABASE_VERSIONS
 
-VERSION = '7.14.0'
+VERSION = '7.16.1'
 DATABASE_VERSION = DATABASE_VERSIONS[0]
 DEMO_MODE = False  # If activated some options are disabled, login is prefilled
 
-LANGUAGES = {'ca': 'Català', 'de': 'Deutsch', 'en': 'English', 'es': 'Español'}
+LANGUAGES = {
+    'ca': 'Català',
+    'de': 'Deutsch',
+    'en': 'English',
+    'es': 'Español',
+    'fr': 'Français'}
 DEBUG = False
 
 DATABASE_NAME = 'openatlas'
@@ -70,6 +75,8 @@ JSON_FORMATS = {
     'geojson-v2': 'application/json'}
 API_FORMATS = RDF_FORMATS | JSON_FORMATS
 
+API_PROXY = ''
+
 LOGICAL_OPERATOR: list[str] = ['and', 'or']
 STR_CATEGORIES: list[str] = [
     "entityName", "entityDescription", "entityAliases", "entityCidocClass",
@@ -79,17 +86,18 @@ INT_CATEGORIES: list[str] = [
     "entityID", "typeID", "typeIDWithSubs", "relationToID"]
 SET_CATEGORIES: list[str] = ["valueTypeID"]
 VALID_CATEGORIES: list[str] = [
-    *STR_CATEGORIES, *INT_CATEGORIES, *SET_CATEGORIES]
+    *STR_CATEGORIES,
+    *INT_CATEGORIES,
+    *SET_CATEGORIES]
 COMPARE_OPERATORS: list[str] = [
     'equal', 'notEqual', 'greaterThan', 'lesserThan', 'greaterThanEqual',
     'lesserThanEqual', 'like']
 
 # Used to connect to ACDH-CH ARCHE systems
-ARCHE = {
-    'id': None,
-    'collection_ids': None,
-    'base_url': None,
-    'thumbnail_url': 'https://arche-thumbnails.acdh.oeaw.ac.at/'}
+ARCHE = {'id': None, 'url': None}
+
+# Used to connect to password protected Vocabs systems
+VOCABS_PASS = ''
 
 # Table options
 TABLE_ROWS = {10: '10', 25: '25', 50: '50', 100: '100'}

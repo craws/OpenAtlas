@@ -54,6 +54,7 @@ project.
    * English
    * German
    * Spanish
+   * French
 
 .. image:: /ui.png
 

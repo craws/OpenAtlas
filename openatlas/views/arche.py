@@ -4,7 +4,8 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
-from openatlas.api.arche.function import fetch_arche_data, import_arche_data
+from openatlas.api.import_scripts.arche import (
+    fetch_collection_data, import_arche_data)
 from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
@@ -25,31 +26,15 @@ def arche_index() -> str:
             display_info({
                 k: str(v) for k, v in app.config['ARCHE'].items()}),
             buttons=[manual('admin/arche')])},
-        crumbs=['ARCHE'])
+        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-data"], 'ARCHE'])
 
 
 @app.route('/arche/fetch')
 @required_group('manager')
 def arche_fetch() -> str:  # pragma: no cover
-    data = fetch_arche_data()
-    table = Table(
-        header=[
-            'ID', _('name'), _('image link'), _('image thumbnail link'),
-            _('creator'), _('latitude'), _('longitude'), _('description'),
-            _('license'), _('date')])
-    for entries in data.values():
-        for metadata in entries.values():
-            table.rows.append([
-                metadata['image_id'],
-                metadata['name'],
-                metadata['image_link'],
-                metadata['image_link_thumbnail'],
-                metadata['creator'],
-                metadata['latitude'],
-                metadata['longitude'],
-                metadata['description'],
-                metadata['license'],
-                metadata['date']])
+    table = Table(header=['ID', _('name')])
+    for entries in fetch_collection_data().values():
+        table.rows.append([entries['collection_id'], entries['filename']])
     tabs = {
         'fetched_entities': Tab(
             'fetched_entities',
@@ -59,14 +44,13 @@ def arche_fetch() -> str:  # pragma: no cover
             if table.rows else [
                 '<p class="uc-first">' + _('no entities to retrieve') +
                 '</p>'])}
-
     return render_template(
         'tabs.html',
         tabs=tabs,
         crumbs=[['ARCHE', url_for('arche_index')], _('fetch')])
 
 
-@app.route('/arche/import', methods=['POST', 'GET'])
+@app.route('/arche/import', methods=['GET', 'POST'])
 @required_group('manager')
 def arche_import_data() -> Response:  # pragma: no cover
     Transaction.begin()

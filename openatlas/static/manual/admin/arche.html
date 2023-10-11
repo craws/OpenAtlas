@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>ARCHE &mdash; OpenAtlas 7.13.0 documentation</title>
+  <title>ARCHE &mdash; OpenAtlas 7.16.0 documentation</title>
   
 
   
@@ -36,7 +36,7 @@
 
     
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Model" href="../model/index.html" />
+    <link rel="next" title="Vocabs" href="vocabs.html" />
     <link rel="prev" title="API" href="api.html" /> 
 </head>
 
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                7.13.0
+                7.16.0
               </div>
             
           
@@ -109,6 +109,7 @@
 <li class="toctree-l2"><a class="reference internal" href="execute_sql.html">Execute SQL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html">API</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">ARCHE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vocabs.html">Vocabs</a></li>
 </ul>
 </li>
 </ul>
@@ -244,8 +245,8 @@ Only data (based on the <a class="reference internal" href="../entity/artifact.h
 <div class="section" id="entity-type">
 <h3><a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a><a class="headerlink" href="#entity-type" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><p>Custom hierarchy <strong>Relevance</strong> for <a class="reference internal" href="../entity/actor.html"><span class="doc">Actor</span></a> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e21-person/version-7.1.1">E21 Person</a>)</p></li>
-<li><p><strong>Involvement</strong> for <a class="reference external" href="https://www.cidoc-crm.org/Entity/e65-creation/version-7.1.1">E65 Creation</a> and p:cidoc_entity:<cite>E12 Production&lt;e12-production&gt;</cite> event</p></li>
+<li><p>Custom hierarchy <strong>Relevance</strong> for <a class="reference internal" href="../entity/actor.html"><span class="doc">Actor</span></a> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e21-person/version-7.1">E21 Person</a>)</p></li>
+<li><p><strong>Involvement</strong> for <a class="reference external" href="https://www.cidoc-crm.org/Entity/e65-creation/version-7.1">E65 Creation</a> and p:cidoc_entity:<cite>E12 Production&lt;e12-production&gt;</cite> event</p></li>
 <li><p>Additional <strong>License</strong> <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> -&gt; EXIF:Copyright</p></li>
 </ul>
 </div>
@@ -256,12 +257,12 @@ Only data (based on the <a class="reference internal" href="../entity/artifact.h
 <div class="section" id="entity-index">
 <h3><a class="reference internal" href="../entity/index.html"><span class="doc">Entity</span></a><a class="headerlink" href="#entity-index" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><p><a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e22-human-made-object/version-7.1.1">E22 Human-Made Object</a>): Graffito, name (IPTC:ObjectName), description (XMP:Description), linked (<a class="reference external" href="https://www.cidoc-crm.org/Property/p67-refers-to/version-7.1.1">P67</a>) to <strong>ARCHE</strong> <a class="reference internal" href="../entity/reference_system.html"><span class="doc">Reference System</span></a> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e32-Authority-Document/version-7.1.1">E32</a>)</p></li>
-<li><p><a class="reference external" href="https://www.cidoc-crm.org/Entity/e53-place/version-7.1.1">E53 Place</a>: Location of Graffito, linked (<a class="reference external" href="https://www.cidoc-crm.org/Property/p53-has-former-or-current-location/version-7.1.1">P53</a>) to <a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a> (EXIF:GPSLatitude, EXIF:GPSLongitude)</p></li>
-<li><p><a class="reference internal" href="../entity/event.html"><span class="doc">Event</span></a> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e12-production/version-7.1.1">E12 Production</a>): Date (EXIF:CreateDate) linked (<a class="reference external" href="https://www.cidoc-crm.org/Property/p11-had-participant/version-7.1.1">P11</a>) to <a class="reference internal" href="../entity/actor.html"><span class="doc">Actor</span></a> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e21-person/version-7.1.1">E21 Person</a>) and linked (<a class="reference external" href="https://www.cidoc-crm.org/Property/p108-has-produced/version-7.1.1">P108</a>) to <a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a></p></li>
-<li><p><a class="reference internal" href="../entity/event.html"><span class="doc">Event</span></a> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e65-creation/version-7.1.1">E65 Creation</a>): Date (EXIF:CreateDate) linked (<a class="reference external" href="https://www.cidoc-crm.org/Property/p14-carried-out-by/version-7.1.1">P14</a>) to <a class="reference internal" href="../entity/actor.html"><span class="doc">Actor</span></a> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e21-person/version-7.1.1">E21 Person</a>) and linked (<a class="reference external" href="https://www.cidoc-crm.org/Property/p92-brought-into-existence/version-7.1.1">P92</a>) to <a class="reference internal" href="../entity/file.html"><span class="doc">File</span></a></p></li>
-<li><p><a class="reference internal" href="../entity/file.html"><span class="doc">File</span></a> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e31-document/version-7.1.1">E31 Document</a>): linked (<a class="reference external" href="https://www.cidoc-crm.org/Property/p2-has-type/version-7.1.1">P2</a>) to <strong>License</strong> <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> (EXIF:Copyright), linked (<a class="reference external" href="https://www.cidoc-crm.org/Property/p67-refers-to/version-7.1.1">P67</a>) to <a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a></p></li>
-<li><p><a class="reference internal" href="../entity/actor.html"><span class="doc">Actor</span></a> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e21-person/version-7.1.1">E21 Person</a>): name (EXIF:Artist, etc.), linked (<a class="reference external" href="https://www.cidoc-crm.org/Property/p2-has-type/version-7.1.1">P2</a>) to <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> <strong>Relevance</strong></p></li>
+<li><p><a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e22-human-made-object/version-7.1">E22 Human-Made Object</a>): Graffito, name (IPTC:ObjectName), description (XMP:Description), linked (<a class="reference external" href="https://www.cidoc-crm.org/Property/p67-refers-to/version-7.1">P67</a>) to <strong>ARCHE</strong> <a class="reference internal" href="../entity/reference_system.html"><span class="doc">Reference System</span></a> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e32-Authority-Document/version-7.1">E32</a>)</p></li>
+<li><p><a class="reference external" href="https://www.cidoc-crm.org/Entity/e53-place/version-7.1">E53 Place</a>: Location of Graffito, linked (<a class="reference external" href="https://www.cidoc-crm.org/Property/p53-has-former-or-current-location/version-7.1">P53</a>) to <a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a> (EXIF:GPSLatitude, EXIF:GPSLongitude)</p></li>
+<li><p><a class="reference internal" href="../entity/event.html"><span class="doc">Event</span></a> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e12-production/version-7.1">E12 Production</a>): Date (EXIF:CreateDate) linked (<a class="reference external" href="https://www.cidoc-crm.org/Property/p11-had-participant/version-7.1">P11</a>) to <a class="reference internal" href="../entity/actor.html"><span class="doc">Actor</span></a> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e21-person/version-7.1">E21 Person</a>) and linked (<a class="reference external" href="https://www.cidoc-crm.org/Property/p108-has-produced/version-7.1">P108</a>) to <a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a></p></li>
+<li><p><a class="reference internal" href="../entity/event.html"><span class="doc">Event</span></a> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e65-creation/version-7.1">E65 Creation</a>): Date (EXIF:CreateDate) linked (<a class="reference external" href="https://www.cidoc-crm.org/Property/p14-carried-out-by/version-7.1">P14</a>) to <a class="reference internal" href="../entity/actor.html"><span class="doc">Actor</span></a> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e21-person/version-7.1">E21 Person</a>) and linked (<a class="reference external" href="https://www.cidoc-crm.org/Property/p92-brought-into-existence/version-7.1">P92</a>) to <a class="reference internal" href="../entity/file.html"><span class="doc">File</span></a></p></li>
+<li><p><a class="reference internal" href="../entity/file.html"><span class="doc">File</span></a> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e31-document/version-7.1">E31 Document</a>): linked (<a class="reference external" href="https://www.cidoc-crm.org/Property/p2-has-type/version-7.1">P2</a>) to <strong>License</strong> <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> (EXIF:Copyright), linked (<a class="reference external" href="https://www.cidoc-crm.org/Property/p67-refers-to/version-7.1">P67</a>) to <a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a></p></li>
+<li><p><a class="reference internal" href="../entity/actor.html"><span class="doc">Actor</span></a> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e21-person/version-7.1">E21 Person</a>): name (EXIF:Artist, etc.), linked (<a class="reference external" href="https://www.cidoc-crm.org/Property/p2-has-type/version-7.1">P2</a>) to <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> <strong>Relevance</strong></p></li>
 </ul>
 </div>
 </div>
@@ -273,7 +274,7 @@ Only data (based on the <a class="reference internal" href="../entity/artifact.h
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="../model/index.html" class="btn btn-neutral float-right" title="Model" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="vocabs.html" class="btn btn-neutral float-right" title="Vocabs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
         <a href="api.html" class="btn btn-neutral float-left" title="API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 

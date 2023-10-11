@@ -51,7 +51,7 @@ class PasswordForm(FlaskForm):
         return valid
 
 
-@app.route('/profile', methods=['POST', 'GET'])
+@app.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile_index() -> str:
     tabs = {
@@ -84,7 +84,7 @@ def profile_index() -> str:
         crumbs=[_('profile')])
 
 
-@app.route('/profile/settings/<category>', methods=['POST', 'GET'])
+@app.route('/profile/settings/<category>', methods=['GET', 'POST'])
 @login_required
 def profile_settings(category: str) -> Union[str, Response]:
     form = getattr(
@@ -126,7 +126,7 @@ def profile_settings(category: str) -> Union[str, Response]:
             _(category)])
 
 
-@app.route('/profile/password', methods=['POST', 'GET'])
+@app.route('/profile/password', methods=['GET', 'POST'])
 @login_required
 def profile_password() -> Union[str, Response]:
     form = PasswordForm()

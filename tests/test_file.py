@@ -103,5 +103,6 @@ class FileTest(TestBaseCase):
 
             for file in files:
                 rv = self.app.get(
-                    url_for('index', view='file', delete_id=file.id))
+                    url_for('delete', id_=file.id),
+                    follow_redirects=True)
                 assert b'The entry has been deleted' in rv.data

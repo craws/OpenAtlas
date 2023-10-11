@@ -188,7 +188,7 @@ class Type(Entity):
             selected_ids: list[int],
             filtered_ids: list[int]) -> list[dict[str, Any]]:
         items = []
-        for id_ in list(filter(lambda x: x not in filtered_ids, types)):
+        for id_ in [id_ for id_ in types if id_ not in filtered_ids]:
             item = g.types[id_]
             items.append({
                 'id': item.id,

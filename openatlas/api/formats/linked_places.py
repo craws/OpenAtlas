@@ -6,17 +6,18 @@ from openatlas import app
 from openatlas.api.resources.util import (
     get_geometric_collection, get_license_name, get_reference_systems,
     replace_empty_list_values_in_dict_with_none, to_camel_case, date_to_str,
-    get_crm_relation)
+    get_crm_relation, get_location_id)
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.display.util import get_file_path
 
 
 def get_linked_places_entity(
-        entity: Entity,
-        links: list[Link],
-        links_inverse: list[Link],
+        entity_dict: dict[str, Any],
         parser: dict[str, Any]) -> dict[str, Any]:
+    entity = entity_dict['entity']
+    links = entity_dict['links']
+    links_inverse = entity_dict['links_inverse']
     return {
         'type': 'FeatureCollection',
         '@context': app.config['API_SCHEMA'],
@@ -101,10 +102,14 @@ def get_lp_file(links_inverse: list[Link]) -> list[dict[str, str]]:
 
 def get_lp_types(entity: Entity, links: list[Link]) -> list[dict[str, Any]]:
     types = []
+    if entity.class_.view == 'place':
+        location = Entity.get_by_id(get_location_id(links), types=True)
+        entity.types.update(location.types)
     for type_ in entity.types:
         type_dict = {
             'identifier': url_for(
                 'api_03.entity', id_=type_.id, _external=True),
+            'descriptions': type_.description,
             'label': type_.name,
             'hierarchy': ' > '.join(map(
                 str, [g.types[root].name for root in type_.root]))}

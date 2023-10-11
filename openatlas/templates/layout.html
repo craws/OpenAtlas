@@ -180,8 +180,9 @@
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     {% for category, message in messages %}
-      <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show"
-           role="alert">
+      <div
+          class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show"
+          role="alert">
         {{ message|uc_first|safe }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ _('close')|uc_first }}"></button>
       </div>

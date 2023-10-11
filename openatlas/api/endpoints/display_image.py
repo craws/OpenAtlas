@@ -13,7 +13,6 @@ from openatlas.display.util import get_file_path
 
 
 class DisplayImage(Resource):
-
     @staticmethod
     def get(filename: str) -> Response:
         entity = get_entity_by_id(int(Pathlib_path(filename).stem))
@@ -26,6 +25,4 @@ class DisplayImage(Resource):
             if parser['image_size'] else None)
         if not filepath:
             raise DisplayFileNotFoundError
-        return send_file(
-            filepath,
-            as_attachment=bool(parser['download']))
+        return send_file(filepath, as_attachment=bool(parser['download']))

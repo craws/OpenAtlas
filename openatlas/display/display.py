@@ -11,9 +11,10 @@ from openatlas.display.base_display import (
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, edit_link, format_entity_date, get_base_table_data, get_file_path,
-    is_authorized, link, remove_link)
+    button, description, edit_link, format_entity_date, get_base_table_data,
+    get_file_path, is_authorized, link, remove_link, uc_first)
 from openatlas.models.entity import Entity
+from openatlas.views.tools import carbon_result, sex_result
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.reference_system import ReferenceSystem
@@ -69,15 +70,20 @@ class FileDisplay(BaseDisplay):
         self.data[_('extension')] = g.file_stats[self.entity.id]['ext'] \
             if self.entity.id in g.file_stats else 'N/A'
 
-    def add_buttons(self) -> None:
-        super().add_buttons()
+    def add_button_others(self) -> None:
         if path := get_file_path(self.entity.id):
             self.buttons.append(button(
                 _('download'),
                 url_for('download_file', filename=path.name)))
             return
         self.buttons.append(
-            '<span class="error">' + _("missing file") + '</span>')
+            '<span class="error">' + uc_first(_("missing file")) + '</span>')
+
+    def add_button_copy(self) -> None:
+        pass
+
+    def add_button_network(self) -> None:
+        pass
 
     def add_tabs(self) -> None:
         super().add_tabs()
@@ -216,6 +222,16 @@ class ProductionDisplay(EventsDisplay):
 class ReferenceSystemDisplay(BaseDisplay):
     entity: ReferenceSystem
 
+    def add_button_copy(self) -> None:
+        pass
+
+    def add_button_delete(self) -> None:
+        if not self.entity.classes and not self.entity.system:
+            super().add_button_delete()
+
+    def add_button_network(self) -> None:
+        pass
+
     def add_data(self) -> None:
         super().add_data()
         self.data[_('website URL')] = link(
@@ -239,8 +255,8 @@ class ReferenceSystemDisplay(BaseDisplay):
             self.tabs[link_.range.class_.name].table.rows.append([
                 link(link_.range),
                 link(
-                    f'{self.entity.resolver_url}{link_.description}',
                     link_.description,
+                    f'{self.entity.resolver_url}{link_.description}',
                     external=True)
                 if self.entity.resolver_url else link_.description,
                 link_.type.name])
@@ -256,6 +272,9 @@ class ReferenceSystemDisplay(BaseDisplay):
 
 
 class SourceDisplay(BaseDisplay):
+
+    def add_button_network(self) -> None:
+        pass
 
     def add_data(self) -> None:
         super().add_data()
@@ -284,8 +303,17 @@ class SourceDisplay(BaseDisplay):
         self.add_reference_tables_data()
         self.add_note_tab()
 
+    def description_html(self) -> str:
+        return description(self.entity.description, _('content'))
+
 
 class SourceTranslationDisplay(BaseDisplay):
+
+    def add_button_copy(self) -> None:
+        pass
+
+    def add_button_network(self) -> None:
+        pass
 
     def add_crumbs(self) -> None:
         self.crumbs = [
@@ -296,11 +324,18 @@ class SourceTranslationDisplay(BaseDisplay):
 
 class StratigraphicUnitDisplay(PlaceBaseDisplay):
 
-    def add_buttons(self) -> None:
-        super().add_buttons()
-        self.buttons.append(button(
-            _('tools'),
-            url_for('tools_index', id_=self.entity.id)))
+    def add_button_others(self) -> None:
+        self.buttons.append(
+            button(_('tools'), url_for('tools_index', id_=self.entity.id)))
+
+    def description_html(self) -> str:
+        html = ''
+        if self.entity.class_.name == 'stratigraphic_unit':
+            if radiocarbon := carbon_result(self.entity):
+                html += f"<p>{radiocarbon}</p>"
+            if sex_estimation := sex_result(self.entity):
+                html += f"<p>{sex_estimation}</p>"
+        return html + description(self.entity.description)
 
 
 class TypeDisplay(TypeBaseDisplay):

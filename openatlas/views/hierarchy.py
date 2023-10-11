@@ -16,7 +16,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 
 
-@app.route('/hierarchy/insert/<category>', methods=['POST', 'GET'])
+@app.route('/hierarchy/insert/<category>', methods=['GET', 'POST'])
 @required_group('manager')
 def hierarchy_insert(category: str) -> Union[str, Response]:
     manager = get_manager(f'hierarchy_{category}')
@@ -51,7 +51,7 @@ def hierarchy_insert(category: str) -> Union[str, Response]:
             '+ ' + uc_first(_(category))])
 
 
-@app.route('/hierarchy/update/<int:id_>', methods=['POST', 'GET'])
+@app.route('/hierarchy/update/<int:id_>', methods=['GET', 'POST'])
 @required_group('manager')
 def hierarchy_update(id_: int) -> Union[str, Response]:
     hierarchy = g.types[id_]
@@ -127,7 +127,7 @@ def remove_class(id_: int, name: str) -> Response:
     return redirect(url_for('hierarchy_update', id_=id_))
 
 
-@app.route('/hierarchy/delete/<int:id_>', methods=['POST', 'GET'])
+@app.route('/hierarchy/delete/<int:id_>', methods=['GET', 'POST'])
 @required_group('manager')
 def hierarchy_delete(id_: int) -> Response:
     type_ = g.types[id_]

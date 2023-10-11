@@ -23,6 +23,7 @@
     {% if config.ARCHE['id'] %}
        <div class="col-auto">{{ 'ARCHE'|button(url_for('arche_index'))|safe }}</div>
     {% endif %}
+    <div class="col-auto">{{ 'VOCABS'|button(url_for('vocabs_index'))|safe }}</div>
   </div>
 {% endif %}
 {% if 'admin'|is_authorized and g.settings.image_processing %}

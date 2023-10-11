@@ -1,7 +1,10 @@
+.. _version_1_0:
+
 Version 1.0
 ===========
 
-.. toctree::
+.. warning:: This version is currently a whitepaper and not released in any code.
+
 
 Entity endpoint
 ***************

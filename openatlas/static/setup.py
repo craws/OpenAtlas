@@ -7,6 +7,8 @@ package_json = {
         "@popperjs/core": "^2.11.5",
         "bootstrap-autocomplete": "2.3.7",
         "bootstrap": "^5.1.3",
+        "chart.js": "4.3.0",
+        "chartjs-plugin-autocolors": "0.2.2",
         "d3": "^5.16.0",
         "datatables.net-bs4": "^1.11.5",
         "datatables.net-buttons-dt": "^1.7.1",

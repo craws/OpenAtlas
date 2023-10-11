@@ -48,7 +48,7 @@ def file_remove_profile_image(entity_id: int) -> Response:
     return redirect(url_for('view', id_=entity.id))
 
 
-@app.route('/file/add/<int:id_>/<view>', methods=['POST', 'GET'])
+@app.route('/file/add/<int:id_>/<view>', methods=['GET', 'POST'])
 @required_group('contributor')
 def file_add(id_: int, view: str) -> Union[str, Response]:
     entity = Entity.get_by_id(id_)

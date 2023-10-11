@@ -15,7 +15,43 @@ def index_changelog() -> str:
 
 
 versions = {
-    '7.14.0': ['TBA', {}],
+    '7.16.1': ['2023-09-20', {
+        'fix': {
+            '2069': 'Broken buttons for preceding event'}}],
+    '7.16.0': ['2023-09-09', {
+        'feature': {
+            '2022': 'Additional database export option (dump)',
+            '2040': 'ARCHE import script',
+            '2048': 'Import Vocabs collection',
+            '2050': 'API: Add place types to LPF',
+            '1981': 'Manual: API',
+            '2037': 'Manual: Vocabs import',
+            '2047': 'Manual: information about actor buttons at place view',
+            '2028': 'Refactor and minor improvements'},
+        'fix': {
+            '2049': 'Link from Source to Artifact broken',
+            '2051': 'Wrong direction for P9',
+            '2057': 'API: proxy for rdflib'}}],
+    '7.15.0': ['2023-07-22', {
+        'feature': {
+            '1991': 'Import controlled vocabularies via API',
+            '2004': 'Visualization for type distribution',
+            '2036': 'Add French language to the web user interface'}}],
+    '7.14.2': ['2023-06-22', {
+        'fix': {
+            '2034': 'At place insert the map is not shown'}}],
+    '7.14.1': ['2023-06-19', {
+        'fix': {
+            '2027': 'Missing checkboxes for input tables'}}],
+    '7.14.0': ['2023-06-16', {
+        'feature': {
+            '1898': 'Update CIDOC CRM from 7.1.1 to 7.1.2',
+            '2020': 'Accessibility: Tab navigation for forms',
+            '2025': 'Daily Debian security updates for GitHub containers',
+            '2017': 'Refactor and minor improvements'},
+        'fix': {
+            '1930': 'CIDOC CRM link checker: keep form values after submit',
+            '2023': 'Autocomplete at Wikidata is too short'}}],
     '7.13.1': ['2023-05-09', {
             'fix': {'2014': "Former network URL isn't working anymore"}}],
     '7.13.0': ['2023-05-06', {

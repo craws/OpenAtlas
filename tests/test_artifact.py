@@ -19,7 +19,7 @@ class ArtifactTest(TestBaseCase):
 
             rv: Any = self.app.get(
                 url_for('insert', class_='artifact', origin_id=place.id))
-            assert b'+&nbsp;<span' in rv.data
+            assert b'+ Artifact' in rv.data
 
             rv = self.app.post(
                 url_for('insert', class_='artifact'),
@@ -87,7 +87,7 @@ class ArtifactTest(TestBaseCase):
             assert b'Conan' in rv.data
 
             rv = self.app.get(
-                url_for('index', view='artifact', delete_id=artifact_id),
+                url_for('delete', id_=artifact_id),
                 follow_redirects=True)
             assert b'The entry has been deleted' in rv.data
 

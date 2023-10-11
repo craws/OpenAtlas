@@ -32,7 +32,6 @@ CIDOC documentation:
 `CIDOC CRM <https://www.cidoc-crm.org/>`_ hierarchy for the different types of
 events included in OpenAtlas.
 
-
 .. include:: navigation.rst
 
 Form fields
