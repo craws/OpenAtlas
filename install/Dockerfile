@@ -17,7 +17,7 @@ RUN cp -rp /usr/lib/iipimage-server/ /var/www/iipsrv/ &&\
     chown -R www-data /var/www/iipsrv/ &&\
     chmod 755 -R /var/www/iipsrv/
 RUN rm /etc/apache2/mods-available/iipsrv.conf
-COPY /install/iiif.conf /etc/apache2/mods-available/
+COPY /install/iipsrv.conf /etc/apache2/mods-available/
 COPY --chown=www-data:www-data / /var/www/openatlas/
 RUN cd /var/www/openatlas && cp install/entrypoint.sh /entrypoint.sh &&\
     cp install/example_apache.conf /etc/apache2/sites-available/000-default.conf &&\
