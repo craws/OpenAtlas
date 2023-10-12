@@ -23,20 +23,18 @@ LANGUAGES = {
     'es': 'Español',
     'fr': 'Français'}
 
-
 # Paths are implemented operating system independent using pathlib.
 # To override them (in instance/production.py) either use them like here
 # or use absolute paths like e.g. pathlib.Path('/some/location/somewhere')
 FILES_PATH = Path(__file__).parent.parent / 'files'
 EXPORT_PATH = Path(FILES_PATH) / 'export'
 UPLOAD_PATH = Path(FILES_PATH) / 'uploads'
-TMP_PATH = Path('/tmp')  # used e.g. for processing imports and export files
+TMP_PATH = Path('/tmp')  # For processing files e.g. at import and export
 
 # Image processing
 DISPLAY_FILE_EXT = ['.bmp', '.gif', '.ico', '.jpeg', '.jpg', '.png', '.svg']
 PROCESSABLE_EXT = ['.tiff', '.tif']
 PROCESSED_EXT = '.jpeg'
-
 PROCESSED_IMAGE_PATH = Path(FILES_PATH) / 'processed_images'
 RESIZED_IMAGES = Path(PROCESSED_IMAGE_PATH) / 'resized'
 IMAGE_SIZE = {

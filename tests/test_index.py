@@ -29,6 +29,7 @@ class IndexTests(TestBaseCase):
 
             g.writable_paths.append(Path(app.root_path) / 'error')
             app.config['DATABASE_VERSION'] = 'error'
+            app.config['EXPORT_PATH'] = Path('error')
             rv = self.app.get(url_for('view', id_=666), follow_redirects=True)
             assert b'teapot' in rv.data
             assert b'OpenAtlas with default password is still' in rv.data
