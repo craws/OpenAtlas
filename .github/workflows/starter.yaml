@@ -120,7 +120,8 @@ jobs:
               'path': '/var/www/iipsrv/',
               'url': 'http://localhost/iiif/',
               'version': 2,
-              'conversion': True}
+              'conversion': True,
+              'compression': 'jpeg'}
           EOF
           # production.py is recreated on every start
           sudo chown 33:33 testing.py
