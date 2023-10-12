@@ -115,6 +115,12 @@ jobs:
               'collection_ids': [0],
               'base_url': 'https://arche-curation.acdh-dev.oeaw.ac.at/',
               'thumbnail_url': 'https://arche-thumbnails.acdh.oeaw.ac.at/'}
+          IIIF = {
+              'activate': True,
+              'path': '/var/www/iipsrv/',
+              'url': 'http://localhost/iiif/',
+              'version': 2,
+              'conversion': True}
           EOF
           # production.py is recreated on every start
           sudo chown 33:33 testing.py
