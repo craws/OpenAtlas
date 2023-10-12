@@ -15,7 +15,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     chown -R www-data:www-data /var/www/.cache /var/www/.local /var/www/.npm /var/log/apache2 /var/run/apache2
 RUN cp -rp /usr/lib/iipimage-server/ /var/www/iipsrv/ &&\
     chown -R www-data /var/www/iipsrv/ &&\
-    chmod 755 -R /var/www/iipsrv/ &&\
+    chmod 755 -R /var/www/iipsrv/
 RUN rm /etc/apache2/mods-available/iipsrv.conf
 COPY /install/iiif.conf /etc/apache2/mods-available/
 COPY --chown=www-data:www-data / /var/www/openatlas/
