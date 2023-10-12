@@ -8,7 +8,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     apt install -y --no-install-recommends python3-pandas python3-jinja2 python3-flask-cors python3-flask-restful p7zip-full &&\
     apt install -y --no-install-recommends python3-wand python3-rdflib python3-requests python3-dicttoxml python3-rdflib-jsonld python3-flasgger &&\
     apt install -y --no-install-recommends apache2 libapache2-mod-wsgi-py3 python3-coverage python3-nose exiftran &&\
-    apt install -y iipimage-server libvips42 libvips-tools &&\
+    apt install -y --no-install-recommends iipimage-server libvips42 libvips-tools &&\
     apt install -y --no-install-recommends gettext npm python3-pip git postgresql-client-13 &&\
     apt install -y --no-install-recommends dos2unix locales locales-all &&\
     mkdir -p /var/www/openatlas /var/www/.cache /var/www/.local /var/www/.npm &&\
