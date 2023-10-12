@@ -777,7 +777,7 @@ def convert_image_to_iiif(id_: int) -> None:
     command = \
         (f"{vips} tiffsave {get_file_path(id_)} {get_iiif_file_path(id_)} "
          f"--tile --pyramid --compression {compression} "
-         f"--premultiply --tile-width 128 --tile-height 128")
+         f"--tile-width 128 --tile-height 128")
     try:
         process = subprocess.Popen(command, shell=True)
         process.wait()
