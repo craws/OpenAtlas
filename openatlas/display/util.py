@@ -760,8 +760,7 @@ def check_iiif_activation() -> bool:
 def check_iiif_file_exist(id_: int) -> bool:
     if app.config['IIIF']['conversion']:
         return get_iiif_file_path(id_).is_file()
-    else:
-        return bool(get_file_path(id_))
+    return bool(get_file_path(id_))
 
 
 def get_iiif_file_path(id_: int) -> Path:
@@ -783,5 +782,5 @@ def convert_image_to_iiif(id_: int) -> None:
         process = subprocess.Popen(command, shell=True)
         process.wait()
         flash(_('IIIF converted'), 'info')
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         flash(f"{_('failed to convert image')}: {e}", 'error')

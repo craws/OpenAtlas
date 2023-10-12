@@ -33,7 +33,7 @@ def image_resizing(name: str, format_: str, size: str) -> bool:
     filename = Path(app.config['UPLOAD_PATH']) / f"{name}{format_}[0]"
     with Image(filename=filename) as src:
         if format_ in app.config['PROCESSABLE_EXT']:
-            format_ = app.config['PROCESSED_EXT']
+            format_ = app.config['PROCESSED_EXT']  # pragma: no cover
         with src.convert(format_.replace('.', '')) as img:
             img.transform(resize=f"{size}x{size}>")
             img.compression_quality = 75
@@ -62,7 +62,7 @@ def check_processed_image(filename: str) -> bool:
 def loop_through_processed_folders(name: str, file_format: str) -> bool:
     ext = file_format
     if file_format in app.config['PROCESSABLE_EXT']:
-        ext = app.config['PROCESSED_EXT']
+        ext = app.config['PROCESSED_EXT']  # pragma: no cover
     for size in app.config['IMAGE_SIZE'].values():
         path = Path(app.config['RESIZED_IMAGES']) / size / f"{name}{ext}"
         if not path.is_file() \

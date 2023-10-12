@@ -101,17 +101,53 @@ class FileTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Updated file' in rv.data
 
+            rv = self.app.get(url_for('view', id_=file_id))
+            assert b'Logo' in rv.data
+
+            rv = self.app.get(url_for('view', id_=file_id))
+            assert b'make_iiif_available' in rv.data
+
             rv = self.app.get(
                 url_for('make_iiif_available', id_=file_id),
                 follow_redirects=True)
             assert b'IIIF converted' in rv.data
 
             rv = self.app.get(url_for('view', id_=file_id))
-            assert b'Logo' in rv.data
+            assert b'iiif' in rv.data
+
+            rv = self.app.get(url_for(
+                'api.iiif_manifest',
+                id_=file_id,
+                version=app.config['IIIF']['version'],
+                _external=True))
+            assert b'/iiif/2/145.tiff' in rv.data
+
+            rv = self.app.get(
+                url_for('api.iiif_sequence', id_=file_id))
+            assert b'/iiif/2/145.tiff' in rv.data
+            rv = self.app.get(
+                url_for('api.iiif_image', id_=file_id))
+            assert b'/iiif/2/145.tiff' in rv.data
+            rv = self.app.get(
+                url_for('api.iiif_canvas', id_=file_id))
+            assert b'/iiif/2/145.tiff' in rv.data
 
             rv = self.app.get(url_for('view_iiif', id_=file_id))
             assert b'Mirador' in rv.data
 
+            rv = self.app.get(url_for('view', id_=place.id))
+            assert b'/full/!100,100/0/default.jpg' in rv.data
+
+            app.config['IIIF']['conversion'] = False
+            rv = self.app.get(url_for('view', id_=place.id))
+            assert b'/full/!100,100/0/default.jpg' in rv.data
+
+            app.config['IIIF']['activate'] = False
+            rv = self.app.get(url_for('view', id_=place.id))
+            assert b'Logo' in rv.data
+
+            app.config['IIIF']['activate'] = True
+            app.config['IIIF']['conversion'] = True
             for file in files:
                 rv = self.app.get(
                     url_for('delete', id_=file.id),
