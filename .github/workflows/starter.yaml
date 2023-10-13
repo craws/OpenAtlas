@@ -118,7 +118,7 @@ jobs:
           IIIF = {
               'activate': True,
               'path': '/var/www/iipsrv/',
-              'url': 'localhost:8080/iiif/',
+              'url': 'http://localhost:8080/iiif/',
               'version': 2,
               'conversion': True,
               'compression': 'jpeg'}
