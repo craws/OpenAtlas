@@ -120,17 +120,21 @@ class FileTest(TestBaseCase):
                 id_=file_id,
                 version=app.config['IIIF']['version'],
                 _external=True))
-            assert b'/iiif/2/145.tiff' in rv.data
+            rv = rv.get_json()
+            assert bool(rv['label'] == 'Updated file')
 
             rv = self.app.get(
                 url_for('api.iiif_sequence', id_=file_id))
-            assert b'/iiif/2/145.tiff' in rv.data
+            rv = rv.get_json()
+            assert bool(str(file_id) in rv['@id'])
             rv = self.app.get(
                 url_for('api.iiif_image', id_=file_id))
-            assert b'/iiif/2/145.tiff' in rv.data
+            rv = rv.get_json()
+            assert bool(str(file_id) in rv['@id'])
             rv = self.app.get(
                 url_for('api.iiif_canvas', id_=file_id))
-            assert b'/iiif/2/145.tiff' in rv.data
+            rv = rv.get_json()
+            assert bool(str(file_id) in rv['@id'])
 
             rv = self.app.get(url_for('view_iiif', id_=file_id))
             assert b'Mirador' in rv.data
@@ -153,5 +157,3 @@ class FileTest(TestBaseCase):
                     url_for('delete', id_=file.id),
                     follow_redirects=True)
                 assert b'The entry has been deleted' in rv.data
-
-
