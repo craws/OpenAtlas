@@ -761,10 +761,10 @@ class Api(ApiTestCase):
 
             # Image Endpoints
             rv = self.app.get(url_for('api_03.licensed_file_overview'))
-            assert '152' in rv.get_json()
+            assert bool(len(rv.get_json().keys()) == 3)
             rv = self.app.get(url_for(
                 'api_03.licensed_file_overview', file_id='154'))
-            assert '154' in rv.get_json()
+            assert bool(len(rv.get_json().keys()) == 1)
 
             # Test Error Handling
             for rv in [
