@@ -430,7 +430,7 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
     if app.config['IIIF']['activate']:
         if path := app.config['IIIF']['path']:
             check_write_access(path, warnings)
-    for path in app.config['WRITABLE_PATHS']:
+    for path in g.writable_paths:
         check_write_access(path, warnings)
     if is_authorized('admin'):
         from openatlas.models.user import User
