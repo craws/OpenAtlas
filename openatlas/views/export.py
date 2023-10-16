@@ -17,7 +17,7 @@ from openatlas.models.export import sql_export
 @required_group('manager')
 def download_sql(filename: str) -> Response:
     return send_from_directory(
-        app.config['EXPORT_DIR'],
+        app.config['EXPORT_PATH'],
         filename,
         as_attachment=True)
 
@@ -25,7 +25,7 @@ def download_sql(filename: str) -> Response:
 @app.route('/export/execute/<format_>')
 @required_group('manager')
 def export_execute(format_: str) -> Response:
-    if os.access(app.config['EXPORT_DIR'], os.W_OK):
+    if os.access(app.config['EXPORT_PATH'], os.W_OK):
         if sql_export(format_):
             g.logger.log('info', 'database', 'SQL export')
             flash(_('data was exported'), 'info')
@@ -38,7 +38,7 @@ def export_execute(format_: str) -> Response:
 @app.route('/export/sql')
 @required_group('manager')
 def export_sql() -> str:
-    path = app.config['EXPORT_DIR']
+    path = app.config['EXPORT_PATH']
     table = Table(['name', 'size'], order=[[0, 'desc']])
     for file in [f for f in path.iterdir()
                  if (path / f).is_file() and f.name != '.gitignore']:
@@ -49,7 +49,7 @@ def export_sql() -> str:
                 _('download'),
                 url_for('download_sql', filename=file.name))]
         if is_authorized('admin') \
-                and os.access(app.config['EXPORT_DIR'], os.W_OK):
+                and os.access(app.config['EXPORT_PATH'], os.W_OK):
             confirm = _('Delete %(name)s?', name=file.name.replace("'", ''))
             data.append(
                 link(
@@ -80,7 +80,7 @@ def export_sql() -> str:
 @required_group('admin')
 def delete_export(filename: str) -> Response:
     try:
-        (app.config['EXPORT_DIR'] / filename).unlink()
+        (app.config['EXPORT_PATH'] / filename).unlink()
         g.logger.log('info', 'file', 'SQL file deleted')
         flash(_('file deleted'), 'info')
     except Exception as e:

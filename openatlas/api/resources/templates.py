@@ -4,6 +4,8 @@ from typing import Any, Type, Union
 from flask_restful import fields
 from flask_restful.fields import Integer, List, Nested, String
 
+from openatlas.models.entity import Entity
+
 
 def geojson_template() -> dict[str, Any]:
     types = {
@@ -304,3 +306,16 @@ def content_template() -> dict[str, Type[String]]:
         'legalNotice': fields.String,
         'siteName': fields.String,
         'imageSizes': fields.Raw}
+
+
+def licensed_file_template(entities: list[Entity]) -> dict[str, Any]:
+    file = {
+        'display': fields.String,
+        'thumbnail': fields.String,
+        'extension': fields.String,
+        'license': fields.String}
+
+    dict_: dict[str, Any] = defaultdict()
+    for entity in entities:
+        dict_[str(entity.id)] = fields.Nested(file)
+    return dict_

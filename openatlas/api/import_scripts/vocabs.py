@@ -37,6 +37,9 @@ def fetch_top_groups(
                     hierarchy,
                     'custom', form_data['classes'],
                     form_data['multiple'])
+                exact_match_id = get_exact_match().id
+                name = group[0].rsplit('/', 1)[-1]
+                ref.link('P67', hierarchy, name, type_id=exact_match_id)
                 import_member(
                     group[0],
                     id_,
@@ -44,8 +47,9 @@ def fetch_top_groups(
                     ref,
                     hierarchy)
                 count.append(group[0])
-            if Type.check_hierarchy_exists(group[1]):
-                duplicates.append(group[0])
+            if (Type.check_hierarchy_exists(group[1])
+                    and group[0] in form_data['top_concepts']):
+                duplicates.append(group[1])
     return count, duplicates
 
 
@@ -55,7 +59,6 @@ def import_member(
         lang: str,
         ref: ReferenceSystem,
         super_: Optional[Entity], ) -> bool:
-    exact_match_id = get_exact_match().id
     req = vocabs_requests(id_, 'groupMembers', {'uri': uri, 'lang': lang})
     child = None
     for member in req['members']:
@@ -63,7 +66,7 @@ def import_member(
         if super_:
             child = Entity.insert('type', member['prefLabel'])
             child.link('P127', super_)
-            ref.link('P67', child, name, type_id=exact_match_id)
+            ref.link('P67', child, name, type_id=get_exact_match().id)
         if member['hasMembers']:
             import_member(member['uri'], id_, lang, ref, child)
     return True
@@ -88,6 +91,9 @@ def fetch_top_level(
                     hierarchy,
                     'custom', form_data['classes'],
                     form_data['multiple'])
+                exact_match_id = get_exact_match().id
+                name = entry['uri'].rsplit('/', 1)[-1]
+                ref.link('P67', hierarchy, name, type_id=exact_match_id)
                 entry['subs'] = import_children(
                     entry['uri'],
                     id_,
@@ -96,7 +102,7 @@ def fetch_top_level(
                     hierarchy)
                 count.append(entry)
             if Type.check_hierarchy_exists(entry['label']):
-                duplicates.append(entry)
+                duplicates.append(entry['label'])
     return count, duplicates
 
 

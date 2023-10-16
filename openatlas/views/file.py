@@ -15,7 +15,7 @@ from openatlas.models.entity import Entity
 @required_group('readonly')
 def download_file(filename: str) -> Any:
     return send_from_directory(
-        app.config['UPLOAD_DIR'],
+        app.config['UPLOAD_PATH'],
         filename,
         as_attachment=True)
 
@@ -27,12 +27,12 @@ def display_file(filename: str) -> Any:
         return send_from_directory(
             app.config['RESIZED_IMAGES'] / request.args.get('size'),
             filename)
-    return send_from_directory(app.config['UPLOAD_DIR'], filename)
+    return send_from_directory(app.config['UPLOAD_PATH'], filename)
 
 
 @app.route('/display_logo/<path:filename>')
 def display_logo(filename: str) -> Any:
-    return send_from_directory(app.config['UPLOAD_DIR'], filename)
+    return send_from_directory(app.config['UPLOAD_PATH'], filename)
 
 
 @app.route('/file/set_profile_image/<int:id_>/<int:origin_id>')

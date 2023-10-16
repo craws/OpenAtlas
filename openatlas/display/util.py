@@ -26,7 +26,6 @@ from openatlas.display.image_processing import check_processed_image
 from openatlas.models.cidoc_class import CidocClass
 from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.content import get_translation
-from openatlas.models.imports import Project
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
@@ -54,6 +53,7 @@ def edit_link(url: str) -> Optional[str]:
     return link(_('edit'), url) if is_authorized('contributor') else None
 
 
+@app.template_filter()
 def ext_references(links: list[Link]) -> str:
     if not links:
         return ''
@@ -309,7 +309,7 @@ def format_name_and_aliases(entity: Entity, show_links: bool) -> str:
 
 
 def get_backup_file_data() -> dict[str, Any]:
-    path = app.config['EXPORT_DIR']
+    path = app.config['EXPORT_PATH']
     latest_file = None
     latest_file_date = None
     for file in [
@@ -338,12 +338,8 @@ def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
     if entity.class_.standard_type_id:
         data.append(entity.standard_type.name if entity.standard_type else '')
     if entity.class_.name == 'file':
-        data.append(
-            g.file_stats[entity.id]['size']
-            if entity.id in g.file_stats else 'N/A')
-        data.append(
-            g.file_stats[entity.id]['ext']
-            if entity.id in g.file_stats else 'N/A')
+        data.append(entity.get_file_size())
+        data.append(entity.get_file_extension())
     if entity.class_.view in ['actor', 'artifact', 'event', 'place']:
         data.append(entity.first)
         data.append(entity.last)
@@ -430,7 +426,7 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
         warnings.append(
             f"Database version {app.config['DATABASE_VERSION']} is needed but "
             f"current version is {g.settings['database_version']}")
-    for path in app.config['WRITABLE_DIRS']:
+    for path in app.config['WRITABLE_PATHS']:
         if not os.access(path, os.W_OK):
             warnings.append(
                 '<p class="uc-first">' + _('directory not writable') +
@@ -466,15 +462,15 @@ def get_file_path(
         entity: Union[int, Entity],
         size: Optional[str] = None) -> Optional[Path]:
     id_ = entity if isinstance(entity, int) else entity.id
-    if id_ not in g.file_stats:
+    if id_ not in g.files:
         return None
-    ext = g.file_stats[id_]['ext']
+    ext = g.files[id_].suffix
     if size:
         if ext in app.config['NONE_DISPLAY_EXT']:
             ext = app.config['PROCESSED_EXT']  # pragma: no cover
         path = app.config['RESIZED_IMAGES'] / size / f"{id_}{ext}"
         return path if os.path.exists(path) else None
-    return app.config['UPLOAD_DIR'] / f"{id_}{ext}"
+    return app.config['UPLOAD_PATH'] / f"{id_}{ext}"
 
 
 def format_date(value: Union[datetime, numpy.datetime64]) -> str:
@@ -504,6 +500,7 @@ def link(
         external: bool = False) -> str:
     from openatlas.models.entity import Entity
     from openatlas.models.user import User
+    from openatlas.models.imports import Project
     html = ''
     if isinstance(object_, (str, LazyString)):
         js = f'onclick="{js}"' if js else ''
@@ -738,10 +735,7 @@ def datetime64_to_timestamp(date: Optional[numpy.datetime64]) -> Optional[str]:
 def get_entities_linked_to_type_recursive(
         id_: int,
         data: list[Entity]) -> list[Entity]:
-    for entity in g.types[id_].get_linked_entities(
-            ['P2', 'P89'],
-            inverse=True,
-            types=True):
+    for entity in g.types[id_].get_linked_entities(['P2', 'P89'], True, True):
         data.append(entity)
     for sub_id in g.types[id_].subs:
         get_entities_linked_to_type_recursive(sub_id, data)

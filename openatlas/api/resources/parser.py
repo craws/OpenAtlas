@@ -155,3 +155,10 @@ image.add_argument(
     help="{error_msg}",
     case_sensitive=False,
     choices=list(size for size in app.config['IMAGE_SIZE']))
+
+files = default.copy()
+files.add_argument(
+    'file_id',
+    type=int,
+    help="{error_msg}",
+    action='append')

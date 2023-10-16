@@ -15,7 +15,7 @@ def current_date_for_filename() -> str:
 
 
 def sql_export(format_: str, postfix: Optional[str] = '') -> bool:
-    file = app.config['EXPORT_DIR'] \
+    file = app.config['EXPORT_PATH'] \
            / f'{current_date_for_filename()}_export{postfix}.{format_}'
     pg_dump = "pg_dump" if os.name == 'posix' \
         else f'"{shutil.which("pg_dump.exe")}"'

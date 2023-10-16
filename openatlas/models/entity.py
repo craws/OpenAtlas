@@ -12,7 +12,7 @@ from openatlas.database.date import Date
 from openatlas.database.entity import Entity as Db
 from openatlas.display.util import (
     datetime64_to_timestamp, format_date_part, sanitize,
-    timestamp_to_datetime64)
+    timestamp_to_datetime64, convert_size)
 from openatlas.models.link import Link
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -110,10 +110,8 @@ class Entity:
             code: str,
             inverse: bool = False,
             types: bool = False) -> list[Entity]:
-        return Link.get_linked_entities_recursive(
-            self.id,
-            code,
-            inverse=inverse,
+        return Entity.get_by_ids(
+            Db.get_linked_entities_recursive(self.id, code, inverse),
             types=types)
 
     def link(self,
@@ -167,7 +165,7 @@ class Entity:
             self,
             codes: Union[str, list[str]],
             inverse: bool = False) -> list[Link]:
-        return Link.get_links(self.id, codes, inverse)
+        return Entity.get_links_of_entities(self.id, codes, inverse)
 
     def delete(self) -> None:
         Entity.delete_(self.id)
@@ -333,6 +331,13 @@ class Entity:
                 self.get_linked_entities_recursive('P46', inverse=True) +
                 [self]}
 
+    def get_file_size(self) -> str:
+        return convert_size(g.files[self.id].stat().st_size) \
+            if self.id in g.files else 'N/A'
+
+    def get_file_extension(self) -> str:
+        return g.files[self.id].suffix if self.id in g.files else 'N/A'
+
     @staticmethod
     def get_invalid_dates() -> list[Entity]:
         return [
@@ -374,8 +379,8 @@ class Entity:
     def get_display_files() -> list[Entity]:
         entities = []
         for row in Db.get_by_class('file', types=True):
-            ext = g.file_stats[row['id']]['ext'] \
-                if row['id'] in g.file_stats else 'N/A'
+            ext = g.files[row['id']].suffix  \
+                if row['id'] in g.files else 'N/A'
             if ext in app.config['DISPLAY_FILE_EXTENSIONS']:
                 entities.append(Entity(row))
         return entities
@@ -485,3 +490,27 @@ class Entity:
             ids: list[int],
             inverse: bool = False) -> dict[int, Any]:
         return Db.get_roots(property_code, ids, inverse)
+
+    @staticmethod
+    def get_links_of_entities(
+            entities: Union[int, list[int]],
+            codes: Union[str, list[str], None] = None,
+            inverse: bool = False) -> list[Link]:
+        entity_ids = set()
+        result = Db.get_links_of_entities(
+            entities,
+            codes if isinstance(codes, list) else [str(codes)],
+            inverse)
+        for row in result:
+            entity_ids.add(row['domain_id'])
+            entity_ids.add(row['range_id'])
+        linked_entities = {
+            e.id: e for e in Entity.get_by_ids(entity_ids, types=True)}
+        links = []
+        for row in result:
+            links.append(
+                Link(
+                    row,
+                    domain=linked_entities[row['domain_id']],
+                    range_=linked_entities[row['range_id']]))
+        return links

@@ -104,9 +104,9 @@ def resolve_entity(
         parser: dict[str, Any]) \
         -> Union[Response, dict[str, Any], tuple[Any, int]]:
     if parser['export'] == 'csv':
-        export_entities_csv(entity, entity.name)
+        return export_entities_csv(entity, entity.name)
     if parser['export'] == 'csvNetwork':
-        export_csv_for_network_analysis([entity], parser)
+        return export_csv_for_network_analysis([entity], parser)
     result = get_entity_formatted(entity, parser)
     if parser['format'] in app.config['RDF_FORMATS']:  # pragma: nocover
         return Response(
@@ -185,7 +185,8 @@ def get_entities_formatted(
         entities_dict[link_.domain.id]['links'].append(link_)
     for link_ in link_parser_check_inverse(entities, parser):
         entities_dict[link_.range.id]['links_inverse'].append(link_)
-    if parser['format'] == 'loud':
+    if parser['format'] == 'loud' \
+            or parser['format'] in app.config['RDF_FORMATS']:
         return [get_loud_entities(item, parse_loud_context())
                 for item in entities_dict.values()]
     return [get_linked_places_entity(item, parser)

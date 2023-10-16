@@ -88,7 +88,7 @@ def insert(
         class_name=class_,
         view_name=g.classes[class_].view,
         gis_data=manager.place_info['gis_data'],
-        writable=os.access(app.config['UPLOAD_DIR'], os.W_OK),
+        writable=os.access(app.config['UPLOAD_PATH'], os.W_OK),
         overlays=manager.place_info['overlays'],
         title=_(g.classes[class_].view),
         crumbs=manager.get_crumbs())
@@ -123,12 +123,11 @@ def update(id_: int, copy: Optional[str] = None) -> Union[str, Response]:
     if entity.class_.view in ['artifact', 'place']:
         manager.entity.image_id = manager.entity.get_profile_image_id()
         if not manager.entity.image_id:
-            for link_ in manager.entity.get_links('P67', inverse=True):
-                domain = link_.domain
-                if domain.class_.view == 'file' \
-                        and get_base_table_data(domain)[3] \
+            for l in manager.entity.get_links('P67', inverse=True):
+                if l.domain.class_.view == 'file' \
+                        and get_base_table_data(l.domain)[3] \
                         in app.config['DISPLAY_FILE_EXTENSIONS']:
-                    manager.entity.image_id = domain.id
+                    manager.entity.image_id = l.domain.id
                     break
     return render_template(
         'entity/update.html',
@@ -210,7 +209,7 @@ def insert_files(manager: BaseManager) -> Union[str, Response]:
             filename = secure_filename(f'a{file.filename}')
             name = f"{manager.entity.id}.{filename.rsplit('.', 1)[1].lower()}"
             ext = secure_filename(file.filename).rsplit('.', 1)[1].lower()
-            path = app.config['UPLOAD_DIR'] / name
+            path = app.config['UPLOAD_PATH'] / name
             file.save(str(path))
             if f'.{ext}' in app.config['DISPLAY_FILE_EXTENSIONS']:
                 call(f'exiftran -ai {path}', shell=True)  # Fix rotation
@@ -229,7 +228,7 @@ def insert_files(manager: BaseManager) -> Union[str, Response]:
     except Exception as e:  # pragma: no cover
         Transaction.rollback()
         for filename in filenames:
-            (app.config['UPLOAD_DIR'] / filename).unlink()
+            (app.config['UPLOAD_PATH'] / filename).unlink()
         g.logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
         url = url_for('index', view=g.classes['file'].view)

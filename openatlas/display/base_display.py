@@ -10,10 +10,10 @@ from flask_login import current_user
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.util import (
-    bookmark_toggle, button, description, edit_link, ext_references,
-    format_date, format_entity_date, get_appearance, get_base_table_data,
-    get_system_data, is_authorized, link, manual, profile_image_table_link,
-    remove_link, get_chart_data)
+    bookmark_toggle, button, description, edit_link, format_date,
+    format_entity_date, get_appearance, get_base_table_data, get_system_data,
+    is_authorized, link, manual, profile_image_table_link, remove_link,
+    get_chart_data)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -101,7 +101,6 @@ class BaseDisplay:
             overlays=self.overlays,
             chart_data=self.get_chart_data(),
             description_html=self.description_html(),
-            ext_references=ext_references(self.entity.reference_systems),
             problematic_type_id=self.problematic_type)
 
     def description_html(self) -> str:
@@ -379,7 +378,7 @@ class PlaceBaseDisplay(BaseDisplay):
                 and current_user.settings['module_map_overlay']:
             self.tabs['file'].table.header.append(_('overlay'))
 
-        for link_ in entity.get_links('P67', inverse=True):
+        for link_ in entity.get_links(['P31', 'P67'], inverse=True):
             domain = link_.domain
             data = get_base_table_data(domain)
             if domain.class_.view == 'file':

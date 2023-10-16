@@ -15,4 +15,4 @@ ARCHE = {
 
 # For Windows user
 # from pathlib import Path
-# TMP_DIR = Path('C:\\Path\\to\\tmp')
+# TMP_PATH = Path('C:\\Path\\to\\tmp')

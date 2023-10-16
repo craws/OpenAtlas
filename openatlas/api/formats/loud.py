@@ -3,6 +3,7 @@ from typing import Any, Optional
 
 from flask import url_for
 
+from openatlas import app
 from openatlas.display.util import get_file_path
 from openatlas.models.gis import Gis
 from openatlas.api.resources.util import remove_spaces_dashes, date_to_str, \
@@ -93,8 +94,8 @@ def get_loud_entities(
                 "_label": label,
                 "type": "DigitalObject"}]})
 
-    return {'@context': "https://linked.art/ns/v1/linked-art.json"} | \
-        base_entity_dict() | properties_set  # type: ignore
+    return {'@context': app.config['API_CONTEXT']['LOUD']} | \
+        base_entity_dict() | properties_set
 
 
 def get_loud_timespan(entity: Entity) -> dict[str, Any]:

@@ -516,9 +516,10 @@ def admin_orphans() -> str:
                 entity.description])
 
     # Orphaned files with no corresponding entity
-    for file in app.config['UPLOAD_DIR'].iterdir():
+    for file in app.config['UPLOAD_PATH'].iterdir():
         if file.name != '.gitignore' \
                 and os.path.isfile(file) \
+                and file.stem.isdigit() \
                 and int(file.stem) not in entity_file_ids:
             confirm = _('Delete %(name)s?', name=file.name.replace("'", ''))
             tabs['orphaned_files'].table.rows.append([
@@ -572,7 +573,7 @@ def admin_orphans() -> str:
 def admin_file_delete(filename: str) -> Response:
     if filename != 'all':  # Delete one file
         try:
-            (app.config['UPLOAD_DIR'] / filename).unlink()
+            (app.config['UPLOAD_PATH'] / filename).unlink()
             flash(f"{filename} {_('was deleted')}", 'info')
         except Exception as e:
             g.logger.log('error', 'file', f'deletion of {filename} failed', e)
@@ -582,10 +583,10 @@ def admin_file_delete(filename: str) -> Response:
     # Delete all files with no corresponding entity
     if is_authorized('admin'):  # pragma: no cover - don't test, ever
         entity_file_ids = [entity.id for entity in Entity.get_by_class('file')]
-        for f in app.config['UPLOAD_DIR'].iterdir():
+        for f in app.config['UPLOAD_PATH'].iterdir():
             if f.name != '.gitignore' and int(f.stem) not in entity_file_ids:
                 try:
-                    (app.config['UPLOAD_DIR'] / f.name).unlink()
+                    (app.config['UPLOAD_PATH'] / f.name).unlink()
                 except Exception as e:
                     g.logger.log(
                         'error', 'file', f'deletion of {f.name} failed', e)
@@ -606,18 +607,16 @@ def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
     table = Table([''] + g.table_headers['file'] + ['date'])
     for entity in Entity.get_display_files():
         date = 'N/A'
-        if entity.id in g.file_stats:
+        if entity.id in g.files:
             date = format_date(
                 datetime.datetime.utcfromtimestamp(
-                    g.file_stats[entity.id]['date']))
+                    g.files[entity.id].stat().st_ctime))
         table.rows.append([
             link(_('set'), url_for('admin_logo', id_=entity.id)),
             entity.name,
             link(entity.standard_type),
-            g.file_stats[entity.id]['size']
-            if entity.id in g.file_stats else 'N/A',
-            g.file_stats[entity.id]['ext']
-            if entity.id in g.file_stats else 'N/A',
+            entity.get_file_size(),
+            entity.get_file_extension(),
             entity.description,
             date])
     return render_template(
@@ -765,7 +764,7 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
         files_size = int(process.stdout.split()[0])
     else:
         files_size = 40999999999  # pragma: no cover
-    stats = shutil.disk_usage(app.config['UPLOAD_DIR'])
+    stats = shutil.disk_usage(app.config['UPLOAD_PATH'])
     percent_free = 100 - math.ceil(stats.free / (stats.total / 100))
     percent_files = math.ceil(files_size / (stats.total / 100))
     other_files = stats.total - stats.free - files_size

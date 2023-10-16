@@ -50,10 +50,8 @@ def get_table(view: str) -> Table:
                 format_date(entity.created),
                 link(entity),
                 link(entity.standard_type),
-                g.file_stats[entity.id]['size']
-                if entity.id in g.file_stats else 'N/A',
-                g.file_stats[entity.id]['ext']
-                if entity.id in g.file_stats else 'N/A',
+                entity.get_file_size(),
+                entity.get_file_extension(),
                 entity.description]
             if g.settings['image_processing'] \
                     and current_user.settings['table_show_icons']:

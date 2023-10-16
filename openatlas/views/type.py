@@ -54,6 +54,9 @@ def type_index() -> str:
                 'forms/tree_select_item.html',
                 name=sanitize(type_.name),
                 data=walk_tree(type_.subs))
+            for link_ in type_.get_links('P67', inverse=True):
+                if link_.domain.class_.view == 'reference_system':
+                    type_.reference_systems.append(link_)
     return render_template(
         'type/index.html',
         buttons=[manual('entity/type')],

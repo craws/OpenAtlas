@@ -15,6 +15,14 @@ def index_changelog() -> str:
 
 
 versions = {
+    '7.17.0': ['TBA', {
+        'feature': {
+            '2026': 'External reference systems for type hierarchies',
+            '2070': 'Modification (E11) for Place (E18)',
+            '2083': 'API: List of images'},
+        'fix': {
+            '2078': 'API: CSV export not working'
+        }}],
     '7.16.1': ['2023-09-20', {
         'fix': {
             '2069': 'Broken buttons for preceding event'}}],
@@ -53,7 +61,7 @@ versions = {
             '1930': 'CIDOC CRM link checker: keep form values after submit',
             '2023': 'Autocomplete at Wikidata is too short'}}],
     '7.13.1': ['2023-05-09', {
-            'fix': {'2014': "Former network URL isn't working anymore"}}],
+        'fix': {'2014': "Former network URL isn't working anymore"}}],
     '7.13.0': ['2023-05-06', {
         'feature': {
             '1952': 'E11 Modification',
@@ -145,7 +153,7 @@ versions = {
     '7.8.1': ['2022-12-08', {
         'fix': {
             '1911': 'Problem when adding members to groups'}}],
-    '7.8.0': ['2022-11-18',  {
+    '7.8.0': ['2022-11-18', {
         'feature': {
             '1400': 'Make specific types required at data entry',
             '1647': 'Composition of artifacts and human remains',
@@ -176,10 +184,10 @@ versions = {
     '7.6.2': ['2022-09-29', {
         'fix': {
             '1822': 'Missing types at edit'}}],
-    '7.6.1': ['2022-08-25',  {
+    '7.6.1': ['2022-08-25', {
         'fix': {
             '1794': 'Bug when editing types connected to artifacts'}}],
-    '7.6.0': ['2022-08-25',  {
+    '7.6.0': ['2022-08-25', {
         'feature': {
             '1788': 'Forms: filter invalid table options',
             '1781': 'Import for bibliographies and editions',

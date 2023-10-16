@@ -394,3 +394,66 @@ class Entity:
             row['start_node']: {
                 'id': row['top_level'],
                 'name': row['name']} for row in g.cursor.fetchall()}
+
+    @staticmethod
+    def get_linked_entities_recursive(
+            id_: int,
+            code: str,
+            inverse: bool) -> list[int]:
+        first = 'domain_id' if inverse else 'range_id'
+        second = 'range_id' if inverse else 'domain_id'
+        g.cursor.execute(
+            f"""
+            WITH RECURSIVE items AS (
+                SELECT {first}
+                FROM model.link
+                WHERE {second} = %(id_)s AND property_code = %(code)s
+                UNION
+                    SELECT l.{first} FROM model.link l
+                    INNER JOIN items i ON
+                        l.{second} = i.{first}
+                        AND l.property_code = %(code)s
+                ) SELECT {first} FROM items;
+            """,
+            {'id_': id_, 'code': code})
+        return [row[first] for row in g.cursor.fetchall()]
+
+    @staticmethod
+    def get_links_of_entities(
+            entities: Union[int, list[int]],
+            codes: Union[str, list[str], None],
+            inverse: bool = False) -> list[dict[str, Any]]:
+        sql = f"""
+            SELECT
+                l.id, l.property_code,
+                l.domain_id,
+                l.range_id,
+                l.description,
+                l.created,
+                l.modified,
+                e.name,
+                l.type_id,
+                COALESCE(to_char(l.begin_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                    AS begin_from, l.begin_comment,
+                COALESCE(to_char(l.begin_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                    AS begin_to,
+                COALESCE(to_char(l.end_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                    AS end_from, l.end_comment,
+                COALESCE(to_char(l.end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                    AS end_to
+            FROM model.link l
+            JOIN model.entity e
+                ON l.{'domain' if inverse else 'range'}_id = e.id """
+        if codes:
+            codes = codes if isinstance(codes, list) else [codes]
+            sql += ' AND l.property_code IN %(codes)s '
+        sql += f"""
+            WHERE l.{'range' if inverse else 'domain'}_id IN %(entities)s
+            GROUP BY l.id, e.name
+            ORDER BY e.name;"""
+        g.cursor.execute(
+            sql, {
+                'entities': tuple(
+                    entities if isinstance(entities, list) else [entities]),
+                'codes': tuple(codes) if codes else ''})
+        return [dict(row) for row in g.cursor.fetchall()]
