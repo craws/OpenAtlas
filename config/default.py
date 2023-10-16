@@ -41,7 +41,7 @@ IMAGE_SIZE = {
     'thumbnail': '200',
     'table': '100'}
 IIIF = {
-    'activate': False,
+    'enabled': False,
     'path': '',
     'url': '',
     'version': 2,

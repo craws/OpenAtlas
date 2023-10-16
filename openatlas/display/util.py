@@ -233,7 +233,7 @@ def profile_image(entity: Entity) -> str:
     src = url_for('display_file', filename=path.name)
     url = src
     width = g.settings["profile_image_width"]
-    if app.config['IIIF']['activate'] and check_iiif_file_exist(entity.id):
+    if app.config['IIIF']['enabled'] and check_iiif_file_exist(entity.id):
         url = url_for('view_iiif', id_=entity.id)
         iiif_ext = '.tiff' if app.config['IIIF']['conversion'] \
             else g.files[entity.id].suffix
@@ -427,7 +427,7 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
         warnings.append(
             f"Database version {app.config['DATABASE_VERSION']} is needed but "
             f"current version is {g.settings['database_version']}")
-    if app.config['IIIF']['activate']:
+    if app.config['IIIF']['enabled']:
         if path := app.config['IIIF']['path']:
             check_write_access(path, warnings)
     for path in g.writable_paths:
@@ -754,7 +754,7 @@ def get_entities_linked_to_type_recursive(
 
 def check_iiif_activation() -> bool:
     iiif = app.config['IIIF']
-    return bool(iiif['activate'] and os.access(Path(iiif['path']), os.W_OK))
+    return bool(iiif['enabled'] and os.access(Path(iiif['path']), os.W_OK))
 
 
 def check_iiif_file_exist(id_: int) -> bool:

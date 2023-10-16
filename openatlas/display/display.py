@@ -80,11 +80,11 @@ class FileDisplay(BaseDisplay):
                 if check_iiif_file_exist(self.entity.id) \
                         or not app.config['IIIF']['conversion']:
                     self.buttons.append(button(
-                        _('iiif'),
+                        _('view in IIIF'),
                         url_for('view_iiif', id_=self.entity.id)))
                 else:
                     self.buttons.append(button(
-                        _('make_iiif_available'),
+                        _('enable IIIF view'),
                         url_for('make_iiif_available', id_=self.entity.id)))
             return
         self.buttons.append(

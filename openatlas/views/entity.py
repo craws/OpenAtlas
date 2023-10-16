@@ -331,6 +331,6 @@ def delete_files(id_: int) -> None:
         path.unlink()
     for resized_path in app.config['RESIZED_IMAGES'].glob(f'**/{id_}.*'):
         resized_path.unlink()
-    if app.config['IIIF']['activate'] and check_iiif_file_exist(id_):
+    if app.config['IIIF']['enabled'] and check_iiif_file_exist(id_):
         if path := get_iiif_file_path(id_):
             path.unlink()
