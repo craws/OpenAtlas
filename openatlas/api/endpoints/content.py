@@ -1,6 +1,6 @@
 from typing import Union
 
-from flask import Response, g
+from flask import Response, g, jsonify
 from flask_restful import Resource, marshal
 
 from openatlas import app
@@ -26,6 +26,27 @@ class GetContent(Resource):
         if parser['download']:
             download(content, content_template(), 'content')
         return marshal(content, content_template()), 200
+
+
+class GetBackendDetails(Resource):
+    @staticmethod
+    def get() -> Union[tuple[Resource, int], Response]:
+        parser = language.parse_args()
+        lang = parser['lang']
+        content = {
+            'version': app.config['VERSION'],
+            'siteName': get_translation('site_name_for_frontend', lang),
+            'imageProcessing': g.settings['image_processing'],
+            'imageSizes': app.config['IMAGE_SIZE'],
+            'IIIF': {
+                'enabled': app.config['IIIF']['enabled'],
+                'url': app.config['IIIF']['url'],
+                'version': app.config['IIIF']['version']}
+        }
+        if parser['download']:
+            download(content, content_template(), 'content')
+        # return marshal(content, content_template()), 200
+        return content
 
 
 class ClassMapping(Resource):
