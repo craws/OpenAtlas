@@ -118,12 +118,12 @@ class Tab:
                         g.classes[item].label,
                         url_for('insert', class_=item, origin_id=id_)))
         elif name == 'artifact':
-            if (entity and entity.class_.name in
+            if entity and entity.class_.name in \
                     ['place',
                      'artifact',
                      'human_remains',
                      'feature',
-                     'stratigraphic_unit']):
+                     'stratigraphic_unit']:
                 self.buttons.append(
                     button(_('add subunit'),
                            url_for('add_subunit', super_id=id_)))

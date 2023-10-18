@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any
 
 from flask import url_for
 
@@ -20,7 +21,7 @@ class FileTest(TestBaseCase):
                 / 'static' / 'images' / 'layout' / 'logo.png'
 
             with open(logo, 'rb') as img_1, open(logo, 'rb') as img_2:
-                rv = self.app.post(
+                rv: Any = self.app.post(
                     url_for('insert', class_='file', origin_id=place.id),
                     data={'name': 'OpenAtlas logo', 'file': [img_1, img_2]},
                     follow_redirects=True)
@@ -93,7 +94,7 @@ class FileTest(TestBaseCase):
             assert b'File keeper' in rv.data
 
             rv = self.app.get(url_for('update', id_=place.id))
-            assert b'alt="image"' in rv.data
+            assert b'File keeper' in rv.data
 
             rv = self.app.post(
                 url_for('entity_add_file', id_=get_hierarchy('Sex').subs[0]),
@@ -101,6 +102,54 @@ class FileTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Updated file' in rv.data
 
+            rv = self.app.get(url_for('view', id_=file_id))
+            assert b'Logo' in rv.data
+
+            rv = self.app.get(url_for('view', id_=file_id))
+            assert b'enable IIIF view' in rv.data
+
+            rv = self.app.get(
+                url_for('make_iiif_available', id_=file_id),
+                follow_redirects=True)
+            assert b'IIIF converted' in rv.data
+
+            rv = self.app.get(url_for('view', id_=file_id))
+            assert b'view in IIIF' in rv.data
+
+            rv = self.app.get(
+                url_for(
+                    'api.iiif_manifest',
+                    id_=file_id,
+                    version=app.config['IIIF']['version']))
+            rv = rv.get_json()
+            assert bool(rv['label'] == 'Updated file')
+
+            rv = self.app.get(url_for('api.iiif_sequence', id_=file_id))
+            rv = rv.get_json()
+            assert bool(str(file_id) in rv['@id'])
+            rv = self.app.get(url_for('api.iiif_image', id_=file_id))
+            rv = rv.get_json()
+            assert bool(str(file_id) in rv['@id'])
+            rv = self.app.get(url_for('api.iiif_canvas', id_=file_id))
+            rv = rv.get_json()
+            assert bool(str(file_id) in rv['@id'])
+
+            rv = self.app.get(url_for('view_iiif', id_=file_id))
+            assert b'Mirador' in rv.data
+
+            rv = self.app.get(url_for('view', id_=place.id))
+            assert b'/full/!100,100/0/default.jpg' in rv.data
+
+            app.config['IIIF']['conversion'] = False
+            rv = self.app.get(url_for('view', id_=place.id))
+            assert b'/full/!100,100/0/default.jpg' in rv.data
+
+            app.config['IIIF']['activate'] = False
+            rv = self.app.get(url_for('view', id_=place.id))
+            assert b'Logo' in rv.data
+
+            app.config['IIIF']['activate'] = True
+            app.config['IIIF']['conversion'] = True
             for file in files:
                 rv = self.app.get(
                     url_for('delete', id_=file.id),

@@ -335,7 +335,7 @@ class Entity:
         return convert_size(g.files[self.id].stat().st_size) \
             if self.id in g.files else 'N/A'
 
-    def get_file_extension(self) -> str:
+    def get_file_ext(self) -> str:
         return g.files[self.id].suffix if self.id in g.files else 'N/A'
 
     @staticmethod
@@ -379,9 +379,8 @@ class Entity:
     def get_display_files() -> list[Entity]:
         entities = []
         for row in Db.get_by_class('file', types=True):
-            ext = g.files[row['id']].suffix  \
-                if row['id'] in g.files else 'N/A'
-            if ext in app.config['DISPLAY_FILE_EXTENSIONS']:
+            ext = g.files[row['id']].suffix if row['id'] in g.files else 'N/A'
+            if ext in app.config['DISPLAY_FILE_EXT']:
                 entities.append(Entity(row))
         return entities
 

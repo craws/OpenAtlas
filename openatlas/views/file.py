@@ -6,7 +6,7 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
-from openatlas.display.util import required_group
+from openatlas.display.util import required_group, convert_image_to_iiif
 from openatlas.forms.form import get_table_form
 from openatlas.models.entity import Entity
 
@@ -66,3 +66,23 @@ def file_add(id_: int, view: str) -> Union[str, Response]:
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],
             entity,
             f"{_('link')} {_(view)}"])
+
+
+@app.route('/file/convert_iiif/<int:id_>', methods=['GET'])
+@required_group('contributor')
+def make_iiif_available(id_: int) -> Response:
+    convert_image_to_iiif(id_)
+    return redirect(url_for('view', id_=id_))
+
+
+@app.route('/view_iiif/<int:id_>', methods=['GET'])
+@required_group('contributor')
+def view_iiif(id_: int) -> str:
+    return render_template(
+        'iiif.html',
+        manifest_url=
+            url_for(
+                'api.iiif_manifest',
+                id_=id_,
+                version=app.config['IIIF']['version'],
+                _external=True))

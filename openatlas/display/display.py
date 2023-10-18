@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from flask import g, url_for
 from flask_babel import lazy_gettext as _
 
+from openatlas import app
 from openatlas.display.base_display import (
     ActorDisplay, BaseDisplay, EventsDisplay, PlaceBaseDisplay,
     ReferenceBaseDisplay, TypeBaseDisplay)
@@ -12,7 +13,8 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
     button, description, edit_link, format_entity_date, get_base_table_data,
-    get_file_path, is_authorized, link, remove_link, uc_first)
+    get_file_path, is_authorized, link, remove_link, uc_first,
+    check_iiif_activation, check_iiif_file_exist)
 from openatlas.models.entity import Entity
 from openatlas.views.tools import carbon_result, sex_result
 
@@ -66,13 +68,24 @@ class FileDisplay(BaseDisplay):
     def add_data(self) -> None:
         super().add_data()
         self.data[_('size')] = self.entity.get_file_size()
-        self.data[_('extension')] = self.entity.get_file_extension()
+        self.data[_('extension')] = self.entity.get_file_ext()
 
     def add_button_others(self) -> None:
         if path := get_file_path(self.entity.id):
             self.buttons.append(button(
                 _('download'),
                 url_for('download_file', filename=path.name)))
+            if check_iiif_activation() \
+                    and self.entity.get_file_ext() in g.display_file_ext:
+                if check_iiif_file_exist(self.entity.id) \
+                        or not app.config['IIIF']['conversion']:
+                    self.buttons.append(button(
+                        _('view in IIIF'),
+                        url_for('view_iiif', id_=self.entity.id)))
+                else:
+                    self.buttons.append(button(
+                        _('enable IIIF view'),
+                        url_for('make_iiif_available', id_=self.entity.id)))
             return
         self.buttons.append(
             '<span class="error">' + uc_first(_("missing file")) + '</span>')
