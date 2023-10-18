@@ -18,7 +18,7 @@ jobs:
           echo "check_result=$check_result" >> $GITHUB_OUTPUT
   call_delploy:
     needs: [check_for_updates]
-    if: needs.check_for_updates.outputs.check_result == 'need to upgrade'
+    if: "!  needs.check_for_updates.outputs.check_result == 'need to upgrade'"
     runs-on: ubuntu-latest
     steps:
       - name: check OpenAtlas container
