@@ -27,8 +27,8 @@ def fetch_top_groups(
     duplicates = []
     if ref := get_vocabs_reference_system(details):
         for group in form_data['choices']:
-            if (not Type.check_hierarchy_exists(group[1]) and
-                    group[0] in form_data['top_concepts']):
+            if not Type.check_hierarchy_exists(group[1]) and \
+                    group[0] in form_data['top_concepts']:
                 hierarchy = Entity.insert(
                     'type',
                     group[1],
@@ -47,8 +47,8 @@ def fetch_top_groups(
                     ref,
                     hierarchy)
                 count.append(group[0])
-            if (Type.check_hierarchy_exists(group[1])
-                    and group[0] in form_data['top_concepts']):
+            if Type.check_hierarchy_exists(group[1]) \
+                    and group[0] in form_data['top_concepts']:
                 duplicates.append(group[1])
     return count, duplicates
 

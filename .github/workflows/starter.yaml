@@ -112,9 +112,14 @@ jobs:
           WTF_CSRF_METHODS: list[str] = []
           ARCHE = {
               'id': 0,
-              'collection_ids': [0],
-              'base_url': 'https://arche-curation.acdh-dev.oeaw.ac.at/',
-              'thumbnail_url': 'https://arche-thumbnails.acdh.oeaw.ac.at/'}
+              'url': 'https://arche-curation.acdh-dev.oeaw.ac.at/'}
+          IIIF = {
+              'enabled': True,
+              'path': '/var/www/iipsrv/',
+              'url': 'http://localhost:8080/iiif/',
+              'version': 2,
+              'conversion': True,
+              'compression': 'jpeg'}
           EOF
           # production.py is recreated on every start
           sudo chown 33:33 testing.py

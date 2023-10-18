@@ -25,7 +25,7 @@ from openatlas.display.table import Table
 from openatlas.display.util import (
     button, convert_size, display_form, display_info, format_date,
     get_file_path, is_authorized, link, manual, required_group, sanitize,
-    send_mail, uc_first)
+    send_mail, uc_first, convert_image_to_iiif)
 from openatlas.forms.field import SubmitField
 from openatlas.forms.setting import (
     ApiForm, ContentForm, FilesForm, GeneralForm, LogForm, MailForm, MapForm,
@@ -616,7 +616,7 @@ def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
             entity.name,
             link(entity.standard_type),
             entity.get_file_size(),
-            entity.get_file_extension(),
+            entity.get_file_ext(),
             entity.description,
             date])
     return render_template(

@@ -4,6 +4,7 @@ import math
 import os
 import re
 import smtplib
+import subprocess
 from datetime import datetime, timedelta
 from email.header import Header
 from email.mime.text import MIMEText
@@ -65,8 +66,8 @@ def ext_references(links: list[Link]) -> str:
             f'{system.resolver_url}{link_.description}',
             external=True) if system.resolver_url else link_.description
         html += \
-            f' ({ g.types[link_.type.id].name } ' + _('at') + \
-            f' { link(link_.domain) })<br>'
+            f' ({g.types[link_.type.id].name} ' + _('at') + \
+            f' {link(link_.domain)})<br>'
     return html
 
 
@@ -127,17 +128,12 @@ def format_entity_date(
     return html + (f" ({comment})" if comment else '')
 
 
-def profile_image_table_link(
-        entity: Entity,
-        file: Entity,
-        extension: str) -> str:
+def profile_image_table_link(entity: Entity, file: Entity, ext: str) -> str:
     if file.id == entity.image_id:
         return link(
             _('unset'),
             url_for('file_remove_profile_image', entity_id=entity.id))
-    if extension in app.config['DISPLAY_FILE_EXTENSIONS'] or (
-            g.settings['image_processing']
-            and extension in app.config['ALLOWED_IMAGE_EXT']):
+    if ext in g.display_file_ext:
         return link(
             _('set'),
             url_for('set_profile_image', id_=file.id, origin_id=entity.id))
@@ -231,40 +227,45 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
 def profile_image(entity: Entity) -> str:
     if not entity.image_id:
         return ''
-    path = get_file_path(entity.image_id)
-    if not path:
+    if not (path := get_file_path(entity.image_id)):
         return ''  # pragma: no cover
-    resized = None
-    size = app.config['IMAGE_SIZE']['thumbnail']
-    if g.settings['image_processing'] and check_processed_image(path.name):
-        if path_ := get_file_path(entity.image_id, size):
-            resized = url_for('display_file', filename=path_.name, size=size)
-    url = url_for('display_file', filename=path.name)
-    src = resized or url
-    style = f'max-width:{g.settings["profile_image_width"]}px;'
-    ext = app.config["DISPLAY_FILE_EXTENSIONS"]
-    if resized:
-        style = f'max-width:{app.config["IMAGE_SIZE"]["thumbnail"]}px;'
-        ext = app.config["ALLOWED_IMAGE_EXT"]
+
+    src = url_for('display_file', filename=path.name)
+    url = src
+    width = g.settings["profile_image_width"]
+    if app.config['IIIF']['enabled'] and check_iiif_file_exist(entity.id):
+        url = url_for('view_iiif', id_=entity.id)
+        iiif_ext = '.tiff' if app.config['IIIF']['conversion'] \
+            else g.files[entity.id].suffix
+        src = \
+            f"{app.config['IIIF']['url']}{entity.id}{iiif_ext}" \
+            f"/full/!{width},{width}/0/default.jpg"
+    elif g.settings['image_processing'] and check_processed_image(path.name):
+        if path_ := get_file_path(
+                entity.image_id,
+                app.config['IMAGE_SIZE']['thumbnail']):
+            src = url_for(
+                'display_file',
+                size=app.config['IMAGE_SIZE']['thumbnail'],
+                filename=path_.name)
+    external = False
     if entity.class_.view == 'file':
-        html = \
-            '<p class="uc-first">' + _('no preview available') + '</p>'
-        if path.suffix.lower() in ext:
-            html = link(
-                f'<img style="{style}" alt="image" src="{src}">',
-                url,
-                external=True)
+        external = True
+        if path.suffix.lower() not in g.display_file_ext:
+            return '<p class="uc-first">' + _('no preview available') + '</p>'
     else:
-        html = link(
-            f'<img style="{style}" alt="image" src="{src}">',
-            url_for('view', id_=entity.image_id))
-    return f'{html}'
+        url = url_for('view', id_=entity.image_id)
+    html = link(
+        f'<img style="max-width:{width}px" alt="{entity.name}" src="{src}">',
+        url,
+        external=external)
+    return html
 
 
 @app.template_filter()
 def get_js_messages(lang: str) -> str:
     js_message_file = Path('static') / 'vendor' / 'jquery_validation_plugin' \
-        / f'messages_{lang}.js'
+                      / f'messages_{lang}.js'
     if not (Path(app.root_path) / js_message_file).is_file():
         return ''
     return f'<script src="/{js_message_file}"></script>'
@@ -313,7 +314,7 @@ def get_backup_file_data() -> dict[str, Any]:
     latest_file = None
     latest_file_date = None
     for file in [
-        f for f in path.iterdir()
+            f for f in path.iterdir()
             if (path / f).is_file() and f.name != '.gitignore']:
         file_date = datetime.utcfromtimestamp((path / file).stat().st_ctime)
         if not latest_file_date or file_date > latest_file_date:
@@ -339,7 +340,7 @@ def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
         data.append(entity.standard_type.name if entity.standard_type else '')
     if entity.class_.name == 'file':
         data.append(entity.get_file_size())
-        data.append(entity.get_file_extension())
+        data.append(entity.get_file_ext())
     if entity.class_.view in ['actor', 'artifact', 'event', 'place']:
         data.append(entity.first)
         data.append(entity.last)
@@ -426,11 +427,11 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
         warnings.append(
             f"Database version {app.config['DATABASE_VERSION']} is needed but "
             f"current version is {g.settings['database_version']}")
-    for path in app.config['WRITABLE_PATHS']:
-        if not os.access(path, os.W_OK):
-            warnings.append(
-                '<p class="uc-first">' + _('directory not writable') +
-                f" {str(path).replace(app.root_path, '')}</p>")
+    if app.config['IIIF']['enabled']:
+        if path := app.config['IIIF']['path']:
+            check_write_access(path, warnings)
+    for path in g.writable_paths:
+        check_write_access(path, warnings)
     if is_authorized('admin'):
         from openatlas.models.user import User
         user = User.get_by_username('OpenAtlas')
@@ -446,6 +447,14 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
     return \
         '<div class="alert alert-danger">' \
         f'{"<br>".join(warnings)}</div>' if warnings else ''
+
+
+def check_write_access(path: Path, warnings: list[str]) -> list[str]:
+    if not os.access(path, os.W_OK):
+        warnings.append(
+            '<p class="uc-first">' + _('directory not writable') +
+            f" {str(path).replace(app.root_path, '')}</p>")
+    return warnings
 
 
 @app.template_filter()
@@ -466,7 +475,7 @@ def get_file_path(
         return None
     ext = g.files[id_].suffix
     if size:
-        if ext in app.config['NONE_DISPLAY_EXT']:
+        if ext in app.config['PROCESSABLE_EXT']:
             ext = app.config['PROCESSED_EXT']  # pragma: no cover
         path = app.config['RESIZED_IMAGES'] / size / f"{id_}{ext}"
         return path if os.path.exists(path) else None
@@ -639,8 +648,9 @@ def manual(site: str) -> str:
         return ''
     return \
         '<a title="' + uc_first(_('manual')) + '" ' \
-        f'href="/static/manual/{site}.html" class="manual" target="_blank" ' \
-        'rel="noopener noreferrer"><i class="fas fs-4 fa-book"></i></a>'
+        f'href="/static/manual/{site}.html" class="manual" ' \
+        f'target="_blank" rel="noopener noreferrer">' \
+        f'<i class="fas fs-4 fa-book"></i></a>'
 
 
 @app.template_filter()
@@ -740,3 +750,37 @@ def get_entities_linked_to_type_recursive(
     for sub_id in g.types[id_].subs:
         get_entities_linked_to_type_recursive(sub_id, data)
     return data
+
+
+def check_iiif_activation() -> bool:
+    iiif = app.config['IIIF']
+    return bool(iiif['enabled'] and os.access(Path(iiif['path']), os.W_OK))
+
+
+def check_iiif_file_exist(id_: int) -> bool:
+    if app.config['IIIF']['conversion']:
+        return get_iiif_file_path(id_).is_file()
+    return bool(get_file_path(id_))
+
+
+def get_iiif_file_path(id_: int) -> Path:
+    ext = '.tiff' if app.config['IIIF']['conversion'] \
+        else g.files[id_].suffix
+    return Path(app.config['IIIF']['path']) / f'{id_}{ext}'
+
+
+def convert_image_to_iiif(id_: int) -> None:
+    compression = app.config['IIIF']['compression'] \
+        if app.config['IIIF']['compression'] in ['deflate', 'jpeg'] \
+        else 'deflate'
+    vips = "vips" if os.name == 'posix' else "vips.exe"
+    command = \
+        (f"{vips} tiffsave {get_file_path(id_)} {get_iiif_file_path(id_)} "
+         f"--tile --pyramid --compression {compression} "
+         f"--tile-width 128 --tile-height 128")
+    try:
+        process = subprocess.Popen(command, shell=True)
+        process.wait()
+        flash(_('IIIF converted'), 'info')
+    except Exception as e:  # pragma: no cover
+        flash(f"{_('failed to convert image')}: {e}", 'error')

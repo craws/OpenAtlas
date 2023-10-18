@@ -13,7 +13,7 @@ from openatlas.database.connect import close_connection, open_connection
 app: Flask = Flask(__name__, instance_relative_config=True)
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
 app.config.from_object('config.default')
-app.config.from_object('config.api_config')
+app.config.from_object('config.api')
 app.config.from_pyfile('production.py')
 app.config['WTF_CSRF_TIME_LIMIT'] = None  # Set CSRF token valid for session
 
@@ -69,10 +69,16 @@ def before_request() -> None:
     for file_ in app.config['UPLOAD_PATH'].iterdir():
         if file_.stem.isdigit():
             g.files[int(file_.stem)] = file_
-    # Set max file upload in MB
     app.config['MAX_CONTENT_LENGTH'] = \
-        g.settings['file_upload_max_size'] * 1024 * 1024
-
+        g.settings['file_upload_max_size'] * 1024 * 1024  # Max upload in MB
+    g.display_file_ext = app.config['DISPLAY_FILE_EXT']
+    if g.settings['image_processing']:
+        g.display_file_ext += app.config['PROCESSABLE_EXT']
+    g.writable_paths = [
+        app.config['EXPORT_PATH'],
+        app.config['RESIZED_IMAGES'],
+        app.config['UPLOAD_PATH'],
+        app.config['TMP_PATH']]
     if request.path.startswith('/api/'):
         ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
         if not current_user.is_authenticated \

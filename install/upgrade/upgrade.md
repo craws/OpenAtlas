@@ -19,6 +19,26 @@ then run the database upgrade script, then restart Apache:
     sudo python3 install/upgrade/database_upgrade.py
     sudo service apache2 restart
 
+### 7.16.x to 7.17.0
+
+#### Configuration
+
+The configuration was refactored, especially path parameters. You should
+compare the instance/production.py with config/default.py in case you made
+adaptions to these. The same goes for instance/tests.py in case you are also
+using tests.
+
+#### IIIF
+For the IIIF implementation new NPM packages are needed:
+
+    $ cd openatlas/static
+    $ rm package.json
+    $ pip3 install -e ./
+    $ ~/.local/bin/calmjs npm --install openatlas
+
+If you want to use IIIF, please read the
+[instructions](https://redmine.openatlas.eu/projects/uni/wiki/IIIF). 
+
 ### 7.16.0 to 7.16.1
 A code base update (e.g. with git pull) and a webserver restart is sufficient.
 

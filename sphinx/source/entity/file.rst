@@ -52,7 +52,7 @@ extensions and can be changed in the configuration file
 
 .. code-block:: python
 
-   DISPLAY_FILE_EXTENSIONS = ['.bmp', '.gif', '.ico', '.jpeg', '.jpg', '.png', '.svg']
+   DISPLAY_FILE_EXT = ['.bmp', '.gif', '.ico', '.jpeg', '.jpg', '.png', '.svg']
 
 Logo
 ----
