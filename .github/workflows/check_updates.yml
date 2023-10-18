@@ -23,7 +23,7 @@ jobs:
     steps:
       - name: check OpenAtlas container
         run: |
-          echo "${{ ! needs.check_for_updates.outputs.check_result == 'need to upgrade'}}"
+          echo "${{ needs.check_for_updates.outputs.check_result == 'need to upgrade'}}"
 
    # uses: ./.github/workflows/starter.yaml
    # secrets: inherit
