@@ -13,7 +13,7 @@ from openatlas.display.util import (
     bookmark_toggle, button, description, edit_link, format_date,
     format_entity_date, get_appearance, get_base_table_data, get_system_data,
     is_authorized, link, manual, profile_image_table_link, remove_link,
-    get_chart_data, check_iiif_file_exist)
+    get_chart_data)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link

@@ -803,7 +803,8 @@ class Api(ApiTestCase):
                         view_class='place',
                         search=
                             '{"typeName":[{"operator":"equal",'
-                            '"values":["Boundary Mark", "Height", "Dimension"],'
+                            '"values":'
+                            '["Boundary Mark", "Height", "Dimension"],'
                             '"logicalOperator":"and"}]}')),
                 self.app.get(
                     url_for(

@@ -78,7 +78,7 @@ def get_table(view: str) -> Table:
 
 def file_preview(entity_id: int) -> str:
     size = app.config['IMAGE_SIZE']['table']
-    param = f"loading='lazy' alt='image' max-width='100px' max-height='100px'"
+    param = "loading='lazy' alt='image' max-width='100px' max-height='100px'"
     if app.config['IIIF']['enabled'] and check_iiif_file_exist(entity_id):
         ext = '.tiff' if app.config['IIIF']['conversion'] \
             else g.files[entity_id].suffix

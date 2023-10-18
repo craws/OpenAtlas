@@ -25,7 +25,7 @@ from openatlas.display.table import Table
 from openatlas.display.util import (
     button, convert_size, display_form, display_info, format_date,
     get_file_path, is_authorized, link, manual, required_group, sanitize,
-    send_mail, uc_first, convert_image_to_iiif)
+    send_mail, uc_first)
 from openatlas.forms.field import SubmitField
 from openatlas.forms.setting import (
     ApiForm, ContentForm, FilesForm, GeneralForm, LogForm, MailForm, MapForm,
