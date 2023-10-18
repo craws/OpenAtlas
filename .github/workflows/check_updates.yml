@@ -16,6 +16,7 @@ jobs:
             -c 'apt-get update >/dev/null; if [ $(apt list --upgradable 2>/dev/null | wc -l) != 1 ]; then echo -n need to upgrade; else echo -n everything fine ; fi')"
           echo "$check_result"
           echo "check_result=$check_result" >> $GITHUB_OUTPUT
+          echo "what"
   call_delploy:
     needs: [check_for_updates]
     if: "!  needs.check_for_updates.outputs.check_result == 'need to upgrade'"
