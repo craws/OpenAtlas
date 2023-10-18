@@ -9,8 +9,11 @@ on:
 jobs:
   check_for_updates:
     runs-on: ubuntu-latest
+    outputs:
+      check_result: ${{ steps.check_openatlas_container.outputs.check_result }}
     steps:
       - name: check OpenAtlas container
+        id: check_openatlas_container
         run: |
           check_result="$(docker run --rm -u 0:0 --entrypoint /bin/bash ghcr.io/acdh-oeaw/openatlas/container-preview:${{ github.ref_name }} \
             -c 'apt-get update >/dev/null; if [ $(apt list --upgradable 2>/dev/null | wc -l) != 1 ]; then echo -n need to upgrade; else echo -n everything fine ; fi')"
