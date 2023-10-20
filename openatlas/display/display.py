@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING
 from flask import g, url_for
 from flask_babel import lazy_gettext as _
 
-from openatlas import app
 from openatlas.display.base_display import (
     ActorDisplay, BaseDisplay, EventsDisplay, PlaceBaseDisplay,
     ReferenceBaseDisplay, TypeBaseDisplay)
@@ -78,7 +77,7 @@ class FileDisplay(BaseDisplay):
             if check_iiif_activation() \
                     and self.entity.get_file_ext() in g.display_file_ext:
                 if check_iiif_file_exist(self.entity.id) \
-                        or not app.config['IIIF']['conversion']:
+                        or not g.settings['iiif_conversion']:
                     self.buttons.append(button(
                         _('view in IIIF'),
                         url_for('view_iiif', id_=self.entity.id)))

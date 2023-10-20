@@ -4,7 +4,6 @@ import requests
 from flask import jsonify, Response, url_for, g
 from flask_restful import Resource
 
-from openatlas import app
 from openatlas.api.resources.model_mapper import get_entity_by_id
 from openatlas.api.resources.util import get_license_name
 from openatlas.models.entity import Entity
@@ -128,9 +127,8 @@ class IIIFManifest(Resource):
 
 
 def get_metadata(entity: Entity) -> dict[str, Any]:
-    ext = '.tiff' if app.config['IIIF']['conversion'] \
-        else entity.get_file_ext()
-    image_url = f"{app.config['IIIF']['url']}{entity.id}{ext}"
+    ext = '.tiff' if g.settings['iiif_conversion'] else entity.get_file_ext()
+    image_url = f"{g.settings['iiif_url']}{entity.id}{ext}"
     req = requests.get(f"{image_url}/info.json")
     image_api = req.json()
     return {'entity': entity, 'img_url': image_url, 'img_api': image_api}
