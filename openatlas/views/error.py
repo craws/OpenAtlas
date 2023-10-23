@@ -33,7 +33,11 @@ def forbidden(e: Exception) -> tuple[str, int]:
 def page_not_found(e: Exception) -> tuple[Any, int]:
     if request.path.startswith('/api/'):
         return jsonify({
-            'message': 'Endpoint not found',
+            'title': 'Endpoint not found',
+            'message':
+                'The requestes endpoint does not exist. '
+                'Please consult the manual or the Swagger documentation: '
+                f'{request.url_root }swagger',
             'url': request.url,
             'timestamp': datetime.datetime.now(),
             'status': 404}), 404
@@ -65,6 +69,7 @@ def access_denied(_e: Exception) -> tuple[Any, int]:
         'title': 'Access denied',
         'message': 'You do not have access to the API. '
                    'Please ask the data provider for permission.',
+        'url': request.url,
         'timestamp': datetime.datetime.now(),
         'status': 403}), 403
 
@@ -74,6 +79,7 @@ def file_not_found(_e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'File not found',
         'message': 'No file was found for the requested ID.',
+        'url': request.url,
         'timestamp': datetime.datetime.now(),
         'status': 404}), 404
 
@@ -83,6 +89,7 @@ def entity_does_not_exist(_e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'Entity does not exist',
         'message': 'The requested entity does not exist in the database.',
+        'url': request.url,
         'timestamp': datetime.datetime.now(),
         'status': 404}), 404
 
@@ -94,6 +101,7 @@ def invalid_cidoc_class_code(_e: Exception) -> tuple[Any, int]:
         'message':
             'The CIDOC class value is invalid, use "all" or '
             + str(list(g.cidoc_classes)),
+        'url': request.url,
         'timestamp': datetime.datetime.now(),
         'status': 400}), 400
 
@@ -104,6 +112,7 @@ def invalid_limit(_e: Exception) -> tuple[Any, int]:
         'title': 'Invalid limit value',
         'message':
             'Only integers between 1 and 100 are allowed for the limit.',
+        'url': request.url,
         'timestamp': datetime.datetime.now(),
         'status': 400}), 400
 
@@ -115,6 +124,7 @@ def invalid_search_syntax(_e: Exception) -> tuple[Any, int]:
         'message':
             'The search request contains major errors. '
             'Please confer the manual.',
+        'url': request.url,
         'timestamp': datetime.datetime.now(),
         'status': 400}), 400
 
@@ -126,6 +136,7 @@ def invalid_system_class(_e: Exception) -> tuple[Any, int]:
         'message':
             'The system_classes value is invalid, use "all" or '
             + str(list(g.classes)),
+        'url': request.url,
         'timestamp': datetime.datetime.now(),
         'status': 400}), 400
 
@@ -137,6 +148,7 @@ def invalid_view_class(_e: Exception) -> tuple[Any, int]:
         'message':
             'The view_classes value is invalid, use "all" or '
             + str(list(g.view_class_mapping)),
+        'url': request.url,
         'timestamp': datetime.datetime.now(),
         'status': 400}), 400
 
@@ -147,6 +159,7 @@ def last_entity_error(_e: Exception) -> tuple[Any, int]:
         'title': 'ID is last entity',
         'message':
             'The requested ID is the last entity, please choose another ID.',
+        'url': request.url,
         'timestamp': datetime.datetime.now(),
         'status': 400}), 400
 
@@ -158,6 +171,7 @@ def invalid_logical_operator(_e: Exception) -> tuple[Any, int]:
         'message':
             'The logical operator is invalid. Please use: '
             f'{app.config["LOGICAL_OPERATOR"]}',
+        'url': request.url,
         'timestamp': datetime.datetime.now(),
         'status': 400}), 400
 
@@ -167,6 +181,7 @@ def no_entity_available(_e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'No entity available',
         'message': 'No entity exist for this request.',
+        'url': request.url,
         'timestamp': datetime.datetime.now(),
         'status': 404}), 404
 
@@ -177,6 +192,7 @@ def no_license(_e: Exception) -> tuple[Any, int]:
         'title': 'No license',
         'message':
             'The requested file has no license and cannot be displayed.',
+        'url': request.url,
         'timestamp': datetime.datetime.now(),
         'status': 409}), 409
 
@@ -186,6 +202,7 @@ def no_search_string(_e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'No search values',
         'message': 'Search values are empty.',
+        'url': request.url,
         'timestamp': datetime.datetime.now(),
         'status': 400}), 400
 
@@ -195,6 +212,7 @@ def not_a_type(_e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'Entity is not a type',
         'message': 'Requested ID either does not exist or is not a Type.',
+        'url': request.url,
         'timestamp': datetime.datetime.now(),
         'status': 400}), 400
 
@@ -204,6 +222,7 @@ def not_a_place(_e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'ID is not a valid place',
         'message': 'This endpoint requires a valid ID of a place entity.',
+        'url': request.url,
         'timestamp': datetime.datetime.now(),
         'status': 400}), 400
 
@@ -215,6 +234,7 @@ def invalid_operator(_e: Exception) -> tuple[Any, int]:
         'message':
             'The compare operator is invalid. '
             f'Please use: {app.config["COMPARE_OPERATORS"]}',
+        'url': request.url,
         'timestamp': datetime.datetime.now(),
         'status': 400}), 400
 
@@ -227,6 +247,7 @@ def empty_query(_e: Exception) -> tuple[Any, int]:
             'The /query endpoint requires at least one of the following '
             'parameters: entities, cidoc_classes, view_classes, '
             'system_classes.',
+        'url': request.url,
         'timestamp': datetime.datetime.now(),
         'status': 400}), 400
 
@@ -238,6 +259,7 @@ def invalid_search_category(_e: Exception) -> tuple[Any, int]:
         'message':
             'The search category is invalid. Please use: '
             f'{app.config["VALID_CATEGORIES"]}',
+        'url': request.url,
         'timestamp': datetime.datetime.now(),
         'status': 400}), 400
 
@@ -248,6 +270,7 @@ def one_id_is_not_a_type(_e: Exception) -> tuple[Any, int]:
         'title': 'One entity ID is not a type',
         'message':
             'One of the requested ID either does not exist or is not a Type.',
+        'url': request.url,
         'timestamp': datetime.datetime.now(),
         'status': 400}), 400
 
@@ -258,5 +281,6 @@ def value_not_an_integer(_e: Exception) -> tuple[Any, int]:
         'title': 'Invalid search value',
         'message':
             'The search values need to be an integer for the chosen category.',
+        'url': request.url,
         'timestamp': datetime.datetime.now(),
         'status': 400}), 400
