@@ -86,6 +86,9 @@ class Api(ApiTestCase):
 
             rv = self.app.get(url_for('api_03.backend_detail')).get_json()
             assert bool(rv['version'] == app.config['VERSION'])
+            rv = self.app.get(
+                url_for('api_03.backend_detail', download=True)).get_json()
+            assert bool(rv['version'] == app.config['VERSION'])
 
             rv = self.app.get(url_for('api_03.system_class_count')).get_json()
             assert bool(rv['person'])
