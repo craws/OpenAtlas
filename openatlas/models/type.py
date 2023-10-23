@@ -117,7 +117,7 @@ class Type(Entity):
                 Db.remove_entity_type(self.id, delete_ids)
 
     @staticmethod
-    def get_all() -> dict[int, Type]:
+    def get_all(with_count: bool = False) -> dict[int, Type]:
         types = {}
         for row in \
                 Db.get_types('type', 'P127') + \
