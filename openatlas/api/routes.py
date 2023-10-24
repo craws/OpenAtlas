@@ -3,7 +3,7 @@ from flask_restful import Api
 from openatlas.api.endpoints.iiif import \
     (IIIFManifest, IIIFImageV2, IIIFCanvasV2, IIIFSequenceV2)
 from openatlas.api.endpoints.content import ClassMapping, \
-    GetContent, SystemClassCount
+    GetContent, SystemClassCount, GetBackendDetails
 from openatlas.api.endpoints.special import GetGeometricEntities, \
     ExportDatabase, GetSubunits
 from openatlas.api.endpoints.display_image import \
@@ -74,6 +74,10 @@ def add_routes_v03(api: Api) -> None:
         GetContent,
         '/content/',
         endpoint="content")
+    api.add_resource(
+        GetBackendDetails,
+        '/backend_details/',
+        endpoint="backend_details")
     api.add_resource(
         ClassMapping,
         '/classes/',

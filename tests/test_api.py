@@ -84,6 +84,12 @@ class Api(ApiTestCase):
             rv = self.app.get(url_for('api_03.content')).get_json()
             assert bool(rv['intro'] == 'This is English')
 
+            rv = self.app.get(url_for('api_03.backend_details')).get_json()
+            assert bool(rv['version'] == app.config['VERSION'])
+            rv = self.app.get(
+                url_for('api_03.backend_details', download=True)).get_json()
+            assert bool(rv['version'] == app.config['VERSION'])
+
             rv = self.app.get(url_for('api_03.system_class_count')).get_json()
             assert bool(rv['person'])
 
@@ -411,7 +417,7 @@ class Api(ApiTestCase):
                 self.app.get(url_for('api_03.type_by_view_class')),
                 self.app.get(
                     url_for('api_03.type_by_view_class', download=True))]:
-                rv = rv.get_json()['place'][0]['children'][0]
+                rv = rv.get_json()['place'][2]['children'][0]
             assert bool(rv['label'] == 'Boundary Mark')
 
             for rv in [

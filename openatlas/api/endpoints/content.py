@@ -5,10 +5,11 @@ from flask_restful import Resource, marshal
 
 from openatlas import app
 from openatlas.api.resources.model_mapper import get_overview_counts
-from openatlas.api.resources.parser import language
+from openatlas.api.resources.parser import language, default
 from openatlas.api.resources.resolve_endpoints import download
 from openatlas.api.resources.templates import (
-    class_overview_template, content_template, overview_template)
+    class_overview_template, content_template, overview_template,
+    backend_details_template)
 from openatlas.models.content import get_translation
 
 
@@ -26,6 +27,28 @@ class GetContent(Resource):
         if parser['download']:
             download(content, content_template(), 'content')
         return marshal(content, content_template()), 200
+
+
+class GetBackendDetails(Resource):
+    @staticmethod
+    def get() -> Union[tuple[Resource, int], Response]:
+        parser = default.parse_args()
+        details = {
+            'version': app.config['VERSION'],
+            'apiVersions': app.config['API_VERSIONS'],
+            'siteName': g.settings['site_name'],
+            'imageProcessing': {
+                'enabled': g.settings['image_processing'],
+                'availableImageSizes':
+                    app.config['IMAGE_SIZE']
+                    if g.settings['image_processing'] else None},
+            'IIIF': {
+                'enabled': app.config['IIIF']['enabled'],
+                'url': app.config['IIIF']['url'],
+                'version': app.config['IIIF']['version']}}
+        if parser['download']:
+            download(details, backend_details_template(), 'content')
+        return marshal(details, backend_details_template()), 200
 
 
 class ClassMapping(Resource):

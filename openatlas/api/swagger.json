@@ -850,6 +850,35 @@
         }
       }
     },
+    "/backend_details/": {
+      "get": {
+        "tags": [
+          "Administrative Endpoints"
+        ],
+        "description": "Retrieves a list of information of the backend configuration.",
+        "operationId": "GetBackendDetails",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/download"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OpenAtlas backend details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackendDetailsModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
     "/system_class_count/": {
       "get": {
         "tags": [
@@ -2351,6 +2380,53 @@
                 "type": "string"
               },
               "table": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "BackendDetailsModel": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "string"
+          },
+          "apiVersions": {
+            "type": "string"
+          },
+          "siteName": {
+            "type": "string"
+          },
+          "imageProcessing": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "string"
+              },
+              "availableImageSizes": {
+                "type": "object",
+                "properties": {
+                  "thumbnail": {
+                    "type": "string"
+                  },
+                  "table": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "IIIF": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "version": {
                 "type": "string"
               }
             }

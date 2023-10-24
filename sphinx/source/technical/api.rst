@@ -161,8 +161,9 @@ Example:
 .. code-block::
 
   {
-      "title": "entity does not exist",
-       "message": "Requested entity does not exist. Try another ID"
+       "title": "entity does not exist",
+       "message": "Requested entity does not exist. Try another ID",
+       "url": "https://demo.openatlas.eu/api/entity/9999/,
        "timestamp": "Tue, 19 Jul 2022 13:59:13 GMT",
        "status": 404
    }
