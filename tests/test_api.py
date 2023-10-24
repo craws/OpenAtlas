@@ -427,8 +427,6 @@ class Api(ApiTestCase):
                     url_for('api_03.type_by_view_class', download=True))]:
                 found = False
                 for item in rv.get_json()['place']:
-                    if found:
-                        break
                     if item['name'] == 'Place':
                         for children in item['children']:
                             if children['label'] == 'Boundary Mark':
@@ -437,8 +435,8 @@ class Api(ApiTestCase):
                 assert found
 
             for rv in [
-                self.app.get(url_for('api_03.type_tree')),
-                self.app.get(url_for('api_03.type_tree', download=True))]:
+                    self.app.get(url_for('api_03.type_tree')),
+                    self.app.get(url_for('api_03.type_tree', download=True))]:
                 assert bool(rv.get_json()['typeTree'])
             rv = self.app.get(url_for('api_03.type_tree', count=True))
             assert rv.get_json() > 0
