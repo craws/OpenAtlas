@@ -408,22 +408,20 @@ class Api(ApiTestCase):
             # ---Type Endpoints---
             for rv in [
                 self.app.get(url_for('api_03.type_overview')),
-                self.app.get(
-                    url_for('api_03.type_overview', download=True))]:
+                self.app.get(url_for('api_03.type_overview', download=True))]:
                 rv = rv.get_json()['place'][0]['children'][0]
             assert bool(rv['label'] == 'Austria')
 
             for rv in [
                 self.app.get(url_for('api_03.type_by_view_class')),
                 self.app.get(
-                    url_for('api_03.type_by_view_class', download=True))]:
+                url_for('api_03.type_by_view_class', download=True))]:
                 rv = rv.get_json()['place'][2]['children'][0]
             assert bool(rv['label'] == 'Boundary Mark')
 
             for rv in [
                 self.app.get(url_for('api_03.type_tree')),
-                self.app.get(
-                    url_for('api_03.type_tree', download=True))]:
+                self.app.get(url_for('api_03.type_tree', download=True))]:
                 assert bool(rv.get_json()['typeTree'])
             rv = self.app.get(url_for('api_03.type_tree', count=True))
             assert rv.get_json() > 0

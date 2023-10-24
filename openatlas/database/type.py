@@ -6,9 +6,8 @@ from flask import g
 class Type:
 
     @staticmethod
-    def get_types() -> list[dict[str, Any]]:
-        g.cursor.execute(
-            """
+    def get_types(with_count: bool) -> list[dict[str, Any]]:
+        sql = f"""
             SELECT
                 e.id,
                 e.name,
@@ -18,8 +17,9 @@ class Type:
                 e.created,
                 e.modified,
                 es.id AS super_id,
-                COUNT(l2.id) AS count,
-                COUNT(l3.id) AS count_property,
+                {'COUNT(l2.id)' if with_count else '0'} AS count,
+                {'COUNT(l3.id)' if with_count else '0'} AS count_property,
+
                 COALESCE(to_char(e.begin_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
                     AS begin_from,
                 COALESCE(to_char(e.begin_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
@@ -36,17 +36,21 @@ class Type:
             LEFT JOIN model.link l ON e.id = l.domain_id
                 AND l.property_code IN ('P127', 'P89')
             LEFT JOIN model.entity es ON l.range_id = es.id
-
-            -- Get count
-            LEFT JOIN model.link l2 ON e.id = l2.range_id
-                AND l2.property_code IN ('P2', 'P89')
-            LEFT JOIN model.link l3 ON e.id = l3.type_id
-
+            """
+        if with_count:
+            sql += """
+                -- Get count
+                LEFT JOIN model.link l2 ON e.id = l2.range_id
+                    AND l2.property_code IN ('P2', 'P89')
+                LEFT JOIN model.link l3 ON e.id = l3.type_id
+                """
+        sql += """
             WHERE e.openatlas_class_name
                 IN ('administrative_unit', 'type', 'type_tools')
             GROUP BY e.id, es.id
             ORDER BY e.name;
-            """)
+            """
+        g.cursor.execute(sql)
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
