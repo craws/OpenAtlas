@@ -408,16 +408,33 @@ class Api(ApiTestCase):
             # ---Type Endpoints---
             for rv in [
                 self.app.get(url_for('api_03.type_overview')),
-                self.app.get(url_for('api_03.type_overview', download=True))]:
-                rv = rv.get_json()['place'][0]['children'][0]
-            assert bool(rv['label'] == 'Austria')
+                self.app.get(
+                    url_for('api_03.type_overview', download=True))]:
+                found = False
+                for item in rv.get_json()['place']:
+                    if found:
+                        break
+                    if item['name'] == 'Administrative unit':
+                        for children in item['children']:
+                            if children['label'] == 'Austria':
+                                found = True
+                                break
+                assert found
 
             for rv in [
                 self.app.get(url_for('api_03.type_by_view_class')),
                 self.app.get(
-                url_for('api_03.type_by_view_class', download=True))]:
-                rv = rv.get_json()['place'][2]['children'][0]
-            assert bool(rv['label'] == 'Boundary Mark')
+                    url_for('api_03.type_by_view_class', download=True))]:
+                found = False
+                for item in rv.get_json()['place']:
+                    if found:
+                        break
+                    if item['name'] == 'Place':
+                        for children in item['children']:
+                            if children['label'] == 'Boundary Mark':
+                                found = True
+                                break
+                assert found
 
             for rv in [
                 self.app.get(url_for('api_03.type_tree')),
@@ -802,45 +819,6 @@ class Api(ApiTestCase):
                     download=True,
                     last=place.id))
             assert 'ID is last entity' in rv.get_json()['title']
-
-            # for rv in [
-            #     self.app.get(url_for('api_03.query', entities=12345)),
-            #     self.app.get(
-            #         url_for(
-            #             'api_03.cidoc_class',
-            #             cidoc_class='E68',
-            #             last=1231)),
-            #     self.app.get(
-            #         url_for(
-            #             'api_03.view_class',
-            #             view_class='place',
-            #             search=
-            #                 '{"typeName":[{"operator":"equal",'
-            #                 '"values":'
-            #                 '["Boundary Mark", "Height", "Dimension"],'
-            #                 '"logicalOperator":"and"}]}')),
-            #     self.app.get(
-            #         url_for(
-            #             'api_03.view_class',
-            #             view_class='place',
-            #             search=
-            #                 '{"beginFrom":[{"operator":"lesserThan",'
-            #                 '"values":["2000-1-1"],'
-            #                 '"logicalOperator":"or"}]}')),
-            #     self.app.get(
-            #         url_for(
-            #             'api_03.query',
-            #             entities=place.id,
-            #             cidoc_classes='E18',
-            #             view_classes='artifact',
-            #             system_classes='person',
-            #             format='lp',
-            #             search=
-            #                 '{"entityDescription":[{"operator":"like",'
-            #                 '"values":["IS", "sam", "FrOdo"],'
-            #                 '"logicalOperator":"and"}]}'))]:
-            #     rv = rv.get_json()
-            #     assert 'No entity available' in rv['title']
 
             rv = self.app.get(
                 url_for(
