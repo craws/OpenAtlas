@@ -77,7 +77,7 @@ def add_routes_v03(api: Api) -> None:
     api.add_resource(
         GetBackendDetails,
         '/backend_details/',
-        endpoint="backend_detail")
+        endpoint="backend_details")
     api.add_resource(
         ClassMapping,
         '/classes/',

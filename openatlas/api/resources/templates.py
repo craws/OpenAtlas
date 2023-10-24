@@ -311,7 +311,7 @@ def content_template() -> dict[str, Type[String]]:
 def backend_details_template() -> dict[str, Type[String]]:
     image_processing = {
         'enabled': fields.String,
-        'availableImageSizes': fields.String}
+        'availableImageSizes': fields.Raw}
     iiif = {
         'enabled': fields.String,
         'url': fields.String,
