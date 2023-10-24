@@ -60,16 +60,7 @@ def before_request() -> None:
     g.cidoc_classes = CidocClass.get_all(session['language'])
     g.properties = CidocProperty.get_all(session['language'])
     g.classes = OpenatlasClass.get_all()
-
-    from time import perf_counter
-    start_time = perf_counter()
-
     g.types = Type.get_all()
-
-    end_time = perf_counter()
-    elapsed_time = end_time - start_time
-    print(f"Elapsed time: {elapsed_time} seconds")
-
     g.reference_systems = ReferenceSystem.get_all()
     g.view_class_mapping = view_class_mapping
     g.class_view_mapping = OpenatlasClass.get_class_view_mapping()

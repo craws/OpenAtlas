@@ -6,7 +6,7 @@ from flask import g
 class Type:
 
     @staticmethod
-    def get_types(class_: str, property_: str) -> list[dict[str, Any]]:
+    def get_types() -> list[dict[str, Any]]:
         g.cursor.execute(
             """
             SELECT
@@ -34,7 +34,7 @@ class Type:
 
             -- Get super
             LEFT JOIN model.link l ON e.id = l.domain_id
-                AND l.property_code = %(property_code)s
+                AND l.property_code IN ('P127', 'P89')
             LEFT JOIN model.entity es ON l.range_id = es.id
 
             -- Get count
@@ -42,11 +42,11 @@ class Type:
                 AND l2.property_code IN ('P2', 'P89')
             LEFT JOIN model.link l3 ON e.id = l3.type_id
 
-            WHERE e.openatlas_class_name = %(class)s
+            WHERE e.openatlas_class_name
+                IN ('administrative_unit', 'type', 'type_tools')
             GROUP BY e.id, es.id
             ORDER BY e.name;
-            """,
-            {'class': class_, 'property_code': property_})
+            """)
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
