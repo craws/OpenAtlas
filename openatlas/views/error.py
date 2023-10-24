@@ -10,7 +10,7 @@ from openatlas.api.resources.error import \
      InvalidSystemClassError, InvalidViewClassError, InvalidLimitError,
      InvalidSearchSyntax, ValueNotIntegerError, NoSearchStringError,
      NotAPlaceError, QueryEmptyError, NotATypeError, TypeIDError,
-     LastEntityError, NoEntityAvailable, DisplayFileNotFoundError)
+     LastEntityError, DisplayFileNotFoundError)
 
 
 @app.errorhandler(400)
@@ -174,16 +174,6 @@ def invalid_logical_operator(_e: Exception) -> tuple[Any, int]:
         'url': request.url,
         'timestamp': datetime.datetime.now(),
         'status': 400}), 400
-
-
-@app.errorhandler(NoEntityAvailable)
-def no_entity_available(_e: Exception) -> tuple[Any, int]:
-    return jsonify({
-        'title': 'No entity available',
-        'message': 'No entity exist for this request.',
-        'url': request.url,
-        'timestamp': datetime.datetime.now(),
-        'status': 404}), 404
 
 
 @app.errorhandler(NoLicenseError)
