@@ -11,10 +11,8 @@ Interface (`API <https://en.wikipedia.org/wiki/API>`_). The API is
 `RESTlike <https://restfulapi.net/rest-architectural-constraints/>`_
 to provide easy access to the data.
 
-* To try out the API first hand, visit https://demo.openatlas.eu/swagger
-* For developers a complete
-  `Swagger documentation <https://app.swaggerhub.com/apis/ctot-nondef/OpenAtlas/>`_
-  is provided.
+To try out the API first hand, visit https://demo.openatlas.eu/swagger
+
 
 Quick Start Guide
 =================
