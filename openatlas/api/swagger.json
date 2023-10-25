@@ -59,15 +59,15 @@
   "tags": [
     {
       "name": "Entity Endpoint",
-      "description": "Endpoint provide information about one entity in the OpenAtlas instance. The requested information is provided in Linked Places format (LPF). Alternatively, GeoJSON or RDFs, derived from the LPF data, can be accessed."
+      "description": "Endpoint provide information about one entity in the OpenAtlas instance. The requested information is provided in Linked Places format (LPF). Alternatively, Linked Open Art, GeoJSON or RDFs, derived from the LPF data, can be accessed."
     },
     {
       "name": "Entity Query Endpoint",
-      "description": "Endpoint provide information about one entity in the OpenAtlas instance. The requested information is provided in Linked Places format (LPF). Alternatively, GeoJSON or RDFs, derived from the LPF data, can be accessed. Combine several or all entities endpoints in one query."
+      "description": "Endpoint provide information about one entity in the OpenAtlas instance. The requested information is provided in Linked Places format (LPF). Alternatively, Linked Open Art, GeoJSON or RDFs, derived from the LPF data, can be accessed. Combine several or all entities endpoints in one query."
     },
     {
       "name": "Entities Endpoint",
-      "description": "Endpoints provide information about entities in the OpenAtlas instance. The requested information is provided in Linked Places format (LPF). Alternatively, GeoJSON or RDFs, derived from the LPF data, can be accessed."
+      "description": "Endpoints provide information about entities in the OpenAtlas instance. The requested information is provided in Linked Places format (LPF). Alternatively, Linked Open Art, GeoJSON or RDFs, derived from the LPF data, can be accessed."
     },
     {
       "name": "Type Endpoints",
