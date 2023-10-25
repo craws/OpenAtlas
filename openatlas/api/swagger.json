@@ -1,5 +1,5 @@
 {
-  "openapi": "3.0.3",
+  "openapi": "3.1.0",
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
@@ -1151,14 +1151,13 @@
             "actor",
             "artifact",
             "event",
+            "file",
             "place",
             "reference",
+            "reference_system",
             "source",
-            "artifact",
-            "type",
-            "file",
             "source_translation",
-            "reference_system"
+            "type"
           ]
         },
         "example": "actor"
@@ -1226,7 +1225,7 @@
             "en",
             "de"
           ],
-          "example": "de"
+          "examples": ["de"]
         }
       },
       "show": {
@@ -1504,14 +1503,13 @@
               "actor",
               "artifact",
               "event",
+              "file",
               "place",
               "reference",
+              "reference_system",
               "source",
-              "artifact",
-              "type",
-              "file",
               "source_translation",
-              "reference_system"
+              "type"
             ]
           }
         },
@@ -2927,14 +2925,14 @@
                 },
                 "references": {
                   "type": "array",
-                  "required": [
-                    "id",
-                    "abbreviation",
-                    "title",
-                    "pages"
-                  ],
                   "items": {
                     "type": "object",
+                    "required": [
+                      "id",
+                      "abbreviation",
+                      "title",
+                      "pages"
+                    ],
                     "properties": {
                       "id": {
                         "type": "integer",
@@ -3137,15 +3135,18 @@
       "LicensedFileOverviewModel": {
         "type": "object",
         "required": [
-          "display",
-          "thumbnail",
-          "extension",
-          "license",
-          "IIIFManifest"
+          "id"
         ],
         "properties": {
           "id": {
             "type": "object",
+            "required": [
+              "display",
+              "thumbnail",
+              "extension",
+              "license",
+              "IIIFManifest"
+            ],
             "properties": {
               "display": {
                 "type": "string"
