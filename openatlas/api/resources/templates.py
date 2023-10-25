@@ -329,7 +329,8 @@ def licensed_file_template(entities: list[Entity]) -> dict[str, Any]:
         'display': fields.String,
         'thumbnail': fields.String,
         'extension': fields.String,
-        'license': fields.String}
+        'license': fields.String,
+        'IIIFManifest': fields.String}
 
     dict_: dict[str, Any] = defaultdict()
     for entity in entities:

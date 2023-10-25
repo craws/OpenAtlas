@@ -3140,7 +3140,8 @@
           "display",
           "thumbnail",
           "extension",
-          "license"
+          "license",
+          "IIIFManifest"
         ],
         "properties": {
           "id": {
@@ -3156,6 +3157,9 @@
                 "type": "string"
               },
               "license": {
+                "type": "string"
+              },
+              "IIIFManifest": {
                 "type": "string"
               }
             }
