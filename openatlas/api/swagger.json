@@ -1,9 +1,9 @@
 {
-  "openapi": "3.0.2",
+  "openapi": "3.0.3",
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.1",
+    "version": "0.5.0",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -53,8 +53,8 @@
     }
   ],
   "externalDocs": {
-    "description": "OpenAtlas Manual",
-    "url": "https://manual.openatlas.eu/"
+    "description": "OpenAtlas API Manual",
+    "url": "https://manual.openatlas.eu/technical/api.html"
   },
   "tags": [
     {
@@ -1286,15 +1286,61 @@
       },
       "search": {
         "name": "search",
-        "description": "Search query for specific results.",
+        "description": "Search query for specific results. For a better overview visit: `https://manual.openatlas.eu/technical/api_parameters_03.html#id27`\n\n **Filterable categories**\n\n entityName, entityDescription, entityAliases, entityCidocClass, entitySystemClass, entityID, typeID, valueTypeID, typeIDWithSubs, typeName, beginFrom, beginTo, endFrom, endTo, relationToID\n\n **Values** \n\n Values has to be a list of items. The items can be either a string, an integer or a tuple (see Note). Strings need to be marked with “” or ‘’, while integers doesn’t allow this.\\n *Note*: the category valueTypeID can search for values of a type ID. But it takes one or more two valued Tuple as list entry: (x,y). x is the type id and y is the searched value. This can be an int or a float, e.g: `{\"operator\":\"lesserThan\",\"values\":[(3142,543.3)],\"logicalOperator\":\"and\"}`\n\n **Compare operators** \n\n equal, notEqual, like (1), greaterThan (2), greaterThanEqual (2), lesserThan (2)\n\nThe compare operators work like the mathematical operators. equal x=y, notEqual x!=y, greaterThan x>y , greaterThanEqual x>=y, lesserThan x<y, lesserThanEqual x<=y. The like operator searches for occurrence of the string, so a match can also occur in the middle of a word.\n\n(1)Only for string based categories\n\n(2)Only for beginFrom, beginTo, endFrom, endTo, valueTypeID\n\n**Logical operators**\n\nNot mandatory, OR is the default value. Logical operators handles, if the values are treated as OR or AND.",
         "in": "query",
+        "style": "deepObject",
+        "allowReserved": true,
+        "explode": true,
         "schema": {
-          "type": "array",
-          "items": {
-            "type": "string"
+          "type": "object",
+          "properties": {
+            "entityName": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "entityDescription": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "entityAliases": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "entityCidocClass": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "entitySystemClass": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "entityID": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "typeID": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "valueTypeID": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "typeIDWithSubs": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "typeName": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "beginFrom": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "beginTo": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "endFrom": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "endTo": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "relationToID": {
+              "$ref": "#/components/schemas/searchCriteria"
+            }
           }
-        },
-        "explode": true
+        }
       },
       "limit": {
         "name": "limit",
@@ -3045,6 +3091,45 @@
                   }
                 }
               }
+            }
+          }
+        }
+      },
+      "searchCriteria": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "operator": {
+              "enum": [
+                "equal",
+                "notEqual",
+                "like",
+                "greaterThan",
+                "greaterThanEqual",
+                "lesserThan",
+                "lesserThanEqual"
+              ]
+            },
+            "values": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ]
+              }
+            },
+            "logicalOperator": {
+              "enum": [
+                "OR",
+                "AND"
+              ],
+              "default": "AND"
             }
           }
         }

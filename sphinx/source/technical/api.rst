@@ -7,11 +7,17 @@ Introduction
 ============
 
 This page provides an overview of the OpenAtlas Application Programming
-Interface (`API <https://en.wikipedia.org/wiki/API>`_). The API is
-`RESTlike <https://restfulapi.net/rest-architectural-constraints/>`_
-to provide easy access to the data.
+Interface (`API <https://en.wikipedia.org/wiki/API>`_). An API allows easy
+and controlled access from external sources (e.g. presentation sites or
+analytical tools) to your data. It is human and mashine readable and
+provides different approaches to query your data.
 
-To try out the API first hand, visit https://demo.openatlas.eu/swagger
+The OpenAtlas API tries to follow the
+`RESTful <https://restfulapi.net/rest-architectural-constraints/>`_ constraints.
+
+To try out the API first hand at our demo site: https://demo.openatlas.eu/swagger.
+If you have your own OpenAtlas instance just visit <your-domain.eu>/swagger. Be aware
+that the :doc:`/admin/api` has to be set to public at the admin section.
 
 
 Quick Start Guide
