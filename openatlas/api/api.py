@@ -16,6 +16,12 @@ app.config['SWAGGER'] = {
             "name": "Apache 2.0",
             "url": "https://www.apache.org/licenses/LICENSE-2.0.html"},
         "route": '/swagger/03',
+        "rule_filter": lambda rule: rule.endpoint.startswith('api_03')},{
+        "endpoint": '04',
+        "license": {
+            "name": "Apache 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"},
+        "route": '/swagger/04',
         "rule_filter": lambda rule: rule.endpoint.startswith('api_03')}],
     "specs_route": "/swagger/"}
 
