@@ -5,7 +5,6 @@ changes happen. You still should read the upgrade notes about important
 information.
 
 **Limitations using the database update script**
-
 * You should only do this within the official **main** branch of OpenAtlas.
 * If the database owner is not called "openatlas" (default) you will have to
   update the SQL files accordingly before.
@@ -20,13 +19,13 @@ then run the database upgrade script, then restart Apache:
     sudo service apache2 restart
 
 ### 7.16.x to 7.17.0
+7.17.0.sql is needed but will be taken care of by the database upgrade script.
 
 #### Configuration
-
 The configuration was refactored, especially path parameters. You should
-compare the instance/production.py with config/default.py in case you made
-adaptions to these. The same goes for instance/tests.py in case you are also
-using tests.
+compare your **instance/production.py** with **config/default.py** in case you
+made adaptions to these. The same goes for **instance/tests.py** in case you
+are also using tests.
 
 #### IIIF
 For the IIIF implementation new NPM packages are needed:
@@ -37,10 +36,7 @@ For the IIIF implementation new NPM packages are needed:
     $ ~/.local/bin/calmjs npm --install openatlas
 
 If you want to use IIIF, please read the
-[instructions](https://redmine.openatlas.eu/projects/uni/wiki/IIIF). 
-
-### 7.16.0 to 7.16.1
-A code base update (e.g. with git pull) and a webserver restart is sufficient.
+[instructions](https://redmine.openatlas.eu/projects/uni/wiki/IIIF).
 
 ### 7.15.0 to 7.16.0
 7.16.0.sql is needed but will be taken care of by the database upgrade script.

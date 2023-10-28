@@ -2,7 +2,7 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (
     BooleanField, IntegerField, SelectField, StringField, FieldList)
-from wtforms.validators import Email, InputRequired, Optional, URL
+from wtforms.validators import Email, InputRequired
 
 from openatlas import app
 from openatlas.forms.field import SubmitField, RemovableListField
@@ -63,10 +63,10 @@ class MailForm(FlaskForm):
 class IiifForm(FlaskForm):
     iiif = BooleanField('IIIF')
     iiif_url = StringField(_('URL'))
-    iiif_version = SelectField(_('version'), choices=(('2', '2'),))
+    iiif_version = SelectField(_('version'), choices=((2, 2),), coerce=int)
     iiif_conversion = SelectField(
         _('conversion'),
-        choices=(('', _('none')), ('deflate', _('deflate')), ('jpeg', 'jpeg')))
+        choices=(('', 'none'), ('deflate', 'deflate'), ('jpeg', 'jpeg')))
     iiif_path = StringField(_('path'))
     save = SubmitField(_('apply'))
 
