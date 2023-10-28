@@ -15,7 +15,7 @@ from openatlas.api.formats.loud import get_loud_entities
 from openatlas.api.formats.rdf import rdf_output
 from openatlas.api.formats.xml import subunit_xml
 from openatlas.api.resources.error import (
-    EntityDoesNotExistError, LastEntityError, NoEntityAvailable, TypeIDError)
+    EntityDoesNotExistError, LastEntityError, TypeIDError)
 from openatlas.api.resources.model_mapper import (
     get_all_links_of_entities, get_all_links_of_entities_inverse)
 from openatlas.api.resources.search import search
@@ -48,8 +48,6 @@ def resolve_entities(
         return export_entities_csv(entities, file_name)
     if parser['export'] == 'csvNetwork':
         return export_csv_for_network_analysis(entities, parser)
-    if not entities:
-        raise NoEntityAvailable
     result = get_json_output(
         sorting(
             remove_duplicate_entities(entities),
@@ -157,9 +155,12 @@ def get_json_output(
     total = get_start_entity(total, parser) \
         if parser['last'] or parser['first'] else total
     j = [i for i, x in enumerate(entities) if x.id == total[0]]
-    new_entities = [e for idx, e in enumerate(entities[j[0]:])]
+    formatted_entities = []
+    if entities:
+        new_entities = [e for idx, e in enumerate(entities[j[0]:])]
+        formatted_entities = get_entities_formatted(new_entities, parser)
     return {
-        "results": get_entities_formatted(new_entities, parser),
+        "results": formatted_entities,
         "pagination": {
             'entitiesPerPage': int(parser['limit']),
             'entities': count,

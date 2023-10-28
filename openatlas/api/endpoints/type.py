@@ -89,8 +89,9 @@ class GetTypeTree(Resource):
 
     @staticmethod
     def get_type_tree() -> dict[int, Any]:
-        return {id_: GetTypeTree.serialize_to_json(type_)
-                for id_, type_ in Type.get_all().items()}
+        return {
+            id_: GetTypeTree.serialize_to_json(type_) for id_, type_
+            in g.types.items()}
 
     @staticmethod
     def serialize_to_json(type_: Type) -> dict[str, Any]:

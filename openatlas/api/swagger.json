@@ -1,9 +1,9 @@
 {
-  "openapi": "3.0.2",
+  "openapi": "3.1.0",
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.1",
+    "version": "0.5.0",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -53,21 +53,21 @@
     }
   ],
   "externalDocs": {
-    "description": "OpenAtlas Manual",
-    "url": "https://manual.openatlas.eu/"
+    "description": "OpenAtlas API Manual",
+    "url": "https://manual.openatlas.eu/technical/api.html"
   },
   "tags": [
     {
       "name": "Entity Endpoint",
-      "description": "Endpoint provide information about one entity in the OpenAtlas instance. The requested information is provided in Linked Places format (LPF). Alternatively, GeoJSON or RDFs, derived from the LPF data, can be accessed."
+      "description": "Endpoint provide information about one entity in the OpenAtlas instance. The requested information is provided in Linked Places format (LPF). Alternatively, Linked Open Art, GeoJSON or RDFs, derived from the LPF data, can be accessed."
     },
     {
       "name": "Entity Query Endpoint",
-      "description": "Endpoint provide information about one entity in the OpenAtlas instance. The requested information is provided in Linked Places format (LPF). Alternatively, GeoJSON or RDFs, derived from the LPF data, can be accessed. Combine several or all entities endpoints in one query."
+      "description": "Endpoint provide information about one entity in the OpenAtlas instance. The requested information is provided in Linked Places format (LPF). Alternatively, Linked Open Art, GeoJSON or RDFs, derived from the LPF data, can be accessed. Combine several or all entities endpoints in one query."
     },
     {
       "name": "Entities Endpoint",
-      "description": "Endpoints provide information about entities in the OpenAtlas instance. The requested information is provided in Linked Places format (LPF). Alternatively, GeoJSON or RDFs, derived from the LPF data, can be accessed."
+      "description": "Endpoints provide information about entities in the OpenAtlas instance. The requested information is provided in Linked Places format (LPF). Alternatively, Linked Open Art, GeoJSON or RDFs, derived from the LPF data, can be accessed."
     },
     {
       "name": "Type Endpoints",
@@ -850,6 +850,35 @@
         }
       }
     },
+    "/backend_details/": {
+      "get": {
+        "tags": [
+          "Administrative Endpoints"
+        ],
+        "description": "Retrieves a list of information of the backend configuration.",
+        "operationId": "GetBackendDetails",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/download"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OpenAtlas backend details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackendDetailsModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
     "/system_class_count/": {
       "get": {
         "tags": [
@@ -1122,14 +1151,13 @@
             "actor",
             "artifact",
             "event",
+            "file",
             "place",
             "reference",
+            "reference_system",
             "source",
-            "artifact",
-            "type",
-            "file",
             "source_translation",
-            "reference_system"
+            "type"
           ]
         },
         "example": "actor"
@@ -1197,7 +1225,7 @@
             "en",
             "de"
           ],
-          "example": "de"
+          "examples": ["de"]
         }
       },
       "show": {
@@ -1257,15 +1285,61 @@
       },
       "search": {
         "name": "search",
-        "description": "Search query for specific results.",
+        "description": "Search query for specific results. For a better overview visit: `https://manual.openatlas.eu/technical/api_parameters_03.html#id27`\n\n **Filterable categories**\n\n entityName, entityDescription, entityAliases, entityCidocClass, entitySystemClass, entityID, typeID, valueTypeID, typeIDWithSubs, typeName, beginFrom, beginTo, endFrom, endTo, relationToID\n\n **Values** \n\n Values has to be a list of items. The items can be either a string, an integer or a tuple (see Note). Strings need to be marked with “” or ‘’, while integers doesn’t allow this.\\n *Note*: the category valueTypeID can search for values of a type ID. But it takes one or more two valued Tuple as list entry: (x,y). x is the type id and y is the searched value. This can be an int or a float, e.g: `{\"operator\":\"lesserThan\",\"values\":[(3142,543.3)],\"logicalOperator\":\"and\"}`\n\n **Compare operators** \n\n equal, notEqual, like (1), greaterThan (2), greaterThanEqual (2), lesserThan (2)\n\nThe compare operators work like the mathematical operators. equal x=y, notEqual x!=y, greaterThan x>y , greaterThanEqual x>=y, lesserThan x<y, lesserThanEqual x<=y. The like operator searches for occurrence of the string, so a match can also occur in the middle of a word.\n\n(1)Only for string based categories\n\n(2)Only for beginFrom, beginTo, endFrom, endTo, valueTypeID\n\n**Logical operators**\n\nNot mandatory, OR is the default value. Logical operators handles, if the values are treated as OR or AND.",
         "in": "query",
+        "style": "deepObject",
+        "allowReserved": true,
+        "explode": true,
         "schema": {
-          "type": "array",
-          "items": {
-            "type": "string"
+          "type": "object",
+          "properties": {
+            "entityName": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "entityDescription": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "entityAliases": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "entityCidocClass": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "entitySystemClass": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "entityID": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "typeID": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "valueTypeID": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "typeIDWithSubs": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "typeName": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "beginFrom": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "beginTo": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "endFrom": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "endTo": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "relationToID": {
+              "$ref": "#/components/schemas/searchCriteria"
+            }
           }
-        },
-        "explode": true
+        }
       },
       "limit": {
         "name": "limit",
@@ -1429,14 +1503,13 @@
               "actor",
               "artifact",
               "event",
+              "file",
               "place",
               "reference",
+              "reference_system",
               "source",
-              "artifact",
-              "type",
-              "file",
               "source_translation",
-              "reference_system"
+              "type"
             ]
           }
         },
@@ -1498,6 +1571,10 @@
     "schemas": {
       "EntitiesOutputModel": {
         "type": "object",
+        "required": [
+          "pagination",
+          "results"
+        ],
         "properties": {
           "pagination": {
             "$ref": "#/components/schemas/PaginationModel"
@@ -1519,6 +1596,12 @@
       },
       "PaginationModel": {
         "type": "object",
+        "required": [
+          "entities",
+          "entitiesPerPage",
+          "index",
+          "totalPages"
+        ],
         "properties": {
           "entities": {
             "type": "integer"
@@ -1549,6 +1632,11 @@
         }
       },
       "LinkedPlacesModel": {
+        "required": [
+          "@context",
+          "type",
+          "features"
+        ],
         "properties": {
           "@context": {
             "type": "string"
@@ -1560,6 +1648,15 @@
             "type": "array",
             "items": {
               "type": "object",
+              "required": [
+                "@id",
+                "type",
+                "crmClass",
+                "systemClass",
+                "properties",
+                "descriptions",
+                "geometry"
+              ],
               "properties": {
                 "@id": {
                   "type": "string"
@@ -1575,6 +1672,9 @@
                 },
                 "properties": {
                   "type": "object",
+                  "required": [
+                    "title"
+                  ],
                   "properties": {
                     "title": {
                       "type": "string"
@@ -1778,6 +1878,10 @@
       },
       "GeoJSONModel": {
         "type": "object",
+        "required": [
+          "features",
+          "type"
+        ],
         "properties": {
           "type": {
             "type": "string",
@@ -1789,6 +1893,11 @@
             "type": "array",
             "items": {
               "type": "object",
+              "required": [
+                "features",
+                "geometry",
+                "properties"
+              ],
               "properties": {
                 "type": {
                   "type": "string"
@@ -1811,6 +1920,19 @@
                 },
                 "properties": {
                   "type": "object",
+                  "required": [
+                    "@id",
+                    "systemClass",
+                    "name",
+                    "description",
+                    "begin_earliest",
+                    "begin_latest",
+                    "begin_comment",
+                    "end_earliest",
+                    "end_latest",
+                    "end_comment",
+                    "types"
+                  ],
                   "properties": {
                     "@id": {
                       "type": "integer"
@@ -1985,6 +2107,10 @@
       },
       "GeometryCollection": {
         "type": "object",
+        "required": [
+          "type",
+          "geometries"
+        ],
         "properties": {
           "type": {
             "type": "string",
@@ -2009,15 +2135,18 @@
             }
           }
         },
-        "required": [
-          "type"
-        ],
         "discriminator": {
           "propertyName": "type"
         }
       },
       "TypeOverviewEntryModel": {
         "type": "object",
+        "required": [
+          "id",
+          "name",
+          "viewClass",
+          "children"
+        ],
         "properties": {
           "id": {
             "type": "integer",
@@ -2042,6 +2171,13 @@
       },
       "TypeOverviewModel": {
         "type": "object",
+        "required": [
+          "standard",
+          "place",
+          "custom",
+          "value",
+          "system"
+        ],
         "properties": {
           "standard": {
             "type": "array",
@@ -2077,12 +2213,31 @@
       },
       "TypeTreeModel": {
         "type": "object",
+        "required": [
+          "type_tree"
+        ],
         "properties": {
           "type_tree": {
             "type": "object",
+            "required": [
+              "type_ids"
+            ],
             "properties": {
               "type_ids": {
                 "type": "object",
+                "required": [
+                  "id",
+                  "name",
+                  "description",
+                  "origin_id",
+                  "first",
+                  "last",
+                  "root",
+                  "subs",
+                  "count",
+                  "count_subs",
+                  "category"
+                ],
                 "properties": {
                   "id": {
                     "type": "integer"
@@ -2131,6 +2286,12 @@
       },
       "TypeViewClassChildren": {
         "type": "object",
+        "required": [
+          "id",
+          "label",
+          "url",
+          "children"
+        ],
         "properties": {
           "id": {
             "type": "string"
@@ -2150,6 +2311,13 @@
         }
       },
       "TypesByViewClassEntry": {
+        "type": "object",
+        "required": [
+          "children",
+          "id",
+          "name",
+          "category"
+        ],
         "properties": {
           "children": {
             "type": "array",
@@ -2166,11 +2334,34 @@
           "category": {
             "type": "string"
           }
-        },
-        "type": "object"
+        }
       },
       "TypesByViewClassModel": {
         "type": "object",
+        "required": [
+          "acquisition",
+          "activity",
+          "actor_actor_relation",
+          "actor_function",
+          "artifact",
+          "bibliography",
+          "creation",
+          "edition",
+          "event",
+          "external_reference",
+          "feature",
+          "file",
+          "group",
+          "human_remains",
+          "involvement",
+          "move",
+          "person",
+          "place",
+          "production",
+          "source",
+          "source_translation",
+          "stratigraphic_unit"
+        ],
         "properties": {
           "acquisition": {
             "type": "array",
@@ -2357,8 +2548,94 @@
           }
         }
       },
+      "BackendDetailsModel": {
+        "type": "object",
+        "required": [
+          "version",
+          "apiVersions",
+          "siteName",
+          "imageProcessing",
+          "IIIF"
+        ],
+        "properties": {
+          "version": {
+            "type": "string"
+          },
+          "apiVersions": {
+            "type": "string"
+          },
+          "siteName": {
+            "type": "string"
+          },
+          "imageProcessing": {
+            "type": "object",
+            "required": [
+              "enabled",
+              "availableImageSizes"
+            ],
+            "properties": {
+              "enabled": {
+                "type": "string"
+              },
+              "availableImageSizes": {
+                "type": "object",
+                "required": [
+                  "thumbnail",
+                  "table"
+                ],
+                "properties": {
+                  "thumbnail": {
+                    "type": "string"
+                  },
+                  "table": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "IIIF": {
+            "type": "object",
+            "required": [
+              "enabled",
+              "url",
+              "version"
+            ],
+            "properties": {
+              "enabled": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "version": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
       "SystemClassCountModel": {
         "type": "object",
+        "required": [
+          "move",
+          "bibliography",
+          "person",
+          "acquisition",
+          "reference_system",
+          "feature",
+          "file",
+          "activity",
+          "type",
+          "administrative_unit",
+          "artifact",
+          "source_translation",
+          "place",
+          "stratigraphic_unit",
+          "edition",
+          "group",
+          "source"
+        ],
         "properties": {
           "move": {
             "type": "integer",
@@ -2434,6 +2711,19 @@
         "type": "array",
         "items": {
           "type": "object",
+          "required": [
+            "id",
+            "parentId",
+            "rootId",
+            "openatlasClassName",
+            "crmClass",
+            "created",
+            "modified",
+            "latestModRec",
+            "geometry",
+            "children",
+            "properties"
+          ],
           "properties": {
             "id": {
               "type": "integer",
@@ -2494,6 +2784,17 @@
             },
             "properties": {
               "type": "object",
+              "required": [
+                "name",
+                "aliases",
+                "description",
+                "standardType",
+                "timespan",
+                "externalReferences",
+                "references",
+                "files",
+                "types"
+              ],
               "properties": {
                 "name": {
                   "type": "string"
@@ -2507,6 +2808,13 @@
                 },
                 "standardType": {
                   "type": "object",
+                  "required": [
+                    "name",
+                    "id",
+                    "rootId",
+                    "path",
+                    "externalReferences"
+                  ],
                   "properties": {
                     "name": {
                       "type": "string"
@@ -2526,6 +2834,14 @@
                       "type": "array",
                       "items": {
                         "type": "object",
+                        "required": [
+                          "type",
+                          "identifier",
+                          "referenceSystem",
+                          "resolverURL",
+                          "referenceURL",
+                          "id"
+                        ],
                         "properties": {
                           "type": {
                             "type": "string"
@@ -2552,6 +2868,12 @@
                 },
                 "timespan": {
                   "type": "object",
+                  "required": [
+                    "earliestBegin",
+                    "latestBegin",
+                    "earliestEnd",
+                    "latestEnd"
+                  ],
                   "properties": {
                     "earliestBegin": {
                       "type": "string"
@@ -2571,6 +2893,14 @@
                   "type": "array",
                   "items": {
                     "type": "object",
+                    "required": [
+                      "type",
+                      "identifier",
+                      "referenceSystem",
+                      "resolverURL",
+                      "referenceURL",
+                      "id"
+                    ],
                     "properties": {
                       "type": {
                         "type": "string"
@@ -2597,6 +2927,12 @@
                   "type": "array",
                   "items": {
                     "type": "object",
+                    "required": [
+                      "id",
+                      "abbreviation",
+                      "title",
+                      "pages"
+                    ],
                     "properties": {
                       "id": {
                         "type": "integer",
@@ -2623,6 +2959,15 @@
                   "type": "array",
                   "items": {
                     "type": "object",
+                    "required": [
+                      "id",
+                      "rootId",
+                      "name",
+                      "path",
+                      "value",
+                      "unit",
+                      "externalReferences"
+                    ],
                     "properties": {
                       "id": {
                         "type": "integer",
@@ -2748,11 +3093,60 @@
           }
         }
       },
+      "searchCriteria": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "operator": {
+              "enum": [
+                "equal",
+                "notEqual",
+                "like",
+                "greaterThan",
+                "greaterThanEqual",
+                "lesserThan",
+                "lesserThanEqual"
+              ]
+            },
+            "values": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ]
+              }
+            },
+            "logicalOperator": {
+              "enum": [
+                "OR",
+                "AND"
+              ],
+              "default": "AND"
+            }
+          }
+        }
+      },
       "LicensedFileOverviewModel": {
         "type": "object",
+        "required": [
+          "id"
+        ],
         "properties": {
           "id": {
             "type": "object",
+            "required": [
+              "display",
+              "thumbnail",
+              "extension",
+              "license",
+              "IIIFManifest"
+            ],
             "properties": {
               "display": {
                 "type": "string"
@@ -2764,6 +3158,9 @@
                 "type": "string"
               },
               "license": {
+                "type": "string"
+              },
+              "IIIFManifest": {
                 "type": "string"
               }
             }

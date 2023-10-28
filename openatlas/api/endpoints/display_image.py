@@ -12,7 +12,8 @@ from openatlas.api.resources.templates import licensed_file_template
 from openatlas.api.resources.util import get_license_name
 from openatlas.api.resources.model_mapper import get_entity_by_id, \
     get_entities_by_system_classes, get_entities_by_ids
-from openatlas.display.util import get_file_path
+from openatlas.display.util import get_file_path, check_iiif_activation, \
+    check_iiif_file_exist
 
 
 class DisplayImage(Resource):
@@ -43,6 +44,14 @@ class LicensedFileOverview(Resource):
         for entity in entities:
             if license_ := get_license_name(entity):
                 if path := get_file_path(entity):
+                    iiif_manifest = ''
+                    if check_iiif_activation() \
+                            and check_iiif_file_exist(entity.id):
+                        iiif_manifest = url_for(
+                            'api.iiif_manifest',
+                            version=app.config['IIIF']['version'],
+                            id_=entity.id,
+                            _external=True)
                     files_dict[path.stem] = {
                         'extension': path.suffix,
                         'display': url_for(
@@ -54,5 +63,6 @@ class LicensedFileOverview(Resource):
                             image_size='thumbnail',
                             filename=path.stem,
                             _external=True),
-                        'license': license_}
+                        'license': license_,
+                        'IIIFManifest': iiif_manifest}
         return marshal(files_dict, licensed_file_template(entities)), 200

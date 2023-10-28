@@ -38,10 +38,6 @@ class LogicalOperatorError(Exception):
     pass
 
 
-class NoEntityAvailable(Exception):
-    pass
-
-
 class NoLicenseError(Exception):
     pass
 

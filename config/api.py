@@ -41,3 +41,4 @@ ARCHE = {'id': None, 'url': None}
 
 # Used to connect to password protected Vocabs systems
 VOCABS_PASS = ''
+API_VERSIONS = ['0.3']
