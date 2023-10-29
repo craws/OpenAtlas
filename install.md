@@ -18,6 +18,11 @@ Feel free to also consult our own
 [documentation](https://redmine.openatlas.eu/projects/uni/wiki/Debian_server_installation)
 that we are using to set up Debian servers for OpenAtlas installations.
 
+* [Requirements](#Requirements)
+* [IIIF](#IIIF) (optional)
+* [Tests](#Tests) (optional)
+* [Docker](#Docker) (alternative installation method)
+
 ## Requirements
 ### Python 3.9 and Flask 1.1.2
     # apt install python3 python3-bcrypt python3-dateutil python3-psycopg2 python3-fuzzywuzzy python3-flask
@@ -118,7 +123,11 @@ instance/production.py:
 
     SESSION_COOKIE_SECURE = True
 
-### Tests (optional)
+## IIIF
+
+IIIF comes here
+
+## Tests
 Install required packages:
 
     # apt install python3-coverage python3-nose
@@ -140,7 +149,7 @@ Run tests with coverage
 
     $ nosetests3 -c tests/.noserc
 
-## Docker 
+## Docker
 Be aware, the [Docker](https://www.docker.com/) installation is experimental
 and is **not** recommended for usage on a productive system.
 
