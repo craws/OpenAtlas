@@ -140,19 +140,19 @@ high-quality, attributed digital objects online at scale. Be aware that:
 You can test http://your.server/iipsrv/iipsrv.fcgi to see if it runs.
 
     sudo mkdir /var/www/iipsrv
-    sudo cp -rp /usr/lib/iipimage-server/iipsrv.fcgi /var/www/iipsrv/
+    sudo cp -p /usr/lib/iipimage-server/iipsrv.fcgi /var/www/iipsrv/
     sudo chown -R www-data /var/www/iipsrv
-    sudo chmod 755 -R /var/www/iipsrv
 
 ### Configuration
 
 Edit the configuration to your needs, see example at
-[install/iipsrv.conf](install/iipsrv.conf), enable the module and restart
-Apache:
+[install/iipsrv.conf](install/iipsrv.conf) and restart Apache:
 
     sudo vim /etc/apache2/mods-available/iipsrv.conf
-    sudo a2enmod iipsrv
     sudo service apache2 restart
+
+Further configuration can be done at the IIIF tab in the admin area of the web
+application.
 
 ## Tests
 Install required packages:
