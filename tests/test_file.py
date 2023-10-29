@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Any
 
-from flask import url_for
+from flask import g, url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
@@ -120,16 +120,18 @@ class FileTest(TestBaseCase):
                 url_for(
                     'api.iiif_manifest',
                     id_=file_id,
-                    version=app.config['IIIF']['version']))
+                    version=g.settings['iiif_version']))
             rv = rv.get_json()
             assert bool(rv['label'] == 'Updated file')
 
             rv = self.app.get(url_for('api.iiif_sequence', id_=file_id))
             rv = rv.get_json()
             assert bool(str(file_id) in rv['@id'])
+
             rv = self.app.get(url_for('api.iiif_image', id_=file_id))
             rv = rv.get_json()
             assert bool(str(file_id) in rv['@id'])
+
             rv = self.app.get(url_for('api.iiif_canvas', id_=file_id))
             rv = rv.get_json()
             assert bool(str(file_id) in rv['@id'])
@@ -140,16 +142,9 @@ class FileTest(TestBaseCase):
             rv = self.app.get(url_for('view', id_=place.id))
             assert b'/full/!100,100/0/default.jpg' in rv.data
 
-            app.config['IIIF']['conversion'] = False
-            rv = self.app.get(url_for('view', id_=place.id))
-            assert b'/full/!100,100/0/default.jpg' in rv.data
-
-            app.config['IIIF']['activate'] = False
             rv = self.app.get(url_for('view', id_=place.id))
             assert b'Logo' in rv.data
 
-            app.config['IIIF']['activate'] = True
-            app.config['IIIF']['conversion'] = True
             for file in files:
                 rv = self.app.get(
                     url_for('delete', id_=file.id),
