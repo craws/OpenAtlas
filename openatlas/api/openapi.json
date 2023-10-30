@@ -1,9 +1,9 @@
 {
-  "openapi": "3.1.0",
+  "openapi": "3.0.2",
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.5.0",
+    "version": "0.4.0",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -16,37 +16,37 @@
   },
   "servers": [
     {
-      "url": "https://demo.openatlas.eu/api/{version}",
+      "url": "https://demo.openatlas.eu/api/{basePath}",
       "description": "Demo Server",
       "variables": {
-        "version": {
-          "default": "0.3",
+        "basePath": {
+          "default": "0.4",
           "enum": [
-            "0.3"
+            "0.3", "0.4"
           ]
         }
       }
     },
     {
-      "url": "https://demo-dev.openatlas.eu/api/{version}",
+      "url": "https://demo-dev.openatlas.eu/api/{basePath}",
       "description": "Demo Dev Server",
       "variables": {
-        "version": {
-          "default": "0.3",
+        "basePath": {
+          "default": "0.4",
           "enum": [
-            "0.3"
+            "0.3", "0.4"
           ]
         }
       }
     },
     {
-      "url": "http://localhost:5000/api/{version}",
+      "url": "http://localhost:5000/api/{basePath}",
       "description": "Used directly in an OpenAtlas instance",
       "variables": {
-        "version": {
-          "default": "0.3",
+        "basePath": {
+          "default": "0.4",
           "enum": [
-            "0.3"
+            "0.3", "0.4"
           ]
         }
       }
@@ -88,7 +88,8 @@
   ],
   "paths": {
     "/entity/{entityId}": {
-      "get": {
+      "get":
+        {
         "tags": [
           "Entity Endpoint"
         ],
@@ -823,8 +824,9 @@
         "tags": [
           "Administrative Endpoints"
         ],
-        "description": "Retrieves a detailed list of information on available frontend content in an OpenAtlas instance - intro, legal notice, contact, and size of processed image",
+        "description": "`WARNING: available only at v0.3.` Retrieves a detailed list of information on available frontend content in an OpenAtlas instance - intro, legal notice, contact, and size of processed image",
         "operationId": "GetContent",
+        "deprecated": true,
         "parameters": [
           {
             "$ref": "#/components/parameters/lang"
@@ -1067,7 +1069,7 @@
     "/licensed_file_overview/": {
       "get": {
         "tags": [
-          "Image Endpoints"
+          "Administrative Endpoints"
         ],
         "description": "Retrieves a list of display URL, thumbnail URL, extension and license of all files which exists and have a licence. With the paramater \"file_id\", only the given IDs where retrieved",
         "operationId": "LicensedFileOverview",
@@ -1118,6 +1120,7 @@
         "in": "path",
         "schema": {
           "enum": [
+            "all",
             "E5",
             "E7",
             "E8",
@@ -1225,7 +1228,7 @@
             "en",
             "de"
           ],
-          "examples": ["de"]
+          "example": "de"
         }
       },
       "show": {
@@ -1468,6 +1471,7 @@
           "type": "array",
           "items": {
             "enum": [
+              "all",
               "E6",
               "E7",
               "E8",

@@ -15,7 +15,7 @@ from openatlas.api.endpoints.type import \
     (GetTypeByViewClass, GetTypeOverview, GetTypeTree)
 
 
-def add_routes_v03(api: Api) -> None:
+def entity_routes(api: Api) -> None:
     api.add_resource(
         GetByViewClass,
         '/view_class/<string:view_class>',
@@ -53,27 +53,8 @@ def add_routes_v03(api: Api) -> None:
         '/entities_linked_to_entity/<int:id_>',
         endpoint="entities_linked_to_entity")
 
-    api.add_resource(
-        GetTypeOverview,
-        '/type_overview/',
-        endpoint="type_overview")
-    api.add_resource(
-        GetTypeTree,
-        '/type_tree/',
-        endpoint="type_tree")
-    api.add_resource(
-        GetTypeByViewClass,
-        '/type_by_view_class/',
-        endpoint="type_by_view_class")
-    api.add_resource(
-        GetSubunits,
-        '/subunits/<int:id_>',
-        endpoint="subunits")
 
-    api.add_resource(
-        GetContent,
-        '/content/',
-        endpoint="content")
+def admin_routes(api: Api) -> None:
     api.add_resource(
         GetBackendDetails,
         '/backend_details/',
@@ -87,6 +68,32 @@ def add_routes_v03(api: Api) -> None:
         '/system_class_count/',
         endpoint='system_class_count')
     api.add_resource(
+        LicensedFileOverview,
+        '/licensed_file_overview/',
+        endpoint='licensed_file_overview')
+
+
+def type_routes(api: Api) -> None:
+    api.add_resource(
+        GetTypeOverview,
+        '/type_overview/',
+        endpoint="type_overview")
+    api.add_resource(
+        GetTypeTree,
+        '/type_tree/',
+        endpoint="type_tree")
+    api.add_resource(
+        GetTypeByViewClass,
+        '/type_by_view_class/',
+        endpoint="type_by_view_class")
+
+
+def special_routes(api: Api) -> None:
+    api.add_resource(
+        GetSubunits,
+        '/subunits/<int:id_>',
+        endpoint="subunits")
+    api.add_resource(
         GetGeometricEntities,
         '/geometric_entities/',
         endpoint="geometric_entities")
@@ -95,14 +102,19 @@ def add_routes_v03(api: Api) -> None:
         '/export_database/<string:format_>',
         endpoint="export_database")
 
+
+def deprecated_routes(api: Api) -> None:
+    api.add_resource(
+        GetContent,
+        '/content/',
+        endpoint="content")
+
+
+def display_routes(api: Api) -> None:
     api.add_resource(
         DisplayImage,
         '/display/<path:filename>',
         endpoint='display')
-    api.add_resource(
-        LicensedFileOverview,
-        '/licensed_file_overview/',
-        endpoint='licensed_file_overview')
 
     api.add_resource(
         IIIFManifest,
