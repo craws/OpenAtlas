@@ -79,8 +79,7 @@ class BaseDisplay:
 
     def add_file_tab_thumbnails(self) -> None:
         if 'file' in self.tabs and current_user.settings['table_show_icons']:
-            if app.config['IIIF']['enabled'] \
-                    or g.settings['image_processing']:
+            if g.settings['iiif'] or g.settings['image_processing']:
                 self.tabs['file'].table.header.insert(1, _('icon'))
                 for row in self.tabs['file'].table.rows:
                     row.insert(1, file_preview(

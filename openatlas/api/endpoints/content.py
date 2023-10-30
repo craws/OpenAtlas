@@ -43,9 +43,9 @@ class GetBackendDetails(Resource):
                     app.config['IMAGE_SIZE']
                     if g.settings['image_processing'] else None},
             'IIIF': {
-                'enabled': app.config['IIIF']['enabled'],
-                'url': app.config['IIIF']['url'],
-                'version': app.config['IIIF']['version']}}
+                'enabled': g.settings['iiif'],
+                'url': g.settings['iiif_url'],
+                'version': int(g.settings['iiif_version'])}}
         if parser['download']:
             download(details, backend_details_template(), 'content')
         return marshal(details, backend_details_template()), 200

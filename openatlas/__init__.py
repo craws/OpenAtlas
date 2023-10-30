@@ -85,6 +85,8 @@ def before_request() -> None:
         app.config['RESIZED_IMAGES'],
         app.config['UPLOAD_PATH'],
         app.config['TMP_PATH']]
+    if g.settings['iiif'] and g.settings['iiif_path']:
+        g.writable_paths.append(g.settings['iiif_path'])
     if request.path.startswith('/api/'):
         ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
         if not current_user.is_authenticated \

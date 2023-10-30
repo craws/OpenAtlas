@@ -60,6 +60,17 @@ class MailForm(FlaskForm):
     save = SubmitField(_('save'))
 
 
+class IiifForm(FlaskForm):
+    iiif = BooleanField('IIIF')
+    iiif_url = StringField(_('URL'))
+    iiif_version = SelectField(_('version'), choices=((2, 2),), coerce=int)
+    iiif_conversion = SelectField(
+        _('conversion'),
+        choices=(('', 'none'), ('deflate', 'deflate'), ('jpeg', 'jpeg')))
+    iiif_path = StringField(_('path'))
+    save = SubmitField(_('apply'))
+
+
 class LogForm(FlaskForm):
     limit = SelectField(
         _('limit'),

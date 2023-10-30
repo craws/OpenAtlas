@@ -29,7 +29,7 @@ from openatlas.display.util import (
 from openatlas.forms.field import SubmitField
 from openatlas.forms.setting import (
     ApiForm, ContentForm, FilesForm, GeneralForm, LogForm, MailForm, MapForm,
-    ModulesForm, SimilarForm, TestMailForm)
+    ModulesForm, SimilarForm, TestMailForm, IiifForm)
 from openatlas.forms.util import get_form_settings, set_form_settings
 from openatlas.models.content import get_content, update_content
 from openatlas.models.entity import Entity
@@ -157,6 +157,13 @@ def admin_index(
                 button(_('edit'), url_for('admin_settings', category='mail'))])
         if g.settings['mail']:
             tabs['email'].content += display_form(form)
+    tabs['iiif'] = Tab(
+        'IIIF',
+        display_info(get_form_settings(IiifForm())),
+        buttons=[
+            manual('admin/iiif'),
+            button(_('edit'), url_for('admin_settings', category='iiif'))])
+
     if is_authorized('manager'):
         tabs['modules'] = Tab(
             _('modules'),
@@ -328,7 +335,7 @@ def admin_delete_single_type_duplicate(
 @app.route('/admin/settings/<category>', methods=['GET', 'POST'])
 @required_group('manager')
 def admin_settings(category: str) -> Union[str, Response]:
-    if category in ['general', 'mail'] and not is_authorized('admin'):
+    if category in ['general', 'mail', 'iiif'] and not is_authorized('admin'):
         abort(403)
     form_name = f"{uc_first(category)}Form"
     form = getattr(

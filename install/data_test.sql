@@ -26,3 +26,10 @@ INSERT INTO web.user_log (user_id, entity_id, action) VALUES (2, 6666, 'insert')
 -- Needed to test external reference systems for hierarchies
 INSERT INTO web.reference_system_openatlas_class (reference_system_id, openatlas_class_name) VALUES
   ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), 'type');
+
+-- IIIF activation
+UPDATE web.settings SET value = 'True' WHERE name = 'iiif';
+UPDATE web.settings SET value = '/var/www/iipsrv'WHERE name = 'iiif_path';
+UPDATE web.settings SET value = 'http://localhost/iiif/'WHERE name = 'iiif_url';
+UPDATE web.settings SET value = '2' WHERE name = 'iiif_version';
+UPDATE web.settings SET value = 'deflate' WHERE name = 'iiif_conversion';

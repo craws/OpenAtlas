@@ -1,19 +1,19 @@
 from pathlib import Path as Pathlib_path
 from typing import Any
 
-from flask import Response, send_file, url_for
+from flask import Response, g, send_file, url_for
 from flask_restful import Resource, marshal
 
 from openatlas import app
-from openatlas.api.resources.error import DisplayFileNotFoundError, \
-    NoLicenseError
-from openatlas.api.resources.parser import image, files
+from openatlas.api.resources.error import (
+    DisplayFileNotFoundError, NoLicenseError)
+from openatlas.api.resources.model_mapper import (
+    get_entities_by_ids, get_entities_by_system_classes, get_entity_by_id)
+from openatlas.api.resources.parser import files, image
 from openatlas.api.resources.templates import licensed_file_template
 from openatlas.api.resources.util import get_license_name
-from openatlas.api.resources.model_mapper import get_entity_by_id, \
-    get_entities_by_system_classes, get_entities_by_ids
-from openatlas.display.util import get_file_path, check_iiif_activation, \
-    check_iiif_file_exist
+from openatlas.display.util import (
+    check_iiif_activation, check_iiif_file_exist, get_file_path)
 
 
 class DisplayImage(Resource):
@@ -49,7 +49,7 @@ class LicensedFileOverview(Resource):
                             and check_iiif_file_exist(entity.id):
                         iiif_manifest = url_for(
                             'api.iiif_manifest',
-                            version=app.config['IIIF']['version'],
+                            version=g.settings['iiif']['version'],
                             id_=entity.id,
                             _external=True)
                     files_dict[path.stem] = {

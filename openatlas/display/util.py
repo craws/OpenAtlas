@@ -233,12 +233,12 @@ def profile_image(entity: Entity) -> str:
     src = url_for('display_file', filename=path.name)
     url = src
     width = g.settings["profile_image_width"]
-    if app.config['IIIF']['enabled'] and check_iiif_file_exist(entity.id):
+    if g.settings['iiif'] and check_iiif_file_exist(entity.id):
         url = url_for('view_iiif', id_=entity.id)
-        iiif_ext = '.tiff' if app.config['IIIF']['conversion'] \
+        iiif_ext = '.tiff' if g.settings['iiif_conversion'] \
             else g.files[entity.id].suffix
         src = \
-            f"{app.config['IIIF']['url']}{entity.id}{iiif_ext}" \
+            f"{g.settings['iiif_url']}{entity.id}{iiif_ext}" \
             f"/full/!{width},{width}/0/default.jpg"
     elif g.settings['image_processing'] and check_processed_image(path.name):
         if path_ := get_file_path(
@@ -427,9 +427,6 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
         warnings.append(
             f"Database version {app.config['DATABASE_VERSION']} is needed but "
             f"current version is {g.settings['database_version']}")
-    if app.config['IIIF']['enabled']:
-        if path := app.config['IIIF']['path']:
-            check_write_access(path, warnings)
     for path in g.writable_paths:
         check_write_access(path, warnings)
     if is_authorized('admin'):
@@ -753,26 +750,24 @@ def get_entities_linked_to_type_recursive(
 
 
 def check_iiif_activation() -> bool:
-    iiif = app.config['IIIF']
-    return bool(iiif['enabled'] and os.access(Path(iiif['path']), os.W_OK))
+    return bool(g.settings['iiif'] and
+    os.access(Path(g.settings['iiif_path']), os.W_OK))
 
 
 def check_iiif_file_exist(id_: int) -> bool:
-    if app.config['IIIF']['conversion']:
+    if g.settings['iiif_conversion']:
         return get_iiif_file_path(id_).is_file()
     return bool(get_file_path(id_))
 
 
 def get_iiif_file_path(id_: int) -> Path:
-    ext = '.tiff' if app.config['IIIF']['conversion'] \
-        else g.files[id_].suffix
-    return Path(app.config['IIIF']['path']) / f'{id_}{ext}'
+    ext = '.tiff' if g.settings['iiif_conversion'] else g.files[id_].suffix
+    return Path(g.settings['iiif_path']) / f'{id_}{ext}'
 
 
 def convert_image_to_iiif(id_: int) -> None:
-    compression = app.config['IIIF']['compression'] \
-        if app.config['IIIF']['compression'] in ['deflate', 'jpeg'] \
-        else 'deflate'
+    compression = g.settings['iiif_conversion'] \
+        if g.settings['iiif_conversion'] in ['deflate', 'jpeg'] else 'deflate'
     vips = "vips" if os.name == 'posix' else "vips.exe"
     command = \
         (f"{vips} tiffsave {get_file_path(id_)} {get_iiif_file_path(id_)} "
