@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>ARCHE &mdash; OpenAtlas 7.16.0 documentation</title>
+  <title>ARCHE &mdash; OpenAtlas 7.17.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                7.16.0
+                7.17.0
               </div>
             
           
@@ -102,6 +102,7 @@
 <li class="toctree-l2"><a class="reference internal" href="mail.html">Mail</a></li>
 <li class="toctree-l2"><a class="reference internal" href="modules.html">Modules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="map.html">Map</a></li>
+<li class="toctree-l2"><a class="reference internal" href="iiif.html">IIIF</a></li>
 <li class="toctree-l2"><a class="reference internal" href="content.html">Content</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_integrity_checks.html">Data integrity checks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="import.html">Import</a></li>
@@ -196,16 +197,16 @@
 <h1>ARCHE<a class="headerlink" href="#arche" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p><strong>Be aware</strong> this feature is experimental and only usable for a specific dataset.</p>
-<p><a class="reference external" href="https://arche.acdh.oeaw.ac.at/">ARCHE</a> (A Resource Centre for the HumanitiEs) is a service aimed at offering stable and persistent hosting as well as dissemination of digital research data and resources.</p>
-<p>In order to import data from ARCHE to OpenAtlas changes to instance/production.py are needed (ask your OpenAtlas administrator for further details):</p>
+<p><strong>Be aware</strong> this feature is only usable for a specific dataset.</p>
+<p><a class="reference external" href="https://arche.acdh.oeaw.ac.at/">ARCHE</a> (A Resource Centre for the HumanitiEs) is a service aimed at offering stable
+and persistent hosting as well as dissemination of digital research data and resources.</p>
+<p>In order to import data from ARCHE to OpenAtlas changes to instance/production.py are needed (ask your OpenAtlas
+administrator for further details):</p>
 <div class="literal-block-wrapper docutils container" id="id2">
 <div class="code-block-caption"><span class="caption-text">instance/production.py</span><a class="headerlink" href="#id2" title="Permalink to this code">¶</a></div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ARCHE</span> <span class="o">=</span> <span class="p">{</span>
- <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>    <span class="c1"># Top collection ID (acdh:TopCollection)</span>
- <span class="s1">&#39;collection_ids&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span>  <span class="c1"># Sub collections ID containing metadata.json files (acdh:Collection)</span>
- <span class="s1">&#39;base_url&#39;</span><span class="p">:</span> <span class="s1">&#39;https://arche-curation.acdh-dev.oeaw.ac.at/&#39;</span><span class="p">,</span>  <span class="c1"># Base URL to get data from</span>
- <span class="s1">&#39;thumbnail_url&#39;</span><span class="p">:</span> <span class="s1">&#39;https://arche-thumbnails.acdh.oeaw.ac.at/&#39;</span>    <span class="c1"># URL of ARCHE thumbnail service</span>
+ <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>    <span class="c1"># Top collection of the project (acdh:TopCollection)</span>
+ <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="s1">&#39;https://arche-curation.acdh-dev.oeaw.ac.at/&#39;</span><span class="p">,</span>  <span class="c1"># Base URL to get data from</span>
  <span class="p">}}</span>
 </pre></div>
 </div>
@@ -214,7 +215,8 @@
 Click on the <strong>ARCHE</strong> button to get to the overview section.</p>
 <div class="section" id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
-<p>Data provided in the production.py is displayed. If user belongs to the <strong>manager</strong> user group, a button called <strong>Fetch</strong> is displayed. Click <strong>Fetch</strong> to fetch data from ARCHE.</p>
+<p>Data provided in the production.py is displayed. If user belongs to the <strong>manager</strong> user group, a button called
+<strong>Fetch</strong> is displayed. Click <strong>Fetch</strong> to fetch data from ARCHE.</p>
 </div>
 <div class="section" id="fetch">
 <h2>Fetch<a class="headerlink" href="#fetch" title="Permalink to this headline">¶</a></h2>
@@ -224,19 +226,8 @@ Only data (based on the <a class="reference internal" href="../entity/artifact.h
 </div>
 <div class="section" id="data-from-arche">
 <h2>Data from ARCHE<a class="headerlink" href="#data-from-arche" title="Permalink to this headline">¶</a></h2>
-<p>All data is gathered from [IMAGE_NAME]_metadata.json:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;image_id&#39;</span><span class="p">:</span> <span class="n">image_id</span> <span class="p">(</span><span class="n">ARCHE</span><span class="p">)</span>
-<span class="s1">&#39;image_link&#39;</span><span class="p">:</span> <span class="n">image_url</span> <span class="p">(</span><span class="n">ARCHE</span><span class="p">)</span>
-<span class="s1">&#39;image_link_thumbnail&#39;</span><span class="p">:</span> <span class="n">thumbnail_url</span> <span class="p">(</span><span class="n">ARCHE</span><span class="p">)</span>
-<span class="s1">&#39;creator&#39;</span><span class="p">:</span> <span class="n">EXIF</span><span class="p">:</span><span class="n">Artist</span>
-<span class="s1">&#39;latitude&#39;</span><span class="p">:</span> <span class="n">EXIF</span><span class="p">:</span><span class="n">GPSLatitude</span>
-<span class="s1">&#39;longitude&#39;</span><span class="p">:</span> <span class="n">EXIF</span><span class="p">:</span><span class="n">GPSLongitude</span>
-<span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">XMP</span><span class="p">:</span><span class="n">Description</span>
-<span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">IPTC</span><span class="p">:</span><span class="n">ObjectName</span>
-<span class="s1">&#39;license&#39;</span><span class="p">:</span> <span class="n">EXIF</span><span class="p">:</span><span class="n">Copyright</span>
-<span class="s1">&#39;date&#39;</span><span class="p">:</span> <span class="n">EXIF</span><span class="p">:</span><span class="n">CreateDate</span>
-</pre></div>
-</div>
+<p>All metadata is gathered from the EXIF endpoint of the first image in the “2_JPGs” collection. Additionally the
+corresponded .png from “4_Orthophotos” is taken as reference file.</p>
 </div>
 <div class="section" id="automatically-created-entities">
 <h2>Automatically created entities<a class="headerlink" href="#automatically-created-entities" title="Permalink to this headline">¶</a></h2>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>API &mdash; OpenAtlas 7.16.0 documentation</title>
+  <title>API &mdash; OpenAtlas 7.17.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                7.16.0
+                7.17.0
               </div>
             
           
@@ -107,6 +107,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#endpoints">Endpoints</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#parameters">Parameters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#error-handling">Error handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#proxy">Proxy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#authentication-guide">Authentication guide</a></li>
 </ul>
 </li>
@@ -190,15 +191,15 @@
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>This page provides an overview of the OpenAtlas Application Programming
-Interface (<a class="reference external" href="https://en.wikipedia.org/wiki/API">API</a>). The API is
-<a class="reference external" href="https://restfulapi.net/rest-architectural-constraints/">RESTlike</a>
-to provide easy access to the data.</p>
-<ul class="simple">
-<li><p>To try out the API first hand, visit <a class="reference external" href="https://demo.openatlas.eu/swagger">https://demo.openatlas.eu/swagger</a></p></li>
-<li><p>For developers a complete
-<a class="reference external" href="https://app.swaggerhub.com/apis/ctot-nondef/OpenAtlas/">Swagger documentation</a>
-is provided.</p></li>
-</ul>
+Interface (<a class="reference external" href="https://en.wikipedia.org/wiki/API">API</a>). An API allows easy
+and controlled access from external sources (e.g. presentation sites or
+analytical tools) to your data. It is human and mashine readable and
+provides different approaches to query your data.</p>
+<p>The OpenAtlas API tries to follow the
+<a class="reference external" href="https://restfulapi.net/rest-architectural-constraints/">RESTful</a> constraints.</p>
+<p>To try out the API first hand at our demo site: <a class="reference external" href="https://demo.openatlas.eu/swagger">https://demo.openatlas.eu/swagger</a>.
+If you have your own OpenAtlas instance just visit &lt;your-domain.eu&gt;/swagger. Be aware
+that the <a class="reference internal" href="../admin/api.html"><span class="doc">API</span></a> has to be set to public at the admin section.</p>
 </div>
 <div class="section" id="quick-start-guide">
 <h2>Quick Start Guide<a class="headerlink" href="#quick-start-guide" title="Permalink to this headline">¶</a></h2>
@@ -340,8 +341,9 @@ If any issues occur when using the OpenAtlas API, a case-specific error message
 is provided in JSON format, describing the error in more detail.</p>
 <p>Example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;entity does not exist&quot;</span><span class="p">,</span>
-     <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Requested entity does not exist. Try another ID&quot;</span>
+     <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;entity does not exist&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Requested entity does not exist. Try another ID&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://demo.openatlas.eu/api/entity/9999/,</span>
      <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="s2">&quot;Tue, 19 Jul 2022 13:59:13 GMT&quot;</span><span class="p">,</span>
      <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="mi">404</span>
  <span class="p">}</span>
@@ -352,6 +354,14 @@ entered, Flask catches this via its own
 <a class="reference external" href="https://flask-restful.readthedocs.io/en/latest/">Flask-RESTful</a> extension.
 An error message is provided by its own error handler
 <a class="reference external" href="https://flask-restful.readthedocs.io/en/latest/reqparse.html#error-handling">error handler</a></p>
+</div>
+<div class="section" id="proxy">
+<h2>Proxy<a class="headerlink" href="#proxy" title="Permalink to this headline">¶</a></h2>
+<p>If the server is behind a proxy, there are some issues with the RDF export of entities.
+To provide the OpenAtlas API with a proxy server, add following line to <strong>instance/production.py</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">API_PROXY</span> <span class="o">=</span> <span class="s1">&#39;http://proxy.example:8899&#39;</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="authentication-guide">
 <h2>Authentication guide<a class="headerlink" href="#authentication-guide" title="Permalink to this headline">¶</a></h2>

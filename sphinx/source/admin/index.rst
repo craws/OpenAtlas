@@ -9,6 +9,7 @@ Admin
    mail
    modules
    map
+   iiif
    content
    data_integrity_checks
    import

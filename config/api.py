@@ -1,3 +1,5 @@
+API_VERSIONS = ['0.3', '0.4']
+
 API_CONTEXT = {
     'LPF': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/'
            'master/linkedplaces-context-v1.1.jsonld',
@@ -41,7 +43,6 @@ ARCHE = {'id': None, 'url': None}
 
 # Used to connect to password protected Vocabs systems
 VOCABS_PASS = ''
-API_VERSIONS = ['0.3']
 
 IMAGE_FORMATS = {
     "jpg": "image/jpeg",
