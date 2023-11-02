@@ -157,12 +157,12 @@ def admin_index(
                 button(_('edit'), url_for('admin_settings', category='mail'))])
         if g.settings['mail']:
             tabs['email'].content += display_form(form)
-    tabs['iiif'] = Tab(
-        'IIIF',
-        display_info(get_form_settings(IiifForm())),
-        buttons=[
-            manual('admin/iiif'),
-            button(_('edit'), url_for('admin_settings', category='iiif'))])
+        tabs['iiif'] = Tab(
+            'IIIF',
+            display_info(get_form_settings(IiifForm())),
+            buttons=[
+                manual('admin/iiif'),
+                button(_('edit'), url_for('admin_settings', category='iiif'))])
 
     if is_authorized('manager'):
         tabs['modules'] = Tab(
