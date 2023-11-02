@@ -92,7 +92,8 @@ def get_entity_formatted(
         'entity': entity,
         'links': get_all_links_of_entities(entity.id),
         'links_inverse': get_all_links_of_entities_inverse(entity.id)}
-    if parser['format'] == 'loud':
+    if parser['format'] == 'loud' \
+            or parser['format'] in app.config['RDF_FORMATS']:
         return get_loud_entities(entity_dict, parse_loud_context())
     return get_linked_places_entity(entity_dict, parser)
 
