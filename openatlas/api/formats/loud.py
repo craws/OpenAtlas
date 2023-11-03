@@ -1,14 +1,14 @@
 from collections import defaultdict
 from typing import Any, Optional
 
-from flask import url_for
+from flask import url_for, g
 
 from openatlas import app
+from openatlas.api.resources.util import (
+    remove_spaces_dashes, date_to_str, get_crm_relation, get_crm_code)
 from openatlas.display.util import get_file_path
-from openatlas.models.gis import Gis
-from openatlas.api.resources.util import remove_spaces_dashes, date_to_str, \
-    get_crm_relation, get_crm_code
 from openatlas.models.entity import Entity
+from openatlas.models.gis import Gis
 from openatlas.models.type import Type
 
 
@@ -40,9 +40,9 @@ def get_loud_entities(
         property_ = {
             'id': url_for('api.entity', id_=link_.domain.id, _external=True),
             'type': loud[get_crm_code(link_, True).replace(' ', '_')],
-            '_label': link_.domain.name, }
-        if type_ := get_standard_type_loud(link_.domain.types):
-            property_['classified_as'] = get_type_property(type_)
+            '_label': link_.domain.name}
+        if standard_type := get_standard_type_loud(link_.domain.types):
+            property_['classified_as'] = get_type_property(standard_type)
         return property_
 
     for link_ in data['links']:
@@ -61,6 +61,7 @@ def get_loud_entities(
             base_property = get_range_links()
             properties_set[property_name].append(base_property)
 
+    image_links = []
     for link_ in data['links_inverse']:
         if link_.property.code in ['OA7', 'OA8', 'OA9']:
             continue
@@ -78,21 +79,44 @@ def get_loud_entities(
             base_property = get_domain_links()
             properties_set[property_name].append(base_property)
 
-    if image_id := Entity.get_profile_image_id(data['entity']):
-        label = ''
-        for item in properties_set["referred_to_by"]:
-            if int(item['id'].split("/")[-1]) == image_id:
-                label = item['_label']
-        path = get_file_path(image_id)
-        properties_set['representation'].append({
+        if link_.domain.class_.name == 'file' and g.files.get(link_.domain.id):
+            image_links.append(link_)
+
+    if image_links:
+        profile_image = Entity.get_profile_image_id(data['entity'])
+        print(profile_image)
+        representation = {
             "type": "VisualItem",
-            "digitally_shown_by": [{
+            "digitally_shown_by": []}
+        for link_ in image_links:
+            id_ = link_.domain.id
+            suffix = g.files[id_].suffix.replace('.', '')
+
+            if not app.config['IMAGE_FORMATS'].get(suffix):
+                continue
+
+            path = get_file_path(id_)
+            image = {
                 "id": url_for(
-                    'api.display',
-                    filename=path.stem,
-                    _external=True) if path else "N/A",
-                "_label": label,
-                "type": "DigitalObject"}]})
+                    'api.entity',
+                    id_=id_,
+                    _external=True),
+                "_label": link_.domain.name,
+                "type": "DigitalObject",
+                "format": app.config['IMAGE_FORMATS'][suffix],
+                "access_point": [{
+                    "id": url_for(
+                        'api.display',
+                        filename=path.stem,
+                        _external=True),
+                    "type": "DigitalObject",
+                    "_label": "ProfileImage" if id_ == profile_image else ''}]}
+
+            if type_ := get_standard_type_loud(link_.domain.types):
+                image['classified_as'] = get_type_property(type_)
+            representation['digitally_shown_by'].append(image)
+
+        properties_set['representation'].append(representation)
 
     return {'@context': app.config['API_CONTEXT']['LOUD']} | \
         base_entity_dict() | properties_set
