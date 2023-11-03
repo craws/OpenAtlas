@@ -775,7 +775,7 @@ def check_iiif_activation() -> bool:
 def check_iiif_file_exist(id_: int) -> bool:
     if g.settings['iiif_conversion']:
         return get_iiif_file_path(id_).is_file()
-    return bool(get_file_path(id_))
+    return bool(get_file_path(id_))  # pragma: no cover
 
 
 def get_iiif_file_path(id_: int) -> Path:

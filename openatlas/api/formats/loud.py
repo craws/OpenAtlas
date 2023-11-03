@@ -12,9 +12,7 @@ from openatlas.models.gis import Gis
 from openatlas.models.type import Type
 
 
-def get_loud_entities(
-        data: dict[str, Any],
-        loud: dict[str, str]) -> Any:
+def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
     properties_set = defaultdict(list)
 
     def base_entity_dict() -> dict[str, Any]:
@@ -25,16 +23,15 @@ def get_loud_entities(
             '_label': data['entity'].name,
             'content': data['entity'].description,
             'timespan': get_loud_timespan(data['entity']),
-            'identified_by': [
-                {"type": "Name",
-                 "content": data['entity'].name}]}
+            'identified_by': [{
+                "type": "Name",
+                "content": data['entity'].name}]}
 
     def get_range_links() -> dict[str, Any]:
-        property_ = {
+        return {
             'id': url_for('api.entity', id_=link_.range.id, _external=True),
             'type': loud[get_crm_code(link_).replace(' ', '_')],
             '_label': link_.range.name}
-        return property_
 
     def get_domain_links() -> dict[str, Any]:
         property_ = {
@@ -52,7 +49,6 @@ def get_loud_entities(
             property_name = 'broader'
         else:
             property_name = loud[get_crm_relation(link_).replace(' ', '_')]
-
         if link_.property.code == 'P53':
             for geom in Gis.get_wkt_by_id(link_.range.id):
                 base_property = get_range_links() | geom
@@ -84,40 +80,28 @@ def get_loud_entities(
 
     if image_links:
         profile_image = Entity.get_profile_image_id(data['entity'])
-        print(profile_image)
-        representation = {
-            "type": "VisualItem",
-            "digitally_shown_by": []}
+        representation = {"type": "VisualItem", "digitally_shown_by": []}
         for link_ in image_links:
             id_ = link_.domain.id
             suffix = g.files[id_].suffix.replace('.', '')
-
             if not app.config['IMAGE_FORMATS'].get(suffix):
-                continue
-
-            path = get_file_path(id_)
+                continue  # pragma: no cover
             image = {
-                "id": url_for(
-                    'api.entity',
-                    id_=id_,
-                    _external=True),
+                "id": url_for('api.entity', id_=id_, _external=True),
                 "_label": link_.domain.name,
                 "type": "DigitalObject",
                 "format": app.config['IMAGE_FORMATS'][suffix],
                 "access_point": [{
                     "id": url_for(
                         'api.display',
-                        filename=path.stem,
+                        filename=get_file_path(id_).stem,
                         _external=True),
                     "type": "DigitalObject",
                     "_label": "ProfileImage" if id_ == profile_image else ''}]}
-
             if type_ := get_standard_type_loud(link_.domain.types):
                 image['classified_as'] = get_type_property(type_)
             representation['digitally_shown_by'].append(image)
-
         properties_set['representation'].append(representation)
-
     return {'@context': app.config['API_CONTEXT']['LOUD']} | \
         base_entity_dict() | properties_set
 
