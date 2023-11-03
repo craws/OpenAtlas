@@ -8,8 +8,16 @@ high-quality, attributed digital objects online at scale. Once installed
 (see installations notes) it can be configured in the admin area at the
 **IIIF** tab.
 
+**Be aware that**
+
+* IIIF is **optional** for an OpenAtlas installation
+* Although already working and in use we still consider it **experimental**
+* Enabling it can **expose** used files to the public (without login)
+
+**Configuration**
+
 * **IIIF** - Select this checkbox to enable IIIF
-* **URL** - Complete URL to the Image API Server, e.g.
+* **URL** - Set the complete URL to the Image API Server, e.g.
   **https://yourserver.eu/iiif/**
 * **Version** - The manifest version provided by OpenAtlas. Currently only
   version 2 is available.
@@ -23,6 +31,10 @@ high-quality, attributed digital objects online at scale. Once installed
   * **deflate** - lossless but files size may be large
   * **jpeg** - much smaller files size but not lossless
 
+In case you are running multiple OpenAtlas instances you should create a sub
+directory for every instance at **/var/www/iipsrv/** and also add these to
+**URL** and **Path** accordingly.
+
 These formats have been successfully tested with OpenAtlas:
 
 * .bmp
@@ -30,7 +42,6 @@ These formats have been successfully tested with OpenAtlas:
 * .ico
 * .jpeg
 * .jpg
-* .pdf
 * .png
 * .svg
 * .tif
