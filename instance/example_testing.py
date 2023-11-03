@@ -12,7 +12,3 @@ ARCHE = {
     'collection_ids': [0],
     'base_url': 'https://arche-curation.acdh-dev.oeaw.ac.at/',
     'thumbnail_url': 'https://arche-thumbnails.acdh.oeaw.ac.at/'}
-
-# For Windows user
-# from pathlib import Path
-# TMP_PATH = Path('C:\\Path\\to\\tmp')

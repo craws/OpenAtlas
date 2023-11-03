@@ -197,8 +197,8 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
         view_name = origin.class_.view
     html = ''
     for item in [
-        'source', 'event', 'actor', 'place', 'artifact', 'reference',
-        'type']:
+            'source', 'event', 'actor', 'place', 'artifact', 'reference',
+            'type']:
         active = ''
         request_parts = request.path.split('/')
         if view_name == item \
@@ -230,24 +230,26 @@ def profile_image(entity: Entity) -> str:
     if not (path := get_file_path(entity.image_id)):
         return ''  # pragma: no cover
 
+    file_id = entity.image_id
     src = url_for('display_file', filename=path.name)
     url = src
     width = g.settings["profile_image_width"]
-    if g.settings['iiif'] and check_iiif_file_exist(entity.id):
-        url = url_for('view_iiif', id_=entity.id)
+
+    if g.settings['iiif'] and check_iiif_file_exist(file_id):
         iiif_ext = '.tiff' if g.settings['iiif_conversion'] \
-            else g.files[entity.id].suffix
+            else g.files[file_id].suffix
         src = \
-            f"{g.settings['iiif_url']}{entity.id}{iiif_ext}" \
+            f"{g.settings['iiif_url']}{file_id}{iiif_ext}" \
             f"/full/!{width},{width}/0/default.jpg"
     elif g.settings['image_processing'] and check_processed_image(path.name):
         if path_ := get_file_path(
-                entity.image_id,
+                file_id,
                 app.config['IMAGE_SIZE']['thumbnail']):
             src = url_for(
                 'display_file',
                 size=app.config['IMAGE_SIZE']['thumbnail'],
                 filename=path_.name)
+
     external = False
     if entity.class_.view == 'file':
         external = True
@@ -255,10 +257,25 @@ def profile_image(entity: Entity) -> str:
             return '<p class="uc-first">' + _('no preview available') + '</p>'
     else:
         url = url_for('view', id_=entity.image_id)
+
     html = link(
         f'<img style="max-width:{width}px" alt="{entity.name}" src="{src}">',
         url,
         external=external)
+
+    if check_iiif_activation() \
+            and g.files[file_id].suffix in g.display_file_ext:
+        if check_iiif_file_exist(file_id) \
+                or not g.settings['iiif_conversion']:
+            html += '<br>' + link(
+                _('view in IIIF'),
+                url_for('view_iiif', id_=file_id),
+                external=True)
+        else:
+            html += button_bar([
+                button(
+                    _('enable IIIF view'),
+                    url_for('make_iiif_available', id_=file_id))])
     return html
 
 
@@ -314,8 +331,8 @@ def get_backup_file_data() -> dict[str, Any]:
     latest_file = None
     latest_file_date = None
     for file in [
-        f for f in path.iterdir()
-        if (path / f).is_file() and f.name != '.gitignore']:
+            f for f in path.iterdir()
+            if (path / f).is_file() and f.name != '.gitignore']:
         file_date = datetime.utcfromtimestamp((path / file).stat().st_ctime)
         if not latest_file_date or file_date > latest_file_date:
             latest_file = file
@@ -334,7 +351,7 @@ def get_backup_file_data() -> dict[str, Any]:
 def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
     data: list[Any] = [format_name_and_aliases(entity, show_links)]
     if entity.class_.view in [
-        'actor', 'artifact', 'event', 'place', 'reference']:
+            'actor', 'artifact', 'event', 'place', 'reference']:
         data.append(entity.class_.label)
     if entity.class_.standard_type_id:
         data.append(entity.standard_type.name if entity.standard_type else '')
@@ -644,15 +661,10 @@ def manual(site: str) -> str:
         # print(f'Missing manual link: {path}')
         return ''
     return \
-            '<a title="' + uc_first(_('manual')) + '" ' \
-                                                   f'href="/static/manual/' \
-                                                   f'{site}.html" ' \
-                                                   f'class="manual" ' \
-                                                   f'target="_blank" ' \
-                                                   f'rel="noopener ' \
-                                                   f'noreferrer">' \
-                                                   f'<i class="fas fs-4 ' \
-                                                   f'fa-book"></i></a>'
+        '<a title="' + uc_first(_('manual')) + '" ' \
+        f'href="/static/manual/{site}.html" class="manual" ' \
+        f'target="_blank" rel="noopener noreferrer">' \
+        f'<i class="fas fs-4 fa-book"></i></a>'
 
 
 @app.template_filter()
@@ -755,8 +767,9 @@ def get_entities_linked_to_type_recursive(
 
 
 def check_iiif_activation() -> bool:
-    return bool(g.settings['iiif'] and
-                os.access(Path(g.settings['iiif_path']), os.W_OK))
+    return bool(
+        g.settings['iiif'] and
+        os.access(Path(g.settings['iiif_path']), os.W_OK))
 
 
 def check_iiif_file_exist(id_: int) -> bool:
