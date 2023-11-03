@@ -197,8 +197,8 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
         view_name = origin.class_.view
     html = ''
     for item in [
-            'source', 'event', 'actor', 'place', 'artifact', 'reference',
-            'type']:
+        'source', 'event', 'actor', 'place', 'artifact', 'reference',
+        'type']:
         active = ''
         request_parts = request.path.split('/')
         if view_name == item \
@@ -314,8 +314,8 @@ def get_backup_file_data() -> dict[str, Any]:
     latest_file = None
     latest_file_date = None
     for file in [
-            f for f in path.iterdir()
-            if (path / f).is_file() and f.name != '.gitignore']:
+        f for f in path.iterdir()
+        if (path / f).is_file() and f.name != '.gitignore']:
         file_date = datetime.utcfromtimestamp((path / file).stat().st_ctime)
         if not latest_file_date or file_date > latest_file_date:
             latest_file = file
@@ -334,7 +334,7 @@ def get_backup_file_data() -> dict[str, Any]:
 def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
     data: list[Any] = [format_name_and_aliases(entity, show_links)]
     if entity.class_.view in [
-            'actor', 'artifact', 'event', 'place', 'reference']:
+        'actor', 'artifact', 'event', 'place', 'reference']:
         data.append(entity.class_.label)
     if entity.class_.standard_type_id:
         data.append(entity.standard_type.name if entity.standard_type else '')
@@ -644,10 +644,15 @@ def manual(site: str) -> str:
         # print(f'Missing manual link: {path}')
         return ''
     return \
-        '<a title="' + uc_first(_('manual')) + '" ' \
-        f'href="/static/manual/{site}.html" class="manual" ' \
-        f'target="_blank" rel="noopener noreferrer">' \
-        f'<i class="fas fs-4 fa-book"></i></a>'
+            '<a title="' + uc_first(_('manual')) + '" ' \
+                                                   f'href="/static/manual/' \
+                                                   f'{site}.html" ' \
+                                                   f'class="manual" ' \
+                                                   f'target="_blank" ' \
+                                                   f'rel="noopener ' \
+                                                   f'noreferrer">' \
+                                                   f'<i class="fas fs-4 ' \
+                                                   f'fa-book"></i></a>'
 
 
 @app.template_filter()
@@ -751,7 +756,7 @@ def get_entities_linked_to_type_recursive(
 
 def check_iiif_activation() -> bool:
     return bool(g.settings['iiif'] and
-    os.access(Path(g.settings['iiif_path']), os.W_OK))
+                os.access(Path(g.settings['iiif_path']), os.W_OK))
 
 
 def check_iiif_file_exist(id_: int) -> bool:
@@ -766,16 +771,22 @@ def get_iiif_file_path(id_: int) -> Path:
 
 
 def convert_image_to_iiif(id_: int) -> None:
-    compression = g.settings['iiif_conversion'] \
-        if g.settings['iiif_conversion'] in ['deflate', 'jpeg'] else 'deflate'
-    vips = "vips" if os.name == 'posix' else "vips.exe"
-    command = \
-        (f"{vips} tiffsave {get_file_path(id_)} {get_iiif_file_path(id_)} "
-         f"--tile --pyramid --compression {compression} "
-         f"--tile-width 128 --tile-height 128")
-    try:
-        process = subprocess.Popen(command, shell=True)
-        process.wait()
+    command = ["vips" if os.name == 'posix' else "vips.exe"]
+    command.extend([
+        'tiffsave',
+        get_file_path(id_),
+        get_iiif_file_path(id_),
+        '--tile',
+        '--pyramid',
+        '--compression',
+        g.settings['iiif_conversion'],
+        '--tile-width',
+        '128',
+        '--tile-height',
+        '128'])
+    process = subprocess.Popen(command)
+    process.wait()
+    if process.returncode == 0:
         flash(_('IIIF converted'), 'info')
-    except Exception as e:  # pragma: no cover
-        flash(f"{_('failed to convert image')}: {e}", 'error')
+    else:
+        flash(f"{_('failed to convert image')}", 'error')

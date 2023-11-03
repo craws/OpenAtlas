@@ -2,6 +2,7 @@ import os
 import shutil
 import subprocess
 from datetime import datetime
+from pathlib import Path
 from typing import Optional
 
 from openatlas import app
@@ -17,21 +18,20 @@ def current_date_for_filename() -> str:
 def sql_export(format_: str, postfix: Optional[str] = '') -> bool:
     file = app.config['EXPORT_PATH'] \
            / f'{current_date_for_filename()}_export{postfix}.{format_}'
-    pg_dump = "pg_dump" if os.name == 'posix' \
-        else f'"{shutil.which("pg_dump.exe")}"'
-    command = \
-        f"{pg_dump} " \
-        f"{'-Fc' if format_ == 'dump' else ''} " \
-        f"-h {app.config['DATABASE_HOST']} " \
-        f"-d {app.config['DATABASE_NAME']} " \
-        f"-U {app.config['DATABASE_USER']} " \
-        f"-p {app.config['DATABASE_PORT']} " \
-        f"-f {file}"
+    command = ["pg_dump" if os.name == 'posix'
+               else Path(shutil.which("pg_dump.exe"))]
+    if format_ == 'dump':
+        command.append('-Fc')
+    command.extend([
+        '-h', app.config['DATABASE_HOST'],
+        '-d', app.config['DATABASE_NAME'],
+        '-U', app.config['DATABASE_USER'],
+        '-p', str(app.config['DATABASE_PORT']),
+        '-f', file])
     try:
         root = os.environ['SYSTEMROOT'] if 'SYSTEMROOT' in os.environ else ''
         subprocess.Popen(
             command,
-            shell=True,
             stdin=subprocess.PIPE,
             env={
                 'PGPASSWORD': app.config['DATABASE_PASS'],

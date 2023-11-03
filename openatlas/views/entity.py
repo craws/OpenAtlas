@@ -212,7 +212,7 @@ def insert_files(manager: BaseManager) -> Union[str, Response]:
             path = app.config['UPLOAD_PATH'] / name
             file.save(str(path))
             if f'.{ext}' in g.display_file_ext:
-                call(f'exiftran -ai {path}', shell=True)  # Fix rotation
+                call(['exiftran', '-ai', path])  # Fix rotation
             filenames.append(name)
             if g.settings['image_processing']:
                 resize_image(name)
