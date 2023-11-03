@@ -85,7 +85,7 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
             id_ = link_.domain.id
             suffix = g.files[id_].suffix.replace('.', '')
             if not app.config['IMAGE_FORMATS'].get(suffix):
-                continue
+                continue  # pragma: no cover
             image = {
                 "id": url_for('api.entity', id_=id_, _external=True),
                 "_label": link_.domain.name,
