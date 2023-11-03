@@ -1,3 +1,4 @@
+import mimetypes
 from collections import defaultdict
 from typing import Any, Optional
 
@@ -83,14 +84,14 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
         representation = {"type": "VisualItem", "digitally_shown_by": []}
         for link_ in image_links:
             id_ = link_.domain.id
-            suffix = g.files[id_].suffix.replace('.', '')
-            if not app.config['IMAGE_FORMATS'].get(suffix):
+            mime_type, _ = mimetypes.guess_type(g.files[id_])
+            if not mime_type:
                 continue  # pragma: no cover
             image = {
                 "id": url_for('api.entity', id_=id_, _external=True),
                 "_label": link_.domain.name,
                 "type": "DigitalObject",
-                "format": app.config['IMAGE_FORMATS'][suffix],
+                "format": mime_type,
                 "access_point": [{
                     "id": url_for(
                         'api.display',

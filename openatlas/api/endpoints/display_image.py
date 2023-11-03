@@ -1,3 +1,4 @@
+import mimetypes
 from pathlib import Path as Pathlib_path
 from typing import Any
 
@@ -49,11 +50,13 @@ class LicensedFileOverview(Resource):
                             check_iiif_file_exist(entity.id)):
                         iiif_manifest = url_for(
                             'api.iiif_manifest',
-                            version=g.settings['iiif']['version'],
+                            version=g.settings['iiif_version'],
                             id_=entity.id,
                             _external=True)  # pragma: no cover
+                    mime_type, _ = mimetypes.guess_type(path)
                     files_dict[path.stem] = {
                         'extension': path.suffix,
+                        'mimetype': mime_type,
                         'display': url_for(
                             'api.display',
                             filename=path.stem,
