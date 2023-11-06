@@ -15,6 +15,10 @@ def index_changelog() -> str:
 
 
 versions = {
+    '7.17.1': ['2023-11-06', {
+        'fix': {
+            '2110': 'API: licensed file overview broken',
+            '2109': 'Manual: Missing API version 0.4 section'}}],
     '7.17.0': ['2023-11-05', {
         'feature': {
             '2070': 'Modification (E11) for Place (E18)',

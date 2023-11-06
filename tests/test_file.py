@@ -142,7 +142,6 @@ class FileTest(TestBaseCase):
 
             rv = self.app.get(url_for('api.licensed_file_overview'))
             assert bool(len(rv.get_json().keys()) == 3)
-            print(rv.get_json())
             rv = self.app.get(
                 url_for('api.licensed_file_overview', download=True))
             assert bool(len(rv.get_json().keys()) == 3)
