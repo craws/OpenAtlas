@@ -317,7 +317,7 @@ intro, legal notice, contact, and size of processed images.
     https://demo.openatlas.eu/api/0.3/content/
 
 Licensed File Overview
-""""""""""""""""""
+""""""""""""""""""""""
 
 .. code::
 

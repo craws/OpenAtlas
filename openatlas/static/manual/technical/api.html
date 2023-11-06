@@ -36,7 +36,7 @@
 
     
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Version 0.3" href="api_version_03.html" />
+    <link rel="next" title="Version 0.4" href="api_version_04.html" />
     <link rel="prev" title="Link checker" href="../model/link_checker.html" /> 
 </head>
 
@@ -265,20 +265,23 @@ see this
 <h2>Versioning<a class="headerlink" href="#versioning" title="Permalink to this headline">¶</a></h2>
 <table class="colwidths-given docutils align-default">
 <colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>stable</p></th>
-<th class="head"><p>unstable</p></th>
 <th class="head"><p>deprecated</p></th>
+<th class="head"><p>unstable</p></th>
+<th class="head"><p>unavailable</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><a class="reference internal" href="api_version_03.html#version-0-3"><span class="std std-ref">0.3</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api_version_04.html#version-0-4"><span class="std std-ref">0.4</span></a></p></td>
+<td><p><a class="reference internal" href="api_version_03.html#version-0-3"><span class="std std-ref">0.3</span></a></p></td>
+<td><p>1.0</p></td>
 <td><p><a class="reference internal" href="api_version_01.html#version-0-1"><span class="std std-ref">0.1</span></a>, <a class="reference internal" href="api_version_02.html#version-0-2"><span class="std std-ref">0.2</span></a></p></td>
-<td><p><a class="reference internal" href="api_version_1.html#version-1-0"><span class="std std-ref">1.0</span></a></p></td>
 </tr>
 </tbody>
 </table>
@@ -286,7 +289,7 @@ see this
 <a class="reference external" href="https://en.wikipedia.org/wiki/Software_versioning#Sequence-based_identifiers">sequenced based versioning</a>
 and reflects the significance: <strong>major.minor.fix</strong> e.g. <strong>3.11.1</strong>. Only the
 <strong>major</strong> number is used for the URL path. <strong>Minor</strong> and <strong>fix</strong> are used for
-documentation reasons only with the exception of versions 0.1, 0.2 and 0.3.
+documentation reasons only with the exception of versions 0.1, 0.2, 0.3 and 0.4.
 A <strong>stable</strong> version of the API will be available at all times. In addition,
 <strong>previous</strong> versions will still be usable but tagged as <strong>deprecated</strong>. A
 warning will be posted in the
@@ -301,7 +304,8 @@ developed, so breaking changes may occur at any time without prior notice.</p>
 has a own set of endpoints, be sure to use the right one.</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="api_version_03.html">Version 0.3 (stable, current)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_version_04.html">Version 0.4 (stable, current)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_version_03.html">Version 0.3 (stable, deprecated)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api_version_02.html">Version 0.2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api_version_01.html">Version 0.1</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api_version_1.html">Version 1.0 (whitepaper)</a></li>
@@ -319,15 +323,14 @@ or RDFs, derived from the <a class="reference external" href="https://github.com
 parameters which can be used. So please consult the <a class="reference internal" href="#endpoints">Endpoints</a> listing for
 more details.</p>
 <p>Parameters are added to the end of an URL after the “<strong>?</strong>” symbol
-(e.g. demo.openatlas.eu/api/0.3/entity/5117**?download=true**) and are
+(e.g. demo.openatlas.eu/api/0.4/entity/5117**?download=true**) and are
 connected with the “<strong>&amp;</strong>” sign.
 For more general information on this topic see this
 <a class="reference external" href="https://www.botify.com/learn/basics/what-are-url-parameters#:~:text=URL%20parameters%20(also%20known%20as,by%20the%20'%26'%20symbol.">article</a>.</p>
-<p>At the moment only the <a class="reference internal" href="api_version_03.html#version-0-3"><span class="std std-ref">stable version 0.3</span></a> of the API can
-be provided by an detailed parameter list.</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="api_parameters_03.html">API parameters 0.3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_parameters_04.html">API parameters 0.4</a></li>
 </ul>
 </div>
 </div>
@@ -375,7 +378,7 @@ To provide the OpenAtlas API with a proxy server, add following line to <strong>
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="api_version_03.html" class="btn btn-neutral float-right" title="Version 0.3" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="api_version_04.html" class="btn btn-neutral float-right" title="Version 0.4" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
         <a href="../model/link_checker.html" class="btn btn-neutral float-left" title="Link checker" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 

@@ -298,7 +298,7 @@ which icon is used, and their english name.
     https://demo.openatlas.eu/api/0.4/classes/
 
 Licensed File Overview
-""""""""""""""""""
+""""""""""""""""""""""
 
 .. code::
 
