@@ -157,7 +157,7 @@ def admin_index(
                 button(_('edit'), url_for('admin_settings', category='mail'))])
         if g.settings['mail']:
             tabs['email'].content += display_form(form)
-        tabs['iiif'] = Tab(
+        tabs['IIIF'] = Tab(
             'IIIF',
             display_info(get_form_settings(IiifForm())),
             buttons=[
@@ -337,10 +337,13 @@ def admin_delete_single_type_duplicate(
 def admin_settings(category: str) -> Union[str, Response]:
     if category in ['general', 'mail', 'iiif'] and not is_authorized('admin'):
         abort(403)
-    form_name = f"{uc_first(category)}Form"
     form = getattr(
         importlib.import_module('openatlas.forms.setting'),
-        form_name)()
+        f"{uc_first(category)}Form")()
+    tab = category \
+        .replace('api', 'data') \
+        .replace('mail', 'email') \
+        .replace('iiif', 'IIIF')
     if form.validate_on_submit():
         data = {}
         for field in form:
@@ -362,16 +365,15 @@ def admin_settings(category: str) -> Union[str, Response]:
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        return redirect(
-            f"{url_for('admin_index')}"
-            f"#tab-{category.replace('api', 'data').replace('mail', 'email')}")
+        return redirect(f"{url_for('admin_index')}#tab-{tab}")
     set_form_settings(form)
-    tab = f"#tab-{category.replace('api', 'data').replace('mail', 'email')}"
     return render_template(
         'content.html',
         content=display_form(form, manual_page=f"admin/{category}"),
         title=_('admin'),
-        crumbs=[[_('admin'), f"{url_for('admin_index')}{tab}"], _(category)])
+        crumbs=[
+            [_('admin'), f"{url_for('admin_index')}#tab-{tab}"],
+            _(category)])
 
 
 @app.route('/admin/similar', methods=['GET', 'POST'])

@@ -54,7 +54,7 @@ class ExportDatabase(Resource):
         if format_ == 'xml':
             return export_database_xml(tables, filename)
         return Response(
-            json.dumps({key: value for key, value in tables.items()}),
+            json.dumps(tables),
             mimetype='application/json',
             headers={
                 'Content-Disposition': f'attachment;filename={filename}.json'})

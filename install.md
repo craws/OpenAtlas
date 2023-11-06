@@ -130,7 +130,7 @@ high-quality, attributed digital objects online at scale. Be aware that:
 
 * IIIF is **optional** for an OpenAtlas installation
 * Although already working and in use we still consider it **experimental**
-* Enabling it can expose used files to the public (without login)
+* Enabling IIIF can expose files to the public (without login)
 
 ### Installation
 
@@ -185,7 +185,7 @@ To run OpenAtlas as a Docker container clone the repository
     git clone https://github.com/craws/OpenAtlas.git
 
 Open an CLI in the directory where you cloned OpenAtlas and run
-    
+
     docker compose up --detach
 
 After the containers are build an OpenAtlas instance is available under
