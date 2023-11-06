@@ -1,6 +1,5 @@
 Features
 ========
-
 OpenAtlas is developed for easy acquisition, editing, and management of
 research data from the humanities as well as related research fields. Special
 emphasis is placed on making data entry as easy and convenient as possible for
@@ -9,7 +8,6 @@ software. The features listed below contribute significantly to this effort.
 
 Model
 -----
-
 The data model specifies the structure in which the information is stored
 within the database. The use of an ontology, for example, allows the data to be
 combined more easily with information from other projects and is consistent
@@ -29,9 +27,8 @@ field of humanities.
 * :doc:`Data integrity check</admin/data_integrity_checks>` functions
 * :doc:`Model link checker<model/link_checker>` to confirm CIDOC CRM validity
 
-User interface
+User Interface
 --------------
-
 The user interface allows for easy and quick entry of information into the
 database, while the data is mapped in the background according to the
 specifications of the data model (see above).
@@ -58,9 +55,18 @@ project.
 
 .. image:: /ui.png
 
-Data exchange
--------------
+IIIF Integration
+----------------
+`IIIF <https://iiif.io/>`_ is a set of open standards for delivering
+high-quality, attributed digital objects online at scale. Included
+services are:
 
+* IIIF Image API
+* IIIF Presentation API (manifest server)
+* IIIF viewer integration (`Mirador <https://projectmirador.org/>`_)
+
+Data Exchange
+-------------
 OpenAtlas offers various possibilities to exchange data with other systems or
 to import data into the database system.
 
@@ -68,9 +74,8 @@ to import data into the database system.
 * :doc:`/admin/export` functions for multiple formats
 * :doc:`/admin/import` of CSV files
 
-User management
+User Management
 ---------------
-
 The User Management Features allows the activation of users for the own
 OpenAtlas instance. These can also be divided into different user groups with
 different permissions. In addition, the user interface can be adapted to the
@@ -83,7 +88,6 @@ user's own preferences via settings.
 
 Anthropological Analyses
 ------------------------
-
 In order to also allow interdisciplinary work with anthropological data,
 anthropological methods, such as age and sex determination, will be available
 in OpenAtlas in the future. The implementation of the age determination
@@ -94,6 +98,5 @@ according to Ferembach et al. is the first step in this direction.
 
 Radiocarbon Dating
 ------------------
-
 This tool is ment to track results of radiocarbon dating, see
 :doc:`here </tools/radiocarbon_dating>`.

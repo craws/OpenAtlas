@@ -14,7 +14,6 @@ from openatlas.models.type import Type
 
 
 def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
-    properties_set = defaultdict(list)
 
     def base_entity_dict() -> dict[str, Any]:
         return {
@@ -43,6 +42,7 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
             property_['classified_as'] = get_type_property(standard_type)
         return property_
 
+    properties_set = defaultdict(list)
     for link_ in data['links']:
         if link_.property.code in ['OA7', 'OA8', 'OA9']:
             continue
@@ -81,24 +81,26 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
 
     if image_links:
         profile_image = Entity.get_profile_image_id(data['entity'])
-        representation = {"type": "VisualItem", "digitally_shown_by": []}
+        representation: dict[str, Any] = {
+            'type': 'VisualItem',
+            'digitally_shown_by': []}
         for link_ in image_links:
             id_ = link_.domain.id
             mime_type, _ = mimetypes.guess_type(g.files[id_])
             if not mime_type:
                 continue  # pragma: no cover
             image = {
-                "id": url_for('api.entity', id_=id_, _external=True),
-                "_label": link_.domain.name,
-                "type": "DigitalObject",
-                "format": mime_type,
-                "access_point": [{
-                    "id": url_for(
+                'id': url_for('api.entity', id_=id_, _external=True),
+                '_label': link_.domain.name,
+                'type': 'DigitalObject',
+                'format': mime_type,
+                'access_point': [{
+                    'id': url_for(
                         'api.display',
-                        filename=get_file_path(id_).stem,
+                        filename=get_file_path(id_).stem,  # type: ignore
                         _external=True),
-                    "type": "DigitalObject",
-                    "_label": "ProfileImage" if id_ == profile_image else ''}]}
+                    'type': 'DigitalObject',
+                    '_label': 'ProfileImage' if id_ == profile_image else ''}]}
             if type_ := get_standard_type_loud(link_.domain.types):
                 image['classified_as'] = get_type_property(type_)
             representation['digitally_shown_by'].append(image)

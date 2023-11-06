@@ -61,13 +61,18 @@ class MailForm(FlaskForm):
 
 
 class IiifForm(FlaskForm):
-    iiif = BooleanField('IIIF')
-    iiif_url = StringField(_('URL'))
-    iiif_version = SelectField(_('version'), choices=((2, 2),), coerce=int)
+    iiif = BooleanField('IIIF', description=_('tooltip IIIF enabled'))
+    iiif_url = StringField(_('URL'), description=_('tooltip IIIF URL'))
+    iiif_version = SelectField(
+        _('version'),
+        choices=((2, 2),),
+        coerce=int,
+        description=_('tooltip IIIF version'))
     iiif_conversion = SelectField(
         _('conversion'),
-        choices=(('', 'none'), ('deflate', 'deflate'), ('jpeg', 'jpeg')))
-    iiif_path = StringField(_('path'))
+        choices=(('', 'none'), ('deflate', 'deflate'), ('jpeg', 'jpeg')),
+        description=_('tooltip IIIF conversion'))
+    iiif_path = StringField(_('path'), description=_('tooltip IIIF path'))
     save = SubmitField(_('apply'))
 
 

@@ -201,9 +201,16 @@
 high-quality, attributed digital objects online at scale. Once installed
 (see installations notes) it can be configured in the admin area at the
 <strong>IIIF</strong> tab.</p>
+<p><strong>Be aware that</strong></p>
+<ul class="simple">
+<li><p>IIIF is <strong>optional</strong> for an OpenAtlas installation</p></li>
+<li><p>Although already working and in use we still consider it <strong>experimental</strong></p></li>
+<li><p>Enabling it can <strong>expose</strong> used files to the public (without login)</p></li>
+</ul>
+<p><strong>Configuration</strong></p>
 <ul class="simple">
 <li><p><strong>IIIF</strong> - Select this checkbox to enable IIIF</p></li>
-<li><p><strong>URL</strong> - Complete URL to the Image API Server, e.g.
+<li><p><strong>URL</strong> - Set the complete URL to the Image API Server, e.g.
 <strong>https://yourserver.eu/iiif/</strong></p></li>
 <li><p><strong>Version</strong> - The manifest version provided by OpenAtlas. Currently only
 version 2 is available.</p></li>
@@ -219,6 +226,9 @@ has to be accessible (write and execute) for the webserver.</p></li>
 </ul>
 </li>
 </ul>
+<p>In case you are running multiple OpenAtlas instances you should create a sub
+directory for every instance at <strong>/var/www/iipsrv/</strong> and also add these to
+<strong>URL</strong> and <strong>Path</strong> accordingly.</p>
 <p>These formats have been successfully tested with OpenAtlas:</p>
 <ul class="simple">
 <li><p>.bmp</p></li>
@@ -226,7 +236,6 @@ has to be accessible (write and execute) for the webserver.</p></li>
 <li><p>.ico</p></li>
 <li><p>.jpeg</p></li>
 <li><p>.jpg</p></li>
-<li><p>.pdf</p></li>
 <li><p>.png</p></li>
 <li><p>.svg</p></li>
 <li><p>.tif</p></li>

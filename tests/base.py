@@ -55,7 +55,7 @@ class TestBaseCase(unittest.TestCase):
         if app.config['LOAD_WINDOWS_TEST_SQL']:  # pragma: no cover
             with open(
                     Path(app.root_path).parent / 'install' /
-                    f'data_test_windows.sql', encoding='utf8') as sql_file:
+                    'data_test_windows.sql', encoding='utf8') as sql_file:
                 self.cursor.execute(sql_file.read())
 
 

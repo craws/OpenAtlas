@@ -24,8 +24,8 @@ then run the database upgrade script, then restart Apache:
 #### Configuration
 The configuration was refactored, especially path parameters. You should
 compare your **instance/production.py** with **config/default.py** in case you
-made adaptions to these. The same goes for **instance/tests.py** in case you
-are also using tests.
+made adaptions there. The same goes for **instance/tests.py** in case you are
+running tests.
 
 #### NPM - additional packages
 
@@ -36,6 +36,19 @@ are also using tests.
 
 #### IIIF
 If you want to use IIIF, please refer to the relevant section at **install.md**
+
+#### Deprecation warnings
+Because of the new API version 0.4.0 following functionality is now deprecated.
+It will be removed with the next OpenAtlas major version **8.0.0**, probably
+around New Year 2024.
+
+**API version 0.4 breaking changes**
+* **API:** Remove of /content endpoint
+* **API:** Rename name to label in first layer of /type_by_view_class/ and
+  /type_overview/
+* **API:** Incorporate /classes into /backend_details
+* **Backend:** Deprecation of the content section in the admin area which was
+  used by former presentation sites
 
 ### 7.15.0 to 7.16.0
 7.16.0.sql is needed but will be taken care of by the database upgrade script.
