@@ -49,7 +49,7 @@ class LicensedFileOverview(Resource):
                             check_iiif_file_exist(entity.id)):
                         iiif_manifest = url_for(
                             'api.iiif_manifest',
-                            version=g.settings['iiif']['version'],
+                            version=g.settings['iiif_version'],
                             id_=entity.id,
                             _external=True)  # pragma: no cover
                     files_dict[path.stem] = {
