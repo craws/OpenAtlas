@@ -10,6 +10,7 @@ from openatlas.api.resources.error import (
 from openatlas.api.resources.model_mapper import (
     get_entities_by_ids, get_entities_by_system_classes, get_entity_by_id)
 from openatlas.api.resources.parser import files, image
+from openatlas.api.resources.resolve_endpoints import download
 from openatlas.api.resources.templates import licensed_file_template
 from openatlas.api.resources.util import get_license_name
 from openatlas.display.util import (
@@ -45,13 +46,13 @@ class LicensedFileOverview(Resource):
             if license_ := get_license_name(entity):
                 if path := get_file_path(entity):
                     iiif_manifest = ''
-                    if (check_iiif_activation() and
-                            check_iiif_file_exist(entity.id)):
+                    if check_iiif_activation() and \
+                            check_iiif_file_exist(entity.id):
                         iiif_manifest = url_for(
                             'api.iiif_manifest',
-                            version=g.settings['iiif']['version'],
+                            version=g.settings['iiif_version'],
                             id_=entity.id,
-                            _external=True)  # pragma: no cover
+                            _external=True)
                     files_dict[path.stem] = {
                         'extension': path.suffix,
                         'display': url_for(
@@ -65,4 +66,6 @@ class LicensedFileOverview(Resource):
                             _external=True),
                         'license': license_,
                         'IIIFManifest': iiif_manifest}
+        if parser['download']:
+            download(files_dict, licensed_file_template(entities), 'files')
         return marshal(files_dict, licensed_file_template(entities)), 200
