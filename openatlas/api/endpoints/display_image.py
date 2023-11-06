@@ -10,6 +10,7 @@ from openatlas.api.resources.error import (
 from openatlas.api.resources.model_mapper import (
     get_entities_by_ids, get_entities_by_system_classes, get_entity_by_id)
 from openatlas.api.resources.parser import files, image
+from openatlas.api.resources.resolve_endpoints import download
 from openatlas.api.resources.templates import licensed_file_template
 from openatlas.api.resources.util import get_license_name
 from openatlas.display.util import (
@@ -65,4 +66,6 @@ class LicensedFileOverview(Resource):
                             _external=True),
                         'license': license_,
                         'IIIFManifest': iiif_manifest}
+        if parser['download']:
+            download(files_dict, licensed_file_template(entities), 'files')
         return marshal(files_dict, licensed_file_template(entities)), 200

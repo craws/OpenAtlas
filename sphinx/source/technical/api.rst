@@ -87,20 +87,22 @@ Versioning
 ==========
 .. list-table::
    :header-rows: 1
-   :widths: 20 20 20
+   :widths: 20 20 20 20
 
    * - stable
-     - unstable
      - deprecated
-   * - :ref:`0.3<version_0_3>`
+     - unstable
+     - unavailable
+   * - :ref:`0.4<version_0_4>`
+     - :ref:`0.3<version_0_3>`
+     - 1.0
      - :ref:`0.1<version_0_1>`, :ref:`0.2<version_0_2>`
-     - :ref:`1.0<version_1_0>`
 
 The OpenAtlas API follows the notion of
 `sequenced based versioning <https://en.wikipedia.org/wiki/Software_versioning#Sequence-based_identifiers>`_
 and reflects the significance: **major.minor.fix** e.g. **3.11.1**. Only the
 **major** number is used for the URL path. **Minor** and **fix** are used for
-documentation reasons only with the exception of versions 0.1, 0.2 and 0.3.
+documentation reasons only with the exception of versions 0.1, 0.2, 0.3 and 0.4.
 A **stable** version of the API will be available at all times. In addition,
 **previous** versions will still be usable but tagged as **deprecated**. A
 warning will be posted in the
@@ -118,7 +120,8 @@ has a own set of endpoints, be sure to use the right one.
 .. toctree::
    :maxdepth: 1
 
-   Version 0.3 (stable, current) <api_version_03>
+   Version 0.4 (stable, current) <api_version_04>
+   Version 0.3 (stable, deprecated) <api_version_03>
    api_version_02
    api_version_01
    Version 1.0 (whitepaper) <api_version_1>
@@ -137,19 +140,17 @@ parameters which can be used. So please consult the `Endpoints`_ listing for
 more details.
 
 Parameters are added to the end of an URL after the "**?**" symbol
-(e.g. demo.openatlas.eu/api/0.3/entity/5117**?download=true**) and are
+(e.g. demo.openatlas.eu/api/0.4/entity/5117**?download=true**) and are
 connected with the "**&**" sign.
 For more general information on this topic see this
 `article <https://www.botify.com/learn/basics/what-are-url-parameters#:~:text=URL%20parameters%20(also%20known%20as,by%20the%20'%26'%20symbol.>`_.
-
-At the moment only the :ref:`stable version 0.3<version_0_3>` of the API can
-be provided by an detailed parameter list.
 
 
 .. toctree::
    :maxdepth: 1
 
    api_parameters_03
+   api_parameters_04
 
 Error handling
 ==============

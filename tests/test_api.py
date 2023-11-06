@@ -435,8 +435,8 @@ class Api(ApiTestCase):
                 assert found
 
             for rv in [
-                    self.app.get(url_for('api_03.type_tree')),
-                    self.app.get(url_for('api_03.type_tree', download=True))]:
+                self.app.get(url_for('api_03.type_tree')),
+                self.app.get(url_for('api_03.type_tree', download=True))]:
                 assert bool(rv.get_json()['typeTree'])
             rv = self.app.get(url_for('api_03.type_tree', count=True))
             assert rv.get_json() > 0
@@ -789,6 +789,11 @@ class Api(ApiTestCase):
 
             # Image Endpoints
             rv = self.app.get(url_for('api_03.licensed_file_overview'))
+            assert bool(len(rv.get_json().keys()) == 3)
+            rv = self.app.get(
+                url_for(
+                    'api_03.licensed_file_overview',
+                    download=True))
             assert bool(len(rv.get_json().keys()) == 3)
             rv = self.app.get(url_for(
                 'api_03.licensed_file_overview', file_id='154'))
