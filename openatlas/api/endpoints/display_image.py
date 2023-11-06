@@ -46,13 +46,13 @@ class LicensedFileOverview(Resource):
             if license_ := get_license_name(entity):
                 if path := get_file_path(entity):
                     iiif_manifest = ''
-                    if (check_iiif_activation() and
-                            check_iiif_file_exist(entity.id)):
+                    if check_iiif_activation() and \
+                            check_iiif_file_exist(entity.id):
                         iiif_manifest = url_for(
                             'api.iiif_manifest',
                             version=g.settings['iiif_version'],
                             id_=entity.id,
-                            _external=True)  # pragma: no cover
+                            _external=True)
                     files_dict[path.stem] = {
                         'extension': path.suffix,
                         'display': url_for(
