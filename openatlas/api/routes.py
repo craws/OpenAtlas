@@ -64,16 +64,20 @@ def admin_routes(api: Api) -> None:
         '/classes/',
         endpoint='class_mapping')
     api.add_resource(
-        SystemClassCount,
-        '/system_class_count/',
-        endpoint='system_class_count')
-    api.add_resource(
         LicensedFileOverview,
         '/licensed_file_overview/',
         endpoint='licensed_file_overview')
+    api.add_resource(
+        SystemClassCount,
+        '/system_class_count/',
+        endpoint='system_class_count')
 
 
 def type_routes(api: Api) -> None:
+    api.add_resource(
+        GetTypeByViewClass,
+        '/type_by_view_class/',
+        endpoint="type_by_view_class")
     api.add_resource(
         GetTypeOverview,
         '/type_overview/',
@@ -82,10 +86,6 @@ def type_routes(api: Api) -> None:
         GetTypeTree,
         '/type_tree/',
         endpoint="type_tree")
-    api.add_resource(
-        GetTypeByViewClass,
-        '/type_by_view_class/',
-        endpoint="type_by_view_class")
 
 
 def special_routes(api: Api) -> None:

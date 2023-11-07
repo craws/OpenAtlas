@@ -136,6 +136,19 @@ class FileTest(TestBaseCase):
             rv = rv.get_json()
             assert bool(str(file_id) in rv['@id'])
 
+            with app.test_request_context():
+                app.preprocess_request()  # type: ignore
+                files[0].link('P2', g.types[get_hierarchy('License').subs[0]])
+
+            rv = self.app.get(url_for('api.licensed_file_overview'))
+            assert bool(len(rv.get_json().keys()) == 3)
+            rv = self.app.get(
+                url_for('api.licensed_file_overview', download=True))
+            assert bool(len(rv.get_json().keys()) == 3)
+            rv = self.app.get(url_for(
+                'api.licensed_file_overview', file_id=file_id))
+            assert bool(len(rv.get_json().keys()) == 1)
+
             rv = self.app.get(url_for('view_iiif', id_=file_id))
             assert b'Mirador' in rv.data
 

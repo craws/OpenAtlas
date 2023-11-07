@@ -1,6 +1,6 @@
-.. _version_0_3:
+.. _version_0_4:
 
-Version 0.3
+Version 0.4
 ===========
 
 Entity Endpoint
@@ -8,7 +8,7 @@ Entity Endpoint
 
 .. code::
 
-  /api/0.3/entity/{id}
+  /api/0.4/entity/{id}
 
 Endpoint provide information about one entity in the OpenAtlas instance. The requested information is provided in Linked
 Places format (LPF). Alternatively, Linked Open Art (LOUD), GeoJSON or RDFs, derived from the LPF data, can be accessed.
@@ -17,11 +17,11 @@ Places format (LPF). Alternatively, Linked Open Art (LOUD), GeoJSON or RDFs, der
 ======================== ====================== ====================== ====================
 **Optional Parameters**
 -------------------------------------------------------------------------------------------
-:ref:`download-para-0.3` :ref:`export-para-0.3` :ref:`format-para-0.3` :ref:`show-para-0.3`
+:ref:`download-para-0.4` :ref:`export-para-0.4` :ref:`format-para-0.4` :ref:`show-para-0.4`
 ======================== ====================== ====================== ====================
 
 **Example**
-    https://demo.openatlas.eu/api/0.3/entity/4840?format=loud
+    https://demo.openatlas.eu/api/0.4/entity/4840?format=loud
 
 Query
 *****
@@ -31,7 +31,7 @@ Linked Places format (LPF). Alternatively, Linked Open Art (LOUD), GeoJSON or RD
 
 .. code::
 
-  /api/0.3/query?
+  /api/0.4/query?
 
 Combine several or all entity endpoints in one query.
 
@@ -42,19 +42,19 @@ query; each request has to be a new parameter.
 ============================= ======================== ============================== ============================
  **Required Parameters** - At least one is required for a successful request
 ------------------------------------------------------------------------------------------------------------------
-:ref:`cidoc-classes-para-0.3` :ref:`entities-para-0.3` :ref:`system-classes-para-0.3` :ref:`view-classes-para-0.3`
+:ref:`cidoc-classes-para-0.4` :ref:`entities-para-0.4` :ref:`system-classes-para-0.4` :ref:`view-classes-para-0.4`
 ============================= ======================== ============================== ============================
 
 ======================== ======================= ======================== ============================= ====================== ======================
  **Optional Parameters**
 -----------------------------------------------------------------------------------------------------------------------------------------------------
-  :ref:`column-para-0.3` :ref:`count-para-0.3`   :ref:`download-para-0.3` :ref:`export-para-0.3`        :ref:`first-para-0.3`  :ref:`format-para-0.3`
-  :ref:`last-para-0.3`   :ref:`limit-para-0.3`   :ref:`page-para-0.3`     :ref:`relation_type-para-0.3` :ref:`search-para-0.3` :ref:`show-para-0.3`
-  :ref:`sort-para-0.3`   :ref:`type_id-para-0.3`
+  :ref:`column-para-0.4` :ref:`count-para-0.4`   :ref:`download-para-0.4` :ref:`export-para-0.4`        :ref:`first-para-0.4`  :ref:`format-para-0.4`
+  :ref:`last-para-0.4`   :ref:`limit-para-0.4`   :ref:`page-para-0.4`     :ref:`relation_type-para-0.4` :ref:`search-para-0.4` :ref:`show-para-0.4`
+  :ref:`sort-para-0.4`   :ref:`type_id-para-0.4`
 ======================== ======================= ======================== ============================= ====================== ======================
 
 **Example**
-    https://demo.openatlas.eu/api/0.3/query?cidoc_classes=E18&cidoc_classes=E31&system_classes=person&limit=120
+    https://demo.openatlas.eu/api/0.4/query?cidoc_classes=E18&cidoc_classes=E31&system_classes=person&limit=120
 
 Multiple Entities
 *****************
@@ -67,47 +67,47 @@ CIDOC Class
 
 .. code::
 
-  /api/0.3/cidoc_class/{cidoc_class}
+  /api/0.4/cidoc_class/{cidoc_class}
 
 Retrieves a JSON list of entities based on their CIDOC CRM class [1]_ [2]_
 
 ======================== ======================= ======================== ============================= ====================== ======================
  **Optional Parameters**
 -----------------------------------------------------------------------------------------------------------------------------------------------------
-  :ref:`column-para-0.3` :ref:`count-para-0.3`   :ref:`download-para-0.3` :ref:`export-para-0.3`        :ref:`first-para-0.3`  :ref:`format-para-0.3`
-  :ref:`last-para-0.3`   :ref:`limit-para-0.3`   :ref:`page-para-0.3`     :ref:`relation_type-para-0.3` :ref:`search-para-0.3` :ref:`show-para-0.3`
-  :ref:`sort-para-0.3`   :ref:`type_id-para-0.3`
+  :ref:`column-para-0.4` :ref:`count-para-0.4`   :ref:`download-para-0.4` :ref:`export-para-0.4`        :ref:`first-para-0.4`  :ref:`format-para-0.4`
+  :ref:`last-para-0.4`   :ref:`limit-para-0.4`   :ref:`page-para-0.4`     :ref:`relation_type-para-0.4` :ref:`search-para-0.4` :ref:`show-para-0.4`
+  :ref:`sort-para-0.4`   :ref:`type_id-para-0.4`
 ======================== ======================= ======================== ============================= ====================== ======================
 
 **Example**
-    https://demo.openatlas.eu/api/0.3/cidoc_class/E18
+    https://demo.openatlas.eu/api/0.4/cidoc_class/E18
 
 Entities Linked to Entity
 """""""""""""""""""""""""
 
 .. code::
 
-  /api/0.3/entities_linked_to_entity/{id}
+  /api/0.4/entities_linked_to_entity/{id}
 
 Used to retrieve a JSON list of entities linked to the entity with the stated **ID** [2]_
 
 ======================== ======================= ======================== ============================= ====================== ======================
  **Optional Parameters**
 -----------------------------------------------------------------------------------------------------------------------------------------------------
-  :ref:`column-para-0.3` :ref:`count-para-0.3`   :ref:`download-para-0.3` :ref:`export-para-0.3`        :ref:`first-para-0.3`  :ref:`format-para-0.3`
-  :ref:`last-para-0.3`   :ref:`limit-para-0.3`   :ref:`page-para-0.3`     :ref:`relation_type-para-0.3` :ref:`search-para-0.3` :ref:`show-para-0.3`
-  :ref:`sort-para-0.3`   :ref:`type_id-para-0.3`
+  :ref:`column-para-0.4` :ref:`count-para-0.4`   :ref:`download-para-0.4` :ref:`export-para-0.4`        :ref:`first-para-0.4`  :ref:`format-para-0.4`
+  :ref:`last-para-0.4`   :ref:`limit-para-0.4`   :ref:`page-para-0.4`     :ref:`relation_type-para-0.4` :ref:`search-para-0.4` :ref:`show-para-0.4`
+  :ref:`sort-para-0.4`   :ref:`type_id-para-0.4`
 ======================== ======================= ======================== ============================= ====================== ======================
 
 **Example**
-    https://demo.openatlas.eu/api/0.3/entities_linked_to_entity/4840
+    https://demo.openatlas.eu/api/0.4/entities_linked_to_entity/4840
 
 Latest
 """"""
 
 .. code::
 
-  /api/0.3/latest/{n}
+  /api/0.4/latest/{n}
 
 Used to retrieve the last entry/entries made. The number {n} represents the amount of entities retrieved.
 {n} can be between 1 and 100. The pagination information is always **null**
@@ -115,92 +115,92 @@ Used to retrieve the last entry/entries made. The number {n} represents the amou
 ======================== ======================== ====================== ======================= =============================
  **Optional Parameters**
 ------------------------------------------------------------------------------------------------------------------------------
-  :ref:`column-para-0.3` :ref:`download-para-0.3` :ref:`export-para-0.3` :ref:`format-para-0.3`  :ref:`relation_type-para-0.3`
-  :ref:`search-para-0.3` :ref:`show-para-0.3`     :ref:`sort-para-0.3`   :ref:`type_id-para-0.3`
+  :ref:`column-para-0.4` :ref:`download-para-0.4` :ref:`export-para-0.4` :ref:`format-para-0.4`  :ref:`relation_type-para-0.4`
+  :ref:`search-para-0.4` :ref:`show-para-0.4`     :ref:`sort-para-0.4`   :ref:`type_id-para-0.4`
 ======================== ======================== ====================== ======================= =============================
 
 **Example**
-    https://demo.openatlas.eu/api/0.3/latest/25
+    https://demo.openatlas.eu/api/0.4/latest/25
 
 System Class
 """"""""""""
 
 .. code::
 
-  /api/0.3/system_class/{system_class}
+  /api/0.4/system_class/{system_class}
 
 Retrieves a list of entities, based on their OpenAtlas system class name as JSON [1]_ [2]_
 
 ======================== ======================= ======================== ============================= ====================== ======================
  **Optional Parameters**
 -----------------------------------------------------------------------------------------------------------------------------------------------------
-  :ref:`column-para-0.3` :ref:`count-para-0.3`   :ref:`download-para-0.3` :ref:`export-para-0.3`        :ref:`first-para-0.3`  :ref:`format-para-0.3`
-  :ref:`last-para-0.3`   :ref:`limit-para-0.3`   :ref:`page-para-0.3`     :ref:`relation_type-para-0.3` :ref:`search-para-0.3` :ref:`show-para-0.3`
-  :ref:`sort-para-0.3`   :ref:`type_id-para-0.3`
+  :ref:`column-para-0.4` :ref:`count-para-0.4`   :ref:`download-para-0.4` :ref:`export-para-0.4`        :ref:`first-para-0.4`  :ref:`format-para-0.4`
+  :ref:`last-para-0.4`   :ref:`limit-para-0.4`   :ref:`page-para-0.4`     :ref:`relation_type-para-0.4` :ref:`search-para-0.4` :ref:`show-para-0.4`
+  :ref:`sort-para-0.4`   :ref:`type_id-para-0.4`
 ======================== ======================= ======================== ============================= ====================== ======================
 
 **Example**
-    https://demo.openatlas.eu/api/0.3/system_class/person
+    https://demo.openatlas.eu/api/0.4/system_class/person
 
 Type Entities
 """""""""""""
 
 .. code::
 
-  /api/0.3/type_entities/{id}
+  /api/0.4/type_entities/{id}
 
 Used to retrieve a JSON list of entities, based on their OpenAtlas **type** [2]_ [3]_
 
 ======================== ======================= ======================== ============================= ====================== ======================
  **Optional Parameters**
 -----------------------------------------------------------------------------------------------------------------------------------------------------
-  :ref:`column-para-0.3` :ref:`count-para-0.3`   :ref:`download-para-0.3` :ref:`export-para-0.3`        :ref:`first-para-0.3`  :ref:`format-para-0.3`
-  :ref:`last-para-0.3`   :ref:`limit-para-0.3`   :ref:`page-para-0.3`     :ref:`relation_type-para-0.3` :ref:`search-para-0.3` :ref:`show-para-0.3`
-  :ref:`sort-para-0.3`   :ref:`type_id-para-0.3`
+  :ref:`column-para-0.4` :ref:`count-para-0.4`   :ref:`download-para-0.4` :ref:`export-para-0.4`        :ref:`first-para-0.4`  :ref:`format-para-0.4`
+  :ref:`last-para-0.4`   :ref:`limit-para-0.4`   :ref:`page-para-0.4`     :ref:`relation_type-para-0.4` :ref:`search-para-0.4` :ref:`show-para-0.4`
+  :ref:`sort-para-0.4`   :ref:`type_id-para-0.4`
 ======================== ======================= ======================== ============================= ====================== ======================
 
 **Example**
-    https://demo.openatlas.eu/api/0.3/type_entities/47
+    https://demo.openatlas.eu/api/0.4/type_entities/47
 
 Type Entities All
 """""""""""""""""
 
 .. code::
 
-  /api/0.3/type_entities_all/{id}
+  /api/0.4/type_entities_all/{id}
 
 Used to retrieve a JSON list of entities, based on their OpenAtlas **type** and includes all connected entities [2]_ [3]_
 
 ======================== ======================= ======================== ============================= ====================== ======================
  **Optional Parameters**
 -----------------------------------------------------------------------------------------------------------------------------------------------------
-  :ref:`column-para-0.3` :ref:`count-para-0.3`   :ref:`download-para-0.3` :ref:`export-para-0.3`        :ref:`first-para-0.3`  :ref:`format-para-0.3`
-  :ref:`last-para-0.3`   :ref:`limit-para-0.3`   :ref:`page-para-0.3`     :ref:`relation_type-para-0.3` :ref:`search-para-0.3` :ref:`show-para-0.3`
-  :ref:`sort-para-0.3`   :ref:`type_id-para-0.3`
+  :ref:`column-para-0.4` :ref:`count-para-0.4`   :ref:`download-para-0.4` :ref:`export-para-0.4`        :ref:`first-para-0.4`  :ref:`format-para-0.4`
+  :ref:`last-para-0.4`   :ref:`limit-para-0.4`   :ref:`page-para-0.4`     :ref:`relation_type-para-0.4` :ref:`search-para-0.4` :ref:`show-para-0.4`
+  :ref:`sort-para-0.4`   :ref:`type_id-para-0.4`
 ======================== ======================= ======================== ============================= ====================== ======================
 
 **Example**
-    https://demo.openatlas.eu/api/0.3/type_entities_all/47
+    https://demo.openatlas.eu/api/0.4/type_entities_all/47
 
 View Class
 """"""""""
 
 .. code::
 
-  /api/0.3/view_class/{view_class}
+  /api/0.4/view_class/{view_class}
 
 Used to retrieve a JSON list of entities based on their OpenAtlas class view
 
 ======================== ======================= ======================== ============================= ====================== ======================
  **Optional Parameters**
 -----------------------------------------------------------------------------------------------------------------------------------------------------
-  :ref:`column-para-0.3` :ref:`count-para-0.3`   :ref:`download-para-0.3` :ref:`export-para-0.3`        :ref:`first-para-0.3`  :ref:`format-para-0.3`
-  :ref:`last-para-0.3`   :ref:`limit-para-0.3`   :ref:`page-para-0.3`     :ref:`relation_type-para-0.3` :ref:`search-para-0.3` :ref:`show-para-0.3`
-  :ref:`sort-para-0.3`   :ref:`type_id-para-0.3`
+  :ref:`column-para-0.4` :ref:`count-para-0.4`   :ref:`download-para-0.4` :ref:`export-para-0.4`        :ref:`first-para-0.4`  :ref:`format-para-0.4`
+  :ref:`last-para-0.4`   :ref:`limit-para-0.4`   :ref:`page-para-0.4`     :ref:`relation_type-para-0.4` :ref:`search-para-0.4` :ref:`show-para-0.4`
+  :ref:`sort-para-0.4`   :ref:`type_id-para-0.4`
 ======================== ======================= ======================== ============================= ====================== ======================
 
 **Example**
-    https://demo.openatlas.eu/api/0.3/view_class/actor
+    https://demo.openatlas.eu/api/0.4/view_class/actor
 
 
 .. [1] All codes available in OpenAtlas can be found under `OpenAtlas and CIDOC CRM class mapping <https://redmine.openatlas.eu/projects/uni/wiki/OpenAtlas_and_CIDOC_CRM_class_mapping?parent=Endpoints>`_
@@ -218,54 +218,54 @@ Type by View Class
 
 .. code::
 
-  /api/0.3/type_by_view_class/
+  /api/0.4/type_by_view_class/
 
 Retrieves a list of all types sorted by view class
 
 ======================== ==
  **Optional Parameters**
 ---------------------------
-:ref:`download-para-0.3`
+:ref:`download-para-0.4`
 ======================== ==
 
 **Example**
-    https://demo.openatlas.eu/api/0.3/type_by_view_class/
+    https://demo.openatlas.eu/api/0.4/type_by_view_class/
 
 Type Overview
 """"""""""""""""""
 
 .. code::
 
-  /api/0.3/type_overview/
+  /api/0.4/type_overview/
 
 Retrieves a list of all type
 
 ======================== ==
  **Optional Parameters**
 ---------------------------
-:ref:`download-para-0.3`
+:ref:`download-para-0.4`
 ======================== ==
 
 **Example**
-    https://demo.openatlas.eu/api/0.3/type_overview/
+    https://demo.openatlas.eu/api/0.4/type_overview/
 
 Type Tree
 """"""""""""""""""
 
 .. code::
 
-  /api/0.3/type_tree/
+  /api/0.4/type_tree/
 
 Shows every *type* in an OpenAtlas instance in hierarchical order.
 
 ======================== ==
  **Optional Parameters**
 ---------------------------
-:ref:`download-para-0.3`
+:ref:`download-para-0.4`
 ======================== ==
 
 **Example**
-    https://demo.openatlas.eu/api/0.3/type_tree/
+    https://demo.openatlas.eu/api/0.4/type_tree/
 
 Administrative Endpoints
 ************************
@@ -277,62 +277,43 @@ Backend Details
 
 .. code::
 
-  /api/0.3/backend_details/
+  /api/0.4/backend_details/
 
 Retrieves a detailed list of the OpenAtlas version, the available API versions, site name, image and IIIF details.
 
 **Example**
-    https://demo.openatlas.eu/api/0.3/backend_details/
+    https://demo.openatlas.eu/api/0.4/backend_details/
 
 Classes
 """"""""""""""""""
 
 .. code::
 
-  /api/0.3/classes/
+  /api/0.4/classes/
 
 Retrieves a detailed list of all available system classes, their CIDOC CRM mapping, which view they belong to,
 which icon is used, and their english name.
 
 **Example**
-    https://demo.openatlas.eu/api/0.3/classes/
-
-Content
-""""""""""""""""""
-
-.. code::
-
-  /api/0.3/content/
-
-Retrieves a detailed list of information on available content in an OpenAtlas instance -
-intro, legal notice, contact, and size of processed images.
-
-======================== ====================
- **Optional Parameters**
----------------------------------------------
-:ref:`download-para-0.3` :ref:`lang-para-0.3`
-======================== ====================
-
-**Example**
-    https://demo.openatlas.eu/api/0.3/content/
+    https://demo.openatlas.eu/api/0.4/classes/
 
 Licensed File Overview
 """"""""""""""""""""""
 
 .. code::
 
-  /api/0.3/licensed_file_overview/
+  /api/0.4/licensed_file_overview/
 
 Retrieves a list of display URL, thumbnail URL, extension and license of all files which exists and have a licence.
 With the parameter "file_id", only the given IDs where retrieved.
 
 **Example**
-    https://demo.openatlas.eu/api/0.3/licensed_file_overview/
+    https://demo.openatlas.eu/api/0.4/licensed_file_overview/
 
 ======================== =======================
  **Optional Parameters**
 ------------------------------------------------
-:ref:`download-para-0.3` :ref:`file_id-para-0.3`
+:ref:`download-para-0.4` :ref:`file_id-para-0.4`
 ======================== =======================
 
 System Class Count
@@ -340,12 +321,12 @@ System Class Count
 
 .. code::
 
-  /api/0.3/system_class_count/
+  /api/0.4/system_class_count/
 
 Retrieves a list of the numbers of entries connected to a system class
 
 **Example**
-    https://demo.openatlas.eu/api/0.3/system_class_count/
+    https://demo.openatlas.eu/api/0.4/system_class_count/
 
 Special Endpoints
 *****************
@@ -357,44 +338,44 @@ Export Database
 
 .. code::
 
-  /api/0.3/export_database/{format}
+  /api/0.4/export_database/{format}
 
 Downloads all information in an OpenAtlas instance as CSV, XML, or JSON
 
 **Example**
-    https://demo.openatlas.eu/api/0.3/export_database/json
+    https://demo.openatlas.eu/api/0.4/export_database/json
 
 Geometric Entities
 """"""""""""""""""
 
 .. code::
 
-  /api/0.3/geometric_entities/
+  /api/0.4/geometric_entities/
 
 Retrieves a detailed GeoJSON list of all chosen geometries in an OpenAtlas instance; this was implemented for map usage
 
 ======================== ======================== ========================
  **Optional Parameters**
 --------------------------------------------------------------------------
-:ref:`count-para-0.3`    :ref:`download-para-0.3` :ref:`geometry-para-0.3`
+:ref:`count-para-0.4`    :ref:`download-para-0.4` :ref:`geometry-para-0.4`
 ======================== ======================== ========================
 
 **Example**
-    https://demo.openatlas.eu/api/0.3/geometric_entities/
+    https://demo.openatlas.eu/api/0.4/geometric_entities/
 
 Subunits
 """"""""
 
 .. code::
 
-  /api/0.3/subunits/{id}
+  /api/0.4/subunits/{id}
 
 Displays all subunits of a place in a special format used by the `THANADOS <http://thanados.net/>`_ project
 
 ======================== ========================
  **Optional Parameters**
 -------------------------------------------------
-:ref:`count-para-0.3`    :ref:`download-para-0.3`
+:ref:`count-para-0.4`    :ref:`download-para-0.4`
 ======================== ========================
 
 Image Endpoints
@@ -405,7 +386,7 @@ Display
 
 .. code::
 
-  /api/0.3/display/{id}
+  /api/0.4/display/{id}
 
 Provides the image connected to the requested ID. Be aware, the image will only be displayed if the request comes
 from a **logged-in** user or API public setting is set to on and the image has a **license**.
@@ -413,6 +394,6 @@ from a **logged-in** user or API public setting is set to on and the image has a
 =========================== ========================
  **Optional Parameters**
 ----------------------------------------------------
-:ref:`image_size-para-0.3`
+:ref:`image_size-para-0.4`
 =========================== ========================
 
