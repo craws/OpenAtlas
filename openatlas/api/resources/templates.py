@@ -295,6 +295,7 @@ def class_overview_template() -> dict[str, Type[String]]:
         'systemClass': fields.String,
         'crmClass': fields.String,
         'view': fields.String,
+        'standardTypeId': fields.String,
         'icon': fields.String,
         'en': fields.String}
 

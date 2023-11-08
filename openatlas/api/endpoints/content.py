@@ -54,13 +54,15 @@ class GetBackendDetails(Resource):
 class ClassMapping(Resource):
     @staticmethod
     def get() -> Union[tuple[Resource, int], Response]:
+        print(g.classes['acquisition'].label)
         return marshal([{
             "systemClass": class_.name,
-            "crmClass": class_.cidoc_class.code,
+            "crmClass": class_.cidoc_class.code if class_.cidoc_class else None,
             "view": class_.view,
+            "standardTypeId": class_.standard_type_id,
             "icon": class_.icon,
             "en": class_.label}
-            for class_ in g.classes.values() if class_.cidoc_class],
+            for class_ in g.classes.values()],
             class_overview_template()), 200
 
 
