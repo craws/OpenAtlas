@@ -59,27 +59,27 @@
   "tags": [
     {
       "name": "Entity Endpoint",
-      "description": "Endpoint provide information about one entity in the OpenAtlas instance. The requested information is provided in Linked Places format (LPF). Alternatively, Linked Open Art, GeoJSON or RDFs, derived from the LPF data, can be accessed."
+      "description": "Information about a single entity. The requested information is provided in Linked Places format (LPF). Alternatively, Linked Open Art (LOUD), GeoJSON or RDFs, derived from the LOUD format, can be accessed."
     },
     {
       "name": "Entity Query Endpoint",
-      "description": "Endpoint provide information about one entity in the OpenAtlas instance. The requested information is provided in Linked Places format (LPF). Alternatively, Linked Open Art, GeoJSON or RDFs, derived from the LPF data, can be accessed. Combine several or all entities endpoints in one query."
+      "description": "Combines several endpoints in one query."
     },
     {
       "name": "Entities Endpoint",
-      "description": "Endpoints provide information about entities in the OpenAtlas instance. The requested information is provided in Linked Places format (LPF). Alternatively, Linked Open Art, GeoJSON or RDFs, derived from the LPF data, can be accessed."
+      "description": "Information about multiple entities. The requested information is provided in Linked Places format (LPF). Alternatively, Linked Open Art (LOUD), GeoJSON or RDFs, derived from the LOUD format, can be accessed."
     },
     {
       "name": "Type Endpoints",
-      "description": "Provide information about Types of an OpenAtlas instance. The results are in JSON and in a custom format."
+      "description": "Information about types. The requested information is provided in a custom JSON format."
     },
     {
       "name": "Administrative Endpoints",
-      "description": "Provide metadata of the OpenAtlas instance for presentation sites."
+      "description": "Additional information for presentation sites."
     },
     {
       "name": "Special Endpoints",
-      "description": "Provides project-specific formats."
+      "description": "Customized endpoints"
     },
     {
       "name": "Image Endpoints",
@@ -93,8 +93,7 @@
         "tags": [
           "Entity Endpoint"
         ],
-        "description": "Retrieves all information about a single entity",
-        "summary": "Get entity by ID",
+        "description": "Retrieves information about a single entity.",
         "operationId": "GetEntity",
         "parameters": [
           {
@@ -143,8 +142,7 @@
           "Entities Endpoint",
           "Entity Query Endpoint"
         ],
-        "description": "Retrieves a list with entity ID, CIDOC CRM code, system class, or menu item. Combine up to four of the Entities Endpoints in a single query. Each request has to be a new parameter.",
-        "summary": "Combine several or all entities endpoints in one query",
+        "description": "Retrieves a list with entity ID, CIDOC CRM code, system class, or view class. You can combine these endpoints in a single query.",
         "operationId": "GetQuery",
         "parameters": [
           {
@@ -224,7 +222,7 @@
         "tags": [
           "Entities Endpoint"
         ],
-        "description": "Retrieves a list of entities, based on their OpenAtlas class name.",
+        "description": "Retrieves entities based on their OpenAtlas class name.",
         "operationId": "GetBySystemClass",
         "parameters": [
           {
@@ -295,7 +293,7 @@
         "tags": [
           "Entities Endpoint"
         ],
-        "description": "Retrieves a list of entities based on their OpenAtlas menu items.",
+        "description": "Retrieves entities based on their OpenAtlas view class.",
         "operationId": "GetByViewClass",
         "parameters": [
           {
@@ -366,7 +364,7 @@
         "tags": [
           "Entities Endpoint"
         ],
-        "description": "Retrieve a list of entities, based on their CIDOC CRM class code.",
+        "description": "Retrieves entities based on their CIDOC CRM class code.",
         "operationId": "GetByCidocClass",
         "parameters": [
           {
@@ -437,7 +435,7 @@
         "tags": [
           "Entities Endpoint"
         ],
-        "description": "Retrieve the last entered entities. n represents the amount of entities retrieved (between 1 and 100). The pagination information is always null.",
+        "description": "Retrieves the last entered entities. `{limit}` represents the amount of entities (between 1 and 100). The pagination information is always null.",
         "operationId": "GetLatest",
         "parameters": [
           {
@@ -500,7 +498,7 @@
         "tags": [
           "Entities Endpoint"
         ],
-        "description": "Used to retrieve a list of entities, based on their OpenAtlas type ID. For an endpoint that lists all available types click confer Types Endpoints",
+        "description": "Retrieves entities based on their OpenAtlas type ID. To get available types see Types Endpoints.",
         "operationId": "GetTypeEntities",
         "parameters": [
           {
@@ -571,7 +569,7 @@
         "tags": [
           "Entities Endpoint"
         ],
-        "description": "Used to retrieve a list of entities, based on their OpenAtlas type ID including all connected subtypes.. For an endpoint that lists all available types click confer Type Endpoints",
+        "description": "Retrieves entities based on their OpenAtlas type ID including all connected subtypes. To get available types see Types Endpoints.",
         "operationId": "GetTypeEntitiesAll",
         "parameters": [
           {
@@ -642,7 +640,7 @@
         "tags": [
           "Entities Endpoint"
         ],
-        "description": "Retrieves a list of entities linked to the entity with the stated ID.",
+        "description": "Retrieves entities linked to the entity with the provided entityId.",
         "operationId": "GetEntitiesLinkedToEntity",
         "parameters": [
           {
@@ -713,7 +711,7 @@
         "tags": [
           "Type Endpoints"
         ],
-        "description": "Retrieves a list of all OpenAtlas types sorted by custom, places, standard and value",
+        "description": "Retrieves all OpenAtlas types sorted by custom, places, standard, system and value types.",
         "operationId": "GetTypeOverview",
         "parameters": [
           {
@@ -742,7 +740,7 @@
         "tags": [
           "Type Endpoints"
         ],
-        "description": "Retrieves a list of all OpenAtlas types, including their information sorted by their IDs",
+        "description": "Retrieves a flat list of all types.",
         "operationId": "GetTypeTree",
         "parameters": [
           {
@@ -771,7 +769,7 @@
         "tags": [
           "Type Endpoints"
         ],
-        "description": "Retrieves a list of all system types",
+        "description": "Retrieves standard types in a hierarchical order.",
         "operationId": "GetTypeByViewClass",
         "parameters": [
           {
@@ -800,7 +798,7 @@
         "tags": [
           "Administrative Endpoints"
         ],
-        "description": "Retrieves a list of all available classes, their CIDOC CRM mapping, their view, which icon can be used, if alias and references systems are allowed and which standard type it has.",
+        "description": "Retrieves all OpenAtlas classes with their English label, CIDOC CRM mapping, view, icon and standard type ID.",
         "operationId": "ClassMapping",
         "responses": {
           "200": {
@@ -857,7 +855,7 @@
         "tags": [
           "Administrative Endpoints"
         ],
-        "description": "Retrieves a list of information of the backend configuration.",
+        "description": "Retrieves a list of backend configuration settings.",
         "operationId": "GetBackendDetails",
         "parameters": [
           {
@@ -886,7 +884,7 @@
         "tags": [
           "Administrative Endpoints"
         ],
-        "description": "Retrieves a detailed list of the numbers of entries connected to a system class",
+        "description": "Retrieves system classes with a count of their instances.",
         "operationId": "SystemClassCount",
         "responses": {
           "200": {
@@ -910,7 +908,7 @@
         "tags": [
           "Special Endpoints"
         ],
-        "description": "Displays all subunits of a place in a special format as used by the THANADOS project. Can only be used for “places”. As format only XML can be chosen",
+        "description": "Retrieves all subunits of a place in a special format, used by e.g. ARIADNEplus and THANADOS.",
         "operationId": "GetSubunits",
         "parameters": [
           {
@@ -942,7 +940,7 @@
         "tags": [
           "Special Endpoints"
         ],
-        "description": "Retrieve a GeoJSON of all chosen geometries in an OpenAtlas instance",
+        "description": "Retrieves a detailed GeoJSON of all chosen geometries, e.g. used for Leaflet maps.",
         "operationId": "GetGeometricEntities",
         "parameters": [
           {
@@ -977,7 +975,7 @@
         "tags": [
           "Special Endpoints"
         ],
-        "description": "Downloads all information in an OpenAtlas instance as CSV, XML, or JSON.",
+        "description": "Downloads all information as CSV, XML, or JSON.",
         "operationId": "ExportDatabase",
         "parameters": [
           {
@@ -1018,7 +1016,7 @@
         "tags": [
           "Image Endpoints"
         ],
-        "description": "Retrieves the respective image if it has a licence.",
+        "description": "Retrieves the image connected to the requested ID if it has a licence.",
         "operationId": "DisplayImage",
         "parameters": [
           {
@@ -1071,7 +1069,7 @@
         "tags": [
           "Administrative Endpoints"
         ],
-        "description": "Retrieves a list of display URL, thumbnail URL, extension and license of all files which exists and have a licence. With the paramater \"file_id\", only the given IDs where retrieved",
+        "description": "Retrieves all existing files with a licence and their display URL, thumbnail URL, extension and license. With the parameter `{file_id}` specific files can be retrieved.",
         "operationId": "LicensedFileOverview",
         "parameters": [
           {
