@@ -29,9 +29,7 @@
   {% if entity.class_.name == 'file' %}
     <div class="col-lg-6">
       <div id="annotate" class="map" style="height: calc(100vh - 200px)"></div>
-      {{ url_for('api.iiif_manifest', id_=entity.id, version=2, _external=True) }}
       <script>
-          // const iiifManifest = "{{ url_for('api.iiif_manifest', id_=entity.id, version=2, _external=True) }}"
           var map = L.map('annotate', {
               center: [0, 0],
               crs: L.CRS.Simple,
@@ -39,7 +37,16 @@
               tileSize: 128
           });
 
-          L.tileLayer.iiif('http://localhost:8182/iiif/2/{{ entity.id }}.tiff/info.json').addTo(map);
+          let baseLayer;
+          $.getJSON('{{ url_for('api.iiif_manifest', id_=entity.id, version=2, _external=True) }}', function (data) {
+              const page = data.sequences[0].canvases[0];
+              baseLayer = L.tileLayer.iiif(
+                  page.images[0].resource.service['@id'] + '/info.json',
+                  {
+                      tileSize: 128
+                  }
+              ).addTo(map);
+          });
 
           // Initialise the FeatureGroup to store editable layers
           var drawnItems = new L.FeatureGroup();
