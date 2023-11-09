@@ -15,6 +15,9 @@ def index_changelog() -> str:
 
 
 versions = {
+    '7.17.2': ['2023-11-09', {
+        'fix': {
+            '2114': 'JavaSrcipt datatable error'}}],
     '7.17.1': ['2023-11-06', {
         'fix': {
             '2110': 'API: licensed file overview broken',
