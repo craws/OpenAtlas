@@ -22,6 +22,7 @@ package_json = {
         "jstree": "^3.3.12",
         "leaflet-imageoverlay-rotated": "^v0.2.1",
         "leaflet-draw": "^1.0.4",
+        "leaflet-iiif": "^3.0.0",
         "leaflet-groupedlayercontrol": "^0.6.1",
         "leaflet.fullscreen": "2.2.0",
         "leaflet.markercluster": "^1.5.3",
