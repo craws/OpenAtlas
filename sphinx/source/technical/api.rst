@@ -93,7 +93,7 @@ Versioning
      - deprecated
      - unstable
      - unavailable
-   * - :ref:`0.4<version_0_4>`
+   * - `0.4 <https://demo.openatlas.eu/swagger/>`_
      - :ref:`0.3<version_0_3>`
      - 1.0
      - :ref:`0.1<version_0_1>`, :ref:`0.2<version_0_2>`
@@ -115,16 +115,21 @@ Endpoints
 =========
 
 Through different endpoints, data can be retrieved from OpenAtlas. Each version
-has a own set of endpoints, be sure to use the right one.
+has an own set of endpoints, be sure to use the right one.
+
+The current version 0.4 endpoint descriptions are available at:
+
+* `Current OpenAPI specification <https://demo.openatlas.eu/swagger/>`_ at the OpenAtlas demo version
+* `Local OpenAPI specification </swagger>`_: this link is only available if called from a OpenAtlas installation
+
+**Former versions**
 
 .. toctree::
    :maxdepth: 1
 
-   Version 0.4 (stable, current) <api_version_04>
    Version 0.3 (stable, deprecated) <api_version_03>
    api_version_02
    api_version_01
-   Version 1.0 (whitepaper) <api_version_1>
 
 The requested information is provided in Linked Places format
 `Linked Places format (LPF) <https://github.com/LinkedPasts/linked-places-format>`_. Alternatively,
@@ -145,12 +150,15 @@ connected with the "**&**" sign.
 For more general information on this topic see this
 `article <https://www.botify.com/learn/basics/what-are-url-parameters#:~:text=URL%20parameters%20(also%20known%20as,by%20the%20'%26'%20symbol.>`_.
 
+* `Current OpenAPI parameters <https://demo.openatlas.eu/swagger/>`_ at the OpenAtlas demo version
+* `Local OpenAPI parameters </swagger>`_: this link is only available if called from a OpenAtlas installation
+
+**Former versions**
 
 .. toctree::
    :maxdepth: 1
 
    api_parameters_03
-   api_parameters_04
 
 Error handling
 ==============

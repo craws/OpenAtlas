@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>API &mdash; OpenAtlas 7.17.0 documentation</title>
+  <title>API &mdash; OpenAtlas 7.18.0 documentation</title>
   
 
   
@@ -36,7 +36,7 @@
 
     
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Version 0.4" href="api_version_04.html" />
+    <link rel="next" title="Version 0.3" href="api_version_03.html" />
     <link rel="prev" title="Link checker" href="../model/link_checker.html" /> 
 </head>
 
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                7.17.0
+                7.18.0
               </div>
             
           
@@ -212,13 +212,13 @@ formats, in which the entity should be exported, can be selected. If the
 buttons are not visible, please change the <strong>Show API links</strong>
 at the <a class="reference internal" href="../tools/profile.html#display"><span class="std std-ref">Display</span></a> tab in your <a class="reference internal" href="../tools/profile.html"><span class="doc">Profile</span></a>.</p>
 <p>Through the UI, only a single entity can be accessed.</p>
-<div class="figure align-center" id="id3">
-<img alt="../_images/api_ui_json.jpg" src="../_images/api_ui_json.jpg" />
-<p class="caption"><span class="caption-text">Possible JSON API formats</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
-</div>
 <div class="figure align-center" id="id4">
+<img alt="../_images/api_ui_json.jpg" src="../_images/api_ui_json.jpg" />
+<p class="caption"><span class="caption-text">Possible JSON API formats</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-center" id="id5">
 <img alt="../_images/api_ui_rdf.jpg" src="../_images/api_ui_rdf.jpg" />
-<p class="caption"><span class="caption-text">Possible RDF API formats</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">Possible RDF API formats</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
 </div>
 </div>
 <div class="section" id="url-get-access">
@@ -278,7 +278,7 @@ see this
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><a class="reference internal" href="api_version_04.html#version-0-4"><span class="std std-ref">0.4</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference external" href="https://demo.openatlas.eu/swagger/">0.4</a></p></td>
 <td><p><a class="reference internal" href="api_version_03.html#version-0-3"><span class="std std-ref">0.3</span></a></p></td>
 <td><p>1.0</p></td>
 <td><p><a class="reference internal" href="api_version_01.html#version-0-1"><span class="std std-ref">0.1</span></a>, <a class="reference internal" href="api_version_02.html#version-0-2"><span class="std std-ref">0.2</span></a></p></td>
@@ -301,14 +301,18 @@ developed, so breaking changes may occur at any time without prior notice.</p>
 <div class="section" id="endpoints">
 <h2>Endpoints<a class="headerlink" href="#endpoints" title="Permalink to this headline">¶</a></h2>
 <p>Through different endpoints, data can be retrieved from OpenAtlas. Each version
-has a own set of endpoints, be sure to use the right one.</p>
+has an own set of endpoints, be sure to use the right one.</p>
+<p>The current version 0.4 endpoint descriptions are available at:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://demo.openatlas.eu/swagger/">Current OpenAPI specification</a> at the OpenAtlas demo version</p></li>
+<li><p><a class="reference external" href="/swagger">Local OpenAPI specification</a>: this link is only available if called from a OpenAtlas installation</p></li>
+</ul>
+<p><strong>Former versions</strong></p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="api_version_04.html">Version 0.4 (stable, current)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api_version_03.html">Version 0.3 (stable, deprecated)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api_version_02.html">Version 0.2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api_version_01.html">Version 0.1</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api_version_1.html">Version 1.0 (whitepaper)</a></li>
 </ul>
 </div>
 <p>The requested information is provided in Linked Places format
@@ -327,10 +331,14 @@ more details.</p>
 connected with the “<strong>&amp;</strong>” sign.
 For more general information on this topic see this
 <a class="reference external" href="https://www.botify.com/learn/basics/what-are-url-parameters#:~:text=URL%20parameters%20(also%20known%20as,by%20the%20'%26'%20symbol.">article</a>.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://demo.openatlas.eu/swagger/">Current OpenAPI parameters</a> at the OpenAtlas demo version</p></li>
+<li><p><a class="reference external" href="/swagger">Local OpenAPI parameters</a>: this link is only available if called from a OpenAtlas installation</p></li>
+</ul>
+<p><strong>Former versions</strong></p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="api_parameters_03.html">API parameters 0.3</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api_parameters_04.html">API parameters 0.4</a></li>
 </ul>
 </div>
 </div>
@@ -378,7 +386,7 @@ To provide the OpenAtlas API with a proxy server, add following line to <strong>
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="api_version_04.html" class="btn btn-neutral float-right" title="Version 0.4" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="api_version_03.html" class="btn btn-neutral float-right" title="Version 0.3" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
         <a href="../model/link_checker.html" class="btn btn-neutral float-left" title="Link checker" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
