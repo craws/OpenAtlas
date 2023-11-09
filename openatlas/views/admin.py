@@ -354,6 +354,8 @@ def admin_settings(category: str) -> Union[str, Response]:
                 value = ' '.join(set(filter(None, field.data)))
             if field.type == 'BooleanField':
                 value = 'True' if field.data else ''
+            if isinstance(value, str):
+                value = value.strip()
             data[field.name] = value
         Transaction.begin()
         try:
