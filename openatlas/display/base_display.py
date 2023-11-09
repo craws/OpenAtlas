@@ -403,6 +403,8 @@ class PlaceBaseDisplay(BaseDisplay):
                                     place_id=entity.id,
                                     link_id=link_.id))
                     data.append(content)
+            if domain.class_.view == 'event':
+                continue
             if domain.class_.view not in ['source', 'file']:
                 data.append(link_.description)
                 data.append(edit_link(
