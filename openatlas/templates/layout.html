@@ -30,17 +30,17 @@
     {% include "map.html" %}
   {% endif %}
   <script>
-      bookmark_csrf_token = '{{ csrf_token() }}';
-      minimumPasswordLength = {{ g.settings.minimum_password_length }};
-      maxFileSize = {{ g.settings.file_upload_max_size }}
-          generatePassword = '{{ _('generate password')|uc_first }}';
-      const style = {
-          stringField: '{{ config.CSS.string_field }}',
-          button: {
-              primary: '{{ config.CSS.button.primary }}',
-              secondary: '{{ config.CSS.button.secondary }}'
-          }
+    bookmark_csrf_token = '{{ csrf_token() }}';
+    minimumPasswordLength = {{ g.settings.minimum_password_length }};
+    maxFileSize = {{ g.settings.file_upload_max_size }}
+    generatePassword = '{{ _('generate password')|uc_first }}';
+    const style = {
+      stringField: '{{ config.CSS.string_field }}',
+      button: {
+          primary: '{{ config.CSS.button.primary }}',
+          secondary: '{{ config.CSS.button.secondary }}'
       }
+  }
   </script>
   <script src="/static/js/functions.js"></script>
   <script src="/static/js/forms.js"></script>
@@ -169,13 +169,13 @@
   </div>
 </nav>
 <nav aria-label="breadcrumb" class="d-flex justify-content-between p-3 mb-3 bg-gray">
-  <div class="breadcrumb mb-0">
-    {{ crumbs|breadcrumb|safe }}
-  </div>
-  <div>
-    {{ g.settings.site_name }}
-    <a href="{{ url_for('index_changelog') }}">{{ config.VERSION }}</a>
-  </div>
+    <div class="breadcrumb mb-0">
+        {{ crumbs|breadcrumb|safe }}
+    </div>
+    <div>
+        {{ g.settings.site_name }}
+        <a href="{{ url_for('index_changelog') }}">{{ config.VERSION }}</a>
+    </div>
 </nav>
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
@@ -198,18 +198,15 @@
   </div>
 </main>
 <script>
-    // Load all tooltips, needs to be at 2end of file
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
+  // Load all tooltips, needs to be at 2end of file
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
+  });
 </script>
 
 <noscript>
-  <style>nav, main, .navbar {
-      display: none;
-  !important;
-  }</style>
+  <style>nav,main,.navbar{display:none;!important;}</style>
   <div class="vw-100 vh-100 d-flex flex-column justify-content-center align-items-center">
     <img src="/static/images/layout/logo.png" alt="OpenAtlas Logo">
     <p class="error">{{ _('warning no js') }}</p>

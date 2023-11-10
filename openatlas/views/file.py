@@ -85,5 +85,3 @@ def view_iiif(id_: int) -> str:
             id_=id_,
             version=g.settings['iiif_version'],
             _external=True))
-
-
