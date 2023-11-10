@@ -29,15 +29,6 @@
   {% if gis_data %}
     {% include "map.html" %}
   {% endif %}
-  {# Todo: make an if entity.class_ == "file" statement #}
-  <link rel="stylesheet" href="/static/css/map.css">
-  <link rel="stylesheet" href="/static/node_modules/leaflet/dist/leaflet.css">
-  <link rel="stylesheet" href="/static/node_modules/leaflet-draw/dist/leaflet.draw.css">
-
-  <script src="/static/node_modules/leaflet/dist/leaflet.js"></script>
-  <script src="/static/node_modules/leaflet-draw/dist/leaflet.draw.js"></script>
-  <script src="/static/node_modules/leaflet-iiif/leaflet-iiif.js"></script>
-  {# end of todo #}
   <script>
       bookmark_csrf_token = '{{ csrf_token() }}';
       minimumPasswordLength = {{ g.settings.minimum_password_length }};

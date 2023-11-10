@@ -2,8 +2,11 @@
 {% block content %}
   {% if entity.class_.view not in ['artifact', 'place'] %}
     <div class="container">
-    {{ form|display_form(manual_page='entity/' + entity.class_.view)|safe }}
-    {{ entity.class_.view|display_citation_example|safe }}
+      {{ form|display_form(manual_page='entity/' + entity.class_.view)|safe }}
+      {{ entity.class_.view|display_citation_example|safe }}
+      {% if entity.class_.view == 'file' %}
+        {% include 'annotate.html' %}
+      {% endif %}
     </div>
   {% else %}
     <div class="row">
@@ -16,7 +19,8 @@
         </div>
       </div>
       <div class="col-lg-7 d-flex align-items-stretch">
-        <div onclick="toggleMapWidth(this)" class="d-none btn btn-light d-lg-flex align-items-center"><i class="fas fa-chevron-right"></i></div>
+        <div onclick="toggleMapWidth(this)" class="d-none btn btn-light d-lg-flex align-items-center"><i
+            class="fas fa-chevron-right"></i></div>
         <div id="map" class="map"></div>
       </div>
     </div>
