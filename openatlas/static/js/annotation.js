@@ -1,4 +1,4 @@
-var map = L.map('annotate', {
+map = L.map('annotate', {
     center: [0, 0],
     crs: L.CRS.Simple,
     zoom: 1,
@@ -20,28 +20,56 @@ $.getJSON(iiif_manifest, function (data) {
 let drawnItems = new L.FeatureGroup();
 map.addLayer(drawnItems);
 
+
+
 // Initialise the draw control and pass it the FeatureGroup of editable layers
-var drawControl = new L.Control.Draw({
+let drawControl = new L.Control.Draw({
     draw: {
         polyline: false,
         circle: false,
         circlemarker: false
-    },
-    edit: {
-        featureGroup: drawnItems
     }
 });
-
 map.addControl(drawControl);
 
+
+
+// Event Handling for Drawn Items
 map.on(L.Draw.Event.CREATED, function (e) {
-    var type = e.layerType
-    var layer = e.layer;
+    let layer = e.layer;
 
-    // Do whatever else you need to. (save to db, add to map etc)
+    // Open a popup for the user to enter a description
+    layer.bindPopup("Enter description: <input type='text' id='popup-description' />", {
+        maxWidth: 300
+    }).openPopup();
 
+    // Add the drawn layer to the drawnItems FeatureGroup
     drawnItems.addLayer(layer);
+
+    // Listen for the popupclose event to save description and coordinates
+    layer.on('popupclose', function () {
+        saveDescription(layer);
+    });
 });
 
+// Function to save the entered description and coordinates
+function saveDescription(layer) {
+    let description = document.getElementById('popup-description').value;
 
-var popup = L.popup([0, 1], {content: '<p>Hello world!<br />This is a nice popup.</p>'}).openOn(map);
+    // Get the coordinates of the drawn shape
+    let latlngs = layer.getLatLngs();
+
+    // Create a JSON object with description and coordinates
+    let data = {
+        description: description,
+        coordinates: latlngs
+    };
+
+    // Store the JSON object in a variable or array
+    // (You can extend this logic to save it to a database or elsewhere)
+    let jsonData = jsonData || [];
+    jsonData.push(data);
+
+    // Log the JSON data for demonstration purposes
+    console.log("JSON Data:", jsonData);
+}
