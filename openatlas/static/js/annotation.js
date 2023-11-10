@@ -32,17 +32,14 @@ let drawControl = new L.Control.Draw({
 });
 map.addControl(drawControl);
 
+
+var jsonData = jsonData || [];
 // Event Handling for Drawn Items
 map.on(L.Draw.Event.CREATED, function (e) {
     let layer = e.layer;
 
-    // Get the coordinates of the drawn shape
-    let latlngs = layer.getLatLngs();
-
-    // Open a popup for the user to enter a description and display coordinates
-    layer.bindPopup(`
-        Enter description: <input type='text' class='popup-description' /><br/>
-        Coordinates: ${latlngs.toString()}`, {
+    // Open a popup for the user to enter a description
+    layer.bindPopup("Enter description: <input type='text' id='popup-description' />", {
         maxWidth: 300
     }).openPopup();
 
@@ -57,12 +54,10 @@ map.on(L.Draw.Event.CREATED, function (e) {
 
 // Function to save the entered description and coordinates
 function saveDescription(layer) {
+    let description = document.getElementById('popup-description').value;
+
     // Get the coordinates of the drawn shape
     let latlngs = layer.getLatLngs();
-
-    // Get the description from the corresponding input field
-    let description = layer.getPopup().querySelector('.popup-description').value;
-
 
     // Create a JSON object with description and coordinates
     let data = {
@@ -72,7 +67,7 @@ function saveDescription(layer) {
 
     // Store the JSON object in a variable or array
     // (You can extend this logic to save it to a database or elsewhere)
-    let jsonData = jsonData || [];
+
     jsonData.push(data);
 
     // Log the JSON data for demonstration purposes
