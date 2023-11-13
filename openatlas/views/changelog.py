@@ -15,6 +15,9 @@ def index_changelog() -> str:
 
 
 versions = {
+    '7.17.3': ['2023-11-13', {
+        'fix': {
+            '2117': 'Modification events not showing at artifact view'}}],
     '7.17.2': ['2023-11-09', {
         'fix': {
             '2114': 'JavaSrcipt datatable error'}}],

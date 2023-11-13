@@ -377,7 +377,13 @@ class PlaceBaseDisplay(BaseDisplay):
 
         for link_ in entity.get_links(['P31', 'P67'], inverse=True):
             domain = link_.domain
+            if domain.class_.view == 'reference_system':
+                entity.reference_systems.append(link_)
+                continue
             data = get_base_table_data(domain)
+            if domain.class_.view in ['event']:
+                self.tabs[domain.class_.view].table.rows.append(data)
+                continue
             if domain.class_.view == 'file':
                 ext = data[3]
                 data.append(profile_image_table_link(entity, domain, ext))
@@ -403,15 +409,10 @@ class PlaceBaseDisplay(BaseDisplay):
                                     place_id=entity.id,
                                     link_id=link_.id))
                     data.append(content)
-            if domain.class_.view == 'event':
-                continue
             if domain.class_.view not in ['source', 'file']:
                 data.append(link_.description)
                 data.append(edit_link(
                     url_for('link_update', id_=link_.id, origin_id=entity.id)))
-                if domain.class_.view == 'reference_system':
-                    entity.reference_systems.append(link_)
-                    continue
             data.append(
                 remove_link(domain.name, link_, entity, domain.class_.view))
             self.tabs[domain.class_.view].table.rows.append(data)
