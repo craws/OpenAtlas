@@ -1,3 +1,4 @@
+import mimetypes
 from typing import Any
 
 import requests
@@ -42,6 +43,7 @@ class IIIFCanvasV2(Resource):
     @staticmethod
     def build_canvas(metadata: dict[str, Any]) -> dict[str, Any]:
         entity = metadata['entity']
+        mime_type, _ = mimetypes.guess_type(g.files[entity.id])
         return {
             "@id": url_for(
                 'api.iiif_canvas', id_=entity.id, version=2, _external=True),
@@ -57,7 +59,7 @@ class IIIFCanvasV2(Resource):
             "thumbnail": {
                 "@id": f'{metadata["img_url"]}/full/!200,200/0/default.jpg',
                 "@type": "dctypes:Image",
-                "format": "image/jpeg",
+                "format": mime_type,
                 "height": 200,
                 "width": 200,
                 "service": {
@@ -75,6 +77,7 @@ class IIIFImageV2(Resource):
     @staticmethod
     def build_image(metadata: dict[str, Any]) -> dict[str, Any]:
         id_ = metadata['entity'].id
+        mime_type, _ = mimetypes.guess_type(g.files[id_])
         return {
             "@context": "https://iiif.io/api/presentation/2/context.json",
             "@id":
@@ -84,7 +87,7 @@ class IIIFImageV2(Resource):
             "resource": {
                 "@id": metadata['img_url'],
                 "@type": "dctypes:Image",
-                "format": "image/jpeg",
+                "format": mime_type,
                 "service": {
                     "@context": "https://iiif.io/api/image/2/context.json",
                     "@id": metadata['img_url'],
