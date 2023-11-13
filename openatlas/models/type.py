@@ -230,5 +230,8 @@ class Type(Entity):
     @staticmethod
     def get_type_orphans() -> list[Type]:
         return [
-            n for key, n in g.types.items()
-            if n.root and n.count < 1 and not n.subs]
+            node for key, node in g.types.items()
+            if node.root
+            and node.category not in ['system', 'tools']
+            and node.count < 1
+            and not node.subs]

@@ -16,9 +16,13 @@ def index_changelog() -> str:
 
 versions = {
     '7.18.0': ['TBA', {}],
+    '7.17.3': ['2023-11-13', {
+        'fix': {
+            '2117': 'Modification events not showing at artifact view',
+            '2118': 'Wrong listing of type orphans'}}],
     '7.17.2': ['2023-11-09', {
         'fix': {
-            '2114': 'JavaSrcipt datatable error'}}],
+            '2114': 'JavaScript datatable error'}}],
     '7.17.1': ['2023-11-06', {
         'fix': {
             '2110': 'API: licensed file overview broken',
