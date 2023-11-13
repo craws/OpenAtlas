@@ -487,7 +487,7 @@ def admin_orphans() -> str:
             table=Table(
                 ['name', 'root'],
                 [[link(type_), link(g.types[type_.root[0]])]
-                 for type_ in Type.get_type_orphans()])),
+                    for type_ in Type.get_type_orphans()])),
         'missing_files': Tab('missing_files', table=Table(header)),
         'orphaned_files': Tab(
             'orphaned_files',

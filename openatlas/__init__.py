@@ -61,10 +61,12 @@ def before_request() -> None:
     g.properties = CidocProperty.get_all(session['language'])
     g.classes = OpenatlasClass.get_all()
     with_count = False
-    if request.path.startswith('/type') or \
-            request.path.startswith('/api/type_tree/') or (
+    if (request.path.startswith('/type')
+            or request.path.startswith('/api/type_tree/')
+            or request.path.startswith('/admin/orphans')
+            or (
                 request.path.startswith('/entity/') and
-                request.path.split('/entity/')[1].isdigit()):
+                request.path.split('/entity/')[1].isdigit())):
         with_count = True
     g.types = Type.get_all(with_count)
     g.reference_systems = ReferenceSystem.get_all()
