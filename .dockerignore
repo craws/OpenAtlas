@@ -3,3 +3,4 @@ docker-compose.yaml
 .github/**
 .git/**
 chart/**
+files/**

@@ -3,9 +3,9 @@ services:
   postgres:
     image: "postgis/postgis:13-3.3"
     environment:
-      - POSTGRES_DB=openatlas
-      - POSTGRES_PASSWORD=verysecret
-      - POSTGRES_USER=openatlas
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_USER=${POSTGRES_USER}
 #    ports:
 #     - "25432:5432"
     volumes:
@@ -19,7 +19,7 @@ services:
 #      Import dump (comment install section above)
 #      - ./files/export/dump.sql:/docker-entrypoint-initdb.d/dump.sql
     healthcheck:
-      test: ["CMD-SHELL", "sh -c 'pg_isready -U openatlas -d openatlas'"]
+      test: ["CMD-SHELL", "sh -c 'PGPASSWORD=${POSTGRES_PASSWORD} psql -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c \\\\q'"]
       interval: 10s
       timeout: 5s
       retries: 30
@@ -31,10 +31,10 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - POSTGRES_DB=openatlas
+      - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_HOST=postgres
-      - POSTGRES_PASSWORD=verysecret
-      - POSTGRES_USER=openatlas
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_USER=${POSTGRES_USER}
     entrypoint: >
       /bin/bash -c 'if [ "$$( psql postgres://$$POSTGRES_USER:$$POSTGRES_PASSWORD@$$POSTGRES_HOST:5432/$$POSTGRES_DB -tAc "SELECT 1 FROM web.settings WHERE id = 1" )" == '"'"'1'"'"' ]; then echo '"'"'Database has already data'"'"'; else cd /var/www/openatlas/install && cat [0-9]_*.sql | psql postgres://$$POSTGRES_USER:$$POSTGRES_PASSWORD@$$POSTGRES_HOST:5432/$$POSTGRES_DB -f -; fi'
     depends_on:
@@ -48,10 +48,10 @@ services:
     ports:
       - "8080:8080"
     environment:
-        - POSTGRES_DB=openatlas
+        - POSTGRES_DB=${POSTGRES_DB}
         - POSTGRES_HOST=postgres
-        - POSTGRES_PASSWORD=verysecret
-        - POSTGRES_USER=openatlas
+        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+        - POSTGRES_USER=${POSTGRES_USER}
     volumes:
       - ./files/uploads:/var/www/openatlas/files/uploads
       - ./files/processed_images/resized:/var/www/openatlas/files/processed_images/resized
