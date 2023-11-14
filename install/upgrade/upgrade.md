@@ -5,7 +5,6 @@ changes happen. You still should read the upgrade notes about important
 information.
 
 **Limitations using the database update script**
-
 * You should only do this within the official **main** branch of OpenAtlas.
 * If the database owner is not called "openatlas" (default) you will have to
   update the SQL files accordingly before.
@@ -19,28 +18,40 @@ then run the database upgrade script, then restart Apache:
     sudo python3 install/upgrade/database_upgrade.py
     sudo service apache2 restart
 
+### 7.17.x to 7.17.3
+A code base update (e.g. with git pull) and a webserver restart is sufficient.
+
 ### 7.16.x to 7.17.0
+7.17.0.sql is needed but will be taken care of by the database upgrade script.
 
 #### Configuration
-
 The configuration was refactored, especially path parameters. You should
-compare the instance/production.py with config/default.py in case you made
-adaptions to these. The same goes for instance/tests.py in case you are also
-using tests.
+compare your **instance/production.py** with **config/default.py** in case you
+made adaptions there. The same goes for **instance/tests.py** in case you are
+running tests.
+
+#### NPM - additional packages
+
+    cd openatlas/static
+    rm package.json
+    pip3 install -e ./
+    ~/.local/bin/calmjs npm --install openatlas
 
 #### IIIF
-For the IIIF implementation new NPM packages are needed:
+If you want to use IIIF, please refer to the relevant section at **install.md**
 
-    $ cd openatlas/static
-    $ rm package.json
-    $ pip3 install -e ./
-    $ ~/.local/bin/calmjs npm --install openatlas
+#### Deprecation warnings
+Because of the new API version 0.4.0 following functionality is now deprecated.
+It will be removed with the next OpenAtlas major version **8.0.0**, probably
+around New Year 2024.
 
-If you want to use IIIF, please read the
-[instructions](https://redmine.openatlas.eu/projects/uni/wiki/IIIF). 
-
-### 7.16.0 to 7.16.1
-A code base update (e.g. with git pull) and a webserver restart is sufficient.
+**API version 0.4 breaking changes**
+* **API:** Remove of /content endpoint
+* **API:** Rename name to label in first layer of /type_by_view_class/ and
+  /type_overview/
+* **API:** Incorporate /classes into /backend_details
+* **Backend:** Deprecation of the content section in the admin area which was
+  used by former presentation sites
 
 ### 7.15.0 to 7.16.0
 7.16.0.sql is needed but will be taken care of by the database upgrade script.
@@ -49,10 +60,10 @@ A code base update (e.g. with git pull) and a webserver restart is sufficient.
 7.15.0.sql is needed but will be taken care of by the database upgrade script.
 For type charts new NPM packages are needed:
 
-    $ cd openatlas/static
-    $ rm package.json
-    $ pip3 install -e ./
-    $ ~/.local/bin/calmjs npm --install openatlas
+    cd openatlas/static
+    rm package.json
+    pip3 install -e ./
+    ~/.local/bin/calmjs npm --install openatlas
 
 ### 7.13.x to 7.14.0
 7.14.0.sql is needed but will be taken care of by the database upgrade script.
@@ -68,7 +79,7 @@ A code base update (e.g. with git pull) and a webserver restart is sufficient.
 
 Install exiftran to support rotation correction of images (#1943)
 
-    # apt install exiftran
+    sudo apt install exiftran
 
 #### Purging database system logs before 2022
 Database system logs before 2022 will be deleted. They aren't that relevant
@@ -81,7 +92,7 @@ upgrade script.
 
 Install python3-requests for new feature API: fetch data from ARCHE (#1848):
 
-    # apt install python3-requests
+    sudo apt install python3-requests
 
 #### For developers
 In case you are using tests you should take a look at
@@ -99,18 +110,18 @@ In this version the following folders, including all sub folders and files,
 
 have to be moved manually to the **files** directory, e.g. as root
 
-    # mv openatlas/uploads/* files/uploads/
-    # mv openatlas/export/sql/* files/export/
-    # mv openatlas/processed_images/ files/processed_images/
-    # chown -R www-data files
+    sudo mv openatlas/uploads/* files/uploads/
+    sudo mv openatlas/export/sql/* files/export/
+    sudo mv openatlas/processed_images/ files/processed_images/
+    sudo chown -R www-data files
 
 Clean up:
 
-    # rm openatlas/uploads/.gitignore
-    # rmdir openatlas/uploads
-    # rm openatlas/export/sql/.gitignore
-    # rmdir openatlas/export/sql
-    # rmdir openatlas/export
+    sudo rm openatlas/uploads/.gitignore
+    sudo rmdir openatlas/uploads
+    sudo rm openatlas/export/sql/.gitignore
+    sudo rmdir openatlas/export/sql
+    sudo rmdir openatlas/export
 
 Be aware, that external applications/scripts, e.g. backup scripts or
 presentation sites might need adaptions too.
@@ -128,16 +139,16 @@ Like announced, the deprecated API version 0.2 was removed in this release.
 
 NPM packages need to be upgraded:
 
-    $ cd openatlas/static
-    $ rm package.json
-    $ pip3 install -e ./
-    $ ~/.local/bin/calmjs npm --install openatlas
+    cd openatlas/static
+    rm package.json
+    pip3 install -e ./
+    ~/.local/bin/calmjs npm --install openatlas
 
 The new CSV export function now provides files to download directly. So
 the CSV folder isn't needed anymore and can be deleted (or moved elsewhere in
 case you like to keep it). To remove it execute:
 
-    $ rm -R openatlas/export/csv
+    rm -R openatlas/export/csv
 
 This is the last version that will support the deprecated API version 0.2.
 In case other systems are still depend on it, they should be updated to use
@@ -157,10 +168,10 @@ The new stable API version is now 0.3 (instead 0.2). Systems using the API
 
 NPM packages need to be upgraded for the Bootstrap upgrade:
 
-    $ cd openatlas/static
-    $ rm package.json
-    $ pip3 install -e ./
-    $ ~/.local/bin/calmjs npm --install openatlas
+    cd openatlas/static
+    rm package.json
+    pip3 install -e ./
+    ~/.local/bin/calmjs npm --install openatlas
 
 ### 7.2.0 to 7.3.0
 7.3.0.sql is needed but will be taken care of by the database upgrade script.
@@ -180,10 +191,10 @@ version **0.3** will be the new default. Version 0.2. will still be available
 
 For the new map system NPM packages have to be upgraded:
 
-    $ cd openatlas/static
-    $ rm package.json
-    $ pip3 install -e ./
-    $ ~/.local/bin/calmjs npm --install openatlas
+    cd openatlas/static
+    rm package.json
+    pip3 install -e ./
+    ~/.local/bin/calmjs npm --install openatlas
 
 ### 7.1.0 to 7.1.1
 A code base update (e.g. with git pull) and a webserver restart is sufficient.
@@ -208,7 +219,7 @@ sites might be needed.
 At admin/mail the port should be the default mail submission port **587**
 (in most cases). If you got port **25** there, you might want to change it. You
 can check the functionality with the **Send test mail** function there
-afterwards.
+afterward.
 
 ### 6.6.x to 7.0.0
 WARNING - this is a major release and requires software upgrades. If you are

@@ -25,11 +25,11 @@ from openatlas.display.table import Table
 from openatlas.display.util import (
     button, convert_size, display_form, display_info, format_date,
     get_file_path, is_authorized, link, manual, required_group, sanitize,
-    send_mail, uc_first, convert_image_to_iiif)
+    send_mail, uc_first)
 from openatlas.forms.field import SubmitField
 from openatlas.forms.setting import (
     ApiForm, ContentForm, FilesForm, GeneralForm, LogForm, MailForm, MapForm,
-    ModulesForm, SimilarForm, TestMailForm)
+    ModulesForm, SimilarForm, TestMailForm, IiifForm)
 from openatlas.forms.util import get_form_settings, set_form_settings
 from openatlas.models.content import get_content, update_content
 from openatlas.models.entity import Entity
@@ -157,6 +157,13 @@ def admin_index(
                 button(_('edit'), url_for('admin_settings', category='mail'))])
         if g.settings['mail']:
             tabs['email'].content += display_form(form)
+        tabs['IIIF'] = Tab(
+            'IIIF',
+            display_info(get_form_settings(IiifForm())),
+            buttons=[
+                manual('admin/iiif'),
+                button(_('edit'), url_for('admin_settings', category='iiif'))])
+
     if is_authorized('manager'):
         tabs['modules'] = Tab(
             _('modules'),
@@ -328,12 +335,15 @@ def admin_delete_single_type_duplicate(
 @app.route('/admin/settings/<category>', methods=['GET', 'POST'])
 @required_group('manager')
 def admin_settings(category: str) -> Union[str, Response]:
-    if category in ['general', 'mail'] and not is_authorized('admin'):
+    if category in ['general', 'mail', 'iiif'] and not is_authorized('admin'):
         abort(403)
-    form_name = f"{uc_first(category)}Form"
     form = getattr(
         importlib.import_module('openatlas.forms.setting'),
-        form_name)()
+        f"{uc_first(category)}Form")()
+    tab = category \
+        .replace('api', 'data') \
+        .replace('mail', 'email') \
+        .replace('iiif', 'IIIF')
     if form.validate_on_submit():
         data = {}
         for field in form:
@@ -344,6 +354,8 @@ def admin_settings(category: str) -> Union[str, Response]:
                 value = ' '.join(set(filter(None, field.data)))
             if field.type == 'BooleanField':
                 value = 'True' if field.data else ''
+            if isinstance(value, str):
+                value = value.strip()
             data[field.name] = value
         Transaction.begin()
         try:
@@ -355,16 +367,15 @@ def admin_settings(category: str) -> Union[str, Response]:
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        return redirect(
-            f"{url_for('admin_index')}"
-            f"#tab-{category.replace('api', 'data').replace('mail', 'email')}")
+        return redirect(f"{url_for('admin_index')}#tab-{tab}")
     set_form_settings(form)
-    tab = f"#tab-{category.replace('api', 'data').replace('mail', 'email')}"
     return render_template(
         'content.html',
         content=display_form(form, manual_page=f"admin/{category}"),
         title=_('admin'),
-        crumbs=[[_('admin'), f"{url_for('admin_index')}{tab}"], _(category)])
+        crumbs=[
+            [_('admin'), f"{url_for('admin_index')}#tab-{tab}"],
+            _(category)])
 
 
 @app.route('/admin/similar', methods=['GET', 'POST'])
@@ -476,7 +487,7 @@ def admin_orphans() -> str:
             table=Table(
                 ['name', 'root'],
                 [[link(type_), link(g.types[type_.root[0]])]
-                 for type_ in Type.get_type_orphans()])),
+                    for type_ in Type.get_type_orphans()])),
         'missing_files': Tab('missing_files', table=Table(header)),
         'orphaned_files': Tab(
             'orphaned_files',

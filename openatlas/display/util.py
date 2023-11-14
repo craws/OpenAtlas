@@ -230,24 +230,26 @@ def profile_image(entity: Entity) -> str:
     if not (path := get_file_path(entity.image_id)):
         return ''  # pragma: no cover
 
+    file_id = entity.image_id
     src = url_for('display_file', filename=path.name)
     url = src
     width = g.settings["profile_image_width"]
-    if app.config['IIIF']['enabled'] and check_iiif_file_exist(entity.id):
-        url = url_for('view_iiif', id_=entity.id)
-        iiif_ext = '.tiff' if app.config['IIIF']['conversion'] \
-            else g.files[entity.id].suffix
+
+    if g.settings['iiif'] and check_iiif_file_exist(file_id):
+        iiif_ext = '.tiff' if g.settings['iiif_conversion'] \
+            else g.files[file_id].suffix
         src = \
-            f"{app.config['IIIF']['url']}{entity.id}{iiif_ext}" \
+            f"{g.settings['iiif_url']}{file_id}{iiif_ext}" \
             f"/full/!{width},{width}/0/default.jpg"
     elif g.settings['image_processing'] and check_processed_image(path.name):
         if path_ := get_file_path(
-                entity.image_id,
+                file_id,
                 app.config['IMAGE_SIZE']['thumbnail']):
             src = url_for(
                 'display_file',
                 size=app.config['IMAGE_SIZE']['thumbnail'],
                 filename=path_.name)
+
     external = False
     if entity.class_.view == 'file':
         external = True
@@ -255,10 +257,25 @@ def profile_image(entity: Entity) -> str:
             return '<p class="uc-first">' + _('no preview available') + '</p>'
     else:
         url = url_for('view', id_=entity.image_id)
+
     html = link(
         f'<img style="max-width:{width}px" alt="{entity.name}" src="{src}">',
         url,
         external=external)
+
+    if check_iiif_activation() \
+            and g.files[file_id].suffix in g.display_file_ext:
+        if check_iiif_file_exist(file_id) \
+                or not g.settings['iiif_conversion']:
+            html += '<br>' + link(
+                _('view in IIIF'),
+                url_for('view_iiif', id_=file_id),
+                external=True)
+        else:
+            html += button_bar([
+                button(
+                    _('enable IIIF view'),
+                    url_for('make_iiif_available', id_=file_id))])
     return html
 
 
@@ -427,9 +444,6 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
         warnings.append(
             f"Database version {app.config['DATABASE_VERSION']} is needed but "
             f"current version is {g.settings['database_version']}")
-    if app.config['IIIF']['enabled']:
-        if path := app.config['IIIF']['path']:
-            check_write_access(path, warnings)
     for path in g.writable_paths:
         check_write_access(path, warnings)
     if is_authorized('admin'):
@@ -753,34 +767,39 @@ def get_entities_linked_to_type_recursive(
 
 
 def check_iiif_activation() -> bool:
-    iiif = app.config['IIIF']
-    return bool(iiif['enabled'] and os.access(Path(iiif['path']), os.W_OK))
+    return bool(
+        g.settings['iiif'] and
+        os.access(Path(g.settings['iiif_path']), os.W_OK))
 
 
 def check_iiif_file_exist(id_: int) -> bool:
-    if app.config['IIIF']['conversion']:
+    if g.settings['iiif_conversion']:
         return get_iiif_file_path(id_).is_file()
-    return bool(get_file_path(id_))
+    return bool(get_file_path(id_))  # pragma: no cover
 
 
 def get_iiif_file_path(id_: int) -> Path:
-    ext = '.tiff' if app.config['IIIF']['conversion'] \
-        else g.files[id_].suffix
-    return Path(app.config['IIIF']['path']) / f'{id_}{ext}'
+    ext = '.tiff' if g.settings['iiif_conversion'] else g.files[id_].suffix
+    return Path(g.settings['iiif_path']) / f'{id_}{ext}'
 
 
 def convert_image_to_iiif(id_: int) -> None:
-    compression = app.config['IIIF']['compression'] \
-        if app.config['IIIF']['compression'] in ['deflate', 'jpeg'] \
-        else 'deflate'
-    vips = "vips" if os.name == 'posix' else "vips.exe"
-    command = \
-        (f"{vips} tiffsave {get_file_path(id_)} {get_iiif_file_path(id_)} "
-         f"--tile --pyramid --compression {compression} "
-         f"--tile-width 128 --tile-height 128")
-    try:
-        process = subprocess.Popen(command, shell=True)
-        process.wait()
+    command = ["vips" if os.name == 'posix' else "vips.exe"]
+    command.extend([
+        'tiffsave',
+        get_file_path(id_),
+        get_iiif_file_path(id_),
+        '--tile',
+        '--pyramid',
+        '--compression',
+        g.settings['iiif_conversion'],
+        '--tile-width',
+        '128',
+        '--tile-height',
+        '128'])
+    process = subprocess.Popen(command)
+    process.wait()
+    if process.returncode == 0:
         flash(_('IIIF converted'), 'info')
-    except Exception as e:  # pragma: no cover
-        flash(f"{_('failed to convert image')}: {e}", 'error')
+    else:
+        flash(f"{_('failed to convert image')}", 'error')

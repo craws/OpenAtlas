@@ -60,7 +60,15 @@ def before_request() -> None:
     g.cidoc_classes = CidocClass.get_all(session['language'])
     g.properties = CidocProperty.get_all(session['language'])
     g.classes = OpenatlasClass.get_all()
-    g.types = Type.get_all()
+    with_count = False
+    if (request.path.startswith('/type')
+            or request.path.startswith('/api/type_tree/')
+            or request.path.startswith('/admin/orphans')
+            or (
+                request.path.startswith('/entity/') and
+                request.path.split('/entity/')[1].isdigit())):
+        with_count = True
+    g.types = Type.get_all(with_count)
     g.reference_systems = ReferenceSystem.get_all()
     g.view_class_mapping = view_class_mapping
     g.class_view_mapping = OpenatlasClass.get_class_view_mapping()
@@ -79,7 +87,10 @@ def before_request() -> None:
         app.config['RESIZED_IMAGES'],
         app.config['UPLOAD_PATH'],
         app.config['TMP_PATH']]
+    if g.settings['iiif'] and g.settings['iiif_path']:
+        g.writable_paths.append(g.settings['iiif_path'])
     if request.path.startswith('/api/'):
+        session['language'] = 'en'
         ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
         if not current_user.is_authenticated \
                 and not g.settings['api_public'] \

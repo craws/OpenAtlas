@@ -42,7 +42,7 @@ def get_table(view: str) -> Table:
     if view == 'file':
         table.order = [[0, 'desc']]
         table.header = ['date'] + table.header
-        if (g.settings['image_processing'] or app.config['IIIF']['enabled']) \
+        if (g.settings['image_processing'] or g.settings['iiif']) \
                 and current_user.settings['table_show_icons']:
             table.header.insert(1, _('icon'))
         for entity in Entity.get_by_class('file', types=True):
@@ -53,8 +53,7 @@ def get_table(view: str) -> Table:
                 entity.get_file_size(),
                 entity.get_file_ext(),
                 entity.description]
-            if (g.settings['image_processing']
-                or app.config['IIIF']['enabled']) \
+            if (g.settings['image_processing'] or g.settings['iiif']) \
                     and current_user.settings['table_show_icons']:
                 data.insert(1, file_preview(entity.id))
             table.rows.append(data)
@@ -78,12 +77,13 @@ def get_table(view: str) -> Table:
 
 def file_preview(entity_id: int) -> str:
     size = app.config['IMAGE_SIZE']['table']
-    param = f"loading='lazy' alt='image' max-width='100px' max-height='100px'"
-    if app.config['IIIF']['enabled'] and check_iiif_file_exist(entity_id):
-        ext = '.tiff' if app.config['IIIF']['conversion'] \
+    param = "loading='lazy' alt='image' max-width='100px' max-height='100px'"
+    if g.settings['iiif'] and check_iiif_file_exist(entity_id):
+        ext = '.tiff' if g.settings['iiif_conversion'] \
             else g.files[entity_id].suffix
-        url = (f"{app.config['IIIF']['url']}{entity_id}{ext}"
-               f"/full/!100,100/0/default.jpg")
+        url =\
+            f"{g.settings['iiif_url']}{entity_id}{ext}" \
+            f"/full/!100,100/0/default.jpg"
         return f"<img src='{url}' {param}>" \
             if ext in g.display_file_ext else ''
     if icon_path := get_file_path(

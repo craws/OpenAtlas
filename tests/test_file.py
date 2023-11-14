@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Any
 
-from flask import url_for
+from flask import g, url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
@@ -120,19 +120,34 @@ class FileTest(TestBaseCase):
                 url_for(
                     'api.iiif_manifest',
                     id_=file_id,
-                    version=app.config['IIIF']['version']))
+                    version=g.settings['iiif_version']))
             rv = rv.get_json()
             assert bool(rv['label'] == 'Updated file')
 
             rv = self.app.get(url_for('api.iiif_sequence', id_=file_id))
             rv = rv.get_json()
             assert bool(str(file_id) in rv['@id'])
+
             rv = self.app.get(url_for('api.iiif_image', id_=file_id))
             rv = rv.get_json()
             assert bool(str(file_id) in rv['@id'])
+
             rv = self.app.get(url_for('api.iiif_canvas', id_=file_id))
             rv = rv.get_json()
             assert bool(str(file_id) in rv['@id'])
+
+            with app.test_request_context():
+                app.preprocess_request()  # type: ignore
+                files[0].link('P2', g.types[get_hierarchy('License').subs[0]])
+
+            rv = self.app.get(url_for('api.licensed_file_overview'))
+            assert bool(len(rv.get_json().keys()) == 3)
+            rv = self.app.get(
+                url_for('api.licensed_file_overview', download=True))
+            assert bool(len(rv.get_json().keys()) == 3)
+            rv = self.app.get(url_for(
+                'api.licensed_file_overview', file_id=file_id))
+            assert bool(len(rv.get_json().keys()) == 1)
 
             rv = self.app.get(url_for('view_iiif', id_=file_id))
             assert b'Mirador' in rv.data
@@ -140,16 +155,9 @@ class FileTest(TestBaseCase):
             rv = self.app.get(url_for('view', id_=place.id))
             assert b'/full/!100,100/0/default.jpg' in rv.data
 
-            app.config['IIIF']['conversion'] = False
-            rv = self.app.get(url_for('view', id_=place.id))
-            assert b'/full/!100,100/0/default.jpg' in rv.data
-
-            app.config['IIIF']['activate'] = False
             rv = self.app.get(url_for('view', id_=place.id))
             assert b'Logo' in rv.data
 
-            app.config['IIIF']['activate'] = True
-            app.config['IIIF']['conversion'] = True
             for file in files:
                 rv = self.app.get(
                     url_for('delete', id_=file.id),

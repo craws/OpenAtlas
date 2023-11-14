@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Version 0.3 &mdash; OpenAtlas 7.16.0 documentation</title>
+  <title>Version 0.3 &mdash; OpenAtlas 7.18.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                7.16.0
+                7.18.0
               </div>
             
           
@@ -107,6 +107,7 @@
 <li class="toctree-l2 current"><a class="reference internal" href="api.html#endpoints">Endpoints</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#parameters">Parameters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#error-handling">Error handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#proxy">Proxy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#authentication-guide">Authentication guide</a></li>
 </ul>
 </li>
@@ -188,7 +189,7 @@
   <div class="section" id="version-0-3">
 <span id="id1"></span><h1>Version 0.3<a class="headerlink" href="#version-0-3" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="entity-endpoint">
-<h2>Entity endpoint<a class="headerlink" href="#entity-endpoint" title="Permalink to this headline">¶</a></h2>
+<h2>Entity Endpoint<a class="headerlink" href="#entity-endpoint" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="mf">0.3</span><span class="o">/</span><span class="n">entity</span><span class="o">/</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span>
 </pre></div>
 </div>
@@ -285,12 +286,12 @@ query; each request has to be a new parameter.</p>
 </dl>
 </div>
 <div class="section" id="multiple-entities">
-<h2>Multiple entities<a class="headerlink" href="#multiple-entities" title="Permalink to this headline">¶</a></h2>
+<h2>Multiple Entities<a class="headerlink" href="#multiple-entities" title="Permalink to this headline">¶</a></h2>
 <p>Endpoints provide information about entities in the OpenAtlas instance. The requested information is provided in Linked
 Places format (LPF). Alternatively, Linked Open Art (LOUD), GeoJSON or RDFs, derived from the LPF data, can be accessed.</p>
 <div class="section" id="cidoc-class">
-<h3>CIDOC class<a class="headerlink" href="#cidoc-class" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="mf">3.0</span><span class="o">/</span><span class="n">cidoc_class</span><span class="o">/</span><span class="p">{</span><span class="n">cidoc_class</span><span class="p">}</span>
+<h3>CIDOC Class<a class="headerlink" href="#cidoc-class" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="mf">0.3</span><span class="o">/</span><span class="n">cidoc_class</span><span class="o">/</span><span class="p">{</span><span class="n">cidoc_class</span><span class="p">}</span>
 </pre></div>
 </div>
 <p>Retrieves a JSON list of entities based on their CIDOC CRM class <a class="footnote-reference brackets" href="#id11" id="id2">1</a> <a class="footnote-reference brackets" href="#id12" id="id3">2</a></p>
@@ -335,7 +336,7 @@ Places format (LPF). Alternatively, Linked Open Art (LOUD), GeoJSON or RDFs, der
 </dl>
 </div>
 <div class="section" id="entities-linked-to-entity">
-<h3>Entities linked to entity<a class="headerlink" href="#entities-linked-to-entity" title="Permalink to this headline">¶</a></h3>
+<h3>Entities Linked to Entity<a class="headerlink" href="#entities-linked-to-entity" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="mf">0.3</span><span class="o">/</span><span class="n">entities_linked_to_entity</span><span class="o">/</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span>
 </pre></div>
 </div>
@@ -418,7 +419,7 @@ Places format (LPF). Alternatively, Linked Open Art (LOUD), GeoJSON or RDFs, der
 </dl>
 </div>
 <div class="section" id="system-class">
-<h3>System class<a class="headerlink" href="#system-class" title="Permalink to this headline">¶</a></h3>
+<h3>System Class<a class="headerlink" href="#system-class" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="mf">0.3</span><span class="o">/</span><span class="n">system_class</span><span class="o">/</span><span class="p">{</span><span class="n">system_class</span><span class="p">}</span>
 </pre></div>
 </div>
@@ -464,7 +465,7 @@ Places format (LPF). Alternatively, Linked Open Art (LOUD), GeoJSON or RDFs, der
 </dl>
 </div>
 <div class="section" id="type-entities">
-<h3>Type entities<a class="headerlink" href="#type-entities" title="Permalink to this headline">¶</a></h3>
+<h3>Type Entities<a class="headerlink" href="#type-entities" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="mf">0.3</span><span class="o">/</span><span class="n">type_entities</span><span class="o">/</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span>
 </pre></div>
 </div>
@@ -510,7 +511,7 @@ Places format (LPF). Alternatively, Linked Open Art (LOUD), GeoJSON or RDFs, der
 </dl>
 </div>
 <div class="section" id="type-entities-all">
-<h3>Type entities all<a class="headerlink" href="#type-entities-all" title="Permalink to this headline">¶</a></h3>
+<h3>Type Entities All<a class="headerlink" href="#type-entities-all" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="mf">0.3</span><span class="o">/</span><span class="n">type_entities_all</span><span class="o">/</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span>
 </pre></div>
 </div>
@@ -556,7 +557,7 @@ Places format (LPF). Alternatively, Linked Open Art (LOUD), GeoJSON or RDFs, der
 </dl>
 </div>
 <div class="section" id="view-class">
-<h3>View class<a class="headerlink" href="#view-class" title="Permalink to this headline">¶</a></h3>
+<h3>View Class<a class="headerlink" href="#view-class" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="mf">0.3</span><span class="o">/</span><span class="n">view_class</span><span class="o">/</span><span class="p">{</span><span class="n">view_class</span><span class="p">}</span>
 </pre></div>
 </div>
@@ -614,10 +615,10 @@ Places format (LPF). Alternatively, Linked Open Art (LOUD), GeoJSON or RDFs, der
 </div>
 </div>
 <div class="section" id="type-endpoints">
-<h2>Type endpoints<a class="headerlink" href="#type-endpoints" title="Permalink to this headline">¶</a></h2>
+<h2>Type Endpoints<a class="headerlink" href="#type-endpoints" title="Permalink to this headline">¶</a></h2>
 <p>Provide information about Types of an OpenAtlas instance. The results are in JSON and in a custom format.</p>
 <div class="section" id="type-by-view-class">
-<h3>Type by view class<a class="headerlink" href="#type-by-view-class" title="Permalink to this headline">¶</a></h3>
+<h3>Type by View Class<a class="headerlink" href="#type-by-view-class" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="mf">0.3</span><span class="o">/</span><span class="n">type_by_view_class</span><span class="o">/</span>
 </pre></div>
 </div>
@@ -641,7 +642,7 @@ Places format (LPF). Alternatively, Linked Open Art (LOUD), GeoJSON or RDFs, der
 </dl>
 </div>
 <div class="section" id="type-overview">
-<h3>Type overview<a class="headerlink" href="#type-overview" title="Permalink to this headline">¶</a></h3>
+<h3>Type Overview<a class="headerlink" href="#type-overview" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="mf">0.3</span><span class="o">/</span><span class="n">type_overview</span><span class="o">/</span>
 </pre></div>
 </div>
@@ -665,7 +666,7 @@ Places format (LPF). Alternatively, Linked Open Art (LOUD), GeoJSON or RDFs, der
 </dl>
 </div>
 <div class="section" id="type-tree">
-<h3>Type tree<a class="headerlink" href="#type-tree" title="Permalink to this headline">¶</a></h3>
+<h3>Type Tree<a class="headerlink" href="#type-tree" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="mf">0.3</span><span class="o">/</span><span class="n">type_tree</span><span class="o">/</span>
 </pre></div>
 </div>
@@ -690,8 +691,19 @@ Places format (LPF). Alternatively, Linked Open Art (LOUD), GeoJSON or RDFs, der
 </div>
 </div>
 <div class="section" id="administrative-endpoints">
-<h2>Administrative endpoints<a class="headerlink" href="#administrative-endpoints" title="Permalink to this headline">¶</a></h2>
+<h2>Administrative Endpoints<a class="headerlink" href="#administrative-endpoints" title="Permalink to this headline">¶</a></h2>
 <p>Provide metadata of the OpenAtlas instance for presentation sites.</p>
+<div class="section" id="backend-details">
+<h3>Backend Details<a class="headerlink" href="#backend-details" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="mf">0.3</span><span class="o">/</span><span class="n">backend_details</span><span class="o">/</span>
+</pre></div>
+</div>
+<p>Retrieves a detailed list of the OpenAtlas version, the available API versions, site name, image and IIIF details.</p>
+<dl class="simple">
+<dt><strong>Example</strong></dt><dd><p><a class="reference external" href="https://demo.openatlas.eu/api/0.3/backend_details/">https://demo.openatlas.eu/api/0.3/backend_details/</a></p>
+</dd>
+</dl>
+</div>
 <div class="section" id="classes">
 <h3>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="mf">0.3</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span>
@@ -729,8 +741,33 @@ intro, legal notice, contact, and size of processed images.</p>
 </dd>
 </dl>
 </div>
+<div class="section" id="licensed-file-overview">
+<h3>Licensed File Overview<a class="headerlink" href="#licensed-file-overview" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="mf">0.3</span><span class="o">/</span><span class="n">licensed_file_overview</span><span class="o">/</span>
+</pre></div>
+</div>
+<p>Retrieves a list of display URL, thumbnail URL, extension and license of all files which exists and have a licence.
+With the parameter “file_id”, only the given IDs where retrieved.</p>
+<dl class="simple">
+<dt><strong>Example</strong></dt><dd><p><a class="reference external" href="https://demo.openatlas.eu/api/0.3/licensed_file_overview/">https://demo.openatlas.eu/api/0.3/licensed_file_overview/</a></p>
+</dd>
+</dl>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 51%" />
+<col style="width: 49%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td colspan="2"><p><strong>Optional Parameters</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api_parameters_03.html#download-para-0-3"><span class="std std-ref">download</span></a></p></td>
+<td><p><a class="reference internal" href="api_parameters_03.html#file-id-para-0-3"><span class="std std-ref">file_id</span></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <div class="section" id="system-class-count">
-<h3>System class count<a class="headerlink" href="#system-class-count" title="Permalink to this headline">¶</a></h3>
+<h3>System Class Count<a class="headerlink" href="#system-class-count" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="mf">0.3</span><span class="o">/</span><span class="n">system_class_count</span><span class="o">/</span>
 </pre></div>
 </div>
@@ -742,10 +779,10 @@ intro, legal notice, contact, and size of processed images.</p>
 </div>
 </div>
 <div class="section" id="special-endpoints">
-<h2>Special endpoints<a class="headerlink" href="#special-endpoints" title="Permalink to this headline">¶</a></h2>
+<h2>Special Endpoints<a class="headerlink" href="#special-endpoints" title="Permalink to this headline">¶</a></h2>
 <p>Provides project-specific formats.</p>
 <div class="section" id="export-database">
-<h3>Export database<a class="headerlink" href="#export-database" title="Permalink to this headline">¶</a></h3>
+<h3>Export Database<a class="headerlink" href="#export-database" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="mf">0.3</span><span class="o">/</span><span class="n">export_database</span><span class="o">/</span><span class="p">{</span><span class="nb">format</span><span class="p">}</span>
 </pre></div>
 </div>
@@ -756,7 +793,7 @@ intro, legal notice, contact, and size of processed images.</p>
 </dl>
 </div>
 <div class="section" id="geometric-entities">
-<h3>Geometric entities<a class="headerlink" href="#geometric-entities" title="Permalink to this headline">¶</a></h3>
+<h3>Geometric Entities<a class="headerlink" href="#geometric-entities" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="mf">0.3</span><span class="o">/</span><span class="n">geometric_entities</span><span class="o">/</span>
 </pre></div>
 </div>
@@ -803,7 +840,9 @@ intro, legal notice, contact, and size of processed images.</p>
 </div>
 </div>
 <div class="section" id="image-endpoints">
-<h2>Image endpoints<a class="headerlink" href="#image-endpoints" title="Permalink to this headline">¶</a></h2>
+<h2>Image Endpoints<a class="headerlink" href="#image-endpoints" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="display">
+<h3>Display<a class="headerlink" href="#display" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="mf">0.3</span><span class="o">/</span><span class="n">display</span><span class="o">/</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span>
 </pre></div>
 </div>
@@ -822,6 +861,7 @@ from a <strong>logged-in</strong> user or API public setting is set to on and th
 </tr>
 </tbody>
 </table>
+</div>
 </div>
 </div>
 

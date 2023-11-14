@@ -1,3 +1,5 @@
+API_VERSIONS = ['0.3', '0.4']
+
 API_CONTEXT = {
     'LPF': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/'
            'master/linkedplaces-context-v1.1.jsonld',
@@ -22,12 +24,12 @@ API_FORMATS = RDF_FORMATS | JSON_FORMATS
 
 LOGICAL_OPERATOR: list[str] = ['and', 'or']
 STR_CATEGORIES: list[str] = [
-    "entityName", "entityDescription", "entityAliases", "entityCidocClass",
-    "entitySystemClass", "typeName", "typeNameWithSubs",
-    "beginFrom", "beginTo", "endFrom", "endTo"]
+    'entityName', 'entityDescription', 'entityAliases', 'entityCidocClass',
+    'entitySystemClass', 'typeName', 'typeNameWithSubs',
+    'beginFrom', 'beginTo', 'endFrom', 'endTo']
 INT_CATEGORIES: list[str] = [
-    "entityID", "typeID", "typeIDWithSubs", "relationToID"]
-SET_CATEGORIES: list[str] = ["valueTypeID"]
+    'entityID', 'typeID', 'typeIDWithSubs', 'relationToID']
+SET_CATEGORIES: list[str] = ['valueTypeID']
 VALID_CATEGORIES: list[str] = [
     *STR_CATEGORIES,
     *INT_CATEGORIES,

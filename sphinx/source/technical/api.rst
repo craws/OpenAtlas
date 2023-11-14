@@ -7,14 +7,18 @@ Introduction
 ============
 
 This page provides an overview of the OpenAtlas Application Programming
-Interface (`API <https://en.wikipedia.org/wiki/API>`_). The API is
-`RESTlike <https://restfulapi.net/rest-architectural-constraints/>`_
-to provide easy access to the data.
+Interface (`API <https://en.wikipedia.org/wiki/API>`_). An API allows easy
+and controlled access from external sources (e.g. presentation sites or
+analytical tools) to your data. It is human and mashine readable and
+provides different approaches to query your data.
 
-* To try out the API first hand, visit https://demo.openatlas.eu/swagger
-* For developers a complete
-  `Swagger documentation <https://app.swaggerhub.com/apis/ctot-nondef/OpenAtlas/>`_
-  is provided.
+The OpenAtlas API tries to follow the
+`RESTful <https://restfulapi.net/rest-architectural-constraints/>`_ constraints.
+
+To try out the API first hand at our demo site: https://demo.openatlas.eu/swagger.
+If you have your own OpenAtlas instance just visit <your-domain.eu>/swagger. Be aware
+that the :doc:`/admin/api` has to be set to public at the admin section.
+
 
 Quick Start Guide
 =================
@@ -83,20 +87,22 @@ Versioning
 ==========
 .. list-table::
    :header-rows: 1
-   :widths: 20 20 20
+   :widths: 20 20 20 20
 
    * - stable
-     - unstable
      - deprecated
-   * - :ref:`0.3<version_0_3>`
+     - unstable
+     - unavailable
+   * - `0.4 <https://demo.openatlas.eu/swagger/>`_
+     - :ref:`0.3<version_0_3>`
+     - 1.0
      - :ref:`0.1<version_0_1>`, :ref:`0.2<version_0_2>`
-     - :ref:`1.0<version_1_0>`
 
 The OpenAtlas API follows the notion of
 `sequenced based versioning <https://en.wikipedia.org/wiki/Software_versioning#Sequence-based_identifiers>`_
 and reflects the significance: **major.minor.fix** e.g. **3.11.1**. Only the
 **major** number is used for the URL path. **Minor** and **fix** are used for
-documentation reasons only with the exception of versions 0.1, 0.2 and 0.3.
+documentation reasons only with the exception of versions 0.1, 0.2, 0.3 and 0.4.
 A **stable** version of the API will be available at all times. In addition,
 **previous** versions will still be usable but tagged as **deprecated**. A
 warning will be posted in the
@@ -109,15 +115,21 @@ Endpoints
 =========
 
 Through different endpoints, data can be retrieved from OpenAtlas. Each version
-has a own set of endpoints, be sure to use the right one.
+has an own set of endpoints, be sure to use the right one.
+
+The current version 0.4 endpoint descriptions are available at:
+
+* `Current OpenAPI specification <https://demo.openatlas.eu/swagger/>`_ at the OpenAtlas demo version
+* `Local OpenAPI specification </swagger>`_: this link is only available if called from a OpenAtlas installation
+
+**Former versions**
 
 .. toctree::
    :maxdepth: 1
 
-   Version 0.3 (stable, current) <api_version_03>
+   Version 0.3 (stable, deprecated) <api_version_03>
    api_version_02
    api_version_01
-   Version 1.0 (whitepaper) <api_version_1>
 
 The requested information is provided in Linked Places format
 `Linked Places format (LPF) <https://github.com/LinkedPasts/linked-places-format>`_. Alternatively,
@@ -133,14 +145,15 @@ parameters which can be used. So please consult the `Endpoints`_ listing for
 more details.
 
 Parameters are added to the end of an URL after the "**?**" symbol
-(e.g. demo.openatlas.eu/api/0.3/entity/5117**?download=true**) and are
+(e.g. demo.openatlas.eu/api/0.4/entity/5117**?download=true**) and are
 connected with the "**&**" sign.
 For more general information on this topic see this
 `article <https://www.botify.com/learn/basics/what-are-url-parameters#:~:text=URL%20parameters%20(also%20known%20as,by%20the%20'%26'%20symbol.>`_.
 
-At the moment only the :ref:`stable version 0.3<version_0_3>` of the API can
-be provided by an detailed parameter list.
+* `Current OpenAPI parameters <https://demo.openatlas.eu/swagger/>`_ at the OpenAtlas demo version
+* `Local OpenAPI parameters </swagger>`_: this link is only available if called from a OpenAtlas installation
 
+**Former versions**
 
 .. toctree::
    :maxdepth: 1
@@ -161,8 +174,9 @@ Example:
 .. code-block::
 
   {
-      "title": "entity does not exist",
-       "message": "Requested entity does not exist. Try another ID"
+       "title": "entity does not exist",
+       "message": "Requested entity does not exist. Try another ID",
+       "url": "https://demo.openatlas.eu/api/entity/9999/,
        "timestamp": "Tue, 19 Jul 2022 13:59:13 GMT",
        "status": 404
    }

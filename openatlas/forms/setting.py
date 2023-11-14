@@ -60,6 +60,22 @@ class MailForm(FlaskForm):
     save = SubmitField(_('save'))
 
 
+class IiifForm(FlaskForm):
+    iiif = BooleanField('IIIF', description=_('tooltip IIIF enabled'))
+    iiif_url = StringField(_('URL'), description=_('tooltip IIIF URL'))
+    iiif_version = SelectField(
+        _('version'),
+        choices=((2, 2),),
+        coerce=int,
+        description=_('tooltip IIIF version'))
+    iiif_conversion = SelectField(
+        _('conversion'),
+        choices=(('', 'none'), ('deflate', 'deflate'), ('jpeg', 'jpeg')),
+        description=_('tooltip IIIF conversion'))
+    iiif_path = StringField(_('path'), description=_('tooltip IIIF path'))
+    save = SubmitField(_('apply'))
+
+
 class LogForm(FlaskForm):
     limit = SelectField(
         _('limit'),

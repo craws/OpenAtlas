@@ -15,14 +15,35 @@ def index_changelog() -> str:
 
 
 versions = {
-    '7.17.0': ['TBA', {
-        'feature': {
-            '2026': 'External reference systems for type hierarchies',
-            '2070': 'Modification (E11) for Place (E18)',
-            '2083': 'API: List of images'},
+    '7.18.0': ['TBA', {}],
+    '7.17.3': ['2023-11-13', {
         'fix': {
-            '2078': 'API: CSV export not working'
-        }}],
+            '2117': 'Modification events not showing at artifact view',
+            '2118': 'Wrong listing of type orphans'}}],
+    '7.17.2': ['2023-11-09', {
+        'fix': {
+            '2114': 'JavaScript datatable error'}}],
+    '7.17.1': ['2023-11-06', {
+        'fix': {
+            '2110': 'API: licensed file overview broken',
+            '2109': 'Manual: Missing API version 0.4 section'}}],
+    '7.17.0': ['2023-11-05', {
+        'feature': {
+            '2070': 'Modification (E11) for Place (E18)',
+            '2026': 'External reference systems for type hierarchies',
+            '2045': 'Performance',
+            '1909': 'IIIF image API server',
+            '2064': 'IIIF viewer integration',
+            '2067': 'IIIF presentation API',
+            '2062': 'IIIF docker installation',
+            '2094': 'IIIF configuration and documentation',
+            '2061': 'API: new version 0.4, deprecation of 0.3',
+            '2087': 'API: provide more meta data',
+            '2083': 'API: List of images',
+            '2095': 'API: Refactor',
+            '2071': 'Refactor and minor improvements'},
+        'fix': {
+            '2078': 'API: CSV export not working'}}],
     '7.16.1': ['2023-09-20', {
         'fix': {
             '2069': 'Broken buttons for preceding event'}}],

@@ -3,7 +3,7 @@
 Version 0.3
 ===========
 
-Entity endpoint
+Entity Endpoint
 ****************
 
 .. code::
@@ -56,18 +56,18 @@ query; each request has to be a new parameter.
 **Example**
     https://demo.openatlas.eu/api/0.3/query?cidoc_classes=E18&cidoc_classes=E31&system_classes=person&limit=120
 
-Multiple entities
+Multiple Entities
 *****************
 
 Endpoints provide information about entities in the OpenAtlas instance. The requested information is provided in Linked
 Places format (LPF). Alternatively, Linked Open Art (LOUD), GeoJSON or RDFs, derived from the LPF data, can be accessed.
 
-CIDOC class
+CIDOC Class
 """""""""""
 
 .. code::
 
-  /api/3.0/cidoc_class/{cidoc_class}
+  /api/0.3/cidoc_class/{cidoc_class}
 
 Retrieves a JSON list of entities based on their CIDOC CRM class [1]_ [2]_
 
@@ -82,7 +82,7 @@ Retrieves a JSON list of entities based on their CIDOC CRM class [1]_ [2]_
 **Example**
     https://demo.openatlas.eu/api/0.3/cidoc_class/E18
 
-Entities linked to entity
+Entities Linked to Entity
 """""""""""""""""""""""""
 
 .. code::
@@ -122,7 +122,7 @@ Used to retrieve the last entry/entries made. The number {n} represents the amou
 **Example**
     https://demo.openatlas.eu/api/0.3/latest/25
 
-System class
+System Class
 """"""""""""
 
 .. code::
@@ -142,7 +142,7 @@ Retrieves a list of entities, based on their OpenAtlas system class name as JSON
 **Example**
     https://demo.openatlas.eu/api/0.3/system_class/person
 
-Type entities
+Type Entities
 """""""""""""
 
 .. code::
@@ -162,7 +162,7 @@ Used to retrieve a JSON list of entities, based on their OpenAtlas **type** [2]_
 **Example**
     https://demo.openatlas.eu/api/0.3/type_entities/47
 
-Type entities all
+Type Entities All
 """""""""""""""""
 
 .. code::
@@ -182,7 +182,7 @@ Used to retrieve a JSON list of entities, based on their OpenAtlas **type** and 
 **Example**
     https://demo.openatlas.eu/api/0.3/type_entities_all/47
 
-View class
+View Class
 """"""""""
 
 .. code::
@@ -208,12 +208,12 @@ Used to retrieve a JSON list of entities based on their OpenAtlas class view
 .. [3] Available IDs can be obtained by using the type-tree or node-overview endpoint.
 
 
-Type endpoints
+Type Endpoints
 ***************
 
 Provide information about Types of an OpenAtlas instance. The results are in JSON and in a custom format.
 
-Type by view class
+Type by View Class
 """"""""""""""""""
 
 .. code::
@@ -231,7 +231,7 @@ Retrieves a list of all types sorted by view class
 **Example**
     https://demo.openatlas.eu/api/0.3/type_by_view_class/
 
-Type overview
+Type Overview
 """"""""""""""""""
 
 .. code::
@@ -249,7 +249,7 @@ Retrieves a list of all type
 **Example**
     https://demo.openatlas.eu/api/0.3/type_overview/
 
-Type tree
+Type Tree
 """"""""""""""""""
 
 .. code::
@@ -267,10 +267,22 @@ Shows every *type* in an OpenAtlas instance in hierarchical order.
 **Example**
     https://demo.openatlas.eu/api/0.3/type_tree/
 
-Administrative endpoints
+Administrative Endpoints
 ************************
 
 Provide metadata of the OpenAtlas instance for presentation sites.
+
+Backend Details
+""""""""""""""""""
+
+.. code::
+
+  /api/0.3/backend_details/
+
+Retrieves a detailed list of the OpenAtlas version, the available API versions, site name, image and IIIF details.
+
+**Example**
+    https://demo.openatlas.eu/api/0.3/backend_details/
 
 Classes
 """"""""""""""""""
@@ -304,7 +316,26 @@ intro, legal notice, contact, and size of processed images.
 **Example**
     https://demo.openatlas.eu/api/0.3/content/
 
-System class count
+Licensed File Overview
+""""""""""""""""""""""
+
+.. code::
+
+  /api/0.3/licensed_file_overview/
+
+Retrieves a list of display URL, thumbnail URL, extension and license of all files which exists and have a licence.
+With the parameter "file_id", only the given IDs where retrieved.
+
+**Example**
+    https://demo.openatlas.eu/api/0.3/licensed_file_overview/
+
+======================== =======================
+ **Optional Parameters**
+------------------------------------------------
+:ref:`download-para-0.3` :ref:`file_id-para-0.3`
+======================== =======================
+
+System Class Count
 """"""""""""""""""
 
 .. code::
@@ -316,12 +347,12 @@ Retrieves a list of the numbers of entries connected to a system class
 **Example**
     https://demo.openatlas.eu/api/0.3/system_class_count/
 
-Special endpoints
+Special Endpoints
 *****************
 
 Provides project-specific formats.
 
-Export database
+Export Database
 """""""""""""""
 
 .. code::
@@ -333,7 +364,7 @@ Downloads all information in an OpenAtlas instance as CSV, XML, or JSON
 **Example**
     https://demo.openatlas.eu/api/0.3/export_database/json
 
-Geometric entities
+Geometric Entities
 """"""""""""""""""
 
 .. code::
@@ -366,7 +397,7 @@ Displays all subunits of a place in a special format used by the `THANADOS <http
 :ref:`count-para-0.3`    :ref:`download-para-0.3`
 ======================== ========================
 
-Image endpoints
+Image Endpoints
 ***************
 
 Display
@@ -385,19 +416,3 @@ from a **logged-in** user or API public setting is set to on and the image has a
 :ref:`image_size-para-0.3`
 =========================== ========================
 
-
-Licensed file overview
-""""""""""""""""""""""
-
-.. code::
-
-  /api/0.3/licensed_file_overview/
-
-Provides a list of all images, or images provided by:ref:`file_id-para-0.3`, with their data used to implement in a
-presentation site (display URL, thumbnail URL, file extension, license).
-
-======================== ======================== ========================
- **Optional Parameters**
---------------------------------------------------------------------------
-:ref:`count-para-0.3`    :ref:`download-para-0.3` :ref:`file_id-para-0.3`
-======================== ======================== ========================

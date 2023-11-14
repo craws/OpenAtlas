@@ -3,7 +3,7 @@ from pathlib import Path
 
 from config.database_versions import DATABASE_VERSIONS
 
-VERSION = '7.17.0'
+VERSION = '7.18.0'
 DATABASE_VERSION = DATABASE_VERSIONS[0]
 DEMO_MODE = False  # If activated some options are disabled, login is prefilled
 DEBUG = False
@@ -40,13 +40,6 @@ RESIZED_IMAGES = Path(PROCESSED_IMAGE_PATH) / 'resized'
 IMAGE_SIZE = {
     'thumbnail': '200',
     'table': '100'}
-IIIF = {
-    'enabled': False,
-    'path': '',
-    'url': '',
-    'version': 2,
-    'conversion': True,
-    'compression': 'deflate'}  # 'deflate' or 'jpeg'
 
 # Security
 SESSION_COOKIE_SECURE = False  # Should be True in production.py if using HTTPS
@@ -64,3 +57,6 @@ CSS = {
     'button': {
         'primary': 'btn btn-outline-primary btn-sm',
         'secondary': 'btn btn-outline-secondary btn-sm'}}
+
+# Tests
+LOAD_WINDOWS_TEST_SQL = False

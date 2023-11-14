@@ -117,12 +117,9 @@ class Type(Entity):
                 Db.remove_entity_type(self.id, delete_ids)
 
     @staticmethod
-    def get_all() -> dict[int, Type]:
+    def get_all(with_count: bool) -> dict[int, Type]:
         types = {}
-        for row in \
-                Db.get_types('type', 'P127') + \
-                Db.get_types('type_tools', 'P127') + \
-                Db.get_types('administrative_unit', 'P89'):
+        for row in Db.get_types(with_count):
             type_ = Type(row)
             types[type_.id] = type_
             type_.count = row['count'] or row['count_property']
@@ -233,5 +230,8 @@ class Type(Entity):
     @staticmethod
     def get_type_orphans() -> list[Type]:
         return [
-            n for key, n in g.types.items()
-            if n.root and n.count < 1 and not n.subs]
+            node for key, node in g.types.items()
+            if node.root
+            and node.category not in ['system', 'tools']
+            and node.count < 1
+            and not node.subs]

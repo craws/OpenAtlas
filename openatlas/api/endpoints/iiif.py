@@ -1,10 +1,10 @@
+import mimetypes
 from typing import Any
 
 import requests
 from flask import jsonify, Response, url_for, g
 from flask_restful import Resource
 
-from openatlas import app
 from openatlas.api.resources.model_mapper import get_entity_by_id
 from openatlas.api.resources.util import get_license_name
 from openatlas.models.entity import Entity
@@ -43,6 +43,7 @@ class IIIFCanvasV2(Resource):
     @staticmethod
     def build_canvas(metadata: dict[str, Any]) -> dict[str, Any]:
         entity = metadata['entity']
+        mime_type, _ = mimetypes.guess_type(g.files[entity.id])
         return {
             "@id": url_for(
                 'api.iiif_canvas', id_=entity.id, version=2, _external=True),
@@ -58,7 +59,7 @@ class IIIFCanvasV2(Resource):
             "thumbnail": {
                 "@id": f'{metadata["img_url"]}/full/!200,200/0/default.jpg',
                 "@type": "dctypes:Image",
-                "format": "image/jpeg",
+                "format": mime_type,
                 "height": 200,
                 "width": 200,
                 "service": {
@@ -76,6 +77,7 @@ class IIIFImageV2(Resource):
     @staticmethod
     def build_image(metadata: dict[str, Any]) -> dict[str, Any]:
         id_ = metadata['entity'].id
+        mime_type, _ = mimetypes.guess_type(g.files[id_])
         return {
             "@context": "https://iiif.io/api/presentation/2/context.json",
             "@id":
@@ -85,7 +87,7 @@ class IIIFImageV2(Resource):
             "resource": {
                 "@id": metadata['img_url'],
                 "@type": "dctypes:Image",
-                "format": "image/jpeg",
+                "format": mime_type,
                 "service": {
                     "@context": "https://iiif.io/api/image/2/context.json",
                     "@id": metadata['img_url'],
@@ -128,9 +130,8 @@ class IIIFManifest(Resource):
 
 
 def get_metadata(entity: Entity) -> dict[str, Any]:
-    ext = '.tiff' if app.config['IIIF']['conversion'] \
-        else entity.get_file_ext()
-    image_url = f"{app.config['IIIF']['url']}{entity.id}{ext}"
+    ext = '.tiff' if g.settings['iiif_conversion'] else entity.get_file_ext()
+    image_url = f"{g.settings['iiif_url']}{entity.id}{ext}"
     req = requests.get(f"{image_url}/info.json")
     image_api = req.json()
     return {'entity': entity, 'img_url': image_url, 'img_api': image_api}

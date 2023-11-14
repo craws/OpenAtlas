@@ -1,0 +1,301 @@
+
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>IIIF &mdash; OpenAtlas 7.18.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Content" href="content.html" />
+    <link rel="prev" title="Map" href="map.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> OpenAtlas
+          
+
+          
+            
+            <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                7.18.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User interface</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../entity/index.html">Entity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Admin</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../entity/file.html">File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user.html">User</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general.html">General</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mail.html">Mail</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html">Modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map.html">Map</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">IIIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="content.html">Content</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_integrity_checks.html">Data integrity checks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="import.html">Import</a></li>
+<li class="toctree-l2"><a class="reference internal" href="export.html">Export</a></li>
+<li class="toctree-l2"><a class="reference internal" href="execute_sql.html">Execute SQL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arche.html">ARCHE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vocabs.html">Vocabs</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../model/index.html">Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technical/api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technical/database_structure.html">Database Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technical/application_structure.html">Application Structure</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Help</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting/index.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAtlas</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content style-external-links">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Admin</a> &raquo;</li>
+        
+      <li>IIIF</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="iiif">
+<h1>IIIF<a class="headerlink" href="#iiif" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<p><a class="reference external" href="https://iiif.io/">IIIF</a> is a set of open standards for delivering
+high-quality, attributed digital objects online at scale. Once installed
+(see installations notes) it can be configured in the admin area at the
+<strong>IIIF</strong> tab.</p>
+<p><strong>Be aware that</strong></p>
+<ul class="simple">
+<li><p>IIIF is <strong>optional</strong> for an OpenAtlas installation</p></li>
+<li><p>Although already working and in use we still consider it <strong>experimental</strong></p></li>
+<li><p>Enabling it can <strong>expose</strong> used files to the public (without login)</p></li>
+</ul>
+<p><strong>Configuration</strong></p>
+<ul class="simple">
+<li><p><strong>IIIF</strong> - Select this checkbox to enable IIIF</p></li>
+<li><p><strong>URL</strong> - Set the complete URL to the Image API Server, e.g.
+<strong>https://yourserver.eu/iiif/</strong></p></li>
+<li><p><strong>Version</strong> - The manifest version provided by OpenAtlas. Currently only
+version 2 is available.</p></li>
+<li><p><strong>Path</strong> - Set the absolute path to the IIIF image drop zone which
+corresponds with the Image API Server folder, e.g. <strong>/var/www/iipsrv/</strong> if
+you followed the default OpenAtlas installation. Be aware that this folder
+has to be accessible (write and execute) for the webserver.</p></li>
+<li><p><strong>Conversion</strong> - Controls if images get converted into pyramid-TIFFs</p>
+<ul>
+<li><p><strong>none</strong> - no conversion</p></li>
+<li><p><strong>deflate</strong> - lossless but files size may be large</p></li>
+<li><p><strong>jpeg</strong> - much smaller files size but not lossless</p></li>
+</ul>
+</li>
+</ul>
+<p>In case you are running multiple OpenAtlas instances you should create a sub
+directory for every instance at <strong>/var/www/iipsrv/</strong> and also add these to
+<strong>URL</strong> and <strong>Path</strong> accordingly.</p>
+<p>These formats have been successfully tested with OpenAtlas:</p>
+<ul class="simple">
+<li><p>.bmp</p></li>
+<li><p>.gif</p></li>
+<li><p>.ico</p></li>
+<li><p>.jpeg</p></li>
+<li><p>.jpg</p></li>
+<li><p>.png</p></li>
+<li><p>.svg</p></li>
+<li><p>.tif</p></li>
+<li><p>.tiff</p></li>
+</ul>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="content.html" class="btn btn-neutral float-right" title="Content" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="map.html" class="btn btn-neutral float-left" title="Map" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+        <p>CC-BY 4.0, Alexander Watzinger and the OpenAtlas team</p>
+        <script type="text/javascript">
+            <!-- Adds target=_blank to external links -->
+            $(document).ready(function () {
+                $('a[href^="http://"], a[href^="https://"]').not('a[class*=internal]').attr('target', '_blank');
+            });
+        </script>
+
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -18,57 +18,62 @@ Feel free to also consult our own
 [documentation](https://redmine.openatlas.eu/projects/uni/wiki/Debian_server_installation)
 that we are using to set up Debian servers for OpenAtlas installations.
 
+* [Requirements](#Requirements)
+* [IIIF](#IIIF) (optional)
+* [Tests](#Tests) (optional)
+* [Docker](#Docker) (alternative installation method)
+
 ## Requirements
 ### Python 3.9 and Flask 1.1.2
-    # apt install python3 python3-bcrypt python3-dateutil python3-psycopg2 python3-fuzzywuzzy python3-flask
-    # apt install python3-flask-babel python3-flask-login python3-flaskext.wtf python3-markdown python3-numpy
-    # apt install python3-pandas python3-jinja2 python3-flask-cors python3-flask-restful p7zip-full
-    # apt install python3-wand python3-rdflib python3-dicttoxml python3-rdflib-jsonld python3-flasgger
-    # apt install python3-requests exiftran
+    sudo apt install python3 python3-bcrypt python3-dateutil python3-psycopg2 python3-fuzzywuzzy python3-flask
+    sudo apt install python3-flask-babel python3-flask-login python3-flaskext.wtf python3-markdown python3-numpy
+    sudo apt install python3-pandas python3-jinja2 python3-flask-cors python3-flask-restful p7zip-full
+    sudo apt install python3-wand python3-rdflib python3-dicttoxml python3-rdflib-jsonld python3-flasgger
+    sudo apt install python3-requests exiftran
 
 ### Apache 2.4
-    # apt install apache2 libapache2-mod-wsgi-py3
+    sudo apt install apache2 libapache2-mod-wsgi-py3
 
 ### PostgreSQL 13 and PostGIS 3
-    # apt install postgresql postgresql-13-postgis-3 postgresql-13-postgis-3-scripts
+    sudo apt install postgresql postgresql-13-postgis-3 postgresql-13-postgis-3-scripts
 
 ### gettext, pip, npm
-    # apt install gettext npm python3-pip
+    sudo apt install gettext npm python3-pip
 
 ## Installation
 ### Files
 Copy the files to /var/www/your_site_name or clone OpenAtlas from GitHub and
 adapt them accordingly as regular user:
 
-    $ git clone https://github.com/craws/OpenAtlas.git
+    git clone https://github.com/craws/OpenAtlas.git
 
 ### Frontend libraries
 Execute this lines as regular user too:
 
-    $ pip3 install calmjs
-    $ cd openatlas/static
-    $ pip3 install -e ./
-    $ ~/.local/bin/calmjs npm --install openatlas
+    pip3 install calmjs
+    cd openatlas/static
+    pip3 install -e ./
+    ~/.local/bin/calmjs npm --install openatlas
 
 ### Database
 Executed statements below as **postgres** user.
 
 Create an openatlas database user
 
-    $ createuser openatlas -P
+    createuser openatlas -P
 
 Create an openatlas database, make openatlas the owner of it
 
-    $ createdb openatlas -O openatlas
+    createdb openatlas -O openatlas
 
-Add postgis and unaccent extension to the database
+Add the [PostGIS](https://postgis.net/) and unaccent extension to the database
 
-    $ psql openatlas -c "CREATE EXTENSION postgis; CREATE EXTENSION unaccent;"
+    psql openatlas -c "CREATE EXTENSION postgis; CREATE EXTENSION unaccent;"
 
 Import the SQL files:
 
-    $ cd install
-    $ cat 1_structure.sql 2_data_model.sql 3_data_web.sql 4_data_type.sql | psql -d openatlas -f -
+    cd install
+    cat 1_structure.sql 2_data_model.sql 3_data_web.sql 4_data_type.sql | psql -d openatlas -f -
 
 A user with username **OpenAtlas** is created with the password
 **change_me_PLEASE!**
@@ -79,7 +84,7 @@ admins until this account is changed.
 ### Configuration
 Copy instance/example_production.py to instance/production.py
 
-    $ cp instance/example_production.py instance/production.py
+    cp instance/example_production.py instance/production.py
 
 Add/change values as appropriate. See config.py which settings are available.
 
@@ -87,21 +92,21 @@ Add/change values as appropriate. See config.py which settings are available.
 As root copy and adapt install/example_apache.conf for a new vhost, activate
 the site:
 
-    # a2ensite your_sitename
+    sudo a2ensite your_sitename
 
 Test Apache configuration and restart
 
-    # apache2ctl configtest
-    # service apache2 restart
+    sudo apache2ctl configtest
+    sudo service apache2 restart
 
 Make the **files** directory writable for the Apache user, e.g.:
 
-    # chown -R www-data files
+    sudo chown -R www-data files
 
 ### Finishing
 Login with username "OpenAtlas" and password "change_me_PLEASE!" and change the
-password in profile. You may want to check the admin area to set up default site
-settings, email and similar.
+password in profile. You may want to check the admin area to set up default
+site settings, email and similar.
 
 ### Upgrade
 If you later like to upgrade the application be sure to read and follow the
@@ -118,38 +123,70 @@ instance/production.py:
 
     SESSION_COOKIE_SECURE = True
 
-### Tests (optional)
+## IIIF
+
+[IIIF](https://iiif.io/) is a set of open standards for delivering
+high-quality, attributed digital objects online at scale. Be aware that:
+
+* IIIF is **optional** for an OpenAtlas installation
+* Although already working and in use we still consider it **experimental**
+* Enabling IIIF can expose files to the public (without login)
+
+### Installation
+
+    sudo apt install iipimage-server libvips-tools
+    sudo service apache2 restart
+
+You can test http://your.server/iipsrv/iipsrv.fcgi to see if it runs.
+
+    sudo mkdir /var/www/iipsrv
+    sudo cp -p /usr/lib/iipimage-server/iipsrv.fcgi /var/www/iipsrv/
+    sudo chown -R www-data /var/www/iipsrv
+
+### Configuration
+
+Edit the configuration to your needs, see example at
+[install/iipsrv.conf](install/iipsrv.conf) and restart Apache:
+
+    sudo vim /etc/apache2/mods-available/iipsrv.conf
+    sudo service apache2 restart
+
+Further configuration can be done at the IIIF tab in the admin area of the web
+application.
+
+## Tests
 Install required packages:
 
-    # apt install python3-coverage python3-nose
+    sudo apt install python3-coverage python3-nose
 
 As postgres:
 
-    $ createdb openatlas_test -O openatlas
+    createdb openatlas_test -O openatlas
+    psql openatlas_test -c "CREATE EXTENSION postgis; CREATE EXTENSION unaccent;"
 
 Copy instance/example_testing.py to instance/testing.py and adapt as needed:
 
-    $ cp instance/example_testing.py instance/testing.py
+    cp instance/example_testing.py instance/testing.py
 
 Run tests
 
-    $ nosetest3
+    nosetest3
 
 Run tests with coverage
 
-    $ nosetests3 -c tests/.noserc
+    nosetests3 -c tests/.noserc
 
-## Docker 
+## Docker
 Be aware, the [Docker](https://www.docker.com/) installation is experimental
 and is **not** recommended for usage on a productive system.
 
 To run OpenAtlas as a Docker container clone the repository
 
-    $ git clone https://github.com/craws/OpenAtlas.git
+    git clone https://github.com/craws/OpenAtlas.git
 
 Open an CLI in the directory where you cloned OpenAtlas and run
-    
-    $ docker compose up --detach
+
+    docker compose up --detach
 
 After the containers are build an OpenAtlas instance is available under
 **localhost:8080**.
@@ -164,4 +201,4 @@ To restore a database SQL dump uncomment following command in
 database is installed (e.g. delete ./data/db/), as the dump will not be
 executed.
 
-    $ - ./files/export/dump.sql:/docker-entrypoint-initdb.d/dump.sql
+    - ./files/export/dump.sql:/docker-entrypoint-initdb.d/dump.sql

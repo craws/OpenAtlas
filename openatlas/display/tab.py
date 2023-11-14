@@ -80,7 +80,8 @@ class Tab:
                     'class',
                     'involvement',
                     'first',
-                    'last', 'description']
+                    'last',
+                    'description']
         elif name == 'file':
             if view != 'reference':
                 self.table.header += [_('main image')]

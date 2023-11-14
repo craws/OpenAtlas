@@ -1,0 +1,932 @@
+
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>API parameters 0.4 &mdash; OpenAtlas 7.17.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Database Structure" href="database_structure.html" />
+    <link rel="prev" title="API parameters 0.3" href="api_parameters_03.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> OpenAtlas
+          
+
+          
+            
+            <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                7.17.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User interface</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../entity/index.html">Entity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../model/index.html">Model</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="api.html">API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="api.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#quick-start-guide">Quick Start Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#versioning">Versioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#endpoints">Endpoints</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="api.html#parameters">Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#error-handling">Error handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#proxy">Proxy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#authentication-guide">Authentication guide</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="database_structure.html">Database Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="application_structure.html">Application Structure</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Help</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting/index.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAtlas</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content style-external-links">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="api.html">API</a> &raquo;</li>
+        
+      <li>API parameters 0.4</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="api-parameters-0-4">
+<h1>API parameters 0.4<a class="headerlink" href="#api-parameters-0-4" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<span id="cidoc-classes-para-0-4"></span><table class="colwidths-given docutils align-default" id="id9">
+<caption><span class="caption-text"><strong>cidoc_classes</strong></span><a class="headerlink" href="#id9" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 89%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><th class="stub"><p>Format</p></th>
+<td><p>string, multiple</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Description</p></th>
+<td><p>CIDOC CRM class code (e.g. E21)</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Values</p></th>
+<td><p>E5, E7, E8, E9, E12, E18, E20, E21, E22, E31, E32, E33, E41, E53, E54, E55, E65, E74</p></td>
+</tr>
+</tbody>
+</table>
+<span id="column-para-0-4"></span><table class="colwidths-given docutils align-default" id="id10">
+<caption><span class="caption-text"><strong>column</strong></span><a class="headerlink" href="#id10" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 89%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><th class="stub"><p>Format</p></th>
+<td><p>string</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Description</p></th>
+<td><p>Results will be sorted by the given column</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Values</p></th>
+<td><div class="line-block">
+<div class="line">ID</div>
+<div class="line">classCode</div>
+<div class="line">name</div>
+<div class="line">description</div>
+<div class="line">created</div>
+<div class="line">modified</div>
+<div class="line">systemClass</div>
+<div class="line">beginFrom</div>
+<div class="line">beginTo</div>
+<div class="line">endFrom</div>
+<div class="line">endTo</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<span id="count-para-0-4"></span><table class="colwidths-given docutils align-default" id="id11">
+<caption><span class="caption-text"><strong>count</strong></span><a class="headerlink" href="#id11" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 89%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><th class="stub"><p>Format</p></th>
+<td><p>boolean</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Description</p></th>
+<td><p>Returns the total count of results as integer</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Values</p></th>
+<td><p>True/False</p></td>
+</tr>
+</tbody>
+</table>
+<span id="download-para-0-4"></span><table class="colwidths-given docutils align-default" id="id12">
+<caption><span class="caption-text"><strong>download</strong></span><a class="headerlink" href="#id12" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 89%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><th class="stub"><p>Format</p></th>
+<td><p>boolean</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Description</p></th>
+<td><p>Triggers file download of the requested data in a file</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Values</p></th>
+<td><p>True/False</p></td>
+</tr>
+</tbody>
+</table>
+<span id="entities-para-0-4"></span><table class="colwidths-given docutils align-default" id="id13">
+<caption><span class="caption-text"><strong>entities</strong></span><a class="headerlink" href="#id13" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 89%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><th class="stub"><p>Format</p></th>
+<td><p>integer, multiple</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Description</p></th>
+<td><p>Specific entity ID</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Values</p></th>
+<td><p>e.g. 89</p></td>
+</tr>
+</tbody>
+</table>
+<span id="export-para-0-4"></span><table class="colwidths-given docutils align-default" id="id14">
+<caption><span class="caption-text"><strong>export</strong></span><a class="headerlink" href="#id14" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 89%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><th class="stub"><p>Format</p></th>
+<td><p>string</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Description</p></th>
+<td><p>Results will be downloaded in the given format</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Values</p></th>
+<td><div class="line-block">
+<div class="line">csv</div>
+<div class="line">csvNetwork</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<span id="file-id-para-0-4"></span><table class="colwidths-given docutils align-default" id="id15">
+<caption><span class="caption-text"><strong>file_id</strong></span><a class="headerlink" href="#id15" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 89%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><th class="stub"><p>Format</p></th>
+<td><p>integer</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Description</p></th>
+<td><p>ID of a file. This parameter can be used multiple times to query more IDs.</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Values</p></th>
+<td><p>e.g. 89</p></td>
+</tr>
+</tbody>
+</table>
+<span id="first-para-0-4"></span><table class="colwidths-given docutils align-default" id="id16">
+<caption><span class="caption-text"><strong>first</strong></span><a class="headerlink" href="#id16" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 89%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><th class="stub"><p>Format</p></th>
+<td><p>integer</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Description</p></th>
+<td><p>List of results starting with given ID</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Values</p></th>
+<td><p>e.g. 89</p></td>
+</tr>
+</tbody>
+</table>
+<span id="format-para-0-4"></span><table class="colwidths-given docutils align-default" id="id17">
+<caption><span class="caption-text"><strong>format</strong></span><a class="headerlink" href="#id17" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 89%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><th class="stub"><p>Format</p></th>
+<td><p>string</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Description</p></th>
+<td><p>Select a preferred output format</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Values</p></th>
+<td><div class="line-block">
+<div class="line">lp</div>
+<div class="line">loud</div>
+<div class="line">geojson</div>
+<div class="line">geojson-v2</div>
+<div class="line">pretty-xml</div>
+<div class="line">n3</div>
+<div class="line">turtle</div>
+<div class="line">nt</div>
+<div class="line">xml (subunits endpoint can only handle xml)</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<span id="geometry-para-0-4"></span><table class="colwidths-given docutils align-default" id="id18">
+<caption><span class="caption-text"><strong>geometry</strong></span><a class="headerlink" href="#id18" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 89%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><th class="stub"><p>Format</p></th>
+<td><p>string</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Description</p></th>
+<td><p>Select a preferred geometry</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Values</p></th>
+<td><div class="line-block">
+<div class="line">gisAll</div>
+<div class="line">gisPointAll</div>
+<div class="line">gisPointSupers</div>
+<div class="line">gisPointSubs</div>
+<div class="line">gisPointSibling</div>
+<div class="line">gisLineAll</div>
+<div class="line">gisPolygonAll</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<span id="id-para-0-4"></span><table class="colwidths-given docutils align-default" id="id19">
+<caption><span class="caption-text"><strong>id</strong></span><a class="headerlink" href="#id19" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 89%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><th class="stub"><p>Format</p></th>
+<td><p>integer</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Description</p></th>
+<td><p>Specific entity ID in OpenAtlas instance</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Values</p></th>
+<td><p>e.g. 89</p></td>
+</tr>
+</tbody>
+</table>
+<span id="image-size-para-0-4"></span><table class="colwidths-given docutils align-default" id="id20">
+<caption><span class="caption-text"><strong>image_size</strong></span><a class="headerlink" href="#id20" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 89%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><th class="stub"><p>Format</p></th>
+<td><p>string</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Description</p></th>
+<td><p>Select the size category for the displayed image (can be modified in production.py)</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Values</p></th>
+<td><div class="line-block">
+<div class="line">table</div>
+<div class="line">thumbnail</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<span id="lang-para-0-4"></span><table class="colwidths-given docutils align-default" id="id21">
+<caption><span class="caption-text"><strong>lang</strong></span><a class="headerlink" href="#id21" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 89%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><th class="stub"><p>Format</p></th>
+<td><p>string</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Description</p></th>
+<td><p>Select an output language</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Values</p></th>
+<td><div class="line-block">
+<div class="line">en</div>
+<div class="line">de</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<span id="last-para-0-4"></span><table class="colwidths-given docutils align-default" id="id22">
+<caption><span class="caption-text"><strong>last</strong></span><a class="headerlink" href="#id22" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 89%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><th class="stub"><p>Format</p></th>
+<td><p>integer</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Description</p></th>
+<td><p>JSON list of results start with entity after given ID</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Values</p></th>
+<td><p>e.g. 90</p></td>
+</tr>
+</tbody>
+</table>
+<span id="latest-para-0-4"></span><table class="colwidths-given docutils align-default" id="id23">
+<caption><span class="caption-text"><strong>latest</strong></span><a class="headerlink" href="#id23" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 89%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><th class="stub"><p>Format</p></th>
+<td><p>integer</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Description</p></th>
+<td><div class="line-block">
+<div class="line">Number of last database entries to be returned.</div>
+<div class="line">Only numbers between 1 and 100 are valid.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Values</p></th>
+<td><p>1 - 100</p></td>
+</tr>
+</tbody>
+</table>
+<span id="limit-para-0-4"></span><table class="colwidths-given docutils align-default" id="id24">
+<caption><span class="caption-text"><strong>limit</strong></span><a class="headerlink" href="#id24" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 89%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><th class="stub"><p>Format</p></th>
+<td><p>integer</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Description</p></th>
+<td><p>Number of entities returned per page</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Values</p></th>
+<td><div class="line-block">
+<div class="line">0 corresponds to “no limit set”</div>
+<div class="line">Default is set to 20 entities</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<span id="none-para-0-4"></span><table class="colwidths-given docutils align-default" id="id25">
+<caption><span class="caption-text"><strong>none</strong></span><a class="headerlink" href="#id25" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 89%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><th class="stub"><p>Format</p></th>
+<td></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Description</p></th>
+<td><p>No parameters are required</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Values</p></th>
+<td></td>
+</tr>
+</tbody>
+</table>
+<span id="page-para-0-4"></span><table class="colwidths-given docutils align-default" id="id26">
+<caption><span class="caption-text"><strong>page</strong></span><a class="headerlink" href="#id26" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 89%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><th class="stub"><p>Format</p></th>
+<td><p>integer</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Description</p></th>
+<td><p>Jump to chosen page</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Values</p></th>
+<td><p>e.g. 2</p></td>
+</tr>
+</tbody>
+</table>
+<span id="relation-type-para-0-4"></span><table class="colwidths-given docutils align-default" id="id27">
+<caption><span class="caption-text"><strong>relation_type</strong></span><a class="headerlink" href="#id27" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 89%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><th class="stub"><p>Format</p></th>
+<td><p>string, multiple</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Description</p></th>
+<td><p>Select which relations are shown</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Values</p></th>
+<td><p>E.g. P53</p></td>
+</tr>
+</tbody>
+</table>
+<span id="search-para-0-4"></span><table class="colwidths-given docutils align-default" id="id28">
+<caption><span class="caption-text"><strong>search</strong></span><a class="headerlink" href="#id28" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 89%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><th class="stub"><p>Format</p></th>
+<td><p>string, multiple</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Description</p></th>
+<td><p>Search request with complex AND/OR logic</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Values</p></th>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>The search parameter provides a tool to filter and search the request with logical operators.</p>
+<dl class="simple">
+<dt><strong>Example</strong></dt><dd><p>The search parameter takes a JSON as value. A key has to be a <em>filterable category</em> followed by a list/array.
+This list need to have again JSON values as items. There can be multiple search parameters. E.g:</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>{domain}/api/{api version}/{endpoint}?search={
+    &quot;typeID&quot;: [{&quot;operator&quot;: &quot;equal&quot;, &quot;values&quot;: [123456]}],
+    &quot;typeName&quot;: [{&quot;operator&quot;: &quot;like&quot;, &quot;values&quot;: [&quot;Chain&quot;, &quot;Bracelet&quot;, &quot;Amule&quot;], &quot;logicalOperator&quot;: &quot;and&quot;}]
+}&amp; search = {
+    &quot;typeName&quot;: [{&quot;operator&quot;: &quot;equal&quot;, &quot;values&quot;: [&quot;Gold&quot;]}],
+    &quot;beginFrom&quot;: [{&quot;operator&quot;: &quot;lesserThan&quot;, &quot;values&quot;: [&quot;0850-05-12&quot;],&quot;logicalOperator&quot;: &quot;and&quot;}]}
+</pre></div>
+</div>
+<p>Every JSON in a search parameter field is logical connected with AND. E.g:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>?search={A:[{X}, {Y}], B: [M]} =&gt; Entities containing A(X and Y) and B(M)
+</pre></div>
+</div>
+<p>To build an search start with following parameter:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">?search={}</span></code></p>
+</div></blockquote>
+<p>Now a <a class="reference internal" href="#categories">categories</a> after which the results are search, has to be selected:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">?search={&quot;typeName&quot;}</span></code></p>
+</div></blockquote>
+<p>After the <a class="reference internal" href="#categories">categories</a> are selected, next make a list with possible multiple JSONs (JSONs are connected with <em>OR</em>)</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">?search={&quot;typeName&quot;:</span> <span class="pre">[{},{}]}</span></code></p>
+</div></blockquote>
+<p>Next a list of <a class="reference internal" href="#values">values</a> has to be provided:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">?search={&quot;typeName&quot;:</span> <span class="pre">[{&quot;values&quot;:</span> <span class="pre">[&quot;Gold&quot;,</span> <span class="pre">&quot;Silver&quot;]}]}</span></code></p>
+</div></blockquote>
+<p>Then an <a class="reference internal" href="#operators">operators</a> has to be selected, how the <a class="reference internal" href="#values">values</a> should be treated:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">?search={&quot;typeName&quot;:</span> <span class="pre">[{&quot;operator&quot;:</span> <span class="pre">&quot;equal&quot;,</span> <span class="pre">&quot;values&quot;:</span> <span class="pre">[&quot;Gold&quot;,</span> <span class="pre">&quot;Silver&quot;]}]}</span></code></p>
+</div></blockquote>
+<p>At last a <a class="reference internal" href="#logical">logical</a> operator can be assigned, if the values will be treated with <em>OR</em> or <em>AND</em>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">?search={&quot;typeName&quot;:</span> <span class="pre">[{&quot;operator&quot;:</span> <span class="pre">&quot;equal&quot;,</span> <span class="pre">&quot;values&quot;:</span> <span class="pre">[&quot;Gold&quot;,</span> <span class="pre">&quot;Silver&quot;],</span> <span class="pre">&quot;logicalOperator&quot;:</span> <span class="pre">&quot;and&quot;}]}</span></code></p>
+</div></blockquote>
+<div class="section" id="filterable-categories">
+<span id="categories"></span><h2>Filterable categories<a class="headerlink" href="#filterable-categories" title="Permalink to this headline">¶</a></h2>
+<table class="hlist"><tr><td><ul class="simple">
+<li><p>entityName</p></li>
+<li><p>entityDescription</p></li>
+<li><p>entityAliases</p></li>
+</ul>
+</td><td><ul class="simple">
+<li><p>entityCidocClass</p></li>
+<li><p>entitySystemClass</p></li>
+<li><p>entityID</p></li>
+</ul>
+</td><td><ul class="simple">
+<li><p>typeID</p></li>
+<li><p>valueTypeID</p></li>
+<li><p>typeIDWithSubs</p></li>
+</ul>
+</td><td><ul class="simple">
+<li><p>typeName</p></li>
+<li><p>beginFrom</p></li>
+<li><p>beginTo</p></li>
+</ul>
+</td><td><ul class="simple">
+<li><p>endFrom</p></li>
+<li><p>endTo</p></li>
+<li><p>relationToID</p></li>
+</ul>
+</td></tr></table>
+</div>
+<div class="section" id="values">
+<span id="id1"></span><h2>Values<a class="headerlink" href="#values" title="Permalink to this headline">¶</a></h2>
+<p>Values has to be a list of items. The items can be either a string, an integer or a tuple (see Note). Strings need to
+be marked with “” or ‘’, while integers doesn’t allow this.</p>
+<p><em>Note</em>: the category valueTypeID can search for values of a type ID. But it takes one or more two valued Tuple as list
+entry: (x,y). x is the type id and y is the searched value. This can be an int or a float, e.g:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">{&quot;operator&quot;:&quot;lesserThan&quot;,&quot;values&quot;:[(3142,543.3)],&quot;logicalOperator&quot;:&quot;and&quot;}</span></code></p>
+</div></blockquote>
+</div>
+<div class="section" id="compare-operators">
+<span id="operators"></span><h2>Compare operators<a class="headerlink" href="#compare-operators" title="Permalink to this headline">¶</a></h2>
+<table class="hlist"><tr><td><ul class="simple">
+<li><p>equal</p></li>
+<li><p>notEqual</p></li>
+</ul>
+</td><td><ul class="simple">
+<li><p>like <a class="footnote-reference brackets" href="#id7" id="id2">1</a></p></li>
+<li><p>greaterThan <a class="footnote-reference brackets" href="#id8" id="id3">2</a></p></li>
+</ul>
+</td><td><ul class="simple">
+<li><p>greaterThanEqual <a class="footnote-reference brackets" href="#id8" id="id4">2</a></p></li>
+<li><p>lesserThan <a class="footnote-reference brackets" href="#id8" id="id5">2</a></p></li>
+</ul>
+</td><td><ul class="simple">
+<li><p>lesserThanEqual <a class="footnote-reference brackets" href="#id8" id="id6">2</a></p></li>
+</ul>
+</td></tr></table>
+<p>The compare operators work like the mathematical operators.
+equal x=y, notEqual x!=y, greaterThan x&gt;y , greaterThanEqual x&gt;=y, lesserThan x&lt;y, lesserThanEqual x&lt;=y.
+The like operator searches for occurrence of the string, so a match can also occur in the middle of a word.</p>
+<dl class="footnote brackets">
+<dt class="label" id="id7"><span class="brackets"><a class="fn-backref" href="#id2">1</a></span></dt>
+<dd><p>Only for string based categories</p>
+</dd>
+<dt class="label" id="id8"><span class="brackets">2</span><span class="fn-backref">(<a href="#id3">1</a>,<a href="#id4">2</a>,<a href="#id5">3</a>,<a href="#id6">4</a>)</span></dt>
+<dd><p>Only for beginFrom, beginTo, endFrom, endTo, valueTypeID</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="logical-operators">
+<span id="logical"></span><h2>Logical operators<a class="headerlink" href="#logical-operators" title="Permalink to this headline">¶</a></h2>
+<p>Not mandatory, <em>OR</em> is the default value. Logical operators handles, if the <a class="reference internal" href="#values">values</a> are treated as <em>OR</em> or <em>AND</em>.</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">and,</span> <span class="pre">or</span></code></p>
+</div></blockquote>
+<span id="show-para-0-4"></span><table class="colwidths-given docutils align-default" id="id29">
+<caption><span class="caption-text"><strong>show</strong></span><a class="headerlink" href="#id29" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 89%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><th class="stub"><p>Format</p></th>
+<td><p>string, multiple</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Description</p></th>
+<td><p>Select a key to be shown. If using “not”, no other keys will be displayed.</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Values</p></th>
+<td><div class="line-block">
+<div class="line">description</div>
+<div class="line">depictions</div>
+<div class="line">geometry</div>
+<div class="line">links</div>
+<div class="line">names</div>
+<div class="line">none</div>
+<div class="line">relations</div>
+<div class="line">types</div>
+<div class="line">when</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<span id="sort-para-0-4"></span><table class="colwidths-given docutils align-default" id="id30">
+<caption><span class="caption-text"><strong>sort</strong></span><a class="headerlink" href="#id30" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 89%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><th class="stub"><p>Format</p></th>
+<td><p>string</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Description</p></th>
+<td><p>Results will be sorted asc/desc (default column is name)</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Values</p></th>
+<td><div class="line-block">
+<div class="line">asc</div>
+<div class="line">desc</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<span id="system-classes-para-0-4"></span><table class="colwidths-given docutils align-default" id="id31">
+<caption><span class="caption-text"><strong>system_classes</strong></span><a class="headerlink" href="#id31" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 89%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><th class="stub"><p>Format</p></th>
+<td><p>string, multiple</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Description</p></th>
+<td><p>Needs to be one of the OpenAtlas system classes</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Values</p></th>
+<td><div class="line-block">
+<div class="line">all</div>
+<div class="line">administrative_unit</div>
+<div class="line">type</div>
+<div class="line">acquisition</div>
+<div class="line">activity</div>
+<div class="line">actor_actor_relation</div>
+<div class="line">actor_function</div>
+<div class="line">appellation</div>
+<div class="line">artifact</div>
+<div class="line">bibliography</div>
+<div class="line">edition</div>
+<div class="line">external_reference</div>
+<div class="line">feature</div>
+<div class="line">file</div>
+<div class="line">group</div>
+<div class="line">human_remains</div>
+<div class="line">involvement</div>
+<div class="line">move</div>
+<div class="line">object_location</div>
+<div class="line">person</div>
+<div class="line">place</div>
+<div class="line">production</div>
+<div class="line">reference_system</div>
+<div class="line">source</div>
+<div class="line">source_translation</div>
+<div class="line">stratigraphic_unit</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<span id="type-id-para-0-4"></span><table class="colwidths-given docutils align-default" id="id32">
+<caption><span class="caption-text"><strong>type_id</strong></span><a class="headerlink" href="#id32" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 89%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><th class="stub"><p>Format</p></th>
+<td><p>integer, multiple</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Description</p></th>
+<td><div class="line-block">
+<div class="line">Output will be filtered by chosen type ID.</div>
+<div class="line">Only entities with this type ID will be displayed.</div>
+<div class="line">The relation is in logical OR.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Values</p></th>
+<td><p>e.g. 90</p></td>
+</tr>
+</tbody>
+</table>
+<span id="view-classes-para-0-4"></span><table class="colwidths-given docutils align-default" id="id33">
+<caption><span class="caption-text"><strong>view_classes</strong></span><a class="headerlink" href="#id33" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 89%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><th class="stub"><p>Format</p></th>
+<td><p>string, multiple</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Description</p></th>
+<td><p>Needs to be one of the OpenAtlas menu items</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Values</p></th>
+<td><div class="line-block">
+<div class="line">actor</div>
+<div class="line">all</div>
+<div class="line">artifact</div>
+<div class="line">event</div>
+<div class="line">file</div>
+<div class="line">object</div>
+<div class="line">place</div>
+<div class="line">reference</div>
+<div class="line">source</div>
+<div class="line">source_translation</div>
+<div class="line">type</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="database_structure.html" class="btn btn-neutral float-right" title="Database Structure" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="api_parameters_03.html" class="btn btn-neutral float-left" title="API parameters 0.3" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+        <p>CC-BY 4.0, Alexander Watzinger and the OpenAtlas team</p>
+        <script type="text/javascript">
+            <!-- Adds target=_blank to external links -->
+            $(document).ready(function () {
+                $('a[href^="http://"], a[href^="https://"]').not('a[class*=internal]').attr('target', '_blank');
+            });
+        </script>
+
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -13,7 +13,7 @@ from openatlas.display.util import (
     bookmark_toggle, button, description, edit_link, format_date,
     format_entity_date, get_appearance, get_base_table_data, get_system_data,
     is_authorized, link, manual, profile_image_table_link, remove_link,
-    get_chart_data, check_iiif_file_exist)
+    get_chart_data)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -79,8 +79,7 @@ class BaseDisplay:
 
     def add_file_tab_thumbnails(self) -> None:
         if 'file' in self.tabs and current_user.settings['table_show_icons']:
-            if app.config['IIIF']['enabled'] \
-                    or g.settings['image_processing']:
+            if g.settings['iiif'] or g.settings['image_processing']:
                 self.tabs['file'].table.header.insert(1, _('icon'))
                 for row in self.tabs['file'].table.rows:
                     row.insert(1, file_preview(
@@ -378,7 +377,13 @@ class PlaceBaseDisplay(BaseDisplay):
 
         for link_ in entity.get_links(['P31', 'P67'], inverse=True):
             domain = link_.domain
+            if domain.class_.view == 'reference_system':
+                entity.reference_systems.append(link_)
+                continue
             data = get_base_table_data(domain)
+            if domain.class_.view in ['event']:
+                self.tabs[domain.class_.view].table.rows.append(data)
+                continue
             if domain.class_.view == 'file':
                 ext = data[3]
                 data.append(profile_image_table_link(entity, domain, ext))
@@ -408,9 +413,6 @@ class PlaceBaseDisplay(BaseDisplay):
                 data.append(link_.description)
                 data.append(edit_link(
                     url_for('link_update', id_=link_.id, origin_id=entity.id)))
-                if domain.class_.view == 'reference_system':
-                    entity.reference_systems.append(link_)
-                    continue
             data.append(
                 remove_link(domain.name, link_, entity, domain.class_.view))
             self.tabs[domain.class_.view].table.rows.append(data)

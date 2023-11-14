@@ -123,11 +123,11 @@ jobs:
           set -x
           cat <<EOF > testing.py
           SERVER_NAME='local.host'
-          DATABASE_NAME='openatlas'
-          DATABASE_USER='openatlas'
+          DATABASE_NAME='${{env.POSTGRES_DB}}'
+          DATABASE_USER='${{env.POSTGRES_USER}}'
           DATABASE_HOST='postgres'
           DATABASE_PORT=5432
-          DATABASE_PASS='verysecret'
+          DATABASE_PASS='${{env.POSTGRES_PASSWORD}}'
           MAIL_PASSWORD='asdQWEtzu123'
           SECRET_KEY='$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c 32;echo;)'  # Used for cookies
           DEBUG = True
@@ -146,8 +146,8 @@ jobs:
           EOF
           sudo chown 33:33 testing.py
           docker cp -a testing.py openatlas-openatlas-1:/var/www/openatlas/instance/
-          docker exec -i openatlas-openatlas-1 /bin/bash -c "cd /var/www/openatlas/instance/ && ls -la && cat testing.py"
-
+          docker exec -i openatlas-openatlas-1 /bin/bash -c "cd /var/www/openatlas/install/ && sed -i 's@http://localhost/iiif/@http://localhost:8080/iiif/@g' data_test.sql"
+          docker exec -i openatlas-openatlas-1 /bin/bash -c "cd /var/www/openatlas/instance/ && ls -la && cat testing.py && cat production.py"
       - name: Run tests
         run: |
           docker exec -i openatlas-openatlas-1 /bin/bash -c "cd /var/www/openatlas/tests && nosetests3 -c .noserc --verbosity=2 --nologcapture --nocapture && echo passed"

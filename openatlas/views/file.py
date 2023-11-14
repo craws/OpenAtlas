@@ -80,9 +80,8 @@ def make_iiif_available(id_: int) -> Response:
 def view_iiif(id_: int) -> str:
     return render_template(
         'iiif.html',
-        manifest_url=
-            url_for(
-                'api.iiif_manifest',
-                id_=id_,
-                version=app.config['IIIF']['version'],
-                _external=True))
+        manifest_url=url_for(
+            'api.iiif_manifest',
+            id_=id_,
+            version=g.settings['iiif_version'],
+            _external=True))

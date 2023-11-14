@@ -1,18 +1,21 @@
+import mimetypes
 from pathlib import Path as Pathlib_path
 from typing import Any
 
-from flask import Response, send_file, url_for
+from flask import Response, g, send_file, url_for
 from flask_restful import Resource, marshal
 
 from openatlas import app
-from openatlas.api.resources.error import DisplayFileNotFoundError, \
-    NoLicenseError
-from openatlas.api.resources.parser import image, files
+from openatlas.api.resources.error import (
+    DisplayFileNotFoundError, NoLicenseError)
+from openatlas.api.resources.model_mapper import (
+    get_entities_by_ids, get_entities_by_system_classes, get_entity_by_id)
+from openatlas.api.resources.parser import files, image
+from openatlas.api.resources.resolve_endpoints import download
 from openatlas.api.resources.templates import licensed_file_template
 from openatlas.api.resources.util import get_license_name
-from openatlas.api.resources.model_mapper import get_entity_by_id, \
-    get_entities_by_system_classes, get_entities_by_ids
-from openatlas.display.util import get_file_path
+from openatlas.display.util import (
+    check_iiif_activation, check_iiif_file_exist, get_file_path)
 
 
 class DisplayImage(Resource):
@@ -43,8 +46,18 @@ class LicensedFileOverview(Resource):
         for entity in entities:
             if license_ := get_license_name(entity):
                 if path := get_file_path(entity):
+                    iiif_manifest = ''
+                    if check_iiif_activation() and \
+                            check_iiif_file_exist(entity.id):
+                        iiif_manifest = url_for(
+                            'api.iiif_manifest',
+                            version=g.settings['iiif_version'],
+                            id_=entity.id,
+                            _external=True)
+                    mime_type, _ = mimetypes.guess_type(path)
                     files_dict[path.stem] = {
                         'extension': path.suffix,
+                        'mimetype': mime_type,
                         'display': url_for(
                             'api.display',
                             filename=path.stem,
@@ -54,5 +67,8 @@ class LicensedFileOverview(Resource):
                             image_size='thumbnail',
                             filename=path.stem,
                             _external=True),
-                        'license': license_}
+                        'license': license_,
+                        'IIIFManifest': iiif_manifest}
+        if parser['download']:
+            download(files_dict, licensed_file_template(entities), 'files')
         return marshal(files_dict, licensed_file_template(entities)), 200
