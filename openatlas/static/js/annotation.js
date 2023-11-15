@@ -39,38 +39,31 @@ map.on(L.Draw.Event.CREATED, function (e) {
     let layer = e.layer;
 
     // Open a popup for the user to enter a description
-    layer.bindPopup("Enter description: <input type='text' id='popup-description' />", {
+    layer.bindPopup("Enter description: <input type='text' id='popup-description' /><br/><button onclick='saveDescription()'>Save</button>", {
         maxWidth: 300
     }).openPopup();
 
     // Add the drawn layer to the drawnItems FeatureGroup
     drawnItems.addLayer(layer);
-
-    // Listen for the popupclose event to save description and coordinates
-    layer.on('popupclose', function () {
-        saveDescription(layer);
-    });
 });
 
-// Function to save the entered description and coordinates
-function saveDescription(layer) {
+function saveDescription() {
     let description = document.getElementById('popup-description').value;
+    let latlngs = drawnItems.getLayers()[drawnItems.getLayers().length - 1].getLatLngs()[0].map(x => [x.lng, x.lat]);
 
-    // Get the coordinates of the drawn shape
-    let latlngs = layer.getLatLngs()[0].map(x => [x.lng, x.lat]);
-
-    // Create a JSON object with description and coordinates
-    let data = {
+    // Update the existing data object
+    jsonData.push({
         description: description,
         coordinates: latlngs
-    };
+    });
 
-    // Store the JSON object in a variable or array
-    // (You can extend this logic to save it to a database or elsewhere)
-
-    jsonData.push(data);
-    $('#annotation').val(JSON.stringify(data));
-
+    $('#annotation').val(JSON.stringify(jsonData));
     // Log the JSON data for demonstration purposes
-    console.log("JSON Data:", jsonData);
+    console.log("JSON Data:", JSON.stringify(jsonData, null, 2));
+    // Clear drawn items from the map
+    drawnItems.clearLayers();
+
+    // Close the popup
+    map.closePopup();
 }
+
