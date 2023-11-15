@@ -21,13 +21,13 @@ let drawnItems = new L.FeatureGroup();
 map.addLayer(drawnItems);
 
 
-
 // Initialise the draw control and pass it the FeatureGroup of editable layers
 let drawControl = new L.Control.Draw({
     draw: {
         polyline: false,
         circle: false,
-        circlemarker: false
+        circlemarker: false,
+        marker: false
     }
 });
 map.addControl(drawControl);
@@ -57,7 +57,7 @@ function saveDescription(layer) {
     let description = document.getElementById('popup-description').value;
 
     // Get the coordinates of the drawn shape
-    let latlngs = layer.getLatLngs();
+    let latlngs = layer.getLatLngs()[0].map(x => [x.lng, x.lat]);
 
     // Create a JSON object with description and coordinates
     let data = {
@@ -69,6 +69,7 @@ function saveDescription(layer) {
     // (You can extend this logic to save it to a database or elsewhere)
 
     jsonData.push(data);
+    $('#annotation').val(JSON.stringify(data));
 
     // Log the JSON data for demonstration purposes
     console.log("JSON Data:", jsonData);

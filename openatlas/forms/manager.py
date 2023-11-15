@@ -261,7 +261,7 @@ class FeatureManager(PlaceBaseManager):
 
 
 class FileManager(BaseManager):
-    fields = ['name', 'description']
+    fields = ['name', 'description', 'annotation']
 
     def additional_fields(self) -> dict[str, Any]:
         fields = {}
