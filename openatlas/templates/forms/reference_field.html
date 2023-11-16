@@ -4,9 +4,9 @@
       autocomplete="off"
       style="position: relative"
       value="{{ field.data['value'] or '' }}"
-      id="reference_system_value_{{ field.reference_system_id }}"
-      placeholder="{{ field.placeholder }}"
+      id="reference_system_id_{{ field.reference_system_id }}"
       name="reference_system_id_{{ field.reference_system_id }}"
+      placeholder="{{ field.placeholder }}"
       type="text"
       class="{{ config.CSS.string_field }}"
       data-reference-system="{{ field.label.text.replace(' ','-') }}">

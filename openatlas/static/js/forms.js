@@ -188,7 +188,7 @@ $(document).ready(function () {
 
   // Add required to reference precision if reference is set
   ['keyup', 'change'].forEach((listener) => {
-    $("[id^=reference_system_value]").on(listener, function () {
+    $("[id^=reference_system_id]").on(listener, function () {
       const select = $(`#reference_system_precision_${this.id.split('_').pop()}`);
       if (!this.value?.length)
         select.removeClass('required');
