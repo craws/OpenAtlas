@@ -2,12 +2,20 @@ from typing import Any, Union
 
 from flask import g, render_template, request, send_from_directory, url_for
 from flask_babel import lazy_gettext as _
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
+from werkzeug.exceptions import abort
+from wtforms import StringField, TextAreaField
+from wtforms.validators import InputRequired
 
 from openatlas import app
-from openatlas.display.util import required_group, convert_image_to_iiif
+from openatlas.display.tab import Tab
+from openatlas.display.util import required_group, convert_image_to_iiif, \
+    get_file_path
+from openatlas.forms.field import SubmitField
 from openatlas.forms.form import get_table_form
+from openatlas.models.annotation import AnnotationImage
 from openatlas.models.entity import Entity
 
 
@@ -85,3 +93,37 @@ def view_iiif(id_: int) -> str:
             id_=id_,
             version=g.settings['iiif_version'],
             _external=True))
+
+
+class AnnotationForm(FlaskForm):
+    coordinate = StringField(_('coordinates'), validators=[InputRequired()])
+    annotation = TextAreaField(_('annotation'))
+    save = SubmitField(_('save'))
+
+
+@app.route('/annotate_image/<int:id_>', methods=['GET', 'POST'])
+@required_group('contributor')
+def annotate_image(id_: int) -> str:
+    entity = Entity.get_by_id(id_, types=True, aliases=True)
+    if not (path := get_file_path(entity.id)):
+        return abort(404)
+    form = AnnotationForm()
+    form.coordinate.data = 'adsasda'
+    if form.validate_on_submit():
+        # todo: validate input
+        AnnotationImage.insert_annotation_image(
+            file_id=id_,
+            coordinates=form.coordinate.data,
+            annotation=form.annotation.data)
+
+        return redirect(url_for('annotate_image', id_=entity.id))
+    return render_template(
+        'tabs.html',
+        tabs={'annotation': Tab('annotation', form=form,
+                                content=render_template('annotate.html',
+                                                        entity=entity))},
+        entity=entity,
+        crumbs=[
+            [_('file'), url_for('index', view='file')],
+            entity,
+            _('annotate')])
