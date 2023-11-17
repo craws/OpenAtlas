@@ -16,6 +16,9 @@ def index_changelog() -> str:
 
 versions = {
     '7.18.0': ['TBA', {}],
+    '7.17.4': ['2023-11-17', {
+        'fix': {
+            '2124': 'No modifications at preceding event'}}],
     '7.17.3': ['2023-11-13', {
         'fix': {
             '2117': 'Modification events not showing at artifact view',

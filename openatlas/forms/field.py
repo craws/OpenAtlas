@@ -436,8 +436,12 @@ def get_table_content(
             entities = Entity.get_by_view('place', types=True, aliases=aliases)
         elif class_name == 'event_preceding':
             class_ = 'event'
-            entities = Entity.get_by_class(
-                ['activity', 'acquisition', 'move', 'production'],
+            entities = Entity.get_by_class([
+                    'activity',
+                    'acquisition',
+                    'modification',
+                    'move',
+                    'production'],
                 types=True,
                 aliases=aliases)
         elif class_name == 'feature_super':

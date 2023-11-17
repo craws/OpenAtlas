@@ -802,4 +802,4 @@ def convert_image_to_iiif(id_: int) -> None:
     if process.returncode == 0:
         flash(_('IIIF converted'), 'info')
     else:
-        flash(f"{_('failed to convert image')}", 'error')
+        flash(f"{_('failed to convert image')}", 'error')  # pragma: no cover
