@@ -99,13 +99,6 @@
   </div>
 
   <script>
-    $("#{{ field.id }}-button").on(
-      'keydown',
-      function (event) {
-        if (onActivateKeyInput(event))
-          $('#{{ field.id }}-modal').modal('show');
-      });
-
     $("#add-{{ add_dynamical }}-modal-{{field.id}} #name_dynamic")
       .on('keyup change', function () {
         if ($(this).val() === '')

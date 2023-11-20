@@ -114,11 +114,11 @@
     </div>
   </div>
   <script>
-  $("#add-type-modal-{{field.id}} #name-dynamic").on('keyup change', function () {
-    if ($(this).val() === '')
-      $('#{{field.id}}-add-type').attr('disabled', '')
-    else
-      $('#{{field.id}}-add-type').removeAttr('disabled')
+    $("#add-type-modal-{{field.id}} #name-dynamic").on('keyup change', function () {
+      if ($(this).val() === '')
+        $('#{{field.id}}-add-type').attr('disabled', '')
+      else
+        $('#{{field.id}}-add-type').removeAttr('disabled')
     });
 
     $('#{{field.id}}-add-type').on('click', async function (e) {
@@ -136,11 +136,6 @@
 {% endif %}
 
 <script>
-  $('#{{ field.id }}-button').on('keydown', function (event) {
-    if (onActivateKeyInput(event))
-       $('#{{ field.id }}-modal').modal('show')
-  });
-
   $("#{{ field.id }}-tree").jstree({
     "core": {"check_callback": true, "data": {{ data|safe }}},
     "plugins": ["search", "checkbox"],
