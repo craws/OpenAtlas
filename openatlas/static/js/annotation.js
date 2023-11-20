@@ -27,7 +27,10 @@ let drawControl = new L.Control.Draw({
         polyline: false,
         circle: false,
         circlemarker: false,
-        marker: false
+        marker: false,
+        polygon: {
+            allowIntersection: false
+        }
     },
     edit: {
         featureGroup: drawnItems
@@ -63,6 +66,8 @@ function updateCoordinatesInput() {
 
         $('#coordinate').val(coordinates);
         console.log(coordinates);
+    } else {
+        $('#coordinate').val('');
     }
 }
 
@@ -79,4 +84,11 @@ function removeLastDrawnGeometry() {
         drawnItems.removeLayer(lastGeometry);
     }
 }
+
+// Event handler for when a geometry is deleted
+map.on('draw:deleted', function (event) {
+    // Clear drawn geometries and update the input field with the remaining coordinates
+    clearDrawnGeometries();
+    updateCoordinatesInput();
+});
 
