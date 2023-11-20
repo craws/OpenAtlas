@@ -1,7 +1,9 @@
+from tkinter import Button
 from typing import Any, Union
 
 from flask import g, render_template, request, send_from_directory, url_for
 from flask_babel import lazy_gettext as _
+from flask_login import current_user
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
@@ -11,8 +13,9 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.display.tab import Tab
+from openatlas.display.table import Table
 from openatlas.display.util import required_group, convert_image_to_iiif, \
-    get_file_path
+    get_file_path, is_authorized, button, format_date
 from openatlas.forms.field import SubmitField
 from openatlas.forms.form import get_table_form
 from openatlas.models.annotation import AnnotationImage
@@ -98,7 +101,6 @@ def view_iiif(id_: int) -> str:
 class AnnotationForm(FlaskForm):
     coordinate = StringField(
         _('coordinates'),
-        render_kw={'disabled': ''},
         validators=[InputRequired()])
     annotation = TextAreaField(_('annotation'))
     save = SubmitField(_('save'))
@@ -108,25 +110,48 @@ class AnnotationForm(FlaskForm):
 @required_group('contributor')
 def annotate_image(id_: int) -> str:
     entity = Entity.get_by_id(id_, types=True, aliases=True)
-    if not (path := get_file_path(entity.id)):
+    if not get_file_path(entity.id):
         return abort(404)
+    table = None
     form = AnnotationForm()
-    # form.coordinate.data = 'adsasda'
+    if annotations := AnnotationImage.get_by_file(entity.id):
+        rows = []
+        for item in annotations:
+            delete = ''
+            if is_authorized('editor') or (
+                    is_authorized('contributor')
+                    and current_user.id == item['user_id']):
+                delete = button(
+                    _('delete'),
+                    url_for('delete_annotation', id_=item['id']))
+            rows.append([
+                format_date(item['created']),
+                item['annotation'],
+                item['coordinates'],
+                delete])
+        table = Table(['date', 'annotation', 'coordinates', ''], rows=rows)
     if form.validate_on_submit():
         # todo: validate input
         AnnotationImage.insert_annotation_image(
             file_id=id_,
             coordinates=form.coordinate.data,
             annotation=form.annotation.data)
-
         return redirect(url_for('annotate_image', id_=entity.id))
     return render_template(
         'tabs.html',
-        tabs={'annotation': Tab('annotation', form=form,
-                                content=render_template('annotate.html',
-                                                        entity=entity))},
+        tabs={'annotation': Tab(
+            'annotation',
+            form=form,
+            table=table,
+            content=render_template('annotate.html', entity=entity))},
         entity=entity,
         crumbs=[
             [_('file'), url_for('index', view='file')],
             entity,
             _('annotate')])
+
+
+@app.route('/delete_annotation/<int:id_>', methods=['GET', 'POST'])
+@required_group('contributor')
+def delete_annotation(id_: int) -> str:
+    pass

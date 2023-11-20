@@ -17,7 +17,6 @@ CREATE TABLE IF NOT EXISTS web.annotation_image
     annotation text COLLATE pg_catalog."default" NOT NULL,
     created timestamp without time zone NOT NULL DEFAULT now(),
     CONSTRAINT annotation_image_pkey PRIMARY KEY (id),
-    CONSTRAINT annotation_image_image_id_entity_id_key UNIQUE (image_id) INCLUDE(entity_id),
     CONSTRAINT annotation_image_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES model.entity (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE SET NULL,
     CONSTRAINT annotation_image_image_id_fkey FOREIGN KEY (image_id) REFERENCES model.entity (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE NOT VALID,
     CONSTRAINT annotation_image_user_id_fkey FOREIGN KEY (user_id) REFERENCES web."user" (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE SET NULL NOT VALID

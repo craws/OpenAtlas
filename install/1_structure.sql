@@ -102,7 +102,6 @@ ALTER TABLE IF EXISTS ONLY web."group" DROP CONSTRAINT IF EXISTS group_name_key;
 ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_pkey;
 ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_entity_id_key;
 ALTER TABLE IF EXISTS ONLY web.annotation_image DROP CONSTRAINT IF EXISTS annotation_image_pkey;
-ALTER TABLE IF EXISTS ONLY web.annotation_image DROP CONSTRAINT IF EXISTS annotation_image_image_id_entity_id_key;
 ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_pkey;
 ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_pkey;
 ALTER TABLE IF EXISTS ONLY model.property_i18n DROP CONSTRAINT IF EXISTS property_i18n_property_code_language_code_key;
@@ -1767,14 +1766,6 @@ ALTER TABLE ONLY model.property_inheritance
 
 ALTER TABLE ONLY model.property
     ADD CONSTRAINT property_pkey PRIMARY KEY (id);
-
-
---
--- Name: annotation_image annotation_image_image_id_entity_id_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
---
-
-ALTER TABLE ONLY web.annotation_image
-    ADD CONSTRAINT annotation_image_image_id_entity_id_key UNIQUE (image_id) INCLUDE (entity_id);
 
 
 --
