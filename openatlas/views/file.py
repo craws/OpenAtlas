@@ -1,7 +1,7 @@
-from tkinter import Button
 from typing import Any, Union
 
-from flask import g, render_template, request, send_from_directory, url_for
+from flask import g, render_template, request, send_from_directory, url_for, \
+    flash
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
@@ -129,11 +129,14 @@ def annotate_image(id_: int) -> str:
                 item['annotation'],
                 item['coordinates'],
                 delete])
-        table = Table(['date', 'annotation', 'coordinates', ''], rows=rows)
+        table = Table(
+            ['date', 'annotation', 'coordinates', ''],
+            rows=rows,
+            order=[[0, 'desc']])
     if form.validate_on_submit():
         # todo: validate input
         AnnotationImage.insert_annotation_image(
-            file_id=id_,
+            image_id=id_,
             coordinates=form.coordinate.data,
             annotation=form.annotation.data)
         return redirect(url_for('annotate_image', id_=entity.id))
@@ -143,7 +146,10 @@ def annotate_image(id_: int) -> str:
             'annotation',
             form=form,
             table=table,
-            content=render_template('annotate.html', entity=entity))},
+            content=render_template(
+                'annotate.html',
+                entity=entity,
+                annotations=annotations))},
         entity=entity,
         crumbs=[
             [_('file'), url_for('index', view='file')],
@@ -154,4 +160,10 @@ def annotate_image(id_: int) -> str:
 @app.route('/delete_annotation/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
 def delete_annotation(id_: int) -> str:
-    pass
+    annotation = AnnotationImage.get_by_id(id_)
+    if current_user.group == 'contributor' \
+            and annotation['user_id'] != current_user.id:
+        abort(403)
+    AnnotationImage.delete(id_)
+    flash(_('annotation deleted'), 'info')
+    return redirect(url_for('annotate_image', id_=annotation['image_id']))

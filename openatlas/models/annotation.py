@@ -6,21 +6,26 @@ from openatlas.database.annotation import AnnotationImage as Db
 
 
 class AnnotationImage:
+    @staticmethod
+    def get_by_id(id_: int) -> Optional[dict[str, Any]]:
+        return Db.get_by_id(id_)
 
     @staticmethod
-    def get_by_file(file_id: int) -> list[dict[str, Any]]:
-        return Db.get_by_file(file_id)
+    def get_by_file(image_id: int) -> list[dict[str, Any]]:
+        return Db.get_by_file(image_id)
 
     @staticmethod
     def insert_annotation_image(
-            file_id: int,
+            image_id: int,
             coordinates: str,
             annotation: Optional[str] = None) -> None:
-        print('model')
         Db.insert({
-            'file_id': file_id,
+            'image_id': image_id,
             'user_id': current_user.id,
             'entity_id': None,
             'coordinates': coordinates,
             'annotation': annotation})
-        pass
+
+    @staticmethod
+    def delete(id_: int) -> None:
+        Db.delete(id_)
