@@ -16,54 +16,67 @@ $.getJSON(iiif_manifest, function (data) {
     ).addTo(map);
 });
 
-// Initialise the FeatureGroup to store editable layers
+
 let drawnItems = new L.FeatureGroup();
 map.addLayer(drawnItems);
 
+let drawnGeometries = []; // Array to store drawn geometries
 
-// Initialise the draw control and pass it the FeatureGroup of editable layers
 let drawControl = new L.Control.Draw({
     draw: {
         polyline: false,
         circle: false,
         circlemarker: false,
         marker: false
+    },
+    edit: {
+        featureGroup: drawnItems
     }
 });
 map.addControl(drawControl);
 
+map.on('draw:created', function (event) {
+    // Clear drawn geometries and add the new one
+    clearDrawnGeometries();
+    drawnItems.addLayer(event.layer);
+    drawnGeometries.push(event.layer);
 
-var jsonData = jsonData || [];
-// Event Handling for Drawn Items
-map.on(L.Draw.Event.CREATED, function (e) {
-    let layer = e.layer;
-
-    // Open a popup for the user to enter a description
-    layer.bindPopup("Enter description: <input type='text' id='popup-description' /><br/><button onclick='saveDescription()'>Save</button>", {
-        maxWidth: 300
-    }).openPopup();
-
-    // Add the drawn layer to the drawnItems FeatureGroup
-    drawnItems.addLayer(layer);
+    // Update the input field with the coordinates
+    updateCoordinatesInput();
 });
 
-function saveDescription() {
-    let description = document.getElementById('popup-description').value;
-    let latlngs = drawnItems.getLayers()[drawnItems.getLayers().length - 1].getLatLngs()[0].map(x => [x.lng, x.lat]);
+// Event handler for when a geometry is edited
+map.on('draw:edited', function (event) {
+    // Update the input field with the coordinates after editing
+    updateCoordinatesInput();
+});
 
-    // Update the existing data object
-    jsonData.push({
-        description: description,
-        coordinates: latlngs
-    });
+// Function to update the #coordinate input field with the latest coordinates
+function updateCoordinatesInput() {
+    if (drawnItems.getLayers().length > 0) {
+        const precision = 2; // Specify the number of decimal places
 
-    $('#annotation').val(JSON.stringify(jsonData));
-    // Log the JSON data for demonstration purposes
-    console.log("JSON Data:", JSON.stringify(jsonData, null, 2));
-    // Clear drawn items from the map
+        let coordinates = drawnItems.getLayers()[0].getLatLngs()[0].map(x => [
+            x.lng.toFixed(precision),
+            x.lat.toFixed(precision)
+        ]);
+
+        $('#coordinate').val(coordinates);
+        console.log(coordinates);
+    }
+}
+
+// To remove all drawn geometries
+function clearDrawnGeometries() {
     drawnItems.clearLayers();
+    drawnGeometries = [];
+}
 
-    // Close the popup
-    map.closePopup();
+// To remove the last drawn geometry
+function removeLastDrawnGeometry() {
+    const lastGeometry = drawnGeometries.pop();
+    if (lastGeometry) {
+        drawnItems.removeLayer(lastGeometry);
+    }
 }
 

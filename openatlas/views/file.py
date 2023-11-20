@@ -96,7 +96,10 @@ def view_iiif(id_: int) -> str:
 
 
 class AnnotationForm(FlaskForm):
-    coordinate = StringField(_('coordinates'), validators=[InputRequired()])
+    coordinate = StringField(
+        _('coordinates'),
+        render_kw={'disabled': ''},
+        validators=[InputRequired()])
     annotation = TextAreaField(_('annotation'))
     save = SubmitField(_('save'))
 
@@ -108,7 +111,7 @@ def annotate_image(id_: int) -> str:
     if not (path := get_file_path(entity.id)):
         return abort(404)
     form = AnnotationForm()
-    form.coordinate.data = 'adsasda'
+    # form.coordinate.data = 'adsasda'
     if form.validate_on_submit():
         # todo: validate input
         AnnotationImage.insert_annotation_image(
