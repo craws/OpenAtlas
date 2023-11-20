@@ -3,11 +3,13 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/leaflet-draw/dist/leaflet.draw.css') }}">
 
 <div class="col">
+  {{ anno }}
   <div id="annotate" class="map" style="height: 800px;"></div>
 </div>
 
 <script>
-    const iiif_manifest = "{{ url_for('api.iiif_manifest', id_=entity.id, version=2, _external=True) }}"
+    const iiif_manifest = "{{ url_for('api.iiif_manifest', id_=entity.id, version=2, _external=True) }}";
+    const annotations = {{ anno | safe }};
 </script>
 
 <script src="{{ url_for('static', filename='node_modules/leaflet/dist/leaflet.js') }}"></script>

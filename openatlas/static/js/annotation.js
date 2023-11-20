@@ -92,3 +92,28 @@ map.on('draw:deleted', function (event) {
     updateCoordinatesInput();
 });
 
+// Function to transform coordinates from 'long,lat,long,lat,...' to Leaflet LatLng array
+function transformCoordinates(coordinates) {
+  const latLngArray = coordinates.split(',').map((coord, index) => {
+    return index % 2 === 0 ? parseFloat(coord) : parseFloat(coord);
+  });
+
+  return latLngArray.reduce((result, value, index, array) => {
+    if (index % 2 === 0) {
+      result.push(array.slice(index, index + 2));
+    }
+    return result;
+  }, []);
+}
+
+// Iterate through annotations and add them to the map
+annotations.forEach(annotation => {
+  const coordinates = transformCoordinates(annotation.coordinates);
+  const geometry = L.polygon(coordinates, {
+    color: 'blue', // You can customize the style here
+    fillOpacity: 0.5
+  }).addTo(map);
+
+  // Add popup with annotation text
+  geometry.bindPopup(annotation.annotation);
+});
