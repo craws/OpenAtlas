@@ -1,0 +1,160 @@
+{{- if .Values.cronjobs -}}
+{{- $app:= . }}
+apiVersion: v1
+kind: List
+items:
+{{- range $jobName, $jobConfig:= .Values.cronjobs }}
+{{- if $.Capabilities.APIVersions.Has "batch/v1" }}
+- apiVersion: "batch/v1"
+{{- else }}
+- apiVersion: "batch/v1beta1"
+{{- end }}
+  kind: CronJob
+  metadata:
+    name: "{{ template "fullname" $app }}-{{ $jobName}}"
+    labels:
+      {{- include "labels" $app | nindent 6 }}
+  spec:
+    concurrencyPolicy: {{ default "Forbid" $jobConfig.concurrencyPolicy }}
+    failedJobsHistoryLimit: {{ default 1 $jobConfig.failedJobsHistoryLimit }}
+    startingDeadlineSeconds: {{ default 300 $jobConfig.startingDeadlineSeconds }}
+    schedule: {{ $jobConfig.schedule | quote }}
+    successfulJobsHistoryLimit: {{ default 1 $jobConfig.successfulJobsHistoryLimit }}
+    jobTemplate:
+      spec:
+        {{- if $jobConfig.activeDeadlineSeconds }}
+        activeDeadlineSeconds: {{ $jobConfig.activeDeadlineSeconds }}
+        {{- end }}
+        {{- if $jobConfig.backoffLimit }}
+        backoffLimit: {{ $jobConfig.backoffLimit }}
+        {{- end }}
+        template:
+          metadata:
+            annotations:
+              {{- if $.Values.podAnnotations }}
+              {{ toYaml $.Values.podAnnotations | nindent 12 }}
+              {{- end }}
+            labels:
+              app: {{ template "appname" $ }}
+              release: {{ $.Release.Name }}
+          spec:
+            imagePullSecrets:
+              {{ toYaml $.Values.image.secrets | nindent 14 }}
+            restartPolicy: {{ default "OnFailure" $jobConfig.restartPolicy }}
+            {{- with $nodeSelectorConfig := default $.Values.nodeSelector $jobConfig.nodeSelector -}}
+            {{- if $nodeSelectorConfig  }}
+            nodeSelector:
+            {{ toYaml $nodeSelectorConfig | nindent 14 }}
+            {{- end }}
+            {{- end }}
+            {{- with $tolerationsConfig := default $.Values.tolerations $jobConfig.tolerations -}}
+            {{- if $tolerationsConfig }}
+            tolerations:
+            {{ toYaml $tolerationsConfig | nindent 14 }}
+            {{- end }}
+            {{- end }}
+            {{- with $affinityConfig := default $.Values.affinity $jobConfig.affinity -}}
+            {{- if $affinityConfig  }}
+            affinity:
+            {{ toYaml $affinityConfig | nindent 14 }}
+            {{- end }}
+            {{- end }}
+            {{- if $jobConfig.extraVolumes }}
+            volumes:
+            {{ toYaml $jobConfig.extraVolumes | nindent 14 }}
+            {{- end }}
+            containers:
+            - name: {{ $.Chart.Name }}
+              image: "{{ template "cronjobimagename" (dict "job" . "glob" $.Values) }}"
+              imagePullPolicy: {{ $.Values.image.pullPolicy }}
+              {{- if $jobConfig.command }}
+              command:
+              {{- range $jobConfig.command }}
+              - {{ . }}
+              {{- end }}
+              {{- end }}
+              {{- if $jobConfig.command }}
+              args:
+              {{- range $jobConfig.args }}
+              - {{ . }}
+              {{- end }}
+              {{- end }}
+              envFrom:
+{{- if eq $.Values.postgis.deploy true }}
+              - configMapRef:
+                  name: {{ template "fullname" $app }}-configmap
+                  optional: false
+              - secretRef:
+                  name: {{ template "fullname" $app }}-secret
+                  optional: false
+  {{- end }}
+              - secretRef:
+                  name: {{ $.Release.Name }}
+                  optional: true
+{{- if $jobConfig.extraEnvFrom }}
+{{ toYaml $jobConfig.extraEnvFrom | nindent 14 }}
+{{- end }}
+              ports:
+              - name: "{{ $.Values.service.name }}"
+                containerPort: {{ $.Values.service.internalPort }}
+              {{- with $livenessProbeConfig := default $.Values.livenessProbe $jobConfig.livenessProbe }}
+              {{- if $livenessProbeConfig }}
+              livenessProbe:
+              {{- if eq $livenessProbeConfig.probeType "httpGet" }}
+                httpGet:
+                  path: {{ $livenessProbeConfig.path }}
+                  scheme: {{ $livenessProbeConfig.scheme }}
+                  port: {{ default $.Values.service.internalPort $livenessProbeConfig.port }}
+              {{- else if eq $livenessProbeConfig.probeType "tcpSocket" }}
+                tcpSocket:
+                  port: {{ default $.Values.service.internalPort $.Values.service.internalPort }}
+              {{- else if eq $livenessProbeConfig.probeType "exec" }}
+                exec:
+                  command:
+                    {{ toYaml $livenessProbeConfig.command | nindent 18 }}
+              {{- end }}
+                initialDelaySeconds: {{ $livenessProbeConfig.initialDelaySeconds }}
+                timeoutSeconds: {{  $livenessProbeConfig.timeoutSeconds }}
+                failureThreshold: {{ $livenessProbeConfig.failureThreshold }}
+                periodSeconds: {{ $livenessProbeConfig.periodSeconds }}
+              {{- end }}
+              {{- end }}
+              {{- with $readinessProbe := default $.Values.readinessProbe  $jobConfig.readinessProbe }}
+              {{- if $readinessProbe  }}
+              readinessProbe:
+                {{- if eq $readinessProbe.probeType "httpGet" }}
+                httpGet:
+                  path: {{ $readinessProbe.path }}
+                  scheme: {{ $readinessProbe.scheme }}
+                  port: {{ default $.Values.service.internalPort $readinessProbe.port }}
+                {{- else if eq $readinessProbe.probeType "tcpSocket" }}
+                tcpSocket:
+                  port: {{ default $.Values.service.internalPort $readinessProbe.port }}
+                {{- else if eq $readinessProbe.probeType "exec" }}
+                exec:
+                  command:
+                    {{ toYaml $readinessProbe.command | nindent 18 }}
+                {{- end }}
+                initialDelaySeconds: {{ $readinessProbe.initialDelaySeconds }}
+                timeoutSeconds: {{ $readinessProbe.timeoutSeconds }}
+                failureThreshold: {{ $readinessProbe.failureThreshold }}
+                periodSeconds: {{ $readinessProbe.periodSeconds }}
+              {{- end }}
+              {{- end }}
+              resources:
+                {{ toYaml $.Values.resources | nindent 16 }}
+              {{- if $jobConfig.extraVolumeMounts }}
+              volumeMounts:
+                - name: uploads
+                  persistentVolumeClaim:
+                    claimName: {{ print ( include "fullname" $app ) "-uploads"| quote }}
+                - name: processed-images
+                  persistentVolumeClaim:
+                    claimName: {{ print ( include "fullname" $app ) "-processed-images"| quote }}
+                - name: export
+                  persistentVolumeClaim:
+                    claimName: {{ print ( include "fullname" $app ) "-export"| quote }}
+              {{ toYaml $jobConfig.extraVolumeMounts | nindent 16 }}
+              {{- end }}
+{{- end -}}
+{{- end -}}

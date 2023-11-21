@@ -45,6 +45,40 @@ readinessProbe:
   scheme: "HTTP"
   probeType: "httpGet"
 
+cronjobs:
+  backup:
+    schedule: "0 3 * * *"
+    command: ["/bin/bash"]
+    args: ["-c", "/var/www/openatlas/install/backup_script.sh /backup"]
+    livenessProbe:
+      command: ["/bin/true"]
+      probeType: "exec"
+      initialDelaySeconds: 5
+      timeoutSeconds: 3
+      failureThreshold: 3
+      periodSeconds: 10
+    readinessProbe:
+      probeType: "exec"
+      command: ["/bin/true"]
+      initialDelaySeconds: 5
+      timeoutSeconds: 3
+      failureThreshold: 3
+      periodSeconds: 10
+    extraVolumes:
+      - mountPath: /var/www/openatlas/files/uploads
+        name: uploads
+      - mountPath: /var/www/openatlas/files/processed_images/resized
+        name: processed-images
+      - mountPath: /var/www/openatlas/files/export/
+        name: export
+      - mountPath: /backup
+        name: backup
+    extraVolumeMounts:
+      - name: backup
+        persistentVolumeClaim:
+          claimName: "openatlas-backup"
+         # storageClass: "backup"
+
 storage:
   export:
     size: 1Gi

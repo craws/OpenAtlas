@@ -93,3 +93,17 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- $merged := deepCopy $custom | mergeOverwrite $defaults -}}
 {{- $merged | toYaml -}}
 {{- end -}}
+
+{{/*
+Templates for cronjob
+*/}}
+
+{{- define "cronjobimagename" -}}
+{{- if hasKey .job "image" -}}
+{{-   if and (hasKey .job.image "repository") (hasKey .job.image "tag") -}}
+{{- printf "%s:%s" .job.image.repository .job.image.tag -}}
+{{-   end -}}
+{{- else -}}
+{{- printf "%s:%s" .glob.image.repository .glob.image.tag -}}
+{{- end -}}
+{{- end -}}
