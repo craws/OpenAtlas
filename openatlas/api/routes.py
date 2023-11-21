@@ -1,7 +1,8 @@
 from flask_restful import Api
 
 from openatlas.api.endpoints.iiif import \
-    (IIIFManifest, IIIFImageV2, IIIFCanvasV2, IIIFSequenceV2)
+    (IIIFManifest, IIIFImageV2, IIIFCanvasV2, IIIFSequenceV2, IIIFAnnotationV2,
+     IIIFAnnotationListV2)
 from openatlas.api.endpoints.content import ClassMapping, \
     GetContent, SystemClassCount, GetBackendDetails
 from openatlas.api.endpoints.special import GetGeometricEntities, \
@@ -120,6 +121,14 @@ def display_routes(api: Api) -> None:
         IIIFManifest,
         '/iiif_manifest/<int:version>/<int:id_>',
         endpoint='iiif_manifest')
+    api.add_resource(
+        IIIFAnnotationListV2,
+        '/iiif_annotation_list/<int:id_>.json',
+        endpoint='iiif_annotation_list')
+    api.add_resource(
+        IIIFAnnotationV2,
+        '/iiif_annotation/<int:id_>/<int:annotation_id>.json',
+        endpoint='iiif_annotation')
     api.add_resource(
         IIIFImageV2,
         '/iiif_image/<int:id_>.json',

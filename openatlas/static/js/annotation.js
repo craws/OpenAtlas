@@ -2,7 +2,7 @@ map = L.map('annotate', {
     center: [0, 0],
     crs: L.CRS.Simple,
     zoom: 1,
-    tileSize: 128
+    tileSize: 256
 });
 
 let baseLayer;
@@ -117,5 +117,5 @@ annotations.forEach(annotation => {
     const truncatedText = annotation.annotation.substring(0, 30);
 
     // Add popup with truncated annotation text below the geometry
-    geometry.bindPopup(`<p>${truncatedText}</p>`, { closeOnClick: false, autoClose: false }).openPopup();
+    geometry.bindPopup(`<p>${truncatedText}</p>`, { closeOnClick: false }).openPopup();
 });
