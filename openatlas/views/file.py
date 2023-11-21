@@ -1,3 +1,4 @@
+import json
 from typing import Any, Union
 
 from flask import g, render_template, request, send_from_directory, url_for, \
@@ -140,12 +141,6 @@ def annotate_image(id_: int) -> str:
             coordinates=form.coordinate.data,
             annotation=form.annotation.data)
         return redirect(url_for('annotate_image', id_=entity.id))
-    # This is just a cleanup process for js passing for presentation purpose.
-    # Todo: remove this function and make it clean
-    for data_dict in annotations:
-        for key in ['entity_id', 'created']:
-            if key in data_dict:
-                del data_dict[key]
     return render_template(
         'tabs.html',
         tabs={'annotation': Tab(
@@ -155,7 +150,7 @@ def annotate_image(id_: int) -> str:
             content=render_template(
                 'annotate.html',
                 entity=entity,
-                annotation_list=annotations))},
+                annotation_list=json.dumps(annotations, default=str)))},
         entity=entity,
         crumbs=[
             [_('file'), url_for('index', view='file')],

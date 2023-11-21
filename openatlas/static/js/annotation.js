@@ -109,10 +109,13 @@ function transformCoordinates(coordinates) {
 annotations.forEach(annotation => {
     const coordinates = transformCoordinates(annotation.coordinates);
     const geometry = L.polygon(coordinates, {
-        color: 'blue', // You can customize the style here
-        fillOpacity: 0.5
+        color: 'blue',
+        fillOpacity: 0.2
     }).addTo(map);
 
-    // Add popup with annotation text
-    geometry.bindPopup(annotation.annotation);
+    // Extract the first 30 characters from the annotation text
+    const truncatedText = annotation.annotation.substring(0, 30);
+
+    // Add popup with truncated annotation text below the geometry
+    geometry.bindPopup(`<p>${truncatedText}</p>`, { closeOnClick: false, autoClose: false }).openPopup();
 });
