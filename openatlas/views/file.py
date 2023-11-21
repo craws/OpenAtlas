@@ -134,13 +134,14 @@ def annotate_image(id_: int) -> str:
             rows=rows,
             order=[[0, 'desc']])
     if form.validate_on_submit():
-        # todo: validate input
+        # Todo: validate input
         AnnotationImage.insert_annotation_image(
             image_id=id_,
             coordinates=form.coordinate.data,
             annotation=form.annotation.data)
         return redirect(url_for('annotate_image', id_=entity.id))
-    # This is just a cleanup process for js passing.
+    # This is just a cleanup process for js passing for presentation purpose.
+    # Todo: remove this function and make it clean
     for data_dict in annotations:
         for key in ['entity_id', 'created']:
             if key in data_dict:
@@ -154,7 +155,7 @@ def annotate_image(id_: int) -> str:
             content=render_template(
                 'annotate.html',
                 entity=entity,
-                anno=annotations))},
+                annotation_list=annotations))},
         entity=entity,
         crumbs=[
             [_('file'), url_for('index', view='file')],
