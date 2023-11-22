@@ -21,6 +21,7 @@ _('invalid involvement dates')
 _('unlinked')
 _('missing files')
 _('orphaned files')
+_('orphaned IIIF files')
 _('orphaned subunits')
 _('circular dependencies')
 
@@ -119,12 +120,12 @@ class Tab:
                         g.classes[item].label,
                         url_for('insert', class_=item, origin_id=id_)))
         elif name == 'artifact':
-            if entity and entity.class_.name in \
-                    ['place',
-                     'artifact',
-                     'human_remains',
-                     'feature',
-                     'stratigraphic_unit']:
+            if entity and entity.class_.name in [
+                    'place',
+                    'artifact',
+                    'human_remains',
+                    'feature',
+                    'stratigraphic_unit']:
                 self.buttons.append(
                     button(_('add subunit'),
                            url_for('add_subunit', super_id=id_)))

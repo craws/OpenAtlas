@@ -3,6 +3,7 @@ import importlib
 import math
 import os
 import shutil
+from pathlib import Path
 from subprocess import run
 from typing import Any, Optional, Union
 
@@ -492,6 +493,9 @@ def admin_orphans() -> str:
         'orphaned_files': Tab(
             'orphaned_files',
             table=Table(['name', 'size', 'date', 'ext'])),
+        'orphaned_iiif_files': Tab(
+            'orphaned_iiif_files',
+            table=Table(['name', 'size', 'date', 'ext'])),
         'orphaned_subunits': Tab(
             'orphaned_subunits',
             table=Table([
@@ -547,6 +551,27 @@ def admin_orphans() -> str:
                     url_for('admin_file_delete', filename=file.name),
                     js=f"return confirm('{confirm}')")
                 if is_authorized('editor') else ''])
+
+    # Orphaned IIIF files with no corresponding entity
+    if g.settings['iiif'] and g.settings['iiif_path']:
+        for file in Path(g.settings['iiif_path']).iterdir():
+            confirm = _('Delete %(name)s?', name=file.name.replace("'", ''))
+            if file.name != '.gitignore' \
+                    and os.path.isfile(file) \
+                    and file.stem.isdigit() \
+                    and int(file.stem) not in entity_file_ids:
+                tabs['orphaned_iiif_files'].table.rows.append([
+                    file.stem,
+                    convert_size(file.stat().st_size),
+                    format_date(
+                        datetime.datetime.utcfromtimestamp(
+                            file.stat().st_ctime)),
+                    file.suffix,
+                    link(
+                        _('delete'),
+                        url_for('admin_file_iiif_delete', filename=file.name),
+                        js=f"return confirm('{confirm}')")
+                    if is_authorized('editor') else ''])
 
     # Orphaned subunits (without connection to a P46 super)
     for entity in Entity.get_orphaned_subunits():
@@ -604,6 +629,18 @@ def admin_file_delete(filename: str) -> Response:
                     flash(_('error file delete'), 'error')
     return redirect(
         f"{url_for('admin_orphans')}#tab-orphaned-files")  # pragma: no cover
+
+
+@app.route('/admin/file/iiif/delete/<filename>')
+@required_group('editor')
+def admin_file_iiif_delete(filename: str) -> Response:
+    try:
+        (Path(g.settings['iiif_path']) / filename).unlink()
+        flash(f"{filename} {_('was deleted')}", 'info')
+    except Exception as e:
+        g.logger.log('error', 'file', f'deletion of IIIF {filename} failed', e)
+        flash(_('error file delete'), 'error')
+    return redirect(f"{url_for('admin_orphans')}#tab-orphaned-iiif-files")
 
 
 @app.route('/admin/logo/')

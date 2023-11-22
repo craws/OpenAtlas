@@ -44,7 +44,9 @@ class AdminTests(TestBaseCase):
             assert b'Invalid linked entity' in rv.data
 
             file_ = 'Test77.txt'
-            with open(Path(app.config['UPLOAD_PATH'] / file_), 'w') as _file:
+            with open(Path(app.config['UPLOAD_PATH'] / file_), 'w') as _:
+                pass
+            with open(Path(Path(g.settings['iiif_path']) / file_), 'w') as _:
                 pass
 
             rv = self.app.get(
@@ -54,6 +56,16 @@ class AdminTests(TestBaseCase):
 
             rv = self.app.get(
                 url_for('admin_file_delete', filename=file_),
+                follow_redirects=True)
+            assert b'An error occurred when trying to delete' in rv.data
+
+            rv = self.app.get(
+                url_for('admin_file_iiif_delete', filename=file_),
+                follow_redirects=True)
+            assert b'Test77.txt was deleted' in rv.data
+
+            rv = self.app.get(
+                url_for('admin_file_iiif_delete', filename=file_),
                 follow_redirects=True)
             assert b'An error occurred when trying to delete' in rv.data
 
