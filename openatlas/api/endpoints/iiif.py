@@ -15,7 +15,7 @@ class IIIFSequenceV2(Resource):
     @staticmethod
     def get(id_: int) -> Response:
         return jsonify(
-            {"@context": "https://iiif.io/api/presentation/2/context.json"} |
+            {"@context": "http://iiif.io/api/presentation/2/context.json"} |
             IIIFSequenceV2.build_sequence(get_metadata(get_entity_by_id(id_))))
 
     @staticmethod
@@ -37,7 +37,7 @@ class IIIFCanvasV2(Resource):
     @staticmethod
     def get(id_: int) -> Response:
         return jsonify(
-            {"@context": "https://iiif.io/api/presentation/2/context.json"} |
+            {"@context": "http://iiif.io/api/presentation/2/context.json"} |
             IIIFCanvasV2.build_canvas(get_metadata(get_entity_by_id(id_))))
 
     @staticmethod
@@ -51,7 +51,7 @@ class IIIFCanvasV2(Resource):
             "height": metadata['img_api']['height'],
             "width": metadata['img_api']['width'],
             "description": {
-                "@value": entity.description,
+                "@value": entity.description or '',
                 "@language": "en"},
             "images": [IIIFImageV2.build_image(metadata)],
             "related": "",
@@ -59,7 +59,7 @@ class IIIFCanvasV2(Resource):
                 "@id": url_for(
                     'api.iiif_annotation_list',
                     id_=entity.id,
-                        _external=True),
+                    _external=True),
                 "@type": "sc:AnnotationList"}],
             "thumbnail": {
                 "@id": f'{metadata["img_url"]}/full/!200,200/0/default.jpg',
@@ -84,7 +84,7 @@ class IIIFImageV2(Resource):
         id_ = metadata['entity'].id
         mime_type, _ = mimetypes.guess_type(g.files[id_])
         return {
-            "@context": "https://iiif.io/api/presentation/2/context.json",
+            "@context": "http://iiif.io/api/presentation/2/context.json",
             "@id":
                 url_for('api.iiif_image', id_=id_, _external=True),
             "@type": "oa:Annotation",
@@ -113,14 +113,12 @@ class IIIFAnnotationListV2(Resource):
     @staticmethod
     def build_annotation_list(metadata: dict[str, Any]) -> dict[str, Any]:
         id_ = metadata['entity'].id
-        [IIIFAnnotationV2.build_annotation(metadata, anno) for anno in
-         AnnotationImage.get_by_file(id_)]
         return {
-            "@context": "https://iiif.io/api/presentation/2/context.json",
+            "@context": "http://iiif.io/api/presentation/2/context.json",
             "@id": url_for(
                 'api.iiif_annotation_list',
                 id_=id_,
-                        _external=True),
+                _external=True),
             "@type": "sc:AnnotationList",
             "resources":
                 [IIIFAnnotationV2.build_annotation(metadata, anno)
@@ -140,58 +138,62 @@ class IIIFAnnotationV2(Resource):
             metadata: dict[str, Any],
             anno: dict[str, Any]) -> dict[str, Any]:
         id_ = metadata['entity'].id
-        coordinates = IIIFAnnotationV2.create_svg_selector(anno['coordinates'])
+        coordinates = generate_svg_selector(anno)
         return {
-            "@context": "https://iiif.io/api/presentation/2/context.json",
+            "@context": "http://iiif.io/api/presentation/2/context.json",
             "@id": url_for(
                 'api.iiif_annotation',
                 id_=id_,
                 annotation_id=anno['id'],
                 _external=True),
             "@type": "oa:Annotation",
-            "motivation": ["sc:commenting"],
-            "resource": {
+            "motivation": ["oa:commenting"],
+            "resource": [{
                 "@type": "dctypes:Text",
                 "chars": anno['annotation'],
                 "format": "text/html"
-            },
+            }],
             "on": {
                 "@type": "oa:SpecificResource",
                 "full": url_for('api.iiif_canvas', id_=id_, _external=True),
-                "selector": {
-                    "@type": "oa:SvgSelector",
-                    "value":
-                        "<svg xmlns='http://www.w3.org/2000/svg' "
-                        "version='1.1'>"
-                        f"<polygon points='{coordinates}' /></svg>"
-                },
+                "selector": coordinates,
                 "within": {
                     "@id": url_for(
                         'api.iiif_manifest',
                         id_=id_, version=2,
                         _external=True),
-                    "@type": "sc:Manifest"
-                }
-            }
-        }
+                    "@type": "sc:Manifest"}}}
 
-    @staticmethod
-    def create_svg_selector(coordinates):
-        if len(coordinates) == 4:
-            x_values, y_values = zip(*coordinates)
-            is_rectangle = len(set(x_values)) == len(set(y_values)) == 2
-            if is_rectangle:
-                x1, y1, x2, y2 = coordinates
-                width = abs(x2 - x1)
-                height = abs(y2 - y1)
-                return f"<svg xmlns='http://www.w3.org/2000/svg' " \
-                       f"version='1.1'><rect x='{x1}' y='{y1}' " \
-                       f"width='{width}' height='{height}' /></svg>"
-        points_str = " ".join(
-            [f"{x},{y}" for x, y in
-             zip(coordinates[0::2], coordinates[1::2])])
-        return f"<svg xmlns='http://www.w3.org/2000/svg' version='1.1'>" \
-               f"<polygon points='{points_str}' /></svg>"
+
+def generate_svg_selector(annotation):
+    coordinates = [float(coord) for coord in
+                   annotation['coordinates'].split(',')]
+
+    if len(coordinates) == 8:
+        # Assuming rectangle as there are 8 coordinates
+        x, y, width, height = (
+            coordinates[0],
+            coordinates[1],
+            coordinates[4] - coordinates[0],
+            coordinates[3] - coordinates[1])
+        selector_value = (f"<rect x='{x}' y='{y}' "
+                          f"width='{width}' height='{height}' />")
+    elif len(coordinates) > 8:
+        # Assuming polygon for more than 8 coordinates
+        points = " ".join([f"{coordinates[i]},{coordinates[i + 1]}" for i in
+                           range(0, len(coordinates), 2)])
+        selector_value = f"<polygon points='{points}' />"
+    else:
+        # Handle invalid coordinates
+        raise ValueError("Invalid number of coordinates for SvgSelector")
+
+    svg_selector = (f"<svg xmlns='http://www.w3.org/2000/svg'"
+                    f" version='1.1'>{selector_value}</svg>")
+
+    return {
+        "@type": "oa:SvgSelector",
+        "value": svg_selector
+    }
 
 
 class IIIFManifest(Resource):
@@ -204,7 +206,7 @@ class IIIFManifest(Resource):
     def get_manifest_version_2(id_: int) -> dict[str, Any]:
         entity = get_entity_by_id(id_)
         return {
-            "@context": "https://iiif.io/api/presentation/2/context.json",
+            "@context": "http://iiif.io/api/presentation/2/context.json",
             "@id":
                 url_for(
                     'api.iiif_manifest',
@@ -213,9 +215,11 @@ class IIIFManifest(Resource):
                     _external=True),
             "@type": "sc:Manifest",
             "label": entity.name,
-            "metadata": [],
+            "metadata": [{
+                "label": "Title",
+                "value": entity.name}],
             "description": [{
-                "@value": entity.description,
+                "@value": entity.description or '',
                 "@language": "en"}],
             "license": get_license_name(entity),
             "attribution": "By OpenAtlas",
@@ -240,6 +244,6 @@ def get_logo() -> dict[str, Any]:
             filename=g.settings['logo_file_id'],
             _external=True),
         "service": {
-            "@context": "https://iiif.io/api/image/2/context.json",
+            "@context": "http://iiif.io/api/image/2/context.json",
             "@id": url_for('overview', _external=True),
-            "profile": "https://iiif.io/api/image/2/level2.json"}}
+            "profile": "http://iiif.io/api/image/2/level2.json"}}
