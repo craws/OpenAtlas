@@ -59,9 +59,18 @@ items:
             {{ toYaml $affinityConfig | nindent 14 }}
             {{- end }}
             {{- end }}
-            {{- if $jobConfig.extraVolumeMounts }}
-            volumeMounts:
-            {{ toYaml $jobConfig.extraVolumeMounts | nindent 14 }}
+            volumes:
+              - name: uploads
+                persistentVolumeClaim:
+                  claimName: {{ print ( include "fullname" $app ) "-uploads"| quote }}
+              - name: processed-images
+                persistentVolumeClaim:
+                  claimName: {{ print ( include "fullname" $app ) "-processed-images"| quote }}
+              - name: export
+                persistentVolumeClaim:
+                  claimName: {{ print ( include "fullname" $app ) "-export"| quote }}
+            {{- if $jobConfig.extraVolumes }}
+            {{ toYaml $jobConfig.extraVolumes | nindent 14 }}
             {{- end }}
             containers:
             - name: {{ $.Chart.Name }}
@@ -143,18 +152,9 @@ items:
               {{- end }}
               resources:
                 {{ toYaml $.Values.resources | nindent 16 }}
-              {{- if $jobConfig.extraVolumes }}
-              volumes:
-                - name: uploads
-                  persistentVolumeClaim:
-                    claimName: {{ print ( include "fullname" $app ) "-uploads"| quote }}
-                - name: processed-images
-                  persistentVolumeClaim:
-                    claimName: {{ print ( include "fullname" $app ) "-processed-images"| quote }}
-                - name: export
-                  persistentVolumeClaim:
-                    claimName: {{ print ( include "fullname" $app ) "-export"| quote }}
-              {{ toYaml $jobConfig.extraVolumes | nindent 16 }}
+              {{- if $jobConfig.extraVolumeMounts }}
+              volumeMounts:
+              {{ toYaml $jobConfig.extraVolumeMounts | nindent 16 }}
               {{- end }}
 {{- end -}}
 {{- end -}}
