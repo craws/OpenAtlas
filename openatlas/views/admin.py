@@ -548,7 +548,7 @@ def admin_orphans() -> str:
                     url_for('download_file', filename=file.name)),
                 link(
                     _('delete'),
-                    url_for('admin_file_iiif_delete', filename=file.name),
+                    url_for('admin_file_delete', filename=file.name),
                     js=f"return confirm('{confirm}')")
                 if is_authorized('editor') else ''])
 
