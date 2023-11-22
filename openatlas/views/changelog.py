@@ -15,7 +15,9 @@ def index_changelog() -> str:
 
 
 versions = {
-    '7.18.0': ['TBA', {}],
+    '7.18.0': ['TBA', {
+        'feature': {
+            '2108': 'IIIF - check for orphaned files'}}],
     '7.17.4': ['2023-11-17', {
         'fix': {
             '2124': 'No modifications at preceding event'}}],
