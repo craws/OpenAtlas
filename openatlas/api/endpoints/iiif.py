@@ -1,9 +1,11 @@
+import math
 import mimetypes
 from typing import Any
 
 import requests
 from flask import jsonify, Response, url_for, g
 from flask_restful import Resource
+from shapely.geometry import Polygon
 
 from openatlas.api.resources.model_mapper import get_entity_by_id
 from openatlas.api.resources.util import get_license_name
@@ -138,7 +140,7 @@ class IIIFAnnotationV2(Resource):
             metadata: dict[str, Any],
             anno: dict[str, Any]) -> dict[str, Any]:
         id_ = metadata['entity'].id
-        coordinates = generate_svg_selector(anno)
+        selector = generate_selector(anno)
         return {
             "@context": "http://iiif.io/api/presentation/2/context.json",
             "@id": url_for(
@@ -156,7 +158,7 @@ class IIIFAnnotationV2(Resource):
             "on": {
                 "@type": "oa:SpecificResource",
                 "full": url_for('api.iiif_canvas', id_=id_, _external=True),
-                "selector": coordinates,
+                "selector": selector,
                 "within": {
                     "@id": url_for(
                         'api.iiif_manifest',
@@ -165,35 +167,32 @@ class IIIFAnnotationV2(Resource):
                     "@type": "sc:Manifest"}}}
 
 
-def generate_svg_selector(annotation):
-    coordinates = [float(coord) for coord in
-                   annotation['coordinates'].split(',')]
+def calculate_fragment_selector_coordinates(coordinates):
+    coordinates_str = coordinates['coordinates']
+    # Splitting the coordinates string into individual values
+    coordinates_list = list(map(float, coordinates_str.split(',')))
 
-    if len(coordinates) == 8:
-        # Assuming rectangle as there are 8 coordinates
-        x, y, width, height = (
-            coordinates[0],
-            coordinates[1],
-            coordinates[4] - coordinates[0],
-            coordinates[3] - coordinates[1])
-        selector_value = (f"<rect x='{x}' y='{y}' "
-                          f"width='{width}' height='{height}' />")
-    elif len(coordinates) > 8:
-        # Assuming polygon for more than 8 coordinates
-        points = " ".join([f"{coordinates[i]},{coordinates[i + 1]}" for i in
-                           range(0, len(coordinates), 2)])
-        selector_value = f"<polygon points='{points}' />"
-    else:
-        # Handle invalid coordinates
-        raise ValueError("Invalid number of coordinates for SvgSelector")
+    # Extracting x, y, width, and height from the coordinates
+    x_min, y_min, x_max, y_max = min(coordinates_list[::2]), min(coordinates_list[1::2]), max(coordinates_list[::2]), max(coordinates_list[1::2])
+    x = x_min
+    y = y_min
+    width = x_max - x_min
+    height = y_max - y_min
 
-    svg_selector = (f"<svg xmlns='http://www.w3.org/2000/svg'"
-                    f" version='1.1'>{selector_value}</svg>")
+    return x, y, width, height
 
-    return {
-        "@type": "oa:SvgSelector",
-        "value": svg_selector
-    }
+def generate_selector(annotation):
+    print(annotation)
+    coordinates = [
+        float(coord) for coord in annotation['coordinates'].split(',')]
+
+    x, y, width, height = calculate_fragment_selector_coordinates(annotation)
+    print(x, y, width, height)
+    output = {
+        "@type": "oa:FragmentSelector",
+        "value": f"xywh={x},{y},{width},{height}"}
+
+    return output
 
 
 class IIIFManifest(Resource):

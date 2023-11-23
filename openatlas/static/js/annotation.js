@@ -10,9 +10,7 @@ $.getJSON(iiif_manifest, function (data) {
     const page = data.sequences[0].canvases[0];
     baseLayer = L.tileLayer.iiif(
         page.images[0].resource.service['@id'] + '/info.json',
-        {
-            tileSize: 128
-        }
+
     ).addTo(map);
 });
 
