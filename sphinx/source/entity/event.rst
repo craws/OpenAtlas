@@ -87,8 +87,14 @@ Move
 
 * **From** - a :doc:`place` as a start point
 * **To** - a :doc:`place` as a destination point
-* :doc:`artifact` - to select artifacts that were moved
-* :doc:`Person <actor>` - to select persons that were moved
+* Moved :doc:`artifact` - to select moved artifacts
+* Moved :doc:`Person <actor>` - to select moved persons
+
+Unfortunately CIDOC CRM doesn't allows a **moved by** relation for groups. It
+is still possible to "move" groups via the actor tab which in the background
+creates a more general **participated at** relation between actor and move
+event. For more information please take a look at :doc:`/examples/journey` or
+:doc:`/examples/move_event` tutorial.
 
 Production
 **********

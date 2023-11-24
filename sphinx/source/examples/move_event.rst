@@ -21,7 +21,7 @@ information:
   list, it might be possible for you to add new types - depending on
   your :doc:`user group</admin/user>` (please see this
   :doc:`tutorial<types>` for more information)
-* you can add one or more **sub events**. Please keep in mind: Sub events
+* You can add one or more **sub events**. Please keep in mind: Sub events
   cannot be added in a temporal order and are used to represent events that
   occur simultaneously. Examples are a music festival with parallel concerts
   or a war with overlapping battles at different locations. To represent a
@@ -30,41 +30,33 @@ information:
   select the event from a list of already entered events. If the event you are
   looking for cannot be found in this list, please add it via **Event** in the
   menu and then link it
-* you can add a **preceding event**, for more information see
+* You can add a **preceding event**, for more information see
   above or the :doc:`journey` tutorial
-* via **from** you can add a location from where the move event started,
+* Via **from** you can add a location from where the move event started,
   think of the starting point of a journey or the place a letter was sent from.
   You can choose a location from a list of already added locations. If the
   place you are looking for is not in this list yet, please add it via
   **Place** menu and then link it
-* via **to**, you can add the end location of the move event. For more
+* Via **to**, you can add the end location of the move event. For more
   information check **from** (above in this tutorial)
-* if an **artifact** was moved by the event, e.g. a letter that was sent, you
+* If an **artifact** was moved by the event, e.g. a letter that was sent, you
   can choose the artifact from a list of already entered artifacts. If the
   artifact is not entered into the database yet, use **Artifact** in the
   menu to create an entry and link it here
-* if a **person** was moved by the event, choose the person from a list
+* If a **person** was moved by the event, choose the person from a list
   of already entered actors. If the actor is not entered into the database
   already, use the **Actor** tab in the menu to create an entry and link it
-  here. **Please note**, only people who did not participate in a move event of
-  their own free will should be linked here. Think of an exchange or transfer
-  of prisoners, the expulsion of individuals, or relic translations and
-  the transport of dead people. Travel does not fall into this category. The
-  participants of a journey or another (voluntarily) undertaken move event are
-  linked in a different way. For more information on this, see the tutorial on
-  :doc:`journey`. **Please also note** that only individuals can be
-  linked here, not groups. A move of a group cannot be mapped via CIDOC CRM
-  at the moment and is therefore not possible here.
-* it is possible to link the move event by using external references (find
+  here. More information about how to add actors is available at the
+  :doc:`journey` tutorial.
+* It is possible to link the move event by using external references (find
   more information :doc:`here</entity/reference_system>`)
-* enter a start and end **date** of the move event
-* additionally you can enter a **description** of the event as free text
+* Enter a start and end **date** of the move event
+* Additionally you can enter a **description** of the event as free text
 
 By clicking the **Insert** or **Insert and continue** button you can save
-the entered data.
-After saving the information, you can link sources, actors (for
-participants of a **voluntary** move event!), references, files and notes
-via the respective buttons on the landing page of your new entry.
+the entered data. After saving the information, you can link sources, actors,
+references, files and notes via the respective buttons on the landing page of
+your new entry.
 
 For more information on move events including an artifact, please see the
 example on :doc:`letters`. On how to enter a journey, please refer
