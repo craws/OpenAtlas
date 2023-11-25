@@ -7,11 +7,11 @@ from flask import g, render_template
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
+from markupsafe import Markup
 from wtforms import (
     BooleanField, Field, FileField, FloatField, HiddenField, StringField,
     TextAreaField)
-from wtforms.widgets import (
-    FileInput, HTMLString, HiddenInput, Input, TextInput)
+from wtforms.widgets import FileInput, HiddenInput, Input, TextInput
 
 from openatlas import app
 from openatlas.display.table import Table
@@ -45,9 +45,9 @@ class ValueTypeRoot(Input):
             self,
             field: ValueTypeField,
             *args: Any,
-            **kwargs: Any) -> RemovableListInput:
+            **kwargs: Any) -> Markup:
         type_ = g.types[field.type_id]
-        return HTMLString(f'{value_type_expand_icon(type_)}')
+        return Markup(f'{value_type_expand_icon(type_)}')
 
 
 class ValueTypeRootField(FloatField):
@@ -68,12 +68,12 @@ class ValueTypeInput(TextInput):
             self,
             field: ValueTypeField,
             *args: Any,
-            **kwargs: Any) -> RemovableListInput:
+            **kwargs: Any) -> Markup:
         type_ = g.types[field.type_id]
         padding = len(type_.root)
         expand_col = \
             f' <div class="me-1">{value_type_expand_icon(type_)}</div>'
-        return HTMLString(f'''
+        return Markup(f'''
             <div class="row g-1" >
               <div class="col-4  d-flex" style="padding-left:{padding}rem">
                 {expand_col if type_.subs else ''}
@@ -364,7 +364,7 @@ class SubmitInput(Input):
     def __call__(self, field: Field, **kwargs: Any) -> str:
         kwargs['class_'] = (kwargs['class_'] + ' uc-first') \
             if 'class_' in kwargs else 'uc-first'
-        return HTMLString(
+        return Markup(
             f'''<button
              type="submit"
              id="{field.id}"

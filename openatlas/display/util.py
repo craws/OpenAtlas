@@ -18,7 +18,7 @@ from bcrypt import hashpw
 from flask import flash, g, render_template, request, url_for
 from flask_babel import LazyString, lazy_gettext as _
 from flask_login import current_user
-from jinja2 import contextfilter
+from jinja2 import pass_context
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 
@@ -288,7 +288,7 @@ def get_js_messages(lang: str) -> str:
     return f'<script src="/{js_message_file}"></script>'
 
 
-@contextfilter  # Prevent Jinja2 context caching
+@pass_context  # Prevent Jinja2 context caching
 @app.template_filter()
 def is_authorized(context: str, group: Optional[str] = None) -> bool:
     if not group:  # In case it wasn't called from a template
@@ -434,7 +434,7 @@ def send_mail(
     return True  # pragma: no cover
 
 
-@contextfilter
+@pass_context
 @app.template_filter()
 def system_warnings(_context: str, _unneeded_string: str) -> str:
     if not is_authorized('manager'):
@@ -642,7 +642,7 @@ def description(text: str, label: Optional[str] = '') -> str:
         f'<div class="description more">{"<br>".join(text.splitlines())}</div>'
 
 
-@contextfilter
+@pass_context
 @app.template_filter()
 def display_content_translation(_context: str, text: str) -> str:
     return get_translation(text)

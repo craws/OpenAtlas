@@ -2,6 +2,7 @@ from typing import Any, Optional
 
 from flask import g, render_template
 from flask_babel import lazy_gettext as _
+from markupsafe import Markup
 from wtforms import Field, FileField, IntegerField, SelectField, StringField
 from wtforms.validators import Email
 
