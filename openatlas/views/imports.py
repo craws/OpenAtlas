@@ -33,7 +33,7 @@ class ProjectForm(FlaskForm):
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
 
-    def validate(self) -> bool:
+    def validate(self, extra_validators=None) -> bool:
         valid = FlaskForm.validate(self)
         name = Import.get_project_by_id(self.project_id).name \
             if self.project_id else ''
@@ -150,7 +150,7 @@ class ImportForm(FlaskForm):
     duplicate = BooleanField(_('check for duplicates'), default=True)
     save = SubmitField(_('import'))
 
-    def validate(self) -> bool:
+    def validate(self, extra_validators=None) -> bool:
         valid = FlaskForm.validate(self)
         if pathlib.Path(request.files['file'].filename) \
                 .suffix.lower() != '.csv':

@@ -43,7 +43,7 @@ class UserForm(FlaskForm):
     insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
 
-    def validate(self) -> bool:
+    def validate(self, extra_validators=None) -> bool:
         valid = FlaskForm.validate(self)
         username = ''
         user_email = ''

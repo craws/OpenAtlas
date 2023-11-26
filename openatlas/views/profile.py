@@ -29,7 +29,7 @@ class PasswordForm(FlaskForm):
     show_passwords = BooleanField(_('show passwords'))
     save = SubmitField(_('save'))
 
-    def validate(self) -> bool:
+    def validate(self, extra_validators=None) -> bool:
         valid = FlaskForm.validate(self)
         hash_ = bcrypt.hashpw(
             self.password_old.data.encode('utf-8'),

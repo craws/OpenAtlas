@@ -26,7 +26,7 @@ def hierarchy_name_exists(form: FlaskForm, field: TreeField) -> None:
             field.errors.append(_('error name exists'))
 
 
-def validate(form: FlaskForm) -> bool:
+def validate(form: FlaskForm, extra_validators=None) -> bool:
     valid = FlaskForm.validate(form)
     if hasattr(form, 'begin_year_from'):  # Dates
         if not validate_dates(form):
