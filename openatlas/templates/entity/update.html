@@ -2,8 +2,8 @@
 {% block content %}
   {% if entity.class_.view not in ['artifact', 'place'] %}
     <div class="container">
-    {{ form|display_form(manual_page='entity/' + entity.class_.view)|safe }}
-    {{ entity.class_.view|display_citation_example|safe }}
+      {{ form|display_form(manual_page='entity/' + entity.class_.view)|safe }}
+      {{ entity.class_.view|display_citation_example|safe }}
     </div>
   {% else %}
     <div class="row">
@@ -20,7 +20,7 @@
         <div id="map" class="map"></div>
       </div>
     </div>
-    <link rel="stylesheet" href="/static/node_modules/leaflet-draw/dist/leaflet.draw.css"/>
+    <link rel="stylesheet" href="/static/node_modules/leaflet-draw/dist/leaflet.draw.css">
     <script src="/static/node_modules/leaflet-draw/dist/leaflet.draw.js"></script>
     <script src="/static/js/map/map.js"></script>
     <script src="/static/js/map/draw.js"></script>

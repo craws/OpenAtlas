@@ -3,21 +3,20 @@
     <div
       id="{{ field.id }}-selection"
       class="g-1 row {{ config.CSS.string_field }}"
-      onclick="$('#{{ field.id }}-modal').modal('show')"
-    >
-    {% for s in selection %}
-    <div onclick="event.stopPropagation()" class="badge col-auto bg-gray">
-      <div class="d-flex align-items-center">
-        <span class="text-black">{{ s.name }}</span>
-        <button
-          onclick="deselectFromTable('{{ field.id }}',{{s.id}})"
-          type="button"
-          class="btn-close p-0 ms-1"
-          aria-label="Close"
-        ></button>
-      </div>
-    </div>
-    {% endfor %}
+      onclick="$('#{{ field.id }}-modal').modal('show')">
+      {% for s in selection %}
+        <div onclick="event.stopPropagation()" class="badge col-auto bg-gray">
+          <div class="d-flex align-items-center">
+            <span class="text-black">{{ s.name }}</span>
+            <button
+              onclick="deselectFromTable('{{ field.id }}',{{s.id}})"
+              type="button"
+              class="btn-close p-0 ms-1"
+              aria-label="Close"
+            ></button>
+          </div>
+        </div>
+      {% endfor %}
     </div>
   </div>
   <div class="col-auto">
@@ -25,8 +24,7 @@
       id="{{ field.id }}-button"
       class="{{ config.CSS.button.secondary }}"
       onclick="$('#{{ field.id }}-modal').modal('show')"
-      tabindex="0"
-    >
+      tabindex="0">
       {{ _('change')|uc_first }}
     </span>
   </div>
@@ -58,14 +56,9 @@
     </div>
   </div>
 </div>
-<script>
-    $('#{{ field.id }}-button')
-        .on('keydown', function (event) {
-            if (onActivateKeyInput(event))
-                $('#{{ field.id }}-modal').modal('show')
-        });
 
-    $("#{{ field.id }}-modal").on("hidden.bs.modal", function (e) {
-        selectFromTableMulti('{{ field.id }}');
-    })
+<script>
+  $("#{{ field.id }}-modal").on("hidden.bs.modal", function (e) {
+    selectFromTableMulti('{{ field.id }}');
+  })
 </script>

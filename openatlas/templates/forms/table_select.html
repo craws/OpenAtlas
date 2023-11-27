@@ -9,8 +9,7 @@
       readonly="readonly"
       value="{{ selection }}"
       onclick="$('#{{ field.id }}-modal').modal('show')"
-      tabindex="0"
-        >
+      tabindex="0">
   </div>
   <div id="{{ field.id }}-clear-field" class="col-auto" {% if not selection %}style="display: none;"{% endif %}>
     <a
@@ -100,19 +99,13 @@
   </div>
 
   <script>
-    $("#{{ field.id }}-button")
-        .on('keydown', function (event) {
-          if (onActivateKeyInput(event))
-            $('#{{ field.id }}-modal').modal('show');
-        });
-
     $("#add-{{ add_dynamical }}-modal-{{field.id}} #name_dynamic")
-        .on('keyup change', function () {
-          if ($(this).val() === '')
-            $('#{{field.id}}-add-{{ add_dynamical }}').attr('disabled', '')
-          else
-            $('#{{field.id}}-add-{{ add_dynamical }}').removeAttr('disabled')
-        });
+      .on('keyup change', function () {
+        if ($(this).val() === '')
+          $('#{{field.id}}-add-{{ add_dynamical }}').attr('disabled', '')
+        else
+          $('#{{field.id}}-add-{{ add_dynamical }}').removeAttr('disabled')
+      });
 
     $('#{{field.id}}-add-{{ add_dynamical }}')
       .on('click', async function (e) {
@@ -126,7 +119,7 @@
         const entityId = await ajaxAddEntity(data);
         const relatedTables = {{ field.related_tables | safe }};
         relatedTables
-            ?.forEach(x => refillTable(x, {{ field.filter_ids }}));
+          ?.forEach(x => refillTable(x, {{ field.filter_ids }}));
         await refillTable('{{ field.id }}', {{ field.filter_ids }});
         $(this).prop("disabled", false).text('{{ _('insert')|uc_first }}');
         $('.modal').modal('hide');

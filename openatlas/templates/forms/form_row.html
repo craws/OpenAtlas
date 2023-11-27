@@ -3,6 +3,10 @@
     <div style="height:31px" class="d-flex align-items-center justify-content-end text-end">
       {% if label is string or label.__class__.__name__ == 'LazyString' %}
         <label class="uc-first">{{ label|safe }}</label>
+      {% elif field.name == 'alias' %}
+        <label class="uc-first" for="{{ field.name }}-0">{{ field.label.text|safe }}</label>
+      {% elif field.__class__.__name__ in ['TableField', 'TableMultiField'] %}
+        <label class="uc-first" for="{{ field.name }}-button">{{ field.label.text|safe }}</label>
       {% else %}
         {{ field.label(class_="uc-first")|safe }}
       {% endif %}

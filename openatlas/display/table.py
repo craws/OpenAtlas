@@ -35,14 +35,13 @@ class Table:
         data = {
             'data': self.rows,
             'stateSave': 'true',
-            'columns':
-                [{
+            'columns': [{
                     'title': uc_first(_(name)) if name else '',
                     'className': 'dt-body-right'
                     if name in ['count', 'size'] else ''}
-                 for name in self.header] +
-                [{'title': '', 'className': ''}
-                 for _item in range(len(self.rows[0]) - len(self.header))],
+                for name in self.header] + [
+                {'title': '', 'className': ''}
+                for _item in range(len(self.rows[0]) - len(self.header))],
             'paging': self.paging,
             'pageLength': current_user.settings['table_rows'],
             'autoWidth': 'false'}

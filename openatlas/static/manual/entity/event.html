@@ -286,9 +286,14 @@ the <strong>carried out by</strong> activity while linking them.</p>
 <ul class="simple">
 <li><p><strong>From</strong> - a <a class="reference internal" href="place.html"><span class="doc">Place</span></a> as a start point</p></li>
 <li><p><strong>To</strong> - a <a class="reference internal" href="place.html"><span class="doc">Place</span></a> as a destination point</p></li>
-<li><p><a class="reference internal" href="artifact.html"><span class="doc">Artifact</span></a> - to select artifacts that were moved</p></li>
-<li><p><a class="reference internal" href="actor.html"><span class="doc">Person</span></a> - to select persons that were moved</p></li>
+<li><p>Moved <a class="reference internal" href="artifact.html"><span class="doc">Artifact</span></a> - to select moved artifacts</p></li>
+<li><p>Moved <a class="reference internal" href="actor.html"><span class="doc">Person</span></a> - to select moved persons</p></li>
 </ul>
+<p>Unfortunately CIDOC CRM doesn’t allows a <strong>moved by</strong> relation for groups. It
+is still possible to “move” groups via the actor tab which in the background
+creates a more general <strong>participated at</strong> relation between actor and move
+event. For more information please take a look at <a class="reference internal" href="../examples/journey.html"><span class="doc">Journey</span></a> or
+<a class="reference internal" href="../examples/move_event.html"><span class="doc">Move events</span></a> tutorial.</p>
 </div>
 <div class="section" id="production">
 <h3>Production<a class="headerlink" href="#production" title="Permalink to this headline">¶</a></h3>
