@@ -78,6 +78,13 @@ cronjobs:
         persistentVolumeClaim:
           claimName: "openatlas-backup"
          # storageClass: "backup"
+    securityContext:
+      runAsNonRoot: false
+      readOnlyRootFilesystem: false
+      capabilities: { }
+      privileged: false
+      allowPrivilegeEscalation: false
+      runAsUser: 0
 
 storage:
   export:

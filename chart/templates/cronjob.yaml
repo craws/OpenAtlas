@@ -156,5 +156,9 @@ items:
               volumeMounts:
               {{ toYaml $jobConfig.extraVolumeMounts | nindent 16 }}
               {{- end }}
+              {{- if $jobConfig.securityContext }}
+              securityContext:
+              {{ toYaml $jobConfig.securityContext | nindent 16 }}
+              {{- end }}
 {{- end -}}
 {{- end -}}
