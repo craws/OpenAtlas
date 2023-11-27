@@ -506,7 +506,7 @@ def format_date(value: Union[datetime, numpy.datetime64]) -> str:
 
 
 def convert_size(size_bytes: int) -> str:
-    if size_bytes == 0:
+    if size_bytes <= 0:
         return "0 B"  # pragma: no cover
     size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
     i = int(math.floor(math.log(size_bytes, 1024)))
