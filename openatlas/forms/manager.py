@@ -413,16 +413,16 @@ class ModificationManager(EventBaseManager):
         if self.form.modified_place.data:
             self.add_link('P31', self.form.modified_place.data)
 
-class MoveManager(EventBaseManager):
 
+class MoveManager(EventBaseManager):
     def additional_fields(self) -> dict[str, Any]:
         return dict(
             super().additional_fields(),
             **{
                 'place_from': TableField(_('from'), add_dynamic=['place']),
                 'place_to': TableField(_('to'), add_dynamic=['place']),
-                'artifact': TableMultiField(),
-                'person': TableMultiField()})
+                'artifact': TableMultiField('moved artifact'),
+                'person': TableMultiField('moved person')})
 
     def populate_update(self) -> None:
         super().populate_update()

@@ -43,6 +43,10 @@ Orphaned files
 **************
 Files that have no corresponding entity are listed here.
 
+Orphaned IIIF files
+*******************
+IIIF files that have no corresponding entity are listed here.
+
 Orphaned subunits
 *****************
 Subunits that are missing a connection to the level above. E.g. a feature

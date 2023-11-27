@@ -203,10 +203,7 @@ procedure:</p>
 <p>If not all <a class="reference internal" href="../entity/actor.html"><span class="doc">actors</span></a> involved in the journey were
 entered into the database already, add them via a click on the respective
 tab in the <a class="reference internal" href="../ui/menu.html"><span class="doc">menu</span></a>. Here, click the <strong>+ Person</strong> button to get to
-the form. As for all other forms, a name is required to save the data.
-<strong>Please note</strong>, that that only individuals entered as person can be linked
-to a move event later on. This is <strong>not possible</strong> for groups, as a move of
-one or more groups can not be mapped with the current version of CIDOC CRM.</p>
+the form. As for all other forms, a name is required to save the data.</p>
 </div>
 <div class="section" id="adding-locations">
 <h2>Adding locations<a class="headerlink" href="#adding-locations" title="Permalink to this headline">¶</a></h2>
@@ -220,12 +217,9 @@ the form. As for all other forms, a name is required to save the data.</p>
 <p>The following steps will create a move event:</p>
 <ul class="simple">
 <li><p>Click on the <strong>Event</strong> tab in the menu then use the <strong>+ Move</strong> button</p></li>
-<li><p>Fill out the form, for more information see the <a class="reference internal" href="move_event.html"><span class="doc">move event tutorial</span></a>.</p></li>
-<li><p><strong>Please note</strong>: do not link a person in this form if the journey was taken
-willingly.
-Link here only people who have not traveled of their own free will - think,
-for example, of a prisoner transport or the translation of relics. To see
-how to link (voluntary) travelers correctly, see below.</p></li>
+<li><p>Fill out the form, for more information see the
+<a class="reference internal" href="move_event.html"><span class="doc">move event tutorial</span></a>.</p></li>
+<li><p>Link persons in this form who made the journey</p></li>
 <li><p><strong>Please also note</strong>: Use <strong>preceding event</strong> to document multiple
 parts of a trip. Unlike <strong>sub events</strong>, these can be put in chronological
 order. Sub events are there to capture events that happen at the same time
@@ -236,26 +230,22 @@ button to save and start to enter another move event</p></li>
 </div>
 <div class="section" id="link-actors-to-the-journey">
 <h2>Link actors to the journey<a class="headerlink" href="#link-actors-to-the-journey" title="Permalink to this headline">¶</a></h2>
-<p>To link actors (who have made a journey of their own free will) to the created
-entry click on the blue <strong>Actor</strong> tab on the landing page of the respective
-move event.</p>
-<ul>
-<li><p>Here, the Link button can be used to link people already entered into the
-database. The following information can be entered via the form:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>at type you can define the role of the actor in the journey; if
+<p>Already entered persons (and artifacts) can be added at the event form which
+creates a <strong>moved by</strong> relation to the event. Unfortunately this is not
+possible for groups in the current version of CIDOC CRM.</p>
+<p>Alternatively, actors (persons and groups) can be added via the actor tab where
+it is also possible to create new ones via the <strong>+ Person</strong> and <strong>+ Group</strong>
+button. In this case a more general <strong>participated at</strong> relation will be used
+between actors and event. It is also possible to add additional information:</p>
+<ul class="simple">
+<li><p>At type you can define the role of the actor in the journey; if
 there is no suitable entry in the list, a new type can be created
 depending on the user’s authorization, see the <a class="reference internal" href="types.html"><span class="doc">types
 tutorial</span></a>.</p></li>
-<li><p>the actor can be changed afterwards via the <strong>Change</strong> button</p></li>
-<li><p>the form of participation can be determined</p></li>
-<li><p>in addition, dates and a free text description are possible</p></li>
-</ul>
-</div></blockquote>
-</li>
-<li><p>via <strong>+person</strong> or <strong>+group</strong> new actors can be created and then linked to
-the move event</p></li>
+<li><p>The actor can be changed afterwards via the <strong>Change</strong> button</p></li>
+<li><p>The form of participation can be determined</p></li>
+<li><p>In addition, dates for the participation (in case they differ from the
+event) and a free text description are possible</p></li>
 </ul>
 </div>
 </div>
