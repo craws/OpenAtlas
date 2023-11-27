@@ -1,21 +1,31 @@
 map = L.map('annotate', {
-    center: [0, 0],
     crs: L.CRS.Simple,
-    zoom: 1,
-    tileSize: 256
+    zoom: 0,
 });
 
 let baseLayer;
+let drawnItems = new L.FeatureGroup();
+
 $.getJSON(iiif_manifest, function (data) {
     const page = data.sequences[0].canvases[0];
     baseLayer = L.tileLayer.iiif(
         page.images[0].resource.service['@id'] + '/info.json',
-
+        {
+            continuousWorld: false,
+            fitBounds: true,  // Set fitBounds to true for automatic fitting
+            setMaxBounds: true,
+            tileSize: 256
+        }
     ).addTo(map);
+    console.log([page.width, page.height])
+    // Get the bounds of the image and fit the map to those bounds
+    const bounds = [
+        [0, 0],  // Assuming the image starts from the top-left corner
+        [page.width, page.height]  // Adjust if the coordinates are different
+    ];
+    map.fitBounds(bounds);
 });
 
-
-let drawnItems = new L.FeatureGroup();
 map.addLayer(drawnItems);
 
 let drawnGeometries = []; // Array to store drawn geometries
@@ -52,34 +62,28 @@ map.on('draw:edited', function (event) {
     updateCoordinatesInput();
 });
 
-// Function to update the #coordinate input field with the latest coordinates
+// Function to update the #coordinate input field with the latest pixel coordinates
 function updateCoordinatesInput() {
     if (drawnItems.getLayers().length > 0) {
-        const precision = 2; // Specify the number of decimal places
-
-        let coordinates = drawnItems.getLayers()[0].getLatLngs()[0].map(x => [
-            x.lng.toFixed(precision),
-            x.lat.toFixed(precision)
-        ]);
-
+        let coordinates = drawnItems.getLayers()[0].getLatLngs()[0].map(latlng => {
+            // Convert each LatLng to pixel coordinates
+            const point = map.latLngToContainerPoint(latlng);
+            return [
+                point.x,
+                point.y
+            ];
+        });
         $('#coordinate').val(coordinates);
     } else {
         $('#coordinate').val('');
     }
 }
 
+
 // To remove all drawn geometries
 function clearDrawnGeometries() {
     drawnItems.clearLayers();
     drawnGeometries = [];
-}
-
-// To remove the last drawn geometry
-function removeLastDrawnGeometry() {
-    const lastGeometry = drawnGeometries.pop();
-    if (lastGeometry) {
-        drawnItems.removeLayer(lastGeometry);
-    }
 }
 
 // Event handler for when a geometry is deleted
@@ -115,5 +119,5 @@ annotations.forEach(annotation => {
     const truncatedText = annotation.annotation.substring(0, 30);
 
     // Add popup with truncated annotation text below the geometry
-    geometry.bindPopup(`<p>${truncatedText}</p>`, { closeOnClick: false }).openPopup();
+    geometry.bindPopup(`<p>${truncatedText}</p>`, {closeOnClick: false}).openPopup();
 });
