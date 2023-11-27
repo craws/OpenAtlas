@@ -30,7 +30,7 @@ from openatlas.display.util import (
 from openatlas.forms.field import SubmitField
 from openatlas.forms.setting import (
     ApiForm, ContentForm, FilesForm, GeneralForm, LogForm, MailForm, MapForm,
-    ModulesForm, SimilarForm, TestMailForm, IiifForm)
+    ModulesForm, SimilarForm, TestMailForm, IiifForm, FrontendForm)
 from openatlas.forms.util import get_form_settings, set_form_settings
 from openatlas.models.content import get_content, update_content
 from openatlas.models.entity import Entity
@@ -185,6 +185,14 @@ def admin_index(
             'content',
             tables['content'].display(),
             buttons=[manual('admin/content')])
+        tabs['frontend'] = Tab(
+            'frontend',
+            display_info(get_form_settings(FrontendForm())),
+            buttons=[
+                manual('admin/map'),
+                button(
+                    _('edit'),
+                    url_for('admin_settings', category='frontend'))])
     if is_authorized('contributor'):
         tabs['data'] = Tab(
             'data',
