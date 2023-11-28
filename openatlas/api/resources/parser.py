@@ -9,14 +9,16 @@ default.add_argument(
     help='{error_msg}',
     case_sensitive=False,
     default=False,
-    choices=('true', 'false'))
+    choices=('true', 'false'),
+    location='args')
 default.add_argument(
     'count',
     type=str,
     help='{error_msg}',
     case_sensitive=False,
     default=False,
-    choices=('true', 'false'))
+    choices=('true', 'false'),
+    location='args')
 
 language = default.copy()
 language.add_argument(
@@ -24,7 +26,8 @@ language.add_argument(
     type=str,
     help='{error_msg}',
     case_sensitive=False,
-    choices=app.config['LANGUAGES'])
+    choices=app.config['LANGUAGES'],
+    location='args')
 
 entity_ = default.copy()
 entity_.add_argument(
@@ -33,7 +36,8 @@ entity_.add_argument(
     type=str,
     default='asc',
     case_sensitive=False,
-    help='{error_msg}. Only "desc" or "asc" will work.')
+    help='{error_msg}. Only "desc" or "asc" will work.',
+    location='args')
 entity_.add_argument(
     'column',
     type=str,
@@ -48,29 +52,35 @@ entity_.add_argument(
         'begin_from',
         'begin_to',
         'end_from',
-        'end_to'))
+        'end_to'),
+    location='args')
 entity_.add_argument(
     'search',
     type=str,
     help='{error_msg}',
-    action='append')
+    action='append',
+    location='args')
 entity_.add_argument(
     'limit',
     type=int,
     default=20,
-    help="Invalid number for limit")
+    help="Invalid number for limit",
+    location='args')
 entity_.add_argument(
     'first',
     type=int,
-    help="Not a valid ID")
+    help="Not a valid ID",
+    location='args')
 entity_.add_argument(
     'last',
     type=int,
-    help="Not a valid ID")
+    help="Not a valid ID",
+    location='args')
 entity_.add_argument(
     'page',
     type=int,
-    help="Not a valid page number")
+    help="Not a valid page number",
+    location='args')
 entity_.add_argument(
     'show',
     type=str,
@@ -82,34 +92,40 @@ entity_.add_argument(
         'depictions', 'geonames', 'description'],
     choices=(
         'when', 'types', 'relations', 'names', 'links', 'geometry',
-        'depictions', 'geonames', 'description', 'none'))
+        'depictions', 'geonames', 'description', 'none'),
+    location='args')
 entity_.add_argument(
     'export',
     type=str,
     help='{error_msg}',
-    choices=('csv', 'csvNetwork'))
+    choices=('csv', 'csvNetwork'),
+    location='args')
 entity_.add_argument(
     'format',
     type=str,
     help='{error_msg}',
     case_sensitive=False,
-    choices=frozenset(app.config['API_FORMATS']))
+    choices=frozenset(app.config['API_FORMATS']),
+    location='args')
 entity_.add_argument(
     'type_id',
     type=int,
     help='{error_msg}',
-    action='append')
+    action='append',
+    location='args')
 entity_.add_argument(
     'relation_type',
     type=str,
     help='{error_msg}',
-    action='append')
+    action='append',
+    location='args')
 entity_.add_argument(
     'centroid',
     type=str,
     case_sensitive=False,
     default=False,
-    choices=('true', 'false'))
+    choices=('true', 'false'),
+    location='args')
 
 gis = default.copy()
 gis.add_argument(
@@ -125,28 +141,33 @@ gis.add_argument(
         'gisPointSubs',
         'gisPointSibling',
         'gisLineAll',
-        'gisPolygonAll'))
+        'gisPolygonAll'),
+    location='args')
 query = entity_.copy()
 query.add_argument(
     'entities',
     type=int,
     action='append',
-    help="{error_msg}")
+    help="{error_msg}",
+    location='args')
 query.add_argument(
     'cidoc_classes',
     type=str,
     action='append',
-    help="{error_msg}")
+    help="{error_msg}",
+    location='args')
 query.add_argument(
     'view_classes',
     type=str,
     action='append',
-    help="{error_msg}")
+    help="{error_msg}",
+    location='args')
 query.add_argument(
     'system_classes',
     type=str,
     action='append',
-    help="{error_msg}")
+    help="{error_msg}",
+    location='args')
 
 image = default.copy()
 image.add_argument(
@@ -154,11 +175,13 @@ image.add_argument(
     type=str,
     help="{error_msg}",
     case_sensitive=False,
-    choices=list(size for size in app.config['IMAGE_SIZE']))
+    choices=list(size for size in app.config['IMAGE_SIZE']),
+    location='args')
 
 files = default.copy()
 files.add_argument(
     'file_id',
     type=int,
     help="{error_msg}",
-    action='append')
+    action='append',
+    location='args')

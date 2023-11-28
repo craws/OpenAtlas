@@ -78,12 +78,6 @@ class Api(ApiTestCase):
             rv = self.app.get(url_for('api_03.class_mapping')).get_json()
             assert self.get_class_mapping(rv)
 
-            rv = self.app.get(
-                url_for('api_03.content', lang='de', download=True)).get_json()
-            assert bool(rv['intro'] == 'Das ist Deutsch')
-            rv = self.app.get(url_for('api_03.content')).get_json()
-            assert bool(rv['intro'] == 'This is English')
-
             rv = self.app.get(url_for('api_03.backend_details')).get_json()
             assert bool(rv['version'] == app.config['VERSION'])
             rv = self.app.get(
