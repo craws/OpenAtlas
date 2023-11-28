@@ -35,7 +35,7 @@ that we are using to set up Debian servers for OpenAtlas installations.
     sudo apt install apache2 libapache2-mod-wsgi-py3
 
 ### PostgreSQL 15 and PostGIS 3
-    sudo apt install postgresql postgresql-13-postgis-3 postgresql-13-postgis-3-scripts
+    sudo apt install postgresql postgresql-15-postgis-3 postgresql-15-postgis-3-scripts
 
 ### gettext, pip, npm
     sudo apt install gettext npm python3-pip
