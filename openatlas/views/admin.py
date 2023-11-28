@@ -189,7 +189,7 @@ def admin_index(
             'frontend',
             display_info(get_form_settings(FrontendForm())),
             buttons=[
-                manual('admin/map'),
+                manual('admin/frontend'),
                 button(
                     _('edit'),
                     url_for('admin_settings', category='frontend'))])
