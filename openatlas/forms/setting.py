@@ -2,7 +2,7 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (
     BooleanField, IntegerField, SelectField, StringField, FieldList)
-from wtforms.validators import Email, InputRequired
+from wtforms.validators import Email, InputRequired, Optional, URL
 
 from openatlas import app
 from openatlas.forms.field import SubmitField, RemovableListField
@@ -94,6 +94,14 @@ class MapForm(FlaskForm):
     map_cluster_disable_at_zoom = IntegerField(_('disable clustering at zoom'))
     map_cluster_max_radius = IntegerField(_('max cluster radius'))
     geonames_username = StringField('GeoNames ' + _('username'))
+    save = SubmitField(_('save'))
+
+
+class FrontendForm(FlaskForm):
+    frontend_website_url = (
+        StringField(_('website URL'), [Optional(), URL()]))
+    frontend_resolver_url = (
+        StringField(_('resolver URL'), [Optional(), URL()]))
     save = SubmitField(_('save'))
 
 

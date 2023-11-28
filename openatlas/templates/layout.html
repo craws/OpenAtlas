@@ -175,6 +175,9 @@
     <div>
         {{ g.settings.site_name }}
         <a href="{{ url_for('index_changelog') }}">{{ config.VERSION }}</a>
+        {% if g.settings.frontend_website_url %}
+          - {{ _('frontend')|link(g.settings.frontend_website_url, external=True)|safe }}
+        {% endif %}
     </div>
 </nav>
 {% with messages = get_flashed_messages(with_categories=true) %}

@@ -130,9 +130,18 @@ class BaseDisplay:
         self.add_button_network()
         self.buttons.append(
             render_template('util/api_links.html', entity=self.entity))
+        self.add_button_frontend()
         self.add_button_others()
         if self.structure and len(self.structure['siblings']) > 1:
             self.add_button_sibling_pager()
+
+    def add_button_frontend(self) -> None:
+        if url := g.settings['frontend_resolver_url']:
+            self.buttons.append(
+                link(
+                    _('view in frontend'),
+                    url + str(self.entity.id),
+                    external=True))
 
     def add_button_copy(self) -> None:
         self.buttons.append(
