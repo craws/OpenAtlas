@@ -17,7 +17,7 @@ $.getJSON(iiif_manifest, function (data) {
             tileSize: 256
         }
     ).addTo(map);
-    console.log([page.width, page.height])
+
     // Get the bounds of the image and fit the map to those bounds
     const bounds = [
         [0, 0],  // Assuming the image starts from the top-left corner
