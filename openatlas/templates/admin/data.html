@@ -11,9 +11,9 @@
   <h1 class="mb-1">{{ _('data transfer')|uc_first }}</h1>
   <div class="row g-1 d-flex align-items-center">
     <div class="col-auto">{{ _('import')|button(url_for('import_index'))|safe }}</div>
-    <div class="col-auto">{{ ('CSV ' + _('export'))|button(url_for('api_03.export_database', format_='csv'))|safe }}</div>
-    <div class="col-auto">{{ ('JSON ' + _('export'))|button(url_for('api_03.export_database', format_='json'))|safe }}</div>
-    <div class="col-auto">{{ ('XML ' + _('export'))|button(url_for('api_03.export_database', format_='xml'))|safe }}</div>
+    <div class="col-auto">{{ ('CSV ' + _('export'))|button(url_for('api.export_database', format_='csv'))|safe }}</div>
+    <div class="col-auto">{{ ('JSON ' + _('export'))|button(url_for('api.export_database', format_='json'))|safe }}</div>
+    <div class="col-auto">{{ ('XML ' + _('export'))|button(url_for('api.export_database', format_='xml'))|safe }}</div>
     {% if 'manager'|is_authorized %}
       <div class="col-auto">{{ ('SQL ' + _('export'))|button(url_for('export_sql'))|safe }}</div>
     {% endif %}

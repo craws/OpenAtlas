@@ -51,7 +51,7 @@ def link_dict(link_: Link, inverse: bool = False) -> dict[str, Any]:
         'label': link_.domain.name if inverse else link_.range.name,
         'relationTo':
             url_for(
-                'api_03.entity',
+                'api.entity',
                 id_=link_.domain.id if inverse else link_.range.id,
                 _external=True),
         'relationType': get_crm_relation(link_, inverse),
@@ -88,7 +88,7 @@ def get_lp_file(links_inverse: list[Link]) -> list[dict[str, str]]:
         path = get_file_path(link.domain.id)
         files.append({
             '@id': url_for(
-                'api_03.entity',
+                'api.entity',
                 id_=link.domain.id,
                 _external=True),
             'title': link.domain.name,
@@ -108,7 +108,7 @@ def get_lp_types(entity: Entity, links: list[Link]) -> list[dict[str, Any]]:
     for type_ in entity.types:
         type_dict = {
             'identifier': url_for(
-                'api_03.entity', id_=type_.id, _external=True),
+                'api.entity', id_=type_.id, _external=True),
             'descriptions': type_.description,
             'label': type_.name,
             'hierarchy': ' > '.join(map(

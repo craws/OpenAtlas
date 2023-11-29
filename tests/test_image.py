@@ -86,7 +86,7 @@ class ImageTest(TestBaseCase):
             assert b'\xff' in rv.data
 
             rv = self.app.get(url_for(
-                'api_03.display',
+                'api.display',
                 filename=file_name,
                 image_size='thumbnail'))
             assert b'\xff' in rv.data
