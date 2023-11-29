@@ -4,8 +4,9 @@ from flask_cors import CORS
 from flask_restful import Api
 
 from openatlas import app
-from openatlas.api.routes import entity_routes, deprecated_routes, \
-    display_routes, type_routes, admin_routes, special_routes
+from openatlas.api.routes import (
+    entity_routes,  display_routes, type_routes, admin_routes, special_routes)
+
 
 app.config['SWAGGER'] = {
     'openapi': '3.0.2',
@@ -40,18 +41,7 @@ display_routes(api)
 type_routes(api)
 admin_routes(api)
 special_routes(api)
-deprecated_routes(api)
 app.register_blueprint(api_bp)
-
-api_bp_03 = Blueprint('api_03', __name__, url_prefix='/api/0.3')
-api_03 = Api(api_bp_03)
-entity_routes(api_03)
-display_routes(api_03)
-type_routes(api_03)
-admin_routes(api_03)
-special_routes(api_03)
-deprecated_routes(api_03)
-app.register_blueprint(api_bp_03)
 
 api_bp_04 = Blueprint('api_04', __name__, url_prefix='/api/0.4')
 api_04 = Api(api_bp_04)
