@@ -30,6 +30,12 @@ ALTER TABLE web.annotation_image_id_seq OWNER TO openatlas;
 ALTER SEQUENCE web.annotation_image_id_seq OWNED BY web.annotation_image.id;
 ALTER TABLE ONLY web.annotation_image ALTER COLUMN id SET DEFAULT nextval('web.annotation_image_id_seq'::regclass);
 
+-- #2096: Add presentation site link in backend
+INSERT INTO web.settings (name, value) VALUES
+    ('frontend_website_url', ''),
+    ('frontend_resolver_url', '');
+
+
 END;
 
 

@@ -138,8 +138,10 @@ def profile_password() -> Union[str, Response]:
         flash(_('info password updated'), 'info')
         return redirect(url_for('profile_index'))
     return render_template(
-        'user/password.html',
-        form=form,
+        'tabs.html',
+        tabs={'password': Tab(
+            'password',
+            content=display_form(form, 'password-form'))},
         title=_('profile'),
         crumbs=[
             [_('profile'), url_for('profile_index')],
