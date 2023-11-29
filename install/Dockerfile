@@ -28,10 +28,8 @@ RUN cd /var/www/openatlas && cp install/entrypoint.sh /entrypoint.sh &&\
     sed -i 's~ServerName.*~~' /etc/apache2/sites-available/000-default.conf
 USER www-data
 RUN cd /var/www/openatlas &&\
-    pip3 install calmjs &&\
     cd openatlas/static &&\
-    pip3 install -e ./ &&\
-    ~/.local/bin/calmjs npm --install openatlas
+    npm install
 RUN a2enmod iipsrv &&\
     service apache2 restart
 
