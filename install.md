@@ -38,7 +38,7 @@ that we are using to set up Debian servers for OpenAtlas installations.
     sudo apt install postgresql postgresql-15-postgis-3 postgresql-15-postgis-3-scripts
 
 ### gettext, pip, npm
-    sudo apt install gettext npm python3-pip
+    sudo apt install gettext npm 
 
 ## Installation
 ### Files
@@ -50,10 +50,8 @@ adapt them accordingly as regular user:
 ### Frontend libraries
 Execute this lines as regular user too:
 
-    pip3 install calmjs
     cd openatlas/static
-    pip3 install -e ./
-    ~/.local/bin/calmjs npm --install openatlas
+    npm install
 
 ### Database
 Executed statements below as **postgres** user.

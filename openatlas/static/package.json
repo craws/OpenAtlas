@@ -1,6 +1,4 @@
-from setuptools import setup
-
-package_json = {
+{
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.15.4",
         "@mapbox/leaflet-pip": "^1.1.0",
@@ -28,12 +26,8 @@ package_json = {
         "leaflet": "^1.7.1",
         "mirador": "^3.3.0",
         "save-svg-as-png": "^1.4.17",
-        "tinymce": "^5.10.3",
-    }
+        "tinymce": "^5.10.3"
+    },
+    "devDependencies": {},
+    "name": "openatlas"
 }
-
-setup(
-    name='openatlas',
-    setup_requires=['calmjs'],
-    package_json=package_json
-)
