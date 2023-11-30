@@ -174,11 +174,11 @@ class TableMultiSelect(HiddenInput):
                 f' id="{entity.id}" '
                 f'{" checked" if entity.id in data else ""}>')
             table.rows.append(row)
-        return render_template(
+        return Markup(render_template(
             'forms/table_multi_select.html',
             field=field,
             selection=[e for e in entities if e.id in data],
-            table=table) + super().__call__(field, **kwargs)
+            table=table)) + super().__call__(field, **kwargs)
 
 
 class TableMultiField(HiddenField):
@@ -230,11 +230,11 @@ class TableSelect(HiddenInput):
             field.id,
             field.data,
             field.filter_ids)
-        return render_template(
+        return Markup(render_template(
             'forms/table_select.html',
             field=field,
             table=table.display(field.id),
-            selection=selection) + super().__call__(field, **kwargs)
+            selection=selection)) + super().__call__(field, **kwargs)
 
 
 class TableField(HiddenField):
@@ -260,12 +260,12 @@ class TreeMultiSelect(HiddenInput):
     def __call__(self, field: TreeField, **kwargs: Any) -> TreeMultiSelect:
         data = field.data or []
         data = ast.literal_eval(data) if isinstance(data, str) else data
-        return render_template(
+        return Markup(render_template(
             'forms/tree_multi_select.html',
             field=field,
             root=g.types[int(field.type_id)],
             selection=sorted(data, key=lambda k: g.types[k].name),
-            data=Type.get_tree_data(int(field.id), data)) \
+            data=Type.get_tree_data(int(field.id), data))) \
             + super().__call__(field, **kwargs)
 
 
@@ -294,7 +294,7 @@ class TreeSelect(HiddenInput):
                 if isinstance(field.data, list) else field.data
             selection = g.types[int(field.data)].name
             selected_ids.append(g.types[int(field.data)].id)
-        return render_template(
+        return Markup(render_template(
             'forms/tree_select.html',
             field=field,
             selection=selection,
@@ -302,7 +302,7 @@ class TreeSelect(HiddenInput):
             data=Type.get_tree_data(
                 int(field.type_id),
                 selected_ids,
-                field.filters_ids)) + super().__call__(field, **kwargs)
+                field.filters_ids))) + super().__call__(field, **kwargs)
 
 
 class TreeField(HiddenField):
