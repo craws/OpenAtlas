@@ -300,15 +300,6 @@ def class_overview_template() -> dict[str, Type[String]]:
         'en': fields.String}
 
 
-def content_template() -> dict[str, Type[String]]:
-    return {
-        'intro': fields.String,
-        'contact': fields.String,
-        'legalNotice': fields.String,
-        'siteName': fields.String,
-        'imageSizes': fields.Raw}
-
-
 def backend_details_template() -> dict[str, Type[String]]:
     image_processing = {
         'enabled': fields.String,
