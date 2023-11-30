@@ -333,7 +333,7 @@ class DragNDrop(FileInput):
             f'.{filename}' for filename
             in g.settings['file_upload_allowed_extension']])
         return super().__call__(field, accept=accept, **kwargs) \
-            + render_template('forms/drag_n_drop_field.html')
+            + Markup(render_template('forms/drag_n_drop_field.html'))
 
 
 class DragNDropField(FileField):

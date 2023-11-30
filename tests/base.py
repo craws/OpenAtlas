@@ -28,7 +28,7 @@ class TestBaseCase(unittest.TestCase):
     def login(self, name: str, logout: bool = True) -> None:
         with app.app_context():
             if logout:
-                self.app.get(url_for('logout'))
+                self.app.get(url_for('logout'), follow_redirects=True)
             self.app.post(
                 url_for('login'),
                 data={'username': name, 'password': 'test'})

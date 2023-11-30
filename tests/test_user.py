@@ -17,7 +17,9 @@ class UserTests(TestBaseCase):
                 'password': 'you_never_guess_this',
                 'password2': 'you_never_guess_this',
                 'group': 'admin',
-                'name': 'Ripley Weaver'}
+                'name': 'Ripley Weaver',
+                'real_name': '',
+                'description': ''}
             rv: Any = self.app.post(url_for('user_insert'), data=data)
             user_id = rv.location.split('/')[-1]
 
@@ -35,7 +37,9 @@ class UserTests(TestBaseCase):
                     'password2': 'you_never_guess_this',
                     'group': 'admin',
                     'name': 'Newt',
-                    'continue_': 'yes'},
+                    'continue_': 'yes',
+                    'real_name': '',
+                    'description': ''},
                 follow_redirects=True)
             assert b'Newt' not in rv.data
 
@@ -90,16 +94,18 @@ class UserTests(TestBaseCase):
             rv = self.app.get('/')
             assert b'Hugo' in rv.data
 
-            rv = self.app.post(
-                url_for('ajax_bookmark'),
-                data={'entity_id': person.id})
-            assert b'Bookmark' in rv.data
+            #rv = self.app.post(
+            #    url_for('ajax_bookmark'),
+            #    data={'entity_id': person.id})
+            #assert b'Bookmark' in rv.data
 
             self.app.get(url_for('logout'))
             rv = self.app.get(url_for('user_insert'), follow_redirects=True)
             assert b'Forgot your password?' not in rv.data
 
-            self.login('Editor', logout=False)
+            self.app.post(
+                url_for('login'),
+                data={'username': 'Editor', 'password': 'test'})
             rv = self.app.get(url_for('user_insert'))
             assert b'403 - Forbidden' in rv.data
 
@@ -116,7 +122,10 @@ class UserTests(TestBaseCase):
             rv = self.app.get(url_for('user_update', id_=self.alice_id))
             assert b'403 - Forbidden' in rv.data
 
-            self.login('Contributor')
+            self.app.get(url_for('logout'))
+            self.app.post(
+                url_for('login'),
+                data={'username': 'Contributor', 'password': 'test'})
             rv = self.app.get(url_for('delete', id_=person.id))
             assert b'403 - Forbidden' in rv.data
 

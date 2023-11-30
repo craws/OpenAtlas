@@ -230,7 +230,7 @@ def admin_content(item: str) -> Union[str, Response]:
             data.append({
                 'name': item,
                 'language': language,
-                'text': form.__getattribute__(language).data.strip()})
+                'text': form.__getattribute__(language).data or ''})
         update_content(data)
         flash(_('info update'), 'info')
         return redirect(f"{url_for('admin_index')}#tab-content")
@@ -757,7 +757,7 @@ def admin_newsletter() -> Union[str, Response]:
     if form.validate_on_submit():
         count = 0
         for user_id in request.form.getlist('recipient'):
-            user = User.get_by_id(user_id)
+            user = User.get_by_id(int(user_id))
             if user \
                     and user.settings['newsletter'] \
                     and user.active \
