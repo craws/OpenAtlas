@@ -18,7 +18,8 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
     button, datetime64_to_timestamp, display_form, format_date,
-    get_backup_file_data, is_authorized, link, manual, required_group)
+    get_backup_file_data, is_authorized, link, manual, required_group,
+    button_bar, uc_first, description)
 from openatlas.forms.field import SubmitField
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Import, is_float
@@ -88,10 +89,35 @@ def import_project_insert() -> Union[str, Response]:
 @required_group('contributor')
 def import_project_view(id_: int) -> str:
     project = Import.get_project_by_id(id_)
+    content = ''
+    if is_authorized('manager'):
+        content = button_bar([
+            manual('admin/import'),
+            button(
+                _('edit'),
+                url_for('import_project_update', id_=project.id)),
+            button(
+                _('delete'),
+                url_for('import_project_delete', id_=project.id),
+                onclick="return confirm('" +
+                _('delete %(name)s?', name=project.name.replace("'", "")) +
+                "')")])
+        content += '<p>' + uc_first(_('new import')) + ':</p>'
+        buttons = []
+        for class_ in \
+                ['source'] \
+                + g.view_class_mapping['event'] \
+                + g.view_class_mapping['actor'] \
+                + ['place', 'bibliography', 'edition']:
+            buttons.append(button(
+                _(class_),
+                url_for('import_data', project_id=project.id, class_=class_)))
+        content += button_bar(buttons)
+    content += description(project.description)
     tabs = {
         'info': Tab(
             'info',
-            render_template('import/project_view.html', project=project)),
+            content=content),
         'entities': Tab(
             'entities',
             table=Table(
@@ -282,7 +308,7 @@ def import_data(project_id: int, class_: str) -> str:
             g.logger.log('error', 'import', 'import check failed', e)
             flash(_('error at import'), 'error')
             return render_template(
-                'import/import_data.html',
+                'import_data.html',
                 form=form,
                 messages=messages,
                 file_data=file_data,
@@ -307,7 +333,7 @@ def import_data(project_id: int, class_: str) -> str:
                 g.logger.log('error', 'import', 'import failed', e)
                 flash(_('error transaction'), 'error')
     return render_template(
-        'import/import_data.html',
+        'import_data.html',
         form=form,
         file_data=file_data,
         table=table,

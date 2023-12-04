@@ -56,7 +56,8 @@ class ClassMapping(Resource):
     def get() -> Union[tuple[Resource, int], Response]:
         return marshal([{
             "systemClass": class_.name,
-            "crmClass": class_.cidoc_class.code if class_.cidoc_class else None,
+            "crmClass":
+                class_.cidoc_class.code if class_.cidoc_class else None,
             "view": class_.view,
             "standardTypeId": class_.standard_type_id,
             "icon": class_.icon,
