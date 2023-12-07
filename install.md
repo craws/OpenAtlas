@@ -133,6 +133,7 @@ high-quality, attributed digital objects online at scale. Be aware that:
 ### Installation
 
     sudo apt install iipimage-server libvips-tools
+    sudo a2enmod fcgid
     sudo service apache2 restart
 
 You can test http://your.server/iipsrv/iipsrv.fcgi to see if it runs.

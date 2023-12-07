@@ -8,7 +8,7 @@ from openatlas.api.resources.model_mapper import get_overview_counts
 from openatlas.api.resources.parser import default
 from openatlas.api.resources.resolve_endpoints import download
 from openatlas.api.resources.templates import (
-    class_overview_template, overview_template, backend_details_template)
+    backend_details_template, class_overview_template, overview_template)
 
 
 class GetBackendDetails(Resource):
@@ -38,8 +38,8 @@ class ClassMapping(Resource):
     def get() -> Union[tuple[Resource, int], Response]:
         return marshal([{
             "systemClass": class_.name,
-            "crmClass": class_.cidoc_class.code
-                if class_.cidoc_class else None,
+            "crmClass":
+                class_.cidoc_class.code if class_.cidoc_class else None,
             "view": class_.view,
             "standardTypeId": class_.standard_type_id,
             "icon": class_.icon,
