@@ -61,7 +61,9 @@ class NoteTest(TestBaseCase):
             rv = self.app.get(url_for('note_view', id_=note_id))
             assert b'403 - Forbidden' in rv.data
 
-            self.login('Editor')
+            self.app.post(
+                url_for('login'),
+                data={'username': 'Editor', 'password': 'test'})
             rv = self.app.get(url_for('note_set_private', id_=note_id))
             assert b'403 - Forbidden' in rv.data
 

@@ -137,7 +137,7 @@ class User(UserMixin):
 
     @staticmethod
     def toggle_bookmark(entity_id: int) -> str:
-        if int(entity_id) in current_user.bookmarks:
+        if entity_id in current_user.bookmarks:
             Db.delete_bookmark(current_user.id, entity_id)
             return 'bookmark'
         Db.insert_bookmark(current_user.id, entity_id)
@@ -164,8 +164,7 @@ class User(UserMixin):
         return settings
 
     @staticmethod
-    def generate_password(
-            length: Optional[int] = None) -> str:
+    def generate_password(length: Optional[int] = None) -> str:
         length = length or g.settings['random_password_length']
         return ''.join(
             secrets.choice(

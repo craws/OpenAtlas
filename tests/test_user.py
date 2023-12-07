@@ -1,6 +1,7 @@
 from typing import Any
 
 from flask import g, url_for
+from flask_login import current_user
 
 from openatlas import app
 from tests.base import TestBaseCase, insert
@@ -91,13 +92,16 @@ class UserTests(TestBaseCase):
                 data={'entity_id': person.id})
             assert b'Remove bookmark' in rv.data
 
+            with app.test_request_context():
+                current_user.bookmarks = [person.id]
+
             rv = self.app.get('/')
             assert b'Hugo' in rv.data
 
-            #rv = self.app.post(
-            #    url_for('ajax_bookmark'),
-            #    data={'entity_id': person.id})
-            #assert b'Bookmark' in rv.data
+            rv = self.app.post(
+                url_for('ajax_bookmark'),
+                data={'entity_id': person.id})
+            assert b'Bookmark' in rv.data
 
             self.app.get(url_for('logout'))
             rv = self.app.get(url_for('user_insert'), follow_redirects=True)
@@ -115,7 +119,10 @@ class UserTests(TestBaseCase):
             rv = self.app.get(url_for('delete', id_=g.wikidata.id))
             assert b'403 - Forbidden' in rv.data
 
-            self.login('Manager')
+            self.app.get(url_for('logout'))
+            self.app.post(
+                url_for('login'),
+                data={'username': 'Manager', 'password': 'test'})
             rv = self.app.get(url_for('admin_settings', category='mail'))
             assert b'403 - Forbidden' in rv.data
 
@@ -135,6 +142,9 @@ class UserTests(TestBaseCase):
             rv = self.app.get(url_for('view', id_=person.id))
             assert b'Hugo' in rv.data
 
-            self.login('Readonly')
+            self.app.get(url_for('logout'))
+            self.app.post(
+                url_for('login'),
+                data={'username': 'Readonly', 'password': 'test'})
             rv = self.app.get(url_for('view', id_=person.id))
             assert b'Hugo' in rv.data

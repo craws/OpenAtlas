@@ -87,7 +87,10 @@ class ActorTests(TestBaseCase):
                 follow_redirects=True)
             assert b'An entry has been created' in rv.data
 
-            self.login('manager')
+            self.app.get(url_for('logout'))
+            self.app.post(
+                url_for('login'),
+                data={'username': 'Manager', 'password': 'test'})
             rv = self.app.get(url_for('update', id_=actor_id))
             assert b'American actress' in rv.data
 

@@ -17,21 +17,15 @@ class TestBaseCase(unittest.TestCase):
         app.config.from_pyfile('testing.py')
         self.setup_database()
         self.app = app.test_client()
-        self.login('Alice', logout=False)
         with app.app_context():
+            self.app.post(
+                url_for('login'),
+                data={'username': 'Alice', 'password': 'test'})
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 self.alice_id = 2
                 self.precision_type = \
                     Type.get_hierarchy('External reference match')
-
-    def login(self, name: str, logout: bool = True) -> None:
-        with app.app_context():
-            if logout:
-                self.app.get(url_for('logout'), follow_redirects=True)
-            self.app.post(
-                url_for('login'),
-                data={'username': name, 'password': 'test'})
 
     def setup_database(self) -> None:
         connection = psycopg2.connect(

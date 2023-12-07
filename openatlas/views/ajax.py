@@ -1,22 +1,22 @@
 import json
 from typing import Optional
 
-from flask import abort, g, jsonify, request
+from flask import Response, abort, g, jsonify, request
 from flask_babel import lazy_gettext as _
 
 from openatlas import app
 from openatlas.database.connect import Transaction
+from openatlas.display.util import required_group, uc_first
 from openatlas.forms.field import get_table_content
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 from openatlas.models.user import User
-from openatlas.display.util import required_group, uc_first
 
 
 @app.route('/ajax/bookmark', methods=['POST'])
 @required_group('readonly')
-def ajax_bookmark() -> str:
-    label = User.toggle_bookmark(request.form['entity_id'])
+def ajax_bookmark() -> Response:
+    label = User.toggle_bookmark(int(request.form['entity_id']))
     label = _('bookmark') if label == 'bookmark' else _('bookmark remove')
     return jsonify(uc_first(label))
 

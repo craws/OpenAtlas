@@ -15,6 +15,7 @@ VALUES
   ((SELECT id FROM web.user WHERE username = 'Alice'), 'entity_show_import', 'True'),
   ((SELECT id FROM web.user WHERE username = 'Alice'), 'newsletter', 'True'),
   ((SELECT id FROM web.user WHERE username = 'Alice'), 'module_time', 'True'),
+  ((SELECT id FROM web.user WHERE username = 'Alice'), 'table_rows', '25'),
   ((SELECT id FROM web.user WHERE username = 'Alice'), 'table_show_icons', 'True');
 
 -- Citation example

@@ -23,10 +23,8 @@ def get_content() -> dict[str, dict[str, str]]:
     return content
 
 
-def get_translation(name: str, lang: Optional[str] = None) -> str:
+def get_translation(name: str) -> str:
     translations = get_content()[name]
-    if lang and lang in translations and translations[lang]:
-        return translations[lang]
     if translations[session['language']]:
         return translations[session['language']]
     return translations[g.settings['default_language']]
