@@ -1,8 +1,3 @@
-
--- Content example for API
-INSERT INTO web.i18n (name, language, text) VALUES ('intro_for_frontend', 'en', 'This is English');
-INSERT INTO web.i18n (name, language, text) VALUES ('intro_for_frontend', 'de', 'Das ist Deutsch');
-
 INSERT INTO model.entity (
   cidoc_class_code, openatlas_class_name, name, description, begin_from, begin_to, begin_comment,
   end_from, end_to, end_comment, created, modified

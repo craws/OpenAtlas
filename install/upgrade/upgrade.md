@@ -18,8 +18,12 @@ then run the database upgrade script, then restart Apache:
     sudo python3 install/upgrade/database_upgrade.py
     sudo service apache2 restart
 
-### 7.17.x to 7.18
-7.18.0.sql is needed but will be taken care of by the database upgrade script.
+### 7.17.x to 8.0.0
+
+This is a major upgrade which utilizes newer versions of underlying software.
+Please consult the install.md about package installation.
+
+8.0.0.sql is needed but will be taken care of by the database upgrade script.
 
 ### 7.16.x to 7.17.0
 7.17.0.sql is needed but will be taken care of by the database upgrade script.

@@ -1,5 +1,3 @@
-from typing import Optional
-
 from flask import g, session
 
 from openatlas import app
@@ -8,15 +6,7 @@ from openatlas.database.content import Content as Db
 
 def get_content() -> dict[str, dict[str, str]]:
     content: dict[str, dict[str, str]] = {}
-    for name in [
-            'intro',
-            'legal_notice',
-            'contact',
-            'citation_example',
-            'intro_for_frontend',
-            'legal_notice_for_frontend',
-            'contact_for_frontend',
-            'site_name_for_frontend']:
+    for name in ['intro', 'legal_notice', 'contact', 'citation_example']:
         content[name] = {lang: '' for lang in app.config['LANGUAGES']}
     for row in Db.get_content():
         content[row['name']][row['language']] = row['text']
