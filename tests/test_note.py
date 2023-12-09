@@ -10,7 +10,7 @@ class NoteTest(TestBaseCase):
     def test_note(self) -> None:
         with app.app_context():
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 actor = insert('person', 'Ripley')
 
             rv = self.app.get(url_for('note_insert', entity_id=actor.id))
@@ -26,7 +26,7 @@ class NoteTest(TestBaseCase):
             assert b'A nice description' in rv.data
 
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 note_id = User.get_notes_by_user_id(self.alice_id)[0]['id']
 
             rv = self.app.get(url_for('note_update', id_=note_id))

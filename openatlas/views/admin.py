@@ -152,12 +152,11 @@ def admin_index(
                 button(_('system log'), url_for('admin_log'))])
         tabs['email'] = Tab(
             'email',
-            display_info(get_form_settings(MailForm())),
+            display_info(get_form_settings(MailForm())) +
+            (display_form(form) if g.settings['mail'] else ''),
             buttons=[
                 manual('admin/mail'),
                 button(_('edit'), url_for('admin_settings', category='mail'))])
-        if g.settings['mail']:
-            tabs['email'].content += display_form(form)
         tabs['IIIF'] = Tab(
             'IIIF',
             display_info(get_form_settings(IiifForm())),

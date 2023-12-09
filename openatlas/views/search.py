@@ -1,8 +1,11 @@
+from typing import Any
+
 from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (
-    BooleanField, IntegerField, SelectMultipleField, StringField, widgets)
+    BooleanField, IntegerField, SelectMultipleField, StringField, validators,
+    widgets)
 from wtforms.validators import InputRequired, NoneOf, NumberRange, Optional
 
 from openatlas import app
@@ -54,7 +57,7 @@ class SearchForm(FlaskForm):
         validators=validator_day)
     include_dateless = BooleanField(_('Include dateless entities'))
 
-    def validate(self, extra_validators=None) -> bool:
+    def validate(self, extra_validators: validators = None) -> bool:
         valid = FlaskForm.validate(self)
         from_date = form_to_datetime64(
             self.begin_year.data,

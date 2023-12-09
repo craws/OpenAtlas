@@ -1,5 +1,5 @@
 import locale
-from typing import Optional
+from typing import Any, Optional
 
 from flask import Flask, Response, g, request, session
 from flask_babel import Babel
@@ -109,5 +109,5 @@ def apply_caching(response: Response) -> Response:
 
 
 @app.teardown_request
-def teardown_request(_exception: Optional[Exception]) -> None:
+def teardown_request(_exception: Optional[Any]) -> None:
     close_connection()

@@ -13,7 +13,7 @@ class FileTest(TestBaseCase):
     def test_file(self) -> None:
         with app.app_context():
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 place = insert('place', 'File keeper')
                 reference = insert('edition', 'Ancient Books')
 
@@ -35,7 +35,7 @@ class FileTest(TestBaseCase):
             assert b'An entry has been created' in rv.data
 
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 files = Entity.get_by_class('file')
                 file_id = files[0].id
 
@@ -137,7 +137,7 @@ class FileTest(TestBaseCase):
             assert bool(str(file_id) in rv['@id'])
 
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 files[0].link('P2', g.types[get_hierarchy('License').subs[0]])
 
             rv = self.app.get(url_for('api.licensed_file_overview'))

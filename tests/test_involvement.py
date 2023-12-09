@@ -9,7 +9,7 @@ class InvolvementTests(TestBaseCase):
     def test_involvement(self) -> None:
         with app.app_context():
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 actor = insert('person', 'Captain Miller')
                 event = insert('acquisition', 'Event Horizon')
 
@@ -53,7 +53,7 @@ class InvolvementTests(TestBaseCase):
             assert b'Event Horizon' in rv.data
 
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 link_ = event.get_links('P22')[0]
 
             rv = self.app.post(

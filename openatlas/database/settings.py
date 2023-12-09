@@ -9,8 +9,7 @@ class Settings:
     @staticmethod
     def get_settings(
             cursor: Optional[DictCursor] = None) -> dict[str, str]:
-        if not cursor:
-            cursor = g.cursor
+        cursor = cursor or g.cursor
         cursor.execute("SELECT name, value FROM web.settings;")
         return {row['name']: row['value'] for row in cursor.fetchall()}
 

@@ -19,7 +19,8 @@ def sql_export(format_: str, postfix: Optional[str] = '') -> bool:
     file = app.config['EXPORT_PATH'] \
            / f'{current_date_for_filename()}_export{postfix}.{format_}'
     command: Any = [
-        "pg_dump" if os.name == 'posix' else Path(shutil.which("pg_dump.exe"))]
+        "pg_dump" if os.name == 'posix'
+        else Path(str(shutil.which("pg_dump.exe")))]
     if format_ == 'dump':
         command.append('-Fc')
     command.extend([

@@ -22,7 +22,7 @@ class TestBaseCase(unittest.TestCase):
                 url_for('login'),
                 data={'username': 'Alice', 'password': 'test'})
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 self.alice_id = 2
                 self.precision_type = \
                     Type.get_hierarchy('External reference match')

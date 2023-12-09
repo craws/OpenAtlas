@@ -3,18 +3,18 @@ from pathlib import Path
 from flask import g, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
-from wtforms import MultipleFileField
+from wtforms import MultipleFileField, validators
 
+from openatlas.display.util import uc_first
 from openatlas.forms.field import TreeField
 from openatlas.forms.util import form_to_datetime64
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
-from openatlas.display.util import uc_first
 
 
 def file(_form: FlaskForm, field: MultipleFileField) -> None:
     for file_ in request.files.getlist('file'):
-        if not file_ or Path(file_.filename).suffix[1:] not in \
+        if not file_ or Path(str(file_.filename)).suffix[1:] not in \
                 g.settings['file_upload_allowed_extension']:
             field.errors.append(_('file type not allowed'))
 
@@ -26,7 +26,7 @@ def hierarchy_name_exists(form: FlaskForm, field: TreeField) -> None:
             field.errors.append(_('error name exists'))
 
 
-def validate(form: FlaskForm, extra_validators=None) -> bool:
+def validate(form: FlaskForm, extra_validators: validators = None) -> bool:
     valid = FlaskForm.validate(form)
     if hasattr(form, 'begin_year_from'):  # Dates
         if not validate_dates(form):

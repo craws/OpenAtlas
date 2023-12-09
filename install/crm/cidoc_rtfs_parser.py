@@ -30,7 +30,7 @@
 #
 
 import time
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 import psycopg2.extras
 from rdflib import URIRef
@@ -50,7 +50,7 @@ DATABASE_HOST = 'localhost'
 DATABASE_PASS = 'CHANGE ME'
 
 
-def connect() -> psycopg2.connect:
+def connect() -> Any:
     return psycopg2.connect(
         database=DATABASE_NAME,
         user=DATABASE_USER,
@@ -89,11 +89,16 @@ def import_cidoc() -> None:
         except Exception:
             print(f'Not able to parse subject: {subject}')
             continue
-        item = Item(code, name.replace('_', ' '), graph.comment(subject))
+        item = Item(
+            code,
+            name.replace('_', ' '),
+            graph.comment(subject))  # type: ignore
 
         # Translations
         for language in ['de', 'en', 'fr', 'ru', 'el', 'pt', 'zh']:
-            translation = graph.preferredLabel(subject, lang=language)
+            translation = graph.preferredLabel(
+                subject,
+                lang=language)  # type: ignore
             if translation and translation[0][1]:
                 item.label[language] = translation[0][1]
 

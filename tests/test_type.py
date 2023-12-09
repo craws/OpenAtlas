@@ -11,7 +11,7 @@ class TypeTest(TestBaseCase):
     def test_type(self) -> None:
         with app.app_context():
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 actor_type = get_hierarchy('Actor relation')
                 dimension_type = get_hierarchy('Dimensions')
                 historical_type = get_hierarchy('Historical place')
@@ -93,7 +93,7 @@ class TypeTest(TestBaseCase):
 
             sex = get_hierarchy('Sex')
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 actor = insert('person', 'Connor MacLeod')
                 actor.link('P2', g.types[sex.subs[0]])
 
@@ -110,7 +110,7 @@ class TypeTest(TestBaseCase):
             assert b'Forbidden' in rv.data
 
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 actor.link('P2', g.types[sex.subs[1]])
 
             rv = self.app.get(url_for('update', id_=actor.id))
@@ -136,7 +136,7 @@ class TypeTest(TestBaseCase):
             assert b'Warning' in rv.data
 
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 actor.link('P74', location, type_id=actor_type.subs[0])
 
             rv = self.app.get(

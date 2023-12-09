@@ -9,7 +9,7 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wtforms import (
     BooleanField, HiddenField, PasswordField, SelectField, StringField,
-    TextAreaField)
+    TextAreaField, validators)
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app
@@ -43,7 +43,7 @@ class UserForm(FlaskForm):
     insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
 
-    def validate(self, extra_validators=None) -> bool:
+    def validate(self, extra_validators: validators = None) -> bool:
         valid = FlaskForm.validate(self)
         username = ''
         user_email = ''
@@ -110,7 +110,7 @@ def user_activity(user_id: int = 0) -> str:
             entity = Entity.get_by_id(row['entity_id'])
             entity_name = link(entity)
         except AttributeError:  # Entity already deleted
-            entity = None  # type: ignore
+            entity = None
             entity_name = f"id {row['entity_id']}"
         user = User.get_by_id(row['user_id'])
         table.rows.append([

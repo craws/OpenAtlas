@@ -27,7 +27,7 @@ class ModelTests(TestBaseCase):
             assert b'Wrong domain' in rv.data
 
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 actor = insert('person', 'King Arthur')
                 event = insert('activity', 'Battle of Camlann')
                 event.link('P11', actor)

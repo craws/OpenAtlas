@@ -41,7 +41,7 @@ class Api(ApiTestCase):
 
         with app.app_context():
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 for entity in get_by_cidoc_classes(['all']):
                     if entity.name == 'Location of Shire':
                         location = entity

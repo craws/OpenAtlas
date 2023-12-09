@@ -16,7 +16,7 @@ class ImageTest(TestBaseCase):
         app.config['IMAGE_SIZE']['tmp'] = '1'
         with app.app_context():
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 place = insert('place', 'Nostromos')
 
             # Resizing through UI insert
@@ -29,7 +29,7 @@ class ImageTest(TestBaseCase):
             assert b'An entry has been created' in rv.data
 
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 files = Entity.get_by_class('file')
                 file_id = files[0].id
 
@@ -44,7 +44,7 @@ class ImageTest(TestBaseCase):
             assert b'The entry has been deleted' in rv.data
 
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 file_pathless = insert('file', 'Pathless_File')
                 file = insert('file', 'Test_File')
                 file.link('P2', g.types[get_hierarchy('License').subs[0]])

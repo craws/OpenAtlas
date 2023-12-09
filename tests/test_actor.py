@@ -11,7 +11,7 @@ class ActorTests(TestBaseCase):
     def test_actor(self) -> None:
         with app.app_context():
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 place = insert('place', 'Vienna')
                 event = insert('acquisition', 'Event Horizon')
                 group = insert('group', 'LV-426 colony')
@@ -145,7 +145,7 @@ class ActorTests(TestBaseCase):
             assert b'Ripley' in rv.data
 
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 link_ = group.get_links('P107')[0]
 
             rv = self.app.get(

@@ -129,9 +129,13 @@ def process_origin(manager: Any) -> None:
 
 
 def process_dates(manager: Any) -> dict[str, Any]:
-    data = {
-        'begin_from': None, 'begin_to': None, 'begin_comment': None,
-        'end_from': None, 'end_to': None, 'end_comment': None}
+    data: dict[str, Any] = {
+        'begin_from': None,
+        'begin_to': None,
+        'begin_comment': None,
+        'end_from': None,
+        'end_to': None,
+        'end_comment': None}
     form = manager.form
     if hasattr(form, 'begin_year_from') and form.begin_year_from.data:
         data['begin_comment'] = form.begin_comment.data

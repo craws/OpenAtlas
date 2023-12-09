@@ -632,7 +632,7 @@ def uc_first(string: str) -> str:
 
 
 @app.template_filter()
-def display_info(data: dict[str, Union[str, list[str]]]) -> str:
+def display_info(data: dict[str, Any]) -> str:
     return render_template('util/info_data.html', data=data)
 
 
@@ -785,7 +785,7 @@ def get_iiif_file_path(id_: int) -> Path:
 
 
 def convert_image_to_iiif(id_: int) -> None:
-    command = ["vips" if os.name == 'posix' else "vips.exe"]
+    command: list[Any] = ["vips" if os.name == 'posix' else "vips.exe"]
     command.extend([
         'tiffsave',
         get_file_path(id_),

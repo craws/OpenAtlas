@@ -9,8 +9,8 @@ from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect, secure_filename
 from werkzeug.wrappers import Response
-from wtforms import BooleanField, FileField, StringField, TextAreaField
-from wtforms.validators import InputRequired
+from wtforms import (
+    BooleanField, FileField, StringField, TextAreaField, validators)
 
 from openatlas import app
 from openatlas.database.connect import Transaction
@@ -29,12 +29,12 @@ class ProjectForm(FlaskForm):
     project_id: Optional[int] = None
     name = StringField(
         _('name'),
-        [InputRequired()],
+        [validators.InputRequired()],
         render_kw={'autofocus': True})
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
 
-    def validate(self, extra_validators=None) -> bool:
+    def validate(self, extra_validators: validators = None) -> bool:
         valid = FlaskForm.validate(self)
         name = Import.get_project_by_id(self.project_id).name \
             if self.project_id else ''
@@ -171,14 +171,14 @@ def import_project_delete(id_: int) -> Response:
 
 
 class ImportForm(FlaskForm):
-    file = FileField(_('file'), [InputRequired()])
+    file = FileField(_('file'), [validators.InputRequired()])
     preview = BooleanField(_('preview only'), default=True)
     duplicate = BooleanField(_('check for duplicates'), default=True)
     save = SubmitField(_('import'))
 
-    def validate(self, extra_validators=None) -> bool:
+    def validate(self, extra_validators: validators=None) -> bool:
         valid = FlaskForm.validate(self)
-        if pathlib.Path(request.files['file'].filename) \
+        if pathlib.Path(str(request.files['file'].filename)) \
                 .suffix.lower() != '.csv':
             self.file.errors.append(_('file type not allowed'))
             valid = False
@@ -197,7 +197,8 @@ def import_data(project_id: int, class_: str) -> str:
     class_label = g.classes[class_].label
     if form.validate_on_submit():
         file_ = request.files['file']
-        file_path = app.config['TMP_PATH'] / secure_filename(file_.filename)
+        file_path = \
+            app.config['TMP_PATH'] / secure_filename(str(file_.filename))
         columns: dict[str, list[str]] = {
             'allowed': ['name', 'id', 'description'],
             'valid': [],

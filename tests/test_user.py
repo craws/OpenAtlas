@@ -83,7 +83,7 @@ class UserTests(TestBaseCase):
             assert b'403 - Forbidden' in rv.data
 
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 person = insert('person', 'Hugo')
                 insert('activity', 'Event Horizon').link('P11', person)
 

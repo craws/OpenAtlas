@@ -11,7 +11,7 @@ class ArtifactTest(TestBaseCase):
     def test_artifact(self) -> None:
         with app.app_context():
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 source = insert('source', 'Necronomicon')
                 actor = insert('person', 'Conan')
                 place = insert('place', 'Home')

@@ -8,7 +8,7 @@ from flask_login import current_user, login_required
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import BooleanField, PasswordField
+from wtforms import BooleanField, PasswordField, validators
 from wtforms.validators import InputRequired
 
 from openatlas import app
@@ -29,7 +29,7 @@ class PasswordForm(FlaskForm):
     show_passwords = BooleanField(_('show passwords'))
     save = SubmitField(_('save'))
 
-    def validate(self, extra_validators=None) -> bool:
+    def validate(self, extra_validators: validators = None) -> bool:
         valid = FlaskForm.validate(self)
         hash_ = bcrypt.hashpw(
             self.password_old.data.encode('utf-8'),

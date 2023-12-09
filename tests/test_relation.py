@@ -9,7 +9,7 @@ class RelationTests(TestBaseCase):
     def test_relation(self) -> None:
         with app.app_context():
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 actor = insert('person', 'Connor MacLeod')
                 related = insert('person', 'The Kurgan')
 
@@ -48,7 +48,7 @@ class RelationTests(TestBaseCase):
             assert b'The Kurgan' in rv.data
 
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 link_ = actor.get_links('OA7')[0]
 
             rv = self.app.post(
