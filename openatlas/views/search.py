@@ -1,5 +1,3 @@
-from typing import Any
-
 from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm

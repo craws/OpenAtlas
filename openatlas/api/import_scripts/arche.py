@@ -54,7 +54,8 @@ def get_existing_ids() -> list[int]:
 def fetch_exif(id_: str) -> dict[str, Any]:
     req = requests.get(
         'https://arche-exif.acdh.oeaw.ac.at/',
-        params={'id': id_})
+        params={'id': id_},
+        timeout=300)
     return req.json()
 
 

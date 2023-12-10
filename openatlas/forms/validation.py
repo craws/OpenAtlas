@@ -27,10 +27,9 @@ def hierarchy_name_exists(form: FlaskForm, field: TreeField) -> None:
 
 
 def validate(form: FlaskForm, extra_validators: validators = None) -> bool:
-    valid = FlaskForm.validate(form)
-    if hasattr(form, 'begin_year_from'):  # Dates
-        if not validate_dates(form):
-            valid = False
+    valid = FlaskForm.validate(form, extra_validators)
+    if hasattr(form, 'begin_year_from') and not validate_dates(form):
+        valid = False
     for field_id, field in form.__dict__.items():  # External reference systems
         if field_id.startswith('reference_system_id_') \
                 and field.data \

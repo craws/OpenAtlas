@@ -37,7 +37,7 @@ def sql_export(format_: str, postfix: Optional[str] = '') -> bool:
             env={
                 'PGPASSWORD': app.config['DATABASE_PASS'],
                 'SYSTEMROOT': root}).wait()
-        with open(os.devnull, 'w') as null:
+        with open(os.devnull, 'w', encoding='utf8') as null:
             subprocess.Popen(
                 ['7z', 'a', f'{file}.7z', file],
                 stdout=null).wait()

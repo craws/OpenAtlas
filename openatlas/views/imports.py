@@ -1,5 +1,5 @@
 import collections
-import pathlib
+from pathlib import Path
 from typing import Optional, Union
 
 import numpy
@@ -17,9 +17,9 @@ from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, datetime64_to_timestamp, display_form, format_date,
-    get_backup_file_data, is_authorized, link, manual, required_group,
-    button_bar, uc_first, description)
+    button, button_bar, datetime64_to_timestamp, description, display_form,
+    format_date, get_backup_file_data, is_authorized, link, manual,
+    required_group, uc_first)
 from openatlas.forms.field import SubmitField
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Import, is_float
@@ -178,8 +178,7 @@ class ImportForm(FlaskForm):
 
     def validate(self, extra_validators: validators=None) -> bool:
         valid = FlaskForm.validate(self)
-        if pathlib.Path(str(request.files['file'].filename)) \
-                .suffix.lower() != '.csv':
+        if Path(str(request.files['file'].filename)) .suffix.lower() != '.csv':
             self.file.errors.append(_('file type not allowed'))
             valid = False
         return valid
@@ -216,7 +215,7 @@ def import_data(project_id: int, class_: str) -> str:
             headers = list(data_frame.columns.values)
             if 'name' not in headers:
                 messages['error'].append(_('missing name column'))
-                raise Exception()
+                raise ValueError()
             for item in headers:
                 if item not in columns['allowed']:
                     columns['invalid'].append(item)
@@ -304,7 +303,7 @@ def import_data(project_id: int, class_: str) -> str:
                     messages['warn'].append(
                         f"{_('possible duplicates')}: {', '.join(duplicates)}")
             if messages['error']:
-                raise Exception()
+                raise ValueError()
         except Exception as e:
             g.logger.log('error', 'import', 'import check failed', e)
             flash(_('error at import'), 'error')
