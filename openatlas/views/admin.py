@@ -222,12 +222,12 @@ def admin_content(item: str) -> Union[str, Response]:
             data.append({
                 'name': item,
                 'language': language,
-                'text': form.__getattribute__(language).data or ''})
+                'text': getattr(form, language).data or ''})
         update_content(data)
         flash(_('info update'), 'info')
         return redirect(f"{url_for('admin_index')}#tab-content")
     for language in app.config['LANGUAGES']:
-        form.__getattribute__(language).data = get_content()[item][language]
+        getattr(form, language).data = get_content()[item][language]
     return render_template(
         'tabs.html',
         tabs={'content': Tab('content', form=form)},

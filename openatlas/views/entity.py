@@ -242,7 +242,7 @@ def save(manager: BaseManager) -> str:
         if not manager.entity or manager.copy:
             manager.insert_entity()
         manager.process_form()
-        manager.update_entity(new=(action == 'insert'))
+        manager.update_entity(new=action == 'insert')
         g.logger.log_user(
             manager.entity.id,
             'insert' if manager.copy else action)

@@ -476,10 +476,11 @@ def check_write_access(path: Path, warnings: list[str]) -> list[str]:
 def tooltip(text: str) -> str:
     if not text:
         return ''
-    return """
-        <span>
-            <i class="fas fa-info-circle tooltipicon" title="{title}"></i>
-        </span>""".format(title=text.replace('"', "'"))
+    title = text.replace('"', "'")
+    return (
+        '<span>'
+        f'<i class="fas fa-info-circle tooltipicon" title="{title}"></i>'
+        '</span>')
 
 
 def get_file_path(
@@ -703,7 +704,7 @@ class MLStripper(HTMLParser):
 
 
 def format_date_part(date: numpy.datetime64, part: str) -> str:
-    string = str(date).split(' ')[0]
+    string = str(date).split(' ', maxsplit=1)[0]
     bc = False
     if string.startswith('-') or string.startswith('0000'):
         bc = True
