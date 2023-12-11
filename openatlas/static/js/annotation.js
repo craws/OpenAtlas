@@ -24,6 +24,17 @@ $.getJSON(iiif_manifest, function (data) {
         [page.width, page.height]  // Adjust if the coordinates are different
     ];
     map.fitBounds(bounds);
+    // Iterate through annotations and add them to the map
+    $.getJSON(page.otherContent[0]['@id'], function(annoData) {
+        $.each(annoData.resources, function(i, value) {
+            const b = /xywh=(.*)/.exec(value.on.selector.value)[1].split(',');
+            const minPoint = L.point(parseInt(b[0]), parseInt(b[1]));
+            const maxPoint = L.point(parseInt(b[0]) + parseInt(b[2]), parseInt(b[1]) + parseInt(b[3]));
+            const min = map.unproject(minPoint);
+            const max = map.unproject(maxPoint);
+            L.rectangle(L.latLngBounds(min, max)).bindPopup(value.resource[0].chars).addTo(map);
+        });
+    });
 });
 
 map.addLayer(drawnItems);
@@ -68,11 +79,13 @@ function updateCoordinatesInput() {
         let coordinates = drawnItems.getLayers()[0].getLatLngs()[0].map(latlng => {
             // Convert each LatLng to pixel coordinates
             const point = map.latLngToContainerPoint(latlng);
+            const origin = map.getPixelOrigin();
             return [
-                point.x,
-                point.y
+                point.x + origin.x,
+                point.y + origin.y
             ];
         });
+        console.log("converted" ,coordinates, "bounds", map.getPixelOrigin());
         $('#coordinate').val(coordinates);
     } else {
         $('#coordinate').val('');
@@ -86,6 +99,8 @@ function clearDrawnGeometries() {
     drawnGeometries = [];
 }
 
+
+
 // Event handler for when a geometry is deleted
 map.on('draw:deleted', function (event) {
     // Clear drawn geometries and update the input field with the remaining coordinates
@@ -93,31 +108,4 @@ map.on('draw:deleted', function (event) {
     updateCoordinatesInput();
 });
 
-// Function to transform coordinates from 'x,y,x,y,...' to Leaflet LatLng array
-function transformCoordinates(coordinates) {
-    const latLngArray = coordinates.split(',').map((coord, index) => {
-        return index % 2 === 0 ? parseFloat(coord) : parseFloat(coord);
-    });
 
-    return latLngArray.reduce((result, value, index, array) => {
-        if (index % 2 === 0) {
-            result.push([array[index + 1], value]); // Swap the order of latitude and longitude
-        }
-        return result;
-    }, []);
-}
-
-// Iterate through annotations and add them to the map
-annotations.forEach(annotation => {
-    const coordinates = transformCoordinates(annotation.coordinates);
-    const geometry = L.polygon(coordinates, {
-        color: 'blue',
-        fillOpacity: 0.2
-    }).addTo(map);
-
-    // Extract the first 30 characters from the annotation text
-    const truncatedText = annotation.annotation.substring(0, 30);
-
-    // Add popup with truncated annotation text below the geometry
-    geometry.bindPopup(`<p>${truncatedText}</p>`, {closeOnClick: false}).openPopup();
-});
