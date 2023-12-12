@@ -30,8 +30,8 @@ $.getJSON(iiif_manifest, function (data) {
             const b = /xywh=(.*)/.exec(value.on.selector.value)[1].split(',');
             const minPoint = L.point(parseInt(b[0]), parseInt(b[1]));
             const maxPoint = L.point(parseInt(b[0]) + parseInt(b[2]), parseInt(b[1]) + parseInt(b[3]));
-            const min = map.unproject(minPoint);
-            const max = map.unproject(maxPoint);
+            const min = map.unproject(minPoint, 5);
+            const max = map.unproject(maxPoint, 5);
             L.rectangle(L.latLngBounds(min, max)).bindPopup(value.resource[0].chars).addTo(map);
         });
     });
@@ -78,11 +78,10 @@ function updateCoordinatesInput() {
     if (drawnItems.getLayers().length > 0) {
         let coordinates = drawnItems.getLayers()[0].getLatLngs()[0].map(latlng => {
             // Convert each LatLng to pixel coordinates
-            const point = map.latLngToContainerPoint(latlng);
-            const origin = map.getPixelOrigin();
+            const point = map.project(latlng, 5);
             return [
-                point.x + origin.x,
-                point.y + origin.y
+                point.x,
+                point.y
             ];
         });
         console.log("converted" ,coordinates, "bounds", map.getPixelOrigin());
