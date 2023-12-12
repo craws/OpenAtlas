@@ -72,6 +72,8 @@ def admin_index(
                 'entities'],
             defs=[{'className': 'dt-body-right', 'targets': 7}]),
         'content': Table(['name'] + list(app.config['LANGUAGES']))}
+    if is_authorized('manager'):
+        tables['user'].header.append(_('info'))
     newsletter = False
     for user in User.get_all():
         if user.settings['newsletter']:
@@ -83,7 +85,7 @@ def admin_index(
                 f'{format_number(count)}</a>'
         email = user.email \
             if is_authorized('manager') or user.settings['show_email'] else ''
-        tables['user'].rows.append([
+        row = [
             link(user),
             user.real_name,
             user.group,
@@ -91,7 +93,10 @@ def admin_index(
             _('yes') if user.settings['newsletter'] else '',
             format_date(user.created),
             format_date(user.login_last_success),
-            user_entities])
+            user_entities]
+        if is_authorized('editor'):
+            row.append(user.description)
+        tables['user'].rows.append(row)
     for item, languages in get_content().items():
         content = [_(item)]
         for language in app.config['LANGUAGES']:
