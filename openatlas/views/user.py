@@ -182,7 +182,6 @@ def user_view(id_: int) -> str:
 @app.route('/admin/user/entities/<int:id_>')
 @required_group('readonly')
 def user_entities(id_: int) -> str:
-    user = User.get_by_id(id_)
     table = Table([
         'name',
         'class',
@@ -190,7 +189,7 @@ def user_entities(id_: int) -> str:
         'begin',
         'end',
         'created'])
-    if user:
+    if user := User.get_by_id(id_):
         for entity in user.get_entities():
             table.rows.append([
                 link(entity),
