@@ -33,6 +33,7 @@ RUN cd /var/www/openatlas &&\
     pip3 install -e ./ &&\
     ~/.local/bin/calmjs npm --install openatlas
 RUN a2enmod iipsrv &&\
+    a2enmod fcgid &&\
     service apache2 restart
 
 EXPOSE 8080
