@@ -26,12 +26,14 @@ Please consult the install.md about package installation.
 
 #### Breaking changes
 **Removal of frontend content management**
+
 Because the new presentation site functionality doesn't require content
 management in the backend anymore this functionality was removed in the.
 In case older versions of the frontend are still use they would have to be
 switched to new ones (OpenAtlas Discovery) or manual adapted.
 
-*New stable API version 0.4*
+**New stable API version 0.4**
+
 The current stable API version is **0.4**. Support for the older API versions
 **0.2** and **0.3** is dropped with this release including the frontend
 content querries mentioned above.
