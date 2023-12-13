@@ -19,11 +19,22 @@ then run the database upgrade script, then restart Apache:
     sudo service apache2 restart
 
 ### 7.17.x to 8.0.0
-
 This is a major upgrade which utilizes newer versions of underlying software.
 Please consult the install.md about package installation.
 
 8.0.0.sql is needed but will be taken care of by the database upgrade script.
+
+#### Breaking changes
+**Removal of frontend content management**
+Because the new presentation site functionality doesn't require content
+management in the backend anymore this functionality was removed in the.
+In case older versions of the frontend are still use they would have to be
+switched to new ones (OpenAtlas Discovery) or manual adapted.
+
+*New stable API version 0.4*
+The current stable API version is **0.4**. Support for the older API versions
+**0.2** and **0.3** is dropped with this release including the frontend
+content querries mentioned above.
 
 ### 7.16.x to 7.17.0
 7.17.0.sql is needed but will be taken care of by the database upgrade script.
