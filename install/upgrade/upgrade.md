@@ -20,7 +20,7 @@ then run the database upgrade script, then restart Apache:
 
 ### 7.17.x to 8.0.0
 This is a major upgrade which utilizes newer versions of underlying software.
-Please consult the install.md about package installation.
+Please consult the install.md about installation.
 
 8.0.0.sql is needed but will be taken care of by the database upgrade script.
 
