@@ -28,7 +28,7 @@ Please consult the install.md about package installation.
 **Removal of frontend content management**
 
 Because the new presentation site functionality doesn't require content
-management in the backend anymore this functionality was removed in the.
+management in the backend anymore this functionality was removed.
 In case older versions of the frontend are still use they would have to be
 switched to new ones (OpenAtlas Discovery) or manual adapted.
 
