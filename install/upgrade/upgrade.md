@@ -29,8 +29,8 @@ Please consult the install.md about installation.
 
 Because the new presentation site functionality doesn't require content
 management in the backend anymore this functionality was removed.
-In case older versions of the frontend are still use they would have to be
-switched to new ones (OpenAtlas Discovery) or manual adapted.
+In case older versions of the frontend are still in use they would have to be
+switched to the new one (OpenAtlas Discovery) or manually adapted.
 
 **New stable API version 0.4**
 
