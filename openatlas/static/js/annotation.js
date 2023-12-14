@@ -85,7 +85,6 @@ function updateCoordinatesInput(event) {
                 point.y * scaleFactor
             ];
         });
-        console.log("converted" ,coordinates, "bounds", drawnItems.getBounds(), mapinstance.getZoom());
         $('#coordinate').val(coordinates);
     } else {
         $('#coordinate').val('');
