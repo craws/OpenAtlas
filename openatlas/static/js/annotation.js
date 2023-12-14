@@ -1,6 +1,5 @@
 map = L.map('annotate', {
-    crs: L.CRS.Simple,
-    zoom: 0,
+    crs: L.CRS.Simple
 });
 
 let baseLayer;
@@ -14,7 +13,7 @@ $.getJSON(iiif_manifest, function (data) {
             continuousWorld: false,
             fitBounds: true,  // Set fitBounds to true for automatic fitting
             setMaxBounds: true,
-            tileSize: 256
+            tileSize: 128
         }
     ).addTo(map);
 
@@ -26,12 +25,13 @@ $.getJSON(iiif_manifest, function (data) {
     map.fitBounds(bounds);
     // Iterate through annotations and add them to the map
     $.getJSON(page.otherContent[0]['@id'], function(annoData) {
+        const scaleFactor = baseLayer.x / baseLayer._imageSizes[map.getZoom()].x;
         $.each(annoData.resources, function(i, value) {
             const b = /xywh=(.*)/.exec(value.on.selector.value)[1].split(',');
-            const minPoint = L.point(parseInt(b[0]), parseInt(b[1]));
-            const maxPoint = L.point(parseInt(b[0]) + parseInt(b[2]), parseInt(b[1]) + parseInt(b[3]));
-            const min = map.unproject(minPoint, 5);
-            const max = map.unproject(maxPoint, 5);
+            const minPoint = L.point(parseInt(b[0]) / scaleFactor, parseInt(b[1]) / scaleFactor);
+            const maxPoint = L.point((parseInt(b[0]) + parseInt(b[2])) / scaleFactor, (parseInt(b[1]) + parseInt(b[3])) / scaleFactor);
+            const min = map.unproject(minPoint, map.getZoom());
+            const max = map.unproject(maxPoint, map.getZoom());
             L.rectangle(L.latLngBounds(min, max)).bindPopup(value.resource[0].chars).addTo(map);
         });
     });
@@ -62,29 +62,30 @@ map.on('draw:created', function (event) {
     clearDrawnGeometries();
     drawnItems.addLayer(event.layer);
     drawnGeometries.push(event.layer);
-
     // Update the input field with the coordinates
-    updateCoordinatesInput();
+    updateCoordinatesInput(event);
 });
 
 // Event handler for when a geometry is edited
 map.on('draw:edited', function (event) {
     // Update the input field with the coordinates after editing
-    updateCoordinatesInput();
+    updateCoordinatesInput(event);
 });
 
 // Function to update the #coordinate input field with the latest pixel coordinates
-function updateCoordinatesInput() {
+function updateCoordinatesInput(event) {
+    const mapinstance = event.target;
+    const scaleFactor = baseLayer.x / baseLayer._imageSizes[mapinstance.getZoom()].x;
     if (drawnItems.getLayers().length > 0) {
         let coordinates = drawnItems.getLayers()[0].getLatLngs()[0].map(latlng => {
             // Convert each LatLng to pixel coordinates
-            const point = map.project(latlng, 5);
+            const point = mapinstance.project(latlng, mapinstance.getZoom());
             return [
-                point.x,
-                point.y
+                point.x * scaleFactor,
+                point.y * scaleFactor
             ];
         });
-        console.log("converted" ,coordinates, "bounds", map.getPixelOrigin());
+        console.log("converted" ,coordinates, "bounds", drawnItems.getBounds(), mapinstance.getZoom());
         $('#coordinate').val(coordinates);
     } else {
         $('#coordinate').val('');
