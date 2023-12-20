@@ -1,6 +1,6 @@
 import collections
 from pathlib import Path
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 import numpy
 import pandas as pd
@@ -27,7 +27,7 @@ from openatlas.models.imports import Import, is_float
 
 class ProjectForm(FlaskForm):
     project_id: Optional[int] = None
-    name = StringField(
+    name: Any = StringField(
         _('name'),
         [validators.InputRequired()],
         render_kw={'autofocus': True})
@@ -171,12 +171,12 @@ def import_project_delete(id_: int) -> Response:
 
 
 class ImportForm(FlaskForm):
-    file = FileField(_('file'), [validators.InputRequired()])
+    file: Any = FileField(_('file'), [validators.InputRequired()])
     preview = BooleanField(_('preview only'), default=True)
     duplicate = BooleanField(_('check for duplicates'), default=True)
     save = SubmitField(_('import'))
 
-    def validate(self, extra_validators: validators=None) -> bool:
+    def validate(self, extra_validators: validators = None) -> bool:
         valid = FlaskForm.validate(self)
         if Path(str(request.files['file'].filename)) .suffix.lower() != '.csv':
             self.file.errors.append(_('file type not allowed'))

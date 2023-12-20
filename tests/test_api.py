@@ -75,7 +75,7 @@ class Api(ApiTestCase):
                         file_without_file = entity
 
             # ---Content Endpoints---
-            rv = self.app.get(url_for('api_04.class_mapping')).get_json()
+            rv: Any = self.app.get(url_for('api_04.class_mapping')).get_json()
             assert self.get_class_mapping(rv)
 
             rv = self.app.get(url_for('api_04.backend_details')).get_json()
@@ -429,8 +429,8 @@ class Api(ApiTestCase):
                 assert found
 
             for rv in [
-                self.app.get(url_for('api_04.type_tree')),
-                self.app.get(url_for('api_04.type_tree', download=True))]:
+                    self.app.get(url_for('api_04.type_tree')),
+                    self.app.get(url_for('api_04.type_tree', download=True))]:
                 assert bool(rv.get_json()['typeTree'])
             rv = self.app.get(url_for('api_04.type_tree', count=True))
             assert rv.get_json() > 0

@@ -10,14 +10,14 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.api.import_scripts.vocabs import (
-    fetch_top_concept_details, fetch_vocabulary_details, get_vocabularies,
-    import_vocabs_data, fetch_top_group_details)
+    fetch_top_concept_details, fetch_top_group_details,
+    fetch_vocabulary_details, get_vocabularies, import_vocabs_data)
 from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, display_form, display_info, is_authorized, link, required_group,
-    manual)
+    button, display_form, display_info, is_authorized, link, manual,
+    required_group)
 from openatlas.forms.field import SubmitField
 from openatlas.forms.form import get_vocabs_form
 from openatlas.models.settings import Settings

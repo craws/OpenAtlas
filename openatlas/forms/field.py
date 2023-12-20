@@ -152,7 +152,7 @@ class TableMultiSelect(HiddenInput):
     def __call__(
             self,
             field: TableMultiField,
-            **kwargs: Any) -> TableMultiSelect:
+            **kwargs: Any) -> str:
         data = field.data or []
         data = ast.literal_eval(data) if isinstance(data, str) else data
         class_ = field.id \
@@ -200,9 +200,9 @@ class ValueFloatField(FloatField):
 
 class TableSelect(HiddenInput):
 
-    def __call__(self, field: TableField, **kwargs: Any) -> TableSelect:
+    def __call__(self, field: TableField, **kwargs: Any) -> str:
 
-        def get_form(class_name_: str) -> FlaskForm:
+        def get_form(class_name_: str) -> Any:
             class SimpleEntityForm(FlaskForm):
                 name_dynamic = StringField(_('name'))
 
@@ -257,7 +257,7 @@ class TableField(HiddenField):
 
 
 class TreeMultiSelect(HiddenInput):
-    def __call__(self, field: TreeField, **kwargs: Any) -> TreeMultiSelect:
+    def __call__(self, field: TreeField, **kwargs: Any) -> str:
         data = field.data or []
         data = ast.literal_eval(data) if isinstance(data, str) else data
         return Markup(render_template(
@@ -286,7 +286,7 @@ class TreeMultiField(HiddenField):
 
 class TreeSelect(HiddenInput):
 
-    def __call__(self, field: TreeField, **kwargs: Any) -> TreeSelect:
+    def __call__(self, field: TreeField, **kwargs: Any) -> str:
         selection = ''
         selected_ids = []
         if field.data:
@@ -328,7 +328,7 @@ class DragNDrop(FileInput):
             self,
             field: RemovableListField,
             *args: Any,
-            **kwargs: Any) -> RemovableListInput:
+            **kwargs: Any) -> str:
         accept = ', '.join([
             f'.{filename}' for filename
             in g.settings['file_upload_allowed_extension']])

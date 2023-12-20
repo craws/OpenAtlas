@@ -1,11 +1,11 @@
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (
-    BooleanField, IntegerField, SelectField, StringField, FieldList)
+    BooleanField, FieldList, IntegerField, SelectField, StringField)
 from wtforms.validators import Email, InputRequired, Optional, URL
 
 from openatlas import app
-from openatlas.forms.field import SubmitField, RemovableListField
+from openatlas.forms.field import RemovableListField, SubmitField
 
 
 class ContentForm(FlaskForm):
@@ -65,7 +65,7 @@ class IiifForm(FlaskForm):
     iiif_url = StringField(_('URL'), description=_('tooltip IIIF URL'))
     iiif_version = SelectField(
         _('version'),
-        choices=((2, 2),),
+        choices=((2, '2'),),
         coerce=int,
         description=_('tooltip IIIF version'))
     iiif_conversion = SelectField(

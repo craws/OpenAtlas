@@ -6,6 +6,7 @@ from openatlas.api.resources.error import (
 
 from openatlas import app
 
+
 def iterate_validation(parameters: list[dict[str, Any]]) -> list[list[bool]]:
     return [[call_validation(search_key, values) for values in value_list]
             for parameter in parameters

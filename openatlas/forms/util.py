@@ -89,7 +89,7 @@ def set_form_settings(form: Any, profile: bool = False) -> None:
         field.data = g.settings[field.name]
 
 
-def was_modified(form: FlaskForm, entity: Entity) -> bool:
+def was_modified(form: Any, entity: Entity) -> bool:
     if not entity.modified or not form.opened.data:
         return False
     if entity.modified < datetime.fromtimestamp(

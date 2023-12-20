@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional, TYPE_CHECKING, Union
+from typing import Any, Optional, TYPE_CHECKING, Union
 
 from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
@@ -39,7 +39,7 @@ def get_manager(
     return manager_instance
 
 
-def get_add_reference_form(class_: str) -> FlaskForm:
+def get_add_reference_form(class_: str) -> Any:
     class Form(FlaskForm):
         pass
 
@@ -73,7 +73,7 @@ def get_table_form(
         table=table.display(classes[0]))
 
 
-def get_move_form(type_: Type) -> FlaskForm:
+def get_move_form(type_: Type) -> Any:
     class Form(FlaskForm):
         is_type_form = HiddenField()
         checkbox_values = HiddenField()
@@ -106,7 +106,7 @@ def get_move_form(type_: Type) -> FlaskForm:
     return form
 
 
-def get_vocabs_form() -> FlaskForm:  # pragma: no cover
+def get_vocabs_form() -> Any:  # pragma: no cover
     class Form(FlaskForm):
         base_url = StringField(
             _('base URL'),
