@@ -36,11 +36,11 @@ def ajax_add_type() -> str:
         entity.link(link[cidoc_code], g.types[int(request.form['superType'])])
         g.logger.log_user(entity.id, 'insert')
         Transaction.commit()
-        return str(entity.id)
     except Exception as _e:  # pragma: no cover
         Transaction.rollback()
         g.logger.log('error', 'ajax', _e)
         abort(400)
+    return str(entity.id)
 
 
 @app.route('/ajax/get_type_tree/<int:root_id>')
@@ -69,11 +69,11 @@ def ajax_create_entity() -> str:
             entity.link('P2', g.types[int(request.form['standardType'])])
         g.logger.log_user(entity.id, 'insert')
         Transaction.commit()
-        return str(entity.id)
     except Exception as _e:  # pragma: no cover
         Transaction.rollback()
         g.logger.log('error', 'ajax', _e)
         abort(400)
+    return str(entity.id)
 
 
 @app.route('/ajax/get_entity_table/<string:content_domain>', methods=['POST'])
