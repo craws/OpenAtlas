@@ -337,8 +337,7 @@ class Entity:
             """
             SELECT e.id
             FROM model.entity e
-            JOIN model.link l ON e.id = l.range_id
-                AND l.property_code = 'P46'
+            JOIN model.link l ON e.id = l.range_id AND l.property_code = 'P46'
             WHERE e.openatlas_class_name IN %(classes)s;
             """,
             {'classes': tuple(classes)})

@@ -250,5 +250,6 @@ class Link:
             WHERE property_code = 'P2' AND range_id IN %(ids)s
             GROUP BY domain_id
             HAVING COUNT(*) > 1;
-            """, {'ids': tuple(ids)})
+            """,
+            {'ids': tuple(ids)})
         return [row['domain_id'] for row in g.cursor.fetchall()]

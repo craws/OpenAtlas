@@ -1,4 +1,4 @@
-# Used for automatic database upgrades and database version checks
+# Used for automatic database upgrades and version checks
 DATABASE_VERSIONS = [
     '8.0.0',
     '7.17.0',
