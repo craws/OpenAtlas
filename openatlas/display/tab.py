@@ -21,7 +21,7 @@ _('invalid involvement dates')
 _('unlinked')
 _('missing files')
 _('orphaned files')
-_('orphaned IIIF files')
+_('orphaned iiif files')
 _('orphaned subunits')
 _('circular dependencies')
 
