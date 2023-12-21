@@ -28,15 +28,15 @@ Please consult the install.md about installation.
 **Removal of frontend content management**
 
 Because the new presentation site functionality doesn't require content
-management in the backend anymore this functionality was removed.
-In case older versions of the frontend are still in use they would have to be
+management in the backend anymore, this functionality was removed.
+In case older frontend versions are still in use they would have to be
 switched to the new one (OpenAtlas Discovery) or manually adapted.
 
 **New stable API version 0.4**
 
-The current stable API version is **0.4**. Support for the older API versions
+The current stable API version is **0.4**. Support for API versions
 **0.2** and **0.3** is dropped with this release including the frontend
-content querries mentioned above.
+content queries mentioned above.
 
 ### 7.16.x to 7.17.0
 7.17.0.sql is needed but will be taken care of by the database upgrade script.
