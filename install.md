@@ -10,9 +10,9 @@ Another (experimental) way to install it would be via
 [Docker](https://www.docker.com/).
 For more information take a look at the end of this document.
 
-It also may work on other Linux distributions or even on non Linux systems, and
-we provided a [requirements.txt](requirements.txt). But it is experimental too
-and would need substantially more knowledge about server administration.
+It may also work on other Linux distributions or even non Linux systems with
+using the [requirements.txt](requirements.txt), but substantially more
+knowledge about server administration would be needed.
 
 Feel free to also consult our own
 [documentation](https://redmine.openatlas.eu/projects/uni/wiki/Debian_server_installation)
