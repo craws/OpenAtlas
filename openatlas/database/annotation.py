@@ -9,15 +9,15 @@ class AnnotationImage:
     def get_by_id(id_: int) -> Optional[dict[str, Any]]:
         g.cursor.execute(
             """
-            SELECT 
-                image_id, 
-                entity_id, 
-                coordinates, 
-                user_id, 
+            SELECT
+                image_id,
+                entity_id,
+                coordinates,
+                user_id,
                 annotation,
                 created
             FROM web.annotation_image
-            WHERE id =  %(id)s;  
+            WHERE id =  %(id)s;
             """,
             {'id': id_})
         return dict(g.cursor.fetchone()) if g.cursor.rowcount else None
@@ -26,16 +26,16 @@ class AnnotationImage:
     def get_by_file(image_id: int) -> list[dict[str, Any]]:
         g.cursor.execute(
             """
-            SELECT 
+            SELECT
                 id,
-                image_id, 
-                entity_id, 
-                coordinates, 
-                user_id, 
+                image_id,
+                entity_id,
+                coordinates,
+                user_id,
                 annotation,
                 created
             FROM web.annotation_image
-            WHERE image_id =  %(image_id)s; 
+            WHERE image_id =  %(image_id)s;
             """,
             {'image_id': image_id})
         return [dict(row) for row in g.cursor.fetchall()]
@@ -45,10 +45,10 @@ class AnnotationImage:
         g.cursor.execute(
             """
             INSERT INTO web.annotation_image (
-                image_id, 
-                entity_id, 
-                coordinates, 
-                user_id, 
+                image_id,
+                entity_id,
+                coordinates,
+                user_id,
                 annotation
             ) VALUES (
                 %(image_id)s,

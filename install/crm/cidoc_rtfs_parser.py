@@ -261,7 +261,6 @@ def import_cidoc() -> None:
 
     # Classes
     for code, class_ in classes.items():
-        print(code)
         sql = """
             INSERT INTO model.cidoc_class (code, name, comment)
             VALUES (%(code)s, %(name)s, %(comment)s);"""

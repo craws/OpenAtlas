@@ -1,11 +1,9 @@
-import math
 import mimetypes
 from typing import Any
 
 import requests
-from flask import jsonify, Response, url_for, g
+from flask import Response, g, jsonify, url_for
 from flask_restful import Resource
-from shapely.geometry import Polygon
 
 from openatlas.api.resources.model_mapper import get_entity_by_id
 from openatlas.api.resources.util import get_license_name
@@ -173,26 +171,23 @@ def calculate_fragment_selector_coordinates(coordinates):
     coordinates_list = list(map(float, coordinates_str.split(',')))
 
     # Extracting x, y, width, and height from the coordinates
-    x_min, y_min, x_max, y_max = min(coordinates_list[::2]), min(coordinates_list[1::2]), max(coordinates_list[::2]), max(coordinates_list[1::2])
+    x_min, y_min,x_max, y_max = (
+        min(coordinates_list[::2]),
+        min(coordinates_list[1::2]),
+        max(coordinates_list[::2]),
+        max(coordinates_list[1::2]))
     x = x_min
     y = y_min
     width = x_max - x_min
     height = y_max - y_min
-
     return x, y, width, height
 
-def generate_selector(annotation):
-    print(annotation)
-    coordinates = [
-        float(coord) for coord in annotation['coordinates'].split(',')]
 
+def generate_selector(annotation):
     x, y, width, height = calculate_fragment_selector_coordinates(annotation)
-    print(x, y, width, height)
-    output = {
+    return {
         "@type": "oa:FragmentSelector",
         "value": f"xywh={x},{y},{width},{height}"}
-
-    return output
 
 
 class IIIFManifest(Resource):

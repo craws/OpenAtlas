@@ -1,19 +1,20 @@
 from flask_restful import Api
 
-from openatlas.api.endpoints.iiif import \
-    (IIIFManifest, IIIFImageV2, IIIFCanvasV2, IIIFSequenceV2, IIIFAnnotationV2,
-     IIIFAnnotationListV2)
-from openatlas.api.endpoints.content import ClassMapping, \
-    SystemClassCount, GetBackendDetails
-from openatlas.api.endpoints.special import GetGeometricEntities, \
-    ExportDatabase, GetSubunits
-from openatlas.api.endpoints.display_image import \
-    (DisplayImage, LicensedFileOverview)
-from openatlas.api.endpoints.entities import GetByCidocClass, \
-    GetBySystemClass, GetByViewClass, GetEntitiesLinkedToEntity, GetEntity, \
-    GetLatest, GetQuery, GetTypeEntities, GetTypeEntitiesAll
-from openatlas.api.endpoints.type import \
-    (GetTypeByViewClass, GetTypeOverview, GetTypeTree)
+from openatlas.api.endpoints.content import (
+    ClassMapping, GetBackendDetails, SystemClassCount)
+from openatlas.api.endpoints.display_image import (
+    DisplayImage, LicensedFileOverview)
+from openatlas.api.endpoints.entities import (
+    GetByCidocClass, GetBySystemClass, GetByViewClass,
+    GetEntitiesLinkedToEntity, GetEntity, GetLatest, GetQuery, GetTypeEntities,
+    GetTypeEntitiesAll)
+from openatlas.api.endpoints.iiif import (
+    IIIFAnnotationListV2, IIIFAnnotationV2, IIIFCanvasV2, IIIFImageV2,
+    IIIFManifest, IIIFSequenceV2)
+from openatlas.api.endpoints.special import (
+    ExportDatabase, GetGeometricEntities, GetSubunits)
+from openatlas.api.endpoints.type import (
+    GetTypeByViewClass, GetTypeOverview, GetTypeTree)
 
 
 def entity_routes(api: Api) -> None:
