@@ -1,0 +1,19 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='css/map.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='node_modules/leaflet/dist/leaflet.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='node_modules/leaflet-draw/dist/leaflet.draw.css') }}">
+
+<div class="col">
+<!--  {{ annotation_list }}-->
+  <div id="annotate" class="map" style="height: 600px;"></div>
+</div>
+
+<script>
+    const iiif_manifest = "{{ url_for('api.iiif_manifest', id_=entity.id, version=2, _external=True) }}";
+    const annotations = {{ annotation_list | safe }};
+</script>
+
+<script src="{{ url_for('static', filename='node_modules/leaflet/dist/leaflet.js') }}"></script>
+<script src="{{ url_for('static', filename='node_modules/leaflet-draw/dist/leaflet.draw.js') }}"></script>
+<script src="{{ url_for('static', filename='node_modules/leaflet-iiif/leaflet-iiif.js') }}"></script>
+<script src="{{ url_for('static', filename='js/annotation.js') }}"></script>
+

@@ -1,18 +1,19 @@
 from flask_restful import Api
 
-from openatlas.api.endpoints.iiif import (
-    IIIFManifest, IIIFImageV2, IIIFCanvasV2, IIIFSequenceV2)
-from openatlas.api.endpoints.content import (
-    ClassMapping, SystemClassCount, GetBackendDetails)
-from openatlas.api.endpoints.special import (
-    GetGeometricEntities, ExportDatabase, GetSubunits)
-from openatlas.api.endpoints.display_image import (
-    DisplayImage, LicensedFileOverview)
-from openatlas.api.endpoints.entities import (
-    GetByCidocClass, GetBySystemClass, GetByViewClass, GetTypeEntitiesAll,
-    GetEntitiesLinkedToEntity, GetEntity, GetLatest, GetQuery, GetTypeEntities)
-from openatlas.api.endpoints.type import (
-    GetTypeByViewClass, GetTypeOverview, GetTypeTree)
+from openatlas.api.endpoints.iiif import \
+    (IIIFManifest, IIIFImageV2, IIIFCanvasV2, IIIFSequenceV2, IIIFAnnotationV2,
+     IIIFAnnotationListV2)
+from openatlas.api.endpoints.content import ClassMapping, \
+    SystemClassCount, GetBackendDetails
+from openatlas.api.endpoints.special import GetGeometricEntities, \
+    ExportDatabase, GetSubunits
+from openatlas.api.endpoints.display_image import \
+    (DisplayImage, LicensedFileOverview)
+from openatlas.api.endpoints.entities import GetByCidocClass, \
+    GetBySystemClass, GetByViewClass, GetEntitiesLinkedToEntity, GetEntity, \
+    GetLatest, GetQuery, GetTypeEntities, GetTypeEntitiesAll
+from openatlas.api.endpoints.type import \
+    (GetTypeByViewClass, GetTypeOverview, GetTypeTree)
 
 
 def entity_routes(api: Api) -> None:
@@ -113,6 +114,14 @@ def display_routes(api: Api) -> None:
         IIIFManifest,
         '/iiif_manifest/<int:version>/<int:id_>',
         endpoint='iiif_manifest')
+    api.add_resource(
+        IIIFAnnotationListV2,
+        '/iiif_annotation_list/<int:id_>.json',
+        endpoint='iiif_annotation_list')
+    api.add_resource(
+        IIIFAnnotationV2,
+        '/iiif_annotation/<int:id_>/<int:annotation_id>.json',
+        endpoint='iiif_annotation')
     api.add_resource(
         IIIFImageV2,
         '/iiif_image/<int:id_>.json',

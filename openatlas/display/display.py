@@ -73,6 +73,9 @@ class FileDisplay(BaseDisplay):
             self.buttons.append(button(
                 _('download'),
                 url_for('download_file', filename=path.name)))
+            self.buttons.append(button(
+                _('annotate'),
+                url_for('annotate_image', id_=self.entity.id)))
             return
         self.buttons.append(
             '<span class="error">' + uc_first(_("missing file")) + '</span>')
