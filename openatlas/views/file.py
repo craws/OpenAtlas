@@ -1,22 +1,23 @@
 import json
 from typing import Any, Union
 
-from flask import g, render_template, request, send_from_directory, url_for, \
-    flash
+from flask import (
+    flash, g, render_template, request, send_from_directory, url_for)
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
+from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from werkzeug.exceptions import abort
 from wtforms import StringField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
-from openatlas.display.util import required_group, convert_image_to_iiif, \
-    get_file_path, is_authorized, button, format_date
+from openatlas.display.util import (
+    button, convert_image_to_iiif, format_date, get_file_path, is_authorized,
+    required_group)
 from openatlas.forms.field import SubmitField
 from openatlas.forms.form import get_table_form
 from openatlas.models.annotation import AnnotationImage
@@ -80,14 +81,14 @@ def file_add(id_: int, view: str) -> Union[str, Response]:
             f"{_('link')} {_(view)}"])
 
 
-@app.route('/file/convert_iiif/<int:id_>', methods=['GET'])
+@app.route('/file/convert_iiif/<int:id_>')
 @required_group('contributor')
 def make_iiif_available(id_: int) -> Response:
     convert_image_to_iiif(id_)
     return redirect(url_for('view', id_=id_))
 
 
-@app.route('/view_iiif/<int:id_>', methods=['GET'])
+@app.route('/view_iiif/<int:id_>')
 @required_group('contributor')
 def view_iiif(id_: int) -> str:
     return render_template(
@@ -100,16 +101,14 @@ def view_iiif(id_: int) -> str:
 
 
 class AnnotationForm(FlaskForm):
-    coordinate = StringField(
-        _('coordinates'),
-        validators=[InputRequired()])
+    coordinate = StringField(_('coordinates'), validators=[InputRequired()])
     annotation = TextAreaField(_('annotation'))
     save = SubmitField(_('save'))
 
 
 @app.route('/annotate_image/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
-def annotate_image(id_: int) -> str:
+def annotate_image(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_, types=True, aliases=True)
     if not get_file_path(entity.id):
         return abort(404)
@@ -158,9 +157,9 @@ def annotate_image(id_: int) -> str:
             _('annotate')])
 
 
-@app.route('/delete_annotation/<int:id_>', methods=['GET', 'POST'])
+@app.route('/delete_annotation/<int:id_>')
 @required_group('contributor')
-def delete_annotation(id_: int) -> str:
+def delete_annotation(id_: int) -> Response:
     annotation = AnnotationImage.get_by_id(id_)
     if current_user.group == 'contributor' \
             and annotation['user_id'] != current_user.id:

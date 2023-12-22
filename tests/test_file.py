@@ -145,8 +145,8 @@ class FileTest(TestBaseCase):
             rv = self.app.get(
                 url_for('api.licensed_file_overview', download=True))
             assert bool(len(rv.get_json().keys()) == 3)
-            rv = self.app.get(url_for(
-                'api.licensed_file_overview', file_id=file_id))
+            rv = self.app.get(
+                url_for('api.licensed_file_overview', file_id=file_id))
             assert bool(len(rv.get_json().keys()) == 1)
 
             rv = self.app.get(url_for('view_iiif', id_=file_id))
@@ -157,6 +157,22 @@ class FileTest(TestBaseCase):
 
             rv = self.app.get(url_for('view', id_=place.id))
             assert b'Logo' in rv.data
+
+            rv = self.app.get(url_for('annotate_image', id_=file_id))
+            assert b'coordinates' in rv.data
+
+            rv = self.app.post(
+                url_for('annotate_image', id_=file_id),
+                data={
+                    'coordinate': '1.5,1.6,1.4,9.6,8.6,9.6,8.6,1.6',
+                    'annotation': 'An interesting annotation'},
+                follow_redirects=True)
+            assert b'An interesting annotation' in rv.data
+
+            rv = self.app.get(
+                url_for('delete_annotation', id_=1),
+                follow_redirects=True)
+            assert b'Annotation deleted' in rv.data
 
             for file in files:
                 rv = self.app.get(
