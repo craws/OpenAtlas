@@ -228,7 +228,6 @@ class BaseManager:
                 for shape in ['point', 'line', 'polygon']}
         if 'annotation' in self.fields:
             self.data['annotation'] = getattr(self.form, 'annotation').data
-            print(self.data['annotation'])
 
     def insert_entity(self) -> None:
         self.entity = Entity.insert(self.class_.name, self.form.name.data)
