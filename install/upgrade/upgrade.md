@@ -20,7 +20,10 @@ then run the database upgrade script, then restart Apache:
 
 ### 7.17.x to 8.0.0
 This is a major upgrade which utilizes newer versions of underlying software.
-Please consult the install.md about installation.
+Please consult the install.md about installation. In case you are using a
+Debian system, feel free to use our own upgrade notes from the issue
+description: https://redmine.openatlas.eu/issues/2038, which is already
+tested.
 
 8.0.0.sql is needed but will be taken care of by the database upgrade script.
 
