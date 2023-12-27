@@ -37,9 +37,9 @@ switched to the new one (OpenAtlas Discovery) or manually adapted.
 
 **New stable API version 0.4**
 
-The current stable API version is **0.4**. Support for API versions
-**0.2** and **0.3** is dropped with this release including the frontend
-content queries mentioned above.
+The current stable API version is **0.4**. Support for API versions **0.3**
+is dropped with this release including the frontend content queries mentioned
+above.
 
 ### 7.16.x to 7.17.0
 7.17.0.sql is needed but will be taken care of by the database upgrade script.

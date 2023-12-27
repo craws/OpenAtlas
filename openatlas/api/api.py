@@ -20,13 +20,7 @@ app.config['SWAGGER'] = {
             "name": "Apache 2.0",
             "url": "https://www.apache.org/licenses/LICENSE-2.0.html"},
         "route": '/openapi.json',
-        "rule_filter": lambda rule: rule.endpoint.startswith('api_04')}, {
-        "endpoint": '03',
-        "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"},
-        "route": '/openapi.json',
-        "rule_filter": lambda rule: rule.endpoint.startswith('api_03')}],
+        "rule_filter": lambda rule: rule.endpoint.startswith('api_04')}],
     "specs_route": "/swagger/"}
 
 app.config['PROPAGATE_EXCEPTIONS'] = True
