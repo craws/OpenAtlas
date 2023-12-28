@@ -63,22 +63,22 @@ following a specific URL schema:
     Input without version number leads to the current stable version
     (`https://demo.openatlas.eu/api/entity/5117 <https://demo.openatlas.eu/api/entity/5117>`_).
     If another version of the API is to be used, the version number can be
-    specified (demo.openatlas.eu/api/**0.3**/entity/5117). A version overview
+    specified (demo.openatlas.eu/api/**0.4**/entity/5117). A version overview
     can be found under point Versioning_.
 **Endpoints**
     Specific data can be queried by attaching an endpoint
-    (demo.openatlas.eu/api/0.3/**entity**/5117). The information is provided
+    (demo.openatlas.eu/api/0.4/**entity**/5117). The information is provided
     in a human - and machine-readable form. Further information under
     Endpoints_.
 **Required path values**
     Must be included to create a valid URL. Different endpoints require
-    different values (demo.openatlas.eu/api/0.3/entity/**5117**. **5117** is
+    different values (demo.openatlas.eu/api/0.4/entity/**5117**. **5117** is
     an ID as required by the entity endpoint) - all required values are state
     in **{** **}** at the Endpoints_ definition.
 **Parameters**
     Used to structure additional information for a given URL. They are added
     to the end of an URL after the "?" symbol
-    (demo.openatlas.eu/api/0.3/entity/5117**?**download=true). All available
+    (demo.openatlas.eu/api/0.4/entity/5117**?**download=true). All available
     Parameters can be found under Parameters_. For more general information
     see this
     `article <https://www.botify.com/learn/basics/what-are-url-parameters#:~:text=URL%20parameters%20(also%20known%20as,by%20the%20'%26'%20symbol.>`_.
@@ -94,9 +94,9 @@ Versioning
      - unstable
      - unavailable
    * - `0.4 <https://demo.openatlas.eu/swagger/>`_
-     - :ref:`0.3<version_0_3>`
+     - None
      - 1.0
-     - :ref:`0.1<version_0_1>`, :ref:`0.2<version_0_2>`
+     - 0.3, 0.2, 0.1
 
 The OpenAtlas API follows the notion of
 `sequenced based versioning <https://en.wikipedia.org/wiki/Software_versioning#Sequence-based_identifiers>`_
@@ -122,19 +122,10 @@ The current version 0.4 endpoint descriptions are available at:
 * `Current OpenAPI specification <https://demo.openatlas.eu/swagger/>`_ at the OpenAtlas demo version
 * `Local OpenAPI specification </swagger>`_: this link is only available if called from a OpenAtlas installation
 
-**Former versions**
-
-.. toctree::
-   :maxdepth: 1
-
-   Version 0.3 (stable, deprecated) <api_version_03>
-   api_version_02
-   api_version_01
-
 The requested information is provided in Linked Places format
 `Linked Places format (LPF) <https://github.com/LinkedPasts/linked-places-format>`_. Alternatively,
 `GeoJSON <https://datatracker.ietf.org/doc/html/rfc7946>`_, `Linked Open Usable Data <https://linked.art/>`_
-or RDFs, derived from the `LPF <https://github.com/LinkedPasts/linked-places-format>`_ data, can be accessed.
+or RDFs, derived from the `Linked Open Usable Data <https://linked.art/>`_ data, can be accessed.
 
 Parameters
 ==========
@@ -153,12 +144,6 @@ For more general information on this topic see this
 * `Current OpenAPI parameters <https://demo.openatlas.eu/swagger/>`_ at the OpenAtlas demo version
 * `Local OpenAPI parameters </swagger>`_: this link is only available if called from a OpenAtlas installation
 
-**Former versions**
-
-.. toctree::
-   :maxdepth: 1
-
-   api_parameters_03
 
 Error handling
 ==============
