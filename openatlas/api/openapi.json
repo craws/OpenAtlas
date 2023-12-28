@@ -88,8 +88,7 @@
   ],
   "paths": {
     "/entity/{entityId}": {
-      "get":
-        {
+      "get": {
         "tags": [
           "Entity Endpoint"
         ],
@@ -978,21 +977,16 @@
         }
       }
     },
-    "/display/{filename}": {
+    "/display/{entityID}": {
       "get": {
         "tags": [
           "Image Endpoints"
         ],
-        "description": "Retrieves the image connected to the requested ID or filename, if it has a licence.",
+        "description": "Retrieves the image connected to the requested ID or entityID, if it has a licence.",
         "operationId": "DisplayImage",
         "parameters": [
           {
-            "in": "path",
-            "name": "filename",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/components/parameters/entityId"
           },
           {
             "in": "query",
@@ -1005,6 +999,52 @@
                 "table"
               ]
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
+    "/iiif_manifest/{version}/{entityId}": {
+      "get": {
+        "tags": [
+          "Image Endpoints"
+        ],
+        "description": "Retrieves the manifest of the IIIF image.",
+        "operationId": "IIIFManifest",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "enum": [
+                2
+              ]
+            }
+          },
+          {
+            "$ref": "#/components/parameters/entityId"
           }
         ],
         "responses": {
@@ -1258,58 +1298,57 @@
         "content": {
           "application/json": {
             "schema": {
-          "type": "object",
-          "properties": {
-            "entityName": {
-              "$ref": "#/components/schemas/searchCriteria"
-            },
-            "entityDescription": {
-              "$ref": "#/components/schemas/searchCriteria"
-            },
-            "entityAliases": {
-              "$ref": "#/components/schemas/searchCriteria"
-            },
-            "entityCidocClass": {
-              "$ref": "#/components/schemas/searchCriteria"
-            },
-            "entitySystemClass": {
-              "$ref": "#/components/schemas/searchCriteria"
-            },
-            "entityID": {
-              "$ref": "#/components/schemas/searchCriteria"
-            },
-            "typeID": {
-              "$ref": "#/components/schemas/searchCriteria"
-            },
-            "valueTypeID": {
-              "$ref": "#/components/schemas/searchCriteria"
-            },
-            "typeIDWithSubs": {
-              "$ref": "#/components/schemas/searchCriteria"
-            },
-            "typeName": {
-              "$ref": "#/components/schemas/searchCriteria"
-            },
-            "beginFrom": {
-              "$ref": "#/components/schemas/searchCriteria"
-            },
-            "beginTo": {
-              "$ref": "#/components/schemas/searchCriteria"
-            },
-            "endFrom": {
-              "$ref": "#/components/schemas/searchCriteria"
-            },
-            "endTo": {
-              "$ref": "#/components/schemas/searchCriteria"
-            },
-            "relationToID": {
-              "$ref": "#/components/schemas/searchCriteria"
+              "type": "object",
+              "properties": {
+                "entityName": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                },
+                "entityDescription": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                },
+                "entityAliases": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                },
+                "entityCidocClass": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                },
+                "entitySystemClass": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                },
+                "entityID": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                },
+                "typeID": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                },
+                "valueTypeID": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                },
+                "typeIDWithSubs": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                },
+                "typeName": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                },
+                "beginFrom": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                },
+                "beginTo": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                },
+                "endFrom": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                },
+                "endTo": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                },
+                "relationToID": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                }
+              }
             }
           }
         }
-          }
-        }
-
       },
       "limit": {
         "name": "limit",

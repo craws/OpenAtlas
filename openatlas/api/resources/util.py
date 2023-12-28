@@ -217,6 +217,10 @@ def get_location_id(links: list[Link]) -> int:
     return [l_.range.id for l_ in links if l_.property.code == 'P53'][0]
 
 
+def get_location_link(links: list[Link]) -> Link:
+    return [l_ for l_ in links if l_.property.code == 'P53'][0]
+
+
 def get_geoms_by_entity(
         location_id: int,
         centroid: Optional[bool] = False) -> dict[str, Any]:

@@ -29,7 +29,8 @@ high-quality, attributed digital objects online at scale. Once installed
 
   * **none** - no conversion
   * **deflate** - lossless but files size may be large
-  * **jpeg** - much smaller files size but not lossless
+  * **jpeg** - much smaller files size but not lossless, e.g. loss of
+    transparency
 
 In case you are running multiple OpenAtlas instances you should create a sub
 directory for every instance at **/var/www/iipsrv/** and also add these to
