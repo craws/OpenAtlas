@@ -122,7 +122,6 @@ class IIIFManifest(Resource):
                 "@value": entity.description,
                 "@language": "en"}],
             "license": get_license_name(entity),
-            "attribution": "By OpenAtlas",
             "logo": get_logo(),
             "sequences": [
                 IIIFSequenceV2.build_sequence(get_metadata(entity))],
