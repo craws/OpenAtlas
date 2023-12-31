@@ -13,7 +13,8 @@ from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    bookmark_toggle, format_date, link, required_group, send_mail, uc_first)
+    bookmark_toggle, button, format_date, link, required_group, send_mail,
+    uc_first)
 from openatlas.forms.field import SubmitField
 from openatlas.models.content import get_translation
 from openatlas.models.entity import Entity
@@ -34,7 +35,27 @@ def overview() -> str:
                         intro=get_translation('intro')))},
             crumbs=['overview'])
     tabs = {
-        'info': Tab('info'),
+        'info': Tab(
+            'info',
+            buttons=[
+                link(
+                    '<i class="fas fa-book"></i> ' + uc_first(_('manual')),
+                    "/static/manual/index.html",
+                    class_=app.config['CSS']['button']['primary'],
+                    external=True),
+                button(_('model'), url_for('model_index')),
+                button(
+                    _('reference systems'),
+                    url_for('index', view='reference_system')),
+                button(
+                    _('network visualization'),
+                    url_for('network', dimensions=0)),
+                link(
+                    _('frontend'),
+                    g.settings['frontend_website_url'],
+                    class_=app.config['CSS']['button']['primary'],
+                    external=True) if g.settings['frontend_website_url']
+                else '']),
         'bookmarks': Tab(
             'bookmarks',
             table=Table(['name', 'class', 'begin', 'end'])),
