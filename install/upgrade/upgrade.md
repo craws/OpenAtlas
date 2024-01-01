@@ -1,5 +1,5 @@
 ## INFO
-Beginning from 6.6.0 you can use the database update script which takes care
+From 6.6.0 on you can use the database update script which takes care
 of database changes even over multiple versions. A backup is made before
 changes happen. You still should read the upgrade notes about important
 information.
