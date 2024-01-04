@@ -748,7 +748,7 @@ def admin_newsletter() -> Union[str, Response]:
                 'class': 'w-100',
                 'rows': '8',
                 'placeholder': uc_first(_('content'))})
-        save = SubmitField(_('send'))
+        save = SubmitField(uc_first(_('send')))
 
     form = NewsLetterForm()
     if form.validate_on_submit():
