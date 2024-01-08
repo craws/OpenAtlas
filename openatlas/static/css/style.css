@@ -95,7 +95,7 @@ form ul, form ol, form li {
   }
 }
 
-.rotate-180{
+.rotate-180 {
   rotate: 180deg;
 }
 
@@ -103,23 +103,23 @@ form ul, form ol, form li {
   background-color: #e9ecef !important
 }
 
-.no-label label{
+.no-label label {
   display:none
 }
 
-.input-height-sm{
+.input-height-sm {
   min-height: calc(1.5em + .5rem + 2px);
 }
 
-.width-full{
+.width-full {
   width:100%;
 }
 
-.value-type-switcher[show]{
+.value-type-switcher[show] {
   rotate:90deg;
 }
 
-.value-type-switcher{
+.value-type-switcher {
   transition:all ease-in 100ms;
 }
 
