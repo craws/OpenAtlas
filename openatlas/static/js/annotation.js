@@ -47,9 +47,7 @@ let drawControl = new L.Control.Draw({
         circle: false,
         circlemarker: false,
         marker: false,
-        polygon: {
-            allowIntersection: false
-        }
+        polygon: false
     },
     edit: {
         featureGroup: drawnItems
