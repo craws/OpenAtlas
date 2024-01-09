@@ -18,6 +18,14 @@ then run the database upgrade script, then restart Apache:
     sudo python3 install/upgrade/database_upgrade.py
     sudo service apache2 restart
 
+### 8.0.0 to 8.1.0
+8.1.0.sql is needed but will be taken care of by the database upgrade script.
+
+New node packages are needed:
+
+    cd openatlas/static
+    npm install
+
 ### 7.17.x to 8.0.0
 This is a major upgrade which utilizes newer versions of underlying software.
 Please consult the install.md about installation. In case you are using a
