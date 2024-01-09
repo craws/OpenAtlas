@@ -9,7 +9,8 @@ from flask_wtf import FlaskForm
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import StringField, TextAreaField
+from wtforms import TextAreaField
+from wtforms.fields.simple import HiddenField
 from wtforms.validators import InputRequired
 
 from openatlas import app
@@ -101,7 +102,7 @@ def view_iiif(id_: int) -> str:
 
 
 class AnnotationForm(FlaskForm):
-    coordinate = StringField(_('coordinates'), validators=[InputRequired()])
+    coordinate = HiddenField(_('coordinates'), validators=[InputRequired()])
     annotation = TextAreaField(_('annotation'))
     save = SubmitField(_('save'))
 
@@ -127,14 +128,12 @@ def annotate_image(id_: int) -> Union[str, Response]:
             rows.append([
                 format_date(item['created']),
                 item['annotation'],
-                item['coordinates'],
                 delete])
         table = Table(
-            ['date', 'annotation', 'coordinates', ''],
+            ['date', 'annotation', ''],
             rows=rows,
             order=[[0, 'desc']])
     if form.validate_on_submit():
-        # Todo: validate input
         AnnotationImage.insert_annotation_image(
             image_id=id_,
             coordinates=form.coordinate.data,
