@@ -19,7 +19,7 @@ from openatlas.display.table import Table
 from openatlas.display.util import (
     button, convert_image_to_iiif, format_date, get_file_path, is_authorized,
     required_group)
-from openatlas.forms.field import SubmitField
+from openatlas.forms.field import SubmitField, TableField
 from openatlas.forms.form import get_table_form
 from openatlas.models.annotation import AnnotationImage
 from openatlas.models.entity import Entity
@@ -104,6 +104,7 @@ def view_iiif(id_: int) -> str:
 class AnnotationForm(FlaskForm):
     coordinate = HiddenField(_('coordinates'), validators=[InputRequired()])
     annotation = TextAreaField(_('annotation'))
+    annotated_entity = TableField(_('entity'))
     save = SubmitField(_('save'))
 
 
@@ -115,6 +116,14 @@ def annotate_image(id_: int) -> Union[str, Response]:
         return abort(404)
     table = None
     form = AnnotationForm()
+    form.annotated_entity.filter_ids = [entity.id]
+    if form.validate_on_submit():
+        AnnotationImage.insert_annotation_image(
+            image_id=id_,
+            coordinates=form.coordinate.data,
+            entity_id=form.annotated_entity.data,
+            annotation=form.annotation.data)
+        return redirect(url_for('annotate_image', id_=entity.id))
     if annotations := AnnotationImage.get_by_file(entity.id):
         rows = []
         for item in annotations:
@@ -133,12 +142,6 @@ def annotate_image(id_: int) -> Union[str, Response]:
             ['date', 'annotation', ''],
             rows=rows,
             order=[[0, 'desc']])
-    if form.validate_on_submit():
-        AnnotationImage.insert_annotation_image(
-            image_id=id_,
-            coordinates=form.coordinate.data,
-            annotation=form.annotation.data)
-        return redirect(url_for('annotate_image', id_=entity.id))
     return render_template(
         'tabs.html',
         tabs={'annotation': Tab(

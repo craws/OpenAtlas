@@ -18,11 +18,12 @@ class AnnotationImage:
     def insert_annotation_image(
             image_id: int,
             coordinates: str,
+            entity_id: Optional[int] = None,
             annotation: Optional[str] = None) -> None:
         Db.insert({
             'image_id': image_id,
             'user_id': current_user.id,
-            'entity_id': None,
+            'entity_id': entity_id,
             'coordinates': coordinates,
             'annotation': annotation})
 
