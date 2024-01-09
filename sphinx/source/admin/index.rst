@@ -11,6 +11,7 @@ Admin
    map
    iiif
    content
+   frontend
    data_integrity_checks
    import
    export

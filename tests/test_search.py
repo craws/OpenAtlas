@@ -9,7 +9,7 @@ class SearchTest(TestBaseCase):
     def test_search(self) -> None:
         with app.app_context():
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 person = insert('person', 'Waldo')
                 person.update({'attributes': {'begin_to': '2018-01-01'}})
                 person.link('P1', insert('appellation', 'Waldo alias'))

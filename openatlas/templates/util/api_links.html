@@ -27,6 +27,6 @@
   </button>
   <ul class="dropdown-menu p-2">
     <li>{{ "CSV"|link(url_for('api.entity', id_=entity.id, export='csv'))|safe }}</li>
-    <li>  {{ "CSV Network Analysis"|link(url_for('api_03.entity', id_=entity.id, export='csvNetwork'))|safe }}</li>
+    <li>  {{ "CSV Network Analysis"|link(url_for('api.entity', id_=entity.id, export='csvNetwork'))|safe }}</li>
   </ul>
 </div>

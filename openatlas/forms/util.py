@@ -89,7 +89,7 @@ def set_form_settings(form: Any, profile: bool = False) -> None:
         field.data = g.settings[field.name]
 
 
-def was_modified(form: FlaskForm, entity: Entity) -> bool:
+def was_modified(form: Any, entity: Entity) -> bool:
     if not entity.modified or not form.opened.data:
         return False
     if entity.modified < datetime.fromtimestamp(
@@ -169,9 +169,9 @@ def inject_template_functions() -> dict[str, Union[str, GlobalSearchForm]]:
                     'display_logo',
                     filename=f"{g.settings['logo_file_id']}{path.suffix}")
         return str(Path('/static') / 'images' / 'layout' / 'logo.png')
-    return dict(
-        get_logo=get_logo(),
-        search_form=GlobalSearchForm(prefix='global'))
+    return {
+        'get_logo': get_logo(),
+        'search_form': GlobalSearchForm(prefix='global')}
 
 
 def check_if_entity_has_time(item: Union[Entity, Link]) -> bool:

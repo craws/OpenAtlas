@@ -198,7 +198,7 @@ def check_update_access(entity: Entity) -> None:
         abort(403)
 
 
-def insert_files(manager: BaseManager) -> Union[str, Response]:
+def insert_files(manager: BaseManager) -> str:
     filenames = []
     try:
         Transaction.begin()
@@ -235,14 +235,14 @@ def insert_files(manager: BaseManager) -> Union[str, Response]:
     return url
 
 
-def save(manager: BaseManager) -> Union[str, Response]:
+def save(manager: BaseManager) -> str:
     Transaction.begin()
     action = 'update' if manager.entity else 'insert'
     try:
         if not manager.entity or manager.copy:
             manager.insert_entity()
         manager.process_form()
-        manager.update_entity(new=(action == 'insert'))
+        manager.update_entity(new=action == 'insert')
         g.logger.log_user(
             manager.entity.id,
             'insert' if manager.copy else action)

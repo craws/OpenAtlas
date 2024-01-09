@@ -1,6 +1,7 @@
 from typing import Any
 
 from flask import g, url_for
+from flask_login import current_user
 
 from openatlas import app
 from tests.base import TestBaseCase, insert
@@ -17,7 +18,9 @@ class UserTests(TestBaseCase):
                 'password': 'you_never_guess_this',
                 'password2': 'you_never_guess_this',
                 'group': 'admin',
-                'name': 'Ripley Weaver'}
+                'name': 'Ripley Weaver',
+                'real_name': '',
+                'description': ''}
             rv: Any = self.app.post(url_for('user_insert'), data=data)
             user_id = rv.location.split('/')[-1]
 
@@ -35,7 +38,9 @@ class UserTests(TestBaseCase):
                     'password2': 'you_never_guess_this',
                     'group': 'admin',
                     'name': 'Newt',
-                    'continue_': 'yes'},
+                    'continue_': 'yes',
+                    'real_name': '',
+                    'description': ''},
                 follow_redirects=True)
             assert b'Newt' not in rv.data
 
@@ -78,7 +83,7 @@ class UserTests(TestBaseCase):
             assert b'403 - Forbidden' in rv.data
 
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 person = insert('person', 'Hugo')
                 insert('activity', 'Event Horizon').link('P11', person)
 
@@ -86,6 +91,9 @@ class UserTests(TestBaseCase):
                 url_for('ajax_bookmark'),
                 data={'entity_id': person.id})
             assert b'Remove bookmark' in rv.data
+
+            with app.test_request_context():
+                current_user.bookmarks = [person.id]
 
             rv = self.app.get('/')
             assert b'Hugo' in rv.data
@@ -99,7 +107,9 @@ class UserTests(TestBaseCase):
             rv = self.app.get(url_for('user_insert'), follow_redirects=True)
             assert b'Forgot your password?' not in rv.data
 
-            self.login('Editor', logout=False)
+            self.app.post(
+                url_for('login'),
+                data={'username': 'Editor', 'password': 'test'})
             rv = self.app.get(url_for('user_insert'))
             assert b'403 - Forbidden' in rv.data
 
@@ -109,14 +119,20 @@ class UserTests(TestBaseCase):
             rv = self.app.get(url_for('delete', id_=g.wikidata.id))
             assert b'403 - Forbidden' in rv.data
 
-            self.login('Manager')
+            self.app.get(url_for('logout'))
+            self.app.post(
+                url_for('login'),
+                data={'username': 'Manager', 'password': 'test'})
             rv = self.app.get(url_for('admin_settings', category='mail'))
             assert b'403 - Forbidden' in rv.data
 
             rv = self.app.get(url_for('user_update', id_=self.alice_id))
             assert b'403 - Forbidden' in rv.data
 
-            self.login('Contributor')
+            self.app.get(url_for('logout'))
+            self.app.post(
+                url_for('login'),
+                data={'username': 'Contributor', 'password': 'test'})
             rv = self.app.get(url_for('delete', id_=person.id))
             assert b'403 - Forbidden' in rv.data
 
@@ -126,6 +142,9 @@ class UserTests(TestBaseCase):
             rv = self.app.get(url_for('view', id_=person.id))
             assert b'Hugo' in rv.data
 
-            self.login('Readonly')
+            self.app.get(url_for('logout'))
+            self.app.post(
+                url_for('login'),
+                data={'username': 'Readonly', 'password': 'test'})
             rv = self.app.get(url_for('view', id_=person.id))
             assert b'Hugo' in rv.data

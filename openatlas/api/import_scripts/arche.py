@@ -39,7 +39,7 @@ def get_metadata(data: dict[str, Any]) -> dict[str, Any]:
             id_ = collection['@id'].replace('n0:', '')
             if int(id_) in existing_ids:
                 continue
-            collection_url = (data['@context']['n0'] + id_)
+            collection_url = data['@context']['n0'] + id_
             metadata[collection_url] = {
                 'collection_id': id_,
                 'filename': collection['n1:hasFilename']}
@@ -54,7 +54,8 @@ def get_existing_ids() -> list[int]:
 def fetch_exif(id_: str) -> dict[str, Any]:
     req = requests.get(
         'https://arche-exif.acdh.oeaw.ac.at/',
-        params={'id': id_})
+        params={'id': id_},
+        timeout=300)
     return req.json()
 
 

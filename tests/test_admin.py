@@ -4,6 +4,7 @@ from flask import g, url_for
 
 from openatlas import app
 from openatlas.database.entity import Entity
+from openatlas.forms.util import form_to_datetime64
 from openatlas.models.link import Link
 from tests.base import TestBaseCase, get_hierarchy, insert
 
@@ -13,7 +14,7 @@ class AdminTests(TestBaseCase):
     def test_admin(self) -> None:
         with app.app_context():
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 person = insert('person', 'Oliver Twist')
                 insert('person', 'Oliver Twist')
                 insert('file', 'Forsaken file')
@@ -44,9 +45,11 @@ class AdminTests(TestBaseCase):
             assert b'Invalid linked entity' in rv.data
 
             file_ = 'Test77.txt'
-            with open(Path(app.config['UPLOAD_PATH'] / file_), 'w') as _:
+            file_path = Path(app.config['UPLOAD_PATH'] / file_)
+            with open(file_path, 'w', encoding='utf8') as _:
                 pass
-            with open(Path(Path(g.settings['iiif_path']) / file_), 'w') as _:
+            iiif_path = Path(Path(g.settings['iiif_path']) / file_)
+            with open(iiif_path, 'w', encoding='utf8') as _:
                 pass
 
             rv = self.app.get(
@@ -70,16 +73,16 @@ class AdminTests(TestBaseCase):
             assert b'An error occurred when trying to delete' in rv.data
 
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 event = insert('acquisition', 'Event Horizon')
                 person.update({
                     'attributes': {
                         'begin_from': '2018-01-31',
                         'begin_to': '2018-01-01'}})
                 involvement = Link.get_by_id(event.link('P11', person)[0])
-                involvement.begin_from = '2017-01-31'
-                involvement.begin_to = '2017-01-01'
-                involvement.end_from = '2017-01-01'
+                involvement.begin_from = form_to_datetime64(2017, 1, 31)
+                involvement.begin_to = form_to_datetime64(2017, 1, 1)
+                involvement.end_from = form_to_datetime64(2017, 1, 1)
                 involvement.update()
                 source = insert('source', 'Tha source')
                 source.link('P67', event)

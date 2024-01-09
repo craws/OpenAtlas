@@ -30,7 +30,7 @@ from openatlas.display.util import (
 from openatlas.forms.field import SubmitField
 from openatlas.forms.setting import (
     ApiForm, ContentForm, FilesForm, GeneralForm, LogForm, MailForm, MapForm,
-    ModulesForm, SimilarForm, TestMailForm, IiifForm)
+    ModulesForm, SimilarForm, TestMailForm, IiifForm, FrontendForm)
 from openatlas.forms.util import get_form_settings, set_form_settings
 from openatlas.models.content import get_content, update_content
 from openatlas.models.entity import Entity
@@ -72,6 +72,8 @@ def admin_index(
                 'entities'],
             defs=[{'className': 'dt-body-right', 'targets': 7}]),
         'content': Table(['name'] + list(app.config['LANGUAGES']))}
+    if is_authorized('manager'):
+        tables['user'].header.append(_('info'))
     newsletter = False
     for user in User.get_all():
         if user.settings['newsletter']:
@@ -83,7 +85,7 @@ def admin_index(
                 f'{format_number(count)}</a>'
         email = user.email \
             if is_authorized('manager') or user.settings['show_email'] else ''
-        tables['user'].rows.append([
+        row = [
             link(user),
             user.real_name,
             user.group,
@@ -91,7 +93,10 @@ def admin_index(
             _('yes') if user.settings['newsletter'] else '',
             format_date(user.created),
             format_date(user.login_last_success),
-            user_entities])
+            user_entities]
+        if is_authorized('editor'):
+            row.append(user.description)
+        tables['user'].rows.append(row)
     for item, languages in get_content().items():
         content = [_(item)]
         for language in app.config['LANGUAGES']:
@@ -152,12 +157,11 @@ def admin_index(
                 button(_('system log'), url_for('admin_log'))])
         tabs['email'] = Tab(
             'email',
-            display_info(get_form_settings(MailForm())),
+            display_info(get_form_settings(MailForm())) +
+            (display_form(form) if g.settings['mail'] else ''),
             buttons=[
                 manual('admin/mail'),
                 button(_('edit'), url_for('admin_settings', category='mail'))])
-        if g.settings['mail']:
-            tabs['email'].content += display_form(form)
         tabs['IIIF'] = Tab(
             'IIIF',
             display_info(get_form_settings(IiifForm())),
@@ -185,6 +189,14 @@ def admin_index(
             'content',
             tables['content'].display(),
             buttons=[manual('admin/content')])
+        tabs['frontend'] = Tab(
+            'frontend',
+            display_info(get_form_settings(FrontendForm())),
+            buttons=[
+                manual('admin/frontend'),
+                button(
+                    _('edit'),
+                    url_for('admin_settings', category='frontend'))])
     if is_authorized('contributor'):
         tabs['data'] = Tab(
             'data',
@@ -202,18 +214,11 @@ def admin_index(
 @app.route('/admin/content/<string:item>', methods=['GET', 'POST'])
 @required_group('manager')
 def admin_content(item: str) -> Union[str, Response]:
-    # Translations of content items
-    _('intro_for_frontend')
-    _('legal_notice_for_frontend')
-    _('contact_for_frontend')
-    _('site_name_for_frontend')
     for language in app.config['LANGUAGES']:
         setattr(
             ContentForm,
             language,
-            StringField()
-            if item == 'site_name_for_frontend'
-            else TextAreaField(render_kw={'class': 'tinymce'}))
+            TextAreaField(render_kw={'class': 'tinymce'}))
     setattr(ContentForm, 'save', SubmitField(_('save')))
     form = ContentForm()
     if form.validate_on_submit():
@@ -222,12 +227,12 @@ def admin_content(item: str) -> Union[str, Response]:
             data.append({
                 'name': item,
                 'language': language,
-                'text': form.__getattribute__(language).data.strip()})
+                'text': getattr(form, language).data or ''})
         update_content(data)
         flash(_('info update'), 'info')
         return redirect(f"{url_for('admin_index')}#tab-content")
     for language in app.config['LANGUAGES']:
-        form.__getattribute__(language).data = get_content()[item][language]
+        getattr(form, language).data = get_content()[item][language]
     return render_template(
         'tabs.html',
         tabs={'content': Tab('content', form=form)},
@@ -743,13 +748,13 @@ def admin_newsletter() -> Union[str, Response]:
                 'class': 'w-100',
                 'rows': '8',
                 'placeholder': uc_first(_('content'))})
-        save = SubmitField(_('send'))
+        save = SubmitField(uc_first(_('send')))
 
     form = NewsLetterForm()
     if form.validate_on_submit():
         count = 0
         for user_id in request.form.getlist('recipient'):
-            user = User.get_by_id(user_id)
+            user = User.get_by_id(int(user_id))
             if user \
                     and user.settings['newsletter'] \
                     and user.active \

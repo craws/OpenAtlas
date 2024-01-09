@@ -1,22 +1,22 @@
 import json
 from typing import Optional
 
-from flask import abort, g, jsonify, request
+from flask import Response, abort, g, jsonify, request
 from flask_babel import lazy_gettext as _
 
 from openatlas import app
 from openatlas.database.connect import Transaction
+from openatlas.display.util import required_group, uc_first
 from openatlas.forms.field import get_table_content
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 from openatlas.models.user import User
-from openatlas.display.util import required_group, uc_first
 
 
 @app.route('/ajax/bookmark', methods=['POST'])
 @required_group('readonly')
-def ajax_bookmark() -> str:
-    label = User.toggle_bookmark(request.form['entity_id'])
+def ajax_bookmark() -> Response:
+    label = User.toggle_bookmark(int(request.form['entity_id']))
     label = _('bookmark') if label == 'bookmark' else _('bookmark remove')
     return jsonify(uc_first(label))
 
@@ -36,11 +36,11 @@ def ajax_add_type() -> str:
         entity.link(link[cidoc_code], g.types[int(request.form['superType'])])
         g.logger.log_user(entity.id, 'insert')
         Transaction.commit()
-        return str(entity.id)
     except Exception as _e:  # pragma: no cover
         Transaction.rollback()
         g.logger.log('error', 'ajax', _e)
         abort(400)
+    return str(entity.id)
 
 
 @app.route('/ajax/get_type_tree/<int:root_id>')
@@ -69,11 +69,11 @@ def ajax_create_entity() -> str:
             entity.link('P2', g.types[int(request.form['standardType'])])
         g.logger.log_user(entity.id, 'insert')
         Transaction.commit()
-        return str(entity.id)
     except Exception as _e:  # pragma: no cover
         Transaction.rollback()
         g.logger.log('error', 'ajax', _e)
         abort(400)
+    return str(entity.id)
 
 
 @app.route('/ajax/get_entity_table/<string:content_domain>', methods=['POST'])

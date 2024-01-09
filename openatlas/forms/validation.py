@@ -1,36 +1,35 @@
 from pathlib import Path
+from typing import Any
 
 from flask import g, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
-from wtforms import MultipleFileField
+from wtforms import validators
 
-from openatlas.forms.field import TreeField
+from openatlas.display.util import uc_first
 from openatlas.forms.util import form_to_datetime64
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
-from openatlas.display.util import uc_first
 
 
-def file(_form: FlaskForm, field: MultipleFileField) -> None:
+def file(_form: FlaskForm, field: Any) -> None:
     for file_ in request.files.getlist('file'):
-        if not file_ or Path(file_.filename).suffix[1:] not in \
+        if not file_ or Path(str(file_.filename)).suffix[1:] not in \
                 g.settings['file_upload_allowed_extension']:
             field.errors.append(_('file type not allowed'))
 
 
-def hierarchy_name_exists(form: FlaskForm, field: TreeField) -> None:
+def hierarchy_name_exists(form: Any, field: Any) -> None:
     if not hasattr(form, 'entity_id') or \
             Entity.get_by_id(int(form.entity_id.data)).name != form.name.data:
         if Type.check_hierarchy_exists(form.name.data):
             field.errors.append(_('error name exists'))
 
 
-def validate(form: FlaskForm) -> bool:
-    valid = FlaskForm.validate(form)
-    if hasattr(form, 'begin_year_from'):  # Dates
-        if not validate_dates(form):
-            valid = False
+def validate(form: FlaskForm, extra_validators: validators = None) -> bool:
+    valid = FlaskForm.validate(form, extra_validators)
+    if hasattr(form, 'begin_year_from') and not validate_dates(form):
+        valid = False
     for field_id, field in form.__dict__.items():  # External reference systems
         if field_id.startswith('reference_system_id_') \
                 and field.data \

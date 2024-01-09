@@ -3,7 +3,7 @@ import shutil
 import subprocess
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from openatlas import app
 
@@ -18,8 +18,9 @@ def current_date_for_filename() -> str:
 def sql_export(format_: str, postfix: Optional[str] = '') -> bool:
     file = app.config['EXPORT_PATH'] \
            / f'{current_date_for_filename()}_export{postfix}.{format_}'
-    command = ["pg_dump" if os.name == 'posix'
-               else Path(shutil.which("pg_dump.exe"))]
+    command: Any = [
+        "pg_dump" if os.name == 'posix'
+        else Path(str(shutil.which("pg_dump.exe")))]
     if format_ == 'dump':
         command.append('-Fc')
     command.extend([
@@ -36,7 +37,7 @@ def sql_export(format_: str, postfix: Optional[str] = '') -> bool:
             env={
                 'PGPASSWORD': app.config['DATABASE_PASS'],
                 'SYSTEMROOT': root}).wait()
-        with open(os.devnull, 'w') as null:
+        with open(os.devnull, 'w', encoding='utf8') as null:
             subprocess.Popen(
                 ['7z', 'a', f'{file}.7z', file],
                 stdout=null).wait()

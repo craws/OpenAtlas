@@ -1,6 +1,6 @@
 import collections
-import pathlib
-from typing import Optional, Union
+from pathlib import Path
+from typing import Any, Optional, Union
 
 import numpy
 import pandas as pd
@@ -9,16 +9,17 @@ from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect, secure_filename
 from werkzeug.wrappers import Response
-from wtforms import BooleanField, FileField, StringField, TextAreaField
-from wtforms.validators import InputRequired
+from wtforms import (
+    BooleanField, FileField, StringField, TextAreaField, validators)
 
 from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, datetime64_to_timestamp, display_form, format_date,
-    get_backup_file_data, is_authorized, link, manual, required_group)
+    button, button_bar, datetime64_to_timestamp, description, display_form,
+    format_date, get_backup_file_data, is_authorized, link, manual,
+    required_group, uc_first)
 from openatlas.forms.field import SubmitField
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Import, is_float
@@ -26,14 +27,14 @@ from openatlas.models.imports import Import, is_float
 
 class ProjectForm(FlaskForm):
     project_id: Optional[int] = None
-    name = StringField(
+    name: Any = StringField(
         _('name'),
-        [InputRequired()],
+        [validators.InputRequired()],
         render_kw={'autofocus': True})
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
 
-    def validate(self) -> bool:
+    def validate(self, extra_validators: validators = None) -> bool:
         valid = FlaskForm.validate(self)
         name = Import.get_project_by_id(self.project_id).name \
             if self.project_id else ''
@@ -88,10 +89,35 @@ def import_project_insert() -> Union[str, Response]:
 @required_group('contributor')
 def import_project_view(id_: int) -> str:
     project = Import.get_project_by_id(id_)
+    content = ''
+    if is_authorized('manager'):
+        content = button_bar([
+            manual('admin/import'),
+            button(
+                _('edit'),
+                url_for('import_project_update', id_=project.id)),
+            button(
+                _('delete'),
+                url_for('import_project_delete', id_=project.id),
+                onclick="return confirm('" +
+                _('delete %(name)s?', name=project.name.replace("'", "")) +
+                "')")])
+        content += '<p>' + uc_first(_('new import')) + ':</p>'
+        buttons = []
+        for class_ in \
+                ['source'] \
+                + g.view_class_mapping['event'] \
+                + g.view_class_mapping['actor'] \
+                + ['place', 'bibliography', 'edition']:
+            buttons.append(button(
+                _(class_),
+                url_for('import_data', project_id=project.id, class_=class_)))
+        content += button_bar(buttons)
+    content += description(project.description)
     tabs = {
         'info': Tab(
             'info',
-            render_template('import/project_view.html', project=project)),
+            content=content),
         'entities': Tab(
             'entities',
             table=Table(
@@ -145,15 +171,14 @@ def import_project_delete(id_: int) -> Response:
 
 
 class ImportForm(FlaskForm):
-    file = FileField(_('file'), [InputRequired()])
+    file: Any = FileField(_('file'), [validators.InputRequired()])
     preview = BooleanField(_('preview only'), default=True)
     duplicate = BooleanField(_('check for duplicates'), default=True)
     save = SubmitField(_('import'))
 
-    def validate(self) -> bool:
+    def validate(self, extra_validators: validators = None) -> bool:
         valid = FlaskForm.validate(self)
-        if pathlib.Path(request.files['file'].filename) \
-                .suffix.lower() != '.csv':
+        if Path(str(request.files['file'].filename)) .suffix.lower() != '.csv':
             self.file.errors.append(_('file type not allowed'))
             valid = False
         return valid
@@ -171,7 +196,8 @@ def import_data(project_id: int, class_: str) -> str:
     class_label = g.classes[class_].label
     if form.validate_on_submit():
         file_ = request.files['file']
-        file_path = app.config['TMP_PATH'] / secure_filename(file_.filename)
+        file_path = \
+            app.config['TMP_PATH'] / secure_filename(str(file_.filename))
         columns: dict[str, list[str]] = {
             'allowed': ['name', 'id', 'description'],
             'valid': [],
@@ -189,7 +215,7 @@ def import_data(project_id: int, class_: str) -> str:
             headers = list(data_frame.columns.values)
             if 'name' not in headers:
                 messages['error'].append(_('missing name column'))
-                raise Exception()
+                raise ValueError()
             for item in headers:
                 if item not in columns['allowed']:
                     columns['invalid'].append(item)
@@ -277,12 +303,12 @@ def import_data(project_id: int, class_: str) -> str:
                     messages['warn'].append(
                         f"{_('possible duplicates')}: {', '.join(duplicates)}")
             if messages['error']:
-                raise Exception()
+                raise ValueError()
         except Exception as e:
             g.logger.log('error', 'import', 'import check failed', e)
             flash(_('error at import'), 'error')
             return render_template(
-                'import/import_data.html',
+                'import_data.html',
                 form=form,
                 messages=messages,
                 file_data=file_data,
@@ -307,7 +333,7 @@ def import_data(project_id: int, class_: str) -> str:
                 g.logger.log('error', 'import', 'import failed', e)
                 flash(_('error transaction'), 'error')
     return render_template(
-        'import/import_data.html',
+        'import_data.html',
         form=form,
         file_data=file_data,
         table=table,

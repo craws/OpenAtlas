@@ -27,7 +27,7 @@ def html_form(
             html += add_row(field, '', field(), row_css=field.selectors)
             continue
         if field.type in ['CSRFTokenField', 'HiddenField']:
-            html += str(field)
+            html += f' {field}'
             continue
         if field.type in ['CustomField']:
             html += add_row(field, value=field.content)

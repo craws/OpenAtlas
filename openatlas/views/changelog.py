@@ -15,10 +15,15 @@ def index_changelog() -> str:
 
 
 versions = {
-    '7.18.0': ['TBA', {
+    '8.0.0': ['2024-01-01', {
         'feature': {
+            '2038': 'Update OpenAtlas software to Debian bookworm',
             '1834': 'Solve confusing actor relations at move event',
-            '2108': 'IIIF - check for orphaned files'}}],
+            '2096': 'Add presentation site links in backend',
+            '2054': 'Remove content for presentation sites',
+            '2108': 'IIIF: check for orphaned files',
+            '2143': 'API: E53 types in geojson formats',
+            '2112': 'Refactor and minor improvements'}}],
     '7.17.4': ['2023-11-17', {
         'fix': {
             '2124': 'No modifications at preceding event'}}],

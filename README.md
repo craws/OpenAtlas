@@ -26,7 +26,9 @@ the [DPP](https://dpp.oeaw.ac.at/) project.
 
 # Installation
 
-Please refer to [install.md](install.md) for requirements and installation.
+Please refer to [install.md](install.md) for requirements and installation and
+to [upgrade.md](install/upgrade/upgrade.md) when upgrading to newer
+versions.
 
 # Contributing
 

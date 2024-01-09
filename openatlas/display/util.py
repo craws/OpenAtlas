@@ -18,7 +18,7 @@ from bcrypt import hashpw
 from flask import flash, g, render_template, request, url_for
 from flask_babel import LazyString, lazy_gettext as _
 from flask_login import current_user
-from jinja2 import contextfilter
+from jinja2 import pass_context
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 
@@ -179,7 +179,8 @@ def get_system_data(entity: Entity) -> dict[str, Any]:
 
 def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
     label = _('bookmark remove') \
-        if entity_id in current_user.bookmarks else _('bookmark')
+        if current_user.bookmarks and entity_id in current_user.bookmarks \
+        else _('bookmark')
     onclick = f"ajaxBookmark('{entity_id}');"
     if for_table:
         return \
@@ -288,7 +289,7 @@ def get_js_messages(lang: str) -> str:
     return f'<script src="/{js_message_file}"></script>'
 
 
-@contextfilter  # Prevent Jinja2 context caching
+@pass_context  # Prevent Jinja2 context caching
 @app.template_filter()
 def is_authorized(context: str, group: Optional[str] = None) -> bool:
     if not group:  # In case it wasn't called from a template
@@ -434,7 +435,7 @@ def send_mail(
     return True  # pragma: no cover
 
 
-@contextfilter
+@pass_context
 @app.template_filter()
 def system_warnings(_context: str, _unneeded_string: str) -> str:
     if not is_authorized('manager'):
@@ -475,10 +476,11 @@ def check_write_access(path: Path, warnings: list[str]) -> list[str]:
 def tooltip(text: str) -> str:
     if not text:
         return ''
-    return """
-        <span>
-            <i class="fas fa-info-circle tooltipicon" title="{title}"></i>
-        </span>""".format(title=text.replace('"', "'"))
+    title = text.replace('"', "'")
+    return (
+        '<span>'
+        f'<i class="fas fa-info-circle tooltipicon" title="{title}"></i>'
+        '</span>')
 
 
 def get_file_path(
@@ -631,7 +633,7 @@ def uc_first(string: str) -> str:
 
 
 @app.template_filter()
-def display_info(data: dict[str, Union[str, list[str]]]) -> str:
+def display_info(data: dict[str, Any]) -> str:
     return render_template('util/info_data.html', data=data)
 
 
@@ -642,7 +644,7 @@ def description(text: str, label: Optional[str] = '') -> str:
         f'<div class="description more">{"<br>".join(text.splitlines())}</div>'
 
 
-@contextfilter
+@pass_context
 @app.template_filter()
 def display_content_translation(_context: str, text: str) -> str:
     return get_translation(text)
@@ -702,7 +704,7 @@ class MLStripper(HTMLParser):
 
 
 def format_date_part(date: numpy.datetime64, part: str) -> str:
-    string = str(date).split(' ')[0]
+    string = str(date).split(' ', maxsplit=1)[0]
     bc = False
     if string.startswith('-') or string.startswith('0000'):
         bc = True
@@ -784,7 +786,7 @@ def get_iiif_file_path(id_: int) -> Path:
 
 
 def convert_image_to_iiif(id_: int) -> None:
-    command = ["vips" if os.name == 'posix' else "vips.exe"]
+    command: list[Any] = ["vips" if os.name == 'posix' else "vips.exe"]
     command.extend([
         'tiffsave',
         get_file_path(id_),

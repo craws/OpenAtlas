@@ -15,7 +15,7 @@ INSERT INTO web.user (username, password, active, email, group_id) VALUES (
   (SELECT id FROM web.group WHERE name = 'admin'));
 
 INSERT INTO web.settings (name, value) VALUES
-  ('database_version', '7.17.0'),
+  ('database_version', '8.0.0'),
   ('api_public', ''),
   ('default_language', 'en'),
   ('table_rows', '25'),
@@ -23,6 +23,8 @@ INSERT INTO web.settings (name, value) VALUES
   ('failed_login_tries', '3'),
   ('file_upload_max_size', '10'),
   ('file_upload_allowed_extension', 'gif jpeg jpg pdf png txt zip'),
+  ('frontend_website_url', ''),
+  ('frontend_resolver_url', ''),
   ('geonames_username', 'openatlas'),
   ('iiif', ''),
   ('iiif_path', ''),

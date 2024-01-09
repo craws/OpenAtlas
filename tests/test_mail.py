@@ -73,6 +73,8 @@ class MailTests(TestBaseCase):
                     'password2': 'you_never_guess_this',
                     'group': 'admin',
                     'name': 'Ripley Weaver',
+                    'real_name': '',
+                    'description': '',
                     'send_info': True},
                 follow_redirects=True)
             assert b'A user was created' in rv.data

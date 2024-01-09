@@ -1,4 +1,4 @@
-FROM debian:11
+FROM debian:12
 
 RUN --mount=type=cache,target=/var/cache/apt \
     export DEBIAN_FRONTEND=noninteractive &&\
@@ -6,11 +6,11 @@ RUN --mount=type=cache,target=/var/cache/apt \
     apt install -y --no-install-recommends python3 python3-bcrypt python3-dateutil python3-psycopg2 python3-fuzzywuzzy python3-flask &&\
     apt install -y --no-install-recommends python3-flask-babel python3-flask-login python3-flaskext.wtf python3-markdown python3-numpy &&\
     apt install -y --no-install-recommends python3-pandas python3-jinja2 python3-flask-cors python3-flask-restful p7zip-full &&\
-    apt install -y --no-install-recommends python3-wand python3-rdflib python3-requests python3-dicttoxml python3-rdflib-jsonld python3-flasgger &&\
+    apt install -y --no-install-recommends python3-wand python3-rdflib python3-requests python3-dicttoxml python3-flasgger &&\
     apt install -y --no-install-recommends apache2 libapache2-mod-wsgi-py3 python3-coverage python3-nose exiftran &&\
-    apt install -y --no-install-recommends iipimage-server libvips-tools &&\
-    apt install -y --no-install-recommends gettext npm python3-pip git postgresql-client-13 &&\
-    apt install -y --no-install-recommends dos2unix locales locales-all w3c-sgml-lib vim nano &&\
+    apt install -y --no-install-recommends iipimage-server libvips-tools python3-email-validator &&\
+    apt install -y --no-install-recommends gettext npm python3-pip git postgresql-client-15 &&\
+    apt install -y --no-install-recommends dos2unix locales locales-all vim w3c-sgml-lib vim nano &&\
     mkdir -p /var/www/openatlas /var/www/.cache /var/www/.local /var/www/.npm &&\
     chown -R www-data:www-data /var/www/.cache /var/www/.local /var/www/.npm /var/log/apache2 /var/run/apache2
 RUN cp -rp /usr/lib/iipimage-server/ /var/www/iipsrv/ &&\
@@ -29,11 +29,10 @@ RUN cd /var/www/openatlas && cp install/entrypoint.sh /entrypoint.sh &&\
     sed -i 's~</VirtualHost>~ErrorLogFormat "{ \"time\":\"%{%Y-%m-%d}tT%{%T}t.%{msec_frac}tZ\", \"function\" : \"[%-m:%l]\" , \"process\" : \"[pid %P:tid %T]\" , \"message\" : \"%M\" ,\ \"referer\"\ : \"%{Referer}i\" },"\nLogFormat "{ \"time\":\"%{%Y-%m-%d}tT%{%T}t.%{msec_frac}tZ\", \"process\":\"%D\", \"filename\":\"%f\", \"remoteIP\":\"%a\", \"host\":\"%V\", \"request\":\"%U\", \"query\":\"%q\", \"method\":\"%m\", \"status\":\"%>s\", \"userAgent\":\"%{User-agent}i\", \"referer\":\"%{Referer}i\" }," combined\nCustomLog /dev/stdout combined\n</VirtualHost>~' /etc/apache2/sites-available/000-default.conf
 USER www-data
 RUN cd /var/www/openatlas &&\
-    pip3 install calmjs &&\
     cd openatlas/static &&\
-    pip3 install -e ./ &&\
-    ~/.local/bin/calmjs npm --install openatlas
+    npm install
 RUN a2enmod iipsrv &&\
+    a2enmod fcgid &&\
     service apache2 restart
 
 EXPOSE 8080

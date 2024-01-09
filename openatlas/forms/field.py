@@ -7,11 +7,11 @@ from flask import g, render_template
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
+from markupsafe import Markup
 from wtforms import (
     BooleanField, Field, FileField, FloatField, HiddenField, StringField,
     TextAreaField)
-from wtforms.widgets import (
-    FileInput, HTMLString, HiddenInput, Input, TextInput)
+from wtforms.widgets import FileInput, HiddenInput, Input, TextInput
 
 from openatlas import app
 from openatlas.display.table import Table
@@ -45,9 +45,9 @@ class ValueTypeRoot(Input):
             self,
             field: ValueTypeField,
             *args: Any,
-            **kwargs: Any) -> RemovableListInput:
+            **kwargs: Any) -> Markup:
         type_ = g.types[field.type_id]
-        return HTMLString(f'{value_type_expand_icon(type_)}')
+        return Markup(f'{value_type_expand_icon(type_)}')
 
 
 class ValueTypeRootField(FloatField):
@@ -68,12 +68,12 @@ class ValueTypeInput(TextInput):
             self,
             field: ValueTypeField,
             *args: Any,
-            **kwargs: Any) -> RemovableListInput:
+            **kwargs: Any) -> Markup:
         type_ = g.types[field.type_id]
         padding = len(type_.root)
         expand_col = \
             f' <div class="me-1">{value_type_expand_icon(type_)}</div>'
-        return HTMLString(f'''
+        return Markup(f'''
             <div class="row g-1" >
               <div class="col-4  d-flex" style="padding-left:{padding}rem">
                 {expand_col if type_.subs else ''}
@@ -152,7 +152,7 @@ class TableMultiSelect(HiddenInput):
     def __call__(
             self,
             field: TableMultiField,
-            **kwargs: Any) -> TableMultiSelect:
+            **kwargs: Any) -> str:
         data = field.data or []
         data = ast.literal_eval(data) if isinstance(data, str) else data
         class_ = field.id \
@@ -174,11 +174,11 @@ class TableMultiSelect(HiddenInput):
                 f' id="{entity.id}" '
                 f'{" checked" if entity.id in data else ""}>')
             table.rows.append(row)
-        return render_template(
+        return Markup(render_template(
             'forms/table_multi_select.html',
             field=field,
             selection=[e for e in entities if e.id in data],
-            table=table) + super().__call__(field, **kwargs)
+            table=table)) + super().__call__(field, **kwargs)
 
 
 class TableMultiField(HiddenField):
@@ -200,9 +200,9 @@ class ValueFloatField(FloatField):
 
 class TableSelect(HiddenInput):
 
-    def __call__(self, field: TableField, **kwargs: Any) -> TableSelect:
+    def __call__(self, field: TableField, **kwargs: Any) -> str:
 
-        def get_form(class_name_: str) -> FlaskForm:
+        def get_form(class_name_: str) -> Any:
             class SimpleEntityForm(FlaskForm):
                 name_dynamic = StringField(_('name'))
 
@@ -230,11 +230,11 @@ class TableSelect(HiddenInput):
             field.id,
             field.data,
             field.filter_ids)
-        return render_template(
+        return Markup(render_template(
             'forms/table_select.html',
             field=field,
             table=table.display(field.id),
-            selection=selection) + super().__call__(field, **kwargs)
+            selection=selection)) + super().__call__(field, **kwargs)
 
 
 class TableField(HiddenField):
@@ -257,15 +257,15 @@ class TableField(HiddenField):
 
 
 class TreeMultiSelect(HiddenInput):
-    def __call__(self, field: TreeField, **kwargs: Any) -> TreeMultiSelect:
+    def __call__(self, field: TreeField, **kwargs: Any) -> str:
         data = field.data or []
         data = ast.literal_eval(data) if isinstance(data, str) else data
-        return render_template(
+        return Markup(render_template(
             'forms/tree_multi_select.html',
             field=field,
             root=g.types[int(field.type_id)],
             selection=sorted(data, key=lambda k: g.types[k].name),
-            data=Type.get_tree_data(int(field.id), data)) \
+            data=Type.get_tree_data(int(field.id), data))) \
             + super().__call__(field, **kwargs)
 
 
@@ -286,7 +286,7 @@ class TreeMultiField(HiddenField):
 
 class TreeSelect(HiddenInput):
 
-    def __call__(self, field: TreeField, **kwargs: Any) -> TreeSelect:
+    def __call__(self, field: TreeField, **kwargs: Any) -> str:
         selection = ''
         selected_ids = []
         if field.data:
@@ -294,7 +294,7 @@ class TreeSelect(HiddenInput):
                 if isinstance(field.data, list) else field.data
             selection = g.types[int(field.data)].name
             selected_ids.append(g.types[int(field.data)].id)
-        return render_template(
+        return Markup(render_template(
             'forms/tree_select.html',
             field=field,
             selection=selection,
@@ -302,7 +302,7 @@ class TreeSelect(HiddenInput):
             data=Type.get_tree_data(
                 int(field.type_id),
                 selected_ids,
-                field.filters_ids)) + super().__call__(field, **kwargs)
+                field.filters_ids))) + super().__call__(field, **kwargs)
 
 
 class TreeField(HiddenField):
@@ -328,12 +328,12 @@ class DragNDrop(FileInput):
             self,
             field: RemovableListField,
             *args: Any,
-            **kwargs: Any) -> RemovableListInput:
+            **kwargs: Any) -> str:
         accept = ', '.join([
             f'.{filename}' for filename
             in g.settings['file_upload_allowed_extension']])
         return super().__call__(field, accept=accept, **kwargs) \
-            + render_template('forms/drag_n_drop_field.html')
+            + Markup(render_template('forms/drag_n_drop_field.html'))
 
 
 class DragNDropField(FileField):
@@ -364,7 +364,7 @@ class SubmitInput(Input):
     def __call__(self, field: Field, **kwargs: Any) -> str:
         kwargs['class_'] = (kwargs['class_'] + ' uc-first') \
             if 'class_' in kwargs else 'uc-first'
-        return HTMLString(
+        return Markup(
             f'''<button
              type="submit"
              id="{field.id}"

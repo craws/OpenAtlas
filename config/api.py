@@ -1,8 +1,9 @@
 API_VERSIONS = ['0.3', '0.4']
 
 API_CONTEXT = {
-    'LPF': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/'
-           'master/linkedplaces-context-v1.1.jsonld',
+    'LPF':
+        'https://raw.githubusercontent.com/LinkedPasts/linked-places/'
+        'master/linkedplaces-context-v1.1.jsonld',
     'LOUD': 'https://linked.art/ns/v1/linked-art.json'}
 
 CORS_ALLOWANCE = '*'  # Cross-Origin source (CORS)
@@ -28,7 +29,10 @@ STR_CATEGORIES: list[str] = [
     'entitySystemClass', 'typeName', 'typeNameWithSubs',
     'beginFrom', 'beginTo', 'endFrom', 'endTo']
 INT_CATEGORIES: list[str] = [
-    'entityID', 'typeID', 'typeIDWithSubs', 'relationToID']
+    'entityID',
+    'typeID',
+    'typeIDWithSubs',
+    'relationToID']
 SET_CATEGORIES: list[str] = ['valueTypeID']
 VALID_CATEGORIES: list[str] = [
     *STR_CATEGORIES,

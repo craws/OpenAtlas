@@ -165,7 +165,6 @@ class BaseManager:
                 SubmitField(_('insert and continue')))
             setattr(self.form_class, 'continue_', HiddenField())
 
-    # pylint: disable=no-self-use
     def additional_fields(self) -> dict[str, Any]:
         return {}
 

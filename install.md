@@ -2,17 +2,17 @@
 Some knowledge about package installation, web server and database
 configuration will be needed.
 
-This software was developed and tested on Linux/Debian 11.5
-(codename "bullseye") and the easiest way to install would be on a
-[Debian](https://www.debian.org/) 11.5 system following these instructions.
+This software was developed and tested on Linux/Debian 12.2
+(codename "bookwom") and the easiest way to install would be on a
+[Debian](https://www.debian.org/) 12.2 system following these instructions.
 
 Another (experimental) way to install it would be via
 [Docker](https://www.docker.com/).
 For more information take a look at the end of this document.
 
-It also may work on other Linux distributions or even on non Linux systems, and
-we provided a [requirements.txt](requirements.txt). But it is experimental too
-and would need substantially more knowledge about server administration.
+It may also work on other Linux distributions or even non Linux systems with
+using the [requirements.txt](requirements.txt), but substantially more
+knowledge about server administration would be needed.
 
 Feel free to also consult our own
 [documentation](https://redmine.openatlas.eu/projects/uni/wiki/Debian_server_installation)
@@ -24,21 +24,21 @@ that we are using to set up Debian servers for OpenAtlas installations.
 * [Docker](#Docker) (alternative installation method)
 
 ## Requirements
-### Python 3.9 and Flask 1.1.2
+### Python 3.11 and Flask 2.2.2
     sudo apt install python3 python3-bcrypt python3-dateutil python3-psycopg2 python3-fuzzywuzzy python3-flask
     sudo apt install python3-flask-babel python3-flask-login python3-flaskext.wtf python3-markdown python3-numpy
     sudo apt install python3-pandas python3-jinja2 python3-flask-cors python3-flask-restful p7zip-full
     sudo apt install python3-wand python3-rdflib python3-dicttoxml python3-rdflib-jsonld python3-flasgger
-    sudo apt install python3-requests exiftran
+    sudo apt install python3-requests exiftran python3-email-validator
 
 ### Apache 2.4
     sudo apt install apache2 libapache2-mod-wsgi-py3
 
-### PostgreSQL 13 and PostGIS 3
-    sudo apt install postgresql postgresql-13-postgis-3 postgresql-13-postgis-3-scripts
+### PostgreSQL 15 and PostGIS 3
+    sudo apt install postgresql postgresql-15-postgis-3 postgresql-15-postgis-3-scripts
 
 ### gettext, pip, npm
-    sudo apt install gettext npm python3-pip
+    sudo apt install gettext npm 
 
 ## Installation
 ### Files
@@ -50,10 +50,8 @@ adapt them accordingly as regular user:
 ### Frontend libraries
 Execute this lines as regular user too:
 
-    pip3 install calmjs
     cd openatlas/static
-    pip3 install -e ./
-    ~/.local/bin/calmjs npm --install openatlas
+    npm install
 
 ### Database
 Executed statements below as **postgres** user.
@@ -135,6 +133,7 @@ high-quality, attributed digital objects online at scale. Be aware that:
 ### Installation
 
     sudo apt install iipimage-server libvips-tools
+    sudo a2enmod fcgid
     sudo service apache2 restart
 
 You can test http://your.server/iipsrv/iipsrv.fcgi to see if it runs.

@@ -254,7 +254,7 @@ class NetworkForm(FlaskForm):
         validators=[InputRequired()])
     charge = StringField(
         _('charge'),
-        default=-80,
+        default=str(-80),
         validators=[InputRequired()])
     distance = IntegerField(
         _('distance'),
@@ -264,7 +264,7 @@ class NetworkForm(FlaskForm):
     depth = SelectField(
         _('depth'),
         default=1,
-        choices=[(x, x) for x in range(1, 13)])
+        choices=[(x, str(x)) for x in range(1, 13)])
     classes = SelectMultipleField(
         _('colors'),
         widget=widgets.ListWidget(prefix_label=False))

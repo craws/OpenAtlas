@@ -10,7 +10,7 @@ class NoteTest(TestBaseCase):
     def test_note(self) -> None:
         with app.app_context():
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 actor = insert('person', 'Ripley')
 
             rv = self.app.get(url_for('note_insert', entity_id=actor.id))
@@ -26,7 +26,7 @@ class NoteTest(TestBaseCase):
             assert b'A nice description' in rv.data
 
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 note_id = User.get_notes_by_user_id(self.alice_id)[0]['id']
 
             rv = self.app.get(url_for('note_update', id_=note_id))
@@ -41,7 +41,10 @@ class NoteTest(TestBaseCase):
             rv = self.app.get(url_for('note_view', id_=note_id))
             assert b'A sad description' in rv.data
 
-            self.login('Manager')
+            self.app.get(url_for('logout'))
+            self.app.post(
+                url_for('login'),
+                data={'username': 'manager', 'password': 'test'})
             rv = self.app.get(url_for('note_view', id_=note_id))
             assert b'set private' in rv.data
 
@@ -50,10 +53,17 @@ class NoteTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Note updated' in rv.data
 
+            self.app.get(url_for('logout'))
+            self.app.post(
+                url_for('login'),
+                data={'username': 'editor', 'password': 'test'})
+
             rv = self.app.get(url_for('note_view', id_=note_id))
             assert b'403 - Forbidden' in rv.data
 
-            self.login('Editor')
+            self.app.post(
+                url_for('login'),
+                data={'username': 'Editor', 'password': 'test'})
             rv = self.app.get(url_for('note_set_private', id_=note_id))
             assert b'403 - Forbidden' in rv.data
 
@@ -63,7 +73,10 @@ class NoteTest(TestBaseCase):
             rv = self.app.get(url_for('note_delete', id_=note_id))
             assert b'403 - Forbidden' in rv.data
 
-            self.login('Alice')
+            self.app.get(url_for('logout'))
+            self.app.post(
+                url_for('login'),
+                data={'username': 'Alice', 'password': 'test'})
             rv = self.app.get(
                 url_for('note_delete', id_=note_id),
                 follow_redirects=True)

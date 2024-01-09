@@ -14,7 +14,7 @@ class PlaceTest(TestBaseCase):
     def test_place(self) -> None:
         with app.app_context():
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 reference = insert('external_reference', 'https://d-nb.info')
                 source = insert('source', 'Necronomicon')
 
@@ -72,7 +72,7 @@ class PlaceTest(TestBaseCase):
             assert b'Necronomicon' in rv.data
 
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 places = Entity.get_by_class('place')
                 place = places[0]
                 place2 = places[1]
@@ -128,7 +128,7 @@ class PlaceTest(TestBaseCase):
             assert b'An entry has been created' in rv.data
 
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 file = Entity.get_by_class('file')[0]
                 link_id = file.link('P67', place)[0]
 
@@ -158,7 +158,7 @@ class PlaceTest(TestBaseCase):
             assert b'Edit' in rv.data
 
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 overlay = Overlay.get_by_object(place)
                 overlay_id = overlay[list(overlay.keys())[0]].id
 

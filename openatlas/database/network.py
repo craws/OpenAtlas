@@ -12,7 +12,8 @@ class Network:
             SELECT id, domain_id, property_code, range_id
             FROM model.link
             WHERE domain_id IN %(ids)s or range_id IN %(ids)s;
-            """, {'ids': tuple(ids)})
+            """,
+            {'ids': tuple(ids)})
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod

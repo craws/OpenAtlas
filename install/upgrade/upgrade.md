@@ -1,5 +1,5 @@
 ## INFO
-Beginning from 6.6.0 you can use the database update script which takes care
+From 6.6.0 on you can use the database update script which takes care
 of database changes even over multiple versions. A backup is made before
 changes happen. You still should read the upgrade notes about important
 information.
@@ -18,8 +18,28 @@ then run the database upgrade script, then restart Apache:
     sudo python3 install/upgrade/database_upgrade.py
     sudo service apache2 restart
 
-### 7.17.x to 7.17.4
-A code base update (e.g. with git pull) and a webserver restart is sufficient.
+### 7.17.x to 8.0.0
+This is a major upgrade which utilizes newer versions of underlying software.
+Please consult the install.md about installation. In case you are using a
+Debian system, feel free to use our own upgrade notes from the issue
+description: https://redmine.openatlas.eu/issues/2038, which is already
+tested.
+
+8.0.0.sql is needed but will be taken care of by the database upgrade script.
+
+#### Breaking changes
+**Removal of frontend content management**
+
+Because the new presentation site functionality doesn't require content
+management in the backend anymore, this functionality was removed.
+In case older frontend versions are still in use they would have to be
+switched to the new one (OpenAtlas Discovery) or manually adapted.
+
+**New stable API version 0.4**
+
+The current stable API version is **0.4**. Support for API versions **0.3**
+is dropped with this release including the frontend content queries mentioned
+above.
 
 ### 7.16.x to 7.17.0
 7.17.0.sql is needed but will be taken care of by the database upgrade script.

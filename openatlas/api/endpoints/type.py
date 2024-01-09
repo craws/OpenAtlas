@@ -19,7 +19,7 @@ def walk_type_tree(types: list[int]) -> list[dict[str, Any]]:
         item = g.types[id_]
         items.append({
             'id': item.id,
-            'url': url_for('api_03.entity', id_=item.id, _external=True),
+            'url': url_for('api.entity', id_=item.id, _external=True),
             'label': item.name.replace("'", "&apos;"),
             'children': walk_type_tree(item.subs)})
     return items

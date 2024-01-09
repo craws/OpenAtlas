@@ -9,7 +9,7 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wtforms import (
     BooleanField, HiddenField, PasswordField, SelectField, StringField,
-    TextAreaField)
+    TextAreaField, validators)
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app
@@ -43,7 +43,7 @@ class UserForm(FlaskForm):
     insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
 
-    def validate(self) -> bool:
+    def validate(self, extra_validators: validators = None) -> bool:
         valid = FlaskForm.validate(self)
         username = ''
         user_email = ''
@@ -110,7 +110,7 @@ def user_activity(user_id: int = 0) -> str:
             entity = Entity.get_by_id(row['entity_id'])
             entity_name = link(entity)
         except AttributeError:  # Entity already deleted
-            entity = None  # type: ignore
+            entity = None
             entity_name = f"id {row['entity_id']}"
         user = User.get_by_id(row['user_id'])
         table.rows.append([
@@ -162,7 +162,7 @@ def user_view(id_: int) -> str:
                     _('delete'),
                     url_for('admin_index', action='delete_user', id_=user.id)
                     + '#tab-user',
-                    onclick=
+                    onclick=""
                     f"return confirm('{_('Delete %(name)s?', name=name)}')"))
         buttons.append(
             button(_('activity'), url_for('user_activity', user_id=user.id)))
@@ -182,7 +182,6 @@ def user_view(id_: int) -> str:
 @app.route('/admin/user/entities/<int:id_>')
 @required_group('readonly')
 def user_entities(id_: int) -> str:
-    user = User.get_by_id(id_)
     table = Table([
         'name',
         'class',
@@ -190,7 +189,7 @@ def user_entities(id_: int) -> str:
         'begin',
         'end',
         'created'])
-    if user:
+    if user := User.get_by_id(id_):
         for entity in user.get_entities():
             table.rows.append([
                 link(entity),
@@ -288,8 +287,11 @@ def user_insert() -> Union[str, Response]:
             return redirect(url_for('user_insert'))
         return redirect(url_for('user_view', id_=user_id))
     return render_template(
-        'user/insert.html',
-        form=form,
+        'tabs.html',
+        tabs={'user': Tab('user', content=display_form(
+            form,
+            'user-form',
+            manual_page='admin/user'))},
         title=_('user'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-user"],

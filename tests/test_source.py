@@ -11,7 +11,7 @@ class SourceTest(TestBaseCase):
     def test_source(self) -> None:
         with app.app_context():
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 gillian = insert('person', 'Gillian Anderson Gillian Anderson')
                 artifact = insert('artifact', 'Artifact with inscription')
                 reference = insert('external_reference', 'https://d-nb.info')

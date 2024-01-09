@@ -11,7 +11,7 @@ class ReferenceTest(TestBaseCase):
     def test_reference(self) -> None:
         with app.app_context():
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 batman = insert('person', 'Batman')
 
             rv: Any = self.app.post(
@@ -35,7 +35,7 @@ class ReferenceTest(TestBaseCase):
             assert b'https://d-nb.info' in rv.data
 
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 link_id = batman.get_links('P67', True)[0].id
 
             rv = self.app.post(

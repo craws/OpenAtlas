@@ -3,10 +3,10 @@ from typing import Any, Optional
 from flask import g
 
 from openatlas.api.resources.util import (
-    link_parser_check,
+    get_location_link, link_parser_check,
     replace_empty_list_values_in_dict_with_none)
 from openatlas.api.resources.model_mapper import \
-    flatten_list_and_remove_duplicates
+    flatten_list_and_remove_duplicates, get_all_links_of_entities
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -16,7 +16,11 @@ def get_geojson(
         entities: list[Entity],
         parser: dict[str, Any]) -> dict[str, Any]:
     out = []
+    links = get_all_links_of_entities([e.id for e in entities], 'P53')
     for entity in entities:
+        if entity.class_.view == 'place':
+            entity_links = [l_ for l_ in links if l_.domain.id == entity.id]
+            entity.types.update(get_location_link(entity_links).range.types)
         if geoms := [get_geojson_dict(entity, parser, geom)
                      for geom in get_geom(entity, parser)]:
             out.extend(geoms)
@@ -48,10 +52,13 @@ def get_geojson_v2(
              if link_.property.code
              in ['P53', 'P74', 'OA8', 'OA9', 'P7', 'P26', 'P27']]
     for entity in entities:
+        entity_links = [
+            link_ for link_ in links if link_.domain.id == entity.id]
+        if entity.class_.view == 'place':
+            entity.types.update(get_location_link(entity_links).range.types)
         if geom := get_geoms_as_collection(
                 entity,
-                [link_.range.id for link_ in links
-                 if link_.domain.id == entity.id],
+                [l_.range.id for l_ in entity_links],
                 parser):
             out.append(get_geojson_dict(entity, parser, geom))
     return {'type': 'FeatureCollection', 'features': out}

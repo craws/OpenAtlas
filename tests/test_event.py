@@ -11,7 +11,7 @@ class EventTest(TestBaseCase):
     def test_event(self) -> None:
         with app.app_context():
             with app.test_request_context():
-                app.preprocess_request()  # type: ignore
+                app.preprocess_request()
                 place_name = 'Lewis and Clark'
                 actor_name = 'Captain Miller'
                 actor = insert('person', actor_name)

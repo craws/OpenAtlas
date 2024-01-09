@@ -22,7 +22,7 @@
         "basePath": {
           "default": "0.4",
           "enum": [
-            "0.3", "0.4"
+            "0.4"
           ]
         }
       }
@@ -34,7 +34,7 @@
         "basePath": {
           "default": "0.4",
           "enum": [
-            "0.3", "0.4"
+            "0.4"
           ]
         }
       }
@@ -46,7 +46,7 @@
         "basePath": {
           "default": "0.4",
           "enum": [
-            "0.3", "0.4"
+            "0.4"
           ]
         }
       }
@@ -88,8 +88,7 @@
   ],
   "paths": {
     "/entity/{entityId}": {
-      "get":
-        {
+      "get": {
         "tags": [
           "Entity Endpoint"
         ],
@@ -817,39 +816,6 @@
         }
       }
     },
-    "/content/": {
-      "get": {
-        "tags": [
-          "Administrative Endpoints"
-        ],
-        "description": "`WARNING: available only at v0.3.` Retrieves a detailed list of information on available frontend content in an OpenAtlas instance - intro, legal notice, contact, and size of processed image",
-        "operationId": "GetContent",
-        "deprecated": true,
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/lang"
-          },
-          {
-            "$ref": "#/components/parameters/download"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ContentModel"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Something went wrong. Please consult the error message."
-          }
-        }
-      }
-    },
     "/backend_details/": {
       "get": {
         "tags": [
@@ -1011,21 +977,16 @@
         }
       }
     },
-    "/display/{filename}": {
+    "/display/{entityID}": {
       "get": {
         "tags": [
           "Image Endpoints"
         ],
-        "description": "Retrieves the image connected to the requested ID or filename, if it has a licence.",
+        "description": "Retrieves the image connected to the requested ID or entityID, if it has a licence.",
         "operationId": "DisplayImage",
         "parameters": [
           {
-            "in": "path",
-            "name": "filename",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/components/parameters/entityId"
           },
           {
             "in": "query",
@@ -1038,6 +999,52 @@
                 "table"
               ]
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
+    "/iiif_manifest/{version}/{entityId}": {
+      "get": {
+        "tags": [
+          "Image Endpoints"
+        ],
+        "description": "Retrieves the manifest of the IIIF image.",
+        "operationId": "IIIFManifest",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "enum": [
+                2
+              ]
+            }
+          },
+          {
+            "$ref": "#/components/parameters/entityId"
           }
         ],
         "responses": {
@@ -1286,63 +1293,62 @@
       },
       "search": {
         "name": "search",
-        "description": "Search query for specific results. For a better overview visit: `https://manual.openatlas.eu/technical/api_parameters_03.html#id27`\n\n **Filterable categories**\n\n entityName, entityDescription, entityAliases, entityCidocClass, entitySystemClass, entityID, typeID, valueTypeID, typeIDWithSubs, typeName, beginFrom, beginTo, endFrom, endTo, relationToID\n\n **Values** \n\n Values has to be a list of items. The items can be either a string, an integer or a tuple (see Note). Strings need to be marked with “” or ‘’, while integers doesn’t allow this.\\n *Note*: the category valueTypeID can search for values of a type ID. But it takes one or more two valued Tuple as list entry: (x,y). x is the type id and y is the searched value. This can be an int or a float, e.g: `{\"operator\":\"lesserThan\",\"values\":[(3142,543.3)],\"logicalOperator\":\"and\"}`\n\n **Compare operators** \n\n equal, notEqual, like (1), greaterThan (2), greaterThanEqual (2), lesserThan (2)\n\nThe compare operators work like the mathematical operators. equal x=y, notEqual x!=y, greaterThan x>y , greaterThanEqual x>=y, lesserThan x<y, lesserThanEqual x<=y. The like operator searches for occurrence of the string, so a match can also occur in the middle of a word.\n\n(1)Only for string based categories\n\n(2)Only for beginFrom, beginTo, endFrom, endTo, valueTypeID\n\n**Logical operators**\n\nNot mandatory, OR is the default value. Logical operators handles, if the values are treated as OR or AND.",
+        "description": "Search query for specific results. For a better overview visit: `https://manual.openatlas.eu/technical/api_parameters_04.html#id27`\n\n **Filterable categories**\n\n entityName, entityDescription, entityAliases, entityCidocClass, entitySystemClass, entityID, typeID, valueTypeID, typeIDWithSubs, typeName, beginFrom, beginTo, endFrom, endTo, relationToID\n\n **Values** \n\n Values has to be a list of items. The items can be either a string, an integer or a tuple (see Note). Strings need to be marked with “” or ‘’, while integers doesn’t allow this.\\n *Note*: the category valueTypeID can search for values of a type ID. But it takes one or more two valued Tuple as list entry: (x,y). x is the type id and y is the searched value. This can be an int or a float, e.g: `{\"operator\":\"lesserThan\",\"values\":[(3142,543.3)],\"logicalOperator\":\"and\"}`\n\n **Compare operators** \n\n equal, notEqual, like (1), greaterThan (2), greaterThanEqual (2), lesserThan (2)\n\nThe compare operators work like the mathematical operators. equal x=y, notEqual x!=y, greaterThan x>y , greaterThanEqual x>=y, lesserThan x<y, lesserThanEqual x<=y. The like operator searches for occurrence of the string, so a match can also occur in the middle of a word.\n\n(1)Only for string based categories\n\n(2)Only for beginFrom, beginTo, endFrom, endTo, valueTypeID\n\n**Logical operators**\n\nNot mandatory, OR is the default value. Logical operators handles, if the values are treated as OR or AND.",
         "in": "query",
         "content": {
           "application/json": {
             "schema": {
-          "type": "object",
-          "properties": {
-            "entityName": {
-              "$ref": "#/components/schemas/searchCriteria"
-            },
-            "entityDescription": {
-              "$ref": "#/components/schemas/searchCriteria"
-            },
-            "entityAliases": {
-              "$ref": "#/components/schemas/searchCriteria"
-            },
-            "entityCidocClass": {
-              "$ref": "#/components/schemas/searchCriteria"
-            },
-            "entitySystemClass": {
-              "$ref": "#/components/schemas/searchCriteria"
-            },
-            "entityID": {
-              "$ref": "#/components/schemas/searchCriteria"
-            },
-            "typeID": {
-              "$ref": "#/components/schemas/searchCriteria"
-            },
-            "valueTypeID": {
-              "$ref": "#/components/schemas/searchCriteria"
-            },
-            "typeIDWithSubs": {
-              "$ref": "#/components/schemas/searchCriteria"
-            },
-            "typeName": {
-              "$ref": "#/components/schemas/searchCriteria"
-            },
-            "beginFrom": {
-              "$ref": "#/components/schemas/searchCriteria"
-            },
-            "beginTo": {
-              "$ref": "#/components/schemas/searchCriteria"
-            },
-            "endFrom": {
-              "$ref": "#/components/schemas/searchCriteria"
-            },
-            "endTo": {
-              "$ref": "#/components/schemas/searchCriteria"
-            },
-            "relationToID": {
-              "$ref": "#/components/schemas/searchCriteria"
+              "type": "object",
+              "properties": {
+                "entityName": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                },
+                "entityDescription": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                },
+                "entityAliases": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                },
+                "entityCidocClass": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                },
+                "entitySystemClass": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                },
+                "entityID": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                },
+                "typeID": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                },
+                "valueTypeID": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                },
+                "typeIDWithSubs": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                },
+                "typeName": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                },
+                "beginFrom": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                },
+                "beginTo": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                },
+                "endFrom": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                },
+                "endTo": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                },
+                "relationToID": {
+                  "$ref": "#/components/schemas/searchCriteria"
+                }
+              }
             }
           }
         }
-          }
-        }
-
       },
       "limit": {
         "name": "limit",
@@ -2520,34 +2526,6 @@
             },
             "en": {
               "type": "string"
-            }
-          }
-        }
-      },
-      "ContentModel": {
-        "type": "object",
-        "properties": {
-          "intro": {
-            "type": "string"
-          },
-          "contact": {
-            "type": "string"
-          },
-          "legalNotice": {
-            "type": "string"
-          },
-          "siteName": {
-            "type": "string"
-          },
-          "imageSizes": {
-            "type": "object",
-            "properties": {
-              "thumbnail": {
-                "type": "string"
-              },
-              "table": {
-                "type": "string"
-              }
             }
           }
         }
