@@ -25,8 +25,8 @@ RUN cd /var/www/openatlas && cp install/entrypoint.sh /entrypoint.sh &&\
     dos2unix /entrypoint.sh &&\
     sed -i 's~^Listen.*~Listen 8080~' /etc/apache2/ports.conf &&\
     sed -i 's~^<VirtualHost \*:80>~<VirtualHost *:8080>~' /etc/apache2/sites-available/000-default.conf &&\
-    sed -i 's~ServerName.*~~' /etc/apache2/sites-available/000-default.conf &&\
-    sed -i 's~</VirtualHost>~ErrorLogFormat "{ \"time\":\"%{%Y-%m-%d}tT%{%T}t.%{msec_frac}tZ\", \"function\" : \"[%-m:%l]\" , \"process\" : \"[pid %P:tid %T]\" , \"message\" : \"%M\" ,\ \"referer\"\ : \"%{Referer}i\" },"\nLogFormat "{ \"time\":\"%{%Y-%m-%d}tT%{%T}t.%{msec_frac}tZ\", \"process\":\"%D\", \"filename\":\"%f\", \"remoteIP\":\"%a\", \"host\":\"%V\", \"request\":\"%U\", \"query\":\"%q\", \"method\":\"%m\", \"status\":\"%>s\", \"userAgent\":\"%{User-agent}i\", \"referer\":\"%{Referer}i\" }," combined\nCustomLog /dev/stdout combined\n</VirtualHost>~' /etc/apache2/sites-available/000-default.conf
+    sed -i 's~ServerName.*~~' /etc/apache2/sites-available/000-default.conf
+    # sed -i 's~</VirtualHost>~ErrorLogFormat "{ \"time\":\"%{%Y-%m-%d}tT%{%T}t.%{msec_frac}tZ\", \"function\" : \"[%-m:%l]\" , \"process\" : \"[pid %P:tid %T]\" , \"message\" : \"%M\" ,\ \"referer\"\ : \"%{Referer}i\" },"\nLogFormat "{ \"time\":\"%{%Y-%m-%d}tT%{%T}t.%{msec_frac}tZ\", \"process\":\"%D\", \"filename\":\"%f\", \"remoteIP\":\"%a\", \"host\":\"%V\", \"request\":\"%U\", \"query\":\"%q\", \"method\":\"%m\", \"status\":\"%>s\", \"userAgent\":\"%{User-agent}i\", \"referer\":\"%{Referer}i\" }," combined\nCustomLog /dev/stdout combined\n</VirtualHost>~' /etc/apache2/sites-available/000-default.conf
 USER www-data
 RUN cd /var/www/openatlas/openatlas/static &&\
     npm install
