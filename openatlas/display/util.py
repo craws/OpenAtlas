@@ -785,7 +785,7 @@ def get_iiif_file_path(id_: int) -> Path:
     return Path(g.settings['iiif_path']) / f'{id_}{ext}'
 
 
-def convert_image_to_iiif(id_: int) -> None:
+def convert_image_to_iiif(id_: int) -> bool:
     command: list[Any] = ["vips" if os.name == 'posix' else "vips.exe"]
     command.extend([
         'tiffsave',
@@ -799,9 +799,21 @@ def convert_image_to_iiif(id_: int) -> None:
         '128',
         '--tile-height',
         '128'])
-    process = subprocess.Popen(command)
-    process.wait()
-    if process.returncode == 0:
-        flash(_('IIIF converted'), 'info')
-    else:
-        flash(f"{_('failed to convert image')}", 'error')  # pragma: no cover
+    try: 
+        process = subprocess.Popen(command)
+        process.wait()
+        return True
+    except:
+        return False
+        
+
+def convert_iiif_files() -> None:
+    if not check_iiif_activation():
+        flash(_('please activate IIIF'), 'info')
+        return
+    for id_, path in g.files.items():
+        if check_iiif_file_exist(id_):
+            continue
+        if path.suffix in g.display_file_ext:
+            convert_image_to_iiif(id_)
+    return

@@ -1,6 +1,6 @@
 from typing import Any, Union
 
-from flask import g, render_template, request, send_from_directory, url_for
+from flask import flash, g, render_template, request, send_from_directory, url_for
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
@@ -71,7 +71,8 @@ def file_add(id_: int, view: str) -> Union[str, Response]:
 @app.route('/file/convert_iiif/<int:id_>', methods=['GET'])
 @required_group('contributor')
 def make_iiif_available(id_: int) -> Response:
-    convert_image_to_iiif(id_)
+    flash(_('IIIF converted'), 'info') if convert_image_to_iiif(id_) \
+        else flash(f"{_('failed to convert image')}", 'error')
     return redirect(url_for('view', id_=id_))
 
 

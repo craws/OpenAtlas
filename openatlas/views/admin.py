@@ -24,7 +24,7 @@ from openatlas.display.image_processing import (
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, convert_size, display_form, display_info, format_date,
+    button, convert_iiif_files, convert_size, display_form, display_info, format_date,
     get_file_path, is_authorized, link, manual, required_group, sanitize,
     send_mail, uc_first)
 from openatlas.forms.field import SubmitField
@@ -167,7 +167,8 @@ def admin_index(
             display_info(get_form_settings(IiifForm())),
             buttons=[
                 manual('admin/iiif'),
-                button(_('edit'), url_for('admin_settings', category='iiif'))])
+                button(_('edit'), url_for('admin_settings', category='iiif')),
+                button(_('convert all files'), url_for('admin_convert_iiif_files'))])
 
     if is_authorized('manager'):
         tabs['modules'] = Tab(
@@ -805,6 +806,14 @@ def admin_delete_orphaned_resized_images() -> Response:
     delete_orphaned_resized_images()
     flash(_('resized orphaned images were deleted'), 'info')
     return redirect(url_for('admin_index') + '#tab-data')
+
+
+@app.route('/admin/convert_iiif_files')
+@required_group('admin')
+def admin_convert_iiif_files() -> Response:
+    convert_iiif_files()
+    flash(_('all image files are converted'), 'info')
+    return redirect(url_for('admin_index') + '#tab-IIIF')
 
 
 def get_disk_space_info() -> Optional[dict[str, Any]]:
