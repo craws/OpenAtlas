@@ -274,7 +274,7 @@ def profile_image(entity: Entity) -> str:
                 external=True) + ' - ' +
                 link(
                     _('annotate'),
-                    url_for('annotate_image', id_=file_id),
+                    url_for('annotation_insert', id_=file_id),
                     external=True))
         else:
             html += button_bar([

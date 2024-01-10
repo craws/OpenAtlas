@@ -122,7 +122,7 @@ class IIIFAnnotationListV2(Resource):
             "@type": "sc:AnnotationList",
             "resources":
                 [IIIFAnnotationV2.build_annotation(metadata, anno)
-                 for anno in AnnotationImage.get_by_file(id_)]}
+                 for anno in AnnotationImage.get_by_file_as_dict(id_)]}
 
 
 class IIIFAnnotationV2(Resource):
@@ -131,7 +131,7 @@ class IIIFAnnotationV2(Resource):
         return jsonify(
             IIIFImageV2.build_annotation(
                 get_metadata(get_entity_by_id(id_)),
-                AnnotationImage.get_by_file(annotation_id)))
+                AnnotationImage.get_by_file_as_dict(annotation_id)))
 
     @staticmethod
     def build_annotation(

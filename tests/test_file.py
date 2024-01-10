@@ -158,11 +158,11 @@ class FileTest(TestBaseCase):
             rv = self.app.get(url_for('view', id_=place.id))
             assert b'Logo' in rv.data
 
-            rv = self.app.get(url_for('annotate_image', id_=file_id))
-            assert b'coordinates' in rv.data
+            rv = self.app.get(url_for('annotation_insert', id_=file_id))
+            assert b'Annotate' in rv.data
 
             rv = self.app.post(
-                url_for('annotate_image', id_=file_id),
+                url_for('annotation_insert', id_=file_id),
                 data={
                     'coordinate': '1.5,1.6,1.4,9.6,8.6,9.6,8.6,1.6',
                     'annotation': 'An interesting annotation'},
@@ -170,7 +170,7 @@ class FileTest(TestBaseCase):
             assert b'An interesting annotation' in rv.data
 
             rv = self.app.get(
-                url_for('delete_annotation', id_=1),
+                url_for('annotation_delete', id_=1),
                 follow_redirects=True)
             assert b'Annotation deleted' in rv.data
 

@@ -22,7 +22,6 @@ if TYPE_CHECKING:  # pragma: no cover
 class Entity:
 
     def __init__(self, data: dict[str, Any]) -> None:
-
         self.id = data['id']
         self.name = data['name']
         self.description = data['description']

@@ -1,4 +1,6 @@
-from typing import Optional, Any
+from __future__ import annotations
+
+from typing import Any, Optional
 
 from flask_login import current_user
 
@@ -6,16 +8,42 @@ from openatlas.database.annotation import AnnotationImage as Db
 
 
 class AnnotationImage:
-    @staticmethod
-    def get_by_id(id_: int) -> Optional[dict[str, Any]]:
-        return Db.get_by_id(id_)
+
+    def __init__(self, data: dict[str, Any]) -> None:
+        self.id = data['id']
+        self.image_id = data['image_id']
+        self.entity_id = data['entity_id']
+        self.coordinates = data['coordinates']
+        self.user_id = data['user_id']
+        self.annotation = data['annotation']
+        self.created = data['created']
+
+    def update(
+            self,
+            entity_id: Optional[int] = None,
+            annotation: Optional[str] = None) -> None:
+        Db.update({
+            'id': self.id,
+            'entity_id': entity_id,
+            'annotation': annotation})
+
+    def delete(self) -> None:
+        Db.delete(self.id)
 
     @staticmethod
-    def get_by_file(image_id: int) -> list[dict[str, Any]]:
+    def get_by_id(id_: int) -> AnnotationImage:
+        return AnnotationImage(Db.get_by_id(id_))
+
+    @staticmethod
+    def get_by_file(image_id: int) -> list[AnnotationImage]:
+        return [AnnotationImage(row) for row in Db.get_by_file(image_id)]
+
+    @staticmethod
+    def get_by_file_as_dict(image_id: int) -> list[dict[str, Any]]:
         return Db.get_by_file(image_id)
 
     @staticmethod
-    def insert_annotation_image(
+    def insert(
             image_id: int,
             coordinates: str,
             entity_id: Optional[int] = None,
@@ -23,10 +51,6 @@ class AnnotationImage:
         Db.insert({
             'image_id': image_id,
             'user_id': current_user.id,
-            'entity_id': entity_id,
+            'entity_id': entity_id or None,
             'coordinates': coordinates,
             'annotation': annotation})
-
-    @staticmethod
-    def delete(id_: int) -> None:
-        Db.delete(id_)

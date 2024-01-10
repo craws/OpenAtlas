@@ -1,4 +1,4 @@
-from typing import Optional, Any
+from typing import Any, Optional
 
 from flask import g
 
@@ -10,6 +10,7 @@ class AnnotationImage:
         g.cursor.execute(
             """
             SELECT
+                id,
                 image_id,
                 entity_id,
                 coordinates,
@@ -56,6 +57,16 @@ class AnnotationImage:
                 %(coordinates)s,
                 %(user_id)s,
                 %(annotation)s);
+            """,
+            data)
+
+    @staticmethod
+    def update(data: dict[str, Any]) -> None:
+        g.cursor.execute(
+            """
+            UPDATE web.annotation_image SET (entity_id, annotation)
+            = (%(entity_id)s, %(annotation)s)
+            WHERE id = %(id)s;
             """,
             data)
 

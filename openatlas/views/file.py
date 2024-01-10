@@ -1,27 +1,14 @@
-import json
 from typing import Any, Union
 
 from flask import (
-    flash, g, render_template, request, send_from_directory, url_for)
+    g, render_template, request, send_from_directory, url_for)
 from flask_babel import lazy_gettext as _
-from flask_login import current_user
-from flask_wtf import FlaskForm
-from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import TextAreaField
-from wtforms.fields.simple import HiddenField
-from wtforms.validators import InputRequired
 
 from openatlas import app
-from openatlas.display.tab import Tab
-from openatlas.display.table import Table
-from openatlas.display.util import (
-    button, convert_image_to_iiif, format_date, get_file_path, is_authorized,
-    required_group)
-from openatlas.forms.field import SubmitField, TableField
+from openatlas.display.util import convert_image_to_iiif, required_group
 from openatlas.forms.form import get_table_form
-from openatlas.models.annotation import AnnotationImage
 from openatlas.models.entity import Entity
 
 
@@ -99,73 +86,3 @@ def view_iiif(id_: int) -> str:
             id_=id_,
             version=g.settings['iiif_version'],
             _external=True))
-
-
-class AnnotationForm(FlaskForm):
-    coordinate = HiddenField(_('coordinates'), validators=[InputRequired()])
-    annotation = TextAreaField(_('annotation'))
-    annotated_entity = TableField(_('entity'))
-    save = SubmitField(_('save'))
-
-
-@app.route('/annotate_image/<int:id_>', methods=['GET', 'POST'])
-@required_group('contributor')
-def annotate_image(id_: int) -> Union[str, Response]:
-    entity = Entity.get_by_id(id_, types=True, aliases=True)
-    if not get_file_path(entity.id):
-        return abort(404)
-    table = None
-    form = AnnotationForm()
-    form.annotated_entity.filter_ids = [entity.id]
-    if form.validate_on_submit():
-        AnnotationImage.insert_annotation_image(
-            image_id=id_,
-            coordinates=form.coordinate.data,
-            entity_id=form.annotated_entity.data,
-            annotation=form.annotation.data)
-        return redirect(url_for('annotate_image', id_=entity.id))
-    if annotations := AnnotationImage.get_by_file(entity.id):
-        rows = []
-        for item in annotations:
-            delete = ''
-            if is_authorized('editor') or (
-                    is_authorized('contributor')
-                    and current_user.id == item['user_id']):
-                delete = button(
-                    _('delete'),
-                    url_for('delete_annotation', id_=item['id']))
-            rows.append([
-                format_date(item['created']),
-                item['annotation'],
-                delete])
-        table = Table(
-            ['date', 'annotation', ''],
-            rows=rows,
-            order=[[0, 'desc']])
-    return render_template(
-        'tabs.html',
-        tabs={'annotation': Tab(
-            'annotation',
-            form=form,
-            table=table,
-            content=render_template(
-                'annotate.html',
-                entity=entity,
-                annotation_list=json.dumps(annotations, default=str)))},
-        entity=entity,
-        crumbs=[
-            [_('file'), url_for('index', view='file')],
-            entity,
-            _('annotate')])
-
-
-@app.route('/delete_annotation/<int:id_>')
-@required_group('contributor')
-def delete_annotation(id_: int) -> Response:
-    annotation = AnnotationImage.get_by_id(id_)
-    if current_user.group == 'contributor' \
-            and annotation['user_id'] != current_user.id:
-        abort(403)
-    AnnotationImage.delete(id_)
-    flash(_('annotation deleted'), 'info')
-    return redirect(url_for('annotate_image', id_=annotation['image_id']))
