@@ -31,6 +31,7 @@ INSERT INTO web.settings (name, value) VALUES
   ('iiif_url', ''),
   ('iiif_version', '2'),
   ('iiif_conversion', ''),
+  ('iiif_convert_on_upload', '');
   ('image_processing', 'True'),
   ('log_level', '6'),
   ('logo_file_id', ''),
