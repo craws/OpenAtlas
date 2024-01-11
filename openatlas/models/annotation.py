@@ -7,7 +7,7 @@ from flask_login import current_user
 from openatlas.database.annotation import AnnotationImage as Db
 
 
-class AnnotationImage:
+class Annotation:
 
     def __init__(self, data: dict[str, Any]) -> None:
         self.id = data['id']
@@ -31,12 +31,12 @@ class AnnotationImage:
         Db.delete(self.id)
 
     @staticmethod
-    def get_by_id(id_: int) -> AnnotationImage:
-        return AnnotationImage(Db.get_by_id(id_))
+    def get_by_id(id_: int) -> Annotation:
+        return Annotation(Db.get_by_id(id_))
 
     @staticmethod
-    def get_by_file(image_id: int) -> list[AnnotationImage]:
-        return [AnnotationImage(row) for row in Db.get_by_file(image_id)]
+    def get_by_file(image_id: int) -> list[Annotation]:
+        return [Annotation(row) for row in Db.get_by_file(image_id)]
 
     @staticmethod
     def get_by_file_as_dict(image_id: int) -> list[dict[str, Any]]:

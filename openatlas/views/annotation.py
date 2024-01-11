@@ -18,7 +18,7 @@ from openatlas.display.table import Table
 from openatlas.display.util import (
     format_date, get_file_path, is_authorized, link, required_group)
 from openatlas.forms.field import SubmitField, TableField
-from openatlas.models.annotation import AnnotationImage
+from openatlas.models.annotation import Annotation
 from openatlas.models.entity import Entity
 
 
@@ -44,14 +44,14 @@ def annotation_insert(id_: int) -> Union[str, Response]:
     form = AnnotationForm()
     form.annotated_entity.filter_ids = [image.id]
     if form.validate_on_submit():
-        AnnotationImage.insert(
+        Annotation.insert(
             image_id=id_,
             coordinates=form.coordinate.data,
             entity_id=form.annotated_entity.data,
             annotation=form.annotation.data)
         return redirect(url_for('annotation_insert', id_=image.id))
     table = None
-    if annotations := AnnotationImage.get_by_file(image.id):
+    if annotations := Annotation.get_by_file(image.id):
         rows = []
         for annotation in annotations:
             delete = ''
@@ -95,7 +95,7 @@ def annotation_insert(id_: int) -> Union[str, Response]:
 @app.route('/annotation_update/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
 def annotation_update(id_: int) -> str | Response:
-    annotation = AnnotationImage.get_by_id(id_)
+    annotation = Annotation.get_by_id(id_)
     form = AnnotationUpdateForm()
     form.annotated_entity.filter_ids = [annotation.image_id]
     if form.validate_on_submit():
@@ -117,7 +117,7 @@ def annotation_update(id_: int) -> str | Response:
 @app.route('/annotation_delete/<int:id_>')
 @required_group('contributor')
 def annotation_delete(id_: int) -> Response:
-    annotation = AnnotationImage.get_by_id(id_)
+    annotation = Annotation.get_by_id(id_)
     if current_user.group == 'contributor' \
             and annotation.user_id != current_user.id:
         abort(403)
