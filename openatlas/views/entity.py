@@ -14,7 +14,7 @@ from openatlas.database.connect import Transaction
 from openatlas.display import display
 from openatlas.display.image_processing import resize_image
 from openatlas.display.util import (
-    button, get_base_table_data, get_file_path, is_authorized, link,
+    button, check_iiif_activation, get_base_table_data, get_file_path, is_authorized, link,
     required_group, get_iiif_file_path, check_iiif_file_exist)
 from openatlas.forms.base_manager import BaseManager
 from openatlas.forms.form import get_manager
@@ -216,6 +216,8 @@ def insert_files(manager: BaseManager) -> str:
             filenames.append(name)
             if g.settings['image_processing']:
                 resize_image(name)
+            if g.settings['iiif_conversion'] and check_iiif_activation():
+                print("start here")
             if len(manager.form.file.data) > 1:
                 manager.form.name.data = \
                     f'{entity_name}_{str(count + 1).zfill(2)}'

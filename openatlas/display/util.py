@@ -811,9 +811,13 @@ def convert_iiif_files() -> None:
     if not check_iiif_activation():
         flash(_('please activate IIIF'), 'info')
         return
+    if not g.settings['iiif_conversion']:
+        flash(_('please activate IIIF conversion'), 'info')
+        return
     for id_, path in g.files.items():
         if check_iiif_file_exist(id_):
             continue
         if path.suffix in g.display_file_ext:
             convert_image_to_iiif(id_)
     return
+
