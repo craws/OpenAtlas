@@ -464,6 +464,11 @@ def get_table_content(
                 g.view_class_mapping['place'] + ['human_remains'],
                 types=True,
                 aliases=aliases)
+        elif class_name == 'annotated_entity':
+            # Hackish (mis)use of filter_ids to get table field for annotations
+            class_ = 'source'
+            entities = Entity.get_by_id(
+                filter_ids[0]).get_linked_entities('P67')
         else:
             class_ = class_name
             entities = Entity.get_by_view(class_, types=True, aliases=aliases)

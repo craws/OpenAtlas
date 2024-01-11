@@ -268,10 +268,14 @@ def profile_image(entity: Entity) -> str:
             and g.files[file_id].suffix in g.display_file_ext:
         if check_iiif_file_exist(file_id) \
                 or not g.settings['iiif_conversion']:
-            html += '<br>' + link(
+            html += ('<br>' + link(
                 _('view in IIIF'),
                 url_for('view_iiif', id_=file_id),
-                external=True)
+                external=True) + ' - ' +
+                link(
+                    _('annotate'),
+                    url_for('annotation_insert', id_=file_id),
+                    external=True))
         else:
             html += button_bar([
                 button(

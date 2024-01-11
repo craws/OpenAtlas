@@ -1,12 +1,13 @@
 from typing import Any, Union
 
-from flask import flash, g, render_template, request, send_from_directory, url_for
+from flask import (
+    flash, g, render_template, request, send_from_directory, url_for)
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
-from openatlas.display.util import required_group, convert_image_to_iiif
+from openatlas.display.util import convert_image_to_iiif, required_group
 from openatlas.forms.form import get_table_form
 from openatlas.models.entity import Entity
 
@@ -68,7 +69,7 @@ def file_add(id_: int, view: str) -> Union[str, Response]:
             f"{_('link')} {_(view)}"])
 
 
-@app.route('/file/convert_iiif/<int:id_>', methods=['GET'])
+@app.route('/file/convert_iiif/<int:id_>')
 @required_group('contributor')
 def make_iiif_available(id_: int) -> Response:
     flash(_('IIIF converted'), 'info') if convert_image_to_iiif(id_) \
@@ -76,7 +77,7 @@ def make_iiif_available(id_: int) -> Response:
     return redirect(url_for('view', id_=id_))
 
 
-@app.route('/view_iiif/<int:id_>', methods=['GET'])
+@app.route('/view_iiif/<int:id_>')
 @required_group('contributor')
 def view_iiif(id_: int) -> str:
     return render_template(

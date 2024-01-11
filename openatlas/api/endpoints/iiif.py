@@ -2,11 +2,12 @@ import mimetypes
 from typing import Any
 
 import requests
-from flask import jsonify, Response, url_for, g
+from flask import Response, g, jsonify, url_for
 from flask_restful import Resource
 
 from openatlas.api.resources.model_mapper import get_entity_by_id
 from openatlas.api.resources.util import get_license_name
+from openatlas.models.annotation import AnnotationImage
 from openatlas.models.entity import Entity
 
 
@@ -14,7 +15,7 @@ class IIIFSequenceV2(Resource):
     @staticmethod
     def get(id_: int) -> Response:
         return jsonify(
-            {"@context": "https://iiif.io/api/presentation/2/context.json"} |
+            {"@context": "http://iiif.io/api/presentation/2/context.json"} |
             IIIFSequenceV2.build_sequence(get_metadata(get_entity_by_id(id_))))
 
     @staticmethod
@@ -23,7 +24,6 @@ class IIIFSequenceV2(Resource):
             "@id": url_for(
                 'api.iiif_sequence',
                 id_=metadata['entity'].id,
-                version=2,
                 _external=True),
             "@type": "sc:Sequence",
             "label": [{
@@ -37,7 +37,7 @@ class IIIFCanvasV2(Resource):
     @staticmethod
     def get(id_: int) -> Response:
         return jsonify(
-            {"@context": "https://iiif.io/api/presentation/2/context.json"} |
+            {"@context": "http://iiif.io/api/presentation/2/context.json"} |
             IIIFCanvasV2.build_canvas(get_metadata(get_entity_by_id(id_))))
 
     @staticmethod
@@ -45,17 +45,22 @@ class IIIFCanvasV2(Resource):
         entity = metadata['entity']
         mime_type, _ = mimetypes.guess_type(g.files[entity.id])
         return {
-            "@id": url_for(
-                'api.iiif_canvas', id_=entity.id, version=2, _external=True),
+            "@id": url_for('api.iiif_canvas', id_=entity.id, _external=True),
             "@type": "sc:Canvas",
             "label": entity.name,
             "height": metadata['img_api']['height'],
             "width": metadata['img_api']['width'],
             "description": {
-                "@value": entity.description,
+                "@value": entity.description or '',
                 "@language": "en"},
             "images": [IIIFImageV2.build_image(metadata)],
             "related": "",
+            "otherContent": [{
+                "@id": url_for(
+                    'api.iiif_annotation_list',
+                    id_=entity.id,
+                    _external=True),
+                "@type": "sc:AnnotationList"}],
             "thumbnail": {
                 "@id": f'{metadata["img_url"]}/full/!200,200/0/default.jpg',
                 "@type": "dctypes:Image",
@@ -79,9 +84,9 @@ class IIIFImageV2(Resource):
         id_ = metadata['entity'].id
         mime_type, _ = mimetypes.guess_type(g.files[id_])
         return {
-            "@context": "https://iiif.io/api/presentation/2/context.json",
+            "@context": "http://iiif.io/api/presentation/2/context.json",
             "@id":
-                url_for('api.iiif_image', id_=id_, version=2, _external=True),
+                url_for('api.iiif_image', id_=id_, _external=True),
             "@type": "oa:Annotation",
             "motivation": "sc:painting",
             "resource": {
@@ -95,7 +100,94 @@ class IIIFImageV2(Resource):
                 "height": metadata['img_api']['height'],
                 "width": metadata['img_api']['width']},
             "on":
-                url_for('api.iiif_canvas', id_=id_, version=2, _external=True)}
+                url_for('api.iiif_canvas', id_=id_, _external=True)}
+
+
+class IIIFAnnotationListV2(Resource):
+    @staticmethod
+    def get(id_: int) -> Response:
+        return jsonify(
+            IIIFAnnotationListV2.build_annotation_list(
+                get_metadata(get_entity_by_id(id_))))
+
+    @staticmethod
+    def build_annotation_list(metadata: dict[str, Any]) -> dict[str, Any]:
+        id_ = metadata['entity'].id
+        return {
+            "@context": "http://iiif.io/api/presentation/2/context.json",
+            "@id": url_for(
+                'api.iiif_annotation_list',
+                id_=id_,
+                _external=True),
+            "@type": "sc:AnnotationList",
+            "resources":
+                [IIIFAnnotationV2.build_annotation(metadata, anno)
+                 for anno in AnnotationImage.get_by_file_as_dict(id_)]}
+
+
+class IIIFAnnotationV2(Resource):
+    @staticmethod
+    def get(id_: int, annotation_id: int) -> Response:
+        return jsonify(
+            IIIFImageV2.build_annotation(
+                get_metadata(get_entity_by_id(id_)),
+                AnnotationImage.get_by_file_as_dict(annotation_id)))
+
+    @staticmethod
+    def build_annotation(
+            metadata: dict[str, Any],
+            anno: dict[str, Any]) -> dict[str, Any]:
+        id_ = metadata['entity'].id
+        selector = generate_selector(anno)
+        return {
+            "@context": "http://iiif.io/api/presentation/2/context.json",
+            "@id": url_for(
+                'api.iiif_annotation',
+                id_=id_,
+                annotation_id=anno['id'],
+                _external=True),
+            "@type": "oa:Annotation",
+            "motivation": ["oa:commenting"],
+            "resource": [{
+                "@type": "dctypes:Text",
+                "chars": anno['annotation'],
+                "format": "text/html"
+            }],
+            "on": {
+                "@type": "oa:SpecificResource",
+                "full": url_for('api.iiif_canvas', id_=id_, _external=True),
+                "selector": selector,
+                "within": {
+                    "@id": url_for(
+                        'api.iiif_manifest',
+                        id_=id_, version=2,
+                        _external=True),
+                    "@type": "sc:Manifest"}}}
+
+
+def calculate_fragment_selector_coordinates(coordinates):
+    coordinates_str = coordinates['coordinates']
+    # Splitting the coordinates string into individual values
+    coordinates_list = list(map(float, coordinates_str.split(',')))
+
+    # Extracting x, y, width, and height from the coordinates
+    x_min, y_min,x_max, y_max = (
+        min(coordinates_list[::2]),
+        min(coordinates_list[1::2]),
+        max(coordinates_list[::2]),
+        max(coordinates_list[1::2]))
+    x = x_min
+    y = y_min
+    width = x_max - x_min
+    height = y_max - y_min
+    return x, y, width, height
+
+
+def generate_selector(annotation):
+    x, y, width, height = calculate_fragment_selector_coordinates(annotation)
+    return {
+        "@type": "oa:FragmentSelector",
+        "value": f"xywh={x},{y},{width},{height}"}
 
 
 class IIIFManifest(Resource):
@@ -108,7 +200,7 @@ class IIIFManifest(Resource):
     def get_manifest_version_2(id_: int) -> dict[str, Any]:
         entity = get_entity_by_id(id_)
         return {
-            "@context": "https://iiif.io/api/presentation/2/context.json",
+            "@context": "http://iiif.io/api/presentation/2/context.json",
             "@id":
                 url_for(
                     'api.iiif_manifest',
@@ -117,9 +209,11 @@ class IIIFManifest(Resource):
                     _external=True),
             "@type": "sc:Manifest",
             "label": entity.name,
-            "metadata": [],
+            "metadata": [{
+                "label": "Title",
+                "value": entity.name}],
             "description": [{
-                "@value": entity.description,
+                "@value": entity.description or '',
                 "@language": "en"}],
             "license": get_license_name(entity),
             "logo": get_logo(),
@@ -143,6 +237,6 @@ def get_logo() -> dict[str, Any]:
             filename=g.settings['logo_file_id'],
             _external=True),
         "service": {
-            "@context": "https://iiif.io/api/image/2/context.json",
+            "@context": "http://iiif.io/api/image/2/context.json",
             "@id": url_for('overview', _external=True),
-            "profile": "https://iiif.io/api/image/2/level2.json"}}
+            "profile": "http://iiif.io/api/image/2/level2.json"}}
