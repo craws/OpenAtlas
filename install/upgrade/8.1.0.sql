@@ -27,4 +27,7 @@ ALTER TABLE web.annotation_image_id_seq OWNER TO openatlas;
 ALTER SEQUENCE web.annotation_image_id_seq OWNED BY web.annotation_image.id;
 ALTER TABLE ONLY web.annotation_image ALTER COLUMN id SET DEFAULT nextval('web.annotation_image_id_seq'::regclass);
 
+-- #2107 IIIF: Automatically convert image files to IIIF
+INSERT INTO web.settings (name, value) VALUES ('iiif_convert_on_upload', '');
+
 END;

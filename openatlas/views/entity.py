@@ -218,7 +218,8 @@ def insert_files(manager: BaseManager) -> str:
             if g.settings['image_processing']:
                 resize_image(name)
             if (g.settings['iiif_conversion']
-                    and check_iiif_activation() and g.settings['iiif_upload']):
+                    and check_iiif_activation() 
+                    and g.settings['iiif_convert_on_upload']):
                 convert_image_to_iiif(manager.entity.id, path)
             if len(manager.form.file.data) > 1:
                 manager.form.name.data = \
