@@ -60,7 +60,8 @@ def annotation_insert(id_: int) -> Union[str, Response]:
                     and current_user.id == annotation.user_id):
                 delete = link(
                     _('delete'),
-                    url_for('annotation_delete', id_=annotation.id))
+                    url_for('annotation_delete', id_=annotation.id),
+                    js="return confirm('" + _('Delete annotation?') + "')")
             rows.append([
                 format_date(annotation.created),
                 annotation.annotation,
