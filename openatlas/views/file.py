@@ -1,7 +1,6 @@
 from typing import Any, Union
 
-from flask import (
-    g, render_template, request, send_from_directory, url_for)
+from flask import g, render_template, request, send_from_directory, url_for
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response

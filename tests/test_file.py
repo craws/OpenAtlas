@@ -4,6 +4,7 @@ from typing import Any
 from flask import g, url_for
 
 from openatlas import app
+from openatlas.display.util import check_iiif_file_exist, get_iiif_file_path
 from openatlas.models.entity import Entity
 from tests.base import TestBaseCase, get_hierarchy, insert
 
@@ -38,6 +39,11 @@ class FileTest(TestBaseCase):
                 app.preprocess_request()
                 files = Entity.get_by_class('file')
                 file_id = files[0].id
+
+            # Remove IIIF file in case it does exist to not break tests
+            if check_iiif_file_exist(file_id):
+                if path := get_iiif_file_path(file_id):
+                    path.unlink()
 
             filename = f'{file_id}.png'
             with self.app.get(url_for('display_logo', filename=filename)):
