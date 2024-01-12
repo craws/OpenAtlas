@@ -39,10 +39,6 @@ class Annotation:
         return [Annotation(row) for row in Db.get_by_file(image_id)]
 
     @staticmethod
-    def get_by_file_as_dict(image_id: int) -> list[dict[str, Any]]:
-        return Db.get_by_file(image_id)
-
-    @staticmethod
     def insert(
             image_id: int,
             coordinates: str,

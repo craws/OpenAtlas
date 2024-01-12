@@ -42,8 +42,8 @@ class FileTest(TestBaseCase):
 
             # Remove IIIF file in case it does exist to not break tests
             if check_iiif_file_exist(file_id):
-                if path := get_iiif_file_path(file_id):
-                    path.unlink()
+                if path := get_iiif_file_path(file_id):  # pragma: no cover
+                    path.unlink()  # pragma: no cover
 
             filename = f'{file_id}.png'
             with self.app.get(url_for('display_logo', filename=filename)):
@@ -174,6 +174,15 @@ class FileTest(TestBaseCase):
                     'annotation': 'An interesting annotation'},
                 follow_redirects=True)
             assert b'An interesting annotation' in rv.data
+
+            rv = self.app.get(url_for('annotation_update', id_=1))
+            assert b'An interesting annotation' in rv.data
+
+            rv = self.app.post(
+                url_for('annotation_update', id_=1),
+                data={'annotation': 'A boring annotation'},
+                follow_redirects=True)
+            assert b'A boring annotation' in rv.data
 
             rv = self.app.get(
                 url_for('annotation_delete', id_=1),
