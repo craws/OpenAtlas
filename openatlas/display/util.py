@@ -132,7 +132,7 @@ def profile_image_table_link(entity: Entity, file: Entity, ext: str) -> str:
     if file.id == entity.image_id:
         return link(
             _('unset'),
-            url_for('file_remove_profile_image', entity_id=entity.id))
+            url_for('remove_profile_image', entity_id=entity.id))
     if ext in g.display_file_ext:
         return link(
             _('set'),

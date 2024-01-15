@@ -14,7 +14,7 @@ from openatlas.models.entity import Entity
 
 @app.route('/download/<path:filename>')
 @required_group('readonly')
-def download_file(filename: str) -> Any:
+def download(filename: str) -> Any:
     return send_from_directory(
         app.config['UPLOAD_PATH'],
         filename,
@@ -36,14 +36,14 @@ def display_logo(filename: str) -> Any:
     return send_from_directory(app.config['UPLOAD_PATH'], filename)
 
 
-@app.route('/file/set_profile_image/<int:id_>/<int:origin_id>')
+@app.route('/set_profile_image/<int:id_>/<int:origin_id>')
 def set_profile_image(id_: int, origin_id: int) -> Response:
     Entity.set_profile_image(id_, origin_id)
     return redirect(url_for('view', id_=origin_id))
 
 
-@app.route('/file/remove_profile_image/<int:entity_id>')
-def file_remove_profile_image(entity_id: int) -> Response:
+@app.route('/remove_profile_image/<int:entity_id>')
+def remove_profile_image(entity_id: int) -> Response:
     entity = Entity.get_by_id(entity_id)
     entity.remove_profile_image()
     return redirect(url_for('view', id_=entity.id))

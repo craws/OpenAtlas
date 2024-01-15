@@ -96,9 +96,7 @@ class ImageTest(TestBaseCase):
             assert b'Test_File' in rv.data
 
             app.config['IMAGE_SIZE']['tmp'] = '1'
-            rv = self.app.get(
-                url_for('admin_resize_images'),
-                follow_redirects=True)
+            rv = self.app.get(url_for('resize_images'), follow_redirects=True)
             assert b'Images were created' in rv.data
 
             rv = self.app.get(

@@ -123,7 +123,7 @@ class UserTests(TestBaseCase):
             self.app.post(
                 url_for('login'),
                 data={'username': 'Manager', 'password': 'test'})
-            rv = self.app.get(url_for('admin_settings', category='mail'))
+            rv = self.app.get(url_for('settings', category='mail'))
             assert b'403 - Forbidden' in rv.data
 
             rv = self.app.get(url_for('user_update', id_=self.alice_id))

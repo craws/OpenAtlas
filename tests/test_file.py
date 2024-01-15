@@ -59,7 +59,7 @@ class FileTest(TestBaseCase):
             with self.app.get(url_for('display_logo', filename=filename)):
                 pass
 
-            with self.app.get(url_for('download_file', filename=filename)):
+            with self.app.get(url_for('download', filename=filename)):
                 pass
 
             rv = self.app.get(url_for('admin_logo'), data={'file': file_id})
@@ -84,7 +84,7 @@ class FileTest(TestBaseCase):
             assert b'File type not allowed' in rv.data
 
             rv = self.app.get(
-                url_for('file_remove_profile_image', entity_id=place.id),
+                url_for('remove_profile_image', entity_id=place.id),
                 follow_redirects=True)
             assert b'Unset' not in rv.data
 

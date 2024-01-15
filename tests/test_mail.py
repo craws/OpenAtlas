@@ -12,13 +12,13 @@ class MailTests(TestBaseCase):
         with app.app_context():
 
             rv: Any = self.app.post(
-                url_for('admin_newsletter'),
+                url_for('newsletter'),
                 data={'subject': 'test', 'body': 'test', 'recipient': []},
                 follow_redirects=True)
             assert b'Newsletter send: 0' in rv.data
 
             rv = self.app.post(
-                url_for('admin_settings', category='mail'),
+                url_for('settings', category='mail'),
                 data={
                     'mail': True,
                     'mail_transport_username': 'whatever',
@@ -42,11 +42,11 @@ class MailTests(TestBaseCase):
                 follow_redirects=True)
             assert b'A test mail was sent' in rv.data
 
-            rv = self.app.get(url_for('admin_newsletter'))
+            rv = self.app.get(url_for('newsletter'))
             assert b'Newsletter' in rv.data
 
             rv = self.app.post(
-                url_for('admin_newsletter'),
+                url_for('newsletter'),
                 data={
                     'subject': 'test',
                     'body': 'test',
