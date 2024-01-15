@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import mimetypes
-from typing import Any
+from typing import Any, Tuple
 
 import requests
 from flask import Response, g, jsonify, url_for
@@ -160,7 +160,9 @@ class IIIFAnnotation(Resource):
                     "@type": "sc:Manifest"}}}
 
 
-def calculate_fragment_selector_coordinates(coordinates):
+def calculate_fragment_selector_coordinates(
+        coordinates: str) -> Tuple[float, float, float, float]:
+
     # Splitting the coordinates string into individual values
     coordinates_list = list(map(float, coordinates.split(',')))
 
@@ -177,7 +179,7 @@ def calculate_fragment_selector_coordinates(coordinates):
     return x, y, width, height
 
 
-def generate_selector(coordinates: str):
+def generate_selector(coordinates: str) -> dict[str, str]:
     x, y, width, height = calculate_fragment_selector_coordinates(coordinates)
     return {
         "@type": "oa:FragmentSelector",
