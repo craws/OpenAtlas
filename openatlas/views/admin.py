@@ -24,9 +24,9 @@ from openatlas.display.image_processing import (
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, convert_iiif_files, convert_size, display_form, display_info, format_date,
-    get_file_path, is_authorized, link, manual, required_group, sanitize,
-    send_mail, uc_first)
+    button, convert_iiif_files, convert_size, count_files_to_convert,
+    display_form, display_info, format_date, get_file_path, is_authorized,
+    link, manual, required_group, sanitize, send_mail, uc_first)
 from openatlas.forms.field import SubmitField
 from openatlas.forms.setting import (
     ApiForm, ContentForm, FilesForm, GeneralForm, LogForm, MailForm, MapForm,
@@ -168,7 +168,9 @@ def admin_index(
             buttons=[
                 manual('admin/iiif'),
                 button(_('edit'), url_for('admin_settings', category='iiif')),
-                button(_('convert all files'), url_for('admin_convert_iiif_files'))])
+                button(
+                    _('convert all files') + f' ({count_files_to_convert()})',
+                    url_for('admin_convert_iiif_files'))])
 
     if is_authorized('manager'):
         tabs['modules'] = Tab(

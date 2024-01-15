@@ -825,3 +825,16 @@ def convert_iiif_files() -> None:
             convert_image_to_iiif(id_)
     flash(_('all image files are converted'), 'info')
     return
+
+
+def count_files_to_convert() -> int:
+    total_files = 0
+    converted_files = 0
+
+    for file_id, file_path in g.files.items():
+        if file_path.suffix in g.display_file_ext:
+            total_files += 1
+            if check_iiif_file_exist(file_id):
+                converted_files += 1
+
+    return total_files - converted_files
