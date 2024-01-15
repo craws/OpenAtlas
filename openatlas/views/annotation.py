@@ -40,7 +40,7 @@ class AnnotationUpdateForm(FlaskForm):
 def annotation_insert(id_: int) -> Union[str, Response]:
     image = Entity.get_by_id(id_, types=True, aliases=True)
     if not get_file_path(image.id):
-        return abort(404)
+        return abort(404)  # pragma: no cover
     form = AnnotationForm()
     form.annotated_entity.filter_ids = [image.id]
     if form.validate_on_submit():
@@ -60,7 +60,8 @@ def annotation_insert(id_: int) -> Union[str, Response]:
                     and current_user.id == annotation.user_id):
                 delete = link(
                     _('delete'),
-                    url_for('annotation_delete', id_=annotation.id))
+                    url_for('annotation_delete', id_=annotation.id),
+                    js="return confirm('" + _('Delete annotation?') + "')")
             rows.append([
                 format_date(annotation.created),
                 annotation.annotation,
@@ -120,7 +121,7 @@ def annotation_delete(id_: int) -> Response:
     annotation = Annotation.get_by_id(id_)
     if current_user.group == 'contributor' \
             and annotation.user_id != current_user.id:
-        abort(403)
+        abort(403)  # pragma: no cover
     annotation.delete()
     flash(_('annotation deleted'), 'info')
     return redirect(url_for('annotation_insert', id_=annotation.image_id))
