@@ -15,6 +15,11 @@ def index_changelog() -> str:
 
 
 versions = {
+    '8.1.0': ['TBA', {
+        'feature': {
+            '1910': 'IIIF: annotation system',
+            '2107': 'IIIF: Automatically convert image files to IIIF',
+            '2149': 'Refactor and minor improvements'}}],
     '8.0.0': ['2024-01-01', {
         'feature': {
             '2038': 'Update OpenAtlas software to Debian bookworm',
