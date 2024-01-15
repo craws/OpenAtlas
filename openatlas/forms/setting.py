@@ -73,7 +73,7 @@ class IiifForm(FlaskForm):
         choices=(('', 'none'), ('deflate', 'deflate'), ('jpeg', 'jpeg')),
         description=_('tooltip IIIF conversion'))
     iiif_path = StringField(_('path'), description=_('tooltip IIIF path'))
-    iiif_upload = BooleanField(
+    iiif_convert_on_upload = BooleanField(
         _('convert on upload'),
         description=_('tooltip IIIF convert on upload'))
     save = SubmitField(_('apply'))

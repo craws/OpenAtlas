@@ -35,6 +35,11 @@ class FileTest(TestBaseCase):
                     follow_redirects=True)
             assert b'An entry has been created' in rv.data
 
+            rv = self.app.get(
+                url_for('admin_convert_iiif_files'),
+                follow_redirects=True)
+            assert b'All image files are converted' in rv.data
+
             with app.test_request_context():
                 app.preprocess_request()
                 files = Entity.get_by_class('file')
@@ -131,16 +136,13 @@ class FileTest(TestBaseCase):
             assert bool(rv['label'] == 'Updated file')
 
             rv = self.app.get(url_for('api.iiif_sequence', id_=file_id))
-            rv = rv.get_json()
-            assert bool(str(file_id) in rv['@id'])
+            assert bool(str(file_id) in rv.get_json()['@id'])
 
             rv = self.app.get(url_for('api.iiif_image', id_=file_id))
-            rv = rv.get_json()
-            assert bool(str(file_id) in rv['@id'])
+            assert bool(str(file_id) in rv.get_json()['@id'])
 
             rv = self.app.get(url_for('api.iiif_canvas', id_=file_id))
-            rv = rv.get_json()
-            assert bool(str(file_id) in rv['@id'])
+            assert bool(str(file_id) in rv.get_json()['@id'])
 
             with app.test_request_context():
                 app.preprocess_request()
@@ -177,6 +179,19 @@ class FileTest(TestBaseCase):
 
             rv = self.app.get(url_for('annotation_update', id_=1))
             assert b'An interesting annotation' in rv.data
+
+            rv = self.app.get(url_for(
+                'api.iiif_annotation_list',
+                image_id=file_id))
+            rv = rv.get_json()
+            assert bool(str(file_id) in rv['@id'])
+            annotation_id = rv['resources'][0]['@id'].rsplit('/', 1)[-1]
+
+            rv = self.app.get(url_for(
+                'api.iiif_annotation',
+                annotation_id=annotation_id.replace('.json', '')))
+            rv = rv.get_json()
+            assert bool(annotation_id in rv['@id'])
 
             rv = self.app.post(
                 url_for('annotation_update', id_=1),

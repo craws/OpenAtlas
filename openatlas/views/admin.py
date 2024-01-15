@@ -812,7 +812,6 @@ def admin_delete_orphaned_resized_images() -> Response:
 @required_group('admin')
 def admin_convert_iiif_files() -> Response:
     convert_iiif_files()
-    flash(_('all image files are converted'), 'info')
     return redirect(url_for('admin_index') + '#tab-IIIF')
 
 
