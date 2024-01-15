@@ -807,7 +807,7 @@ def convert_image_to_iiif(id_: int, path: Optional[Path] = None) -> bool:
         process = subprocess.Popen(command)
         process.wait()
         return True
-    except:
+    except:  # pragma: no cover
         return False
 
 
@@ -825,4 +825,3 @@ def convert_iiif_files() -> None:
             convert_image_to_iiif(id_)
     flash(_('all image files are converted'), 'info')
     return
-

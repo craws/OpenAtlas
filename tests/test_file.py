@@ -35,15 +35,20 @@ class FileTest(TestBaseCase):
                     follow_redirects=True)
             assert b'An entry has been created' in rv.data
 
-            rv = self.app.get(
-                url_for('admin_convert_iiif_files'),
-                follow_redirects=True)
-            assert b'All image files are converted' in rv.data
-
             with app.test_request_context():
                 app.preprocess_request()
                 files = Entity.get_by_class('file')
                 file_id = files[0].id
+
+            # Remove IIIF file in case it does exist to not break tests
+            if check_iiif_file_exist(file_id):
+                if path := get_iiif_file_path(file_id):  # pragma: no cover
+                    path.unlink()  # pragma: no cover
+
+            rv = self.app.get(
+                url_for('admin_convert_iiif_files'),
+                follow_redirects=True)
+            assert b'All image files are converted' in rv.data
 
             # Remove IIIF file in case it does exist to not break tests
             if check_iiif_file_exist(file_id):
