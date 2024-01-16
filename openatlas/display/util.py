@@ -809,32 +809,3 @@ def convert_image_to_iiif(id_: int, path: Optional[Path] = None) -> bool:
         return True
     except:  # pragma: no cover
         return False
-
-
-def convert_iiif_files() -> None:
-    if not check_iiif_activation():  # pragma: no cover
-        flash(_('please activate IIIF'), 'info')
-        return
-    if not g.settings['iiif_conversion']:  # pragma: no cover
-        flash(_('please activate IIIF conversion'), 'info')
-        return
-    for id_, path in g.files.items():
-        if check_iiif_file_exist(id_):
-            continue
-        if path.suffix in g.display_file_ext:
-            convert_image_to_iiif(id_)
-    flash(_('all image files are converted'), 'info')
-    return
-
-
-def count_files_to_convert() -> int:
-    total_files = 0
-    converted_files = 0
-
-    for file_id, file_path in g.files.items():
-        if file_path.suffix in g.display_file_ext:
-            total_files += 1
-            if check_iiif_file_exist(file_id):
-                converted_files += 1
-
-    return total_files - converted_files
