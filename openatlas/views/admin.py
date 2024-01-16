@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 import importlib
 import math
@@ -24,7 +26,8 @@ from openatlas.display.image_processing import (
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, convert_iiif_files, convert_size, count_files_to_convert,
+    button, check_iiif_activation, check_iiif_file_exist,
+    convert_image_to_iiif, convert_size,
     display_form, display_info, format_date, get_file_path, is_authorized,
     link, manual, required_group, sanitize, send_mail, uc_first)
 from openatlas.forms.field import SubmitField
@@ -829,3 +832,35 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
         'percent_used': percent_free,
         'percent_project': percent_files,
         'percent_other': 100 - (percent_files + percent_free)}
+
+
+def count_files_to_convert() -> int:
+    total_files = 0
+    converted_files = 0
+    existing_files = [entity.id for entity in Entity.get_by_class('file')]
+    for file_id, file_path in g.files.items():
+        if (file_id in existing_files and
+                file_path.suffix in g.display_file_ext):
+            total_files += 1
+            if check_iiif_file_exist(file_id):
+                converted_files += 1
+
+    return total_files - converted_files
+
+
+def convert_iiif_files() -> None:
+    if not check_iiif_activation():  # pragma: no cover
+        flash(_('please activate IIIF'), 'info')
+        return
+    if not g.settings['iiif_conversion']:  # pragma: no cover
+        flash(_('please activate IIIF conversion'), 'info')
+        return
+    existing_files = [entity.id for entity in Entity.get_by_class('file')]
+    for file_id, file_path in g.files.items():
+        if check_iiif_file_exist(file_id):
+            continue
+        if (file_id in existing_files and
+                file_path.suffix in g.display_file_ext):
+            convert_image_to_iiif(file_id)
+    flash(_('all image files are converted'), 'info')
+    return
