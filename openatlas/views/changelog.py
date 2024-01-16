@@ -15,6 +15,9 @@ def index_changelog() -> str:
 
 
 versions = {
+    '8.0.1': ['2024-01-16', {
+        'fix': {
+            '2155': 'Checkboxes in checkbox groups are disabled'}}],
     '8.0.0': ['2024-01-01', {
         'feature': {
             '2038': 'Update OpenAtlas software to Debian bookworm',

@@ -18,6 +18,9 @@ then run the database upgrade script, then restart Apache:
     sudo python3 install/upgrade/database_upgrade.py
     sudo service apache2 restart
 
+### 8.0.0 to 8.0.1
+A code base update (e.g. with git pull) and a webserver restart is sufficient.
+
 ### 7.17.x to 8.0.0
 This is a major upgrade which utilizes newer versions of underlying software.
 Please consult the install.md about installation. In case you are using a
