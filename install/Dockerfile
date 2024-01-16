@@ -25,8 +25,8 @@ RUN cd /var/www/openatlas && cp install/entrypoint.sh /entrypoint.sh &&\
     dos2unix /entrypoint.sh &&\
     sed -i 's~^Listen.*~Listen 8080~' /etc/apache2/ports.conf &&\
     sed -i 's~^<VirtualHost \*:80>~<VirtualHost *:8080>~' /etc/apache2/sites-available/000-default.conf &&\
-    sed -i 's~ServerName.*~~' /etc/apache2/sites-available/000-default.conf &&\
-    systemctl disable iipsrv.service
+    sed -i 's~ServerName.*~~' /etc/apache2/sites-available/000-default.conf
+
 USER www-data
 RUN cd /var/www/openatlas &&\
     cd openatlas/static &&\
@@ -34,6 +34,7 @@ RUN cd /var/www/openatlas &&\
 RUN a2enmod iipsrv &&\
     a2enmod fcgid &&\
     service apache2 restart
+RUN systemctl disable iipsrv.service
 
 EXPOSE 8080
 ENV APACHE_CONFDIR /etc/apache2
