@@ -459,7 +459,6 @@ class HierarchyBaseManager(BaseManager):
         return {
             'classes': SelectMultipleField(
                 _('classes'),
-                render_kw={'disabled': True},
                 description=_('tooltip hierarchy forms'),
                 choices=Type.get_class_choices(self.entity),
                 option_widget=widgets.CheckboxInput(),

@@ -20,6 +20,9 @@ versions = {
             '1910': 'IIIF: annotation system',
             '2107': 'IIIF: Automatically convert image files to IIIF',
             '2149': 'Refactor and minor improvements'}}],
+    '8.0.1': ['2024-01-16', {
+        'fix': {
+            '2155': 'Checkboxes in checkbox groups are disabled'}}],
     '8.0.0': ['2024-01-01', {
         'feature': {
             '2038': 'Update OpenAtlas software to Debian bookworm',

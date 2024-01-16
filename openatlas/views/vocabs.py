@@ -126,14 +126,12 @@ def vocabulary_import_view(category: str, id_: str) -> Union[str, Response]:
     class ImportVocabsHierarchyForm(FlaskForm):
         concepts = SelectMultipleField(
             _('top concepts') if category == 'hierarchy' else _('groups'),
-            render_kw={'disabled': True},
             choices=fetch_top_concept_details(id_) if category == 'hierarchy'
             else fetch_top_group_details(id_),
             option_widget=widgets.CheckboxInput(),
             widget=widgets.ListWidget(prefix_label=False))
         classes = SelectMultipleField(
             _('classes'),
-            render_kw={'disabled': True},
             description=_('tooltip hierarchy forms'),
             choices=Type.get_class_choices(),
             option_widget=widgets.CheckboxInput(),
