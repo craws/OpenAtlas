@@ -72,8 +72,10 @@ def file_add(id_: int, view: str) -> str | Response:
 @app.route('/file/convert_iiif/<int:id_>')
 @required_group('contributor')
 def make_iiif_available(id_: int) -> Response:
-    flash(_('IIIF converted'), 'info') if convert_image_to_iiif(id_) \
-        else flash(f"{_('failed to convert image')}", 'error')
+    if convert_image_to_iiif(id_):
+        flash(_('IIIF converted'), 'info')
+    else:
+        flash(_('failed to convert image'), 'error')  # pragma: no cover
     return redirect(url_for('view', id_=id_))
 
 

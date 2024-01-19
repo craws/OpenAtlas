@@ -807,5 +807,5 @@ def convert_image_to_iiif(id_: int, path: Optional[Path] = None) -> bool:
         process = subprocess.Popen(command)
         process.wait()
         return True
-    except:  # pragma: no cover
+    except Exception:  # pragma: no cover
         return False
