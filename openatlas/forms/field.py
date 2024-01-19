@@ -15,7 +15,7 @@ from wtforms.widgets import FileInput, HiddenInput, Input, TextInput
 
 from openatlas import app
 from openatlas.display.table import Table
-from openatlas.display.util import get_base_table_data, is_authorized
+from openatlas.display.util import get_base_table_data, is_authorized, uc_first
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 
@@ -428,6 +428,14 @@ def get_table_content(
                 entity.name])
             if entity.code == selected_data:
                 selection = f'{entity.code} {entity.name}'
+    elif class_name == 'annotated_entity':
+        # Hackish (mis)use of filter_ids to get table field for annotations
+        table = Table(['name', 'class', 'description'])
+        for item in Entity.get_by_id(filter_ids[0]).get_linked_entities('P67'):
+            table.rows.append([
+                format_name_and_aliases(item, 'annotated_entity'),
+                uc_first(item.class_.name),
+                item.description])
     else:
         aliases = current_user.settings['table_show_aliases']
         if 'place' in class_name or class_name in \
@@ -464,11 +472,6 @@ def get_table_content(
                 g.view_class_mapping['place'] + ['human_remains'],
                 types=True,
                 aliases=aliases)
-        elif class_name == 'annotated_entity':
-            # Hackish (mis)use of filter_ids to get table field for annotations
-            class_ = 'source'
-            entities = Entity.get_by_id(
-                filter_ids[0]).get_linked_entities('P67')
         else:
             class_ = class_name
             entities = Entity.get_by_view(class_, types=True, aliases=aliases)
