@@ -1,5 +1,4 @@
 import ast
-from typing import Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -36,7 +35,7 @@ def link_delete(id_: int, origin_id: int) -> Response:
 
 @app.route('/link/insert/<int:id_>/<view>', methods=['GET', 'POST'])
 @required_group('contributor')
-def link_insert(id_: int, view: str) -> Union[str, Response]:
+def link_insert(id_: int, view: str) -> str | Response:
     entity = Entity.get_by_id(id_)
     property_code = 'P67'
     inverse = False
@@ -68,7 +67,7 @@ def link_insert(id_: int, view: str) -> Union[str, Response]:
 
 @app.route('/link/update/<int:id_>/<int:origin_id>', methods=['GET', 'POST'])
 @required_group('contributor')
-def link_update(id_: int, origin_id: int) -> Union[str, Response]:
+def link_update(id_: int, origin_id: int) -> str | Response:
     link_ = Link.get_by_id(id_)
     domain = Entity.get_by_id(link_.domain.id)
     range_ = Entity.get_by_id(link_.range.id)
@@ -109,7 +108,7 @@ def link_update(id_: int, origin_id: int) -> Union[str, Response]:
 
 @app.route('/insert/relation/<type_>/<int:origin_id>', methods=['GET', 'POST'])
 @required_group('contributor')
-def insert_relation(type_: str, origin_id: int) -> Union[str, Response]:
+def insert_relation(type_: str, origin_id: int) -> str | Response:
     origin = Entity.get_by_id(origin_id)
     manager = get_manager(
         'actor_function' if type_.startswith('member') else type_,
@@ -146,7 +145,7 @@ def insert_relation(type_: str, origin_id: int) -> Union[str, Response]:
             _(type_)])
 
 
-def reference_link_update(link_: Link, origin: Entity) -> Union[str, Response]:
+def reference_link_update(link_: Link, origin: Entity) -> str | Response:
     origin = Entity.get_by_id(origin.id)
     form = AddReferenceForm()
     del form.reference
@@ -173,7 +172,7 @@ def reference_link_update(link_: Link, origin: Entity) -> Union[str, Response]:
 
 @app.route('/reference/add/<int:id_>/<view>', methods=['GET', 'POST'])
 @required_group('contributor')
-def reference_add(id_: int, view: str) -> Union[str, Response]:
+def reference_add(id_: int, view: str) -> str | Response:
     reference = Entity.get_by_id(id_)
     form = get_add_reference_form(view)
     if form.validate_on_submit():
@@ -195,7 +194,7 @@ def reference_add(id_: int, view: str) -> Union[str, Response]:
 
 @app.route('/add/subunit/<int:super_id>', methods=['GET', 'POST'])
 @required_group('contributor')
-def add_subunit(super_id: int) -> Union[str, Response]:
+def add_subunit(super_id: int) -> str | Response:
     super_ = Entity.get_by_id(super_id)
     if request.method == 'POST':
         if request.form['checkbox_values']:
@@ -221,7 +220,7 @@ def add_subunit(super_id: int) -> Union[str, Response]:
 
 @app.route('/entity/add/file/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
-def entity_add_file(id_: int) -> Union[str, Response]:
+def entity_add_file(id_: int) -> str | Response:
     entity = Entity.get_by_id(id_)
     if request.method == 'POST':
         if request.form['checkbox_values']:
@@ -244,7 +243,7 @@ def entity_add_file(id_: int) -> Union[str, Response]:
 
 @app.route('/entity/add/source/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
-def entity_add_source(id_: int) -> Union[str, Response]:
+def entity_add_source(id_: int) -> str | Response:
     entity = Entity.get_by_id(id_)
     if request.method == 'POST':
         if request.form['checkbox_values']:
@@ -267,7 +266,7 @@ def entity_add_source(id_: int) -> Union[str, Response]:
 
 @app.route('/entity/add/reference/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
-def entity_add_reference(id_: int) -> Union[str, Response]:
+def entity_add_reference(id_: int) -> str | Response:
     entity = Entity.get_by_id(id_)
     form = AddReferenceForm()
     if form.validate_on_submit():

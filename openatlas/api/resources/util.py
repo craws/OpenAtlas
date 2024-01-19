@@ -1,13 +1,14 @@
 import ast
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 import numpy
 from flask import g, json
 from numpy import datetime64
 
 from openatlas.api.resources.error import InvalidSearchSyntax
-from openatlas.api.resources.model_mapper import get_entities_by_ids, \
-    get_all_links_of_entities, get_all_links_of_entities_inverse
+from openatlas.api.resources.model_mapper import (
+    get_all_links_of_entities, get_all_links_of_entities_inverse,
+    get_entities_by_ids)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -41,12 +42,10 @@ def replace_empty_list_values_in_dict_with_none(
     return data
 
 
-def get_linked_entities_api(id_: Union[int, list[int]]) -> list[Entity]:
-    domain_entity = [
-        link_.range for link_ in get_all_links_of_entities(id_)]
-    range_entity = [
-        link_.domain for link_ in get_all_links_of_entities_inverse(id_)]
-    return [*range_entity, *domain_entity]
+def get_linked_entities_api(id_: int | list[int]) -> list[Entity]:
+    domain = [link_.range for link_ in get_all_links_of_entities(id_)]
+    range_ = [link_.domain for link_ in get_all_links_of_entities_inverse(id_)]
+    return [*range_, *domain]
 
 
 def get_linked_entities_id_api(id_: int) -> list[Entity]:
@@ -102,7 +101,7 @@ def get_entities_by_type(
     return new_entities
 
 
-def get_key(entity: Entity, parser: dict[str, Any]) -> Union[datetime64, str]:
+def get_key(entity: Entity, parser: dict[str, Any]) -> datetime64 | str:
     if parser['column'] == 'cidoc_class':
         return entity.cidoc_class.name
     if parser['column'] == 'system_class':
@@ -110,7 +109,7 @@ def get_key(entity: Entity, parser: dict[str, Any]) -> Union[datetime64, str]:
     if parser['column'] in ['begin_from', 'begin_to', 'end_from', 'end_to']:
         if not getattr(entity, parser['column']):
             date = ("-" if parser["sort"] == 'desc' else "") \
-                   + '9999999-01-01T00:00:00'
+                + '9999999-01-01T00:00:00'
             return numpy.datetime64(date)
     return getattr(entity, parser['column'])
 

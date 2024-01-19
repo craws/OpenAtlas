@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any
 
 from flask import (
     flash, g, render_template, request, send_from_directory, url_for)
@@ -51,7 +51,7 @@ def remove_profile_image(entity_id: int) -> Response:
 
 @app.route('/file/add/<int:id_>/<view>', methods=['GET', 'POST'])
 @required_group('contributor')
-def file_add(id_: int, view: str) -> Union[str, Response]:
+def file_add(id_: int, view: str) -> str | Response:
     entity = Entity.get_by_id(id_)
     if request.method == 'POST':
         if request.form['checkbox_values']:

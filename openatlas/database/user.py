@@ -1,4 +1,4 @@
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 from flask import g
 
@@ -35,10 +35,7 @@ class User:
             data)
 
     @staticmethod
-    def update_settings(
-            user_id: int,
-            name: str,
-            value: Union[int, str]) -> None:
+    def update_settings(user_id: int, name: str, value: int | str) -> None:
         g.cursor.execute(
             """
             INSERT INTO web.user_settings (user_id, "name", "value")

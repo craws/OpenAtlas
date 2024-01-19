@@ -1,4 +1,4 @@
-from typing import Any, Iterable, Optional, Union
+from typing import Any, Iterable, Optional
 
 from flask import g
 
@@ -66,7 +66,7 @@ class Entity:
 
     @staticmethod
     def get_by_class(
-            classes: Union[str, list[str]],
+            classes: str | list[str],
             types: bool = False,
             aliases: bool = False) -> list[dict[str, Any]]:
         g.cursor.execute(
@@ -78,7 +78,7 @@ class Entity:
 
     @staticmethod
     def get_by_cidoc_class(
-            code: Union[str, list[str]],
+            code: str | list[str],
             types: bool = False,
             aliases: bool = False) -> list[dict[str, Any]]:
         g.cursor.execute(
@@ -419,8 +419,8 @@ class Entity:
 
     @staticmethod
     def get_links_of_entities(
-            entities: Union[int, list[int]],
-            codes: Union[str, list[str], None],
+            entities: int | list[int],
+            codes: str | list[str] | None,
             inverse: bool = False) -> list[dict[str, Any]]:
         sql = f"""
             SELECT

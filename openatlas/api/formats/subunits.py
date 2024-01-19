@@ -1,5 +1,5 @@
 from operator import attrgetter
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 from flask import g
 
@@ -43,16 +43,17 @@ def get_parent(links: list[Link]) -> Optional[int]:
     return None
 
 
-def get_children(data: dict[str, Any]) -> list[Union[int, dict[str, Any]]]:
-    children = [link_.range.id for link_ in data['links'] if
-                link_.property.code == 'P46']
+def get_children(data: dict[str, Any]) -> list[int | dict[str, Any]]:
+    children = [
+        link_.range.id for link_ in data['links'] if
+        link_.property.code == 'P46']
     return [{'child': child} for child in children] \
         if data['parser']['format'] == 'xml' else children
 
 
 def get_geometries_thanados(
         geom: Optional[dict[str, Any]],
-        parser: dict[str, Any]) -> Union[list[Any], dict[str, Any], None]:
+        parser: dict[str, Any]) -> list[Any] | dict[str, Any] | None:
     if parser['format'] == 'xml' and geom:
         if geom['type'] == 'GeometryCollection':
             geometries = []

@@ -1,5 +1,3 @@
-from typing import Union
-
 from flask import abort, flash, g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
 from werkzeug.utils import redirect
@@ -18,7 +16,7 @@ from openatlas.models.type import Type
 
 @app.route('/hierarchy/insert/<category>', methods=['GET', 'POST'])
 @required_group('manager')
-def hierarchy_insert(category: str) -> Union[str, Response]:
+def hierarchy_insert(category: str) -> str | Response:
     manager = get_manager(f'hierarchy_{category}')
     if manager.form.validate_on_submit():
         try:
@@ -53,7 +51,7 @@ def hierarchy_insert(category: str) -> Union[str, Response]:
 
 @app.route('/hierarchy/update/<int:id_>', methods=['GET', 'POST'])
 @required_group('manager')
-def hierarchy_update(id_: int) -> Union[str, Response]:
+def hierarchy_update(id_: int) -> str | Response:
     hierarchy = g.types[id_]
     if hierarchy.category in ('standard', 'system'):
         abort(403)

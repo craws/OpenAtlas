@@ -1,5 +1,4 @@
 import json
-from typing import Union
 
 from flask import flash, render_template, url_for
 from flask_babel import lazy_gettext as _
@@ -37,7 +36,7 @@ class AnnotationUpdateForm(FlaskForm):
 
 @app.route('/annotation_insert/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
-def annotation_insert(id_: int) -> Union[str, Response]:
+def annotation_insert(id_: int) -> str | Response:
     image = Entity.get_by_id(id_, types=True, aliases=True)
     if not get_file_path(image.id):
         return abort(404)  # pragma: no cover

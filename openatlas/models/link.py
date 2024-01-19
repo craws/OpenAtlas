@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Optional, TYPE_CHECKING, Union
+from typing import Any, Optional, TYPE_CHECKING
 
 from flask import abort, g
 
@@ -92,7 +92,7 @@ class Link:
     @staticmethod
     def get_linked_entities(
             id_: int,
-            codes: Union[str, list[str]],
+            codes: str | list[str],
             inverse: bool = False,
             types: bool = False) -> list[Entity]:
         from openatlas.models.entity import Entity

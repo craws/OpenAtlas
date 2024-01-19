@@ -2,24 +2,24 @@ import zipfile
 from collections import defaultdict
 from io import BytesIO
 from itertools import groupby
-from typing import Any, Union
+from typing import Any
 
 import pandas as pd
 from flask import Response, g
 
-from openatlas.api.resources.util import (
-    get_linked_entities_api,
-    link_parser_check, link_parser_check_inverse, remove_duplicate_entities)
 from openatlas.api.resources.model_mapper import (
     get_all_links_of_entities, get_all_links_of_entities_inverse)
+from openatlas.api.resources.util import (
+    get_linked_entities_api, link_parser_check, link_parser_check_inverse,
+    remove_duplicate_entities)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 
 
 def export_entities_csv(
-        entities: Union[Entity, list[Entity]],
-        name: Union[int, str]) -> Response:
+        entities: Entity | list[Entity],
+        name: int | str) -> Response:
     frames = [
         build_entity_dataframe(entity, True) for entity in
         (entities if isinstance(entities, list) else [entities])]

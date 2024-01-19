@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any
 
 from flask import g, request
 from flask_login import current_user
@@ -26,7 +26,7 @@ class Logger:
             priority_: str,
             type_: str,
             message: str,
-            info: Union[str, Exception, None] = None) -> None:
+            info: str | Exception | None = None) -> None:
         log_levels = app.config['LOG_LEVELS']
         priority = list(log_levels)[list(log_levels.values()).index(priority_)]
         if int(g.settings['log_level']) <= priority:

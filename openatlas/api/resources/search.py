@@ -1,4 +1,4 @@
-from typing import Any, Tuple, Union
+from typing import Any, Tuple
 
 from flask import g
 
@@ -57,7 +57,7 @@ def get_search_parameter(parser: dict[str, Any]) -> dict[str, Any]:
 
 def get_search_values(
         category: str,
-        parameter: dict[str, Any]) -> list[Union[str, int, list[Any]]]:
+        parameter: dict[str, Any]) -> list[str | int | list[Any]]:
     values = [
         value.lower() if isinstance(value, str) else value
         for value in parameter["values"]]

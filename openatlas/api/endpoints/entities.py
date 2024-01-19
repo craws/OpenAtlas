@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any
 
 from flask import Response, g
 from flask_restful import Resource
@@ -19,7 +19,7 @@ from openatlas.api.resources.util import (
 class GetByCidocClass(Resource):
     @staticmethod
     def get(cidoc_class: str) \
-            -> Union[tuple[Resource, int], Response, dict[str, Any]]:
+            -> tuple[Resource, int] | Response | dict[str, Any]:
         return resolve_entities(
             get_by_cidoc_classes([cidoc_class]),
             entity_.parse_args(),
@@ -29,7 +29,7 @@ class GetByCidocClass(Resource):
 class GetBySystemClass(Resource):
     @staticmethod
     def get(system_class: str) \
-            -> Union[tuple[Resource, int], Response, dict[str, Any]]:
+            -> tuple[Resource, int] | Response | dict[str, Any]:
         return resolve_entities(
             get_entities_by_system_classes([system_class]),
             entity_.parse_args(),
@@ -39,7 +39,7 @@ class GetBySystemClass(Resource):
 class GetByViewClass(Resource):
     @staticmethod
     def get(view_class: str) \
-            -> Union[tuple[Resource, int], Response, dict[str, Any]]:
+            -> tuple[Resource, int] | Response | dict[str, Any]:
         return resolve_entities(
             get_entities_by_view_classes([view_class]),
             entity_.parse_args(),
@@ -48,7 +48,7 @@ class GetByViewClass(Resource):
 
 class GetEntitiesLinkedToEntity(Resource):
     @staticmethod
-    def get(id_: int) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
+    def get(id_: int) -> tuple[Resource, int] | Response | dict[str, Any]:
         return resolve_entities(
             get_linked_entities_api(id_),
             entity_.parse_args(),
@@ -57,14 +57,13 @@ class GetEntitiesLinkedToEntity(Resource):
 
 class GetEntity(Resource):
     @staticmethod
-    def get(id_: int) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
+    def get(id_: int) -> tuple[Resource, int] | Response | dict[str, Any]:
         return resolve_entity(get_entity_by_id(id_), entity_.parse_args())
 
 
 class GetLatest(Resource):
     @staticmethod
-    def get(limit: int) \
-            -> Union[tuple[Resource, int], Response, dict[str, Any]]:
+    def get(limit: int) -> tuple[Resource, int] | Response | dict[str, Any]:
         if not 0 < limit < 101:
             raise InvalidLimitError
         return resolve_entities(
@@ -75,7 +74,7 @@ class GetLatest(Resource):
 
 class GetTypeEntities(Resource):
     @staticmethod
-    def get(id_: int) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
+    def get(id_: int) -> tuple[Resource, int] | Response | dict[str, Any]:
         if id_ not in g.types:
             raise NotATypeError
         if not (entities := g.types[id_].get_linked_entities(
@@ -88,7 +87,7 @@ class GetTypeEntities(Resource):
 
 class GetTypeEntitiesAll(Resource):
     @staticmethod
-    def get(id_: int) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
+    def get(id_: int) -> tuple[Resource, int] | Response | dict[str, Any]:
         if id_ not in g.types:
             raise NotATypeError
         if not (entities := get_entities_from_type_with_subs(id_)):
@@ -99,12 +98,13 @@ class GetTypeEntitiesAll(Resource):
 
 class GetQuery(Resource):
     @staticmethod
-    def get() -> Union[tuple[Resource, int], Response, dict[str, Any]]:
+    def get() -> tuple[Resource, int] | Response | dict[str, Any]:
         parser = query.parse_args()
-        if not any([parser['entities'],
-                    parser['cidoc_classes'],
-                    parser['view_classes'],
-                    parser['system_classes']]):
+        if not any([
+                parser['entities'],
+                parser['cidoc_classes'],
+                parser['view_classes'],
+                parser['system_classes']]):
             raise QueryEmptyError
         entities = []
         if parser['entities']:

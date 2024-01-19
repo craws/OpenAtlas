@@ -1,10 +1,10 @@
-from typing import Union, Optional, Any
+from typing import Any, Optional
 
 from flask import g
 
 from openatlas.api.resources.error import (
-    EntityDoesNotExistError, InvalidCidocClassCodeError, InvalidViewClassError,
-    InvalidSystemClassError)
+    EntityDoesNotExistError, InvalidCidocClassCodeError,
+    InvalidSystemClassError, InvalidViewClassError)
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 
@@ -55,15 +55,15 @@ def get_entities_by_system_classes(system_classes: list[str]) -> list[Entity]:
 
 
 def get_all_links_of_entities(
-        entities: Union[int, list[int]],
-        codes: Union[str, list[str], None] = None) -> list[Link]:
+        entities: int | list[int],
+        codes: str | list[str] | None = None) -> list[Link]:
     codes = list(g.properties) if not codes else codes
     return Entity.get_links_of_entities(entities, codes)
 
 
 def get_all_links_of_entities_inverse(
-        entities: Union[int, list[int]],
-        codes: Optional[Union[str, list[str]]] = None) -> list[Link]:
+        entities: int | list[int],
+        codes: Optional[str | list[str]] = None) -> list[Link]:
     codes = list(g.properties) if not codes else codes
     return Entity.get_links_of_entities(entities, codes, inverse=True)
 

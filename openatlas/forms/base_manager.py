@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import time
-from typing import Any, Optional, TYPE_CHECKING, Union
+from typing import Any, Optional, TYPE_CHECKING
 
 from flask import g, request, url_for
 from flask_babel import lazy_gettext as _
@@ -196,7 +196,7 @@ class BaseManager:
     def add_link(
             self,
             property_: str,
-            range_: Union[str, Entity],
+            range_: str | Entity,
             description: Optional[str] = None,
             inverse: bool = False,
             return_link_id: bool = False,
@@ -348,8 +348,8 @@ class ArtifactBaseManager(PlaceBaseManager):
         crumbs = super().get_crumbs()
         if self.place_info['structure'] and self.origin:
             if count := len([
-                i for i in self.place_info['structure']['siblings'] if
-                i.class_.name == self.class_.name]):
+                    i for i in self.place_info['structure']['siblings'] if
+                    i.class_.name == self.class_.name]):
                 crumbs[-1] = crumbs[-1] + f' ({count} {_("exists")})'
         return crumbs
 

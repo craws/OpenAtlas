@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import ast
-from typing import Any, Iterable, Optional, TYPE_CHECKING, Union
+from typing import Any, Iterable, Optional, TYPE_CHECKING
 
 from flask import g, request
 from fuzzywuzzy import fuzz
@@ -11,8 +11,8 @@ from openatlas import app
 from openatlas.database.date import Date
 from openatlas.database.entity import Entity as Db
 from openatlas.display.util import (
-    datetime64_to_timestamp, format_date_part, sanitize,
-    timestamp_to_datetime64, convert_size)
+    convert_size, datetime64_to_timestamp, format_date_part, sanitize,
+    timestamp_to_datetime64)
 from openatlas.models.link import Link
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -95,7 +95,7 @@ class Entity:
 
     def get_linked_entities(
             self,
-            code: Union[str, list[str]],
+            code: str | list[str],
             inverse: bool = False,
             types: bool = False) -> list[Entity]:
         return Link.get_linked_entities(
@@ -115,7 +115,7 @@ class Entity:
 
     def link(self,
              code: str,
-             range_: Union[Entity, list[Entity]],
+             range_: Entity | list[Entity],
              description: Optional[str] = None,
              inverse: bool = False,
              type_id: Optional[int] = None) -> list[int]:
@@ -162,7 +162,7 @@ class Entity:
 
     def get_links(
             self,
-            codes: Union[str, list[str]],
+            codes: str | list[str],
             inverse: bool = False) -> list[Link]:
         return Entity.get_links_of_entities(self.id, codes, inverse)
 
@@ -348,13 +348,13 @@ class Entity:
         return [Entity.get_by_id(x['id']) for x in Db.get_orphaned_subunits()]
 
     @staticmethod
-    def delete_(id_: Union[int, list[int]]) -> None:
+    def delete_(id_: int | list[int]) -> None:
         if id_:
             Db.delete(id_ if isinstance(id_, list) else [id_])
 
     @staticmethod
     def get_by_class(
-            classes: Union[str, list[str]],
+            classes: str | list[str],
             types: bool = False,
             aliases: bool = False) -> list[Entity]:
         if aliases:  # For performance: check classes if they can have an alias
@@ -394,7 +394,7 @@ class Entity:
 
     @staticmethod
     def get_by_cidoc_class(
-            code: Union[str, list[str]],
+            code: str | list[str],
             types: bool = False,
             aliases: bool = False) -> list[Entity]:
         return [
@@ -491,8 +491,8 @@ class Entity:
 
     @staticmethod
     def get_links_of_entities(
-            entities: Union[int, list[int]],
-            codes: Union[str, list[str], None] = None,
+            entities: int | list[int],
+            codes: str | list[str] | None = None,
             inverse: bool = False) -> list[Link]:
         entity_ids = set()
         result = Db.get_links_of_entities(

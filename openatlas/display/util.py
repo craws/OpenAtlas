@@ -11,7 +11,7 @@ from email.mime.text import MIMEText
 from functools import wraps
 from html.parser import HTMLParser
 from pathlib import Path
-from typing import Any, Optional, TYPE_CHECKING, Union
+from typing import Any, Optional, TYPE_CHECKING
 
 import numpy
 from bcrypt import hashpw
@@ -111,7 +111,7 @@ def get_appearance(event_links: list[Link]) -> tuple[str, str]:
 
 
 def format_entity_date(
-        entity: Union[Entity, Link],
+        entity: Entity | Link,
         type_: str,  # begin or end
         object_: Optional[Entity] = None) -> str:
     html = link(object_) if object_ else ''
@@ -388,7 +388,7 @@ def required_group(group: str):  # type: ignore
 def send_mail(
         subject: str,
         text: str,
-        recipients: Union[str, list[str]],
+        recipients: str | list[str],
         log_body: bool = True) -> bool:
     """
         Send one mail to every recipient.
@@ -488,7 +488,7 @@ def tooltip(text: str) -> str:
 
 
 def get_file_path(
-        entity: Union[int, Entity],
+        entity: int | Entity,
         size: Optional[str] = None) -> Optional[Path]:
     id_ = entity if isinstance(entity, int) else entity.id
     if id_ not in g.files:
@@ -502,7 +502,7 @@ def get_file_path(
     return app.config['UPLOAD_PATH'] / f"{id_}{ext}"
 
 
-def format_date(value: Union[datetime, numpy.datetime64]) -> str:
+def format_date(value: datetime | numpy.datetime64) -> str:
     if not value:
         return ''
     if isinstance(value, numpy.datetime64):

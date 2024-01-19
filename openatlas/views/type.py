@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any
 
 from flask import abort, flash, g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -80,7 +80,7 @@ def type_delete(id_: int) -> Response:
 
 @app.route('/type/delete_recursive/<int:id_>', methods=['GET', 'POST'])
 @required_group('editor')
-def type_delete_recursive(id_: int) -> Union[str, Response]:
+def type_delete_recursive(id_: int) -> str | Response:
 
     class DeleteRecursiveTypesForm(FlaskForm):
         confirm_delete = BooleanField(
@@ -136,7 +136,7 @@ def type_delete_recursive(id_: int) -> Union[str, Response]:
 
 @app.route('/type/move/<int:id_>', methods=['GET', 'POST'])
 @required_group('editor')
-def type_move_entities(id_: int) -> Union[str, Response]:
+def type_move_entities(id_: int) -> str | Response:
     type_ = g.types[id_]
     root = g.types[type_.root[0]]
     if root.category in ['system', 'value']:

@@ -1,4 +1,4 @@
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 from flask import url_for
 
@@ -13,7 +13,7 @@ class Api(ApiTestCase):
     def get_bool(
             data: dict[str, Any],
             key: str,
-            value: Optional[Union[str, list[Any]]] = None) -> bool:
+            value: Optional[str | list[Any]] = None) -> bool:
         return bool(data[key] == value) if value else bool(data[key])
 
     @staticmethod

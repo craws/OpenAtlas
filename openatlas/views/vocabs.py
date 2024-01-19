@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Optional
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -48,7 +48,7 @@ def vocabs_index() -> str:
 
 @app.route('/vocabs/update', methods=['GET', 'POST'])
 @required_group('manager')
-def vocabs_update() -> Union[str, Response]:
+def vocabs_update() -> str | Response:
     form = get_vocabs_form()
     if form.validate_on_submit():
         Settings.update({
@@ -120,7 +120,7 @@ def vocabulary_detail(category: str, url: str) -> Optional[str]:
 
 @app.route('/vocabs/import/<category>/<id_>', methods=['GET', 'POST'])
 @required_group('manager')
-def vocabulary_import_view(category: str, id_: str) -> Union[str, Response]:
+def vocabulary_import_view(category: str, id_: str) -> str | Response:
     details = fetch_vocabulary_details(id_)
 
     class ImportVocabsHierarchyForm(FlaskForm):

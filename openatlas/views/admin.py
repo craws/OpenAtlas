@@ -7,7 +7,7 @@ import os
 import shutil
 from pathlib import Path
 from subprocess import run
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -32,8 +32,8 @@ from openatlas.display.util import (
     link, manual, required_group, sanitize, send_mail, uc_first)
 from openatlas.forms.field import SubmitField
 from openatlas.forms.setting import (
-    ApiForm, ContentForm, FilesForm, GeneralForm, LogForm, MailForm, MapForm,
-    ModulesForm, SimilarForm, TestMailForm, IiifForm, FrontendForm)
+    ApiForm, ContentForm, FilesForm, FrontendForm, GeneralForm, IiifForm,
+    LogForm, MailForm, MapForm, ModulesForm, SimilarForm, TestMailForm)
 from openatlas.forms.util import get_form_settings, set_form_settings
 from openatlas.models.content import get_content, update_content
 from openatlas.models.entity import Entity
@@ -50,7 +50,7 @@ from openatlas.models.user import User
 @required_group('readonly')
 def admin_index(
         action: Optional[str] = None,
-        id_: Optional[int] = None) -> Union[str, Response]:
+        id_: Optional[int] = None) -> str | Response:
     if is_authorized('manager'):
         if id_ and action == 'delete_user':
             user = User.get_by_id(id_)
@@ -213,7 +213,7 @@ def admin_index(
 
 @app.route('/admin/content/<string:item>', methods=['GET', 'POST'])
 @required_group('manager')
-def admin_content(item: str) -> Union[str, Response]:
+def admin_content(item: str) -> str | Response:
     for language in app.config['LANGUAGES']:
         setattr(
             ContentForm,
@@ -266,8 +266,7 @@ def check_links() -> str:
 @app.route('/check_link_duplicates')
 @app.route('/check_link_duplicates/<delete>')
 @required_group('contributor')
-def check_link_duplicates(
-        delete: Optional[str] = None) -> Union[str, Response]:
+def check_link_duplicates(delete: Optional[str] = None) -> str | Response:
     if delete:
         count = Link.delete_link_duplicates()
         g.logger.log('info', 'admin', f"Deleted duplicate links: {count}")
@@ -338,7 +337,7 @@ def delete_single_type_duplicate(entity_id: int, type_id: int) -> Response:
 
 @app.route('/settings/<category>', methods=['GET', 'POST'])
 @required_group('manager')
-def settings(category: str) -> Union[str, Response]:
+def settings(category: str) -> str | Response:
     if category in ['general', 'mail', 'iiif'] and not is_authorized('admin'):
         abort(403)
     form = getattr(
@@ -647,7 +646,7 @@ def admin_file_iiif_delete(filename: str) -> Response:
 @app.route('/admin/logo/')
 @app.route('/admin/logo/<int:id_>')
 @required_group('manager')
-def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
+def admin_logo(id_: Optional[int] = None) -> str | Response:
     if g.settings['logo_file_id']:
         abort(418)  # pragma: no cover - logo already set
     if id_:
@@ -728,7 +727,7 @@ def log_delete() -> Response:
 
 @app.route('/newsletter', methods=['GET', 'POST'])
 @required_group('manager')
-def newsletter() -> Union[str, Response]:
+def newsletter() -> str | Response:
     class NewsLetterForm(FlaskForm):
         subject = StringField(
             '',

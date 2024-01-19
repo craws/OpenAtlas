@@ -1,5 +1,3 @@
-from typing import Union
-
 from flask import flash, g, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
@@ -124,7 +122,7 @@ def set_locale(language: str) -> Response:
 
 @app.route('/overview/feedback', methods=['GET', 'POST'])
 @required_group('readonly')
-def index_feedback() -> Union[str, Response]:
+def index_feedback() -> str | Response:
 
     class FeedbackForm(FlaskForm):
         subject = SelectField(

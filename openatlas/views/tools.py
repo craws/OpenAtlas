@@ -1,5 +1,4 @@
-
-from typing import Any, Union
+from typing import Any
 
 from flask import flash, g, json, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -64,7 +63,7 @@ def carbon_result(entity: Entity) -> str:
 
 @app.route('/tools/index/<int:id_>')
 @required_group('readonly')
-def tools_index(id_: int) -> Union[str, Response]:
+def tools_index(id_: int) -> str | Response:
     entity = Entity.get_by_id(id_)
     tabs = {
         'info': Tab(
@@ -85,7 +84,7 @@ def tools_index(id_: int) -> Union[str, Response]:
 
 @app.route('/tools/sex/<int:id_>')
 @required_group('readonly')
-def sex(id_: int) -> Union[str, Response]:
+def sex(id_: int) -> str | Response:
     entity = Entity.get_by_id(id_, types=True)
     buttons = [manual('tools/anthropological_analyses')]
     types = SexEstimation.get_types(entity)
@@ -109,13 +108,14 @@ def sex(id_: int) -> Union[str, Response]:
     return render_template(
         'tabs.html',
         entity=entity,
-        tabs={'info': Tab(
-            _('sex estimation'),
-            render_template(
-                'tools/sex.html',
-                data=data,
-                result=sex_result(entity)),
-            buttons=buttons)},
+        tabs={
+            'info': Tab(
+                _('sex estimation'),
+                render_template(
+                    'tools/sex.html',
+                    data=data,
+                    result=sex_result(entity)),
+                buttons=buttons)},
         crumbs=start_crumbs(entity) + [
             [_('tools'), url_for('tools_index', id_=entity.id)],
             _('sex estimation')])
@@ -123,7 +123,7 @@ def sex(id_: int) -> Union[str, Response]:
 
 @app.route('/tools/sex/delete/<int:id_>')
 @required_group('contributor')
-def sex_delete(id_: int) -> Union[str, Response]:
+def sex_delete(id_: int) -> str | Response:
     try:
         Transaction.begin()
         for dict_ in get_sex_types(id_):
@@ -138,7 +138,7 @@ def sex_delete(id_: int) -> Union[str, Response]:
 
 @app.route('/tools/sex/update/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
-def sex_update(id_: int) -> Union[str, Response]:
+def sex_update(id_: int) -> str | Response:
 
     class Form(FlaskForm):
         pass
@@ -190,7 +190,7 @@ def sex_update(id_: int) -> Union[str, Response]:
 
 @app.route('/tools/carbon/<int:id_>')
 @required_group('readonly')
-def carbon(id_: int) -> Union[str, Response]:
+def carbon(id_: int) -> str | Response:
     entity = Entity.get_by_id(id_, types=True)
     buttons = [manual('tools/radiocarbon_dating')]
     if is_authorized('contributor'):
@@ -214,7 +214,7 @@ def carbon(id_: int) -> Union[str, Response]:
 
 @app.route('/tools/carbon/update/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
-def carbon_update(id_: int) -> Union[str, Response]:
+def carbon_update(id_: int) -> str | Response:
 
     class Form(FlaskForm):
         lab_id = StringField(

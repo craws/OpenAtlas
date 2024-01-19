@@ -1,4 +1,4 @@
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 from flask import json, render_template
 from flask_babel import lazy_gettext as _
@@ -20,7 +20,7 @@ class Table:
             self,
             header: Optional[list[str]] = None,
             rows: Optional[list[Any]] = None,
-            order: Optional[list[list[Union[int, str]]]] = None,
+            order: Optional[list[list[int | str]]] = None,
             defs: Optional[list[dict[str, Any]]] = None,
             paging: bool = True) -> None:
         self.header = header or []

@@ -1,6 +1,6 @@
 import os
 from subprocess import call
-from typing import Optional, Union
+from typing import Optional
 
 from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
@@ -14,9 +14,9 @@ from openatlas.database.connect import Transaction
 from openatlas.display import display
 from openatlas.display.image_processing import resize_image
 from openatlas.display.util import (
-    button, check_iiif_activation, convert_image_to_iiif, get_base_table_data,
-    get_file_path, is_authorized, link,
-    required_group, get_iiif_file_path, check_iiif_file_exist)
+    button, check_iiif_activation, check_iiif_file_exist,
+    convert_image_to_iiif, get_base_table_data, get_file_path,
+    get_iiif_file_path, is_authorized, link, required_group)
 from openatlas.forms.base_manager import BaseManager
 from openatlas.forms.form import get_manager
 from openatlas.forms.util import was_modified
@@ -28,7 +28,7 @@ from openatlas.models.type import Type
 
 @app.route('/entity/<int:id_>')
 @required_group('readonly')
-def view(id_: int) -> Union[str, Response]:
+def view(id_: int) -> str | Response:
     if id_ in g.types:  # Types have their own view
         entity = g.types[id_]
         if not entity.root:
@@ -73,9 +73,7 @@ def reference_system_remove_class(system_id: int, class_name: str) -> Response:
 @app.route('/insert/<class_>', methods=['GET', 'POST'])
 @app.route('/insert/<class_>/<int:origin_id>', methods=['GET', 'POST'])
 @required_group('contributor')
-def insert(
-        class_: str,
-        origin_id: Optional[int] = None) -> Union[str, Response]:
+def insert(class_: str, origin_id: Optional[int] = None) -> str | Response:
     check_insert_access(class_)
     origin = Entity.get_by_id(origin_id) if origin_id else None
     manager = get_manager(class_, origin=origin)
@@ -98,7 +96,7 @@ def insert(
 @app.route('/update/<int:id_>', methods=['GET', 'POST'])
 @app.route('/update/<int:id_>/<copy>', methods=['GET', 'POST'])
 @required_group('contributor')
-def update(id_: int, copy: Optional[str] = None) -> Union[str, Response]:
+def update(id_: int, copy: Optional[str] = None) -> str | Response:
     entity = Entity.get_by_id(id_, types=True, aliases=True)
     check_update_access(entity)
     if entity.check_too_many_single_type_links():
@@ -218,7 +216,7 @@ def insert_files(manager: BaseManager) -> str:
             if g.settings['image_processing']:
                 resize_image(name)
             if (g.settings['iiif_conversion']
-                    and check_iiif_activation() 
+                    and check_iiif_activation()
                     and g.settings['iiif_convert_on_upload']):
                 convert_image_to_iiif(manager.entity.id, path)
             if len(manager.form.file.data) > 1:
