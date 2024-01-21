@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-01-21 14:10+0100\n"
+"POT-Creation-Date: 2024-01-21 19:41+0100\n"
 "PO-Revision-Date: 2023-07-15 13:06+0200\n"
 "Last-Translator: Clément Besnier <clem@clementbesnier.fr>\n"
 "Language: fr\n"
@@ -157,7 +157,7 @@ msgstr "activité"
 msgid "overlay"
 msgstr "surcouche"
 
-#: openatlas/display/base_display.py:414 openatlas/display/tab.py:252
+#: openatlas/display/base_display.py:414 openatlas/display/tab.py:254
 #: openatlas/display/util.py:582 openatlas/templates/forms/form_table.html:5
 #: openatlas/views/link.py:65 openatlas/views/link.py:192
 msgid "link"
@@ -190,7 +190,7 @@ msgstr "unité"
 msgid "ID for imports"
 msgstr "ID pour les imports"
 
-#: openatlas/display/base_display.py:528 openatlas/display/tab.py:90
+#: openatlas/display/base_display.py:528 openatlas/display/tab.py:92
 #: openatlas/forms/add_fields.py:237 openatlas/forms/base_manager.py:141
 #: openatlas/forms/field.py:207 openatlas/forms/manager.py:516
 #: openatlas/forms/util.py:27 openatlas/views/arche.py:35
@@ -209,7 +209,7 @@ msgstr "valeur"
 msgid "class"
 msgstr "classe"
 
-#: openatlas/display/base_display.py:528 openatlas/display/tab.py:90
+#: openatlas/display/base_display.py:528 openatlas/display/tab.py:92
 #: openatlas/templates/model/cidoc_class_view.html:6
 #: openatlas/templates/model/property_view.html:6 openatlas/views/admin.py:79
 #: openatlas/views/user.py:40
@@ -316,7 +316,7 @@ msgstr "précision"
 
 #: openatlas/display/display.py:264 openatlas/display/util.py:47
 #: openatlas/views/admin.py:312 openatlas/views/hierarchy.py:99
-#: openatlas/views/overlay.py:97
+#: openatlas/views/overlay.py:98
 msgid "remove"
 msgstr "supprimer"
 
@@ -334,12 +334,13 @@ msgid "tools"
 msgstr "outils"
 
 #: openatlas/display/tab.py:16
-msgid "member of"
-msgstr "membre de"
+#, fuzzy
+msgid "bookmarks"
+msgstr "marque-page"
 
 #: openatlas/display/tab.py:17
-msgid "texts"
-msgstr "textes"
+msgid "circular dependencies"
+msgstr "dépendances circulaires"
 
 #: openatlas/display/tab.py:18
 msgid "invalid dates"
@@ -354,50 +355,59 @@ msgid "invalid involvement dates"
 msgstr "dates de participation invalies"
 
 #: openatlas/display/tab.py:21
-msgid "unlinked"
-msgstr "non lié"
+msgid "member of"
+msgstr "membre de"
 
 #: openatlas/display/tab.py:22
 msgid "missing files"
 msgstr "fichiers manquants"
 
 #: openatlas/display/tab.py:23
+#, fuzzy
+msgid "notes"
+msgstr "note"
+
+#: openatlas/display/tab.py:24
 msgid "orphaned files"
 msgstr "fichiers orphelins"
 
-#: openatlas/display/tab.py:24
+#: openatlas/display/tab.py:25
 #, fuzzy
 msgid "orphaned iiif files"
 msgstr "fichiers orphelins"
 
-#: openatlas/display/tab.py:25
+#: openatlas/display/tab.py:26
 msgid "orphaned subunits"
 msgstr "sous-unités orphelins"
 
-#: openatlas/display/tab.py:26
-msgid "circular dependencies"
-msgstr "dépendances circulaires"
+#: openatlas/display/tab.py:27
+msgid "texts"
+msgstr "textes"
 
-#: openatlas/display/tab.py:88
+#: openatlas/display/tab.py:28
+msgid "unlinked"
+msgstr "non lié"
+
+#: openatlas/display/tab.py:90
 msgid "main image"
 msgstr "image principale"
 
-#: openatlas/display/tab.py:90 openatlas/views/admin.py:393
+#: openatlas/display/tab.py:92 openatlas/views/admin.py:393
 #: openatlas/views/index.py:66
 msgid "count"
 msgstr "décompte"
 
-#: openatlas/display/tab.py:130 openatlas/views/link.py:218
+#: openatlas/display/tab.py:132 openatlas/views/link.py:218
 msgid "add subunit"
 msgstr "ajouter une sous-unité"
 
-#: openatlas/display/tab.py:212 openatlas/views/index.py:63
+#: openatlas/display/tab.py:214 openatlas/views/index.py:63
 #: openatlas/views/note.py:46 openatlas/views/note.py:55
 #: openatlas/views/note.py:90
 msgid "note"
 msgstr "note"
 
-#: openatlas/display/tab.py:273
+#: openatlas/display/tab.py:275
 msgid "text"
 msgstr "texte"
 
@@ -1566,7 +1576,7 @@ msgid "hierarchy"
 msgstr "hierarchies"
 
 #: openatlas/templates/type/index.html:63 openatlas/views/overlay.py:56
-#: openatlas/views/overlay.py:101 openatlas/views/tools.py:39
+#: openatlas/views/overlay.py:102 openatlas/views/tools.py:39
 msgid "place"
 msgstr "lieu"
 
@@ -1884,8 +1894,9 @@ msgid "annotation"
 msgstr "lieu"
 
 #: openatlas/views/annotation.py:63
-msgid "Delete annotation?"
-msgstr ""
+#, fuzzy
+msgid "delete annotation"
+msgstr "lieu"
 
 #: openatlas/views/annotation.py:125
 #, fuzzy
@@ -2263,7 +2274,7 @@ msgstr "modifier la note"
 msgid "note deleted"
 msgstr "note supprimée"
 
-#: openatlas/views/overlay.py:104
+#: openatlas/views/overlay.py:105
 msgid "update overlay"
 msgstr "mettre à jour la surcouche"
 
@@ -2562,4 +2573,7 @@ msgstr ""
 
 #~ msgid "orphaned IIIF files"
 #~ msgstr "fichiers orphelins"
+
+#~ msgid "Delete annotation?"
+#~ msgstr ""
 
