@@ -532,7 +532,7 @@ def link(
     from openatlas.models.imports import Project
     html = ''
     if isinstance(object_, (str, LazyString)):
-        js = f'onclick="{js}"' if js else ''
+        js = f'onclick="{uc_first(js)}"' if js else ''
         uc_first_class = 'uc-first' if uc_first_ and not \
             str(object_).startswith('http') else ''
         ext = 'target="_blank" rel="noopener noreferrer"' if external else ''

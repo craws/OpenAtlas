@@ -589,7 +589,7 @@ def orphans() -> str:
             tab.content = _('Congratulations, everything looks fine!')
 
     if tabs['orphaned_files'].table.rows and is_authorized('admin'):
-        text = uc_first(_('delete all files without corresponding entities?'))
+        text = _('delete all files without corresponding entities?')
         tabs['orphaned_files'].buttons.append(
             button(
                 _('delete all files'),
@@ -706,7 +706,7 @@ def log() -> str:
     buttons = [button(
         _('delete all logs'),
         url_for('log_delete'),
-        onclick=f"return confirm('{uc_first(_('delete all logs'))}?')")]
+        onclick=f"return confirm('{_('delete all logs')}?')")]
 
     return render_template(
         'tabs.html',

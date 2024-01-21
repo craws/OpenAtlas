@@ -60,7 +60,7 @@ def annotation_insert(id_: int) -> str | Response:
                 delete = link(
                     _('delete'),
                     url_for('annotation_delete', id_=annotation.id),
-                    js="return confirm('" + _('Delete annotation?') + "')")
+                    js="return confirm('" + _('delete annotation') + "?')")
             rows.append([
                 format_date(annotation.created),
                 annotation.annotation,

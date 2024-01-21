@@ -9,7 +9,7 @@ from wtforms import FloatField
 from wtforms.validators import InputRequired
 
 from openatlas import app
-from openatlas.display.util import button, required_group, uc_first
+from openatlas.display.util import button, required_group
 from openatlas.forms.field import SubmitField
 from openatlas.models.entity import Entity
 from openatlas.models.overlay import Overlay
@@ -93,10 +93,11 @@ def overlay_update(id_: int) -> str | Response:
         form=form,
         overlay=overlay,
         entity=entity,
-        buttons=[button(
-            _('remove'),
-            url_for('overlay_remove', id_=overlay.id, place_id=entity.id),
-            onclick=f"return confirm('{uc_first(_('remove'))}?');")],
+        buttons=[
+            button(
+                _('remove'),
+                url_for('overlay_remove', id_=overlay.id, place_id=entity.id),
+                onclick=f"return confirm('{_('remove')}?');")],
         crumbs=[
             [_('place'), url_for('index', view='place')],
             entity,

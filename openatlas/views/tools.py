@@ -13,7 +13,7 @@ from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.util import (
     button, display_form, display_info, is_authorized, link, manual,
-    remove_link, required_group, uc_first)
+    remove_link, required_group)
 from openatlas.forms.field import SubmitField
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -94,7 +94,7 @@ def sex(id_: int) -> str | Response:
             buttons.append(button(
                 _('delete'),
                 url_for('sex_delete', id_=id_),
-                onclick="return confirm('" + uc_first(_('delete')) + "?')"))
+                onclick="return confirm('" + _('delete') + "?')"))
     data = []
     for item in types:
         type_ = g.types[item['id']]
