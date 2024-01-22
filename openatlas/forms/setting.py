@@ -55,8 +55,7 @@ class MailForm(FlaskForm):
     mail_from_email = StringField(_('mail from email'), [Email()])
     mail_from_name = StringField(_('mail from name'))
     mail_recipients_feedback = FieldList(
-        RemovableListField(render_kw={'class': 'email'}),
-        render_kw={'class': 'no-label'})
+        RemovableListField(render_kw={'class': 'email'}))
     save = SubmitField(_('save'))
 
 
@@ -116,9 +115,7 @@ class ApiForm(FlaskForm):
 class FilesForm(FlaskForm):
     file_upload_max_size = IntegerField(_('maximum file size in MB'))
     profile_image_width = IntegerField(_('profile image width in pixel'))
-    file_upload_allowed_extension = FieldList(
-        RemovableListField(),
-        render_kw={'class': 'no-label'})
+    file_upload_allowed_extension = FieldList(RemovableListField())
     save = SubmitField(_('save'))
 
 
