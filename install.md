@@ -38,7 +38,7 @@ that we are using to set up Debian servers for OpenAtlas installations.
     sudo apt install postgresql postgresql-15-postgis-3 postgresql-15-postgis-3-scripts
 
 ### gettext, pip, npm
-    sudo apt install gettext npm 
+    sudo apt install gettext npm
 
 ## Installation
 ### Files
@@ -149,6 +149,10 @@ Edit the configuration to your needs, see example at
 
     sudo vim /etc/apache2/mods-available/iipsrv.conf
     sudo service apache2 restart
+
+If using Debian, prevent systemd to try to start the service itself:
+
+    sudo systemctl disable iipsrv.service
 
 Further configuration can be done at the IIIF tab in the admin area of the web
 application.

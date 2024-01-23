@@ -26,6 +26,15 @@ New node packages are needed:
     cd openatlas/static
     npm install
 
+#### IIIF related clean up
+In case you followed the installation instruction for Debian:
+Although it works as is you could follow the instructions below to avoid
+unneeded error and warn messages in your logs.
+
+Disable systemd to try starting IIPImage server (we start it over Apache)
+
+    sudo systemctl disable iipsrv.service
+
 ### 7.17.x to 8.0.0
 This is a major upgrade which utilizes newer versions of underlying software.
 Please consult the install.md about installation. In case you are using a
