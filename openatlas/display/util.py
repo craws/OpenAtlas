@@ -235,7 +235,6 @@ def profile_image(entity: Entity) -> str:
     src = url_for('display_file', filename=path.name)
     url = src
     width = g.settings["profile_image_width"]
-
     if g.settings['iiif'] and check_iiif_file_exist(file_id):
         iiif_ext = '.tiff' if g.settings['iiif_conversion'] \
             else g.files[file_id].suffix
@@ -263,9 +262,9 @@ def profile_image(entity: Entity) -> str:
         f'<img style="max-width:{width}px" alt="{entity.name}" src="{src}">',
         url,
         external=external)
-
-    if check_iiif_activation() \
-            and g.files[file_id].suffix in g.display_file_ext:
+    if (entity.class_.name == 'file'
+            and check_iiif_activation()
+            and g.files[file_id].suffix in g.display_file_ext):
         if check_iiif_file_exist(file_id) \
                 or not g.settings['iiif_conversion']:
             html += ('<br>' + link(
