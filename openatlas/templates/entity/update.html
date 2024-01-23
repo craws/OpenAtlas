@@ -4,9 +4,6 @@
     <div class="container">
       {{ form|display_form(manual_page='entity/' + entity.class_.view)|safe }}
       {{ entity.class_.view|display_citation_example|safe }}
-      {% if entity.class_.view == 'file' %}
-        {% include 'annotate.html' %}
-      {% endif %}
     </div>
   {% else %}
     <div class="row">
