@@ -27,13 +27,18 @@ New node packages are needed:
     npm install
 
 #### IIIF related clean up
-In case you followed the installation instruction for Debian:
-Although it works as is you could follow the instructions below to avoid
-unneeded error and warn messages in your logs.
+In case you followed the installation instruction for Debian: although it
+works as is you could follow the instructions below to avoid unneeded error
+and warn messages in your logs.
 
 Disable systemd to try starting IIPImage server (we start it over Apache)
 
     sudo systemctl disable iipsrv.service
+
+Replace "Location" with "Directory" (2 times) in
+/etc/apache2/mods-available/iipsrv.conf
+
+See /etc/apache2/mods-available/iipsrv.conf for an updated example.
 
 ### 7.17.x to 8.0.0
 This is a major upgrade which utilizes newer versions of underlying software.
