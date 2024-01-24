@@ -5,7 +5,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>IIIF &mdash; OpenAtlas 8.0.0 documentation</title>
+  <title>Image annotation &mdash; OpenAtlas 8.0.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
@@ -18,8 +18,8 @@
         <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Content" href="content.html" />
-    <link rel="prev" title="Map" href="map.html" /> 
+    <link rel="next" title="Map" href="map.html" />
+    <link rel="prev" title="Notes" href="notes.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -50,26 +50,18 @@
 <li class="toctree-l1"><a class="reference internal" href="../features.html">Features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../entity/index.html">Entity</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">Admin</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../entity/file.html">File</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user.html">User</a></li>
-<li class="toctree-l2"><a class="reference internal" href="general.html">General</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mail.html">Mail</a></li>
-<li class="toctree-l2"><a class="reference internal" href="modules.html">Modules</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="search.html">Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="profile.html">Profile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notes.html">Notes</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Image annotation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="map.html">Map</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">IIIF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="content.html">Content</a></li>
-<li class="toctree-l2"><a class="reference internal" href="frontend.html">Frontend</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_integrity_checks.html">Data integrity checks</a></li>
-<li class="toctree-l2"><a class="reference internal" href="import.html">Import</a></li>
-<li class="toctree-l2"><a class="reference internal" href="export.html">Export</a></li>
-<li class="toctree-l2"><a class="reference internal" href="execute_sql.html">Execute SQL</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html">API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="arche.html">ARCHE</a></li>
-<li class="toctree-l2"><a class="reference internal" href="vocabs.html">Vocabs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="network.html">Network visualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="anthropological_analyses.html">Anthropological Analyses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="radiocarbon_dating.html">Radiocarbon Dating</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul>
@@ -99,8 +91,8 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="index.html">Admin</a></li>
-      <li class="breadcrumb-item active">IIIF</li>
+          <li class="breadcrumb-item"><a href="index.html">Tools</a></li>
+      <li class="breadcrumb-item active">Image annotation</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -109,62 +101,43 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="iiif">
-<h1>IIIF<a class="headerlink" href="#iiif" title="Permalink to this heading"></a></h1>
+  <section id="image-annotation">
+<h1>Image annotation<a class="headerlink" href="#image-annotation" title="Permalink to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p><a class="reference external" href="https://iiif.io/">IIIF</a> is a set of open standards for delivering
-high-quality, attributed digital objects online at scale. Once installed
-(see installations notes) it can be configured in the admin area at the
-<strong>IIIF</strong> tab.</p>
-<p><strong>Be aware that</strong></p>
+<p>The image annotation feature allows for marking areas on an image and adding
+a text and/or link it to an entity. E.g. a person on a group picture or an
+artifact at an excavation site image.</p>
+<p>Prerequisite for image annotation is an enabled and configured
+<a class="reference internal" href="../admin/iiif.html"><span class="doc">IIIF</span></a> server.</p>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading"></a></h2>
+<p>At a <a class="reference internal" href="../entity/file.html"><span class="doc">File</span></a> detail view click on the <strong>Enable IIIF view</strong> button
+below the image if it wasn’t converted already.</p>
+<p>Once the image was converted you can click on the <strong>Annotate</strong> link below the
+image and the annotation view will open in a new tab.</p>
+<p>In the image annotation view you can see the image in an IIIF viewer and a form
+for new annotations and a list of already entered annotations with links to
+edit or delete them.</p>
+<p><strong>Form fields</strong></p>
 <ul class="simple">
-<li><p>IIIF is <strong>optional</strong> for an OpenAtlas installation</p></li>
-<li><p>Enabling it can <strong>expose</strong> used files to the public (without login)</p></li>
+<li><p><strong>IIIF image view</strong> - here you can use the rectangle draw button on the left
+side to mark an area.</p></li>
+<li><p><strong>Annotation</strong> - you can enter a description here</p></li>
+<li><p><strong>Entity</strong> - you can link an entity here</p></li>
 </ul>
-<p><strong>Configuration</strong></p>
-<ul class="simple">
-<li><p><strong>IIIF</strong> - Select this checkbox to enable IIIF</p></li>
-<li><p><strong>URL</strong> - Set the complete URL to the Image API Server, e.g.
-<strong>https://yourserver.eu/iiif/</strong></p></li>
-<li><p><strong>Version</strong> - The manifest version provided by OpenAtlas. Currently only
-version 2 is available.</p></li>
-<li><p><strong>Path</strong> - Set the absolute path to the IIIF image drop zone which
-corresponds with the Image API Server folder, e.g. <strong>/var/www/iipsrv/</strong> if
-you followed the default OpenAtlas installation. Be aware that this folder
-has to be accessible (write and execute) for the webserver.</p></li>
-<li><p><strong>Conversion</strong> - Controls if images get converted into pyramid-TIFFs</p>
-<ul>
-<li><p><strong>none</strong> - no conversion</p></li>
-<li><p><strong>deflate</strong> - lossless but files size may be large</p></li>
-<li><p><strong>jpeg</strong> - much smaller files size but not lossless, e.g. loss of
-transparency</p></li>
-</ul>
-</li>
-</ul>
-<p>In case you are running multiple OpenAtlas instances you should create a sub
-directory for every instance at <strong>/var/www/iipsrv/</strong> and also add these to
-<strong>URL</strong> and <strong>Path</strong> accordingly.</p>
-<p>These formats have been successfully tested with OpenAtlas:</p>
-<ul class="simple">
-<li><p>.bmp</p></li>
-<li><p>.gif</p></li>
-<li><p>.ico</p></li>
-<li><p>.jpeg</p></li>
-<li><p>.jpg</p></li>
-<li><p>.png</p></li>
-<li><p>.svg</p></li>
-<li><p>.tif</p></li>
-<li><p>.tiff</p></li>
-</ul>
+<p>Be aware that the <strong>Entity</strong> selection only offers entities that are already
+linked to the file. This is to guarantee that the entity is also linked via
+the model (which the image annotation is not part of).</p>
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="map.html" class="btn btn-neutral float-left" title="Map" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="content.html" class="btn btn-neutral float-right" title="Content" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="notes.html" class="btn btn-neutral float-left" title="Notes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="map.html" class="btn btn-neutral float-right" title="Map" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

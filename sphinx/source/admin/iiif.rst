@@ -11,7 +11,6 @@ high-quality, attributed digital objects online at scale. Once installed
 **Be aware that**
 
 * IIIF is **optional** for an OpenAtlas installation
-* Although already working and in use we still consider it **experimental**
 * Enabling it can **expose** used files to the public (without login)
 
 **Configuration**

@@ -65,6 +65,11 @@ services are:
 * IIIF Presentation API (manifest server)
 * IIIF viewer integration (`Mirador <https://projectmirador.org/>`_)
 
+Image Annotation
+----------------
+With enabled IIIF it is possible to annotate images and link the annotation to
+entities via the :doc:`/tools/image_annotation` feature.
+
 Data Exchange
 -------------
 OpenAtlas offers various possibilities to exchange data with other systems or

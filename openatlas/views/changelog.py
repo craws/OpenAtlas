@@ -17,7 +17,7 @@ def index_changelog() -> str:
 versions = {
     '8.1.0': ['TBA', {
         'feature': {
-            '1910': 'IIIF: annotation system',
+            '1910': 'IIIF: Image annotation',
             '2107': 'IIIF: Automatically convert image files to IIIF',
             '2159': 'Update Catalan and Spanish translations',
             '2149': 'Refactor and minor improvements'}}],

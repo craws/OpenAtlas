@@ -15,7 +15,7 @@ from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    format_date, get_file_path, is_authorized, link, required_group)
+    format_date, get_file_path, is_authorized, link, manual, required_group)
 from openatlas.forms.field import SubmitField, TableField
 from openatlas.models.annotation import Annotation
 from openatlas.models.entity import Entity
@@ -70,21 +70,19 @@ def annotation_insert(id_: int) -> str | Response:
                     _('edit'),
                     url_for('annotation_update', id_=annotation.id)),
                 delete])
-        table = Table(
-            ['date', 'annotation', 'entity'],
-            rows=rows,
-            order=[[0, 'desc']])
+        table = Table(['date', 'annotation', 'entity'], rows, [[0, 'desc']])
     return render_template(
         'tabs.html',
         tabs={
             'annotation': Tab(
                 'annotation',
-                form=form,
-                table=table,
-                content=render_template(
+                render_template(
                     'annotate.html',
                     entity=image,
-                    annotation_list=json.dumps(annotations, default=str)))},
+                    annotations=json.dumps(annotations, default=str)),
+                table,
+                [manual('tools/image_annotation')],
+                form=form)},
         entity=image,
         crumbs=[
             [_('file'), url_for('index', view='file')],
