@@ -319,12 +319,13 @@ def get_redirect_url(manager: BaseManager) -> str:
             and manager.form.continue_.data in ['sub', 'human_remains']:
         class_ = manager.form.continue_.data
         if class_ == 'sub':
-            if manager.entity.class_.name == 'place':
-                class_ = 'feature'
-            elif manager.entity.class_.name == 'feature':
-                class_ = 'stratigraphic_unit'
-            elif manager.entity.class_.name == 'stratigraphic_unit':
-                class_ = 'artifact'
+            match manager.entity.class_.name:
+                case 'place':
+                    class_ = 'feature'
+                case 'feature':
+                    class_ = 'stratigraphic_unit'
+                case 'stratigraphic_unit':
+                    class_ = 'artifact'
         url = url_for('insert', class_=class_, origin_id=manager.entity.id)
     return url
 
