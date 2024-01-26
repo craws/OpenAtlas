@@ -142,7 +142,7 @@ class IIIFAnnotation(Resource):
             "motivation": ["oa:commenting"],
             "resource": [{
                 "@type": "dctypes:Text",
-                "chars": annotation.annotation,
+                "chars": annotation.text,
                 "format": "text/html"}],
             "on": {
                 "@type": "oa:SpecificResource",

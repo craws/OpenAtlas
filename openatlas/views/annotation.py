@@ -23,13 +23,13 @@ from openatlas.models.entity import Entity
 
 class AnnotationForm(FlaskForm):
     coordinate = HiddenField(_('coordinates'), validators=[InputRequired()])
-    annotation = TextAreaField(_('annotation'))
+    text = TextAreaField(_('annotation'))
     annotated_entity = TableField(_('entity'))
     save = SubmitField(_('save'))
 
 
 class AnnotationUpdateForm(FlaskForm):
-    annotation = TextAreaField(_('annotation'))
+    text = TextAreaField(_('annotation'))
     annotated_entity = TableField(_('entity'))
     save = SubmitField(_('save'))
 
@@ -47,7 +47,7 @@ def annotation_insert(id_: int) -> str | Response:
             image_id=id_,
             coordinates=form.coordinate.data,
             entity_id=form.annotated_entity.data,
-            annotation=form.annotation.data)
+            text=form.text.data)
         return redirect(url_for('annotation_insert', id_=image.id))
     table = None
     if annotations := Annotation.get_by_file(image.id):
@@ -63,7 +63,7 @@ def annotation_insert(id_: int) -> str | Response:
                     js="return confirm('" + _('delete annotation') + "?')")
             rows.append([
                 format_date(annotation.created),
-                annotation.annotation,
+                annotation.text,
                 link(Entity.get_by_id(annotation.entity_id))
                 if annotation.entity_id else '',
                 link(
@@ -98,10 +98,10 @@ def annotation_update(id_: int) -> str | Response:
     form.annotated_entity.filter_ids = [annotation.image_id]
     if form.validate_on_submit():
         annotation.update(
-            entity_id=form.annotated_entity.data or None,
-            annotation=form.annotation.data)
+            form.annotated_entity.data or None,
+            form.text.data)
         return redirect(url_for('annotation_insert', id_=annotation.image_id))
-    form.annotation.data = annotation.annotation
+    form.text.data = annotation.text
     form.annotated_entity.data = annotation.entity_id
     return render_template(
         'tabs.html',

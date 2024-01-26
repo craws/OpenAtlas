@@ -178,29 +178,27 @@ class FileTest(TestBaseCase):
                 url_for('annotation_insert', id_=file_id),
                 data={
                     'coordinate': '1.5,1.6,1.4,9.6,8.6,9.6,8.6,1.6',
-                    'annotation': 'An interesting annotation'},
+                    'text': 'An interesting annotation'},
                 follow_redirects=True)
             assert b'An interesting annotation' in rv.data
 
             rv = self.app.get(url_for('annotation_update', id_=1))
             assert b'An interesting annotation' in rv.data
 
-            rv = self.app.get(url_for(
-                'api.iiif_annotation_list',
-                image_id=file_id))
-            rv = rv.get_json()
-            assert bool(str(file_id) in rv['@id'])
-            annotation_id = rv['resources'][0]['@id'].rsplit('/', 1)[-1]
+            rv = self.app.get(
+                url_for('api.iiif_annotation_list', image_id=file_id))
+            json = rv.get_json()
+            assert bool(str(file_id) in json['@id'])
 
+            annotation_id = json['resources'][0]['@id'].rsplit('/', 1)[-1]
             rv = self.app.get(url_for(
                 'api.iiif_annotation',
                 annotation_id=annotation_id.replace('.json', '')))
-            rv = rv.get_json()
-            assert bool(annotation_id in rv['@id'])
+            assert bool(annotation_id in rv.get_json()['@id'])
 
             rv = self.app.post(
                 url_for('annotation_update', id_=1),
-                data={'annotation': 'A boring annotation'},
+                data={'text': 'A boring annotation'},
                 follow_redirects=True)
             assert b'A boring annotation' in rv.data
 

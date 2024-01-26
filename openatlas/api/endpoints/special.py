@@ -75,10 +75,10 @@ class ExportDatabase(Resource):
 class GetSubunits(Resource):
     @staticmethod
     def get(id_: int) -> tuple[Resource, int] | Response | dict[str, Any]:
-        parser = entity_.parse_args()
         entity = get_entity_by_id(id_)
-        if not entity.class_.name == 'place':
+        if entity.class_.name != 'place':
             raise NotAPlaceError
+        parser = entity_.parse_args()
         return resolve_subunits(
             get_subunits_from_id(entity, parser),
             parser,

@@ -72,11 +72,9 @@ def get_lp_links(
     for link_ in links:
         if link_.property.code in properties:
             out.append(link_dict(link_))
-        continue
     for link_ in links_inverse:
         if link_.property.code in properties:
             out.append(link_dict(link_, inverse=True))
-        continue
     return out
 
 

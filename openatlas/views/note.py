@@ -94,7 +94,7 @@ def note_insert(entity_id: int) -> str | Response:
 @required_group('contributor')
 def note_update(id_: int) -> str | Response:
     note = User.get_note_by_id(id_)
-    if not note['user_id'] == current_user.id:
+    if note['user_id'] != current_user.id:
         abort(403)
     entity = Entity.get_by_id(note['entity_id'])
     form = NoteForm()
@@ -119,7 +119,7 @@ def note_update(id_: int) -> str | Response:
 @required_group('contributor')
 def note_delete(id_: int) -> Response:
     note = User.get_note_by_id(id_)
-    if not note['user_id'] == current_user.id:
+    if note['user_id'] != current_user.id:
         abort(403)
     User.delete_note(note['id'])
     flash(_('note deleted'), 'info')

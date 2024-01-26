@@ -160,9 +160,8 @@ def get_exif(entries: dict[str, Any]) -> dict[str, Any]:
 def get_hierarchy_by_name(name: str) -> Optional[Type]:
     type_ = None
     for type_id in g.types:
-        if g.types[type_id].name == name:
-            if not g.types[type_id].root:
-                type_ = g.types[type_id]
+        if g.types[type_id].name == name and not g.types[type_id].root:
+            type_ = g.types[type_id]
     return type_
 
 

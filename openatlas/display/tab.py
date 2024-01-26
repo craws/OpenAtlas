@@ -54,9 +54,8 @@ class Tab:
             name: str,
             entity: Optional[Entity] = None) -> None:
         view = entity.class_.view if entity else None
-        if entity:
-            if not self.table.header:
-                self.table.header = g.table_headers[name]
+        if entity and not self.table.header:
+            self.table.header = g.table_headers[name]
         if name == 'reference' or entity and entity.class_.view == 'reference':
             self.table.header = self.table.header + ['page']
         if name == 'actor':

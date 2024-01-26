@@ -15,17 +15,17 @@ class Annotation:
         self.entity_id = data['entity_id']
         self.coordinates = data['coordinates']
         self.user_id = data['user_id']
-        self.annotation = data['annotation']
+        self.text = data['annotation']
         self.created = data['created']
 
     def update(
             self,
             entity_id: Optional[int] = None,
-            annotation: Optional[str] = None) -> None:
+            text: Optional[str] = None) -> None:
         Db.update({
             'id': self.id,
             'entity_id': entity_id,
-            'annotation': annotation})
+            'annotation': text})
 
     def delete(self) -> None:
         Db.delete(self.id)
@@ -43,10 +43,10 @@ class Annotation:
             image_id: int,
             coordinates: str,
             entity_id: Optional[int] = None,
-            annotation: Optional[str] = None) -> None:
+            text: Optional[str] = None) -> None:
         Db.insert({
             'image_id': image_id,
             'user_id': current_user.id,
             'entity_id': entity_id or None,
             'coordinates': coordinates,
-            'annotation': annotation})
+            'annotation': text})

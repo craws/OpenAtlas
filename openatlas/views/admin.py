@@ -855,11 +855,9 @@ def convert_iiif_files() -> None:
         flash(_('please activate IIIF conversion'), 'info')
         return
     existing_files = [entity.id for entity in Entity.get_by_class('file')]
-    for file_id, file_path in g.files.items():
-        if check_iiif_file_exist(file_id):
+    for id_, file_path in g.files.items():
+        if check_iiif_file_exist(id_):
             continue
-        if (file_id in existing_files and
-                file_path.suffix in g.display_file_ext):
-            convert_image_to_iiif(file_id)
+        if id_ in existing_files and file_path.suffix in g.display_file_ext:
+            convert_image_to_iiif(id_)
     flash(_('all image files are converted'), 'info')
-    return
