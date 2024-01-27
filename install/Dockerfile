@@ -33,7 +33,7 @@ RUN cd /var/www/openatlas &&\
     npm install
 RUN a2enmod iipsrv &&\
     a2enmod fcgid &&\
-    service apache2 restart \
+    service apache2 restart
 
 EXPOSE 8080
 ENV APACHE_CONFDIR /etc/apache2
