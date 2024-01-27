@@ -4,9 +4,9 @@ even over multiple versions. A backup is made before changes happen. You still
 should read the upgrade notes about important information.
 
 **Limitations using the database update script**
-* You should only do this within the official **main** branch of OpenAtlas.
-* If the database owner is not called "openatlas" (default) you will have to
-  update the SQL files accordingly before.
+* This should only be done within the official **main** branch of OpenAtlas
+* If the database owner is not called **openatlas** (default) the SQL files need
+  to be updated accordingly before
 
 **How to upgrade**
 
@@ -26,18 +26,17 @@ New node packages are needed:
     npm install
 
 #### IIIF related clean up
-In case you followed the installation instruction for Debian: although it
-works as is you could follow the instructions below to avoid unneeded error
-and warn messages in your logs.
+If you followed our Debian install instruction: although it works you can
+follow these instructions to avoid error and warn messages in your logs:
 
-Disable systemd to try starting the IIPImage server (it's started via Apache)
+* Replace **Location** with **Directory** (2 times) in
+**/etc/apache2/mods-available/iipsrv.conf**, see **install/iipsrv.conf** for an
+updated example
+* Disable systemd to try starting the IIPImage server because it's already
+started via Apache
+
 
     sudo systemctl disable iipsrv.service
-
-Replace "Location" with "Directory" (2 times) in
-/etc/apache2/mods-available/iipsrv.conf
-
-See /etc/apache2/mods-available/iipsrv.conf for an updated example.
 
 ### 7.17.x to 8.0.0
 This is a major upgrade which utilizes newer versions of underlying software.

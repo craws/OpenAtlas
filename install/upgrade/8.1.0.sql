@@ -1,10 +1,13 @@
--- Upgrade 8.0.0 to 8.1.0
+-- Upgrade 8.0.x to 8.1.0
 -- Be sure to backup the database and read the upgrade notes before executing.
 
 BEGIN;
 
 -- Raise database version
 UPDATE web.settings SET value = '8.1.0' WHERE name = 'database_version';
+
+-- #2107 IIIF: Automatically convert image files to IIIF
+INSERT INTO web.settings (name, value) VALUES ('iiif_convert_on_upload', '');
 
 -- #1910 IIIF annotation system
 CREATE TABLE IF NOT EXISTS web.annotation_image (
@@ -26,8 +29,5 @@ CREATE SEQUENCE web.annotation_image_id_seq START WITH 1 INCREMENT BY 1 NO MINVA
 ALTER TABLE web.annotation_image_id_seq OWNER TO openatlas;
 ALTER SEQUENCE web.annotation_image_id_seq OWNED BY web.annotation_image.id;
 ALTER TABLE ONLY web.annotation_image ALTER COLUMN id SET DEFAULT nextval('web.annotation_image_id_seq'::regclass);
-
--- #2107 IIIF: Automatically convert image files to IIIF
-INSERT INTO web.settings (name, value) VALUES ('iiif_convert_on_upload', '');
 
 END;
