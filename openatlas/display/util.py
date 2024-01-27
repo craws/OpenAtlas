@@ -30,7 +30,6 @@ from openatlas.models.content import get_translation
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
-    from openatlas.models.user import User
     from openatlas.models.link import Link
     from openatlas.models.type import Type
 
