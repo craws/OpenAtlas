@@ -7,7 +7,8 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
-from openatlas.display.util import convert_image_to_iiif, required_group
+from openatlas.display.util import check_iiif_file_exist, \
+    convert_image_to_iiif, required_group
 from openatlas.forms.form import get_table_form
 from openatlas.models.entity import Entity
 
@@ -84,22 +85,20 @@ def make_iiif_available(id_: int) -> Response:
 def view_iiif(id_: int) -> str:
     entity = Entity.get_by_id(id_)
     manifests = []
-    if entity.class_ == 'file':
-        manifests.append(
-            url_for(
-                'api.iiif_manifest',
-                id_=id_,
-                version=g.settings['iiif_version'],
-                _external=True))
+    if entity.class_.view == 'file' and check_iiif_file_exist(id_):
+        manifests.append(get_manifest_url(id_))
     else:
         for file in entity.get_linked_entities('P67', True):
-            if file.id in g.files:
-                manifests.append(
-                    url_for(
-                        'api.iiif_manifest',
-                        id_=file.id,
-                        version=g.settings['iiif_version'],
-                        _external=True))
+            if file.class_.view == 'file' and check_iiif_file_exist(file.id):
+                manifests.append(get_manifest_url(file.id))
     return render_template(
         'iiif.html',
         manifests=manifests)
+
+
+def get_manifest_url(id_: int) -> str:
+    return url_for(
+        'api.iiif_manifest',
+        id_=id_,
+        version=g.settings['iiif_version'],
+        _external=True)
