@@ -82,10 +82,24 @@ def make_iiif_available(id_: int) -> Response:
 @app.route('/view_iiif/<int:id_>')
 @required_group('contributor')
 def view_iiif(id_: int) -> str:
+    entity = Entity.get_by_id(id_)
+    manifests = []
+    if entity.class_ == 'file':
+        manifests.append(
+            url_for(
+                'api.iiif_manifest',
+                id_=id_,
+                version=g.settings['iiif_version'],
+                _external=True))
+    else:
+        for file in entity.get_linked_entities('P67', True):
+            if file.id in g.files:
+                manifests.append(
+                    url_for(
+                        'api.iiif_manifest',
+                        id_=file.id,
+                        version=g.settings['iiif_version'],
+                        _external=True))
     return render_template(
         'iiif.html',
-        manifest_url=url_for(
-            'api.iiif_manifest',
-            id_=id_,
-            version=g.settings['iiif_version'],
-            _external=True))
+        manifests=manifests)
