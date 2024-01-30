@@ -59,4 +59,4 @@ COPYING in the root directory of this repository or the online version at
 <https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html>
 
 The OpenAtlas logo was designed by Jan Belik and is licensed under
-[CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
