@@ -89,9 +89,12 @@ def file_preview(entity_id: int) -> str:
             app.config['IMAGE_SIZE']['table']):
         url = url_for('display_file', filename=icon_path.name, size=size)
         return f"<img src='{url}' {param}>"
-    path = get_file_path(entity_id)
-    if path and check_processed_image(path.name):
-        if icon := get_file_path(entity_id, app.config['IMAGE_SIZE']['table']):
-            url = url_for('display_file', filename=icon.name, size=size)
-            return f"<img src='{url}' {param}>"
+    if g.settings['image_processing']:
+        path = get_file_path(entity_id)
+        if path and check_processed_image(path.name):
+            if icon := get_file_path(
+                    entity_id,
+                    app.config['IMAGE_SIZE']['table']):
+                url = url_for('display_file', filename=icon.name, size=size)
+                return f"<img src='{url}' {param}>"
     return ''
