@@ -132,6 +132,9 @@ class FileTest(TestBaseCase):
             rv = self.app.get(url_for('view', id_=file_id))
             assert b'view in IIIF' in rv.data
 
+            rv = self.app.get(url_for('view', id_=place.id))
+            assert b'view in IIIF' in rv.data
+
             rv = self.app.get(
                 url_for(
                     'api.iiif_manifest',
@@ -163,6 +166,9 @@ class FileTest(TestBaseCase):
             assert bool(len(rv.get_json().keys()) == 1)
 
             rv = self.app.get(url_for('view_iiif', id_=file_id))
+            assert b'Mirador' in rv.data
+
+            rv = self.app.get(url_for('view_iiif', id_=place.id))
             assert b'Mirador' in rv.data
 
             rv = self.app.get(url_for('view', id_=place.id))
