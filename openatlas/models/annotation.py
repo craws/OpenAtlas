@@ -32,7 +32,7 @@ class Annotation:
 
     @staticmethod
     def get_by_id(id_: int) -> Annotation:
-        return Annotation(Db.get_by_id(id_))
+        return Annotation(Db.get_by_id(id_))  # type: ignore
 
     @staticmethod
     def get_by_file(image_id: int) -> list[Annotation]:
