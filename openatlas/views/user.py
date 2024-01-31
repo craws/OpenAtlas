@@ -160,8 +160,7 @@ def user_view(id_: int) -> str:
             buttons.append(
                 button(
                     _('delete'),
-                    url_for('admin_index', action='delete_user', id_=user.id)
-                    + '#tab-user',
+                    f"{url_for('user_delete', id_=user.id)}#tab-user",
                     onclick=""
                     f"return confirm('{_('Delete %(name)s?', name=name)}')"))
         buttons.append(
@@ -177,6 +176,19 @@ def user_view(id_: int) -> str:
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-user"],
             user.username])
+
+
+@app.route('/user/delete/<int:id_>')
+@required_group('manager')
+def user_delete(id_:int) -> Response:
+    user = User.get_by_id(id_)
+    if not user \
+            or user.id == current_user.id \
+            or (user.group == 'admin' and not is_authorized('admin')):
+        abort(403)
+    User.delete(id_)
+    flash(_('user deleted'), 'info')
+    return redirect(f"{url_for('admin_index')}#tab-user")
 
 
 @app.route('/admin/user/entities/<int:id_>')

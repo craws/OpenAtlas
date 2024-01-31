@@ -71,7 +71,7 @@ class FileTest(TestBaseCase):
             assert b'remove custom logo' in rv.data
 
             rv = self.app.get(
-                url_for('admin_index', action="remove_logo", id_=0),
+                url_for('logo_remove', action='remove_logo'),
                 follow_redirects=True)
             assert b'Logo' in rv.data
 

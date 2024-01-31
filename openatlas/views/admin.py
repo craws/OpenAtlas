@@ -46,23 +46,8 @@ from openatlas.models.user import User
 
 @app.route('/admin', methods=['GET', 'POST'], strict_slashes=False)
 @app.route('/admin/', methods=['GET', 'POST'], strict_slashes=False)
-@app.route('/admin/<action>/<int:id_>', strict_slashes=False)
 @required_group('readonly')
-def admin_index(
-        action: Optional[str] = None,
-        id_: Optional[int] = None) -> str | Response:
-    if is_authorized('manager'):
-        if id_ and action == 'delete_user':
-            user = User.get_by_id(id_)
-            if not user \
-                    or user.id == current_user.id \
-                    or (user.group == 'admin' and not is_authorized('admin')):
-                abort(403)
-            User.delete(id_)
-            flash(_('user deleted'), 'info')
-        elif action == 'remove_logo':
-            Settings.set_logo()
-            return redirect(f"{url_for('admin_index')}#tab-file")
+def admin_index() -> str:
     tables = {
         'user': Table([
                 'username',
@@ -209,6 +194,13 @@ def admin_index(
         tabs=tabs,
         title=_('admin'),
         crumbs=[_('admin')])
+
+
+@app.route('/logo/remove')
+@required_group('manager')
+def logo_remove():
+    Settings.set_logo()
+    return redirect(f"{url_for('admin_index')}#tab-file")
 
 
 @app.route('/admin/content/<string:item>', methods=['GET', 'POST'])

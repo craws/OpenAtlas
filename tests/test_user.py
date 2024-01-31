@@ -61,7 +61,7 @@ class UserTests(TestBaseCase):
             assert b'404' in rv.data
 
             rv = self.app.get(
-                url_for('admin_index', action='delete_user', id_=user_id))
+                url_for('user_delete', id_=user_id, follow_redirects=True))
             assert b'User deleted' in rv.data
 
             rv = self.app.post(
