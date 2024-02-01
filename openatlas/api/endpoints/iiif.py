@@ -17,7 +17,7 @@ class IIIFSequence(Resource):
     @staticmethod
     def get(id_: int) -> Response:
         return jsonify(
-            {"@context": "http://iiif.io/api/presentation/2/context.json"} |
+            {"@context": "https://iiif.io/api/presentation/2/context.json"} |
             IIIFSequence.build_sequence(get_metadata(get_entity_by_id(id_))))
 
     @staticmethod
@@ -38,7 +38,7 @@ class IIIFCanvas(Resource):
     @staticmethod
     def get(id_: int) -> Response:
         return jsonify(
-            {"@context": "http://iiif.io/api/presentation/2/context.json"} |
+            {"@context": "https://iiif.io/api/presentation/2/context.json"} |
             IIIFCanvas.build_canvas(get_metadata(get_entity_by_id(id_))))
 
     @staticmethod
@@ -85,7 +85,7 @@ class IIIFImage(Resource):
         id_ = metadata['entity'].id
         mime_type, _ = mimetypes.guess_type(g.files[id_])
         return {
-            "@context": "http://iiif.io/api/presentation/2/context.json",
+            "@context": "https://iiif.io/api/presentation/2/context.json",
             "@id": url_for('api.iiif_image', id_=id_, _external=True),
             "@type": "oa:Annotation",
             "motivation": "sc:painting",
@@ -111,7 +111,7 @@ class IIIFAnnotationList(Resource):
     def build_annotation_list(image_id: int) -> dict[str, Any]:
         annotations_ = Annotation.get_by_file(image_id)
         return {
-            "@context": "http://iiif.io/api/presentation/2/context.json",
+            "@context": "https://iiif.io/api/presentation/2/context.json",
             "@id": url_for(
                 'api.iiif_annotation_list',
                 image_id=image_id,
@@ -140,7 +140,7 @@ class IIIFAnnotation(Resource):
                 url = resolver + str(entity.id)
             entity_link = f"<a href={url} target=_blank>{entity.name}</a>"
         return {
-            "@context": "http://iiif.io/api/presentation/2/context.json",
+            "@context": "https://iiif.io/api/presentation/2/context.json",
             "@id": url_for(
                 'api.iiif_annotation',
                 annotation_id=annotation.id,
@@ -207,7 +207,7 @@ class IIIFManifest(Resource):
     def get_manifest_version_2(id_: int) -> dict[str, Any]:
         entity = get_entity_by_id(id_)
         return {
-            "@context": "http://iiif.io/api/presentation/2/context.json",
+            "@context": "https://iiif.io/api/presentation/2/context.json",
             "@id":
                 url_for(
                     'api.iiif_manifest',
@@ -244,6 +244,6 @@ def get_logo() -> dict[str, Any]:
             filename=g.settings['logo_file_id'],
             _external=True),
         "service": {
-            "@context": "http://iiif.io/api/image/2/context.json",
+            "@context": "https://iiif.io/api/image/2/context.json",
             "@id": url_for('overview', _external=True),
-            "profile": "http://iiif.io/api/image/2/level2.json"}}
+            "profile": "https://iiif.io/api/image/2/level2.json"}}
