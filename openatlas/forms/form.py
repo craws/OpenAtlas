@@ -15,6 +15,7 @@ from openatlas.forms import base_manager, manager
 from openatlas.forms.field import SubmitField, TableMultiField, TreeField
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
+from openatlas.views.entity_index import file_preview
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.type import Type
@@ -55,7 +56,7 @@ def get_table_form(
     entities = Entity.get_by_class(classes, types=True, aliases=True)
     if excluded and isinstance(excluded[0], Entity):
         excluded = [entity.id for entity in excluded]  # type: ignore
-    table = Table([''] + g.table_headers[classes[0]], order=[[1, 'asc']])
+    table = Table([''] + g.table_headers[classes[0]], order=[[2, 'asc']])
     for entity in entities:
         if entity.id not in excluded:
             input_ = f"""
@@ -64,8 +65,12 @@ def get_table_form(
                     name="values"
                     type="checkbox"
                     value="{entity.id}">"""
-            table.rows.append(
-                [input_] + get_base_table_data(entity, show_links=False))
+            rows = [input_]
+            if classes[0] == 'file':
+                rows.append(file_preview(entity.id))
+            rows.extend(get_base_table_data(entity, show_links=False))
+
+            table.rows.append(rows)
     if not table.rows:
         return '<p class="uc-first">' + _('no entries') + '</p>'
     return render_template(
@@ -114,4 +119,5 @@ def get_vocabs_form() -> Any:  # pragma: no cover
         endpoint = StringField(_('endpoint'), validators=[InputRequired()])
         vocabs_user = StringField(_('user'))
         save = SubmitField(_('save'))
+
     return Form()

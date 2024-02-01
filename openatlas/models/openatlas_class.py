@@ -109,7 +109,8 @@ class OpenatlasClass:
                 'name', 'class', 'type', 'begin', 'end', 'description'],
             'entities': ['name', 'class', 'info'],
             'event': ['name', 'class', 'type', 'begin', 'end', 'description'],
-            'file': ['name', 'license', 'size', 'extension', 'description'],
+            'file': [
+                'icon', 'name', 'license', 'size', 'extension', 'description'],
             'member': ['member', 'function', 'first', 'last', 'description'],
             'member_of': [
                 'member of', 'function', 'first', 'last', 'description'],
