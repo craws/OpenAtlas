@@ -4,6 +4,7 @@ from typing import Any, Optional, TYPE_CHECKING
 
 from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
+from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import HiddenField, SelectMultipleField, StringField, widgets
 from wtforms.validators import InputRequired, URL
@@ -57,6 +58,10 @@ def get_table_form(
     if excluded and isinstance(excluded[0], Entity):
         excluded = [entity.id for entity in excluded]  # type: ignore
     table = Table([''] + g.table_headers[classes[0]], order=[[2, 'asc']])
+    if (classes[0] == 'file' and
+            (g.settings['image_processing'] or g.settings['iiif'])
+            and current_user.settings['table_show_icons']):
+        table.header.insert(1, _('icon'))
     for entity in entities:
         if entity.id not in excluded:
             input_ = f"""
@@ -66,7 +71,9 @@ def get_table_form(
                     type="checkbox"
                     value="{entity.id}">"""
             rows = [input_]
-            if classes[0] == 'file':
+            if (classes[0] == 'file' and
+                    (g.settings['image_processing'] or g.settings['iiif'])
+                    and current_user.settings['table_show_icons']):
                 rows.append(file_preview(entity.id))
             rows.extend(get_base_table_data(entity, show_links=False))
 
