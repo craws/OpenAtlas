@@ -132,8 +132,9 @@ class FileTest(TestBaseCase):
             rv = self.app.get(url_for('view', id_=file_id))
             assert b'view in IIIF' in rv.data
 
-            rv = self.app.get(url_for('view', id_=place.id))
-            assert b'view in IIIF' in rv.data
+            rv = self.app.get(
+                url_for('view', id_=place.id, _anchor="tab-file"))
+            assert b'view all IIIF images' in rv.data
 
             rv = self.app.get(
                 url_for(
