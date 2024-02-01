@@ -132,6 +132,13 @@ class IIIFAnnotation(Resource):
     @staticmethod
     def build_annotation(annotation: Annotation) -> dict[str, Any]:
         selector = generate_selector(annotation.coordinates)
+        entity_link = ''
+        if annotation.entity_id:
+            entity = get_entity_by_id(annotation.entity_id)
+            url = url_for('api.entity', id_=entity.id, _external=True)
+            if resolver := g.settings['frontend_resolver_url']:
+                url = resolver + str(entity.id)
+            entity_link = f"<a href={url} target=_blank>{entity.name}</a>"
         return {
             "@context": "http://iiif.io/api/presentation/2/context.json",
             "@id": url_for(
@@ -141,9 +148,13 @@ class IIIFAnnotation(Resource):
             "@type": "oa:Annotation",
             "motivation": ["oa:commenting"],
             "resource": [{
+                "@type": "dctypes:Dataset",
+                "chars": entity_link,
+                "format": "text/html"}, {
                 "@type": "dctypes:Text",
                 "chars": annotation.text,
-                "format": "text/html"}],
+                "format": "text/plain"}
+            ],
             "on": {
                 "@type": "oa:SpecificResource",
                 "full": url_for(

@@ -165,9 +165,6 @@ class FileTest(TestBaseCase):
                 url_for('api.licensed_file_overview', file_id=file_id))
             assert bool(len(rv.get_json().keys()) == 1)
 
-            rv = self.app.get(url_for('view_iiif', id_=file_id))
-            assert b'Mirador' in rv.data
-
             rv = self.app.get(url_for('view_iiif', id_=place.id))
             assert b'Mirador' in rv.data
 
@@ -184,9 +181,13 @@ class FileTest(TestBaseCase):
                 url_for('annotation_insert', id_=file_id),
                 data={
                     'coordinate': '1.5,1.6,1.4,9.6,8.6,9.6,8.6,1.6',
-                    'text': 'An interesting annotation'},
+                    'text': 'An interesting annotation',
+                    'annotated_entity': place.id},
                 follow_redirects=True)
             assert b'An interesting annotation' in rv.data
+
+            rv = self.app.get(url_for('view_iiif', id_=file_id))
+            assert b'Mirador' in rv.data
 
             rv = self.app.get(url_for('annotation_update', id_=1))
             assert b'An interesting annotation' in rv.data
