@@ -7,7 +7,8 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 
 from openatlas.display.table import Table
-from openatlas.display.util import button, is_authorized, manual
+from openatlas.display.util import button, check_iiif_activation, \
+    check_iiif_file_exist, is_authorized, manual
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
@@ -122,11 +123,11 @@ class Tab:
                         url_for('insert', class_=item, origin_id=id_)))
         elif name == 'artifact':
             if entity and entity.class_.name in [
-                    'place',
-                    'artifact',
-                    'human_remains',
-                    'feature',
-                    'stratigraphic_unit']:
+                'place',
+                'artifact',
+                'human_remains',
+                'feature',
+                'stratigraphic_unit']:
                 self.buttons.append(
                     button(_('add subunit'),
                            url_for('add_subunit', super_id=id_)))
@@ -199,6 +200,15 @@ class Tab:
                 button(
                     g.classes[name].label,
                     url_for('insert', class_=name, origin_id=id_)))
+            if check_iiif_activation():
+                for file in entity.get_linked_entities('P67', True):
+                    if (file.class_.view == 'file'
+                            and check_iiif_file_exist(file.id)):
+                        self.buttons.append(
+                            button(
+                                _('view all IIIF images'),
+                                url_for('view_iiif', id_=entity.id)))
+                        break
         elif name == 'member':
             self.buttons.append(
                 button(

@@ -432,6 +432,8 @@ def get_table_content(
         # Hackish (mis)use of filter_ids to get table field for annotations
         table = Table(['name', 'class', 'description'])
         for item in Entity.get_by_id(filter_ids[0]).get_linked_entities('P67'):
+            if selected_data and item.id == int(selected_data):
+                selection = item.name  # pragma: no cover
             table.rows.append([
                 format_name_and_aliases(item, 'annotated_entity'),
                 uc_first(item.class_.name),

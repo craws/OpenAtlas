@@ -82,8 +82,7 @@ def file_preview(entity_id: int) -> str:
         url =\
             f"{g.settings['iiif_url']}{entity_id}{ext}" \
             f"/full/!100,100/0/default.jpg"
-        return f"<img src='{url}' {param}>" \
-            if ext in g.display_file_ext else ''
+        return f"<img src='{url}' {param}>"
     if icon_path := get_file_path(
             entity_id,
             app.config['IMAGE_SIZE']['table']):

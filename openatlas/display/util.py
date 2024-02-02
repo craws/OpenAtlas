@@ -279,14 +279,6 @@ def profile_image(entity: Entity) -> str:
                 button(
                     _('enable IIIF view'),
                     url_for('make_iiif_available', id_=file_id))])
-    elif check_iiif_activation():
-        for file in entity.get_linked_entities('P67', True):
-            if file.class_.view == 'file' and check_iiif_file_exist(file.id):
-                html += ('<br>' + link(
-                    _('view in IIIF'),
-                    url_for('view_iiif', id_=entity.id),
-                    external=True))
-                break
     return html
 
 
