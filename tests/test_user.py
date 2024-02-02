@@ -61,7 +61,8 @@ class UserTests(TestBaseCase):
             assert b'404' in rv.data
 
             rv = self.app.get(
-                url_for('user_delete', id_=user_id, follow_redirects=True))
+                url_for('user_delete', id_=user_id),
+                follow_redirects=True)
             assert b'User deleted' in rv.data
 
             rv = self.app.post(
@@ -75,11 +76,7 @@ class UserTests(TestBaseCase):
                 data={'limit': 100, 'user': 0, 'action': 'all'})
             assert b'activity' in rv.data
 
-            rv = self.app.get(
-                url_for(
-                    'admin_index',
-                    action='delete_user',
-                    id_=self.alice_id))
+            rv = self.app.get(url_for('user_delete', id_=self.alice_id))
             assert b'403 - Forbidden' in rv.data
 
             with app.test_request_context():

@@ -45,7 +45,6 @@ from openatlas.models.user import User
 
 
 @app.route('/admin', methods=['GET', 'POST'], strict_slashes=False)
-@app.route('/admin/', methods=['GET', 'POST'], strict_slashes=False)
 @required_group('readonly')
 def admin_index() -> str:
     tables = {
