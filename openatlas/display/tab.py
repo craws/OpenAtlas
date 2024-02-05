@@ -123,14 +123,15 @@ class Tab:
                         url_for('insert', class_=item, origin_id=id_)))
         elif name == 'artifact':
             if entity and entity.class_.name in [
-                'place',
-                'artifact',
-                'human_remains',
-                'feature',
-                'stratigraphic_unit']:
+                    'place',
+                    'artifact',
+                    'human_remains',
+                    'feature',
+                    'stratigraphic_unit']:
                 self.buttons.append(
-                    button(_('add subunit'),
-                           url_for('add_subunit', super_id=id_)))
+                    button(
+                        _('add subunit'),
+                        url_for('add_subunit', super_id=id_)))
             if entity and entity.class_.name != 'human_remains':
                 self.buttons.append(
                     button(
@@ -200,7 +201,7 @@ class Tab:
                 button(
                     g.classes[name].label,
                     url_for('insert', class_=name, origin_id=id_)))
-            if check_iiif_activation():
+            if entity and check_iiif_activation():
                 for file in entity.get_linked_entities('P67', True):
                     if (file.class_.view == 'file'
                             and check_iiif_file_exist(file.id)):
