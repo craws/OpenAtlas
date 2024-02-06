@@ -1,5 +1,5 @@
 import datetime
-from typing import Optional, Union
+from typing import Optional
 
 import bcrypt
 from bcrypt import hashpw
@@ -44,7 +44,7 @@ class PasswordResetForm(FlaskForm):
 
 
 @app.route('/login', methods=['GET', 'POST'])
-def login() -> Union[str, Response]:
+def login() -> str | Response:
     if current_user.is_authenticated:
         return redirect('/')
     form = LoginForm()
@@ -103,7 +103,7 @@ def login() -> Union[str, Response]:
 
 
 @app.route('/password_reset', methods=['GET', 'POST'])
-def reset_password() -> Union[str, Response]:
+def reset_password() -> str | Response:
     if current_user.is_authenticated:  # Prevent password reset if logged in
         return redirect(url_for('overview'))
     form = PasswordResetForm()

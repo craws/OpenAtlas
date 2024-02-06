@@ -3,7 +3,7 @@ from __future__ import annotations
 import ast
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional, TYPE_CHECKING, Union
+from typing import Any, Optional, TYPE_CHECKING
 
 import numpy
 from flask import g, url_for
@@ -161,7 +161,7 @@ class GlobalSearchForm(FlaskForm):
 
 
 @app.context_processor
-def inject_template_functions() -> dict[str, Union[str, GlobalSearchForm]]:
+def inject_template_functions() -> dict[str, str | GlobalSearchForm]:
     def get_logo() -> str:
         if g.settings['logo_file_id']:
             if path := get_file_path(int(g.settings['logo_file_id'])):
@@ -174,7 +174,7 @@ def inject_template_functions() -> dict[str, Union[str, GlobalSearchForm]]:
         'search_form': GlobalSearchForm(prefix='global')}
 
 
-def check_if_entity_has_time(item: Union[Entity, Link]) -> bool:
+def check_if_entity_has_time(item: Entity | Link) -> bool:
     for date_ in [item.begin_from, item.begin_to, item.end_from, item.end_to]:
         if date_ and '00:00:00' not in str(date_):
             return True

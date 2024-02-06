@@ -1,5 +1,3 @@
-from typing import Union
-
 from flask import Response, g
 from flask_restful import Resource, marshal
 
@@ -13,7 +11,7 @@ from openatlas.api.resources.templates import (
 
 class GetBackendDetails(Resource):
     @staticmethod
-    def get() -> Union[tuple[Resource, int], Response]:
+    def get() -> tuple[Resource, int] | Response:
         parser = default.parse_args()
         details = {
             'version': app.config['VERSION'],
@@ -35,7 +33,7 @@ class GetBackendDetails(Resource):
 
 class ClassMapping(Resource):
     @staticmethod
-    def get() -> Union[tuple[Resource, int], Response]:
+    def get() -> tuple[Resource, int] | Response:
         return marshal([{
             "systemClass": class_.name,
             "crmClass":
@@ -50,5 +48,5 @@ class ClassMapping(Resource):
 
 class SystemClassCount(Resource):
     @staticmethod
-    def get() -> Union[tuple[Resource, int], Response]:
+    def get() -> tuple[Resource, int] | Response:
         return marshal(get_overview_counts(), overview_template()), 200

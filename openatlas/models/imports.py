@@ -1,4 +1,4 @@
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 from flask import g
 from flask_login import current_user
@@ -125,9 +125,9 @@ class Import:
                         northing=row['northing'])
 
 
-def is_float(value: Union[int, float]) -> bool:
+def is_float(value: int | float) -> bool:
     try:
         float(value)
-        return True
     except ValueError:
         return False
+    return True

@@ -1,4 +1,4 @@
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 from flask import g
 from psycopg2.extras import DictCursor
@@ -24,7 +24,7 @@ class Settings:
             {'name': field_name, 'value': value})
 
     @staticmethod
-    def set_logo(file_id: Union[int, str, None] = None) -> None:
+    def set_logo(file_id: int | str | None = None) -> None:
         g.cursor.execute(
             """
             UPDATE web.settings

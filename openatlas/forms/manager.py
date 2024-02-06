@@ -261,7 +261,7 @@ class FeatureManager(PlaceBaseManager):
 
 
 class FileManager(BaseManager):
-    fields = ['name', 'description']
+    fields = ['name', 'description', 'annotation']
 
     def additional_fields(self) -> dict[str, Any]:
         fields = {}
@@ -537,7 +537,6 @@ class ReferenceSystemManager(BaseManager):
             precision_id: TreeField(precision_id),
             'classes': SelectMultipleField(
                 _('classes'),
-                render_kw={'disabled': True},
                 choices=choices,
                 option_widget=widgets.CheckboxInput(),
                 widget=widgets.ListWidget(prefix_label=False))

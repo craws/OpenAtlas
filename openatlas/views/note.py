@@ -1,5 +1,3 @@
-from typing import Union
-
 from flask import flash, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
@@ -59,7 +57,7 @@ def note_view(id_: int) -> str:
 
 @app.route('/note/private/<int:id_>')
 @required_group('contributor')
-def note_set_private(id_: int) -> Union[str, Response]:
+def note_set_private(id_: int) -> str | Response:
     if not is_authorized('manager'):
         abort(403)
     note = User.get_note_by_id(id_)
@@ -70,7 +68,7 @@ def note_set_private(id_: int) -> Union[str, Response]:
 
 @app.route('/note/insert/<int:entity_id>', methods=['GET', 'POST'])
 @required_group('contributor')
-def note_insert(entity_id: int) -> Union[str, Response]:
+def note_insert(entity_id: int) -> str | Response:
     entity = Entity.get_by_id(entity_id)
     form = NoteForm()
     if form.validate_on_submit():
@@ -94,9 +92,9 @@ def note_insert(entity_id: int) -> Union[str, Response]:
 
 @app.route('/note/update/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
-def note_update(id_: int) -> Union[str, Response]:
+def note_update(id_: int) -> str | Response:
     note = User.get_note_by_id(id_)
-    if not note['user_id'] == current_user.id:
+    if note['user_id'] != current_user.id:
         abort(403)
     entity = Entity.get_by_id(note['entity_id'])
     form = NoteForm()
@@ -121,7 +119,7 @@ def note_update(id_: int) -> Union[str, Response]:
 @required_group('contributor')
 def note_delete(id_: int) -> Response:
     note = User.get_note_by_id(id_)
-    if not note['user_id'] == current_user.id:
+    if note['user_id'] != current_user.id:
         abort(403)
     User.delete_note(note['id'])
     flash(_('note deleted'), 'info')

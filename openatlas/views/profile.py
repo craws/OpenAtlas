@@ -1,5 +1,4 @@
 import importlib
-from typing import Union
 
 import bcrypt
 from flask import flash, g, render_template, session, url_for
@@ -86,7 +85,7 @@ def profile_index() -> str:
 
 @app.route('/profile/settings/<category>', methods=['GET', 'POST'])
 @login_required
-def profile_settings(category: str) -> Union[str, Response]:
+def profile_settings(category: str) -> str | Response:
     form = getattr(
         importlib.import_module('openatlas.forms.setting'),
         f"{uc_first(category)}Form")()
@@ -128,7 +127,7 @@ def profile_settings(category: str) -> Union[str, Response]:
 
 @app.route('/profile/password', methods=['GET', 'POST'])
 @login_required
-def profile_password() -> Union[str, Response]:
+def profile_password() -> str | Response:
     form = PasswordForm()
     if form.validate_on_submit():
         current_user.password = bcrypt.hashpw(

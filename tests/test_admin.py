@@ -27,21 +27,21 @@ class AdminTests(TestBaseCase):
                     'description': '',
                     'type_id': None})
 
-            rv = self.app.get(url_for('admin_orphans'))
+            rv = self.app.get(url_for('orphans'))
             assert b'Oliver Twist' in rv.data
             assert b'Forsaken file' in rv.data
             assert b'Forsaken subunit' in rv.data
 
-            rv = self.app.get(url_for('admin_log'))
+            rv = self.app.get(url_for('log'))
             assert b'Login' in rv.data
 
-            rv = self.app.get(url_for('admin_check_dates'))
+            rv = self.app.get(url_for('check_dates'))
             assert b'Congratulations, everything looks fine!' in rv.data
 
-            rv = self.app.get(url_for('admin_log_delete'))
+            rv = self.app.get(url_for('log_delete'))
             assert b'Login' not in rv.data
 
-            rv = self.app.get(url_for('admin_check_links'))
+            rv = self.app.get(url_for('check_links'))
             assert b'Invalid linked entity' in rv.data
 
             file_ = 'Test77.txt'
@@ -91,35 +91,35 @@ class AdminTests(TestBaseCase):
                 source.link('P2', g.types[source_type.subs[0]])
                 source.link('P2', g.types[source_type.subs[1]])
 
-            rv = self.app.get(url_for('admin_check_dates'))
+            rv = self.app.get(url_for('check_dates'))
             assert b'<span class="tab-counter">' in rv.data
 
-            rv = self.app.get(url_for('admin_check_link_duplicates'))
+            rv = self.app.get(url_for('check_link_duplicates'))
             assert b'Event Horizon' in rv.data
 
             rv = self.app.get(
-                url_for('admin_check_link_duplicates', delete='delete'),
+                url_for('check_link_duplicates', delete='delete'),
                 follow_redirects=True)
             assert b'remove' in rv.data
 
             rv = self.app.get(
                 url_for(
-                    'admin_delete_single_type_duplicate',
+                    'delete_single_type_duplicate',
                     entity_id=source.id,
                     type_id=source_type.subs[0]),
                 follow_redirects=True)
             assert b'Congratulations, everything looks fine!' in rv.data
 
             rv = self.app.post(
-                url_for('admin_check_similar'),
+                url_for('check_similar'),
                 data={'classes': 'person', 'ratio': 100},
                 follow_redirects=True)
             assert b'Oliver Twist' in rv.data
 
-            rv = self.app.get(url_for('admin_settings', category='mail'))
+            rv = self.app.get(url_for('settings', category='mail'))
             assert b'mail from' in rv.data
 
-            rv = self.app.get(url_for('admin_settings', category='general'))
+            rv = self.app.get(url_for('settings', category='general'))
             assert b'log level' in rv.data
 
             rv = self.app.post(

@@ -1,15 +1,15 @@
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 from flask import g, url_for
 
 from openatlas import app
 from openatlas.api.resources.util import (
-    get_geometric_collection, get_license_name, get_location_link,
-    get_reference_systems, replace_empty_list_values_in_dict_with_none,
-    to_camel_case, date_to_str, get_crm_relation)
+    date_to_str, get_crm_relation, get_geometric_collection, get_license_name,
+    get_location_link, get_reference_systems,
+    replace_empty_list_values_in_dict_with_none, to_camel_case)
+from openatlas.display.util import get_file_path
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.display.util import get_file_path
 
 
 def get_linked_places_entity(
@@ -72,11 +72,9 @@ def get_lp_links(
     for link_ in links:
         if link_.property.code in properties:
             out.append(link_dict(link_))
-        continue
     for link_ in links_inverse:
         if link_.property.code in properties:
             out.append(link_dict(link_, inverse=True))
-        continue
     return out
 
 
@@ -121,7 +119,7 @@ def get_lp_types(entity: Entity, links: list[Link]) -> list[dict[str, Any]]:
     return types
 
 
-def get_lp_time(entity: Union[Entity, Link]) -> Optional[dict[str, Any]]:
+def get_lp_time(entity: Entity | Link) -> Optional[dict[str, Any]]:
     return {
         'start': {
             'earliest': date_to_str(entity.begin_from),

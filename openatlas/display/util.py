@@ -11,7 +11,7 @@ from email.mime.text import MIMEText
 from functools import wraps
 from html.parser import HTMLParser
 from pathlib import Path
-from typing import Any, Optional, TYPE_CHECKING, Union
+from typing import Any, Optional, TYPE_CHECKING
 
 import numpy
 from bcrypt import hashpw
@@ -30,7 +30,6 @@ from openatlas.models.content import get_translation
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
-    from openatlas.models.user import User
     from openatlas.models.link import Link
     from openatlas.models.type import Type
 
@@ -111,7 +110,7 @@ def get_appearance(event_links: list[Link]) -> tuple[str, str]:
 
 
 def format_entity_date(
-        entity: Union[Entity, Link],
+        entity: Entity | Link,
         type_: str,  # begin or end
         object_: Optional[Entity] = None) -> str:
     html = link(object_) if object_ else ''
@@ -132,7 +131,7 @@ def profile_image_table_link(entity: Entity, file: Entity, ext: str) -> str:
     if file.id == entity.image_id:
         return link(
             _('unset'),
-            url_for('file_remove_profile_image', entity_id=entity.id))
+            url_for('remove_profile_image', entity_id=entity.id))
     if ext in g.display_file_ext:
         return link(
             _('set'),
@@ -235,7 +234,6 @@ def profile_image(entity: Entity) -> str:
     src = url_for('display_file', filename=path.name)
     url = src
     width = g.settings["profile_image_width"]
-
     if g.settings['iiif'] and check_iiif_file_exist(file_id):
         iiif_ext = '.tiff' if g.settings['iiif_conversion'] \
             else g.files[file_id].suffix
@@ -263,15 +261,19 @@ def profile_image(entity: Entity) -> str:
         f'<img style="max-width:{width}px" alt="{entity.name}" src="{src}">',
         url,
         external=external)
-
-    if check_iiif_activation() \
-            and g.files[file_id].suffix in g.display_file_ext:
+    if (entity.class_.name == 'file'
+            and check_iiif_activation()
+            and g.files[file_id].suffix in g.display_file_ext):
         if check_iiif_file_exist(file_id) \
                 or not g.settings['iiif_conversion']:
-            html += '<br>' + link(
+            html += ('<br>' + link(
                 _('view in IIIF'),
                 url_for('view_iiif', id_=file_id),
-                external=True)
+                external=True) + ' - ' +
+                link(
+                    _('annotate'),
+                    url_for('annotation_insert', id_=file_id),
+                    external=True))
         else:
             html += button_bar([
                 button(
@@ -384,7 +386,7 @@ def required_group(group: str):  # type: ignore
 def send_mail(
         subject: str,
         text: str,
-        recipients: Union[str, list[str]],
+        recipients: str | list[str],
         log_body: bool = True) -> bool:
     """
         Send one mail to every recipient.
@@ -484,7 +486,7 @@ def tooltip(text: str) -> str:
 
 
 def get_file_path(
-        entity: Union[int, Entity],
+        entity: int | Entity,
         size: Optional[str] = None) -> Optional[Path]:
     id_ = entity if isinstance(entity, int) else entity.id
     if id_ not in g.files:
@@ -498,7 +500,7 @@ def get_file_path(
     return app.config['UPLOAD_PATH'] / f"{id_}{ext}"
 
 
-def format_date(value: Union[datetime, numpy.datetime64]) -> str:
+def format_date(value: datetime | numpy.datetime64) -> str:
     if not value:
         return ''
     if isinstance(value, numpy.datetime64):
@@ -528,7 +530,7 @@ def link(
     from openatlas.models.imports import Project
     html = ''
     if isinstance(object_, (str, LazyString)):
-        js = f'onclick="{js}"' if js else ''
+        js = f'onclick="{uc_first(js)}"' if js else ''
         uc_first_class = 'uc-first' if uc_first_ and not \
             str(object_).startswith('http') else ''
         ext = 'target="_blank" rel="noopener noreferrer"' if external else ''
@@ -785,11 +787,11 @@ def get_iiif_file_path(id_: int) -> Path:
     return Path(g.settings['iiif_path']) / f'{id_}{ext}'
 
 
-def convert_image_to_iiif(id_: int) -> None:
+def convert_image_to_iiif(id_: int, path: Optional[Path] = None) -> bool:
     command: list[Any] = ["vips" if os.name == 'posix' else "vips.exe"]
     command.extend([
         'tiffsave',
-        get_file_path(id_),
+        path or get_file_path(id_),
         get_iiif_file_path(id_),
         '--tile',
         '--pyramid',
@@ -799,9 +801,9 @@ def convert_image_to_iiif(id_: int) -> None:
         '128',
         '--tile-height',
         '128'])
-    process = subprocess.Popen(command)
-    process.wait()
-    if process.returncode == 0:
-        flash(_('IIIF converted'), 'info')
-    else:
-        flash(f"{_('failed to convert image')}", 'error')  # pragma: no cover
+    try:
+        process = subprocess.Popen(command)
+        process.wait()
+        return True
+    except Exception:  # pragma: no cover
+        return False

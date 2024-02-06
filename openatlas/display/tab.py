@@ -13,17 +13,19 @@ if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
 
 # Needed for translations of tab titles
-_('member of')
-_('texts')
+_('bookmarks')
+_('circular dependencies')
 _('invalid dates')
 _('invalid link dates')
 _('invalid involvement dates')
-_('unlinked')
+_('member of')
 _('missing files')
+_('notes')
 _('orphaned files')
 _('orphaned iiif files')
 _('orphaned subunits')
-_('circular dependencies')
+_('texts')
+_('unlinked')
 
 
 class Tab:
@@ -52,9 +54,8 @@ class Tab:
             name: str,
             entity: Optional[Entity] = None) -> None:
         view = entity.class_.view if entity else None
-        if entity:
-            if not self.table.header:
-                self.table.header = g.table_headers[name]
+        if entity and not self.table.header:
+            self.table.header = g.table_headers[name]
         if name == 'reference' or entity and entity.class_.view == 'reference':
             self.table.header = self.table.header + ['page']
         if name == 'actor':

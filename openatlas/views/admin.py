@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 import importlib
 import math
@@ -5,7 +7,7 @@ import os
 import shutil
 from pathlib import Path
 from subprocess import run
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -24,13 +26,14 @@ from openatlas.display.image_processing import (
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, convert_size, display_form, display_info, format_date,
-    get_file_path, is_authorized, link, manual, required_group, sanitize,
-    send_mail, uc_first)
+    button, check_iiif_activation, check_iiif_file_exist,
+    convert_image_to_iiif, convert_size,
+    display_form, display_info, format_date, get_file_path, is_authorized,
+    link, manual, required_group, sanitize, send_mail, uc_first)
 from openatlas.forms.field import SubmitField
 from openatlas.forms.setting import (
-    ApiForm, ContentForm, FilesForm, GeneralForm, LogForm, MailForm, MapForm,
-    ModulesForm, SimilarForm, TestMailForm, IiifForm, FrontendForm)
+    ApiForm, ContentForm, FilesForm, FrontendForm, GeneralForm, IiifForm,
+    LogForm, MailForm, MapForm, ModulesForm, SimilarForm, TestMailForm)
 from openatlas.forms.util import get_form_settings, set_form_settings
 from openatlas.models.content import get_content, update_content
 from openatlas.models.entity import Entity
@@ -47,7 +50,7 @@ from openatlas.models.user import User
 @required_group('readonly')
 def admin_index(
         action: Optional[str] = None,
-        id_: Optional[int] = None) -> Union[str, Response]:
+        id_: Optional[int] = None) -> str | Response:
     if is_authorized('manager'):
         if id_ and action == 'delete_user':
             user = User.get_by_id(id_)
@@ -74,10 +77,10 @@ def admin_index(
         'content': Table(['name'] + list(app.config['LANGUAGES']))}
     if is_authorized('manager'):
         tables['user'].header.append(_('info'))
-    newsletter = False
+    newsletter_ = False
     for user in User.get_all():
         if user.settings['newsletter']:
-            newsletter = True
+            newsletter_ = True
         user_entities = ''
         if count := User.get_created_entities_count(user.id):
             user_entities = \
@@ -128,7 +131,7 @@ def admin_index(
                 disk_space_info=get_disk_space_info()),
             buttons=[
                 manual('entity/file'),
-                button(_('edit'), url_for('admin_settings', category='files'))
+                button(_('edit'), url_for('settings', category='files'))
                 if is_authorized('manager') else '',
                 button(_('list'), url_for('index', view='file')),
                 button(_('file'), url_for('insert', class_='file'))
@@ -139,10 +142,10 @@ def admin_index(
             buttons=[
                 manual('admin/user'),
                 button(_('activity'), url_for('user_activity')),
-                button(_('newsletter'), url_for('admin_newsletter')) if (
+                button(_('newsletter'), url_for('newsletter')) if (
                     is_authorized('manager') and
                     g.settings['mail'] and
-                    newsletter) else '',
+                    newsletter_) else '',
                 button(_('user'), url_for('user_insert'))
                 if is_authorized('manager') else ''])}
     if is_authorized('admin'):
@@ -151,23 +154,24 @@ def admin_index(
             display_info(get_form_settings(GeneralForm())),
             buttons=[
                 manual('admin/general'),
-                button(
-                    _('edit'),
-                    url_for('admin_settings', category='general')),
-                button(_('system log'), url_for('admin_log'))])
+                button(_('edit'), url_for('settings', category='general')),
+                button(_('system log'), url_for('log'))])
         tabs['email'] = Tab(
             'email',
             display_info(get_form_settings(MailForm())) +
             (display_form(form) if g.settings['mail'] else ''),
             buttons=[
                 manual('admin/mail'),
-                button(_('edit'), url_for('admin_settings', category='mail'))])
+                button(_('edit'), url_for('settings', category='mail'))])
         tabs['IIIF'] = Tab(
             'IIIF',
             display_info(get_form_settings(IiifForm())),
             buttons=[
                 manual('admin/iiif'),
-                button(_('edit'), url_for('admin_settings', category='iiif'))])
+                button(_('edit'), url_for('settings', category='iiif')),
+                button(
+                    _('convert all files') + f' ({count_files_to_convert()})',
+                    url_for('admin_convert_iiif_files'))])
 
     if is_authorized('manager'):
         tabs['modules'] = Tab(
@@ -176,15 +180,13 @@ def admin_index(
             + display_info(get_form_settings(ModulesForm())),
             buttons=[
                 manual('admin/modules'),
-                button(
-                    _('edit'),
-                    url_for('admin_settings', category='modules'))])
+                button(_('edit'), url_for('settings', category='modules'))])
         tabs['map'] = Tab(
             'map',
             display_info(get_form_settings(MapForm())),
             buttons=[
                 manual('admin/map'),
-                button(_('edit'), url_for('admin_settings', category='map'))])
+                button(_('edit'), url_for('settings', category='map'))])
         tabs['content'] = Tab(
             'content',
             tables['content'].display(),
@@ -194,9 +196,7 @@ def admin_index(
             display_info(get_form_settings(FrontendForm())),
             buttons=[
                 manual('admin/frontend'),
-                button(
-                    _('edit'),
-                    url_for('admin_settings', category='frontend'))])
+                button(_('edit'), url_for('settings', category='frontend'))])
     if is_authorized('contributor'):
         tabs['data'] = Tab(
             'data',
@@ -213,7 +213,7 @@ def admin_index(
 
 @app.route('/admin/content/<string:item>', methods=['GET', 'POST'])
 @required_group('manager')
-def admin_content(item: str) -> Union[str, Response]:
+def admin_content(item: str) -> str | Response:
     for language in app.config['LANGUAGES']:
         setattr(
             ContentForm,
@@ -242,9 +242,9 @@ def admin_content(item: str) -> Union[str, Response]:
             _(item)])
 
 
-@app.route('/admin/check_links')
+@app.route('/check_links')
 @required_group('contributor')
-def admin_check_links() -> str:
+def check_links() -> str:
     tab = Tab(
         'check_links',
         table=Table(
@@ -263,16 +263,15 @@ def admin_check_links() -> str:
             _('check links')])
 
 
-@app.route('/admin/check_link_duplicates')
-@app.route('/admin/check_link_duplicates/<delete>')
+@app.route('/check_link_duplicates')
+@app.route('/check_link_duplicates/<delete>')
 @required_group('contributor')
-def admin_check_link_duplicates(
-        delete: Optional[str] = None) -> Union[str, Response]:
+def check_link_duplicates(delete: Optional[str] = None) -> str | Response:
     if delete:
         count = Link.delete_link_duplicates()
         g.logger.log('info', 'admin', f"Deleted duplicate links: {count}")
         flash(f"{_('deleted links')}: {count}", 'info')
-        return redirect(url_for('admin_check_link_duplicates'))
+        return redirect(url_for('check_link_duplicates'))
     tab = Tab(
         'check_link_duplicates',
         buttons=[manual('admin/data_integrity_checks')])
@@ -298,7 +297,7 @@ def admin_check_link_duplicates(
         tab.buttons.append(
             button(
                 _('delete link duplicates'),
-                url_for('admin_check_link_duplicates', delete='delete')))
+                url_for('check_link_duplicates', delete='delete')))
     else:  # Check single types for multiple use
         tab.table = Table(
             ['entity', 'class', 'base type', 'incorrect multiple types'])
@@ -306,7 +305,7 @@ def admin_check_link_duplicates(
             remove_links = []
             for type_ in row['offending_types']:
                 url = url_for(
-                    'admin_delete_single_type_duplicate',
+                    'delete_single_type_duplicate',
                     entity_id=row['entity'].id,
                     type_id=type_.id)
                 remove_links.append(
@@ -328,19 +327,17 @@ def admin_check_link_duplicates(
             _('check link duplicates')])
 
 
-@app.route('/admin/delete_single_type_duplicate/<int:entity_id>/<int:type_id>')
+@app.route('/delete_single_type_duplicate/<int:entity_id>/<int:type_id>')
 @required_group('contributor')
-def admin_delete_single_type_duplicate(
-        entity_id: int,
-        type_id: int) -> Response:
+def delete_single_type_duplicate(entity_id: int, type_id: int) -> Response:
     g.types[type_id].remove_entity_links(entity_id)
     flash(_('link removed'), 'info')
-    return redirect(url_for('admin_check_link_duplicates'))
+    return redirect(url_for('check_link_duplicates'))
 
 
-@app.route('/admin/settings/<category>', methods=['GET', 'POST'])
+@app.route('/settings/<category>', methods=['GET', 'POST'])
 @required_group('manager')
-def admin_settings(category: str) -> Union[str, Response]:
+def settings(category: str) -> str | Response:
     if category in ['general', 'mail', 'iiif'] and not is_authorized('admin'):
         abort(403)
     form = getattr(
@@ -384,9 +381,9 @@ def admin_settings(category: str) -> Union[str, Response]:
             _(category)])
 
 
-@app.route('/admin/similar', methods=['GET', 'POST'])
+@app.route('/check_similar', methods=['GET', 'POST'])
 @required_group('contributor')
-def admin_check_similar() -> str:
+def check_similar() -> str:
     form = SimilarForm()
     form.classes.choices = [
         (class_.name, class_.label)
@@ -413,9 +410,9 @@ def admin_check_similar() -> str:
             _('check similar names')])
 
 
-@app.route('/admin/check/dates')
+@app.route('/check/dates')
 @required_group('contributor')
-def admin_check_dates() -> str:
+def check_dates() -> str:
     tabs = {
         'dates': Tab(
             'invalid_dates',
@@ -474,9 +471,9 @@ def admin_check_dates() -> str:
             _('check dates')])
 
 
-@app.route('/admin/orphans')
+@app.route('/orphans')
 @required_group('contributor')
-def admin_orphans() -> str:
+def orphans() -> str:
     header = [
         'name',
         'class',
@@ -548,9 +545,7 @@ def admin_orphans() -> str:
                 format_date(
                     datetime.datetime.utcfromtimestamp(file.stat().st_ctime)),
                 file.suffix,
-                link(
-                    _('download'),
-                    url_for('download_file', filename=file.name)),
+                link(_('download'), url_for('download', filename=file.name)),
                 link(
                     _('delete'),
                     url_for('admin_file_delete', filename=file.name),
@@ -594,7 +589,7 @@ def admin_orphans() -> str:
             tab.content = _('Congratulations, everything looks fine!')
 
     if tabs['orphaned_files'].table.rows and is_authorized('admin'):
-        text = uc_first(_('delete all files without corresponding entities?'))
+        text = _('delete all files without corresponding entities?')
         tabs['orphaned_files'].buttons.append(
             button(
                 _('delete all files'),
@@ -619,7 +614,7 @@ def admin_file_delete(filename: str) -> Response:
         except Exception as e:
             g.logger.log('error', 'file', f'deletion of {filename} failed', e)
             flash(_('error file delete'), 'error')
-        return redirect(f"{url_for('admin_orphans')}#tab-orphaned-files")
+        return redirect(f"{url_for('orphans')}#tab-orphaned-files")
 
     # Delete all files with no corresponding entity
     if is_authorized('admin'):  # pragma: no cover - don't test, ever
@@ -633,7 +628,7 @@ def admin_file_delete(filename: str) -> Response:
                         'error', 'file', f'deletion of {f.name} failed', e)
                     flash(_('error file delete'), 'error')
     return redirect(
-        f"{url_for('admin_orphans')}#tab-orphaned-files")  # pragma: no cover
+        f"{url_for('orphans')}#tab-orphaned-files")  # pragma: no cover
 
 
 @app.route('/admin/file/iiif/delete/<filename>')
@@ -645,13 +640,13 @@ def admin_file_iiif_delete(filename: str) -> Response:
     except Exception as e:
         g.logger.log('error', 'file', f'deletion of IIIF {filename} failed', e)
         flash(_('error file delete'), 'error')
-    return redirect(f"{url_for('admin_orphans')}#tab-orphaned-iiif-files")
+    return redirect(f"{url_for('orphans')}#tab-orphaned-iiif-files")
 
 
 @app.route('/admin/logo/')
 @app.route('/admin/logo/<int:id_>')
 @required_group('manager')
-def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
+def admin_logo(id_: Optional[int] = None) -> str | Response:
     if g.settings['logo_file_id']:
         abort(418)  # pragma: no cover - logo already set
     if id_:
@@ -682,9 +677,9 @@ def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
             _('logo')])
 
 
-@app.route('/admin/log', methods=['GET', 'POST'])
+@app.route('/log', methods=['GET', 'POST'])
 @required_group('admin')
-def admin_log() -> str:
+def log() -> str:
     form = LogForm()
     form.user.choices = [(0, _('all'))] + User.get_users_for_form()
     table = Table(
@@ -710,8 +705,8 @@ def admin_log() -> str:
             row['info']])
     buttons = [button(
         _('delete all logs'),
-        url_for('admin_log_delete'),
-        onclick=f"return confirm('{uc_first(_('delete all logs'))}?')")]
+        url_for('log_delete'),
+        onclick=f"return confirm('{_('delete all logs')}?')")]
 
     return render_template(
         'tabs.html',
@@ -722,17 +717,17 @@ def admin_log() -> str:
             _('system log')])
 
 
-@app.route('/admin/log/delete')
+@app.route('/log/delete')
 @required_group('admin')
-def admin_log_delete() -> Response:
+def log_delete() -> Response:
     g.logger.delete_all_system_logs()
     flash(_('Logs deleted'), 'info')
-    return redirect(url_for('admin_log'))
+    return redirect(url_for('log'))
 
 
-@app.route('/admin/newsletter', methods=['GET', 'POST'])
+@app.route('/newsletter', methods=['GET', 'POST'])
 @required_group('manager')
-def admin_newsletter() -> Union[str, Response]:
+def newsletter() -> str | Response:
     class NewsLetterForm(FlaskForm):
         subject = StringField(
             '',
@@ -791,9 +786,9 @@ def admin_newsletter() -> Union[str, Response]:
             _('newsletter')])
 
 
-@app.route('/admin/resize_images')
+@app.route('/resize_images')
 @required_group('admin')
-def admin_resize_images() -> Response:
+def resize_images() -> Response:
     create_resized_images()
     flash(_('images were created'), 'info')
     return redirect(url_for('admin_index') + '#tab-data')
@@ -805,6 +800,13 @@ def admin_delete_orphaned_resized_images() -> Response:
     delete_orphaned_resized_images()
     flash(_('resized orphaned images were deleted'), 'info')
     return redirect(url_for('admin_index') + '#tab-data')
+
+
+@app.route('/admin/convert_iiif_files')
+@required_group('admin')
+def admin_convert_iiif_files() -> Response:
+    convert_iiif_files()
+    return redirect(url_for('admin_index') + '#tab-IIIF')
 
 
 def get_disk_space_info() -> Optional[dict[str, Any]]:
@@ -829,3 +831,33 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
         'percent_used': percent_free,
         'percent_project': percent_files,
         'percent_other': 100 - (percent_files + percent_free)}
+
+
+def count_files_to_convert() -> int:
+    total_files = 0
+    converted_files = 0
+    existing_files = [entity.id for entity in Entity.get_by_class('file')]
+    for file_id, file_path in g.files.items():
+        if (file_id in existing_files and
+                file_path.suffix in g.display_file_ext):
+            total_files += 1
+            if check_iiif_file_exist(file_id):
+                converted_files += 1
+
+    return total_files - converted_files
+
+
+def convert_iiif_files() -> None:
+    if not check_iiif_activation():  # pragma: no cover
+        flash(_('please activate IIIF'), 'info')
+        return
+    if not g.settings['iiif_conversion']:  # pragma: no cover
+        flash(_('please activate IIIF conversion'), 'info')
+        return
+    existing_files = [entity.id for entity in Entity.get_by_class('file')]
+    for id_, file_path in g.files.items():
+        if check_iiif_file_exist(id_):
+            continue
+        if id_ in existing_files and file_path.suffix in g.display_file_ext:
+            convert_image_to_iiif(id_)
+    flash(_('all image files are converted'), 'info')

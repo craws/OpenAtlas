@@ -1,16 +1,18 @@
 from flask_restful import Api
 
-from openatlas.api.endpoints.iiif import (
-    IIIFManifest, IIIFImageV2, IIIFCanvasV2, IIIFSequenceV2)
 from openatlas.api.endpoints.content import (
-    ClassMapping, SystemClassCount, GetBackendDetails)
-from openatlas.api.endpoints.special import (
-    GetGeometricEntities, ExportDatabase, GetSubunits)
+    ClassMapping, GetBackendDetails, SystemClassCount)
 from openatlas.api.endpoints.display_image import (
     DisplayImage, LicensedFileOverview)
 from openatlas.api.endpoints.entities import (
-    GetByCidocClass, GetBySystemClass, GetByViewClass, GetTypeEntitiesAll,
-    GetEntitiesLinkedToEntity, GetEntity, GetLatest, GetQuery, GetTypeEntities)
+    GetByCidocClass, GetBySystemClass, GetByViewClass,
+    GetEntitiesLinkedToEntity, GetEntity, GetLatest, GetQuery, GetTypeEntities,
+    GetTypeEntitiesAll)
+from openatlas.api.endpoints.iiif import (
+    IIIFAnnotationList, IIIFAnnotation, IIIFCanvas, IIIFImage,
+    IIIFManifest, IIIFSequence)
+from openatlas.api.endpoints.special import (
+    ExportDatabase, GetGeometricEntities, GetSubunits)
 from openatlas.api.endpoints.type import (
     GetTypeByViewClass, GetTypeOverview, GetTypeTree)
 
@@ -114,14 +116,22 @@ def display_routes(api: Api) -> None:
         '/iiif_manifest/<int:version>/<int:id_>',
         endpoint='iiif_manifest')
     api.add_resource(
-        IIIFImageV2,
+        IIIFAnnotationList,
+        '/iiif_annotation_list/<int:image_id>.json',
+        endpoint='iiif_annotation_list')
+    api.add_resource(
+        IIIFAnnotation,
+        '/iiif_annotation/<int:annotation_id>.json',
+        endpoint='iiif_annotation')
+    api.add_resource(
+        IIIFImage,
         '/iiif_image/<int:id_>.json',
         endpoint='iiif_image')
     api.add_resource(
-        IIIFCanvasV2,
+        IIIFCanvas,
         '/iiif_canvas/<int:id_>.json',
         endpoint='iiif_canvas')
     api.add_resource(
-        IIIFSequenceV2,
+        IIIFSequence,
         '/iiif_sequence/<int:id_>.json',
         endpoint='iiif_sequence')

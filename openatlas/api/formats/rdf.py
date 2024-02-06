@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Any, Union
+from typing import Any
 
 from rdflib import Graph
 
@@ -8,7 +8,7 @@ from openatlas import app
 
 
 def rdf_output(
-        data: Union[list[dict[str, Any]], dict[str, Any]],
+        data: list[dict[str, Any]] | dict[str, Any],
         parser: dict[str, Any]) -> Any:  # pragma: nocover
     os.environ['http_proxy'] = app.config['API_PROXY']
     os.environ['https_proxy'] = app.config['API_PROXY']

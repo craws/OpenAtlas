@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import time
-from typing import Any, Optional, TYPE_CHECKING, Union
+from typing import Any, Optional, TYPE_CHECKING
 
 from flask import g, request, url_for
 from flask_babel import lazy_gettext as _
@@ -83,6 +83,8 @@ class BaseManager:
             setattr(Form, 'gis_points', HiddenField(default='[]'))
             setattr(Form, 'gis_polygons', HiddenField(default='[]'))
             setattr(Form, 'gis_lines', HiddenField(default='[]'))
+        if 'annotation' in self.fields:
+            setattr(Form, 'annotation', HiddenField(default='[]'))
         self.add_buttons()
         self.form: Any = Form(obj=self.link_ or self.entity)
         self.customize_labels()
@@ -140,12 +142,7 @@ class BaseManager:
                     [InputRequired()],
                     render_kw={'autofocus': True}))
         if 'alias' in self.fields:
-            setattr(
-                self.form_class,
-                'alias',
-                FieldList(
-                    RemovableListField(),
-                    render_kw={'class': 'no-label'}))
+            setattr(self.form_class, 'alias', FieldList(RemovableListField()))
 
     def update_entity(self, new: bool = False) -> None:
         self.continue_link_id = self.entity.update(self.data, new)
@@ -194,7 +191,7 @@ class BaseManager:
     def add_link(
             self,
             property_: str,
-            range_: Union[str, Entity],
+            range_: str | Entity,
             description: Optional[str] = None,
             inverse: bool = False,
             return_link_id: bool = False,
@@ -224,6 +221,8 @@ class BaseManager:
             self.data['gis'] = {
                 shape: getattr(self.form, f'gis_{shape}s').data
                 for shape in ['point', 'line', 'polygon']}
+        if 'annotation' in self.fields:
+            self.data['annotation'] = getattr(self.form, 'annotation').data
 
     def insert_entity(self) -> None:
         self.entity = Entity.insert(self.class_.name, self.form.name.data)
@@ -455,7 +454,6 @@ class HierarchyBaseManager(BaseManager):
         return {
             'classes': SelectMultipleField(
                 _('classes'),
-                render_kw={'disabled': True},
                 description=_('tooltip hierarchy forms'),
                 choices=Type.get_class_choices(self.entity),
                 option_widget=widgets.CheckboxInput(),

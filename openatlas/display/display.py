@@ -70,9 +70,8 @@ class FileDisplay(BaseDisplay):
 
     def add_button_others(self) -> None:
         if path := get_file_path(self.entity.id):
-            self.buttons.append(button(
-                _('download'),
-                url_for('download_file', filename=path.name)))
+            self.buttons.append(
+                button(_('download'), url_for('download', filename=path.name)))
             return
         self.buttons.append(
             '<span class="error">' + uc_first(_("missing file")) + '</span>')

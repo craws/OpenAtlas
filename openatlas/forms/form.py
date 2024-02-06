@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Optional, TYPE_CHECKING, Union
+from typing import Any, Optional, TYPE_CHECKING
 
 from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
@@ -51,7 +51,7 @@ def get_add_reference_form(class_: str) -> Any:
 
 def get_table_form(
         classes: list[str],
-        excluded: Union[list[int], list[Entity]]) -> str:
+        excluded: list[int] | list[Entity]) -> str:
     entities = Entity.get_by_class(classes, types=True, aliases=True)
     if excluded and isinstance(excluded[0], Entity):
         excluded = [entity.id for entity in excluded]  # type: ignore

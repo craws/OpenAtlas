@@ -1,5 +1,3 @@
-from typing import Union
-
 from flask import g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
@@ -9,15 +7,15 @@ from openatlas import app
 from openatlas.display.image_processing import check_processed_image
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, format_date, get_base_table_data, get_file_path, is_authorized,
-    link, manual, required_group, check_iiif_file_exist)
+    button, check_iiif_file_exist, format_date, get_base_table_data,
+    get_file_path, is_authorized, link, manual, required_group)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 
 
 @app.route('/index/<view>')
 @required_group('readonly')
-def index(view: str) -> Union[str, Response]:
+def index(view: str) -> str | Response:
     buttons = [manual(f'entity/{view}')]
     for name in g.view_class_mapping[view] if view != 'place' else ['place']:
         if is_authorized(g.classes[name].write_access):

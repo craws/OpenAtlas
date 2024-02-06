@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Optional
 
 import bcrypt
 from flask import abort, flash, g, render_template, request, url_for
@@ -209,7 +209,7 @@ def user_entities(id_: int) -> str:
 
 @app.route('/admin/user/update/<int:id_>', methods=['GET', 'POST'])
 @required_group('manager')
-def user_update(id_: int) -> Union[str, Response]:
+def user_update(id_: int) -> str | Response:
     user = User.get_by_id(id_)
     if not user:
         abort(404)
@@ -245,7 +245,7 @@ def user_update(id_: int) -> Union[str, Response]:
 
 @app.route('/admin/user/insert', methods=['GET', 'POST'])
 @required_group('manager')
-def user_insert() -> Union[str, Response]:
+def user_insert() -> str | Response:
     form = UserForm()
     form.group.choices = get_groups()
     if not g.settings['mail']:

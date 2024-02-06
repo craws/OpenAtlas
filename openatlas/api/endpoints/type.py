@@ -1,12 +1,11 @@
 from collections import defaultdict
-from typing import Any, Union
+from typing import Any
 
-from flask import Response, g, url_for, jsonify
+from flask import Response, g, jsonify, url_for
 from flask_restful import Resource, marshal
 
 from openatlas.api.resources.parser import default, entity_
-from openatlas.api.resources.resolve_endpoints import (
-    download)
+from openatlas.api.resources.resolve_endpoints import download
 from openatlas.api.resources.templates import (
     type_by_view_class_template, type_overview_template, type_tree_template)
 from openatlas.models.entity import Entity
@@ -27,7 +26,7 @@ def walk_type_tree(types: list[int]) -> list[dict[str, Any]]:
 
 class GetTypeByViewClass(Resource):
     @staticmethod
-    def get() -> Union[tuple[Resource, int], Response]:
+    def get() -> tuple[Resource, int] | Response:
         types = GetTypeByViewClass.get_type_by_view()
         if default.parse_args()['download']:
             return download(types, type_by_view_class_template(types), 'types')
@@ -50,7 +49,7 @@ class GetTypeByViewClass(Resource):
 
 class GetTypeOverview(Resource):
     @staticmethod
-    def get() -> Union[tuple[Resource, int], Response]:
+    def get() -> tuple[Resource, int] | Response:
         types = GetTypeOverview.get_type_overview()
         if default.parse_args()['download']:
             return download(types, type_overview_template(), 'types')
@@ -78,7 +77,7 @@ class GetTypeOverview(Resource):
 
 class GetTypeTree(Resource):
     @staticmethod
-    def get() -> Union[tuple[Resource, int], Response]:
+    def get() -> tuple[Resource, int] | Response:
         parser = entity_.parse_args()
         type_tree = {'typeTree': GetTypeTree.get_type_tree()}
         if parser['download']:

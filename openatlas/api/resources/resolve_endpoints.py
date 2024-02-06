@@ -1,7 +1,7 @@
 import itertools
 import json
 import pathlib
-from typing import Any, Union
+from typing import Any
 
 from flask import Response, jsonify, request
 from flask_restful import marshal
@@ -33,12 +33,9 @@ from openatlas.models.entity import Entity
 def resolve_entities(
         entities: list[Entity],
         parser: dict[str, Any],
-        file_name: Union[int, str]) \
-        -> Union[Response, dict[str, Any], tuple[Any, int]]:
+        file_name: int | str) -> Response | dict[str, Any] | tuple[Any, int]:
     if parser['type_id'] and not (
-            entities := get_entities_by_type(entities, parser)
-    ):  # pylint: disable=superfluous-parens
-        # check disabled because of pylint bug, fixed in pylint 2.10.0
+            entities := get_entities_by_type(entities, parser)):
         raise TypeIDError
     if parser['search']:
         search_parser = parser_str_to_dict(parser['search'])
@@ -49,9 +46,7 @@ def resolve_entities(
     if parser['export'] == 'csvNetwork':
         return export_csv_for_network_analysis(entities, parser)
     result = get_json_output(
-        sorting(
-            remove_duplicate_entities(entities),
-            parser),
+        sorting(remove_duplicate_entities(entities), parser),
         parser)
     if parser['format'] in app.config['RDF_FORMATS']:  # pragma: nocover
         return Response(
@@ -100,8 +95,7 @@ def get_entity_formatted(
 
 def resolve_entity(
         entity: Entity,
-        parser: dict[str, Any]) \
-        -> Union[Response, dict[str, Any], tuple[Any, int]]:
+        parser: dict[str, Any]) -> Response | dict[str, Any] | tuple[Any, int]:
     if parser['export'] == 'csv':
         return export_entities_csv(entity, entity.name)
     if parser['export'] == 'csvNetwork':
@@ -124,7 +118,7 @@ def resolve_entity(
 def resolve_subunits(
         subunit: list[dict[str, Any]],
         parser: dict[str, Any],
-        name: str) -> Union[Response, dict[str, Any], tuple[Any, int]]:
+        name: str) -> Response | dict[str, Any] | tuple[Any, int]:
     out = {'collection' if parser['format'] == 'xml' else name: subunit}
     if parser['count']:
         return jsonify(len(out[name]))
@@ -234,9 +228,9 @@ def get_by_page(
 
 
 def download(
-        data: Union[list[Any], dict[Any, Any]],
+        data: list[Any] | dict[Any, Any],
         template: dict[Any, Any],
-        name: Union[str, int]) -> Response:
+        name: str | int) -> Response:
     return Response(
         json.dumps(marshal(data, template)),
         mimetype='application/json',

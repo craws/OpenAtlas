@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any, Type, Union
+from typing import Any, Type
 
 from flask_restful import fields
 from flask_restful.fields import Integer, List, Nested, String
@@ -126,9 +126,8 @@ def linked_places_template(show: str) -> dict[str, Type[String]]:
         'features': fields.List(fields.Nested(feature))}
 
 
-def pagination() -> dict[str, Union[List, Nested]]:
+def pagination() -> dict[str, List | Nested]:
     page_index = {"page": fields.Integer, "startId": fields.Integer}
-
     return {
         "entities": fields.Integer,
         "entitiesPerPage": fields.Integer,
@@ -227,7 +226,7 @@ def subunit_template(id_: str) -> dict[str, List]:
     return {id_: fields.List(fields.Nested(json))}
 
 
-def overview_template() -> dict[str, Type[Union[String, Integer]]]:
+def overview_template() -> dict[str, Type[String | Integer]]:
     return {
         'move': fields.Integer,
         'bibliography': fields.Integer,

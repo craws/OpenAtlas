@@ -4,6 +4,7 @@ from typing import Any
 from flask import g, url_for
 
 from openatlas import app
+from openatlas.display.util import check_iiif_file_exist, get_iiif_file_path
 from openatlas.models.entity import Entity
 from tests.base import TestBaseCase, get_hierarchy, insert
 
@@ -39,11 +40,26 @@ class FileTest(TestBaseCase):
                 files = Entity.get_by_class('file')
                 file_id = files[0].id
 
+            # Remove IIIF file to not break tests
+            if check_iiif_file_exist(file_id):
+                if path := get_iiif_file_path(file_id):  # pragma: no cover
+                    path.unlink()  # pragma: no cover
+
+            rv = self.app.get(
+                url_for('admin_convert_iiif_files'),
+                follow_redirects=True)
+            assert b'All image files are converted' in rv.data
+
+            # Remove IIIF file to not break tests
+            if check_iiif_file_exist(file_id):
+                if path := get_iiif_file_path(file_id):  # pragma: no cover
+                    path.unlink()  # pragma: no cover
+
             filename = f'{file_id}.png'
             with self.app.get(url_for('display_logo', filename=filename)):
                 pass
 
-            with self.app.get(url_for('download_file', filename=filename)):
+            with self.app.get(url_for('download', filename=filename)):
                 pass
 
             rv = self.app.get(url_for('admin_logo'), data={'file': file_id})
@@ -68,7 +84,7 @@ class FileTest(TestBaseCase):
             assert b'File type not allowed' in rv.data
 
             rv = self.app.get(
-                url_for('file_remove_profile_image', entity_id=place.id),
+                url_for('remove_profile_image', entity_id=place.id),
                 follow_redirects=True)
             assert b'Unset' not in rv.data
 
@@ -125,16 +141,13 @@ class FileTest(TestBaseCase):
             assert bool(rv['label'] == 'Updated file')
 
             rv = self.app.get(url_for('api.iiif_sequence', id_=file_id))
-            rv = rv.get_json()
-            assert bool(str(file_id) in rv['@id'])
+            assert bool(str(file_id) in rv.get_json()['@id'])
 
             rv = self.app.get(url_for('api.iiif_image', id_=file_id))
-            rv = rv.get_json()
-            assert bool(str(file_id) in rv['@id'])
+            assert bool(str(file_id) in rv.get_json()['@id'])
 
             rv = self.app.get(url_for('api.iiif_canvas', id_=file_id))
-            rv = rv.get_json()
-            assert bool(str(file_id) in rv['@id'])
+            assert bool(str(file_id) in rv.get_json()['@id'])
 
             with app.test_request_context():
                 app.preprocess_request()
@@ -145,8 +158,8 @@ class FileTest(TestBaseCase):
             rv = self.app.get(
                 url_for('api.licensed_file_overview', download=True))
             assert bool(len(rv.get_json().keys()) == 3)
-            rv = self.app.get(url_for(
-                'api.licensed_file_overview', file_id=file_id))
+            rv = self.app.get(
+                url_for('api.licensed_file_overview', file_id=file_id))
             assert bool(len(rv.get_json().keys()) == 1)
 
             rv = self.app.get(url_for('view_iiif', id_=file_id))
@@ -157,6 +170,42 @@ class FileTest(TestBaseCase):
 
             rv = self.app.get(url_for('view', id_=place.id))
             assert b'Logo' in rv.data
+
+            rv = self.app.get(url_for('annotation_insert', id_=file_id))
+            assert b'Annotate' in rv.data
+
+            rv = self.app.post(
+                url_for('annotation_insert', id_=file_id),
+                data={
+                    'coordinate': '1.5,1.6,1.4,9.6,8.6,9.6,8.6,1.6',
+                    'text': 'An interesting annotation'},
+                follow_redirects=True)
+            assert b'An interesting annotation' in rv.data
+
+            rv = self.app.get(url_for('annotation_update', id_=1))
+            assert b'An interesting annotation' in rv.data
+
+            rv = self.app.get(
+                url_for('api.iiif_annotation_list', image_id=file_id))
+            json = rv.get_json()
+            assert bool(str(file_id) in json['@id'])
+
+            annotation_id = json['resources'][0]['@id'].rsplit('/', 1)[-1]
+            rv = self.app.get(url_for(
+                'api.iiif_annotation',
+                annotation_id=annotation_id.replace('.json', '')))
+            assert bool(annotation_id in rv.get_json()['@id'])
+
+            rv = self.app.post(
+                url_for('annotation_update', id_=1),
+                data={'text': 'A boring annotation'},
+                follow_redirects=True)
+            assert b'A boring annotation' in rv.data
+
+            rv = self.app.get(
+                url_for('annotation_delete', id_=1),
+                follow_redirects=True)
+            assert b'Annotation deleted' in rv.data
 
             for file in files:
                 rv = self.app.get(

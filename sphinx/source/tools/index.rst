@@ -7,6 +7,7 @@ Tools
    search
    profile
    notes
+   image_annotation
    map
    network
    anthropological_analyses

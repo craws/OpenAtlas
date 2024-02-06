@@ -1,5 +1,4 @@
 import ast
-from typing import Union
 
 from flask import flash, render_template, url_for
 from flask_babel import lazy_gettext as _
@@ -10,7 +9,7 @@ from wtforms import FloatField
 from wtforms.validators import InputRequired
 
 from openatlas import app
-from openatlas.display.util import button, required_group, uc_first
+from openatlas.display.util import button, required_group
 from openatlas.forms.field import SubmitField
 from openatlas.models.entity import Entity
 from openatlas.models.overlay import Overlay
@@ -36,7 +35,7 @@ class OverlayForm(FlaskForm):
 def overlay_insert(
         image_id: int,
         place_id: int,
-        link_id: int) -> Union[str, Response]:
+        link_id: int) -> str | Response:
     form = OverlayForm()
     if form.validate_on_submit():
         Overlay.insert({
@@ -62,7 +61,7 @@ def overlay_insert(
 
 @app.route('/overlay/update/<int:id_>', methods=['GET', 'POST'])
 @required_group('editor')
-def overlay_update(id_: int) -> Union[str, Response]:
+def overlay_update(id_: int) -> str | Response:
     overlay = Overlay.get_by_id(id_)
     form = OverlayForm()
     if form.validate_on_submit():
@@ -94,10 +93,11 @@ def overlay_update(id_: int) -> Union[str, Response]:
         form=form,
         overlay=overlay,
         entity=entity,
-        buttons=[button(
-            _('remove'),
-            url_for('overlay_remove', id_=overlay.id, place_id=entity.id),
-            onclick=f"return confirm('{uc_first(_('remove'))}?');")],
+        buttons=[
+            button(
+                _('remove'),
+                url_for('overlay_remove', id_=overlay.id, place_id=entity.id),
+                onclick=f"return confirm('{_('remove')}?');")],
         crumbs=[
             [_('place'), url_for('index', view='place')],
             entity,

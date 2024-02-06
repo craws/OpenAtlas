@@ -1,16 +1,16 @@
-from typing import Any, Union
-
-from openatlas.api.resources.error import (
-    SearchCategoriesError, LogicalOperatorError, OperatorError,
-    NoSearchStringError, ValueNotIntegerError)
+from typing import Any
 
 from openatlas import app
+from openatlas.api.resources.error import (
+    LogicalOperatorError, NoSearchStringError, OperatorError,
+    SearchCategoriesError, ValueNotIntegerError)
 
 
 def iterate_validation(parameters: list[dict[str, Any]]) -> list[list[bool]]:
-    return [[call_validation(search_key, values) for values in value_list]
-            for parameter in parameters
-            for search_key, value_list in parameter.items()]
+    return [
+        [call_validation(search_key, values) for values in value_list]
+        for parameter in parameters
+        for search_key, value_list in parameter.items()]
 
 
 def call_validation(search_key: str, values: dict[str, Any]) -> bool:
@@ -45,5 +45,5 @@ def check_if_date_search(k: str) -> bool:
     return bool(k in ["beginFrom", "beginTo", "endFrom", "endTo"])
 
 
-def check_if_date(value: str) -> Union[str, bool]:
+def check_if_date(value: str) -> str | bool:
     return False if value == "None" else value

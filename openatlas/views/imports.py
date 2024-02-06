@@ -1,6 +1,6 @@
 import collections
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 import numpy
 import pandas as pd
@@ -69,7 +69,7 @@ def import_index() -> str:
 
 @app.route('/import/project/insert', methods=['GET', 'POST'])
 @required_group('manager')
-def import_project_insert() -> Union[str, Response]:
+def import_project_insert() -> str | Response:
     form = ProjectForm()
     if form.validate_on_submit():
         id_ = Import.insert_project(form.name.data, form.description.data)
@@ -141,7 +141,7 @@ def import_project_view(id_: int) -> str:
 
 @app.route('/import/project/update/<int:id_>', methods=['GET', 'POST'])
 @required_group('manager')
-def import_project_update(id_: int) -> Union[str, Response]:
+def import_project_update(id_: int) -> str | Response:
     project = Import.get_project_by_id(id_)
     form = ProjectForm(obj=project)
     form.project_id = id_

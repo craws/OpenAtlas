@@ -1,3 +1,5 @@
+from typing import Any
+
 from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
@@ -97,7 +99,7 @@ def search_index() -> str:
         crumbs=[_('search')])
 
 
-def build_search_table(form: FlaskForm) -> Table:
+def build_search_table(form: Any) -> Table:
     table = Table(['name', 'class', 'first', 'last', 'description'])
     entities = search({
         'term': form.term.data,
