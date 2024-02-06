@@ -4,3 +4,4 @@ docker-compose.yaml
 .git/**
 chart/**
 files/**
+data/**
