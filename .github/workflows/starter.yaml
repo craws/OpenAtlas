@@ -151,7 +151,7 @@ jobs:
           docker exec -i openatlas-openatlas-1 /bin/bash -c "cd /var/www/openatlas/instance/ && ls -la && cat testing.py && cat production.py"
       - name: Run tests
         run: |
-          docker exec -i openatlas-openatlas-1 /bin/bash -c "cd /var/www/openatlas/tests && nosetests3 -c .noserc --verbosity=2 --nologcapture --nocapture && echo passed"
+          docker exec -i openatlas-openatlas-1 /bin/bash -c "cd /var/www/openatlas/tests && nosetests3 --verbosity=2 --nologcapture --nocapture && echo passed"
   _3:
     needs: [setup_workflow_env, test_openatlas]
     uses: acdh-oeaw/gl-autodevops-minimal-port/.github/workflows/deploy.yml@main
