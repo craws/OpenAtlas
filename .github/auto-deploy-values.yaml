@@ -5,7 +5,7 @@ postgis:
   name: "${POSTGRES_DB}"
   user: "${POSTGRES_USER}"
   password: "${POSTGRES_PASSWORD}"
-  version: "13-3.3"
+  version: "15-3.4"
 
 service:
   name: "web"
