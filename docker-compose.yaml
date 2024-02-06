@@ -27,7 +27,7 @@ services:
   initdb:
     build:
       context: .
-      dockerfile: install/Dockerfile
+      dockerfile: install/docker/Dockerfile
     ports:
       - "8080:8080"
     environment:
@@ -44,7 +44,7 @@ services:
   openatlas:
     build:
       context: .
-      dockerfile: install/Dockerfile
+      dockerfile: install/docker/Dockerfile
     ports:
       - "8080:8080"
     environment:

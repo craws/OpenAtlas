@@ -49,7 +49,7 @@ cronjobs:
   backup:
     schedule: "0 3 * * *"
     command: ["/bin/bash"]
-    args: ["-c", "/var/www/openatlas/install/backup_script.sh /backup"]
+    args: ["-c", "/var/www/openatlas/install/docker/backup_script.sh /backup"]
     livenessProbe:
       command: ["/bin/true"]
       probeType: "exec"

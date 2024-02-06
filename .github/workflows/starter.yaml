@@ -68,7 +68,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: install/Dockerfile
+          file: install/docker/Dockerfile
           platforms: linux/amd64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
@@ -99,12 +99,13 @@ jobs:
         run: |
           container_name_tag="$(echo -n '${{ needs.setup_workflow_env.outputs.registry_root }}${{ needs.setup_workflow_env.outputs.image_name }}' | tr '_' '-' | tr '[:upper:]' '[:lower:]'):$(git rev-parse --short HEAD)"
           docker pull $container_name_tag
-          docker tag $container_name_tag openatlas-openatlas          
+          docker tag $container_name_tag openatlas-openatlas
+          docker tag $container_name_tag openatlas-openatlas
           docker tag $container_name_tag openatlas-initdb
 
       - name: Docker compose
         run: |
-          docker compose up --detach 
+          docker compose up --detach
 
       - name: Docker service overview
         run: |
