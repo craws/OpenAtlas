@@ -9,7 +9,7 @@ postgis:
   name: openatlas-test
   user: openatlas
   password: openatlas
-  version: "13-3.3"
+  version: "15-3.4"
 
 service:
   name: "web"
