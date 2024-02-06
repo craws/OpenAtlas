@@ -45,83 +45,9 @@ from openatlas.models.user import User
 
 
 @app.route('/admin', methods=['GET', 'POST'], strict_slashes=False)
-@app.route('/admin/', methods=['GET', 'POST'], strict_slashes=False)
-@app.route('/admin/<action>/<int:id_>', strict_slashes=False)
 @required_group('readonly')
-def admin_index(
-        action: Optional[str] = None,
-        id_: Optional[int] = None) -> str | Response:
-    if is_authorized('manager'):
-        if id_ and action == 'delete_user':
-            user = User.get_by_id(id_)
-            if not user \
-                    or user.id == current_user.id \
-                    or (user.group == 'admin' and not is_authorized('admin')):
-                abort(403)
-            User.delete(id_)
-            flash(_('user deleted'), 'info')
-        elif action == 'remove_logo':
-            Settings.set_logo()
-            return redirect(f"{url_for('admin_index')}#tab-file")
-    tables = {
-        'user': Table([
-                'username',
-                'name',
-                'group',
-                'email',
-                'newsletter',
-                'created',
-                'last login',
-                'entities'],
-            defs=[{'className': 'dt-body-right', 'targets': 7}]),
-        'content': Table(['name'] + list(app.config['LANGUAGES']))}
-    if is_authorized('manager'):
-        tables['user'].header.append(_('info'))
-    newsletter_ = False
-    for user in User.get_all():
-        if user.settings['newsletter']:
-            newsletter_ = True
-        user_entities = ''
-        if count := User.get_created_entities_count(user.id):
-            user_entities = \
-                f'<a href="{url_for("user_entities", id_=user.id)}">' \
-                f'{format_number(count)}</a>'
-        email = user.email \
-            if is_authorized('manager') or user.settings['show_email'] else ''
-        row = [
-            link(user),
-            user.real_name,
-            user.group,
-            email,
-            _('yes') if user.settings['newsletter'] else '',
-            format_date(user.created),
-            format_date(user.login_last_success),
-            user_entities]
-        if is_authorized('editor'):
-            row.append(user.description)
-        tables['user'].rows.append(row)
-    for item, languages in get_content().items():
-        content = [_(item)]
-        for language in app.config['LANGUAGES']:
-            content.append(sanitize(languages[language], 'text'))
-        content.append(link(_('edit'), url_for('admin_content', item=item)))
-        tables['content'].rows.append(content)
-    form = TestMailForm() if is_authorized('admin') \
-        and g.settings['mail'] else None
-    if form and form.validate_on_submit():
-        subject = _(
-            'Test mail from %(site_name)s',
-            site_name=g.settings['site_name'])
-        body = _(
-            'This test mail was sent by %(username)s',
-            username=current_user.username)
-        body += f" {_('at')} {request.headers['Host']}"
-        if send_mail(subject, body, form.receiver.data):
-            flash(_(
-                'A test mail was sent to %(email)s.',
-                email=form.receiver.data), 'info')
-    elif form and request.method == 'GET':
-        form.receiver.data = current_user.email
+def admin_index() -> str:
+    users = User.get_all()
     tabs = {
         'files': Tab(
             _('files'),
@@ -138,14 +64,11 @@ def admin_index(
                 if is_authorized('contributor') else '']),
         'user': Tab(
             _('user'),
-            table=tables['user'],
+            table=get_user_table(users),
             buttons=[
                 manual('admin/user'),
                 button(_('activity'), url_for('user_activity')),
-                button(_('newsletter'), url_for('newsletter')) if (
-                    is_authorized('manager') and
-                    g.settings['mail'] and
-                    newsletter_) else '',
+                get_newsletter_button(users),
                 button(_('user'), url_for('user_insert'))
                 if is_authorized('manager') else ''])}
     if is_authorized('admin'):
@@ -158,8 +81,7 @@ def admin_index(
                 button(_('system log'), url_for('log'))])
         tabs['email'] = Tab(
             'email',
-            display_info(get_form_settings(MailForm())) +
-            (display_form(form) if g.settings['mail'] else ''),
+            display_info(get_form_settings(MailForm())) + get_test_mail_form(),
             buttons=[
                 manual('admin/mail'),
                 button(_('edit'), url_for('settings', category='mail'))])
@@ -172,11 +94,10 @@ def admin_index(
                 button(
                     _('convert all files') + f' ({count_files_to_convert()})',
                     url_for('admin_convert_iiif_files'))])
-
     if is_authorized('manager'):
         tabs['modules'] = Tab(
             _('modules'),
-            '<h1 class="uc-first">' + _('defaults for new user') + '</h1>'
+            '<h1>' + uc_first(_('defaults for new user')) + '</h1>'
             + display_info(get_form_settings(ModulesForm())),
             buttons=[
                 manual('admin/modules'),
@@ -189,7 +110,7 @@ def admin_index(
                 button(_('edit'), url_for('settings', category='map'))])
         tabs['content'] = Tab(
             'content',
-            tables['content'].display(),
+            get_content_table(),
             buttons=[manual('admin/content')])
         tabs['frontend'] = Tab(
             'frontend',
@@ -209,6 +130,82 @@ def admin_index(
         tabs=tabs,
         title=_('admin'),
         crumbs=[_('admin')])
+
+
+def get_content_table() -> str:
+    table = Table(['name'] + list(app.config['LANGUAGES']))
+    for item, languages in get_content().items():
+        content = [_(item)]
+        for language in app.config['LANGUAGES']:
+            content.append(sanitize(languages[language], 'text'))
+        content.append(link(_('edit'), url_for('admin_content', item=item)))
+        table.rows.append(content)
+    return table.display()
+
+
+def get_test_mail_form() -> str:
+    if not g.settings['mail']:
+        return ''
+    form = TestMailForm()
+    if form.validate_on_submit():
+        subject = _(
+            'Test mail from %(site_name)s',
+            site_name=g.settings['site_name'])
+        body = (_(
+            'This test mail was sent by %(username)s',
+            username=current_user.username) +
+            ' ' + _('at') + ' ' + request.headers['Host'])
+        if send_mail(subject, body, form.receiver.data):
+            flash(_(
+                'A test mail was sent to %(email)s.',
+                email=form.receiver.data), 'info')
+    elif request.method == 'GET':
+        form.receiver.data = current_user.email
+    return display_form(form)
+
+
+def get_newsletter_button(users: list[User]) -> str:
+    if g.settings['mail'] and is_authorized('manager'):
+        for user in users:
+            if user.settings['newsletter']:
+                return button(_('newsletter'), url_for('newsletter'))
+    return ''
+
+
+def get_user_table(users: list[User]) -> Table:
+    table = Table([
+        'username', 'name', 'group', 'email', 'newsletter', 'created',
+        'last login', 'entities'],
+        defs=[{'className': 'dt-body-right', 'targets': 7}])
+    if is_authorized('manager'):
+        table.header.append(_('info'))
+    for user in users:
+        user_entities = ''
+        if count := User.get_created_entities_count(user.id):
+            user_entities = link(
+                format_number(count),
+                url_for("user_entities", id_=user.id))
+        row = [
+            link(user),
+            user.real_name,
+            user.group,
+            user.email if is_authorized('manager')
+            or user.settings['show_email'] else '',
+            _('yes') if user.settings['newsletter'] else '',
+            format_date(user.created),
+            format_date(user.login_last_success),
+            user_entities]
+        if is_authorized('editor'):
+            row.append(user.description)
+        table.rows.append(row)
+    return table
+
+
+@app.route('/logo/remove')
+@required_group('manager')
+def logo_remove() -> Response:
+    Settings.set_logo()
+    return redirect(f"{url_for('admin_index')}#tab-file")
 
 
 @app.route('/admin/content/<string:item>', methods=['GET', 'POST'])

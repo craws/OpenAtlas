@@ -134,7 +134,8 @@ def import_arche_data() -> int:
             'https://arche-thumbnails.acdh.oeaw.ac.at/',
             params={'id': ortho_photo, 'width': 1200},  # type: ignore
             timeout=60).content
-        open(str(app.config['UPLOAD_PATH'] / filename), "wb").write(thumb_req)
+        with open(str(app.config['UPLOAD_PATH'] / filename), "wb") as file_:
+            file_.write(thumb_req)
         file.link('P67', artifact)
 
         creator = get_or_create_person(

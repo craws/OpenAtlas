@@ -15,6 +15,7 @@ def index_changelog() -> str:
 
 
 versions = {
+    '8.2.0': ['TBA', {}],
     '8.1.1': ['2024-02-02', {
         'fix': {
             '2172': 'Minor issue at annotation update form'}}],

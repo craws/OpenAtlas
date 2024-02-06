@@ -2,30 +2,37 @@
   <div id="viewer" style="width: 50%;"></div>
   <script src="/static/node_modules/mirador/dist/mirador.min.js"></script>
   <script>
-      var config = {
-          "id": "viewer",
-          "layout": "1x1",
-          "mainMenuSettings": {
-              "show": false
-          },
-          "workspaceControlPanel": {
-              "enabled": false,
-          },
-          "window": {
-              "allowClose": false,
-              "defaultSideBarPanel": 'attribution',
-              "sideBarOpenByDefault": true,
-          },
-          "language": "{{ session.language }}",
-          "availableLanguages": {
-              "de": "Deutsch",
-              "en": "English",
-              "fr": "Français"
-          },
-          "windows": [{
-              "loadedManifest": "{{ manifest_url }}"
-          }]
-      };
-      Mirador.viewer(config);
+    var config = {
+      "id": "viewer",
+      "layout": "1x1",
+      "mainMenuSettings": {
+        "show": true
+      },
+      "workspaceControlPanel": {
+        "enabled": true
+      },
+      "window": {
+        "allowClose": false,
+        "defaultSideBarPanel": 'attribution',
+        "sideBarOpenByDefault": true,
+        "forceDrawAnnotations": true,
+        "highlightAllAnnotations": true
+      },
+      "workspace": {
+        "type": "{{ "mosaic" if manifests|length < 9 else 'elastic' }}"
+      },
+      "language": "{{ session.language }}",
+      "availableLanguages": {
+        "de": "Deutsch",
+        "en": "English",
+        "fr": "Français"
+      },
+      "windows": [
+        {% for manifest in manifests %}
+          {"loadedManifest": "{{ manifest }}"},
+        {% endfor %}
+      ]
+    };
+    Mirador.viewer(config);
   </script>
 </div>

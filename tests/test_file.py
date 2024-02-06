@@ -71,7 +71,7 @@ class FileTest(TestBaseCase):
             assert b'remove custom logo' in rv.data
 
             rv = self.app.get(
-                url_for('admin_index', action="remove_logo", id_=0),
+                url_for('logo_remove', action='remove_logo'),
                 follow_redirects=True)
             assert b'Logo' in rv.data
 
@@ -133,6 +133,10 @@ class FileTest(TestBaseCase):
             assert b'view in IIIF' in rv.data
 
             rv = self.app.get(
+                url_for('view', id_=place.id, _anchor="tab-file"))
+            assert b'view all IIIF images' in rv.data
+
+            rv = self.app.get(
                 url_for(
                     'api.iiif_manifest',
                     id_=file_id,
@@ -162,7 +166,7 @@ class FileTest(TestBaseCase):
                 url_for('api.licensed_file_overview', file_id=file_id))
             assert bool(len(rv.get_json().keys()) == 1)
 
-            rv = self.app.get(url_for('view_iiif', id_=file_id))
+            rv = self.app.get(url_for('view_iiif', id_=place.id))
             assert b'Mirador' in rv.data
 
             rv = self.app.get(url_for('view', id_=place.id))
@@ -178,9 +182,13 @@ class FileTest(TestBaseCase):
                 url_for('annotation_insert', id_=file_id),
                 data={
                     'coordinate': '1.5,1.6,1.4,9.6,8.6,9.6,8.6,1.6',
-                    'text': 'An interesting annotation'},
+                    'text': 'An interesting annotation',
+                    'annotated_entity': place.id},
                 follow_redirects=True)
             assert b'An interesting annotation' in rv.data
+
+            rv = self.app.get(url_for('view_iiif', id_=file_id))
+            assert b'Mirador' in rv.data
 
             rv = self.app.get(url_for('annotation_update', id_=1))
             assert b'An interesting annotation' in rv.data
