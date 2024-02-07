@@ -4,7 +4,19 @@ on:
   workflow_call: {}
   repository_dispatch:
     types: [run]
-  workflow_dispatch: {}
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'
+        required: false
+        default: false
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'
+        required: false
+        default: false
 jobs:
   setup_workflow_env:
     runs-on: ubuntu-latest
@@ -149,9 +161,14 @@ jobs:
           docker cp -a testing.py openatlas-openatlas-1:/var/www/openatlas/instance/
           docker exec -i openatlas-openatlas-1 /bin/bash -c "cd /var/www/openatlas/install/ && sed -i 's@http://localhost/iiif/@http://localhost:8080/iiif/@g' data_test.sql"
           docker exec -i openatlas-openatlas-1 /bin/bash -c "cd /var/www/openatlas/instance/ && ls -la && cat testing.py && cat production.py"
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+        with:
+          detached: true
       - name: Run tests
         run: |
-          docker exec -i openatlas-openatlas-1 /bin/bash -c "(cd /var/www/openatlas/tests && nosetests3 --verbosity=2 --nologcapture --nocapture) || (echo Tests exited with $?; exit 1)"
+          (docker exec -i openatlas-openatlas-1 /bin/bash -c "(cd /var/www/openatlas/tests && nosetests3 --verbosity=2 --nologcapture --nocapture) || (echo Tests exited with $?; exit 1)") || 
   _3:
     needs: [setup_workflow_env, test_openatlas]
     uses: acdh-oeaw/gl-autodevops-minimal-port/.github/workflows/deploy.yml@main
