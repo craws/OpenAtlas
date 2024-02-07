@@ -149,8 +149,6 @@ jobs:
           docker cp -a testing.py openatlas-openatlas-1:/var/www/openatlas/instance/
           docker exec -i openatlas-openatlas-1 /bin/bash -c "cd /var/www/openatlas/install/ && sed -i 's@http://localhost/iiif/@http://localhost:8080/iiif/@g' data_test.sql"
           docker exec -i openatlas-openatlas-1 /bin/bash -c "cd /var/www/openatlas/instance/ && ls -la && cat testing.py && cat production.py"
-      - name: Run tests
-        run: |
           docker exec -i openatlas-openatlas-1 /bin/bash -c "(cd /var/www/openatlas/tests && nosetests3 --verbosity=2 --nologcapture --nocapture) || (echo Tests exited with $?; exit 1)"
   _3:
     needs: [setup_workflow_env, test_openatlas]
