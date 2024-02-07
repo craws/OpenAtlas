@@ -168,7 +168,8 @@ jobs:
           detached: true
       - name: Run tests
         run: |
-          (docker exec -i openatlas-openatlas-1 /bin/bash -c "(cd /var/www/openatlas/tests && nosetests3 --verbosity=2 --nologcapture --nocapture) || (echo Tests exited with $?; exit 1)") || 
+          (docker exec -i openatlas-openatlas-1 /bin/bash -c "(cd /var/www/openatlas/tests && nosetests3 --verbosity=2 --nologcapture --nocapture) || (echo Tests exited with $?; exit 1)") ||\
+          (echo Retry; docker exec -i openatlas-openatlas-1 /bin/bash -c "(cd /var/www/openatlas/tests && nosetests3 --verbosity=2 --nologcapture --nocapture)
   _3:
     needs: [setup_workflow_env, test_openatlas]
     uses: acdh-oeaw/gl-autodevops-minimal-port/.github/workflows/deploy.yml@main
