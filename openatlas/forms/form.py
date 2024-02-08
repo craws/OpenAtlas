@@ -51,12 +51,8 @@ def get_add_reference_form(class_: str) -> Any:
     return Form()
 
 
-def get_table_form(
-        classes: list[str],
-        excluded: list[int] | list[Entity]) -> str:
+def get_table_form(classes: list[str], excluded: list[int]) -> str:
     entities = Entity.get_by_class(classes, types=True, aliases=True)
-    if excluded and isinstance(excluded[0], Entity):
-        excluded = [entity.id for entity in excluded]  # type: ignore
     table = Table([''] + g.table_headers[classes[0]], order=[[2, 'asc']])
     if (classes[0] == 'file' and
             (g.settings['image_processing'] or g.settings['iiif'])

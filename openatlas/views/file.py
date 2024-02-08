@@ -7,8 +7,8 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
-from openatlas.display.util import check_iiif_file_exist, \
-    convert_image_to_iiif, required_group
+from openatlas.display.util import (
+    check_iiif_file_exist, convert_image_to_iiif, required_group)
 from openatlas.forms.form import get_table_form
 from openatlas.models.entity import Entity
 
@@ -62,7 +62,7 @@ def file_add(id_: int, view: str) -> str | Response:
         'content.html',
         content=get_table_form(
             g.view_class_mapping[view],
-            entity.get_linked_entities('P67')),
+            [e.id for e in entity.get_linked_entities('P67')]),
         title=entity.name,
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],
