@@ -15,7 +15,13 @@ def index_changelog() -> str:
 
 
 versions = {
-    '8.2.0': ['TBA', {}],
+    '8.2.0': ['TBA', {
+        'feature': {
+            '1542': 'OpenAtlas on Kubernetes',
+            '2089': 'IIIF: Displaying images from an entity',
+            '2166': 'IIIF: Include linked entities in annotation manifest'
+        }
+    }],
     '8.1.1': ['2024-02-02', {
         'fix': {
             '2172': 'Minor issue at annotation update form'}}],
@@ -911,6 +917,9 @@ versions = {
             '318': 'Import definitions from CIDOC rdfs'}}],
     '0.0.1': ['2014-11-05', {
         'feature': {
-            '':
-                'Initial version based on the "Zend Base" project from ' +
-                link("https://craws.net", 'craws.net', external=True)}}]}
+            '': 'Initial version based on the Zend Base project from ' +
+                link(
+                    'craws.net',
+                    'https://craws.net',
+                    uc_first_=False,
+                    external=True)}}]}

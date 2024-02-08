@@ -502,6 +502,7 @@ map.on('draw:editvertex', function () {
     $("#coordinatesDiv input").removeClass('error');
 
 });
+
 map.on('draw:editmove', function () {
     $('#easting').val(currentEditLayer.getLatLng().lng)
     $('#northing').val(currentEditLayer.getLatLng().lat)
