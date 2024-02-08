@@ -131,7 +131,7 @@ spec:
             - secretRef:
                 name: {{ .Release.Name }}
                 optional: true
-          image: ghcr.io/acdh-oeaw/openatlas/container-preview:49b8d39
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: IfNotPresent
           name: initdb
           resources: {}
