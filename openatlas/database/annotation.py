@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 from flask import g
 
@@ -6,7 +6,7 @@ from flask import g
 class AnnotationImage:
 
     @staticmethod
-    def get_by_id(id_: int) -> Optional[dict[str, Any]]:
+    def get_by_id(id_: int) -> dict[str, Any]:
         g.cursor.execute(
             """
             SELECT
@@ -21,7 +21,7 @@ class AnnotationImage:
             WHERE id =  %(id)s;
             """,
             {'id': id_})
-        return dict(g.cursor.fetchone()) if g.cursor.rowcount else None
+        return dict(g.cursor.fetchone()) if g.cursor.rowcount else {}
 
     @staticmethod
     def get_by_file(image_id: int) -> list[dict[str, Any]]:
