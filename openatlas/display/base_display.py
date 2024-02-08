@@ -471,11 +471,12 @@ class ReferenceBaseDisplay(BaseDisplay):
                 'link_update',
                 id_=link_.id,
                 origin_id=self.entity.id)))
-            data.append(remove_link(
-                range_.name,
-                link_,
-                self.entity,
-                range_.class_.name))
+            data.append(
+                remove_link(
+                    range_.name,
+                    link_,
+                    self.entity,
+                    range_.class_.name))
             self.tabs[range_.class_.view].table.rows.append(data)
 
 

@@ -21,6 +21,7 @@ from flask_login import current_user
 from jinja2 import pass_context
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.display.image_processing import check_processed_image
@@ -284,8 +285,9 @@ def profile_image(entity: Entity) -> str:
 
 @app.template_filter()
 def get_js_messages(lang: str) -> str:
-    js_message_file = Path('static') / 'vendor' / 'jquery_validation_plugin' \
-                      / f'messages_{lang}.js'
+    js_message_file = \
+        Path('static') / 'vendor' / 'jquery_validation_plugin' \
+        / f'messages_{lang}.js'
     if not (Path(app.root_path) / js_message_file).is_file():
         return ''
     return f'<script src="/{js_message_file}"></script>'
@@ -368,10 +370,10 @@ def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
     return data
 
 
-def required_group(group: str):  # type: ignore
-    def wrapper(func):  # type: ignore
+def required_group(group: str) -> Any:
+    def wrapper(func: Any) -> Any:
         @wraps(func)
-        def wrapped(*args, **kwargs):  # type: ignore
+        def wrapped(*args: Any, **kwargs: Any) -> Response:
             if not current_user.is_authenticated:
                 return redirect(url_for('login', next=request.path))
             if not is_authorized(group):
