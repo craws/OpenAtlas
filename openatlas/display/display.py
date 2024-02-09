@@ -1,23 +1,20 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from flask import g, url_for
 from flask_babel import lazy_gettext as _
 
 from openatlas.display.base_display import (
     ActorDisplay, BaseDisplay, EventsDisplay, PlaceBaseDisplay,
     ReferenceBaseDisplay, TypeBaseDisplay)
+from openatlas.display.string_functions import is_authorized, uc_first
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
     button, description, edit_link, format_entity_date, get_base_table_data,
-    get_file_path, is_authorized, link, remove_link, uc_first)
+    get_file_path, link, remove_link)
 from openatlas.models.entity import Entity
+from openatlas.models.reference_system import ReferenceSystem
 from openatlas.views.tools import carbon_result, sex_result
-
-if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.models.reference_system import ReferenceSystem
 
 
 class AcquisitionDisplay(EventsDisplay):

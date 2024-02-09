@@ -6,7 +6,7 @@ from wtforms import Field, FileField, IntegerField, SelectField, StringField
 from wtforms.validators import Email
 
 from openatlas import app
-from openatlas.display.util import manual
+from openatlas.display.string_functions import manual
 from openatlas.forms.field import ValueTypeField
 
 

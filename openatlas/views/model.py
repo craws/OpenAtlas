@@ -9,9 +9,9 @@ from wtforms import (
 from wtforms.validators import InputRequired
 
 from openatlas import app
+from openatlas.display.string_functions import manual, uc_first
 from openatlas.display.table import Table
-from openatlas.display.util import (
-    button, link, manual, required_group, uc_first)
+from openatlas.display.util import button, link, required_group
 from openatlas.forms.field import SubmitField, TableField
 from openatlas.models.entity import Entity
 from openatlas.models.network import Network

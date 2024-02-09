@@ -14,7 +14,8 @@ from wtforms import BooleanField, PasswordField, StringField
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app
-from openatlas.display.util import display_form, send_mail, uc_first
+from openatlas.display.string_functions import uc_first
+from openatlas.display.util import display_form, send_mail
 from openatlas.forms.field import SubmitField
 from openatlas.models.user import User
 

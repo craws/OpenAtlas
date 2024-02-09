@@ -6,7 +6,8 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.database.connect import Transaction
-from openatlas.display.util import get_backup_file_data, manual, required_group
+from openatlas.display.string_functions import manual
+from openatlas.display.util import get_backup_file_data, required_group
 from openatlas.forms.field import SubmitField
 
 

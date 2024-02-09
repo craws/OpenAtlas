@@ -13,11 +13,12 @@ from wtforms import (
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app
+from openatlas.display.string_functions import is_authorized, manual, uc_first
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
     button, description, display_form, display_info, format_date,
-    is_authorized, link, manual, required_group, send_mail, uc_first)
+    link, required_group, send_mail)
 from openatlas.forms.field import SubmitField, generate_password_field
 from openatlas.models.entity import Entity
 from openatlas.models.user import User

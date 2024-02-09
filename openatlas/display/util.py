@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import math
 import os
 import smtplib
 import subprocess
@@ -23,6 +22,8 @@ from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.display.image_processing import check_processed_image
+from openatlas.display.string_functions import (
+    convert_size, datetime64_to_timestamp, is_authorized, uc_first)
 from openatlas.models.cidoc_class import CidocClass
 from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.content import get_translation
@@ -292,24 +293,6 @@ def get_js_messages(lang: str) -> str:
     return f'<script src="/{js_message_file}"></script>'
 
 
-@pass_context  # Prevent Jinja2 context caching
-@app.template_filter()
-def is_authorized(context: str, group: Optional[str] = None) -> bool:
-    if not group:  # In case it wasn't called from a template
-        group = context
-    if not current_user.is_authenticated or not hasattr(current_user, 'group'):
-        return False
-    if current_user.group == 'admin' \
-            or current_user.group == group \
-            or (current_user.group == 'manager'
-                and group in ['editor', 'contributor', 'readonly']) \
-            or (current_user.group == 'editor'
-                and group in ['contributor', 'readonly']) \
-            or (current_user.group == 'contributor' and group in ['readonly']):
-        return True
-    return False
-
-
 def format_name_and_aliases(entity: Entity, show_links: bool) -> str:
     name = link(entity) if show_links else entity.name
     if not entity.aliases or not current_user.settings['table_show_aliases']:
@@ -499,14 +482,6 @@ def format_date(value: datetime | numpy.datetime64) -> str:
     return value.date().isoformat().replace(' 00:00:00', '')
 
 
-def convert_size(size_bytes: int) -> str:
-    if size_bytes <= 0:
-        return "0 B"  # pragma: no cover
-    size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
-    i = int(math.floor(math.log(size_bytes, 1024)))
-    return f"{int(size_bytes / math.pow(1024, i))} {size_name[i]}"
-
-
 @app.template_filter()
 def link(
         object_: Any,
@@ -515,8 +490,8 @@ def link(
         uc_first_: Optional[bool] = True,
         js: Optional[str] = None,
         external: bool = False) -> str:
-    from openatlas.models.entity import Entity
     from openatlas.models.user import User
+    from openatlas.models.entity import Entity
     html = ''
     if isinstance(object_, (str, LazyString)):
         js = f'onclick="{uc_first(js)}"' if js else ''
@@ -619,11 +594,6 @@ def breadcrumb(crumbs: list[Any]) -> str:
 
 
 @app.template_filter()
-def uc_first(string: str) -> str:
-    return str(string)[0].upper() + str(string)[1:] if string else ''
-
-
-@app.template_filter()
 def display_info(data: dict[str, Any]) -> str:
     return render_template('util/info_data.html', data=data)
 
@@ -642,25 +612,6 @@ def display_content_translation(_context: str, text: str) -> str:
 
 
 @app.template_filter()
-def manual(site: str) -> str:
-    """ If the manual page exists, return the link to it"""
-    parts = site.split('/')
-    if len(parts) < 2:
-        return ''
-    path = \
-        Path(app.root_path) / 'static' / 'manual' / parts[0] / \
-        (parts[1] + '.html')
-    if not path.exists():
-        # print(f'Missing manual link: {path}')
-        return ''
-    return \
-        '<a title="' + uc_first(_('manual')) + '" ' \
-        f'href="/static/manual/{site}.html" class="manual" ' \
-        f'target="_blank" rel="noopener noreferrer">' \
-        f'<i class="fas fs-4 fa-book"></i></a>'
-
-
-@app.template_filter()
 def display_form(
         form: Any,
         form_id: Optional[str] = None,
@@ -673,61 +624,6 @@ def display_form(
         '<table class="table table-no-style">' \
         f'{html_form(form, form_id, manual_page)}' \
         f'</table></form>'
-
-
-def format_date_part(date: numpy.datetime64, part: str) -> str:
-    string = str(date).split(' ', maxsplit=1)[0]
-    bc = False
-    if string.startswith('-') or string.startswith('0000'):
-        bc = True
-        string = string[1:]
-    string = string.replace('T', '-').replace(':', '-')
-    parts = string.split('-')
-    if part == 'year':  # If it's a negative year, add one year
-        return f'-{int(parts[0]) + 1}' if bc else f'{int(parts[0])}'
-    if part == 'month':
-        return parts[1]
-    if part == 'hour':
-        return parts[3]
-    if part == 'minute':
-        return parts[4]
-    if part == 'second':
-        return parts[5]
-    return parts[2]
-
-
-def timestamp_to_datetime64(string: str) -> Optional[numpy.datetime64]:
-    if not string:
-        return None
-    string_list = string.split(' ')
-    if 'BC' in string_list:
-        parts = string_list[0].split('-')
-        date = f'-{int(parts[0]) - 1}-{parts[1]}-{parts[2]}T{string_list[1]}'
-        return numpy.datetime64(date)
-    return numpy.datetime64(f'{string_list[0]}T{string_list[1]}')
-
-
-def datetime64_to_timestamp(date: Optional[numpy.datetime64]) -> Optional[str]:
-    if not date:
-        return None
-    string = str(date)
-    postfix = ''
-    if string.startswith('-') or string.startswith('0000'):
-        string = string[1:]
-        postfix = ' BC'
-    string = string.replace('T', '-').replace(':', '-').replace(' ', '-')
-    parts = string.split('-')
-    year = int(parts[0]) + 1 if postfix else int(parts[0])
-    hour = 0
-    minute = 0
-    second = 0
-    if len(parts) > 3:
-        hour = int(parts[3])
-        minute = int(parts[4])
-        second = int(parts[5])
-    return \
-        f'{year:04}-{int(parts[1]):02}-{int(parts[2]):02} ' \
-        f'{hour:02}:{minute:02}:{second:02}{postfix}'
 
 
 def get_entities_linked_to_type_recursive(

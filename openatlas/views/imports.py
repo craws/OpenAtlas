@@ -14,12 +14,13 @@ from wtforms import (
 
 from openatlas import app
 from openatlas.database.connect import Transaction
+from openatlas.display.string_functions import (
+    datetime64_to_timestamp, is_authorized, manual, uc_first)
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, button_bar, datetime64_to_timestamp, description, display_form,
-    format_date, get_backup_file_data, is_authorized, link, manual,
-    required_group, uc_first)
+    button, button_bar, description, display_form, format_date,
+    get_backup_file_data, link, required_group)
 from openatlas.forms.field import SubmitField
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Import, is_float

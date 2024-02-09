@@ -8,11 +8,11 @@ from wtforms import SelectField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app
+from openatlas.display.string_functions import uc_first
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    bookmark_toggle, button, format_date, link, required_group, send_mail,
-    uc_first)
+    bookmark_toggle, button, format_date, link, required_group, send_mail)
 from openatlas.forms.field import SubmitField
 from openatlas.models.content import get_translation
 from openatlas.models.entity import Entity

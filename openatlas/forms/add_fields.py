@@ -10,7 +10,7 @@ from wtforms import IntegerField, StringField, TextAreaField
 from wtforms.validators import (
     InputRequired, NoneOf, NumberRange, Optional as OptionalValidator)
 
-from openatlas.display.util import is_authorized
+from openatlas.display.string_functions import is_authorized
 from openatlas.forms.field import (
     ReferenceField, TreeField, TreeMultiField, ValueTypeField,
     ValueTypeRootField)

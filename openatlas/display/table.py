@@ -4,7 +4,7 @@ from flask import json, render_template
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 
-from openatlas.display.util import uc_first
+from openatlas.display.string_functions import uc_first
 
 # Needed for translations
 _('previous')
