@@ -1,6 +1,7 @@
 # sensitive data (except example files)
 instance/
 !instance/example_*
+!instance/__init__.py
 
 # cache, system logs
 __pycache__/
