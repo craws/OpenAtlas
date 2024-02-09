@@ -115,11 +115,9 @@ def get_key(entity: Entity, parser: dict[str, Any]) -> datetime64 | str:
 
 
 def remove_duplicate_entities(entities: list[Entity]) -> list[Entity]:
-    seen = set()  # type: ignore
+    seen: set[int] = set()
     seen_add = seen.add  # Do not change, faster than always call seen.add()
-    return [
-        entity for entity in entities
-        if not (entity.id in seen or seen_add(entity.id))]
+    return [e for e in entities if not (e.id in seen or seen_add(e.id))]
 
 
 def remove_spaces_dashes(string: str) -> str:
