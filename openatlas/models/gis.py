@@ -6,7 +6,7 @@ from typing import Any, Optional, TYPE_CHECKING
 from flask import g, json
 
 from openatlas.database.gis import Gis as Db
-from openatlas.display.util import sanitize
+from openatlas.display.string_functions import sanitize
 from openatlas.models.type import Type
 
 if TYPE_CHECKING:  # pragma: no cover

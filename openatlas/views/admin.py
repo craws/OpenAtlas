@@ -23,13 +23,14 @@ from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.image_processing import (
     create_resized_images, delete_orphaned_resized_images)
+from openatlas.display.string_functions import sanitize
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
     button, check_iiif_activation, check_iiif_file_exist,
-    convert_image_to_iiif, convert_size,
-    display_form, display_info, format_date, get_file_path, is_authorized,
-    link, manual, required_group, sanitize, send_mail, uc_first)
+    convert_image_to_iiif, convert_size, display_form, display_info,
+    format_date, get_file_path, is_authorized, link, manual, required_group,
+    send_mail, uc_first)
 from openatlas.forms.field import SubmitField
 from openatlas.forms.setting import (
     ApiForm, ContentForm, FilesForm, FrontendForm, GeneralForm, IiifForm,

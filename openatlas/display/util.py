@@ -2,14 +2,12 @@ from __future__ import annotations
 
 import math
 import os
-import re
 import smtplib
 import subprocess
 from datetime import datetime, timedelta
 from email.header import Header
 from email.mime.text import MIMEText
 from functools import wraps
-from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any, Optional, TYPE_CHECKING
 
@@ -28,6 +26,7 @@ from openatlas.display.image_processing import check_processed_image
 from openatlas.models.cidoc_class import CidocClass
 from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.content import get_translation
+from openatlas.models.imports import Project
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
@@ -311,17 +310,6 @@ def is_authorized(context: str, group: Optional[str] = None) -> bool:
     return False
 
 
-@app.template_filter()
-def sanitize(string: str, mode: Optional[str] = None) -> str:
-    if not string:
-        return ''
-    if mode == 'text':  # Remove HTML tags, keep linebreaks
-        stripper = MLStripper()
-        stripper.feed(string)
-        return stripper.get_data().strip()
-    return re.sub('[^A-Za-z0-9]+', '', string)  # Filter ASCII letters/numbers
-
-
 def format_name_and_aliases(entity: Entity, show_links: bool) -> str:
     name = link(entity) if show_links else entity.name
     if not entity.aliases or not current_user.settings['table_show_aliases']:
@@ -529,7 +517,6 @@ def link(
         external: bool = False) -> str:
     from openatlas.models.entity import Entity
     from openatlas.models.user import User
-    from openatlas.models.imports import Project
     html = ''
     if isinstance(object_, (str, LazyString)):
         js = f'onclick="{uc_first(js)}"' if js else ''
@@ -686,25 +673,6 @@ def display_form(
         '<table class="table table-no-style">' \
         f'{html_form(form, form_id, manual_page)}' \
         f'</table></form>'
-
-
-class MLStripper(HTMLParser):
-
-    def error(self: MLStripper, message: str) -> None:
-        pass  # pragma: no cover
-
-    def __init__(self) -> None:
-        super().__init__()
-        self.reset()
-        self.strict = False
-        self.convert_charrefs = True
-        self.fed: list[str] = []
-
-    def handle_data(self, data: Any) -> None:
-        self.fed.append(data)
-
-    def get_data(self) -> str:
-        return ''.join(self.fed)
 
 
 def format_date_part(date: numpy.datetime64, part: str) -> str:

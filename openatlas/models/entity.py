@@ -10,8 +10,9 @@ from werkzeug.exceptions import abort
 from openatlas import app
 from openatlas.database.date import Date
 from openatlas.database.entity import Entity as Db
+from openatlas.display.string_functions import sanitize
 from openatlas.display.util import (
-    convert_size, datetime64_to_timestamp, format_date_part, sanitize,
+    convert_size, datetime64_to_timestamp, format_date_part,
     timestamp_to_datetime64)
 from openatlas.models.link import Link
 

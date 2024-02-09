@@ -4,7 +4,7 @@ from flask import g
 from flask_login import current_user
 
 from openatlas.database.imports import Import as Db
-from openatlas.display.util import sanitize
+from openatlas.display.string_functions import sanitize
 
 
 class Project:
