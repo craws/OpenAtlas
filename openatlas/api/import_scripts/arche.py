@@ -181,9 +181,8 @@ def get_or_create_person(name: str, relevance: Type) -> Entity:
 def get_or_create_person_types() -> dict[str, Any]:
     hierarchy = get_hierarchy_by_name('Relevance')
     if not hierarchy:
-        hierarchy = Entity.insert('type', 'Relevance')  # type: ignore
-        Type.insert_hierarchy(
-            hierarchy, 'custom', ['person'], True)  # type: ignore
+        if hierarchy := Entity.insert('type', 'Relevance'):  # type: ignore
+            Type.insert_hierarchy(hierarchy, 'custom', ['person'], True)
     return {
         'photographer_type': get_or_create_type(hierarchy, 'Photographer'),
         'artist_type': get_or_create_type(hierarchy, 'Graffito artist')}
