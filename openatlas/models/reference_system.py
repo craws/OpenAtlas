@@ -54,10 +54,6 @@ class ReferenceSystem(Entity):
             Db.add_classes(self.id, data['reference_system']['classes'])
 
     @staticmethod
-    def delete_links_from_entity(entity: Entity) -> None:
-        Db.delete_links_from_entity(entity.id)
-
-    @staticmethod
     def insert_system(data: dict[str, str]) -> ReferenceSystem:
         entity = Entity.insert(
             'reference_system',

@@ -233,7 +233,6 @@ class Entity:
                 self.link('P1', Entity.insert('appellation', alias))
 
     def update_links(self, data: dict[str, Any], new: bool) -> Optional[int]:
-        from openatlas.models.reference_system import ReferenceSystem
         if not new:
             if 'delete' in data['links'] and data['links']['delete']:
                 self.delete_links(data['links']['delete'])
@@ -242,7 +241,7 @@ class Entity:
                 self.delete_links(data['links']['delete_inverse'], True)
             if 'delete_reference_system' in data['links'] \
                     and data['links']['delete_reference_system']:
-                ReferenceSystem.delete_links_from_entity(self)
+                Db.delete_reference_system_links(self.id)
         continue_link_id = None
         for link_ in data['links']['insert']:
             ids = self.link(
