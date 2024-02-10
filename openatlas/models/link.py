@@ -116,31 +116,6 @@ class Link:
         Db.delete_(id_)
 
     @staticmethod
-    def get_invalid_cidoc_links() -> list[dict[str, str]]:
-        from openatlas.models.entity import Entity
-        from openatlas.display.util import link
-        invalid_linking = []
-        for row in Db.get_cidoc_links():
-            valid_domain = g.properties[row['property_code']].find_object(
-                'domain_class_code',
-                row['domain_code'])
-            valid_range = g.properties[row['property_code']].find_object(
-                'range_class_code',
-                row['range_code'])
-            if not valid_domain or not valid_range:
-                invalid_linking.append(row)
-        invalid_links = []
-        for item in invalid_linking:
-            for row in Db.get_invalid_links(item):
-                domain = Entity.get_by_id(row['domain_id'])
-                range_ = Entity.get_by_id(row['range_id'])
-                invalid_links.append({
-                    'domain': f"{link(domain)} ({domain.cidoc_class.code})",
-                    'property': link(g.properties[row['property_code']]),
-                    'range': f"{link(range_)} ({range_.cidoc_class.code})"})
-        return invalid_links
-
-    @staticmethod
     def invalid_involvement_dates() -> list[Link]:
         return [
             Link.get_by_id(row['id'])

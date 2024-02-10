@@ -490,3 +490,39 @@ class Entity:
             """,
             {'id_': id_, 'codes': tuple(codes)})
         return [row['result_id'] for row in g.cursor.fetchall()]
+
+    @staticmethod
+    def get_cidoc_links() -> list[dict[str, Any]]:
+        g.cursor.execute(
+            """
+            SELECT DISTINCT
+                l.property_code,
+                d.cidoc_class_code AS domain_code,
+                r.cidoc_class_code AS range_code
+            FROM model.link l
+            JOIN model.entity d ON l.domain_id = d.id
+            JOIN model.entity r ON l.range_id = r.id;
+            """)
+        return [dict(row) for row in g.cursor.fetchall()]
+
+    @staticmethod
+    def get_invalid_links(data: dict[str, Any]) -> list[dict[str, int]]:
+        g.cursor.execute(
+            """
+            SELECT
+                l.id,
+                l.property_code,
+                l.domain_id,
+                l.range_id,
+                l.description,
+                l.created,
+                l.modified
+            FROM model.link l
+            JOIN model.entity d ON l.domain_id = d.id
+            JOIN model.entity r ON l.range_id = r.id
+            WHERE l.property_code = %(property_code)s
+                AND d.cidoc_class_code = %(domain_code)s
+                AND r.cidoc_class_code = %(range_code)s;
+            """,
+            data)
+        return [dict(row) for row in g.cursor.fetchall()]

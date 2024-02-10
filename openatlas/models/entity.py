@@ -562,3 +562,24 @@ class Entity:
                 f'id: {id_}, code: {code}')
             abort(418, f'Missing linked {code} for {id_}')
         return entity
+
+    @staticmethod
+    def get_invalid_cidoc_links() -> list[dict[str, Any]]:
+        invalid_linking = []
+        for row in Db.get_cidoc_links():
+            valid_domain = g.properties[row['property_code']].find_object(
+                'domain_class_code',
+                row['domain_code'])
+            valid_range = g.properties[row['property_code']].find_object(
+                'range_class_code',
+                row['range_code'])
+            if not valid_domain or not valid_range:
+                invalid_linking.append(row)
+        invalid_links = []
+        for item in invalid_linking:
+            for row in Db.get_invalid_links(item):
+                invalid_links.append({
+                    'domain': Entity.get_by_id(row['domain_id']),
+                    'property': g.properties[row['property_code']],
+                    'range': Entity.get_by_id(row['range_id'])})
+        return invalid_links

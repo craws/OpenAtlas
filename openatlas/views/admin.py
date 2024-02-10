@@ -244,18 +244,19 @@ def admin_content(item: str) -> str | Response:
 @app.route('/check_links')
 @required_group('contributor')
 def check_links() -> str:
-    tab = Tab(
-        'check_links',
-        table=Table(
-            ['domain', 'property', 'range'],
-            [[x['domain'], x['property'], x['range']]
-             for x in Link.get_invalid_cidoc_links()]),
-        buttons=[manual('admin/data_integrity_checks')])
-    tab.content = _('Congratulations, everything looks fine!') \
-        if not tab.table.rows else None
+    table = Table(['domain', 'property', 'range'])
+    for row in Entity.get_invalid_cidoc_links():
+        table.rows.append([
+            f"{link(row['domain'])} ({row['domain'].cidoc_class.code})",
+            link(row['property']),
+            f"{link(row['range'])} ({row['range'].cidoc_class.code})"])
     return render_template(
         'tabs.html',
-        tabs={'check_links': tab},
+        tabs={'links': Tab(
+            'links',
+            '' if table.rows else _('Congratulations, everything looks fine!'),
+            table,
+            [manual('admin/data_integrity_checks')])},
         title=_('admin'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
