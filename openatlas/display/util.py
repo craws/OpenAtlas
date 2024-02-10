@@ -42,12 +42,12 @@ def remove_link(
         tab: Optional[str] = '') -> Optional[str]:
     if not is_authorized('contributor'):
         return None
+    confirm = _('Remove %(name)s?', name=name.replace("'", ''))
     url = url_for('link_delete', id_=link_.id, origin_id=origin.id)
     return link(
         _('remove'),
         f'{url}#tab-{tab}' if tab else url,
-        js="return confirm('{x}')".format(
-            x=_('Remove %(name)s?', name=name.replace("'", ''))))
+        js=f"return confirm('{confirm}')")
 
 
 def edit_link(url: str) -> Optional[str]:
