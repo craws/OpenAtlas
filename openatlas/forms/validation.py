@@ -6,7 +6,7 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import validators
 
-from openatlas.display.string_functions import uc_first
+from openatlas.display.util2 import uc_first
 from openatlas.forms.util import form_to_datetime64
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type

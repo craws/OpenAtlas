@@ -13,11 +13,11 @@ from openatlas.api.import_scripts.vocabs import (
     fetch_top_concept_details, fetch_top_group_details,
     fetch_vocabulary_details, get_vocabularies, import_vocabs_data)
 from openatlas.database.connect import Transaction
-from openatlas.display.string_functions import is_authorized, manual
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
-from openatlas.display.util import (
-    button, display_form, display_info, link, required_group)
+from openatlas.display.util import button, display_info, link, required_group
+from openatlas.display.util2 import is_authorized, manual
+from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
 from openatlas.forms.form import get_vocabs_form
 from openatlas.models.settings import Settings

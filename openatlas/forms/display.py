@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any, Optional
 
 from flask import g, render_template
@@ -6,7 +8,7 @@ from wtforms import Field, FileField, IntegerField, SelectField, StringField
 from wtforms.validators import Email
 
 from openatlas import app
-from openatlas.display.string_functions import manual
+from openatlas.display.util2 import manual
 from openatlas.forms.field import ValueTypeField
 
 
@@ -153,3 +155,17 @@ def add_dates(form: Any) -> str:
         style='' if valid_dates else 'display:table-row',
         label=_('hide')
         if form.begin_year_from.data or form.end_year_from.data else _('show'))
+
+
+@app.template_filter()
+def display_form(
+        form: Any,
+        form_id: Optional[str] = None,
+        manual_page: Optional[str] = None) -> str:
+    form_id = f'id="{form_id}"' if form_id else ''
+    multipart = 'enctype="multipart/form-data"' if 'file' in form else ''
+    return \
+        f'<form method="post" {form_id} {multipart}>' \
+        '<table class="table table-no-style">' \
+        f'{html_form(form, form_id, manual_page)}' \
+        f'</table></form>'

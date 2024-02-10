@@ -9,7 +9,7 @@ from flask import g, session
 from flask_login import UserMixin, current_user
 
 from openatlas.database.user import User as Db
-from openatlas.display.string_functions import sanitize
+from openatlas.display.util2 import sanitize
 from openatlas.models.entity import Entity
 
 

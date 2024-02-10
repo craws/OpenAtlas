@@ -7,7 +7,7 @@ from flask import abort, g
 from openatlas.database.date import Date
 from openatlas.database.link import Link as Db
 from openatlas.database.tools import Tools
-from openatlas.display.string_functions import (
+from openatlas.display.util2 import (
     datetime64_to_timestamp, format_date_part, timestamp_to_datetime64)
 
 if TYPE_CHECKING:  # pragma: no cover

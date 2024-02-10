@@ -3,14 +3,12 @@ from __future__ import annotations
 import os
 import smtplib
 import subprocess
-from datetime import datetime, timedelta
 from email.header import Header
 from email.mime.text import MIMEText
 from functools import wraps
 from pathlib import Path
 from typing import Any, Optional, TYPE_CHECKING
 
-import numpy
 from bcrypt import hashpw
 from flask import flash, g, render_template, request, url_for
 from flask_babel import LazyString, lazy_gettext as _
@@ -22,14 +20,15 @@ from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.display.image_processing import check_processed_image
-from openatlas.display.string_functions import (
-    convert_size, datetime64_to_timestamp, is_authorized, uc_first)
+from openatlas.display.util2 import format_date, is_authorized, uc_first
 from openatlas.models.cidoc_class import CidocClass
 from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.content import get_translation
+from openatlas.models.entity import Entity
+from openatlas.models.imports import Project
+from openatlas.models.user import User
 
 if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.models.entity import Entity
     from openatlas.models.link import Link
     from openatlas.models.type import Type
 
@@ -301,28 +300,6 @@ def format_name_and_aliases(entity: Entity, show_links: bool) -> str:
         f'{"".join(f"<p>{alias}</p>" for alias in entity.aliases.values())}'
 
 
-def get_backup_file_data() -> dict[str, Any]:
-    path = app.config['EXPORT_PATH']
-    latest_file = None
-    latest_file_date = None
-    for file in [
-            f for f in path.iterdir()
-            if (path / f).is_file() and f.name != '.gitignore']:
-        file_date = datetime.utcfromtimestamp((path / file).stat().st_ctime)
-        if not latest_file_date or file_date > latest_file_date:
-            latest_file = file
-            latest_file_date = file_date
-    file_data: dict[str, Any] = {'backup_too_old': True}
-    if latest_file and latest_file_date:
-        yesterday = datetime.today() - timedelta(days=1)
-        file_data['file'] = latest_file.name
-        file_data['backup_too_old'] = \
-            bool(yesterday > latest_file_date and not app.testing)
-        file_data['size'] = convert_size(latest_file.stat().st_size)
-        file_data['date'] = format_date(latest_file_date)
-    return file_data
-
-
 def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
     data: list[Any] = [format_name_and_aliases(entity, show_links)]
     if entity.class_.view in [
@@ -422,7 +399,6 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
     for path in g.writable_paths:
         check_write_access(path, warnings)
     if is_authorized('admin'):
-        from openatlas.models.user import User
         user = User.get_by_username('OpenAtlas')
         if user and user.active:
             hash_ = hashpw(
@@ -472,15 +448,6 @@ def get_file_path(
     return app.config['UPLOAD_PATH'] / f"{id_}{ext}"
 
 
-def format_date(value: datetime | numpy.datetime64) -> str:
-    if not value:
-        return ''
-    if isinstance(value, numpy.datetime64):
-        date_ = datetime64_to_timestamp(value)
-        return date_.lstrip('0').replace(' 00:00:00', '') if date_ else ''
-    return value.date().isoformat().replace(' 00:00:00', '')
-
-
 @app.template_filter()
 def link(
         object_: Any,
@@ -489,9 +456,6 @@ def link(
         uc_first_: Optional[bool] = True,
         js: Optional[str] = None,
         external: bool = False) -> str:
-    from openatlas.models.user import User
-    from openatlas.models.entity import Entity
-    from openatlas.models.imports import Project
     html = ''
     if isinstance(object_, (str, LazyString)):
         js = f'onclick="{uc_first(js)}"' if js else ''
@@ -609,21 +573,6 @@ def description(text: str, label: Optional[str] = '') -> str:
 @app.template_filter()
 def display_content_translation(_context: str, text: str) -> str:
     return get_translation(text)
-
-
-@app.template_filter()
-def display_form(
-        form: Any,
-        form_id: Optional[str] = None,
-        manual_page: Optional[str] = None) -> str:
-    from openatlas.forms.display import html_form
-    form_id = f'id="{form_id}"' if form_id else ''
-    multipart = 'enctype="multipart/form-data"' if 'file' in form else ''
-    return \
-        f'<form method="post" {form_id} {multipart}>' \
-        '<table class="table table-no-style">' \
-        f'{html_form(form, form_id, manual_page)}' \
-        f'</table></form>'
 
 
 def get_entities_linked_to_type_recursive(

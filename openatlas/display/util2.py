@@ -1,5 +1,9 @@
+# util2.py functions don't need the model and help preventing circular imports
+from __future__ import annotations
+
 import math
 import re
+from datetime import datetime, timedelta
 from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any, Optional
@@ -145,3 +149,34 @@ def manual(site: str) -> str:
         f'href="/static/manual/{site}.html" class="manual" ' \
         f'target="_blank" rel="noopener noreferrer">' \
         f'<i class="fas fs-4 fa-book"></i></a>'
+
+
+def get_backup_file_data() -> dict[str, Any]:
+    path = app.config['EXPORT_PATH']
+    latest_file = None
+    latest_file_date = None
+    for file in [
+            f for f in path.iterdir()
+            if (path / f).is_file() and f.name != '.gitignore']:
+        file_date = datetime.utcfromtimestamp((path / file).stat().st_ctime)
+        if not latest_file_date or file_date > latest_file_date:
+            latest_file = file
+            latest_file_date = file_date
+    file_data: dict[str, Any] = {'backup_too_old': True}
+    if latest_file and latest_file_date:
+        yesterday = datetime.today() - timedelta(days=1)
+        file_data['file'] = latest_file.name
+        file_data['backup_too_old'] = \
+            bool(yesterday > latest_file_date and not app.testing)
+        file_data['size'] = convert_size(latest_file.stat().st_size)
+        file_data['date'] = format_date(latest_file_date)
+    return file_data
+
+
+def format_date(value: datetime | numpy.datetime64) -> str:
+    if not value:
+        return ''
+    if isinstance(value, numpy.datetime64):
+        date_ = datetime64_to_timestamp(value)
+        return date_.lstrip('0').replace(' 00:00:00', '') if date_ else ''
+    return value.date().isoformat().replace(' 00:00:00', '')

@@ -13,11 +13,11 @@ from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display import display
 from openatlas.display.image_processing import resize_image
-from openatlas.display.string_functions import is_authorized
 from openatlas.display.util import (
     button, check_iiif_activation, check_iiif_file_exist,
     convert_image_to_iiif, get_base_table_data, get_file_path,
     get_iiif_file_path, link, required_group)
+from openatlas.display.util2 import is_authorized
 from openatlas.forms.base_manager import BaseManager
 from openatlas.forms.form import get_manager
 from openatlas.forms.util import was_modified

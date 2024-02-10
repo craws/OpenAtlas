@@ -4,7 +4,7 @@ from typing import Any
 from flask import g
 from werkzeug.exceptions import abort
 
-from openatlas.display.string_functions import sanitize
+from openatlas.display.util2 import sanitize
 from openatlas.forms.util import form_to_datetime64
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem

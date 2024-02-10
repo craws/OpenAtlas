@@ -5,10 +5,11 @@ from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.database.connect import Transaction
-from openatlas.display.string_functions import sanitize, uc_first
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    display_form, get_entities_linked_to_type_recursive, link, required_group)
+    get_entities_linked_to_type_recursive, link, required_group)
+from openatlas.display.util2 import sanitize, uc_first
+from openatlas.forms.display import display_form
 from openatlas.forms.form import get_manager
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type

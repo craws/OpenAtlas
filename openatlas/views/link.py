@@ -10,7 +10,8 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.database.connect import Transaction
-from openatlas.display.util import display_form, required_group
+from openatlas.display.util import required_group
+from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField, TableField
 from openatlas.forms.form import (
     get_add_reference_form, get_manager, get_table_form)
