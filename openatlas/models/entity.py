@@ -81,7 +81,7 @@ class Entity:
             code: str,
             inverse: bool = False,
             types: bool = False) -> Optional[Entity]:
-        return Link.get_linked_entity(
+        return Entity.get_linked_entity_static(
             self.id,
             code,
             inverse=inverse,
@@ -92,14 +92,18 @@ class Entity:
             code: str,
             inverse: bool = False,
             types: bool = False) -> Entity:
-        return Link.get_linked_entity_safe(self.id, code, inverse, types)
+        return Entity.get_linked_entity_safe_static(
+            self.id,
+            code,
+            inverse,
+            types)
 
     def get_linked_entities(
             self,
             code: str | list[str],
             inverse: bool = False,
             types: bool = False) -> list[Entity]:
-        return Link.get_linked_entities(
+        return Entity.get_linked_entities_static(
             self.id,
             code,
             inverse=inverse,
@@ -511,3 +515,50 @@ class Entity:
                     domain=linked_entities[row['domain_id']],
                     range_=linked_entities[row['range_id']]))
         return links
+
+    @staticmethod
+    def get_linked_entity_static(
+            id_: int,
+            code: str,
+            inverse: bool = False,
+            types: bool = False) -> Optional[Entity]:
+        result = Entity.get_linked_entities_static(
+            id_,
+            code,
+            inverse=inverse,
+            types=types)
+        if len(result) > 1:  # pragma: no cover
+            g.logger.log(
+                'error',
+                'model',
+                f'Multiple linked entities found for {code}')
+            abort(400, 'Multiple linked entities found')
+        return result[0] if result else None
+
+    @staticmethod
+    def get_linked_entities_static(
+            id_: int,
+            codes: str | list[str],
+            inverse: bool = False,
+            types: bool = False) -> list[Entity]:
+        codes = codes if isinstance(codes, list) else [codes]
+        return Entity.get_by_ids(
+            Db.get_linked_entities_inverse(id_, codes) if inverse
+            else Db.get_linked_entities(id_, codes),
+            types=types)
+
+    @staticmethod
+    def get_linked_entity_safe_static(
+            id_: int,
+            code: str,
+            inverse: bool = False,
+            types: bool = False) -> Entity:
+        entity = Entity.get_linked_entity_static(id_, code, inverse, types)
+        if not entity:  # pragma: no cover
+            g.logger.log(
+                'error',
+                'model',
+                'missing linked',
+                f'id: {id_}, code: {code}')
+            abort(418, f'Missing linked {code} for {id_}')
+        return entity

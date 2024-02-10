@@ -468,3 +468,25 @@ class Entity:
             """, {
                 'systems_ids': tuple(g.reference_systems.keys()),
                 'entity_id': entity_id})
+
+    @staticmethod
+    def get_linked_entities(id_: int, codes: list[str]) -> list[int]:
+        g.cursor.execute(
+            """
+            SELECT range_id AS result_id
+            FROM model.link
+            WHERE domain_id = %(id_)s AND property_code IN %(codes)s;
+            """,
+            {'id_': id_, 'codes': tuple(codes)})
+        return [row['result_id'] for row in g.cursor.fetchall()]
+
+    @staticmethod
+    def get_linked_entities_inverse(id_: int, codes: list[str]) -> list[int]:
+        g.cursor.execute(
+            """
+            SELECT domain_id AS result_id
+            FROM model.link
+            WHERE range_id = %(id_)s AND property_code IN %(codes)s;
+            """,
+            {'id_': id_, 'codes': tuple(codes)})
+        return [row['result_id'] for row in g.cursor.fetchall()]

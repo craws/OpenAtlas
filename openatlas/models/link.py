@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Optional, TYPE_CHECKING
 
-from flask import abort, g
+from flask import g
 
 from openatlas.database.date import Date
 from openatlas.database.link import Link as Db
@@ -69,54 +69,6 @@ class Link:
         self.end_from = data['end_from']
         self.end_to = data['end_to']
         self.end_comment = data['end_comment']
-
-    @staticmethod
-    def get_linked_entity(
-            id_: int,
-            code: str,
-            inverse: bool = False,
-            types: bool = False) -> Optional[Entity]:
-        result = Link.get_linked_entities(
-            id_,
-            code,
-            inverse=inverse,
-            types=types)
-        if len(result) > 1:  # pragma: no cover
-            g.logger.log(
-                'error',
-                'model',
-                f'Multiple linked entities found for {code}')
-            abort(400, 'Multiple linked entities found')
-        return result[0] if result else None
-
-    @staticmethod
-    def get_linked_entities(
-            id_: int,
-            codes: str | list[str],
-            inverse: bool = False,
-            types: bool = False) -> list[Entity]:
-        from openatlas.models.entity import Entity
-        codes = codes if isinstance(codes, list) else [codes]
-        return Entity.get_by_ids(
-            Db.get_linked_entities_inverse(id_, codes) if inverse
-            else Db.get_linked_entities(id_, codes),
-            types=types)
-
-    @staticmethod
-    def get_linked_entity_safe(
-            id_: int,
-            code: str,
-            inverse: bool = False,
-            types: bool = False) -> Entity:
-        entity = Link.get_linked_entity(id_, code, inverse, types)
-        if not entity:  # pragma: no cover
-            g.logger.log(
-                'error',
-                'model',
-                'missing linked',
-                f'id: {id_}, code: {code}')
-            abort(418, f'Missing linked {code} for {id_}')
-        return entity
 
     @staticmethod
     def delete_by_codes(

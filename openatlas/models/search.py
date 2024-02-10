@@ -5,7 +5,6 @@ from flask_login import current_user
 
 from openatlas.database.entity import Entity as Db
 from openatlas.models.entity import Entity
-from openatlas.models.link import Link
 
 
 def search(data: dict[str, Any]) -> list[Entity]:
@@ -23,7 +22,10 @@ def search(data: dict[str, Any]) -> list[Entity]:
             data['own'],
             current_user.id):
         if row['openatlas_class_name'] == 'appellation':
-            entity = Link.get_linked_entity_safe(row['id'], 'P1', True)
+            entity = Entity.get_linked_entity_safe_static(
+                row['id'],
+                'P1',
+                True)
             if entity.class_.name not in data['classes']:
                 continue
         else:

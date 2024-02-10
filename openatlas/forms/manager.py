@@ -15,7 +15,6 @@ from openatlas.forms.field import (
     DragNDropField, SubmitField, TableField, TableMultiField, TreeField)
 from openatlas.forms.validation import file
 from openatlas.models.entity import Entity
-from openatlas.models.link import Link
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 
@@ -452,13 +451,13 @@ class MoveManager(EventBaseManager):
         if self.form.place_from.data:
             self.add_link(
                 'P27',
-                Link.get_linked_entity_safe(
+                Entity.get_linked_entity_safe_static(
                     int(self.form.place_from.data),
                     'P53'))
         if self.form.place_to.data:
             self.add_link(
                 'P26',
-                Link.get_linked_entity_safe(
+                Entity.get_linked_entity_safe_static(
                     int(self.form.place_to.data),
                     'P53'))
 
