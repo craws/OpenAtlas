@@ -7,7 +7,6 @@ from flask import g, json
 
 from openatlas.database.gis import Gis as Db
 from openatlas.display.string_functions import sanitize
-from openatlas.models.type import Type
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
@@ -68,7 +67,6 @@ class Gis:
                 + subunit_ids \
                 + sibling_ids
         object_ids = [x.id for x in objects] if objects else []
-        place_root = Type.get_hierarchy('Place')
         for row in Db.get_all(extra_ids):
             description = row['description'].replace('"', '\"') \
                 if row['description'] else ''
@@ -100,7 +98,7 @@ class Gis:
                 type_ids = ast.literal_eval(f"[{row['types']}]")
                 for type_id in list(set(type_ids)):
                     type_ = g.types[type_id]
-                    if type_.root and type_.root[0] == place_root.id:
+                    if type_.root and g.types[type_.root[0]].name == 'Place':
                         item['properties']['objectType'] = \
                             type_.name.replace('"', '\"')
                         break

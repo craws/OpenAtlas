@@ -13,6 +13,7 @@ from openatlas.database.entity import Entity as Db
 from openatlas.display.string_functions import (
     convert_size, datetime64_to_timestamp, format_date_part, sanitize,
     timestamp_to_datetime64)
+from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -267,7 +268,6 @@ class Entity:
         return continue_link_id
 
     def update_gis(self, gis_data: dict[str, Any], new: bool) -> None:
-        from openatlas.models.gis import Gis
         if not self.location:
             self.location = self.get_linked_entity_safe('P53')
         if not new:

@@ -9,7 +9,6 @@ from openatlas.database.link import Link as Db
 from openatlas.database.tools import Tools
 from openatlas.display.string_functions import (
     datetime64_to_timestamp, format_date_part, timestamp_to_datetime64)
-from openatlas.display.util import link
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
@@ -167,17 +166,16 @@ class Link:
     @staticmethod
     def get_invalid_cidoc_links() -> list[dict[str, str]]:
         from openatlas.models.entity import Entity
-
+        from openatlas.display.util import link
         invalid_linking = []
         for row in Db.get_cidoc_links():
-            property_ = g.properties[row['property_code']]
-            domain_is_valid = property_.find_object(
+            valid_domain = g.properties[row['property_code']].find_object(
                 'domain_class_code',
                 row['domain_code'])
-            range_is_valid = property_.find_object(
+            valid_range = g.properties[row['property_code']].find_object(
                 'range_class_code',
                 row['range_code'])
-            if not domain_is_valid or not range_is_valid:
+            if not valid_domain or not valid_range:
                 invalid_linking.append(row)
         invalid_links = []
         for item in invalid_linking:
