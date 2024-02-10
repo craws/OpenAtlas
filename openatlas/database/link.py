@@ -182,16 +182,3 @@ class Link:
                     FROM model.link) AS temp_table);
             """)
         return g.cursor.rowcount
-
-    @staticmethod
-    def check_single_type_duplicates(ids: list[int]) -> list[int]:
-        g.cursor.execute(
-            """
-            SELECT domain_id
-            FROM model.link
-            WHERE property_code = 'P2' AND range_id IN %(ids)s
-            GROUP BY domain_id
-            HAVING COUNT(*) > 1;
-            """,
-            {'ids': tuple(ids)})
-        return [row['domain_id'] for row in g.cursor.fetchall()]

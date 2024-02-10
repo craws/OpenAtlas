@@ -301,7 +301,7 @@ def check_link_duplicates(delete: Optional[str] = None) -> str | Response:
     else:  # Check single types for multiple use
         tab.table = Table(
             ['entity', 'class', 'base type', 'incorrect multiple types'])
-        for row in Link.check_single_type_duplicates():
+        for row in Entity.check_single_type_duplicates():
             remove_links = []
             for type_ in row['offending_types']:
                 url = url_for(

@@ -134,23 +134,3 @@ class Link:
     @staticmethod
     def delete_link_duplicates() -> int:
         return Db.delete_link_duplicates()
-
-    @staticmethod
-    def check_single_type_duplicates() -> list[dict[str, Any]]:
-        from openatlas.models.entity import Entity
-        data = []
-        for type_ in g.types.values():
-            if not type_.multiple and type_.category not in ['value', 'tools']:
-                if type_ids := type_.get_sub_ids_recursive():
-                    for id_ in Db.check_single_type_duplicates(type_ids):
-                        offending_types = []
-                        entity = Entity.get_by_id(id_, types=True)
-                        for entity_type in entity.types:
-                            if g.types[entity_type.root[0]].id == type_.id:
-                                offending_types.append(entity_type)
-                        if offending_types:
-                            data.append({
-                                'entity': entity,
-                                'type': type_,
-                                'offending_types': offending_types})
-        return data
