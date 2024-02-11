@@ -10,11 +10,13 @@ from werkzeug.exceptions import abort
 from openatlas import app
 from openatlas.database.date import Date
 from openatlas.database.entity import Entity as Db
+from openatlas.database.tools import Tools
 from openatlas.display.util2 import (
     convert_size, datetime64_to_timestamp, format_date_part, sanitize,
     timestamp_to_datetime64)
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
+from openatlas.models.tools import get_carbon_link
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.type import Type
@@ -175,7 +177,18 @@ class Entity:
         Entity.delete_(self.id)
 
     def delete_links(self, codes: list[str], inverse: bool = False) -> None:
-        Link.delete_by_codes(self, codes, inverse)
+        from openatlas.models.type import Type
+        if self.class_.name == 'stratigraphic_unit' \
+                and 'P2' in codes \
+                and not inverse:
+            exclude_ids = Type.get_sub_ids_recursive(g.sex_type)
+            exclude_ids.append(g.radiocarbon_type.id)
+            if Tools.get_sex_types(self.id) or get_carbon_link(self):
+                Db.remove_types(self.id, exclude_ids)
+                codes.remove('P2')
+                if not codes:
+                    return
+        Db.delete_by_codes(self.id, codes, inverse)
 
     def update(
             self,

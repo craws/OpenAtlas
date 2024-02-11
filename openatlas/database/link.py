@@ -6,17 +6,6 @@ from flask import g
 class Link:
 
     @staticmethod
-    def remove_types(id_: int, exclude_ids: list[int]) -> None:
-        g.cursor.execute(
-            """
-            DELETE FROM model.link
-            WHERE property_code = 'P2'
-                AND domain_id = %(id)s
-                AND range_id NOT IN %(exclude_ids)s;
-            """,
-            {'id': id_, 'exclude_ids': tuple(exclude_ids)})
-
-    @staticmethod
     def update(data: dict[str, Any]) -> None:
         g.cursor.execute(
             """
@@ -39,18 +28,6 @@ class Link:
             WHERE id = %(id)s;
             """,
             data)
-
-    @staticmethod
-    def delete_by_codes(
-            entity_id: int,
-            codes: list[str], inverse: bool = False) -> None:
-        g.cursor.execute(
-            f"""
-            DELETE FROM model.link
-            WHERE property_code IN %(codes)s
-                AND {'range_id' if inverse else 'domain_id'} = %(id)s;
-            """,
-            {'id': entity_id, 'codes': tuple(codes)})
 
     @staticmethod
     def get_by_id(id_: int) -> dict[str, Any]:

@@ -6,7 +6,6 @@ from flask import g
 
 from openatlas.database.date import Date
 from openatlas.database.link import Link as Db
-from openatlas.database.tools import Tools
 from openatlas.display.util2 import (
     datetime64_to_timestamp, format_date_part, timestamp_to_datetime64)
 
@@ -69,26 +68,6 @@ class Link:
         self.end_from = data['end_from']
         self.end_to = data['end_to']
         self.end_comment = data['end_comment']
-
-    @staticmethod
-    def delete_by_codes(
-            entity: Entity,
-            codes: list[str],
-            inverse: bool = False) -> None:
-        from openatlas.models.tools import get_carbon_link
-        from openatlas.models.type import Type
-        if entity.class_.name == 'stratigraphic_unit' \
-                and 'P2' in codes \
-                and not inverse:
-            exclude_ids = Type.get_sub_ids_recursive(
-                Type.get_hierarchy('Features for sexing'))
-            exclude_ids.append(Type.get_hierarchy('Radiocarbon').id)
-            if Tools.get_sex_types(entity.id) or get_carbon_link(entity):
-                Db.remove_types(entity.id, exclude_ids)
-                codes.remove('P2')
-                if not codes:
-                    return
-        Db.delete_by_codes(entity.id, codes, inverse)
 
     @staticmethod
     def get_by_id(id_: int) -> Link:

@@ -68,6 +68,9 @@ def before_request() -> None:
                 request.path.split('/entity/')[1].isdigit())):
         with_count = True
     g.types = Type.get_all(with_count)
+    g.radiocarbon_type = Type.get_hierarchy('Radiocarbon')
+    g.sex_type = Type.get_hierarchy('Features for sexing')
+    g.reference_match_type = Type.get_hierarchy('External reference match')
     g.reference_systems = ReferenceSystem.get_all()
     g.view_class_mapping = view_class_mapping
     g.class_view_mapping = OpenatlasClass.get_class_view_mapping()

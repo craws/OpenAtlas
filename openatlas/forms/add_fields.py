@@ -14,13 +14,12 @@ from openatlas.display.util2 import is_authorized
 from openatlas.forms.field import (
     ReferenceField, TreeField, TreeMultiField, ValueTypeField,
     ValueTypeRootField)
-from openatlas.models.type import Type
 
 
 def add_reference_systems(manager: Any) -> None:
     precisions = [('', '')] + [
         (str(g.types[id_].id), g.types[id_].name)
-        for id_ in Type.get_hierarchy('External reference match').subs]
+        for id_ in g.reference_match_type.subs]
     systems = list(g.reference_systems.values())
     systems.sort(key=lambda x: x.name.casefold())
     for system in systems:
