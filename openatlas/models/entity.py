@@ -507,21 +507,21 @@ class Entity:
 
     @staticmethod
     def get_links_of_entities(
-            entities: int | list[int],
+            entity_ids: int | list[int],
             codes: str | list[str] | None = None,
             inverse: bool = False) -> list[Link]:
-        entity_ids = set()
-        result = Db.get_links_of_entities(
-            entities,
+        result = set()
+        rows = Db.get_links_of_entities(
+            entity_ids,
             codes if isinstance(codes, list) else [str(codes)],
             inverse)
-        for row in result:
-            entity_ids.add(row['domain_id'])
-            entity_ids.add(row['range_id'])
+        for row in rows:
+            result.add(row['domain_id'])
+            result.add(row['range_id'])
         linked_entities = {
-            e.id: e for e in Entity.get_by_ids(entity_ids, types=True)}
+            e.id: e for e in Entity.get_by_ids(result, types=True)}
         links = []
-        for row in result:
+        for row in rows:
             links.append(
                 Link(
                     row,
