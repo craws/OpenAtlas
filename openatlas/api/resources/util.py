@@ -6,9 +6,7 @@ from flask import g, json
 from numpy import datetime64
 
 from openatlas.api.resources.error import InvalidSearchSyntax
-from openatlas.api.resources.model_mapper import (
-    get_all_links_of_entities, get_all_links_of_entities_inverse,
-    get_entities_by_ids)
+from openatlas.api.resources.model_mapper import get_entities_by_ids
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -43,15 +41,16 @@ def replace_empty_list_values_in_dict_with_none(
 
 
 def get_linked_entities_api(id_: int | list[int]) -> list[Entity]:
-    domain = [link_.range for link_ in get_all_links_of_entities(id_)]
-    range_ = [link_.domain for link_ in get_all_links_of_entities_inverse(id_)]
+    domain = [link_.range for link_ in Entity.get_links_of_entities(id_)]
+    range_ = [
+        l.domain for l in Entity.get_links_of_entities(id_, inverse=True)]
     return [*range_, *domain]
 
 
 def get_linked_entities_id_api(id_: int) -> list[Entity]:
-    domain_ids = [link_.range.id for link_ in get_all_links_of_entities(id_)]
+    domain_ids = [l.range.id for l in Entity.get_links_of_entities(id_)]
     range_ids = [
-        link_.domain.id for link_ in get_all_links_of_entities_inverse(id_)]
+        l.domain.id for l in Entity.get_links_of_entities(id_, inverse=True)]
     return [*range_ids, *domain_ids]
 
 
@@ -129,7 +128,7 @@ def link_parser_check(
         parser: dict[str, Any]) -> list[Link]:
     if any(i in ['relations', 'types', 'depictions', 'links', 'geometry']
            for i in parser['show']):
-        return get_all_links_of_entities(
+        return Entity.get_links_of_entities(
             [entity.id for entity in entities],
             get_properties_for_links(parser))
     return []
@@ -140,9 +139,10 @@ def link_parser_check_inverse(
         parser: dict[str, Any]) -> list[Link]:
     if any(i in ['relations', 'types', 'depictions', 'links', 'geometry']
            for i in parser['show']):
-        return get_all_links_of_entities_inverse(
+        return Entity.get_links_of_entities(
             [entity.id for entity in entities],
-            get_properties_for_links(parser))
+            get_properties_for_links(parser),
+            inverse=True)
     return []
 
 

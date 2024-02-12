@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 from flask import g
 
@@ -6,7 +6,6 @@ from openatlas.api.resources.error import (
     EntityDoesNotExistError, InvalidCidocClassCodeError,
     InvalidSystemClassError, InvalidViewClassError)
 from openatlas.models.entity import Entity
-from openatlas.models.link import Link
 
 
 def get_entity_by_id(id_: int) -> Entity:
@@ -52,18 +51,6 @@ def get_entities_by_system_classes(system_classes: list[str]) -> list[Entity]:
     if not all(sc in g.classes for sc in system_classes):
         raise InvalidSystemClassError
     return Entity.get_by_class(system_classes, types=True, aliases=True)
-
-
-def get_all_links_of_entities(
-        entity_ids: int | list[int],
-        codes: str | list[str] | None = None) -> list[Link]:
-    return Entity.get_links_of_entities(entity_ids, codes)
-
-
-def get_all_links_of_entities_inverse(
-        entity_ids: int | list[int],
-        codes: Optional[str | list[str]] = None) -> list[Link]:
-    return Entity.get_links_of_entities(entity_ids, codes, inverse=True)
 
 
 def flatten_list_and_remove_duplicates(list_: list[Any]) -> list[Any]:
