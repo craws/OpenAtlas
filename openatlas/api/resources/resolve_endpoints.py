@@ -145,8 +145,9 @@ def get_json_output(
     parser['limit'] = count if parser['limit'] == 0 else parser['limit']
     e_list = list(itertools.islice(total, 0, None, int(parser['limit'])))
     index = [{'page': num + 1, 'startId': i} for num, i in enumerate(e_list)]
-    parser['first'] = get_by_page(index, parser) \
-        if parser['page'] else parser['first']
+    if index:
+        parser['first'] = get_by_page(index, parser) \
+            if parser['page'] else parser['first']
     total = get_start_entity(total, parser) \
         if parser['last'] or parser['first'] else total
     j = [i for i, x in enumerate(entities) if x.id == total[0]]
