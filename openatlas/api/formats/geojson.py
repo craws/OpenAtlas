@@ -6,7 +6,7 @@ from openatlas.api.resources.util import (
     get_location_link, link_parser_check,
     replace_empty_list_values_in_dict_with_none)
 from openatlas.api.resources.model_mapper import (
-    flatten_list_and_remove_duplicates, get_all_links_of_entities)
+    flatten_list_and_remove_duplicates)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 
@@ -15,7 +15,7 @@ def get_geojson(
         entities: list[Entity],
         parser: dict[str, Any]) -> dict[str, Any]:
     out = []
-    links = get_all_links_of_entities([e.id for e in entities], 'P53')
+    links = Entity.get_links_of_entities([e.id for e in entities], 'P53')
     for entity in entities:
         if entity.class_.view == 'place':
             entity_links = [l_ for l_ in links if l_.domain.id == entity.id]

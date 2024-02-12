@@ -3,7 +3,7 @@ from typing import Any, Tuple
 from flask import g
 
 from openatlas.api.resources.model_mapper import (
-    flatten_list_and_remove_duplicates, get_all_links_of_entities_inverse)
+    flatten_list_and_remove_duplicates)
 from openatlas.api.resources.search_validation import (
     check_if_date, check_if_date_search)
 from openatlas.api.resources.util import get_linked_entities_id_api
@@ -75,7 +75,7 @@ def get_search_values(
 def search_for_value(
         values: Tuple[int, float],
         parameter: dict[str, Any]) -> list[int]:
-    links = get_all_links_of_entities_inverse(values[0])
+    links = Entity.get_links_of_entities(values[0], inverse=True)
     ids = []
     for link_ in links:
         if link_.description and search_entity(

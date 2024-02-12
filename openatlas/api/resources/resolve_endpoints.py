@@ -16,14 +16,11 @@ from openatlas.api.formats.rdf import rdf_output
 from openatlas.api.formats.xml import subunit_xml
 from openatlas.api.resources.error import (
     EntityDoesNotExistError, LastEntityError, TypeIDError)
-from openatlas.api.resources.model_mapper import (
-    get_all_links_of_entities, get_all_links_of_entities_inverse)
 from openatlas.api.resources.search import search
-from openatlas.api.resources.search_validation import (
-    iterate_validation)
+from openatlas.api.resources.search_validation import iterate_validation
 from openatlas.api.resources.templates import (
     geojson_collection_template, geojson_pagination, linked_place_pagination,
-    linked_places_template, subunit_template, loud_pagination, loud_template)
+    linked_places_template, loud_pagination, loud_template, subunit_template)
 from openatlas.api.resources.util import (
     get_entities_by_type, get_key, link_parser_check,
     link_parser_check_inverse, parser_str_to_dict, remove_duplicate_entities)
@@ -85,8 +82,8 @@ def get_entity_formatted(
         return get_geojson_v2([entity], parser)
     entity_dict = {
         'entity': entity,
-        'links': get_all_links_of_entities(entity.id),
-        'links_inverse': get_all_links_of_entities_inverse(entity.id)}
+        'links': Entity.get_links_of_entities(entity.id),
+        'links_inverse': Entity.get_links_of_entities(entity.id, inverse=True)}
     if parser['format'] == 'loud' \
             or parser['format'] in app.config['RDF_FORMATS']:
         return get_loud_entities(entity_dict, parse_loud_context())
@@ -145,8 +142,9 @@ def get_json_output(
     parser['limit'] = count if parser['limit'] == 0 else parser['limit']
     e_list = list(itertools.islice(total, 0, None, int(parser['limit'])))
     index = [{'page': num + 1, 'startId': i} for num, i in enumerate(e_list)]
-    parser['first'] = get_by_page(index, parser) \
-        if parser['page'] else parser['first']
+    if index:
+        parser['first'] = get_by_page(index, parser) \
+            if parser['page'] else parser['first']
     total = get_start_entity(total, parser) \
         if parser['last'] or parser['first'] else total
     j = [i for i, x in enumerate(entities) if x.id == total[0]]

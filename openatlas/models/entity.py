@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import ast
-from typing import Any, Iterable, Optional, TYPE_CHECKING
+from typing import Any, Iterable, Optional
 
 from flask import g, request
 from fuzzywuzzy import fuzz
@@ -17,9 +17,6 @@ from openatlas.display.util2 import (
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.models.tools import get_carbon_link
-
-if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.models.type import Type
 
 
 class Entity:
@@ -38,7 +35,7 @@ class Entity:
         self.location: Optional[Entity] = None  # Respective location if place
 
         self.standard_type = None
-        self.types: dict[Type, str] = {}
+        self.types = {}
         if 'types' in data and data['types']:
             for item in data['types']:  # f1 = type id, f2 = value
                 type_ = g.types[item['f1']]
@@ -177,11 +174,10 @@ class Entity:
         Entity.delete_(self.id)
 
     def delete_links(self, codes: list[str], inverse: bool = False) -> None:
-        from openatlas.models.type import Type
         if self.class_.name == 'stratigraphic_unit' \
                 and 'P2' in codes \
                 and not inverse:
-            exclude_ids = Type.get_sub_ids_recursive(g.sex_type)
+            exclude_ids = g.sex_type.get_sub_ids_recursive()
             exclude_ids.append(g.radiocarbon_type.id)
             if Tools.get_sex_types(self.id) or get_carbon_link(self):
                 Db.remove_types(self.id, exclude_ids)
@@ -511,10 +507,9 @@ class Entity:
             codes: str | list[str] | None = None,
             inverse: bool = False) -> list[Link]:
         result = set()
-        rows = Db.get_links_of_entities(
-            entity_ids,
-            codes if isinstance(codes, list) else [str(codes)],
-            inverse)
+        if codes:
+            codes = codes if isinstance(codes, list) else [str(codes)]
+        rows = Db.get_links_of_entities(entity_ids, codes, inverse)
         for row in rows:
             result.add(row['domain_id'])
             result.add(row['range_id'])

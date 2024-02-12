@@ -28,10 +28,18 @@ class OpenatlasClass:
     _('acquisition')
     _('actor relation')
     _('actor function')
+    _('administrative unit')
     _('appellation')
     _('bibliography')
+    _('creation')
     _('external reference')
+    _('feature')
+    _('involvement')
+    _('modification')
+    _('production')
+    _('object location')
     _('source translation')
+    _('type tools')
 
     def __init__(
             self,

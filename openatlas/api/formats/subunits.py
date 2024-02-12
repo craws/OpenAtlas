@@ -4,8 +4,7 @@ from typing import Any, Optional
 from flask import g
 
 from openatlas.api.resources.database_mapper import get_all_links_as_dict
-from openatlas.api.resources.model_mapper import (
-    get_all_links_of_entities_inverse, get_entities_by_ids)
+from openatlas.api.resources.model_mapper import get_entities_by_ids
 from openatlas.api.resources.util import (
     filter_link_list_by_property_codes, get_geometric_collection,
     get_license_name, get_reference_systems, remove_duplicate_entities,
@@ -262,7 +261,9 @@ def get_all_subs_linked_to_place_recursive(
 def get_type_links_inverse(entities: list[Entity]) -> list[Link]:
     types = remove_duplicate_entities(
         [type_ for entity in entities for type_ in entity.types])
-    links = get_all_links_of_entities_inverse(
-        [type_.id for type_ in types], 'P67')
+    links = Entity.get_links_of_entities(
+        [type_.id for type_ in types],
+        'P67',
+        inverse=True)
     return [link_ for link_ in links if
             link_.domain.class_.name == 'reference_system']
