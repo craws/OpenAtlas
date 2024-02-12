@@ -10,7 +10,8 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.database.connect import Transaction
-from openatlas.display.util import display_form, required_group
+from openatlas.display.util import required_group
+from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField, TableField
 from openatlas.forms.form import (
     get_add_reference_form, get_manager, get_table_form)
@@ -57,7 +58,9 @@ def link_insert(id_: int, view: str) -> str | Response:
         excluded = entity.get_linked_entities(property_code, inverse=inverse)
     return render_template(
         'content.html',
-        content=get_table_form(g.view_class_mapping[view], excluded),
+        content=get_table_form(
+            g.view_class_mapping[view],
+            [e.id for e in excluded]),
         title=_(entity.class_.view),
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],
@@ -232,7 +235,7 @@ def entity_add_file(id_: int) -> str | Response:
         'content.html',
         content=get_table_form(
             ['file'],
-            entity.get_linked_entities('P67', inverse=True)),
+            [e.id for e in entity.get_linked_entities('P67', inverse=True)]),
         entity=entity,
         title=entity.name,
         crumbs=[
@@ -256,7 +259,7 @@ def entity_add_source(id_: int) -> str | Response:
         'content.html',
         content=get_table_form(
             ['source'],
-            entity.get_linked_entities('P67', inverse=True)),
+            [e.id for e in entity.get_linked_entities('P67', inverse=True)]),
         title=entity.name,
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],

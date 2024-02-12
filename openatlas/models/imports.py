@@ -4,7 +4,9 @@ from flask import g
 from flask_login import current_user
 
 from openatlas.database.imports import Import as Db
-from openatlas.display.util import sanitize
+from openatlas.display.util2 import sanitize
+from openatlas.models.entity import Entity
+from openatlas.models.gis import Gis
 
 
 class Project:
@@ -69,8 +71,6 @@ class Import:
 
     @staticmethod
     def import_data(project: Project, class_: str, data: list[Any]) -> None:
-        from openatlas.models.entity import Entity
-        from openatlas.models.gis import Gis
         for row in data:
             entity = Entity.insert(
                 class_,

@@ -7,8 +7,9 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 
 from openatlas.display.table import Table
-from openatlas.display.util import button, check_iiif_activation, \
-    check_iiif_file_exist, is_authorized, manual
+from openatlas.display.util import (
+    button, check_iiif_activation, check_iiif_file_exist)
+from openatlas.display.util2 import is_authorized, manual
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity

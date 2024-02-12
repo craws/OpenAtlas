@@ -89,6 +89,7 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
             mime_type, _ = mimetypes.guess_type(g.files[id_])
             if not mime_type:
                 continue  # pragma: no cover
+            file_ = get_file_path(id_)
             image = {
                 'id': url_for('api.entity', id_=id_, _external=True),
                 '_label': link_.domain.name,
@@ -97,7 +98,7 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
                 'access_point': [{
                     'id': url_for(
                         'api.display',
-                        filename=get_file_path(id_).stem,  # type: ignore
+                        filename=file_.stem if file_ else '',
                         _external=True),
                     'type': 'DigitalObject',
                     '_label': 'ProfileImage' if id_ == profile_image else ''}]}

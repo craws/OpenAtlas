@@ -13,8 +13,9 @@ from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    get_chart_data, get_entities_linked_to_type_recursive, link, manual,
-    required_group, sanitize)
+    get_chart_data, get_entities_linked_to_type_recursive, link,
+    required_group)
+from openatlas.display.util2 import manual, sanitize
 from openatlas.forms.field import SubmitField
 from openatlas.forms.form import get_move_form
 from openatlas.models.entity import Entity

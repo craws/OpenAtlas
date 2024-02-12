@@ -2,13 +2,12 @@ from __future__ import annotations
 
 from typing import Any, Optional, TYPE_CHECKING
 
-from flask import abort, g
+from flask import g
 
 from openatlas.database.date import Date
 from openatlas.database.link import Link as Db
-from openatlas.database.tools import Tools
-from openatlas.display.util import (
-    datetime64_to_timestamp, format_date_part, link, timestamp_to_datetime64)
+from openatlas.display.util2 import (
+    datetime64_to_timestamp, format_date_part, timestamp_to_datetime64)
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
@@ -71,74 +70,6 @@ class Link:
         self.end_comment = data['end_comment']
 
     @staticmethod
-    def get_linked_entity(
-            id_: int,
-            code: str,
-            inverse: bool = False,
-            types: bool = False) -> Optional[Entity]:
-        result = Link.get_linked_entities(
-            id_,
-            code,
-            inverse=inverse,
-            types=types)
-        if len(result) > 1:  # pragma: no cover
-            g.logger.log(
-                'error',
-                'model',
-                f'Multiple linked entities found for {code}')
-            abort(400, 'Multiple linked entities found')
-        return result[0] if result else None
-
-    @staticmethod
-    def get_linked_entities(
-            id_: int,
-            codes: str | list[str],
-            inverse: bool = False,
-            types: bool = False) -> list[Entity]:
-        from openatlas.models.entity import Entity
-        codes = codes if isinstance(codes, list) else [codes]
-        return Entity.get_by_ids(
-            Db.get_linked_entities_inverse(id_, codes) if inverse
-            else Db.get_linked_entities(id_, codes),
-            types=types)
-
-    @staticmethod
-    def get_linked_entity_safe(
-            id_: int,
-            code: str,
-            inverse: bool = False,
-            types: bool = False) -> Entity:
-        entity = Link.get_linked_entity(id_, code, inverse, types)
-        if not entity:  # pragma: no cover
-            g.logger.log(
-                'error',
-                'model',
-                'missing linked',
-                f'id: {id_}, code: {code}')
-            abort(418, f'Missing linked {code} for {id_}')
-        return entity
-
-    @staticmethod
-    def delete_by_codes(
-            entity: Entity,
-            codes: list[str],
-            inverse: bool = False) -> None:
-        from openatlas.models.tools import get_carbon_link
-        from openatlas.models.type import Type
-        if entity.class_.name == 'stratigraphic_unit' \
-                and 'P2' in codes \
-                and not inverse:
-            exclude_ids = Type.get_sub_ids_recursive(
-                Type.get_hierarchy('Features for sexing'))
-            exclude_ids.append(Type.get_hierarchy('Radiocarbon').id)
-            if Tools.get_sex_types(entity.id) or get_carbon_link(entity):
-                Db.remove_types(entity.id, exclude_ids)
-                codes.remove('P2')
-                if not codes:
-                    return
-        Db.delete_by_codes(entity.id, codes, inverse)
-
-    @staticmethod
     def get_by_id(id_: int) -> Link:
         return Link(Db.get_by_id(id_))
 
@@ -164,32 +95,6 @@ class Link:
         Db.delete_(id_)
 
     @staticmethod
-    def get_invalid_cidoc_links() -> list[dict[str, str]]:
-        from openatlas.models.entity import Entity
-
-        invalid_linking = []
-        for row in Db.get_cidoc_links():
-            property_ = g.properties[row['property_code']]
-            domain_is_valid = property_.find_object(
-                'domain_class_code',
-                row['domain_code'])
-            range_is_valid = property_.find_object(
-                'range_class_code',
-                row['range_code'])
-            if not domain_is_valid or not range_is_valid:
-                invalid_linking.append(row)
-        invalid_links = []
-        for item in invalid_linking:
-            for row in Db.get_invalid_links(item):
-                domain = Entity.get_by_id(row['domain_id'])
-                range_ = Entity.get_by_id(row['range_id'])
-                invalid_links.append({
-                    'domain': f"{link(domain)} ({domain.cidoc_class.code})",
-                    'property': link(g.properties[row['property_code']]),
-                    'range': f"{link(range_)} ({range_.cidoc_class.code})"})
-        return invalid_links
-
-    @staticmethod
     def invalid_involvement_dates() -> list[Link]:
         return [
             Link.get_by_id(row['id'])
@@ -208,23 +113,3 @@ class Link:
     @staticmethod
     def delete_link_duplicates() -> int:
         return Db.delete_link_duplicates()
-
-    @staticmethod
-    def check_single_type_duplicates() -> list[dict[str, Any]]:
-        from openatlas.models.entity import Entity
-        data = []
-        for type_ in g.types.values():
-            if not type_.multiple and type_.category not in ['value', 'tools']:
-                if type_ids := type_.get_sub_ids_recursive():
-                    for id_ in Db.check_single_type_duplicates(type_ids):
-                        offending_types = []
-                        entity = Entity.get_by_id(id_, types=True)
-                        for entity_type in entity.types:
-                            if g.types[entity_type.root[0]].id == type_.id:
-                                offending_types.append(entity_type)
-                        if offending_types:
-                            data.append({
-                                'entity': entity,
-                                'type': type_,
-                                'offending_types': offending_types})
-        return data

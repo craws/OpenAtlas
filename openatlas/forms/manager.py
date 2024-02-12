@@ -15,9 +15,7 @@ from openatlas.forms.field import (
     DragNDropField, SubmitField, TableField, TableMultiField, TreeField)
 from openatlas.forms.validation import file
 from openatlas.models.entity import Entity
-from openatlas.models.link import Link
 from openatlas.models.reference_system import ReferenceSystem
-from openatlas.models.type import Type
 
 
 class AcquisitionManager(EventBaseManager):
@@ -452,13 +450,13 @@ class MoveManager(EventBaseManager):
         if self.form.place_from.data:
             self.add_link(
                 'P27',
-                Link.get_linked_entity_safe(
+                Entity.get_linked_entity_safe_static(
                     int(self.form.place_from.data),
                     'P53'))
         if self.form.place_to.data:
             self.add_link(
                 'P26',
-                Link.get_linked_entity_safe(
+                Entity.get_linked_entity_safe_static(
                     int(self.form.place_to.data),
                     'P53'))
 
@@ -517,7 +515,6 @@ class ReferenceSystemManager(BaseManager):
                     render_kw={'autofocus': True, 'readonly': True}))
 
     def additional_fields(self) -> dict[str, Any]:
-        precision_id = str(Type.get_hierarchy('External reference match').id)
         choices = []
         for class_ in g.classes.values():
             if not class_.reference_system_allowed \
@@ -528,6 +525,7 @@ class ReferenceSystemManager(BaseManager):
                     and class_.name != 'Place'):
                 continue
             choices.append((class_.name, g.classes[class_.name].label))
+        precision_id = str(g.reference_match_type.id)
         return {
             'website_url': StringField(_('website URL'), [Optional(), URL()]),
             'resolver_url': StringField(

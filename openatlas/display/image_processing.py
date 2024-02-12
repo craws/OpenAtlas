@@ -4,6 +4,7 @@ from flask import g
 from wand.image import Image
 
 from openatlas import app
+from openatlas.models.entity import Entity
 
 
 def resize_image(filename: str) -> None:
@@ -95,7 +96,6 @@ def delete_orphaned_resized_images() -> None:
 
 
 def create_resized_images() -> None:
-    from openatlas.models.entity import Entity
     for e in Entity.get_by_class('file'):
         if e.id in g.files and e.get_file_ext() in g.display_file_ext:
             resize_image(f"{e.id}{e.get_file_ext()}")

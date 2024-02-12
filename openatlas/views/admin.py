@@ -27,9 +27,11 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
     button, check_iiif_activation, check_iiif_file_exist,
-    convert_image_to_iiif, convert_size,
-    display_form, display_info, format_date, get_file_path, is_authorized,
-    link, manual, required_group, sanitize, send_mail, uc_first)
+    convert_image_to_iiif, display_info, get_file_path, link, required_group,
+    send_mail)
+from openatlas.display.util2 import (
+    convert_size, format_date, is_authorized, manual, sanitize, uc_first)
+from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
 from openatlas.forms.setting import (
     ApiForm, ContentForm, FilesForm, FrontendForm, GeneralForm, IiifForm,
@@ -242,18 +244,19 @@ def admin_content(item: str) -> str | Response:
 @app.route('/check_links')
 @required_group('contributor')
 def check_links() -> str:
-    tab = Tab(
-        'check_links',
-        table=Table(
-            ['domain', 'property', 'range'],
-            [[x['domain'], x['property'], x['range']]
-             for x in Link.get_invalid_cidoc_links()]),
-        buttons=[manual('admin/data_integrity_checks')])
-    tab.content = _('Congratulations, everything looks fine!') \
-        if not tab.table.rows else None
+    table = Table(['domain', 'property', 'range'])
+    for row in Entity.get_invalid_cidoc_links():
+        table.rows.append([
+            f"{link(row['domain'])} ({row['domain'].cidoc_class.code})",
+            link(row['property']),
+            f"{link(row['range'])} ({row['range'].cidoc_class.code})"])
     return render_template(
         'tabs.html',
-        tabs={'check_links': tab},
+        tabs={'links': Tab(
+            'links',
+            '' if table.rows else _('Congratulations, everything looks fine!'),
+            table,
+            [manual('admin/data_integrity_checks')])},
         title=_('admin'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
@@ -298,7 +301,7 @@ def check_link_duplicates(delete: Optional[str] = None) -> str | Response:
     else:  # Check single types for multiple use
         tab.table = Table(
             ['entity', 'class', 'base type', 'incorrect multiple types'])
-        for row in Link.check_single_type_duplicates():
+        for row in Entity.check_single_type_duplicates():
             remove_links = []
             for type_ in row['offending_types']:
                 url = url_for(

@@ -10,10 +10,10 @@ from flask_login import current_user
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.util import (
-    bookmark_toggle, button, description, edit_link, format_date,
-    format_entity_date, get_appearance, get_base_table_data, get_system_data,
-    is_authorized, link, manual, profile_image_table_link, remove_link,
-    get_chart_data)
+    bookmark_toggle, button, description, edit_link, format_entity_date,
+    get_appearance, get_base_table_data, get_chart_data, get_system_data,
+    link, profile_image_table_link, remove_link)
+from openatlas.display.util2 import format_date, is_authorized, manual
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -471,11 +471,12 @@ class ReferenceBaseDisplay(BaseDisplay):
                 'link_update',
                 id_=link_.id,
                 origin_id=self.entity.id)))
-            data.append(remove_link(
-                range_.name,
-                link_,
-                self.entity,
-                range_.class_.name))
+            data.append(
+                remove_link(
+                    range_.name,
+                    link_,
+                    self.entity,
+                    range_.class_.name))
             self.tabs[range_.class_.view].table.rows.append(data)
 
 

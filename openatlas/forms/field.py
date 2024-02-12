@@ -15,7 +15,8 @@ from wtforms.widgets import FileInput, HiddenInput, Input, TextInput
 
 from openatlas import app
 from openatlas.display.table import Table
-from openatlas.display.util import get_base_table_data, is_authorized, uc_first
+from openatlas.display.util import get_base_table_data
+from openatlas.display.util2 import is_authorized, uc_first
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 

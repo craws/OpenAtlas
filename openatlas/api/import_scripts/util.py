@@ -26,8 +26,7 @@ def get_type_by_name(type_name: str) -> Optional[Type]:
 
 
 def get_exact_match() -> Entity:
-    return get_or_create_type(
-        Type.get_hierarchy('External reference match'), 'exact match')
+    return get_or_create_type(g.reference_match_type, 'exact match')
 
 
 def get_reference_system(name: str) -> Entity:  # pragma: no cover

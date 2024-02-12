@@ -8,8 +8,8 @@ from werkzeug.wrappers import Response
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
-from openatlas.display.util import (
-    button, convert_size, is_authorized, link, manual, required_group)
+from openatlas.display.util import button, link, required_group
+from openatlas.display.util2 import convert_size, is_authorized, manual
 from openatlas.models.export import sql_export
 
 

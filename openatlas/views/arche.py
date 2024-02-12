@@ -9,8 +9,8 @@ from openatlas.api.import_scripts.arche import (
 from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
-from openatlas.display.util import (
-    button, display_info, is_authorized, manual, required_group)
+from openatlas.display.util import button, display_info, required_group
+from openatlas.display.util2 import is_authorized, manual
 
 
 @app.route('/arche')

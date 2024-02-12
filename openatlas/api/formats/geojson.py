@@ -5,11 +5,10 @@ from flask import g
 from openatlas.api.resources.util import (
     get_location_link, link_parser_check,
     replace_empty_list_values_in_dict_with_none)
-from openatlas.api.resources.model_mapper import \
-    flatten_list_and_remove_duplicates, get_all_links_of_entities
+from openatlas.api.resources.model_mapper import (
+    flatten_list_and_remove_duplicates, get_all_links_of_entities)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
-from openatlas.models.link import Link
 
 
 def get_geojson(
@@ -31,7 +30,7 @@ def get_geojson(
 
 def get_geom(entity: Entity, parser: dict[str, Any]) -> list[Any]:
     if entity.class_.view == 'place' or entity.class_.name == 'artifact':
-        id_ = Link.get_linked_entity_safe(entity.id, 'P53').id
+        id_ = entity.get_linked_entity_safe('P53').id
         geoms = Gis.get_by_id(id_)
         if parser['centroid']:
             geoms.extend(Gis.get_centroids_by_id(id_))

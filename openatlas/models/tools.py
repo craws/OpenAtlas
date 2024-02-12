@@ -7,7 +7,6 @@ from flask import g
 
 from openatlas.database.tools import Tools as Db
 from openatlas.models.link import Link
-from openatlas.models.type import Type
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
@@ -32,7 +31,7 @@ def update_carbon(
         link_.description = json.dumps(data)
         link_.update()
     else:
-        entity.link('P2', Type.get_hierarchy('Radiocarbon'), json.dumps(data))
+        entity.link('P2', g.radiocarbon_type, json.dumps(data))
 
 
 class SexEstimation:
@@ -223,7 +222,7 @@ class SexEstimation:
 
     @staticmethod
     def prepare_feature_types() -> None:
-        for category_id in Type.get_hierarchy('Features for sexing').subs:
+        for category_id in g.sex_type.subs:
             for id_ in g.types[category_id].subs:
                 SexEstimation.features[g.types[id_].name]['id'] = \
                     g.types[id_].id
@@ -255,7 +254,8 @@ class SexEstimation:
         for name, item in data.items():
             entity.link(
                 'P2',
-                g.types[SexEstimation.features[name]['id']], item)
+                g.types[SexEstimation.features[name]['id']],
+                item)
 
     @staticmethod
     def get_types(entity: Entity) -> list[dict[str, Any]]:

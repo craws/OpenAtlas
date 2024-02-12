@@ -439,7 +439,7 @@ class EventBaseManager(BaseManager):
             if self.form.place.data:
                 self.add_link(
                     'P7',
-                    Link.get_linked_entity_safe(
+                    Entity.get_linked_entity_safe_static(
                         int(self.form.place.data),
                         'P53'))
         if self.origin and self.origin.class_.view == 'actor':

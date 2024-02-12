@@ -2,7 +2,7 @@ from typing import Any
 
 from flask import g
 
-from openatlas.display.util import format_date_part
+from openatlas.display.util2 import format_date_part
 
 
 def populate_types(manager: Any) -> None:

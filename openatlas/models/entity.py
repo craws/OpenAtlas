@@ -10,10 +10,13 @@ from werkzeug.exceptions import abort
 from openatlas import app
 from openatlas.database.date import Date
 from openatlas.database.entity import Entity as Db
-from openatlas.display.util import (
+from openatlas.database.tools import Tools
+from openatlas.display.util2 import (
     convert_size, datetime64_to_timestamp, format_date_part, sanitize,
     timestamp_to_datetime64)
+from openatlas.models.gis import Gis
 from openatlas.models.link import Link
+from openatlas.models.tools import get_carbon_link
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.type import Type
@@ -80,7 +83,7 @@ class Entity:
             code: str,
             inverse: bool = False,
             types: bool = False) -> Optional[Entity]:
-        return Link.get_linked_entity(
+        return Entity.get_linked_entity_static(
             self.id,
             code,
             inverse=inverse,
@@ -91,14 +94,18 @@ class Entity:
             code: str,
             inverse: bool = False,
             types: bool = False) -> Entity:
-        return Link.get_linked_entity_safe(self.id, code, inverse, types)
+        return Entity.get_linked_entity_safe_static(
+            self.id,
+            code,
+            inverse,
+            types)
 
     def get_linked_entities(
             self,
             code: str | list[str],
             inverse: bool = False,
             types: bool = False) -> list[Entity]:
-        return Link.get_linked_entities(
+        return Entity.get_linked_entities_static(
             self.id,
             code,
             inverse=inverse,
@@ -170,7 +177,18 @@ class Entity:
         Entity.delete_(self.id)
 
     def delete_links(self, codes: list[str], inverse: bool = False) -> None:
-        Link.delete_by_codes(self, codes, inverse)
+        from openatlas.models.type import Type
+        if self.class_.name == 'stratigraphic_unit' \
+                and 'P2' in codes \
+                and not inverse:
+            exclude_ids = Type.get_sub_ids_recursive(g.sex_type)
+            exclude_ids.append(g.radiocarbon_type.id)
+            if Tools.get_sex_types(self.id) or get_carbon_link(self):
+                Db.remove_types(self.id, exclude_ids)
+                codes.remove('P2')
+                if not codes:
+                    return
+        Db.delete_by_codes(self.id, codes, inverse)
 
     def update(
             self,
@@ -233,7 +251,6 @@ class Entity:
                 self.link('P1', Entity.insert('appellation', alias))
 
     def update_links(self, data: dict[str, Any], new: bool) -> Optional[int]:
-        from openatlas.models.reference_system import ReferenceSystem
         if not new:
             if 'delete' in data['links'] and data['links']['delete']:
                 self.delete_links(data['links']['delete'])
@@ -242,7 +259,7 @@ class Entity:
                 self.delete_links(data['links']['delete_inverse'], True)
             if 'delete_reference_system' in data['links'] \
                     and data['links']['delete_reference_system']:
-                ReferenceSystem.delete_links_from_entity(self)
+                Db.delete_reference_system_links(self.id)
         continue_link_id = None
         for link_ in data['links']['insert']:
             ids = self.link(
@@ -268,7 +285,6 @@ class Entity:
         return continue_link_id
 
     def update_gis(self, gis_data: dict[str, Any], new: bool) -> None:
-        from openatlas.models.gis import Gis
         if not self.location:
             self.location = self.get_linked_entity_safe('P53')
         if not new:
@@ -491,24 +507,111 @@ class Entity:
 
     @staticmethod
     def get_links_of_entities(
-            entities: int | list[int],
+            entity_ids: int | list[int],
             codes: str | list[str] | None = None,
             inverse: bool = False) -> list[Link]:
-        entity_ids = set()
-        result = Db.get_links_of_entities(
-            entities,
+        result = set()
+        rows = Db.get_links_of_entities(
+            entity_ids,
             codes if isinstance(codes, list) else [str(codes)],
             inverse)
-        for row in result:
-            entity_ids.add(row['domain_id'])
-            entity_ids.add(row['range_id'])
+        for row in rows:
+            result.add(row['domain_id'])
+            result.add(row['range_id'])
         linked_entities = {
-            e.id: e for e in Entity.get_by_ids(entity_ids, types=True)}
+            e.id: e for e in Entity.get_by_ids(result, types=True)}
         links = []
-        for row in result:
+        for row in rows:
             links.append(
                 Link(
                     row,
                     domain=linked_entities[row['domain_id']],
                     range_=linked_entities[row['range_id']]))
         return links
+
+    @staticmethod
+    def get_linked_entity_static(
+            id_: int,
+            code: str,
+            inverse: bool = False,
+            types: bool = False) -> Optional[Entity]:
+        result = Entity.get_linked_entities_static(
+            id_,
+            code,
+            inverse=inverse,
+            types=types)
+        if len(result) > 1:  # pragma: no cover
+            g.logger.log(
+                'error',
+                'model',
+                f'Multiple linked entities found for {code}')
+            abort(400, 'Multiple linked entities found')
+        return result[0] if result else None
+
+    @staticmethod
+    def get_linked_entities_static(
+            id_: int,
+            codes: str | list[str],
+            inverse: bool = False,
+            types: bool = False) -> list[Entity]:
+        codes = codes if isinstance(codes, list) else [codes]
+        return Entity.get_by_ids(
+            Db.get_linked_entities_inverse(id_, codes) if inverse
+            else Db.get_linked_entities(id_, codes),
+            types=types)
+
+    @staticmethod
+    def get_linked_entity_safe_static(
+            id_: int,
+            code: str,
+            inverse: bool = False,
+            types: bool = False) -> Entity:
+        entity = Entity.get_linked_entity_static(id_, code, inverse, types)
+        if not entity:  # pragma: no cover
+            g.logger.log(
+                'error',
+                'model',
+                'missing linked',
+                f'id: {id_}, code: {code}')
+            abort(418, f'Missing linked {code} for {id_}')
+        return entity
+
+    @staticmethod
+    def get_invalid_cidoc_links() -> list[dict[str, Any]]:
+        invalid_linking = []
+        for row in Db.get_cidoc_links():
+            valid_domain = g.properties[row['property_code']].find_object(
+                'domain_class_code',
+                row['domain_code'])
+            valid_range = g.properties[row['property_code']].find_object(
+                'range_class_code',
+                row['range_code'])
+            if not valid_domain or not valid_range:
+                invalid_linking.append(row)
+        invalid_links = []
+        for item in invalid_linking:
+            for row in Db.get_invalid_links(item):
+                invalid_links.append({
+                    'domain': Entity.get_by_id(row['domain_id']),
+                    'property': g.properties[row['property_code']],
+                    'range': Entity.get_by_id(row['range_id'])})
+        return invalid_links
+
+    @staticmethod
+    def check_single_type_duplicates() -> list[dict[str, Any]]:
+        data = []
+        for type_ in g.types.values():
+            if not type_.multiple and type_.category not in ['value', 'tools']:
+                if type_ids := type_.get_sub_ids_recursive():
+                    for id_ in Db.check_single_type_duplicates(type_ids):
+                        offending_types = []
+                        entity = Entity.get_by_id(id_, types=True)
+                        for entity_type in entity.types:
+                            if g.types[entity_type.root[0]].id == type_.id:
+                                offending_types.append(entity_type)
+                        if offending_types:
+                            data.append({
+                                'entity': entity,
+                                'type': type_,
+                                'offending_types': offending_types})
+        return data
