@@ -507,10 +507,9 @@ class Entity:
             codes: str | list[str] | None = None,
             inverse: bool = False) -> list[Link]:
         result = set()
-        rows = Db.get_links_of_entities(
-            entity_ids,
-            codes if isinstance(codes, list) else [str(codes)],
-            inverse)
+        if codes:
+            codes = codes if isinstance(codes, list) else [str(codes)]
+        rows = Db.get_links_of_entities(entity_ids, codes, inverse)
         for row in rows:
             result.add(row['domain_id'])
             result.add(row['range_id'])

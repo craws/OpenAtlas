@@ -57,18 +57,13 @@ def get_entities_by_system_classes(system_classes: list[str]) -> list[Entity]:
 def get_all_links_of_entities(
         entity_ids: int | list[int],
         codes: str | list[str] | None = None) -> list[Link]:
-    return Entity.get_links_of_entities(
-        entity_ids,
-        codes or list(g.properties))
+    return Entity.get_links_of_entities(entity_ids, codes)
 
 
 def get_all_links_of_entities_inverse(
         entity_ids: int | list[int],
         codes: Optional[str | list[str]] = None) -> list[Link]:
-    return Entity.get_links_of_entities(
-        entity_ids,
-        codes or list(g.properties),
-        inverse=True)
+    return Entity.get_links_of_entities(entity_ids, codes, inverse=True)
 
 
 def flatten_list_and_remove_duplicates(list_: list[Any]) -> list[Any]:
