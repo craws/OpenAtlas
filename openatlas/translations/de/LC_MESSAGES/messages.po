@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2024-01-21 19:41+0100\n"
-"PO-Revision-Date: 2024-01-21 19:50+0100\n"
+"PO-Revision-Date: 2024-02-12 15:23+0100\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language-Team: de <LL@li.org>\n"
 "Language: de\n"
@@ -630,7 +630,7 @@ msgstr "umgekehrt"
 
 #: openatlas/forms/display.py:42 openatlas/views/model.py:90
 msgid "reference system"
-msgstr "Referenz-System"
+msgstr "Referenzsystem"
 
 #: openatlas/forms/display.py:154 openatlas/templates/util/translations.html:10
 msgid "hide"
@@ -1032,15 +1032,15 @@ msgstr "Erwerb"
 
 #: openatlas/models/openatlas_class.py:29
 msgid "actor relation"
-msgstr "Akteur Beziehung"
+msgstr "Beziehung"
 
 #: openatlas/models/openatlas_class.py:30
 msgid "actor function"
-msgstr "Akteur Funktion"
+msgstr "Funktion"
 
 #: openatlas/models/openatlas_class.py:31
 msgid "appellation"
-msgstr "Benennung"
+msgstr "Bezeichnung"
 
 #: openatlas/models/openatlas_class.py:32
 msgid "bibliography"
@@ -1052,7 +1052,7 @@ msgstr "Externe Referenz"
 
 #: openatlas/models/openatlas_class.py:34
 msgid "source translation"
-msgstr "Quellübersetzung"
+msgstr "Quellenübersetzung"
 
 #: openatlas/models/openatlas_class.py:70
 msgid "events not performed by actors, e.g. a natural disaster"
@@ -2040,7 +2040,7 @@ msgstr "Modell"
 
 #: openatlas/views/index.py:46
 msgid "reference systems"
-msgstr "Referenz-Systeme"
+msgstr "Referenzsysteme"
 
 #: openatlas/views/index.py:49 openatlas/views/model.py:310
 msgid "network visualization"
