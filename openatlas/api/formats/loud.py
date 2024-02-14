@@ -17,7 +17,7 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
 
     def base_entity_dict() -> dict[str, Any]:
         return {
-            'id': url_for('view', id_=data['entity'].id, _external=True),
+            'id': url_for('api.entity', id_=data['entity'].id, _external=True),
             'type': remove_spaces_dashes(
                 data['entity'].cidoc_class.i18n['en']),
             '_label': data['entity'].name,

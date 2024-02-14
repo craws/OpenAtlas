@@ -22,7 +22,7 @@ def get_linked_places_entity(
         'type': 'FeatureCollection',
         '@context': app.config['API_CONTEXT']['LPF'],
         'features': [replace_empty_list_values_in_dict_with_none({
-            '@id': url_for('view', id_=entity.id, _external=True),
+            '@id': url_for('api.entity', id_=entity.id, _external=True),
             'type': 'Feature',
             'crmClass': f'crm:{entity.cidoc_class.code} '
                         f"{entity.cidoc_class.i18n['en']}",
