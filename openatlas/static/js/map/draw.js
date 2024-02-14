@@ -59,7 +59,7 @@ map.addControl(areaButton);
 
 wktButton = new L.Control.EasyButtons({
     position: 'topright',
-    intentedIcon: 'fa-solid fa-font',
+    intentedIcon: 'fa-edit fa',
     title: translate['map_info_wkt']
 })
 wktButton.intendedFunction = () => importWKT();
@@ -286,6 +286,7 @@ function closeForm(withoutSave = true) {
 }
 
 function saveCurrentEditLayer() {
+    console.log(currentEditLayer)
     const name = $('#nameField').val();
     const description = $('#descriptionField').val();
     let geometry = [];
@@ -462,9 +463,9 @@ function check_coordinates_input_wkt() {
         'Point': /^POINT\s*\(\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(\s+-?\d+(\.\d+)?)?\s*\)$/,
         'LineString': /^LINESTRING\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)$/,
         'Polygon': /^POLYGON\s*\(\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)(,\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\))*\s*\)$/,
-        'MultiPoint': /^MULTIPOINT\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)$/,
-        'MultiLineString': /^MULTILINESTRING\s*\(\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)(,\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\))*\s*\)$/,
-        'MultiPolygon': /^MULTIPOLYGON\s*\(\s*\(\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)\s*\)(,\s*\(\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)\s*\))*\s*\)$/
+        // 'MultiPoint': /^MULTIPOINT\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)$/,
+        // 'MultiLineString': /^MULTILINESTRING\s*\(\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)(,\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\))*\s*\)$/,
+        // 'MultiPolygon': /^MULTIPOLYGON\s*\(\s*\(\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)\s*\)(,\s*\(\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)\s*\))*\s*\)$/
     };
 
     const isValidWKT = (input) => {
@@ -484,15 +485,37 @@ function check_coordinates_input_wkt() {
 }
 
 function drawWKT(wktString) {
-    if (currentEditLayer) {
-        map.removeLayer(currentEditLayer);
+    saveCurrentEditLayer();
+
+    const name = $('#nameField')?.val();
+    const description = $('#descriptionField')?.val();
+
+    const wktPolygon = wellknown.parse(wktString);
+    if (wktPolygon.type === 'Polygon') {
+        const coordinates = wktPolygon.coordinates[0].map(coord => [coord[1], coord[0]]);
+        const geojsonFeature = {
+            type: 'Feature',
+            geometry: {
+                type: 'Polygon',
+                coordinates: [coordinates]
+            },
+            properties: {
+                name: name || '',
+                description: description || '',
+                shapeType: 'area'
+            }
+        };
     }
 
-    currentEditLayer = L.geoJson(wellknown.parse($('#wktInput').val()));
+    console.log(geojsonFeature)
+    currentEditLayer = L.geoJSON(geojsonFeature);
     console.log(currentEditLayer)
     currentEditLayer.addTo(map);
     map.fitBounds(currentEditLayer.getBounds());
+
 }
+
+
 map.on('draw:editvertex', function () {
     const newCoordinates =
       currentEditLayer.feature.geometry.type === 'Polygon' ?
