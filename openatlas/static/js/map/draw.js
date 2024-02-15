@@ -6,69 +6,69 @@ let deleteIdList = [];
 let drawLayerIsArea = false;
 map.addLayer(drawnItems);
 L.Control.EasyButtons = L.Control.extend({
-    onAdd: function () {
-        var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
-        this.link = L.DomUtil.create('a', 'leaflet-bar-part', container);
-        this._addImage()
-        this.link.href = '#';
-        L.DomEvent.on(this.link, 'click', this._click, this);
-        this.link.title = this.options.title;
-        return container;
-    },
-    _click: function (e) {
-        L.DomEvent.stopPropagation(e);
-        L.DomEvent.preventDefault(e);
-        this.intendedFunction();
-    },
-    _addImage: function () {
-        L.DomUtil.create('i', this.options.intentedIcon, this.link);
-    }
+  onAdd: function () {
+    var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+    this.link = L.DomUtil.create('a', 'leaflet-bar-part', container);
+    this._addImage()
+    this.link.href = '#';
+    L.DomEvent.on(this.link, 'click', this._click, this);
+    this.link.title = this.options.title;
+    return container;
+  },
+  _click: function (e) {
+    L.DomEvent.stopPropagation(e);
+    L.DomEvent.preventDefault(e);
+    this.intendedFunction();
+  },
+  _addImage: function () {
+    L.DomUtil.create('i', this.options.intentedIcon, this.link);
+  }
 });
 
 pointButton = new L.Control.EasyButtons({
-    position: 'topright',
-    intentedIcon: 'fa-map-marker-alt fa',
-    title: translate['map_info_centerpoint']
+  position: 'topright',
+  intentedIcon: 'fa-map-marker-alt fa',
+  title: translate['map_info_centerpoint']
 })
 pointButton.intendedFunction = () => drawGeometry('point');
 map.addControl(pointButton);
 
 polylineButton = new L.Control.EasyButtons({
-    position: 'topright',
-    intentedIcon: 'fa-project-diagram fa',
-    title: translate['map_info_linestring']
+  position: 'topright',
+  intentedIcon: 'fa-project-diagram fa',
+  title: translate['map_info_linestring']
 })
 polylineButton.intendedFunction = () => drawGeometry('polyline');
 map.addControl(polylineButton);
 
 polygonButton = new L.Control.EasyButtons({
-    position: 'topright',
-    intentedIcon: 'fa-vector-square fa',
-    title: translate['map_info_shape']
+  position: 'topright',
+  intentedIcon: 'fa-vector-square fa',
+  title: translate['map_info_shape']
 })
 polygonButton.intendedFunction = () => drawGeometry('shape');
 map.addControl(polygonButton);
 
 areaButton = new L.Control.EasyButtons({
-    position: 'topright',
-    intentedIcon: 'fa-draw-polygon fa',
-    title: translate['map_info_area']
+  position: 'topright',
+  intentedIcon: 'fa-draw-polygon fa',
+  title: translate['map_info_area']
 })
 areaButton.intendedFunction = () => drawGeometry('area');
 map.addControl(areaButton);
 
 wktButton = new L.Control.EasyButtons({
-    position: 'topright',
-    intentedIcon: 'fa-edit fa',
-    title: translate['map_info_wkt']
+  position: 'topleft',
+  intentedIcon: 'fa-edit fa',
+  title: translate['map_info_wkt']
 })
 wktButton.intendedFunction = () => importWKT();
 map.addControl(wktButton);
 
 let mapInputForm = L.control();
 mapInputForm.onAdd = () => {
-    let div = L.DomUtil.create('div');
-    div.innerHTML = `
+  let div = L.DomUtil.create('div');
+  div.innerHTML = `
     <div class="mapFormDiv" onmouseover="interactionOff()"
       onmouseout="interactionOn()">
             <span id="closeButton" title="${translate["map_info_close"]}"
@@ -95,476 +95,543 @@ mapInputForm.onAdd = () => {
                 <input type="text" oninput="check_coordinates_input_polygon()" class="${style.stringField}"
                   id="polyInput"  placeholder="[[lon1,lat1],[lon2,lat2],...]">
             </div>
-            <div class="wktInput">
-                <label for='wktInput'>${translate["map_info_wkt"]}</label>
-                <input type="text" oninput="check_coordinates_input_wkt()" class="${style.stringField}"
-                  id="wktInput"  placeholder="POLYGON ((lat1 lon1, lat2 lon2, ...))">
-            </div>
         </div>
         </div>
     `;
-    return div;
+  return div;
+}
+
+let wktInputForm = L.control();
+wktInputForm.onAdd = () => {
+  let div = L.DomUtil.create('div');
+  div.innerHTML = `
+    <div class="mapFormDiv" onmouseover="interactionOff()"
+      onmouseout="interactionOn()">
+            <span id="closeButton" title="${translate["map_info_close"]}"
+              onclick="closeWktForm()" class="fad">X</span>
+            <p id="inputFormInfo"></p>
+            <div class="wktInput">
+                <label for='wktInput'>${translate["map_info_wkt"]}</label>
+                <input type="text" oninput="checkAndToggleDrawButton()" class="${style.stringField}"
+                  id="wktInput"  placeholder="POLYGON ((lat1 lon1, lat2 lon2, ...))">
+            </div>
+            <button id="drawButton" title="${translate["map_wkt_draw"]}"
+              onclick="closeWktForm(true)" class="fad" disabled>Draw</button>
+        </div>
+        </div>
+    `;
+  return div;
+}
+
+function checkAndToggleDrawButton() {
+  const drawButton = document.getElementById('drawButton');
+  drawButton.disabled = !check_coordinates_input_wkt();
 }
 
 map.on(L.Draw.Event.CREATED, function (e) {
-    const name = $('#nameField')?.val();
-    const description = $('#descriptionField')?.val();
-    let geometry = [];
-    let shapeType = "";
-    currentEditLayer = e.layer;
-    switch (e.layerType.toLowerCase()) {
-        case 'marker':
-            geometry = {
-                type: 'Point',
-                coordinates: [currentEditLayer.getLatLng().lng,
-                    currentEditLayer.getLatLng().lat]
-            };
-            shapeType = 'centerpoint';
-            $('#easting').val(currentEditLayer.getLatLng().lng)
-            $('#northing').val(currentEditLayer.getLatLng().lat)
-            $("#coordinatesDiv input").removeClass('error');
-            break;
-        case 'polyline':
-            geometry = {
-                type: 'LineString',
-                coordinates:
-                  currentEditLayer.getLatLngs().map(x => [x.lng, x.lat])
-            };
-            shapeType = 'polyline';
-            $('#polyInput').val(JSON.stringify(geometry.coordinates));
-            break;
-        case 'polygon':
-            geometry = {
-                type: 'Polygon',
-                coordinates:
-                  [currentEditLayer.getLatLngs()[0].map(x => [x.lng, x.lat])]
-            };
-            // Add first xy again as last xy to close polygon
-            geometry.coordinates =
-              [[...geometry.coordinates[0], geometry.coordinates[0][0]]]
-            $('#polyInput').val(JSON.stringify(geometry.coordinates[0]));
+  const name = $('#nameField')?.val();
+  const description = $('#descriptionField')?.val();
+  let geometry = [];
+  let shapeType = "";
+  currentEditLayer = e.layer;
+  switch (e.layerType.toLowerCase()) {
+    case 'marker':
+      geometry = {
+        type: 'Point',
+        coordinates: [currentEditLayer.getLatLng().lng,
+          currentEditLayer.getLatLng().lat]
+      };
+      shapeType = 'centerpoint';
+      $('#easting').val(currentEditLayer.getLatLng().lng)
+      $('#northing').val(currentEditLayer.getLatLng().lat)
+      $("#coordinatesDiv input").removeClass('error');
+      break;
+    case 'polyline':
+      geometry = {
+        type: 'LineString',
+        coordinates:
+          currentEditLayer.getLatLngs().map(x => [x.lng, x.lat])
+      };
+      shapeType = 'polyline';
+      $('#polyInput').val(JSON.stringify(geometry.coordinates));
+      break;
+    case 'polygon':
+      geometry = {
+        type: 'Polygon',
+        coordinates:
+          [currentEditLayer.getLatLngs()[0].map(x => [x.lng, x.lat])]
+      };
+      // Add first xy again as last xy to close polygon
+      geometry.coordinates =
+        [[...geometry.coordinates[0], geometry.coordinates[0][0]]]
+      $('#polyInput').val(JSON.stringify(geometry.coordinates[0]));
 
-            shapeType = drawLayerIsArea ? 'area' : 'shape';
-            break;
+      shapeType = drawLayerIsArea ? 'area' : 'shape';
+      break;
 
+  }
+  currentEditLayer.feature = {
+    type: "Feature",
+    geometry: geometry,
+    properties: {
+      name: name,
+      description: description,
+      id: Date.now() * -1,
+      shapeType: shapeType
     }
-    currentEditLayer.feature = {
-        type: "Feature",
-        geometry: geometry,
-        properties: {
-            name: name,
-            description: description,
-            id: Date.now() * -1,
-            shapeType: shapeType
-        }
-    }
-    setPopup(true)(currentEditLayer.feature, currentEditLayer);
-    currentDrawLayer = undefined;
-    drawnItems.addLayer(currentEditLayer);
+  }
+  setPopup(true)(currentEditLayer.feature, currentEditLayer);
+  currentDrawLayer = undefined;
+  drawnItems.addLayer(currentEditLayer);
 });
 
 function editGeometry(featureId) {
-    saveCurrentEditLayer();
-    let tempLayer = Object.values(selectedLayer._layers)
-        .find(x => x.feature.properties.id === featureId) ||
-      Object.values(drawnItems._layers)
-        .find(x => x?.feature?.properties?.id === featureId);
+  saveCurrentEditLayer();
+  let tempLayer = Object.values(selectedLayer._layers)
+      .find(x => x.feature.properties.id === featureId) ||
+    Object.values(drawnItems._layers)
+      .find(x => x?.feature?.properties?.id === featureId);
 
-    openForm(tempLayer.feature.properties.shapeType, tempLayer.feature);
+  openForm(tempLayer.feature.properties.shapeType, tempLayer.feature);
 
-    switch (tempLayer.feature.properties.shapeType.toLowerCase()) {
-        case "centerpoint":
-        case "point":
-            currentEditLayer = L.marker(tempLayer.getLatLng(), {
-                draggable: true,
-                icon: editIcon
-            }).addTo(map);
-            $('#easting').val(tempLayer.getLatLng().lng)
-            $('#northing').val(tempLayer.getLatLng().lat)
+  switch (tempLayer.feature.properties.shapeType.toLowerCase()) {
+    case "centerpoint":
+    case "point":
+      currentEditLayer = L.marker(tempLayer.getLatLng(), {
+        draggable: true,
+        icon: editIcon
+      }).addTo(map);
+      $('#easting').val(tempLayer.getLatLng().lng)
+      $('#northing').val(tempLayer.getLatLng().lat)
 
-            break;
-        case "polyline":
-        case "linestring":
-            currentEditLayer = L.polyline(tempLayer.getLatLngs()).addTo(map);
-            currentEditLayer.options.editing
-            || (currentEditLayer.options.editing = {});
-            $('#polyInput')
-              .val(JSON.stringify(tempLayer.feature.geometry.coordinates));
-            break;
-        default:
-            currentEditLayer = L.polygon(tempLayer.getLatLngs()).addTo(map);
-            $('#polyInput').val(
-              JSON.stringify(tempLayer.feature.geometry.coordinates[0]));
+      break;
+    case "polyline":
+    case "linestring":
+      currentEditLayer = L.polyline(tempLayer.getLatLngs()).addTo(map);
+      currentEditLayer.options.editing
+      || (currentEditLayer.options.editing = {});
+      $('#polyInput')
+        .val(JSON.stringify(tempLayer.feature.geometry.coordinates));
+      break;
+    default:
+      currentEditLayer = L.polygon(tempLayer.getLatLngs()).addTo(map);
+      $('#polyInput').val(
+        JSON.stringify(tempLayer.feature.geometry.coordinates[0]));
 
-    }
-    $("#coordinatesDiv input").removeClass('error');
-    currentEditLayer.options.editing
-    || (currentEditLayer.options.editing = {});
-    currentEditLayer.editing.enable();
-    currentEditLayer.feature = tempLayer.feature;
-    map.closePopup();
-    setPopup(true)(currentEditLayer.feature, currentEditLayer);
-    drawnItems.removeLayer(tempLayer);
-    selectedLayer.removeLayer(tempLayer);
+  }
+  $("#coordinatesDiv input").removeClass('error');
+  currentEditLayer.options.editing
+  || (currentEditLayer.options.editing = {});
+  currentEditLayer.editing.enable();
+  currentEditLayer.feature = tempLayer.feature;
+  map.closePopup();
+  setPopup(true)(currentEditLayer.feature, currentEditLayer);
+  drawnItems.removeLayer(tempLayer);
+  selectedLayer.removeLayer(tempLayer);
 }
 
 function deleteGeometry(featureId) {
-    closeForm();
-    saveCurrentEditLayer();
-    let tempLayer = Object.values(selectedLayer._layers)
-        .find(x => x.feature.properties.id === featureId) ||
-      Object.values(drawnItems._layers)
-        .find(x => x?.feature?.properties?.id === featureId);
-    tempLayer.remove();
-    deleteIdList.push(featureId);
+  closeForm();
+  saveCurrentEditLayer();
+  let tempLayer = Object.values(selectedLayer._layers)
+      .find(x => x.feature.properties.id === featureId) ||
+    Object.values(drawnItems._layers)
+      .find(x => x?.feature?.properties?.id === featureId);
+  tempLayer.remove();
+  deleteIdList.push(featureId);
 }
 
 function drawGeometry(shapeType) {
-    openForm(shapeType);
-    drawLayerIsArea = false;
-    switch (shapeType.toLowerCase()) {
-        case 'point':
-            currentDrawLayer = new L.Draw.Marker(map);
-            break;
-        case 'polyline':
-            currentDrawLayer = new L.Draw.Polyline(map);
-            break;
-        case 'area':
-            drawLayerIsArea = true;
-            currentDrawLayer = new L.Draw.Polygon(map, {
-                allowIntersection: false,
-                shapeOptions: {weight: 0}
-            });
-            break;
-        case 'shape':
-            currentDrawLayer =
-              new L.Draw.Polygon(map, {allowIntersection: false});
-            break;
-    }
-    currentDrawLayer.enable();
+  openForm(shapeType);
+  drawLayerIsArea = false;
+  switch (shapeType.toLowerCase()) {
+    case 'point':
+      currentDrawLayer = new L.Draw.Marker(map);
+      break;
+    case 'polyline':
+      currentDrawLayer = new L.Draw.Polyline(map);
+      break;
+    case 'area':
+      drawLayerIsArea = true;
+      currentDrawLayer = new L.Draw.Polygon(map, {
+        allowIntersection: false,
+        shapeOptions: {weight: 0}
+      });
+      break;
+    case 'shape':
+      currentDrawLayer =
+        new L.Draw.Polygon(map, {allowIntersection: false});
+      break;
+  }
+  currentDrawLayer.enable();
 }
 
 function importWKT() {
-    map.addControl(mapInputForm);
-    $('.leaflet-right .leaflet-bar').hide();
-    $('.markerInput').hide();
-    $('.polygonInput').hide();
-    $('.wktInput').show();
-    $('#nameField');
-    $('#descriptionField');
+  map.addControl(wktInputForm);
+  $('.leaflet-right .leaflet-bar').hide();
+  $('.wktInput').show();
 }
 
 function openForm(shapeType, feature = undefined) {
-    if (shapeType === 'polyline') shapeType = 'LineString'
-    if (shapeType === 'point') shapeType = 'centerpoint'
+  if (shapeType === 'polyline') shapeType = 'LineString'
+  if (shapeType === 'point') shapeType = 'centerpoint'
 
-    map.addControl(mapInputForm);
-    $('.leaflet-right .leaflet-bar').hide();
+  map.addControl(mapInputForm);
+  $('.leaflet-right .leaflet-bar').hide();
 
-    $('.wktInput').hide();
-    if (shapeType == 'centerpoint') {
-        $('.markerInput').show();
-        $('.polygonInput').hide();
-    } else {
-        $('.markerInput').hide();
-        $('.polygonInput').show();
-    }
+  if (shapeType == 'centerpoint') {
+    $('.markerInput').show();
+    $('.polygonInput').hide();
+  } else {
+    $('.markerInput').hide();
+    $('.polygonInput').show();
+  }
 
-    $('#inputFormTitle').text(shapeType);
-    $('#inputFormInfo').text(translate[`map_info_${shapeType}`]);
-    $('#nameField').val(feature?.properties?.name || '');
-    $('#descriptionField').val(feature?.properties?.description || '');
+  $('#inputFormTitle').text(shapeType);
+  $('#inputFormInfo').text(translate[`map_info_${shapeType}`]);
+  $('#nameField').val(feature?.properties?.name || '');
+  $('#descriptionField').val(feature?.properties?.description || '');
 }
 
 function closeForm(withoutSave = true) {
-    interactionOn();
-    currentDrawLayer?.disable();
-    saveCurrentEditLayer();
+  interactionOn();
+  currentDrawLayer?.disable();
+  saveCurrentEditLayer();
 
-    mapInputForm.remove(map);
-    $('.leaflet-right .leaflet-bar').show();
+  mapInputForm.remove(map);
+  $('.leaflet-right .leaflet-bar').show();
 }
 
-function saveCurrentEditLayer() {
-    console.log(currentEditLayer)
-    const name = $('#nameField').val();
-    const description = $('#descriptionField').val();
-    let geometry = [];
-    let shapeType = "";
-    if (currentEditLayer) {
-        switch (currentEditLayer?.feature
-          ?.properties?.shapeType.toLowerCase()) {
-            case 'marker':
-            case 'point':
-            case 'centerpoint':
-                geometry = {
-                    type: 'Point',
-                    coordinates: [currentEditLayer.getLatLng().lng,
-                        currentEditLayer.getLatLng().lat]
-                };
-                shapeType = "centerpoint";
-                break;
-            case 'polyline':
-            case 'linestring':
-                geometry = {
-                    type: 'LineString',
-                    coordinates:
-                      currentEditLayer.getLatLngs().map(x => [x.lng, x.lat])
-                };
-                shapeType = "polyline";
-                break;
-            case 'polygon':
-            case 'area':
-            case 'shape':
-                geometry = {
-                    type: 'Polygon',
-                    coordinates: [currentEditLayer.getLatLngs()[0]
-                      .map(x => [x.lng, x.lat])]
-                };
-                // Add first xy again as last xy to close polygon
-                geometry.coordinates =
-                  [[...geometry.coordinates[0], geometry.coordinates[0][0]]]
+function closeWktForm(save = false) {
+  if (save) {
+    saveCurrentEditLayer();
+    const wktGeometry = wellknown.parse($('#wktInput').val());
+    const geom = {
+      type: "Feature",
+      geometry: wktGeometry,
+      properties: {
+        name: '',
+        description: '',
+        shapeType: ''
+      }
+    };
 
-                shapeType = currentEditLayer?.feature?.properties?.shapeType;
-                break;
-
-        }
-        currentEditLayer.feature = {
-            ...currentEditLayer.feature,
-            geometry: geometry,
-            properties: {
-                ...currentEditLayer.feature.properties,
-                name: name,
-                description: description,
-                shapeType: shapeType
-            },
-
-        }
-        currentEditLayer.editing.disable();
-        setPopup(true)(currentEditLayer.feature, currentEditLayer);
-
-        drawnItems.addLayer(currentEditLayer);
-        currentEditLayer = undefined;
+    switch (wktGeometry.type.toLowerCase()) {
+      case 'point':
+        geom.properties.shapeType = "centerpoint";
+        openForm("centerpoint", geom);
+        currentEditLayer = L.marker(wktGeometry.coordinates.reverse(), {
+          draggable: true,
+          icon: editIcon
+        }).addTo(map);
+        break;
+      case 'linestring':
+        geom.properties.shapeType = "polyline";
+        openForm("polyline", geom);
+        currentEditLayer = L.polyline(wktGeometry.coordinates, {
+          draggable: true,
+          icon: editIcon
+        }).addTo(map);
+        break;
+      case 'polygon':
+        geom.properties.shapeType = "shape";
+        openForm("shape", geom);
+        currentEditLayer = L.polygon(wktGeometry.coordinates, {
+          draggable: true,
+          icon: editIcon
+        }).addTo(map);
+        break;
     }
+    currentEditLayer.feature = geom;
+    setPopup(true)(currentEditLayer.feature, currentEditLayer);
+  }
+  wktInputForm.remove(map);
+  $('.leaflet-right .leaflet-bar').show();
+}
+
+
+
+function saveCurrentEditLayer() {
+  const name = $('#nameField').val();
+  const description = $('#descriptionField').val();
+  let geometry = [];
+  let shapeType = "";
+  if (currentEditLayer) {
+    switch (currentEditLayer?.feature
+      ?.properties?.shapeType.toLowerCase()) {
+      case 'marker':
+      case 'point':
+      case 'centerpoint':
+        geometry = {
+          type: 'Point',
+          coordinates: [currentEditLayer.getLatLng().lng,
+            currentEditLayer.getLatLng().lat]
+        };
+        shapeType = "centerpoint";
+        break;
+      case 'polyline':
+      case 'linestring':
+        geometry = {
+          type: 'LineString',
+          coordinates:
+            currentEditLayer.getLatLngs().map(x => [x.lng, x.lat])
+        };
+        shapeType = "polyline";
+        break;
+      case 'polygon':
+      case 'area':
+      case 'shape':
+        geometry = {
+          type: 'Polygon',
+          coordinates: [currentEditLayer.getLatLngs()[0]
+            .map(x => [x.lng, x.lat])]
+        };
+        // Add first xy again as last xy to close polygon
+        geometry.coordinates =
+          [[...geometry.coordinates[0], geometry.coordinates[0][0]]]
+
+        shapeType = currentEditLayer?.feature?.properties?.shapeType;
+        break;
+
+    }
+    currentEditLayer.feature = {
+      ...currentEditLayer.feature,
+      geometry: geometry,
+      properties: {
+        ...currentEditLayer.feature.properties,
+        name: name,
+        description: description,
+        shapeType: shapeType
+      },
+
+    }
+    currentEditLayer.editing.disable();
+    setPopup(true)(currentEditLayer.feature, currentEditLayer);
+
+    drawnItems.addLayer(currentEditLayer);
+    currentEditLayer = undefined;
+  }
 
 }
 
 function updateHiddenInputFields() {
-    saveCurrentEditLayer();
-    const drawnItemsFeatures =
-      Object.values(drawnItems?._layers).map(x => x.feature);
-    const drawnItemsFeaturesIds = drawnItemsFeatures.map(x => x.properties.id);
-    const removeIdList = [...drawnItemsFeaturesIds, ...deleteIdList];
-    const allGisElements =
-      [...gisSelected.filter(x => !removeIdList.includes(x.properties.id)),
-          ...drawnItemsFeatures
-            .filter(x => !deleteIdList.includes(x.properties.id))];
+  saveCurrentEditLayer();
+  const drawnItemsFeatures =
+    Object.values(drawnItems?._layers).map(x => x.feature);
+  const drawnItemsFeaturesIds = drawnItemsFeatures.map(x => x.properties.id);
+  const removeIdList = [...drawnItemsFeaturesIds, ...deleteIdList];
+  const allGisElements =
+    [...gisSelected.filter(x => !removeIdList.includes(x.properties.id)),
+      ...drawnItemsFeatures
+        .filter(x => !deleteIdList.includes(x.properties.id))];
 
-    $('#gis_points').val(JSON.stringify(allGisElements
-      .filter(x => x.geometry.type.toLowerCase() === 'point')));
-    $('#gis_lines').val(JSON.stringify(allGisElements
-      .filter(x => x.geometry.type.toLowerCase() === 'linestring')));
-    $('#gis_polygons').val(JSON.stringify(allGisElements
-      .filter(x => x.geometry.type.toLowerCase() === 'polygon')));
+  $('#gis_points').val(JSON.stringify(allGisElements
+    .filter(x => x.geometry.type.toLowerCase() === 'point')));
+  $('#gis_lines').val(JSON.stringify(allGisElements
+    .filter(x => x.geometry.type.toLowerCase() === 'linestring')));
+  $('#gis_polygons').val(JSON.stringify(allGisElements
+    .filter(x => x.geometry.type.toLowerCase() === 'polygon')));
 }
 
 function importGeonamesID(geo, popup, map) {
-    $('[data-reference-system="GeoNames"]').val(geo.geonameId).change();
-    map.closePopup(popup);
+  $('[data-reference-system="GeoNames"]').val(geo.geonameId).change();
+  map.closePopup(popup);
 }
 
 function importNewPoint(geo, popup, map) {
-    saveCurrentEditLayer();
-    map.closePopup(popup);
-    point =
-      {
-          type: "Feature",
-          geometry: {type: "Point", coordinates: [geo.lng, geo.lat]},
-          properties: {
-              name: geo.name,
-              description:
-                `${geo.name} (${geo.geonameId}), imported from GeoNames`,
-              shapeType: "centerpoint"
-          }
-      };
-    openForm("centerpoint", point);
-    currentEditLayer = L.marker([geo.lat, geo.lng], {
-        draggable: true,
-        icon: editIcon
-    }).addTo(map);
-    currentEditLayer.editing.enable();
-    currentEditLayer.feature = point;
-    setPopup(true)(currentEditLayer.feature, currentEditLayer);
+  saveCurrentEditLayer();
+  map.closePopup(popup);
+  point =
+    {
+      type: "Feature",
+      geometry: {type: "Point", coordinates: [geo.lng, geo.lat]},
+      properties: {
+        name: geo.name,
+        description:
+          `${geo.name} (${geo.geonameId}), imported from GeoNames`,
+        shapeType: "centerpoint"
+      }
+    };
+
+  console.log(point)
+  openForm("centerpoint", point);
+  currentEditLayer = L.marker([geo.lat, geo.lng], {
+    draggable: true,
+    icon: editIcon
+  }).addTo(map);
+  currentEditLayer.editing.enable();
+  currentEditLayer.feature = point;
+  setPopup(true)(currentEditLayer.feature, currentEditLayer);
 }
 
 function importAll(geo, popup, map) {
-    importGeonamesID(geo, popup, map);
-    importNewPoint(geo, popup, map);
+  importGeonamesID(geo, popup, map);
+  importNewPoint(geo, popup, map);
 }
 
 $(document).ready(function () {
-    $('#save,#insert_and_continue,#insert_continue_sub')
-      .on('click', function () {
-          updateHiddenInputFields();
-      });
+  $('#save,#insert_and_continue,#insert_continue_sub')
+    .on('click', function () {
+      updateHiddenInputFields();
+    });
 });
 
 function check_coordinates_input_marker() {
-    var floatRegex = /^-?\d+(?:[.,]\d*?)?$/;
-    let lng = $('#easting').val().replace(",", ".")
-    let lat = $('#northing').val().replace(",", ".")
+  var floatRegex = /^-?\d+(?:[.,]\d*?)?$/;
+  let lng = $('#easting').val().replace(",", ".")
+  let lat = $('#northing').val().replace(",", ".")
 
-    if (!floatRegex.test(lng)) $("#easting").addClass('error');
-    else $("#easting").removeClass('error');
-    if (!floatRegex.test(lat)) $("#northing").addClass('error');
-    else $("#northing").removeClass('error');
-    if (!floatRegex.test(lng) || !floatRegex.test(lat)) return false;
-    currentEditLayer.feature.geometry.coordinates =
-      [parseFloat(lng), parseFloat(lat)]
-    var newLatLng = new L.LatLng(parseFloat(lat), parseFloat(lng));
-    currentEditLayer.setLatLng(newLatLng);
-    if (!map.getBounds().contains(newLatLng)) map.panTo(newLatLng);
-    return floatRegex.test(lng) && floatRegex.test(lat);
+  if (!floatRegex.test(lng)) $("#easting").addClass('error');
+  else $("#easting").removeClass('error');
+  if (!floatRegex.test(lat)) $("#northing").addClass('error');
+  else $("#northing").removeClass('error');
+  if (!floatRegex.test(lng) || !floatRegex.test(lat)) return false;
+  currentEditLayer.feature.geometry.coordinates =
+    [parseFloat(lng), parseFloat(lat)]
+  var newLatLng = new L.LatLng(parseFloat(lat), parseFloat(lng));
+  currentEditLayer.setLatLng(newLatLng);
+  if (!map.getBounds().contains(newLatLng)) map.panTo(newLatLng);
+  return floatRegex.test(lng) && floatRegex.test(lat);
 }
 
 function check_coordinates_input_polygon() {
-    var floatRegex = /^-?\d+(?:[.,]\d*?)?$/;
-    currentEditLayer.editing.disable();
+  var floatRegex = /^-?\d+(?:[.,]\d*?)?$/;
+  currentEditLayer.editing.disable();
 
-    const validateInput = (input) => {
-        let points = [];
-        try {
-            points = JSON.parse(input)
-        } catch {
-            return false
-        }
-
-        if (!Array.isArray(points)) return false;
-        if (points.some(x => !Array.isArray(x) || x.length !== 2))
-            return false;
-        if (points.some(x => x.some(y => !floatRegex.test(y)))) return false;
-        return true
+  const validateInput = (input) => {
+    let points = [];
+    try {
+      points = JSON.parse(input)
+    } catch {
+      return false
     }
-    if (!validateInput($('#polyInput').val())) {
-        $('#polyInput').addClass('error');
-        return false;
-    }
-    $('#polyInput').removeClass('error');
-    const points = JSON.parse($('#polyInput').val());
 
-    const latLngs = points.map(x => new L.LatLng(x[1], x[0]));
-    currentEditLayer.setLatLngs(latLngs);
+    if (!Array.isArray(points)) return false;
+    if (points.some(x => !Array.isArray(x) || x.length !== 2))
+      return false;
+    if (points.some(x => x.some(y => !floatRegex.test(y)))) return false;
+    return true
+  }
+  if (!validateInput($('#polyInput').val())) {
+    $('#polyInput').addClass('error');
+    return false;
+  }
+  $('#polyInput').removeClass('error');
+  const points = JSON.parse($('#polyInput').val());
+
+  const latLngs = points.map(x => new L.LatLng(x[1], x[0]));
+  currentEditLayer.setLatLngs(latLngs);
 }
 
 
 function check_coordinates_input_wkt() {
 
-    const wktPatterns = {
-        'Point': /^POINT\s*\(\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(\s+-?\d+(\.\d+)?)?\s*\)$/,
-        'LineString': /^LINESTRING\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)$/,
-        'Polygon': /^POLYGON\s*\(\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)(,\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\))*\s*\)$/,
-        // 'MultiPoint': /^MULTIPOINT\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)$/,
-        // 'MultiLineString': /^MULTILINESTRING\s*\(\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)(,\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\))*\s*\)$/,
-        // 'MultiPolygon': /^MULTIPOLYGON\s*\(\s*\(\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)\s*\)(,\s*\(\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)\s*\))*\s*\)$/
-    };
+  const wktPatterns = {
+    'Point': /^POINT\s*\(\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(\s+-?\d+(\.\d+)?)?\s*\)$/,
+    'LineString': /^LINESTRING\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)$/,
+    'Polygon': /^POLYGON\s*\(\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)(,\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\))*\s*\)$/,
+    // 'MultiPoint': /^MULTIPOINT\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)$/,
+    // 'MultiLineString': /^MULTILINESTRING\s*\(\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)(,\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\))*\s*\)$/,
+    // 'MultiPolygon': /^MULTIPOLYGON\s*\(\s*\(\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)\s*\)(,\s*\(\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)\s*\))*\s*\)$/
+  };
 
-    const isValidWKT = (input) => {
-        for (const patternKey in wktPatterns) {
-            if (wktPatterns.hasOwnProperty(patternKey) && wktPatterns[patternKey].test(input.trim())) {
-              return true;
-            }
-        }
+  const isValidWKT = (input) => {
+    for (const patternKey in wktPatterns) {
+      if (wktPatterns.hasOwnProperty(patternKey) && wktPatterns[patternKey].test(input.trim())) {
+        return true;
+      }
     }
-    const wktString = $('#wktInput').val();
-    if (isValidWKT(wktString)) {
-        drawWKT(wktString);
-    } else {
-        $('#wktInput').addClass('error');
-        return false;
-    }
+  }
+  const wktString = $('#wktInput').val();
+  if (isValidWKT(wktString)) {
+    return true
+  } else {
+    $('#wktInput').addClass('error');
+    return false;
+  }
 }
 
 function drawWKT(wktString) {
-    saveCurrentEditLayer();
+  saveCurrentEditLayer();
 
-    const name = $('#nameField')?.val();
-    const description = $('#descriptionField')?.val();
+  const name = $('#nameField')?.val();
+  const description = $('#descriptionField')?.val();
 
-    const wktPolygon = wellknown.parse(wktString);
-    if (wktPolygon.type === 'Polygon') {
-        const coordinates = wktPolygon.coordinates[0].map(coord => [coord[1], coord[0]]);
-        const geojsonFeature = {
-            type: 'Feature',
-            geometry: {
-                type: 'Polygon',
-                coordinates: [coordinates]
-            },
-            properties: {
-                name: name || '',
-                description: description || '',
-                shapeType: 'area'
-            }
-        };
-    }
+  const wktPolygon = wellknown.parse(wktString);
+  if (wktPolygon.type === 'Polygon') {
+    const coordinates = wktPolygon.coordinates[0].map(coord => [coord[1], coord[0]]);
+    const geojsonFeature = {
+      type: 'Feature',
+      geometry: {
+        type: 'Polygon',
+        coordinates: [coordinates]
+      },
+      properties: {
+        name: name || '',
+        description: description || '',
+        shapeType: 'area'
+      }
+    };
+  }
 
-    console.log(geojsonFeature)
-    currentEditLayer = L.geoJSON(geojsonFeature);
-    console.log(currentEditLayer)
-    currentEditLayer.addTo(map);
-    map.fitBounds(currentEditLayer.getBounds());
+  console.log(geojsonFeature)
+  currentEditLayer = L.geoJSON(geojsonFeature);
+  console.log(currentEditLayer)
+  currentEditLayer.addTo(map);
+  map.fitBounds(currentEditLayer.getBounds());
 
 }
 
 
 map.on('draw:editvertex', function () {
-    const newCoordinates =
-      currentEditLayer.feature.geometry.type === 'Polygon' ?
-        currentEditLayer.getLatLngs()[0].map(x => [x.lng, x.lat]) :
-        currentEditLayer.getLatLngs().map(x => [x.lng, x.lat]);
-    $('#polyInput').val(JSON.stringify(newCoordinates))
-    $("#coordinatesDiv input").removeClass('error');
+  const newCoordinates =
+    currentEditLayer.feature.geometry.type === 'Polygon' ?
+      currentEditLayer.getLatLngs()[0].map(x => [x.lng, x.lat]) :
+      currentEditLayer.getLatLngs().map(x => [x.lng, x.lat]);
+  $('#polyInput').val(JSON.stringify(newCoordinates))
+  $("#coordinatesDiv input").removeClass('error');
 
 });
 
 map.on('draw:editmove', function () {
-    $('#easting').val(currentEditLayer.getLatLng().lng)
-    $('#northing').val(currentEditLayer.getLatLng().lat)
-    $("#coordinatesDiv input").removeClass('error');
+  $('#easting').val(currentEditLayer.getLatLng().lng)
+  $('#northing').val(currentEditLayer.getLatLng().lat)
+  $("#coordinatesDiv input").removeClass('error');
 });
 
 map.on('keyup', (event) => {
-    if (event.originalEvent.key === 'Escape')
-        closeForm();
+  if (event.originalEvent.key === 'Escape')
+    closeForm();
 });
 
 function interactionOn() {
-    // Enable interaction with map e.g. if cursor leaves form
-    if (currentDrawLayer?.type === 'marker')
-        currentDrawLayer.enable();
-    captureCoordinates = true;
-    map.dragging.enable();
-    map.touchZoom.enable();
-    map.doubleClickZoom.enable();
-    map.scrollWheelZoom.enable();
-    map.boxZoom.enable();
-    map.keyboard.enable();
-    if (map.tap) {
-        map.tap.enable();
-    }
+  // Enable interaction with map e.g. if cursor leaves form
+  if (currentDrawLayer?.type === 'marker')
+    currentDrawLayer.enable();
+  captureCoordinates = true;
+  map.dragging.enable();
+  map.touchZoom.enable();
+  map.doubleClickZoom.enable();
+  map.scrollWheelZoom.enable();
+  map.boxZoom.enable();
+  map.keyboard.enable();
+  if (map.tap) {
+    map.tap.enable();
+  }
 }
 
 function interactionOff() {
-    if (currentDrawLayer?.type === 'marker')
-        currentDrawLayer.disable();
-    // Disable interaction with map e.g. if cursor is over a form
-    captureCoordinates = false;
-    map.dragging.disable();
-    map.touchZoom.disable();
-    map.doubleClickZoom.disable();
-    map.scrollWheelZoom.disable();
-    map.boxZoom.disable();
-    map.keyboard.disable();
-    if (map.tap) {
-        map.tap.disable();
-    }
+  if (currentDrawLayer?.type === 'marker')
+    currentDrawLayer.disable();
+  // Disable interaction with map e.g. if cursor is over a form
+  captureCoordinates = false;
+  map.dragging.disable();
+  map.touchZoom.disable();
+  map.doubleClickZoom.disable();
+  map.scrollWheelZoom.disable();
+  map.boxZoom.disable();
+  map.keyboard.disable();
+  if (map.tap) {
+    map.tap.disable();
+  }
 }
