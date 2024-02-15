@@ -529,10 +529,7 @@ function check_coordinates_input_wkt() {
   const wktPatterns = {
     'Point': /^POINT\s*\(\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(\s+-?\d+(\.\d+)?)?\s*\)$/,
     'LineString': /^LINESTRING\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)$/,
-    'Polygon': /^POLYGON\s*\(\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)(,\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\))*\s*\)$/,
-    // 'MultiPoint': /^MULTIPOINT\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)$/,
-    // 'MultiLineString': /^MULTILINESTRING\s*\(\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)(,\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\))*\s*\)$/,
-    // 'MultiPolygon': /^MULTIPOLYGON\s*\(\s*\(\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)\s*\)(,\s*\(\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)\s*\))*\s*\)$/
+    'Polygon': /^POLYGON\s*\(\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)(,\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\))*\s*\)$/
   };
 
   const isValidWKT = (input) => {
@@ -550,38 +547,6 @@ function check_coordinates_input_wkt() {
     return false;
   }
 }
-
-function drawWKT(wktString) {
-  saveCurrentEditLayer();
-
-  const name = $('#nameField')?.val();
-  const description = $('#descriptionField')?.val();
-
-  const wktPolygon = wellknown.parse(wktString);
-  if (wktPolygon.type === 'Polygon') {
-    const coordinates = wktPolygon.coordinates[0].map(coord => [coord[1], coord[0]]);
-    const geojsonFeature = {
-      type: 'Feature',
-      geometry: {
-        type: 'Polygon',
-        coordinates: [coordinates]
-      },
-      properties: {
-        name: name || '',
-        description: description || '',
-        shapeType: 'area'
-      }
-    };
-  }
-
-  console.log(geojsonFeature)
-  currentEditLayer = L.geoJSON(geojsonFeature);
-  console.log(currentEditLayer)
-  currentEditLayer.addTo(map);
-  map.fitBounds(currentEditLayer.getBounds());
-
-}
-
 
 map.on('draw:editvertex', function () {
   const newCoordinates =
