@@ -5,9 +5,74 @@ FAQ
 
 Here you can find answers to some frequently asked questions.
 
-**Why is it not possible to add custom types with a free text entry field
-the same way it is possible with numbers for value types?**
+How to manage multiple projects or case studies
+-----------------------------------------------
 
+Tag: technical
+
+There are two main approaches how to deal with multiple projects or case
+studies.
+
+Multiple instances
+******************
+
+If every project has their own instance (installation) of OpenAtlas than you
+don't have to worry about separating the data later. But it would also mean
+that data can't be used together, at least not directly.
+
+Shared instance
+***************
+
+Projects (or case studies) can use the same instance which can be especially
+useful if they share data, e.g. information about places or persons.
+
+For data separation a custom :doc:`/entity/type` can be created,
+usually called **Case study**, which can be:
+
+* attached to multiple classes (probably most of them)
+* set to **multiple** use so that e.g. a place can be part of multiple case
+  studies
+* set to **required** so that users don't forget to enter it
+
+Later on, e.g. when running analyses or developing a presentation site for one
+case study, this type can be used to separate the data via the
+:doc:`/technical/api`.
+
+How does data access work
+-------------------------
+Tag: design decision
+
+In OpenAtlas it can be chosen if and when to make data public but:
+
+* All registered users have access to all model data
+* Either **all** data is made public via the :doc:`/technical/api` or **none**
+* Presentation sites can filter which data (e.g. which case study) to show
+  via the API
+* Showing images is a special case because it also depends on licenses and the
+  :doc:`/admin/iiif` server
+
+There is no option (or plans to add one) to **hide** parts of the data for
+specific users. Reasons for this is that it would conflict with one of our core
+values (open) but there are also practical reasons, e.g. to avoid duplicates.
+If a strict separation is needed, using multiple OpenAtlas instances would
+likely be a better alternative.
+
+How to enter professions
+------------------------
+Tag: model
+
+A profession is not entered via a type as a lot of other information you
+will put into the database. You can enter a person’s profession by linking
+them to a group.
+This group consists of people with the same profession. Say you want to
+enter our lead developer Alex into the database: create a group named
+‘OpenAtlas’ and connect him to that group in the respective form. Here you
+can also pick the role he has in that group from a list of types. For a more
+detailed tutorial on how to enter professions, have a look
+:doc:`here</examples/profession>`.
+
+Why can't a free text field be added via custom types
+-----------------------------------------------------
 Tag: design decision
 
 A free text entry field would lead to lots of unstructured data.
@@ -28,22 +93,8 @@ We are more than happy to help you find a solution tailored to your
 project’s specific needs, so please don’t hesitate to reach out to us if you
 have any additional questions on this topic.
 
-**How can I enter professions into the OpenAtlas system?**
-
-Tag: model
-
-A profession is not entered via a type as a lot of other information you
-will put into the database. You can enter a person’s profession by linking
-them to a group.
-This group consists of people with the same profession. Say you want to
-enter our lead developer Alex into the database: create a group named
-‘OpenAtlas’ and connect him to that group in the respective form. Here you
-can also pick the role he has in that group from a list of types. For a more
-detailed tutorial on how to enter professions, have a look
-:doc:`here</examples/profession>`.
-
-**Why can't longer texts be formatted?**
-
+Why can't longer texts be formatted
+-----------------------------------
 Tag: design decision
 
 For formatting longer texts, e.g. entity descriptions, only linebreaks can

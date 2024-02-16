@@ -798,7 +798,7 @@
           "Administrative Endpoints"
         ],
         "description": "Retrieves all OpenAtlas classes with their English label, CIDOC CRM mapping, view, icon and standard type ID.",
-        "operationId": "ClassMapping",
+        "operationId": "Classes",
         "responses": {
           "200": {
             "description": "Success",
@@ -806,6 +806,38 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ClassesModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
+    "/class_mapping/": {
+      "get": {
+        "tags": [
+          "Proposal"
+        ],
+        "description": "Retrieves all OpenAtlas classes with their label, CIDOC CRM mapping, view, icon and standard type ID. Label language is English by default but can be changed by `locale` parameter",
+        "operationId": "ClassMapping",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/locale"
+          },
+          {
+            "$ref": "#/components/parameters/download"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClassMappingModel"
                 }
               }
             }
@@ -1223,16 +1255,20 @@
           "type": "boolean"
         }
       },
-      "lang": {
-        "name": "lang",
+      "locale": {
+        "name": "locale",
         "description": "Choose language",
         "in": "query",
         "schema": {
           "type": "string",
           "enum": [
+            "ca",
+            "de",
             "en",
-            "de"
+            "es",
+            "fr"
           ],
+          "default": "en",
           "example": "de"
         }
       },
@@ -2526,6 +2562,37 @@
             },
             "en": {
               "type": "string"
+            }
+          }
+        }
+      },
+      "ClassMappingModel": {
+        "type": "object",
+        "properties": {
+          "locale": {
+            "type": "string"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string"
+                },
+                "systemClass": {
+                  "type": "string"
+                },
+                "crmClass": {
+                  "type": "string"
+                },
+                "view": {
+                  "type": "string"
+                },
+                "icon": {
+                  "type": "string"
+                }
+              }
             }
           }
         }

@@ -1,7 +1,7 @@
 from flask_restful import Api
 
 from openatlas.api.endpoints.content import (
-    ClassMapping, GetBackendDetails, SystemClassCount)
+    ClassMapping, Classes, GetBackendDetails, SystemClassCount)
 from openatlas.api.endpoints.display_image import (
     DisplayImage, LicensedFileOverview)
 from openatlas.api.endpoints.entities import (
@@ -62,8 +62,12 @@ def admin_routes(api: Api) -> None:
         '/backend_details/',
         endpoint="backend_details")
     api.add_resource(
-        ClassMapping,
+        Classes,
         '/classes/',
+        endpoint='classes')
+    api.add_resource(
+        ClassMapping,
+        '/class_mapping/',
         endpoint='class_mapping')
     api.add_resource(
         LicensedFileOverview,

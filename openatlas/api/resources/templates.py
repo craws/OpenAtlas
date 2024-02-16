@@ -299,6 +299,19 @@ def class_overview_template() -> dict[str, Type[String]]:
         'en': fields.String}
 
 
+def class_mapping_template() -> dict[str, Type[String]]:
+    classes = {
+        'label': fields.String,
+        'systemClass': fields.String,
+        'crmClass': fields.String,
+        'view': fields.String,
+        'standardTypeId': fields.String,
+        'icon': fields.String}
+    return {
+        "locale": fields.String,
+        'results': fields.List(fields.Nested(classes))}
+
+
 def backend_details_template() -> dict[str, Type[String]]:
     image_processing = {
         'enabled': fields.String,

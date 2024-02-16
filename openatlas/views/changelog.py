@@ -19,7 +19,8 @@ versions = {
         'feature': {
             '1542': 'OpenAtlas on Kubernetes',
             '2089': 'IIIF: Displaying images from an entity',
-            '2166': 'IIIF: Include linked entities in annotation manifest'
+            '2166': 'IIIF: Include linked entities in annotation manifest',
+            '2187': 'Manual: FAQs about multiple projects and data access'
         }
     }],
     '8.1.1': ['2024-02-02', {

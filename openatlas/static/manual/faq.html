@@ -5,7 +5,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FAQ &mdash; OpenAtlas 8.1.0 documentation</title>
+  <title>FAQ &mdash; OpenAtlas 8.2.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/style.css" type="text/css" />
@@ -34,7 +34,7 @@
               <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                8.1.0
+                8.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -63,7 +63,12 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="troubleshooting/index.html">Troubleshooting</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">FAQ</a><ul class="simple">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">FAQ</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-manage-multiple-projects-or-case-studies">How to manage multiple projects or case studies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-does-data-access-work">How does data access work</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-enter-professions">How to enter professions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#why-can-t-a-free-text-field-be-added-via-custom-types">Why can’t a free text field be added via custom types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#why-can-t-longer-texts-be-formatted">Why can’t longer texts be formatted</a></li>
 </ul>
 </li>
 </ul>
@@ -96,8 +101,67 @@
 <div class="toctree-wrapper compound">
 </div>
 <p>Here you can find answers to some frequently asked questions.</p>
-<p><strong>Why is it not possible to add custom types with a free text entry field
-the same way it is possible with numbers for value types?</strong></p>
+<section id="how-to-manage-multiple-projects-or-case-studies">
+<h2>How to manage multiple projects or case studies<a class="headerlink" href="#how-to-manage-multiple-projects-or-case-studies" title="Permalink to this heading"></a></h2>
+<p>Tag: technical</p>
+<p>There are two main approaches how to deal with multiple projects or case
+studies.</p>
+<section id="multiple-instances">
+<h3>Multiple instances<a class="headerlink" href="#multiple-instances" title="Permalink to this heading"></a></h3>
+<p>If every project has their own instance (installation) of OpenAtlas than you
+don’t have to worry about separating the data later. But it would also mean
+that data can’t be used together, at least not directly.</p>
+</section>
+<section id="shared-instance">
+<h3>Shared instance<a class="headerlink" href="#shared-instance" title="Permalink to this heading"></a></h3>
+<p>Projects (or case studies) can use the same instance which can be especially
+useful if they share data, e.g. information about places or persons.</p>
+<p>For data separation a custom <a class="reference internal" href="entity/type.html"><span class="doc">Type</span></a> can be created,
+usually called <strong>Case study</strong>, which can be:</p>
+<ul class="simple">
+<li><p>attached to multiple classes (probably most of them)</p></li>
+<li><p>set to <strong>multiple</strong> use so that e.g. a place can be part of multiple case
+studies</p></li>
+<li><p>set to <strong>required</strong> so that users don’t forget to enter it</p></li>
+</ul>
+<p>Later on, e.g. when running analyses or developing a presentation site for one
+case study, this type can be used to separate the data via the
+<a class="reference internal" href="technical/api.html"><span class="doc">API</span></a>.</p>
+</section>
+</section>
+<section id="how-does-data-access-work">
+<h2>How does data access work<a class="headerlink" href="#how-does-data-access-work" title="Permalink to this heading"></a></h2>
+<p>Tag: design decision</p>
+<p>In OpenAtlas it can be chosen if and when to make data public but:</p>
+<ul class="simple">
+<li><p>All registered users have access to all model data</p></li>
+<li><p>Either <strong>all</strong> data is made public via the <a class="reference internal" href="technical/api.html"><span class="doc">API</span></a> or <strong>none</strong></p></li>
+<li><p>Presentation sites can filter which data (e.g. which case study) to show
+via the API</p></li>
+<li><p>Showing images is a special case because it also depends on licenses and the
+<a class="reference internal" href="admin/iiif.html"><span class="doc">IIIF</span></a> server</p></li>
+</ul>
+<p>There is no option (or plans to add one) to <strong>hide</strong> parts of the data for
+specific users. Reasons for this is that it would conflict with one of our core
+values (open) but there are also practical reasons, e.g. to avoid duplicates.
+If a strict separation is needed, using multiple OpenAtlas instances would
+likely be a better alternative.</p>
+</section>
+<section id="how-to-enter-professions">
+<h2>How to enter professions<a class="headerlink" href="#how-to-enter-professions" title="Permalink to this heading"></a></h2>
+<p>Tag: model</p>
+<p>A profession is not entered via a type as a lot of other information you
+will put into the database. You can enter a person’s profession by linking
+them to a group.
+This group consists of people with the same profession. Say you want to
+enter our lead developer Alex into the database: create a group named
+‘OpenAtlas’ and connect him to that group in the respective form. Here you
+can also pick the role he has in that group from a list of types. For a more
+detailed tutorial on how to enter professions, have a look
+<a class="reference internal" href="examples/profession.html"><span class="doc">here</span></a>.</p>
+</section>
+<section id="why-can-t-a-free-text-field-be-added-via-custom-types">
+<h2>Why can’t a free text field be added via custom types<a class="headerlink" href="#why-can-t-a-free-text-field-be-added-via-custom-types" title="Permalink to this heading"></a></h2>
 <p>Tag: design decision</p>
 <p>A free text entry field would lead to lots of unstructured data.
 Unstructured data can not be processed automatically and would result in it
@@ -116,18 +180,9 @@ create new types, click <a class="reference internal" href="examples/types.html"
 <p>We are more than happy to help you find a solution tailored to your
 project’s specific needs, so please don’t hesitate to reach out to us if you
 have any additional questions on this topic.</p>
-<p><strong>How can I enter professions into the OpenAtlas system?</strong></p>
-<p>Tag: model</p>
-<p>A profession is not entered via a type as a lot of other information you
-will put into the database. You can enter a person’s profession by linking
-them to a group.
-This group consists of people with the same profession. Say you want to
-enter our lead developer Alex into the database: create a group named
-‘OpenAtlas’ and connect him to that group in the respective form. Here you
-can also pick the role he has in that group from a list of types. For a more
-detailed tutorial on how to enter professions, have a look
-<a class="reference internal" href="examples/profession.html"><span class="doc">here</span></a>.</p>
-<p><strong>Why can’t longer texts be formatted?</strong></p>
+</section>
+<section id="why-can-t-longer-texts-be-formatted">
+<h2>Why can’t longer texts be formatted<a class="headerlink" href="#why-can-t-longer-texts-be-formatted" title="Permalink to this heading"></a></h2>
 <p>Tag: design decision</p>
 <p>For formatting longer texts, e.g. entity descriptions, only linebreaks can
 be used. The main reason for not implementing formatting systems like HTML or
@@ -140,6 +195,7 @@ possible.</p>
 <p>Of course the situation is different for e.g. presentation sites for OpenAtlas
 data. There it would be possible to e.g. add manual formatted texts where
 needed.</p>
+</section>
 </section>
 
 
@@ -159,7 +215,7 @@ needed.</p>
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
   
-        <p>CC-BY 4.0, Alexander Watzinger and the OpenAtlas team</p>
+        <p>CC BY 4.0, Alexander Watzinger and the OpenAtlas team</p>
         <script type="text/javascript">
             <!-- Adds target=_blank to external links -->
             $(document).ready(function () {
