@@ -138,12 +138,36 @@ function checkAndToggleDrawButton() {
   const chooseShapeDiv = document.getElementById('chooseShape');
   const drawButton = document.getElementById('drawButton');
 
-  if (input.startsWith('POLYGON') && check_coordinates_input_wkt()) {
-    chooseShapeDiv.style.display = 'block';
+  if (check_coordinates_input_wkt()) {
+    if (input.startsWith('POLYGON')) {
+      chooseShapeDiv.style.display = 'block';
+    }
     drawButton.disabled = false;
   } else {
     chooseShapeDiv.style.display = 'none';
     drawButton.disabled = true;
+  }
+}
+
+function check_coordinates_input_wkt() {
+  const wktPatterns = {
+    'Point': /^POINT\s*\(\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(\s+-?\d+(\.\d+)?)?\s*\)$/,
+    'LineString': /^LINESTRING\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)$/,
+    'Polygon': /^POLYGON\s*\(\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)(,\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\))*\s*\)$/
+  };
+  const isValidWKT = (input) => {
+    for (const patternKey in wktPatterns) {
+      if (wktPatterns.hasOwnProperty(patternKey) && wktPatterns[patternKey].test(input.trim())) {
+        return true;
+      }
+    }
+  }
+  const wktString = $('#wktInput').val();
+  if (isValidWKT(wktString)) {
+    return true
+  } else {
+    $('#wktInput').addClass('error');
+    return false;
   }
 }
 
@@ -324,7 +348,7 @@ function closeForm(withoutSave = true) {
 function closeWktForm(save = false) {
   if (save) {
     saveCurrentEditLayer();
-    const wktGeometry = wellknown.parse($('#wktInput').val());
+    const wktGeometry = wellknown.parse($('#wktInput').val().trim());
     const geom = {
       type: "Feature",
       geometry: wktGeometry,
@@ -334,7 +358,6 @@ function closeWktForm(save = false) {
         shapeType: ''
       }
     };
-
     switch (wktGeometry.type.toLowerCase()) {
       case 'point':
         geom.properties.shapeType = "centerpoint";
@@ -347,14 +370,13 @@ function closeWktForm(save = false) {
       case 'linestring':
         geom.properties.shapeType = "polyline";
         openForm("polyline", geom);
-        currentEditLayer = L.polyline(wktGeometry.coordinates, {
+        currentEditLayer = L.polyline(reverseLineCoordinates(wktGeometry.coordinates), {
           draggable: true,
           icon: editIcon
         }).addTo(map);
         break;
       case 'polygon':
         let radioShapeType = $("input:radio[name=wktType]:checked").val();
-        console.log(radioShapeType)
         geom.properties.shapeType = radioShapeType;
         openForm(radioShapeType, geom);
         currentEditLayer = L.polygon(wktGeometry.coordinates, {
@@ -370,7 +392,9 @@ function closeWktForm(save = false) {
   $('.leaflet-right .leaflet-bar').show();
 }
 
-
+function reverseLineCoordinates(coordinates) {
+  return coordinates.map(coord => coord.slice().reverse());
+}
 
 function saveCurrentEditLayer() {
   const name = $('#nameField').val();
@@ -542,31 +566,6 @@ function check_coordinates_input_polygon() {
 
   const latLngs = points.map(x => new L.LatLng(x[1], x[0]));
   currentEditLayer.setLatLngs(latLngs);
-}
-
-
-function check_coordinates_input_wkt() {
-
-  const wktPatterns = {
-    'Point': /^POINT\s*\(\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(\s+-?\d+(\.\d+)?)?\s*\)$/,
-    'LineString': /^LINESTRING\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)$/,
-    'Polygon': /^POLYGON\s*\(\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\)(,\s*\(\s*(-?\d+(\.\d+)?\s+-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?)*)\s*\))*\s*\)$/
-  };
-
-  const isValidWKT = (input) => {
-    for (const patternKey in wktPatterns) {
-      if (wktPatterns.hasOwnProperty(patternKey) && wktPatterns[patternKey].test(input.trim())) {
-        return true;
-      }
-    }
-  }
-  const wktString = $('#wktInput').val();
-  if (isValidWKT(wktString)) {
-    return true
-  } else {
-    $('#wktInput').addClass('error');
-    return false;
-  }
 }
 
 map.on('draw:editvertex', function () {
