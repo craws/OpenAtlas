@@ -29,13 +29,23 @@ class Api(ApiTestCase):
         return bool(geom['features'][0]['properties'][key])
 
     @staticmethod
-    def get_class_mapping(data: list[dict[str, Any]]) -> bool:
+    def get_classes(data: list[dict[str, Any]]) -> bool:
         return bool(
             data[0]['systemClass']
             and data[0]['crmClass']
             and data[0]['view']
             and data[0]['icon']
             and data[0]['en'])
+
+    @staticmethod
+    def get_class_mapping(data: dict[str, Any], locale: str) -> bool:
+        return bool(
+            data['locale'] == locale
+            and data['results'][0]['systemClass']
+            and data['results'][0]['crmClass']
+            and data['results'][0]['view']
+            and data['results'][0]['icon']
+            and data['results'][0]['label'])
 
     def test_api(self) -> None:
 
@@ -75,8 +85,16 @@ class Api(ApiTestCase):
                         file_without_file = entity
 
             # ---Content Endpoints---
-            rv: Any = self.app.get(url_for('api_04.class_mapping')).get_json()
-            assert self.get_class_mapping(rv)
+            rv: Any = self.app.get(url_for('api_04.classes')).get_json()
+            assert self.get_classes(rv)
+
+            rv = self.app.get(
+                url_for('api_04.class_mapping', locale='de')).get_json()
+            assert self.get_class_mapping(rv, 'de')
+
+            rv = self.app.get(url_for(
+                'api_04.class_mapping', locale='ca', download=True)).get_json()
+            assert self.get_class_mapping(rv, 'ca')
 
             rv = self.app.get(url_for('api_04.backend_details')).get_json()
             assert bool(rv['version'] == app.config['VERSION'])
