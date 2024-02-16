@@ -319,7 +319,7 @@ function drawGeometry(shapeType) {
 
 function importWKT() {
   map.addControl(wktInputForm);
-  $('.leaflet-left .leaflet-bar').hide();
+  $('.leaflet-right .leaflet-bar').hide(); // Since it appears right, hide the right bar
   $('.wktInput').show();
 }
 
@@ -378,8 +378,9 @@ function closeWktForm(save = false) {
       case 'linestring':
         geom.properties.shapeType = "polyline";
         openForm("polyline", geom);
+
+        console.log(wktGeometry.coordinates)
         currentEditLayer = L.polyline(reverseLineCoordinates(wktGeometry.coordinates), {
-          draggable: true,
           icon: editIcon
         }).addTo(map);
         break;
@@ -387,14 +388,15 @@ function closeWktForm(save = false) {
         let radioShapeType = $("input:radio[name=wktType]:checked").val();
         geom.properties.shapeType = radioShapeType;
         openForm(radioShapeType, geom);
-        currentEditLayer = L.polygon(wktGeometry.coordinates, {
-          draggable: true,
-          icon: editIcon
+        console.log(wktGeometry.coordinates)
+        currentEditLayer = L.polygon(reverseLineCoordinates(wktGeometry.coordinates[0]), {
+          icon: editIcon,
         }).addTo(map);
         break;
     }
     currentEditLayer.feature = geom;
-    setPopup(true)(currentEditLayer.feature, currentEditLayer);
+    // Don't know if this is important. Copied it from other code
+    // setPopup(true)(currentEditLayer.feature, currentEditLayer);
   }
   wktInputForm.remove(map);
   $('.leaflet-right .leaflet-bar').show();
