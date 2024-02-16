@@ -7,10 +7,35 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
+from openatlas.display.tab import Tab
 from openatlas.display.util import (
-    check_iiif_file_exist, convert_image_to_iiif, required_group)
+    button, check_iiif_file_exist, convert_image_to_iiif, required_group)
+from openatlas.display.util2 import is_authorized, manual
 from openatlas.forms.form import get_table_form
+from openatlas.forms.setting import FilesForm
+from openatlas.forms.util import get_form_settings
 from openatlas.models.entity import Entity
+from openatlas.views.admin import get_disk_space_info
+
+
+@app.route('/file')
+@required_group('readonly')
+def file_index() -> str:
+    tabs = {
+        'files': Tab(
+            _('files'),
+            render_template(
+                'file.html',
+                info=get_form_settings(FilesForm()),
+                disk_space_info=get_disk_space_info()),
+            buttons=[
+                manual('entity/file'),
+                button(_('edit'), url_for('settings', category='files'))
+                if is_authorized('manager') else '',
+                button(_('list'), url_for('index', view='file')),
+                button(_('file'), url_for('insert', class_='file'))
+                if is_authorized('contributor') else ''])}
+    return render_template('tabs.html', tabs=tabs, crums=[_('file')])
 
 
 @app.route('/download/<path:filename>')
@@ -88,12 +113,10 @@ def view_iiif(id_: int) -> str:
     if entity.class_.view == 'file' and check_iiif_file_exist(id_):
         manifests.append(get_manifest_url(id_))
     else:
-        for file in entity.get_linked_entities('P67', True):
-            if file.class_.view == 'file' and check_iiif_file_exist(file.id):
-                manifests.append(get_manifest_url(file.id))
-    return render_template(
-        'iiif.html',
-        manifests=manifests)
+        for file_ in entity.get_linked_entities('P67', True):
+            if file_.class_.view == 'file' and check_iiif_file_exist(file_.id):
+                manifests.append(get_manifest_url(file_.id))
+    return render_template('iiif.html', manifests=manifests)
 
 
 def get_manifest_url(id_: int) -> str:

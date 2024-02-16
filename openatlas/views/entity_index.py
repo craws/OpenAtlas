@@ -32,7 +32,7 @@ def index(view: str) -> str | Response:
         buttons=buttons,
         gis_data=Gis.get_all() if view == 'place' else None,
         title=_(view.replace('_', ' ')),
-        crumbs=[[_('admin'), url_for('admin_index')], _('file')]
+        crumbs=[[_('file'), url_for('file_index')], _('files')]
         if view == 'file' else [_(view).replace('_', ' ')])
 
 

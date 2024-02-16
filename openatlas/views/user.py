@@ -134,11 +134,12 @@ def user_view(id_: int) -> str:
     user = User.get_by_id(id_)
     if not user:
         abort(404)
-    entities_count = ''
+    created_count = ''
     if count := User.get_created_entities_count(user.id):
-        entities_count = \
-            f'<a href="{url_for("user_entities", id_=user.id)}">' \
-            f'{format_number(count)}</a>'
+        created_count = link(
+            format_number(count),
+            url_for("user_entities", id_=user.id),
+            uc_first_=False)
     info = {
         _('username'): user.username,
         _('group'): user.group,
@@ -146,7 +147,7 @@ def user_view(id_: int) -> str:
         _('email'):
             user.email
             if is_authorized('manager') or user.settings['show_email'] else '',
-        _('created entities'): entities_count,
+        _('created entities'): created_count,
         _('language'): user.settings['language'],
         _('last login'): format_date(user.login_last_success),
         _('failed logins'):

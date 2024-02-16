@@ -34,8 +34,8 @@ from openatlas.display.util2 import (
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
 from openatlas.forms.setting import (
-    ApiForm, ContentForm, FilesForm, FrontendForm, GeneralForm, IiifForm,
-    LogForm, MailForm, MapForm, ModulesForm, SimilarForm, TestMailForm)
+    ApiForm, ContentForm, FrontendForm, GeneralForm, IiifForm, LogForm,
+    MailForm, MapForm, ModulesForm, SimilarForm, TestMailForm)
 from openatlas.forms.util import get_form_settings, set_form_settings
 from openatlas.models.content import get_content, update_content
 from openatlas.models.entity import Entity
@@ -51,19 +51,6 @@ from openatlas.models.user import User
 def admin_index() -> str:
     users = User.get_all()
     tabs = {
-        'files': Tab(
-            _('files'),
-            render_template(
-                'admin/file.html',
-                info=get_form_settings(FilesForm()),
-                disk_space_info=get_disk_space_info()),
-            buttons=[
-                manual('entity/file'),
-                button(_('edit'), url_for('settings', category='files'))
-                if is_authorized('manager') else '',
-                button(_('list'), url_for('index', view='file')),
-                button(_('file'), url_for('insert', class_='file'))
-                if is_authorized('contributor') else '']),
         'user': Tab(
             _('user'),
             table=get_user_table(users),
@@ -207,7 +194,7 @@ def get_user_table(users: list[User]) -> Table:
 @required_group('manager')
 def logo_remove() -> Response:
     Settings.set_logo()
-    return redirect(f"{url_for('admin_index')}#tab-file")
+    return redirect(url_for('file_index'))
 
 
 @app.route('/admin/content/<string:item>', methods=['GET', 'POST'])
@@ -308,9 +295,7 @@ def check_link_duplicates(delete: Optional[str] = None) -> str | Response:
                     'delete_single_type_duplicate',
                     entity_id=row['entity'].id,
                     type_id=type_.id)
-                remove_links.append(
-                    f'<a href="{url}" class="uc-first">' + _("remove") + '</a>'
-                    f' {type_.name}')
+                remove_links.append(f"{link(_('remove'), url)} {type_.name}")
             tab.table.rows.append([
                 link(row['entity']),
                 row['entity'].class_.label,
@@ -377,8 +362,9 @@ def settings(category: str) -> str | Response:
         content=display_form(form, manual_page=f"admin/{category}"),
         title=_('admin'),
         crumbs=[
+            [_('file'), url_for('file_index')] if category == 'files' else
             [_('admin'), f"{url_for('admin_index')}#tab-{tab}"],
-            _(category)])
+            _('settings') if category == 'files' else _(category)])
 
 
 @app.route('/check_similar', methods=['GET', 'POST'])
@@ -651,7 +637,7 @@ def admin_logo(id_: Optional[int] = None) -> str | Response:
         abort(418)  # pragma: no cover - logo already set
     if id_:
         Settings.set_logo(id_)
-        return redirect(f"{url_for('admin_index')}#tab-file")
+        return redirect(url_for('file_index'))
     table = Table([''] + g.table_headers['file'] + ['date'])
     for entity in Entity.get_display_files():
         date = 'N/A'
@@ -671,10 +657,7 @@ def admin_logo(id_: Optional[int] = None) -> str | Response:
         'tabs.html',
         tabs={'logo': Tab('files', table=table)},
         title=_('logo'),
-        crumbs=[[
-            _('admin'),
-            f"{url_for('admin_index')}#tab-files"],
-            _('logo')])
+        crumbs=[[_('file'), url_for('file_index')], _('logo')])
 
 
 @app.route('/log', methods=['GET', 'POST'])

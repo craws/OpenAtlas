@@ -197,7 +197,7 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
     html = ''
     for item in [
             'source', 'event', 'actor', 'place', 'artifact', 'reference',
-            'type']:
+            'type', 'file']:
         active = ''
         request_parts = request.path.split('/')
         if view_name == item \
@@ -209,16 +209,11 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
             if name in g.class_view_mapping \
                     and g.class_view_mapping[name] == item:
                 active = 'active'
-        if item == 'type':
-            html += \
-                f'<a href="{url_for("type_index")}" ' \
-                f'class="nav-item nav-link fw-bold uc-first {active}">' + \
-                _('types') + '</a>'
-        else:
-            html += \
-                f'<a href="{url_for("index", view=item)}" ' \
-                f'class="nav-item nav-link fw-bold uc-first {active}">' + \
-                _(item) + '</a>'
+        html += link(
+            _(item),
+            url_for(f'{item}_index') if item in ['file', 'type']
+            else url_for("index", view=item),
+            f'nav-item nav-link fw-bold uc-first {active}')
     return html
 
 
@@ -458,13 +453,13 @@ def link(
         external: bool = False) -> str:
     html = ''
     if isinstance(object_, (str, LazyString)):
-        js = f'onclick="{uc_first(js)}"' if js else ''
-        uc_first_class = 'uc-first' if uc_first_ and not \
-            str(object_).startswith('http') else ''
-        ext = 'target="_blank" rel="noopener noreferrer"' if external else ''
-        html = \
-            f'<a href="{url}" class="{class_} {uc_first_class}" {js} ' \
-            f'{ext}>{object_}</a>'
+        js = f' onclick="{uc_first(js)}"' if js else ''
+        ext = ' target="_blank" rel="noopener noreferrer"' if external else ''
+        class_ = str(class_)  # Just to make Mypy happy
+        if uc_first_ and not str(object_).startswith('http'):
+            class_ += ' uc-first'
+        class_ = f' class="{class_.strip()}"' if class_.strip() else ''
+        html = f'<a href="{url}"{class_}{js}{ext}>{object_}</a>'
     elif isinstance(object_, Entity):
         html = link(
             object_.name,
