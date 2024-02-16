@@ -38,9 +38,9 @@ class Api(ApiTestCase):
             and data[0]['en'])
 
     @staticmethod
-    def get_class_mapping(data: dict[str, Any]) -> bool:
+    def get_class_mapping(data: dict[str, Any], locale: str) -> bool:
         return bool(
-            data['locale']
+            data['locale'] == locale
             and data['results'][0]['systemClass']
             and data['results'][0]['crmClass']
             and data['results'][0]['view']
@@ -88,8 +88,13 @@ class Api(ApiTestCase):
             rv: Any = self.app.get(url_for('api_04.classes')).get_json()
             assert self.get_classes(rv)
 
-            rv: Any = self.app.get(url_for('api_04.class_mapping')).get_json()
-            assert self.get_class_mapping(rv)
+            rv = self.app.get(
+                url_for('api_04.class_mapping', locale='de')).get_json()
+            assert self.get_class_mapping(rv, 'de')
+
+            rv = self.app.get(url_for(
+                'api_04.class_mapping', locale='ca', download=True)).get_json()
+            assert self.get_class_mapping(rv, 'ca')
 
             rv = self.app.get(url_for('api_04.backend_details')).get_json()
             assert bool(rv['version'] == app.config['VERSION'])

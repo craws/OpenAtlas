@@ -51,7 +51,6 @@ class ClassMapping(Resource):
     @staticmethod
     def get() -> tuple[Resource, int] | Response:
         parser = locale.parse_args()
-        session['language'] = parser['locale']
         results = {
             "locale": session['language'],
             "results": [{

@@ -823,6 +823,14 @@
         ],
         "description": "Retrieves all OpenAtlas classes with their label, CIDOC CRM mapping, view, icon and standard type ID. Label language is English by default but can be changed by `locale` parameter",
         "operationId": "ClassMapping",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/locale"
+          },
+          {
+            "$ref": "#/components/parameters/download"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -1247,16 +1255,20 @@
           "type": "boolean"
         }
       },
-      "lang": {
-        "name": "lang",
+      "locale": {
+        "name": "locale",
         "description": "Choose language",
         "in": "query",
         "schema": {
           "type": "string",
           "enum": [
+            "ca",
+            "de",
             "en",
-            "de"
+            "es",
+            "fr"
           ],
+          "default": "en",
           "example": "de"
         }
       },

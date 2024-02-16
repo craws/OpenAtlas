@@ -31,6 +31,9 @@ from openatlas.views import (
 
 @babel.localeselector
 def get_locale() -> str:
+    if (request.path.startswith('/api/')
+            and request.args.get('locale') in app.config['LANGUAGES']):
+        return str(request.args.get('locale'))
     if 'language' in session:
         return session['language']
     best_match = request.accept_languages.best_match(app.config['LANGUAGES'])
