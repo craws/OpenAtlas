@@ -105,27 +105,46 @@ let wktInputForm = L.control();
 wktInputForm.onAdd = () => {
   let div = L.DomUtil.create('div');
   div.innerHTML = `
-    <div class="mapFormDiv" onmouseover="interactionOff()"
-      onmouseout="interactionOn()">
-            <span id="closeButton" title="${translate["map_info_close"]}"
-              onclick="closeWktForm()" class="fad">X</span>
-            <p id="inputFormInfo"></p>
-            <div class="wktInput">
-                <label for='wktInput'>${translate["map_info_wkt"]}</label>
-                <input type="text" oninput="checkAndToggleDrawButton()" class="${style.stringField}"
-                  id="wktInput"  placeholder="POLYGON ((lat1 lon1, lat2 lon2, ...))">
-            </div>
-            <button id="drawButton" title="${translate["map_wkt_draw"]}"
-              onclick="closeWktForm(true)" class="fad" disabled>Draw</button>
-        </div>
-        </div>
-    `;
+    <div class="mapFormDiv" onmouseover="interactionOff()" onmouseout="interactionOn()">
+      <span id="closeButton" title="${translate["map_info_close"]}" onclick="closeWktForm()" class="fad">X</span>
+      <p id="inputFormInfo"></p>
+      <div class="wktInput">
+        <label for='wktInput'>${translate["map_info_wkt"]}</label>
+        <input type="text" oninput="checkAndToggleDrawButton()" class="${style.stringField}" id="wktInput"  placeholder="POLYGON ((lat1 lon1, lat2 lon2, ...))">
+        <div id="chooseShape" style="display: none;">
+          <label>Polygon:</label>
+          <div class="form-check">
+           <input class="form-check-input" type="radio" name="wktType" value="shape" id="shape" style="width: 10px; height: 10px;" checked="checked">
+            <label class="form-check-label" for="shape">
+              Shape
+            </label>
+          </div>
+          <div class="form-check">
+           <input class="form-check-input" type="radio" name="wktType" value="area" style="width: 10px; height: 10px;" id="area">
+            <label class="form-check-label" for="area">
+              Area
+            </label>
+          </div>
+        </div>    
+      </div>
+      <button id="drawButton" title="${translate["map_wkt_draw"]}" onclick="closeWktForm(true)" class="fad" disabled>Draw</button>
+    </div>
+  `;
   return div;
 }
 
 function checkAndToggleDrawButton() {
+  const input = document.getElementById('wktInput').value.trim();
+  const chooseShapeDiv = document.getElementById('chooseShape');
   const drawButton = document.getElementById('drawButton');
-  drawButton.disabled = !check_coordinates_input_wkt();
+
+  if (input.startsWith('POLYGON') && check_coordinates_input_wkt()) {
+    chooseShapeDiv.style.display = 'block';
+    drawButton.disabled = false;
+  } else {
+    chooseShapeDiv.style.display = 'none';
+    drawButton.disabled = true;
+  }
 }
 
 map.on(L.Draw.Event.CREATED, function (e) {
@@ -334,8 +353,10 @@ function closeWktForm(save = false) {
         }).addTo(map);
         break;
       case 'polygon':
-        geom.properties.shapeType = "shape";
-        openForm("shape", geom);
+        let radioShapeType = $("input:radio[name=wktType]:checked").val();
+        console.log(radioShapeType)
+        geom.properties.shapeType = radioShapeType;
+        openForm(radioShapeType, geom);
         currentEditLayer = L.polygon(wktGeometry.coordinates, {
           draggable: true,
           icon: editIcon

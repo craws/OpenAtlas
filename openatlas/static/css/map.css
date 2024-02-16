@@ -37,7 +37,6 @@ a.manual svg.svg-inline--fa {
     position: relative;
     display: flex;
     flex-direction: column;
-
 }
 
 .mapFormDiv input {
@@ -84,3 +83,9 @@ a.manual svg.svg-inline--fa {
 .leaflet-shadow-pane {
     z-index: 400 !important;
 }
+
+.form-check {
+    display: inline-block;
+    margin-left: 1em;
+}
+
