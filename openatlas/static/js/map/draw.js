@@ -105,29 +105,37 @@ let wktInputForm = L.control();
 wktInputForm.onAdd = () => {
   let div = L.DomUtil.create('div');
   div.innerHTML = `
-    <div class="mapFormDiv" onmouseover="interactionOff()" onmouseout="interactionOn()">
-      <span id="closeButton" title="${translate["map_info_close"]}" onclick="closeWktForm()" class="fad">X</span>
+    <div class="mapFormDiv" 
+    onmouseover="interactionOff()" onmouseout="interactionOn()">
+      <span id="closeButton" title="${translate["map_info_close"]}" 
+      onclick="closeWktForm()" class="fad">X</span>
       <p id="inputFormInfo"></p>
       <div class="wktInput">
         <label for='wktInput'>${translate["map_info_wkt"]}</label>
-        <input type="text" oninput="checkAndToggleDrawButton()" class="${style.stringField}" id="wktInput"  placeholder="POLYGON ((lat1 lon1, lat2 lon2, ...))">
+        <input type="text" oninput="checkAndToggleDrawButton()" 
+        class="${style.stringField}" id="wktInput"  
+        placeholder="POLYGON((lat1 lon1, lat2 lon2, ...))">
         <div id="chooseShape" style="display: none;">
-          <label>Polygon:</label>
+          <label>${translate["polygon"]}:</label>
           <div class="form-check">
-           <input class="form-check-input" type="radio" name="wktType" value="shape" id="shape" style="width: 10px; height: 10px;" checked="checked">
+           <input class="form-check-input" type="radio" name="wktType" 
+           value="shape" id="shape" style="width: 10px; height: 10px;" 
+           checked="checked">
             <label class="form-check-label" for="shape">
               Shape
             </label>
           </div>
           <div class="form-check">
-           <input class="form-check-input" type="radio" name="wktType" value="area" style="width: 10px; height: 10px;" id="area">
+           <input class="form-check-input" type="radio" name="wktType" 
+           value="area" style="width: 10px; height: 10px;" id="area">
             <label class="form-check-label" for="area">
               Area
             </label>
           </div>
         </div>    
       </div>
-      <button id="drawButton" title="${translate["map_wkt_draw"]}" onclick="closeWktForm(true)" class="fad" disabled>Draw</button>
+      <button id="drawButton" title="${translate["draw_geometry"]}" 
+      onclick="closeWktForm(true)" class="fad" disabled>${translate["draw_geometry"]}</button>
     </div>
   `;
   return div;
@@ -311,7 +319,7 @@ function drawGeometry(shapeType) {
 
 function importWKT() {
   map.addControl(wktInputForm);
-  $('.leaflet-right .leaflet-bar').hide();
+  $('.leaflet-left .leaflet-bar').hide();
   $('.wktInput').show();
 }
 
@@ -498,7 +506,6 @@ function importNewPoint(geo, popup, map) {
       }
     };
 
-  console.log(point)
   openForm("centerpoint", point);
   currentEditLayer = L.marker([geo.lat, geo.lng], {
     draggable: true,
