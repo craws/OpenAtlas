@@ -92,7 +92,6 @@ def before_request() -> None:
     if g.settings['iiif'] and g.settings['iiif_path']:
         g.writable_paths.append(g.settings['iiif_path'])
     if request.path.startswith('/api/'):
-        session['language'] = 'en'
         ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
         if not current_user.is_authenticated \
                 and not g.settings['api_public'] \

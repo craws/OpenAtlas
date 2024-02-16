@@ -20,11 +20,12 @@ default.add_argument(
     choices=('true', 'false'),
     location='args')
 
-language = default.copy()
-language.add_argument(
-    'lang',
+locale = default.copy()
+locale.add_argument(
+    'locale',
     type=str,
     help='{error_msg}',
+    default='en',
     case_sensitive=False,
     choices=app.config['LANGUAGES'],
     location='args')
