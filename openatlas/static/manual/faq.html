@@ -64,7 +64,7 @@
 <li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="troubleshooting/index.html">Troubleshooting</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">FAQ</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#managing-multiple-projects-or-case-studies">Managing multiple projects or case studies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-manage-multiple-projects-or-case-studies">How to manage multiple projects or case studies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#how-does-data-access-work">How does data access work</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#how-to-enter-professions">How to enter professions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#why-can-t-a-free-text-field-be-added-via-custom-types">Why can’t a free text field be added via custom types</a></li>
@@ -101,8 +101,8 @@
 <div class="toctree-wrapper compound">
 </div>
 <p>Here you can find answers to some frequently asked questions.</p>
-<section id="managing-multiple-projects-or-case-studies">
-<h2>Managing multiple projects or case studies<a class="headerlink" href="#managing-multiple-projects-or-case-studies" title="Permalink to this heading"></a></h2>
+<section id="how-to-manage-multiple-projects-or-case-studies">
+<h2>How to manage multiple projects or case studies<a class="headerlink" href="#how-to-manage-multiple-projects-or-case-studies" title="Permalink to this heading"></a></h2>
 <p>Tag: technical</p>
 <p>There are two main approaches how to deal with multiple projects or case
 studies.</p>
@@ -120,12 +120,12 @@ useful if they share data, e.g. information about places or persons.</p>
 usually called <strong>Case study</strong>, which can be:</p>
 <ul class="simple">
 <li><p>attached to multiple classes (probably most of them)</p></li>
-<li><p>configured to multiple use so that e.g. a place can be part of multiple case
+<li><p>set to <strong>multiple</strong> use so that e.g. a place can be part of multiple case
 studies</p></li>
-<li><p>configured to be required so that users don’t forget to enter it</p></li>
+<li><p>set to <strong>required</strong> so that users don’t forget to enter it</p></li>
 </ul>
 <p>Later on, e.g. when running analyses or developing a presentation site for one
-case study, this type can be used to separate the data again via the
+case study, this type can be used to separate the data via the
 <a class="reference internal" href="technical/api.html"><span class="doc">API</span></a>.</p>
 </section>
 </section>
@@ -135,18 +135,17 @@ case study, this type can be used to separate the data again via the
 <p>In OpenAtlas it can be chosen if and when to make data public but:</p>
 <ul class="simple">
 <li><p>All registered users have access to all model data</p></li>
-<li><p>Either all data is made public via the <a class="reference internal" href="technical/api.html"><span class="doc">API</span></a> or none</p></li>
+<li><p>Either <strong>all</strong> data is made public via the <a class="reference internal" href="technical/api.html"><span class="doc">API</span></a> or <strong>none</strong></p></li>
 <li><p>Presentation sites can filter which data (e.g. which case study) to show
 via the API</p></li>
 <li><p>Showing images is a special case because it also depends on licenses and the
 <a class="reference internal" href="admin/iiif.html"><span class="doc">IIIF</span></a> server</p></li>
 </ul>
-<p>There is no option to <strong>hide</strong> parts of the data for specific users and
-although requests have been made, there are no plans to implement this. Reasons
-for this is that it would conflict with one of our core values (open) but
-there are also technical reasons, e.g. to avoid creating duplicates. If a
-strict separation is needed, using multiple OpenAtlas instances would likely be
-a better alternative.</p>
+<p>There is no option (or plans to add one) to <strong>hide</strong> parts of the data for
+specific users. Reasons for this is that it would conflict with one of our core
+values (open) but there are also practical reasons, e.g. to avoid duplicates.
+If a strict separation is needed, using multiple OpenAtlas instances would
+likely be a better alternative.</p>
 </section>
 <section id="how-to-enter-professions">
 <h2>How to enter professions<a class="headerlink" href="#how-to-enter-professions" title="Permalink to this heading"></a></h2>

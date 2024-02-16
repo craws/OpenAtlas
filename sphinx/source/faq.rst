@@ -5,8 +5,8 @@ FAQ
 
 Here you can find answers to some frequently asked questions.
 
-Managing multiple projects or case studies
-------------------------------------------
+How to manage multiple projects or case studies
+-----------------------------------------------
 
 Tag: technical
 
@@ -30,12 +30,12 @@ For data separation a custom :doc:`/entity/type` can be created,
 usually called **Case study**, which can be:
 
 * attached to multiple classes (probably most of them)
-* configured to multiple use so that e.g. a place can be part of multiple case
+* set to **multiple** use so that e.g. a place can be part of multiple case
   studies
-* configured to be required so that users don't forget to enter it
+* set to **required** so that users don't forget to enter it
 
 Later on, e.g. when running analyses or developing a presentation site for one
-case study, this type can be used to separate the data again via the
+case study, this type can be used to separate the data via the
 :doc:`/technical/api`.
 
 How does data access work
@@ -45,22 +45,20 @@ Tag: design decision
 In OpenAtlas it can be chosen if and when to make data public but:
 
 * All registered users have access to all model data
-* Either all data is made public via the :doc:`/technical/api` or none
+* Either **all** data is made public via the :doc:`/technical/api` or **none**
 * Presentation sites can filter which data (e.g. which case study) to show
   via the API
 * Showing images is a special case because it also depends on licenses and the
   :doc:`/admin/iiif` server
 
-There is no option to **hide** parts of the data for specific users and
-although requests have been made, there are no plans to implement this. Reasons
-for this is that it would conflict with one of our core values (open) but
-there are also technical reasons, e.g. to avoid creating duplicates. If a
-strict separation is needed, using multiple OpenAtlas instances would likely be
-a better alternative.
+There is no option (or plans to add one) to **hide** parts of the data for
+specific users. Reasons for this is that it would conflict with one of our core
+values (open) but there are also practical reasons, e.g. to avoid duplicates.
+If a strict separation is needed, using multiple OpenAtlas instances would
+likely be a better alternative.
 
 How to enter professions
 ------------------------
-
 Tag: model
 
 A profession is not entered via a type as a lot of other information you
@@ -97,7 +95,6 @@ have any additional questions on this topic.
 
 Why can't longer texts be formatted
 -----------------------------------
-
 Tag: design decision
 
 For formatting longer texts, e.g. entity descriptions, only linebreaks can
