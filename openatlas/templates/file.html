@@ -56,7 +56,7 @@
       {% if g.settings.logo_file_id %}
         {{ _('remove custom logo')|button(url_for('logo_remove'))|safe }}
       {% else %}
-        {{ _('choose custom logo')|button(url_for('admin_logo'))|safe }}
+        {{ _('choose custom logo')|button(url_for('logo'))|safe }}
       {% endif %}
     </div>
   </div>

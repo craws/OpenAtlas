@@ -125,7 +125,7 @@ class AdminTests(TestBaseCase):
             rv = self.app.get(url_for('settings', category='iiif'))
             assert b'on upload' in rv.data
 
-            rv = self.app.get(url_for('settings', category='files'))
+            rv = self.app.get(url_for('settings', category='file'))
             assert b'file size in MB' in rv.data
 
             rv = self.app.post(

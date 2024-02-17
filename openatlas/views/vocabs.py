@@ -29,18 +29,20 @@ from openatlas.models.type import Type
 def vocabs_index() -> str:
     return render_template(
         'tabs.html',
-        tabs={'info': Tab(
-            'info',
-            display_info({
-                _('base URL'): g.settings['vocabs_base_url'],
-                _('endpoint'): g.settings['vocabs_endpoint'],
-                _('user'): g.settings['vocabs_user']}),
-            buttons=[
-                manual('admin/vocabs'),
-                button(_('edit'), url_for('vocabs_update'))
-                if is_authorized('manager') else '',
-                button(_('show vocabularies'), url_for('show_vocabularies'))
-            ])},
+        tabs={
+            'info': Tab(
+                'info',
+                display_info({
+                    _('base URL'): g.settings['vocabs_base_url'],
+                    _('endpoint'): g.settings['vocabs_endpoint'],
+                    _('user'): g.settings['vocabs_user']}),
+                buttons=[
+                    manual('admin/vocabs'),
+                    button(_('edit'), url_for('vocabs_update'))
+                    if is_authorized('manager') else '',
+                    button(
+                        _('show vocabularies'),
+                        url_for('show_vocabularies'))])},
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
             'VOCABS'])
@@ -101,11 +103,13 @@ def show_vocabularies() -> str:
                     'vocabulary_import_view',
                     category="groups",
                     id_=entry['id']))])
-    tabs = {'vocabularies': Tab(
-        _('vocabularies'), table=table, buttons=[manual('admin/vocabs')])}
     return render_template(
         'tabs.html',
-        tabs=tabs,
+        tabs={
+            'vocabularies': Tab(
+                _('vocabularies'),
+                table=table,
+                buttons=[manual('admin/vocabs')])},
         buttons=[manual('admin/vocabs')],
         title='VOCABS',
         crumbs=[
@@ -179,12 +183,13 @@ def vocabulary_import_view(category: str, id_: str) -> str | Response:
         return redirect(f"{url_for('type_index')}#menu-tab-custom")
     return render_template(
         'tabs.html',
-        tabs={'info': Tab(
-            'info',
-            _('You are about to import following hierarchy') + ': ' +
-            link(details['title'], details['conceptUri'], external=True),
-            form=form,
-            buttons=[manual('admin/vocabs')])},
+        tabs={
+            'info': Tab(
+                'info',
+                _('You are about to import following hierarchy') + ': ' +
+                link(details['title'], details['conceptUri'], external=True),
+                form=form,
+                buttons=[manual('admin/vocabs')])},
         title=id_,
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],

@@ -59,17 +59,18 @@ def export_sql() -> str:
             table.rows.append(data)
     return render_template(
         'tabs.html',
-        tabs={'export': Tab(
-            _('export'),
-            table.display(),
-            buttons=[
-                manual('admin/export'),
-                button(
-                    _('export SQL'),
-                    url_for('export_execute', format_='sql')),
-                button(
-                    _('export database dump'),
-                    url_for('export_execute', format_='dump'))])},
+        tabs={
+            'export': Tab(
+                'export',
+                table.display(),
+                buttons=[
+                    manual('admin/export'),
+                    button(
+                        _('export SQL'),
+                        url_for('export_execute', format_='sql')),
+                    button(
+                        _('export database dump'),
+                        url_for('export_execute', format_='dump'))])},
         title=_('export SQL'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],

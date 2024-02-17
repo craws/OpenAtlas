@@ -303,10 +303,13 @@ def user_insert() -> str | Response:
         return redirect(url_for('user_view', id_=user_id))
     return render_template(
         'tabs.html',
-        tabs={'user': Tab('user', content=display_form(
-            form,
-            'user-form',
-            manual_page='admin/user'))},
+        tabs={
+            'user': Tab(
+                'user',
+                content=display_form(
+                    form,
+                    'user-form',
+                    manual_page='admin/user'))},
         title=_('user'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-user"],

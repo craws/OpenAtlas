@@ -51,7 +51,7 @@ def admin_index() -> str:
     users = User.get_all()
     tabs = {
         'user': Tab(
-            _('user'),
+            'user',
             table=get_user_table(users),
             buttons=[
                 manual('admin/user'),
@@ -75,7 +75,7 @@ def admin_index() -> str:
                 button(_('edit'), url_for('settings', category='mail'))])
     if is_authorized('manager'):
         tabs['modules'] = Tab(
-            _('modules'),
+            'modules',
             '<h1>' + uc_first(_('defaults for new user')) + '</h1>'
             + display_info(get_form_settings(ModulesForm())),
             buttons=[
@@ -178,13 +178,6 @@ def get_user_table(users: list[User]) -> Table:
             row.append(user.description)
         table.rows.append(row)
     return table
-
-
-@app.route('/logo/remove')
-@required_group('manager')
-def logo_remove() -> Response:
-    Settings.set_logo()
-    return redirect(url_for('file_index'))
 
 
 @app.route('/admin/content/<string:item>', methods=['GET', 'POST'])
@@ -321,7 +314,7 @@ def settings(category: str) -> str | Response:
     tab = category.replace('api', 'data').replace('mail', 'email')
     redirect_url = f"{url_for('admin_index')}#tab-{tab}"
     crumbs = [[_('admin'), f"{url_for('admin_index')}#tab-{tab}"], _(category)]
-    if category == 'files':
+    if category == 'file':
         redirect_url = f"{url_for('file_index')}"
         crumbs = [[_('file'), url_for('file_index')], _('settings')]
     elif category == 'iiif':
@@ -480,9 +473,11 @@ def orphans() -> str:
             'orphaned_subunits',
             table=Table([
                 'id', 'name', 'class', 'created', 'modified', 'description'])),
-        'circular': Tab('circular_dependencies', table=Table(
-            ['entity'],
-            [[link(e)] for e in Entity.get_entities_linked_to_itself()]))}
+        'circular': Tab(
+            'circular_dependencies',
+            table=Table(
+                ['entity'],
+                [[link(e)] for e in Entity.get_entities_linked_to_itself()]))}
 
     for entity in Entity.get_orphans():
         tabs[
@@ -619,37 +614,6 @@ def admin_file_iiif_delete(filename: str) -> Response:
         g.logger.log('error', 'file', f'deletion of IIIF {filename} failed', e)
         flash(_('error file delete'), 'error')
     return redirect(f"{url_for('orphans')}#tab-orphaned-iiif-files")
-
-
-@app.route('/admin/logo/')
-@app.route('/admin/logo/<int:id_>')
-@required_group('manager')
-def admin_logo(id_: Optional[int] = None) -> str | Response:
-    if g.settings['logo_file_id']:
-        abort(418)  # pragma: no cover - logo already set
-    if id_:
-        Settings.set_logo(id_)
-        return redirect(url_for('file_index'))
-    table = Table([''] + g.table_headers['file'] + ['date'])
-    for entity in Entity.get_display_files():
-        date = 'N/A'
-        if entity.id in g.files:
-            date = format_date(
-                datetime.datetime.utcfromtimestamp(
-                    g.files[entity.id].stat().st_ctime))
-        table.rows.append([
-            link(_('set'), url_for('admin_logo', id_=entity.id)),
-            entity.name,
-            link(entity.standard_type),
-            entity.get_file_size(),
-            entity.get_file_ext(),
-            entity.description,
-            date])
-    return render_template(
-        'tabs.html',
-        tabs={'logo': Tab('files', table=table)},
-        title=_('logo'),
-        crumbs=[[_('file'), url_for('file_index')], _('logo')])
 
 
 @app.route('/log', methods=['GET', 'POST'])
