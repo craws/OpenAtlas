@@ -22,7 +22,8 @@ versions = {
             '2166': 'IIIF: Include linked entities in annotation manifest',
             '2173': 'API: classes translation',
             '1542': 'OpenAtlas on Kubernetes',
-            '2187': 'Manual: FAQs about multiple projects and data access'
+            '2187': 'Manual: FAQs about multiple projects and data access',
+            '2168': 'Refactor and minor improvements'
         }
     }],
     '8.1.1': ['2024-02-02', {
