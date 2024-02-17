@@ -9,13 +9,14 @@ from werkzeug.wrappers import Response
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.util import (
-    button, check_iiif_file_exist, convert_image_to_iiif, required_group)
+    button, check_iiif_activation, check_iiif_file_exist,
+    convert_image_to_iiif, display_info, required_group)
 from openatlas.display.util2 import is_authorized, manual
 from openatlas.forms.form import get_table_form
-from openatlas.forms.setting import FilesForm
+from openatlas.forms.setting import FilesForm, IiifForm
 from openatlas.forms.util import get_form_settings
 from openatlas.models.entity import Entity
-from openatlas.views.admin import get_disk_space_info
+from openatlas.views.admin import count_files_to_convert, get_disk_space_info
 
 
 @app.route('/file')
@@ -35,7 +36,21 @@ def file_index() -> str:
                 button(_('list'), url_for('index', view='file')),
                 button(_('file'), url_for('insert', class_='file'))
                 if is_authorized('contributor') else ''])}
-    return render_template('tabs.html', tabs=tabs, crums=[_('file')])
+    if is_authorized('admin'):
+        tabs['IIIF'] = Tab(
+            'IIIF',
+            display_info(get_form_settings(IiifForm())),
+            buttons=[
+                manual('admin/iiif'),
+                button(_('edit'), url_for('settings', category='iiif')),
+                button(
+                    _('convert all files') + f' ({count_files_to_convert()})',
+                    url_for('convert_iiif_files'))])
+    return render_template(
+        'tabs.html',
+        title=_('file'),
+        tabs=tabs,
+        crumbs=[_('file')])
 
 
 @app.route('/download/<path:filename>')
@@ -117,6 +132,29 @@ def view_iiif(id_: int) -> str:
             if file_.class_.view == 'file' and check_iiif_file_exist(file_.id):
                 manifests.append(get_manifest_url(file_.id))
     return render_template('iiif.html', manifests=manifests)
+
+
+@app.route('/convert_iiif_files')
+@required_group('admin')
+def convert_iiif_files() -> Response:
+    convert()
+    return redirect(url_for('file_index') + '#tab-IIIF')
+
+
+def convert() -> None:
+    if not check_iiif_activation():  # pragma: no cover
+        flash(_('please activate IIIF'), 'info')
+        return
+    if not g.settings['iiif_conversion']:  # pragma: no cover
+        flash(_('please activate IIIF conversion'), 'info')
+        return
+    existing_files = [entity.id for entity in Entity.get_by_class('file')]
+    for id_, file_path in g.files.items():
+        if check_iiif_file_exist(id_):
+            continue
+        if id_ in existing_files and file_path.suffix in g.display_file_ext:
+            convert_image_to_iiif(id_)
+    flash(_('all image files are converted'), 'info')
 
 
 def get_manifest_url(id_: int) -> str:

@@ -26,16 +26,15 @@ from openatlas.display.image_processing import (
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, check_iiif_activation, check_iiif_file_exist,
-    convert_image_to_iiif, display_info, get_file_path, link, required_group,
-    send_mail)
+    button, check_iiif_file_exist, display_info, get_file_path, link,
+    required_group, send_mail)
 from openatlas.display.util2 import (
     convert_size, format_date, is_authorized, manual, sanitize, uc_first)
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
 from openatlas.forms.setting import (
-    ApiForm, ContentForm, FrontendForm, GeneralForm, IiifForm, LogForm,
-    MailForm, MapForm, ModulesForm, SimilarForm, TestMailForm)
+    ApiForm, ContentForm, FrontendForm, GeneralForm, LogForm, MailForm,
+    MapForm, ModulesForm, SimilarForm, TestMailForm)
 from openatlas.forms.util import get_form_settings, set_form_settings
 from openatlas.models.content import get_content, update_content
 from openatlas.models.entity import Entity
@@ -74,15 +73,6 @@ def admin_index() -> str:
             buttons=[
                 manual('admin/mail'),
                 button(_('edit'), url_for('settings', category='mail'))])
-        tabs['IIIF'] = Tab(
-            'IIIF',
-            display_info(get_form_settings(IiifForm())),
-            buttons=[
-                manual('admin/iiif'),
-                button(_('edit'), url_for('settings', category='iiif')),
-                button(
-                    _('convert all files') + f' ({count_files_to_convert()})',
-                    url_for('admin_convert_iiif_files'))])
     if is_authorized('manager'):
         tabs['modules'] = Tab(
             _('modules'),
@@ -328,10 +318,15 @@ def settings(category: str) -> str | Response:
     form = getattr(
         importlib.import_module('openatlas.forms.setting'),
         f"{uc_first(category)}Form")()
-    tab = category \
-        .replace('api', 'data') \
-        .replace('mail', 'email') \
-        .replace('iiif', 'IIIF')
+    tab = category.replace('api', 'data').replace('mail', 'email')
+    redirect_url = f"{url_for('admin_index')}#tab-{tab}"
+    crumbs = [[_('admin'), f"{url_for('admin_index')}#tab-{tab}"], _(category)]
+    if category == 'files':
+        redirect_url = f"{url_for('file_index')}"
+        crumbs = [[_('file'), url_for('file_index')], _('settings')]
+    elif category == 'iiif':
+        redirect_url = f"{url_for('file_index')}#tab-IIIF"
+        crumbs = [[_('file'), url_for('file_index')], _('IIIF')]
     if form.validate_on_submit():
         data = {}
         for field in form:
@@ -355,16 +350,13 @@ def settings(category: str) -> str | Response:
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        return redirect(f"{url_for('admin_index')}#tab-{tab}")
+        return redirect(redirect_url)
     set_form_settings(form)
     return render_template(
         'content.html',
         content=display_form(form, manual_page=f"admin/{category}"),
         title=_('admin'),
-        crumbs=[
-            [_('file'), url_for('file_index')] if category == 'files' else
-            [_('admin'), f"{url_for('admin_index')}#tab-{tab}"],
-            _('settings') if category == 'files' else _(category)])
+        crumbs=crumbs)
 
 
 @app.route('/check_similar', methods=['GET', 'POST'])
@@ -785,13 +777,6 @@ def admin_delete_orphaned_resized_images() -> Response:
     return redirect(url_for('admin_index') + '#tab-data')
 
 
-@app.route('/admin/convert_iiif_files')
-@required_group('admin')
-def admin_convert_iiif_files() -> Response:
-    convert_iiif_files()
-    return redirect(url_for('admin_index') + '#tab-IIIF')
-
-
 def get_disk_space_info() -> Optional[dict[str, Any]]:
     if os.name == 'posix':
         process = run(
@@ -828,19 +813,3 @@ def count_files_to_convert() -> int:
                 converted_files += 1
 
     return total_files - converted_files
-
-
-def convert_iiif_files() -> None:
-    if not check_iiif_activation():  # pragma: no cover
-        flash(_('please activate IIIF'), 'info')
-        return
-    if not g.settings['iiif_conversion']:  # pragma: no cover
-        flash(_('please activate IIIF conversion'), 'info')
-        return
-    existing_files = [entity.id for entity in Entity.get_by_class('file')]
-    for id_, file_path in g.files.items():
-        if check_iiif_file_exist(id_):
-            continue
-        if id_ in existing_files and file_path.suffix in g.display_file_ext:
-            convert_image_to_iiif(id_)
-    flash(_('all image files are converted'), 'info')

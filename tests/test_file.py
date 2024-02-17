@@ -46,7 +46,7 @@ class FileTest(TestBaseCase):
                     path.unlink()  # pragma: no cover
 
             rv = self.app.get(
-                url_for('admin_convert_iiif_files'),
+                url_for('convert_iiif_files'),
                 follow_redirects=True)
             assert b'All image files are converted' in rv.data
 

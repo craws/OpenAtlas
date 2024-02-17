@@ -122,6 +122,12 @@ class AdminTests(TestBaseCase):
             rv = self.app.get(url_for('settings', category='general'))
             assert b'log level' in rv.data
 
+            rv = self.app.get(url_for('settings', category='iiif'))
+            assert b'on upload' in rv.data
+
+            rv = self.app.get(url_for('settings', category='files'))
+            assert b'file size in MB' in rv.data
+
             rv = self.app.post(
                 url_for('admin_content', item='citation_example'),
                 data={'en': 'cool citation'},
