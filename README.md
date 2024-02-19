@@ -22,7 +22,7 @@ Documentation:
 [MEDCON](https://oeaw.academia.edu/MappingMedievalConflict) project.
 
 [Development demo](https://demo-dev.openatlas.eu) with data kindly provided by
-the [DPP](https://dpp.oeaw.ac.at/) project.
+the [THANADOS](https://thanados.net/) project.
 
 # Installation
 

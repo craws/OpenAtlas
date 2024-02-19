@@ -18,6 +18,7 @@ versions = {
     '8.2.0': ['TBA', {
         'feature': {
             '2186': 'Move file item from admin area to menu',
+            '1475': 'Archaeological demo version',
             '2089': 'IIIF: Displaying images from an entity',
             '2166': 'IIIF: Include linked entities in annotation manifest',
             '2173': 'API: classes translation',
