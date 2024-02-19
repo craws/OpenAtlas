@@ -134,11 +134,12 @@ def user_view(id_: int) -> str:
     user = User.get_by_id(id_)
     if not user:
         abort(404)
-    entities_count = ''
+    created_count = ''
     if count := User.get_created_entities_count(user.id):
-        entities_count = \
-            f'<a href="{url_for("user_entities", id_=user.id)}">' \
-            f'{format_number(count)}</a>'
+        created_count = link(
+            format_number(count),
+            url_for("user_entities", id_=user.id),
+            uc_first_=False)
     info = {
         _('username'): user.username,
         _('group'): user.group,
@@ -146,7 +147,7 @@ def user_view(id_: int) -> str:
         _('email'):
             user.email
             if is_authorized('manager') or user.settings['show_email'] else '',
-        _('created entities'): entities_count,
+        _('created entities'): created_count,
         _('language'): user.settings['language'],
         _('last login'): format_date(user.login_last_success),
         _('failed logins'):
@@ -302,10 +303,13 @@ def user_insert() -> str | Response:
         return redirect(url_for('user_view', id_=user_id))
     return render_template(
         'tabs.html',
-        tabs={'user': Tab('user', content=display_form(
-            form,
-            'user-form',
-            manual_page='admin/user'))},
+        tabs={
+            'user': Tab(
+                'user',
+                content=display_form(
+                    form,
+                    'user-form',
+                    manual_page='admin/user'))},
         title=_('user'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-user"],

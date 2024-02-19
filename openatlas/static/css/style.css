@@ -135,6 +135,15 @@ table.table-no-style tr td{
   border-bottom-width: 0!important;;
 }
 
+div.progress {
+  height: 30px;
+}
+
+span.disk-space-legend {
+    width:0.75em;
+    height:0.75em;
+}
+
 .more {
   overflow: hidden;
   text-overflow: ellipsis;

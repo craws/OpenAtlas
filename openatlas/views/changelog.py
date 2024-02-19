@@ -17,10 +17,13 @@ def index_changelog() -> str:
 versions = {
     '8.2.0': ['TBA', {
         'feature': {
-            '1542': 'OpenAtlas on Kubernetes',
+            '2186': 'Move file item from admin area to menu',
             '2089': 'IIIF: Displaying images from an entity',
             '2166': 'IIIF: Include linked entities in annotation manifest',
-            '2187': 'Manual: FAQs about multiple projects and data access'
+            '2173': 'API: classes translation',
+            '1542': 'OpenAtlas on Kubernetes',
+            '2187': 'Manual: FAQs about multiple projects and data access',
+            '2168': 'Refactor and minor improvements'
         }
     }],
     '8.1.1': ['2024-02-02', {

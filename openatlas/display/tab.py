@@ -17,11 +17,13 @@ if TYPE_CHECKING:  # pragma: no cover
 # Needed for translations of tab titles
 _('bookmarks')
 _('circular dependencies')
+_('export')
 _('invalid dates')
 _('invalid link dates')
 _('invalid involvement dates')
 _('member of')
 _('missing files')
+_('modules')
 _('notes')
 _('orphaned files')
 _('orphaned iiif files')
@@ -48,7 +50,7 @@ class Tab:
         self.table = table or Table()
         self.set_table_headers(name, entity)
         self.buttons: list[str] = buttons or [manual(f'entity/{name}')]
-        if is_authorized('contributor') or name == 'files':
+        if is_authorized('contributor'):
             self.set_buttons(name, entity)
 
     def set_table_headers(

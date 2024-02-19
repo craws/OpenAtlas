@@ -117,9 +117,7 @@ def import_project_view(id_: int) -> str:
         content += button_bar(buttons)
     content += description(project.description)
     tabs = {
-        'info': Tab(
-            'info',
-            content=content),
+        'info': Tab('info', content=content),
         'entities': Tab(
             'entities',
             table=Table(

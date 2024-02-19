@@ -21,11 +21,12 @@ def arche_index() -> str:
             button(_('fetch'), url_for('arche_fetch'))
     return render_template(
         'tabs.html',
-        tabs={'info': Tab(
-            'info',
-            display_info({
-                k: str(v) for k, v in app.config['ARCHE'].items()}),
-            buttons=[manual('admin/arche')])},
+        tabs={
+            'info': Tab(
+                'info',
+                display_info({
+                    k: str(v) for k, v in app.config['ARCHE'].items()}),
+                buttons=[manual('admin/arche')])},
         crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-data"], 'ARCHE'])
 
 

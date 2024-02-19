@@ -46,7 +46,7 @@ class FileTest(TestBaseCase):
                     path.unlink()  # pragma: no cover
 
             rv = self.app.get(
-                url_for('admin_convert_iiif_files'),
+                url_for('convert_iiif_files'),
                 follow_redirects=True)
             assert b'All image files are converted' in rv.data
 
@@ -62,11 +62,11 @@ class FileTest(TestBaseCase):
             with self.app.get(url_for('download', filename=filename)):
                 pass
 
-            rv = self.app.get(url_for('admin_logo'), data={'file': file_id})
+            rv = self.app.get(url_for('logo'), data={'file': file_id})
             assert b'OpenAtlas logo' in rv.data
 
             rv = self.app.get(
-                url_for('admin_logo', id_=file_id),
+                url_for('logo', id_=file_id),
                 follow_redirects=True)
             assert b'remove custom logo' in rv.data
 

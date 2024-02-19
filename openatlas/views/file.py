@@ -1,16 +1,59 @@
-from typing import Any
+from datetime import datetime
+from typing import Any, Optional
 
 from flask import (
-    flash, g, render_template, request, send_from_directory, url_for)
+    abort, flash, g, render_template, request, send_from_directory, url_for)
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
+from openatlas.display.tab import Tab
+from openatlas.display.table import Table
 from openatlas.display.util import (
-    check_iiif_file_exist, convert_image_to_iiif, required_group)
+    button, check_iiif_activation, check_iiif_file_exist,
+    convert_image_to_iiif, display_info, link, required_group)
+from openatlas.display.util2 import format_date, is_authorized, manual
 from openatlas.forms.form import get_table_form
+from openatlas.forms.setting import FileForm, IiifForm
+from openatlas.forms.util import get_form_settings
 from openatlas.models.entity import Entity
+from openatlas.models.settings import Settings
+from openatlas.views.admin import count_files_to_convert, get_disk_space_info
+
+
+@app.route('/file')
+@required_group('readonly')
+def file_index() -> str:
+    tabs = {
+        'settings': Tab(
+            'settings',
+            render_template(
+                'file.html',
+                info=get_form_settings(FileForm()),
+                disk_space_info=get_disk_space_info()),
+            buttons=[
+                manual('entity/file'),
+                button(_('edit'), url_for('settings', category='file'))
+                if is_authorized('manager') else '',
+                button(_('list'), url_for('index', view='file')),
+                button(_('file'), url_for('insert', class_='file'))
+                if is_authorized('contributor') else ''])}
+    if is_authorized('admin'):
+        tabs['IIIF'] = Tab(
+            'IIIF',
+            display_info(get_form_settings(IiifForm())),
+            buttons=[
+                manual('admin/iiif'),
+                button(_('edit'), url_for('settings', category='iiif')),
+                button(
+                    _('convert all files') + f' ({count_files_to_convert()})',
+                    url_for('convert_iiif_files'))])
+    return render_template(
+        'tabs.html',
+        title=_('file'),
+        tabs=tabs,
+        crumbs=[_('file')])
 
 
 @app.route('/download/<path:filename>')
@@ -88,12 +131,33 @@ def view_iiif(id_: int) -> str:
     if entity.class_.view == 'file' and check_iiif_file_exist(id_):
         manifests.append(get_manifest_url(id_))
     else:
-        for file in entity.get_linked_entities('P67', True):
-            if file.class_.view == 'file' and check_iiif_file_exist(file.id):
-                manifests.append(get_manifest_url(file.id))
-    return render_template(
-        'iiif.html',
-        manifests=manifests)
+        for file_ in entity.get_linked_entities('P67', True):
+            if file_.class_.view == 'file' and check_iiif_file_exist(file_.id):
+                manifests.append(get_manifest_url(file_.id))
+    return render_template('iiif.html', manifests=manifests)
+
+
+@app.route('/convert_iiif_files')
+@required_group('admin')
+def convert_iiif_files() -> Response:
+    convert()
+    return redirect(url_for('file_index') + '#tab-IIIF')
+
+
+def convert() -> None:
+    if not check_iiif_activation():  # pragma: no cover
+        flash(_('please activate IIIF'), 'info')
+        return
+    if not g.settings['iiif_conversion']:  # pragma: no cover
+        flash(_('please activate IIIF conversion'), 'info')
+        return
+    existing_files = [entity.id for entity in Entity.get_by_class('file')]
+    for id_, file_path in g.files.items():
+        if check_iiif_file_exist(id_):
+            continue
+        if id_ in existing_files and file_path.suffix in g.display_file_ext:
+            convert_image_to_iiif(id_)
+    flash(_('all image files are converted'), 'info')
 
 
 def get_manifest_url(id_: int) -> str:
@@ -102,3 +166,40 @@ def get_manifest_url(id_: int) -> str:
         id_=id_,
         version=g.settings['iiif_version'],
         _external=True)
+
+
+@app.route('/logo/')
+@app.route('/logo/<int:id_>')
+@required_group('manager')
+def logo(id_: Optional[int] = None) -> str | Response:
+    if g.settings['logo_file_id']:
+        abort(418)  # pragma: no cover - logo already set
+    if id_:
+        Settings.set_logo(id_)
+        return redirect(url_for('file_index'))
+    table = Table([''] + g.table_headers['file'] + ['date'])
+    for entity in Entity.get_display_files():
+        date = 'N/A'
+        if entity.id in g.files:
+            date = format_date(
+                datetime.utcfromtimestamp(g.files[entity.id].stat().st_ctime))
+        table.rows.append([
+            link(_('set'), url_for('logo', id_=entity.id)),
+            entity.name,
+            link(entity.standard_type),
+            entity.get_file_size(),
+            entity.get_file_ext(),
+            entity.description,
+            date])
+    return render_template(
+        'tabs.html',
+        tabs={'logo': Tab('logo', table=table)},
+        title=_('logo'),
+        crumbs=[[_('file'), url_for('file_index')], _('logo')])
+
+
+@app.route('/logo/remove')
+@required_group('manager')
+def logo_remove() -> Response:
+    Settings.set_logo()
+    return redirect(url_for('file_index'))

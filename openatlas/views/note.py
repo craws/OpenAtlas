@@ -10,7 +10,7 @@ from wtforms import BooleanField, TextAreaField
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.util import button, link, required_group
-from openatlas.display.util2 import is_authorized, manual
+from openatlas.display.util2 import is_authorized, manual, uc_first
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
 from openatlas.models.entity import Entity
@@ -42,13 +42,13 @@ def note_view(id_: int) -> str:
             button(
                 _('set private'),
                 url_for('note_set_private', id_=note['id']))]
-    tabs = {'info': Tab(
-        'info',
-        '<h1 class="uc-first">' + _('note') + f"</h1>{note['text']}",
-        buttons=buttons)}
     return render_template(
         'tabs.html',
-        tabs=tabs,
+        tabs={
+            'info': Tab(
+                'info',
+                '<h1>' + uc_first(_('note')) + f"</h1>{note['text']}",
+                buttons=buttons)},
         entity=entity,
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],

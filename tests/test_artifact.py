@@ -94,6 +94,9 @@ class ArtifactTest(TestBaseCase):
             rv = self.app.get(url_for('user_view', id_=self.alice_id))
             assert b'<a href="/admin/user/entities/2">1</a>' in rv.data
 
+            rv = self.app.get(url_for('admin_index'))
+            assert b'>1</a>' in rv.data
+
             rv = self.app.post(
                 url_for('insert', class_='artifact'),
                 data={'name': 'This will be continued', 'continue_': 'yes'},

@@ -139,9 +139,10 @@ def profile_password() -> str | Response:
         return redirect(url_for('profile_index'))
     return render_template(
         'tabs.html',
-        tabs={'password': Tab(
-            'password',
-            content=display_form(form, 'password-form'))},
+        tabs={
+            'password': Tab(
+                'password',
+                content=display_form(form, 'password-form'))},
         title=_('profile'),
         crumbs=[
             [_('profile'), url_for('profile_index')],

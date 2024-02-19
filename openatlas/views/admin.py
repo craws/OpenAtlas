@@ -26,16 +26,15 @@ from openatlas.display.image_processing import (
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, check_iiif_activation, check_iiif_file_exist,
-    convert_image_to_iiif, display_info, get_file_path, link, required_group,
-    send_mail)
+    button, check_iiif_file_exist, display_info, get_file_path, link,
+    required_group, send_mail)
 from openatlas.display.util2 import (
     convert_size, format_date, is_authorized, manual, sanitize, uc_first)
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
 from openatlas.forms.setting import (
-    ApiForm, ContentForm, FilesForm, FrontendForm, GeneralForm, IiifForm,
-    LogForm, MailForm, MapForm, ModulesForm, SimilarForm, TestMailForm)
+    ApiForm, ContentForm, FrontendForm, GeneralForm, LogForm, MailForm,
+    MapForm, ModulesForm, SimilarForm, TestMailForm)
 from openatlas.forms.util import get_form_settings, set_form_settings
 from openatlas.models.content import get_content, update_content
 from openatlas.models.entity import Entity
@@ -51,21 +50,8 @@ from openatlas.models.user import User
 def admin_index() -> str:
     users = User.get_all()
     tabs = {
-        'files': Tab(
-            _('files'),
-            render_template(
-                'admin/file.html',
-                info=get_form_settings(FilesForm()),
-                disk_space_info=get_disk_space_info()),
-            buttons=[
-                manual('entity/file'),
-                button(_('edit'), url_for('settings', category='files'))
-                if is_authorized('manager') else '',
-                button(_('list'), url_for('index', view='file')),
-                button(_('file'), url_for('insert', class_='file'))
-                if is_authorized('contributor') else '']),
         'user': Tab(
-            _('user'),
+            'user',
             table=get_user_table(users),
             buttons=[
                 manual('admin/user'),
@@ -87,18 +73,9 @@ def admin_index() -> str:
             buttons=[
                 manual('admin/mail'),
                 button(_('edit'), url_for('settings', category='mail'))])
-        tabs['IIIF'] = Tab(
-            'IIIF',
-            display_info(get_form_settings(IiifForm())),
-            buttons=[
-                manual('admin/iiif'),
-                button(_('edit'), url_for('settings', category='iiif')),
-                button(
-                    _('convert all files') + f' ({count_files_to_convert()})',
-                    url_for('admin_convert_iiif_files'))])
     if is_authorized('manager'):
         tabs['modules'] = Tab(
-            _('modules'),
+            'modules',
             '<h1>' + uc_first(_('defaults for new user')) + '</h1>'
             + display_info(get_form_settings(ModulesForm())),
             buttons=[
@@ -203,13 +180,6 @@ def get_user_table(users: list[User]) -> Table:
     return table
 
 
-@app.route('/logo/remove')
-@required_group('manager')
-def logo_remove() -> Response:
-    Settings.set_logo()
-    return redirect(f"{url_for('admin_index')}#tab-file")
-
-
 @app.route('/admin/content/<string:item>', methods=['GET', 'POST'])
 @required_group('manager')
 def admin_content(item: str) -> str | Response:
@@ -308,9 +278,7 @@ def check_link_duplicates(delete: Optional[str] = None) -> str | Response:
                     'delete_single_type_duplicate',
                     entity_id=row['entity'].id,
                     type_id=type_.id)
-                remove_links.append(
-                    f'<a href="{url}" class="uc-first">' + _("remove") + '</a>'
-                    f' {type_.name}')
+                remove_links.append(f"{link(_('remove'), url)} {type_.name}")
             tab.table.rows.append([
                 link(row['entity']),
                 row['entity'].class_.label,
@@ -343,10 +311,15 @@ def settings(category: str) -> str | Response:
     form = getattr(
         importlib.import_module('openatlas.forms.setting'),
         f"{uc_first(category)}Form")()
-    tab = category \
-        .replace('api', 'data') \
-        .replace('mail', 'email') \
-        .replace('iiif', 'IIIF')
+    tab = category.replace('api', 'data').replace('mail', 'email')
+    redirect_url = f"{url_for('admin_index')}#tab-{tab}"
+    crumbs = [[_('admin'), f"{url_for('admin_index')}#tab-{tab}"], _(category)]
+    if category == 'file':
+        redirect_url = f"{url_for('file_index')}"
+        crumbs = [[_('file'), url_for('file_index')], _('settings')]
+    elif category == 'iiif':
+        redirect_url = f"{url_for('file_index')}#tab-IIIF"
+        crumbs = [[_('file'), url_for('file_index')], _('IIIF')]
     if form.validate_on_submit():
         data = {}
         for field in form:
@@ -370,15 +343,13 @@ def settings(category: str) -> str | Response:
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        return redirect(f"{url_for('admin_index')}#tab-{tab}")
+        return redirect(redirect_url)
     set_form_settings(form)
     return render_template(
         'content.html',
         content=display_form(form, manual_page=f"admin/{category}"),
         title=_('admin'),
-        crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-{tab}"],
-            _(category)])
+        crumbs=crumbs)
 
 
 @app.route('/check_similar', methods=['GET', 'POST'])
@@ -502,9 +473,11 @@ def orphans() -> str:
             'orphaned_subunits',
             table=Table([
                 'id', 'name', 'class', 'created', 'modified', 'description'])),
-        'circular': Tab('circular_dependencies', table=Table(
-            ['entity'],
-            [[link(e)] for e in Entity.get_entities_linked_to_itself()]))}
+        'circular': Tab(
+            'circular_dependencies',
+            table=Table(
+                ['entity'],
+                [[link(e)] for e in Entity.get_entities_linked_to_itself()]))}
 
     for entity in Entity.get_orphans():
         tabs[
@@ -643,40 +616,6 @@ def admin_file_iiif_delete(filename: str) -> Response:
     return redirect(f"{url_for('orphans')}#tab-orphaned-iiif-files")
 
 
-@app.route('/admin/logo/')
-@app.route('/admin/logo/<int:id_>')
-@required_group('manager')
-def admin_logo(id_: Optional[int] = None) -> str | Response:
-    if g.settings['logo_file_id']:
-        abort(418)  # pragma: no cover - logo already set
-    if id_:
-        Settings.set_logo(id_)
-        return redirect(f"{url_for('admin_index')}#tab-file")
-    table = Table([''] + g.table_headers['file'] + ['date'])
-    for entity in Entity.get_display_files():
-        date = 'N/A'
-        if entity.id in g.files:
-            date = format_date(
-                datetime.datetime.utcfromtimestamp(
-                    g.files[entity.id].stat().st_ctime))
-        table.rows.append([
-            link(_('set'), url_for('admin_logo', id_=entity.id)),
-            entity.name,
-            link(entity.standard_type),
-            entity.get_file_size(),
-            entity.get_file_ext(),
-            entity.description,
-            date])
-    return render_template(
-        'tabs.html',
-        tabs={'logo': Tab('files', table=table)},
-        title=_('logo'),
-        crumbs=[[
-            _('admin'),
-            f"{url_for('admin_index')}#tab-files"],
-            _('logo')])
-
-
 @app.route('/log', methods=['GET', 'POST'])
 @required_group('admin')
 def log() -> str:
@@ -802,13 +741,6 @@ def admin_delete_orphaned_resized_images() -> Response:
     return redirect(url_for('admin_index') + '#tab-data')
 
 
-@app.route('/admin/convert_iiif_files')
-@required_group('admin')
-def admin_convert_iiif_files() -> Response:
-    convert_iiif_files()
-    return redirect(url_for('admin_index') + '#tab-IIIF')
-
-
 def get_disk_space_info() -> Optional[dict[str, Any]]:
     if os.name == 'posix':
         process = run(
@@ -845,19 +777,3 @@ def count_files_to_convert() -> int:
                 converted_files += 1
 
     return total_files - converted_files
-
-
-def convert_iiif_files() -> None:
-    if not check_iiif_activation():  # pragma: no cover
-        flash(_('please activate IIIF'), 'info')
-        return
-    if not g.settings['iiif_conversion']:  # pragma: no cover
-        flash(_('please activate IIIF conversion'), 'info')
-        return
-    existing_files = [entity.id for entity in Entity.get_by_class('file')]
-    for id_, file_path in g.files.items():
-        if check_iiif_file_exist(id_):
-            continue
-        if id_ in existing_files and file_path.suffix in g.display_file_ext:
-            convert_image_to_iiif(id_)
-    flash(_('all image files are converted'), 'info')
