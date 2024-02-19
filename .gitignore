@@ -34,6 +34,8 @@ openatlas/static/package-lock.json
 # Docker files
 .npm/
 .local/
+/data/
+env.sh
 
 # SonarQube
 .scannerwork/*
