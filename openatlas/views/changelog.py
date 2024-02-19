@@ -19,14 +19,13 @@ versions = {
         'feature': {
             '2186': 'Move file item from admin area to menu',
             '1475': 'Archaeological demo version',
+            '1047': 'Enter WKT geometries',
             '2089': 'IIIF: Displaying images from an entity',
             '2166': 'IIIF: Include linked entities in annotation manifest',
             '2173': 'API: classes translation',
             '1542': 'OpenAtlas on Kubernetes',
             '2187': 'Manual: FAQs about multiple projects and data access',
-            '2168': 'Refactor and minor improvements'
-        }
-    }],
+            '2168': 'Refactor and minor improvements'}}],
     '8.1.1': ['2024-02-02', {
         'fix': {
             '2172': 'Minor issue at annotation update form'}}],
