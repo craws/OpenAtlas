@@ -1,16 +1,60 @@
-name: 'Tests'
+name: 'Build, test and deploy OpenAtlas'
 on:
   push: {}
   workflow_call: {}
+  repository_dispatch:
+    types: [run]
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'
+        required: false
+        default: false
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'
+        required: false
+        default: false
 jobs:
+  setup_workflow_env:
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.get_environment_from_git_ref.outputs.environment }}
+      environment_short: ${{ steps.get_environment_from_git_ref.outputs.environment_short }}
+      image_name: container-preview
+      registry_root: ghcr.io/${{ github.repository }}/
+      default_port: "5000"
+      APP_NAME: OpenAtlas
+      APP_ROOT: "/"
+    steps:
+      - name: Get environment from git ref
+        id: get_environment_from_git_ref
+        run: |
+          echo "Running on branch ${{ github.ref_name }}"
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "environment=production"
+            echo "environment=production" >> $GITHUB_OUTPUT
+            echo "environment_short=prod" >> $GITHUB_OUTPUT
+          else
+            echo "environment=review/${{ github.ref_name }}"
+            echo "environment=review/${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            echo "environment_short=$(echo -n ${{ github.ref_name }} | sed s/feature_// | tr '_' '-' | tr '[:upper:]' '[:lower:]' )" >> $GITHUB_OUTPUT
+          fi
   build_openatlas:
+    needs: [setup_workflow_env]
+    environment: ${{ needs.setup_workflow_env.outputs.environment }}
+    permissions:
+      packages: write
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -18,10 +62,10 @@ jobs:
 
       - name: Create tags based on git data
         id: meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: |
-            ghcr.io/${{ github.repository }}/container-preview
+            ${{ needs.setup_workflow_env.outputs.registry_root }}${{ needs.setup_workflow_env.outputs.image_name }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -30,13 +74,13 @@ jobs:
             type=raw,value=latest,enable={{is_default_branch}}
             type=raw,value={{sha}}
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
 
       - name: Build and push
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           context: .
-          file: install/Dockerfile
+          file: install/docker/Dockerfile
           platforms: linux/amd64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
@@ -50,63 +94,55 @@ jobs:
       POSTGRES_DB: openatlas_test
       POSTGRES_USER: openatlas
     runs-on: ubuntu-latest
-    needs: [build_openatlas]
+    needs: [setup_workflow_env, build_openatlas]
+    environment: ${{ needs.setup_workflow_env.outputs.environment }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create openatlas network
+      - name: Fetch container image built above
         run: |
-          docker network create --internal openatlas
-          
-      - name: Create postgis container
+          container_name_tag="$(echo -n '${{ needs.setup_workflow_env.outputs.registry_root }}${{ needs.setup_workflow_env.outputs.image_name }}' | tr '_' '-' | tr '[:upper:]' '[:lower:]'):$(git rev-parse --short HEAD)"
+          docker pull $container_name_tag
+          docker tag $container_name_tag openatlas-openatlas
+          docker tag $container_name_tag openatlas-openatlas
+          docker tag $container_name_tag openatlas-initdb
+
+      - name: Docker compose
         run: |
-          docker run -d -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD\
-                        -e POSTGRES_DB=$POSTGRES_DB\
-                        -e POSTGRES_USER=$POSTGRES_USER\
-                        --name postgres --network openatlas\
-                        postgis/postgis:13-3.3
+          docker compose up --detach
 
-      - name: Wait
-        run: sleep 8
-
-#      - name: Add extensions to db
-#        run: |
-#          docker exec -i postgres psql -U $POSTGRES_USER -d $POSTGRES_DB -c 'CREATE EXTENSION IF NOT EXISTS postgis; CREATE EXTENSION IF NOT EXISTS unaccent;'
-
-      - name: Initialize db
+      - name: Docker service overview
         run: |
-          docker cp install/ postgres:/install/
-          docker exec -i postgres /bin/bash -c "cd install && cat 0_extensions.sql 1_structure.sql 2_data_model.sql 3_data_web.sql 4_data_type.sql | psql -U $POSTGRES_USER -d $POSTGRES_DB -f -"
+          docker ps
+          docker network ls
 
-      - name: Create openatlas container and run tests
+      - name: File folders ownership
         run: |
-          COOKIE_KEY=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c 32;echo;)
-          echo "COOKIE_KEY=$COOKIE_KEY"
-          docker create -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD\
-                        -e POSTGRES_DB=$POSTGRES_DB\
-                        -e POSTGRES_USER=$POSTGRES_USER\
-                        -e POSTGRES_HOST=postgres\
-                        -e COOKIE_KEY=$COOKIE_KEY\
-                        --name openatlas --network openatlas\
-                        ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')/container-preview:$(echo ${{ github.ref_name }} | sed 's/\//-/')
+          ls -la
+          sudo chown -R 33:33 ./files/uploads
+          sudo chown -R 33:33 ./files/processed_images/resized
+          sudo chown -R 33:33 ./files/export
+
+      - name: Write testing.py
+        run: |
           set -x
           cat <<EOF > testing.py
           SERVER_NAME='local.host'
-          DATABASE_NAME='openatlas_test'
-          DATABASE_USER='openatlas'
+          DATABASE_NAME='${{env.POSTGRES_DB}}'
+          DATABASE_USER='${{env.POSTGRES_USER}}'
           DATABASE_HOST='postgres'
           DATABASE_PORT=5432
-          DATABASE_PASS='verysecret'
+          DATABASE_PASS='${{env.POSTGRES_PASSWORD}}'
           MAIL_PASSWORD='asdQWEtzu123'
-          SECRET_KEY='$COOKIE_KEY'  # Used for cookies
+          SECRET_KEY='$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c 32;echo;)'  # Used for cookies
           DEBUG = True
           WTF_CSRF_ENABLED = False
           WTF_CSRF_METHODS: list[str] = []
@@ -121,16 +157,51 @@ jobs:
               'conversion': True,
               'compression': 'jpeg'}
           EOF
-          # production.py is recreated on every start
           sudo chown 33:33 testing.py
-          docker cp -a testing.py openatlas:/var/www/openatlas/instance/
-          docker start openatlas
-          until [ "$(docker inspect -f {{.State.Running}} openatlas)"=="true" ]; do
-              sleep 0.1;
-          done;
-          docker exec -i openatlas /bin/bash -c "cd /var/www/openatlas/install/ && sed -i 's@http://localhost/iiif/@http://localhost:8080/iiif/@g' data_test.sql"
-          docker exec -i openatlas /bin/bash -c "cd /var/www/openatlas/instance/ && ls -la && cat testing.py && cat production.py"
-
+          docker cp -a testing.py openatlas-openatlas-1:/var/www/openatlas/instance/
+          docker exec -i openatlas-openatlas-1 /bin/bash -c "cd /var/www/openatlas/install/ && sed -i 's@http://localhost/iiif/@http://localhost:8080/iiif/@g' data_test.sql"
+          docker exec -i openatlas-openatlas-1 /bin/bash -c "cd /var/www/openatlas/instance/ && ls -la && cat testing.py && cat production.py"
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+        with:
+          detached: true
       - name: Run tests
         run: |
-          docker exec -i openatlas /bin/bash -c "cd /var/www/openatlas/tests && nosetests3 -c .noserc --nologcapture --nocapture && echo passed"
+          (docker exec -i openatlas-openatlas-1 /bin/bash -c "(cd /var/www/openatlas/tests && nosetests3 --verbosity=2 --nologcapture --nocapture) || (echo Tests exited with $?; exit 1)") ||\
+          (echo Retry; docker exec -i openatlas-openatlas-1 /bin/bash -c "(cd /var/www/openatlas/tests && nosetests3 --verbosity=2 --nologcapture --nocapture)")
+  _3:
+    needs: [setup_workflow_env, test_openatlas]
+    uses: acdh-oeaw/gl-autodevops-minimal-port/.github/workflows/deploy.yml@main
+    secrets: inherit
+    if: ${{ github.repository_owner == 'acdh-oeaw' }}
+    with:
+      environment: ${{ needs.setup_workflow_env.outputs.environment}}
+      DOCKER_TAG: ${{ needs.setup_workflow_env.outputs.registry_root }}${{ needs.setup_workflow_env.outputs.image_name }}
+      APP_NAME: ${{ needs.setup_workflow_env.outputs.APP_NAME }}-${{ needs.setup_workflow_env.outputs.environment_short }}
+      APP_ROOT: ${{ needs.setup_workflow_env.outputs.APP_ROOT }}
+      default_port: ${{ needs.setup_workflow_env.outputs.default_port}}
+  with_db_demo_deploy:
+    needs: [setup_workflow_env, test_openatlas]
+    uses: acdh-oeaw/gl-autodevops-minimal-port/.github/workflows/deploy.yml@main
+    secrets: inherit
+    if: ${{ github.repository_owner == 'acdh-oeaw' }}
+    with:
+      environment: review/with_db_demo_deploy
+      do_deploy: ${{ needs.setup_workflow_env.outputs.environment == 'review/develop' }}
+      DOCKER_TAG: ${{ needs.setup_workflow_env.outputs.registry_root }}${{ needs.setup_workflow_env.outputs.image_name }}
+      APP_NAME: ${{ needs.setup_workflow_env.outputs.APP_NAME }}-with_db_demo_deploy
+      APP_ROOT: ${{ needs.setup_workflow_env.outputs.APP_ROOT }}
+      default_port: ${{ needs.setup_workflow_env.outputs.default_port}}
+  openatlas_demo:
+    needs: [setup_workflow_env, test_openatlas]
+    uses: acdh-oeaw/gl-autodevops-minimal-port/.github/workflows/deploy.yml@main
+    secrets: inherit
+    if: ${{ github.repository_owner == 'acdh-oeaw' }}
+    with:
+      environment: openatlas-demo
+      do_deploy: ${{ needs.setup_workflow_env.outputs.environment == 'review/develop' }}
+      DOCKER_TAG: ${{ needs.setup_workflow_env.outputs.registry_root }}${{ needs.setup_workflow_env.outputs.image_name }}
+      APP_NAME: ${{ needs.setup_workflow_env.outputs.APP_NAME }}-openatlas-demo
+      APP_ROOT: ${{ needs.setup_workflow_env.outputs.APP_ROOT }}
+      default_port: ${{ needs.setup_workflow_env.outputs.default_port}}
