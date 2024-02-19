@@ -10,7 +10,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     apt install -y --no-install-recommends apache2 libapache2-mod-wsgi-py3 python3-coverage python3-nose exiftran &&\
     apt install -y --no-install-recommends iipimage-server libvips-tools python3-email-validator &&\
     apt install -y --no-install-recommends gettext npm python3-pip git postgresql-client-15 &&\
-    apt install -y --no-install-recommends dos2unix locales locales-all vim w3c-sgml-lib nano &&\
+    apt install -y --no-install-recommends dos2unix locales locales-all vim &&\
     mkdir -p /var/www/openatlas /var/www/.cache /var/www/.local /var/www/.npm &&\
     chown -R www-data:www-data /var/www/.cache /var/www/.local /var/www/.npm /var/log/apache2 /var/run/apache2
 RUN cp -rp /usr/lib/iipimage-server/ /var/www/iipsrv/ &&\
@@ -19,16 +19,17 @@ RUN cp -rp /usr/lib/iipimage-server/ /var/www/iipsrv/ &&\
 RUN rm /etc/apache2/mods-available/iipsrv.conf
 COPY /install/iipsrv.conf /etc/apache2/mods-available/iipsrv.conf
 COPY --chown=www-data:www-data / /var/www/openatlas/
-RUN cd /var/www/openatlas && cp install/docker/entrypoint.sh /entrypoint.sh &&\
+RUN cd /var/www/openatlas && cp install/entrypoint.sh /entrypoint.sh &&\
     cp install/example_apache.conf /etc/apache2/sites-available/000-default.conf &&\
     chmod a+x /entrypoint.sh &&\
     dos2unix /entrypoint.sh &&\
     sed -i 's~^Listen.*~Listen 8080~' /etc/apache2/ports.conf &&\
     sed -i 's~^<VirtualHost \*:80>~<VirtualHost *:8080>~' /etc/apache2/sites-available/000-default.conf &&\
-    sed -i 's~ServerName.*~~' /etc/apache2/sites-available/000-default.conf &&\
-    sed -i 's~</VirtualHost>~ErrorLogFormat "{ \\"time\\":\\"%{%Y-%m-%d}tT%{%T}t.%{msec_frac}tZ\\", \\"function\\" : \\"[%-m:%l]\\" , \\"process\\" : \\"[pid %P:tid %T]\\" , \\"message\\" : \\"%M\\" ,\ \\"referer\\"\ : \\"%{Referer}i\\" },"\nLogFormat "{ \\"time\\":\\"%{%Y-%m-%d}tT%{%T}t.%{msec_frac}tZ\\", \\"process\\":\\"%D\\", \\"filename\\":\\"%f\\", \\"remoteIP\\":\\"%a\\", \\"host\\":\\"%V\\", \\"request\\":\\"%U\\", \\"query\\":\\"%q\\", \\"method\\":\\"%m\\", \\"status\\":\\"%>s\\", \\"userAgent\\":\\"%{User-agent}i\\", \\"referer\\":\\"%{Referer}i\\" }," OpenAtlasLog\nCustomLog /dev/stdout OpenAtlasLog\nErrorLog /dev/stdout\n</VirtualHost>~' /etc/apache2/sites-available/000-default.conf
+    sed -i 's~ServerName.*~~' /etc/apache2/sites-available/000-default.conf
+
 USER www-data
-RUN cd /var/www/openatlas/openatlas/static &&\
+RUN cd /var/www/openatlas &&\
+    cd openatlas/static &&\
     npm install
 RUN a2enmod iipsrv &&\
     a2enmod fcgid &&\
