@@ -111,6 +111,7 @@ wktInputForm.onAdd = () => {
       onclick="closeWktForm()" class="fad">X</span>
       <p id="inputFormInfo"></p>
       <div class="wktInput">
+        <b>${translate["import_wkt"]}</b>
         <label for='wktInput'>${translate["map_info_wkt"]}</label>
         <input type="text" oninput="checkAndToggleDrawButton()" 
         class="${style.stringField}" id="wktInput"  
