@@ -118,17 +118,18 @@ def is_authorized(context: str, group: Optional[str] = None) -> bool:
         return False
     match current_user.group:
         case 'admin':
-            return True
+            authorized = True
         case 'manager' if group in ['editor', 'contributor', 'readonly']:
-            return True
+            authorized = True
         case 'editor' if group in ['contributor', 'readonly']:
-            return True
+            authorized = True
         case 'contributor' if group in ['readonly']:
-            return True
+            authorized = True
         case _ if current_user.group == group:
-            return True
+            authorized = True
         case _:
-            return False
+            authorized = False
+    return authorized
 
 
 @app.template_filter()
