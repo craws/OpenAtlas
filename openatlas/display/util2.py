@@ -116,15 +116,19 @@ def is_authorized(context: str, group: Optional[str] = None) -> bool:
         group = context
     if not current_user.is_authenticated or not hasattr(current_user, 'group'):
         return False
-    if current_user.group == 'admin' \
-            or current_user.group == group \
-            or (current_user.group == 'manager'
-                and group in ['editor', 'contributor', 'readonly']) \
-            or (current_user.group == 'editor'
-                and group in ['contributor', 'readonly']) \
-            or (current_user.group == 'contributor' and group in ['readonly']):
-        return True
-    return False
+    match current_user.group:
+        case 'admin':
+            return True
+        case 'manager' if group in ['editor', 'contributor', 'readonly']:
+            return True
+        case 'editor' if group in ['contributor', 'readonly']:
+            return True
+        case 'contributor' if group in ['readonly']:
+            return True
+        case _ if current_user.group == group:
+            return True
+        case _:
+            return False
 
 
 @app.template_filter()

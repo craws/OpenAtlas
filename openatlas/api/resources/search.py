@@ -115,6 +115,7 @@ def search_entity(
                             item in entity_values for item in search_value)))
             return all(bool_values)
 
+    bool_ = False
     match operator_:
         case 'equal' if logical_operator == 'or':
             bool_ = bool(any(item in entity_values for item in search_values))
@@ -149,8 +150,6 @@ def search_entity(
             bool_ = bool(any(item >= entity_values for item in search_values))
         case 'lesserThanEqual' if is_comparable and logical_operator == 'and':
             bool_ = bool(all(item >= entity_values for item in search_values))
-        case _:
-            bool_ = False
     return bool_
 
 

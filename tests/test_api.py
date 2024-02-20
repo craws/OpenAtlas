@@ -53,36 +53,37 @@ class Api(ApiTestCase):
             with app.test_request_context():
                 app.preprocess_request()
                 for entity in get_by_cidoc_classes(['all']):
-                    if entity.name == 'Location of Shire':
-                        location = entity
-                    if entity.name == 'Shire':
-                        place = entity
-                    if entity.name == 'Boundary Mark':
-                        boundary_mark = entity
-                    if entity.name == 'Travel to Mordor':
-                        event = entity
-                    if entity.name == 'Economical':
-                        relation_sub = entity
-                    if entity.name == 'Austria':
-                        unit_node = entity
-                    if entity.name == 'Frodo':
-                        actor = entity
-                    if entity.name == 'Sam':
-                        actor2 = entity
-                    if entity.name == 'Home of Baggins':
-                        feature = entity
-                    if entity.name == 'Location of Home of Baggins':
-                        feature_location = entity
-                    if entity.name == 'Sûza':
-                        alias = entity
-                    if entity.name == 'Height':
-                        height = entity
-                    if entity.name == 'Change of Property':
-                        change_of_property = entity
-                    if entity.name == 'File without license':
-                        file_without_licences = entity
-                    if entity.name == 'File without file':
-                        file_without_file = entity
+                    match entity.name:
+                        case 'Location of Shire':
+                            location = entity
+                        case 'Shire':
+                            place = entity
+                        case 'Boundary Mark':
+                            boundary_mark = entity
+                        case 'Travel to Mordor':
+                            event = entity
+                        case 'Economical':
+                            relation_sub = entity
+                        case 'Austria':
+                            unit_node = entity
+                        case 'Frodo':
+                            actor = entity
+                        case 'Sam':
+                            actor2 = entity
+                        case 'Home of Baggins':
+                            feature = entity
+                        case 'Location of Home of Baggins':
+                            feature_location = entity
+                        case 'Sûza':
+                            alias = entity
+                        case 'Height':
+                            height = entity
+                        case 'Change of Property':
+                            change_of_property = entity
+                        case 'File without license':
+                            file_without_licences = entity
+                        case 'File without file':
+                            file_without_file = entity
 
             # ---Content Endpoints---
             rv: Any = self.app.get(url_for('api_04.classes')).get_json()
@@ -447,8 +448,8 @@ class Api(ApiTestCase):
                 assert found
 
             for rv in [
-                    self.app.get(url_for('api_04.type_tree')),
-                    self.app.get(url_for('api_04.type_tree', download=True))]:
+                self.app.get(url_for('api_04.type_tree')),
+                self.app.get(url_for('api_04.type_tree', download=True))]:
                 assert bool(rv.get_json()['typeTree'])
             rv = self.app.get(url_for('api_04.type_tree', count=True))
             assert rv.get_json() > 0
