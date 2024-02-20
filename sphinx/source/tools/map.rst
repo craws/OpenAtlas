@@ -20,6 +20,24 @@ Search
 With the magnifying glass icon in the upper left you can search for (current)
 places at `GeoNames <https://www.geonames.org/>`_.
 
+WKT import
+----------
+
+.. |edit| image:: edit.png
+
+With the |edit| icon a WKT text can be imported.
+Clicking this button will open a new popup where a WKT geometry can be entered.
+If the geometry is valid, the **draw geometry** button will be enabled. By
+clicking this button the geometry will be drawn on the map and the respective
+geometry popup will open to enter *title* and *description* for this geometry.
+
+Possible WKT geometries with examples are:
+
+* POINT(30 10)
+* LINESTRING(30 10, 10 30, 40 40)
+* POLYGON((30 10, 40 40, 20 40, 10 20, 30 10))
+
+
 Adding new geometries
 ---------------------
 When in insert or update mode of a place you have following options available
