@@ -58,6 +58,7 @@ def get_search_parameter(parser: dict[str, Any]) -> dict[str, Any]:
 def get_search_values(
         category: str,
         parameter: dict[str, Any]) -> list[str | int | list[Any]]:
+    # Todo: can be match case
     values = [
         value.lower() if isinstance(value, str) else value
         for value in parameter["values"]]
@@ -96,6 +97,7 @@ def search_entity(
         search_values: list[Any],
         logical_operator: str,
         is_comparable: bool) -> bool:
+    # Todo: can be match case
     if not entity_values and (operator_ == 'like' or is_comparable):
         return False
     bool_: bool = False
@@ -158,29 +160,32 @@ def search_entity(
 
 
 def value_to_be_searched(entity: Entity, key: str) -> Any:
-    value: Any = None
-    if key in ["entityID", "relationToID", "valueTypeID"]:
-        value = [entity.id]
-    if key == "entityName":
-        value = [entity.name.lower()]
-    if key == "entityDescription" and entity.description:
-        value = [entity.description.lower()]
-    if key == "entityAliases":
-        value = list(value.lower() for value in entity.aliases.values())
-    if key == "entityCidocClass":
-        value = [entity.cidoc_class.code.lower()]
-    if key == "entitySystemClass":
-        value = [entity.class_.name.lower()]
-    if key == "typeName":
-        value = [type_.name.lower() for type_ in entity.types]
-    if key in ["typeID", "typeIDWithSubs"]:
-        value = [type_.id for type_ in entity.types]
-    if key == "beginFrom":
-        value = check_if_date(str(entity.begin_from))
-    if key == "beginTo":
-        value = check_if_date(str(entity.begin_to))
-    if key == "endFrom":
-        value = check_if_date(str(entity.end_from))
-    if key == "endTo":
-        value = check_if_date(str(entity.end_to))
-    return value or []
+    value: Any = None  # Just to make Mypy happy
+    match key:
+        case "entityID" | "relationToID" | "valueTypeID":
+            value = [entity.id]
+        case "entityName":
+            value = [entity.name.lower()]
+        case "entityDescription" if entity.description:
+            value = [entity.description.lower()]
+        case "entityAliases":
+            value = list(value.lower() for value in entity.aliases.values())
+        case "entityCidocClass":
+            value = [entity.cidoc_class.code.lower()]
+        case "entitySystemClass":
+            value = [entity.class_.name.lower()]
+        case "typeName":
+            value = [type_.name.lower() for type_ in entity.types]
+        case "typeID" | "typeIDWithSubs":
+            value = [type_.id for type_ in entity.types]
+        case "beginFrom":
+            value = check_if_date(str(entity.begin_from))
+        case "beginTo":
+            value = check_if_date(str(entity.begin_to))
+        case "endFrom":
+            value = check_if_date(str(entity.end_from))
+        case "endTo":
+            value = check_if_date(str(entity.end_to))
+        case _:
+            value = []
+    return value
