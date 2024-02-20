@@ -102,12 +102,14 @@ def add_row(
         row_css: Optional[str] = None) -> str:
     row_css = row_css or ''
     field_css = ''
+    if field and field.render_kw and 'class' in field.render_kw:
+        field_css = field.render_kw['class']
     if field:
         if field.flags.required \
                 and field.label.text \
                 and form_id != 'login-form':
             field.label.text += ' *'
-        field_css = 'required' if field.flags.required else ''
+        field_css += ' required' if field.flags.required else ''
         field_css += ' integer' if isinstance(field, IntegerField) else ''
         field_css += f' {app.config["CSS"]["string_field"]}' \
             if isinstance(
@@ -121,7 +123,7 @@ def add_row(
         field=field,
         label=label,
         value=value,
-        field_css=field_css,
+        field_css=field_css.strip(),
         row_css=row_css)
 
 
