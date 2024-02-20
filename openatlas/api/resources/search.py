@@ -58,7 +58,6 @@ def get_search_parameter(parser: dict[str, Any]) -> dict[str, Any]:
 def get_search_values(
         category: str,
         parameter: dict[str, Any]) -> list[str | int | list[Any]]:
-    # Todo: can be match case
     values = [
         value.lower() if isinstance(value, str) else value
         for value in parameter["values"]]
@@ -97,10 +96,9 @@ def search_entity(
         search_values: list[Any],
         logical_operator: str,
         is_comparable: bool) -> bool:
-    # Todo: can be match case
     if not entity_values and (operator_ == 'like' or is_comparable):
         return False
-    bool_: bool = False
+
     if any(isinstance(i, list) for i in search_values):
         if logical_operator == 'or':
             search_values = flatten_list_and_remove_duplicates(search_values)
@@ -116,46 +114,43 @@ def search_entity(
                         bool_values.append(bool(not any(
                             item in entity_values for item in search_value)))
             return all(bool_values)
-    if operator_ == 'equal':
-        if logical_operator == 'or':
+
+    match operator_:
+        case 'equal' if logical_operator == 'or':
             bool_ = bool(any(item in entity_values for item in search_values))
-        if logical_operator == 'and':
+        case 'equal' if logical_operator == 'and':
             bool_ = bool(all(item in entity_values for item in search_values))
-    if operator_ == 'notEqual':
-        if logical_operator == 'or':
+        case 'notEqual' if logical_operator == 'or':
             bool_ = bool(
                 not any(item in entity_values for item in search_values))
-        if logical_operator == 'and':
+        case 'notEqual' if logical_operator == 'and':
             bool_ = bool(
                 not all(item in entity_values for item in search_values))
-    if operator_ == 'like':
-        if logical_operator == 'or':
+        case 'like' if logical_operator == 'or':
             bool_ = bool(any(
                 item in value for item in search_values
                 for value in entity_values))
-        if logical_operator == 'and':
+        case 'like' if logical_operator == 'and':
             bool_ = bool(all(
                 item in ' '.join(entity_values) for item in search_values))
-    if operator_ == 'greaterThan' and is_comparable:
-        if logical_operator == 'or':
+        case 'greaterThan' if is_comparable and logical_operator == 'or':
             bool_ = bool(any(item < entity_values for item in search_values))
-        if logical_operator == 'and':
+        case 'greaterThan' if is_comparable and logical_operator == 'and':
             bool_ = bool(all(item < entity_values for item in search_values))
-    if operator_ == 'greaterThanEqual' and is_comparable:
-        if logical_operator == 'or':
+        case 'greaterThanEqual' if is_comparable and logical_operator == 'or':
             bool_ = bool(any(item <= entity_values for item in search_values))
-        if logical_operator == 'and':
+        case 'greaterThanEqual' if is_comparable and logical_operator == 'and':
             bool_ = bool(all(item <= entity_values for item in search_values))
-    if operator_ == 'lesserThan' and is_comparable:
-        if logical_operator == 'or':
+        case 'lesserThan' if is_comparable and logical_operator == 'or':
             bool_ = bool(any(item > entity_values for item in search_values))
-        if logical_operator == 'and':
+        case 'lesserThan' if is_comparable and logical_operator == 'and':
             bool_ = bool(all(item > entity_values for item in search_values))
-    if operator_ == 'lesserThanEqual' and is_comparable:
-        if logical_operator == 'or':
+        case 'lesserThanEqual' if is_comparable and logical_operator == 'or':
             bool_ = bool(any(item >= entity_values for item in search_values))
-        if logical_operator == 'and':
+        case 'lesserThanEqual' if is_comparable and logical_operator == 'and':
             bool_ = bool(all(item >= entity_values for item in search_values))
+        case _:
+            bool_ = False
     return bool_
 
 
