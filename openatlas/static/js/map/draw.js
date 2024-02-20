@@ -379,8 +379,6 @@ function closeWktForm(save = false) {
       case 'linestring':
         geom.properties.shapeType = "polyline";
         openForm("polyline", geom);
-
-        console.log(wktGeometry.coordinates)
         currentEditLayer = L.polyline(reverseLineCoordinates(wktGeometry.coordinates), {
           icon: editIcon
         }).addTo(map);
@@ -389,15 +387,12 @@ function closeWktForm(save = false) {
         let radioShapeType = $("input:radio[name=wktType]:checked").val();
         geom.properties.shapeType = radioShapeType;
         openForm(radioShapeType, geom);
-        console.log(wktGeometry.coordinates)
         currentEditLayer = L.polygon(reverseLineCoordinates(wktGeometry.coordinates[0]), {
           icon: editIcon,
         }).addTo(map);
         break;
     }
     currentEditLayer.feature = geom;
-    // Don't know if this is important. Copied it from other code
-    // setPopup(true)(currentEditLayer.feature, currentEditLayer);
   }
   wktInputForm.remove(map);
   $('.leaflet-right .leaflet-bar').show();
