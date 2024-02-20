@@ -1,11 +1,15 @@
 [MASTER]
-disable=C0111, broad-except, cyclic-import, duplicate-code
+disable=C0111, broad-except, duplicate-code
 good-names=f,i,j,k,l,x,y,ex,Run,_,e,js,bc,id,rv,ip,to  # default is i,j,k,ex,Run,_
 ignore=openatlas.wsgi
 min-public-methods=0
 
+# We are still learning. Lower/remove these limits once all above are solved.
+max-args=10        # default=5  (too-many-arguments)
+max-attributes=14  # default=7  (too-many-instance-attributes)
+max-branches=24    # default=12 (too-many-branches)
+max-locals=20      # default=10 (too-many-locals)
+max-statements=100 # default=50 (too-many-statements)
+
 [FORMAT]
 max-line-length=79
-
-[TYPECHECK]
-ignored-classes=Form

@@ -20,7 +20,7 @@ app.config['WTF_CSRF_TIME_LIMIT'] = None  # Set CSRF token valid for session
 locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
 babel = Babel(app)
 
-# pylint: disable=wrong-import-position, import-outside-toplevel
+# pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position
 from openatlas.models.logger import Logger
 from openatlas.api import api
 from openatlas.views import (
