@@ -612,8 +612,8 @@ def convert_image_to_iiif(id_: int, path: Optional[Path] = None) -> bool:
         '--tile-height',
         '128'])
     try:
-        process = subprocess.Popen(command)
-        process.wait()
+        with subprocess.Popen(command) as sub_process:
+            sub_process.wait()
         return True
     except Exception:  # pragma: no cover
         return False

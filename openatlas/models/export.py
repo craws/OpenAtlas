@@ -31,16 +31,18 @@ def sql_export(format_: str, postfix: Optional[str] = '') -> bool:
         '-f', file])
     try:
         root = os.environ['SYSTEMROOT'] if 'SYSTEMROOT' in os.environ else ''
-        subprocess.Popen(
-            command,
-            stdin=subprocess.PIPE,
-            env={
-                'PGPASSWORD': app.config['DATABASE_PASS'],
-                'SYSTEMROOT': root}).wait()
+        with subprocess.Popen(
+                command,
+                stdin=subprocess.PIPE,
+                env={
+                    'PGPASSWORD': app.config['DATABASE_PASS'],
+                    'SYSTEMROOT': root}) as sub_process:
+            sub_process.wait()
         with open(os.devnull, 'w', encoding='utf8') as null:
-            subprocess.Popen(
-                ['7z', 'a', f'{file}.7z', file],
-                stdout=null).wait()
+            with subprocess.Popen(
+                    ['7z', 'a', f'{file}.7z', file],
+                    stdout=null) as sub_process:
+                sub_process.wait()
         file.unlink()
     except Exception:  # pragma: no cover
         return False
