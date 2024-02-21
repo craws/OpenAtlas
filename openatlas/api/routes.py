@@ -1,5 +1,3 @@
-from flask_restful import Api
-
 from openatlas.api.endpoints.content import (
     ClassMapping, Classes, GetBackendDetails, SystemClassCount)
 from openatlas.api.endpoints.display_image import (
@@ -16,126 +14,46 @@ from openatlas.api.endpoints.special import (
 from openatlas.api.endpoints.type import (
     GetTypeByViewClass, GetTypeOverview, GetTypeTree)
 
+entity = [
+    [GetByViewClass, '/view_class/<string:view_class>', "view_class"],
+    [GetByCidocClass, '/cidoc_class/<string:cidoc_class>', "cidoc_class"],
+    [GetEntity, '/entity/<int:id_>', 'entity'],
+    [GetLatest, '/latest/<int:limit>', "latest"],
+    [GetQuery, '/query/', "query"],
+    [GetBySystemClass, '/system_class/<string:system_class>', "system_class"],
+    [GetTypeEntities, '/type_entities/<int:id_>', "type_entities"],
+    [GetTypeEntitiesAll, '/type_entities_all/<int:id_>', "type_entities_all"],
+    [GetEntitiesLinkedToEntity,
+     '/entities_linked_to_entity/<int:id_>',
+     "entities_linked_to_entity"]]
 
-def entity_routes(api: Api) -> None:
-    api.add_resource(
-        GetByViewClass,
-        '/view_class/<string:view_class>',
-        endpoint="view_class")
-    api.add_resource(
-        GetByCidocClass,
-        '/cidoc_class/<string:cidoc_class>',
-        endpoint="cidoc_class")
-    api.add_resource(
-        GetEntity,
-        '/entity/<int:id_>',
-        endpoint='entity')
-    api.add_resource(
-        GetLatest,
-        '/latest/<int:limit>',
-        endpoint="latest")
-    api.add_resource(
-        GetQuery,
-        '/query/',
-        endpoint="query")
-    api.add_resource(
-        GetBySystemClass,
-        '/system_class/<string:system_class>',
-        endpoint="system_class")
-    api.add_resource(
-        GetTypeEntities,
-        '/type_entities/<int:id_>',
-        endpoint="type_entities")
-    api.add_resource(
-        GetTypeEntitiesAll,
-        '/type_entities_all/<int:id_>',
-        endpoint="type_entities_all")
-    api.add_resource(
-        GetEntitiesLinkedToEntity,
-        '/entities_linked_to_entity/<int:id_>',
-        endpoint="entities_linked_to_entity")
+admin = [
+    [SystemClassCount, '/system_class_count/', 'system_class_count'],
+    [GetBackendDetails, '/backend_details/', "backend_details"],
+    [ClassMapping, '/class_mapping/', 'class_mapping'],
+    [LicensedFileOverview, '/licensed_file_overview/',
+     'licensed_file_overview'],
+    [Classes, '/classes/', 'classes']]
 
+types = [
+    [GetTypeByViewClass, '/type_by_view_class/', "type_by_view_class"],
+    [GetTypeOverview, '/type_overview/', "type_overview"],
+    [GetTypeTree, '/type_tree/', "type_tree"]]
 
-def admin_routes(api: Api) -> None:
-    api.add_resource(
-        GetBackendDetails,
-        '/backend_details/',
-        endpoint="backend_details")
-    api.add_resource(
-        Classes,
-        '/classes/',
-        endpoint='classes')
-    api.add_resource(
-        ClassMapping,
-        '/class_mapping/',
-        endpoint='class_mapping')
-    api.add_resource(
-        LicensedFileOverview,
-        '/licensed_file_overview/',
-        endpoint='licensed_file_overview')
-    api.add_resource(
-        SystemClassCount,
-        '/system_class_count/',
-        endpoint='system_class_count')
+special = [
+    [ExportDatabase, '/export_database/<string:format_>', "export_database"],
+    [GetGeometricEntities, '/geometric_entities/', "geometric_entities"],
+    [GetSubunits, '/subunits/<int:id_>', "subunits"]]
 
+display = [
+    [DisplayImage, '/display/<path:filename>', 'display'],
+    [IIIFManifest, '/iiif_manifest/<int:version>/<int:id_>', 'iiif_manifest'],
+    [IIIFImage, '/iiif_image/<int:id_>.json', 'iiif_image'],
+    [IIIFCanvas, '/iiif_canvas/<int:id_>.json', 'iiif_canvas'],
+    [IIIFSequence, '/iiif_sequence/<int:id_>.json', 'iiif_sequence'],
+    [IIIFAnnotationList, '/iiif_annotation_list/<int:image_id>.json',
+     'iiif_annotation_list'],
+    [IIIFAnnotation, '/iiif_annotation/<int:annotation_id>.json',
+     'iiif_annotation']]
 
-def type_routes(api: Api) -> None:
-    api.add_resource(
-        GetTypeByViewClass,
-        '/type_by_view_class/',
-        endpoint="type_by_view_class")
-    api.add_resource(
-        GetTypeOverview,
-        '/type_overview/',
-        endpoint="type_overview")
-    api.add_resource(
-        GetTypeTree,
-        '/type_tree/',
-        endpoint="type_tree")
-
-
-def special_routes(api: Api) -> None:
-    api.add_resource(
-        GetSubunits,
-        '/subunits/<int:id_>',
-        endpoint="subunits")
-    api.add_resource(
-        GetGeometricEntities,
-        '/geometric_entities/',
-        endpoint="geometric_entities")
-    api.add_resource(
-        ExportDatabase,
-        '/export_database/<string:format_>',
-        endpoint="export_database")
-
-
-def display_routes(api: Api) -> None:
-    api.add_resource(
-        DisplayImage,
-        '/display/<path:filename>',
-        endpoint='display')
-
-    api.add_resource(
-        IIIFManifest,
-        '/iiif_manifest/<int:version>/<int:id_>',
-        endpoint='iiif_manifest')
-    api.add_resource(
-        IIIFAnnotationList,
-        '/iiif_annotation_list/<int:image_id>.json',
-        endpoint='iiif_annotation_list')
-    api.add_resource(
-        IIIFAnnotation,
-        '/iiif_annotation/<int:annotation_id>.json',
-        endpoint='iiif_annotation')
-    api.add_resource(
-        IIIFImage,
-        '/iiif_image/<int:id_>.json',
-        endpoint='iiif_image')
-    api.add_resource(
-        IIIFCanvas,
-        '/iiif_canvas/<int:id_>.json',
-        endpoint='iiif_canvas')
-    api.add_resource(
-        IIIFSequence,
-        '/iiif_sequence/<int:id_>.json',
-        endpoint='iiif_sequence')
+routes = (entity + admin + types + special + display)
