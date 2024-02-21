@@ -7,7 +7,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     apt install -y --no-install-recommends python3-flask-babel python3-flask-login python3-flaskext.wtf python3-markdown python3-numpy &&\
     apt install -y --no-install-recommends python3-pandas python3-jinja2 python3-flask-cors python3-flask-restful p7zip-full &&\
     apt install -y --no-install-recommends python3-wand python3-rdflib python3-requests python3-dicttoxml python3-flasgger &&\
-    apt install -y --no-install-recommends apache2 libapache2-mod-wsgi-py3 python3-coverage python3-nose exiftran &&\
+    apt install -y --no-install-recommends apache2 libapache2-mod-wsgi-py3 brotli python3-coverage python3-nose exiftran &&\
     apt install -y --no-install-recommends iipimage-server libvips-tools python3-email-validator &&\
     apt install -y --no-install-recommends gettext npm python3-pip git postgresql-client-15 &&\
     apt install -y --no-install-recommends dos2unix locales locales-all vim w3c-sgml-lib nano &&\
@@ -26,12 +26,14 @@ RUN cd /var/www/openatlas && cp install/docker/entrypoint.sh /entrypoint.sh &&\
     sed -i 's~^Listen.*~Listen 8080~' /etc/apache2/ports.conf &&\
     sed -i 's~^<VirtualHost \*:80>~<VirtualHost *:8080>~' /etc/apache2/sites-available/000-default.conf &&\
     sed -i 's~ServerName.*~~' /etc/apache2/sites-available/000-default.conf &&\
-    sed -i 's~</VirtualHost>~ErrorLogFormat "{ \\"time\\":\\"%{%Y-%m-%d}tT%{%T}t.%{msec_frac}tZ\\", \\"function\\" : \\"[%-m:%l]\\" , \\"process\\" : \\"[pid %P:tid %T]\\" , \\"message\\" : \\"%M\\" ,\ \\"referer\\"\ : \\"%{Referer}i\\" },"\nLogFormat "{ \\"time\\":\\"%{%Y-%m-%d}tT%{%T}t.%{msec_frac}tZ\\", \\"process\\":\\"%D\\", \\"filename\\":\\"%f\\", \\"remoteIP\\":\\"%a\\", \\"host\\":\\"%V\\", \\"request\\":\\"%U\\", \\"query\\":\\"%q\\", \\"method\\":\\"%m\\", \\"status\\":\\"%>s\\", \\"userAgent\\":\\"%{User-agent}i\\", \\"referer\\":\\"%{Referer}i\\" }," OpenAtlasLog\nCustomLog /dev/stdout OpenAtlasLog\nErrorLog /dev/stdout\n</VirtualHost>~' /etc/apache2/sites-available/000-default.conf
+    sed -i 's~</VirtualHost>~ErrorLogFormat "{ \\"time\\":\\"%{%Y-%m-%d}tT%{%T}t.%{msec_frac}tZ\\", \\"function\\" : \\"[%-m:%l]\\" , \\"process\\" : \\"[pid %P:tid %T]\\" , \\"message\\" : \\"%M\\" ,\ \\"referer\\"\ : \\"%{Referer}i\\" },"\nLogFormat "{ \\"time\\":\\"%{%Y-%m-%d}tT%{%T}t.%{msec_frac}tZ\\", \\"process\\":\\"%D\\", \\"filename\\":\\"%f\\", \\"remoteIP\\":\\"%a\\", \\"host\\":\\"%V\\", \\"request\\":\\"%U\\", \\"query\\":\\"%q\\", \\"method\\":\\"%m\\", \\"status\\":\\"%>s\\", \\"userAgent\\":\\"%{User-agent}i\\", \\"referer\\":\\"%{Referer}i\\" }," OpenAtlasLog\nCustomLog /dev/stdout OpenAtlasLog\nErrorLog /dev/stdout\n</VirtualHost>~' /etc/apache2/sites-available/000-default.conf &&\
+    sed -i 's~</VirtualHost>~<IfModule mod_brotli.c>\nAddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/xml text/css text/javascript application/javascript application/x-javascript application/json application/xml\nBrotliCompressionQuality 4\n</IfModule></VirtualHost>~' /etc/apache2/sites-available/000-default.conf
 USER www-data
 RUN cd /var/www/openatlas/openatlas/static &&\
     npm install
 RUN a2enmod iipsrv &&\
     a2enmod fcgid &&\
+    a2enmod brotli &&\
     service apache2 restart
 
 EXPOSE 8080
