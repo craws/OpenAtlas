@@ -27,13 +27,13 @@ RUN cd /var/www/openatlas && cp install/docker/entrypoint.sh /entrypoint.sh &&\
     sed -i 's~^<VirtualHost \*:80>~<VirtualHost *:8080>~' /etc/apache2/sites-available/000-default.conf &&\
     sed -i 's~ServerName.*~~' /etc/apache2/sites-available/000-default.conf &&\
     sed -i 's~</VirtualHost>~ErrorLogFormat "{ \\"time\\":\\"%{%Y-%m-%d}tT%{%T}t.%{msec_frac}tZ\\", \\"function\\" : \\"[%-m:%l]\\" , \\"process\\" : \\"[pid %P:tid %T]\\" , \\"message\\" : \\"%M\\" ,\ \\"referer\\"\ : \\"%{Referer}i\\" },"\nLogFormat "{ \\"time\\":\\"%{%Y-%m-%d}tT%{%T}t.%{msec_frac}tZ\\", \\"process\\":\\"%D\\", \\"filename\\":\\"%f\\", \\"remoteIP\\":\\"%a\\", \\"host\\":\\"%V\\", \\"request\\":\\"%U\\", \\"query\\":\\"%q\\", \\"method\\":\\"%m\\", \\"status\\":\\"%>s\\", \\"userAgent\\":\\"%{User-agent}i\\", \\"referer\\":\\"%{Referer}i\\" }," OpenAtlasLog\nCustomLog /dev/stdout OpenAtlasLog\nErrorLog /dev/stdout\n</VirtualHost>~' /etc/apache2/sites-available/000-default.conf &&\
-    sed -i 's~</VirtualHost>~<IfModule mod_brotli.c>\nAddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/xml text/css text/javascript application/javascript application/x-javascript application/json application/xml\nBrotliCompressionQuality 4\n</IfModule></VirtualHost>~' /etc/apache2/sites-available/000-default.conf
-USER www-data
-RUN cd /var/www/openatlas/openatlas/static &&\
-    npm install
+    sed -i 's~</VirtualHost>~<IfModule mod_brotli.c>\nAddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/xml text/css text/javascript application/javascript application/x-javascript application/json application/xml\nBrotliCompressionQuality 4\n</IfModule>\n</VirtualHost>~' /etc/apache2/sites-available/000-default.conf
 RUN a2enmod iipsrv &&\
     a2enmod fcgid &&\
-    a2enmod brotli &&\
+    a2enmod brotli
+USER www-data
+RUN cd /var/www/openatlas/openatlas/static &&\
+    npm install \ &&\
     service apache2 restart
 
 EXPOSE 8080
