@@ -1699,6 +1699,7 @@
                 "type",
                 "crmClass",
                 "systemClass",
+                "viewClass",
                 "properties",
                 "descriptions",
                 "geometry"
@@ -1714,6 +1715,9 @@
                   "type": "string"
                 },
                 "systemClass": {
+                  "type": "string"
+                },
+                "viewClass": {
                   "type": "string"
                 },
                 "properties": {
@@ -1969,6 +1973,7 @@
                   "required": [
                     "@id",
                     "systemClass",
+                    "viewClass",
                     "name",
                     "description",
                     "begin_earliest",
@@ -1984,6 +1989,9 @@
                       "type": "integer"
                     },
                     "systemClass": {
+                      "type": "string"
+                    },
+                    "viewClass": {
                       "type": "string"
                     },
                     "name": {

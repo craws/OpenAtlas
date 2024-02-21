@@ -98,6 +98,7 @@ def get_geojson_dict(
         'properties': {
             '@id': entity.id,
             'systemClass': entity.class_.name,
+            'viewClass': entity.class_.view,
             'name': entity.name,
             'description': entity.description
             if 'description' in parser['show'] else None,

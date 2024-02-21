@@ -26,6 +26,7 @@ def get_linked_places_entity(
             'type': 'Feature',
             'crmClass': f'crm:{entity.cidoc_class.code} '
                         f"{entity.cidoc_class.i18n['en']}",
+            'viewClass': entity.class_.view,
             'systemClass': entity.class_.name,
             'properties': {'title': entity.name},
             'types': get_lp_types(entity, links)

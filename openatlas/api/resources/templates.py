@@ -16,6 +16,7 @@ def geojson_template() -> dict[str, Any]:
     properties = {
         '@id': fields.Integer,
         'systemClass': fields.String,
+        'viewClass': fields.String,
         'name': fields.String,
         'description': fields.String,
         'begin_earliest': fields.String,
@@ -103,6 +104,7 @@ def linked_places_template(show: str) -> dict[str, Type[String]]:
         'type': fields.String,
         'crmClass': fields.String,
         'systemClass': fields.String,
+        'viewClass': fields.String,
         'properties': fields.Nested(title),
         'descriptions': fields.List(fields.Nested(description))}
 
