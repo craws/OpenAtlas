@@ -4,7 +4,6 @@ from typing import Any, Optional, TYPE_CHECKING
 
 from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
-from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import HiddenField, SelectMultipleField, StringField, widgets
 from wtforms.validators import InputRequired, URL
@@ -12,6 +11,7 @@ from wtforms.validators import InputRequired, URL
 from openatlas import app
 from openatlas.display.table import Table
 from openatlas.display.util import get_base_table_data
+from openatlas.display.util2 import show_table_icons
 from openatlas.forms import base_manager, manager
 from openatlas.forms.field import SubmitField, TableMultiField, TreeField
 from openatlas.models.entity import Entity
@@ -54,9 +54,7 @@ def get_add_reference_form(class_: str) -> Any:
 def get_table_form(classes: list[str], excluded: list[int]) -> str:
     entities = Entity.get_by_class(classes, types=True, aliases=True)
     table = Table([''] + g.table_headers[classes[0]], order=[[2, 'asc']])
-    if (classes[0] == 'file' and
-            (g.settings['image_processing'] or g.settings['iiif'])
-            and current_user.settings['table_show_icons']):
+    if classes[0] == 'file' and show_table_icons():
         table.header.insert(1, _('icon'))
     for entity in entities:
         if entity.id not in excluded:
@@ -67,9 +65,7 @@ def get_table_form(classes: list[str], excluded: list[int]) -> str:
                     type="checkbox"
                     value="{entity.id}">"""
             rows = [input_]
-            if (classes[0] == 'file' and
-                    (g.settings['image_processing'] or g.settings['iiif'])
-                    and current_user.settings['table_show_icons']):
+            if classes[0] == 'file' and show_table_icons():
                 rows.append(file_preview(entity.id))
             rows.extend(get_base_table_data(entity, show_links=False))
 

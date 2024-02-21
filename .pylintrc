@@ -13,3 +13,6 @@ max-statements=100 # default=50 (too-many-statements)
 
 [FORMAT]
 max-line-length=79
+
+[TYPECHECK]
+ignored-classes=Form

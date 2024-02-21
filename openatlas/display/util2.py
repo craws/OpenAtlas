@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 import numpy
+from flask import g
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from jinja2 import pass_context
@@ -185,3 +186,8 @@ def format_date(value: datetime | numpy.datetime64) -> str:
         date_ = datetime64_to_timestamp(value)
         return date_.lstrip('0').replace(' 00:00:00', '') if date_ else ''
     return value.date().isoformat().replace(' 00:00:00', '')
+
+
+def show_table_icons() -> bool:
+    return current_user.settings['table_show_icons'] \
+        and (g.settings['image_processing'] or g.settings['iiif'])

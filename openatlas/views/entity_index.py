@@ -1,6 +1,5 @@
 from flask import g, render_template, url_for
 from flask_babel import lazy_gettext as _
-from flask_login import current_user
 from werkzeug.wrappers import Response
 
 from openatlas import app
@@ -9,7 +8,8 @@ from openatlas.display.table import Table
 from openatlas.display.util import (
     button, check_iiif_file_exist, get_base_table_data, get_file_path, link,
     required_group)
-from openatlas.display.util2 import format_date, is_authorized, manual
+from openatlas.display.util2 import (
+    format_date, is_authorized, manual, show_table_icons)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 
@@ -41,8 +41,7 @@ def get_table(view: str) -> Table:
     if view == 'file':
         table.order = [[0, 'desc']]
         table.header = ['date'] + table.header
-        if (g.settings['image_processing'] or g.settings['iiif']) \
-                and current_user.settings['table_show_icons']:
+        if show_table_icons():
             table.header.insert(1, _('icon'))
         for entity in Entity.get_by_class('file', types=True):
             data = [
@@ -52,8 +51,7 @@ def get_table(view: str) -> Table:
                 entity.get_file_size(),
                 entity.get_file_ext(),
                 entity.description]
-            if (g.settings['image_processing'] or g.settings['iiif']) \
-                    and current_user.settings['table_show_icons']:
+            if show_table_icons():
                 data.insert(1, file_preview(entity.id))
             table.rows.append(data)
     elif view == 'reference_system':
