@@ -4,7 +4,9 @@ from flask import g, url_for
 
 from openatlas import app
 from openatlas.api.resources.util import (
-    date_to_str, get_crm_relation, get_geometric_collection, get_license_name,
+    date_to_str, get_crm_relation, get_crm_relation_label_x,
+    get_crm_relation_x,
+    get_geometric_collection, get_license_name,
     get_location_link, get_reference_systems,
     replace_empty_list_values_in_dict_with_none, to_camel_case)
 from openatlas.display.util import get_file_path
@@ -64,6 +66,24 @@ def link_dict(link_: Link, inverse: bool = False) -> dict[str, Any]:
             get_lp_time(link_.domain if inverse else link_.range)]}}
 
 
+def link_dict_x(link_: Link, inverse: bool = False) -> dict[str, Any]:
+    return {
+        'label': link_.domain.name if inverse else link_.range.name,
+        'relationTo':
+            url_for(
+                'api.entity',
+                id_=link_.domain.id if inverse else link_.range.id,
+                _external=True),
+        'relationType': get_crm_relation_x(link_),
+        'relationTypeLabel': get_crm_relation_label_x(link_, inverse),
+        'relationSystemClass':
+            link_.domain.class_.name if inverse else link_.range.class_.name,
+        'type': to_camel_case(link_.type.name) if link_.type else None,
+        'relationDescription': link_.description,
+        'when': {'timespans': [
+            get_lp_time(link_.domain if inverse else link_.range)]}}
+
+
 def get_lp_links(
         links: list[Link],
         links_inverse: list[Link],
@@ -72,10 +92,14 @@ def get_lp_links(
     out = []
     for link_ in links:
         if link_.property.code in properties:
-            out.append(link_dict(link_))
+            out.append(
+                link_dict_x(link_) if parser['format'] == 'lpx'
+                else link_dict(link_))
     for link_ in links_inverse:
         if link_.property.code in properties:
-            out.append(link_dict(link_, inverse=True))
+            out.append(
+                link_dict_x(link_, inverse=True) if parser['format'] == 'lpx'
+                else link_dict(link_, inverse=True))
     return out
 
 

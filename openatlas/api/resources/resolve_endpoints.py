@@ -102,7 +102,7 @@ def resolve_entity(
         return Response(
             rdf_output(result, parser),
             mimetype=app.config['RDF_FORMATS'][parser['format']])
-    template = linked_places_template(parser['show'])
+    template = linked_places_template(parser)
     if parser['format'] in ['geojson', 'geojson-v2']:
         template = geojson_collection_template()
     if parser['format'] == 'loud':

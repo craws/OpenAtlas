@@ -60,7 +60,7 @@ def geometries_template() -> dict[str, Any]:
     return {'type': fields.String, 'features': fields.Nested(feature)}
 
 
-def linked_places_template(show: str) -> dict[str, Type[String]]:
+def linked_places_template(parser: dict[str, Any]) -> dict[str, Type[String]]:
     title = {'title': fields.String}
     depictions = {
         '@id': fields.String,
@@ -99,6 +99,8 @@ def linked_places_template(show: str) -> dict[str, Type[String]]:
         'relationDescription': fields.String,
         'type': fields.String,
         'when': fields.Nested(when)}
+    if parser['format'] == 'lpx':
+        relations['relationTypeLabel'] = fields.String
     feature = {
         '@id': fields.String,
         'type': fields.String,
@@ -107,7 +109,7 @@ def linked_places_template(show: str) -> dict[str, Type[String]]:
         'viewClass': fields.String,
         'properties': fields.Nested(title),
         'descriptions': fields.List(fields.Nested(description))}
-
+    show = parser['show']
     if 'when' in show:
         feature['when'] = fields.Nested(when)
     if 'types' in show:
@@ -140,7 +142,7 @@ def pagination() -> dict[str, List | Nested]:
 def linked_place_pagination(parser: dict[str, str]) -> dict[str, Any]:
     return {
         "results": fields.List(fields.Nested(
-            linked_places_template(parser['show']))),
+            linked_places_template(parser))),
         "pagination": fields.Nested(pagination())}
 
 

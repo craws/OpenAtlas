@@ -18,6 +18,7 @@ RDF_FORMATS = {
     'xml': 'application/xml'}
 JSON_FORMATS = {
     'lp': 'application/ld+json',
+    'lpx': 'application/ld+json',
     'loud': 'application/ld+json',
     'geojson': 'application/json',
     'geojson-v2': 'application/json'}

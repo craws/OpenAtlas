@@ -181,6 +181,17 @@ class Api(ApiTestCase):
                 rv['depictions'][0], 'license', 'Open license')
             assert self.get_bool(rv['depictions'][0], 'url')
 
+            rv = self.app.get(url_for(
+                'api_04.entity', id_=place.id, format='lpx', locale='de'))
+            assert 'application/json' in rv.headers.get('Content-Type')
+            rv = rv.get_json()['features'][0]
+            rel = rv['relations']
+            assert self.get_bool(rel[1], 'label', 'Height')
+            assert self.get_bool(rel[1], 'relationDescription', '23.0')
+            assert self.get_bool(rel[0], 'relationTo')
+            assert self.get_bool(rel[0], 'relationType', 'crm:P2_has_type')
+            assert self.get_bool(rel[0], 'relationTypeLabel', 'hat den Typus')
+
             # Test entity in GeoJSON format
             rv = self.app.get(url_for(
                 'api_04.entity', id_=place.id, format='geojson'))

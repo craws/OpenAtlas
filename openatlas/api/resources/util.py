@@ -265,6 +265,19 @@ def get_crm_relation(link_: Link, inverse: bool = False) -> str:
     return f"crm:{link_.property.code}{property_}"
 
 
+def get_crm_relation_label_x(link_: Link, inverse: bool = False) -> str:
+    if inverse and link_.property.name_inverse:
+        return link_.property.name_inverse
+    return link_.property.name
+
+
+def get_crm_relation_x(link_: Link, inverse: bool = False) -> str:
+    property_ = f"i_{link_.property.i18n_inverse['en']}" \
+        if inverse and link_.property.i18n_inverse['en'] \
+        else f"_{link_.property.i18n['en']}"
+    return f"crm:{link_.property.code}{property_.replace(' ', '_')}"
+
+
 def get_crm_code(link_: Link, inverse: bool = False) -> str:
     name = link_.domain.cidoc_class.i18n['en'] \
         if inverse else link_.range.cidoc_class.i18n['en']
