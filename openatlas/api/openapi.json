@@ -109,6 +109,9 @@
           },
           {
             "$ref": "#/components/parameters/export"
+          },
+          {
+            "$ref": "#/components/parameters/locale"
           }
         ],
         "responses": {
@@ -197,6 +200,9 @@
           },
           {
             "$ref": "#/components/parameters/relation_type"
+          },
+          {
+            "$ref": "#/components/parameters/locale"
           }
         ],
         "responses": {
@@ -268,6 +274,9 @@
           },
           {
             "$ref": "#/components/parameters/relation_type"
+          },
+          {
+            "$ref": "#/components/parameters/locale"
           }
         ],
         "responses": {
@@ -339,6 +348,9 @@
           },
           {
             "$ref": "#/components/parameters/relation_type"
+          },
+          {
+            "$ref": "#/components/parameters/locale"
           }
         ],
         "responses": {
@@ -410,6 +422,9 @@
           },
           {
             "$ref": "#/components/parameters/relation_type"
+          },
+          {
+            "$ref": "#/components/parameters/locale"
           }
         ],
         "responses": {
@@ -473,6 +488,9 @@
           },
           {
             "$ref": "#/components/parameters/relation_type"
+          },
+          {
+            "$ref": "#/components/parameters/locale"
           }
         ],
         "responses": {
@@ -544,6 +562,9 @@
           },
           {
             "$ref": "#/components/parameters/relation_type"
+          },
+          {
+            "$ref": "#/components/parameters/locale"
           }
         ],
         "responses": {
@@ -615,6 +636,9 @@
           },
           {
             "$ref": "#/components/parameters/relation_type"
+          },
+          {
+            "$ref": "#/components/parameters/locale"
           }
         ],
         "responses": {
@@ -686,6 +710,9 @@
           },
           {
             "$ref": "#/components/parameters/relation_type"
+          },
+          {
+            "$ref": "#/components/parameters/locale"
           }
         ],
         "responses": {
@@ -1257,7 +1284,7 @@
       },
       "locale": {
         "name": "locale",
-        "description": "Choose language",
+        "description": "Choose language for system inherent labels",
         "in": "query",
         "schema": {
           "type": "string",
@@ -1438,6 +1465,7 @@
           "type": "string",
           "enum": [
             "lp",
+            "lpx",
             "geojson",
             "geojson-v2",
             "pretty-xml",
