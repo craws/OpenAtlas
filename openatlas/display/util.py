@@ -455,10 +455,9 @@ def link(
     if isinstance(object_, (str, LazyString)):
         js = f' onclick="{uc_first(js)}"' if js else ''
         ext = ' target="_blank" rel="noopener noreferrer"' if external else ''
-        class_ = str(class_)  # Just to make Mypy happy
         if uc_first_ and not str(object_).startswith('http'):
-            class_ += ' uc-first'
-        class_ = f' class="{class_.strip()}"' if class_.strip() else ''
+            object_ = uc_first(object_)
+        class_ = f' class="{class_.strip()}"' if class_ else ''
         html = f'<a href="{url}"{class_}{js}{ext}>{object_}</a>'
     elif isinstance(object_, Entity):
         html = link(
@@ -470,16 +469,19 @@ def link(
         html = link(
             object_.code,
             url_for('cidoc_class_view', code=object_.code),
+            uc_first_=False,
             external=external)
     elif isinstance(object_, CidocProperty):
         html = link(
             object_.code,
             url_for('property_view', code=object_.code),
+            uc_first_=False,
             external=external)
     elif isinstance(object_, Project):
         html = link(
             object_.name,
             url_for('import_project_view', id_=object_.id),
+            uc_first_=False,
             external=external)
     elif isinstance(object_, User):
         html = link(

@@ -130,7 +130,7 @@ class FileTest(TestBaseCase):
             assert b'IIIF converted' in rv.data
 
             rv = self.app.get(url_for('view', id_=file_id))
-            assert b'view in IIIF' in rv.data
+            assert b'View in IIIF' in rv.data
 
             rv = self.app.get(
                 url_for('view', id_=place.id, _anchor="tab-file"))

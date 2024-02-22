@@ -56,4 +56,4 @@ display = [
     [IIIFAnnotation, '/iiif_annotation/<int:annotation_id>.json',
      'iiif_annotation']]
 
-routes = (entity + admin + types + special + display)
+routes = entity + admin + types + special + display
