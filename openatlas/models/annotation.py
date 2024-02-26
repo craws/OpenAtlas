@@ -4,7 +4,7 @@ from typing import Any, Optional
 
 from flask_login import current_user
 
-from openatlas.database.annotation import AnnotationImage as Db
+from openatlas.database import annotation as db
 
 
 class Annotation:
@@ -22,21 +22,18 @@ class Annotation:
             self,
             entity_id: Optional[int] = None,
             text: Optional[str] = None) -> None:
-        Db.update({
-            'id': self.id,
-            'entity_id': entity_id,
-            'annotation': text})
+        db.update({'id': self.id, 'entity_id': entity_id, 'annotation': text})
 
     def delete(self) -> None:
-        Db.delete(self.id)
+        db.delete(self.id)
 
     @staticmethod
     def get_by_id(id_: int) -> Annotation:
-        return Annotation(Db.get_by_id(id_))
+        return Annotation(db.get_by_id(id_))
 
     @staticmethod
     def get_by_file(image_id: int) -> list[Annotation]:
-        return [Annotation(row) for row in Db.get_by_file(image_id)]
+        return [Annotation(row) for row in db.get_by_file(image_id)]
 
     @staticmethod
     def insert(
@@ -44,7 +41,7 @@ class Annotation:
             coordinates: str,
             entity_id: Optional[int] = None,
             text: Optional[str] = None) -> None:
-        Db.insert({
+        db.insert({
             'image_id': image_id,
             'user_id': current_user.id,
             'entity_id': entity_id or None,

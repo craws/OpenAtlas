@@ -4,8 +4,7 @@ from typing import Any, Optional, TYPE_CHECKING
 
 from flask import g
 
-from openatlas.database.date import Date
-from openatlas.database.link import Link as Db
+from openatlas.database import date, link as db
 from openatlas.display.util2 import (
     datetime64_to_timestamp, format_date_part, timestamp_to_datetime64)
 
@@ -47,7 +46,7 @@ class Link:
                 if self.end_to else self.last
 
     def update(self) -> None:
-        Db.update({
+        db.update({
             'id': self.id,
             'property_code': self.property.code,
             'domain_id': self.domain.id,
@@ -71,45 +70,45 @@ class Link:
 
     @staticmethod
     def get_by_id(id_: int) -> Link:
-        return Link(Db.get_by_id(id_))
+        return Link(db.get_by_id(id_))
 
     @staticmethod
     def get_links_by_type(type_: Type) -> list[dict[str, Any]]:
-        return Db.get_links_by_type(type_.id)
+        return db.get_links_by_type(type_.id)
 
     @staticmethod
     def get_links_by_type_recursive(
             type_: Type,
             result: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        result += Db.get_links_by_type(type_.id)
+        result += db.get_links_by_type(type_.id)
         for sub_id in type_.subs:
             result = Link.get_links_by_type_recursive(g.types[sub_id], result)
         return result
 
     @staticmethod
     def get_entity_ids_by_type_ids(types_: list[int]) -> list[int]:
-        return Db.get_entity_ids_by_type_ids(types_)
+        return db.get_entity_ids_by_type_ids(types_)
 
     @staticmethod
     def delete_(id_: int) -> None:
-        Db.delete_(id_)
+        db.delete_(id_)
 
     @staticmethod
     def invalid_involvement_dates() -> list[Link]:
         return [
             Link.get_by_id(row['id'])
-            for row in Date.invalid_involvement_dates()]
+            for row in date.invalid_involvement_dates()]
 
     @staticmethod
     def get_invalid_link_dates() -> list[Link]:
         return [
             Link.get_by_id(row['id'])
-            for row in Date.get_invalid_link_dates()]
+            for row in date.get_invalid_link_dates()]
 
     @staticmethod
     def check_link_duplicates() -> list[dict[str, Any]]:
-        return Db.check_link_duplicates()
+        return db.check_link_duplicates()
 
     @staticmethod
     def delete_link_duplicates() -> int:
-        return Db.delete_link_duplicates()
+        return db.delete_link_duplicates()

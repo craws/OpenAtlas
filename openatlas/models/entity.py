@@ -8,9 +8,7 @@ from fuzzywuzzy import fuzz
 from werkzeug.exceptions import abort
 
 from openatlas import app
-from openatlas.database.date import Date
-from openatlas.database.entity import Entity as Db
-from openatlas.database.tools import Tools
+from openatlas.database import date, entity as db, tools as db_tools
 from openatlas.display.util2 import (
     convert_size, datetime64_to_timestamp, format_date_part, sanitize,
     timestamp_to_datetime64)
@@ -114,7 +112,7 @@ class Entity:
             inverse: bool = False,
             types: bool = False) -> list[Entity]:
         return Entity.get_by_ids(
-            Db.get_linked_entities_recursive(self.id, code, inverse),
+            db.get_linked_entities_recursive(self.id, code, inverse),
             types=types)
 
     def link(self,
@@ -145,7 +143,7 @@ class Entity:
                     f" > {code} > {range_.class_.cidoc_class.code}"
                 g.logger.log('error', 'model', text)
                 abort(400, text)
-            id_ = Db.link({
+            id_ = db.link({
                 'property_code': code,
                 'domain_id': domain.id,
                 'range_id': range_.id,
@@ -179,12 +177,12 @@ class Entity:
                 and not inverse:
             exclude_ids = g.sex_type.get_sub_ids_recursive()
             exclude_ids.append(g.radiocarbon_type.id)
-            if Tools.get_sex_types(self.id) or get_carbon_link(self):
-                Db.remove_types(self.id, exclude_ids)
+            if db_tools.get_sex_types(self.id) or get_carbon_link(self):
+                db.remove_types(self.id, exclude_ids)
                 codes.remove('P2')
                 if not codes:
                     return
-        Db.delete_by_codes(self.id, codes, inverse)
+        db.delete_links_by_codes(self.id, codes, inverse)
 
     def update(
             self,
@@ -218,7 +216,7 @@ class Entity:
     def update_attributes(self, attributes: dict[str, Any]) -> None:
         for key, value in attributes.items():
             setattr(self, key, value)
-        Db.update({
+        db.update({
             'id': self.id,
             'name': self.name.strip(),
             'begin_from': datetime64_to_timestamp(self.begin_from),
@@ -255,7 +253,7 @@ class Entity:
                 self.delete_links(data['links']['delete_inverse'], True)
             if 'delete_reference_system' in data['links'] \
                     and data['links']['delete_reference_system']:
-                Db.delete_reference_system_links(self.id)
+                db.delete_reference_system_links(self.id)
         continue_link_id = None
         for link_ in data['links']['insert']:
             ids = self.link(
@@ -284,7 +282,7 @@ class Entity:
         if not self.location:
             self.location = self.get_linked_entity_safe('P53')
         if not new:
-            Db.update({
+            db.update({
                 'id': self.location.id,
                 'name': f'Location of {str(self.name).strip()}',
                 'begin_from': None,
@@ -298,10 +296,10 @@ class Entity:
         Gis.insert(self.location, gis_data)
 
     def get_profile_image_id(self) -> Optional[int]:
-        return Db.get_profile_image_id(self.id)
+        return db.get_profile_image_id(self.id)
 
     def remove_profile_image(self) -> None:
-        Db.remove_profile_image(self.id)
+        db.remove_profile_image(self.id)
 
     def get_name_directed(self, inverse: bool = False) -> str:
         """Returns name part of a directed type e.g. parent of (child of)"""
@@ -353,16 +351,16 @@ class Entity:
     def get_invalid_dates() -> list[Entity]:
         return [
             Entity.get_by_id(row['id'], types=True)
-            for row in Date.get_invalid_dates()]
+            for row in date.get_invalid_dates()]
 
     @staticmethod
     def get_orphaned_subunits() -> list[Entity]:
-        return [Entity.get_by_id(x['id']) for x in Db.get_orphaned_subunits()]
+        return [Entity.get_by_id(x['id']) for x in db.get_orphaned_subunits()]
 
     @staticmethod
     def delete_(id_: int | list[int]) -> None:
         if id_:
-            Db.delete(id_ if isinstance(id_, list) else [id_])
+            db.delete(id_ if isinstance(id_, list) else [id_])
 
     @staticmethod
     def get_by_class(
@@ -371,13 +369,12 @@ class Entity:
             aliases: bool = False) -> list[Entity]:
         if aliases:  # For performance: check classes if they can have an alias
             aliases = False
-            for class_ in classes if isinstance(classes, list) \
-                    else [classes]:
+            for class_ in classes if isinstance(classes, list) else [classes]:
                 if g.classes[class_].alias_allowed:
                     aliases = True
                     break
         return [
-            Entity(row) for row in Db.get_by_class(classes, types, aliases)]
+            Entity(row) for row in db.get_by_class(classes, types, aliases)]
 
     @staticmethod
     def get_by_view(
@@ -389,7 +386,7 @@ class Entity:
     @staticmethod
     def get_display_files() -> list[Entity]:
         entities = []
-        for row in Db.get_by_class('file', types=True):
+        for row in db.get_by_class('file', types=True):
             ext = g.files[row['id']].suffix if row['id'] in g.files else 'N/A'
             if ext in app.config['DISPLAY_FILE_EXT']:
                 entities.append(Entity(row))
@@ -397,12 +394,12 @@ class Entity:
 
     @staticmethod
     def insert(class_: str, name: str, desc: Optional[str] = None) -> Entity:
-        id_ = Db.insert({
-            'name': name.strip(),
-            'code': g.classes[class_].cidoc_class.code,
-            'openatlas_class_name': class_,
-            'description': sanitize(desc, 'text') if desc else None})
-        return Entity.get_by_id(id_)
+        return Entity.get_by_id(
+            db.insert({
+                'name': name.strip(),
+                'code': g.classes[class_].cidoc_class.code,
+                'openatlas_class_name': class_,
+                'description': sanitize(desc, 'text') if desc else None}))
 
     @staticmethod
     def get_by_cidoc_class(
@@ -410,7 +407,7 @@ class Entity:
             types: bool = False,
             aliases: bool = False) -> list[Entity]:
         return [
-            Entity(row) for row in Db.get_by_cidoc_class(code, types, aliases)]
+            Entity(row) for row in db.get_by_cidoc_class(code, types, aliases)]
 
     @staticmethod
     def get_by_id(
@@ -421,7 +418,7 @@ class Entity:
             return g.types[id_]
         if id_ in g.reference_systems:
             return g.reference_systems[id_]
-        data = Db.get_by_id(id_, types, aliases)
+        data = db.get_by_id(id_, types, aliases)
         if not data:
             if 'activity' in request.path:  # Re-raise if in user activity view
                 raise AttributeError
@@ -434,7 +431,7 @@ class Entity:
             types: bool = False,
             aliases: bool = False) -> list[Entity]:
         entities = []
-        for row in Db.get_by_ids(ids, types, aliases):
+        for row in db.get_by_ids(ids, types, aliases):
             if row['id'] in g.types:
                 entities.append(g.types[row['id']])
             elif row['id'] in g.reference_systems:
@@ -446,7 +443,7 @@ class Entity:
     @staticmethod
     def get_by_project_id(project_id: int) -> list[Entity]:
         entities = []
-        for row in Db.get_by_project_id(project_id):
+        for row in db.get_by_project_id(project_id):
             entity = Entity(row)
             entity.origin_id = row['origin_id']
             entities.append(entity)
@@ -454,7 +451,7 @@ class Entity:
 
     @staticmethod
     def get_by_link_property(code: str, class_: str) -> list[Entity]:
-        return [Entity(row) for row in Db.get_by_link_property(code, class_)]
+        return [Entity(row) for row in db.get_by_link_property(code, class_)]
 
     @staticmethod
     def get_similar_named(class_: str, ratio: int) -> dict[int, Any]:
@@ -474,32 +471,32 @@ class Entity:
 
     @staticmethod
     def get_overview_counts() -> dict[str, int]:
-        return Db.get_overview_counts(g.class_view_mapping)
+        return db.get_overview_counts(g.class_view_mapping)
 
     @staticmethod
     def get_orphans() -> list[Entity]:
-        return [Entity.get_by_id(row['id']) for row in Db.get_orphans()]
+        return [Entity.get_by_id(row['id']) for row in db.get_orphans()]
 
     @staticmethod
     def get_latest(limit: int) -> list[Entity]:
         return [
-            Entity(row) for row in Db.get_latest(g.class_view_mapping, limit)]
+            Entity(row) for row in db.get_latest(g.class_view_mapping, limit)]
 
     @staticmethod
     def set_profile_image(id_: int, origin_id: int) -> None:
-        Db.set_profile_image(id_, origin_id)
+        db.set_profile_image(id_, origin_id)
 
     @staticmethod
     def get_entities_linked_to_itself() -> list[Entity]:
         return [
-            Entity.get_by_id(row['domain_id']) for row in Db.get_circular()]
+            Entity.get_by_id(row['domain_id']) for row in db.get_circular()]
 
     @staticmethod
     def get_roots(
             property_code: str,
             ids: list[int],
             inverse: bool = False) -> dict[int, Any]:
-        return Db.get_roots(property_code, ids, inverse)
+        return db.get_roots(property_code, ids, inverse)
 
     @staticmethod
     def get_links_of_entities(
@@ -509,7 +506,7 @@ class Entity:
         result = set()
         if codes:
             codes = codes if isinstance(codes, list) else [str(codes)]
-        rows = Db.get_links_of_entities(entity_ids, codes, inverse)
+        rows = db.get_links_of_entities(entity_ids, codes, inverse)
         for row in rows:
             result.add(row['domain_id'])
             result.add(row['range_id'])
@@ -551,8 +548,8 @@ class Entity:
             types: bool = False) -> list[Entity]:
         codes = codes if isinstance(codes, list) else [codes]
         return Entity.get_by_ids(
-            Db.get_linked_entities_inverse(id_, codes) if inverse
-            else Db.get_linked_entities(id_, codes),
+            db.get_linked_entities_inverse(id_, codes) if inverse
+            else db.get_linked_entities(id_, codes),
             types=types)
 
     @staticmethod
@@ -574,7 +571,7 @@ class Entity:
     @staticmethod
     def get_invalid_cidoc_links() -> list[dict[str, Any]]:
         invalid_linking = []
-        for row in Db.get_cidoc_links():
+        for row in db.get_cidoc_links():
             valid_domain = g.properties[row['property_code']].find_object(
                 'domain_class_code',
                 row['domain_code'])
@@ -585,7 +582,7 @@ class Entity:
                 invalid_linking.append(row)
         invalid_links = []
         for item in invalid_linking:
-            for row in Db.get_invalid_links(item):
+            for row in db.get_invalid_links(item):
                 invalid_links.append({
                     'domain': Entity.get_by_id(row['domain_id']),
                     'property': g.properties[row['property_code']],
@@ -598,7 +595,7 @@ class Entity:
         for type_ in g.types.values():
             if not type_.multiple and type_.category not in ['value', 'tools']:
                 if type_ids := type_.get_sub_ids_recursive():
-                    for id_ in Db.check_single_type_duplicates(type_ids):
+                    for id_ in db.check_single_type_duplicates(type_ids):
                         offending_types = []
                         entity = Entity.get_by_id(id_, types=True)
                         for entity_type in entity.types:

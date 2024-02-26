@@ -4,7 +4,7 @@ from flask import g, request
 from flask_login import current_user
 
 from openatlas import app
-from openatlas.database.logger import Logger as Db
+from openatlas.database import logger as db
 from openatlas.models.imports import Import
 from openatlas.models.user import User
 
@@ -29,8 +29,8 @@ class Logger:
             info: str | Exception | None = None) -> None:
         log_levels = app.config['LOG_LEVELS']
         priority = list(log_levels)[list(log_levels.values()).index(priority_)]
-        if int(g.settings['log_level']) <= priority:
-            Db.log({
+        if priority >= int(g.settings['log_level']):
+            db.log({
                 'priority': priority,
                 'type': type_,
                 'message': message,
@@ -43,19 +43,19 @@ class Logger:
             limit: str,
             priority: str,
             user_id: str) -> list[dict[str, Any]]:
-        return Db.get_system_logs(limit, priority, user_id)
+        return db.get_system_logs(limit, priority, user_id)
 
     @staticmethod
     def delete_all_system_logs() -> None:
-        Db.delete_all_system_logs()
+        db.delete_all_system_logs()
 
     @staticmethod
     def log_user(entity_id: int, action: str) -> None:
-        Db.log_user(entity_id, current_user.id, action)
+        db.log_user(entity_id, current_user.id, action)
 
     @staticmethod
     def get_log_info(entity_id: int) -> dict[str, Any]:
-        data = Db.get_log_for_advanced_view(entity_id)
+        data = db.get_log_for_advanced_view(entity_id)
         return {
             'creator': User.get_by_id(data['creator_id'])
             if data['creator_id'] else None,

@@ -28,7 +28,7 @@ from config.default import (
     DATABASE_HOST, DATABASE_PORT, EXPORT_PATH)
 from instance import production
 from openatlas.database.connect import open_connection
-from openatlas.database.settings import Settings
+from openatlas.database import settings as db_settings
 from openatlas.models.export import sql_export
 
 config = {
@@ -48,7 +48,7 @@ for item in config:
 
 db = open_connection(config)
 cursor = db.cursor(cursor_factory=extras.DictCursor)
-settings = Settings.get_settings(cursor)
+settings = db_settings.get_settings(cursor)
 
 
 def database_upgrade() -> None:

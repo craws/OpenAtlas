@@ -8,7 +8,7 @@ from typing import Any, Optional
 from flask import g, session
 from flask_login import UserMixin, current_user
 
-from openatlas.database.user import User as Db
+from openatlas.database import user as db
 from openatlas.display.util2 import sanitize
 from openatlas.models.entity import Entity
 
@@ -39,7 +39,7 @@ class User(UserMixin):
         self.modified = row['modified']
 
     def update(self) -> None:
-        Db.update({
+        db.update({
             'id': self.id,
             'username': self.username.strip(),
             'real_name': self.real_name.strip(),
@@ -57,13 +57,13 @@ class User(UserMixin):
 
     def update_settings(self, settings: dict[str, Any]) -> None:
         for name, value in settings.items():
-            Db.update_settings(self.id, name, value)
+            db.update_settings(self.id, name, value)
 
     def remove_newsletter(self) -> None:
-        Db.remove_newsletter(self.id)
+        db.remove_newsletter(self.id)
 
     def update_language(self) -> None:
-        Db.update_language(self.id, current_user.settings['language'])
+        db.update_language(self.id, current_user.settings['language'])
 
     def login_attempts_exceeded(self) -> bool:
         if not self.login_last_failure \
@@ -75,41 +75,41 @@ class User(UserMixin):
         return bool(unlocked > datetime.datetime.now())
 
     def get_notes_by_entity_id(self, entity_id: int) -> list[dict[str, Any]]:
-        return Db.get_notes_by_entity_id(self.id, entity_id)
+        return db.get_notes_by_entity_id(self.id, entity_id)
 
     def get_entities(self) -> list[Entity]:
-        return Entity.get_by_ids(Db.get_user_entities(self.id), types=True)
+        return Entity.get_by_ids(db.get_user_entities(self.id), types=True)
 
     @staticmethod
     def get_all() -> list[User]:
-        return [User(row) for row in Db.get_all()]
+        return [User(row) for row in db.get_all()]
 
     @staticmethod
     def get_by_id(user_id: int, bookmarks: bool = False) -> Optional[User]:
-        if user_data := Db.get_by_id(user_id):
+        if user_data := db.get_by_id(user_id):
             return User(
                 user_data,
-                Db.get_bookmarks(user_id) if bookmarks else None)
+                db.get_bookmarks(user_id) if bookmarks else None)
         return None  # e.g. obsolete session values
 
     @staticmethod
     def get_by_reset_code(code: str) -> Optional[User]:
-        user_data = Db.get_by_reset_code(code)
+        user_data = db.get_by_reset_code(code)
         return User(user_data) if user_data else None
 
     @staticmethod
     def get_by_email(email: str) -> Optional[User]:
-        user_data = Db.get_by_email(email)
+        user_data = db.get_by_email(email)
         return User(user_data) if user_data else None
 
     @staticmethod
     def get_by_username(username: str) -> Optional[User]:
-        user_data = Db.get_by_username(username)
+        user_data = db.get_by_username(username)
         return User(user_data) if user_data else None
 
     @staticmethod
     def get_by_unsubscribe_code(code: str) -> Optional[User]:
-        user_data = Db.get_by_unsubscribe_code(code)
+        user_data = db.get_by_unsubscribe_code(code)
         return User(user_data) if user_data else None
 
     @staticmethod
@@ -117,30 +117,30 @@ class User(UserMixin):
             limit: int,
             user_id: int,
             action: str) -> list[dict[str, Any]]:
-        return Db.get_activities(limit, user_id, action)
+        return db.get_activities(limit, user_id, action)
 
     @staticmethod
     def get_created_entities_count(user_id: int) -> int:
-        return Db.get_created_entities_count(user_id)
+        return db.get_created_entities_count(user_id)
 
     @staticmethod
     def insert(data: dict[str, Any]) -> int:
-        return Db.insert(data)
+        return db.insert(data)
 
     @staticmethod
     def delete(id_: int) -> None:
-        Db.delete(id_)
+        db.delete(id_)
 
     @staticmethod
     def get_users_for_form() -> list[tuple[int, str]]:
-        return Db.get_users_for_form()
+        return db.get_users_for_form()
 
     @staticmethod
     def toggle_bookmark(entity_id: int) -> str:
         if entity_id in current_user.bookmarks:
-            Db.delete_bookmark(current_user.id, entity_id)
+            db.delete_bookmark(current_user.id, entity_id)
             return 'bookmark'
-        Db.insert_bookmark(current_user.id, entity_id)
+        db.insert_bookmark(current_user.id, entity_id)
         return 'bookmark remove'
 
     @staticmethod
@@ -157,7 +157,7 @@ class User(UserMixin):
                     ['map_zoom_max', 'map_zoom_default', 'table_rows'] \
                     or setting.startswith('module_'):
                 settings[setting] = g.settings[setting]
-        for row in Db.get_settings(user_id):
+        for row in db.get_settings(user_id):
             settings[row['name']] = row['value']
             if row['name'] in ['table_rows']:
                 settings[row['name']] = int(row['value'])
@@ -176,20 +176,20 @@ class User(UserMixin):
             user_id: int,
             note: str,
             public: bool) -> None:
-        Db.insert_note(user_id, entity_id, sanitize(note, 'text'), public)
+        db.insert_note(user_id, entity_id, sanitize(note, 'text'), public)
 
     @staticmethod
     def update_note(id_: int, note: str, public: bool) -> None:
-        Db.update_note(id_, sanitize(note, 'text'), public)
+        db.update_note(id_, sanitize(note, 'text'), public)
 
     @staticmethod
     def get_note_by_id(id_: int) -> dict[str, Any]:
-        return Db.get_note_by_id(id_)
+        return db.get_note_by_id(id_)
 
     @staticmethod
     def get_notes_by_user_id(user_id: int) -> list[dict[str, Any]]:
-        return Db.get_notes_by_user_id(user_id)
+        return db.get_notes_by_user_id(user_id)
 
     @staticmethod
     def delete_note(id_: int) -> None:
-        Db.delete_note(id_)
+        db.delete_note(id_)

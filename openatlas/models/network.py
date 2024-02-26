@@ -2,7 +2,7 @@ from typing import Optional
 
 from flask import g
 
-from openatlas.database.network import Network as Db
+from openatlas.database import network as db
 from openatlas.models.entity import Entity
 
 
@@ -18,7 +18,7 @@ class Network:
             id_: int,
             depth: int,
             dimensions: Optional[int]) -> Optional[str]:
-        mapping = Db.get_object_mapping()
+        mapping = db.get_object_mapping()
         entity_ids = {id_}
         location_id = 0
         if id_ in mapping.values():
@@ -27,7 +27,7 @@ class Network:
             entity_ids.add(location_id)
         edges = []
         for _ in range(depth):
-            for row in Db.get_ego_network(entity_ids):
+            for row in db.get_ego_network(entity_ids):
                 if row['property_code'] in Network.properties:
                     domain_id = mapping[row['domain_id']] \
                         if row['domain_id'] in mapping else row['domain_id']
@@ -58,11 +58,11 @@ class Network:
             colors: dict[str, str],
             show_orphans: bool,
             dimensions: Optional[int]) -> Optional[str]:
-        mapping = Db.get_object_mapping()
+        mapping = db.get_object_mapping()
         classes = [c.name for c in g.classes.values() if c.network_color]
         entities: set[int] = set()
         nodes = []
-        for row in Db.get_entities(classes):
+        for row in db.get_entities(classes):
             if row['id'] not in mapping \
                     and row['id'] not in entities \
                     and row['openatlas_class_name'] != 'source':
@@ -74,7 +74,7 @@ class Network:
                 entities.add(row['id'])
         edges = []
         edge_entity_ids = set()
-        for row in Db.get_edges(classes, Network.properties):
+        for row in db.get_edges(classes, Network.properties):
             domain_id = mapping[row['domain_id']] \
                 if row['domain_id'] in mapping else row['domain_id']
             range_id = mapping[row['range_id']] \

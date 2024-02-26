@@ -1,14 +1,14 @@
 from flask import g, session
 
 from openatlas import app
-from openatlas.database.content import Content as Db
+from openatlas.database import content as db
 
 
 def get_content() -> dict[str, dict[str, str]]:
     content: dict[str, dict[str, str]] = {}
     for name in ['intro', 'legal_notice', 'contact', 'citation_example']:
         content[name] = {lang: '' for lang in app.config['LANGUAGES']}
-    for row in Db.get_content():
+    for row in db.get_content():
         content[row['name']][row['language']] = row['text']
     return content
 
@@ -22,4 +22,4 @@ def get_translation(name: str) -> str:
 
 def update_content(data: list[dict[str, str]]) -> None:
     for item in data:
-        Db.update(item['name'], item['language'], item['text'])
+        db.update(item['name'], item['language'], item['text'])

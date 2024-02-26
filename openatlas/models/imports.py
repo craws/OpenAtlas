@@ -3,7 +3,7 @@ from typing import Any, Optional
 from flask import g
 from flask_login import current_user
 
-from openatlas.database.imports import Import as Db
+from openatlas.database import imports as db
 from openatlas.display.util2 import sanitize
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
@@ -24,38 +24,38 @@ class Import:
 
     @staticmethod
     def insert_project(name: str, description: Optional[str] = None) -> int:
-        return Db.insert_project(
+        return db.insert_project(
             name,
             description.strip() if description else None)
 
     @staticmethod
     def get_all_projects() -> list[Project]:
-        return [Project(row) for row in Db.get_all_projects()]
+        return [Project(row) for row in db.get_all_projects()]
 
     @staticmethod
     def get_project_by_id(id_: int) -> Project:
-        return Project(Db.get_project_by_id(id_))
+        return Project(db.get_project_by_id(id_))
 
     @staticmethod
     def get_project_by_name(name: str) -> Optional[Project]:
-        row = Db.get_project_by_name(name)
+        row = db.get_project_by_name(name)
         return Project(row) if row else None
 
     @staticmethod
     def delete_project(id_: int) -> None:
-        Db.delete_project(id_)
+        db.delete_project(id_)
 
     @staticmethod
     def get_origin_ids(project: Project, origin_ids: list[str]) -> list[str]:
-        return Db.check_origin_ids(project.id, origin_ids)
+        return db.check_origin_ids(project.id, origin_ids)
 
     @staticmethod
     def check_duplicates(class_: str, names: list[str]) -> list[str]:
-        return Db.check_duplicates(class_, names)
+        return db.check_duplicates(class_, names)
 
     @staticmethod
     def update_project(project: Project) -> None:
-        Db.update_project(
+        db.update_project(
             project.id,
             project.name,
             sanitize(project.description, 'text'))
@@ -76,7 +76,7 @@ class Import:
                 class_,
                 row['name'],
                 row['description'] if 'description' in row else None)
-            Db.import_data(
+            db.import_data(
                 project.id,
                 entity.id,
                 current_user.id,

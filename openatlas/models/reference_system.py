@@ -4,7 +4,7 @@ from typing import Any, Optional
 
 from flask import g
 
-from openatlas.database.reference_system import ReferenceSystem as Db
+from openatlas.database import reference_system as db
 from openatlas.models.entity import Entity
 
 
@@ -28,7 +28,7 @@ class ReferenceSystem(Entity):
     @staticmethod
     def get_all() -> dict[int, ReferenceSystem]:
         systems = {}
-        for row in Db.get_all():
+        for row in db.get_all():
             system = ReferenceSystem(row)
             for class_ in g.classes.values():
                 if system.id in class_.reference_systems:
@@ -41,17 +41,17 @@ class ReferenceSystem(Entity):
         return systems
 
     def remove_class(self, class_name: str) -> None:
-        Db.remove_class(self.id, class_name)
+        db.remove_class(self.id, class_name)
 
     def update_system(self, data: dict[str, Any]) -> None:
-        Db.update_system({
+        db.update_system({
             'entity_id': self.id,
             'name': self.name,
             'website_url': data['reference_system']['website_url'],
             'resolver_url': data['reference_system']['resolver_url'],
             'identifier_example': data['reference_system']['placeholder']})
         if data['reference_system']['classes']:
-            Db.add_classes(self.id, data['reference_system']['classes'])
+            db.add_classes(self.id, data['reference_system']['classes'])
 
     @staticmethod
     def insert_system(data: dict[str, str]) -> ReferenceSystem:
@@ -59,7 +59,7 @@ class ReferenceSystem(Entity):
             'reference_system',
             data['name'],
             data['description'])
-        Db.insert_system({
+        db.insert_system({
             'entity_id': entity.id,
             'name': entity.name,
             'website_url': data['website_url'] or None,

@@ -3,7 +3,7 @@ from typing import Any
 from flask import g
 from flask_login import current_user
 
-from openatlas.database.entity import Entity as Db
+from openatlas.database import entity as db
 from openatlas.models.entity import Entity
 
 
@@ -15,7 +15,7 @@ def search(data: dict[str, Any]) -> list[Entity]:
             data['classes'].append('appellation')
             break
     entities = []
-    for row in Db.search(
+    for row in db.search(
             data['term'],
             data['classes'],
             data['desc'],
@@ -66,4 +66,4 @@ def check_dates(entity: Entity, data: dict[str, Any]) -> bool:
 
 
 def get_subunits_without_super(classes: list[str]) -> list[int]:
-    return Db.get_subunits_without_super(classes)
+    return db.get_subunits_without_super(classes)

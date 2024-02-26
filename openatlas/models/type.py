@@ -6,7 +6,7 @@ from typing import Any, Optional
 from flask import g
 
 from openatlas import app
-from openatlas.database.type import Type as Db
+from openatlas.database import type as db
 from openatlas.models.entity import Entity
 
 
@@ -43,20 +43,20 @@ class Type(Entity):
 
     def get_count_by_class(self, name: str) -> Optional[int]:
         if type_ids := self.get_sub_ids_recursive():
-            return Db.get_class_count(name, type_ids)
+            return db.get_class_count(name, type_ids)
         return None
 
     def set_required(self) -> None:
-        Db.set_required(self.id)
+        db.set_required(self.id)
 
     def unset_required(self) -> None:
-        Db.unset_required(self.id)
+        db.unset_required(self.id)
 
     def remove_class(self, name: str) -> None:
-        Db.remove_class(self.id, name)
+        db.remove_class(self.id, name)
 
     def remove_entity_links(self, entity_id: int) -> None:
-        Db.remove_entity_links(self.id, entity_id)
+        db.remove_entity_links(self.id, entity_id)
 
     def get_untyped(self) -> list[Entity]:
         untyped = []
@@ -78,11 +78,11 @@ class Type(Entity):
             name: str,
             classes: list[str],
             multiple: bool) -> None:
-        Db.update_hierarchy({
+        db.update_hierarchy({
             'id': self.id,
             'name': name,
             'multiple': multiple})
-        Db.add_classes_to_hierarchy(self.id, classes)
+        db.add_classes_to_hierarchy(self.id, classes)
 
     def move_entities(self, new_type_id: int, checkbox_values: str) -> None:
         root = g.types[self.root[0]]
@@ -104,22 +104,22 @@ class Type(Entity):
                     'new_type_id': new_type_id,
                     'entity_ids': tuple(entity_ids)}
                 if root.name in app.config['PROPERTY_TYPES']:
-                    Db.move_link_type(data)
+                    db.move_link_type(data)
                 else:
-                    Db.move_entity_type(data)
+                    db.move_entity_type(data)
         else:
             delete_ids = entity_ids  # No new type selected so delete all links
 
         if delete_ids:
             if root.name in app.config['PROPERTY_TYPES']:
-                Db.remove_link_type(self.id, delete_ids)
+                db.remove_link_type(self.id, delete_ids)
             else:
-                Db.remove_entity_type(self.id, delete_ids)
+                db.remove_entity_type(self.id, delete_ids)
 
     @staticmethod
     def get_all(with_count: bool) -> dict[int, Type]:
         types = {}
-        for row in Db.get_types(with_count):
+        for row in db.get_types(with_count):
             type_ = Type(row)
             types[type_.id] = type_
             type_.count = row['count'] or row['count_property']
@@ -131,7 +131,7 @@ class Type(Entity):
 
     @staticmethod
     def populate_subs(types: dict[int, Type]) -> None:
-        hierarchies = {row['id']: row for row in Db.get_hierarchies()}
+        hierarchies = {row['id']: row for row in db.get_hierarchies()}
         for type_ in types.values():
             if type_.root:
                 super_ = types[type_.root[-1]]
@@ -220,12 +220,12 @@ class Type(Entity):
             category: str,
             classes: list[str],
             multiple: bool) -> None:
-        Db.insert_hierarchy({
+        db.insert_hierarchy({
             'id': type_.id,
             'name': type_.name,
             'multiple': multiple,
             'category': category})
-        Db.add_classes_to_hierarchy(type_.id, classes)
+        db.add_classes_to_hierarchy(type_.id, classes)
 
     @staticmethod
     def get_type_orphans() -> list[Type]:

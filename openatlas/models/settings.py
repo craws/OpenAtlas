@@ -1,6 +1,6 @@
 from typing import Any, Optional
 
-from openatlas.database.settings import Settings as Db
+from openatlas.database import settings as db
 
 
 class Settings:
@@ -11,7 +11,7 @@ class Settings:
         settings: dict[str, Any] = {}
         for name in Settings.MODULES:  # Set empty in case it doesn't exist
             settings[f'module_{name}'] = ''
-        for name, value in Db.get_settings().items():
+        for name, value in db.get_settings().items():
             settings[name] = value
             if name in [
                     'table_rows',
@@ -32,8 +32,8 @@ class Settings:
     @staticmethod
     def update(data: dict[str, str]) -> None:
         for name, value in data.items():
-            Db.update(name, value)
+            db.update(name, value)
 
     @staticmethod
     def set_logo(file_id: Optional[int] = None) -> None:
-        Db.set_logo(file_id or '')
+        db.set_logo(file_id or '')

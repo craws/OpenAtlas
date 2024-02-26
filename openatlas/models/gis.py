@@ -5,7 +5,7 @@ from typing import Any, Optional, TYPE_CHECKING
 
 from flask import g, json
 
-from openatlas.database.gis import Gis as Db
+from openatlas.database import gis as db
 from openatlas.display.util2 import sanitize
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -21,15 +21,15 @@ class Gis:
 
     @staticmethod
     def get_by_id(id_: int) -> list[dict[str, Any]]:
-        return Db.get_by_id(id_)
+        return db.get_by_id(id_)
 
     @staticmethod
     def get_centroids_by_id(id_: int) -> list[dict[str, Any]]:
-        return Db.get_centroids_by_id(id_)
+        return db.get_centroids_by_id(id_)
 
     @staticmethod
     def get_wkt_by_id(id_: int) -> list[dict[str, Any]]:
-        return Db.get_wkt_by_id(id_)
+        return db.get_wkt_by_id(id_)
 
     @staticmethod
     def get_all(
@@ -67,7 +67,7 @@ class Gis:
                 + subunit_ids \
                 + sibling_ids
         object_ids = [x.id for x in objects] if objects else []
-        for row in Db.get_all(extra_ids):
+        for row in db.get_all(extra_ids):
             description = row['description'].replace('"', '\"') \
                 if row['description'] else ''
             object_desc = row['object_desc'].replace('"', '\"') \
@@ -154,9 +154,9 @@ class Gis:
         for shape in ['point', 'line', 'polygon']:
             for item in json.loads(data[shape]):
                 if item['properties']['shapeType'] != 'centerpoint' \
-                        and not Db.test_geom(json.dumps(item['geometry'])):
+                        and not db.test_geom(json.dumps(item['geometry'])):
                     raise InvalidGeomException
-                Db.insert(
+                db.insert(
                     shape='linestring' if shape == 'line' else shape,
                     data={
                         'entity_id': entity.id,
@@ -175,7 +175,7 @@ class Gis:
             project: Project,
             easting: float,
             northing: float) -> None:
-        Db.insert_import({
+        db.insert_import({
             'entity_id': location.id,
             'description':
                 f"Imported centerpoint of {sanitize(entity.name, 'text')} "
@@ -185,4 +185,4 @@ class Gis:
 
     @staticmethod
     def delete_by_entity(entity: Entity) -> None:
-        Db.delete_by_entity_id(entity.id)
+        db.delete_by_entity_id(entity.id)

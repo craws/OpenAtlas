@@ -7,7 +7,7 @@ from openatlas import app
 from openatlas.api.import_scripts.util import (
     get_exact_match, get_or_create_type, get_reference_system,
     request_arche_metadata)
-from openatlas.database.reference_system import ReferenceSystem as Db
+from openatlas.database import reference_system as db
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
@@ -172,5 +172,5 @@ def get_arche_reference_system() -> ReferenceSystem:
             'website_url': 'https://arche.acdh.oeaw.ac.at/',
             'resolver_url': f"{app.config['ARCHE']['url']}/browser/detail/"})
     if 'artifact' not in system.classes:
-        Db.add_classes(system.id, ['artifact'])
+        db.add_classes(system.id, ['artifact'])
     return system

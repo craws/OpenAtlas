@@ -5,7 +5,7 @@ from typing import Any
 from flask import g
 
 from openatlas import app
-from openatlas.database.cidoc_class import CidocClass as Db
+from openatlas.database import cidoc_class as db
 
 
 class CidocClass:
@@ -22,11 +22,11 @@ class CidocClass:
 
     @staticmethod
     def get_all(language: str) -> dict[str, CidocClass]:
-        classes = {row['code']: CidocClass(row) for row in Db.get_classes()}
-        for row in Db.get_hierarchy():
+        classes = {row['code']: CidocClass(row) for row in db.get_classes()}
+        for row in db.get_hierarchy():
             classes[row['super_code']].sub.append(row['sub_code'])
             classes[row['sub_code']].super.append(row['super_code'])
-        for row in Db.get_translations(app.config['LANGUAGES']):
+        for row in db.get_translations(app.config['LANGUAGES']):
             classes[row['class_code']].i18n[row['language_code']] = row['text']
         for class_ in classes.values():
             if language in class_.i18n:

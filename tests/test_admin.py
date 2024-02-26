@@ -3,7 +3,7 @@ from pathlib import Path
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.database.entity import Entity
+from openatlas.database import entity as db
 from openatlas.forms.util import form_to_datetime64
 from openatlas.models.link import Link
 from tests.base import TestBaseCase, get_hierarchy, insert
@@ -20,7 +20,7 @@ class AdminTests(TestBaseCase):
                 insert('file', 'Forsaken file')
                 insert('feature', 'Forsaken subunit')
                 invalid = insert('artifact', 'Invalid linked entity')
-                Entity.link({
+                db.link({
                     'property_code': 'P86',
                     'domain_id': invalid.id,
                     'range_id': invalid.id,

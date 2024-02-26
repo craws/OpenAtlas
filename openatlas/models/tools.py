@@ -5,7 +5,7 @@ from typing import Any, Optional, TYPE_CHECKING
 
 from flask import g
 
-from openatlas.database.tools import Tools as Db
+from openatlas.database import tools as db
 from openatlas.models.link import Link
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -13,7 +13,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 def get_sex_types(id_: int) -> list[dict[str, Any]]:
-    return Db.get_sex_types(id_)
+    return db.get_sex_types(id_)
 
 
 def get_carbon_link(entity: Entity) -> Optional[Link]:

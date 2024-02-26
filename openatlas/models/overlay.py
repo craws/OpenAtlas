@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, TYPE_CHECKING
 
-from openatlas.database.overlay import Overlay as Db
+from openatlas.database import overlay as db
 from openatlas.display.util import get_file_path
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -22,7 +22,7 @@ class Overlay:
 
     @staticmethod
     def insert(data: dict[str, Any]) -> None:
-        Db.insert({
+        db.insert({
             'image_id': data['image_id'],
             'place_id': data['place_id'],
             'link_id': data['link_id'],
@@ -36,7 +36,7 @@ class Overlay:
 
     @staticmethod
     def update(data: dict[str, Any]) -> None:
-        Db.update({
+        db.update({
             'image_id': data['image_id'],
             'place_id': data['place_id'],
             'bounding_box':
@@ -51,12 +51,12 @@ class Overlay:
     def get_by_object(object_: Entity) -> dict[int, Overlay]:
         ids = [object_.id] + \
             [e.id for e in object_.get_linked_entities_recursive('P46', True)]
-        return {row['image_id']: Overlay(row) for row in Db.get_by_object(ids)}
+        return {row['image_id']: Overlay(row) for row in db.get_by_object(ids)}
 
     @staticmethod
     def get_by_id(id_: int) -> Overlay:
-        return Overlay(Db.get_by_id(id_))
+        return Overlay(db.get_by_id(id_))
 
     @staticmethod
     def remove(id_: int) -> None:
-        Db.remove(id_)
+        db.remove(id_)

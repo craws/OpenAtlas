@@ -5,7 +5,7 @@ from typing import Optional
 from flask import g
 from flask_babel import lazy_gettext as _
 
-from openatlas.database.openatlas_class import OpenAtlasClass as Db
+from openatlas.database import openatlas_class as db
 
 view_class_mapping = {
     'actor': ['person', 'group'],
@@ -88,12 +88,12 @@ class OpenatlasClass:
 
     @staticmethod
     def get_class_count() -> dict[str, int]:
-        return Db.get_class_count()
+        return db.get_class_count()
 
     @staticmethod
     def get_all() -> dict[str, OpenatlasClass]:
         classes = {}
-        for row in Db.get_classes():
+        for row in db.get_classes():
             classes[row['name']] = OpenatlasClass(
                 name=row['name'],
                 cidoc_class=row['cidoc_class_code'],
