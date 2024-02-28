@@ -98,8 +98,15 @@ $(document).ready(function () {
   /* Hide value type fields with class* wildcard selector */
   $('[class*="value-type-switch"]').addClass('display-none');
 
-  // $('label[for="show_passwords"]').css('display', 'block');
   $('#show_passwords').show()
+  .change(function () {
+    alert('whatever')
+    $('#password')[0].type = this.checked ? 'text' : 'password';
+    $('#password2')[0].type = this.checked ? 'text' : 'password';
+    if (document.getElementById('password_old')) {
+      $('#password_old')[0].type = this.checked ? 'text' : 'password';
+    }
+  });
 
   /* Below section sets up validation for various forms */
   // Enable validation for hidden fields
