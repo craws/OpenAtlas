@@ -100,7 +100,6 @@ $(document).ready(function () {
 
   $('#show_passwords').show()
   .change(function () {
-    alert('whatever')
     $('#password')[0].type = this.checked ? 'text' : 'password';
     $('#password2')[0].type = this.checked ? 'text' : 'password';
     if (document.getElementById('password_old')) {
