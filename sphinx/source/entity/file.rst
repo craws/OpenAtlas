@@ -5,9 +5,8 @@ File
 
 CIDOC documentation: :cidoc_entity:`E31 Document<e31-document>`
 
-A file overview can be seen navigating to :doc:`/ui/menu` item **Admin** at the
-right top of the site. The first tab will be **Files** with a **List** button
-to show all files.
+The first tab **Files** shows an overview of used disk space and a **List**
+button to show all files.
 
 .. include:: /entity/navigation.rst
 
@@ -63,7 +62,7 @@ selected a larger one the browser will try to scale it.
 Image preview
 -------------
 If image processing is enabled (default=on, configurable by admins) and user
-have **Show icons in tables** in their :doc:`/tools/profile` activated small
+have **Show icons in tables** in their :doc:`/tools/profile` activated, small
 images of files are shown in tables.
 
 Please be aware with many files and large tables this can impact performance.

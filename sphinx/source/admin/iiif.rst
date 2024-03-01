@@ -5,7 +5,7 @@ IIIF
 
 `IIIF <https://iiif.io/>`_ is a set of open standards for delivering
 high-quality, attributed digital objects online at scale. Once installed
-(see installations notes) it can be configured in the admin area at the
+(see installations notes) it can be configured at the file menu item in the
 **IIIF** tab.
 
 **Be aware that**
