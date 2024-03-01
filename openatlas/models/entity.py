@@ -18,7 +18,6 @@ from openatlas.models.tools import get_carbon_link
 
 
 class Entity:
-
     def __init__(self, data: dict[str, Any]) -> None:
         self.id = data['id']
         self.name = data['name']

@@ -14,7 +14,6 @@ from openatlas.models.type import Type
 
 
 def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
-
     def base_entity_dict() -> dict[str, Any]:
         return {
             'id': url_for('api.entity', id_=data['entity'].id, _external=True),

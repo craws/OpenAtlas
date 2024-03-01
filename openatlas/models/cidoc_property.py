@@ -9,7 +9,6 @@ from openatlas.database import cidoc_property as db
 
 
 class CidocProperty:
-
     def __init__(self, data: dict[str, Any]) -> None:
         self.id = data['id']
         self.name = data['name']

@@ -19,7 +19,6 @@ from openatlas.models.reference_system import ReferenceSystem
 
 
 class AcquisitionManager(EventBaseManager):
-
     def additional_fields(self) -> dict[str, Any]:
         return dict(
             super().additional_fields(),
@@ -133,7 +132,6 @@ class ActivityManager(EventBaseManager):
 
 
 class AdministrativeUnitManager(TypeBaseManager):
-
     def process_form(self) -> None:
         super().process_form()
         self.data['links']['delete'].add('P89')
@@ -141,7 +139,6 @@ class AdministrativeUnitManager(TypeBaseManager):
 
 
 class ArtifactManager(ArtifactBaseManager):
-
     def additional_fields(self) -> dict[str, Any]:
         filter_ids = []
         if entity := self.entity:
@@ -176,7 +173,6 @@ class BibliographyManager(BaseManager):
 
 
 class CreationManager(EventBaseManager):
-
     def additional_fields(self) -> dict[str, Any]:
         return dict(
             super().additional_fields(),
@@ -278,7 +274,6 @@ class GroupManager(ActorBaseManager):
 
 
 class HumanRemainsManager(ArtifactBaseManager):
-
     def additional_fields(self) -> dict[str, Any]:
         filter_ids = []
         if entity := self.entity:
@@ -312,7 +307,6 @@ class HumanRemainsManager(ArtifactBaseManager):
 
 
 class HierarchyCustomManager(HierarchyBaseManager):
-
     def additional_fields(self) -> dict[str, Any]:
         tooltip = _('tooltip hierarchy multiple')
         return {
@@ -383,7 +377,6 @@ class InvolvementManager(BaseManager):
 
 
 class ModificationManager(EventBaseManager):
-
     def additional_fields(self) -> dict[str, Any]:
         return dict(
             super().additional_fields(),
@@ -462,7 +455,6 @@ class MoveManager(EventBaseManager):
 
 
 class PersonManager(ActorBaseManager):
-
     def customize_labels(self) -> None:
         self.form.begins_in.label.text = _('born in')
         self.form.ends_in.label.text = _('died in')
@@ -484,7 +476,6 @@ class PlaceManager(PlaceBaseManager):
 
 
 class ProductionManager(EventBaseManager):
-
     def additional_fields(self) -> dict[str, Any]:
         return dict(
             super().additional_fields(),
@@ -647,7 +638,6 @@ class StratigraphicUnitManager(PlaceBaseManager):
 
 
 class TypeManager(TypeBaseManager):
-
     def add_description(self) -> None:
         super().add_description()
         if self.get_root().category == 'value':

@@ -10,7 +10,6 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 class Overlay:
-
     def __init__(self, row: dict[str, Any]) -> None:
         self.id = row['id']
         self.name = row['name'] if 'name' in row else ''

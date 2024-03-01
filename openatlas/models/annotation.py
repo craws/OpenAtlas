@@ -8,7 +8,6 @@ from openatlas.database import annotation as db
 
 
 class Annotation:
-
     def __init__(self, data: dict[str, Any]) -> None:
         self.id = data['id']
         self.image_id = data['image_id']

@@ -14,7 +14,6 @@ from openatlas.models.entity import Entity
 
 
 class User(UserMixin):
-
     def __init__(
             self,
             row: dict[str, Any],

@@ -35,14 +35,12 @@ def update_carbon(
 
 
 class SexEstimation:
-
     result = {
         'female': -0.7,         # -2  to -0.7
         'likely female': -0.3,  # -0,69 to -0.31
         'indifferent': 0.3,     # -0.3 to 0.3
         'likely male': 0.7,     # 0.31 to 0.69
         'male': 2}              # 0.7 to 2
-
     options = {
         '': 0,
         'Female': -2,
@@ -51,7 +49,6 @@ class SexEstimation:
         'Male?': 1,
         'Male': 2,
         'Not preserved': 0}
-
     features: dict[str, dict[str, Any]] = {
         'Glabella': {
             'category': 'Skull',

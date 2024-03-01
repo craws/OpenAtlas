@@ -20,7 +20,6 @@ app.config['LOG_LEVELS'] = {
 
 
 class Logger:
-
     @staticmethod
     def log(
             priority_: str,

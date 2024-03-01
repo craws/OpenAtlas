@@ -10,7 +10,6 @@ from openatlas.models.gis import Gis
 
 
 class Project:
-
     def __init__(self, row: dict[str, Any]) -> None:
         self.id = row['id']
         self.name = row['name']
@@ -21,7 +20,6 @@ class Project:
 
 
 class Import:
-
     @staticmethod
     def insert_project(name: str, description: Optional[str] = None) -> int:
         return db.insert_project(

@@ -9,7 +9,6 @@ from openatlas.models.entity import Entity
 
 
 class ReferenceSystem(Entity):
-
     def __init__(self, row: dict[str, Any]) -> None:
         super().__init__(row)
         self.website_url = row['website_url']

@@ -18,7 +18,6 @@ class InvalidGeomException(Exception):
 
 
 class Gis:
-
     @staticmethod
     def get_by_id(id_: int) -> list[dict[str, Any]]:
         return db.get_by_id(id_)

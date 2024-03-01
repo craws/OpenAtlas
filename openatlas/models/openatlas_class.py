@@ -23,7 +23,6 @@ view_class_mapping = {
 
 
 class OpenatlasClass:
-
     # Needed class label translations
     _('acquisition')
     _('actor relation')

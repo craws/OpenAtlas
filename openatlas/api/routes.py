@@ -7,8 +7,8 @@ from openatlas.api.endpoints.entities import (
     GetEntitiesLinkedToEntity, GetEntity, GetLatest, GetQuery, GetTypeEntities,
     GetTypeEntitiesAll)
 from openatlas.api.endpoints.iiif import (
-    IIIFAnnotationList, IIIFAnnotation, IIIFCanvas, IIIFImage,
-    IIIFManifest, IIIFSequence)
+    IIIFAnnotation, IIIFAnnotationList, IIIFCanvas, IIIFImage, IIIFManifest,
+    IIIFSequence)
 from openatlas.api.endpoints.special import (
     ExportDatabase, GetGeometricEntities, GetSubunits)
 from openatlas.api.endpoints.type import (
