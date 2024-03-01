@@ -142,7 +142,7 @@ def uc_first(string: str) -> str:
 def manual(site: str) -> str:
     """ If the manual page exists, return the link to it"""
     parts = site.split('/')
-    if len(parts) < 2:
+    if len(parts) < 2 or parts[1] in ['entities', 'info', 'subs']:
         return ''
     path = \
         Path(app.root_path) / 'static' / 'manual' / parts[0] / \

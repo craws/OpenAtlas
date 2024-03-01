@@ -12,7 +12,7 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
     bookmark_toggle, button, link, required_group, send_mail)
-from openatlas.display.util2 import format_date, uc_first
+from openatlas.display.util2 import format_date, manual, uc_first
 from openatlas.forms.field import SubmitField
 from openatlas.models.content import get_translation
 from openatlas.models.entity import Entity
@@ -59,6 +59,7 @@ def overview() -> str:
             table=Table(['name', 'class', 'begin', 'end'])),
         'notes': Tab(
             'notes',
+            buttons=[manual('tools/notes')],
             table=Table(
                 ['date', _('visibility'), 'entity', 'class', _('note')]))}
     tables = {

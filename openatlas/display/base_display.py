@@ -109,7 +109,10 @@ class BaseDisplay:
         return None
 
     def add_note_tab(self) -> None:
-        self.tabs['note'] = Tab('note', entity=self.entity)
+        self.tabs['note'] = Tab(
+            'note',
+            buttons=[manual('tools/notes')],
+            entity=self.entity)
         for note in current_user.get_notes_by_entity_id(self.entity.id):
             data = [
                 format_date(note['created']),

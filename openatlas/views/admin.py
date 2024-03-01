@@ -384,9 +384,11 @@ def check_similar() -> str:
 @app.route('/check/dates')
 @required_group('contributor')
 def check_dates() -> str:
+    manual_link = manual('admin/data_integrity_checks')
     tabs = {
         'dates': Tab(
             'invalid_dates',
+            buttons=[manual_link],
             table=Table([
                 'name',
                 'class',
@@ -396,9 +398,11 @@ def check_dates() -> str:
                 'description'])),
         'link_dates': Tab(
             'invalid_link_dates',
+            buttons=[manual_link],
             table=Table(['link', 'domain', 'range'])),
         'involvement_dates': Tab(
             'invalid_involvement_dates',
+            buttons=[manual_link],
             table=Table(
                 ['actor', 'event', 'class', 'involvement', 'description']))}
     for entity in Entity.get_invalid_dates():
@@ -430,7 +434,6 @@ def check_dates() -> str:
                 url_for('link_update', id_=link_.id, origin_id=actor.id))]
         tabs['involvement_dates'].table.rows.append(data)
     for tab in tabs.values():
-        tab.buttons = [manual('admin/data_integrity_checks')]
         if not tab.table.rows:
             tab.content = _('Congratulations, everything looks fine!')
     return render_template(
@@ -445,6 +448,7 @@ def check_dates() -> str:
 @app.route('/orphans')
 @required_group('contributor')
 def orphans() -> str:
+    manual_link = manual('admin/data_integrity_checks')
     header = [
         'name',
         'class',
@@ -454,27 +458,38 @@ def orphans() -> str:
         'updated',
         'description']
     tabs = {
-        'orphans': Tab('orphans', table=Table(header)),
-        'unlinked': Tab('unlinked', table=Table(header)),
+        'orphans': Tab('orphans', buttons=[manual_link], table=Table(header)),
+        'unlinked': Tab(
+            'unlinked',
+            buttons=[manual_link],
+            table=Table(header)),
         'types': Tab(
             'type',
+            buttons=[manual_link],
             table=Table(
                 ['name', 'root'],
                 [[link(type_), link(g.types[type_.root[0]])]
                     for type_ in Type.get_type_orphans()])),
-        'missing_files': Tab('missing_files', table=Table(header)),
+        'missing_files': Tab(
+            'missing_files',
+            buttons=[manual_link],
+            table=Table(header)),
         'orphaned_files': Tab(
             'orphaned_files',
+            buttons=[manual_link],
             table=Table(['name', 'size', 'date', 'ext'])),
         'orphaned_iiif_files': Tab(
             'orphaned_iiif_files',
+            buttons=[manual_link],
             table=Table(['name', 'size', 'date', 'ext'])),
         'orphaned_subunits': Tab(
             'orphaned_subunits',
+            buttons=[manual_link],
             table=Table([
                 'id', 'name', 'class', 'created', 'modified', 'description'])),
         'circular': Tab(
             'circular_dependencies',
+            buttons=[manual_link],
             table=Table(
                 ['entity'],
                 [[link(e)] for e in Entity.get_entities_linked_to_itself()]))}
@@ -557,7 +572,6 @@ def orphans() -> str:
             entity.description])
 
     for tab in tabs.values():
-        tab.buttons = [manual('admin/data_integrity_checks')]
         if not tab.table.rows:
             tab.content = _('Congratulations, everything looks fine!')
 
