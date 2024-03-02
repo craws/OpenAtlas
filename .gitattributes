@@ -1,4 +1,5 @@
 openatlas/static/vendor/** linguist-vendored
+chart/** linguist-documentation
 install/** linguist-documentation
 sphinx/** linguist-documentation
 openatlas/static/manual/** linguist-documentation
