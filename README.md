@@ -19,10 +19,10 @@ Documentation:
 # Demo versions
 
 [Demo](https://demo.openatlas.eu) with data kindly provided by the
-[MEDCON](https://oeaw.academia.edu/MappingMedievalConflict) project.
+[MEDCON](https://oeaw.academia.edu/MappingMedievalConflict) project (historical).
 
 [Development demo](https://demo-dev.openatlas.eu) with data kindly provided by
-the [THANADOS](https://thanados.net/) project.
+the [THANADOS](https://thanados.net/) project (archeological).
 
 # Installation
 
