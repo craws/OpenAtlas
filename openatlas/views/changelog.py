@@ -16,6 +16,9 @@ def index_changelog() -> str:
 
 versions = {
     '8.3.0': ['TBA', {}],
+    '8.2.1': ['2024-03-04', {
+        'fix': {
+            '2184': 'Directory for processed files not writable'}}],
     '8.2.0': ['2024-03-02', {
         'feature': {
             '2186': 'Move file item from admin area to menu',
