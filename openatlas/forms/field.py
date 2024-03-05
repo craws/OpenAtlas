@@ -245,11 +245,9 @@ class TableField(HiddenField):
             validators: Optional[Any] = None,
             filter_ids: Optional[list[int]] = None,
             add_dynamic: Optional[list[str]] = None,
-            related_tables: Optional[list[str]] = None,
             **kwargs: Any) -> None:
         super().__init__(label, validators, **kwargs)
         self.filter_ids = filter_ids or []
-        self.related_tables = related_tables or []
         self.add_dynamical = \
             (add_dynamic or []) if is_authorized('editor') else []
         self.add_dynamical.reverse()  # Reverse needed (CSS .float-end)

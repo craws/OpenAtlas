@@ -241,18 +241,9 @@ class ActorBaseManager(BaseManager):
 
     def additional_fields(self) -> dict[str, Any]:
         return {
-            'residence': TableField(
-                _('residence'),
-                add_dynamic=['place'],
-                related_tables=['begins_in', 'ends_in']),
-            'begins_in': TableField(
-                _('begins in'),
-                add_dynamic=['place'],
-                related_tables=['residence', 'ends_in']),
-            'ends_in': TableField(
-                _('ends in'),
-                add_dynamic=['place'],
-                related_tables=['begins_in', 'residence'])}
+            'residence': TableField(_('residence'), add_dynamic=['place']),
+            'begins_in': TableField(_('begins in'), add_dynamic=['place']),
+            'ends_in': TableField(_('ends in'), add_dynamic=['place'])}
 
     def populate_insert(self) -> None:
         self.form.alias.append_entry('')
@@ -388,8 +379,7 @@ class EventBaseManager(BaseManager):
                     'event',
                     'modification',
                     'move',
-                    'production'],
-                related_tables=['event_preceding'])}
+                    'production'])}
         if self.class_.name != 'event':
             fields['event_preceding'] = TableField(
                 _('preceding event'),
@@ -399,8 +389,7 @@ class EventBaseManager(BaseManager):
                     'acquisition',
                     'modification',
                     'move',
-                    'production'],
-                related_tables=['event'])
+                    'production'])
         if self.class_.name != 'move':
             fields['place'] = \
                 TableField(_('location'), add_dynamic=['place'])
