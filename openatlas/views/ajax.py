@@ -8,7 +8,7 @@ from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.util import required_group
 from openatlas.display.util2 import uc_first
-from openatlas.forms.field import get_table_content
+from openatlas.forms.base_manager import BaseManager
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 from openatlas.models.user import User
@@ -81,5 +81,5 @@ def ajax_create_entity() -> str:
 @required_group('readonly')
 def ajax_get_entity_table(content_domain: str) -> str:
     filter_ids = json.loads(request.form['filterIds']) or []
-    table, _selection = get_table_content(content_domain, None, filter_ids)
+    table = BaseManager.get_table_content(content_domain, None, filter_ids)
     return table.display(content_domain)

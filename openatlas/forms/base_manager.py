@@ -12,10 +12,14 @@ from wtforms import (
     widgets)
 from wtforms.validators import InputRequired
 
+from openatlas.display.table import Table
+from openatlas.display.util import get_base_table_data
+from openatlas.display.util2 import uc_first
 from openatlas.forms.add_fields import (
     add_date_fields, add_reference_systems, add_types)
 from openatlas.forms.field import (
-    RemovableListField, SubmitField, TableField, TreeField)
+    RemovableListField, SubmitField, TableField, TreeField,
+    format_name_and_aliases)
 from openatlas.forms.populate import (
     populate_dates, populate_reference_systems, populate_types)
 from openatlas.forms.process import (
@@ -67,10 +71,10 @@ class BaseManager:
 
         self.form_class = Form
         self.add_name_fields()
-        add_types(self)
+        # add_types(self)
         for id_, field in self.additional_fields().items():
             setattr(Form, id_, field)
-        add_reference_systems(self)
+        # add_reference_systems(self)
         if self.entity:
             setattr(Form, 'entity_id', HiddenField())
         if 'date' in self.fields:
@@ -235,6 +239,84 @@ class BaseManager:
         self.link_.description = self.form.description.data
         self.link_.set_dates(process_dates(self))
 
+    @staticmethod
+    def get_table(
+            class_name: str,
+            entities: list[Entity],
+            selected_data: Optional[Any] = None,
+            filter_ids: Optional[list[int]] = None) -> Table:
+        filter_ids = filter_ids or []
+        # if class_name in ('cidoc_domain', 'cidoc_property', 'cidoc_range'):
+        #     table = Table(
+        #         ['code', 'name'],
+        #         defs=[
+        #             {'orderDataType': 'cidoc-model', 'targets': [0]},
+        #             {'sType': 'numeric', 'targets': [0]}])
+        #     for id_, entity in (
+        #             g.properties if class_name == 'cidoc_property'
+        #             else g.cidoc_classes).items():
+        #         onclick = f'''
+        #             onclick="selectFromTable(
+        #                 this,
+        #                 '{class_name}',
+        #                 '{id_}',
+        #                 '{entity.code} {entity.name}');"'''
+        #         table.rows.append([
+        #             f'<a href="#" {onclick}>{entity.code}</a>',
+        #             entity.name])
+        #         if entity.code == selected_data:
+        #             selection = f'{entity.code} {entity.name}'
+        # elif class_name == 'annotated_entity':
+        #     # Hackish (mis)use of filter_ids to get table field for annotations
+        #     table = Table(['name', 'class', 'description'])
+        #     for item in Entity.get_by_id(filter_ids[0]).get_linked_entities(
+        #             'P67'):
+        #         if selected_data and item.id == int(selected_data):
+        #             selection = item.name  # pragma: no cover
+        #         table.rows.append([
+        #             format_name_and_aliases(item, 'annotated_entity'),
+        #             uc_first(item.class_.name),
+        #             item.description])
+        # else:
+        #     aliases = current_user.settings['table_show_aliases']
+        #     if 'place' in class_name or class_name in \
+        #             ['begins_in', 'ends_in', 'residence']:
+        #         class_ = 'place'
+        #         entities = Entity.get_by_view('place', types=True,
+        #                                       aliases=aliases)
+        #     elif class_name == 'feature_super':
+        #         class_ = 'place'
+        #         entities = \
+        #             Entity.get_by_class('place', types=True, aliases=aliases)
+        #     elif class_name == 'stratigraphic_super':
+        #         class_ = 'place'
+        #         entities = \
+        #             Entity.get_by_class('feature', types=True, aliases=aliases)
+        #     elif class_name == 'artifact_super':
+        #         class_ = 'place'
+        #         entities = Entity.get_by_class(
+        #             g.view_class_mapping['place'] + ['artifact'],
+        #             types=True,
+        #             aliases=aliases)
+        #     elif class_name == 'human_remains_super':
+        #         class_ = 'place'
+        #         entities = Entity.get_by_class(
+        #             g.view_class_mapping['place'] + ['human_remains'],
+        #             types=True,
+        #             aliases=aliases)
+        #     else:
+        #         class_ = class_name
+        #         entities = Entity.get_by_view(
+        #             class_,
+        #             types=True,
+        #             aliases=aliases)
+        table = Table(g.table_headers[class_name])
+        for entity in [e for e in entities if e.id not in filter_ids]:
+            data = get_base_table_data(entity, show_links=False)
+            data[0] = format_name_and_aliases(entity, class_name)
+            table.rows.append(data)
+        return table
+
 
 class ActorBaseManager(BaseManager):
     fields = ['name', 'alias', 'date', 'description', 'continue']
@@ -370,20 +452,31 @@ class EventBaseManager(BaseManager):
         if self.entity:
             filter_ids = self.get_sub_ids(self.entity, [self.entity.id])
         fields = {
-            'event': TableField(
-                _('sub event of'),
-                filter_ids=filter_ids,
-                add_dynamic=[
-                    'activity',
-                    'acquisition',
-                    'event',
-                    'modification',
-                    'move',
-                    'production'])}
+            'sub event of':
+                TableField(
+                    self.get_table(
+                        'event',
+                        Entity.get_by_view('event', types=True),
+                        [],
+                        filter_ids),
+                    add_dynamic=[
+                        'activity',
+                        'acquisition',
+                        'event',
+                        'modification',
+                        'move',
+                        'production'])}
         if self.class_.name != 'event':
-            fields['event_preceding'] = TableField(
-                _('preceding event'),
-                filter_ids=filter_ids,
+            fields['preceding_event'] = TableField(
+                self.get_table(
+                    'event',
+                    Entity.get_by_class([
+                        'activity',
+                        'acquisition',
+                        'modification',
+                        'move',
+                        'production'], types=True),
+                     filter_ids=filter_ids),
                 add_dynamic=[
                     'activity',
                     'acquisition',
@@ -392,7 +485,9 @@ class EventBaseManager(BaseManager):
                     'production'])
         if self.class_.name != 'move':
             fields['place'] = \
-                TableField(_('location'), add_dynamic=['place'])
+                TableField(
+                    self.get_table('place', Entity.get_by_class('place')),
+                    add_dynamic=['place'])
         return fields
 
     def populate_insert(self) -> None:
