@@ -171,13 +171,13 @@ class IIIFAnnotation(Resource):
                     "@type": "sc:Manifest"}}}
 
 
-def convert_coordinates(coordinates_str: str) -> list[Tuple[int, int]]:
+def convert_coordinates(coordinates_str: str) -> list[list[int]]:
     coordinates = list(map(float, coordinates_str.split(',')))
-    return [(int(coordinates[i]), int(coordinates[i + 1]))
+    return [[int(coordinates[i]), int(coordinates[i + 1])]
             for i in range(0, len(coordinates), 2)]
 
 
-def generate_svg_path(coordinates: list[Tuple[int, int]]) -> str:
+def generate_svg_path(coordinates: list[list[int]]) -> str:
     dwg = svgwrite.Drawing(size=("100%", "100%"))
     path = dwg.path(
         d=f"M{'L'.join([f'{x},{y}' for x, y in coordinates])}z",
@@ -187,7 +187,7 @@ def generate_svg_path(coordinates: list[Tuple[int, int]]) -> str:
 
 
 def calculate_bounding_box(
-        coordinates: list[Tuple[int, int]]) -> Tuple[int, int, int, int]:
+        coordinates: list[list[int]]) -> Tuple[int, int, int, int]:
     x_values = [x for x, y in coordinates]
     y_values = [y for x, y in coordinates]
     x = min(x_values)
