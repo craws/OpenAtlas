@@ -7,11 +7,11 @@
       type="text"
       placeholder="{{ _('change')|uc_first }}"
       readonly="readonly"
-      value="{{ selection }}"
+      value="{{ field.selection }}"
       onclick="$('#{{ field.id }}-modal').modal('show')"
       tabindex="0">
   </div>
-  <div id="{{ field.id }}-clear-field" class="col-auto" {% if not selection %}style="display: none;"{% endif %}>
+  <div id="{{ field.id }}-clear-field" class="col-auto" {% if not field.selection %}style="display: none;"{% endif %}>
     <a
         href="#"
         id="{{ field.id }}-clear"
@@ -50,7 +50,7 @@
             + {{ _(add_dynamical)|uc_first }}
           </button>
         {% endfor %}
-        <div class="modal-body-table">{{ table|safe }}</div>
+        <div class="modal-body-table">{{ field.table.display(field.id)|safe }}</div>
       </div>
       <div class="modal-footer">
         <button
