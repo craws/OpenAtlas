@@ -185,7 +185,7 @@ def check_if_entity_has_time(item: Entity | Link) -> bool:
 
 
 def table(
-        field_id: str,
+        table_id: str,
         class_name: str,
         entities: list[Entity],
         filter_ids: Optional[list[int]] = None) -> Table:
@@ -193,7 +193,7 @@ def table(
     for entity in \
             [e for e in entities if not filter_ids or e.id not in filter_ids]:
         data = get_base_table_data(entity, show_links=False)
-        data[0] = format_name_and_aliases(entity, class_name)
+        data[0] = format_name_and_aliases(entity, table_id)
         table_.rows.append(data)
     return table_
 
@@ -300,8 +300,6 @@ def table_multi(
 #
 #         data = field.data or []
 #         data = ast.literal_eval(data) if isinstance(data, str) else data
-#         class_ = field.id \
-#             if field.id not in ['given_place', 'modified_place'] else 'place'
 #         aliases = current_user.settings['table_show_aliases']
 #         if class_ in ['group', 'person']:
 #             entities = Entity.get_by_class(class_, types=True, aliases=aliases)

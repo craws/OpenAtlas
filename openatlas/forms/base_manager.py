@@ -53,6 +53,7 @@ class BaseManager:
         self.crumbs: list[Any] = []
         self.insert = bool(not self.entity and not self.link_)
         self.place_info: dict[str, Any] = {}
+        self.aliases = current_user.settings['table_show_aliases']
 
         if self.insert:
             self.get_place_info_for_insert()
@@ -365,17 +366,26 @@ class EventBaseManager(BaseManager):
         return ids
 
     def additional_fields(self) -> dict[str, Any]:
-        filter_ids = []
+        sub_filter_ids = []
+        super_event = None
+        preceding_event = None
+        place = None
         if self.entity:
-            filter_ids = self.get_sub_ids(self.entity, [self.entity.id])
+            sub_filter_ids = self.get_sub_ids(self.entity, [self.entity.id])
+            super_event = self.entity.get_linked_entity('P9', inverse=True)
+            preceding_event = self.entity.get_linked_entity('P134')
+            if self.class_.name != 'move':
+                if place_ := self.entity.get_linked_entity('P7'):
+                    place = place_.get_linked_entity_safe('P53', True)
         fields = {
-            'sub event of':
+            'sub_event_of':
                 TableField(
                     table(
                         'sub_event_of',
                         'event',
-                        Entity.get_by_view('event', types=True),
-                        filter_ids),
+                        Entity.get_by_view('event', True, self.aliases),
+                        sub_filter_ids),
+                    super_event,
                     add_dynamic=[
                         'activity',
                         'acquisition',
@@ -384,7 +394,7 @@ class EventBaseManager(BaseManager):
                         'move',
                         'production'])}
         if self.class_.name != 'event':
-            fields['preceding event'] = TableField(
+            fields['preceding_event'] = TableField(
                 table(
                     'preceding_event',
                     'event',
@@ -393,8 +403,9 @@ class EventBaseManager(BaseManager):
                         'acquisition',
                         'modification',
                         'move',
-                        'production'], types=True),
-                    filter_ids),
+                        'production'], True, self.aliases),
+                    sub_filter_ids),
+                preceding_event,
                 add_dynamic=[
                     'activity',
                     'acquisition',
@@ -403,7 +414,11 @@ class EventBaseManager(BaseManager):
                     'production'])
         if self.class_.name != 'move':
             fields['place'] = TableField(
-                table('place', 'place', Entity.get_by_class('place')),
+                table(
+                    'place',
+                    'place',
+                    Entity.get_by_class('place', True, self.aliases)),
+                place,
                 add_dynamic=['place'])
         return fields
 
@@ -417,24 +432,14 @@ class EventBaseManager(BaseManager):
                 else:
                     self.form.place.data = self.origin.id
 
-    def populate_update(self) -> None:
-        super().populate_update()
-        if super_ := self.entity.get_linked_entity('P9', inverse=True):
-            self.form.event.data = super_.id
-        if preceding_ := self.entity.get_linked_entity('P134'):
-            self.form.event_preceding.data = preceding_.id
-        if self.class_.name != 'move':
-            if place := self.entity.get_linked_entity('P7'):
-                self.form.place.data = \
-                    place.get_linked_entity_safe('P53', True).id
 
     def process_form(self) -> None:
         super().process_form()
         self.data['links']['delete_inverse'].add('P9')
-        self.add_link('P9', self.form.event.data, inverse=True)
+        self.add_link('P9', self.form.sub_event_of.data, inverse=True)
         if self.class_.name != 'event':
             self.data['links']['delete'].add('P134')
-            self.add_link('P134', self.form.event_preceding.data)
+            self.add_link('P134', self.form.preceding_event.data)
         if self.class_.name != 'move':
             self.data['links']['delete'].add('P7')
             if self.form.place.data:

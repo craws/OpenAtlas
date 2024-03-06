@@ -13,18 +13,29 @@ from openatlas.forms.base_manager import (
     HierarchyBaseManager, PlaceBaseManager, TypeBaseManager)
 from openatlas.forms.field import (
     DragNDropField, SubmitField, TableField, TableMultiField, TreeField)
+from openatlas.forms.util import table, table_multi
 from openatlas.forms.validation import file
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
 
 
 class AcquisitionManager(EventBaseManager):
+
+    _('given place')
+    _('given artifact')
+
     def additional_fields(self) -> dict[str, Any]:
         return dict(
             super().additional_fields(),
             **{
-                'given_place': TableMultiField(_('given place')),
-                'artifact': TableMultiField(_('given artifact'))})
+                'given_place': TableMultiField(
+                    table_multi(
+                        'given_place',
+                        'place',
+                        Entity.get_by_class('place', True, self.aliases))),
+                'artifact': TableMultiField(
+                    table_multi(
+                        _('given artifact')))})
 
     def populate_update(self) -> None:
         super().populate_update()

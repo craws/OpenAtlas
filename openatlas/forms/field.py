@@ -213,13 +213,12 @@ class TableField(HiddenField):
     def __init__(
             self,
             table: Table,
-            selection: Optional[str] = None,
+            selection: Optional[Entity] = None,
             validators: Optional[Any] = None,
             add_dynamic: Optional[list[str]] = None,
             **kwargs: Any) -> None:
         super().__init__(validators=validators, **kwargs)
         self.table = table
-        print(table.display())
         self.selection = selection
         self.add_dynamical = \
             (add_dynamic or []) if is_authorized('editor') else []
