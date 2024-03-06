@@ -197,7 +197,7 @@ def calculate_bounding_box(
     return x, y, width, height
 
 
-def generate_selector(coordinates_str: str) -> dict[str, dict[str, str]]:
+def generate_selector(coordinates_str: str) -> dict[str, Any]:
     coordinates = convert_coordinates(coordinates_str)
     x, y, width, height = calculate_bounding_box(coordinates)
     return {

@@ -1,5 +1,3 @@
-import json
-
 from flask import flash, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
