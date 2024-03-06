@@ -4,6 +4,7 @@ import mimetypes
 from typing import Any, Tuple
 
 import requests
+import svgwrite
 from flask import Response, g, jsonify, url_for
 from flask_restful import Resource
 
@@ -131,7 +132,6 @@ class IIIFAnnotation(Resource):
 
     @staticmethod
     def build_annotation(annotation: Annotation) -> dict[str, Any]:
-        selector = generate_selector(annotation.coordinates)
         entity_link = ''
         if annotation.entity_id:
             entity = get_entity_by_id(annotation.entity_id)
@@ -161,7 +161,7 @@ class IIIFAnnotation(Resource):
                     'api.iiif_canvas',
                     id_=annotation.image_id,
                     _external=True),
-                "selector": selector,
+                "selector": generate_selector(annotation.coordinates),
                 "within": {
                     "@id": url_for(
                         'api.iiif_manifest',
@@ -171,30 +171,43 @@ class IIIFAnnotation(Resource):
                     "@type": "sc:Manifest"}}}
 
 
-def calculate_fragment_selector_coordinates(
-        coordinates: str) -> Tuple[float, float, float, float]:
+def convert_coordinates(coordinates_str: str) -> list[list[int]]:
+    coordinates = list(map(float, coordinates_str.split(',')))
+    return [[int(coordinates[i]), int(coordinates[i + 1])]
+            for i in range(0, len(coordinates), 2)]
 
-    # Splitting the coordinates string into individual values
-    coordinates_list = list(map(float, coordinates.split(',')))
 
-    # Extracting x, y, width, and height from the coordinates
-    x_min, y_min, x_max, y_max = (
-        min(coordinates_list[::2]),
-        min(coordinates_list[1::2]),
-        max(coordinates_list[::2]),
-        max(coordinates_list[1::2]))
-    x = x_min
-    y = y_min
-    width = x_max - x_min
-    height = y_max - y_min
+def generate_svg_path(coordinates: list[list[int]]) -> str:
+    dwg = svgwrite.Drawing(size=("100%", "100%"))
+    path = dwg.path(
+        d=f"M{'L'.join([f'{x},{y}' for x, y in coordinates])}z",
+        fill="none", stroke="#0d6efd", stroke_width=1)
+    dwg.add(path)
+    return dwg.tostring()
+
+
+def calculate_bounding_box(
+        coordinates: list[list[int]]) -> Tuple[int, int, int, int]:
+    x_values = [x for x, y in coordinates]
+    y_values = [y for x, y in coordinates]
+    x = min(x_values)
+    y = min(y_values)
+    width = max(x_values) - x
+    height = max(y_values) - y
     return x, y, width, height
 
 
-def generate_selector(coordinates: str) -> dict[str, str]:
-    x, y, width, height = calculate_fragment_selector_coordinates(coordinates)
+def generate_selector(coordinates_str: str) -> dict[str, Any]:
+    coordinates = convert_coordinates(coordinates_str)
+    x, y, width, height = calculate_bounding_box(coordinates)
     return {
-        "@type": "oa:FragmentSelector",
-        "value": f"xywh={x},{y},{width},{height}"}
+        "default": {
+            "@type": "oa:FragmentSelector",
+            "value": f"xywh={x},{y},{width},{height}"},
+        "item": {
+            "@type": "oa:SvgSelector",
+            "value": generate_svg_path(coordinates)},
+        "@type": "oa:Choice"}
 
 
 class IIIFManifest(Resource):

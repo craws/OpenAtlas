@@ -1,5 +1,3 @@
-import json
-
 from flask import flash, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
@@ -76,10 +74,7 @@ def annotation_insert(id_: int) -> str | Response:
         tabs={
             'annotation': Tab(
                 'annotation',
-                render_template(
-                    'annotate.html',
-                    entity=image,
-                    annotations=json.dumps(annotations, default=str)),
+                render_template('annotate.html', entity=image),
                 table,
                 [manual('tools/image_annotation')],
                 form=form)},

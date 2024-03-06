@@ -8,7 +8,6 @@
 
 <script>
     const iiif_manifest = "{{ url_for('api.iiif_manifest', id_=entity.id, version=2, _external=True) }}";
-    const annotations = {{ annotations|safe }};
 </script>
 
 <script src="{{ url_for('static', filename='node_modules/leaflet/dist/leaflet.js') }}"></script>

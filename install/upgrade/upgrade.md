@@ -17,6 +17,12 @@ then run the database upgrade script, then restart Apache:
     sudo python3 install/upgrade/database_upgrade.py
     sudo service apache2 restart
 
+### 8.2.x to 8.3.0
+
+Install python3-svgwrite to support polygon for image annotations (#2126)
+
+    sudo apt install python3-svgwrite
+
 ### 8.2.0 to 8.2.1
 
 This is a fix for installation, no need to update an existing instance. 
