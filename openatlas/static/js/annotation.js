@@ -47,7 +47,7 @@ let drawControl = new L.Control.Draw({
         circle: false,
         circlemarker: false,
         marker: false,
-        polygon: false
+        polygon: true
     },
     edit: {
         featureGroup: drawnItems
@@ -79,8 +79,8 @@ function updateCoordinatesInput(event) {
             // Convert each LatLng to pixel coordinates
             const point = mapinstance.project(latlng, mapinstance.getZoom());
             return [
-                point.x * scaleFactor,
-                point.y * scaleFactor
+                Math.trunc(point.x * scaleFactor),
+                Math.trunc(point.y * scaleFactor)
             ];
         });
         $('#coordinate').val(coordinates);
