@@ -12,18 +12,19 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
     button, check_iiif_activation, check_iiif_file_exist,
-    convert_image_to_iiif, display_info, link, required_group)
+    convert_image_to_iiif, delete_iiif_image, display_info, link,
+    required_group)
 from openatlas.display.util2 import format_date, is_authorized, manual
 from openatlas.forms.form import get_table_form
 from openatlas.forms.setting import FileForm, IiifForm
 from openatlas.forms.util import get_form_settings
 from openatlas.models.entity import Entity
 from openatlas.models.settings import Settings
-from openatlas.views.admin import count_files_to_convert, get_disk_space_info
+from openatlas.views.admin import (
+    count_files_to_convert, count_files_to_delete, get_disk_space_info)
 
 
 @app.route('/file')
-@required_group('readonly')
 def file_index() -> str:
     tabs = {
         'settings': Tab(
@@ -48,7 +49,11 @@ def file_index() -> str:
                 button(_('edit'), url_for('settings', category='iiif')),
                 button(
                     _('convert all files') + f' ({count_files_to_convert()})',
-                    url_for('convert_iiif_files'))])
+                    url_for('convert_iiif_files')),
+                button(
+                    _('delete all IIIF files') +
+                    f' ({count_files_to_delete()})',
+                    url_for('delete_iiif_files'))])
     return render_template(
         'tabs.html',
         title=_('file'),
@@ -137,6 +142,14 @@ def view_iiif(id_: int) -> str:
     return render_template('iiif.html', manifests=manifests)
 
 
+def get_manifest_url(id_: int) -> str:
+    return url_for(
+        'api.iiif_manifest',
+        id_=id_,
+        version=g.settings['iiif_version'],
+        _external=True)
+
+
 @app.route('/convert_iiif_files')
 @required_group('admin')
 def convert_iiif_files() -> Response:
@@ -160,12 +173,22 @@ def convert() -> None:
     flash(_('all image files are converted'), 'info')
 
 
-def get_manifest_url(id_: int) -> str:
-    return url_for(
-        'api.iiif_manifest',
-        id_=id_,
-        version=g.settings['iiif_version'],
-        _external=True)
+@app.route('/delete_iiif_files')
+@required_group('admin')
+def delete_iiif_files() -> Response:
+    delete()
+    return redirect(url_for('file_index') + '#tab-IIIF')
+
+
+def delete() -> None:
+    if app.config['UPLOAD_PATH'].match(
+            g.settings['iiif_path']):  # pragma: no cover
+        flash(_('cannot delete images in upload directory'), 'warning')
+        return
+    for id_ in g.files:
+        if check_iiif_file_exist(id_):
+            delete_iiif_image(id_)
+    flash(_('all IIIF files are deleted'), 'info')
 
 
 @app.route('/logo/')

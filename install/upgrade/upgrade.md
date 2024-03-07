@@ -23,6 +23,12 @@ Install python3-svgwrite to support polygon for image annotations (#2126)
 
     sudo apt install python3-svgwrite
 
+**For developers**
+
+To run tests, please add a new tests/ folder to your IIIF directory, e.g.:
+
+    mkdir /var/www/iipsrv/tests
+
 ### 8.2.0 to 8.2.1
 
 This is a fix for installation, no need to update an existing instance. 

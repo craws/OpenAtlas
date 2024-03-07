@@ -789,5 +789,8 @@ def count_files_to_convert() -> int:
             total_files += 1
             if check_iiif_file_exist(file_id):
                 converted_files += 1
-
     return total_files - converted_files
+
+
+def count_files_to_delete() -> int:
+    return len([id_ for id_ in g.files if check_iiif_file_exist(id_)])

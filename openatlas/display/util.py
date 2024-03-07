@@ -599,6 +599,10 @@ def get_iiif_file_path(id_: int) -> Path:
     return Path(g.settings['iiif_path']) / f'{id_}{ext}'
 
 
+def delete_iiif_image(id_: int) -> None:
+    get_iiif_file_path(id_).unlink()
+
+
 def convert_image_to_iiif(id_: int, path: Optional[Path] = None) -> bool:
     command: list[Any] = ["vips" if os.name == 'posix' else "vips.exe"]
     command.extend([

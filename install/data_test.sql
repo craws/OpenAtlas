@@ -30,8 +30,8 @@ INSERT INTO web.reference_system_openatlas_class (reference_system_id, openatlas
 
 -- IIIF activation
 UPDATE web.settings SET value = 'True' WHERE name = 'iiif';
-UPDATE web.settings SET value = '/var/www/iipsrv' WHERE name = 'iiif_path';
-UPDATE web.settings SET value = 'http://localhost/iiif/' WHERE name = 'iiif_url';
+UPDATE web.settings SET value = '/var/www/iipsrv/tests/' WHERE name = 'iiif_path';
+UPDATE web.settings SET value = 'http://localhost/iiif/tests/' WHERE name = 'iiif_url';
 UPDATE web.settings SET value = '2' WHERE name = 'iiif_version';
 UPDATE web.settings SET value = 'deflate' WHERE name = 'iiif_conversion';
 UPDATE web.settings SET value = 'True' WHERE name = 'iiif_convert_on_upload';

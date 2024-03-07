@@ -50,10 +50,9 @@ class FileTest(TestBaseCase):
                 follow_redirects=True)
             assert b'All image files are converted' in rv.data
 
-            # Remove IIIF file to not break tests
-            if check_iiif_file_exist(file_id):
-                if path := get_iiif_file_path(file_id):  # pragma: no cover
-                    path.unlink()  # pragma: no cover
+            rv = self.app.get(
+                url_for('delete_iiif_files'), follow_redirects=True)
+            assert b'IIIF files are deleted' in rv.data
 
             filename = f'{file_id}.png'
             with self.app.get(url_for('display_logo', filename=filename)):
