@@ -110,7 +110,7 @@ def import_project_view(id_: int) -> str:
                 ['source'] \
                 + g.view_class_mapping['event'] \
                 + g.view_class_mapping['actor'] \
-                + ['place', 'bibliography', 'edition', 'artifact']:
+                + ['place', 'artifact', 'bibliography', 'edition']:
             buttons.append(button(
                 _(class_),
                 url_for('import_data', project_id=project.id, class_=class_)))
