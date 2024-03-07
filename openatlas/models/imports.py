@@ -106,7 +106,7 @@ class Import:
                     entity.link('P2', g.types[int(type_id)])  # pragma no cover
 
             # GIS
-            if class_ == 'place':
+            if class_ in ['place', 'artifact']:
                 location = Entity.insert(
                     'object_location',
                     f"Location of {row['name']}")
