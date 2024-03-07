@@ -173,14 +173,22 @@ def convert() -> None:
     flash(_('all image files are converted'), 'info')
 
 
+@app.route('/delete_iiif_file/<int:id_>')
+@required_group('admin')
+def delete_iiif_file(id_: int) -> Response:
+    delete_iiif_image(id_)
+    flash(_('IIIF file deleted'), 'info')
+    return redirect(url_for('view', id_=id_))
+
+
 @app.route('/delete_iiif_files')
 @required_group('admin')
 def delete_iiif_files() -> Response:
-    delete()
+    delete_all_iiif_files()
     return redirect(url_for('file_index') + '#tab-IIIF')
 
 
-def delete() -> None:
+def delete_all_iiif_files() -> None:
     if app.config['UPLOAD_PATH'].match(
             g.settings['iiif_path']):  # pragma: no cover
         flash(_('cannot delete images in upload directory'), 'warning')

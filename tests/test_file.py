@@ -39,11 +39,10 @@ class FileTest(TestBaseCase):
                 app.preprocess_request()
                 files = Entity.get_by_class('file')
                 file_id = files[0].id
-
-            # Remove IIIF file to not break tests
-            if check_iiif_file_exist(file_id):
-                if path := get_iiif_file_path(file_id):  # pragma: no cover
-                    path.unlink()  # pragma: no cover
+            rv = self.app.get(
+                url_for('delete_iiif_file', id_=file_id),
+                follow_redirects=True)
+            assert b'IIIF file deleted' in rv.data
 
             rv = self.app.get(
                 url_for('convert_iiif_files'),
