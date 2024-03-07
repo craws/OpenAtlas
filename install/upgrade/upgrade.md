@@ -25,7 +25,7 @@ Install python3-svgwrite to support polygon for image annotations (#2126)
 
 **For developers**
 
-To run tests, please add a new tests/ folder to your IIIF directory, e.g.:
+To run tests, please add a new *tests/* folder to your IIIF directory, e.g.:
 
     mkdir /var/www/iipsrv/tests
 
