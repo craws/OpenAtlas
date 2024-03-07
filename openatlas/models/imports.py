@@ -105,6 +105,11 @@ class Import:
                         continue
                     entity.link('P2', g.types[int(type_id)])  # pragma no cover
 
+            if class_ in ['place', 'person', 'group']:
+                aliases = row['alias'].split(";")
+                for alias_ in aliases:
+                    entity.link('P1', Entity.insert('appellation', alias_))
+
             # GIS
             if class_ in ['place', 'artifact']:
                 location = Entity.insert(

@@ -207,6 +207,8 @@ def import_data(project_id: int, class_: str) -> str:
                 'begin_from', 'begin_to', 'begin_comment',
                 'end_from', 'end_to', 'end_comment'])
         columns['allowed'].append('type_ids')
+        if class_ in ['place', 'person', 'group']:
+            columns['allowed'] += ['alias']
         if class_ in ['place', 'artifact']:
             columns['allowed'] += ['easting', 'northing']
         try:
