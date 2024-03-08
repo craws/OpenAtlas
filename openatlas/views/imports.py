@@ -7,6 +7,7 @@ import pandas as pd
 from flask import flash, g, render_template, request, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import FlaskForm
+from pandas import Series
 from werkzeug.utils import redirect, secure_filename
 from werkzeug.wrappers import Response
 from wtforms import (
@@ -102,8 +103,9 @@ def import_project_view(id_: int) -> str:
                 _('delete'),
                 url_for('import_project_delete', id_=project.id),
                 onclick="return confirm('" +
-                _('delete %(name)s?', name=project.name.replace("'", "")) +
-                "')")])
+                        _('delete %(name)s?',
+                          name=project.name.replace("'", "")) +
+                        "')")])
         content += '<p>' + uc_first(_('new import')) + ':</p>'
         buttons = []
         for class_ in \
@@ -178,7 +180,7 @@ class ImportForm(FlaskForm):
 
     def validate(self, extra_validators: validators = None) -> bool:
         valid = FlaskForm.validate(self)
-        if Path(str(request.files['file'].filename)) .suffix.lower() != '.csv':
+        if Path(str(request.files['file'].filename)).suffix.lower() != '.csv':
             self.file.errors.append(_('file type not allowed'))
             valid = False
         return valid
@@ -198,19 +200,7 @@ def import_data(project_id: int, class_: str) -> str:
         file_ = request.files['file']
         file_path = \
             app.config['TMP_PATH'] / secure_filename(str(file_.filename))
-        columns: dict[str, list[str]] = {
-            'allowed': ['name', 'id', 'description'],
-            'valid': [],
-            'invalid': []}
-        if class_ not in g.view_class_mapping['reference']:
-            columns['allowed'].extend([
-                'begin_from', 'begin_to', 'begin_comment',
-                'end_from', 'end_to', 'end_comment'])
-        columns['allowed'].append('type_ids')
-        if class_ in ['place', 'person', 'group']:
-            columns['allowed'] += ['alias']
-        if class_ in ['place', 'artifact']:
-            columns['allowed'] += ['easting', 'northing']
+        columns = get_allowed_columns(class_)
         try:
             file_.save(str(file_path))
             data_frame = pd.read_csv(file_path, keep_default_na=False)
@@ -230,49 +220,18 @@ def import_data(project_id: int, class_: str) -> str:
             checked_data = []
             origin_ids = []
             names = []
-            missing_name_count = 0
-            invalid_type_ids = False
-            invalid_geoms = False
+            checks = {
+                'missing_name_count': 0,
+                'invalid_type_ids': False,
+                'invalid_geoms': False}
             for _index, row in data_frame.iterrows():
                 if not row['name']:
-                    missing_name_count += 1
+                    checks['missing_name_count'] += 1
                     continue
                 table_row = []
                 checked_row = {}
                 for item in headers:
-                    value = row[item]
-                    if item == 'type_ids':
-                        type_ids = []
-                        for type_id in str(value).split():
-                            if Import.check_type_id(type_id, class_):
-                                type_ids.append(type_id)  # pragma: no cover
-                            else:
-                                type_ids.append(
-                                    f'<span class="error">{type_id}</span>')
-                                invalid_type_ids = True
-                        value = ' '.join(type_ids)
-                    if item in ['northing', 'easting'] \
-                            and row[item] \
-                            and not is_float(row[item]):
-                        value = f'<span class="error">{value}</span>'
-                        invalid_geoms = True
-                    if item in [
-                            'begin_from',
-                            'begin_to',
-                            'end_from',
-                            'end_to']:
-                        if not value:
-                            value = ''
-                        else:
-                            try:
-                                value = datetime64_to_timestamp(
-                                    numpy.datetime64(value))
-                                row[item] = value
-                            except ValueError:
-                                row[item] = ''
-                                value = '' if str(value) == 'NaT' else \
-                                    f'<span class="error">{value}</span>'
-                    table_row.append(str(value))
+                    table_row.append(set_cell_value(row, item, class_, checks))
                     checked_row[item] = row[item]
                     if item == 'name' and form.duplicate.data:
                         names.append(row['name'].lower())
@@ -280,14 +239,14 @@ def import_data(project_id: int, class_: str) -> str:
                         origin_ids.append(str(row['id']))
                 table_data.append(table_row)
                 checked_data.append(checked_row)
-            if invalid_type_ids:
+            if checks['invalid_type_ids']:
                 messages['warn'].append(_('invalid type ids'))
-            if invalid_geoms:
+            if checks['invalid_geoms:']:
                 messages['warn'].append(_('invalid coordinates'))
             table = Table(headers, rows=table_data)
-            if missing_name_count:
+            if checks['missing_name_count']:
                 messages['warn'].append(
-                    f"{_('empty names')}: {missing_name_count}")
+                    f"{_('empty names')}: {checks['missing_name_count']}")
             doubles = [
                 item for item, count in collections.Counter(origin_ids).items()
                 if count > 1]
@@ -346,3 +305,56 @@ def import_data(project_id: int, class_: str) -> str:
             [_('import'), url_for('import_index')],
             project,
             class_label])
+
+
+def get_allowed_columns(class_: str) -> dict[str, list[str]]:
+    columns = ['name', 'id', 'description']
+    if class_ not in g.view_class_mapping['reference']:
+        columns.extend([
+            'begin_from', 'begin_to', 'begin_comment',
+            'end_from', 'end_to', 'end_comment'])
+    columns.append('type_ids')
+    if class_ in ['place', 'person', 'group']:
+        columns.extend(['alias'])
+    if class_ in ['place', 'artifact']:
+        columns.extend(['easting', 'northing'])
+    return {
+        'allowed': columns,
+        'valid': [],
+        'invalid': []}
+
+
+def set_cell_value(
+        row: Series,
+        item: str,
+        class_: str,
+        checks: dict[str, Any]) -> str:
+    value = row[item]
+    if item == 'type_ids':
+        type_ids = []
+        for type_id in str(value).split():
+            if Import.check_type_id(type_id, class_):
+                type_ids.append(type_id)  # pragma: no cover
+            else:
+                type_ids.append(
+                    f'<span class="error">{type_id}</span>')
+                checks['invalid_type_ids'] = True
+        value = ' '.join(type_ids)
+    if item in ['northing', 'easting'] \
+            and row[item] \
+            and not is_float(row[item]):
+        value = f'<span class="error">{value}</span>'
+        checks['invalid_geoms'] = True
+    if item in ['begin_from', 'begin_to', 'end_from', 'end_to']:
+        if not value:
+            value = ''
+        else:
+            try:
+                value = datetime64_to_timestamp(
+                    numpy.datetime64(value))
+                row[item] = value
+            except ValueError:
+                row[item] = ''
+                value = '' if str(value) == 'NaT' else \
+                    f'<span class="error">{value}</span>'
+    return str(value)
