@@ -4,7 +4,6 @@ from typing import Any
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.display.util import check_iiif_file_exist, get_iiif_file_path
 from openatlas.models.entity import Entity
 from tests.base import TestBaseCase, get_hierarchy, insert
 
