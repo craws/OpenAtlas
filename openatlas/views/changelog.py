@@ -15,7 +15,12 @@ def index_changelog() -> str:
 
 
 versions = {
-    '8.3.0': ['TBA', {}],
+    '8.3.0': ['TBA', {
+        'feature': {
+            '2193': 'Import artifacts',
+            '2126': 'IIIF: Polygons for annotation selection',
+            '2106': 'IIIF: Delete IIIF images',
+            '2146': 'IIIF: Display hints for possible problems'}}],
     '8.2.1': ['2024-03-04', {
         'fix': {
             '2184': 'Directory for processed files not writable'}}],

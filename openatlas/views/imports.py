@@ -110,7 +110,7 @@ def import_project_view(id_: int) -> str:
                 ['source'] \
                 + g.view_class_mapping['event'] \
                 + g.view_class_mapping['actor'] \
-                + ['place', 'bibliography', 'edition']:
+                + ['place', 'artifact', 'bibliography', 'edition']:
             buttons.append(button(
                 _(class_),
                 url_for('import_data', project_id=project.id, class_=class_)))
@@ -207,7 +207,7 @@ def import_data(project_id: int, class_: str) -> str:
                 'begin_from', 'begin_to', 'begin_comment',
                 'end_from', 'end_to', 'end_comment'])
         columns['allowed'].append('type_ids')
-        if class_ == 'place':
+        if class_ in ['place', 'artifact']:
             columns['allowed'] += ['easting', 'northing']
         try:
             file_.save(str(file_path))

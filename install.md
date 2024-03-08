@@ -171,6 +171,10 @@ Copy instance/example_testing.py to instance/testing.py and adapt as needed:
 
     cp instance/example_testing.py instance/testing.py
 
+Create a own folder to test IIIF images, e.g.:
+
+    mkdir /var/www/iipsrv/tests
+
 Run tests
 
     nosetest3

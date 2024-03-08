@@ -2,7 +2,7 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (
     BooleanField, FieldList, IntegerField, SelectField, StringField)
-from wtforms.validators import Email, InputRequired, Optional, URL
+from wtforms.validators import Email, InputRequired, Optional, Regexp, URL
 
 from openatlas import app
 from openatlas.forms.field import RemovableListField, SubmitField
@@ -61,7 +61,12 @@ class MailForm(FlaskForm):
 
 class IiifForm(FlaskForm):
     iiif = BooleanField('IIIF', description=_('tooltip IIIF enabled'))
-    iiif_url = StringField(_('URL'), description=_('tooltip IIIF URL'))
+    iiif_url = StringField(
+        _('URL'),
+        validators=[
+            URL(require_tld=False),
+            Regexp(r'^(.*)\/$', message=_('URL need a trailing /'))],
+        description=_('tooltip IIIF URL'))
     iiif_version = SelectField(
         _('version'),
         choices=((2, '2'),),
