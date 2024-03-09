@@ -20,37 +20,37 @@ from openatlas.models.reference_system import ReferenceSystem
 
 
 class AcquisitionManager(EventBaseManager):
-
     _('given place')
     _('given artifact')
 
     def additional_fields(self) -> dict[str, Any]:
+        data = {'place': {}, 'artifact': {}}
+        if not self.insert:
+            for entity in self.entity.get_linked_entities('P24'):
+                data[
+                    'artifact' if entity.class_.name == 'artifact'
+                    else 'place'][entity.id] = entity
         return dict(
             super().additional_fields(),
             **{
                 'given_place': TableMultiField(
                     table_multi(
-                        'given_place',
                         'place',
-                        Entity.get_by_class('place', True, self.aliases))),
-                'artifact': TableMultiField(
+                        Entity.get_by_class('place', True, self.aliases),
+                        data['place']),
+                    data['place']),
+                'given_artifact': TableMultiField(
                     table_multi(
-                        _('given artifact')))})
-
-    def populate_update(self) -> None:
-        super().populate_update()
-        data: dict[str, list[int]] = {'place': [], 'artifact': []}
-        for entity in self.entity.get_linked_entities('P24'):
-            var = 'artifact' if entity.class_.name == 'artifact' else 'place'
-            data[var].append(entity.id)
-        self.form.given_place.data = data['place']
-        self.form.artifact.data = data['artifact']
+                        'artifact',
+                        Entity.get_by_class('artifact', True),
+                        data['artifact']),
+                    data['artifact'])})
 
     def process_form(self) -> None:
         super().process_form()
         self.data['links']['delete'].add('P24')
         self.add_link('P24', self.form.given_place.data)
-        self.add_link('P24', self.form.artifact.data)
+        self.add_link('P24', self.form.given_artifact.data)
 
 
 class ActorRelationManager(BaseManager):

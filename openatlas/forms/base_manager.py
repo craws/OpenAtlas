@@ -334,8 +334,8 @@ class ArtifactBaseManager(PlaceBaseManager):
         crumbs = super().get_crumbs()
         if self.place_info['structure'] and self.origin:
             if count := len([
-                i for i in self.place_info['structure']['siblings'] if
-                i.class_.name == self.class_.name]):
+                i for i in self.place_info['structure']['siblings']
+                if i.class_.name == self.class_.name]):
                 crumbs[-1] = crumbs[-1] + f' ({count} {_("exists")})'
         return crumbs
 
@@ -370,7 +370,7 @@ class EventBaseManager(BaseManager):
         super_event = None
         preceding_event = None
         place = None
-        if self.entity:
+        if not self.insert:
             sub_filter_ids = self.get_sub_ids(self.entity, [self.entity.id])
             super_event = self.entity.get_linked_entity('P9', inverse=True)
             preceding_event = self.entity.get_linked_entity('P134')
@@ -431,7 +431,6 @@ class EventBaseManager(BaseManager):
                     self.form.place_from.data = self.origin.id
                 else:
                     self.form.place.data = self.origin.id
-
 
     def process_form(self) -> None:
         super().process_form()
