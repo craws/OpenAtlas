@@ -12,7 +12,8 @@ from wtforms import (
     widgets)
 from wtforms.validators import InputRequired
 
-from openatlas.forms.add_fields import add_date_fields
+from openatlas.forms.add_fields import (
+    add_date_fields, add_reference_systems, add_types)
 from openatlas.forms.field import (
     RemovableListField, SubmitField, TableField, TreeField)
 from openatlas.forms.populate import (
@@ -62,15 +63,14 @@ class BaseManager:
 
         class Form(FlaskForm):
             opened = HiddenField()
-            origin_id = HiddenField()
             validate = validate
 
         self.form_class = Form
         self.add_name_fields()
-        # add_types(self)
+        add_types(self)
         for id_, field in self.additional_fields().items():
             setattr(Form, id_, field)
-        # add_reference_systems(self)
+        add_reference_systems(self)
         if self.entity:
             setattr(Form, 'entity_id', HiddenField())
         if 'date' in self.fields:

@@ -212,7 +212,7 @@ def table_multi(
         row.insert(
             0,
             f'<input type="checkbox" value="{e.name}" id="{e.id}" '
-            f'{" checked" if e.id in selected.keys() else ""}>')
+            f'{" checked" if selected and e.id in selected.keys() else ""}>')
         table_.rows.append(row)
     return table_
 
@@ -255,7 +255,6 @@ def table_multi(
         #             uc_first(item.class_.name),
         #             item.description])
         # else:
-        #     aliases = current_user.settings['table_show_aliases']
         #     if 'place' in class_name or class_name in \
         #             ['begins_in', 'ends_in', 'residence']:
         #         class_ = 'place'
@@ -281,15 +280,4 @@ def table_multi(
         #             g.view_class_mapping['place'] + ['human_remains'],
         #             types=True,
         #             aliases=aliases)
-        #     else:
-        #         class_ = class_name
-        #         entities = Entity.get_by_view(
-        #             class_,
-        #             types=True,
-        #             aliases=aliases)
-        #table = Table(g.table_headers[class_name])
-        #for entity in [e for e in entities if e.id not in filter_ids]:
-        #    data = get_base_table_data(entity, show_links=False)
-        #    data[0] = format_name_and_aliases(entity, class_name)
-        #    table.rows.append(data)
         #return table

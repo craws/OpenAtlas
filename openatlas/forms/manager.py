@@ -53,6 +53,52 @@ class AcquisitionManager(EventBaseManager):
         self.add_link('P24', self.form.given_artifact.data)
 
 
+class ActorFunctionManager(BaseManager):
+    fields = ['date', 'description', 'continue']
+
+    def additional_fields(self) -> dict[str, Any]:
+        if self.link_:
+            return {}
+        if 'membership' in request.url:
+            field_name = 'group'
+            entities = Entity.get_by_class('group')
+        else:
+            field_name = 'actor'
+            entities = Entity.get_by_view('actor')
+        return {
+            'member_origin_id': HiddenField(),
+            field_name:
+                TableMultiField(
+                    table_multi(
+                        'actor',
+                        entities,
+                        filter_ids=[self.origin.id]),
+                    validators=[InputRequired()])}
+
+    def populate_insert(self) -> None:
+        self.form.member_origin_id.data = self.origin.id
+
+    def process_form(self) -> None:
+        super().process_form()
+        link_type = self.get_link_type()
+        class_ = 'group' if hasattr(self.form, 'group') else 'actor'
+        for actor in Entity.get_by_ids(
+                ast.literal_eval(getattr(self.form, class_).data)):
+            self.add_link(
+                'P107',
+                actor,
+                self.form.description.data,
+                inverse=(class_ == 'group'),
+                type_id=link_type.id if link_type else None)
+
+    def process_link_form(self) -> None:
+        super().process_link_form()
+        type_id = getattr(
+            self.form,
+            str(g.classes['actor_function'].standard_type_id)).data
+        self.link_.type = g.types[int(type_id)] if type_id else None
+
+
 class ActorRelationManager(BaseManager):
     fields = ['date', 'description', 'continue']
 
@@ -98,44 +144,6 @@ class ActorRelationManager(BaseManager):
             new_range = self.link_.domain
             self.link_.domain = self.link_.range
             self.link_.range = new_range
-
-
-class ActorFunctionManager(BaseManager):
-    fields = ['date', 'description', 'continue']
-
-    def additional_fields(self) -> dict[str, Any]:
-        if self.link_:
-            return {}
-        return {
-            'member_origin_id': HiddenField(),
-            'group' if 'membership' in request.url else 'actor':
-                TableMultiField(
-                    _('actor'),
-                    [InputRequired()],
-                    filter_ids=[self.origin.id])}
-
-    def populate_insert(self) -> None:
-        self.form.member_origin_id.data = self.origin.id
-
-    def process_form(self) -> None:
-        super().process_form()
-        link_type = self.get_link_type()
-        class_ = 'group' if hasattr(self.form, 'group') else 'actor'
-        for actor in Entity.get_by_ids(
-                ast.literal_eval(getattr(self.form, class_).data)):
-            self.add_link(
-                'P107',
-                actor,
-                self.form.description.data,
-                inverse=(class_ == 'group'),
-                type_id=link_type.id if link_type else None)
-
-    def process_link_form(self) -> None:
-        super().process_link_form()
-        type_id = getattr(
-            self.form,
-            str(g.classes['actor_function'].standard_type_id)).data
-        self.link_.type = g.types[int(type_id)] if type_id else None
 
 
 class ActivityManager(EventBaseManager):
