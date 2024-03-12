@@ -267,7 +267,10 @@ def profile_image(entity: Entity) -> str:
                 link(
                     _('annotate'),
                     url_for('annotation_insert', id_=file_id),
-                    external=True))
+                    external=True) + '<br>' +
+                link(
+                    _('delete IIIF'),
+                    url_for('delete_iiif_file', id_=file_id)))
         else:
             html += button_bar([
                 button(
@@ -597,6 +600,10 @@ def check_iiif_file_exist(id_: int) -> bool:
 def get_iiif_file_path(id_: int) -> Path:
     ext = '.tiff' if g.settings['iiif_conversion'] else g.files[id_].suffix
     return Path(g.settings['iiif_path']) / f'{id_}{ext}'
+
+
+def delete_iiif_image(id_: int) -> None:
+    get_iiif_file_path(id_).unlink(missing_ok=True)
 
 
 def convert_image_to_iiif(id_: int, path: Optional[Path] = None) -> bool:
