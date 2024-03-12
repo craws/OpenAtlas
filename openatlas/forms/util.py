@@ -260,10 +260,6 @@ def table_multi(
         #         class_ = 'place'
         #         entities = Entity.get_by_view('place', types=True,
         #                                       aliases=aliases)
-        #     elif class_name == 'feature_super':
-        #         class_ = 'place'
-        #         entities = \
-        #             Entity.get_by_class('place', types=True, aliases=aliases)
         #     elif class_name == 'stratigraphic_super':
         #         class_ = 'place'
         #         entities = \

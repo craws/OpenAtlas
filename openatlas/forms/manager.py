@@ -250,29 +250,30 @@ class FeatureManager(PlaceBaseManager):
                     _('insert and add') + ' ' + _('stratigraphic unit')))
 
     def additional_fields(self) -> dict[str, Any]:
+        if self.insert:
+            super_ = self.origin if self.origin \
+                and self.origin.class_.name == 'place' else None
+        else:
+            super_ = self.entity.get_linked_entity('P46', inverse=True)
         return dict(
             super().additional_fields(),
-            **{'feature_super': TableField(
-                _('super'),
-                [InputRequired()],
-                add_dynamic=['place'])})
-
-    def populate_insert(self) -> None:
-        super().populate_insert()
-        if self.origin and self.origin.class_.name == 'place':
-            self.form.feature_super.data = self.origin.id
-
-    def populate_update(self) -> None:
-        super().populate_update()
-        self.form.feature_super.data = \
-            self.entity.get_linked_entity_safe('P46', inverse=True).id
+            **{
+                'super':
+                    TableField(
+                        table(
+                            'super',
+                            'place',
+                            Entity.get_by_class('place', types=True)),
+                        selection=super_,
+                        validators=[InputRequired()],
+                        add_dynamic=['place'])})
 
     def process_form(self) -> None:
         super().process_form()
         self.data['links']['delete_inverse'].add('P46')
         self.add_link(
             'P46',
-            Entity.get_by_id(int(self.form.feature_super.data)),
+            Entity.get_by_id(int(self.form.super.data)),
             inverse=True)
 
 
