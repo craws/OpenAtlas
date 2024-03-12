@@ -106,19 +106,16 @@ class ActorRelationManager(BaseManager):
         fields = {'inverse': BooleanField(_('inverse'))}
         if not self.link_:
             fields['actor'] = TableMultiField(
-                _('actor'),
-                [InputRequired()],
-                filter_ids=[self.origin.id])
+                table_multi(
+                    'actor',
+                    Entity.get_by_class('person'),
+                    filter_ids=[self.origin.id]),
+                validators=[InputRequired()])
             fields['relation_origin_id'] = HiddenField()
         return fields
 
     def populate_insert(self) -> None:
         self.form.relation_origin_id.data = self.origin.id
-
-    def populate_update(self) -> None:
-        super().populate_update()
-        if self.origin.id == self.link_.range.id:
-            self.form.inverse.data = True
 
     def process_form(self) -> None:
         super().process_form()
@@ -144,6 +141,11 @@ class ActorRelationManager(BaseManager):
             new_range = self.link_.domain
             self.link_.domain = self.link_.range
             self.link_.range = new_range
+
+    def populate_update(self) -> None:
+        super().populate_update()
+        if self.origin.id == self.link_.range.id:
+            self.form.inverse.data = True
 
 
 class ActivityManager(EventBaseManager):
