@@ -160,8 +160,6 @@ class AdministrativeUnitManager(TypeBaseManager):
 
 
 class ArtifactManager(ArtifactBaseManager):
-    _('owned by')
-
     def additional_fields(self) -> dict[str, Any]:
         filter_ids = []
         if self.entity:
@@ -199,24 +197,23 @@ class BibliographyManager(BaseManager):
 
 class CreationManager(EventBaseManager):
     def additional_fields(self) -> dict[str, Any]:
+        if self.insert:
+            selection = self.origin \
+                if self.origin and self.origin.class_.name == 'file' else None
+        else:
+            selection = [e for e in self.entity.get_linked_entities('P94')]
         return dict(
             super().additional_fields(),
-            **{'file': TableMultiField(_('document'))})
-
-    def populate_insert(self) -> None:
-        super().populate_insert()
-        if self.origin and self.origin.class_.name == 'file':
-            self.form.file.data = [self.origin.id]
-
-    def populate_update(self) -> None:
-        super().populate_update()
-        self.form.file.data = [
-            entity.id for entity in self.entity.get_linked_entities('P94')]
+            **{
+                'document':
+                    TableMultiField(
+                        table_multi('file', Entity.get_by_class('file')),
+                        selection)})
 
     def process_form(self) -> None:
         super().process_form()
         self.data['links']['delete'].add('P94')
-        self.add_link('P94', self.form.file.data)
+        self.add_link('P94', self.form.document.data)
 
 
 class EditionManager(BaseManager):
