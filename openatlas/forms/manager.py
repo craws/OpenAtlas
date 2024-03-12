@@ -299,34 +299,34 @@ class GroupManager(ActorBaseManager):
 class HumanRemainsManager(ArtifactBaseManager):
     def additional_fields(self) -> dict[str, Any]:
         filter_ids = []
-        if entity := self.entity:
-            filter_ids = \
-                [entity.id] + \
-                [e.id for e in entity.get_linked_entities_recursive('P46')]
+        if self.entity:
+            filter_ids = [self.entity.id] + [
+                e.id for e in self.entity.get_linked_entities_recursive('P46')]
+        if self.insert:
+            super_ = self.origin if self.origin \
+                and self.origin.class_.view in ['artifact', 'place'] else None
+        else:
+            super_ = self.entity.get_linked_entity('P46', inverse=True)
         return dict(
             super().additional_fields(),
-            **{'human_remains_super': TableField(
-                _('super'),
-                filter_ids=filter_ids,
-                add_dynamic=['place'])})
-
-    def populate_insert(self) -> None:
-        super().populate_insert()
-        if self.origin and self.origin.class_.view in ['artifact', 'place']:
-            self.form.human_remains_super.data = self.origin.id
-
-    def populate_update(self) -> None:
-        super().populate_update()
-        if super_ := self.entity.get_linked_entity('P46', inverse=True):
-            self.form.human_remains_super.data = super_.id
+            **{
+                'super':
+                    TableField(
+                        table(
+                            'super',
+                            'place',
+                            Entity.get_by_class(
+                                g.view_class_mapping['place']
+                                + ['human remains'],
+                                types=True),
+                            filter_ids=filter_ids),
+                        selection=super_,
+                        add_dynamic=['place'])})
 
     def process_form(self) -> None:
         super().process_form()
-        if self.form.human_remains_super.data:
-            self.add_link(
-                'P46',
-                self.form.human_remains_super.data,
-                inverse=True)
+        if self.form.super.data:
+            self.add_link('P46', self.form.super.data, inverse=True)
 
 
 class HierarchyCustomManager(HierarchyBaseManager):

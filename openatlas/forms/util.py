@@ -264,10 +264,4 @@ def table_multi(
         #         class_ = 'place'
         #         entities = \
         #             Entity.get_by_class('feature', types=True, aliases=aliases)
-        #     elif class_name == 'human_remains_super':
-        #         class_ = 'place'
-        #         entities = Entity.get_by_class(
-        #             g.view_class_mapping['place'] + ['human_remains'],
-        #             types=True,
-        #             aliases=aliases)
         #return table
