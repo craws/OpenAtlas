@@ -268,12 +268,6 @@ def table_multi(
         #         class_ = 'place'
         #         entities = \
         #             Entity.get_by_class('feature', types=True, aliases=aliases)
-        #     elif class_name == 'artifact_super':
-        #         class_ = 'place'
-        #         entities = Entity.get_by_class(
-        #             g.view_class_mapping['place'] + ['artifact'],
-        #             types=True,
-        #             aliases=aliases)
         #     elif class_name == 'human_remains_super':
         #         class_ = 'place'
         #         entities = Entity.get_by_class(

@@ -326,34 +326,33 @@ class ArtifactBaseManager(PlaceBaseManager):
     fields = ['name', 'date', 'description', 'continue', 'map']
 
     def additional_fields(self) -> dict[str, Any]:
+        if self.insert:
+            owner = self.origin if self.origin \
+                and self.origin.class_.view == 'actor' else None
+        else:
+            owner = self.entity.get_linked_entity('P52')
         return {
-            'actor':
-                TableField(_('owned by'), add_dynamic=['person', 'group'])}
+            'owned_by':
+                TableField(
+                    table('owned_by', 'actor', Entity.get_by_view('actor')),
+                    owner,
+                    add_dynamic=['person', 'group'])}
 
     def get_crumbs(self) -> list[Any]:
         crumbs = super().get_crumbs()
         if self.place_info['structure'] and self.origin:
             if count := len([
                 i for i in self.place_info['structure']['siblings']
-                if i.class_.name == self.class_.name]):
+                    if i.class_.name == self.class_.name]):
                 crumbs[-1] = crumbs[-1] + f' ({count} {_("exists")})'
         return crumbs
-
-    def populate_insert(self) -> None:
-        if self.origin and self.origin.class_.view == 'actor':
-            self.form.actor.data = self.origin.id
-
-    def populate_update(self) -> None:
-        super().populate_update()
-        if owner := self.entity.get_linked_entity('P52'):
-            self.form.actor.data = owner.id
 
     def process_form(self) -> None:
         super().process_form()
         self.data['links']['delete'].add('P52')
         self.data['links']['delete_inverse'].add('P46')
-        if self.form.actor.data:
-            self.add_link('P52', self.form.actor.data)
+        if self.form.owned_by.data:
+            self.add_link('P52', self.form.owned_by.data)
 
 
 class EventBaseManager(BaseManager):
