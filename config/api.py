@@ -1,7 +1,11 @@
 from pathlib import Path
 
 API_VERSIONS = ['0.4']
-API_PATH = Path(__file__).parent.parent / 'openatlas' / 'api'
+
+OPENAPI_FILE = (Path(
+    __file__).parent.parent / 'openatlas' / 'api' / 'openapi.json')
+OPENAPI_INSTANCE_FILE = Path(__file__).parent.parent / 'files' / 'openapi.json'
+
 API_CONTEXT = {
     'LPF':
         'https://raw.githubusercontent.com/LinkedPasts/linked-places/'

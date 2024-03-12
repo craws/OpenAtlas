@@ -1,6 +1,6 @@
 import json
 import locale
-from pathlib import Path
+import shutil
 from typing import Any, Optional
 
 from flask import Flask, Response, g, request, session
@@ -103,17 +103,17 @@ def before_request() -> None:
                 and ip not in app.config['ALLOWED_IPS']:
             raise AccessDeniedError
     if request.path.startswith('/swagger'):
-        data = json.loads(
-            (app.config['API_PATH'] / 'openapi.json').read_text())
-        if not (app.config['API_PATH'] / 'openapi_instance.json').exists() \
-                and len(data['servers']) == 2:
-            data['servers'].insert(0, {
-                "url": request.host_url + '/api/{basePath}',
-                "description": f"{g.settings['site_name']} Server",
-                "variables": {
-                    "basePath": {"default": "0.4", "enum": ["0.4"]}}})
-            new_file = app.config['API_PATH'] / 'openapi_instance.json'
-            new_file.write_text(json.dumps(data, indent=4))
+        oa_instance = app.config['OPENAPI_INSTANCE_FILE']
+        if not oa_instance.exists():
+            shutil.copy(app.config['OPENAPI_FILE'], oa_instance)
+        if data := json.loads(oa_instance.read_text()):
+            if len(data['servers']) == 2:
+                data['servers'].insert(0, {
+                    "url": request.host_url + 'api/{basePath}',
+                    "description": f"{g.settings['site_name']} Server",
+                    "variables": {
+                        "basePath": {"default": "0.4", "enum": ["0.4"]}}})
+                oa_instance.write_text(json.dumps(data, indent=4))
 
 
 @app.after_request
