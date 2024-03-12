@@ -4,7 +4,7 @@
       id="{{ field.id }}-selection"
       class="g-1 row {{ config.CSS.string_field }}"
       onclick="$('#{{ field.id }}-modal').modal('show')">
-      {% for s in selection %}
+      {% for s in field.selection.values() %}
         <div onclick="event.stopPropagation()" class="badge col-auto bg-gray">
           <div class="d-flex align-items-center">
             <span class="text-black">{{ s.name }}</span>
@@ -43,7 +43,7 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body">{{ table.display(field.id)|safe }}</div>
+      <div class="modal-body">{{ field.table.display(field.id)|safe }}</div>
       <div class="modal-footer">
         <button
             type="button"

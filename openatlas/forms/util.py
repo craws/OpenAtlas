@@ -199,20 +199,21 @@ def table(
 
 
 def table_multi(
+        class_name: str,
         entities: list[Entity],
         selected: Optional[dict[int, Entity]] = None,
         filter_ids: Optional[list[int]] = None) -> Table:
     table_ = Table(
-        ['name', 'type', 'x'],
-        order=[[2, "desc"], [0, "asc"]],
-        defs=[{'orderDataType': 'dom-checkbox', 'targets': 2}])
+        [''] + g.table_headers[class_name],
+        order=[[0, 'desc'], [1, 'asc']],
+        defs=[{'orderDataType': 'dom-checkbox', 'targets': 0}])
     for e in [e for e in entities if not filter_ids or e.id not in filter_ids]:
-        check = 'checked' if selected and e.id in list(selected.keys()) else ''
-        table_.rows.append([
-            e.name,
-            # print_tags(e),
-            f'<input id="{e.id}" value="{e.name}" '
-            f'type="checkbox" {check} class="multi-table-select">'])
+        row = get_base_table_data(e, show_links=False)
+        row.insert(
+            0,
+            f'<input type="checkbox" value="{e.name}" id="{e.id}" '
+            f'{" checked" if selected and e.id in selected.keys() else ""}>')
+        table_.rows.append(row)
     return table_
 
     #@staticmethod
@@ -254,7 +255,6 @@ def table_multi(
         #             uc_first(item.class_.name),
         #             item.description])
         # else:
-        #     aliases = current_user.settings['table_show_aliases']
         #     if 'place' in class_name or class_name in \
         #             ['begins_in', 'ends_in', 'residence']:
         #         class_ = 'place'
@@ -280,45 +280,4 @@ def table_multi(
         #             g.view_class_mapping['place'] + ['human_remains'],
         #             types=True,
         #             aliases=aliases)
-        #     else:
-        #         class_ = class_name
-        #         entities = Entity.get_by_view(
-        #             class_,
-        #             types=True,
-        #             aliases=aliases)
-        #table = Table(g.table_headers[class_name])
-        #for entity in [e for e in entities if e.id not in filter_ids]:
-        #    data = get_base_table_data(entity, show_links=False)
-        #    data[0] = format_name_and_aliases(entity, class_name)
-        #    table.rows.append(data)
         #return table
-
-
-# class TableMultiSelect(HiddenInput):
-#
-#     def __call__(self, field: TableMultiField, **kwargs: Any) -> str:
-#
-#         data = field.data or []
-#         data = ast.literal_eval(data) if isinstance(data, str) else data
-#         aliases = current_user.settings['table_show_aliases']
-#         if class_ in ['group', 'person']:
-#             entities = Entity.get_by_class(class_, types=True, aliases=aliases)
-#         else:
-#             entities = Entity.get_by_view(class_, types=True, aliases=aliases)
-#         table = Table(
-#             [''] + g.table_headers[class_],
-#             order=[[0, 'desc'], [1, 'asc']],
-#             defs=[{'orderDataType': 'dom-checkbox', 'targets': 0}])
-#         for entity in [e for e in entities if e.id not in field.filter_ids]:
-#             row = get_base_table_data(entity, show_links=False)
-#             row.insert(
-#                 0,
-#                 f'<input type="checkbox" value="{entity.name}"'
-#                 f' id="{entity.id}" '
-#                 f'{" checked" if entity.id in data else ""}>')
-#             table.rows.append(row)
-#         return Markup(render_template(
-#             'forms/table_multi_select.html',
-#             field=field,
-#             selection=[e for e in entities if e.id in data],
-#             table=table)) + super().__call__(field, **kwargs)

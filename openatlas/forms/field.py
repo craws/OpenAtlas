@@ -167,7 +167,7 @@ class TableMultiField(HiddenField):
             **kwargs: Any) -> None:
         super().__init__(validators=validators, **kwargs)
         self.table = table
-        self.selection = selection
+        self.selection = selection or {}
 
 
 class ValueFloatField(FloatField):

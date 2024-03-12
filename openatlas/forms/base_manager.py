@@ -12,7 +12,8 @@ from wtforms import (
     widgets)
 from wtforms.validators import InputRequired
 
-from openatlas.forms.add_fields import add_date_fields
+from openatlas.forms.add_fields import (
+    add_date_fields, add_reference_systems, add_types)
 from openatlas.forms.field import (
     RemovableListField, SubmitField, TableField, TreeField)
 from openatlas.forms.populate import (
@@ -62,15 +63,14 @@ class BaseManager:
 
         class Form(FlaskForm):
             opened = HiddenField()
-            origin_id = HiddenField()
             validate = validate
 
         self.form_class = Form
         self.add_name_fields()
-        # add_types(self)
+        add_types(self)
         for id_, field in self.additional_fields().items():
             setattr(Form, id_, field)
-        # add_reference_systems(self)
+        add_reference_systems(self)
         if self.entity:
             setattr(Form, 'entity_id', HiddenField())
         if 'date' in self.fields:
@@ -334,8 +334,8 @@ class ArtifactBaseManager(PlaceBaseManager):
         crumbs = super().get_crumbs()
         if self.place_info['structure'] and self.origin:
             if count := len([
-                i for i in self.place_info['structure']['siblings'] if
-                i.class_.name == self.class_.name]):
+                i for i in self.place_info['structure']['siblings']
+                if i.class_.name == self.class_.name]):
                 crumbs[-1] = crumbs[-1] + f' ({count} {_("exists")})'
         return crumbs
 
@@ -370,7 +370,7 @@ class EventBaseManager(BaseManager):
         super_event = None
         preceding_event = None
         place = None
-        if self.entity:
+        if not self.insert:
             sub_filter_ids = self.get_sub_ids(self.entity, [self.entity.id])
             super_event = self.entity.get_linked_entity('P9', inverse=True)
             preceding_event = self.entity.get_linked_entity('P134')
@@ -431,7 +431,6 @@ class EventBaseManager(BaseManager):
                     self.form.place_from.data = self.origin.id
                 else:
                     self.form.place.data = self.origin.id
-
 
     def process_form(self) -> None:
         super().process_form()
