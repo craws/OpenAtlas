@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from flasgger import Swagger
 from flask import Blueprint
 from flask_cors import CORS
@@ -11,7 +13,7 @@ app.config['SWAGGER'] = {
     'uiversion': 3,
     "swagger_version": "2.0",
     "specs": [{
-        "endpoint": '04',
+        "endpoint": 'openapi_04',
         "license": {
             "name": "Apache 2.0",
             "url": "https://www.apache.org/licenses/LICENSE-2.0.html"},
@@ -22,7 +24,9 @@ app.config['SWAGGER'] = {
 app.config['PROPAGATE_EXCEPTIONS'] = True
 CORS(app, resources={r"/api/*": {"origins": app.config['CORS_ALLOWANCE']}})
 
-Swagger(app, parse=False, template_file="api/openapi.json")
+suffix = '_instance' \
+    if (Path(app.root_path) / 'api' / 'openapi_instance.json').exists() else ''
+Swagger(app, parse=False, template_file=f"api/openapi{suffix}.json")
 
 blueprint = Blueprint('api', __name__, url_prefix='/api')
 api = Api(blueprint)

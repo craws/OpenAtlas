@@ -1,4 +1,6 @@
+import json
 import locale
+from pathlib import Path
 from typing import Any, Optional
 
 from flask import Flask, Response, g, request, session
@@ -67,8 +69,8 @@ def before_request() -> None:
             or request.path.startswith('/api/type_tree/')
             or request.path.startswith('/admin/orphans')
             or (
-                request.path.startswith('/entity/') and
-                request.path.split('/entity/')[1].isdigit())):
+                    request.path.startswith('/entity/') and
+                    request.path.split('/entity/')[1].isdigit())):
         with_count = True
     g.types = Type.get_all(with_count)
     g.radiocarbon_type = Type.get_hierarchy('Radiocarbon')
@@ -100,6 +102,18 @@ def before_request() -> None:
                 and not g.settings['api_public'] \
                 and ip not in app.config['ALLOWED_IPS']:
             raise AccessDeniedError
+    if request.path.startswith('/swagger'):
+        data = json.loads(
+            (app.config['API_PATH'] / 'openapi.json').read_text())
+        if not (app.config['API_PATH'] / 'openapi_instance.json').exists() \
+                and len(data['servers']) == 2:
+            data['servers'].insert(0, {
+                "url": request.host_url + '/api/{basePath}',
+                "description": f"{g.settings['site_name']} Server",
+                "variables": {
+                    "basePath": {"default": "0.4", "enum": ["0.4"]}}})
+            new_file = app.config['API_PATH'] / 'openapi_instance.json'
+            new_file.write_text(json.dumps(data, indent=4))
 
 
 @app.after_request

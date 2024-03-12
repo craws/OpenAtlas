@@ -1,5 +1,7 @@
-API_VERSIONS = ['0.3', '0.4']
+from pathlib import Path
 
+API_VERSIONS = ['0.4']
+API_PATH = Path(__file__).parent.parent / 'openatlas' / 'api'
 API_CONTEXT = {
     'LPF':
         'https://raw.githubusercontent.com/LinkedPasts/linked-places/'

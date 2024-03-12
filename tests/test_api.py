@@ -85,8 +85,12 @@ class Api(ApiTestCase):
                         case 'File without file':
                             file_without_file = entity
 
+            # Test Swagger UI
+            rv: Any = self.app.get(url_for('flasgger.apidocs'))
+            assert b'Flasgger' in rv.data
+
             # ---Content Endpoints---
-            rv: Any = self.app.get(url_for('api_04.classes')).get_json()
+            rv = self.app.get(url_for('api_04.classes')).get_json()
             assert self.get_classes(rv)
 
             rv = self.app.get(

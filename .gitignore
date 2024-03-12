@@ -19,6 +19,9 @@ cover
 # created files
 files/
 
+# created OpenAPI file
+openatlas/api/openapi_instance.json
+
 # ide
 .idea
 .ftpconfig
