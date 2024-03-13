@@ -1,4 +1,6 @@
+import json
 import locale
+import shutil
 from typing import Any, Optional
 
 from flask import Flask, Response, g, request, session
@@ -66,8 +68,7 @@ def before_request() -> None:
     if (request.path.startswith('/type')
             or request.path.startswith('/api/type_tree/')
             or request.path.startswith('/admin/orphans')
-            or (
-                request.path.startswith('/entity/') and
+            or (request.path.startswith('/entity/') and
                 request.path.split('/entity/')[1].isdigit())):
         with_count = True
     g.types = Type.get_all(with_count)
@@ -100,6 +101,32 @@ def before_request() -> None:
                 and not g.settings['api_public'] \
                 and ip not in app.config['ALLOWED_IPS']:
             raise AccessDeniedError
+
+    openapi = app.config['OPENAPI_FILE']
+    openapi_instance = app.config['OPENAPI_INSTANCE_FILE']
+    if not openapi_instance.exists():
+        shutil.copy(openapi, openapi_instance)
+    with openapi_instance.open(mode='r+') as i, openapi.open(mode='r') as o:
+        original = json.load(o)
+        instance = json.load(i)
+        if original['info']['version'] != instance['info']['version']:
+            shutil.copy(openapi, openapi_instance)
+        server = {
+            "url": request.host_url + 'api/{basePath}',
+            "description": f"{g.settings['site_name']} Server",
+            "variables": {
+                "basePath": {"default": "0.4", "enum": ["0.4"]}}}
+        modified = False
+        if len(instance['servers']) == 2:
+            instance['servers'].insert(0, server)
+            modified = True
+        elif instance['servers'][0]['description'] != server['description']:
+            instance['servers'][0] = server
+            modified = True
+        if modified:
+            i.seek(0)
+            json.dump(instance, i, indent=4)
+            i.truncate()
 
 
 @app.after_request
