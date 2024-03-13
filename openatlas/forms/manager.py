@@ -30,21 +30,20 @@ class AcquisitionManager(EventBaseManager):
                 data[
                     'artifact' if entity.class_.name == 'artifact'
                     else 'place'][entity.id] = entity
-        return dict(
-            super().additional_fields(),
-            **{
-                'given_place': TableMultiField(
-                    table_multi(
-                        'place',
-                        Entity.get_by_class('place', True, self.aliases),
-                        data['place']),
-                    data['place']),
-                'given_artifact': TableMultiField(
-                    table_multi(
-                        'artifact',
-                        Entity.get_by_class('artifact', True),
-                        data['artifact']),
-                    data['artifact'])})
+        fields = super().additional_fields()
+        fields['given_place'] = TableMultiField(
+            table_multi(
+                'place',
+                Entity.get_by_class('place', True, self.aliases),
+                data['place']),
+            data['place'])
+        fields['given_artifact'] = TableMultiField(
+            table_multi(
+                'artifact',
+                Entity.get_by_class('artifact', True),
+                data['artifact']),
+            data['artifact'])
+        return fields
 
     def process_form(self) -> None:
         super().process_form()
@@ -170,20 +169,18 @@ class ArtifactManager(ArtifactBaseManager):
                 and self.origin.class_.view in ['artifact', 'place'] else None
         else:
             super_ = self.entity.get_linked_entity('P46', inverse=True)
-        return dict(
-            super().additional_fields(),
-            **{
-                'super':
-                    TableField(
-                        table(
-                            'super',
-                            'place',
-                            Entity.get_by_class(
-                                g.view_class_mapping['place'] + ['artifact'],
-                                types=True),
-                            filter_ids=filter_ids),
-                        selection=super_,
-                        add_dynamic=['place'])})
+        fields = super().additional_fields()
+        fields['super'] = TableField(
+            table(
+                'super',
+                'place',
+                Entity.get_by_class(
+                    g.view_class_mapping['place'] + ['artifact'],
+                    types=True),
+                filter_ids=filter_ids),
+            selection=super_,
+            add_dynamic=['place'])
+        return fields
 
     def process_form(self) -> None:
         super().process_form()
@@ -202,13 +199,11 @@ class CreationManager(EventBaseManager):
                 if self.origin and self.origin.class_.name == 'file' else None
         else:
             selection = [e for e in self.entity.get_linked_entities('P94')]
-        return dict(
-            super().additional_fields(),
-            **{
-                'document':
-                    TableMultiField(
-                        table_multi('file', Entity.get_by_class('file')),
-                        selection)})
+        fields = super().additional_fields()
+        fields['document'] = TableMultiField(
+            table_multi('file', Entity.get_by_class('file')),
+            selection)
+        return fields
 
     def process_form(self) -> None:
         super().process_form()
@@ -255,18 +250,13 @@ class FeatureManager(PlaceBaseManager):
                 and self.origin.class_.name == 'place' else None
         else:
             super_ = self.entity.get_linked_entity('P46', inverse=True)
-        return dict(
-            super().additional_fields(),
-            **{
-                'super':
-                    TableField(
-                        table(
-                            'super',
-                            'place',
-                            Entity.get_by_class('place', types=True)),
-                        selection=super_,
-                        validators=[InputRequired()],
-                        add_dynamic=['place'])})
+        fields = super().additional_fields()
+        fields['super'] = TableField(
+            table('super', 'place', Entity.get_by_class('place', types=True)),
+            selection=super_,
+            validators=[InputRequired()],
+            add_dynamic=['place'])
+        return fields
 
     def process_form(self) -> None:
         super().process_form()
@@ -351,9 +341,9 @@ class InvolvementManager(BaseManager):
         elif self.origin and self.origin.class_.view != 'actor':
             event_class_name = self.origin.class_.name
         choices = [('P11', g.properties['P11'].name)]
-        if event_class_name in \
-                ['acquisition', 'activity', 'creation', 'modification',
-                 'production']:
+        if event_class_name in [
+                'acquisition', 'activity', 'creation', 'modification',
+                'production']:
             choices.append(('P14', g.properties['P14'].name))
             if event_class_name == 'acquisition':
                 choices.append(('P22', g.properties['P22'].name))
@@ -362,7 +352,7 @@ class InvolvementManager(BaseManager):
         if self.insert and self.origin:
             class_ = 'actor' if self.origin.class_.view == 'event' else 'event'
             fields[class_] = TableMultiField(
-                table_multi(class_, Entity.get_by_class(class_)),
+                table_multi(class_, Entity.get_by_class(class_, types=True)),
                 validators=[InputRequired()])
         return fields
 
@@ -402,24 +392,31 @@ class InvolvementManager(BaseManager):
 
 
 class ModificationManager(EventBaseManager):
-    def additional_fields(self) -> dict[str, Any]:
-        return dict(
-            super().additional_fields(),
-            **{
-                'artifact': TableMultiField(),
-                'modified_place': TableMultiField('place')})
+    _('modified place')
 
-    def populate_update(self) -> None:
-        super().populate_update()
-        artifact_data = []
-        place_data = []
-        for item in self.entity.get_linked_entities('P31'):
-            if item.class_.name == 'artifact':
-                artifact_data.append(item.id)
-            elif item.cidoc_class.code == 'E18':
-                place_data.append(item.id)
-        self.form.artifact.data = artifact_data
-        self.form.modified_place.data = place_data
+    def additional_fields(self) -> dict[str, Any]:
+        artifacts = {}
+        places = {}
+        if not self.insert:
+            for item in self.entity.get_linked_entities('P31'):
+                if item.class_.name == 'artifact':
+                    artifacts[item.id] = item
+                elif item.cidoc_class.code == 'E18':
+                    places[item.id] = item
+        fields = super().additional_fields()
+        fields['artifact'] = TableMultiField(
+            table_multi(
+                'artifact',
+                Entity.get_by_class('artifact', types=True),
+                artifacts),
+            artifacts)
+        fields['modified_place'] = TableMultiField(
+            table_multi(
+                'place',
+                Entity.get_by_class('place', types=True),
+                places),
+            places)
+        return fields
 
     def process_form(self) -> None:
         super().process_form()
