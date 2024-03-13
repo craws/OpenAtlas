@@ -359,9 +359,11 @@ class InvolvementManager(BaseManager):
                 choices.append(('P22', g.properties['P22'].name))
                 choices.append(('P23', g.properties['P23'].name))
         fields = {'activity': SelectField(_('activity'), choices=choices)}
-        if not self.entity and not self.link_ and self.origin:
-            name = 'actor' if self.origin.class_.view == 'event' else 'event'
-            fields[name] = TableMultiField(_(name), [InputRequired()])
+        if self.insert and self.origin:
+            class_ = 'actor' if self.origin.class_.view == 'event' else 'event'
+            fields[class_] = TableMultiField(
+                table_multi(class_, Entity.get_by_class(class_)),
+                validators=[InputRequired()])
         return fields
 
     def populate_update(self) -> None:
