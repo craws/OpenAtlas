@@ -35,6 +35,7 @@ class OpenatlasClass:
     _('feature')
     _('involvement')
     _('modification')
+    _('move')
     _('production')
     _('object location')
     _('source translation')

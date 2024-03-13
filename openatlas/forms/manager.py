@@ -428,40 +428,56 @@ class ModificationManager(EventBaseManager):
 
 
 class MoveManager(EventBaseManager):
-    def additional_fields(self) -> dict[str, Any]:
-        return dict(
-            super().additional_fields(),
-            **{
-                'place_from': TableField(_('from'), add_dynamic=['place']),
-                'place_to': TableField(_('to'), add_dynamic=['place']),
-                'artifact': TableMultiField('moved artifact'),
-                'person': TableMultiField('moved person')})
+    _('moved artifact')
+    _('moved person')
+    _('place to')
+    _('place from')
 
-    def populate_update(self) -> None:
-        super().populate_update()
-        if place_from := self.entity.get_linked_entity('P27'):
-            self.form.place_from.data = \
-                place_from.get_linked_entity_safe('P53', True).id
-        if place_to := self.entity.get_linked_entity('P26'):
-            self.form.place_to.data = \
-                place_to.get_linked_entity_safe('P53', True).id
-        person_data = []
-        object_data = []
-        for linked_entity in self.entity.get_linked_entities('P25'):
-            if linked_entity.class_.name == 'person':
-                person_data.append(linked_entity.id)
-            elif linked_entity.class_.view == 'artifact':
-                object_data.append(linked_entity.id)
-        self.form.person.data = person_data
-        self.form.artifact.data = object_data
+    def additional_fields(self) -> dict[str, Any]:
+        fields = super().additional_fields()
+        place_from = None
+        place_to = None
+        artifacts = {}
+        persons = {}
+        if self.entity:
+            if place := self.entity.get_linked_entity('P27'):
+                place_from = place.get_linked_entity_safe('P53', True)
+            if place := self.entity.get_linked_entity('P26'):
+                place_to = place.get_linked_entity_safe('P53', True)
+            for linked_entity in self.entity.get_linked_entities('P25'):
+                if linked_entity.class_.name == 'person':
+                    persons[linked_entity.id] = linked_entity
+                elif linked_entity.class_.view == 'artifact':
+                    artifacts[linked_entity.id] = linked_entity
+        fields['place_from'] = TableField(
+            table('place_from', 'place', Entity.get_by_class('place', types=True)),
+            place_from,
+            add_dynamic=['place'])
+        fields['place_to'] = TableField(
+            table('place_to', 'place', Entity.get_by_class('place', types=True)),
+            place_to,
+            add_dynamic=['place'])
+        fields['moved_artifact'] = TableMultiField(
+            table_multi(
+                'artifact',
+                Entity.get_by_class('artifact', types=True),
+                artifacts),
+            artifacts)
+        fields['moved_person'] = TableMultiField(
+            table_multi(
+                'person',
+                Entity.get_by_class('person'),
+                persons),
+            persons)
+        return fields
 
     def process_form(self) -> None:
         super().process_form()
         self.data['links']['delete'].update(['P25', 'P26', 'P27'])
-        if self.form.artifact.data:
-            self.add_link('P25', self.form.artifact.data)
-        if self.form.person.data:
-            self.add_link('P25', self.form.person.data)
+        if self.form.moved_artifact.data:
+            self.add_link('P25', self.form.moved_artifact.data)
+        if self.form.moved_person.data:
+            self.add_link('P25', self.form.moved_person.data)
         if self.form.place_from.data:
             self.add_link(
                 'P27',
