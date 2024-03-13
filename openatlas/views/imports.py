@@ -25,7 +25,7 @@ from openatlas.display.util2 import (
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
 from openatlas.models.entity import Entity
-from openatlas.models.imports import Import, is_float
+from openatlas.models.imports import Import, Project, is_float
 
 
 class ProjectForm(FlaskForm):
@@ -204,18 +204,7 @@ def import_data(project_id: int, class_: str) -> str:
         try:
             file_.save(str(file_path))
             data_frame = pd.read_csv(file_path, keep_default_na=False)
-            headers = list(data_frame.columns.values)
-            if 'name' not in headers:
-                messages['error'].append(_('missing name column'))
-                raise ValueError()
-            for item in headers:
-                if item not in columns['allowed']:
-                    columns['invalid'].append(item)
-                    del data_frame[item]
-            if columns['invalid']:
-                messages['warn'].append(
-                    f"{_('invalid columns')}: {','.join(columns['invalid'])}")
-            headers = list(data_frame.columns.values)  # Get clean headers
+            headers = get_clean_header(data_frame, columns, messages)
             table_data = []
             checked_data = []
             origin_ids = []
@@ -239,32 +228,16 @@ def import_data(project_id: int, class_: str) -> str:
                         origin_ids.append(str(row['id']))
                 table_data.append(table_row)
                 checked_data.append(checked_row)
-            if checks['invalid_type_ids']:
-                messages['warn'].append(_('invalid type ids'))
-            if checks['invalid_geoms']:
-                messages['warn'].append(_('invalid coordinates'))
-            table = Table(headers, rows=table_data)
-            if checks['missing_name_count']:
-                messages['warn'].append(
-                    f"{_('empty names')}: {checks['missing_name_count']}")
-            doubles = [
-                item for item, count in collections.Counter(origin_ids).items()
-                if count > 1]
-            if doubles:
-                messages['error'].append(
-                    f"{_('double IDs in import')}: {', '.join(doubles)}")
-            existing = Import.get_origin_ids(project, origin_ids) \
-                if origin_ids else None
-            if existing:
-                messages['error'].append(
-                    f"{_('IDs already in database')}: {', '.join(existing)}")
+
             if form.duplicate.data:  # Check for possible duplicates
                 duplicates = Import.check_duplicates(class_, names)
                 if duplicates:
                     messages['warn'].append(
                         f"{_('possible duplicates')}: {', '.join(duplicates)}")
-            if messages['error']:
-                raise ValueError()
+
+            error_messages(origin_ids, project, checks, messages)
+
+            table = Table(headers, rows=table_data)
         except Exception as e:
             g.logger.log('error', 'import', 'import check failed', e)
             flash(_('error at import'), 'error')
@@ -283,16 +256,16 @@ def import_data(project_id: int, class_: str) -> str:
         if not form.preview.data and checked_data and (
                 not file_data['backup_too_old'] or app.testing):
             Transaction.begin()
-            # try:
-            Import.import_data(project, class_, checked_data)
-            Transaction.commit()
-            g.logger.log('info', 'import', f'import: {len(checked_data)}')
-            flash(f"{_('import of')}: {len(checked_data)}", 'info')
-            imported = True
-            # except Exception as e:  # pragma: no cover
-            #     Transaction.rollback()
-            #     g.logger.log('error', 'import', 'import failed', e)
-            #     flash(_('error transaction'), 'error')
+            try:
+                Import.import_data(project, class_, checked_data)
+                Transaction.commit()
+                g.logger.log('info', 'import', f'import: {len(checked_data)}')
+                flash(f"{_('import of')}: {len(checked_data)}", 'info')
+                imported = True
+            except Exception as e:  # pragma: no cover
+                Transaction.rollback()
+                g.logger.log('error', 'import', 'import failed', e)
+                flash(_('error transaction'), 'error')
     return render_template(
         'import_data.html',
         form=form,
@@ -305,6 +278,24 @@ def import_data(project_id: int, class_: str) -> str:
             [_('import'), url_for('import_index')],
             project,
             class_label])
+
+
+def get_clean_header(
+        data_frame: Any,
+        columns: dict[str, list[str]],
+        messages: dict[str, list[str]]) -> list[str]:
+    headers = list(data_frame.columns.values)
+    if 'name' not in headers:
+        messages['error'].append(_('missing name column'))
+        raise ValueError()
+    for item in headers:
+        if item not in columns['allowed']:
+            columns['invalid'].append(item)
+            del data_frame[item]
+    if columns['invalid']:
+        messages['warn'].append(
+            f"{_('invalid columns')}: {','.join(columns['invalid'])}")
+    return list(data_frame.columns.values)
 
 
 def get_allowed_columns(class_: str) -> dict[str, list[str]]:
@@ -358,3 +349,30 @@ def set_cell_value(
                 value = '' if str(value) == 'NaT' else \
                     f'<span class="error">{value}</span>'
     return str(value)
+
+
+def error_messages(
+        origin_ids: list[str],
+        project: Project,
+        checks: dict[str, Any],
+        messages: dict[str, list[str]]) -> None:
+    if checks['invalid_type_ids']:
+        messages['warn'].append(_('invalid type ids'))
+    if checks['invalid_geoms']:
+        messages['warn'].append(_('invalid coordinates'))
+    if checks['missing_name_count']:
+        messages['warn'].append(
+            f"{_('empty names')}: {checks['missing_name_count']}")
+    doubles = [
+        item for item, count in collections.Counter(origin_ids).items()
+        if count > 1]
+    if doubles:
+        messages['error'].append(
+            f"{_('double IDs in import')}: {', '.join(doubles)}")
+    existing = Import.get_origin_ids(project, origin_ids) \
+        if origin_ids else None
+    if existing:
+        messages['error'].append(
+            f"{_('IDs already in database')}: {', '.join(existing)}")
+    if messages['error']:
+        raise ValueError()
