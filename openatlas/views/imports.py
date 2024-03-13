@@ -241,7 +241,7 @@ def import_data(project_id: int, class_: str) -> str:
                 checked_data.append(checked_row)
             if checks['invalid_type_ids']:
                 messages['warn'].append(_('invalid type ids'))
-            if checks['invalid_geoms:']:
+            if checks['invalid_geoms']:
                 messages['warn'].append(_('invalid coordinates'))
             table = Table(headers, rows=table_data)
             if checks['missing_name_count']:
