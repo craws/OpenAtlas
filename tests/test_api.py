@@ -99,6 +99,14 @@ class Api(ApiTestCase):
                 f.truncate()
             rv = self.app.get(url_for('flasgger.apidocs'))
             assert b'Flasgger' in rv.data
+            with app.config['OPENAPI_INSTANCE_FILE'].open(mode='r+') as f:
+                data = json.load(f)
+                data['info']['version'] = '9.9.9'
+                f.seek(0)
+                json.dump(data, f)
+                f.truncate()
+            rv = self.app.get(url_for('flasgger.apidocs'))
+            assert b'Flasgger' in rv.data
 
             # ---Content Endpoints---
             rv = self.app.get(url_for('api_04.classes')).get_json()

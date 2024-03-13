@@ -3,7 +3,7 @@
     "info": {
         "title": "OpenAtlas API",
         "description": "An API that allows user to access data from an OpenAtlas instance.",
-        "version": "0.4.0",
+        "version": "0.4.1",
         "contact": {
             "name": "OpenAtlas",
             "url": "https://openatlas.eu",
@@ -1918,8 +1918,25 @@
                                     "format": "nullable"
                                 },
                                 "depictions": {
-                                    "type": "string",
-                                    "format": "nullable"
+                                    "type": "array",
+                                    "format": "nullable",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "@id": {
+                                                "type": "string"
+                                            },
+                                            "title": {
+                                                "type": "string"
+                                            },
+                                            "license": {
+                                                "type": "string"
+                                            },
+                                            "url": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
                                 },
                                 "geometry": {
                                     "oneOf": [

@@ -101,28 +101,32 @@ def before_request() -> None:
                 and not g.settings['api_public'] \
                 and ip not in app.config['ALLOWED_IPS']:
             raise AccessDeniedError
-    if request.path.startswith('/swagger'):
-        create_openapi_file()
 
-
-def create_openapi_file() -> None:
-    oa_instance = app.config['OPENAPI_INSTANCE_FILE']
-    if not oa_instance.exists():
-        shutil.copy(app.config['OPENAPI_FILE'], oa_instance)
-    with oa_instance.open(mode='r+') as f:
-        data = json.load(f)
+    openapi = app.config['OPENAPI_FILE']
+    openapi_instance = app.config['OPENAPI_INSTANCE_FILE']
+    if not openapi_instance.exists():
+        shutil.copy(openapi, openapi_instance)
+    with openapi_instance.open(mode='r+') as i, openapi.open(mode='r') as o:
+        original = json.load(o)
+        instance = json.load(i)
+        if original['info']['version'] != instance['info']['version']:
+            shutil.copy(openapi, openapi_instance)
         server = {
-                "url": request.host_url + 'api/{basePath}',
-                "description": f"{g.settings['site_name']} Server",
-                "variables": {
-                    "basePath": {"default": "0.4", "enum": ["0.4"]}}}
-        if len(data['servers']) == 2:
-            data['servers'].insert(0, server)
-        elif data['servers'][0]['description'] != server['description']:
-            data['servers'][0] = server
-        f.seek(0)
-        json.dump(data, f, indent=4)
-        f.truncate()
+            "url": request.host_url + 'api/{basePath}',
+            "description": f"{g.settings['site_name']} Server",
+            "variables": {
+                "basePath": {"default": "0.4", "enum": ["0.4"]}}}
+        modified = False
+        if len(instance['servers']) == 2:
+            instance['servers'].insert(0, server)
+            modified = True
+        elif instance['servers'][0]['description'] != server['description']:
+            instance['servers'][0] = server
+            modified = True
+        if modified:
+            i.seek(0)
+            json.dump(instance, i, indent=4)
+            i.truncate()
 
 
 @app.after_request
