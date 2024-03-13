@@ -1,3 +1,4 @@
+import json
 from typing import Any, Optional
 
 from flask import url_for
@@ -85,8 +86,22 @@ class Api(ApiTestCase):
                         case 'File without file':
                             file_without_file = entity
 
+            # Test Swagger UI
+            if app.config['OPENAPI_INSTANCE_FILE'].exists():
+                app.config['OPENAPI_INSTANCE_FILE'].unlink()
+            rv: Any = self.app.get(url_for('flasgger.apidocs'))
+            assert b'Flasgger' in rv.data
+            with app.config['OPENAPI_INSTANCE_FILE'].open(mode='r+') as f:
+                data = json.load(f)
+                data['servers'][0]['description'] = 'Wrong description'
+                f.seek(0)
+                json.dump(data, f)
+                f.truncate()
+            rv = self.app.get(url_for('flasgger.apidocs'))
+            assert b'Flasgger' in rv.data
+
             # ---Content Endpoints---
-            rv: Any = self.app.get(url_for('api_04.classes')).get_json()
+            rv = self.app.get(url_for('api_04.classes')).get_json()
             assert self.get_classes(rv)
 
             rv = self.app.get(
@@ -192,6 +207,10 @@ class Api(ApiTestCase):
             assert self.get_bool(rel[0], 'relationType', 'crm:P2_has_type')
             assert self.get_bool(rel[0], 'relationTypeLabel', 'hat den Typus')
 
+            geojson_checklist = [
+                '@id', 'systemClass', 'name', 'description', 'begin_earliest',
+                'begin_latest', 'begin_comment', 'end_earliest', 'end_latest',
+                'end_comment', 'types']
             # Test entity in GeoJSON format
             rv = self.app.get(url_for(
                 'api_04.entity', id_=place.id, format='geojson'))
@@ -199,17 +218,8 @@ class Api(ApiTestCase):
             rv = rv.get_json()['features'][0]
             assert self.get_bool(rv['geometry'], 'type')
             assert self.get_bool(rv['geometry'], 'coordinates')
-            assert self.get_bool(rv['properties'], '@id')
-            assert self.get_bool(rv['properties'], 'systemClass')
-            assert self.get_bool(rv['properties'], 'name')
-            assert self.get_bool(rv['properties'], 'description')
-            assert self.get_bool(rv['properties'], 'begin_earliest')
-            assert self.get_bool(rv['properties'], 'begin_latest')
-            assert self.get_bool(rv['properties'], 'begin_comment')
-            assert self.get_bool(rv['properties'], 'end_earliest')
-            assert self.get_bool(rv['properties'], 'end_latest')
-            assert self.get_bool(rv['properties'], 'end_comment')
-            assert self.get_bool(rv['properties'], 'types')
+            for key in geojson_checklist:
+                assert self.get_bool(rv['properties'], key)
 
             rv = self.app.get(url_for(
                 'api_04.entity', id_=place.id, format='geojson-v2'))
@@ -218,17 +228,8 @@ class Api(ApiTestCase):
             assert self.get_bool(rv['geometry'], 'type')
             assert self.get_bool(
                 rv['geometry']['geometries'][0], 'coordinates')
-            assert self.get_bool(rv['properties'], '@id')
-            assert self.get_bool(rv['properties'], 'systemClass')
-            assert self.get_bool(rv['properties'], 'name')
-            assert self.get_bool(rv['properties'], 'description')
-            assert self.get_bool(rv['properties'], 'begin_earliest')
-            assert self.get_bool(rv['properties'], 'begin_latest')
-            assert self.get_bool(rv['properties'], 'begin_comment')
-            assert self.get_bool(rv['properties'], 'end_earliest')
-            assert self.get_bool(rv['properties'], 'end_latest')
-            assert self.get_bool(rv['properties'], 'end_comment')
-            assert self.get_bool(rv['properties'], 'types')
+            for key in geojson_checklist:
+                assert self.get_bool(rv['properties'], key)
 
             # Test entity in Linked Open Usable Data
             rv = self.app.get(
@@ -458,10 +459,10 @@ class Api(ApiTestCase):
                                 break
                 assert found
 
-            for rv in [
-                self.app.get(url_for('api_04.type_tree')),
-                self.app.get(url_for('api_04.type_tree', download=True))]:
-                assert bool(rv.get_json()['typeTree'])
+            rv = self.app.get(url_for('api_04.type_tree'))
+            assert bool(rv.get_json()['typeTree'])
+            rv = self.app.get(url_for('api_04.type_tree', download=True))
+            assert bool(rv.get_json()['typeTree'])
             rv = self.app.get(url_for('api_04.type_tree', count=True))
             assert rv.get_json() > 0
 

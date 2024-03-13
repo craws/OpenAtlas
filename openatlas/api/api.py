@@ -11,7 +11,7 @@ app.config['SWAGGER'] = {
     'uiversion': 3,
     "swagger_version": "2.0",
     "specs": [{
-        "endpoint": '04',
+        "endpoint": 'openapi_04',
         "license": {
             "name": "Apache 2.0",
             "url": "https://www.apache.org/licenses/LICENSE-2.0.html"},
@@ -22,7 +22,10 @@ app.config['SWAGGER'] = {
 app.config['PROPAGATE_EXCEPTIONS'] = True
 CORS(app, resources={r"/api/*": {"origins": app.config['CORS_ALLOWANCE']}})
 
-Swagger(app, parse=False, template_file="api/openapi.json")
+openapi_file = app.config['OPENAPI_INSTANCE_FILE'] \
+    if app.config['OPENAPI_INSTANCE_FILE'].exists() \
+    else app.config['OPENAPI_FILE']
+Swagger(app, parse=False, template_file=str(openapi_file))
 
 blueprint = Blueprint('api', __name__, url_prefix='/api')
 api = Api(blueprint)
