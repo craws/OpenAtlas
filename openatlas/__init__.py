@@ -68,9 +68,8 @@ def before_request() -> None:
     if (request.path.startswith('/type')
             or request.path.startswith('/api/type_tree/')
             or request.path.startswith('/admin/orphans')
-            or (
-                    request.path.startswith('/entity/') and
-                    request.path.split('/entity/')[1].isdigit())):
+            or (request.path.startswith('/entity/') and
+                request.path.split('/entity/')[1].isdigit())):
         with_count = True
     g.types = Type.get_all(with_count)
     g.radiocarbon_type = Type.get_hierarchy('Radiocarbon')
@@ -103,17 +102,27 @@ def before_request() -> None:
                 and ip not in app.config['ALLOWED_IPS']:
             raise AccessDeniedError
     if request.path.startswith('/swagger'):
-        oa_instance = app.config['OPENAPI_INSTANCE_FILE']
-        if not oa_instance.exists():
-            shutil.copy(app.config['OPENAPI_FILE'], oa_instance)
-        if data := json.loads(oa_instance.read_text()):
-            if len(data['servers']) == 2:
-                data['servers'].insert(0, {
-                    "url": request.host_url + 'api/{basePath}',
-                    "description": f"{g.settings['site_name']} Server",
-                    "variables": {
-                        "basePath": {"default": "0.4", "enum": ["0.4"]}}})
-                oa_instance.write_text(json.dumps(data, indent=4))
+        create_openapi_file()
+
+
+def create_openapi_file() -> None:
+    oa_instance = app.config['OPENAPI_INSTANCE_FILE']
+    if not oa_instance.exists():
+        shutil.copy(app.config['OPENAPI_FILE'], oa_instance)
+    with oa_instance.open(mode='r+') as f:
+        data = json.load(f)
+        server = {
+                "url": request.host_url + 'api/{basePath}',
+                "description": f"{g.settings['site_name']} Server",
+                "variables": {
+                    "basePath": {"default": "0.4", "enum": ["0.4"]}}}
+        if len(data['servers']) == 2:
+            data['servers'].insert(0, server)
+        elif data['servers'][0]['description'] != server['description']:
+            data['servers'][0] = server
+        f.seek(0)
+        json.dump(data, f, indent=4)
+        f.truncate()
 
 
 @app.after_request
