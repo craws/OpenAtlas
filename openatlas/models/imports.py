@@ -2,6 +2,8 @@ from typing import Any, Optional
 
 from flask import g
 from flask_login import current_user
+from shapely import wkt
+from shapely.errors import WKTReadingError
 
 from openatlas.database import imports as db
 from openatlas.display.util2 import sanitize
@@ -81,22 +83,13 @@ class Import:
                 origin_id=row['id'] if 'id' in row and row['id'] else None)
 
             # Dates
-            dates = {
-                'begin_from': None, 'begin_to': None, 'begin_comment': None,
-                'end_from': None, 'end_to': None, 'end_comment': None}
-            if 'begin_from' in row and row['begin_from']:
-                dates['begin_from'] = row['begin_from']
-                if 'begin_to' in row and row['begin_to']:
-                    dates['begin_to'] = row['begin_to']
-                if 'begin_comment' in row and row['begin_comment']:
-                    dates['begin_comment'] = row['begin_comment']
-            if 'end_from' in row and row['end_from']:
-                dates['end_from'] = row['end_from']
-                if 'end_to' in row and row['end_to']:
-                    dates['end_to'] = row['end_to']
-                if 'end_comment' in row and row['end_comment']:
-                    dates['end_comment'] = row['end_comment']
-            entity.update({'attributes': dates})
+            entity.update({'attributes': {
+                'begin_from': row.get('begin_from'),
+                'begin_to': row.get('begin_to'),
+                'begin_comment': row.get('begin_comment'),
+                'end_from': row.get('end_from'),
+                'end_to': row.get('end_to'),
+                'end_comment': row.get('end_comment')}})
 
             # Types
             if 'type_ids' in row and row['type_ids']:
@@ -117,21 +110,13 @@ class Import:
                     'object_location',
                     f"Location of {row['name']}")
                 entity.link('P53', location)
-                if 'easting' in row \
-                        and is_float(row['easting']) \
-                        and 'northing' in row \
-                        and is_float(row['northing']):
-                    Gis.insert_import(
+                try:
+                    wkt_ = wkt.loads(row['wkt'])
+                except WKTReadingError:
+                    wkt_ = None
+                if wkt_:
+                    Gis.insert_wkt(
                         entity=entity,
                         location=location,
                         project=project,
-                        easting=row['easting'],
-                        northing=row['northing'])
-
-
-def is_float(value: int | float) -> bool:
-    try:
-        float(value)
-    except ValueError:
-        return False
-    return True
+                        wkt_=wkt_)

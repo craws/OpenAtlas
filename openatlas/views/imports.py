@@ -9,6 +9,7 @@ from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import FlaskForm
 from pandas import Series
 from shapely import wkt
+from shapely.errors import WKTReadingError
 from werkzeug.utils import redirect, secure_filename
 from werkzeug.wrappers import Response
 from wtforms import (
@@ -26,7 +27,7 @@ from openatlas.display.util2 import (
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
 from openatlas.models.entity import Entity
-from openatlas.models.imports import Import, Project, is_float
+from openatlas.models.imports import Import, Project
 
 
 class ProjectForm(FlaskForm):
@@ -309,7 +310,7 @@ def get_allowed_columns(class_: str) -> dict[str, list[str]]:
     if class_ in ['place', 'person', 'group']:
         columns.extend(['alias'])
     if class_ in ['place', 'artifact']:
-        columns.extend(['easting', 'northing', 'wkt'])
+        columns.extend(['wkt'])
     return {
         'allowed': columns,
         'valid': [],
@@ -322,38 +323,39 @@ def set_cell_value(
         class_: str,
         checks: dict[str, Any]) -> str:
     value = row[item]
-    if item == 'type_ids':
-        type_ids = []
-        for type_id in str(value).split():
-            if Import.check_type_id(type_id, class_):
-                type_ids.append(type_id)  # pragma: no cover
-            else:
-                type_ids.append(
-                    f'<span class="error">{type_id}</span>')
-                checks['invalid_type_ids'] = True
-        value = ' '.join(type_ids)
-    if item in ['northing', 'easting'] \
-            and row[item] \
-            and not is_float(row[item]):
-        value = f'<span class="error">{value}</span>'
-        checks['invalid_geoms'] = True
-    if item == 'wkt' and row[item]:
-        try:
-            wkt.loads(row[item])
-        except Exception:
-            checks['invalid_geoms'] = True
-    if item in ['begin_from', 'begin_to', 'end_from', 'end_to']:
-        if not value:
-            value = ''
-        else:
+    match item:
+        case 'type_ids':
+            type_ids = []
+            for type_id in str(value).split():
+                if Import.check_type_id(type_id, class_):
+                    type_ids.append(type_id)  # pragma: no cover
+                else:
+                    type_ids.append(
+                        f'<span class="error">{type_id}</span>')
+                    checks['invalid_type_ids'] = True
+            value = ' '.join(type_ids)
+        case 'wkt' if row[item]:
+            wkt_ = None
             try:
-                value = datetime64_to_timestamp(
-                    numpy.datetime64(value))
-                row[item] = value
-            except ValueError:
-                row[item] = ''
-                value = '' if str(value) == 'NaT' else \
-                    f'<span class="error">{value}</span>'
+                wkt_ = wkt.loads(row[item])
+            except WKTReadingError:
+                value = f'<span class="error">{value}</span>'
+                checks['invalid_geoms'] = True
+            if wkt_ and wkt_.type not in ['Point', 'LineString', 'Polygon']:
+                value = f'<span class="error">{value}</span>'
+                checks['invalid_geoms'] = True
+        case 'begin_from' | 'begin_to' | 'end_from' | 'end_to':
+            if not value:
+                value = ''
+            else:
+                try:
+                    value = datetime64_to_timestamp(
+                        numpy.datetime64(value))
+                    row[item] = value
+                except ValueError:
+                    row[item] = ''
+                    value = '' if str(value) == 'NaT' else \
+                        f'<span class="error">{value}</span>'
     return str(value)
 
 
