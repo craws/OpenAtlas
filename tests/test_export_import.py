@@ -120,6 +120,13 @@ class ExportImportTest(TestBaseCase):
             assert b'empty names' in rv.data
             assert b'double IDs in import' in rv.data
 
+            with open(test_path / 'invalid_3.csv', 'rb') as file:
+                rv = self.app.post(
+                    url_for('import_data', class_='place', project_id=p_id),
+                    data={'file': file},
+                    follow_redirects=True)
+            assert b'invalid coordinates' in rv.data
+
             rv = self.app.get(url_for('import_project_view', id_=p_id))
             assert b'London' in rv.data
 
