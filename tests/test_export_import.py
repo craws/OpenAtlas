@@ -117,6 +117,7 @@ class ExportImportTest(TestBaseCase):
             assert b'invalid columns: not_existing_column' in rv.data
             assert b'invalid type ids' in rv.data
             assert b'invalid coordinates' in rv.data
+            assert b'invalid reference system' in rv.data
             assert b'empty names' in rv.data
             assert b'double IDs in import' in rv.data
 

@@ -212,6 +212,7 @@ def import_data(project_id: int, class_: str) -> str:
             origin_ids = []
             names = []
             checks = {
+                'invalid_reference_system': False,
                 'missing_name_count': 0,
                 'invalid_type_ids': False,
                 'invalid_geoms': False}
@@ -301,7 +302,7 @@ def get_clean_header(
 
 
 def get_allowed_columns(class_: str) -> dict[str, list[str]]:
-    columns = ['name', 'id', 'description']
+    columns = ['name', 'id', 'description', 'external_reference_system']
     if class_ not in g.view_class_mapping['reference']:
         columns.extend([
             'begin_from', 'begin_to', 'begin_comment',
@@ -345,17 +346,24 @@ def set_cell_value(
                 value = f'<span class="error">{value}</span>'
                 checks['invalid_geoms'] = True
         case 'begin_from' | 'begin_to' | 'end_from' | 'end_to':
-            if not value:
-                value = ''
-            else:
-                try:
-                    value = datetime64_to_timestamp(
-                        numpy.datetime64(value))
-                    row[item] = value
-                except ValueError:
-                    row[item] = ''
-                    value = '' if str(value) == 'NaT' else \
-                        f'<span class="error">{value}</span>'
+            try:
+                value = datetime64_to_timestamp(
+                    numpy.datetime64(value))
+                row[item] = value
+            except ValueError:
+                row[item] = ''
+                value = '' if str(value) == 'NaT' else \
+                    f'<span class="error">{value}</span>'
+        case 'external_reference_system':
+            external_references = []
+            for values in value.split():
+                if Import.check_external_reference_id(values.split(';')):
+                    external_references.append(values)
+                else:
+                    external_references.append(
+                        f'<span class="error">{values}</span>')
+                    checks['invalid_reference_system'] = True
+            value = ' '.join(external_references)
     return str(value)
 
 
@@ -364,6 +372,8 @@ def error_messages(
         project: Project,
         checks: dict[str, Any],
         messages: dict[str, list[str]]) -> None:
+    if checks['invalid_reference_system']:
+        messages['warn'].append(_('invalid reference system'))
     if checks['invalid_type_ids']:
         messages['warn'].append(_('invalid type ids'))
     if checks['invalid_geoms']:

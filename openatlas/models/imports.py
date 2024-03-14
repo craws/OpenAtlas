@@ -70,6 +70,14 @@ class Import:
         return True  # pragma: no cover
 
     @staticmethod
+    def check_external_reference_id(value: list[str]) -> bool:
+        if not value[0].isdigit() or int(value[0]) not in g.reference_systems:
+            return False
+        if value[2] not in ['close', 'exact']:
+            return False
+        return True  # pragma: no cover
+
+    @staticmethod
     def import_data(project: Project, class_: str, data: list[Any]) -> None:
         for row in data:
             entity = Entity.insert(
