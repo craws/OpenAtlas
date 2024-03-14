@@ -515,14 +515,18 @@ class PlaceManager(PlaceBaseManager):
 
 class ProductionManager(EventBaseManager):
     def additional_fields(self) -> dict[str, Any]:
-        return dict(
-            super().additional_fields(),
-            **{'artifact': TableMultiField()})
-
-    def populate_update(self) -> None:
-        super().populate_update()
-        self.form.artifact.data = \
-            [entity.id for entity in self.entity.get_linked_entities('P108')]
+        fields = super().additional_fields()
+        selection = None
+        if not self.insert and self.entity:
+            selection = \
+                {e.id: e for e in self.entity.get_linked_entities('P108')}
+        fields['artifact'] = TableMultiField(
+            table_multi(
+                'artifact',
+                Entity.get_by_class('artifact', types=True),
+                selection),
+            selection)
+        return fields
 
     def process_form(self) -> None:
         super().process_form()
