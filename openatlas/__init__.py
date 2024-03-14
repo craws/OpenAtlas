@@ -106,8 +106,8 @@ def before_request() -> None:
     openapi_instance = app.config['OPENAPI_INSTANCE_FILE']
     if not openapi_instance.exists():
         shutil.copy(openapi, openapi_instance)
-    with openapi_instance.open(mode='r+') as i, openapi.open(mode='r') as o:
-        original = json.load(o)
+    with openapi_instance.open(mode='r+') as i, openapi.open(mode='r') as f:
+        original = json.load(f)
         instance = json.load(i)
         if original['info']['version'] != instance['info']['version']:
             shutil.copy(openapi, openapi_instance)
