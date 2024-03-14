@@ -1,4 +1,4 @@
-id,name,alias,description,begin_from,begin_to,begin_comment,end_from,end_to,end_comment,northing,easting,type_ids,not_existing_column
-place_1,Vienna,Wien,Capital of Austria,not_a_date,NaT,It was a rainy day.,,2049-12-31,"We'll see about that.",not_coordinate,16.37208,666,
+id,name,alias,description,begin_from,begin_to,begin_comment,end_from,end_to,end_comment,northing,easting,wkt,type_ids,not_existing_column
+place_1,Vienna,Wien,Capital of Austria,not_a_date,NaT,It was a rainy day.,,2049-12-31,"We'll see about that.",not_coordinate,16.37208,POINT (30 NAN),666,
 place_1,,,,,,,,,,,,,
 place_1,Vienna,,,,,,,,,,,

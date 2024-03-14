@@ -29,7 +29,7 @@ that we are using to set up Debian servers for OpenAtlas installations.
     sudo apt install python3-flask-babel python3-flask-login python3-flaskext.wtf python3-markdown python3-numpy
     sudo apt install python3-pandas python3-jinja2 python3-flask-cors python3-flask-restful p7zip-full
     sudo apt install python3-wand python3-rdflib python3-dicttoxml python3-rdflib-jsonld python3-flasgger
-    sudo apt install python3-requests exiftran python3-email-validator python3-svgwrite
+    sudo apt install python3-requests exiftran python3-email-validator python3-svgwrite python3-shapely
 
 ### Apache 2.4
     sudo apt install apache2 libapache2-mod-wsgi-py3

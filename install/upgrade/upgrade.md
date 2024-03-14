@@ -19,9 +19,10 @@ then run the database upgrade script, then restart Apache:
 
 ### 8.2.x to 8.3.0
 
-Install python3-svgwrite to support polygon for image annotations (#2126)
+Install python3-svgwrite to support polygon for image annotations (#2126) and 
+python3-shapely for import of WKT for the enhance import (#1567). 
 
-    sudo apt install python3-svgwrite
+    sudo apt install python3-svgwrite python3-shapely
 
 **For developers**
 

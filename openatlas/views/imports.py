@@ -8,6 +8,7 @@ from flask import flash, g, render_template, request, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import FlaskForm
 from pandas import Series
+from shapely import wkt
 from werkzeug.utils import redirect, secure_filename
 from werkzeug.wrappers import Response
 from wtforms import (
@@ -308,7 +309,7 @@ def get_allowed_columns(class_: str) -> dict[str, list[str]]:
     if class_ in ['place', 'person', 'group']:
         columns.extend(['alias'])
     if class_ in ['place', 'artifact']:
-        columns.extend(['easting', 'northing'])
+        columns.extend(['easting', 'northing', 'wkt'])
     return {
         'allowed': columns,
         'valid': [],
@@ -336,6 +337,11 @@ def set_cell_value(
             and not is_float(row[item]):
         value = f'<span class="error">{value}</span>'
         checks['invalid_geoms'] = True
+    if item == 'wkt' and row[item]:
+        try:
+            wkt.loads(row[item])
+        except Exception:
+            checks['invalid_geoms'] = True
     if item in ['begin_from', 'begin_to', 'end_from', 'end_to']:
         if not value:
             value = ''
