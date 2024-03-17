@@ -223,26 +223,6 @@ def table_multi(
     #        selected_data: Optional[Any] = None,
     #        filter_ids: Optional[list[int]] = None) -> Table:
     #    filter_ids = filter_ids or []
-        # if class_name in ('cidoc_domain', 'cidoc_property', 'cidoc_range'):
-        #     table = Table(
-        #         ['code', 'name'],
-        #         defs=[
-        #             {'orderDataType': 'cidoc-model', 'targets': [0]},
-        #             {'sType': 'numeric', 'targets': [0]}])
-        #     for id_, entity in (
-        #             g.properties if class_name == 'cidoc_property'
-        #             else g.cidoc_classes).items():
-        #         onclick = f'''
-        #             onclick="selectFromTable(
-        #                 this,
-        #                 '{class_name}',
-        #                 '{id_}',
-        #                 '{entity.code} {entity.name}');"'''
-        #         table.rows.append([
-        #             f'<a href="#" {onclick}>{entity.code}</a>',
-        #             entity.name])
-        #         if entity.code == selected_data:
-        #             selection = f'{entity.code} {entity.name}'
         # elif class_name == 'annotated_entity':
         #     # Hackish (mis)use of filter_ids to get table field for annotations
         #     table = Table(['name', 'class', 'description'])
@@ -254,10 +234,3 @@ def table_multi(
         #             format_name_and_aliases(item, 'annotated_entity'),
         #             uc_first(item.class_.name),
         #             item.description])
-        # else:
-        #     if 'place' in class_name or class_name in \
-        #             ['begins_in', 'ends_in', 'residence']:
-        #         class_ = 'place'
-        #         entities = Entity.get_by_view('place', types=True,
-        #                                       aliases=aliases)
-        #return table

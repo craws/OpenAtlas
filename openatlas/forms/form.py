@@ -13,7 +13,8 @@ from openatlas.display.table import Table
 from openatlas.display.util import get_base_table_data
 from openatlas.display.util2 import show_table_icons
 from openatlas.forms import base_manager, manager
-from openatlas.forms.field import SubmitField, TableMultiField, TreeField
+from openatlas.forms.field import (
+    SubmitField, TableField, TableMultiField, TreeField)
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.views.entity_index import file_preview
@@ -75,6 +76,37 @@ def get_table_form(classes: list[str], excluded: list[int]) -> str:
     return render_template(
         'forms/form_table.html',
         table=table.display(classes[0]))
+
+
+def get_cidoc_form():
+    class Form(FlaskForm):
+        pass
+
+    for name in ('domain', 'property', 'range'):
+        selection = None
+        cidoc_table = Table(
+            ['code', 'name'],
+            defs=[
+                {'orderDataType': 'cidoc-model', 'targets': [0]},
+                {'sType': 'numeric', 'targets': [0]}])
+        for item in (g.properties if name == 'property' else g.cidoc_classes).values():
+            onclick = f'''
+                onclick="selectFromTable(
+                    this,
+                    '{name}',
+                    '{item.code}',
+                    '{item.code} {item.name}');"'''
+            cidoc_table.rows.append([
+                f'<a href="#" {onclick}>{item.code}</a>',
+                item.name])
+            if request.method == 'POST' and item.code == request.form[name]:
+                selection = item
+        setattr(
+            Form,
+            name,
+            TableField(cidoc_table, selection, validators=[InputRequired()]))
+    setattr(Form, 'save', SubmitField(_('test')))
+    return Form()
 
 
 def get_move_form(type_: Type) -> Any:

@@ -15,6 +15,8 @@ from wtforms.widgets import FileInput, HiddenInput, Input, TextInput
 from openatlas import app
 from openatlas.display.table import Table
 from openatlas.display.util2 import is_authorized
+from openatlas.models.cidoc_class import CidocClass
+from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 
@@ -200,9 +202,17 @@ class TableSelect(HiddenInput):
         field.forms = {}
         for class_name in field.add_dynamical:
             field.forms[class_name] = get_form(class_name)
-
-        field.data = field.selection.id if field.selection else ''
-        field.data_string = field.selection.name if field.selection else ''
+        field.data = ''
+        field.data_string = ''
+        if field.selection and isinstance(
+                field.selection,
+                (CidocClass, CidocProperty)):
+            field.data = field.selection.code
+            field.data_string = \
+                f'{field.selection.code} {field.selection.name}'
+        elif field.selection:
+            field.data = field.selection.id
+            field.data_string = field.selection.name
         return super().__call__(field, **kwargs) + Markup(
             render_template('forms/table_select.html', field=field))
 

@@ -12,37 +12,22 @@ from openatlas import app
 from openatlas.display.table import Table
 from openatlas.display.util import button, link, required_group
 from openatlas.display.util2 import manual, uc_first
-from openatlas.forms.field import SubmitField, TableField
+from openatlas.forms.field import SubmitField
+from openatlas.forms.form import get_cidoc_form
 from openatlas.models.entity import Entity
 from openatlas.models.network import Network
 from openatlas.models.openatlas_class import OpenatlasClass
 
 
-class LinkCheckForm(FlaskForm):
-
-    cidoc_domain = TableField('Domain', [InputRequired()])
-    cidoc_property = TableField('Property', [InputRequired()])
-    cidoc_range = TableField('Range', [InputRequired()])
-    save = SubmitField(_('test'))
-
-
 @app.route('/overview/model', methods=['GET', 'POST'])
 @required_group('readonly')
 def model_index() -> str:
-    form = LinkCheckForm()
-    form_classes = {
-        code: f'{code} {class_.name}'
-        for code, class_ in g.cidoc_classes.items()}
-    form.cidoc_domain.choices = form_classes
-    form.cidoc_range.choices = form_classes
-    form.cidoc_property.choices = {
-        code: f'{code} {property_.name}'
-        for code, property_ in g.properties.items()}
+    form = get_cidoc_form()
     result = None
     if form.validate_on_submit():
-        domain = g.cidoc_classes[form.cidoc_domain.data]
-        range_ = g.cidoc_classes[form.cidoc_range.data]
-        property_ = g.properties[form.cidoc_property.data]
+        domain = g.cidoc_classes[form.domain.data]
+        range_ = g.cidoc_classes[form.range.data]
+        property_ = g.properties[form.property.data]
         result = {
             'domain': domain,
             'property': property_,
