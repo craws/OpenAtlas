@@ -165,10 +165,10 @@ class ArtifactManager(ArtifactBaseManager):
             filter_ids = [self.entity.id] + [
                 e.id for e in self.entity.get_linked_entities_recursive('P46')]
         if self.insert:
-            super_ = self.origin if self.origin \
+            selection = self.origin if self.origin \
                 and self.origin.class_.view in ['artifact', 'place'] else None
         else:
-            super_ = self.entity.get_linked_entity('P46', inverse=True)
+            selection = self.entity.get_linked_entity('P46', inverse=True)
         fields = super().additional_fields()
         fields['super'] = TableField(
             table(
@@ -178,7 +178,7 @@ class ArtifactManager(ArtifactBaseManager):
                     g.view_class_mapping['place'] + ['artifact'],
                     types=True),
                 filter_ids=filter_ids),
-            selection=super_,
+            selection,
             add_dynamic=['place'])
         return fields
 
@@ -245,15 +245,15 @@ class FeatureManager(PlaceBaseManager):
                     _('insert and add') + ' ' + _('stratigraphic unit')))
 
     def additional_fields(self) -> dict[str, Any]:
+        fields = super().additional_fields()
         if self.insert:
-            super_ = self.origin if self.origin \
+            selection = self.origin if self.origin \
                 and self.origin.class_.name == 'place' else None
         else:
-            super_ = self.entity.get_linked_entity('P46', inverse=True)
-        fields = super().additional_fields()
+            selection = self.entity.get_linked_entity('P46', inverse=True)
         fields['super'] = TableField(
             table('super', 'place', Entity.get_by_class('place', types=True)),
-            selection=super_,
+            selection,
             validators=[InputRequired()],
             add_dynamic=['place'])
         return fields
@@ -293,10 +293,10 @@ class HumanRemainsManager(ArtifactBaseManager):
             filter_ids = [self.entity.id] + [
                 e.id for e in self.entity.get_linked_entities_recursive('P46')]
         if self.insert:
-            super_ = self.origin if self.origin \
+            selection = self.origin if self.origin \
                 and self.origin.class_.view in ['artifact', 'place'] else None
         else:
-            super_ = self.entity.get_linked_entity('P46', inverse=True)
+            selection = self.entity.get_linked_entity('P46', inverse=True)
         return dict(
             super().additional_fields(),
             **{
@@ -310,7 +310,7 @@ class HumanRemainsManager(ArtifactBaseManager):
                                 + ['human remains'],
                                 types=True),
                             filter_ids=filter_ids),
-                        selection=super_,
+                        selection,
                         add_dynamic=['place'])})
 
     def process_form(self) -> None:
@@ -450,11 +450,17 @@ class MoveManager(EventBaseManager):
                 elif linked_entity.class_.view == 'artifact':
                     artifacts[linked_entity.id] = linked_entity
         fields['place_from'] = TableField(
-            table('place_from', 'place', Entity.get_by_class('place', types=True)),
+            table(
+                'place_from',
+                'place',
+                Entity.get_by_class('place', types=True)),
             place_from,
             add_dynamic=['place'])
         fields['place_to'] = TableField(
-            table('place_to', 'place', Entity.get_by_class('place', types=True)),
+            table(
+                'place_to',
+                'place',
+                Entity.get_by_class('place', types=True)),
             place_to,
             add_dynamic=['place'])
         fields['moved_artifact'] = TableMultiField(
@@ -657,28 +663,27 @@ class StratigraphicUnitManager(PlaceBaseManager):
                 SubmitField(_('insert and add') + ' ' + _('human remains')))
 
     def additional_fields(self) -> dict[str, Any]:
-        return dict(
-            super().additional_fields(),
-            **{'stratigraphic_super': TableField(
-                _('super'),
-                [InputRequired()])})
-
-    def populate_insert(self) -> None:
-        super().populate_insert()
-        if self.origin and self.origin.class_.name == 'feature':
-            self.form.stratigraphic_super.data = self.origin.id
-
-    def populate_update(self) -> None:
-        super().populate_update()
-        self.form.stratigraphic_super.data = \
-            self.entity.get_linked_entity_safe('P46', inverse=True).id
+        fields = super().additional_fields()
+        selection = None
+        if not self.insert and self.entity:
+            selection = self.entity.get_linked_entity_safe('P46', inverse=True)
+        elif self.origin and self.origin.class_.name == 'feature':
+            selection = self.origin
+        fields['super'] = TableField(
+                table(
+                    'super',
+                    'place',
+                    Entity.get_by_class('feature', types=True)),
+                selection,
+                validators=[InputRequired()])
+        return fields
 
     def process_form(self) -> None:
         super().process_form()
         self.data['links']['delete_inverse'].add('P46')
         self.add_link(
             'P46',
-            Entity.get_by_id(int(self.form.stratigraphic_super.data)),
+            Entity.get_by_id(int(self.form.super.data)),
             inverse=True)
 
 

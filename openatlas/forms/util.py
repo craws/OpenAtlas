@@ -201,7 +201,7 @@ def table(
 def table_multi(
         class_name: str,
         entities: list[Entity],
-        selected: Optional[dict[int, Entity]] = None,
+        selection: Optional[dict[int, Entity]] = None,
         filter_ids: Optional[list[int]] = None) -> Table:
     table_ = Table(
         [''] + g.table_headers[class_name],
@@ -212,7 +212,7 @@ def table_multi(
         row.insert(
             0,
             f'<input type="checkbox" value="{e.name}" id="{e.id}" '
-            f'{" checked" if selected and e.id in selected.keys() else ""}>')
+            f'{" checked" if selection and e.id in selection.keys() else ""}>')
         table_.rows.append(row)
     return table_
 
@@ -260,8 +260,4 @@ def table_multi(
         #         class_ = 'place'
         #         entities = Entity.get_by_view('place', types=True,
         #                                       aliases=aliases)
-        #     elif class_name == 'stratigraphic_super':
-        #         class_ = 'place'
-        #         entities = \
-        #             Entity.get_by_class('feature', types=True, aliases=aliases)
         #return table
