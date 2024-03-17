@@ -596,19 +596,22 @@ class SourceManager(BaseManager):
         setattr(self.form_class, 'description', TextAreaField(_('content')))
 
     def additional_fields(self) -> dict[str, Any]:
+        selection = None
+        if not self.insert and self.entity:
+            selection = {
+                entity.id: entity for entity in
+                self.entity.get_linked_entities('P128', inverse=True)}
+        elif self.origin and self.origin.class_.name == 'artifact':
+            selection = [self.origin.id]
         return {
-            'artifact': TableMultiField(description=_(
-                'Link artifacts as the information carrier of the source'))}
-
-    def populate_insert(self) -> None:
-        if self.origin and self.origin.class_.name == 'artifact':
-            self.form.artifact.data = [self.origin.id]
-
-    def populate_update(self) -> None:
-        super().populate_update()
-        self.form.artifact.data = [
-            item.id for item in
-            self.entity.get_linked_entities('P128', inverse=True)]
+            'artifact': TableMultiField(
+                table_multi(
+                    'artifact',
+                    Entity.get_by_class('artifact'),
+                    selection),
+                description=_(
+                    'Link artifacts as the information carrier of the source'),
+                selection=selection)}
 
     def process_form(self) -> None:
         super().process_form()
