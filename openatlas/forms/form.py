@@ -6,6 +6,7 @@ from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import HiddenField, SelectMultipleField, StringField, widgets
+from wtforms.fields.simple import TextAreaField
 from wtforms.validators import InputRequired, URL
 
 from openatlas import app
@@ -14,7 +15,8 @@ from openatlas.display.util import get_base_table_data
 from openatlas.display.util2 import show_table_icons
 from openatlas.forms import base_manager, manager
 from openatlas.forms.field import (
-    SubmitField, TableField, TableMultiField, TreeField)
+    SubmitField, TableField, TableMultiField, TreeField,
+    format_name_and_aliases)
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.views.entity_index import file_preview
@@ -52,6 +54,28 @@ def get_add_reference_form(class_: str) -> Any:
     return Form()
 
 
+def get_annotation_form(
+        image_id,
+        entity: Optional[Entity] = None,
+        insert: Optional[bool] = True):
+    class Form(FlaskForm):
+        text = TextAreaField(_('annotation'))
+    if insert:
+        setattr(
+            Form,
+            'coordinate',
+            HiddenField(_('coordinates'), validators=[InputRequired()]))
+    table = Table(['name', 'class', 'description'])
+    for item in Entity.get_by_id(image_id).get_linked_entities('P67'):
+        table.rows.append([
+            format_name_and_aliases(item, 'entity'),
+            item.class_.name,
+            item.description])
+    setattr(Form, 'entity', TableField(table, entity))
+    setattr(Form, 'save', SubmitField(_('save')))
+    return Form()
+
+
 def get_table_form(classes: list[str], excluded: list[int]) -> str:
     entities = Entity.get_by_class(classes, types=True, aliases=True)
     table = Table([''] + g.table_headers[classes[0]], order=[[2, 'asc']])
@@ -69,7 +93,6 @@ def get_table_form(classes: list[str], excluded: list[int]) -> str:
             if classes[0] == 'file' and show_table_icons():
                 rows.append(file_preview(entity.id))
             rows.extend(get_base_table_data(entity, show_links=False))
-
             table.rows.append(rows)
     if not table.rows:
         return '<p class="uc-first">' + _('no entries') + '</p>'
@@ -78,7 +101,7 @@ def get_table_form(classes: list[str], excluded: list[int]) -> str:
         table=table.display(classes[0]))
 
 
-def get_cidoc_form():
+def get_cidoc_form() -> Any:
     class Form(FlaskForm):
         pass
 
@@ -89,7 +112,9 @@ def get_cidoc_form():
             defs=[
                 {'orderDataType': 'cidoc-model', 'targets': [0]},
                 {'sType': 'numeric', 'targets': [0]}])
-        for item in (g.properties if name == 'property' else g.cidoc_classes).values():
+        for item in (
+                g.properties if name == 'property'
+                else g.cidoc_classes).values():
             onclick = f'''
                 onclick="selectFromTable(
                     this,

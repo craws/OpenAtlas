@@ -1,35 +1,18 @@
 from flask import flash, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
-from flask_wtf import FlaskForm
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import TextAreaField
-from wtforms.fields.simple import HiddenField
-from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import get_file_path, link, required_group
 from openatlas.display.util2 import format_date, is_authorized, manual
-from openatlas.forms.field import SubmitField, TableField
+from openatlas.forms.form import get_annotation_form
 from openatlas.models.annotation import Annotation
 from openatlas.models.entity import Entity
-
-
-class AnnotationForm(FlaskForm):
-    coordinate = HiddenField(_('coordinates'), validators=[InputRequired()])
-    text = TextAreaField(_('annotation'))
-    annotated_entity = TableField(_('entity'))
-    save = SubmitField(_('save'))
-
-
-class AnnotationUpdateForm(FlaskForm):
-    text = TextAreaField(_('annotation'))
-    annotated_entity = TableField(_('entity'))
-    save = SubmitField(_('save'))
 
 
 @app.route('/annotation_insert/<int:id_>', methods=['GET', 'POST'])
@@ -38,13 +21,12 @@ def annotation_insert(id_: int) -> str | Response:
     image = Entity.get_by_id(id_, types=True, aliases=True)
     if not get_file_path(image.id):
         return abort(404)  # pragma: no cover
-    form = AnnotationForm()
-    form.annotated_entity.filter_ids = [image.id]
+    form = get_annotation_form(image.id)
     if form.validate_on_submit():
         Annotation.insert(
             image_id=id_,
             coordinates=form.coordinate.data,
-            entity_id=form.annotated_entity.data,
+            entity_id=form.entity.data,
             text=form.text.data)
         return redirect(url_for('annotation_insert', id_=image.id))
     table = None
@@ -89,15 +71,16 @@ def annotation_insert(id_: int) -> str | Response:
 @required_group('contributor')
 def annotation_update(id_: int) -> str | Response:
     annotation = Annotation.get_by_id(id_)
-    form = AnnotationUpdateForm()
-    form.annotated_entity.filter_ids = [annotation.image_id]
+    form = get_annotation_form(
+        annotation.image_id,
+        Entity.get_by_id(annotation.entity_id)
+        if annotation.entity_id else None,
+        insert=False)
     if form.validate_on_submit():
-        annotation.update(
-            form.annotated_entity.data or None,
-            form.text.data)
+        annotation.update(form.entity.data or None, form.text.data)
         return redirect(url_for('annotation_insert', id_=annotation.image_id))
     form.text.data = annotation.text
-    form.annotated_entity.data = annotation.entity_id
+    form.entity.data = annotation.entity_id
     return render_template(
         'tabs.html',
         tabs={'annotation': Tab('annotation', form=form)},

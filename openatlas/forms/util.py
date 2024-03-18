@@ -215,22 +215,3 @@ def table_multi(
             f'{" checked" if selection and e.id in selection.keys() else ""}>')
         table_.rows.append(row)
     return table_
-
-    #@staticmethod
-    #def get_table(
-    #        class_name: str,
-    #        entities: list[Entity],
-    #        selected_data: Optional[Any] = None,
-    #        filter_ids: Optional[list[int]] = None) -> Table:
-    #    filter_ids = filter_ids or []
-        # elif class_name == 'annotated_entity':
-        #     # Hackish (mis)use of filter_ids to get table field for annotations
-        #     table = Table(['name', 'class', 'description'])
-        #     for item in Entity.get_by_id(filter_ids[0]).get_linked_entities(
-        #             'P67'):
-        #         if selected_data and item.id == int(selected_data):
-        #             selection = item.name  # pragma: no cover
-        #         table.rows.append([
-        #             format_name_and_aliases(item, 'annotated_entity'),
-        #             uc_first(item.class_.name),
-        #             item.description])
