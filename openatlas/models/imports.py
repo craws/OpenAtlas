@@ -5,7 +5,8 @@ from flask_login import current_user
 from shapely import wkt
 from shapely.errors import WKTReadingError
 
-from openatlas.api.import_scripts.util import get_match_types, get_type_by_name
+from openatlas.api.import_scripts.util import get_match_types, \
+    get_reference_system_by_name
 from openatlas.database import imports as db
 from openatlas.display.util2 import sanitize
 from openatlas.models.entity import Entity
@@ -71,14 +72,6 @@ class Import:
         return True  # pragma: no cover
 
     @staticmethod
-    def check_external_reference_id(value: list[str]) -> bool:
-        if not value[0].isdigit() or int(value[0]) not in g.reference_systems:
-            return False
-        if value[2] not in get_match_types():
-            return False
-        return True  # pragma: no cover
-
-    @staticmethod
     def import_data(project: Project, class_: str, data: list[Any]) -> None:
         for row in data:
             entity = Entity.insert(
@@ -107,24 +100,42 @@ class Import:
                         continue
                     entity.link('P2', g.types[int(type_id)])  # pragma no cover
 
+            match_types = get_match_types()
             if row.get('external_reference_system'):
-                match_types = get_match_types()
                 for reference in row['external_reference_system'].split():
                     values = reference.split(';')
-                    if Import.check_external_reference_id(values):
+                    if (values[0] in g.reference_systems
+                            and values[2] in match_types):
                         reference_system = g.reference_systems[int(values[0])]
-                        match_id = match_types[values[2]].id
                         reference_system.link(
                             'P67',
                             entity,
                             values[1],
-                            type_id=match_id)
+                            type_id=match_types[values[2]].id)
 
+            if wikidata := row.get('wikidata'):
+                values = wikidata.split(';')
+                if len(values) == 2 and values[1] in match_types:
+                    wikidata = get_reference_system_by_name('Wikidata')
+                    wikidata.link(
+                        'P67',
+                        entity,
+                        values[0],
+                        type_id=match_types[values[1]].id)
+
+            if geonames := row.get('geonames'):
+                values = geonames.split(';')
+                if len(values) == 2 and values[1] in match_types:
+                    wikidata = get_reference_system_by_name('GeoNames')
+                    wikidata.link(
+                        'P67',
+                        entity,
+                        values[0],
+                        type_id=match_types[values[1]].id)
             # Alias
             if class_ in ['place', 'person', 'group']:
-                aliases = row['alias'].split(";") if row['alias'] else None
-                if aliases:
-                    for alias_ in aliases:
+                if aliases := row.get('alias'):
+                    for alias_ in aliases.split(";"):
                         entity.link('P1', Entity.insert('appellation', alias_))
 
             # GIS

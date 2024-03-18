@@ -16,6 +16,7 @@ from wtforms import (
     BooleanField, FileField, StringField, TextAreaField, validators)
 
 from openatlas import app
+from openatlas.api.import_scripts.util import get_match_types
 from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
@@ -223,7 +224,8 @@ def import_data(project_id: int, class_: str) -> str:
                 table_row = []
                 checked_row = {}
                 for item in headers:
-                    table_row.append(set_cell_value(row, item, class_, checks))
+                    table_row.append(
+                        check_cell_value(row, item, class_, checks))
                     checked_row[item] = row[item]
                     if item == 'name' and form.duplicate.data:
                         names.append(row['name'].lower())
@@ -302,7 +304,8 @@ def get_clean_header(
 
 
 def get_allowed_columns(class_: str) -> dict[str, list[str]]:
-    columns = ['name', 'id', 'description', 'external_reference_system']
+    columns = ['name', 'id', 'description', 'external_reference_system',
+               'wikidata', 'geonames']
     if class_ not in g.view_class_mapping['reference']:
         columns.extend([
             'begin_from', 'begin_to', 'begin_comment',
@@ -318,7 +321,7 @@ def get_allowed_columns(class_: str) -> dict[str, list[str]]:
         'invalid': []}
 
 
-def set_cell_value(
+def check_cell_value(
         row: Series,
         item: str,
         class_: str,
@@ -356,14 +359,20 @@ def set_cell_value(
                     f'<span class="error">{value}</span>'
         case 'external_reference_system':
             external_references = []
-            for values in value.split():
-                if Import.check_external_reference_id(values.split(';')):
-                    external_references.append(values)
-                else:
-                    external_references.append(
-                        f'<span class="error">{values}</span>')
+            for values_ in value.split():
+                values = values_.split(';')
+                if values[0] not in g.reference_systems:
+                    values[0] = f'<span class="error">{values[0]}</span>'
                     checks['invalid_reference_system'] = True
+                if values[2] not in get_match_types():
+                    values[2] = f'<span class="error">{values[2]}</span>'
+                    checks['invalid_reference_system'] = True
+                external_references.append(';'.join(values))
             value = ' '.join(external_references)
+        case 'wikidata' | 'geonames' if value:
+            values = value.split(';')
+            if not len(values) == 2 or values[1] not in get_match_types():
+                value = f'<span class="error">{value}</span>'
     return str(value)
 
 

@@ -5,6 +5,7 @@ from flask import g
 
 from openatlas import app
 from openatlas.models.entity import Entity
+from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 
 
@@ -22,7 +23,17 @@ def get_type_by_name(type_name: str) -> Optional[Type]:
     for type_id in g.types:
         if g.types[type_id].name == type_name:
             type_ = g.types[type_id]
+            break
     return type_
+
+
+def get_reference_system_by_name(name: str) -> Optional[ReferenceSystem]:
+    reference_system = None
+    for reference_system_id in g.reference_systems:
+        if g.reference_systems[reference_system_id].name == name:
+            reference_system = g.reference_systems[reference_system_id]
+            break
+    return reference_system
 
 
 def get_exact_match() -> Entity:
