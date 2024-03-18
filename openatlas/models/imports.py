@@ -5,6 +5,7 @@ from flask_login import current_user
 from shapely import wkt
 from shapely.errors import WKTReadingError
 
+from openatlas.api.import_scripts.util import get_match_types, get_type_by_name
 from openatlas.database import imports as db
 from openatlas.display.util2 import sanitize
 from openatlas.models.entity import Entity
@@ -73,7 +74,7 @@ class Import:
     def check_external_reference_id(value: list[str]) -> bool:
         if not value[0].isdigit() or int(value[0]) not in g.reference_systems:
             return False
-        if value[2] not in ['close', 'exact']:
+        if value[2] not in get_match_types():
             return False
         return True  # pragma: no cover
 
@@ -83,12 +84,12 @@ class Import:
             entity = Entity.insert(
                 class_,
                 row['name'],
-                row['description'] if 'description' in row else None)
+                row.get('description'))
             db.import_data(
                 project.id,
                 entity.id,
                 current_user.id,
-                origin_id=row['id'] if 'id' in row and row['id'] else None)
+                origin_id=row.get('id'))
 
             # Dates
             entity.update({'attributes': {
@@ -100,12 +101,26 @@ class Import:
                 'end_comment': row.get('end_comment')}})
 
             # Types
-            if 'type_ids' in row and row['type_ids']:
+            if row.get('type_ids'):
                 for type_id in str(row['type_ids']).split():
                     if not Import.check_type_id(type_id, class_):
                         continue
                     entity.link('P2', g.types[int(type_id)])  # pragma no cover
 
+            if row.get('external_reference_system'):
+                match_types = get_match_types()
+                for reference in row['external_reference_system'].split():
+                    values = reference.split(';')
+                    if Import.check_external_reference_id(values):
+                        reference_system = g.reference_systems[int(values[0])]
+                        match_id = match_types[values[2]].id
+                        reference_system.link(
+                            'P67',
+                            entity,
+                            values[1],
+                            type_id=match_id)
+
+            # Alias
             if class_ in ['place', 'person', 'group']:
                 aliases = row['alias'].split(";") if row['alias'] else None
                 if aliases:

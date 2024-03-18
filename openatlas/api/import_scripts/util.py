@@ -29,6 +29,17 @@ def get_exact_match() -> Entity:
     return get_or_create_type(g.reference_match_type, 'exact match')
 
 
+def get_match_types() -> dict[str, Type]:
+    match_dictionary = {}
+    for match in [g.types[match] for match in g.reference_match_type.subs]:
+        match match.name:
+            case 'exact match':
+                match_dictionary['exact_match'] = match
+            case 'close match':
+                match_dictionary['close_match'] = match
+    return match_dictionary
+
+
 def get_reference_system(name: str) -> Entity:  # pragma: no cover
     return [i for i in g.reference_systems.values() if i.name == name][0]
 
