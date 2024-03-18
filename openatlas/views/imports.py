@@ -196,53 +196,18 @@ def import_data(project_id: int, class_: str) -> str:
     form = ImportForm()
     table = None
     imported = False
-    messages: dict[str, list[str]] = {'error': [], 'warn': []}
     file_data = get_backup_file_data()
     class_label = g.classes[class_].label
+    messages: dict[str, list[str]] = {'error': [], 'warn': []}
     if form.validate_on_submit():
-        file_ = request.files['file']
-        file_path = \
-            app.config['TMP_PATH'] / secure_filename(str(file_.filename))
-        columns = get_allowed_columns(class_)
         try:
-            file_.save(str(file_path))
-            data_frame = pd.read_csv(file_path, keep_default_na=False)
-            headers = get_clean_header(data_frame, columns, messages)
-            table_data = []
-            checked_data = []
-            origin_ids = []
-            names = []
-            checks = {
-                'invalid_reference_system': False,
-                'missing_name_count': 0,
-                'invalid_type_ids': False,
-                'invalid_geoms': False}
-            for _index, row in data_frame.iterrows():
-                if not row['name']:
-                    checks['missing_name_count'] += 1
-                    continue
-                table_row = []
-                checked_row = {}
-                for item in headers:
-                    table_row.append(
-                        check_cell_value(row, item, class_, checks))
-                    checked_row[item] = row[item]
-                    if item == 'name' and form.duplicate.data:
-                        names.append(row['name'].lower())
-                    if item == 'id' and row[item]:
-                        origin_ids.append(str(row['id']))
-                table_data.append(table_row)
-                checked_data.append(checked_row)
-
-            if form.duplicate.data:  # Check for possible duplicates
-                duplicates = Import.check_duplicates(class_, names)
-                if duplicates:
-                    messages['warn'].append(
-                        f"{_('possible duplicates')}: {', '.join(duplicates)}")
-
-            error_messages(origin_ids, project, checks, messages)
-
-            table = Table(headers, rows=table_data)
+            checked_data: list[Any] = []
+            table = check_data_for_table_representation(
+                form,
+                class_,
+                messages,
+                checked_data,
+                project)
         except Exception as e:
             g.logger.log('error', 'import', 'import check failed', e)
             flash(_('error at import'), 'error')
@@ -283,6 +248,55 @@ def import_data(project_id: int, class_: str) -> str:
             [_('import'), url_for('import_index')],
             project,
             class_label])
+
+
+def check_data_for_table_representation(
+        form,
+        class_: str,
+        messages: dict[str, list[str]],
+        checked_data: list[Any],
+        project: Project) -> Table:
+    file_ = request.files['file']
+    file_path = \
+        app.config['TMP_PATH'] / secure_filename(str(file_.filename))
+    columns = get_allowed_columns(class_)
+    file_.save(str(file_path))
+    data_frame = pd.read_csv(file_path, keep_default_na=False)
+    headers = get_clean_header(data_frame, columns, messages)
+    table_data = []
+    origin_ids = []
+    names = []
+    checks = {
+        'invalid_reference_system': False,
+        'missing_name_count': 0,
+        'invalid_type_ids': False,
+        'invalid_geoms': False}
+    for _index, row in data_frame.iterrows():
+        if not row['name']:
+            checks['missing_name_count'] += 1
+            continue
+        table_row = []
+        checked_row = {}
+        for item in headers:
+            table_row.append(
+                check_cell_value(row, item, class_, checks))
+            checked_row[item] = row[item]
+            if item == 'name' and form.duplicate.data:
+                names.append(row['name'].lower())
+            if item == 'id' and row[item]:
+                origin_ids.append(str(row['id']))
+        table_data.append(table_row)
+        checked_data.append(checked_row)
+
+    if form.duplicate.data:  # Check for possible duplicates
+        duplicates = Import.check_duplicates(class_, names)
+        if duplicates:
+            messages['warn'].append(
+                f"{_('possible duplicates')}: {', '.join(duplicates)}")
+
+    error_messages(origin_ids, project, checks, messages)
+
+    return Table(headers, rows=table_data)
 
 
 def get_clean_header(
