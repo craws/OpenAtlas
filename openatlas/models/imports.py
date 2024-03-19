@@ -67,7 +67,7 @@ class Import:
         if not type_id.isdigit() or int(type_id) not in g.types:
             return False
         if class_ not in g.types[
-                g.types[int(type_id)].root[-1]].classes:  # pragma: no cover
+            g.types[int(type_id)].root[-1]].classes:  # pragma: no cover
             return False
         return True  # pragma: no cover
 
@@ -106,12 +106,13 @@ class Import:
                     values = reference.split(';')
                     if (values[0] in g.reference_systems
                             and values[2] in match_types):
-                        reference_system = g.reference_systems[int(values[0])]
-                        reference_system.link(
-                            'P67',
-                            entity,
-                            values[1],
-                            type_id=match_types[values[2]].id)
+                        if reference_system := g.reference_systems[int(
+                                values[0])]:  # pragma no cover
+                            reference_system.link(
+                                'P67',
+                                entity,
+                                values[1],
+                                type_id=match_types[values[2]].id)
 
             if wikidata := row.get('wikidata'):
                 values = wikidata.split(';')
@@ -146,7 +147,7 @@ class Import:
                 entity.link('P53', location)
                 try:
                     wkt_ = wkt.loads(row['wkt'])
-                except WKTReadingError:
+                except WKTReadingError:  # pragma no cover
                     wkt_ = None
                 if wkt_:
                     Gis.insert_wkt(

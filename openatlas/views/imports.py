@@ -251,7 +251,7 @@ def import_data(project_id: int, class_: str) -> str:
 
 
 def check_data_for_table_representation(
-        form,
+        form: ImportForm,
         class_: str,
         messages: dict[str, list[str]],
         checked_data: list[Any],
