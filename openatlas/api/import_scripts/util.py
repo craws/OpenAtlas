@@ -36,6 +36,17 @@ def get_reference_system_by_name(name: str) -> Optional[ReferenceSystem]:
     return reference_system
 
 
+def get_wikidata_geonames_object_by_name(
+        name: str) -> Optional[ReferenceSystem]:
+    match name:
+        case 'wikidata':
+            return get_reference_system_by_name('Wikidata')
+        case 'geonames':
+            return get_reference_system_by_name('GeoNames')
+        case _:
+            return None
+
+
 def get_exact_match() -> Entity:
     return get_or_create_type(g.reference_match_type, 'exact match')
 

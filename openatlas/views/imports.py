@@ -16,7 +16,8 @@ from wtforms import (
     BooleanField, FileField, StringField, TextAreaField, validators)
 
 from openatlas import app
-from openatlas.api.import_scripts.util import get_match_types
+from openatlas.api.import_scripts.util import get_match_types, \
+    get_wikidata_geonames_object_by_name
 from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
@@ -200,28 +201,28 @@ def import_data(project_id: int, class_: str) -> str:
     class_label = g.classes[class_].label
     messages: dict[str, list[str]] = {'error': [], 'warn': []}
     if form.validate_on_submit():
-        #try:
-        checked_data: list[Any] = []
-        table = check_data_for_table_representation(
-            form,
-            class_,
-            messages,
-            checked_data,
-            project)
-        #except Exception as e:
-        #    g.logger.log('error', 'import', 'import check failed', e)
-        #    flash(_('error at import'), 'error')
-        #    return render_template(
-        #        'import_data.html',
-        #        form=form,
-        #        messages=messages,
-        #        file_data=file_data,
-        #        title=_('import'),
-        #        crumbs=[
-        #            [_('admin'), f"{url_for('admin_index')}#tab-data"],
-        #            [_('import'), url_for('import_index')],
-        #            project,
-        #            class_label])
+        try:
+            checked_data: list[Any] = []
+            table = check_data_for_table_representation(
+                form,
+                class_,
+                messages,
+                checked_data,
+                project)
+        except Exception as e:
+            g.logger.log('error', 'import', 'import check failed', e)
+            flash(_('error at import'), 'error')
+            return render_template(
+               'import_data.html',
+               form=form,
+               messages=messages,
+               file_data=file_data,
+               title=_('import'),
+               crumbs=[
+                   [_('admin'), f"{url_for('admin_index')}#tab-data"],
+                   [_('import'), url_for('import_index')],
+                   project,
+                   class_label])
 
         if not form.preview.data and checked_data and (
                 not file_data['backup_too_old'] or app.testing):
@@ -389,7 +390,7 @@ def check_cell_value(
             external_references = []
             for values_ in value.split():
                 values = values_.split(';')
-                if values[0] not in g.reference_systems:
+                if not Import.check_reference_system_id(values[0], class_):
                     values[0] = f'<span class="error">{values[0]}</span>'
                     checks['invalid_reference_system'] = True
                 if values[2] not in get_match_types():
@@ -399,8 +400,12 @@ def check_cell_value(
             value = ' '.join(external_references)
         case 'wikidata' | 'geonames' if value:
             values = value.split(';')
-            if not len(values) == 2 or values[1] not in get_match_types():
-                value = f'<span class="error">{value}</span>'
+            if ref_sys := get_wikidata_geonames_object_by_name(item):
+                if (not Import.check_reference_system_id(
+                        str(ref_sys.id),
+                        class_)
+                        or values[1] not in get_match_types()):
+                    value = f'<span class="error">{value}</span>'
     return str(value)
 
 

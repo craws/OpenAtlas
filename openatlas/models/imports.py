@@ -69,7 +69,16 @@ class Import:
         if not g.types[int(type_id)].root:
             return False
         if class_ not in g.types[
-                g.types[int(type_id)].root[-1]].classes:  # pragma: no cover
+            g.types[int(type_id)].root[-1]].classes:  # pragma: no cover
+            return False
+        return True  # pragma: no cover
+
+    @staticmethod
+    def check_reference_system_id(id_: str, class_: str) -> bool:
+        if not id_.isdigit() or int(id_) not in g.reference_systems:
+            return False
+        if (class_ not in
+                g.reference_systems[int(id_)].classes):  # pragma: no cover
             return False
         return True  # pragma: no cover
 
@@ -116,25 +125,31 @@ class Import:
                                 values[1],
                                 type_id=match_types[values[2]].id)
 
-            if wikidata := row.get('wikidata'):
-                values = wikidata.split(';')
-                if len(values) == 2 and values[1] in match_types:
-                    wikidata = get_reference_system_by_name('Wikidata')
-                    wikidata.link(
-                        'P67',
-                        entity,
-                        values[0],
-                        type_id=match_types[values[1]].id)
+            if data := row.get('wikidata'):
+                values = data.split(';')
+                if wikidata := get_reference_system_by_name('Wikidata'):
+                    if (Import.check_reference_system_id(
+                            str(wikidata.id),
+                            class_)
+                            and len(values) == 2 and values[1] in match_types):
+                        wikidata.link(
+                            'P67',
+                            entity,
+                            values[0],
+                            type_id=match_types[values[1]].id)
 
-            if geonames := row.get('geonames'):
-                values = geonames.split(';')
-                if len(values) == 2 and values[1] in match_types:
-                    wikidata = get_reference_system_by_name('GeoNames')
-                    wikidata.link(
-                        'P67',
-                        entity,
-                        values[0],
-                        type_id=match_types[values[1]].id)
+            if data := row.get('geonames'):
+                values = data.split(';')
+                if geonames := get_reference_system_by_name('GeoNames'):
+                    if (Import.check_reference_system_id(
+                            str(geonames.id),
+                            class_)
+                            and len(values) == 2 and values[1] in match_types):
+                        geonames.link(
+                            'P67',
+                            entity,
+                            values[0],
+                            type_id=match_types[values[1]].id)
             # Alias
             if class_ in ['place', 'person', 'group']:
                 if aliases := row.get('alias'):
