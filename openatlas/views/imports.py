@@ -200,28 +200,28 @@ def import_data(project_id: int, class_: str) -> str:
     class_label = g.classes[class_].label
     messages: dict[str, list[str]] = {'error': [], 'warn': []}
     if form.validate_on_submit():
-        try:
-            checked_data: list[Any] = []
-            table = check_data_for_table_representation(
-                form,
-                class_,
-                messages,
-                checked_data,
-                project)
-        except Exception as e:
-            g.logger.log('error', 'import', 'import check failed', e)
-            flash(_('error at import'), 'error')
-            return render_template(
-                'import_data.html',
-                form=form,
-                messages=messages,
-                file_data=file_data,
-                title=_('import'),
-                crumbs=[
-                    [_('admin'), f"{url_for('admin_index')}#tab-data"],
-                    [_('import'), url_for('import_index')],
-                    project,
-                    class_label])
+        #try:
+        checked_data: list[Any] = []
+        table = check_data_for_table_representation(
+            form,
+            class_,
+            messages,
+            checked_data,
+            project)
+        #except Exception as e:
+        #    g.logger.log('error', 'import', 'import check failed', e)
+        #    flash(_('error at import'), 'error')
+        #    return render_template(
+        #        'import_data.html',
+        #        form=form,
+        #        messages=messages,
+        #        file_data=file_data,
+        #        title=_('import'),
+        #        crumbs=[
+        #            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+        #            [_('import'), url_for('import_index')],
+        #            project,
+        #            class_label])
 
         if not form.preview.data and checked_data and (
                 not file_data['backup_too_old'] or app.testing):
@@ -268,6 +268,8 @@ def check_data_for_table_representation(
     names = []
     checks = {
         'invalid_reference_system': False,
+        'invalid_value_type_values': False,
+        'invalid_value_type_ids': False,
         'missing_name_count': 0,
         'invalid_type_ids': False,
         'invalid_geoms': False}
@@ -319,12 +321,11 @@ def get_clean_header(
 
 def get_allowed_columns(class_: str) -> dict[str, list[str]]:
     columns = ['name', 'id', 'description', 'external_reference_system',
-               'wikidata', 'geonames']
+               'wikidata', 'geonames', 'type_ids', 'value_type_ids']
     if class_ not in g.view_class_mapping['reference']:
         columns.extend([
             'begin_from', 'begin_to', 'begin_comment',
             'end_from', 'end_to', 'end_comment'])
-    columns.append('type_ids')
     if class_ in ['place', 'person', 'group']:
         columns.extend(['alias'])
     if class_ in ['place', 'artifact']:
@@ -352,6 +353,19 @@ def check_cell_value(
                         f'<span class="error">{type_id}</span>')
                     checks['invalid_type_ids'] = True
             value = ' '.join(type_ids)
+        case 'value_type_ids':
+            value_types = []
+            for value_type in str(value).split():
+                values = value_type.split(';')
+                if not Import.check_type_id(values[0], class_):
+                    values[0] = f'<span class="error">{values[0]}</span>'
+                    checks['invalid_value_type_ids'] = True
+                if (not values[1].isdigit() and
+                        not values[1].replace('.', '', 1).isdigit()):
+                    values[1] = f'<span class="error">{values[1]}</span>'
+                    checks['invalid_value_type_values'] = True
+                value_types.append(';'.join(values))
+            value = ' '.join(value_types)
         case 'wkt' if row[item]:
             wkt_ = None
             try:
@@ -399,6 +413,10 @@ def error_messages(
         messages['warn'].append(_('invalid reference system'))
     if checks['invalid_type_ids']:
         messages['warn'].append(_('invalid type ids'))
+    if checks['invalid_value_type_ids']:
+        messages['warn'].append(_('invalid value type ids'))
+    if checks['invalid_value_type_values']:
+        messages['warn'].append(_('invalid value type values'))
     if checks['invalid_geoms']:
         messages['warn'].append(_('invalid coordinates'))
     if checks['missing_name_count']:

@@ -66,8 +66,10 @@ class Import:
     def check_type_id(type_id: str, class_: str) -> bool:
         if not type_id.isdigit() or int(type_id) not in g.types:
             return False
+        if not g.types[int(type_id)].root:
+            return False
         if class_ not in g.types[
-            g.types[int(type_id)].root[-1]].classes:  # pragma: no cover
+                g.types[int(type_id)].root[-1]].classes:  # pragma: no cover
             return False
         return True  # pragma: no cover
 
