@@ -116,6 +116,8 @@ class ExportImportTest(TestBaseCase):
                     follow_redirects=True)
             assert b'invalid columns: not_existing_column' in rv.data
             assert b'invalid type ids' in rv.data
+            assert b'invalid value type ids' in rv.data
+            assert b'invalid value type values' in rv.data
             assert b'invalid coordinates' in rv.data
             assert b'invalid reference system' in rv.data
             assert b'empty names' in rv.data

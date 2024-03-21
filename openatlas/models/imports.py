@@ -66,10 +66,10 @@ class Import:
     def check_type_id(type_id: str, class_: str) -> bool:
         if not type_id.isdigit() or int(type_id) not in g.types:
             return False
-        if not g.types[int(type_id)].root:
+        if not g.types[int(type_id)].root:  # pragma: no cover
             return False
         if class_ not in g.types[
-            g.types[int(type_id)].root[-1]].classes:  # pragma: no cover
+                g.types[int(type_id)].root[-1]].classes:  # pragma: no cover
             return False
         return True  # pragma: no cover
 
@@ -105,11 +105,23 @@ class Import:
                 'end_comment': row.get('end_comment')}})
 
             # Types
-            if row.get('type_ids'):
-                for type_id in str(row['type_ids']).split():
+            if type_ids := row.get('type_ids'):
+                for type_id in str(type_ids).split():
                     if not Import.check_type_id(type_id, class_):
                         continue
                     entity.link('P2', g.types[int(type_id)])  # pragma no cover
+
+            if data := row.get('value_type_ids'):
+                for value_types in str(data).split():
+                    value_type = value_types.split(';')
+                    if (not Import.check_type_id(value_type[0], class_) or
+                            (value_type[1].isdigit() and
+                             value_type[1].replace('.', '', 1).isdigit())):
+                        continue
+                    entity.link(
+                        'P2',
+                        g.types[int(value_type[0])],
+                        value_type[1])  # pragma no cover
 
             match_types = get_match_types()
             if row.get('external_reference_system'):
