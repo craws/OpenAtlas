@@ -17,6 +17,7 @@ from openatlas.forms import base_manager, manager
 from openatlas.forms.field import (
     SubmitField, TableField, TableMultiField, TreeField,
     format_name_and_aliases)
+from openatlas.forms.util import table_multi
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.views.entity_index import file_preview
@@ -48,7 +49,12 @@ def get_add_reference_form(class_: str) -> Any:
     class Form(FlaskForm):
         pass
 
-    setattr(Form, class_, TableMultiField(_(class_), [InputRequired()]))
+    setattr(
+        Form,
+        class_,
+        TableMultiField(
+            table_multi(class_, Entity.get_by_view(class_)),
+            validators=[InputRequired()]))
     setattr(Form, 'page', StringField(_('page')))
     setattr(Form, 'save', SubmitField(_('insert')))
     return Form()
