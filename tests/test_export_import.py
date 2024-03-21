@@ -12,7 +12,7 @@ from tests.base import TestBaseCase
 class ExportImportTest(TestBaseCase):
 
     def test_export(self) -> None:
-        with app.app_context():
+        with ((app.app_context())):
             rv: Any = self.app.get(url_for('export_sql'))
             assert b'Export SQL' in rv.data
 
@@ -115,6 +115,7 @@ class ExportImportTest(TestBaseCase):
                     data={'file': file},
                     follow_redirects=True)
             assert b'invalid columns: not_existing_column' in rv.data
+            assert b'invalid administrative unit or'in rv.data
             assert b'invalid type ids' in rv.data
             assert b'invalid value type ids' in rv.data
             assert b'invalid value type values' in rv.data

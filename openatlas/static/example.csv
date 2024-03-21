@@ -1,4 +1,4 @@
-id,name,alias,description,begin_from,begin_to,begin_comment,end_from,end_to,end_comment,wkt,type_ids,value_type_ids,external_reference_system,wikidata,geonames
-place_1,Vienna,Wien,Capital of Austria,1500-01-01,1500-12-31,It was a rainy day.,2045-01-01,2049-12-31,We'll see about that.,"POLYGON((16.1203 48.30671, 16.606275 48.30671, 16.606275 48.3154, 16.1203 48.3154, 16.1203 48.30671))",666,128787;13,156149;vienna;exact_match 6666;stadt-wien;close_match,Q152419;close_match,2761369;exact_match
-place_2,London,,,,,,,,,POINT (51 0),,,,,
-place_3,Rom,,,,,,,,,"LINESTRING (12.458533781141528 41.922205268362234, 12.53062334955289 41.917606998887024, 12.52169797441624 41.888476931243254)",,,,,
+id,name,alias,description,begin_from,begin_to,begin_comment,end_from,end_to,end_comment,wkt,type_ids,value_type_ids,external_reference_system,wikidata,geonames,administrative_unit,historical_place
+place_1,Vienna,Wien,Capital of Austria,1500-01-01,1500-12-31,It was a rainy day.,2045-01-01,2049-12-31,We'll see about that.,"POLYGON((16.1203 48.30671, 16.606275 48.30671, 16.606275 48.3154, 16.1203 48.3154, 16.1203 48.30671))",666,128787;13,156149;vienna;exact_match 6666;stadt-wien;close_match,Q152419;close_match,2761369;exact_match,12,
+place_2,London,,,,,,,,,POINT (51 0),,,,,,,
+place_3,Rom,,,,,,,,,"LINESTRING (12.458533781141528 41.922205268362234, 12.53062334955289 41.917606998887024, 12.52169797441624 41.888476931243254)",,,,,,,

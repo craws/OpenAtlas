@@ -68,8 +68,12 @@ class Import:
             return False
         if not g.types[int(type_id)].root:  # pragma: no cover
             return False
-        if class_ not in g.types[
-                g.types[int(type_id)].root[-1]].classes:  # pragma: no cover
+        root_type = g.types[g.types[int(type_id)].root[-1]]
+        if class_ not in root_type.classes:  # pragma: no cover
+            return False
+        if root_type.name in [
+                'Administrative unit',
+                'Historical place']:  # pragma: no cover
             return False
         return True  # pragma: no cover
 

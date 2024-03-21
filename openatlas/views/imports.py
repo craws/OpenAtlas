@@ -260,14 +260,14 @@ def check_data_for_table_representation(
     file_ = request.files['file']
     file_path = \
         app.config['TMP_PATH'] / secure_filename(str(file_.filename))
-    columns = get_allowed_columns(class_)
     file_.save(str(file_path))
     data_frame = pd.read_csv(file_path, keep_default_na=False)
-    headers = get_clean_header(data_frame, columns, messages)
+    headers = get_clean_header(data_frame, class_, messages)
     table_data = []
     origin_ids = []
     names = []
     checks = {
+        'invalid_administrative_units': False,
         'invalid_reference_system': False,
         'invalid_value_type_values': False,
         'invalid_value_type_ids': False,
@@ -304,8 +304,9 @@ def check_data_for_table_representation(
 
 def get_clean_header(
         data_frame: Any,
-        columns: dict[str, list[str]],
+        class_: str,
         messages: dict[str, list[str]]) -> list[str]:
+    columns = get_allowed_columns(class_)
     headers = list(data_frame.columns.values)
     if 'name' not in headers:
         messages['error'].append(_('missing name column'))
@@ -328,9 +329,11 @@ def get_allowed_columns(class_: str) -> dict[str, list[str]]:
             'begin_from', 'begin_to', 'begin_comment',
             'end_from', 'end_to', 'end_comment'])
     if class_ in ['place', 'person', 'group']:
-        columns.extend(['alias'])
+        columns.append('alias')
     if class_ in ['place', 'artifact']:
-        columns.extend(['wkt'])
+        columns.append('wkt')
+    if class_ in ['place']:
+        columns.extend(['administrative_unit', 'historical_place'])
     return {
         'allowed': columns,
         'valid': [],
@@ -367,7 +370,7 @@ def check_cell_value(
                     checks['invalid_value_type_values'] = True
                 value_types.append(';'.join(values))
             value = ' '.join(value_types)
-        case 'wkt' if row[item]:
+        case 'wkt' if value:
             wkt_ = None
             try:
                 wkt_ = wkt.loads(row[item])
@@ -406,6 +409,12 @@ def check_cell_value(
                         class_)
                         or values[1] not in get_match_types()):
                     value = f'<span class="error">{value}</span>'
+        case 'administrative_unit' | 'historical_place' if value:
+            if ((not value.isdigit() or int(value) not in g.types) or
+                    g.types[g.types[int(value)].root[-1]].name not in [
+                        'Administrative unit', 'Historical place']):
+                value = f'<span class="error">{value}</span>'
+                checks['invalid_administrative_units'] = True
     return str(value)
 
 
@@ -414,6 +423,9 @@ def error_messages(
         project: Project,
         checks: dict[str, Any],
         messages: dict[str, list[str]]) -> None:
+    if checks['invalid_administrative_units']:
+        messages['warn'].append(
+            _('invalid administrative unit or historical place'))
     if checks['invalid_reference_system']:
         messages['warn'].append(_('invalid reference system'))
     if checks['invalid_type_ids']:
