@@ -31,14 +31,11 @@ that we are using to set up Debian servers for OpenAtlas installations.
     sudo apt install python3-wand python3-rdflib python3-dicttoxml python3-rdflib-jsonld python3-flasgger
     sudo apt install python3-requests exiftran python3-email-validator python3-svgwrite
 
-### Apache 2.4
-    sudo apt install apache2 libapache2-mod-wsgi-py3
+### Apache 2.4, gettext, npm
+    sudo apt install apache2 libapache2-mod-wsgi-py3 gettext npm
 
 ### PostgreSQL 15 and PostGIS 3
     sudo apt install postgresql postgresql-15-postgis-3 postgresql-15-postgis-3-scripts
-
-### gettext, pip, npm
-    sudo apt install gettext npm
 
 ## Installation
 ### Files
