@@ -123,8 +123,7 @@ class Import:
             reference_systems = list(set(
                 key for key in row if key.startswith('reference_system_')))
             for header in reference_systems:
-                system = header.replace(
-                    'reference_system_', '').replace('_', ' ')
+                system = header.replace('reference_system_', '')
                 if reference_system := get_reference_system_by_name(system):
                     if ((data := row.get(header)) and
                             class_ in reference_system.classes):

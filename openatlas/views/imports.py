@@ -401,7 +401,7 @@ def check_cell_value(
                 value = f'<span class="error">{value}</span>'
                 checks['invalid_administrative_units'] = True
         case _ if item.startswith('reference_system_') and value:
-            item = item.replace('reference_system_', '').replace('_', ' ')
+            item = item.replace('reference_system_', '')
             reference_system = get_reference_system_by_name(item)
             if not reference_system:
                 value = f'<span class="error">{value}</span>'
