@@ -16,8 +16,8 @@ from wtforms import (
     BooleanField, FileField, StringField, TextAreaField, validators)
 
 from openatlas import app
-from openatlas.api.import_scripts.util import get_match_types, \
-    get_wikidata_geonames_object_by_name
+from openatlas.api.import_scripts.util import (
+    get_match_types, get_reference_system_by_name)
 from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
@@ -268,12 +268,14 @@ def check_data_for_table_representation(
     names = []
     checks = {
         'invalid_administrative_units': False,
+        'invalid_reference_system_class': False,
         'invalid_reference_system': False,
+        'invalid_match_type': False,
         'invalid_value_type_values': False,
         'invalid_value_type_ids': False,
-        'missing_name_count': 0,
         'invalid_type_ids': False,
-        'invalid_geoms': False}
+        'invalid_geoms': False,
+        'missing_name_count': 0}
     for _index, row in data_frame.iterrows():
         if not row['name']:
             checks['missing_name_count'] += 1
@@ -312,6 +314,8 @@ def get_clean_header(
         messages['error'].append(_('missing name column'))
         raise ValueError()
     for item in headers:
+        if item.startswith('reference_system_'):
+            columns['allowed'].append(item)
         if item not in columns['allowed']:
             columns['invalid'].append(item)
             del data_frame[item]
@@ -322,8 +326,7 @@ def get_clean_header(
 
 
 def get_allowed_columns(class_: str) -> dict[str, list[str]]:
-    columns = ['name', 'id', 'description', 'external_reference_system',
-               'wikidata', 'geonames', 'type_ids', 'value_type_ids']
+    columns = ['name', 'id', 'description', 'type_ids', 'value_type_ids']
     if class_ not in g.view_class_mapping['reference']:
         columns.extend([
             'begin_from', 'begin_to', 'begin_comment',
@@ -391,32 +394,25 @@ def check_cell_value(
                 row[item] = ''
                 value = '' if str(value) == 'NaT' else \
                     f'<span class="error">{value}</span>'
-        case 'external_reference_system':
-            external_references = []
-            for values_ in value.split():
-                values = values_.split(';')
-                if not Import.check_reference_system_id(values[0], class_):
-                    values[0] = f'<span class="error">{values[0]}</span>'
-                    checks['invalid_reference_system'] = True
-                if values[2] not in get_match_types():
-                    values[2] = f'<span class="error">{values[2]}</span>'
-                    checks['invalid_reference_system'] = True
-                external_references.append(';'.join(values))
-            value = ' '.join(external_references)
-        case 'wikidata' | 'geonames' if value:
-            values = value.split(';')
-            if ref_sys := get_wikidata_geonames_object_by_name(item):
-                if (not Import.check_reference_system_id(
-                        str(ref_sys.id),
-                        class_)
-                        or values[1] not in get_match_types()):
-                    value = f'<span class="error">{value}</span>'
         case 'administrative_unit' | 'historical_place' if value:
             if ((not value.isdigit() or int(value) not in g.types) or
                     g.types[g.types[int(value)].root[-1]].name not in [
                         'Administrative unit', 'Historical place']):
                 value = f'<span class="error">{value}</span>'
                 checks['invalid_administrative_units'] = True
+        case _ if item.startswith('reference_system_') and value:
+            item = item.replace('reference_system_', '').replace('_', ' ')
+            reference_system = get_reference_system_by_name(item)
+            if not reference_system:
+                value = f'<span class="error">{value}</span>'
+                checks['invalid_reference_system'] = True
+            if reference_system and class_ not in reference_system.classes:
+                value = f'<span class="error">{value}</span>'
+                checks['invalid_reference_system_class'] = True
+            values = value.split(';')
+            if values[1] not in get_match_types():
+                value = f'{values[0]};<span class="error">{values[1]}</span>'
+                checks['invalid_match_type'] = True
     return str(value)
 
 
@@ -428,8 +424,12 @@ def error_messages(
     if checks['invalid_administrative_units']:
         messages['warn'].append(
             _('invalid administrative unit or historical place'))
+    if checks['invalid_reference_system_class']:
+        messages['warn'].append(_('invalid reference system for class'))
     if checks['invalid_reference_system']:
         messages['warn'].append(_('invalid reference system'))
+    if checks['invalid_match_type']:
+        messages['warn'].append(_('invalid match type'))
     if checks['invalid_type_ids']:
         messages['warn'].append(_('invalid type ids'))
     if checks['invalid_value_type_ids']:

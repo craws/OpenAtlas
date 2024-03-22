@@ -104,7 +104,7 @@ class ExportImportTest(TestBaseCase):
             test_path = Path(app.root_path).parent / 'tests'
             with open(test_path / 'invalid_1.csv', 'rb') as file:
                 rv = self.app.post(
-                    url_for('import_data', class_='place', project_id=p_id),
+                    url_for('import_data', class_='source', project_id=p_id),
                     data={'file': file},
                     follow_redirects=True)
             assert b'missing name column' in rv.data
@@ -115,7 +115,7 @@ class ExportImportTest(TestBaseCase):
                     data={'file': file},
                     follow_redirects=True)
             assert b'invalid columns: not_existing_column' in rv.data
-            assert b'invalid administrative unit or'in rv.data
+            assert b'invalid administrative unit or ' in rv.data
             assert b'invalid type ids' in rv.data
             assert b'invalid value type ids' in rv.data
             assert b'invalid value type values' in rv.data
@@ -126,10 +126,10 @@ class ExportImportTest(TestBaseCase):
 
             with open(test_path / 'invalid_3.csv', 'rb') as file:
                 rv = self.app.post(
-                    url_for('import_data', class_='place', project_id=p_id),
+                    url_for('import_data', class_='source', project_id=p_id),
                     data={'file': file},
                     follow_redirects=True)
-            assert b'invalid coordinates' in rv.data
+            assert b'invalid reference system for class' in rv.data
 
             rv = self.app.get(url_for('import_project_view', id_=p_id))
             assert b'London' in rv.data

@@ -72,17 +72,7 @@ class Import:
         if class_ not in root_type.classes:  # pragma: no cover
             return False
         if root_type.name in [
-            'Administrative unit',
-            'Historical place']:  # pragma: no cover
-            return False
-        return True  # pragma: no cover
-
-    @staticmethod
-    def check_reference_system_id(id_: str, class_: str) -> bool:
-        if not id_.isdigit() or int(id_) not in g.reference_systems:
-            return False
-        if (class_ not in
-                g.reference_systems[int(id_)].classes):  # pragma: no cover
+                'Administrative unit', 'Historical place']:  # pragma: no cover
             return False
         return True  # pragma: no cover
 
@@ -130,46 +120,23 @@ class Import:
                         value_type[1])  # pragma no cover
 
             match_types = get_match_types()
-            if row.get('external_reference_system'):
-                for reference in row['external_reference_system'].split():
-                    values = reference.split(';')
-                    if (values[0] in g.reference_systems
-                            and values[2] in match_types):
-                        if reference_system := g.reference_systems[int(
-                                values[0])]:  # pragma no cover
+            reference_systems = list(set(
+                key for key in row if key.startswith('reference_system_')))
+            for header in reference_systems:
+                system = header.replace(
+                    'reference_system_', '').replace('_', ' ')
+                if reference_system := get_reference_system_by_name(system):
+                    if ((data := row.get(header)) and
+                            class_ in reference_system.classes):
+                        values = data.split(';')
+                        if values[1] in match_types:
                             reference_system.link(
-                                'P67',
-                                entity,
-                                values[1],
-                                type_id=match_types[values[2]].id)
+                                    'P67',
+                                    entity,
+                                    values[0],
+                                    type_id=match_types[values[1]].id)
 
-            if data := row.get('wikidata'):
-                values = data.split(';')
-                if wikidata := get_reference_system_by_name('Wikidata'):
-                    if (Import.check_reference_system_id(
-                            str(wikidata.id),
-                            class_)
-                            and len(values) == 2 and values[1] in match_types):
-                        wikidata.link(
-                            'P67',
-                            entity,
-                            values[0],
-                            type_id=match_types[values[1]].id)
-
-            if data := row.get('geonames'):
-                values = data.split(';')
-                if geonames := get_reference_system_by_name('GeoNames'):
-                    if (Import.check_reference_system_id(
-                            str(geonames.id),
-                            class_)
-                            and len(values) == 2 and values[1] in match_types):
-                        geonames.link(
-                            'P67',
-                            entity,
-                            values[0],
-                            type_id=match_types[values[1]].id)
-
-                    # Alias
+            # Alias
             if class_ in ['place', 'person', 'group']:
                 if aliases := row.get('alias'):
                     for alias_ in aliases.split(";"):
