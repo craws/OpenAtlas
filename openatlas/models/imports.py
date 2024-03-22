@@ -66,15 +66,14 @@ class Import:
     def check_type_id(type_id: str, class_: str) -> bool:
         if not type_id.isdigit() or int(type_id) not in g.types:
             return False
-        if not g.types[int(type_id)].root:  # pragma: no cover
+        if not g.types[int(type_id)].root:
             return False
         root_type = g.types[g.types[int(type_id)].root[-1]]
-        if class_ not in root_type.classes:  # pragma: no cover
+        if class_ not in root_type.classes:
             return False
-        if root_type.name in [
-                'Administrative unit', 'Historical place']:  # pragma: no cover
+        if root_type.name in ['Administrative unit', 'Historical place']:
             return False
-        return True  # pragma: no cover
+        return True
 
     @staticmethod
     def import_data(project: Project, class_: str, data: list[Any]) -> None:
@@ -103,7 +102,7 @@ class Import:
                 for type_id in str(type_ids).split():
                     if not Import.check_type_id(type_id, class_):
                         continue
-                    entity.link('P2', g.types[int(type_id)])  # pragma no cover
+                    entity.link('P2', g.types[int(type_id)])
 
             if data := row.get('value_type_ids'):
                 for value_types in str(data).split():
@@ -111,14 +110,15 @@ class Import:
                     number = value_type[1][1:] \
                         if value_type[1].startswith('-') else value_type[1]
                     if (not Import.check_type_id(value_type[0], class_) or
-                            (number.isdigit() and
-                             number.replace('.', '', 1).isdigit())):
+                            (not number.isdigit() or
+                             not number.replace('.', '', 1).isdigit())):
                         continue
                     entity.link(
                         'P2',
                         g.types[int(value_type[0])],
-                        value_type[1])  # pragma no cover
+                        value_type[1])
 
+            # External reference systems
             match_types = get_match_types()
             reference_systems = list(set(
                 key for key in row if key.startswith('reference_system_')))
@@ -160,7 +160,7 @@ class Import:
                         location.link('P89', g.types[int(data)])
                 try:
                     wkt_ = wkt.loads(row['wkt'])
-                except WKTReadingError:  # pragma no cover
+                except WKTReadingError:
                     wkt_ = None
                 if wkt_:
                     Gis.insert_wkt(

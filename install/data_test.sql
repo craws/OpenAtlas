@@ -37,3 +37,7 @@ UPDATE web.settings SET value = 'deflate' WHERE name = 'iiif_conversion';
 UPDATE web.settings SET value = 'True' WHERE name = 'iiif_convert_on_upload';
 UPDATE web.settings SET value = 'https://frontend-demo.openatlas.eu/entity/' WHERE name = 'frontend_resolver_url';
 
+-- Add Dimensions value type to place
+INSERT INTO web.hierarchy_openatlas_class (hierarchy_id, openatlas_class_name) VALUES
+  ((SELECT id FROM web.hierarchy WHERE name='Dimensions'), 'place');
+

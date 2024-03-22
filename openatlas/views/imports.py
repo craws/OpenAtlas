@@ -354,7 +354,7 @@ def check_cell_value(
             type_ids = []
             for type_id in str(value).split():
                 if Import.check_type_id(type_id, class_):
-                    type_ids.append(type_id)  # pragma: no cover
+                    type_ids.append(type_id)
                 else:
                     type_ids.append(
                         f'<span class="error">{type_id}</span>')
