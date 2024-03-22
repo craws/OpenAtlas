@@ -364,8 +364,10 @@ def check_cell_value(
                 if not Import.check_type_id(values[0], class_):
                     values[0] = f'<span class="error">{values[0]}</span>'
                     checks['invalid_value_type_ids'] = True
-                if (not values[1].isdigit() and
-                        not values[1].replace('.', '', 1).isdigit()):
+                number = values[1][1:] if values[1].startswith('-') \
+                    else values[1]
+                if (not number.isdigit() and
+                        not number.replace('.', '', 1).isdigit()):
                     values[1] = f'<span class="error">{values[1]}</span>'
                     checks['invalid_value_type_values'] = True
                 value_types.append(';'.join(values))

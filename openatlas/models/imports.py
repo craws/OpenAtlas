@@ -72,8 +72,8 @@ class Import:
         if class_ not in root_type.classes:  # pragma: no cover
             return False
         if root_type.name in [
-                'Administrative unit',
-                'Historical place']:  # pragma: no cover
+            'Administrative unit',
+            'Historical place']:  # pragma: no cover
             return False
         return True  # pragma: no cover
 
@@ -118,9 +118,11 @@ class Import:
             if data := row.get('value_type_ids'):
                 for value_types in str(data).split():
                     value_type = value_types.split(';')
+                    number = value_type[1][1:] \
+                        if value_type[1].startswith('-') else value_type[1]
                     if (not Import.check_type_id(value_type[0], class_) or
-                            (value_type[1].isdigit() and
-                             value_type[1].replace('.', '', 1).isdigit())):
+                            (number.isdigit() and
+                             number.replace('.', '', 1).isdigit())):
                         continue
                     entity.link(
                         'P2',
@@ -166,7 +168,8 @@ class Import:
                             entity,
                             values[0],
                             type_id=match_types[values[1]].id)
-            # Alias
+
+                    # Alias
             if class_ in ['place', 'person', 'group']:
                 if aliases := row.get('alias'):
                     for alias_ in aliases.split(";"):
@@ -178,6 +181,17 @@ class Import:
                     'object_location',
                     f"Location of {row['name']}")
                 entity.link('P53', location)
+
+                if data := row.get('administrative_unit'):
+                    if ((data.isdigit() and int(data) in g.types) and
+                            g.types[g.types[int(data)].root[-1]].name in [
+                                'Administrative unit']):
+                        location.link('P89', g.types[int(data)])
+                if data := row.get('historical_place'):
+                    if ((data.isdigit() and int(data) in g.types) and
+                            g.types[g.types[int(data)].root[-1]].name in [
+                                'Historical place']):
+                        location.link('P89', g.types[int(data)])
                 try:
                     wkt_ = wkt.loads(row['wkt'])
                 except WKTReadingError:  # pragma no cover
