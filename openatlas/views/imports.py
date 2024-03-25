@@ -1,4 +1,4 @@
-import collections
+from collections import Counter
 from pathlib import Path
 from typing import Any, Optional
 
@@ -50,6 +50,98 @@ class ProjectForm(FlaskForm):
             self.name.errors.append(_('error name exists'))
             valid = False
         return valid
+
+
+class WarningHandler:
+    def __init__(self):
+        self.warning: dict[str, Any] = {
+            'invalid_administrative_units': False,
+            'invalid_reference_system_class': False,
+            'invalid_reference_system': False,
+            'invalid_match_type': False,
+            'invalid_value_type_values': False,
+            'invalid_value_type_ids': False,
+            'invalid_type_ids': False,
+            'invalid_geoms': False,
+            'missing_name_count': False,
+            'possible_duplicates': '',
+            'invalid_columns': ''}
+        self.error: dict[str, Any] = {
+            'missing_name_column': False,
+            'double_ids': False,
+            'ids_already_in_database': False}
+        self.messages: dict[str, list[str]] = {'error': [], 'warn': []}
+
+    def set_warning(
+            self,
+            check_name: str,
+            value: Optional[str] = None) -> None:
+        if check_name in self.warning:
+            self.warning[check_name] = value or True
+            self.generate_warning_messages()
+
+    def set_error(
+            self,
+            check_name: str,
+            value: Optional[str] = None) -> None:
+        if check_name in self.error:
+            self.error[check_name] = value or True
+            self.generate_error_messages()
+
+    def add_warn_message(self, message: str) -> None:
+        self.messages['warn'].append(message)
+
+    def add_error_message(self, message: str) -> None:
+        self.messages['error'].append(message)
+
+    def clear_warning_messages(self) -> None:
+        self.messages['warn'].clear()
+
+    def clear_error_messages(self) -> None:
+        self.messages['error'].clear()
+
+    def generate_warning_messages(self) -> None:
+        self.clear_warning_messages()
+        if self.warning['invalid_columns']:
+            self.add_warn_message(
+                f"{_('invalid columns')}: {self.warning['invalid_columns']}")
+        if self.warning['possible_duplicates']:
+            self.add_warn_message(
+                f"{_('possible duplicates')}: "
+                f"{self.warning['possible_duplicates']}")
+        if self.warning['invalid_administrative_units']:
+            self.add_warn_message(
+                _('invalid administrative unit or historical place'))
+        if self.warning['invalid_reference_system_class']:
+            self.add_warn_message(_('invalid reference system for class'))
+        if self.warning['invalid_reference_system']:
+            self.add_warn_message(_('invalid reference system'))
+        if self.warning['invalid_match_type']:
+            self.add_warn_message(_('invalid match type'))
+        if self.warning['invalid_type_ids']:
+            self.add_warn_message(_('invalid type ids'))
+        if self.warning['invalid_value_type_ids']:
+            self.add_warn_message(_('invalid value type ids'))
+        if self.warning['invalid_value_type_values']:
+            self.add_warn_message(_('invalid value type values'))
+        if self.warning['invalid_geoms']:
+            self.add_warn_message(_('invalid coordinates'))
+        if self.warning['missing_name_count']:
+            self.add_warn_message(
+                f"{_('empty names')}: {self.warning['missing_name_count']}")
+
+    def generate_error_messages(self) -> None:
+        if self.error['ids_already_in_database']:
+            self.add_error_message(
+                f"{_('IDs already in database')}: "
+                f"{self.error['ids_already_in_database']}")
+        if self.error['double_ids']:
+            self.add_error_message(
+                f"{_('double IDs in import')}: {self.error['double_ids']}")
+        if self.error['missing_name_column']:
+            self.add_error_message(_('missing name column'))
+        if self.messages['error']:
+            raise ValueError()
 
 
 @app.route('/import/index')
@@ -199,30 +291,30 @@ def import_data(project_id: int, class_: str) -> str:
     imported = False
     file_data = get_backup_file_data()
     class_label = g.classes[class_].label
-    messages: dict[str, list[str]] = {'error': [], 'warn': []}
+    checks = WarningHandler()
     if form.validate_on_submit():
         try:
             checked_data: list[Any] = []
             table = check_data_for_table_representation(
                 form,
                 class_,
-                messages,
+                checks,
                 checked_data,
                 project)
         except Exception as e:
             g.logger.log('error', 'import', 'import check failed', e)
             flash(_('error at import'), 'error')
             return render_template(
-               'import_data.html',
-               form=form,
-               messages=messages,
-               file_data=file_data,
-               title=_('import'),
-               crumbs=[
-                   [_('admin'), f"{url_for('admin_index')}#tab-data"],
-                   [_('import'), url_for('import_index')],
-                   project,
-                   class_label])
+                'import_data.html',
+                form=form,
+                messages=checks.messages,
+                file_data=file_data,
+                title=_('import'),
+                crumbs=[
+                    [_('admin'), f"{url_for('admin_index')}#tab-data"],
+                    [_('import'), url_for('import_index')],
+                    project,
+                    class_label])
 
         if not form.preview.data and checked_data and (
                 not file_data['backup_too_old'] or app.testing):
@@ -243,7 +335,7 @@ def import_data(project_id: int, class_: str) -> str:
         file_data=file_data,
         table=table,
         imported=imported,
-        messages=messages,
+        messages=checks.messages,
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
             [_('import'), url_for('import_index')],
@@ -254,37 +346,25 @@ def import_data(project_id: int, class_: str) -> str:
 def check_data_for_table_representation(
         form: ImportForm,
         class_: str,
-        messages: dict[str, list[str]],
+        checks: WarningHandler,
         checked_data: list[Any],
         project: Project) -> Table:
     file_ = request.files['file']
-    file_path = \
-        app.config['TMP_PATH'] / secure_filename(str(file_.filename))
+    file_path = app.config['TMP_PATH'] / secure_filename(str(file_.filename))
     file_.save(str(file_path))
     data_frame = pd.read_csv(file_path, keep_default_na=False)
-    headers = get_clean_header(data_frame, class_, messages)
+    headers = get_clean_header(data_frame, class_, checks)
     table_data = []
     origin_ids = []
     names = []
-    checks = {
-        'invalid_administrative_units': False,
-        'invalid_reference_system_class': False,
-        'invalid_reference_system': False,
-        'invalid_match_type': False,
-        'invalid_value_type_values': False,
-        'invalid_value_type_ids': False,
-        'invalid_type_ids': False,
-        'invalid_geoms': False,
-        'missing_name_count': 0}
     for _index, row in data_frame.iterrows():
-        if not row['name']:
-            checks['missing_name_count'] += 1
+        if not row.get('name'):
+            checks.set_warning('missing_name_count')
             continue
         table_row = []
         checked_row = {}
         for item in headers:
-            table_row.append(
-                check_cell_value(row, item, class_, checks))
+            table_row.append(check_cell_value(row, item, class_, checks))
             checked_row[item] = row[item]
             if item == 'name' and form.duplicate.data:
                 names.append(row['name'].lower())
@@ -292,27 +372,29 @@ def check_data_for_table_representation(
                 origin_ids.append(str(row['id']))
         table_data.append(table_row)
         checked_data.append(checked_row)
-
     if form.duplicate.data:  # Check for possible duplicates
         duplicates = Import.check_duplicates(class_, names)
         if duplicates:
-            messages['warn'].append(
-                f"{_('possible duplicates')}: {', '.join(duplicates)}")
-
-    error_messages(origin_ids, project, checks, messages)
-
+            checks.set_warning('possible_duplicates', ', '.join(duplicates))
+    doubles = [
+        item for item, count in Counter(origin_ids).items() if count > 1]
+    if doubles:
+        checks.set_error('double_ids', ', '.join(doubles))
+    existing = Import.get_origin_ids(project, origin_ids) \
+        if origin_ids else None
+    if existing:
+        checks.set_error('ids_already_in_database', ', '.join(existing))
     return Table(headers, rows=table_data)
 
 
 def get_clean_header(
         data_frame: Any,
         class_: str,
-        messages: dict[str, list[str]]) -> list[str]:
+        messages: WarningHandler) -> list[str]:
     columns = get_allowed_columns(class_)
     headers = list(data_frame.columns.values)
     if 'name' not in headers:
-        messages['error'].append(_('missing name column'))
-        raise ValueError()
+        messages.set_error('missing_name_column')
     for item in headers:
         if item.startswith('reference_system_'):
             columns['allowed'].append(item)
@@ -320,8 +402,7 @@ def get_clean_header(
             columns['invalid'].append(item)
             del data_frame[item]
     if columns['invalid']:
-        messages['warn'].append(
-            f"{_('invalid columns')}: {','.join(columns['invalid'])}")
+        messages.set_warning('invalid_columns', ','.join(columns['invalid']))
     return list(data_frame.columns.values)
 
 
@@ -347,7 +428,7 @@ def check_cell_value(
         row: Series,
         item: str,
         class_: str,
-        checks: dict[str, Any]) -> str:
+        checks: WarningHandler) -> str:
     value = row[item]
     match item:
         case 'type_ids':
@@ -358,7 +439,7 @@ def check_cell_value(
                 else:
                     type_ids.append(
                         f'<span class="error">{type_id}</span>')
-                    checks['invalid_type_ids'] = True
+                    checks.set_warning('invalid_type_ids')
             value = ' '.join(type_ids)
         case 'value_type_ids':
             value_types = []
@@ -366,13 +447,13 @@ def check_cell_value(
                 values = value_type.split(';')
                 if not Import.check_type_id(values[0], class_):
                     values[0] = f'<span class="error">{values[0]}</span>'
-                    checks['invalid_value_type_ids'] = True
+                    checks.set_warning('invalid_value_type_ids')
                 number = values[1][1:] if values[1].startswith('-') \
                     else values[1]
                 if (not number.isdigit() and
                         not number.replace('.', '', 1).isdigit()):
                     values[1] = f'<span class="error">{values[1]}</span>'
-                    checks['invalid_value_type_values'] = True
+                    checks.set_warning('invalid_value_type_values')
                 value_types.append(';'.join(values))
             value = ' '.join(value_types)
         case 'wkt' if value:
@@ -381,10 +462,10 @@ def check_cell_value(
                 wkt_ = wkt.loads(row[item])
             except WKTReadingError:
                 value = f'<span class="error">{value}</span>'
-                checks['invalid_geoms'] = True
+                checks.set_warning('invalid_geoms')
             if wkt_ and wkt_.type not in ['Point', 'LineString', 'Polygon']:
                 value = f'<span class="error">{value}</span>'
-                checks['invalid_geoms'] = True
+                checks.set_warning('invalid_geoms')
         case 'begin_from' | 'begin_to' | 'end_from' | 'end_to':
             try:
                 value = datetime64_to_timestamp(
@@ -399,58 +480,18 @@ def check_cell_value(
                     g.types[g.types[int(value)].root[-1]].name not in [
                         'Administrative unit', 'Historical place']):
                 value = f'<span class="error">{value}</span>'
-                checks['invalid_administrative_units'] = True
+                checks.set_warning('invalid_administrative_units')
         case _ if item.startswith('reference_system_') and value:
             item = item.replace('reference_system_', '')
             reference_system = get_reference_system_by_name(item)
             if not reference_system:
                 value = f'<span class="error">{value}</span>'
-                checks['invalid_reference_system'] = True
+                checks.set_warning('invalid_reference_system')
             if reference_system and class_ not in reference_system.classes:
                 value = f'<span class="error">{value}</span>'
-                checks['invalid_reference_system_class'] = True
+                checks.set_warning('invalid_reference_system_class')
             values = value.split(';')
             if values[1] not in get_match_types():
                 value = f'{values[0]};<span class="error">{values[1]}</span>'
-                checks['invalid_match_type'] = True
+                checks.set_warning('invalid_match_type')
     return str(value)
-
-
-def error_messages(
-        origin_ids: list[str],
-        project: Project,
-        checks: dict[str, Any],
-        messages: dict[str, list[str]]) -> None:
-    if checks['invalid_administrative_units']:
-        messages['warn'].append(
-            _('invalid administrative unit or historical place'))
-    if checks['invalid_reference_system_class']:
-        messages['warn'].append(_('invalid reference system for class'))
-    if checks['invalid_reference_system']:
-        messages['warn'].append(_('invalid reference system'))
-    if checks['invalid_match_type']:
-        messages['warn'].append(_('invalid match type'))
-    if checks['invalid_type_ids']:
-        messages['warn'].append(_('invalid type ids'))
-    if checks['invalid_value_type_ids']:
-        messages['warn'].append(_('invalid value type ids'))
-    if checks['invalid_value_type_values']:
-        messages['warn'].append(_('invalid value type values'))
-    if checks['invalid_geoms']:
-        messages['warn'].append(_('invalid coordinates'))
-    if checks['missing_name_count']:
-        messages['warn'].append(
-            f"{_('empty names')}: {checks['missing_name_count']}")
-    doubles = [
-        item for item, count in collections.Counter(origin_ids).items()
-        if count > 1]
-    if doubles:
-        messages['error'].append(
-            f"{_('double IDs in import')}: {', '.join(doubles)}")
-    existing = Import.get_origin_ids(project, origin_ids) \
-        if origin_ids else None
-    if existing:
-        messages['error'].append(
-            f"{_('IDs already in database')}: {', '.join(existing)}")
-    if messages['error']:
-        raise ValueError()
