@@ -52,41 +52,19 @@ class ProjectForm(FlaskForm):
         return valid
 
 
-class WarningHandler:
+class CheckHandler:
     def __init__(self):
-        self.warning: dict[str, Any] = {
-            'invalid_administrative_units': False,
-            'invalid_reference_system_class': False,
-            'invalid_reference_system': False,
-            'invalid_match_type': False,
-            'invalid_value_type_values': False,
-            'invalid_value_type_ids': False,
-            'invalid_type_ids': False,
-            'invalid_geoms': False,
-            'missing_name_count': False,
-            'possible_duplicates': '',
-            'invalid_columns': ''}
-        self.error: dict[str, Any] = {
-            'missing_name_column': False,
-            'double_ids': False,
-            'ids_already_in_database': False}
+        self.warning: dict[str, Any] = {}
+        self.error: dict[str, Any] = {}
         self.messages: dict[str, list[str]] = {'error': [], 'warn': []}
 
-    def set_warning(
-            self,
-            check_name: str,
-            value: Optional[str] = None) -> None:
-        if check_name in self.warning:
-            self.warning[check_name] = value or True
-            self.generate_warning_messages()
+    def set_warning(self, name: str, value: Optional[str] = None) -> None:
+        self.warning[name] = value or True
+        self.generate_warning_messages()
 
-    def set_error(
-            self,
-            check_name: str,
-            value: Optional[str] = None) -> None:
-        if check_name in self.error:
-            self.error[check_name] = value or True
-            self.generate_error_messages()
+    def set_error(self, name: str, value: Optional[str] = None) -> None:
+        self.error[name] = value or True
+        self.generate_error_messages()
 
     def add_warn_message(self, message: str) -> None:
         self.messages['warn'].append(message)
@@ -102,43 +80,44 @@ class WarningHandler:
 
     def generate_warning_messages(self) -> None:
         self.clear_warning_messages()
-        if self.warning['invalid_columns']:
+        if self.warning.get('invalid_columns'):
             self.add_warn_message(
                 f"{_('invalid columns')}: {self.warning['invalid_columns']}")
-        if self.warning['possible_duplicates']:
+        if self.warning.get('possible_duplicates'):
             self.add_warn_message(
                 f"{_('possible duplicates')}: "
-                f"{self.warning['possible_duplicates']}")
-        if self.warning['invalid_administrative_units']:
+                f"{self.warning.get('possible_duplicates')}")
+        if self.warning.get('invalid_administrative_units'):
             self.add_warn_message(
                 _('invalid administrative unit or historical place'))
-        if self.warning['invalid_reference_system_class']:
+        if self.warning.get('invalid_reference_system_class'):
             self.add_warn_message(_('invalid reference system for class'))
-        if self.warning['invalid_reference_system']:
+        if self.warning.get('invalid_reference_system'):
             self.add_warn_message(_('invalid reference system'))
-        if self.warning['invalid_match_type']:
+        if self.warning.get('invalid_match_type'):
             self.add_warn_message(_('invalid match type'))
-        if self.warning['invalid_type_ids']:
+        if self.warning.get('invalid_type_ids'):
             self.add_warn_message(_('invalid type ids'))
-        if self.warning['invalid_value_type_ids']:
+        if self.warning.get('invalid_value_type_ids'):
             self.add_warn_message(_('invalid value type ids'))
-        if self.warning['invalid_value_type_values']:
+        if self.warning.get('invalid_value_type_values'):
             self.add_warn_message(_('invalid value type values'))
-        if self.warning['invalid_geoms']:
+        if self.warning.get('invalid_geoms'):
             self.add_warn_message(_('invalid coordinates'))
-        if self.warning['missing_name_count']:
+        if self.warning.get('missing_name_count'):
             self.add_warn_message(
                 f"{_('empty names')}: {self.warning['missing_name_count']}")
 
     def generate_error_messages(self) -> None:
-        if self.error['ids_already_in_database']:
+        self.clear_error_messages()
+        if self.error.get('ids_already_in_database'):
             self.add_error_message(
                 f"{_('IDs already in database')}: "
                 f"{self.error['ids_already_in_database']}")
-        if self.error['double_ids']:
+        if self.error.get('double_ids'):
             self.add_error_message(
                 f"{_('double IDs in import')}: {self.error['double_ids']}")
-        if self.error['missing_name_column']:
+        if self.error.get('missing_name_column'):
             self.add_error_message(_('missing name column'))
         if self.messages['error']:
             raise ValueError()
@@ -291,7 +270,7 @@ def import_data(project_id: int, class_: str) -> str:
     imported = False
     file_data = get_backup_file_data()
     class_label = g.classes[class_].label
-    checks = WarningHandler()
+    checks = CheckHandler()
     if form.validate_on_submit():
         try:
             checked_data: list[Any] = []
@@ -346,7 +325,7 @@ def import_data(project_id: int, class_: str) -> str:
 def check_data_for_table_representation(
         form: ImportForm,
         class_: str,
-        checks: WarningHandler,
+        checks: CheckHandler,
         checked_data: list[Any],
         project: Project) -> Table:
     file_ = request.files['file']
@@ -390,7 +369,7 @@ def check_data_for_table_representation(
 def get_clean_header(
         data_frame: Any,
         class_: str,
-        messages: WarningHandler) -> list[str]:
+        messages: CheckHandler) -> list[str]:
     columns = get_allowed_columns(class_)
     headers = list(data_frame.columns.values)
     if 'name' not in headers:
@@ -428,7 +407,7 @@ def check_cell_value(
         row: Series,
         item: str,
         class_: str,
-        checks: WarningHandler) -> str:
+        checks: CheckHandler) -> str:
     value = row[item]
     match item:
         case 'type_ids':
