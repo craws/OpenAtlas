@@ -21,7 +21,8 @@ versions = {
             '2126': 'IIIF: Polygons for annotation selection',
             '2106': 'IIIF: Delete IIIF images',
             '2146': 'IIIF: Display hints for possible problems',
-            '2228': 'API: Swagger UI adaptation'}}],
+            '2228': 'API: Swagger UI adaptation',
+            '2241': 'Manual: Subordinate artifacts (and places)'}}],
     '8.2.1': ['2024-03-04', {
         'fix': {
             '2184': 'Directory for processed files not writable'}}],
