@@ -111,7 +111,7 @@ class ExportImportTest(TestBaseCase):
                     url_for('import_data', class_='place', project_id=p_id),
                     data={'file': file, 'duplicate': True},
                     follow_redirects=True)
-            assert b'ids already in database' in rv.data
+            assert b'IDs already in database' in rv.data
 
             with open(static_path / 'favicon.ico', 'rb') as file:
                 rv = self.app.post(
@@ -141,7 +141,7 @@ class ExportImportTest(TestBaseCase):
             assert b'invalid coordinates' in rv.data
             assert b'invalid reference system' in rv.data
             assert b'empty names' in rv.data
-            assert b'double ids in import' in rv.data
+            assert b'double IDs in import' in rv.data
 
             with open(test_path / 'invalid_3.csv', 'rb') as file:
                 rv = self.app.post(
