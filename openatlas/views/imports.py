@@ -1,4 +1,4 @@
-from collections import Counter
+from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any, Optional
 
@@ -7,7 +7,7 @@ import pandas as pd
 from flask import flash, g, render_template, request, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import FlaskForm
-from pandas import Series
+from pandas import DataFrame, Series
 from shapely import wkt
 from shapely.errors import WKTReadingError
 from werkzeug.utils import redirect, secure_filename
@@ -31,6 +31,21 @@ from openatlas.forms.field import SubmitField
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Import, Project
 
+_('invalid columns')
+_('possible duplicates')
+_('invalid administrative units')
+_('invalid reference system for class')
+_('invalid reference system')
+_('invalid match type')
+_('invalid type ids')
+_('invalid value type ids type ids')
+_('invalid value type values')
+_('invalid coordinates')
+_('empty names')
+_('missing name column')
+_('ids already in database')
+_('double ids in import')
+
 
 class ProjectForm(FlaskForm):
     project_id: Optional[int] = None
@@ -53,17 +68,17 @@ class ProjectForm(FlaskForm):
 
 
 class CheckHandler:
-    def __init__(self):
-        self.warning: dict[str, Any] = {}
-        self.error: dict[str, Any] = {}
+    def __init__(self) -> None:
+        self.warning: dict[Any, list[Any]] = defaultdict(list)
+        self.error: dict[Any, list[Any]] = defaultdict(list)
         self.messages: dict[str, list[str]] = {'error': [], 'warn': []}
 
     def set_warning(self, name: str, value: Optional[str] = None) -> None:
-        self.warning[name] = value or True
+        self.warning[name].append(value)
         self.generate_warning_messages()
 
     def set_error(self, name: str, value: Optional[str] = None) -> None:
-        self.error[name] = value or True
+        self.error[name].append(value)
         self.generate_error_messages()
 
     def add_warn_message(self, message: str) -> None:
@@ -80,45 +95,18 @@ class CheckHandler:
 
     def generate_warning_messages(self) -> None:
         self.clear_warning_messages()
-        if self.warning.get('invalid_columns'):
+        for key, value in self.warning.items():
             self.add_warn_message(
-                f"{_('invalid columns')}: {self.warning['invalid_columns']}")
-        if self.warning.get('possible_duplicates'):
-            self.add_warn_message(
-                f"{_('possible duplicates')}: "
-                f"{self.warning.get('possible_duplicates')}")
-        if self.warning.get('invalid_administrative_units'):
-            self.add_warn_message(
-                _('invalid administrative unit or historical place'))
-        if self.warning.get('invalid_reference_system_class'):
-            self.add_warn_message(_('invalid reference system for class'))
-        if self.warning.get('invalid_reference_system'):
-            self.add_warn_message(_('invalid reference system'))
-        if self.warning.get('invalid_match_type'):
-            self.add_warn_message(_('invalid match type'))
-        if self.warning.get('invalid_type_ids'):
-            self.add_warn_message(_('invalid type ids'))
-        if self.warning.get('invalid_value_type_ids'):
-            self.add_warn_message(_('invalid value type ids'))
-        if self.warning.get('invalid_value_type_values'):
-            self.add_warn_message(_('invalid value type values'))
-        if self.warning.get('invalid_geoms'):
-            self.add_warn_message(_('invalid coordinates'))
-        if self.warning.get('missing_name_count'):
-            self.add_warn_message(
-                f"{_('empty names')}: {self.warning['missing_name_count']}")
+                f"{_(key.replace('_', ' '))}: {', '.join(value)}")
 
     def generate_error_messages(self) -> None:
         self.clear_error_messages()
-        if self.error.get('ids_already_in_database'):
-            self.add_error_message(
-                f"{_('IDs already in database')}: "
-                f"{self.error['ids_already_in_database']}")
-        if self.error.get('double_ids'):
-            self.add_error_message(
-                f"{_('double IDs in import')}: {self.error['double_ids']}")
-        if self.error.get('missing_name_column'):
-            self.add_error_message(_('missing name column'))
+        for key, value in self.error.items():
+            if key == 'missing_name_column':
+                self.add_error_message(_('missing name column'))
+            else:
+                self.add_error_message(
+                    f"{_(key.replace('_', ' '))}: {', '.join(value)}")
         if self.messages['error']:
             raise ValueError()
 
@@ -338,7 +326,7 @@ def check_data_for_table_representation(
     names = []
     for _index, row in data_frame.iterrows():
         if not row.get('name'):
-            checks.set_warning('missing_name_count')
+            checks.set_warning('empty_names', row.get('id'))
             continue
         table_row = []
         checked_row = {}
@@ -358,7 +346,7 @@ def check_data_for_table_representation(
     doubles = [
         item for item, count in Counter(origin_ids).items() if count > 1]
     if doubles:
-        checks.set_error('double_ids', ', '.join(doubles))
+        checks.set_error('double_ids_in_import', ', '.join(doubles))
     existing = Import.get_origin_ids(project, origin_ids) \
         if origin_ids else None
     if existing:
@@ -367,11 +355,11 @@ def check_data_for_table_representation(
 
 
 def get_clean_header(
-        data_frame: Any,
+        data_frame: DataFrame,
         class_: str,
         messages: CheckHandler) -> list[str]:
     columns = get_allowed_columns(class_)
-    headers = list(data_frame.columns.values)
+    headers = data_frame.columns.to_list()
     if 'name' not in headers:
         messages.set_error('missing_name_column')
     for item in headers:
@@ -381,8 +369,8 @@ def get_clean_header(
             columns['invalid'].append(item)
             del data_frame[item]
     if columns['invalid']:
-        messages.set_warning('invalid_columns', ','.join(columns['invalid']))
-    return list(data_frame.columns.values)
+        messages.set_warning('invalid_columns', ', '.join(columns['invalid']))
+    return data_frame.columns.to_list()
 
 
 def get_allowed_columns(class_: str) -> dict[str, list[str]]:
@@ -409,6 +397,7 @@ def check_cell_value(
         class_: str,
         checks: CheckHandler) -> str:
     value = row[item]
+    id_ = row.get('id')
     match item:
         case 'type_ids':
             type_ids = []
@@ -418,7 +407,7 @@ def check_cell_value(
                 else:
                     type_ids.append(
                         f'<span class="error">{type_id}</span>')
-                    checks.set_warning('invalid_type_ids')
+                    checks.set_warning('invalid_type_ids', id_)
             value = ' '.join(type_ids)
         case 'value_type_ids':
             value_types = []
@@ -426,13 +415,13 @@ def check_cell_value(
                 values = value_type.split(';')
                 if not Import.check_type_id(values[0], class_):
                     values[0] = f'<span class="error">{values[0]}</span>'
-                    checks.set_warning('invalid_value_type_ids')
+                    checks.set_warning('invalid_value_type_ids', id_)
                 number = values[1][1:] if values[1].startswith('-') \
                     else values[1]
                 if (not number.isdigit() and
                         not number.replace('.', '', 1).isdigit()):
                     values[1] = f'<span class="error">{values[1]}</span>'
-                    checks.set_warning('invalid_value_type_values')
+                    checks.set_warning('invalid_value_type_values', id_)
                 value_types.append(';'.join(values))
             value = ' '.join(value_types)
         case 'wkt' if value:
@@ -441,10 +430,10 @@ def check_cell_value(
                 wkt_ = wkt.loads(row[item])
             except WKTReadingError:
                 value = f'<span class="error">{value}</span>'
-                checks.set_warning('invalid_geoms')
+                checks.set_warning('invalid_coordinates', id_)
             if wkt_ and wkt_.type not in ['Point', 'LineString', 'Polygon']:
                 value = f'<span class="error">{value}</span>'
-                checks.set_warning('invalid_geoms')
+                checks.set_warning('invalid_coordinates', id_)
         case 'begin_from' | 'begin_to' | 'end_from' | 'end_to':
             try:
                 value = datetime64_to_timestamp(
@@ -459,18 +448,18 @@ def check_cell_value(
                     g.types[g.types[int(value)].root[-1]].name not in [
                         'Administrative unit', 'Historical place']):
                 value = f'<span class="error">{value}</span>'
-                checks.set_warning('invalid_administrative_units')
+                checks.set_warning('invalid_administrative_units', id_)
         case _ if item.startswith('reference_system_') and value:
             item = item.replace('reference_system_', '')
             reference_system = get_reference_system_by_name(item)
             if not reference_system:
                 value = f'<span class="error">{value}</span>'
-                checks.set_warning('invalid_reference_system')
+                checks.set_warning('invalid_reference_system', id_)
             if reference_system and class_ not in reference_system.classes:
                 value = f'<span class="error">{value}</span>'
-                checks.set_warning('invalid_reference_system_class')
+                checks.set_warning('invalid_reference_system_class', id_)
             values = value.split(';')
             if values[1] not in get_match_types():
                 value = f'{values[0]};<span class="error">{values[1]}</span>'
-                checks.set_warning('invalid_match_type')
+                checks.set_warning('invalid_match_type', id_)
     return str(value)

@@ -109,7 +109,7 @@ class ExportImportTest(TestBaseCase):
                     url_for('import_data', class_='place', project_id=p_id),
                     data={'file': file, 'duplicate': True},
                     follow_redirects=True)
-            assert b'IDs already in database' in rv.data
+            assert b'ids already in database' in rv.data
 
             with open(static_path / 'favicon.ico', 'rb') as file:
                 rv = self.app.post(
@@ -132,14 +132,14 @@ class ExportImportTest(TestBaseCase):
                     data={'file': file},
                     follow_redirects=True)
             assert b'invalid columns: not_existing_column' in rv.data
-            assert b'invalid administrative unit or ' in rv.data
+            assert b'invalid administrative units' in rv.data
             assert b'invalid type ids' in rv.data
             assert b'invalid value type ids' in rv.data
             assert b'invalid value type values' in rv.data
             assert b'invalid coordinates' in rv.data
             assert b'invalid reference system' in rv.data
             assert b'empty names' in rv.data
-            assert b'double IDs in import' in rv.data
+            assert b'double ids in import' in rv.data
 
             with open(test_path / 'invalid_3.csv', 'rb') as file:
                 rv = self.app.post(
@@ -153,7 +153,7 @@ class ExportImportTest(TestBaseCase):
                     url_for('import_data', class_='source', project_id=p_id),
                     data={'file': file},
                     follow_redirects=True)
-            assert b'invalid reference system for class' in rv.data
+            assert b'invalid match type' in rv.data
 
             data_frame = pd.read_csv(
                 static_path / 'example.csv',
