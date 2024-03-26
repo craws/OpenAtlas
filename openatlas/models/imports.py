@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import Any, Optional
 
 from flask import g
@@ -74,6 +75,19 @@ class Import:
         if root_type.name in ['Administrative unit', 'Historical place']:
             return False
         return True
+
+    @staticmethod
+    def check_single_type_duplicates(type_ids: list[str]) -> list[str]:
+        single_types = defaultdict(list)
+        for type_id in type_ids:
+            if not g.types[int(type_id)].multiple:
+                single_types[g.types[
+                    g.types[int(type_id)].root[-1]].name].append(type_id)
+        single_type_ids = []
+        for value in single_types.values():
+            if len(value) > 1:
+                single_type_ids.extend(value)
+        return single_type_ids
 
     @staticmethod
     def import_data(project: Project, class_: str, data: list[Any]) -> None:

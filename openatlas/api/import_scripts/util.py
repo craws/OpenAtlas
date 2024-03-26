@@ -52,10 +52,6 @@ def get_match_types() -> dict[str, Type]:
     return match_dictionary
 
 
-def get_reference_system(name: str) -> Entity:  # pragma: no cover
-    return [i for i in g.reference_systems.values() if i.name == name][0]
-
-
 def vocabs_requests(
         id_: Optional[str] = '',
         endpoint: Optional[str] = '',

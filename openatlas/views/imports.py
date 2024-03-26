@@ -69,16 +69,16 @@ class ProjectForm(FlaskForm):
 
 class CheckHandler:
     def __init__(self) -> None:
-        self.warning: dict[Any, list[Any]] = defaultdict(list)
-        self.error: dict[Any, list[Any]] = defaultdict(list)
+        self.warning: dict[Any, set[Any]] = defaultdict(set)
+        self.error: dict[Any, set[Any]] = defaultdict(set)
         self.messages: dict[str, list[str]] = {'error': [], 'warn': []}
 
     def set_warning(self, name: str, value: Optional[str] = None) -> None:
-        self.warning[name].append(value)
+        self.warning[name].add(value)
         self.generate_warning_messages()
 
     def set_error(self, name: str, value: Optional[str] = None) -> None:
-        self.error[name].append(value)
+        self.error[name].add(value)
         self.generate_error_messages()
 
     def add_warn_message(self, message: str) -> None:
@@ -401,13 +401,20 @@ def check_cell_value(
     match item:
         case 'type_ids':
             type_ids = []
+            invalids_type_ids = []
             for type_id in str(value).split():
                 if Import.check_type_id(type_id, class_):
                     type_ids.append(type_id)
                 else:
-                    type_ids.append(
-                        f'<span class="error">{type_id}</span>')
+                    invalids_type_ids.append(type_id)
                     checks.set_warning('invalid_type_ids', id_)
+            for type_id in type_ids:
+                if type_id in Import.check_single_type_duplicates(type_ids):
+                    invalids_type_ids.append(type_id)
+                    checks.set_warning('single_type_duplicates', id_)
+            for i, type_id in enumerate(type_ids):
+                if type_id in invalids_type_ids:
+                    type_ids[i] = f'<span class="error">{type_id}</span>'
             value = ' '.join(type_ids)
         case 'value_type_ids':
             value_types = []

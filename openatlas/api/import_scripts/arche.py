@@ -5,7 +5,7 @@ from flask import g
 
 from openatlas import app
 from openatlas.api.import_scripts.util import (
-    get_exact_match, get_or_create_type, get_reference_system,
+    get_exact_match, get_or_create_type, get_reference_system_by_name,
     request_arche_metadata)
 from openatlas.database import reference_system as db
 from openatlas.models.entity import Entity
@@ -91,7 +91,7 @@ def import_arche_data() -> int:
     for entries in fetch_collection_data().values():
         name = entries['filename']
         artifact = Entity.insert('artifact', name)
-        get_reference_system('ARCHE').link(
+        get_reference_system_by_name('ARCHE').link(
             'P67',
             artifact,
             entries['collection_id'],

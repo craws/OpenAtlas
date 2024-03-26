@@ -21,6 +21,8 @@ class ExportImportTest(TestBaseCase):
                     match entity.name:
                         case 'Boundary Mark':
                             boundary_mark = entity
+                        case 'Infrastructure':
+                            infrastructure = entity
                         case 'Austria':
                             austria = entity
                         case 'Height':
@@ -163,7 +165,8 @@ class ExportImportTest(TestBaseCase):
             data_frame.at[2, 'id'] = 'new_place_3'
             data_frame.at[0, 'administrative_unit'] = austria.id
             data_frame.at[0, 'historical_place'] = carantania.id
-            type_ids_list = [boundary_mark.id, austria.id, place_type.id]
+            type_ids_list = [
+                boundary_mark.id, infrastructure.id, austria.id, place_type.id]
             data_frame.at[0, 'type_ids'] = ' '.join(map(str, type_ids_list))
             data_frame.at[0, 'value_type_ids'] = f'{height.id};42'
             data_frame.at[0, 'wkt'] = "POLYGON((16.1203 BLA, 16.606275))"
@@ -173,6 +176,7 @@ class ExportImportTest(TestBaseCase):
                     url_for('import_data', class_='place', project_id=p_id),
                     data={'file': file, 'duplicate': True},
                     follow_redirects=True)
+            assert b'single type duplicates' in rv.data
             assert b'Vienna' in rv.data
 
             (test_path / 'example.csv').unlink()
