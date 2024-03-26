@@ -26,6 +26,7 @@ Can be linked via tabs to
 -------------------------
 * :doc:`source` - when it is referenced there
 * :doc:`event` - acquisition, modification, move or production
+* **Artifact** - here sub artifacts or :doc:`human_remains` can be added
 * :doc:`reference`
 * :doc:`file`
 
