@@ -238,12 +238,22 @@ class BaseManager:
 
 class ActorBaseManager(BaseManager):
     fields = ['name', 'alias', 'date', 'description', 'continue']
+    _('begins in')
+    _('ends in')
 
     def additional_fields(self) -> dict[str, Any]:
+
+        places = Entity.get_by_class('place', types=True, aliases=self.aliases)
         return {
-            'residence': TableField(_('residence'), add_dynamic=['place']),
-            'begins_in': TableField(_('begins in'), add_dynamic=['place']),
-            'ends_in': TableField(_('ends in'), add_dynamic=['place'])}
+            'residence': TableField(
+                table('residence', 'place', places),
+                add_dynamic=['place']),
+            'begins_in': TableField(
+                table('begins in', 'place', places),
+                add_dynamic=['place']),
+            'ends_in': TableField(
+                table('begins in', 'place', places),
+                add_dynamic=['place'])}
 
     def populate_insert(self) -> None:
         self.form.alias.append_entry('')
@@ -334,7 +344,10 @@ class ArtifactBaseManager(PlaceBaseManager):
         return {
             'owned_by':
                 TableField(
-                    table('owned_by', 'actor', Entity.get_by_view('actor')),
+                    table(
+                        'owned_by',
+                        'actor',
+                        Entity.get_by_view('actor', aliases=self.aliases)),
                     owner,
                     add_dynamic=['person', 'group'])}
 

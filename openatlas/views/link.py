@@ -2,28 +2,18 @@ import ast
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
-from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import StringField
-from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.util import required_group
 from openatlas.forms.display import display_form
-from openatlas.forms.field import SubmitField, TableField
 from openatlas.forms.form import (
     get_add_reference_form, get_manager, get_table_form)
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.search import get_subunits_without_super
-
-
-class AddReferenceForm(FlaskForm):
-    reference = TableField(_('reference'), [InputRequired()])
-    page = StringField(_('page'))
-    save = SubmitField(_('insert'))
 
 
 @app.route('/link/delete/<int:id_>/<int:origin_id>', methods=['GET', 'POST'])
@@ -150,7 +140,7 @@ def insert_relation(type_: str, origin_id: int) -> str | Response:
 
 def reference_link_update(link_: Link, origin: Entity) -> str | Response:
     origin = Entity.get_by_id(origin.id)
-    form = AddReferenceForm()
+    form = get_add_reference_form('reference')
     del form.reference
     if form.validate_on_submit():
         link_.description = form.page.data
@@ -271,7 +261,7 @@ def entity_add_source(id_: int) -> str | Response:
 @required_group('contributor')
 def entity_add_reference(id_: int) -> str | Response:
     entity = Entity.get_by_id(id_)
-    form = AddReferenceForm()
+    form = get_add_reference_form('reference')
     if form.validate_on_submit():
         entity.link_string(
             'P67',

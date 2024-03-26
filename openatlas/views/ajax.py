@@ -3,14 +3,15 @@ from typing import Optional
 
 from flask import Response, abort, g, jsonify, request
 from flask_babel import lazy_gettext as _
+from flask_login import current_user
 
 from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.util import required_group
 from openatlas.display.util2 import uc_first
-from openatlas.forms.base_manager import BaseManager
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
+from openatlas.forms.util import table
 from openatlas.models.user import User
 
 
@@ -80,6 +81,12 @@ def ajax_create_entity() -> str:
 @app.route('/ajax/get_entity_table/<string:content_domain>', methods=['POST'])
 @required_group('readonly')
 def ajax_get_entity_table(content_domain: str) -> str:
-    filter_ids = json.loads(request.form['filterIds']) or []
-    table = BaseManager.get_table_content(content_domain, None, filter_ids)
-    return table.display(content_domain)
+    table_ = table(
+        content_domain,
+        content_domain,
+        Entity.get_by_class(
+            content_domain,
+            True,
+            current_user.settings['table_show_aliases']),
+        json.loads(request.form['filterIds']) or [])
+    return table_.display(content_domain)

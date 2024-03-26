@@ -4,6 +4,7 @@ from typing import Any, Optional, TYPE_CHECKING
 
 from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
+from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import HiddenField, SelectMultipleField, StringField, widgets
 from wtforms.fields.simple import TextAreaField
@@ -53,7 +54,12 @@ def get_add_reference_form(class_: str) -> Any:
         Form,
         class_,
         TableMultiField(
-            table_multi(class_, Entity.get_by_view(class_)),
+            table_multi(
+                class_,
+                Entity.get_by_view(
+                    class_,
+                    True,
+                    current_user.settings['table_show_aliases'])),
             validators=[InputRequired()]))
     setattr(Form, 'page', StringField(_('page')))
     setattr(Form, 'save', SubmitField(_('insert')))
