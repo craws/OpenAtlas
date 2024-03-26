@@ -91,11 +91,12 @@ def import_arche_data() -> int:
     for entries in fetch_collection_data().values():
         name = entries['filename']
         artifact = Entity.insert('artifact', name)
-        get_reference_system_by_name('ARCHE').link(
-            'P67',
-            artifact,
-            entries['collection_id'],
-            type_id=get_exact_match().id)
+        if ref := get_reference_system_by_name('ARCHE'):
+            ref.link(
+                'P67',
+                artifact,
+                entries['collection_id'],
+                type_id=get_exact_match().id)
         artifact.link(
             'P53',
             Entity.insert('object_location', f"Location of {name}"))

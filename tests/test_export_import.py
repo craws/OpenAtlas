@@ -149,6 +149,8 @@ class ExportImportTest(TestBaseCase):
                     data={'file': file},
                     follow_redirects=True)
             assert b'invalid coordinates' in rv.data
+            assert b'invalid value types' in rv.data
+            assert b'invalid reference system value' in rv.data
 
             with open(test_path / 'invalid_3.csv', 'rb') as file:
                 rv = self.app.post(
@@ -168,7 +170,7 @@ class ExportImportTest(TestBaseCase):
             type_ids_list = [
                 boundary_mark.id, infrastructure.id, austria.id, place_type.id]
             data_frame.at[0, 'type_ids'] = ' '.join(map(str, type_ids_list))
-            data_frame.at[0, 'value_type_ids'] = f'{height.id};42'
+            data_frame.at[0, 'value_types'] = f'{height.id};42'
             data_frame.at[0, 'wkt'] = "POLYGON((16.1203 BLA, 16.606275))"
             data_frame.to_csv(test_path / 'example.csv', index=False)
             with open(test_path / 'example.csv', 'rb') as file:

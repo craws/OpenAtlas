@@ -36,9 +36,12 @@ _('possible duplicates')
 _('invalid administrative units')
 _('invalid reference system for class')
 _('invalid reference system')
+_('invalid reference system value')
 _('invalid match type')
 _('invalid type ids')
-_('invalid value type ids type ids')
+_('single type duplicates')
+_('invalid value types')
+_('invalid value type ids')
 _('invalid value type values')
 _('invalid coordinates')
 _('empty names')
@@ -374,7 +377,7 @@ def get_clean_header(
 
 
 def get_allowed_columns(class_: str) -> dict[str, list[str]]:
-    columns = ['name', 'id', 'description', 'type_ids', 'value_type_ids']
+    columns = ['name', 'id', 'description', 'type_ids', 'value_types']
     if class_ not in g.view_class_mapping['reference']:
         columns.extend([
             'begin_from', 'begin_to', 'begin_comment',
@@ -416,10 +419,15 @@ def check_cell_value(
                 if type_id in invalids_type_ids:
                     type_ids[i] = f'<span class="error">{type_id}</span>'
             value = ' '.join(type_ids)
-        case 'value_type_ids':
+        case 'value_types':
             value_types = []
             for value_type in str(value).split():
-                values = value_type.split(';')
+                values = str(value_type).split(';')
+                if len(values) != 2 or not values[1]:
+                    value_types.append(
+                        f'<span class="error">{value_type}</span>')
+                    checks.set_warning('invalid_value_types', id_)
+                    continue
                 if not Import.check_type_id(values[0], class_):
                     values[0] = f'<span class="error">{values[0]}</span>'
                     checks.set_warning('invalid_value_type_ids', id_)
@@ -451,7 +459,7 @@ def check_cell_value(
                 value = '' if str(value) == 'NaT' else \
                     f'<span class="error">{value}</span>'
         case 'administrative_unit' | 'historical_place' if value:
-            if ((not value.isdigit() or int(value) not in g.types) or
+            if ((not str(value).isdigit() or int(value) not in g.types) or
                     g.types[g.types[int(value)].root[-1]].name not in [
                         'Administrative unit', 'Historical place']):
                 value = f'<span class="error">{value}</span>'
@@ -465,8 +473,15 @@ def check_cell_value(
             if reference_system and class_ not in reference_system.classes:
                 value = f'<span class="error">{value}</span>'
                 checks.set_warning('invalid_reference_system_class', id_)
-            values = value.split(';')
-            if values[1] not in get_match_types():
-                value = f'{values[0]};<span class="error">{values[1]}</span>'
+            values = str(value).split(';')
+            if len(values) != 2:
+                value = f'<span class="error">{value}</span>'
+                checks.set_warning('invalid_reference_system_value', id_)
+            elif values[1] not in get_match_types():
+                if values[1]:
+                    value = (
+                        f'{values[0]};<span class="error">{values[1]}</span>')
+                else:
+                    value = f'<span class="error">{value}</span>'
                 checks.set_warning('invalid_match_type', id_)
     return str(value)

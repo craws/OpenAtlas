@@ -118,7 +118,8 @@ class Import:
                         continue
                     entity.link('P2', g.types[int(type_id)])
 
-            if data := row.get('value_type_ids'):
+            # Value types
+            if data := row.get('value_types'):
                 for value_types in str(data).split():
                     value_type = value_types.split(';')
                     number = value_type[1][1:] \
@@ -163,12 +164,12 @@ class Import:
                 entity.link('P53', location)
 
                 if data := row.get('administrative_unit'):
-                    if ((data.isdigit() and int(data) in g.types) and
+                    if ((str(data).isdigit() and int(data) in g.types) and
                             g.types[g.types[int(data)].root[-1]].name in [
                                 'Administrative unit']):
                         location.link('P89', g.types[int(data)])
                 if data := row.get('historical_place'):
-                    if ((data.isdigit() and int(data) in g.types) and
+                    if ((str(data).isdigit() and int(data) in g.types) and
                             g.types[g.types[int(data)].root[-1]].name in [
                                 'Historical place']):
                         location.link('P89', g.types[int(data)])
