@@ -28,6 +28,8 @@ Form fields
 Can be linked via tabs to
 -------------------------
 * :doc:`source` - when it is referenced there
+* :doc:`event` - acquisition, modification, move or production
+* :doc:`artifact` - here sub artifacts or human remains can be added
 * :doc:`reference`
 * :doc:`file`
 
