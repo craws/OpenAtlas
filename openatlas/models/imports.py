@@ -92,6 +92,11 @@ class Import:
     @staticmethod
     def import_data(project: Project, class_: str, data: list[Any]) -> None:
         for row in data:
+            if value := row.get('openatlas_class'):
+                if (value.lower().replace(' ', '_') in
+                        (g.view_class_mapping['place'] +
+                         g.view_class_mapping['artifact'])):
+                    class_ = value.lower().replace(' ', '_')
             entity = Entity.insert(
                 class_,
                 row['name'],
