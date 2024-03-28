@@ -362,8 +362,33 @@ def check_data_for_table_representation(
         if parent_id := row.get('parent_id'):
             if parent_id not in origin_ids:
                 checks.set_error('invalid parent id', row.get('id'))
-
+            if not check_parent(row, checked_data):
+                checks.set_error('invalid parent class', row.get('id'))
     return Table(headers, rows=table_data)
+
+
+def check_parent(
+        entry: dict[str, Any],
+        checked_data: list[Any]) -> bool:
+    entity_dict = {}
+    for row in checked_data:
+        entity_dict[row.get('id')] = row
+    parent_class = entity_dict[entry.get('parent_id')].get(
+        'openatlas_class').lower().replace(' ', '_')
+    match entry.get('openatlas_class').lower().replace(' ', '_'):
+        case 'feature':
+            if parent_class == 'place':
+                return True
+        case 'stratigraphic_unit':
+            if parent_class == 'feature':
+                return True
+        case ('artifact' | 'human_remains'):
+            if (parent_class in
+                    g.view_class_mapping['place']
+                    + g.view_class_mapping['artifact']):
+                return True
+        case _:
+            return False
 
 
 def get_clean_header(
@@ -466,7 +491,7 @@ def check_cell_value(
                 row[item] = value
             except ValueError:
                 row[item] = ''
-                value = '' if str(value) == 'NaT' else error_span( value)
+                value = '' if str(value) == 'NaT' else error_span(value)
         case 'administrative_unit' | 'historical_place' if value:
             if ((not str(value).isdigit() or int(value) not in g.types) or
                     g.types[g.types[int(value)].root[-1]].name not in [
