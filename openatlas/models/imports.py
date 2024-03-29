@@ -193,6 +193,7 @@ class Import:
                         location=location,
                         project=project,
                         wkt_=wkt_)
+
         for entry in entities.values():
             if entry['parent_id']:
                 entities[entry['parent_id']]['entity'].link(

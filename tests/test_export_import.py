@@ -151,13 +151,34 @@ class ExportImportTest(TestBaseCase):
             assert b'invalid coordinates' in rv.data
             assert b'invalid value types' in rv.data
             assert b'invalid reference system value' in rv.data
+            assert b'invalid match type' in rv.data
+            assert b'invalid openatlas class' in rv.data
+            assert b'invalid parent class' in rv.data
+            assert b'empty ids' in rv.data
 
-            with open(test_path / 'invalid_3.csv', 'rb') as file:
+            data_frame = pd.read_csv(
+                test_path / 'invalid_3.csv',
+                keep_default_na=False)
+            data_frame.at[0, 'openatlas_class'] = 'place'
+            data_frame.to_csv(test_path / 'invalid_3_modified.csv', index=False)
+            with open(test_path / 'invalid_3_modified.csv', 'rb') as file:
                 rv = self.app.post(
-                    url_for('import_data', class_='source', project_id=p_id),
+                    url_for('import_data', class_='place', project_id=p_id),
                     data={'file': file},
                     follow_redirects=True)
-            assert b'invalid match type' in rv.data
+            assert b'invalid parent class' in rv.data
+
+            data_frame.at[4, 'parent_id'] = 'strati_1'
+            data_frame.at[4, 'openatlas_class'] = 'human remains'
+            data_frame.to_csv(test_path / 'invalid_3_modified.csv', index=False)
+            with open(test_path / 'invalid_3_modified.csv', 'rb') as file:
+                rv = self.app.post(
+                    url_for('import_data', class_='place', project_id=p_id),
+                    data={'file': file},
+                    follow_redirects=True)
+            assert b'invalid parent id' in rv.data
+
+            (test_path / 'invalid_3_modified.csv').unlink()
 
             data_frame = pd.read_csv(
                 static_path / 'example.csv',
@@ -182,6 +203,14 @@ class ExportImportTest(TestBaseCase):
             assert b'Vienna' in rv.data
 
             (test_path / 'example.csv').unlink()
+
+            with open(
+                    static_path / 'example_place_hierarchy.csv', 'rb') as file:
+                rv = self.app.post(
+                    url_for('import_data', class_='place', project_id=p_id),
+                    data={'file': file, 'duplicate': True},
+                    follow_redirects=True)
+                assert b'Bone' in rv.data
 
             rv = self.app.get(url_for('import_project_view', id_=p_id))
             assert b'London' in rv.data

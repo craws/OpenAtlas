@@ -34,7 +34,7 @@ from openatlas.models.imports import Import, Project
 _('invalid columns')
 _('possible duplicates')
 _('invalid administrative units')
-_('invalid reference system for class')
+_('invalid reference system class')
 _('invalid reference system')
 _('invalid reference system value')
 _('invalid match type')
@@ -44,8 +44,9 @@ _('invalid value types')
 _('invalid value type ids')
 _('invalid value type values')
 _('invalid coordinates')
-_('invalid_openatlas_class')
+_('invalid openatlas class')
 _('empty names')
+_('empty ids')
 _('missing name column')
 _('ids already in database')
 _('double ids in import')
@@ -100,8 +101,8 @@ class CheckHandler:
     def generate_warning_messages(self) -> None:
         self.clear_warning_messages()
         for key, value in self.warning.items():
-            self.add_warn_message(
-                f"{_(key.replace('_', ' '))}: {', '.join(value)}")
+            row_ids = f": {', '.join(value)}" if None not in value else None
+            self.add_warn_message(_(key.replace('_', ' ')) + f"{row_ids}")
 
     def generate_error_messages(self) -> None:
         self.clear_error_messages()
@@ -330,7 +331,7 @@ def check_data_for_table_representation(
     names = []
     for _index, row in data_frame.iterrows():
         if not row.get('id'):
-            checks.set_warning('empty_id')
+            checks.set_warning('empty_ids')
             continue
         if not row.get('name'):
             checks.set_warning('empty_names', row.get('id'))
@@ -373,23 +374,25 @@ def check_parent(
     entity_dict = {}
     for row in checked_data:
         entity_dict[row.get('id')] = row
-    parent_class = entity_dict[entry.get('parent_id')].get(
-        'openatlas_class').lower().replace(' ', '_')
-    match entry.get('openatlas_class').lower().replace(' ', '_'):
+    parent_class = entity_dict[entry.get('parent_id')][
+        'openatlas_class'].lower().replace(' ', '_')
+    match entry['openatlas_class'].lower().replace(' ', '_'):
         case 'feature':
             if parent_class == 'place':
                 return True
         case 'stratigraphic_unit':
             if parent_class == 'feature':
                 return True
-        case ('artifact' | 'human_remains'):
+        case 'artifact':
+            if parent_class in g.view_class_mapping['place'] + ['artifact']:
+                return True
+        case 'human_remains':
             if (parent_class in
-                    g.view_class_mapping['place']
-                    + g.view_class_mapping['artifact']):
+                    g.view_class_mapping['place'] + ['human_remains']):
                 return True
         case _:
             return False
-
+    return False  # pragma: no cover
 
 def get_clean_header(
         data_frame: DataFrame,
