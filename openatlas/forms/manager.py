@@ -199,7 +199,7 @@ class CreationManager(EventBaseManager):
             selection = self.origin \
                 if self.origin and self.origin.class_.name == 'file' else None
         else:
-            selection = [e for e in self.entity.get_linked_entities('P94')]
+            selection = self.entity.get_linked_entities('P94')
         fields = super().additional_fields()
         fields['document'] = TableMultiField(
             table_multi('file', Entity.get_by_class('file')),
