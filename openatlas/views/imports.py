@@ -1,4 +1,4 @@
-import collections
+from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any, Optional
 
@@ -7,12 +7,17 @@ import pandas as pd
 from flask import flash, g, render_template, request, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import FlaskForm
+from pandas import DataFrame, Series
+from shapely import wkt
+from shapely.errors import WKTReadingError
 from werkzeug.utils import redirect, secure_filename
 from werkzeug.wrappers import Response
 from wtforms import (
     BooleanField, FileField, StringField, TextAreaField, validators)
 
 from openatlas import app
+from openatlas.api.import_scripts.util import (
+    get_match_types, get_reference_system_by_name)
 from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
@@ -24,7 +29,25 @@ from openatlas.display.util2 import (
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
 from openatlas.models.entity import Entity
-from openatlas.models.imports import Import, is_float
+from openatlas.models.imports import Import, Project
+
+_('invalid columns')
+_('possible duplicates')
+_('invalid administrative units')
+_('invalid reference system for class')
+_('invalid reference system')
+_('invalid reference system value')
+_('invalid match type')
+_('invalid type ids')
+_('single type duplicates')
+_('invalid value types')
+_('invalid value type ids')
+_('invalid value type values')
+_('invalid coordinates')
+_('empty names')
+_('missing name column')
+_('ids already in database')
+_('double ids in import')
 
 
 class ProjectForm(FlaskForm):
@@ -45,6 +68,50 @@ class ProjectForm(FlaskForm):
             self.name.errors.append(_('error name exists'))
             valid = False
         return valid
+
+
+class CheckHandler:
+    def __init__(self) -> None:
+        self.warning: dict[Any, set[Any]] = defaultdict(set)
+        self.error: dict[Any, set[Any]] = defaultdict(set)
+        self.messages: dict[str, list[str]] = {'error': [], 'warn': []}
+
+    def set_warning(self, name: str, value: Optional[str] = None) -> None:
+        self.warning[name].add(value)
+        self.generate_warning_messages()
+
+    def set_error(self, name: str, value: Optional[str] = None) -> None:
+        self.error[name].add(value)
+        self.generate_error_messages()
+
+    def add_warn_message(self, message: str) -> None:
+        self.messages['warn'].append(message)
+
+    def add_error_message(self, message: str) -> None:
+        self.messages['error'].append(message)
+
+    def clear_warning_messages(self) -> None:
+        self.messages['warn'].clear()
+
+    def clear_error_messages(self) -> None:
+        self.messages['error'].clear()
+
+    def generate_warning_messages(self) -> None:
+        self.clear_warning_messages()
+        for key, value in self.warning.items():
+            self.add_warn_message(
+                f"{_(key.replace('_', ' '))}: {', '.join(value)}")
+
+    def generate_error_messages(self) -> None:
+        self.clear_error_messages()
+        for key, value in self.error.items():
+            if key == 'missing_name_column':
+                self.add_error_message(_('missing name column'))
+            else:
+                self.add_error_message(
+                    f"{_(key.replace('_', ' '))}: {', '.join(value)}")
+        if self.messages['error']:
+            raise ValueError()
 
 
 @app.route('/import/index')
@@ -102,8 +169,9 @@ def import_project_view(id_: int) -> str:
                 _('delete'),
                 url_for('import_project_delete', id_=project.id),
                 onclick="return confirm('" +
-                _('delete %(name)s?', name=project.name.replace("'", "")) +
-                "')")])
+                        _('delete %(name)s?',
+                          name=project.name.replace("'", "")) +
+                        "')")])
         content += '<p>' + uc_first(_('new import')) + ':</p>'
         buttons = []
         for class_ in \
@@ -178,7 +246,7 @@ class ImportForm(FlaskForm):
 
     def validate(self, extra_validators: validators = None) -> bool:
         valid = FlaskForm.validate(self)
-        if Path(str(request.files['file'].filename)) .suffix.lower() != '.csv':
+        if Path(str(request.files['file'].filename)).suffix.lower() != '.csv':
             self.file.errors.append(_('file type not allowed'))
             valid = False
         return valid
@@ -191,126 +259,25 @@ def import_data(project_id: int, class_: str) -> str:
     form = ImportForm()
     table = None
     imported = False
-    messages: dict[str, list[str]] = {'error': [], 'warn': []}
     file_data = get_backup_file_data()
     class_label = g.classes[class_].label
+    checks = CheckHandler()
     if form.validate_on_submit():
-        file_ = request.files['file']
-        file_path = \
-            app.config['TMP_PATH'] / secure_filename(str(file_.filename))
-        columns: dict[str, list[str]] = {
-            'allowed': ['name', 'id', 'description'],
-            'valid': [],
-            'invalid': []}
-        if class_ not in g.view_class_mapping['reference']:
-            columns['allowed'].extend([
-                'begin_from', 'begin_to', 'begin_comment',
-                'end_from', 'end_to', 'end_comment'])
-        columns['allowed'].append('type_ids')
-        if class_ in ['place', 'artifact']:
-            columns['allowed'] += ['easting', 'northing']
         try:
-            file_.save(str(file_path))
-            data_frame = pd.read_csv(file_path, keep_default_na=False)
-            headers = list(data_frame.columns.values)
-            if 'name' not in headers:
-                messages['error'].append(_('missing name column'))
-                raise ValueError()
-            for item in headers:
-                if item not in columns['allowed']:
-                    columns['invalid'].append(item)
-                    del data_frame[item]
-            if columns['invalid']:
-                messages['warn'].append(
-                    f"{_('invalid columns')}: {','.join(columns['invalid'])}")
-            headers = list(data_frame.columns.values)  # Get clean headers
-            table_data = []
-            checked_data = []
-            origin_ids = []
-            names = []
-            missing_name_count = 0
-            invalid_type_ids = False
-            invalid_geoms = False
-            for _index, row in data_frame.iterrows():
-                if not row['name']:
-                    missing_name_count += 1
-                    continue
-                table_row = []
-                checked_row = {}
-                for item in headers:
-                    value = row[item]
-                    if item == 'type_ids':
-                        type_ids = []
-                        for type_id in str(value).split():
-                            if Import.check_type_id(type_id, class_):
-                                type_ids.append(type_id)  # pragma: no cover
-                            else:
-                                type_ids.append(
-                                    f'<span class="error">{type_id}</span>')
-                                invalid_type_ids = True
-                        value = ' '.join(type_ids)
-                    if item in ['northing', 'easting'] \
-                            and row[item] \
-                            and not is_float(row[item]):
-                        value = f'<span class="error">{value}</span>'
-                        invalid_geoms = True
-                    if item in [
-                            'begin_from',
-                            'begin_to',
-                            'end_from',
-                            'end_to']:
-                        if not value:
-                            value = ''
-                        else:
-                            try:
-                                value = datetime64_to_timestamp(
-                                    numpy.datetime64(value))
-                                row[item] = value
-                            except ValueError:
-                                row[item] = ''
-                                value = '' if str(value) == 'NaT' else \
-                                    f'<span class="error">{value}</span>'
-                    table_row.append(str(value))
-                    checked_row[item] = row[item]
-                    if item == 'name' and form.duplicate.data:
-                        names.append(row['name'].lower())
-                    if item == 'id' and row[item]:
-                        origin_ids.append(str(row['id']))
-                table_data.append(table_row)
-                checked_data.append(checked_row)
-            if invalid_type_ids:
-                messages['warn'].append(_('invalid type ids'))
-            if invalid_geoms:
-                messages['warn'].append(_('invalid coordinates'))
-            table = Table(headers, rows=table_data)
-            if missing_name_count:
-                messages['warn'].append(
-                    f"{_('empty names')}: {missing_name_count}")
-            doubles = [
-                item for item, count in collections.Counter(origin_ids).items()
-                if count > 1]
-            if doubles:
-                messages['error'].append(
-                    f"{_('double IDs in import')}: {', '.join(doubles)}")
-            existing = Import.get_origin_ids(project, origin_ids) \
-                if origin_ids else None
-            if existing:
-                messages['error'].append(
-                    f"{_('IDs already in database')}: {', '.join(existing)}")
-            if form.duplicate.data:  # Check for possible duplicates
-                duplicates = Import.check_duplicates(class_, names)
-                if duplicates:
-                    messages['warn'].append(
-                        f"{_('possible duplicates')}: {', '.join(duplicates)}")
-            if messages['error']:
-                raise ValueError()
+            checked_data: list[Any] = []
+            table = check_data_for_table_representation(
+                form,
+                class_,
+                checks,
+                checked_data,
+                project)
         except Exception as e:
             g.logger.log('error', 'import', 'import check failed', e)
             flash(_('error at import'), 'error')
             return render_template(
                 'import_data.html',
                 form=form,
-                messages=messages,
+                messages=checks.messages,
                 file_data=file_data,
                 title=_('import'),
                 crumbs=[
@@ -338,9 +305,183 @@ def import_data(project_id: int, class_: str) -> str:
         file_data=file_data,
         table=table,
         imported=imported,
-        messages=messages,
+        messages=checks.messages,
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
             [_('import'), url_for('import_index')],
             project,
             class_label])
+
+
+def check_data_for_table_representation(
+        form: ImportForm,
+        class_: str,
+        checks: CheckHandler,
+        checked_data: list[Any],
+        project: Project) -> Table:
+    file_ = request.files['file']
+    file_path = app.config['TMP_PATH'] / secure_filename(str(file_.filename))
+    file_.save(str(file_path))
+    data_frame = pd.read_csv(file_path, keep_default_na=False)
+    headers = get_clean_header(data_frame, class_, checks)
+    table_data = []
+    origin_ids = []
+    names = []
+    for _index, row in data_frame.iterrows():
+        if not row.get('name'):
+            checks.set_warning('empty_names', row.get('id'))
+            continue
+        table_row = []
+        checked_row = {}
+        for item in headers:
+            table_row.append(check_cell_value(row, item, class_, checks))
+            checked_row[item] = row[item]
+            if item == 'name' and form.duplicate.data:
+                names.append(row['name'].lower())
+            if item == 'id' and row[item]:
+                origin_ids.append(str(row['id']))
+        table_data.append(table_row)
+        checked_data.append(checked_row)
+    if form.duplicate.data:  # Check for possible duplicates
+        duplicates = Import.check_duplicates(class_, names)
+        if duplicates:
+            checks.set_warning('possible_duplicates', ', '.join(duplicates))
+    doubles = [
+        item for item, count in Counter(origin_ids).items() if count > 1]
+    if doubles:
+        checks.set_error('double_ids_in_import', ', '.join(doubles))
+    existing = Import.get_origin_ids(project, origin_ids) \
+        if origin_ids else None
+    if existing:
+        checks.set_error('ids_already_in_database', ', '.join(existing))
+    return Table(headers, rows=table_data)
+
+
+def get_clean_header(
+        data_frame: DataFrame,
+        class_: str,
+        messages: CheckHandler) -> list[str]:
+    columns = get_allowed_columns(class_)
+    headers = data_frame.columns.to_list()
+    if 'name' not in headers:
+        messages.set_error('missing_name_column')
+    for item in headers:
+        if item.startswith('reference_system_'):
+            columns['allowed'].append(item)
+        if item not in columns['allowed']:
+            columns['invalid'].append(item)
+            del data_frame[item]
+    if columns['invalid']:
+        messages.set_warning('invalid_columns', ', '.join(columns['invalid']))
+    return data_frame.columns.to_list()
+
+
+def get_allowed_columns(class_: str) -> dict[str, list[str]]:
+    columns = ['name', 'id', 'description', 'type_ids', 'value_types']
+    if class_ not in g.view_class_mapping['reference']:
+        columns.extend([
+            'begin_from', 'begin_to', 'begin_comment',
+            'end_from', 'end_to', 'end_comment'])
+    if class_ in ['place', 'person', 'group']:
+        columns.append('alias')
+    if class_ in ['place', 'artifact']:
+        columns.append('wkt')
+    if class_ in ['place']:
+        columns.extend(['administrative_unit', 'historical_place'])
+    return {
+        'allowed': columns,
+        'valid': [],
+        'invalid': []}
+
+
+def check_cell_value(
+        row: Series,
+        item: str,
+        class_: str,
+        checks: CheckHandler) -> str:
+    value = row[item]
+    id_ = row.get('id')
+    match item:
+        case 'type_ids':
+            type_ids = []
+            invalids_type_ids = []
+            for type_id in str(value).split():
+                if Import.check_type_id(type_id, class_):
+                    type_ids.append(type_id)
+                else:
+                    invalids_type_ids.append(type_id)
+                    checks.set_warning('invalid_type_ids', id_)
+            for type_id in type_ids:
+                if type_id in Import.check_single_type_duplicates(type_ids):
+                    invalids_type_ids.append(type_id)
+                    checks.set_warning('single_type_duplicates', id_)
+            for i, type_id in enumerate(type_ids):
+                if type_id in invalids_type_ids:
+                    type_ids[i] = f'<span class="error">{type_id}</span>'
+            value = ' '.join(type_ids)
+        case 'value_types':
+            value_types = []
+            for value_type in str(value).split():
+                values = str(value_type).split(';')
+                if len(values) != 2 or not values[1]:
+                    value_types.append(
+                        f'<span class="error">{value_type}</span>')
+                    checks.set_warning('invalid_value_types', id_)
+                    continue
+                if not Import.check_type_id(values[0], class_):
+                    values[0] = f'<span class="error">{values[0]}</span>'
+                    checks.set_warning('invalid_value_type_ids', id_)
+                number = values[1][1:] if values[1].startswith('-') \
+                    else values[1]
+                if (not number.isdigit() and
+                        not number.replace('.', '', 1).isdigit()):
+                    values[1] = f'<span class="error">{values[1]}</span>'
+                    checks.set_warning('invalid_value_type_values', id_)
+                value_types.append(';'.join(values))
+            value = ' '.join(value_types)
+        case 'wkt' if value:
+            wkt_ = None
+            try:
+                wkt_ = wkt.loads(row[item])
+            except WKTReadingError:
+                value = f'<span class="error">{value}</span>'
+                checks.set_warning('invalid_coordinates', id_)
+            if wkt_ and wkt_.type not in ['Point', 'LineString', 'Polygon']:
+                value = f'<span class="error">{value}</span>'
+                checks.set_warning('invalid_coordinates', id_)
+        case 'begin_from' | 'begin_to' | 'end_from' | 'end_to':
+            try:
+                value = datetime64_to_timestamp(
+                    numpy.datetime64(value))
+                row[item] = value
+            except ValueError:
+                row[item] = ''
+                value = '' if str(value) == 'NaT' else \
+                    f'<span class="error">{value}</span>'
+        case 'administrative_unit' | 'historical_place' if value:
+            if ((not str(value).isdigit() or int(value) not in g.types) or
+                    g.types[g.types[int(value)].root[-1]].name not in [
+                        'Administrative unit', 'Historical place']):
+                value = f'<span class="error">{value}</span>'
+                checks.set_warning('invalid_administrative_units', id_)
+        case _ if item.startswith('reference_system_') and value:
+            item = item.replace('reference_system_', '')
+            reference_system = get_reference_system_by_name(item)
+            if not reference_system:
+                value = f'<span class="error">{value}</span>'
+                checks.set_warning('invalid_reference_system', id_)
+            if reference_system and class_ not in reference_system.classes:
+                value = f'<span class="error">{value}</span>'
+                checks.set_warning('invalid_reference_system_class', id_)
+            values = str(value).split(';')
+            if len(values) != 2:
+                value = f'<span class="error">{value}</span>'
+                checks.set_warning('invalid_reference_system_value', id_)
+            elif values[1] not in get_match_types():
+                if values[1]:
+                    value = (
+                        f'{values[0]};<span class="error">{values[1]}</span>')
+                else:
+                    value = f'<span class="error">{value}</span>'
+                checks.set_warning('invalid_match_type', id_)
+    return str(value)

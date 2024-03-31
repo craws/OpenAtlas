@@ -1,8 +1,13 @@
+from collections import defaultdict
 from typing import Any, Optional
 
 from flask import g
 from flask_login import current_user
+from shapely import wkt
+from shapely.errors import WKTReadingError
 
+from openatlas.api.import_scripts.util import get_match_types, \
+    get_reference_system_by_name
 from openatlas.database import imports as db
 from openatlas.display.util2 import sanitize
 from openatlas.models.entity import Entity
@@ -62,10 +67,27 @@ class Import:
     def check_type_id(type_id: str, class_: str) -> bool:
         if not type_id.isdigit() or int(type_id) not in g.types:
             return False
-        if class_ not in g.types[
-                g.types[int(type_id)].root[-1]].classes:  # pragma: no cover
+        if not g.types[int(type_id)].root:
             return False
-        return True  # pragma: no cover
+        root_type = g.types[g.types[int(type_id)].root[-1]]
+        if class_ not in root_type.classes:
+            return False
+        if root_type.name in ['Administrative unit', 'Historical place']:
+            return False
+        return True
+
+    @staticmethod
+    def check_single_type_duplicates(type_ids: list[str]) -> list[str]:
+        single_types = defaultdict(list)
+        for type_id in type_ids:
+            if not g.types[int(type_id)].multiple:
+                single_types[g.types[
+                    g.types[int(type_id)].root[-1]].name].append(type_id)
+        single_type_ids = []
+        for value in single_types.values():
+            if len(value) > 1:
+                single_type_ids.extend(value)
+        return single_type_ids
 
     @staticmethod
     def import_data(project: Project, class_: str, data: list[Any]) -> None:
@@ -73,37 +95,66 @@ class Import:
             entity = Entity.insert(
                 class_,
                 row['name'],
-                row['description'] if 'description' in row else None)
+                row.get('description'))
             db.import_data(
                 project.id,
                 entity.id,
                 current_user.id,
-                origin_id=row['id'] if 'id' in row and row['id'] else None)
+                origin_id=row.get('id'))
 
             # Dates
-            dates = {
-                'begin_from': None, 'begin_to': None, 'begin_comment': None,
-                'end_from': None, 'end_to': None, 'end_comment': None}
-            if 'begin_from' in row and row['begin_from']:
-                dates['begin_from'] = row['begin_from']
-                if 'begin_to' in row and row['begin_to']:
-                    dates['begin_to'] = row['begin_to']
-                if 'begin_comment' in row and row['begin_comment']:
-                    dates['begin_comment'] = row['begin_comment']
-            if 'end_from' in row and row['end_from']:
-                dates['end_from'] = row['end_from']
-                if 'end_to' in row and row['end_to']:
-                    dates['end_to'] = row['end_to']
-                if 'end_comment' in row and row['end_comment']:
-                    dates['end_comment'] = row['end_comment']
-            entity.update({'attributes': dates})
+            entity.update({'attributes': {
+                'begin_from': row.get('begin_from'),
+                'begin_to': row.get('begin_to'),
+                'begin_comment': row.get('begin_comment'),
+                'end_from': row.get('end_from'),
+                'end_to': row.get('end_to'),
+                'end_comment': row.get('end_comment')}})
 
             # Types
-            if 'type_ids' in row and row['type_ids']:
-                for type_id in str(row['type_ids']).split():
+            if type_ids := row.get('type_ids'):
+                for type_id in str(type_ids).split():
                     if not Import.check_type_id(type_id, class_):
                         continue
-                    entity.link('P2', g.types[int(type_id)])  # pragma no cover
+                    entity.link('P2', g.types[int(type_id)])
+
+            # Value types
+            if data := row.get('value_types'):
+                for value_types in str(data).split():
+                    value_type = value_types.split(';')
+                    number = value_type[1][1:] \
+                        if value_type[1].startswith('-') else value_type[1]
+                    if (not Import.check_type_id(value_type[0], class_) or
+                            (not number.isdigit() or
+                             not number.replace('.', '', 1).isdigit())):
+                        continue
+                    entity.link(
+                        'P2',
+                        g.types[int(value_type[0])],
+                        value_type[1])
+
+            # External reference systems
+            match_types = get_match_types()
+            reference_systems = list(set(
+                key for key in row if key.startswith('reference_system_')))
+            for header in reference_systems:
+                system = header.replace('reference_system_', '')
+                if reference_system := get_reference_system_by_name(system):
+                    if ((data := row.get(header)) and
+                            class_ in reference_system.classes):
+                        values = data.split(';')
+                        if values[1] in match_types:
+                            reference_system.link(
+                                    'P67',
+                                    entity,
+                                    values[0],
+                                    type_id=match_types[values[1]].id)
+
+            # Alias
+            if class_ in ['place', 'person', 'group']:
+                if aliases := row.get('alias'):
+                    for alias_ in aliases.split(";"):
+                        entity.link('P1', Entity.insert('appellation', alias_))
 
             # GIS
             if class_ in ['place', 'artifact']:
@@ -111,21 +162,24 @@ class Import:
                     'object_location',
                     f"Location of {row['name']}")
                 entity.link('P53', location)
-                if 'easting' in row \
-                        and is_float(row['easting']) \
-                        and 'northing' in row \
-                        and is_float(row['northing']):
-                    Gis.insert_import(
+
+                if data := row.get('administrative_unit'):
+                    if ((str(data).isdigit() and int(data) in g.types) and
+                            g.types[g.types[int(data)].root[-1]].name in [
+                                'Administrative unit']):
+                        location.link('P89', g.types[int(data)])
+                if data := row.get('historical_place'):
+                    if ((str(data).isdigit() and int(data) in g.types) and
+                            g.types[g.types[int(data)].root[-1]].name in [
+                                'Historical place']):
+                        location.link('P89', g.types[int(data)])
+                try:
+                    wkt_ = wkt.loads(row['wkt'])
+                except WKTReadingError:
+                    wkt_ = None
+                if wkt_:
+                    Gis.insert_wkt(
                         entity=entity,
                         location=location,
                         project=project,
-                        easting=row['easting'],
-                        northing=row['northing'])
-
-
-def is_float(value: int | float) -> bool:
-    try:
-        float(value)
-    except ValueError:
-        return False
-    return True
+                        wkt_=wkt_)

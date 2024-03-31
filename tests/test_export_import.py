@@ -2,9 +2,11 @@ import os
 from pathlib import Path
 from typing import Any
 
+import pandas as pd
 from flask import url_for
 
 from openatlas import app
+from openatlas.api.resources.model_mapper import get_by_cidoc_classes
 from openatlas.models.export import current_date_for_filename
 from tests.base import TestBaseCase
 
@@ -13,6 +15,23 @@ class ExportImportTest(TestBaseCase):
 
     def test_export(self) -> None:
         with app.app_context():
+            with app.test_request_context():
+                app.preprocess_request()
+                for entity in get_by_cidoc_classes(['all']):
+                    match entity.name:
+                        case 'Boundary Mark':
+                            boundary_mark = entity
+                        case 'Infrastructure':
+                            infrastructure = entity
+                        case 'Austria':
+                            austria = entity
+                        case 'Height':
+                            height = entity
+                        case 'Carantania':
+                            carantania = entity
+                        case 'Place':
+                            place_type = entity
+
             rv: Any = self.app.get(url_for('export_sql'))
             assert b'Export SQL' in rv.data
 
@@ -104,7 +123,7 @@ class ExportImportTest(TestBaseCase):
             test_path = Path(app.root_path).parent / 'tests'
             with open(test_path / 'invalid_1.csv', 'rb') as file:
                 rv = self.app.post(
-                    url_for('import_data', class_='place', project_id=p_id),
+                    url_for('import_data', class_='source', project_id=p_id),
                     data={'file': file},
                     follow_redirects=True)
             assert b'missing name column' in rv.data
@@ -115,10 +134,54 @@ class ExportImportTest(TestBaseCase):
                     data={'file': file},
                     follow_redirects=True)
             assert b'invalid columns: not_existing_column' in rv.data
+            assert b'invalid administrative units' in rv.data
             assert b'invalid type ids' in rv.data
+            assert b'invalid value type ids' in rv.data
+            assert b'invalid value type values' in rv.data
             assert b'invalid coordinates' in rv.data
+            assert b'invalid reference system' in rv.data
             assert b'empty names' in rv.data
             assert b'double IDs in import' in rv.data
+
+            with open(test_path / 'invalid_3.csv', 'rb') as file:
+                rv = self.app.post(
+                    url_for('import_data', class_='place', project_id=p_id),
+                    data={'file': file},
+                    follow_redirects=True)
+            assert b'invalid coordinates' in rv.data
+            assert b'invalid value types' in rv.data
+            assert b'invalid reference system value' in rv.data
+
+            with open(test_path / 'invalid_3.csv', 'rb') as file:
+                rv = self.app.post(
+                    url_for('import_data', class_='source', project_id=p_id),
+                    data={'file': file},
+                    follow_redirects=True)
+            assert b'invalid match type' in rv.data
+
+            data_frame = pd.read_csv(
+                static_path / 'example.csv',
+                keep_default_na=False)
+            data_frame.at[0, 'id'] = 'new_place_1'
+            data_frame.at[1, 'id'] = 'new_place_2'
+            data_frame.at[2, 'id'] = 'new_place_3'
+            data_frame.at[0, 'administrative_unit'] = austria.id
+            data_frame.at[0, 'historical_place'] = carantania.id
+            type_ids_list = [
+                boundary_mark.id, infrastructure.id, austria.id, place_type.id]
+            data_frame.at[0, 'type_ids'] = ' '.join(map(str, type_ids_list))
+            data_frame.at[0, 'value_types'] = f'{height.id};42'
+            data_frame.at[0, 'wkt'] = "POLYGON((16.1203 BLA, 16.606275))"
+            data_frame.to_csv(test_path / 'example.csv', index=False)
+            with open(test_path / 'example.csv', 'rb') as file:
+                rv = self.app.post(
+                    url_for('import_data', class_='place', project_id=p_id),
+                    data={'file': file, 'duplicate': True},
+                    follow_redirects=True)
+            assert b'single type duplicates' in rv.data
+            assert b'Vienna' in rv.data
+
+            (test_path / 'example.csv').unlink()
 
             rv = self.app.get(url_for('import_project_view', id_=p_id))
             assert b'London' in rv.data
