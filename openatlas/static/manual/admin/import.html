@@ -157,6 +157,7 @@ later.</p>
 an error message.</p>
 <ul class="simple">
 <li><p><strong>name</strong> - required, an error will be displayed if the header is missing. A warning will be displayed, if names in data rows are missing and these wont get imported.</p></li>
+<li><p><strong>alias</strong> - only available for person, group and place, see below</p></li>
 <li><p><strong>description</strong> - a description can be provided</p></li>
 <li><p><strong>origin_id</strong> - optional but useful to trace it back. It has to be <strong>unique per project</strong> so if you have multiple like a person and place with id = 1 you can prefix them in the document e.g. person_1, place_1 before importing them</p></li>
 <li><p><strong>begin_from</strong> - used for dates, see below</p></li>
@@ -164,9 +165,17 @@ an error message.</p>
 <li><p><strong>end_from</strong> - used for dates, see below</p></li>
 <li><p><strong>end_to</strong> - used for dates, see below</p></li>
 <li><p><strong>type_ids</strong> - used to link to types, see below</p></li>
-<li><p><strong>northing</strong> - only available for places, see below</p></li>
-<li><p><strong>easting</strong> - only available for places, see below</p></li>
+<li><p><strong>value_types</strong> - used to link to a value type, see below</p></li>
+<li><p><strong>wkt</strong> - only available for places and artifacts, see below</p></li>
+<li><p><strong>reference_system_*</strong> - used to link existing external reference systems, see below</p></li>
+<li><p><strong>administrative_unit</strong> - only available for places, id of existing administrative unit</p></li>
+<li><p><strong>historical_place</strong> - only available for places, id of existing historical place</p></li>
 </ul>
+<section id="alias">
+<h3>Alias<a class="headerlink" href="#alias" title="Permalink to this heading"></a></h3>
+<p><a class="reference internal" href="../ui/alias.html"><span class="doc">Alias</span></a> can be entered as string. Multiple aliases can be separated with semicolon (<strong>;</strong>).
+If an alias contains a comma (<strong>,</strong>) please surround the whole filed with double quotes(<strong>”</strong>)</p>
+</section>
 <section id="dates">
 <h3>Dates<a class="headerlink" href="#dates" title="Permalink to this heading"></a></h3>
 <p>Dates can be entered in the format <strong>YYYY-MM-DD</strong> in the fields <strong>begin_from</strong> and <strong>end_from</strong>.
@@ -188,16 +197,42 @@ a custom type <strong>Case studies</strong> to link them all in one go.</p>
 <li><p>The id of a type can be looked up at the detail view of a type</p></li>
 </ul>
 </section>
-<section id="places">
-<h3>Places<a class="headerlink" href="#places" title="Permalink to this heading"></a></h3>
-<p>If importing places, point coordinates can be imported too. Keep in mind to use
-the <a class="reference external" href="https://gisgeography.com/wgs84-world-geodetic-system/">WGS84</a> geodetic system.
-Coordinates will only be imported if a columns <strong>northing</strong> (latitude) and <strong>easting</strong> (Longitude)
-is present and rows contain number values.</p>
+<section id="value-types">
+<h3>Value types<a class="headerlink" href="#value-types" title="Permalink to this heading"></a></h3>
+<p>It is possible to link entities to value types at the import.</p>
 <ul class="simple">
-<li><p><strong>northing</strong> - number value</p></li>
-<li><p><strong>easting</strong> - number value</p></li>
+<li><p>Value types can be entered at the column <strong>value_types</strong></p></li>
+<li><p>Type id and value are separated with an semicolon (<strong>;</strong>), e.g. 1234;-13.65</p></li>
+<li><p>Value types need always a value</p></li>
+<li><p>You can enter multiple separated with a space</p></li>
+<li><p>The id of a type can be looked up at the detail view of a value type</p></li>
 </ul>
+</section>
+<section id="wkt-coordinates">
+<h3>WKT coordinates<a class="headerlink" href="#wkt-coordinates" title="Permalink to this heading"></a></h3>
+<p>For places and artifact point, polygon or linestring coordinates can be imported. Keep in mind to use
+the <a class="reference external" href="https://gisgeography.com/wgs84-world-geodetic-system/">WGS84</a> geodetic system.
+Coordinates will be imported as <a class="reference external" href="https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry">WKT</a>.
+It is only possible to import one geometry for each entry. Since the WKT format uses commas (<strong>,</strong>),
+surround the coordinates with double quotes (<strong>”</strong>)</p>
+<dl class="simple">
+<dt>Example:</dt><dd><p>“LINESTRING (12.458533781141528 41.922205268362234, 12.53062334955289 41.917606998887024, 12.52169797441624 41.888476931243254)”</p>
+</dd>
+</dl>
+</section>
+<section id="external-reference-systems">
+<h3>External reference systems<a class="headerlink" href="#external-reference-systems" title="Permalink to this heading"></a></h3>
+<p>It is possible to link the imported entity to an existing <a class="reference internal" href="../entity/reference_system.html"><span class="doc">Reference System</span></a>.
+In this case, the header has to be named <strong>reference_system_*</strong> with the <em>name</em> of the
+external reference system appended, e.g. <strong>reference_system_wikidata</strong>.
+If spaces occur in the name, please substitute them with underscore (<strong>_</strong>), e.g.
+<strong>reference_system_getty_aat</strong>.</p>
+<p>The entry consist of two values, separated by a semicolon (<strong>;</strong>). First value is
+the identifier, e.g. Q54123, the second value is the match type (<strong>close_match</strong> or <strong>exact_match</strong>)</p>
+<dl class="simple">
+<dt>Example:</dt><dd><p>Q54123;close_match</p>
+</dd>
+</dl>
 </section>
 </section>
 <section id="import-options">
