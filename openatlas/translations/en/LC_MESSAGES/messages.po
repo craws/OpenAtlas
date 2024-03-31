@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-03-26 18:34+0100\n"
-"PO-Revision-Date: 2024-03-26 18:38+0100\n"
+"POT-Creation-Date: 2024-03-31 16:26+0200\n"
+"PO-Revision-Date: 2024-03-31 16:28+0200\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language-Team: en <LL@li.org>\n"
 "Language: en\n"
@@ -835,7 +835,7 @@ msgstr "Select this checkbox to enable IIIF"
 
 #: openatlas/forms/setting.py:68
 msgid "URL need a trailing /"
-msgstr ""
+msgstr "URL need a trailing /"
 
 #: openatlas/forms/setting.py:69
 msgid "tooltip IIIF URL"
@@ -2040,7 +2040,7 @@ msgstr "IIIF file deleted"
 
 #: openatlas/views/file.py:194
 msgid "cannot delete images in upload directory"
-msgstr ""
+msgstr "cannot delete images in upload directory"
 
 #: openatlas/views/file.py:199
 msgid "all IIIF files are deleted"
