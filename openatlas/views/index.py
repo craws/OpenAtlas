@@ -114,11 +114,13 @@ def overview() -> str:
 
 @app.route('/index/setlocale/<language>')
 def set_locale(language: str) -> Response:
+    if language not in app.config['LANGUAGES']:
+        language = g.settings['default_language']
     session['language'] = language
     if hasattr(current_user, 'id') and current_user.id:
         current_user.settings['language'] = language
         current_user.update_language()
-    return redirect(request.referrer)
+    return redirect(request.referrer or url_for('overview'))
 
 
 @app.route('/overview/feedback', methods=['GET', 'POST'])
