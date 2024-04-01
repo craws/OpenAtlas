@@ -435,14 +435,10 @@ class EventBaseManager(BaseManager):
         return fields
 
     def populate_insert(self) -> None:
-        if self.origin:
-            if self.origin.class_.view == 'artifact':
-                self.form.artifact.data = [self.origin.id]
-            elif self.origin.class_.view == 'place':
-                if self.class_.name == 'move':
-                    self.form.place_from.data = self.origin.id
-                else:
-                    self.form.place.data = self.origin.id
+        if self.origin \
+                and self.origin.class_.view == 'place' \
+                and self.class_.name != 'move':
+            self.form.place.data = self.origin.id
 
     def process_form(self) -> None:
         super().process_form()

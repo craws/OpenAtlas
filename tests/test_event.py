@@ -62,7 +62,7 @@ class EventTest(TestBaseCase):
                     'name': 'Second event',
                     'given_place': [residence.id],
                     'place': residence.id,
-                    'event': activity_id,
+                    'sub_event_of': activity_id,
                     'begin_year_from': '1949',
                     'begin_month_from': '10',
                     'begin_day_from': '8',
@@ -80,8 +80,8 @@ class EventTest(TestBaseCase):
                     'name': 'Keep it moving',
                     'place_to': residence.id,
                     'place_from': residence.id,
-                    'artifact': artifact.id,
-                    'person': actor.id})
+                    'moved_artifact': artifact.id,
+                    'moved_person': actor.id})
             move_id = rv.location.split('/')[-1]
 
             rv = self.app.get(url_for('view', id_=move_id))
