@@ -641,7 +641,7 @@ class TypeManager(TypeBaseManager):
     def add_description(self) -> None:
         super().add_description()
         if self.get_root().category == 'value':
-            del self.form_class.description
+            del self.form_class.description  # pylint: disable=no-member
             setattr(self.form_class, 'description', StringField(_('unit')))
 
     def process_form(self) -> None:
