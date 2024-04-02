@@ -48,6 +48,7 @@ The header can contain following titles. Columns with other titles won't get imp
 an error message.
 
 * **name** - required, an error will be displayed if the header is missing. A warning will be displayed, if names in data rows are missing and these wont get imported.
+* **alias** - only available for person, group and place, see below
 * **description** - a description can be provided
 * **origin_id** - optional but useful to trace it back. It has to be **unique per project** so if you have multiple like a person and place with id = 1 you can prefix them in the document e.g. person_1, place_1 before importing them
 * **begin_from** - used for dates, see below
@@ -55,9 +56,17 @@ an error message.
 * **end_from** - used for dates, see below
 * **end_to** - used for dates, see below
 * **type_ids** - used to link to types, see below
-* **northing** - only available for places, see below
-* **easting** - only available for places, see below
+* **value_types** - used to link to a value type, see below
+* **wkt** - only available for places and artifacts, see below
+* **reference_system_*** - used to link existing external reference systems, see below
+* **administrative_unit** - only available for places, id of existing administrative unit
+* **historical_place** - only available for places, id of existing historical place
 
+
+Alias
++++++
+:doc:`/ui/alias` can be entered as string. Multiple aliases can be separated with semicolon (**;**).
+If an alias contains a comma (**,**) please surround the whole filed with double quotes(**"**)
 
 Dates
 +++++
@@ -78,15 +87,40 @@ a custom type **Case studies** to link them all in one go.
 * You can enter multiple separated with a space
 * The id of a type can be looked up at the detail view of a type
 
-Places
-++++++
-If importing places, point coordinates can be imported too. Keep in mind to use
-the `WGS84 <https://gisgeography.com/wgs84-world-geodetic-system/>`_ geodetic system.
-Coordinates will only be imported if a columns **northing** (latitude) and **easting** (Longitude)
-is present and rows contain number values.
+Value types
++++++++++++
+It is possible to link entities to value types at the import.
 
-* **northing** - number value
-* **easting** - number value
+* Value types can be entered at the column **value_types**
+* Type id and value are separated with an semicolon (**;**), e.g. 1234;-13.65
+* Value types need always a value
+* You can enter multiple separated with a space
+* The id of a type can be looked up at the detail view of a value type
+
+WKT coordinates
++++++++++++++++
+For places and artifact point, polygon or linestring coordinates can be imported. Keep in mind to use
+the `WGS84 <https://gisgeography.com/wgs84-world-geodetic-system/>`_ geodetic system.
+Coordinates will be imported as `WKT <https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry>`_.
+It is only possible to import one geometry for each entry. Since the WKT format uses commas (**,**),
+surround the coordinates with double quotes (**"**)
+
+Example:
+    "LINESTRING (12.458533781141528 41.922205268362234, 12.53062334955289 41.917606998887024, 12.52169797441624 41.888476931243254)"
+
+External reference systems
+++++++++++++++++++++++++++
+It is possible to link the imported entity to an existing :doc:`/entity/reference_system`.
+In this case, the header has to be named **reference_system_*** with the *name* of the
+external reference system appended, e.g. **reference_system_wikidata**.
+If spaces occur in the name, please substitute them with underscore (**_**), e.g.
+**reference_system_getty_aat**.
+
+The entry consist of two values, separated by a semicolon (**;**). First value is
+the identifier, e.g. Q54123, the second value is the match type (**close_match** or **exact_match**)
+
+Example:
+    Q54123;close_match
 
 
 Import options

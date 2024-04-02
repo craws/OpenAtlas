@@ -4,6 +4,7 @@ import ast
 from typing import Any, Optional, TYPE_CHECKING
 
 from flask import g, json
+from shapely.geometry import Point, Polygon, LineString
 
 from openatlas.database import gis as db
 from openatlas.display.util2 import sanitize
@@ -61,10 +62,10 @@ class Gis:
             super_id = [structure['supers'][-1].id] \
                 if structure['supers'] else []
             extra_ids = [
-                objects[0].id if objects else 0] \
-                + super_id \
-                + subunit_ids \
-                + sibling_ids
+                            objects[0].id if objects else 0] \
+                        + super_id \
+                        + subunit_ids \
+                        + sibling_ids
         object_ids = [x.id for x in objects] if objects else []
         for row in db.get_all(extra_ids):
             description = row['description'].replace('"', '\"') \
@@ -168,19 +169,27 @@ class Gis:
                         'geojson': json.dumps(item['geometry'])})
 
     @staticmethod
-    def insert_import(
+    def insert_wkt(
             entity: Entity,
             location: Entity,
             project: Project,
-            easting: float,
-            northing: float) -> None:
-        db.insert_import({
+            wkt_: Polygon | Point | LineString) -> None:
+        shape_type = ''
+        match wkt_type := str(wkt_.type).lower():
+            case 'point':
+                shape_type = 'centerpoint'
+            case 'linestring':
+                shape_type = 'polyline'
+            case 'polygon':
+                shape_type = 'shape'
+        db.insert_wkt({
             'entity_id': location.id,
             'description':
-                f"Imported centerpoint of {sanitize(entity.name, 'text')} "
+                f"Imported geometry of {sanitize(entity.name, 'text')} "
                 f"from the {sanitize(project.name, 'text')} project",
-            'geojson':
-                f'{{"type":"Point", "coordinates": [{easting},{northing}]}}'})
+            'type': shape_type,
+            'wkt': str(wkt_)},
+            wkt_type)
 
     @staticmethod
     def delete_by_entity(entity: Entity) -> None:

@@ -15,8 +15,10 @@ def index_changelog() -> str:
 
 
 versions = {
-    '8.3.0': ['TBA', {
+    '8.4.0': ['TBA', {}],
+    '8.3.0': ['2024-04-01', {
         'feature': {
+            '1567': 'Enhanced Import',
             '2193': 'Import artifacts',
             '2126': 'IIIF: Polygons for annotation selection',
             '2106': 'IIIF: Delete IIIF images',

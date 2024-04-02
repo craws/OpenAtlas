@@ -5,6 +5,7 @@ from flask import g
 
 from openatlas import app
 from openatlas.models.entity import Entity
+from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 
 
@@ -22,15 +23,33 @@ def get_type_by_name(type_name: str) -> Optional[Type]:
     for type_id in g.types:
         if g.types[type_id].name == type_name:
             type_ = g.types[type_id]
+            break
     return type_
+
+
+def get_reference_system_by_name(name: str) -> Optional[ReferenceSystem]:
+    reference_system = None
+    name = name.lower().replace('_', ' ')
+    for id_ in g.reference_systems:
+        if g.reference_systems[id_].name.lower().replace('_', ' ') == name:
+            reference_system = g.reference_systems[id_]
+            break
+    return reference_system
 
 
 def get_exact_match() -> Entity:
     return get_or_create_type(g.reference_match_type, 'exact match')
 
 
-def get_reference_system(name: str) -> Entity:  # pragma: no cover
-    return [i for i in g.reference_systems.values() if i.name == name][0]
+def get_match_types() -> dict[str, Type]:
+    match_dictionary = {}
+    for match in [g.types[match] for match in g.reference_match_type.subs]:
+        match match.name:
+            case 'exact match':
+                match_dictionary['exact_match'] = match
+            case 'close match':
+                match_dictionary['close_match'] = match
+    return match_dictionary
 
 
 def vocabs_requests(

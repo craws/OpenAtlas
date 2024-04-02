@@ -19,13 +19,17 @@ then run the database upgrade script, then restart Apache:
 
 ### 8.2.x to 8.3.0
 
-Install python3-svgwrite to support polygon for image annotations (#2126)
+No database updates are required but new Python packages are needed:
 
-    sudo apt install python3-svgwrite
+* python3-svgwrite (#2126 Polygons for image annotations)
+* python3-shapely (#1567 WKT import)
+
+
+    sudo apt install python3-svgwrite python3-shapely
 
 **For developers**
 
-To run tests, please add a new *tests/* folder to your IIIF directory, e.g.:
+To run tests, please add a new **tests** folder to your IIIF directory, e.g.:
 
     mkdir /var/www/iipsrv/tests
 
@@ -37,7 +41,7 @@ sufficient.
 
 ### 8.1.x to 8.2.0
 
-There is no database update for this release but new node packages are needed:
+No database updates are required but new node packages are needed:
 
     cd openatlas/static
     npm install

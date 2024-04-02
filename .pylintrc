@@ -5,14 +5,11 @@ good-names=bc, e, ex, f, i, id, ip, j, js, k, l, Run, rv, to, x, y, _
 
 # We are still learning. Lower/remove these limits once all above are solved.
 min-public-methods=1 # default=2  (too-few-public-methods)
-max-args=10          # default=5  (too-many-arguments)
+max-args=6           # default=5  (too-many-arguments)
 max-attributes=14    # default=7  (too-many-instance-attributes)
-max-branches=24      # default=12 (too-many-branches)
+max-branches=20      # default=12 (too-many-branches)
 max-locals=20        # default=10 (too-many-locals)
-max-statements=100   # default=50 (too-many-statements)
+max-statements=80    # default=50 (too-many-statements)
 
 [FORMAT]
 max-line-length=79
-
-[TYPECHECK]
-ignored-classes=Form
