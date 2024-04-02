@@ -173,7 +173,7 @@ class FileTest(TestBaseCase):
             assert b'Logo' in rv.data
 
             rv = self.app.get(url_for('annotation_insert', id_=file_id))
-            assert b'Annotation' in rv.data
+            assert b'annotate' in rv.data
 
             rv = self.app.post(
                 url_for('annotation_insert', id_=file_id),
