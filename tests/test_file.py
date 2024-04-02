@@ -180,7 +180,7 @@ class FileTest(TestBaseCase):
                 data={
                     'coordinate': '1.5,1.6,1.4,9.6,8.6,9.6,8.6,1.6',
                     'text': 'An interesting annotation',
-                    'annotated_entity': place.id},
+                    'entity': place.id},
                 follow_redirects=True)
             assert b'An interesting annotation' in rv.data
 
