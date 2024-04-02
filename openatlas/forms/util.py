@@ -201,17 +201,19 @@ def table(
 def table_multi(
         class_name: str,
         entities: list[Entity],
-        selection: Optional[dict[int, Entity]] = None,
+        selection: Optional[list[Entity]] = None,
         filter_ids: Optional[list[int]] = None) -> Table:
+    filter_ids = filter_ids or []
+    selection_ids = [e.id for e in selection] if selection else []
     table_ = Table(
         [''] + g.table_headers[class_name],
         order=[[0, 'desc'], [1, 'asc']],
         defs=[{'orderDataType': 'dom-checkbox', 'targets': 0}])
-    for e in [e for e in entities if not filter_ids or e.id not in filter_ids]:
+    for e in [e for e in entities if e.id not in filter_ids]:
         row = get_base_table_data(e, show_links=False)
         row.insert(
             0,
             f'<input type="checkbox" value="{e.name}" id="{e.id}" '
-            f'{" checked" if selection and e.id in selection.keys() else ""}>')
+            f'{" checked" if e.id in selection_ids else ""}>')
         table_.rows.append(row)
     return table_

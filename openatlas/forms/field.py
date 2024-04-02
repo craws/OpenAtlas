@@ -152,7 +152,7 @@ class TableMultiSelect(HiddenInput):
 
     def __call__(self, field: TableMultiField, **kwargs: Any) -> str:
         field.data = list(field.selection.keys()) if field.selection else None
-        field.data_list = sorted([e.name for e in field.selection.values()]) \
+        field.data_list = sorted(e.name for e in field.selection.values()) \
             if field.selection else []
         return super().__call__(field, **kwargs) + Markup(
             render_template('forms/table_multi_select.html', field=field))
@@ -164,12 +164,12 @@ class TableMultiField(HiddenField):
     def __init__(
             self,
             table: Table,
-            selection: Optional[dict[int, Entity]] = None,
+            selection: Optional[list[Entity]] = None,
             validators: Optional[Any] = None,
             **kwargs: Any) -> None:
         super().__init__(validators=validators, **kwargs)
         self.table = table
-        self.selection = selection or {}
+        self.selection = {e.id: e for e in selection} if selection else {}
 
 
 class ValueFloatField(FloatField):

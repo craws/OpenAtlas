@@ -24,12 +24,12 @@ class AcquisitionManager(EventBaseManager):
     _('given artifact')
 
     def additional_fields(self) -> dict[str, Any]:
-        data = {'place': {}, 'artifact': {}}
+        data = {'place': [], 'artifact': []}
         if not self.insert:
             for entity in self.entity.get_linked_entities('P24'):
                 data[
                     'artifact' if entity.class_.name == 'artifact'
-                    else 'place'][entity.id] = entity
+                    else 'place'].append(entity)
         fields = super().additional_fields()
         fields['given_place'] = TableMultiField(
             table_multi(
@@ -198,13 +198,12 @@ class CreationManager(EventBaseManager):
         selection = None
         if self.insert:
             if self.origin and self.origin.class_.name == 'file':
-                selection = {self.origin.id: self.origin}
+                selection = [self.origin]
         else:
-            selection = \
-                {e.id: e for e in self.entity.get_linked_entities('P94')}
+            selection = self.entity.get_linked_entities('P94')
         fields = super().additional_fields()
         fields['document'] = TableMultiField(
-            table_multi('file', Entity.get_by_class('file')),
+            table_multi('file', Entity.get_by_class('file'), selection),
             selection)
         return fields
 
@@ -404,14 +403,14 @@ class ModificationManager(EventBaseManager):
     _('modified place')
 
     def additional_fields(self) -> dict[str, Any]:
-        artifacts = {}
-        places = {}
+        artifacts = []
+        places = []
         if not self.insert:
             for item in self.entity.get_linked_entities('P31'):
                 if item.class_.name == 'artifact':
-                    artifacts[item.id] = item
+                    artifacts.append(item)
                 elif item.cidoc_class.code == 'E18':
-                    places[item.id] = item
+                    places.append(item)
         fields = super().additional_fields()
         fields['artifact'] = TableMultiField(
             table_multi(
@@ -446,21 +445,17 @@ class MoveManager(EventBaseManager):
         fields = super().additional_fields()
         place_from = None
         place_to = None
-        artifacts = {}
-        persons = {}
+        data = {'artifact': [], 'person': []}
         if self.entity:
             if place := self.entity.get_linked_entity('P27'):
                 place_from = place.get_linked_entity_safe('P53', True)
             if place := self.entity.get_linked_entity('P26'):
                 place_to = place.get_linked_entity_safe('P53', True)
             for linked_entity in self.entity.get_linked_entities('P25'):
-                if linked_entity.class_.name == 'person':
-                    persons[linked_entity.id] = linked_entity
-                elif linked_entity.class_.view == 'artifact':
-                    artifacts[linked_entity.id] = linked_entity
+                data[linked_entity.class_.name].append(linked_entity)
         elif self.origin:
             if self.origin.class_.view == 'artifact':
-                artifacts = {self.origin.id: self.origin}
+                data['artifact'] = [self.origin]
             elif self.origin.class_.view == 'place':
                 place_from = self.origin
         fields['place_from'] = TableField(
@@ -481,14 +476,14 @@ class MoveManager(EventBaseManager):
             table_multi(
                 'artifact',
                 Entity.get_by_class('artifact', True),
-                artifacts),
-            artifacts)
+                data['artifact']),
+            data['artifact'])
         fields['moved_person'] = TableMultiField(
             table_multi(
                 'person',
                 Entity.get_by_class('person', aliases=self.aliases),
-                persons),
-            persons)
+                data['person']),
+            data['person'])
         return fields
 
     def process_form(self) -> None:
@@ -538,8 +533,7 @@ class ProductionManager(EventBaseManager):
         fields = super().additional_fields()
         selection = None
         if not self.insert and self.entity:
-            selection = \
-                {e.id: e for e in self.entity.get_linked_entities('P108')}
+            selection = self.entity.get_linked_entities('P108')
         fields['artifact'] = TableMultiField(
             table_multi(
                 'artifact',
@@ -618,11 +612,9 @@ class SourceManager(BaseManager):
     def additional_fields(self) -> dict[str, Any]:
         selection = None
         if not self.insert and self.entity:
-            selection = {
-                entity.id: entity for entity in
-                self.entity.get_linked_entities('P128', inverse=True)}
+            selection = self.entity.get_linked_entities('P128', inverse=True)
         elif self.origin and self.origin.class_.name == 'artifact':
-            selection = {self.origin.id: self.origin}
+            selection = [self.origin]
         return {
             'artifact': TableMultiField(
                 table_multi(
