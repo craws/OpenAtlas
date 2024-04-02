@@ -195,11 +195,13 @@ class BibliographyManager(BaseManager):
 
 class CreationManager(EventBaseManager):
     def additional_fields(self) -> dict[str, Any]:
+        selection = None
         if self.insert:
-            selection = self.origin \
-                if self.origin and self.origin.class_.name == 'file' else None
+            if self.origin and self.origin.class_.name == 'file':
+                selection = {self.origin.id: self.origin}
         else:
-            selection = [e for e in self.entity.get_linked_entities('P94')]
+            selection = \
+                {e.id: e for e in self.entity.get_linked_entities('P94')}
         fields = super().additional_fields()
         fields['document'] = TableMultiField(
             table_multi('file', Entity.get_by_class('file')),
@@ -358,8 +360,8 @@ class InvolvementManager(BaseManager):
             class_ = 'actor' if self.origin.class_.view == 'event' else 'event'
             fields[class_] = TableMultiField(
                 table_multi(
-                    class_,
-                    Entity.get_by_class(class_, True, self.aliases)),
+                    'person',
+                    Entity.get_by_view(class_, True, self.aliases)),
                 validators=[InputRequired()])
         return fields
 
@@ -456,6 +458,11 @@ class MoveManager(EventBaseManager):
                     persons[linked_entity.id] = linked_entity
                 elif linked_entity.class_.view == 'artifact':
                     artifacts[linked_entity.id] = linked_entity
+        elif self.origin:
+            if self.origin.class_.view == 'artifact':
+                artifacts = {self.origin.id: self.origin}
+            elif self.origin.class_.view == 'place':
+                place_from = self.origin
         fields['place_from'] = TableField(
             table(
                 'place_from',
@@ -615,7 +622,7 @@ class SourceManager(BaseManager):
                 entity.id: entity for entity in
                 self.entity.get_linked_entities('P128', inverse=True)}
         elif self.origin and self.origin.class_.name == 'artifact':
-            selection = [self.origin.id]
+            selection = {self.origin.id: self.origin}
         return {
             'artifact': TableMultiField(
                 table_multi(

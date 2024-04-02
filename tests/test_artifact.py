@@ -25,7 +25,7 @@ class ArtifactTest(TestBaseCase):
                 url_for('insert', class_='artifact'),
                 data={
                     'name': 'Love-letter',
-                    'actor': actor.id,
+                    'owned_by': actor.id,
                     'super': place.id})
             artifact_id = rv.location.split('/')[-1]
 
@@ -68,9 +68,9 @@ class ArtifactTest(TestBaseCase):
 
             rv = self.app.post(
                 url_for('insert', class_='move', origin_id=artifact_id),
-                data={'name': 'Event Horizon', 'artifact': [artifact_id]},
+                data={'name': 'Event Zero', 'moved_artifact': [artifact_id]},
                 follow_redirects=True)
-            assert b'Event Horizon' in rv.data
+            assert b'Event Zero' in rv.data
 
             rv = self.app.get(
                 url_for('link_insert', id_=actor.id, view='artifact'))
