@@ -18,10 +18,14 @@ class IndexTests(TestBaseCase):
             rv = self.app.get(url_for('login'), follow_redirects=True)
             assert b'first' in rv.data
 
-            # Can't use follow_redirects because would get into a loop
-            self.app.get(url_for('set_locale', language='de'))
+            rv = self.app.get(
+                url_for('set_locale', language='non_existing_locale'),
+                follow_redirects=True)
+            assert b'Source' in rv.data
 
-            rv = self.app.get('/')
+            rv = self.app.get(
+                url_for('set_locale', language='de'),
+                follow_redirects=True)
             assert b'Quelle' in rv.data
             assert b'messages_de.js' in rv.data
 

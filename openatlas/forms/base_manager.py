@@ -21,7 +21,7 @@ from openatlas.forms.populate import (
 from openatlas.forms.process import (
     process_dates, process_origin, process_standard_fields)
 from openatlas.forms.util import (
-    check_if_entity_has_time, string_to_entity_list)
+    check_if_entity_has_time, string_to_entity_list, table)
 from openatlas.forms.validation import hierarchy_name_exists, validate
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
@@ -54,6 +54,8 @@ class BaseManager:
         self.crumbs: list[Any] = []
         self.insert = bool(not self.entity and not self.link_)
         self.place_info: dict[str, Any] = {}
+        self.aliases = current_user.settings['table_show_aliases']
+        self.table_items = {}  # Store table entities to avoid multiple loading
 
         if self.insert:
             self.get_place_info_for_insert()
@@ -62,11 +64,12 @@ class BaseManager:
 
         class Form(FlaskForm):
             opened = HiddenField()
-            origin_id = HiddenField()
             validate = validate
 
         self.form_class = Form
         self.add_name_fields()
+        for id_, field in self.top_fields().items():
+            setattr(Form, id_, field)
         add_types(self)
         for id_, field in self.additional_fields().items():
             setattr(Form, id_, field)
@@ -165,6 +168,9 @@ class BaseManager:
     def additional_fields(self) -> dict[str, Any]:
         return {}
 
+    def top_fields(self) -> dict[str, Any]:
+        return {}
+
     def get_link_type(self) -> Optional[Entity]:
         # Returns base type of link, e.g. involvement between actor and event
         for field in self.form:
@@ -238,38 +244,40 @@ class BaseManager:
 
 class ActorBaseManager(BaseManager):
     fields = ['name', 'alias', 'date', 'description', 'continue']
+    _('begins in')
+    _('ends in')
 
     def additional_fields(self) -> dict[str, Any]:
+        residence = None
+        begins_in = None
+        ends_in = None
+        self.table_items['place'] = \
+            Entity.get_by_class('place', types=True, aliases=self.aliases)
+        if not self.insert:
+            if residence := self.entity.get_linked_entity('P74'):
+                residence = residence.get_linked_entity_safe('P53', True)
+            if first := self.entity.get_linked_entity('OA8'):
+                begins_in = first.get_linked_entity_safe('P53', True)
+            if last := self.entity.get_linked_entity('OA9'):
+                ends_in = last.get_linked_entity_safe('P53', True)
         return {
             'residence': TableField(
-                _('residence'),
-                add_dynamic=['place'],
-                related_tables=['begins_in', 'ends_in']),
+                table('residence', self.table_items['place']),
+                residence,
+                add_dynamic=['place']),
             'begins_in': TableField(
-                _('begins in'),
-                add_dynamic=['place'],
-                related_tables=['residence', 'ends_in']),
+                table('begins in', self.table_items['place']),
+                begins_in,
+                add_dynamic=['place']),
             'ends_in': TableField(
-                _('ends in'),
-                add_dynamic=['place'],
-                related_tables=['begins_in', 'residence'])}
+                table('begins in', self.table_items['place']),
+                ends_in,
+                add_dynamic=['place'])}
 
     def populate_insert(self) -> None:
         self.form.alias.append_entry('')
         if self.origin and self.origin.class_.name == 'place':
             self.form.residence.data = self.origin.id
-
-    def populate_update(self) -> None:
-        super().populate_update()
-        if residence := self.entity.get_linked_entity('P74'):
-            self.form.residence.data = \
-                residence.get_linked_entity_safe('P53', True).id
-        if first := self.entity.get_linked_entity('OA8'):
-            self.form.begins_in.data = \
-                first.get_linked_entity_safe('P53', True).id
-        if last := self.entity.get_linked_entity('OA9'):
-            self.form.ends_in.data = \
-                last.get_linked_entity_safe('P53', True).id
 
     def process_form(self) -> None:
         super().process_form()
@@ -335,34 +343,35 @@ class ArtifactBaseManager(PlaceBaseManager):
     fields = ['name', 'date', 'description', 'continue', 'map']
 
     def additional_fields(self) -> dict[str, Any]:
+        if self.insert:
+            owner = self.origin if self.origin \
+                and self.origin.class_.view == 'actor' else None
+        else:
+            owner = self.entity.get_linked_entity('P52')
+        self.table_items['actor'] = \
+            Entity.get_by_view('actor', aliases=self.aliases)
         return {
-            'actor':
-                TableField(_('owned by'), add_dynamic=['person', 'group'])}
+            'owned_by':
+                TableField(
+                    table('owned_by', self.table_items['actor']),
+                    owner,
+                    add_dynamic=['person', 'group'])}
 
     def get_crumbs(self) -> list[Any]:
         crumbs = super().get_crumbs()
         if self.place_info['structure'] and self.origin:
             if count := len([
-                    i for i in self.place_info['structure']['siblings'] if
-                    i.class_.name == self.class_.name]):
+                i for i in self.place_info['structure']['siblings']
+                    if i.class_.name == self.class_.name]):
                 crumbs[-1] = crumbs[-1] + f' ({count} {_("exists")})'
         return crumbs
-
-    def populate_insert(self) -> None:
-        if self.origin and self.origin.class_.view == 'actor':
-            self.form.actor.data = self.origin.id
-
-    def populate_update(self) -> None:
-        super().populate_update()
-        if owner := self.entity.get_linked_entity('P52'):
-            self.form.actor.data = owner.id
 
     def process_form(self) -> None:
         super().process_form()
         self.data['links']['delete'].add('P52')
         self.data['links']['delete_inverse'].add('P46')
-        if self.form.actor.data:
-            self.add_link('P52', self.form.actor.data)
+        if self.form.owned_by.data:
+            self.add_link('P52', self.form.owned_by.data)
 
 
 class EventBaseManager(BaseManager):
@@ -375,62 +384,55 @@ class EventBaseManager(BaseManager):
         return ids
 
     def additional_fields(self) -> dict[str, Any]:
-        filter_ids = []
-        if self.entity:
-            filter_ids = self.get_sub_ids(self.entity, [self.entity.id])
+        sub_filter_ids = []
+        super_event = None
+        event_preceding = None
+        place = None
+        if not self.insert:
+            sub_filter_ids = self.get_sub_ids(self.entity, [self.entity.id])
+            super_event = self.entity.get_linked_entity('P9', inverse=True)
+            event_preceding = self.entity.get_linked_entity('P134')
+            if self.class_.name != 'move':
+                if place_ := self.entity.get_linked_entity('P7'):
+                    place = place_.get_linked_entity_safe('P53', True)
+        self.table_items = {
+            'event_view': Entity.get_by_view('event', True, self.aliases),
+            'place': Entity.get_by_class('place', True, self.aliases)}
+        self.table_items['event_preceding'] = [
+            e for e in self.table_items['event_view']
+            if e.class_.name != 'event']
         fields = {
-            'event': TableField(
-                _('sub event of'),
-                filter_ids=filter_ids,
-                add_dynamic=[
-                    'activity',
-                    'acquisition',
-                    'event',
-                    'modification',
-                    'move',
-                    'production'],
-                related_tables=['event_preceding'])}
+            'sub_event_of':
+                TableField(
+                    table(
+                        'sub_event_of',
+                        self.table_items['event_view'],
+                        sub_filter_ids),
+                    super_event)}
         if self.class_.name != 'event':
             fields['event_preceding'] = TableField(
-                _('preceding event'),
-                filter_ids=filter_ids,
-                add_dynamic=[
-                    'activity',
-                    'acquisition',
-                    'modification',
-                    'move',
-                    'production'],
-                related_tables=['event'])
+                table(
+                    'event_preceding',
+                    self.table_items['event_preceding'],
+                    sub_filter_ids),
+                event_preceding)
         if self.class_.name != 'move':
-            fields['place'] = \
-                TableField(_('location'), add_dynamic=['place'])
+            fields['place'] = TableField(
+                table('place', self.table_items['place']),
+                place,
+                add_dynamic=['place'])
         return fields
 
     def populate_insert(self) -> None:
-        if self.origin:
-            if self.origin.class_.view == 'artifact':
-                self.form.artifact.data = [self.origin.id]
-            elif self.origin.class_.view == 'place':
-                if self.class_.name == 'move':
-                    self.form.place_from.data = self.origin.id
-                else:
-                    self.form.place.data = self.origin.id
-
-    def populate_update(self) -> None:
-        super().populate_update()
-        if super_ := self.entity.get_linked_entity('P9', inverse=True):
-            self.form.event.data = super_.id
-        if preceding_ := self.entity.get_linked_entity('P134'):
-            self.form.event_preceding.data = preceding_.id
-        if self.class_.name != 'move':
-            if place := self.entity.get_linked_entity('P7'):
-                self.form.place.data = \
-                    place.get_linked_entity_safe('P53', True).id
+        if self.origin \
+                and self.origin.class_.view == 'place' \
+                and self.class_.name != 'move':
+            self.form.place.data = self.origin.id
 
     def process_form(self) -> None:
         super().process_form()
         self.data['links']['delete_inverse'].add('P9')
-        self.add_link('P9', self.form.event.data, inverse=True)
+        self.add_link('P9', self.form.sub_event_of.data, inverse=True)
         if self.class_.name != 'event':
             self.data['links']['delete'].add('P134')
             self.add_link('P134', self.form.event_preceding.data)

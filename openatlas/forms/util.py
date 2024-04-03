@@ -13,7 +13,10 @@ from flask_wtf import FlaskForm
 from wtforms import StringField
 
 from openatlas import app
-from openatlas.display.util import get_file_path
+from openatlas.display.table import Table
+from openatlas.display.util import \
+    get_base_table_data, get_file_path
+from openatlas.forms.field import format_name_and_aliases
 from openatlas.forms.setting import ProfileForm
 from openatlas.models.entity import Entity
 
@@ -179,3 +182,37 @@ def check_if_entity_has_time(item: Entity | Link) -> bool:
         if date_ and '00:00:00' not in str(date_):
             return True
     return False
+
+
+def table(
+        table_id: str,
+        entities: list[Entity],
+        filter_ids: Optional[list[int]] = None) -> Table:
+    table_ = Table(
+        g.table_headers[entities[0].class_.name if entities else 'place'])
+    for e in [e for e in entities if not filter_ids or e.id not in filter_ids]:
+        data = get_base_table_data(e, show_links=False)
+        data[0] = format_name_and_aliases(e, table_id)
+        table_.rows.append(data)
+    return table_
+
+
+def table_multi(
+        entities: list[Entity],
+        selection: Optional[list[Entity]] = None,
+        filter_ids: Optional[list[int]] = None) -> Table:
+    filter_ids = filter_ids or []
+    selection_ids = [e.id for e in selection] if selection else []
+    class_name = entities[0].class_.name if entities else 'place'
+    table_ = Table(
+        [''] + g.table_headers[class_name],
+        order=[[0, 'desc'], [1, 'asc']],
+        defs=[{'orderDataType': 'dom-checkbox', 'targets': 0}])
+    for e in [e for e in entities if e.id not in filter_ids]:
+        row = get_base_table_data(e, show_links=False)
+        row.insert(
+            0,
+            f'<input type="checkbox" value="{e.name}" id="{e.id}" '
+            f'{" checked" if e.id in selection_ids else ""}>')
+        table_.rows.append(row)
+    return table_

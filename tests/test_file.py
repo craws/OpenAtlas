@@ -173,14 +173,14 @@ class FileTest(TestBaseCase):
             assert b'Logo' in rv.data
 
             rv = self.app.get(url_for('annotation_insert', id_=file_id))
-            assert b'Annotate' in rv.data
+            assert b'annotate' in rv.data
 
             rv = self.app.post(
                 url_for('annotation_insert', id_=file_id),
                 data={
                     'coordinate': '1.5,1.6,1.4,9.6,8.6,9.6,8.6,1.6',
                     'text': 'An interesting annotation',
-                    'annotated_entity': place.id},
+                    'entity': place.id},
                 follow_redirects=True)
             assert b'An interesting annotation' in rv.data
 

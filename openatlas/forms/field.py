@@ -5,7 +5,6 @@ from typing import Any, Optional
 
 from flask import g, render_template
 from flask_babel import lazy_gettext as _
-from flask_login import current_user
 from flask_wtf import FlaskForm
 from markupsafe import Markup
 from wtforms import (
@@ -15,8 +14,9 @@ from wtforms.widgets import FileInput, HiddenInput, Input, TextInput
 
 from openatlas import app
 from openatlas.display.table import Table
-from openatlas.display.util import get_base_table_data
-from openatlas.display.util2 import is_authorized, uc_first
+from openatlas.display.util2 import is_authorized
+from openatlas.models.cidoc_class import CidocClass
+from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 
@@ -150,49 +150,26 @@ class ReferenceField(Field):
 
 class TableMultiSelect(HiddenInput):
 
-    def __call__(
-            self,
-            field: TableMultiField,
-            **kwargs: Any) -> str:
-        data = field.data or []
-        data = ast.literal_eval(data) if isinstance(data, str) else data
-        class_ = field.id \
-            if field.id not in ['given_place', 'modified_place'] else 'place'
-        aliases = current_user.settings['table_show_aliases']
-        if class_ in ['group', 'person']:
-            entities = Entity.get_by_class(class_, types=True, aliases=aliases)
-        else:
-            entities = Entity.get_by_view(class_, types=True, aliases=aliases)
-        table = Table(
-            [''] + g.table_headers[class_],
-            order=[[0, 'desc'], [1, 'asc']],
-            defs=[{'orderDataType': 'dom-checkbox', 'targets': 0}])
-        for entity in [e for e in entities if e.id not in field.filter_ids]:
-            row = get_base_table_data(entity, show_links=False)
-            row.insert(
-                0,
-                f'<input type="checkbox" value="{entity.name}"'
-                f' id="{entity.id}" '
-                f'{" checked" if entity.id in data else ""}>')
-            table.rows.append(row)
-        return Markup(render_template(
-            'forms/table_multi_select.html',
-            field=field,
-            selection=[e for e in entities if e.id in data],
-            table=table)) + super().__call__(field, **kwargs)
+    def __call__(self, field: TableMultiField, **kwargs: Any) -> str:
+        field.data = list(field.selection.keys()) if field.selection else None
+        field.data_list = sorted(e.name for e in field.selection.values()) \
+            if field.selection else []
+        return super().__call__(field, **kwargs) + Markup(
+            render_template('forms/table_multi_select.html', field=field))
 
 
 class TableMultiField(HiddenField):
+    widget = TableMultiSelect()
+
     def __init__(
             self,
-            label: Optional[str] = None,
+            table: Table,
+            selection: Optional[list[Entity]] = None,
             validators: Optional[Any] = None,
-            filter_ids: Optional[list[int]] = None,
             **kwargs: Any) -> None:
-        super().__init__(label, validators, **kwargs)
-        self.filter_ids = filter_ids or []
-
-    widget = TableMultiSelect()
+        super().__init__(validators=validators, **kwargs)
+        self.table = table
+        self.selection = {e.id: e for e in selection} if selection else {}
 
 
 class ValueFloatField(FloatField):
@@ -200,8 +177,7 @@ class ValueFloatField(FloatField):
 
 
 class TableSelect(HiddenInput):
-
-    def __call__(self, field: TableField, **kwargs: Any) -> str:
+    def __call__(self, field: Any, **kwargs: Any) -> str:
 
         def get_form(class_name_: str) -> Any:
             class SimpleEntityForm(FlaskForm):
@@ -219,42 +195,44 @@ class TableSelect(HiddenInput):
                         type_id=str(standard_type_id)))
             setattr(
                 SimpleEntityForm,
-                "description_dynamic",
+                'description_dynamic',
                 TextAreaField(_('description')))
             return SimpleEntityForm()
 
         field.forms = {}
         for class_name in field.add_dynamical:
             field.forms[class_name] = get_form(class_name)
-
-        table, selection = get_table_content(
-            field.id,
-            field.data,
-            field.filter_ids)
-        return Markup(render_template(
-            'forms/table_select.html',
-            field=field,
-            table=table.display(field.id),
-            selection=selection)) + super().__call__(field, **kwargs)
+        field.data = ''
+        field.data_string = ''
+        if field.selection and isinstance(
+                field.selection,
+                (CidocClass, CidocProperty)):
+            field.data = field.selection.code
+            field.data_string = \
+                f'{field.selection.code} {field.selection.name}'
+        elif field.selection:
+            field.data = field.selection.id
+            field.data_string = field.selection.name
+        return super().__call__(field, **kwargs) + Markup(
+            render_template('forms/table_select.html', field=field))
 
 
 class TableField(HiddenField):
+    widget = TableSelect()
+
     def __init__(
             self,
-            label: Optional[str] = None,
+            table: Table,
+            selection: Optional[Entity] = None,
             validators: Optional[Any] = None,
-            filter_ids: Optional[list[int]] = None,
             add_dynamic: Optional[list[str]] = None,
-            related_tables: Optional[list[str]] = None,
             **kwargs: Any) -> None:
-        super().__init__(label, validators, **kwargs)
-        self.filter_ids = filter_ids or []
-        self.related_tables = related_tables or []
+        super().__init__(validators=validators, **kwargs)
+        self.table = table
+        self.selection = selection
         self.add_dynamical = \
             (add_dynamic or []) if is_authorized('editor') else []
         self.add_dynamical.reverse()  # Reverse needed (CSS .float-end)
-
-    widget = TableSelect()
 
 
 class TreeMultiSelect(HiddenInput):
@@ -401,91 +379,6 @@ def value_type_expand_icon(type_: Type) -> str:
             class="fa fa-chevron-right value-type-switcher input-height-sm">
             </i>
         </span>'''
-
-
-def get_table_content(
-        class_name: str,
-        selected_data: Any,
-        filter_ids: Optional[list[int]] = None) -> tuple[Table, str]:
-    filter_ids = filter_ids or []
-    selection = ''
-    if class_name in ('cidoc_domain', 'cidoc_property', 'cidoc_range'):
-        table = Table(
-            ['code', 'name'],
-            defs=[
-                {'orderDataType': 'cidoc-model', 'targets': [0]},
-                {'sType': 'numeric', 'targets': [0]}])
-        for id_, entity in (
-                g.properties if class_name == 'cidoc_property'
-                else g.cidoc_classes).items():
-            onclick = f'''
-                onclick="selectFromTable(
-                    this,
-                    '{class_name}',
-                    '{id_}',
-                    '{entity.code} {entity.name}');"'''
-            table.rows.append([
-                f'<a href="#" {onclick}>{entity.code}</a>',
-                entity.name])
-            if entity.code == selected_data:
-                selection = f'{entity.code} {entity.name}'
-    elif class_name == 'annotated_entity':
-        # Hackish (mis)use of filter_ids to get table field for annotations
-        table = Table(['name', 'class', 'description'])
-        for item in Entity.get_by_id(filter_ids[0]).get_linked_entities('P67'):
-            if selected_data and item.id == int(selected_data):
-                selection = item.name  # pragma: no cover
-            table.rows.append([
-                format_name_and_aliases(item, 'annotated_entity'),
-                uc_first(item.class_.name),
-                item.description])
-    else:
-        aliases = current_user.settings['table_show_aliases']
-        if 'place' in class_name or class_name in \
-                ['begins_in', 'ends_in', 'residence']:
-            class_ = 'place'
-            entities = Entity.get_by_view('place', types=True, aliases=aliases)
-        elif class_name == 'event_preceding':
-            class_ = 'event'
-            entities = Entity.get_by_class([
-                    'activity',
-                    'acquisition',
-                    'modification',
-                    'move',
-                    'production'],
-                types=True,
-                aliases=aliases)
-        elif class_name == 'feature_super':
-            class_ = 'place'
-            entities = \
-                Entity.get_by_class('place', types=True, aliases=aliases)
-        elif class_name == 'stratigraphic_super':
-            class_ = 'place'
-            entities = \
-                Entity.get_by_class('feature', types=True, aliases=aliases)
-        elif class_name == 'artifact_super':
-            class_ = 'place'
-            entities = Entity.get_by_class(
-                g.view_class_mapping['place'] + ['artifact'],
-                types=True,
-                aliases=aliases)
-        elif class_name == 'human_remains_super':
-            class_ = 'place'
-            entities = Entity.get_by_class(
-                g.view_class_mapping['place'] + ['human_remains'],
-                types=True,
-                aliases=aliases)
-        else:
-            class_ = class_name
-            entities = Entity.get_by_view(class_, types=True, aliases=aliases)
-        table = Table(g.table_headers[class_])
-        for entity in [e for e in entities if e.id not in filter_ids]:
-            if selected_data and entity.id == int(selected_data):
-                selection = entity.name
-            data = get_base_table_data(entity, show_links=False)
-            data[0] = format_name_and_aliases(entity, class_name)
-            table.rows.append(data)
-    return table, selection
 
 
 def format_name_and_aliases(entity: Entity, field_id: str) -> str:

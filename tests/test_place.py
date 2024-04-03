@@ -214,10 +214,7 @@ class PlaceTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Entities were updated' in rv.data
 
-            data = {
-                'name': "Try continue",
-                'continue_': 'sub',
-                'feature_super': place.id}
+            data = {'name': 'Try', 'continue_': 'sub', 'super': place.id}
             rv = self.app.post(
                 url_for('insert', class_='place'),
                 data=data,
@@ -242,7 +239,7 @@ class PlaceTest(TestBaseCase):
             assert b'insert and add human remains' in rv.data
 
             data['name'] = "I'm a stratigraphic unit"
-            data['stratigraphic_super'] = feat_id
+            data['super'] = feat_id
             rv = self.app.post(
                 url_for(
                     'insert',
@@ -256,7 +253,7 @@ class PlaceTest(TestBaseCase):
 
             data = {
                 'name': 'You never find me',
-                'artifact_super': strati_id,
+                'super': strati_id,
                 get_hierarchy('Dimensions').subs[0]: 50}
             rv = self.app.post(
                 url_for('insert', class_='artifact', origin_id=strati_id),
@@ -279,7 +276,7 @@ class PlaceTest(TestBaseCase):
                 data={
                     'name': 'My human remains',
                     'actor': actor.id,
-                    'human_remains_super': strati_id,
+                    'super': strati_id,
                     remains_type.id: str([remains_type.subs[0]])})
             human_remains_id = rv.location.split('/')[-1]
 
@@ -350,7 +347,7 @@ class PlaceTest(TestBaseCase):
 
             rv = self.app.post(
                 url_for('update', id_=strati_id),
-                data={'name': 'New name', 'stratigraphic_super': feat_id},
+                data={'name': 'New name', 'super': feat_id},
                 follow_redirects=True)
             assert b'Changes have been saved' in rv.data
 

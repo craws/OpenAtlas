@@ -7,11 +7,11 @@
       type="text"
       placeholder="{{ _('change')|uc_first }}"
       readonly="readonly"
-      value="{{ selection }}"
+      value="{{ field.data_string }}"
       onclick="$('#{{ field.id }}-modal').modal('show')"
       tabindex="0">
   </div>
-  <div id="{{ field.id }}-clear-field" class="col-auto" {% if not selection %}style="display: none;"{% endif %}>
+  <div id="{{ field.id }}-clear-field" class="col-auto" {% if not field.selection %}style="display: none;"{% endif %}>
     <a
         href="#"
         id="{{ field.id }}-clear"
@@ -50,7 +50,7 @@
             + {{ _(add_dynamical)|uc_first }}
           </button>
         {% endfor %}
-        <div class="modal-body-table">{{ table|safe }}</div>
+        <div class="modal-body-table">{{ field.table.display(field.id)|safe }}</div>
       </div>
       <div class="modal-footer">
         <button
@@ -117,10 +117,7 @@
         const data = {name, description, entityName, standardType};
         e.preventDefault();
         const entityId = await ajaxAddEntity(data);
-        const relatedTables = {{ field.related_tables | safe }};
-        relatedTables
-          ?.forEach(x => refillTable(x, {{ field.filter_ids }}));
-        await refillTable('{{ field.id }}', {{ field.filter_ids }});
+        /* await refillTable('{{ field.id }}', {{ field.filter_ids }}); */
         $(this).prop("disabled", false).text('{{ _('insert')|uc_first }}');
         $('.modal').modal('hide');
         selectFromTable(undefined, '{{ field.id }}', entityId, name)

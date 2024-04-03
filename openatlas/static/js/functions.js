@@ -299,7 +299,7 @@ function deselectNode(fieldId,nodeId){
  selectFromTreeMulti(fieldId)
 }
 
-function selectFromTable(element, table, id,label= undefined) {
+function selectFromTable(element, table, id, label=undefined) {
   $("#" + table).attr('value', id);
   $("#" + table + "-button").val(label || element?.innerText );
   $("#" + table + "-button").focus(); /* to refresh/fill button and remove validation errors */

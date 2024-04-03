@@ -20,10 +20,7 @@ class ModelTests(TestBaseCase):
 
             rv = self.app.post(
                 url_for('model_index'),
-                data={
-                    'cidoc_domain': 'E1',
-                    'cidoc_range': 'E1',
-                    'cidoc_property': 'P13'})
+                data={'domain': 'E1', 'range': 'E1', 'property': 'P13'})
             assert b'Wrong domain' in rv.data
 
             with app.test_request_context():

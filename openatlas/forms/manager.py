@@ -13,55 +13,103 @@ from openatlas.forms.base_manager import (
     HierarchyBaseManager, PlaceBaseManager, TypeBaseManager)
 from openatlas.forms.field import (
     DragNDropField, SubmitField, TableField, TableMultiField, TreeField)
+from openatlas.forms.util import table, table_multi
 from openatlas.forms.validation import file
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
 
 
 class AcquisitionManager(EventBaseManager):
-    def additional_fields(self) -> dict[str, Any]:
-        return dict(
-            super().additional_fields(),
-            **{
-                'given_place': TableMultiField(_('given place')),
-                'artifact': TableMultiField(_('given artifact'))})
+    _('given place')
+    _('given artifact')
 
-    def populate_update(self) -> None:
-        super().populate_update()
-        data: dict[str, list[int]] = {'place': [], 'artifact': []}
-        for entity in self.entity.get_linked_entities('P24'):
-            var = 'artifact' if entity.class_.name == 'artifact' else 'place'
-            data[var].append(entity.id)
-        self.form.given_place.data = data['place']
-        self.form.artifact.data = data['artifact']
+    def additional_fields(self) -> dict[str, Any]:
+        data = {'place': [], 'artifact': []}
+        if not self.insert:
+            for entity in self.entity.get_linked_entities('P24'):
+                data[
+                    'artifact' if entity.class_.name == 'artifact'
+                    else 'place'].append(entity)
+        fields = super().additional_fields()
+        fields['given_place'] = TableMultiField(
+            table_multi(self.table_items['place'], data['place']),
+            data['place'])
+        fields['given_artifact'] = TableMultiField(
+            table_multi(
+                Entity.get_by_class('artifact', True),
+                data['artifact']),
+            data['artifact'])
+        return fields
 
     def process_form(self) -> None:
         super().process_form()
         self.data['links']['delete'].add('P24')
         self.add_link('P24', self.form.given_place.data)
-        self.add_link('P24', self.form.artifact.data)
+        self.add_link('P24', self.form.given_artifact.data)
+
+
+class ActorFunctionManager(BaseManager):
+    fields = ['date', 'description', 'continue']
+
+    def top_fields(self) -> dict[str, Any]:
+        if self.link_:
+            return {}
+        if 'membership' in request.url:
+            field_name = 'group'
+            entities = Entity.get_by_class('group', aliases=self.aliases)
+        else:
+            field_name = 'actor'
+            entities = Entity.get_by_view('actor', aliases=self.aliases)
+        return {
+            'member_origin_id': HiddenField(),
+            field_name:
+                TableMultiField(
+                    table_multi(entities, filter_ids=[self.origin.id]),
+                    validators=[InputRequired()])}
+
+    def populate_insert(self) -> None:
+        self.form.member_origin_id.data = self.origin.id
+
+    def process_form(self) -> None:
+        super().process_form()
+        link_type = self.get_link_type()
+        class_ = 'group' if hasattr(self.form, 'group') else 'actor'
+        for actor in Entity.get_by_ids(
+                ast.literal_eval(getattr(self.form, class_).data)):
+            self.add_link(
+                'P107',
+                actor,
+                self.form.description.data,
+                inverse=(class_ == 'group'),
+                type_id=link_type.id if link_type else None)
+
+    def process_link_form(self) -> None:
+        super().process_link_form()
+        type_id = getattr(
+            self.form,
+            str(g.classes['actor_function'].standard_type_id)).data
+        self.link_.type = g.types[int(type_id)] if type_id else None
 
 
 class ActorRelationManager(BaseManager):
     fields = ['date', 'description', 'continue']
 
-    def additional_fields(self) -> dict[str, Any]:
-        fields = {'inverse': BooleanField(_('inverse'))}
+    def top_fields(self) -> dict[str, Any]:
+        fields = {}
         if not self.link_:
             fields['actor'] = TableMultiField(
-                _('actor'),
-                [InputRequired()],
-                filter_ids=[self.origin.id])
+                table_multi(
+                    Entity.get_by_class('person', aliases=self.aliases),
+                    filter_ids=[self.origin.id]),
+                validators=[InputRequired()])
             fields['relation_origin_id'] = HiddenField()
         return fields
 
+    def additional_fields(self) -> dict[str, Any]:
+        return {'inverse': BooleanField(_('inverse'))}
+
     def populate_insert(self) -> None:
         self.form.relation_origin_id.data = self.origin.id
-
-    def populate_update(self) -> None:
-        super().populate_update()
-        if self.origin.id == self.link_.range.id:
-            self.form.inverse.data = True
 
     def process_form(self) -> None:
         super().process_form()
@@ -88,43 +136,10 @@ class ActorRelationManager(BaseManager):
             self.link_.domain = self.link_.range
             self.link_.range = new_range
 
-
-class ActorFunctionManager(BaseManager):
-    fields = ['date', 'description', 'continue']
-
-    def additional_fields(self) -> dict[str, Any]:
-        if self.link_:
-            return {}
-        return {
-            'member_origin_id': HiddenField(),
-            'group' if 'membership' in request.url else 'actor':
-                TableMultiField(
-                    _('actor'),
-                    [InputRequired()],
-                    filter_ids=[self.origin.id])}
-
-    def populate_insert(self) -> None:
-        self.form.member_origin_id.data = self.origin.id
-
-    def process_form(self) -> None:
-        super().process_form()
-        link_type = self.get_link_type()
-        class_ = 'group' if hasattr(self.form, 'group') else 'actor'
-        for actor in Entity.get_by_ids(
-                ast.literal_eval(getattr(self.form, class_).data)):
-            self.add_link(
-                'P107',
-                actor,
-                self.form.description.data,
-                inverse=(class_ == 'group'),
-                type_id=link_type.id if link_type else None)
-
-    def process_link_form(self) -> None:
-        super().process_link_form()
-        type_id = getattr(
-            self.form,
-            str(g.classes['actor_function'].standard_type_id)).data
-        self.link_.type = g.types[int(type_id)] if type_id else None
+    def populate_update(self) -> None:
+        super().populate_update()
+        if self.origin.id == self.link_.range.id:
+            self.form.inverse.data = True
 
 
 class ActivityManager(EventBaseManager):
@@ -141,31 +156,31 @@ class AdministrativeUnitManager(TypeBaseManager):
 class ArtifactManager(ArtifactBaseManager):
     def additional_fields(self) -> dict[str, Any]:
         filter_ids = []
-        if entity := self.entity:
-            filter_ids = \
-                [entity.id] + \
-                [e.id for e in entity.get_linked_entities_recursive('P46')]
-        return dict(
-            super().additional_fields(),
-            **{'artifact_super': TableField(
-                _('super'),
-                filter_ids=filter_ids,
-                add_dynamic=['place'])})
-
-    def populate_insert(self) -> None:
-        super().populate_insert()
-        if self.origin and self.origin.class_.view in ['artifact', 'place']:
-            self.form.artifact_super.data = self.origin.id
-
-    def populate_update(self) -> None:
-        super().populate_update()
-        if super_ := self.entity.get_linked_entity('P46', inverse=True):
-            self.form.artifact_super.data = super_.id
+        if self.entity:
+            filter_ids = [self.entity.id] + [
+                e.id for e in self.entity.get_linked_entities_recursive('P46')]
+        if self.insert:
+            selection = self.origin if self.origin \
+                and self.origin.class_.view in ['artifact', 'place'] else None
+        else:
+            selection = self.entity.get_linked_entity('P46', inverse=True)
+        fields = super().additional_fields()
+        fields['super'] = TableField(
+            table(
+                'super',
+                Entity.get_by_class(
+                    g.view_class_mapping['place'] + ['artifact'],
+                    types=True,
+                    aliases=self.aliases),
+                filter_ids=filter_ids),
+            selection,
+            add_dynamic=['place'])
+        return fields
 
     def process_form(self) -> None:
         super().process_form()
-        if self.form.artifact_super.data:
-            self.add_link('P46', self.form.artifact_super.data, inverse=True)
+        if self.form.super.data:
+            self.add_link('P46', self.form.super.data, inverse=True)
 
 
 class BibliographyManager(BaseManager):
@@ -174,24 +189,22 @@ class BibliographyManager(BaseManager):
 
 class CreationManager(EventBaseManager):
     def additional_fields(self) -> dict[str, Any]:
-        return dict(
-            super().additional_fields(),
-            **{'file': TableMultiField(_('document'))})
-
-    def populate_insert(self) -> None:
-        super().populate_insert()
-        if self.origin and self.origin.class_.name == 'file':
-            self.form.file.data = [self.origin.id]
-
-    def populate_update(self) -> None:
-        super().populate_update()
-        self.form.file.data = [
-            entity.id for entity in self.entity.get_linked_entities('P94')]
+        selection = None
+        if self.insert:
+            if self.origin and self.origin.class_.name == 'file':
+                selection = [self.origin]
+        else:
+            selection = self.entity.get_linked_entities('P94')
+        fields = super().additional_fields()
+        fields['document'] = TableMultiField(
+            table_multi(Entity.get_by_class('file'), selection),
+            selection)
+        return fields
 
     def process_form(self) -> None:
         super().process_form()
         self.data['links']['delete'].add('P94')
-        self.add_link('P94', self.form.file.data)
+        self.add_link('P94', self.form.document.data)
 
 
 class EditionManager(BaseManager):
@@ -228,29 +241,25 @@ class FeatureManager(PlaceBaseManager):
                     _('insert and add') + ' ' + _('stratigraphic unit')))
 
     def additional_fields(self) -> dict[str, Any]:
-        return dict(
-            super().additional_fields(),
-            **{'feature_super': TableField(
-                _('super'),
-                [InputRequired()],
-                add_dynamic=['place'])})
-
-    def populate_insert(self) -> None:
-        super().populate_insert()
-        if self.origin and self.origin.class_.name == 'place':
-            self.form.feature_super.data = self.origin.id
-
-    def populate_update(self) -> None:
-        super().populate_update()
-        self.form.feature_super.data = \
-            self.entity.get_linked_entity_safe('P46', inverse=True).id
+        fields = super().additional_fields()
+        if self.insert:
+            selection = self.origin if self.origin \
+                and self.origin.class_.name == 'place' else None
+        else:
+            selection = self.entity.get_linked_entity('P46', inverse=True)
+        fields['super'] = TableField(
+            table('super', Entity.get_by_class('place', True, self.aliases)),
+            selection,
+            validators=[InputRequired()],
+            add_dynamic=['place'])
+        return fields
 
     def process_form(self) -> None:
         super().process_form()
         self.data['links']['delete_inverse'].add('P46')
         self.add_link(
             'P46',
-            Entity.get_by_id(int(self.form.feature_super.data)),
+            Entity.get_by_id(int(self.form.super.data)),
             inverse=True)
 
 
@@ -276,34 +285,31 @@ class GroupManager(ActorBaseManager):
 class HumanRemainsManager(ArtifactBaseManager):
     def additional_fields(self) -> dict[str, Any]:
         filter_ids = []
-        if entity := self.entity:
-            filter_ids = \
-                [entity.id] + \
-                [e.id for e in entity.get_linked_entities_recursive('P46')]
-        return dict(
-            super().additional_fields(),
-            **{'human_remains_super': TableField(
-                _('super'),
-                filter_ids=filter_ids,
-                add_dynamic=['place'])})
-
-    def populate_insert(self) -> None:
-        super().populate_insert()
-        if self.origin and self.origin.class_.view in ['artifact', 'place']:
-            self.form.human_remains_super.data = self.origin.id
-
-    def populate_update(self) -> None:
-        super().populate_update()
-        if super_ := self.entity.get_linked_entity('P46', inverse=True):
-            self.form.human_remains_super.data = super_.id
+        if self.entity:
+            filter_ids = [self.entity.id] + [
+                e.id for e in self.entity.get_linked_entities_recursive('P46')]
+        if self.insert:
+            selection = self.origin if self.origin \
+                and self.origin.class_.view in ['artifact', 'place'] else None
+        else:
+            selection = self.entity.get_linked_entity('P46', inverse=True)
+        fields = super().additional_fields()
+        fields['super'] = TableField(
+            table(
+                'super',
+                Entity.get_by_class(
+                    g.view_class_mapping['place'] + ['human remains'],
+                    types=True,
+                    aliases=self.aliases),
+                filter_ids=filter_ids),
+            selection,
+            add_dynamic=['place'])
+        return fields
 
     def process_form(self) -> None:
         super().process_form()
-        if self.form.human_remains_super.data:
-            self.add_link(
-                'P46',
-                self.form.human_remains_super.data,
-                inverse=True)
+        if self.form.super.data:
+            self.add_link('P46', self.form.super.data, inverse=True)
 
 
 class HierarchyCustomManager(HierarchyBaseManager):
@@ -321,24 +327,27 @@ class HierarchyValueManager(HierarchyBaseManager):
 class InvolvementManager(BaseManager):
     fields = ['date', 'description', 'continue']
 
-    def additional_fields(self) -> dict[str, Any]:
+    def top_fields(self) -> dict[str, Any]:
         event_class_name = ''
         if self.link_:
             event_class_name = self.link_.domain.class_.name
         elif self.origin and self.origin.class_.view != 'actor':
             event_class_name = self.origin.class_.name
+        fields = {}
+        if self.insert and self.origin:
+            class_ = 'actor' if self.origin.class_.view == 'event' else 'event'
+            fields[class_] = TableMultiField(
+                table_multi(Entity.get_by_view(class_, True, self.aliases)),
+                validators=[InputRequired()])
         choices = [('P11', g.properties['P11'].name)]
-        if event_class_name in \
-                ['acquisition', 'activity', 'creation', 'modification',
-                 'production']:
+        if event_class_name in [
+                'acquisition', 'activity', 'creation', 'modification',
+                'production']:
             choices.append(('P14', g.properties['P14'].name))
             if event_class_name == 'acquisition':
                 choices.append(('P22', g.properties['P22'].name))
                 choices.append(('P23', g.properties['P23'].name))
-        fields = {'activity': SelectField(_('activity'), choices=choices)}
-        if not self.entity and not self.link_ and self.origin:
-            name = 'actor' if self.origin.class_.view == 'event' else 'event'
-            fields[name] = TableMultiField(_(name), [InputRequired()])
+        fields['activity'] = SelectField(_('activity'), choices=choices)
         return fields
 
     def populate_update(self) -> None:
@@ -377,24 +386,25 @@ class InvolvementManager(BaseManager):
 
 
 class ModificationManager(EventBaseManager):
-    def additional_fields(self) -> dict[str, Any]:
-        return dict(
-            super().additional_fields(),
-            **{
-                'artifact': TableMultiField(),
-                'modified_place': TableMultiField('place')})
+    _('modified place')
 
-    def populate_update(self) -> None:
-        super().populate_update()
-        artifact_data = []
-        place_data = []
-        for item in self.entity.get_linked_entities('P31'):
-            if item.class_.name == 'artifact':
-                artifact_data.append(item.id)
-            elif item.cidoc_class.code == 'E18':
-                place_data.append(item.id)
-        self.form.artifact.data = artifact_data
-        self.form.modified_place.data = place_data
+    def additional_fields(self) -> dict[str, Any]:
+        artifacts = []
+        places = []
+        if not self.insert:
+            for item in self.entity.get_linked_entities('P31'):
+                if item.class_.name == 'artifact':
+                    artifacts.append(item)
+                elif item.cidoc_class.code == 'E18':
+                    places.append(item)
+        fields = super().additional_fields()
+        fields['artifact'] = TableMultiField(
+            table_multi(Entity.get_by_class('artifact', True), artifacts),
+            artifacts)
+        fields['modified_place'] = TableMultiField(
+            table_multi(self.table_items['place'], places),
+            places)
+        return fields
 
     def process_form(self) -> None:
         super().process_form()
@@ -406,40 +416,55 @@ class ModificationManager(EventBaseManager):
 
 
 class MoveManager(EventBaseManager):
-    def additional_fields(self) -> dict[str, Any]:
-        return dict(
-            super().additional_fields(),
-            **{
-                'place_from': TableField(_('from'), add_dynamic=['place']),
-                'place_to': TableField(_('to'), add_dynamic=['place']),
-                'artifact': TableMultiField('moved artifact'),
-                'person': TableMultiField('moved person')})
+    _('moved artifact')
+    _('moved person')
+    _('place to')
+    _('place from')
 
-    def populate_update(self) -> None:
-        super().populate_update()
-        if place_from := self.entity.get_linked_entity('P27'):
-            self.form.place_from.data = \
-                place_from.get_linked_entity_safe('P53', True).id
-        if place_to := self.entity.get_linked_entity('P26'):
-            self.form.place_to.data = \
-                place_to.get_linked_entity_safe('P53', True).id
-        person_data = []
-        object_data = []
-        for linked_entity in self.entity.get_linked_entities('P25'):
-            if linked_entity.class_.name == 'person':
-                person_data.append(linked_entity.id)
-            elif linked_entity.class_.view == 'artifact':
-                object_data.append(linked_entity.id)
-        self.form.person.data = person_data
-        self.form.artifact.data = object_data
+    def additional_fields(self) -> dict[str, Any]:
+        fields = super().additional_fields()
+        place_from = None
+        place_to = None
+        data = {'artifact': [], 'person': []}
+        if self.entity:
+            if place := self.entity.get_linked_entity('P27'):
+                place_from = place.get_linked_entity_safe('P53', True)
+            if place := self.entity.get_linked_entity('P26'):
+                place_to = place.get_linked_entity_safe('P53', True)
+            for linked_entity in self.entity.get_linked_entities('P25'):
+                data[linked_entity.class_.name].append(linked_entity)
+        elif self.origin:
+            if self.origin.class_.view == 'artifact':
+                data['artifact'] = [self.origin]
+            elif self.origin.class_.view == 'place':
+                place_from = self.origin
+        fields['place_from'] = TableField(
+            table('place_from', self.table_items['place']),
+            place_from,
+            add_dynamic=['place'])
+        fields['place_to'] = TableField(
+            table('place_to', self.table_items['place']),
+            place_to,
+            add_dynamic=['place'])
+        fields['moved_artifact'] = TableMultiField(
+            table_multi(
+                Entity.get_by_class('artifact', True),
+                data['artifact']),
+            data['artifact'])
+        fields['moved_person'] = TableMultiField(
+            table_multi(
+                Entity.get_by_class('person', aliases=self.aliases),
+                data['person']),
+            data['person'])
+        return fields
 
     def process_form(self) -> None:
         super().process_form()
         self.data['links']['delete'].update(['P25', 'P26', 'P27'])
-        if self.form.artifact.data:
-            self.add_link('P25', self.form.artifact.data)
-        if self.form.person.data:
-            self.add_link('P25', self.form.person.data)
+        if self.form.moved_artifact.data:
+            self.add_link('P25', self.form.moved_artifact.data)
+        if self.form.moved_person.data:
+            self.add_link('P25', self.form.moved_person.data)
         if self.form.place_from.data:
             self.add_link(
                 'P27',
@@ -477,14 +502,14 @@ class PlaceManager(PlaceBaseManager):
 
 class ProductionManager(EventBaseManager):
     def additional_fields(self) -> dict[str, Any]:
-        return dict(
-            super().additional_fields(),
-            **{'artifact': TableMultiField()})
-
-    def populate_update(self) -> None:
-        super().populate_update()
-        self.form.artifact.data = \
-            [entity.id for entity in self.entity.get_linked_entities('P108')]
+        fields = super().additional_fields()
+        selection = None
+        if not self.insert and self.entity:
+            selection = self.entity.get_linked_entities('P108')
+        fields['artifact'] = TableMultiField(
+            table_multi(Entity.get_by_class('artifact', True), selection),
+            selection)
+        return fields
 
     def process_form(self) -> None:
         super().process_form()
@@ -554,19 +579,17 @@ class SourceManager(BaseManager):
         setattr(self.form_class, 'description', TextAreaField(_('content')))
 
     def additional_fields(self) -> dict[str, Any]:
+        selection = None
+        if not self.insert and self.entity:
+            selection = self.entity.get_linked_entities('P128', inverse=True)
+        elif self.origin and self.origin.class_.name == 'artifact':
+            selection = [self.origin]
         return {
-            'artifact': TableMultiField(description=_(
-                'Link artifacts as the information carrier of the source'))}
-
-    def populate_insert(self) -> None:
-        if self.origin and self.origin.class_.name == 'artifact':
-            self.form.artifact.data = [self.origin.id]
-
-    def populate_update(self) -> None:
-        super().populate_update()
-        self.form.artifact.data = [
-            item.id for item in
-            self.entity.get_linked_entities('P128', inverse=True)]
+            'artifact': TableMultiField(
+                table_multi(Entity.get_by_class('artifact', True), selection),
+                description=_(
+                    'Link artifacts as the information carrier of the source'),
+                selection=selection)}
 
     def process_form(self) -> None:
         super().process_form()
@@ -612,28 +635,24 @@ class StratigraphicUnitManager(PlaceBaseManager):
                 SubmitField(_('insert and add') + ' ' + _('human remains')))
 
     def additional_fields(self) -> dict[str, Any]:
-        return dict(
-            super().additional_fields(),
-            **{'stratigraphic_super': TableField(
-                _('super'),
-                [InputRequired()])})
-
-    def populate_insert(self) -> None:
-        super().populate_insert()
-        if self.origin and self.origin.class_.name == 'feature':
-            self.form.stratigraphic_super.data = self.origin.id
-
-    def populate_update(self) -> None:
-        super().populate_update()
-        self.form.stratigraphic_super.data = \
-            self.entity.get_linked_entity_safe('P46', inverse=True).id
+        fields = super().additional_fields()
+        selection = None
+        if not self.insert and self.entity:
+            selection = self.entity.get_linked_entity_safe('P46', inverse=True)
+        elif self.origin and self.origin.class_.name == 'feature':
+            selection = self.origin
+        fields['super'] = TableField(
+                table('super', Entity.get_by_class('feature', True)),
+                selection,
+                validators=[InputRequired()])
+        return fields
 
     def process_form(self) -> None:
         super().process_form()
         self.data['links']['delete_inverse'].add('P46')
         self.add_link(
             'P46',
-            Entity.get_by_id(int(self.form.stratigraphic_super.data)),
+            Entity.get_by_id(int(self.form.super.data)),
             inverse=True)
 
 

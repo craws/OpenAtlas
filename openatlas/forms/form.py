@@ -4,8 +4,10 @@ from typing import Any, Optional, TYPE_CHECKING
 
 from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
+from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import HiddenField, SelectMultipleField, StringField, widgets
+from wtforms.fields.simple import TextAreaField
 from wtforms.validators import InputRequired, URL
 
 from openatlas import app
@@ -13,7 +15,10 @@ from openatlas.display.table import Table
 from openatlas.display.util import get_base_table_data
 from openatlas.display.util2 import show_table_icons
 from openatlas.forms import base_manager, manager
-from openatlas.forms.field import SubmitField, TableMultiField, TreeField
+from openatlas.forms.field import (
+    SubmitField, TableField, TableMultiField, TreeField,
+    format_name_and_aliases)
+from openatlas.forms.util import table_multi
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.views.entity_index import file_preview
@@ -45,9 +50,40 @@ def get_add_reference_form(class_: str) -> Any:
     class Form(FlaskForm):
         pass
 
-    setattr(Form, class_, TableMultiField(_(class_), [InputRequired()]))
+    setattr(
+        Form,
+        class_,
+        TableMultiField(
+            table_multi(
+                Entity.get_by_view(
+                    class_,
+                    types=True,
+                    aliases=current_user.settings['table_show_aliases'])),
+            validators=[InputRequired()]))
     setattr(Form, 'page', StringField(_('page')))
     setattr(Form, 'save', SubmitField(_('insert')))
+    return Form()
+
+
+def get_annotation_form(
+        image_id,
+        entity: Optional[Entity] = None,
+        insert: Optional[bool] = True):
+    class Form(FlaskForm):
+        text = TextAreaField(_('annotation'))
+    if insert:
+        setattr(
+            Form,
+            'coordinate',
+            HiddenField(_('coordinates'), validators=[InputRequired()]))
+    table = Table(['name', 'class', 'description'])
+    for item in Entity.get_by_id(image_id).get_linked_entities('P67'):
+        table.rows.append([
+            format_name_and_aliases(item, 'entity'),
+            item.class_.name,
+            item.description])
+    setattr(Form, 'entity', TableField(table, entity))
+    setattr(Form, 'save', SubmitField(_('save')))
     return Form()
 
 
@@ -68,13 +104,45 @@ def get_table_form(classes: list[str], excluded: list[int]) -> str:
             if classes[0] == 'file' and show_table_icons():
                 rows.append(file_preview(entity.id))
             rows.extend(get_base_table_data(entity, show_links=False))
-
             table.rows.append(rows)
     if not table.rows:
         return '<p class="uc-first">' + _('no entries') + '</p>'
     return render_template(
         'forms/form_table.html',
         table=table.display(classes[0]))
+
+
+def get_cidoc_form() -> Any:
+    class Form(FlaskForm):
+        pass
+
+    for name in ('domain', 'property', 'range'):
+        selection = None
+        cidoc_table = Table(
+            ['code', 'name'],
+            defs=[
+                {'orderDataType': 'cidoc-model', 'targets': [0]},
+                {'sType': 'numeric', 'targets': [0]}])
+        for item in (
+                g.properties if name == 'property'
+                else g.cidoc_classes).values():
+            onclick = f'''
+                onclick="selectFromTable(
+                    this,
+                    '{name}',
+                    '{item.code}',
+                    '{item.code} {item.name}');"'''
+            cidoc_table.rows.append([
+                f'<a href="#" {onclick}>{item.code}</a>',
+                item.name])
+            if request.method == 'POST' and item.code == request.form[name]:
+                selection = item
+        setattr(
+            Form,
+            name,
+            TableField(cidoc_table, selection, validators=[InputRequired()]))
+    setattr(Form, 'save', SubmitField(_('test')))
+    return Form()
 
 
 def get_move_form(type_: Type) -> Any:
