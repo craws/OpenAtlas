@@ -55,6 +55,7 @@ class BaseManager:
         self.insert = bool(not self.entity and not self.link_)
         self.place_info: dict[str, Any] = {}
         self.aliases = current_user.settings['table_show_aliases']
+        self.table_items = {}  # Store table entities to avoid multiple loading
 
         if self.insert:
             self.get_place_info_for_insert()
@@ -242,17 +243,17 @@ class ActorBaseManager(BaseManager):
     _('ends in')
 
     def additional_fields(self) -> dict[str, Any]:
-
-        places = Entity.get_by_class('place', types=True, aliases=self.aliases)
+        self.table_items['place'] = \
+            Entity.get_by_class('place', types=True, aliases=self.aliases)
         return {
             'residence': TableField(
-                table('residence', 'place', places),
+                table('residence', 'place', self.table_items['place']),
                 add_dynamic=['place']),
             'begins_in': TableField(
-                table('begins in', 'place', places),
+                table('begins in', 'place', self.table_items['place']),
                 add_dynamic=['place']),
             'ends_in': TableField(
-                table('begins in', 'place', places),
+                table('begins in', 'place', self.table_items['place']),
                 add_dynamic=['place'])}
 
     def populate_insert(self) -> None:
@@ -341,13 +342,12 @@ class ArtifactBaseManager(PlaceBaseManager):
                 and self.origin.class_.view == 'actor' else None
         else:
             owner = self.entity.get_linked_entity('P52')
+        self.table_items['actor'] = \
+            Entity.get_by_view('actor', aliases=self.aliases)
         return {
             'owned_by':
                 TableField(
-                    table(
-                        'owned_by',
-                        'actor',
-                        Entity.get_by_view('actor', aliases=self.aliases)),
+                    table('owned_by', 'actor', self.table_items['actor']),
                     owner,
                     add_dynamic=['person', 'group'])}
 
@@ -389,13 +389,19 @@ class EventBaseManager(BaseManager):
             if self.class_.name != 'move':
                 if place_ := self.entity.get_linked_entity('P7'):
                     place = place_.get_linked_entity_safe('P53', True)
+        self.table_items = {
+            'event_view': Entity.get_by_view('event', True, self.aliases),
+            'place': Entity.get_by_class('place', True, self.aliases)}
+        self.table_items['event_preceding'] = [
+            e for e in self.table_items['event_view']
+            if e.class_.name != 'event']
         fields = {
             'sub_event_of':
                 TableField(
                     table(
                         'sub_event_of',
                         'event',
-                        Entity.get_by_view('event', True, self.aliases),
+                        self.table_items['event_view'],
                         sub_filter_ids),
                     super_event,
                     add_dynamic=[
@@ -410,12 +416,7 @@ class EventBaseManager(BaseManager):
                 table(
                     'preceding_event',
                     'event',
-                    Entity.get_by_class([
-                        'activity',
-                        'acquisition',
-                        'modification',
-                        'move',
-                        'production'], True, self.aliases),
+                    self.table_items['event_preceding'],
                     sub_filter_ids),
                 preceding_event,
                 add_dynamic=[
@@ -426,10 +427,7 @@ class EventBaseManager(BaseManager):
                     'production'])
         if self.class_.name != 'move':
             fields['place'] = TableField(
-                table(
-                    'place',
-                    'place',
-                    Entity.get_by_class('place', True, self.aliases)),
+                table('place', 'place', self.table_items['place']),
                 place,
                 add_dynamic=['place'])
         return fields

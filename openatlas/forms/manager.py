@@ -32,10 +32,7 @@ class AcquisitionManager(EventBaseManager):
                     else 'place'].append(entity)
         fields = super().additional_fields()
         fields['given_place'] = TableMultiField(
-            table_multi(
-                'place',
-                Entity.get_by_class('place', True, self.aliases),
-                data['place']),
+            table_multi('place', self.table_items['place'], data['place']),
             data['place'])
         fields['given_artifact'] = TableMultiField(
             table_multi(
@@ -419,10 +416,7 @@ class ModificationManager(EventBaseManager):
                 artifacts),
             artifacts)
         fields['modified_place'] = TableMultiField(
-            table_multi(
-                'place',
-                Entity.get_by_class('place', True, self.aliases),
-                places),
+            table_multi('place', self.table_items['place'], places),
             places)
         return fields
 
@@ -459,17 +453,11 @@ class MoveManager(EventBaseManager):
             elif self.origin.class_.view == 'place':
                 place_from = self.origin
         fields['place_from'] = TableField(
-            table(
-                'place_from',
-                'place',
-                Entity.get_by_class('place', True, self.aliases)),
+            table('place_from', 'place', self.table_items['place']),
             place_from,
             add_dynamic=['place'])
         fields['place_to'] = TableField(
-            table(
-                'place_to',
-                'place',
-                Entity.get_by_class('place', True, self.aliases)),
+            table('place_to', 'place', self.table_items['place']),
             place_to,
             add_dynamic=['place'])
         fields['moved_artifact'] = TableMultiField(
