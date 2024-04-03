@@ -29,19 +29,16 @@ class OverlayForm(FlaskForm):
 
 
 @app.route(
-    '/overlay/insert/<int:image_id>/<int:place_id>/<int:link_id>',
+    '/overlay/insert/<int:image_id>/<int:place_id>',
     methods=['GET', 'POST'])
 @required_group('editor')
 def overlay_insert(
         image_id: int,
-        place_id: int,
-        link_id: int) -> str | Response:
+        place_id: int) -> str | Response:
     form = OverlayForm()
     if form.validate_on_submit():
         Overlay.insert({
             'image_id': image_id,
-            'place_id': place_id,
-            'link_id': link_id,
             'top_left_northing': form.top_left_northing.data,
             'top_left_easting': form.top_left_easting.data,
             'top_right_northing': form.top_right_northing.data,
@@ -59,15 +56,16 @@ def overlay_insert(
             _('overlay')])
 
 
-@app.route('/overlay/update/<int:id_>', methods=['GET', 'POST'])
+@app.route(
+    '/overlay/update/<int:overlay_id>/<int:place_id>', methods=['GET', 'POST'])
 @required_group('editor')
-def overlay_update(id_: int) -> str | Response:
-    overlay = Overlay.get_by_id(id_)
+def overlay_update(place_id: int, overlay_id: int) -> str | Response:
+    overlay = Overlay.get_by_id(overlay_id)
+    place = Entity.get_by_id(place_id)
     form = OverlayForm()
     if form.validate_on_submit():
         Overlay.update({
             'image_id': overlay.image_id,
-            'place_id': overlay.place_id,
             'top_left_northing': form.top_left_northing.data,
             'top_left_easting': form.top_left_easting.data,
             'top_right_northing': form.top_right_northing.data,
@@ -76,7 +74,7 @@ def overlay_update(id_: int) -> str | Response:
             'bottom_left_easting': form.bottom_left_easting.data})
         flash(_('info update'), 'info')
         return redirect(
-            f"{url_for('view', id_=overlay.place_id)}#tab-file")
+            f"{url_for('view', id_=place.id)}#tab-file")
     bounding = [[0, 0], [0, 0], [0, 0]]  # For data entered before 6.4.0
     bounding_values = ast.literal_eval(overlay.bounding_box)
     if len(bounding_values) == 3:
@@ -87,20 +85,19 @@ def overlay_update(id_: int) -> str | Response:
     form.top_right_northing.data = bounding[1][0]
     form.bottom_left_easting.data = bounding[2][1]
     form.bottom_left_northing.data = bounding[2][0]
-    entity = Entity.get_by_id(overlay.place_id)
     return render_template(
         'overlay.html',
         form=form,
         overlay=overlay,
-        entity=entity,
+        entity=place,
         buttons=[
             button(
                 _('remove'),
-                url_for('overlay_remove', id_=overlay.id, place_id=entity.id),
+                url_for('overlay_remove', id_=overlay.id, place_id=place.id),
                 onclick=f"return confirm('{_('remove')}?');")],
         crumbs=[
             [_('place'), url_for('index', view='place')],
-            entity,
+            place,
             Entity.get_by_id(overlay.image_id),
             _('update overlay')])
 

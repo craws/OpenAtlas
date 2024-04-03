@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 13.13 (Debian 13.13-0+deb11u1)
--- Dumped by pg_dump version 13.13 (Debian 13.13-0+deb11u1)
+-- Dumped from database version 15.6 (Debian 15.6-0+deb12u1)
+-- Dumped by pg_dump version 15.6 (Debian 15.6-0+deb12u1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -25,8 +25,6 @@ ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_boo
 ALTER TABLE IF EXISTS ONLY web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_openatlas_class_openatlas_class_name_fkey;
 ALTER TABLE IF EXISTS ONLY web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_form_reference_system_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.reference_system DROP CONSTRAINT IF EXISTS reference_system_entity_id_fkey;
-ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_place_id_fkey;
-ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_link_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_image_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.hierarchy_openatlas_class DROP CONSTRAINT IF EXISTS hierarchy_openatlas_class_openatlas_class_name_fkey;
 ALTER TABLE IF EXISTS ONLY web.hierarchy DROP CONSTRAINT IF EXISTS hierarchy_id_fkey;
@@ -89,7 +87,7 @@ ALTER TABLE IF EXISTS ONLY web.reference_system_openatlas_class DROP CONSTRAINT 
 ALTER TABLE IF EXISTS ONLY web.reference_system DROP CONSTRAINT IF EXISTS reference_system_name_key;
 ALTER TABLE IF EXISTS ONLY web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_form_pkey;
 ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_pkey;
-ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_image_id_place_id_key;
+ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_image_id_key;
 ALTER TABLE IF EXISTS ONLY web.system_log DROP CONSTRAINT IF EXISTS log_pkey;
 ALTER TABLE IF EXISTS ONLY web.i18n DROP CONSTRAINT IF EXISTS i18n_pkey;
 ALTER TABLE IF EXISTS ONLY web.i18n DROP CONSTRAINT IF EXISTS i18n_name_language_key;
@@ -1086,8 +1084,6 @@ ALTER SEQUENCE web.log_id_seq OWNED BY web.system_log.id;
 CREATE TABLE web.map_overlay (
     id integer NOT NULL,
     image_id integer NOT NULL,
-    place_id integer NOT NULL,
-    link_id integer NOT NULL,
     bounding_box text NOT NULL,
     created timestamp without time zone DEFAULT now() NOT NULL,
     modified timestamp without time zone
@@ -1095,13 +1091,6 @@ CREATE TABLE web.map_overlay (
 
 
 ALTER TABLE web.map_overlay OWNER TO openatlas;
-
---
--- Name: COLUMN map_overlay.link_id; Type: COMMENT; Schema: web; Owner: openatlas
---
-
-COMMENT ON COLUMN web.map_overlay.link_id IS 'Used to remove overlay entry if link is removed';
-
 
 --
 -- Name: map_overlay_id_seq; Type: SEQUENCE; Schema: web; Owner: openatlas
@@ -1865,11 +1854,11 @@ ALTER TABLE ONLY web.system_log
 
 
 --
--- Name: map_overlay map_overlay_image_id_place_id_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: map_overlay map_overlay_image_id_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY web.map_overlay
-    ADD CONSTRAINT map_overlay_image_id_place_id_key UNIQUE (image_id, place_id);
+    ADD CONSTRAINT map_overlay_image_id_key UNIQUE (image_id);
 
 
 --
@@ -2351,22 +2340,6 @@ ALTER TABLE ONLY web.hierarchy_openatlas_class
 
 ALTER TABLE ONLY web.map_overlay
     ADD CONSTRAINT map_overlay_image_id_fkey FOREIGN KEY (image_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: map_overlay map_overlay_link_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
---
-
-ALTER TABLE ONLY web.map_overlay
-    ADD CONSTRAINT map_overlay_link_id_fkey FOREIGN KEY (link_id) REFERENCES model.link(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: map_overlay map_overlay_place_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
---
-
-ALTER TABLE ONLY web.map_overlay
-    ADD CONSTRAINT map_overlay_place_id_fkey FOREIGN KEY (place_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
