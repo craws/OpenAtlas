@@ -243,35 +243,36 @@ class ActorBaseManager(BaseManager):
     _('ends in')
 
     def additional_fields(self) -> dict[str, Any]:
+        residence = None
+        begins_in = None
+        ends_in = None
         self.table_items['place'] = \
             Entity.get_by_class('place', types=True, aliases=self.aliases)
+        if not self.insert:
+            if residence := self.entity.get_linked_entity('P74'):
+                residence = residence.get_linked_entity_safe('P53', True)
+            if first := self.entity.get_linked_entity('OA8'):
+                begins_in = first.get_linked_entity_safe('P53', True)
+            if last := self.entity.get_linked_entity('OA9'):
+                ends_in = last.get_linked_entity_safe('P53', True)
         return {
             'residence': TableField(
                 table('residence', self.table_items['place']),
+                residence,
                 add_dynamic=['place']),
             'begins_in': TableField(
                 table('begins in', self.table_items['place']),
+                begins_in,
                 add_dynamic=['place']),
             'ends_in': TableField(
                 table('begins in', self.table_items['place']),
+                ends_in,
                 add_dynamic=['place'])}
 
     def populate_insert(self) -> None:
         self.form.alias.append_entry('')
         if self.origin and self.origin.class_.name == 'place':
             self.form.residence.data = self.origin.id
-
-    def populate_update(self) -> None:
-        super().populate_update()
-        if residence := self.entity.get_linked_entity('P74'):
-            self.form.residence.data = \
-                residence.get_linked_entity_safe('P53', True).id
-        if first := self.entity.get_linked_entity('OA8'):
-            self.form.begins_in.data = \
-                first.get_linked_entity_safe('P53', True).id
-        if last := self.entity.get_linked_entity('OA9'):
-            self.form.ends_in.data = \
-                last.get_linked_entity_safe('P53', True).id
 
     def process_form(self) -> None:
         super().process_form()
@@ -380,12 +381,12 @@ class EventBaseManager(BaseManager):
     def additional_fields(self) -> dict[str, Any]:
         sub_filter_ids = []
         super_event = None
-        preceding_event = None
+        event_preceding = None
         place = None
         if not self.insert:
             sub_filter_ids = self.get_sub_ids(self.entity, [self.entity.id])
             super_event = self.entity.get_linked_entity('P9', inverse=True)
-            preceding_event = self.entity.get_linked_entity('P134')
+            event_preceding = self.entity.get_linked_entity('P134')
             if self.class_.name != 'move':
                 if place_ := self.entity.get_linked_entity('P7'):
                     place = place_.get_linked_entity_safe('P53', True)
@@ -402,27 +403,14 @@ class EventBaseManager(BaseManager):
                         'sub_event_of',
                         self.table_items['event_view'],
                         sub_filter_ids),
-                    super_event,
-                    add_dynamic=[
-                        'activity',
-                        'acquisition',
-                        'event',
-                        'modification',
-                        'move',
-                        'production'])}
+                    super_event)}
         if self.class_.name != 'event':
-            fields['preceding_event'] = TableField(
+            fields['event_preceding'] = TableField(
                 table(
-                    'preceding_event',
+                    'event_preceding',
                     self.table_items['event_preceding'],
                     sub_filter_ids),
-                preceding_event,
-                add_dynamic=[
-                    'activity',
-                    'acquisition',
-                    'modification',
-                    'move',
-                    'production'])
+                event_preceding)
         if self.class_.name != 'move':
             fields['place'] = TableField(
                 table('place', self.table_items['place']),
@@ -442,7 +430,7 @@ class EventBaseManager(BaseManager):
         self.add_link('P9', self.form.sub_event_of.data, inverse=True)
         if self.class_.name != 'event':
             self.data['links']['delete'].add('P134')
-            self.add_link('P134', self.form.preceding_event.data)
+            self.add_link('P134', self.form.event_preceding.data)
         if self.class_.name != 'move':
             self.data['links']['delete'].add('P7')
             if self.form.place.data:
