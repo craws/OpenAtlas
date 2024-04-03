@@ -24,7 +24,7 @@ INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name, descript
   ('E33', 'source', 'Silmarillion', NULL),
   ('E21', 'person', 'Frodo', 'That is Frodo'),
   ('E21', 'person', 'Sam', 'That is Sam'),
-  ('E32', 'external_reference', 'https://lotr.fandom.com/', NULL),
+  ('E31', 'external_reference', 'https://lotr.fandom.com/', NULL),
   ('E41', 'appellation', 'Sûza', NULL),
   ('E41', 'appellation', 'The ring bearer', NULL),
   ('E7', 'activity', 'Travel to Mordor', NULL),

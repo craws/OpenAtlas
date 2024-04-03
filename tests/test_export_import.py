@@ -8,10 +8,10 @@ from flask import url_for
 from openatlas import app
 from openatlas.api.resources.model_mapper import get_by_cidoc_classes
 from openatlas.models.export import current_date_for_filename
-from tests.base import TestBaseCase
+from tests.base import ExportImportTestCase, TestBaseCase
 
 
-class ExportImportTest(TestBaseCase):
+class ExportImportTest(ExportImportTestCase):
 
     def test_export(self) -> None:
         with app.app_context():
@@ -31,6 +31,8 @@ class ExportImportTest(TestBaseCase):
                             carantania = entity
                         case 'Place':
                             place_type = entity
+                        case 'https://lotr.fandom.com/':
+                            reference = entity
 
             rv: Any = self.app.get(url_for('export_sql'))
             assert b'Export SQL' in rv.data
@@ -140,6 +142,8 @@ class ExportImportTest(TestBaseCase):
             assert b'invalid value type values' in rv.data
             assert b'invalid coordinates' in rv.data
             assert b'invalid reference system' in rv.data
+            assert b'invalid references' in rv.data
+            assert b'invalid reference id' in rv.data
             assert b'empty names' in rv.data
             assert b'double IDs in import' in rv.data
 
@@ -192,6 +196,7 @@ class ExportImportTest(TestBaseCase):
                 boundary_mark.id, infrastructure.id, austria.id, place_type.id]
             data_frame.at[0, 'type_ids'] = ' '.join(map(str, type_ids_list))
             data_frame.at[0, 'value_types'] = f'{height.id};42'
+            data_frame.at[0, 'references'] = f'{reference.id};IV'
             data_frame.at[0, 'wkt'] = "POLYGON((16.1203 BLA, 16.606275))"
             data_frame.to_csv(test_path / 'example.csv', index=False)
             with open(test_path / 'example.csv', 'rb') as file:

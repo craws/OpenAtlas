@@ -64,6 +64,16 @@ class ApiTestCase(TestBaseCase):
             self.cursor.execute(sql_file.read())
 
 
+class ExportImportTestCase(TestBaseCase):
+
+    def setUp(self) -> None:
+        super().setUp()
+        with open(
+                Path(app.root_path).parent / 'install' / 'data_test_api.sql',
+                encoding='utf8') as sql_file:
+            self.cursor.execute(sql_file.read())
+
+
 def insert(
         class_: str,
         name: str,

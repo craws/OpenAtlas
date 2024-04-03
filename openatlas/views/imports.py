@@ -18,6 +18,8 @@ from wtforms import (
 from openatlas import app
 from openatlas.api.import_scripts.util import (
     get_match_types, get_reference_system_by_name)
+from openatlas.api.resources.error import EntityDoesNotExistError
+from openatlas.api.resources.model_mapper import get_entity_by_id
 from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
@@ -45,6 +47,8 @@ _('invalid value type ids')
 _('invalid value type values')
 _('invalid coordinates')
 _('invalid openatlas class')
+_('invalid references')
+_('invalid reference id')
 _('empty names')
 _('empty ids')
 _('missing name column')
@@ -394,6 +398,7 @@ def check_parent(
             return False
     return False  # pragma: no cover
 
+
 def get_clean_header(
         data_frame: DataFrame,
         class_: str,
@@ -418,7 +423,8 @@ def get_allowed_columns(class_: str) -> dict[str, list[str]]:
     if class_ not in g.view_class_mapping['reference']:
         columns.extend([
             'begin_from', 'begin_to', 'begin_comment',
-            'end_from', 'end_to', 'end_comment'])
+            'end_from', 'end_to', 'end_comment',
+            'references'])
     if class_ in ['place', 'person', 'group']:
         columns.append('alias')
     if class_ in ['place', 'artifact']:
@@ -477,6 +483,25 @@ def check_cell_value(
                     checks.set_warning('invalid_value_type_values', id_)
                 value_types.append(';'.join(values))
             value = ' '.join(value_types)
+        case 'references' if value:
+            references = []
+            for reference in str(value).split():
+                values = str(reference).split(';')
+                if len(values) > 2:
+                    references.append(error_span(reference))
+                    checks.set_warning('invalid_references', id_)
+                    continue
+                if not values[0].isdigit():
+                    values[0] = error_span(values[0])
+                    checks.set_warning('invalid_reference_id', id_)
+                else:
+                    try:
+                        get_entity_by_id(int(values[0]))
+                    except EntityDoesNotExistError:
+                        values[0] = error_span(values[0])
+                        checks.set_warning('invalid_reference_id', id_)
+                references.append(';'.join(values))
+            value = ' '.join(references)
         case 'wkt' if value:
             wkt_ = None
             try:
