@@ -44,11 +44,15 @@ class Overlay:
 
     @staticmethod
     def get_by_object(object_: Entity) -> dict[int, Overlay]:
-        # todo: make overlay available for subunits
-        # places: list[Entity] = [object_] + \
-        #     [e for e in object_.get_linked_entities_recursive('P46', True)]
-        # todo get_display_files() get all files not only the linked ones
-        ids = [image.id for image in object_.get_display_files()]
+        places = [object_] + \
+            [e for e in object_.get_linked_entities_recursive('P46', True)]
+        ids = []
+        for place in places:
+            for reference in place.get_linked_entities('P67', True):
+                if reference.class_.name == 'file':
+                    ids.append(reference.id)
+        if not ids:
+            return {}
         return {row['image_id']: Overlay(row) for row in db.get_by_object(ids)}
 
     @staticmethod

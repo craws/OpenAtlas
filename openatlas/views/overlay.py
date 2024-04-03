@@ -56,7 +56,8 @@ def overlay_insert(
             _('overlay')])
 
 
-@app.route('/overlay/update/<int:place_id>/<int:overlay_id>', methods=['GET', 'POST'])
+@app.route(
+    '/overlay/update/<int:overlay_id>/<int:place_id>', methods=['GET', 'POST'])
 @required_group('editor')
 def overlay_update(place_id: int, overlay_id: int) -> str | Response:
     overlay = Overlay.get_by_id(overlay_id)

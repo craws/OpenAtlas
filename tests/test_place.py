@@ -165,17 +165,15 @@ class PlaceTest(TestBaseCase):
             rv = self.app.get(
                 url_for(
                     'overlay_update',
-                    id_=overlay_id,
-                    place_id=place.id,
-                    link_id=link_id))
+                    overlay_id=overlay_id,
+                    place_id=place.id))
             assert b'42' in rv.data
 
             rv = self.app.post(
                 url_for(
                     'overlay_update',
-                    id_=overlay_id,
-                    place_id=place.id,
-                    link_id=link_id),
+                    overlay_id=overlay_id,
+                    place_id=place.id),
                 data=data,
                 follow_redirects=True)
             assert b'Changes have been saved' in rv.data
