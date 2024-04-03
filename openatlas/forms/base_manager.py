@@ -247,13 +247,13 @@ class ActorBaseManager(BaseManager):
             Entity.get_by_class('place', types=True, aliases=self.aliases)
         return {
             'residence': TableField(
-                table('residence', 'place', self.table_items['place']),
+                table('residence', self.table_items['place']),
                 add_dynamic=['place']),
             'begins_in': TableField(
-                table('begins in', 'place', self.table_items['place']),
+                table('begins in', self.table_items['place']),
                 add_dynamic=['place']),
             'ends_in': TableField(
-                table('begins in', 'place', self.table_items['place']),
+                table('begins in', self.table_items['place']),
                 add_dynamic=['place'])}
 
     def populate_insert(self) -> None:
@@ -347,7 +347,7 @@ class ArtifactBaseManager(PlaceBaseManager):
         return {
             'owned_by':
                 TableField(
-                    table('owned_by', 'actor', self.table_items['actor']),
+                    table('owned_by', self.table_items['actor']),
                     owner,
                     add_dynamic=['person', 'group'])}
 
@@ -400,7 +400,6 @@ class EventBaseManager(BaseManager):
                 TableField(
                     table(
                         'sub_event_of',
-                        'event',
                         self.table_items['event_view'],
                         sub_filter_ids),
                     super_event,
@@ -415,7 +414,6 @@ class EventBaseManager(BaseManager):
             fields['preceding_event'] = TableField(
                 table(
                     'preceding_event',
-                    'event',
                     self.table_items['event_preceding'],
                     sub_filter_ids),
                 preceding_event,
@@ -427,7 +425,7 @@ class EventBaseManager(BaseManager):
                     'production'])
         if self.class_.name != 'move':
             fields['place'] = TableField(
-                table('place', 'place', self.table_items['place']),
+                table('place', self.table_items['place']),
                 place,
                 add_dynamic=['place'])
         return fields

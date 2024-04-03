@@ -186,25 +186,24 @@ def check_if_entity_has_time(item: Entity | Link) -> bool:
 
 def table(
         table_id: str,
-        class_name: str,
         entities: list[Entity],
         filter_ids: Optional[list[int]] = None) -> Table:
-    table_ = Table(g.table_headers[class_name])
-    for entity in \
-            [e for e in entities if not filter_ids or e.id not in filter_ids]:
-        data = get_base_table_data(entity, show_links=False)
-        data[0] = format_name_and_aliases(entity, table_id)
+    table_ = Table(
+        g.table_headers[entities[0].class_.name if entities else 'place'])
+    for e in [e for e in entities if not filter_ids or e.id not in filter_ids]:
+        data = get_base_table_data(e, show_links=False)
+        data[0] = format_name_and_aliases(e, table_id)
         table_.rows.append(data)
     return table_
 
 
 def table_multi(
-        class_name: str,
         entities: list[Entity],
         selection: Optional[list[Entity]] = None,
         filter_ids: Optional[list[int]] = None) -> Table:
     filter_ids = filter_ids or []
     selection_ids = [e.id for e in selection] if selection else []
+    class_name = entities[0].class_.name if entities else 'place'
     table_ = Table(
         [''] + g.table_headers[class_name],
         order=[[0, 'desc'], [1, 'asc']],

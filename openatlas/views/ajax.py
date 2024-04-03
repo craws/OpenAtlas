@@ -83,7 +83,6 @@ def ajax_create_entity() -> str:
 def ajax_get_entity_table(content_domain: str) -> str:
     table_ = table(
         content_domain,
-        content_domain,
         Entity.get_by_class(
             content_domain,
             True,

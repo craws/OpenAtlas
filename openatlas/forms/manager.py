@@ -32,11 +32,10 @@ class AcquisitionManager(EventBaseManager):
                     else 'place'].append(entity)
         fields = super().additional_fields()
         fields['given_place'] = TableMultiField(
-            table_multi('place', self.table_items['place'], data['place']),
+            table_multi(self.table_items['place'], data['place']),
             data['place'])
         fields['given_artifact'] = TableMultiField(
             table_multi(
-                'artifact',
                 Entity.get_by_class('artifact', True),
                 data['artifact']),
             data['artifact'])
@@ -65,10 +64,7 @@ class ActorFunctionManager(BaseManager):
             'member_origin_id': HiddenField(),
             field_name:
                 TableMultiField(
-                    table_multi(
-                        'actor',
-                        entities,
-                        filter_ids=[self.origin.id]),
+                    table_multi(entities, filter_ids=[self.origin.id]),
                     validators=[InputRequired()])}
 
     def populate_insert(self) -> None:
@@ -103,7 +99,6 @@ class ActorRelationManager(BaseManager):
         if not self.link_:
             fields['actor'] = TableMultiField(
                 table_multi(
-                    'actor',
                     Entity.get_by_class('person', aliases=self.aliases),
                     filter_ids=[self.origin.id]),
                 validators=[InputRequired()])
@@ -170,7 +165,6 @@ class ArtifactManager(ArtifactBaseManager):
         fields['super'] = TableField(
             table(
                 'super',
-                'place',
                 Entity.get_by_class(
                     g.view_class_mapping['place'] + ['artifact'],
                     types=True,
@@ -200,7 +194,7 @@ class CreationManager(EventBaseManager):
             selection = self.entity.get_linked_entities('P94')
         fields = super().additional_fields()
         fields['document'] = TableMultiField(
-            table_multi('file', Entity.get_by_class('file'), selection),
+            table_multi(Entity.get_by_class('file'), selection),
             selection)
         return fields
 
@@ -251,10 +245,7 @@ class FeatureManager(PlaceBaseManager):
         else:
             selection = self.entity.get_linked_entity('P46', inverse=True)
         fields['super'] = TableField(
-            table(
-                'super',
-                'place',
-                Entity.get_by_class('place', True, self.aliases)),
+            table('super', Entity.get_by_class('place', True, self.aliases)),
             selection,
             validators=[InputRequired()],
             add_dynamic=['place'])
@@ -299,22 +290,18 @@ class HumanRemainsManager(ArtifactBaseManager):
                 and self.origin.class_.view in ['artifact', 'place'] else None
         else:
             selection = self.entity.get_linked_entity('P46', inverse=True)
-        return dict(
-            super().additional_fields(),
-            **{
-                'super':
-                    TableField(
-                        table(
-                            'super',
-                            'place',
-                            Entity.get_by_class(
-                                g.view_class_mapping['place']
-                                + ['human remains'],
-                                types=True,
-                                aliases=self.aliases),
-                            filter_ids=filter_ids),
-                        selection,
-                        add_dynamic=['place'])})
+        fields = super().additional_fields()
+        fields['super'] = TableField(
+            table(
+                'super',
+                Entity.get_by_class(
+                    g.view_class_mapping['place'] + ['human remains'],
+                    types=True,
+                    aliases=self.aliases),
+                filter_ids=filter_ids),
+            selection,
+            add_dynamic=['place'])
+        return fields
 
     def process_form(self) -> None:
         super().process_form()
@@ -355,9 +342,7 @@ class InvolvementManager(BaseManager):
         if self.insert and self.origin:
             class_ = 'actor' if self.origin.class_.view == 'event' else 'event'
             fields[class_] = TableMultiField(
-                table_multi(
-                    'person',
-                    Entity.get_by_view(class_, True, self.aliases)),
+                table_multi(Entity.get_by_view(class_, True, self.aliases)),
                 validators=[InputRequired()])
         return fields
 
@@ -410,13 +395,10 @@ class ModificationManager(EventBaseManager):
                     places.append(item)
         fields = super().additional_fields()
         fields['artifact'] = TableMultiField(
-            table_multi(
-                'artifact',
-                Entity.get_by_class('artifact', True),
-                artifacts),
+            table_multi(Entity.get_by_class('artifact', True), artifacts),
             artifacts)
         fields['modified_place'] = TableMultiField(
-            table_multi('place', self.table_items['place'], places),
+            table_multi(self.table_items['place'], places),
             places)
         return fields
 
@@ -453,22 +435,20 @@ class MoveManager(EventBaseManager):
             elif self.origin.class_.view == 'place':
                 place_from = self.origin
         fields['place_from'] = TableField(
-            table('place_from', 'place', self.table_items['place']),
+            table('place_from', self.table_items['place']),
             place_from,
             add_dynamic=['place'])
         fields['place_to'] = TableField(
-            table('place_to', 'place', self.table_items['place']),
+            table('place_to', self.table_items['place']),
             place_to,
             add_dynamic=['place'])
         fields['moved_artifact'] = TableMultiField(
             table_multi(
-                'artifact',
                 Entity.get_by_class('artifact', True),
                 data['artifact']),
             data['artifact'])
         fields['moved_person'] = TableMultiField(
             table_multi(
-                'person',
                 Entity.get_by_class('person', aliases=self.aliases),
                 data['person']),
             data['person'])
@@ -523,10 +503,7 @@ class ProductionManager(EventBaseManager):
         if not self.insert and self.entity:
             selection = self.entity.get_linked_entities('P108')
         fields['artifact'] = TableMultiField(
-            table_multi(
-                'artifact',
-                Entity.get_by_class('artifact', True),
-                selection),
+            table_multi(Entity.get_by_class('artifact', True), selection),
             selection)
         return fields
 
@@ -605,10 +582,7 @@ class SourceManager(BaseManager):
             selection = [self.origin]
         return {
             'artifact': TableMultiField(
-                table_multi(
-                    'artifact',
-                    Entity.get_by_class('artifact', True),
-                    selection),
+                table_multi(Entity.get_by_class('artifact', True), selection),
                 description=_(
                     'Link artifacts as the information carrier of the source'),
                 selection=selection)}
@@ -664,7 +638,7 @@ class StratigraphicUnitManager(PlaceBaseManager):
         elif self.origin and self.origin.class_.name == 'feature':
             selection = self.origin
         fields['super'] = TableField(
-                table('super', 'place', Entity.get_by_class('feature', True)),
+                table('super', Entity.get_by_class('feature', True)),
                 selection,
                 validators=[InputRequired()])
         return fields

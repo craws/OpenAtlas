@@ -55,11 +55,10 @@ def get_add_reference_form(class_: str) -> Any:
         class_,
         TableMultiField(
             table_multi(
-                class_,
                 Entity.get_by_view(
                     class_,
-                    True,
-                    current_user.settings['table_show_aliases'])),
+                    types=True,
+                    aliases=current_user.settings['table_show_aliases'])),
             validators=[InputRequired()]))
     setattr(Form, 'page', StringField(_('page')))
     setattr(Form, 'save', SubmitField(_('insert')))
