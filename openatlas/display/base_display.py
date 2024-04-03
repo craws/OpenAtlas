@@ -410,7 +410,8 @@ class PlaceBaseDisplay(BaseDisplay):
                         if domain.id in overlays and (html_link := edit_link(
                                 url_for(
                                     'overlay_update',
-                                    id_=overlays[domain.id].id))):
+                                    place_id=entity.id,
+                                    overlay_id=overlays[domain.id].id))):
                             content += html_link
                         else:
                             content = link(

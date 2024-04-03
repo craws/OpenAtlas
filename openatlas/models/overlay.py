@@ -14,7 +14,6 @@ class Overlay:
         self.id = row['id']
         self.name = row['name'] if 'name' in row else ''
         self.image_id = row['image_id']
-        self.place_id = row['place_id']
         self.bounding_box = row['bounding_box']
         path = get_file_path(row['image_id'])
         self.image_name = path.name if path else False
@@ -23,8 +22,6 @@ class Overlay:
     def insert(data: dict[str, Any]) -> None:
         db.insert({
             'image_id': data['image_id'],
-            'place_id': data['place_id'],
-            'link_id': data['link_id'],
             'bounding_box':
                 f"[[{data['top_left_northing']}, "
                 f"{data['top_left_easting']}], "
@@ -37,7 +34,6 @@ class Overlay:
     def update(data: dict[str, Any]) -> None:
         db.update({
             'image_id': data['image_id'],
-            'place_id': data['place_id'],
             'bounding_box':
                 f"[[{data['top_left_northing']}, "
                 f"{data['top_left_easting']}], "
@@ -48,8 +44,15 @@ class Overlay:
 
     @staticmethod
     def get_by_object(object_: Entity) -> dict[int, Overlay]:
-        ids = [object_.id] + \
-            [e.id for e in object_.get_linked_entities_recursive('P46', True)]
+        places = [object_] + \
+            [e for e in object_.get_linked_entities_recursive('P46', True)]
+        ids = []
+        for place in places:
+            for reference in place.get_linked_entities('P67', True):
+                if reference.class_.name == 'file':
+                    ids.append(reference.id)
+        if not ids:
+            return {}
         return {row['image_id']: Overlay(row) for row in db.get_by_object(ids)}
 
     @staticmethod
