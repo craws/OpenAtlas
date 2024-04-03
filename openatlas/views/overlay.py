@@ -29,19 +29,16 @@ class OverlayForm(FlaskForm):
 
 
 @app.route(
-    '/overlay/insert/<int:image_id>/<int:place_id>/<int:link_id>',
+    '/overlay/insert/<int:image_id>/<int:place_id>',
     methods=['GET', 'POST'])
 @required_group('editor')
 def overlay_insert(
         image_id: int,
-        place_id: int,
-        link_id: int) -> str | Response:
+        place_id: int) -> str | Response:
     form = OverlayForm()
     if form.validate_on_submit():
         Overlay.insert({
             'image_id': image_id,
-            'place_id': place_id,
-            'link_id': link_id,
             'top_left_northing': form.top_left_northing.data,
             'top_left_easting': form.top_left_easting.data,
             'top_right_northing': form.top_right_northing.data,
