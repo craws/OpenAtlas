@@ -51,7 +51,7 @@ class AcquisitionManager(EventBaseManager):
 class ActorFunctionManager(BaseManager):
     fields = ['date', 'description', 'continue']
 
-    def additional_fields(self) -> dict[str, Any]:
+    def top_fields(self) -> dict[str, Any]:
         if self.link_:
             return {}
         if 'membership' in request.url:
@@ -94,8 +94,8 @@ class ActorFunctionManager(BaseManager):
 class ActorRelationManager(BaseManager):
     fields = ['date', 'description', 'continue']
 
-    def additional_fields(self) -> dict[str, Any]:
-        fields = {'inverse': BooleanField(_('inverse'))}
+    def top_fields(self) -> dict[str, Any]:
+        fields = {}
         if not self.link_:
             fields['actor'] = TableMultiField(
                 table_multi(
@@ -104,6 +104,9 @@ class ActorRelationManager(BaseManager):
                 validators=[InputRequired()])
             fields['relation_origin_id'] = HiddenField()
         return fields
+
+    def additional_fields(self) -> dict[str, Any]:
+        return {'inverse': BooleanField(_('inverse'))}
 
     def populate_insert(self) -> None:
         self.form.relation_origin_id.data = self.origin.id
@@ -324,12 +327,18 @@ class HierarchyValueManager(HierarchyBaseManager):
 class InvolvementManager(BaseManager):
     fields = ['date', 'description', 'continue']
 
-    def additional_fields(self) -> dict[str, Any]:
+    def top_fields(self) -> dict[str, Any]:
         event_class_name = ''
         if self.link_:
             event_class_name = self.link_.domain.class_.name
         elif self.origin and self.origin.class_.view != 'actor':
             event_class_name = self.origin.class_.name
+        fields = {}
+        if self.insert and self.origin:
+            class_ = 'actor' if self.origin.class_.view == 'event' else 'event'
+            fields[class_] = TableMultiField(
+                table_multi(Entity.get_by_view(class_, True, self.aliases)),
+                validators=[InputRequired()])
         choices = [('P11', g.properties['P11'].name)]
         if event_class_name in [
                 'acquisition', 'activity', 'creation', 'modification',
@@ -338,12 +347,7 @@ class InvolvementManager(BaseManager):
             if event_class_name == 'acquisition':
                 choices.append(('P22', g.properties['P22'].name))
                 choices.append(('P23', g.properties['P23'].name))
-        fields = {'activity': SelectField(_('activity'), choices=choices)}
-        if self.insert and self.origin:
-            class_ = 'actor' if self.origin.class_.view == 'event' else 'event'
-            fields[class_] = TableMultiField(
-                table_multi(Entity.get_by_view(class_, True, self.aliases)),
-                validators=[InputRequired()])
+        fields['activity'] = SelectField(_('activity'), choices=choices)
         return fields
 
     def populate_update(self) -> None:

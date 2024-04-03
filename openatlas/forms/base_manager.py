@@ -68,6 +68,8 @@ class BaseManager:
 
         self.form_class = Form
         self.add_name_fields()
+        for id_, field in self.top_fields().items():
+            setattr(Form, id_, field)
         add_types(self)
         for id_, field in self.additional_fields().items():
             setattr(Form, id_, field)
@@ -164,6 +166,9 @@ class BaseManager:
             setattr(self.form_class, 'continue_', HiddenField())
 
     def additional_fields(self) -> dict[str, Any]:
+        return {}
+
+    def top_fields(self) -> dict[str, Any]:
         return {}
 
     def get_link_type(self) -> Optional[Entity]:
