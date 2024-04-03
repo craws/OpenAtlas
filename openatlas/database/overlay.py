@@ -21,7 +21,7 @@ def update(data: dict[str, Any]) -> None:
         """
         UPDATE web.map_overlay
         SET bounding_box = %(bounding_box)s
-        WHERE image_id = %(image_id)s AND place_id = %(place_id)s;
+        WHERE image_id = %(image_id)s;
         """,
         data)
 
