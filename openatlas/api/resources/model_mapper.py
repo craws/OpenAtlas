@@ -7,6 +7,7 @@ from openatlas.api.resources.error import (
     InvalidSystemClassError, InvalidViewClassError)
 from openatlas.models.entity import Entity
 
+# todo: add class ApiEntity(Entity)
 
 def get_entity_by_id(id_: int) -> Entity:
     try:
