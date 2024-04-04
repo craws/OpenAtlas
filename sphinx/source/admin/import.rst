@@ -8,11 +8,18 @@ from `CSV <https://en.wikipedia.org/wiki/Comma-separated_values>`_ files.
 Currently lists can be imported containing:
 
 * Name
+* Alias
 * Description
 * Dates
 * GIS data
 * Types
+* Value types
+* References
+* Reference systems
+* Administrative unit
+* Historical place
 * origin_id
+* Place hierarchy
 
 Preparations
 ------------
@@ -26,11 +33,11 @@ nothing will be imported.
 
 **The file:**
 
-* Take a look at the :download:`example.csv`
+* Take a look at the :download:`example.csv` or :download:`example_place_hierarchy.csv`
 * Make sure the extension is spelled correctly in lower case e.g. my_data.csv
-* In the first line should be the header names
-* Each following line is one data set. Values are separated by commas
-* Text can be enclosed in double quotes, especially if the contain commas
+* In the first row should be the header names
+* Each following row is one data set. Values are separated by commas
+* Text can be enclosed in double quotes (**"**), especially if the contain commas
 
 Projects
 --------
@@ -50,27 +57,30 @@ an error message.
 * **name** - required, an error will be displayed if the header is missing. A warning will be displayed, if names in data rows are missing and these wont get imported.
 * **alias** - only available for person, group and place, see below
 * **description** - a description can be provided
-* **origin_id** - optional but useful to trace it back. It has to be **unique per project** so if you have multiple like a person and place with id = 1 you can prefix them in the document e.g. person_1, place_1 before importing them
+* **origin_id** - It has to be **unique per project** so if you have multiple like a person and place with id = 1 you can prefix them in the document e.g. person_1, place_1 before importing them
 * **begin_from** - used for dates, see below
 * **begin_to** - used for dates, see below
 * **end_from** - used for dates, see below
 * **end_to** - used for dates, see below
 * **type_ids** - used to link to types, see below
 * **value_types** - used to link to a value type, see below
+* **references** - used to link existing references, see below
 * **wkt** - only available for places and artifacts, see below
 * **reference_system_*** - used to link existing external reference systems, see below
 * **administrative_unit** - only available for places, id of existing administrative unit
 * **historical_place** - only available for places, id of existing historical place
+* **parent_id** - only available for place, id of of a super unit in a place hierarchy, see below
+* **openatlas_class** - only available for place and only used with **parent_id**, see below
 
 
 Alias
 +++++
 :doc:`/ui/alias` can be entered as string. Multiple aliases can be separated with semicolon (**;**).
-If an alias contains a comma (**,**) please surround the whole filed with double quotes(**"**)
+If an :doc:`/ui/alias` contains a comma (**,**) please surround the whole filed with double quotes(**"**)
 
 Dates
 +++++
-Dates can be entered in the format **YYYY-MM-DD** in the fields **begin_from** and **end_from**.
+:doc:`/ui/date`s can be entered in the format **YYYY-MM-DD** in the fields **begin_from** and **end_from**.
 You can also use time spans in combinations with the fields **begin_to** and **end_to**,
 see: :doc:`/ui/date`
 
@@ -80,22 +90,31 @@ see: :doc:`/ui/date`
 
 Types
 +++++
-It is possible to link entities to types at the import which can be very useful e.g. if you have
+It is possible to link entities to :doc:`/entity/type` at the import which can be very useful e.g. if you have
 a custom type **Case studies** to link them all in one go.
 
-* Type ids can be entered at the column **type_ids**
+* :doc:`/entity/type` ids can be entered at the column **type_ids**
 * You can enter multiple separated with a space
-* The id of a type can be looked up at the detail view of a type
+* The id of a :doc:`/entity/type` can be looked up at the detail view of a :doc:`/entity/type`
 
 Value types
 +++++++++++
-It is possible to link entities to value types at the import.
+It is possible to link entities to value :doc:`/entity/type` at the import.
 
-* Value types can be entered at the column **value_types**
+* Value :doc:`/entity/type` can be entered at the column **value_types**
 * Type id and value are separated with an semicolon (**;**), e.g. 1234;-13.65
-* Value types need always a value
+* Value :doc:`/entity/type` need always a value
 * You can enter multiple separated with a space
-* The id of a type can be looked up at the detail view of a value type
+* The id of a value :doc:`/entity/type` can be looked up at the detail view of a value :doc:`/entity/type`
+
+References
+++++++++++
+It is possible to link existing :doc:`/entity/reference` to imported entities.
+
+* :doc:`/entity/reference` ID and pages are separated with an semicolon (**;**), e.g. 1234;56-78
+* To link :doc:`/entity/reference` without page number just add the ID without semicolon (**;**)
+* You can enter multiple :doc:`/entity/reference` separated with a space, e.g. 1234;56-78 5678
+* The ID of an :doc:`/entity/reference` can be looked up at the detail view of the entity
 
 WKT coordinates
 +++++++++++++++
@@ -112,7 +131,7 @@ External reference systems
 ++++++++++++++++++++++++++
 It is possible to link the imported entity to an existing :doc:`/entity/reference_system`.
 In this case, the header has to be named **reference_system_*** with the *name* of the
-external reference system appended, e.g. **reference_system_wikidata**.
+external :doc:`/entity/reference_system` appended, e.g. **reference_system_wikidata**.
 If spaces occur in the name, please substitute them with underscore (**_**), e.g.
 **reference_system_getty_aat**.
 
@@ -121,6 +140,19 @@ the identifier, e.g. Q54123, the second value is the match type (**close_match**
 
 Example:
     Q54123;close_match
+
+Parent id and OpenAtlas class
++++++++++++++++++++++++++++++
+The **parent_id** is used to generate a :doc:`/entity/place` hierarchy together with :doc:`feature`, :doc:`stratigraphic_unit`,
+:doc:`artifact`, and :doc:`/entity/human_remains`.
+The **parent_id** has to be a **origin_id** of a row in the **current** import file.
+To declare, which entry has a specific class, the **openatlas_class** column is used.
+Here the following classes can be entered: :doc:`/entity/place`, :doc:`feature`, :doc:`stratigraphic_unit`,
+:doc:`artifact`, and :doc:`/entity/human_remains`. This is case insensitive.
+For a example, please see: :download:`example_place_hierarchy.csv`
+For questions about the correct place hierarchy structure, please refer to our the archaeological sub units model.
+
+.. image:: model/openatlas_schema2.png
 
 
 Import options

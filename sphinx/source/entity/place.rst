@@ -57,7 +57,7 @@ extends in space that can be connected to various other information (temporal,
 spatial, events, sources etc.). Furthermore, places can be divided into
 multiple subunits to record archaeological information. For more information
 on those subunits see :doc:`feature`, :doc:`stratigraphic_unit`,
-:doc:`artifact`, and Human remains as well as a detailed workflow example
+:doc:`artifact`, and :doc:`/entity/human_remains` as well as a detailed workflow example
 (:doc:`/examples/archaeological_data`).
 
 An example of a place would be a graveyard. That place is the superior unit.
