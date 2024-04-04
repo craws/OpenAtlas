@@ -227,7 +227,7 @@ def get_by_page(
 
 def download(
         data: list[Any] | dict[Any, Any],
-        template: dict[Any, Any],
+        template: dict[str, Any],
         name: str | int) -> Response:
     return Response(
         json.dumps(marshal(data, template)),

@@ -28,7 +28,7 @@ class GetBackendDetails(Resource):
                 'url': g.settings['iiif_url'],
                 'version': int(g.settings['iiif_version'])}}
         if parser['download']:
-            download(details, backend_details_template(), 'content')
+            return download(details, backend_details_template(), 'content')
         return marshal(details, backend_details_template()), 200
 
 
@@ -36,34 +36,30 @@ class Classes(Resource):
     @staticmethod
     def get() -> tuple[Resource, int] | Response:
         return marshal([{
-            "systemClass": class_.name,
-            "crmClass":
-                class_.cidoc_class.code if class_.cidoc_class else None,
-            "view": class_.view,
-            "standardTypeId": class_.standard_type_id,
-            "icon": class_.icon,
-            "en": class_.label}
-            for class_ in g.classes.values()],
+            "systemClass": item.name,
+            "crmClass": item.cidoc_class.code if item.cidoc_class else None,
+            "view": item.view,
+            "standardTypeId": item.standard_type_id,
+            "icon": item.icon,
+            "en": item.label} for item in g.classes.values()],
             class_overview_template()), 200
 
 
 class ClassMapping(Resource):
     @staticmethod
     def get() -> tuple[Resource, int] | Response:
-        parser = locale.parse_args()
         results = {
             "locale": session['language'],
             "results": [{
                 "label": class_.label,
                 "systemClass": class_.name,
                 "crmClass":
-                    class_.cidoc_class.code if class_.cidoc_class else
-                    None,
+                    class_.cidoc_class.code if class_.cidoc_class else None,
                 "view": class_.view,
                 "standardTypeId": class_.standard_type_id,
                 "icon": class_.icon} for class_ in g.classes.values()]}
-        if parser['download']:
-            download(results, class_mapping_template(), 'content')
+        if locale.parse_args()['download']:
+            return download(results, class_mapping_template(), 'content')
         return marshal(results, class_mapping_template()), 200
 
 

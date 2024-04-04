@@ -304,35 +304,33 @@ def class_overview_template() -> dict[str, Type[String]]:
 
 
 def class_mapping_template() -> dict[str, Type[String]]:
-    classes = {
-        'label': fields.String,
-        'systemClass': fields.String,
-        'crmClass': fields.String,
-        'view': fields.String,
-        'standardTypeId': fields.String,
-        'icon': fields.String}
     return {
         "locale": fields.String,
-        'results': fields.List(fields.Nested(classes))}
+        'results': fields.List(fields.Nested({
+            'label': fields.String,
+            'systemClass': fields.String,
+            'crmClass': fields.String,
+            'view': fields.String,
+            'standardTypeId': fields.String,
+            'icon': fields.String}))}
 
 
 def backend_details_template() -> dict[str, Type[String]]:
-    image_processing = {
-        'enabled': fields.String,
-        'availableImageSizes': fields.Raw}
-    iiif = {
-        'enabled': fields.String,
-        'url': fields.String,
-        'version': fields.String}
     return {
         'version': fields.String,
         'apiVersions': fields.Raw,
         'siteName': fields.String,
-        'imageProcessing': fields.Nested(image_processing),
-        'IIIF': fields.Nested(iiif)}
+        'imageProcessing': fields.Nested({
+            'enabled': fields.String,
+            'availableImageSizes': fields.Raw}),
+        'IIIF': fields.Nested({
+            'enabled': fields.String,
+            'url': fields.String,
+            'version': fields.String})}
 
 
 def licensed_file_template(entities: list[Entity]) -> dict[str, Any]:
+    dict_: dict[str, Any] = defaultdict()
     file = {
         'display': fields.String,
         'thumbnail': fields.String,
@@ -340,8 +338,6 @@ def licensed_file_template(entities: list[Entity]) -> dict[str, Any]:
         'mimetype': fields.String,
         'license': fields.String,
         'IIIFManifest': fields.String}
-
-    dict_: dict[str, Any] = defaultdict()
     for entity in entities:
         dict_[str(entity.id)] = fields.Nested(file)
     return dict_
