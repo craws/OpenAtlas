@@ -266,11 +266,11 @@ class ActorBaseManager(BaseManager):
                 residence,
                 add_dynamic=['place']),
             'begins_in': TableField(
-                table('begins in', self.table_items['place']),
+                table('begins_in', self.table_items['place']),
                 begins_in,
                 add_dynamic=['place']),
             'ends_in': TableField(
-                table('begins in', self.table_items['place']),
+                table('ends_in', self.table_items['place']),
                 ends_in,
                 add_dynamic=['place'])}
 
@@ -417,8 +417,8 @@ class EventBaseManager(BaseManager):
                     sub_filter_ids),
                 event_preceding)
         if self.class_.name != 'move':
-            fields['place'] = TableField(
-                table('place', self.table_items['place']),
+            fields['location'] = TableField(
+                table('location', self.table_items['place']),
                 place,
                 add_dynamic=['place'])
         return fields
@@ -427,7 +427,7 @@ class EventBaseManager(BaseManager):
         if self.origin \
                 and self.origin.class_.view == 'place' \
                 and self.class_.name != 'move':
-            self.form.place.data = self.origin.id
+            self.form.location.data = self.origin.id
 
     def process_form(self) -> None:
         super().process_form()
@@ -438,11 +438,11 @@ class EventBaseManager(BaseManager):
             self.add_link('P134', self.form.event_preceding.data)
         if self.class_.name != 'move':
             self.data['links']['delete'].add('P7')
-            if self.form.place.data:
+            if self.form.location.data:
                 self.add_link(
                     'P7',
                     Entity.get_linked_entity_safe_static(
-                        int(self.form.place.data),
+                        int(self.form.location.data),
                         'P53'))
         if self.origin and self.origin.class_.view == 'actor':
             self.add_link('P11', self.origin, return_link_id=True)
