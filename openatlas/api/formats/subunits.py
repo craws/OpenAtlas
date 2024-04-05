@@ -3,8 +3,6 @@ from typing import Any, Optional
 
 from flask import g
 
-from openatlas.api.resources.database_mapper import get_all_links_as_dict
-from openatlas.api.resources.model_mapper import get_entities_by_ids
 from openatlas.api.resources.util import (
     filter_link_list_by_property_codes, get_geometric_collection,
     get_license_name, get_reference_systems, remove_duplicate_entities,
@@ -202,11 +200,12 @@ def get_types(data: dict[str, Any]) -> Optional[list[dict[str, Any]]]:
 def get_subunits_from_id(
         entity: Entity,
         parser: dict[str, Any]) -> list[dict[str, Any]]:
-    all_links = get_all_links_as_dict()
-    entity_ids = get_all_subs_linked_to_place(entity, all_links)
-    entities = get_entities_by_ids(entity_ids)
+    entities = ([entity] +
+                entity.get_linked_entities_recursive('P46', types=True))
     entities.sort(key=attrgetter('id'))
-    links = get_links_from_list_of_links(entity_ids, all_links)
+    links_test = Entity.get_links_of_entities([e.id for e in entities])
+    links_test_inverse = (
+        Entity.get_links_of_entities([e.id for e in entities], inverse=True))
     ext_reference_links = get_type_links_inverse(entities)
     latest_modified = max(
         entity.modified for entity in entities if entity.modified)
@@ -215,11 +214,11 @@ def get_subunits_from_id(
         entities_dict[entity_.id] = {
             'entity': entity_,
             'links':
-                [Link(link_) for link_ in links['links']
-                 if link_['domain_id'] == entity_.id],
+                [link_ for link_ in links_test
+                 if link_.domain.id == entity_.id],
             'links_inverse':
-                [Link(link_) for link_ in links['links_inverse']
-                 if link_['range_id'] == entity_.id],
+                [link_ for link_ in links_test_inverse
+                 if link_.range.id == entity_.id],
             'ext_reference_links': ext_reference_links,
             'root_id': entity.id,
             'latest_modified': latest_modified,
@@ -228,13 +227,14 @@ def get_subunits_from_id(
 
 
 def get_links_from_list_of_links(
-        entities: list[int],
+        entities: list[Entity],
         links: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
+    entities_id = [entity.id for entity in entities]
     data: dict[str, list[Any]] = {'links': [], 'links_inverse': []}
     for link_ in links:
-        if link_['domain_id'] in entities:
+        if link_['domain_id'] in entities_id:
             data['links'].append(link_)
-        if link_['range_id'] in entities:
+        if link_['range_id'] in entities_id:
             data['links_inverse'].append(link_)
     return data
 
@@ -258,9 +258,11 @@ def get_all_subs_linked_to_place_recursive(
     return data
 
 
-def get_type_links_inverse(entities: list[Entity]) -> list[Link]:
+def get_type_links_inverse(entities: list[Entity]) -> Optional[list[Link]]:
     types = remove_duplicate_entities(
         [type_ for entity in entities for type_ in entity.types])
+    if not types:
+        return None
     links = Entity.get_links_of_entities(
         [type_.id for type_ in types],
         'P67',

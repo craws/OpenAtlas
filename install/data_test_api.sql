@@ -8,27 +8,28 @@ INSERT INTO model.entity (
   '2022-09-21 16:38:05.923431'
 );
 
-INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name, description) VALUES
-  ('E53', 'object_location', 'Location of Shire', NULL),
-  ('E18', 'place', 'Mordor', 'The heart of evil.'),
-  ('E53', 'object_location', 'Location of Mordor', NULL),
-  ('E22', 'artifact', 'The One Ring', NULL),
-  ('E53', 'object_location', 'Location of The One Ring', NULL),
-  ('E18', 'feature', 'Home of Baggins', NULL),
-  ('E53', 'object_location', 'Location of Home of Baggins', NULL),
-  ('E18', 'stratigraphic_unit', 'Bar', NULL),
-  ('E53', 'object_location', 'Location of Bar', NULL),
-  ('E31', 'file', 'Picture with a License', NULL),
-  ('E31', 'file', 'File without license', NULL),
-  ('E31', 'file', 'File without file', NULL),
-  ('E33', 'source', 'Silmarillion', NULL),
-  ('E21', 'person', 'Frodo', 'That is Frodo'),
-  ('E21', 'person', 'Sam', 'That is Sam'),
-  ('E32', 'external_reference', 'https://lotr.fandom.com/', NULL),
-  ('E41', 'appellation', 'Sûza', NULL),
-  ('E41', 'appellation', 'The ring bearer', NULL),
-  ('E7', 'activity', 'Travel to Mordor', NULL),
-  ('E7', 'activity', 'Exchange of the one ring', NULL);
+INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name, description, modified)
+VALUES
+  ('E53', 'object_location', 'Location of Shire', NULL, CURRENT_TIMESTAMP),
+  ('E18', 'place', 'Mordor', 'The heart of evil.', CURRENT_TIMESTAMP),
+  ('E53', 'object_location', 'Location of Mordor', NULL, CURRENT_TIMESTAMP),
+  ('E22', 'artifact', 'The One Ring', NULL, CURRENT_TIMESTAMP),
+  ('E53', 'object_location', 'Location of The One Ring', NULL, CURRENT_TIMESTAMP),
+  ('E18', 'feature', 'Home of Baggins', NULL, CURRENT_TIMESTAMP),
+  ('E53', 'object_location', 'Location of Home of Baggins', NULL, CURRENT_TIMESTAMP),
+  ('E18', 'stratigraphic_unit', 'Bar', NULL, CURRENT_TIMESTAMP),
+  ('E53', 'object_location', 'Location of Bar', NULL, CURRENT_TIMESTAMP),
+  ('E31', 'file', 'Picture with a License', NULL, CURRENT_TIMESTAMP),
+  ('E31', 'file', 'File without license', NULL, CURRENT_TIMESTAMP),
+  ('E31', 'file', 'File without file', NULL, CURRENT_TIMESTAMP),
+  ('E33', 'source', 'Silmarillion', NULL, CURRENT_TIMESTAMP),
+  ('E21', 'person', 'Frodo', 'That is Frodo', CURRENT_TIMESTAMP),
+  ('E21', 'person', 'Sam', 'That is Sam', CURRENT_TIMESTAMP),
+  ('E32', 'external_reference', 'https://lotr.fandom.com/', NULL, CURRENT_TIMESTAMP),
+  ('E41', 'appellation', 'Sûza', NULL, CURRENT_TIMESTAMP),
+  ('E41', 'appellation', 'The ring bearer', NULL, CURRENT_TIMESTAMP),
+  ('E7', 'activity', 'Travel to Mordor', NULL, CURRENT_TIMESTAMP),
+  ('E7', 'activity', 'Exchange of the one ring', NULL, CURRENT_TIMESTAMP);
 
 
 INSERT INTO model.gis (entity_id, name, description, type, geom_point, geom_polygon, geom_linestring)

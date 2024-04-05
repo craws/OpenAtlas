@@ -389,24 +389,25 @@ def get_roots(
 
 def get_linked_entities_recursive(
         id_: int,
-        code: str,
+        codes: list[str] | str,
         inverse: bool) -> list[int]:
     first = 'domain_id' if inverse else 'range_id'
     second = 'range_id' if inverse else 'domain_id'
+    codes = codes if isinstance(codes, list) else [codes]
     g.cursor.execute(
         f"""
         WITH RECURSIVE items AS (
             SELECT {first}
             FROM model.link
-            WHERE {second} = %(id_)s AND property_code = %(code)s
+            WHERE {second} = %(id_)s AND property_code IN %(code)s
             UNION
                 SELECT l.{first} FROM model.link l
                 INNER JOIN items i ON
                     l.{second} = i.{first}
-                    AND l.property_code = %(code)s
+                    AND l.property_code IN %(code)s
             ) SELECT {first} FROM items;
         """,
-        {'id_': id_, 'code': code})
+        {'id_': id_, 'code': tuple(codes) if codes else ''})
     return [row[first] for row in g.cursor.fetchall()]
 
 
