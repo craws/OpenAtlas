@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import ast
-from typing import Any, Optional, TYPE_CHECKING
+from collections import defaultdict
+from typing import Any, Dict, List, Optional, TYPE_CHECKING
 
 from flask import g, json
 from shapely.geometry import Point, Polygon, LineString
@@ -24,8 +25,16 @@ class Gis:
         return db.get_by_id(id_)
 
     @staticmethod
+    def get_by_ids(ids: list[int]) -> defaultdict[int, list[dict[str, Any]]]:
+        return db.get_by_ids(ids)
+
+    @staticmethod
     def get_centroids_by_id(id_: int) -> list[dict[str, Any]]:
         return db.get_centroids_by_id(id_)
+
+    @staticmethod
+    def get_centroids_by_ids(ids: list[int]) -> defaultdict[int, list]:
+        return db.get_centroids_by_ids(ids)
 
     @staticmethod
     def get_wkt_by_id(id_: int) -> list[dict[str, Any]]:

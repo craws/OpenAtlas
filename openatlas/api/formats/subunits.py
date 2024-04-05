@@ -1,14 +1,19 @@
+import time
 from operator import attrgetter
 from typing import Any, Optional
 
 from flask import g
 
 from openatlas.api.resources.util import (
-    filter_link_list_by_property_codes, get_geometric_collection,
-    get_license_name, get_reference_systems, remove_duplicate_entities,
+    filter_link_list_by_property_codes,
+    get_geometric_collection_with_geoms, get_license_name, get_location_links,
+    get_reference_systems,
+    remove_duplicate_entities,
     replace_empty_list_values_in_dict_with_none)
+from openatlas.database.gis import get_centroids_by_ids
 from openatlas.display.util import get_file_path
 from openatlas.models.entity import Entity
+from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 
 
@@ -24,9 +29,10 @@ def get_subunit(data: dict[str, Any]) -> dict[str, Any]:
         'latestModRec': data['latest_modified'],
         'geometry':
             get_geometries_thanados(
-                get_geometric_collection(
+                get_geometric_collection_with_geoms(
                     data['entity'],
                     data['links'],
+                    data['geoms'],
                     data['parser']),
                 data['parser']),
         'children': get_children(data),
@@ -79,7 +85,7 @@ def transform_geometries_for_xml(geom: dict[str, Any]) -> list[Any]:
 def transform_coordinates_for_xml(coordinates: list[float]) -> list[Any]:
     return [
         {'coordinate':
-            {'longitude': coordinates[0], 'latitude': coordinates[1]}}]
+             {'longitude': coordinates[0], 'latitude': coordinates[1]}}]
 
 
 def get_properties(data: dict[str, Any]) -> dict[str, Any]:
@@ -132,10 +138,10 @@ def get_references(
 
 def get_timespans(entity: Entity) -> dict[str, Any]:
     return {
-        'earliestBegin': str(entity.begin_from) if entity.begin_from else None,
-        'latestBegin': str(entity.begin_to) if entity.begin_to else None,
-        'earliestEnd': str(entity.end_from) if entity.end_from else None,
-        'latestEnd': str(entity.end_to) if entity.end_to else None}
+        'earliestBegin': str(entity.begin_from) or None,
+        'latestBegin': str(entity.begin_to) or None,
+        'earliestEnd': str(entity.end_from) or None,
+        'latestEnd': str(entity.end_to) or None}
 
 
 def get_file(data: dict[str, Any]) -> list[dict[str, Any]]:
@@ -176,8 +182,9 @@ def get_types(data: dict[str, Any]) -> Optional[list[dict[str, Any]]]:
     for type_ in data['entity'].types:
         if type_.category == 'standard':
             continue
-        type_ref_link = [link for link in data['ext_reference_links'] if
-                         link.range.id == type_.id]
+        type_ref_link = [
+            link for link in data['ext_reference_links']
+            if link.range.id == type_.id]
         types_dict = {
             'id': type_.id,
             'name': type_.name,
@@ -203,22 +210,47 @@ def get_subunits_from_id(
     entities = ([entity] +
                 entity.get_linked_entities_recursive('P46', types=True))
     entities.sort(key=attrgetter('id'))
-    links_test = Entity.get_links_of_entities([e.id for e in entities])
-    links_test_inverse = (
+    links = Entity.get_links_of_entities([e.id for e in entities])
+    links_inverse = (
         Entity.get_links_of_entities([e.id for e in entities], inverse=True))
     ext_reference_links = get_type_links_inverse(entities)
     latest_modified = max(
         entity.modified for entity in entities if entity.modified)
+    link_dict = {}
+    for entity in entities:
+        link_dict[entity.id] = {
+            'links': set(),
+            'links_inverse': set(),
+            'geoms': []}
+    for link_ in links:
+        link_dict[link_.domain.id]['links'].add(link_)
+    for link_ in links_inverse:
+        link_dict[link_.range.id]['links_inverse'].add(link_)
+    location_links = get_location_links(links)
+    location_ids = [l_.range.id for l_ in location_links]
+    location_geoms = Gis.get_by_ids(location_ids)
+
+    location_centroids = None
+    if parser['centroid']:
+        location_centroids = get_centroids_by_ids(location_ids)
+
+    for entity in entities:
+        for link_ in location_links:
+            if entity.id == link_.domain.id:
+                entity.location = link_.range
+                link_dict[entity.id]['geoms'].extend(
+                    location_geoms[link_.range.id])
+                if parser['centroid']:
+                    link_dict[entity.id]['geoms'].extend(
+                        location_centroids[link_.range.id])
+
     entities_dict: dict[int, Any] = {}
     for entity_ in entities:
         entities_dict[entity_.id] = {
             'entity': entity_,
-            'links':
-                [link_ for link_ in links_test
-                 if link_.domain.id == entity_.id],
-            'links_inverse':
-                [link_ for link_ in links_test_inverse
-                 if link_.range.id == entity_.id],
+            'links': link_dict[entity_.id]['links'],
+            'links_inverse': link_dict[entity_.id]['links_inverse'],
+            'geoms': link_dict[entity_.id]['geoms'],
             'ext_reference_links': ext_reference_links,
             'root_id': entity.id,
             'latest_modified': latest_modified,

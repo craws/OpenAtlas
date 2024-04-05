@@ -175,43 +175,82 @@ def get_reference_systems(
                 'referenceSystem': system.name})
     return ref
 
-
 def get_geometric_collection(
         entity: Entity,
         links: list[Link],
         parser: dict[str, Any]) -> Optional[dict[str, Any]]:
-    data = None
-    if entity.class_.view == 'place' or entity.class_.name == 'artifact':
-        data = get_geoms_by_entity(get_location_id(links), parser['centroid'])
-    elif entity.class_.name == 'object_location':
-        data = get_geoms_by_entity(entity.id, parser['centroid'])
-    elif entity.class_.view == 'actor':
-        geoms = [
-            Gis.get_by_id(link_.range.id) for link_ in links
-            if link_.property.code in ['P74', 'OA8', 'OA9']]
-        if parser['centroid']:
-            geoms.extend(
-                [Gis.get_centroids_by_id(link_.range.id) for link_ in links
-                 if link_.property.code in ['P74', 'OA8', 'OA9']])
-        data = {
-            'type': 'GeometryCollection',
-            'geometries': [geom for sublist in geoms for geom in sublist]}
-    elif entity.class_.view == 'event':
-        geoms = [
-            Gis.get_by_id(link_.range.id) for link_ in links
-            if link_.property.code in ['P7', 'P26', 'P27']]
-        if parser['centroid']:
-            geoms.extend(
-                [Gis.get_centroids_by_id(link_.range.id) for link_ in links
-                 if link_.property.code in ['P7', 'P26', 'P27']])
-        data = {
-            'type': 'GeometryCollection',
-            'geometries': [geom for sublist in geoms for geom in sublist]}
-    return data
+    match entity.class_.view:
+        case 'place' | 'artifact':
+            return get_geoms_by_entity(
+                get_location_id(links),
+                parser['centroid'])
+        case 'actor':
+            geoms = [
+                Gis.get_by_id(link_.range.id) for link_ in links
+                if link_.property.code in ['P74', 'OA8', 'OA9']]
+            if parser['centroid']:
+                geoms.extend(
+                    [Gis.get_centroids_by_id(link_.range.id) for link_ in links
+                     if link_.property.code in ['P74', 'OA8', 'OA9']])
+            return {
+                'type': 'GeometryCollection',
+                'geometries': [geom for sublist in geoms for geom in sublist]}
+        case 'event':
+            geoms = [
+                Gis.get_by_id(link_.range.id) for link_ in links
+                if link_.property.code in ['P7', 'P26', 'P27']]
+            if parser['centroid']:
+                geoms.extend(
+                    [Gis.get_centroids_by_id(link_.range.id) for link_ in links
+                     if link_.property.code in ['P7', 'P26', 'P27']])
+            return {
+                'type': 'GeometryCollection',
+                'geometries': [geom for sublist in geoms for geom in sublist]}
+        case _ if entity.class_.name == 'object_location':
+            return get_geoms_by_entity(entity.id, parser['centroid'])
+    return None
+
+def get_geometric_collection_with_geoms(
+        entity: Entity,
+        links: list[Link],
+        geoms: list[dict[str, Any]],
+        parser: dict[str, Any]) -> Optional[dict[str, Any]]:
+    match entity.class_.view:
+        case 'place' | 'artifact':
+            return get_geojson_geometries(geoms)
+        case 'actor':
+            geoms = [
+                Gis.get_by_id(link_.range.id) for link_ in links
+                if link_.property.code in ['P74', 'OA8', 'OA9']]
+            if parser['centroid']:
+                geoms.extend(
+                    [Gis.get_centroids_by_id(link_.range.id) for link_ in links
+                     if link_.property.code in ['P74', 'OA8', 'OA9']])
+            return {
+                'type': 'GeometryCollection',
+                'geometries': [geom for sublist in geoms for geom in sublist]}
+        case 'event':
+            geoms = [
+                Gis.get_by_id(link_.range.id) for link_ in links
+                if link_.property.code in ['P7', 'P26', 'P27']]
+            if parser['centroid']:
+                geoms.extend(
+                    [Gis.get_centroids_by_id(link_.range.id) for link_ in links
+                     if link_.property.code in ['P7', 'P26', 'P27']])
+            return {
+                'type': 'GeometryCollection',
+                'geometries': [geom for sublist in geoms for geom in sublist]}
+        case _ if entity.class_.name == 'object_location':
+            return get_geojson_geometries(geoms)
+    return None
 
 
 def get_location_id(links: list[Link]) -> int:
     return [l_.range.id for l_ in links if l_.property.code == 'P53'][0]
+
+
+def get_location_links(links: list[Link]) -> list[Link]:
+    return [link_ for link_ in links if link_.property.code == 'P53']
 
 
 def get_location_link(links: list[Link]) -> Link:
@@ -228,6 +267,10 @@ def get_geoms_by_entity(
         return geoms[0]
     return {'type': 'GeometryCollection', 'geometries': geoms}
 
+def get_geojson_geometries(geoms: list[dict[str, Any]]) -> dict[str, Any]:
+    if len(geoms) == 1:
+        return geoms[0]
+    return {'type': 'GeometryCollection', 'geometries': geoms}
 
 def get_geometries(parser: dict[str, Any]) -> list[dict[str, Any]]:
     choices = [
