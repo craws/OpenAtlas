@@ -40,6 +40,9 @@ class IndexTests(TestBaseCase):
             assert b'Database version error is needed but current' in rv.data
             assert b'directory not writable' in rv.data
 
+            rv = self.app.get('/static/non_existing_file.js')
+            assert b'The site does not exist.' in rv.data
+
             rv = self.app.get(url_for('logout'), follow_redirects=True)
             assert b'Password' in rv.data
 
