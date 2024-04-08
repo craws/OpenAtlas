@@ -338,5 +338,3 @@ def get_crm_code(link_: Link, inverse: bool = False) -> str:
     return f"crm:{code} {name}"
 
 
-def flatten_list_and_remove_duplicates(list_: list[Any]) -> list[Any]:
-    return [item for sublist in list_ for item in sublist if item not in list_]

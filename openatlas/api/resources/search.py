@@ -5,7 +5,9 @@ from flask import g
 from openatlas.api.resources.search_validation import (
     check_if_date, check_if_date_search)
 from openatlas.api.resources.util import (
-    flatten_list_and_remove_duplicates, get_linked_entities_id_api)
+    get_linked_entities_id_api)
+from openatlas.api.resources.api_entity import \
+    flatten_list_and_remove_duplicates
 from openatlas.models.entity import Entity
 
 

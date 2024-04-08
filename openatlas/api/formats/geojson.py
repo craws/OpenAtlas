@@ -3,8 +3,10 @@ from typing import Any, Optional
 from flask import g
 
 from openatlas.api.resources.util import (
-    flatten_list_and_remove_duplicates, get_location_link, link_parser_check,
+    get_location_link, link_parser_check,
     replace_empty_list_values_in_dict_with_none)
+from openatlas.api.resources.api_entity import \
+    flatten_list_and_remove_duplicates
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 
