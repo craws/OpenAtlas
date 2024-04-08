@@ -20,15 +20,16 @@ from openatlas.display.util import (
 class DisplayImage(Resource):
     @staticmethod
     def get(filename: str) -> Response:
-        entity = ApiEntity.get_entity_by_id_safe(
-            int(Pathlib_path(filename).stem))
+        entity = ApiEntity.get_by_id(
+            int(Pathlib_path(filename).stem),
+            types=True)
         if not get_license_name(entity):
             raise NoLicenseError
         parser = image.parse_args()
-        filepath = get_file_path(
-            entity,
-            app.config['IMAGE_SIZE'][parser['image_size']]
-            if parser['image_size'] else None)
+        size = None
+        if parser['image_size']:
+            size = app.config['IMAGE_SIZE'][parser['image_size']]
+        filepath = get_file_path(entity, size)
         if not filepath:
             raise DisplayFileNotFoundError
         return send_file(filepath, as_attachment=bool(parser['download']))
@@ -44,31 +45,35 @@ class LicensedFileOverview(Resource):
             entities = ApiEntity.get_by_system_classes(['file'])
         files_dict = {}
         for entity in entities:
-            if license_ := get_license_name(entity):
-                if path := get_file_path(entity):
-                    iiif_manifest = ''
-                    if check_iiif_activation() and \
-                            check_iiif_file_exist(entity.id):
-                        iiif_manifest = url_for(
-                            'api.iiif_manifest',
-                            version=g.settings['iiif_version'],
-                            id_=entity.id,
-                            _external=True)
-                    mime_type, _ = mimetypes.guess_type(path)
-                    files_dict[path.stem] = {
-                        'extension': path.suffix,
-                        'mimetype': mime_type,
-                        'display': url_for(
-                            'api.display',
-                            filename=path.stem,
-                            _external=True),
-                        'thumbnail': url_for(
-                            'api.display',
-                            image_size='thumbnail',
-                            filename=path.stem,
-                            _external=True),
-                        'license': license_,
-                        'IIIFManifest': iiif_manifest}
+            if not (license_ := get_license_name(entity)):
+                continue
+            if not (path := get_file_path(entity)):
+                continue
+            iiif_manifest = ''
+            if check_iiif_activation() and check_iiif_file_exist(entity.id):
+                iiif_manifest = url_for(
+                    'api.iiif_manifest',
+                    version=g.settings['iiif_version'],
+                    id_=entity.id,
+                    _external=True)
+            mime_type, _ = mimetypes.guess_type(path)
+            files_dict[path.stem] = {
+                'extension': path.suffix,
+                'mimetype': mime_type,
+                'display': url_for(
+                    'api.display',
+                    filename=path.stem,
+                    _external=True),
+                'thumbnail': url_for(
+                    'api.display',
+                    image_size='thumbnail',
+                    filename=path.stem,
+                    _external=True),
+                'license': license_,
+                'IIIFManifest': iiif_manifest}
         if parser['download']:
-            download(files_dict, licensed_file_template(entities), 'files')
+            return download(
+                files_dict,
+                licensed_file_template(entities),
+                'files'), 200
         return marshal(files_dict, licensed_file_template(entities)), 200

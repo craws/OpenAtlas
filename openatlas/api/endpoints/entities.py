@@ -57,7 +57,7 @@ class GetEntity(Resource):
     @staticmethod
     def get(id_: int) -> tuple[Resource, int] | Response | dict[str, Any]:
         return resolve_entity(
-            ApiEntity.get_entity_by_id_safe(id_),
+            ApiEntity.get_by_id(id_, types=True, aliases=True),
             entity_.parse_args())
 
 

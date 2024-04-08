@@ -1,5 +1,3 @@
-from typing import Any
-
 from flask import g
 
 from openatlas.api.resources.error import (
@@ -8,11 +6,16 @@ from openatlas.api.resources.error import (
 from openatlas.models.entity import Entity
 
 
+# Todo: remove "types=True, aliases=True" for better performance.
+#  Best get them with the links
 class ApiEntity(Entity):
     @staticmethod
-    def get_entity_by_id_safe(id_: int) -> Entity:
+    def get_by_id(
+            id_: int,
+            types: bool = False,
+            aliases: bool = False) -> Entity:
         try:
-            entity = Entity.get_by_id(id_, types=True, aliases=True)
+            entity = Entity.get_by_id(id_, types=types, aliases=aliases)
         except Exception as e:
             raise EntityDoesNotExistError from e
         return entity
@@ -30,18 +33,14 @@ class ApiEntity(Entity):
         codes = list(g.view_class_mapping) if 'all' in codes else codes
         if not all(c in g.view_class_mapping for c in codes):
             raise InvalidViewClassError
-        view_classes = flatten_list_and_remove_duplicates(
-            [g.view_class_mapping[view] for view in codes])
-        return Entity.get_by_class(view_classes, types=True, aliases=True)
+        return Entity.get_by_class(
+            sum([g.view_class_mapping[i] for i in codes], []),
+            types=True,
+            aliases=True)
 
     @staticmethod
-    def get_by_system_classes(system_classes: list[str]) -> list[Entity]:
-        system_classes = list(g.classes) \
-            if 'all' in system_classes else system_classes
-        if not all(sc in g.classes for sc in system_classes):
+    def get_by_system_classes(classes: list[str]) -> list[Entity]:
+        classes = list(g.classes) if 'all' in classes else classes
+        if not all(sc in g.classes for sc in classes):
             raise InvalidSystemClassError
-        return Entity.get_by_class(system_classes, types=True, aliases=True)
-
-
-def flatten_list_and_remove_duplicates(list_: list[Any]) -> list[Any]:
-    return [item for sublist in list_ for item in sublist if item not in list_]
+        return Entity.get_by_class(classes, types=True, aliases=True)

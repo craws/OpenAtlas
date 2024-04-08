@@ -75,7 +75,7 @@ class ExportDatabase(Resource):
 class GetSubunits(Resource):
     @staticmethod
     def get(id_: int) -> tuple[Resource, int] | Response | dict[str, Any]:
-        entity = ApiEntity.get_entity_by_id_safe(id_)
+        entity = ApiEntity.get_by_id(id_, types=True, aliases=True)
         if entity.class_.name != 'place':
             raise NotAPlaceError
         parser = entity_.parse_args()

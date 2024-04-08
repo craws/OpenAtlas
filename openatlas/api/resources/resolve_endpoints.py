@@ -25,6 +25,7 @@ from openatlas.api.resources.templates import (
 from openatlas.api.resources.util import (
     get_entities_by_type, get_key, link_parser_check,
     link_parser_check_inverse, parser_str_to_dict, remove_duplicate_entities)
+from openatlas.models.entity import Entity
 
 
 def resolve_entities(
@@ -76,7 +77,7 @@ def sorting(
 
 
 def get_entity_formatted(
-        entity: ApiEntity,
+        entity: Entity,
         parser: dict[str, Any]) -> dict[str, Any]:
     if parser['format'] == 'geojson':
         return get_geojson([entity], parser)
@@ -94,7 +95,7 @@ def get_entity_formatted(
 
 
 def resolve_entity(
-        entity: ApiEntity,
+        entity: Entity,
         parser: dict[str, Any]) -> Response | dict[str, Any] | tuple[Any, int]:
     if parser['export'] == 'csv':
         return export_entities_csv(entity, entity.name)
