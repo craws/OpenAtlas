@@ -6,7 +6,7 @@ from flask import g, json
 from numpy import datetime64
 
 from openatlas.api.resources.error import InvalidSearchSyntax
-from openatlas.api.resources.model_mapper import get_entities_by_ids
+from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -59,7 +59,10 @@ def get_entities_linked_to_special_type(id_: int) -> list[Entity]:
                   Link.get_links_by_type(g.types[id_])]
     range_ids = [link_['range_id'] for link_ in
                  Link.get_links_by_type(g.types[id_])]
-    return get_entities_by_ids(range_ids + domain_ids)
+    return ApiEntity.get_by_ids(
+        range_ids + domain_ids,
+        types=True,
+        aliases=True)
 
 
 def get_entities_linked_to_special_type_recursive(
@@ -85,8 +88,10 @@ def get_entities_linked_to_type_recursive_(
 def get_entities_from_type_with_subs(id_: int) -> list[Entity]:
     type_ids = get_entities_linked_to_type_recursive_(id_, [id_])
     entity_ids = Link.get_entity_ids_by_type_ids(type_ids)
-    return get_entities_by_ids(
-        [link_ for link_ in entity_ids if link_ not in type_ids])
+    return ApiEntity.get_by_ids(
+        [link_ for link_ in entity_ids if link_ not in type_ids],
+        types=True,
+        aliases=True)
 
 
 def get_entities_by_type(
@@ -113,7 +118,7 @@ def get_key(entity: Entity, parser: dict[str, Any]) -> datetime64 | str:
     return getattr(entity, parser['column'])
 
 
-def remove_duplicate_entities(entities: list[Entity]) -> list[Entity]:
+def remove_duplicate_entities(entities: list[ApiEntity]) -> list[ApiEntity]:
     seen: set[int] = set()
     seen_add = seen.add  # Do not change, faster than always call seen.add()
     return [e for e in entities if not (e.id in seen or seen_add(e.id))]
@@ -124,7 +129,7 @@ def remove_spaces_dashes(string: str) -> str:
 
 
 def link_parser_check(
-        entities: list[Entity],
+        entities: list[ApiEntity],
         parser: dict[str, Any]) -> list[Link]:
     if any(i in ['relations', 'types', 'depictions', 'links', 'geometry']
            for i in parser['show']):
@@ -175,6 +180,8 @@ def get_reference_systems(
                 'referenceSystem': system.name})
     return ref
 
+
+# todo: this should get deleted if other functions moves to ApiEntity
 def get_geometric_collection(
         entity: Entity,
         links: list[Link],
@@ -210,6 +217,8 @@ def get_geometric_collection(
             return get_geoms_by_entity(entity.id, parser['centroid'])
     return None
 
+
+# todo: move this to ApiEntity
 def get_geometric_collection_with_geoms(
         entity: Entity,
         links: list[Link],
@@ -327,3 +336,7 @@ def get_crm_code(link_: Link, inverse: bool = False) -> str:
     code = link_.domain.cidoc_class.code \
         if inverse else link_.range.cidoc_class.code
     return f"crm:{code} {name}"
+
+
+def flatten_list_and_remove_duplicates(list_: list[Any]) -> list[Any]:
+    return [item for sublist in list_ for item in sublist if item not in list_]

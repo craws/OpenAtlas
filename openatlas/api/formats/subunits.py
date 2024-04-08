@@ -1,4 +1,3 @@
-import time
 from operator import attrgetter
 from typing import Any, Optional
 
@@ -217,8 +216,8 @@ def get_subunits_from_id(
     latest_modified = max(
         entity.modified for entity in entities if entity.modified)
     link_dict = {}
-    for entity in entities:
-        link_dict[entity.id] = {
+    for entity_ in entities:
+        link_dict[entity_.id] = {
             'links': set(),
             'links_inverse': set(),
             'geoms': []}
@@ -234,14 +233,14 @@ def get_subunits_from_id(
     if parser['centroid']:
         location_centroids = get_centroids_by_ids(location_ids)
 
-    for entity in entities:
+    for entity_ in entities:
         for link_ in location_links:
-            if entity.id == link_.domain.id:
-                entity.location = link_.range
-                link_dict[entity.id]['geoms'].extend(
+            if entity_.id == link_.domain.id:
+                entity_.location = link_.range
+                link_dict[entity_.id]['geoms'].extend(
                     location_geoms[link_.range.id])
                 if parser['centroid']:
-                    link_dict[entity.id]['geoms'].extend(
+                    link_dict[entity_.id]['geoms'].extend(
                         location_centroids[link_.range.id])
 
     entities_dict: dict[int, Any] = {}

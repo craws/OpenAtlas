@@ -4,7 +4,7 @@ from typing import Any, Optional
 from flask import url_for
 
 from openatlas import app
-from openatlas.api.resources.model_mapper import get_by_cidoc_classes
+from openatlas.api.resources.api_entity import ApiEntity
 from tests.base import ApiTestCase
 
 
@@ -53,7 +53,7 @@ class Api(ApiTestCase):
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()
-                for entity in get_by_cidoc_classes(['all']):
+                for entity in  ApiEntity.get_by_cidoc_classes(['all']):
                     match entity.name:
                         case 'Location of Shire':
                             location = entity

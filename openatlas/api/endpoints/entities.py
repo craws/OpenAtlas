@@ -3,11 +3,9 @@ from typing import Any
 from flask import Response, g
 from flask_restful import Resource
 
+from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.error import (
     InvalidLimitError, NotATypeError, QueryEmptyError)
-from openatlas.api.resources.model_mapper import (
-    get_by_cidoc_classes, get_entities_by_ids, get_entities_by_system_classes,
-    get_entities_by_view_classes, get_entity_by_id, get_latest_entities)
 from openatlas.api.resources.parser import entity_, query
 from openatlas.api.resources.resolve_endpoints import (
     resolve_entities, resolve_entity)
@@ -21,7 +19,7 @@ class GetByCidocClass(Resource):
     def get(cidoc_class: str) \
             -> tuple[Resource, int] | Response | dict[str, Any]:
         return resolve_entities(
-            get_by_cidoc_classes([cidoc_class]),
+            ApiEntity.get_by_cidoc_classes([cidoc_class]),
             entity_.parse_args(),
             cidoc_class)
 
@@ -31,7 +29,7 @@ class GetBySystemClass(Resource):
     def get(system_class: str) \
             -> tuple[Resource, int] | Response | dict[str, Any]:
         return resolve_entities(
-            get_entities_by_system_classes([system_class]),
+            ApiEntity.get_by_system_classes([system_class]),
             entity_.parse_args(),
             system_class)
 
@@ -41,7 +39,7 @@ class GetByViewClass(Resource):
     def get(view_class: str) \
             -> tuple[Resource, int] | Response | dict[str, Any]:
         return resolve_entities(
-            get_entities_by_view_classes([view_class]),
+            ApiEntity.get_by_view_classes([view_class]),
             entity_.parse_args(),
             view_class)
 
@@ -58,7 +56,9 @@ class GetEntitiesLinkedToEntity(Resource):
 class GetEntity(Resource):
     @staticmethod
     def get(id_: int) -> tuple[Resource, int] | Response | dict[str, Any]:
-        return resolve_entity(get_entity_by_id(id_), entity_.parse_args())
+        return resolve_entity(
+            ApiEntity.get_entity_by_id_safe(id_),
+            entity_.parse_args())
 
 
 class GetLatest(Resource):
@@ -67,7 +67,7 @@ class GetLatest(Resource):
         if not 0 < limit < 101:
             raise InvalidLimitError
         return resolve_entities(
-            get_latest_entities(limit),
+            ApiEntity.get_latest(limit),
             entity_.parse_args(),
             limit)
 
@@ -90,9 +90,12 @@ class GetTypeEntitiesAll(Resource):
     def get(id_: int) -> tuple[Resource, int] | Response | dict[str, Any]:
         if id_ not in g.types:
             raise NotATypeError
+        # Todo rewrite this with recursive
         if not (entities := get_entities_from_type_with_subs(id_)):
-            entities = get_entities_by_ids(
-                get_entities_linked_to_special_type_recursive(id_, []))
+            entities = ApiEntity.get_by_ids(
+                get_entities_linked_to_special_type_recursive(id_, []),
+                types=True,
+                aliases=True)
         return resolve_entities(entities, entity_.parse_args(), id_)
 
 
@@ -108,13 +111,18 @@ class GetQuery(Resource):
             raise QueryEmptyError
         entities = []
         if parser['entities']:
-            entities.extend(get_entities_by_ids(parser['entities']))
+            entities.extend(
+                ApiEntity.get_by_ids(
+                    parser['entities'],
+                    types=True,
+                    aliases=True))
         if parser['view_classes']:
             entities.extend(
-                get_entities_by_view_classes(parser['view_classes']))
+                ApiEntity.get_by_view_classes(parser['view_classes']))
         if parser['system_classes']:
             entities.extend(
-                get_entities_by_system_classes(parser['system_classes']))
+                ApiEntity.get_by_system_classes(parser['system_classes']))
         if parser['cidoc_classes']:
-            entities.extend(get_by_cidoc_classes(parser['cidoc_classes']))
+            entities.extend(
+                ApiEntity.get_by_cidoc_classes(parser['cidoc_classes']))
         return resolve_entities(entities, parser, 'query')

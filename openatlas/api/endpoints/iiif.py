@@ -8,7 +8,7 @@ import svgwrite
 from flask import Response, g, jsonify, url_for
 from flask_restful import Resource
 
-from openatlas.api.resources.model_mapper import get_entity_by_id
+from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.util import get_license_name
 from openatlas.models.annotation import Annotation
 from openatlas.models.entity import Entity
@@ -19,7 +19,8 @@ class IIIFSequence(Resource):
     def get(id_: int) -> Response:
         return jsonify(
             {"@context": "https://iiif.io/api/presentation/2/context.json"} |
-            IIIFSequence.build_sequence(get_metadata(get_entity_by_id(id_))))
+            IIIFSequence.build_sequence(
+                get_metadata(ApiEntity.get_entity_by_id_safe(id_))))
 
     @staticmethod
     def build_sequence(metadata: dict[str, Any]) -> dict[str, Any]:
@@ -40,7 +41,8 @@ class IIIFCanvas(Resource):
     def get(id_: int) -> Response:
         return jsonify(
             {"@context": "https://iiif.io/api/presentation/2/context.json"} |
-            IIIFCanvas.build_canvas(get_metadata(get_entity_by_id(id_))))
+            IIIFCanvas.build_canvas(
+                get_metadata(ApiEntity.get_entity_by_id_safe(id_))))
 
     @staticmethod
     def build_canvas(metadata: dict[str, Any]) -> dict[str, Any]:
@@ -79,7 +81,8 @@ class IIIFImage(Resource):
     @staticmethod
     def get(id_: int) -> Response:
         return jsonify(
-            IIIFImage.build_image(get_metadata(get_entity_by_id(id_))))
+            IIIFImage.build_image(
+                get_metadata(ApiEntity.get_entity_by_id_safe(id_))))
 
     @staticmethod
     def build_image(metadata: dict[str, Any]) -> dict[str, Any]:
@@ -134,7 +137,7 @@ class IIIFAnnotation(Resource):
     def build_annotation(annotation: Annotation) -> dict[str, Any]:
         entity_link = ''
         if annotation.entity_id:
-            entity = get_entity_by_id(annotation.entity_id)
+            entity = ApiEntity.get_entity_by_id_safe(annotation.entity_id)
             url = url_for('api.entity', id_=entity.id, _external=True)
             if resolver := g.settings['frontend_resolver_url']:
                 url = resolver + str(entity.id)
@@ -218,7 +221,7 @@ class IIIFManifest(Resource):
 
     @staticmethod
     def get_manifest_version_2(id_: int) -> dict[str, Any]:
-        entity = get_entity_by_id(id_)
+        entity = ApiEntity.get_entity_by_id_safe(id_)
         return {
             "@context": "https://iiif.io/api/presentation/2/context.json",
             "@id":

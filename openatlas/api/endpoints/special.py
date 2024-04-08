@@ -11,7 +11,7 @@ from openatlas.api.resources.database_mapper import (
     get_all_entities_as_dict, get_all_links_as_dict, get_cidoc_hierarchy,
     get_classes, get_properties, get_property_hierarchy)
 from openatlas.api.resources.error import NotAPlaceError
-from openatlas.api.resources.model_mapper import get_entity_by_id
+from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.parser import entity_, gis
 from openatlas.api.resources.resolve_endpoints import (
     download, resolve_subunits)
@@ -75,7 +75,7 @@ class ExportDatabase(Resource):
 class GetSubunits(Resource):
     @staticmethod
     def get(id_: int) -> tuple[Resource, int] | Response | dict[str, Any]:
-        entity = get_entity_by_id(id_)
+        entity = ApiEntity.get_entity_by_id_safe(id_)
         if entity.class_.name != 'place':
             raise NotAPlaceError
         parser = entity_.parse_args()

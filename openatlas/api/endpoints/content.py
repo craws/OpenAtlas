@@ -2,7 +2,7 @@ from flask import Response, g, session
 from flask_restful import Resource, marshal
 
 from openatlas import app
-from openatlas.api.resources.model_mapper import get_overview_counts
+from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.parser import default, locale
 from openatlas.api.resources.resolve_endpoints import download
 from openatlas.api.resources.templates import (
@@ -66,4 +66,6 @@ class ClassMapping(Resource):
 class SystemClassCount(Resource):
     @staticmethod
     def get() -> tuple[Resource, int] | Response:
-        return marshal(get_overview_counts(), overview_template()), 200
+        return marshal(
+            ApiEntity.get_overview_counts(),
+            overview_template()), 200

@@ -14,6 +14,7 @@ from openatlas.api.formats.linked_places import get_linked_places_entity
 from openatlas.api.formats.loud import get_loud_entities
 from openatlas.api.formats.rdf import rdf_output
 from openatlas.api.formats.xml import subunit_xml
+from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.error import (
     EntityDoesNotExistError, LastEntityError, TypeIDError)
 from openatlas.api.resources.search import search
@@ -24,11 +25,10 @@ from openatlas.api.resources.templates import (
 from openatlas.api.resources.util import (
     get_entities_by_type, get_key, link_parser_check,
     link_parser_check_inverse, parser_str_to_dict, remove_duplicate_entities)
-from openatlas.models.entity import Entity
 
 
 def resolve_entities(
-        entities: list[Entity],
+        entities: list[ApiEntity],
         parser: dict[str, Any],
         file_name: int | str) -> Response | dict[str, Any] | tuple[Any, int]:
     if parser['type_id'] and not (
@@ -64,7 +64,9 @@ def get_entities_template(parser: dict[str, str]) -> dict[str, Any]:
     return linked_place_pagination(parser)
 
 
-def sorting(entities: list[Entity], parser: dict[str, Any]) -> list[Entity]:
+def sorting(
+        entities: list[ApiEntity],
+        parser: dict[str, Any]) -> list[ApiEntity]:
     if 'latest' in request.path:
         return entities
     return sorted(
@@ -74,7 +76,7 @@ def sorting(entities: list[Entity], parser: dict[str, Any]) -> list[Entity]:
 
 
 def get_entity_formatted(
-        entity: Entity,
+        entity: ApiEntity,
         parser: dict[str, Any]) -> dict[str, Any]:
     if parser['format'] == 'geojson':
         return get_geojson([entity], parser)
@@ -82,8 +84,9 @@ def get_entity_formatted(
         return get_geojson_v2([entity], parser)
     entity_dict = {
         'entity': entity,
-        'links': Entity.get_links_of_entities(entity.id),
-        'links_inverse': Entity.get_links_of_entities(entity.id, inverse=True)}
+        'links': ApiEntity.get_links_of_entities(entity.id),
+        'links_inverse': ApiEntity.get_links_of_entities(
+            entity.id, inverse=True)}
     if parser['format'] == 'loud' \
             or parser['format'] in app.config['RDF_FORMATS']:
         return get_loud_entities(entity_dict, parse_loud_context())
@@ -91,7 +94,7 @@ def get_entity_formatted(
 
 
 def resolve_entity(
-        entity: Entity,
+        entity: ApiEntity,
         parser: dict[str, Any]) -> Response | dict[str, Any] | tuple[Any, int]:
     if parser['export'] == 'csv':
         return export_entities_csv(entity, entity.name)
@@ -135,7 +138,7 @@ def resolve_subunits(
 
 
 def get_json_output(
-        entities: list[Entity],
+        entities: list[ApiEntity],
         parser: dict[str, Any]) -> dict[str, Any]:
     total = [e.id for e in entities]
     count = len(total)
@@ -162,7 +165,7 @@ def get_json_output(
 
 
 def get_entities_formatted(
-        entities_all: list[Entity],
+        entities_all: list[ApiEntity],
         parser: dict[str, Any]) -> list[dict[str, Any]]:
     entities = entities_all[:int(parser['limit'])]
     if parser['format'] == 'geojson':

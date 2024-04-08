@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import ast
 from collections import defaultdict
-from typing import Any, Dict, List, Optional, TYPE_CHECKING
+from typing import Any, Optional, TYPE_CHECKING
 
 from flask import g, json
 from shapely.geometry import Point, Polygon, LineString
