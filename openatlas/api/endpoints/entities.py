@@ -20,8 +20,7 @@ class GetByCidocClass(Resource):
             -> tuple[Resource, int] | Response | dict[str, Any]:
         return resolve_entities(
             ApiEntity.get_by_cidoc_classes([cidoc_class]),
-            entity_.parse_args(),
-            cidoc_class)
+            entity_.parse_args())
 
 
 class GetBySystemClass(Resource):
@@ -30,8 +29,7 @@ class GetBySystemClass(Resource):
             -> tuple[Resource, int] | Response | dict[str, Any]:
         return resolve_entities(
             ApiEntity.get_by_system_classes([system_class]),
-            entity_.parse_args(),
-            system_class)
+            entity_.parse_args())
 
 
 class GetByViewClass(Resource):
@@ -40,8 +38,7 @@ class GetByViewClass(Resource):
             -> tuple[Resource, int] | Response | dict[str, Any]:
         return resolve_entities(
             ApiEntity.get_by_view_classes([view_class]),
-            entity_.parse_args(),
-            view_class)
+            entity_.parse_args())
 
 
 class GetEntitiesLinkedToEntity(Resource):
@@ -49,8 +46,7 @@ class GetEntitiesLinkedToEntity(Resource):
     def get(id_: int) -> tuple[Resource, int] | Response | dict[str, Any]:
         return resolve_entities(
             get_linked_entities_api(id_),
-            entity_.parse_args(),
-            'linkedEntities')
+            entity_.parse_args())
 
 
 class GetEntity(Resource):
@@ -68,8 +64,7 @@ class GetLatest(Resource):
             raise InvalidLimitError
         return resolve_entities(
             ApiEntity.get_latest(limit),
-            entity_.parse_args(),
-            limit)
+            entity_.parse_args())
 
 
 class GetTypeEntities(Resource):
@@ -82,7 +77,7 @@ class GetTypeEntities(Resource):
                 inverse=True,
                 types=True)):
             entities = get_entities_linked_to_special_type(id_)
-        return resolve_entities(entities, entity_.parse_args(), id_)
+        return resolve_entities(entities, entity_.parse_args())
 
 
 class GetTypeEntitiesAll(Resource):
@@ -96,7 +91,7 @@ class GetTypeEntitiesAll(Resource):
                 get_entities_linked_to_special_type_recursive(id_, []),
                 types=True,
                 aliases=True)
-        return resolve_entities(entities, entity_.parse_args(), id_)
+        return resolve_entities(entities, entity_.parse_args())
 
 
 class GetQuery(Resource):
@@ -125,4 +120,4 @@ class GetQuery(Resource):
         if parser['cidoc_classes']:
             entities.extend(
                 ApiEntity.get_by_cidoc_classes(parser['cidoc_classes']))
-        return resolve_entities(entities, parser, 'query')
+        return resolve_entities(entities, parser)

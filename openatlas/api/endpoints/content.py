@@ -28,7 +28,7 @@ class GetBackendDetails(Resource):
                 'url': g.settings['iiif_url'],
                 'version': int(g.settings['iiif_version'])}}
         if parser['download']:
-            return download(details, backend_details_template(), 'content')
+            return download(details, backend_details_template())
         return marshal(details, backend_details_template()), 200
 
 
@@ -59,7 +59,7 @@ class ClassMapping(Resource):
                 "standardTypeId": class_.standard_type_id,
                 "icon": class_.icon} for class_ in g.classes.values()]}
         if locale.parse_args()['download']:
-            return download(results, class_mapping_template(), 'content')
+            return download(results, class_mapping_template())
         return marshal(results, class_mapping_template()), 200
 
 

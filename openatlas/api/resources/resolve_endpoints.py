@@ -23,24 +23,22 @@ from openatlas.api.resources.templates import (
     geojson_collection_template, geojson_pagination, linked_place_pagination,
     linked_places_template, loud_pagination, loud_template, subunit_template)
 from openatlas.api.resources.util import (
-    get_entities_by_type, get_key, link_parser_check,
-    link_parser_check_inverse, parser_str_to_dict, remove_duplicate_entities)
+    filter_by_type, get_key, link_parser_check,
+    link_parser_check_inverse, remove_duplicate_entities)
 from openatlas.models.entity import Entity
 
 
 def resolve_entities(
-        entities: list[ApiEntity],
-        parser: dict[str, Any],
-        file_name: int | str) -> Response | dict[str, Any] | tuple[Any, int]:
-    if parser['type_id'] and not (
-            entities := get_entities_by_type(entities, parser)):
-        raise TypeIDError
+        entities: list[Entity],
+        parser: dict[str, Any]) -> Response | dict[str, Any] | tuple[Any, int]:
+    if parser['type_id']:
+        if not (entities := filter_by_type(entities, parser['type_id'])):
+            raise TypeIDError
     if parser['search']:
-        search_parser = parser_str_to_dict(parser['search'])
-        if iterate_validation(search_parser):
+        if search_parser := iterate_validation(parser['search']):
             entities = search(entities, search_parser)
     if parser['export'] == 'csv':
-        return export_entities_csv(entities, file_name)
+        return export_entities_csv(entities)
     if parser['export'] == 'csvNetwork':
         return export_csv_for_network_analysis(entities, parser)
     result = get_json_output(
@@ -53,7 +51,7 @@ def resolve_entities(
     if parser['count'] == 'true':
         return jsonify(result['pagination']['entities'])
     if parser['download'] == 'true':
-        return download(result, get_entities_template(parser), file_name)
+        return download(result, get_entities_template(parser))
     return marshal(result, get_entities_template(parser)), 200
 
 
@@ -98,7 +96,7 @@ def resolve_entity(
         entity: Entity,
         parser: dict[str, Any]) -> Response | dict[str, Any] | tuple[Any, int]:
     if parser['export'] == 'csv':
-        return export_entities_csv(entity, entity.name)
+        return export_entities_csv(entity)
     if parser['export'] == 'csvNetwork':
         return export_csv_for_network_analysis([entity], parser)
     result = get_entity_formatted(entity, parser)
@@ -112,7 +110,7 @@ def resolve_entity(
     if parser['format'] == 'loud':
         template = loud_template(result)
     if parser['download']:
-        download(result, template, entity.id)
+        return download(result, template)
     return marshal(result, template), 200
 
 
@@ -134,7 +132,7 @@ def resolve_subunits(
             subunit_xml(out),
             mimetype=app.config['RDF_FORMATS'][parser['format']])
     if parser['download']:
-        download(out, subunit_template(name), name)
+        download(out, subunit_template(name))
     return marshal(out, subunit_template(name)), 200
 
 
@@ -231,9 +229,8 @@ def get_by_page(
 
 def download(
         data: list[Any] | dict[Any, Any],
-        template: dict[str, Any],
-        name: str | int) -> Response:
+        template: dict[str, Any]) -> Response:
     return Response(
         json.dumps(marshal(data, template)),
         mimetype='application/json',
-        headers={'Content-Disposition': f'attachment;filename={name}.json'})
+        headers={'Content-Disposition': f'attachment;filename=result.json'})

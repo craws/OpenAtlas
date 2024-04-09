@@ -29,7 +29,7 @@ class GetTypeByViewClass(Resource):
     def get() -> tuple[Resource, int] | Response:
         types = GetTypeByViewClass.get_type_by_view()
         if default.parse_args()['download']:
-            return download(types, type_by_view_class_template(types), 'types')
+            return download(types, type_by_view_class_template(types))
         return marshal(types, type_by_view_class_template(types)), 200
 
     @staticmethod
@@ -52,7 +52,7 @@ class GetTypeOverview(Resource):
     def get() -> tuple[Resource, int] | Response:
         types = GetTypeOverview.get_type_overview()
         if default.parse_args()['download']:
-            return download(types, type_overview_template(), 'types')
+            return download(types, type_overview_template())
         return marshal(types, type_overview_template()), 200
 
     @staticmethod
@@ -81,7 +81,7 @@ class GetTypeTree(Resource):
         parser = entity_.parse_args()
         type_tree = {'typeTree': GetTypeTree.get_type_tree()}
         if parser['download']:
-            return download(type_tree, type_tree_template(), 'type_tree')
+            return download(type_tree, type_tree_template())
         if parser['count'] == 'true':
             return jsonify(len(type_tree['typeTree']))
         return marshal(type_tree, type_tree_template()), 200

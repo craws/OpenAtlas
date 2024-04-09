@@ -72,8 +72,5 @@ class LicensedFileOverview(Resource):
                 'license': license_,
                 'IIIFManifest': iiif_manifest}
         if parser['download']:
-            return download(
-                files_dict,
-                licensed_file_template(entities),
-                'files'), 200
+            return download(files_dict, licensed_file_template(entities)), 200
         return marshal(files_dict, licensed_file_template(entities)), 200

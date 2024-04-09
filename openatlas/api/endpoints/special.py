@@ -30,7 +30,7 @@ class GetGeometricEntities(Resource):
         if parser['count'] == 'true':
             return jsonify(len(output['features']))
         if parser['download'] == 'true':
-            return download(output, geometries_template(), 'geometries')
+            return download(output, geometries_template())
         return marshal(output, geometries_template()), 200
 
 

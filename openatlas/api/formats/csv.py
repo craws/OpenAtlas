@@ -15,20 +15,13 @@ from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 
 
-def export_entities_csv(
-        entities: Entity | list[Entity],
-        name: int | str) -> Response:
-    frames = [
-        build_entity_dataframe(entity, True) for entity in
-        (entities if isinstance(entities, list) else [entities])]
+def export_entities_csv(entities: Entity | list[Entity]) -> Response:
+    entities = entities if isinstance(entities, list) else [entities]
+    frames = [build_entity_dataframe(e, relations=True) for e in entities]
     return Response(
         pd.DataFrame(data=frames).to_csv(),
         mimetype='text/csv',
-        headers={
-            'Content-Disposition':
-                f'attachment;'
-                f'filename='
-                f'{str(name).encode("utf8").decode("unicode-escape")}.csv'})
+        headers={'Content-Disposition': 'attachment;filename=result.csv'})
 
 
 def build_entity_dataframe(

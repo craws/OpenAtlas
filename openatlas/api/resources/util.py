@@ -1,11 +1,9 @@
-import ast
 from typing import Any, Optional
 
 import numpy
 from flask import g, json
 from numpy import datetime64
 
-from openatlas.api.resources.error import InvalidSearchSyntax
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
@@ -24,13 +22,6 @@ def get_license_name(entity: Entity) -> Optional[str]:
 
 def to_camel_case(i: str) -> str:
     return (i[0] + i.title().translate(" ")[1:] if i else i).replace(" ", "")
-
-
-def parser_str_to_dict(parser: list[str]) -> list[dict[str, Any]]:
-    try:
-        return [ast.literal_eval(p) for p in parser]
-    except Exception as e:
-        raise InvalidSearchSyntax from e
 
 
 def replace_empty_list_values_in_dict_with_none(
@@ -95,15 +86,12 @@ def get_entities_from_type_with_subs(id_: int) -> list[Entity]:
         aliases=True)
 
 
-def get_entities_by_type(
-        entities: list[Entity],
-        parser: dict[str, Any]) -> list[Entity]:
-    new_entities = []
+def filter_by_type(entities: list[Entity], ids: list[int]) -> list[Entity]:
+    result = []
     for entity in entities:
-        if any(ids in [key.id for key in entity.types]
-               for ids in parser['type_id']):
-            new_entities.append(entity)
-    return new_entities
+        if any(id_ in [key.id for key in entity.types] for id_ in ids):
+            result.append(entity)
+    return result
 
 
 def get_key(entity: Entity, parser: dict[str, Any]) -> datetime64 | str:
@@ -114,12 +102,12 @@ def get_key(entity: Entity, parser: dict[str, Any]) -> datetime64 | str:
     if parser['column'] in ['begin_from', 'begin_to', 'end_from', 'end_to']:
         if not getattr(entity, parser['column']):
             date = ("-" if parser["sort"] == 'desc' else "") \
-                + '9999999-01-01T00:00:00'
+                   + '9999999-01-01T00:00:00'
             return numpy.datetime64(date)
     return getattr(entity, parser['column'])
 
 
-def remove_duplicate_entities(entities: list[ApiEntity]) -> list[ApiEntity]:
+def remove_duplicate_entities(entities: list[Entity]) -> list[Entity]:
     seen: set[int] = set()
     seen_add = seen.add  # Do not change, faster than always call seen.add()
     return [e for e in entities if not (e.id in seen or seen_add(e.id))]
@@ -130,7 +118,7 @@ def remove_spaces_dashes(string: str) -> str:
 
 
 def link_parser_check(
-        entities: list[ApiEntity],
+        entities: list[Entity],
         parser: dict[str, Any]) -> list[Link]:
     if any(i in ['relations', 'types', 'depictions', 'links', 'geometry']
            for i in parser['show']):
@@ -277,10 +265,12 @@ def get_geoms_by_entity(
         return geoms[0]
     return {'type': 'GeometryCollection', 'geometries': geoms}
 
+
 def get_geojson_geometries(geoms: list[dict[str, Any]]) -> dict[str, Any]:
     if len(geoms) == 1:
         return geoms[0]
     return {'type': 'GeometryCollection', 'geometries': geoms}
+
 
 def get_geometries(parser: dict[str, Any]) -> list[dict[str, Any]]:
     choices = [

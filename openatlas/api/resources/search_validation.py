@@ -1,25 +1,27 @@
+import ast
 from typing import Any
 
 from openatlas import app
 from openatlas.api.resources.error import (
-    LogicalOperatorError, NoSearchStringError, OperatorError,
+    InvalidSearchSyntax, LogicalOperatorError, NoSearchStringError,
+    OperatorError,
     SearchCategoriesError, ValueNotIntegerError)
 
 
-def iterate_validation(parameters: list[dict[str, Any]]) -> list[list[bool]]:
-    return [
-        [call_validation(search_key, values) for values in value_list]
-        for parameter in parameters
-        for search_key, value_list in parameter.items()]
-
-
-def call_validation(search_key: str, values: dict[str, Any]) -> bool:
-    return parameter_validation(
-        categories=search_key,
-        operator_=values['operator'],
-        search_values=values["values"],
-        logical_operator=values[
-            'logicalOperator'] if 'logicalOperator' in values else 'or')
+def iterate_validation(param: list[str]) -> list[list[bool]]:
+    try:
+        parameters = [ast.literal_eval(item) for item in param]
+    except Exception as e:
+        raise InvalidSearchSyntax from e
+    for parameter in parameters:
+        for search_key, value_list in parameter.items():
+            for values in value_list:
+                parameter_validation(
+                    search_key,
+                    values['operator'],
+                    values["values"],
+                    values.get('logicalOperator') or 'or')
+    return parameters
 
 
 def parameter_validation(
