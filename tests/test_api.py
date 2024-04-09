@@ -527,8 +527,7 @@ class Api(ApiTestCase):
                     system_classes='person',
                     format='lp',
                     search=f'{{"valueTypeID":[{{"operator":"equal",'
-                           f'"values":[({height.id},23.0)],'
-                           f'"logicalOperator":"or"}}]}}')),
+                           f'"values":[({height.id},23.0)]}}]}}')),
                 self.app.get(url_for(
                     'api_04.query',
                     system_classes='place',

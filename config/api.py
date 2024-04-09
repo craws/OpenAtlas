@@ -31,20 +31,20 @@ JSON_FORMATS = {
 API_FORMATS = RDF_FORMATS | JSON_FORMATS
 
 LOGICAL_OPERATOR: list[str] = ['and', 'or']
-STR_CATEGORIES: list[str] = [
+STR_VALUES: list[str] = [
     'entityName', 'entityDescription', 'entityAliases', 'entityCidocClass',
     'entitySystemClass', 'typeName', 'typeNameWithSubs',
     'beginFrom', 'beginTo', 'endFrom', 'endTo']
-INT_CATEGORIES: list[str] = [
+INT_VALUES: list[str] = [
     'entityID',
     'typeID',
     'typeIDWithSubs',
     'relationToID']
-SET_CATEGORIES: list[str] = ['valueTypeID']
-VALID_CATEGORIES: list[str] = [
-    *STR_CATEGORIES,
-    *INT_CATEGORIES,
-    *SET_CATEGORIES]
+FLOAT_VALUES: list[str] = ['valueTypeID']
+VALID_VALUES: list[str] = [
+    *STR_VALUES,
+    *INT_VALUES,
+    *FLOAT_VALUES]
 COMPARE_OPERATORS: list[str] = [
     'equal', 'notEqual', 'greaterThan', 'lesserThan', 'greaterThanEqual',
     'lesserThanEqual', 'like']

@@ -6,7 +6,7 @@ from flask import jsonify, render_template, request, g
 from openatlas import app
 from openatlas.api.resources.error import \
     (AccessDeniedError, NoLicenseError, EntityDoesNotExistError, OperatorError,
-     LogicalOperatorError, SearchCategoriesError, InvalidCidocClassCodeError,
+     LogicalOperatorError, SearchValueError, InvalidCidocClassCodeError,
      InvalidSystemClassError, InvalidViewClassError, InvalidLimitError,
      InvalidSearchSyntax, ValueNotIntegerError, NoSearchStringError,
      NotAPlaceError, QueryEmptyError, NotATypeError, TypeIDError,
@@ -249,13 +249,13 @@ def empty_query(_e: Exception) -> tuple[Any, int]:
         'status': 400}), 400
 
 
-@app.errorhandler(SearchCategoriesError)
+@app.errorhandler(SearchValueError)
 def invalid_search_category(_e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'Invalid search category',
         'message':
             'The search category is invalid. Please use: '
-            f'{app.config["VALID_CATEGORIES"]}',
+            f'{app.config["VALID_VALUES"]}',
         'url': request.url,
         'timestamp': datetime.datetime.now(),
         'status': 400}), 400

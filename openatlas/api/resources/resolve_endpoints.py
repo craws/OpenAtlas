@@ -18,7 +18,7 @@ from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.error import (
     EntityDoesNotExistError, LastEntityError, TypeIDError)
 from openatlas.api.resources.search import search
-from openatlas.api.resources.search_validation import iterate_validation
+from openatlas.api.resources.search_validation import parameter_validation
 from openatlas.api.resources.templates import (
     geojson_collection_template, geojson_pagination, linked_place_pagination,
     linked_places_template, loud_pagination, loud_template, subunit_template)
@@ -35,7 +35,7 @@ def resolve_entities(
         if not (entities := filter_by_type(entities, parser['type_id'])):
             raise TypeIDError
     if parser['search']:
-        if search_parser := iterate_validation(parser['search']):
+        if search_parser := parameter_validation(parser['search']):
             entities = search(entities, search_parser)
     if parser['export'] == 'csv':
         return export_entities_csv(entities)
@@ -63,9 +63,7 @@ def get_entities_template(parser: dict[str, str]) -> dict[str, Any]:
     return linked_place_pagination(parser)
 
 
-def sorting(
-        entities: list[ApiEntity],
-        parser: dict[str, Any]) -> list[ApiEntity]:
+def sorting(entities: list[Entity], parser: dict[str, Any]) -> list[Entity]:
     if 'latest' in request.path:
         return entities
     return sorted(
@@ -137,7 +135,7 @@ def resolve_subunits(
 
 
 def get_json_output(
-        entities: list[ApiEntity],
+        entities: list[Entity],
         parser: dict[str, Any]) -> dict[str, Any]:
     total = [e.id for e in entities]
     count = len(total)
@@ -164,7 +162,7 @@ def get_json_output(
 
 
 def get_entities_formatted(
-        entities_all: list[ApiEntity],
+        entities_all: list[Entity],
         parser: dict[str, Any]) -> list[dict[str, Any]]:
     entities = entities_all[:int(parser['limit'])]
     if parser['format'] == 'geojson':

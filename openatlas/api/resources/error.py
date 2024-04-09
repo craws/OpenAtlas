@@ -62,7 +62,7 @@ class QueryEmptyError(Exception):
     pass
 
 
-class SearchCategoriesError(Exception):
+class SearchValueError(Exception):
     pass
 
 

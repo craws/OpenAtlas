@@ -45,10 +45,9 @@ def get_search_parameter(parser: dict[str, Any]) -> dict[str, Any]:
         for value in values:
             parameter.update({
                 "search_values": get_search_values(category, value),
-                "logical_operator": value['logicalOperator']
-                if 'logicalOperator' in value else 'or',
-                "operator": 'equal'
-                if category == "valueTypeID" else value['operator'],
+                "logical_operator": value['logicalOperator'],
+                "operator": 'equal' if category == "valueTypeID"
+                else value['operator'],
                 "category": category,
                 "is_date": check_if_date_search(category)})
     return parameter

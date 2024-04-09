@@ -4,43 +4,33 @@ from typing import Any
 from openatlas import app
 from openatlas.api.resources.error import (
     InvalidSearchSyntax, LogicalOperatorError, NoSearchStringError,
-    OperatorError,
-    SearchCategoriesError, ValueNotIntegerError)
+    OperatorError, SearchValueError, ValueNotIntegerError)
 
 
-def iterate_validation(param: list[str]) -> list[list[bool]]:
+def parameter_validation(params: list[str]) -> list[dict[str, Any]]:
     try:
-        parameters = [ast.literal_eval(item) for item in param]
+        params = [ast.literal_eval(item) for item in params]
     except Exception as e:
         raise InvalidSearchSyntax from e
-    for parameter in parameters:
-        for search_key, value_list in parameter.items():
+    for param in params:
+        for search_key, value_list in param.items():
             for values in value_list:
-                parameter_validation(
-                    search_key,
-                    values['operator'],
-                    values["values"],
-                    values.get('logicalOperator') or 'or')
-    return parameters
-
-
-def parameter_validation(
-        categories: Any,
-        operator_: str,
-        search_values: list[Any],
-        logical_operator: str) -> bool:
-    if logical_operator not in app.config['LOGICAL_OPERATOR']:
-        raise LogicalOperatorError
-    if categories not in app.config['VALID_CATEGORIES']:
-        raise SearchCategoriesError
-    if operator_ not in app.config['COMPARE_OPERATORS']:
-        raise OperatorError
-    if not search_values:
-        raise NoSearchStringError
-    if categories in app.config['INT_CATEGORIES']:
-        if not bool(any(isinstance(value, int) for value in search_values)):
-            raise ValueNotIntegerError
-    return True
+                values['logicalOperator'] = \
+                    values.get('logicalOperator') or 'or'
+                if values['logicalOperator'] \
+                        not in app.config['LOGICAL_OPERATOR']:
+                    raise LogicalOperatorError
+                if values['operator'] not in app.config['COMPARE_OPERATORS']:
+                    raise OperatorError
+                if not values["values"]:
+                    raise NoSearchStringError
+                if search_key not in app.config['VALID_VALUES']:
+                    raise SearchValueError
+                if search_key in app.config['INT_VALUES']:
+                    for value in values['values']:
+                        if not isinstance(value, int):
+                            raise ValueNotIntegerError
+    return params
 
 
 def check_if_date_search(k: str) -> bool:
