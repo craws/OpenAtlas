@@ -85,7 +85,6 @@ class GetTypeEntitiesAll(Resource):
     def get(id_: int) -> tuple[Resource, int] | Response | dict[str, Any]:
         if id_ not in g.types:
             raise NotATypeError
-        # Todo rewrite this with recursive
         if not (entities := get_entities_from_type_with_subs(id_)):
             entities = ApiEntity.get_by_ids(
                 get_entities_linked_to_special_type_recursive(id_, []),

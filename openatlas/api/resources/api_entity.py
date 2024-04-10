@@ -6,8 +6,6 @@ from openatlas.api.resources.error import (
 from openatlas.models.entity import Entity
 
 
-# Todo: remove "types=True, aliases=True" for better performance.
-#  Best get them with the links
 class ApiEntity(Entity):
     @staticmethod
     def get_by_id(
