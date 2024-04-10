@@ -284,19 +284,6 @@ def get_geometries(parser: dict[str, Any]) -> list[dict[str, Any]]:
             out.append(geom)
     return out
 
-
-def filter_link_list_by_property_codes(
-        links: list[dict[str, Any]],
-        codes: list[str]) -> list[dict[str, str]]:
-    data = []
-    for link_ in links:
-        if link_['property_code'] in codes:
-            data.append({
-                'domain_id': link_['domain_id'],
-                'range_id': link_['range_id']})
-    return data
-
-
 def date_to_str(date: Any) -> Optional[str]:
     return str(date) if date else None
 

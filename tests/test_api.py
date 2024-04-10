@@ -129,6 +129,9 @@ class Api(ApiTestCase):
             rv = self.app.get(url_for('api_04.system_class_count')).get_json()
             assert bool(rv['person'])
 
+            rv = self.app.get(url_for('api.licensed_file_overview'))
+            assert bool(len(rv.get_json().keys()) == 3)
+
             for rv in [
                 self.app.get(url_for('api_04.geometric_entities')),
                 self.app.get(

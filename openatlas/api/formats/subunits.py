@@ -4,12 +4,9 @@ from typing import Any, Optional
 from flask import g
 
 from openatlas.api.resources.util import (
-    filter_link_list_by_property_codes,
     get_geometric_collection_with_geoms, get_license_name, get_location_links,
-    get_reference_systems,
-    remove_duplicate_entities,
+    get_reference_systems, remove_duplicate_entities,
     replace_empty_list_values_in_dict_with_none)
-from openatlas.database.gis import get_centroids_by_ids
 from openatlas.display.util import get_file_path
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
@@ -231,7 +228,7 @@ def get_subunits_from_id(
 
     location_centroids = None
     if parser['centroid']:
-        location_centroids = get_centroids_by_ids(location_ids)
+        location_centroids = Gis.get_centroids_by_ids(location_ids)
 
     for entity_ in entities:
         for link_ in location_links:
@@ -255,38 +252,6 @@ def get_subunits_from_id(
             'latest_modified': latest_modified,
             'parser': parser}
     return [get_subunit(item) for item in entities_dict.values()]
-
-
-def get_links_from_list_of_links(
-        entities: list[Entity],
-        links: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
-    entities_id = [entity.id for entity in entities]
-    data: dict[str, list[Any]] = {'links': [], 'links_inverse': []}
-    for link_ in links:
-        if link_['domain_id'] in entities_id:
-            data['links'].append(link_)
-        if link_['range_id'] in entities_id:
-            data['links_inverse'].append(link_)
-    return data
-
-
-def get_all_subs_linked_to_place(
-        entity: Entity,
-        links: list[dict[str, Any]]) -> list[int]:
-    links_ = filter_link_list_by_property_codes(links, ['P46'])
-    return get_all_subs_linked_to_place_recursive(entity.id, links_, [])
-
-
-def get_all_subs_linked_to_place_recursive(
-        id_: int,
-        links: list[dict[str, Any]],
-        data: list[int]) -> list[int]:
-    data.append(id_)
-    for link_ in links:
-        if link_['domain_id'] == id_:
-            get_all_subs_linked_to_place_recursive(
-                link_['range_id'], links, data)
-    return data
 
 
 def get_type_links_inverse(entities: list[Entity]) -> Optional[list[Link]]:
