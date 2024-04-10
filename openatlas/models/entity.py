@@ -98,12 +98,14 @@ class Entity:
             self,
             code: str | list[str],
             inverse: bool = False,
-            types: bool = False) -> list[Entity]:
+            types: bool = False,
+            sort: bool = False) -> list[Entity]:
         return Entity.get_linked_entities_static(
             self.id,
             code,
             inverse=inverse,
-            types=types)
+            types=types,
+            sort=sort)
 
     def get_linked_entities_recursive(
             self,
@@ -428,7 +430,7 @@ class Entity:
     def get_by_ids(
             ids: Iterable[int],
             types: bool = False,
-            aliases: bool = False) -> list[Entity]:
+            aliases: bool = False,) -> list[Entity]:
         entities = []
         for row in db.get_by_ids(ids, types, aliases):
             if row['id'] in g.types:
@@ -544,12 +546,16 @@ class Entity:
             id_: int,
             codes: str | list[str],
             inverse: bool = False,
-            types: bool = False) -> list[Entity]:
+            types: bool = False,
+            sort: bool = False) -> list[Entity]:
         codes = codes if isinstance(codes, list) else [codes]
-        return Entity.get_by_ids(
+        entities = Entity.get_by_ids(
             db.get_linked_entities_inverse(id_, codes) if inverse
             else db.get_linked_entities(id_, codes),
             types=types)
+        if sort and entities:
+            entities.sort(key=lambda x: x.name)
+        return entities
 
     @staticmethod
     def get_linked_entity_safe_static(

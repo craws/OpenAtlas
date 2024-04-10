@@ -21,12 +21,15 @@ class AcquisitionDisplay(EventsDisplay):
 
     def add_data(self) -> None:
         super().add_data()
-        self.data[_('recipient')] = \
-            [link(actor) for actor in self.entity.get_linked_entities('P22')]
-        self.data[_('donor')] = \
-            [link(donor) for donor in self.entity.get_linked_entities('P23')]
-        self.data[_('given object')] = \
-            [link(item) for item in self.entity.get_linked_entities('P24')]
+        self.data[_('recipient')] = [
+            link(actor) for actor in
+            self.entity.get_linked_entities('P22', sort=True)]
+        self.data[_('donor')] = [
+            link(donor) for donor in
+            self.entity.get_linked_entities('P23', sort=True)]
+        self.data[_('given object')] = [
+            link(item) for item in
+            self.entity.get_linked_entities('P24', sort=True)]
 
 
 class ActivityDisplay(EventsDisplay):
@@ -83,8 +86,8 @@ class FileDisplay(BaseDisplay):
         super().add_tabs()
         entity = self.entity
         for name in [
-                'source', 'event', 'actor', 'place', 'feature',
-                'stratigraphic_unit', 'artifact', 'reference', 'type']:
+            'source', 'event', 'actor', 'place', 'feature',
+            'stratigraphic_unit', 'artifact', 'reference', 'type']:
             self.tabs[name] = Tab(name, entity=entity)
         entity.image_id = entity.id if get_file_path(entity.id) else None
         for link_ in entity.get_links('P67'):
@@ -280,8 +283,8 @@ class SourceDisplay(BaseDisplay):
         super().add_tabs()
         entity = self.entity
         for name in [
-                'actor', 'artifact', 'feature', 'event', 'place',
-                'stratigraphic_unit', 'text', 'reference', 'file']:
+            'actor', 'artifact', 'feature', 'event', 'place',
+            'stratigraphic_unit', 'text', 'reference', 'file']:
             self.tabs[name] = Tab(name, entity=entity)
         for text in entity.get_linked_entities('P73', types=True):
             self.tabs['text'].table.rows.append([
