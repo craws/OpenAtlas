@@ -207,6 +207,13 @@ class ExportImportTest(ExportImportTestCase):
             assert b'single type duplicates' in rv.data
             assert b'Vienna' in rv.data
 
+            with open(test_path / 'example.csv', 'rb') as file:
+                rv = self.app.post(
+                    url_for('import_data', class_='source', project_id=p_id),
+                    data={'file': file, 'duplicate': True},
+                    follow_redirects=True)
+            assert b'invalid reference system class' in rv.data
+
             (test_path / 'example.csv').unlink()
 
             with open(
