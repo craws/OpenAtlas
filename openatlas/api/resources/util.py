@@ -170,7 +170,6 @@ def get_reference_systems(
     return ref
 
 
-# todo: this should get deleted if other functions moves to ApiEntity
 def get_geometric_collection(
         entity: Entity,
         links: list[Link],
@@ -204,42 +203,6 @@ def get_geometric_collection(
                 'geometries': [geom for sublist in geoms for geom in sublist]}
         case _ if entity.class_.name == 'object_location':
             return get_geoms_by_entity(entity.id, parser['centroid'])
-    return None
-
-
-# todo: move this to ApiEntity
-def get_geometric_collection_with_geoms(
-        entity: Entity,
-        links: list[Link],
-        geoms: list[dict[str, Any]],
-        parser: dict[str, Any]) -> Optional[dict[str, Any]]:
-    match entity.class_.view:
-        case 'place' | 'artifact':
-            return get_geojson_geometries(geoms)
-        case 'actor':
-            geoms = [
-                Gis.get_by_id(link_.range.id) for link_ in links
-                if link_.property.code in ['P74', 'OA8', 'OA9']]
-            if parser['centroid']:
-                geoms.extend(
-                    [Gis.get_centroids_by_id(link_.range.id) for link_ in links
-                     if link_.property.code in ['P74', 'OA8', 'OA9']])
-            return {
-                'type': 'GeometryCollection',
-                'geometries': [geom for sublist in geoms for geom in sublist]}
-        case 'event':
-            geoms = [
-                Gis.get_by_id(link_.range.id) for link_ in links
-                if link_.property.code in ['P7', 'P26', 'P27']]
-            if parser['centroid']:
-                geoms.extend(
-                    [Gis.get_centroids_by_id(link_.range.id) for link_ in links
-                     if link_.property.code in ['P7', 'P26', 'P27']])
-            return {
-                'type': 'GeometryCollection',
-                'geometries': [geom for sublist in geoms for geom in sublist]}
-        case _ if entity.class_.name == 'object_location':
-            return get_geojson_geometries(geoms)
     return None
 
 

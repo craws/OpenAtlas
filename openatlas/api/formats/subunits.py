@@ -4,7 +4,7 @@ from typing import Any, Optional
 from flask import g
 
 from openatlas.api.resources.util import (
-    get_geometric_collection_with_geoms, get_license_name, get_location_links,
+    get_geojson_geometries, get_license_name, get_location_links,
     get_reference_systems, remove_duplicate_entities,
     replace_empty_list_values_in_dict_with_none)
 from openatlas.display.util import get_file_path
@@ -25,11 +25,7 @@ def get_subunit(data: dict[str, Any]) -> dict[str, Any]:
         'latestModRec': data['latest_modified'],
         'geometry':
             get_geometries_thanados(
-                get_geometric_collection_with_geoms(
-                    data['entity'],
-                    data['links'],
-                    data['geoms'],
-                    data['parser']),
+                get_geojson_geometries(data['geoms']),
                 data['parser']),
         'children': get_children(data),
         'properties': get_properties(data)})
@@ -78,10 +74,8 @@ def transform_geometries_for_xml(geom: dict[str, Any]) -> list[Any]:
     return output
 
 
-def transform_coordinates_for_xml(coordinates: list[float]) -> list[Any]:
-    return [
-        {'coordinate':
-             {'longitude': coordinates[0], 'latitude': coordinates[1]}}]
+def transform_coordinates_for_xml(coord: list[float]) -> list[Any]:
+    return [{'coordinate': {'longitude': coord[0], 'latitude': coord[1]}}]
 
 
 def get_properties(data: dict[str, Any]) -> dict[str, Any]:
@@ -254,11 +248,9 @@ def get_subunits_from_id(
     return [get_subunit(item) for item in entities_dict.values()]
 
 
-def get_type_links_inverse(entities: list[Entity]) -> Optional[list[Link]]:
+def get_type_links_inverse(entities: list[Entity]) -> list[Link]:
     types = remove_duplicate_entities(
         [type_ for entity in entities for type_ in entity.types])
-    if not types:
-        return None
     links = Entity.get_links_of_entities(
         [type_.id for type_ in types],
         'P67',
