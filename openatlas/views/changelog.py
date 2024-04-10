@@ -15,7 +15,10 @@ def index_changelog() -> str:
 
 
 versions = {
-    '8.4.0': ['TBA', {}],
+    '8.4.0': ['TBA', {
+        'feature': {
+            '2158': 'Georeferencing files for multiple places (overlay)',
+            '2223': 'Improved forms'}}],
     '8.3.0': ['2024-04-01', {
         'feature': {
             '1567': 'Enhanced Import',

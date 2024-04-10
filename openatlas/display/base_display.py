@@ -480,7 +480,7 @@ class ReferenceBaseDisplay(BaseDisplay):
                     range_.name,
                     link_,
                     self.entity,
-                    range_.class_.name))
+                    range_.class_.view))
             self.tabs[range_.class_.view].table.rows.append(data)
 
 

@@ -24,7 +24,7 @@ class EventTest(TestBaseCase):
             rv: Any = self.app.get(url_for('insert', class_='activity'))
             assert b'+ Activity' in rv.data
 
-            data = {'name': 'Event Horizon', 'place': residence.id}
+            data = {'name': 'Event Horizon', 'location': residence.id}
             rv = self.app.post(
                 url_for('insert', class_='activity'),
                 data=data)
@@ -61,7 +61,7 @@ class EventTest(TestBaseCase):
                 data={
                     'name': 'Second event',
                     'given_place': [residence.id],
-                    'place': residence.id,
+                    'location': residence.id,
                     'sub_event_of': activity_id,
                     'begin_year_from': '1949',
                     'begin_month_from': '10',

@@ -44,7 +44,7 @@ class OpenatlasClass:
     def __init__(
             self,
             name: str,
-            cidoc_class: str,
+            cidoc_class: str | None,
             hierarchies: list[int],
             alias_allowed: bool,
             reference_system_allowed: bool,

@@ -22,9 +22,9 @@ app.config['SWAGGER'] = {
 app.config['PROPAGATE_EXCEPTIONS'] = True
 CORS(app, resources={r"/api/*": {"origins": app.config['CORS_ALLOWANCE']}})
 
-openapi_file = app.config['OPENAPI_INSTANCE_FILE'] \
-    if app.config['OPENAPI_INSTANCE_FILE'].exists() \
-    else app.config['OPENAPI_FILE']
+openapi_file = app.config['OPENAPI_FILE']
+if app.config['OPENAPI_INSTANCE_FILE'].exists():
+    openapi_file = app.config['OPENAPI_INSTANCE_FILE']
 Swagger(app, parse=False, template_file=str(openapi_file))
 
 blueprint = Blueprint('api', __name__, url_prefix='/api')

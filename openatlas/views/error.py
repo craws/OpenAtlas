@@ -35,9 +35,16 @@ def page_not_found(e: Exception) -> tuple[Any, int]:
         return jsonify({
             'title': 'Endpoint not found',
             'message':
-                'The requestes endpoint does not exist. '
+                'The requested endpoint does not exist. '
                 'Please consult the manual or the Swagger documentation: '
                 f'{request.url_root }swagger',
+            'url': request.url,
+            'timestamp': datetime.datetime.now(),
+            'status': 404}), 404
+    elif request.path.startswith('/static'):
+        return jsonify({
+            'title': 'Site not found',
+            'message': 'The site does not exist.',
             'url': request.url,
             'timestamp': datetime.datetime.now(),
             'status': 404}), 404

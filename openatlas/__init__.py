@@ -1,6 +1,4 @@
-import json
 import locale
-import shutil
 from typing import Any, Optional
 
 from flask import Flask, Response, g, request, session
@@ -44,6 +42,7 @@ def get_locale() -> str:
 
 @app.before_request
 def before_request() -> None:
+    from openatlas.api.resources.openapi_util import write_openapi_instance
     from openatlas.models.openatlas_class import (
         OpenatlasClass, view_class_mapping)
     from openatlas.models.cidoc_property import CidocProperty
@@ -95,38 +94,14 @@ def before_request() -> None:
         app.config['TMP_PATH']]
     if g.settings['iiif'] and g.settings['iiif_path']:
         g.writable_paths.append(g.settings['iiif_path'])
-    if request.path.startswith('/api/'):
+    if request.path.startswith('/swagger'):
+        write_openapi_instance()
+    elif request.path.startswith('/api/'):
         ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
         if not current_user.is_authenticated \
                 and not g.settings['api_public'] \
                 and ip not in app.config['ALLOWED_IPS']:
             raise AccessDeniedError
-
-    openapi = app.config['OPENAPI_FILE']
-    openapi_instance = app.config['OPENAPI_INSTANCE_FILE']
-    if not openapi_instance.exists():
-        shutil.copy(openapi, openapi_instance)
-    with openapi_instance.open(mode='r+') as i, openapi.open(mode='r') as f:
-        original = json.load(f)
-        instance = json.load(i)
-        if original['info']['version'] != instance['info']['version']:
-            shutil.copy(openapi, openapi_instance)
-        server = {
-            "url": request.host_url + 'api/{basePath}',
-            "description": f"{g.settings['site_name']} Server",
-            "variables": {
-                "basePath": {"default": "0.4", "enum": ["0.4"]}}}
-        modified = False
-        if len(instance['servers']) == 2:
-            instance['servers'].insert(0, server)
-            modified = True
-        elif instance['servers'][0]['description'] != server['description']:
-            instance['servers'][0] = server
-            modified = True
-        if modified:
-            i.seek(0)
-            json.dump(instance, i, indent=4)
-            i.truncate()
 
 
 @app.after_request
