@@ -33,7 +33,7 @@ class Gis:
         return db.get_centroids_by_id(id_)
 
     @staticmethod
-    def get_centroids_by_ids(ids: list[int]) -> defaultdict[int, list]:
+    def get_centroids_by_ids(ids: list[int]) -> defaultdict[int, list[Any]]:
         return db.get_centroids_by_ids(ids)
 
     @staticmethod

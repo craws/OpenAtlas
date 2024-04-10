@@ -44,8 +44,8 @@ class Overlay:
 
     @staticmethod
     def get_by_object(object_: Entity) -> dict[int, Overlay]:
-        places = [object_] + \
-            [e for e in object_.get_linked_entities_recursive('P46', True)]
+        places = [object_] + list(
+            object_.get_linked_entities_recursive('P46', True))
         ids = []
         for place in places:
             for reference in place.get_linked_entities('P67', True):

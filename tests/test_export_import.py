@@ -8,7 +8,7 @@ from flask import url_for
 from openatlas import app
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.models.export import current_date_for_filename
-from tests.base import ExportImportTestCase, TestBaseCase
+from tests.base import ExportImportTestCase
 
 
 class ExportImportTest(ExportImportTestCase):
@@ -164,7 +164,9 @@ class ExportImportTest(ExportImportTestCase):
                 test_path / 'invalid_3.csv',
                 keep_default_na=False)
             data_frame.at[0, 'openatlas_class'] = 'place'
-            data_frame.to_csv(test_path / 'invalid_3_modified.csv', index=False)
+            data_frame.to_csv(
+                test_path / 'invalid_3_modified.csv',
+                index=False)
             with open(test_path / 'invalid_3_modified.csv', 'rb') as file:
                 rv = self.app.post(
                     url_for('import_data', class_='place', project_id=p_id),
@@ -174,7 +176,9 @@ class ExportImportTest(ExportImportTestCase):
 
             data_frame.at[4, 'parent_id'] = 'strati_1'
             data_frame.at[4, 'openatlas_class'] = 'human remains'
-            data_frame.to_csv(test_path / 'invalid_3_modified.csv', index=False)
+            data_frame.to_csv(
+                test_path / 'invalid_3_modified.csv',
+                index=False)
             with open(test_path / 'invalid_3_modified.csv', 'rb') as file:
                 rv = self.app.post(
                     url_for('import_data', class_='place', project_id=p_id),

@@ -8,8 +8,8 @@ from shapely.errors import WKTReadingError
 
 from openatlas.api.import_scripts.util import get_match_types, \
     get_reference_system_by_name
+from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.error import EntityDoesNotExistError
-from openatlas.api.resources.model_mapper import get_entity_by_id
 from openatlas.database import imports as db
 from openatlas.display.util2 import sanitize
 from openatlas.models.entity import Entity
@@ -150,7 +150,7 @@ class Import:
                     reference = references.split(';')
                     if len(reference) <= 2 and reference[0].isdigit():
                         try:
-                            ref_entity = get_entity_by_id(int(reference[0]))
+                            ref_entity = ApiEntity.get_by_id(int(reference[0]))
                         except EntityDoesNotExistError:
                             continue
                         page = reference[1] if len(reference) > 1 else None

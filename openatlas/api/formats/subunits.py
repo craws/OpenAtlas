@@ -206,7 +206,7 @@ def get_subunits_from_id(
     ext_reference_links = get_type_links_inverse(entities)
     latest_modified = max(
         entity.modified for entity in entities if entity.modified)
-    link_dict = {}
+    link_dict: dict[int, dict[str, Any]] = {}
     for entity_ in entities:
         link_dict[entity_.id] = {
             'links': set(),

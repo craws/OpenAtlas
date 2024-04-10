@@ -18,8 +18,8 @@ from wtforms import (
 from openatlas import app
 from openatlas.api.import_scripts.util import (
     get_match_types, get_reference_system_by_name)
+from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.error import EntityDoesNotExistError
-from openatlas.api.resources.model_mapper import get_entity_by_id
 from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
@@ -496,7 +496,7 @@ def check_cell_value(
                     checks.set_warning('invalid_reference_id', id_)
                 else:
                     try:
-                        get_entity_by_id(int(values[0]))
+                        ApiEntity.get_by_id(int(values[0]))
                     except EntityDoesNotExistError:
                         values[0] = error_span(values[0])
                         checks.set_warning('invalid_reference_id', id_)

@@ -41,7 +41,7 @@ def page_not_found(e: Exception) -> tuple[Any, int]:
             'url': request.url,
             'timestamp': datetime.datetime.now(),
             'status': 404}), 404
-    elif request.path.startswith('/static'):
+    if request.path.startswith('/static'):
         return jsonify({
             'title': 'Site not found',
             'message': 'The site does not exist.',

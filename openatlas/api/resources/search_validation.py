@@ -9,10 +9,10 @@ from openatlas.api.resources.error import (
 
 def parameter_validation(params: list[str]) -> list[dict[str, Any]]:
     try:
-        params = [ast.literal_eval(item) for item in params]
+        parameters = [ast.literal_eval(item) for item in params]
     except Exception as e:
         raise InvalidSearchSyntax from e
-    for param in params:
+    for param in parameters:
         for search_key, value_list in param.items():
             for values in value_list:
                 values['logicalOperator'] = \
@@ -30,7 +30,7 @@ def parameter_validation(params: list[str]) -> list[dict[str, Any]]:
                     for value in values['values']:
                         if not isinstance(value, int):
                             raise ValueNotIntegerError
-    return params
+    return parameters
 
 
 def check_if_date_search(k: str) -> bool:
