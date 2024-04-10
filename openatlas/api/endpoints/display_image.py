@@ -37,7 +37,7 @@ class DisplayImage(Resource):
 
 class LicensedFileOverview(Resource):
     @staticmethod
-    def get() -> tuple[Any, int]:
+    def get() -> Response | tuple[Any, int]:
         parser = files.parse_args()
         if parser['file_id']:
             entities = ApiEntity.get_by_ids(parser['file_id'])
@@ -72,5 +72,5 @@ class LicensedFileOverview(Resource):
                 'license': license_,
                 'IIIFManifest': iiif_manifest}
         if parser['download']:
-            return download(files_dict, licensed_file_template(entities)), 200
+            return download(files_dict, licensed_file_template(entities))
         return marshal(files_dict, licensed_file_template(entities)), 200

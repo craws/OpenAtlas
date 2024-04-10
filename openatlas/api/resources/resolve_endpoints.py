@@ -231,4 +231,4 @@ def download(
     return Response(
         json.dumps(marshal(data, template)),
         mimetype='application/json',
-        headers={'Content-Disposition': f'attachment;filename=result.json'})
+        headers={'Content-Disposition': 'attachment;filename=result.json'})
