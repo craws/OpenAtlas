@@ -18,6 +18,8 @@ from wtforms import (
 from openatlas import app
 from openatlas.api.import_scripts.util import (
     get_match_types, get_reference_system_by_name)
+from openatlas.api.resources.error import EntityDoesNotExistError
+from openatlas.api.resources.model_mapper import get_entity_by_id
 from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
@@ -34,7 +36,7 @@ from openatlas.models.imports import Import, Project
 _('invalid columns')
 _('possible duplicates')
 _('invalid administrative units')
-_('invalid reference system for class')
+_('invalid reference system class')
 _('invalid reference system')
 _('invalid reference system value')
 _('invalid match type')
@@ -44,7 +46,11 @@ _('invalid value types')
 _('invalid value type ids')
 _('invalid value type values')
 _('invalid coordinates')
+_('invalid openatlas class')
+_('invalid references')
+_('invalid reference id')
 _('empty names')
+_('empty ids')
 _('missing name column')
 _('ids already in database')
 _('double ids in import')
@@ -99,8 +105,8 @@ class CheckHandler:
     def generate_warning_messages(self) -> None:
         self.clear_warning_messages()
         for key, value in self.warning.items():
-            self.add_warn_message(
-                f"{_(key.replace('_', ' '))}: {', '.join(value)}")
+            row_ids = f": {', '.join(value)}" if None not in value else None
+            self.add_warn_message(_(key.replace('_', ' ')) + f"{row_ids}")
 
     def generate_error_messages(self) -> None:
         self.clear_error_messages()
@@ -328,6 +334,9 @@ def check_data_for_table_representation(
     origin_ids = []
     names = []
     for _index, row in data_frame.iterrows():
+        if not row.get('id'):
+            checks.set_warning('empty_ids')
+            continue
         if not row.get('name'):
             checks.set_warning('empty_names', row.get('id'))
             continue
@@ -354,7 +363,40 @@ def check_data_for_table_representation(
         if origin_ids else None
     if existing:
         checks.set_error('ids_already_in_database', ', '.join(existing))
+    for row in checked_data:
+        if parent_id := row.get('parent_id'):
+            if parent_id not in origin_ids:
+                checks.set_error('invalid parent id', row.get('id'))
+            if not check_parent(row, checked_data):
+                checks.set_error('invalid parent class', row.get('id'))
     return Table(headers, rows=table_data)
+
+
+def check_parent(
+        entry: dict[str, Any],
+        checked_data: list[Any]) -> bool:
+    entity_dict = {}
+    for row in checked_data:
+        entity_dict[row.get('id')] = row
+    parent_class = entity_dict[entry.get('parent_id')][
+        'openatlas_class'].lower().replace(' ', '_')
+    match entry['openatlas_class'].lower().replace(' ', '_'):
+        case 'feature':
+            if parent_class == 'place':
+                return True
+        case 'stratigraphic_unit':
+            if parent_class == 'feature':
+                return True
+        case 'artifact':
+            if parent_class in g.view_class_mapping['place'] + ['artifact']:
+                return True
+        case 'human_remains':
+            if (parent_class in
+                    g.view_class_mapping['place'] + ['human_remains']):
+                return True
+        case _:
+            return False
+    return False  # pragma: no cover
 
 
 def get_clean_header(
@@ -381,13 +423,16 @@ def get_allowed_columns(class_: str) -> dict[str, list[str]]:
     if class_ not in g.view_class_mapping['reference']:
         columns.extend([
             'begin_from', 'begin_to', 'begin_comment',
-            'end_from', 'end_to', 'end_comment'])
+            'end_from', 'end_to', 'end_comment',
+            'references'])
     if class_ in ['place', 'person', 'group']:
         columns.append('alias')
     if class_ in ['place', 'artifact']:
         columns.append('wkt')
     if class_ in ['place']:
-        columns.extend(['administrative_unit', 'historical_place'])
+        columns.extend([
+            'administrative_unit', 'historical_place', 'parent_id',
+            'openatlas_class'])
     return {
         'allowed': columns,
         'valid': [],
@@ -402,7 +447,7 @@ def check_cell_value(
     value = row[item]
     id_ = row.get('id')
     match item:
-        case 'type_ids':
+        case 'type_ids' if value:
             type_ids = []
             invalids_type_ids = []
             for type_id in str(value).split():
@@ -417,37 +462,55 @@ def check_cell_value(
                     checks.set_warning('single_type_duplicates', id_)
             for i, type_id in enumerate(type_ids):
                 if type_id in invalids_type_ids:
-                    type_ids[i] = f'<span class="error">{type_id}</span>'
+                    type_ids[i] = error_span(type_id)
             value = ' '.join(type_ids)
-        case 'value_types':
+        case 'value_types' if value:
             value_types = []
             for value_type in str(value).split():
                 values = str(value_type).split(';')
                 if len(values) != 2 or not values[1]:
-                    value_types.append(
-                        f'<span class="error">{value_type}</span>')
+                    value_types.append(error_span(value_type))
                     checks.set_warning('invalid_value_types', id_)
                     continue
                 if not Import.check_type_id(values[0], class_):
-                    values[0] = f'<span class="error">{values[0]}</span>'
+                    values[0] = error_span(values[0])
                     checks.set_warning('invalid_value_type_ids', id_)
                 number = values[1][1:] if values[1].startswith('-') \
                     else values[1]
                 if (not number.isdigit() and
                         not number.replace('.', '', 1).isdigit()):
-                    values[1] = f'<span class="error">{values[1]}</span>'
+                    values[1] = error_span(values[1])
                     checks.set_warning('invalid_value_type_values', id_)
                 value_types.append(';'.join(values))
             value = ' '.join(value_types)
+        case 'references' if value:
+            references = []
+            for reference in str(value).split():
+                values = str(reference).split(';')
+                if len(values) > 2:
+                    references.append(error_span(reference))
+                    checks.set_warning('invalid_references', id_)
+                    continue
+                if not values[0].isdigit():
+                    values[0] = error_span(values[0])
+                    checks.set_warning('invalid_reference_id', id_)
+                else:
+                    try:
+                        get_entity_by_id(int(values[0]))
+                    except EntityDoesNotExistError:
+                        values[0] = error_span(values[0])
+                        checks.set_warning('invalid_reference_id', id_)
+                references.append(';'.join(values))
+            value = ' '.join(references)
         case 'wkt' if value:
             wkt_ = None
             try:
                 wkt_ = wkt.loads(row[item])
             except WKTReadingError:
-                value = f'<span class="error">{value}</span>'
+                value = error_span(value)
                 checks.set_warning('invalid_coordinates', id_)
             if wkt_ and wkt_.type not in ['Point', 'LineString', 'Polygon']:
-                value = f'<span class="error">{value}</span>'
+                value = error_span(value)
                 checks.set_warning('invalid_coordinates', id_)
         case 'begin_from' | 'begin_to' | 'end_from' | 'end_to':
             try:
@@ -456,32 +519,40 @@ def check_cell_value(
                 row[item] = value
             except ValueError:
                 row[item] = ''
-                value = '' if str(value) == 'NaT' else \
-                    f'<span class="error">{value}</span>'
+                value = '' if str(value) == 'NaT' else error_span(value)
         case 'administrative_unit' | 'historical_place' if value:
             if ((not str(value).isdigit() or int(value) not in g.types) or
                     g.types[g.types[int(value)].root[-1]].name not in [
                         'Administrative unit', 'Historical place']):
-                value = f'<span class="error">{value}</span>'
+                value = error_span(value)
                 checks.set_warning('invalid_administrative_units', id_)
+        case 'openatlas_class' if value:
+            if (value.lower().replace(' ', '_') not in
+                    (g.view_class_mapping['place'] +
+                     g.view_class_mapping['artifact'])):
+                value = error_span(value)
+                checks.set_warning('invalid_openatlas_class', id_)
         case _ if item.startswith('reference_system_') and value:
             item = item.replace('reference_system_', '')
             reference_system = get_reference_system_by_name(item)
             if not reference_system:
-                value = f'<span class="error">{value}</span>'
+                value = error_span(value)
                 checks.set_warning('invalid_reference_system', id_)
             if reference_system and class_ not in reference_system.classes:
-                value = f'<span class="error">{value}</span>'
+                value = error_span(value)
                 checks.set_warning('invalid_reference_system_class', id_)
             values = str(value).split(';')
             if len(values) != 2:
-                value = f'<span class="error">{value}</span>'
+                value = error_span(value)
                 checks.set_warning('invalid_reference_system_value', id_)
             elif values[1] not in get_match_types():
                 if values[1]:
-                    value = (
-                        f'{values[0]};<span class="error">{values[1]}</span>')
+                    value = f'{values[0]};{error_span(values[1])}'
                 else:
-                    value = f'<span class="error">{value}</span>'
+                    value = error_span(value)
                 checks.set_warning('invalid_match_type', id_)
     return str(value)
+
+
+def error_span(value: str) -> str:
+    return f'<span class="error">{value}</span>'

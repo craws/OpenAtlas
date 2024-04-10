@@ -8,6 +8,8 @@ from shapely.errors import WKTReadingError
 
 from openatlas.api.import_scripts.util import get_match_types, \
     get_reference_system_by_name
+from openatlas.api.resources.error import EntityDoesNotExistError
+from openatlas.api.resources.model_mapper import get_entity_by_id
 from openatlas.database import imports as db
 from openatlas.display.util2 import sanitize
 from openatlas.models.entity import Entity
@@ -91,7 +93,13 @@ class Import:
 
     @staticmethod
     def import_data(project: Project, class_: str, data: list[Any]) -> None:
+        entities: dict[str | int, dict[str, Any]] = {}
         for row in data:
+            if value := row.get('openatlas_class'):
+                if (value.lower().replace(' ', '_') in
+                        (g.view_class_mapping['place'] +
+                         g.view_class_mapping['artifact'])):
+                    class_ = value.lower().replace(' ', '_')
             entity = Entity.insert(
                 class_,
                 row['name'],
@@ -101,6 +109,9 @@ class Import:
                 entity.id,
                 current_user.id,
                 origin_id=row.get('id'))
+            entities[row.get('id')] = {
+                'entity': entity,
+                'parent_id': row.get('parent_id')}
 
             # Dates
             entity.update({'attributes': {
@@ -133,6 +144,18 @@ class Import:
                         g.types[int(value_type[0])],
                         value_type[1])
 
+            # References
+            if data := row.get('references'):
+                for references in str(data).split():
+                    reference = references.split(';')
+                    if len(reference) <= 2 and reference[0].isdigit():
+                        try:
+                            ref_entity = get_entity_by_id(int(reference[0]))
+                        except EntityDoesNotExistError:
+                            continue
+                        page = reference[1] if len(reference) > 1 else None
+                        ref_entity.link('P67', entity, page)
+
             # External reference systems
             match_types = get_match_types()
             reference_systems = list(set(
@@ -145,10 +168,10 @@ class Import:
                         values = data.split(';')
                         if values[1] in match_types:
                             reference_system.link(
-                                    'P67',
-                                    entity,
-                                    values[0],
-                                    type_id=match_types[values[1]].id)
+                                'P67',
+                                entity,
+                                values[0],
+                                type_id=match_types[values[1]].id)
 
             # Alias
             if class_ in ['place', 'person', 'group']:
@@ -157,7 +180,8 @@ class Import:
                         entity.link('P1', Entity.insert('appellation', alias_))
 
             # GIS
-            if class_ in ['place', 'artifact']:
+            if (class_ in g.view_class_mapping['place']
+                    + g.view_class_mapping['artifact']):
                 location = Entity.insert(
                     'object_location',
                     f"Location of {row['name']}")
@@ -174,7 +198,7 @@ class Import:
                                 'Historical place']):
                         location.link('P89', g.types[int(data)])
                 try:
-                    wkt_ = wkt.loads(row['wkt'])
+                    wkt_ = wkt.loads(row['wkt']) if row.get('wkt') else None
                 except WKTReadingError:
                     wkt_ = None
                 if wkt_:
@@ -183,3 +207,9 @@ class Import:
                         location=location,
                         project=project,
                         wkt_=wkt_)
+
+        for entry in entities.values():
+            if entry['parent_id']:
+                entities[entry['parent_id']]['entity'].link(
+                    'P46',
+                    entry['entity'])

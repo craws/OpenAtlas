@@ -25,7 +25,7 @@ VALUES
   ('E33', 'source', 'Silmarillion', NULL, CURRENT_TIMESTAMP),
   ('E21', 'person', 'Frodo', 'That is Frodo', CURRENT_TIMESTAMP),
   ('E21', 'person', 'Sam', 'That is Sam', CURRENT_TIMESTAMP),
-  ('E32', 'external_reference', 'https://lotr.fandom.com/', NULL, CURRENT_TIMESTAMP),
+  ('E31', 'external_reference', 'https://lotr.fandom.com/', NULL, CURRENT_TIMESTAMP),
   ('E41', 'appellation', 'Sûza', NULL, CURRENT_TIMESTAMP),
   ('E41', 'appellation', 'The ring bearer', NULL, CURRENT_TIMESTAMP),
   ('E7', 'activity', 'Travel to Mordor', NULL, CURRENT_TIMESTAMP),
