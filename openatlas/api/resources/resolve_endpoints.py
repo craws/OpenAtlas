@@ -26,6 +26,7 @@ from openatlas.api.resources.util import (
     filter_by_type, get_key, link_parser_check,
     link_parser_check_inverse, remove_duplicate_entities)
 from openatlas.models.entity import Entity
+from openatlas.models.link import Link
 
 
 def resolve_entities(
@@ -41,9 +42,8 @@ def resolve_entities(
         return export_entities_csv(entities)
     if parser['export'] == 'csvNetwork':
         return export_csv_for_network_analysis(entities, parser)
-    result = get_json_output(
-        sorting(remove_duplicate_entities(entities), parser),
-        parser)
+    sorted_entities = sorting(remove_duplicate_entities(entities), parser)
+    result = get_json_output(sorted_entities, parser)
     if parser['format'] in app.config['RDF_FORMATS']:  # pragma: no cover
         return Response(
             rdf_output(result['results'], parser),
@@ -169,7 +169,7 @@ def get_entities_formatted(
         return [get_geojson(entities, parser)]
     if parser['format'] == 'geojson-v2':
         return [get_geojson_v2(entities, parser)]
-    entities_dict: dict[str, Any] = {}
+    entities_dict: dict[int, dict[str, Entity | list[Link]]] = {}
     for entity in entities:
         entities_dict[entity.id] = {
             'entity': entity,

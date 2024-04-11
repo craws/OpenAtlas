@@ -247,6 +247,7 @@ def get_geometries(parser: dict[str, Any]) -> list[dict[str, Any]]:
             out.append(geom)
     return out
 
+
 def date_to_str(date: Any) -> Optional[str]:
     return str(date) if date else None
 
