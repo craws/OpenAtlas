@@ -101,7 +101,8 @@ class GetQuery(Resource):
                 parser['entities'],
                 parser['cidoc_classes'],
                 parser['view_classes'],
-                parser['system_classes']]):
+                parser['system_classes'],
+                parser['linked_entities']]):
             raise QueryEmptyError
         entities = []
         if parser['entities']:
@@ -119,4 +120,6 @@ class GetQuery(Resource):
         if parser['cidoc_classes']:
             entities.extend(
                 ApiEntity.get_by_cidoc_classes(parser['cidoc_classes']))
+        if parser['linked_entities']:
+            entities.extend(get_linked_entities_api(parser['linked_entities']))
         return resolve_entities(entities, parser)

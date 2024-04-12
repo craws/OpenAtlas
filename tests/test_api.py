@@ -348,6 +348,7 @@ class Api(ApiTestCase):
                     classes='E18',
                     codes='artifact',
                     system_classes='person',
+                    linked_entities=place.id,
                     sort='desc',
                     column='system_class',
                     download=True,

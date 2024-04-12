@@ -233,7 +233,7 @@ def get_subunits_from_id(
                 if parser['centroid']:
                     link_dict[entity_.id]['geoms'].extend(
                         location_centroids[link_.range.id])
-
+    external_reference = get_type_links_inverse(entities)
     entities_dict: dict[int, Any] = {}
     for entity_ in entities:
         entities_dict[entity_.id] = {
@@ -241,7 +241,7 @@ def get_subunits_from_id(
             'links': link_dict[entity_.id]['links'],
             'links_inverse': link_dict[entity_.id]['links_inverse'],
             'geoms': link_dict[entity_.id]['geoms'],
-            'ext_reference_links': get_type_links_inverse(entities),
+            'ext_reference_links': external_reference,
             'root_id': entity.id,
             'latest_modified': latest_modified,
             'parser': parser}

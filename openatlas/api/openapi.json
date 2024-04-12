@@ -3,7 +3,7 @@
     "info": {
         "title": "OpenAtlas API",
         "description": "An API that allows user to access data from an OpenAtlas instance.",
-        "version": "0.4.1",
+        "version": "0.4.2",
         "contact": {
             "name": "OpenAtlas",
             "url": "https://openatlas.eu",
@@ -146,6 +146,9 @@
                     },
                     {
                         "$ref": "#/components/parameters/cidoc_classes"
+                    },
+                    {
+                        "$ref": "#/components/parameters/linked_entities"
                     },
                     {
                         "$ref": "#/components/parameters/download"
@@ -1512,6 +1515,18 @@
             "entities": {
                 "name": "entities",
                 "description": "Entity ids which will be requested",
+                "in": "query",
+                "schema": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "explode": true
+            },
+            "linked_entities": {
+                "name": "linked_entities",
+                "description": "Entity IDs, from which all linked entities are requested",
                 "in": "query",
                 "schema": {
                     "type": "array",
