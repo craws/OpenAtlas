@@ -19,7 +19,10 @@ versions = {
         'feature': {
             '2158': 'Georeferencing files for multiple places (overlay)',
             '2244': 'Import of place hierarchy',
-            '2223': 'Improved forms'}}],
+            '2223': 'Improved forms',
+            '2251':
+                'Presentation sites: change entity/id endpoint to entities/id',
+            '2248': 'Refactor and minor improvements'}}],
     '8.3.0': ['2024-04-01', {
         'feature': {
             '1567': 'Enhanced Import',
