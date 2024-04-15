@@ -203,9 +203,9 @@ def table_multi(
         filter_ids: Optional[list[int]] = None) -> Table:
     filter_ids = filter_ids or []
     selection_ids = [e.id for e in selection] if selection else []
-    class_name = entities[0].class_.name if entities else 'place'
+    view = entities[0].class_.view if entities else 'place'
     table_ = Table(
-        [''] + g.table_headers[class_name],
+        [''] + g.table_headers[view],
         order=[[0, 'desc'], [1, 'asc']],
         defs=[{'orderDataType': 'dom-checkbox', 'targets': 0}])
     for e in [e for e in entities if e.id not in filter_ids]:
