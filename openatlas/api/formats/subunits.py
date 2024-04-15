@@ -230,7 +230,7 @@ def get_subunits_from_id(
                 entity_.location = link_.range
                 link_dict[entity_.id]['geoms'].extend(
                     location_geoms[link_.range.id])
-                if parser['centroid']:
+                if parser['centroid'] and location_centroids:
                     link_dict[entity_.id]['geoms'].extend(
                         location_centroids[link_.range.id])
     external_reference = get_type_links_inverse(entities)

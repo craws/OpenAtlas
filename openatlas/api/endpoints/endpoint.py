@@ -15,28 +15,25 @@ from numpy import datetime64
 from rdflib import Graph
 
 from openatlas import app
-from openatlas.api.formats.csv import build_entity_dataframe, \
-    build_link_dataframe
-from openatlas.api.formats.geojson import get_geoms_dict
+from openatlas.api.formats.csv import (
+    build_entity_dataframe, build_link_dataframe)
 from openatlas.api.formats.linked_places import get_linked_places_entity
 from openatlas.api.formats.loud import get_loud_entities
-from openatlas.api.resources.error import (EntityDoesNotExistError, \
-                                           InvalidSearchSyntax, \
-                                           LastEntityError,
-                                           LogicalOperatorError,
-                                           NoSearchStringError,
-                                           OperatorError, \
-                                           SearchValueError, \
-                                           TypeIDError, ValueNotIntegerError)
-from openatlas.api.resources.resolve_endpoints import download, \
-    parse_loud_context
+from openatlas.api.resources.api_entity import ApiEntity
+from openatlas.api.resources.error import (
+    EntityDoesNotExistError, InvalidSearchSyntax, LastEntityError,
+    LogicalOperatorError, NoSearchStringError, OperatorError, SearchValueError,
+    TypeIDError, ValueNotIntegerError)
+from openatlas.api.resources.resolve_endpoints import (
+    download, parse_loud_context)
 from openatlas.api.resources.search import get_search_parameter, \
     iterate_through_entities
-from openatlas.api.resources.templates import geojson_pagination, \
-    linked_place_pagination, loud_pagination
+from openatlas.api.resources.templates import (
+    geojson_collection_template, geojson_pagination, linked_place_pagination,
+    linked_places_template, loud_pagination, loud_template)
 from openatlas.api.resources.util import (
-    flatten_list_and_remove_duplicates, get_linked_entities_api,
-    get_location_link, remove_duplicate_entities,
+    flatten_list_and_remove_duplicates, get_geoms_dict,
+    get_linked_entities_api, get_location_link, remove_duplicate_entities,
     replace_empty_list_values_in_dict_with_none)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
@@ -44,8 +41,11 @@ from openatlas.models.link import Link
 
 
 class Endpoint:
-    def __init__(self, entities: list[Entity], parser: dict[str, Any]) -> None:
-        self.entities = entities
+    def __init__(
+            self,
+            entities: list[Entity] | Entity,
+            parser: dict[str, Any]) -> None:
+        self.entities = entities if isinstance(entities, list) else [entities]
         self.parser = parser
 
     def resolve_entities(self) -> Response | dict[str, Any] | tuple[Any, int]:
@@ -76,6 +76,42 @@ class Endpoint:
         if self.parser['download'] == 'true':
             return download(result, self.get_entities_template())
         return marshal(result, self.get_entities_template()), 200
+
+    def resolve_entity(self) -> Response | dict[str, Any] | tuple[Any, int]:
+        if self.parser['export'] == 'csv':
+            return self.export_entities_csv()
+        if self.parser['export'] == 'csvNetwork':
+            return self.export_csv_for_network_analysis()
+        result = self.get_entity_formatted()
+        if (self.parser['format']
+                in app.config['RDF_FORMATS']):  # pragma: no cover
+            return Response(
+                self.rdf_output(result),
+                mimetype=app.config['RDF_FORMATS'][self.parser['format']])
+        template = linked_places_template(self.parser)
+        if self.parser['format'] in ['geojson', 'geojson-v2']:
+            template = geojson_collection_template()
+        if self.parser['format'] == 'loud':
+            template = loud_template(result)
+        if self.parser['download']:
+            return download(result, template)
+        return marshal(result, template), 200
+
+    def get_entity_formatted(self) -> dict[str, Any]:
+        if self.parser['format'] == 'geojson':
+            return self.get_geojson()
+        if self.parser['format'] == 'geojson-v2':
+            return self.get_geojson_v2()
+        entity = self.entities[0]
+        entity_dict = {
+            'entity': entity,
+            'links': ApiEntity.get_links_of_entities(entity.id),
+            'links_inverse': ApiEntity.get_links_of_entities(
+                entity.id, inverse=True)}
+        if self.parser['format'] == 'loud' \
+                or self.parser['format'] in app.config['RDF_FORMATS']:
+            return get_loud_entities(entity_dict, parse_loud_context())
+        return get_linked_places_entity(entity_dict, self.parser)
 
     def filter_by_type(self, ids: list[int]) -> list[Entity]:
         result = []
@@ -112,9 +148,8 @@ class Endpoint:
         return parameters
 
     def export_entities_csv(self) -> Response:
-        entities = self.entities \
-            if isinstance(self.entities, list) else [self.entities]
-        frames = [build_entity_dataframe(e, relations=True) for e in entities]
+        frames = \
+            [build_entity_dataframe(e, relations=True) for e in self.entities]
         return Response(
             pd.DataFrame(data=frames).to_csv(),
             mimetype='text/csv',
@@ -179,10 +214,10 @@ class Endpoint:
             return codes
         return None
 
-    def sorting(self) -> list[Entity]:
+    def sorting(self) -> None:
         if 'latest' in request.path:
-            return self.entities
-        return sorted(
+            return
+        self.entities = sorted(
             self.entities,
             key=lambda entity: self.get_key(entity),
             reverse=bool(self.parser['sort'] == 'desc'))
@@ -200,12 +235,12 @@ class Endpoint:
                 return numpy.datetime64(date)
         return getattr(entity, self.parser['column'])
 
-    def remove_duplicate_entities(self) -> list[Entity]:
+    def remove_duplicate_entities(self) -> None:
         seen: set[int] = set()
         # Do not change, faster than always call seen.add()
         seen_add = seen.add
-        return [e for e in self.entities if
-                not (e.id in seen or seen_add(e.id))]
+        self.entities = \
+            [e for e in self.entities if not (e.id in seen or seen_add(e.id))]
 
     def get_json_output(self) -> dict[str, Any]:
         total = [e.id for e in self.entities]
@@ -261,7 +296,7 @@ class Endpoint:
             return [self.get_geojson()]
         if self.parser['format'] == 'geojson-v2':
             return [self.get_geojson_v2()]
-        entities_dict: dict[int, dict[str, Entity | list[Link]]] = {}
+        entities_dict: dict[int, dict[str, Any]] = {}
         for entity in self.entities:
             entities_dict[entity.id] = {
                 'entity': entity,

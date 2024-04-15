@@ -9,13 +9,6 @@ from openatlas.api.resources.util import (
 from openatlas.models.entity import Entity
 
 
-def search(
-        entities: list[Entity],
-        parser: list[dict[str, Any]]) -> list[Entity]:
-    parameter = [get_search_parameter(p) for p in parser]
-    return [e for e in entities if iterate_through_entities(e, parameter)]
-
-
 def get_sub_ids(id_: int, subs: list[Any]) -> list[Any]:
     new_subs = g.types[id_].get_sub_ids_recursive()
     subs.extend(new_subs)
