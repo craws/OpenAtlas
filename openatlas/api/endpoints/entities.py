@@ -3,6 +3,7 @@ from typing import Any
 from flask import Response, g
 from flask_restful import Resource
 
+from openatlas.api.endpoints.endpoint import Endpoint
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.error import (
     InvalidLimitError, NotATypeError, QueryEmptyError)
@@ -18,9 +19,9 @@ class GetByCidocClass(Resource):
     @staticmethod
     def get(cidoc_class: str) \
             -> tuple[Resource, int] | Response | dict[str, Any]:
-        return resolve_entities(
+        return Endpoint(
             ApiEntity.get_by_cidoc_classes([cidoc_class]),
-            entity_.parse_args())
+            entity_.parse_args()).resolve_entities()
 
 
 class GetBySystemClass(Resource):
