@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, Optional, TYPE_CHECKING
 
 from flask import g, json
 
@@ -7,6 +7,9 @@ from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.models.reference_system import ReferenceSystem
+
+if TYPE_CHECKING:  # pragma: no cover
+    from openatlas.api.endpoints.parser import Parser
 
 
 def get_license_name(entity: Entity) -> Optional[str]:
@@ -113,17 +116,17 @@ def get_reference_systems(
 def get_geometric_collection(
         entity: Entity,
         links: list[Link],
-        parser: dict[str, Any]) -> Optional[dict[str, Any]]:
+        parser: Any) -> Optional[dict[str, Any]]:
     match entity.class_.view:
         case 'place' | 'artifact':
             return get_geoms_by_entity(
                 get_location_id(links),
-                parser['centroid'])
+                parser.centroid)
         case 'actor':
             geoms = [
                 Gis.get_by_id(link_.range.id) for link_ in links
                 if link_.property.code in ['P74', 'OA8', 'OA9']]
-            if parser['centroid']:
+            if parser.centroid:
                 geoms.extend(
                     [Gis.get_centroids_by_id(link_.range.id) for link_ in links
                      if link_.property.code in ['P74', 'OA8', 'OA9']])
@@ -134,7 +137,7 @@ def get_geometric_collection(
             geoms = [
                 Gis.get_by_id(link_.range.id) for link_ in links
                 if link_.property.code in ['P7', 'P26', 'P27']]
-            if parser['centroid']:
+            if parser.centroid:
                 geoms.extend(
                     [Gis.get_centroids_by_id(link_.range.id) for link_ in links
                      if link_.property.code in ['P7', 'P26', 'P27']])
@@ -142,7 +145,7 @@ def get_geometric_collection(
                 'type': 'GeometryCollection',
                 'geometries': [geom for sublist in geoms for geom in sublist]}
         case _ if entity.class_.name == 'object_location':
-            return get_geoms_by_entity(entity.id, parser['centroid'])
+            return get_geoms_by_entity(entity.id, parser.centroid)
     return None
 
 

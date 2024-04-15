@@ -1,10 +1,15 @@
+from __future__ import annotations
+
 from collections import defaultdict
-from typing import Any, Type
+from typing import Any, TYPE_CHECKING, Type
 
 from flask_restful import fields
 from flask_restful.fields import Integer, List, Nested, String
 
 from openatlas.models.entity import Entity
+
+if TYPE_CHECKING:  # pragma: no cover
+    from openatlas.api.endpoints.parser import Parser
 
 
 def geojson_template() -> dict[str, Any]:
@@ -60,7 +65,7 @@ def geometries_template() -> dict[str, Any]:
     return {'type': fields.String, 'features': fields.Nested(feature)}
 
 
-def linked_places_template(parser: dict[str, Any]) -> dict[str, Type[String]]:
+def linked_places_template(parser: Parser) -> dict[str, Type[String]]:
     title = {'title': fields.String}
     depictions = {
         '@id': fields.String,
@@ -99,7 +104,7 @@ def linked_places_template(parser: dict[str, Any]) -> dict[str, Type[String]]:
         'relationDescription': fields.String,
         'type': fields.String,
         'when': fields.Nested(when)}
-    if parser['format'] == 'lpx':
+    if parser.format == 'lpx':
         relations['relationTypeLabel'] = fields.String
     feature = {
         '@id': fields.String,
@@ -109,7 +114,7 @@ def linked_places_template(parser: dict[str, Any]) -> dict[str, Type[String]]:
         'viewClass': fields.String,
         'properties': fields.Nested(title),
         'descriptions': fields.List(fields.Nested(description))}
-    show = parser['show']
+    show = parser.show
     if 'when' in show:
         feature['when'] = fields.Nested(when)
     if 'types' in show:
@@ -139,7 +144,7 @@ def pagination() -> dict[str, List | Nested]:
         "totalPages": fields.Integer}
 
 
-def linked_place_pagination(parser: dict[str, str]) -> dict[str, Any]:
+def linked_place_pagination(parser: Parser) -> dict[str, Any]:
     return {
         "results": fields.List(fields.Nested(
             linked_places_template(parser))),
