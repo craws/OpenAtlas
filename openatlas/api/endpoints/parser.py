@@ -16,7 +16,8 @@ from openatlas.api.resources.error import (
     EntityDoesNotExistError, InvalidSearchSyntax, LastEntityError,
     LogicalOperatorError, NoSearchStringError, OperatorError, SearchValueError,
     ValueNotIntegerError)
-from openatlas.api.resources.search import get_search_values, search_result
+from openatlas.api.resources.search import (
+    get_search_values, search_entity, value_to_be_searched)
 from openatlas.api.resources.search_validation import check_if_date_search
 from openatlas.api.resources.templates import (
     geojson_pagination, linked_place_pagination, loud_pagination)
@@ -97,7 +98,15 @@ class Parser:
                         "is_date": check_if_date_search(category)})
 
     def search_filter(self, entity: Entity) -> bool:
-        return bool([p for p in self.search_param if search_result(entity, p)])
+        for p in self.search_param:
+            if not search_entity(
+                    entity_values=value_to_be_searched(entity, p['category']),
+                    operator_=p['operator'],
+                    search_values=p['search_values'],
+                    logical_operator=p['logical_operator'],
+                    is_comparable=p['is_date']):
+                return False
+        return True
 
     def get_properties_for_links(self) -> Optional[list[str]]:
         if self.relation_type:

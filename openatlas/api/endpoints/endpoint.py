@@ -1,4 +1,3 @@
-import ast
 import itertools
 import zipfile
 from io import BytesIO
@@ -6,7 +5,7 @@ from itertools import groupby
 from typing import Any
 
 import pandas as pd
-from flask import Response, g, jsonify, request
+from flask import Response, jsonify, request
 from flask_restful import marshal
 
 from openatlas import app
