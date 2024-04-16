@@ -16,6 +16,8 @@ from openatlas.api.resources.error import (
     EntityDoesNotExistError, InvalidSearchSyntax, LastEntityError,
     LogicalOperatorError, NoSearchStringError, OperatorError, SearchValueError,
     ValueNotIntegerError)
+from openatlas.api.resources.search import get_search_values, search_result
+from openatlas.api.resources.search_validation import check_if_date_search
 from openatlas.api.resources.templates import (
     geojson_pagination, linked_place_pagination, loud_pagination)
 from openatlas.api.resources.util import (
@@ -33,6 +35,7 @@ class Parser:
     sort = None
     column: str = ''
     search: str = ''
+    search_param: list[dict[str, Any]]
     limit: int = 0
     first = None
     last = None
@@ -57,10 +60,9 @@ class Parser:
         for item in parser:
             setattr(self, item, parser[item])
 
-    def parameter_validation(self) -> list[dict[str, Any]]:
+    def set_search_param(self) -> None:
         try:
-            parameters = \
-                [ast.literal_eval(item) for item in self.search]
+            parameters = [ast.literal_eval(i) for i in self.search]
         except Exception as e:
             raise InvalidSearchSyntax from e
         for param in parameters:
@@ -82,7 +84,20 @@ class Parser:
                         for value in values['values']:
                             if not isinstance(value, int):
                                 raise ValueNotIntegerError
-        return parameters
+        self.search_param = []
+        for param in parameters:
+            for category, values in param.items():
+                for value in values:
+                    self.search_param.append({
+                        "search_values": get_search_values(category, value),
+                        "logical_operator": value['logicalOperator'],
+                        "operator": 'equal' if category == "valueTypeID"
+                        else value['operator'],
+                        "category": category,
+                        "is_date": check_if_date_search(category)})
+
+    def search_filter(self, entity: Entity) -> bool:
+        return bool([p for p in self.search_param if search_result(entity, p)])
 
     def get_properties_for_links(self) -> Optional[list[str]]:
         if self.relation_type:

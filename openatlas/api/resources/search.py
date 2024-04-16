@@ -3,7 +3,7 @@ from typing import Any, Tuple
 from flask import g
 
 from openatlas.api.resources.search_validation import (
-    check_if_date, check_if_date_search)
+    check_if_date)
 from openatlas.api.resources.util import (
     flatten_list_and_remove_duplicates, get_linked_entities_id_api)
 from openatlas.models.entity import Entity
@@ -17,10 +17,6 @@ def get_sub_ids(id_: int, subs: list[Any]) -> list[Any]:
     return subs
 
 
-def iterate_through_entities(
-        entity: Entity,
-        parameter: list[dict[str, Any]]) -> bool:
-    return bool([p for p in parameter if search_result(entity, p)])
 
 
 def search_result(entity: Entity, parameter: dict[str, Any]) -> bool:
@@ -30,20 +26,6 @@ def search_result(entity: Entity, parameter: dict[str, Any]) -> bool:
         search_values=parameter['search_values'],
         logical_operator=parameter['logical_operator'],
         is_comparable=parameter['is_date']))
-
-
-def get_search_parameter(parser: dict[str, Any]) -> dict[str, Any]:
-    parameter = {}
-    for category, values in parser.items():
-        for value in values:
-            parameter.update({
-                "search_values": get_search_values(category, value),
-                "logical_operator": value['logicalOperator'],
-                "operator": 'equal' if category == "valueTypeID"
-                else value['operator'],
-                "category": category,
-                "is_date": check_if_date_search(category)})
-    return parameter
 
 
 def get_search_values(

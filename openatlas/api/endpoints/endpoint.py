@@ -1,3 +1,4 @@
+import ast
 import itertools
 import zipfile
 from io import BytesIO
@@ -16,8 +17,6 @@ from openatlas.api.formats.loud import get_loud_entities
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.resolve_endpoints import (
     download, parse_loud_context)
-from openatlas.api.resources.search import (
-    get_search_parameter, iterate_through_entities)
 from openatlas.api.resources.templates import (
     geojson_collection_template, linked_places_template, loud_template)
 from openatlas.api.resources.util import (
@@ -38,11 +37,9 @@ class Endpoint:
         if self.parser.type_id:
             self.entities = self.filter_by_type()
         if self.parser.search:
-            if search_parser := self.parser.parameter_validation():
-                parameter = [get_search_parameter(p) for p in search_parser]
-                self.entities = [
-                    e for e in self.entities
-                    if iterate_through_entities(e, parameter)]
+            self.parser.set_search_param()
+            self.entities = [
+                e for e in self.entities if self.parser.search_filter(e)]
         if self.parser.export == 'csv':
             return self.export_entities_csv()
         if self.parser.export == 'csvNetwork':
@@ -100,7 +97,7 @@ class Endpoint:
     def filter_by_type(self) -> list[Entity]:
         result = []
         for entity in self.entities:
-            if any(id_ in [key.id for key in entity.types]
+            if any(id_ in [type_.id for type_ in entity.types]
                    for id_ in self.parser.type_id):
                 result.append(entity)
         return result
