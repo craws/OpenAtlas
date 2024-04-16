@@ -478,6 +478,19 @@ class Api(ApiTestCase):
             rv = self.app.get(url_for('api_04.type_tree', count=True))
             assert rv.get_json() > 0
 
+            rv = self.app.get(url_for(
+                    'api_04.query',
+                    entities=place.id,
+                    cidoc_classes='E18',
+                    view_classes='artifact',
+                    system_classes='person',
+                    format='lp',
+                    search="""{"entityAliases":[{"operator":"equal",
+                    "values":["Sûza"],"logicalOperator":"and"}],
+                    "typeID":[{"operator":"equal","values":[1121212],
+                    "logicalOperator":"and"}]}"""))
+            assert bool(rv.get_json()['pagination']['entities'] == 0)
+
             for rv in [
                 self.app.get(url_for(
                     'api_04.query',
