@@ -9,8 +9,8 @@ from openatlas.api.resources.error import (
     LogicalOperatorError, SearchValueError, InvalidCidocClassCodeError,
     InvalidSystemClassError, InvalidViewClassError, InvalidLimitError,
     InvalidSearchSyntax, ValueNotIntegerError, NoSearchStringError,
-    NotAPlaceError, QueryEmptyError, NotATypeError, TypeIDError,
-    LastEntityError, DisplayFileNotFoundError)
+    NotAPlaceError, QueryEmptyError, NotATypeError, LastEntityError,
+    DisplayFileNotFoundError)
 
 
 @app.errorhandler(400)

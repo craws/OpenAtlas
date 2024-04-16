@@ -44,7 +44,7 @@ class Parser:
     show: list[str]
     export = None
     format = None
-    type_id = None
+    type_id: list[int]
     relation_type = None
     centroid = None
     geometry = None
@@ -58,6 +58,7 @@ class Parser:
 
     def __init__(self, parser: dict[str, Any]):
         self.show = []
+        self.type_id = []
         for item in parser:
             setattr(self, item, parser[item])
 
@@ -98,13 +99,13 @@ class Parser:
                         "is_date": check_if_date_search(category)})
 
     def search_filter(self, entity: Entity) -> bool:
-        for p in self.search_param:
+        for i in self.search_param:
             if not search_entity(
-                    entity_values=value_to_be_searched(entity, p['category']),
-                    operator_=p['operator'],
-                    search_values=p['search_values'],
-                    logical_operator=p['logical_operator'],
-                    is_comparable=p['is_date']):
+                    entity_values=value_to_be_searched(entity, i['category']),
+                    operator_=i['operator'],
+                    search_values=i['search_values'],
+                    logical_operator=i['logical_operator'],
+                    is_comparable=i['is_date']):
                 return False
         return True
 

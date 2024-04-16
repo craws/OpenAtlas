@@ -166,8 +166,7 @@ class Endpoint:
 
     def remove_duplicate_entities(self) -> None:
         seen: set[int] = set()
-        # Do not change, faster than always call seen.add()
-        seen_add = seen.add
+        seen_add = seen.add  # Faster than always call seen.add()
         self.entities = \
             [e for e in self.entities if not (e.id in seen or seen_add(e.id))]
 
