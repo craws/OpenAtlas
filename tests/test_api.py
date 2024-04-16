@@ -848,13 +848,6 @@ class Api(ApiTestCase):
             assert 'ID is last entity' in rv.get_json()['title']
 
             rv = self.app.get(
-                url_for(
-                    'api_04.query',
-                    system_classes='person',
-                    type_id=boundary_mark.id))
-            assert 'One entity ID is not a type' in rv.get_json()['title']
-
-            rv = self.app.get(
                 url_for('api_04.system_class', system_class='Wrong'))
             assert 'Invalid system_classes value' in rv.get_json()['title']
 

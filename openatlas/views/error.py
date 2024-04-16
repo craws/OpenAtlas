@@ -4,13 +4,13 @@ from typing import Any
 from flask import jsonify, render_template, request, g
 
 from openatlas import app
-from openatlas.api.resources.error import \
-    (AccessDeniedError, NoLicenseError, EntityDoesNotExistError, OperatorError,
-     LogicalOperatorError, SearchValueError, InvalidCidocClassCodeError,
-     InvalidSystemClassError, InvalidViewClassError, InvalidLimitError,
-     InvalidSearchSyntax, ValueNotIntegerError, NoSearchStringError,
-     NotAPlaceError, QueryEmptyError, NotATypeError, TypeIDError,
-     LastEntityError, DisplayFileNotFoundError)
+from openatlas.api.resources.error import (
+    AccessDeniedError, NoLicenseError, EntityDoesNotExistError, OperatorError,
+    LogicalOperatorError, SearchValueError, InvalidCidocClassCodeError,
+    InvalidSystemClassError, InvalidViewClassError, InvalidLimitError,
+    InvalidSearchSyntax, ValueNotIntegerError, NoSearchStringError,
+    NotAPlaceError, QueryEmptyError, NotATypeError, TypeIDError,
+    LastEntityError, DisplayFileNotFoundError)
 
 
 @app.errorhandler(400)
@@ -37,7 +37,7 @@ def page_not_found(e: Exception) -> tuple[Any, int]:
             'message':
                 'The requested endpoint does not exist. '
                 'Please consult the manual or the Swagger documentation: '
-                f'{request.url_root }swagger',
+                f'{request.url_root}swagger',
             'url': request.url,
             'timestamp': datetime.datetime.now(),
             'status': 404}), 404
@@ -256,17 +256,6 @@ def invalid_search_category(_e: Exception) -> tuple[Any, int]:
         'message':
             'The search category is invalid. Please use: '
             f'{app.config["VALID_VALUES"]}',
-        'url': request.url,
-        'timestamp': datetime.datetime.now(),
-        'status': 400}), 400
-
-
-@app.errorhandler(TypeIDError)
-def one_id_is_not_a_type(_e: Exception) -> tuple[Any, int]:
-    return jsonify({
-        'title': 'One entity ID is not a type',
-        'message':
-            'One of the requested ID either does not exist or is not a Type.',
         'url': request.url,
         'timestamp': datetime.datetime.now(),
         'status': 400}), 400

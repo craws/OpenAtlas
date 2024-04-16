@@ -5,7 +5,7 @@ from itertools import groupby
 from typing import Any
 
 import pandas as pd
-from flask import Response, jsonify, request
+from flask import Response, g, jsonify, request
 from flask_restful import marshal
 
 from openatlas import app
@@ -14,7 +14,6 @@ from openatlas.api.formats.csv import (
     build_entity_dataframe, build_link_dataframe)
 from openatlas.api.formats.loud import get_loud_entities
 from openatlas.api.resources.api_entity import ApiEntity
-from openatlas.api.resources.error import TypeIDError
 from openatlas.api.resources.resolve_endpoints import (
     download, parse_loud_context)
 from openatlas.api.resources.search import (
@@ -30,16 +29,14 @@ from openatlas.models.link import Link
 class Endpoint:
     def __init__(
             self,
-            entities: list[Entity] | Entity,
+            entities: Entity | list[Entity],
             parser: dict[str, Any]) -> None:
         self.entities = entities if isinstance(entities, list) else [entities]
         self.parser = Parser(parser)
 
-    def resolve_entities(self) -> Response | dict[str, Any] | tuple[Any, int]:
+    def resolve_entities(self) -> Response | dict[str, Any]:
         if self.parser.type_id:
-            self.entities = self.filter_by_type(self.parser.type_id)
-            if not self.entities:
-                raise TypeIDError
+            self.entities = self.filter_by_type()
         if self.parser.search:
             if search_parser := self.parser.parameter_validation():
                 parameter = [get_search_parameter(p) for p in search_parser]
@@ -62,7 +59,7 @@ class Endpoint:
             return jsonify(result['pagination']['entities'])
         if self.parser.download == 'true':
             return download(result, self.parser.get_entities_template())
-        return marshal(result, self.parser.get_entities_template()), 200
+        return marshal(result, self.parser.get_entities_template())
 
     def resolve_entity(self) -> Response | dict[str, Any] | tuple[Any, int]:
         if self.parser.export == 'csv':
@@ -100,10 +97,11 @@ class Endpoint:
             return get_loud_entities(entity_dict, parse_loud_context())
         return self.parser.get_linked_places_entity(entity_dict)
 
-    def filter_by_type(self, ids: list[int]) -> list[Entity]:
+    def filter_by_type(self) -> list[Entity]:
         result = []
         for entity in self.entities:
-            if any(id_ in [key.id for key in entity.types] for id_ in ids):
+            if any(id_ in [key.id for key in entity.types]
+                   for id_ in self.parser.type_id):
                 result.append(entity)
         return result
 
