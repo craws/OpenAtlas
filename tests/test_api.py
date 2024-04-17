@@ -53,7 +53,7 @@ class Api(ApiTestCase):
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()
-                for entity in  ApiEntity.get_by_cidoc_classes(['all']):
+                for entity in ApiEntity.get_by_cidoc_classes(['all']):
                     match entity.name:
                         case 'Location of Shire':
                             location = entity
