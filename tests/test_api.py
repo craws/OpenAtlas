@@ -1,9 +1,11 @@
 import json
+from pathlib import Path
 from typing import Any, Optional
 
 from flask import url_for
 
 from openatlas import app
+from openatlas.api.import_scripts.util import get_type_by_name
 from openatlas.api.resources.api_entity import ApiEntity
 from tests.base import ApiTestCase
 
@@ -51,6 +53,16 @@ class Api(ApiTestCase):
     def test_api(self) -> None:
 
         with app.app_context():
+
+            logo = Path(app.root_path) \
+                / 'static' / 'images' / 'layout' / 'logo.png'
+
+            with open(logo, 'rb') as img:
+                self.app.post(
+                    url_for('insert', class_='file'),
+                    data={'name': 'OpenAtlas logo', 'file': img},
+                    follow_redirects=True)
+
             with app.test_request_context():
                 app.preprocess_request()
                 for entity in ApiEntity.get_by_cidoc_classes(['all']):
@@ -85,6 +97,8 @@ class Api(ApiTestCase):
                             file_without_licences = entity
                         case 'File without file':
                             file_without_file = entity
+                        case 'OpenAtlas logo':
+                            file = entity
 
             # Test Swagger UI
             if app.config['OPENAPI_INSTANCE_FILE'].exists():
@@ -129,8 +143,19 @@ class Api(ApiTestCase):
             rv = self.app.get(url_for('api_04.system_class_count')).get_json()
             assert bool(rv['person'])
 
+            with app.test_request_context():
+                app.preprocess_request()
+                file.link('P2', get_type_by_name('Open license'))
+            rv = self.app.get(url_for(
+                'api.licensed_file_overview',
+                file_id=file.id))
+            assert self.get_bool(
+                rv.get_json()[str(file.id)],
+                'license',
+                'Open license')
+
             rv = self.app.get(url_for('api.licensed_file_overview'))
-            assert bool(len(rv.get_json().keys()) == 3)
+            assert bool(len(rv.get_json().keys()) == 4)
 
             for rv in [
                 self.app.get(url_for('api_04.geometric_entities')),
