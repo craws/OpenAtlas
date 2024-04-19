@@ -88,8 +88,8 @@ class FileDisplay(BaseDisplay):
         super().add_tabs()
         entity = self.entity
         for name in [
-                'source', 'event', 'actor', 'place', 'feature',
-                'stratigraphic_unit', 'artifact', 'reference', 'type']:
+                'source', 'event', 'actor', 'place', 'artifact', 'reference',
+                'type']:
             self.tabs[name] = Tab(name, entity=entity)
         entity.image_id = entity.id if get_file_path(entity.id) else None
         for link_ in entity.get_links('P67'):
