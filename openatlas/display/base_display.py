@@ -266,7 +266,9 @@ class ActorDisplay(BaseDisplay):
         for link_ in self.event_links:
             event = link_.domain
             link_.object_ = None  # Needed for first/last appearance
-            for place in event.get_linked_entities(['P7', 'P26', 'P27']):
+            for place in event.get_linked_entities(
+                    ['P7', 'P26', 'P27'],
+                    sort=True):
                 link_.object_ = place.get_linked_entity_safe('P53', True)
                 self.linked_places.append(link_.object_)
             self.tabs['event'].table.rows.append([
@@ -330,7 +332,10 @@ class EventsDisplay(BaseDisplay):
         self.data[_('succeeding event')] = \
             '<br>'.join([
                 link(e)
-                for e in self.entity.get_linked_entities('P134', True)])
+                for e in self.entity.get_linked_entities(
+                    'P134',
+                    inverse=True,
+                    sort=True)])
         if place := self.entity.get_linked_entity('P7'):
             self.data[_('location')] = \
                 link(place.get_linked_entity_safe('P53', True))
@@ -341,7 +346,7 @@ class EventsDisplay(BaseDisplay):
         for name in ['subs', 'source', 'actor', 'reference', 'file']:
             self.tabs[name] = Tab(name, entity=entity)
         self.add_reference_tables_data()
-        for sub in entity.get_linked_entities('P9', types=True):
+        for sub in entity.get_linked_entities('P9', types=True, sort=True):
             self.tabs['subs'].table.rows.append(get_base_table_data(sub))
         self.tabs['actor'].table.header.insert(5, _('activity'))
         for link_ in entity.get_links(['P11', 'P14', 'P22', 'P23']):
@@ -361,7 +366,7 @@ class EventsDisplay(BaseDisplay):
                 remove_link(link_.range.name, link_, entity, 'actor')])
         self.linked_places = [
             location.get_linked_entity_safe('P53', True) for location
-            in entity.get_linked_entities(['P7', 'P26', 'P27'])]
+            in entity.get_linked_entities(['P7', 'P26', 'P27'], sort=True)]
 
 
 class PlaceBaseDisplay(BaseDisplay):
@@ -548,7 +553,11 @@ class TypeBaseDisplay(BaseDisplay):
                     link(Entity.get_by_id(row['domain_id'])),
                     link(Entity.get_by_id(row['range_id']))])
         else:
-            entities = entity.get_linked_entities(['P2', 'P89'], True, True)
+            entities = entity.get_linked_entities(
+                ['P2', 'P89'],
+                inverse=True,
+                types=True,
+                sort=True)
             root_places = {}
             if possible_sub_unit and entities:
                 root_places = Entity.get_roots(
