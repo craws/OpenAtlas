@@ -665,6 +665,7 @@ def admin_annotation_delete(id_: int) -> Response:
 def admin_annotation_relink(image_id: int, entity_id: int) -> Response:
     image = Entity.get_by_id(image_id)
     image.link('P67', Entity.get_by_id(entity_id))
+    flash(_('entities relinked'), 'info')
     return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
 
 
@@ -675,6 +676,7 @@ def admin_annotation_remove_entity(
         annotation_id: int,
         entity_id: int) -> Response:
     Annotation.remove_entity_from_annotation(annotation_id, entity_id)
+    flash(_('entity removed from annotation'), 'info')
     return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
 
 

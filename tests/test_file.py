@@ -18,7 +18,7 @@ class FileTest(TestBaseCase):
                 reference = insert('edition', 'Ancient Books')
 
             logo = Path(app.root_path) \
-                / 'static' / 'images' / 'layout' / 'logo.png'
+                   / 'static' / 'images' / 'layout' / 'logo.png'
 
             with open(logo, 'rb') as img_1, open(logo, 'rb') as img_2:
                 rv: Any = self.app.post(
@@ -37,7 +37,8 @@ class FileTest(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()
                 files = Entity.get_by_class('file')
-                file_id = files[0].id
+                file = files[0]
+                file_id = file.id
             rv = self.app.get(
                 url_for('delete_iiif_file', id_=file_id),
                 follow_redirects=True)
@@ -201,6 +202,31 @@ class FileTest(TestBaseCase):
                 annotation_id=annotation_id.replace('.json', '')))
             assert bool(annotation_id in rv.get_json()['@id'])
 
+            with app.test_request_context():
+                app.preprocess_request()
+                file.delete_links(['P67'])
+
+            rv = self.app.get(url_for('orphans'))
+            assert b'File keeper' in rv.data
+
+            rv = self.app.get(url_for(
+                'admin_annotation_relink',
+                image_id=file.id,
+                entity_id=place.id),
+                follow_redirects=True)
+            assert b'Entities relinked' in rv.data
+
+            with app.test_request_context():
+                app.preprocess_request()
+                file.delete_links(['P67'])
+
+            rv = self.app.get(url_for(
+                'admin_annotation_remove_entity',
+                annotation_id=1,
+                entity_id=place.id),
+                follow_redirects=True)
+            assert b'Entity removed from annotation' in rv.data
+
             rv = self.app.post(
                 url_for('annotation_update', id_=1),
                 data={'text': 'A boring annotation'},
@@ -209,6 +235,22 @@ class FileTest(TestBaseCase):
 
             rv = self.app.get(
                 url_for('annotation_delete', id_=1),
+                follow_redirects=True)
+            assert b'Annotation deleted' in rv.data
+
+            self.app.post(
+                url_for('annotation_insert', id_=file_id),
+                data={
+                    'coordinate': '1.5,1.6,1.4,9.6,8.6,9.6,8.6,1.6',
+                    'text': 'An interesting annotation',
+                    'entity': place.id})
+
+            with app.test_request_context():
+                app.preprocess_request()
+                file.delete_links(['P67'])
+
+            rv = self.app.get(
+                url_for('admin_annotation_delete', id_=2),
                 follow_redirects=True)
             assert b'Annotation deleted' in rv.data
 
