@@ -36,6 +36,7 @@ from openatlas.forms.setting import (
     ApiForm, ContentForm, FrontendForm, GeneralForm, LogForm, MailForm,
     MapForm, ModulesForm, SimilarForm, TestMailForm)
 from openatlas.forms.util import get_form_settings, set_form_settings
+from openatlas.models.annotation import Annotation
 from openatlas.models.content import get_content, update_content
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Import
@@ -482,6 +483,10 @@ def orphans() -> str:
             'orphaned_iiif_files',
             buttons=[manual_link],
             table=Table(['name', 'size', 'date', 'ext'])),
+        'orphaned_annotations': Tab(
+            'orphaned_annotations',
+            buttons=[manual_link],
+            table=Table(['image', 'entity', 'annotation', 'creation'])),
         'orphaned_subunits': Tab(
             'orphaned_subunits',
             buttons=[manual_link],
@@ -561,6 +566,36 @@ def orphans() -> str:
                         js=f"return confirm('{confirm}')")
                     if is_authorized('editor') else ''])
 
+    # Orphaned annotations
+    for annotation in Annotation.get_orphaned_annotations():
+        file = Entity.get_by_id(annotation.image_id)
+        entity = None
+        if annotation.entity_id:
+            entity = Entity.get_by_id(annotation.entity_id)
+        tabs['orphaned_annotations'].table.rows.append([
+            link(file),
+            link(entity) or None,
+            annotation.text,
+            annotation.created,
+            link(
+                _('relink entity'),
+                url_for(
+                    'admin_annotation_relink',
+                    image_id=file.id,
+                    entity_id=entity.id),
+                js=f"return confirm('{_('relink entity')}?')"),
+            link(
+                _('remove entity'),
+                url_for(
+                    'admin_annotation_remove_entity',
+                    annotation_id=annotation.id,
+                    entity_id=entity.id),
+                js=f"return confirm('{_('remove entity')}?')"),
+            link(
+                _('delete annotation'),
+                url_for('admin_annotation_delete', id_=annotation.id),
+                js=f"return confirm('{_('delete annotation')}?')")])
+
     # Orphaned subunits (without connection to a P46 super)
     for entity in Entity.get_orphaned_subunits():
         tabs['orphaned_subunits'].table.rows.append([
@@ -616,6 +651,33 @@ def admin_file_delete(filename: str) -> Response:
                     flash(_('error file delete'), 'error')
     return redirect(
         f"{url_for('orphans')}#tab-orphaned-files")  # pragma: no cover
+
+
+@app.route('/admin/annotation/delete/<int:id_>')
+@required_group('editor')
+def admin_annotation_delete(id_: int) -> Response:
+    annotation = Annotation.get_by_id(id_)
+    annotation.delete()
+    flash(_('annotation deleted'), 'info')
+    return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
+
+
+@app.route('/admin/annotation/relink/<int:image_id>/<int:entity_id>')
+@required_group('editor')
+def admin_annotation_relink(image_id: int, entity_id: int) -> Response:
+    image = Entity.get_by_id(image_id)
+    image.link('P67', Entity.get_by_id(entity_id))
+    return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
+
+
+@app.route(
+    '/admin/annotation/remove/entity/<int:annotation_id>/<int:entity_id>')
+@required_group('editor')
+def admin_annotation_remove_entity(
+        annotation_id: int,
+        entity_id: int) -> Response:
+    Annotation.remove_entity_from_annotation(annotation_id, entity_id)
+    return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
 
 
 @app.route('/admin/file/iiif/delete/<filename>')

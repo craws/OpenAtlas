@@ -35,6 +35,16 @@ class Annotation:
         return [Annotation(row) for row in db.get_by_file(image_id)]
 
     @staticmethod
+    def get_orphaned_annotations() -> list[Annotation]:
+        return [Annotation(row) for row in db.get_orphaned_annotations()]
+
+    @staticmethod
+    def remove_entity_from_annotation(
+            annotation_id: int,
+            entity_id: int) -> None:
+        db.remove_entity(annotation_id, entity_id)
+
+    @staticmethod
     def insert(
             image_id: int,
             coordinates: str,

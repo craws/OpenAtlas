@@ -100,3 +100,4 @@ def annotation_delete(id_: int) -> Response:
     annotation.delete()
     flash(_('annotation deleted'), 'info')
     return redirect(url_for('annotation_insert', id_=annotation.image_id))
+
