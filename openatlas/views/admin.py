@@ -569,12 +569,10 @@ def orphans() -> str:
     # Orphaned annotations
     for annotation in Annotation.get_orphaned_annotations():
         file = Entity.get_by_id(annotation.image_id)
-        entity = None
-        if annotation.entity_id:
-            entity = Entity.get_by_id(annotation.entity_id)
+        entity = Entity.get_by_id(annotation.entity_id)
         tabs['orphaned_annotations'].table.rows.append([
             link(file),
-            link(entity) or None,
+            link(entity),
             annotation.text,
             annotation.created,
             link(
