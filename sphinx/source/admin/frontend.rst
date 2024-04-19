@@ -13,6 +13,6 @@ links to it in the backend:
   overview.
 * **Resolver URL** - in case entity details can be viewed using the id at
   the end of an URL, a resolver URL can be specified. E.g. with the
-  resolver URL **https://frontend-demo.openatlas.eu/entity/** a link for the
-  presentation site view of an entity would be shown in the backend and would
-  look like this: https://frontend-demo.openatlas.eu/entity/5560
+  resolver URL https://example.net/entities/ a link for the   presentation site
+  view of an entity would be shown in the backend and would  look like this:
+  https://example.net/entities/1234

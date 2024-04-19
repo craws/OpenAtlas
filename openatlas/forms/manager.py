@@ -24,7 +24,7 @@ class AcquisitionManager(EventBaseManager):
     _('given artifact')
 
     def additional_fields(self) -> dict[str, Any]:
-        data = {'place': [], 'artifact': []}
+        data: dict[str, list[Any]] = {'place': [], 'artifact': []}
         if not self.insert:
             for entity in self.entity.get_linked_entities('P24'):
                 data[
@@ -425,7 +425,7 @@ class MoveManager(EventBaseManager):
         fields = super().additional_fields()
         place_from = None
         place_to = None
-        data = {'artifact': [], 'person': []}
+        data: dict[str, list[Any]] = {'artifact': [], 'person': []}
         if self.entity:
             if place := self.entity.get_linked_entity('P27'):
                 place_from = place.get_linked_entity_safe('P53', True)

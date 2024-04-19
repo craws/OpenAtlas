@@ -40,7 +40,7 @@ class LicensedFileOverview(Resource):
     def get() -> Response | tuple[Any, int]:
         parser = files.parse_args()
         if parser['file_id']:
-            entities = ApiEntity.get_by_ids(parser['file_id'])
+            entities = ApiEntity.get_by_ids(parser['file_id'], types=True)
         else:
             entities = ApiEntity.get_by_system_classes(['file'])
         files_dict = {}

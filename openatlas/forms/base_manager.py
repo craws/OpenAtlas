@@ -55,7 +55,7 @@ class BaseManager:
         self.insert = bool(not self.entity and not self.link_)
         self.place_info: dict[str, Any] = {}
         self.aliases = current_user.settings['table_show_aliases']
-        self.table_items = {}  # Store table entities to avoid multiple loading
+        self.table_items: dict[str, list[Entity]] = {}
 
         if self.insert:
             self.get_place_info_for_insert()
