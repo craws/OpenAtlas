@@ -77,7 +77,9 @@ def get_annotation_form(
             'coordinate',
             HiddenField(_('coordinates'), validators=[InputRequired()]))
     table = Table(['name', 'class', 'description'])
-    for item in Entity.get_by_id(image_id).get_linked_entities('P67'):
+    for item in Entity.get_by_id(image_id).get_linked_entities(
+            'P67',
+            sort=True):
         table.rows.append([
             format_name_and_aliases(item, 'entity'),
             item.class_.name,
@@ -161,7 +163,7 @@ def get_move_form(type_: Type) -> Any:
     setattr(Form, str(root.id), TreeField(str(root.id)))
     choices = []
     if root.class_.name == 'administrative_unit':
-        for entity in type_.get_linked_entities('P89', True):
+        for entity in type_.get_linked_entities('P89', True, sort=True):
             place = entity.get_linked_entity('P53', True)
             if place:
                 choices.append((entity.id, place.name))

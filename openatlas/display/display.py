@@ -21,12 +21,15 @@ class AcquisitionDisplay(EventsDisplay):
 
     def add_data(self) -> None:
         super().add_data()
-        self.data[_('recipient')] = \
-            [link(actor) for actor in self.entity.get_linked_entities('P22')]
-        self.data[_('donor')] = \
-            [link(donor) for donor in self.entity.get_linked_entities('P23')]
-        self.data[_('given object')] = \
-            [link(item) for item in self.entity.get_linked_entities('P24')]
+        self.data[_('recipient')] = [
+            link(actor) for actor in
+            self.entity.get_linked_entities('P22', sort=True)]
+        self.data[_('donor')] = [
+            link(donor) for donor in
+            self.entity.get_linked_entities('P23', sort=True)]
+        self.data[_('given object')] = [
+            link(item) for item in
+            self.entity.get_linked_entities('P24', sort=True)]
 
 
 class ActivityDisplay(EventsDisplay):
@@ -42,7 +45,8 @@ class ArtifactDisplay(PlaceBaseDisplay):
     def add_data(self) -> None:
         super().add_data()
         self.data[_('source')] = [
-            link(source) for source in self.entity.get_linked_entities('P128')]
+            link(source) for source
+            in self.entity.get_linked_entities('P128', sort=True)]
         self.data[_('owned by')] = link(self.entity.get_linked_entity('P52'))
 
 
@@ -54,8 +58,9 @@ class CreationDisplay(EventsDisplay):
 
     def add_data(self) -> None:
         super().add_data()
-        self.data[_('document')] = \
-            [link(file_) for file_ in self.entity.get_linked_entities('P94')]
+        self.data[_('document')] = [
+            link(file_) for file_
+            in self.entity.get_linked_entities('P94', sort=True)]
 
 
 class FileDisplay(BaseDisplay):
@@ -148,8 +153,9 @@ class ModificationDisplay(EventsDisplay):
 
     def add_data(self) -> None:
         super().add_data()
-        self.data[_('object')] = \
-            [link(entity) for entity in self.entity.get_linked_entities('P31')]
+        self.data[_('object')] = [
+            link(entity) for entity
+            in self.entity.get_linked_entities('P31', sort=True)]
 
 
 class MoveDisplay(EventsDisplay):
@@ -167,7 +173,7 @@ class MoveDisplay(EventsDisplay):
                 'end',
                 to.get_linked_entity_safe('P53', True))
         moved: dict[str, list[str]] = {'actor': [], 'artifact': []}
-        for entity in self.entity.get_linked_entities('P25'):
+        for entity in self.entity.get_linked_entities('P25', sort=True):
             moved[entity.class_.view].append(link(entity))
         self.data[_('person')] = moved['actor']
         self.data[_('artifact')] = moved['artifact']
@@ -196,7 +202,9 @@ class PlaceDisplay(PlaceBaseDisplay):
         actor_ids = []
         for event in self.events:
             for actor in \
-                    event.get_linked_entities(['P11', 'P14', 'P22', 'P23']):
+                    event.get_linked_entities(
+                        ['P11', 'P14', 'P22', 'P23'],
+                        sort=True):
                 if actor.id not in actor_ids:
                     actor_ids.append(actor.id)
                     self.tabs['actor'].table.rows.append([
@@ -210,7 +218,8 @@ class ProductionDisplay(EventsDisplay):
     def add_data(self) -> None:
         super().add_data()
         self.data[_('produced')] = [
-            link(item) for item in self.entity.get_linked_entities('P108')]
+            link(item) for item
+            in self.entity.get_linked_entities('P108', sort=True)]
 
 
 class ReferenceSystemDisplay(BaseDisplay):
