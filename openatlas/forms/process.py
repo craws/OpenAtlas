@@ -147,8 +147,12 @@ def process_dates(manager: Any) -> dict[str, Any]:
             form.begin_minute_from.data if 'begin_hour_from' in form else None,
             form.begin_second_from.data if 'begin_hour_from' in form else None)
         data['begin_to'] = form_to_datetime64(
-            form.begin_year_to.data,
-            form.begin_month_to.data,
+            form.begin_year_to.data or (
+                form.begin_year_from.data if not
+                form.begin_day_from.data else None),
+            form.begin_month_to.data or (
+                form.begin_month_from.data if not
+                form.begin_day_from.data else None),
             form.begin_day_to.data,
             form.begin_hour_to.data if 'begin_hour_from' in form else None,
             form.begin_minute_to.data if 'begin_hour_from' in form else None,
@@ -160,15 +164,17 @@ def process_dates(manager: Any) -> dict[str, Any]:
             form.end_year_from.data,
             form.end_month_from.data,
             form.end_day_from.data,
-            form.end_hour_from.data if 'begin_hour_from' in form else None,
-            form.end_minute_from.data if 'begin_hour_from' in form else None,
-            form.end_second_from.data if 'begin_hour_from' in form else None)
+            form.end_hour_from.data if 'end_hour_from' in form else None,
+            form.end_minute_from.data if 'end_hour_from' in form else None,
+            form.end_second_from.data if 'end_hour_from' in form else None)
         data['end_to'] = form_to_datetime64(
-            form.end_year_to.data,
-            form.end_month_to.data,
+            form.end_year_to.data or
+            (form.end_year_from.data if not form.end_day_from.data else None),
+            form.end_month_to.data or
+            (form.end_month_from.data if not form.end_day_from.data else None),
             form.end_day_to.data,
-            form.end_hour_to.data if 'begin_hour_from' in form else None,
-            form.end_minute_to.data if 'begin_hour_from' in form else None,
-            form.end_second_to.data if 'begin_hour_from' in form else None,
+            form.end_hour_to.data if 'end_hour_from' in form else None,
+            form.end_minute_to.data if 'end_hour_from' in form else None,
+            form.end_second_to.data if 'end_hour_from' in form else None,
             to_date=True)
     return data
