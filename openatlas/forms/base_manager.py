@@ -378,7 +378,7 @@ class EventBaseManager(BaseManager):
     fields = ['name', 'date', 'description', 'continue']
 
     def get_sub_ids(self, entity: Entity, ids: list[int]) -> list[int]:
-        for sub in entity.get_linked_entities('P9'):
+        for sub in entity.get_linked_entities('P9', sort=True):
             ids.append(sub.id)
             self.get_sub_ids(sub, ids)
         return ids

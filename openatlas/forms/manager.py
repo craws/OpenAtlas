@@ -26,7 +26,7 @@ class AcquisitionManager(EventBaseManager):
     def additional_fields(self) -> dict[str, Any]:
         data: dict[str, list[Any]] = {'place': [], 'artifact': []}
         if not self.insert:
-            for entity in self.entity.get_linked_entities('P24'):
+            for entity in self.entity.get_linked_entities('P24', sort=True):
                 data[
                     'artifact' if entity.class_.name == 'artifact'
                     else 'place'].append(entity)
@@ -194,7 +194,7 @@ class CreationManager(EventBaseManager):
             if self.origin and self.origin.class_.name == 'file':
                 selection = [self.origin]
         else:
-            selection = self.entity.get_linked_entities('P94')
+            selection = self.entity.get_linked_entities('P94', sort=True)
         fields = super().additional_fields()
         fields['document'] = TableMultiField(
             table_multi(Entity.get_by_class('file'), selection),
@@ -392,7 +392,7 @@ class ModificationManager(EventBaseManager):
         artifacts = []
         places = []
         if not self.insert:
-            for item in self.entity.get_linked_entities('P31'):
+            for item in self.entity.get_linked_entities('P31', sort=True):
                 if item.class_.name == 'artifact':
                     artifacts.append(item)
                 elif item.cidoc_class.code == 'E18':
@@ -431,7 +431,9 @@ class MoveManager(EventBaseManager):
                 place_from = place.get_linked_entity_safe('P53', True)
             if place := self.entity.get_linked_entity('P26'):
                 place_to = place.get_linked_entity_safe('P53', True)
-            for linked_entity in self.entity.get_linked_entities('P25'):
+            for linked_entity in self.entity.get_linked_entities(
+                    'P25',
+                    sort=True):
                 data[linked_entity.class_.name].append(linked_entity)
         elif self.origin:
             if self.origin.class_.view == 'artifact':
@@ -505,7 +507,7 @@ class ProductionManager(EventBaseManager):
         fields = super().additional_fields()
         selection = None
         if not self.insert and self.entity:
-            selection = self.entity.get_linked_entities('P108')
+            selection = self.entity.get_linked_entities('P108', sort=True)
         fields['artifact'] = TableMultiField(
             table_multi(Entity.get_by_class('artifact', True), selection),
             selection)
@@ -581,7 +583,10 @@ class SourceManager(BaseManager):
     def additional_fields(self) -> dict[str, Any]:
         selection = None
         if not self.insert and self.entity:
-            selection = self.entity.get_linked_entities('P128', inverse=True)
+            selection = self.entity.get_linked_entities(
+                'P128',
+                inverse=True,
+                sort=True)
         elif self.origin and self.origin.class_.name == 'artifact':
             selection = [self.origin]
         return {
