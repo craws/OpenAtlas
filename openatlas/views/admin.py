@@ -26,7 +26,8 @@ from openatlas.display.image_processing import (
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, check_iiif_file_exist, display_info, get_file_path, link,
+    button, check_iiif_activation, check_iiif_file_exist, display_info,
+    get_file_path, link,
     required_group, send_mail)
 from openatlas.display.util2 import (
     convert_size, format_date, is_authorized, manual, sanitize, uc_first)
@@ -546,7 +547,7 @@ def orphans() -> str:
                 if is_authorized('editor') else ''])
 
     # Orphaned IIIF files with no corresponding entity
-    if g.settings['iiif'] and g.settings['iiif_path']:
+    if check_iiif_activation():
         for file in Path(g.settings['iiif_path']).iterdir():
             confirm = _('Delete %(name)s?', name=file.name.replace("'", ''))
             if file.name != '.gitignore' \
