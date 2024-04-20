@@ -32,7 +32,7 @@ they are artifacts or were forgotten to link.
 Type
 ****
 These types were created but have no sub types or associated data. Maybe they
-originate from thefirst install or were never used.
+originate from the first install or were never used.
 
 Missing files
 *************
@@ -46,6 +46,15 @@ Files that have no corresponding entity are listed here.
 Orphaned IIIF files
 *******************
 IIIF files that have no corresponding entity are listed here.
+
+Orphaned annotations
+********************
+Annotations that are linked to an entity, but where the file and the entity
+doesn't have a connection are listed here. There are three options to proceed:
+
+* *Relink entity*: Add a link between file and entity
+* *Remove entity*: Removes the entity from the annotation
+* *Delete annotation*: Deletes the whole annotation
 
 Orphaned subunits
 *****************

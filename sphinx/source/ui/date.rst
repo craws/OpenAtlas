@@ -33,6 +33,15 @@ span where you are sure it had happened, e.g. the fist decade of 1800.
 Missing days and months are filled out so that the result will be
 **1800-01-01** to **1809-12-31**.
 
+**Autocomplete dates**
+
+If not an exact date was entered, the system automatically creates
+a **time span**. For example, if only the first year is entered, it will be
+converted to a timespan of this year. For example:
+
+* **800** will generate: **800-1-1** to **800-12-31**.
+* **800-5** will generate **800-5-1** to **800-5-31**
+
 **Input values**
 
 * **Year**: -4713 to 9999 but not zero
