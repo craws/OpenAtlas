@@ -39,6 +39,11 @@
         <strong>{{ disk_space_info.total }}</strong>
       </p>
       <p class="mb-1">
+        <span class="bg-gray d-inline-block ml-2 disk-space-legend"></span>
+        {{ _('free disk space')|uc_first }}
+        <strong>{{ disk_space_info.free }}</strong>
+      </p>
+      <p class="mb-1">
         <span class="bg-primary d-inline-block ml-2 disk-space-legend"></span>
         {{ _('non project files')|uc_first }}
         <strong>{{ disk_space_info.other_files }}</strong>
@@ -48,12 +53,8 @@
         {{ _('project files')|uc_first }}
         <strong>{{ disk_space_info.project }}</strong>
       </p>
-      <p class="mb-1">
-        <span class="bg-gray d-inline-block ml-2 disk-space-legend"></span>
-        {{ _('free disk space')|uc_first }}
-        <strong>{{ disk_space_info.free }}</strong>
-      </p>
     </div>
+    <div class="ms-2">
     <h1>
     {{ _('distribution of project files') }}
     </h1>
@@ -117,6 +118,7 @@
           <strong>{{ disk_space_info.iiif }}</strong>
         </p>
       </div>
+    </div>
   {% endif %}
 </div>
 {% if 'manager'|is_authorized %}

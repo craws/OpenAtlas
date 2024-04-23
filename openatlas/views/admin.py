@@ -819,51 +819,56 @@ def admin_delete_orphaned_resized_images() -> Response:
 
 
 def get_disk_space_info() -> Optional[dict[str, Any]]:
-    export, upload, processed, iiif = 0, 0, 0, 0
+    paths = {
+        'export': {
+            'path': app.config['EXPORT_PATH'], 'size': 0, 'mounted': False},
+        'upload': {
+            'path': app.config['UPLOAD_PATH'], 'size': 0, 'mounted': False},
+        'processed': {
+            'path': app.config['PROCESSED_IMAGE_PATH'],
+            'size': 0,
+            'mounted': False},
+        'iiif': {
+            'path': g.settings['iiif_path'], 'size': 0, 'mounted': False}}
     if os.name == 'posix':
-        process = run(
-            ['du', '-sb', app.config['EXPORT_PATH']],
-            capture_output=True,
-            text=True,
-            check=True)
-        export = int(process.stdout.split()[0])
-        process = run(
-            ['du', '-sb', app.config['UPLOAD_PATH']],
-            capture_output=True,
-            text=True,
-            check=True)
-        upload = int(process.stdout.split()[0])
-        process = run(
-            ['du', '-sb', app.config['PROCESSED_IMAGE_PATH']],
-            capture_output=True,
-            text=True,
-            check=True)
-        processed = int(process.stdout.split()[0])
-        process = run(
-            ['du', '-sb', g.settings['iiif_path']],
-            capture_output=True,
-            text=True,
-            check=True)
-        iiif = int(process.stdout.split()[0])
-
-        files_size = export + upload + processed + iiif
+        for path in paths.values():
+            process = run(
+                ['du', '-sb', path['path']],
+                capture_output=True,
+                text=True,
+                # check=True
+            )
+            path['size'] = int(process.stdout.split()[0])
+            process = run(
+                ['df', path['path']],
+                capture_output=True,
+                text=True,
+                # check=True
+            )
+            tmp = process.stdout.split()
+            if '/mnt/' in tmp[-1]:
+                path['mounted'] = True
+        files_size = sum(
+            paths[key]['size']
+            for key in ['export', 'upload', 'processed', 'iiif'])
     else:
         files_size = 40999999999  # pragma: no cover
     stats = shutil.disk_usage(app.config['UPLOAD_PATH'])
     percent_free = 100 - math.ceil(stats.free / (stats.total / 100))
     percent_files = math.ceil(files_size / (stats.total / 100))
-    percent_export = math.ceil(export / (files_size / 100))
-    percent_upload = math.ceil(upload / (files_size / 100))
-    percent_processed = math.ceil(processed / (files_size / 100))
-    percent_iiif = math.ceil(iiif / (files_size / 100))
+    percent_export = math.ceil(paths['export']['size'] / (files_size / 100))
+    percent_upload = math.ceil(paths['upload']['size'] / (files_size / 100))
+    percent_iiif = math.ceil(paths['iiif']['size'] / (files_size / 100))
+    percent_processed = math.ceil(
+        paths['processed']['size'] / (files_size / 100))
     other_files = stats.total - stats.free - files_size
     return {
         'total': convert_size(stats.total),
         'project': convert_size(files_size),
-        'export': convert_size(export),
-        'upload': convert_size(upload),
-        'processed': convert_size(processed),
-        'iiif': convert_size(iiif),
+        'export': convert_size(paths['export']['size']),
+        'upload': convert_size(paths['upload']['size']),
+        'processed': convert_size(paths['processed']['size']),
+        'iiif': convert_size(paths['iiif']['size']),
         'other_files': convert_size(other_files),
         'free': convert_size(stats.free),
         'percent_used': percent_free,
