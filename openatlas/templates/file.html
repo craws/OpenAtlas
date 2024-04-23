@@ -1,73 +1,128 @@
 <div style="float:left;">
   {{ info|display_info|safe }}
   {% if disk_space_info %}
+    <h1>
+    {{ _('local disk usage') }}
+    </h1>
     <div class="progress">
       <div
-          class="progress-bar bg-primary"
-          role="progressbar"
-          style="width: {{ disk_space_info.percent_used - disk_space_info.percent_project }}%"
-          aria-valuenow="{{ disk_space_info.percent_used - disk_space_info.percent_project }}"
-          aria-valuemin="0"
-          aria-valuemax="100">
+        class="progress-bar bg-primary"
+        role="progressbar"
+        style="width: {{ disk_space_info.percent_used - disk_space_info.percent_project }}%"
+        aria-valuenow="{{ disk_space_info.percent_used - disk_space_info.percent_project }}"
+        aria-valuemin="0"
+        aria-valuemax="100">
         <b>{{ disk_space_info.percent_used - disk_space_info.percent_project }}%</b>
       </div>
       <div
-          class="progress-bar bg-warning"
-          role="progressbar"
-          style="width: {{ disk_space_info.percent_project }}%"
-          aria-valuenow="{{ disk_space_info.percent_project }}"
-          aria-valuemin="0"
-          aria-valuemax="100">
+        class="progress-bar bg-warning"
+        role="progressbar"
+        style="width: {{ disk_space_info.percent_project }}%"
+        aria-valuenow="{{ disk_space_info.percent_project }}"
+        aria-valuemin="0"
+        aria-valuemax="100">
         <b>{{ disk_space_info.percent_project }}%</b>
       </div>
       <div
-          class="progress-bar bg-gray"
-          role="progressbar"
-          style="width: {{ 100 - disk_space_info.percent_used }}%"
-          aria-valuenow="{{ 100 - disk_space_info.percent_used }}"
-          aria-valuemin="0"
-          aria-valuemax="100">
+        class="progress-bar bg-gray"
+        role="progressbar"
+        style="width: {{ 100 - disk_space_info.percent_used }}%"
+        aria-valuenow="{{ 100 - disk_space_info.percent_used }}"
+        aria-valuemin="0"
+        aria-valuemax="100">
         <b class="text-dark">{{ 100 - disk_space_info.percent_used }}%</b>
       </div>
     </div>
     <div>
       <p class="mb-1">
-        {{ _('total disk space')|uc_first }} <strong>{{ disk_space_info.total }}</strong>
+        {{ _('total disk space')|uc_first }}
+        <strong>{{ disk_space_info.total }}</strong>
       </p>
       <p class="mb-1">
-        {{ _('non project files')|uc_first }} <strong>{{ disk_space_info.other_files }}</strong>
         <span class="bg-primary d-inline-block ml-2 disk-space-legend"></span>
+        {{ _('non project files')|uc_first }}
+        <strong>{{ disk_space_info.other_files }}</strong>
       </p>
       <p class="mb-1">
-        {{ _('project files')|uc_first }} <strong>{{ disk_space_info.project }}</strong>
         <span class="bg-warning d-inline-block ml-2 disk-space-legend"></span>
+        {{ _('project files')|uc_first }}
+        <strong>{{ disk_space_info.project }}</strong>
       </p>
       <p class="mb-1">
-        {{ _('export')|uc_first }} <strong>{{ disk_space_info.export }}</strong>
-        <span class="bg-warning d-inline-block ml-2 disk-space-legend"></span>
-      </p>
-      <p class="mb-1">
-        {{ _('upload')|uc_first }} <strong>{{ disk_space_info.upload }}</strong>
-        <span class="bg-warning d-inline-block ml-2 disk-space-legend"></span>
-      </p>
-      <p class="mb-1">
-        {{ _('processed')|uc_first }} <strong>{{ disk_space_info.processed }}</strong>
-        <span class="bg-warning d-inline-block ml-2 disk-space-legend"></span>
-      </p>
-      <p class="mb-1">
-        {{ _('iiif')|uc_first }} <strong>{{ disk_space_info.iiif }}</strong>
-        <span class="bg-warning d-inline-block ml-2 disk-space-legend"></span>
-      </p>
-      <p class="mb-1">
-        {{ _('free disk space')|uc_first }} <strong>{{ disk_space_info.free }}</strong>
         <span class="bg-gray d-inline-block ml-2 disk-space-legend"></span>
+        {{ _('free disk space')|uc_first }}
+        <strong>{{ disk_space_info.free }}</strong>
       </p>
     </div>
+    <h1>
+    {{ _('distribution of project files') }}
+    </h1>
+    <div class="progress">
+      <div
+        class="progress-bar bg-danger"
+        role="progressbar"
+        style="width: {{ disk_space_info.percent_upload }}%"
+        aria-valuenow="{{ disk_space_info.percent_upload }}"
+        aria-valuemin="0"
+        aria-valuemax="100">
+        <b>{{ disk_space_info.percent_upload }}%</b>
+      </div>
+      <div
+        class="progress-bar bg-success"
+        role="progressbar"
+        style="width: {{ disk_space_info.percent_export }}%"
+        aria-valuenow="{{ disk_space_info.percent_export }}"
+        aria-valuemin="0"
+        aria-valuemax="100">
+        <b>{{ disk_space_info.percent_export }}%</b>
+      </div>
+      <div
+        class="progress-bar bg-info"
+        role="progressbar"
+        style="width: {{ disk_space_info.percent_processed }}%"
+        aria-valuenow="{{ disk_space_info.percent_processed }}"
+        aria-valuemin="0"
+        aria-valuemax="100">
+        <b class="text-dark">{{ disk_space_info.percent_processed }}%</b>
+      </div>
+      <div
+        class="progress-bar bg-dark"
+        role="progressbar"
+        style="width: {{ disk_space_info.percent_iiif }}%"
+        aria-valuenow="{{ disk_space_info.percent_iiif }}"
+        aria-valuemin="0"
+        aria-valuemax="100">
+        <b>{{ disk_space_info.percent_iiif }}%</b>
+      </div>
+    </div>
+    <div>
+        <p class="mb-1">
+          <span class="bg-danger d-inline-block ml-2 disk-space-legend"></span>
+          {{ _('upload folder')|uc_first }}
+          <strong>{{ disk_space_info.upload }}</strong>
+        </p>
+        <p class="mb-1">
+          <span class="bg-success d-inline-block ml-2 disk-space-legend"></span>
+          {{ _('export folder')|uc_first }}
+          <strong>{{ disk_space_info.export }}</strong>
+        </p>
+        <p class="mb-1">
+          <span class="bg-info d-inline-block ml-2 disk-space-legend"></span>
+          {{ _('processed images folder')|uc_first }}
+          <strong>{{ disk_space_info.processed }}</strong>
+        </p>
+        <p class="mb-1">
+          <span class="bg-dark d-inline-block ml-2 disk-space-legend"></span>
+          {{ _('iiif folder')|uc_first }}
+          <strong>{{ disk_space_info.iiif }}</strong>
+        </p>
+      </div>
   {% endif %}
 </div>
 {% if 'manager'|is_authorized %}
   <div style="float:left;margin-left:2em;">
-    <img src="{{ get_logo|safe }}" id="logo-preview" alt="Logo" style="max-width:400px;"><br>
+    <img src="{{ get_logo|safe }}" id="logo-preview" alt="Logo"
+         style="max-width:400px;"><br>
     <div class="toolbar">
       {% if g.settings.logo_file_id %}
         {{ _('remove custom logo')|button(url_for('logo_remove'))|safe }}

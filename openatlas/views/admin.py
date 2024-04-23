@@ -819,7 +819,7 @@ def admin_delete_orphaned_resized_images() -> Response:
 
 
 def get_disk_space_info() -> Optional[dict[str, Any]]:
-    export, upload, processed, iiif = 0,0,0,0
+    export, upload, processed, iiif = 0, 0, 0, 0
     if os.name == 'posix':
         process = run(
             ['du', '-sb', app.config['EXPORT_PATH']],
@@ -852,6 +852,10 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
     stats = shutil.disk_usage(app.config['UPLOAD_PATH'])
     percent_free = 100 - math.ceil(stats.free / (stats.total / 100))
     percent_files = math.ceil(files_size / (stats.total / 100))
+    percent_export = math.ceil(export / (files_size / 100))
+    percent_upload = math.ceil(upload / (files_size / 100))
+    percent_processed = math.ceil(processed / (files_size / 100))
+    percent_iiif = math.ceil(iiif / (files_size / 100))
     other_files = stats.total - stats.free - files_size
     return {
         'total': convert_size(stats.total),
@@ -864,6 +868,10 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
         'free': convert_size(stats.free),
         'percent_used': percent_free,
         'percent_project': percent_files,
+        'percent_export': percent_export,
+        'percent_upload': percent_upload,
+        'percent_processed': percent_processed,
+        'percent_iiif': percent_iiif,
         'percent_other': 100 - (percent_files + percent_free)}
 
 
