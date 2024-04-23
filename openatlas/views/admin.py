@@ -135,7 +135,7 @@ def get_test_mail_form() -> str:
         body = (_(
             'This test mail was sent by %(username)s',
             username=current_user.username) +
-            ' ' + _('at') + ' ' + request.headers['Host'])
+                ' ' + _('at') + ' ' + request.headers['Host'])
         if send_mail(subject, body, form.receiver.data):
             flash(_(
                 'A test mail was sent to %(email)s.',
@@ -171,7 +171,7 @@ def get_user_table(users: list[User]) -> Table:
             user.real_name,
             user.group,
             user.email if is_authorized('manager')
-            or user.settings['show_email'] else '',
+                          or user.settings['show_email'] else '',
             _('yes') if user.settings['newsletter'] else '',
             format_date(user.created),
             format_date(user.login_last_success),
@@ -471,7 +471,7 @@ def orphans() -> str:
             table=Table(
                 ['name', 'root'],
                 [[link(type_), link(g.types[type_.root[0]])]
-                    for type_ in Type.get_type_orphans()])),
+                 for type_ in Type.get_type_orphans()])),
         'missing_files': Tab(
             'missing_files',
             buttons=[manual_link],
@@ -504,13 +504,13 @@ def orphans() -> str:
         tabs[
             'unlinked'
             if entity.class_.view else 'orphans'].table.rows.append([
-                link(entity),
-                link(entity.class_),
-                link(entity.standard_type),
-                entity.class_.label,
-                format_date(entity.created),
-                format_date(entity.modified),
-                entity.description])
+            link(entity),
+            link(entity.class_),
+            link(entity.standard_type),
+            entity.class_.label,
+            format_date(entity.created),
+            format_date(entity.modified),
+            entity.description])
 
     # Orphaned file entities with no corresponding file
     entity_file_ids = []
@@ -819,13 +819,34 @@ def admin_delete_orphaned_resized_images() -> Response:
 
 
 def get_disk_space_info() -> Optional[dict[str, Any]]:
+    export, upload, processed, iiif = 0,0,0,0
     if os.name == 'posix':
         process = run(
-            ['du', '-sb', app.config['FILES_PATH']],
+            ['du', '-sb', app.config['EXPORT_PATH']],
             capture_output=True,
             text=True,
             check=True)
-        files_size = int(process.stdout.split()[0])
+        export = int(process.stdout.split()[0])
+        process = run(
+            ['du', '-sb', app.config['UPLOAD_PATH']],
+            capture_output=True,
+            text=True,
+            check=True)
+        upload = int(process.stdout.split()[0])
+        process = run(
+            ['du', '-sb', app.config['PROCESSED_IMAGE_PATH']],
+            capture_output=True,
+            text=True,
+            check=True)
+        processed = int(process.stdout.split()[0])
+        process = run(
+            ['du', '-sb', g.settings['iiif_path']],
+            capture_output=True,
+            text=True,
+            check=True)
+        iiif = int(process.stdout.split()[0])
+
+        files_size = export + upload + processed + iiif
     else:
         files_size = 40999999999  # pragma: no cover
     stats = shutil.disk_usage(app.config['UPLOAD_PATH'])
@@ -835,6 +856,10 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
     return {
         'total': convert_size(stats.total),
         'project': convert_size(files_size),
+        'export': convert_size(export),
+        'upload': convert_size(upload),
+        'processed': convert_size(processed),
+        'iiif': convert_size(iiif),
         'other_files': convert_size(other_files),
         'free': convert_size(stats.free),
         'percent_used': percent_free,

@@ -43,6 +43,22 @@
         <span class="bg-warning d-inline-block ml-2 disk-space-legend"></span>
       </p>
       <p class="mb-1">
+        {{ _('export')|uc_first }} <strong>{{ disk_space_info.export }}</strong>
+        <span class="bg-warning d-inline-block ml-2 disk-space-legend"></span>
+      </p>
+      <p class="mb-1">
+        {{ _('upload')|uc_first }} <strong>{{ disk_space_info.upload }}</strong>
+        <span class="bg-warning d-inline-block ml-2 disk-space-legend"></span>
+      </p>
+      <p class="mb-1">
+        {{ _('processed')|uc_first }} <strong>{{ disk_space_info.processed }}</strong>
+        <span class="bg-warning d-inline-block ml-2 disk-space-legend"></span>
+      </p>
+      <p class="mb-1">
+        {{ _('iiif')|uc_first }} <strong>{{ disk_space_info.iiif }}</strong>
+        <span class="bg-warning d-inline-block ml-2 disk-space-legend"></span>
+      </p>
+      <p class="mb-1">
         {{ _('free disk space')|uc_first }} <strong>{{ disk_space_info.free }}</strong>
         <span class="bg-gray d-inline-block ml-2 disk-space-legend"></span>
       </p>
