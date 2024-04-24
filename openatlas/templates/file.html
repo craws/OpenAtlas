@@ -2,7 +2,7 @@
   {{ info|display_info|safe }}
   {% if disk_space_info %}
     <h1>
-    {{ _('local disk usage') }}
+    {{ _('local disk usage') | uc_first }}
     </h1>
     <div class="progress">
       <div
@@ -56,7 +56,7 @@
     </div>
     <div class="ms-2">
     <h1>
-    {{ _('distribution of project files') }}
+    {{ _('distribution of project files') | uc_first }}
     </h1>
     <div class="progress">
       <div
@@ -100,22 +100,22 @@
         <p class="mb-1">
           <span class="bg-danger d-inline-block ml-2 disk-space-legend"></span>
           {{ _('upload folder')|uc_first }}
-          <strong>{{ disk_space_info.upload }}</strong>
+          <strong>{{ disk_space_info.upload }}</strong> {% if 'upload' in disk_space_info.mounted %}(mounted){% endif %}
         </p>
         <p class="mb-1">
           <span class="bg-success d-inline-block ml-2 disk-space-legend"></span>
           {{ _('export folder')|uc_first }}
-          <strong>{{ disk_space_info.export }}</strong>
+          <strong>{{ disk_space_info.export }}</strong> {% if 'export' in disk_space_info.mounted %}(mounted){% endif %}
         </p>
         <p class="mb-1">
           <span class="bg-info d-inline-block ml-2 disk-space-legend"></span>
           {{ _('processed images folder')|uc_first }}
-          <strong>{{ disk_space_info.processed }}</strong>
+          <strong>{{ disk_space_info.processed }}</strong> {% if 'processed' in disk_space_info.mounted %}(mounted){% endif %}
         </p>
         <p class="mb-1">
           <span class="bg-dark d-inline-block ml-2 disk-space-legend"></span>
           {{ _('iiif folder')|uc_first }}
-          <strong>{{ disk_space_info.iiif }}</strong>
+          <strong>{{ disk_space_info.iiif }}</strong> {% if 'iiif' in disk_space_info.mounted %}(mounted){% endif %}
         </p>
       </div>
     </div>

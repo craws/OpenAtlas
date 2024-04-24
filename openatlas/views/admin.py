@@ -824,29 +824,27 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
             'path': app.config['EXPORT_PATH'], 'size': 0, 'mounted': False},
         'upload': {
             'path': app.config['UPLOAD_PATH'], 'size': 0, 'mounted': False},
+        'iiif': {
+            'path': g.settings['iiif_path'], 'size': 0, 'mounted': False},
         'processed': {
             'path': app.config['PROCESSED_IMAGE_PATH'],
             'size': 0,
-            'mounted': False},
-        'iiif': {
-            'path': g.settings['iiif_path'], 'size': 0, 'mounted': False}}
+            'mounted': False}}
     if os.name == 'posix':
         for path in paths.values():
             process = run(
                 ['du', '-sb', path['path']],
                 capture_output=True,
                 text=True,
-                # check=True
-            )
+                check=True)
             path['size'] = int(process.stdout.split()[0])
             process = run(
                 ['df', path['path']],
                 capture_output=True,
                 text=True,
-                # check=True
-            )
+                check=True)
             tmp = process.stdout.split()
-            if '/mnt/' in tmp[-1]:
+            if '/mnt/' in tmp[-1]:  # pragma: no cover
                 path['mounted'] = True
         files_size = sum(
             paths[key]['size']
@@ -877,7 +875,8 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
         'percent_upload': percent_upload,
         'percent_processed': percent_processed,
         'percent_iiif': percent_iiif,
-        'percent_other': 100 - (percent_files + percent_free)}
+        'percent_other': 100 - (percent_files + percent_free),
+        'mounted': [k for k, v in paths.items() if v['mounted']]}
 
 
 def count_files_to_convert() -> int:
