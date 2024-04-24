@@ -99,6 +99,8 @@ class Api(ApiTestCase):
                             file_without_file = entity
                         case 'OpenAtlas logo':
                             file = entity
+                        case 'Open license':
+                            open_license = entity
 
             # Test Swagger UI
             if app.config['OPENAPI_INSTANCE_FILE'].exists():
@@ -145,7 +147,7 @@ class Api(ApiTestCase):
 
             with app.test_request_context():
                 app.preprocess_request()
-                file.link('P2', get_type_by_name('Open license'))
+                file.link('P2', open_license)
             rv = self.app.get(url_for(
                 'api.licensed_file_overview',
                 file_id=file.id))
