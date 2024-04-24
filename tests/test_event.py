@@ -56,23 +56,33 @@ class EventTest(TestBaseCase):
                 url_for('insert', class_='move', origin_id=residence.id))
             assert b'Location' not in rv.data
 
+            data = {
+                'name': 'Second event',
+                'given_place': [residence.id],
+                'given_artifact': '',
+                'location': residence.id,
+                'sub_event_of': activity_id,
+                'begin_year_from': '1949',
+                'begin_month_from': '10',
+                'begin_day_from': '8',
+                'end_year_from': '1951',
+                f'reference_system_id_{g.wikidata.id}':
+                    ['Q123', self.precision_type.subs[0]]}
+
             rv = self.app.post(
                 url_for('insert', class_='acquisition'),
-                data={
-                    'name': 'Second event',
-                    'given_place': [residence.id],
-                    'location': residence.id,
-                    'sub_event_of': activity_id,
-                    'begin_year_from': '1949',
-                    'begin_month_from': '10',
-                    'begin_day_from': '8',
-                    'end_year_from': '1951',
-                    f'reference_system_id_{g.wikidata.id}':
-                        ['Q123', self.precision_type.subs[0]]})
+                data=data)
             event_id = rv.location.split('/')[-1]
 
             rv = self.app.get(url_for('view', id_=event_id))
             assert b'Event Horizon' in rv.data
+
+            data['end_year_from'] = '7'
+            data['event_preceding'] = ''
+            rv = self.app.post(
+                url_for('insert', class_='acquisition'),
+                data=data)
+            assert b'Begin dates cannot start after end dates' in rv.data
 
             rv = self.app.post(
                 url_for('insert', class_='move'),

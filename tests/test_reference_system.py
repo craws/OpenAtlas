@@ -108,6 +108,9 @@ class ReferenceSystemTest(TestBaseCase):
                 url_for('insert', class_='person'),
                 data={
                     'name': 'Test',
+                    'residence': '',
+                    'begins_in': '',
+                    'ends_in': '',
                     f'reference_system_id_{g.wikidata.id}':
                         ['invalid id', '']})
             assert b'Wrong id format' in rv.data

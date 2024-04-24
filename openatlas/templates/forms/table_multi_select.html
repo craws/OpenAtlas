@@ -4,7 +4,7 @@
       id="{{ field.id }}-selection"
       class="g-1 row {{ config.CSS.string_field }}"
       onclick="$('#{{ field.id }}-modal').modal('show')">
-      {% for s in field.selection.values() %}
+      {% for s in field.selection %}
         <div onclick="event.stopPropagation()" class="badge col-auto bg-gray">
           <div class="d-flex align-items-center">
             <span class="text-black">{{ s.name }}</span>
