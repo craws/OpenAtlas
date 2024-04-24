@@ -18,8 +18,11 @@ versions = {
     '8.4.0': ['TBA', {
         'feature': {
             '2158': 'Georeferencing files for multiple places (overlay)',
+            '2157': 'Dates: improved autocomplete',
             '2244': 'Import of place hierarchy',
             '2223': 'Improved forms',
+            '2246': 'Sorting of related entities in views and forms',
+            '2152': 'Annotations: check orphan function',
             '2251':
                 'Presentation sites: change entity/id endpoint to entities/id',
             '2248': 'Refactor and minor improvements'}}],

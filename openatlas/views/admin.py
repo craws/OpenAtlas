@@ -26,7 +26,8 @@ from openatlas.display.image_processing import (
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, check_iiif_file_exist, display_info, get_file_path, link,
+    button, check_iiif_activation, check_iiif_file_exist, display_info,
+    get_file_path, link,
     required_group, send_mail)
 from openatlas.display.util2 import (
     convert_size, format_date, is_authorized, manual, sanitize, uc_first)
@@ -36,6 +37,7 @@ from openatlas.forms.setting import (
     ApiForm, ContentForm, FrontendForm, GeneralForm, LogForm, MailForm,
     MapForm, ModulesForm, SimilarForm, TestMailForm)
 from openatlas.forms.util import get_form_settings, set_form_settings
+from openatlas.models.annotation import Annotation
 from openatlas.models.content import get_content, update_content
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Import
@@ -133,7 +135,7 @@ def get_test_mail_form() -> str:
         body = (_(
             'This test mail was sent by %(username)s',
             username=current_user.username) +
-            ' ' + _('at') + ' ' + request.headers['Host'])
+                ' ' + _('at') + ' ' + request.headers['Host'])
         if send_mail(subject, body, form.receiver.data):
             flash(_(
                 'A test mail was sent to %(email)s.',
@@ -169,7 +171,7 @@ def get_user_table(users: list[User]) -> Table:
             user.real_name,
             user.group,
             user.email if is_authorized('manager')
-            or user.settings['show_email'] else '',
+                          or user.settings['show_email'] else '',
             _('yes') if user.settings['newsletter'] else '',
             format_date(user.created),
             format_date(user.login_last_success),
@@ -469,7 +471,7 @@ def orphans() -> str:
             table=Table(
                 ['name', 'root'],
                 [[link(type_), link(g.types[type_.root[0]])]
-                    for type_ in Type.get_type_orphans()])),
+                 for type_ in Type.get_type_orphans()])),
         'missing_files': Tab(
             'missing_files',
             buttons=[manual_link],
@@ -482,6 +484,10 @@ def orphans() -> str:
             'orphaned_iiif_files',
             buttons=[manual_link],
             table=Table(['name', 'size', 'date', 'ext'])),
+        'orphaned_annotations': Tab(
+            'orphaned_annotations',
+            buttons=[manual_link],
+            table=Table(['image', 'entity', 'annotation', 'creation'])),
         'orphaned_subunits': Tab(
             'orphaned_subunits',
             buttons=[manual_link],
@@ -498,13 +504,13 @@ def orphans() -> str:
         tabs[
             'unlinked'
             if entity.class_.view else 'orphans'].table.rows.append([
-                link(entity),
-                link(entity.class_),
-                link(entity.standard_type),
-                entity.class_.label,
-                format_date(entity.created),
-                format_date(entity.modified),
-                entity.description])
+            link(entity),
+            link(entity.class_),
+            link(entity.standard_type),
+            entity.class_.label,
+            format_date(entity.created),
+            format_date(entity.modified),
+            entity.description])
 
     # Orphaned file entities with no corresponding file
     entity_file_ids = []
@@ -541,7 +547,7 @@ def orphans() -> str:
                 if is_authorized('editor') else ''])
 
     # Orphaned IIIF files with no corresponding entity
-    if g.settings['iiif'] and g.settings['iiif_path']:
+    if check_iiif_activation():
         for file in Path(g.settings['iiif_path']).iterdir():
             confirm = _('Delete %(name)s?', name=file.name.replace("'", ''))
             if file.name != '.gitignore' \
@@ -560,6 +566,34 @@ def orphans() -> str:
                         url_for('admin_file_iiif_delete', filename=file.name),
                         js=f"return confirm('{confirm}')")
                     if is_authorized('editor') else ''])
+
+    # Orphaned annotations
+    for annotation in Annotation.get_orphaned_annotations():
+        file = Entity.get_by_id(annotation.image_id)
+        entity = Entity.get_by_id(annotation.entity_id)
+        tabs['orphaned_annotations'].table.rows.append([
+            link(file),
+            link(entity),
+            annotation.text,
+            annotation.created,
+            link(
+                _('relink entity'),
+                url_for(
+                    'admin_annotation_relink',
+                    image_id=file.id,
+                    entity_id=entity.id),
+                js=f"return confirm('{_('relink entity')}?')"),
+            link(
+                _('remove entity'),
+                url_for(
+                    'admin_annotation_remove_entity',
+                    annotation_id=annotation.id,
+                    entity_id=entity.id),
+                js=f"return confirm('{_('remove entity')}?')"),
+            link(
+                _('delete annotation'),
+                url_for('admin_annotation_delete', id_=annotation.id),
+                js=f"return confirm('{_('delete annotation')}?')")])
 
     # Orphaned subunits (without connection to a P46 super)
     for entity in Entity.get_orphaned_subunits():
@@ -616,6 +650,35 @@ def admin_file_delete(filename: str) -> Response:
                     flash(_('error file delete'), 'error')
     return redirect(
         f"{url_for('orphans')}#tab-orphaned-files")  # pragma: no cover
+
+
+@app.route('/admin/annotation/delete/<int:id_>')
+@required_group('editor')
+def admin_annotation_delete(id_: int) -> Response:
+    annotation = Annotation.get_by_id(id_)
+    annotation.delete()
+    flash(_('annotation deleted'), 'info')
+    return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
+
+
+@app.route('/admin/annotation/relink/<int:image_id>/<int:entity_id>')
+@required_group('editor')
+def admin_annotation_relink(image_id: int, entity_id: int) -> Response:
+    image = Entity.get_by_id(image_id)
+    image.link('P67', Entity.get_by_id(entity_id))
+    flash(_('entities relinked'), 'info')
+    return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
+
+
+@app.route(
+    '/admin/annotation/remove/entity/<int:annotation_id>/<int:entity_id>')
+@required_group('editor')
+def admin_annotation_remove_entity(
+        annotation_id: int,
+        entity_id: int) -> Response:
+    Annotation.remove_entity_from_annotation(annotation_id, entity_id)
+    flash(_('entity removed from annotation'), 'info')
+    return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
 
 
 @app.route('/admin/file/iiif/delete/<filename>')
@@ -756,27 +819,64 @@ def admin_delete_orphaned_resized_images() -> Response:
 
 
 def get_disk_space_info() -> Optional[dict[str, Any]]:
+    paths = {
+        'export': {
+            'path': app.config['EXPORT_PATH'], 'size': 0, 'mounted': False},
+        'upload': {
+            'path': app.config['UPLOAD_PATH'], 'size': 0, 'mounted': False},
+        'iiif': {
+            'path': g.settings['iiif_path'], 'size': 0, 'mounted': False},
+        'processed': {
+            'path': app.config['PROCESSED_IMAGE_PATH'],
+            'size': 0,
+            'mounted': False}}
     if os.name == 'posix':
-        process = run(
-            ['du', '-sb', app.config['FILES_PATH']],
-            capture_output=True,
-            text=True,
-            check=True)
-        files_size = int(process.stdout.split()[0])
+        for path in paths.values():
+            process = run(
+                ['du', '-sb', path['path']],
+                capture_output=True,
+                text=True,
+                check=True)
+            path['size'] = int(process.stdout.split()[0])
+            process = run(
+                ['df', path['path']],
+                capture_output=True,
+                text=True,
+                check=True)
+            tmp = process.stdout.split()
+            if '/mnt/' in tmp[-1]:  # pragma: no cover
+                path['mounted'] = True
+        files_size = sum(
+            paths[key]['size']
+            for key in ['export', 'upload', 'processed', 'iiif'])
     else:
         files_size = 40999999999  # pragma: no cover
     stats = shutil.disk_usage(app.config['UPLOAD_PATH'])
     percent_free = 100 - math.ceil(stats.free / (stats.total / 100))
     percent_files = math.ceil(files_size / (stats.total / 100))
+    percent_export = math.ceil(paths['export']['size'] / (files_size / 100))
+    percent_upload = math.ceil(paths['upload']['size'] / (files_size / 100))
+    percent_iiif = math.ceil(paths['iiif']['size'] / (files_size / 100))
+    percent_processed = math.ceil(
+        paths['processed']['size'] / (files_size / 100))
     other_files = stats.total - stats.free - files_size
     return {
         'total': convert_size(stats.total),
         'project': convert_size(files_size),
+        'export': convert_size(paths['export']['size']),
+        'upload': convert_size(paths['upload']['size']),
+        'processed': convert_size(paths['processed']['size']),
+        'iiif': convert_size(paths['iiif']['size']),
         'other_files': convert_size(other_files),
         'free': convert_size(stats.free),
         'percent_used': percent_free,
         'percent_project': percent_files,
-        'percent_other': 100 - (percent_files + percent_free)}
+        'percent_export': percent_export,
+        'percent_upload': percent_upload,
+        'percent_processed': percent_processed,
+        'percent_iiif': percent_iiif,
+        'percent_other': 100 - (percent_files + percent_free),
+        'mounted': [k for k, v in paths.items() if v['mounted']]}
 
 
 def count_files_to_convert() -> int:

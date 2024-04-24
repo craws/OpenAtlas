@@ -1,3 +1,4 @@
+from collections import defaultdict
 from operator import attrgetter
 from typing import Any, Optional
 
@@ -220,7 +221,7 @@ def get_subunits_from_id(
     location_ids = [l_.range.id for l_ in location_links]
     location_geoms = Gis.get_by_ids(location_ids)
 
-    location_centroids = None
+    location_centroids = defaultdict(list)
     if parser['centroid']:
         location_centroids = Gis.get_centroids_by_ids(location_ids)
 

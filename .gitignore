@@ -28,7 +28,6 @@ venv
 openatlas/static/.eggs/
 openatlas/static/node_modules
 openatlas/static/openatlas.egg-info/
-openatlas/static/package.json
 openatlas/static/package-lock.json
 
 # Docker files

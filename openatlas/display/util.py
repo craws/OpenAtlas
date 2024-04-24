@@ -578,7 +578,11 @@ def display_content_translation(_context: str, text: str) -> str:
 def get_entities_linked_to_type_recursive(
         id_: int,
         data: list[Entity]) -> list[Entity]:
-    for entity in g.types[id_].get_linked_entities(['P2', 'P89'], True, True):
+    for entity in g.types[id_].get_linked_entities(
+            ['P2', 'P89'],
+            inverse=True,
+            types=True,
+            sort=True):
         data.append(entity)
     for sub_id in g.types[id_].subs:
         get_entities_linked_to_type_recursive(sub_id, data)

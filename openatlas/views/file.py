@@ -24,6 +24,7 @@ from openatlas.views.admin import (
     count_files_to_convert, count_files_to_delete, get_disk_space_info)
 
 
+@required_group('readonly')
 @app.route('/file')
 def file_index() -> str:
     tabs = {
