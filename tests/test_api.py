@@ -5,7 +5,6 @@ from typing import Any, Optional
 from flask import url_for
 
 from openatlas import app
-from openatlas.api.import_scripts.util import get_type_by_name
 from openatlas.api.resources.api_entity import ApiEntity
 from tests.base import ApiTestCase
 
