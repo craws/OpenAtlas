@@ -22,6 +22,7 @@ versions = {
             '2244': 'Import of place hierarchy',
             '2223': 'Improved forms',
             '2246': 'Sorting of related entities in views and forms',
+            '2133': 'Better file stats',
             '2152': 'Annotations: check orphan function',
             '2251':
                 'Presentation sites: change entity/id endpoint to entities/id',

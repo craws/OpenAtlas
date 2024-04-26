@@ -21,7 +21,7 @@ from openatlas.forms.populate import (
 from openatlas.forms.process import (
     process_dates, process_origin, process_standard_fields)
 from openatlas.forms.util import (
-    check_if_entity_has_time, string_to_entity_list, table)
+    check_if_entity_has_time, string_to_entity_list)
 from openatlas.forms.validation import hierarchy_name_exists, validate
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
@@ -262,15 +262,15 @@ class ActorBaseManager(BaseManager):
                 ends_in = last.get_linked_entity_safe('P53', True)
         return {
             'residence': TableField(
-                table('residence', self.table_items['place']),
+                self.table_items['place'],
                 residence,
                 add_dynamic=['place']),
             'begins_in': TableField(
-                table('begins_in', self.table_items['place']),
+                self.table_items['place'],
                 begins_in,
                 add_dynamic=['place']),
             'ends_in': TableField(
-                table('ends_in', self.table_items['place']),
+                self.table_items['place'],
                 ends_in,
                 add_dynamic=['place'])}
 
@@ -353,7 +353,7 @@ class ArtifactBaseManager(PlaceBaseManager):
         return {
             'owned_by':
                 TableField(
-                    table('owned_by', self.table_items['actor']),
+                    self.table_items['actor'],
                     owner,
                     add_dynamic=['person', 'group'])}
 
@@ -404,21 +404,17 @@ class EventBaseManager(BaseManager):
         fields = {
             'sub_event_of':
                 TableField(
-                    table(
-                        'sub_event_of',
-                        self.table_items['event_view'],
-                        sub_filter_ids),
-                    super_event)}
+                    self.table_items['event_view'],
+                    super_event,
+                    sub_filter_ids)}
         if self.class_.name != 'event':
             fields['event_preceding'] = TableField(
-                table(
-                    'event_preceding',
-                    self.table_items['event_preceding'],
-                    sub_filter_ids),
-                event_preceding)
+                self.table_items['event_preceding'],
+                event_preceding,
+                sub_filter_ids)
         if self.class_.name != 'move':
             fields['location'] = TableField(
-                table('location', self.table_items['place']),
+                self.table_items['place'],
                 place,
                 add_dynamic=['place'])
         return fields

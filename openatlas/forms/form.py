@@ -16,9 +16,7 @@ from openatlas.display.util import get_base_table_data
 from openatlas.display.util2 import show_table_icons
 from openatlas.forms import base_manager, manager
 from openatlas.forms.field import (
-    SubmitField, TableField, TableMultiField, TreeField,
-    format_name_and_aliases)
-from openatlas.forms.util import table_multi
+    SubmitField, TableField, TableMultiField, TreeField, TableCidocField)
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.views.entity_index import file_preview
@@ -54,11 +52,10 @@ def get_add_reference_form(class_: str) -> Any:
         Form,
         class_,
         TableMultiField(
-            table_multi(
-                Entity.get_by_view(
-                    class_,
-                    types=True,
-                    aliases=current_user.settings['table_show_aliases'])),
+            Entity.get_by_view(
+                class_,
+                types=True,
+                aliases=current_user.settings['table_show_aliases']),
             validators=[InputRequired()]))
     setattr(Form, 'page', StringField(_('page')))
     setattr(Form, 'save', SubmitField(_('insert')))
@@ -76,15 +73,12 @@ def get_annotation_form(
             Form,
             'coordinate',
             HiddenField(_('coordinates'), validators=[InputRequired()]))
-    table = Table(['name', 'class', 'description'])
-    for item in Entity.get_by_id(image_id).get_linked_entities(
-            'P67',
-            sort=True):
-        table.rows.append([
-            format_name_and_aliases(item, 'entity'),
-            item.class_.name,
-            item.description])
-    setattr(Form, 'entity', TableField(table, entity))
+    setattr(
+        Form,
+        'entity',
+        TableField(
+            Entity.get_by_id(image_id).get_linked_entities('P67', sort=True),
+            entity))
     setattr(Form, 'save', SubmitField(_('save')))
     return Form()
 
@@ -119,30 +113,12 @@ def get_cidoc_form() -> Any:
         pass
 
     for name in ('domain', 'property', 'range'):
-        selection = None
-        cidoc_table = Table(
-            ['code', 'name'],
-            defs=[
-                {'orderDataType': 'cidoc-model', 'targets': [0]},
-                {'sType': 'numeric', 'targets': [0]}])
-        for item in (
-                g.properties if name == 'property'
-                else g.cidoc_classes).values():
-            onclick = f'''
-                onclick="selectFromTable(
-                    this,
-                    '{name}',
-                    '{item.code}',
-                    '{item.code} {item.name}');"'''
-            cidoc_table.rows.append([
-                f'<a href="#" {onclick}>{item.code}</a>',
-                item.name])
-            if request.method == 'POST' and item.code == request.form[name]:
-                selection = item
         setattr(
             Form,
             name,
-            TableField(cidoc_table, selection, validators=[InputRequired()]))
+            TableCidocField(
+                g.properties.values() if name == 'property'
+                else g.cidoc_classes.values()))
     setattr(Form, 'save', SubmitField(_('test')))
     return Form()
 
