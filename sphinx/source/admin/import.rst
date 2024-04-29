@@ -129,7 +129,8 @@ It is possible to link existing :doc:`/entity/reference` to imported entities.
 
 WKT coordinates
 +++++++++++++++
-For places and artifact point, polygon or linestring coordinates can be imported. Keep in mind to use
+For places and artifact (multi)point, (multi)polygon, (multi)linestring coordinates or
+GeometricCollection can be imported. Keep in mind to use
 the `WGS84 <https://gisgeography.com/wgs84-world-geodetic-system/>`_ geodetic system.
 Coordinates will be imported as `WKT <https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry>`_.
 It is only possible to import one geometry for each entry. Since the WKT format uses commas (**,**),
