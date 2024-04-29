@@ -190,6 +190,20 @@ def show_untyped_entities(id_: int) -> str:
             _('untyped entities')])
 
 
+@app.route('/type/set-selectable/<int:id_>')
+@required_group('editor')
+def type_set_selectable(id_: int) -> Response:
+    g.types[id_].set_selectable()
+    return redirect(url_for('view', id_=id_))
+
+
+@app.route('/type/unset-selectable/<int:id_>')
+@required_group('editor')
+def type_unset_selectable(id_: int) -> Response:
+    g.types[id_].unset_selectable()
+    return redirect(url_for('view', id_=id_))
+
+
 @app.route('/type/multiple_linked/<int:id_>')
 @required_group('editor')
 def show_multiple_linked_entities(id_: int) -> str:

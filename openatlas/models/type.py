@@ -25,6 +25,7 @@ class Type(Entity):
     multiple = False
     required = False
     directional = False
+    selectable = True
 
     def __init__(self, row: dict[str, Any]) -> None:
         super().__init__(row)
@@ -51,6 +52,13 @@ class Type(Entity):
 
     def unset_required(self) -> None:
         db.unset_required(self.id)
+
+    def set_selectable(self) -> None:
+        db.set_selectable(self.id)
+
+    def unset_selectable(self) -> None:
+        if not self.count:
+            db.unset_selectable(self.id)
 
     def remove_class(self, name: str) -> None:
         db.remove_class(self.id, name)
@@ -126,6 +134,7 @@ class Type(Entity):
             type_.count_subs = 0
             type_.subs = []
             type_.root = [row['super_id']] if row['super_id'] else []
+            type_.selectable = not bool(row['non_selectable'])
         Type.populate_subs(types)
         return types
 

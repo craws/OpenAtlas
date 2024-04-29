@@ -25,8 +25,13 @@ def get_types(with_count: bool) -> list[dict[str, Any]]:
             COALESCE(to_char(e.end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
                 AS end_to,
             e.begin_comment,
-            e.end_comment
+            e.end_comment,
+            tns.entity_id AS non_selectable
+
         FROM model.entity e
+
+        -- Selectable or not
+        LEFT OUTER JOIN web.type_none_selectable tns ON e.id = tns.entity_id
 
         -- Get super
         LEFT JOIN model.link l ON e.id = l.domain_id
@@ -43,7 +48,7 @@ def get_types(with_count: bool) -> list[dict[str, Any]]:
     sql += """
         WHERE e.openatlas_class_name
             IN ('administrative_unit', 'type', 'type_tools')
-        GROUP BY e.id, es.id
+        GROUP BY e.id, es.id, tns.entity_id
         ORDER BY e.name;
         """
     g.cursor.execute(sql)
@@ -68,6 +73,18 @@ def set_required(id_: int) -> None:
 def unset_required(id_: int) -> None:
     g.cursor.execute(
         "UPDATE web.hierarchy SET required = false WHERE id = %(id)s;",
+        {'id': id_})
+
+
+def set_selectable(id_: int) -> None:
+    g.cursor.execute(
+        "DELETE FROM web.type_none_selectable WHERE entity_id = %(id)s;",
+        {'id': id_})
+
+
+def unset_selectable(id_: int) -> None:
+    g.cursor.execute(
+        "INSERT INTO web.type_none_selectable (entity_id) VALUES (%(id)s)",
         {'id': id_})
 
 

@@ -1,6 +1,4 @@
-
 BEGIN;
-
 
 -- #2261 Option to prevent selection of a type
 DROP TABLE IF EXISTS "type_none_selectable";
@@ -12,12 +10,12 @@ CREATE TABLE "web"."type_none_selectable" (
     "entity_id" integer NOT NULL,
     "created" timestamp DEFAULT now() NOT NULL,
     CONSTRAINT "type_none_selectable_pkey" PRIMARY KEY ("id")
-) WITH (oids = false);
+);
 
 COMMENT ON TABLE "web"."type_none_selectable" IS 'IDs of types that are not meant to be selected, e.g. a category';
 
-
+ALTER TABLE ONLY "web"."type_none_selectable" ADD CONSTRAINT entity_id_key UNIQUE (entity_id);
 ALTER TABLE ONLY "web"."type_none_selectable" ADD CONSTRAINT "type_none_selectable_entity_id_fkey"
-FOREIGN KEY (entity_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;
+    FOREIGN KEY (entity_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;
 
 END;
