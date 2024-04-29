@@ -204,11 +204,15 @@ class Type(Entity):
         items = []
         for id_ in [id_ for id_ in types if id_ not in filtered_ids]:
             item = g.types[id_]
+            state = {}
+            if item.id in selected_ids:
+                state['selected'] = 'true'
+            if not item.selectable:
+                state['disabled'] = 'true'
             items.append({
                 'id': item.id,
                 'text': item.name.replace("'", "&apos;"),
-                'state':
-                    {'selected': 'true'} if item.id in selected_ids else '',
+                'state': state or '',
                 'children':
                     Type.walk_tree(item.subs, selected_ids, filtered_ids)})
         return items
