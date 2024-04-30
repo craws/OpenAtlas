@@ -74,7 +74,7 @@ class BaseDisplay:
             title = " > ".join([g.types[i].name for i in type_.root])
             html = f'<span title="{title}">{link(type_)}</span>'
             if type_.category == 'value':
-                html += f' {float(value):g} {type_.description}'
+                html += f" {float(value):g} {type_.description or ''}"
             data[g.types[type_.root[0]].name].append(html)
         return {key: data[key] for key in sorted(data.keys())}
 
