@@ -197,16 +197,30 @@ class Import:
                             g.types[g.types[int(data)].root[-1]].name in [
                                 'Historical place']):
                         location.link('P89', g.types[int(data)])
-                try:
-                    wkt_ = wkt.loads(row['wkt']) if row.get('wkt') else None
-                except WKTReadingError:
-                    wkt_ = None
-                if wkt_:
-                    Gis.insert_wkt(
-                        entity=entity,
-                        location=location,
-                        project=project,
-                        wkt_=wkt_)
+
+                if coordinates := row.get('wkt'):
+                    try:
+                        wkt_ = wkt.loads(coordinates)
+                    except WKTReadingError:
+                        wkt_ = None
+                    if wkt_:
+                        if (wkt_.geom_type in
+                                ['MultiPoint',
+                                 'MultiLineString',
+                                 'MultiPolygon',
+                                 'GeometryCollection']):
+                            for poly in wkt_:
+                                Gis.insert_wkt(
+                                    entity=entity,
+                                    location=location,
+                                    project=project,
+                                    wkt_=poly)
+                        else:
+                            Gis.insert_wkt(
+                                entity=entity,
+                                location=location,
+                                project=project,
+                                wkt_=wkt_)
 
         for entry in entities.values():
             if entry['parent_id']:
