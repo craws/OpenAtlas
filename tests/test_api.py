@@ -54,7 +54,7 @@ class Api(ApiTestCase):
         with app.app_context():
 
             logo = Path(app.root_path) \
-                / 'static' / 'images' / 'layout' / 'logo.png'
+                   / 'static' / 'images' / 'layout' / 'logo.png'
 
             with open(logo, 'rb') as img:
                 self.app.post(
@@ -137,7 +137,7 @@ class Api(ApiTestCase):
 
             rv = self.app.get(
                 url_for('api_04.properties', locale='de')).get_json()
-            assert rv['P2']['nameInverse'] =='ist Typus von'
+            assert rv['P2']['nameInverse'] == 'ist Typus von'
             assert bool(rv['P2']['id'])
             assert bool(rv['P2']['name'])
             assert bool(rv['P2']['nameInverse'])
@@ -148,7 +148,7 @@ class Api(ApiTestCase):
             rv = self.app.get(url_for(
                 'api_04.properties', locale='fr', download=True)).get_json()
             assert bool(rv['P2']['id'])
-            assert rv['P2']['name'] =='est de type'
+            assert rv['P2']['name'] == 'est de type'
 
             rv = self.app.get(url_for('api_04.backend_details')).get_json()
             assert bool(rv['version'] == app.config['VERSION'])
@@ -172,6 +172,16 @@ class Api(ApiTestCase):
 
             rv = self.app.get(url_for('api.licensed_file_overview'))
             assert bool(len(rv.get_json().keys()) == 4)
+
+            rv = self.app.get(url_for(
+                'api_04.network_visualisation',
+                exclude_system_classes='type'))
+            rv = rv.get_json()
+            assert bool(rv[str(place.id)])
+            rv = self.app.get(
+                url_for('api_04.network_visualisation', download=True))
+            rv = rv.get_json()
+            assert bool(rv[str(boundary_mark.id)])
 
             for rv in [
                 self.app.get(url_for('api_04.geometric_entities')),
@@ -520,13 +530,13 @@ class Api(ApiTestCase):
             assert rv.get_json() > 0
 
             rv = self.app.get(url_for(
-                    'api_04.query',
-                    entities=place.id,
-                    cidoc_classes='E18',
-                    view_classes='artifact',
-                    system_classes='person',
-                    format='lp',
-                    search="""{"entityAliases":[{"operator":"equal",
+                'api_04.query',
+                entities=place.id,
+                cidoc_classes='E18',
+                view_classes='artifact',
+                system_classes='person',
+                format='lp',
+                search="""{"entityAliases":[{"operator":"equal",
                     "values":["Sûza"],"logicalOperator":"and"}],
                     "typeID":[{"operator":"equal","values":[1121212],
                     "logicalOperator":"and"}]}"""))

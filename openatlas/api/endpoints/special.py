@@ -1,21 +1,25 @@
 import json
+from collections import defaultdict
 from typing import Any
 
-from flask import Response, jsonify
+from flask import Response, g, jsonify
 from flask_restful import Resource, marshal
 
+from openatlas.api.endpoints.parser import Parser
 from openatlas.api.formats.csv import export_database_csv
 from openatlas.api.formats.subunits import get_subunits_from_id
 from openatlas.api.formats.xml import export_database_xml
 from openatlas.api.resources.database_mapper import (
-    get_all_entities_as_dict, get_all_links_as_dict, get_cidoc_hierarchy,
+    get_all_entities_as_dict, get_all_links_as_dict, get_all_links_for_network,
+    get_cidoc_hierarchy,
     get_classes, get_properties, get_property_hierarchy)
 from openatlas.api.resources.error import NotAPlaceError
 from openatlas.api.resources.api_entity import ApiEntity
-from openatlas.api.resources.parser import entity_, gis
+from openatlas.api.resources.parser import entity_, gis, network
 from openatlas.api.resources.resolve_endpoints import (
     download, resolve_subunits)
-from openatlas.api.resources.templates import geometries_template
+from openatlas.api.resources.templates import geometries_template, \
+    network_visualisation_template
 from openatlas.api.resources.util import get_geometries
 from openatlas.models.export import current_date_for_filename
 
@@ -83,3 +87,32 @@ class GetSubunits(Resource):
             get_subunits_from_id(entity, parser),
             parser,
             str(id_))
+
+
+class GetNetworkVisualisation(Resource):
+    @staticmethod
+    def get() -> tuple[Resource, int] | Response | dict[str, Any]:
+        parser = Parser(network.parse_args())
+        system_classes = [class_ for class_ in g.classes]
+        if exclude := parser.exclude_system_classes:
+            system_classes = [s for s in system_classes if s not in exclude]
+        output: dict[str, Any] = defaultdict()
+        for item in get_all_links_for_network(system_classes):
+            if output.get(item['domain_id']):
+                output[item['domain_id']]['relations'].append(item['range_id'])
+                continue
+            if output.get(item['range_id']):
+                output[item['range_id']]['relations'].append(item['domain_id'])
+                continue
+            output[item['range_id']] = {
+                'label': item['range_name'],
+                'systemClass': item['range_system_class'],
+                'relations': [item['domain_id']]}
+            output[item['domain_id']] = {
+                'label': item['domain_name'],
+                'systemClass': item['domain_system_class'],
+                'relations': [item['range_id']]}
+        output = dict(output)
+        if parser.download:
+            return download(output, network_visualisation_template(output))
+        return marshal(output, network_visualisation_template(output)), 200

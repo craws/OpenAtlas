@@ -10,7 +10,7 @@ from openatlas.api.endpoints.iiif import (
     IIIFAnnotation, IIIFAnnotationList, IIIFCanvas, IIIFImage, IIIFManifest,
     IIIFSequence)
 from openatlas.api.endpoints.special import (
-    ExportDatabase, GetGeometricEntities, GetSubunits)
+    ExportDatabase, GetGeometricEntities, GetNetworkVisualisation, GetSubunits)
 from openatlas.api.endpoints.type import (
     GetTypeByViewClass, GetTypeOverview, GetTypeTree)
 
@@ -44,7 +44,10 @@ types = [
 special = [
     [ExportDatabase, '/export_database/<string:format_>', "export_database"],
     [GetGeometricEntities, '/geometric_entities/', "geometric_entities"],
-    [GetSubunits, '/subunits/<int:id_>', "subunits"]]
+    [GetSubunits, '/subunits/<int:id_>', "subunits"],
+    [GetNetworkVisualisation,
+     '/network_visualisation/',
+     'network_visualisation'],]
 
 display = [
     [DisplayImage, '/display/<path:filename>', 'display'],

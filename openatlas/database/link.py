@@ -154,3 +154,28 @@ def delete_link_duplicates() -> int:
                 FROM model.link) AS temp_table);
         """)
     return g.cursor.rowcount
+
+
+def get_all_links_for_network(
+        system_classes: list[str]) -> list[dict[str, Any]]:
+    g.cursor.execute(
+        """
+        SELECT
+            l.id,
+            l.property_code,
+            l.domain_id,
+            de.name AS domain_name,
+            de.openatlas_class_name AS domain_system_class,
+            l.range_id,
+            re.name AS range_name,
+            re.openatlas_class_name AS range_system_class,
+            l.description,
+            l.type_id
+        FROM model.link l
+        JOIN model.entity de ON l.domain_id = de.id
+        JOIN model.entity re ON l.range_id = re.id
+        WHERE de.openatlas_class_name IN  %(system_classes)s
+            AND re.openatlas_class_name IN  %(system_classes)s
+        """,
+        {'system_classes': tuple(system_classes)})
+    return [dict(row) for row in g.cursor.fetchall()]

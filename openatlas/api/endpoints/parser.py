@@ -58,10 +58,12 @@ class Parser:
     system_classes = None
     image_size = None
     file_id = None
+    exclude_system_classes: list[str]
 
     def __init__(self, parser: dict[str, Any]):
         self.show = []
         self.type_id = []
+        self.exclude_system_classes = []
         for item in parser:
             setattr(self, item, parser[item])
 

@@ -358,7 +358,7 @@ def backend_details_template() -> dict[str, Type[String]]:
 
 
 def licensed_file_template(entities: list[Entity]) -> dict[str, Any]:
-    dict_: dict[str, Any] = defaultdict()
+    template: dict[str, Any] = defaultdict()
     file = {
         'display': fields.String,
         'thumbnail': fields.String,
@@ -367,5 +367,15 @@ def licensed_file_template(entities: list[Entity]) -> dict[str, Any]:
         'license': fields.String,
         'IIIFManifest': fields.String}
     for entity in entities:
-        dict_[str(entity.id)] = fields.Nested(file)
-    return dict_
+        template[str(entity.id)] = fields.Nested(file)
+    return template
+
+
+def network_visualisation_template(entities: dict[str, Any]) -> dict[str, Any]:
+    template: dict[str, Any] = defaultdict()
+    for entity in entities:
+        template[entity] = fields.Nested({
+        'label': fields.String,
+        'systemClass': fields.String,
+        'relations': fields.List(fields.Integer)})
+    return template

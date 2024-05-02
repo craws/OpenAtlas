@@ -192,3 +192,11 @@ files.add_argument(
     help="{error_msg}",
     action='append',
     location='args')
+
+network = default.copy()
+network.add_argument(
+    'exclude_system_classes',
+    type=str,
+    help="{error_msg}",
+    action='append',
+    location='args')
