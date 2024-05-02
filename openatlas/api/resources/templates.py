@@ -310,7 +310,7 @@ def class_overview_template() -> dict[str, Type[String]]:
 
 def class_mapping_template() -> dict[str, Type[String]]:
     return {
-        "locale": fields.String,
+        'locale': fields.String,
         'results': fields.List(fields.Nested({
             'label': fields.String,
             'systemClass': fields.String,
@@ -318,6 +318,25 @@ def class_mapping_template() -> dict[str, Type[String]]:
             'view': fields.String,
             'standardTypeId': fields.String,
             'icon': fields.String}))}
+
+
+def properties_template(properties: dict[str, Any]) -> dict[str, Type[String]]:
+    properties_dict = {
+        'id': fields.String,
+        'name': fields.String,
+        'nameInverse': fields.String,
+        'code': fields.String,
+        'domainClassCode': fields.String,
+        'rangeClassCode': fields.String,
+        'count': fields.String,
+        'sub': fields.String,
+        'super': fields.String,
+        'i18n': fields.Raw,
+        'i18nInverse': fields.Raw}
+    dict_: dict[str, Any] = defaultdict()
+    for key in properties:
+        dict_[key] = fields.Nested(properties_dict)
+    return dict_
 
 
 def backend_details_template() -> dict[str, Type[String]]:

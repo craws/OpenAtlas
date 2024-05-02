@@ -7,7 +7,7 @@ from openatlas.api.resources.parser import default, locale
 from openatlas.api.resources.resolve_endpoints import download
 from openatlas.api.resources.templates import (
     backend_details_template, class_mapping_template, class_overview_template,
-    overview_template)
+    overview_template, properties_template)
 
 
 class GetBackendDetails(Resource):
@@ -61,6 +61,28 @@ class ClassMapping(Resource):
         if locale.parse_args()['download']:
             return download(results, class_mapping_template())
         return marshal(results, class_mapping_template()), 200
+
+
+class GetProperties(Resource):
+    @staticmethod
+    def get() -> tuple[Resource, int] | Response:
+        results = {}
+        for property_code, property_ in g.properties.items():
+            results[property_code] = {
+                "id": property_.id,
+                "name": property_.name,
+                "nameInverse": property_.name_inverse,
+                "code": property_.code,
+                "domainClassCode": property_.domain_class_code,
+                "rangeClassCode": property_.range_class_code,
+                "count": property_.count,
+                "sub": property_.sub,
+                "super": property_.super,
+                "i18n": property_.i18n,
+                "i18nInverse": property_.i18n_inverse}
+        if locale.parse_args()['download']:
+            return download(results, properties_template(g.properties))
+        return marshal(results, properties_template(g.properties)), 200
 
 
 class SystemClassCount(Resource):
