@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import ast
 import itertools
 import json
@@ -11,7 +13,7 @@ from rdflib import Graph
 
 from openatlas import app
 from openatlas.api.formats.linked_places import (
-    get_lp_file, get_lp_links, get_lp_time, get_lp_types)
+    get_lp_file, get_lp_links, get_lp_time)
 from openatlas.api.resources.error import (
     EntityDoesNotExistError, InvalidSearchSyntax, LastEntityError,
     LogicalOperatorError, NoSearchStringError, OperatorError, SearchValueError,
@@ -23,10 +25,11 @@ from openatlas.api.resources.templates import (
     geojson_pagination, linked_place_pagination, loud_pagination)
 from openatlas.api.resources.util import (
     flatten_list_and_remove_duplicates, get_geometric_collection,
-    get_geoms_dict, get_reference_systems,
+    get_geoms_dict, get_location_link, get_reference_systems,
     replace_empty_list_values_in_dict_with_none)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
+from openatlas.models.link import Link
 
 
 class Parser:
@@ -127,7 +130,7 @@ class Parser:
         if self.column == 'system_class':
             return entity.class_.name
         if self.column in [
-                'begin_from', 'begin_to', 'end_from', 'end_to']:
+            'begin_from', 'begin_to', 'end_from', 'end_to']:
             if not getattr(entity, self.column):
                 date = ("-" if self.sort == 'desc' else "") \
                        + '9999999-01-01T00:00:00'
@@ -186,7 +189,7 @@ class Parser:
                 'viewClass': entity.class_.view,
                 'systemClass': entity.class_.name,
                 'properties': {'title': entity.name},
-                'types': get_lp_types(entity, links)
+                'types': self.get_lp_types(entity, links)
                 if 'types' in self.show else None,
                 'depictions': get_lp_file(links_inverse)
                 if 'depictions' in self.show else None,
@@ -271,3 +274,33 @@ class Parser:
         if self.format == 'loud':
             return loud_pagination()
         return linked_place_pagination(self)
+
+    def get_lp_types(
+            self,
+            entity: Entity,
+            links: list[Link]) -> list[dict[str, Any]]:
+        types = []
+        if entity.class_.view == 'place':
+            entity.types.update(get_location_link(links).range.types)
+        for type_ in entity.types:
+            type_dict = {
+                'identifier': url_for(
+                    'api.entity', id_=type_.id, _external=True),
+                'descriptions': type_.description,
+                'label': type_.name,
+                'hierarchy': ' > '.join(map(
+                    str,
+                    [g.types[root].name for root in type_.root])),
+                'typeHierarchy': [{
+                    'label': g.types[root].name,
+                    'descriptions': g.types[root].description,
+                    'identifier': url_for(
+                        'api.entity', id_=g.types[root].id, _external=True)}
+                    for root in type_.root]}
+            for link in links:
+                if link.range.id == type_.id and link.description:
+                    type_dict['value'] = link.description
+                    if link.range.id == type_.id and type_.description:
+                        type_dict['unit'] = type_.description
+            types.append(type_dict)
+        return types

@@ -2021,6 +2021,23 @@
                       "hierarchy": {
                         "type": "string"
                       },
+                      "typeHierarchy": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "identifier": {
+                              "type": "string"
+                            },
+                            "label": {
+                              "type": "string"
+                            },
+                            "description": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
                       "value": {
                         "type": "number",
                         "format": "float"

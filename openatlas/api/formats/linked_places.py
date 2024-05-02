@@ -6,7 +6,7 @@ from flask import g, url_for
 
 from openatlas.api.resources.util import (
     date_to_str, get_crm_relation, get_crm_relation_label_x,
-    get_crm_relation_x, get_license_name, get_location_link, to_camel_case)
+    get_crm_relation_x, get_license_name, to_camel_case)
 from openatlas.display.util import get_file_path
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -28,8 +28,7 @@ def link_dict(link_: Link, inverse: bool = False) -> dict[str, Any]:
             link_.domain.class_.name if inverse else link_.range.class_.name,
         'type': to_camel_case(link_.type.name) if link_.type else None,
         'relationDescription': link_.description,
-        'when': {'timespans': [
-            get_lp_time(link_.domain if inverse else link_.range)]}}
+        'when': {'timespans': [get_lp_time(link_)]}}
 
 
 def link_dict_x(link_: Link, inverse: bool = False) -> dict[str, Any]:
@@ -46,8 +45,7 @@ def link_dict_x(link_: Link, inverse: bool = False) -> dict[str, Any]:
             link_.domain.class_.name if inverse else link_.range.class_.name,
         'type': to_camel_case(link_.type.name) if link_.type else None,
         'relationDescription': link_.description,
-        'when': {'timespans': [
-            get_lp_time(link_.domain if inverse else link_.range)]}}
+        'when': {'timespans': [get_lp_time(link_)]}}
 
 
 def get_lp_links(
@@ -87,27 +85,6 @@ def get_lp_file(links_inverse: list[Link]) -> list[dict[str, str]]:
                 filename=path.stem,
                 _external=True) if path else "N/A"})
     return files
-
-
-def get_lp_types(entity: Entity, links: list[Link]) -> list[dict[str, Any]]:
-    types = []
-    if entity.class_.view == 'place':
-        entity.types.update(get_location_link(links).range.types)
-    for type_ in entity.types:
-        type_dict = {
-            'identifier': url_for(
-                'api.entity', id_=type_.id, _external=True),
-            'descriptions': type_.description,
-            'label': type_.name,
-            'hierarchy': ' > '.join(map(
-                str, [g.types[root].name for root in type_.root]))}
-        for link in links:
-            if link.range.id == type_.id and link.description:
-                type_dict['value'] = link.description
-                if link.range.id == type_.id and type_.description:
-                    type_dict['unit'] = type_.description
-        types.append(type_dict)
-    return types
 
 
 def get_lp_time(entity: Entity | Link) -> Optional[dict[str, Any]]:

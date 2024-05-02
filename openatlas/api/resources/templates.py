@@ -81,6 +81,10 @@ def linked_places_template(parser: Parser) -> dict[str, Type[String]]:
         'label': fields.String,
         'descriptions': fields.String,
         'hierarchy': fields.String,
+        'typeHierarchy': fields.List(fields.Nested({
+            'identifier': fields.String,
+            'label': fields.String,
+            'description': fields.String})),
         'value': fields.Float,
         'unit': fields.String}
 
