@@ -70,7 +70,7 @@ at map layer button at the upper right corner.
 
 To insert new overlays (only available for editors and admins) go to the view
 of a specific place. After adding an image file in the file tab you can click
-**add** in the overlay column to enter coordinates (Easting and Northing) for:
+**link** in the overlay column to enter coordinates (Easting and Northing) for:
 
 * top left corner
 * top right corner
