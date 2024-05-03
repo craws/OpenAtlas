@@ -295,6 +295,7 @@ class TableCidocField(HiddenField):
     def __init__(self, items: list[Any], **kwargs: Any) -> None:
         super().__init__(validators=[InputRequired()], **kwargs)
         self.items = items
+        self.selection = None
 
 
 def table(

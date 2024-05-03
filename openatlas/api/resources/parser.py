@@ -152,6 +152,12 @@ query.add_argument(
     help="{error_msg}",
     location='args')
 query.add_argument(
+    'linked_entities',
+    type=int,
+    action='append',
+    help="{error_msg}",
+    location='args')
+query.add_argument(
     'cidoc_classes',
     type=str,
     action='append',
@@ -183,6 +189,14 @@ files = default.copy()
 files.add_argument(
     'file_id',
     type=int,
+    help="{error_msg}",
+    action='append',
+    location='args')
+
+network = default.copy()
+network.add_argument(
+    'exclude_system_classes',
+    type=str,
     help="{error_msg}",
     action='append',
     location='args')

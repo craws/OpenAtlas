@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2024-03-31 16:26+0200\n"
-"PO-Revision-Date: 2024-03-31 16:29+0200\n"
+"PO-Revision-Date: 2024-05-03 14:12+0200\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language-Team: de <LL@li.org>\n"
 "Language: de\n"
@@ -549,7 +549,7 @@ msgstr "Manual"
 #: openatlas/forms/add_fields.py:135 openatlas/forms/add_fields.py:172
 #: openatlas/views/search.py:41 openatlas/views/search.py:50
 msgid "YYYY"
-msgstr "YYYYY"
+msgstr "JJJJ"
 
 #: openatlas/forms/add_fields.py:63 openatlas/forms/add_fields.py:100
 #: openatlas/forms/add_fields.py:141 openatlas/forms/add_fields.py:178
@@ -559,7 +559,7 @@ msgstr "MM"
 #: openatlas/forms/add_fields.py:69 openatlas/forms/add_fields.py:106
 #: openatlas/forms/add_fields.py:147 openatlas/forms/add_fields.py:184
 msgid "DD"
-msgstr "DD"
+msgstr "TT"
 
 #: openatlas/forms/add_fields.py:76 openatlas/forms/add_fields.py:113
 #: openatlas/forms/add_fields.py:154 openatlas/forms/add_fields.py:191

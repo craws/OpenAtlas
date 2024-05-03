@@ -54,7 +54,7 @@ class Api(ApiTestCase):
         with app.app_context():
 
             logo = Path(app.root_path) \
-                / 'static' / 'images' / 'layout' / 'logo.png'
+                   / 'static' / 'images' / 'layout' / 'logo.png'
 
             with open(logo, 'rb') as img:
                 self.app.post(
@@ -135,6 +135,21 @@ class Api(ApiTestCase):
                 'api_04.class_mapping', locale='ca', download=True)).get_json()
             assert self.get_class_mapping(rv, 'ca')
 
+            rv = self.app.get(
+                url_for('api_04.properties', locale='de')).get_json()
+            assert rv['P2']['nameInverse'] == 'ist Typus von'
+            assert bool(rv['P2']['id'])
+            assert bool(rv['P2']['name'])
+            assert bool(rv['P2']['nameInverse'])
+            assert bool(rv['P2']['i18n'])
+            assert bool(rv['P2']['i18nInverse'])
+            assert bool(rv['P2']['code'])
+
+            rv = self.app.get(url_for(
+                'api_04.properties', locale='fr', download=True)).get_json()
+            assert bool(rv['P2']['id'])
+            assert rv['P2']['name'] == 'est de type'
+
             rv = self.app.get(url_for('api_04.backend_details')).get_json()
             assert bool(rv['version'] == app.config['VERSION'])
             rv = self.app.get(
@@ -157,6 +172,17 @@ class Api(ApiTestCase):
 
             rv = self.app.get(url_for('api.licensed_file_overview'))
             assert bool(len(rv.get_json().keys()) == 4)
+
+            rv = self.app.get(url_for(
+                'api_04.network_visualisation',
+                exclude_system_classes='type'))
+            rv = rv.get_json()
+            assert bool(len(rv['results']) == 70)
+            rv = self.app.get(
+                url_for('api_04.network_visualisation', download=True))
+            rv = rv.get_json()
+            assert bool(len(rv['results']) == 160)
+
 
             for rv in [
                 self.app.get(url_for('api_04.geometric_entities')),
@@ -374,6 +400,7 @@ class Api(ApiTestCase):
                     classes='E18',
                     codes='artifact',
                     system_classes='person',
+                    linked_entities=place.id,
                     sort='desc',
                     column='system_class',
                     download=True,
@@ -502,6 +529,19 @@ class Api(ApiTestCase):
             assert bool(rv.get_json()['typeTree'])
             rv = self.app.get(url_for('api_04.type_tree', count=True))
             assert rv.get_json() > 0
+
+            rv = self.app.get(url_for(
+                'api_04.query',
+                entities=place.id,
+                cidoc_classes='E18',
+                view_classes='artifact',
+                system_classes='person',
+                format='lp',
+                search="""{"entityAliases":[{"operator":"equal",
+                    "values":["Sûza"],"logicalOperator":"and"}],
+                    "typeID":[{"operator":"equal","values":[1121212],
+                    "logicalOperator":"and"}]}"""))
+            assert bool(rv.get_json()['pagination']['entities'] == 0)
 
             for rv in [
                 self.app.get(url_for(
@@ -871,13 +911,6 @@ class Api(ApiTestCase):
                     download=True,
                     last=place.id))
             assert 'ID is last entity' in rv.get_json()['title']
-
-            rv = self.app.get(
-                url_for(
-                    'api_04.query',
-                    system_classes='person',
-                    type_id=boundary_mark.id))
-            assert 'One entity ID is not a type' in rv.get_json()['title']
 
             rv = self.app.get(
                 url_for('api_04.system_class', system_class='Wrong'))
