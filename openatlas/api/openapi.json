@@ -898,6 +898,38 @@
         }
       }
     },
+    "/network_visualisation/": {
+      "get": {
+        "tags": [
+          "Proposal"
+        ],
+        "description": "Retrieves a list of object with id, system_class, label and related ids",
+        "operationId": "GetNetworkVisualisation",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/exclude_system_classes"
+          },
+          {
+            "$ref": "#/components/parameters/download"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NetworkVisualisationModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
     "/backend_details/": {
       "get": {
         "tags": [
@@ -1785,6 +1817,43 @@
           "items": {
             "enum": [
               "all",
+              "acquisition",
+              "activity",
+              "administrative_unit",
+              "appellation",
+              "artifact",
+              "bibliography",
+              "creation",
+              "edition",
+              "event",
+              "external_reference",
+              "feature",
+              "file",
+              "group",
+              "human_remains",
+              "move",
+              "object_location",
+              "person",
+              "place",
+              "production",
+              "reference_system",
+              "source",
+              "source_translation",
+              "stratigraphic_unit",
+              "type",
+              "tools"
+            ]
+          }
+        }
+      },
+      "exclude_system_classes": {
+        "name": "exclude_system_classes",
+        "description": "System classes to be excluded from network",
+        "in": "query",
+        "schema": {
+          "type": "array",
+          "items": {
+            "enum": [
               "acquisition",
               "activity",
               "administrative_unit",
@@ -2848,6 +2917,29 @@
                 "icon": {
                   "type": "string"
                 }
+              }
+            }
+          }
+        }
+      },
+      "NetworkVisualisationModel": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "systemClass": {
+              "type": "string"
+            },
+            "relations": {
+              "type": "array",
+              "items": {
+                "type": "number"
               }
             }
           }
