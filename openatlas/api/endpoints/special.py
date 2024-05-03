@@ -112,7 +112,7 @@ class GetNetworkVisualisation(Resource):
                     'label': item['range_name'],
                     'systemClass': item['range_system_class'],
                     'relations': [item['domain_id']]}
-        results = {'results': []}
+        results: dict[str, Any] = {'results': []}
         for id_, dict_ in output.items():
             dict_['id'] = id_
             results['results'].append(dict_)
