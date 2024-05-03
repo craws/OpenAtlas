@@ -32,7 +32,7 @@ def walk_tree(types: list[int]) -> list[dict[str, Any]]:
         if item.selectable:
             text = f'{name} {format_number(item.count)}{count_subs}'
         else:
-            text = f'<span class="inactive">{name}{count_subs}</span>'
+            text = f'<span class="text-muted">{name}{count_subs}</span>'
         items.append({
             'id': item.id,
             'href': url_for('view', id_=item.id),

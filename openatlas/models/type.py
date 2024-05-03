@@ -134,7 +134,7 @@ class Type(Entity):
             type_.count_subs = 0
             type_.subs = []
             type_.root = [row['super_id']] if row['super_id'] else []
-            type_.selectable = not bool(row['non_selectable'])
+            type_.selectable = not row['non_selectable']
         Type.populate_subs(types)
         return types
 

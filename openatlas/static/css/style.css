@@ -78,10 +78,6 @@ div.data-table > div > div {
     white-space: nowrap;
 }
 
-span.inactive {
-    color: grey;
-}
-
 /* Map */
 .map {
   position:sticky !important;
