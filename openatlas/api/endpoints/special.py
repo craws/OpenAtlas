@@ -100,19 +100,22 @@ class GetNetworkVisualisation(Resource):
         for item in get_all_links_for_network(system_classes):
             if output.get(item['domain_id']):
                 output[item['domain_id']]['relations'].append(item['range_id'])
-                continue
+            else:
+                output[item['domain_id']] = {
+                    'label': item['domain_name'],
+                    'systemClass': item['domain_system_class'],
+                    'relations': [item['range_id']]}
             if output.get(item['range_id']):
                 output[item['range_id']]['relations'].append(item['domain_id'])
-                continue
-            output[item['range_id']] = {
-                'label': item['range_name'],
-                'systemClass': item['range_system_class'],
-                'relations': [item['domain_id']]}
-            output[item['domain_id']] = {
-                'label': item['domain_name'],
-                'systemClass': item['domain_system_class'],
-                'relations': [item['range_id']]}
-        output = dict(output)
+            else:
+                output[item['range_id']] = {
+                    'label': item['range_name'],
+                    'systemClass': item['range_system_class'],
+                    'relations': [item['domain_id']]}
+        results = {'results': []}
+        for id_, dict_ in output.items():
+            dict_['id'] = id_
+            results['results'].append(dict_)
         if parser.download:
-            return download(output, network_visualisation_template(output))
-        return marshal(output, network_visualisation_template(output)), 200
+            return download(results, network_visualisation_template())
+        return marshal(results, network_visualisation_template()), 200

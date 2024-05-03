@@ -177,11 +177,12 @@ class Api(ApiTestCase):
                 'api_04.network_visualisation',
                 exclude_system_classes='type'))
             rv = rv.get_json()
-            assert bool(rv[str(place.id)])
+            assert bool(len(rv['results']) == 70)
             rv = self.app.get(
                 url_for('api_04.network_visualisation', download=True))
             rv = rv.get_json()
-            assert bool(rv[str(boundary_mark.id)])
+            assert bool(len(rv['results']) == 160)
+
 
             for rv in [
                 self.app.get(url_for('api_04.geometric_entities')),

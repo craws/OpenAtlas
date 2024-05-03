@@ -371,11 +371,9 @@ def licensed_file_template(entities: list[Entity]) -> dict[str, Any]:
     return template
 
 
-def network_visualisation_template(entities: dict[str, Any]) -> dict[str, Any]:
-    template: dict[str, Any] = defaultdict()
-    for entity in entities:
-        template[entity] = fields.Nested({
+def network_visualisation_template() -> dict[str, Any]:
+    return {'results': fields.List(fields.Nested({
+        'id': fields.Integer,
         'label': fields.String,
         'systemClass': fields.String,
-        'relations': fields.List(fields.Integer)})
-    return template
+        'relations': fields.List(fields.Integer)}))}
