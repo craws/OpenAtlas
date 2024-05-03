@@ -16,7 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.10.3\n"
+"Generated-By: Babel 2.11.0\n"
 
 #: openatlas/display/base_display.py:83 openatlas/forms/form.py:58
 #: openatlas/views/entity_index.py:45 openatlas/views/model.py:93
@@ -39,7 +39,7 @@ msgstr "vue"
 
 #: openatlas/display/base_display.py:145
 msgid "view in frontend"
-msgstr ""
+msgstr "voir dans l'interface"
 
 #: openatlas/display/base_display.py:152 openatlas/forms/base_manager.py:126
 msgid "copy"
@@ -274,7 +274,7 @@ msgstr "fichier manquant"
 
 #: openatlas/display/display.py:151
 msgid "object"
-msgstr ""
+msgstr "objet"
 
 #: openatlas/display/display.py:172
 msgid "person"
@@ -412,7 +412,7 @@ msgstr "ajouter une sous-unité"
 
 #: openatlas/display/tab.py:213
 msgid "view all IIIF images"
-msgstr ""
+msgstr "voir tous les images IIIF"
 
 #: openatlas/display/tab.py:227 openatlas/views/index.py:64
 #: openatlas/views/note.py:50 openatlas/views/note.py:56
@@ -513,7 +513,7 @@ msgstr "aucune prévisualisation disponible"
 
 #: openatlas/display/util.py:264
 msgid "view in IIIF"
-msgstr ""
+msgstr "voir dans le IIIF"
 
 #: openatlas/display/util.py:268 openatlas/views/annotation.py:85
 #: openatlas/views/annotation.py:107
@@ -528,7 +528,7 @@ msgstr "supprimer"
 
 #: openatlas/display/util.py:277
 msgid "enable IIIF view"
-msgstr ""
+msgstr "activer la vue IIIF"
 
 #: openatlas/display/util.py:375
 msgid "error mail login"
@@ -668,11 +668,11 @@ msgstr "page"
 
 #: openatlas/forms/form.py:116 openatlas/views/vocabs.py:36
 msgid "base URL"
-msgstr ""
+msgstr "la base de l'URL"
 
 #: openatlas/forms/form.py:118 openatlas/views/vocabs.py:37
 msgid "endpoint"
-msgstr ""
+msgstr "point d'accès"
 
 #: openatlas/forms/form.py:119 openatlas/forms/setting.py:94
 #: openatlas/views/admin.py:60 openatlas/views/index.py:72
@@ -839,15 +839,15 @@ msgstr "message du nom"
 
 #: openatlas/forms/setting.py:63
 msgid "tooltip IIIF enabled"
-msgstr ""
+msgstr "Sélectionnez cette case à cocher pour activer l'IIIF"
 
 #: openatlas/forms/setting.py:68
 msgid "URL need a trailing /"
-msgstr ""
+msgstr "Il faut un / à la fin de l'URL"
 
 #: openatlas/forms/setting.py:69
 msgid "tooltip IIIF URL"
-msgstr ""
+msgstr "Définissez l'URL complète vers Image API Server, par exemple https://yourserver.eu/iiif/"
 
 #: openatlas/forms/setting.py:71 openatlas/templates/index/changelog.html:5
 msgid "version"
@@ -855,31 +855,37 @@ msgstr "version"
 
 #: openatlas/forms/setting.py:74
 msgid "tooltip IIIF version"
-msgstr ""
+msgstr "La version du manifeste fournie par OpenAtlas"
 
 #: openatlas/forms/setting.py:76
 msgid "conversion"
-msgstr ""
+msgstr "conversion"
 
 #: openatlas/forms/setting.py:78
 msgid "tooltip IIIF conversion"
-msgstr ""
+msgstr "Vérifie si les images sont converties en TIFFs pyramidaux. La réduction est sans perte "
+"mais la taille des fichiers peut être grande, le jpeg entraîne des tailles de fichiers bien plus petites "
+"mais est avec perte."
 
 #: openatlas/forms/setting.py:79
 msgid "path"
-msgstr ""
+msgstr "chemin"
 
 #: openatlas/forms/setting.py:79
 msgid "tooltip IIIF path"
-msgstr ""
+msgstr "Définissez la chemin absolu vers la zone de dépôt (glisser-déposer) d'image IIIF qui correspond avec le dossier du "
+"Image API Server, par exemmple /var/www/iipsrv/ si vous suiver l'installation d'OpenAtlas par défaut. "
+"Soyez conscient que ce dossier doit être accessible (en écriture et en exécution) pour le serveur web."
 
 #: openatlas/forms/setting.py:81
 msgid "convert on upload"
-msgstr ""
+msgstr "convertir pendant le téléversement"
 
 #: openatlas/forms/setting.py:82
 msgid "tooltip IIIF convert on upload"
-msgstr ""
+msgstr "vérifie si les images sont converties en TIFFs pyramidaux. La réduction est sans perte "
+"mais la taille des fichiers peut être grande, le jpeg entraîne des tailles de fichiers bien plus petites "
+"mais est avec perte."
 
 #: openatlas/forms/setting.py:83 openatlas/forms/setting.py:95
 #: openatlas/templates/model/network.html:104 openatlas/views/model.py:288
@@ -1070,7 +1076,7 @@ msgstr "fonction d'acteur"
 
 #: openatlas/models/openatlas_class.py:30
 msgid "administrative unit"
-msgstr ""
+msgstr "unité administrative"
 
 #: openatlas/models/openatlas_class.py:31
 msgid "appellation"
@@ -1723,13 +1729,12 @@ msgstr "pour modifier à nouveau, veuillez sauvegarder ou recharger la page."
 
 #: openatlas/templates/util/translations.html:18
 msgid "map_info_shape"
-msgstr "Desinner la forme ou la chose physiquement si la zone est connue"
+msgstr "Dessinez la forme ou la chose physiquement si la zone est connue"
 
 #: openatlas/templates/util/translations.html:19
 msgid "map_info_area"
-msgstr ""
-"Desinnez la zone dans laquelle la chose est localisée. Par exemple si la "
-"forme exacte est inconnue mais qu'elle doit être dans une aire donnée."
+msgstr "Dessinez la zone dans laquelle la chose est localisée. Par exemple si la forme exacte est inconnue "
+"mais qu'elle doit être dans une aire donnée."
 
 #: openatlas/templates/util/translations.html:20
 msgid "map_info_point"
@@ -1788,7 +1793,7 @@ msgstr "polygone"
 
 #: openatlas/templates/util/translations.html:33
 msgid "draw geometry"
-msgstr ""
+msgstr "dessiner la géométrie"
 
 #: openatlas/templates/util/translations.html:34
 #, fuzzy
@@ -1860,7 +1865,7 @@ msgstr "abscisse"
 
 #: openatlas/views/admin.py:322
 msgid "IIIF"
-msgstr ""
+msgstr "IIIF"
 
 #: openatlas/views/admin.py:345 openatlas/views/arche.py:66
 #: openatlas/views/entity.py:237 openatlas/views/entity.py:272
@@ -1999,11 +2004,11 @@ msgstr "fichiers"
 
 #: openatlas/views/export.py:31
 msgid "data was exported"
-msgstr ""
+msgstr "les données ont été exportées"
 
 #: openatlas/views/export.py:34
 msgid "export failed"
-msgstr ""
+msgstr "l'export a échoué"
 
 #: openatlas/views/export.py:69 openatlas/views/export.py:74
 #: openatlas/views/export.py:77
@@ -2012,7 +2017,7 @@ msgstr "exporter SQL"
 
 #: openatlas/views/export.py:72
 msgid "export database dump"
-msgstr ""
+msgstr "exporter la base de données"
 
 #: openatlas/views/export.py:86
 msgid "file deleted"
@@ -2034,19 +2039,19 @@ msgstr "supprimer tous les fichiers"
 
 #: openatlas/views/file.py:125
 msgid "IIIF converted"
-msgstr ""
+msgstr "converti en IIIF"
 
 #: openatlas/views/file.py:127
 msgid "failed to convert image"
-msgstr ""
+msgstr "échec de la conversion de l'image"
 
 #: openatlas/views/file.py:162
 msgid "please activate IIIF"
-msgstr ""
+msgstr "veuillez activer l'IIIF"
 
 #: openatlas/views/file.py:165
 msgid "please activate IIIF conversion"
-msgstr ""
+msgstr "veuillez activer la conversion en IIIF"
 
 #: openatlas/views/file.py:173
 #, fuzzy
@@ -2060,7 +2065,7 @@ msgstr "fichier supprimé"
 
 #: openatlas/views/file.py:194
 msgid "cannot delete images in upload directory"
-msgstr ""
+msgstr "impossible de supprimer les images dans le dossier de téléversement"
 
 #: openatlas/views/file.py:199
 #, fuzzy
@@ -2145,11 +2150,11 @@ msgstr "colonne nom manquante"
 
 #: openatlas/views/imports.py:49
 msgid "ids already in database"
-msgstr ""
+msgstr "les ids sont déjà dans la base de données"
 
 #: openatlas/views/imports.py:50
 msgid "double ids in import"
-msgstr ""
+msgstr "il y a des doublons d'ids dans l'import"
 
 #: openatlas/views/imports.py:120 openatlas/views/imports.py:128
 #: openatlas/views/imports.py:154
@@ -2537,10 +2542,8 @@ msgstr "types supprimés"
 msgid ""
 "Warning: this type has subs and/or links to entities (see tabs). Please "
 "check if you want to delete these subs and links too."
-msgstr ""
-"Attention, ce type a des sous-unités et/ou des liens vers des entités. "
-"Veuillez les vérifier si vous voulez supprimer ces sous-unités et liens "
-"aussi."
+msgstr "Attention, ce type a des sous-unités et/ou des liens vers des entités. "
+"Veuillez les vérifier si vous voulez supprimer ces sous-unités et liens aussi."
 
 #: openatlas/views/type.py:152
 msgid "Entities were updated"
@@ -2608,36 +2611,36 @@ msgstr "Echec de l'envoi des informations du compte à %(email)s"
 
 #: openatlas/views/vocabs.py:44
 msgid "show vocabularies"
-msgstr ""
+msgstr "montrer les vocabbulaires"
 
 #: openatlas/views/vocabs.py:85
 msgid "languages"
-msgstr ""
+msgstr "langues"
 
 #: openatlas/views/vocabs.py:110 openatlas/views/vocabs.py:118
 #: openatlas/views/vocabs.py:197
 msgid "vocabularies"
-msgstr ""
+msgstr "vocabulaires"
 
 #: openatlas/views/vocabs.py:132
 msgid "top concepts"
-msgstr ""
+msgstr "concepts principaux"
 
 #: openatlas/views/vocabs.py:132
 msgid "groups"
-msgstr ""
+msgstr "groupes"
 
 #: openatlas/views/vocabs.py:151
 msgid "I'm sure to import this hierarchy"
-msgstr ""
+msgstr "Je suis sûr d'importer cette hiérarchie"
 
 #: openatlas/views/vocabs.py:154
 msgid "import hierarchy"
-msgstr ""
+msgstr "importer la hiérarchie"
 
 #: openatlas/views/vocabs.py:189
 msgid "You are about to import following hierarchy"
-msgstr ""
+msgstr "Vous êtes sur le point d'importer la hiérarchie suivante"
 
 #~ msgid "no file to upload"
 #~ msgstr "aucun fichier à téléverser"
