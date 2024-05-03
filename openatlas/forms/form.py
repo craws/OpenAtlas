@@ -125,7 +125,6 @@ def get_cidoc_form() -> Any:
 
 def get_move_form(type_: Type) -> Any:
     class Form(FlaskForm):
-        is_type_form = HiddenField()
         checkbox_values = HiddenField()
         selection = SelectMultipleField(
             '',

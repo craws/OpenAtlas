@@ -465,10 +465,10 @@ class TypeBaseManager(BaseManager):
     def additional_fields(self) -> dict[str, Any]:
         root = self.get_root()
         fields = {
-            'is_type_form': HiddenField(),
             str(root.id): TreeField(
                 str(root.id),
-                filter_ids=[self.entity.id] if self.entity else [])}
+                filter_ids=[self.entity.id] if self.entity else [],
+                is_type_form=True)}
         if root.directional:
             fields['name_inverse'] = StringField(_('inverse'))
         return fields

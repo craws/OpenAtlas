@@ -520,7 +520,7 @@ class TypeBaseDisplay(BaseDisplay):
             elif not self.entity.count:
                 self.buttons.append(
                     button(
-                        _('unset selectable'),
+                        _('set unselectable'),
                         url_for('type_unset_selectable', id_=self.entity.id)))
 
     def add_button_update(self) -> None:

@@ -190,31 +190,38 @@ class Type(Entity):
     def get_tree_data(
             type_id: Optional[int],
             selected_ids: list[int],
-            filtered_ids: Optional[list[int]] = None) -> list[dict[str, Any]]:
+            filtered_ids: Optional[list[int]] = None,
+            is_type_form: Optional[bool] = False) -> list[dict[str, Any]]:
         return Type.walk_tree(
             g.types[type_id].subs,
             selected_ids,
-            filtered_ids or [])
+            filtered_ids or [],
+            is_type_form)
 
     @staticmethod
     def walk_tree(
             types: list[int],
             selected_ids: list[int],
-            filtered_ids: list[int]) -> list[dict[str, Any]]:
+            filtered_ids: list[int],
+            is_type_form: bool) -> list[dict[str, Any]]:
         items = []
         for id_ in [id_ for id_ in types if id_ not in filtered_ids]:
             item = g.types[id_]
             state = {}
             if item.id in selected_ids:
                 state['selected'] = 'true'
-            if not item.selectable:
+            if not is_type_form and not item.selectable:
                 state['disabled'] = 'true'
             items.append({
                 'id': item.id,
                 'text': item.name.replace("'", "&apos;"),
                 'state': state or '',
                 'children':
-                    Type.walk_tree(item.subs, selected_ids, filtered_ids)})
+                    Type.walk_tree(
+                        item.subs,
+                        selected_ids,
+                        filtered_ids,
+                        is_type_form)})
         return items
 
     @staticmethod
