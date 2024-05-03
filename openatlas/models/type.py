@@ -57,7 +57,7 @@ class Type(Entity):
         db.set_selectable(self.id)
 
     def unset_selectable(self) -> None:
-        if not self.count:
+        if not self.count and self.category != 'value':
             db.unset_selectable(self.id)
 
     def remove_class(self, name: str) -> None:

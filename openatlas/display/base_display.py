@@ -511,7 +511,7 @@ class TypeBaseDisplay(BaseDisplay):
         pass
 
     def add_button_others(self) -> None:
-        if is_authorized('editor'):
+        if is_authorized('editor') and self.entity.category != 'value':
             if not self.entity.selectable:
                 self.buttons.append(
                     button(
