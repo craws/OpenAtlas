@@ -196,7 +196,7 @@ class Type(Entity):
             g.types[type_id].subs,
             selected_ids,
             filtered_ids or [],
-            is_type_form)
+            is_type_form or False)
 
     @staticmethod
     def walk_tree(

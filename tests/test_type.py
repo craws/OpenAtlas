@@ -99,10 +99,10 @@ class TypeTest(TestBaseCase):
                 follow_redirects=True)
             assert b'set selectable' in rv.data
 
-            rv: Any = self.app.get(url_for('insert', class_='person'))
+            rv = self.app.get(url_for('insert', class_='person'))
             assert b'sex' in rv.data
 
-            rv: Any = self.app.get(url_for('type_index'))
+            rv = self.app.get(url_for('type_index'))
             assert b'sex' in rv.data
 
             rv = self.app.get(
