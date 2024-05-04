@@ -92,10 +92,28 @@ class TypeTest(TestBaseCase):
             assert b'Unit' in rv.data
 
             sex = get_hierarchy('Sex')
+            sex_sub = g.types[sex.subs[0]]
+
+            rv = self.app.get(
+                url_for('type_unset_selectable', id_=sex_sub.id),
+                follow_redirects=True)
+            assert b'set selectable' in rv.data
+
+            rv: Any = self.app.get(url_for('insert', class_='person'))
+            assert b'sex' in rv.data
+
+            rv: Any = self.app.get(url_for('type_index'))
+            assert b'sex' in rv.data
+
+            rv = self.app.get(
+                url_for('type_set_selectable', id_=sex_sub.id),
+                follow_redirects=True)
+            assert b'set unselectable' in rv.data
+
             with app.test_request_context():
                 app.preprocess_request()
                 actor = insert('person', 'Connor MacLeod')
-                actor.link('P2', g.types[sex.subs[0]])
+                actor.link('P2', sex_sub)
 
             rv = self.app.get(url_for('show_untyped_entities', id_=sex.id))
             assert b'no entries' in rv.data
