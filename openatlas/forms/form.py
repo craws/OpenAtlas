@@ -13,7 +13,7 @@ from wtforms.validators import InputRequired, URL
 from openatlas import app
 from openatlas.display.table import Table
 from openatlas.display.util import get_base_table_data
-from openatlas.display.util2 import show_table_icons
+from openatlas.display.util2 import show_table_icons, uc_first
 from openatlas.forms import base_manager, manager
 from openatlas.forms.field import (
     SubmitField, TableField, TableMultiField, TreeField, TableCidocField)
@@ -132,7 +132,7 @@ def get_move_form(type_: Type) -> Any:
             coerce=int,
             option_widget=widgets.CheckboxInput(),
             widget=widgets.ListWidget(prefix_label=False))
-        save = SubmitField(_('move entities'))
+        save = SubmitField(uc_first(_('move entities')))
 
     root = g.types[type_.root[0]]
     setattr(Form, str(root.id), TreeField(str(root.id)))
