@@ -93,7 +93,7 @@ class GetNetworkVisualisation(Resource):
     @staticmethod
     def get() -> tuple[Resource, int] | Response | dict[str, Any]:
         parser = Parser(network.parse_args())
-        system_classes = [class_ for class_ in g.classes]
+        system_classes = g.classes
         if exclude := parser.exclude_system_classes:
             system_classes = [s for s in system_classes if s not in exclude]
         output: dict[str, Any] = defaultdict()
