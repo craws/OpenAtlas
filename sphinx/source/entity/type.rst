@@ -16,6 +16,9 @@ feature the user interface can be adapted for specific research interests.
 * **Untyped entities** can be checked at the type overview
 * **Multiple linked entities** can be checked at the type overview, useful if
   switching to single
+* Types (except value types) can be **Set unselectable**, e.g. to enter
+  sub categories, via the corresponding button at a type view. But only if not
+  already used by entities and at least editor permissions are needed.
 * A more detailed description on how to enter new types can be found
   :doc:`here</examples/types>`
 
