@@ -21,9 +21,7 @@ then run the database upgrade script, then restart Apache:
 8.4.0.sql is needed but will be taken care of by the database upgrade script.
 
 ### 8.2.x to 8.3.0
-
 No database updates are required but new Python packages are needed:
-
 * python3-svgwrite (#2126 Polygons for image annotations)
 * python3-shapely (#1567 WKT import)
 
@@ -37,13 +35,11 @@ To run tests, please add a new **tests** folder to your IIIF directory, e.g.:
     mkdir /var/www/iipsrv/tests
 
 ### 8.2.0 to 8.2.1
-
 This is a fix for installation, no need to update an existing instance. 
 In case you want to update it anyway, a git pull and apache restart would be 
 sufficient. 
 
 ### 8.1.x to 8.2.0
-
 No database updates are required but new node packages are needed:
 
     cd openatlas/static
