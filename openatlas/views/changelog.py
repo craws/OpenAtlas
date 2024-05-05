@@ -15,7 +15,7 @@ def index_changelog() -> str:
 
 
 versions = {
-    '8.4.0': ['TBA', {
+    '8.4.0': ['2024-05-05', {
         'feature': {
             '2261': 'Option to prevent selection of a type',
             '2158': 'Georeferencing files for multiple places (overlay)',
