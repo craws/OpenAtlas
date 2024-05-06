@@ -14,8 +14,10 @@ from openatlas.models.type import Type
 
 def file(_form: FlaskForm, field: Any) -> None:
     for file_ in request.files.getlist('file'):
-        if not file_ or Path(str(file_.filename)).suffix[1:].lower() not in \
-                g.settings['file_upload_allowed_extension']:
+        if not file_ \
+                or Path(str(file_.filename)).suffix[1:].lower() not in [
+                    i.lower() for i in
+                    g.settings['file_upload_allowed_extension']]:
             field.errors.append(_('file type not allowed'))
 
 
