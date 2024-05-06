@@ -9,10 +9,6 @@ from openatlas.api.resources.util import (
 from openatlas.models.entity import Entity
 
 
-
-
-
-
 def get_search_values(
         category: str,
         parameter: dict[str, Any]) -> list[str | int | list[Any]]:
@@ -29,12 +25,14 @@ def get_search_values(
             [search_for_value(value, parameter) for value in values])
     return values
 
+
 def get_sub_ids(id_: int, subs: list[Any]) -> list[Any]:
     new_subs = g.types[id_].get_sub_ids_recursive()
     subs.extend(new_subs)
     for sub in new_subs:
         get_sub_ids(sub, subs)
     return subs
+
 
 def search_for_value(
         values: Tuple[int, float],

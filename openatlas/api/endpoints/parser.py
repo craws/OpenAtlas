@@ -66,6 +66,8 @@ class Parser:
         self.exclude_system_classes = []
         for item in parser:
             setattr(self, item, parser[item])
+        if self.search:
+            self.set_search_param()
 
     def set_search_param(self) -> None:
         try:
