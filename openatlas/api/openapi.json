@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.3",
+    "version": "0.4.3.3",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -2872,6 +2872,13 @@
         "type": "array",
         "items": {
           "type": "object",
+          "required": [
+            "en",
+            "systemClass",
+            "crmClass",
+            "icon",
+            "view"
+          ],
           "properties": {
             "systemClass": {
               "type": "string"
@@ -2901,6 +2908,13 @@
             "type": "array",
             "items": {
               "type": "object",
+              "required": [
+                "label",
+                "systemClass",
+                "crmClass",
+                "icon",
+                "view"
+              ],
               "properties": {
                 "label": {
                   "type": "string"
@@ -2924,14 +2938,23 @@
       },
       "NetworkVisualisationModel": {
         "type": "object",
+        "required": [
+          "results"
+        ],
         "properties": {
           "results": {
             "type": "array",
             "items": {
               "type": "object",
+              "required": [
+                "id",
+                "label",
+                "relations",
+                "systemClass"
+              ],
               "properties": {
                 "id": {
-                  "type": "string"
+                  "type": "number"
                 },
                 "label": {
                   "type": "string"
@@ -3407,6 +3430,18 @@
       },
       "PropertiesDetailModel": {
         "type": "object",
+        "required": [
+          "id",
+          "name",
+          "nameInverse",
+          "code",
+          "domainClassCode",
+          "rangeClassCode",
+          "count",
+          "super",
+          "i18n",
+          "i18nInverse"
+        ],
         "properties": {
           "id": {
             "type": "number"
@@ -3443,6 +3478,9 @@
           },
           "i18n": {
             "type": "object",
+            "required": [
+              "en"
+            ],
             "properties": {
               "de": {
                 "type": "string"
