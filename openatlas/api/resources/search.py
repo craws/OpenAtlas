@@ -116,7 +116,6 @@ def search_entity(
 
 
 def value_to_be_searched(entity: Entity, key: str) -> Any:
-    value: Any = None  # Just to make Mypy happy
     match key:
         case "entityID" | "relationToID" | "valueTypeID":
             value = [entity.id]
