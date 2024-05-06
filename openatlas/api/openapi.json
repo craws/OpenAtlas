@@ -2954,7 +2954,7 @@
               ],
               "properties": {
                 "id": {
-                  "type": "string"
+                  "type": "number"
                 },
                 "label": {
                   "type": "string"
