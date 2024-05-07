@@ -451,10 +451,6 @@ class Entity:
         return entities
 
     @staticmethod
-    def get_by_link_property(code: str, class_: str) -> list[Entity]:
-        return [Entity(row) for row in db.get_by_link_property(code, class_)]
-
-    @staticmethod
     def get_similar_named(class_: str, ratio: int) -> dict[int, Any]:
         similar: dict[int, Any] = {}
         already_added: set[int] = set()

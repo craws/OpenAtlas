@@ -103,15 +103,17 @@ class Tab:
         if name == 'actor':
             if view == 'file':
                 self.buttons.append(
-                    button('link', url_for('file_add', id_=id_, view=name)))
+                    button('link', url_for('file_add', id_=id_, view='actor')))
             elif view == 'reference':
                 self.buttons.append(
                     button(
                         'link',
-                        url_for('reference_add', id_=id_, view=name)))
+                        url_for('reference_add', id_=id_, view='actor')))
             elif view == 'source':
                 self.buttons.append(
-                    button('link', url_for('link_insert', id_=id_, view=name)))
+                    button(
+                        'link',
+                        url_for('link_insert', id_=id_, view='actor')))
             elif view == 'event':
                 self.buttons.append(button(
                     'link',
@@ -236,7 +238,9 @@ class Tab:
                         url_for('reference_add', id_=id_, view=name)))
             elif view == 'source':
                 self.buttons.append(
-                    button('link', url_for('link_insert', id_=id_, view=name)))
+                    button(
+                        'link',
+                        url_for('link_insert', id_=id_, view='source')))
             self.buttons.append(
                 button(
                     g.classes[name].label,

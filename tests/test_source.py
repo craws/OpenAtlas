@@ -26,8 +26,13 @@ class SourceTest(TestBaseCase):
             assert b'Artifact with inscription' in rv.data
 
             rv = self.app.get(
+                url_for('link_insert', id_=source_id, view='actor'))
+            assert b'Gillian' in rv.data
+
+            rv = self.app.post(
                 url_for('link_insert', id_=source_id, view='actor'),
-                data={'checkbox_values': [gillian.id]})
+                data={'checkbox_values': [gillian.id]},
+                follow_redirects=True)
             assert b'Gillian' in rv.data
 
             rv = self.app.get(url_for('update', id_=source_id))

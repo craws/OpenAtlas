@@ -25,25 +25,6 @@ def get_by_ids(
     return [dict(row) for row in g.cursor.fetchall()]
 
 
-def get_by_link_property(code: str, class_: str) -> list[dict[str, Any]]:
-    g.cursor.execute(
-        """
-        SELECT
-            e.id,
-            e.cidoc_class_code,
-            e.name,
-            e.openatlas_class_name,
-            e.description,
-            e.created,
-            e.modified
-        FROM model.entity e
-        JOIN model.link l ON e.id = l.domain_id AND l.property_code = %(code)s
-        WHERE e.openatlas_class_name = %(class)s;
-        """,
-        {'code': code, 'class': class_})
-    return [dict(row) for row in g.cursor.fetchall()]
-
-
 def get_by_project_id(project_id: int) -> list[dict[str, Any]]:
     g.cursor.execute(
         """
