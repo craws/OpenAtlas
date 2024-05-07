@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.3d",
+    "version": "0.4.3e",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -659,6 +659,83 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/entityId"
+          },
+          {
+            "$ref": "#/components/parameters/download"
+          },
+          {
+            "$ref": "#/components/parameters/count"
+          },
+          {
+            "$ref": "#/components/parameters/show"
+          },
+          {
+            "$ref": "#/components/parameters/format"
+          },
+          {
+            "$ref": "#/components/parameters/export"
+          },
+          {
+            "$ref": "#/components/parameters/column"
+          },
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/search"
+          },
+          {
+            "$ref": "#/components/parameters/first"
+          },
+          {
+            "$ref": "#/components/parameters/last"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/limit"
+          },
+          {
+            "$ref": "#/components/parameters/type_id"
+          },
+          {
+            "$ref": "#/components/parameters/relation_type"
+          },
+          {
+            "$ref": "#/components/parameters/locale"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/ld+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntitiesOutputModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
+    "/linked_entities_by_properties_recursive/{entityId}": {
+      "get": {
+        "tags": [
+          "Proposal"
+        ],
+        "description": "Retrieves all entities linked with the provided property to the entity with the provided `{entityId}` in a recursive manner.",
+        "operationId": "GetLinkedEntitiesByPropertyRecursive",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/entityId"
+          },
+          {
+            "$ref": "#/components/parameters/properties"
           },
           {
             "$ref": "#/components/parameters/download"
@@ -1411,7 +1488,7 @@
       },
       "search": {
         "name": "search",
-        "description": "Search query for specific results. For a better overview visit: `https://manual.openatlas.eu/technical/api_parameters_04.html#id27`\n\n **Filterable categories**\n\n entityName, entityDescription, entityAliases, entityCidocClass, entitySystemClass, entityID, typeID, valueTypeID, typeIDWithSubs, typeName, beginFrom, beginTo, endFrom, endTo, relationToID\n\n **Values** \n\n Values has to be a list of items. The items can be either a string, an integer or a tuple (see Note). Strings need to be marked with \u201c\u201d or \u2018\u2019, while integers doesn\u2019t allow this.\\n *Note*: the category valueTypeID can search for values of a type ID. But it takes one or more two valued Tuple as list entry: (x,y). x is the type id and y is the searched value. This can be an int or a float, e.g: `{\"operator\":\"lesserThan\",\"values\":[(3142,543.3)],\"logicalOperator\":\"and\"}`\n\n **Compare operators** \n\n equal, notEqual, like (1), greaterThan (2), greaterThanEqual (2), lesserThan (2)\n\nThe compare operators work like the mathematical operators. equal x=y, notEqual x!=y, greaterThan x>y , greaterThanEqual x>=y, lesserThan x<y, lesserThanEqual x<=y. The like operator searches for occurrence of the string, so a match can also occur in the middle of a word.\n\n(1)Only for string based categories\n\n(2)Only for beginFrom, beginTo, endFrom, endTo, valueTypeID\n\n**Logical operators**\n\nNot mandatory, OR is the default value. Logical operators handles, if the values are treated as OR or AND.",
+        "description": "Search query for specific results.\n\n **Filterable categories**\n\n entityName, entityDescription, entityAliases, entityCidocClass, entitySystemClass, entityID, typeID, valueTypeID, typeIDWithSubs, typeName, beginFrom, beginTo, endFrom, endTo, relationToID\n\n **Values** \n\n Values has to be a list of items. The items can be either a string, an integer or a tuple (see Note). Strings need to be marked with \u201c\u201d or \u2018\u2019, while integers doesn\u2019t allow this.\\n *Note*: the category valueTypeID can search for values of a type ID. But it takes one or more two valued Tuple as list entry: (x,y). x is the type id and y is the searched value. This can be an int or a float, e.g: `{\"operator\":\"lesserThan\",\"values\":[(3142,543.3)],\"logicalOperator\":\"and\"}`\n\n **Compare operators** \n\n equal, notEqual, like (1), greaterThan (2), greaterThanEqual (2), lesserThan (2)\n\nThe compare operators work like the mathematical operators. equal x=y, notEqual x!=y, greaterThan x>y , greaterThanEqual x>=y, lesserThan x<y, lesserThanEqual x<=y. The like operator searches for occurrence of the string, so a match can also occur in the middle of a word.\n\n(1)Only for string based categories\n\n(2)Only for beginFrom, beginTo, endFrom, endTo, valueTypeID\n\n**Logical operators**\n\nNot mandatory, OR is the default value. Logical operators handles, if the values are treated as OR or AND.",
         "in": "query",
         "content": {
           "application/json": {
@@ -1552,6 +1629,171 @@
           "type": "array",
           "items": {
             "enum": [
+              "P43",
+              "P140",
+              "P99",
+              "P112",
+              "P113",
+              "P17",
+              "P104",
+              "P142",
+              "P195",
+              "P164",
+              "P129",
+              "P33",
+              "P53",
+              "P42",
+              "P48",
+              "P37",
+              "P182",
+              "P132",
+              "P56",
+              "P148",
+              "P150",
+              "P100",
+              "P180",
+              "P98",
+              "P74",
+              "P124",
+              "P152",
+              "OA8",
+              "P20",
+              "P25",
+              "P144",
+              "P2",
+              "P54",
+              "P97",
+              "P34",
+              "P175",
+              "P51",
+              "P123",
+              "P55",
+              "P70",
+              "P8",
+              "P11",
+              "P196",
+              "P126",
+              "P105",
+              "P44",
+              "P109",
+              "P12",
+              "P9",
+              "P156",
+              "P86",
+              "P111",
+              "P4",
+              "P197",
+              "P179",
+              "P128",
+              "P141",
+              "P19",
+              "P65",
+              "P103",
+              "P59",
+              "P183",
+              "P15",
+              "P89",
+              "P184",
+              "P94",
+              "P92",
+              "P110",
+              "P16",
+              "P130",
+              "P72",
+              "P1",
+              "P68",
+              "P188",
+              "P23",
+              "P125",
+              "P93",
+              "P160",
+              "P50",
+              "P95",
+              "P40",
+              "P62",
+              "P198",
+              "P49",
+              "P145",
+              "P139",
+              "P174",
+              "P31",
+              "P28",
+              "P177",
+              "P21",
+              "P26",
+              "P5",
+              "P135",
+              "P22",
+              "P14",
+              "P136",
+              "P189",
+              "P137",
+              "P106",
+              "P166",
+              "P69",
+              "P27",
+              "P101",
+              "P38",
+              "P35",
+              "P10",
+              "P143",
+              "P173",
+              "P75",
+              "P176",
+              "P127",
+              "P108",
+              "P76",
+              "P91",
+              "P24",
+              "P73",
+              "P133",
+              "P29",
+              "OA9",
+              "P191",
+              "P96",
+              "P71",
+              "P165",
+              "P7",
+              "P67",
+              "P161",
+              "P186",
+              "P107",
+              "P134",
+              "P146",
+              "P13",
+              "P121",
+              "P46",
+              "P185",
+              "P39",
+              "P45",
+              "P32",
+              "P187",
+              "P147",
+              "P157",
+              "P122",
+              "P30",
+              "OA7",
+              "P52",
+              "P151",
+              "P167",
+              "P102",
+              "P41",
+              "P138"
+            ]
+          }
+        },
+        "explode": true
+      },
+      "properties": {
+        "name": "properties",
+        "description": "Retrieves entities which are connected to the requested entity with the `property`",
+        "in": "query",
+        "required": true,
+        "schema": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "all",
               "P43",
               "P140",
               "P99",

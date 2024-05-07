@@ -42,3 +42,16 @@ class ApiEntity(Entity):
         if not all(sc in g.classes for sc in classes):
             raise InvalidSystemClassError
         return Entity.get_by_class(classes, types=True, aliases=True)
+
+    @staticmethod
+    def get_linked_entities_with_properties(
+            id_: int,
+            properties: list[str]) -> list[Entity]:
+        properties = list(g.properties) if 'all' in properties else properties
+        entity = ApiEntity.get_by_id(id_)
+        return ([entity]
+                + entity.get_linked_entities_recursive(properties, types=True)
+                + entity.get_linked_entities_recursive(
+                    properties,
+                    inverse=True,
+                    types=True))
