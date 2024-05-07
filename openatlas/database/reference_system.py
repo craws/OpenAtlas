@@ -79,8 +79,8 @@ def update_system(data: dict[str, Any]) -> None:
             %(name)s,
             %(website_url)s,
             %(resolver_url)s,
-            %(identifier_example)s)
-        WHERE entity_id = %(entity_id)s;
+            %(identifier_example)s
+        ) WHERE entity_id = %(entity_id)s;
         """,
         data)
 

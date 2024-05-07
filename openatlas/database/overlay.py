@@ -6,12 +6,8 @@ from flask import g
 def insert(data: dict[str, Any]) -> None:
     g.cursor.execute(
         """
-        INSERT INTO web.map_overlay (
-            image_id,
-            bounding_box)
-        VALUES (
-            %(image_id)s,
-            %(bounding_box)s);
+        INSERT INTO web.map_overlay (image_id, bounding_box)
+        VALUES (%(image_id)s, %(bounding_box)s);
         """,
         data)
 

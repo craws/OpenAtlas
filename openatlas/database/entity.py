@@ -294,12 +294,12 @@ def search(
 def link(data: dict[str, Any]) -> int:
     g.cursor.execute(
         """
-        INSERT INTO model.link(
+        INSERT INTO model.link (
             property_code, domain_id, range_id, description, type_id
         ) VALUES (
             %(property_code)s, %(domain_id)s, %(range_id)s, %(description)s,
-            %(type_id)s)
-        RETURNING id;
+            %(type_id)s
+        ) RETURNING id;
         """,
         data)
     return g.cursor.fetchone()['id']

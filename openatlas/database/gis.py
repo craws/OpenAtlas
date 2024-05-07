@@ -134,7 +134,6 @@ def get_centroid_dict(row: dict[str, Any]) -> dict[str, Any]:
 
 
 def get_wkt_by_id(id_: int) -> list[dict[str, Any]]:
-    geometries = []
     g.cursor.execute(
         """
         SELECT
@@ -150,6 +149,7 @@ def get_wkt_by_id(id_: int) -> list[dict[str, Any]]:
         WHERE place.id = %(id_)s;
         """,
         {'id_': id_})
+    geometries = []
     for row in g.cursor.fetchall():
         geometry = {}
         if row['point']:
