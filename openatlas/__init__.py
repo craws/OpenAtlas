@@ -24,9 +24,9 @@ babel = Babel(app)
 from openatlas.models.logger import Logger
 from openatlas.api import api
 from openatlas.views import (
-    admin, ajax, annotation, arche, tools, changelog, entity, entity_index,
-    error, export, file, hierarchy, index, imports, link, login, model, note,
-    overlay, profile, search, sql, type as type_, user, vocabs)
+    admin, ajax, annotation, arche, changelog, entity, entity_index, error,
+    export, file, hierarchy, index, imports, link, login, model, note, overlay,
+    profile, search, sql, tools, type as type_, user, vocabs)
 
 
 @babel.localeselector
@@ -64,9 +64,7 @@ def before_request() -> None:
     g.properties = CidocProperty.get_all(session['language'])
     g.classes = OpenatlasClass.get_all()
     with_count = False
-    if (request.path.startswith('/type')
-            or request.path.startswith('/api/type_tree/')
-            or request.path.startswith('/admin/orphans')
+    if (request.path.startswith(('/type', '/api/type_tree/', '/admin/orphans'))
             or (request.path.startswith('/entity/') and
                 request.path.split('/entity/')[1].isdigit())):
         with_count = True
