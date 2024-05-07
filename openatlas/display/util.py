@@ -196,8 +196,8 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
         view_name = origin.class_.view
     html = ''
     for item in [
-            'source', 'event', 'actor', 'place', 'artifact', 'reference',
-            'type', 'file']:
+        'source', 'event', 'actor', 'place', 'artifact', 'reference',
+        'type', 'file']:
         active = ''
         request_parts = request.path.split('/')
         if view_name == item \
@@ -263,12 +263,14 @@ def profile_image(entity: Entity) -> str:
             html += ('<br>' + link(
                 _('view in IIIF'),
                 url_for('view_iiif', id_=file_id),
-                external=True) + ' - ' +
-                link(
+                external=True))
+            if is_authorized('contributor'):
+                html += (' - ' + link(
                     _('annotate'),
                     url_for('annotation_insert', id_=file_id),
-                    external=True) + '<br>' +
-                link(
+                    external=True))
+            if is_authorized('admin'):
+                html += ('<br>' + link(
                     _('delete IIIF'),
                     url_for('delete_iiif_file', id_=file_id)))
         else:
@@ -301,7 +303,7 @@ def format_name_and_aliases(entity: Entity, show_links: bool) -> str:
 def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
     data: list[Any] = [format_name_and_aliases(entity, show_links)]
     if entity.class_.view in [
-            'actor', 'artifact', 'event', 'place', 'reference']:
+        'actor', 'artifact', 'event', 'place', 'reference']:
         data.append(entity.class_.label)
     if entity.class_.standard_type_id:
         data.append(entity.standard_type.name if entity.standard_type else '')

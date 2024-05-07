@@ -130,7 +130,7 @@ def make_iiif_available(id_: int) -> Response:
 
 
 @app.route('/view_iiif/<int:id_>')
-@required_group('contributor')
+@required_group('readonly')
 def view_iiif(id_: int) -> str:
     entity = Entity.get_by_id(id_)
     manifests = []
