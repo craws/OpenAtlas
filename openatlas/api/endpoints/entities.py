@@ -48,6 +48,17 @@ class GetEntitiesLinkedToEntity(Resource):
             entity_.parse_args()).resolve_entities()
 
 
+class GetLinkedEntitiesByPropertyRecursive(Resource):
+    @staticmethod
+    def get(id_: int) -> Response | dict[str, Any]:
+        parser = entity_.parse_args()
+        return Endpoint(
+            ApiEntity.get_linked_entities_with_properties(
+                id_,
+                parser['properties']),
+            parser).resolve_entities()
+
+
 class GetEntity(Resource):
     @staticmethod
     def get(id_: int) -> tuple[Resource, int] | Response | dict[str, Any]:
@@ -97,11 +108,11 @@ class GetQuery(Resource):
     def get() -> tuple[Resource, int] | Response | dict[str, Any]:
         parser = query.parse_args()
         if not any([
-                parser['entities'],
-                parser['cidoc_classes'],
-                parser['view_classes'],
-                parser['system_classes'],
-                parser['linked_entities']]):
+            parser['entities'],
+            parser['cidoc_classes'],
+            parser['view_classes'],
+            parser['system_classes'],
+            parser['linked_entities']]):
             raise QueryEmptyError
         entities = []
         if parser['entities']:

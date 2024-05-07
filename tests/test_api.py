@@ -183,7 +183,6 @@ class Api(ApiTestCase):
             rv = rv.get_json()
             assert bool(len(rv['results']) == 160)
 
-
             for rv in [
                 self.app.get(url_for('api_04.geometric_entities')),
                 self.app.get(
@@ -353,6 +352,15 @@ class Api(ApiTestCase):
                     export='csvNetwork'))]:
                 assert b'Shire' in rv.data
                 assert 'application/zip' in rv.headers.get('Content-Type')
+
+            rv = self.app.get(url_for(
+                'api_04.linked_entities_by_properties_recursive',
+                id_=place.id,
+                properties='P46'))
+            rv = rv.get_json()
+            names = [place.name, feature.name, 'Bar']
+            for item in rv['results']:
+                assert item['features'][0]['properties']['title'] in names
 
             # Test Entities endpoints
             for rv in [

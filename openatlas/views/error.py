@@ -5,7 +5,8 @@ from flask import jsonify, render_template, request, g
 
 from openatlas import app
 from openatlas.api.resources.error import (
-    AccessDeniedError, NoLicenseError, EntityDoesNotExistError, OperatorError,
+    AccessDeniedError, InvalidPropertiesError, NoLicenseError,
+    EntityDoesNotExistError, OperatorError,
     LogicalOperatorError, SearchValueError, InvalidCidocClassCodeError,
     InvalidSystemClassError, InvalidViewClassError, InvalidLimitError,
     InvalidSearchSyntax, ValueNotIntegerError, NoSearchStringError,
