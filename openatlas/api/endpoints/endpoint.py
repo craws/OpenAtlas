@@ -158,9 +158,10 @@ class Endpoint:
     def sorting(self) -> None:
         if 'latest' in request.path:
             return
+
         self.entities = sorted(
             self.entities,
-            key=lambda entity: self.parser.get_key(entity),
+            key=self.parser.get_key,
             reverse=bool(self.parser.sort == 'desc'))
 
     def remove_duplicate_entities(self) -> None:
@@ -176,8 +177,8 @@ class Endpoint:
             if self.parser.limit == 0 else self.parser.limit
         e_list = list(
             itertools.islice(total, 0, None, int(self.parser.limit)))
-        index = [{'page': num + 1, 'startId': i} for num, i in
-                 enumerate(e_list)]
+        index = \
+            [{'page': num + 1, 'startId': i} for num, i in enumerate(e_list)]
         if index:
             self.parser.first = self.parser.get_by_page(index) \
                 if self.parser.page else self.parser.first
@@ -214,10 +215,12 @@ class Endpoint:
             entities_dict[link_.range.id]['links_inverse'].append(link_)
         if self.parser.format == 'loud' \
                 or self.parser.format in app.config['RDF_FORMATS']:
-            return [get_loud_entities(item, parse_loud_context())
-                    for item in entities_dict.values()]
-        return [self.parser.get_linked_places_entity(item)
+            return [
+                get_loud_entities(item, parse_loud_context())
                 for item in entities_dict.values()]
+        return [
+            self.parser.get_linked_places_entity(item)
+            for item in entities_dict.values()]
 
     def get_geojson(self) -> dict[str, Any]:
         out = []
@@ -239,9 +242,9 @@ class Endpoint:
 
     def get_geojson_v2(self) -> dict[str, Any]:
         out = []
-        links = [link_ for link_ in self.link_parser_check()
-                 if link_.property.code
-                 in ['P53', 'P74', 'OA8', 'OA9', 'P7', 'P26', 'P27']]
+        links = [
+            link_ for link_ in self.link_parser_check() if link_.property.code
+            in ['P53', 'P74', 'OA8', 'OA9', 'P7', 'P26', 'P27']]
         for entity in self.entities:
             entity_links = [
                 link_ for link_ in links if link_.domain.id == entity.id]
