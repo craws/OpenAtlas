@@ -34,6 +34,10 @@ class LastEntityError(Exception):
     pass
 
 
+class InvalidPropertiesError(Exception):
+    pass
+
+
 class LogicalOperatorError(Exception):
     pass
 

@@ -22,6 +22,7 @@ ALTER TABLE IF EXISTS ONLY web.user_notes DROP CONSTRAINT IF EXISTS user_notes_e
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS user_group_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_bookmarks_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_bookmarks_entity_id_fkey;
+ALTER TABLE IF EXISTS ONLY web.type_none_selectable DROP CONSTRAINT IF EXISTS type_none_selectable_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_openatlas_class_openatlas_class_name_fkey;
 ALTER TABLE IF EXISTS ONLY web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_form_reference_system_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.reference_system DROP CONSTRAINT IF EXISTS reference_system_entity_id_fkey;
@@ -80,6 +81,7 @@ ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS user_email_key;
 ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_bookmarks_user_id_entity_id_key;
 ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_bookmarks_pkey;
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS unsubscribe_code_key;
+ALTER TABLE IF EXISTS ONLY web.type_none_selectable DROP CONSTRAINT IF EXISTS type_none_selectable_pkey;
 ALTER TABLE IF EXISTS ONLY web.settings DROP CONSTRAINT IF EXISTS settings_pkey;
 ALTER TABLE IF EXISTS ONLY web.settings DROP CONSTRAINT IF EXISTS settings_name_key;
 ALTER TABLE IF EXISTS ONLY web.reference_system DROP CONSTRAINT IF EXISTS reference_system_pkey;
@@ -99,6 +101,7 @@ ALTER TABLE IF EXISTS ONLY web."group" DROP CONSTRAINT IF EXISTS group_pkey;
 ALTER TABLE IF EXISTS ONLY web."group" DROP CONSTRAINT IF EXISTS group_name_key;
 ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_pkey;
 ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_entity_id_key;
+ALTER TABLE IF EXISTS ONLY web.type_none_selectable DROP CONSTRAINT IF EXISTS entity_id_key;
 ALTER TABLE IF EXISTS ONLY web.annotation_image DROP CONSTRAINT IF EXISTS annotation_image_pkey;
 ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_pkey;
 ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_pkey;
@@ -158,6 +161,8 @@ DROP SEQUENCE IF EXISTS web.user_id_seq;
 DROP SEQUENCE IF EXISTS web.user_bookmarks_id_seq;
 DROP TABLE IF EXISTS web.user_bookmarks;
 DROP TABLE IF EXISTS web."user";
+DROP TABLE IF EXISTS web.type_none_selectable;
+DROP SEQUENCE IF EXISTS web.type_none_selectable_id_seq;
 DROP SEQUENCE IF EXISTS web.settings_id_seq;
 DROP TABLE IF EXISTS web.settings;
 DROP SEQUENCE IF EXISTS web.reference_system_form_id_seq;
@@ -1207,6 +1212,40 @@ ALTER SEQUENCE web.settings_id_seq OWNED BY web.settings.id;
 
 
 --
+-- Name: type_none_selectable_id_seq; Type: SEQUENCE; Schema: web; Owner: openatlas
+--
+
+CREATE SEQUENCE web.type_none_selectable_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    MAXVALUE 2147483647
+    CACHE 1;
+
+
+ALTER TABLE web.type_none_selectable_id_seq OWNER TO openatlas;
+
+--
+-- Name: type_none_selectable; Type: TABLE; Schema: web; Owner: openatlas
+--
+
+CREATE TABLE web.type_none_selectable (
+    id integer DEFAULT nextval('web.type_none_selectable_id_seq'::regclass) NOT NULL,
+    entity_id integer NOT NULL,
+    created timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE web.type_none_selectable OWNER TO openatlas;
+
+--
+-- Name: TABLE type_none_selectable; Type: COMMENT; Schema: web; Owner: openatlas
+--
+
+COMMENT ON TABLE web.type_none_selectable IS 'IDs of types that are not meant to be selected, e.g. a category';
+
+
+--
 -- Name: user; Type: TABLE; Schema: web; Owner: openatlas
 --
 
@@ -1766,6 +1805,14 @@ ALTER TABLE ONLY web.annotation_image
 
 
 --
+-- Name: type_none_selectable entity_id_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.type_none_selectable
+    ADD CONSTRAINT entity_id_key UNIQUE (entity_id);
+
+
+--
 -- Name: entity_profile_image entity_profile_image_entity_id_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
@@ -1915,6 +1962,14 @@ ALTER TABLE ONLY web.settings
 
 ALTER TABLE ONLY web.settings
     ADD CONSTRAINT settings_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: type_none_selectable type_none_selectable_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.type_none_selectable
+    ADD CONSTRAINT type_none_selectable_pkey PRIMARY KEY (id);
 
 
 --
@@ -2364,6 +2419,14 @@ ALTER TABLE ONLY web.reference_system_openatlas_class
 
 ALTER TABLE ONLY web.reference_system_openatlas_class
     ADD CONSTRAINT reference_system_openatlas_class_openatlas_class_name_fkey FOREIGN KEY (openatlas_class_name) REFERENCES model.openatlas_class(name) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: type_none_selectable type_none_selectable_entity_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.type_none_selectable
+    ADD CONSTRAINT type_none_selectable_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

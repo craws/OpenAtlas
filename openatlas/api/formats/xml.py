@@ -1,10 +1,10 @@
-import logging
+from logging import ERROR
 from typing import Any
 
 import dicttoxml
 from flask import Response
 
-dicttoxml.LOG.setLevel(logging.ERROR)
+dicttoxml.LOG.setLevel(ERROR)
 
 
 def subunit_xml(result: dict[str, Any]) -> bytes:

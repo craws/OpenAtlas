@@ -34,8 +34,8 @@ def update(data: dict[str, Any]) -> None:
             %(login_failed_count)s,
             (SELECT id FROM web.group WHERE name LIKE %(group_name)s),
             %(password_reset_code)s, %(password_reset_date)s,
-            %(unsubscribe_code)s)
-        WHERE id = %(id)s;
+            %(unsubscribe_code)s
+        ) WHERE id = %(id)s;
         """,
         data)
 

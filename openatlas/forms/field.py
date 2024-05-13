@@ -3,20 +3,20 @@ from __future__ import annotations
 import ast
 from typing import Any, Optional
 
-from flask import g, render_template
+from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from markupsafe import Markup
 from wtforms import (
     BooleanField, Field, FileField, FloatField, HiddenField, StringField,
     TextAreaField)
+from wtforms.validators import InputRequired
 from wtforms.widgets import FileInput, HiddenInput, Input, TextInput
 
 from openatlas import app
 from openatlas.display.table import Table
+from openatlas.display.util import get_base_table_data
 from openatlas.display.util2 import is_authorized
-from openatlas.models.cidoc_class import CidocClass
-from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 
@@ -149,11 +149,20 @@ class ReferenceField(Field):
 
 
 class TableMultiSelect(HiddenInput):
-
-    def __call__(self, field: TableMultiField, **kwargs: Any) -> str:
-        field.data = list(field.selection.keys()) if field.selection else None
-        field.data_list = sorted(e.name for e in field.selection.values()) \
-            if field.selection else []
+    def __call__(self: Any, field: TableMultiField, **kwargs: Any) -> str:
+        from openatlas.forms.util import string_to_entity_list
+        if request and request.method == 'POST':
+            field.selection = []
+            if request.form[field.name]:
+                field.selection = \
+                    string_to_entity_list(request.form[field.name])
+        if field.selection:
+            field.data = [e.id for e in field.selection]
+            field.data_list = sorted([e.name for e in field.selection])
+        field.table = table_multi(
+            field.entities,
+            field.selection,
+            field.filter_ids)
         return super().__call__(field, **kwargs) + Markup(
             render_template('forms/table_multi_select.html', field=field))
 
@@ -163,13 +172,37 @@ class TableMultiField(HiddenField):
 
     def __init__(
             self,
-            table: Table,
+            entities: list[Entity],
             selection: Optional[list[Entity]] = None,
-            validators: Optional[Any] = None,
+            filter_ids: Optional[list[int]] = None,
+            description: Optional[str] = None,
             **kwargs: Any) -> None:
-        super().__init__(validators=validators, **kwargs)
-        self.table = table
-        self.selection = {e.id: e for e in selection} if selection else {}
+        super().__init__(**kwargs)
+        self.entities = entities
+        self.selection = selection or []
+        self.filter_ids = filter_ids or []
+        self.description = description
+
+
+def table_multi(
+        entities: list[Entity],
+        selection: list[Entity],
+        filter_ids: list[int]) -> Table:
+    filter_ids = filter_ids or []
+    selection_ids = [e.id for e in selection] if selection else []
+    view = entities[0].class_.view if entities else 'place'
+    table_ = Table(
+        [''] + g.table_headers[view],
+        order=[[0, 'desc'], [1, 'asc']],
+        defs=[{'orderDataType': 'dom-checkbox', 'targets': 0}])
+    for e in [e for e in entities if e.id not in filter_ids]:
+        row = get_base_table_data(e, show_links=False)
+        row.insert(
+            0,
+            f'<input type="checkbox" value="{e.name}" id="{e.id}" '
+            f'{" checked" if e.id in selection_ids else ""}>')
+        table_.rows.append(row)
+    return table_
 
 
 class ValueFloatField(FloatField):
@@ -202,17 +235,21 @@ class TableSelect(HiddenInput):
         field.forms = {}
         for class_name in field.add_dynamical:
             field.forms[class_name] = get_form(class_name)
+
+        if request and request.method == 'POST':
+            field.selection = \
+                Entity.get_by_id(int(request.form[field.name])) \
+                if request.form[field.name] else None
+
         field.data = ''
         field.data_string = ''
-        if field.selection and isinstance(
-                field.selection,
-                (CidocClass, CidocProperty)):
-            field.data = field.selection.code
-            field.data_string = \
-                f'{field.selection.code} {field.selection.name}'
-        elif field.selection:
+        if field.selection:
             field.data = field.selection.id
             field.data_string = field.selection.name
+        if field.id == 'entity':
+            field.table = table_annotation(field.entities)
+        else:
+            field.table = table(field.id, field.entities, field.filter_ids)
         return super().__call__(field, **kwargs) + Markup(
             render_template('forms/table_select.html', field=field))
 
@@ -222,17 +259,80 @@ class TableField(HiddenField):
 
     def __init__(
             self,
-            table: Table,
+            entities: list[Entity],
             selection: Optional[Entity] = None,
+            filter_ids: Optional[list[int]] = None,
             validators: Optional[Any] = None,
             add_dynamic: Optional[list[str]] = None,
             **kwargs: Any) -> None:
         super().__init__(validators=validators, **kwargs)
-        self.table = table
+        self.entities = entities
         self.selection = selection
+        self.filter_ids = filter_ids or []
         self.add_dynamical = \
             (add_dynamic or []) if is_authorized('editor') else []
         self.add_dynamical.reverse()  # Reverse needed (CSS .float-end)
+
+
+class TableCidocSelect(HiddenInput):
+    def __call__(self, field: Any, **kwargs: Any) -> str:
+
+        if request and request.method == 'POST':
+            if code := request.form[field.name]:
+                field.selection = g.properties[code] if \
+                    field.id == 'property' else g.cidoc_classes[code]
+        field.data = field.selection.code if field.data else ''
+        field.data_string = f'{field.selection.code} {field.selection.name}' \
+            if field.selection else ''
+        field.table = table_cidoc(field.id, field.items)
+        return super().__call__(field, **kwargs) + Markup(
+            render_template('forms/table_select.html', field=field))
+
+
+class TableCidocField(HiddenField):
+    widget = TableCidocSelect()
+
+    def __init__(self, items: list[Any], **kwargs: Any) -> None:
+        super().__init__(validators=[InputRequired()], **kwargs)
+        self.items = items
+        self.selection = None
+
+
+def table(
+        table_id: str,
+        entities: list[Entity],
+        filter_ids: Optional[list[int]] = None) -> Table:
+    table_ = Table(
+        g.table_headers[entities[0].class_.name if entities else 'place'])
+    for e in [e for e in entities if not filter_ids or e.id not in filter_ids]:
+        data = get_base_table_data(e, show_links=False)
+        data[0] = format_name_and_aliases(e, table_id)
+        table_.rows.append(data)
+    return table_
+
+
+def table_annotation(entities: list[Entity]) -> Table:
+    table_ = Table(['name', 'class', 'description'])
+    for item in entities:
+        table_.rows.append([
+            format_name_and_aliases(item, 'entity'),
+            item.class_.name,
+            item.description])
+    return table_
+
+
+def table_cidoc(table_id: str, items: list[Any]) -> Table:
+    table_ = Table(
+        ['code', 'name'],
+        defs=[
+            {'orderDataType': 'cidoc-model', 'targets': [0]},
+            {'sType': 'numeric', 'targets': [0]}])
+    for i in items:
+        onclick = f'''
+            onclick="selectFromTable(this,
+            '{table_id}', '{i.code}', '{i.code} {i.name}');"'''
+        table_.rows.append([f'<a href="#" {onclick}>{i.code}</a>', i.name])
+    return table_
 
 
 class TreeMultiSelect(HiddenInput):
@@ -281,7 +381,8 @@ class TreeSelect(HiddenInput):
             data=Type.get_tree_data(
                 int(field.type_id),
                 selected_ids,
-                field.filters_ids))) + super().__call__(field, **kwargs)
+                field.filters_ids,
+                field.is_type_form))) + super().__call__(field, **kwargs)
 
 
 class TreeField(HiddenField):
@@ -290,14 +391,14 @@ class TreeField(HiddenField):
             self,
             label: str,
             validators: Any = None,
-            form: Any = None,
             type_id: str = '',
             filter_ids: Optional[list[int]] = None,
+            is_type_form: Optional[bool] = False,
             **kwargs: Any) -> None:
         super().__init__(label, validators, **kwargs)
-        self.form = form
         self.type_id = type_id or self.id
         self.filters_ids = filter_ids
+        self.is_type_form = is_type_form
 
     widget = TreeSelect()
 
@@ -365,8 +466,7 @@ def generate_password_field() -> CustomField:
 
 def value_type_expand_icon(type_: Type) -> str:
     return f'''
-        <span
-        onkeydown="
+        <span onkeydown="
             if (onActivateKeyInput(event))
                 switch_value_type({type_.id},this.children[0])"
         >

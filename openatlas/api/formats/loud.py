@@ -115,7 +115,9 @@ def get_loud_timespan(entity: Entity) -> dict[str, Any]:
         'begin_of_the_begin': date_to_str(entity.begin_from),
         'end_of_the_begin': date_to_str(entity.begin_to),
         'begin_of_the_end': date_to_str(entity.end_from),
-        'end_of_the_end': date_to_str(entity.end_to)}
+        'end_of_the_end': date_to_str(entity.end_to),
+        'beginning_is_qualified_by': entity.begin_comment,
+        'end_is_qualified_by': entity.end_comment}
 
 
 def get_type_property(type_: Type) -> dict[str, Any]:

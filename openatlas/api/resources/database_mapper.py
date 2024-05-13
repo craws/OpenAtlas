@@ -29,3 +29,8 @@ def get_classes() -> list[dict[str, Any]]:
 
 def get_cidoc_hierarchy() -> list[dict[str, Any]]:
     return db_class.get_hierarchy()
+
+
+def get_all_links_for_network(
+        system_classes: list[str]) -> list[dict[str, Any]]:
+    return db_link.get_all_links_for_network(system_classes)

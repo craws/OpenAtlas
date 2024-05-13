@@ -28,13 +28,16 @@ def walk_tree(types: list[int]) -> list[dict[str, Any]]:
         item = g.types[id_]
         count_subs = f' ({format_number(item.count_subs)})' \
             if item.count_subs else ''
+        name = item.name.replace("'", "&apos;")
+        if item.selectable:
+            text = f'{name} {format_number(item.count)}{count_subs}'
+        else:
+            text = f'<span class="text-muted">{name}{count_subs}</span>'
         items.append({
             'id': item.id,
             'href': url_for('view', id_=item.id),
             'a_attr': {'href': url_for('view', id_=item.id)},
-            'text':
-                item.name.replace("'", "&apos;") +
-                f' {format_number(item.count)}{count_subs}',
+            'text': text,
             'children': walk_tree(item.subs)})
     return items
 
@@ -188,6 +191,20 @@ def show_untyped_entities(id_: int) -> str:
             [_('types'), url_for('type_index')],
             link(g.types[id_]),
             _('untyped entities')])
+
+
+@app.route('/type/set-selectable/<int:id_>')
+@required_group('editor')
+def type_set_selectable(id_: int) -> Response:
+    g.types[id_].set_selectable()
+    return redirect(url_for('view', id_=id_))
+
+
+@app.route('/type/unset-selectable/<int:id_>')
+@required_group('editor')
+def type_unset_selectable(id_: int) -> Response:
+    g.types[id_].unset_selectable()
+    return redirect(url_for('view', id_=id_))
 
 
 @app.route('/type/multiple_linked/<int:id_>')

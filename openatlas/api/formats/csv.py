@@ -7,21 +7,9 @@ from typing import Any
 import pandas as pd
 from flask import Response, g
 
-from openatlas.api.resources.util import (
-    get_linked_entities_api, link_parser_check, link_parser_check_inverse,
-    remove_duplicate_entities)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
-
-
-def export_entities_csv(entities: Entity | list[Entity]) -> Response:
-    entities = entities if isinstance(entities, list) else [entities]
-    frames = [build_entity_dataframe(e, relations=True) for e in entities]
-    return Response(
-        pd.DataFrame(data=frames).to_csv(),
-        mimetype='text/csv',
-        headers={'Content-Disposition': 'attachment;filename=result.csv'})
 
 
 def build_entity_dataframe(
@@ -113,40 +101,6 @@ def get_csv_geometry(entity: Entity) -> dict[str, Any]:
             and entity.cidoc_class.code == 'E53':
         dict_ = {key: [geom[key] for geom in geoms] for key in geoms[0]}
     return dict_
-
-
-def export_csv_for_network_analysis(
-        entities: list[Entity],
-        parser: dict[str, Any]) -> Response:
-    archive = BytesIO()
-    with zipfile.ZipFile(archive, 'w') as zipped_file:
-        for key, frame in get_entities_grouped_by_class(entities).items():
-            with zipped_file.open(f'{key}.csv', 'w') as file:
-                file.write(bytes(
-                    pd.DataFrame(data=frame).to_csv(), encoding='utf8'))
-        with zipped_file.open('links.csv', 'w') as file:
-            link_frame = [
-                build_link_dataframe(link_) for link_ in
-                (link_parser_check(entities, parser) +
-                 link_parser_check_inverse(entities, parser))]
-            file.write(bytes(
-                pd.DataFrame(data=link_frame).to_csv(), encoding='utf8'))
-    return Response(
-        archive.getvalue(),
-        mimetype='application/zip',
-        headers={'Content-Disposition': 'attachment;filename=oa_csv.zip'})
-
-
-def get_entities_grouped_by_class(entities: list[Entity]) -> dict[str, Any]:
-    entities += get_linked_entities_api([e.id for e in entities])
-    entities = remove_duplicate_entities(entities)
-    grouped_entities = {}
-    for class_, entities_ in groupby(
-            sorted(entities, key=lambda entity: entity.class_.name),
-            key=lambda entity: entity.class_.name):
-        grouped_entities[class_] = \
-            [build_entity_dataframe(entity) for entity in entities_]
-    return grouped_entities
 
 
 def get_grouped_entities(entities: list[dict[str, Any]]) -> dict[str, Any]:

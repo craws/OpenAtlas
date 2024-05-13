@@ -74,7 +74,7 @@ class BaseDisplay:
             title = " > ".join([g.types[i].name for i in type_.root])
             html = f'<span title="{title}">{link(type_)}</span>'
             if type_.category == 'value':
-                html += f' {float(value):g} {type_.description}'
+                html += f" {float(value):g} {type_.description or ''}"
             data[g.types[type_.root[0]].name].append(html)
         return {key: data[key] for key in sorted(data.keys())}
 
@@ -133,8 +133,8 @@ class BaseDisplay:
         self.add_button_network()
         self.buttons.append(
             render_template('util/api_links.html', entity=self.entity))
-        self.add_button_frontend()
         self.add_button_others()
+        self.add_button_frontend()
         if self.structure and len(self.structure['siblings']) > 1:
             self.add_button_sibling_pager()
 
@@ -510,6 +510,19 @@ class TypeBaseDisplay(BaseDisplay):
     def add_button_network(self) -> None:
         pass
 
+    def add_button_others(self) -> None:
+        if is_authorized('editor') and self.entity.category != 'value':
+            if not self.entity.selectable:
+                self.buttons.append(
+                    button(
+                        _('set selectable'),
+                        url_for('type_set_selectable', id_=self.entity.id)))
+            elif not self.entity.count:
+                self.buttons.append(
+                    button(
+                        _('set unselectable'),
+                        url_for('type_unset_selectable', id_=self.entity.id)))
+
     def add_button_update(self) -> None:
         if self.entity.category != 'system':
             super().add_button_update()
@@ -519,6 +532,8 @@ class TypeBaseDisplay(BaseDisplay):
         self.data[_('super')] = link(g.types[self.entity.root[-1]])
         if self.entity.category == 'value':
             self.data[_('unit')] = self.entity.description
+        self.data[_('selectable')] = str(_('yes')) \
+            if self.entity.selectable else str(_('no'))
         self.data[_('ID for imports')] = self.entity.id
 
     def add_tabs(self) -> None:

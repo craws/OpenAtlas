@@ -24,6 +24,7 @@ from openatlas.views.admin import (
     count_files_to_convert, count_files_to_delete, get_disk_space_info)
 
 
+@required_group('readonly')
 @app.route('/file')
 def file_index() -> str:
     tabs = {
@@ -129,7 +130,7 @@ def make_iiif_available(id_: int) -> Response:
 
 
 @app.route('/view_iiif/<int:id_>')
-@required_group('contributor')
+@required_group('readonly')
 def view_iiif(id_: int) -> str:
     entity = Entity.get_by_id(id_)
     manifests = []

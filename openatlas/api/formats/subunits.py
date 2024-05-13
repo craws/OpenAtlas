@@ -204,19 +204,19 @@ def get_subunits_from_id(
     links = Entity.get_links_of_entities([e.id for e in entities])
     links_inverse = (
         Entity.get_links_of_entities([e.id for e in entities], inverse=True))
-    ext_reference_links = get_type_links_inverse(entities)
     latest_modified = max(
         entity.modified for entity in entities if entity.modified)
-    link_dict: dict[int, dict[str, Any]] = {}
+
+    link_dict: dict[int, dict[str, list[Any]]] = {}
     for entity_ in entities:
         link_dict[entity_.id] = {
-            'links': set(),
-            'links_inverse': set(),
+            'links': [],
+            'links_inverse': [],
             'geoms': []}
     for link_ in links:
-        link_dict[link_.domain.id]['links'].add(link_)
+        link_dict[link_.domain.id]['links'].append(link_)
     for link_ in links_inverse:
-        link_dict[link_.range.id]['links_inverse'].add(link_)
+        link_dict[link_.range.id]['links_inverse'].append(link_)
     location_links = get_location_links(links)
     location_ids = [l_.range.id for l_ in location_links]
     location_geoms = Gis.get_by_ids(location_ids)
@@ -231,10 +231,10 @@ def get_subunits_from_id(
                 entity_.location = link_.range
                 link_dict[entity_.id]['geoms'].extend(
                     location_geoms[link_.range.id])
-                if parser['centroid']:
+                if parser['centroid'] and location_centroids:
                     link_dict[entity_.id]['geoms'].extend(
                         location_centroids[link_.range.id])
-
+    external_reference = get_type_links_inverse(entities)
     entities_dict: dict[int, Any] = {}
     for entity_ in entities:
         entities_dict[entity_.id] = {
@@ -242,7 +242,7 @@ def get_subunits_from_id(
             'links': link_dict[entity_.id]['links'],
             'links_inverse': link_dict[entity_.id]['links_inverse'],
             'geoms': link_dict[entity_.id]['geoms'],
-            'ext_reference_links': ext_reference_links,
+            'ext_reference_links': external_reference,
             'root_id': entity.id,
             'latest_modified': latest_modified,
             'parser': parser}

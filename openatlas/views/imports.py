@@ -46,7 +46,7 @@ _('invalid value types')
 _('invalid value type ids')
 _('invalid value type values')
 _('invalid coordinates')
-_('invalid openatlas class')
+_('invalid OpenAtlas class')
 _('invalid references')
 _('invalid reference id')
 _('empty names')
@@ -295,16 +295,16 @@ def import_data(project_id: int, class_: str) -> str:
         if not form.preview.data and checked_data and (
                 not file_data['backup_too_old'] or app.testing):
             Transaction.begin()
-            try:
-                Import.import_data(project, class_, checked_data)
-                Transaction.commit()
-                g.logger.log('info', 'import', f'import: {len(checked_data)}')
-                flash(f"{_('import of')}: {len(checked_data)}", 'info')
-                imported = True
-            except Exception as e:  # pragma: no cover
-                Transaction.rollback()
-                g.logger.log('error', 'import', 'import failed', e)
-                flash(_('error transaction'), 'error')
+            #try:
+            Import.import_data(project, class_, checked_data)
+            Transaction.commit()
+            g.logger.log('info', 'import', f'import: {len(checked_data)}')
+            flash(f"{_('import of')}: {len(checked_data)}", 'info')
+            imported = True
+            # except Exception as e:  # pragma: no cover
+            #     Transaction.rollback()
+            #     g.logger.log('error', 'import', 'import failed', e)
+            #     flash(_('error transaction'), 'error')
     return render_template(
         'import_data.html',
         form=form,
@@ -503,13 +503,9 @@ def check_cell_value(
                 references.append(';'.join(values))
             value = ' '.join(references)
         case 'wkt' if value:
-            wkt_ = None
             try:
-                wkt_ = wkt.loads(row[item])
+                wkt.loads(row[item])
             except WKTReadingError:
-                value = error_span(value)
-                checks.set_warning('invalid_coordinates', id_)
-            if wkt_ and wkt_.type not in ['Point', 'LineString', 'Polygon']:
                 value = error_span(value)
                 checks.set_warning('invalid_coordinates', id_)
         case 'begin_from' | 'begin_to' | 'end_from' | 'end_to':

@@ -1,14 +1,15 @@
-from typing import Any, Optional
+from typing import Any, Optional, TYPE_CHECKING
 
-import numpy
 from flask import g, json
-from numpy import datetime64
 
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.models.reference_system import ReferenceSystem
+
+if TYPE_CHECKING:  # pragma: no cover
+    from openatlas.api.endpoints.parser import Parser
 
 
 def get_license_name(entity: Entity) -> Optional[str]:
@@ -85,28 +86,6 @@ def get_entities_from_type_with_subs(id_: int) -> list[Entity]:
         types=True,
         aliases=True)
 
-
-def filter_by_type(entities: list[Entity], ids: list[int]) -> list[Entity]:
-    result = []
-    for entity in entities:
-        if any(id_ in [key.id for key in entity.types] for id_ in ids):
-            result.append(entity)
-    return result
-
-
-def get_key(entity: Entity, parser: dict[str, Any]) -> datetime64 | str:
-    if parser['column'] == 'cidoc_class':
-        return entity.cidoc_class.name
-    if parser['column'] == 'system_class':
-        return entity.class_.name
-    if parser['column'] in ['begin_from', 'begin_to', 'end_from', 'end_to']:
-        if not getattr(entity, parser['column']):
-            date = ("-" if parser["sort"] == 'desc' else "") \
-                   + '9999999-01-01T00:00:00'
-            return numpy.datetime64(date)
-    return getattr(entity, parser['column'])
-
-
 def remove_duplicate_entities(entities: list[Entity]) -> list[Entity]:
     seen: set[int] = set()
     seen_add = seen.add  # Do not change, faster than always call seen.add()
@@ -115,42 +94,6 @@ def remove_duplicate_entities(entities: list[Entity]) -> list[Entity]:
 
 def remove_spaces_dashes(string: str) -> str:
     return string.replace(' ', '').replace('-', '')
-
-
-def link_parser_check(
-        entities: list[Entity],
-        parser: dict[str, Any]) -> list[Link]:
-    if any(i in ['relations', 'types', 'depictions', 'links', 'geometry']
-           for i in parser['show']):
-        return Entity.get_links_of_entities(
-            [entity.id for entity in entities],
-            get_properties_for_links(parser))
-    return []
-
-
-def link_parser_check_inverse(
-        entities: list[Entity],
-        parser: dict[str, Any]) -> list[Link]:
-    if any(i in ['relations', 'types', 'depictions', 'links', 'geometry']
-           for i in parser['show']):
-        return Entity.get_links_of_entities(
-            [entity.id for entity in entities],
-            get_properties_for_links(parser),
-            inverse=True)
-    return []
-
-
-def get_properties_for_links(parser: dict[str, Any]) -> Optional[list[str]]:
-    if parser['relation_type']:
-        codes = parser['relation_type']
-        if 'geometry' in parser['show']:
-            codes.append('P53')
-        if 'types' in parser['show']:
-            codes.append('P2')
-        if any(i in ['depictions', 'links'] for i in parser['show']):
-            codes.append('P67')
-        return codes
-    return None
 
 
 def get_reference_systems(
@@ -173,17 +116,17 @@ def get_reference_systems(
 def get_geometric_collection(
         entity: Entity,
         links: list[Link],
-        parser: dict[str, Any]) -> Optional[dict[str, Any]]:
+        parser: Any) -> Optional[dict[str, Any]]:
     match entity.class_.view:
         case 'place' | 'artifact':
             return get_geoms_by_entity(
                 get_location_id(links),
-                parser['centroid'])
+                parser.centroid)
         case 'actor':
             geoms = [
                 Gis.get_by_id(link_.range.id) for link_ in links
                 if link_.property.code in ['P74', 'OA8', 'OA9']]
-            if parser['centroid']:
+            if parser.centroid:
                 geoms.extend(
                     [Gis.get_centroids_by_id(link_.range.id) for link_ in links
                      if link_.property.code in ['P74', 'OA8', 'OA9']])
@@ -194,7 +137,7 @@ def get_geometric_collection(
             geoms = [
                 Gis.get_by_id(link_.range.id) for link_ in links
                 if link_.property.code in ['P7', 'P26', 'P27']]
-            if parser['centroid']:
+            if parser.centroid:
                 geoms.extend(
                     [Gis.get_centroids_by_id(link_.range.id) for link_ in links
                      if link_.property.code in ['P7', 'P26', 'P27']])
@@ -202,7 +145,7 @@ def get_geometric_collection(
                 'type': 'GeometryCollection',
                 'geometries': [geom for sublist in geoms for geom in sublist]}
         case _ if entity.class_.name == 'object_location':
-            return get_geoms_by_entity(entity.id, parser['centroid'])
+            return get_geoms_by_entity(entity.id, parser.centroid)
     return None
 
 
@@ -247,6 +190,7 @@ def get_geometries(parser: dict[str, Any]) -> list[dict[str, Any]]:
             out.append(geom)
     return out
 
+
 def date_to_str(date: Any) -> Optional[str]:
     return str(date) if date else None
 
@@ -281,3 +225,11 @@ def get_crm_code(link_: Link, inverse: bool = False) -> str:
 
 def flatten_list_and_remove_duplicates(list_: list[Any]) -> list[Any]:
     return [item for sublist in list_ for item in sublist if item not in list_]
+
+
+def get_geoms_dict(geoms: list[dict[str, Any]]) -> Optional[dict[str, Any]]:
+    if len(geoms) == 0:
+        return None
+    if len(geoms) == 1:
+        return geoms[0]
+    return {'type': 'GeometryCollection', 'geometries': geoms}

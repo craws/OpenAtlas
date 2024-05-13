@@ -29,6 +29,9 @@ class ArtifactTest(TestBaseCase):
                     'super': place.id})
             artifact_id = rv.location.split('/')[-1]
 
+            rv = self.app.get(url_for('view', id_=actor.id))
+            assert b'Love-letter' in rv.data
+
             rv = self.app.get(url_for('add_subunit', super_id=place.id))
             assert b'Love-letter' not in rv.data
 
@@ -71,16 +74,6 @@ class ArtifactTest(TestBaseCase):
                 data={'name': 'Event Zero', 'moved_artifact': [artifact_id]},
                 follow_redirects=True)
             assert b'Event Zero' in rv.data
-
-            rv = self.app.get(
-                url_for('link_insert', id_=actor.id, view='artifact'))
-            assert b'A little hate' in rv.data
-
-            rv = self.app.post(
-                url_for('link_insert', id_=actor.id, view='artifact'),
-                data={'checkbox_values': [artifact_id]},
-                follow_redirects=True)
-            assert b'A little hate' in rv.data
 
             rv = self.app.get(
                 url_for('insert', class_='artifact', origin_id=actor.id))

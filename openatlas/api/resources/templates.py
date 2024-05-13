@@ -1,10 +1,15 @@
+from __future__ import annotations
+
 from collections import defaultdict
-from typing import Any, Type
+from typing import Any, TYPE_CHECKING, Type
 
 from flask_restful import fields
 from flask_restful.fields import Integer, List, Nested, String
 
 from openatlas.models.entity import Entity
+
+if TYPE_CHECKING:  # pragma: no cover
+    from openatlas.api.endpoints.parser import Parser
 
 
 def geojson_template() -> dict[str, Any]:
@@ -60,7 +65,7 @@ def geometries_template() -> dict[str, Any]:
     return {'type': fields.String, 'features': fields.Nested(feature)}
 
 
-def linked_places_template(parser: dict[str, Any]) -> dict[str, Type[String]]:
+def linked_places_template(parser: Parser) -> dict[str, Type[String]]:
     title = {'title': fields.String}
     depictions = {
         '@id': fields.String,
@@ -76,6 +81,10 @@ def linked_places_template(parser: dict[str, Any]) -> dict[str, Type[String]]:
         'label': fields.String,
         'descriptions': fields.String,
         'hierarchy': fields.String,
+        'typeHierarchy': fields.List(fields.Nested({
+            'identifier': fields.String,
+            'label': fields.String,
+            'description': fields.String})),
         'value': fields.Float,
         'unit': fields.String}
 
@@ -99,7 +108,7 @@ def linked_places_template(parser: dict[str, Any]) -> dict[str, Type[String]]:
         'relationDescription': fields.String,
         'type': fields.String,
         'when': fields.Nested(when)}
-    if parser['format'] == 'lpx':
+    if parser.format == 'lpx':
         relations['relationTypeLabel'] = fields.String
     feature = {
         '@id': fields.String,
@@ -109,7 +118,7 @@ def linked_places_template(parser: dict[str, Any]) -> dict[str, Type[String]]:
         'viewClass': fields.String,
         'properties': fields.Nested(title),
         'descriptions': fields.List(fields.Nested(description))}
-    show = parser['show']
+    show = parser.show
     if 'when' in show:
         feature['when'] = fields.Nested(when)
     if 'types' in show:
@@ -139,7 +148,7 @@ def pagination() -> dict[str, List | Nested]:
         "totalPages": fields.Integer}
 
 
-def linked_place_pagination(parser: dict[str, str]) -> dict[str, Any]:
+def linked_place_pagination(parser: Parser) -> dict[str, Any]:
     return {
         "results": fields.List(fields.Nested(
             linked_places_template(parser))),
@@ -305,7 +314,7 @@ def class_overview_template() -> dict[str, Type[String]]:
 
 def class_mapping_template() -> dict[str, Type[String]]:
     return {
-        "locale": fields.String,
+        'locale': fields.String,
         'results': fields.List(fields.Nested({
             'label': fields.String,
             'systemClass': fields.String,
@@ -313,6 +322,25 @@ def class_mapping_template() -> dict[str, Type[String]]:
             'view': fields.String,
             'standardTypeId': fields.String,
             'icon': fields.String}))}
+
+
+def properties_template(properties: dict[str, Any]) -> dict[str, Type[String]]:
+    properties_dict = {
+        'id': fields.String,
+        'name': fields.String,
+        'nameInverse': fields.String,
+        'code': fields.String,
+        'domainClassCode': fields.String,
+        'rangeClassCode': fields.String,
+        'count': fields.String,
+        'sub': fields.String,
+        'super': fields.String,
+        'i18n': fields.Raw,
+        'i18nInverse': fields.Raw}
+    dict_: dict[str, Any] = defaultdict()
+    for key in properties:
+        dict_[key] = fields.Nested(properties_dict)
+    return dict_
 
 
 def backend_details_template() -> dict[str, Type[String]]:
@@ -330,7 +358,7 @@ def backend_details_template() -> dict[str, Type[String]]:
 
 
 def licensed_file_template(entities: list[Entity]) -> dict[str, Any]:
-    dict_: dict[str, Any] = defaultdict()
+    template: dict[str, Any] = defaultdict()
     file = {
         'display': fields.String,
         'thumbnail': fields.String,
@@ -339,5 +367,13 @@ def licensed_file_template(entities: list[Entity]) -> dict[str, Any]:
         'license': fields.String,
         'IIIFManifest': fields.String}
     for entity in entities:
-        dict_[str(entity.id)] = fields.Nested(file)
-    return dict_
+        template[str(entity.id)] = fields.Nested(file)
+    return template
+
+
+def network_visualisation_template() -> dict[str, Any]:
+    return {'results': fields.List(fields.Nested({
+        'id': fields.Integer,
+        'label': fields.String,
+        'systemClass': fields.String,
+        'relations': fields.List(fields.Integer)}))}

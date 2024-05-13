@@ -15,14 +15,21 @@ def index_changelog() -> str:
 
 
 versions = {
-    '8.4.0': ['TBA', {
+    '8.5.0': ['TBA', {}],
+    '8.4.0': ['2024-05-05', {
         'feature': {
+            '2261': 'Option to prevent selection of a type',
             '2158': 'Georeferencing files for multiple places (overlay)',
             '2157': 'Dates: improved autocomplete',
             '2244': 'Import of place hierarchy',
+            '2265': 'Import WTK multi geometries',
             '2223': 'Improved forms',
             '2246': 'Sorting of related entities in views and forms',
+            '2133': 'Better file stats',
             '2152': 'Annotations: check orphan function',
+            '2269': 'Updated French translations',
+            '2249': 'API: 0.4.2',
+            '1980': 'API: Improve LOUD',
             '2251':
                 'Presentation sites: change entity/id endpoint to entities/id',
             '2248': 'Refactor and minor improvements'}}],

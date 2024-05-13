@@ -28,29 +28,15 @@ def link_delete(id_: int, origin_id: int) -> Response:
 @required_group('contributor')
 def link_insert(id_: int, view: str) -> str | Response:
     entity = Entity.get_by_id(id_)
-    property_code = 'P67'
-    inverse = False
-    if entity.class_.view == 'actor' and view == 'artifact':
-        property_code = 'P52'
-        inverse = True
     if request.method == 'POST':
         if request.form['checkbox_values']:
-            entity.link_string(
-                property_code,
-                request.form['checkbox_values'],
-                inverse=inverse)
+            entity.link_string('P67', request.form['checkbox_values'])
         return redirect(f"{url_for('view', id_=entity.id)}#tab-{view}")
-    if entity.class_.view == 'actor' and view == 'artifact':
-        excluded = \
-            Entity.get_by_link_property(property_code, 'artifact') + \
-            Entity.get_by_link_property(property_code, 'human_remains')
-    else:
-        excluded = entity.get_linked_entities(property_code, inverse=inverse)
     return render_template(
         'content.html',
         content=get_table_form(
             g.view_class_mapping[view],
-            [e.id for e in excluded]),
+            [e.id for e in entity.get_linked_entities('P67')]),
         title=_(entity.class_.view),
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],
