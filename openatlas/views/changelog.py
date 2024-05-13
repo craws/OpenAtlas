@@ -17,7 +17,10 @@ def index_changelog() -> str:
 versions = {
     '8.5.0': ['TBA', {
         'feature': {
-            '2277': 'References for types'}}],
+            '2277': 'References for types',
+            '2273': 'API: Endpoint to retrieve all available CIDOC properties',
+            '2274': 'API: Endpoint to get related entities'
+        }}],
     '8.4.0': ['2024-05-05', {
         'feature': {
             '2261': 'Option to prevent selection of a type',
