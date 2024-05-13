@@ -18,7 +18,7 @@ class FileTest(TestBaseCase):
                 reference = insert('edition', 'Ancient Books')
 
             logo = Path(app.root_path) \
-                   / 'static' / 'images' / 'layout' / 'logo.png'
+                / 'static' / 'images' / 'layout' / 'logo.png'
 
             with open(logo, 'rb') as img_1, open(logo, 'rb') as img_2:
                 rv: Any = self.app.post(

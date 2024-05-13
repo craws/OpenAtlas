@@ -266,6 +266,9 @@ class FileManager(BaseManager):
         if not self.entity:
             fields['file'] = DragNDropField(_('file'), [InputRequired()])
             setattr(self.form_class, 'validate_file', file)
+        fields['public'] = BooleanField()
+        fields['creator'] = StringField()
+        fields['license_holder'] = StringField()
         if not self.entity \
                 and self.origin \
                 and self.origin.class_.view == 'reference':

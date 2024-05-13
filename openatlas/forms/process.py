@@ -34,7 +34,9 @@ def process_standard_fields(manager: Any) -> None:
                 'resolver_url',
                 'placeholder',
                 'classes',
-                'inverse')) \
+                'inverse',
+                'creator',
+                'license_holder')) \
                 or field_type in [
                     'CSRFTokenField',
                     'HiddenField',
@@ -93,6 +95,11 @@ def process_standard_fields(manager: Any) -> None:
                     value['value'],
                     inverse=True,
                     type_id=value['precision'])
+        elif key == 'public':
+            manager.data['file_info'] = {
+                'public': manager.form.public.data,
+                'creator': manager.form.creator.data or None,
+                'license_holder': manager.form.license_holder.data or None}
         else:  # pragma: no cover
             abort(418, f'Form error: {key}, {field_type}, value={value}')
 

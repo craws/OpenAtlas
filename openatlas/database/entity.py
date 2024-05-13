@@ -305,6 +305,27 @@ def link(data: dict[str, Any]) -> int:
     return g.cursor.fetchone()['id']
 
 
+def update_file_info(data: dict[str, Any]) -> None:
+    g.cursor.execute(
+        """
+        INSERT INTO model.file_info (
+            entity_id,
+            public,
+            creator,
+            license_holder
+        ) VALUES (
+            %(entity_id)s,
+            %(public)s,
+            %(creator)s,
+            %(license_holder)s
+        ) ON CONFLICT (entity_id) DO UPDATE SET
+            public = %(public)s,
+            creator = %(creator)s,
+            license_holder = %(license_holder)s;
+        """,
+        data)
+
+
 def get_subunits_without_super(classes: list[str]) -> list[int]:
     g.cursor.execute(
         """

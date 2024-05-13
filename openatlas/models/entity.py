@@ -201,6 +201,9 @@ class Entity:
             continue_link_id = self.update_links(data, new)
         if 'gis' in data:
             self.update_gis(data['gis'], new)
+        if self.class_.name == 'file':
+            data['file_info']['entity_id'] = self.id
+            db.update_file_info(data['file_info'])
         return continue_link_id
 
     def update_administrative_units(
