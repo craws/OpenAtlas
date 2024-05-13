@@ -470,7 +470,7 @@ class ReferenceBaseDisplay(BaseDisplay):
         super().add_tabs()
         for name in [
                 'source', 'event', 'actor', 'place', 'feature',
-                'stratigraphic_unit', 'artifact', 'file']:
+                'stratigraphic_unit', 'artifact', 'file', 'type']:
             self.tabs[name] = Tab(name, entity=self.entity)
         for link_ in self.entity.get_links('P67'):
             range_ = link_.range
@@ -542,6 +542,7 @@ class TypeBaseDisplay(BaseDisplay):
         self.tabs['subs'] = Tab('subs', entity=entity)
         self.tabs['entities'] = Tab('entities', entity=entity)
         self.tabs['file'] = Tab('file', entity=entity)
+        self.tabs['reference'] = Tab('reference', entity=entity)
         self.add_reference_tables_data()
         for sub_id in entity.subs:
             self.tabs['subs'].table.rows.append([
