@@ -1,4 +1,4 @@
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Any, Optional
 
 from flask import g, json
 
@@ -7,9 +7,6 @@ from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.models.reference_system import ReferenceSystem
-
-if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.api.endpoints.parser import Parser
 
 
 def get_license_name(entity: Entity) -> Optional[str]:
@@ -36,22 +33,25 @@ def replace_empty_list_values_in_dict_with_none(
 def get_linked_entities_api(id_: int | list[int]) -> list[Entity]:
     domain = [link_.range for link_ in Entity.get_links_of_entities(id_)]
     range_ = [
-        l.domain for l in Entity.get_links_of_entities(id_, inverse=True)]
+        link_.domain for link_ in
+        Entity.get_links_of_entities(id_, inverse=True)]
     return [*range_, *domain]
 
 
 def get_linked_entities_id_api(id_: int) -> list[Entity]:
-    domain_ids = [l.range.id for l in Entity.get_links_of_entities(id_)]
+    domain_ids = [
+        link_.range.id for link_ in Entity.get_links_of_entities(id_)]
     range_ids = [
-        l.domain.id for l in Entity.get_links_of_entities(id_, inverse=True)]
+        link_.domain.id for link_ in
+        Entity.get_links_of_entities(id_, inverse=True)]
     return [*range_ids, *domain_ids]
 
 
 def get_entities_linked_to_special_type(id_: int) -> list[Entity]:
-    domain_ids = [link_['domain_id'] for link_ in
-                  Link.get_links_by_type(g.types[id_])]
-    range_ids = [link_['range_id'] for link_ in
-                 Link.get_links_by_type(g.types[id_])]
+    domain_ids = [
+        link_['domain_id'] for link_ in Link.get_links_by_type(g.types[id_])]
+    range_ids = [
+        link_['range_id'] for link_ in Link.get_links_by_type(g.types[id_])]
     return ApiEntity.get_by_ids(
         range_ids + domain_ids,
         types=True,
@@ -85,6 +85,7 @@ def get_entities_from_type_with_subs(id_: int) -> list[Entity]:
         [link_ for link_ in entity_ids if link_ not in type_ids],
         types=True,
         aliases=True)
+
 
 def remove_duplicate_entities(entities: list[Entity]) -> list[Entity]:
     seen: set[int] = set()
