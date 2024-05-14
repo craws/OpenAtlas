@@ -15,6 +15,9 @@ def index_changelog() -> str:
 
 
 versions = {
+    '8.4.1': ['2024-05-14', {
+        'fix': {
+            '2280': 'Dynamic type add not working for single types'}}],
     '8.4.0': ['2024-05-05', {
         'feature': {
             '2261': 'Option to prevent selection of a type',
