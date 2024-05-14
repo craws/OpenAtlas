@@ -351,6 +351,9 @@ class Entity:
     def get_file_ext(self) -> str:
         return g.files[self.id].suffix if self.id in g.files else 'N/A'
 
+    def get_file_info(self) -> dict[str, Any]:
+        return db.get_file_info(self.id)
+
     @staticmethod
     def get_invalid_dates() -> list[Entity]:
         return [
