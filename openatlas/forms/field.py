@@ -394,8 +394,10 @@ class TreeField(HiddenField):
             type_id: str = '',
             filter_ids: Optional[list[int]] = None,
             is_type_form: Optional[bool] = False,
+            form: Any = None,
             **kwargs: Any) -> None:
         super().__init__(label, validators, **kwargs)
+        self.form = form
         self.type_id = type_id or self.id
         self.filters_ids = filter_ids
         self.is_type_form = is_type_form
