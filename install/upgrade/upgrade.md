@@ -17,6 +17,9 @@ then run the database upgrade script, then restart Apache:
     sudo python3 install/upgrade/database_upgrade.py
     sudo service apache2 restart
 
+### 8.4.0 to 8.4.1
+A code base update (e.g. with git pull) and a webserver restart is sufficient.
+
 ### 8.3.0 to 8.4.0
 8.4.0.sql is needed but will be taken care of by the database upgrade script.
 

@@ -261,4 +261,4 @@ def add_types(manager: Any) -> None:
                 setattr(
                     manager.form_class,
                     str(type_.id),
-                    TreeField(str(type_.id), validators))
+                    TreeField(str(type_.id), validators, form=form))
