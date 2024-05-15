@@ -275,6 +275,13 @@ class FileManager(BaseManager):
             fields['page'] = StringField()  # Needed to link file after insert
         return fields
 
+    def populate_update(self) -> None:
+        super().populate_update()
+        file_info = self.entity.get_file_info()
+        self.form.public.data = file_info['public']
+        self.form.creator.data = file_info['creator']
+        self.form.license_holder.data = file_info['license_holder']
+
 
 class GroupManager(ActorBaseManager):
     pass
