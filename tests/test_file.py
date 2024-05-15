@@ -39,6 +39,10 @@ class FileTest(TestBaseCase):
                 files = Entity.get_by_class('file')
                 file = files[0]
                 file_id = file.id
+
+            rv = self.app.get(url_for('update', id_=file_id))
+            assert b'License' in rv.data
+
             rv = self.app.get(
                 url_for('delete_iiif_file', id_=file_id),
                 follow_redirects=True)
