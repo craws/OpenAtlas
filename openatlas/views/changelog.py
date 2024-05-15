@@ -21,6 +21,9 @@ versions = {
             '2273': 'API: Endpoint to retrieve all available CIDOC properties',
             '2274': 'API: Endpoint to get related entities'
         }}],
+    '8.4.1': ['2024-05-14', {
+        'fix': {
+            '2280': 'Dynamic type add not working for single types'}}],
     '8.4.0': ['2024-05-05', {
         'feature': {
             '2261': 'Option to prevent selection of a type',
