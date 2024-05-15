@@ -48,6 +48,7 @@ ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_range_id_fk
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_property_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_domain_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.gis DROP CONSTRAINT IF EXISTS gis_entity_id_fkey;
+ALTER TABLE IF EXISTS ONLY model.file_info DROP CONSTRAINT IF EXISTS file_info_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_openatlas_class_name_fkey;
 ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_class_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_code_fkey;
@@ -68,6 +69,7 @@ DROP TRIGGER IF EXISTS update_modified ON web.hierarchy;
 DROP TRIGGER IF EXISTS update_modified ON web."group";
 DROP TRIGGER IF EXISTS update_modified ON model.link;
 DROP TRIGGER IF EXISTS update_modified ON model.gis;
+DROP TRIGGER IF EXISTS update_modified ON model.file_info;
 DROP TRIGGER IF EXISTS update_modified ON model.entity;
 DROP TRIGGER IF EXISTS on_delete_entity ON model.entity;
 DROP TRIGGER IF EXISTS update_modified ON import.project;
@@ -112,7 +114,9 @@ ALTER TABLE IF EXISTS ONLY model.openatlas_class DROP CONSTRAINT IF EXISTS opena
 ALTER TABLE IF EXISTS ONLY model.openatlas_class DROP CONSTRAINT IF EXISTS openatlas_class_name_key;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_pkey;
 ALTER TABLE IF EXISTS ONLY model.gis DROP CONSTRAINT IF EXISTS gis_pkey;
+ALTER TABLE IF EXISTS ONLY model.file_info DROP CONSTRAINT IF EXISTS file_info_pkey;
 ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_pkey;
+ALTER TABLE IF EXISTS ONLY model.file_info DROP CONSTRAINT IF EXISTS entity_id_key;
 ALTER TABLE IF EXISTS ONLY model.cidoc_class DROP CONSTRAINT IF EXISTS class_pkey;
 ALTER TABLE IF EXISTS ONLY model.cidoc_class DROP CONSTRAINT IF EXISTS class_name_key;
 ALTER TABLE IF EXISTS ONLY model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_id_sub_id_key;
@@ -196,6 +200,8 @@ DROP SEQUENCE IF EXISTS model.link_id_seq;
 DROP TABLE IF EXISTS model.link;
 DROP SEQUENCE IF EXISTS model.gis_id_seq;
 DROP TABLE IF EXISTS model.gis;
+DROP TABLE IF EXISTS model.file_info;
+DROP SEQUENCE IF EXISTS model.file_info_id_seq;
 DROP SEQUENCE IF EXISTS model.entity_id_seq;
 DROP TABLE IF EXISTS model.entity;
 DROP SEQUENCE IF EXISTS model.cidoc_class_inheritance_id_seq;
@@ -550,6 +556,44 @@ ALTER TABLE model.entity_id_seq OWNER TO openatlas;
 --
 
 ALTER SEQUENCE model.entity_id_seq OWNED BY model.entity.id;
+
+
+--
+-- Name: file_info_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
+--
+
+CREATE SEQUENCE model.file_info_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    MAXVALUE 2147483647
+    CACHE 1;
+
+
+ALTER TABLE model.file_info_id_seq OWNER TO openatlas;
+
+--
+-- Name: file_info; Type: TABLE; Schema: model; Owner: openatlas
+--
+
+CREATE TABLE model.file_info (
+    id integer DEFAULT nextval('model.file_info_id_seq'::regclass) NOT NULL,
+    entity_id integer,
+    public boolean DEFAULT false,
+    creator text,
+    license_holder text,
+    created timestamp without time zone DEFAULT now() NOT NULL,
+    modified timestamp without time zone
+);
+
+
+ALTER TABLE model.file_info OWNER TO openatlas;
+
+--
+-- Name: TABLE file_info; Type: COMMENT; Schema: model; Owner: openatlas
+--
+
+COMMENT ON TABLE model.file_info IS 'Indicates if public sharing of corresponding file is allowed.';
 
 
 --
@@ -1717,11 +1761,27 @@ ALTER TABLE ONLY model.cidoc_class
 
 
 --
+-- Name: file_info entity_id_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.file_info
+    ADD CONSTRAINT entity_id_key UNIQUE (entity_id);
+
+
+--
 -- Name: entity entity_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY model.entity
     ADD CONSTRAINT entity_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: file_info file_info_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.file_info
+    ADD CONSTRAINT file_info_pkey PRIMARY KEY (id);
 
 
 --
@@ -2074,6 +2134,13 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON model.entity FOR EACH ROW EXECUT
 
 
 --
+-- Name: file_info update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
+--
+
+CREATE TRIGGER update_modified BEFORE UPDATE ON model.file_info FOR EACH ROW EXECUTE FUNCTION model.update_modified();
+
+
+--
 -- Name: gis update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
 --
 
@@ -2219,6 +2286,14 @@ ALTER TABLE ONLY model.entity
 
 ALTER TABLE ONLY model.entity
     ADD CONSTRAINT entity_openatlas_class_name_fkey FOREIGN KEY (openatlas_class_name) REFERENCES model.openatlas_class(name) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: file_info file_info_entity_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.file_info
+    ADD CONSTRAINT file_info_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

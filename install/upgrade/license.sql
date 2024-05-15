@@ -13,7 +13,7 @@ CREATE SEQUENCE model.file_info_id_seq
 ALTER TABLE model.file_info_id_seq OWNER TO openatlas;
 
 CREATE TABLE model.file_info (
-    id integer DEFAULT nextval('file_info_id_seq'::regclass) NOT NULL,
+    id integer DEFAULT nextval('model.file_info_id_seq'::regclass) NOT NULL,
     entity_id integer,
     public boolean DEFAULT false,
     creator text,
@@ -26,7 +26,7 @@ COMMENT ON TABLE model.file_info IS 'Indicates if public sharing of correspondin
 ALTER TABLE model.file_info OWNER TO openatlas;
 
 ALTER TABLE model.file_info ADD CONSTRAINT entity_id_key UNIQUE (entity_id);
-ALTER TABLE model.file_info ADD CONSTRAINT type_none_selectable_entity_id_fkey
+ALTER TABLE model.file_info ADD CONSTRAINT file_info_entity_id_fkey
     FOREIGN KEY (entity_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 CREATE TRIGGER update_modified BEFORE
