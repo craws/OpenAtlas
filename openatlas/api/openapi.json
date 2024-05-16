@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.3f",
+    "version": "0.4.3g",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -987,6 +987,9 @@
             "$ref": "#/components/parameters/exclude_system_classes"
           },
           {
+            "$ref": "#/components/parameters/linked_to_ids"
+          },
+          {
             "$ref": "#/components/parameters/download"
           }
         ],
@@ -1488,7 +1491,7 @@
       },
       "search": {
         "name": "search",
-        "description": "Search query for specific results.\n\n **Filterable categories**\n\n entityName, entityDescription, entityAliases, entityCidocClass, entitySystemClass, entityID, typeID, valueTypeID, typeIDWithSubs, typeName, beginFrom, beginTo, endFrom, endTo, relationToID\n\n **Values** \n\n Values has to be a list of items. The items can be either a string, an integer or a tuple (see Note). Strings need to be marked with \u201c\u201d or \u2018\u2019, while integers doesn\u2019t allow this.\\n *Note*: the category valueTypeID can search for values of a type ID. But it takes one or more two valued Tuple as list entry: (x,y). x is the type id and y is the searched value. This can be an int or a float, e.g: `{\"operator\":\"lesserThan\",\"values\":[(3142,543.3)],\"logicalOperator\":\"and\"}`\n\n **Compare operators** \n\n equal, notEqual, like (1), greaterThan (2), greaterThanEqual (2), lesserThan (2)\n\nThe compare operators work like the mathematical operators. equal x=y, notEqual x!=y, greaterThan x>y , greaterThanEqual x>=y, lesserThan x<y, lesserThanEqual x<=y. The like operator searches for occurrence of the string, so a match can also occur in the middle of a word.\n\n(1)Only for string based categories\n\n(2)Only for beginFrom, beginTo, endFrom, endTo, valueTypeID\n\n**Logical operators**\n\nNot mandatory, OR is the default value. Logical operators handles, if the values are treated as OR or AND.",
+        "description": "Search query for specific results.\n\n **Filterable categories**\n\n entityName, entityDescription, entityAliases, entityCidocClass, entitySystemClass, entityID, typeID, valueTypeID, typeIDWithSubs, typeName, beginFrom, beginTo, endFrom, endTo, relationToID\n\n **Values** \n\n Values has to be a list of items. The items can be either a string, an integer or a tuple (see Note). Strings need to be marked with \u201c\u201d or \u2018\u2019, while integers does not allow this.\\n *Note*: the category valueTypeID can search for values of a type ID. But it takes one or more two valued Tuple as list entry: (x,y). x is the type id and y is the searched value. This can be an int or a float, e.g: `{\"operator\":\"lesserThan\",\"values\":[(3142,543.3)],\"logicalOperator\":\"and\"}`\n\n **Compare operators** \n\n equal, notEqual, like (1), greaterThan (2), greaterThanEqual (2), lesserThan (2)\n\nThe compare operators work like the mathematical operators. equal x=y, notEqual x!=y, greaterThan x>y , greaterThanEqual x>=y, lesserThan x<y, lesserThanEqual x<=y. The like operator searches for occurrence of the string, so a match can also occur in the middle of a word.\n\n(1)Only for string based categories\n\n(2)Only for beginFrom, beginTo, endFrom, endTo, valueTypeID\n\n**Logical operators**\n\nNot mandatory, OR is the default value. Logical operators handles, if the values are treated as OR or AND.",
         "in": "query",
         "content": {
           "application/json": {
@@ -2124,6 +2127,18 @@
             ]
           }
         }
+      },
+      "linked_to_ids": {
+        "name": "linked_to_ids",
+        "description": "Show only entities, which are linked to given IDs",
+        "in": "query",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "explode": true
       },
       "image_size": {
         "name": "image_size",
