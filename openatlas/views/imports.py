@@ -363,7 +363,7 @@ def check_data_for_table_representation(
         if origin_ids else None
     if existing:
         checks.set_error('ids_already_in_database', ', '.join(existing))
-    entity_dict = {row.get('id'): row for row in checked_data}
+    entity_dict: dict[str, Any] = {row.get('id'): row for row in checked_data}
     for row in checked_data:
         if parent_id := row.get('parent_id'):
             if parent_id not in origin_ids:
