@@ -376,8 +376,8 @@ def check_data_for_table_representation(
 def check_parent(
         entry: dict[str, Any],
         entity_dict: dict[str, Any]) -> bool:
-    parent_class = entity_dict[entry.get('parent_id')][
-        'openatlas_class'].lower().replace(' ', '_')
+    parent_class = entity_dict[
+        entry['parent_id']]['openatlas_class'].lower().replace(' ', '_')
     match entry['openatlas_class'].lower().replace(' ', '_'):
         case 'feature':
             if parent_class == 'place':
