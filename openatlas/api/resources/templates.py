@@ -71,7 +71,9 @@ def linked_places_template(parser: Parser) -> dict[str, Type[String]]:
         '@id': fields.String,
         'title': fields.String,
         'license': fields.String,
-        'url': fields.String}
+        'url': fields.String,
+        'mimetype': fields.String,
+        'IIIFManifest': fields.String}
     links = {
         'type': fields.String,
         'identifier': fields.String,

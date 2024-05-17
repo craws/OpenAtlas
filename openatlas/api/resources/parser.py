@@ -226,3 +226,9 @@ network.add_argument(
     help="{error_msg}",
     action='append',
     location='args')
+network.add_argument(
+    'linked_to_ids',
+    type=int,
+    help='{error_msg}',
+    action='append',
+    location='args')

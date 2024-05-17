@@ -178,6 +178,11 @@ class Api(ApiTestCase):
                 exclude_system_classes='type'))
             rv = rv.get_json()
             assert bool(len(rv['results']) == 70)
+            rv = self.app.get(url_for(
+                'api_04.network_visualisation',
+                linked_to_ids=boundary_mark.id))
+            rv = rv.get_json()
+            assert bool(len(rv['results']) == 3)
             rv = self.app.get(
                 url_for('api_04.network_visualisation', download=True))
             rv = rv.get_json()

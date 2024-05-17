@@ -20,6 +20,9 @@ versions = {
             '2277': 'References for types',
             '2273': 'API: Endpoint to retrieve all available CIDOC properties',
             '2274': 'API: Endpoint to get related entities'
+        },
+        'fix': {
+            '2278': 'Import Place Hierarchy'
         }}],
     '8.4.1': ['2024-05-14', {
         'fix': {

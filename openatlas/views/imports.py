@@ -83,11 +83,11 @@ class CheckHandler:
         self.messages: dict[str, list[str]] = {'error': [], 'warn': []}
 
     def set_warning(self, name: str, value: Optional[str] = None) -> None:
-        self.warning[name].add(value)
+        self.warning[name].add(str(value))
         self.generate_warning_messages()
 
     def set_error(self, name: str, value: Optional[str] = None) -> None:
-        self.error[name].add(value)
+        self.error[name].add(str(value))
         self.generate_error_messages()
 
     def add_warn_message(self, message: str) -> None:
@@ -328,7 +328,7 @@ def check_data_for_table_representation(
     file_ = request.files['file']
     file_path = app.config['TMP_PATH'] / secure_filename(str(file_.filename))
     file_.save(str(file_path))
-    data_frame = pd.read_csv(file_path, keep_default_na=False)
+    data_frame = pd.read_csv(file_path, keep_default_na=False, dtype=str)
     headers = get_clean_header(data_frame, class_, checks)
     table_data = []
     origin_ids = []
@@ -363,23 +363,21 @@ def check_data_for_table_representation(
         if origin_ids else None
     if existing:
         checks.set_error('ids_already_in_database', ', '.join(existing))
+    entity_dict: dict[str, Any] = {row.get('id'): row for row in checked_data}
     for row in checked_data:
         if parent_id := row.get('parent_id'):
             if parent_id not in origin_ids:
                 checks.set_error('invalid parent id', row.get('id'))
-            if not check_parent(row, checked_data):
+            if not check_parent(row, entity_dict):
                 checks.set_error('invalid parent class', row.get('id'))
     return Table(headers, rows=table_data)
 
 
 def check_parent(
         entry: dict[str, Any],
-        checked_data: list[Any]) -> bool:
-    entity_dict = {}
-    for row in checked_data:
-        entity_dict[row.get('id')] = row
-    parent_class = entity_dict[entry.get('parent_id')][
-        'openatlas_class'].lower().replace(' ', '_')
+        entity_dict: dict[str, Any]) -> bool:
+    parent_class = entity_dict[
+        entry['parent_id']]['openatlas_class'].lower().replace(' ', '_')
     match entry['openatlas_class'].lower().replace(' ', '_'):
         case 'feature':
             if parent_class == 'place':
@@ -446,6 +444,9 @@ def check_cell_value(
         checks: CheckHandler) -> str:
     value = row[item]
     id_ = row.get('id')
+    if openatlas_class := row.get('openatlas_class'):
+        if openatlas_class in g.classes:
+            class_ = openatlas_class
     match item:
         case 'type_ids' if value:
             type_ids = []
