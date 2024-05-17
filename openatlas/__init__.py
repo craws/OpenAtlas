@@ -42,7 +42,6 @@ def get_locale() -> str:
 
 @app.before_request
 def before_request() -> None:
-    from openatlas.api.resources.openapi_util import write_openapi_instance
     from openatlas.models.openatlas_class import (
         OpenatlasClass, view_class_mapping)
     from openatlas.models.cidoc_property import CidocProperty
@@ -76,6 +75,16 @@ def before_request() -> None:
     g.view_class_mapping = view_class_mapping
     g.class_view_mapping = OpenatlasClass.get_class_view_mapping()
     g.table_headers = OpenatlasClass.get_table_headers()
+    g.writable_paths = [
+        app.config['EXPORT_PATH'],
+        app.config['RESIZED_IMAGES'],
+        app.config['UPLOAD_PATH'],
+        app.config['TMP_PATH']]
+    setup_files()
+    setup_api()
+
+
+def setup_files() -> None:
     g.files = {}
     for file_ in app.config['UPLOAD_PATH'].iterdir():
         if file_.stem.isdigit():
@@ -85,13 +94,12 @@ def before_request() -> None:
     g.display_file_ext = app.config['DISPLAY_FILE_EXT']
     if g.settings['image_processing']:
         g.display_file_ext += app.config['PROCESSABLE_EXT']
-    g.writable_paths = [
-        app.config['EXPORT_PATH'],
-        app.config['RESIZED_IMAGES'],
-        app.config['UPLOAD_PATH'],
-        app.config['TMP_PATH']]
     if g.settings['iiif'] and g.settings['iiif_path']:
         g.writable_paths.append(g.settings['iiif_path'])
+
+
+def setup_api() -> None:
+    from openatlas.api.resources.openapi_util import write_openapi_instance
     if request.path.startswith('/swagger'):
         write_openapi_instance()
     elif request.path.startswith('/api/'):
