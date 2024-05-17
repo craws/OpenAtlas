@@ -9,6 +9,7 @@ from psycopg2 import extras
 
 from openatlas.api.resources.error import AccessDeniedError
 from openatlas.database.connect import close_connection, open_connection
+from openatlas.models.entity import Entity
 
 app: Flask = Flask(__name__, instance_relative_config=True)
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
@@ -96,6 +97,7 @@ def setup_files() -> None:
         g.display_file_ext += app.config['PROCESSABLE_EXT']
     if g.settings['iiif'] and g.settings['iiif_path']:
         g.writable_paths.append(g.settings['iiif_path'])
+    g.file_info = Entity.get_all_file_info()
 
 
 def setup_api() -> None:

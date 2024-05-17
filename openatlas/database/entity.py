@@ -335,10 +335,16 @@ def get_file_info(id_: int) -> dict[str, Any]:
         """
         SELECT public, creator, license_holder
         FROM model.file_info
-        WHERE entity_id = %(id)s
+        WHERE entity_id = %(id)s;
         """,
         {'id': id_})
     return dict(g.cursor.fetchone()) if g.cursor.rowcount else default
+
+
+def get_all_file_info() -> dict[str, Any]:
+    g.cursor.execute(
+        "SELECT id, public, creator, license_holder FROM model.file_info;")
+    return [dict(row) for row in g.cursor.fetchall()]
 
 
 def get_subunits_without_super(classes: list[str]) -> list[int]:

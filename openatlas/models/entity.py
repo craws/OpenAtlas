@@ -355,6 +355,10 @@ class Entity:
         return db.get_file_info(self.id)
 
     @staticmethod
+    def get_all_file_info() -> dict[int, Any]:
+        db.get_all_file_info()
+
+    @staticmethod
     def get_invalid_dates() -> list[Entity]:
         return [
             Entity.get_by_id(row['id'], types=True)
