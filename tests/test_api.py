@@ -643,7 +643,7 @@ class Api(ApiTestCase):
                     system_classes='person',
                     format='lp',
                     search="""{"beginFrom":[{"operator":"lesserThan",
-                        "values":["2020-1-1"],"logicalOperator":"and"}]}""")),
+                        "values":["2020-01-01"],"logicalOperator":"and"}]}""")),
                 self.app.get(url_for(
                     'api_04.query',
                     entities=place.id,
@@ -652,7 +652,7 @@ class Api(ApiTestCase):
                     system_classes='person',
                     format='lp',
                     search="""{"beginFrom":[{"operator":"lesserThan",
-                        "values":["2020-1-1"],"logicalOperator":"or"}]}""")),
+                        "values":["2020-01-01"],"logicalOperator":"or"}]}""")),
                 self.app.get(url_for(
                     'api_04.query',
                     entities=place.id,
@@ -661,7 +661,7 @@ class Api(ApiTestCase):
                     system_classes='person',
                     format='lp',
                     search="""{"beginTo":[{"operator":"lesserThanEqual",
-                        "values":["2018-3-01"],"logicalOperator":"and"}]}""")),
+                        "values":["2018-03-01"],"logicalOperator":"and"}]}""")),
                 self.app.get(url_for(
                     'api_04.query',
                     entities=place.id,
@@ -670,7 +670,7 @@ class Api(ApiTestCase):
                     system_classes='person',
                     format='lp',
                     search="""{"beginTo":[{"operator":"lesserThanEqual",
-                        "values":["2018-3-01"],"logicalOperator":"or"}]}""")),
+                        "values":["2018-03-01"],"logicalOperator":"or"}]}""")),
                 self.app.get(url_for(
                     'api_04.query',
                     entities=place.id,
@@ -679,7 +679,7 @@ class Api(ApiTestCase):
                     system_classes='person',
                     format='lp',
                     search="""{"endFrom":[{"operator":"greaterThan",
-                        "values":["2013-2-1"],"logicalOperator":"and"}]}""")),
+                        "values":["2013-02-01"],"logicalOperator":"and"}]}""")),
                 self.app.get(url_for(
                     'api_04.query',
                     entities=place.id,
@@ -688,7 +688,7 @@ class Api(ApiTestCase):
                     system_classes='person',
                     format='lp',
                     search="""{"endFrom":[{"operator":"greaterThan",
-                        "values":["2013-2-1"],"logicalOperator":"or"}]}""")),
+                        "values":["2013-02-01"],"logicalOperator":"or"}]}""")),
                 self.app.get(url_for(
                     'api_04.query',
                     entities=place.id,
@@ -965,13 +965,29 @@ class Api(ApiTestCase):
                 search='{"typeName":[{"operator":"notEqual",'
                        '"values":[],'
                        '"logicalOperator":"or"}]}'))
-            assert 'No search values' in rv.get_json()['title']
+            assert 'No search value' in rv.get_json()['title']
+
+            rv = self.app.get(url_for(
+                'api_04.view_class',
+                view_class='place',
+                search='{"beginFrom":[{"operator":"notEqual",'
+                       '"values":["Help"],'
+                       '"logicalOperator":"or"}]}'))
+            assert 'Invalid search values' in rv.get_json()['title']
+
+            rv = self.app.get(url_for(
+                'api_04.view_class',
+                view_class='place',
+                search='{"beginFrom":[{"operator":"notEqual",'
+                       '"values":["800-1-1", "Help"],'
+                       '"logicalOperator":"or"}]}'))
+            assert 'Invalid search values' in rv.get_json()['title']
 
             rv = self.app.get(url_for(
                 'api_04.view_class',
                 view_class='place',
                 search='"beginFrom":[{"operator":"lesserThan",'
-                       '"values":["2000-1-1"],'
+                       '"values":["2000-01-01"],'
                        '"logicalOperator":"or"}]}'))
             assert 'Invalid search syntax' in rv.get_json()['title']
 

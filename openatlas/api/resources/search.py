@@ -2,8 +2,6 @@ from typing import Any, Tuple
 
 from flask import g
 
-from openatlas.api.resources.search_validation import (
-    check_if_date)
 from openatlas.api.resources.util import (
     flatten_list_and_remove_duplicates, get_linked_entities_id_api)
 from openatlas.models.entity import Entity
@@ -134,13 +132,13 @@ def value_to_be_searched(entity: Entity, key: str) -> Any:
         case "typeID" | "typeIDWithSubs":
             value = [type_.id for type_ in entity.types]
         case "beginFrom":
-            value = check_if_date(str(entity.begin_from))
+            value = entity.begin_from
         case "beginTo":
-            value = check_if_date(str(entity.begin_to))
+            value = entity.begin_to
         case "endFrom":
-            value = check_if_date(str(entity.end_from))
+            value = entity.end_from
         case "endTo":
-            value = check_if_date(str(entity.end_to))
+            value = entity.end_to
         case _:
             value = []
     return value

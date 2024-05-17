@@ -15,12 +15,12 @@ from openatlas import app
 from openatlas.api.formats.linked_places import (
     get_lp_file, get_lp_links, get_lp_time)
 from openatlas.api.resources.error import (
-    EntityDoesNotExistError, InvalidSearchSyntax, LastEntityError,
-    LogicalOperatorError, NoSearchStringError, OperatorError, SearchValueError,
-    ValueNotIntegerError)
+    EntityDoesNotExistError, InvalidSearchSyntax, InvalidSearchValueError,
+    LastEntityError)
 from openatlas.api.resources.search import (
     get_search_values, search_entity, value_to_be_searched)
-from openatlas.api.resources.search_validation import check_if_date_search
+from openatlas.api.resources.search_validation import check_if_date_search, \
+    check_search_parameters
 from openatlas.api.resources.templates import (
     geojson_pagination, linked_place_pagination, loud_pagination)
 from openatlas.api.resources.util import (
@@ -76,24 +76,20 @@ class Parser:
         except Exception as e:
             raise InvalidSearchSyntax from e
         for param in parameters:
-            for search_key, value_list in param.items():
+            for category, value_list in param.items():
                 for values in value_list:
-                    values['logicalOperator'] = \
-                        values.get('logicalOperator') or 'or'
-                    if values['logicalOperator'] \
-                            not in app.config['LOGICAL_OPERATOR']:
-                        raise LogicalOperatorError
-                    if (values['operator'] not in
-                            app.config['COMPARE_OPERATORS']):
-                        raise OperatorError
-                    if not values["values"]:
-                        raise NoSearchStringError
-                    if search_key not in app.config['VALID_VALUES']:
-                        raise SearchValueError
-                    if search_key in app.config['INT_VALUES']:
-                        for value in values['values']:
-                            if not isinstance(value, int):
-                                raise ValueNotIntegerError
+                    values['logicalOperator'] = (
+                            values.get('logicalOperator') or 'or')
+                    check_search_parameters(category, values)
+                    if check_if_date_search(category):
+                        try:
+                            values["values"] = [
+                                numpy.datetime64(values["values"][0])]
+                        except ValueError as e:
+                            raise InvalidSearchValueError(
+                                category,
+                                values["values"]) from e
+
         self.search_param = []
         for param in parameters:
             for category, values in param.items():
@@ -134,8 +130,7 @@ class Parser:
             return entity.cidoc_class.name
         if self.column == 'system_class':
             return entity.class_.name
-        if self.column in [
-            'begin_from', 'begin_to', 'end_from', 'end_to']:
+        if self.column in ['begin_from', 'begin_to', 'end_from', 'end_to']:
             if not getattr(entity, self.column):
                 date = ("-" if self.sort == 'desc' else "") \
                        + '9999999-01-01T00:00:00'

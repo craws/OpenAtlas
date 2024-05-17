@@ -7,10 +7,11 @@ from openatlas import app
 from openatlas.api.resources.error import (
     AccessDeniedError, DisplayFileNotFoundError, EntityDoesNotExistError,
     InvalidCidocClassCodeError, InvalidLimitError, InvalidSearchSyntax,
-    InvalidSystemClassError, InvalidViewClassError, LastEntityError,
+    InvalidSearchValueError, InvalidSystemClassError, InvalidViewClassError,
+    LastEntityError,
     LogicalOperatorError, NoLicenseError, NoSearchStringError,
     NotAPlaceError, NotATypeError, OperatorError, QueryEmptyError,
-    SearchValueError, ValueNotIntegerError)
+    InvalidSearchCategoryError, ValueNotIntegerError)
 
 
 @app.errorhandler(400)
@@ -195,10 +196,10 @@ def no_license(_e: Exception) -> tuple[Any, int]:
 
 
 @app.errorhandler(NoSearchStringError)
-def no_search_string(_e: Exception) -> tuple[Any, int]:
+def no_search_string(_e: NoSearchStringError) -> tuple[Any, int]:
     return jsonify({
-        'title': 'No search values',
-        'message': 'Search values are empty.',
+        'title': 'No search value',
+        'message': f'Search value for {_e.category} is missing.',
         'url': request.url,
         'timestamp': datetime.datetime.now(),
         'status': 400}), 400
@@ -249,13 +250,24 @@ def empty_query(_e: Exception) -> tuple[Any, int]:
         'status': 400}), 400
 
 
-@app.errorhandler(SearchValueError)
+@app.errorhandler(InvalidSearchCategoryError)
 def invalid_search_category(_e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'Invalid search category',
         'message':
             'The search category is invalid. Please use: '
             f'{app.config["VALID_VALUES"]}',
+        'url': request.url,
+        'timestamp': datetime.datetime.now(),
+        'status': 400}), 400
+
+
+@app.errorhandler(InvalidSearchValueError)
+def invalid_search_value(_e: InvalidSearchValueError) -> tuple[Any, int]:
+    return jsonify({
+        'title': 'Invalid search values',
+        'message':
+            f'Search value is invalid for {_e.category}: {_e.values} ',
         'url': request.url,
         'timestamp': datetime.datetime.now(),
         'status': 400}), 400

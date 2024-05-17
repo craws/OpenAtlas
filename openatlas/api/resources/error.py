@@ -47,7 +47,9 @@ class NoLicenseError(Exception):
 
 
 class NoSearchStringError(Exception):
-    pass
+    def __init__(self, category, ):
+        super().__init__()
+        self.category = category
 
 
 class NotATypeError(Exception):
@@ -66,8 +68,15 @@ class QueryEmptyError(Exception):
     pass
 
 
-class SearchValueError(Exception):
+class InvalidSearchCategoryError(Exception):
     pass
+
+
+class InvalidSearchValueError(Exception):
+    def __init__(self, category, values):
+        super().__init__()
+        self.category = category
+        self.values = values
 
 
 class TypeIDError(Exception):
