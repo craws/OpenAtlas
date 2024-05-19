@@ -1,9 +1,9 @@
 BEGIN;
 
--- #2129: Attributions for files
-DROP TABLE IF EXISTS model.file_info;
-DROP SEQUENCE IF EXISTS file_info_id_seq;
+-- Raise database version
+UPDATE web.settings SET value = '8.5.0' WHERE name = 'database_version';
 
+-- #2129: Attributions for files
 CREATE SEQUENCE model.file_info_id_seq
     START WITH 1
     INCREMENT BY 1
