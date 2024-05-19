@@ -72,6 +72,15 @@ class Entity:
             self.last = format_date_part(self.end_to, 'year') \
                 if self.end_to else self.last
 
+        if self.class_.name == 'file':
+            self.public = False
+            self.creator = None
+            self.license_holder = None
+            if self.id in g.file_info:
+                self.public = g.file_info[self.id]['public']
+                self.creator = g.file_info[self.id]['creator']
+                self.license_holder = g.file_info[self.id]['license_holder']
+
     def get_linked_entity(
             self,
             code: str,
@@ -351,12 +360,9 @@ class Entity:
     def get_file_ext(self) -> str:
         return g.files[self.id].suffix if self.id in g.files else 'N/A'
 
-    def get_file_info(self) -> dict[str, Any]:
-        return db.get_file_info(self.id)
-
     @staticmethod
-    def get_all_file_info() -> dict[int, Any]:
-        db.get_all_file_info()
+    def get_file_info() -> dict[int, Any]:
+        return db.get_file_info()
 
     @staticmethod
     def get_invalid_dates() -> list[Entity]:

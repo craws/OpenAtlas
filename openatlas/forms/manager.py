@@ -277,10 +277,9 @@ class FileManager(BaseManager):
 
     def populate_update(self) -> None:
         super().populate_update()
-        file_info = self.entity.get_file_info()
-        self.form.public.data = file_info['public']
-        self.form.creator.data = file_info['creator']
-        self.form.license_holder.data = file_info['license_holder']
+        self.form.public.data = self.entity.public
+        self.form.creator.data = self.entity.creator
+        self.form.license_holder.data = self.entity.license_holder
 
 
 class GroupManager(ActorBaseManager):

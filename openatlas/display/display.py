@@ -67,9 +67,10 @@ class FileDisplay(BaseDisplay):
 
     def add_data(self) -> None:
         super().add_data()
-        self.data = self.data | self.entity.get_file_info()
         self.data['public'] = str(_('yes')) \
-            if self.data['public'] else str(_('no'))
+            if self.entity.public else str(_('no'))
+        self.data['creator'] = self.entity.creator
+        self.data['license_holder'] = self.entity.license_holder
         self.data[_('size')] = self.entity.get_file_size()
         self.data[_('extension')] = self.entity.get_file_ext()
 
