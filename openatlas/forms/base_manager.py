@@ -86,8 +86,6 @@ class BaseManager:
             setattr(Form, 'gis_points', HiddenField(default='[]'))
             setattr(Form, 'gis_polygons', HiddenField(default='[]'))
             setattr(Form, 'gis_lines', HiddenField(default='[]'))
-        if 'annotation' in self.fields:
-            setattr(Form, 'annotation', HiddenField(default='[]'))
         self.add_buttons()
         self.form: Any = Form(obj=self.link_ or self.entity)
         self.customize_labels()
@@ -227,8 +225,6 @@ class BaseManager:
             self.data['gis'] = {
                 shape: getattr(self.form, f'gis_{shape}s').data
                 for shape in ['point', 'line', 'polygon']}
-        if 'annotation' in self.fields:
-            self.data['annotation'] = getattr(self.form, 'annotation').data
 
     def insert_entity(self) -> None:
         self.entity = Entity.insert(self.class_.name, self.form.name.data)
