@@ -266,7 +266,7 @@ class FileManager(BaseManager):
         if not self.entity:
             fields['file'] = DragNDropField(_('file'), [InputRequired()])
             setattr(self.form_class, 'validate_file', file)
-        fields['public'] = BooleanField()
+        fields['public'] = BooleanField(_('public sharing allowed'))
         fields['creator'] = StringField()
         fields['license_holder'] = StringField()
         if not self.entity \
