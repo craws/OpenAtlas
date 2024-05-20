@@ -27,6 +27,15 @@ Form fields
   one
 * :doc:`/ui/description`
 
+Form fields important for public sharing
+----------------------------------------
+Beside the license other information is important in case it is planned to
+share files with the public, e.g. at a presentation site or a public archive.
+More information is available at :ref:`public_sharing_label`
+
+* **Public sharing allowed** - indicates if public sharing is allowed
+* **Creator** - the creator of the file, e.g. the designer of a logo
+* **License holder** - in case the creator isn't also the license holder
 
 Can be linked via tabs to
 -------------------------
@@ -36,10 +45,8 @@ Can be linked via tabs to
 * :doc:`/entity/place`
 * :doc:`/entity/reference`
 
-
 Settings
 --------
-
 * **Maximum file size in MB** - this limits also the total size of multiple
   file upload
 * **Profile image width in pixel** - related to the layout of info tabs
@@ -66,3 +73,34 @@ have **Show icons in tables** in their :doc:`/tools/profile` activated, small
 images of files are shown in tables.
 
 Please be aware with many files and large tables this can impact performance.
+
+How to make files available for the public
+------------------------------------------
+In case it is planned to share files with the public, e.g. at a presentation
+site or a public archive, several criteria have to be met.
+
+Criteria checked by the software
+********************************
+* The file must exist
+* A license has to be specified
+* It has to be marked with **public sharing allowed**
+
+In case these criteria aren't met, a file won't be:
+* Shared via the :doc:`/technical/api`
+* Won't show up on presentation sites developed by the OpenAtlas team
+* Won't be included in case the long time archiving system
+  `ARCHE <https://arche.acdh.oeaw.ac.at/>`_ is used
+
+Criteria checked by managers and users
+**************************************
+* The linked license is the correct one and allows public sharing
+* Other license specific criteria, e.g. specifying the creator, are met
+
+There are many licenses with many different criteria, e.g. a
+CC-BY 4.0 license requires the attribution to the creator. Because it is not
+possible to check these automatically, it is the responsibility of
+the project management to ensure that all necessary requirements
+are met and to indicated it via setting the **public sharing allowed** flag.
+
+Be aware that licenses can be linked to an external reference (e.g. an URL)
+which might be informative for other users or viewers.
