@@ -187,8 +187,7 @@ class Api(ApiTestCase):
             rv = self.app.get(
                 url_for('api_04.network_visualisation', download=True))
             rv = rv.get_json()
-            # 158 != 160 after license changes (Alex)
-            # assert bool(len(rv['results']) == 160)
+            assert bool(len(rv['results']) == 158)
 
             for rv in [
                 self.app.get(url_for('api_04.geometric_entities')),
