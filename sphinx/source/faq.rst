@@ -91,6 +91,10 @@ In case these criteria aren't met, a file won't be:
 * Won't be included in case the long time archiving
   system `ARCHE <https://arche.acdh.oeaw.ac.at/>`_ is used
 
+But be aware that although the file itself won't be shared, the file
+information (e.g. filename) will still be available (e.g. shown on a
+presentation site).
+
 Criteria checked by users
 *************************
 * The linked license has to be the correct one and allow public sharing
