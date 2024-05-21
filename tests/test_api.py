@@ -98,7 +98,7 @@ class Api(ApiTestCase):
                             file_without_file = entity
                         case 'OpenAtlas logo':
                             file = entity
-                        case 'Open license':
+                        case 'Public domain':
                             open_license = entity
 
             # Test Swagger UI
@@ -168,14 +168,15 @@ class Api(ApiTestCase):
             assert self.get_bool(
                 rv.get_json()[str(file.id)],
                 'license',
-                'Open license')
+                'Public domain')
 
             rv = self.app.get(url_for('api.licensed_file_overview'))
             assert bool(len(rv.get_json().keys()) == 4)
 
-            rv = self.app.get(url_for(
-                'api_04.network_visualisation',
-                exclude_system_classes='type'))
+            rv = self.app.get(
+                url_for(
+                    'api_04.network_visualisation',
+                    exclude_system_classes='type'))
             rv = rv.get_json()
             assert bool(len(rv['results']) == 70)
             rv = self.app.get(url_for(
@@ -186,7 +187,7 @@ class Api(ApiTestCase):
             rv = self.app.get(
                 url_for('api_04.network_visualisation', download=True))
             rv = rv.get_json()
-            assert bool(len(rv['results']) == 160)
+            assert bool(len(rv['results']) == 158)
 
             for rv in [
                 self.app.get(url_for('api_04.geometric_entities')),
@@ -260,7 +261,7 @@ class Api(ApiTestCase):
             assert self.get_bool(
                 rv['depictions'][0], 'title', 'Picture with a License')
             assert self.get_bool(
-                rv['depictions'][0], 'license', 'Open license')
+                rv['depictions'][0], 'license', 'Public domain')
             assert self.get_bool(rv['depictions'][0], 'url')
 
             rv = self.app.get(url_for(

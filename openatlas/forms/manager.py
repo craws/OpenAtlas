@@ -266,11 +266,20 @@ class FileManager(BaseManager):
         if not self.entity:
             fields['file'] = DragNDropField(_('file'), [InputRequired()])
             setattr(self.form_class, 'validate_file', file)
+        fields['public'] = BooleanField(_('public sharing allowed'))
+        fields['creator'] = StringField()
+        fields['license_holder'] = StringField()
         if not self.entity \
                 and self.origin \
                 and self.origin.class_.view == 'reference':
             fields['page'] = StringField()  # Needed to link file after insert
         return fields
+
+    def populate_update(self) -> None:
+        super().populate_update()
+        self.form.public.data = self.entity.public
+        self.form.creator.data = self.entity.creator
+        self.form.license_holder.data = self.entity.license_holder
 
 
 class GroupManager(ActorBaseManager):

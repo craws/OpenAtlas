@@ -114,18 +114,14 @@ INSERT INTO model.link (property_code, range_id, domain_id) VALUES
   ('P127', (SELECT id FROM model.entity WHERE name='Source'), (SELECT id FROM model.entity WHERE name='Contract'));
 
 INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name, description) VALUES
-  ('E55', 'type', 'License', 'Types for the licensing of a file'),
-  ('E55', 'type', 'Proprietary license', Null),
-  ('E55', 'type', 'Open license', Null),
+  ('E55', 'type', 'License', 'Type for the licensing of a file'),
   ('E55', 'type', 'Public domain', Null),
   ('E55', 'type', 'CC BY 4.0', Null),
   ('E55', 'type', 'CC BY-SA 4.0', Null);
 INSERT INTO model.link (property_code, range_id, domain_id) VALUES
-  ('P127', (SELECT id FROM model.entity WHERE name='License'), (SELECT id FROM model.entity WHERE name='Proprietary license')),
-  ('P127', (SELECT id FROM model.entity WHERE name='License'), (SELECT id FROM model.entity WHERE name='Open license')),
-  ('P127', (SELECT id FROM model.entity WHERE name='Open license'), (SELECT id FROM model.entity WHERE name='Public domain')),
-  ('P127', (SELECT id FROM model.entity WHERE name='Open license'), (SELECT id FROM model.entity WHERE name='CC BY 4.0')),
-  ('P127', (SELECT id FROM model.entity WHERE name='Open license'), (SELECT id FROM model.entity WHERE name='CC BY-SA 4.0'));
+  ('P127', (SELECT id FROM model.entity WHERE name='License'), (SELECT id FROM model.entity WHERE name='Public domain')),
+  ('P127', (SELECT id FROM model.entity WHERE name='License'), (SELECT id FROM model.entity WHERE name='CC BY 4.0')),
+  ('P127', (SELECT id FROM model.entity WHERE name='License'), (SELECT id FROM model.entity WHERE name='CC BY-SA 4.0'));
 
 INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name, description) VALUES
   ('E55', 'type', 'Actor relation', 'Categories for the relationship between two actors. This may be a mutual relationship (e.g. actor A is friend of actor B and vice versa), or a directional relationship (e.g. actor A is the child of actor B, while actor B is the parent of actor A).'),

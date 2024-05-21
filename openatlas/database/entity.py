@@ -305,6 +305,40 @@ def link(data: dict[str, Any]) -> int:
     return g.cursor.fetchone()['id']
 
 
+def update_file_info(data: dict[str, Any]) -> None:
+    g.cursor.execute(
+        """
+        INSERT INTO model.file_info (
+            entity_id,
+            public,
+            creator,
+            license_holder
+        ) VALUES (
+            %(entity_id)s,
+            %(public)s,
+            %(creator)s,
+            %(license_holder)s
+        ) ON CONFLICT (entity_id) DO UPDATE SET
+            public = %(public)s,
+            creator = %(creator)s,
+            license_holder = %(license_holder)s;
+        """,
+        data)
+
+
+def get_file_info() -> dict[int, dict[str, Any]]:
+    g.cursor.execute(
+        """
+        SELECT entity_id, public, creator, license_holder
+        FROM model.file_info;
+        """)
+    return {
+        row['entity_id']: {
+            'public': row['public'],
+            'license_holder': row['license_holder'],
+            'creator': row['creator']} for row in g.cursor.fetchall()}
+
+
 def get_subunits_without_super(classes: list[str]) -> list[int]:
     g.cursor.execute(
         """
