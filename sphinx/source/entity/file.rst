@@ -35,7 +35,7 @@ More information is available at :ref:`public_sharing_label`
 
 * **Public sharing allowed** - indicates if public sharing is allowed
 * **Creator** - the creator of the file, e.g. the designer of a logo
-* **License holder** - in case the creator isn't also the license holder
+* **License holder** - if not the same as creator
 
 Can be linked via tabs to
 -------------------------
@@ -88,8 +88,8 @@ Criteria checked by the software
 In case these criteria aren't met, a file won't be:
 * Shared via the :doc:`/technical/api`
 * Won't show up on presentation sites developed by the OpenAtlas team
-* Won't be included in case the long time archiving system
-  `ARCHE <https://arche.acdh.oeaw.ac.at/>`_ is used
+* Won't be included in case the long time archiving
+system `ARCHE <https://arche.acdh.oeaw.ac.at/>`_ is used
 
 Criteria checked by managers and users
 **************************************
