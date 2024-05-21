@@ -23,6 +23,7 @@ class DisplayImage(Resource):
         entity = ApiEntity.get_by_id(
             int(Pathlib_path(filename).stem),
             types=True)
+        # Todo: don't show if entity.public is false
         if not get_license_name(entity):
             raise NoLicenseError
         parser = image.parse_args()
@@ -57,7 +58,7 @@ class LicensedFileOverview(Resource):
                     id_=entity.id,
                     _external=True)
             mime_type, _ = mimetypes.guess_type(path)
-            # Todo: add license and license holder
+            # Todo: add license url
             files_dict[path.stem] = {
                 'extension': path.suffix,
                 'mimetype': mime_type,
@@ -71,6 +72,9 @@ class LicensedFileOverview(Resource):
                     filename=path.stem,
                     _external=True),
                 'license': license_,
+                'creator': entity.creator,
+                'licenseHolder': entity.license_holder,
+                'publicShareable': entity.public,
                 'IIIFManifest': iiif_manifest}
         if parser['download']:
             return download(files_dict, licensed_file_template(entities))

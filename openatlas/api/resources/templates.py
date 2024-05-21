@@ -71,6 +71,9 @@ def linked_places_template(parser: Parser) -> dict[str, Type[String]]:
         '@id': fields.String,
         'title': fields.String,
         'license': fields.String,
+        'licenseHolder': fields.String,
+        'creator': fields.String,
+        'publicShareable': fields.Boolean,
         'url': fields.String,
         'mimetype': fields.String,
         'IIIFManifest': fields.String}
@@ -367,6 +370,9 @@ def licensed_file_template(entities: list[Entity]) -> dict[str, Any]:
         'extension': fields.String,
         'mimetype': fields.String,
         'license': fields.String,
+        'creator': fields.String,
+        'licenseHolder': fields.String,
+        'publicShareable': fields.Boolean,
         'IIIFManifest': fields.String}
     for entity in entities:
         template[str(entity.id)] = fields.Nested(file)

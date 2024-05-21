@@ -141,12 +141,15 @@ def get_file(data: dict[str, Any]) -> list[dict[str, Any]]:
         if link.domain.class_.name != 'file':
             continue
         path = get_file_path(link.domain.id)
-        # Todo: add license and license holder
+        # Todo: add license url
         files.append({
             'id': link.domain.id,
             'name': link.domain.name,
             'fileName': path.name if path else None,
             'license': get_license_name(link.domain),
+            'creator': link.domain.creator,
+            'licenseHolder': link.domain.license_holder,
+            'publicShareable': link.domain.public,
             'source': link.domain.description or None})
     if data['parser']['format'] == 'xml':
         return [{'file': file} for file in files]
