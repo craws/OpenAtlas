@@ -57,6 +57,7 @@ class LicensedFileOverview(Resource):
                     id_=entity.id,
                     _external=True)
             mime_type, _ = mimetypes.guess_type(path)
+            # Todo: add license and license holder
             files_dict[path.stem] = {
                 'extension': path.suffix,
                 'mimetype': mime_type,

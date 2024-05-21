@@ -85,6 +85,7 @@ def get_lp_file(links_inverse: list[Link]) -> list[dict[str, str]]:
         mime_type = None
         if path:
             mime_type, _ = mimetypes.guess_type(path)
+        # Todo: add license and license holder
         files.append({
             '@id': url_for(
                 'api.entity',
