@@ -7,7 +7,7 @@ from flask_restful import Resource, marshal
 
 from openatlas import app
 from openatlas.api.resources.error import (
-    DisplayFileNotFoundError, NoLicenseError)
+    DisplayFileNotFoundError, NoLicenseError, NotPublicError)
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.parser import files, image
 from openatlas.api.resources.resolve_endpoints import download
@@ -23,7 +23,8 @@ class DisplayImage(Resource):
         entity = ApiEntity.get_by_id(
             int(Pathlib_path(filename).stem),
             types=True)
-        # Todo: don't show if entity.public is false
+        if not entity.public:
+            raise NotPublicError
         if not get_license_name(entity):
             raise NoLicenseError
         parser = image.parse_args()

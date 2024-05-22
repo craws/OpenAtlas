@@ -46,6 +46,10 @@ class NoLicenseError(Exception):
     pass
 
 
+class NotPublicError(Exception):
+    pass
+
+
 class NoSearchStringError(Exception):
     pass
 
