@@ -41,7 +41,7 @@ def link_dict_x(link_: Link, inverse: bool = False) -> dict[str, Any]:
                 'api.entity',
                 id_=link_.domain.id if inverse else link_.range.id,
                 _external=True),
-        'relationType': get_crm_relation_x(link_),
+        'relationType': get_crm_relation_x(link_, inverse),
         'relationTypeLabel': get_crm_relation_label_x(link_, inverse),
         'relationSystemClass':
             link_.domain.class_.name if inverse else link_.range.class_.name,
