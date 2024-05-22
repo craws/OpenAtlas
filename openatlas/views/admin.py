@@ -27,8 +27,7 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
     button, check_iiif_activation, check_iiif_file_exist, display_info,
-    get_file_path, link,
-    required_group, send_mail)
+    get_file_path, link, required_group, send_mail)
 from openatlas.display.util2 import (
     convert_size, format_date, is_authorized, manual, sanitize, uc_first)
 from openatlas.forms.display import display_form
@@ -171,7 +170,7 @@ def get_user_table(users: list[User]) -> Table:
             user.real_name,
             user.group,
             user.email if is_authorized('manager')
-                          or user.settings['show_email'] else '',
+                or user.settings['show_email'] else '',
             _('yes') if user.settings['newsletter'] else '',
             format_date(user.created),
             format_date(user.login_last_success),
@@ -504,13 +503,13 @@ def orphans() -> str:
         tabs[
             'unlinked'
             if entity.class_.view else 'orphans'].table.rows.append([
-            link(entity),
-            link(entity.class_),
-            link(entity.standard_type),
-            entity.class_.label,
-            format_date(entity.created),
-            format_date(entity.modified),
-            entity.description])
+                link(entity),
+                link(entity.class_),
+                link(entity.standard_type),
+                entity.class_.label,
+                format_date(entity.created),
+                format_date(entity.modified),
+                entity.description])
 
     # Orphaned file entities with no corresponding file
     entity_file_ids = []
@@ -831,27 +830,22 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
             'size': 0,
             'mounted': False}}
     if os.name == 'posix':
-        for path in paths.values():
-            try:
-                process = run(
+        for key, path in paths.items():
+            if not os.access(path['path'], os.W_OK):  # pragma: no cover
+                flash(f"{key} {_('directory not writable')}", 'error')
+                continue
+            size = run(
                     ['du', '-sb', path['path']],
                     capture_output=True,
                     text=True,
                     check=True)
-            except Exception as e:  # pragma: no cover
-                flash(str(e), 'error')
-                continue
-            path['size'] = int(process.stdout.split()[0])
-            try:
-                process = run(
-                    ['df', path['path']],
-                    capture_output=True,
-                    text=True,
-                    check=True)
-            except Exception as e:  # pragma: no cover
-                flash(str(e), 'error')
-                continue
-            tmp = process.stdout.split()
+            path['size'] = int(size.stdout.split()[0])
+            mounted = run(
+                ['df', path['path']],
+                capture_output=True,
+                text=True,
+                check=True)
+            tmp = mounted.stdout.split()
             if '/mnt/' in tmp[-1]:  # pragma: no cover
                 path['mounted'] = True
         files_size = sum(
