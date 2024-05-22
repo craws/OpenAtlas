@@ -832,17 +832,25 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
             'mounted': False}}
     if os.name == 'posix':
         for path in paths.values():
-            process = run(
-                ['du', '-sb', path['path']],
-                capture_output=True,
-                text=True,
-                check=True)
+            try:
+                process = run(
+                    ['du', '-sb', path['path']],
+                    capture_output=True,
+                    text=True,
+                    check=True)
+            except Exception as e:  # pragma: no cover
+                flash(str(e), 'error')
+                continue
             path['size'] = int(process.stdout.split()[0])
-            process = run(
-                ['df', path['path']],
-                capture_output=True,
-                text=True,
-                check=True)
+            try:
+                process = run(
+                    ['df', path['path']],
+                    capture_output=True,
+                    text=True,
+                    check=True)
+            except Exception as e:  # pragma: no cover
+                flash(str(e), 'error')
+                continue
             tmp = process.stdout.split()
             if '/mnt/' in tmp[-1]:  # pragma: no cover
                 path['mounted'] = True
