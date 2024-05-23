@@ -131,7 +131,7 @@ WKT coordinates
 +++++++++++++++
 For places and artifact (multi)point, (multi)polygon, (multi)linestring coordinates or
 GeometricCollection can be imported. Keep in mind to use
-the `WGS84 <https://gisgeography.com/wgs84-world-geodetic-system/>`_ geodetic system.
+the `WGS84 <https://gisgeography.com/wgs84-world-geodetic-system/>`_ geodetic system (EPSG 4326).
 Coordinates will be imported as `WKT <https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry>`_.
 It is only possible to import one geometry for each entry. Since the WKT format uses commas (**,**),
 surround the coordinates with double quotes (**"**)
