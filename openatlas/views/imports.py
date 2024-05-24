@@ -345,7 +345,6 @@ def check_data_for_table_representation(
             continue
         if row.get('parent_id') and row.get('openatlas_parent_id'):
             checks.set_error('multiple_parent_ids', row.get('id'))
-            continue
         table_row = []
         checked_row = {}
         for item in headers:
@@ -542,7 +541,7 @@ def check_cell_value(
             try:
                 entity = Entity.get_by_id(value)
             except ImATeapot:
-                checks.set_error('invalid parent id', id_)
+                checks.set_error('invalid_parent_id', id_)
             if entity and not check_parent(
                     row['openatlas_class'],
                     entity.class_.label):
