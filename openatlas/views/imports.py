@@ -10,6 +10,7 @@ from flask_wtf import FlaskForm
 from pandas import DataFrame, Series
 from shapely import wkt
 from shapely.errors import WKTReadingError
+from werkzeug.exceptions import ImATeapot
 from werkzeug.utils import redirect, secure_filename
 from werkzeug.wrappers import Response
 from wtforms import (
@@ -271,42 +272,42 @@ def import_data(project_id: int, class_: str) -> str:
     class_label = g.classes[class_].label
     checks = CheckHandler()
     if form.validate_on_submit():
-        # try:
-        checked_data: list[Any] = []
-        table = check_data_for_table_representation(
+        try:
+            checked_data: list[Any] = []
+            table = check_data_for_table_representation(
             form,
             class_,
             checks,
             checked_data,
             project)
-        # except Exception as e:
-        #     g.logger.log('error', 'import', 'import check failed', e)
-        #     flash(_('error at import'), 'error')
-        #     return render_template(
-        #         'import_data.html',
-        #         form=form,
-        #         messages=checks.messages,
-        #         file_data=file_data,
-        #         title=_('import'),
-        #         crumbs=[
-        #             [_('admin'), f"{url_for('admin_index')}#tab-data"],
-        #             [_('import'), url_for('import_index')],
-        #             project,
-        #             class_label])
+        except Exception as e:
+            g.logger.log('error', 'import', 'import check failed', e)
+            flash(_('error at import'), 'error')
+            return render_template(
+                'import_data.html',
+                form=form,
+                messages=checks.messages,
+                file_data=file_data,
+                title=_('import'),
+                crumbs=[
+                    [_('admin'), f"{url_for('admin_index')}#tab-data"],
+                    [_('import'), url_for('import_index')],
+                    project,
+                    class_label])
 
         if not form.preview.data and checked_data and (
                 not file_data['backup_too_old'] or app.testing):
             Transaction.begin()
-            # try:
-            Import.import_data(project, class_, checked_data)
-            Transaction.commit()
-            g.logger.log('info', 'import', f'import: {len(checked_data)}')
-            flash(f"{_('import of')}: {len(checked_data)}", 'info')
-            imported = True
-            # except Exception as e:  # pragma: no cover
-            #     Transaction.rollback()
-            #     g.logger.log('error', 'import', 'import failed', e)
-            #     flash(_('error transaction'), 'error')
+            try:
+                Import.import_data(project, class_, checked_data)
+                Transaction.commit()
+                g.logger.log('info', 'import', f'import: {len(checked_data)}')
+                flash(f"{_('import of')}: {len(checked_data)}", 'info')
+                imported = True
+            except Exception as e:  # pragma: no cover
+                Transaction.rollback()
+                g.logger.log('error', 'import', 'import failed', e)
+                flash(_('error transaction'), 'error')
     return render_template(
         'import_data.html',
         form=form,
@@ -337,10 +338,10 @@ def check_data_for_table_representation(
     names = []
     for _index, row in data_frame.iterrows():
         if not row.get('id'):
-            checks.set_error('empty_ids')
+            checks.set_warning('empty_ids')
             continue
         if not row.get('name'):
-            checks.set_error('empty_names', row.get('id'))
+            checks.set_warning('empty_names', row.get('id'))
             continue
         if row.get('parent_id') and row.get('openatlas_parent_id'):
             checks.set_error('multiple_parent_ids', row.get('id'))
@@ -368,24 +369,24 @@ def check_data_for_table_representation(
         if origin_ids else None
     if existing:
         checks.set_error('ids_already_in_database', ', '.join(existing))
-    entity_dict: dict[str, Any] = {
-        row.get('id'): row['openatlas_class'].lower().replace(' ', '_')
-        for row in checked_data}
-    for row in checked_data:
-        if parent_id := row.get('parent_id'):
-            if parent_id not in origin_ids:
-                checks.set_error('invalid parent id', row.get('id'))
-            if not check_parent(
-                    row['openatlas_class'].lower().replace(' ', '_'),
-                    entity_dict[row['parent_id']]):
-                checks.set_error('invalid parent class', row.get('id'))
+    if 'openatlas_class' in headers:
+        entity_dict: dict[str, Any] = {
+            row.get('id'): row['openatlas_class'].replace(' ', '_')
+            for row in checked_data}
+        for row in checked_data:
+            if parent_id := row.get('parent_id'):
+                if parent_id not in origin_ids:
+                    checks.set_error('invalid parent id', row.get('id'))
+                if not check_parent(
+                        row['openatlas_class'].replace(' ', '_'),
+                        entity_dict[row['parent_id']]):
+                    checks.set_error('invalid parent class', row.get('id'))
     return Table(headers, rows=table_data)
 
 
-def check_parent(
-        entity_class: dict[str, Any],
-        parent_class: dict[str, Any]) -> bool:
-    match entity_class:
+def check_parent(entity_class: str, parent_class: str) -> bool:
+    parent_class = parent_class.lower()
+    match entity_class.lower():
         case 'feature':
             if parent_class == 'place':
                 return True
@@ -540,7 +541,7 @@ def check_cell_value(
             entity = None
             try:
                 entity = Entity.get_by_id(value)
-            except Exception:
+            except ImATeapot:
                 checks.set_error('invalid parent id', id_)
             if entity and not check_parent(
                     row['openatlas_class'],
