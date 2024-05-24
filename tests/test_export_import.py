@@ -33,6 +33,8 @@ class ExportImportTest(ExportImportTestCase):
                             place_type = entity
                         case 'https://lotr.fandom.com/':
                             reference = entity
+                        case 'Shire':
+                            place = entity
 
             rv: Any = self.app.get(url_for('export_sql'))
             assert b'Export SQL' in rv.data
@@ -184,6 +186,43 @@ class ExportImportTest(ExportImportTestCase):
                     data={'file': file},
                     follow_redirects=True)
             assert b'invalid parent id' in rv.data
+            (test_path / 'invalid_3_modified.csv').unlink()
+
+            data_frame = pd.read_csv(
+                test_path / 'invalid_3.csv',
+                keep_default_na=False)
+            data_frame.at[4, 'openatlas_parent_id'] = place.id
+            data_frame.to_csv(
+                test_path / 'invalid_3_modified.csv',
+                index=False)
+            with open(test_path / 'invalid_3_modified.csv', 'rb') as file:
+                rv = self.app.post(
+                    url_for('import_data', class_='place', project_id=p_id),
+                    data={'file': file},
+                    follow_redirects=True)
+            assert b'multiple parent ids' in rv.data
+
+            data_frame.at[3, 'openatlas_parent_id'] = 99999
+            data_frame.to_csv(
+                test_path / 'invalid_3_modified.csv',
+                index=False)
+            with open(test_path / 'invalid_3_modified.csv', 'rb') as file:
+                rv = self.app.post(
+                    url_for('import_data', class_='place', project_id=p_id),
+                    data={'file': file},
+                    follow_redirects=True)
+            assert b'invalid parent id' in rv.data
+
+            data_frame.at[3, 'openatlas_parent_id'] = place_type.id
+            data_frame.to_csv(
+                test_path / 'invalid_3_modified.csv',
+                index=False)
+            with open(test_path / 'invalid_3_modified.csv', 'rb') as file:
+                rv = self.app.post(
+                    url_for('import_data', class_='place', project_id=p_id),
+                    data={'file': file},
+                    follow_redirects=True)
+            assert b'invalid parent class' in rv.data
 
             (test_path / 'invalid_3_modified.csv').unlink()
 
@@ -216,16 +255,22 @@ class ExportImportTest(ExportImportTestCase):
                     data={'file': file, 'duplicate': True},
                     follow_redirects=True)
             assert b'invalid reference system class' in rv.data
-
             (test_path / 'example.csv').unlink()
 
-            with open(
-                    static_path / 'example_place_hierarchy.csv', 'rb') as file:
+            data_frame = pd.read_csv(
+                static_path / 'example_place_hierarchy.csv',
+                keep_default_na=False)
+            data_frame.at[7, 'openatlas_parent_id'] = place.id
+            data_frame.to_csv(
+                test_path / 'example_place_hierarchy.csv',
+                index=False)
+            with open(test_path / 'example_place_hierarchy.csv', 'rb') as file:
                 rv = self.app.post(
                     url_for('import_data', class_='place', project_id=p_id),
                     data={'file': file, 'duplicate': True},
                     follow_redirects=True)
                 assert b'Bone' in rv.data
+            (test_path / 'example_place_hierarchy.csv').unlink()
 
             rv = self.app.get(url_for('import_project_view', id_=p_id))
             assert b'London' in rv.data
