@@ -70,6 +70,7 @@ an error message.
 * **administrative_unit** - only available for places, id of existing administrative unit
 * **historical_place** - only available for places, id of existing historical place
 * **parent_id** - only available for place, id of a super unit in a place hierarchy, see :ref:`Place hierarchy import`
+* **openatlas_parent_id** - only available for place, id of a super unit existing in OpenAtlas, see :ref:`Place hierarchy import`
 * **openatlas_class** - only available for place and only used with **parent_id**, see :ref:`Place hierarchy import`
 
 .. _Alias import:
@@ -159,15 +160,19 @@ Example:
 
 Place hierarchy
 +++++++++++++++++++++++++++++
-The **parent_id** is used to generate a :doc:`/entity/place` hierarchy together with :doc:`/entity/feature`, :doc:`/entity/stratigraphic_unit`,
+The **parent_id** or **openatlas_parent_id** is used to generate a :doc:`/entity/place` hierarchy together
+with :doc:`/entity/feature`, :doc:`/entity/stratigraphic_unit`,
 :doc:`/entity/artifact`, and :doc:`/entity/human_remains`.
 The **parent_id** has to be an **origin_id** of a row in the **current** import file.
+The **openatlas_parent_id** has to be an **existing** OpenAtlas entity ID with the correct class.
 To declare, which entry has a specific class, the **openatlas_class** column is used.
-Here the following classes can be entered: :doc:`/entity/place`, :doc:`/entity/feature`, :doc:`/entity/stratigraphic_unit`,
-:doc:`/entity/artifact`, and :doc:`/entity/human_remains`. This is case-insensitive.
+Here the following classes can be entered: :doc:`/entity/place`, :doc:`/entity/feature`,
+:doc:`/entity/stratigraphic_unit`, :doc:`/entity/artifact`, and
+:doc:`/entity/human_remains`. This is case-insensitive.
 For an example, please see: :download:`example_place_hierarchy.csv`
 
-For questions about the correct place hierarchy structure, please see the **archaeological sub units** at the OpenAtlas :doc:`/model/index`.
+For questions about the correct place hierarchy structure, please see the
+**archaeological sub units** at the OpenAtlas :doc:`/model/index`.
 
 Import options
 --------------
