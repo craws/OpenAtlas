@@ -141,7 +141,6 @@ def get_file(data: dict[str, Any]) -> list[dict[str, Any]]:
         if link.domain.class_.name != 'file':
             continue
         path = get_file_path(link.domain.id)
-        # Todo: add license url
         files.append({
             'id': link.domain.id,
             'name': link.domain.name,

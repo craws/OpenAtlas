@@ -77,7 +77,6 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
 
         if link_.domain.class_.name == 'file' and g.files.get(link_.domain.id):
             image_links.append(link_)
-    # Todo: add license and license holder
     if image_links:
         profile_image = Entity.get_profile_image_id(data['entity'])
         representation: dict[str, Any] = {
