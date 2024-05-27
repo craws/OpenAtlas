@@ -111,7 +111,8 @@ class Import:
                 origin_id=row.get('id'))
             entities[row.get('id')] = {
                 'entity': entity,
-                'parent_id': row.get('parent_id')}
+                'parent_id': row.get('parent_id'),
+                'openatlas_parent_id':  row.get('openatlas_parent_id')}
 
             # Dates
             entity.update({'attributes': {
@@ -225,5 +226,9 @@ class Import:
         for entry in entities.values():
             if entry['parent_id']:
                 entities[entry['parent_id']]['entity'].link(
+                    'P46',
+                    entry['entity'])
+            if entry['openatlas_parent_id']:
+                Entity.get_by_id(entry['openatlas_parent_id']).link(
                     'P46',
                     entry['entity'])

@@ -125,7 +125,7 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
         if not manager.entity.image_id:
             for link_ in manager.entity.get_links('P67', inverse=True):
                 if link_.domain.class_.view == 'file' \
-                        and get_base_table_data(link_.domain)[3] \
+                        and get_base_table_data(link_.domain)[6] \
                         in g.display_file_ext:
                     manager.entity.image_id = link_.domain.id
                     break

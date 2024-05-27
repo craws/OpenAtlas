@@ -48,6 +48,9 @@ def get_table(view: str) -> Table:
                 format_date(entity.created),
                 link(entity),
                 link(entity.standard_type),
+                _('yes') if entity.public else None,
+                entity.creator,
+                entity.license_holder,
                 entity.get_file_size(),
                 entity.get_file_ext(),
                 entity.description]

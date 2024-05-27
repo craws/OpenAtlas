@@ -10,6 +10,7 @@ from flask_wtf import FlaskForm
 from pandas import DataFrame, Series
 from shapely import wkt
 from shapely.errors import WKTReadingError
+from werkzeug.exceptions import ImATeapot
 from werkzeug.utils import redirect, secure_filename
 from werkzeug.wrappers import Response
 from wtforms import (
@@ -54,6 +55,8 @@ _('empty ids')
 _('missing name column')
 _('ids already in database')
 _('double ids in import')
+_('multiple parent ids')
+_('invalid openatlas parent id')
 
 
 class ProjectForm(FlaskForm):
@@ -272,11 +275,11 @@ def import_data(project_id: int, class_: str) -> str:
         try:
             checked_data: list[Any] = []
             table = check_data_for_table_representation(
-                form,
-                class_,
-                checks,
-                checked_data,
-                project)
+            form,
+            class_,
+            checks,
+            checked_data,
+            project)
         except Exception as e:
             g.logger.log('error', 'import', 'import check failed', e)
             flash(_('error at import'), 'error')
@@ -340,6 +343,8 @@ def check_data_for_table_representation(
         if not row.get('name'):
             checks.set_warning('empty_names', row.get('id'))
             continue
+        if row.get('parent_id') and row.get('openatlas_parent_id'):
+            checks.set_error('multiple_parent_ids', row.get('id'))
         table_row = []
         checked_row = {}
         for item in headers:
@@ -363,22 +368,24 @@ def check_data_for_table_representation(
         if origin_ids else None
     if existing:
         checks.set_error('ids_already_in_database', ', '.join(existing))
-    entity_dict: dict[str, Any] = {row.get('id'): row for row in checked_data}
-    for row in checked_data:
-        if parent_id := row.get('parent_id'):
-            if parent_id not in origin_ids:
-                checks.set_error('invalid parent id', row.get('id'))
-            if not check_parent(row, entity_dict):
-                checks.set_error('invalid parent class', row.get('id'))
+    if 'openatlas_class' in headers:
+        entity_dict: dict[str, Any] = {
+            row.get('id'): row['openatlas_class'].replace(' ', '_')
+            for row in checked_data}
+        for row in checked_data:
+            if parent_id := row.get('parent_id'):
+                if parent_id not in origin_ids:
+                    checks.set_error('invalid parent id', row.get('id'))
+                if not check_parent(
+                        row['openatlas_class'].replace(' ', '_'),
+                        entity_dict[row['parent_id']]):
+                    checks.set_error('invalid parent class', row.get('id'))
     return Table(headers, rows=table_data)
 
 
-def check_parent(
-        entry: dict[str, Any],
-        entity_dict: dict[str, Any]) -> bool:
-    parent_class = entity_dict[
-        entry['parent_id']]['openatlas_class'].lower().replace(' ', '_')
-    match entry['openatlas_class'].lower().replace(' ', '_'):
+def check_parent(entity_class: str, parent_class: str) -> bool:
+    parent_class = parent_class.lower()
+    match entity_class.lower():
         case 'feature':
             if parent_class == 'place':
                 return True
@@ -430,7 +437,7 @@ def get_allowed_columns(class_: str) -> dict[str, list[str]]:
     if class_ in ['place']:
         columns.extend([
             'administrative_unit', 'historical_place', 'parent_id',
-            'openatlas_class'])
+            'openatlas_class', 'openatlas_parent_id'])
     return {
         'allowed': columns,
         'valid': [],
@@ -529,6 +536,16 @@ def check_cell_value(
                      g.view_class_mapping['artifact'])):
                 value = error_span(value)
                 checks.set_warning('invalid_openatlas_class', id_)
+        case 'openatlas_parent_id' if value:
+            entity = None
+            try:
+                entity = Entity.get_by_id(value)
+            except ImATeapot:
+                checks.set_error('invalid_parent_id', id_)
+            if entity and not check_parent(
+                    row['openatlas_class'],
+                    entity.class_.label):
+                checks.set_error('invalid_parent_class', id_)
         case _ if item.startswith('reference_system_') and value:
             item = item.replace('reference_system_', '')
             reference_system = get_reference_system_by_name(item)

@@ -18,12 +18,12 @@ versions = {
     '8.5.0': ['TBA', {
         'feature': {
             '2277': 'References for types',
+            '2129': 'Attributions for files',
+            '2105': 'New file license system',
             '2273': 'API: Endpoint to retrieve all available CIDOC properties',
-            '2274': 'API: Endpoint to get related entities'
-        },
+            '2274': 'API: Endpoint to get related entities'},
         'fix': {
-            '2278': 'Import Place Hierarchy'
-        }}],
+            '2278': 'Import Place Hierarchy'}}],
     '8.4.1': ['2024-05-14', {
         'fix': {
             '2280': 'Dynamic type add not working for single types'}}],

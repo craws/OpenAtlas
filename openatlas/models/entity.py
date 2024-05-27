@@ -72,6 +72,15 @@ class Entity:
             self.last = format_date_part(self.end_to, 'year') \
                 if self.end_to else self.last
 
+        if self.class_.name == 'file':
+            self.public = False
+            self.creator = None
+            self.license_holder = None
+            if self.id in g.file_info:
+                self.public = g.file_info[self.id]['public']
+                self.creator = g.file_info[self.id]['creator']
+                self.license_holder = g.file_info[self.id]['license_holder']
+
     def get_linked_entity(
             self,
             code: str,
@@ -201,6 +210,9 @@ class Entity:
             continue_link_id = self.update_links(data, new)
         if 'gis' in data:
             self.update_gis(data['gis'], new)
+        if self.class_.name == 'file':
+            data['file_info']['entity_id'] = self.id
+            db.update_file_info(data['file_info'])
         return continue_link_id
 
     def update_administrative_units(
@@ -347,6 +359,10 @@ class Entity:
 
     def get_file_ext(self) -> str:
         return g.files[self.id].suffix if self.id in g.files else 'N/A'
+
+    @staticmethod
+    def get_file_info() -> dict[int, Any]:
+        return db.get_file_info()
 
     @staticmethod
     def get_invalid_dates() -> list[Entity]:

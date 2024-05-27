@@ -5,7 +5,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FAQ &mdash; OpenAtlas 8.4.0 documentation</title>
+  <title>FAQ &mdash; OpenAtlas 8.5.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/style.css" type="text/css" />
@@ -34,7 +34,7 @@
               <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                8.4.0
+                8.5.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -67,6 +67,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#how-to-manage-multiple-projects-or-case-studies">How to manage multiple projects or case studies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#how-does-data-access-work">How does data access work</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#how-to-enter-professions">How to enter professions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-make-files-available-for-the-public">How to make files available for the public</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#why-can-t-a-free-text-field-be-added-via-custom-types">Why can’t a free text field be added via custom types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#why-can-t-longer-texts-be-formatted">Why can’t longer texts be formatted</a></li>
 </ul>
@@ -159,6 +160,43 @@ enter our lead developer Alex into the database: create a group named
 can also pick the role he has in that group from a list of types. For a more
 detailed tutorial on how to enter professions, have a look
 <a class="reference internal" href="examples/profession.html"><span class="doc">here</span></a>.</p>
+</section>
+<section id="how-to-make-files-available-for-the-public">
+<span id="public-sharing-label"></span><h2>How to make files available for the public<a class="headerlink" href="#how-to-make-files-available-for-the-public" title="Permalink to this heading"></a></h2>
+<p>In case it is planned to share files with the public, e.g. at a presentation
+site or a public archive, several criteria have to be met.</p>
+<section id="criteria-checked-by-the-software">
+<h3>Criteria checked by the software<a class="headerlink" href="#criteria-checked-by-the-software" title="Permalink to this heading"></a></h3>
+<ul class="simple">
+<li><p>The file must exist</p></li>
+<li><p>A license has to be specified</p></li>
+<li><p>It has to be marked with <strong>public sharing allowed</strong></p></li>
+</ul>
+<p>In case these criteria aren’t met, a file won’t be:</p>
+<ul class="simple">
+<li><p>Shared via the <a class="reference internal" href="technical/api.html"><span class="doc">API</span></a></p></li>
+<li><p>Won’t show up on presentation sites developed by the OpenAtlas team</p></li>
+<li><p>Won’t be included in case the long time archiving
+system <a class="reference external" href="https://arche.acdh.oeaw.ac.at/">ARCHE</a> is used</p></li>
+</ul>
+<p>But be aware that although the file itself won’t be shared, the file
+information (e.g. filename) will still be available (e.g. shown on a
+presentation site).</p>
+</section>
+<section id="criteria-checked-by-users">
+<h3>Criteria checked by users<a class="headerlink" href="#criteria-checked-by-users" title="Permalink to this heading"></a></h3>
+<ul class="simple">
+<li><p>The linked license has to be the correct one and allow public sharing</p></li>
+<li><p>Other license specific criteria, e.g. specifying the creator, are met</p></li>
+</ul>
+<p>There are many licenses with different criteria, e.g. a CC-BY 4.0 license
+requires the attribution to the creator. Because it is not possible to check
+these automatically, it is the responsibility of the project management to
+ensure that all necessary requirements are met and to indicated it via setting
+the <strong>public sharing allowed</strong> flag.</p>
+<p>Be aware that licenses can be linked to an external reference (e.g. an URL)
+which might be informative for other users or viewers.</p>
+</section>
 </section>
 <section id="why-can-t-a-free-text-field-be-added-via-custom-types">
 <h2>Why can’t a free text field be added via custom types<a class="headerlink" href="#why-can-t-a-free-text-field-be-added-via-custom-types" title="Permalink to this heading"></a></h2>

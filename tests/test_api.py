@@ -52,7 +52,6 @@ class Api(ApiTestCase):
     def test_api(self) -> None:
 
         with app.app_context():
-
             logo = Path(app.root_path) \
                    / 'static' / 'images' / 'layout' / 'logo.png'
 
@@ -98,7 +97,7 @@ class Api(ApiTestCase):
                             file_without_file = entity
                         case 'OpenAtlas logo':
                             file = entity
-                        case 'Open license':
+                        case 'Public domain':
                             open_license = entity
 
             # Test Swagger UI
@@ -168,14 +167,15 @@ class Api(ApiTestCase):
             assert self.get_bool(
                 rv.get_json()[str(file.id)],
                 'license',
-                'Open license')
+                'Public domain')
 
             rv = self.app.get(url_for('api.licensed_file_overview'))
             assert bool(len(rv.get_json().keys()) == 4)
 
-            rv = self.app.get(url_for(
-                'api_04.network_visualisation',
-                exclude_system_classes='type'))
+            rv = self.app.get(
+                url_for(
+                    'api_04.network_visualisation',
+                    exclude_system_classes='type'))
             rv = rv.get_json()
             assert bool(len(rv['results']) == 70)
             rv = self.app.get(url_for(
@@ -186,7 +186,7 @@ class Api(ApiTestCase):
             rv = self.app.get(
                 url_for('api_04.network_visualisation', download=True))
             rv = rv.get_json()
-            assert bool(len(rv['results']) == 160)
+            assert bool(len(rv['results']) == 158)
 
             for rv in [
                 self.app.get(url_for('api_04.geometric_entities')),
@@ -249,7 +249,9 @@ class Api(ApiTestCase):
             links = rv['links'][0]
             assert self.get_bool(links, 'type', 'closeMatch')
             assert self.get_bool(
-                links, 'identifier', 'https://www.geonames.org/2761369')
+                links,
+                'identifier',
+                'https://www.geonames.org/2761369')
             assert self.get_bool(links, 'referenceSystem', 'GeoNames')
             assert self.get_bool(rv['geometry'], 'type', 'GeometryCollection')
             assert self.get_bool(
@@ -260,7 +262,7 @@ class Api(ApiTestCase):
             assert self.get_bool(
                 rv['depictions'][0], 'title', 'Picture with a License')
             assert self.get_bool(
-                rv['depictions'][0], 'license', 'Open license')
+                rv['depictions'][0], 'license', 'Public domain')
             assert self.get_bool(rv['depictions'][0], 'url')
 
             rv = self.app.get(url_for(
@@ -318,18 +320,6 @@ class Api(ApiTestCase):
                            '28.9409293485759 41.0273124142771,28.941969652866 '
                            '41.0284940983463,28.9399641177912 41.0297647897435'
                            ',28.9389559878606 41.0290525580955))')
-
-            # Problems because of
-            # issue 130 https://github.com/RDFLib/rdflib/issues/130
-            # or GitHub Actions connection issues
-            # for rv in [
-            #     self.app.get(
-            #         url_for('api_04.entity', id_=place.id, format='n3')),
-            #     self.app.get(url_for(
-            #         'api_04.view_class',
-            #         view_class='place',
-            #         format='n3'))]:
-            #     assert b'Shire' in rv.data
 
             # Test Entity export and RDFS
             for rv in [
@@ -1013,14 +1003,14 @@ class Api(ApiTestCase):
                        '"logicalOperator":"xor"}]}'))
             assert 'Invalid logical operator' in rv.get_json()['title']
 
-            rv = self.app.get(url_for(
-                'api_04.display',
-                filename=f'{file_without_licences.id}'))
+            rv = self.app.get(
+                url_for(
+                    'api_04.display',
+                    filename=f'{file_without_licences.id}'))
             assert 'No license' in rv.get_json()['title']
 
-            rv = self.app.get(url_for(
-                'api_04.display',
-                filename=f'{file_without_file.id}'))
+            rv = self.app.get(
+                url_for('api_04.display', filename=f'{file_without_file.id}'))
             assert 'File not found' in rv.get_json()['title']
 
             assert b'Endpoint not found' in self.app.get('/api/entity2').data
