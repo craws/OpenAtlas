@@ -213,7 +213,7 @@ class BaseDisplay:
             domain = link_.domain
             data = get_base_table_data(domain)
             if domain.class_.view == 'file':
-                ext = data[3]
+                ext = data[6]
                 data.append(profile_image_table_link(entity, domain, ext))
                 if not entity.image_id and ext in g.display_file_ext:
                     entity.image_id = domain.id
@@ -402,7 +402,7 @@ class PlaceBaseDisplay(BaseDisplay):
                 self.tabs[domain.class_.view].table.rows.append(data)
                 continue
             if domain.class_.view == 'file':
-                ext = data[3]
+                ext = data[6]
                 data.append(profile_image_table_link(entity, domain, ext))
                 if not entity.image_id and ext in g.display_file_ext:
                     entity.image_id = domain.id
