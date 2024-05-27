@@ -308,9 +308,9 @@ def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
     if entity.class_.standard_type_id:
         data.append(entity.standard_type.name if entity.standard_type else '')
     if entity.class_.name == 'file':
-        data.append(_('yes') if entity.public else None),
-        data.append(entity.creator),
-        data.append(entity.license_holder),
+        data.append(_('yes') if entity.public else None)
+        data.append(entity.creator)
+        data.append(entity.license_holder)
         data.append(entity.get_file_size())
         data.append(entity.get_file_ext())
     if entity.class_.view in ['actor', 'artifact', 'event', 'place']:

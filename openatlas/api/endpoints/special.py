@@ -115,7 +115,7 @@ class GetNetworkVisualisation(Resource):
         results: dict[str, Any] = {'results': []}
         for id_, dict_ in output.items():
             if linked_to_id := parser.linked_to_ids:
-                if not (set(linked_to_id) & set(dict_['relations'])):
+                if not set(linked_to_id) & set(dict_['relations']):
                     continue
             dict_['id'] = id_
             results['results'].append(dict_)
