@@ -96,8 +96,6 @@ class Api(ApiTestCase):
                             height = entity
                         case 'Change of Property':
                             change_of_property = entity
-                        case 'Picture with a License':
-                            file_public = entity
                         case 'File not public':
                             file_not_public = entity
                         case 'File without license':
@@ -642,7 +640,8 @@ class Api(ApiTestCase):
                     system_classes='person',
                     format='lp',
                     search="""{"beginFrom":[{"operator":"lesserThan",
-                        "values":["2020-01-01"],"logicalOperator":"and"}]}""")),
+                        "values":["2020-01-01"],
+                        "logicalOperator":"and"}]}""")),
                 self.app.get(url_for(
                     'api_04.query',
                     entities=place.id,
@@ -660,7 +659,8 @@ class Api(ApiTestCase):
                     system_classes='person',
                     format='lp',
                     search="""{"beginTo":[{"operator":"lesserThanEqual",
-                        "values":["2018-03-01"],"logicalOperator":"and"}]}""")),
+                        "values":["2018-03-01"],
+                        "logicalOperator":"and"}]}""")),
                 self.app.get(url_for(
                     'api_04.query',
                     entities=place.id,
@@ -678,7 +678,8 @@ class Api(ApiTestCase):
                     system_classes='person',
                     format='lp',
                     search="""{"endFrom":[{"operator":"greaterThan",
-                        "values":["2013-02-01"],"logicalOperator":"and"}]}""")),
+                        "values":["2013-02-01"],
+                        "logicalOperator":"and"}]}""")),
                 self.app.get(url_for(
                     'api_04.query',
                     entities=place.id,

@@ -1,3 +1,6 @@
+from typing import Any
+
+
 class AccessDeniedError(Exception):
     pass
 
@@ -51,7 +54,7 @@ class NotPublicError(Exception):
 
 
 class NoSearchStringError(Exception):
-    def __init__(self, category, ):
+    def __init__(self, category: str) -> None:
         super().__init__()
         self.category = category
 
@@ -77,7 +80,7 @@ class InvalidSearchCategoryError(Exception):
 
 
 class InvalidSearchValueError(Exception):
-    def __init__(self, category, values):
+    def __init__(self, category: str, values: dict[str, Any]) -> None:
         super().__init__()
         self.category = category
         self.values = values
