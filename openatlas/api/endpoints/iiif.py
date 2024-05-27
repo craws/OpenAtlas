@@ -9,6 +9,7 @@ from flask import Response, g, jsonify, url_for
 from flask_restful import Resource
 
 from openatlas.api.resources.api_entity import ApiEntity
+from openatlas.api.resources.util import get_license_name
 from openatlas.models.annotation import Annotation
 from openatlas.models.entity import Entity
 
@@ -218,7 +219,10 @@ class IIIFManifest(Resource):
 
     @staticmethod
     def get_manifest_version_2(id_: int) -> dict[str, Any]:
-        entity = ApiEntity.get_by_id(id_)
+        entity = ApiEntity.get_by_id(id_, types=True)
+        license_ = get_license_name(entity)
+        if entity.license_holder:
+            license_ = f'{license_}, {entity.license_holder}'
         return {
             "@context": "https://iiif.io/api/presentation/2/context.json",
             "@id":
@@ -235,27 +239,7 @@ class IIIFManifest(Resource):
             "description": [{
                 "@value": entity.description or '',
                 "@language": "en"}],
-            # https://iiif.io/api/presentation/2.0/#rights-and-licensing-properties
-            # Todo: license
-            # A link to an external resource that describes the license or
-            # rights statement under which the resource is being used. The
-            # rationale for this being a URI and not a human readable label
-            # is that typically there is one license for many resources, and
-            # the text is too long to be displayed to the user along with the
-            # object. If displaying the text is a requirement, then it is
-            # recommended to include the information using the attribution
-            # property instead.
-            "license": "https://www.example.org/license.html",
-            # Todo: attribution
-            # A human readable label that must be displayed when the resource
-            # it is associated with is displayed or used. For example, this
-            # could be used to present copyright or ownership statements, or
-            # simply an acknowledgement of the owning and/or publishing
-            # institutions.
-            #
-            # !Attribution should then be the license name and the holder!
-            "attribution": "Provided by Example Organization",
-
+            "attribution": license_,
             "logo": get_logo(),
             "sequences": [
                 IIIFSequence.build_sequence(get_metadata(entity))],

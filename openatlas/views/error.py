@@ -198,7 +198,7 @@ def no_license(_e: Exception) -> tuple[Any, int]:
 @app.errorhandler(NotPublicError)
 def not_public(_e: Exception) -> tuple[Any, int]:
     return jsonify({
-        'title': 'No public',
+        'title': 'Not public',
         'message':
             'This file is not public shareable.',
         'url': request.url,

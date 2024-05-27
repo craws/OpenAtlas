@@ -17,8 +17,8 @@ class FileTest(TestBaseCase):
                 place = insert('place', 'File keeper')
                 reference = insert('edition', 'Ancient Books')
 
-            logo = Path(app.root_path) \
-                / 'static' / 'images' / 'layout' / 'logo.png'
+            logo = Path(
+                app.root_path) / 'static' / 'images' / 'layout' / 'logo.png'
 
             with open(logo, 'rb') as img_1, open(logo, 'rb') as img_2:
                 rv: Any = self.app.post(
@@ -30,21 +30,38 @@ class FileTest(TestBaseCase):
             with open(logo, 'rb') as img:
                 rv = self.app.post(
                     url_for('insert', class_='file', origin_id=reference.id),
-                    data={'name': 'OpenAtlas logo', 'file': img},
+                    data={
+                        'name': 'OpenAtlas logo',
+                        'file': img},
                     follow_redirects=True)
             assert b'An entry has been created' in rv.data
+
+            with open(logo, 'rb') as img:
+                data = {
+                    'name': 'IIIF File',
+                    'file': img,
+                    'creator': 'Max',
+                    'license_holder': 'Moritz',
+                    'public': True}
+                rv = self.app.post(url_for('insert', class_='file'), data=data)
+                iiif_id = rv.location.split('/')[-1]
+
+            for type_ in g.types.values():
+                if type_.name == 'Public domain':
+                    license_ = type_
+                    break
 
             with app.test_request_context():
                 app.preprocess_request()
                 files = Entity.get_by_class('file')
-                file = files[0]
-                file_id = file.id
+                iiif_file = Entity.get_by_id(iiif_id)
+                iiif_file.link('P2', license_)
 
-            rv = self.app.get(url_for('update', id_=file_id))
+            rv = self.app.get(url_for('update', id_=iiif_id))
             assert b'License' in rv.data
 
             rv = self.app.get(
-                url_for('delete_iiif_file', id_=file_id),
+                url_for('delete_iiif_file', id_=iiif_id),
                 follow_redirects=True)
             assert b'IIIF file deleted' in rv.data
 
@@ -57,18 +74,18 @@ class FileTest(TestBaseCase):
                 url_for('delete_iiif_files'), follow_redirects=True)
             assert b'IIIF files are deleted' in rv.data
 
-            filename = f'{file_id}.png'
+            filename = f'{iiif_id}.png'
             with self.app.get(url_for('display_logo', filename=filename)):
                 pass
 
             with self.app.get(url_for('download', filename=filename)):
                 pass
 
-            rv = self.app.get(url_for('logo'), data={'file': file_id})
+            rv = self.app.get(url_for('logo'), data={'file': iiif_id})
             assert b'OpenAtlas logo' in rv.data
 
             rv = self.app.get(
-                url_for('logo', id_=file_id),
+                url_for('logo', id_=iiif_id),
                 follow_redirects=True)
             assert b'remove custom logo' in rv.data
 
@@ -92,21 +109,21 @@ class FileTest(TestBaseCase):
 
             rv = self.app.post(
                 url_for('reference_add', id_=reference.id, view='file'),
-                data={'file': file_id, 'page': '777'},
+                data={'file': iiif_id, 'page': '777'},
                 follow_redirects=True)
             assert b'777' in rv.data
 
             rv = self.app.post(
-                url_for('update', id_=file_id),
+                url_for('update', id_=iiif_id),
                 data={'name': 'Updated file'},
                 follow_redirects=True)
             assert b'Changes have been saved' in rv.data
 
-            rv = self.app.get(url_for('file_add', id_=file_id, view='actor'))
+            rv = self.app.get(url_for('file_add', id_=iiif_id, view='actor'))
             assert b'link actor' in rv.data
 
             rv = self.app.post(
-                url_for('file_add', id_=file_id, view='actor'),
+                url_for('file_add', id_=iiif_id, view='actor'),
                 data={'checkbox_values': [place.id]},
                 follow_redirects=True)
             assert b'File keeper' in rv.data
@@ -116,22 +133,22 @@ class FileTest(TestBaseCase):
 
             rv = self.app.post(
                 url_for('entity_add_file', id_=get_hierarchy('Sex').subs[0]),
-                data={'checkbox_values': str([file_id])},
+                data={'checkbox_values': str([iiif_id])},
                 follow_redirects=True)
             assert b'Updated file' in rv.data
 
-            rv = self.app.get(url_for('view', id_=file_id))
+            rv = self.app.get(url_for('view', id_=iiif_id))
             assert b'Logo' in rv.data
 
-            rv = self.app.get(url_for('view', id_=file_id))
+            rv = self.app.get(url_for('view', id_=iiif_id))
             assert b'enable IIIF view' in rv.data
 
             rv = self.app.get(
-                url_for('make_iiif_available', id_=file_id),
+                url_for('make_iiif_available', id_=iiif_id),
                 follow_redirects=True)
             assert b'IIIF converted' in rv.data
 
-            rv = self.app.get(url_for('view', id_=file_id))
+            rv = self.app.get(url_for('view', id_=iiif_id))
             assert b'View in IIIF' in rv.data
 
             rv = self.app.get(
@@ -141,31 +158,31 @@ class FileTest(TestBaseCase):
             rv = self.app.get(
                 url_for(
                     'api.iiif_manifest',
-                    id_=file_id,
+                    id_=iiif_id,
                     version=g.settings['iiif_version']))
             rv = rv.get_json()
             assert bool(rv['label'] == 'Updated file')
 
-            rv = self.app.get(url_for('api.iiif_sequence', id_=file_id))
-            assert bool(str(file_id) in rv.get_json()['@id'])
+            rv = self.app.get(url_for('api.iiif_sequence', id_=iiif_id))
+            assert bool(str(iiif_id) in rv.get_json()['@id'])
 
-            rv = self.app.get(url_for('api.iiif_image', id_=file_id))
-            assert bool(str(file_id) in rv.get_json()['@id'])
+            rv = self.app.get(url_for('api.iiif_image', id_=iiif_id))
+            assert bool(str(iiif_id) in rv.get_json()['@id'])
 
-            rv = self.app.get(url_for('api.iiif_canvas', id_=file_id))
-            assert bool(str(file_id) in rv.get_json()['@id'])
+            rv = self.app.get(url_for('api.iiif_canvas', id_=iiif_id))
+            assert bool(str(iiif_id) in rv.get_json()['@id'])
 
             with app.test_request_context():
                 app.preprocess_request()
                 files[0].link('P2', g.types[get_hierarchy('License').subs[0]])
 
             rv = self.app.get(url_for('api.licensed_file_overview'))
-            assert bool(len(rv.get_json().keys()) == 3)
+            assert bool(len(rv.get_json().keys()) == 4)
             rv = self.app.get(
                 url_for('api.licensed_file_overview', download=True))
-            assert bool(len(rv.get_json().keys()) == 3)
+            assert bool(len(rv.get_json().keys()) == 4)
             rv = self.app.get(
-                url_for('api.licensed_file_overview', file_id=file_id))
+                url_for('api.licensed_file_overview', file_id=iiif_id))
             assert bool(len(rv.get_json().keys()) == 1)
 
             rv = self.app.get(url_for('view_iiif', id_=place.id))
@@ -177,11 +194,11 @@ class FileTest(TestBaseCase):
             rv = self.app.get(url_for('view', id_=place.id))
             assert b'Logo' in rv.data
 
-            rv = self.app.get(url_for('annotation_insert', id_=file_id))
+            rv = self.app.get(url_for('annotation_insert', id_=iiif_id))
             assert b'annotate' in rv.data
 
             rv = self.app.post(
-                url_for('annotation_insert', id_=file_id),
+                url_for('annotation_insert', id_=iiif_id),
                 data={
                     'coordinate': '1.5,1.6,1.4,9.6,8.6,9.6,8.6,1.6',
                     'text': 'An interesting annotation',
@@ -189,16 +206,16 @@ class FileTest(TestBaseCase):
                 follow_redirects=True)
             assert b'An interesting annotation' in rv.data
 
-            rv = self.app.get(url_for('view_iiif', id_=file_id))
+            rv = self.app.get(url_for('view_iiif', id_=iiif_id))
             assert b'Mirador' in rv.data
 
             rv = self.app.get(url_for('annotation_update', id_=1))
             assert b'An interesting annotation' in rv.data
 
             rv = self.app.get(
-                url_for('api.iiif_annotation_list', image_id=file_id))
+                url_for('api.iiif_annotation_list', image_id=iiif_id))
             json = rv.get_json()
-            assert bool(str(file_id) in json['@id'])
+            assert bool(str(iiif_id) in json['@id'])
 
             annotation_id = json['resources'][0]['@id'].rsplit('/', 1)[-1]
             rv = self.app.get(url_for(
@@ -208,21 +225,21 @@ class FileTest(TestBaseCase):
 
             with app.test_request_context():
                 app.preprocess_request()
-                file.delete_links(['P67'])
+                iiif_file.delete_links(['P67'])
 
             rv = self.app.get(url_for('orphans'))
             assert b'File keeper' in rv.data
 
             rv = self.app.get(url_for(
                 'admin_annotation_relink',
-                image_id=file.id,
+                image_id=iiif_id,
                 entity_id=place.id),
                 follow_redirects=True)
             assert b'Entities relinked' in rv.data
 
             with app.test_request_context():
                 app.preprocess_request()
-                file.delete_links(['P67'])
+                iiif_file.delete_links(['P67'])
 
             rv = self.app.get(url_for(
                 'admin_annotation_remove_entity',
@@ -243,7 +260,7 @@ class FileTest(TestBaseCase):
             assert b'Annotation deleted' in rv.data
 
             self.app.post(
-                url_for('annotation_insert', id_=file_id),
+                url_for('annotation_insert', id_=iiif_id),
                 data={
                     'coordinate': '1.5,1.6,1.4,9.6,8.6,9.6,8.6,1.6',
                     'text': 'An interesting annotation',
@@ -251,7 +268,7 @@ class FileTest(TestBaseCase):
 
             with app.test_request_context():
                 app.preprocess_request()
-                file.delete_links(['P67'])
+                iiif_file.delete_links(['P67'])
 
             rv = self.app.get(
                 url_for('admin_annotation_delete', id_=2),
