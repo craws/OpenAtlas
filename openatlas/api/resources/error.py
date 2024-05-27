@@ -46,6 +46,10 @@ class NoLicenseError(Exception):
     pass
 
 
+class NotPublicError(Exception):
+    pass
+
+
 class NoSearchStringError(Exception):
     def __init__(self, category, ):
         super().__init__()

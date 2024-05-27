@@ -22,6 +22,7 @@ VALUES
   ('E31', 'file', 'Picture with a License', NULL, CURRENT_TIMESTAMP),
   ('E31', 'file', 'File without license', NULL, CURRENT_TIMESTAMP),
   ('E31', 'file', 'File without file', NULL, CURRENT_TIMESTAMP),
+  ('E31', 'file', 'File not public', NULL, CURRENT_TIMESTAMP),
   ('E33', 'source', 'Silmarillion', NULL, CURRENT_TIMESTAMP),
   ('E21', 'person', 'Frodo', 'That is Frodo', CURRENT_TIMESTAMP),
   ('E21', 'person', 'Sam', 'That is Sam', CURRENT_TIMESTAMP),
@@ -98,6 +99,7 @@ VALUES
   ('P52', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='The One Ring') ),
   ('P2', (SELECT id FROM model.entity WHERE name='Public domain'), (SELECT id FROM model.entity WHERE name='Picture with a License') ),
   ('P2', (SELECT id FROM model.entity WHERE name='Public domain'), (SELECT id FROM model.entity WHERE name='File without file') ),
+  ('P2', (SELECT id FROM model.entity WHERE name='Public domain'), (SELECT id FROM model.entity WHERE name='File not public') ),
   ('P74', (SELECT id FROM model.entity WHERE name='Location of Shire'), (SELECT id FROM model.entity WHERE name='Sam') ),
   ('OA8', (SELECT id FROM model.entity WHERE name='Location of Shire'), (SELECT id FROM model.entity WHERE name='Sam') ),
   ('P11', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='Travel to Mordor') ),
@@ -115,3 +117,10 @@ VALUES
 INSERT INTO web.entity_profile_image (entity_id, image_id)
 VALUES ( (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='Picture with a License') )
 ON CONFLICT (entity_id) DO UPDATE SET image_id=(SELECT id FROM model.entity WHERE name='Picture with a License');
+
+INSERT INTO model.file_info (entity_id, public, creator, license_holder)
+VALUES
+    ((SELECT id FROM model.entity WHERE name='File without license'), TRUE, 'Frodo', 'Frodo' ),
+    ((SELECT id FROM model.entity WHERE name='File without file'), TRUE, 'Sam', 'Sam' ),
+    ((SELECT id FROM model.entity WHERE name='Picture with a License'), TRUE, 'Sauron', 'Sauron' ),
+    ((SELECT id FROM model.entity WHERE name='File not public'), FALSE, 'Sauron', 'Sauron' );

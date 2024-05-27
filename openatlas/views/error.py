@@ -10,7 +10,8 @@ from openatlas.api.resources.error import (
     InvalidSearchValueError, InvalidSystemClassError, InvalidViewClassError,
     LastEntityError,
     LogicalOperatorError, NoLicenseError, NoSearchStringError,
-    NotAPlaceError, NotATypeError, OperatorError, QueryEmptyError,
+    NotAPlaceError, NotATypeError, NotPublicError, OperatorError,
+    QueryEmptyError,
     InvalidSearchCategoryError, ValueNotIntegerError)
 
 
@@ -190,6 +191,17 @@ def no_license(_e: Exception) -> tuple[Any, int]:
         'title': 'No license',
         'message':
             'The requested file has no license and cannot be displayed.',
+        'url': request.url,
+        'timestamp': datetime.datetime.now(),
+        'status': 409}), 409
+
+
+@app.errorhandler(NotPublicError)
+def not_public(_e: Exception) -> tuple[Any, int]:
+    return jsonify({
+        'title': 'Not public',
+        'message':
+            'This file is not public shareable.',
         'url': request.url,
         'timestamp': datetime.datetime.now(),
         'status': 409}), 409

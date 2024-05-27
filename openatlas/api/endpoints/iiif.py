@@ -219,7 +219,10 @@ class IIIFManifest(Resource):
 
     @staticmethod
     def get_manifest_version_2(id_: int) -> dict[str, Any]:
-        entity = ApiEntity.get_by_id(id_)
+        entity = ApiEntity.get_by_id(id_, types=True)
+        license_ = get_license_name(entity)
+        if entity.license_holder:
+            license_ = f'{license_}, {entity.license_holder}'
         return {
             "@context": "https://iiif.io/api/presentation/2/context.json",
             "@id":
@@ -236,7 +239,7 @@ class IIIFManifest(Resource):
             "description": [{
                 "@value": entity.description or '',
                 "@language": "en"}],
-            "license": get_license_name(entity),
+            "attribution": license_,
             "logo": get_logo(),
             "sequences": [
                 IIIFSequence.build_sequence(get_metadata(entity))],

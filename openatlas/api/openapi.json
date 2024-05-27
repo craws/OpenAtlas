@@ -2511,6 +2511,15 @@
                       "license": {
                         "type": "string"
                       },
+                      "licenseHolder": {
+                        "type": "string"
+                      },
+                      "creator": {
+                        "type": "string"
+                      },
+                      "publicShareable": {
+                        "type": "boolean"
+                      },
                       "url": {
                         "type": "string"
                       },
@@ -4548,6 +4557,9 @@
               "thumbnail",
               "extension",
               "license",
+              "licenseHolder",
+              "creator",
+              "publicShareable",
               "IIIFManifest"
             ],
             "properties": {
@@ -4562,6 +4574,15 @@
               },
               "license": {
                 "type": "string"
+              },
+              "licenseHolder": {
+                "type": "string"
+              },
+              "creator": {
+                "type": "string"
+              },
+              "publicShareable": {
+                "type": "boolean"
               },
               "IIIFManifest": {
                 "type": "string"

@@ -92,6 +92,9 @@ def get_lp_file(links_inverse: list[Link]) -> list[dict[str, str]]:
                 _external=True),
             'title': link.domain.name,
             'license': get_license_name(link.domain),
+            'creator': link.domain.creator,
+            'licenseHolder': link.domain.license_holder,
+            'publicShareable': link.domain.public,
             'mimetype': mime_type,
             'IIIFManifest': iiif_manifest,
             'url': url_for(

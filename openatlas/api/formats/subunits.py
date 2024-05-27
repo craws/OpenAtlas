@@ -146,6 +146,9 @@ def get_file(data: dict[str, Any]) -> list[dict[str, Any]]:
             'name': link.domain.name,
             'fileName': path.name if path else None,
             'license': get_license_name(link.domain),
+            'creator': link.domain.creator,
+            'licenseHolder': link.domain.license_holder,
+            'publicShareable': link.domain.public,
             'source': link.domain.description or None})
     if data['parser']['format'] == 'xml':
         return [{'file': file} for file in files]
