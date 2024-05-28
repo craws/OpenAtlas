@@ -7,7 +7,7 @@ from openatlas.api.endpoints.endpoint import Endpoint
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.error import (
     InvalidLimitError, NotATypeError, QueryEmptyError)
-from openatlas.api.resources.parser import entity_, query
+from openatlas.api.resources.parser import entity_, properties, query
 from openatlas.api.resources.util import (
     get_entities_from_type_with_subs, get_entities_linked_to_special_type,
     get_entities_linked_to_special_type_recursive, get_linked_entities_api)
@@ -51,7 +51,7 @@ class GetEntitiesLinkedToEntity(Resource):
 class GetLinkedEntitiesByPropertyRecursive(Resource):
     @staticmethod
     def get(id_: int) -> Response | dict[str, Any]:
-        parser = entity_.parse_args()
+        parser = properties.parse_args()
         return Endpoint(
             ApiEntity.get_linked_entities_with_properties(
                 id_,
@@ -108,11 +108,11 @@ class GetQuery(Resource):
     def get() -> tuple[Resource, int] | Response | dict[str, Any]:
         parser = query.parse_args()
         if not any([
-            parser['entities'],
-            parser['cidoc_classes'],
-            parser['view_classes'],
-            parser['system_classes'],
-            parser['linked_entities']]):
+                parser['entities'],
+                parser['cidoc_classes'],
+                parser['view_classes'],
+                parser['system_classes'],
+                parser['linked_entities']]):
             raise QueryEmptyError
         entities = []
         if parser['entities']:
