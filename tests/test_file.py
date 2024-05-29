@@ -11,11 +11,13 @@ from tests.base import TestBaseCase, get_hierarchy, insert
 class FileTest(TestBaseCase):
 
     def test_file(self) -> None:
+
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()
                 place = insert('place', 'File keeper')
                 reference = insert('edition', 'Ancient Books')
+                license_type = get_hierarchy('License')
 
             logo = Path(
                 app.root_path) / 'static' / 'images' / 'layout' / 'logo.png'
@@ -23,16 +25,29 @@ class FileTest(TestBaseCase):
             with open(logo, 'rb') as img_1, open(logo, 'rb') as img_2:
                 rv: Any = self.app.post(
                     url_for('insert', class_='file', origin_id=place.id),
-                    data={'name': 'OpenAtlas logo', 'file': [img_1, img_2]},
+                    data={
+                        'name': 'OpenAtlas logo',
+                        'public': True,
+                        'file': [img_1, img_2]},
                     follow_redirects=True)
             assert b'An entry has been created' in rv.data
+
+            with app.test_request_context():
+                app.preprocess_request()
+                files = Entity.get_by_class('file')
+                file_without_creator_id = files[0].id
+
+            rv = self.app.get(url_for('view', id_=file_without_creator_id))
+            assert b'but license is missing ' in rv.data
 
             with open(logo, 'rb') as img:
                 rv = self.app.post(
                     url_for('insert', class_='file', origin_id=reference.id),
                     data={
                         'name': 'OpenAtlas logo',
-                        'file': img},
+                        'file': img,
+                        'public': True,
+                        str(license_type.id): license_type.subs[0]},
                     follow_redirects=True)
             assert b'An entry has been created' in rv.data
 

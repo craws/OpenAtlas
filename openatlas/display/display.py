@@ -67,8 +67,14 @@ class FileDisplay(BaseDisplay):
 
     def add_data(self) -> None:
         super().add_data()
-        self.data[_('public sharing allowed')] = str(_('yes')) \
-            if self.entity.public else str(_('no'))
+        self.data[_('public sharing allowed')] = str(_('no'))
+        if self.entity.public:
+            self.data[_('public sharing allowed')] = str(_('yes'))
+            if not self.entity.standard_type:
+                self.data[_('public sharing allowed')] = str(_('yes')) + (
+                    ' <span class="error">' + _('but license is missing ') +
+                    '</span>')
+
         self.data[_('creator')] = self.entity.creator
         self.data[_('license_holder')] = self.entity.license_holder
         self.data[_('size')] = self.entity.get_file_size()

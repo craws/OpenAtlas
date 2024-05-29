@@ -1,5 +1,5 @@
 from flask import g, render_template, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import format_number, lazy_gettext as _
 from werkzeug.wrappers import Response
 
 from openatlas import app
@@ -9,7 +9,7 @@ from openatlas.display.util import (
     button, check_iiif_file_exist, get_base_table_data, get_file_path, link,
     required_group)
 from openatlas.display.util2 import (
-    format_date, is_authorized, manual, show_table_icons)
+    format_date, is_authorized, manual, show_table_icons, uc_first)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 
@@ -25,6 +25,9 @@ def index(view: str) -> str | Response:
                     g.classes[name].label,
                     url_for('insert', class_=name),
                     tooltip_text=g.classes[name].get_tooltip()))
+    crumbs = [_(view).replace('_', ' ')]
+    if view == 'file':
+        crumbs = [[_('file'), url_for('file_index')], _('files')]
     return render_template(
         'entity/index.html',
         class_=view,
@@ -32,18 +35,24 @@ def index(view: str) -> str | Response:
         buttons=buttons,
         gis_data=Gis.get_all() if view == 'place' else None,
         title=_(view.replace('_', ' ')),
-        crumbs=[[_('file'), url_for('file_index')], _('files')]
-        if view == 'file' else [_(view).replace('_', ' ')])
+        crumbs=crumbs)
 
 
 def get_table(view: str) -> Table:
     table = Table(g.table_headers[view])
     if view == 'file':
+        stats = {'public': 0, 'without_license': 0, 'without_creator': 0}
         table.order = [[0, 'desc']]
         table.header = ['date'] + table.header
         if show_table_icons():
             table.header.insert(1, _('icon'))
         for entity in Entity.get_by_class('file', types=True):
+            if entity.public:
+                stats['public'] += 1
+                if not entity.standard_type:
+                    stats['without_license'] += 1
+                elif not entity.creator:
+                    stats['without_creator'] += 1
             data = [
                 format_date(entity.created),
                 link(entity),
@@ -57,6 +66,14 @@ def get_table(view: str) -> Table:
             if show_table_icons():
                 data.insert(1, file_preview(entity.id))
             table.rows.append(data)
+        table.additional_information = (
+            uc_first(_('files')) + ': ' +
+            f"{format_number(stats['public'])} " + _('public') +
+            f", {format_number(stats['without_license'])} " +
+            _('public without license') +
+            f", {format_number(stats['without_creator'])} " +
+            _('public with license but without creator'))
+
     elif view == 'reference_system':
         for system in g.reference_systems.values():
             table.rows.append([
