@@ -20,8 +20,12 @@ versions = {
             '2277': 'References for types',
             '2129': 'Attributions for files',
             '2105': 'New file license system',
+            '2288': 'Import entities to existing hierarchy',
+            '2271': 'API: 0.4.3',
+            '2294': 'API: Adapt public sharing of files',
             '2273': 'API: Endpoint to retrieve all available CIDOC properties',
-            '2274': 'API: Endpoint to get related entities'},
+            '2274': 'API: Endpoint to get related entities',
+            '2272': 'Refactor and minor improvements'},
         'fix': {
             '2278': 'Import Place Hierarchy'}}],
     '8.4.1': ['2024-05-14', {
