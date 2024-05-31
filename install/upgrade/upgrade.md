@@ -20,6 +20,9 @@ then run the database upgrade script, then restart Apache:
 ### 8.4.x to 8.5.0
 8.5.0.sql is needed but will be taken care of by the database upgrade script.
 
+Please note the changes regarding making files available via the API:
+https://manual.openatlas.eu/faq.html#how-to-make-files-available-for-the-public
+
 ### 8.3.0 to 8.4.0
 8.4.0.sql is needed but will be taken care of by the database upgrade script.
 
