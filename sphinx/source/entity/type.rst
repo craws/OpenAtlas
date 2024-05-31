@@ -63,6 +63,11 @@ Form fields
 * :doc:`/ui/date`
 * A super (type) if it is a sub type of another type
 
+Can be linked via tabs to
+-------------------------
+* :doc:`reference`
+* :doc:`file`
+
 Making types required
 ---------------------
 It is possible making specifying of types required. This can be done at the

@@ -95,6 +95,12 @@ But be aware that although the file itself won't be shared, the file
 information (e.g. filename) will still be available (e.g. shown on a
 presentation site).
 
+At **file** -> **list** at the top you find counts for:
+
+* public files
+* public files with a missing license
+* public files with a license but without creator (which many licenses require)
+
 Criteria checked by users
 *************************
 * The linked license has to be the correct one and allow public sharing

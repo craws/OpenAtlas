@@ -82,8 +82,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../troubleshooting/index.html">Troubleshooting</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../faq.html#criteria-checked-by-the-software">Criteria checked by the software</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../faq.html#criteria-checked-by-managers-and-users">Criteria checked by managers and users</a></li>
 </ul>
 
         </div>
@@ -181,6 +179,7 @@ an error message.</p>
 <li><p><strong>administrative_unit</strong> - only available for places, id of existing administrative unit</p></li>
 <li><p><strong>historical_place</strong> - only available for places, id of existing historical place</p></li>
 <li><p><strong>parent_id</strong> - only available for place, id of a super unit in a place hierarchy, see <a class="reference internal" href="#place-hierarchy-import"><span class="std std-ref">Place hierarchy</span></a></p></li>
+<li><p><strong>openatlas_parent_id</strong> - only available for place, id of a super unit existing in OpenAtlas, see <a class="reference internal" href="#place-hierarchy-import"><span class="std std-ref">Place hierarchy</span></a></p></li>
 <li><p><strong>openatlas_class</strong> - only available for place and only used with <strong>parent_id</strong>, see <a class="reference internal" href="#place-hierarchy-import"><span class="std std-ref">Place hierarchy</span></a></p></li>
 </ul>
 <section id="alias">
@@ -234,7 +233,7 @@ a custom type <strong>Case studies</strong> to link them all in one go.</p>
 <span id="wkt-import"></span><h3>WKT coordinates<a class="headerlink" href="#wkt-coordinates" title="Permalink to this heading"></a></h3>
 <p>For places and artifact (multi)point, (multi)polygon, (multi)linestring coordinates or
 GeometricCollection can be imported. Keep in mind to use
-the <a class="reference external" href="https://gisgeography.com/wgs84-world-geodetic-system/">WGS84</a> geodetic system.
+the <a class="reference external" href="https://gisgeography.com/wgs84-world-geodetic-system/">WGS84</a> geodetic system (EPSG 4326).
 Coordinates will be imported as <a class="reference external" href="https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry">WKT</a>.
 It is only possible to import one geometry for each entry. Since the WKT format uses commas (<strong>,</strong>),
 surround the coordinates with double quotes (<strong>”</strong>)</p>
@@ -259,14 +258,18 @@ the identifier, e.g. Q54123, the second value is the match type (<strong>close_m
 </section>
 <section id="place-hierarchy">
 <span id="place-hierarchy-import"></span><h3>Place hierarchy<a class="headerlink" href="#place-hierarchy" title="Permalink to this heading"></a></h3>
-<p>The <strong>parent_id</strong> is used to generate a <a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a> hierarchy together with <a class="reference internal" href="../entity/feature.html"><span class="doc">Feature</span></a>, <a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>,
+<p>The <strong>parent_id</strong> or <strong>openatlas_parent_id</strong> is used to generate a <a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a> hierarchy together
+with <a class="reference internal" href="../entity/feature.html"><span class="doc">Feature</span></a>, <a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>,
 <a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a>, and <a class="reference internal" href="../entity/human_remains.html"><span class="doc">Human remains</span></a>.
 The <strong>parent_id</strong> has to be an <strong>origin_id</strong> of a row in the <strong>current</strong> import file.
+The <strong>openatlas_parent_id</strong> has to be an <strong>existing</strong> OpenAtlas entity ID with the correct class.
 To declare, which entry has a specific class, the <strong>openatlas_class</strong> column is used.
-Here the following classes can be entered: <a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a>, <a class="reference internal" href="../entity/feature.html"><span class="doc">Feature</span></a>, <a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>,
-<a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a>, and <a class="reference internal" href="../entity/human_remains.html"><span class="doc">Human remains</span></a>. This is case-insensitive.
+Here the following classes can be entered: <a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a>, <a class="reference internal" href="../entity/feature.html"><span class="doc">Feature</span></a>,
+<a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>, <a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a>, and
+<a class="reference internal" href="../entity/human_remains.html"><span class="doc">Human remains</span></a>. This is case-insensitive.
 For an example, please see: <a class="reference download internal" download="" href="../_downloads/b05023d4f028f7f863c2384f2569e5f0/example_place_hierarchy.csv"><code class="xref download docutils literal notranslate"><span class="pre">example_place_hierarchy.csv</span></code></a></p>
-<p>For questions about the correct place hierarchy structure, please see the <strong>archaeological sub units</strong> at the OpenAtlas <a class="reference internal" href="../model/index.html"><span class="doc">Model</span></a>.</p>
+<p>For questions about the correct place hierarchy structure, please see the
+<strong>archaeological sub units</strong> at the OpenAtlas <a class="reference internal" href="../model/index.html"><span class="doc">Model</span></a>.</p>
 </section>
 </section>
 <section id="import-options">

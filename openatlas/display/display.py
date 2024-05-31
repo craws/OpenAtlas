@@ -74,7 +74,6 @@ class FileDisplay(BaseDisplay):
                 self.data[_('public sharing allowed')] = str(_('yes')) + (
                     ' <span class="error">' + _('but license is missing ') +
                     '</span>')
-
         self.data[_('creator')] = self.entity.creator
         self.data[_('license holder')] = self.entity.license_holder
         self.data[_('size')] = self.entity.get_file_size()
