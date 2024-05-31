@@ -76,7 +76,7 @@ class FileDisplay(BaseDisplay):
                     '</span>')
 
         self.data[_('creator')] = self.entity.creator
-        self.data[_('license_holder')] = self.entity.license_holder
+        self.data[_('license holder')] = self.entity.license_holder
         self.data[_('size')] = self.entity.get_file_size()
         self.data[_('extension')] = self.entity.get_file_ext()
 
