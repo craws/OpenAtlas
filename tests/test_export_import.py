@@ -200,7 +200,7 @@ class ExportImportTest(ExportImportTestCase):
                     url_for('import_data', class_='place', project_id=p_id),
                     data={'file': file},
                     follow_redirects=True)
-            assert b'multiple parent ids' in rv.data
+            assert b'multiple parent IDs' in rv.data
 
             data_frame.at[3, 'openatlas_parent_id'] = 99999
             data_frame.to_csv(
@@ -235,7 +235,10 @@ class ExportImportTest(ExportImportTestCase):
             data_frame.at[0, 'administrative_unit'] = austria.id
             data_frame.at[0, 'historical_place'] = carantania.id
             type_ids_list = [
-                boundary_mark.id, infrastructure.id, austria.id, place_type.id]
+                boundary_mark.id,
+                infrastructure.id,
+                austria.id,
+                place_type.id]
             data_frame.at[0, 'type_ids'] = ' '.join(map(str, type_ids_list))
             data_frame.at[0, 'value_types'] = f'{height.id};42'
             data_frame.at[0, 'references'] = f'{reference.id};IV'
