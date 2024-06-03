@@ -42,7 +42,8 @@ class BaseDisplay:
         self.entity.image_id = entity.get_profile_image_id()
         self.add_tabs()
         self.add_note_tab()
-        self.add_file_tab_thumbnails()
+        if 'file' in self.tabs and show_table_icons():
+            self.add_file_tab_thumbnails()
         self.add_crumbs()
         self.add_buttons()
         if self.linked_places:
@@ -68,9 +69,9 @@ class BaseDisplay:
         for type_, value in sorted(
                 self.entity.types.items(),
                 key=lambda x: x[0].name):
-            if self.entity.standard_type and type_.id \
-                    == self.entity.standard_type.id:
-                continue  # Standard type is already added
+            if self.entity.standard_type \
+                    and type_.id == self.entity.standard_type.id:
+                continue  # Standard type is already included
             title = " > ".join([g.types[i].name for i in type_.root])
             html = f'<span title="{title}">{link(type_)}</span>'
             if type_.category == 'value':
@@ -79,13 +80,10 @@ class BaseDisplay:
         return {key: data[key] for key in sorted(data.keys())}
 
     def add_file_tab_thumbnails(self) -> None:
-        if 'file' in self.tabs and show_table_icons():
-            self.tabs['file'].table.header.insert(1, _('icon'))
-            for row in self.tabs['file'].table.rows:
-                row.insert(1, file_preview(
-                    int(row[0]
-                        .replace('<a href="/entity/', '')
-                        .split('"')[0])))
+        self.tabs['file'].table.header.insert(1, _('icon'))
+        for row in self.tabs['file'].table.rows:
+            id_ = int(row[0].replace('<a href="/entity/', '').split('"')[0])
+            row.insert(1, file_preview(id_))
 
     def add_info_tab_content(self) -> None:
         self.add_data()
