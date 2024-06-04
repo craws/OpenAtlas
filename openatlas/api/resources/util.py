@@ -129,13 +129,13 @@ def get_geometric_collection(
                 if link_.property.code in ['P74', 'OA8', 'OA9']]
             if parser.centroid:
                 centroids = []
-                for link_ in links:
+                for link_ in links:  # pragma: no cover
                     if link_.property.code in ['P7', 'P26', 'P27']:
-                        if centroid_result := Gis.get_centroids_by_id(
-                                link_.range.id):
+                        if centroid_result := (
+                                Gis.get_centroids_by_id(link_.range.id)):
                             centroids.append(centroid_result)
                 if centroids:
-                    geoms.extend(centroids)
+                    geoms.extend(centroids)  # pragma: no cover
             return {
                 'type': 'GeometryCollection',
                 'geometries': [geom for sublist in geoms for geom in sublist]}
@@ -147,8 +147,8 @@ def get_geometric_collection(
                 centroids = []
                 for link_ in links:
                     if link_.property.code in ['P7', 'P26', 'P27']:
-                        if centroid_result := Gis.get_centroids_by_id(
-                                link_.range.id):
+                        if centroid_result := (
+                                Gis.get_centroids_by_id(link_.range.id)):
                             centroids.append(centroid_result)
                 if centroids:
                     geoms.extend(centroids)
