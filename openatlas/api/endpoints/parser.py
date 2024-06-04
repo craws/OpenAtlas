@@ -163,12 +163,14 @@ class Parser:
             id_ = entity.get_linked_entity_safe('P53').id
             geoms = Gis.get_by_id(id_)
             if self.centroid:
-                geoms.extend(Gis.get_centroids_by_id(id_))
+                if centroid_result := Gis.get_centroids_by_id(id_):
+                    geoms.extend(centroid_result)
             return geoms
         if entity.class_.name == 'object_location':
             geoms = Gis.get_by_id(entity.id)
             if self.centroid:
-                geoms.extend(Gis.get_centroids_by_id(entity.id))
+                if centroid_result := Gis.get_centroids_by_id(entity.id):
+                    geoms.extend(centroid_result)
             return geoms
         return []
 
@@ -250,7 +252,8 @@ class Parser:
         if entity.class_.name == 'object_location':
             geoms: list[Any] = Gis.get_by_id(entity.id)
             if self.centroid:
-                geoms.extend(Gis.get_centroids_by_id(entity.id))
+                if centroid_result := Gis.get_centroids_by_id(entity.id):
+                    geoms.extend(centroid_result)
             return get_geoms_dict(geoms)
         if links:
             geoms = [Gis.get_by_id(id_) for id_ in links]

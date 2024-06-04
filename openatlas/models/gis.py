@@ -29,7 +29,10 @@ class Gis:
         return db.get_by_ids(ids)
 
     @staticmethod
-    def get_centroids_by_id(id_: int) -> list[dict[str, Any]]:
+    def get_centroids_by_id(id_: int) -> Optional[list[dict[str, Any]]]:
+        result = db.get_centroids_by_id(id_)
+        if len(result) == 1 and not result[0]:
+            return None
         return db.get_centroids_by_id(id_)
 
     @staticmethod
@@ -71,10 +74,10 @@ class Gis:
             super_id = [structure['supers'][-1].id] \
                 if structure['supers'] else []
             extra_ids = [
-                            objects[0].id if objects else 0] \
-                        + super_id \
-                        + subunit_ids \
-                        + sibling_ids
+                    objects[0].id if objects else 0] \
+                + super_id \
+                + subunit_ids \
+                + sibling_ids
         object_ids = [x.id for x in objects] if objects else []
         for row in db.get_all(extra_ids):
             description = row['description'].replace('"', '\"') \
