@@ -356,18 +356,15 @@ def check_data_for_table_representation(
                 origin_ids.append(str(row['id']))
         table_data.append(table_row)
         checked_data.append(checked_row)
-    if form.duplicate.data:  # Check for possible duplicates
-        duplicates = Import.check_duplicates(class_, names)
-        if duplicates:
+    if form.duplicate.data:
+        if duplicates := Import.check_duplicates(class_, names):
             checks.set_warning('possible_duplicates', ', '.join(duplicates))
-    doubles = [
-        item for item, count in Counter(origin_ids).items() if count > 1]
+    doubles = [i for i, count in Counter(origin_ids).items() if count > 1]
     if doubles:
         checks.set_error('double_ids_in_import', ', '.join(doubles))
-    existing = Import.get_origin_ids(project, origin_ids) \
-        if origin_ids else None
-    if existing:
-        checks.set_error('ids_already_in_database', ', '.join(existing))
+    if origin_ids:
+        if existing := Import.get_origin_ids(project, origin_ids):
+            checks.set_error('ids_already_in_database', ', '.join(existing))
     if 'openatlas_class' in headers:
         entity_dict: dict[str, Any] = {
             row.get('id'): row['openatlas_class'].replace(' ', '_')
