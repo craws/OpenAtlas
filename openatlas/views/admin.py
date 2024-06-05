@@ -43,7 +43,7 @@ from openatlas.models.checks import (
     get_orphans, get_similar_named)
 from openatlas.models.content import get_content, update_content
 from openatlas.models.entity import Entity
-from openatlas.models.imports import Import
+from openatlas.models.imports import get_all_projects
 from openatlas.models.link import Link
 from openatlas.models.settings import Settings
 from openatlas.models.type import Type
@@ -107,7 +107,7 @@ def admin_index() -> str:
             'data',
             render_template(
                 'admin/data.html',
-                imports=Import.get_all_projects(),
+                imports=get_all_projects(),
                 info=get_form_settings(ApiForm())))
     return render_template(
         'tabs.html',

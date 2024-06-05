@@ -5,7 +5,7 @@ from flask_login import current_user
 
 from openatlas import app
 from openatlas.database import logger as db
-from openatlas.models.imports import Import
+from openatlas.models.imports import get_project_by_id
 from openatlas.models.user import User
 
 app.config['LOG_LEVELS'] = {
@@ -62,7 +62,7 @@ class Logger:
             'modifier': User.get_by_id(data['modifier_id'])
             if data['modifier_id'] else None,
             'modified': data['modified'],
-            'project': Import.get_project_by_id(data['project_id'])
+            'project': get_project_by_id(data['project_id'])
             if data['project_id'] else None,
             'importer': User.get_by_id(data['importer_id'])
             if data['importer_id'] else None,
