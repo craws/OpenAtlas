@@ -37,6 +37,10 @@ from openatlas.forms.setting import (
     MapForm, ModulesForm, SimilarForm, TestMailForm)
 from openatlas.forms.util import get_form_settings, set_form_settings
 from openatlas.models.annotation import Annotation
+from openatlas.models.checks import (
+    check_single_type_duplicates, get_entities_linked_to_itself,
+    get_invalid_cidoc_links, get_invalid_dates, get_orphaned_subunits,
+    get_orphans, get_similar_named)
 from openatlas.models.content import get_content, update_content
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Import
@@ -170,7 +174,7 @@ def get_user_table(users: list[User]) -> Table:
             user.real_name,
             user.group,
             user.email if is_authorized('manager')
-                or user.settings['show_email'] else '',
+            or user.settings['show_email'] else '',
             _('yes') if user.settings['newsletter'] else '',
             format_date(user.created),
             format_date(user.login_last_success),
@@ -216,7 +220,7 @@ def admin_content(item: str) -> str | Response:
 @required_group('contributor')
 def check_links() -> str:
     table = Table(['domain', 'property', 'range'])
-    for row in Entity.get_invalid_cidoc_links():
+    for row in get_invalid_cidoc_links():
         table.rows.append([
             f"{link(row['domain'])} ({row['domain'].cidoc_class.code})",
             link(row['property']),
@@ -272,7 +276,7 @@ def check_link_duplicates(delete: Optional[str] = None) -> str | Response:
     else:  # Check single types for multiple use
         tab.table = Table(
             ['entity', 'class', 'base type', 'incorrect multiple types'])
-        for row in Entity.check_single_type_duplicates():
+        for row in check_single_type_duplicates():
             remove_links = []
             for type_ in row['offending_types']:
                 url = url_for(
@@ -363,7 +367,7 @@ def check_similar() -> str:
     table = None
     if form.validate_on_submit():
         table = Table(['name', _('count')])
-        for sample in Entity.get_similar_named(
+        for sample in get_similar_named(
                 form.classes.data,
                 form.ratio.data).values():
             similar = [link(entity) for entity in sample['entities']]
@@ -406,7 +410,7 @@ def check_dates() -> str:
             buttons=[manual_link],
             table=Table(
                 ['actor', 'event', 'class', 'involvement', 'description']))}
-    for entity in Entity.get_invalid_dates():
+    for entity in get_invalid_dates():
         tabs['dates'].table.rows.append([
             link(entity),
             entity.class_.label,
@@ -497,9 +501,9 @@ def orphans() -> str:
             buttons=[manual_link],
             table=Table(
                 ['entity'],
-                [[link(e)] for e in Entity.get_entities_linked_to_itself()]))}
+                [[link(e)] for e in get_entities_linked_to_itself()]))}
 
-    for entity in Entity.get_orphans():
+    for entity in get_orphans():
         tabs[
             'unlinked'
             if entity.class_.view else 'orphans'].table.rows.append([
@@ -595,7 +599,7 @@ def orphans() -> str:
                 js=f"return confirm('{_('delete annotation')}?')")])
 
     # Orphaned subunits (without connection to a P46 super)
-    for entity in Entity.get_orphaned_subunits():
+    for entity in get_orphaned_subunits():
         tabs['orphaned_subunits'].table.rows.append([
             entity.id,
             entity.name,
