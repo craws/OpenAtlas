@@ -20,7 +20,8 @@ def insert_project(name: str, description: Optional[str]) -> int:
         INSERT INTO import.project (name, description)
         VALUES (%(name)s, %(description)s)
         RETURNING id;
-        """, {'name': name, 'description':  description})
+        """,
+        {'name': name, 'description':  description})
     return g.cursor.fetchone()['id']
 
 
