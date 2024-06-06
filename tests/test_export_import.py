@@ -234,12 +234,12 @@ class ExportImportTest(ExportImportTestCase):
             data_frame.at[2, 'id'] = 'new_place_3'
             data_frame.at[0, 'administrative_unit'] = austria.id
             data_frame.at[0, 'historical_place'] = carantania.id
-            type_ids_list = [
+            type_ids = [
                 boundary_mark.id,
                 infrastructure.id,
                 austria.id,
                 place_type.id]
-            data_frame.at[0, 'type_ids'] = ' '.join(map(str, type_ids_list))
+            data_frame.at[0, 'type_ids'] = ' '.join(map(str, type_ids))
             data_frame.at[0, 'value_types'] = f'{height.id};42'
             data_frame.at[0, 'references'] = f'{reference.id};IV'
             data_frame.at[0, 'wkt'] = "POLYGON((16.1203 BLA, 16.606275))"

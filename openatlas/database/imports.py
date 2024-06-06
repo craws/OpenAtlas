@@ -67,7 +67,7 @@ def check_duplicates(class_: str, names: list[str]) -> list[str]:
     return [row['name'] for row in g.cursor.fetchall()]
 
 
-def update_project(id_: int, name: str, description: str) -> None:
+def update_project(id_: int, name: str, description: Optional[str]) -> None:
     g.cursor.execute(
         """
         UPDATE import.project

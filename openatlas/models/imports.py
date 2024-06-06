@@ -105,117 +105,18 @@ def import_data_(project: Project, class_: str, data: list[Any]) -> None:
             entity.id,
             current_user.id,
             origin_id=row.get('id'))
+        if class_ in ['place', 'person', 'group']:
+            insert_alias(entity, row)
+        insert_dates(entity, row)
+        link_types(entity, row, class_)
+        link_references(entity, row, class_)
+        if class_ in g.view_class_mapping['place'] \
+                + g.view_class_mapping['artifact']:
+            insert_gis(entity, row, project)
         entities[row.get('id')] = {
             'entity': entity,
             'parent_id': row.get('parent_id'),
             'openatlas_parent_id':  row.get('openatlas_parent_id')}
-
-        # Dates
-        entity.update({'attributes': {
-            'begin_from': row.get('begin_from'),
-            'begin_to': row.get('begin_to'),
-            'begin_comment': row.get('begin_comment'),
-            'end_from': row.get('end_from'),
-            'end_to': row.get('end_to'),
-            'end_comment': row.get('end_comment')}})
-
-        # Types
-        if type_ids := row.get('type_ids'):
-            for type_id in str(type_ids).split():
-                if not check_type_id(type_id, class_):
-                    continue
-                entity.link('P2', g.types[int(type_id)])
-
-        # Value types
-        if data := row.get('value_types'):
-            for value_types in str(data).split():
-                value_type = value_types.split(';')
-                number = value_type[1][1:] \
-                    if value_type[1].startswith('-') else value_type[1]
-                if (not check_type_id(value_type[0], class_) or (
-                        not number.isdigit() or
-                        not number.replace('.', '', 1).isdigit())):
-                    continue
-                entity.link('P2', g.types[int(value_type[0])], value_type[1])
-
-        # References
-        if data := row.get('references'):
-            for references in str(data).split():
-                reference = references.split(';')
-                if len(reference) <= 2 and reference[0].isdigit():
-                    try:
-                        ref_entity = ApiEntity.get_by_id(int(reference[0]))
-                    except EntityDoesNotExistError:
-                        continue
-                    page = reference[1] if len(reference) > 1 else None
-                    ref_entity.link('P67', entity, page)
-
-        # External reference systems
-        match_types = get_match_types()
-        reference_systems = list(
-            set(key for key in row if key.startswith('reference_system_')))
-        for header in reference_systems:
-            system = header.replace('reference_system_', '')
-            if reference_system := get_reference_system_by_name(system):
-                if ((data := row.get(header)) and
-                        class_ in reference_system.classes):
-                    values = data.split(';')
-                    if values[1] in match_types:
-                        reference_system.link(
-                            'P67',
-                            entity,
-                            values[0],
-                            type_id=match_types[values[1]].id)
-
-        # Alias
-        if class_ in ['place', 'person', 'group']:
-            if aliases := row.get('alias'):
-                for alias_ in aliases.split(";"):
-                    entity.link('P1', Entity.insert('appellation', alias_))
-
-        # GIS
-        if (class_ in g.view_class_mapping['place']
-                + g.view_class_mapping['artifact']):
-            location = Entity.insert(
-                'object_location',
-                f"Location of {row['name']}")
-            entity.link('P53', location)
-
-            if data := row.get('administrative_unit'):
-                if ((str(data).isdigit() and int(data) in g.types) and
-                        g.types[g.types[int(data)].root[-1]].name in [
-                            'Administrative unit']):
-                    location.link('P89', g.types[int(data)])
-            if data := row.get('historical_place'):
-                if ((str(data).isdigit() and int(data) in g.types) and
-                        g.types[g.types[int(data)].root[-1]].name in [
-                            'Historical place']):
-                    location.link('P89', g.types[int(data)])
-
-            if coordinates := row.get('wkt'):
-                try:
-                    wkt_ = wkt.loads(coordinates)
-                except WKTReadingError:
-                    wkt_ = None
-                if wkt_:
-                    if (wkt_.geom_type in [
-                            'MultiPoint',
-                            'MultiLineString',
-                            'MultiPolygon',
-                            'GeometryCollection']):
-                        for poly in wkt_:
-                            Gis.insert_wkt(
-                                entity=entity,
-                                location=location,
-                                project=project,
-                                wkt_=poly)
-                    else:
-                        Gis.insert_wkt(
-                            entity=entity,
-                            location=location,
-                            project=project,
-                            wkt_=wkt_)
-
     for entry in entities.values():
         if entry['parent_id']:
             entities[entry['parent_id']]['entity'].link(
@@ -225,3 +126,91 @@ def import_data_(project: Project, class_: str, data: list[Any]) -> None:
             Entity.get_by_id(entry['openatlas_parent_id']).link(
                 'P46',
                 entry['entity'])
+
+
+def insert_dates(entity: Entity, row: dict[str, Any]) -> None:
+    entity.update({'attributes': {
+        'begin_from': row.get('begin_from'),
+        'begin_to': row.get('begin_to'),
+        'begin_comment': row.get('begin_comment'),
+        'end_from': row.get('end_from'),
+        'end_to': row.get('end_to'),
+        'end_comment': row.get('end_comment')}})
+
+
+def insert_alias(entity: Entity, row: dict[str, Any]) -> None:
+    if aliases := row.get('alias'):
+        for alias_ in aliases.split(";"):
+            entity.link('P1', Entity.insert('appellation', alias_))
+
+
+def link_types(entity: Entity, row: dict[str, Any], class_: str) -> None:
+    if type_ids := row.get('type_ids'):
+        for type_id in str(type_ids).split():
+            if check_type_id(type_id, class_):
+                entity.link('P2', g.types[int(type_id)])
+    if data := row.get('value_types'):
+        for value_types in str(data).split():
+            value_type = value_types.split(';')
+            number = value_type[1][1:] \
+                if value_type[1].startswith('-') else value_type[1]
+            if check_type_id(value_type[0], class_) and \
+                    (number.isdigit() or number.replace('.', '', 1).isdigit()):
+                entity.link('P2', g.types[int(value_type[0])], value_type[1])
+
+
+def link_references(entity: Entity, row: dict[str, Any], class_: str) -> None:
+    if data := row.get('references'):
+        for references in str(data).split():
+            reference = references.split(';')
+            if len(reference) <= 2 and reference[0].isdigit():
+                try:
+                    ref_entity = ApiEntity.get_by_id(int(reference[0]))
+                except EntityDoesNotExistError:
+                    continue
+                page = reference[1] if len(reference) > 1 else None
+                ref_entity.link('P67', entity, page)
+    match_types = get_match_types()
+    systems = list(set(i for i in row if i.startswith('reference_system_')))
+    for header in systems:
+        system = header.replace('reference_system_', '')
+        if reference_system := get_reference_system_by_name(system):
+            if ((data := row.get(header)) and
+                    class_ in reference_system.classes):
+                values = data.split(';')
+                if values[1] in match_types:
+                    reference_system.link(
+                        'P67',
+                        entity,
+                        values[0],
+                        type_id=match_types[values[1]].id)
+
+
+def insert_gis(entity: Entity, row: dict[str, Any], project: Project) -> None:
+    location = Entity.insert('object_location', f"Location of {row['name']}")
+    entity.link('P53', location)
+    if data := row.get('administrative_unit'):
+        if ((str(data).isdigit() and int(data) in g.types) and
+                g.types[g.types[int(data)].root[-1]].name in [
+                    'Administrative unit']):
+            location.link('P89', g.types[int(data)])
+    if data := row.get('historical_place'):
+        if ((str(data).isdigit() and int(data) in g.types) and
+                g.types[g.types[int(data)].root[-1]].name in [
+                    'Historical place']):
+            location.link('P89', g.types[int(data)])
+    if coordinates := row.get('wkt'):
+        try:
+            wkt_ = wkt.loads(coordinates)
+        except WKTReadingError:
+            wkt_ = None
+        if wkt_:
+            if wkt_.geom_type in [
+                    'MultiPoint',
+                    'MultiLineString',
+                    'MultiPolygon',
+                    'GeometryCollection']:
+                for poly in wkt_:
+                    Gis.insert_wkt(entity, location, project, poly)
+            else:
+                Gis.insert_wkt(entity, location, project, wkt_)
