@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import datetime
 import secrets
 import string
+from datetime import datetime, timedelta
 from typing import Any, Optional
 
 from flask import g, session
@@ -69,9 +69,9 @@ class User(UserMixin):
                 or self.login_failed_count < \
                 int(g.settings['failed_login_tries']):
             return False
-        unlocked = self.login_last_failure + datetime.timedelta(
+        unlocked = self.login_last_failure + timedelta(
             minutes=int(g.settings['failed_login_forget_minutes']))
-        return bool(unlocked > datetime.datetime.now())
+        return bool(unlocked > datetime.now())
 
     def get_notes_by_entity_id(self, entity_id: int) -> list[dict[str, Any]]:
         return db.get_notes_by_entity_id(self.id, entity_id)

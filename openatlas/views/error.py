@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from typing import Any
 
 from flask import g, jsonify, render_template, request
@@ -6,11 +6,11 @@ from flask import g, jsonify, render_template, request
 from openatlas import app
 from openatlas.api.resources.error import (
     AccessDeniedError, DisplayFileNotFoundError, EntityDoesNotExistError,
-    InvalidCidocClassCodeError, InvalidLimitError, InvalidSearchSyntax,
-    InvalidSearchValueError, InvalidSystemClassError, InvalidViewClassError,
-    LastEntityError, LogicalOperatorError, NoLicenseError, NoSearchStringError,
-    NotAPlaceError, NotATypeError, NotPublicError, OperatorError,
-    QueryEmptyError, InvalidSearchCategoryError, ValueNotIntegerError)
+    InvalidCidocClassCodeError, InvalidLimitError, InvalidSearchCategoryError,
+    InvalidSearchSyntax, InvalidSearchValueError, InvalidSystemClassError,
+    InvalidViewClassError, LastEntityError, LogicalOperatorError,
+    NoLicenseError, NoSearchStringError, NotAPlaceError, NotATypeError,
+    NotPublicError, OperatorError, QueryEmptyError, ValueNotIntegerError)
 
 
 @app.errorhandler(400)
@@ -39,14 +39,14 @@ def page_not_found(e: Exception) -> tuple[Any, int]:
                 'Please consult the manual or the Swagger documentation: '
                 f'{request.url_root}swagger',
             'url': request.url,
-            'timestamp': datetime.datetime.now(),
+            'timestamp': datetime.now(),
             'status': 404}), 404
     if request.path.startswith('/static'):
         return jsonify({
             'title': 'Site not found',
             'message': 'The site does not exist.',
             'url': request.url,
-            'timestamp': datetime.datetime.now(),
+            'timestamp': datetime.now(),
             'status': 404}), 404
     return render_template(
         'error/404.html',
@@ -77,7 +77,7 @@ def access_denied(_e: Exception) -> tuple[Any, int]:
         'message': 'You do not have access to the API. '
                    'Please ask the data provider for permission.',
         'url': request.url,
-        'timestamp': datetime.datetime.now(),
+        'timestamp': datetime.now(),
         'status': 403}), 403
 
 
@@ -87,7 +87,7 @@ def file_not_found(_e: Exception) -> tuple[Any, int]:
         'title': 'File not found',
         'message': 'No file was found for the requested ID.',
         'url': request.url,
-        'timestamp': datetime.datetime.now(),
+        'timestamp': datetime.now(),
         'status': 404}), 404
 
 
@@ -97,7 +97,7 @@ def entity_does_not_exist(_e: Exception) -> tuple[Any, int]:
         'title': 'Entity does not exist',
         'message': 'The requested entity does not exist in the database.',
         'url': request.url,
-        'timestamp': datetime.datetime.now(),
+        'timestamp': datetime.now(),
         'status': 404}), 404
 
 
@@ -109,7 +109,7 @@ def invalid_cidoc_class_code(_e: Exception) -> tuple[Any, int]:
             'The CIDOC class value is invalid, use "all" or '
             + str(list(g.cidoc_classes)),
         'url': request.url,
-        'timestamp': datetime.datetime.now(),
+        'timestamp': datetime.now(),
         'status': 400}), 400
 
 
@@ -120,7 +120,7 @@ def invalid_limit(_e: Exception) -> tuple[Any, int]:
         'message':
             'Only integers between 1 and 100 are allowed for the limit.',
         'url': request.url,
-        'timestamp': datetime.datetime.now(),
+        'timestamp': datetime.now(),
         'status': 400}), 400
 
 
@@ -132,7 +132,7 @@ def invalid_search_syntax(_e: Exception) -> tuple[Any, int]:
             'The search request contains major errors. '
             'Please confer the manual.',
         'url': request.url,
-        'timestamp': datetime.datetime.now(),
+        'timestamp': datetime.now(),
         'status': 400}), 400
 
 
@@ -144,7 +144,7 @@ def invalid_system_class(_e: Exception) -> tuple[Any, int]:
             'The system_classes value is invalid, use "all" or '
             + str(list(g.classes)),
         'url': request.url,
-        'timestamp': datetime.datetime.now(),
+        'timestamp': datetime.now(),
         'status': 400}), 400
 
 
@@ -156,7 +156,7 @@ def invalid_view_class(_e: Exception) -> tuple[Any, int]:
             'The view_classes value is invalid, use "all" or '
             + str(list(g.view_class_mapping)),
         'url': request.url,
-        'timestamp': datetime.datetime.now(),
+        'timestamp': datetime.now(),
         'status': 400}), 400
 
 
@@ -167,7 +167,7 @@ def last_entity_error(_e: Exception) -> tuple[Any, int]:
         'message':
             'The requested ID is the last entity, please choose another ID.',
         'url': request.url,
-        'timestamp': datetime.datetime.now(),
+        'timestamp': datetime.now(),
         'status': 400}), 400
 
 
@@ -179,7 +179,7 @@ def invalid_logical_operator(_e: Exception) -> tuple[Any, int]:
             'The logical operator is invalid. Please use: '
             f'{app.config["LOGICAL_OPERATOR"]}',
         'url': request.url,
-        'timestamp': datetime.datetime.now(),
+        'timestamp': datetime.now(),
         'status': 400}), 400
 
 
@@ -190,7 +190,7 @@ def no_license(_e: Exception) -> tuple[Any, int]:
         'message':
             'The requested file has no license and cannot be displayed.',
         'url': request.url,
-        'timestamp': datetime.datetime.now(),
+        'timestamp': datetime.now(),
         'status': 409}), 409
 
 
@@ -201,7 +201,7 @@ def not_public(_e: Exception) -> tuple[Any, int]:
         'message':
             'This file is not public shareable.',
         'url': request.url,
-        'timestamp': datetime.datetime.now(),
+        'timestamp': datetime.now(),
         'status': 409}), 409
 
 
@@ -211,7 +211,7 @@ def no_search_string(_e: NoSearchStringError) -> tuple[Any, int]:
         'title': 'No search value',
         'message': f'Search value for {_e.category} is missing.',
         'url': request.url,
-        'timestamp': datetime.datetime.now(),
+        'timestamp': datetime.now(),
         'status': 400}), 400
 
 
@@ -221,7 +221,7 @@ def not_a_type(_e: Exception) -> tuple[Any, int]:
         'title': 'Entity is not a type',
         'message': 'Requested ID either does not exist or is not a Type.',
         'url': request.url,
-        'timestamp': datetime.datetime.now(),
+        'timestamp': datetime.now(),
         'status': 400}), 400
 
 
@@ -231,7 +231,7 @@ def not_a_place(_e: Exception) -> tuple[Any, int]:
         'title': 'ID is not a valid place',
         'message': 'This endpoint requires a valid ID of a place entity.',
         'url': request.url,
-        'timestamp': datetime.datetime.now(),
+        'timestamp': datetime.now(),
         'status': 400}), 400
 
 
@@ -243,7 +243,7 @@ def invalid_operator(_e: Exception) -> tuple[Any, int]:
             'The compare operator is invalid. '
             f'Please use: {app.config["COMPARE_OPERATORS"]}',
         'url': request.url,
-        'timestamp': datetime.datetime.now(),
+        'timestamp': datetime.now(),
         'status': 400}), 400
 
 
@@ -256,7 +256,7 @@ def empty_query(_e: Exception) -> tuple[Any, int]:
             'parameters: entities, cidoc_classes, view_classes, '
             'system_classes.',
         'url': request.url,
-        'timestamp': datetime.datetime.now(),
+        'timestamp': datetime.now(),
         'status': 400}), 400
 
 
@@ -268,7 +268,7 @@ def invalid_search_category(_e: Exception) -> tuple[Any, int]:
             'The search category is invalid. Please use: '
             f'{app.config["VALID_VALUES"]}',
         'url': request.url,
-        'timestamp': datetime.datetime.now(),
+        'timestamp': datetime.now(),
         'status': 400}), 400
 
 
@@ -279,7 +279,7 @@ def invalid_search_value(_e: InvalidSearchValueError) -> tuple[Any, int]:
         'message':
             f'Search value is invalid for {_e.category}: {_e.values} ',
         'url': request.url,
-        'timestamp': datetime.datetime.now(),
+        'timestamp': datetime.now(),
         'status': 400}), 400
 
 
@@ -290,5 +290,5 @@ def value_not_an_integer(_e: Exception) -> tuple[Any, int]:
         'message':
             'The search values need to be an integer for the chosen category.',
         'url': request.url,
-        'timestamp': datetime.datetime.now(),
+        'timestamp': datetime.now(),
         'status': 400}), 400

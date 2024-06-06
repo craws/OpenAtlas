@@ -34,8 +34,7 @@ from openatlas.forms.field import SubmitField
 from openatlas.models.entity import Entity
 from openatlas.models.imports import (
     Project, check_duplicates, check_single_type_duplicates, check_type_id,
-    delete_project, get_all_projects, get_origin_ids, get_project_by_id,
-    get_project_by_name, import_data_, insert_project, update_project)
+    get_origin_ids, import_data_)
 
 _('invalid columns')
 _('possible duplicates')
@@ -73,9 +72,9 @@ class ProjectForm(FlaskForm):
 
     def validate(self, extra_validators: validators = None) -> bool:
         valid = FlaskForm.validate(self)
-        name = get_project_by_id(self.project_id).name \
+        name = Project.get_by_id(self.project_id).name \
             if self.project_id else ''
-        if name != self.name.data and get_project_by_name(self.name.data):
+        if name != self.name.data and Project.get_by_name(self.name.data):
             self.name.errors.append(_('error name exists'))
             valid = False
         return valid
@@ -129,7 +128,7 @@ class CheckHandler:
 @required_group('contributor')
 def import_index() -> str:
     table = Table([_('project'), _('entities'), _('description')])
-    for project in get_all_projects():
+    for project in Project.get_all():
         table.rows.append([
             link(project),
             format_number(project.count),
@@ -152,7 +151,7 @@ def import_index() -> str:
 def import_project_insert() -> str | Response:
     form = ProjectForm()
     if form.validate_on_submit():
-        id_ = insert_project(form.name.data, form.description.data)
+        id_ = Project.insert(form.name.data, form.description.data)
         flash(_('project inserted'), 'info')
         return redirect(url_for('import_project_view', id_=id_))
     return render_template(
@@ -168,7 +167,7 @@ def import_project_insert() -> str | Response:
 @app.route('/import/project/view/<int:id_>')
 @required_group('contributor')
 def import_project_view(id_: int) -> str:
-    project = get_project_by_id(id_)
+    project = Project.get_by_id(id_)
     content = ''
     if is_authorized('manager'):
         content = button_bar([
@@ -221,13 +220,13 @@ def import_project_view(id_: int) -> str:
 @app.route('/import/project/update/<int:id_>', methods=['GET', 'POST'])
 @required_group('manager')
 def import_project_update(id_: int) -> str | Response:
-    project = get_project_by_id(id_)
+    project = Project.get_by_id(id_)
     form = ProjectForm(obj=project)
     form.project_id = id_
     if form.validate_on_submit():
         project.name = form.name.data
         project.description = form.description.data
-        update_project(project)
+        project.update()
         flash(_('project updated'), 'info')
         return redirect(url_for('import_project_view', id_=project.id))
     return render_template(
@@ -244,7 +243,7 @@ def import_project_update(id_: int) -> str | Response:
 @app.route('/import/project/delete/<int:id_>')
 @required_group('manager')
 def import_project_delete(id_: int) -> Response:
-    delete_project(id_)
+    Project.delete(id_)
     flash(_('project deleted'), 'info')
     return redirect(url_for('import_index'))
 
@@ -266,7 +265,7 @@ class ImportForm(FlaskForm):
 @app.route('/import/data/<int:project_id>/<class_>', methods=['GET', 'POST'])
 @required_group('manager')
 def import_data(project_id: int, class_: str) -> str:
-    project = get_project_by_id(project_id)
+    project = Project.get_by_id(project_id)
     form = ImportForm()
     table = None
     imported = False

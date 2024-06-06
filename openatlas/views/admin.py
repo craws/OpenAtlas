@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-import datetime
 import importlib
 import math
 import os
 import shutil
+from datetime import datetime
 from pathlib import Path
 from subprocess import run
 from typing import Any, Optional
@@ -43,7 +43,7 @@ from openatlas.models.checks import (
     get_orphans, get_similar_named)
 from openatlas.models.content import get_content, update_content
 from openatlas.models.entity import Entity
-from openatlas.models.imports import get_all_projects
+from openatlas.models.imports import Project
 from openatlas.models.link import Link
 from openatlas.models.settings import Settings
 from openatlas.models.type import Type
@@ -107,7 +107,7 @@ def admin_index() -> str:
             'data',
             render_template(
                 'admin/data.html',
-                imports=get_all_projects(),
+                imports=Project.get_all(),
                 info=get_form_settings(ApiForm())))
     return render_template(
         'tabs.html',
@@ -539,8 +539,7 @@ def orphans() -> str:
             tabs['orphaned_files'].table.rows.append([
                 file.stem,
                 convert_size(file.stat().st_size),
-                format_date(
-                    datetime.datetime.utcfromtimestamp(file.stat().st_ctime)),
+                format_date(datetime.utcfromtimestamp(file.stat().st_ctime)),
                 file.suffix,
                 link(_('download'), url_for('download', filename=file.name)),
                 link(
@@ -561,8 +560,7 @@ def orphans() -> str:
                     file.stem,
                     convert_size(file.stat().st_size),
                     format_date(
-                        datetime.datetime.utcfromtimestamp(
-                            file.stat().st_ctime)),
+                        datetime.utcfromtimestamp(file.stat().st_ctime)),
                     file.suffix,
                     link(
                         _('delete'),
