@@ -290,6 +290,10 @@ class FileTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Annotation deleted' in rv.data
 
+            with app.test_request_context():
+                app.preprocess_request()
+                files = Entity.get_by_class('file')
+
             for file in files:
                 rv = self.app.get(
                     url_for('delete', id_=file.id),
