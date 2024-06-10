@@ -1,6 +1,6 @@
 import ast
 from collections import defaultdict
-from typing import Any
+from typing import Any, Optional
 
 from flask import g
 
@@ -66,7 +66,7 @@ def get_geometry_dict(row: dict[str, Any]) -> dict[str, Any]:
     return geometry
 
 
-def get_centroids_by_id(id_: int) -> list[dict[str, Any]]:
+def get_centroids_by_id(id_: int) -> Optional[list[dict[str, Any]]]:
     geometries = []
     g.cursor.execute(
         """
@@ -87,8 +87,9 @@ def get_centroids_by_id(id_: int) -> list[dict[str, Any]]:
         """,
         {'id_': id_})
     for row in g.cursor.fetchall():
-        geometries.append(get_centroid_dict(row))
-    return geometries
+        if data := get_centroid_dict(row):
+            geometries.append(data)
+    return geometries or None
 
 
 def get_centroids_by_ids(ids: list[int]) -> defaultdict[int, list[Any]]:

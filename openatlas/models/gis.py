@@ -30,9 +30,6 @@ class Gis:
 
     @staticmethod
     def get_centroids_by_id(id_: int) -> Optional[list[dict[str, Any]]]:
-        result = db.get_centroids_by_id(id_)
-        if len(result) == 1 and not result[0]:
-            return None  # pragma: no cover
         return db.get_centroids_by_id(id_)
 
     @staticmethod
