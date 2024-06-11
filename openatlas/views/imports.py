@@ -360,8 +360,7 @@ def check_data_for_table_representation(
     if form.duplicate.data:
         if duplicates := check_duplicates(class_, names):
             checks.set_warning('possible_duplicates', ', '.join(duplicates))
-    doubles = [i for i, count in Counter(origin_ids).items() if count > 1]
-    if doubles:
+    if doubles := [i for i, count in Counter(origin_ids).items() if count > 1]:
         checks.set_error('double_ids_in_import', ', '.join(doubles))
     if origin_ids:
         if existing := get_origin_ids(project, origin_ids):
