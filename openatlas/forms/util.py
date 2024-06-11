@@ -14,7 +14,6 @@ from wtforms import StringField
 
 from openatlas import app
 from openatlas.display.util import get_file_path
-from openatlas.forms.setting import ProfileForm
 from openatlas.models.entity import Entity
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -22,14 +21,6 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 def get_form_settings(form: Any, profile: bool = False) -> dict[str, str]:
-    if isinstance(form, ProfileForm):
-        return {
-            _('name'): current_user.real_name,
-            _('email'): current_user.email,
-            _('show email'): str(
-                _('on') if current_user.settings['show_email'] else _('off')),
-            _('newsletter'): str(
-                _('on') if current_user.settings['newsletter'] else _('off'))}
     settings = {}
     for field in form:
         if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
