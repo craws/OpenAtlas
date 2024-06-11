@@ -9,9 +9,8 @@ from openatlas.api.resources.util import (
     get_reference_systems, remove_duplicate_entities,
     replace_empty_list_values_in_dict_with_none)
 from openatlas.display.util import get_file_path
-from openatlas.models.entity import Entity
+from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
-from openatlas.models.link import Link
 
 
 def get_subunit(data: dict[str, Any]) -> dict[str, Any]:

@@ -23,9 +23,8 @@ from openatlas.forms.process import (
 from openatlas.forms.util import (
     check_if_entity_has_time, string_to_entity_list)
 from openatlas.forms.validation import hierarchy_name_exists, validate
-from openatlas.models.entity import Entity
+from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
-from openatlas.models.link import Link
 from openatlas.models.overlay import Overlay
 from openatlas.models.type import Type
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 import ast
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Any, Optional
 
 import numpy
 from flask import g, url_for
@@ -14,10 +14,7 @@ from wtforms import StringField
 
 from openatlas import app
 from openatlas.display.util import get_file_path
-from openatlas.models.entity import Entity
-
-if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.models.link import Link
+from openatlas.models.entity import Entity, Link
 
 
 def get_form_settings(form: Any, profile: bool = False) -> dict[str, str]:

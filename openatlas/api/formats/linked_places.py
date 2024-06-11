@@ -8,10 +8,9 @@ from flask import g, url_for
 from openatlas.api.resources.util import (
     date_to_str, get_crm_relation, get_crm_relation_label_x,
     get_crm_relation_x, get_license_name, to_camel_case)
-from openatlas.display.util import check_iiif_activation, \
-    check_iiif_file_exist, get_file_path
-from openatlas.models.entity import Entity
-from openatlas.models.link import Link
+from openatlas.display.util import (
+    check_iiif_activation, check_iiif_file_exist, get_file_path)
+from openatlas.models.entity import Entity, Link
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.api.endpoints.parser import Parser

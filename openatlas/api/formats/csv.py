@@ -7,9 +7,8 @@ from typing import Any
 import pandas as pd
 from flask import Response, g
 
-from openatlas.models.entity import Entity
+from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
-from openatlas.models.link import Link
 
 
 def build_entity_dataframe(

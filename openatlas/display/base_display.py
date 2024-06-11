@@ -15,9 +15,8 @@ from openatlas.display.util import (
     link, profile_image_table_link, remove_link)
 from openatlas.display.util2 import (
     format_date, is_authorized, manual, show_table_icons)
-from openatlas.models.entity import Entity
+from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
-from openatlas.models.link import Link
 from openatlas.models.overlay import Overlay
 from openatlas.models.type import Type
 from openatlas.models.user import User

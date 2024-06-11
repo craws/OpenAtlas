@@ -5,7 +5,7 @@ from flask import g, url_for
 from openatlas import app
 from openatlas.database import entity as db
 from openatlas.forms.util import form_to_datetime64
-from openatlas.models.link import Link
+from openatlas.models.entity import Link
 from tests.base import TestBaseCase, get_hierarchy, insert
 
 

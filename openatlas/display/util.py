@@ -24,12 +24,11 @@ from openatlas.display.util2 import format_date, is_authorized, uc_first
 from openatlas.models.cidoc_class import CidocClass
 from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.content import get_translation
-from openatlas.models.entity import Entity
+from openatlas.models.entity import Entity, Link
 from openatlas.models.imports import Project
 from openatlas.models.user import User
 
 if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.models.link import Link
     from openatlas.models.type import Type
 
 

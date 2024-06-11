@@ -18,8 +18,7 @@ from openatlas.display.util import (
 from openatlas.display.util2 import manual, sanitize
 from openatlas.forms.field import SubmitField
 from openatlas.forms.form import get_move_form
-from openatlas.models.entity import Entity
-from openatlas.models.link import Link
+from openatlas.models.entity import Entity, Link
 
 
 def walk_tree(types: list[int]) -> list[dict[str, Any]]:

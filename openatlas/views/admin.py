@@ -42,9 +42,8 @@ from openatlas.models.checks import (
     get_invalid_cidoc_links, get_invalid_dates, get_orphaned_subunits,
     get_orphans, get_similar_named)
 from openatlas.models.content import get_content, update_content
-from openatlas.models.entity import Entity
+from openatlas.models.entity import Entity, Link
 from openatlas.models.imports import Project
-from openatlas.models.link import Link
 from openatlas.models.settings import Settings
 from openatlas.models.type import Type
 from openatlas.models.user import User

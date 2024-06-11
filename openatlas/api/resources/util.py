@@ -3,9 +3,8 @@ from typing import Any, Optional
 from flask import g, json
 
 from openatlas.api.resources.api_entity import ApiEntity
-from openatlas.models.entity import Entity
+from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
-from openatlas.models.link import Link
 from openatlas.models.reference_system import ReferenceSystem
 
 
