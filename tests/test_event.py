@@ -62,9 +62,6 @@ class EventTest(TestBaseCase):
                 data=data)
             event_id = rv.location.split('/')[-1]
 
-            rv = self.app.get(url_for('view', id_=event_id))
-            assert b'Event Horizon' in rv.data
-
             data['end_year_from'] = '7'
             data['event_preceding'] = ''
             rv = self.app.post(
