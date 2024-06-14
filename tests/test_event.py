@@ -54,6 +54,7 @@ class EventTest(TestBaseCase):
                 'begin_month_from': '10',
                 'begin_day_from': '8',
                 'end_year_from': '1951',
+                'event_preceding': '',
                 f'reference_system_id_{g.wikidata.id}':
                     ['Q123', self.precision_type.subs[0]]}
 
@@ -63,7 +64,6 @@ class EventTest(TestBaseCase):
             event_id = rv.location.split('/')[-1]
 
             data['end_year_from'] = '7'
-            data['event_preceding'] = ''
             rv = self.app.post(
                 url_for('insert', class_='acquisition'),
                 data=data)

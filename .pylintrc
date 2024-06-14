@@ -3,8 +3,9 @@ ignore=openatlas.wsgi
 disable=C0111, broad-except, duplicate-code
 good-names=bc, e, ex, f, i, id, ip, j, js, k, l, Run, rv, to, x, y, _
 
+min-public-methods=1 # default=2 but isn't useful with inheritance
+
 # We are still learning. Lower/remove these limits once all above are solved.
-min-public-methods=1 # default=2  (too-few-public-methods)
 max-args=6           # default=5  (too-many-arguments)
 max-attributes=14    # default=7  (too-many-instance-attributes)
 max-branches=20      # default=12 (too-many-branches)

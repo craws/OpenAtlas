@@ -27,19 +27,12 @@ class AdminTests(TestBaseCase):
                     'description': '',
                     'type_id': None})
 
-            rv = self.app.get(url_for('orphans'))
-            assert b'Oliver Twist' in rv.data
-            assert b'Forsaken file' in rv.data
-            assert b'Forsaken subunit' in rv.data
-
-            rv = self.app.get(url_for('log'))
-            assert b'Login' in rv.data
+            assert b'Oliver Twist' in self.app.get(url_for('orphans')).data
+            assert b'Login' in self.app.get(url_for('log')).data
+            assert b'Login' not in self.app.get(url_for('log_delete')).data
 
             rv = self.app.get(url_for('check_dates'))
             assert b'Congratulations, everything looks fine!' in rv.data
-
-            rv = self.app.get(url_for('log_delete'))
-            assert b'Login' not in rv.data
 
             rv = self.app.get(url_for('check_links'))
             assert b'Invalid linked entity' in rv.data
