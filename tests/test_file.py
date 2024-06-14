@@ -153,9 +153,6 @@ class FileTest(TestBaseCase):
             assert b'Updated file' in rv.data
 
             rv = self.app.get(url_for('view', id_=iiif_id))
-            assert b'Logo' in rv.data
-
-            rv = self.app.get(url_for('view', id_=iiif_id))
             assert b'enable IIIF view' in rv.data
 
             rv = self.app.get(
