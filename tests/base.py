@@ -26,6 +26,8 @@ class TestBaseCase(unittest.TestCase):
                 self.alice_id = 2
                 self.precision_type = \
                     Type.get_hierarchy('External reference match')
+                self.test_path = Path(app.root_path).parent / 'tests'
+                self.static_path = Path(app.root_path) / 'static'
 
     def setup_database(self) -> None:
         connection = psycopg2.connect(
