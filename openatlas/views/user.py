@@ -189,7 +189,7 @@ def user_delete(id_:int) -> Response:
             or user.id == current_user.id \
             or (user.group == 'admin' and not is_authorized('admin')):
         abort(403)
-    User.delete(id_)
+    user.delete()
     flash(_('user deleted'), 'info')
     return redirect(f"{url_for('admin_index')}#tab-user")
 

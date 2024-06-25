@@ -54,6 +54,9 @@ class User(UserMixin):
             'password_reset_code': self.password_reset_code,
             'password_reset_date': self.password_reset_date})
 
+    def delete(self) -> None:
+        db.delete(self.id)
+
     def update_settings(self, settings: dict[str, Any]) -> None:
         for name, value in settings.items():
             db.update_settings(self.id, name, value)
@@ -125,10 +128,6 @@ class User(UserMixin):
     @staticmethod
     def insert(data: dict[str, Any]) -> int:
         return db.insert(data)
-
-    @staticmethod
-    def delete(id_: int) -> None:
-        db.delete(id_)
 
     @staticmethod
     def get_users_for_form() -> list[tuple[int, str]]:

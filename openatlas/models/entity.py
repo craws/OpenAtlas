@@ -32,9 +32,9 @@ class Entity:
         self.origin_id: Optional[int] = None  # When coming from another entity
         self.image_id: Optional[int] = None  # Profile image
         self.location: Optional[Entity] = None  # Respective location if place
-
-        self.standard_type = None
         self.types = {}
+        self.standard_type = None
+
         if 'types' in data and data['types']:
             for item in data['types']:  # f1 = type id, f2 = value
                 type_ = g.types[item['f1']]
@@ -51,7 +51,6 @@ class Entity:
             self.aliases = dict(
                 sorted(self.aliases.items(), key=lambda item_: item_[1]))
 
-        # Dates
         self.begin_from = None
         self.begin_to = None
         self.begin_comment = None

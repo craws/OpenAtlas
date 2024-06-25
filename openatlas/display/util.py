@@ -195,8 +195,8 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
         view_name = origin.class_.view
     html = ''
     for item in [
-        'source', 'event', 'actor', 'place', 'artifact', 'reference',
-        'type', 'file']:
+            'source', 'event', 'actor', 'place', 'artifact', 'reference',
+            'type', 'file']:
         active = ''
         request_parts = request.path.split('/')
         if view_name == item \
@@ -218,11 +218,8 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
 
 @app.template_filter()
 def profile_image(entity: Entity) -> str:
-    if not entity.image_id:
+    if not entity.image_id or not (path := get_file_path(entity.image_id)):
         return ''
-    if not (path := get_file_path(entity.image_id)):
-        return ''  # pragma: no cover
-
     file_id = entity.image_id
     src = url_for('display_file', filename=path.name)
     url = src
@@ -302,7 +299,7 @@ def format_name_and_aliases(entity: Entity, show_links: bool) -> str:
 def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
     data: list[Any] = [format_name_and_aliases(entity, show_links)]
     if entity.class_.view in [
-        'actor', 'artifact', 'event', 'place', 'reference']:
+            'actor', 'artifact', 'event', 'place', 'reference']:
         data.append(entity.class_.label)
     if entity.class_.standard_type_id:
         data.append(entity.standard_type.name if entity.standard_type else '')
@@ -504,11 +501,11 @@ def link(
 def button(
         label: str,
         url: Optional[str] = None,
-        css: Optional[str] = 'primary',
         id_: Optional[str] = None,
         onclick: Optional[str] = None,
         tooltip_text: Optional[str] = None) -> str:
     tag = 'a' if url else 'span'
+    css = 'secondary' if id_ in ['date-switcher'] else 'primary'
     if url and '/insert' in url and label != _('link'):
         label = f'+ <span class="uc-first d-inline-block">{label}</span>'
     tooltip_ = ''
@@ -631,6 +628,6 @@ def convert_image_to_iiif(id_: int, path: Optional[Path] = None) -> bool:
     try:
         with subprocess.Popen(command) as sub_process:
             sub_process.wait()
-        return True
     except Exception:  # pragma: no cover
         return False
+    return True

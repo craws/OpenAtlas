@@ -248,12 +248,13 @@ class Tab:
                             type_='member',
                             origin_id=id_)))
             case 'member_of':
-                self.buttons.append(button(
-                    'link',
-                    url_for(
-                        'insert_relation',
-                        type_='membership',
-                        origin_id=id_)))
+                self.buttons.append(
+                    button(
+                        'link',
+                        url_for(
+                            'insert_relation',
+                            type_='membership',
+                            origin_id=id_)))
             case 'note' if is_authorized('contributor'):
                 self.buttons.append(
                     button(_('note'), url_for('note_insert', entity_id=id_)))
@@ -281,9 +282,10 @@ class Tab:
                 self.buttons.append(
                     button('link', url_for('entity_add_reference', id_=id_)))
                 for item in g.view_class_mapping['reference']:
-                    self.buttons.append(button(
-                        g.classes[item].label,
-                        url_for('insert', class_=item, origin_id=id_)))
+                    self.buttons.append(
+                        button(
+                            g.classes[item].label,
+                            url_for('insert', class_=item, origin_id=id_)))
             case 'relation':
                 self.buttons.append(
                     button(

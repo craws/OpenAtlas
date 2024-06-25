@@ -719,10 +719,11 @@ def log() -> str:
             row['message'],
             user,
             row['info']])
-    buttons = [button(
-        _('delete all logs'),
-        url_for('log_delete'),
-        onclick=f"return confirm('{_('delete all logs')}?')")]
+    buttons = [
+        button(
+            _('delete all logs'),
+            url_for('log_delete'),
+            onclick=f"return confirm('{_('delete all logs')}?')")]
 
     return render_template(
         'tabs.html',

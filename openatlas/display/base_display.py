@@ -116,7 +116,7 @@ class BaseDisplay:
                 _('public') if note['public'] else _('private'),
                 link(User.get_by_id(note['user_id'])),
                 note['text'],
-                link(_("view"), url_for("note_view", id_=note["id"]))]
+                link(_('view'), url_for('note_view', id_=note['id']))]
             self.tabs['note'].table.rows.append(data)
 
     def add_buttons(self) -> None:
