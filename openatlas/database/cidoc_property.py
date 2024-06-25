@@ -7,7 +7,6 @@ def get_properties() -> list[dict[str, Any]]:
     g.cursor.execute(
         """
         SELECT
-            p.id,
             p.code,
             p.comment,
             p.domain_class_code,
@@ -18,7 +17,6 @@ def get_properties() -> list[dict[str, Any]]:
         FROM model.property p
         LEFT JOIN model.link l ON p.code = l.property_code
         GROUP BY (
-            p.id,
             p.code,
             p.comment,
             p.domain_class_code,

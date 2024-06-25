@@ -103,7 +103,6 @@ class Api(ApiTestCase):
             rv = self.app.get(
                 url_for('api_04.properties', locale='de')).get_json()
             assert rv['P2']['nameInverse'] == 'ist Typus von'
-            assert bool(rv['P2']['id'])
             assert bool(rv['P2']['name'])
             assert bool(rv['P2']['nameInverse'])
             assert bool(rv['P2']['i18n'])
@@ -112,7 +111,6 @@ class Api(ApiTestCase):
 
             rv = self.app.get(url_for(
                 'api_04.properties', locale='fr', download=True)).get_json()
-            assert bool(rv['P2']['id'])
             assert rv['P2']['name'] == 'est de type'
             rv = self.app.get(url_for('api_04.backend_details')).get_json()
             assert bool(rv['version'] == app.config['VERSION'])
