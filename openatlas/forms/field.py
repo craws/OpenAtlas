@@ -138,8 +138,8 @@ class ReferenceField(Field):
         self.placeholder = placeholder
         self.choices = choices
         self.reference_system_id = reference_system_id
-        self.data = {"value": "", "precision": ""}
-        self.row_css = "reference-system-switch"
+        self.data = {'value': '', 'precision': ''}
+        self.row_css = 'reference-system-switch'
 
     def process_formdata(self, valuelist: list[str]) -> None:
         self.data = {

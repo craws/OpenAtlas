@@ -70,8 +70,7 @@ class Gis:
             sibling_ids = [e.id for e in structure['siblings']]
             super_id = [structure['supers'][-1].id] \
                 if structure['supers'] else []
-            extra_ids = [
-                    objects[0].id if objects else 0] \
+            extra_ids = [objects[0].id if objects else 0] \
                 + super_id \
                 + subunit_ids \
                 + sibling_ids
