@@ -55,6 +55,14 @@ $(document).ready(function () {
     }
   });
 
+  /* Show and hide function for external reference systems */
+  $("#wikidata-switcher").click(function () {
+    $(".wikidata-switch").toggleClass('d-none');
+    $(this).text(function (i, text) {
+      return $.trim(text) === translate.show ? translate.hide : translate.show;
+    })
+  });
+
   /* Show and hide function for reference systems */
   $("#reference-system-switcher").click(function () {
     $(".reference-system-switch").toggleClass('d-none');
