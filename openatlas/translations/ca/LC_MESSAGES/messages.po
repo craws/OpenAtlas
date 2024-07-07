@@ -281,20 +281,20 @@ msgstr "document"
 #: openatlas/display/display.py:70 openatlas/display/display.py:72
 #: openatlas/display/display.py:74 openatlas/forms/manager.py:269
 msgid "public sharing allowed"
-msgstr ""
+msgstr "es permet compartir en públic"
 
 #: openatlas/display/display.py:75
 msgid "but license is missing "
-msgstr ""
+msgstr "però falta la llicència"
 
 #: openatlas/display/display.py:78
 #, fuzzy
 msgid "creator"
-msgstr "localització"
+msgstr "creador"
 
 #: openatlas/display/display.py:79
 msgid "license holder"
-msgstr ""
+msgstr "titular de la llicència"
 
 #: openatlas/display/display.py:80
 msgid "size"
@@ -452,7 +452,7 @@ msgstr "afegeix subunitat"
 
 #: openatlas/display/tab.py:215
 msgid "view all IIIF images"
-msgstr ""
+msgstr "veure totes les imatges IIIF"
 
 #: openatlas/display/tab.py:229 openatlas/views/index.py:64
 #: openatlas/views/note.py:50 openatlas/views/note.py:56
@@ -708,7 +708,7 @@ msgstr "pàgina"
 #: openatlas/forms/form.py:70
 #, fuzzy
 msgid "annotation"
-msgstr "localització"
+msgstr "anotació"
 
 #: openatlas/forms/form.py:75
 #, fuzzy
@@ -909,11 +909,11 @@ msgstr "tooltip IIIF habilitat"
 
 #: openatlas/forms/setting.py:68
 msgid "URL need a trailing /"
-msgstr ""
+msgstr "L'URL necessita el caràcter final /"
 
 #: openatlas/forms/setting.py:69
 msgid "tooltip IIIF URL"
-msgstr ""
+msgstr "Establiu l'URL complet al servidor de l'API d'imatges, p. ex. https://yourserver.eu/iiif/"
 
 #: openatlas/forms/setting.py:71 openatlas/templates/index/changelog.html:5
 msgid "version"
@@ -941,12 +941,12 @@ msgstr "tooltip ruta IIIF"
 
 #: openatlas/forms/setting.py:81
 msgid "convert on upload"
-msgstr ""
+msgstr "convertir durant la càrrega"
 
 #: openatlas/forms/setting.py:82
 #, fuzzy
 msgid "tooltip IIIF convert on upload"
-msgstr "tooltip conversió IIIF"
+msgstr "tooltip IIIF convertir en pujar"
 
 #: openatlas/forms/setting.py:83 openatlas/forms/setting.py:95
 #: openatlas/templates/model/network.html:104 openatlas/views/model.py:273
@@ -1022,8 +1022,8 @@ msgstr "correu electrònic"
 #: openatlas/forms/setting.py:138
 msgid "tooltip email"
 msgstr ""
-"Proporcionar un correu electrònic vàlid és important en el cas que hagi "
-"de restablir la seva contrasenya."
+"Proporcionar un correu electrònic vàlid és important en el cas "
+"que hagi de restablir la seva contrasenya."
 
 #: openatlas/forms/setting.py:140 openatlas/forms/util.py:29
 msgid "show email"
@@ -1137,7 +1137,7 @@ msgstr "funció de l actor"
 
 #: openatlas/models/openatlas_class.py:30
 msgid "administrative unit"
-msgstr ""
+msgstr "unitat administrativa"
 
 #: openatlas/models/openatlas_class.py:31
 msgid "appellation"
@@ -1150,7 +1150,7 @@ msgstr "bibliografia"
 #: openatlas/models/openatlas_class.py:33
 #, fuzzy
 msgid "creation"
-msgstr "localització"
+msgstr "creació"
 
 #: openatlas/models/openatlas_class.py:34
 msgid "external reference"
@@ -1164,12 +1164,12 @@ msgstr "Dates de participació invàlides"
 #: openatlas/models/openatlas_class.py:37
 #, fuzzy
 msgid "modification"
-msgstr "localització"
+msgstr "modificació"
 
 #: openatlas/models/openatlas_class.py:38
 #, fuzzy
 msgid "move"
-msgstr "mogut"
+msgstr "moure"
 
 #: openatlas/models/openatlas_class.py:39
 #, fuzzy
@@ -1179,7 +1179,7 @@ msgstr "produït"
 #: openatlas/models/openatlas_class.py:40
 #, fuzzy
 msgid "object location"
-msgstr "localització"
+msgstr "ubicació de l'objecte"
 
 #: openatlas/models/openatlas_class.py:41
 msgid "source translation"
@@ -1221,7 +1221,7 @@ msgstr "creació de documents (fitxers)"
 #: openatlas/templates/file.html:5
 #, fuzzy
 msgid "local disk usage"
-msgstr "espai total al disc"
+msgstr "ús del disc local"
 
 #: openatlas/templates/file.html:38
 msgid "total disk space"
@@ -1242,11 +1242,11 @@ msgstr "fitxers del projecte"
 #: openatlas/templates/file.html:59
 #, fuzzy
 msgid "distribution of project files"
-msgstr "fitxers que no són de projecte"
+msgstr "distribució de fitxers del projecte"
 
 #: openatlas/templates/file.html:102
 msgid "upload folder"
-msgstr ""
+msgstr "puja carpeta"
 
 #: openatlas/templates/file.html:107
 #, fuzzy
@@ -1255,11 +1255,11 @@ msgstr "l'exportació ha fallat"
 
 #: openatlas/templates/file.html:112
 msgid "processed images folder"
-msgstr ""
+msgstr "carpeta d'imatges processades"
 
 #: openatlas/templates/file.html:117
 msgid "IIIF folder"
-msgstr ""
+msgstr "carpeta IIIF"
 
 #: openatlas/templates/file.html:130
 msgid "remove custom logo"
@@ -1352,7 +1352,7 @@ msgstr "contacte"
 
 #: openatlas/templates/layout.html:131 openatlas/templates/layout.html:155
 msgid "legal_notice"
-msgstr "Avís Legal"
+msgstr "avís Legal"
 
 #: openatlas/templates/layout.html:134
 msgid "logout"
@@ -1375,8 +1375,8 @@ msgstr "tanca"
 #: openatlas/templates/layout.html:208
 msgid "warning no js"
 msgstr ""
-"Sembla que Javascript està desactivat. La funcionalitat d aquest lloc "
-"serà limitada."
+"Sembla que Javascript està desactivat. La funcionalitat "
+"d aquest lloc serà limitada."
 
 #: openatlas/templates/login.html:9 openatlas/views/login.py:152
 msgid "Forgot your password?"
@@ -1504,7 +1504,7 @@ msgid ""
 " to the main page."
 msgstr ""
 "Utilitzeu el botó Enrere del vostre navegador o feu clic <a "
-"href=\"/\">aquí</a> per a ana la pàgina inicial"
+"href=\"/\">aquí</a> per a anar la pàgina inicial"
 
 #: openatlas/templates/error/400.html:11 openatlas/templates/error/403.html:10
 msgid "Please let us know if you think it's a bug"
@@ -1528,8 +1528,8 @@ msgid ""
 "We searched a long time but this document does not exist. Maybe you "
 "mistyped or followed a broken link."
 msgstr ""
-"Hem buscat molt de temps però aquest document no existeix. Potser vas "
-"escriure malament o vas seguir un enllaç trencat"
+"Hem buscat molt de temps però aquest document no existeix. ""
+" Potser vas escriure malament o vas seguir un enllaç trencat"
 
 #: openatlas/templates/error/418.html:8
 msgid "This entry doesn't exist. Maybe you followed an obsolete link."
@@ -1832,8 +1832,8 @@ msgstr "Dibuixeu la forma si es coneix l extensió precisa"
 #: openatlas/templates/util/translations.html:19
 msgid "map_info_area"
 msgstr ""
-"Dibuixeu l àrea aproximada, encara que la seva localització sigui "
-"imprecisa"
+"Dibuixeu l àrea aproximada, encara que "
+"la seva localització sigui imprecisa"
 
 #: openatlas/templates/util/translations.html:20
 msgid "map_info_point"
@@ -1892,12 +1892,12 @@ msgstr "polígon"
 
 #: openatlas/templates/util/translations.html:33
 msgid "draw geometry"
-msgstr ""
+msgstr "dibuixa la geometria"
 
 #: openatlas/templates/util/translations.html:34
 #, fuzzy
 msgid "import wkt"
-msgstr "importa"
+msgstr "importa wkt"
 
 #: openatlas/views/admin.py:70 openatlas/views/admin.py:732
 msgid "system log"
@@ -1956,11 +1956,11 @@ msgstr "enllaç eliminat"
 #: openatlas/views/admin.py:320
 #, fuzzy
 msgid "settings"
-msgstr "est"
+msgstr "configuració"
 
 #: openatlas/views/admin.py:323
 msgid "IIIF"
-msgstr ""
+msgstr "IIIF"
 
 #: openatlas/views/admin.py:346 openatlas/views/arche.py:66
 #: openatlas/views/entity.py:237 openatlas/views/entity.py:272
@@ -1993,7 +1993,7 @@ msgstr "moure entitats"
 #: openatlas/views/admin.py:593 openatlas/views/annotation.py:43
 #, fuzzy
 msgid "delete annotation"
-msgstr "localització"
+msgstr "esborra l'anotació"
 
 #: openatlas/views/admin.py:612
 msgid "delete all files without corresponding entities?"
@@ -2021,7 +2021,7 @@ msgstr "no hi ha entitats per recuperar"
 
 #: openatlas/views/admin.py:679
 msgid "entity removed from annotation"
-msgstr ""
+msgstr "l'entitat s'ha eliminat de l'anotació"
 
 #: openatlas/views/admin.py:722
 msgid "delete all logs"
@@ -2111,11 +2111,11 @@ msgstr "fitxers"
 
 #: openatlas/views/entity_index.py:73
 msgid "public without license"
-msgstr ""
+msgstr "públic sense llicència"
 
 #: openatlas/views/entity_index.py:75
 msgid "public with license but without creator"
-msgstr ""
+msgstr "públic <mb llicència però sense creador"
 
 #: openatlas/views/export.py:31
 msgid "data was exported"
@@ -2158,15 +2158,15 @@ msgstr "IIIF convertit"
 
 #: openatlas/views/file.py:128
 msgid "failed to convert image"
-msgstr ""
+msgstr "no s'ha pogut convertir la imatge"
 
 #: openatlas/views/file.py:163
 msgid "please activate IIIF"
-msgstr ""
+msgstr "si us plau, activeu IIIF"
 
 #: openatlas/views/file.py:166
 msgid "please activate IIIF conversion"
-msgstr ""
+msgstr "si us plau, activeu la conversió IIIF"
 
 #: openatlas/views/file.py:174
 #, fuzzy
@@ -2180,7 +2180,7 @@ msgstr "fitxer esborrat"
 
 #: openatlas/views/file.py:195
 msgid "cannot delete images in upload directory"
-msgstr ""
+msgstr "no es poden eliminar imatges al directori de càrrega"
 
 #: openatlas/views/file.py:200
 #, fuzzy
@@ -2194,61 +2194,61 @@ msgstr "logo"
 #: openatlas/views/imports.py:37
 #, fuzzy
 msgid "invalid columns"
-msgstr "coordenades invàlides"
+msgstr "columnes invàlides"
 
 #: openatlas/views/imports.py:38
 #, fuzzy
 msgid "possible duplicates"
-msgstr "enllaç duplicat"
+msgstr "possible duplicat"
 
 #: openatlas/views/imports.py:39
 #, fuzzy
 msgid "invalid administrative units"
-msgstr "coordenades invàlides"
+msgstr "unitats administratives invàlides"
 
 #: openatlas/views/imports.py:40
 #, fuzzy
 msgid "invalid reference system class"
-msgstr "sistemes de referència externs"
+msgstr "classe de sistema de referència no vàlida"
 
 #: openatlas/views/imports.py:41
 #, fuzzy
 msgid "invalid reference system"
-msgstr "sistema de referència"
+msgstr "sistema de referència no vàlid"
 
 #: openatlas/views/imports.py:42
 #, fuzzy
 msgid "invalid reference system value"
-msgstr "sistemes de referència externs"
+msgstr "valor del sistema de referència no vàlid"
 
 #: openatlas/views/imports.py:43
 #, fuzzy
 msgid "invalid match type"
-msgstr "dates invàlides"
+msgstr "tipus de concordança no vàlid"
 
 #: openatlas/views/imports.py:44
 msgid "invalid type ids"
-msgstr "id de tipus invàlids"
+msgstr "IDs de tipus no vàlid"
 
 #: openatlas/views/imports.py:45
 #, fuzzy
 msgid "single type duplicates"
-msgstr "enllaç duplicat"
+msgstr "duplicats de tipus únic"
 
 #: openatlas/views/imports.py:46
 #, fuzzy
 msgid "invalid value types"
-msgstr "dates invàlides"
+msgstr "tipus de valors no vàlids"
 
 #: openatlas/views/imports.py:47
 #, fuzzy
 msgid "invalid value type ids"
-msgstr "id de tipus invàlids"
+msgstr "IDs de tipus de valor no vàlid"
 
 #: openatlas/views/imports.py:48
 #, fuzzy
 msgid "invalid value type values"
-msgstr "id de tipus invàlids"
+msgstr "valors de tipus de valor no vàlids"
 
 #: openatlas/views/imports.py:49
 msgid "invalid coordinates"
@@ -2257,12 +2257,12 @@ msgstr "coordenades invàlides"
 #: openatlas/views/imports.py:50
 #, fuzzy
 msgid "invalid OpenAtlas class"
-msgstr "coordenades invàlides"
+msgstr "classe OpenAtlas invàlida"
 
 #: openatlas/views/imports.py:51
 #, fuzzy
 msgid "invalid references"
-msgstr "sistema de referència"
+msgstr "referència invàlida"
 
 #: openatlas/views/imports.py:52
 #, fuzzy
@@ -2285,21 +2285,21 @@ msgstr "falta el nom de la columna"
 
 #: openatlas/views/imports.py:56
 msgid "ids already in database"
-msgstr ""
+msgstr "els identificadors ja estan a la base de dades"
 
 #: openatlas/views/imports.py:57
 msgid "double ids in import"
-msgstr ""
+msgstr "identificadors duplicars en importar"
 
 #: openatlas/views/imports.py:58
 #, fuzzy
 msgid "multiple parent ids"
-msgstr "múltiples entitats enllaçadess"
+msgstr "múltiples identificadors de pares"
 
 #: openatlas/views/imports.py:59
 #, fuzzy
 msgid "invalid openatlas parent id"
-msgstr "coordenades invàlides"
+msgstr "ID de pare de Openatlas no vàlid"
 
 #: openatlas/views/imports.py:129 openatlas/views/imports.py:137
 #: openatlas/views/imports.py:163
@@ -2589,11 +2589,11 @@ msgstr "Les contrasenyes no coincideixen"
 
 #: openatlas/views/profile.py:46
 msgid "error new password like old password"
-msgstr "La contrasenya nova és igual a l anterior"
+msgstr "la contrasenya nova és igual a l anterior"
 
 #: openatlas/views/profile.py:49 openatlas/views/user.py:69
 msgid "error password too short"
-msgstr "La contrasenya és massa curta"
+msgstr "la contrasenya és massa curta"
 
 #: openatlas/views/profile.py:73 openatlas/views/profile.py:149
 msgid "change password"
@@ -2778,18 +2778,10 @@ msgstr "jerarquia d'importació"
 msgid "You are about to import following hierarchy"
 msgstr "Esteu a punt d'importar la jerarquia següent"
 
-#~ msgid "Delete annotation?"
-#~ msgstr ""
-
-#~ msgid "draw_geometry"
-#~ msgstr ""
+#~ msgid "orphaned IIIF files"
+#~ msgstr "orphaned IIIF files und"
 
 #~ msgid "actor"
 #~ msgstr "actor"
 
-#~ msgid "iiif folder"
-#~ msgstr ""
-
-#~ msgid "license_holder"
-#~ msgstr ""
 

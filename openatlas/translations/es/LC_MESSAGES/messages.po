@@ -43,7 +43,7 @@ msgstr "vista en frontend"
 
 #: openatlas/display/base_display.py:152 openatlas/forms/base_manager.py:127
 msgid "copy"
-msgstr ""
+msgstr "copiar"
 
 #: openatlas/display/base_display.py:160 openatlas/views/admin.py:534
 #: openatlas/views/admin.py:551 openatlas/views/export.py:53
@@ -281,20 +281,20 @@ msgstr "documento"
 #: openatlas/display/display.py:70 openatlas/display/display.py:72
 #: openatlas/display/display.py:74 openatlas/forms/manager.py:269
 msgid "public sharing allowed"
-msgstr ""
+msgstr "se permite compartir en público"
 
 #: openatlas/display/display.py:75
 msgid "but license is missing "
-msgstr ""
+msgstr "pero falta la licencia "
 
 #: openatlas/display/display.py:78
 #, fuzzy
 msgid "creator"
-msgstr "localización"
+msgstr "creador"
 
 #: openatlas/display/display.py:79
 msgid "license holder"
-msgstr ""
+msgstr "titular de la licencia"
 
 #: openatlas/display/display.py:80
 msgid "size"
@@ -312,7 +312,7 @@ msgstr "descargar"
 
 #: openatlas/display/display.py:89
 msgid "missing file"
-msgstr "archivo perdido"
+msgstr "fichero perdido"
 
 #: openatlas/display/display.py:166
 msgid "object"
@@ -452,7 +452,7 @@ msgstr "añade subunidad"
 
 #: openatlas/display/tab.py:215
 msgid "view all IIIF images"
-msgstr ""
+msgstr "ver todas las imágenes IIIF"
 
 #: openatlas/display/tab.py:229 openatlas/views/index.py:64
 #: openatlas/views/note.py:50 openatlas/views/note.py:56
@@ -708,12 +708,12 @@ msgstr "página"
 #: openatlas/forms/form.py:70
 #, fuzzy
 msgid "annotation"
-msgstr "localización"
+msgstr "anotación"
 
 #: openatlas/forms/form.py:75
 #, fuzzy
 msgid "coordinates"
-msgstr "coordenadas inválidas"
+msgstr "coordenadas"
 
 #: openatlas/forms/form.py:122
 msgid "test"
@@ -763,7 +763,7 @@ msgstr "unidad estratigráfica"
 #: openatlas/views/file.py:62 openatlas/views/file.py:230
 #: openatlas/views/imports.py:251
 msgid "file"
-msgstr "archivo"
+msgstr "fichero"
 
 #: openatlas/forms/manager.py:319 openatlas/views/vocabs.py:145
 msgid "tooltip hierarchy multiple"
@@ -909,7 +909,7 @@ msgstr "información sobre herramientas IIIF habilitada"
 
 #: openatlas/forms/setting.py:68
 msgid "URL need a trailing /"
-msgstr ""
+msgstr "La URL necesita el carácter final / "
 
 #: openatlas/forms/setting.py:69
 msgid "tooltip IIIF URL"
@@ -941,7 +941,7 @@ msgstr "descripción emergente ruta IIIF"
 
 #: openatlas/forms/setting.py:81
 msgid "convert on upload"
-msgstr ""
+msgstr "convertir al subir"
 
 #: openatlas/forms/setting.py:82
 #, fuzzy
@@ -1137,7 +1137,7 @@ msgstr "función del actor"
 
 #: openatlas/models/openatlas_class.py:30
 msgid "administrative unit"
-msgstr ""
+msgstr "unidad administrativa"
 
 #: openatlas/models/openatlas_class.py:31
 msgid "appellation"
@@ -1150,7 +1150,7 @@ msgstr "bibliografía"
 #: openatlas/models/openatlas_class.py:33
 #, fuzzy
 msgid "creation"
-msgstr "localización"
+msgstr "creación"
 
 #: openatlas/models/openatlas_class.py:34
 msgid "external reference"
@@ -1164,12 +1164,12 @@ msgstr "Fechas de participación inválidas"
 #: openatlas/models/openatlas_class.py:37
 #, fuzzy
 msgid "modification"
-msgstr "localización"
+msgstr "modificación"
 
 #: openatlas/models/openatlas_class.py:38
 #, fuzzy
 msgid "move"
-msgstr "movido"
+msgstr "mover"
 
 #: openatlas/models/openatlas_class.py:39
 #, fuzzy
@@ -1179,7 +1179,7 @@ msgstr "producido"
 #: openatlas/models/openatlas_class.py:40
 #, fuzzy
 msgid "object location"
-msgstr "localización"
+msgstr "ubicacón del objeto"
 
 #: openatlas/models/openatlas_class.py:41
 msgid "source translation"
@@ -1221,7 +1221,7 @@ msgstr "creación de documentos (archivos)"
 #: openatlas/templates/file.html:5
 #, fuzzy
 msgid "local disk usage"
-msgstr "espacio total en disco"
+msgstr "uso del disco local"
 
 #: openatlas/templates/file.html:38
 msgid "total disk space"
@@ -1242,11 +1242,11 @@ msgstr "archivos de proyecto"
 #: openatlas/templates/file.html:59
 #, fuzzy
 msgid "distribution of project files"
-msgstr "archivos que no son de proyecto"
+msgstr "distribución de archivos del proyecto"
 
 #: openatlas/templates/file.html:102
 msgid "upload folder"
-msgstr ""
+msgstr "subir carpeta"
 
 #: openatlas/templates/file.html:107
 #, fuzzy
@@ -1255,11 +1255,11 @@ msgstr "exportación fallida"
 
 #: openatlas/templates/file.html:112
 msgid "processed images folder"
-msgstr ""
+msgstr "carpeta de imágenes procesadas"
 
 #: openatlas/templates/file.html:117
 msgid "IIIF folder"
-msgstr ""
+msgstr "carpeta IIIF"
 
 #: openatlas/templates/file.html:130
 msgid "remove custom logo"
@@ -1896,12 +1896,12 @@ msgstr "polígono"
 
 #: openatlas/templates/util/translations.html:33
 msgid "draw geometry"
-msgstr ""
+msgstr "dibuja geometría"
 
 #: openatlas/templates/util/translations.html:34
 #, fuzzy
 msgid "import wkt"
-msgstr "importar"
+msgstr "importar wkt"
 
 #: openatlas/views/admin.py:70 openatlas/views/admin.py:732
 msgid "system log"
@@ -1964,7 +1964,7 @@ msgstr "este"
 
 #: openatlas/views/admin.py:323
 msgid "IIIF"
-msgstr ""
+msgstr "IIIF"
 
 #: openatlas/views/admin.py:346 openatlas/views/arche.py:66
 #: openatlas/views/entity.py:237 openatlas/views/entity.py:272
@@ -1997,7 +1997,7 @@ msgstr "mover entidades"
 #: openatlas/views/admin.py:593 openatlas/views/annotation.py:43
 #, fuzzy
 msgid "delete annotation"
-msgstr "localización"
+msgstr "eliminar anotación"
 
 #: openatlas/views/admin.py:612
 msgid "delete all files without corresponding entities?"
@@ -2025,7 +2025,7 @@ msgstr "no hay entidades que recuperar"
 
 #: openatlas/views/admin.py:679
 msgid "entity removed from annotation"
-msgstr ""
+msgstr "entidad eliminada de la anotación"
 
 #: openatlas/views/admin.py:722
 msgid "delete all logs"
@@ -2111,15 +2111,15 @@ msgstr "Se ingresó una geometría no válida"
 
 #: openatlas/views/entity_index.py:30 openatlas/views/entity_index.py:70
 msgid "files"
-msgstr "archivos"
+msgstr "ficheros"
 
 #: openatlas/views/entity_index.py:73
 msgid "public without license"
-msgstr ""
+msgstr "público sin licencia"
 
 #: openatlas/views/entity_index.py:75
 msgid "public with license but without creator"
-msgstr ""
+msgstr "público con licencia pero sin creador"
 
 #: openatlas/views/export.py:31
 msgid "data was exported"
@@ -2162,15 +2162,15 @@ msgstr "IIIF convertida"
 
 #: openatlas/views/file.py:128
 msgid "failed to convert image"
-msgstr ""
+msgstr "no se ha podido convertir la imagen"
 
 #: openatlas/views/file.py:163
 msgid "please activate IIIF"
-msgstr ""
+msgstr "por favor active IIIF"
 
 #: openatlas/views/file.py:166
 msgid "please activate IIIF conversion"
-msgstr ""
+msgstr "por favor active la conversión IIIF"
 
 #: openatlas/views/file.py:174
 #, fuzzy
@@ -2184,7 +2184,7 @@ msgstr "fichero eliminado"
 
 #: openatlas/views/file.py:195
 msgid "cannot delete images in upload directory"
-msgstr ""
+msgstr "no se pueden eliminar imágenes en el directorio de carga"
 
 #: openatlas/views/file.py:200
 #, fuzzy
@@ -2198,7 +2198,7 @@ msgstr "logo"
 #: openatlas/views/imports.py:37
 #, fuzzy
 msgid "invalid columns"
-msgstr "coordenadas inválidas"
+msgstr "columnas inválidas"
 
 #: openatlas/views/imports.py:38
 #, fuzzy
@@ -2208,27 +2208,27 @@ msgstr "enlace duplicado"
 #: openatlas/views/imports.py:39
 #, fuzzy
 msgid "invalid administrative units"
-msgstr "coordenadas inválidas"
+msgstr "unidades administrativas inválidas"
 
 #: openatlas/views/imports.py:40
 #, fuzzy
 msgid "invalid reference system class"
-msgstr "sistemas de referencia externos"
+msgstr "clase de sistema de referencia no válida"
 
 #: openatlas/views/imports.py:41
 #, fuzzy
 msgid "invalid reference system"
-msgstr "sistema de referencia"
+msgstr "sistema de referencia inválido"
 
 #: openatlas/views/imports.py:42
 #, fuzzy
 msgid "invalid reference system value"
-msgstr "sistemas de referencia externos"
+msgstr "valor no válido del sistema de referencia"
 
 #: openatlas/views/imports.py:43
 #, fuzzy
 msgid "invalid match type"
-msgstr "fechas inválidas"
+msgstr "tipo de coincidencia no válida"
 
 #: openatlas/views/imports.py:44
 msgid "invalid type ids"
@@ -2237,22 +2237,22 @@ msgstr "id de tipos inválidos"
 #: openatlas/views/imports.py:45
 #, fuzzy
 msgid "single type duplicates"
-msgstr "enlace duplicado"
+msgstr "duplicados de un solo tipo"
 
 #: openatlas/views/imports.py:46
 #, fuzzy
 msgid "invalid value types"
-msgstr "fechas inválidas"
+msgstr "tipos de valores no válidos"
 
 #: openatlas/views/imports.py:47
 #, fuzzy
 msgid "invalid value type ids"
-msgstr "id de tipos inválidos"
+msgstr "ID de tipos de valores no válidos"
 
 #: openatlas/views/imports.py:48
 #, fuzzy
 msgid "invalid value type values"
-msgstr "id de tipos inválidos"
+msgstr "valores de tipo de valor no válidos"
 
 #: openatlas/views/imports.py:49
 msgid "invalid coordinates"
@@ -2261,17 +2261,17 @@ msgstr "coordenadas inválidas"
 #: openatlas/views/imports.py:50
 #, fuzzy
 msgid "invalid OpenAtlas class"
-msgstr "coordenadas inválidas"
+msgstr "clase OpenAtlas no válida"
 
 #: openatlas/views/imports.py:51
 #, fuzzy
 msgid "invalid references"
-msgstr "sistema de referencia"
+msgstr "referencias no válidas"
 
 #: openatlas/views/imports.py:52
 #, fuzzy
 msgid "invalid reference id"
-msgstr "sistema de referencia"
+msgstr "ID de referencia no válido"
 
 #: openatlas/views/imports.py:53
 #, fuzzy
@@ -2289,21 +2289,21 @@ msgstr "falta el nombre de la columna"
 
 #: openatlas/views/imports.py:56
 msgid "ids already in database"
-msgstr ""
+msgstr "identificadores ya en la base de datos"
 
 #: openatlas/views/imports.py:57
 msgid "double ids in import"
-msgstr ""
+msgstr "identificadores duplicados en la impotación"
 
 #: openatlas/views/imports.py:58
 #, fuzzy
 msgid "multiple parent ids"
-msgstr "varias entidades vinculadas"
+msgstr "múltiples identificadores de padres"
 
 #: openatlas/views/imports.py:59
 #, fuzzy
 msgid "invalid openatlas parent id"
-msgstr "coordenadas inválidas"
+msgstr "ID de padre de Openatlas no válido"
 
 #: openatlas/views/imports.py:129 openatlas/views/imports.py:137
 #: openatlas/views/imports.py:163
@@ -2661,7 +2661,7 @@ msgstr "corresponde a"
 #: openatlas/views/tools.py:52 openatlas/views/tools.py:78
 #: openatlas/views/tools.py:122 openatlas/views/tools.py:191
 msgid "sex estimation"
-msgstr "estimación de género "
+msgstr "estimación de género"
 
 #: openatlas/views/tools.py:233
 msgid "radiocarbon year"
@@ -2785,18 +2785,8 @@ msgstr "importar jerarquía"
 msgid "You are about to import following hierarchy"
 msgstr "Estás a punto de importar la siguiente jerarquía"
 
-#~ msgid "Delete annotation?"
-#~ msgstr ""
-
-#~ msgid "draw_geometry"
-#~ msgstr ""
+#~ msgid "orphaned IIIF files"
+#~ msgstr "orphaned IIIF files und"
 
 #~ msgid "actor"
 #~ msgstr "actor"
-
-#~ msgid "iiif folder"
-#~ msgstr ""
-
-#~ msgid "license_holder"
-#~ msgstr ""
-
