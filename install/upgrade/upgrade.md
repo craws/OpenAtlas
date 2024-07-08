@@ -30,8 +30,7 @@ https://manual.openatlas.eu/faq.html#how-to-make-files-available-for-the-public
 No database updates are required but new Python packages are needed:
 * python3-svgwrite (#2126 Polygons for image annotations)
 * python3-shapely (#1567 WKT import)
-
-
+<!-- end of the list -->
     sudo apt install python3-svgwrite python3-shapely
 
 **For developers**
@@ -68,8 +67,7 @@ follow these instructions to avoid error and warn messages in your logs:
 updated example
 * Disable systemd to try starting the IIPImage server because it's already
 started via Apache
-
-
+<!-- end of the list -->
     sudo systemctl disable iipsrv.service
 
 ### 7.17.x to 8.0.0
