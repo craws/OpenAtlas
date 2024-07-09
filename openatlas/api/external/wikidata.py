@@ -40,9 +40,12 @@ def fetch_wikidata(id_: str) -> dict[str, Any]:
     except:
         pass
 
-    info['founded_by'] = [
-        add_resolver_url(v['mainsnak']['datavalue']['value']['numeric-id'])
-        for v in data['entities'][id_]['claims']['P112']]
+    try:
+        info['founded_by'] = [
+            add_resolver_url(v['mainsnak']['datavalue']['value']['numeric-id'])
+            for v in data['entities'][id_]['claims']['P112']]
+    except:
+        pass
 
     try:
         info['nick_names'] = [

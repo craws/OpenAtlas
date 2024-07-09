@@ -19,9 +19,7 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
-from openatlas.api.external.wikidata import fetch_wikidata
 from openatlas.display.image_processing import check_processed_image
-from openatlas.display.table import Table
 from openatlas.display.util2 import format_date, is_authorized, uc_first
 from openatlas.models.cidoc_class import CidocClass
 from openatlas.models.cidoc_property import CidocProperty
@@ -53,16 +51,6 @@ def edit_link(url: str) -> Optional[str]:
     return link(_('edit'), url) if is_authorized('contributor') else None
 
 
-def display_external_info(name: str, info: dict[str, Any]) -> str:
-    html = f' <span id="{name}-switcher" class="uc-first ' + \
-        f'{app.config["CSS"]["button"]["secondary"]}">' + _('show') + '</span>'
-    table = Table(
-        [],
-        [[uc_first(name), value] for name, value in info.items()])
-    html += f'<div class="d-none {name}-switch">{table.display()}</div>'
-    return html
-
-
 @app.template_filter()
 def ext_references(links: list[Link]) -> str:
     if not links:
@@ -78,8 +66,12 @@ def ext_references(links: list[Link]) -> str:
             f' ({g.types[link_.type.id].name} ' + _('at') + \
             f' {link(link_.domain)})'
         if system.name == 'Wikidata':
-            if info := fetch_wikidata(link_.description):
-                html += display_external_info('wikidata', info)
+            html += (
+                ' <span class="uc-first '
+                f'{app.config["CSS"]["button"]["secondary"]}"'
+                f'onclick="ajaxAddWikidataInfo(\'{link_.description}\')">'
+                + _('show') + '</span>'
+                '<div id="wikidata-info-div"></div>')
         html += '<br>'
     return html
 

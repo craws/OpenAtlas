@@ -74,6 +74,7 @@ $(document).ready(function () {
       $(more).insertAfter(this);
     }
   });
+
   $(".more-link").click(function () {
     if ($(this).hasClass("less")) {
       $(this).removeClass("less");
@@ -135,6 +136,7 @@ $(document).ready(function () {
   }).on('autocomplete.select', function(evt,item) {
       $('input[data-reference-system=Wikidata]').val(item.id);
   });
+
 });
 
 $.jstree.defaults.core.themes.dots = false;
@@ -191,6 +193,17 @@ async function ajaxAddEntity(data) {
   return newEntityId;
 }
 
+async function ajaxAddWikidataInfo(data) {
+  $.ajax({
+    type: 'post',
+    url: '/ajax/add_wikidata_info',
+    data: 'id_=' + data,
+    success: function (info) {
+      $('#wikidata-info-div').html(info);
+    }
+  });
+}
+
 async function refillTable(id, filterIds = []) {
   const tableContent = await $.ajax({
     type: 'post',
@@ -228,11 +241,13 @@ async function ajaxAddType(data, fieldId, typeId, multiple=false) {
 function getTypeTree(rootId){
   return $.ajax({type: 'get', url: `/ajax/get_type_tree/${rootId}`});
 }
+
 function updateTree(id, d, refreshCallback) {
   $(`#${id}-tree`).jstree(true).settings.core.data = d;
   $(`#${id}-tree`).jstree(true).refresh();
   if (refreshCallback) $(`#${id}-tree`).on('refresh.jstree', refreshCallback);
 }
+
 function fillTreeSelect(id,d,minimum_jstree_search){
     $(`#${id}-tree`).jstree({
       "plugins": ["search"],

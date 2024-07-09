@@ -6,8 +6,9 @@ from flask_babel import lazy_gettext as _
 from flask_login import current_user
 
 from openatlas import app
+from openatlas.api.external.wikidata import fetch_wikidata
 from openatlas.database.connect import Transaction
-from openatlas.display.util import required_group
+from openatlas.display.util import display_info, required_group
 from openatlas.display.util2 import uc_first
 from openatlas.forms.field import table
 from openatlas.models.entity import Entity
@@ -89,3 +90,9 @@ def ajax_get_entity_table(content_domain: str) -> str:
             current_user.settings['table_show_aliases']),
         json.loads(request.form['filterIds']) or [])
     return table_.display(content_domain)
+
+
+@app.route('/ajax/add_wikidata_info', methods=['POST'])
+@required_group('readonly')
+def ajax_add_wikidata_info() -> str:
+    return display_info(fetch_wikidata(request.form['id_']))
