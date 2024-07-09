@@ -200,6 +200,7 @@ async function ajaxAddWikidataInfo(data) {
     data: 'id_=' + data,
     success: function (info) {
       $('#wikidata-info-div').html(info);
+      $('#wikidata-switch').hide();
     }
   });
 }

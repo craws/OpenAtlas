@@ -23,57 +23,57 @@ def fetch_wikidata(id_: str) -> dict[str, Any]:
     info = {}
     try:
         data = requests.get(url, params=params).json()
-    except:
+    except:  # pragma: no cover
         return {}
     try:
         info['title'] = data['entities'][id_]['labels']['en']['value']
-    except:
+    except:  # pragma: no cover
         pass
     try:
         info['aliases'] = [
             ' ' + v['value'] for v in data['entities'][id_]['aliases']['en']]
-    except:
+    except:  # pragma: no cover
         pass
     try:
         info['description'] = \
             data['entities'][id_]['descriptions']['en']['value']
-    except:
+    except:  # pragma: no cover
         pass
 
     try:
-        info['founded_by'] = [
+        info['founded by'] = [
             add_resolver_url(v['mainsnak']['datavalue']['value']['numeric-id'])
             for v in data['entities'][id_]['claims']['P112']]
     except:
         pass
 
     try:
-        info['nick_names'] = [
+        info['nick names'] = [
             v['mainsnak']['datavalue']['value']['text']
             for v in data['entities'][id_]['claims']['P1449']]
     except:
         pass
     try:
-        info['official_websites'] = [
+        info['official websites'] = [
             ' ' + link(
                 v['mainsnak']['datavalue']['value'],
                 v['mainsnak']['datavalue']['value'],
                 external=True)
             for v in data['entities'][id_]['claims']['P856']]
-    except:
+    except:  # pragma: no cover
         pass
     try:
         info['categories'] = [
             add_resolver_url(v['mainsnak']['datavalue']['value']['numeric-id'])
             for v in data['entities'][id_]['claims']['P910']]
-    except:
+    except:  # pragma: no cover
         pass
 
     try:
         info['inception'] = \
             data['entities'][id_]['claims']['P571'][0]['mainsnak'][
                 'datavalue']['value']['time']
-    except:
+    except:  # pragma: no cover
         pass
 
     try:
@@ -83,6 +83,6 @@ def fetch_wikidata(id_: str) -> dict[str, Any]:
         info['longitude'] = \
             data['entities'][id_]['claims']['P625'][0]['mainsnak'][
                 'datavalue']['value']['longitude']
-    except:
+    except:  # pragma: no cover
         pass
     return info

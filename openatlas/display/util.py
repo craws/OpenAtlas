@@ -67,7 +67,7 @@ def ext_references(links: list[Link]) -> str:
             f' {link(link_.domain)})'
         if system.name == 'Wikidata':
             html += (
-                ' <span class="uc-first '
+                ' <span id="wikidata-switch" class="uc-first '
                 f'{app.config["CSS"]["button"]["secondary"]}"'
                 f'onclick="ajaxAddWikidataInfo(\'{link_.description}\')">'
                 + _('show') + '</span>'

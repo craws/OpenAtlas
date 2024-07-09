@@ -40,6 +40,11 @@ class IndexTests(TestBaseCase):
             assert b'Database version error is needed but current' in rv.data
             assert b'directory not writable' in rv.data
 
+            rv = self.app.post(
+                url_for('ajax_add_wikidata_info'),
+                data={'id_': 'Q304037'})
+            assert b'National Library of Austria' in rv.data
+
             rv = self.app.get('/static/non_existing_file.js')
             assert b'The site does not exist.' in rv.data
 
