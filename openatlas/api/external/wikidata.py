@@ -3,9 +3,10 @@ from typing import Any
 import requests
 from flask import g
 
+from openatlas.display.util import link
+
 
 def add_resolver_url(id_: str) -> str:
-    from openatlas.display.util import link
     return link(
         f'Q{id_}',
         f'{g.reference_systems[g.wikidata.id].resolver_url}Q{id_}',
@@ -13,7 +14,6 @@ def add_resolver_url(id_: str) -> str:
 
 
 def fetch_wikidata(id_: str) -> dict[str, Any]:
-    from openatlas.display.util import link
     url = 'https://www.wikidata.org/w/api.php'
     params = {
         'action': 'wbgetentities',
