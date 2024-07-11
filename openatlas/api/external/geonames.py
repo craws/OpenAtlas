@@ -17,7 +17,7 @@ def fetch_geonames(id_: str) -> dict[str, Any]:
         return {}
     info = {}
     for key, value in data_dict.items():
-        if key == 'alternateNames':
+        if key == 'alternateNames' and value:
             info[key] = '<br>'.join(value.split(','))
         elif isinstance(value, str):
             info[key] = value
