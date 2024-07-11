@@ -26,6 +26,7 @@ svgwrite~=1.4.3
 Wand==0.6.11
 werkzeug==2.2.2
 wtforms==3.0.1
+xmltodict==0.13.0
 
 # Used for testing
 # coverage==6.5.0
