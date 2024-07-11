@@ -41,9 +41,14 @@ class IndexTests(TestBaseCase):
             assert b'directory not writable' in rv.data
 
             rv = self.app.post(
-                url_for('ajax_add_wikidata_info'),
+                url_for('ajax_wikidata_info'),
                 data={'id_': 'Q304037'})
             assert b'National Library of Austria' in rv.data
+
+            rv = self.app.post(
+                url_for('ajax_geonames_info'),
+                data={'id_': '747712'})
+            assert b'Edirne' in rv.data
 
             rv = self.app.get('/static/non_existing_file.js')
             assert b'The site does not exist.' in rv.data
