@@ -47,7 +47,8 @@ def get_by_project_id(project_id: int) -> list[dict[str, Any]]:
         JOIN import.entity ie ON e.id = ie.entity_id
         WHERE ie.project_id = %(id)s
         GROUP BY e.id, ie.origin_id;
-        """, {'id': project_id})
+        """,
+        {'id': project_id})
     return [dict(row) for row in g.cursor.fetchall()]
 
 
