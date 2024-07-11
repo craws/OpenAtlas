@@ -72,7 +72,7 @@ def ext_references(links: list[Link]) -> str:
                 f'{app.config["CSS"]["button"]["secondary"]}"'
                 f'onclick="ajax{uc_first(name)}Info'
                 f'(\'{link_.description}\')">' + _('show') + '</span>'
-                f'<div id="{name}-info-div"></div>')
+                f'<div id="{name}-info-div" class="bg-gray"></div>')
         html += '<br>'
     return html
 

@@ -106,7 +106,7 @@ form ul, form ol, form li {
   rotate: 180deg;
 }
 
-.bg-gray{
+.bg-gray {
   background-color: #e9ecef !important
 }
 
@@ -115,15 +115,15 @@ form ul, form ol, form li {
 }
 
 .width-full {
-  width:100%;
+  width: 100%;
 }
 
 .value-type-switcher[show] {
-  rotate:90deg;
+  rotate: 90deg;
 }
 
 .value-type-switcher {
-  transition:all ease-in 100ms;
+  transition: all ease-in 100ms;
 }
 
 td.fit-width{
@@ -169,7 +169,7 @@ span.disk-space-legend {
   flex-wrap: wrap;
   margin-top: 5px;
   white-space: normal;
-  padding:5px;
+  padding: 5px;
   color: rgba(var(--bs-secondary-rgb),1) !important;
 }
 
