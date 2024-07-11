@@ -49,7 +49,7 @@ def fetch_wikidata(id_: str) -> dict[str, Any]:
         info['nick names'] = [
             v['mainsnak']['datavalue']['value']['text']
             for v in data['entities'][id_]['claims']['P1449']]
-    except  Exception:
+    except Exception:
         pass
     try:
         info['official websites'] = [

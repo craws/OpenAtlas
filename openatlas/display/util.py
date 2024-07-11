@@ -65,13 +65,14 @@ def ext_references(links: list[Link]) -> str:
         html += \
             f' ({g.types[link_.type.id].name} ' + _('at') + \
             f' {link(link_.domain)})'
-        if system.name == 'Wikidata':
+        if system.name in ['GeoNames', 'Wikidata']:
+            name = system.name.lower()
             html += (
-                ' <span id="wikidata-switch" class="uc-first '
+                f' <span id="{name}-switch" class="uc-first '
                 f'{app.config["CSS"]["button"]["secondary"]}"'
-                f'onclick="ajaxAddWikidataInfo(\'{link_.description}\')">'
-                + _('show') + '</span>'
-                '<div id="wikidata-info-div"></div>')
+                f'onclick="ajax{uc_first(name)}Info'
+                f'(\'{link_.description}\')">' + _('show') + '</span>'
+                f'<div id="{name}-info-div"></div>')
         html += '<br>'
     return html
 

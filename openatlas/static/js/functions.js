@@ -193,14 +193,26 @@ async function ajaxAddEntity(data) {
   return newEntityId;
 }
 
-async function ajaxAddWikidataInfo(data) {
+async function ajaxWikidataInfo(data) {
   $.ajax({
     type: 'post',
-    url: '/ajax/add_wikidata_info',
+    url: '/ajax/wikidata_info',
     data: 'id_=' + data,
     success: function (info) {
       $('#wikidata-info-div').html(info);
       $('#wikidata-switch').hide();
+    }
+  });
+}
+
+async function ajaxGeonamesInfo(data) {
+  $.ajax({
+    type: 'post',
+    url: '/ajax/geonames_info',
+    data: 'id_=' + data,
+    success: function (info) {
+      $('#geonames-info-div').html(info);
+      $('#geonames-switch').hide();
     }
   });
 }
