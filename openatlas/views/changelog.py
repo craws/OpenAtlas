@@ -17,6 +17,7 @@ def index_changelog() -> str:
 versions = {
     '8.6.0': ['TBA', {
         'feature': {
+            '2320': 'Display external info',
             '2322': 'Update Catalan and Spanish translations'}}],
     '8.5.0': ['2024-06-01', {
         'feature': {
