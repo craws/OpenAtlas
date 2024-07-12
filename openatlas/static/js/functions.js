@@ -116,7 +116,7 @@ $(document).ready(function () {
    * Bootstrap version needs to be manually set d/t
    */
   $('input[data-reference-system=Wikidata]').autoComplete({
-    bootstrapVersion: '5',
+    bootstrapVersion: '4',
     resolver: 'custom',
     formatResult: function (item) {
       return {
@@ -137,6 +137,24 @@ $(document).ready(function () {
       $('input[data-reference-system=Wikidata]').val(item.id);
   });
 
+    $('input[data-reference-system=GND]').autocomplete({
+      source : function(request, response) {
+        $.ajax({
+          url : "https://lobid.org/gnd/search",
+          dataType : "jsonp",
+          data : {
+            q : request.term,
+            format : "json:preferredName,professionOrOccupation"
+          },
+          success : function(data) {
+            response(data);
+          }
+        });
+      },
+      select: function(event, ui) {
+        $('#id').val('id:"'+ui.item.id+'"');
+      }
+    });
 });
 
 $.jstree.defaults.core.themes.dots = false;

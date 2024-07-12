@@ -18,7 +18,9 @@ then run the database upgrade script, then restart Apache:
     sudo service apache2 restart
 
 ### 8.5.0 to 8.6.0
-No database updates are required but the Python package xmltodict is needed:
+8.6.0.sql is needed but will be taken care of by the database upgrade script.
+
+The additional Python package xmltodict is needed:
 
     sudo apt install python3-xmltodict
 
