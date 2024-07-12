@@ -116,7 +116,7 @@ $(document).ready(function () {
    * Bootstrap version needs to be manually set d/t
    */
   $('input[data-reference-system=Wikidata]').autoComplete({
-    bootstrapVersion: '4',
+    bootstrapVersion: '5',
     resolver: 'custom',
     formatResult: function (item) {
       return {
