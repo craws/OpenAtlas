@@ -2,7 +2,8 @@ html, body, input, select, textarea {
   font-family: helvetica, arial, sans-serif;
 }
 
-a{
+
+a {
   font-weight: bold;
   text-decoration: none;
 }
@@ -53,6 +54,11 @@ img#logo {
 }
 
 /* Table */
+
+table {
+  --bs-table-bg: inherit !important;
+}
+
 .table tr p {
   margin: 0.2rem 0 0.2rem 0;
 }
