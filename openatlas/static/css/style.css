@@ -22,6 +22,10 @@ h2 {
   margin: 1em 0;
 }
 
+textarea {
+    height: 100%;
+}
+
 .chart-wrapper {
   height: 40vh;
   width: 40vw;

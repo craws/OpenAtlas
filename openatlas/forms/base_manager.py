@@ -130,7 +130,7 @@ class BaseManager:
         setattr(
             self.form_class,
             'description',
-            TextAreaField(_('description')))
+            TextAreaField(_('description'), render_kw={'rows':5}))
 
     def add_name_fields(self) -> None:
         if 'name' in self.fields:
