@@ -18,7 +18,9 @@ versions = {
     '8.6.0': ['TBA', {
         'feature': {
             '2320': 'Display external info',
-            '2322': 'Update Catalan and Spanish translations'}}],
+            '2322': 'Update Catalan and Spanish translations',
+            '2328': 'Display more information of sub classes',
+            '2327': 'Larger description field'}}],
     '8.5.0': ['2024-06-01', {
         'feature': {
             '2277': 'References for types',
