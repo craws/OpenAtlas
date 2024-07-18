@@ -53,9 +53,10 @@ class BaseDisplay:
         self.tabs = {'info': Tab('info')}
 
     def add_crumbs(self) -> None:
-        self.crumbs = [[
-            _(self.entity.class_.view.replace('_', ' ')),
-            url_for('index', view=self.entity.class_.view)]]
+        label = _(self.entity.class_.view.replace('_', ' '))
+        if self.entity.class_.view in ['event']:
+            label += f' ({self.entity.cidoc_class.name})'
+        self.crumbs = [[label, url_for('index', view=self.entity.class_.view)]]
         if self.structure:
             for super_ in self.structure['supers']:
                 self.crumbs.append(link(super_))

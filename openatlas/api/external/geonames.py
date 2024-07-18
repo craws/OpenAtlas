@@ -6,7 +6,7 @@ from flask import g
 
 
 def fetch_geonames(id_: str) -> dict[str, Any]:
-    url = f"http://api.geonames.org/get"
+    url = 'http://api.geonames.org/get'
     params = {
         'geonameId': {id_},
         'username': {g.settings['geonames_username']}}
