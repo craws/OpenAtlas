@@ -65,7 +65,7 @@ def ext_references(links: list[Link]) -> str:
         html += \
             f' ({g.types[link_.type.id].name} ' + _('at') + \
             f' {link(link_.domain)})'
-        if system.name in ['GeoNames', 'Wikidata']:
+        if system.name in ['GeoNames', 'GND', 'Wikidata']:
             name = system.name.lower()
             html += (
                 f' <span id="{name}-switch" class="uc-first '

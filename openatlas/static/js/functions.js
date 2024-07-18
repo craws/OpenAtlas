@@ -235,6 +235,18 @@ async function ajaxGeonamesInfo(data) {
   });
 }
 
+async function ajaxGndInfo(data) {
+  $.ajax({
+    type: 'post',
+    url: '/ajax/gnd_info',
+    data: 'id_=' + data,
+    success: function (info) {
+      $('#gnd-info-div').html(info);
+      $('#gnd-switch').hide();
+    }
+  });
+}
+
 async function refillTable(id, filterIds = []) {
   const tableContent = await $.ajax({
     type: 'post',

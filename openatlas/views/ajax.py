@@ -7,6 +7,7 @@ from flask_login import current_user
 
 from openatlas import app
 from openatlas.api.external.geonames import fetch_geonames
+from openatlas.api.external.gnd import fetch_gnd
 from openatlas.api.external.wikidata import fetch_wikidata
 from openatlas.database.connect import Transaction
 from openatlas.display.util import display_info, required_group
@@ -103,3 +104,9 @@ def ajax_wikidata_info() -> str:
 @required_group('readonly')
 def ajax_geonames_info() -> str:
     return display_info(fetch_geonames(request.form['id_']))
+
+
+@app.route('/ajax/gnd_info', methods=['POST'])
+@required_group('readonly')
+def ajax_gnd_info() -> str:
+    return display_info(fetch_gnd(request.form['id_']))
