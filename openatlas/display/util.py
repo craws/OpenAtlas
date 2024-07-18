@@ -166,7 +166,8 @@ def get_system_data(entity: Entity) -> dict[str, Any]:
     data = {}
     if 'entity_show_class' in current_user.settings \
             and current_user.settings['entity_show_class']:
-        data[_('class')] = link(entity.cidoc_class)
+        data[_('class')] = \
+            f'{link(entity.cidoc_class)} {entity.cidoc_class.name}'
     info = g.logger.get_log_info(entity.id)
     if 'entity_show_dates' in current_user.settings \
             and current_user.settings['entity_show_dates']:
