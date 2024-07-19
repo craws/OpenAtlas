@@ -136,25 +136,40 @@ $(document).ready(function () {
   }).on('autocomplete.select', function(evt,item) {
       $('input[data-reference-system=Wikidata]').val(item.id);
   });
-
-    $('input[data-reference-system=GND]').autocomplete({
-      source : function(request, response) {
+  
+  /**
+   * GND autocomplete
+   * Documentation: https://bootstrap-autocomplete.readthedocs.io/en/latest/
+   * Bootstrap version needs to be manually set d/t
+  */
+  $('input[data-reference-system=GND]').autoComplete({
+    bootstrapVersion: '4',
+    resolver: 'custom',
+    formatResult: function (item) {
+      return {
+         value: item.id,
+         text: `${item.label} - ${item.category}<br/><small>${item.id.substring(item.id.lastIndexOf('/') + 1)}</small>`
+      };
+    },
+    events: {
+      search: function (qry, callback) {
         $.ajax({
-          url : "https://lobid.org/gnd/search",
-          dataType : "jsonp",
-          data : {
-            q : request.term,
-            format : "json:preferredName,professionOrOccupation"
+          url: "https://lobid.org/gnd/search",
+          dataType: "jsonp",
+          data: {
+            q: qry,
+            format: "json:preferredName"
           },
-          success : function(data) {
-            response(data);
+          success: function(data) {
+            callback(data);
           }
-        });
-      },
-      select: function(event, ui) {
-        $('#id').val('id:"'+ui.item.id+'"');
+        })
       }
-    });
+    }
+  }).on('autocomplete.select', function(evt,item) {
+    $('input[data-reference-system=GND]').val(item.id.substring(item.id.lastIndexOf('/') + 1));
+  });
+  
 });
 
 $.jstree.defaults.core.themes.dots = false;
