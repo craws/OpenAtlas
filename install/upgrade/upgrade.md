@@ -24,6 +24,14 @@ The additional Python package xmltodict is needed:
 
     sudo apt install python3-xmltodict
 
+#### New GND reference system
+A new default external reference system was added: GND, together with usage
+of their API to search and display information.
+
+In case your already using GND as reference system, make sure that it is
+spelled exactly "GND" so that the database update script can use and update
+this automatically.
+
 ### 8.4.x to 8.5.0
 8.5.0.sql is needed but will be taken care of by the database upgrade script.
 
