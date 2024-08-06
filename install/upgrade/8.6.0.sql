@@ -20,8 +20,8 @@ SELECT
     true,
     'GND',
     (SELECT id FROM model.entity WHERE name = 'GND' AND cidoc_class_code = 'E32'),
-    'https://gnd.network/',
     'https://lobid.org/gnd/',
+    'https://d-nb.info/gnd/',
     '119338467'
 WHERE NOT EXISTS (
     SELECT 1 FROM web.reference_system WHERE name='GND'

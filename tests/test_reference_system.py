@@ -11,6 +11,21 @@ class ReferenceSystemTest(TestBaseCase):
     def test_reference_system(self) -> None:
         with app.app_context():
 
+            rv = self.app.post(
+                url_for('ajax_wikidata_info'),
+                data={'id_': 'Q304037'})
+            assert b'National Library of Austria' in rv.data
+
+            rv = self.app.post(
+                url_for('ajax_geonames_info'),
+                data={'id_': '747712'})
+            assert b'Edirne' in rv.data
+
+            rv = self.app.post(
+                url_for('ajax_gnd_info'),
+                data={'id_': '1158433263'})
+            assert b'Abasgulijev' in rv.data
+
             rv: Any = self.app.get(
                 url_for('insert', class_='reference_system'))
             assert b'resolver URL' in rv.data
@@ -75,7 +90,9 @@ class ReferenceSystemTest(TestBaseCase):
                 data={
                     'name': 'Actor test',
                     f'reference_system_id_{g.wikidata.id}':
-                        ['Q123', self.precision_type.subs[0]]})
+                        ['Q123', self.precision_type.subs[0]],
+                    f'reference_system_id_{g.gnd.id}':
+                        ['1158433263', self.precision_type.subs[0]]})
             person_id = rv.location.split('/')[-1]
 
             rv = self.app.get(url_for('view', id_=g.wikidata.id))

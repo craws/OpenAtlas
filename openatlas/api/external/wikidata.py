@@ -7,10 +7,7 @@ from openatlas.display.util import link
 
 
 def add_resolver_url(id_: str) -> str:
-    return link(
-        f'Q{id_}',
-        f'{g.reference_systems[g.wikidata.id].resolver_url}Q{id_}',
-        external=True)
+    return link(f'Q{id_}', f'{g.wikidata.resolver_url}Q{id_}', external=True)
 
 
 def fetch_wikidata(id_: str) -> dict[str, Any]:
