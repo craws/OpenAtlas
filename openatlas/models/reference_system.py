@@ -33,10 +33,8 @@ class ReferenceSystem(Entity):
                 if system.id in class_.reference_systems:
                     system.classes.append(class_.name)
             systems[system.id] = system
-            if system.name == 'GeoNames':
-                g.geonames = system
-            elif system.name == 'Wikidata':
-                g.wikidata = system
+            if system.system:
+                setattr(g, system.name.lower(), system)
         return systems
 
     def remove_class(self, class_name: str) -> None:
