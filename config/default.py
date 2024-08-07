@@ -60,3 +60,7 @@ CSS = {
 
 # Tests
 LOAD_WINDOWS_TEST_SQL = False
+
+# External APIs
+API_WIKIDATA = 'https://www.wikidata.org/w/api.php'
+API_GEONAMES = 'http://api.geonames.org/get'

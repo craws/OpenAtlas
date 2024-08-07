@@ -26,8 +26,7 @@ class ReferenceSystemTest(TestBaseCase):
                 data={'id_': '1158433263'})
             assert b'Abasgulijev' in rv.data
 
-            rv: Any = self.app.get(
-                url_for('insert', class_='reference_system'))
+            rv = self.app.get(url_for('insert', class_='reference_system'))
             assert b'resolver URL' in rv.data
 
             rv = self.app.post(

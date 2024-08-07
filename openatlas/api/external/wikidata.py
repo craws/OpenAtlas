@@ -3,6 +3,7 @@ from typing import Any
 import requests
 from flask import g
 
+from openatlas import app
 from openatlas.display.util import link
 
 
@@ -11,7 +12,6 @@ def add_resolver_url(id_: str) -> str:
 
 
 def fetch_wikidata(id_: str) -> dict[str, Any]:
-    url = 'https://www.wikidata.org/w/api.php'
     params = {
         'action': 'wbgetentities',
         'ids': id_,
@@ -19,7 +19,10 @@ def fetch_wikidata(id_: str) -> dict[str, Any]:
         'languages': 'en'}
     info = {}
     try:
-        data = requests.get(url, params=params, timeout=10).json()
+        data = requests.get(
+            app.config['API_WIKIDATA'],
+            params=params,
+            timeout=10).json()
     except Exception:  # pragma: no cover
         return {}
     try:
