@@ -23,8 +23,8 @@ class ReferenceSystemTest(TestBaseCase):
 
             rv = self.app.post(
                 url_for('ajax_gnd_info'),
-                data={'id_': '1158433263'})
-            assert b'Abasgulijev' in rv.data
+                data={'id_': '118584596'})
+            assert b'Mozart' in rv.data
 
             rv = self.app.get(url_for('insert', class_='reference_system'))
             assert b'resolver URL' in rv.data

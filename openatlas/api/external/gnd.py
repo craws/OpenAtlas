@@ -6,20 +6,13 @@ from flask import g
 from openatlas.display.util import link
 
 
-def print_values(values: dict[str: str]) -> str:
-    items = []
-    for item in values:
-        items.append(link(item["label"], item["id"], external=True))
-    return '<br>'.join(items)
-
-
 def fetch_gnd(id_: str) -> dict[str, Any]:
     url = f'{g.gnd.resolver_url}{id_}.json'
-    info = {}
+    info: dict[str, str] = {}
     try:
         data = requests.get(url, timeout=10).json()
     except Exception:  # pragma: no cover
-        return {}
+        return info
     if 'preferredName' in data:
         info['preferred name'] = data['preferredName']
     if 'gender' in data:
@@ -34,5 +27,9 @@ def fetch_gnd(id_: str) -> dict[str, Any]:
         info['place of death'] = print_values(data['placeOfDeath'])
     if 'type' in data:
         info['type'] = '<br>'.join(data['type'])
-
     return info
+
+
+def print_values(values: list[dict[str, str]]) -> str:
+    return '<br>'.join(
+        [link(item['label'], item['id'], external=True) for item in values])
