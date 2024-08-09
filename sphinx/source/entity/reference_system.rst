@@ -20,7 +20,7 @@ For step by step instructions to add a reference system have a look at our
 
 Included by default
 -------------------
-These systems are all included in the default application. Furthermore,
+These systems are included in the default application. Furthermore,
 it was made use of their APIs to provide search functionality inside of
 OpenAtlas and display their information about already linked entities at the
 corresponding entity detail view.
@@ -41,7 +41,7 @@ database available and accessible through various web services, under a
 Creative Commons attribution license. The GeoNames database contains over
 25,000,000 geographical names corresponding to over 11,800,000 unique features.
 
-For GeoNames the search is integrated in search at the map and it is also
+For GeoNames the search is integrated in the map search field and it is also
 possible to take over their coordinates for specific places.
 
 By default it is usable for **places**.
