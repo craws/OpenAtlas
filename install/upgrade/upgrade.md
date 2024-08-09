@@ -5,8 +5,8 @@ should read the upgrade notes about important information.
 
 **Limitations using the database update script**
 * This should only be done within the official **main** branch of OpenAtlas
-* If the database owner is not called **openatlas** (default) the SQL files need
-  to be updated accordingly before
+* If the database owner is not called **openatlas** (default) the SQL files
+  need to be updated accordingly before
 
 **How to upgrade**
 
@@ -29,8 +29,9 @@ A new default external reference system was added: GND, together with usage
 of their API to search and display information.
 
 In case your already using GND as reference system, make sure that it is
-spelled exactly "GND" so that the database update script can use and update
-this automatically.
+spelled exactly "GND" before running the database update script so that the
+script can use the existing one and update it automatically without losing
+already made links.
 
 ### 8.4.x to 8.5.0
 8.5.0.sql is needed but will be taken care of by the database upgrade script.
