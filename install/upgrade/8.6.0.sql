@@ -9,7 +9,7 @@ INSERT INTO model.entity (name, cidoc_class_code, description, openatlas_class_n
 SELECT
     'GND',
     'E32',
-    'A collection of cultural and research authority data in the German-speaking countries.',
+    'GND stands for Gemeinsame Normdatei (Integrated Authority File) and offers a broad range of elements to describe authorities.',
     'reference_system'
 WHERE NOT EXISTS (
     SELECT 1 FROM model.entity WHERE name='GND'
@@ -21,7 +21,7 @@ SELECT
     'GND',
     (SELECT id FROM model.entity WHERE name = 'GND' AND cidoc_class_code = 'E32'),
     'https://lobid.org/gnd/',
-    'https://d-nb.info/gnd/',
+    'https://d-nb.info/standards/elementset/gnd',
     '119338467'
 WHERE NOT EXISTS (
     SELECT 1 FROM web.reference_system WHERE name='GND'
