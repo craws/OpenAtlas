@@ -28,7 +28,7 @@ The additional Python package xmltodict is needed:
 A new default external reference system was added: GND, together with usage
 of their API to search and display information.
 
-In case your already using GND as reference system, make sure that it is
+In case GND is already used as reference system, make sure that it is
 spelled exactly "GND" before running the database update script so that the
 script can use the existing one and update it automatically without losing
 already made links.
