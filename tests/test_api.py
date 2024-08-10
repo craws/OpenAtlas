@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from flask import url_for
 
@@ -11,49 +11,10 @@ from tests.base import ApiTestCase
 
 class Api(ApiTestCase):
 
-    @staticmethod
-    def get_bool(
-            data: dict[str, Any],
-            key: str,
-            value: Optional[str | list[Any]] = None) -> bool:
-        return bool(data[key] == value) if value else bool(data[key])
-
-    @staticmethod
-    def get_bool_inverse(data: dict[str, Any], key: str) -> bool:
-        return bool(not data[key])
-
-    @staticmethod
-    def get_no_key(data: dict[str, Any], key: str) -> bool:
-        return bool(key not in data.keys())
-
-    @staticmethod
-    def get_geom_properties(geom: dict[str, Any], key: str) -> bool:
-        return bool(geom['features'][0]['properties'][key])
-
-    @staticmethod
-    def get_classes(data: list[dict[str, Any]]) -> bool:
-        return bool(
-            data[0]['systemClass']
-            and data[0]['crmClass']
-            and data[0]['view']
-            and data[0]['icon']
-            and data[0]['en'])
-
-    @staticmethod
-    def get_class_mapping(data: dict[str, Any], locale: str) -> bool:
-        return bool(
-            data['locale'] == locale
-            and data['results'][0]['systemClass']
-            and data['results'][0]['crmClass']
-            and data['results'][0]['view']
-            and data['results'][0]['icon']
-            and data['results'][0]['label'])
-
     def test_api(self) -> None:
-
         with app.app_context():
             logo = Path(app.root_path) \
-                   / 'static' / 'images' / 'layout' / 'logo.png'
+                / 'static' / 'images' / 'layout' / 'logo.png'
 
             with open(logo, 'rb') as img:
                 self.app.post(
@@ -132,11 +93,9 @@ class Api(ApiTestCase):
             # ---Content Endpoints---
             rv = self.app.get(url_for('api_04.classes')).get_json()
             assert self.get_classes(rv)
-
             rv = self.app.get(
                 url_for('api_04.class_mapping', locale='de')).get_json()
             assert self.get_class_mapping(rv, 'de')
-
             rv = self.app.get(url_for(
                 'api_04.class_mapping', locale='ca', download=True)).get_json()
             assert self.get_class_mapping(rv, 'ca')
@@ -144,7 +103,6 @@ class Api(ApiTestCase):
             rv = self.app.get(
                 url_for('api_04.properties', locale='de')).get_json()
             assert rv['P2']['nameInverse'] == 'ist Typus von'
-            assert bool(rv['P2']['id'])
             assert bool(rv['P2']['name'])
             assert bool(rv['P2']['nameInverse'])
             assert bool(rv['P2']['i18n'])
@@ -153,15 +111,12 @@ class Api(ApiTestCase):
 
             rv = self.app.get(url_for(
                 'api_04.properties', locale='fr', download=True)).get_json()
-            assert bool(rv['P2']['id'])
             assert rv['P2']['name'] == 'est de type'
-
             rv = self.app.get(url_for('api_04.backend_details')).get_json()
             assert bool(rv['version'] == app.config['VERSION'])
             rv = self.app.get(
                 url_for('api_04.backend_details', download=True)).get_json()
             assert bool(rv['version'] == app.config['VERSION'])
-
             rv = self.app.get(url_for('api_04.system_class_count')).get_json()
             assert bool(rv['person'])
 
@@ -532,7 +487,6 @@ class Api(ApiTestCase):
                                 found = True
                                 break
                 assert found
-
             rv = self.app.get(url_for('api_04.type_tree'))
             assert bool(rv.get_json()['typeTree'])
             rv = self.app.get(url_for('api_04.type_tree', download=True))
@@ -764,7 +718,6 @@ class Api(ApiTestCase):
                                 "values":["Mordor"],
                                 "logicalOperator":"or"}]}"""))]:
                 assert bool(rv.get_json()['pagination']['entities'] == 1)
-
             for rv in [
                 self.app.get(url_for(
                     'api_04.query',
@@ -797,7 +750,6 @@ class Api(ApiTestCase):
                            f'{height.id}],'
                            f'"logicalOperator":"or"}}]}}'))]:
                 assert bool(rv.get_json()['pagination']['entities'] == 2)
-
             for rv in [
                 self.app.get(url_for(
                     'api_04.query',
@@ -1034,7 +986,6 @@ class Api(ApiTestCase):
                 'api_04.display',
                 filename=f'{file_not_public.id}'))
             assert 'Not public' in rv.get_json()['title']
-
             assert b'Endpoint not found' in self.app.get('/api/entity2').data
 
             self.app.get(url_for('logout'))

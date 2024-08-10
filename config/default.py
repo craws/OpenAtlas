@@ -3,7 +3,7 @@ from pathlib import Path
 
 from config.database_versions import DATABASE_VERSIONS
 
-VERSION = '8.5.0'
+VERSION = '8.6.0'
 DATABASE_VERSION = DATABASE_VERSIONS[0]
 DEMO_MODE = False  # If activated some options are disabled, login is prefilled
 DEBUG = False
@@ -60,3 +60,7 @@ CSS = {
 
 # Tests
 LOAD_WINDOWS_TEST_SQL = False
+
+# External APIs
+API_WIKIDATA = 'https://www.wikidata.org/w/api.php'
+API_GEONAMES = 'http://api.geonames.org/get'

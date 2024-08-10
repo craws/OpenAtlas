@@ -21,7 +21,7 @@ def insert_project(name: str, description: Optional[str]) -> int:
         VALUES (%(name)s, %(description)s)
         RETURNING id;
         """,
-        {'name': name, 'description': description})
+        {'name': name, 'description':  description})
     return g.cursor.fetchone()['id']
 
 
@@ -68,7 +68,7 @@ def check_duplicates(class_: str, names: list[str]) -> list[str]:
     return [row['name'] for row in g.cursor.fetchall()]
 
 
-def update_project(id_: int, name: str, description: str) -> None:
+def update_project(id_: int, name: str, description: Optional[str]) -> None:
     g.cursor.execute(
         """
         UPDATE import.project

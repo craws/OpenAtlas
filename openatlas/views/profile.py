@@ -17,7 +17,7 @@ from openatlas.display.util import button, display_info
 from openatlas.display.util2 import manual, uc_first
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField, generate_password_field
-from openatlas.forms.setting import DisplayForm, ModulesForm, ProfileForm
+from openatlas.forms.setting import DisplayForm, ModulesForm
 from openatlas.forms.util import get_form_settings, set_form_settings
 
 
@@ -57,7 +57,13 @@ def profile_index() -> str:
     tabs = {
         'profile': Tab(
             'profile',
-            display_info(get_form_settings(ProfileForm(), True)),
+            display_info({
+                _('name'): current_user.real_name,
+                _('email'): current_user.email,
+                _('show email'): str(_('on'))
+                if current_user.settings['show_email'] else str(_('off')),
+                _('newsletter'): str(_('on'))
+                if current_user.settings['newsletter'] else str(_('off'))}),
             buttons=[manual('tools/profile')]),
         'modules': Tab(
             'modules',

@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 
 import bcrypt
@@ -71,7 +71,7 @@ def login() -> str | Response:
                         user.login_failed_count
                     if user.settings['language']:
                         session['language'] = user.settings['language']
-                    user.login_last_success = datetime.datetime.now()
+                    user.login_last_success = datetime.now()
                     user.login_failed_count = 0
                     user.update()
                     g.logger.log('info', 'auth', f'Login of {user.username}')
@@ -88,7 +88,7 @@ def login() -> str | Response:
                     'auth',
                     f'Wrong password: {user.username}')
                 user.login_failed_count += 1
-                user.login_last_failure = datetime.datetime.now()
+                user.login_last_failure = datetime.now()
                 user.update()
                 flash(_('error wrong password'), 'error')
         else:
@@ -113,7 +113,7 @@ def reset_password() -> str | Response:
         if user := User.get_by_email(form.email.data):
             code = User.generate_password()
             user.password_reset_code = code
-            user.password_reset_date = datetime.datetime.now()
+            user.password_reset_date = datetime.now()
             user.update()
             url = url_for('reset_confirm', code=code)
             link = f"{request.scheme}://{request.headers['Host']}{url}"
@@ -160,8 +160,7 @@ def reset_confirm(code: str) -> Response:
         flash(_('invalid password reset confirmation code'), 'error')
         abort(404)
     hours = g.settings['reset_confirm_hours']
-    if datetime.datetime.now() > \
-            user.password_reset_date + datetime.timedelta(hours=hours):
+    if datetime.now() > user.password_reset_date + timedelta(hours=hours):
         g.logger.log('info', 'auth', 'reset code expired')
         flash(_('This reset confirmation code has expired.'), 'error')
         abort(404)

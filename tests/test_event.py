@@ -12,20 +12,14 @@ class EventTest(TestBaseCase):
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()
-                place_name = 'Lewis and Clark'
-                actor_name = 'Captain Miller'
-                actor = insert('person', actor_name)
+                actor = insert('person', 'Captain Miller')
                 file = insert('file', 'X-Files')
-                source = insert('source', 'Necronomicon')
                 artifact = insert('artifact', 'artifact')
-                residence = insert('place', place_name)
+                residence = insert('place', 'Lewis and Clark')
                 reference = insert('external_reference', 'https://d-nb.info')
 
-            rv: Any = self.app.get(url_for('insert', class_='activity'))
-            assert b'+ Activity' in rv.data
-
             data = {'name': 'Event Horizon', 'location': residence.id}
-            rv = self.app.post(
+            rv: Any = self.app.post(
                 url_for('insert', class_='activity'),
                 data=data)
             activity_id = rv.location.split('/')[-1]
@@ -42,19 +36,13 @@ class EventTest(TestBaseCase):
                 follow_redirects=True)
             assert b'An entry has been created' in rv.data
 
-            rv = self.app.post(
-                url_for('insert', class_='activity', origin_id=source.id),
-                data=data,
-                follow_redirects=True)
-            assert b'An entry has been created' in rv.data
-
             rv = self.app.get(
                 url_for('insert', class_='activity', origin_id=residence.id))
             assert b'location' in rv.data
 
             rv = self.app.get(
                 url_for('insert', class_='move', origin_id=residence.id))
-            assert b'Location' not in rv.data
+            assert b'Moved artifact' in rv.data
 
             data = {
                 'name': 'Second event',
@@ -66,6 +54,7 @@ class EventTest(TestBaseCase):
                 'begin_month_from': '10',
                 'begin_day_from': '8',
                 'end_year_from': '1951',
+                'event_preceding': '',
                 f'reference_system_id_{g.wikidata.id}':
                     ['Q123', self.precision_type.subs[0]]}
 
@@ -74,11 +63,7 @@ class EventTest(TestBaseCase):
                 data=data)
             event_id = rv.location.split('/')[-1]
 
-            rv = self.app.get(url_for('view', id_=event_id))
-            assert b'Event Horizon' in rv.data
-
             data['end_year_from'] = '7'
-            data['event_preceding'] = ''
             rv = self.app.post(
                 url_for('insert', class_='acquisition'),
                 data=data)
@@ -154,10 +139,10 @@ class EventTest(TestBaseCase):
             assert b'An entry has been created' in rv.data
 
             rv = self.app.get(url_for('view', id_=residence.id))
-            assert bytes(place_name, 'utf-8') in rv.data
+            assert bytes('Lewis and Clark', 'utf-8') in rv.data
 
             rv = self.app.get(url_for('view', id_=actor.id))
-            assert bytes(actor_name, 'utf-8') in rv.data
+            assert bytes('Captain Miller', 'utf-8') in rv.data
 
             rv = self.app.post(
                 url_for('insert', class_='acquisition'),

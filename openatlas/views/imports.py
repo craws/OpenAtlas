@@ -32,7 +32,9 @@ from openatlas.display.util2 import (
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
 from openatlas.models.entity import Entity
-from openatlas.models.imports import Import, Project
+from openatlas.models.imports import (
+    Project, check_duplicates, check_single_type_duplicates, check_type_id,
+    get_origin_ids, import_data_)
 
 _('invalid columns')
 _('possible duplicates')
@@ -70,10 +72,9 @@ class ProjectForm(FlaskForm):
 
     def validate(self, extra_validators: validators = None) -> bool:
         valid = FlaskForm.validate(self)
-        name = Import.get_project_by_id(self.project_id).name \
+        name = Project.get_by_id(self.project_id).name \
             if self.project_id else ''
-        if name != self.name.data \
-                and Import.get_project_by_name(self.name.data):
+        if name != self.name.data and Project.get_by_name(self.name.data):
             self.name.errors.append(_('error name exists'))
             valid = False
         return valid
@@ -127,7 +128,7 @@ class CheckHandler:
 @required_group('contributor')
 def import_index() -> str:
     table = Table([_('project'), _('entities'), _('description')])
-    for project in Import.get_all_projects():
+    for project in Project.get_all():
         table.rows.append([
             link(project),
             format_number(project.count),
@@ -150,7 +151,7 @@ def import_index() -> str:
 def import_project_insert() -> str | Response:
     form = ProjectForm()
     if form.validate_on_submit():
-        id_ = Import.insert_project(form.name.data, form.description.data)
+        id_ = Project.insert(form.name.data, form.description.data)
         flash(_('project inserted'), 'info')
         return redirect(url_for('import_project_view', id_=id_))
     return render_template(
@@ -166,7 +167,7 @@ def import_project_insert() -> str | Response:
 @app.route('/import/project/view/<int:id_>')
 @required_group('contributor')
 def import_project_view(id_: int) -> str:
-    project = Import.get_project_by_id(id_)
+    project = Project.get_by_id(id_)
     content = ''
     if is_authorized('manager'):
         content = button_bar([
@@ -219,13 +220,13 @@ def import_project_view(id_: int) -> str:
 @app.route('/import/project/update/<int:id_>', methods=['GET', 'POST'])
 @required_group('manager')
 def import_project_update(id_: int) -> str | Response:
-    project = Import.get_project_by_id(id_)
+    project = Project.get_by_id(id_)
     form = ProjectForm(obj=project)
     form.project_id = id_
     if form.validate_on_submit():
         project.name = form.name.data
         project.description = form.description.data
-        Import.update_project(project)
+        project.update()
         flash(_('project updated'), 'info')
         return redirect(url_for('import_project_view', id_=project.id))
     return render_template(
@@ -242,7 +243,7 @@ def import_project_update(id_: int) -> str | Response:
 @app.route('/import/project/delete/<int:id_>')
 @required_group('manager')
 def import_project_delete(id_: int) -> Response:
-    Import.delete_project(id_)
+    Project.delete(id_)
     flash(_('project deleted'), 'info')
     return redirect(url_for('import_index'))
 
@@ -264,7 +265,7 @@ class ImportForm(FlaskForm):
 @app.route('/import/data/<int:project_id>/<class_>', methods=['GET', 'POST'])
 @required_group('manager')
 def import_data(project_id: int, class_: str) -> str:
-    project = Import.get_project_by_id(project_id)
+    project = Project.get_by_id(project_id)
     form = ImportForm()
     table = None
     imported = False
@@ -275,11 +276,11 @@ def import_data(project_id: int, class_: str) -> str:
         try:
             checked_data: list[Any] = []
             table = check_data_for_table_representation(
-            form,
-            class_,
-            checks,
-            checked_data,
-            project)
+                form,
+                class_,
+                checks,
+                checked_data,
+                project)
         except Exception as e:
             g.logger.log('error', 'import', 'import check failed', e)
             flash(_('error at import'), 'error')
@@ -299,7 +300,7 @@ def import_data(project_id: int, class_: str) -> str:
                 not file_data['backup_too_old'] or app.testing):
             Transaction.begin()
             try:
-                Import.import_data(project, class_, checked_data)
+                import_data_(project, class_, checked_data)
                 Transaction.commit()
                 g.logger.log('info', 'import', f'import: {len(checked_data)}')
                 flash(f"{_('import of')}: {len(checked_data)}", 'info')
@@ -356,18 +357,14 @@ def check_data_for_table_representation(
                 origin_ids.append(str(row['id']))
         table_data.append(table_row)
         checked_data.append(checked_row)
-    if form.duplicate.data:  # Check for possible duplicates
-        duplicates = Import.check_duplicates(class_, names)
-        if duplicates:
+    if form.duplicate.data:
+        if duplicates := check_duplicates(class_, names):
             checks.set_warning('possible_duplicates', ', '.join(duplicates))
-    doubles = [
-        item for item, count in Counter(origin_ids).items() if count > 1]
-    if doubles:
+    if doubles := [i for i, count in Counter(origin_ids).items() if count > 1]:
         checks.set_error('double_ids_in_import', ', '.join(doubles))
-    existing = Import.get_origin_ids(project, origin_ids) \
-        if origin_ids else None
-    if existing:
-        checks.set_error('ids_already_in_database', ', '.join(existing))
+    if origin_ids:
+        if existing := get_origin_ids(project, origin_ids):
+            checks.set_error('ids_already_in_database', ', '.join(existing))
     if 'openatlas_class' in headers:
         entity_dict: dict[str, Any] = {
             row.get('id'): row['openatlas_class'].replace(' ', '_')
@@ -459,13 +456,13 @@ def check_cell_value(
             type_ids = []
             invalids_type_ids = []
             for type_id in str(value).split():
-                if Import.check_type_id(type_id, class_):
+                if check_type_id(type_id, class_):
                     type_ids.append(type_id)
                 else:
                     invalids_type_ids.append(type_id)
                     checks.set_warning('invalid_type_ids', id_)
             for type_id in type_ids:
-                if type_id in Import.check_single_type_duplicates(type_ids):
+                if type_id in check_single_type_duplicates(type_ids):
                     invalids_type_ids.append(type_id)
                     checks.set_warning('single_type_duplicates', id_)
             for i, type_id in enumerate(type_ids):
@@ -480,7 +477,7 @@ def check_cell_value(
                     value_types.append(error_span(value_type))
                     checks.set_warning('invalid_value_types', id_)
                     continue
-                if not Import.check_type_id(values[0], class_):
+                if not check_type_id(values[0], class_):
                     values[0] = error_span(values[0])
                     checks.set_warning('invalid_value_type_ids', id_)
                 number = values[1][1:] if values[1].startswith('-') \

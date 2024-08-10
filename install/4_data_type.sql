@@ -421,15 +421,18 @@ INSERT INTO web.hierarchy_openatlas_class (hierarchy_id, openatlas_class_name) V
 -- External Reference Systems
 INSERT INTO model.entity (name, cidoc_class_code, description, openatlas_class_name) VALUES
   ('GeoNames', 'E32', 'Geographical database covering all countries and many places.', 'reference_system'),
-  ('Wikidata', 'E32', 'A free and open knowledge base and common source of open data providing persistent identifier and links to other sources.', 'reference_system');
+  ('Wikidata', 'E32', 'A free and open knowledge base and common source of open data providing persistent identifier and links to other sources.', 'reference_system'),
+  ('GND',      'E32', 'A collection of cultural and research authority data in the German-speaking countries.', 'reference_system');
 
 INSERT INTO web.reference_system (system, name, entity_id, resolver_url, website_url, identifier_example)
 VALUES
   (true, 'GeoNames', (SELECT id FROM model.entity WHERE name = 'GeoNames' AND cidoc_class_code = 'E32'), 'https://www.geonames.org/', 'https://www.geonames.org/', '1234567'),
-  (true, 'Wikidata', (SELECT id FROM model.entity WHERE name = 'Wikidata' AND cidoc_class_code = 'E32'), 'https://www.wikidata.org/entity/', 'https://www.wikidata.org', 'Q123');
+  (true, 'Wikidata', (SELECT id FROM model.entity WHERE name = 'Wikidata' AND cidoc_class_code = 'E32'), 'https://www.wikidata.org/entity/', 'https://www.wikidata.org', 'Q123'),
+  (true, 'GND',      (SELECT id FROM model.entity WHERE name = 'GND'      AND cidoc_class_code = 'E32'), 'https://lobid.org/gnd/', 'https://d-nb.info/gnd/','119338467');
 
 INSERT INTO web.reference_system_openatlas_class (reference_system_id, openatlas_class_name) VALUES
   ((SELECT entity_id FROM web.reference_system WHERE name='GeoNames'), 'place'),
   ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), 'place'),
   ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), 'person'),
-  ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), 'group');
+  ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), 'group'),
+  ((SELECT entity_id FROM web.reference_system WHERE name='GND'), 'person');

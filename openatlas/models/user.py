@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import datetime
 import secrets
 import string
+from datetime import datetime, timedelta
 from typing import Any, Optional
 
 from flask import g, session
@@ -54,6 +54,9 @@ class User(UserMixin):
             'password_reset_code': self.password_reset_code,
             'password_reset_date': self.password_reset_date})
 
+    def delete(self) -> None:
+        db.delete(self.id)
+
     def update_settings(self, settings: dict[str, Any]) -> None:
         for name, value in settings.items():
             db.update_settings(self.id, name, value)
@@ -69,9 +72,9 @@ class User(UserMixin):
                 or self.login_failed_count < \
                 int(g.settings['failed_login_tries']):
             return False
-        unlocked = self.login_last_failure + datetime.timedelta(
+        unlocked = self.login_last_failure + timedelta(
             minutes=int(g.settings['failed_login_forget_minutes']))
-        return bool(unlocked > datetime.datetime.now())
+        return bool(unlocked > datetime.now())
 
     def get_notes_by_entity_id(self, entity_id: int) -> list[dict[str, Any]]:
         return db.get_notes_by_entity_id(self.id, entity_id)
@@ -125,10 +128,6 @@ class User(UserMixin):
     @staticmethod
     def insert(data: dict[str, Any]) -> int:
         return db.insert(data)
-
-    @staticmethod
-    def delete(id_: int) -> None:
-        db.delete(id_)
 
     @staticmethod
     def get_users_for_form() -> list[tuple[int, str]]:

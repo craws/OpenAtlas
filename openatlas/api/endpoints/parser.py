@@ -19,17 +19,16 @@ from openatlas.api.resources.error import (
     LastEntityError)
 from openatlas.api.resources.search import (
     get_search_values, search_entity, value_to_be_searched)
-from openatlas.api.resources.search_validation import check_if_date_search, \
-    check_search_parameters
+from openatlas.api.resources.search_validation import (
+    check_if_date_search, check_search_parameters)
 from openatlas.api.resources.templates import (
     geojson_pagination, linked_place_pagination, loud_pagination)
 from openatlas.api.resources.util import (
     flatten_list_and_remove_duplicates, get_geometric_collection,
     get_geoms_dict, get_location_link, get_reference_systems,
     replace_empty_list_values_in_dict_with_none)
-from openatlas.models.entity import Entity
+from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
-from openatlas.models.link import Link
 
 
 class Parser:
@@ -163,12 +162,14 @@ class Parser:
             id_ = entity.get_linked_entity_safe('P53').id
             geoms = Gis.get_by_id(id_)
             if self.centroid:
-                geoms.extend(Gis.get_centroids_by_id(id_))
+                if centroid_result := Gis.get_centroids_by_id(id_):
+                    geoms.extend(centroid_result)
             return geoms
         if entity.class_.name == 'object_location':
             geoms = Gis.get_by_id(entity.id)
             if self.centroid:
-                geoms.extend(Gis.get_centroids_by_id(entity.id))
+                if centroid_result := Gis.get_centroids_by_id(entity.id):
+                    geoms.extend(centroid_result)
             return geoms
         return []
 
@@ -250,7 +251,8 @@ class Parser:
         if entity.class_.name == 'object_location':
             geoms: list[Any] = Gis.get_by_id(entity.id)
             if self.centroid:
-                geoms.extend(Gis.get_centroids_by_id(entity.id))
+                if centroid_result := Gis.get_centroids_by_id(entity.id):
+                    geoms.extend(centroid_result)
             return get_geoms_dict(geoms)
         if links:
             geoms = [Gis.get_by_id(id_) for id_ in links]

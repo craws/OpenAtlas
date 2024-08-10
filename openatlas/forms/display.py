@@ -34,19 +34,19 @@ def html_form(
         if field.type in ['CustomField']:
             html += add_row(field, value=field.content)
             continue
-        if field.id.startswith("reference_system"):
-            if len(reference_systems_fields) > 3 \
-                    and not reference_systems_fields_errors:
-                if not reference_systems_added:
-                    reference_systems_added = True
-                    html += add_row(
-                        None,
-                        _('reference system'),
-                        '<span id="reference-system-switcher" class="uc-first '
-                        f'{app.config["CSS"]["button"]["secondary"]}">'
-                        f'{_("show")}</span>')
-                html += add_row(field, row_css="d-none")
-                continue
+        if field.id.startswith("reference_system") \
+                and len(reference_systems_fields) > 3 \
+                and not reference_systems_fields_errors:
+            if not reference_systems_added:
+                reference_systems_added = True
+                html += add_row(
+                    None,
+                    _('reference system'),
+                    '<span id="reference-system-switcher" class="uc-first '
+                    f'{app.config["CSS"]["button"]["secondary"]}">'
+                    + _('show') + '</span>')
+            html += add_row(field, row_css="d-none")
+            continue
         if field.id.split('_', 1)[0] in ('begin', 'end'):
             if field.id == 'begin_year_from':
                 html += add_dates(form)
@@ -69,9 +69,7 @@ def html_form(
         if field.id == 'save':
             class_ = \
                 f"{app.config['CSS']['button']['primary']} text-wrap uc-first"
-            buttons = []
-            if manual_page:
-                buttons.append(manual(manual_page))
+            buttons = [manual(manual_page)] if manual_page else []
             buttons.append(field(class_=class_))
             if 'insert_and_continue' in form:
                 buttons.append(form.insert_and_continue(class_=class_))
@@ -84,7 +82,7 @@ def html_form(
                 map(lambda x: f'<div class="col-auto">{x}</div>', buttons))
             html += add_row(
                 field,
-                '',  # Setting label to '' keeps the button row label empty
+                '',  # Setting label to '' to keep button row label empty
                 '<div class="row g-1 align-items-center ">'
                 f'{"".join(buttons)}</div>')
             continue

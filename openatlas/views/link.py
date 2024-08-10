@@ -11,8 +11,7 @@ from openatlas.display.util import required_group
 from openatlas.forms.display import display_form
 from openatlas.forms.form import (
     get_add_reference_form, get_manager, get_table_form)
-from openatlas.models.entity import Entity
-from openatlas.models.link import Link
+from openatlas.models.entity import Entity, Link
 from openatlas.models.search import get_subunits_without_super
 
 

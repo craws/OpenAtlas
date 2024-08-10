@@ -17,6 +17,7 @@ from openatlas import app
 from openatlas.display.table import Table
 from openatlas.display.util import get_base_table_data
 from openatlas.display.util2 import is_authorized
+from openatlas.forms.util import string_to_entity_list
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 
@@ -137,8 +138,8 @@ class ReferenceField(Field):
         self.placeholder = placeholder
         self.choices = choices
         self.reference_system_id = reference_system_id
-        self.data = {"value": "", "precision": ""}
-        self.row_css = "reference-system-switch"
+        self.data = {'value': '', 'precision': ''}
+        self.row_css = 'reference-system-switch'
 
     def process_formdata(self, valuelist: list[str]) -> None:
         self.data = {
@@ -150,7 +151,6 @@ class ReferenceField(Field):
 
 class TableMultiSelect(HiddenInput):
     def __call__(self: Any, field: TableMultiField, **kwargs: Any) -> str:
-        from openatlas.forms.util import string_to_entity_list
         if request and request.method == 'POST':
             field.selection = []
             if request.form[field.name]:

@@ -1,20 +1,22 @@
 from __future__ import annotations
 
 import ast
-from typing import Any, Iterable, Optional
+from typing import Any, Iterable, Optional, TYPE_CHECKING
 
 from flask import g, request
-from fuzzywuzzy import fuzz
 from werkzeug.exceptions import abort
 
 from openatlas import app
-from openatlas.database import date, entity as db, tools as db_tools
+from openatlas.database import (
+    date, entity as db, link as db_link, tools as db_tools)
 from openatlas.display.util2 import (
     convert_size, datetime64_to_timestamp, format_date_part, sanitize,
     timestamp_to_datetime64)
 from openatlas.models.gis import Gis
-from openatlas.models.link import Link
 from openatlas.models.tools import get_carbon_link
+
+if TYPE_CHECKING:  # pragma: no cover
+    from openatlas.models.type import Type
 
 
 class Entity:
@@ -30,9 +32,9 @@ class Entity:
         self.origin_id: Optional[int] = None  # When coming from another entity
         self.image_id: Optional[int] = None  # Profile image
         self.location: Optional[Entity] = None  # Respective location if place
-
-        self.standard_type = None
         self.types = {}
+        self.standard_type = None
+
         if 'types' in data and data['types']:
             for item in data['types']:  # f1 = type id, f2 = value
                 type_ = g.types[item['f1']]
@@ -49,7 +51,6 @@ class Entity:
             self.aliases = dict(
                 sorted(self.aliases.items(), key=lambda item_: item_[1]))
 
-        # Dates
         self.begin_from = None
         self.begin_to = None
         self.begin_comment = None
@@ -284,8 +285,7 @@ class Entity:
                         data['attributes_link']['begin_comment']
                     item.end_from = data['attributes_link']['end_from']
                     item.end_to = data['attributes_link']['end_to']
-                    item.end_comment = \
-                        data['attributes_link']['end_comment']
+                    item.end_comment = data['attributes_link']['end_comment']
                     item.update()
             if link_['return_link_id']:
                 continue_link_id = ids[0]
@@ -363,16 +363,6 @@ class Entity:
     @staticmethod
     def get_file_info() -> dict[int, Any]:
         return db.get_file_info()
-
-    @staticmethod
-    def get_invalid_dates() -> list[Entity]:
-        return [
-            Entity.get_by_id(row['id'], types=True)
-            for row in date.get_invalid_dates()]
-
-    @staticmethod
-    def get_orphaned_subunits() -> list[Entity]:
-        return [Entity.get_by_id(x['id']) for x in db.get_orphaned_subunits()]
 
     @staticmethod
     def delete_(id_: int | list[int]) -> None:
@@ -467,28 +457,8 @@ class Entity:
         return entities
 
     @staticmethod
-    def get_similar_named(class_: str, ratio: int) -> dict[int, Any]:
-        similar: dict[int, Any] = {}
-        already_added: set[int] = set()
-        entities = Entity.get_by_class(class_)
-        for sample in [e for e in entities if e.id not in already_added]:
-            similar[sample.id] = {'entity': sample, 'entities': []}
-            for entity in entities:
-                if entity.id != sample.id \
-                        and fuzz.ratio(sample.name, entity.name) >= ratio:
-                    already_added.add(sample.id)
-                    already_added.add(entity.id)
-                    similar[sample.id]['entities'].append(entity)
-        return {
-            item: data for item, data in similar.items() if data['entities']}
-
-    @staticmethod
     def get_overview_counts() -> dict[str, int]:
         return db.get_overview_counts(g.class_view_mapping)
-
-    @staticmethod
-    def get_orphans() -> list[Entity]:
-        return [Entity.get_by_id(row['id']) for row in db.get_orphans()]
 
     @staticmethod
     def get_latest(limit: int) -> list[Entity]:
@@ -498,11 +468,6 @@ class Entity:
     @staticmethod
     def set_profile_image(id_: int, origin_id: int) -> None:
         db.set_profile_image(id_, origin_id)
-
-    @staticmethod
-    def get_entities_linked_to_itself() -> list[Entity]:
-        return [
-            Entity.get_by_id(row['domain_id']) for row in db.get_circular()]
 
     @staticmethod
     def get_roots(
@@ -585,42 +550,102 @@ class Entity:
             abort(418, f'Missing linked {code} for {id_}')
         return entity
 
-    @staticmethod
-    def get_invalid_cidoc_links() -> list[dict[str, Any]]:
-        invalid_linking = []
-        for row in db.get_cidoc_links():
-            valid_domain = g.properties[row['property_code']].find_object(
-                'domain_class_code',
-                row['domain_code'])
-            valid_range = g.properties[row['property_code']].find_object(
-                'range_class_code',
-                row['range_code'])
-            if not valid_domain or not valid_range:
-                invalid_linking.append(row)
-        invalid_links = []
-        for item in invalid_linking:
-            for row in db.get_invalid_links(item):
-                invalid_links.append({
-                    'domain': Entity.get_by_id(row['domain_id']),
-                    'property': g.properties[row['property_code']],
-                    'range': Entity.get_by_id(row['range_id'])})
-        return invalid_links
+
+class Link:
+    object_: Optional[Entity]  # Needed for first/last appearance
+
+    def __init__(
+            self,
+            row: dict[str, Any],
+            domain: Optional[Entity] = None,
+            range_: Optional[Entity] = None) -> None:
+        self.id = row['id']
+        self.description = row['description']
+        self.property = g.properties[row['property_code']]
+        self.domain = domain or Entity.get_by_id(row['domain_id'])
+        self.range = range_ or Entity.get_by_id(row['range_id'])
+        self.type = g.types[row['type_id']] if row['type_id'] else None
+        self.types: dict[Entity, None] = {}
+        if 'type_id' in row and row['type_id']:
+            self.types[g.types[row['type_id']]] = None
+        if 'begin_from' in row:
+            self.begin_from = timestamp_to_datetime64(row['begin_from'])
+            self.begin_to = timestamp_to_datetime64(row['begin_to'])
+            self.begin_comment = row['begin_comment']
+            self.end_from = timestamp_to_datetime64(row['end_from'])
+            self.end_to = timestamp_to_datetime64(row['end_to'])
+            self.end_comment = row['end_comment']
+            self.first = format_date_part(self.begin_from, 'year') \
+                if self.begin_from else None
+            self.last = format_date_part(self.end_from, 'year') \
+                if self.end_from else None
+            self.last = format_date_part(self.end_to, 'year') \
+                if self.end_to else self.last
+
+    def update(self) -> None:
+        db_link.update({
+            'id': self.id,
+            'property_code': self.property.code,
+            'domain_id': self.domain.id,
+            'range_id': self.range.id,
+            'type_id': self.type.id if self.type else None,
+            'description': self.description,
+            'begin_from': datetime64_to_timestamp(self.begin_from),
+            'begin_to': datetime64_to_timestamp(self.begin_to),
+            'begin_comment': self.begin_comment,
+            'end_from': datetime64_to_timestamp(self.end_from),
+            'end_to': datetime64_to_timestamp(self.end_to),
+            'end_comment': self.end_comment})
+
+    def set_dates(self, data: dict[str, Any]) -> None:
+        self.begin_from = data['begin_from']
+        self.begin_to = data['begin_to']
+        self.begin_comment = data['begin_comment']
+        self.end_from = data['end_from']
+        self.end_to = data['end_to']
+        self.end_comment = data['end_comment']
 
     @staticmethod
-    def check_single_type_duplicates() -> list[dict[str, Any]]:
-        data = []
-        for type_ in g.types.values():
-            if not type_.multiple and type_.category not in ['value', 'tools']:
-                if type_ids := type_.get_sub_ids_recursive():
-                    for id_ in db.check_single_type_duplicates(type_ids):
-                        offending_types = []
-                        entity = Entity.get_by_id(id_, types=True)
-                        for entity_type in entity.types:
-                            if g.types[entity_type.root[0]].id == type_.id:
-                                offending_types.append(entity_type)
-                        if offending_types:
-                            data.append({
-                                'entity': entity,
-                                'type': type_,
-                                'offending_types': offending_types})
-        return data
+    def get_by_id(id_: int) -> Link:
+        return Link(db_link.get_by_id(id_))
+
+    @staticmethod
+    def get_links_by_type(type_: Type) -> list[dict[str, Any]]:
+        return db_link.get_links_by_type(type_.id)
+
+    @staticmethod
+    def get_links_by_type_recursive(
+            type_: Type,
+            result: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        result += db_link.get_links_by_type(type_.id)
+        for sub_id in type_.subs:
+            result = Link.get_links_by_type_recursive(g.types[sub_id], result)
+        return result
+
+    @staticmethod
+    def get_entity_ids_by_type_ids(types_: list[int]) -> list[int]:
+        return db_link.get_entity_ids_by_type_ids(types_)
+
+    @staticmethod
+    def delete_(id_: int) -> None:
+        db_link.delete_(id_)
+
+    @staticmethod
+    def invalid_involvement_dates() -> list[Link]:
+        return [
+            Link.get_by_id(row['id'])
+            for row in date.invalid_involvement_dates()]
+
+    @staticmethod
+    def get_invalid_link_dates() -> list[Link]:
+        return [
+            Link.get_by_id(row['id'])
+            for row in date.get_invalid_link_dates()]
+
+    @staticmethod
+    def check_link_duplicates() -> list[dict[str, Any]]:
+        return db_link.check_link_duplicates()
+
+    @staticmethod
+    def delete_link_duplicates() -> int:
+        return db_link.delete_link_duplicates()

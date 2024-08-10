@@ -16,8 +16,7 @@ from openatlas.display.util import (
 from openatlas.display.util2 import is_authorized, manual
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
-from openatlas.models.entity import Entity
-from openatlas.models.link import Link
+from openatlas.models.entity import Entity, Link
 from openatlas.models.tools import (
     SexEstimation, get_carbon_link, get_sex_types, update_carbon)
 

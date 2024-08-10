@@ -20,8 +20,7 @@ from openatlas.api.resources.templates import (
     geojson_collection_template, linked_places_template, loud_template)
 from openatlas.api.resources.util import (
     get_linked_entities_api, get_location_link, remove_duplicate_entities)
-from openatlas.models.entity import Entity
-from openatlas.models.link import Link
+from openatlas.models.entity import Entity, Link
 
 
 class Endpoint:

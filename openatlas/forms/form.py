@@ -16,9 +16,8 @@ from openatlas.display.util import get_base_table_data
 from openatlas.display.util2 import show_table_icons, uc_first
 from openatlas.forms import base_manager, manager
 from openatlas.forms.field import (
-    SubmitField, TableField, TableMultiField, TreeField, TableCidocField)
-from openatlas.models.entity import Entity
-from openatlas.models.link import Link
+    SubmitField, TableCidocField, TableField, TableMultiField, TreeField)
+from openatlas.models.entity import Entity, Link
 from openatlas.views.entity_index import file_preview
 
 if TYPE_CHECKING:  # pragma: no cover

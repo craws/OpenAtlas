@@ -153,9 +153,6 @@ class FileTest(TestBaseCase):
             assert b'Updated file' in rv.data
 
             rv = self.app.get(url_for('view', id_=iiif_id))
-            assert b'Logo' in rv.data
-
-            rv = self.app.get(url_for('view', id_=iiif_id))
             assert b'enable IIIF view' in rv.data
 
             rv = self.app.get(
@@ -289,6 +286,10 @@ class FileTest(TestBaseCase):
                 url_for('admin_annotation_delete', id_=2),
                 follow_redirects=True)
             assert b'Annotation deleted' in rv.data
+
+            with app.test_request_context():
+                app.preprocess_request()
+                files = Entity.get_by_class('file')
 
             for file in files:
                 rv = self.app.get(

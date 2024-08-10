@@ -6,8 +6,11 @@ from flask_babel import lazy_gettext as _
 from flask_login import current_user
 
 from openatlas import app
+from openatlas.api.external.geonames import fetch_geonames
+from openatlas.api.external.gnd import fetch_gnd
+from openatlas.api.external.wikidata import fetch_wikidata
 from openatlas.database.connect import Transaction
-from openatlas.display.util import required_group
+from openatlas.display.util import display_info, required_group
 from openatlas.display.util2 import uc_first
 from openatlas.forms.field import table
 from openatlas.models.entity import Entity
@@ -89,3 +92,21 @@ def ajax_get_entity_table(content_domain: str) -> str:
             current_user.settings['table_show_aliases']),
         json.loads(request.form['filterIds']) or [])
     return table_.display(content_domain)
+
+
+@app.route('/ajax/wikidata_info', methods=['POST'])
+@required_group('readonly')
+def ajax_wikidata_info() -> str:
+    return display_info(fetch_wikidata(request.form['id_']))
+
+
+@app.route('/ajax/geonames_info', methods=['POST'])
+@required_group('readonly')
+def ajax_geonames_info() -> str:
+    return display_info(fetch_geonames(request.form['id_']))
+
+
+@app.route('/ajax/gnd_info', methods=['POST'])
+@required_group('readonly')
+def ajax_gnd_info() -> str:
+    return display_info(fetch_gnd(request.form['id_']))

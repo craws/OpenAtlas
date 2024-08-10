@@ -267,12 +267,12 @@ class FileManager(BaseManager):
             fields['file'] = DragNDropField(_('file'), [InputRequired()])
             setattr(self.form_class, 'validate_file', file)
         fields['public'] = BooleanField(_('public sharing allowed'))
-        fields['creator'] = StringField()
-        fields['license_holder'] = StringField()
+        fields['creator'] = StringField(_('creator'))
+        fields['license_holder'] = StringField(_('license holder'))
         if not self.entity \
                 and self.origin \
                 and self.origin.class_.view == 'reference':
-            fields['page'] = StringField()  # Needed to link file after insert
+            fields['page'] = StringField(_('page'))
         return fields
 
     def populate_update(self) -> None:

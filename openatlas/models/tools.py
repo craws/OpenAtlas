@@ -6,10 +6,9 @@ from typing import Any, Optional, TYPE_CHECKING
 from flask import g
 
 from openatlas.database import tools as db
-from openatlas.models.link import Link
 
 if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.models.entity import Entity
+    from openatlas.models.entity import Entity, Link
 
 
 def get_sex_types(id_: int) -> list[dict[str, Any]]:

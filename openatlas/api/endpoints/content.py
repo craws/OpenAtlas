@@ -69,7 +69,6 @@ class GetProperties(Resource):
         results = {}
         for property_code, property_ in g.properties.items():
             results[property_code] = {
-                "id": property_.id,
                 "name": property_.name,
                 "nameInverse": property_.name_inverse,
                 "code": property_.code,

@@ -104,3 +104,13 @@ class ImageTest(TestBaseCase):
                 url_for('admin_delete_orphaned_resized_images'),
                 follow_redirects=True)
             assert b'Resized orphaned images were deleted' in rv.data
+
+            with app.test_request_context():
+                app.preprocess_request()
+                files = Entity.get_by_class('file')
+
+            for file in files:
+                rv = self.app.get(
+                    url_for('delete', id_=file.id),
+                    follow_redirects=True)
+                assert b'The entry has been deleted' in rv.data

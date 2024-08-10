@@ -47,7 +47,8 @@ def get_by_project_id(project_id: int) -> list[dict[str, Any]]:
         JOIN import.entity ie ON e.id = ie.entity_id
         WHERE ie.project_id = %(id)s
         GROUP BY e.id, ie.origin_id;
-        """, {'id': project_id})
+        """,
+        {'id': project_id})
     return [dict(row) for row in g.cursor.fetchall()]
 
 
@@ -83,35 +84,6 @@ def get_overview_counts(classes: list[str]) -> dict[str, int]:
         """,
         {'classes': tuple(classes)})
     return {row['name']: row['count'] for row in g.cursor.fetchall()}
-
-
-def get_orphaned_subunits() -> list[dict[str, Any]]:
-    g.cursor.execute(
-        """
-        SELECT e.id
-        FROM model.entity e
-        LEFT JOIN model.link l ON e.id = l.range_id AND l.property_code = 'P46'
-        WHERE l.domain_id IS NULL
-            AND e.openatlas_class_name IN ('feature', 'stratigraphic_unit')
-        """)
-    return [dict(row) for row in g.cursor.fetchall()]
-
-
-def get_orphans() -> list[dict[str, Any]]:
-    g.cursor.execute(
-        """
-        SELECT e.id
-        FROM model.entity e
-        LEFT JOIN model.link l1 ON e.id = l1.domain_id
-            AND l1.range_id NOT IN
-                (SELECT id FROM model.entity WHERE cidoc_class_code = 'E55')
-        LEFT JOIN model.link l2 ON e.id = l2.range_id
-        WHERE l1.domain_id IS NULL
-            AND l2.range_id IS NULL
-            AND e.cidoc_class_code != 'E55'
-            AND e.openatlas_class_name != 'reference_system';
-        """)
-    return [dict(row) for row in g.cursor.fetchall()]
 
 
 def get_latest(classes: list[str], limit: int) -> list[dict[str, Any]]:
@@ -152,12 +124,6 @@ def get_all_entities() -> list[dict[str, Any]]:
                 AS end_to
         FROM model.entity e;
         """)
-    return [dict(row) for row in g.cursor.fetchall()]
-
-
-def get_circular() -> list[dict[str, Any]]:
-    g.cursor.execute(
-        'SELECT domain_id FROM model.link WHERE domain_id = range_id;')
     return [dict(row) for row in g.cursor.fetchall()]
 
 
@@ -498,55 +464,6 @@ def get_linked_entities_inverse(id_: int, codes: list[str]) -> list[int]:
         """,
         {'id_': id_, 'codes': tuple(codes)})
     return [row['result_id'] for row in g.cursor.fetchall()]
-
-
-def get_cidoc_links() -> list[dict[str, Any]]:
-    g.cursor.execute(
-        """
-        SELECT DISTINCT
-            l.property_code,
-            d.cidoc_class_code AS domain_code,
-            r.cidoc_class_code AS range_code
-        FROM model.link l
-        JOIN model.entity d ON l.domain_id = d.id
-        JOIN model.entity r ON l.range_id = r.id;
-        """)
-    return [dict(row) for row in g.cursor.fetchall()]
-
-
-def get_invalid_links(data: dict[str, Any]) -> list[dict[str, int]]:
-    g.cursor.execute(
-        """
-        SELECT
-            l.id,
-            l.property_code,
-            l.domain_id,
-            l.range_id,
-            l.description,
-            l.created,
-            l.modified
-        FROM model.link l
-        JOIN model.entity d ON l.domain_id = d.id
-        JOIN model.entity r ON l.range_id = r.id
-        WHERE l.property_code = %(property_code)s
-            AND d.cidoc_class_code = %(domain_code)s
-            AND r.cidoc_class_code = %(range_code)s;
-        """,
-        data)
-    return [dict(row) for row in g.cursor.fetchall()]
-
-
-def check_single_type_duplicates(ids: list[int]) -> list[int]:
-    g.cursor.execute(
-        """
-        SELECT domain_id
-        FROM model.link
-        WHERE property_code = 'P2' AND range_id IN %(ids)s
-        GROUP BY domain_id
-        HAVING COUNT(*) > 1;
-        """,
-        {'ids': tuple(ids)})
-    return [row['domain_id'] for row in g.cursor.fetchall()]
 
 
 def delete_links_by_codes(

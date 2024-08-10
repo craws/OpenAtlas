@@ -5,7 +5,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Database Structure &mdash; OpenAtlas 8.5.0 documentation</title>
+  <title>Database Structure &mdash; OpenAtlas 8.6.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
@@ -35,7 +35,7 @@
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                8.5.0
+                8.6.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -67,8 +67,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../troubleshooting/index.html">Troubleshooting</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../faq.html#criteria-checked-by-the-software">Criteria checked by the software</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../faq.html#criteria-checked-by-managers-and-users">Criteria checked by managers and users</a></li>
 </ul>
 
         </div>
@@ -99,13 +97,29 @@
 <div class="toctree-wrapper compound">
 </div>
 <p>Regarding the database structure, the following PostgreSQL schemas are used:</p>
-<ul class="simple">
+<ul>
 <li><p><strong>import</strong> - to track entities imported via the backend</p></li>
-<li><p><strong>model</strong> - CIDOC specifications (classes, properties) and OpenAtlas classed
-base on them, entities and links</p></li>
+<li><p><strong>model</strong> - the main project data</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>CIDOC specifications (classes, properties, translations)</p></li>
+<li><p>OpenAtlas classes (based on CIDOC classes)</p></li>
+<li><p>Entities (OpenAtlas class instances)</p></li>
+<li><p>Links (CIDOC property instances)</p></li>
+</ul>
+</div></blockquote>
+</li>
 <li><p><strong>public</strong> - general PostgreSQL functionality, e.g. PostGIS functions</p></li>
-<li><p><strong>web</strong> - none model data related to the website, e.g. users with their
-preferences and permissions</p></li>
+<li><p><strong>web</strong> - none model data related to the website, e.g.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>website settings (upload size limit, email configuration, …)</p></li>
+<li><p>groups, users and their preferences, notes, bookmarks, …</p></li>
+<li><p>image annotations</p></li>
+<li><p>external reference system specifications</p></li>
+</ul>
+</div></blockquote>
+</li>
 </ul>
 </section>
 

@@ -6,23 +6,68 @@ Reference System
 CIDOC documentation:
 :cidoc_entity:`E32 Authority Document<e32-authority-document>`
 
-For step by step instructions have a look at our
-:doc:`/examples/reference_systems`.
+Reference systems can be used to link entities to external sources. You can
+see a list of available systems by clicking the **Reference system** button on
+the start page.
 
-Reference systems can be used to link entities to external sources, e.g. to
-`Wikidata <https://www.wikidata.org/>`_  or
-`GeoNames <https://www.geonames.org/>`_
-which are already included in the default application. You can see a list of
-available systems by clicking the **Reference system** button on the start
-page. Links consists of an identifier (ID) and a precision.
+Linking entities to external reference systems has many advantages like
+being able to find or provide more information from other sources and it makes
+it a lot easier to merge/compare data from other projects using the same
+reference systems.
+
+For step by step instructions to add a reference system have a look at our
+:doc:`/examples/reference_systems` example.
+
+Included by default
+-------------------
+These systems are included in the default application. Furthermore,
+it was made use of their APIs to provide search functionality inside of
+OpenAtlas and display their information about already linked entities at the
+corresponding entity detail view.
+
+Wikidata
+********
+`Wikidata <https://wikidata.org/>`_ is a collaboratively edited multilingual
+knowledge graph hosted by the Wikimedia Foundation. It is a common source of
+open data that Wikimedia projects such as Wikipedia, and anyone else, is able
+to use under the CC0 public domain license.
+
+By default it is usable for **places, persons and groups**.
+
+GeoNames
+********
+`GeoNames <https://www.geonames.org/>`_ is a user-editable geographical
+database available and accessible through various web services, under a
+Creative Commons attribution license. The GeoNames database contains over
+25,000,000 geographical names corresponding to over 11,800,000 unique features.
+
+For GeoNames the search is integrated in the map search field and it is also
+possible to take over their coordinates for specific places.
+
+By default it is usable for **places**.
+
+GND
+***
+The `GND <https://d-nb.info/standards/elementset/gnd>`_ or Gemeinsame Normdatei
+(translated as Integrated Authority File) is an international authority
+file for the organisation of personal names, subject headings and corporate
+bodies from catalogues. It is used mainly for documentation in libraries and
+increasingly also by archives and museums.
+
+By default it is usable for **persons**.
+
+Usage
+-----
+Links consists of an identifier (ID) and a precision and can be entered when
+adding or updating an entity.
 
 ID
---
+**
 The identifier of the entity in the external reference system. For GeoNames
 and Wikidata it will be checked for a valid format.
 
 Precision
----------
+*********
 When linking to an external reference a precision is required. Available
 options are the `SKOS <https://www.w3.org/TR/skos-primer/>`_ based definitions
 of the confidence degree that concepts can be used interchangeable.

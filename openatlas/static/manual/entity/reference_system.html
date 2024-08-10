@@ -5,7 +5,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reference System &mdash; OpenAtlas 8.5.0 documentation</title>
+  <title>Reference System &mdash; OpenAtlas 8.6.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
@@ -35,7 +35,7 @@
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                8.5.0
+                8.6.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -79,8 +79,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../troubleshooting/index.html">Troubleshooting</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../faq.html#criteria-checked-by-the-software">Criteria checked by the software</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../faq.html#criteria-checked-by-managers-and-users">Criteria checked by managers and users</a></li>
 </ul>
 
         </div>
@@ -113,21 +111,60 @@
 </div>
 <p>CIDOC documentation:
 <a class="reference external" href="https://www.cidoc-crm.org/Entity/e32-authority-document/version-7.1">E32 Authority Document</a></p>
-<p>For step by step instructions have a look at our
-<a class="reference internal" href="../examples/reference_systems.html"><span class="doc">References Systems</span></a>.</p>
-<p>Reference systems can be used to link entities to external sources, e.g. to
-<a class="reference external" href="https://www.wikidata.org/">Wikidata</a>  or
-<a class="reference external" href="https://www.geonames.org/">GeoNames</a>
-which are already included in the default application. You can see a list of
-available systems by clicking the <strong>Reference system</strong> button on the start
-page. Links consists of an identifier (ID) and a precision.</p>
+<p>Reference systems can be used to link entities to external sources. You can
+see a list of available systems by clicking the <strong>Reference system</strong> button on
+the start page.</p>
+<p>Linking entities to external reference systems has many advantages like
+being able to find or provide more information from other sources and it makes
+it a lot easier to merge/compare data from other projects using the same
+reference systems.</p>
+<p>For step by step instructions to add a reference system have a look at our
+<a class="reference internal" href="../examples/reference_systems.html"><span class="doc">References Systems</span></a> example.</p>
+<section id="included-by-default">
+<h2>Included by default<a class="headerlink" href="#included-by-default" title="Permalink to this heading"></a></h2>
+<p>These systems are included in the default application. Furthermore,
+it was made use of their APIs to provide search functionality inside of
+OpenAtlas and display their information about already linked entities at the
+corresponding entity detail view.</p>
+<section id="wikidata">
+<h3>Wikidata<a class="headerlink" href="#wikidata" title="Permalink to this heading"></a></h3>
+<p><a class="reference external" href="https://wikidata.org/">Wikidata</a> is a collaboratively edited multilingual
+knowledge graph hosted by the Wikimedia Foundation. It is a common source of
+open data that Wikimedia projects such as Wikipedia, and anyone else, is able
+to use under the CC0 public domain license.</p>
+<p>By default it is usable for <strong>places, persons and groups</strong>.</p>
+</section>
+<section id="geonames">
+<h3>GeoNames<a class="headerlink" href="#geonames" title="Permalink to this heading"></a></h3>
+<p><a class="reference external" href="https://www.geonames.org/">GeoNames</a> is a user-editable geographical
+database available and accessible through various web services, under a
+Creative Commons attribution license. The GeoNames database contains over
+25,000,000 geographical names corresponding to over 11,800,000 unique features.</p>
+<p>For GeoNames the search is integrated in the map search field and it is also
+possible to take over their coordinates for specific places.</p>
+<p>By default it is usable for <strong>places</strong>.</p>
+</section>
+<section id="gnd">
+<h3>GND<a class="headerlink" href="#gnd" title="Permalink to this heading"></a></h3>
+<p>The <a class="reference external" href="https://d-nb.info/standards/elementset/gnd">GND</a> or Gemeinsame Normdatei
+(translated as Integrated Authority File) is an international authority
+file for the organisation of personal names, subject headings and corporate
+bodies from catalogues. It is used mainly for documentation in libraries and
+increasingly also by archives and museums.</p>
+<p>By default it is usable for <strong>persons</strong>.</p>
+</section>
+</section>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading"></a></h2>
+<p>Links consists of an identifier (ID) and a precision and can be entered when
+adding or updating an entity.</p>
 <section id="id">
-<h2>ID<a class="headerlink" href="#id" title="Permalink to this heading"></a></h2>
+<h3>ID<a class="headerlink" href="#id" title="Permalink to this heading"></a></h3>
 <p>The identifier of the entity in the external reference system. For GeoNames
 and Wikidata it will be checked for a valid format.</p>
 </section>
 <section id="precision">
-<h2>Precision<a class="headerlink" href="#precision" title="Permalink to this heading"></a></h2>
+<h3>Precision<a class="headerlink" href="#precision" title="Permalink to this heading"></a></h3>
 <p>When linking to an external reference a precision is required. Available
 options are the <a class="reference external" href="https://www.w3.org/TR/skos-primer/">SKOS</a> based definitions
 of the confidence degree that concepts can be used interchangeable.</p>
@@ -140,6 +177,7 @@ interchangeably</p></li>
 <p>E.g. if a historical project links the city of Vienna to Wikidata, a
 <strong>close match</strong> would be more suitable, because the Wikidata entry is more
 about the current city and not the historical one.</p>
+</section>
 </section>
 <section id="configuration">
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h2>

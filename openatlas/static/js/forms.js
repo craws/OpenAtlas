@@ -65,9 +65,9 @@ $(document).ready(function () {
 
   /* Show and hide function for date input fields */
   $("#date-switcher").attr(
-      "aria-pressed",
-      !$(".date-switch").hasClass('d-none')
-    );
+    "aria-pressed",
+    !$(".date-switch").hasClass('d-none')
+  );
 
   $("#date-switcher").click(function () {
     toggleDateFieldVisible(this);
@@ -80,14 +80,13 @@ $(document).ready(function () {
   function toggleDateFieldVisible(el) {
     $(".date-switch").toggleClass('d-none');
     $("#date-switcher").attr(
-        "aria-pressed",
-        !$(".date-switch").hasClass('d-none')
-      );
+      "aria-pressed",
+      !$(".date-switch").hasClass('d-none')
+    );
     $(el).text(function (i, text) {
       return $.trim(text) === translate.show ? translate.hide : translate.show;
     })
   }
-
 
   /* Hide date fields if there are any and if they are empty */
   if ($('#begin_year_from').length &&
@@ -170,19 +169,19 @@ $(document).ready(function () {
     $("#password2").val(random_password);
   })
 
-    // Adding a generic submit handler to form validation
-    .each(function () {
-      $(this).validate({
-        errorClass: "d-block error",
-        submitHandler: function (form) {
-          if (this.submitButton.id === "insert_and_continue") $('#continue_').val('yes');
-          if (this.submitButton.id === "insert_continue_sub") $('#continue_').val('sub');
-          if (this.submitButton.id === "insert_continue_human_remains") $('#continue_').val('human_remains');
-          $('button[type="submit"]').prop("disabled", true).text(translate.inProgress);
-          form.submit();
-        },
-      });
+  // Adding a generic submit handler to form validation
+  .each(function () {
+    $(this).validate({
+      errorClass: "d-block error",
+      submitHandler: function (form) {
+        if (this.submitButton.id === "insert_and_continue") $('#continue_').val('yes');
+        if (this.submitButton.id === "insert_continue_sub") $('#continue_').val('sub');
+        if (this.submitButton.id === "insert_continue_human_remains") $('#continue_').val('human_remains');
+        $('button[type="submit"]').prop("disabled", true).text(translate.inProgress);
+        form.submit();
+      },
     });
+  });
 
   // Add required to reference precision if reference is set
   ['keyup', 'change'].forEach((listener) => {

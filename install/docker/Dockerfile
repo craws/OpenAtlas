@@ -10,7 +10,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     apt install -y --no-install-recommends apache2 libapache2-mod-wsgi-py3 brotli python3-coverage python3-nose exiftran &&\
     apt install -y --no-install-recommends iipimage-server libvips-tools python3-email-validator python3-svgwrite python3-shapely &&\
     apt install -y --no-install-recommends gettext npm python3-pip git postgresql-client-15 &&\
-    apt install -y --no-install-recommends dos2unix locales locales-all vim w3c-sgml-lib nano &&\
+    apt install -y --no-install-recommends dos2unix locales locales-all vim w3c-sgml-lib nano python3-xmltodict &&\
     mkdir -p /var/www/openatlas /var/www/.cache /var/www/.local /var/www/.npm &&\
     chown -R www-data:www-data /var/www/.cache /var/www/.local /var/www/.npm /var/log/apache2 /var/run/apache2
 RUN cp -rp /usr/lib/iipimage-server/ /var/www/iipsrv/ &&\

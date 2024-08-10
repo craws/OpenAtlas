@@ -12,7 +12,6 @@ class CidocClass:
     def __init__(self, data: dict[str, Any]) -> None:
         self.name = data['name']
         self.code = data['code']
-        self.id = data['id']
         self.comment = data['comment']
         self.count = data['count']
         self.i18n: dict[str, str] = {}

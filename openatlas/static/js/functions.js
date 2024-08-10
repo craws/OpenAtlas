@@ -74,6 +74,7 @@ $(document).ready(function () {
       $(more).insertAfter(this);
     }
   });
+
   $(".more-link").click(function () {
     if ($(this).hasClass("less")) {
       $(this).removeClass("less");
@@ -135,6 +136,40 @@ $(document).ready(function () {
   }).on('autocomplete.select', function(evt,item) {
       $('input[data-reference-system=Wikidata]').val(item.id);
   });
+  
+  /**
+   * GND autocomplete
+   * Documentation: https://bootstrap-autocomplete.readthedocs.io/en/latest/
+   * Bootstrap version needs to be manually set d/t
+  */
+  $('input[data-reference-system=GND]').autoComplete({
+    bootstrapVersion: '4',
+    resolver: 'custom',
+    formatResult: function (item) {
+      return {
+         value: item.id,
+         text: `${item.label} - ${item.category}<br/><small>${item.id.substring(item.id.lastIndexOf('/') + 1)}</small>`
+      };
+    },
+    events: {
+      search: function (qry, callback) {
+        $.ajax({
+          url: "https://lobid.org/gnd/search",
+          dataType: "jsonp",
+          data: {
+            q: qry,
+            format: "json:preferredName"
+          },
+          success: function(data) {
+            callback(data);
+          }
+        })
+      }
+    }
+  }).on('autocomplete.select', function(evt,item) {
+    $('input[data-reference-system=GND]').val(item.id.substring(item.id.lastIndexOf('/') + 1));
+  });
+  
 });
 
 $.jstree.defaults.core.themes.dots = false;
@@ -191,6 +226,42 @@ async function ajaxAddEntity(data) {
   return newEntityId;
 }
 
+async function ajaxWikidataInfo(data) {
+  $.ajax({
+    type: 'post',
+    url: '/ajax/wikidata_info',
+    data: 'id_=' + data,
+    success: function (info) {
+      $('#wikidata-info-div').html(info);
+      $('#wikidata-switch').hide();
+    }
+  });
+}
+
+async function ajaxGeonamesInfo(data) {
+  $.ajax({
+    type: 'post',
+    url: '/ajax/geonames_info',
+    data: 'id_=' + data,
+    success: function (info) {
+      $('#geonames-info-div').html(info);
+      $('#geonames-switch').hide();
+    }
+  });
+}
+
+async function ajaxGndInfo(data) {
+  $.ajax({
+    type: 'post',
+    url: '/ajax/gnd_info',
+    data: 'id_=' + data,
+    success: function (info) {
+      $('#gnd-info-div').html(info);
+      $('#gnd-switch').hide();
+    }
+  });
+}
+
 async function refillTable(id, filterIds = []) {
   const tableContent = await $.ajax({
     type: 'post',
@@ -228,11 +299,13 @@ async function ajaxAddType(data, fieldId, typeId, multiple=false) {
 function getTypeTree(rootId){
   return $.ajax({type: 'get', url: `/ajax/get_type_tree/${rootId}`});
 }
+
 function updateTree(id, d, refreshCallback) {
   $(`#${id}-tree`).jstree(true).settings.core.data = d;
   $(`#${id}-tree`).jstree(true).refresh();
   if (refreshCallback) $(`#${id}-tree`).on('refresh.jstree', refreshCallback);
 }
+
 function fillTreeSelect(id,d,minimum_jstree_search){
     $(`#${id}-tree`).jstree({
       "plugins": ["search"],

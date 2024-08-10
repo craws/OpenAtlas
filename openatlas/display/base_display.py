@@ -15,9 +15,8 @@ from openatlas.display.util import (
     link, profile_image_table_link, remove_link)
 from openatlas.display.util2 import (
     format_date, is_authorized, manual, show_table_icons)
-from openatlas.models.entity import Entity
+from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
-from openatlas.models.link import Link
 from openatlas.models.overlay import Overlay
 from openatlas.models.type import Type
 from openatlas.models.user import User
@@ -42,7 +41,8 @@ class BaseDisplay:
         self.entity.image_id = entity.get_profile_image_id()
         self.add_tabs()
         self.add_note_tab()
-        self.add_file_tab_thumbnails()
+        if 'file' in self.tabs and show_table_icons():
+            self.add_file_tab_thumbnails()
         self.add_crumbs()
         self.add_buttons()
         if self.linked_places:
@@ -53,9 +53,10 @@ class BaseDisplay:
         self.tabs = {'info': Tab('info')}
 
     def add_crumbs(self) -> None:
-        self.crumbs = [[
-            _(self.entity.class_.view.replace('_', ' ')),
-            url_for('index', view=self.entity.class_.view)]]
+        label = _(self.entity.class_.view.replace('_', ' '))
+        if self.entity.class_.view in ['event']:
+            label += f' ({self.entity.cidoc_class.name})'
+        self.crumbs = [[label, url_for('index', view=self.entity.class_.view)]]
         if self.structure:
             for super_ in self.structure['supers']:
                 self.crumbs.append(link(super_))
@@ -68,9 +69,9 @@ class BaseDisplay:
         for type_, value in sorted(
                 self.entity.types.items(),
                 key=lambda x: x[0].name):
-            if self.entity.standard_type and type_.id \
-                    == self.entity.standard_type.id:
-                continue  # Standard type is already added
+            if self.entity.standard_type \
+                    and type_.id == self.entity.standard_type.id:
+                continue  # Standard type is already included
             title = " > ".join([g.types[i].name for i in type_.root])
             html = f'<span title="{title}">{link(type_)}</span>'
             if type_.category == 'value':
@@ -79,13 +80,10 @@ class BaseDisplay:
         return {key: data[key] for key in sorted(data.keys())}
 
     def add_file_tab_thumbnails(self) -> None:
-        if 'file' in self.tabs and show_table_icons():
-            self.tabs['file'].table.header.insert(1, _('icon'))
-            for row in self.tabs['file'].table.rows:
-                row.insert(1, file_preview(
-                    int(row[0]
-                        .replace('<a href="/entity/', '')
-                        .split('"')[0])))
+        self.tabs['file'].table.header.insert(1, _('icon'))
+        for row in self.tabs['file'].table.rows:
+            id_ = int(row[0].replace('<a href="/entity/', '').split('"')[0])
+            row.insert(1, file_preview(id_))
 
     def add_info_tab_content(self) -> None:
         self.add_data()
@@ -119,7 +117,7 @@ class BaseDisplay:
                 _('public') if note['public'] else _('private'),
                 link(User.get_by_id(note['user_id'])),
                 note['text'],
-                link(_("view"), url_for("note_view", id_=note["id"]))]
+                link(_('view'), url_for('note_view', id_=note['id']))]
             self.tabs['note'].table.rows.append(data)
 
     def add_buttons(self) -> None:

@@ -132,13 +132,13 @@ def value_to_be_searched(entity: Entity, key: str) -> Any:
         case "typeID" | "typeIDWithSubs":
             value = [type_.id for type_ in entity.types]
         case "beginFrom":
-            value = entity.begin_from
+            value = entity.begin_from  # type: ignore
         case "beginTo":
-            value = entity.begin_to
+            value = entity.begin_to  # type: ignore
         case "endFrom":
-            value = entity.end_from
+            value = entity.end_from  # type: ignore
         case "endTo":
-            value = entity.end_to
+            value = entity.end_to  # type: ignore
         case _:
             value = []
     return value
