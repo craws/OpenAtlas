@@ -281,7 +281,7 @@ msgstr "se permite compartir en público"
 
 #: openatlas/display/display.py:75
 msgid "but license is missing "
-msgstr "per falta la licencia"
+msgstr "per falta la licencia "
 
 #: openatlas/display/display.py:77 openatlas/forms/manager.py:270
 msgid "creator"
@@ -479,7 +479,7 @@ msgstr "ítems"
 #: openatlas/display/table.py:14
 #, python-format
 msgid "showing %(first)s to %(last)s of %(all)s entries"
-msgstr "mostrando del %(first)s a %(last)s de %(all)s ítems\""
+msgstr "mostrando del %(first)s a %(last)s de %(all)s ítems"
 
 #: openatlas/display/table.py:35 openatlas/forms/form.py:104
 #: openatlas/views/admin.py:377
@@ -893,13 +893,13 @@ msgstr "tooltip IIIF habilitada"
 
 #: openatlas/forms/setting.py:68
 msgid "URL need a trailing /"
-msgstr ""
+msgstr "La URL necesita un / al final"
 
 #: openatlas/forms/setting.py:69
 msgid "tooltip IIIF URL"
 msgstr ""
 "Establece el URL completo al servidor Image API, "
-" ex. https://tuservidor.eu/iiif/"
+"ex. https://tuservidor.eu/iiif/"
 
 #: openatlas/forms/setting.py:71 openatlas/templates/index/changelog.html:5
 msgid "version"
@@ -940,7 +940,7 @@ msgstr "convertir al subir"
 msgid "tooltip IIIF convert on upload"
 msgstr ""
 "controla si las imágene se convierten en TIFF de pirámide. "
-"El 'deflate' no tiene pérdidas pero el tamaño de los archivos puede ser grande."
+"El 'deflate' no tiene pérdidas pero el tamaño de los archivos puede ser grande. "
 "En cambio, el jpeg resulta en ficheros de mucho menor tamaño, pero "
 "con pérdidas de calidad"
 
@@ -2616,7 +2616,7 @@ msgstr "corresponde a"
 #: openatlas/views/tools.py:52 openatlas/views/tools.py:78
 #: openatlas/views/tools.py:122 openatlas/views/tools.py:191
 msgid "sex estimation"
-msgstr "estimación de género "
+msgstr "estimación de género"
 
 #: openatlas/views/tools.py:233
 msgid "radiocarbon year"

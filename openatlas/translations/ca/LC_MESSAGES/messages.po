@@ -280,8 +280,8 @@ msgid "public sharing allowed"
 msgstr "es permet compartir en públic"
 
 #: openatlas/display/display.py:75
-msgid "but license is missing"
-msgstr "però falta la llicència"
+msgid "but license is missing "
+msgstr "però falta la llicència "
 
 #: openatlas/display/display.py:77 openatlas/forms/manager.py:270
 msgid "creator"
@@ -893,7 +893,7 @@ msgstr "tooltip IIIF habilitat"
 
 #: openatlas/forms/setting.py:68
 msgid "URL need a trailing /"
-msgstr "L'URL necessita un final /"
+msgstr "L'URL necessita / al final"
 
 #: openatlas/forms/setting.py:69
 msgid "tooltip IIIF URL"
@@ -1818,7 +1818,7 @@ msgstr "Dibuixeu la forma si es coneix l'extensió precisa"
 #: openatlas/templates/util/translations.html:19
 msgid "map_info_area"
 msgstr ""
-"Dibuixeu l àrea aproximada, encara que la ""
+"Dibuixeu l àrea aproximada, encara que la "
 "seva localització sigui imprecisa"
 
 #: openatlas/templates/util/translations.html:20
@@ -1828,7 +1828,7 @@ msgstr "Establiu un marcador/punt a la posició on es troba el lloc"
 #: openatlas/templates/util/translations.html:21
 msgid "map_info_linestring"
 msgstr ""
-"Dibuixeu una línia connectada a les característiques espacials d un "
+"Dibuixeu una línia connectada a les característiques espacials d'un "
 "objecte físic (per exemple: el curs d un riu o camí)"
 
 #: openatlas/templates/util/translations.html:22
@@ -2558,7 +2558,7 @@ msgstr "canvia la contrasenya"
 
 #: openatlas/views/profile.py:138
 msgid "info password updated"
-msgstr "informació de contrasenya actualitzada"
+msgstr "la contrasenya ha estat actualitzada"
 
 #: openatlas/views/search.py:25
 msgid "Only entities edited by me"
