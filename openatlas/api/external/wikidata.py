@@ -22,6 +22,7 @@ def fetch_wikidata(id_: str) -> dict[str, Any]:
         data = requests.get(
             app.config['API_WIKIDATA'],
             params=params,
+            proxies=app.config['PROXIES'],
             timeout=10).json()
     except Exception:  # pragma: no cover
         return {}

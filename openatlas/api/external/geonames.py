@@ -14,7 +14,8 @@ def fetch_geonames(id_: str) -> dict[str, Any]:
     try:
         data = requests.get(
             app.config['API_GEONAMES'],
-            params,
+            params=params,
+            proxies=app.config['PROXIES'],
             timeout=10).content
         data_dict = xmltodict.parse(data)['geoname']
     except Exception:  # pragma: no cover
