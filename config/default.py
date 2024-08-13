@@ -46,6 +46,9 @@ SESSION_COOKIE_SECURE = False  # Should be True in production.py if using HTTPS
 REMEMBER_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 
+# Proxies (e.g. for calls to remote APIs when behind an institution firewall)
+PROXIES = None
+
 # Table options
 TABLE_ROWS = {10: '10', 25: '25', 50: '50', 100: '100'}
 
