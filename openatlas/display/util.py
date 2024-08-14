@@ -467,7 +467,7 @@ def link(
         external: bool = False) -> str:
     html = ''
     if isinstance(object_, (str, LazyString)):
-        js = f' onclick="{uc_first(js)}"' if js else ''
+        js = f' onclick="{js}"' if js else ''
         ext = ' target="_blank" rel="noopener noreferrer"' if external else ''
         if uc_first_ and not str(object_).startswith('http'):
             object_ = uc_first(object_)
