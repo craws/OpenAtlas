@@ -3,7 +3,7 @@ from pathlib import Path
 
 from config.database_versions import DATABASE_VERSIONS
 
-VERSION = '8.7.0'
+VERSION = '8.6.1'
 DATABASE_VERSION = DATABASE_VERSIONS[0]
 DEMO_MODE = False  # If activated some options are disabled, login is prefilled
 DEBUG = False
@@ -47,6 +47,9 @@ REMEMBER_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 
 # Proxies (e.g. for calls to remote APIs when behind an institution firewall)
+# e.g. PROXIES = {
+#    'http': 'http://someurl.org:8080',
+#    'https': 'http://someurl.org:8080'}
 PROXIES = None
 
 # Table options
