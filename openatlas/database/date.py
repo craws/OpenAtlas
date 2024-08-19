@@ -82,3 +82,19 @@ def invalid_involvement_dates() -> list[dict[str, Any]]:
                 AND involvement.begin_from < event.begin_from);
         """)
     return [dict(row) for row in g.cursor.fetchall()]
+
+
+def invalid_preceding_dates() -> list[dict[str, Any]]:
+    g.cursor.execute(
+        """
+        SELECT link.id
+        FROM model.entity preceding
+        JOIN model.link ON preceding.id = link.range_id
+            AND link.property_code = 'P134'
+        JOIN model.entity succeeding ON link.domain_id = succeeding.id
+        WHERE
+            preceding.begin_from IS NOT NULL
+                AND succeeding.begin_from IS NOT NULL
+                AND succeeding.begin_from < preceding.begin_from;
+        """)
+    return [dict(row) for row in g.cursor.fetchall()]

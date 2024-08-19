@@ -408,7 +408,11 @@ def check_dates() -> str:
             'invalid_involvement_dates',
             buttons=[manual_link],
             table=Table(
-                ['actor', 'event', 'class', 'involvement', 'description']))}
+                ['actor', 'event', 'class', 'involvement', 'description'])),
+        'preceding_dates': Tab(
+            'invalid_preceding_dates',
+            buttons=[manual_link],
+            table=Table(['preceding', 'succeeding']))}
     for entity in get_invalid_dates():
         tabs['dates'].table.rows.append([
             link(entity),
@@ -437,6 +441,10 @@ def check_dates() -> str:
                 _('edit'),
                 url_for('link_update', id_=link_.id, origin_id=actor.id))]
         tabs['involvement_dates'].table.rows.append(data)
+    for link_ in Link.invalid_preceding_dates():
+        tabs['preceding_dates'].table.rows.append([
+            link(link_.range),
+            link(link_.domain)])
     for tab in tabs.values():
         if not tab.table.rows:
             tab.content = _('Congratulations, everything looks fine!')

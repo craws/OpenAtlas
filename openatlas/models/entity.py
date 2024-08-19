@@ -637,6 +637,12 @@ class Link:
             for row in date.invalid_involvement_dates()]
 
     @staticmethod
+    def invalid_preceding_dates() -> list[Link]:
+        return [
+            Link.get_by_id(row['id'])
+            for row in date.invalid_preceding_dates()]
+
+    @staticmethod
     def get_invalid_link_dates() -> list[Link]:
         return [
             Link.get_by_id(row['id'])
