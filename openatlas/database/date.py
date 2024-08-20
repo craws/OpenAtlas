@@ -98,3 +98,28 @@ def invalid_preceding_dates() -> list[dict[str, Any]]:
                 AND succeeding.begin_from < preceding.begin_from;
         """)
     return [dict(row) for row in g.cursor.fetchall()]
+
+
+def invalid_sub_dates() -> list[dict[str, Any]]:
+    g.cursor.execute(
+        """
+        SELECT link.id
+        FROM model.entity super
+        JOIN model.link ON super.id = link.domain_id
+            AND link.property_code = 'P9'
+        JOIN model.entity sub ON link.range_id = sub.id
+        WHERE
+            (super.begin_from IS NOT NULL
+                AND sub.begin_from IS NOT NULL
+                AND sub.begin_from < super.begin_from)
+            OR (super.end_from IS NOT NULL AND sub.end_from IS NOT NULL
+                AND (super.end_to IS NULL AND sub.end_to IS NULL AND
+                    sub.end_from > super.end_from)
+                OR (super.end_to IS NULL AND sub.end_to IS NOT NULL AND
+                    sub.end_from > super.end_to)
+                OR (super.end_to IS NOT NULL AND sub.end_to IS NULL AND
+                    sub.end_to > super.end_from)
+                OR (super.end_to IS NOT NULL AND sub.end_to IS NOT NULL AND
+                    sub.end_to > super.end_to));
+        """)
+    return [dict(row) for row in g.cursor.fetchall()]

@@ -388,11 +388,9 @@ def check_similar() -> str:
 @app.route('/check/dates')
 @required_group('contributor')
 def check_dates() -> str:
-    manual_link = manual('admin/data_integrity_checks')
     tabs = {
         'dates': Tab(
             'invalid_dates',
-            buttons=[manual_link],
             table=Table([
                 'name',
                 'class',
@@ -402,17 +400,15 @@ def check_dates() -> str:
                 'description'])),
         'link_dates': Tab(
             'invalid_link_dates',
-            buttons=[manual_link],
             table=Table(['link', 'domain', 'range'])),
         'involvement_dates': Tab(
             'invalid_involvement_dates',
-            buttons=[manual_link],
             table=Table(
                 ['actor', 'event', 'class', 'involvement', 'description'])),
         'preceding_dates': Tab(
             'invalid_preceding_dates',
-            buttons=[manual_link],
-            table=Table(['preceding', 'succeeding']))}
+            table=Table(['preceding', 'succeeding'])),
+        'sub_dates': Tab('invalid_sub_dates', table=Table(['super', 'sub']))}
     for entity in get_invalid_dates():
         tabs['dates'].table.rows.append([
             link(entity),
@@ -445,7 +441,12 @@ def check_dates() -> str:
         tabs['preceding_dates'].table.rows.append([
             link(link_.range),
             link(link_.domain)])
+    for link_ in Link.invalid_sub_dates():
+        tabs['sub_dates'].table.rows.append([
+            link(link_.range),
+            link(link_.domain)])
     for tab in tabs.values():
+        tab.buttons = manual('admin/data_integrity_checks'),
         if not tab.table.rows:
             tab.content = _('Congratulations, everything looks fine!')
     return render_template(
