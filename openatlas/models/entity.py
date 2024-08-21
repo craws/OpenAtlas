@@ -652,7 +652,7 @@ class Link:
     def get_invalid_link_dates() -> list[Link]:
         return [
             Link.get_by_id(row['id'])
-            for row in date.get_invalid_link_dates()]
+            for row in date.invalid_link_dates()]
 
     @staticmethod
     def check_link_duplicates() -> list[dict[str, Any]]:

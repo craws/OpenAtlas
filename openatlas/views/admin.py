@@ -38,9 +38,9 @@ from openatlas.forms.setting import (
 from openatlas.forms.util import get_form_settings, set_form_settings
 from openatlas.models.annotation import Annotation
 from openatlas.models.checks import (
-    check_single_type_duplicates, get_entities_linked_to_itself,
-    get_invalid_cidoc_links, get_invalid_dates, get_orphaned_subunits,
-    get_orphans, get_similar_named)
+    entities_linked_to_itself, invalid_cidoc_links, invalid_dates,
+    orphaned_subunits, orphans as get_orphans, similar_named,
+    single_type_duplicates)
 from openatlas.models.content import get_content, update_content
 from openatlas.models.entity import Entity, Link
 from openatlas.models.imports import Project
@@ -219,7 +219,7 @@ def admin_content(item: str) -> str | Response:
 @required_group('contributor')
 def check_links() -> str:
     table = Table(['domain', 'property', 'range'])
-    for row in get_invalid_cidoc_links():
+    for row in invalid_cidoc_links():
         table.rows.append([
             f"{link(row['domain'])} ({row['domain'].cidoc_class.code})",
             link(row['property']),
@@ -275,7 +275,7 @@ def check_link_duplicates(delete: Optional[str] = None) -> str | Response:
     else:  # Check single types for multiple use
         tab.table = Table(
             ['entity', 'class', 'base type', 'incorrect multiple types'])
-        for row in check_single_type_duplicates():
+        for row in single_type_duplicates():
             remove_links = []
             for type_ in row['offending_types']:
                 url = url_for(
@@ -366,13 +366,11 @@ def check_similar() -> str:
     table = None
     if form.validate_on_submit():
         table = Table(['name', _('count')])
-        for sample in get_similar_named(
-                form.classes.data,
-                form.ratio.data).values():
-            similar = [link(entity) for entity in sample['entities']]
+        for item in similar_named(form.classes.data, form.ratio.data).values():
+            similar = [link(entity) for entity in item['entities']]
             table.rows.append([
-                f"{link(sample['entity'])}<br><br>{'<br><br>'.join(similar)}",
-                len(sample['entities']) + 1])
+                f"{link(item['entity'])}<br><br>{'<br><br>'.join(similar)}",
+                len(item['entities']) + 1])
     content = display_form(form, manual_page='admin/data_integrity_checks')
     content += ('<p class="uc-first">' + _('no entries') + '</p>') \
         if table and not table.rows else ''
@@ -409,7 +407,7 @@ def check_dates() -> str:
             'invalid_preceding_dates',
             table=Table(['preceding', 'succeeding'])),
         'sub_dates': Tab('invalid_sub_dates', table=Table(['super', 'sub']))}
-    for entity in get_invalid_dates():
+    for entity in invalid_dates():
         tabs['dates'].table.rows.append([
             link(entity),
             entity.class_.label,
@@ -446,7 +444,7 @@ def check_dates() -> str:
             link(link_.range),
             link(link_.domain)])
     for tab in tabs.values():
-        tab.buttons = manual('admin/data_integrity_checks'),
+        tab.buttons = [manual('admin/data_integrity_checks')]
         if not tab.table.rows:
             tab.content = _('Congratulations, everything looks fine!')
     return render_template(
@@ -461,7 +459,6 @@ def check_dates() -> str:
 @app.route('/orphans')
 @required_group('contributor')
 def orphans() -> str:
-    manual_link = manual('admin/data_integrity_checks')
     header = [
         'name',
         'class',
@@ -471,46 +468,35 @@ def orphans() -> str:
         'updated',
         'description']
     tabs = {
-        'orphans': Tab('orphans', buttons=[manual_link], table=Table(header)),
-        'unlinked': Tab(
-            'unlinked',
-            buttons=[manual_link],
-            table=Table(header)),
+        'orphans': Tab('orphans', table=Table(header)),
+        'unlinked': Tab('unlinked', table=Table(header)),
         'types': Tab(
             'type',
-            buttons=[manual_link],
             table=Table(
                 ['name', 'root'],
                 [[link(type_), link(g.types[type_.root[0]])]
                  for type_ in Type.get_type_orphans()])),
-        'missing_files': Tab(
-            'missing_files',
-            buttons=[manual_link],
-            table=Table(header)),
+        'missing_files': Tab('missing_files', table=Table(header)),
         'orphaned_files': Tab(
             'orphaned_files',
-            buttons=[manual_link],
             table=Table(['name', 'size', 'date', 'ext'])),
         'orphaned_iiif_files': Tab(
             'orphaned_iiif_files',
-            buttons=[manual_link],
             table=Table(['name', 'size', 'date', 'ext'])),
         'orphaned_annotations': Tab(
             'orphaned_annotations',
-            buttons=[manual_link],
             table=Table(['image', 'entity', 'annotation', 'creation'])),
         'orphaned_subunits': Tab(
             'orphaned_subunits',
-            buttons=[manual_link],
             table=Table([
                 'id', 'name', 'class', 'created', 'modified', 'description'])),
         'circular': Tab(
             'circular_dependencies',
-            buttons=[manual_link],
             table=Table(
                 ['entity'],
-                [[link(e)] for e in get_entities_linked_to_itself()]))}
-
+                [[link(e)] for e in entities_linked_to_itself()]))}
+    for tab in tabs.values():
+        tab.buttons = [manual('admin/data_integrity_checks')]
     for entity in get_orphans():
         tabs[
             'unlinked'
@@ -605,7 +591,7 @@ def orphans() -> str:
                 js=f"return confirm('{_('delete annotation')}?')")])
 
     # Orphaned subunits (without connection to a P46 super)
-    for entity in get_orphaned_subunits():
+    for entity in orphaned_subunits():
         tabs['orphaned_subunits'].table.rows.append([
             entity.id,
             entity.name,
@@ -733,7 +719,6 @@ def log() -> str:
             _('delete all logs'),
             url_for('log_delete'),
             onclick=f"return confirm('{_('delete all logs')}?')")]
-
     return render_template(
         'tabs.html',
         tabs={'log': Tab('log', form=form, table=table, buttons=buttons)},

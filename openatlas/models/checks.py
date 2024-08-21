@@ -3,12 +3,11 @@ from typing import Any
 from flask import g
 from fuzzywuzzy import fuzz
 
-from openatlas.database import checks as db
-from openatlas.database import date
+from openatlas.database import checks as db, date
 from openatlas.models.entity import Entity
 
 
-def check_single_type_duplicates() -> list[dict[str, Any]]:
+def single_type_duplicates() -> list[dict[str, Any]]:
     data = []
     for type_ in g.types.values():
         if type_.multiple or type_.category in ['value', 'tools']:
@@ -28,25 +27,25 @@ def check_single_type_duplicates() -> list[dict[str, Any]]:
     return data
 
 
-def get_invalid_dates() -> list[Entity]:
+def invalid_dates() -> list[Entity]:
     return [
         Entity.get_by_id(row['id'], types=True)
-        for row in date.get_invalid_dates()]
+        for row in date.invalid_dates()]
 
 
-def get_orphans() -> list[Entity]:
+def orphans() -> list[Entity]:
     return [Entity.get_by_id(row['id']) for row in db.get_orphans()]
 
 
-def get_orphaned_subunits() -> list[Entity]:
+def orphaned_subunits() -> list[Entity]:
     return [Entity.get_by_id(x['id']) for x in db.get_orphaned_subunits()]
 
 
-def get_entities_linked_to_itself() -> list[Entity]:
+def entities_linked_to_itself() -> list[Entity]:
     return [Entity.get_by_id(row['domain_id']) for row in db.get_circular()]
 
 
-def get_invalid_cidoc_links() -> list[dict[str, Any]]:
+def invalid_cidoc_links() -> list[dict[str, Any]]:
     invalid_linking = []
     for row in db.get_cidoc_links():
         valid_domain = g.properties[row['property_code']].find_object(
@@ -67,7 +66,7 @@ def get_invalid_cidoc_links() -> list[dict[str, Any]]:
     return invalid_links
 
 
-def get_similar_named(class_: str, ratio: int) -> dict[int, Any]:
+def similar_named(class_: str, ratio: int) -> dict[int, Any]:
     similar: dict[int, Any] = {}
     already_added: set[int] = set()
     entities = Entity.get_by_class(class_)

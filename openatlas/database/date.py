@@ -3,7 +3,7 @@ from typing import Any
 from flask import g
 
 
-def get_invalid_dates() -> list[dict[str, Any]]:
+def invalid_dates() -> list[dict[str, Any]]:
     g.cursor.execute(
         """
         SELECT id
@@ -22,7 +22,7 @@ def get_invalid_dates() -> list[dict[str, Any]]:
     return [dict(row) for row in g.cursor.fetchall()]
 
 
-def get_invalid_link_dates() -> list[dict[str, Any]]:
+def invalid_link_dates() -> list[dict[str, Any]]:
     g.cursor.execute(
         """
         SELECT id
