@@ -15,7 +15,9 @@ def index_changelog() -> str:
 
 
 versions = {
-    '8.7.0': ['TBA', {}],
+    '8.7.0': ['TBA', {
+        'feature': {
+            '2339': 'Dates: additional checks'}}],
     '8.6.1': ['2024-08-14', {
         'feature': {
             '2337': 'Configurable proxy server',
