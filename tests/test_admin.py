@@ -68,6 +68,17 @@ class AdminTests(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()
                 event = insert('acquisition', 'Event Horizon')
+                event.update(
+                    data={
+                        'attributes':
+                            {'begin_from': form_to_datetime64(2000, 1, 1)}})
+                event2 = insert('activity', 'Event Impossible')
+                event2.update(
+                    data={
+                        'attributes':
+                            {'begin_from': form_to_datetime64(1000, 1, 1)}})
+                event2.link('P134', event)
+                event.link('P9', event2)
                 person.update({
                     'attributes': {
                         'begin_from': '2018-01-31',
