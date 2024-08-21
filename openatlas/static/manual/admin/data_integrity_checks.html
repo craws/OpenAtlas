@@ -5,7 +5,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Data integrity checks &mdash; OpenAtlas 8.6.0 documentation</title>
+  <title>Data integrity checks &mdash; OpenAtlas 8.7.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
@@ -35,7 +35,7 @@
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                8.6.0
+                8.7.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -176,12 +176,35 @@ create circular dependencies within the application. Nevertheless it’s a usefu
 check for e.g. if data is imported from other systems.</p>
 </section>
 </section>
-<section id="check-dates">
-<h2>Check dates<a class="headerlink" href="#check-dates" title="Permalink to this heading"></a></h2>
-<p>In this tab invalid date combinations are shown, e.g. begin dates which are
-later than end dates. These entries should be cleared up otherwise they cannot
-be updated because the user interface won’t allow saving entries with invalid
-date combinations.</p>
+<section id="dates">
+<h2>Dates<a class="headerlink" href="#dates" title="Permalink to this heading"></a></h2>
+<p>In this view various results of invalid or inconsistent dates are shown.</p>
+<section id="invalid-dates">
+<h3>Invalid dates<a class="headerlink" href="#invalid-dates" title="Permalink to this heading"></a></h3>
+<p>Invalid date combinations are shown, e.g. begin dates which are
+later than end dates. These issues should be fixed because otherwise the user
+interface won’t allow to update these entities.</p>
+</section>
+<section id="invalid-link-dates">
+<h3>Invalid link dates<a class="headerlink" href="#invalid-link-dates" title="Permalink to this heading"></a></h3>
+<p>Like with “invalid dates” issues with these should be solved as soon as
+possible.</p>
+</section>
+<section id="invalid-involvement-dates">
+<h3>Invalid involvement dates<a class="headerlink" href="#invalid-involvement-dates" title="Permalink to this heading"></a></h3>
+<p>Incompatible dates at involvement are shown. E.g. a person participated at an
+event longer than the event took place.</p>
+</section>
+<section id="invalid-preceding-dates">
+<h3>Invalid preceding dates<a class="headerlink" href="#invalid-preceding-dates" title="Permalink to this heading"></a></h3>
+<p>Incompatible dates for chained events are shown. E.g. a preceding event started
+after the succeeding event.</p>
+</section>
+<section id="invalid-sub-dates">
+<h3>Invalid sub dates<a class="headerlink" href="#invalid-sub-dates" title="Permalink to this heading"></a></h3>
+<p>Incompatible dates for hierarchical events are shown. E.g. a sub event began
+before the super event began.</p>
+</section>
 </section>
 <section id="check-links">
 <h2>Check links<a class="headerlink" href="#check-links" title="Permalink to this heading"></a></h2>

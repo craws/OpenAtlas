@@ -68,12 +68,35 @@ married to herself or a type has itself as super. It shouldn't be possible to
 create circular dependencies within the application. Nevertheless it's a useful
 check for e.g. if data is imported from other systems.
 
-Check dates
------------
-In this tab invalid date combinations are shown, e.g. begin dates which are
-later than end dates. These entries should be cleared up otherwise they cannot
-be updated because the user interface won't allow saving entries with invalid
-date combinations.
+Dates
+-----
+In this view various results of invalid or inconsistent dates are shown.
+
+Invalid dates
+*************
+Invalid date combinations are shown, e.g. begin dates which are
+later than end dates. These issues should be fixed because otherwise the user
+interface won't allow to update these entities.
+
+Invalid link dates
+******************
+Like with "invalid dates" issues with these should be solved as soon as
+possible.
+
+Invalid involvement dates
+*************************
+Incompatible dates at involvement are shown. E.g. a person participated at an
+event longer than the event took place.
+
+Invalid preceding dates
+***********************
+Incompatible dates for chained events are shown. E.g. a preceding event started
+after the succeeding event.
+
+Invalid sub dates
+*****************
+Incompatible dates for hierarchical events are shown. E.g. a sub event began
+before the super event began.
 
 Check links
 -----------
