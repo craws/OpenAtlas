@@ -14,7 +14,6 @@ API_CONTEXT = {
 
 CORS_ALLOWANCE = '*'  # Cross-Origin source (CORS)
 ALLOWED_IPS = ['127.0.0.1']
-API_PROXY = ''
 
 RDF_FORMATS = {
     'pretty-xml': 'application/rdf+xml',

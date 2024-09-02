@@ -265,8 +265,10 @@ class Parser:
             self,
             data: list[dict[str, Any]] | dict[str, Any]) \
             -> Any:  # pragma: nocover
-        os.environ['http_proxy'] = app.config['API_PROXY']
-        os.environ['https_proxy'] = app.config['API_PROXY']
+        if 'http' in app.config['PROXIES']:
+            os.environ['http_proxy'] = app.config['PROXIES']['http']
+        if 'https' in app.config['PROXIES']:
+            os.environ['https_proxy'] = app.config['PROXIES']['https']
         graph = Graph().parse(data=json.dumps(data), format='json-ld')
         return graph.serialize(format=self.format, encoding='utf-8')
 

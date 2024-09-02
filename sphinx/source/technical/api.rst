@@ -180,7 +180,9 @@ To provide the OpenAtlas API with a proxy server, add following line to **instan
 
 .. code-block:: python
 
-    API_PROXY = 'http://proxy.example:8899'
+    PROXIES = {
+        'http': 'http://someurl.org:8080',
+        'https': 'http://someurl.org:8080'}
 
 Authentication guide
 ====================
