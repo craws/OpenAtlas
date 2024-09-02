@@ -828,7 +828,6 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
     if os.name == 'posix':
         for key, path in paths.items():
             if not os.access(path['path'], os.W_OK):  # pragma: no cover
-                flash(f"{key} {_('directory not writable')}", 'error')
                 continue
             size = run(
                     ['du', '-sb', path['path']],

@@ -170,6 +170,10 @@ span.disk-space-legend {
   color: #dc3545;
 }
 
+div.alert p {
+  margin: 0;
+}
+
 /* Drop-field */
 .drag-n-drop {
   min-height: 120px;
