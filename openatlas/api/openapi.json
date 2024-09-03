@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.3i",
+    "version": "0.4.4a",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -1205,7 +1205,7 @@
         }
       }
     },
-    "/display/{entityID}": {
+    "/display/{entityId}": {
       "get": {
         "tags": [
           "Image Endpoints"
@@ -4515,6 +4515,7 @@
           "type": "object",
           "properties": {
             "operator": {
+              "type": "string",
               "enum": [
                 "equal",
                 "notEqual",
@@ -4539,6 +4540,7 @@
               }
             },
             "logicalOperator": {
+              "type": "string",
               "enum": [
                 "OR",
                 "AND"
