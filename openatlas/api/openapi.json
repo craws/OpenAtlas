@@ -3897,7 +3897,6 @@
       "PropertiesDetailModel": {
         "type": "object",
         "required": [
-          "id",
           "name",
           "nameInverse",
           "code",
@@ -3909,9 +3908,6 @@
           "i18nInverse"
         ],
         "properties": {
-          "id": {
-            "type": "number"
-          },
           "name": {
             "type": "string"
           },
