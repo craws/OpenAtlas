@@ -461,6 +461,10 @@ class Entity:
         return db.get_overview_counts(g.class_view_mapping)
 
     @staticmethod
+    def get_overview_counts_by_type(ids: list[int]) -> dict[str, int]:
+        return db.get_overview_counts_by_type(ids, g.class_view_mapping)
+
+    @staticmethod
     def get_latest(limit: int) -> list[Entity]:
         return [
             Entity(row) for row in db.get_latest(g.class_view_mapping, limit)]

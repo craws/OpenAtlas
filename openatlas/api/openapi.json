@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.4b",
+    "version": "0.4.4c",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -1080,6 +1080,11 @@
         ],
         "description": "Retrieves system classes with a count of their instances.",
         "operationId": "SystemClassCount",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/type_id"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -1665,7 +1670,7 @@
       },
       "type_id": {
         "name": "type_id",
-        "description": "Show only entities with the given type id.",
+        "description": "Show only entities with the given type id or linked to it.",
         "in": "query",
         "schema": {
           "type": "array",

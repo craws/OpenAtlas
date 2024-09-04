@@ -85,6 +85,20 @@ def get_overview_counts(classes: list[str]) -> dict[str, int]:
         {'classes': tuple(classes)})
     return {row['name']: row['count'] for row in g.cursor.fetchall()}
 
+def get_overview_counts_by_type(
+        ids: list[int],
+        classes: list[str]) -> dict[str, int]:
+    g.cursor.execute(
+        """
+        SELECT openatlas_class_name AS name, COUNT(openatlas_class_name)
+        FROM model.entity e
+        JOIN model.link t ON e.id = t.domain_id
+        WHERE openatlas_class_name IN %(classes)s AND t.range_id IN %(ids)s  
+        GROUP BY openatlas_class_name;
+        """,
+        {'ids': tuple(ids), 'classes': tuple(classes)})
+    return {row['name']: row['count'] for row in g.cursor.fetchall()}
+
 
 def get_latest(classes: list[str], limit: int) -> list[dict[str, Any]]:
     g.cursor.execute(

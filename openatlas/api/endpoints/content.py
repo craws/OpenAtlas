@@ -3,7 +3,8 @@ from flask_restful import Resource, marshal
 
 from openatlas import app
 from openatlas.api.resources.api_entity import ApiEntity
-from openatlas.api.resources.parser import default, locale
+from openatlas.api.resources.error import NotATypeError
+from openatlas.api.resources.parser import default, entity_, locale
 from openatlas.api.resources.resolve_endpoints import download
 from openatlas.api.resources.templates import (
     backend_details_template, class_mapping_template, class_overview_template,
@@ -87,6 +88,11 @@ class GetProperties(Resource):
 class SystemClassCount(Resource):
     @staticmethod
     def get() -> tuple[Resource, int] | Response:
-        return marshal(
-            ApiEntity.get_overview_counts(),
-            overview_template()), 200
+        if ids := entity_.parse_args()['type_id']:
+            if not set(ids).issubset(g.types.keys()):
+                raise NotATypeError
+            overview = ApiEntity.get_overview_counts_by_type(ids)
+        else:
+            overview = ApiEntity.get_overview_counts()
+        return marshal(overview, overview_template()), 200
+

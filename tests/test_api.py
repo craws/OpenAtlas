@@ -119,6 +119,10 @@ class Api(ApiTestCase):
             assert bool(rv['version'] == app.config['VERSION'])
             rv = self.app.get(url_for('api_04.system_class_count')).get_json()
             assert bool(rv['person'])
+            rv = self.app.get(url_for(
+                'api_04.system_class_count',
+                type_id=boundary_mark.id)).get_json()
+            assert bool(rv['place'])
 
             with app.test_request_context():
                 app.preprocess_request()
@@ -954,6 +958,9 @@ class Api(ApiTestCase):
             assert 'Entity is not a type' in rv.get_json()['title']
 
             rv = self.app.get(url_for('api_04.type_entities_all', id_=1234))
+            assert 'Entity is not a type' in rv.get_json()['title']
+
+            rv = self.app.get(url_for('api_04.system_class_count',type_id=999))
             assert 'Entity is not a type' in rv.get_json()['title']
 
             rv = self.app.get(url_for(
