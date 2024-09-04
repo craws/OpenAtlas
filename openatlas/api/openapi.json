@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.4a",
+    "version": "0.4.4b",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -1586,6 +1586,15 @@
                   "$ref": "#/components/schemas/searchCriteria"
                 }
               }
+            },
+            "example": {
+              "entityName": [
+                {
+                  "operator": "like",
+                  "values": "A",
+                  "logicalOperator": "and"
+                }
+              ]
             }
           }
         }
@@ -4538,10 +4547,10 @@
             "logicalOperator": {
               "type": "string",
               "enum": [
-                "OR",
-                "AND"
+                "or",
+                "and"
               ],
-              "default": "AND"
+              "default": "and"
             }
           }
         }
