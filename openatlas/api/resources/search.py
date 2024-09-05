@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Any, Optional, Tuple
 
 from flask import g
@@ -22,7 +21,7 @@ def get_search_values(
             [get_linked_entities_id_api(value) for value in values])
     if category in ["valueTypeID"]:
         return flatten_list_and_remove_duplicates(
-            [search_for_value(value, parameter) for value in values])
+            [search_for_value_type(value, parameter) for value in values])
     return values
 
 
@@ -34,7 +33,7 @@ def get_sub_ids(id_: int, subs: list[Any]) -> list[Any]:
     return subs
 
 
-def search_for_value(
+def search_for_value_type(
         values: Tuple[int, float],
         parameter: dict[str, Any]) -> list[int]:
     links = Entity.get_links_of_entities(values[0], inverse=True)
