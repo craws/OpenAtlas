@@ -1,6 +1,8 @@
-from typing import Any, Tuple
+from datetime import datetime
+from typing import Any, Optional, Tuple
 
 from flask import g
+from numpy import datetime64
 
 from openatlas.api.resources.util import (
     flatten_list_and_remove_duplicates, get_linked_entities_id_api)
@@ -116,13 +118,15 @@ def search_entity(
 def value_to_be_searched(entity: Entity, key: str) -> Any:
     match key:
         case "entityID" | "relationToID" | "valueTypeID":
-            value = [entity.id]
+            value: list[int | str] | Optional[datetime64] = [entity.id]
         case "entityName":
             value = [entity.name.lower()]
         case "entityDescription" if entity.description:
             value = [entity.description.lower()]
         case "entityAliases":
-            value = list(value.lower() for value in entity.aliases.values())
+            value = list(
+                value.lower() for value in entity.aliases.values()
+                if isinstance(value, str))
         case "entityCidocClass":
             value = [entity.cidoc_class.code.lower()]
         case "entitySystemClass":
@@ -132,13 +136,13 @@ def value_to_be_searched(entity: Entity, key: str) -> Any:
         case "typeID" | "typeIDWithSubs":
             value = [type_.id for type_ in entity.types]
         case "beginFrom":
-            value = entity.begin_from  # type: ignore
+            value = entity.begin_from
         case "beginTo":
-            value = entity.begin_to  # type: ignore
+            value = entity.begin_to
         case "endFrom":
-            value = entity.end_from  # type: ignore
+            value = entity.end_from
         case "endTo":
-            value = entity.end_to  # type: ignore
+            value = entity.end_to
         case _:
             value = []
     return value
