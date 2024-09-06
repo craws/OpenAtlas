@@ -97,6 +97,11 @@ class GetNetworkVisualisation(Resource):
         if exclude := parser.exclude_system_classes:
             system_classes = [s for s in system_classes if s not in exclude]
         output: dict[str, Any] = defaultdict()
+        links = get_all_links_for_network(system_classes)
+        for link_ in links:
+            if link_['property_code'] == 'P74':
+                print(link_['domain_name'])
+                print(link_['range_name'])
         for item in get_all_links_for_network(system_classes):
             if output.get(item['domain_id']):
                 output[item['domain_id']]['relations'].append(item['range_id'])
