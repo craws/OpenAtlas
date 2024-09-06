@@ -247,6 +247,7 @@ def subunit_template(id_: str) -> dict[str, List]:
 def overview_template() -> dict[str, Type[String | Integer]]:
     return {
         'move': fields.Integer,
+        'external_reference': fields.Integer,
         'bibliography': fields.Integer,
         'person': fields.Integer,
         'acquisition': fields.Integer,
