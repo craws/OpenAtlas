@@ -95,4 +95,3 @@ class SystemClassCount(Resource):
         else:
             overview = ApiEntity.get_overview_counts()
         return marshal(overview, overview_template()), 200
-
