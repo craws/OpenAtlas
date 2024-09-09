@@ -130,7 +130,7 @@ class BaseManager:
         setattr(
             self.form_class,
             'description',
-            TextAreaField(_('description'), render_kw={'rows':5}))
+            TextAreaField(_('description'), render_kw={'rows': 5}))
 
     def add_name_fields(self) -> None:
         if 'name' in self.fields:
@@ -372,21 +372,18 @@ class ArtifactBaseManager(PlaceBaseManager):
 class EventBaseManager(BaseManager):
     fields = ['name', 'date', 'description', 'continue']
 
-    def get_sub_ids(self, entity: Entity, ids: list[int]) -> list[int]:
-        for sub in entity.get_linked_entities('P9', sort=True):
-            ids.append(sub.id)
-            self.get_sub_ids(sub, ids)
-        return ids
-
     def additional_fields(self) -> dict[str, Any]:
-        sub_filter_ids = []
+        place = None
         super_event = None
         event_preceding = None
-        place = None
+        filter_ids = []
         if not self.insert:
-            sub_filter_ids = self.get_sub_ids(self.entity, [self.entity.id])
             super_event = self.entity.get_linked_entity('P9', inverse=True)
             event_preceding = self.entity.get_linked_entity('P134')
+            filter_ids = [self.entity.id] + [
+                e.id for e in self.entity.get_linked_entities_recursive('P9') +
+                self.entity.get_linked_entities_recursive('P134', inverse=True)
+            ]
             if self.class_.name != 'move':
                 if place_ := self.entity.get_linked_entity('P7'):
                     place = place_.get_linked_entity_safe('P53', True)
@@ -401,12 +398,12 @@ class EventBaseManager(BaseManager):
                 TableField(
                     self.table_items['event_view'],
                     super_event,
-                    sub_filter_ids)}
+                    filter_ids)}
         if self.class_.name != 'event':
             fields['event_preceding'] = TableField(
                 self.table_items['event_preceding'],
                 event_preceding,
-                sub_filter_ids)
+                filter_ids)
         if self.class_.name != 'move':
             fields['location'] = TableField(
                 self.table_items['place'],

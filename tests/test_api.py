@@ -170,12 +170,10 @@ class Api(ApiTestCase):
                 url_for('api_04.export_database', format_='xml'))
             assert b'Shire' in rv.data
             assert 'application/xml' in rv.headers.get('Content-Type')
-
             rv = self.app.get(
                 url_for('api_04.export_database', format_='json'))
             assert b'Shire' in rv.data
             assert 'application/json' in rv.headers.get('Content-Type')
-
             rv = self.app.get(url_for('api_04.export_database', format_='csv'))
             assert b'Shire' in rv.data
             assert 'application/zip' in rv.headers.get('Content-Type')
@@ -255,7 +253,6 @@ class Api(ApiTestCase):
             assert self.get_bool(rv['geometry'], 'coordinates')
             for key in geojson_checklist:
                 assert self.get_bool(rv['properties'], key)
-
             rv = self.app.get(url_for(
                 'api_04.entity', id_=place.id, format='geojson-v2'))
             assert 'application/json' in rv.headers.get('Content-Type')
@@ -313,7 +310,6 @@ class Api(ApiTestCase):
                     export='csvNetwork'))]:
                 assert b'Shire' in rv.data
                 assert 'application/zip' in rv.headers.get('Content-Type')
-
             rv = self.app.get(url_for(
                 'api_04.linked_entities_by_properties_recursive',
                 id_=place.id,
