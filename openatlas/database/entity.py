@@ -85,6 +85,7 @@ def get_overview_counts(classes: list[str]) -> dict[str, int]:
         {'classes': tuple(classes)})
     return {row['name']: row['count'] for row in g.cursor.fetchall()}
 
+
 def get_overview_counts_by_type(
         ids: list[int],
         classes: list[str]) -> dict[str, int]:
