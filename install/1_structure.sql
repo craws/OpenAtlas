@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 15.6 (Debian 15.6-0+deb12u1)
--- Dumped by pg_dump version 15.6 (Debian 15.6-0+deb12u1)
+-- Dumped from database version 15.8 (Debian 15.8-0+deb12u1)
+-- Dumped by pg_dump version 15.8 (Debian 15.8-0+deb12u1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -32,6 +32,9 @@ ALTER TABLE IF EXISTS ONLY web.hierarchy DROP CONSTRAINT IF EXISTS hierarchy_id_
 ALTER TABLE IF EXISTS ONLY web.hierarchy_openatlas_class DROP CONSTRAINT IF EXISTS hierarchy_form_hierarchy_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_image_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_entity_id_fkey;
+ALTER TABLE IF EXISTS ONLY web.annotation_text DROP CONSTRAINT IF EXISTS annotation_text_user_id_fkey;
+ALTER TABLE IF EXISTS ONLY web.annotation_text DROP CONSTRAINT IF EXISTS annotation_text_source_id_fkey;
+ALTER TABLE IF EXISTS ONLY web.annotation_text DROP CONSTRAINT IF EXISTS annotation_text_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.annotation_image DROP CONSTRAINT IF EXISTS annotation_image_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.annotation_image DROP CONSTRAINT IF EXISTS annotation_image_image_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.annotation_image DROP CONSTRAINT IF EXISTS annotation_image_entity_id_fkey;
@@ -67,6 +70,7 @@ DROP TRIGGER IF EXISTS update_modified ON web.i18n;
 DROP TRIGGER IF EXISTS update_modified ON web.hierarchy_openatlas_class;
 DROP TRIGGER IF EXISTS update_modified ON web.hierarchy;
 DROP TRIGGER IF EXISTS update_modified ON web."group";
+DROP TRIGGER IF EXISTS update_modified ON web.annotation_text;
 DROP TRIGGER IF EXISTS update_modified ON model.link;
 DROP TRIGGER IF EXISTS update_modified ON model.gis;
 DROP TRIGGER IF EXISTS update_modified ON model.file_info;
@@ -104,6 +108,7 @@ ALTER TABLE IF EXISTS ONLY web."group" DROP CONSTRAINT IF EXISTS group_name_key;
 ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_pkey;
 ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_entity_id_key;
 ALTER TABLE IF EXISTS ONLY web.type_none_selectable DROP CONSTRAINT IF EXISTS entity_id_key;
+ALTER TABLE IF EXISTS ONLY web.annotation_text DROP CONSTRAINT IF EXISTS annotation_text_pkey;
 ALTER TABLE IF EXISTS ONLY web.annotation_image DROP CONSTRAINT IF EXISTS annotation_image_pkey;
 ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_pkey;
 ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_pkey;
@@ -186,6 +191,8 @@ DROP SEQUENCE IF EXISTS web.group_id_seq;
 DROP TABLE IF EXISTS web."group";
 DROP SEQUENCE IF EXISTS web.entity_profile_image_id_seq;
 DROP TABLE IF EXISTS web.entity_profile_image;
+DROP TABLE IF EXISTS web.annotation_text;
+DROP SEQUENCE IF EXISTS web.annotation_text_id_seq;
 DROP SEQUENCE IF EXISTS web.annotation_image_id_seq;
 DROP TABLE IF EXISTS web.annotation_image;
 DROP SEQUENCE IF EXISTS model.property_inheritance_id_seq;
@@ -891,6 +898,39 @@ ALTER TABLE web.annotation_image_id_seq OWNER TO openatlas;
 
 ALTER SEQUENCE web.annotation_image_id_seq OWNED BY web.annotation_image.id;
 
+
+--
+-- Name: annotation_text_id_seq; Type: SEQUENCE; Schema: web; Owner: openatlas
+--
+
+CREATE SEQUENCE web.annotation_text_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    MAXVALUE 2147483647
+    CACHE 1;
+
+
+ALTER TABLE web.annotation_text_id_seq OWNER TO openatlas;
+
+--
+-- Name: annotation_text; Type: TABLE; Schema: web; Owner: openatlas
+--
+
+CREATE TABLE web.annotation_text (
+    id integer DEFAULT nextval('web.annotation_text_id_seq'::regclass) NOT NULL,
+    source_id integer NOT NULL,
+    entity_id integer NOT NULL,
+    link_start integer NOT NULL,
+    link_end integer NOT NULL,
+    user_id integer,
+    text integer,
+    created timestamp without time zone DEFAULT now() NOT NULL,
+    modified timestamp without time zone
+);
+
+
+ALTER TABLE web.annotation_text OWNER TO openatlas;
 
 --
 -- Name: entity_profile_image; Type: TABLE; Schema: web; Owner: openatlas
@@ -1865,6 +1905,14 @@ ALTER TABLE ONLY web.annotation_image
 
 
 --
+-- Name: annotation_text annotation_text_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.annotation_text
+    ADD CONSTRAINT annotation_text_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: type_none_selectable entity_id_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
@@ -2155,6 +2203,13 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON model.link FOR EACH ROW EXECUTE 
 
 
 --
+-- Name: annotation_text update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
+--
+
+CREATE TRIGGER update_modified BEFORE UPDATE ON web.annotation_text FOR EACH ROW EXECUTE FUNCTION model.update_modified();
+
+
+--
 -- Name: group update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
 --
 
@@ -2422,6 +2477,30 @@ ALTER TABLE ONLY web.annotation_image
 
 ALTER TABLE ONLY web.annotation_image
     ADD CONSTRAINT annotation_image_user_id_fkey FOREIGN KEY (user_id) REFERENCES web."user"(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: annotation_text annotation_text_entity_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.annotation_text
+    ADD CONSTRAINT annotation_text_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: annotation_text annotation_text_source_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.annotation_text
+    ADD CONSTRAINT annotation_text_source_id_fkey FOREIGN KEY (source_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: annotation_text annotation_text_user_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.annotation_text
+    ADD CONSTRAINT annotation_text_user_id_fkey FOREIGN KEY (user_id) REFERENCES web."user"(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
