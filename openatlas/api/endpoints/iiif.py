@@ -9,7 +9,7 @@ from flask import Response, g, jsonify, url_for
 from flask_restful import Resource
 
 from openatlas.api.resources.api_entity import ApiEntity
-from openatlas.api.resources.util import get_license_name
+from openatlas.api.resources.util import get_license_url, get_license_name
 from openatlas.models.annotation import Annotation
 from openatlas.models.entity import Entity
 
@@ -240,6 +240,7 @@ class IIIFManifest(Resource):
                 "@value": entity.description or '',
                 "@language": "en"}],
             "attribution": license_,
+            "license": get_license_url(entity),
             "logo": get_logo(),
             "sequences": [
                 IIIFSequence.build_sequence(get_metadata(entity))],

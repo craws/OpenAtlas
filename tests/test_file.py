@@ -167,6 +167,13 @@ class FileTest(TestBaseCase):
                 url_for('view', id_=place.id, _anchor="tab-file"))
             assert b'view all IIIF images' in rv.data
 
+            with app.test_request_context():
+                app.preprocess_request()
+                license_url = insert("external_reference", "http://this.url/")
+                license_url.link('P67', license_)
+                iiif_file = Entity.get_by_id(iiif_id)
+                iiif_file.link('P2', license_)
+
             rv = self.app.get(
                 url_for(
                     'api.iiif_manifest',
