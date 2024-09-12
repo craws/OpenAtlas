@@ -14,7 +14,8 @@ def get_search_values(
     values = parameter["values"]
     match category:
         case "typeIDWithSubs":
-            values = [[value] + get_sub_ids(value, []) for value in values]
+            for value in values:
+                values += g.types[value].get_sub_ids_recursive()
         case "relationToID":
             values = flatten_list_and_remove_duplicates(
                 [get_linked_entities_id_api(value) for value in values])
@@ -26,14 +27,6 @@ def get_search_values(
                 value.lower() if isinstance(value, str) else value
                 for value in values]
     return values
-
-
-def get_sub_ids(id_: int, subs: list[Any]) -> list[Any]:
-    new_subs = g.types[id_].get_sub_ids_recursive()
-    subs.extend(new_subs)
-    for sub in new_subs:
-        get_sub_ids(sub, subs)
-    return subs
 
 
 def search_for_value_type(
