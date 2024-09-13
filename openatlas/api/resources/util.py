@@ -17,6 +17,17 @@ def get_license_name(entity: Entity) -> Optional[str]:
     return license_
 
 
+def get_license_url(entity: Entity) -> Optional[str]:
+    url = ''
+    for type_ in entity.types:
+        if g.types[type_.root[0]].name == 'License':
+            for link_ in type_.get_links('P67', inverse=True):
+                if link_.domain.class_.label == "External reference":
+                    url = link_.domain.name
+            break
+    return url
+
+
 def to_camel_case(i: str) -> str:
     return (i[0] + i.title().translate(" ")[1:] if i else i).replace(" ", "")
 
