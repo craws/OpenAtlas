@@ -34,3 +34,7 @@ def get_cidoc_hierarchy() -> list[dict[str, Any]]:
 def get_all_links_for_network(
         system_classes: list[str]) -> list[dict[str, Any]]:
     return db_link.get_all_links_for_network(system_classes)
+
+
+def get_links_by_id_network(ids: list[int])-> list[dict[str, Any]]:
+    return db_link.get_links_by_id_network(ids)

@@ -12,7 +12,8 @@ from openatlas.api.formats.xml import export_database_xml
 from openatlas.api.resources.database_mapper import (
     get_all_entities_as_dict, get_all_links_as_dict, get_all_links_for_network,
     get_cidoc_hierarchy,
-    get_classes, get_properties, get_property_hierarchy)
+    get_classes, get_links_by_id_network, get_properties,
+    get_property_hierarchy)
 from openatlas.api.resources.error import NotAPlaceError
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.parser import entity_, gis, network
@@ -21,6 +22,7 @@ from openatlas.api.resources.resolve_endpoints import (
 from openatlas.api.resources.templates import geometries_template, \
     network_visualisation_template
 from openatlas.api.resources.util import get_geometries
+from openatlas.database.entity import get_linked_entities_recursive
 from openatlas.models.export import current_date_for_filename
 
 
@@ -89,10 +91,38 @@ class GetSubunits(Resource):
             str(id_))
 
 
+
+
 class GetNetworkVisualisation(Resource):
     @staticmethod
     def get() -> tuple[Resource, int] | Response | dict[str, Any]:
-        parser = Parser(network.parse_args())
+        def overwrite_location_with_place() -> None:
+            locations = {}
+            for l in links:
+                if l['property_code'] == 'P53':
+                    locations[l['range_id']] = {
+                        'range_id': l['domain_id'],
+                        'range_name': l['domain_name'],
+                        'range_system_class': l['domain_system_class']}
+
+            copy = links.copy()
+            for i, l in enumerate(copy):
+                if l['range_id'] in locations:
+                    links[i].update(
+                        range_id=locations[l['range_id']]['range_id'],
+                        range_name=locations[l['range_id']]['range_name'],
+                        range_system_class=locations[
+                            l['range_id']]['range_system_class'])
+                if (l['domain_id'] in locations
+                        and "administrative_unit" not in exclude_):
+                    links[i].update(
+                        domain_id=locations[l['domain_id']]['range_id'],
+                        domain_name=locations[
+                            l['domain_id']]['range_name'],
+                        domain_ystem_class=locations[
+                            l['domain_id']]['range_system_class'])
+
+
         system_classes = g.classes
         location_classes = [
             "administrative_unit",
@@ -101,39 +131,31 @@ class GetNetworkVisualisation(Resource):
             "human_remains",
             "place",
             "stratigraphic_unit"]
+        parser = Parser(network.parse_args())
         exclude_ = parser.exclude_system_classes or []
+        if all(item in location_classes for item in exclude_):
+            exclude_ += ['object_location']
         if exclude_:
-            if all(item in location_classes for item in exclude_):
-                exclude_ += ['object_location']
             system_classes = [s for s in system_classes if s not in exclude_]
-        links = get_all_links_for_network(system_classes)
 
-        def overwrite_location_with_place() -> None:
-            locations = {}
-            for link_ in links:
-                if link_['property_code'] == 'P53':
-                    locations[link_['range_id']] = {
-                        'range_id': link_['domain_id'],
-                        'range_name': link_['domain_name'],
-                        'range_system_class': link_['domain_system_class']}
 
+        if parser.linked_to_ids:
+            all_ids = []
+            for id_ in parser.linked_to_ids:
+                all_ids += get_linked_entities_recursive(id_, list(g.properties), True)
+                all_ids += get_linked_entities_recursive(id_, list(g.properties), False)
+            links = get_links_by_id_network(all_ids + parser.linked_to_ids)
             links_copy = links.copy()
-            for i, link_ in enumerate(links_copy):
-                if link_['range_id'] in locations:
-                    links[i].update(
-                        range_id=locations[link_['range_id']]['range_id'],
-                        range_name=locations[link_['range_id']]['range_name'],
-                        range_system_class=locations[
-                            link_['range_id']]['range_system_class'])
-                if (link_['domain_id'] in locations
-                        and "administrative_unit" not in exclude_):
-                    links[i].update(
-                        domain_id=locations[link_['domain_id']]['range_id'],
-                        domain_name=locations[
-                            link_['domain_id']]['range_name'],
-                        domain_ystem_class=locations[
-                            link_['domain_id']]['range_system_class'])
+            if exclude_:
+                for i, link_ in enumerate(links_copy):
+                    if link_['domain_system_class'] in exclude_ or link_['range_system_class'] in exclude_:
+                        print(i)
+                        print(link_['domain_system_class'])
+                        print(link_['range_system_class'])
+                        del links[i]
 
+        else:
+            links = get_all_links_for_network(system_classes)
 
         overwrite_location_with_place()
         output: dict[str, Any] = defaultdict(set)
