@@ -64,6 +64,7 @@ class Parser:
         self.show = []
         self.type_id = []
         self.exclude_system_classes = []
+        self.search_param = []
         for item in parser:
             setattr(self, item, parser[item])
         if self.search:
@@ -71,11 +72,11 @@ class Parser:
 
     def set_search_param(self) -> None:
         try:
-            parameters = [ast.literal_eval(i) for i in self.search]
+            url_parameters = [ast.literal_eval(i) for i in self.search]
         except Exception as e:
             raise InvalidSearchSyntax from e
-        for param in parameters:
-            for category, value_list in param.items():
+        for item in url_parameters:
+            for category, value_list in item.items():
                 for values in value_list:
                     values['logicalOperator'] = (
                             values.get('logicalOperator') or 'or')
@@ -89,15 +90,16 @@ class Parser:
                                 category,
                                 values["values"]) from e
 
-        self.search_param = []
-        for param in parameters:
-            for category, values in param.items():
-                for value in values:
+        for item in url_parameters:
+            for category, values in item.items():
+                for parameter in values:
                     self.search_param.append({
-                        "search_values": get_search_values(category, value),
-                        "logical_operator": value['logicalOperator'],
+                        "search_values": get_search_values(
+                            category,
+                            parameter),
+                        "logical_operator": parameter['logicalOperator'],
                         "operator": 'equal' if category == "valueTypeID"
-                        else value['operator'],
+                        else parameter['operator'],
                         "category": category,
                         "is_date": check_if_date_search(category)})
 

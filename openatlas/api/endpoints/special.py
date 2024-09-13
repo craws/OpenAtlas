@@ -94,39 +94,64 @@ class GetNetworkVisualisation(Resource):
     def get() -> tuple[Resource, int] | Response | dict[str, Any]:
         parser = Parser(network.parse_args())
         system_classes = g.classes
-        if exclude := parser.exclude_system_classes:
-            system_classes = [s for s in system_classes if s not in exclude]
-        output: dict[str, Any] = defaultdict()
-        location_ids = []
+        location_classes = [
+            "administrative_unit",
+            "artifact",
+            "feature",
+            "human_remains",
+            "place",
+            "stratigraphic_unit"]
+        exclude_ = parser.exclude_system_classes or []
+        if exclude_:
+            if all(item in location_classes for item in exclude_):
+                exclude_ += ['object_location']
+            system_classes = [s for s in system_classes if s not in exclude_]
         links = get_all_links_for_network(system_classes)
+
+        def overwrite_location_with_place() -> None:
+            locations = {}
+            for link_ in links:
+                if link_['property_code'] == 'P53':
+                    locations[link_['range_id']] = {
+                        'range_id': link_['domain_id'],
+                        'range_name': link_['domain_name'],
+                        'range_system_class': link_['domain_system_class']}
+
+            links_copy = links.copy()
+            for i, link_ in enumerate(links_copy):
+                if link_['range_id'] in locations:
+                    links[i].update(
+                        range_id=locations[link_['range_id']]['range_id'],
+                        range_name=locations[link_['range_id']]['range_name'],
+                        range_system_class=locations[
+                            link_['range_id']]['range_system_class'])
+                if (link_['domain_id'] in locations
+                        and "administrative_unit" not in exclude_):
+                    links[i].update(
+                        domain_id=locations[link_['domain_id']]['range_id'],
+                        domain_name=locations[
+                            link_['domain_id']]['range_name'],
+                        domain_ystem_class=locations[
+                            link_['domain_id']]['range_system_class'])
+
+
+        overwrite_location_with_place()
+        output: dict[str, Any] = defaultdict(set)
         for item in links:
             if output.get(item['domain_id']):
-                output[item['domain_id']]['relations'].append(item['range_id'])
+                output[item['domain_id']]['relations'].add(item['range_id'])
             else:
                 output[item['domain_id']] = {
                     'label': item['domain_name'],
                     'systemClass': item['domain_system_class'],
-                    'relations': [item['range_id']]}
+                    'relations': {item['range_id']}}
             if output.get(item['range_id']):
-                output[item['range_id']]['relations'].append(item['domain_id'])
+                output[item['range_id']]['relations'].add(item['domain_id'])
             else:
                 output[item['range_id']] = {
                     'label': item['range_name'],
                     'systemClass': item['range_system_class'],
-                    'relations': [item['domain_id']]}
-            if (item['property_code']
-                    in ['P74', 'P7', 'P26', 'P27', 'OA8', 'OA9']):
-                location_ids.append(item['range_id'])
-
-        for link_ in links:
-            if (link_['property_code'] == 'P53'
-                    and link_['range_id'] in location_ids):
-                output[link_['domain_id']] = {
-                    'label': link_['domain_name'],
-                    'systemClass': link_['domain_system_class'],
-                    'relations':
-                        output[link_['range_id']]['relations']
-                        + output[link_['domain_id']]['relations']}
+                    'relations': {item['domain_id']}}
 
         results: dict[str, Any] = {'results': []}
         for id_, dict_ in output.items():
