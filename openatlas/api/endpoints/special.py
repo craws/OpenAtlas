@@ -138,22 +138,24 @@ class GetNetworkVisualisation(Resource):
         if exclude_:
             system_classes = [s for s in system_classes if s not in exclude_]
 
-
         if parser.linked_to_ids:
-            all_ids = []
+            ids = []
             for id_ in parser.linked_to_ids:
-                all_ids += get_linked_entities_recursive(id_, list(g.properties), True)
-                all_ids += get_linked_entities_recursive(id_, list(g.properties), False)
-            links = get_links_by_id_network(all_ids + parser.linked_to_ids)
-            links_copy = links.copy()
+                ids += get_linked_entities_recursive(
+                    id_,
+                    list(g.properties),
+                    True)
+                ids += get_linked_entities_recursive(
+                    id_,
+                    list(g.properties),
+                    False)
+            all_ = get_links_by_id_network(ids + parser.linked_to_ids)
+            links = []
             if exclude_:
-                for i, link_ in enumerate(links_copy):
-                    if link_['domain_system_class'] in exclude_ or link_['range_system_class'] in exclude_:
-                        print(i)
-                        print(link_['domain_system_class'])
-                        print(link_['range_system_class'])
-                        del links[i]
-
+                for link_ in all_:
+                    if (link_['domain_system_class'] not in exclude_
+                            or link_['range_system_class'] not in exclude_):
+                        links.append(link_)
         else:
             links = get_all_links_for_network(system_classes)
 
