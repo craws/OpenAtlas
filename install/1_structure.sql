@@ -871,7 +871,7 @@ CREATE TABLE web.annotation_image (
     entity_id integer,
     coordinates text NOT NULL,
     user_id integer,
-    annotation text NOT NULL,
+    text text,
     created timestamp without time zone DEFAULT now() NOT NULL
 );
 

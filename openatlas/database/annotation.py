@@ -9,7 +9,7 @@ SELECT = """
         entity_id,
         coordinates,
         user_id,
-        annotation,
+        text,
         created
     FROM web.annotation_image
     """
@@ -36,7 +36,7 @@ def get_orphaned_annotations() -> list[dict[str, Any]]:
             a.entity_id,
             a.coordinates,
             a.user_id,
-            a.annotation,
+            a.text,
             a.created
         FROM web.annotation_image a
         LEFT JOIN model.link l ON l.domain_id = a.image_id 
@@ -55,13 +55,13 @@ def insert(data: dict[str, Any]) -> None:
             entity_id,
             coordinates,
             user_id,
-            annotation
+            text
         ) VALUES (
             %(image_id)s,
             %(entity_id)s,
             %(coordinates)s,
             %(user_id)s,
-            %(annotation)s);
+            %(text)s);
         """,
         data)
 
@@ -70,7 +70,7 @@ def update(data: dict[str, Any]) -> None:
     g.cursor.execute(
         """
         UPDATE web.annotation_image
-        SET (entity_id, annotation) = (%(entity_id)s, %(annotation)s)
+        SET (entity_id, text) = (%(entity_id)s, %(text)s)
         WHERE id = %(id)s;
         """,
         data)

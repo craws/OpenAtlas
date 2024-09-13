@@ -485,7 +485,7 @@ def orphans() -> str:
             table=Table(['name', 'size', 'date', 'ext'])),
         'orphaned_annotations': Tab(
             'orphaned_annotations',
-            table=Table(['image', 'entity', 'annotation', 'creation'])),
+            table=Table(['image', 'entity', 'text', 'creation'])),
         'orphaned_subunits': Tab(
             'orphaned_subunits',
             table=Table([

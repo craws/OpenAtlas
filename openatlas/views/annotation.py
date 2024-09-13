@@ -50,7 +50,7 @@ def annotation_insert(id_: int) -> str | Response:
                     _('edit'),
                     url_for('annotation_update', id_=annotation.id)),
                 delete])
-        table = Table(['date', 'annotation', 'entity'], rows, [[0, 'desc']])
+        table = Table(['date', 'text', 'entity'], rows, [[0, 'desc']])
     return render_template(
         'tabs.html',
         tabs={

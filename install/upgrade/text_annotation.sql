@@ -1,6 +1,12 @@
 BEGIN;
 
 -- #2079: Text annotation
+
+-- Adapt image annotation to sync fields
+ALTER TABLE web.annotation_image RENAME COLUMN annotation TO text;
+ALTER TABLE web.annotation_image ALTER COLUMN text DROP NOT NULL;
+
+-- Text annotation
 ALTER TABLE IF EXISTS ONLY web.annotation_text DROP CONSTRAINT IF EXISTS annotation_text_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.annotation_text DROP CONSTRAINT IF EXISTS annotation_text_source_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.annotation_text DROP CONSTRAINT IF EXISTS annotation_text_entity_id_fkey;
