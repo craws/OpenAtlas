@@ -288,6 +288,12 @@ class SourceDisplay(BaseDisplay):
     def add_button_network(self) -> None:
         pass
 
+    def add_button_others(self) -> None:
+        self.buttons.append(
+            button(
+                _('annotation'),
+                url_for('annotation_text_insert', id_=self.entity.id)))
+
     def add_data(self) -> None:
         super().add_data()
         self.data[_('artifact')] = [

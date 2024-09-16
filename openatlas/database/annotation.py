@@ -2,7 +2,8 @@ from typing import Any
 
 from flask import g
 
-SELECT = """
+ANNOTATION_IMAGE_SELECT = \
+    """
     SELECT
         id,
         image_id,
@@ -14,20 +15,50 @@ SELECT = """
     FROM web.annotation_image
     """
 
+ANNOTATION_TEXT_SELECT = \
+    """
+    SELECT
+        id,
+        source_id,
+        entity_id,
+        link_start,
+        link_end,
+        user_id,
+        text,
+        created
+    FROM web.annotation_text
+    """
 
-def get_by_id(id_: int) -> dict[str, Any]:
-    g.cursor.execute(SELECT + ' WHERE id =  %(id)s;', {'id': id_})
+
+def get_annotation_image_by_id(id_: int) -> dict[str, Any]:
+    g.cursor.execute(
+        ANNOTATION_IMAGE_SELECT + ' WHERE id =  %(id)s;',
+        {'id': id_})
     return dict(g.cursor.fetchone()) if g.cursor.rowcount else {}
 
 
-def get_by_file(image_id: int) -> list[dict[str, Any]]:
+def get_annotation_text_by_id(id_: int) -> dict[str, Any]:
     g.cursor.execute(
-        SELECT + ' WHERE image_id =  %(image_id)s;',
+        ANNOTATION_TEXT_SELECT + ' WHERE id =  %(id)s;',
+        {'id': id_})
+    return dict(g.cursor.fetchone()) if g.cursor.rowcount else {}
+
+
+def get_annotation_image_by_file(image_id: int) -> list[dict[str, Any]]:
+    g.cursor.execute(
+        ANNOTATION_IMAGE_SELECT + ' WHERE image_id =  %(image_id)s;',
         {'image_id': image_id})
     return [dict(row) for row in g.cursor.fetchall()]
 
 
-def get_orphaned_annotations() -> list[dict[str, Any]]:
+def get_annotation_text_by_source(source_id: int) -> list[dict[str, Any]]:
+    g.cursor.execute(
+        ANNOTATION_TEXT_SELECT + ' WHERE source_id =  %(source_id)s;',
+        {'source_id': source_id})
+    return [dict(row) for row in g.cursor.fetchall()]
+
+
+def get_annotation_image_orphans() -> list[dict[str, Any]]:
     g.cursor.execute(
         """
         SELECT
@@ -47,7 +78,7 @@ def get_orphaned_annotations() -> list[dict[str, Any]]:
     return [dict(row) for row in g.cursor.fetchall()]
 
 
-def insert(data: dict[str, Any]) -> None:
+def insert_annotation_image(data: dict[str, Any]) -> None:
     g.cursor.execute(
         """
         INSERT INTO web.annotation_image (
@@ -66,7 +97,7 @@ def insert(data: dict[str, Any]) -> None:
         data)
 
 
-def update(data: dict[str, Any]) -> None:
+def update_annotation_image(data: dict[str, Any]) -> None:
     g.cursor.execute(
         """
         UPDATE web.annotation_image
@@ -76,13 +107,15 @@ def update(data: dict[str, Any]) -> None:
         data)
 
 
-def delete(id_: int) -> None:
+def delete_annotation_image(id_: int) -> None:
     g.cursor.execute(
         'DELETE FROM web.annotation_image WHERE id = %(id)s;',
         {'id': id_})
 
 
-def remove_entity(annotation_id: int, entity_id: int) -> None:
+def remove_entity_from_annotation_image(
+        annotation_id: int,
+        entity_id: int) -> None:
     g.cursor.execute(
         """
         UPDATE web.annotation_image
@@ -90,3 +123,24 @@ def remove_entity(annotation_id: int, entity_id: int) -> None:
         WHERE id = %(annotation_id)s AND entity_id = %(entity_id)s;
         """,
         {'annotation_id': annotation_id, 'entity_id': entity_id})
+
+
+def insert_annotation_text(data: dict[str, Any]) -> None:
+    g.cursor.execute(
+        """
+        INSERT INTO web.annotation_text (
+            source_id,
+            entity_id,
+            link_start,
+            link_end,
+            user_id,
+            text
+        ) VALUES (
+            %(source_id)s,
+            %(entity_id)s,
+            %(link_start)s,
+            %(link_end)s,
+            %(user_id)s,
+            %(text)s);
+        """,
+        data)

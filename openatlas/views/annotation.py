@@ -10,9 +10,62 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import get_file_path, link, required_group
 from openatlas.display.util2 import format_date, is_authorized, manual
-from openatlas.forms.form import get_annotation_form
-from openatlas.models.annotation import Annotation
+from openatlas.forms.form import (
+    get_annotation_image_form, get_annotation_text_form)
+from openatlas.models.annotation import AnnotationImage, AnnotationText
 from openatlas.models.entity import Entity
+
+
+@app.route('/annotation_text_insert/<int:id_>', methods=['GET', 'POST'])
+@required_group('contributor')
+def annotation_text_insert(id_: int) -> str | Response:
+    source = Entity.get_by_id(id_, types=True)
+    form = get_annotation_text_form(source.id)
+    if form.validate_on_submit():
+        AnnotationText.insert(
+            source_id=id_,
+            link_start=int(form.link_start.data),
+            link_end=int(form.entity.data),
+            text=form.text.data)
+        return redirect(url_for('annotation_text_insert', id_=source.id))
+    table = None
+    if annotations := AnnotationText.get_by_source(source.id):
+        rows = []
+        for annotation in annotations:
+            delete = ''
+            if is_authorized('editor') or (
+                    is_authorized('contributor')
+                    and current_user.id == annotation.user_id):
+                pass
+                # delete = link(
+                #    _('delete'),
+                #    url_for('annotation_image_delete', id_=annotation.id),
+                #    js="return confirm('" + _('delete annotation') + "?')")
+            rows.append([
+                format_date(annotation.created),
+                annotation.text,
+                link(Entity.get_by_id(annotation.entity_id))
+                if annotation.entity_id else '',
+                'update',
+                # link(
+                #     _('edit'),
+                #    url_for('annotation_text_update', id_=annotation.id)),
+                delete])
+        table = Table(['date', 'text', 'entity'], rows, [[0, 'desc']])
+    return render_template(
+        'tabs.html',
+        tabs={
+            'annotation': Tab(
+                'annotation',
+                render_template('annotate_text.html', entity=source),
+                table,
+                [manual('tools/text_annotation')],
+                form=form)},
+        entity=source,
+        crumbs=[
+            [_('source'), url_for('index', view='source')],
+            source,
+            _('annotate')])
 
 
 @app.route('/annotation_image_insert/<int:id_>', methods=['GET', 'POST'])
@@ -21,16 +74,16 @@ def annotation_image_insert(id_: int) -> str | Response:
     image = Entity.get_by_id(id_, types=True, aliases=True)
     if not get_file_path(image.id):
         return abort(404)  # pragma: no cover
-    form = get_annotation_form(image.id)
+    form = get_annotation_image_form(image.id)
     if form.validate_on_submit():
-        Annotation.insert(
+        AnnotationImage.insert(
             image_id=id_,
             coordinates=form.coordinate.data,
             entity_id=form.entity.data,
             text=form.text.data)
         return redirect(url_for('annotation_image_insert', id_=image.id))
     table = None
-    if annotations := Annotation.get_by_file(image.id):
+    if annotations := AnnotationImage.get_by_file(image.id):
         rows = []
         for annotation in annotations:
             delete = ''
@@ -56,7 +109,7 @@ def annotation_image_insert(id_: int) -> str | Response:
         tabs={
             'annotation': Tab(
                 'annotation',
-                render_template('annotate.html', entity=image),
+                render_template('annotate_image.html', entity=image),
                 table,
                 [manual('tools/image_annotation')],
                 form=form)},
@@ -70,8 +123,8 @@ def annotation_image_insert(id_: int) -> str | Response:
 @app.route('/annotation_image_update/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
 def annotation_image_update(id_: int) -> str | Response:
-    annotation = Annotation.get_by_id(id_)
-    form = get_annotation_form(
+    annotation = AnnotationImage.get_by_id(id_)
+    form = get_annotation_image_form(
         annotation.image_id,
         Entity.get_by_id(annotation.entity_id)
         if annotation.entity_id else None,
@@ -94,7 +147,7 @@ def annotation_image_update(id_: int) -> str | Response:
 @app.route('/annotation_image_delete/<int:id_>')
 @required_group('contributor')
 def annotation_image_delete(id_: int) -> Response:
-    annotation = Annotation.get_by_id(id_)
+    annotation = AnnotationImage.get_by_id(id_)
     if current_user.group == 'contributor' \
             and annotation.user_id != current_user.id:
         abort(403)  # pragma: no cover

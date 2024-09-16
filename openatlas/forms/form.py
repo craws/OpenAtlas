@@ -61,10 +61,10 @@ def get_add_reference_form(class_: str) -> Any:
     return Form()
 
 
-def get_annotation_form(
+def get_annotation_image_form(
         image_id: int,
         entity: Optional[Entity] = None,
-        insert: Optional[bool] = True) -> FlaskForm:
+        insert: Optional[bool] = True) -> Any:
     class Form(FlaskForm):
         text = TextAreaField(_('annotation'))
     if insert:
@@ -77,6 +77,24 @@ def get_annotation_form(
         'entity',
         TableField(
             Entity.get_by_id(image_id).get_linked_entities('P67', sort=True),
+            entity))
+    setattr(Form, 'save', SubmitField(_('save')))
+    return Form()
+
+
+def get_annotation_text_form(
+        source_id: int,
+        entity: Optional[Entity] = None,
+        insert: Optional[bool] = True) -> Any:
+    class Form(FlaskForm):
+        text = TextAreaField(_('annotation'))
+    if insert:
+        pass
+    setattr(
+        Form,
+        'entity',
+        TableField(
+            Entity.get_by_id(source_id).get_linked_entities('P67', sort=True),
             entity))
     setattr(Form, 'save', SubmitField(_('save')))
     return Form()

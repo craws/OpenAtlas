@@ -10,7 +10,7 @@ from flask_restful import Resource
 
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.util import get_license_url, get_license_name
-from openatlas.models.annotation import Annotation
+from openatlas.models.annotation import AnnotationImage
 from openatlas.models.entity import Entity
 
 
@@ -111,7 +111,7 @@ class IIIFAnnotationList(Resource):
 
     @staticmethod
     def build_annotation_list(image_id: int) -> dict[str, Any]:
-        annotations_ = Annotation.get_by_file(image_id)
+        annotations_ = AnnotationImage.get_by_file(image_id)
         return {
             "@context": "https://iiif.io/api/presentation/2/context.json",
             "@id": url_for(
@@ -129,10 +129,10 @@ class IIIFAnnotation(Resource):
     def get(annotation_id: int) -> Response:
         return jsonify(
             IIIFAnnotation.build_annotation(
-                Annotation.get_by_id(annotation_id)))
+                AnnotationImage.get_by_id(annotation_id)))
 
     @staticmethod
-    def build_annotation(annotation: Annotation) -> dict[str, Any]:
+    def build_annotation(annotation: AnnotationImage) -> dict[str, Any]:
         entity_link = ''
         if annotation.entity_id:
             entity = ApiEntity.get_by_id(annotation.entity_id)
