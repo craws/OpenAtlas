@@ -175,7 +175,30 @@ def get_all_links_for_network(
         JOIN model.entity de ON l.domain_id = de.id
         JOIN model.entity re ON l.range_id = re.id
         WHERE de.openatlas_class_name IN  %(system_classes)s
-            AND re.openatlas_class_name IN  %(system_classes)s
+            AND re.openatlas_class_name IN  %(system_classes)s;
         """,
         {'system_classes': tuple(system_classes)})
+    return [dict(row) for row in g.cursor.fetchall()]
+
+
+def get_links_by_id_network(ids: list[int]) -> list[dict[str, Any]]:
+    g.cursor.execute(
+        """
+        SELECT
+            l.id,
+            l.property_code,
+            l.domain_id,
+            de.name AS domain_name,
+            de.openatlas_class_name AS domain_system_class,
+            l.range_id,
+            re.name AS range_name,
+            re.openatlas_class_name AS range_system_class,
+            l.description,
+            l.type_id
+        FROM model.link l
+        JOIN model.entity de ON l.domain_id = de.id
+        JOIN model.entity re ON l.range_id = re.id
+        WHERE l.range_id IN %(ids)s OR l.domain_id IN %(ids)s;
+        """,
+        {'ids': tuple(ids)})
     return [dict(row) for row in g.cursor.fetchall()]
