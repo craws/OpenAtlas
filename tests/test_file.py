@@ -227,8 +227,7 @@ class FileTest(TestBaseCase):
 
             rv = self.app.get(url_for(
                 'view_iiif',
-                id_=iiif_id,
-                url='https://openatlas.eu'))
+                id_=iiif_id))
             assert b'Mirador' in rv.data
 
             rv = self.app.get(
@@ -250,8 +249,10 @@ class FileTest(TestBaseCase):
             rv = self.app.get(url_for('annotation_update', id_=1))
             assert b'An interesting annotation' in rv.data
 
-            rv = self.app.get(
-                url_for('api.iiif_annotation_list', image_id=iiif_id))
+            rv = self.app.get(url_for(
+                'api.iiif_annotation_list',
+                image_id=iiif_id,
+                url="https://openatlas.eu"))
             json = rv.get_json()
             assert bool(str(iiif_id) in json['@id'])
 
