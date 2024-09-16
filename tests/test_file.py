@@ -213,11 +213,11 @@ class FileTest(TestBaseCase):
             rv = self.app.get(url_for('view', id_=place.id))
             assert b'Logo' in rv.data
 
-            rv = self.app.get(url_for('annotation_insert', id_=iiif_id))
+            rv = self.app.get(url_for('annotation_image_insert', id_=iiif_id))
             assert b'annotate' in rv.data
 
             rv = self.app.post(
-                url_for('annotation_insert', id_=iiif_id),
+                url_for('annotation_image_insert', id_=iiif_id),
                 data={
                     'coordinate': '1.5,1.6,1.4,9.6,8.6,9.6,8.6,1.6',
                     'text': 'An interesting annotation',
@@ -228,7 +228,7 @@ class FileTest(TestBaseCase):
             rv = self.app.get(url_for('view_iiif', id_=iiif_id))
             assert b'Mirador' in rv.data
 
-            rv = self.app.get(url_for('annotation_update', id_=1))
+            rv = self.app.get(url_for('annotation_image_update', id_=1))
             assert b'An interesting annotation' in rv.data
 
             rv = self.app.get(
@@ -268,18 +268,18 @@ class FileTest(TestBaseCase):
             assert b'Entity removed from annotation' in rv.data
 
             rv = self.app.post(
-                url_for('annotation_update', id_=1),
+                url_for('annotation_image_update', id_=1),
                 data={'text': 'A boring annotation'},
                 follow_redirects=True)
             assert b'A boring annotation' in rv.data
 
             rv = self.app.get(
-                url_for('annotation_delete', id_=1),
+                url_for('annotation_image_delete', id_=1),
                 follow_redirects=True)
             assert b'Annotation deleted' in rv.data
 
             self.app.post(
-                url_for('annotation_insert', id_=iiif_id),
+                url_for('annotation_image_insert', id_=iiif_id),
                 data={
                     'coordinate': '1.5,1.6,1.4,9.6,8.6,9.6,8.6,1.6',
                     'text': 'An interesting annotation',

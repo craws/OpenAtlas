@@ -273,7 +273,7 @@ def profile_image(entity: Entity) -> str:
             if is_authorized('contributor'):
                 html += (' - ' + link(
                     _('annotate'),
-                    url_for('annotation_insert', id_=file_id),
+                    url_for('annotation_image_insert', id_=file_id),
                     external=True))
             if is_authorized('admin'):
                 html += ('<br>' + link(
