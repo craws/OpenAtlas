@@ -71,6 +71,7 @@ DROP TRIGGER IF EXISTS update_modified ON web.hierarchy_openatlas_class;
 DROP TRIGGER IF EXISTS update_modified ON web.hierarchy;
 DROP TRIGGER IF EXISTS update_modified ON web."group";
 DROP TRIGGER IF EXISTS update_modified ON web.annotation_text;
+DROP TRIGGER IF EXISTS update_modified ON web.annotation_image;
 DROP TRIGGER IF EXISTS update_modified ON model.link;
 DROP TRIGGER IF EXISTS update_modified ON model.gis;
 DROP TRIGGER IF EXISTS update_modified ON model.file_info;
@@ -872,7 +873,8 @@ CREATE TABLE web.annotation_image (
     coordinates text NOT NULL,
     user_id integer,
     text text,
-    created timestamp without time zone DEFAULT now() NOT NULL
+    created timestamp without time zone DEFAULT now() NOT NULL,
+    modified timestamp without time zone
 );
 
 
@@ -920,7 +922,7 @@ ALTER TABLE web.annotation_text_id_seq OWNER TO openatlas;
 CREATE TABLE web.annotation_text (
     id integer DEFAULT nextval('web.annotation_text_id_seq'::regclass) NOT NULL,
     source_id integer NOT NULL,
-    entity_id integer NOT NULL,
+    entity_id integer,
     link_start integer NOT NULL,
     link_end integer NOT NULL,
     user_id integer,
@@ -2200,6 +2202,13 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON model.gis FOR EACH ROW EXECUTE F
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON model.link FOR EACH ROW EXECUTE FUNCTION model.update_modified();
+
+
+--
+-- Name: annotation_image update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
+--
+
+CREATE TRIGGER update_modified BEFORE UPDATE ON web.annotation_image FOR EACH ROW EXECUTE FUNCTION model.update_modified();
 
 
 --
