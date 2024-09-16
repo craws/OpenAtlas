@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.4e",
+    "version": "0.4.4f",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -1278,6 +1278,9 @@
           },
           {
             "$ref": "#/components/parameters/entityId"
+          },
+          {
+            "$ref": "#/components/parameters/url"
           }
         ],
         "responses": {
@@ -1602,6 +1605,14 @@
               ]
             }
           }
+        }
+      },
+      "url": {
+        "name": "url",
+        "description": "Provide a valid URL, e.g. https://openatlas.eu/. At an IIIF endpoint this will replace the base URL of all annotations.",
+        "in": "query",
+        "schema": {
+          "type": "string"
         }
       },
       "limit": {

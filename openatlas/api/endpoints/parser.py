@@ -7,6 +7,7 @@ import os
 from typing import Any, Optional
 
 import numpy
+import validators
 from flask import g, url_for
 from numpy import datetime64
 from rdflib import Graph
@@ -16,7 +17,7 @@ from openatlas.api.formats.linked_places import (
     get_lp_file, get_lp_links, get_lp_time)
 from openatlas.api.resources.error import (
     EntityDoesNotExistError, InvalidSearchSyntax, InvalidSearchValueError,
-    LastEntityError)
+    LastEntityError, UrlNotValid)
 from openatlas.api.resources.search import (
     get_search_values, search_entity, value_to_be_searched)
 from openatlas.api.resources.search_validation import (
@@ -59,6 +60,7 @@ class Parser:
     file_id = None
     exclude_system_classes: list[str]
     linked_to_ids: list[int]
+    url = None
 
     def __init__(self, parser: dict[str, Any]):
         self.show = []
@@ -69,6 +71,10 @@ class Parser:
             setattr(self, item, parser[item])
         if self.search:
             self.set_search_param()
+        if self.url:
+            self.is_valid_url()
+            if not self.url.endswith('/'):
+                self.url += '/'
 
     def set_search_param(self) -> None:
         try:
@@ -281,8 +287,12 @@ class Parser:
             return loud_pagination()
         return linked_place_pagination(self)
 
+    def is_valid_url(self) -> None:
+        if isinstance(validators.url(self.url), validators.ValidationFailure):
+            raise UrlNotValid(self.url)
+
+    @staticmethod
     def get_lp_types(
-            self,
             entity: Entity,
             links: list[Link]) -> list[dict[str, Any]]:
         types = []

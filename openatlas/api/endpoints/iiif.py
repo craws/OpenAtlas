@@ -8,7 +8,9 @@ import svgwrite
 from flask import Response, g, jsonify, url_for
 from flask_restful import Resource
 
+from openatlas.api.endpoints.parser import Parser
 from openatlas.api.resources.api_entity import ApiEntity
+from openatlas.api.resources.parser import iiif
 from openatlas.api.resources.util import get_license_url, get_license_name
 from openatlas.models.annotation import Annotation
 from openatlas.models.entity import Entity
@@ -19,11 +21,14 @@ class IIIFSequence(Resource):
     def get(id_: int) -> Response:
         return jsonify(
             {"@context": "https://iiif.io/api/presentation/2/context.json"} |
-            IIIFSequence.build_sequence(
-                get_metadata(ApiEntity.get_by_id(id_))))
+            IIIFSequence.build_sequence(get_metadata(
+                ApiEntity.get_by_id(id_)),
+                Parser(iiif.parse_args())))
 
     @staticmethod
-    def build_sequence(metadata: dict[str, Any]) -> dict[str, Any]:
+    def build_sequence(
+            metadata: dict[str, Any],
+            parser: Parser) -> dict[str, Any]:
         return {
             "@id": url_for(
                 'api.iiif_sequence',
@@ -33,7 +38,7 @@ class IIIFSequence(Resource):
             "label": [{
                 "@value": "Normal Sequence",
                 "@language": "en"}],
-            "canvases": [IIIFCanvas.build_canvas(metadata)]}
+            "canvases": [IIIFCanvas.build_canvas(metadata, parser)]}
 
 
 class IIIFCanvas(Resource):
@@ -41,10 +46,13 @@ class IIIFCanvas(Resource):
     def get(id_: int) -> Response:
         return jsonify(
             {"@context": "https://iiif.io/api/presentation/2/context.json"} |
-            IIIFCanvas.build_canvas(get_metadata(ApiEntity.get_by_id(id_))))
+            IIIFCanvas.build_canvas(get_metadata(
+                ApiEntity.get_by_id(id_)),
+                Parser(iiif.parse_args())))
 
     @staticmethod
-    def build_canvas(metadata: dict[str, Any]) -> dict[str, Any]:
+    def build_canvas(metadata: dict[str, Any], parser: Parser) -> dict[
+        str, Any]:
         entity = metadata['entity']
         mime_type, _ = mimetypes.guess_type(g.files[entity.id])
         return {
@@ -62,6 +70,7 @@ class IIIFCanvas(Resource):
                 "@id": url_for(
                     'api.iiif_annotation_list',
                     image_id=entity.id,
+                    url=parser.url,
                     _external=True),
                 "@type": "sc:AnnotationList"}],
             "thumbnail": {
@@ -107,10 +116,12 @@ class IIIFImage(Resource):
 class IIIFAnnotationList(Resource):
     @staticmethod
     def get(image_id: int) -> Response:
-        return jsonify(IIIFAnnotationList.build_annotation_list(image_id))
+        return jsonify(IIIFAnnotationList.build_annotation_list
+                       (image_id,
+                        Parser(iiif.parse_args())))
 
     @staticmethod
-    def build_annotation_list(image_id: int) -> dict[str, Any]:
+    def build_annotation_list(image_id: int, parser: Parser) -> dict[str, Any]:
         annotations_ = Annotation.get_by_file(image_id)
         return {
             "@context": "https://iiif.io/api/presentation/2/context.json",
@@ -120,7 +131,7 @@ class IIIFAnnotationList(Resource):
                 _external=True),
             "@type": "sc:AnnotationList",
             "resources": [
-                IIIFAnnotation.build_annotation(annotation)
+                IIIFAnnotation.build_annotation(annotation, parser)
                 for annotation in annotations_]}
 
 
@@ -129,16 +140,21 @@ class IIIFAnnotation(Resource):
     def get(annotation_id: int) -> Response:
         return jsonify(
             IIIFAnnotation.build_annotation(
-                Annotation.get_by_id(annotation_id)))
+                Annotation.get_by_id(annotation_id),
+                Parser(iiif.parse_args())))
 
     @staticmethod
-    def build_annotation(annotation: Annotation) -> dict[str, Any]:
+    def build_annotation(
+            annotation: Annotation,
+            parser: Parser) -> dict[str, Any]:
         entity_link = ''
         if annotation.entity_id:
             entity = ApiEntity.get_by_id(annotation.entity_id)
             url = url_for('api.entity', id_=entity.id, _external=True)
             if resolver := g.settings['frontend_resolver_url']:
                 url = resolver + str(entity.id)
+            if parser_url := parser.url:
+                url = parser_url + str(entity.id)
             entity_link = f"<a href={url} target=_blank>{entity.name}</a>"
         return {
             "@context": "https://iiif.io/api/presentation/2/context.json",
@@ -215,10 +231,10 @@ class IIIFManifest(Resource):
     @staticmethod
     def get(version: int, id_: int) -> Response:
         operation = getattr(IIIFManifest, f'get_manifest_version_{version}')
-        return jsonify(operation(id_))
+        return jsonify(operation(id_, Parser(iiif.parse_args())))
 
     @staticmethod
-    def get_manifest_version_2(id_: int) -> dict[str, Any]:
+    def get_manifest_version_2(id_: int, parser: Parser) -> dict[str, Any]:
         entity = ApiEntity.get_by_id(id_, types=True)
         license_ = get_license_name(entity)
         if entity.license_holder:
@@ -243,7 +259,7 @@ class IIIFManifest(Resource):
             "license": get_license_url(entity),
             "logo": get_logo(),
             "sequences": [
-                IIIFSequence.build_sequence(get_metadata(entity))],
+                IIIFSequence.build_sequence(get_metadata(entity), parser)],
             "structures": []}
 
 
