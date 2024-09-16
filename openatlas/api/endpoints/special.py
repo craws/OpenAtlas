@@ -91,12 +91,10 @@ class GetSubunits(Resource):
             str(id_))
 
 
-
-
 class GetNetworkVisualisation(Resource):
     @staticmethod
     def get() -> tuple[Resource, int] | Response | dict[str, Any]:
-        def overwrite_location_with_place() -> None:
+        def overwrite_object_locations_with_place() -> None:
             locations = {}
             for l in links:
                 if l['property_code'] == 'P53':
@@ -122,7 +120,6 @@ class GetNetworkVisualisation(Resource):
                         domain_ystem_class=locations[
                             l['domain_id']]['range_system_class'])
 
-
         system_classes = g.classes
         location_classes = [
             "administrative_unit",
@@ -138,9 +135,9 @@ class GetNetworkVisualisation(Resource):
         if exclude_:
             system_classes = [s for s in system_classes if s not in exclude_]
 
-        if parser.linked_to_ids:
+        if linked_to_ids := parser.linked_to_ids:
             ids = []
-            for id_ in parser.linked_to_ids:
+            for id_ in linked_to_ids:
                 ids += get_linked_entities_recursive(
                     id_,
                     list(g.properties),
@@ -149,7 +146,7 @@ class GetNetworkVisualisation(Resource):
                     id_,
                     list(g.properties),
                     False)
-            all_ = get_links_by_id_network(ids + parser.linked_to_ids)
+            all_ = get_links_by_id_network(ids + linked_to_ids)
             links = []
             if exclude_:
                 for link_ in all_:
@@ -159,8 +156,23 @@ class GetNetworkVisualisation(Resource):
         else:
             links = get_all_links_for_network(system_classes)
 
-        overwrite_location_with_place()
-        output: dict[str, Any] = defaultdict(set)
+        overwrite_object_locations_with_place()
+        link_dict = GetNetworkVisualisation.get_link_dictionary(links)
+
+        results: dict[str, Any] = {'results': []}
+        for id_, dict_ in link_dict.items():
+            if linked_to_ids:
+                if not set(linked_to_ids) & set(dict_['relations']):
+                    continue
+            dict_['id'] = id_
+            results['results'].append(dict_)
+        if parser.download:
+            return download(results, network_visualisation_template())
+        return marshal(results, network_visualisation_template()), 200
+
+    @staticmethod
+    def get_link_dictionary(links: list[dict[str, Any]]) -> dict[int, Any]:
+        output: dict[int, Any] = defaultdict(set)
         for item in links:
             if output.get(item['domain_id']):
                 output[item['domain_id']]['relations'].add(item['range_id'])
@@ -176,14 +188,4 @@ class GetNetworkVisualisation(Resource):
                     'label': item['range_name'],
                     'systemClass': item['range_system_class'],
                     'relations': {item['domain_id']}}
-
-        results: dict[str, Any] = {'results': []}
-        for id_, dict_ in output.items():
-            if linked_to_id := parser.linked_to_ids:
-                if not set(linked_to_id) & set(dict_['relations']):
-                    continue
-            dict_['id'] = id_
-            results['results'].append(dict_)
-        if parser.download:
-            return download(results, network_visualisation_template())
-        return marshal(results, network_visualisation_template()), 200
+        return output
