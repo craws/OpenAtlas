@@ -21,8 +21,9 @@ versions = {
             '2297': 'API: Add file license links for IIIF Manifest',
             '2317': 'API: Wrong search operators in OpenAPI file',
             '2321': 'API: API: Missing places in network endpoint',
-            '2314': 'API: Links in annotation may use wrong domain',
-        }}],
+            '2314': 'API: Links in annotation may use wrong domain'},
+        'fix': {
+            '2348': 'Wrong link between Source and Place'}}],
     '8.6.1': ['2024-08-14', {
         'feature': {
             '2337': 'Configurable proxy server',
