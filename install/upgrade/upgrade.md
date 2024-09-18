@@ -18,9 +18,7 @@ then run the database upgrade script, then restart Apache:
     sudo service apache2 restart
 
 ### 8.6.x to 8.7.0
-A code base update (e.g. with git pull) and a webserver restart is sufficient.
-
-The additional Python package validators is needed:
+No database update is required but an additional Python package is needed:
 
     sudo apt install python3-validators
 
