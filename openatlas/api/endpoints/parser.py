@@ -71,10 +71,9 @@ class Parser:
             setattr(self, item, parser[item])
         if self.search:
             self.set_search_param()
-        if self.url:
-            self.is_valid_url()
-            if not self.url.endswith('/'):
-                self.url += '/'
+        self.is_valid_url()
+        if self.url and not self.url.endswith('/'):
+            self.url += '/'
 
     def set_search_param(self) -> None:
         try:
@@ -288,7 +287,9 @@ class Parser:
         return linked_place_pagination(self)
 
     def is_valid_url(self) -> None:
-        if isinstance(validators.url(self.url), validators.ValidationFailure):
+        if self.url and isinstance(
+                validators.url(self.url),
+                validators.ValidationFailure):
             raise UrlNotValid(self.url)
 
     @staticmethod
