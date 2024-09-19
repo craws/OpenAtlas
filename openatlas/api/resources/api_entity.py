@@ -48,7 +48,7 @@ class ApiEntity(Entity):
             id_: int,
             properties: list[str]) -> list[Entity]:
         properties = list(g.properties) if 'all' in properties else properties
-        entity = ApiEntity.get_by_id(id_)
+        entity = ApiEntity.get_by_id(id_, types=True)
         return ([entity]
                 + entity.get_linked_entities_recursive(properties, types=True)
                 + entity.get_linked_entities_recursive(
