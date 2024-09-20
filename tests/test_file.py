@@ -167,6 +167,13 @@ class FileTest(TestBaseCase):
                 url_for('view', id_=place.id, _anchor="tab-file"))
             assert b'view all IIIF images' in rv.data
 
+            with app.test_request_context():
+                app.preprocess_request()
+                license_url = insert("external_reference", "http://this.url/")
+                license_url.link('P67', license_)
+                iiif_file = Entity.get_by_id(iiif_id)
+                iiif_file.link('P2', license_)
+
             rv = self.app.get(
                 url_for(
                     'api.iiif_manifest',
@@ -218,14 +225,34 @@ class FileTest(TestBaseCase):
                 follow_redirects=True)
             assert b'An interesting annotation' in rv.data
 
-            rv = self.app.get(url_for('view_iiif', id_=iiif_id))
+            rv = self.app.get(url_for(
+                'view_iiif',
+                id_=iiif_id))
             assert b'Mirador' in rv.data
+
+            rv = self.app.get(
+                url_for(
+                    'api.iiif_manifest',
+                    id_=iiif_id,
+                    version=g.settings['iiif_version'],
+                    url="https://openatlas.eu"))
+            assert b'openatlas.eu' in rv.data
+
+            rv = self.app.get(
+                url_for(
+                    'api.iiif_manifest',
+                    id_=iiif_id,
+                    version=g.settings['iiif_version'],
+                    url="https://openatlaseu"))
+            assert b'URL not valid' in rv.data
 
             rv = self.app.get(url_for('annotation_update', id_=1))
             assert b'An interesting annotation' in rv.data
 
-            rv = self.app.get(
-                url_for('api.iiif_annotation_list', image_id=iiif_id))
+            rv = self.app.get(url_for(
+                'api.iiif_annotation_list',
+                image_id=iiif_id,
+                url="https://openatlas.eu"))
             json = rv.get_json()
             assert bool(str(iiif_id) in json['@id'])
 

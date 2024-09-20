@@ -275,7 +275,7 @@ class Tab:
                     self.buttons.append(
                         button(
                             'link',
-                            url_for('link_insert', id_=id_, view='source')))
+                            url_for('link_insert', id_=id_, view=name)))
                 self.buttons.append(
                     button(
                         g.classes[name].label,

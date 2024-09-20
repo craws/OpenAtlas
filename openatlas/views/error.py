@@ -10,7 +10,8 @@ from openatlas.api.resources.error import (
     InvalidSearchSyntax, InvalidSearchValueError, InvalidSystemClassError,
     InvalidViewClassError, LastEntityError, LogicalOperatorError,
     NoLicenseError, NoSearchStringError, NotAPlaceError, NotATypeError,
-    NotPublicError, OperatorError, QueryEmptyError, ValueNotIntegerError)
+    NotPublicError, OperatorError, QueryEmptyError, UrlNotValid,
+    ValueNotIntegerError)
 
 
 @app.errorhandler(400)
@@ -289,6 +290,19 @@ def value_not_an_integer(_e: Exception) -> tuple[Any, int]:
         'title': 'Invalid search value',
         'message':
             'The search values need to be an integer for the chosen category.',
+        'url': request.url,
+        'timestamp': datetime.now(),
+        'status': 400}), 400
+
+
+
+@app.errorhandler(UrlNotValid)
+def url_not_valid(_e: UrlNotValid) -> tuple[Any, int]:
+    return jsonify({
+        'title': 'URL not valid',
+        'message':
+            f'{_e.url} is not a valid URL. Please provide a valid URL schema, '
+            'e.g. https://openatlas.eu/',
         'url': request.url,
         'timestamp': datetime.now(),
         'status': 400}), 400

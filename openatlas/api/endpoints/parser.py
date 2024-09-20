@@ -7,6 +7,7 @@ import os
 from typing import Any, Optional
 
 import numpy
+import validators
 from flask import g, url_for
 from numpy import datetime64
 from rdflib import Graph
@@ -16,7 +17,7 @@ from openatlas.api.formats.linked_places import (
     get_lp_file, get_lp_links, get_lp_time)
 from openatlas.api.resources.error import (
     EntityDoesNotExistError, InvalidSearchSyntax, InvalidSearchValueError,
-    LastEntityError)
+    LastEntityError, UrlNotValid)
 from openatlas.api.resources.search import (
     get_search_values, search_entity, value_to_be_searched)
 from openatlas.api.resources.search_validation import (
@@ -59,23 +60,28 @@ class Parser:
     file_id = None
     exclude_system_classes: list[str]
     linked_to_ids: list[int]
+    url = None
 
     def __init__(self, parser: dict[str, Any]):
         self.show = []
         self.type_id = []
         self.exclude_system_classes = []
+        self.search_param = []
         for item in parser:
             setattr(self, item, parser[item])
         if self.search:
             self.set_search_param()
+        self.is_valid_url()
+        if self.url and not self.url.endswith('/'):
+            self.url += '/'
 
     def set_search_param(self) -> None:
         try:
-            parameters = [ast.literal_eval(i) for i in self.search]
+            url_parameters = [ast.literal_eval(i) for i in self.search]
         except Exception as e:
             raise InvalidSearchSyntax from e
-        for param in parameters:
-            for category, value_list in param.items():
+        for item in url_parameters:
+            for category, value_list in item.items():
                 for values in value_list:
                     values['logicalOperator'] = (
                             values.get('logicalOperator') or 'or')
@@ -89,15 +95,16 @@ class Parser:
                                 category,
                                 values["values"]) from e
 
-        self.search_param = []
-        for param in parameters:
-            for category, values in param.items():
-                for value in values:
+        for item in url_parameters:
+            for category, values in item.items():
+                for parameter in values:
                     self.search_param.append({
-                        "search_values": get_search_values(category, value),
-                        "logical_operator": value['logicalOperator'],
+                        "search_values": get_search_values(
+                            category,
+                            parameter),
+                        "logical_operator": parameter['logicalOperator'],
                         "operator": 'equal' if category == "valueTypeID"
-                        else value['operator'],
+                        else parameter['operator'],
                         "category": category,
                         "is_date": check_if_date_search(category)})
 
@@ -279,8 +286,14 @@ class Parser:
             return loud_pagination()
         return linked_place_pagination(self)
 
+    def is_valid_url(self) -> None:
+        if self.url and isinstance(
+                validators.url(self.url),
+                validators.ValidationFailure):
+            raise UrlNotValid(self.url)
+
+    @staticmethod
     def get_lp_types(
-            self,
             entity: Entity,
             links: list[Link]) -> list[dict[str, Any]]:
         types = []
