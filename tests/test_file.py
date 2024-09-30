@@ -225,14 +225,34 @@ class FileTest(TestBaseCase):
                 follow_redirects=True)
             assert b'An interesting annotation' in rv.data
 
-            rv = self.app.get(url_for('view_iiif', id_=iiif_id))
+            rv = self.app.get(url_for(
+                'view_iiif',
+                id_=iiif_id))
             assert b'Mirador' in rv.data
+
+            rv = self.app.get(
+                url_for(
+                    'api.iiif_manifest',
+                    id_=iiif_id,
+                    version=g.settings['iiif_version'],
+                    url="https://openatlas.eu"))
+            assert b'openatlas.eu' in rv.data
+
+            rv = self.app.get(
+                url_for(
+                    'api.iiif_manifest',
+                    id_=iiif_id,
+                    version=g.settings['iiif_version'],
+                    url="https://openatlaseu"))
+            assert b'URL not valid' in rv.data
 
             rv = self.app.get(url_for('annotation_image_update', id_=1))
             assert b'An interesting annotation' in rv.data
 
-            rv = self.app.get(
-                url_for('api.iiif_annotation_list', image_id=iiif_id))
+            rv = self.app.get(url_for(
+                'api.iiif_annotation_list',
+                image_id=iiif_id,
+                url="https://openatlas.eu"))
             json = rv.get_json()
             assert bool(str(iiif_id) in json['@id'])
 

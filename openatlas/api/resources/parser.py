@@ -277,3 +277,10 @@ network.add_argument(
     help='{error_msg}',
     action='append',
     location='args')
+
+iiif = reqparse.RequestParser()
+iiif.add_argument(
+    'url',
+    type=str,
+    help='{error_msg}',
+    location='args')

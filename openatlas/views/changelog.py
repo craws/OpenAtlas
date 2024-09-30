@@ -15,9 +15,18 @@ def index_changelog() -> str:
 
 
 versions = {
-    '8.7.0': ['TBA', {
+    '8.8.0': ['TBA', {}],
+    '8.7.0': ['2024-09-19', {
         'feature': {
-            '2339': 'Dates: additional checks'}}],
+            '2339': 'Dates: additional checks',
+            '2346': 'API: 0.4.4',
+            '2297': 'API: Add file license links for IIIF Manifest',
+            '2317': 'API: Wrong search operators in OpenAPI file',
+            '2321': 'API: Missing places in network endpoint',
+            '2338': 'Refactor and minor improvements'},
+        'fix': {
+            '2348': 'Wrong link between Source and Place',
+            '2314': 'Links in annotation may use wrong domain'}}],
     '8.6.1': ['2024-08-14', {
         'feature': {
             '2337': 'Configurable proxy server',
