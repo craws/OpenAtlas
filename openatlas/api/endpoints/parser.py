@@ -84,7 +84,7 @@ class Parser:
             for category, value_list in item.items():
                 for values in value_list:
                     values['logicalOperator'] = (
-                            values.get('logicalOperator') or 'or')
+                        values.get('logicalOperator') or 'or')
                     check_search_parameters(category, values)
                     if check_if_date_search(category):
                         try:
@@ -95,18 +95,16 @@ class Parser:
                                 category,
                                 values["values"]) from e
 
-        for item in url_parameters:
-            for category, values in item.items():
-                for parameter in values:
                     self.search_param.append({
                         "search_values": get_search_values(
                             category,
-                            parameter),
-                        "logical_operator": parameter['logicalOperator'],
+                            values),
+                        "logical_operator": values['logicalOperator'],
                         "operator": 'equal' if category == "valueTypeID"
-                        else parameter['operator'],
+                        else values['operator'],
                         "category": category,
                         "is_date": check_if_date_search(category)})
+
 
     def search_filter(self, entity: Entity) -> bool:
         for i in self.search_param:

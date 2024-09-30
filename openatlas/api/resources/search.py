@@ -10,7 +10,7 @@ from openatlas.models.entity import Entity
 
 def get_search_values(
         category: str,
-        parameter: dict[str, Any]) -> list[str | int | list[Any]]:
+        parameter: dict[str, Any]) -> list[str | int | list[int]]:
     values = parameter["values"]
     match category:
         case "typeIDWithSubs":
