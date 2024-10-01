@@ -98,25 +98,24 @@ class Parser:
         for search in url_parameters:
             for category, value_list in search.items():
                 for values in value_list:
+                    is_comparable= False
+                    if check_if_date_search(category):
+                        is_comparable = True
+                    if category == 'valueTypeID':
+                        is_comparable = True
                     self.search_param.append({
                         "search_values": get_search_values(
                             category,
                             values),
                         "logical_operator": values['logicalOperator'],
-                        "operator": 'equal' if category == "valueTypeID"
-                        else values['operator'],
+                        "operator": values['operator'],
                         "category": category,
-                        "is_date": check_if_date_search(category)})
+                        "is_comparable": is_comparable})
 
 
     def search_filter(self, entity: Entity) -> bool:
-        for i in self.search_param:
-            if not search_entity(
-                    entity_values=value_to_be_searched(entity, i['category']),
-                    operator_=i['operator'],
-                    search_values=i['search_values'],
-                    logical_operator=i['logical_operator'],
-                    is_comparable=i['is_date']):
+        for param in self.search_param:
+            if not search_entity(entity, param):
                 return False
         return True
 

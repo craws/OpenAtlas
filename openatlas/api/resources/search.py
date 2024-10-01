@@ -1,4 +1,4 @@
-from typing import Any, Optional, Tuple
+from typing import Any, Optional
 
 from flask import g
 from numpy import datetime64
@@ -18,9 +18,10 @@ def get_search_values(
         case "relationToID":
             values = flatten_list_and_remove_duplicates(
                 [get_linked_entities_id_api(value) for value in values])
-        case "valueTypeID":
-            values = flatten_list_and_remove_duplicates(
-                [search_for_value_type(value, parameter) for value in values])
+        # case "valueTypeID":
+        #     values = flatten_list_and_remove_duplicates(
+        #         [search_for_value_type(value, parameter) for value in
+        #         values])
         case _:
             values = [
                 value.lower() if isinstance(value, str) else value
@@ -28,30 +29,22 @@ def get_search_values(
     return values
 
 
-def search_for_value_type(
-        values: Tuple[int, float],
-        parameter: dict[str, Any]) -> list[int]:
-    links = Entity.get_links_of_entities(values[0], inverse=True)
-    ids = []
-    for link_ in links:
-        if link_.description and search_entity(
-                entity_values=[float(link_.description)]
-                if parameter['operator'] in ['equal', 'notEqual']
-                else float(link_.description),
-                operator_=parameter['operator'],
-                search_values=[values[1]],
-                logical_operator=parameter['logicalOperator'],
-                is_comparable=True):
-            ids.append(link_.domain.id)
-    return ids
 
 
-def search_entity(
-        entity_values: Any,
-        operator_: str,
-        search_values: list[Any],
-        logical_operator: str,
-        is_comparable: bool) -> bool:
+
+def search_entity(entity: Entity, param: dict[str, Any]) -> bool:
+    entity_values = value_to_be_searched(entity, param)
+    operator_ = param['operator']
+    search_values = param['search_values']
+    logical_operator = param['logical_operator']
+    is_comparable = param['is_comparable']
+
+    # Problem is, that we get not only one value to compare.
+    # How compare multiple?
+    if param['category'] == 'valueTypeID':
+        search_values = [value[1] for value in search_values]
+        print(search_values)
+
     if not entity_values and (operator_ == 'like' or is_comparable):
         return False
 
@@ -109,10 +102,13 @@ def search_entity(
     return bool_
 
 
-def value_to_be_searched(entity: Entity, key: str) -> Any:
-    match key:
+def value_to_be_searched(
+        entity: Entity, param: dict[str, Any]) \
+        -> list[int | str | float] | Optional[datetime64] | Optional[float]:
+    value: list[int | str | float] | Optional[datetime64]| Optional[float] = []
+    match param['category']:
         case "entityID" | "relationToID" | "valueTypeID":
-            value: list[int | str] | Optional[datetime64] = [entity.id]
+            value = [entity.id]
         case "entityName":
             value = [entity.name.lower()]
         case "entityDescription" if entity.description:
@@ -137,6 +133,15 @@ def value_to_be_searched(entity: Entity, key: str) -> Any:
             value = entity.end_from
         case "endTo":
             value = entity.end_to
+        case "valueTypeID":
+            links = Entity.get_links_of_entities(
+                param['values'][0],
+                inverse=True)
+            for link_ in links:
+                if link_.description:
+                    value = [float(entity.description)] \
+                        if param['operator'] in ['equal', 'notEqual'] \
+                        else float(entity.description)
         case _:
             value = []
     return value
