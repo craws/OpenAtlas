@@ -10,7 +10,7 @@ def check_if_date_search(k: str) -> bool:
     return bool(k in ["beginFrom", "beginTo", "endFrom", "endTo"])
 
 
-def check_search_parameters(category: str, values: dict[str, Any]) -> None:
+def validate_search_parameters(category: str, values: dict[str, Any]) -> None:
     if values['logicalOperator'] not in app.config['LOGICAL_OPERATOR']:
         raise LogicalOperatorError
     if values['operator'] not in app.config['COMPARE_OPERATORS']:

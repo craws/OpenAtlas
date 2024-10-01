@@ -21,7 +21,7 @@ from openatlas.api.resources.error import (
 from openatlas.api.resources.search import (
     get_search_values, search_entity, value_to_be_searched)
 from openatlas.api.resources.search_validation import (
-    check_if_date_search, check_search_parameters)
+    check_if_date_search, validate_search_parameters)
 from openatlas.api.resources.templates import (
     geojson_pagination, linked_place_pagination, loud_pagination)
 from openatlas.api.resources.util import (
@@ -80,12 +80,12 @@ class Parser:
             url_parameters = [ast.literal_eval(i) for i in self.search]
         except Exception as e:
             raise InvalidSearchSyntax from e
-        for item in url_parameters:
-            for category, value_list in item.items():
+        for search in url_parameters:
+            for category, value_list in search.items():
                 for values in value_list:
                     values['logicalOperator'] = (
                         values.get('logicalOperator') or 'or')
-                    check_search_parameters(category, values)
+                    validate_search_parameters(category, values)
                     if check_if_date_search(category):
                         try:
                             values["values"] = [
@@ -95,6 +95,9 @@ class Parser:
                                 category,
                                 values["values"]) from e
 
+        for search in url_parameters:
+            for category, value_list in search.items():
+                for values in value_list:
                     self.search_param.append({
                         "search_values": get_search_values(
                             category,
