@@ -99,10 +99,15 @@ class Parser:
             for category, value_list in search.items():
                 for values in value_list:
                     is_comparable= False
+                    links = []
                     if check_if_date_search(category):
                         is_comparable = True
                     if category == 'valueTypeID':
                         is_comparable = True
+                        for value in values["values"]:
+                            links.append(Entity.get_links_of_entities(
+                                value[0],
+                                inverse=True))
                     self.search_param.append({
                         "search_values": get_search_values(
                             category,
@@ -110,9 +115,14 @@ class Parser:
                         "logical_operator": values['logicalOperator'],
                         "operator": values['operator'],
                         "category": category,
-                        "is_comparable": is_comparable})
+                        "is_comparable": is_comparable,
+                        "value_type_links":
+                            flatten_list_and_remove_duplicates(links)})
 
-
+    # Todo: fix multiple valueTypeID searches, e.g.
+    # search={"valueTypeID":[{"operator":"equal","values":[(150412,34)],
+    # "logicalOperator":"or"}]}&search={"valueTypeID":[{"operator":"equal",
+    # "values":[(131994,13.5),(131997,3.7)],"logicalOperator":"or"}]}
     def search_filter(self, entity: Entity) -> bool:
         for param in self.search_param:
             if not search_entity(entity, param):
