@@ -25,7 +25,7 @@ def annotation_text_insert(id_: int) -> str | Response:
         AnnotationText.insert(
             source_id=id_,
             link_start=int(form.link_start.data),
-            link_end=int(form.entity.data),
+            link_end=int(form.link_end.data),
             text=form.text.data)
         return redirect(url_for('annotation_text_insert', id_=source.id))
     table = None
@@ -47,9 +47,9 @@ def annotation_text_insert(id_: int) -> str | Response:
                 link(Entity.get_by_id(annotation.entity_id))
                 if annotation.entity_id else '',
                 'update',
-                # link(
-                #     _('edit'),
-                #    url_for('annotation_text_update', id_=annotation.id)),
+                link(
+                    _('edit'),
+                    url_for('annotation_text_update', id_=annotation.id)),
                 delete])
         table = Table(['date', 'text', 'entity'], rows, [[0, 'desc']])
     return render_template(
@@ -57,11 +57,41 @@ def annotation_text_insert(id_: int) -> str | Response:
         tabs={
             'annotation': Tab(
                 'annotation',
-                render_template('annotate_text.html', entity=source),
+                render_template(
+                    'annotate_text.html',
+                    entity=source,
+                    formatted_text=source.description),
                 table,
                 [manual('tools/text_annotation')],
                 form=form)},
         entity=source,
+        crumbs=[
+            [_('source'), url_for('index', view='source')],
+            source,
+            _('annotate')])
+
+
+@app.route('/annotation_text_update/<int:id_>', methods=['GET', 'POST'])
+@required_group('contributor')
+def annotation_text_update(id_: int) -> str | Response:
+    annotation = AnnotationText.get_by_id(id_)
+    source = Entity.get_by_id(annotation.source_id)
+    form = get_annotation_text_form(
+        annotation.source_id,
+        Entity.get_by_id(annotation.entity_id)
+        if annotation.entity_id else None,
+        insert=False)
+    if form.validate_on_submit():
+        #annotation.update(form.entity.data or None, form.text.data)
+        return redirect(url_for('annotation_text_insert', id_=source.id))
+    print(annotation.link_start)
+    form.text.data = annotation.text
+    form.entity.data = annotation.entity_id
+    form.link_start.data = annotation.link_start
+    form.link_end.data = annotation.link_end
+    return render_template(
+        'tabs.html',
+        tabs={'annotation': Tab('annotation', form=form)},
         crumbs=[
             [_('source'), url_for('index', view='source')],
             source,

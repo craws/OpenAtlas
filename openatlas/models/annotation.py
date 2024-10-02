@@ -70,7 +70,7 @@ class AnnotationText:
         self.source_id = data['source_id']
         self.entity_id = data['entity_id']
         self.link_start = data['link_start']
-        self.link_start = data['link_end']
+        self.link_end = data['link_end']
         self.user_id = data['user_id']
         self.text = data['text']
         self.created = data['created']
@@ -87,10 +87,10 @@ class AnnotationText:
     # def delete(self) -> None:
     #     db.delete_annotation_image(self.id)
     #
-    # @staticmethod
-    # def get_by_id(id_: int) -> AnnotationText:
-    #     return AnnotationText(db.get_annotation_image_by_id(id_))
-    #
+    @staticmethod
+    def get_by_id(id_: int) -> AnnotationText:
+        return AnnotationText(db.get_annotation_text_by_id(id_))
+
 
     @staticmethod
     def get_by_source(source_id: int) -> list[AnnotationText]:
@@ -113,8 +113,8 @@ class AnnotationText:
             text: Optional[str] = None) -> None:
         db.insert_annotation_text({
             'source_id': source_id,
-            'user_id': current_user.id,
-            'entity_id': entity_id or None,
             'link_start': link_start,
             'link_end': link_end,
-            'text': text})
+            'entity_id': entity_id,
+            'text': text,
+            'user_id': current_user.id,})

@@ -7,6 +7,7 @@ from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import HiddenField, SelectMultipleField, StringField, widgets
+from wtforms.fields.numeric import IntegerField
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import InputRequired, URL
 
@@ -86,10 +87,15 @@ def get_annotation_text_form(
         source_id: int,
         entity: Optional[Entity] = None,
         insert: Optional[bool] = True) -> Any:
+
     class Form(FlaskForm):
         text = TextAreaField(_('annotation'))
+        link_start = IntegerField()
+        link_end = IntegerField()
+
     if insert:
         pass
+
     setattr(
         Form,
         'entity',

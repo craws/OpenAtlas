@@ -27,7 +27,7 @@ CREATE TABLE web.annotation_text (
     link_start integer NOT NULL,
     link_end integer NOT NULL,
     user_id integer,
-    text integer,
+    text text,
     created timestamp without time zone DEFAULT now() NOT NULL,
     modified timestamp without time zone
 );
