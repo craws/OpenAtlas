@@ -113,6 +113,24 @@ def delete_annotation_image(id_: int) -> None:
         {'id': id_})
 
 
+def update_annotation_text(data: dict[str, Any]) -> None:
+    print(data)
+    g.cursor.execute(
+        """
+        UPDATE web.annotation_text
+        SET (entity_id, text, link_start, link_end) =
+        (%(entity_id)s, %(text)s, %(link_start)s, %(link_end)s)
+        WHERE id = %(id)s;
+        """,
+        data)
+
+
+def delete_annotation_text(id_: int) -> None:
+    g.cursor.execute(
+        'DELETE FROM web.annotation_text WHERE id = %(id)s;',
+        {'id': id_})
+
+
 def remove_entity_from_annotation_image(
         annotation_id: int,
         entity_id: int) -> None:

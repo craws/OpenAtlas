@@ -30,28 +30,31 @@ def annotation_text_insert(id_: int) -> str | Response:
         return redirect(url_for('annotation_text_insert', id_=source.id))
     table = None
     if annotations := AnnotationText.get_by_source(source.id):
-        rows = []
+        table = Table(
+            ['date', 'text', 'entity', 'start', 'end'],
+            [],
+            [[0, 'desc']])
         for annotation in annotations:
             delete = ''
             if is_authorized('editor') or (
                     is_authorized('contributor')
                     and current_user.id == annotation.user_id):
-                pass
-                # delete = link(
-                #    _('delete'),
-                #    url_for('annotation_image_delete', id_=annotation.id),
-                #    js="return confirm('" + _('delete annotation') + "?')")
-            rows.append([
+                delete = link(
+                    _('delete'),
+                    url_for('annotation_text_delete', id_=annotation.id),
+                    js="return confirm('" + _('delete annotation') + "?')")
+            table.rows.append([
                 format_date(annotation.created),
                 annotation.text,
                 link(Entity.get_by_id(annotation.entity_id))
                 if annotation.entity_id else '',
-                'update',
+                annotation.link_start,
+                annotation.link_end,
                 link(
                     _('edit'),
                     url_for('annotation_text_update', id_=annotation.id)),
                 delete])
-        table = Table(['date', 'text', 'entity'], rows, [[0, 'desc']])
+
     return render_template(
         'tabs.html',
         tabs={
@@ -82,9 +85,12 @@ def annotation_text_update(id_: int) -> str | Response:
         if annotation.entity_id else None,
         insert=False)
     if form.validate_on_submit():
-        #annotation.update(form.entity.data or None, form.text.data)
+        annotation.update(
+            form.link_start.data,
+            form.link_end.data,
+            int(form.entity.data) if form.entity.data else None,
+            form.text.data)
         return redirect(url_for('annotation_text_insert', id_=source.id))
-    print(annotation.link_start)
     form.text.data = annotation.text
     form.entity.data = annotation.entity_id
     form.link_start.data = annotation.link_start
@@ -185,3 +191,16 @@ def annotation_image_delete(id_: int) -> Response:
     flash(_('annotation deleted'), 'info')
     return redirect(
         url_for('annotation_image_insert', id_=annotation.image_id))
+
+
+@app.route('/annotation_text_delete/<int:id_>')
+@required_group('contributor')
+def annotation_text_delete(id_: int) -> Response:
+    annotation = AnnotationText.get_by_id(id_)
+    if current_user.group == 'contributor' \
+            and annotation.user_id != current_user.id:
+        abort(403)  # pragma: no cover
+    annotation.delete()
+    flash(_('annotation deleted'), 'info')
+    return redirect(
+        url_for('annotation_text_insert', id_=annotation.source_id))
