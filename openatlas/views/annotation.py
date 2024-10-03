@@ -8,7 +8,8 @@ from werkzeug.wrappers import Response
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
-from openatlas.display.util import get_file_path, link, required_group
+from openatlas.display.util import (
+    display_annotation_text_links, get_file_path, link, required_group)
 from openatlas.display.util2 import format_date, is_authorized, manual
 from openatlas.forms.form import (
     get_annotation_image_form, get_annotation_text_form)
@@ -26,10 +27,11 @@ def annotation_text_insert(id_: int) -> str | Response:
             source_id=id_,
             link_start=int(form.link_start.data),
             link_end=int(form.link_end.data),
+            entity_id=int(form.entity.data) if form.entity.data else None,
             text=form.text.data)
         return redirect(url_for('annotation_text_insert', id_=source.id))
     table = None
-    if annotations := AnnotationText.get_by_source(source.id):
+    if annotations := AnnotationText.get_by_source_id(source.id):
         table = Table(
             ['date', 'text', 'entity', 'start', 'end'],
             [],
@@ -63,7 +65,7 @@ def annotation_text_insert(id_: int) -> str | Response:
                 render_template(
                     'annotate_text.html',
                     entity=source,
-                    formatted_text=source.description),
+                    formatted_text=display_annotation_text_links(source)),
                 table,
                 [manual('tools/text_annotation')],
                 form=form)},

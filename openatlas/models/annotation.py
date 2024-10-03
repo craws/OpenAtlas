@@ -96,7 +96,7 @@ class AnnotationText:
         return AnnotationText(db.get_annotation_text_by_id(id_))
 
     @staticmethod
-    def get_by_source(source_id: int) -> list[AnnotationText]:
+    def get_by_source_id(source_id: int) -> list[AnnotationText]:
         return [
             AnnotationText(row) for row
             in db.get_annotation_text_by_source(source_id)]

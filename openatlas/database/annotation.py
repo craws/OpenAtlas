@@ -53,7 +53,11 @@ def get_annotation_image_by_file(image_id: int) -> list[dict[str, Any]]:
 
 def get_annotation_text_by_source(source_id: int) -> list[dict[str, Any]]:
     g.cursor.execute(
-        ANNOTATION_TEXT_SELECT + ' WHERE source_id =  %(source_id)s;',
+        ANNOTATION_TEXT_SELECT +
+        """
+        WHERE source_id = %(source_id)s
+        ORDER BY link_start;
+        """,
         {'source_id': source_id})
     return [dict(row) for row in g.cursor.fetchall()]
 
