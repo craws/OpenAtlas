@@ -304,8 +304,8 @@ class SourceDisplay(BaseDisplay):
         super().add_tabs()
         entity = self.entity
         for name in [
-                'actor', 'artifact', 'feature', 'event', 'place',
-                'stratigraphic_unit', 'text', 'reference', 'file']:
+                'actor', 'artifact', 'event', 'place', 'text', 'reference',
+                'file']:
             self.tabs[name] = Tab(name, entity=entity)
         for text in entity.get_linked_entities('P73', types=True):
             self.tabs['text'].table.rows.append([
