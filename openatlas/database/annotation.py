@@ -12,7 +12,7 @@ ANNOTATION_IMAGE_SELECT = \
         user_id,
         text,
         created
-    FROM web.annotation_image
+    FROM model.annotation_image
     """
 
 ANNOTATION_TEXT_SELECT = \
@@ -26,7 +26,7 @@ ANNOTATION_TEXT_SELECT = \
         user_id,
         text,
         created
-    FROM web.annotation_text
+    FROM model.annotation_text
     """
 
 
@@ -73,7 +73,7 @@ def get_annotation_image_orphans() -> list[dict[str, Any]]:
             a.user_id,
             a.text,
             a.created
-        FROM web.annotation_image a
+        FROM model.annotation_image a
         LEFT JOIN model.link l ON l.domain_id = a.image_id 
             AND l.range_id = a.entity_id 
             AND l.property_code = 'P67'
@@ -85,7 +85,7 @@ def get_annotation_image_orphans() -> list[dict[str, Any]]:
 def insert_annotation_image(data: dict[str, Any]) -> None:
     g.cursor.execute(
         """
-        INSERT INTO web.annotation_image (
+        INSERT INTO model.annotation_image (
             image_id,
             entity_id,
             coordinates,
@@ -104,7 +104,7 @@ def insert_annotation_image(data: dict[str, Any]) -> None:
 def update_annotation_image(data: dict[str, Any]) -> None:
     g.cursor.execute(
         """
-        UPDATE web.annotation_image
+        UPDATE model.annotation_image
         SET (entity_id, text) = (%(entity_id)s, %(text)s)
         WHERE id = %(id)s;
         """,
@@ -113,7 +113,7 @@ def update_annotation_image(data: dict[str, Any]) -> None:
 
 def delete_annotation_image(id_: int) -> None:
     g.cursor.execute(
-        'DELETE FROM web.annotation_image WHERE id = %(id)s;',
+        'DELETE FROM model.annotation_image WHERE id = %(id)s;',
         {'id': id_})
 
 
@@ -121,7 +121,7 @@ def update_annotation_text(data: dict[str, Any]) -> None:
     print(data)
     g.cursor.execute(
         """
-        UPDATE web.annotation_text
+        UPDATE model.annotation_text
         SET (entity_id, text, link_start, link_end) =
         (%(entity_id)s, %(text)s, %(link_start)s, %(link_end)s)
         WHERE id = %(id)s;
@@ -131,7 +131,7 @@ def update_annotation_text(data: dict[str, Any]) -> None:
 
 def delete_annotation_text(id_: int) -> None:
     g.cursor.execute(
-        'DELETE FROM web.annotation_text WHERE id = %(id)s;',
+        'DELETE FROM model.annotation_text WHERE id = %(id)s;',
         {'id': id_})
 
 
@@ -140,7 +140,7 @@ def remove_entity_from_annotation_image(
         entity_id: int) -> None:
     g.cursor.execute(
         """
-        UPDATE web.annotation_image
+        UPDATE model.annotation_image
         SET entity_id = NULL
         WHERE id = %(annotation_id)s AND entity_id = %(entity_id)s;
         """,
@@ -150,7 +150,7 @@ def remove_entity_from_annotation_image(
 def insert_annotation_text(data: dict[str, Any]) -> None:
     g.cursor.execute(
         """
-        INSERT INTO web.annotation_text (
+        INSERT INTO model.annotation_text (
             source_id,
             entity_id,
             link_start,
