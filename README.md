@@ -1,5 +1,5 @@
 [![License: GPL v2](https://img.shields.io/badge/License-GPL_v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
-[![Python 3.9](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/release/python-390/)
+[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/release/python-3110/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7605689.svg)](https://doi.org/10.5281/zenodo.7605689)
 ![tests](https://github.com/craws/OpenAtlas/actions/workflows/starter.yaml/badge.svg)
 
