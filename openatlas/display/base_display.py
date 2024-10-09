@@ -467,8 +467,8 @@ class ReferenceBaseDisplay(BaseDisplay):
     def add_tabs(self) -> None:
         super().add_tabs()
         for name in [
-                'source', 'event', 'actor', 'place', 'feature',
-                'stratigraphic_unit', 'artifact', 'file', 'type']:
+                'source', 'event', 'actor', 'place', 'artifact', 'file',
+                'type']:
             self.tabs[name] = Tab(name, entity=self.entity)
         for link_ in self.entity.get_links('P67'):
             range_ = link_.range
