@@ -913,6 +913,14 @@ class Api(ApiTestCase):
             rv = self.app.get(url_for(
                 'api_04.view_class',
                 view_class='place',
+                search='{"typeID":[{"operator":"like",'
+                       '"values":["Boundary Mark", "Height", "Dimension"],'
+                       '"logicalOperator":"and"}]}'))
+            assert 'Operator not supported' in rv.get_json()['title']
+
+            rv = self.app.get(url_for(
+                'api_04.view_class',
+                view_class='place',
                 search='{"All":[{"operator":"notEqual",'
                        '"values":["Boundary Mark", "Height"],'
                        '"logicalOperator":"or"}]}'))

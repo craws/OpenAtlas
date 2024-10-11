@@ -86,6 +86,8 @@ class Parser:
                     values['logicalOperator'] = (
                             values.get('logicalOperator') or 'or')
                     check_search_parameters(category, values)
+                    if category in app.config['INT_VALUES']:
+                        values['values'] = list(map(int, values['values']))
                     if check_if_date_search(category):
                         try:
                             values["values"] = [
