@@ -71,6 +71,10 @@ class OperatorError(Exception):
     pass
 
 
+class OperatorNotSupported(Exception):
+    pass
+
+
 class QueryEmptyError(Exception):
     pass
 
