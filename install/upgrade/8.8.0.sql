@@ -7,6 +7,20 @@ UPDATE web.settings SET value = '8.8.0' WHERE name = 'database_version';
 -- This is work in progress!
 
 
+-- check general P67 counts
+SELECT DISTINCT
+    count(l.property_code),
+    d.openatlas_class_name AS domain,
+    l.property_code,
+    r.openatlas_class_name AS range
+FROM model.link l
+JOIN model.entity d ON l.domain_id = d.id
+JOIN model.entity r ON l.range_id = r.id
+WHERE l.property_code = 'P67'
+GROUP BY l.property_code, d.openatlas_class_name, r.openatlas_class_name
+ORDER BY domain, range
+
+
 -- bibliography and edition should always be the domain for P67 - referenced by
 UPDATE model.link
 SET (domain_id, range_id) = (range_id, domain_id)
