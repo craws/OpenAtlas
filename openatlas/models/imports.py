@@ -161,6 +161,8 @@ def link_types(entity: Entity, row: dict[str, Any], class_: str) -> None:
 
 def link_references(entity: Entity, row: dict[str, Any], class_: str) -> None:
     if data := row.get('references'):
+        if '"' in str(data):
+            data = clean_reference_pages(str(data))
         for references in str(data).split():
             reference = references.split(';')
             if len(reference) <= 2 and reference[0].isdigit():
@@ -168,7 +170,7 @@ def link_references(entity: Entity, row: dict[str, Any], class_: str) -> None:
                     ref_entity = ApiEntity.get_by_id(int(reference[0]))
                 except EntityDoesNotExistError:
                     continue
-                page = reference[1] if len(reference) > 1 else None
+                page = reference[1].replace('|', ' ') or None
                 ref_entity.link('P67', entity, page)
     match_types = get_match_types()
     systems = list(set(i for i in row if i.startswith('reference_system_')))
@@ -214,3 +216,24 @@ def insert_gis(entity: Entity, row: dict[str, Any], project: Project) -> None:
                     Gis.insert_wkt(entity, location, project, poly)
             else:
                 Gis.insert_wkt(entity, location, project, wkt_)
+
+
+def clean_reference_pages(value: str) -> str:
+    new_string = ""
+    inside_quotes = False
+    current_part = ""
+
+    for char in value:
+        if char == '"':
+            if inside_quotes:
+                modified_part = current_part.replace(' ', '|')
+                new_string += modified_part
+                inside_quotes = False
+                current_part = ""
+            else:
+                inside_quotes = True
+        elif inside_quotes:
+            current_part += char
+        else:
+            new_string += char
+    return new_string

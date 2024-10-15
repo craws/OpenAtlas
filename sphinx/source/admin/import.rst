@@ -122,6 +122,7 @@ References
 It is possible to link existing :doc:`/entity/reference` to imported entities.
 
 * :doc:`/entity/reference` ID and pages are separated with a semicolon (**;**), e.g. 1234;56-78
+* To link :doc:`/entity/reference` with multiple page numbers, wrap the numbers in quotation marks, e.g. 1234;"IV, 56-78"
 * To link :doc:`/entity/reference` without page number, just add the ID without semicolon (**;**)
 * You can enter multiple :doc:`/entity/reference` separated with a space, e.g. 1234;56-78 5678
 * The ID of a :doc:`/entity/reference` can be looked up at the detail view of the entity

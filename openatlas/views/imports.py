@@ -34,7 +34,7 @@ from openatlas.forms.field import SubmitField
 from openatlas.models.entity import Entity
 from openatlas.models.imports import (
     Project, check_duplicates, check_single_type_duplicates, check_type_id,
-    get_origin_ids, import_data_)
+    clean_reference_pages, get_origin_ids, import_data_)
 
 _('invalid columns')
 _('possible duplicates')
@@ -490,6 +490,8 @@ def check_cell_value(
             value = ' '.join(value_types)
         case 'references' if value:
             references = []
+            if '"' in str(value):
+                value = clean_reference_pages(str(value))
             for reference in str(value).split():
                 values = str(reference).split(';')
                 if len(values) > 2:
@@ -505,7 +507,7 @@ def check_cell_value(
                     except EntityDoesNotExistError:
                         values[0] = error_span(values[0])
                         checks.set_warning('invalid_reference_id', id_)
-                references.append(';'.join(values))
+                references.append((';'.join(values)).replace('|', ' '))
             value = ' '.join(references)
         case 'wkt' if value:
             try:
