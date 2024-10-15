@@ -50,7 +50,6 @@ _('invalid value type ids')
 _('invalid value type values')
 _('invalid coordinates')
 _('invalid OpenAtlas class')
-_('invalid references')
 _('invalid reference id')
 _('empty names')
 _('empty ids')
@@ -490,14 +489,8 @@ def check_cell_value(
             value = ' '.join(value_types)
         case 'references' if value:
             references = []
-            if '"' in str(value):
-                value = clean_reference_pages(str(value))
-            for reference in str(value).split():
+            for reference in clean_reference_pages(str(value)):
                 values = str(reference).split(';')
-                if len(values) > 2:
-                    references.append(error_span(reference))
-                    checks.set_warning('invalid_references', id_)
-                    continue
                 if not values[0].isdigit():
                     values[0] = error_span(values[0])
                     checks.set_warning('invalid_reference_id', id_)
@@ -507,7 +500,7 @@ def check_cell_value(
                     except EntityDoesNotExistError:
                         values[0] = error_span(values[0])
                         checks.set_warning('invalid_reference_id', id_)
-                references.append((';'.join(values)).replace('|', ' '))
+                references.append(';'.join(values))
             value = ' '.join(references)
         case 'wkt' if value:
             try:

@@ -114,7 +114,6 @@ class ExportImportTest(ExportImportTestCase):
             assert b'invalid value type ids' in rv.data
             assert b'invalid value type values' in rv.data
             assert b'invalid reference system' in rv.data
-            assert b'invalid references' in rv.data
             assert b'invalid reference id' in rv.data
             assert b'empty names' in rv.data
             assert b'double IDs in import' in rv.data
