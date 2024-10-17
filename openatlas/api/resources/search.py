@@ -40,20 +40,30 @@ def search_entity(entity: Entity | Link, param: dict[str, Any]) -> bool:
             search_values = flatten_list_and_remove_duplicates(search_values)
         else:
             bool_values = []
-            for search_value in search_values:
+            for item in search_values:
                 if operator_ == 'equal':
                     if logical_operator == 'and':
                         bool_values.append(bool(any(
-                            item in entity_values for item in search_value)))
+                            item in entity_values for item in item)))
                 if operator_ == 'notEqual':
                     if logical_operator == 'and':
                         bool_values.append(bool(not any(
-                            item in entity_values for item in search_value)))
+                            item in entity_values for item in item)))
             return all(bool_values)
     bool_ = False
     # print(entity_values)
     # print(type(entity_values))
     # print(type(search_values))
+    # import operator
+    # todo: check operator module to simplify the operator calls
+    def check_value_type():
+        b = True
+        values = dict(entity_values)
+        for i in search_values:
+            if i[0] not in values or not values[i[0]] > i[1]:
+                b = False
+                break
+        return b
     match operator_:
         case 'equal' if logical_operator == 'or':
             bool_ = bool(any(item in entity_values for item in search_values))
@@ -76,15 +86,7 @@ def search_entity(entity: Entity | Link, param: dict[str, Any]) -> bool:
             bool_ = bool(any(item < entity_values for item in search_values))
         case 'greaterThan' if is_comparable and logical_operator == 'and':
             if param['category'] == 'valueTypeID':
-                test_bool = []
-                for search_value in search_values:
-                    test_dict = dict(entity_values)
-                    if search_value[0] not in test_dict:
-                        test_bool.append(False)
-                        continue
-                    test_bool.append(test_dict[search_value[0]] > search_value[1])
-                print(test_bool)
-                bool_ = bool(all(test_bool))
+               bool_ = check_value_type()
             else:
                 bool_ = bool(all(item < entity_values for item in search_values))
         case 'greaterThanEqual' if is_comparable and logical_operator == 'or':
