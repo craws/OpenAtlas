@@ -18,16 +18,11 @@ def get_search_values(
         case "relationToID":
             values = flatten_list_and_remove_duplicates(
                 [get_linked_entities_id_api(value) for value in values])
-        case "valueTypeID":
-            values = [value[1] for value in values]
         case _:
             values = [
                 value.lower() if isinstance(value, str) else value
                 for value in values]
     return values
-
-
-
 
 
 def search_entity(entity: Entity | Link, param: dict[str, Any]) -> bool:
@@ -55,9 +50,10 @@ def search_entity(entity: Entity | Link, param: dict[str, Any]) -> bool:
                         bool_values.append(bool(not any(
                             item in entity_values for item in search_value)))
             return all(bool_values)
-    if entity_values:
-        print(entity_values)
     bool_ = False
+    # print(entity_values)
+    # print(type(entity_values))
+    # print(type(search_values))
     match operator_:
         case 'equal' if logical_operator == 'or':
             bool_ = bool(any(item in entity_values for item in search_values))
@@ -79,7 +75,18 @@ def search_entity(entity: Entity | Link, param: dict[str, Any]) -> bool:
         case 'greaterThan' if is_comparable and logical_operator == 'or':
             bool_ = bool(any(item < entity_values for item in search_values))
         case 'greaterThan' if is_comparable and logical_operator == 'and':
-            bool_ = bool(all(item < entity_values for item in search_values))
+            if param['category'] == 'valueTypeID':
+                test_bool = []
+                for search_value in search_values:
+                    test_dict = dict(entity_values)
+                    if search_value[0] not in test_dict:
+                        test_bool.append(False)
+                        continue
+                    test_bool.append(test_dict[search_value[0]] > search_value[1])
+                print(test_bool)
+                bool_ = bool(all(test_bool))
+            else:
+                bool_ = bool(all(item < entity_values for item in search_values))
         case 'greaterThanEqual' if is_comparable and logical_operator == 'or':
             bool_ = bool(any(item <= entity_values for item in search_values))
         case 'greaterThanEqual' if is_comparable and logical_operator == 'and':
@@ -97,8 +104,8 @@ def search_entity(entity: Entity | Link, param: dict[str, Any]) -> bool:
 
 def value_to_be_searched(
         entity: Entity, param: dict[str, Any]) \
-        -> list[int | str | float] | Optional[datetime64] | Optional[float]:
-    value: list[int | str | float] | Optional[datetime64]| Optional[float] = []
+        -> list[int | str | tuple[int, float]] | Optional[datetime64]:
+    value: list[int | str | tuple[int, float]] | Optional[datetime64] = []
     match param['category']:
         case "entityID" | "relationToID":
             value = [entity.id]
@@ -129,8 +136,6 @@ def value_to_be_searched(
         case "valueTypeID":
             value = []
             for link_ in param['value_type_links']:
-                    if entity.id == link_.domain.id:
-                        value.append(float(link_.description))
-        case _:
-            value = []
+                if entity.id == link_.domain.id:
+                    value.append((link_.range.id, float(link_.description)))
     return value

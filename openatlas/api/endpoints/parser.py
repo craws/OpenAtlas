@@ -19,7 +19,7 @@ from openatlas.api.resources.error import (
     EntityDoesNotExistError, InvalidSearchSyntax, InvalidSearchValueError,
     LastEntityError, UrlNotValid)
 from openatlas.api.resources.search import (
-    get_search_values, search_entity, value_to_be_searched)
+    get_search_values, search_entity)
 from openatlas.api.resources.search_validation import (
     check_if_date_search, validate_search_parameters)
 from openatlas.api.resources.templates import (
@@ -84,7 +84,7 @@ class Parser:
             for category, value_list in search.items():
                 for values in value_list:
                     values['logicalOperator'] = (
-                        values.get('logicalOperator') or 'or')
+                            values.get('logicalOperator') or 'or')
                     validate_search_parameters(category, values)
                     if category in app.config['INT_VALUES']:
                         values['values'] = list(map(int, values['values']))
@@ -100,7 +100,7 @@ class Parser:
         for search in url_parameters:
             for category, value_list in search.items():
                 for values in value_list:
-                    is_comparable= False
+                    is_comparable = False
                     links = []
                     if check_if_date_search(category):
                         is_comparable = True

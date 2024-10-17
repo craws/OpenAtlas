@@ -243,7 +243,10 @@ class Endpoint:
         out = []
         links = [
             link_ for link_ in self.link_parser_check() if link_.property.code
-            in ['P53', 'P74', 'OA8', 'OA9', 'P7', 'P26', 'P27']]
+                                                           in ['P53', 'P74',
+                                                               'OA8', 'OA9',
+                                                               'P7', 'P26',
+                                                               'P27']]
         for entity in self.entities:
             entity_links = [
                 link_ for link_ in links if link_.domain.id == entity.id]
