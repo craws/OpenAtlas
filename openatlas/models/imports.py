@@ -218,4 +218,5 @@ def insert_gis(entity: Entity, row: dict[str, Any], project: Project) -> None:
 
 
 def clean_reference_pages(value: str) -> list[str]:
-    return re.findall(r'\d+;.*?(?=\d+;|$)', value)
+    matches =  re.findall(r'([a-zA-Z\d]*;[^;]*?(?=[a-zA-Z\d]*;|$))', value)
+    return [match.strip() for match in matches]
