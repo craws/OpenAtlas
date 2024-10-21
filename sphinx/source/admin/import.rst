@@ -163,7 +163,7 @@ The imported data can be linked to an already existing
   whole cell in quotation marks, e.g. "1234;IV, 56-78 542;34-23 66;"
 * to link a :doc:`/entity/reference` without page numbers, just add the ID
   and a semicolon (**;**) without further information
-* enter multiple :doc:`/entity/reference`s separated by a space, e.g. 1234;
+* enter multiple :doc:`/entity/reference` separated by a space, e.g. 1234;
   56-78 5678;
 * the ID of each :doc:`/entity/reference` can be found at the detail view of
   said reference in your OpenAtlas instance
