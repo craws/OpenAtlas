@@ -16,7 +16,11 @@ def index_changelog() -> str:
 
 # pylint: disable=too-many-lines
 versions = {
-    '8.8.0': ['TBA', {}],
+    '8.8.0': ['TBA', {
+        'fix': {
+            '2371': 'Broken export functions'
+        }
+    }],
     '8.7.0': ['2024-09-19', {
         'feature': {
             '2339': 'Dates: additional checks',
