@@ -5,7 +5,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>API &mdash; OpenAtlas 8.7.0 documentation</title>
+  <title>API &mdash; OpenAtlas 8.8.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
@@ -35,7 +35,7 @@
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                8.7.0
+                8.8.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -276,7 +276,9 @@ An error message is provided by its own error handler
 <h2>Proxy<a class="headerlink" href="#proxy" title="Permalink to this heading"></a></h2>
 <p>If the server is behind a proxy, there are some issues with the RDF export of entities.
 To provide the OpenAtlas API with a proxy server, add following line to <strong>instance/production.py</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">API_PROXY</span> <span class="o">=</span> <span class="s1">&#39;http://proxy.example:8899&#39;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">PROXIES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;http&#39;</span><span class="p">:</span> <span class="s1">&#39;http://someurl.org:8080&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;https&#39;</span><span class="p">:</span> <span class="s1">&#39;http://someurl.org:8080&#39;</span><span class="p">}</span>
 </pre></div>
 </div>
 </section>

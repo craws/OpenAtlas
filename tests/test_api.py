@@ -993,6 +993,15 @@ class Api(ApiTestCase):
                 url_for('api_04.display', filename=f'{file_without_file.id}'))
             assert 'File not found' in rv.get_json()['title']
 
+            rv = self.app.get(
+                url_for('api_04.iiif_manifest', version= 2, id_=place.id))
+            assert 'File not found' in rv.get_json()['title']
+
+            rv = self.app.get(
+                url_for('api_04.iiif_sequence', version= 2, id_=place.id))
+            assert 'File not found' in rv.get_json()['title']
+
+
             rv = self.app.get(url_for(
                 'api_04.display',
                 filename=f'{file_not_public.id}'))

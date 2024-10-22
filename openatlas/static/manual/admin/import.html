@@ -5,7 +5,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Import &mdash; OpenAtlas 8.7.0 documentation</title>
+  <title>Import &mdash; OpenAtlas 8.8.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
@@ -35,7 +35,7 @@
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                8.7.0
+                8.8.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -112,9 +112,10 @@
 <h1>Import<a class="headerlink" href="#import" title="Permalink to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>Import is available for admins and managers and offers functionality to import data
-from <a class="reference external" href="https://en.wikipedia.org/wiki/Comma-separated_values">CSV</a> files.
-Currently lists can be imported containing:</p>
+<p>Import settings are available for admins and managers and offer functionality
+to import data directly from
+<a class="reference external" href="https://en.wikipedia.org/wiki/Comma-separated_values">CSV</a> files.
+Lists containing the following fields can be imported currently:</p>
 <ul class="simple">
 <li><p>Name</p></li>
 <li><p>Alias</p></li>
@@ -130,113 +131,153 @@ Currently lists can be imported containing:</p>
 <li><p>origin_id</p></li>
 <li><p>Place hierarchy</p></li>
 </ul>
-<section id="preparations">
-<h2>Preparations<a class="headerlink" href="#preparations" title="Permalink to this heading"></a></h2>
-<p>Automatic imports can be dangerous for data integrity and it may be very time consuming to reverse them so we strongly advise:</p>
+<section id="preparation">
+<h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this heading"></a></h2>
+<p>Automatic imports cause problems regarding data integrity, so proceed with
+caution. Fixing such problems can be time consuming, so we strongly advise
+you to:</p>
 <ul class="simple">
-<li><p>SQL backups <strong>before</strong> import, an existing backup not older than a day is enforced</p></li>
+<li><p>Make an SQL backups <strong>before</strong> the import of any data; an existing backup
+not older than a day is enforced</p></li>
 <li><p>Use the preview (enabled by default) and check if the data looks alright</p></li>
 </ul>
-<p>The import operation is encapsulated in a transaction, meaning if there is an error in the script,
-nothing will be imported.</p>
+<p>The import operation is encapsulated in a transaction. So if there is an
+error in the script, nothing will be imported.</p>
 <p><strong>The file:</strong></p>
 <ul class="simple">
-<li><p>Take a look at the <a class="reference download internal" download="" href="../_downloads/c252be00e4e00a8d8fbe6ca68143f1c4/example.csv"><code class="xref download docutils literal notranslate"><span class="pre">example.csv</span></code></a> or <a class="reference download internal" download="" href="../_downloads/b05023d4f028f7f863c2384f2569e5f0/example_place_hierarchy.csv"><code class="xref download docutils literal notranslate"><span class="pre">example_place_hierarchy.csv</span></code></a></p></li>
-<li><p>Make sure the extension is spelled correctly in lower case e.g. my_data.csv</p></li>
-<li><p>In the first row should be the header names</p></li>
-<li><p>Each following row is one data set. Values are separated by commas</p></li>
-<li><p>Text can be enclosed in double quotes (<strong>”</strong>), especially if the contain commas</p></li>
+<li><p>Take a look at the <a class="reference download internal" download="" href="../_downloads/c252be00e4e00a8d8fbe6ca68143f1c4/example.csv"><code class="xref download docutils literal notranslate"><span class="pre">example.csv</span></code></a> or
+<a class="reference download internal" download="" href="../_downloads/b05023d4f028f7f863c2384f2569e5f0/example_place_hierarchy.csv"><code class="xref download docutils literal notranslate"><span class="pre">example_place_hierarchy.csv</span></code></a></p></li>
+<li><p>Make sure the file extension (.csv) is spelled correctly in lower case e.g.
+my_data.csv</p></li>
+<li><p>Header names are found in the first row of the table</p></li>
+<li><p>Each following row contains one data set; values are separated by commas</p></li>
+<li><p>Text should be enclosed in double quotes (<strong>”</strong>), especially if they contain
+commas</p></li>
 </ul>
 </section>
-<section id="projects">
-<h2>Projects<a class="headerlink" href="#projects" title="Permalink to this heading"></a></h2>
-<p>To retrace imported entities they have to be associated with a project. If there is none (or not
-the right one) available, you’ll have to create a new one. The name and description can be updated
+<section id="project">
+<h2>Project<a class="headerlink" href="#project" title="Permalink to this heading"></a></h2>
+<p>To find imported entities after the import, they have to be associated with a
+project. If no project is available (or not the right one) you have
+to create a new one. Name and description of said project can be updated
 later.</p>
 </section>
 <section id="import-class">
 <h2>Import class<a class="headerlink" href="#import-class" title="Permalink to this heading"></a></h2>
-<p>Only one class can be imported at a time, so you have to choose one of the available classes.</p>
+<p>Only one class can be imported at a time, so you have to choose one of the
+available classes.</p>
 </section>
 <section id="possible-import-fields">
 <h2>Possible import fields<a class="headerlink" href="#possible-import-fields" title="Permalink to this heading"></a></h2>
-<p>The header can contain the following titles. Columns with other titles won’t get imported but shown as
-an error message.</p>
+<p>Column headers can contain the following titles. Other titles won’t be
+imported and an error message will be displayed</p>
 <ul class="simple">
-<li><p><strong>name</strong> - required, an error will be displayed if the header is missing. A warning will be displayed, if names in data rows are missing and these won’t get imported.</p></li>
-<li><p><strong>alias</strong> - only available for person, group and place, see <a class="reference internal" href="#alias-import"><span class="std std-ref">Alias</span></a></p></li>
+<li><p><strong>name</strong> - required, an error will be displayed if name; the data will not
+get imported if a name is missing</p></li>
+<li><p><strong>alias</strong> - only available for person, group and place, see
+<a class="reference internal" href="#alias-import"><span class="std std-ref">Alias</span></a></p></li>
 <li><p><strong>description</strong> - a description can be provided</p></li>
-<li><p><strong>origin_id</strong> - It has to be <strong>unique per project</strong> so if you have multiple like a person and place with id = 1 you can prefix them in the document e.g. person_1, place_1 before importing them</p></li>
+<li><p><strong>origin_id</strong> - this field has to be <strong>unique per project</strong>; if you have
+same IDs like a person and place with id = 1, you can prefix them in the
+document e.g. person_1, place_1 before importing</p></li>
 <li><p><strong>begin_from</strong> - used for dates, see <a class="reference internal" href="#dates-import"><span class="std std-ref">Dates</span></a></p></li>
 <li><p><strong>begin_to</strong> - used for dates, see <a class="reference internal" href="#dates-import"><span class="std std-ref">Dates</span></a></p></li>
 <li><p><strong>end_from</strong> - used for dates, see <a class="reference internal" href="#dates-import"><span class="std std-ref">Dates</span></a></p></li>
 <li><p><strong>end_to</strong> - used for dates, see <a class="reference internal" href="#dates-import"><span class="std std-ref">Dates</span></a></p></li>
-<li><p><strong>type_ids</strong> - used to link to types, see <a class="reference internal" href="#types-import"><span class="std std-ref">Types</span></a></p></li>
-<li><p><strong>value_types</strong> - used to link to a value type, see <a class="reference internal" href="#value-types-import"><span class="std std-ref">Value types</span></a></p></li>
-<li><p><strong>references</strong> - used to link existing references, see <a class="reference internal" href="#references-import"><span class="std std-ref">References</span></a></p></li>
+<li><p><strong>type_ids</strong> - used for linking to a type, see <a class="reference internal" href="#types-import"><span class="std std-ref">Types</span></a></p></li>
+<li><p><strong>value_types</strong> - used for linking to a value type, see <a class="reference internal" href="#value-types-import"><span class="std std-ref">Value types</span></a></p></li>
+<li><p><strong>references</strong> - used for linking data to already existing references in
+the database, see <a class="reference internal" href="#references-import"><span class="std std-ref">References</span></a></p></li>
 <li><p><strong>wkt</strong> - only available for places and artifacts, see <a class="reference internal" href="#wkt-import"><span class="std std-ref">WKT coordinates</span></a></p></li>
-<li><p><strong>reference_system_*</strong> - used to link existing external reference systems, see <a class="reference internal" href="#reference-systems-import"><span class="std std-ref">External reference systems</span></a></p></li>
-<li><p><strong>administrative_unit</strong> - only available for places, id of existing administrative unit</p></li>
-<li><p><strong>historical_place</strong> - only available for places, id of existing historical place</p></li>
-<li><p><strong>parent_id</strong> - only available for place, id of a super unit in a place hierarchy, see <a class="reference internal" href="#place-hierarchy-import"><span class="std std-ref">Place hierarchy</span></a></p></li>
-<li><p><strong>openatlas_parent_id</strong> - only available for place, id of a super unit existing in OpenAtlas, see <a class="reference internal" href="#place-hierarchy-import"><span class="std std-ref">Place hierarchy</span></a></p></li>
-<li><p><strong>openatlas_class</strong> - only available for place and only used with <strong>parent_id</strong>, see <a class="reference internal" href="#place-hierarchy-import"><span class="std std-ref">Place hierarchy</span></a></p></li>
+<li><p><strong>reference_system_*</strong> - used for linking data to already existing external
+reference systems in the database, see <a class="reference internal" href="#reference-systems-import"><span class="std std-ref">External reference systems</span></a></p></li>
+<li><p><strong>administrative_unit</strong> - only available for places, ID of existing
+administrative unit</p></li>
+<li><p><strong>historical_place</strong> - only available for places, ID of existing
+historical place</p></li>
+<li><p><strong>parent_id</strong> - only available for place, ID of a super unit in a place
+hierarchy, see <a class="reference internal" href="#place-hierarchy-import"><span class="std std-ref">Place hierarchy</span></a></p></li>
+<li><p><strong>openatlas_parent_id</strong> - only available for place, ID of a super unit
+existing in OpenAtlas, see <a class="reference internal" href="#place-hierarchy-import"><span class="std std-ref">Place hierarchy</span></a></p></li>
+<li><p><strong>openatlas_class</strong> - only available for place and only used with
+<strong>parent_id</strong>, see <a class="reference internal" href="#place-hierarchy-import"><span class="std std-ref">Place hierarchy</span></a></p></li>
 </ul>
 <section id="alias">
 <span id="alias-import"></span><h3>Alias<a class="headerlink" href="#alias" title="Permalink to this heading"></a></h3>
-<p><a class="reference internal" href="../ui/alias.html"><span class="doc">Alias</span></a> can be entered as string. Multiple aliases can be separated with semicolon (<strong>;</strong>).
-If an <a class="reference internal" href="../ui/alias.html"><span class="doc">Alias</span></a> contains a comma (<strong>,</strong>) please surround the whole filed with double quotes(<strong>”</strong>)</p>
+<p><a class="reference internal" href="../ui/alias.html"><span class="doc">Alias</span></a> can be entered as string. Multiple aliases can be separated
+by semicolon (;). If an <a class="reference internal" href="../ui/alias.html"><span class="doc">Alias</span></a> contains a comma (,) please
+surround the whole string with double quotes(<strong>”</strong>).</p>
 </section>
 <section id="dates">
 <span id="dates-import"></span><h3>Dates<a class="headerlink" href="#dates" title="Permalink to this heading"></a></h3>
-<p>Dates can be entered in the format <strong>YYYY-MM-DD</strong> in the fields <strong>begin_from</strong> and <strong>end_from</strong>.
-You can also use time spans in combinations with the fields <strong>begin_to</strong> and <strong>end_to</strong>,
-see: <a class="reference internal" href="../ui/date.html"><span class="doc">Date</span></a></p>
+<p>Dates can be entered in the format <strong>YYYY-MM-DD</strong>. Fill out the <strong>begin_from</strong>
+and <strong>end_from</strong> field for a known timeframe. For a timespan you can use
+<strong>begin_to</strong> and <strong>end_to</strong> in combination with <strong>begin_from</strong>
+and <strong>end_from</strong>. For more information see: <a class="reference internal" href="../ui/date.html"><span class="doc">Date</span></a>.</p>
+<p>Keep in mind:</p>
 <ul class="simple">
-<li><p>If the date format is incorrect, they will be displayed in red and won’t be imported</p></li>
-<li><p>Missing values for time spans will be discarded silently, e.g. a valid value in <strong>begin_to</strong>, but an empty value in <strong>begin_from</strong></p></li>
-<li><p>There are no advanced checks between dates, e.g. end dates can be before begin dates. You should check them after the import at <a class="reference internal" href="data_integrity_checks.html"><span class="doc">Data integrity checks</span></a></p></li>
+<li><p>if the date format is incorrect, it will be displayed in red and won’t be
+imported</p></li>
+<li><p>if the required fields are missing data (<strong>begin_from</strong>
+and/or <strong>end_from</strong>), values entered in the other fields (<strong>begin_to</strong> and
+<strong>end_to</strong>) will be lost without further warning</p></li>
+<li><p>There are no advanced checks for dates, so end dates can start before
+begin dates. Check validity after the importing process; for more
+information see <a class="reference internal" href="data_integrity_checks.html"><span class="doc">Data integrity checks</span></a></p></li>
 </ul>
 </section>
 <section id="types">
 <span id="types-import"></span><h3>Types<a class="headerlink" href="#types" title="Permalink to this heading"></a></h3>
-<p>It is possible to link entities to <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> at the import which can be very useful e.g. if you have
-a custom type <strong>Case studies</strong> to link them all in one go.</p>
+<p>It is possible to link entities to one or multiple <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a>. This
+can be useful for example when you use a custom type <strong>Case studies</strong> you
+can link all of the imported data to this.</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> ids can be entered at the column <strong>type_ids</strong></p></li>
-<li><p>You can enter multiple separated with a space</p></li>
-<li><p>The id of a <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> can be looked up at the detail view of a <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a></p></li>
+<li><p><a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> IDs can be entered in the column <strong>type_ids</strong></p></li>
+<li><p>you can enter multiple IDs, separated by a space</p></li>
+<li><p>the ID of a <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> can be found at the detail view of the
+specific <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> in your OpenAtlas instance</p></li>
 </ul>
 </section>
 <section id="value-types">
 <span id="value-types-import"></span><h3>Value types<a class="headerlink" href="#value-types" title="Permalink to this heading"></a></h3>
-<p>It is possible to link entities to value <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> at the import.</p>
+<p>It is possible to link entities to one or multiple value <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a>
+when importing.</p>
 <ul class="simple">
-<li><p>Value <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> can be entered at the column <strong>value_types</strong></p></li>
-<li><p>Type id and value are separated with a semicolon (<strong>;</strong>), e.g. 1234;-13.65</p></li>
-<li><p>Value <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> need always a value</p></li>
-<li><p>You can enter multiple separated with a space</p></li>
-<li><p>The id of a value <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> can be looked up at the detail view of a value <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a></p></li>
+<li><p>a Value <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> can be entered via the <strong>value_types</strong> column</p></li>
+<li><p>type ID and corresponding value are separated by a semicolon (<strong>;</strong>), e.g.
+1234;-13.65</p></li>
+<li><p>for each value <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> a value is required</p></li>
+<li><p>multiple value type-value pairs are separated by a space</p></li>
+<li><p>The ID of a value <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> can be found at the detail view of a
+specific value <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> in your OpenAtlas instance</p></li>
 </ul>
 </section>
 <section id="references">
 <span id="references-import"></span><h3>References<a class="headerlink" href="#references" title="Permalink to this heading"></a></h3>
-<p>It is possible to link existing <a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a> to imported entities.</p>
+<p>The imported data can be linked to an already existing
+<a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a>.</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a> ID and pages are separated with a semicolon (<strong>;</strong>), e.g. 1234;56-78</p></li>
-<li><p>To link <a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a> without page number, just add the ID without semicolon (<strong>;</strong>)</p></li>
-<li><p>You can enter multiple <a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a> separated with a space, e.g. 1234;56-78 5678</p></li>
-<li><p>The ID of a <a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a> can be looked up at the detail view of the entity</p></li>
+<li><p><a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a> ID and pages are separated by a semicolon
+(<strong>;</strong>), e.g. 1234;56-78</p></li>
+<li><p>to link a <a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a> with multiple page numbers, wrap the
+whole cell in quotation marks, e.g. “1234;IV, 56-78 542;34-23 66;”</p></li>
+<li><p>to link a <a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a> without page numbers, just add the ID
+and a semicolon (<strong>;</strong>) without further information</p></li>
+<li><p>enter multiple <a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a> separated by a space, e.g. 1234;
+56-78 5678;</p></li>
+<li><p>the ID of each <a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a> can be found at the detail view of
+said reference in your OpenAtlas instance</p></li>
 </ul>
 </section>
 <section id="wkt-coordinates">
 <span id="wkt-import"></span><h3>WKT coordinates<a class="headerlink" href="#wkt-coordinates" title="Permalink to this heading"></a></h3>
-<p>For places and artifact (multi)point, (multi)polygon, (multi)linestring coordinates or
-GeometricCollection can be imported. Keep in mind to use
-the <a class="reference external" href="https://gisgeography.com/wgs84-world-geodetic-system/">WGS84</a> geodetic system (EPSG 4326).
+<p>For places and artifact (multi)point, (multi)polygon, and (multi)linestring
+coordinates or GeometricCollection can be imported. Keep in mind to use
+the <a class="reference external" href="https://gisgeography.com/wgs84-world-geodetic-system/">WGS84</a>
+geodetic system (EPSG 4326).
 Coordinates will be imported as <a class="reference external" href="https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry">WKT</a>.
-It is only possible to import one geometry for each entry. Since the WKT format uses commas (<strong>,</strong>),
-surround the coordinates with double quotes (<strong>”</strong>)</p>
+It is only possible to import one geometry for each entry. Since the WKT
+format uses commas, surround tall coordinates with double quotes (“)</p>
 <dl class="simple">
 <dt>Example:</dt><dd><p>“LINESTRING (12.458533781141528 41.922205268362234, 12.53062334955289 41.917606998887024, 12.52169797441624 41.888476931243254)”</p>
 </dd>
@@ -245,12 +286,13 @@ surround the coordinates with double quotes (<strong>”</strong>)</p>
 <section id="external-reference-systems">
 <span id="reference-systems-import"></span><h3>External reference systems<a class="headerlink" href="#external-reference-systems" title="Permalink to this heading"></a></h3>
 <p>It is possible to link the imported entity to an existing <a class="reference internal" href="../entity/reference_system.html"><span class="doc">Reference System</span></a>.
-In this case, the header has to be named <strong>reference_system_*</strong> with the <em>name</em> of the
-external <a class="reference internal" href="../entity/reference_system.html"><span class="doc">Reference System</span></a> appended, e.g. <strong>reference_system_wikidata</strong>.
-If spaces occur in the name, please substitute them with underscore (<strong>_</strong>), e.g.
-<strong>reference_system_getty_aat</strong>.</p>
-<p>The entry consist of two values, separated by a semicolon (<strong>;</strong>). The first value is
-the identifier, e.g. Q54123, the second value is the match type (<strong>close_match</strong> or <strong>exact_match</strong>)</p>
+Named the coulmn <strong>reference_system_*</strong> with the <em>name</em> of the external
+<a class="reference internal" href="../entity/reference_system.html"><span class="doc">Reference System</span></a> appended, e.g. <strong>reference_system_wikidata</strong>.
+If spaces occur in the name, please substitute them with underscore (_),
+e.g. <strong>reference_system_getty_aat</strong>.
+Each entry consist of two values, separated by a semicolon (;). The first
+value is the identifier, e.g. Q54123, the second value is the match type
+(<strong>close_match</strong> or <strong>exact_match</strong>)</p>
 <dl class="simple">
 <dt>Example:</dt><dd><p>Q54123;close_match</p>
 </dd>
@@ -258,36 +300,46 @@ the identifier, e.g. Q54123, the second value is the match type (<strong>close_m
 </section>
 <section id="place-hierarchy">
 <span id="place-hierarchy-import"></span><h3>Place hierarchy<a class="headerlink" href="#place-hierarchy" title="Permalink to this heading"></a></h3>
-<p>The <strong>parent_id</strong> or <strong>openatlas_parent_id</strong> is used to generate a <a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a> hierarchy together
+<p>Use the <strong>parent_id</strong> or <strong>openatlas_parent_id</strong> to generate a
+<a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a> hierarchy together
 with <a class="reference internal" href="../entity/feature.html"><span class="doc">Feature</span></a>, <a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>,
 <a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a>, and <a class="reference internal" href="../entity/human_remains.html"><span class="doc">Human remains</span></a>.
-The <strong>parent_id</strong> has to be an <strong>origin_id</strong> of a row in the <strong>current</strong> import file.
-The <strong>openatlas_parent_id</strong> has to be an <strong>existing</strong> OpenAtlas entity ID with the correct class.
-To declare, which entry has a specific class, the <strong>openatlas_class</strong> column is used.
-Here the following classes can be entered: <a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a>, <a class="reference internal" href="../entity/feature.html"><span class="doc">Feature</span></a>,
-<a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>, <a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a>, and
-<a class="reference internal" href="../entity/human_remains.html"><span class="doc">Human remains</span></a>. This is case-insensitive.
+The <strong>parent_id</strong> has to be an <strong>origin_id</strong> of a row in the <strong>current</strong>
+import file.
+The <strong>openatlas_parent_id</strong> has to be an <strong>existing</strong> OpenAtlas entity ID
+with the correct class.
+To declare, which entry has a specific class, the <strong>openatlas_class</strong> column
+is used. Here the following classes can be entered: <a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a>,
+<a class="reference internal" href="../entity/feature.html"><span class="doc">Feature</span></a>, <a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>,
+<a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a>, and <a class="reference internal" href="../entity/human_remains.html"><span class="doc">Human remains</span></a>. This is
+case-insensitive.
 For an example, please see: <a class="reference download internal" download="" href="../_downloads/b05023d4f028f7f863c2384f2569e5f0/example_place_hierarchy.csv"><code class="xref download docutils literal notranslate"><span class="pre">example_place_hierarchy.csv</span></code></a></p>
-<p>For questions about the correct place hierarchy structure, please see the
-<strong>archaeological sub units</strong> at the OpenAtlas <a class="reference internal" href="../model/index.html"><span class="doc">Model</span></a>.</p>
+<p>For questions about the correct place hierarchy structure, please have a
+look at <strong>archaeological sub units</strong> at the OpenAtlas <a class="reference internal" href="../model/index.html"><span class="doc">Model</span></a>.</p>
 </section>
 </section>
 <section id="import-options">
 <h2>Import options<a class="headerlink" href="#import-options" title="Permalink to this heading"></a></h2>
 <ul class="simple">
-<li><p><strong>File</strong> - select the file you’ll want to import</p></li>
-<li><p><strong>Preview</strong> - if this option is selected, nothing will be imported and you see a preview</p></li>
-<li><p><strong>Check for duplicates</strong> - if selected, the chosen class e.g. person will be searched for already existing names. The search is not case-sensitive e.g. “King Arthur” would be found even it is spelled “KiNg ArThUr”. If duplicates are found a warning is printed but this doesn’t stop the import so check it before with the preview.</p></li>
+<li><p><strong>File</strong> - select a file you’ll want to import</p></li>
+<li><p><strong>Preview</strong> - if this option is selected, nothing will be imported and you
+see a preview</p></li>
+<li><p><strong>Check for duplicates</strong> - if selected, the chosen class e.g. person will
+be searched for already existing names. The search is not case-sensitive
+e.g. “King Arthur” would be found even it is spelled “KiNg ArThUr”. If
+duplicates are found, a warning is printed but doesn’t stop the import</p></li>
 </ul>
 </section>
 <section id="after-the-import">
 <h2>After the import<a class="headerlink" href="#after-the-import" title="Permalink to this heading"></a></h2>
-<p>When the import went through, you’ll see a summary which data was imported (like the preview).
-Also, you can browse the projects to see which imported entities are associated with them.
-If you enabled the advanced layout you can also see in the detail view of an entity from which
-project it was imported, which user did the import and the origin_id value.</p>
-<p>Although the script makes a lot of validation checks it’s always a good idea to run
-<a class="reference internal" href="data_integrity_checks.html"><span class="doc">Data integrity checks</span></a> after each import.</p>
+<p>When the import went through, a summary which data was imported is shown.
+You can also browse the projects to see which imported entities are associated
+with them.
+If advanced layout is enabled, the detail view of an entity shows from which
+project the entity was imported, which user did the import and the
+origin_id value.</p>
+<p><strong>It is always a good idea to run :doc:`/admin/data_integrity_checks` after
+each import.</strong></p>
 </section>
 </section>
 

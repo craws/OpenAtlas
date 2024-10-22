@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.5a",
+    "version": "0.4.5b",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -1210,7 +1210,7 @@
         }
       }
     },
-    "/display/{entityId}": {
+    "/display/{fileId}": {
       "get": {
         "tags": [
           "Image Endpoints"
@@ -1219,7 +1219,7 @@
         "operationId": "DisplayImage",
         "parameters": [
           {
-            "$ref": "#/components/parameters/entityId"
+            "$ref": "#/components/parameters/fileId"
           },
           {
             "in": "query",
@@ -1258,7 +1258,7 @@
         }
       }
     },
-    "/iiif_manifest/{version}/{entityId}": {
+    "/iiif_manifest/{version}/{fileId}": {
       "get": {
         "tags": [
           "Image Endpoints"
@@ -1277,7 +1277,7 @@
             }
           },
           {
-            "$ref": "#/components/parameters/entityId"
+            "$ref": "#/components/parameters/fileId"
           },
           {
             "$ref": "#/components/parameters/url"
@@ -1348,6 +1348,16 @@
         "name": "entityId",
         "in": "path",
         "description": "Specific entity ID",
+        "required": true,
+        "schema": {
+          "type": "integer"
+        },
+        "example": 40
+      },
+      "fileId": {
+        "name": "fileId",
+        "in": "path",
+        "description": "Specific ID of a file entity.",
         "required": true,
         "schema": {
           "type": "integer"

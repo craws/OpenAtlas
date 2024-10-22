@@ -34,7 +34,7 @@ from openatlas.forms.field import SubmitField
 from openatlas.models.entity import Entity
 from openatlas.models.imports import (
     Project, check_duplicates, check_single_type_duplicates, check_type_id,
-    get_origin_ids, import_data_)
+    clean_reference_pages, get_origin_ids, import_data_)
 
 _('invalid columns')
 _('possible duplicates')
@@ -50,7 +50,6 @@ _('invalid value type ids')
 _('invalid value type values')
 _('invalid coordinates')
 _('invalid OpenAtlas class')
-_('invalid references')
 _('invalid reference id')
 _('empty names')
 _('empty ids')
@@ -490,12 +489,8 @@ def check_cell_value(
             value = ' '.join(value_types)
         case 'references' if value:
             references = []
-            for reference in str(value).split():
+            for reference in clean_reference_pages(str(value)):
                 values = str(reference).split(';')
-                if len(values) > 2:
-                    references.append(error_span(reference))
-                    checks.set_warning('invalid_references', id_)
-                    continue
                 if not values[0].isdigit():
                     values[0] = error_span(values[0])
                     checks.set_warning('invalid_reference_id', id_)

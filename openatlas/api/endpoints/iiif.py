@@ -10,8 +10,10 @@ from flask_restful import Resource
 
 from openatlas.api.endpoints.parser import Parser
 from openatlas.api.resources.api_entity import ApiEntity
+from openatlas.api.resources.error import DisplayFileNotFoundError
 from openatlas.api.resources.parser import iiif
-from openatlas.api.resources.util import get_license_url, get_license_name
+from openatlas.api.resources.util import get_license_name, get_license_url
+from openatlas.display.util import check_iiif_file_exist
 from openatlas.models.annotation import AnnotationImage
 from openatlas.models.entity import Entity
 
@@ -232,11 +234,13 @@ class IIIFManifest(Resource):
     @staticmethod
     def get(version: int, id_: int) -> Response:
         operation = getattr(IIIFManifest, f'get_manifest_version_{version}')
-        return jsonify(operation(id_))
+        return jsonify(operation(id_, Parser(iiif.parse_args())))
 
     @staticmethod
-    def get_manifest_version_2(id_: int) -> dict[str, Any]:
+    def get_manifest_version_2(id_: int, parser: Parser) -> dict[str, Any]:
         entity = ApiEntity.get_by_id(id_, types=True)
+        if entity.class_.view != 'file' and not check_iiif_file_exist(id_):
+            raise DisplayFileNotFoundError
         license_ = get_license_name(entity)
         if entity.license_holder:
             license_ = f'{license_}, {entity.license_holder}'
@@ -260,13 +264,13 @@ class IIIFManifest(Resource):
             "license": get_license_url(entity),
             "logo": get_logo(),
             "sequences": [
-                IIIFSequence.build_sequence(
-                    get_metadata(entity),
-                    Parser(iiif.parse_args()))],
+                IIIFSequence.build_sequence(get_metadata(entity), parser)],
             "structures": []}
 
 
 def get_metadata(entity: Entity) -> dict[str, Any]:
+    if entity.class_.view != 'file' and not check_iiif_file_exist(entity.id):
+        raise DisplayFileNotFoundError
     ext = '.tiff' if g.settings['iiif_conversion'] else entity.get_file_ext()
     image_url = f"{g.settings['iiif_url']}{entity.id}{ext}"
     req = requests.get(f"{image_url}/info.json", timeout=30)
