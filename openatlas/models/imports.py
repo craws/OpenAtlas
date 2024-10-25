@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from collections import defaultdict
 from typing import Any, Optional
 
@@ -161,14 +162,14 @@ def link_types(entity: Entity, row: dict[str, Any], class_: str) -> None:
 
 def link_references(entity: Entity, row: dict[str, Any], class_: str) -> None:
     if data := row.get('references'):
-        for references in str(data).split():
+        for references in clean_reference_pages(str(data)):
             reference = references.split(';')
             if len(reference) <= 2 and reference[0].isdigit():
                 try:
                     ref_entity = ApiEntity.get_by_id(int(reference[0]))
                 except EntityDoesNotExistError:
                     continue
-                page = reference[1] if len(reference) > 1 else None
+                page = reference[1] or None
                 ref_entity.link('P67', entity, page)
     match_types = get_match_types()
     systems = list(set(i for i in row if i.startswith('reference_system_')))
@@ -214,3 +215,8 @@ def insert_gis(entity: Entity, row: dict[str, Any], project: Project) -> None:
                     Gis.insert_wkt(entity, location, project, poly)
             else:
                 Gis.insert_wkt(entity, location, project, wkt_)
+
+
+def clean_reference_pages(value: str) -> list[str]:
+    matches =  re.findall(r'([a-zA-Z\d]*;[^;]*?(?=[a-zA-Z\d]*;|$))', value)
+    return [match.strip() for match in matches]

@@ -5,7 +5,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>API &mdash; OpenAtlas 8.7.0 documentation</title>
+  <title>API &mdash; OpenAtlas 8.8.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
@@ -35,7 +35,7 @@
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                8.7.0
+                8.8.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -113,13 +113,28 @@
 <div class="toctree-wrapper compound">
 </div>
 <p>Description: <a class="reference internal" href="../technical/api.html"><span class="doc">API</span></a></p>
-<ul class="simple">
-<li><p><strong>Public</strong> (default=off). If you turn it on the API and linked files with a license can be accessed even without logging in. This might be useful if you want the data open anyway to allow other systems to use it.</p></li>
+<ul>
+<li><p><strong>Public</strong> (default=off)</p>
+<blockquote>
+<div><ul>
+<li><p>If turned off the API and files with a license can still be accessed by</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>A browser used b a logged in user</p></li>
+<li><p>If the IP of the request-computer is on the <strong>IP Whitelist</strong></p></li>
 </ul>
-<p><strong>Note</strong>: The API and files linked to a license can still be requested from:</p>
-<ul class="simple">
-<li><p>a browser, where a user is logged in</p></li>
-<li><p>if the IP of the request-computer is on the <strong>IP Whitelist</strong></p></li>
+</div></blockquote>
+</li>
+<li><dl class="simple">
+<dt>If turned on the API and linked files with a</dt><dd><p>license can be accessed without being logged in. This might be useful
+if you want to allow other systems to use your data without
+restrictions.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</li>
 </ul>
 </section>
 
