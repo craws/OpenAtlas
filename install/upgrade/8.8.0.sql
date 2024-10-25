@@ -3,7 +3,7 @@ BEGIN;
 -- Raise database version
 UPDATE web.settings SET value = '8.8.0' WHERE name = 'database_version';
 
--- #2357: Fix possible wrong direction for references with files
+-- #2357: Fix possible wrong direction for reference links to files
 UPDATE model.link
 SET (domain_id, range_id) = (range_id, domain_id)
 WHERE id IN (
