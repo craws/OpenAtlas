@@ -518,7 +518,7 @@ def check_cell_value(
                 value = '' if str(value) == 'NaT' else error_span(value)
         case 'administrative_unit' | 'historical_place' if value:
             if ((not str(value).isdigit() or int(value) not in g.types) or
-                    g.types[g.types[int(value)].root[-1]].name not in [
+                    g.types[g.types[int(value)].root[0]].name not in [
                         'Administrative unit', 'Historical place']):
                 value = error_span(value)
                 checks.set_warning('invalid_administrative_units', id_)

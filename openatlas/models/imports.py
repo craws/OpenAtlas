@@ -71,7 +71,7 @@ def check_type_id(type_id: str, class_: str) -> bool:
         return False
     if not g.types[int(type_id)].root:
         return False
-    root_type = g.types[g.types[int(type_id)].root[-1]]
+    root_type = g.types[g.types[int(type_id)].root[0]]
     if class_ not in root_type.classes:
         return False
     if root_type.name in ['Administrative unit', 'Historical place']:
@@ -82,9 +82,9 @@ def check_type_id(type_id: str, class_: str) -> bool:
 def check_single_type_duplicates(type_ids: list[str]) -> list[str]:
     single_types = defaultdict(list)
     for type_id in type_ids:
-        if not g.types[int(type_id)].multiple:
+        if not g.types[g.types[int(type_id)].root[0]].multiple:
             single_types[
-                g.types[g.types[int(type_id)].root[-1]].name].append(type_id)
+                g.types[g.types[int(type_id)].root[0]].name].append(type_id)
     single_type_ids = []
     for value in single_types.values():
         if len(value) > 1:
@@ -192,12 +192,12 @@ def insert_gis(entity: Entity, row: dict[str, Any], project: Project) -> None:
     entity.link('P53', location)
     if data := row.get('administrative_unit'):
         if ((str(data).isdigit() and int(data) in g.types) and
-                g.types[g.types[int(data)].root[-1]].name in [
+                g.types[g.types[int(data)].root[0]].name in [
                     'Administrative unit']):
             location.link('P89', g.types[int(data)])
     if data := row.get('historical_place'):
         if ((str(data).isdigit() and int(data) in g.types) and
-                g.types[g.types[int(data)].root[-1]].name in [
+                g.types[g.types[int(data)].root[0]].name in [
                     'Historical place']):
             location.link('P89', g.types[int(data)])
     if coordinates := row.get('wkt'):
