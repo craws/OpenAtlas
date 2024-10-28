@@ -19,7 +19,7 @@ Lists containing the following fields can be imported currently:
 * Reference systems
 * Administrative unit
 * Historical place
-* origin_id
+* Origin IDs
 * Place hierarchy
 
 Preparation
@@ -68,7 +68,7 @@ imported and an error message will be displayed
 * **alias** - only available for person, group and place, see
   :ref:`Alias import`
 * **description** - a description can be provided
-* **origin_id** - this field has to be **unique per project**; if you have
+* **id** - this field has to be **unique per project**; if you have
   same IDs like a person and place with id = 1, you can prefix them in the
   document e.g. person_1, place_1 before importing
 * **begin_from** - used for dates, see :ref:`Dates import`
@@ -207,7 +207,7 @@ Use the **parent_id** or **openatlas_parent_id** to generate a
 :doc:`/entity/place` hierarchy together
 with :doc:`/entity/feature`, :doc:`/entity/stratigraphic_unit`,
 :doc:`/entity/artifact`, and :doc:`/entity/human_remains`.
-The **parent_id** has to be an **origin_id** of a row in the **current**
+The **parent_id** has to be an origin **id** of a row in the **current**
 import file.
 The **openatlas_parent_id** has to be an **existing** OpenAtlas entity ID
 with the correct class.
@@ -238,7 +238,7 @@ You can also browse the projects to see which imported entities are associated
 with them.
 If advanced layout is enabled, the detail view of an entity shows from which
 project the entity was imported, which user did the import and the
-origin_id value.
+origin ID value.
 
 **It is always a good idea to run :doc:`/admin/data_integrity_checks` after
 each import.**
