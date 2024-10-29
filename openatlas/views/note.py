@@ -82,7 +82,8 @@ def note_insert(entity_id: int) -> str | Response:
         return redirect(f"{url_for('view', id_=entity.id)}#tab-note")
     return render_template(
         'content.html',
-        content=display_form(form),
+        content='<p>' + _('notes info') + '</p>' +
+        display_form(form, manual_page='tools/notes'),
         entity=entity,
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],

@@ -3,70 +3,79 @@ Data integrity checks
 
 .. toctree::
 
-The quality of data is very important to us. Although ultimately the data
-responsibility lies with editors and project managers we take great care to
-avoid entering of inconsistent data on a technical level, e.g. with the user
-interface it is not possible to enter begin dates which are later than end
-dates.
+OpenAtlas puts great emphasis on the data quality. Even if the
+responsibility for the quality of the information entered ultimately lies
+with the individual projects, avoidance of inconsistent on a technical level
+are important during the development of the application. It is therefore not
+possible e.g. to enter the start date of an event after the end date of the
+same event
 
-Nevertheless mistakes can happen, not only on the application level but also
-e.g. when importing data from other projects or deleting files outside of the
-application. Because data integrity is important for the quality of research we
-implemented functions to check possible inconsistencies which are described in
-detail below.
+Nevertheless mistakes happen, not only on the application level but also
+when importing data from other projects or deleting files outside of the
+application, etc. Therefore, functions to check possible inconsistencies were
+implemented and are described in detail below.
 
 Orphans
 -------
 
 Orphans
 *******
-In this tab entries like dates which are not linked are shown. They could be
-artifacts from imports or bugs and can be deleted. If they seem to appear
-regularly again (without imports or known bugs) please report that issue.
+Here unlinked data are shown. These so called orphans could be artifacts
+from imports or results of bugs and can be deleted. If orphans seem to appear
+regularly (without data imports or known bugs) please report this issue to the
+OpenAtlas team e.g. via the
+`OpenAtlas redmine <https://redmine.openatlas.eu/>`_.
+
 
 Entities without links
 **********************
-Entries shown have no relation to other entities. That could be ok but maybe
-they are artifacts or were forgotten to link.
+Entries shown have no relation to other entities. Of course that can be
+part of the normal data set, but should be check if correct. An unlinked
+entity could be artifacts of an import or were not linked by accident.
 
 Type
 ****
-These types were created but have no sub types or associated data. Maybe they
-originate from the first install or were never used.
+The types listed here were created but have no sub types or associated data.
+They might have been pre-installed before teams have started entering
+information or were created and then never used.
 
 Missing files
 *************
-Here are listed file entities which have no corresponding file, most likely
-because the file itself doesn't exist anymore.
+File entities without a corresponding file are listed here. This is (most
+likely) caused by the deletion of files from the dataset.
 
 Orphaned files
 **************
-Files that have no corresponding entity are listed here.
+Files without a corresponding file entity are listed here.
 
 Orphaned IIIF files
 *******************
-IIIF files that have no corresponding entity are listed here.
+IIIF files without a corresponding entity are listed here.
 
 Orphaned annotations
 ********************
-Annotations that are linked to an entity, but where the file and the entity
-doesn't have a connection are listed here. There are three options to proceed:
+Annotations that are linked to an entity, but file and entity themselves are
+not linked are listed here. There are three options to proceed:
 
-* *Relink entity*: Add a link between file and entity
+* *Relink entity*: Adds a link between file and entity
 * *Remove entity*: Removes the entity from the annotation
 * *Delete annotation*: Deletes the whole annotation
 
 Orphaned subunits
 *****************
-Subunits that are missing a connection to the level above. E.g. a feature
-without a connection to a place.
+Subunits without a link to the level above, e.g. a feature
+with no connection to a place.
 
 Circular dependencies
 *********************
-A check if an entity is linked to itself. This could happen e.g. if a person is
-married to herself or a type has itself as super. It shouldn't be possible to
-create circular dependencies within the application. Nevertheless it's a useful
-check for e.g. if data is imported from other systems.
+It can be checked if an entity is linked to itself. This could happen, for
+example, if a person has been entered as is married to themself or a type
+has itself as super. It shouldn't be possible to create circular
+dependencies within the application but nevertheless it's useful to
+check the database as this can happen through data imports or bugs. If you
+find circular dependencies in your dataset regularly with a previous report
+or known bugs, please report the issue e.g. via the
+`OpenAtlas redmine <https://redmine.openatlas.eu/>`_.
 
 Dates
 -----
@@ -74,64 +83,68 @@ In this view various results of invalid or inconsistent dates are shown.
 
 Invalid dates
 *************
-Invalid date combinations are shown, e.g. begin dates which are
-later than end dates. These issues should be fixed because otherwise the user
+In this tab invalid date combinations are shown, for example dates of begins
+That are later than end dates. These issues should be fixed, otherwise the user
 interface won't allow to update these entities.
 
 Invalid link dates
 ******************
-Like with "invalid dates" issues with these should be solved as soon as
+Similar to "invalid dates", invalid link dates should be fixed as soon as
 possible.
 
 Invalid involvement dates
 *************************
-Incompatible dates at involvement are shown. E.g. a person participated at an
-event longer than the event took place.
+Incompatible dates for involvements are shown. Example: A person participated
+in an event for longer than the event lasted.
 
 Invalid preceding dates
 ***********************
-Incompatible dates for chained events are shown. E.g. a preceding event started
-after the succeeding event.
+Here, incompatible dates for chained events are listed. Example: A
+preceding event starts after the succeeding event.
 
 Invalid sub dates
 *****************
-Incompatible dates for hierarchical events are shown. E.g. a sub event began
-before the super event began.
+This tab shows incompatible dates for hierarchical events. Example: A
+sub event begins before the super event began.
 
 Check links
 -----------
-With this function every link will be checked for CIDOC validity. Depending on
-the amount of data this could take some time. Data entered with the OpenAtlas
-user interface should always be CIDOC valid but in case of e.g. imported
-data this check should be used afterwards. If invalid links are found they
-should be dealt with outside the application.
+Here, every link will be checked for its CIDOC validity. Depending on the
+amount of data this can take some time. While data entered by using the
+OpenAtlas user interface should always be CIDOC conform, imported
+data should be check after import. If invalid links are
+found the problem should be resolved in the original data source.
 
 Check link duplicates
 ---------------------
-There are actually two checks:
+Two tests are combined:
 
-The first one checks for duplicate links which are identically and can be
-safely deleted when clicking the *Delete link duplicates* button.
+The first test checks for duplicate links that are identically. These links
+can be afterwards by clicking the *Delete link duplicates* button.
 
-In case the first test found no duplicate links it will be checked for entities
-connected multiple times two a type which is defined for single use. E.g. a
-place has the type castle and city. In this case you would only see one in the
-user interface and the other one would get deleted in case anybody updates the
-entry. Here you have the option to look at these and remove the wrong ones
-clicking on the **Remove** link beside the entries in the last column.
+In case the first test found no duplicate links the dataset will be checked
+for entities that were connected to a single use type multiple times.
+Example: A place has been linked to types castle and city. Only one of the
+types will be displayed in the user interface, the other one would be
+deleted automatically if the entry is updated by anyone.
+You are then given the option to have a look at the links and to remove the
+wrong ones by clicking the **Remove** link next to the entries in the
+last column.
 
-Both checks shouldn't find anything wrong with data entered with the
-application but nevertheless it could happen because of imports or unknown bugs.
+By using the OpenAtlas interface link duplicates should be avoided
+automatically but can happen due to data import or bugs. If this is a
+reoccuring issue for your dataset, please report e.g. via the
+`OpenAtlas redmine <https://redmine.openatlas.eu/>`_.
 
 Check similar names
 -------------------
-Here you can search for similar names. Depending on selection and data volume
-this might take some time.
+This test will search for similar entity names. Depending on selection
+and data volume this might take some time. The following options are given:
 
-* **Classes** - select the class which you want to search for similar names
+* **Classes** - select the class you want to search for similar names
 * **Ratio** - select how similar the names should be, 100 is the default and
-  means absolute identical
+  means 100% identical
 
 The function uses the `fuzzywuzzy <https://pypi.org/project/fuzzywuzzy/>`_
-package is used which in turn uses the
+package which uses the
 `Levenshtein Distance <https://en.wikipedia.org/wiki/Levenshtein_distance>`_.
