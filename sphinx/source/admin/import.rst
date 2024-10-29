@@ -63,14 +63,15 @@ Possible import fields
 Column headers can contain the following titles. Other titles won't be
 imported and an error message will be displayed
 
+* **id** - this field has to be **unique per project**; if you have
+  same IDs like a person and place with id = 1, you can prefix them in the
+  document e.g. person_1, place_1 before importing. Please use only characters,
+  numbers, underscore (_) or hyphen (-).
 * **name** - required, an error will be displayed if name; the data will not
   get imported if a name is missing
 * **alias** - only available for person, group and place, see
   :ref:`Alias import`
 * **description** - a description can be provided
-* **id** - this field has to be **unique per project**; if you have
-  same IDs like a person and place with id = 1, you can prefix them in the
-  document e.g. person_1, place_1 before importing
 * **begin_from** - used for dates, see :ref:`Dates import`
 * **begin_to** - used for dates, see :ref:`Dates import`
 * **end_from** - used for dates, see :ref:`Dates import`

@@ -62,6 +62,10 @@ def get_origin_ids(project: Project, origin_ids: list[str]) -> list[str]:
     return db.check_origin_ids(project.id, origin_ids)
 
 
+def get_id_from_origin_id(project: Project, origin_id: str) -> str:
+    return db.get_id_from_origin_id(project.id, origin_id)
+
+
 def check_duplicates(class_: str, names: list[str]) -> list[str]:
     return db.check_duplicates(class_, names)
 
@@ -110,7 +114,7 @@ def import_data_(project: Project, class_: str, data: list[Any]) -> None:
             insert_alias(entity, row)
         insert_dates(entity, row)
         link_types(entity, row, class_)
-        link_references(entity, row, class_)
+        link_references(entity, row, class_, project)
         if class_ in g.view_class_mapping['place'] \
                 + g.view_class_mapping['artifact']:
             insert_gis(entity, row, project)
@@ -160,18 +164,31 @@ def link_types(entity: Entity, row: dict[str, Any], class_: str) -> None:
                 entity.link('P2', g.types[int(value_type[0])], value_type[1])
 
 
-def link_references(entity: Entity, row: dict[str, Any], class_: str) -> None:
-    if data := row.get('reference_ids'):
-        for references in clean_reference_pages(str(data)):
+def link_references(
+        entity: Entity,
+        row: dict[str, Any],
+        class_: str,
+        project: Project) -> None:
+    if ref_ids := row.get('reference_ids'):
+        for references in clean_reference_pages(str(ref_ids)):
             reference = references.split(';')
             if len(reference) <= 2 and reference[0].isdigit():
                 try:
                     ref_entity = ApiEntity.get_by_id(int(reference[0]))
-                    print(ref_entity)
                 except EntityDoesNotExistError:
                     continue
                 page = reference[1] or None
                 ref_entity.link('P67', entity, page)
+    if origin_ref_ids := row.get('origin_reference_ids'):
+        for references in clean_reference_pages(str(origin_ref_ids)):
+                reference = references.split(';')
+                if ref_id := get_id_from_origin_id(project, reference[0]):
+                    try:
+                        ref_entity = ApiEntity.get_by_id(int(ref_id))
+                    except EntityDoesNotExistError:
+                        continue
+                    page = reference[1] or None
+                    ref_entity.link('P67', entity, page)
     match_types = get_match_types()
     systems = list(set(i for i in row if i.startswith('reference_system_')))
     for header in systems:
@@ -219,5 +236,5 @@ def insert_gis(entity: Entity, row: dict[str, Any], project: Project) -> None:
 
 
 def clean_reference_pages(value: str) -> list[str]:
-    matches =  re.findall(r'([a-zA-Z\d]*;[^;]*?(?=[a-zA-Z\d]*;|$))', value)
+    matches =  re.findall(r'([\w\-]*;[^;]*?(?=[a-zA-Z\d]*;|$))', value)
     return [match.strip() for match in matches]
