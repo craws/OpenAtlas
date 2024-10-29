@@ -75,6 +75,16 @@ class ExportImportTest(ExportImportTestCase):
                 url_for('import_data', class_='person', project_id=p_id))
             assert b'file *' in rv.data
 
+            with open(self.test_path / 'bibliography.csv', 'rb') as file:
+                rv = self.app.post(
+                    url_for(
+                        'import_data',
+                        class_='bibliography',
+                        project_id=p_id),
+                    data={'file': file, 'duplicate': True},
+                    follow_redirects=True)
+            assert b'OpenAtlas 2024' in rv.data
+
             with open(self.static_path / 'example.csv', 'rb') as file:
                 rv = self.app.post(
                     url_for('import_data', class_='place', project_id=p_id),
@@ -114,7 +124,6 @@ class ExportImportTest(ExportImportTestCase):
             assert b'invalid value type ids' in rv.data
             assert b'invalid value type values' in rv.data
             assert b'invalid reference system' in rv.data
-            assert b'invalid references' in rv.data
             assert b'invalid reference id' in rv.data
             assert b'empty names' in rv.data
             assert b'double IDs in import' in rv.data
@@ -230,8 +239,8 @@ class ExportImportTest(ExportImportTestCase):
             data_frame.at[0, 'id'] = 'new_place_1'
             data_frame.at[1, 'id'] = 'new_place_2'
             data_frame.at[2, 'id'] = 'new_place_3'
-            data_frame.at[0, 'administrative_unit'] = austria.id
-            data_frame.at[0, 'historical_place'] = carantania.id
+            data_frame.at[0, 'administrative_unit_id'] = austria.id
+            data_frame.at[0, 'historical_place_id'] = carantania.id
             type_ids = [
                 boundary_mark.id,
                 infrastructure.id,
@@ -239,7 +248,7 @@ class ExportImportTest(ExportImportTestCase):
                 place_type.id]
             data_frame.at[0, 'type_ids'] = ' '.join(map(str, type_ids))
             data_frame.at[0, 'value_types'] = f'{height.id};42'
-            data_frame.at[0, 'references'] = f'{reference.id};IV'
+            data_frame.at[0, 'reference_ids'] = f'{reference.id};IV'
             data_frame.at[0, 'wkt'] = "POLYGON((16.1203 BLA, 16.606275))"
             data_frame.to_csv(self.test_path / 'example.csv', index=False)
             with open(self.test_path / 'example.csv', 'rb') as file:
@@ -248,6 +257,7 @@ class ExportImportTest(ExportImportTestCase):
                     data={'file': file, 'duplicate': True},
                     follow_redirects=True)
             assert b'single type duplicates' in rv.data
+            assert b'invalid origin reference id' in rv.data
             assert b'Vienna' in rv.data
 
             with open(self.test_path / 'example.csv', 'rb') as file:

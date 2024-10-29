@@ -50,7 +50,7 @@ SESSION_COOKIE_SAMESITE = 'Lax'
 # e.g. PROXIES = {
 #    'http': 'http://someurl.org:8080',
 #    'https': 'http://someurl.org:8080'}
-PROXIES = None
+PROXIES: dict[str, str] = {}
 
 # Table options
 TABLE_ROWS = {10: '10', 25: '25', 50: '50', 100: '100'}
