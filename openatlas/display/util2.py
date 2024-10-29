@@ -164,7 +164,7 @@ def get_backup_file_data() -> dict[str, Any]:
     for file in [
             f for f in path.iterdir()
             if (path / f).is_file() and f.name != '.gitignore']:
-        file_date = datetime.utcfromtimestamp((path / file).stat().st_ctime)
+        file_date = datetime.fromtimestamp((path / file).stat().st_ctime)
         if not latest_file_date or file_date > latest_file_date:
             latest_file = file
             latest_file_date = file_date

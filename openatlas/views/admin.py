@@ -533,7 +533,7 @@ def orphans() -> str:
             tabs['orphaned_files'].table.rows.append([
                 file.stem,
                 convert_size(file.stat().st_size),
-                format_date(datetime.utcfromtimestamp(file.stat().st_ctime)),
+                format_date(datetime.fromtimestamp(file.stat().st_ctime)),
                 file.suffix,
                 link(_('download'), url_for('download', filename=file.name)),
                 link(
@@ -553,8 +553,7 @@ def orphans() -> str:
                 tabs['orphaned_iiif_files'].table.rows.append([
                     file.stem,
                     convert_size(file.stat().st_size),
-                    format_date(
-                        datetime.utcfromtimestamp(file.stat().st_ctime)),
+                    format_date(datetime.fromtimestamp(file.stat().st_ctime)),
                     file.suffix,
                     link(
                         _('delete'),
