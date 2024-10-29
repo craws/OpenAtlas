@@ -181,11 +181,11 @@ def link_references(
                 ref_entity.link('P67', entity, page)
     if origin_ref_ids := row.get('origin_reference_ids'):
         for references in clean_reference_pages(str(origin_ref_ids)):
-                reference = references.split(';')
-                if ref_id := get_id_from_origin_id(project, reference[0]):
-                    ref_entity = ApiEntity.get_by_id(int(ref_id[0]))
-                    page = reference[1] or None
-                    ref_entity.link('P67', entity, page)
+            reference = references.split(';')
+            if ref_id := get_id_from_origin_id(project, reference[0]):
+                ref_entity = ApiEntity.get_by_id(int(ref_id[0]))
+                page = reference[1] or None
+                ref_entity.link('P67', entity, page)
     match_types = get_match_types()
     systems = list(set(i for i in row if i.startswith('reference_system_')))
     for header in systems:
