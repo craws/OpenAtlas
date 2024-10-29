@@ -4,6 +4,8 @@ data:
   POSTGRES_DB: {{ .Values.postgis.name | default (printf "%s" (include "fullname" .)) | quote }}
 kind: ConfigMap
 metadata:
+  annotations:
+    helm.sh/resource-policy: keep
   labels:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
   name: {{ template "fullname" . }}-configmap
