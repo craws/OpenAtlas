@@ -75,6 +75,16 @@ class ExportImportTest(ExportImportTestCase):
                 url_for('import_data', class_='person', project_id=p_id))
             assert b'file *' in rv.data
 
+            with open(self.test_path / 'bibliography.csv', 'rb') as file:
+                rv = self.app.post(
+                    url_for(
+                        'import_data',
+                        class_='bibliography',
+                        project_id=p_id),
+                    data={'file': file, 'duplicate': True},
+                    follow_redirects=True)
+            assert b'OpenAtlas 2024' in rv.data
+
             with open(self.static_path / 'example.csv', 'rb') as file:
                 rv = self.app.post(
                     url_for('import_data', class_='place', project_id=p_id),
@@ -247,6 +257,7 @@ class ExportImportTest(ExportImportTestCase):
                     data={'file': file, 'duplicate': True},
                     follow_redirects=True)
             assert b'single type duplicates' in rv.data
+            assert b'invalid origin reference id' in rv.data
             assert b'Vienna' in rv.data
 
             with open(self.test_path / 'example.csv', 'rb') as file:

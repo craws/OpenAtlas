@@ -273,28 +273,28 @@ def import_data(project_id: int, class_: str) -> str:
     class_label = g.classes[class_].label
     checks = CheckHandler()
     if form.validate_on_submit():
-        # try:
-        checked_data: list[Any] = []
-        table = check_data_for_table_representation(
-            form,
-            class_,
-            checks,
-            checked_data,
-            project)
-        # except Exception as e:
-        #     g.logger.log('error', 'import', 'import check failed', e)
-        #     flash(_('error at import'), 'error')
-        #     return render_template(
-        #         'import_data.html',
-        #         form=form,
-        #         messages=checks.messages,
-        #         file_data=file_data,
-        #         title=_('import'),
-        #         crumbs=[
-        #             [_('admin'), f"{url_for('admin_index')}#tab-data"],
-        #             [_('import'), url_for('import_index')],
-        #             project,
-        #             class_label])
+        try:
+            checked_data: list[Any] = []
+            table = check_data_for_table_representation(
+                form,
+                class_,
+                checks,
+                checked_data,
+                project)
+        except Exception as e:
+            g.logger.log('error', 'import', 'import check failed', e)
+            flash(_('error at import'), 'error')
+            return render_template(
+                'import_data.html',
+                form=form,
+                messages=checks.messages,
+                file_data=file_data,
+                title=_('import'),
+                crumbs=[
+                    [_('admin'), f"{url_for('admin_index')}#tab-data"],
+                    [_('import'), url_for('import_index')],
+                    project,
+                    class_label])
 
         if not form.preview.data and checked_data and (
                 not file_data['backup_too_old'] or app.testing):

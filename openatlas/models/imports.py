@@ -62,7 +62,7 @@ def get_origin_ids(project: Project, origin_ids: list[str]) -> list[str]:
     return db.check_origin_ids(project.id, origin_ids)
 
 
-def get_id_from_origin_id(project: Project, origin_id: str) -> str:
+def get_id_from_origin_id(project: Project, origin_id: str) -> list[str]:
     return db.get_id_from_origin_id(project.id, origin_id)
 
 
@@ -183,10 +183,7 @@ def link_references(
         for references in clean_reference_pages(str(origin_ref_ids)):
                 reference = references.split(';')
                 if ref_id := get_id_from_origin_id(project, reference[0]):
-                    try:
-                        ref_entity = ApiEntity.get_by_id(int(ref_id))
-                    except EntityDoesNotExistError:
-                        continue
+                    ref_entity = ApiEntity.get_by_id(int(ref_id[0]))
                     page = reference[1] or None
                     ref_entity.link('P67', entity, page)
     match_types = get_match_types()

@@ -81,6 +81,9 @@ imported and an error message will be displayed
   import`
 * **reference_ids** - used for linking data to already existing references in
   the database, see :ref:`References import`
+* **origin_reference_ids** - used for linking data to already existing
+  references in the database within the same project,
+  see :ref:`Origin references import`
 * **wkt** - only available for places and artifacts, see :ref:`WKT import`
 * **reference_system_*** - used for linking data to already existing external
   reference systems in the database, see :ref:`Reference systems import`
@@ -168,6 +171,27 @@ The imported data can be linked to an already existing
   56-78 5678;
 * the ID of each :doc:`/entity/reference` can be found at the detail view of
   said reference in your OpenAtlas instance
+
+
+.. _Origin references import:
+
+Origin references
++++++++++++++++++
+The imported data can be linked to an already existing
+:doc:`/entity/reference` within the same import project and through the origin
+ID (the ID which was given in the import), e.g. "literature_1".
+
+* :doc:`/entity/reference` origin ID and pages are separated by a semicolon
+  (**;**), e.g. literature_1;56-78
+* to link a :doc:`/entity/reference` with multiple page numbers, wrap the
+  whole cell in quotation marks, e.g. "literature_1;IV, 56-78 book_2;34-23 66;"
+* to link a :doc:`/entity/reference` without page numbers, just add the ID
+  and a semicolon (**;**) without further information
+* enter multiple :doc:`/entity/reference` separated by a space, e.g. literature_1;
+  56-78 book_2;
+* the **origin ID** of each :doc:`/entity/reference` can be found at the detail view of
+  said reference in your OpenAtlas instance if you have **Show import information**
+  enabled in your :doc:`/tools/profile`.
 
 .. _WKT import:
 
