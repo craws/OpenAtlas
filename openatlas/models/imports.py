@@ -161,12 +161,13 @@ def link_types(entity: Entity, row: dict[str, Any], class_: str) -> None:
 
 
 def link_references(entity: Entity, row: dict[str, Any], class_: str) -> None:
-    if data := row.get('references'):
+    if data := row.get('reference_ids'):
         for references in clean_reference_pages(str(data)):
             reference = references.split(';')
             if len(reference) <= 2 and reference[0].isdigit():
                 try:
                     ref_entity = ApiEntity.get_by_id(int(reference[0]))
+                    print(ref_entity)
                 except EntityDoesNotExistError:
                     continue
                 page = reference[1] or None
@@ -190,12 +191,12 @@ def link_references(entity: Entity, row: dict[str, Any], class_: str) -> None:
 def insert_gis(entity: Entity, row: dict[str, Any], project: Project) -> None:
     location = Entity.insert('object_location', f"Location of {row['name']}")
     entity.link('P53', location)
-    if data := row.get('administrative_unit'):
+    if data := row.get('administrative_unit_id'):
         if ((str(data).isdigit() and int(data) in g.types) and
                 g.types[g.types[int(data)].root[0]].name in [
                     'Administrative unit']):
             location.link('P89', g.types[int(data)])
-    if data := row.get('historical_place'):
+    if data := row.get('historical_place_id'):
         if ((str(data).isdigit() and int(data) in g.types) and
                 g.types[g.types[int(data)].root[0]].name in [
                     'Historical place']):

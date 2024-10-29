@@ -78,14 +78,14 @@ imported and an error message will be displayed
 * **type_ids** - used for linking to a type, see :ref:`Types import`
 * **value_types** - used for linking to a value type, see :ref:`Value types
   import`
-* **references** - used for linking data to already existing references in
+* **reference_ids** - used for linking data to already existing references in
   the database, see :ref:`References import`
 * **wkt** - only available for places and artifacts, see :ref:`WKT import`
 * **reference_system_*** - used for linking data to already existing external
   reference systems in the database, see :ref:`Reference systems import`
-* **administrative_unit** - only available for places, ID of existing
+* **administrative_unit_id** - only available for places, ID of existing
   administrative unit
-* **historical_place** - only available for places, ID of existing
+* **historical_place_id** - only available for places, ID of existing
   historical place
 * **parent_id** - only available for place, ID of a super unit in a place
   hierarchy, see :ref:`Place hierarchy import`

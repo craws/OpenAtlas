@@ -425,14 +425,14 @@ def get_allowed_columns(class_: str) -> dict[str, list[str]]:
         columns.extend([
             'begin_from', 'begin_to', 'begin_comment',
             'end_from', 'end_to', 'end_comment',
-            'references'])
+            'reference_ids'])
     if class_ in ['place', 'person', 'group']:
         columns.append('alias')
     if class_ in ['place', 'artifact']:
         columns.append('wkt')
     if class_ in ['place']:
         columns.extend([
-            'administrative_unit', 'historical_place', 'parent_id',
+            'administrative_unit_id', 'historical_place_id', 'parent_id',
             'openatlas_class', 'openatlas_parent_id'])
     return {
         'allowed': columns,
@@ -487,7 +487,7 @@ def check_cell_value(
                     checks.set_warning('invalid_value_type_values', id_)
                 value_types.append(';'.join(values))
             value = ' '.join(value_types)
-        case 'references' if value:
+        case 'reference_ids' if value:
             references = []
             for reference in clean_reference_pages(str(value)):
                 values = str(reference).split(';')
@@ -516,7 +516,7 @@ def check_cell_value(
             except ValueError:
                 row[item] = ''
                 value = '' if str(value) == 'NaT' else error_span(value)
-        case 'administrative_unit' | 'historical_place' if value:
+        case 'administrative_unit_id' | 'historical_place_id' if value:
             if ((not str(value).isdigit() or int(value) not in g.types) or
                     g.types[g.types[int(value)].root[0]].name not in [
                         'Administrative unit', 'Historical place']):

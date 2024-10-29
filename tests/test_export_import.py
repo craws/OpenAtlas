@@ -229,8 +229,8 @@ class ExportImportTest(ExportImportTestCase):
             data_frame.at[0, 'id'] = 'new_place_1'
             data_frame.at[1, 'id'] = 'new_place_2'
             data_frame.at[2, 'id'] = 'new_place_3'
-            data_frame.at[0, 'administrative_unit'] = austria.id
-            data_frame.at[0, 'historical_place'] = carantania.id
+            data_frame.at[0, 'administrative_unit_id'] = austria.id
+            data_frame.at[0, 'historical_place_id'] = carantania.id
             type_ids = [
                 boundary_mark.id,
                 infrastructure.id,
@@ -238,7 +238,7 @@ class ExportImportTest(ExportImportTestCase):
                 place_type.id]
             data_frame.at[0, 'type_ids'] = ' '.join(map(str, type_ids))
             data_frame.at[0, 'value_types'] = f'{height.id};42'
-            data_frame.at[0, 'references'] = f'{reference.id};IV'
+            data_frame.at[0, 'reference_ids'] = f'{reference.id};IV'
             data_frame.at[0, 'wkt'] = "POLYGON((16.1203 BLA, 16.606275))"
             data_frame.to_csv(self.test_path / 'example.csv', index=False)
             with open(self.test_path / 'example.csv', 'rb') as file:
