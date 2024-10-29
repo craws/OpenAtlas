@@ -5,7 +5,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Data integrity checks &mdash; OpenAtlas 8.7.0 documentation</title>
+  <title>Data integrity checks &mdash; OpenAtlas 8.8.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
@@ -35,7 +35,7 @@
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                8.7.0
+                8.8.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -112,68 +112,76 @@
 <h1>Data integrity checks<a class="headerlink" href="#data-integrity-checks" title="Permalink to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>The quality of data is very important to us. Although ultimately the data
-responsibility lies with editors and project managers we take great care to
-avoid entering of inconsistent data on a technical level, e.g. with the user
-interface it is not possible to enter begin dates which are later than end
-dates.</p>
-<p>Nevertheless mistakes can happen, not only on the application level but also
-e.g. when importing data from other projects or deleting files outside of the
-application. Because data integrity is important for the quality of research we
-implemented functions to check possible inconsistencies which are described in
-detail below.</p>
+<p>OpenAtlas puts great emphasis on the data quality. Even if the
+responsibility for the quality of the information entered ultimately lies
+with the individual projects, avoidance of inconsistent on a technical level
+are important during the development of the application. It is therefore not
+possible e.g. to enter the start date of an event after the end date of the
+same event</p>
+<p>Nevertheless mistakes happen, not only on the application level but also
+when importing data from other projects or deleting files outside of the
+application, etc. Therefore, functions to check possible inconsistencies were
+implemented and are described in detail below.</p>
 <section id="orphans">
 <h2>Orphans<a class="headerlink" href="#orphans" title="Permalink to this heading"></a></h2>
 <section id="id1">
 <h3>Orphans<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
-<p>In this tab entries like dates which are not linked are shown. They could be
-artifacts from imports or bugs and can be deleted. If they seem to appear
-regularly again (without imports or known bugs) please report that issue.</p>
+<p>Here unlinked data are shown. These so called orphans could be artifacts
+from imports or results of bugs and can be deleted. If orphans seem to appear
+regularly (without data imports or known bugs) please report this issue to the
+OpenAtlas team e.g. via the
+<a class="reference external" href="https://redmine.openatlas.eu/">OpenAtlas redmine</a>.</p>
 </section>
 <section id="entities-without-links">
 <h3>Entities without links<a class="headerlink" href="#entities-without-links" title="Permalink to this heading"></a></h3>
-<p>Entries shown have no relation to other entities. That could be ok but maybe
-they are artifacts or were forgotten to link.</p>
+<p>Entries shown have no relation to other entities. Of course that can be
+part of the normal data set, but should be check if correct. An unlinked
+entity could be artifacts of an import or were not linked by accident.</p>
 </section>
 <section id="type">
 <h3>Type<a class="headerlink" href="#type" title="Permalink to this heading"></a></h3>
-<p>These types were created but have no sub types or associated data. Maybe they
-originate from the first install or were never used.</p>
+<p>The types listed here were created but have no sub types or associated data.
+They might have been pre-installed before teams have started entering
+information or were created and then never used.</p>
 </section>
 <section id="missing-files">
 <h3>Missing files<a class="headerlink" href="#missing-files" title="Permalink to this heading"></a></h3>
-<p>Here are listed file entities which have no corresponding file, most likely
-because the file itself doesn’t exist anymore.</p>
+<p>File entities without a corresponding file are listed here. This is (most
+likely) caused by the deletion of files from the dataset.</p>
 </section>
 <section id="orphaned-files">
 <h3>Orphaned files<a class="headerlink" href="#orphaned-files" title="Permalink to this heading"></a></h3>
-<p>Files that have no corresponding entity are listed here.</p>
+<p>Files without a corresponding file entity are listed here.</p>
 </section>
 <section id="orphaned-iiif-files">
 <h3>Orphaned IIIF files<a class="headerlink" href="#orphaned-iiif-files" title="Permalink to this heading"></a></h3>
-<p>IIIF files that have no corresponding entity are listed here.</p>
+<p>IIIF files without a corresponding entity are listed here.</p>
 </section>
 <section id="orphaned-annotations">
 <h3>Orphaned annotations<a class="headerlink" href="#orphaned-annotations" title="Permalink to this heading"></a></h3>
-<p>Annotations that are linked to an entity, but where the file and the entity
-doesn’t have a connection are listed here. There are three options to proceed:</p>
+<p>Annotations that are linked to an entity, but file and entity themselves are
+not linked are listed here. There are three options to proceed:</p>
 <ul class="simple">
-<li><p><em>Relink entity</em>: Add a link between file and entity</p></li>
+<li><p><em>Relink entity</em>: Adds a link between file and entity</p></li>
 <li><p><em>Remove entity</em>: Removes the entity from the annotation</p></li>
 <li><p><em>Delete annotation</em>: Deletes the whole annotation</p></li>
 </ul>
 </section>
 <section id="orphaned-subunits">
 <h3>Orphaned subunits<a class="headerlink" href="#orphaned-subunits" title="Permalink to this heading"></a></h3>
-<p>Subunits that are missing a connection to the level above. E.g. a feature
-without a connection to a place.</p>
+<p>Subunits without a link to the level above, e.g. a feature
+with no connection to a place.</p>
 </section>
 <section id="circular-dependencies">
 <h3>Circular dependencies<a class="headerlink" href="#circular-dependencies" title="Permalink to this heading"></a></h3>
-<p>A check if an entity is linked to itself. This could happen e.g. if a person is
-married to herself or a type has itself as super. It shouldn’t be possible to
-create circular dependencies within the application. Nevertheless it’s a useful
-check for e.g. if data is imported from other systems.</p>
+<p>It can be checked if an entity is linked to itself. This could happen, for
+example, if a person has been entered as is married to themself or a type
+has itself as super. It shouldn’t be possible to create circular
+dependencies within the application but nevertheless it’s useful to
+check the database as this can happen through data imports or bugs. If you
+find circular dependencies in your dataset regularly with a previous report
+or known bugs, please report the issue e.g. via the
+<a class="reference external" href="https://redmine.openatlas.eu/">OpenAtlas redmine</a>.</p>
 </section>
 </section>
 <section id="dates">
@@ -181,64 +189,68 @@ check for e.g. if data is imported from other systems.</p>
 <p>In this view various results of invalid or inconsistent dates are shown.</p>
 <section id="invalid-dates">
 <h3>Invalid dates<a class="headerlink" href="#invalid-dates" title="Permalink to this heading"></a></h3>
-<p>Invalid date combinations are shown, e.g. begin dates which are
-later than end dates. These issues should be fixed because otherwise the user
+<p>In this tab invalid date combinations are shown, for example dates of begins
+That are later than end dates. These issues should be fixed, otherwise the user
 interface won’t allow to update these entities.</p>
 </section>
 <section id="invalid-link-dates">
 <h3>Invalid link dates<a class="headerlink" href="#invalid-link-dates" title="Permalink to this heading"></a></h3>
-<p>Like with “invalid dates” issues with these should be solved as soon as
+<p>Similar to “invalid dates”, invalid link dates should be fixed as soon as
 possible.</p>
 </section>
 <section id="invalid-involvement-dates">
 <h3>Invalid involvement dates<a class="headerlink" href="#invalid-involvement-dates" title="Permalink to this heading"></a></h3>
-<p>Incompatible dates at involvement are shown. E.g. a person participated at an
-event longer than the event took place.</p>
+<p>Incompatible dates for involvements are shown. Example: A person participated
+in an event for longer than the event lasted.</p>
 </section>
 <section id="invalid-preceding-dates">
 <h3>Invalid preceding dates<a class="headerlink" href="#invalid-preceding-dates" title="Permalink to this heading"></a></h3>
-<p>Incompatible dates for chained events are shown. E.g. a preceding event started
-after the succeeding event.</p>
+<p>Here, incompatible dates for chained events are listed. Example: A
+preceding event starts after the succeeding event.</p>
 </section>
 <section id="invalid-sub-dates">
 <h3>Invalid sub dates<a class="headerlink" href="#invalid-sub-dates" title="Permalink to this heading"></a></h3>
-<p>Incompatible dates for hierarchical events are shown. E.g. a sub event began
-before the super event began.</p>
+<p>This tab shows incompatible dates for hierarchical events. Example: A
+sub event begins before the super event began.</p>
 </section>
 </section>
 <section id="check-links">
 <h2>Check links<a class="headerlink" href="#check-links" title="Permalink to this heading"></a></h2>
-<p>With this function every link will be checked for CIDOC validity. Depending on
-the amount of data this could take some time. Data entered with the OpenAtlas
-user interface should always be CIDOC valid but in case of e.g. imported
-data this check should be used afterwards. If invalid links are found they
-should be dealt with outside the application.</p>
+<p>Here, every link will be checked for its CIDOC validity. Depending on the
+amount of data this can take some time. While data entered by using the
+OpenAtlas user interface should always be CIDOC conform, imported
+data should be check after import. If invalid links are
+found the problem should be resolved in the original data source.</p>
 </section>
 <section id="check-link-duplicates">
 <h2>Check link duplicates<a class="headerlink" href="#check-link-duplicates" title="Permalink to this heading"></a></h2>
-<p>There are actually two checks:</p>
-<p>The first one checks for duplicate links which are identically and can be
-safely deleted when clicking the <em>Delete link duplicates</em> button.</p>
-<p>In case the first test found no duplicate links it will be checked for entities
-connected multiple times two a type which is defined for single use. E.g. a
-place has the type castle and city. In this case you would only see one in the
-user interface and the other one would get deleted in case anybody updates the
-entry. Here you have the option to look at these and remove the wrong ones
-clicking on the <strong>Remove</strong> link beside the entries in the last column.</p>
-<p>Both checks shouldn’t find anything wrong with data entered with the
-application but nevertheless it could happen because of imports or unknown bugs.</p>
+<p>Two tests are combined:</p>
+<p>The first test checks for duplicate links that are identically. These links
+can be afterwards by clicking the <em>Delete link duplicates</em> button.</p>
+<p>In case the first test found no duplicate links the dataset will be checked
+for entities that were connected to a single use type multiple times.
+Example: A place has been linked to types castle and city. Only one of the
+types will be displayed in the user interface, the other one would be
+deleted automatically if the entry is updated by anyone.
+You are then given the option to have a look at the links and to remove the
+wrong ones by clicking the <strong>Remove</strong> link next to the entries in the
+last column.</p>
+<p>By using the OpenAtlas interface link duplicates should be avoided
+automatically but can happen due to data import or bugs. If this is a
+reoccuring issue for your dataset, please report e.g. via the
+<a class="reference external" href="https://redmine.openatlas.eu/">OpenAtlas redmine</a>.</p>
 </section>
 <section id="check-similar-names">
 <h2>Check similar names<a class="headerlink" href="#check-similar-names" title="Permalink to this heading"></a></h2>
-<p>Here you can search for similar names. Depending on selection and data volume
-this might take some time.</p>
+<p>This test will search for similar entity names. Depending on selection
+and data volume this might take some time. The following options are given:</p>
 <ul class="simple">
-<li><p><strong>Classes</strong> - select the class which you want to search for similar names</p></li>
+<li><p><strong>Classes</strong> - select the class you want to search for similar names</p></li>
 <li><p><strong>Ratio</strong> - select how similar the names should be, 100 is the default and
-means absolute identical</p></li>
+means 100% identical</p></li>
 </ul>
 <p>The function uses the <a class="reference external" href="https://pypi.org/project/fuzzywuzzy/">fuzzywuzzy</a>
-package is used which in turn uses the
+package which uses the
 <a class="reference external" href="https://en.wikipedia.org/wiki/Levenshtein_distance">Levenshtein Distance</a>.</p>
 </section>
 </section>

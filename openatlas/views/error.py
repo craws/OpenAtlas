@@ -10,7 +10,8 @@ from openatlas.api.resources.error import (
     InvalidSearchSyntax, InvalidSearchValueError, InvalidSystemClassError,
     InvalidViewClassError, LastEntityError, LogicalOperatorError,
     NoLicenseError, NoSearchStringError, NotAPlaceError, NotATypeError,
-    NotPublicError, OperatorError, QueryEmptyError, UrlNotValid,
+    NotPublicError, OperatorError, OperatorNotSupported, QueryEmptyError,
+    UrlNotValid,
     ValueNotIntegerError)
 
 
@@ -243,6 +244,22 @@ def invalid_operator(_e: Exception) -> tuple[Any, int]:
         'message':
             'The compare operator is invalid. '
             f'Please use: {app.config["COMPARE_OPERATORS"]}',
+        'url': request.url,
+        'timestamp': datetime.now(),
+        'status': 400}), 400
+
+
+@app.errorhandler(OperatorNotSupported)
+def operator_not_supported(_e: Exception) -> tuple[Any, int]:
+    return jsonify({
+        'title': 'Operator not supported',
+        'message':
+            'Operator not supported for this search category.'
+            '"like" is only supported by entityName, entityDescription, '
+            'entityAliases, entityCidocClass, entitySystemClass, typeName.'
+            '"greaterThan", "greaterThanEqual", "lesserThan" and '
+            '"lesserThanEqual" are only supported by beginFrom, beginTo, '
+            'endFrom, endTo, valueTypeID',
         'url': request.url,
         'timestamp': datetime.now(),
         'status': 400}), 400

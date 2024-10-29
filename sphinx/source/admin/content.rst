@@ -3,15 +3,15 @@ Content
 
 .. toctree::
 
-Displayed texts in available languages can be customized here:
+Used to cutomise text in available languages:
 
-* **Intro** - displayed at the top at the start page before logging in
-* **Contact** - displayed at the contact site, e.g. contact information for
+* **Intro** - displayed on top of the start page before log in
+* **Contact** - displayed on contact site, e.g. contact information for
   the website maintainer
-* **Legal notice** - displayed at the legal notice site, e.g. information
+* **Legal notice** - displayed on the legal notice site, e.g. information
   about the institute
-* **Citation example** - displayed under the form at insert/update of an
-  edition or a bibliography
+* **Citation example** - displayed underneath the form fields of an
+  insert/update of an edition or a bibliography entry
 
 
 Links to **Contact** and **Legal notice** are available at the cogwheel icon

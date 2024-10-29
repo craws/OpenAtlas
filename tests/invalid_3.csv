@@ -1,4 +1,4 @@
-id,name,alias,description,begin_from,begin_to,begin_comment,end_from,end_to,end_comment,wkt,type_ids,value_types,reference_system_wikidata,reference_system_geonames,administrative_unit,historical_place,openatlas_class,parent_id,openatlas_parent_id
+id,name,alias,description,begin_from,begin_to,begin_comment,end_from,end_to,end_comment,wkt,type_ids,value_types,reference_system_wikidata,reference_system_geonames,administrative_unit_id,historical_place_id,openatlas_class,parent_id,openatlas_parent_id
 new_place,Vienna,Wien,Capital of Austria,not_a_date,NaT,It was a rainy day.,,2049-12-31,We'll see about that.,"POLYGON((16.1203 BLA, 16.606275 48.30671, 16.606275 48.3154, 16.1203 48.3154, 16.1203 48.30671))",666,1456;,sdf,215;,,,Ort,,
 feature_1,Grave 1,,,,,,,,,,,,,,,,feature,new_place,
 strati_1,Filling 1,,,,,,,,,,,,,,,,stratigraphic unit,feature_1,

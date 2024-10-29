@@ -11,14 +11,14 @@ Export SQL
 * Be aware, especially when sharing, that **user data**, e.g. email addresses,
   are included in the database backups
 * SQL dumps are saved in the **files/export** folder
-* A warning will be shown if the directory isn't writable
+* A warning will appear if the directory isn't writable
 * File names begin with date and time e.g. 2018-08-23_1533_export.sql
 * Existing backups are shown in a list and can be downloaded or deleted
 
 Export SQL
 **********
 A SQL dump will be created with **pg_dump** in a plain text format. The
-resulting file could be used to fill an existing empty database, e.g.
+resulting file can be used to fill an existing empty database, such as
 
 .. code-block::
 
@@ -27,9 +27,9 @@ resulting file could be used to fill an existing empty database, e.g.
 Export database dump
 ********************
 
-A SQL dump will be created with **pg_dump** in custom archiving format (-Fc).
-With this format **pg_restore** can be used to restore the database regardless
-of which operating system and line breaks are used e.g.
+A SQL dump will be created with **pg_dump** in a custom archiving format (-Fc).
+In this format **pg_restore** can be used to restore the database regardless
+of used operating system and if line breaks are used or not
 
 .. code-block::
 
@@ -39,7 +39,7 @@ of which operating system and line breaks are used e.g.
 Export CSV
 ----------
 When the **Export CSV** button is clicked, a **ZIP** file containing several
-**CSV** files is downloaded. The CSV files are:
+**CSV** files is downloaded. The ZIP file contains:
 
 * All entities divided by their OpenAtlas class
 * Links
@@ -49,13 +49,13 @@ When the **Export CSV** button is clicked, a **ZIP** file containing several
 * Hierarchy of classes
 * Geometries
 
-The file name of the **ZIP** file starts with the current date and time, for
+The **ZIP** file's name starts with the current date and time, for
 example 2022-10-04_1610-export.zip. This process can take some time.
 
 Export JSON
 -----------
-When the **Export JSON** button is clicked, the download of a **JSON** file
-begins. This file contains following keys:
+When the **Export JSON** button is clicked, a **JSON** file is downloaded.
+This file contains the following keys:
 
 * Entities
 * Links
@@ -70,8 +70,8 @@ The file name starts with the current date and time, for example
 
 Export XML
 ----------
-When the **Export XML** button is clicked, the download of an
-**XML** file begins. This file contains following tags:
+When the **Export XML** button is clicked, an **XML** file is
+downloaded. This file contains the following tags:
 
 * Entities
 * Links

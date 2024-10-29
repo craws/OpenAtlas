@@ -3,50 +3,56 @@ ARCHE
 
 .. toctree::
 
-**Be aware** this feature is only usable for a specific dataset.
+`ARCHE <https://arche.acdh.oeaw.ac.at/>`_ (A Resource Centre for the
+HumanitiEs) is a service aimed at offering stable and persistent hosting as
+well as dissemination of digital research data and resources.
 
-`ARCHE <https://arche.acdh.oeaw.ac.at/>`_ (A Resource Centre for the HumanitiEs) is a service aimed at offering stable
-and persistent hosting as well as dissemination of digital research data and resources.
-
-In order to import data from ARCHE to OpenAtlas changes to instance/production.py are needed (ask your OpenAtlas
-administrator for further details):
+In order to import data from ARCHE to OpenAtlas, changes to
+instance/production.py are needed (ask your OpenAtlas administrator for
+further details):
 
 .. code-block::
    :caption: instance/production.py
 
    ARCHE = {
     'id': 0,    # Top collection of the project (acdh:TopCollection)
-    'url': 'https://arche-curation.acdh-dev.oeaw.ac.at/',  # Base URL to get data from
+    'url': 'https://arche-curation.acdh-dev.oeaw.ac.at/',  # Base URL to get
+    data from
     }}
 
-The **ARCHE** button is displayed in the Admin/Data menu only if above data is provided.
+The **ARCHE** button is displayed in the Admin/Data menu only if the
+changes mentioned above are made.
 Click on the **ARCHE** button to get to the overview section.
 
 Overview
 --------
 
-Data provided in the production.py is displayed. If user belongs to the **manager** user group, a button called
-**Fetch** is displayed. Click **Fetch** to fetch data from ARCHE.
+Data provided in the production.py is displayed. If user is part of
+the **manager** user group, the **Fetch** button is displayed. Click
+**Fetch** to fetch data from ARCHE.
 
 
 Fetch
 -----
 
 Data fetched from ARCHE are listed in a :doc:`/ui/table`.
-Only data (based on the :doc:`/entity/artifact`), which was not imported is shown.
+Only data (based on the :doc:`/entity/artifact`) that was not imported is
+shown.
 
 Click on **Import ARCHE data** to import data.
 
 Data from ARCHE
 ---------------
 
-All metadata is gathered from the EXIF endpoint of the first image in the "2_JPGs" collection. Additionally the
-corresponded .png from "4_Orthophotos" is taken as reference file.
+All metadata is gathered from the EXIF endpoint of the first image in the
+"2_JPGs" collection. Additionally, the corresponding .png from
+"4_Orthophotos" is taken as reference file.
 
 Automatically created entities
 ------------------------------
 
-All necessary new types, persons etc. will be automatically created or added during the import process.
+All necessary new types, persons etc. will be automatically created or added
+during the import process.
 
 .. image:: ARCHE_import_OpenAtlas.jpg
     :width: 700px
@@ -60,7 +66,8 @@ All necessary new types, persons etc. will be automatically created or added dur
 :doc:`/entity/reference_system`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-New :doc:`/entity/reference_system` named **ARCHE** is created with data provided by instance/production.py
+New :doc:`/entity/reference_system` named **ARCHE** is created with data
+provided by instance/production.py
 
 :doc:`/entity/index`
 ^^^^^^^^^^^^^^^^^^^^

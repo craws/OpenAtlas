@@ -3,7 +3,8 @@ from typing import Any
 from openatlas import app
 from openatlas.api.resources.error import (
     InvalidSearchCategoryError, InvalidSearchValueError, LogicalOperatorError,
-    NoSearchStringError, OperatorError, ValueNotIntegerError)
+    NoSearchStringError, OperatorError, OperatorNotSupported,
+    ValueNotIntegerError)
 
 
 def check_if_date_search(k: str) -> bool:
@@ -23,6 +24,9 @@ def check_search_parameters(category: str, values: dict[str, Any]) -> None:
     if category not in app.config['VALID_VALUES']:
         raise InvalidSearchCategoryError
     if category in app.config['INT_VALUES']:
+        if values['operator'] not in ['equal', 'notEqual']:
+            raise OperatorNotSupported
         for value in values['values']:
             if not isinstance(value, int):
-                raise ValueNotIntegerError
+                if not value.isdigit():
+                    raise ValueNotIntegerError

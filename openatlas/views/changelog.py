@@ -16,7 +16,15 @@ def index_changelog() -> str:
 
 # pylint: disable=too-many-lines
 versions = {
-    '8.8.0': ['TBA', {}],
+    '8.8.0': ['TBA', {
+        'feature': {
+            '2349': 'Stronger hints that notes are not part of the model',
+            '2354': 'Page field of reference import should allow spaces',
+            '2351': 'Refactor and minor improvements'},
+        'fix': {
+            '2357': 'Wrong direction for reference links to files',
+            '2371': 'Broken export functions'}
+    }],
     '8.7.0': ['2024-09-19', {
         'feature': {
             '2339': 'Dates: additional checks',

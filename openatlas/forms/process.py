@@ -130,9 +130,14 @@ def process_origin(manager: Any) -> None:
     elif manager.origin.class_.name == 'source' \
             and manager.entity.class_.name != 'source_translation':
         manager.add_link('P67', manager.origin, inverse=True)
-    elif manager.origin.class_.name == 'file' \
-            and manager.entity.class_.name != 'creation':
-        manager.add_link('P67', manager.origin, inverse=True)
+    elif manager.origin.class_.name == 'file':
+        if manager.entity.class_.view == 'reference':
+            manager.add_link(
+                'P67',
+                manager.origin,
+                return_link_id=True)
+        elif manager.entity.class_.name != 'creation':
+            manager.add_link('P67', manager.origin, inverse=True)
 
 
 def process_dates(manager: Any) -> dict[str, Any]:
