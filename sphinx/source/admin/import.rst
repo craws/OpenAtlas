@@ -63,14 +63,15 @@ Possible import fields
 Column headers can contain the following titles. Other titles won't be
 imported and an error message will be displayed
 
+* **id** - this field has to be **unique per project**; if you have
+  same IDs like a person and place with id = 1, you can prefix them in the
+  document e.g. person_1, place_1 before importing. Please use only characters,
+  numbers, underscore (_) or hyphen (-).
 * **name** - required, an error will be displayed if name; the data will not
   get imported if a name is missing
 * **alias** - only available for person, group and place, see
   :ref:`Alias import`
 * **description** - a description can be provided
-* **id** - this field has to be **unique per project**; if you have
-  same IDs like a person and place with id = 1, you can prefix them in the
-  document e.g. person_1, place_1 before importing
 * **begin_from** - used for dates, see :ref:`Dates import`
 * **begin_to** - used for dates, see :ref:`Dates import`
 * **end_from** - used for dates, see :ref:`Dates import`
@@ -78,14 +79,17 @@ imported and an error message will be displayed
 * **type_ids** - used for linking to a type, see :ref:`Types import`
 * **value_types** - used for linking to a value type, see :ref:`Value types
   import`
-* **references** - used for linking data to already existing references in
+* **reference_ids** - used for linking data to already existing references in
   the database, see :ref:`References import`
+* **origin_reference_ids** - used for linking data to already existing
+  references in the database within the same project,
+  see :ref:`Origin references import`
 * **wkt** - only available for places and artifacts, see :ref:`WKT import`
 * **reference_system_*** - used for linking data to already existing external
   reference systems in the database, see :ref:`Reference systems import`
-* **administrative_unit** - only available for places, ID of existing
+* **administrative_unit_id** - only available for places, ID of existing
   administrative unit
-* **historical_place** - only available for places, ID of existing
+* **historical_place_id** - only available for places, ID of existing
   historical place
 * **parent_id** - only available for place, ID of a super unit in a place
   hierarchy, see :ref:`Place hierarchy import`
@@ -167,6 +171,27 @@ The imported data can be linked to an already existing
   56-78 5678;
 * the ID of each :doc:`/entity/reference` can be found at the detail view of
   said reference in your OpenAtlas instance
+
+
+.. _Origin references import:
+
+Origin references
++++++++++++++++++
+The imported data can be linked to an already existing
+:doc:`/entity/reference` within the same import project and through the origin
+ID (the ID which was given in the import), e.g. "literature_1".
+
+* :doc:`/entity/reference` origin ID and pages are separated by a semicolon
+  (**;**), e.g. literature_1;56-78
+* to link a :doc:`/entity/reference` with multiple page numbers, wrap the
+  whole cell in quotation marks, e.g. "literature_1;IV, 56-78 book_2;34-23 66;"
+* to link a :doc:`/entity/reference` without page numbers, just add the ID
+  and a semicolon (**;**) without further information
+* enter multiple :doc:`/entity/reference` separated by a space, e.g. literature_1;
+  56-78 book_2;
+* the **origin ID** of each :doc:`/entity/reference` can be found at the detail view of
+  said reference in your OpenAtlas instance if you have **Show import information**
+  enabled in your :doc:`/tools/profile`.
 
 .. _WKT import:
 

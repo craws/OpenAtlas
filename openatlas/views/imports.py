@@ -34,7 +34,7 @@ from openatlas.forms.field import SubmitField
 from openatlas.models.entity import Entity
 from openatlas.models.imports import (
     Project, check_duplicates, check_single_type_duplicates, check_type_id,
-    clean_reference_pages, get_origin_ids, import_data_)
+    clean_reference_pages, get_id_from_origin_id, get_origin_ids, import_data_)
 
 _('invalid columns')
 _('possible duplicates')
@@ -51,6 +51,7 @@ _('invalid value type values')
 _('invalid coordinates')
 _('invalid OpenAtlas class')
 _('invalid reference id')
+_('invalid origin reference id')
 _('empty names')
 _('empty ids')
 _('missing name column')
@@ -348,7 +349,8 @@ def check_data_for_table_representation(
         table_row = []
         checked_row = {}
         for item in headers:
-            table_row.append(check_cell_value(row, item, class_, checks))
+            table_row.append(
+                check_cell_value(row, item, class_, checks, project))
             checked_row[item] = row[item]
             if item == 'name' and form.duplicate.data:
                 names.append(row['name'].lower())
@@ -425,14 +427,14 @@ def get_allowed_columns(class_: str) -> dict[str, list[str]]:
         columns.extend([
             'begin_from', 'begin_to', 'begin_comment',
             'end_from', 'end_to', 'end_comment',
-            'references'])
+            'reference_ids', 'origin_reference_ids'])
     if class_ in ['place', 'person', 'group']:
         columns.append('alias')
     if class_ in ['place', 'artifact']:
         columns.append('wkt')
     if class_ in ['place']:
         columns.extend([
-            'administrative_unit', 'historical_place', 'parent_id',
+            'administrative_unit_id', 'historical_place_id', 'parent_id',
             'openatlas_class', 'openatlas_parent_id'])
     return {
         'allowed': columns,
@@ -444,7 +446,8 @@ def check_cell_value(
         row: Series,
         item: str,
         class_: str,
-        checks: CheckHandler) -> str:
+        checks: CheckHandler,
+        project: Project) -> str:
     value = row[item]
     id_ = row.get('id')
     if openatlas_class := row.get('openatlas_class'):
@@ -487,7 +490,7 @@ def check_cell_value(
                     checks.set_warning('invalid_value_type_values', id_)
                 value_types.append(';'.join(values))
             value = ' '.join(value_types)
-        case 'references' if value:
+        case 'reference_ids' if value:
             references = []
             for reference in clean_reference_pages(str(value)):
                 values = str(reference).split(';')
@@ -502,6 +505,15 @@ def check_cell_value(
                         checks.set_warning('invalid_reference_id', id_)
                 references.append(';'.join(values))
             value = ' '.join(references)
+        case 'origin_reference_ids' if value:
+            origin_references = []
+            for reference in clean_reference_pages(str(value)):
+                values = str(reference).split(';')
+                if not get_id_from_origin_id(project, values[0]):
+                    checks.set_warning('invalid_origin_reference_id', id_)
+                    values[0] = error_span(values[0])
+                origin_references.append(';'.join(values))
+            value = ' '.join(origin_references)
         case 'wkt' if value:
             try:
                 wkt.loads(row[item])
@@ -516,7 +528,7 @@ def check_cell_value(
             except ValueError:
                 row[item] = ''
                 value = '' if str(value) == 'NaT' else error_span(value)
-        case 'administrative_unit' | 'historical_place' if value:
+        case 'administrative_unit_id' | 'historical_place_id' if value:
             if ((not str(value).isdigit() or int(value) not in g.types) or
                     g.types[g.types[int(value)].root[0]].name not in [
                         'Administrative unit', 'Historical place']):
