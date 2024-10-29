@@ -19,7 +19,10 @@ versions = {
     '8.8.0': ['TBA', {
         'feature': {
             '2349': 'Stronger hints that notes are not part of the model',
+            '2353': 'Link to reference origin IDs at import',
             '2354': 'Page field of reference import should allow spaces',
+            '2361':
+                'Change label and location for links to a presentation site',
             '2351': 'Refactor and minor improvements'},
         'fix': {
             '2357': 'Wrong direction for reference links to files',
