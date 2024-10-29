@@ -30,6 +30,7 @@ _('notes')
 _('orphaned files')
 _('orphaned iiif files')
 _('orphaned subunits')
+_('presentation site')
 _('texts')
 _('unlinked')
 

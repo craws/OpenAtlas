@@ -96,7 +96,7 @@ def admin_index() -> str:
             get_content_table(),
             buttons=[manual('admin/content')])
         tabs['frontend'] = Tab(
-            'frontend',
+            'presentation_site',
             display_info(get_form_settings(FrontendForm())),
             buttons=[
                 manual('admin/frontend'),
