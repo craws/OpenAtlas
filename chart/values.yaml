@@ -5,10 +5,9 @@
 postgis:
   deploy: true
   version: "15-3.4"
-  # Set host, name, user if database is external
+  # Set host, name if database is external. The user has to be openatlas.
   # host: postgres
   # name: openatlas-test
-  # user: openatlas
   # Set this to anything also with deploy: true to keep the generated password
   # password: openatlas
 
