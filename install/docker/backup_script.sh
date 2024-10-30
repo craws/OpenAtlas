@@ -13,7 +13,7 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 
-export DB_URL="postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DB"
+export DB_URL="postgres://openatlas:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DB"
 mkdir -p $1
 pg_dump ${DB_URL} > $1/$(date '+%Y-%m-%d_%H%M')_export_${POSTGRES_DB}.sql
 

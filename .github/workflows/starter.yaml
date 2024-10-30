@@ -137,7 +137,7 @@ jobs:
           cat <<EOF > testing.py
           SERVER_NAME='local.host'
           DATABASE_NAME='${{env.POSTGRES_DB}}'
-          DATABASE_USER='${{env.POSTGRES_USER}}'
+          DATABASE_USER='openatlas'
           DATABASE_HOST='postgres'
           DATABASE_PORT=5432
           DATABASE_PASS='${{env.POSTGRES_PASSWORD}}'
