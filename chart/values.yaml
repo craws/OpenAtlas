@@ -4,12 +4,13 @@
 
 postgis:
   deploy: true
-  # Set host if database is external
-  #  host: postgres
-  name: openatlas-test
-  user: openatlas
-  password: openatlas
   version: "15-3.4"
+  # Set host, name, user if database is external
+  # host: postgres
+  # name: openatlas-test
+  # user: openatlas
+  # Set this to anything also with deploy: true to keep the generated password
+  # password: openatlas
 
 service:
   name: "web"
@@ -17,10 +18,10 @@ service:
   externalPort: 8080
   internalPort: 8080
   enabled: true
-  url: oa-helm.acdh-cluster-2.arz.oeaw.ac.at
+  url: openatlas.example.org
 
 ingress:
-  enabled: true
+  enabled: false
   path: "/"
   annotations:
     kubernetes.io/ingress.class: "nginx"
