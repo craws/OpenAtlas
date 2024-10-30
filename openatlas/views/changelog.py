@@ -22,6 +22,7 @@ versions = {
             '2353': 'Link to reference origin IDs at import',
             '2354': 'Page field of reference import should allow spaces',
             '2361': 'Change label and location for presentation site links',
+            '2365': 'API 0.4.5',
             '2351': 'Refactor and minor improvements'},
         'fix': {
             '2357': 'Wrong direction for reference links to files',
