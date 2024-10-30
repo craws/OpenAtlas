@@ -315,9 +315,12 @@ def settings(category: str) -> str | Response:
     form = getattr(
         importlib.import_module('openatlas.forms.setting'),
         f"{uc_first(category)}Form")()
-    tab = category.replace('api', 'data').replace('mail', 'email')
+    tab = (category.replace('api', 'data').replace('mail', 'email'))
     redirect_url = f"{url_for('admin_index')}#tab-{tab}"
-    crumbs = [[_('admin'), f"{url_for('admin_index')}#tab-{tab}"], _(category)]
+    crumbs = [[
+        _('admin'),
+        f"{url_for('admin_index')}#tab-{tab}"],
+        _(category.replace('frontend', 'presentation site'))]
     if category == 'file':
         redirect_url = f"{url_for('file_index')}"
         crumbs = [[_('file'), url_for('file_index')], _('settings')]
