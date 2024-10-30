@@ -99,7 +99,7 @@ def admin_index() -> str:
             'presentation_site',
             display_info(get_form_settings(FrontendForm())),
             buttons=[
-                manual('admin/frontend'),
+                manual('admin/presentation_site'),
                 button(_('edit'), url_for('settings', category='frontend'))])
     if is_authorized('contributor'):
         tabs['data'] = Tab(
@@ -352,9 +352,10 @@ def settings(category: str) -> str | Response:
             flash(_('error transaction'), 'error')
         return redirect(redirect_url)
     set_form_settings(form)
+    manual_page = f"admin/{category.replace('frontend', 'presentation_site')}"
     return render_template(
         'content.html',
-        content=display_form(form, manual_page=f"admin/{category}"),
+        content=display_form(form, manual_page=manual_page),
         title=_('admin'),
         crumbs=crumbs)
 
