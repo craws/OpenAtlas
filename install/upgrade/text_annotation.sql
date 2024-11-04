@@ -6,6 +6,7 @@ BEGIN;
 ALTER TABLE web.annotation_image SET SCHEMA model;
 ALTER TABLE model.annotation_image RENAME COLUMN annotation TO text;
 ALTER TABLE model.annotation_image ALTER COLUMN text DROP NOT NULL;
+ALTER TABLE model.annotation_image DROP COLUMN user_id;
 ALTER TABLE model.annotation_image ADD COLUMN modified timestamp without time zone;
 CREATE TRIGGER update_modified BEFORE UPDATE ON model.annotation_image FOR EACH ROW EXECUTE FUNCTION model.update_modified();
 
@@ -27,7 +28,6 @@ CREATE TABLE model.annotation_text (
     entity_id integer,
     link_start integer NOT NULL,
     link_end integer NOT NULL,
-    user_id integer,
     text text,
     created timestamp without time zone DEFAULT now() NOT NULL,
     modified timestamp without time zone
@@ -38,6 +38,5 @@ ALTER TABLE ONLY model.annotation_text ADD CONSTRAINT annotation_text_pkey PRIMA
 CREATE TRIGGER update_modified BEFORE UPDATE ON model.annotation_text FOR EACH ROW EXECUTE FUNCTION model.update_modified();
 ALTER TABLE ONLY model.annotation_text ADD CONSTRAINT annotation_text_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE ONLY model.annotation_text ADD CONSTRAINT annotation_text_source_id_fkey FOREIGN KEY (source_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE ONLY model.annotation_text ADD CONSTRAINT annotation_text_user_id_fkey FOREIGN KEY (user_id) REFERENCES web."user"(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 END;
