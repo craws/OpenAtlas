@@ -8,7 +8,7 @@ set -o nounset
 set -o pipefail
 # set -o xtrace # Uncomment this line for debugging purposes
 
-export DB_URL="postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DB"
+export DB_URL="postgres://openatlas:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DB"
 
 source /etc/apache2/envvars
 
@@ -18,7 +18,7 @@ export MAIL_PASSWORD=${MAIL_PASSWORD:-CHANGE ME}
 
 cat <<EOF > /var/www/openatlas/instance/production.py
 DATABASE_NAME='$POSTGRES_DB'
-DATABASE_USER='$POSTGRES_USER'
+DATABASE_USER='openatlas'
 DATABASE_HOST='$POSTGRES_HOST'
 DATABASE_PORT=5432
 DATABASE_PASS='$POSTGRES_PASSWORD'

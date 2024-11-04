@@ -49,9 +49,9 @@ def overview() -> str:
                     _('network visualization'),
                     url_for('network', dimensions=0)),
                 link(
-                    _('frontend'),
+                    '<i class="fas fa-eye"></i> ' +
+                    uc_first(_('presentation site')),
                     g.settings['frontend_website_url'],
-                    class_=app.config['CSS']['button']['primary'],
                     external=True) if g.settings['frontend_website_url']
                 else '']),
         'bookmarks': Tab(

@@ -10,7 +10,7 @@ Admin
    map
    iiif
    content
-   frontend
+   presentation_site
    data_integrity_checks
    import
    export
