@@ -9,7 +9,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     apt install -y --no-install-recommends python3-wand python3-rdflib python3-requests python3-dicttoxml python3-flasgger &&\
     apt install -y --no-install-recommends apache2 libapache2-mod-wsgi-py3 brotli python3-coverage python3-nose exiftran &&\
     apt install -y --no-install-recommends iipimage-server libvips-tools python3-email-validator python3-svgwrite python3-shapely &&\
-    apt install -y --no-install-recommends python3-validators &&\
+    apt install -y --no-install-recommends python3-validators python3-jwt &&\
     apt install -y --no-install-recommends gettext npm python3-pip git postgresql-client-15 &&\
     apt install -y --no-install-recommends dos2unix locales locales-all vim w3c-sgml-lib nano python3-xmltodict &&\
     mkdir -p /var/www/openatlas /var/www/.cache /var/www/.local /var/www/.npm &&\

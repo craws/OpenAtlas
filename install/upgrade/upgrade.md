@@ -17,13 +17,13 @@ then run the database upgrade script, then restart Apache:
     sudo python3 install/upgrade/database_upgrade.py
     sudo service apache2 restart
 
-### 8.7.0 to 8.8.0
-8.8.0.sql is needed but will be taken care of by the database upgrade script.
-
-### 8.6.x to 8.7.0
+### 8.x.x to 8.x.x
 No database update is required but an additional Python package is needed:
 
-    sudo apt install python3-validators
+    sudo apt install python3-jwt
+
+### 8.7.0 to 8.8.0
+8.8.0.sql is needed but will be taken care of by the database upgrade script.
 
 **Proxy configuration**
 
