@@ -14,7 +14,7 @@ from openatlas.display.util import (
     get_appearance, get_base_table_data, get_chart_data, get_system_data,
     link, profile_image_table_link, remove_link)
 from openatlas.display.util2 import (
-    format_date, is_authorized, manual, show_table_icons)
+    format_date, is_authorized, manual, show_table_icons, uc_first)
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 from openatlas.models.overlay import Overlay
@@ -90,9 +90,17 @@ class BaseDisplay:
         if hasattr(current_user, 'settings'):
             self.data |= get_system_data(self.entity)
         self.tabs['info'].buttons = self.buttons
+        frontend_link = None
+        if url := g.settings['frontend_resolver_url']:
+            frontend_link = link(
+                '<i class="fas fa-eye"></i> ' +
+                uc_first(_('presentation site')),
+                url + str(self.entity.id),
+                external=True)
         self.tabs['info'].content = render_template(
             'entity/view.html',
             entity=self.entity,
+            frontend_link=frontend_link,
             info_data=self.data,
             gis_data=self.gis_data,
             overlays=self.overlays,
@@ -132,17 +140,8 @@ class BaseDisplay:
         self.buttons.append(
             render_template('util/api_links.html', entity=self.entity))
         self.add_button_others()
-        self.add_button_frontend()
         if self.structure and len(self.structure['siblings']) > 1:
             self.add_button_sibling_pager()
-
-    def add_button_frontend(self) -> None:
-        if url := g.settings['frontend_resolver_url']:
-            self.buttons.append(
-                link(
-                    _('view in frontend'),
-                    url + str(self.entity.id),
-                    external=True))
 
     def add_button_copy(self) -> None:
         self.buttons.append(

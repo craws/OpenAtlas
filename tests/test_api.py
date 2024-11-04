@@ -8,7 +8,7 @@ from openatlas import app
 from openatlas.api.resources.api_entity import ApiEntity
 from tests.base import ApiTestCase
 
-
+# pylint: disable=too-many-lines
 class Api(ApiTestCase):
 
     def test_api(self) -> None:

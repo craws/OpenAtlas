@@ -96,10 +96,10 @@ def admin_index() -> str:
             get_content_table(),
             buttons=[manual('admin/content')])
         tabs['frontend'] = Tab(
-            'frontend',
+            'presentation_site',
             display_info(get_form_settings(FrontendForm())),
             buttons=[
-                manual('admin/frontend'),
+                manual('admin/presentation_site'),
                 button(_('edit'), url_for('settings', category='frontend'))])
     if is_authorized('contributor'):
         tabs['data'] = Tab(
@@ -315,9 +315,12 @@ def settings(category: str) -> str | Response:
     form = getattr(
         importlib.import_module('openatlas.forms.setting'),
         f"{uc_first(category)}Form")()
-    tab = category.replace('api', 'data').replace('mail', 'email')
+    tab = (category.replace('api', 'data').replace('mail', 'email'))
     redirect_url = f"{url_for('admin_index')}#tab-{tab}"
-    crumbs = [[_('admin'), f"{url_for('admin_index')}#tab-{tab}"], _(category)]
+    crumbs = [[
+        _('admin'),
+        f"{url_for('admin_index')}#tab-{tab}"],
+        _(category.replace('frontend', 'presentation site'))]
     if category == 'file':
         redirect_url = f"{url_for('file_index')}"
         crumbs = [[_('file'), url_for('file_index')], _('settings')]
@@ -349,9 +352,10 @@ def settings(category: str) -> str | Response:
             flash(_('error transaction'), 'error')
         return redirect(redirect_url)
     set_form_settings(form)
+    manual_page = f"admin/{category.replace('frontend', 'presentation_site')}"
     return render_template(
         'content.html',
-        content=display_form(form, manual_page=f"admin/{category}"),
+        content=display_form(form, manual_page=manual_page),
         title=_('admin'),
         crumbs=crumbs)
 
@@ -533,7 +537,7 @@ def orphans() -> str:
             tabs['orphaned_files'].table.rows.append([
                 file.stem,
                 convert_size(file.stat().st_size),
-                format_date(datetime.utcfromtimestamp(file.stat().st_ctime)),
+                format_date(datetime.fromtimestamp(file.stat().st_ctime)),
                 file.suffix,
                 link(_('download'), url_for('download', filename=file.name)),
                 link(
@@ -553,8 +557,7 @@ def orphans() -> str:
                 tabs['orphaned_iiif_files'].table.rows.append([
                     file.stem,
                     convert_size(file.stat().st_size),
-                    format_date(
-                        datetime.utcfromtimestamp(file.stat().st_ctime)),
+                    format_date(datetime.fromtimestamp(file.stat().st_ctime)),
                     file.suffix,
                     link(
                         _('delete'),

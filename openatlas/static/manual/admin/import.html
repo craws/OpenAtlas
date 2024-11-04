@@ -59,7 +59,7 @@
 <li class="toctree-l2"><a class="reference internal" href="map.html">Map</a></li>
 <li class="toctree-l2"><a class="reference internal" href="iiif.html">IIIF</a></li>
 <li class="toctree-l2"><a class="reference internal" href="content.html">Content</a></li>
-<li class="toctree-l2"><a class="reference internal" href="frontend.html">Frontend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="presentation_site.html">Presentation site</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_integrity_checks.html">Data integrity checks</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Import</a></li>
 <li class="toctree-l2"><a class="reference internal" href="export.html">Export</a></li>
@@ -128,7 +128,7 @@ Lists containing the following fields can be imported currently:</p>
 <li><p>Reference systems</p></li>
 <li><p>Administrative unit</p></li>
 <li><p>Historical place</p></li>
-<li><p>origin_id</p></li>
+<li><p>Origin IDs</p></li>
 <li><p>Place hierarchy</p></li>
 </ul>
 <section id="preparation">
@@ -172,28 +172,32 @@ available classes.</p>
 <p>Column headers can contain the following titles. Other titles won’t be
 imported and an error message will be displayed</p>
 <ul class="simple">
+<li><p><strong>id</strong> - this field has to be <strong>unique per project</strong>; if you have
+same IDs like a person and place with id = 1, you can prefix them in the
+document e.g. person_1, place_1 before importing. Please use only characters,
+numbers, underscore (_) or hyphen (-).</p></li>
 <li><p><strong>name</strong> - required, an error will be displayed if name; the data will not
 get imported if a name is missing</p></li>
 <li><p><strong>alias</strong> - only available for person, group and place, see
 <a class="reference internal" href="#alias-import"><span class="std std-ref">Alias</span></a></p></li>
 <li><p><strong>description</strong> - a description can be provided</p></li>
-<li><p><strong>origin_id</strong> - this field has to be <strong>unique per project</strong>; if you have
-same IDs like a person and place with id = 1, you can prefix them in the
-document e.g. person_1, place_1 before importing</p></li>
 <li><p><strong>begin_from</strong> - used for dates, see <a class="reference internal" href="#dates-import"><span class="std std-ref">Dates</span></a></p></li>
 <li><p><strong>begin_to</strong> - used for dates, see <a class="reference internal" href="#dates-import"><span class="std std-ref">Dates</span></a></p></li>
 <li><p><strong>end_from</strong> - used for dates, see <a class="reference internal" href="#dates-import"><span class="std std-ref">Dates</span></a></p></li>
 <li><p><strong>end_to</strong> - used for dates, see <a class="reference internal" href="#dates-import"><span class="std std-ref">Dates</span></a></p></li>
 <li><p><strong>type_ids</strong> - used for linking to a type, see <a class="reference internal" href="#types-import"><span class="std std-ref">Types</span></a></p></li>
 <li><p><strong>value_types</strong> - used for linking to a value type, see <a class="reference internal" href="#value-types-import"><span class="std std-ref">Value types</span></a></p></li>
-<li><p><strong>references</strong> - used for linking data to already existing references in
+<li><p><strong>reference_ids</strong> - used for linking data to already existing references in
 the database, see <a class="reference internal" href="#references-import"><span class="std std-ref">References</span></a></p></li>
+<li><p><strong>origin_reference_ids</strong> - used for linking data to already existing
+references in the database within the same project,
+see <a class="reference internal" href="#origin-references-import"><span class="std std-ref">Origin references</span></a></p></li>
 <li><p><strong>wkt</strong> - only available for places and artifacts, see <a class="reference internal" href="#wkt-import"><span class="std std-ref">WKT coordinates</span></a></p></li>
 <li><p><strong>reference_system_*</strong> - used for linking data to already existing external
 reference systems in the database, see <a class="reference internal" href="#reference-systems-import"><span class="std std-ref">External reference systems</span></a></p></li>
-<li><p><strong>administrative_unit</strong> - only available for places, ID of existing
+<li><p><strong>administrative_unit_id</strong> - only available for places, ID of existing
 administrative unit</p></li>
-<li><p><strong>historical_place</strong> - only available for places, ID of existing
+<li><p><strong>historical_place_id</strong> - only available for places, ID of existing
 historical place</p></li>
 <li><p><strong>parent_id</strong> - only available for place, ID of a super unit in a place
 hierarchy, see <a class="reference internal" href="#place-hierarchy-import"><span class="std std-ref">Place hierarchy</span></a></p></li>
@@ -269,6 +273,25 @@ and a semicolon (<strong>;</strong>) without further information</p></li>
 said reference in your OpenAtlas instance</p></li>
 </ul>
 </section>
+<section id="origin-references">
+<span id="origin-references-import"></span><h3>Origin references<a class="headerlink" href="#origin-references" title="Permalink to this heading"></a></h3>
+<p>The imported data can be linked to an already existing
+<a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a> within the same import project and through the origin
+ID (the ID which was given in the import), e.g. “literature_1”.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a> origin ID and pages are separated by a semicolon
+(<strong>;</strong>), e.g. literature_1;56-78</p></li>
+<li><p>to link a <a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a> with multiple page numbers, wrap the
+whole cell in quotation marks, e.g. “literature_1;IV, 56-78 book_2;34-23 66;”</p></li>
+<li><p>to link a <a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a> without page numbers, just add the ID
+and a semicolon (<strong>;</strong>) without further information</p></li>
+<li><p>enter multiple <a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a> separated by a space, e.g. literature_1;
+56-78 book_2;</p></li>
+<li><p>the <strong>origin ID</strong> of each <a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a> can be found at the detail view of
+said reference in your OpenAtlas instance if you have <strong>Show import information</strong>
+enabled in your <a class="reference internal" href="../tools/profile.html"><span class="doc">Profile</span></a>.</p></li>
+</ul>
+</section>
 <section id="wkt-coordinates">
 <span id="wkt-import"></span><h3>WKT coordinates<a class="headerlink" href="#wkt-coordinates" title="Permalink to this heading"></a></h3>
 <p>For places and artifact (multi)point, (multi)polygon, and (multi)linestring
@@ -304,7 +327,7 @@ value is the identifier, e.g. Q54123, the second value is the match type
 <a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a> hierarchy together
 with <a class="reference internal" href="../entity/feature.html"><span class="doc">Feature</span></a>, <a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>,
 <a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a>, and <a class="reference internal" href="../entity/human_remains.html"><span class="doc">Human remains</span></a>.
-The <strong>parent_id</strong> has to be an <strong>origin_id</strong> of a row in the <strong>current</strong>
+The <strong>parent_id</strong> has to be an origin <strong>id</strong> of a row in the <strong>current</strong>
 import file.
 The <strong>openatlas_parent_id</strong> has to be an <strong>existing</strong> OpenAtlas entity ID
 with the correct class.
@@ -337,7 +360,7 @@ You can also browse the projects to see which imported entities are associated
 with them.
 If advanced layout is enabled, the detail view of an entity shows from which
 project the entity was imported, which user did the import and the
-origin_id value.</p>
+origin ID value.</p>
 <p><strong>It is always a good idea to run :doc:`/admin/data_integrity_checks` after
 each import.</strong></p>
 </section>
