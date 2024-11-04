@@ -1,3 +1,4 @@
+import builtins
 from typing import Any, Optional
 
 from flask import g
@@ -50,12 +51,7 @@ def search_entity(entity: Entity | Link, param: dict[str, Any]) -> bool:
                         bool_values.append(bool(not any(
                             item in entity_values for item in item)))
             return all(bool_values)
-    bool_ = False
-    # print(entity_values)
-    # print(type(entity_values))
-    # print(type(search_values))
-    # import operator
-    # todo: check operator module to simplify the operator calls
+    # Todo: add to all comparison functions and replace > with operators from import operator
     def check_value_type():
         b = True
         values = dict(entity_values)
@@ -64,44 +60,33 @@ def search_entity(entity: Entity | Link, param: dict[str, Any]) -> bool:
                 b = False
                 break
         return b
+    found = False
+    scope = getattr(builtins, 'any' if logical_operator == 'or' else 'all')
     match operator_:
-        case 'equal' if logical_operator == 'or':
-            bool_ = bool(any(item in entity_values for item in search_values))
-        case 'equal' if logical_operator == 'and':
-            bool_ = bool(all(item in entity_values for item in search_values))
-        case 'notEqual' if logical_operator == 'or':
-            bool_ = bool(
-                not any(item in entity_values for item in search_values))
-        case 'notEqual' if logical_operator == 'and':
-            bool_ = bool(
-                not all(item in entity_values for item in search_values))
-        case 'like' if logical_operator == 'or':
-            bool_ = bool(any(
-                item in value for item in search_values
-                for value in entity_values))
-        case 'like' if logical_operator == 'and':
-            bool_ = bool(all(
-                item in ' '.join(entity_values) for item in search_values))
-        case 'greaterThan' if is_comparable and logical_operator == 'or':
-            bool_ = bool(any(item < entity_values for item in search_values))
-        case 'greaterThan' if is_comparable and logical_operator == 'and':
+        case 'equal':
+            found = bool(scope([item in entity_values for item in search_values]))
+        case 'notEqual':
+            found = bool(
+                not scope(item in entity_values for item in search_values))
+        case 'like':
+            # Todo: this function seems to have been a word search but we want to have a %like% search
+            found = bool(any(item in value for item in search_values for value in entity_values))
+            # found = bool(all(item in ' '.join(entity_values) for item in search_values))
+        case True if not is_comparable:
+            found = False
+        case 'greaterThan':
             if param['category'] == 'valueTypeID':
-               bool_ = check_value_type()
+               found = check_value_type()
             else:
-                bool_ = bool(all(item < entity_values for item in search_values))
-        case 'greaterThanEqual' if is_comparable and logical_operator == 'or':
-            bool_ = bool(any(item <= entity_values for item in search_values))
-        case 'greaterThanEqual' if is_comparable and logical_operator == 'and':
-            bool_ = bool(all(item <= entity_values for item in search_values))
-        case 'lesserThan' if is_comparable and logical_operator == 'or':
-            bool_ = bool(any(item > entity_values for item in search_values))
-        case 'lesserThan' if is_comparable and logical_operator == 'and':
-            bool_ = bool(all(item > entity_values for item in search_values))
-        case 'lesserThanEqual' if is_comparable and logical_operator == 'or':
-            bool_ = bool(any(item >= entity_values for item in search_values))
-        case 'lesserThanEqual' if is_comparable and logical_operator == 'and':
-            bool_ = bool(all(item >= entity_values for item in search_values))
-    return bool_
+                found = bool(scope(item < entity_values for item in search_values))
+        case 'greaterThanEqual':
+            found = bool(scope(item <= entity_values for item in search_values))
+        case 'lesserThan':
+            found = bool(scope(item > entity_values for item in search_values))
+        case 'lesserThanEqual':
+            found = bool(scope(item >= entity_values for item in search_values))
+
+    return found
 
 
 def value_to_be_searched(
