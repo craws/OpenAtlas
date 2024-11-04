@@ -3,6 +3,7 @@ from typing import Any, Optional
 
 from flask import Flask, Response, g, request, session
 from flask_babel import Babel
+from flask_jwt_extended import JWTManager
 from flask_login import current_user
 from flask_wtf.csrf import CSRFProtect
 from psycopg2 import extras
@@ -16,9 +17,9 @@ app.config.from_object('config.default')
 app.config.from_object('config.api')
 app.config.from_pyfile('production.py')
 app.config['WTF_CSRF_TIME_LIMIT'] = None  # Set CSRF token valid for session
-
 locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
 babel = Babel(app)
+jwt = JWTManager(app)
 
 # pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position
 from openatlas.models.logger import Logger

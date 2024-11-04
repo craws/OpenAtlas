@@ -3,7 +3,9 @@ from collections import defaultdict
 from typing import Any
 
 from flask import Response, g, jsonify
+from flask_jwt_extended import create_access_token
 from flask_restful import Resource, marshal
+from flask_login import current_user
 
 from openatlas.api.endpoints.parser import Parser
 from openatlas.api.formats.csv import export_database_csv
@@ -189,3 +191,17 @@ class GetNetworkVisualisation(Resource):
                     'systemClass': item['range_system_class'],
                     'relations': {item['domain_id']}}
         return output
+
+
+class GetJwtToken(Resource):
+    @staticmethod
+    def get() -> tuple[Resource, int] | Response | dict[str, Any]:
+        if not current_user.is_authenticated:
+            print('not logged in')
+        else:
+            print(current_user)
+            print(current_user.username)
+            print(current_user.password)
+            print(current_user.group)
+            print(create_access_token(identity=current_user.username))
+        pass
