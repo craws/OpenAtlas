@@ -3,7 +3,7 @@ postgis:
   deploy: ${DEPLOY_DATABASE}
   host: "${POSTGRES_HOST}"
   name: "${POSTGRES_DB}"
-  user: "${POSTGRES_USER}"
+  # ${POSTGRES_PASSWORD} is ignored, it has to be openatlas
   password: "${POSTGRES_PASSWORD}"
   version: "15-3.4"
 

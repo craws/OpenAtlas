@@ -214,7 +214,7 @@ def logo(id_: Optional[int] = None) -> str | Response:
         date = 'N/A'
         if entity.id in g.files:
             date = format_date(
-                datetime.utcfromtimestamp(g.files[entity.id].stat().st_ctime))
+                datetime.fromtimestamp(g.files[entity.id].stat().st_ctime))
         table.rows.append([
             link(_('set'), url_for('logo', id_=entity.id)),
             entity.name,
