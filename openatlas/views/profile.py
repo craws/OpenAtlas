@@ -1,6 +1,7 @@
 import importlib
-
 import bcrypt
+
+from datetime import timedelta
 from flask import flash, g, render_template, request, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_jwt_extended import create_access_token
@@ -148,10 +149,17 @@ def generate_token() -> str | Response:
         expiration = form.expiration.data
         return redirect(f"{url_for('generate_token', expiration=expiration)}")
     if expiration:
-        form.token_text.data = str(create_access_token(
+        match expiration:
+            case '0':
+                expires_delta = timedelta(days=1)
+            case '1':
+                expires_delta = timedelta(days=90)
+            case '2' | _:
+                expires_delta = False
+        form.token_text.data = create_access_token(
             identity=current_user.username,
             additional_claims={'role': current_user.group},
-            expires_delta=None))
+            expires_delta=expires_delta)
     return render_template(
         'content.html',
         content=display_form(form, manual_page='profile'),
