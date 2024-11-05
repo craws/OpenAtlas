@@ -1,8 +1,9 @@
 import importlib
 
 import bcrypt
-from flask import flash, g, render_template, session, url_for
+from flask import flash, g, render_template, request, session, url_for
 from flask_babel import lazy_gettext as _
+from flask_jwt_extended import create_access_token
 from flask_login import current_user, login_required
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
@@ -17,7 +18,7 @@ from openatlas.display.util import button, display_info
 from openatlas.display.util2 import manual, uc_first
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField, generate_password_field
-from openatlas.forms.setting import DisplayForm, ModulesForm
+from openatlas.forms.setting import DisplayForm, ModulesForm, TokenForm
 from openatlas.forms.util import get_form_settings, set_form_settings
 
 
@@ -72,6 +73,10 @@ def profile_index() -> str:
         'display': Tab(
             'display',
             display_info(get_form_settings(DisplayForm(), True)),
+            buttons=[manual('tools/profile')]),
+        'token': Tab(
+            'token',
+            display_info(get_form_settings(TokenForm(), True)),
             buttons=[manual('tools/profile')])}
     if not app.config['DEMO_MODE']:
         tabs['profile'].buttons += [
@@ -83,6 +88,8 @@ def profile_index() -> str:
                     url_for('profile_settings', category='modules')))
         tabs['display'].buttons.append(
             button(_('edit'), url_for('profile_settings', category='display')))
+        tabs['token'].buttons.append(
+            button(_('generate'), url_for('generate_token')))
     return render_template(
         'tabs.html',
         tabs=tabs,
@@ -130,6 +137,29 @@ def profile_settings(category: str) -> str | Response:
         crumbs=[
             [_('profile'), f"{url_for('profile_index')}#tab-{category}"],
             _(category)])
+
+
+@app.route('/profile/generate_token', methods=['GET', 'POST'])
+@login_required
+def generate_token() -> str | Response:
+    expiration = request.args.get('expiration')
+    form = TokenForm()
+    if form.validate_on_submit():
+        expiration = form.expiration.data
+        return redirect(f"{url_for('generate_token', expiration=expiration)}")
+    if expiration:
+        form.token_text.data = str(create_access_token(
+            identity=current_user.username,
+            additional_claims={'role': current_user.group},
+            expires_delta=None))
+    return render_template(
+        'content.html',
+        content=display_form(form, manual_page='profile'),
+        title=_('profile'),
+        crumbs=[
+            [_('profile'), f"{url_for('profile_index')}#tab-token"],
+            _('token')])
+
 
 
 @app.route('/profile/password', methods=['GET', 'POST'])
