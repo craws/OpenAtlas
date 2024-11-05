@@ -66,12 +66,9 @@ def search_entity(entity: Entity | Link, param: dict[str, Any]) -> bool:
         case 'equal':
             found = bool(scope([item in entity_values for item in search_values]))
         case 'notEqual':
-            found = bool(
-                not scope(item in entity_values for item in search_values))
+            found = bool(not scope(item in entity_values for item in search_values))
         case 'like':
-            # Todo: this function seems to have been a word search but we want to have a %like% search
-            found = bool(any(item in value for item in search_values for value in entity_values))
-            # found = bool(all(item in ' '.join(entity_values) for item in search_values))
+            found = bool(scope(item in value for item in search_values for value in entity_values))
         case True if not is_comparable:
             found = False
         case 'greaterThan':
