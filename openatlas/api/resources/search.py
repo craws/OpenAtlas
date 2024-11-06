@@ -52,15 +52,14 @@ def search_entity(entity: Entity | Link, param: dict[str, Any]) -> bool:
                         bool_values.append(bool(not any(
                             item in entity_values for item in item)))
             return all(bool_values)
-    # Todo: we never get here with valueTypeID. Test it
+
     operator_mapping = {
         'greaterThan': 'gt',
         'greaterThanEqual': 'ge',
         'lesserThan': 'lt',
         'lesserThanEqual': 'le'}
-
+    # Todo: include scope in check_value_type
     def check_value_type(op: str):
-        print("hello")
         b = True
         values = dict(entity_values)
         for i in search_values:
@@ -77,10 +76,10 @@ def search_entity(entity: Entity | Link, param: dict[str, Any]) -> bool:
             found = bool(not scope(item in entity_values for item in search_values))
         case 'like':
             found = bool(scope(item in value for item in search_values for value in entity_values))
-        case True if not is_comparable:
+        case _ if not is_comparable:
             found = False
-        case True if param['category'] == 'valueTypeID':
-            found = check_value_type(operator_mapping['operator_'])
+        case _ if param['category'] == 'valueTypeID':
+            found = check_value_type(operator_mapping[operator_])
         case 'greaterThan':
             found = bool(scope(item < entity_values for item in search_values))
         case 'greaterThanEqual':

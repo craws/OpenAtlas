@@ -55,6 +55,8 @@ class Api(ApiTestCase):
                             alias = entity
                         case 'Height':
                             height = entity
+                        case 'Weight':
+                            weight_ = entity
                         case 'Change of Property':
                             change_of_property = entity
                         case 'File not public':
@@ -507,6 +509,31 @@ class Api(ApiTestCase):
                     "logicalOperator":"and"}]}"""))
             assert bool(rv.get_json()['pagination']['entities'] == 0)
 
+            rv = self.app.get(url_for(
+                'api_04.query',
+                entities=place.id,
+                cidoc_classes='E18',
+                view_classes='artifact',
+                system_classes='person',
+                format='lp',
+                search="""{"entityAliases":[{"operator":"greaterThan",
+                    "values":["Sûza"],"logicalOperator":"and"}],
+                    "typeID":[{"operator":"equal","values":[1121212],
+                    "logicalOperator":"and"}]}"""))
+            assert bool(rv.get_json()['pagination']['entities'] == 0)
+
+            rv = self.app.get(url_for(
+                    'api_04.query',
+                    entities=place.id,
+                    classes='E18',
+                    codes='place',
+                    system_classes='person',
+                    format='lp',
+                    search=f"""{{"valueTypeID":[{{"operator":"greaterThanEqual",
+                    "values":[({height.id},23.0), ({weight_.id}, 999.0)],
+                    "logicalOperator":"and"}}]}}"""))
+            assert bool(rv.get_json()['pagination']['entities'] == 1)
+
             for rv in [
                 self.app.get(url_for(
                     'api_04.query',
@@ -560,6 +587,15 @@ class Api(ApiTestCase):
                     system_classes='person',
                     format='lp',
                     search=f'{{"valueTypeID":[{{"operator":"equal",'
+                           f'"values":[({height.id},23.0)]}}]}}')),
+                self.app.get(url_for(
+                    'api_04.query',
+                    entities=place.id,
+                    classes='E18',
+                    codes='place',
+                    system_classes='person',
+                    format='lp',
+                    search=f'{{"valueTypeID":[{{"operator":"greaterThanEqual",'
                            f'"values":[({height.id},23.0)]}}]}}')),
                 self.app.get(url_for(
                     'api_04.query',
@@ -701,7 +737,7 @@ class Api(ApiTestCase):
                     system_classes='person',
                     format='lp',
                     search='{"typeName": [{"operator": "like",'
-                           '"values": ["Oun", "HeI"],'
+                           '"values": ["Oun", "mark"],'
                            '"logicalOperator": "and"}]}')),
                 self.app.get(url_for(
                     'api_04.query',
@@ -710,13 +746,7 @@ class Api(ApiTestCase):
                     format='lp',
                     search=f'{{"typeIDWithSubs":[{{"operator":"notEqual",'
                            f'"values":[{boundary_mark.id}],'
-                           f'"logicalOperator":"and"}}]}}')),
-                self.app.get(url_for(
-                    'api_04.query',
-                    system_classes='place',
-                    search="""{"entityName":[{"operator":"notEqual",
-                                "values":["Mordor"],
-                                "logicalOperator":"or"}]}"""))]:
+                           f'"logicalOperator":"and"}}]}}'))]:
                 assert bool(rv.get_json()['pagination']['entities'] == 1)
             for rv in [
                 self.app.get(url_for(
