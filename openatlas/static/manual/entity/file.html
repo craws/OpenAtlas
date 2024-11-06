@@ -112,26 +112,29 @@
 <p>CIDOC documentation: <a class="reference external" href="https://www.cidoc-crm.org/Entity/e31-document/version-7.1">E31 Document</a></p>
 <p>The first tab <strong>Files</strong> shows an overview of used disk space and a <strong>List</strong>
 button to show all files.</p>
-<p>On the index page already entered entities are listed in a <a class="reference internal" href="../ui/table.html"><span class="doc">Table</span></a>.</p>
+<p>At the index page already entered entities are listed in a <a class="reference internal" href="../ui/table.html"><span class="doc">Table</span></a>.</p>
 <ul class="simple">
-<li><p>Click on the <strong>+</strong> button to enter a new one.</p></li>
-<li><p>Click on the <strong>name</strong> of an entry in the list to access the <strong>detail view</strong>.</p></li>
-<li><p>To edit or delete an entry click on the <strong>Edit</strong> button in the <strong>detail view.</strong></p></li>
+<li><p>Click on the <strong>+</strong> button to enter a new one</p></li>
+<li><p>Click on the <strong>name</strong> of an entry in the list to access the <strong>detail view</strong></p></li>
+<li><p>To edit or delete an entry, click on the <strong>Edit</strong> button in the <strong>detail
+view.</strong></p></li>
 </ul>
-<p>If entities are linked to displayable files the first one is shown in the info
-tab but can be changed to another one in the files tab of the entity.</p>
+<p>If entities are linked to displayable files the first linked file is shown in
+the info tab. If another image should be displayed it can be changed in the
+files tab of each entity.</p>
 <p>Files can be uploaded by editors if they don’t exceed the upload size limit and
-have an allowed extension. Both criteria are displayed at the upload form. It
-is possible to upload multiple files in one go. They can either be selected in
-the file field or drag and dropped into the specified area.</p>
+have one of the allowed extensions. Both criteria are displayed in the
+upload form. It is possible to upload multiple files in one go. They can
+either be selected via the file field or by drag and drop.</p>
 <section id="form-fields">
 <h2>Form fields<a class="headerlink" href="#form-fields" title="Permalink to this heading"></a></h2>
 <ul class="simple">
-<li><p><strong>File</strong> - here you can chose a file from your computer</p></li>
-<li><p><a class="reference internal" href="../ui/name.html"><span class="doc">Name</span></a> - if empty it will be prefilled after the file selection with
-the filename</p></li>
-<li><p><strong>License</strong> - which works like a <a class="reference internal" href="type.html"><span class="doc">Type</span></a>, it is a good practice to define
-one</p></li>
+<li><p><strong>File</strong> - choose a file from your computer</p></li>
+<li><p><a class="reference internal" href="../ui/name.html"><span class="doc">Name</span></a> - a name is required; if field is left empty, it will be
+filled with the file name after file selection</p></li>
+<li><p><strong>License</strong> - files such as images can only be shown on a presentation
+site and archived if a license is defined; furthermore it is just good
+practice to define licence</p></li>
 <li><p><a class="reference internal" href="../ui/description.html"><span class="doc">Description</span></a></p></li>
 </ul>
 </section>
@@ -143,7 +146,7 @@ More information is available at <a class="reference internal" href="../faq.html
 <ul class="simple">
 <li><p><strong>Public sharing allowed</strong> - indicates if public sharing is allowed</p></li>
 <li><p><strong>Creator</strong> - the creator of the file, e.g. the designer of a logo</p></li>
-<li><p><strong>License holder</strong> - if not the same as creator</p></li>
+<li><p><strong>License holder</strong> - mention if different from creator</p></li>
 </ul>
 </section>
 <section id="can-be-linked-via-tabs-to">
@@ -158,11 +161,13 @@ More information is available at <a class="reference internal" href="../faq.html
 </section>
 <section id="settings">
 <h2>Settings<a class="headerlink" href="#settings" title="Permalink to this heading"></a></h2>
+<p>File settings can be accessed via the Files menu item. Not all users can
+change the settings; Options provided are:</p>
 <ul class="simple">
-<li><p><strong>Maximum file size in MB</strong> - this limits also the total size of multiple
-file upload</p></li>
+<li><p><strong>Maximum file size in MB</strong> limits the maximum file size; also limits the
+total size when multiple files are uploaded together</p></li>
 <li><p><strong>Profile image width in pixel</strong> - related to the layout of info tabs</p></li>
-<li><p><strong>Allowed file extensions</strong></p></li>
+<li><p><strong>Allowed file extensions</strong> - e.g. pdf, jpg, jpeg, svg</p></li>
 </ul>
 <p>Images that can be displayed in the browser are defined through their
 extensions and can be changed in the configuration file
@@ -173,47 +178,49 @@ extensions and can be changed in the configuration file
 </section>
 <section id="logo">
 <h2>Logo<a class="headerlink" href="#logo" title="Permalink to this heading"></a></h2>
-<p>You can chose a custom logo. The file has to be uploaded before and has to have
-a display file extension. The displayed logo has a max-height of 120 px. If you
-selected a larger one the browser will try to scale it.</p>
+<p>You can chose a custom logo. To do so chose an already uploaded file with a
+displayable file extension. The displayed logo has a max-height of 120 px.
+If you have selected a larger image your browser will try to scale it.</p>
 </section>
 <section id="image-preview">
 <h2>Image preview<a class="headerlink" href="#image-preview" title="Permalink to this heading"></a></h2>
 <p>If image processing is enabled (default=on, configurable by admins) and user
 have <strong>Show icons in tables</strong> in their <a class="reference internal" href="../tools/profile.html"><span class="doc">Profile</span></a> activated, small
 images of files are shown in tables.</p>
-<p>Please be aware with many files and large tables this can impact performance.</p>
+<p><strong>Please be aware many files and large tables can impact performance.</strong></p>
 </section>
 <section id="how-to-make-files-available-for-the-public">
 <h2>How to make files available for the public<a class="headerlink" href="#how-to-make-files-available-for-the-public" title="Permalink to this heading"></a></h2>
-<p>In case it is planned to share files with the public, e.g. at a presentation
+<p>In case files are supposed to be shared with the public, e.g. on a presentation
 site or a public archive, several criteria have to be met.</p>
 <section id="criteria-checked-by-the-software">
 <h3>Criteria checked by the software<a class="headerlink" href="#criteria-checked-by-the-software" title="Permalink to this heading"></a></h3>
 <ul class="simple">
 <li><p>The file must exist</p></li>
 <li><p>A license has to be specified</p></li>
-<li><p>It has to be marked with <strong>public sharing allowed</strong></p></li>
+<li><p><strong>Public sharing allowed</strong> has to be marked</p></li>
 </ul>
-<p>In case these criteria aren’t met, a file won’t be:
-* Shared via the <a class="reference internal" href="../technical/api.html"><span class="doc">API</span></a>
-* Won’t show up on presentation sites developed by the OpenAtlas team
-* Won’t be included in case the long time archiving
-system <a class="reference external" href="https://arche.acdh.oeaw.ac.at/">ARCHE</a> is used</p>
+<p>In case these criteria aren’t met, a file won’t be:</p>
+<ul class="simple">
+<li><p>Shared via the <a class="reference internal" href="../technical/api.html"><span class="doc">API</span></a></p></li>
+<li><p>Won’t show up on presentation sites developed by the OpenAtlas team</p></li>
+<li><p>Won’t be included in long time archiving
+if <a class="reference external" href="https://arche.acdh.oeaw.ac.at/">ARCHE</a> is used</p></li>
+</ul>
 </section>
 <section id="criteria-checked-by-managers-and-users">
 <h3>Criteria checked by managers and users<a class="headerlink" href="#criteria-checked-by-managers-and-users" title="Permalink to this heading"></a></h3>
 <ul class="simple">
-<li><p>The linked license is the correct one and allows public sharing</p></li>
+<li><p>The linked license is correct and allows public sharing</p></li>
 <li><p>Other license specific criteria, e.g. specifying the creator, are met</p></li>
 </ul>
-<p>There are many licenses with many different criteria, e.g. a
-CC-BY 4.0 license requires the attribution to the creator. Because it is not
-possible to check these automatically, it is the responsibility of
-the project management to ensure that all necessary requirements
-are met and to indicated it via setting the <strong>public sharing allowed</strong> flag.</p>
-<p>Be aware that licenses can be linked to an external reference (e.g. an URL)
-which might be informative for other users or viewers.</p>
+<p>A automatic check for those specifics is not possible as there are many
+licenses with numerous different criteria. Therefore it is the
+responsibility of the project management to ensure that all necessary
+requirements are met. To indicate this use the <strong>public sharing
+allowed</strong> flag.</p>
+<p><strong>Used licenses should linked to an external reference (e.g. an URL) were
+possible as it is informative for other users and viewers.</strong></p>
 </section>
 </section>
 </section>

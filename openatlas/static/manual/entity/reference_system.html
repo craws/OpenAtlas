@@ -111,28 +111,30 @@
 </div>
 <p>CIDOC documentation:
 <a class="reference external" href="https://www.cidoc-crm.org/Entity/e32-authority-document/version-7.1">E32 Authority Document</a></p>
-<p>Reference systems can be used to link entities to external sources. You can
-see a list of available systems by clicking the <strong>Reference system</strong> button on
-the start page.</p>
-<p>Linking entities to external reference systems has many advantages like
-being able to find or provide more information from other sources and it makes
-it a lot easier to merge/compare data from other projects using the same
-reference systems.</p>
-<p>For step by step instructions to add a reference system have a look at our
+<p>Reference systems can be used to link entities to external sources. A list with
+available reference systems is provided when clicking the
+<strong>Reference system</strong> button on the start page.</p>
+<p>Linking entities to external reference systems has many advantages such as
+being able to find or provide more information from other sources. Futhermore,
+they facilitate the merge of data sets. By using reference systems LOD (Linked
+Open Data) can be created.
+Furthermore, analogue reference systems such as library catalogues or
+inventory numbers of a museum can be used in this way.</p>
+<p>For step by step instructions how to add a reference system have a look at our
 <a class="reference internal" href="../examples/reference_systems.html"><span class="doc">References Systems</span></a> example.</p>
 <section id="included-by-default">
 <h2>Included by default<a class="headerlink" href="#included-by-default" title="Permalink to this heading"></a></h2>
-<p>These systems are included in the default application. Furthermore,
-it was made use of their APIs to provide search functionality inside of
-OpenAtlas and display their information about already linked entities at the
-corresponding entity detail view.</p>
+<p>The following reference systems are pre-installed. By using their provided
+APIs, OpenAtlas can provide search functionality in the respective form fields
+and display information about already linked entities in the corresponding
+entity detail view.</p>
 <section id="wikidata">
 <h3>Wikidata<a class="headerlink" href="#wikidata" title="Permalink to this heading"></a></h3>
 <p><a class="reference external" href="https://wikidata.org/">Wikidata</a> is a collaboratively edited multilingual
 knowledge graph hosted by the Wikimedia Foundation. It is a common source of
-open data that Wikimedia projects such as Wikipedia, and anyone else, is able
-to use under the CC0 public domain license.</p>
-<p>By default it is usable for <strong>places, persons and groups</strong>.</p>
+open data for Wikimedia projects such as Wikipedia. Everyone is able
+to use the information under the CC0 public domain license.</p>
+<p>By default it is usable for <strong>places, persons and groups</strong> within OpenAtlas.</p>
 </section>
 <section id="geonames">
 <h3>GeoNames<a class="headerlink" href="#geonames" title="Permalink to this heading"></a></h3>
@@ -140,18 +142,19 @@ to use under the CC0 public domain license.</p>
 database available and accessible through various web services, under a
 Creative Commons attribution license. The GeoNames database contains over
 25,000,000 geographical names corresponding to over 11,800,000 unique features.</p>
-<p>For GeoNames the search is integrated in the map search field and it is also
-possible to take over their coordinates for specific places.</p>
-<p>By default it is usable for <strong>places</strong>.</p>
+<p>The GeoNames search functionality is integrated in the map search field.
+This enables users to automatically use the provided coordinates and
+identifiers for specific places.</p>
+<p>By default it is usable for <strong>places</strong> in OpenAtlas.</p>
 </section>
 <section id="gnd">
 <h3>GND<a class="headerlink" href="#gnd" title="Permalink to this heading"></a></h3>
 <p>The <a class="reference external" href="https://d-nb.info/standards/elementset/gnd">GND</a> or Gemeinsame Normdatei
 (translated as Integrated Authority File) is an international authority
-file for the organisation of personal names, subject headings and corporate
+file for the organisation of personal names, subject headings, and corporate
 bodies from catalogues. It is used mainly for documentation in libraries and
 increasingly also by archives and museums.</p>
-<p>By default it is usable for <strong>persons</strong>.</p>
+<p>By default it is usable for <strong>persons</strong> in OpenAtlas.</p>
 </section>
 </section>
 <section id="usage">
@@ -160,50 +163,53 @@ increasingly also by archives and museums.</p>
 adding or updating an entity.</p>
 <section id="id">
 <h3>ID<a class="headerlink" href="#id" title="Permalink to this heading"></a></h3>
-<p>The identifier of the entity in the external reference system. For GeoNames
-and Wikidata it will be checked for a valid format.</p>
+<p>The identifier of an entity in the external reference system. For GeoNames
+and Wikidata IDs will be checked for a valid format.</p>
 </section>
 <section id="precision">
 <h3>Precision<a class="headerlink" href="#precision" title="Permalink to this heading"></a></h3>
 <p>When linking to an external reference a precision is required. Available
 options are the <a class="reference external" href="https://www.w3.org/TR/skos-primer/">SKOS</a> based definitions
-of the confidence degree that concepts can be used interchangeable.</p>
+of confidence degree.</p>
 <ul class="simple">
-<li><p><strong>Close match</strong>: Concepts are sufficiently similar that they can be used
-interchangeably in some information retrieval applications</p></li>
-<li><p><strong>Exact match</strong>: High degree of confidence that the concepts can be used
+<li><p><strong>Close match</strong>: Concepts (here a dataset in OpenAtlas and a dataset in an
+external reference system) are sufficiently similar, therefore they can be
+used interchangeably in some information retrieval applications</p></li>
+<li><p><strong>Exact match</strong>: High degree of confidence that the concepts (a dataset in
+OpenAtlas and a dataset in an external reference system) can be used
 interchangeably</p></li>
 </ul>
-<p>E.g. if a historical project links the city of Vienna to Wikidata, a
-<strong>close match</strong> would be more suitable, because the Wikidata entry is more
-about the current city and not the historical one.</p>
+<p>E.g. if a historical project links the city of Vienna in Wikidata, a
+<strong>close match</strong> would be more suitable, as the Wikidata entry deals
+primarily with the current city Vienna and not the historical place.</p>
 </section>
 </section>
 <section id="configuration">
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h2>
-<p>Admins and manager can add, update and delete external reference systems.</p>
+<p>Admins and manager can add, update, and delete external reference systems.</p>
 <ul class="simple">
-<li><p><strong>Name</strong> - e.g. Wikipedia; can not be changed for Wikidata or GeoNames</p></li>
-<li><p><strong>Website URL</strong> - an URL to the project site of the reference system</p></li>
-<li><p><strong>Resolver URL</strong> - an URL that can be linked to in combination with an ID,
-e.g. the resolver URL <strong>https://www.wikidata.org/wiki/</strong> would create
-together with a <strong>Q123</strong>
-identifier the external link: <a class="reference external" href="https://www.wikidata.org/wiki/Q123">https://www.wikidata.org/wiki/Q123</a></p></li>
-<li><p><strong>Example ID</strong> - an example id to show the desired format e.g. Q123
-for Wikidata</p></li>
+<li><p><strong>Name</strong> - e.g. Wikipedia; the name can not be changed for the
+pre-installed reference systems Wikidata and GeoNames</p></li>
+<li><p><strong>Website URL</strong> - URL of the reference system (e.g.
+<a class="reference external" href="https://wikidata.org/">Wikidata</a> for Wikidata)</p></li>
+<li><p><strong>Resolver URL</strong> - URL that - in combination with the ID - links to an
+entity in the reference system (e.g. the resolver URL
+<strong>https://www.wikidata.org/wiki/</strong> in combination with the ID <strong>Q123</strong>
+creates the external link: <a class="reference external" href="https://www.wikidata.org/wiki/Q123">https://www.wikidata.org/wiki/Q123</a> (September)</p></li>
+<li><p><strong>Example ID</strong> - an example id to show the desired format (e.g. Q123
+for Wikidata)</p></li>
 <li><p><strong>External reference match</strong> - default precision selected in forms</p></li>
 <li><p><strong>Description</strong> - a short description, shown in forms when mouse over
 the <strong>i</strong> icon</p></li>
 <li><p><strong>Classes</strong> - a checkbox list of available classes, for GeoNames only place
 is available</p></li>
 </ul>
-<p>Classes can be removed from a system by clicking on the tab with the
+<p>Classes can be removed from a reference system by clicking on the tab with the
 corresponding class name and clicking the <strong>Remove</strong> button. This button is
-only available if there are no entities of this class linked to the reference
-system.</p>
+only available if there are no entities of this class linked to it yet.</p>
 <p>Reference systems can be deleted only if no classes are attached to it.
-Wikidata and GeoNames are integrated and cannot be deleted but if desired they
-can be disabled by removing the classes.</p>
+Wikidata and GeoNames are integrated into OpenAtlas and cannot be deleted but,
+if desired, can be disabled by removing the classes.</p>
 </section>
 </section>
 

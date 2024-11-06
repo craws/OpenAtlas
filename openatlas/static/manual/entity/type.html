@@ -114,52 +114,57 @@
 can be accessed and edited via the <strong>Types</strong> <a class="reference internal" href="../ui/menu.html"><span class="doc">Menu</span></a> item. With this
 feature the user interface can be adapted for specific research interests.</p>
 <ul class="simple">
-<li><p>Types can be added dynamically in forms (with at least editor permission)
-with basic information like name, description and super type</p></li>
+<li><p>Types can be added dynamically in forms (for users with editor status or
+higher) with basic information like name, description and super type</p></li>
 <li><p>The root type description is shown in forms as a mouse over text at
 the <strong>i</strong> icon</p></li>
-<li><p><strong>Untyped entities</strong> can be checked at the type overview</p></li>
-<li><p><strong>Multiple linked entities</strong> can be checked at the type overview, useful if
-switching to single</p></li>
-<li><p>Types (except value types) can be <strong>Set unselectable</strong>, e.g. to enter
-sub categories, via the corresponding button at a type view. But only if not
-already used by entities and at least editor permissions are needed.</p></li>
+<li><p><strong>Untyped entities</strong> can be checked via type overview</p></li>
+<li><p><strong>Multiple linked entities</strong> can be checked at type overview, useful if
+a type should be switched to single choice</p></li>
+<li><p>Types (except value types) can be <strong>Set unselectable</strong> via the
+corresponding button in a type view. If selected only the type’s
+sub-categories can be selected in a form. Set unselectable can only be
+selected if the type is not already used for entities. You need editor
+permission or higher to make this change</p></li>
 <li><p>A more detailed description on how to enter new types can be found
 <a class="reference internal" href="../examples/types.html"><span class="doc">here</span></a></p></li>
 </ul>
 <section id="standard-types">
 <h2>Standard types<a class="headerlink" href="#standard-types" title="Permalink to this heading"></a></h2>
-<p>Standard types are already present in the default installation with a few
-examples.</p>
+<p>Some standard types are pre-installed in every OpenAtlas instance. These types</p>
 <ul class="simple">
 <li><p>Cannot be deleted or renamed (but subtypes of them can)</p></li>
 <li><p>Are single select only</p></li>
-<li><p>In forms they appear with a <strong>Type</strong> label</p></li>
+<li><p>Appear in forms with a <strong>Type</strong> label</p></li>
 <li><p>Are displayed in entity tables</p></li>
 </ul>
 </section>
 <section id="custom-types">
 <h2>Custom types<a class="headerlink" href="#custom-types" title="Permalink to this heading"></a></h2>
 <p>Custom types can be created, deleted and renamed. The default installation
-comes with one example custom type <strong>Sex</strong> which is used for actor.</p>
+comes with one example custom type <strong>Sex</strong> which is used for actors. Custom
+types</p>
 <ul class="simple">
-<li><p>Can be set to allow single or multiple choices</p></li>
-<li><p>Can be used for multiple classes, e.g. a hierarchy “case study” for places,
-actors and events</p></li>
+<li><p>Can be single or multiple choices</p></li>
+<li><p>Can be used for multiple classes, for example the type “case study” and its
+sub-types can be used in forms for places, actors, and events</p></li>
 </ul>
 <p>If you want to change an existing <strong>multiple type to single</strong> but the
-multiple checkbox is greyed out and not selectable it means that at least one
-entity already used multiple. You can check these entries at the type overview
-at <strong>multiple linked entities</strong>.</p>
+multiple checkbox is greyed out and not selectable, the multiple option is
+used for at least one entity already. Check entries in type overview at
+<strong>multiple linked entities</strong> and make changes if necessary.</p>
 </section>
 <section id="value-types">
 <h2>Value types<a class="headerlink" href="#value-types" title="Permalink to this heading"></a></h2>
-<p>Value types can be created, deleted and renamed. The default installation comes
-with an example value type <strong>Dimensions</strong> with the sub types <strong>Height</strong> and
-<strong>Weight</strong> which are used in the form for artifacts.</p>
+<p>Value types can be created, deleted, and renamed. They are used to add
+values in form of decimals to an entity. The default installation
+comes with an example value type <strong>Dimensions</strong> with the sub-types
+<strong>Height</strong> and <strong>Weight</strong> which are used in the form for artifacts. Value
+types</p>
 <ul class="simple">
 <li><p>Can be used for multiple classes</p></li>
 <li><p>Values can be entered as decimals in forms</p></li>
+<li><p>A unit such as centimetre, gram, or percentage can be specified</p></li>
 </ul>
 </section>
 <section id="form-fields">
@@ -169,7 +174,7 @@ with an example value type <strong>Dimensions</strong> with the sub types <stron
 <li><p><a class="reference internal" href="../ui/description.html"><span class="doc">Description</span></a></p></li>
 <li><p><a class="reference internal" href="reference_system.html"><span class="doc">Reference System</span></a></p></li>
 <li><p><a class="reference internal" href="../ui/date.html"><span class="doc">Date</span></a></p></li>
-<li><p>A super (type) if it is a sub type of another type</p></li>
+<li><p>A super (type) if it is a sub-type of another type</p></li>
 </ul>
 </section>
 <section id="can-be-linked-via-tabs-to">
@@ -181,14 +186,14 @@ with an example value type <strong>Dimensions</strong> with the sub types <stron
 </section>
 <section id="making-types-required">
 <h2>Making types required<a class="headerlink" href="#making-types-required" title="Permalink to this heading"></a></h2>
-<p>It is possible making specifying of types required. This can be done at the
-type overview in the right information display of the respective type by users
-who have at least manager permissions.</p>
-<p>Be careful with making types required, especially when there are users who
-aren’t permitted to create new ones. It may put them in an awkward situation at
-data entry and, as a result, may even reduce the data quality.</p>
-<p>Also keep in mind, that existing entries which haven’t set this type, will than
-not be possible to update, without setting the required type.</p>
+<p>It is possible to make certain types required. To make a type required, go
+to type overview. Mark it as required in the display on the right. You have
+to have manager or higher status to do this.</p>
+<p>Please keep in mind that not all users can add new types when making a type
+required. This might lead to situations where a user is unable to choose a
+fitting type for an entity and might therefore reduce data quality.</p>
+<p>Existing entries that were entered before a typ was set to required and have
+no set values for this specific type can not be updated anymore afterwards.</p>
 </section>
 </section>
 

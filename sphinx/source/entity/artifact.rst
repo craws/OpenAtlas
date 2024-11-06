@@ -6,7 +6,7 @@ Artifact
 CIDOC documentation:
 :cidoc_entity:`E22 Human-Made Object<e22-human-made-object>`
 
-Artifact can be entered here, e.g. a coin
+Artifact such as coins or pottery can be entered in this form.
 
 .. include:: navigation.rst
 
@@ -18,18 +18,19 @@ Form fields
 * :doc:`/ui/description`
 * :doc:`/tools/map`
 * :doc:`reference_system`
-* **Super** - a :doc:`place`, :doc:`feature`, :doc:`stratigraphic_unit` or
-  artifact, which it is a part of
-* **Owned by** - the :doc:`actor` who owns the artifact
+* **Super** - A :doc:`place`, :doc:`feature`, :doc:`stratigraphic_unit`, or
+  artifact, which the entered artifact is a part of
+* **Owned by** - Link the artifact to an :doc:`actor` (person or group) who
+  owns it, such as a museum or a collector
 
 Can be linked via tabs to
 -------------------------
-* :doc:`source` - when it is referenced there
-* :doc:`event` - acquisition, modification, move or production
-* **Artifact** - here sub artifacts or :doc:`human_remains` can be added
-* :doc:`reference`
-* :doc:`file`
+* :doc:`source` - Use, if an artifact is mentioned in a source
+* :doc:`event` - Use, if an artifact was part of an event such as its
+  production
+* **Artifact** - Use, to add sub artifacts or :doc:`human_remains`
+* :doc:`reference` - Use to add citation
+* :doc:`file` - Add a file, e.g. a picture of the artifact
 
-If the artifact is a carrier of information it can be linked to a source. For
-this you would have to edit or create the source and choose the artifact within
-the source form.
+If an artifact is a carrier of information **create or edit a source** and
+choose the artifact that carries the source **within the source form**.
