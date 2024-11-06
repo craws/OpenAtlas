@@ -53,7 +53,7 @@ File settings can be accessed via the Files menu item. Not all users can
 change the settings; Options provided are:
 
 * **Maximum file size in MB** limits the maximum file size; also limits the
-total size when multiple files are uploaded together
+  total size when multiple files are uploaded together
 * **Profile image width in pixel** - related to the layout of info tabs
 * **Allowed file extensions** - e.g. pdf, jpg, jpeg, svg
 
@@ -91,10 +91,11 @@ Criteria checked by the software
 * **Public sharing allowed** has to be marked
 
 In case these criteria aren't met, a file won't be:
+
 * Shared via the :doc:`/technical/api`
 * Won't show up on presentation sites developed by the OpenAtlas team
-* Won't be included in long time archiving if
-  `ARCHE <https://arche.acdh.oeaw.ac.at/>`_ is used
+* Won't be included in long time archiving
+  if `ARCHE <https://arche.acdh.oeaw.ac.at/>`_ is used
 
 Criteria checked by managers and users
 **************************************

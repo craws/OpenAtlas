@@ -41,7 +41,7 @@ types
 
 * Can be single or multiple choices
 * Can be used for multiple classes, for example the type "case study" and its
-sub-types can be used in forms for places, actors, and events
+  sub-types can be used in forms for places, actors, and events
 
 If you want to change an existing **multiple type to single** but the
 multiple checkbox is greyed out and not selectable, the multiple option is

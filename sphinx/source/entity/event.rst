@@ -13,7 +13,7 @@ CIDOC documentation:
 :cidoc_entity:`E65 Creation<e65-creation>`
 
 * **Activity** (:cidoc_entity:`E7 Activity<e7-activity>`) - The most common
-form of event, such as a battle, a meeting, or a wedding
+  form of event, such as a battle, a meeting, or a wedding
 * **Acquisition** (:cidoc_entity:`E8 Acquisition<e8-acquisition>`) - Maps a
   change of property from one owner to another
 * **Creation** (:cidoc_entity:`E65 Creation<e65-creation>`) - The creation
