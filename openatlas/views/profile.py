@@ -4,7 +4,7 @@ import bcrypt
 from datetime import timedelta
 from flask import flash, g, render_template, request, session, url_for
 from flask_babel import lazy_gettext as _
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, create_refresh_token
 from flask_login import current_user, login_required
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
