@@ -81,6 +81,7 @@ versions = {
             '2152': 'Annotations: check orphan function',
             '2269': 'Updated French translations',
             '2249': 'API: 0.4.2',
+            '2200': 'API: Expand LPF format',
             '1980': 'API: Improve LOUD',
             '2251':
                 'Presentation sites: change entity/id endpoint to entities/id',

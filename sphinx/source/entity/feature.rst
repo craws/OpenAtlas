@@ -6,7 +6,8 @@ Feature
 CIDOC documentation: :cidoc_entity:`E18 Physical Thing<e18-physical-thing>`
 
 Features are subunit of a :doc:`place` and used in archaeological data
-recording. E.g. graves or buildings of a site would be considered Features.
+recording. E.g. graves or buildings of an archaeological site would be
+considered features.
 
 Form fields
 -----------
@@ -14,17 +15,18 @@ Form fields
 * :doc:`type`
 * :doc:`/ui/date`
 * :doc:`/ui/description`
-* Super - a :doc:`place` which it is a part of
+* Super - :doc:`place` the feature is a part of
 * :doc:`/tools/map`
 
 Can be linked via tabs to
 -------------------------
-* :doc:`source` - when it is referenced there
-* :doc:`event` - only for new events. For existing the location at the event
-  itself can be edited.
-* :doc:`reference`
-* :doc:`stratigraphic_unit`
-* :doc:`file`
+* :doc:`source` - use, if a feature is referenced in it
+* :doc:`event` - use only for new events. For already existing events link
+  the location in the event form
+* :doc:`reference` can be used to add a citation
+* :doc:`stratigraphic_unit` is used to link a subunit of a feature (e.g. a
+  skeleton (stratigraphic unit) in a grave (feature))
+* :doc:`file` can be used to add files such as pictures
 
 Super and subunits
 ------------------
