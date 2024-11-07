@@ -2,7 +2,6 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any, Optional
 
-import numpy
 import pandas as pd
 from flask import flash, g, render_template, request, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -31,6 +30,7 @@ from openatlas.display.util2 import (
     manual, uc_first)
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
+from openatlas.forms.util import form_to_datetime64
 from openatlas.models.entity import Entity
 from openatlas.models.imports import (
     Project, check_duplicates, check_single_type_duplicates, check_type_id,
@@ -39,6 +39,7 @@ from openatlas.models.imports import (
 _('invalid columns')
 _('possible duplicates')
 _('invalid administrative units')
+_('invalid dates')
 _('invalid reference system class')
 _('invalid reference system')
 _('invalid reference system value')
@@ -520,14 +521,21 @@ def check_cell_value(
             except WKTReadingError:
                 value = error_span(value)
                 checks.set_warning('invalid_coordinates', id_)
-        case 'begin_from' | 'begin_to' | 'end_from' | 'end_to':
+        case 'begin_from' | 'begin_to' | 'end_from' | 'end_to' if value:
             try:
-                value = datetime64_to_timestamp(
-                    numpy.datetime64(value))
-                row[item] = value
+                value = value.split('-')
+                value = [int(item) for item in value]
+                value = value + [None] * (3 - len(value))
+                value = datetime64_to_timestamp(form_to_datetime64(
+                    value[0],
+                    value[1],
+                    value[2],
+                    to_date=item in ['begin_to', 'end_to']))
+                row[item] = value if all(value) else ''
             except ValueError:
                 row[item] = ''
                 value = '' if str(value) == 'NaT' else error_span(value)
+                checks.set_warning('invalid_dates', id_)
         case 'administrative_unit_id' | 'historical_place_id' if value:
             if ((not str(value).isdigit() or int(value) not in g.types) or
                     g.types[g.types[int(value)].root[0]].name not in [

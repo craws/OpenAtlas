@@ -134,6 +134,7 @@ class ExportImportTest(ExportImportTestCase):
                     data={'file': file},
                     follow_redirects=True)
             assert b'invalid coordinates' in rv.data
+            assert b'invalid dates' in rv.data
             assert b'invalid value types' in rv.data
             assert b'invalid reference system value' in rv.data
             assert b'invalid match type' in rv.data
