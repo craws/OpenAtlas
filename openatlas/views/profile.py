@@ -84,9 +84,9 @@ def profile_index() -> str:
             button(_('edit'), url_for('profile_settings', category='profile')),
             button(_('change password'), url_for('profile_password'))]
         tabs['modules'].buttons.append(
-                button(
-                    _('edit'),
-                    url_for('profile_settings', category='modules')))
+            button(
+                _('edit'),
+                url_for('profile_settings', category='modules')))
         tabs['display'].buttons.append(
             button(_('edit'), url_for('profile_settings', category='display')))
         tabs['token'].buttons.append(
@@ -143,23 +143,22 @@ def profile_settings(category: str) -> str | Response:
 @app.route('/profile/generate_token', methods=['GET', 'POST'])
 @login_required
 def generate_token() -> str | Response:
-    expiration = request.args.get('expiration')
     form = TokenForm()
     if form.validate_on_submit():
         expiration = form.expiration.data
-        return redirect(f"{url_for('generate_token', expiration=expiration)}")
-    if expiration:
-        match expiration:
-            case '0':
-                expires_delta = timedelta(days=1)
-            case '1':
-                expires_delta = timedelta(days=90)
-            case '2' | _:
-                expires_delta = False
-        form.token_text.data = create_access_token(
-            identity=current_user.username,
-            additional_claims={'role': current_user.group},
-            expires_delta=expires_delta)
+        token_name = form.token_name.data
+        token = None
+        Transaction.begin()
+        try:
+            token = current_user.generate_token(expiration, token_name)
+            Transaction.commit()
+            flash(_('token stored'), 'info')
+        except Exception as e:  # pragma: no cover
+            Transaction.rollback()
+            g.logger.log('error', 'database', 'transaction failed', e)
+            flash(_('error transaction'), 'error')
+        return redirect(f"{url_for('generate_token', token=token)}")
+    form.token_text.data = request.args.get('token')
     return render_template(
         'content.html',
         content=display_form(form, manual_page='profile'),
@@ -167,7 +166,6 @@ def generate_token() -> str | Response:
         crumbs=[
             [_('profile'), f"{url_for('profile_index')}#tab-token"],
             _('token')])
-
 
 
 @app.route('/profile/password', methods=['GET', 'POST'])

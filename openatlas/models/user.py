@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from typing import Any, Optional
 
 from flask import g, session
+from flask_jwt_extended import create_access_token, decode_token
 from flask_login import UserMixin, current_user
 
 from openatlas.database import user as db
@@ -81,6 +82,27 @@ class User(UserMixin):
 
     def get_entities(self) -> list[Entity]:
         return Entity.get_by_ids(db.get_user_entities(self.id), types=True)
+
+    def generate_token(self, expiration: str, token_name: str) -> None:
+        match expiration:
+            case '0':
+                expires_delta = timedelta(days=1)
+            case '1':
+                expires_delta = timedelta(days=90)
+            case '2' | _:
+                expires_delta = False
+        access_token = create_access_token(
+            identity=self.username,
+            additional_claims={'role': self.group},
+            expires_delta=expires_delta)
+        decoded_token = decode_token(access_token, allow_expired=True )
+        db.generate_token({
+            'jit':decoded_token['jti'],
+            'user_id': self.id,
+            'name': token_name,
+            'valid_until': datetime.fromtimestamp(decoded_token.get('exp')),
+            'valid_from': datetime.fromtimestamp(decoded_token['iat'])})
+        return access_token
 
     @staticmethod
     def get_all() -> list[User]:

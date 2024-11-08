@@ -298,3 +298,12 @@ def get_user_entities(id_: int) -> list[int]:
         """,
         {'user_id': id_})
     return [row['id'] for row in g.cursor.fetchall()]
+
+
+def generate_token(data: dict[str, str]) -> None:
+    g.cursor.execute(
+        """
+        INSERT INTO web.user_tokens(user_id, jit, valid_from, valid_until, name)
+            VALUES (%(user_id)s, %(jit)s, %(valid_from)s, %(valid_until)s, %(name)s);
+        """, data)
+    return None

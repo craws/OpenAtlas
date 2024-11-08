@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (
@@ -169,5 +171,8 @@ class TokenForm(FlaskForm):
         _('expiration'),
         choices=[('0','One day'),('1','90 days'), ('2', 'no expiration date')],
         default='0')
+    token_name = StringField(
+        _('token name'),
+        default=f"Token_{datetime.today().strftime('%Y-%m-%d')}")
     token_text = StringField(_('token'), render_kw={'readonly': True})
     save = SubmitField(_('generate'))
