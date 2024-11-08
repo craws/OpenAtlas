@@ -95,14 +95,20 @@ class User(UserMixin):
             identity=self.username,
             additional_claims={'role': self.group},
             expires_delta=expires_delta)
-        decoded_token = decode_token(access_token, allow_expired=True )
+        decoded_token = decode_token(access_token, allow_expired=True)
         db.generate_token({
-            'jit':decoded_token['jti'],
+            'jit': decoded_token['jti'],
             'user_id': self.id,
             'name': token_name,
             'valid_until': datetime.fromtimestamp(decoded_token.get('exp')),
             'valid_from': datetime.fromtimestamp(decoded_token['iat'])})
         return access_token
+
+    def get_tokens(self) -> list[dict[str, Any]]:
+        return db.get_tokens(self.id)
+
+    def delete_token(self, id_: int) -> None:
+        return db.delete_tokens(self.id, id_)
 
     @staticmethod
     def get_all() -> list[User]:

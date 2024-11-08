@@ -15,7 +15,8 @@ from wtforms.validators import InputRequired
 from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
-from openatlas.display.util import button, display_info
+from openatlas.display.table import Table
+from openatlas.display.util import button, display_info, link
 from openatlas.display.util2 import manual, uc_first
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField, generate_password_field
@@ -157,15 +158,37 @@ def generate_token() -> str | Response:
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
+        # Todo: instead of passing token via URL, use Response (
+        #  https://tedboy.github.io/flask/interface_api.response_object.html
+        #  ?highlight=response)
         return redirect(f"{url_for('generate_token', token=token)}")
+    table = Table(['name', 'jit', 'valid_from', 'valid_until'])
+    for token in current_user.get_tokens():
+        table.rows.append([
+            token['name'],
+            token['jit'],
+            token['valid_from'],
+            token['valid_until'],
+            link(
+                _('delete'),
+                url_for('delete_token', id_=token['id']))])
     form.token_text.data = request.args.get('token')
     return render_template(
         'content.html',
         content=display_form(form, manual_page='profile'),
+        table=table,
         title=_('profile'),
         crumbs=[
             [_('profile'), f"{url_for('profile_index')}#tab-token"],
             _('token')])
+
+
+@app.route('/profile/delete_token/<int:id_>')
+@login_required
+def delete_token(id_: int) -> str | Response:
+    current_user.delete_token(id_)
+    flash(_('token deleted'), 'info')
+    return redirect(url_for('generate_token'))
 
 
 @app.route('/profile/password', methods=['GET', 'POST'])

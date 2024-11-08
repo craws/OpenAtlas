@@ -300,10 +300,30 @@ def get_user_entities(id_: int) -> list[int]:
     return [row['id'] for row in g.cursor.fetchall()]
 
 
+def get_tokens(id_: int) -> list[dict[str, Any]]:
+    g.cursor.execute(
+        """
+        SELECT id, user_id, jit, valid_from, valid_until, name, created
+            FROM web.user_tokens 
+            WHERE user_id = %(user_id)s;
+        """, {'user_id': id_})
+    return [dict(row) for row in g.cursor.fetchall()]
+
+
 def generate_token(data: dict[str, str]) -> None:
     g.cursor.execute(
         """
-        INSERT INTO web.user_tokens(user_id, jit, valid_from, valid_until, name)
-            VALUES (%(user_id)s, %(jit)s, %(valid_from)s, %(valid_until)s, %(name)s);
+        INSERT INTO web.user_tokens(user_id, jit, valid_from, valid_until, 
+        name)
+            VALUES (%(user_id)s, %(jit)s, %(valid_from)s, %(valid_until)s, 
+            %(name)s);
         """, data)
     return None
+
+
+def delete_tokens(user_id: int, id_: int) -> None:
+    g.cursor.execute(
+        """
+        DELETE FROM web.user_tokens 
+        WHERE id = %(id)s AND user_id = %(user_id)s;
+        """, {'user_id': user_id, 'id': id_})
