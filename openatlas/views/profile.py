@@ -1,8 +1,9 @@
 import importlib
 import bcrypt
 
-from datetime import timedelta
-from flask import flash, g, render_template, request, session, url_for
+from datetime import datetime, timedelta
+from flask import flash, g, make_response, render_template, request, session, \
+    url_for
 from flask_babel import lazy_gettext as _
 from flask_jwt_extended import create_access_token, create_refresh_token
 from flask_login import current_user, login_required
@@ -158,10 +159,17 @@ def generate_token() -> str | Response:
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        # Todo: instead of passing token via URL, use Response (
-        #  https://tedboy.github.io/flask/interface_api.response_object.html
-        #  ?highlight=response)
-        return redirect(f"{url_for('generate_token', token=token)}")
+        response = make_response(redirect(url_for('generate_token')))
+        response.set_cookie(
+            'jwt_token',
+            token,
+            httponly=True,
+            secure=True,
+            max_age=timedelta(seconds=1))
+        return response
+    token = request.cookies.get('jwt_token')
+    form.token_text.data = token
+
     table = Table(['name', 'jit', 'valid_from', 'valid_until'])
     for token in current_user.get_tokens():
         table.rows.append([
@@ -172,7 +180,6 @@ def generate_token() -> str | Response:
             link(
                 _('delete'),
                 url_for('delete_token', id_=token['id']))])
-    form.token_text.data = request.args.get('token')
     return render_template(
         'content.html',
         content=display_form(form, manual_page='profile'),
