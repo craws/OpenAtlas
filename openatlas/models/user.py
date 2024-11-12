@@ -96,11 +96,14 @@ class User(UserMixin):
             additional_claims={'role': self.group},
             expires_delta=expires_delta)
         decoded_token = decode_token(access_token, allow_expired=True)
+        valid_until = datetime.max
+        if decoded_token.get('exp'):
+            valid_until = datetime.fromtimestamp(decoded_token.get('exp'))
         db.generate_token({
             'jit': decoded_token['jti'],
             'user_id': self.id,
             'name': token_name,
-            'valid_until': datetime.fromtimestamp(decoded_token.get('exp')),
+            'valid_until': valid_until,
             'valid_from': datetime.fromtimestamp(decoded_token['iat'])})
         return access_token
 
