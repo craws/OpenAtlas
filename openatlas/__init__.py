@@ -1,9 +1,10 @@
 import locale
 from typing import Any, Optional
 
+from cleo.helpers import option
 from flask import Flask, Response, g, request, session
 from flask_babel import Babel
-from flask_jwt_extended import JWTManager
+from flask_jwt_extended import JWTManager, verify_jwt_in_request
 from flask_login import current_user
 from flask_wtf.csrf import CSRFProtect
 from psycopg2 import extras
@@ -109,7 +110,10 @@ def setup_api() -> None:
         ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
         if not current_user.is_authenticated \
                 and not g.settings['api_public'] \
-                and ip not in app.config['ALLOWED_IPS']:
+                and ip not in app.config['ALLOWED_IPS'] \
+                and not verify_jwt_in_request(
+                    optional=True,
+                    locations='headers'):
             raise AccessDeniedError
 
 

@@ -174,7 +174,6 @@ def generate_token() -> str | Response:
     return render_template(
         'content.html',
         content=display_form(form, manual_page='profile'),
-        table=get_token_table(),
         title=_('profile'),
         crumbs=[
             [_('profile'), f"{url_for('profile_index')}#tab-token"],
