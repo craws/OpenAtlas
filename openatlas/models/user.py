@@ -86,7 +86,7 @@ class User(UserMixin):
     def generate_token(self, expiration: str, token_name: str) -> None:
         match expiration:
             case '0':
-                expires_delta = timedelta(days=1)
+                expires_delta: timedelta | bool = timedelta(days=1)
             case '1':
                 expires_delta = timedelta(days=90)
             case '2' | _:

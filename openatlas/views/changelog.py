@@ -16,6 +16,10 @@ def index_changelog() -> str:
 
 # pylint: disable=too-many-lines
 versions = {
+    '8.9.0': ['TBA', {
+        'feature': {
+            '1233': 'API: External Authentication',}
+    }],
     '8.8.0': ['2024-10-31', {
         'feature': {
             '2349': 'Stronger hints that notes are not part of the model',

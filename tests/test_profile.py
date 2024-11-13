@@ -1,14 +1,14 @@
 from flask import url_for
 
 from openatlas import app
-from tests.base import TestBaseCase
+from openatlas.database.user import get_tokens
+from tests.base import ProfileTestCase
 
 
-class ProfileTests(TestBaseCase):
+class ProfileTests(ProfileTestCase):
 
     def test_profile(self) -> None:
         with app.app_context():
-
             rv = self.app.get(url_for('profile_settings', category='profile'))
             assert b'alice@example.com' in rv.data
 
@@ -65,3 +65,33 @@ class ProfileTests(TestBaseCase):
                 data=data,
                 follow_redirects=True)
             assert b'too short' in rv.data
+
+            tokens = [
+                {'expiration': 0, 'token_name': 'one day token'},
+                {'expiration': 1, 'token_name': '90 days token'},
+                {'expiration': 2, 'token_name': 'indefinite token'}]
+            for token in tokens:
+                rv = self.app.post(
+                    url_for('generate_token'),
+                    data=token,
+                    follow_redirects=True)
+                assert b'Token stored' in rv.data
+
+            # This should get the token table, which will not be generated
+            rv = self.app.get(url_for('profile_index'))
+            assert b'Generate' in rv.data
+
+            with app.app_context():
+                with app.test_request_context():
+                    app.preprocess_request()
+                    token_id = get_tokens(self.alice_id)[0]['id']
+
+            rv = self.app.get(
+                url_for('delete_token', id_=token_id),
+                follow_redirects=True)
+            assert b'Token deleted' in rv.data
+
+            rv = self.app.get(
+                url_for('delete_all_tokens'),
+                follow_redirects=True)
+            assert b'All tokens deleted' in rv.data

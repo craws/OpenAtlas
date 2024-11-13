@@ -1,9 +1,9 @@
--- Upgrade 8.0.x to 8.1.0
+-- Upgrade 8.8.x to 8.9.0
 -- Be sure to backup the database and read the upgrade notes before executing.
 
 BEGIN;
 
--- UPDATE web.settings SET value = '8.0.0' WHERE name = 'database_version';
+UPDATE web.settings SET value = '8.9.0' WHERE name = 'database_version';
 
 
 CREATE TABLE IF NOT EXISTS web.user_tokens

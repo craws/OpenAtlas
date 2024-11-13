@@ -1,7 +1,6 @@
 import locale
 from typing import Any, Optional
 
-from cleo.helpers import option
 from flask import Flask, Response, g, request, session
 from flask_babel import Babel
 from flask_jwt_extended import JWTManager, verify_jwt_in_request

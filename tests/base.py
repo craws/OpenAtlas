@@ -6,6 +6,7 @@ import psycopg2
 from flask import url_for
 
 from openatlas import app
+from openatlas.database.user import get_tokens
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 
@@ -102,6 +103,15 @@ class ApiTestCase(TestBaseCase):
             and data['results'][0]['view']
             and data['results'][0]['icon']
             and data['results'][0]['label'])
+
+
+class ProfileTestCase(TestBaseCase):
+    def setUp(self) -> None:
+        super().setUp()
+        with app.app_context():
+            with app.test_request_context():
+                app.preprocess_request()
+                self.token_id = get_tokens(self.alice_id)
 
 
 class ExportImportTestCase(TestBaseCase):

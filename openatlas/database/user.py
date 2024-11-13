@@ -318,7 +318,6 @@ def generate_token(data: dict[str, str]) -> None:
             VALUES (%(user_id)s, %(jit)s, %(valid_from)s, %(valid_until)s, 
             %(name)s);
         """, data)
-    return None
 
 
 def delete_tokens(user_id: int, id_: int) -> None:
