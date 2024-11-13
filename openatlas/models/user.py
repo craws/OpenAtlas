@@ -113,6 +113,9 @@ class User(UserMixin):
     def delete_token(self, id_: int) -> None:
         return db.delete_tokens(self.id, id_)
 
+    def delete_all_tokens(self) -> None:
+        return db.delete_all_tokens(self.id)
+
     @staticmethod
     def get_all() -> list[User]:
         return [User(row) for row in db.get_all()]

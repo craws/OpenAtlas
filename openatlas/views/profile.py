@@ -1,11 +1,10 @@
 import importlib
 import bcrypt
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 from flask import flash, g, make_response, render_template, request, session, \
     url_for
 from flask_babel import lazy_gettext as _
-from flask_jwt_extended import create_access_token, create_refresh_token
 from flask_login import current_user, login_required
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
@@ -93,6 +92,9 @@ def profile_index() -> str:
             button(_('edit'), url_for('profile_settings', category='display')))
         tabs['token'].buttons.append(
             button(_('generate'), url_for('generate_token')))
+        tabs['token'].buttons.append(
+            button(_('delete all tokens'), url_for('delete_all_tokens')))
+        tabs['token'].table = get_token_table()
     return render_template(
         'tabs.html',
         tabs=tabs,
@@ -169,21 +171,10 @@ def generate_token() -> str | Response:
         return response
     token = request.cookies.get('jwt_token')
     form.token_text.data = token
-
-    table = Table(['name', 'jit', 'valid_from', 'valid_until'])
-    for token in current_user.get_tokens():
-        table.rows.append([
-            token['name'],
-            token['jit'],
-            token['valid_from'],
-            token['valid_until'],
-            link(
-                _('delete'),
-                url_for('delete_token', id_=token['id']))])
     return render_template(
         'content.html',
         content=display_form(form, manual_page='profile'),
-        table=table,
+        table=get_token_table(),
         title=_('profile'),
         crumbs=[
             [_('profile'), f"{url_for('profile_index')}#tab-token"],
@@ -196,6 +187,14 @@ def delete_token(id_: int) -> str | Response:
     current_user.delete_token(id_)
     flash(_('token deleted'), 'info')
     return redirect(url_for('generate_token'))
+
+
+@app.route('/profile/delete_all_tokens/')
+@login_required
+def delete_all_tokens() -> str | Response:
+    current_user.delete_all_tokens()
+    flash(_('all tokens deleted'), 'info')
+    return redirect(f"{url_for('profile_index')}#tab-token")
 
 
 @app.route('/profile/password', methods=['GET', 'POST'])
@@ -219,3 +218,17 @@ def profile_password() -> str | Response:
         crumbs=[
             [_('profile'), url_for('profile_index')],
             _('change password')])
+
+
+def get_token_table() -> Table:
+    table = Table(['name', 'jit', 'valid_from', 'valid_until'])
+    for token in current_user.get_tokens():
+        table.rows.append([
+            token['name'],
+            token['jit'],
+            token['valid_from'],
+            token['valid_until'],
+            link(
+                _('delete'),
+                url_for('delete_token', id_=token['id']))])
+    return table

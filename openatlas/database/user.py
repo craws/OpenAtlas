@@ -327,3 +327,10 @@ def delete_tokens(user_id: int, id_: int) -> None:
         DELETE FROM web.user_tokens 
         WHERE id = %(id)s AND user_id = %(user_id)s;
         """, {'user_id': user_id, 'id': id_})
+
+
+def delete_all_tokens(user_id: int) -> None:
+    g.cursor.execute(
+        """
+        DELETE FROM web.user_tokens WHERE user_id = %(user_id)s;
+        """, {'user_id': user_id})
