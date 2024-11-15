@@ -87,11 +87,16 @@ class ProfileTests(ProfileTestCase):
                     token_id = get_tokens(self.alice_id)[0]['id']
 
             rv = self.app.get(
-                url_for('delete_token', id_=token_id),
+                url_for('revoke_token', id_=token_id),
                 follow_redirects=True)
-            assert b'Token deleted' in rv.data
+            assert b'Token revoked' in rv.data
+
+            rv = self.app.get(
+                url_for('revoke_all_tokens'),
+                follow_redirects=True)
+            assert b'All tokens revoked' in rv.data
 
             rv = self.app.get(
                 url_for('delete_all_tokens'),
                 follow_redirects=True)
-            assert b'All tokens deleted' in rv.data
+            assert b'All revoked tokens deleted' in rv.data

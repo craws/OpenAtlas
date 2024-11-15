@@ -100,7 +100,7 @@ class User(UserMixin):
         if decoded_token.get('exp'):
             valid_until = datetime.fromtimestamp(decoded_token.get('exp'))
         db.generate_token({
-            'jit': decoded_token['jti'],
+            'jti': decoded_token['jti'],
             'user_id': self.id,
             'name': token_name,
             'valid_until': valid_until,
@@ -110,11 +110,14 @@ class User(UserMixin):
     def get_tokens(self) -> list[dict[str, Any]]:
         return db.get_tokens(self.id)
 
-    def delete_token(self, id_: int) -> None:
-        return db.delete_tokens(self.id, id_)
+    def revoke_jwt_token(self, id_: int) -> None:
+        return db.revoke_jwt_token(self.id, id_)
 
-    def delete_all_tokens(self) -> None:
-        return db.delete_all_tokens(self.id)
+    def delete_all_revoked_tokens(self) -> None:
+        return db.delete_all_revoked_tokens(self.id)
+
+    def revoke_all_tokens(self) -> None:
+        return db.revoke_all_tokens(self.id)
 
     @staticmethod
     def get_all() -> list[User]:

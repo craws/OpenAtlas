@@ -1,4 +1,5 @@
 import locale
+import datetime
 from typing import Any, Optional
 
 from flask import Flask, Response, g, request, session
@@ -10,6 +11,7 @@ from psycopg2 import extras
 
 from openatlas.api.resources.error import AccessDeniedError
 from openatlas.database.connect import close_connection, open_connection
+from openatlas.database.user import check_token_revoked
 
 app: Flask = Flask(__name__, instance_relative_config=True)
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
@@ -111,8 +113,8 @@ def setup_api() -> None:
                 and not g.settings['api_public'] \
                 and ip not in app.config['ALLOWED_IPS'] \
                 and not verify_jwt_in_request(
-                    optional=True,
-                    locations='headers'):
+            optional=True,
+            locations='headers'):
             raise AccessDeniedError
 
 
@@ -129,3 +131,15 @@ def apply_caching(response: Response) -> Response:
 @app.teardown_request
 def teardown_request(_exception: Optional[Any]) -> None:
     close_connection()
+
+
+@jwt.token_in_blocklist_loader
+def check_if_token_revoked(
+        jwt_header: dict[str, Any],
+        jwt_payload: dict[str, Any]) -> bool:
+    if not jwt_header['typ'] == 'JWT':
+        return True
+    token = check_token_revoked(jwt_payload["jti"])
+    if token['revoked'] or token['valid_until'] < datetime.datetime.now():
+        return True
+    return False

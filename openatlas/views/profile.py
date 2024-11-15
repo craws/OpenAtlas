@@ -93,21 +93,25 @@ def profile_index() -> str:
         tabs['token'].buttons.append(
             button(_('generate'), url_for('generate_token')))
         tabs['token'].buttons.append(
-            button(_('delete all tokens'), url_for('delete_all_tokens')))
+            button(_('revoke all tokens'), url_for('revoke_all_tokens')))
+        tabs['token'].buttons.append(
+            button(_('delete revoked tokens'), url_for('delete_all_tokens')))
         token_table = Table([
             _('name'),
-            'jit',
+            'jti',
             _('valid from'),
-            _('valid until')])
+            _('valid until'),
+            _('revoked')])
         for token in current_user.get_tokens():
             token_table.rows.append([
                 token['name'],
-                token['jit'],
+                token['jti'],
                 token['valid_from'],
                 token['valid_until'],
+                token['revoked'],
                 link(
-                    _('delete'),
-                    url_for('delete_token', id_=token['id']))])
+                    _('revoke'),
+                    url_for('revoke_token', id_=token['id']))])
         tabs['token'].table = token_table
     return render_template(
         'tabs.html',
@@ -195,17 +199,25 @@ def generate_token() -> str | Response:
 
 @app.route('/profile/delete_token/<int:id_>')
 @login_required
-def delete_token(id_: int) -> str | Response:
-    current_user.delete_token(id_)
-    flash(_('token deleted'), 'info')
+def revoke_token(id_: int) -> str | Response:
+    current_user.revoke_jwt_token(id_)
+    flash(_('token revoked'), 'info')
     return redirect(f"{url_for('profile_index')}#tab-token")
 
 
-@app.route('/profile/delete_all_tokens/')
+@app.route('/profile/delete_revoked_tokens/')
 @login_required
 def delete_all_tokens() -> str | Response:
-    current_user.delete_all_tokens()
-    flash(_('all tokens deleted'), 'info')
+    current_user.delete_all_revoked_tokens()
+    flash(_('all revoked tokens deleted'), 'info')
+    return redirect(f"{url_for('profile_index')}#tab-token")
+
+
+@app.route('/profile/revoke_all_tokens/')
+@login_required
+def revoke_all_tokens() -> str | Response:
+    current_user.revoke_all_tokens()
+    flash(_('all tokens revoked'), 'info')
     return redirect(f"{url_for('profile_index')}#tab-token")
 
 

@@ -303,9 +303,10 @@ def get_user_entities(id_: int) -> list[int]:
 def get_tokens(id_: int) -> list[dict[str, Any]]:
     g.cursor.execute(
         """
-        SELECT id, user_id, jit, valid_from, valid_until, name, created
-            FROM web.user_tokens 
-            WHERE user_id = %(user_id)s;
+        SELECT 
+            id, user_id, jti, valid_from, valid_until, name, created, revoked
+        FROM web.user_tokens 
+        WHERE user_id = %(user_id)s;
         """, {'user_id': id_})
     return [dict(row) for row in g.cursor.fetchall()]
 
@@ -313,23 +314,41 @@ def get_tokens(id_: int) -> list[dict[str, Any]]:
 def generate_token(data: dict[str, str]) -> None:
     g.cursor.execute(
         """
-        INSERT INTO web.user_tokens(user_id, jit, valid_from, valid_until, 
+        INSERT INTO web.user_tokens(user_id, jti, valid_from, valid_until, 
         name)
-            VALUES (%(user_id)s, %(jit)s, %(valid_from)s, %(valid_until)s, 
+            VALUES (%(user_id)s, %(jti)s, %(valid_from)s, %(valid_until)s, 
             %(name)s);
         """, data)
 
 
-def delete_tokens(user_id: int, id_: int) -> None:
+def revoke_jwt_token(user_id: int, id_: int) -> None:
     g.cursor.execute(
         """
-        DELETE FROM web.user_tokens 
+        UPDATE web.user_tokens SET revoked=true
         WHERE id = %(id)s AND user_id = %(user_id)s;
         """, {'user_id': user_id, 'id': id_})
 
 
-def delete_all_tokens(user_id: int) -> None:
+def delete_all_revoked_tokens(user_id: int) -> None:
     g.cursor.execute(
         """
-        DELETE FROM web.user_tokens WHERE user_id = %(user_id)s;
+        DELETE FROM web.user_tokens 
+        WHERE user_id = %(user_id)s AND revoked = true;
         """, {'user_id': user_id})
+
+def revoke_all_tokens(user_id: int) -> None:
+    g.cursor.execute(
+        """
+        UPDATE web.user_tokens SET revoked=true WHERE user_id = %(user_id)s;
+        """, {'user_id': user_id})
+
+def check_token_revoked(jti: str) -> dict[str, Any]:
+    g.cursor.execute(
+        """
+        SELECT revoked, valid_until FROM web.user_tokens WHERE jti = %(jti)s;
+        """, {'jti': jti})
+    if row := g.cursor.fetchone():
+        token = {'revoked': row[0], 'valid_until': row[1]}
+    else:
+        token = {'revoked': True, 'valid_until': True}
+    return token

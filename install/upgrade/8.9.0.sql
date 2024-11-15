@@ -11,11 +11,12 @@ CREATE TABLE IF NOT EXISTS web.user_tokens
     id integer NOT NULL,
     user_id integer NOT NULL,
     name text COLLATE pg_catalog."default",
-    jit text COLLATE pg_catalog."default",
+    jti text COLLATE pg_catalog."default",
     valid_from timestamp without time zone,
     valid_until timestamp without time zone,
     created timestamp without time zone NOT NULL DEFAULT now(),
     modified timestamp without time zone,
+    revoked boolean NOT NULL DEFAULT false,
     CONSTRAINT user_tokens_pkey PRIMARY KEY (id),
     CONSTRAINT user_tokens_user_id_fkey FOREIGN KEY (user_id) REFERENCES web."user" (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE SET NULL NOT VALID
 );

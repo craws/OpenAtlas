@@ -1498,11 +1498,12 @@ CREATE TABLE web.user_tokens (
     id integer NOT NULL,
     user_id integer NOT NULL,
     name text,
-    jit text,
+    jti text,
     valid_from timestamp without time zone,
     valid_until timestamp without time zone,
     created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone
+    modified timestamp without time zone,
+    revoked boolean NOT NULL DEFAULT false
 );
 
 
