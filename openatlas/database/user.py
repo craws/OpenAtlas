@@ -329,6 +329,14 @@ def revoke_jwt_token(user_id: int, id_: int) -> None:
         """, {'user_id': user_id, 'id': id_})
 
 
+def authorize_jwt_token(user_id: int, id_: int) -> None:
+    g.cursor.execute(
+        """
+        UPDATE web.user_tokens SET revoked=false
+        WHERE id = %(id)s AND user_id = %(user_id)s;
+        """, {'user_id': user_id, 'id': id_})
+
+
 def delete_all_revoked_tokens(user_id: int) -> None:
     g.cursor.execute(
         """
@@ -336,11 +344,13 @@ def delete_all_revoked_tokens(user_id: int) -> None:
         WHERE user_id = %(user_id)s AND revoked = true;
         """, {'user_id': user_id})
 
+
 def revoke_all_tokens(user_id: int) -> None:
     g.cursor.execute(
         """
         UPDATE web.user_tokens SET revoked=true WHERE user_id = %(user_id)s;
         """, {'user_id': user_id})
+
 
 def check_token_revoked(jti: str) -> dict[str, Any]:
     g.cursor.execute(

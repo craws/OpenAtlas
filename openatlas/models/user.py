@@ -113,6 +113,9 @@ class User(UserMixin):
     def revoke_jwt_token(self, id_: int) -> None:
         return db.revoke_jwt_token(self.id, id_)
 
+    def authorize_jwt_token(self, id_: int) -> None:
+        return db.authorize_jwt_token(self.id, id_)
+
     def delete_all_revoked_tokens(self) -> None:
         return db.delete_all_revoked_tokens(self.id)
 

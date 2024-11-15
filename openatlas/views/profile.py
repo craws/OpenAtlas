@@ -103,15 +103,20 @@ def profile_index() -> str:
             _('valid until'),
             _('revoked')])
         for token in current_user.get_tokens():
+            revoke_link = link(
+                _('revoke'),
+                url_for('revoke_token', id_=token['id']))
+            if token['revoked']:
+                revoke_link = link(
+                    _('authorize'),
+                    url_for('authorize_token', id_=token['id']))
             token_table.rows.append([
                 token['name'],
                 token['jti'],
                 token['valid_from'],
                 token['valid_until'],
                 token['revoked'],
-                link(
-                    _('revoke'),
-                    url_for('revoke_token', id_=token['id']))])
+                revoke_link])
         tabs['token'].table = token_table
     return render_template(
         'tabs.html',
@@ -197,11 +202,19 @@ def generate_token() -> str | Response:
             _('token')])
 
 
-@app.route('/profile/delete_token/<int:id_>')
+@app.route('/profile/revoke_token/<int:id_>')
 @login_required
 def revoke_token(id_: int) -> str | Response:
     current_user.revoke_jwt_token(id_)
     flash(_('token revoked'), 'info')
+    return redirect(f"{url_for('profile_index')}#tab-token")
+
+
+@app.route('/profile/authorize_token/<int:id_>')
+@login_required
+def authorize_token(id_: int) -> str | Response:
+    current_user.authorize_jwt_token(id_)
+    flash(_('token authorized'), 'info')
     return redirect(f"{url_for('profile_index')}#tab-token")
 
 
