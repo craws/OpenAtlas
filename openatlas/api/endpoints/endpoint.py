@@ -174,8 +174,9 @@ class Endpoint:
         count = len(total)
         self.parser.limit = count \
             if self.parser.limit == 0 else self.parser.limit
-        e_list = list(
-            itertools.islice(total, 0, None, int(self.parser.limit)))
+        e_list = []
+        if total:
+            e_list = list(itertools.islice(total, 0, None, self.parser.limit))
         index = \
             [{'page': num + 1, 'startId': i} for num, i in enumerate(e_list)]
         if index:
