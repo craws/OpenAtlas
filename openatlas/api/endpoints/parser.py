@@ -121,15 +121,13 @@ class Parser:
                         "value_type_links":
                             flatten_list_and_remove_duplicates(links)})
 
-    # Todo: fix multiple valueTypeID searches, e.g.
-    # search={"valueTypeID":[{"operator":"equal","values":[(150412,34)],
-    # "logicalOperator":"or"}]}&search={"valueTypeID":[{"operator":"equal",
-    # "values":[(131994,13.5),(131997,3.7)],"logicalOperator":"or"}]}
     def search_filter(self, entity: Entity) -> bool:
+        found = False
         for param in self.search_param:
-            if not search_entity(entity, param):
-                return False
-        return True
+            if search_entity(entity, param):
+                found = True
+                break
+        return found
 
     def get_properties_for_links(self) -> Optional[list[str]]:
         if self.relation_type:
