@@ -1,13 +1,12 @@
 import builtins
 import operator
-from typing import Any, Optional
+from typing import Any
 
 from flask import g
-from numpy import datetime64
 
 from openatlas.api.resources.util import (
     flatten_list_and_remove_duplicates, get_linked_entities_id_api)
-from openatlas.models.entity import Entity, Link
+from openatlas.models.entity import Entity
 
 
 def get_search_values(
@@ -27,7 +26,7 @@ def get_search_values(
     return values
 
 
-def search_entity(entity: Entity | Link, param: dict[str, Any]) -> bool:
+def search_entity(entity: Entity, param: dict[str, Any]) -> bool:
     entity_values = value_to_be_searched(entity, param)
     operator_ = param['operator']
     search_values = param['search_values']
@@ -45,12 +44,13 @@ def search_entity(entity: Entity | Link, param: dict[str, Any]) -> bool:
             for item in search_values:
                 if operator_ == 'equal':
                     if logical_operator == 'and':
-                        bool_values.append(bool(any(
-                            item in entity_values for item in item)))
+                        bool_values.append(
+                            bool(any(item in entity_values for item in item)))
                 if operator_ == 'notEqual':
                     if logical_operator == 'and':
-                        bool_values.append(bool(not any(
-                            item in entity_values for item in item)))
+                        bool_values.append(
+                            bool(not any(
+                                item in entity_values for item in item)))
             return all(bool_values)
 
     operator_mapping = {
@@ -59,7 +59,7 @@ def search_entity(entity: Entity | Link, param: dict[str, Any]) -> bool:
         'lesserThan': 'lt',
         'lesserThanEqual': 'le'}
 
-    def check_value_type():
+    def check_value_type() -> bool:
         found_ = False
         values = dict(entity_values)
         op = operator_mapping[operator_]
@@ -78,30 +78,29 @@ def search_entity(entity: Entity | Link, param: dict[str, Any]) -> bool:
     scope = getattr(builtins, 'any' if logical_operator == 'or' else 'all')
     match operator_:
         case 'equal':
-            found = bool(scope([item in entity_values for item in search_values]))
+            found = bool(scope([i in entity_values for i in search_values]))
         case 'notEqual':
-            found = bool(not scope(item in entity_values for item in search_values))
+            found = bool(not scope(i in entity_values for i in search_values))
         case 'like':
-            found = bool(scope(item in value for item in search_values for value in entity_values))
+            found = bool(scope(
+                i in value for i in search_values for value in entity_values))
         case _ if not is_comparable:
             found = False
         case _ if param['category'] == 'valueTypeID':
             found = check_value_type()
         case 'greaterThan':
-            found = bool(scope(item < entity_values for item in search_values))
+            found = bool(scope(i < entity_values for i in search_values))
         case 'greaterThanEqual':
-            found = bool(scope(item <= entity_values for item in search_values))
+            found = bool(scope(i <= entity_values for i in search_values))
         case 'lesserThan':
-            found = bool(scope(item > entity_values for item in search_values))
+            found = bool(scope(i > entity_values for i in search_values))
         case 'lesserThanEqual':
-            found = bool(scope(item >= entity_values for item in search_values))
+            found = bool(scope(i >= entity_values for i in search_values))
     return found
 
 
-def value_to_be_searched(
-        entity: Entity, param: dict[str, Any]) \
-        -> list[int | str | tuple[int, float]] | Optional[datetime64]:
-    value: list[int | str | tuple[int, float]] | Optional[datetime64] = []
+def value_to_be_searched(entity: Entity, param: dict[str, Any])  -> Any:
+    value: Any = []
     match param['category']:
         case "entityID" | "relationToID":
             value = [entity.id]
