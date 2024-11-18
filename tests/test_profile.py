@@ -1,4 +1,5 @@
 from flask import url_for
+from flask_jwt_extended import decode_token
 
 from openatlas import app
 from openatlas.database.user import get_tokens
@@ -81,6 +82,11 @@ class ProfileTests(ProfileTestCase):
             rv = self.app.get(url_for('profile_index'))
             assert b'Generate' in rv.data
 
+            rv = self.app.post(
+                url_for('generate_token'),
+                data={'expiration': 0, 'token_name': 'one day token'})
+            jwt_token = rv.headers['Set-Cookie'].replace('jwt_token=', '')
+
             with app.app_context():
                 with app.test_request_context():
                     app.preprocess_request()
@@ -90,6 +96,11 @@ class ProfileTests(ProfileTestCase):
                 url_for('revoke_token', id_=token_id),
                 follow_redirects=True)
             assert b'Token revoked' in rv.data
+
+            rv = self.app.get(
+                url_for('authorize_token', id_=token_id),
+                follow_redirects=True)
+            assert b'Token authorized' in rv.data
 
             rv = self.app.get(
                 url_for('revoke_all_tokens'),
