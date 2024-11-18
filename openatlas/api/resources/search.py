@@ -58,15 +58,22 @@ def search_entity(entity: Entity | Link, param: dict[str, Any]) -> bool:
         'greaterThanEqual': 'ge',
         'lesserThan': 'lt',
         'lesserThanEqual': 'le'}
-    # Todo: include scope in check_value_type
-    def check_value_type(op: str):
-        b = True
+
+    def check_value_type():
+        found_ = False
         values = dict(entity_values)
+        op = operator_mapping[operator_]
         for i in search_values:
-            if i[0] not in values or not getattr(operator, op)(values[i[0]],  i[1]):
-                b = False
-                break
-        return b
+            if i[0] in values and getattr(operator, op)(values[i[0]], i[1]):
+                found_ = True
+                if logical_operator == 'or':
+                    break
+            else:
+                if logical_operator == 'and':
+                    found_ = False
+                    break
+        return found_
+
     found = False
     scope = getattr(builtins, 'any' if logical_operator == 'or' else 'all')
     match operator_:
@@ -79,7 +86,7 @@ def search_entity(entity: Entity | Link, param: dict[str, Any]) -> bool:
         case _ if not is_comparable:
             found = False
         case _ if param['category'] == 'valueTypeID':
-            found = check_value_type(operator_mapping[operator_])
+            found = check_value_type()
         case 'greaterThan':
             found = bool(scope(item < entity_values for item in search_values))
         case 'greaterThanEqual':
@@ -88,7 +95,6 @@ def search_entity(entity: Entity | Link, param: dict[str, Any]) -> bool:
             found = bool(scope(item > entity_values for item in search_values))
         case 'lesserThanEqual':
             found = bool(scope(item >= entity_values for item in search_values))
-
     return found
 
 
