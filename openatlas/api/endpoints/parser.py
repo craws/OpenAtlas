@@ -110,6 +110,8 @@ class Parser:
                             links.append(Entity.get_links_of_entities(
                                 value[0],
                                 inverse=True))
+                    # Todo: different between each search parameter. This
+                    #  list just puts every search param in a list
                     self.search_param.append({
                         "search_values": get_search_values(
                             category,
