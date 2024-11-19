@@ -1,3 +1,4 @@
+import datetime
 from typing import Any, Optional
 
 from flask import g
@@ -311,7 +312,7 @@ def get_tokens(id_: int) -> list[dict[str, Any]]:
     return [dict(row) for row in g.cursor.fetchall()]
 
 
-def generate_token(data: dict[str, str]) -> None:
+def generate_token(data: dict[str, Any]) -> None:
     g.cursor.execute(
         """
         INSERT INTO web.user_tokens(user_id, jti, valid_from, valid_until, 

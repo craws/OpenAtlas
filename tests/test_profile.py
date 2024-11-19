@@ -1,7 +1,7 @@
 from flask import url_for
 from flask_jwt_extended import decode_token
 
-from openatlas import app
+from openatlas import app, check_if_token_revoked
 from openatlas.database.user import get_tokens
 from tests.base import ProfileTestCase
 
@@ -67,14 +67,14 @@ class ProfileTests(ProfileTestCase):
                 follow_redirects=True)
             assert b'too short' in rv.data
 
-            tokens = [
+            expire_dates = [
                 {'expiration': 0, 'token_name': 'one day token'},
                 {'expiration': 1, 'token_name': '90 days token'},
                 {'expiration': 2, 'token_name': 'indefinite token'}]
-            for token in tokens:
+            for expire_date in expire_dates:
                 rv = self.app.post(
                     url_for('generate_token'),
-                    data=token,
+                    data=expire_date,
                     follow_redirects=True)
                 assert b'Token stored' in rv.data
 
@@ -82,20 +82,49 @@ class ProfileTests(ProfileTestCase):
             rv = self.app.get(url_for('profile_index'))
             assert b'Generate' in rv.data
 
+            # Getting valid JWT token
             rv = self.app.post(
                 url_for('generate_token'),
                 data={'expiration': 0, 'token_name': 'one day token'})
-            jwt_token = rv.headers['Set-Cookie'].replace('jwt_token=', '')
+            for part in rv.headers['Set-Cookie'].split(';'):
+                if 'jwt_token=' in part:
+                    jwt_token = part.replace('jwt_token=', '').strip()
+                    break
+
 
             with app.app_context():
                 with app.test_request_context():
                     app.preprocess_request()
-                    token_id = get_tokens(self.alice_id)[0]['id']
+                    decoded = decode_token(jwt_token)
+                    check = check_if_token_revoked({'typ': 'JWT'}, decoded)
+                    assert check is False
+
+                    check = check_if_token_revoked({'typ': 'Unknown'}, decoded)
+                    assert check is True
+
+                    tokens = get_tokens(self.alice_id)
+                    token_id = tokens[0]['id']
+                    token_to_be_revoked_id = 0
+                    for token in tokens:
+                        if token['jti'] == decoded['jti']:
+                            token_to_be_revoked_id = token['id']
+                            break
 
             rv = self.app.get(
-                url_for('revoke_token', id_=token_id),
+                url_for('api_04.class_mapping', locale='de'),
+            headers={'Authorization': f'Bearer {jwt_token}'})
+            assert b'results' in rv.data
+
+            rv = self.app.get(
+                url_for('revoke_token', id_=token_to_be_revoked_id),
                 follow_redirects=True)
             assert b'Token revoked' in rv.data
+
+            with app.app_context():
+                with app.test_request_context():
+                    app.preprocess_request()
+                    check = check_if_token_revoked({'typ': 'JWT'}, decoded)
+                    assert check is True
 
             rv = self.app.get(
                 url_for('authorize_token', id_=token_id),
@@ -111,3 +140,9 @@ class ProfileTests(ProfileTestCase):
                 url_for('delete_all_tokens'),
                 follow_redirects=True)
             assert b'All revoked tokens deleted' in rv.data
+
+            with app.app_context():
+                with app.test_request_context():
+                    app.preprocess_request()
+                    check = check_if_token_revoked({'typ': 'JWT'}, decoded)
+                    assert check is True

@@ -84,21 +84,20 @@ class User(UserMixin):
         return Entity.get_by_ids(db.get_user_entities(self.id), types=True)
 
     def generate_token(self, expiration: str, token_name: str) -> None:
+        expires_delta = None
         match expiration:
             case '0':
-                expires_delta: timedelta | bool = timedelta(days=1)
+                expires_delta = timedelta(days=1)
             case '1':
                 expires_delta = timedelta(days=90)
-            case '2' | _:
-                expires_delta = False
         access_token = create_access_token(
             identity=self.username,
             additional_claims={'role': self.group},
-            expires_delta=expires_delta)
+            expires_delta=expires_delta)  # type: ignore
         decoded_token = decode_token(access_token, allow_expired=True)
         valid_until = datetime.max
-        if decoded_token.get('exp'):
-            valid_until = datetime.fromtimestamp(decoded_token.get('exp'))
+        if expire := decoded_token.get('exp'):
+            valid_until = datetime.fromtimestamp(expire)
         db.generate_token({
             'jti': decoded_token['jti'],
             'user_id': self.id,
