@@ -18,8 +18,7 @@ from openatlas.api.formats.linked_places import (
 from openatlas.api.resources.error import (
     EntityDoesNotExistError, InvalidSearchSyntax, InvalidSearchValueError,
     LastEntityError, UrlNotValid)
-from openatlas.api.resources.search import (
-    get_search_values, search_entity)
+from openatlas.api.resources.search import get_search_values, search_entity
 from openatlas.api.resources.search_validation import (
     check_if_date_search, validate_search_parameters)
 from openatlas.api.resources.templates import (
@@ -39,7 +38,7 @@ class Parser:
     sort = None
     column: str = ''
     search: str = ''
-    search_param: list[dict[str, Any]]
+    search_param: list[list[dict[str, Any]]]
     limit: int = 0
     first = None
     last = None
@@ -98,6 +97,7 @@ class Parser:
                                 values["values"]) from e
 
         for search in url_parameters:
+            set_of_search_parameter = []
             for category, value_list in search.items():
                 for values in value_list:
                     is_comparable = False
@@ -112,7 +112,7 @@ class Parser:
                                 inverse=True))
                     # Todo: different between each search parameter. This
                     #  list just puts every search param in a list
-                    self.search_param.append({
+                    set_of_search_parameter.append({
                         "search_values": get_search_values(
                             category,
                             values),
@@ -122,14 +122,26 @@ class Parser:
                         "is_comparable": is_comparable,
                         "value_type_links":
                             flatten_list_and_remove_duplicates(links)})
+            self.search_param.append(set_of_search_parameter)
 
     def search_filter(self, entity: Entity) -> bool:
         found = False
-        for param in self.search_param:
-            if search_entity(entity, param):
+        for set_of_param in self.search_param:
+            if self.search_through_set_of_param(set_of_param, entity):
                 found = True
                 break
         return found
+
+    # Todo: Refactor this function into search_filter().
+    #  Then above todo is resolved
+    def search_through_set_of_param(self, set_of_param, entity) -> bool:
+        found = []
+        for param in set_of_param:
+            if search_entity(entity, param):
+                found.append(True)
+            else:
+                found.append(False)
+        return all(found)
 
     def get_properties_for_links(self) -> Optional[list[str]]:
         if self.relation_type:
