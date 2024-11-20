@@ -129,7 +129,8 @@ class Parser:
                 found = True
         return found
 
-    def get_properties_for_links(self) -> Optional[list[str]]:
+    def get_properties_for_links(self) -> list[str]:
+        codes = []
         if self.relation_type:
             codes = self.relation_type
             if 'geometry' in self.show:
@@ -138,8 +139,7 @@ class Parser:
                 codes.append('P2')
             if any(i in ['depictions', 'links'] for i in self.show):
                 codes.append('P67')
-            return codes
-        return None
+        return codes
 
     def get_key(self, entity: Entity) -> datetime64 | str:
         if self.column == 'cidoc_class':
