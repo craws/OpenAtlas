@@ -16,12 +16,12 @@ from openatlas.api.endpoints.type import (
     GetTypeByViewClass, GetTypeOverview, GetTypeTree)
 
 entity = [
-    [GetByViewClass, '/view_class/<string:view_class>', 'view_class'],
-    [GetByCidocClass, '/cidoc_class/<string:cidoc_class>', 'cidoc_class'],
+    [GetByViewClass, '/view_class/<string:class_>', 'view_class'],
+    [GetByCidocClass, '/cidoc_class/<string:class_>', 'cidoc_class'],
     [GetEntity, '/entity/<int:id_>', 'entity'],
     [GetLatest, '/latest/<int:limit>', 'latest'],
     [GetQuery, '/query/', 'query'],
-    [GetBySystemClass, '/system_class/<string:system_class>', 'system_class'],
+    [GetBySystemClass, '/system_class/<string:class_>', 'system_class'],
     [GetTypeEntities, '/type_entities/<int:id_>', 'type_entities'],
     [GetTypeEntitiesAll, '/type_entities_all/<int:id_>', 'type_entities_all'],
     [GetLinkedEntitiesByPropertyRecursive,

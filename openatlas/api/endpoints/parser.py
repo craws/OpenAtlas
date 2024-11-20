@@ -32,6 +32,7 @@ from openatlas.models.gis import Gis
 
 
 class Parser:
+    # Todo: Group attributes to reduce the long list
     download = None
     count = None
     locale = None
