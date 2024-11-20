@@ -35,7 +35,6 @@ class Endpoint:
         if self.parser.type_id:
             self.entities = self.filter_by_type()
         if self.parser.search:
-            print(self.parser.search)
             self.entities = [
                 e for e in self.entities if self.parser.search_filter(e)]
         if self.parser.export == 'csv':

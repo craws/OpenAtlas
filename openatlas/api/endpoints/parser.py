@@ -82,8 +82,8 @@ class Parser:
         for search in url_parameters:
             for category, value_list in search.items():
                 for values in value_list:
-                    values['logicalOperator'] = (
-                            values.get('logicalOperator') or 'or')
+                    values['logicalOperator'] = \
+                        values.get('logicalOperator') or 'or'
                     validate_search_parameters(category, values)
                     if category in app.config['INT_VALUES']:
                         values['values'] = list(map(int, values['values']))
@@ -97,51 +97,37 @@ class Parser:
                                 values["values"]) from e
 
         for search in url_parameters:
-            set_of_search_parameter = []
+            search_parameter = []
             for category, value_list in search.items():
                 for values in value_list:
-                    is_comparable = False
                     links = []
-                    if check_if_date_search(category):
-                        is_comparable = True
+                    is_comparable = check_if_date_search(category)
                     if category == 'valueTypeID':
                         is_comparable = True
                         for value in values["values"]:
-                            links.append(Entity.get_links_of_entities(
-                                value[0],
-                                inverse=True))
-                    # Todo: different between each search parameter. This
-                    #  list just puts every search param in a list
-                    set_of_search_parameter.append({
-                        "search_values": get_search_values(
-                            category,
-                            values),
+                            links.append(
+                                Entity.get_links_of_entities(
+                                    value[0],
+                                    inverse=True))
+                    search_parameter.append({
+                        "search_values": get_search_values(category, values),
                         "logical_operator": values['logicalOperator'],
                         "operator": values['operator'],
                         "category": category,
                         "is_comparable": is_comparable,
                         "value_type_links":
                             flatten_list_and_remove_duplicates(links)})
-            self.search_param.append(set_of_search_parameter)
+            self.search_param.append(search_parameter)
 
     def search_filter(self, entity: Entity) -> bool:
         found = False
         for set_of_param in self.search_param:
-            if self.search_through_set_of_param(set_of_param, entity):
+            for param in set_of_param:
+                if not search_entity(entity, param):
+                    found = False
+                    break
                 found = True
-                break
         return found
-
-    # Todo: Refactor this function into search_filter().
-    #  Then above todo is resolved
-    def search_through_set_of_param(self, set_of_param, entity) -> bool:
-        found = []
-        for param in set_of_param:
-            if search_entity(entity, param):
-                found.append(True)
-            else:
-                found.append(False)
-        return all(found)
 
     def get_properties_for_links(self) -> Optional[list[str]]:
         if self.relation_type:
