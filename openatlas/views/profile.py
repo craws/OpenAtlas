@@ -101,8 +101,12 @@ def profile_index() -> str:
             'jti',
             _('valid from'),
             _('valid until'),
-            _('revoked')])
+            _('revoked'),
+            _('delete')])
         for token in current_user.get_tokens():
+            delete_link = link(
+                _('delete'),
+                url_for('delete_token', id_=token['id']))
             revoke_link = link(
                 _('revoke'),
                 url_for('revoke_token', id_=token['id']))
@@ -116,7 +120,8 @@ def profile_index() -> str:
                 token['valid_from'],
                 token['valid_until'],
                 token['revoked'],
-                revoke_link])
+                revoke_link,
+                delete_link])
         tabs['token'].table = token_table
     return render_template(
         'tabs.html',
@@ -215,6 +220,14 @@ def revoke_token(id_: int) -> str | Response:
 def authorize_token(id_: int) -> str | Response:
     current_user.authorize_jwt_token(id_)
     flash(_('token authorized'), 'info')
+    return redirect(f"{url_for('profile_index')}#tab-token")
+
+
+@app.route('/profile/delete_token/<int:id_>')
+@login_required
+def delete_token(id_: int) -> str | Response:
+    current_user.delete_token(id_)
+    flash(_('token deleted'), 'info')
     return redirect(f"{url_for('profile_index')}#tab-token")
 
 

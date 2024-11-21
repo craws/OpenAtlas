@@ -101,6 +101,7 @@ class User(UserMixin):
         db.generate_token({
             'jti': decoded_token['jti'],
             'user_id': self.id,
+            'creator_id': self.id,
             'name': token_name,
             'valid_until': valid_until,
             'valid_from': datetime.fromtimestamp(decoded_token['iat'])})
@@ -114,6 +115,9 @@ class User(UserMixin):
 
     def authorize_jwt_token(self, id_: int) -> None:
         return db.authorize_jwt_token(self.id, id_)
+
+    def delete_token(self, id_: int) -> None:
+        return db.delete_token(self.id, id_)
 
     def delete_all_revoked_tokens(self) -> None:
         return db.delete_all_revoked_tokens(self.id)

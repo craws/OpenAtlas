@@ -338,6 +338,14 @@ def authorize_jwt_token(user_id: int, id_: int) -> None:
         """, {'user_id': user_id, 'id': id_})
 
 
+def delete_token(user_id: int, id_: int) -> None:
+    g.cursor.execute(
+        """
+        DELETE FROM web.user_tokens 
+        WHERE id = %(id)s AND user_id = %(user_id)s;
+        """, {'user_id': user_id, 'id': id_})
+
+
 def delete_all_revoked_tokens(user_id: int) -> None:
     g.cursor.execute(
         """
