@@ -77,8 +77,6 @@ def get_lp_file(links_inverse: list[Link]) -> list[dict[str, str]]:
         iiif_base_path= ''
         img_id = link.domain.id
         if check_iiif_activation() and check_iiif_file_exist(img_id):
-            print(check_iiif_file_exist(img_id))
-            print(g.files.get(img_id))
             iiif_manifest = url_for(
                 'api.iiif_manifest',
                 version=g.settings['iiif_version'],
@@ -91,7 +89,6 @@ def get_lp_file(links_inverse: list[Link]) -> list[dict[str, str]]:
         mime_type = None
         if path:
             mime_type, _ = mimetypes.guess_type(path)
-        print(iiif_manifest)
         files.append({
             '@id': url_for(
                 'api.entity',
