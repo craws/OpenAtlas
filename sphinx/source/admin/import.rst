@@ -110,10 +110,10 @@ surround the whole string with double quotes(**"**).
 
 Dates
 +++++
-Dates can be entered in the format **YYYY-MM-DD**. Fill out the **begin_from**
-and **end_from** field for a known timeframe. For a timespan you can use
-**begin_to** and **end_to** in combination with **begin_from**
-and **end_from**. For more information see: :doc:`/ui/date`.
+Dates can be entered in the format **YYYY-MM-DD**, **YYYY-MM** or **YYYY**.
+Fill out the **begin_from** and **end_from** field for a known timeframe.
+For a timespan you can use **begin_to** and **end_to** in combination
+with **begin_from** and **end_from**. For more information see: :doc:`/ui/date`.
 
 Keep in mind:
 
