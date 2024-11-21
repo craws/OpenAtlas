@@ -98,9 +98,9 @@ class Api(ApiTestCase):
             rv = self.app.get(
                 url_for('api_04.class_mapping', locale='de')).get_json()
             assert self.get_class_mapping(rv, 'de')
-            rv = self.app.get(url_for(
-                'api_04.class_mapping', locale='ca', download=True)).get_json()
-            assert self.get_class_mapping(rv, 'ca')
+            rv = self.app.get(
+                url_for('api_04.class_mapping', locale='ca', download=True))
+            assert self.get_class_mapping(rv.get_json(), 'ca')
 
             rv = self.app.get(
                 url_for('api_04.properties', locale='de')).get_json()
@@ -111,9 +111,9 @@ class Api(ApiTestCase):
             assert bool(rv['P2']['i18nInverse'])
             assert bool(rv['P2']['code'])
 
-            rv = self.app.get(url_for(
-                'api_04.properties', locale='fr', download=True)).get_json()
-            assert rv['P2']['name'] == 'est de type'
+            rv = self.app.get(
+                url_for('api_04.properties', locale='fr', download=True))
+            assert rv.get_json()['P2']['name'] == 'est de type'
             rv = self.app.get(url_for('api_04.backend_details')).get_json()
             assert bool(rv['version'] == app.config['VERSION'])
             rv = self.app.get(
@@ -121,17 +121,15 @@ class Api(ApiTestCase):
             assert bool(rv['version'] == app.config['VERSION'])
             rv = self.app.get(url_for('api_04.system_class_count')).get_json()
             assert bool(rv['person'])
-            rv = self.app.get(url_for(
-                'api_04.system_class_count',
-                type_id=boundary_mark.id)).get_json()
-            assert bool(rv['place'])
+            rv = self.app.get(
+                url_for('api_04.system_class_count', type_id=boundary_mark.id))
+            assert bool(rv.get_json()['place'])
 
             with app.test_request_context():
                 app.preprocess_request()
                 file.link('P2', open_license)
-            rv = self.app.get(url_for(
-                'api.licensed_file_overview',
-                file_id=file.id))
+            rv = self.app.get(
+                url_for('api.licensed_file_overview', file_id=file.id))
             assert self.get_bool(
                 rv.get_json()[str(file.id)],
                 'license',
@@ -145,7 +143,8 @@ class Api(ApiTestCase):
                 exclude_system_classes='type'))
             rv = rv.get_json()
             assert bool(len(rv['results']) == 65)
-            rv = self.app.get(url_for(
+            rv = self.app.get(
+                url_for(
                 'api_04.network_visualisation',
                 linked_to_ids=boundary_mark.id))
             rv = rv.get_json()
@@ -230,8 +229,12 @@ class Api(ApiTestCase):
                 rv['depictions'][0], 'license', 'Public domain')
             assert self.get_bool(rv['depictions'][0], 'url')
 
-            rv = self.app.get(url_for(
-                'api_04.entity', id_=place.id, format='lpx', locale='de'))
+            rv = self.app.get(
+                url_for(
+                'api_04.entity',
+                    id_=place.id,
+                    format='lpx',
+                    locale='de'))
             assert 'application/json' in rv.headers.get('Content-Type')
             rv = rv.get_json()['features'][0]
             rel = rv['relations']
@@ -246,8 +249,8 @@ class Api(ApiTestCase):
                 'begin_latest', 'begin_comment', 'end_earliest', 'end_latest',
                 'end_comment', 'types']
             # Test entity in GeoJSON format
-            rv = self.app.get(url_for(
-                'api_04.entity', id_=place.id, format='geojson'))
+            rv = self.app.get(
+                url_for('api_04.entity', id_=place.id, format='geojson'))
             assert 'application/json' in rv.headers.get('Content-Type')
             rv = rv.get_json()['features'][0]
             assert self.get_bool(rv['geometry'], 'type')
@@ -289,7 +292,8 @@ class Api(ApiTestCase):
             for rv in [
                 self.app.get(
                     url_for('api_04.entity', id_=place.id, export='csv')),
-                self.app.get(url_for(
+                self.app.get(
+                    url_for(
                     'api_04.query',
                     entities=location.id,
                     cidoc_classes='E18',
@@ -300,9 +304,11 @@ class Api(ApiTestCase):
                 assert 'text/csv' in rv.headers.get('Content-Type')
 
             for rv in [
-                self.app.get(url_for(
+                self.app.get(
+                    url_for(
                     'api_04.entity', id_=place.id, export='csvNetwork')),
-                self.app.get(url_for(
+                self.app.get(
+                    url_for(
                     'api_04.query',
                     entities=location.id,
                     cidoc_classes='E18',
@@ -311,7 +317,8 @@ class Api(ApiTestCase):
                     export='csvNetwork'))]:
                 assert b'Shire' in rv.data
                 assert 'application/zip' in rv.headers.get('Content-Type')
-            rv = self.app.get(url_for(
+            rv = self.app.get(
+                url_for(
                 'api_04.linked_entities_by_properties_recursive',
                 id_=place.id,
                 properties='P46'))
@@ -768,36 +775,38 @@ class Api(ApiTestCase):
                 url_for(
                     'api_04.view_class',
                     class_='place',
-                    search='{"All":[{"operator":"notEqual",'
-                           '"values":["Boundary Mark", "Height"],'
-                           '"logicalOperator":"or"}]}'))
+                    search={
+                        "All":[{
+                        "operator":"notEqual",
+                            "values":["Boundary Mark", "Height"]}]}))
             assert 'Invalid search category' in rv.get_json()['title']
 
             rv = self.app.get(
                 url_for(
                     'api_04.view_class',
                     class_='place',
-                    search='{"typeName":[{"operator":"notEqual",'
-                           '"values":[],'
-                           '"logicalOperator":"or"}]}'))
+                    search={
+                        "typeName":[{"operator":"notEqual","values":[]}]}))
             assert 'No search value' in rv.get_json()['title']
 
             rv = self.app.get(
                 url_for(
                     'api_04.view_class',
                     class_='place',
-                    search='{"beginFrom":[{"operator":"notEqual",'
-                           '"values":["Help"],'
-                           '"logicalOperator":"or"}]}'))
+                    search={
+                        "beginFrom":[{
+                            "operator":"notEqual",
+                            "values":["Help"]}]}))
             assert 'Invalid search values' in rv.get_json()['title']
 
             rv = self.app.get(
                 url_for(
                     'api_04.view_class',
                     class_='place',
-                    search='{"beginFrom":[{"operator":"notEqual",'
-                           '"values":["800-1-1", "Help"],'
-                           '"logicalOperator":"or"}]}'))
+                    search={
+                        "beginFrom":[{
+                        "operator":"notEqual",
+                            "values":["800-1-1", "Help"]}]}))
             assert 'Invalid search values' in rv.get_json()['title']
 
             rv = self.app.get(
@@ -823,18 +832,22 @@ class Api(ApiTestCase):
                 url_for(
                     'api_04.view_class',
                     class_='place',
-                    search='{"typeName":[{"operator":"notEqualT",'
-                           '"values":["Boundary Mark", "Height"],'
-                           '"logicalOperator":"and"}]}'))
+                    search={
+                        "typeName":[{
+                            "operator":"notEqualT",
+                            "values":["Boundary Mark", "Height"],
+                            "logicalOperator":"and"}]}))
             assert 'Invalid compare operator' in rv.get_json()['title']
 
             rv = self.app.get(
                 url_for(
                     'api_04.view_class',
                     class_='place',
-                    search='{"typeName":[{"operator":"notEqual",'
-                           '"values":["Boundary Mark", "Height"],'
-                           '"logicalOperator":"xor"}]}'))
+                    search={
+                        "typeName":[{
+                            "operator":"notEqual",
+                            "values":["Boundary Mark", "Height"],
+                            "logicalOperator":"xor"}]}))
             assert 'Invalid logical operator' in rv.get_json()['title']
 
             rv = self.app.get(
