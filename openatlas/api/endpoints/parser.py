@@ -18,8 +18,7 @@ from openatlas.api.formats.linked_places import (
 from openatlas.api.resources.error import (
     EntityDoesNotExistError, InvalidSearchSyntax, InvalidSearchValueError,
     LastEntityError, UrlNotValid)
-from openatlas.api.resources.search import (
-    get_search_values, search_entity, value_to_be_searched)
+from openatlas.api.resources.search import get_search_values, search_entity
 from openatlas.api.resources.search_validation import (
     check_if_date_search, validate_search_parameters)
 from openatlas.api.resources.templates import (
@@ -33,13 +32,14 @@ from openatlas.models.gis import Gis
 
 
 class Parser:
+    # Todo: Group attributes to reduce the long list
     download = None
     count = None
     locale = None
     sort = None
     column: str = ''
     search: str = ''
-    search_param: list[dict[str, Any]]
+    search_param: list[list[dict[str, Any]]]
     limit: int = 0
     first = None
     last = None
@@ -83,8 +83,8 @@ class Parser:
         for search in url_parameters:
             for category, value_list in search.items():
                 for values in value_list:
-                    values['logicalOperator'] = (
-                        values.get('logicalOperator') or 'or')
+                    values['logicalOperator'] = \
+                        values.get('logicalOperator') or 'or'
                     validate_search_parameters(category, values)
                     if category in app.config['INT_VALUES']:
                         values['values'] = list(map(int, values['values']))
@@ -98,31 +98,40 @@ class Parser:
                                 values["values"]) from e
 
         for search in url_parameters:
+            search_parameter = []
             for category, value_list in search.items():
                 for values in value_list:
-                    self.search_param.append({
-                        "search_values": get_search_values(
-                            category,
-                            values),
+                    links = []
+                    is_comparable = check_if_date_search(category)
+                    if category == 'valueTypeID':
+                        is_comparable = True
+                        for value in values["values"]:
+                            links.append(
+                                Entity.get_links_of_entities(
+                                    value[0],
+                                    inverse=True))
+                    search_parameter.append({
+                        "search_values": get_search_values(category, values),
                         "logical_operator": values['logicalOperator'],
-                        "operator": 'equal' if category == "valueTypeID"
-                        else values['operator'],
+                        "operator": values['operator'],
                         "category": category,
-                        "is_date": check_if_date_search(category)})
-
+                        "is_comparable": is_comparable,
+                        "value_type_links":
+                            flatten_list_and_remove_duplicates(links)})
+            self.search_param.append(search_parameter)
 
     def search_filter(self, entity: Entity) -> bool:
-        for i in self.search_param:
-            if not search_entity(
-                    entity_values=value_to_be_searched(entity, i['category']),
-                    operator_=i['operator'],
-                    search_values=i['search_values'],
-                    logical_operator=i['logical_operator'],
-                    is_comparable=i['is_date']):
-                return False
-        return True
+        found = False
+        for set_of_param in self.search_param:
+            for param in set_of_param:
+                if not search_entity(entity, param):
+                    found = False
+                    break
+                found = True
+        return found
 
-    def get_properties_for_links(self) -> Optional[list[str]]:
+    def get_properties_for_links(self) -> list[str]:
+        codes = []
         if self.relation_type:
             codes = self.relation_type
             if 'geometry' in self.show:
@@ -131,8 +140,7 @@ class Parser:
                 codes.append('P2')
             if any(i in ['depictions', 'links'] for i in self.show):
                 codes.append('P67')
-            return codes
-        return None
+        return codes
 
     def get_key(self, entity: Entity) -> datetime64 | str:
         if self.column == 'cidoc_class':
