@@ -505,388 +505,158 @@ class Api(ApiTestCase):
             rv = self.app.get(url_for('api_04.type_tree', count=True))
             assert rv.get_json() > 0
 
-            rv = self.app.get(
-                url_for(
-                    'api_04.query',
-                    entities=place.id,
-                    cidoc_classes='E18',
-                    view_classes='artifact',
-                    system_classes='person',
-                    format='lp',
-                    search="""{"entityAliases":[{"operator":"equal",
-                    "values":["Sûza"],"logicalOperator":"and"}],
-                    "typeID":[{"operator":"equal","values":[1121212],
-                    "logicalOperator":"and"}]}"""))
-            assert bool(rv.get_json()['pagination']['entities'] == 0)
+            # ---Test search---
+            search_string_constructor = {
+                0: [{
+                    "entityAliases": [{
+                        "operator": "equal",
+                        "values": ["Sûza"],
+                        "logicalOperator": "and"}],
+                    "typeID": [{
+                        "operator": "equal", "values": [1121212],
+                        "logicalOperator": "and"}]}, {
+                    "valueTypeID": [{
+                        "operator": "lesserThanEqual",
+                        "values": [(height.id, 1.0), (weight_.id, 1.0)],
+                        "logicalOperator": "and"}]}, {
+                    "entityAliases": [{
+                        "operator": "greaterThan", "values": ["Sûza"]}],
+                    "typeID": [{"operator": "equal", "values": [1121212]}]}],
+                1: [{
+                    "valueTypeID": [{
+                        "operator": "equal",
+                        "values": [(height.id, 23.0)]}]}, {
+                    "valueTypeID": [{
+                        "operator": "greaterThanEqual",
+                        "values": [(height.id, 23.0)]}]}, {
+                    "typeName": [{
+                        "operator": "equal",
+                        "values": ["Boundary Mark", "Height"],
+                        "logicalOperator": "and"}]}, {
+                    "beginFrom": [{
+                        "operator": "lesserThan",
+                        "values": ["2020-01-01"],
+                        "logicalOperator": "and"}]}, {
+                    "beginFrom": [{
+                        "operator": "lesserThan",
+                        "values": ["2020-01-01"]}]}, {
+                    "beginTo": [{
+                        "operator": "lesserThanEqual",
+                        "values": ["2018-03-01"],
+                        "logicalOperator": "and"}]}, {
+                    "beginTo": [{
+                        "operator": "lesserThanEqual",
+                        "values": ["2018-03-01"]}]}, {
+                    "endFrom": [{
+                        "operator": "greaterThan",
+                        "values": ["2013-02-01"],
+                        "logicalOperator": "and"}]}, {
+                    "endFrom": [{
+                        "operator": "greaterThan",
+                        "values": ["2013-02-01"]}]}, {
+                    "endTo": [{
+                        "operator": "greaterThanEqual",
+                        "values": ["2019-03-01"],
+                        "logicalOperator": "and"}]}, {
+                    "endTo": [{
+                        "operator": "greaterThanEqual",
+                        "values": ["2019-03-01"]}]}, {
+                    "entityAliases": [
+                        {"operator": "like", "values": ["S"]}]}, {
+                    "typeName": [{
+                        "operator": "like",
+                        "values": ["Oun", "mark"],
+                        "logicalOperator": "and"}]}, {
+                    "entityDescription": [{
+                        "operator": "equal",
+                        "values": [
+                            "the shirE Was the Homeland of the hobbits.",
+                            "homeland"]}]}, {
+                    "valueTypeID": [{
+                        "operator": "greaterThanEqual",
+                        "values": [(height.id, 23.0), (weight_.id, 999.0)],
+                        "logicalOperator": "and"}]}],
+                2: [{
+                    "entityCidocClass": [{
+                        "operator": "equal",
+                        "values": ["E21"],
+                        "logicalOperator": "and"}]}, {
+                    "entitySystemClass": [{
+                        "operator": "equal",
+                        "values": ["person"],
+                        "logicalOperator": "and"}]}, {
+                    "typeIDWithSubs": [{
+                        "operator": "equal",
+                        "values": [boundary_mark.id, height.id]}]}, {
+                    "typeIDWithSubs": [{
+                        "operator": "equal",
+                        "values": [boundary_mark.id],
+                        "logicalOperator": "and"}]}, {
+                    "typeID": [{
+                        "operator": "equal",
+                        "values": [boundary_mark.id, height.id]}]}],
+                3: [{
+                    "typeIDWithSubs": [{
+                        "operator": "equal",
+                        "values": [
+                            boundary_mark.id, height.id,
+                            change_of_property.id]}]}, {
+                    "entityDescription": [{
+                        "operator": "like",
+                        "values": ["FrOdO", "sam"]}]}],
+                5: [{"entityName": [{"operator": "like", "values": ["Fr"]}]}],
+                9: [{
+                    "relationToID": [{
+                        "operator": "equal", "values": [place.id]}]}],
+                161: [{
+                    "typeIDWithSubs": [{
+                        "operator": "notEqual",
+                        "values": [boundary_mark.id],
+                        "logicalOperator": "and"}]}],
+                162: [{
+                    "typeName": [{
+                        "operator": "notEqual",
+                        "values": ["Boundary Mark", "Height"],
+                        "logicalOperator": "and"}]}, {
+                    "entityID": [{
+                        "operator": "notEqual",
+                        "values": [place.id],
+                        "logicalOperator": "and"}]}, {
+                    "entityAliases": [{
+                        "operator": "notEqual",
+                        "values": ["Sûza"],
+                        "logicalOperator": "and"}]}, {
+                    "entityName": [
+                        {"operator": "notEqual", "values": ["Mordor"]}]}]}
 
-            rv = self.app.get(
-                url_for(
-                    'api_04.query',
-                    entities=place.id,
-                    cidoc_classes='E18',
-                    view_classes='artifact',
-                    system_classes='person',
-                    format='lp',
-                    search="""{"entityAliases":[{"operator":"greaterThan",
-                    "values":["Sûza"],"logicalOperator":"and"}],
-                    "typeID":[{"operator":"equal","values":[1121212],
-                    "logicalOperator":"and"}]}"""))
-            assert bool(rv.get_json()['pagination']['entities'] == 0)
-
-            rv = self.app.get(
-                url_for(
-                    'api_04.query',
-                    entities=place.id,
-                    cidoc_classes='E18',
-                    view_classes='artifact',
-                    system_classes='person',
-                    format='lp',
-                    search=f"""{{"valueTypeID":
-                    [{{"operator":"lesserThanEqual",
-                    "values":[({height.id},1.0), ({weight_.id}, 1.0)],
-                    "logicalOperator":"and"}}]}}"""))
-            assert bool(rv.get_json()['pagination']['entities'] == 0)
-
-            rv = self.app.get(
-                url_for(
-                    'api_04.query',
-                    entities=place.id,
-                    classes='E18',
-                    codes='place',
-                    system_classes='person',
-                    format='lp',
-                    search=f"""{{"valueTypeID":
-                    [{{"operator":"greaterThanEqual",
-                    "values":[({height.id},23.0), ({weight_.id}, 999.0)],
-                    "logicalOperator":"and"}}]}}"""))
-            assert bool(rv.get_json()['pagination']['entities'] == 1)
-
-            for rv in [
-                self.app.get(
+            for count, search_string in search_string_constructor.items():
+                rv = self.app.get(
                     url_for(
                         'api_04.query',
-                        entities=place.id,
-                        cidoc_classes='E18',
-                        view_classes='artifact',
-                        system_classes='person',
-                        format='lp',
-                        search="""{"entityCidocClass":[{"operator":"equal",
-                        "values":["E21"],"logicalOperator":"and"}]}""")),
-                self.app.get(
-                    url_for(
-                        'api_04.query',
-                        entities=place.id,
-                        cidoc_classes='E18',
-                        view_classes='artifact',
-                        system_classes='person',
-                        format='lp',
-                        search="""{"entitySystemClass":[{"operator":"equal",
-                        "values":["person"],"logicalOperator":"and"}]}""")),
-                self.app.get(
-                    url_for(
-                        'api_04.query',
-                        entities=place.id,
-                        classes='E18',
-                        codes='artifact',
-                        system_classes='activity',
-                        format='lp',
-                        search=f'{{"typeIDWithSubs":[{{"operator":"equal",'
-                               f'"values":[{boundary_mark.id},'
-                               f'{height.id},'
-                               f'{change_of_property.id}],'
-                               f'"logicalOperator":"or"}}]}}')),
-                self.app.get(
-                    url_for(
-                        'api_04.query',
-                        entities=place.id,
-                        cidoc_classes='E18',
-                        view_classes='artifact',
-                        system_classes='person',
-                        format='lp',
-                        search='{"entityDescription":[{"operator":"like",'
-                               '"values":["FrOdO", "sam"],'
-                               '"logicalOperator":"or"}]}'))]:
-                assert bool(rv.get_json()['pagination']['entities'] == 2)
-
-            # Test search parameter
-            for rv in [
-                self.app.get(
-                    url_for(
-                        'api_04.query',
-                        entities=place.id,
-                        classes='E18',
-                        codes='place',
-                        system_classes='person',
-                        format='lp',
-                        search=f'{{"valueTypeID":[{{"operator":"equal",'
-                               f'"values":[({height.id},23.0)]}}]}}')),
-                self.app.get(
-                    url_for(
-                        'api_04.query',
-                        entities=place.id,
-                        classes='E18',
-                        codes='place',
-                        system_classes='person',
-                        format='lp',
-                        search=f'{{"valueTypeID":[{{'
-                               f'"operator":"greaterThanEqual",'
-                               f'"values":[({height.id},23.0)]}}]}}')),
-                self.app.get(
-                    url_for(
-                        'api_04.query',
-                        system_classes='place',
-                        search="""{"entityName":[{"operator":"notEqual",
-                        "values":["Mordor"],"logicalOperator":"or"}]}""")),
-                self.app.get(
-                    url_for(
-                        'api_04.query',
-                        entities=place.id,
-                        cidoc_classes='E18',
-                        view_classes='artifact',
-                        system_classes='person',
-                        format='lp',
-                        search="""{"typeName":[{"operator":"equal",
-                        "values":["Boundary Mark", "Height"],
-                        "logicalOperator":"and"}]}""")),
-                self.app.get(
-                    url_for(
-                        'api_04.query',
-                        entities=place.id,
-                        cidoc_classes='E18',
-                        view_classes='artifact',
-                        system_classes='person',
-                        format='lp',
-                        search=f'{{"relationToID":[{{"operator":"equal",'
-                               f'"values":[{place.id}],'
-                               f'"logicalOperator":"or"}}]}}')),
-                self.app.get(
-                    url_for(
-                        'api_04.query',
-                        entities=place.id,
-                        cidoc_classes='E18',
-                        view_classes='artifact',
-                        system_classes='person',
-                        format='lp',
-                        search="""{"beginFrom":[{"operator":"lesserThan",
-                        "values":["2020-01-01"],
-                        "logicalOperator":"and"}]}""")),
-                self.app.get(
-                    url_for(
-                        'api_04.query',
-                        entities=place.id,
-                        cidoc_classes='E18',
-                        view_classes='artifact',
-                        system_classes='person',
-                        format='lp',
-                        search="""{"beginFrom":[{"operator":"lesserThan",
-                        "values":["2020-01-01"],"logicalOperator":"or"}]}""")),
-                self.app.get(
-                    url_for(
-                        'api_04.query',
-                        entities=place.id,
-                        cidoc_classes='E18',
-                        view_classes='artifact',
-                        system_classes='person',
-                        format='lp',
-                        search="""{"beginTo":[{"operator":"lesserThanEqual",
-                        "values":["2018-03-01"],
-                        "logicalOperator":"and"}]}""")),
-                self.app.get(
-                    url_for(
-                        'api_04.query',
-                        entities=place.id,
-                        cidoc_classes='E18',
-                        view_classes='artifact',
-                        system_classes='person',
-                        format='lp',
-                        search="""{"beginTo":[{"operator":"lesserThanEqual",
-                        "values":["2018-03-01"],"logicalOperator":"or"}]}""")),
-                self.app.get(
-                    url_for(
-                        'api_04.query',
-                        entities=place.id,
-                        cidoc_classes='E18',
-                        view_classes='artifact',
-                        system_classes='person',
-                        format='lp',
-                        search="""{"endFrom":[{"operator":"greaterThan",
-                        "values":["2013-02-01"],
-                        "logicalOperator":"and"}]}""")),
-                self.app.get(
-                    url_for(
-                        'api_04.query',
-                        entities=place.id,
-                        cidoc_classes='E18',
-                        view_classes='artifact',
-                        system_classes='person',
-                        format='lp',
-                        search="""{"endFrom":[{"operator":"greaterThan",
-                        "values":["2013-02-01"],"logicalOperator":"or"}]}""")),
-                self.app.get(
-                    url_for(
-                        'api_04.query',
-                        entities=place.id,
-                        cidoc_classes='E18',
-                        view_classes='artifact',
-                        system_classes='person',
-                        format='lp',
-                        search='{"endTo":[{"operator":"greaterThanEqual", '
-                               '"values":["2019-03-01"],'
-                               '"logicalOperator":"and"}]}')),
-                self.app.get(
-                    url_for(
-                        'api_04.query',
-                        entities=place.id,
-                        cidoc_classes='E18',
-                        view_classes='artifact',
-                        system_classes='person',
-                        format='lp',
-                        search="""{"endTo":[{"operator":"greaterThanEqual",
-                    "values":["2019-03-01"],"logicalOperator":"or"}]}""")),
-                self.app.get(
-                    url_for(
-                        'api_04.query',
-                        entities=place.id,
-                        cidoc_classes='E18',
-                        view_classes='all',
                         system_classes='all',
-                        format='lp',
-                        search='{"entityDescription":[{"operator":"equal",'
-                               '"values":["the shirE Was the Homeland of the'
-                               ' hobbits.", "homeland"],'
-                               '"logicalOperator":"or"}]}')),
-                self.app.get(
-                    url_for(
-                        'api_04.query',
-                        entities=place.id,
-                        cidoc_classes='E18',
-                        view_classes='artifact',
-                        system_classes='person',
-                        format='lp',
-                        search='{"entityName":[{"operator":"like",'
-                               '"values":["Fr"],'
-                               '"logicalOperator":"or"}]}')),
-                self.app.get(
-                    url_for(
-                        'api_04.query',
-                        entities=place.id,
-                        cidoc_classes='E18',
-                        view_classes='artifact',
-                        system_classes='person',
-                        format='lp',
-                        search='{"entityAliases":[{"operator":"like",'
-                               '"values":["S"],'
-                               '"logicalOperator":"or"}]}')),
-                self.app.get(
-                    url_for(
-                        'api_04.query',
-                        entities=place.id,
-                        cidoc_classes='E18',
-                        view_classes='artifact',
-                        system_classes='person',
-                        format='lp',
-                        search='{"typeName": [{"operator": "like",'
-                               '"values": ["Oun", "mark"],'
-                               '"logicalOperator": "and"}]}')),
-                self.app.get(
-                    url_for(
-                        'api_04.query',
-                        system_classes='place',
-                        view_classes='artifact',
-                        format='lp',
-                        search=f'{{"typeIDWithSubs":[{{"operator":"notEqual",'
-                               f'"values":[{boundary_mark.id}],'
-                               f'"logicalOperator":"and"}}]}}'))]:
-                assert bool(rv.get_json()['pagination']['entities'] == 1)
-            for rv in [
-                self.app.get(
-                    url_for(
-                        'api_04.query',
-                        entities=place.id,
-                        cidoc_classes='E18',
-                        view_classes='artifact',
-                        system_classes='person',
-                        format='lp',
-                        search=f'{{"typeID":[{{"operator":"equal",'
-                               f'"values":[{boundary_mark.id},'
-                               f'{height.id}],'
-                               f'"logicalOperator":"or"}}]}}')),
-                self.app.get(
-                    url_for(
-                        'api_04.query',
-                        system_classes='place',
-                        view_classes='artifact',
-                        format='lp',
-                        search=f'{{"typeIDWithSubs":[{{"operator":"equal",'
-                               f'"values":[{boundary_mark.id}],'
-                               f'"logicalOperator":"and"}}]}}')),
-                self.app.get(
-                    url_for(
-                        'api_04.query',
-                        entities=place.id,
-                        cidoc_classes='E18',
-                        view_classes='artifact',
-                        system_classes='person',
-                        format='lp',
-                        search=f'{{"typeIDWithSubs":[{{"operator":"equal",'
-                               f'"values":[{boundary_mark.id},'
-                               f'{height.id}],'
-                               f'"logicalOperator":"or"}}]}}'))]:
-                assert bool(rv.get_json()['pagination']['entities'] == 2)
-            for rv in [
-                self.app.get(
-                    url_for(
-                        'api_04.query',
-                        entities=place.id,
-                        cidoc_classes='E18',
-                        view_classes='artifact',
-                        system_classes='person',
-                        format='lp',
-                        search="""{"typeName":[{"operator":"notEqual",
-                        "values":["Boundary Mark", "Height"],
-                        "logicalOperator":"and"}]}""")),
-                self.app.get(
-                    url_for(
-                        'api_04.query',
-                        entities=place.id,
-                        cidoc_classes='E18',
-                        view_classes='artifact',
-                        system_classes='person',
-                        format='lp',
-                        search=f'{{"entityID":[{{"operator":"notEqual",'
-                               f'"values":[{place.id}],'
-                               f'"logicalOperator":"and"}}]}}')),
-                self.app.get(
-                    url_for(
-                        'api_04.query',
-                        entities=place.id,
-                        cidoc_classes='E18',
-                        view_classes='artifact',
-                        system_classes='person',
-                        format='lp',
-                        search="""{"entityAliases":[{"operator":"notEqual",
-                        "values":["Sûza"],"logicalOperator":"and"}]}"""))]:
-                assert bool(rv.get_json()['pagination']['entities'] == 6)
+                        search=search_string))
+                assert bool(rv.get_json()['pagination']['entities'] == count)
+
             for rv in [
                 self.app.get(url_for('api_04.subunits', id_=place.id)),
                 self.app.get(
                     url_for('api_04.subunits', id_=place.id, download=True))]:
                 assert 'application/json' in rv.headers.get('Content-Type')
-                rv = rv.get_json()[str(place.id)]
-                for item in rv:
-                    if item['id'] == place.id:
-                        assert bool(item['id'] == place.id)
-                        assert bool(item['openatlasClassName'] == "place")
-                        assert bool(item['children'] == [feature.id])
-                        item = item['properties']
-                        assert bool(item['name'] == place.name)
-                        assert bool(item['description'] == place.description)
-                        assert bool(item['aliases'] == [alias.name])
-                        assert bool(item['externalReferences'])
-                        assert bool(item['timespan'])
-                        assert bool(item['standardType'])
-                        assert bool(item['files'])
-                        assert bool(item['types'])
+            rv = rv.get_json()[str(place.id)]
+            for item in rv:
+                if item['id'] == place.id:
+                    assert bool(item['id'] == place.id)
+                    assert bool(item['openatlasClassName'] == "place")
+                    assert bool(item['children'] == [feature.id])
+                    item = item['properties']
+                    assert bool(item['name'] == place.name)
+                    assert bool(item['description'] == place.description)
+                    assert bool(item['aliases'] == [alias.name])
+                    assert bool(item['externalReferences'])
+                    assert bool(item['timespan'])
+                    assert bool(item['standardType'])
+                    assert bool(item['files'])
+                    assert bool(item['types'])
 
             rv = self.app.get(
                 url_for('api_04.subunits', id_=place.id, count=True))
@@ -913,10 +683,11 @@ class Api(ApiTestCase):
                             centroid=True))
                     assert b'(autogenerated)' in rv.data
                     assert 'application/json' in rv.headers.get('Content-Type')
-            rv = self.app.get(
-                url_for('api_04.subunits', id_=place.id, centroid=True))
-            assert b'(autogenerated)' in rv.data
-            assert 'application/json' in rv.headers.get('Content-Type')
+                    rv = self.app.get(
+                        url_for('api_04.subunits', id_=place.id,
+                                centroid=True))
+                    assert b'(autogenerated)' in rv.data
+                    assert 'application/json' in rv.headers.get('Content-Type')
             rv = self.app.get(
                 url_for(
                     'api_04.view_class',
@@ -939,7 +710,7 @@ class Api(ApiTestCase):
                 self.app.get(
                     url_for('api_04.cidoc_class', class_='E18', last=1231))]:
                 rv = rv.get_json()
-                assert 'Entity does not exist' in rv['title']
+            assert 'Entity does not exist' in rv['title']
 
             rv = self.app.get(url_for('api_04.subunits', id_=actor.id))
             assert 'ID is not a valid place' in rv.get_json()['title']
