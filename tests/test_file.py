@@ -16,7 +16,7 @@ class FileTest(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()
                 place = insert('place', 'File keeper')
-                reference = insert('edition', 'Ancient Books')
+                reference = insert('edition', 'Ancient Books', 'Really!')
                 license_type = get_hierarchy('License')
 
             logo = Path(

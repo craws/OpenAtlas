@@ -60,7 +60,7 @@ class Parser:
     file_id = None
     exclude_system_classes: list[str]
     linked_to_ids: list[int]
-    url = None
+    url: str = ''
 
     def __init__(self, parser: dict[str, Any]):
         self.show = []
