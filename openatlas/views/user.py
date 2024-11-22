@@ -103,6 +103,7 @@ def user_activity(user_id: int = 0) -> str:
     if form.validate_on_submit():
         limit = int(form.limit.data)
         user_id = int(form.user.data)
+        action = form.action.data
     form.user.data = user_id
     table = Table(
         ['date', 'user', 'action', 'class', 'entity'],
