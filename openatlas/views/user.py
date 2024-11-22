@@ -167,8 +167,8 @@ def user_view(id_: int) -> str:
                     f"{url_for('user_delete', id_=user.id)}#tab-user",
                     onclick=""
                     f"return confirm('{_('Delete %(name)s?', name=name)}')"))
-        buttons.append(
-            button(_('activity'), url_for('user_activity', user_id=user.id)))
+    buttons.append(
+        button(_('activity'), url_for('user_activity', user_id=user.id)))
     return render_template(
         'tabs.html',
         tabs={
