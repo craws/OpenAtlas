@@ -121,7 +121,8 @@ def get_by_unsubscribe_code(code: str) -> Optional[dict[str, Any]]:
 def get_activities(
         limit: int,
         user_id: int,
-        action: str) -> list[dict[str, Any]]:
+        action: str,
+        entity_id: int | None) -> list[dict[str, Any]]:
     g.cursor.execute(
         f"""
         SELECT
@@ -134,10 +135,14 @@ def get_activities(
         WHERE TRUE
             {'AND user_id = %(id)s' if int(user_id) else ''}
             {'AND action = %(action)s' if action != 'all' else ''}
+            {'AND entity_id = %(entity_id)s' if entity_id else ''}
         ORDER BY created DESC
         {'LIMIT %(limit)s' if int(limit) else ''};
-        """,
-        {'limit': limit, 'id': user_id, 'action': action})
+        """, {
+            'limit': limit,
+            'id': user_id,
+            'action': action,
+            'entity_id': entity_id})
     return g.cursor.fetchall()
 
 

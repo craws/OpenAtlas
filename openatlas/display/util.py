@@ -172,10 +172,13 @@ def get_system_data(entity: Entity) -> dict[str, Any]:
     if 'entity_show_dates' in current_user.settings \
             and current_user.settings['entity_show_dates']:
         data[_('created')] = \
-            f"{format_date(entity.created)} {link(info['creator'])}"
+            f"{format_date(entity.created)} {link(info['creator'])} "
         if info['modified']:
             data[_('modified')] = \
                 f"{format_date(info['modified'])} {link(info['modifier'])}"
+        data[_('activity')] = link(
+            _('log'),
+            url_for('user_activity', user_id=0, entity_id=entity.id))
     if 'entity_show_import' in current_user.settings \
             and current_user.settings['entity_show_import']:
         data[_('imported from')] = link(info['project'])

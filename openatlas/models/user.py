@@ -118,8 +118,9 @@ class User(UserMixin):
     def get_activities(
             limit: int,
             user_id: int,
-            action: str) -> list[dict[str, Any]]:
-        return db.get_activities(limit, user_id, action)
+            action: str,
+            entity_id: int | None) -> list[dict[str, Any]]:
+        return db.get_activities(limit, user_id, action, entity_id)
 
     @staticmethod
     def get_created_entities_count(user_id: int) -> int:
