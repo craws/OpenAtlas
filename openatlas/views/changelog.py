@@ -16,6 +16,11 @@ def index_changelog() -> str:
 
 # pylint: disable=too-many-lines
 versions = {
+    '8.9.0': ['TBA', {
+        'feature': {
+            '2389': 'Activity log for entities',
+            '2381': 'Import only year dates',
+            '2391': 'IIIF: add reference '}}],
     '8.8.0': ['2024-10-31', {
         'feature': {
             '2349': 'Stronger hints that notes are not part of the model',
