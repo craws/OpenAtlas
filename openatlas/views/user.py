@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Optional
 
 import bcrypt
 from flask import abort, flash, g, render_template, request, url_for
@@ -28,14 +28,14 @@ from openatlas.models.user import User
 class UserForm(FlaskForm):
     user_id: Optional[int] = None
     active = BooleanField(_('active'), default=True)
-    username = StringField(
+    username: Any = StringField(
         _('username'),
         [InputRequired()],
         render_kw={'autofocus': True})
     group = SelectField(_('group'), choices=[])
-    email = StringField(_('email'), [InputRequired(), Email()])
-    password = PasswordField(_('password'), [InputRequired()])
-    password2 = PasswordField(_('repeat password'), [InputRequired()])
+    email: Any = StringField(_('email'), [InputRequired(), Email()])
+    password: Any = PasswordField(_('password'), [InputRequired()])
+    password2: Any = PasswordField(_('repeat password'), [InputRequired()])
     generate_password = generate_password_field()
     show_passwords = BooleanField(_('show passwords'))
     real_name = StringField(_('full name'), description=_('tooltip full name'))
@@ -91,8 +91,8 @@ class ActivityForm(FlaskForm):
     save = SubmitField(_('apply'))
 
 
-@app.route('/admin/user/activity', methods=['GET', 'POST'])
-@app.route('/admin/user/activity/<int:user_id>', methods=['GET', 'POST'])
+@app.route('/user/activity', methods=['GET', 'POST'])
+@app.route('/user/activity/<int:user_id>', methods=['GET', 'POST'])
 @required_group('readonly')
 def user_activity(user_id: int = 0) -> str:
     form = ActivityForm()
@@ -128,7 +128,7 @@ def user_activity(user_id: int = 0) -> str:
         crumbs=[[_('admin'), url_for('admin_index')], _('activity')])
 
 
-@app.route('/admin/user/view/<int:id_>')
+@app.route('/user/view/<int:id_>')
 @required_group('readonly')
 def user_view(id_: int) -> str:
     user = User.get_by_id(id_)
@@ -183,7 +183,7 @@ def user_view(id_: int) -> str:
 
 @app.route('/user/delete/<int:id_>')
 @required_group('manager')
-def user_delete(id_:int) -> Response:
+def user_delete(id_: int) -> Response:
     user = User.get_by_id(id_)
     if not user \
             or user.id == current_user.id \
@@ -194,7 +194,7 @@ def user_delete(id_:int) -> Response:
     return redirect(f"{url_for('admin_index')}#tab-user")
 
 
-@app.route('/admin/user/entities/<int:id_>')
+@app.route('/user/entities/<int:id_>')
 @required_group('readonly')
 def user_entities(id_: int) -> str:
     table = Table([
@@ -222,7 +222,7 @@ def user_entities(id_: int) -> str:
             _('created entities')])
 
 
-@app.route('/admin/user/update/<int:id_>', methods=['GET', 'POST'])
+@app.route('/user/update/<int:id_>', methods=['GET', 'POST'])
 @required_group('manager')
 def user_update(id_: int) -> str | Response:
     user = User.get_by_id(id_)
@@ -258,7 +258,7 @@ def user_update(id_: int) -> str | Response:
             _('edit')])
 
 
-@app.route('/admin/user/insert', methods=['GET', 'POST'])
+@app.route('/user/insert', methods=['GET', 'POST'])
 @required_group('manager')
 def user_insert() -> str | Response:
     form = UserForm()
