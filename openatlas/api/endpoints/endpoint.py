@@ -11,7 +11,7 @@ from flask_restful import marshal
 from openatlas import app
 from openatlas.api.endpoints.parser import Parser
 from openatlas.api.formats.csv import (
-    build_entity_dataframe, build_link_dataframe)
+    build_dataframe, build_link_dataframe)
 from openatlas.api.formats.loud import get_loud_entities
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.resolve_endpoints import (
@@ -44,8 +44,7 @@ class Endpoint:
         self.remove_duplicate_entities()
         self.sorting()
         result = self.get_json_output()
-        if (self.parser.format
-                in app.config['RDF_FORMATS']):  # pragma: no cover
+        if self.parser.format in app.config['RDF_FORMATS']:  # pragma: no cover
             return Response(
                 self.parser.rdf_output(result['results']),
                 mimetype=app.config['RDF_FORMATS'][self.parser.format])
@@ -100,8 +99,7 @@ class Endpoint:
         return result
 
     def export_entities_csv(self) -> Response:
-        frames = \
-            [build_entity_dataframe(e, relations=True) for e in self.entities]
+        frames = [build_dataframe(e, relations=True) for e in self.entities]
         return Response(
             pd.DataFrame(data=frames).to_csv(),
             mimetype='text/csv',
@@ -118,7 +116,7 @@ class Endpoint:
                 link_frame = [
                     build_link_dataframe(link_) for link_ in
                     (self.link_parser_check()
-                     + self.link_parser_check_inverse())]
+                     + self.link_parser_check(inverse=True))]
                 file.write(bytes(
                     pd.DataFrame(data=link_frame).to_csv(), encoding='utf8'))
         return Response(
@@ -134,25 +132,18 @@ class Endpoint:
                 sorted(entities, key=lambda entity: entity.class_.name),
                 key=lambda entity: entity.class_.name):
             grouped_entities[class_] = \
-                [build_entity_dataframe(entity) for entity in entities_]
+                [build_dataframe(entity) for entity in entities_]
         return grouped_entities
 
-    def link_parser_check(self) -> list[Link]:
-        if any(i in ['relations', 'types', 'depictions', 'links', 'geometry']
-               for i in self.parser.show):
-            return Entity.get_links_of_entities(
-                [entity.id for entity in self.entities],
-                self.parser.get_properties_for_links())
-        return []
-
-    def link_parser_check_inverse(self) -> list[Link]:
-        if any(i in ['relations', 'types', 'depictions', 'links', 'geometry']
-               for i in self.parser.show):
-            return Entity.get_links_of_entities(
+    def link_parser_check(self, inverse: bool = False) -> list[Link]:
+        links = []
+        show_ = {'relations', 'types', 'depictions', 'links', 'geometry'}
+        if set(self.parser.show) & show_:
+            links = Entity.get_links_of_entities(
                 [entity.id for entity in self.entities],
                 self.parser.get_properties_for_links(),
-                inverse=True)
-        return []
+                inverse=inverse)
+        return links
 
     def sorting(self) -> None:
         if 'latest' in request.path:
@@ -172,8 +163,8 @@ class Endpoint:
     def get_json_output(self) -> dict[str, Any]:
         total = [e.id for e in self.entities]
         count = len(total)
-        self.parser.limit = count \
-            if self.parser.limit == 0 else self.parser.limit
+        if self.parser.limit == 0:
+            self.parser.limit = count
         e_list = []
         if total:
             e_list = list(itertools.islice(total, 0, None, self.parser.limit))
@@ -211,7 +202,7 @@ class Endpoint:
                 'links_inverse': []}
         for link_ in self.link_parser_check():
             entities_dict[link_.domain.id]['links'].append(link_)
-        for link_ in self.link_parser_check_inverse():
+        for link_ in self.link_parser_check(inverse=True):
             entities_dict[link_.range.id]['links_inverse'].append(link_)
         if self.parser.format == 'loud' \
                 or self.parser.format in app.config['RDF_FORMATS']:
@@ -242,12 +233,9 @@ class Endpoint:
 
     def get_geojson_v2(self) -> dict[str, Any]:
         out = []
-        links = [
-            link_ for link_ in self.link_parser_check() if link_.property.code
-                                                           in ['P53', 'P74',
-                                                               'OA8', 'OA9',
-                                                               'P7', 'P26',
-                                                               'P27']]
+        property_codes = ['P53', 'P74', 'OA8', 'OA9', 'P7', 'P26', 'P27']
+        link_parser = self.link_parser_check()
+        links = [l for l in link_parser if l.property.code in property_codes]
         for entity in self.entities:
             entity_links = [
                 link_ for link_ in links if link_.domain.id == entity.id]

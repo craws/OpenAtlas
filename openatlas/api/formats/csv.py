@@ -11,7 +11,7 @@ from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 
 
-def build_entity_dataframe(
+def build_dataframe(
         entity: Entity,
         relations: bool = False) -> dict[str, Any]:
     geom = get_csv_geom_entry(entity)
