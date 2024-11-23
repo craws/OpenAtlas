@@ -51,10 +51,8 @@ ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_class_c
 ALTER TABLE IF EXISTS ONLY model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_sub_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.cidoc_class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_fkey;
-ALTER TABLE IF EXISTS ONLY model.annotation_text DROP CONSTRAINT IF EXISTS annotation_text_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.annotation_text DROP CONSTRAINT IF EXISTS annotation_text_source_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.annotation_text DROP CONSTRAINT IF EXISTS annotation_text_entity_id_fkey;
-ALTER TABLE IF EXISTS ONLY model.annotation_image DROP CONSTRAINT IF EXISTS annotation_image_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.annotation_image DROP CONSTRAINT IF EXISTS annotation_image_image_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.annotation_image DROP CONSTRAINT IF EXISTS annotation_image_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_user_id_fkey;
@@ -413,7 +411,6 @@ CREATE TABLE model.annotation_image (
     image_id integer NOT NULL,
     entity_id integer,
     coordinates text NOT NULL,
-    user_id integer,
     text text,
     created timestamp without time zone DEFAULT now() NOT NULL,
     modified timestamp without time zone
@@ -467,7 +464,6 @@ CREATE TABLE model.annotation_text (
     entity_id integer,
     link_start integer NOT NULL,
     link_end integer NOT NULL,
-    user_id integer,
     text text,
     created timestamp without time zone DEFAULT now() NOT NULL,
     modified timestamp without time zone
@@ -2348,14 +2344,6 @@ ALTER TABLE ONLY model.annotation_image
 
 
 --
--- Name: annotation_image annotation_image_user_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
---
-
-ALTER TABLE ONLY model.annotation_image
-    ADD CONSTRAINT annotation_image_user_id_fkey FOREIGN KEY (user_id) REFERENCES web."user"(id) ON UPDATE CASCADE ON DELETE SET NULL;
-
-
---
 -- Name: annotation_text annotation_text_entity_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
@@ -2369,14 +2357,6 @@ ALTER TABLE ONLY model.annotation_text
 
 ALTER TABLE ONLY model.annotation_text
     ADD CONSTRAINT annotation_text_source_id_fkey FOREIGN KEY (source_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: annotation_text annotation_text_user_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
---
-
-ALTER TABLE ONLY model.annotation_text
-    ADD CONSTRAINT annotation_text_user_id_fkey FOREIGN KEY (user_id) REFERENCES web."user"(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

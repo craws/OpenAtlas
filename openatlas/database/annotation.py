@@ -9,7 +9,6 @@ ANNOTATION_IMAGE_SELECT = \
         image_id,
         entity_id,
         coordinates,
-        user_id,
         text,
         created
     FROM model.annotation_image
@@ -23,7 +22,6 @@ ANNOTATION_TEXT_SELECT = \
         entity_id,
         link_start,
         link_end,
-        user_id,
         text,
         created
     FROM model.annotation_text
@@ -70,7 +68,6 @@ def get_annotation_image_orphans() -> list[dict[str, Any]]:
             a.image_id,
             a.entity_id,
             a.coordinates,
-            a.user_id,
             a.text,
             a.created
         FROM model.annotation_image a
@@ -89,13 +86,11 @@ def insert_annotation_image(data: dict[str, Any]) -> None:
             image_id,
             entity_id,
             coordinates,
-            user_id,
             text
         ) VALUES (
             %(image_id)s,
             %(entity_id)s,
             %(coordinates)s,
-            %(user_id)s,
             %(text)s);
         """,
         data)
@@ -155,14 +150,12 @@ def insert_annotation_text(data: dict[str, Any]) -> None:
             entity_id,
             link_start,
             link_end,
-            user_id,
             text
         ) VALUES (
             %(source_id)s,
             %(entity_id)s,
             %(link_start)s,
             %(link_end)s,
-            %(user_id)s,
             %(text)s);
         """,
         data)

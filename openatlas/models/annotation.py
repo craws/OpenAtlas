@@ -13,7 +13,6 @@ class AnnotationImage:
         self.image_id = data['image_id']
         self.entity_id = data['entity_id']
         self.coordinates = data['coordinates']
-        self.user_id = data['user_id']
         self.text = data['text']
         self.created = data['created']
 
@@ -58,7 +57,6 @@ class AnnotationImage:
             text: Optional[str] = None) -> None:
         db.insert_annotation_image({
             'image_id': image_id,
-            'user_id': current_user.id,
             'entity_id': entity_id or None,
             'coordinates': coordinates,
             'text': text})
@@ -71,7 +69,6 @@ class AnnotationText:
         self.entity_id = data['entity_id']
         self.link_start = data['link_start']
         self.link_end = data['link_end']
-        self.user_id = data['user_id']
         self.text = data['text']
         self.created = data['created']
 
@@ -113,5 +110,4 @@ class AnnotationText:
             'link_start': link_start,
             'link_end': link_end,
             'entity_id': entity_id,
-            'text': text,
-            'user_id': current_user.id})
+            'text': text})
