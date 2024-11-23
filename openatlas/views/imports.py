@@ -2,7 +2,6 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any, Optional
 
-import numpy
 import pandas as pd
 from flask import flash, g, render_template, request, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -31,14 +30,16 @@ from openatlas.display.util2 import (
     manual, uc_first)
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
+from openatlas.forms.util import form_to_datetime64
 from openatlas.models.entity import Entity
 from openatlas.models.imports import (
     Project, check_duplicates, check_single_type_duplicates, check_type_id,
-    clean_reference_pages, get_origin_ids, import_data_)
+    clean_reference_pages, get_id_from_origin_id, get_origin_ids, import_data_)
 
 _('invalid columns')
 _('possible duplicates')
 _('invalid administrative units')
+_('invalid dates')
 _('invalid reference system class')
 _('invalid reference system')
 _('invalid reference system value')
@@ -51,6 +52,7 @@ _('invalid value type values')
 _('invalid coordinates')
 _('invalid OpenAtlas class')
 _('invalid reference id')
+_('invalid origin reference id')
 _('empty names')
 _('empty ids')
 _('missing name column')
@@ -348,7 +350,8 @@ def check_data_for_table_representation(
         table_row = []
         checked_row = {}
         for item in headers:
-            table_row.append(check_cell_value(row, item, class_, checks))
+            table_row.append(
+                check_cell_value(row, item, class_, checks, project))
             checked_row[item] = row[item]
             if item == 'name' and form.duplicate.data:
                 names.append(row['name'].lower())
@@ -425,14 +428,14 @@ def get_allowed_columns(class_: str) -> dict[str, list[str]]:
         columns.extend([
             'begin_from', 'begin_to', 'begin_comment',
             'end_from', 'end_to', 'end_comment',
-            'references'])
+            'reference_ids', 'origin_reference_ids'])
     if class_ in ['place', 'person', 'group']:
         columns.append('alias')
     if class_ in ['place', 'artifact']:
         columns.append('wkt')
     if class_ in ['place']:
         columns.extend([
-            'administrative_unit', 'historical_place', 'parent_id',
+            'administrative_unit_id', 'historical_place_id', 'parent_id',
             'openatlas_class', 'openatlas_parent_id'])
     return {
         'allowed': columns,
@@ -444,7 +447,8 @@ def check_cell_value(
         row: Series,
         item: str,
         class_: str,
-        checks: CheckHandler) -> str:
+        checks: CheckHandler,
+        project: Project) -> str:
     value = row[item]
     id_ = row.get('id')
     if openatlas_class := row.get('openatlas_class'):
@@ -487,7 +491,7 @@ def check_cell_value(
                     checks.set_warning('invalid_value_type_values', id_)
                 value_types.append(';'.join(values))
             value = ' '.join(value_types)
-        case 'references' if value:
+        case 'reference_ids' if value:
             references = []
             for reference in clean_reference_pages(str(value)):
                 values = str(reference).split(';')
@@ -502,23 +506,39 @@ def check_cell_value(
                         checks.set_warning('invalid_reference_id', id_)
                 references.append(';'.join(values))
             value = ' '.join(references)
+        case 'origin_reference_ids' if value:
+            origin_references = []
+            for reference in clean_reference_pages(str(value)):
+                values = str(reference).split(';')
+                if not get_id_from_origin_id(project, values[0]):
+                    checks.set_warning('invalid_origin_reference_id', id_)
+                    values[0] = error_span(values[0])
+                origin_references.append(';'.join(values))
+            value = ' '.join(origin_references)
         case 'wkt' if value:
             try:
                 wkt.loads(row[item])
             except WKTReadingError:
                 value = error_span(value)
                 checks.set_warning('invalid_coordinates', id_)
-        case 'begin_from' | 'begin_to' | 'end_from' | 'end_to':
+        case 'begin_from' | 'begin_to' | 'end_from' | 'end_to' if value:
             try:
-                value = datetime64_to_timestamp(
-                    numpy.datetime64(value))
-                row[item] = value
+                value = value.split('-')
+                value = [int(item) for item in value]
+                value = value + [None] * (3 - len(value))
+                value = datetime64_to_timestamp(form_to_datetime64(
+                    value[0],
+                    value[1],
+                    value[2],
+                    to_date=item in ['begin_to', 'end_to']))
+                row[item] = value if all(value) else ''
             except ValueError:
                 row[item] = ''
                 value = '' if str(value) == 'NaT' else error_span(value)
-        case 'administrative_unit' | 'historical_place' if value:
+                checks.set_warning('invalid_dates', id_)
+        case 'administrative_unit_id' | 'historical_place_id' if value:
             if ((not str(value).isdigit() or int(value) not in g.types) or
-                    g.types[g.types[int(value)].root[-1]].name not in [
+                    g.types[g.types[int(value)].root[0]].name not in [
                         'Administrative unit', 'Historical place']):
                 value = error_span(value)
                 checks.set_warning('invalid_administrative_units', id_)

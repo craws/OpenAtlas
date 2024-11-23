@@ -122,13 +122,13 @@ Tag: design decision
 A free text entry field would lead to lots of unstructured data.
 Unstructured data can not be processed automatically and would result in it
 not being presented nor searchable in the OpenAtlas system as well as in a
-frontend that presents your data. Therefore, we made the decision, not to
-include free text types into the OpenAtlas system. Solutions to this problem
+presentation site that presents your data. Therefore, we made the decision, not
+to include free text types into the OpenAtlas system. Solutions to this problem
 are very case specific, but you could:
 
 * use the already provided description fields to enter any type of free text
   (keep in mind that this also comes with restrictions on how to present this
-  data in a frontend)
+  data at a presentation site)
 * create a new tree of project specific types for as many cases as possible
   and structure your data with them – for a step by step tutorial how to
   create new types, click :doc:`here</examples/types>`.

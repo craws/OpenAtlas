@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Optional
 
 import bcrypt
 from flask import abort, flash, g, render_template, request, url_for
@@ -28,14 +28,14 @@ from openatlas.models.user import User
 class UserForm(FlaskForm):
     user_id: Optional[int] = None
     active = BooleanField(_('active'), default=True)
-    username = StringField(
+    username: Any = StringField(
         _('username'),
         [InputRequired()],
         render_kw={'autofocus': True})
     group = SelectField(_('group'), choices=[])
-    email = StringField(_('email'), [InputRequired(), Email()])
-    password = PasswordField(_('password'), [InputRequired()])
-    password2 = PasswordField(_('repeat password'), [InputRequired()])
+    email: Any = StringField(_('email'), [InputRequired(), Email()])
+    password: Any = PasswordField(_('password'), [InputRequired()])
+    password2: Any = PasswordField(_('repeat password'), [InputRequired()])
     generate_password = generate_password_field()
     show_passwords = BooleanField(_('show passwords'))
     real_name = StringField(_('full name'), description=_('tooltip full name'))
@@ -91,10 +91,13 @@ class ActivityForm(FlaskForm):
     save = SubmitField(_('apply'))
 
 
-@app.route('/admin/user/activity', methods=['GET', 'POST'])
-@app.route('/admin/user/activity/<int:user_id>', methods=['GET', 'POST'])
+@app.route('/user/activity', methods=['GET', 'POST'])
+@app.route('/user/activity/<int:user_id>', methods=['GET', 'POST'])
+@app.route(
+    '/user/activity/<int:user_id>/<int:entity_id>',
+    methods=['GET', 'POST'])
 @required_group('readonly')
-def user_activity(user_id: int = 0) -> str:
+def user_activity(user_id: int = 0, entity_id: Optional[int] = None) -> str:
     form = ActivityForm()
     form.user.choices = [(0, _('all'))] + User.get_users_for_form()
     limit = 100
@@ -103,11 +106,12 @@ def user_activity(user_id: int = 0) -> str:
     if form.validate_on_submit():
         limit = int(form.limit.data)
         user_id = int(form.user.data)
+        action = form.action.data
     form.user.data = user_id
     table = Table(
         ['date', 'user', 'action', 'class', 'entity'],
         order=[[0, 'desc']])
-    for row in User.get_activities(limit, user_id, action):
+    for row in User.get_activities(limit, user_id, action, entity_id):
         try:
             entity = Entity.get_by_id(row['entity_id'])
             entity_name = link(entity)
@@ -125,10 +129,10 @@ def user_activity(user_id: int = 0) -> str:
         'content.html',
         content=display_form(form) + table.display(),
         title=_('user'),
-        crumbs=[[_('admin'), url_for('admin_index')], _('activity')])
+        crumbs=[[_('user'), url_for('admin_index')], _('activity')])
 
 
-@app.route('/admin/user/view/<int:id_>')
+@app.route('/user/view/<int:id_>')
 @required_group('readonly')
 def user_view(id_: int) -> str:
     user = User.get_by_id(id_)
@@ -148,6 +152,8 @@ def user_view(id_: int) -> str:
             user.email
             if is_authorized('manager') or user.settings['show_email'] else '',
         _('created entities'): created_count,
+        _('activity'):
+            link(_('log'),  url_for('user_activity', user_id=user.id)),
         _('language'): user.settings['language'],
         _('last login'): format_date(user.login_last_success),
         _('failed logins'):
@@ -166,8 +172,6 @@ def user_view(id_: int) -> str:
                     f"{url_for('user_delete', id_=user.id)}#tab-user",
                     onclick=""
                     f"return confirm('{_('Delete %(name)s?', name=name)}')"))
-        buttons.append(
-            button(_('activity'), url_for('user_activity', user_id=user.id)))
     return render_template(
         'tabs.html',
         tabs={
@@ -183,7 +187,7 @@ def user_view(id_: int) -> str:
 
 @app.route('/user/delete/<int:id_>')
 @required_group('manager')
-def user_delete(id_:int) -> Response:
+def user_delete(id_: int) -> Response:
     user = User.get_by_id(id_)
     if not user \
             or user.id == current_user.id \
@@ -194,7 +198,7 @@ def user_delete(id_:int) -> Response:
     return redirect(f"{url_for('admin_index')}#tab-user")
 
 
-@app.route('/admin/user/entities/<int:id_>')
+@app.route('/user/entities/<int:id_>')
 @required_group('readonly')
 def user_entities(id_: int) -> str:
     table = Table([
@@ -222,7 +226,7 @@ def user_entities(id_: int) -> str:
             _('created entities')])
 
 
-@app.route('/admin/user/update/<int:id_>', methods=['GET', 'POST'])
+@app.route('/user/update/<int:id_>', methods=['GET', 'POST'])
 @required_group('manager')
 def user_update(id_: int) -> str | Response:
     user = User.get_by_id(id_)
@@ -258,7 +262,7 @@ def user_update(id_: int) -> str | Response:
             _('edit')])
 
 
-@app.route('/admin/user/insert', methods=['GET', 'POST'])
+@app.route('/user/insert', methods=['GET', 'POST'])
 @required_group('manager')
 def user_insert() -> str | Response:
     form = UserForm()

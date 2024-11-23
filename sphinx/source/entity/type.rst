@@ -9,51 +9,57 @@ Types are used to add information or group entities. They are hierarchical and
 can be accessed and edited via the **Types** :doc:`/ui/menu` item. With this
 feature the user interface can be adapted for specific research interests.
 
-* Types can be added dynamically in forms (with at least editor permission)
-  with basic information like name, description and super type
+* Types can be added dynamically in forms (for users with editor status or
+  higher) with basic information like name, description and super type
 * The root type description is shown in forms as a mouse over text at
   the **i** icon
-* **Untyped entities** can be checked at the type overview
-* **Multiple linked entities** can be checked at the type overview, useful if
-  switching to single
-* Types (except value types) can be **Set unselectable**, e.g. to enter
-  sub categories, via the corresponding button at a type view. But only if not
-  already used by entities and at least editor permissions are needed.
+* **Untyped entities** can be checked via type overview
+* **Multiple linked entities** can be checked at type overview, useful if
+  a type should be switched to single choice
+* Types (except value types) can be **Set unselectable** via the
+  corresponding button in a type view. If selected only the type's
+  sub-categories can be selected in a form. Set unselectable can only be
+  selected if the type is not already used for entities. You need editor
+  permission or higher to make this change
 * A more detailed description on how to enter new types can be found
   :doc:`here</examples/types>`
 
 Standard types
 --------------
-Standard types are already present in the default installation with a few
-examples.
+Some standard types are pre-installed in every OpenAtlas instance. These types
 
 * Cannot be deleted or renamed (but subtypes of them can)
 * Are single select only
-* In forms they appear with a **Type** label
+* Appear in forms with a **Type** label
 * Are displayed in entity tables
 
 Custom types
 ------------
 Custom types can be created, deleted and renamed. The default installation
-comes with one example custom type **Sex** which is used for actor.
+comes with one example custom type **Sex** which is used for actors. Custom
+types
 
-* Can be set to allow single or multiple choices
-* Can be used for multiple classes, e.g. a hierarchy "case study" for places,
-  actors and events
+* Can be single or multiple choices
+* Can be used for multiple classes, for example the type "case study" and its
+  sub-types can be used in forms for places, actors, and events
 
 If you want to change an existing **multiple type to single** but the
-multiple checkbox is greyed out and not selectable it means that at least one
-entity already used multiple. You can check these entries at the type overview
-at **multiple linked entities**.
+multiple checkbox is greyed out and not selectable, the multiple option is
+used for at least one entity already. Check entries in type overview at
+**multiple linked entities** and make changes if necessary.
 
 Value types
 -----------
-Value types can be created, deleted and renamed. The default installation comes
-with an example value type **Dimensions** with the sub types **Height** and
-**Weight** which are used in the form for artifacts.
+Value types can be created, deleted, and renamed. They are used to add
+values in form of decimals to an entity. The default installation
+comes with an example value type **Dimensions** with the sub-types
+**Height** and **Weight** which are used in the form for artifacts. Value
+types
 
 * Can be used for multiple classes
 * Values can be entered as decimals in forms
+* A unit such as centimetre, gram, or percentage can be specified
+
 
 Form fields
 -----------
@@ -61,7 +67,7 @@ Form fields
 * :doc:`/ui/description`
 * :doc:`reference_system`
 * :doc:`/ui/date`
-* A super (type) if it is a sub type of another type
+* A super (type) if it is a sub-type of another type
 
 Can be linked via tabs to
 -------------------------
@@ -70,13 +76,13 @@ Can be linked via tabs to
 
 Making types required
 ---------------------
-It is possible making specifying of types required. This can be done at the
-type overview in the right information display of the respective type by users
-who have at least manager permissions.
+It is possible to make certain types required. To make a type required, go
+to type overview. Mark it as required in the display on the right. You have
+to have manager or higher status to do this.
 
-Be careful with making types required, especially when there are users who
-aren't permitted to create new ones. It may put them in an awkward situation at
-data entry and, as a result, may even reduce the data quality.
+Please keep in mind that not all users can add new types when making a type
+required. This might lead to situations where a user is unable to choose a
+fitting type for an entity and might therefore reduce data quality.
 
-Also keep in mind, that existing entries which haven't set this type, will than
-not be possible to update, without setting the required type.
+Existing entries that were entered before a typ was set to required and have
+no set values for this specific type can not be updated anymore afterwards.

@@ -2,8 +2,11 @@
 apiVersion: v1
 data:
   POSTGRES_DB: {{ .Values.postgis.name | default (printf "%s" (include "fullname" .)) | quote }}
+  POSTGRES_USER: openatlas
 kind: ConfigMap
 metadata:
+  annotations:
+    helm.sh/resource-policy: keep
   labels:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
   name: {{ template "fullname" . }}-configmap

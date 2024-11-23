@@ -74,20 +74,25 @@ def get_lp_file(links_inverse: list[Link]) -> list[dict[str, str]]:
         if link.domain.class_.name != 'file':
             continue
         iiif_manifest = ''
-        if check_iiif_activation() and check_iiif_file_exist(link.domain.id):
+        iiif_base_path= ''
+        img_id = link.domain.id
+        if check_iiif_activation() and check_iiif_file_exist(img_id):
             iiif_manifest = url_for(
                 'api.iiif_manifest',
                 version=g.settings['iiif_version'],
-                id_=link.domain.id,
+                id_=img_id,
                 _external=True)
-        path = get_file_path(link.domain.id)
+            if g.files.get(img_id):
+                iiif_base_path =\
+                    f"{g.settings['iiif_url']}{img_id}{g.files[img_id].suffix}"
+        path = get_file_path(img_id)
         mime_type = None
         if path:
             mime_type, _ = mimetypes.guess_type(path)
         files.append({
             '@id': url_for(
                 'api.entity',
-                id_=link.domain.id,
+                id_=img_id,
                 _external=True),
             'title': link.domain.name,
             'license': get_license_name(link.domain),
@@ -96,6 +101,7 @@ def get_lp_file(links_inverse: list[Link]) -> list[dict[str, str]]:
             'publicShareable': link.domain.public,
             'mimetype': mime_type,
             'IIIFManifest': iiif_manifest,
+            'IIIFBasePath': iiif_base_path,
             'url': url_for(
                 'api.display',
                 filename=path.stem,

@@ -58,6 +58,16 @@ def check_origin_ids(project_id: int, origin_ids: list[str]) -> list[str]:
     return [row['origin_id'] for row in g.cursor.fetchall()]
 
 
+def get_id_from_origin_id(project_id: int, origin_id: str) -> list[str]:
+    g.cursor.execute(
+        """
+        SELECT entity_id FROM import.entity
+        WHERE project_id = %(project_id)s AND origin_id = %(ids)s;
+        """,
+        {'project_id': project_id, 'ids': origin_id})
+    return g.cursor.fetchone()
+
+
 def check_duplicates(class_: str, names: list[str]) -> list[str]:
     g.cursor.execute(
         """

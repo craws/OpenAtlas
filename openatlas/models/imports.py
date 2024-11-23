@@ -62,6 +62,10 @@ def get_origin_ids(project: Project, origin_ids: list[str]) -> list[str]:
     return db.check_origin_ids(project.id, origin_ids)
 
 
+def get_id_from_origin_id(project: Project, origin_id: str) -> list[str]:
+    return db.get_id_from_origin_id(project.id, origin_id)
+
+
 def check_duplicates(class_: str, names: list[str]) -> list[str]:
     return db.check_duplicates(class_, names)
 
@@ -71,7 +75,7 @@ def check_type_id(type_id: str, class_: str) -> bool:
         return False
     if not g.types[int(type_id)].root:
         return False
-    root_type = g.types[g.types[int(type_id)].root[-1]]
+    root_type = g.types[g.types[int(type_id)].root[0]]
     if class_ not in root_type.classes:
         return False
     if root_type.name in ['Administrative unit', 'Historical place']:
@@ -82,9 +86,9 @@ def check_type_id(type_id: str, class_: str) -> bool:
 def check_single_type_duplicates(type_ids: list[str]) -> list[str]:
     single_types = defaultdict(list)
     for type_id in type_ids:
-        if not g.types[int(type_id)].multiple:
+        if not g.types[g.types[int(type_id)].root[0]].multiple:
             single_types[
-                g.types[g.types[int(type_id)].root[-1]].name].append(type_id)
+                g.types[g.types[int(type_id)].root[0]].name].append(type_id)
     single_type_ids = []
     for value in single_types.values():
         if len(value) > 1:
@@ -110,7 +114,7 @@ def import_data_(project: Project, class_: str, data: list[Any]) -> None:
             insert_alias(entity, row)
         insert_dates(entity, row)
         link_types(entity, row, class_)
-        link_references(entity, row, class_)
+        link_references(entity, row, class_, project)
         if class_ in g.view_class_mapping['place'] \
                 + g.view_class_mapping['artifact']:
             insert_gis(entity, row, project)
@@ -160,15 +164,26 @@ def link_types(entity: Entity, row: dict[str, Any], class_: str) -> None:
                 entity.link('P2', g.types[int(value_type[0])], value_type[1])
 
 
-def link_references(entity: Entity, row: dict[str, Any], class_: str) -> None:
-    if data := row.get('references'):
-        for references in clean_reference_pages(str(data)):
+def link_references(
+        entity: Entity,
+        row: dict[str, Any],
+        class_: str,
+        project: Project) -> None:
+    if ref_ids := row.get('reference_ids'):
+        for references in clean_reference_pages(str(ref_ids)):
             reference = references.split(';')
             if len(reference) <= 2 and reference[0].isdigit():
                 try:
                     ref_entity = ApiEntity.get_by_id(int(reference[0]))
                 except EntityDoesNotExistError:
                     continue
+                page = reference[1] or None
+                ref_entity.link('P67', entity, page)
+    if origin_ref_ids := row.get('origin_reference_ids'):
+        for references in clean_reference_pages(str(origin_ref_ids)):
+            reference = references.split(';')
+            if ref_id := get_id_from_origin_id(project, reference[0]):
+                ref_entity = ApiEntity.get_by_id(int(ref_id[0]))
                 page = reference[1] or None
                 ref_entity.link('P67', entity, page)
     match_types = get_match_types()
@@ -190,14 +205,14 @@ def link_references(entity: Entity, row: dict[str, Any], class_: str) -> None:
 def insert_gis(entity: Entity, row: dict[str, Any], project: Project) -> None:
     location = Entity.insert('object_location', f"Location of {row['name']}")
     entity.link('P53', location)
-    if data := row.get('administrative_unit'):
+    if data := row.get('administrative_unit_id'):
         if ((str(data).isdigit() and int(data) in g.types) and
-                g.types[g.types[int(data)].root[-1]].name in [
+                g.types[g.types[int(data)].root[0]].name in [
                     'Administrative unit']):
             location.link('P89', g.types[int(data)])
-    if data := row.get('historical_place'):
+    if data := row.get('historical_place_id'):
         if ((str(data).isdigit() and int(data) in g.types) and
-                g.types[g.types[int(data)].root[-1]].name in [
+                g.types[g.types[int(data)].root[0]].name in [
                     'Historical place']):
             location.link('P89', g.types[int(data)])
     if coordinates := row.get('wkt'):
@@ -218,5 +233,5 @@ def insert_gis(entity: Entity, row: dict[str, Any], project: Project) -> None:
 
 
 def clean_reference_pages(value: str) -> list[str]:
-    matches =  re.findall(r'([a-zA-Z\d]*;[^;]*?(?=[a-zA-Z\d]*;|$))', value)
+    matches =  re.findall(r'([\w\-]*;[^;]*?(?=[\w\-]*;|$))', value)
     return [match.strip() for match in matches]
