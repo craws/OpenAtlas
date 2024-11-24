@@ -21,7 +21,6 @@ class FileTest(TestBaseCase):
 
             logo = Path(
                 app.root_path) / 'static' / 'images' / 'layout' / 'logo.png'
-
             with open(logo, 'rb') as img_1, open(logo, 'rb') as img_2:
                 rv: Any = self.app.post(
                     url_for('insert', class_='file', origin_id=place.id),
@@ -172,8 +171,7 @@ class FileTest(TestBaseCase):
             rv = self.app.get(url_for('view', id_=iiif_id))
             assert b'View in IIIF' in rv.data
 
-            rv = self.app.get(
-                url_for('view', id_=place.id, _anchor="tab-file"))
+            rv = self.app.get(url_for('view', id_=place.id))
             assert b'view all IIIF images' in rv.data
 
             with app.test_request_context():
@@ -206,9 +204,11 @@ class FileTest(TestBaseCase):
 
             rv = self.app.get(url_for('api.licensed_file_overview'))
             assert bool(len(rv.get_json().keys()) == 4)
+
             rv = self.app.get(
                 url_for('api.licensed_file_overview', download=True))
             assert bool(len(rv.get_json().keys()) == 4)
+
             rv = self.app.get(
                 url_for('api.licensed_file_overview', file_id=iiif_id))
             assert bool(len(rv.get_json().keys()) == 1)
@@ -234,9 +234,7 @@ class FileTest(TestBaseCase):
                 follow_redirects=True)
             assert b'An interesting annotation' in rv.data
 
-            rv = self.app.get(url_for(
-                'view_iiif',
-                id_=iiif_id))
+            rv = self.app.get(url_for('view_iiif', id_=iiif_id))
             assert b'Mirador' in rv.data
 
             rv = self.app.get(
@@ -266,9 +264,10 @@ class FileTest(TestBaseCase):
             assert bool(str(iiif_id) in json['@id'])
 
             annotation_id = json['resources'][0]['@id'].rsplit('/', 1)[-1]
-            rv = self.app.get(url_for(
-                'api.iiif_annotation',
-                annotation_id=annotation_id.replace('.json', '')))
+            rv = self.app.get(
+                url_for(
+                    'api.iiif_annotation',
+                    annotation_id=annotation_id.replace('.json', '')))
             assert bool(annotation_id in rv.get_json()['@id'])
 
             with app.test_request_context():
@@ -289,10 +288,11 @@ class FileTest(TestBaseCase):
                 app.preprocess_request()
                 iiif_file.delete_links(['P67'])
 
-            rv = self.app.get(url_for(
-                'admin_annotation_remove_entity',
-                annotation_id=1,
-                entity_id=place.id),
+            rv = self.app.get(
+                url_for(
+                    'admin_annotation_remove_entity',
+                    annotation_id=1,
+                    entity_id=place.id),
                 follow_redirects=True)
             assert b'Entity removed from annotation' in rv.data
 
