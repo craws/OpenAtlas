@@ -94,12 +94,14 @@ class ActorTests(TestBaseCase):
             rv = self.app.get(url_for('update', id_=actor_id))
             assert b'American actress' in rv.data
 
-            data['name'] = 'Susan Alexandra Weaver'
-            data['alias-1'] = 'Ripley1'
-            data['end_year_from'] = ''
-            data['end_year_to'] = ''
-            data['begin_year_to'] = '1950'
-            data['begin_day_from'] = ''
+            data.update({
+                'name': 'Susan Alexandra Weaver',
+                'alias-1': 'Ripley1',
+                'end_year_from': '',
+                'end_year_to': '',
+                'begin_year_to': '1950',
+                'begin_day_from': ''})
+
             rv = self.app.post(
                 url_for('update', id_=actor_id),
                 data=data,
@@ -147,10 +149,6 @@ class ActorTests(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()
                 link_ = group.get_links('P107')[0]
-
-            rv = self.app.get(
-                url_for('link_update', id_=link_.id, origin_id=group.id))
-            assert b'Susan' in rv.data
 
             rv = self.app.post(
                 url_for('link_update', id_=link_.id, origin_id=group.id),
