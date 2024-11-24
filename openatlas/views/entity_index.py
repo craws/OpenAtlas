@@ -28,17 +28,20 @@ def index(view: str) -> str | Response:
     crumbs = [_(view).replace('_', ' ')]
     if view == 'file':
         crumbs = [[_('file'), url_for('file_index')], _('files')]
+    table, file_info = get_table(view)
     return render_template(
         'entity/index.html',
         class_=view,
-        table=get_table(view),
+        table=table,
+        file_info=file_info,
         buttons=buttons,
         gis_data=Gis.get_all() if view == 'place' else None,
         title=_(view.replace('_', ' ')),
         crumbs=crumbs)
 
 
-def get_table(view: str) -> Table:
+def get_table(view: str) -> tuple[Table, str]:
+    file_info = ''
     table = Table(g.table_headers[view])
     if view == 'file':
         stats = {'public': 0, 'without_license': 0, 'without_creator': 0}
@@ -66,7 +69,7 @@ def get_table(view: str) -> Table:
             if show_table_icons():
                 data.insert(1, file_preview(entity.id))
             table.rows.append(data)
-        table.additional_information = (
+        file_info = (
             uc_first(_('files')) + ': ' +
             f"{format_number(stats['public'])} " + _('public') +
             f", {format_number(stats['without_license'])} " +
@@ -89,7 +92,7 @@ def get_table(view: str) -> Table:
         classes = 'place' if view == 'place' else g.view_class_mapping[view]
         entities = Entity.get_by_class(classes, types=True, aliases=True)
         table.rows = [get_base_table_data(entity) for entity in entities]
-    return table
+    return table, file_info
 
 
 def file_preview(entity_id: int) -> str:
