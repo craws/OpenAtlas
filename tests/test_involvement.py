@@ -7,12 +7,13 @@ from tests.base import TestBaseCase, insert
 class InvolvementTests(TestBaseCase):
 
     def test_involvement(self) -> None:
+        c = self.client
         with app.test_request_context():
             app.preprocess_request()
             actor = insert('person', 'Captain Miller')
             event = insert('acquisition', 'Event Horizon')
 
-        rv = self.app.post(
+        rv = c.post(
             url_for('update', id_=event.id),
             data={
                  'name': 'Event Horizon',
@@ -23,7 +24,7 @@ class InvolvementTests(TestBaseCase):
             follow_redirects=True)
         assert b'Event Horizon' in rv.data
 
-        rv = self.app.post(
+        rv = c.post(
             url_for(
                 'insert_relation',
                 type_='involvement',
@@ -36,7 +37,7 @@ class InvolvementTests(TestBaseCase):
             follow_redirects=True)
         assert b'Event Horizon' in rv.data
 
-        rv = self.app.post(
+        rv = c.post(
             url_for(
                 'insert_relation',
                 type_='involvement',
@@ -48,14 +49,14 @@ class InvolvementTests(TestBaseCase):
             follow_redirects=True)
         assert b'Event Horizon' in rv.data
 
-        rv = self.app.get(url_for('view', id_=event.id))
+        rv = c.get(url_for('view', id_=event.id))
         assert b'Event Horizon' in rv.data
 
         with app.test_request_context():
             app.preprocess_request()
             link_ = event.get_links('P22')[0]
 
-        rv = self.app.post(
+        rv = c.post(
             url_for('link_update', id_=link_.id, origin_id=actor.id),
             data={
                 'description': 'Infinite Space - Infinite Terror',
