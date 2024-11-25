@@ -269,10 +269,11 @@ class FileTest(TestBaseCase):
         rv = c.get(url_for('orphans'))
         assert b'File keeper' in rv.data
 
-        rv = c.get(url_for(
-            'admin_annotation_relink',
-            image_id=iiif_id,
-            entity_id=place.id),
+        rv = c.get(
+            url_for(
+                'admin_annotation_relink',
+                image_id=iiif_id,
+                entity_id=place.id),
             follow_redirects=True)
         assert b'Entities relinked' in rv.data
 
