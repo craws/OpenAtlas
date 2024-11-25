@@ -488,13 +488,11 @@ def link(
         html = link(
             object_.code,
             url_for('cidoc_class_view', code=object_.code),
-            uc_first_=False,
             external=external)
     elif isinstance(object_, CidocProperty):
         html = link(
             object_.code,
             url_for('property_view', code=object_.code),
-            uc_first_=False,
             external=external)
     elif isinstance(object_, Project):
         html = link(
