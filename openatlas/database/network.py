@@ -16,7 +16,7 @@ def get_ego_network(ids: set[int]) -> list[dict[str, Any]]:
 
 def get_edges(
         classes: list[str],
-        properties: list[str]) -> list[dict[str, int]]:
+        properties: list[str]) -> list[dict[Any, int]]:
     g.cursor.execute(
         """
         SELECT l.id, l.domain_id, l.range_id
