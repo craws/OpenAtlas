@@ -18,7 +18,7 @@
         <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Journey" href="journey.html" />
+    <link rel="next" title="Adding actors" href="journey.html" />
     <link rel="prev" title="Types" href="types.html" /> 
 </head>
 
@@ -100,94 +100,163 @@
 <h1>Archaeological data<a class="headerlink" href="#archaeological-data" title="Permalink to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>The steps mentioned below describe how to enter archaeological data into OpenAtlas.
-The following elements are involved in the procedure:</p>
+<p>The following steps describe how to enter archaeological data into OpenAtlas.
+These elements are involved in the procedure:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a>: the archaeological site itself (Level 1)</p></li>
-<li><p><a class="reference internal" href="../entity/feature.html"><span class="doc">Feature</span></a>: a subunit of the place, e.g. graves, buildings, and pits. A place can consist of multiple subunits (Level 2)</p></li>
-<li><p><a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>: a subunit of the feature, e.g. burial. A feature can consist of multiple subunits (Level 3)</p></li>
-<li><p><a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a>: an archaeological artifact, e.g. coin or knife (Level 4)</p></li>
-<li><p><a class="reference internal" href="../entity/human_remains.html"><span class="doc">Human remains</span></a>: subunits of a burial, e.g. bones and teeth that carry anthropological information (Level 4)</p></li>
-<li><p><a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a>: used for classification, can be extended by users</p></li>
-<li><p><a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a>: citation, e.g. book or article written a bout the site or any of the subunits</p></li>
-<li><p><a class="reference internal" href="../entity/file.html"><span class="doc">File</span></a>: an image or other file concerning the site or any of its subunits</p></li>
+<li><p><a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a>: The archaeological site itself (Level 1)</p></li>
+<li><p><a class="reference internal" href="../entity/feature.html"><span class="doc">Feature</span></a>: A subunit of the place, e.g. one or more graves,
+buildings, or pits. Each place can consist of multiple subunits (Level 2)</p></li>
+<li><p><a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>: A subunit of a feature such as a burial
+or the backfilling of a grave. A feature can consist of multiple subunits
+(Level 3)</p></li>
+<li><p><a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a>: An archaeological artifact, e.g. a coin or knife
+(Level 4)</p></li>
+<li><p><a class="reference internal" href="../entity/human_remains.html"><span class="doc">Human remains</span></a>: Bones and teeth that carry anthropological
+information (Level 4)</p></li>
+<li><p><a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a>: Used for classification, can be extended by most
+users (depending on status)</p></li>
+<li><p><a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a>: Citation the information is coming from, such as
+books, articles or online sources concerning the site or any of its subunits</p></li>
+<li><p><a class="reference internal" href="../entity/file.html"><span class="doc">File</span></a>: One or more images or other file concerning the site or
+any of its subunits</p></li>
 </ul>
 <img alt="../_images/sub_unit.jpg" src="../_images/sub_unit.jpg" />
 <section id="adding-a-new-place">
 <h2>Adding a new place<a class="headerlink" href="#adding-a-new-place" title="Permalink to this heading"></a></h2>
-<p>In order to store new archaeological information in the database, the first necessary step is to create a new
-<a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a>. In the OpenAtlas database a place is a physical thing that has a certain position and or extend in
-space that can be connected to various other information (temporal, spatial, events, sources etc.).</p>
+<p>In order to store new archaeological information in the database, the first
+necessary step is to create a new <a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a>. A place is a
+physical thing with a certain position and/or extend in
+space that can be connected to various other information (temporal, spatial,
+events, sources etc.).
+To create a new place</p>
 <ul class="simple">
-<li><p>Click on <a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a> in the <a class="reference internal" href="../ui/menu.html"><span class="doc">Menu</span></a> and create a new entry by using the <strong>+ Place</strong> button</p></li>
+<li><p>Click on <a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a> in the <a class="reference internal" href="../ui/menu.html"><span class="doc">Menu</span></a> and create a new
+entry by using the <strong>+ Place</strong> button</p></li>
 <li><p>State the site’s name</p></li>
-<li><p>Select an appropriate <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> from the list, e.g. Burial Site or Settlement</p></li>
-<li><p>Use the magnifier button on the map to add the site to the map as well as a GeoNames reference if desired</p></li>
-<li><p>Add further information, e.g. evidence, an alias, a date or a description if available</p></li>
-<li><p>Press <strong>Insert</strong> to save the entry</p></li>
-<li><p>To add a citation click the <strong>Reference tab</strong></p></li>
-<li><p>If you want to add an image e.g. a plot or photo of the site use the <strong>File tab</strong></p></li>
+<li><p>Select an appropriate <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> from the list, e.g. burial site
+or settlement</p></li>
+<li><p>Use the magnifier button on the map to add the site to the map as well as
+a GeoNames reference if desired</p></li>
+<li><p>Add further information, e.g. evidence, an alias, a date or a description;
+keep in mind that some additional form fields might be required to save
+information</p></li>
+<li><p>Press <strong>Insert</strong> to save the entry. Press <strong>Insert and continue</strong> to save and
+add another place. A new place form will open. Press
+<strong>Insert and add feature</strong> to save and immediately add a feature to the
+place. A feature form will open</p></li>
+<li><p>To add a citation click the <strong>Reference tab</strong> after saving the entry</p></li>
+<li><p>If you want to add an image e.g. a plot or photo of the site use the
+<strong>File tab</strong> after saving the entry</p></li>
 </ul>
 </section>
 <section id="adding-a-feature-to-the-site">
 <h2>Adding a feature to the site<a class="headerlink" href="#adding-a-feature-to-the-site" title="Permalink to this heading"></a></h2>
-<p>Next, a <a class="reference internal" href="../entity/feature.html"><span class="doc">Feature</span></a> connected to the <a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a> will be created.
-This feature can be a grave of a graveyard, a building of a settlement, etc.</p>
+<p>In a next step you can add a <a class="reference internal" href="../entity/feature.html"><span class="doc">Feature</span></a> to the
+<a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a>. A feature can be a grave of a graveyard, a building
+of a settlement, etc. To add a feature to a place</p>
 <ul class="simple">
-<li><p>Click on the <strong>Feature Tab</strong> and create a new entry by using the <strong>+ Feature</strong> button</p></li>
+<li><p>Click on the <strong>Feature Tab</strong> and create a new entry by using the
+<strong>+ Feature</strong> button or click <strong>Insert and add feature</strong> when saving a
+place’s information</p></li>
 <li><p>Choose a descriptive name</p></li>
 <li><p>Select an appropriate <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> from the list</p></li>
-<li><p>Add further information, e.g. dimensions or a description</p></li>
-<li><p>Press <strong>Insert and add stratigraphic unit</strong> to save the entry and go on with the workflow</p></li>
+<li><p>Add further information, e.g. dimensions or a description; keep in mind
+that some additional form fields might be required to save information</p></li>
+<li><p>Press <strong>Insert</strong> to save the entry. Press <strong>Insert and continue</strong> to save and
+add another feature to the same place. A new feature form will open. Press
+<strong>Insert and add stratigraphic unit</strong> to save and immediately add a
+stratigraphic unit to the feature. A stratigraphic unit form will open</p></li>
 </ul>
-<p>If you want to link the created feature to a different citation or add an image you can use <strong>Insert</strong> and add those
-information or go back later and do it then. In this case you would have to click the <strong>Stratigraphic unit Tab</strong> and the
-<strong>+ Stratigraphic unit</strong> button to go on with the workflow.</p>
+<p>After saving the information on the feature a different citation, an image,
+etc. can be added in the same way as for place. Keep in mind, you can also
+always come back to an entry later to add or change information.</p>
 </section>
 <section id="adding-a-stratigraphic-unit-to-the-feature">
 <h2>Adding a stratigraphic unit to the feature<a class="headerlink" href="#adding-a-stratigraphic-unit-to-the-feature" title="Permalink to this heading"></a></h2>
-<p>Every <a class="reference internal" href="../entity/feature.html"><span class="doc">Feature</span></a> can consist of one or more <a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>.
-For a grave this would be the burial or a burial and the backfilling.</p>
+<p>Every <a class="reference internal" href="../entity/feature.html"><span class="doc">Feature</span></a> can consist of one or more
+<a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>.
+For a grave this would be one or more burials and/or the backfilling.</p>
 <ul class="simple">
-<li><p>By clicking Insert and add stratigraphic unit in the before mentioned step, you can directly enter a stratigraphic unit connected to the created feature</p></li>
+<li><p>Click on the <strong>Stratigraphic unit Tab</strong> and create a new entry by using the
+<strong>+ Stratigraphic unit</strong> button or click
+<strong>Insert and add stratigraphic unit</strong> when saving information on a feature
+to open the stratigraphic unit form</p></li>
 <li><p>Choose a descriptive name</p></li>
-<li><p>Select an appropriate <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> from the list, e.g. burial or interface</p></li>
-<li><p>Add additional information on the stratigraphic unit if available</p></li>
-<li><p>Press <strong>Insert and add artifact</strong> or <strong>Insert an add human remains</strong> to go on with the workflow</p></li>
+<li><p>Select an appropriate <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> from the list, e.g. burial or
+interface</p></li>
+<li><p>Add additional information on the stratigraphic unit; keep in mind that
+some additional form fields might be required to save information</p></li>
+<li><p>Press <strong>Insert</strong> to save the entry. Press <strong>Insert and continue</strong> to save and
+add another stratigraphic unit to the same feature. A new feature form
+will open. Press <strong>Insert and add artifact</strong> to save and
+immediately add an artifact to the stratigraphic unit. An artifact
+form will open. Click <strong>Insert an add human remains</strong> to save and
+immediately add anthropological information on bones to the stratigraphic
+unit. A human remains form will open</p></li>
 </ul>
+<p>After saving the information on the stratigraphic unit a different citation,
+an image, etc. can be added in the same way as for place. Keep in mind, you
+can also always come back to an entry later to add or change information.</p>
 </section>
 <section id="adding-an-artifact-to-the-stratigraphic-unit">
 <h2>Adding an artifact to the stratigraphic unit<a class="headerlink" href="#adding-an-artifact-to-the-stratigraphic-unit" title="Permalink to this heading"></a></h2>
-<p>The following steps add a <a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a> to the before created <a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>. You can now add grave goods to a burial or
-artifacts to a certain layer of the feature.</p>
+<p>The following steps add an <a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a> to a
+<a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>.</p>
 <ul class="simple">
-<li><p>By clicking Insert and add artifact in the before mentioned step, you can directly connect an artifact to the newly created stratigraphic unit</p></li>
+<li><p>Add an artifact to a stratigraphic unit by clicking the <strong>Artifact tab</strong>
+and create a new entry by using the <strong>+ Artifact</strong> button or click
+<strong>Insert and add artifact</strong> when saving information on a stratigraphic unit
+to open the artifact unit form</p></li>
 <li><p>Choose a descriptive name</p></li>
-<li><p>Select an appropriate <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> from the list, e.g. pottery or a finger ring</p></li>
-<li><p>Add additional information if available</p></li>
-<li><p>Press <strong>Insert</strong> to save the entry</p></li>
-<li><p>Add a file if desired by using the <strong>File</strong> tab</p></li>
+<li><p>Select an appropriate <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> from the list such as pottery or
+finger ring</p></li>
+<li><p>Add additional information; keep in mind that some additional form fields
+might be required to save information</p></li>
+<li><p>Press <strong>Insert</strong> to save the entry or <strong>Insert and continue</strong> to add
+another artifact to the same super immediately</p></li>
+<li><p>Add a file or citation if desired by using the <strong>File</strong> tab</p></li>
 </ul>
-<p>You can also enter an artifact by going to the stratigraphic unit you want to link the artifact to. Click the <strong>Artifact tab</strong> and
-<strong>+ Artifact</strong> afterwards.</p>
+<p>Artifacts can also be added directly to a place or feature, e.g. to add
+stray finds to a place. To do so, go to the place or feature you want to add
+an artifact to. Click the <strong>Artifact tab</strong> and then the <strong>+ Artifact</strong> button.
+The “super” of an artifact (a place, feature, or stratigraphic unit) can be
+changed in the artifact’s form after pressing the <strong>Edit</strong> button.
+You can also create an artifact by clicking the artifact tab in the menu and
+the <strong>+ Artifact</strong> button afterwards. The artifact can then be linked to an
+existing super in the form.</p>
 </section>
 <section id="adding-human-remains-to-the-stratigraphic-unit">
 <h2>Adding human remains to the stratigraphic unit<a class="headerlink" href="#adding-human-remains-to-the-stratigraphic-unit" title="Permalink to this heading"></a></h2>
-<p>Anthropological data can be entered into OpenAtlas by adding <a class="reference internal" href="../entity/human_remains.html"><span class="doc">Human remains</span></a>. You can do so by connecting a
-certain bone to a <a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a> and add all the relevant information, e.g. pathological changes,
-measurements, discoloration, or additional information. Please note that additional information can
-be entered via custom types in the stratigraphic unit entry mask, e.g. biological sex, gender,
+<p>Anthropological data can be entered by adding <a class="reference internal" href="../entity/human_remains.html"><span class="doc">Human remains</span></a>.
+You can do so by connecting a certain bone to a
+<a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a> and add all the relevant information, e.g.
+pathological changes, measurements, discoloration, or additional information.
+Please note that additional information can be entered via custom types in
+the stratigraphic unit entry mask, e.g. biological sex, gender,
 and age of an individual.</p>
 <ul class="simple">
-<li><p>By clicking Insert and add human remains in the before mentioned creation of a stratigraphic unit, you can directly connect human remains to it</p></li>
+<li><p>Add human remains to a stratigraphic unit by clicking the
+<strong>Human remains tab</strong> and create a new entry by using the
+<strong>+ Human remains</strong> button or click <strong>Insert and add human remains</strong> when
+saving information on a stratigraphic unit to open the human remains form</p></li>
 <li><p>Choose a descriptive name</p></li>
-<li><p>Select an appropriate <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> from the list, e.g. femur or canine</p></li>
-<li><p>Add additional information if available</p></li>
-<li><p>Press <strong>Insert</strong> to save the entry</p></li>
-<li><p>Add a file if desired by using the <strong>File</strong> tab</p></li>
+<li><p>Select an appropriate <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> from the list such as humerus or
+skull</p></li>
+<li><p>Add additional information; keep in mind that some additional form fields
+might be required to save information</p></li>
+<li><p>Press <strong>Insert</strong> to save the entry or <strong>Insert and continue</strong> to add
+another bone or tooth to the same super immediately</p></li>
+<li><p>Add a file or citation if desired by using the <strong>File</strong> tab</p></li>
 </ul>
-<p>You can also enter <a class="reference internal" href="../entity/human_remains.html"><span class="doc">Human remains</span></a> by going to the stratigraphic unit you want to link the information to. Click the
-<strong>Human remains tab</strong> and <strong>+ Human remains button</strong> afterwards.</p>
+<p>Human remains can also be added directly to a place or feature, e.g. to add
+stray finds to a place. To do so, go to the place or feature you want to add
+the remains to. Click the <strong>Artifact tab</strong> and then the <strong>+ Human remains</strong>
+button.
+The “super” of a human remains entry (a place, feature, or stratigraphic unit)
+can be changed in the form after pressing the <strong>Edit</strong> button.
+You can also create human remain entries by clicking the artifact tab in the
+menu and the <strong>+ Human remains</strong> button afterwards. The remains can then be
+linked to an existing super in the form.</p>
 </section>
 </section>
 
@@ -196,7 +265,7 @@ and age of an individual.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="types.html" class="btn btn-neutral float-left" title="Types" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="journey.html" class="btn btn-neutral float-right" title="Journey" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="journey.html" class="btn btn-neutral float-right" title="Adding actors" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

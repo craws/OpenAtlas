@@ -1,4 +1,4 @@
- Journey
+Journey
 =======
 
 .. toctree::

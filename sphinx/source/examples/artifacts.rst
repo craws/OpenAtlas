@@ -109,7 +109,7 @@ First of all, adding an artifact to more than one :doc:`/entity/place` or
 locations, it is possible to keep track of that in the following way:
 
 * Choose the :doc:`/entity/place` the artifact has it's first occurrence at,
-for example its production site or a place an artifact was found at during
+  for example its production site or a place an artifact was found at during
   archaeological excavation.
 * link any other place by adding a move event - for example when an artifact
   is moved from an excavation site to a museum or from a production site to
