@@ -131,7 +131,7 @@ class Parser:
         return found
 
     def get_properties_for_links(self) -> list[str]:
-        codes = []
+        codes: list[str] = []
         if self.relation_type:
             codes = self.relation_type
             if 'geometry' in self.show:
