@@ -93,8 +93,11 @@ class ActivityForm(FlaskForm):
 
 @app.route('/user/activity', methods=['GET', 'POST'])
 @app.route('/user/activity/<int:user_id>', methods=['GET', 'POST'])
+@app.route(
+    '/user/activity/<int:user_id>/<int:entity_id>',
+    methods=['GET', 'POST'])
 @required_group('readonly')
-def user_activity(user_id: int = 0) -> str:
+def user_activity(user_id: int = 0, entity_id: Optional[int] = None) -> str:
     form = ActivityForm()
     form.user.choices = [(0, _('all'))] + User.get_users_for_form()
     limit = 100
@@ -103,11 +106,12 @@ def user_activity(user_id: int = 0) -> str:
     if form.validate_on_submit():
         limit = int(form.limit.data)
         user_id = int(form.user.data)
+        action = form.action.data
     form.user.data = user_id
     table = Table(
         ['date', 'user', 'action', 'class', 'entity'],
         order=[[0, 'desc']])
-    for row in User.get_activities(limit, user_id, action):
+    for row in User.get_activities(limit, user_id, action, entity_id):
         try:
             entity = Entity.get_by_id(row['entity_id'])
             entity_name = link(entity)
@@ -125,7 +129,7 @@ def user_activity(user_id: int = 0) -> str:
         'content.html',
         content=display_form(form) + table.display(),
         title=_('user'),
-        crumbs=[[_('admin'), url_for('admin_index')], _('activity')])
+        crumbs=[[_('user'), url_for('admin_index')], _('activity')])
 
 
 @app.route('/user/view/<int:id_>')
@@ -134,12 +138,9 @@ def user_view(id_: int) -> str:
     user = User.get_by_id(id_)
     if not user:
         abort(404)
-    created_count = ''
-    if count := User.get_created_entities_count(user.id):
-        created_count = link(
-            format_number(count),
-            url_for("user_entities", id_=user.id),
-            uc_first_=False)
+    count = ''
+    if x := User.get_created_entities_count(user.id):
+        count = link(format_number(x), url_for("user_entities", id_=user.id))
     info = {
         _('username'): user.username,
         _('group'): user.group,
@@ -147,7 +148,9 @@ def user_view(id_: int) -> str:
         _('email'):
             user.email
             if is_authorized('manager') or user.settings['show_email'] else '',
-        _('created entities'): created_count,
+        _('created entities'): count,
+        _('activity'):
+            link(_('log'),  url_for('user_activity', user_id=user.id)),
         _('language'): user.settings['language'],
         _('last login'): format_date(user.login_last_success),
         _('failed logins'):
@@ -166,8 +169,6 @@ def user_view(id_: int) -> str:
                     f"{url_for('user_delete', id_=user.id)}#tab-user",
                     onclick=""
                     f"return confirm('{_('Delete %(name)s?', name=name)}')"))
-        buttons.append(
-            button(_('activity'), url_for('user_activity', user_id=user.id)))
     return render_template(
         'tabs.html',
         tabs={

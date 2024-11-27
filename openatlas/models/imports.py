@@ -100,9 +100,9 @@ def import_data_(project: Project, class_: str, data: list[Any]) -> None:
     entities: dict[str | int, dict[str, Any]] = {}
     for row in data:
         if value := row.get('openatlas_class'):
-            if (value.lower().replace(' ', '_') in (
+            if value.lower().replace(' ', '_') in (
                     g.view_class_mapping['place'] +
-                    g.view_class_mapping['artifact'])):
+                    g.view_class_mapping['artifact']):
                 class_ = value.lower().replace(' ', '_')
         entity = Entity.insert(class_, row['name'], row.get('description'))
         db.import_data(

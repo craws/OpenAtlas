@@ -12,46 +12,48 @@ Model
 
 **Data Model**
 
-While the model uses `CIDOC CRM <https://www.cidoc-crm.org/>`_ as
-ontology, it can be used without prior knowledge of data models, ontologies,
-etc. The software automatically maps information to the model. As the
-definitions of the CIDOC Conceptual Reference Model was imported into the
-system, its
+OpenAtlas automatically maps information to
+`CIDOC CRM <https://www.cidoc-crm.org/>`_ which is used to build the model
+of the database. This happens in the background of the application without
+the user noticing. Therefore, the database can be used by anyone without
+prior knowledge of data modeling, ontologies, CIDOC CRM
+and the alike.
+As the definitions of the CIDOC Conceptual Reference Model are imported into
+the system, its
 `classes <https://demo.openatlas.eu/overview/model/cidoc_class_index>`_
 and `properties <https://demo.openatlas.eu/overview/model/property>`_ can be
-browsed directly in OpenAtlas (see also :doc:`here<cidoc_crm>`).
+browsed directly in OpenAtlas (for more information see
+:doc:`here<cidoc_crm>`).
 Furthermore, it is possible to verify link-conformity between entities via the
-`link-checker <https://demo.openatlas.eu/overview/model>`_ (for more
-information click here :doc:`here<link_checker>`).
+`link-checker <https://demo.openatlas.eu/overview/model>`_ (more
+information is available :doc:`here<link_checker>`).
 
-During the development much emphasis was put on the fact that users do not have
-to concern themselves with the model or its ontology. Nevertheless, it is
-possible to display the CIDOC classes used in the user interface and thus gain
-insight into how the data is mapped.
+During the development of the database emphasis is put on easy usage without
+prior knowledge on data models or it ontologies.
 
-Pressing the **Model** button on the start page leads to a
-graphical presentation of the model (see below), a
-:doc:`link checking tool<link_checker>` and links to the classes and
-properties.
+For everyone interested, a graphical representation of the current data model
+can be found by clicking the **Model** button on the start page. Furthermore, a
+link checker that helps you find valid CIDOC CRM links as well as links to
+all classes and properties is provided :doc:`here<link_checker>`.
 
 .. image:: openatlas_schema.png
 .. image:: openatlas_schema2.png
 
-Furthermore, it is possible to active **Show CIDOC classes** in the user
-interface. This will displays the CIDOC class of an entity in the detail view
-of a data base entry.
-To do so click the gear symbol and choose :doc:`profile</tools/profile>`. Go
-to **Display**, press the **Edit** button and choose **Show CIDOC classes**.
+It is possible to show the CIDOC class of each entity in the detail view
+of the user interface. To enable this, click the gear symbol and choose
+:doc:`profile</tools/profile>`. Go to **Display**, press the **Edit** button
+and choose **Show CIDOC classes**.
 
-While we try to only use CIDOC CRM classes and properties where possible
-(instead of introducing own classes or using extensions), some shortcuts are
-used to increase performance and to keep the code base maintainable.
-For more information, see :doc:`OpenAtlas shortcuts<openatlas_shortcuts>`.
+Instead of introducing own classes or using extensions, OpenAtlas uses only
+basic CIDOC CRM classes and properties wherever possible. In addition, some
+shortcuts are used to increase performance and to keep the code base
+maintainable. For more information, see
+:doc:`OpenAtlas shortcuts<openatlas_shortcuts>`.
 
 While OpenAtlas uses the CIDOC CRM within the application, a finer grained
-model is needed to deal with any contextual differences needed for the user
-interface. Therefore, e.g.
-:cidoc_entity:`E33 - Lingustic Object<e33-linguistic-object>` can be a source
-or a source translation with different forms in different context.
-An overview of internal mapping and CIDOC CRM classes can be found here
-`here <https://github.com/craws/OpenAtlas/tree/main/install/crm>`_
+model is needed to deal with contextual differences in the user interface.
+Therefore, :cidoc_entity:`E33 - Lingustic Object<e33-linguistic-object>` is
+used as class for sources as well as source translations with different user
+interface forms.
+An overview of the internal mapping and CIDOC CRM classes can be found
+`here <https://github.com/craws/OpenAtlas/tree/main/install/crm>`_.

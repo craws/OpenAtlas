@@ -7,6 +7,7 @@ from tests.base import TestBaseCase
 class DateTest(TestBaseCase):
 
     def test_date(self) -> None:
+        c = self.client
         with app.app_context():
             data = {  # Don't change year values, needed for leap years
                 'name': 'Date place',
@@ -17,14 +18,14 @@ class DateTest(TestBaseCase):
                 'end_year_from': 1996,
                 'end_year_to': 1996}
 
-            rv = self.app.post(
+            rv = c.post(
                 url_for('insert', class_='place'),
                 data=data,
                 follow_redirects=True)
             assert b'Date place' in rv.data
 
             data['begin_day_from'] = 31
-            rv = self.app.post(
+            rv = c.post(
                 url_for('insert', class_='place'),
                 data=data,
                 follow_redirects=True)
@@ -32,7 +33,7 @@ class DateTest(TestBaseCase):
 
             data['begin_day_from'] = 5
             data['begin_year_from'] = 20
-            rv = self.app.post(
+            rv = c.post(
                 url_for('insert', class_='place'),
                 data=data,
                 follow_redirects=True)
@@ -40,21 +41,21 @@ class DateTest(TestBaseCase):
 
             data['begin_year_from'] = -1949
             data['end_year_from'] = -2000
-            rv = self.app.post(
+            rv = c.post(
                 url_for('insert', class_='place'),
                 data=data,
                 follow_redirects=True)
             assert b'Begin dates cannot start after end dates' in rv.data
 
             data['end_year_to'] = ''
-            rv = self.app.post(
+            rv = c.post(
                 url_for('insert', class_='place'),
                 data=data,
                 follow_redirects=True)
             assert b'Begin dates cannot start after end dates' in rv.data
 
             data['begin_year_from'] = ''
-            rv = self.app.post(
+            rv = c.post(
                 url_for('insert', class_='place'),
                 data=data,
                 follow_redirects=True)

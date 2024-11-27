@@ -5,7 +5,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Application Structure &mdash; OpenAtlas 8.8.0 documentation</title>
+  <title>Application Structure &mdash; OpenAtlas 8.9.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
@@ -35,7 +35,7 @@
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                8.8.0
+                8.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -98,7 +98,7 @@
 </div>
 <p>The website’s software is written in <a class="reference external" href="https://www.python.org/">Python</a> and
 uses the <a class="reference external" href="https://palletsprojects.com/p/flask/">Flask</a> framework.
-Below you find an overview of the file structure:</p>
+Below you can find an overview of the file structure:</p>
 <ul>
 <li><p><strong>config</strong> - default configuration</p></li>
 <li><p><strong>files</strong>:</p>
@@ -124,9 +124,9 @@ for web browsers</p></li>
 <blockquote>
 <div><ul class="simple">
 <li><p><strong>api</strong></p></li>
-<li><p><strong>database</strong> - the SQL code lives here</p></li>
+<li><p><strong>database</strong> - SQL code lives here</p></li>
 <li><p><strong>display</strong> - display manager and utility functions</p></li>
-<li><p><strong>forms</strong> - form manager and other forms related files</p></li>
+<li><p><strong>forms</strong> - form manager and other form related files</p></li>
 <li><p><strong>models</strong> - classes used in the application</p></li>
 <li><p><strong>static</strong> - the web root containing CSS, JavaScript, layout images,
 etc.</p></li>
@@ -136,12 +136,12 @@ etc.</p></li>
 </ul>
 </div></blockquote>
 </li>
-<li><p><strong>sphinx</strong> - source files for the user manual, used with
+<li><p><strong>sphinx</strong> - source files of the user manual, for more details see
 <a class="reference external" href="https://www.sphinx-doc.org/en/master/">Sphinx</a></p></li>
 <li><p><strong>test</strong></p></li>
 </ul>
-<p>To retrace for example a call that was made from a web browser such as
-/entity/15883</p>
+<p>To retrace a call that was made from a web browser (for example
+/entity/15883) the following steps will be executed:</p>
 <ul class="simple">
 <li><p><strong>openatlas/init.py</strong> is processed and <strong>before_request()</strong> is executed</p></li>
 <li><p>The URL is resolved and a function in <strong>views</strong> is called, in this case
@@ -153,7 +153,7 @@ in <strong>openatlas/models/entity.py</strong></p></li>
 <li><p>A template is called from the view, in this case
 <strong>openatlas/templates/entity/view.html</strong></p></li>
 <li><p>The template may use filters defined in <strong>openatlas/display/util.py</strong>
-like: some_data|some_filter</p></li>
+such as: some_data|some_filter</p></li>
 </ul>
 </section>
 

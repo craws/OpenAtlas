@@ -28,7 +28,6 @@ class Table:
         self.paging = paging
         self.order = order or ''
         self.defs = defs or []
-        self.additional_information = None
 
     def display(self, name: str = 'default') -> str:
         if not self.rows:

@@ -5,7 +5,7 @@ Application Structure
 
 The website's software is written in `Python <https://www.python.org/>`_ and
 uses the `Flask <https://palletsprojects.com/p/flask/>`_ framework.
-Below you find an overview of the file structure:
+Below you can find an overview of the file structure:
 
 * **config** - default configuration
 * **files**:
@@ -24,9 +24,9 @@ Below you find an overview of the file structure:
 * **openatlas**:
 
     * **api**
-    * **database** - the SQL code lives here
+    * **database** - SQL code lives here
     * **display** - display manager and utility functions
-    * **forms** - form manager and other forms related files
+    * **forms** - form manager and other form related files
     * **models** - classes used in the application
     * **static** - the web root containing CSS, JavaScript, layout images,
       etc.
@@ -34,12 +34,12 @@ Below you find an overview of the file structure:
     * **translations** - source and compiled files for translations
     * **views** - files concerning routing, redirects, etc.
 
-* **sphinx** - source files for the user manual, used with
+* **sphinx** - source files of the user manual, for more details see
   `Sphinx <https://www.sphinx-doc.org/en/master/>`_
 * **test**
 
-To retrace for example a call that was made from a web browser such as
-/entity/15883
+To retrace a call that was made from a web browser (for example
+/entity/15883) the following steps will be executed:
 
 * **openatlas/init.py** is processed and **before_request()** is executed
 * The URL is resolved and a function in **views** is called, in this case
@@ -51,6 +51,6 @@ To retrace for example a call that was made from a web browser such as
 * A template is called from the view, in this case
   **openatlas/templates/entity/view.html**
 * The template may use filters defined in **openatlas/display/util.py**
-  like: some_data|some_filter
+  such as: some_data|some_filter
 
 

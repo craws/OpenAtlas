@@ -4,16 +4,15 @@ OpenAtlas shortcuts
 .. toctree::
 
 OpenAtlas uses several shortcuts in order to simplify connections between
-entities that are always used the same way. All shortcuts can be resolved
-according to :doc:`CIDOC CRM<cidoc_crm>` specifications and are valid
-links. These shortcuts are indicated by a preceding OA in combination with a
-number. Currently OpenAtlas uses 3 shortcuts:
+entities that are continuously used in the same way. All shortcuts can be
+resolved in accordance with  the:doc:`CIDOC CRM<cidoc_crm>` specifications and
+are valid links. These shortcuts are indicated by a preceding OA in
+combination with a number. Currently OpenAtlas uses 3 shortcuts:
 
 OA7 - has relationship to
 -------------------------
 
-OA7 is used to link two instances of :cidoc_entity:`E39 - Actor<e39-actor>` via
-a certain relationship; in that way an actor can be linked with an actor.
+OA7 is used to link two instances of :cidoc_entity:`E39 - Actor<e39-actor>`
 :cidoc_entity:`E39 - Actor<e39-actor>` linked with
 :cidoc_entity:`E39 - Actor<e39-actor>`
 
@@ -28,13 +27,13 @@ a certain relationship; in that way an actor can be linked with an actor.
 
 Example:
 [Stefan (:cidoc_entity:`E21<e21-person>`)] participated in
-(:cidoc_property:`P11i<p11-had-participant>`) [Relationship from Stefan to
+(:cidoc_property:`P11i<p11-had-participant>`) [Relationship between Stefan and
 Joachim (:cidoc_entity:`E5<e5-event>`)] had participant
 (:cidoc_property:`P11<p11-had-participant>` [Joachim
 (:cidoc_entity:`E21<e21-person>`)]
 
 The connecting event is defined by an entity of class
-:cidoc_entity:`E55<e55-type>`: [Relationship from Stefan to Joachim
+:cidoc_entity:`E55<e55-type>`: [Relationship between Stefan and Joachim
 (:cidoc_entity:`E5<e5-event>`)] has type
 (:cidoc_property:`P2<P2-has-type>`) [Son to Father
 (:cidoc_entity:`E55<e55-type>`)]
@@ -42,9 +41,9 @@ The connecting event is defined by an entity of class
 OA8 - appears for the first time in
 -----------------------------------
 
-OA8 is used to link the beginning of a Persistent Item's
+OA8 is used to link the beginning of a persistent item's
 (:cidoc_entity:`E77<e77-persistent-item>`) life
-span (or time of usage) with a certain place. E.g to document the birthplace of
+span (or time of usage) with a certain place, e.g to document a birthplace of
 a person.
 
 :cidoc_entity:`E77 - Persistent Item<e77-persistent-item>` linked with a
@@ -62,18 +61,17 @@ a person.
 
 Example:
 [Albert Einstein (:cidoc_entity:`E521<e21-person>` was brought into existence
-by
-(:cidoc_property:`P92<p92-brought-into-existence>`) [Birth of Albert Einstein
-(:cidoc_entity:`E567<e67-birth>`)] took place at
+by (:cidoc_property:`P92<p92-brought-into-existence>`) [Birth of Albert
+Einstein (:cidoc_entity:`E567<e67-birth>`)] took place at
 (:cidoc_property:`P7<p7-took-place-at>`) [Ulm (:cidoc_entity:`E53<e53-place>`)]
 
 OA9 - appears for the last time in
 ----------------------------------
 
-OA9 is used to link the end of a Persistent Item's
+OA9 is used to link the end of a persistent item's
 (:cidoc_entity:`E77<e77-persistent-item>`) life
-span (or time of usage) with a certain place (:cidoc_entity:`E53<e53-place>`).
-E.g to document a person's place of death.
+span (or time of usage) with a certain place
+(:cidoc_entity:`E53<e53-place>`), e.g to document a person's place of death.
 :cidoc_entity:`E77 - Persistent Item<e77-persistent-item>` linked with a
 :cidoc_entity:`E53 - Place<e53-place>`.
 
@@ -97,12 +95,12 @@ by (:cidoc_property:`P93i<P93-took-out-of-existence>`)
 Dates
 -----
 
-For dates, data is stored in the table model.entity respectively model.link in
+Dates are stored in the table model.entity/model.link in
 the fields begin_from, begin_to, begin_comment, end_from, end_to, end_comment
 as timestamps.
-Depending on class of the entity respectively the domain and range classes of
-the link, these dates can be mapped as CIDOC CRM
-:cidoc_entity:`E61 - Time Primitive<e61-time-primitive>` entities.
+Depending on the class of the entity as well as the domain and range of the
+link, these dates can be mapped as CIDOC CRM
+:cidoc_entity:`E61 - Time Primitive<e61-time-primitive>`.
 
 E77 - Persistent Item
 +++++++++++++++++++++

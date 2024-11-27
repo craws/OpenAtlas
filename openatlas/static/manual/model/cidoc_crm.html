@@ -5,7 +5,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CIDOC CRM &mdash; OpenAtlas 8.8.0 documentation</title>
+  <title>CIDOC CRM &mdash; OpenAtlas 8.9.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
@@ -35,7 +35,7 @@
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                8.8.0
+                8.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -108,57 +108,59 @@ widely used ontology in the digital humanities as well as an
 It is a formal ontology, developed by an developed by an interdisciplinary team
 in connection with the International Council of Museums
 (<a class="reference external" href="https://icom.museum/en/">ICOM</a>).</p>
-<p>It is used as basis for the underlying data model of OpenAtlas and the
-currently used version is
+<p>In OpenAtlas its current version,
 <a class="reference external" href="https://cidoc-crm.org/Version/version-7.1.2">CIDOC CRM v7.1.2</a> published in
-May 2021.
-A script is used to parse the specification and import it into a
+May 2021, is used as underlying data model of the database.</p>
+<p>A script is used to parse the specification and import it into a
 <a class="reference external" href="https://www.postgresql.org/">PostgreSQL</a> database (more information is
-available on <a class="reference external" href="https://github.com/craws/OpenAtlas/tree/main/install">GitHub</a>)</p>
+available on <a class="reference external" href="https://github.com/craws/OpenAtlas/tree/main/install">GitHub</a>).
+In this way all data is mapped to CIDOC CRM automatically without the
+users having to familiarise themselves with the ontology.</p>
 <p>The ontology consists of classes, linked together by properties.</p>
 <section id="cidoc-classes">
 <h2>CIDOC classes<a class="headerlink" href="#cidoc-classes" title="Permalink to this heading"></a></h2>
-<p>Classes are indicated by a preceding <strong>E</strong> followed by a numeric code-e.g.
+<p>Classes are indicated by a preceding <strong>E</strong> followed by a numeric code - e.g.
 “<a class="reference external" href="https://www.cidoc-crm.org/Entity/e39-actor/version-7.1">E39 - Actor</a>” or
 “<a class="reference external" href="https://www.cidoc-crm.org/Entity/e67-birth/version-7.1">E67 - Birth</a>”.
 All entities used within OpenAtlas can be characterised as CIDOC classes.
-An overview of all CIDOC CRM classes can be found on this
-<a class="reference external" href="https://demo.openatlas.eu/overview/model/cidoc_class_index">page</a>. The count
-indicates how many times each class has been used in this database instance.
-A click on the class name will get you to an overview of the class with
+An overview of all CIDOC CRM classes can be found
+<a class="reference external" href="https://demo.openatlas.eu/overview/model/cidoc_class_index">here</a>.
+The displayed count indicates how many times each class has been used in
+your OpenAtlas instance.
+A click on the class name will bring you to an overview of the class with
 detailed information, such as a short description, sub- and super classes as
 well as possible properties.</p>
 </section>
 <section id="cidoc-properties">
 <h2>CIDOC Properties<a class="headerlink" href="#cidoc-properties" title="Permalink to this heading"></a></h2>
-<p>CIDOC entities are indicated by a combination of “P” and a numerical sequence -
-think “<a class="reference external" href="https://www.cidoc-crm.org/Property/p11-had-participant/version-7.1">P11 - had participant</a>” or
-“<a class="reference external" href="https://www.cidoc-crm.org/Property/p2-has-type/version-7.1">P2 - has type</a>“. They are used to link classes
-to other classes. So when an activity to place at a certain location, this can
-be modelled in the following way</p>
+<p>CIDOC properties are indicated by a combination of the letter “P” and a
+numerical sequence - think
+“<a class="reference external" href="https://www.cidoc-crm.org/Property/p11-had-participant/version-7.1">P11 - had participant</a>” or
+“<a class="reference external" href="https://www.cidoc-crm.org/Property/p2-has-type/version-7.1">P2 - has type</a>“. They are used to link a
+class to another class. So an activity taking place at a certain location,
+can be modelled in the following way</p>
 <img alt="../_images/properties.png" src="../_images/properties.png" />
-<p>An overview of all CIDOC CRM properties can be found
-<a class="reference external" href="https://demo.openatlas.eu/overview/model/property">here</a>. The count
-indicates how many times each property has been used in this database instance.
-A click on the property name will get you to an overview of the property with
+<p>An overview of all CIDOC CRM properties can be at the
+<a class="reference external" href="https://demo.openatlas.eu/overview/model/property">demo</a>. The displayed
+count indicates how many times each property has been used in your OpenAtlas
+instance.
+A click on the property name will bring you to an overview of the property with
 detailed information, such as a short description.</p>
-<p>OpenAtlas does not import nor use inverse properties (ending with i) since our
-links are directed anyway. Nevertheless their labels are imported for more
-convenient browsing possibilities of relations.
-Properties with URLs as domain/range are ignored because the system used here
+<p>OpenAtlas does not import nor use inverse properties (properties ending with
+the letter i) since all used links are directed anyway. Nevertheless their
+labels are imported for more convenient browsing possibilities of relations.
+Properties with URLs as domain/range are ignored as the system used here
 has a foreign key on domain which must match an existing class.
-Also some properties are linked as sub_properties_of properties with the i
+Also some properties are linked as “sub_properties_of” properties with the i
 suffix. Since we don’t use inverse properties in the database
-(direction is determined through domain/range selection)they are linked to
+(direction is determined through domain/range selection) they are linked to
 their counterpart without i.</p>
-<p>There are some “special” properties we ignore, e.g.
-<a class="reference external" href="https://www.cidoc-crm.org/Property/P3-has-note/version-7.1">P3 - has note</a>, you can look them up in the
-OpenAtlas CIDOC parser script where they are defined at the top:
-<a class="reference external" href="https://github.com/craws/OpenAtlas/blob/main/install/crm/cidoc_rtfs_parser.py">https://github.com/craws/OpenAtlas/blob/main/install/crm/cidoc_rtfs_parser.py</a>
-We don’t import them because of technical reasons, e.g. they are missing some
-definitions that “normal” properties have and the import script would have
-troubles to deal with them. E.g. they have no defined range but this is a
-foreign key in our database that can’t be empty.</p>
+<p>There are some “special” properties that are not included in OpenAtlas, e.g.
+<a class="reference external" href="https://www.cidoc-crm.org/Property/P3-has-note/version-7.1">P3 - has note</a>. They can be found in the
+<a class="reference external" href="https://github.com/craws/OpenAtlas/blob/main/install/crm/cidoc_rtfs_parser.py">OpenAtlas CIDOC parser script</a>
+on GitHub, where they are defined on the top:
+These properties are not import due to technical reasons, e.g. missing
+definitions that “normal” properties have or no defined range.</p>
 </section>
 </section>
 

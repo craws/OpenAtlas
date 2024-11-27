@@ -11,7 +11,7 @@ Create a new move event - general instruction
 
 As move events are a subgroup of :doc:`events</entity/event>`, click
 **Event** in the menu to create a new entry. This will bring you to the
-event overview page where you can find the **+Move** button.
+event overview page where you can find the **+ Move** button.
 By clicking it a form will open in which you can add the following
 information:
 
@@ -25,18 +25,17 @@ information:
   cannot be added in a temporal order and are used to represent events that
   occur simultaneously. Examples are a music festival with parallel concerts
   or a war with overlapping battles at different locations. To represent a
-  temporal sequence, use **preceding event** (for a short
-  introduction see the :doc:`journey` tutorial). You can
-  select the event from a list of already entered events. If the event you are
-  looking for cannot be found in this list, please add it via **Event** in the
-  menu and then link it
+  temporal sequence, use **preceding event** (for a short introduction see
+  the :doc:`journey` tutorial). You can select the event from a list of
+  already entered events. If the event you are looking for cannot be found
+  in this list, please add it via **Event** in the menu and then link it
 * You can add a **preceding event**, for more information see
   above or the :doc:`journey` tutorial
 * Via **from** you can add a location from where the move event started,
   think of the starting point of a journey or the place a letter was sent from.
   You can choose a location from a list of already added locations. If the
   place you are looking for is not in this list yet, please add it via
-  **Place** menu and then link it
+  **Place** in the menu and then link it
 * Via **to**, you can add the end location of the move event. For more
   information check **from** (above in this tutorial)
 * If an **artifact** was moved by the event, e.g. a letter that was sent, you
@@ -50,12 +49,12 @@ information:
   :doc:`journey` tutorial.
 * It is possible to link the move event by using external references (find
   more information :doc:`here</entity/reference_system>`)
-* Enter a start and end **date** of the move event
+* Enter a start and end **date** of the move event if known
 * Additionally you can enter a **description** of the event as free text
 
 By clicking the **Insert** or **Insert and continue** button you can save
 the entered data. After saving the information, you can link sources, actors,
-references, files and notes via the respective buttons on the landing page of
+references, files, and notes via the respective buttons on the landing page of
 your new entry.
 
 For more information on move events including an artifact, please see the
