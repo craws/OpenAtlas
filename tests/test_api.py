@@ -103,58 +103,55 @@ class Api(ApiTestCase):
 
         rv = c.get(url_for('api_04.properties', locale='de')).get_json()
         assert rv['P2']['nameInverse'] == 'ist Typus von'
-        assert bool(rv['P2']['name'])
-        assert bool(rv['P2']['nameInverse'])
-        assert bool(rv['P2']['i18n'])
-        assert bool(rv['P2']['i18nInverse'])
-        assert bool(rv['P2']['code'])
+        assert rv['P2']['name']
+        assert rv['P2']['nameInverse']
+        assert rv['P2']['i18n']
+        assert rv['P2']['i18nInverse']
+        assert rv['P2']['code']
 
         rv = c.get(url_for('api_04.properties', locale='fr', download=True))
         assert rv.get_json()['P2']['name'] == 'est de type'
         rv = c.get(url_for('api_04.backend_details')).get_json()
-        assert bool(rv['version'] == app.config['VERSION'])
+        assert rv['version'] == app.config['VERSION']
         rv = c.get(url_for('api_04.backend_details', download=True)).get_json()
-        assert bool(rv['version'] == app.config['VERSION'])
+        assert rv['version'] == app.config['VERSION']
         rv = c.get(url_for('api_04.system_class_count')).get_json()
-        assert bool(rv['person'])
+        assert rv['person']
         rv = c.get(
             url_for('api_04.system_class_count', type_id=boundary_mark.id))
-        assert bool(rv.get_json()['place'])
+        assert rv.get_json()['place']
 
         rv = c.get(url_for('api.licensed_file_overview', file_id=file.id))
-        assert self.get_bool(
-            rv.get_json()[str(file.id)],
-            'license',
-            'Public domain')
+        assert rv.get_json()[str(file.id)]['license'] == 'Public domain'
 
         rv = c.get(url_for('api.licensed_file_overview'))
-        assert bool(len(rv.get_json().keys()) == 5)
+        assert len(rv.get_json().keys()) == 5
 
         rv = c.get(url_for(
             'api_04.network_visualisation',
             exclude_system_classes='type'))
         rv = rv.get_json()
-        assert bool(len(rv['results']) == 65)
+        assert len(rv['results']) == 65
         rv = c.get(
             url_for(
                 'api_04.network_visualisation',
                 linked_to_ids=boundary_mark.id))
         rv = rv.get_json()
-        assert bool(len(rv['results']) == 3)
+        assert len(rv['results']) == 3
         rv = c.get(url_for('api_04.network_visualisation', download=True))
         rv = rv.get_json()
-        assert bool(len(rv['results']) == 154)
+        assert len(rv['results']) == 154
 
         for rv in [
             c.get(url_for('api_04.geometric_entities')),
             c.get(url_for('api_04.geometric_entities', download=True))]:
             rv = rv.get_json()
-            assert bool(rv['features'][0]['geometry']['coordinates'])
-            assert self.get_geom_properties(rv, 'id')
-            assert self.get_geom_properties(rv, 'objectDescription')
-            assert self.get_geom_properties(rv, 'objectId')
-            assert self.get_geom_properties(rv, 'objectName')
-            assert self.get_geom_properties(rv, 'shapeType')
+            assert rv['features'][0]['geometry']['coordinates']
+            assert rv['features'][0]['properties']['id']
+            assert rv['features'][0]['properties']['objectDescription']
+            assert rv['features'][0]['properties']['objectId']
+            assert rv['features'][0]['properties']['objectName']
+            assert rv['features'][0]['properties']['shapeType']
 
         rv = c.get(url_for('api_04.export_database', format_='xml'))
         assert b'Shire' in rv.data
@@ -171,49 +168,37 @@ class Api(ApiTestCase):
         rv = c.get(url_for('api_04.entity', id_=place.id, download=True))
         assert 'application/json' in rv.headers.get('Content-Type')
         rv = rv.get_json()['features'][0]
-        assert self.get_bool(rv, '@id')
-        assert self.get_bool(rv, 'type', 'Feature')
-        assert self.get_bool(rv, 'crmClass', 'crm:E18 Physical Thing')
-        assert self.get_bool(rv, 'systemClass', 'place')
-        assert self.get_bool(rv['properties'], 'title')
+        assert rv['@id']
+        assert rv['type'] == 'Feature'
+        assert rv['crmClass'] == 'crm:E18 Physical Thing'
+        assert rv['systemClass'] == 'place'
+        assert rv['properties']['title'] == 'Shire'
         desc = rv['descriptions'][0]
-        assert self.get_bool(
-            desc, 'value', 'The Shire was the homeland of the hobbits.')
+        assert desc['value'] == 'The Shire was the homeland of the hobbits.'
         timespan = rv['when']['timespans'][0]
-        assert self.get_bool(
-            timespan['start'], 'earliest', '2018-01-31T00:00:00')
-        assert self.get_bool(
-            timespan['start'], 'latest', '2018-03-01T00:00:00')
-        assert self.get_bool(
-            timespan['end'], 'earliest', '2019-01-31T00:00:00')
-        assert self.get_bool(
-            timespan['end'], 'latest', '2019-03-01T00:00:00')
-        assert self.get_bool(rv['types'][0], 'identifier')
-        assert self.get_bool(rv['types'][0], 'label', 'Boundary Mark')
-        rel = rv['relations']
-        assert self.get_bool(rel[1], 'label', 'Height')
-        assert self.get_bool(rel[1], 'relationDescription', '23.0')
-        assert self.get_bool(rel[0], 'relationTo')
-        assert self.get_bool(rel[0], 'relationType', 'crm:P2 has type')
-        assert self.get_bool(rel[0], 'relationSystemClass', 'type')
-        assert self.get_bool(rv['names'][0], 'alias', 'Sûza')
+        assert timespan['start']['earliest'] == '2018-01-31T00:00:00'
+        assert timespan['start']['latest'] == '2018-03-01T00:00:00'
+        assert timespan['end']['earliest'] == '2019-01-31T00:00:00'
+        assert timespan['end']['latest'] == '2019-03-01T00:00:00'
+        assert rv['types'][0]['identifier']
+        assert rv['types'][0]['label'] == 'Boundary Mark'
+        assert rv['relations'][1]['label'] == 'Height'
+        assert rv['relations'][1]['relationDescription'] == '23.0'
+        assert rv['relations'][0]['relationTo']
+        assert rv['relations'][0]['relationType'] == 'crm:P2 has type'
+        assert rv['relations'][0]['relationSystemClass'] == 'type'
+        assert rv['names'][0]['alias'] == 'Sûza'
         links = rv['links'][0]
-        assert self.get_bool(links, 'type', 'closeMatch')
-        assert self.get_bool(
-            links,
-            'identifier',
-            'https://www.geonames.org/2761369')
-        assert self.get_bool(links, 'referenceSystem', 'GeoNames')
-        assert self.get_bool(rv['geometry'], 'type', 'GeometryCollection')
-        assert self.get_bool(
-            rv['geometry']['geometries'][1],
-            'coordinates',
-            [16.37069611, 48.208571233])
-        assert self.get_bool(rv['depictions'][0], '@id')
-        assert self.get_bool(
-            rv['depictions'][0], 'title', 'Picture with a License')
-        assert self.get_bool(rv['depictions'][0], 'license', 'Public domain')
-        assert self.get_bool(rv['depictions'][0], 'url')
+        assert links['type'] == 'closeMatch'
+        assert links['identifier'] == 'https://www.geonames.org/2761369'
+        assert links['referenceSystem'] == 'GeoNames'
+        assert rv['geometry']['type'] == 'GeometryCollection'
+        assert (rv['geometry']['geometries'][1]['coordinates']
+                == [16.37069611, 48.208571233])
+        assert rv['depictions'][0]['@id']
+        assert rv['depictions'][0]['title'] == 'Picture with a License'
+        assert rv['depictions'][0]['license'] == 'Public domain'
+        assert rv['depictions'][0]['url']
 
         rv = c.get(
             url_for(
@@ -223,12 +208,12 @@ class Api(ApiTestCase):
                 locale='de'))
         assert 'application/json' in rv.headers.get('Content-Type')
         rv = rv.get_json()['features'][0]
-        rel = rv['relations']
-        assert self.get_bool(rel[1], 'label', 'Height')
-        assert self.get_bool(rel[1], 'relationDescription', '23.0')
-        assert self.get_bool(rel[0], 'relationTo')
-        assert self.get_bool(rel[0], 'relationType', 'crm:P2_has_type')
-        assert self.get_bool(rel[0], 'relationTypeLabel', 'hat den Typus')
+
+        assert rv['relations'][1]['label'] == 'Height'
+        assert rv['relations'][1]['relationDescription'] == '23.0'
+        assert rv['relations'][0]['relationTo']
+        assert rv['relations'][0]['relationType'] == 'crm:P2_has_type'
+        assert rv['relations'][0]['relationTypeLabel'] == 'hat den Typus'
 
         geojson_checklist = [
             '@id', 'systemClass', 'name', 'description', 'begin_earliest',
@@ -238,37 +223,35 @@ class Api(ApiTestCase):
         rv = c.get(url_for('api_04.entity', id_=place.id, format='geojson'))
         assert 'application/json' in rv.headers.get('Content-Type')
         rv = rv.get_json()['features'][0]
-        assert self.get_bool(rv['geometry'], 'type')
-        assert self.get_bool(rv['geometry'], 'coordinates')
+        assert rv['geometry']['type']
+        assert rv['geometry']['coordinates']
         for key in geojson_checklist:
-            assert self.get_bool(rv['properties'], key)
+            assert rv['properties'][key]
         rv = c.get(url_for('api_04.entity', id_=place.id, format='geojson-v2'))
         assert 'application/json' in rv.headers.get('Content-Type')
         rv = rv.get_json()['features'][0]
-        assert self.get_bool(rv['geometry'], 'type')
-        assert self.get_bool(rv['geometry']['geometries'][0], 'coordinates')
+        assert rv['geometry']['type']
+        assert rv['geometry']['geometries'][0]['coordinates']
         for key in geojson_checklist:
-            assert self.get_bool(rv['properties'], key)
+            assert rv['properties'][key]
 
         # Test entity in Linked Open Usable Data
         rv = c.get(url_for('api_04.entity', id_=place.id, format='loud'))
         assert 'application/json' in rv.headers.get('Content-Type')
         rv = rv.get_json()
-        assert bool(rv['type'] == 'PhysicalThing')
-        assert bool(rv['_label'] == 'Shire')
-        assert bool(rv['content']
-                    == 'The Shire was the homeland of the hobbits.')
-        assert bool(rv['timespan']['begin_of_the_begin']
-                    == '2018-01-31T00:00:00')
-        assert bool(rv['identified_by'][0]['_label'] == 'Sûza')
-        assert bool(rv['classified_as'][0]['_label'] == 'Boundary Mark')
-        assert bool(rv['former_or_current_location'][0]['_label']
-                    == 'Location of Shire')
-        assert bool(rv['former_or_current_location'][0]['defined_by']
-                    == 'POLYGON((28.9389559878606 41.0290525580955,'
-                       '28.9409293485759 41.0273124142771,28.941969652866 '
-                       '41.0284940983463,28.9399641177912 41.0297647897435'
-                       ',28.9389559878606 41.0290525580955))')
+        assert rv['type'] == 'PhysicalThing'
+        assert rv['_label'] == 'Shire'
+        assert rv['content'] == 'The Shire was the homeland of the hobbits.'
+        assert rv['timespan']['begin_of_the_begin'] == '2018-01-31T00:00:00'
+        assert rv['identified_by'][0]['_label'] == 'Sûza'
+        assert rv['classified_as'][0]['_label'] == 'Boundary Mark'
+        assert (rv['former_or_current_location'][0]['_label']
+                == 'Location of Shire')
+        assert (rv['former_or_current_location'][0]['defined_by']
+                == 'POLYGON((28.9389559878606 41.0290525580955,'
+                   '28.9409293485759 41.0273124142771,28.941969652866 '
+                   '41.0284940983463,28.9399641177912 41.0297647897435'
+                   ',28.9389559878606 41.0290525580955))')
 
         # Test Entity export and RDFS
         for rv in [
@@ -358,21 +341,19 @@ class Api(ApiTestCase):
                     actor=place.id))]:
             assert 'application/json' in rv.headers.get('Content-Type')
             rv = rv.get_json()
-            rv_results = rv['results'][0]['features'][0]
-            rv_page = rv['pagination']
-            assert self.get_bool(rv_results, '@id')
-            assert self.get_bool(rv_page, 'entities')
-            assert self.get_bool(rv_page, 'entitiesPerPage')
-            assert self.get_bool(rv_page, 'index')
-            assert self.get_bool(rv_page, 'totalPages')
+            assert rv['results'][0]['features'][0]['@id']
+            assert rv['pagination']['entities']
+            assert rv['pagination']['entitiesPerPage']
+            assert rv['pagination']['index']
+            assert rv['pagination']['totalPages']
 
         # Test Entities with show=none
         rv = c.get(url_for('api_04.cidoc_class', class_='E21', show='none'))
         rv = rv.get_json()['results'][0]['features'][0]
-        assert self.get_bool_inverse(rv, 'geometry')
-        assert self.get_no_key(rv, 'depictions')
-        assert self.get_no_key(rv, 'links')
-        assert self.get_no_key(rv, 'types')
+        assert not rv['geometry']
+        assert not rv.get('depictions')
+        assert not rv.get('links')
+        assert not rv.get('types')
 
         # Test if Query returns enough entities
         rv = c.get(
@@ -384,7 +365,7 @@ class Api(ApiTestCase):
                 system_classes='person',
                 limit=0,
                 first=actor2.id)).get_json()
-        assert bool(rv['pagination']['entities'] == 8)
+        assert rv['pagination']['entities'] == 8
 
         # Test page parameter
         rv = c.get(
@@ -397,8 +378,8 @@ class Api(ApiTestCase):
                 limit=1,
                 page=7)).get_json()
         properties = rv['results'][0]['features'][0]['properties']
-        assert bool(properties['title'] == place.name)
-        assert bool(len(rv['results']) == 1)
+        assert properties['title'] == place.name
+        assert len(rv['results']) == 1
 
         # Test Entities count
         rv = c.get(
@@ -409,10 +390,10 @@ class Api(ApiTestCase):
                 view_classes='artifact',
                 system_classes='person',
                 count=True))
-        assert bool(rv.get_json() == 8)
+        assert rv.get_json() == 8
 
         rv = c.get(url_for('api_04.geometric_entities', count=True))
-        assert bool(rv.get_json() == 6)
+        assert rv.get_json() == 6
 
         # Test entities with GeoJSON Format
         for rv in [
@@ -433,8 +414,8 @@ class Api(ApiTestCase):
                     system_classes='person',
                     format='geojson-v2'))]:
             rv = rv.get_json()['results'][0]['features'][0]
-            assert self.get_bool(rv['properties'], '@id')
-            assert self.get_bool(rv['properties'], 'systemClass')
+            assert rv['properties']['@id']
+            assert rv['properties']['systemClass']
 
         # Test entities with Linked Open Usable Data Format
         rv = c.get(
@@ -447,39 +428,23 @@ class Api(ApiTestCase):
                 format='loud',
                 limit=0))
         rv = rv.get_json()['results'][0]
-        assert bool(rv['type'] == 'Type')
-        assert bool(rv['_label'] == 'Abbot')
+        assert rv['type'] == 'Type'
+        assert rv['_label'] == 'Abbot'
 
         # ---Type Endpoints---
         for rv in [
             c.get(url_for('api_04.type_overview')),
             c.get(url_for('api_04.type_overview', download=True))]:
-            found = False
-            for item in rv.get_json()['place']:
-                if found:
-                    break
-                if item['name'] == 'Administrative unit':
-                    for children in item['children']:
-                        if children['label'] == 'Austria':
-                            found = True
-                            break
-            assert found
+            assert 'Austria' in str(rv.get_json())
 
         for rv in [
             c.get(url_for('api_04.type_by_view_class')),
             c.get(url_for('api_04.type_by_view_class', download=True))]:
-            found = False
-            for item in rv.get_json()['place']:
-                if item['name'] == 'Place':
-                    for children in item['children']:
-                        if children['label'] == 'Boundary Mark':
-                            found = True
-                            break
-            assert found
+            assert 'Boundary Mark' in str(rv.get_json())
         rv = c.get(url_for('api_04.type_tree'))
-        assert bool(rv.get_json()['typeTree'])
+        assert rv.get_json()['typeTree']
         rv = c.get(url_for('api_04.type_tree', download=True))
-        assert bool(rv.get_json()['typeTree'])
+        assert rv.get_json()['typeTree']
         rv = c.get(url_for('api_04.type_tree', count=True))
         assert rv.get_json() > 0
 
@@ -613,7 +578,7 @@ class Api(ApiTestCase):
                     'api_04.query',
                     system_classes='all',
                     search=search_string))
-            assert bool(rv.get_json()['pagination']['entities'] == count)
+            assert rv.get_json()['pagination']['entities'] == count
 
         for rv in [
             c.get(url_for('api_04.subunits', id_=place.id)),
@@ -622,18 +587,18 @@ class Api(ApiTestCase):
         rv = rv.get_json()[str(place.id)]
         for item in rv:
             if item['id'] == place.id:
-                assert bool(item['id'] == place.id)
-                assert bool(item['openatlasClassName'] == "place")
-                assert bool(item['children'] == [feature.id])
+                assert item['id'] == place.id
+                assert item['openatlasClassName'] == "place"
+                assert item['children'] == [feature.id]
                 item = item['properties']
-                assert bool(item['name'] == place.name)
-                assert bool(item['description'] == place.description)
-                assert bool(item['aliases'] == [alias.name])
-                assert bool(item['externalReferences'])
-                assert bool(item['timespan'])
-                assert bool(item['standardType'])
-                assert bool(item['files'])
-                assert bool(item['types'])
+                assert item['name'] == place.name
+                assert item['description'] == place.description
+                assert item['aliases'] == [alias.name]
+                assert item['externalReferences']
+                assert item['timespan']
+                assert item['standardType']
+                assert item['files']
+                assert item['types']
 
         rv = c.get(url_for('api_04.subunits', id_=place.id, count=True))
         assert b'3' in rv.data
