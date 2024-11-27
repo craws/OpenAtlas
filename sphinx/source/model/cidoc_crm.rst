@@ -1,5 +1,5 @@
 CIDOC CRM
-==========
+=========
 
 .. toctree::
 
@@ -48,8 +48,8 @@ can be modelled in the following way
 
 .. image:: properties.png
 
-An overview of all CIDOC CRM properties can be found
-`here <https://demo.openatlas.eu/overview/model/property>`_. The displayed
+An overview of all CIDOC CRM properties can be at the
+`demo <https://demo.openatlas.eu/overview/model/property>`_. The displayed
 count indicates how many times each property has been used in your OpenAtlas
 instance.
 A click on the property name will bring you to an overview of the property with

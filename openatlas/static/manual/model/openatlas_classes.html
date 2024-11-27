@@ -103,34 +103,42 @@
 <div class="toctree-wrapper compound">
 </div>
 <p>These special classes are used within the software to further refine
-<a class="reference external" href="https://www.cidoc-crm.org/">CIDOC CRM</a> classes for the user interface.</p>
-<p>All OpenAtlas classes can be mapped directly to the corresponding CIDOC CRM
-classes. For all available classes and properties of CIDOC CRM (version 7.1.2)
-<a class="reference external" href="https://cidoc-crm.org/Version/version-7.1.2">see here</a>.</p>
+<a class="reference external" href="https://www.cidoc-crm.org/">CIDOC CRM</a> classes for the user interface.
+While OpenAtlas uses the CIDOC CRM within the application, a finer grained
+model is needed to deal with contextual differences in the user
+interface. Therefore,
+<a class="reference external" href="https://www.cidoc-crm.org/Entity/e33-linguistic-object/version-7.1">E33 - Lingustic Object</a> is used as class
+for sources as well as source translations with different user interface forms.
+An overview of the internal mapping and CIDOC CRM classes can be found
+<a class="reference external" href="https://github.com/craws/OpenAtlas/tree/main/install/crm">here</a>.</p>
+<p>All of these so called OpenAtlas classes can be mapped directly to the
+corresponding CIDOC CRM class. For all available classes and properties of
+CIDOC CRM (version 7.1.2) see
+<a class="reference external" href="https://cidoc-crm.org/Version/version-7.1.2">the CIDOC CRM documentation</a>.</p>
 <p>Example:
-The CIDOC class <a class="reference external" href="https://www.cidoc-crm.org/Entity/e18-physical-thing/version-7.1">E18 - Physical Thing</a>
-“comprises all persistent physical items with a relatively stable form,
-human-made or natural” (for more information see
+<a class="reference external" href="https://www.cidoc-crm.org/Entity/e18-physical-thing/version-7.1">E18 - Physical Thing</a> “comprises all
+persistent physical items with a relatively stable form, human-made or
+natural” (for more information see
 <a class="reference external" href="https://www.cidoc-crm.org/Entity/e18-physical-thing/version-7.1">CIDOC CRM</a> documentation).
 In OpenAtlas E18 is used to represent <a class="reference internal" href="../entity/place.html"><span class="doc">place</span></a>,
 <a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">stratigraphic unit</span></a>, and
-<a class="reference internal" href="../entity/feature.html"><span class="doc">feature</span></a>, which are all physical things according to
-<a class="reference external" href="https://www.cidoc-crm.org/">CIDOC CRM</a>.
+<a class="reference internal" href="../entity/feature.html"><span class="doc">feature</span></a>, which are all considered physical things
+according to <a class="reference external" href="https://www.cidoc-crm.org/">CIDOC CRM</a>.
 To differentiate between those different entities, the corresponding OpenAtlas
 classes were created. While <a class="reference internal" href="../entity/place.html"><span class="doc">place</span></a>,
 <a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">stratigraphic unit</span></a>, and
 <a class="reference internal" href="../entity/feature.html"><span class="doc">feature</span></a> are all considered E18 and mapped to this
 CIDOC CRM class in the background of the application, the user interface
-displays the OpenAtlas class name for user’s convenience and to avoid
-confusion.</p>
+displays the OpenAtlas class name and a corresponding, entity-specific form
+for user’s convenience and to avoid confusion.</p>
 <p>The same is true for bibliography, edition, external reference and file,
 which are all considered to be <a class="reference external" href="https://www.cidoc-crm.org/Entity/E31-Document/version-7.1">E31 - Documents</a> in
 CIDOC CRM or the OpenAtlas classes source and source translation which
 correspond to the CIDOC class
 <a class="reference external" href="https://www.cidoc-crm.org/Entity/E33-Linguistic-Object/version-7.1">E33 - Linguistic object</a>.</p>
 <p>An overview of all OpenAtlas classes used and how they correspond to CIDOC CRM
-classes can be found
-<a class="reference external" href="https://demo.openatlas.eu/overview/model/openatlas_class_index">here</a>.</p>
+classes can be found at the
+<a class="reference external" href="https://demo.openatlas.eu/overview/model/openatlas_class_index">demo</a>.</p>
 </section>
 
 

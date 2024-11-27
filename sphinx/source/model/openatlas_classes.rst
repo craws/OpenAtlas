@@ -42,5 +42,5 @@ correspond to the CIDOC class
 :cidoc_entity:`E33 - Linguistic object<E33-Linguistic-Object>`.
 
 An overview of all OpenAtlas classes used and how they correspond to CIDOC CRM
-classes can be found
-`here <https://demo.openatlas.eu/overview/model/openatlas_class_index>`_.
+classes can be found at the
+`demo <https://demo.openatlas.eu/overview/model/openatlas_class_index>`_.

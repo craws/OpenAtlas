@@ -103,14 +103,13 @@
 <div class="toctree-wrapper compound">
 </div>
 <p>OpenAtlas uses several shortcuts in order to simplify connections between
-entities that are always used the same way. All shortcuts can be resolved
-according to <a class="reference internal" href="cidoc_crm.html"><span class="doc">CIDOC CRM</span></a> specifications and are valid
-links. These shortcuts are indicated by a preceding OA in combination with a
-number. Currently OpenAtlas uses 3 shortcuts:</p>
+entities that are continuously used in the same way. All shortcuts can be
+resolved in accordance with  the:doc:<cite>CIDOC CRM&lt;cidoc_crm&gt;</cite> specifications and
+are valid links. These shortcuts are indicated by a preceding OA in
+combination with a number. Currently OpenAtlas uses 3 shortcuts:</p>
 <section id="oa7-has-relationship-to">
 <h2>OA7 - has relationship to<a class="headerlink" href="#oa7-has-relationship-to" title="Permalink to this heading"></a></h2>
-<p>OA7 is used to link two instances of <a class="reference external" href="https://www.cidoc-crm.org/Entity/e39-actor/version-7.1">E39 - Actor</a> via
-a certain relationship; in that way an actor can be linked with an actor.
+<p>OA7 is used to link two instances of <a class="reference external" href="https://www.cidoc-crm.org/Entity/e39-actor/version-7.1">E39 - Actor</a>
 <a class="reference external" href="https://www.cidoc-crm.org/Entity/e39-actor/version-7.1">E39 - Actor</a> linked with
 <a class="reference external" href="https://www.cidoc-crm.org/Entity/e39-actor/version-7.1">E39 - Actor</a></p>
 <ul class="simple">
@@ -123,21 +122,21 @@ a certain relationship; in that way an actor can be linked with an actor.
 </div>
 <p>Example:
 [Stefan (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e21-person/version-7.1">E21</a>)] participated in
-(<a class="reference external" href="https://www.cidoc-crm.org/Property/p11-had-participant/version-7.1">P11i</a>) [Relationship from Stefan to
+(<a class="reference external" href="https://www.cidoc-crm.org/Property/p11-had-participant/version-7.1">P11i</a>) [Relationship between Stefan and
 Joachim (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e5-event/version-7.1">E5</a>)] had participant
 (<a class="reference external" href="https://www.cidoc-crm.org/Property/p11-had-participant/version-7.1">P11</a> [Joachim
 (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e21-person/version-7.1">E21</a>)]</p>
 <p>The connecting event is defined by an entity of class
-<a class="reference external" href="https://www.cidoc-crm.org/Entity/e55-type/version-7.1">E55</a>: [Relationship from Stefan to Joachim
+<a class="reference external" href="https://www.cidoc-crm.org/Entity/e55-type/version-7.1">E55</a>: [Relationship between Stefan and Joachim
 (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e5-event/version-7.1">E5</a>)] has type
 (<a class="reference external" href="https://www.cidoc-crm.org/Property/P2-has-type/version-7.1">P2</a>) [Son to Father
 (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e55-type/version-7.1">E55</a>)]</p>
 </section>
 <section id="oa8-appears-for-the-first-time-in">
 <h2>OA8 - appears for the first time in<a class="headerlink" href="#oa8-appears-for-the-first-time-in" title="Permalink to this heading"></a></h2>
-<p>OA8 is used to link the beginning of a Persistent Item’s
+<p>OA8 is used to link the beginning of a persistent item’s
 (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e77-persistent-item/version-7.1">E77</a>) life
-span (or time of usage) with a certain place. E.g to document the birthplace of
+span (or time of usage) with a certain place, e.g to document a birthplace of
 a person.</p>
 <p><a class="reference external" href="https://www.cidoc-crm.org/Entity/e77-persistent-item/version-7.1">E77 - Persistent Item</a> linked with a
 <a class="reference external" href="https://www.cidoc-crm.org/Entity/e53-place/version-7.1">E53 - Place</a>.</p>
@@ -152,17 +151,16 @@ a person.</p>
 </div>
 <p>Example:
 [Albert Einstein (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e21-person/version-7.1">E521</a> was brought into existence
-by
-(<a class="reference external" href="https://www.cidoc-crm.org/Property/p92-brought-into-existence/version-7.1">P92</a>) [Birth of Albert Einstein
-(<a class="reference external" href="https://www.cidoc-crm.org/Entity/e67-birth/version-7.1">E567</a>)] took place at
+by (<a class="reference external" href="https://www.cidoc-crm.org/Property/p92-brought-into-existence/version-7.1">P92</a>) [Birth of Albert
+Einstein (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e67-birth/version-7.1">E567</a>)] took place at
 (<a class="reference external" href="https://www.cidoc-crm.org/Property/p7-took-place-at/version-7.1">P7</a>) [Ulm (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e53-place/version-7.1">E53</a>)]</p>
 </section>
 <section id="oa9-appears-for-the-last-time-in">
 <h2>OA9 - appears for the last time in<a class="headerlink" href="#oa9-appears-for-the-last-time-in" title="Permalink to this heading"></a></h2>
-<p>OA9 is used to link the end of a Persistent Item’s
+<p>OA9 is used to link the end of a persistent item’s
 (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e77-persistent-item/version-7.1">E77</a>) life
-span (or time of usage) with a certain place (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e53-place/version-7.1">E53</a>).
-E.g to document a person’s place of death.
+span (or time of usage) with a certain place
+(<a class="reference external" href="https://www.cidoc-crm.org/Entity/e53-place/version-7.1">E53</a>), e.g to document a person’s place of death.
 <a class="reference external" href="https://www.cidoc-crm.org/Entity/e77-persistent-item/version-7.1">E77 - Persistent Item</a> linked with a
 <a class="reference external" href="https://www.cidoc-crm.org/Entity/e53-place/version-7.1">E53 - Place</a>.</p>
 <ul class="simple">
@@ -183,12 +181,12 @@ by (<a class="reference external" href="https://www.cidoc-crm.org/Property/P93-t
 </section>
 <section id="dates">
 <h2>Dates<a class="headerlink" href="#dates" title="Permalink to this heading"></a></h2>
-<p>For dates, data is stored in the table model.entity respectively model.link in
+<p>Dates are stored in the table model.entity/model.link in
 the fields begin_from, begin_to, begin_comment, end_from, end_to, end_comment
 as timestamps.
-Depending on class of the entity respectively the domain and range classes of
-the link, these dates can be mapped as CIDOC CRM
-<a class="reference external" href="https://www.cidoc-crm.org/Entity/e61-time-primitive/version-7.1">E61 - Time Primitive</a> entities.</p>
+Depending on the class of the entity as well as the domain and range of the
+link, these dates can be mapped as CIDOC CRM
+<a class="reference external" href="https://www.cidoc-crm.org/Entity/e61-time-primitive/version-7.1">E61 - Time Primitive</a>.</p>
 <section id="e77-persistent-item">
 <h3>E77 - Persistent Item<a class="headerlink" href="#e77-persistent-item" title="Permalink to this heading"></a></h3>
 <p>E77 Persistent Item <strong>begin</strong> linked with a E61 Time Primitive:</p>

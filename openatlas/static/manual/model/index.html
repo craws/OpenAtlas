@@ -109,43 +109,45 @@
 </ul>
 </div>
 <p><strong>Data Model</strong></p>
-<p>While the model uses <a class="reference external" href="https://www.cidoc-crm.org/">CIDOC CRM</a> as
-ontology, it can be used without prior knowledge of data models, ontologies,
-etc. The software automatically maps information to the model. As the
-definitions of the CIDOC Conceptual Reference Model was imported into the
-system, its
+<p>OpenAtlas automatically maps information to
+<a class="reference external" href="https://www.cidoc-crm.org/">CIDOC CRM</a> which is used to build the model
+of the database. This happens in the background of the application without
+the user noticing. Therefore, the database can be used by anyone without
+prior knowledge of data modeling, ontologies, CIDOC CRM
+and the alike.
+As the definitions of the CIDOC Conceptual Reference Model are imported into
+the system, its
 <a class="reference external" href="https://demo.openatlas.eu/overview/model/cidoc_class_index">classes</a>
 and <a class="reference external" href="https://demo.openatlas.eu/overview/model/property">properties</a> can be
-browsed directly in OpenAtlas (see also <a class="reference internal" href="cidoc_crm.html"><span class="doc">here</span></a>).
+browsed directly in OpenAtlas (for more information see
+<a class="reference internal" href="cidoc_crm.html"><span class="doc">here</span></a>).
 Furthermore, it is possible to verify link-conformity between entities via the
-<a class="reference external" href="https://demo.openatlas.eu/overview/model">link-checker</a> (for more
-information click here <a class="reference internal" href="link_checker.html"><span class="doc">here</span></a>).</p>
-<p>During the development much emphasis was put on the fact that users do not have
-to concern themselves with the model or its ontology. Nevertheless, it is
-possible to display the CIDOC classes used in the user interface and thus gain
-insight into how the data is mapped.</p>
-<p>Pressing the <strong>Model</strong> button on the start page leads to a
-graphical presentation of the model (see below), a
-<a class="reference internal" href="link_checker.html"><span class="doc">link checking tool</span></a> and links to the classes and
-properties.</p>
+<a class="reference external" href="https://demo.openatlas.eu/overview/model">link-checker</a> (more
+information is available <a class="reference internal" href="link_checker.html"><span class="doc">here</span></a>).</p>
+<p>During the development of the database emphasis is put on easy usage without
+prior knowledge on data models or it ontologies.</p>
+<p>For everyone interested, a graphical representation of the current data model
+can be found by clicking the <strong>Model</strong> button on the start page. Furthermore, a
+link checker that helps you find valid CIDOC CRM links as well as links to
+all classes and properties is provided <a class="reference internal" href="link_checker.html"><span class="doc">here</span></a>.</p>
 <img alt="../_images/openatlas_schema.png" src="../_images/openatlas_schema.png" />
 <img alt="../_images/openatlas_schema2.png" src="../_images/openatlas_schema2.png" />
-<p>Furthermore, it is possible to active <strong>Show CIDOC classes</strong> in the user
-interface. This will displays the CIDOC class of an entity in the detail view
-of a data base entry.
-To do so click the gear symbol and choose <a class="reference internal" href="../tools/profile.html"><span class="doc">profile</span></a>. Go
-to <strong>Display</strong>, press the <strong>Edit</strong> button and choose <strong>Show CIDOC classes</strong>.</p>
-<p>While we try to only use CIDOC CRM classes and properties where possible
-(instead of introducing own classes or using extensions), some shortcuts are
-used to increase performance and to keep the code base maintainable.
-For more information, see <a class="reference internal" href="openatlas_shortcuts.html"><span class="doc">OpenAtlas shortcuts</span></a>.</p>
+<p>It is possible to show the CIDOC class of each entity in the detail view
+of the user interface. To enable this, click the gear symbol and choose
+<a class="reference internal" href="../tools/profile.html"><span class="doc">profile</span></a>. Go to <strong>Display</strong>, press the <strong>Edit</strong> button
+and choose <strong>Show CIDOC classes</strong>.</p>
+<p>Instead of introducing own classes or using extensions, OpenAtlas uses only
+basic CIDOC CRM classes and properties wherever possible. In addition, some
+shortcuts are used to increase performance and to keep the code base
+maintainable. For more information, see
+<a class="reference internal" href="openatlas_shortcuts.html"><span class="doc">OpenAtlas shortcuts</span></a>.</p>
 <p>While OpenAtlas uses the CIDOC CRM within the application, a finer grained
-model is needed to deal with any contextual differences needed for the user
-interface. Therefore, e.g.
-<a class="reference external" href="https://www.cidoc-crm.org/Entity/e33-linguistic-object/version-7.1">E33 - Lingustic Object</a> can be a source
-or a source translation with different forms in different context.
-An overview of internal mapping and CIDOC CRM classes can be found here
-<a class="reference external" href="https://github.com/craws/OpenAtlas/tree/main/install/crm">here</a></p>
+model is needed to deal with contextual differences in the user interface.
+Therefore, <a class="reference external" href="https://www.cidoc-crm.org/Entity/e33-linguistic-object/version-7.1">E33 - Lingustic Object</a> is
+used as class for sources as well as source translations with different user
+interface forms.
+An overview of the internal mapping and CIDOC CRM classes can be found
+<a class="reference external" href="https://github.com/craws/OpenAtlas/tree/main/install/crm">here</a>.</p>
 </section>
 
 
