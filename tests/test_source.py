@@ -1,5 +1,3 @@
-from typing import Any
-
 from flask import url_for
 
 from openatlas import app
@@ -16,7 +14,7 @@ class SourceTest(TestBaseCase):
             artifact = insert('artifact', 'Artifact with inscription')
             reference = insert('external_reference', 'https://d-nb.info')
 
-        rv: Any = c.post(
+        rv = c.post(
             url_for('insert', class_='source'),
             data={'name': 'Necronomicon'})
         source_id = rv.location.split('/')[-1]

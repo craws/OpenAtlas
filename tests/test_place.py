@@ -25,7 +25,7 @@ class PlaceTest(TestBaseCase):
             unit_type.id: str([unit_type.subs[0], unit_type.subs[1]]),
             f'reference_system_id_{g.geonames.id}':
                 ['123456', self.precision_type.subs[0]]}
-        rv: Any = c.post(
+        rv = c.post(
             url_for('insert', class_='place', origin_id=reference.id),
             data=data,
             follow_redirects=True)

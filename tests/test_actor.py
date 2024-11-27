@@ -1,5 +1,3 @@
-from typing import Any
-
 from flask import url_for
 
 from openatlas import app
@@ -16,7 +14,7 @@ class ActorTests(TestBaseCase):
             event = insert('acquisition', 'Event Horizon')
             group = insert('group', 'LV-426 colony')
 
-        rv: Any = c.get(url_for('insert', class_='person', origin_id=place.id))
+        rv = c.get(url_for('insert', class_='person', origin_id=place.id))
         assert b'Vienna' in rv.data
 
         sex = get_hierarchy('Sex')

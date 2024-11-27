@@ -1,5 +1,3 @@
-from typing import Any
-
 from flask import g, url_for
 
 from openatlas import app
@@ -20,7 +18,7 @@ class TypeTest(TestBaseCase):
             location = place.get_linked_entity_safe('P53')
             location.link('P89', g.types[historical_type.subs[0]])
 
-        rv: Any = c.get(url_for('view', id_=historical_type.subs[0]))
+        rv = c.get(url_for('view', id_=historical_type.subs[0]))
         assert b'Historical place' in rv.data
 
         rv = c.get(url_for('insert', class_='type', origin_id=actor_type.id))

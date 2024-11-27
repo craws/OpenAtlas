@@ -1,5 +1,4 @@
 import os
-from typing import Any
 
 import pandas as pd
 from flask import url_for
@@ -17,7 +16,7 @@ class ExportImportTest(ExportImportTestCase):
         assert b'Export SQL' in c.get(url_for('export_sql')).data
 
         date_ = current_date_for_filename()
-        rv: Any = c.get(
+        rv = c.get(
             url_for('export_execute', format_='sql'),
             follow_redirects=True)
         assert b'Data was exported' in rv.data

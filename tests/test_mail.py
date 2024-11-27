@@ -1,5 +1,3 @@
-from typing import Any
-
 from flask import url_for
 
 from tests.base import TestBaseCase
@@ -9,7 +7,7 @@ class MailTests(TestBaseCase):
 
     def test_mail(self) -> None:
         c = self.client
-        rv: Any = c.post(
+        rv = c.post(
             url_for('newsletter'),
             data={'subject': 'test', 'body': 'test', 'recipient': []},
             follow_redirects=True)

@@ -1,5 +1,3 @@
-from typing import Any
-
 from flask import g, url_for
 
 from tests.base import TestBaseCase, get_hierarchy
@@ -14,7 +12,7 @@ class HierarchyTest(TestBaseCase):
             'classes': ['file', 'group', 'move', 'person', 'place', 'source'],
             'multiple': True,
             'description': 'Very important!'}
-        rv: Any = c.post(
+        rv = c.post(
             url_for('hierarchy_insert', category='custom'),
             data=data,
             follow_redirects=True)

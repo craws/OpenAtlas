@@ -1,5 +1,3 @@
-from typing import Any
-
 from flask import g, url_for
 
 from openatlas import app
@@ -19,7 +17,7 @@ class EventTest(TestBaseCase):
             reference = insert('external_reference', 'https://d-nb.info')
 
         data = {'name': 'Event Horizon', 'location': residence.id}
-        rv: Any = c.post(url_for('insert', class_='activity'), data=data)
+        rv = c.post(url_for('insert', class_='activity'), data=data)
         activity_id = rv.location.split('/')[-1]
 
         rv = c.post(

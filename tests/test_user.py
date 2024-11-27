@@ -1,5 +1,3 @@
-from typing import Any
-
 from flask import g, url_for
 from flask_login import current_user
 
@@ -21,7 +19,7 @@ class UserTests(TestBaseCase):
             'name': 'Ripley Weaver',
             'real_name': '',
             'description': ''}
-        rv: Any = c.post(url_for('user_insert'), data=data)
+        rv = c.post(url_for('user_insert'), data=data)
         user_id = rv.location.split('/')[-1]
 
         data['password'] = 'too short'

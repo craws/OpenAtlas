@@ -1,5 +1,3 @@
-from typing import Any
-
 from flask import url_for
 
 from openatlas import app
@@ -14,7 +12,7 @@ class ReferenceTest(TestBaseCase):
             app.preprocess_request()
             batman = insert('person', 'Batman')
 
-        rv: Any = c.post(
+        rv = c.post(
             url_for('insert', class_='external_reference'),
             data={'name': 'https://openatlas.eu',  'description': 'No'})
         reference_id = rv.location.split('/')[-1]
