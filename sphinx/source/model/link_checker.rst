@@ -3,6 +3,6 @@ Link checker
 
 With the
 `link checker <https://demo.openatlas.eu/overview/model>`_
-you can test if certain class and property connections
-are CIDOC CRM conform. It can be reached via the **Model** button at the
-overview.
+the validity of CIDOC CRM class - property connections can be checked. The
+link checker can also be accessed by clicking the **Model** button at the
+overview page of each OpenAtlas instance.
