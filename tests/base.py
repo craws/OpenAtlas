@@ -15,22 +15,21 @@ class TestBaseCase(unittest.TestCase):
     def setUp(self) -> None:
         app.testing = True
         app.config.from_pyfile('testing.py')
-
         self.setup_database()
         self.client = app.test_client()
         self.app = self.client  # Remove after updated API tests
-        app.app_context().push()  # Always provide app.app_context
-        self.client.post(
-            url_for('login'),
-            data={'username': 'Alice', 'password': 'test'})
-        with app.test_request_context():
-            app.preprocess_request()
-            self.alice_id = 2
-            self.precision_type = \
-                Type.get_hierarchy('External reference match')
-            self.test_path = Path(app.root_path).parent / 'tests'
-            self.static_path = Path(app.root_path) / 'static'
-        app.app_context().push()  # Push again for e.g. logged-in user
+        with app.app_context():
+            self.client.post(
+                url_for('login'),
+                data={'username': 'Alice', 'password': 'test'})
+            with app.test_request_context():
+                app.preprocess_request()
+                self.alice_id = 2
+                self.precision_type = \
+                    Type.get_hierarchy('External reference match')
+                self.test_path = Path(app.root_path).parent / 'tests'
+                self.static_path = Path(app.root_path) / 'static'
+        app.app_context().push()
 
     def setup_database(self) -> None:
         connection = psycopg2.connect(
