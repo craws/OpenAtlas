@@ -11,7 +11,7 @@ def get_class_count() -> dict[str, int]:
         LEFT JOIN model.entity e ON oc.name = e.openatlas_class_name
         GROUP BY oc.name;
         """)
-    return {row['name']: row['count'] for row in g.cursor.fetchall()}
+    return {row['name']: row['count'] for row in list(g.cursor)}
 
 
 def get_classes() -> list[dict[str, Any]]:

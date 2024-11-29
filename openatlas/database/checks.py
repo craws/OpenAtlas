@@ -13,7 +13,7 @@ def check_single_type_duplicates(ids: list[int]) -> list[int]:
         HAVING COUNT(*) > 1;
         """,
         {'ids': tuple(ids)})
-    return [row['domain_id'] for row in g.cursor.fetchall()]
+    return [row[0] for row in list(g.cursor)]
 
 
 def get_orphaned_subunits() -> list[dict[str, Any]]:

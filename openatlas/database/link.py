@@ -75,7 +75,7 @@ def get_entity_ids_by_type_ids(type_ids: list[int]) -> list[int]:
         ORDER BY id;
         """,
         {'type_ids': tuple(type_ids)})
-    return [row[0] for row in g.cursor.fetchall()]
+    return [row[0] for row in list(g.cursor)]
 
 
 def delete_(id_: int) -> None:

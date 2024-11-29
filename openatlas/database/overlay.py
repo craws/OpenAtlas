@@ -42,7 +42,7 @@ def get_by_id(id_: int) -> dict[str, Any]:
         WHERE id = %(id)s;
         """,
         {'id': id_})
-    return dict(g.cursor.fetchone())
+    return g.cursor.fetchone()
 
 
 def remove(id_: int) -> None:

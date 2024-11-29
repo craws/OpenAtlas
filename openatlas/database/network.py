@@ -51,4 +51,4 @@ def get_object_mapping() -> dict[int, int]:
         JOIN model.entity e2 ON l.range_id = e2.id
             AND e.openatlas_class_name = 'place';
         """)
-    return {row['range_id']: row['id'] for row in g.cursor.fetchall()}
+    return {row['range_id']: row['id'] for row in list(g.cursor)}

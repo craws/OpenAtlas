@@ -83,7 +83,7 @@ def get_overview_counts(classes: list[str]) -> dict[str, int]:
         GROUP BY openatlas_class_name;
         """,
         {'classes': tuple(classes)})
-    return {row['name']: row['count'] for row in g.cursor.fetchall()}
+    return {row['name']: row['count'] for row in list(g.cursor)}
 
 
 def get_overview_counts_by_type(
@@ -98,7 +98,7 @@ def get_overview_counts_by_type(
         GROUP BY openatlas_class_name;
         """,
         {'ids': tuple(ids), 'classes': tuple(classes)})
-    return {row['name']: row['count'] for row in g.cursor.fetchall()}
+    return {row['name']: row['count'] for row in list(g.cursor)}
 
 
 def get_latest(classes: list[str], limit: int) -> list[dict[str, Any]]:
@@ -317,7 +317,7 @@ def get_file_info() -> dict[int, dict[str, Any]]:
         row['entity_id']: {
             'public': row['public'],
             'license_holder': row['license_holder'],
-            'creator': row['creator']} for row in g.cursor.fetchall()}
+            'creator': row['creator']} for row in list(g.cursor)}
 
 
 def get_subunits_without_super(classes: list[str]) -> list[int]:
@@ -329,7 +329,7 @@ def get_subunits_without_super(classes: list[str]) -> list[int]:
         WHERE e.openatlas_class_name IN %(classes)s;
         """,
         {'classes': tuple(classes)})
-    return [row['id'] for row in g.cursor.fetchall()]
+    return [row[0] for row in list(g.cursor)]
 
 
 def get_roots(
@@ -380,7 +380,7 @@ def get_roots(
     return {
         row['start_node']: {
             'id': row['top_level'],
-            'name': row['name']} for row in g.cursor.fetchall()}
+            'name': row['name']} for row in list(g.cursor)}
 
 
 def get_linked_entities_recursive(
@@ -404,7 +404,7 @@ def get_linked_entities_recursive(
             ) SELECT {first} FROM items;
         """,
         {'id_': id_, 'code': tuple(codes) if codes else ''})
-    return [row[first] for row in g.cursor.fetchall()]
+    return [row[0] for row in list(g.cursor)]
 
 
 def get_links_of_entities(
@@ -461,23 +461,23 @@ def delete_reference_system_links(entity_id: int) -> None:
 def get_linked_entities(id_: int, codes: list[str]) -> list[int]:
     g.cursor.execute(
         """
-        SELECT range_id AS result_id
+        SELECT range_id
         FROM model.link
         WHERE domain_id = %(id_)s AND property_code IN %(codes)s;
         """,
         {'id_': id_, 'codes': tuple(codes)})
-    return [row['result_id'] for row in g.cursor.fetchall()]
+    return [row[0] for row in list(g.cursor)]
 
 
 def get_linked_entities_inverse(id_: int, codes: list[str]) -> list[int]:
     g.cursor.execute(
         """
-        SELECT domain_id AS result_id
+        SELECT domain_id
         FROM model.link
         WHERE range_id = %(id_)s AND property_code IN %(codes)s;
         """,
         {'id_': id_, 'codes': tuple(codes)})
-    return [row['result_id'] for row in g.cursor.fetchall()]
+    return [row[0] for row in list(g.cursor)]
 
 
 def delete_links_by_codes(

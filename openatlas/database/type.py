@@ -52,7 +52,7 @@ def get_types(with_count: bool) -> list[dict[str, Any]]:
         ORDER BY e.name;
         """
     g.cursor.execute(sql)
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_hierarchies() -> list[dict[str, Any]]:
@@ -61,7 +61,7 @@ def get_hierarchies() -> list[dict[str, Any]]:
         SELECT id, name, category, multiple, directional, required
         FROM web.hierarchy;
         """)
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def set_required(id_: int) -> None:
