@@ -31,7 +31,7 @@ def get_by_object(ids: list[int]) -> list[dict[str, Any]]:
         WHERE o.image_id IN %(image_ids)s;
         """,
         {'image_ids': tuple(ids)})
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_by_id(id_: int) -> dict[str, Any]:

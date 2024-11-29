@@ -27,19 +27,19 @@ def insert_project(name: str, description: Optional[str]) -> int:
 
 def get_all_projects() -> list[dict[str, Any]]:
     g.cursor.execute(f'{SQL} GROUP BY p.id ORDER BY name;')
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_project_by_id(id_: int) -> dict[str, Any]:
     g.cursor.execute(f'{SQL} WHERE p.id = %(id)s GROUP BY p.id;', {'id': id_})
-    return dict(g.cursor.fetchone())
+    return g.cursor.fetchone()
 
 
 def get_project_by_name(name: str) -> Optional[dict[str, Any]]:
     g.cursor.execute(
         f'{SQL} WHERE p.name = %(name)s GROUP BY p.id;',
         {'name': name})
-    return dict(g.cursor.fetchone()) if g.cursor.rowcount else None
+    return g.cursor.fetchone()
 
 
 def delete_project(id_: int) -> None:

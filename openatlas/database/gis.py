@@ -6,7 +6,6 @@ from flask import g
 
 
 def get_by_id(id_: int) -> list[dict[str, Any]]:
-    geometries = []
     g.cursor.execute(
         """
         SELECT
@@ -22,13 +21,10 @@ def get_by_id(id_: int) -> list[dict[str, Any]]:
         WHERE place.id = %(id_)s;
         """,
         {'id_': id_})
-    for row in g.cursor.fetchall():
-        geometries.append(get_geometry_dict(row))
-    return geometries
+    return [get_geometry_dict(row) for row in list(g.cursor)]
 
 
 def get_by_ids(ids: list[int]) -> defaultdict[int, list[dict[str, Any]]]:
-    locations = defaultdict(list)
     g.cursor.execute(
         """
         SELECT
@@ -45,7 +41,8 @@ def get_by_ids(ids: list[int]) -> defaultdict[int, list[dict[str, Any]]]:
         WHERE place.id IN %(ids)s;
         """,
         {'ids': tuple(ids)})
-    for row in g.cursor.fetchall():
+    locations = defaultdict(list)
+    for row in list(g.cursor):
         locations[row['entity_id']].append(get_geometry_dict(row))
     return locations
 
@@ -67,7 +64,6 @@ def get_geometry_dict(row: dict[str, Any]) -> dict[str, Any]:
 
 
 def get_centroids_by_id(id_: int) -> Optional[list[dict[str, Any]]]:
-    geometries = []
     g.cursor.execute(
         """
         SELECT
@@ -86,14 +82,14 @@ def get_centroids_by_id(id_: int) -> Optional[list[dict[str, Any]]]:
         WHERE place.id = %(id_)s;
         """,
         {'id_': id_})
-    for row in g.cursor.fetchall():
+    geometries = []
+    for row in list(g.cursor):
         if data := get_centroid_dict(row):
             geometries.append(data)
     return geometries or None
 
 
 def get_centroids_by_ids(ids: list[int]) -> defaultdict[int, list[Any]]:
-    locations = defaultdict(list)
     g.cursor.execute(
         """
         SELECT
@@ -113,7 +109,8 @@ def get_centroids_by_ids(ids: list[int]) -> defaultdict[int, list[Any]]:
         WHERE place.id IN %(ids)s;
         """,
         {'ids': tuple(ids)})
-    for row in g.cursor.fetchall():
+    locations = defaultdict(list)
+    for row in list(g.cursor):
         locations[row['entity_id']].append(get_centroid_dict(row))
     return locations
 
@@ -151,7 +148,7 @@ def get_wkt_by_id(id_: int) -> list[dict[str, Any]]:
         """,
         {'id_': id_})
     geometries = []
-    for row in g.cursor.fetchall():
+    for row in list(g.cursor):
         geometry = {}
         if row['point']:
             geometry['defined_by'] = row['point']
@@ -199,7 +196,7 @@ def get_all(extra_ids: list[int]) -> list[dict[str, Any]]:
         GROUP BY object.id, g.id;
         """,
         {'extra_ids': tuple(extra_ids)})
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def test_geom(geometry: str) -> bool:
@@ -232,8 +229,7 @@ def insert_wkt(data: dict[str, Any], shape: str) -> None:
             entity_id, name, description, type, geom_{shape}
         ) VALUES (
             %(entity_id)s, '', %(description)s, %(type)s,
-            public.ST_SetSRID(public.ST_GeomFromText(%(wkt)s),4326)
-        );
+            public.ST_SetSRID(public.ST_GeomFromText(%(wkt)s),4326));
         """,
         data)
 

@@ -45,4 +45,4 @@ def get_classes() -> list[dict[str, Any]]:
                 WHERE c.name = ro.openatlas_class_name) y) y
         ORDER BY c.name;
         """)
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)

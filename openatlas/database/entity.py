@@ -6,11 +6,11 @@ from flask import g
 def get_by_id(
         id_: int,
         types: bool = False,
-        aliases: bool = False) -> Optional[dict[str, Any]]:
+        aliases: bool = False) -> dict[str, Any]:
     g.cursor.execute(
         select_sql(types, aliases) + ' WHERE e.id = %(id)s GROUP BY e.id;',
         {'id': id_})
-    return dict(g.cursor.fetchone()) if g.cursor.rowcount else None
+    return g.cursor.fetchone()
 
 
 def get_by_ids(
@@ -408,7 +408,7 @@ def get_linked_entities_recursive(
 
 
 def get_links_of_entities(
-        entities: int | list[int],
+        ids: int | list[int],
         codes: str | list[str] | None,
         inverse: bool = False) -> list[dict[str, Any]]:
     sql = f"""
@@ -441,8 +441,7 @@ def get_links_of_entities(
         ORDER BY e.name;"""
     g.cursor.execute(
         sql, {
-            'entities': tuple(
-                entities if isinstance(entities, list) else [entities]),
+            'entities': tuple(ids if isinstance(ids, list) else [ids]),
             'codes': tuple(codes) if codes else ''})
     return list(g.cursor)
 
