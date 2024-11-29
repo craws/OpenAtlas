@@ -64,7 +64,7 @@ def get_add_reference_form(class_: str) -> Any:
 def get_annotation_form(
         image_id: int,
         entity: Optional[Entity] = None,
-        insert: Optional[bool] = True) -> FlaskForm:
+        insert: Optional[bool] = True) -> Any:
     class Form(FlaskForm):
         text = TextAreaField(_('annotation'))
     if insert:
