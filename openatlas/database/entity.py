@@ -22,7 +22,7 @@ def get_by_ids(
     g.cursor.execute(
         select_sql(types, aliases) + ' WHERE e.id IN %(ids)s GROUP BY e.id ',
         {'ids': tuple(ids)})
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_by_project_id(project_id: int) -> list[dict[str, Any]]:
@@ -49,7 +49,7 @@ def get_by_project_id(project_id: int) -> list[dict[str, Any]]:
         GROUP BY e.id, ie.origin_id;
         """,
         {'id': project_id})
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_by_class(
@@ -60,7 +60,7 @@ def get_by_class(
         select_sql(types, aliases) +
         ' WHERE e.openatlas_class_name IN %(class)s GROUP BY e.id;',
         {'class': tuple(classes if isinstance(classes, list) else [classes])})
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_by_cidoc_class(
@@ -71,7 +71,7 @@ def get_by_cidoc_class(
         select_sql(types, aliases) +
         'WHERE e.cidoc_class_code IN %(codes)s GROUP BY e.id;',
         {'codes': tuple(code if isinstance(code, list) else [code])})
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_overview_counts(classes: list[str]) -> dict[str, int]:
@@ -111,7 +111,7 @@ def get_latest(classes: list[str], limit: int) -> list[dict[str, Any]]:
         DESC LIMIT %(limit)s;
         """,
         {'codes': tuple(classes), 'limit': limit})
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_all_entities() -> list[dict[str, Any]]:
@@ -139,7 +139,7 @@ def get_all_entities() -> list[dict[str, Any]]:
                 AS end_to
         FROM model.entity e;
         """)
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def insert(data: dict[str, Any]) -> int:
@@ -269,7 +269,7 @@ def search(
         ORDER BY e.name;
         """,
         {'term': f'%{term}%', 'user_id': user_id, 'classes': tuple(classes)})
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def link(data: dict[str, Any]) -> int:
@@ -444,7 +444,7 @@ def get_links_of_entities(
             'entities': tuple(
                 entities if isinstance(entities, list) else [entities]),
             'codes': tuple(codes) if codes else ''})
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def delete_reference_system_links(entity_id: int) -> None:
