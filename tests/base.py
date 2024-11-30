@@ -17,7 +17,6 @@ class TestBaseCase(unittest.TestCase):
         app.config.from_pyfile('testing.py')
         self.setup_database()
         self.client = app.test_client()
-        self.app = self.client  # Remove after updated API tests
         with app.app_context():
             self.client.post(
                 url_for('login'),
