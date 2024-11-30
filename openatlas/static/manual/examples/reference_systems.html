@@ -5,7 +5,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>References Systems &mdash; OpenAtlas 8.8.0 documentation</title>
+  <title>References Systems &mdash; OpenAtlas 8.9.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
@@ -35,7 +35,7 @@
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                8.8.0
+                8.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -100,11 +100,11 @@
 <h1>References Systems<a class="headerlink" href="#references-systems" title="Permalink to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>To create <strong>Linked Open Data</strong> (LOD) it is possible to link data entered
-into the database with a <a class="reference internal" href="../entity/reference_system.html"><span class="doc">Reference System</span></a>. Online available
+<p>To create <strong>Linked Open Data</strong> (LOD) it is possible to connect entered
+information with a <a class="reference internal" href="../entity/reference_system.html"><span class="doc">Reference System</span></a>. Online available
 <strong>controlled vocabularies</strong> and <strong>gazetteers</strong> are particularly suitable for
 this. But it is also possible to link your own data with analog resources,
-e.g. card catalogs or inventory data from museums.</p>
+such as card catalogs or inventory data from museums.</p>
 <p><a class="reference external" href="https://www.wikidata.org/">Wikidata</a>  and <a class="reference external" href="https://www.geonames.org/">GeoNames</a> are available in OpenAtlas by default but other applications can be
 added by the users. To see which reference systems are already available on
 your OpenAtlas instance, click the <strong>Reference system</strong> button on the start
@@ -118,17 +118,17 @@ regarding <a class="reference internal" href="../entity/reference_system.html"><
 <h2>Create a new reference system<a class="headerlink" href="#create-a-new-reference-system" title="Permalink to this heading"></a></h2>
 <p>To create a new reference system click the <strong>Reference System</strong> button on
 the starting page of your OpenAtlas instance. You will then see a list with
-all already added external references.
-If permissions to create additional external references are available, a
-<strong>+Reference system</strong> button can also be found here. Click it to get into
-the form. Here you can fill in the following fields:</p>
+already added external references.
+If you user group has permission to create additional external references a
+<strong>+ Reference system</strong> button is displayed. Click it to get into the form.
+Here you can add the following information:</p>
 <ul class="simple">
 <li><p><strong>Name</strong>: Choose a descriptive name; as for other forms, a name is
 required to save data.</p></li>
 <li><p><strong>Website URL</strong>: State the vocabulary’s/gazetteer’s URL, e.g.
 <a class="reference external" href="https://www.wikidata.org">https://www.wikidata.org</a> for Wikidata</p></li>
 <li><p><strong>Resolver URL</strong>: Put in an URL that brings you to the respective entry
-when combined with an ID e.g. <a class="reference external" href="https://www.wikidata.org/wiki/">https://www.wikidata.org/wiki/</a> see for
+when combined with an ID e.g. <a class="reference external" href="https://www.wikidata.org/wiki/">https://www.wikidata.org/wiki/</a> - see for
 example <a class="reference external" href="https://www.wikidata.org/wiki/Q3044">https://www.wikidata.org/wiki/Q3044</a> where Q3044 is an ID (the link
 will bring you directly to Charlemagne’s entry in Wikidata)</p></li>
 <li><p><strong>Example ID</strong>: An example ID can be specified, which is then used as an
@@ -143,27 +143,27 @@ blank and exact or close match can be chosen from a drop down list.
 Close match and exact match are
 <a class="reference external" href="https://www.w3.org/TR/skos-primer/">SKOS</a> based definitions of confidence</p>
 <ul>
-<li><p>choose <strong>Close match</strong> if the data base entry and the entity in the
-vocabulary are sufficiently similar and can be used interchangeably in some
+<li><p>choose <strong>Close match</strong> if your entry and the entity in the vocabulary
+are sufficiently similar and can be used interchangeably in some
 information retrieval application (think a D-shaped belt buckle is a
 close match to a belt buckle (Wikidata ID Q3180027) or the historic
 Vienna is a close match to today’s Vienna as it is included in Geonames)</p></li>
 <li><p>choose <strong>Exact match</strong> if there is a high degree of confidence that the
 entered data and the vocabulary’s entity are interchangeable (think
-Charlemagne - the King of Franks, King of Lombards and became Holy Roman
+Charlemagne - the King of Franks, King of Lombards who became Holy Roman
 Emperor in 800 AD is an exact match to Q3044 in Wikidata or the Venus of
 Willendorf in the Natural History Museum Vienna is an exact match to the
 entity Q131397 (Venus of Willendorf) in Wikidata)</p></li>
 </ul>
 </li>
-<li><p><strong>Classes</strong>: Select here in which forms the new external reference should
+<li><p><strong>Classes</strong>: Select in which forms the new external reference should
 be displayed. This can appear in one or more forms</p></li>
 <li><p><strong>Description</strong>: you can add a description as free text if desired</p></li>
 </ul>
 <p>Save the information to the database by clicking the <strong>Insert</strong> button.</p>
 <p><strong>Please keep in mind</strong>: When information is entered into a reference system
-field in a form, the data in this form can only be saved if an
-external reference match is also specified.</p>
+field in a form, the data in this form can only be saved if an external
+reference match is also specified.</p>
 </section>
 </section>
 

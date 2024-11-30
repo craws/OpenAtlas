@@ -5,7 +5,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>API &mdash; OpenAtlas 8.8.0 documentation</title>
+  <title>API &mdash; OpenAtlas 8.9.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
@@ -35,7 +35,7 @@
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                8.8.0
+                8.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -106,28 +106,29 @@
 </div>
 <section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading"></a></h2>
-<p>This page provides an overview of the OpenAtlas Application Programming
-Interface (<a class="reference external" href="https://en.wikipedia.org/wiki/API">API</a>). An API allows easy
-and controlled access from external sources (e.g. presentation sites or
-analytical tools) to your data. It is human and mashine readable and
-provides different approaches to query your data.</p>
-<p>The OpenAtlas API tries to follow the
+<p>This page provides an overview of the OpenAtlas API. An (<a class="reference external" href="https://en.wikipedia.org/wiki/API">API</a>) allows easy and controlled access to the data
+stored in an OpenAtlas instance from external sources, such as presentation
+sites or analytical tools. The information provided is readable for human and
+machines alike. By using the API data can be queried in several different ways.</p>
+<p>The development of the OpenAtlas API follows the
 <a class="reference external" href="https://restfulapi.net/rest-architectural-constraints/">RESTful</a> constraints.</p>
-<p>To try out the API first hand at our demo site: <a class="reference external" href="https://demo.openatlas.eu/swagger">https://demo.openatlas.eu/swagger</a>.
-If you have your own OpenAtlas instance just visit &lt;your-domain.eu&gt;/swagger. Be aware
-that the <a class="reference internal" href="../admin/api.html"><span class="doc">API</span></a> has to be set to public at the admin section.</p>
+<p>Testing the API is possible via: <a class="reference external" href="https://demo.openatlas.eu/swagger">https://demo.openatlas.eu/swagger</a>.
+Using it with the data from a specific OpenAtlas instance is possible by
+visiting &lt;your-domain.eu&gt;/swagger. Be aware
+that the <a class="reference internal" href="../admin/api.html"><span class="doc">API</span></a> has to be set to public in the admin setting
+section of the instance.</p>
 </section>
 <section id="quick-start-guide">
 <h2>Quick Start Guide<a class="headerlink" href="#quick-start-guide" title="Permalink to this heading"></a></h2>
-<p>The API can be accessed via the OpenAtlas user interface or through URL GET
+<p>The API can be accessed via the OpenAtlas user interface or through an URL GET
 requests.</p>
 <section id="ui-access">
 <h3>1. UI access<a class="headerlink" href="#ui-access" title="Permalink to this heading"></a></h3>
-<p>Each detail view of an entity provide two buttons (JSON and RDF) where the
-formats, in which the entity should be exported, can be selected. If the
-buttons are not visible, please change the <strong>Show API links</strong>
-at the <a class="reference internal" href="../tools/profile.html#display"><span class="std std-ref">Display</span></a> tab in your <a class="reference internal" href="../tools/profile.html"><span class="doc">Profile</span></a>.</p>
-<p>Through the UI, only a single entity can be accessed.</p>
+<p>Each detail view of an entity provides two buttons (JSON and RDF). Via those
+buttons the format, in which the entity will be exported, can be selected.
+If the buttons are not visible, please change the <strong>Show API links</strong>
+in the <a class="reference internal" href="../tools/profile.html#display"><span class="std std-ref">Display</span></a> tab of your <a class="reference internal" href="../tools/profile.html"><span class="doc">Profile</span></a> in the settings.</p>
+<p>By using the UI in this way, only a single entity can be accessed.</p>
 <figure class="align-center" id="id5">
 <img alt="../_images/api_ui_json.jpg" src="../_images/api_ui_json.jpg" />
 <figcaption>
@@ -144,8 +145,8 @@ at the <a class="reference internal" href="../tools/profile.html#display"><span 
 <section id="url-get-access">
 <h3>2. URL / GET access<a class="headerlink" href="#url-get-access" title="Permalink to this heading"></a></h3>
 <p>The most common way to communicate with the OpenAtlas API is through GET
-request, either manually from the local browser or with other applications
-following a specific URL schema:</p>
+request. This can be done either manually from the local browser or with other
+applications following a specific URL schema:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>{domain}/api/{api version}/{endpoint}?{parameter}&amp;{parameter}
 </pre></div>
 </div>
@@ -153,29 +154,29 @@ following a specific URL schema:</p>
 <dt><strong>Example URL</strong></dt><dd><p><a class="reference external" href="https://demo.openatlas.eu/api/0.3/entity/5117">https://demo.openatlas.eu/api/0.3/entity/5117</a></p>
 </dd>
 <dt><strong>Domain</strong></dt><dd><p>Location of the OpenAtlas instance from which information should be
-retrieved; e.g. <a class="reference external" href="https://demo-openatlas.eu/">https://demo-openatlas.eu/</a> for the demo version.</p>
+retrieved, e.g. <a class="reference external" href="https://demo-openatlas.eu/">https://demo-openatlas.eu/</a> for the demo version</p>
 </dd>
-<dt><strong>API Version</strong></dt><dd><p>Input without version number leads to the current stable version
+<dt><strong>API Version</strong></dt><dd><p>Input without a version number leads to the current stable version
 (<a class="reference external" href="https://demo.openatlas.eu/api/entity/5117">https://demo.openatlas.eu/api/entity/5117</a>).
 If another version of the API is to be used, the version number can be
-specified (demo.openatlas.eu/api/<strong>0.4</strong>/entity/5117). A version overview
-can be found under point <a class="reference internal" href="#versioning">Versioning</a>.</p>
+specified (e.g. demo.openatlas.eu/api/<strong>0.4</strong>/entity/5117). A version
+overview can be found under <a class="reference internal" href="#versioning">Versioning</a>.</p>
 </dd>
 <dt><strong>Endpoints</strong></dt><dd><p>Specific data can be queried by attaching an endpoint
-(demo.openatlas.eu/api/0.4/<strong>entity</strong>/5117). The information is provided
-in a human - and machine-readable form. Further information under
-<a class="reference internal" href="#endpoints">Endpoints</a>.</p>
+(e.g. demo.openatlas.eu/api/0.4/<strong>entity</strong>/5117). The information is
+provided in a human - and machine-readable form. For further information
+see <a class="reference internal" href="#endpoints">Endpoints</a>.</p>
 </dd>
 <dt><strong>Required path values</strong></dt><dd><p>Must be included to create a valid URL. Different endpoints require
-different values (demo.openatlas.eu/api/0.4/entity/<strong>5117</strong>. <strong>5117</strong> is
-an ID as required by the entity endpoint) - all required values are state
-in <strong>{</strong> <strong>}</strong> at the <a class="reference internal" href="#endpoints">Endpoints</a> definition.</p>
+different values (e.g. demo.openatlas.eu/api/0.4/entity/<strong>5117</strong>.
+<strong>5117</strong> is an ID as required by the entity endpoint) - all required
+values are state in <strong>{</strong> <strong>}</strong> at the <a class="reference internal" href="#endpoints">Endpoints</a> definition.</p>
 </dd>
 <dt><strong>Parameters</strong></dt><dd><p>Used to structure additional information for a given URL. They are added
 to the end of an URL after the “?” symbol
-(demo.openatlas.eu/api/0.4/entity/5117**?**download=true). All available
-Parameters can be found under <a class="reference internal" href="#parameters">Parameters</a>. For more general information
-see this
+(e.g. demo.openatlas.eu/api/0.4/entity/5117**?**download=true). All
+available Parameters can be found under <a class="reference internal" href="#parameters">Parameters</a>. For more general
+information see this
 <a class="reference external" href="https://www.botify.com/learn/basics/what-are-url-parameters#:~:text=URL%20parameters%20(also%20known%20as,by%20the%20'%26'%20symbol.">article</a>.</p>
 </dd>
 </dl>
@@ -215,37 +216,43 @@ A <strong>stable</strong> version of the API will be available at all times. In 
 warning will be posted in the
 <a class="reference external" href="https://redmine.openatlas.eu/projects/uni/roadmap">roadmap</a> and
 <a class="reference external" href="https://redmine.openatlas.eu/projects/uni/news">release notes</a> before
-these versions will be discontinued. <strong>Unstable</strong> versions are currently
-developed, so breaking changes may occur at any time without prior notice.</p>
+a versions is discontinued. <strong>Unstable</strong> versions are currently
+still under development, so breaking changes may occur at any time without
+prior notice.</p>
 </section>
 <section id="endpoints">
 <h2>Endpoints<a class="headerlink" href="#endpoints" title="Permalink to this heading"></a></h2>
 <p>Through different endpoints, data can be retrieved from OpenAtlas. Each version
-has an own set of endpoints, be sure to use the right one.</p>
+has an own set of endpoints, make sure to use the correct one.</p>
 <p>The current version 0.4 endpoint descriptions are available at:</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://demo.openatlas.eu/swagger/">Current OpenAPI specification</a> at the OpenAtlas demo version</p></li>
-<li><p><a class="reference external" href="/swagger">Local OpenAPI specification</a>: this link is only available if called from a OpenAtlas installation</p></li>
+<li><p><a class="reference external" href="https://demo.openatlas.eu/swagger/">Current OpenAPI specification</a> for
+the OpenAtlas demo version</p></li>
+<li><p><a class="reference external" href="/swagger">Local OpenAPI specification</a>: this link is only available if
+called from an OpenAtlas instance</p></li>
 </ul>
-<p>The requested information is provided in Linked Places format
-<a class="reference external" href="https://github.com/LinkedPasts/linked-places-format">Linked Places format (LPF)</a>. Alternatively,
+<p>The requested information is provided in the
+<a class="reference external" href="https://github.com/LinkedPasts/linked-places-format">Linked Places format (LPF)</a>.
+Alternatively,
 <a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc7946">GeoJSON</a>, <a class="reference external" href="https://linked.art/">Linked Open Usable Data</a>
-or RDFs, derived from the <a class="reference external" href="https://linked.art/">Linked Open Usable Data</a> data, can be accessed.</p>
+or RDFs, derived from <a class="reference external" href="https://linked.art/">Linked Open Usable Data</a>
+data, can be accessed.</p>
 </section>
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h2>
-<p>With parameters the result of the requested endpoint can be manipulated
-(filtered, searched, sorted, etc.). Each endpoint provide another set of
-parameters which can be used. So please consult the <a class="reference internal" href="#endpoints">Endpoints</a> listing for
-more details.</p>
+<p>By using parameters the result of the requested endpoint can be manipulated
+(filtered, searched, sorted, etc.). Each endpoint provides another set of
+parameters which can be used. Consult the <a class="reference internal" href="#endpoints">Endpoints</a> list for more details.</p>
 <p>Parameters are added to the end of an URL after the “<strong>?</strong>” symbol
 (e.g. demo.openatlas.eu/api/0.4/entity/5117**?download=true**) and are
 connected with the “<strong>&amp;</strong>” sign.
-For more general information on this topic see this
+For more general information on this, see this
 <a class="reference external" href="https://www.botify.com/learn/basics/what-are-url-parameters#:~:text=URL%20parameters%20(also%20known%20as,by%20the%20'%26'%20symbol.">article</a>.</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://demo.openatlas.eu/swagger/">Current OpenAPI parameters</a> at the OpenAtlas demo version</p></li>
-<li><p><a class="reference external" href="/swagger">Local OpenAPI parameters</a>: this link is only available if called from a OpenAtlas installation</p></li>
+<li><p><a class="reference external" href="https://demo.openatlas.eu/swagger/">Current OpenAPI parameters</a> at the
+OpenAtlas demo version</p></li>
+<li><p><a class="reference external" href="/swagger">Local OpenAPI parameters</a>: this link is only available if
+called from an OpenAtlas instance</p></li>
 </ul>
 </section>
 <section id="error-handling">
@@ -268,14 +275,15 @@ is provided in JSON format, describing the error in more detail.</p>
 </div>
 <p>If an invalid endpoint parameter value e.g. ?sort=kfs instead of ?sort=desc is
 entered, Flask catches this via its own
-<a class="reference external" href="https://flask-restful.readthedocs.io/en/latest/">Flask-RESTful</a> extension.
-An error message is provided by its own error handler
+<a class="reference external" href="https://flask-restful.readthedocs.io/en/latest/">Flask-RESTful</a> extension
+and displays an error message provided by its own
 <a class="reference external" href="https://flask-restful.readthedocs.io/en/latest/reqparse.html#error-handling">error handler</a></p>
 </section>
 <section id="proxy">
 <h2>Proxy<a class="headerlink" href="#proxy" title="Permalink to this heading"></a></h2>
-<p>If the server is behind a proxy, there are some issues with the RDF export of entities.
-To provide the OpenAtlas API with a proxy server, add following line to <strong>instance/production.py</strong></p>
+<p>If the server is behind a proxy, issues with the RDF export of entities can
+occur. To provide the OpenAtlas API with a proxy server, add the following
+line to <strong>instance/production.py</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">PROXIES</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;http&#39;</span><span class="p">:</span> <span class="s1">&#39;http://someurl.org:8080&#39;</span><span class="p">,</span>
     <span class="s1">&#39;https&#39;</span><span class="p">:</span> <span class="s1">&#39;http://someurl.org:8080&#39;</span><span class="p">}</span>

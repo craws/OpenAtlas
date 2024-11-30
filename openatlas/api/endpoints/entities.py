@@ -15,28 +15,25 @@ from openatlas.api.resources.util import (
 
 class GetByCidocClass(Resource):
     @staticmethod
-    def get(cidoc_class: str) \
-            -> tuple[Resource, int] | Response | dict[str, Any]:
+    def get(class_: str) -> tuple[Resource, int] | Response | dict[str, Any]:
         return Endpoint(
-            ApiEntity.get_by_cidoc_classes([cidoc_class]),
+            ApiEntity.get_by_cidoc_classes([class_]),
             entity_.parse_args()).resolve_entities()
 
 
 class GetBySystemClass(Resource):
     @staticmethod
-    def get(system_class: str) \
-            -> tuple[Resource, int] | Response | dict[str, Any]:
+    def get(class_: str) -> tuple[Resource, int] | Response | dict[str, Any]:
         return Endpoint(
-            ApiEntity.get_by_system_classes([system_class]),
+            ApiEntity.get_by_system_classes([class_]),
             entity_.parse_args()).resolve_entities()
 
 
 class GetByViewClass(Resource):
     @staticmethod
-    def get(view_class: str) \
-            -> tuple[Resource, int] | Response | dict[str, Any]:
+    def get(class_: str) -> tuple[Resource, int] | Response | dict[str, Any]:
         return Endpoint(
-            ApiEntity.get_by_view_classes([view_class]),
+            ApiEntity.get_by_view_classes([class_]),
             entity_.parse_args()).resolve_entities()
 
 

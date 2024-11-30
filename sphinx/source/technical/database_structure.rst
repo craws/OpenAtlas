@@ -14,10 +14,10 @@ Regarding the database structure, the following PostgreSQL schemas are used:
    * Entities (OpenAtlas class instances)
    * Links (CIDOC property instances)
 
-* **public** - general PostgreSQL functionality, e.g. PostGIS functions
-* **web** - none model data related to the website, e.g.
+* **public** - general PostgreSQL functionality such as PostGIS functions
+* **web** - non-model data related to the website such as:
 
    * website settings (upload size limit, email configuration, ...)
-   * groups, users and their preferences, notes, bookmarks, ...
+   * groups, users, user's preferences, notes, bookmarks, ...
    * image annotations
    * external reference system specifications

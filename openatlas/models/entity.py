@@ -328,8 +328,8 @@ class Entity:
         for type_ in self.types:
             if type_.root[0] in type_dict:
                 type_dict[type_.root[0]] += 1
-            else:
-                type_dict[type_.root[0]] = 1
+                continue
+            type_dict[type_.root[0]] = 1
         for id_, count in type_dict.items():
             if count > 1 and not g.types[id_].multiple:
                 return True
@@ -648,15 +648,11 @@ class Link:
 
     @staticmethod
     def invalid_sub_dates() -> list[Link]:
-        return [
-            Link.get_by_id(row['id'])
-            for row in date.invalid_sub_dates()]
+        return [Link.get_by_id(row['id']) for row in date.invalid_sub_dates()]
 
     @staticmethod
     def get_invalid_link_dates() -> list[Link]:
-        return [
-            Link.get_by_id(row['id'])
-            for row in date.invalid_link_dates()]
+        return [Link.get_by_id(row['id']) for row in date.invalid_link_dates()]
 
     @staticmethod
     def check_link_duplicates() -> list[dict[str, Any]]:

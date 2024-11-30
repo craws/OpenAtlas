@@ -76,6 +76,7 @@ def linked_places_template(parser: Parser) -> dict[str, Type[String]]:
         'publicShareable': fields.Boolean,
         'url': fields.String,
         'mimetype': fields.String,
+        'IIIFBasePath': fields.String,
         'IIIFManifest': fields.String}
     links = {
         'type': fields.String,

@@ -1,5 +1,4 @@
-import datetime
-from typing import Any, Optional
+from typing import Any
 
 from flask import g
 
@@ -72,7 +71,7 @@ def update_language(user_id: int, value: str) -> None:
 
 def get_all() -> list[dict[str, Any]]:
     g.cursor.execute(f'{SQL} ORDER BY username;')
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_bookmarks(user_id: int) -> list[int]:
@@ -83,46 +82,47 @@ def get_bookmarks(user_id: int) -> list[int]:
         WHERE user_id = %(user_id)s;
         """,
         {'user_id': user_id})
-    return [row['entity_id'] for row in g.cursor.fetchall()]
+    return [row[0] for row in list(g.cursor)]
 
 
-def get_by_id(user_id: int) -> Optional[dict[str, Any]]:
+def get_by_id(user_id: int) -> dict[str, Any]:
     g.cursor.execute(f'{SQL} WHERE u.id = %(id)s;', {'id': user_id})
-    return dict(g.cursor.fetchone()) if g.cursor.rowcount else None
+    return g.cursor.fetchone()
 
 
-def get_by_reset_code(code: str) -> Optional[dict[str, Any]]:
+def get_by_reset_code(code: str) -> dict[str, Any]:
     g.cursor.execute(
         f'{SQL} WHERE u.password_reset_code = %(code)s;',
         {'code': code})
-    return dict(g.cursor.fetchone()) if g.cursor.rowcount else None
+    return g.cursor.fetchone()
 
 
-def get_by_email(email: str) -> Optional[dict[str, Any]]:
+def get_by_email(email: str) -> dict[str, Any]:
     g.cursor.execute(
         f'{SQL} WHERE LOWER(u.email) = LOWER(%(email)s);',
         {'email': email})
-    return dict(g.cursor.fetchone()) if g.cursor.rowcount else None
+    return g.cursor.fetchone()
 
 
-def get_by_username(username: str) -> Optional[dict[str, Any]]:
+def get_by_username(username: str) -> dict[str, Any]:
     g.cursor.execute(
         f'{SQL} WHERE LOWER(u.username) = LOWER(%(username)s);',
         {'username': username})
-    return dict(g.cursor.fetchone()) if g.cursor.rowcount else None
+    return g.cursor.fetchone()
 
 
-def get_by_unsubscribe_code(code: str) -> Optional[dict[str, Any]]:
+def get_by_unsubscribe_code(code: str) -> dict[str, Any]:
     g.cursor.execute(
         f'{SQL} WHERE u.unsubscribe_code = %(code)s;',
         {'code': code})
-    return dict(g.cursor.fetchone()) if g.cursor.rowcount else None
+    return g.cursor.fetchone()
 
 
 def get_activities(
         limit: int,
         user_id: int,
-        action: str) -> list[dict[str, Any]]:
+        action: str,
+        entity_id: int | None) -> list[dict[str, Any]]:
     g.cursor.execute(
         f"""
         SELECT
@@ -135,11 +135,15 @@ def get_activities(
         WHERE TRUE
             {'AND user_id = %(id)s' if int(user_id) else ''}
             {'AND action = %(action)s' if action != 'all' else ''}
+            {'AND entity_id = %(entity_id)s' if entity_id else ''}
         ORDER BY created DESC
         {'LIMIT %(limit)s' if int(limit) else ''};
-        """,
-        {'limit': limit, 'id': user_id, 'action': action})
-    return g.cursor.fetchall()
+        """, {
+            'limit': limit,
+            'id': user_id,
+            'action': action,
+            'entity_id': entity_id})
+    return list(g.cursor)
 
 
 def get_created_entities_count(user_id: int) -> int:
@@ -188,7 +192,7 @@ def delete(id_: int) -> None:
 
 def get_users_for_form() -> list[tuple[int, str]]:
     g.cursor.execute('SELECT id, username FROM web.user ORDER BY username;')
-    return [(row['id'], row['username']) for row in g.cursor.fetchall()]
+    return [(row['id'], row['username']) for row in list(g.cursor)]
 
 
 def insert_bookmark(user_id: int, entity_id: int) -> None:
@@ -217,7 +221,7 @@ def get_settings(user_id: int) -> list[dict[str, Any]]:
         WHERE user_id = %(user_id)s;
         """,
         {'user_id': user_id})
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_notes_by_entity_id(
@@ -231,7 +235,7 @@ def get_notes_by_entity_id(
             AND (public IS TRUE or user_id = %(user_id)s);
         """,
         {'entity_id': entity_id, 'user_id': user_id})
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_notes_by_user_id(user_id: int) -> list[dict[str, Any]]:
@@ -242,7 +246,7 @@ def get_notes_by_user_id(user_id: int) -> list[dict[str, Any]]:
         WHERE user_id = %(user_id)s;
         """,
         {'user_id': user_id})
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_note_by_id(id_: int) -> dict[str, Any]:
@@ -253,7 +257,7 @@ def get_note_by_id(id_: int) -> dict[str, Any]:
         WHERE id = %(id)s;
         """,
         {'id': id_})
-    return dict(g.cursor.fetchone())
+    return g.cursor.fetchone()
 
 
 def insert_note(
@@ -298,7 +302,7 @@ def get_user_entities(id_: int) -> list[int]:
             AND l.action = 'insert';
         """,
         {'user_id': id_})
-    return [row['id'] for row in g.cursor.fetchall()]
+    return [row[0] for row in list(g.cursor)]
 
 
 def get_tokens(id_: int) -> list[dict[str, Any]]:

@@ -7,7 +7,7 @@ from psycopg2.extras import DictCursor
 def get_settings(cursor: Optional[DictCursor] = None) -> dict[str, str]:
     cursor = cursor or g.cursor
     cursor.execute('SELECT name, value FROM web.settings;')
-    return {row['name']: row['value'] for row in cursor.fetchall()}
+    return {row['name']: row['value'] for row in list(cursor)}
 
 
 def update(field_name: str, value: Any) -> None:

@@ -14,8 +14,8 @@ def log(data: dict[str, Any]) -> None:
 
 def get_system_logs(
         limit: str,
-        priority:
-        str, user_id: str) -> list[dict[str, Any]]:
+        priority: str,
+        user_id: str) -> list[dict[str, Any]]:
     g.cursor.execute(
         f"""
         SELECT id, priority, type, message, user_id, info, created
@@ -26,7 +26,7 @@ def get_system_logs(
         {' LIMIT %(limit)s' if int(limit) > 0 else ''};
         """,
         {'limit': limit, 'priority': priority, 'user_id': user_id})
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def delete_all_system_logs() -> None:

@@ -238,10 +238,12 @@ def get_crm_relation_x(link_: Link, inverse: bool = False) -> str:
 
 
 def get_crm_code(link_: Link, inverse: bool = False) -> str:
-    name = link_.domain.cidoc_class.i18n['en'] \
-        if inverse else link_.range.cidoc_class.i18n['en']
-    code = link_.domain.cidoc_class.code \
-        if inverse else link_.range.cidoc_class.code
+    name = link_.range.cidoc_class.i18n['en']
+    if inverse:
+        name = link_.domain.cidoc_class.i18n['en']
+    code = link_.range.cidoc_class.code
+    if inverse:
+        code = link_.domain.cidoc_class.code
     return f"crm:{code} {name}"
 
 

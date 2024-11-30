@@ -2,7 +2,6 @@ from flask import render_template
 from flask_babel import lazy_gettext as _
 
 from openatlas import app
-from openatlas.display.util import link
 
 
 @app.route('/changelog')
@@ -18,7 +17,10 @@ def index_changelog() -> str:
 versions = {
     '8.9.0': ['TBA', {
         'feature': {
-            '1233': 'API: External Authentication',}
+            '2389': 'Activity log for entities',
+            '2381': 'Import only year dates',
+            '2391': 'IIIF: add reference ',
+            '1233': 'API: External Authentication'}
     }],
     '8.8.0': ['2024-10-31', {
         'feature': {
@@ -1011,9 +1013,5 @@ versions = {
             '318': 'Import definitions from CIDOC rdfs'}}],
     '0.0.1': ['2014-11-05', {
         'feature': {
-            '': 'Initial version based on the Zend Base project from ' +
-                link(
-                    'craws.net',
-                    'https://craws.net',
-                    uc_first_=False,
-                    external=True)}}]}
+            '': 'Initial version based on the Zend Base project from craws.net'
+        }}]}

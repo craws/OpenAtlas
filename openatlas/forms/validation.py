@@ -6,7 +6,6 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import validators
 
-from openatlas.display.util2 import uc_first
 from openatlas.forms.util import form_to_datetime64
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
@@ -32,31 +31,30 @@ def validate(form: FlaskForm, extra_validators: validators = None) -> bool:
     valid = FlaskForm.validate(form, extra_validators)
     if hasattr(form, 'begin_year_from') and not validate_dates(form):
         valid = False
-    for field_id, field in form.__dict__.items():  # External reference systems
+    for field_id, field in form.__dict__.items():
         if field_id.startswith('reference_system_id_') \
                 and field.data \
                 and field.data['value']:
             if not field.data['precision']:
                 valid = False
                 field.errors.append(_('precision required'))
-            if field.label.text == 'Wikidata':
-                if field.data['value'][0].upper() != 'Q' \
-                        or not field.data['value'][1:].isdigit():
-                    field.errors.append(_('wrong id format'))
-                    valid = False
-                else:
-                    field.data['value'] = uc_first(field.data['value'])
-            if field.label.text == 'GeoNames' \
-                    and not field.data['value'].isnumeric():
-                field.errors.append(_('wrong id format'))
-                valid = False
+            match field.label.text:
+                case 'Wikidata':
+                    if field.data['value'][0] != 'Q' \
+                            or not field.data['value'][1:].isdigit():
+                        field.errors.append(_('wrong id format'))
+                        valid = False
+                case 'GeoNames':
+                    if not field.data['value'].isnumeric():
+                        field.errors.append(_('wrong id format'))
+                        valid = False
     return valid
 
 
 def validate_dates(form: FlaskForm) -> bool:
     valid = True
     dates = {}
-    for prefix in ['begin_', 'end_']:  # Create "dates" dict for validation
+    for prefix in ['begin_', 'end_']:
         if getattr(form, f'{prefix}year_to').data \
                 and not getattr(form, f'{prefix}year_from').data:
             getattr(form, f'{prefix}year_from').errors.append(
@@ -78,8 +76,8 @@ def validate_dates(form: FlaskForm) -> bool:
                     getattr(form, f'{prefix}day{postfix}').errors.append(
                         _('not a valid date'))
                     valid = False
-                else:
-                    dates[prefix + postfix.replace('_', '')] = date
+                    continue
+                dates[prefix + postfix.replace('_', '')] = date
 
     # Check for valid date combination e.g. begin not after end
     if valid:
@@ -92,13 +90,12 @@ def validate_dates(form: FlaskForm) -> bool:
                 valid = False
     if 'begin_from' in dates and 'end_from' in dates:
         field = getattr(form, 'begin_year_from')
-        if len(dates) == 4:  # All dates are used
-            if dates['begin_from'] > dates['end_from'] \
-                    or dates['begin_to'] > dates['end_to']:
-                field.errors.append(
-                    _('Begin dates cannot start after end dates.'))
-                valid = False
-        else:
+        if len(dates) == 4 and (
+                dates['begin_from'] > dates['end_from']
+                or dates['begin_to'] > dates['end_to']):
+            field.errors.append(_('Begin dates cannot start after end dates.'))
+            valid = False
+        elif len(dates) != 4:
             first = dates['begin_to'] \
                 if 'begin_to' in dates else dates['begin_from']
             second = dates['end_from'] \

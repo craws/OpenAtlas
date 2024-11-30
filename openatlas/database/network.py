@@ -11,12 +11,12 @@ def get_ego_network(ids: set[int]) -> list[dict[str, Any]]:
         WHERE domain_id IN %(ids)s or range_id IN %(ids)s;
         """,
         {'ids': tuple(ids)})
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_edges(
         classes: list[str],
-        properties: list[str]) -> list[dict[str, int]]:
+        properties: list[str]) -> list[dict[Any, int]]:
     g.cursor.execute(
         """
         SELECT l.id, l.domain_id, l.range_id
@@ -28,7 +28,7 @@ def get_edges(
         WHERE property_code IN %(properties)s;
         """,
         {'classes': tuple(classes), 'properties': tuple(properties)})
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_entities(classes: list[str]) -> list[dict[str, Any]]:
@@ -39,7 +39,7 @@ def get_entities(classes: list[str]) -> list[dict[str, Any]]:
         WHERE openatlas_class_name IN %(classes)s;
         """,
         {'classes': tuple(classes)})
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_object_mapping() -> dict[int, int]:
@@ -51,4 +51,4 @@ def get_object_mapping() -> dict[int, int]:
         JOIN model.entity e2 ON l.range_id = e2.id
             AND e.openatlas_class_name = 'place';
         """)
-    return {row['range_id']: row['id'] for row in g.cursor.fetchall()}
+    return {row['range_id']: row['id'] for row in list(g.cursor)}
