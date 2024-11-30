@@ -89,10 +89,9 @@ class ApiTestCase(TestBaseCase):
 class ProfileTestCase(TestBaseCase):
     def setUp(self) -> None:
         super().setUp()
-        with app.app_context():
-            with app.test_request_context():
-                app.preprocess_request()
-                self.token_id = get_tokens(self.alice_id)
+        with app.test_request_context():
+            app.preprocess_request()
+            self.token_id = get_tokens(self.alice_id)
 
 
 class ExportImportTestCase(TestBaseCase):
