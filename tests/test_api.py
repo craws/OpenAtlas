@@ -289,6 +289,13 @@ class Api(ApiTestCase):
         names = [place.name, feature.name, 'Bar']
         for item in rv['results']:
             assert item['features'][0]['properties']['title'] in names
+        rv = c.get(
+            url_for(
+                'api_04.linked_entities_by_properties_recursive',
+                id_=place.id,
+                properties='all'))
+        rv = rv.get_json()
+        assert rv['results'][0]['features'][0]['properties']
 
         # Test Entities endpoints
         for rv in [
