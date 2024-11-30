@@ -3,7 +3,7 @@ from flask import g
 
 def get_content() -> list[dict[str, str]]:
     g.cursor.execute('SELECT name, language, text FROM web.i18n;')
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def update(name: str, language: str, text: str) -> None:

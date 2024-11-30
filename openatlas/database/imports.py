@@ -27,19 +27,19 @@ def insert_project(name: str, description: Optional[str]) -> int:
 
 def get_all_projects() -> list[dict[str, Any]]:
     g.cursor.execute(f'{SQL} GROUP BY p.id ORDER BY name;')
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_project_by_id(id_: int) -> dict[str, Any]:
     g.cursor.execute(f'{SQL} WHERE p.id = %(id)s GROUP BY p.id;', {'id': id_})
-    return dict(g.cursor.fetchone())
+    return g.cursor.fetchone()
 
 
-def get_project_by_name(name: str) -> Optional[dict[str, Any]]:
+def get_project_by_name(name: str) -> dict[str, Any]:
     g.cursor.execute(
         f'{SQL} WHERE p.name = %(name)s GROUP BY p.id;',
         {'name': name})
-    return dict(g.cursor.fetchone()) if g.cursor.rowcount else None
+    return g.cursor.fetchone()
 
 
 def delete_project(id_: int) -> None:
@@ -51,11 +51,12 @@ def delete_project(id_: int) -> None:
 def check_origin_ids(project_id: int, origin_ids: list[str]) -> list[str]:
     g.cursor.execute(
         """
-        SELECT origin_id FROM import.entity
+        SELECT origin_id
+        FROM import.entity
         WHERE project_id = %(project_id)s AND origin_id IN %(ids)s;
         """,
         {'project_id': project_id, 'ids': tuple(set(origin_ids))})
-    return [row['origin_id'] for row in g.cursor.fetchall()]
+    return [row[0] for row in list(g.cursor)]
 
 
 def get_id_from_origin_id(project_id: int, origin_id: str) -> list[str]:
@@ -75,7 +76,7 @@ def check_duplicates(class_: str, names: list[str]) -> list[str]:
         WHERE openatlas_class_name = %(class_)s AND LOWER(name) IN %(names)s;
         """,
         {'class_': class_, 'names': tuple(names)})
-    return [row['name'] for row in g.cursor.fetchall()]
+    return [row[0] for row in list(g.cursor)]
 
 
 def update_project(id_: int, name: str, description: Optional[str]) -> None:

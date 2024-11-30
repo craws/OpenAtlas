@@ -2,7 +2,7 @@ from typing import Any
 
 from flask import g
 
-SELECT = """
+SQL = """
     SELECT
         id,
         image_id,
@@ -16,15 +16,15 @@ SELECT = """
 
 
 def get_by_id(id_: int) -> dict[str, Any]:
-    g.cursor.execute(SELECT + ' WHERE id =  %(id)s;', {'id': id_})
-    return dict(g.cursor.fetchone()) if g.cursor.rowcount else {}
+    g.cursor.execute(SQL + ' WHERE id =  %(id)s;', {'id': id_})
+    return g.cursor.fetchone()
 
 
 def get_by_file(image_id: int) -> list[dict[str, Any]]:
     g.cursor.execute(
-        SELECT + ' WHERE image_id =  %(image_id)s;',
+        SQL + ' WHERE image_id =  %(image_id)s;',
         {'image_id': image_id})
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_orphaned_annotations() -> list[dict[str, Any]]:
@@ -44,7 +44,7 @@ def get_orphaned_annotations() -> list[dict[str, Any]]:
             AND l.property_code = 'P67'
         WHERE l.id IS NULL AND a.entity_id IS NOT NULL
         """)
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def insert(data: dict[str, Any]) -> None:

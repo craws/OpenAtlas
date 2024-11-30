@@ -19,7 +19,7 @@ def invalid_dates() -> list[dict[str, Any]]:
                 AND end_to IS NOT NULL
                 AND begin_to > end_to);
         """)
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def invalid_link_dates() -> list[dict[str, Any]]:
@@ -38,7 +38,7 @@ def invalid_link_dates() -> list[dict[str, Any]]:
                 AND end_to IS NOT NULL
                 AND begin_to > end_to);
         """)
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def invalid_involvement_dates() -> list[dict[str, Any]]:
@@ -81,7 +81,7 @@ def invalid_involvement_dates() -> list[dict[str, Any]]:
                 AND event.begin_from IS NOT NULL
                 AND involvement.begin_from < event.begin_from);
         """)
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def invalid_preceding_dates() -> list[dict[str, Any]]:
@@ -97,7 +97,7 @@ def invalid_preceding_dates() -> list[dict[str, Any]]:
                 AND succeeding.begin_from IS NOT NULL
                 AND succeeding.begin_from < preceding.begin_from;
         """)
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def invalid_sub_dates() -> list[dict[str, Any]]:
@@ -122,4 +122,4 @@ def invalid_sub_dates() -> list[dict[str, Any]]:
                 OR (super.end_to IS NOT NULL AND sub.end_to IS NOT NULL AND
                     sub.end_to > super.end_to));
         """)
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)

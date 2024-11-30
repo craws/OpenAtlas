@@ -24,13 +24,13 @@ def get_properties() -> list[dict[str, Any]]:
             p.name,
             p.name_inverse);
         """)
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_hierarchy() -> list[dict[str, Any]]:
     g.cursor.execute(
         'SELECT super_code, sub_code FROM model.property_inheritance;')
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_translations(language_codes: list[str]) -> list[dict[str, Any]]:
@@ -41,4 +41,4 @@ def get_translations(language_codes: list[str]) -> list[dict[str, Any]]:
         WHERE language_code IN %(language_codes)s;
         """,
         {'language_codes': tuple(language_codes)})
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)

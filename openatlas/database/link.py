@@ -51,7 +51,7 @@ def get_by_id(id_: int) -> dict[str, Any]:
         WHERE l.id = %(id)s;
         """,
         {'id': id_})
-    return dict(g.cursor.fetchone())
+    return g.cursor.fetchone()
 
 
 def get_links_by_type(type_id: int) -> list[dict[str, Any]]:
@@ -62,7 +62,7 @@ def get_links_by_type(type_id: int) -> list[dict[str, Any]]:
         WHERE type_id = %(type_id)s;
         """,
         {'type_id': type_id})
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_entity_ids_by_type_ids(type_ids: list[int]) -> list[int]:
@@ -75,7 +75,7 @@ def get_entity_ids_by_type_ids(type_ids: list[int]) -> list[int]:
         ORDER BY id;
         """,
         {'type_ids': tuple(type_ids)})
-    return [row[0] for row in g.cursor.fetchall()]
+    return [row[0] for row in list(g.cursor)]
 
 
 def delete_(id_: int) -> None:
@@ -108,7 +108,7 @@ def get_all_links() -> list[dict[str, Any]]:
                 AS end_to
         FROM model.link l;
         """)
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def check_link_duplicates() -> list[dict[str, int]]:
@@ -134,7 +134,7 @@ def check_link_duplicates() -> list[dict[str, int]]:
             end_from, end_to, end_comment
         HAVING COUNT(*) > 1;
         """)
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def delete_link_duplicates() -> int:
@@ -178,6 +178,7 @@ def get_all_links_for_network(
             AND re.openatlas_class_name IN  %(system_classes)s;
         """,
         {'system_classes': tuple(system_classes)})
+    # Todo: return list(g.cursor) would be better but triggers an API error
     return [dict(row) for row in g.cursor.fetchall()]
 
 
@@ -201,4 +202,5 @@ def get_links_by_id_network(ids: list[int]) -> list[dict[str, Any]]:
         WHERE l.range_id IN %(ids)s OR l.domain_id IN %(ids)s;
         """,
         {'ids': tuple(ids)})
+    # Todo: return list(g.cursor) would be better but triggers an API error
     return [dict(row) for row in g.cursor.fetchall()]
