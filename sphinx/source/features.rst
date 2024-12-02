@@ -9,7 +9,7 @@ software. The features listed below contribute significantly to this effort.
 Model
 -----
 The data model specifies the structure in which the information is stored
-within the database. The use of an ontology, for example, allows the data to be
+within the database. The use of an ontology allows the data to be
 combined more easily with information from other projects and is consistent
 with the `FAIR principles <https://www.go-fair.org/fair-principles/>`_.
 
@@ -18,8 +18,8 @@ The OpenAtlas :doc:`/model/index` is based on the international standard of
 field of humanities.
 
 * :doc:`Types </entity/type>` can be used to adapt for specific research topics
-* :doc:`Reference Systems </entity/reference_system>` for
-  Linked Open Data (LOD)
+* :doc:`Reference Systems </entity/reference_system>` help create Linked Open
+  Data (LOD)
 * Mapping :doc:`spatial </tools/map>` and
   :doc:`temporal </ui/date>` uncertainty
 * :doc:`Archaeological finds </examples/archaeological_data>`
@@ -29,7 +29,7 @@ field of humanities.
 
 User Interface
 --------------
-The user interface allows for easy and quick entry of information into the
+The user interface (UI) allows for easy and quick entry of information into the
 database, while the data is mapped in the background according to the
 specifications of the data model (see above).
 Due to the use of :doc:`types </entity/type>`, this can be designed
@@ -81,8 +81,8 @@ to import data into the database system.
 
 User Management
 ---------------
-The User Management Features allows the activation of users for the own
-OpenAtlas instance. These can also be divided into different user groups with
+The User Management Features allows the activation of users for your
+OpenAtlas instance. They can be divided into different user groups with
 different permissions. In addition, the user interface can be adapted to the
 user's own preferences via settings.
 
