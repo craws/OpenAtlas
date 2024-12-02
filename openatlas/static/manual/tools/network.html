@@ -105,11 +105,12 @@
 <h1>Network visualization<a class="headerlink" href="#network-visualization" title="Permalink to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>With the integration of <a class="reference external" href="https://d3js.org/">D3.js</a> data can be visualized as
-a network graph available at the <strong>Network visualization</strong> button at the
-<a class="reference internal" href="../overview.html"><span class="doc">Overview</span></a> or as an egocentric network at the entity detail view.</p>
-<p><strong>Classic</strong> is the default but it can be switched to other types at the top of
-the visualization pages.</p>
+<p>With the integration of <a class="reference external" href="https://d3js.org/">D3.js</a>, data can be visualized as
+a network graph. The graph, specific for each OpenAtlas instance, is available
+via the <strong>Network visualization</strong> button at the <a class="reference internal" href="../overview.html"><span class="doc">Overview</span></a> or as an
+egocentric network at the entity detail view.</p>
+<p>Three different layouts are provided. <strong>Classic</strong> is the default setting but
+it can be switched to other types at the top of the visualization pages.</p>
 <figure class="align-left" id="id2">
 <img alt="../_images/network_classic.png" src="../_images/network_classic.png" />
 <figcaption>
@@ -153,14 +154,13 @@ the visualization pages.</p>
 <section id="options">
 <h2>Options<a class="headerlink" href="#options" title="Permalink to this heading"></a></h2>
 <ul class="simple">
-<li><p><strong>Colors</strong> - you can change the node color of classes</p></li>
-<li><p><strong>Depth</strong> - in egocentric networks you can define the link depth</p></li>
-<li><p><strong>Show orphans</strong> - if nodes without connections should be shown too</p></li>
-<li><p><strong>Width</strong> - the width of the resulting image in pixel</p></li>
-<li><p><strong>Height</strong> - the height of the resulting image in pixel</p></li>
-<li><p><strong>Charge</strong> - a parameter for the distance between entries which are not
-connected</p></li>
-<li><p><strong>Distance</strong> - a parameter for the distance between connected entries</p></li>
+<li><p><strong>Colors</strong> - changes the node color of classes</p></li>
+<li><p><strong>Depth</strong> - defines the link depth in egocentric networks</p></li>
+<li><p><strong>Show orphans</strong> - select if nodes without any connections are displayed</p></li>
+<li><p><strong>Width</strong> - define width of the displayed image in pixel</p></li>
+<li><p><strong>Height</strong> - define height of the displayed image in pixel</p></li>
+<li><p><strong>Charge</strong> - select the distance between unconnected entities</p></li>
+<li><p><strong>Distance</strong> - select the distance between connected entities</p></li>
 </ul>
 </section>
 <section id="in-case-of-performance-issues">
@@ -175,8 +175,9 @@ data sets</p></li>
 <h2>Download<a class="headerlink" href="#download" title="Permalink to this heading"></a></h2>
 <p>If an image is available (classic mode only) you can download it as PNG.
 Be aware that the resulting image is exactly what you see in this moment so
-you may want to change width and height in the options before. Also you may
-want to choose a zoom level where labels are readable.</p>
+you may want to change width and height in the options before downloading.
+Set the zoom level according to your needs to ensure the labels are still
+readable.</p>
 </section>
 </section>
 

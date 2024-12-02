@@ -106,29 +106,30 @@
 <div class="toctree-wrapper compound">
 </div>
 <p>The image annotation feature allows for marking areas on an image and adding
-a text and/or link it to an entity. E.g. a person on a group picture or an
-artifact at an excavation site image.</p>
+a text and/or link to an entity. In that way a person in a group picture
+or an artifact on an excavation photo can be linked to the entity in OpenAtlas.</p>
 <p>Prerequisite for image annotation is an enabled and configured
 <a class="reference internal" href="../admin/iiif.html"><span class="doc">IIIF</span></a> server.</p>
 <section id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading"></a></h2>
-<p>At a <a class="reference internal" href="../entity/file.html"><span class="doc">File</span></a> detail view click on the <strong>Enable IIIF view</strong> button
-below the image if it wasn’t converted already.</p>
-<p>Once the image was converted you can click on the <strong>Annotate</strong> link below the
+<p>In a <a class="reference internal" href="../entity/file.html"><span class="doc">File</span></a>’s detail view, click the <strong>Enable IIIF view</strong> button
+below the image, if it is not converted already.
+Once the image is converted click the <strong>Annotate</strong> link below the
 image and the annotation view will open in a new tab.</p>
-<p>In the image annotation view you can see the image in an IIIF viewer and a form
-for new annotations and a list of already entered annotations with links to
-edit or delete them.</p>
+<p>In the image annotation view you can see the image in an IIIF viewer as
+well as a form for new annotations including a list of already saved
+annotations. Links to edit or delete previous annotations are als porvided.</p>
 <p><strong>Form fields</strong></p>
 <ul class="simple">
-<li><p><strong>IIIF image view</strong> - here you can use the rectangle draw button on the left
-side to mark an area.</p></li>
-<li><p><strong>Annotation</strong> - you can enter a description here</p></li>
-<li><p><strong>Entity</strong> - you can link an entity here</p></li>
+<li><p><strong>IIIF image view</strong> - click the button on the left to draw a rectangle
+to mark the desired area.</p></li>
+<li><p><strong>Annotation</strong> - enter a description</p></li>
+<li><p><strong>Entity</strong> - link to an entity</p></li>
 </ul>
 <p>Be aware that the <strong>Entity</strong> selection only offers entities that are already
-linked to the file. This is to guarantee that the entity is also linked via
-the model (which the image annotation is not part of).</p>
+linked to the file. This guarantees that each selectable entity is also
+linked to the file via the model. Immage annotation does not create new
+model links in the background!</p>
 </section>
 </section>
 

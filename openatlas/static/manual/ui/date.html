@@ -93,29 +93,30 @@
 <div class="toctree-wrapper compound">
 </div>
 <p>CIDOC based OpenAtlas shortcuts: OA8 (begins in) and OA9 (ends in)</p>
-<p>Date input fields in forms are initially hidden and can be shown with
-clicking on <strong>Show</strong> beside the <strong>Date</strong> label.</p>
-<p>To manage uncertainty in time up to 4 dates can be used: a time span for the
-beginning and a time span for the ending. You find detailed examples here:
+<p>Date input fields in forms are initially hidden and can be shown after
+clicking on the <strong>Show</strong> button next to the <strong>Date</strong> label.</p>
+<p>To manage uncertainty in time up to four dates can be used: a time span for the
+beginning with start and end date as well as and a time span for the end,
+also with a beginning and end date. Find detailed examples here:
 <a class="reference internal" href="../examples/time_spans.html"><span class="doc">Time Spans</span></a></p>
 <img alt="../_images/date1.png" src="../_images/date1.png" />
 <p><strong>Exact date</strong></p>
-<p>For example if you knew the exact birth of an actor you could enter
-<strong>1356-12-23</strong> in the first row.</p>
+<p>If you know the exact birth of an actor you could enter
+<strong>1356-12-23</strong> in the first row of the date field.</p>
 <p><strong>Time span</strong></p>
-<p>If you are unsure e.g when a Church was destroyed you could use both end
-dates. Chose a wide enough
-span where you are sure it had happened, e.g. the fist decade of 1800.</p>
-<ul class="simple">
-<li><p>enter in the first end year: <strong>1800</strong></p></li>
-<li><p>enter in the second end year: <strong>1809</strong></p></li>
-</ul>
-<p>Missing days and months are filled out so that the result will be
-<strong>1800-01-01</strong> to <strong>1809-12-31</strong>.</p>
+<p>If you are unsure when e.g. a Church was destroyed, you can use both end
+dates to enter a timespan. Chose a wide enough range to make sure the event
+lies in between those dates with 100% certainty. So, to record a date within
+the fist decade of 1800, enter:
+* <strong>1800</strong> into the first end row of the date field
+* <strong>1809</strong> into the second end row of the date field</p>
+<p>Days and months are filled in automatically if not stated by you. The result
+will therefor be <strong>1800-01-01</strong> to <strong>1809-12-31</strong>.</p>
 <p><strong>Autocomplete dates</strong></p>
-<p>If not an exact date was entered, the system automatically creates
-a <strong>time span</strong>. For example, if only the first year is entered, it will be
-converted to a timespan of this year. For example:</p>
+<p>If a date but not an exact date was entered into the form, the system
+automatically creates a <strong>time span</strong>. For example, if only a year is
+entered in the first row, a timespan of this year will be saved.
+For example:</p>
 <ul class="simple">
 <li><p><strong>800</strong> will generate: <strong>800-1-1</strong> to <strong>800-12-31</strong>.</p></li>
 <li><p><strong>800-5</strong> will generate <strong>800-5-1</strong> to <strong>800-5-31</strong></p></li>
@@ -125,10 +126,12 @@ converted to a timespan of this year. For example:</p>
 <li><p><strong>Year</strong>: -4713 to 9999 but not zero</p></li>
 <li><p><strong>Month</strong>: 1 to 12</p></li>
 <li><p><strong>Day</strong>: 1 to 31</p></li>
-<li><p><strong>Comment</strong>: a text field for additional information for begin or end</p></li>
+<li><p><strong>Comment</strong>: add additional information for begin or end</p></li>
 </ul>
-<p>Additional fields if the time module is activated in <a class="reference internal" href="../tools/profile.html"><span class="doc">Profile</span></a> or
-a time was already entered:</p>
+<p>Additional fields for hour, minute and second appear if the time module is
+activated in the <a class="reference internal" href="../tools/profile.html"><span class="doc">Profile</span></a> or if that information was already
+entered for that entity:</p>
+<p>Possible values:</p>
 <ul class="simple">
 <li><p><strong>Hour</strong>: 0 to 23</p></li>
 <li><p><strong>Minute</strong>: 0 to 59</p></li>
@@ -139,7 +142,8 @@ a time was already entered:</p>
 year or similar. Most limitations come from the database
 <a class="reference external" href="https://www.postgresql.org/">PostgreSQL</a> which in turn uses the
 <a class="reference external" href="https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar">Proleptic Gregorian calendar</a>.
-So there is no year zero (one year before year 1 is the year 1 BC).</p>
+So there is no year zero (one year before year 1 is the year 1 BC) and dates
+before the year 4713 BC can not be recorded.</p>
 </section>
 
 
