@@ -489,11 +489,20 @@ def orphans() -> str:
             table=Table(['name', 'size', 'date', 'ext'])),
         'orphaned_annotations': Tab(
             'orphaned_annotations',
-            table=Table(['image', 'entity', 'annotation', 'creation'])),
+            table=Table(
+                ['image', 'entity', 'annotation', 'creation'],
+                get_orphaned_annotations())),
         'orphaned_subunits': Tab(
             'orphaned_subunits',
-            table=Table([
-                'id', 'name', 'class', 'created', 'modified', 'description'])),
+            table=Table(
+                ['id', 'name', 'class', 'created', 'modified', 'description'],
+                [[
+                    e.id,
+                    e.name,
+                    e.class_.label,
+                    format_date(e.created),
+                    format_date(e.modified),
+                    e.description] for e in orphaned_subunits()])),
         'circular': Tab(
             'circular_dependencies',
             table=Table(
@@ -513,7 +522,6 @@ def orphans() -> str:
                 format_date(entity.modified),
                 entity.description])
 
-    # Orphaned file entities with no corresponding file
     entity_file_ids = []
     for entity in Entity.get_by_class('file', types=True):
         entity_file_ids.append(entity.id)
@@ -527,81 +535,12 @@ def orphans() -> str:
                 format_date(entity.modified),
                 entity.description])
 
-    # Orphaned files with no corresponding entity
-    for file in app.config['UPLOAD_PATH'].iterdir():
-        if file.name != '.gitignore' \
-                and os.path.isfile(file) \
-                and file.stem.isdigit() \
-                and int(file.stem) not in entity_file_ids:
-            confirm = _('Delete %(name)s?', name=file.name.replace("'", ''))
-            tabs['orphaned_files'].table.rows.append([
-                file.stem,
-                convert_size(file.stat().st_size),
-                format_date(datetime.fromtimestamp(file.stat().st_ctime)),
-                file.suffix,
-                link(_('download'), url_for('download', filename=file.name)),
-                link(
-                    _('delete'),
-                    url_for('admin_file_delete', filename=file.name),
-                    js=f"return confirm('{confirm}')")
-                if is_authorized('editor') else ''])
+    tabs['orphaned_files'].table.rows = \
+        get_files_without_entity(entity_file_ids)
 
-    # Orphaned IIIF files with no corresponding entity
     if check_iiif_activation():
-        for file in Path(g.settings['iiif_path']).iterdir():
-            confirm = _('Delete %(name)s?', name=file.name.replace("'", ''))
-            if file.name != '.gitignore' \
-                    and os.path.isfile(file) \
-                    and file.stem.isdigit() \
-                    and int(file.stem) not in entity_file_ids:
-                tabs['orphaned_iiif_files'].table.rows.append([
-                    file.stem,
-                    convert_size(file.stat().st_size),
-                    format_date(datetime.fromtimestamp(file.stat().st_ctime)),
-                    file.suffix,
-                    link(
-                        _('delete'),
-                        url_for('admin_file_iiif_delete', filename=file.name),
-                        js=f"return confirm('{confirm}')")
-                    if is_authorized('editor') else ''])
-
-    # Orphaned annotations
-    for annotation in Annotation.get_orphaned_annotations():
-        file = Entity.get_by_id(annotation.image_id)
-        entity = Entity.get_by_id(annotation.entity_id)
-        tabs['orphaned_annotations'].table.rows.append([
-            link(file),
-            link(entity),
-            annotation.text,
-            annotation.created,
-            link(
-                _('relink entity'),
-                url_for(
-                    'admin_annotation_relink',
-                    image_id=file.id,
-                    entity_id=entity.id),
-                js=f"return confirm('{_('relink entity')}?')"),
-            link(
-                _('remove entity'),
-                url_for(
-                    'admin_annotation_remove_entity',
-                    annotation_id=annotation.id,
-                    entity_id=entity.id),
-                js=f"return confirm('{_('remove entity')}?')"),
-            link(
-                _('delete annotation'),
-                url_for('admin_annotation_delete', id_=annotation.id),
-                js=f"return confirm('{_('delete annotation')}?')")])
-
-    # Orphaned subunits (without connection to a P46 super)
-    for entity in orphaned_subunits():
-        tabs['orphaned_subunits'].table.rows.append([
-            entity.id,
-            entity.name,
-            entity.class_.label,
-            format_date(entity.created),
-            format_date(entity.modified),
-            entity.description])
+        tabs['orphaned_iiif_files'].table.rows = \
+            get_iiif_files_without_entity(entity_file_ids)
 
     for tab in tabs.values():
         if not tab.table.rows:
@@ -894,3 +833,77 @@ def count_files_to_convert() -> int:
 
 def count_files_to_delete() -> int:
     return len([id_ for id_ in g.files if check_iiif_file_exist(id_)])
+
+
+def get_files_without_entity(entity_file_ids: list[int]) -> list[Any]:
+    rows = []
+    for file in app.config['UPLOAD_PATH'].iterdir():
+        if file.name != '.gitignore' \
+                and os.path.isfile(file) \
+                and file.stem.isdigit() \
+                and int(file.stem) not in entity_file_ids:
+            confirm = _('Delete %(name)s?', name=file.name.replace("'", ''))
+            rows.append([
+                file.stem,
+                convert_size(file.stat().st_size),
+                format_date(datetime.fromtimestamp(file.stat().st_ctime)),
+                file.suffix,
+                link(_('download'), url_for('download', filename=file.name)),
+                link(
+                    _('delete'),
+                    url_for('admin_file_delete', filename=file.name),
+                    js=f"return confirm('{confirm}')")
+                if is_authorized('editor') else ''])
+    return rows
+
+
+def get_iiif_files_without_entity(entity_file_ids: list[int]) -> list[Any]:
+    rows = []
+    for file in Path(g.settings['iiif_path']).iterdir():
+        confirm = _('Delete %(name)s?', name=file.name.replace("'", ''))
+        if file.name != '.gitignore' \
+                and os.path.isfile(file) \
+                and file.stem.isdigit() \
+                and int(file.stem) not in entity_file_ids:
+            rows.append([
+                file.stem,
+                convert_size(file.stat().st_size),
+                format_date(datetime.fromtimestamp(file.stat().st_ctime)),
+                file.suffix,
+                link(
+                    _('delete'),
+                    url_for('admin_file_iiif_delete', filename=file.name),
+                    js=f"return confirm('{confirm}')")
+                if is_authorized('editor') else ''])
+    return rows
+
+
+def get_orphaned_annotations() -> list[Any]:
+    rows = []
+    for annotation in Annotation.get_orphaned_annotations():
+        file = Entity.get_by_id(annotation.image_id)
+        entity = Entity.get_by_id(annotation.entity_id)
+        rows.append([
+            link(file),
+            link(entity),
+            annotation.text,
+            annotation.created,
+            link(
+                _('relink entity'),
+                url_for(
+                    'admin_annotation_relink',
+                    image_id=file.id,
+                    entity_id=entity.id),
+                js=f"return confirm('{_('relink entity')}?')"),
+            link(
+                _('remove entity'),
+                url_for(
+                    'admin_annotation_remove_entity',
+                    annotation_id=annotation.id,
+                    entity_id=entity.id),
+                js=f"return confirm('{_('remove entity')}?')"),
+            link(
+                _('delete annotation'),
+                url_for('admin_annotation_delete', id_=annotation.id),
+                js=f"return confirm('{_('delete annotation')}?')")])
+    return rows
