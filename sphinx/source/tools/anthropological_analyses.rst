@@ -15,11 +15,11 @@ Sex estimation on the method published by *Ferembach et al. 1979*
 (D. Ferembach, I. Schwidetzky, and M. Stloukal, Empfehlungen für die
 Alters- und Geschlechtsdiagnose am Skelett. Homo 30, 1979, 1-32).
 
-For this method, features of the bones, primarily in the skull and pelvis, are
-examined. In addition to the features proposed in Ferembach et al. possibilities
-to assess the margo supramastoideus, os sacrum, and the robustness of the
-humerus and femur were supplemented. Therefore, the following features can be
-accessed:
+Features of the bones, primarily in the skull and pelvis, are
+examined when following this method. In addition to the features proposed in
+Ferembach et al. possibilities to assess the margo supramastoideus, os
+sacrum, and the robustness of the humerus and femur were supplemented.
+Therefore, the following features can be accessed:
 
 **Skull**
 
@@ -75,8 +75,8 @@ value (W) are given:
 * **male** 2
 * **not preserved** (no assigned value)
 
-The product is then divided by the sum of the weighting values used.
-The result is called sex ratio and can take values between -2 and 2.
+The product of all features is then divided by the sum of the weighting values
+used. The result is called sex ratio and can take values between -2 and 2.
 The following types are assigned:
 
 * -2 to -0.7: 		**female**

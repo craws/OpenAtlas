@@ -106,26 +106,30 @@
 <div class="toctree-wrapper compound">
 </div>
 <p>The interactive map (based on <a class="reference external" href="https://leafletjs.com/">Leaflet</a>) is a tool
-to present and enter the location of places. <a class="reference external" href="https://postgis.net/">PostGIS</a>
-is used for creating and manipulating spatial data.</p>
+to present and enter a place’s location.
+<a class="reference external" href="https://postgis.net/">PostGIS</a> is used for creating and manipulating
+spatial data.</p>
 <section id="navigation">
 <h2>Navigation<a class="headerlink" href="#navigation" title="Permalink to this heading"></a></h2>
 <ul class="simple">
-<li><p>You can zoom in/out with the mousewheel or the <strong>+</strong>/<strong>-</strong> buttons in the
-upper left corner.</p></li>
-<li><p>You can drag the content with the mouse (left click and hold)</p></li>
-<li><p>Change the basemap at the layer button in the upper right corner.</p></li>
-<li><p>Switch to full screen with the rectangle in the upper left.</p></li>
+<li><p>Zoom in/out of the map by using your mousewheel or the <strong>+</strong>/<strong>-</strong>
+buttons in the upper left corner</p></li>
+<li><p>Drag the content with the mouse (left click and hold)</p></li>
+<li><p>Change the basemap by using layer button in the upper right corner</p></li>
+<li><p>Switch to full screen with the rectangle in the upper left corner</p></li>
 </ul>
 </section>
 <section id="search">
 <h2>Search<a class="headerlink" href="#search" title="Permalink to this heading"></a></h2>
-<p>With the magnifying glass icon in the upper left you can search for (current)
-places at <a class="reference external" href="https://www.geonames.org/">GeoNames</a>.</p>
+<p>Press the magnifying glass icon on the left side to search for
+a places. The search filters data on
+<a class="reference external" href="https://www.geonames.org/">GeoNames</a> and provides a list of places with
+the same name. Choosing the desired places allows to import the geonames ID
+and/or the coordinates of said place into the OpenAtlas place form (see below).</p>
 </section>
 <section id="wkt-import">
 <h2>WKT import<a class="headerlink" href="#wkt-import" title="Permalink to this heading"></a></h2>
-<p>With the <img alt="edit" src="../_images/edit.png" /> icon a WKT text can be imported.
+<p>With the <img alt="edit" src="../_images/edit.png" /> icon WKT text can be imported.
 Clicking this button will open a new popup where a WKT geometry can be entered.
 If the geometry is valid, the <strong>draw geometry</strong> button will be enabled. By
 clicking this button the geometry will be drawn on the map and the respective
@@ -139,33 +143,32 @@ geometry popup will open to enter <em>title</em> and <em>description</em> for th
 </section>
 <section id="adding-new-geometries">
 <h2>Adding new geometries<a class="headerlink" href="#adding-new-geometries" title="Permalink to this heading"></a></h2>
-<p>When in insert or update mode of a place you have following options available
-(can be combined):</p>
+<p>When in insert or update mode of a place you have the following options
+(more than one can be used):</p>
 <ul class="simple">
-<li><p>Set a marker/point at the position where the physical thing is located.</p></li>
-<li><p>Draw a line connected to a physical objects spatial characteristics, e.g.
-the course of a road.</p></li>
-<li><p>Draw the shape of a physical thing if the precise extend is known.</p></li>
-<li><p>Draw the area in which the physical thing is located. E.g. if its precise
-shape is not known but known to be within a certain area.</p></li>
+<li><p>Set a marker/point at the position where the physical thing is located</p></li>
+<li><p>Draw a line connected to a physical object’s spatial characteristics, e.g.
+the course of a road or the bed of a river</p></li>
+<li><p>Draw the shape of a physical thing if the precise extend is known</p></li>
+<li><p>Draw an area in which the physical thing is located with 100% certainty</p></li>
 </ul>
 </section>
 <section id="id1">
 <h2>GeoNames<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h2>
-<p>The <em>GeoNames ID</em> field can either be manually entered or imported from a map
-search result.</p>
-<p>The checkbox <strong>exact match</strong> can be used if there is a high
-degree of confidence that the concepts can be used interchangeably. By default
-it is a <strong>close match</strong>, which means that the concepts are sufficiently similar
+<p>The <em>GeoNames ID</em> field can either be entered manually or imported
+from the map’s search result</p>
+<p><strong>Exact match</strong> should be used if there is a high degree of confidence that
+the concepts can be used interchangeably. By default it is a
+<strong>close match</strong>, which means that the concepts are sufficiently similar
 that they can be used interchangeably in some information retrieval
 applications. Please refer to <a class="reference external" href="https://www.w3.org/TR/skos-reference/">SKOS</a>
 for further information.</p>
 </section>
 <section id="map-overlay">
 <h2>Map Overlay<a class="headerlink" href="#map-overlay" title="Permalink to this heading"></a></h2>
-<p>If you have the module map overlay activated in your <a class="reference internal" href="profile.html"><span class="doc">Profile</span></a>, added
+<p>If the module map overlay is activated in the <a class="reference internal" href="profile.html"><span class="doc">Profile</span></a> settings, added
 overlays for places will be visible on the map by default and can be toggled
-at map layer button at the upper right corner.</p>
+with the map layer button at the upper right corner.</p>
 <p>To insert new overlays (only available for editors and admins) go to the view
 of a specific place. After adding an image file in the file tab you can click
 <strong>link</strong> in the overlay column to enter coordinates (Easting and Northing) for:</p>
@@ -175,7 +178,7 @@ of a specific place. After adding an image file in the file tab you can click
 <li><p>bottom left corner</p></li>
 </ul>
 <p>of the image to position it on the map.
-The coordinates need to be in <strong>WGS84</strong> decimal degrees (EPSG 4326).</p>
+The coordinates have to be stated in <strong>WGS84</strong> decimal degrees (EPSG 4326).</p>
 </section>
 </section>
 

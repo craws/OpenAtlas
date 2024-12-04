@@ -10,52 +10,52 @@ How to manage multiple projects or case studies
 
 Tag: technical
 
-There are two main approaches how to deal with multiple projects or case
-studies.
+There are two main approaches on how to deal with multiple projects or case
+studies:
 
 Multiple instances
 ******************
 
-If every project has their own instance (installation) of OpenAtlas than you
+If every project has their own instance (installation) of OpenAtlas then you
 don't have to worry about separating the data later. But it would also mean
 that data can't be used together, at least not directly.
 
 Shared instance
 ***************
 
-Projects (or case studies) can use the same instance which can be especially
-useful if they share data, e.g. information about places or persons.
+Projects (or case studies) can use the same instance which can be useful if
+they share data, such as information about places or persons.
 
 For data separation a custom :doc:`/entity/type` can be created,
 usually called **Case study**, which can be:
 
-* attached to multiple classes (probably most of them)
-* set to **multiple** use so that e.g. a place can be part of multiple case
+* Attached to multiple classes (probably most of them)
+* Set to **multiple** use so that a place can be part of multiple case
   studies
-* set to **required** so that users don't forget to enter it
+* Set to **required** so that users don't forget to choose at least one
 
 Later on, e.g. when running analyses or developing a presentation site for one
-case study, this type can be used to separate the data via the
-:doc:`/technical/api`.
+case study, data can be filtered by case studies to separate the data sets
+via the :doc:`/technical/api`.
 
 How does data access work
 -------------------------
 Tag: design decision
 
-In OpenAtlas it can be chosen if and when to make data public but:
+If and when data saved in OpenAtlas is shared can be chosen at any point, but:
 
 * All registered users have access to all model data
 * Either **all** data is made public via the :doc:`/technical/api` or **none**
-* Presentation sites can filter which data (e.g. which case study) to show
+* Presentation sites can filter which data (e.g. which case study) is shown
   via the API
 * Showing images is a special case because it also depends on licenses and the
   :doc:`/admin/iiif` server
 
 There is no option (or plans to add one) to **hide** parts of the data for
-specific users. Reasons for this is that it would conflict with one of our core
-values (open) but there are also practical reasons, e.g. to avoid duplicates.
-If a strict separation is needed, using multiple OpenAtlas instances would
-likely be a better alternative.
+specific users as that conflicts with one of our core value - to be open.
+Furthermore, there are practical reasons, e.g. to avoid duplicates.
+If a strict separation is needed, using multiple OpenAtlas instances might
+be a better solution.
 
 How to enter professions
 ------------------------
@@ -67,7 +67,7 @@ them to a group.
 This group consists of people with the same profession. Say you want to
 enter our lead developer Alex into the database: create a group named
 ‘OpenAtlas’ and connect him to that group in the respective form. Here you
-can also pick the role he has in that group from a list of types. For a more
+can pick the role he has in that group from a list of types. For a more
 detailed tutorial on how to enter professions, have a look
 :doc:`here</examples/profession>`.
 
@@ -75,31 +75,31 @@ detailed tutorial on how to enter professions, have a look
 
 How to make files available for the public
 ------------------------------------------
-In case it is planned to share files with the public, e.g. at a presentation
-site or a public archive, several criteria have to be met.
+If you plan on sharing files with the public, e.g. on a presentation
+site or a public archive, several criteria have to be met:
 
 Criteria checked by the software
 ********************************
 * The file must exist
 * A license has to be specified
-* It has to be marked with **public sharing allowed**
+* The file has to be marked with **public sharing allowed**
 
-In case these criteria aren't met, a file won't be:
+In case these criteria aren't met, a file:
 
-* Shared via the :doc:`/technical/api`
-* Won't show up on presentation sites developed by the OpenAtlas team
-* Won't be included in case the long time archiving
-  system `ARCHE <https://arche.acdh.oeaw.ac.at/>`_ is used
+* Will not be shared via the :doc:`/technical/api`
+* Will not show up on presentation sites developed by the OpenAtlas team
+* Will not be included in long-term archiving via
+  `ARCHE <https://arche.acdh.oeaw.ac.at/>`_
 
-But be aware that although the file itself won't be shared, the file
-information (e.g. filename) will still be available (e.g. shown on a
+Be aware that although the file itself won't be shared, the file
+information (such as filenames, etc.) will still be available (e.g. shown on a
 presentation site).
 
-At **file** -> **list** at the top you find counts for:
+At **file** -> **list** you find counts for:
 
-* public files
-* public files with a missing license
-* public files with a license but without creator (which many licenses require)
+* Public files
+* Public files with a missing license
+* Public files with a license but without creator (which many licenses require)
 
 Criteria checked by users
 *************************
@@ -121,15 +121,15 @@ Tag: design decision
 
 A free text entry field would lead to lots of unstructured data.
 Unstructured data can not be processed automatically and would result in it
-not being presented nor searchable in the OpenAtlas system as well as in a
-presentation site that presents your data. Therefore, we made the decision, not
-to include free text types into the OpenAtlas system. Solutions to this problem
-are very case specific, but you could:
+neither being presented nor searchable in the OpenAtlas system as well as in a
+presentation site. Therefore, we made the decision, not to include free text
+types into the OpenAtlas system. Solutions to this problem are very case
+specific, but you could:
 
-* use the already provided description fields to enter any type of free text
-  (keep in mind that this also comes with restrictions on how to present this
-  data at a presentation site)
-* create a new tree of project specific types for as many cases as possible
+* Use the provided description field to enter any type of free text
+  (keep in mind that this also comes with restrictions on how to present the
+  data on a presentation site)
+* Create a new tree of project specific types for as many cases as possible
   and structure your data with them – for a step by step tutorial how to
   create new types, click :doc:`here</examples/types>`.
 
@@ -148,9 +148,8 @@ be used by other systems via the :doc:`/technical/api`, and these systems are
 not necessarily able to handle these formats.
 
 Another reason is that these formats might change over time. All in all it is
-more important for us that acquired data is as interoperable, as long as
+more important that acquired data is as interoperable for as long as
 possible.
 
-Of course the situation is different for e.g. presentation sites for OpenAtlas
-data. There it would be possible to e.g. add manual formatted texts where
-needed.
+For presentation sites and the alike it is possible to add e.g. manually
+formatted texts, etc. where needed.
