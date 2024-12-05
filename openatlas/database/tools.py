@@ -15,4 +15,4 @@ def get_sex_types(id_: int) -> list[dict[str, Any]]:
             AND e.name != 'Radiocarbon';
         """,
         {'id': id_})
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)

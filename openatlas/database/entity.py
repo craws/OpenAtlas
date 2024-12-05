@@ -6,11 +6,11 @@ from flask import g
 def get_by_id(
         id_: int,
         types: bool = False,
-        aliases: bool = False) -> Optional[dict[str, Any]]:
+        aliases: bool = False) -> dict[str, Any]:
     g.cursor.execute(
         select_sql(types, aliases) + ' WHERE e.id = %(id)s GROUP BY e.id;',
         {'id': id_})
-    return dict(g.cursor.fetchone()) if g.cursor.rowcount else None
+    return g.cursor.fetchone()
 
 
 def get_by_ids(
@@ -22,7 +22,7 @@ def get_by_ids(
     g.cursor.execute(
         select_sql(types, aliases) + ' WHERE e.id IN %(ids)s GROUP BY e.id ',
         {'ids': tuple(ids)})
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_by_project_id(project_id: int) -> list[dict[str, Any]]:
@@ -49,7 +49,7 @@ def get_by_project_id(project_id: int) -> list[dict[str, Any]]:
         GROUP BY e.id, ie.origin_id;
         """,
         {'id': project_id})
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_by_class(
@@ -60,7 +60,7 @@ def get_by_class(
         select_sql(types, aliases) +
         ' WHERE e.openatlas_class_name IN %(class)s GROUP BY e.id;',
         {'class': tuple(classes if isinstance(classes, list) else [classes])})
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_by_cidoc_class(
@@ -71,7 +71,7 @@ def get_by_cidoc_class(
         select_sql(types, aliases) +
         'WHERE e.cidoc_class_code IN %(codes)s GROUP BY e.id;',
         {'codes': tuple(code if isinstance(code, list) else [code])})
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_overview_counts(classes: list[str]) -> dict[str, int]:
@@ -83,7 +83,7 @@ def get_overview_counts(classes: list[str]) -> dict[str, int]:
         GROUP BY openatlas_class_name;
         """,
         {'classes': tuple(classes)})
-    return {row['name']: row['count'] for row in g.cursor.fetchall()}
+    return {row['name']: row['count'] for row in list(g.cursor)}
 
 
 def get_overview_counts_by_type(
@@ -98,7 +98,7 @@ def get_overview_counts_by_type(
         GROUP BY openatlas_class_name;
         """,
         {'ids': tuple(ids), 'classes': tuple(classes)})
-    return {row['name']: row['count'] for row in g.cursor.fetchall()}
+    return {row['name']: row['count'] for row in list(g.cursor)}
 
 
 def get_latest(classes: list[str], limit: int) -> list[dict[str, Any]]:
@@ -111,7 +111,7 @@ def get_latest(classes: list[str], limit: int) -> list[dict[str, Any]]:
         DESC LIMIT %(limit)s;
         """,
         {'codes': tuple(classes), 'limit': limit})
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_all_entities() -> list[dict[str, Any]]:
@@ -139,7 +139,7 @@ def get_all_entities() -> list[dict[str, Any]]:
                 AS end_to
         FROM model.entity e;
         """)
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def insert(data: dict[str, Any]) -> int:
@@ -269,7 +269,7 @@ def search(
         ORDER BY e.name;
         """,
         {'term': f'%{term}%', 'user_id': user_id, 'classes': tuple(classes)})
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def link(data: dict[str, Any]) -> int:
@@ -317,7 +317,7 @@ def get_file_info() -> dict[int, dict[str, Any]]:
         row['entity_id']: {
             'public': row['public'],
             'license_holder': row['license_holder'],
-            'creator': row['creator']} for row in g.cursor.fetchall()}
+            'creator': row['creator']} for row in list(g.cursor)}
 
 
 def get_subunits_without_super(classes: list[str]) -> list[int]:
@@ -329,7 +329,7 @@ def get_subunits_without_super(classes: list[str]) -> list[int]:
         WHERE e.openatlas_class_name IN %(classes)s;
         """,
         {'classes': tuple(classes)})
-    return [row['id'] for row in g.cursor.fetchall()]
+    return [row[0] for row in list(g.cursor)]
 
 
 def get_roots(
@@ -380,7 +380,7 @@ def get_roots(
     return {
         row['start_node']: {
             'id': row['top_level'],
-            'name': row['name']} for row in g.cursor.fetchall()}
+            'name': row['name']} for row in list(g.cursor)}
 
 
 def get_linked_entities_recursive(
@@ -404,11 +404,11 @@ def get_linked_entities_recursive(
             ) SELECT {first} FROM items;
         """,
         {'id_': id_, 'code': tuple(codes) if codes else ''})
-    return [row[first] for row in g.cursor.fetchall()]
+    return [row[0] for row in list(g.cursor)]
 
 
 def get_links_of_entities(
-        entities: int | list[int],
+        ids: int | list[int],
         codes: str | list[str] | None,
         inverse: bool = False) -> list[dict[str, Any]]:
     sql = f"""
@@ -441,10 +441,9 @@ def get_links_of_entities(
         ORDER BY e.name;"""
     g.cursor.execute(
         sql, {
-            'entities': tuple(
-                entities if isinstance(entities, list) else [entities]),
+            'entities': tuple(ids if isinstance(ids, list) else [ids]),
             'codes': tuple(codes) if codes else ''})
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def delete_reference_system_links(entity_id: int) -> None:
@@ -462,23 +461,23 @@ def delete_reference_system_links(entity_id: int) -> None:
 def get_linked_entities(id_: int, codes: list[str]) -> list[int]:
     g.cursor.execute(
         """
-        SELECT range_id AS result_id
+        SELECT range_id
         FROM model.link
         WHERE domain_id = %(id_)s AND property_code IN %(codes)s;
         """,
         {'id_': id_, 'codes': tuple(codes)})
-    return [row['result_id'] for row in g.cursor.fetchall()]
+    return [row[0] for row in list(g.cursor)]
 
 
 def get_linked_entities_inverse(id_: int, codes: list[str]) -> list[int]:
     g.cursor.execute(
         """
-        SELECT domain_id AS result_id
+        SELECT domain_id
         FROM model.link
         WHERE range_id = %(id_)s AND property_code IN %(codes)s;
         """,
         {'id_': id_, 'codes': tuple(codes)})
-    return [row['result_id'] for row in g.cursor.fetchall()]
+    return [row[0] for row in list(g.cursor)]
 
 
 def delete_links_by_codes(

@@ -7,12 +7,13 @@ from tests.base import TestBaseCase, get_hierarchy, insert
 class RelationTests(TestBaseCase):
 
     def test_relation(self) -> None:
+        c = self.client
         with app.test_request_context():
             app.preprocess_request()
             actor = insert('person', 'Connor MacLeod')
             related = insert('person', 'The Kurgan')
 
-        rv = self.app.get(
+        rv = c.get(
             url_for(
                 'insert_relation',
                 origin_id=actor.id,
@@ -31,7 +32,7 @@ class RelationTests(TestBaseCase):
             'begin_year_to': '-1948',
             'end_year_from': '2049',
             'end_year_to': '2050'}
-        rv = self.app.post(
+        rv = c.post(
             url_for(
                 'insert_relation',
                 origin_id=actor.id,
@@ -40,17 +41,17 @@ class RelationTests(TestBaseCase):
             follow_redirects=True)
         assert b'The Kurgan' in rv.data
 
-        rv = self.app.get(url_for('view', id_=sub_id))
+        rv = c.get(url_for('view', id_=sub_id))
         assert b'Connor' in rv.data
 
-        rv = self.app.get(url_for('type_move_entities', id_=sub_id))
+        rv = c.get(url_for('type_move_entities', id_=sub_id))
         assert b'The Kurgan' in rv.data
 
         with app.test_request_context():
             app.preprocess_request()
             link_ = actor.get_links('OA7')[0]
 
-        rv = self.app.post(
+        rv = c.post(
             url_for('type_move_entities', id_=sub_id),
             data={
                 relation.id: relation.subs[1],
@@ -59,7 +60,7 @@ class RelationTests(TestBaseCase):
             follow_redirects=True)
         assert b'Entities were updated' in rv.data
 
-        rv = self.app.post(
+        rv = c.post(
             url_for('type_move_entities', id_=relation.subs[1]),
             data={
                 relation.id: '',
@@ -68,11 +69,10 @@ class RelationTests(TestBaseCase):
             follow_redirects=True)
         assert b'Entities were updated' in rv.data
 
-        rv = self.app.get(
-            url_for('link_update', id_=link_.id, origin_id=related.id))
+        rv = c.get(url_for('link_update', id_=link_.id, origin_id=related.id))
         assert b'Connor' in rv.data
 
-        rv = self.app.post(
+        rv = c.post(
             url_for('link_update', id_=link_.id, origin_id=actor.id),
             data={'description': 'There can be only one', 'inverse': True},
             follow_redirects=True)

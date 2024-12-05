@@ -1,5 +1,4 @@
 import os
-from typing import Any
 
 import pandas as pd
 from flask import url_for
@@ -13,104 +12,99 @@ from tests.base import ExportImportTestCase
 class ExportImportTest(ExportImportTestCase):
 
     def test_export(self) -> None:
-        assert b'Export SQL' in self.app.get(url_for('export_sql')).data
+        c = self.client
+        assert b'Export SQL' in c.get(url_for('export_sql')).data
 
         date_ = current_date_for_filename()
-        rv: Any = self.app.get(
+        rv = c.get(
             url_for('export_execute', format_='sql'),
             follow_redirects=True)
         assert b'Data was exported' in rv.data
 
-        rv = self.app.get(
-            url_for('download_sql', filename=f'{date_}_export.sql.7z'))
+        rv = c.get(url_for('download_sql', filename=f'{date_}_export.sql.7z'))
         assert b'7z' in rv.data
 
         date_ = current_date_for_filename()
-        rv = self.app.get(
+        rv = c.get(
             url_for('export_execute', format_='dump'),
             follow_redirects=True)
         assert b'Data was exported' in rv.data
 
-        rv = self.app.get(
-            url_for('download_sql', filename=f'{date_}_export.dump.7z'))
+        rv = c.get(url_for('download_sql', filename=f'{date_}_export.dump.7z'))
         assert b'7z' in rv.data
 
-        assert b'Warning' in self.app.get(url_for('sql_index')).data
-        assert b'execute' in self.app.get(url_for('sql_execute')).data
+        assert b'Warning' in c.get(url_for('sql_index')).data
+        assert b'execute' in c.get(url_for('sql_execute')).data
 
-        rv = self.app.post(
+        rv = c.post(
             url_for('sql_execute'),
             data={'statement': 'SELECT * FROM web.user;'})
         assert b'Alice' in rv.data
 
-        rv = self.app.post(url_for('sql_execute'), data={'statement': 'e'})
+        rv = c.post(url_for('sql_execute'), data={'statement': 'e'})
         assert b'syntax error' in rv.data
 
-        rv = self.app.get(url_for('import_project_insert'))
+        rv = c.get(url_for('import_project_insert'))
         assert b'name *' in rv.data
 
-        rv = self.app.post(
-            url_for('import_project_insert'),
-            data={'name': 'Project X'})
+        rv = c.post(url_for('import_project_insert'), data={'name': 'X-Files'})
         p_id = rv.location.split('/')[-1]
 
-        rv = self.app.get(url_for('import_project_update', id_=p_id))
+        rv = c.get(url_for('import_project_update', id_=p_id))
         assert b'name *' in rv.data
 
-        rv = self.app.post(
+        rv = c.post(
             url_for('import_project_update', id_=p_id),
-            data={'name': 'Project X', 'description': 'whoa!'},
+            data={'name': 'X-Files', 'description': 'whoa!'},
             follow_redirects=True)
         assert b'whoa!' in rv.data
 
-        rv = self.app.post(
-            url_for('import_project_insert'),
-            data={'name': 'Project X'})
+        rv = c.post(url_for('import_project_insert'), data={'name': 'X-Files'})
         assert b'The name is already in use' in rv.data
 
-        assert b'Project X' in self.app.get(url_for('import_index')).data
+        rv = c.get(url_for('import_index'))
+        assert b'X-Files' in rv.data
 
-        rv = self.app.get(
-            url_for('import_data', class_='person', project_id=p_id))
+        rv = c.get(url_for('import_data', class_='person', project_id=p_id))
         assert b'file *' in rv.data
 
         with open(self.test_path / 'bibliography.csv', 'rb') as file:
-            rv = self.app.post(
+            rv = c.post(
                 url_for('import_data', class_='bibliography', project_id=p_id),
                 data={'file': file, 'duplicate': True},
                 follow_redirects=True)
         assert b'OpenAtlas 2024' in rv.data
 
         with open(self.static_path / 'example.csv', 'rb') as file:
-            rv = self.app.post(
+            rv = c.post(
                 url_for('import_data', class_='place', project_id=p_id),
                 data={'file': file, 'duplicate': True},
                 follow_redirects=True)
         assert b'Vienna' in rv.data
 
         with open(self.static_path / 'example.csv', 'rb') as file:
-            rv = self.app.post(
+            rv = c.post(
                 url_for('import_data', class_='place', project_id=p_id),
                 data={'file': file, 'duplicate': True},
                 follow_redirects=True)
         assert b'IDs already in database' in rv.data
 
         with open(self.static_path / 'favicon.ico', 'rb') as file:
-            rv = self.app.post(
+            rv = c.post(
                 url_for('import_data', class_='place', project_id=p_id),
                 data={'file': file},
                 follow_redirects=True)
         assert b'File type not allowed' in rv.data
 
         with open(self.test_path / 'invalid_1.csv', 'rb') as file:
-            rv = self.app.post(
+            rv = c.post(
                 url_for('import_data', class_='source', project_id=p_id),
                 data={'file': file},
                 follow_redirects=True)
         assert b'missing name column' in rv.data
 
         with open(self.test_path / 'invalid_2.csv', 'rb') as file:
-            rv = self.app.post(
+            rv = c.post(
                 url_for('import_data', class_='place', project_id=p_id),
                 data={'file': file},
                 follow_redirects=True)
@@ -125,7 +119,7 @@ class ExportImportTest(ExportImportTestCase):
         assert b'double IDs in import' in rv.data
 
         with open(self.test_path / 'invalid_3.csv', 'rb') as file:
-            rv = self.app.post(
+            rv = c.post(
                 url_for('import_data', class_='place', project_id=p_id),
                 data={'file': file},
                 follow_redirects=True)
@@ -146,7 +140,7 @@ class ExportImportTest(ExportImportTestCase):
             self.test_path / 'invalid_3_modified.csv',
             index=False)
         with open(self.test_path / 'invalid_3_modified.csv', 'rb') as file:
-            rv = self.app.post(
+            rv = c.post(
                 url_for('import_data', class_='place', project_id=p_id),
                 data={'file': file},
                 follow_redirects=True)
@@ -158,7 +152,7 @@ class ExportImportTest(ExportImportTestCase):
             self.test_path / 'invalid_3_modified.csv',
             index=False)
         with open(self.test_path / 'invalid_3_modified.csv', 'rb') as file:
-            rv = self.app.post(
+            rv = c.post(
                 url_for('import_data', class_='place', project_id=p_id),
                 data={'file': file},
                 follow_redirects=True)
@@ -166,9 +160,8 @@ class ExportImportTest(ExportImportTestCase):
         (self.test_path / 'invalid_3_modified.csv').unlink()
 
     def test_export2(self) -> None:
-        rv = self.app.post(
-            url_for('import_project_insert'),
-            data={'name': 'Project X'})
+        c = self.client
+        rv = c.post(url_for('import_project_insert'), data={'name': 'X-Files'})
         p_id = rv.location.split('/')[-1]
         with app.test_request_context():
             app.preprocess_request()
@@ -199,7 +192,7 @@ class ExportImportTest(ExportImportTestCase):
             self.test_path / 'invalid_3_modified.csv',
             index=False)
         with open(self.test_path / 'invalid_3_modified.csv', 'rb') as file:
-            rv = self.app.post(
+            rv = c.post(
                 url_for('import_data', class_='place', project_id=p_id),
                 data={'file': file},
                 follow_redirects=True)
@@ -210,7 +203,7 @@ class ExportImportTest(ExportImportTestCase):
             self.test_path / 'invalid_3_modified.csv',
             index=False)
         with open(self.test_path / 'invalid_3_modified.csv', 'rb') as file:
-            rv = self.app.post(
+            rv = c.post(
                 url_for('import_data', class_='place', project_id=p_id),
                 data={'file': file},
                 follow_redirects=True)
@@ -221,7 +214,7 @@ class ExportImportTest(ExportImportTestCase):
             self.test_path / 'invalid_3_modified.csv',
             index=False)
         with open(self.test_path / 'invalid_3_modified.csv', 'rb') as file:
-            rv = self.app.post(
+            rv = c.post(
                 url_for('import_data', class_='place', project_id=p_id),
                 data={'file': file},
                 follow_redirects=True)
@@ -248,7 +241,7 @@ class ExportImportTest(ExportImportTestCase):
         data_frame.at[0, 'wkt'] = "POLYGON((16.1203 BLA, 16.606275))"
         data_frame.to_csv(self.test_path / 'example.csv', index=False)
         with open(self.test_path / 'example.csv', 'rb') as file:
-            rv = self.app.post(
+            rv = c.post(
                 url_for('import_data', class_='place', project_id=p_id),
                 data={'file': file, 'duplicate': True},
                 follow_redirects=True)
@@ -257,7 +250,7 @@ class ExportImportTest(ExportImportTestCase):
         assert b'Vienna' in rv.data
 
         with open(self.test_path / 'example.csv', 'rb') as file:
-            rv = self.app.post(
+            rv = c.post(
                 url_for('import_data', class_='source', project_id=p_id),
                 data={'file': file, 'duplicate': True},
                 follow_redirects=True)
@@ -274,35 +267,35 @@ class ExportImportTest(ExportImportTestCase):
         with open(
                 self.test_path / 'example_place_hierarchy.csv',
                 'rb') as file:
-            rv = self.app.post(
+            rv = c.post(
                 url_for('import_data', class_='place', project_id=p_id),
                 data={'file': file, 'duplicate': True},
                 follow_redirects=True)
             assert b'Bone' in rv.data
         (self.test_path / 'example_place_hierarchy.csv').unlink()
 
-        rv = self.app.get(url_for('import_project_view', id_=p_id))
+        rv = c.get(url_for('import_project_view', id_=p_id))
         assert b'London' in rv.data
 
-        rv = self.app.get(
+        rv = c.get(
             url_for('import_project_delete', id_=p_id),
             follow_redirects=True)
         assert b'Project deleted' in rv.data
 
         date_ = current_date_for_filename()
-        rv = self.app.get(
+        rv = c.get(
             url_for('delete_export', filename=f'{date_}_export.sql.7z'),
             follow_redirects=True)
         if os.name == 'posix':
             assert b'File deleted' in rv.data
 
-        rv = self.app.get(
+        rv = c.get(
             url_for('delete_export', filename=f'{date_}_export.dump.7z'),
             follow_redirects=True)
         if os.name == 'posix':
             assert b'File deleted' in rv.data
 
-        rv = self.app.get(
+        rv = c.get(
             url_for('delete_export', filename='non_existing'),
             follow_redirects=True)
         assert b'An error occurred when trying to delete the f' in rv.data

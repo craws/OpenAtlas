@@ -32,21 +32,22 @@ def get_annotation_image_by_id(id_: int) -> dict[str, Any]:
     g.cursor.execute(
         ANNOTATION_IMAGE_SELECT + ' WHERE id =  %(id)s;',
         {'id': id_})
-    return dict(g.cursor.fetchone()) if g.cursor.rowcount else {}
+    return g.cursor.fetchone()
+
 
 
 def get_annotation_text_by_id(id_: int) -> dict[str, Any]:
     g.cursor.execute(
         ANNOTATION_TEXT_SELECT + ' WHERE id =  %(id)s;',
         {'id': id_})
-    return dict(g.cursor.fetchone()) if g.cursor.rowcount else {}
+    return g.cursor.fetchone()
 
 
 def get_annotation_image_by_file(image_id: int) -> list[dict[str, Any]]:
     g.cursor.execute(
         ANNOTATION_IMAGE_SELECT + ' WHERE image_id =  %(image_id)s;',
         {'image_id': image_id})
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_annotation_text_by_source(source_id: int) -> list[dict[str, Any]]:
@@ -57,7 +58,7 @@ def get_annotation_text_by_source(source_id: int) -> list[dict[str, Any]]:
         ORDER BY link_start;
         """,
         {'source_id': source_id})
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_annotation_image_orphans() -> list[dict[str, Any]]:
@@ -76,7 +77,7 @@ def get_annotation_image_orphans() -> list[dict[str, Any]]:
             AND l.property_code = 'P67'
         WHERE l.id IS NULL AND a.entity_id IS NOT NULL
         """)
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def insert_annotation_image(data: dict[str, Any]) -> None:

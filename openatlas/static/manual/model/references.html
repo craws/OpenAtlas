@@ -109,14 +109,14 @@ link various entities to references.
 References can be:</p>
 <ul class="simple">
 <li><p>Documents (<a class="reference external" href="https://www.cidoc-crm.org/Entity/E31-Document/version-7.1">E31</a>) such as files, bibliographic
-entities or references like URLs, DOIs, etc.</p></li>
+entities, or references like URLs, DOIs, etc.</p></li>
 <li><p>Linguistic Objects (<a class="reference external" href="https://www.cidoc-crm.org/Entity/E33-Linguistic-Object/version-7.1">E33</a>) such as the
 content of a medieval charter</p></li>
 </ul>
 <p>In order to record which part of the document contains the respective reference
 a delimiter respectively a certain value to determine the position in the
-reference, is stored along with the link between the entities. This can be page
-numbers of a book, chapters, figure numbers etc.</p>
+reference, is stored along with the link between the entities. This can be
+a page numbers of a book, a chapter, a figure number, etc.</p>
 <img alt="../_images/references.png" src="../_images/references.png" />
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">E31</span><span class="p">(</span><span class="n">Document</span><span class="p">)</span> <span class="o">-</span> <span class="n">P67</span><span class="p">(</span><span class="n">refers</span> <span class="n">to</span><span class="p">)</span> <span class="o">-</span> <span class="n">E21</span><span class="p">(</span><span class="n">Person</span><span class="p">)</span> <span class="n">at</span> <span class="n">delimiter</span><span class="p">:</span> <span class="s2">&quot;Folio 7v&quot;</span>
 </pre></div>
@@ -134,8 +134,7 @@ a whole refers to the entity, no delimiter is necessary.</p>
 <p>Reference systems include sources such as vocabularies, gazetteers, etc.
 They are considered authority documents
 (<a class="reference external" href="https://www.cidoc-crm.org/Entity/E32-Authority-Document/version-7.1">E32</a>).</p>
-<p>Users can define a reference system respectively authority document by defining
-a name, class, and description.</p>
+<p>Users can define a reference system by defining a name, class, and description.</p>
 <p>Example:</p>
 <ul class="simple">
 <li><p>Name: <a class="reference external" href="http://geonames.org/">GeoNames</a></p></li>
@@ -147,8 +146,8 @@ place names that are available for download free of charge.</p></li>
 <p>OpenAtlas distinguishes between:</p>
 <ul class="simple">
 <li><p>Functional web resources, implemented via an API, etc.</p></li>
-<li><p>Non-digital respectively non-web-functional resources such as printed
-encyclopedia, card catalogs, inventory records, etc.</p></li>
+<li><p>Non-digital/non-web-functional resources such as printed encyclopedia,
+card catalogs, inventory records, etc.</p></li>
 </ul>
 <p>The link between an entity and the Authority Document is stored in the
 model.link table in the following way:</p>
@@ -156,12 +155,13 @@ model.link table in the following way:</p>
 <li><p>domain_id: ID of the Authority Document</p></li>
 <li><p>property_code: P67</p></li>
 <li><p>range_id: ID of the entity</p></li>
-<li><p>description: delimiter (alphanumeric)</p></li>
+<li><p>description: delimiter (alphanumerical)</p></li>
 </ul>
 <p>This combination of <a class="reference external" href="https://www.cidoc-crm.org/Entity/E32-Authority-Document/version-7.1">E32</a> and delimiter
-could furthermore be resolved as <a class="reference external" href="https://www.cidoc-crm.org/Entity/E31-Document/version-7.1">E31 Document</a> as
-it is a unique reference documenting the entity while the E32 alone is the
-container for all possible references from this authority document.</p>
+can be resolved as <a class="reference external" href="https://www.cidoc-crm.org/Entity/E31-Document/version-7.1">E31 Document</a> as it is a
+unique reference documenting the entity while the E32 by itself can be
+considered as container for all possible references from this authority
+document.</p>
 <img alt="../_images/reference_system.png" src="../_images/reference_system.png" />
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">E21</span><span class="p">(</span><span class="n">Person</span><span class="p">)</span> <span class="o">-</span> <span class="n">P67i</span><span class="p">(</span><span class="ow">is</span> <span class="n">referred</span> <span class="n">to</span> <span class="n">by</span><span class="p">)</span> <span class="o">-</span> <span class="n">E31</span><span class="p">(</span><span class="n">Document</span><span class="p">)</span> <span class="o">-</span> <span class="n">P71</span><span class="p">(</span><span class="ow">is</span> <span class="n">listed</span> <span class="ow">in</span><span class="p">)</span> <span class="o">-</span>
 <span class="n">E32</span><span class="p">(</span><span class="n">Authority</span> <span class="n">Document</span><span class="p">)</span>
@@ -174,25 +174,26 @@ container for all possible references from this authority document.</p>
 (<a class="reference external" href="https://www.cidoc-crm.org/Entity/E31-Document/version-7.1">E31 Document</a>)] is listed in
 (<a class="reference external" href="https://www.cidoc-crm.org/Property/P71-lists/version-7.1">P71i</a>)[<a class="reference external" href="https://www.wikidata.org/wiki/">WikiData</a>
 (<a class="reference external" href="https://www.cidoc-crm.org/Entity/E32-Authority-Document/version-7.1">E32</a>)]</p>
+<p>For more information on reference systems see the following links:
+<a class="reference internal" href="../examples/reference_systems.html"><span class="doc">References Systems</span></a> and <a class="reference internal" href="../entity/reference_system.html"><span class="doc">Reference System</span></a>.</p>
 </section>
 <section id="references-and-files">
 <h2>References and Files<a class="headerlink" href="#references-and-files" title="Permalink to this heading"></a></h2>
 <p>Various entities can be connected to files. This is mapped as:</p>
 <p><a class="reference external" href="https://www.cidoc-crm.org/Entity/E31-Document/version-7.1">E31</a> (Document = file) - refers to
 (<a class="reference external" href="https://www.cidoc-crm.org/Property/P67-refers-to/version-7.1">P67</a>) - <a class="reference external" href="https://www.cidoc-crm.org/Entity/E1-CRM-Entity/version-7.1">E1</a></p>
-<p>Files can refer to any of the “top level” entities and can
-(but need not necessarily) be images. Files are stored with a certain
+<p>Files can refer to any of the “top level” entities and can be
+(but don’t have to be) images. Files are stored with a certain
 system type (i.e. file). If the file is an image, this is most probably a
 depiction of the entity.</p>
-<p>A file can also have a further reference - e.g. the source where the file comes
-from. This can be a bibliographical reference to the publication
-where a file (e.g. a scanned image) is extracted from. In this case there is a
-link between a document <a class="reference external" href="https://www.cidoc-crm.org/Entity/E31-Document/version-7.1">E31</a> with a type
-“Bibliography” (or sub type) via <a class="reference external" href="https://www.cidoc-crm.org/Property/P67-refers-to/version-7.1">P67</a> to
+<p>A file can be linked to a reference, such as a bibliographical reference to
+the publication the file originates from.
+In this creates a link between a document <a class="reference external" href="https://www.cidoc-crm.org/Entity/E31-Document/version-7.1">E31</a>
+and a type “Bibliography” via <a class="reference external" href="https://www.cidoc-crm.org/Property/P67-refers-to/version-7.1">P67</a> to
 another document <a class="reference external" href="https://www.cidoc-crm.org/Entity/E31-Document/version-7.1">E31</a> with a system type “file”.
 In this case the file is not the depiction of the reference but the reference
 is the origin of the file. This is mostly needed to document the copyright
-respectively right holder or source of the file.</p>
+respectively right holder or source of a file.</p>
 </section>
 </section>
 

@@ -99,12 +99,11 @@ class Type(Entity):
         if new_type_id:  # A new type was selected
             if root.multiple:
                 cleaned_entity_ids = []
-                for entity in Entity.get_by_ids(entity_ids, types=True):
-                    if any(type_.id == int(new_type_id)
-                           for type_ in entity.types):
-                        delete_ids.append(entity.id)
-                    else:
-                        cleaned_entity_ids.append(entity.id)
+                for e in Entity.get_by_ids(entity_ids, types=True):
+                    if any(type_.id == int(new_type_id) for type_ in e.types):
+                        delete_ids.append(e.id)
+                        continue
+                    cleaned_entity_ids.append(e.id)
                 entity_ids = cleaned_entity_ids
             if entity_ids:
                 data = {
@@ -151,14 +150,14 @@ class Type(Entity):
                     type_.root[-1],
                     type_.root)
                 type_.category = hierarchies[type_.root[0]]['category']
-            else:
-                type_.category = hierarchies[type_.id]['category']
-                type_.multiple = hierarchies[type_.id]['multiple']
-                type_.required = hierarchies[type_.id]['required']
-                type_.directional = hierarchies[type_.id]['directional']
-                for class_ in g.classes.values():
-                    if class_.hierarchies and type_.id in class_.hierarchies:
-                        type_.classes.append(class_.name)
+                continue
+            type_.category = hierarchies[type_.id]['category']
+            type_.multiple = hierarchies[type_.id]['multiple']
+            type_.required = hierarchies[type_.id]['required']
+            type_.directional = hierarchies[type_.id]['directional']
+            for class_ in g.classes.values():
+                if class_.hierarchies and type_.id in class_.hierarchies:
+                    type_.classes.append(class_.name)
 
     @staticmethod
     def get_root_path(
@@ -175,16 +174,12 @@ class Type(Entity):
 
     @staticmethod
     def check_hierarchy_exists(name: str) -> list[Type]:
-        hierarchies = [
-            root for root in g.types.values()
-            if root.name == name and not root.root]
-        return hierarchies
+        return [x for x in g.types.values() if x.name == name and not x.root]
 
     @staticmethod
     def get_hierarchy(name: str) -> Type:
-        return [
-            root for root in g.types.values()
-            if root.name == name and not root.root][0]
+        return \
+            [x for x in g.types.values() if x.name == name and not x.root][0]
 
     @staticmethod
     def get_tree_data(

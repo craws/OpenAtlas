@@ -42,7 +42,7 @@ def get_all() -> list[dict[str, Any]]:
             rs.system,
             rs.entity_id;
         """)
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def add_classes(entity_id: int, class_names: list[str]) -> None:

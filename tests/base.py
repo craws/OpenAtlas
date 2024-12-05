@@ -15,21 +15,20 @@ class TestBaseCase(unittest.TestCase):
     def setUp(self) -> None:
         app.testing = True
         app.config.from_pyfile('testing.py')
-
         self.setup_database()
-        self.app = app.test_client()
-        app.app_context().push()  # Always provide app.app_context
-        self.app.post(
-            url_for('login'),
-            data={'username': 'Alice', 'password': 'test'})
-        with app.test_request_context():
-            app.preprocess_request()
-            self.alice_id = 2
-            self.precision_type = \
-                Type.get_hierarchy('External reference match')
-            self.test_path = Path(app.root_path).parent / 'tests'
-            self.static_path = Path(app.root_path) / 'static'
-        app.app_context().push()  # Push again for e.g. logged-in user
+        self.client = app.test_client()
+        with app.app_context():
+            self.client.post(
+                url_for('login'),
+                data={'username': 'Alice', 'password': 'test'})
+            with app.test_request_context():
+                app.preprocess_request()
+                self.alice_id = 2
+                self.precision_type = \
+                    Type.get_hierarchy('External reference match')
+                self.test_path = Path(app.root_path).parent / 'tests'
+                self.static_path = Path(app.root_path) / 'static'
+        app.app_context().push()
 
     def setup_database(self) -> None:
         connection = psycopg2.connect(
@@ -41,12 +40,12 @@ class TestBaseCase(unittest.TestCase):
         connection.autocommit = True
         self.cursor = connection.cursor()
         for file_name in [
-                '0_extensions',
-                '1_structure',
-                '2_data_model',
-                '3_data_web',
-                '4_data_type',
-                'data_test']:
+            '0_extensions',
+            '1_structure',
+            '2_data_model',
+            '3_data_web',
+            '4_data_type',
+            'data_test']:
             with open(
                     Path(app.root_path).parent / 'install' /
                     f'{file_name}.sql', encoding='utf8') as sql_file:
@@ -68,42 +67,21 @@ class ApiTestCase(TestBaseCase):
             self.cursor.execute(sql_file.read())
 
     @staticmethod
-    def get_bool(
-            data: dict[str, Any],
-            key: str,
-            value: Optional[str | list[Any]] = None) -> bool:
-        return bool(data[key] == value) if value else bool(data[key])
-
-    @staticmethod
-    def get_bool_inverse(data: dict[str, Any], key: str) -> bool:
-        return bool(not data[key])
-
-    @staticmethod
-    def get_no_key(data: dict[str, Any], key: str) -> bool:
-        return bool(key not in data.keys())
-
-    @staticmethod
-    def get_geom_properties(geom: dict[str, Any], key: str) -> bool:
-        return bool(geom['features'][0]['properties'][key])
-
-    @staticmethod
     def get_classes(data: list[dict[str, Any]]) -> bool:
-        return bool(
-            data[0]['systemClass']
-            and data[0]['crmClass']
-            and data[0]['view']
-            and data[0]['icon']
-            and data[0]['en'])
+        return (data[0]['systemClass']
+                and data[0]['crmClass']
+                and data[0]['view']
+                and data[0]['icon']
+                and data[0]['en'])
 
     @staticmethod
     def get_class_mapping(data: dict[str, Any], locale: str) -> bool:
-        return bool(
-            data['locale'] == locale
-            and data['results'][0]['systemClass']
-            and data['results'][0]['crmClass']
-            and data['results'][0]['view']
-            and data['results'][0]['icon']
-            and data['results'][0]['label'])
+        return (data['locale'] == locale
+                and data['results'][0]['systemClass']
+                and data['results'][0]['crmClass']
+                and data['results'][0]['view']
+                and data['results'][0]['icon']
+                and data['results'][0]['label'])
 
 
 class ExportImportTestCase(TestBaseCase):

@@ -28,9 +28,7 @@ def single_type_duplicates() -> list[dict[str, Any]]:
 
 
 def invalid_dates() -> list[Entity]:
-    return [
-        Entity.get_by_id(row['id'], types=True)
-        for row in date.invalid_dates()]
+    return [Entity.get_by_id(row['id'], True) for row in date.invalid_dates()]
 
 
 def orphans() -> list[Entity]:

@@ -101,17 +101,17 @@
 <div class="toctree-wrapper compound">
 </div>
 <p>This section is focused on how the <a class="reference internal" href="../ui/date.html"><span class="doc">Date</span></a> input fields work
-and how to put in time spans correctly.</p>
+and how to enter time spans correctly.</p>
 <section id="where-to-find-the-input-fields">
 <h2>Where to find the input fields<a class="headerlink" href="#where-to-find-the-input-fields" title="Permalink to this heading"></a></h2>
-<p><a class="reference internal" href="../ui/date.html"><span class="doc">Date</span></a> input fields can be found on the following:</p>
+<p><a class="reference internal" href="../ui/date.html"><span class="doc">Date</span></a> input fields can be found on the following forms:</p>
 <ul class="simple">
 <li><p>All forms connected to <a class="reference internal" href="../entity/event.html"><span class="doc">Events</span></a></p></li>
 <li><p>All forms connected to <a class="reference internal" href="../entity/actor.html"><span class="doc">Actors</span></a></p></li>
 <li><p>All forms connected to <a class="reference internal" href="../entity/type.html"><span class="doc">Types</span></a></p></li>
 <li><p><a class="reference internal" href="../entity/place.html"><span class="doc">Places</span></a></p></li>
 <li><p><a class="reference internal" href="../entity/feature.html"><span class="doc">Features</span></a></p></li>
-<li><p><a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Statigraphic Units</span></a></p></li>
+<li><p><a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Stratigraphic Units</span></a></p></li>
 <li><p><a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifacts</span></a></p></li>
 </ul>
 <p>It is not provided for the input of:</p>
@@ -133,12 +133,12 @@ field is initially hidden. It can be used by clicking the <strong>Show</strong> 
 <p>Begin and end each provide two lines for data entry. This can be used for
 entering precise, known data as well as for tracking time spans.</p>
 <p>The following values can be put in:
-* Year (YYYY) as four digits: -4713 to 9999, the year 0 is not allowed
-* Month (MM) as two digits: 1 to 12
-* Day (DD) as two digits: 1 to 31
-* Hour (hh) as two digits: 0 to 23
-* Minute (mm) as two digits: 0 to 59
-* Seconds (ss) as two digits: 0 to 59
+* Year (YYYY) as four digits: -4713 to 9999, <strong>the year 0 is not allowed</strong>
+* Month (MM) as two digits: 01 to 12
+* Day (DD) as two digits: 01 to 31
+* Hour (hh) as two digits: 00 to 23
+* Minute (mm) as two digits: 00 to 59
+* Seconds (ss) as two digits: 00 to 59
 * Comments as free text for additional information</p>
 <p>Years before the year 0 can be indicated by a preceding minus. Please note that
 years before the year 4713 BC (spelling -4713) cannot be entered at the moment
@@ -168,8 +168,8 @@ and 1648 - 10 - 24 into the first row of <strong>End</strong>.</p>
 <h3>Time spans<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
 <p>If dating is uncertain, time spans for the beginning, end or beginning and end
 of the time span can be given.
-This is possible via the four input fields of the date field - 2 for begin
-and to for end:</p>
+This is possible via the four input fields of the date field - two for begin
+and two for end:</p>
 <ul class="simple">
 <li><p>The first line represents the <strong>beginning of the begin</strong></p></li>
 <li><p>The second line represents the <strong>end of the begin</strong></p></li>
@@ -177,26 +177,28 @@ and to for end:</p>
 <li><p>The fourth line represents the <strong>ending of the end</strong></p></li>
 </ul>
 <p>In the case of unknown start and end dates, the time span must be selected
-large enough so that the actual time frame lies within the specified span with
-a 100 % certainty.</p>
+big enough to be sure the actual time frame lies within the specified
+span with a 100 % certainty.</p>
 <p>Example: The exact date of death of King Stephen I of Hungary is known - 15
 August 1038 AD - but for the date of birth only a time span from 01.01.975 AD
 to 31.12.975 AD can be given. As first input field corresponds to the earliest
 possible start of the time span, 975 - 01 - 01 should be entered. The second
 line corresponds to the latest possible end of the time span, in this case 975
-- 12 - 31.</p>
+- 12 - 31.
+As end 15 August 1038 can be stated in the third line (the fourth line will
+be filled automatically).</p>
 <img alt="../_images/date_stephen.png" src="../_images/date_stephen.png" />
 </section>
 </section>
 <section id="activate-hours-minutes-and-seconds">
 <h2>Activate hours, minutes, and seconds<a class="headerlink" href="#activate-hours-minutes-and-seconds" title="Permalink to this heading"></a></h2>
 <p>By default, years, months and days can be entered into the date input field.
-However, some projects might want to also track hours, minutes, and seconds.
+However, some projects might need to also track hours, minutes, and seconds.
 Those additional input fields can be activated in your
 <a class="reference internal" href="../tools/profile.html"><span class="doc">profile</span></a>. To do so click the <strong>gear</strong> and go to
 <strong>Profile</strong>. Here click <strong>Modules</strong>. Click on the <strong>Edit</strong> button and check
-<strong>“Time”</strong> to turn it on. You might have to refresh your page for it to show in
-the form.</p>
+<strong>Time</strong> to turn it on. You might have to refresh your form page afterwards
+(keyboard buttons ctrl + F5).</p>
 <img alt="../_images/date_hours.png" src="../_images/date_hours.png" />
 </section>
 </section>

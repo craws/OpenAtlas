@@ -13,7 +13,7 @@ def check_single_type_duplicates(ids: list[int]) -> list[int]:
         HAVING COUNT(*) > 1;
         """,
         {'ids': tuple(ids)})
-    return [row['domain_id'] for row in g.cursor.fetchall()]
+    return [row[0] for row in list(g.cursor)]
 
 
 def get_orphaned_subunits() -> list[dict[str, Any]]:
@@ -25,7 +25,7 @@ def get_orphaned_subunits() -> list[dict[str, Any]]:
         WHERE l.domain_id IS NULL
             AND e.openatlas_class_name IN ('feature', 'stratigraphic_unit')
         """)
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_orphans() -> list[dict[str, Any]]:
@@ -42,13 +42,13 @@ def get_orphans() -> list[dict[str, Any]]:
             AND e.cidoc_class_code != 'E55'
             AND e.openatlas_class_name != 'reference_system';
         """)
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_circular() -> list[dict[str, Any]]:
     g.cursor.execute(
         'SELECT domain_id FROM model.link WHERE domain_id = range_id;')
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_cidoc_links() -> list[dict[str, Any]]:
@@ -62,7 +62,7 @@ def get_cidoc_links() -> list[dict[str, Any]]:
         JOIN model.entity d ON l.domain_id = d.id
         JOIN model.entity r ON l.range_id = r.id;
         """)
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
 
 
 def get_invalid_links(data: dict[str, Any]) -> list[dict[str, int]]:
@@ -84,4 +84,4 @@ def get_invalid_links(data: dict[str, Any]) -> list[dict[str, int]]:
             AND r.cidoc_class_code = %(range_code)s;
         """,
         data)
-    return [dict(row) for row in g.cursor.fetchall()]
+    return list(g.cursor)
