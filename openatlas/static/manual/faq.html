@@ -105,48 +105,48 @@
 <section id="how-to-manage-multiple-projects-or-case-studies">
 <h2>How to manage multiple projects or case studies<a class="headerlink" href="#how-to-manage-multiple-projects-or-case-studies" title="Permalink to this heading"></a></h2>
 <p>Tag: technical</p>
-<p>There are two main approaches how to deal with multiple projects or case
-studies.</p>
+<p>There are two main approaches on how to deal with multiple projects or case
+studies:</p>
 <section id="multiple-instances">
 <h3>Multiple instances<a class="headerlink" href="#multiple-instances" title="Permalink to this heading"></a></h3>
-<p>If every project has their own instance (installation) of OpenAtlas than you
+<p>If every project has their own instance (installation) of OpenAtlas then you
 don’t have to worry about separating the data later. But it would also mean
 that data can’t be used together, at least not directly.</p>
 </section>
 <section id="shared-instance">
 <h3>Shared instance<a class="headerlink" href="#shared-instance" title="Permalink to this heading"></a></h3>
-<p>Projects (or case studies) can use the same instance which can be especially
-useful if they share data, e.g. information about places or persons.</p>
+<p>Projects (or case studies) can use the same instance which can be useful if
+they share data, such as information about places or persons.</p>
 <p>For data separation a custom <a class="reference internal" href="entity/type.html"><span class="doc">Type</span></a> can be created,
 usually called <strong>Case study</strong>, which can be:</p>
 <ul class="simple">
-<li><p>attached to multiple classes (probably most of them)</p></li>
-<li><p>set to <strong>multiple</strong> use so that e.g. a place can be part of multiple case
+<li><p>Attached to multiple classes (probably most of them)</p></li>
+<li><p>Set to <strong>multiple</strong> use so that a place can be part of multiple case
 studies</p></li>
-<li><p>set to <strong>required</strong> so that users don’t forget to enter it</p></li>
+<li><p>Set to <strong>required</strong> so that users don’t forget to choose at least one</p></li>
 </ul>
 <p>Later on, e.g. when running analyses or developing a presentation site for one
-case study, this type can be used to separate the data via the
-<a class="reference internal" href="technical/api.html"><span class="doc">API</span></a>.</p>
+case study, data can be filtered by case studies to separate the data sets
+via the <a class="reference internal" href="technical/api.html"><span class="doc">API</span></a>.</p>
 </section>
 </section>
 <section id="how-does-data-access-work">
 <h2>How does data access work<a class="headerlink" href="#how-does-data-access-work" title="Permalink to this heading"></a></h2>
 <p>Tag: design decision</p>
-<p>In OpenAtlas it can be chosen if and when to make data public but:</p>
+<p>If and when data saved in OpenAtlas is shared can be chosen at any point, but:</p>
 <ul class="simple">
 <li><p>All registered users have access to all model data</p></li>
 <li><p>Either <strong>all</strong> data is made public via the <a class="reference internal" href="technical/api.html"><span class="doc">API</span></a> or <strong>none</strong></p></li>
-<li><p>Presentation sites can filter which data (e.g. which case study) to show
+<li><p>Presentation sites can filter which data (e.g. which case study) is shown
 via the API</p></li>
 <li><p>Showing images is a special case because it also depends on licenses and the
 <a class="reference internal" href="admin/iiif.html"><span class="doc">IIIF</span></a> server</p></li>
 </ul>
 <p>There is no option (or plans to add one) to <strong>hide</strong> parts of the data for
-specific users. Reasons for this is that it would conflict with one of our core
-values (open) but there are also practical reasons, e.g. to avoid duplicates.
-If a strict separation is needed, using multiple OpenAtlas instances would
-likely be a better alternative.</p>
+specific users as that conflicts with one of our core value - to be open.
+Furthermore, there are practical reasons, e.g. to avoid duplicates.
+If a strict separation is needed, using multiple OpenAtlas instances might
+be a better solution.</p>
 </section>
 <section id="how-to-enter-professions">
 <h2>How to enter professions<a class="headerlink" href="#how-to-enter-professions" title="Permalink to this heading"></a></h2>
@@ -157,36 +157,36 @@ them to a group.
 This group consists of people with the same profession. Say you want to
 enter our lead developer Alex into the database: create a group named
 ‘OpenAtlas’ and connect him to that group in the respective form. Here you
-can also pick the role he has in that group from a list of types. For a more
+can pick the role he has in that group from a list of types. For a more
 detailed tutorial on how to enter professions, have a look
 <a class="reference internal" href="examples/profession.html"><span class="doc">here</span></a>.</p>
 </section>
 <section id="how-to-make-files-available-for-the-public">
 <span id="public-sharing-label"></span><h2>How to make files available for the public<a class="headerlink" href="#how-to-make-files-available-for-the-public" title="Permalink to this heading"></a></h2>
-<p>In case it is planned to share files with the public, e.g. at a presentation
-site or a public archive, several criteria have to be met.</p>
+<p>If you plan on sharing files with the public, e.g. on a presentation
+site or a public archive, several criteria have to be met:</p>
 <section id="criteria-checked-by-the-software">
 <h3>Criteria checked by the software<a class="headerlink" href="#criteria-checked-by-the-software" title="Permalink to this heading"></a></h3>
 <ul class="simple">
 <li><p>The file must exist</p></li>
 <li><p>A license has to be specified</p></li>
-<li><p>It has to be marked with <strong>public sharing allowed</strong></p></li>
+<li><p>The file has to be marked with <strong>public sharing allowed</strong></p></li>
 </ul>
-<p>In case these criteria aren’t met, a file won’t be:</p>
+<p>In case these criteria aren’t met, a file:</p>
 <ul class="simple">
-<li><p>Shared via the <a class="reference internal" href="technical/api.html"><span class="doc">API</span></a></p></li>
-<li><p>Won’t show up on presentation sites developed by the OpenAtlas team</p></li>
-<li><p>Won’t be included in case the long time archiving
-system <a class="reference external" href="https://arche.acdh.oeaw.ac.at/">ARCHE</a> is used</p></li>
+<li><p>Will not be shared via the <a class="reference internal" href="technical/api.html"><span class="doc">API</span></a></p></li>
+<li><p>Will not show up on presentation sites developed by the OpenAtlas team</p></li>
+<li><p>Will not be included in long-term archiving via
+<a class="reference external" href="https://arche.acdh.oeaw.ac.at/">ARCHE</a></p></li>
 </ul>
-<p>But be aware that although the file itself won’t be shared, the file
-information (e.g. filename) will still be available (e.g. shown on a
+<p>Be aware that although the file itself won’t be shared, the file
+information (such as filenames, etc.) will still be available (e.g. shown on a
 presentation site).</p>
-<p>At <strong>file</strong> -&gt; <strong>list</strong> at the top you find counts for:</p>
+<p>At <strong>file</strong> -&gt; <strong>list</strong> you find counts for:</p>
 <ul class="simple">
-<li><p>public files</p></li>
-<li><p>public files with a missing license</p></li>
-<li><p>public files with a license but without creator (which many licenses require)</p></li>
+<li><p>Public files</p></li>
+<li><p>Public files with a missing license</p></li>
+<li><p>Public files with a license but without creator (which many licenses require)</p></li>
 </ul>
 </section>
 <section id="criteria-checked-by-users">
@@ -209,15 +209,15 @@ which might be informative for other users or viewers.</p>
 <p>Tag: design decision</p>
 <p>A free text entry field would lead to lots of unstructured data.
 Unstructured data can not be processed automatically and would result in it
-not being presented nor searchable in the OpenAtlas system as well as in a
-presentation site that presents your data. Therefore, we made the decision, not
-to include free text types into the OpenAtlas system. Solutions to this problem
-are very case specific, but you could:</p>
+neither being presented nor searchable in the OpenAtlas system as well as in a
+presentation site. Therefore, we made the decision, not to include free text
+types into the OpenAtlas system. Solutions to this problem are very case
+specific, but you could:</p>
 <ul class="simple">
-<li><p>use the already provided description fields to enter any type of free text
-(keep in mind that this also comes with restrictions on how to present this
-data at a presentation site)</p></li>
-<li><p>create a new tree of project specific types for as many cases as possible
+<li><p>Use the provided description field to enter any type of free text
+(keep in mind that this also comes with restrictions on how to present the
+data on a presentation site)</p></li>
+<li><p>Create a new tree of project specific types for as many cases as possible
 and structure your data with them – for a step by step tutorial how to
 create new types, click <a class="reference internal" href="examples/types.html"><span class="doc">here</span></a>.</p></li>
 </ul>
@@ -234,11 +234,10 @@ Markdown for e.g. bold font, underline, lists and similar is that data may
 be used by other systems via the <a class="reference internal" href="technical/api.html"><span class="doc">API</span></a>, and these systems are
 not necessarily able to handle these formats.</p>
 <p>Another reason is that these formats might change over time. All in all it is
-more important for us that acquired data is as interoperable, as long as
+more important that acquired data is as interoperable for as long as
 possible.</p>
-<p>Of course the situation is different for e.g. presentation sites for OpenAtlas
-data. There it would be possible to e.g. add manual formatted texts where
-needed.</p>
+<p>For presentation sites and the alike it is possible to add e.g. manually
+formatted texts, etc. where needed.</p>
 </section>
 </section>
 

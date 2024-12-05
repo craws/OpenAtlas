@@ -3,8 +3,8 @@ Overview
 
 .. toctree::
 
-The overview page can be reached when clicking on the logo at the upper left.
-When logged in following is displayed:
+The overview page can be reached by clicking on the logo in the upper left
+corner. When logged in following information is displayed:
 
 * An overview table of already entered entities
 * Links to manual, :doc:`/model/index` and :doc:`/tools/network`

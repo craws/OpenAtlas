@@ -4,8 +4,8 @@ Image annotation
 .. toctree::
 
 The image annotation feature allows for marking areas on an image and adding
-a text and/or link it to an entity. E.g. a person on a group picture or an
-artifact at an excavation site image.
+a text and/or link to an entity. In that way a person in a group picture
+or an artifact on an excavation photo can be linked to the entity in OpenAtlas.
 
 Prerequisite for image annotation is an enabled and configured
 :doc:`/admin/iiif` server.
@@ -13,23 +13,23 @@ Prerequisite for image annotation is an enabled and configured
 Usage
 -----
 
-At a :doc:`/entity/file` detail view click on the **Enable IIIF view** button
-below the image if it wasn't converted already.
-
-Once the image was converted you can click on the **Annotate** link below the
+In a :doc:`/entity/file`'s detail view, click the **Enable IIIF view** button
+below the image, if it is not converted already.
+Once the image is converted click the **Annotate** link below the
 image and the annotation view will open in a new tab.
 
-In the image annotation view you can see the image in an IIIF viewer and a form
-for new annotations and a list of already entered annotations with links to
-edit or delete them.
+In the image annotation view you can see the image in an IIIF viewer as
+well as a form for new annotations including a list of already saved
+annotations. Links to edit or delete previous annotations are als porvided.
 
 **Form fields**
 
-* **IIIF image view** - here you can use the rectangle draw button on the left
-  side to mark an area.
-* **Annotation** - you can enter a description here
-* **Entity** - you can link an entity here
+* **IIIF image view** - click the button on the left to draw a rectangle
+  to mark the desired area.
+* **Annotation** - enter a description
+* **Entity** - link to an entity
 
 Be aware that the **Entity** selection only offers entities that are already
-linked to the file. This is to guarantee that the entity is also linked via
-the model (which the image annotation is not part of).
+linked to the file. This guarantees that each selectable entity is also
+linked to the file via the model. Immage annotation does not create new
+model links in the background!

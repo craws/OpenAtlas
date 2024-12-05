@@ -3,17 +3,19 @@ Network visualization
 
 .. toctree::
 
-With the integration of `D3.js <https://d3js.org/>`_ data can be visualized as
-a network graph available at the **Network visualization** button at the
-:doc:`/overview` or as an egocentric network at the entity detail view.
+With the integration of `D3.js <https://d3js.org/>`_, data can be visualized as
+a network graph. The graph, specific for each OpenAtlas instance, is available
+via the **Network visualization** button at the :doc:`/overview` or as an
+egocentric network at the entity detail view.
 
-**Classic** is the default but it can be switched to other types at the top of
-the visualization pages.
+Three different layouts are provided. **Classic** is the default setting but
+it can be switched to other types at the top of the visualization pages.
 
 .. figure:: network_classic.png
    :align: left
 
    Classic
+
 .. figure:: network_2d.png
    :align: left
 
@@ -41,14 +43,13 @@ Navigation
 
 Options
 -------
-* **Colors** - you can change the node color of classes
-* **Depth** - in egocentric networks you can define the link depth
-* **Show orphans** - if nodes without connections should be shown too
-* **Width** - the width of the resulting image in pixel
-* **Height** - the height of the resulting image in pixel
-* **Charge** - a parameter for the distance between entries which are not
-  connected
-* **Distance** - a parameter for the distance between connected entries
+* **Colors** - changes the node color of classes
+* **Depth** - defines the link depth in egocentric networks
+* **Show orphans** - select if nodes without any connections are displayed
+* **Width** - define width of the displayed image in pixel
+* **Height** - define height of the displayed image in pixel
+* **Charge** - select the distance between unconnected entities
+* **Distance** - select the distance between connected entities
 
 In case of performance issues
 -----------------------------
@@ -60,5 +61,6 @@ Download
 --------
 If an image is available (classic mode only) you can download it as PNG.
 Be aware that the resulting image is exactly what you see in this moment so
-you may want to change width and height in the options before. Also you may
-want to choose a zoom level where labels are readable.
+you may want to change width and height in the options before downloading.
+Set the zoom level according to your needs to ensure the labels are still
+readable.

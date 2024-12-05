@@ -9,14 +9,14 @@ button displayed on the level of stratigraphic units.
 
 .. image:: tool_button.png
 
-After then pressing the **Radiocarbon dating** button, you can add and/or edit
+After pressing the **Radiocarbon dating** button, you can add and/or edit
 the following information:
 
 * **Laboratory ID** - an alphanumerical abbreviation of the lab that conducted
   the analyses, e.g. VERA for Vienna Environmental Research Accelerator
 * **Specimen ID** - a numeric ID given to the sample by the conducting
   laboratory
-* **Radiocarbon year** - Result if the analysis in years, e.g. 1015
+* **Radiocarbon year** - Result of the analysis in years, e.g. 1015
 * **Range** - Accounts for the possible error of the measurement and is stated
   in the result as +/- value in years, e.g. +/- 30. In the form you only state
   the amount of years, adding +/- into the form field is not necessary
