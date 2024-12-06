@@ -19,6 +19,7 @@ versions = {
         'feature': {
             '2389': 'Activity log for entities',
             '2381': 'Import only year dates',
+            '2390': 'More hints about usage at sources',
             '2391': 'IIIF: add reference '}}],
     '8.8.0': ['2024-10-31', {
         'feature': {

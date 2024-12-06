@@ -303,10 +303,15 @@ class SourceDisplay(BaseDisplay):
     def add_tabs(self) -> None:
         super().add_tabs()
         entity = self.entity
-        for name in [
-                'actor', 'artifact', 'event', 'place', 'text', 'reference',
-                'file']:
-            self.tabs[name] = Tab(name, entity=entity)
+        for name, tooltip in {
+                'actor': _('mentioned in the source'),
+                'artifact': _('mentioned in the source'),
+                'event': _('mentioned in the source'),
+                'place': _('mentioned in the source'),
+                'text': _('mentioned in the source'),
+                'reference': '',
+                'file': ''}.items():
+            self.tabs[name] = Tab(name, entity=entity, tooltip=tooltip)
         for text in entity.get_linked_entities('P73', types=True):
             self.tabs['text'].table.rows.append([
                 link(text),
