@@ -9,7 +9,7 @@ from flask_wtf import FlaskForm
 from openatlas.display.table import Table
 from openatlas.display.util import (
     button, check_iiif_activation, check_iiif_file_exist)
-from openatlas.display.util2 import is_authorized, manual
+from openatlas.display.util2 import is_authorized, manual, uc_first
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
@@ -44,7 +44,8 @@ class Tab:
             table: Optional[Table] = None,
             buttons: Optional[list[str]] = None,
             entity: Optional[Entity] = None,
-            form: Optional[FlaskForm] = None) -> None:
+            form: Optional[FlaskForm] = None,
+            tooltip: Optional[str] = None) -> None:
 
         self.name = name
         self.content = content
@@ -53,6 +54,7 @@ class Tab:
         self.table = table or Table()
         self.set_table_headers(name, entity)
         self.buttons: list[str] = buttons or [manual(f'entity/{name}')]
+        self.tooltip = uc_first(tooltip) if tooltip else ''
         if is_authorized('contributor'):
             self.set_buttons(name, entity)
 
