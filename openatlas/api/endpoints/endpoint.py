@@ -17,7 +17,8 @@ from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.resolve_endpoints import (
     download, parse_loud_context)
 from openatlas.api.resources.templates import (
-    geojson_collection_template, linked_places_template, loud_template)
+    geojson_collection_template, linked_places_template, loud_template,
+    )
 from openatlas.api.resources.util import (
     get_linked_entities_api, get_location_link, remove_duplicate_entities)
 from openatlas.models.entity import Entity, Link
@@ -73,6 +74,8 @@ class Endpoint:
         self.remove_duplicate_entities()
         self.sort_entities()
         self.get_pagination()
+        if self.parser.count == 'true':
+            return jsonify(self.pagination['count'])
         self.reduce_entities_list()
 
         if self.parser.export == 'csv':
@@ -90,8 +93,7 @@ class Endpoint:
             return Response(
                 self.parser.rdf_output(result['results']),
                 mimetype=app.config['RDF_FORMATS'][self.parser.format])
-        if self.parser.count == 'true':
-            return jsonify(result['pagination']['entities'])
+
         if self.parser.download == 'true':
             return download(result, self.parser.get_entities_template())
         return marshal(result, self.parser.get_entities_template())
