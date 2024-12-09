@@ -244,6 +244,7 @@ class SexEstimation:
             entity: Entity,
             data: dict[str, str],
             types: list[dict[str, Any]]) -> None:
+        from openatlas.models.entity import Link
         for dict_ in types:
             Link.delete_(dict_['link_id'])
         SexEstimation.prepare_feature_types()
