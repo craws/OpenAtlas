@@ -30,6 +30,38 @@ class Endpoint:
             parser: dict[str, Any]) -> None:
         self.entities = entities if isinstance(entities, list) else [entities]
         self.parser = Parser(parser)
+        self.pagination = None
+
+    def get_pagination(self) -> None:
+        total = [e.id for e in self.entities]
+        count = len(total)
+        self.parser.limit = self.parser.limit or count
+        # List of start ids for the index/pages
+        e_list = []
+        if total:
+            e_list = list(itertools.islice(total, 0, None, self.parser.limit))
+        # Creating index
+        index = \
+            [{'page': i + 1, 'startId': id_} for i, id_ in enumerate(e_list)]
+        if self.parser.page:
+            self.parser.first = self.parser.get_by_page(index)
+        # Get which entity should be displayed (first or last)
+        if self.parser.last or self.parser.first:
+            total = self.parser.get_start_entity(total)
+        # Finding position in list of first entity
+        entity_list_index = 0
+        for index_, entity in enumerate(self.entities):
+            if entity.id == total[0]:
+                entity_list_index = index_
+                break
+
+        self.pagination = {
+            'count': count, 'index': index, 'entity_index': entity_list_index}
+
+    def reduce_entities_list(self) -> None:
+        start_index = self.pagination['entity_index']
+        end_index = start_index + int(self.parser.limit)
+        self.entities = self.entities[start_index:end_index]
 
     def resolve_entities(self) -> Response | dict[str, Any]:
         if self.parser.type_id:
@@ -37,13 +69,23 @@ class Endpoint:
         if self.parser.search:
             self.entities = [
                 e for e in self.entities if self.parser.search_filter(e)]
+
+        self.remove_duplicate_entities()
+        self.sort_entities()
+        self.get_pagination()
+        self.reduce_entities_list()
+
         if self.parser.export == 'csv':
             return self.export_entities_csv()
         if self.parser.export == 'csvNetwork':
             return self.export_csv_for_network_analysis()
-        self.remove_duplicate_entities()
-        self.sorting()
-        result = self.get_json_output()
+        result = {
+            "results": self.get_entities_formatted() if self.entities else [],
+            "pagination": {
+                'entitiesPerPage': int(self.parser.limit),
+                'entities': self.pagination['count'],
+                'index': self.pagination['index'],
+                'totalPages': len(self.pagination['index'])}}
         if self.parser.format in app.config['RDF_FORMATS']:  # pragma: no cover
             return Response(
                 self.parser.rdf_output(result['results']),
@@ -145,7 +187,7 @@ class Endpoint:
                 inverse=inverse)
         return links
 
-    def sorting(self) -> None:
+    def sort_entities(self) -> None:
         if 'latest' in request.path:
             return
 
@@ -160,36 +202,7 @@ class Endpoint:
         self.entities = \
             [e for e in self.entities if not (e.id in seen or seen_add(e.id))]
 
-    def get_json_output(self) -> dict[str, Any]:
-        total = [e.id for e in self.entities]
-        count = len(total)
-        if self.parser.limit == 0:
-            self.parser.limit = count
-        e_list = []
-        if total:
-            e_list = list(itertools.islice(total, 0, None, self.parser.limit))
-        index = \
-            [{'page': num + 1, 'startId': i} for num, i in enumerate(e_list)]
-        if index:
-            self.parser.first = self.parser.get_by_page(index) \
-                if self.parser.page else self.parser.first
-        total = self.parser.get_start_entity(total) \
-            if self.parser.last or self.parser.first else total
-        j = [i for i, x in enumerate(self.entities) if x.id == total[0]]
-        formatted_entities = []
-        if self.entities:
-            self.entities = [e for idx, e in enumerate(self.entities[j[0]:])]
-            formatted_entities = self.get_entities_formatted()
-        return {
-            "results": formatted_entities,
-            "pagination": {
-                'entitiesPerPage': int(self.parser.limit),
-                'entities': count,
-                'index': index,
-                'totalPages': len(index)}}
-
     def get_entities_formatted(self) -> list[dict[str, Any]]:
-        self.entities = self.entities[:int(self.parser.limit)]
         if self.parser.format == 'geojson':
             return [self.get_geojson()]
         if self.parser.format == 'geojson-v2':
