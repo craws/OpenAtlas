@@ -31,6 +31,19 @@ class Endpoint:
         self.entities = entities if isinstance(entities, list) else [entities]
         self.parser = Parser(parser)
         self.pagination = None
+        self.entities_with_links: dict[int, dict[str, Any]] = {}
+
+
+    def get_links_for_entities(self) -> None:
+        for entity in self.entities:
+            self.entities_with_links[entity.id] = {
+                'entity': entity,
+                'links': [],
+                'links_inverse': []}
+        for link_ in self.link_parser_check():
+            self.entities_with_links[link_.domain.id]['links'].append(link_)
+        for link_ in self.link_parser_check(inverse=True):
+            self.entities_with_links[link_.range.id]['links_inverse'].append(link_)
 
     def get_pagination(self) -> None:
         total = [e.id for e in self.entities]
@@ -75,6 +88,8 @@ class Endpoint:
         self.sort_entities()
         self.get_pagination()
         self.reduce_entities_list()
+        if self.entities:
+            self.get_links_for_entities()
         if self.parser.export == 'csv':
             return self.export_entities_csv()
         if self.parser.export == 'csvNetwork':
@@ -201,28 +216,28 @@ class Endpoint:
             [e for e in self.entities if not (e.id in seen or seen_add(e.id))]
 
     def get_entities_formatted(self) -> list[dict[str, Any]]:
-        if self.parser.format == 'geojson':
-            return [self.get_geojson()]
-        if self.parser.format == 'geojson-v2':
-            return [self.get_geojson_v2()]
-        entities_dict: dict[int, dict[str, Any]] = {}
-        for entity in self.entities:
-            entities_dict[entity.id] = {
-                'entity': entity,
-                'links': [],
-                'links_inverse': []}
-        for link_ in self.link_parser_check():
-            entities_dict[link_.domain.id]['links'].append(link_)
-        for link_ in self.link_parser_check(inverse=True):
-            entities_dict[link_.range.id]['links_inverse'].append(link_)
-        if self.parser.format == 'loud' \
-                or self.parser.format in app.config['RDF_FORMATS']:
-            return [
-                get_loud_entities(item, parse_loud_context())
-                for item in entities_dict.values()]
-        return [
-            self.parser.get_linked_places_entity(item)
-            for item in entities_dict.values()]
+        match self.parser.format:
+            case 'geojson':
+                entities= [self.get_geojson()]
+            case 'geojson-v2':
+                entities= [self.get_geojson_v2()]
+            case 'loud':
+                parsed_context = parse_loud_context()
+                entities = [
+                    get_loud_entities(item, parsed_context)
+                    for item in self.entities_with_links.values()]
+            case 'lp' | 'lpx':
+                entities= [
+                    self.parser.get_linked_places_entity(item)
+                    for item in self.entities_with_links.values()]
+            case _ if self.parser.format in app.config['RDF_FORMATS']:
+                parsed_context = parse_loud_context()
+                entities = [
+                    get_loud_entities(item, parsed_context)
+                    for item in self.entities_with_links.values()]
+            case _:
+                entities = []
+        return entities
 
     def get_geojson(self) -> dict[str, Any]:
         out = []

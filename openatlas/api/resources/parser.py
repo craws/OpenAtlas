@@ -106,6 +106,7 @@ entity_.add_argument(
     type=str,
     help='{error_msg}',
     case_sensitive=False,
+    default='lp',
     choices=frozenset(app.config['API_FORMATS']),
     location='args')
 entity_.add_argument(
