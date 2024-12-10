@@ -11,15 +11,14 @@ from flask_restful import marshal
 from openatlas import app
 from openatlas.api.endpoints.parser import Parser
 from openatlas.api.formats.csv import (
-    build_dataframe, build_dataframe_network, build_link_dataframe)
+    build_dataframe_with_relations, build_dataframe, build_link_dataframe)
 from openatlas.api.formats.loud import get_loud_entities
 from openatlas.api.resources.resolve_endpoints import (
     download, parse_loud_context)
 from openatlas.api.resources.templates import (
     geojson_collection_template, geojson_pagination, linked_place_pagination,
     linked_places_template, loud_pagination, loud_template)
-from openatlas.api.resources.util import (
-    get_linked_entities_api, get_location_link)
+from openatlas.api.resources.util import  get_location_link
 from openatlas.models.entity import Entity, Link
 
 
@@ -84,7 +83,15 @@ class Endpoint:
         if self.parser.search:
             self.entities = [
                 e for e in self.entities if self.parser.search_filter(e)]
-        self.remove_duplicate_entities()
+        before = len(self.entities)
+        # self.remove_duplicate_entities()
+        self.entities = set(self.entities)
+        after = len(self.entities)
+        if before != after:
+            print(before)
+            print(after)
+        self.entities = list(self.entities)
+
         if self.parser.count == 'true':
             return jsonify(len(self.entities))
         self.sort_entities()
@@ -132,7 +139,7 @@ class Endpoint:
 
     def export_entities_csv(self) -> Response:
         frames = [
-            build_dataframe(e, relations=True)
+            build_dataframe_with_relations(e)
             for e in self.entities_with_links.values()]
         return Response(
             pd.DataFrame(data=frames).to_csv(),
@@ -177,7 +184,7 @@ class Endpoint:
                 sorted(self.entities, key=lambda entity: entity.class_.name),
                 key=lambda entity: entity.class_.name):
                 grouped_entities[class_] = \
-                    [build_dataframe_network(entity) for entity in entities_]
+                    [build_dataframe(entity) for entity in entities_]
         return grouped_entities
 
     def link_parser_check(self, inverse: bool = False) -> list[Link]:
@@ -202,8 +209,14 @@ class Endpoint:
     def remove_duplicate_entities(self) -> None:
         seen: set[int] = set()
         seen_add = seen.add  # Faster than always call seen.add()
-        self.entities = \
-            [e for e in self.entities if not (e.id in seen or seen_add(e.id))]
+        entities = []
+        for e in self.entities:
+            if e.id not in seen:
+                seen_add(e.id)
+                entities.append(e)
+        self.entities = entities
+        # self.entities = \
+        #     [e for e in self.entities if not (e.id in seen or seen_add(e.id))]
 
     def get_entities_formatted(self) -> None:
         entities = []
