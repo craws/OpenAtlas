@@ -12,8 +12,9 @@ from openatlas.models.gis import Gis
 
 
 def build_dataframe(
-        entity: Entity,
+        entity_dict: dict[str, Any],
         relations: bool = False) -> dict[str, Any]:
+    entity = entity_dict['entity']
     geom = get_csv_geom_entry(entity)
     data = {
         'id': str(entity.id),
