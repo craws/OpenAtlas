@@ -11,7 +11,7 @@ from flask_restful import marshal
 from openatlas import app
 from openatlas.api.endpoints.parser import Parser
 from openatlas.api.formats.csv import (
-    build_dataframe, build_link_dataframe)
+    build_dataframe, build_dataframe_network, build_link_dataframe)
 from openatlas.api.formats.loud import get_loud_entities
 from openatlas.api.resources.resolve_endpoints import (
     download, parse_loud_context)
@@ -19,7 +19,7 @@ from openatlas.api.resources.templates import (
     geojson_collection_template, geojson_pagination, linked_place_pagination,
     linked_places_template, loud_pagination, loud_template)
 from openatlas.api.resources.util import (
-    get_linked_entities_api, get_location_link, remove_duplicate_entities)
+    get_linked_entities_api, get_location_link)
 from openatlas.models.entity import Entity, Link
 
 
@@ -28,11 +28,11 @@ class Endpoint:
             self,
             entities: Entity | list[Entity],
             parser: dict[str, Any],
-            single_entity: bool = False) -> None:
+            single: bool = False) -> None:
         self.entities = entities if isinstance(entities, list) else [entities]
         self.parser = Parser(parser)
         self.pagination = None
-        self.single_entity = single_entity
+        self.single = single
         self.entities_with_links: dict[int, dict[str, Any]] = {}
         self.formated_entities = []
 
@@ -79,24 +79,23 @@ class Endpoint:
         self.entities = self.entities[start_index:end_index]
 
     def resolve_entities(self) -> Response | dict[str, Any]:
-        if not self.single_entity:
-            if self.parser.type_id:
-                self.entities = self.filter_by_type()
-            if self.parser.search:
-                self.entities = [
-                    e for e in self.entities if self.parser.search_filter(e)]
-            self.remove_duplicate_entities()
-            if self.parser.count == 'true':
-                return jsonify(len(self.entities))
-            self.sort_entities()
-            self.get_pagination()
-            self.reduce_entities_to_limit()
-        if self.parser.export == 'csvNetwork':
-            return self.export_csv_for_network_analysis()
+        if self.parser.type_id:
+            self.entities = self.filter_by_type()
+        if self.parser.search:
+            self.entities = [
+                e for e in self.entities if self.parser.search_filter(e)]
+        self.remove_duplicate_entities()
+        if self.parser.count == 'true':
+            return jsonify(len(self.entities))
+        self.sort_entities()
+        self.get_pagination()
+        self.reduce_entities_to_limit()
         if self.entities:
             self.get_links_for_entities()
         if self.parser.export == 'csv':
             return self.export_entities_csv()
+        if self.parser.export == 'csvNetwork':
+            return self.export_csv_for_network_analysis()
         if self.entities:
             self.get_entities_formatted()
 
@@ -111,7 +110,7 @@ class Endpoint:
         return marshal(result, self.get_entities_template(result))
 
     def get_json_output(self) -> dict[str, Any]:
-        if not self.single_entity:
+        if not self.single:
             result = {
                 "results": self.formated_entities,
                 "pagination": {
@@ -141,6 +140,19 @@ class Endpoint:
             headers={'Content-Disposition': 'attachment;filename=result.csv'})
 
     def export_csv_for_network_analysis(self) -> Response:
+        entities = []
+        links = []
+        for items in self.entities_with_links.values():
+            entities.append(items['entity'])
+            for link_ in items['links']:
+                entities.append(link_.range)
+                links.append(link_)
+            for link_inverse in items['links']:
+                entities.append(link_inverse.domain)
+                links.append(link_inverse)
+        self.entities = entities
+        self.remove_duplicate_entities()
+        self.get_links_for_entities()
         archive = BytesIO()
         with zipfile.ZipFile(archive, 'w') as zipped_file:
             for key, frame in self.get_entities_grouped_by_class().items():
@@ -150,11 +162,9 @@ class Endpoint:
                             pd.DataFrame(data=frame).to_csv(),
                             encoding='utf8'))
             with zipped_file.open('links.csv', 'w') as file:
-                link_frame = [
-                    build_link_dataframe(link_) for link_ in
-                    (self.link_parser_check()
-                     + self.link_parser_check(inverse=True))]
-                file.write(bytes(
+                link_frame = [build_link_dataframe(link_) for link_ in links]
+                file.write(
+                    bytes(
                     pd.DataFrame(data=link_frame).to_csv(), encoding='utf8'))
         return Response(
             archive.getvalue(),
@@ -162,14 +172,12 @@ class Endpoint:
             headers={'Content-Disposition': 'attachment;filename=oa_csv.zip'})
 
     def get_entities_grouped_by_class(self) -> dict[str, Any]:
-        self.entities += get_linked_entities_api([e.id for e in self.entities])
-        entities = remove_duplicate_entities(self.entities)
         grouped_entities = {}
         for class_, entities_ in groupby(
-                sorted(entities, key=lambda entity: entity.class_.name),
+                sorted(self.entities, key=lambda entity: entity.class_.name),
                 key=lambda entity: entity.class_.name):
-            grouped_entities[class_] = \
-                [build_dataframe(entity) for entity in entities_]
+                grouped_entities[class_] = \
+                    [build_dataframe_network(entity) for entity in entities_]
         return grouped_entities
 
     def link_parser_check(self, inverse: bool = False) -> list[Link]:
@@ -260,14 +268,14 @@ class Endpoint:
         match self.parser.format:
             case 'geojson' | 'geojson-v2':
                 template = geojson_collection_template()
-                if not self.single_entity:
+                if not self.single:
                     template = geojson_pagination()
             case 'loud':
                 template = loud_template(result)
-                if not self.single_entity:
+                if not self.single:
                     template = loud_pagination()
             case 'lp' | 'lpx' | _:
                 template = linked_places_template(self.parser)
-                if not self.single_entity:
+                if not self.single:
                     template = linked_place_pagination(self.parser)
         return template

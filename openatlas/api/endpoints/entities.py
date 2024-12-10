@@ -20,7 +20,6 @@ class GetByCidocClass(Resource):
             ApiEntity.get_by_cidoc_classes([class_]),
             entity_.parse_args()).resolve_entities()
 
-
 class GetBySystemClass(Resource):
     @staticmethod
     def get(class_: str) -> tuple[Resource, int] | Response | dict[str, Any]:
@@ -62,7 +61,7 @@ class GetEntity(Resource):
         return Endpoint(
             ApiEntity.get_by_id(id_, types=True, aliases=True),
             entity_.parse_args(),
-            single_entity=True).resolve_entities()
+            single=True).resolve_entities()
 
 
 class GetLatest(Resource):

@@ -263,20 +263,20 @@ class Api(ApiTestCase):
                     export='csv'))]:
             assert b'Shire' in rv.data
             assert 'text/csv' in rv.headers.get('Content-Type')
-        #
-        # for rv in [
-        #     c.get(
-        #         url_for('api_04.entity', id_=place.id, export='csvNetwork')),
-        #     c.get(
-        #         url_for(
-        #             'api_04.query',
-        #             entities=location.id,
-        #             cidoc_classes='E18',
-        #             view_classes='artifact',
-        #             system_classes='person',
-        #             export='csvNetwork'))]:
-        #     assert b'Shire' in rv.data
-        #     assert 'application/zip' in rv.headers.get('Content-Type')
+
+        for rv in [
+            c.get(
+                url_for('api_04.entity', id_=place.id, export='csvNetwork')),
+            c.get(
+                url_for(
+                    'api_04.query',
+                    entities=location.id,
+                    cidoc_classes='E18',
+                    view_classes='artifact',
+                    system_classes='person',
+                    export='csvNetwork'))]:
+            assert b'Shire' in rv.data
+            assert 'application/zip' in rv.headers.get('Content-Type')
 
         rv = c.get(
             url_for(

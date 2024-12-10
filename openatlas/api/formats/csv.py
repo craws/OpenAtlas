@@ -38,6 +38,25 @@ def build_dataframe(
     return data
 
 
+def build_dataframe_network(entity: Entity) -> dict[str, Any]:
+    geom = get_csv_geom_entry(entity)
+    data = {
+        'id': str(entity.id),
+        'name': entity.name,
+        'description': entity.description,
+        'begin_from': entity.begin_from,
+        'begin_to': entity.begin_to,
+        'begin_comment': entity.begin_comment,
+        'end_from': entity.end_from,
+        'end_to': entity.end_to,
+        'end_comment': entity.end_comment,
+        'cidoc_class': entity.cidoc_class.name,
+        'system_class': entity.class_.name,
+        'geom_type': geom['type'],
+        'coordinates': geom['coordinates']}
+    return data
+
+
 def build_link_dataframe(link: Link) -> dict[str, Any]:
     return {
         'id': link.id,
