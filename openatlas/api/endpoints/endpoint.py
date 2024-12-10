@@ -4,6 +4,7 @@ from io import BytesIO
 from itertools import groupby
 from typing import Any
 
+import cytoolz
 import pandas as pd
 from flask import Response, jsonify, request
 from flask_restful import marshal
@@ -77,20 +78,75 @@ class Endpoint:
         end_index = start_index + int(self.parser.limit)
         self.entities = self.entities[start_index:end_index]
 
+    def remove_duplicate_entities(self) -> None:
+        seen: set[int] = set()
+        seen_add = seen.add  # Faster than always call seen.add()
+        self.entities = \
+            [e for e in self.entities if not (e.id in seen or seen_add(e.id))]
+
+    def remove_duplicate_entities_2(self) -> None:
+        seen: set[int] = set()
+        seen_add = seen.add  # Faster than always call seen.add()
+        entities = []
+        for e in self.entities:
+            if e.id not in seen:
+                seen_add(e.id)
+                entities.append(e)
+        self.entities = entities
+        # self.entities = \
+        #     [e for e in self.entities if not (e.id in seen or seen_add(e.id))]
+
+    def remove_duplicate_entities_3(self) -> None:
+        self.entities = list(cytoolz.unique(self.entities, key=lambda x: x.id))
+
+    def remove_duplicate_entities_4(self) -> None:
+        self.entities = list(set(self.entities))
+
     def resolve_entities(self) -> Response | dict[str, Any]:
         if self.parser.type_id:
             self.entities = self.filter_by_type()
         if self.parser.search:
             self.entities = [
                 e for e in self.entities if self.parser.search_filter(e)]
+
+        origin_self_entities = self.entities.copy()
+        x = 1
         before = len(self.entities)
-        # self.remove_duplicate_entities()
-        self.entities = set(self.entities)
-        after = len(self.entities)
+        import time
+
+        # Assuming x and origin_self_entities are defined
+
+        # Timing the first loop
+        start_time = time.time()
+        for i in range(x):
+            self.entities = origin_self_entities
+            self.remove_duplicate_entities()
+        end_time = time.time()
+        print(f"Time taken for 1: {end_time - start_time:.8f} seconds")
+
+
+        # Timing the third loop
+        start_time = time.time()
+        for i in range(x):
+            self.entities = origin_self_entities
+            self.remove_duplicate_entities_3()
+        end_time = time.time()
+        print(f"Time taken for 3: {end_time - start_time:.6f} seconds")
+
+        # Timing the third loop
+        start_time = time.time()
+        for i in range(x):
+            self.entities = origin_self_entities
+            self.remove_duplicate_entities_4()
+        end_time = time.time()
+        print(f"Time taken for 4: {end_time - start_time:.6f} seconds")
+
+
+        after= len(self.entities)
+
         if before != after:
             print(before)
             print(after)
-        self.entities = list(self.entities)
 
         if self.parser.count == 'true':
             return jsonify(len(self.entities))
@@ -205,18 +261,6 @@ class Endpoint:
             self.entities,
             key=self.parser.get_key,
             reverse=bool(self.parser.sort == 'desc'))
-
-    def remove_duplicate_entities(self) -> None:
-        seen: set[int] = set()
-        seen_add = seen.add  # Faster than always call seen.add()
-        entities = []
-        for e in self.entities:
-            if e.id not in seen:
-                seen_add(e.id)
-                entities.append(e)
-        self.entities = entities
-        # self.entities = \
-        #     [e for e in self.entities if not (e.id in seen or seen_add(e.id))]
 
     def get_entities_formatted(self) -> None:
         entities = []
