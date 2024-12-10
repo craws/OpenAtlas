@@ -30,12 +30,14 @@ class Endpoint:
             single: bool = False) -> None:
         self.entities = entities if isinstance(entities, list) else [entities]
         self.parser = Parser(parser)
-        self.pagination = None
+        self.pagination: dict[str, Any] = {}
         self.single = single
         self.entities_with_links: dict[int, dict[str, Any]] = {}
-        self.formated_entities = []
+        self.formated_entities: list[dict[str, Any]] = []
 
     def get_links_for_entities(self) -> None:
+        if not self.entities:
+            return
         for entity in self.entities:
             self.entities_with_links[entity.id] = {
                 'entity': entity,
@@ -83,28 +85,19 @@ class Endpoint:
         if self.parser.search:
             self.entities = [
                 e for e in self.entities if self.parser.search_filter(e)]
-        before = len(self.entities)
-        # self.remove_duplicate_entities()
-        self.entities = set(self.entities)
-        after = len(self.entities)
-        if before != after:
-            print(before)
-            print(after)
-        self.entities = list(self.entities)
-
+        self.remove_duplicate_entities()
         if self.parser.count == 'true':
             return jsonify(len(self.entities))
+
         self.sort_entities()
         self.get_pagination()
         self.reduce_entities_to_limit()
-        if self.entities:
-            self.get_links_for_entities()
+        self.get_links_for_entities()
         if self.parser.export == 'csv':
             return self.export_entities_csv()
         if self.parser.export == 'csvNetwork':
             return self.export_csv_for_network_analysis()
-        if self.entities:
-            self.get_entities_formatted()
+        self.get_entities_formatted()
 
         if self.parser.format in app.config['RDF_FORMATS']:  # pragma: no cover
             return Response(
@@ -209,16 +202,12 @@ class Endpoint:
     def remove_duplicate_entities(self) -> None:
         seen: set[int] = set()
         seen_add = seen.add  # Faster than always call seen.add()
-        entities = []
-        for e in self.entities:
-            if e.id not in seen:
-                seen_add(e.id)
-                entities.append(e)
-        self.entities = entities
-        # self.entities = \
-        #     [e for e in self.entities if not (e.id in seen or seen_add(e.id))]
+        self.entities = \
+            [e for e in self.entities if not (e.id in seen or seen_add(e.id))]
 
     def get_entities_formatted(self) -> None:
+        if not self.entities:
+            return
         entities = []
         match self.parser.format:
             case 'geojson':

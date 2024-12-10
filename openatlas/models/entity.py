@@ -82,12 +82,6 @@ class Entity:
                 self.creator = g.file_info[self.id]['creator']
                 self.license_holder = g.file_info[self.id]['license_holder']
 
-    def __eq__(self, other):
-        return self.id == other.id
-
-    def __hash__(self):
-        return hash(('id', self.id))
-
     def get_linked_entity(
             self,
             code: str,
