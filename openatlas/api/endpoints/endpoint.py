@@ -85,7 +85,7 @@ class Endpoint:
         if self.parser.search:
             self.entities = [
                 e for e in self.entities if self.parser.search_filter(e)]
-        self.remove_duplicate_entities()
+        self.remove_duplicates()
         if self.parser.count == 'true':
             return jsonify(len(self.entities))
 
@@ -151,7 +151,7 @@ class Endpoint:
                 entities.append(link_inverse.domain)
                 links.append(link_inverse)
         self.entities = entities
-        self.remove_duplicate_entities()
+        self.remove_duplicates()
         self.get_links_for_entities()
         archive = BytesIO()
         with zipfile.ZipFile(archive, 'w') as zipped_file:
@@ -176,7 +176,7 @@ class Endpoint:
         for class_, entities_ in groupby(
                 sorted(self.entities, key=lambda entity: entity.class_.name),
                 key=lambda entity: entity.class_.name):
-                grouped_entities[class_] = \
+            grouped_entities[class_] = \
                     [build_dataframe(entity) for entity in entities_]
         return grouped_entities
 
@@ -199,11 +199,11 @@ class Endpoint:
             key=self.parser.get_key,
             reverse=bool(self.parser.sort == 'desc'))
 
-    def remove_duplicate_entities(self) -> None:
-        seen: set[int] = set()
-        seen_add = seen.add  # Faster than always call seen.add()
+    def remove_duplicates(self) -> None:
+        exists: set[int] = set()
+        add_ = exists.add  # Faster than always call exists.add()
         self.entities = \
-            [e for e in self.entities if not (e.id in seen or seen_add(e.id))]
+            [e for e in self.entities if not (e.id in exists or add_(e.id))]
 
     def get_entities_formatted(self) -> None:
         if not self.entities:
