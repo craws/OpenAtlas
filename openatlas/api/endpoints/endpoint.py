@@ -28,11 +28,11 @@ class Endpoint:
             self,
             entities: Entity | list[Entity],
             parser: dict[str, Any],
-            single: bool = False) -> None:
+            single_entity: bool = False) -> None:
         self.entities = entities if isinstance(entities, list) else [entities]
         self.parser = Parser(parser)
         self.pagination = None
-        self.single = single
+        self.single_entity = single_entity
         self.entities_with_links: dict[int, dict[str, Any]] = {}
         self.formated_entities = []
 
@@ -79,7 +79,7 @@ class Endpoint:
         self.entities = self.entities[start_index:end_index]
 
     def resolve_entities(self) -> Response | dict[str, Any]:
-        if not self.single:
+        if not self.single_entity:
             if self.parser.type_id:
                 self.entities = self.filter_by_type()
             if self.parser.search:
@@ -111,7 +111,7 @@ class Endpoint:
         return marshal(result, self.get_entities_template(result))
 
     def get_json_output(self) -> dict[str, Any]:
-        if not self.single:
+        if not self.single_entity:
             result = {
                 "results": self.formated_entities,
                 "pagination": {
@@ -145,8 +145,10 @@ class Endpoint:
         with zipfile.ZipFile(archive, 'w') as zipped_file:
             for key, frame in self.get_entities_grouped_by_class().items():
                 with zipped_file.open(f'{key}.csv', 'w') as file:
-                    file.write(bytes(
-                        pd.DataFrame(data=frame).to_csv(), encoding='utf8'))
+                    file.write(
+                        bytes(
+                            pd.DataFrame(data=frame).to_csv(),
+                            encoding='utf8'))
             with zipped_file.open('links.csv', 'w') as file:
                 link_frame = [
                     build_link_dataframe(link_) for link_ in
@@ -196,6 +198,7 @@ class Endpoint:
             [e for e in self.entities if not (e.id in seen or seen_add(e.id))]
 
     def get_entities_formatted(self) -> None:
+        entities = []
         match self.parser.format:
             case 'geojson':
                 entities = [self.get_geojson()]
@@ -210,13 +213,12 @@ class Endpoint:
                 entities = [
                     self.parser.get_linked_places_entity(item)
                     for item in self.entities_with_links.values()]
-            case _ if self.parser.format in app.config['RDF_FORMATS']:
+            case _ if self.parser.format \
+                   in app.config['RDF_FORMATS']:  # pragma: no cover
                 parsed_context = parse_loud_context()
                 entities = [
                     get_loud_entities(item, parsed_context)
                     for item in self.entities_with_links.values()]
-            case _:
-                entities = []
         self.formated_entities = entities
 
     def get_geojson(self) -> dict[str, Any]:
@@ -258,14 +260,14 @@ class Endpoint:
         match self.parser.format:
             case 'geojson' | 'geojson-v2':
                 template = geojson_collection_template()
-                if not self.single:
+                if not self.single_entity:
                     template = geojson_pagination()
             case 'loud':
                 template = loud_template(result)
-                if not self.single:
+                if not self.single_entity:
                     template = loud_pagination()
             case 'lp' | 'lpx' | _:
                 template = linked_places_template(self.parser)
-                if not self.single:
+                if not self.single_entity:
                     template = linked_place_pagination(self.parser)
         return template

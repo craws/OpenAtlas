@@ -62,7 +62,7 @@ class GetEntity(Resource):
         return Endpoint(
             ApiEntity.get_by_id(id_, types=True, aliases=True),
             entity_.parse_args(),
-            True).resolve_entities()
+            single_entity=True).resolve_entities()
 
 
 class GetLatest(Resource):
