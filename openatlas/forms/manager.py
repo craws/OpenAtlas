@@ -12,7 +12,7 @@ from openatlas.forms.base_manager import (
     ActorBaseManager, ArtifactBaseManager, BaseManager, EventBaseManager,
     HierarchyBaseManager, PlaceBaseManager, TypeBaseManager)
 from openatlas.forms.field import (
-    DragNDropField, SubmitField, TableField, TableMultiField, TreeField)
+    DragNDropField, SubmitField, TableField, TableMultiField, TreeField, TextAnnotationField, SubmitSourceField)
 from openatlas.forms.validation import file
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
@@ -576,7 +576,16 @@ class SourceManager(BaseManager):
     fields = ['name', 'continue', 'description']
 
     def add_description(self) -> None:
-        setattr(self.form_class, 'description', TextAreaField(_('content')))
+
+        setattr(self.form_class, 'description', TextAnnotationField(
+            label=_('content'),
+            source_text="Test Text",
+            # source_text: html with <mark> attributes that holds the meta attribute with id and comment as annotations
+            linked_entities=[
+                {'id': 1, 'name': 'Entity 1'},
+                {'id': 2, 'name': 'Entity 2'}
+            ]
+        ))
 
     def additional_fields(self) -> dict[str, Any]:
         selection = None
@@ -600,6 +609,18 @@ class SourceManager(BaseManager):
             self.data['links']['delete_inverse'].add('P128')
             if self.form.artifact.data:
                 self.add_link('P128', self.form.artifact.data, inverse=True)
+
+    def add_buttons(self) -> None:
+        setattr(
+            self.form_class,
+            'save',
+            SubmitSourceField(_('insert') if self.insert else _('save')))
+        if self.insert and 'continue' in self.fields:
+            setattr(
+                self.form_class,
+                'insert_and_continue',
+                SubmitSourceField(_('insert and continue')))
+            setattr(self.form_class, 'continue_', HiddenField())
 
 
 class SourceTranslationManager(BaseManager):

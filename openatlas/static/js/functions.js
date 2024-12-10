@@ -545,3 +545,7 @@ function toggleMapWidth(element){
   parent.classList.toggle("col-lg-7")
   element.classList.toggle("rotate-180")
 }
+
+function saveAnnotationText() {
+    return document.querySelector("[name='annotation-source-text']").value = document.querySelector("#editor .ProseMirror").innerHTML;
+}

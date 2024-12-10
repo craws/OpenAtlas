@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Text Annotation Editor</title>
+</head>
+<body>
+<script src="https://unpkg.com/vue@3"></script>
+<link rel="stylesheet" href="/static/vendor/text-annotation/style.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="/static/vendor/text-annotation/text-annotation.iife.js"></script>
+<div id="app"></div>
+<script>
+  const linkedEntities = {{ field.linked_entities | tojson | safe }};
+  const sourceText = {{ field.source_text | tojson | safe }};
+
+  const app = TextAnnotationEditor.createTextAnnotationApp({
+    linkedEntities: linkedEntities || [],
+    sourceText: sourceText || '',
+  });
+</script>
+</body>
+</html>

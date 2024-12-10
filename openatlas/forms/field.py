@@ -209,6 +209,34 @@ class ValueFloatField(FloatField):
     pass
 
 
+class TextAnnotation(HiddenInput):
+    def __call__(self, field: Any, **kwargs: Any) -> str:
+
+        source_text = field.data
+        linked_entities = field.linked_entities
+
+        return super().__call__(field, **kwargs) + Markup(
+            render_template('text-annotation.html',
+                            field=field,
+                            source_text=source_text,
+                            linked_entities=linked_entities)
+        )
+
+
+class TextAnnotationField(Field):
+    widget = TextAnnotation()
+
+    def __init__(self, label=None, validators=None, source_text=None, linked_entities=None, **kwargs):
+
+        super().__init__(label, validators, **kwargs)
+
+        self.source_text = source_text or ''
+        self.linked_entities = linked_entities or []
+
+    def _value(self):
+        return self.data or ''
+
+
 class TableSelect(HiddenInput):
     def __call__(self, field: Any, **kwargs: Any) -> str:
 
@@ -252,7 +280,6 @@ class TableSelect(HiddenInput):
             field.table = table(field.id, field.entities, field.filter_ids)
         return super().__call__(field, **kwargs) + Markup(
             render_template('forms/table_select.html', field=field))
-
 
 class TableField(HiddenField):
     widget = TableSelect()
@@ -456,6 +483,27 @@ class SubmitInput(Input):
 
 class SubmitField(BooleanField):
     widget = SubmitInput()
+
+
+class SubmitSourceInput(Input):
+    input_type = 'submit'
+
+    def __call__(self, field: Field, **kwargs: Any) -> str:
+        onclick_event = "saveAnnotationText();"
+        kwargs['class_'] = (kwargs['class_'] + ' uc-first') \
+            if 'class_' in kwargs else 'uc-first'
+        kwargs['onclick'] = onclick_event
+        return Markup(
+            f'''
+            <button
+             type="submit"
+             id="{field.id}"
+             {self.html_params(name=field.name, **kwargs)}
+             >{field.label.text}</button>''')
+
+
+class SubmitSourceField(BooleanField):
+    widget = SubmitSourceInput()
 
 
 def generate_password_field() -> CustomField:
