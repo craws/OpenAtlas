@@ -211,29 +211,29 @@ class ValueFloatField(FloatField):
 
 class TextAnnotation(HiddenInput):
     def __call__(self, field: Any, **kwargs: Any) -> str:
-
-        source_text = field.data
-        linked_entities = field.linked_entities
-
         return super().__call__(field, **kwargs) + Markup(
-            render_template('text-annotation.html',
-                            field=field,
-                            source_text=source_text,
-                            linked_entities=linked_entities)
-        )
+            render_template(
+                'text-annotation.html',
+                field=field,
+                source_text=field.data,
+                linked_entities=field.linked_entities))
 
 
 class TextAnnotationField(Field):
     widget = TextAnnotation()
 
-    def __init__(self, label=None, validators=None, source_text=None, linked_entities=None, **kwargs):
-
+    def __init__(
+            self,
+            label: str,
+            validators: Optional[Any] = None,
+            source_text: Optional[str] = None,
+            linked_entities: Optional[list[Any]] = None,
+            **kwargs: Any) -> None:
         super().__init__(label, validators, **kwargs)
-
         self.source_text = source_text or ''
         self.linked_entities = linked_entities or []
 
-    def _value(self):
+    def _value(self) -> str:
         return self.data or ''
 
 
@@ -280,6 +280,7 @@ class TableSelect(HiddenInput):
             field.table = table(field.id, field.entities, field.filter_ids)
         return super().__call__(field, **kwargs) + Markup(
             render_template('forms/table_select.html', field=field))
+
 
 class TableField(HiddenField):
     widget = TableSelect()

@@ -12,7 +12,8 @@ from openatlas.forms.base_manager import (
     ActorBaseManager, ArtifactBaseManager, BaseManager, EventBaseManager,
     HierarchyBaseManager, PlaceBaseManager, TypeBaseManager)
 from openatlas.forms.field import (
-    DragNDropField, SubmitField, TableField, TableMultiField, TreeField, TextAnnotationField, SubmitSourceField)
+    DragNDropField, SubmitField, TableField, TableMultiField, TreeField,
+    TextAnnotationField, SubmitSourceField)
 from openatlas.forms.validation import file
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
@@ -576,16 +577,17 @@ class SourceManager(BaseManager):
     fields = ['name', 'continue', 'description']
 
     def add_description(self) -> None:
-
+        linked_entities = []
+        text = ''
+        if self.entity:
+            # To do: transform for text annotation widget
+            text = self.entity.description
+            for e in self.entity.get_linked_entities('P67'):
+                linked_entities.append({'id': e.id, 'name': e.name})
         setattr(self.form_class, 'description', TextAnnotationField(
             label=_('content'),
-            source_text="Test Text",
-            # source_text: html with <mark> attributes that holds the meta attribute with id and comment as annotations
-            linked_entities=[
-                {'id': 1, 'name': 'Entity 1'},
-                {'id': 2, 'name': 'Entity 2'}
-            ]
-        ))
+            source_text=text,
+            linked_entities=linked_entities))
 
     def additional_fields(self) -> dict[str, Any]:
         selection = None
@@ -601,10 +603,13 @@ class SourceManager(BaseManager):
                 Entity.get_by_class('artifact', True),
                 selection,
                 description=
-                _('Link artifacts as the information carrier of the source'))}
+                _('Link artifacts as the information carrier of the source')),
+            'hidden_annotation_text': HiddenField()}
 
     def process_form(self) -> None:
         super().process_form()
+        self.data['attributes']['description'] = \
+            self.form.hidden_annotation_text.data
         if not self.origin:
             self.data['links']['delete_inverse'].add('P128')
             if self.form.artifact.data:
