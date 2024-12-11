@@ -255,8 +255,6 @@ class Entity:
             return sanitize(self.description, 'text')
         AnnotationText.delete_annotations_text(self.id)
         text = self.description
-        print(text)
-        print('***************')
         replace_strings = [
             '<p>', '</p>', '<br class="ProseMirror-trailingBreak">']
         for string in replace_strings:
@@ -285,11 +283,9 @@ class Entity:
             inner_text = text[annotation.link_start+ offset: annotation.link_end+offset]
             meta = json.dumps(dict_).replace('"', '&quot;')
             mark = f'<mark meta="{meta}">{inner_text}</mark>'
-
             start = annotation.link_start + offset
             end = annotation.link_end + offset
             text = text[:start] + mark + text[end:]
-
             offset += (len(mark) - len(inner_text))
         text = text.replace('\n', '<br>') if text else text
         return text

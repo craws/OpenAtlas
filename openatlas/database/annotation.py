@@ -114,7 +114,6 @@ def delete_annotation_image(id_: int) -> None:
 
 
 def update_annotation_text(data: dict[str, Any]) -> None:
-    print(data)
     g.cursor.execute(
         """
         UPDATE model.annotation_text
