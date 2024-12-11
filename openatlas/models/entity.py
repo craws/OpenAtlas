@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import re
 from typing import Any, Iterable, Optional, TYPE_CHECKING
 
 from flask import g, request
@@ -10,7 +11,8 @@ from openatlas import app
 from openatlas.database import (
     date, entity as db, link as db_link, tools as db_tools)
 from openatlas.display.util2 import (
-    convert_size, datetime64_to_timestamp, format_date_part, sanitize,
+    convert_size, datetime64_to_timestamp, format_date_part,
+    sanitize,
     timestamp_to_datetime64)
 from openatlas.models.gis import Gis
 from openatlas.models.tools import get_carbon_link
@@ -230,11 +232,6 @@ class Entity:
     def update_attributes(self, attributes: dict[str, Any]) -> None:
         for key, value in attributes.items():
             setattr(self, key, value)
-        if self.class_.name == 'source':
-            description = self.description
-        else:
-            description = sanitize(self.description, 'text') \
-                if self.description else None
         db.update({
             'id': self.id,
             'name': self.name.strip(),
@@ -247,7 +244,50 @@ class Entity:
                 if self.begin_comment else None,
             'end_comment':
                 str(self.end_comment).strip() if self.end_comment else None,
-            'description': description})
+            'description': self.update_description()})
+
+    def update_description(self):
+        if not self.description:
+            return None
+        if self.class_.name != 'source':
+            return sanitize(self.description, 'text')
+        text = self.description
+        replace_strings = [
+            '<p>', '</p>', '<br class="ProseMirror-trailingBreak">']
+        for string in replace_strings:
+            text = text.replace(string, '')
+        text = re.sub(r'(<br>\s*)+$', '', text)
+        text = text.replace('<br>', '\n').replace('&quot;', '"')
+        # self.extract_annotation(text)
+        return self.description
+
+
+    # @staticmethod
+    # def extract_strings_recursive(string: str):
+    #     start_idx = string.find("<mark")
+    #     if start_idx == -1:
+    #         return
+    #     end_idx = string.find("</mark>", start_idx) + 7
+    #     part = string[start_idx:end_idx]
+    #     # print(part)
+    #     info = re.findall(r'"(.+?)"', string)[0]
+    #     info = info.replace('&quot;', '"')
+    #     info = json.loads(info)
+    #     # print(info)
+    #     # print(string)
+    #
+    #     match = re.search('>(.*?)</mark>', part)
+    #     title = match.group(1)
+    #     print(title)
+    #     new_string = string.replace(part, title)
+    #     print(new_string)
+    #
+    #     # res = [string[start_idx+len(tag)+2:end_idx]]
+    #
+    #     # recursive call to extract strings after the current tag
+    #     # res += extract_strings_recursive(string[end_idx+len(tag)+3:], tag)
+    #
+    #     return ''
 
     def update_aliases(self, aliases: list[str]) -> None:
         delete_ids = []
