@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import json
 import re
 from typing import Any, Iterable, Optional, TYPE_CHECKING
 
@@ -14,6 +15,7 @@ from openatlas.display.util2 import (
     convert_size, datetime64_to_timestamp, format_date_part,
     sanitize,
     timestamp_to_datetime64)
+from openatlas.models.annotation import AnnotationText
 from openatlas.models.gis import Gis
 from openatlas.models.tools import get_carbon_link
 
@@ -258,36 +260,40 @@ class Entity:
             text = text.replace(string, '')
         text = re.sub(r'(<br>\s*)+$', '', text)
         text = text.replace('<br>', '\n').replace('&quot;', '"')
-        # self.extract_annotation(text)
-        return self.description
+        processed_text = self.process_text(text)
+        for data in processed_text['data']:
+            AnnotationText.insert(
+                data['source_id'],
+                data['link_start'],
+                data['link_end'],
+                data['entity_id'],
+                data['text'])
+        return processed_text['text']
 
+    def process_text(self, text):
+        data = []
+        current_offset = 1
+        pattern = r'<mark meta="(.*?)">(.*?)</mark>'
 
-    # @staticmethod
-    # def extract_strings_recursive(string: str):
-    #     start_idx = string.find("<mark")
-    #     if start_idx == -1:
-    #         return
-    #     end_idx = string.find("</mark>", start_idx) + 7
-    #     part = string[start_idx:end_idx]
-    #     # print(part)
-    #     info = re.findall(r'"(.+?)"', string)[0]
-    #     info = info.replace('&quot;', '"')
-    #     info = json.loads(info)
-    #     # print(info)
-    #     # print(string)
-    #
-    #     match = re.search('>(.*?)</mark>', part)
-    #     title = match.group(1)
-    #     print(title)
-    #     new_string = string.replace(part, title)
-    #     print(new_string)
-    #
-    #     # res = [string[start_idx+len(tag)+2:end_idx]]
-    #
-    #     # recursive call to extract strings after the current tag
-    #     # res += extract_strings_recursive(string[end_idx+len(tag)+3:], tag)
-    #
-    #     return ''
+        def replace_mark(match):
+            nonlocal current_offset
+            metadata = json.loads(match.group(1))
+            inner_text = match.group(2)
+            start, end = match.span()
+            adjusted_start = start + current_offset
+            adjusted_end = adjusted_start + len(inner_text)
+            data.append({
+                'source_id': self.id,
+                'entity_id': metadata.get('id'),
+                'text': metadata.get('comment'),
+                'link_start': adjusted_start,
+                'link_end': adjusted_end})
+            current_offset += len(inner_text) - (end - start)
+            return inner_text
+
+        return {
+            'text': re.sub(pattern, replace_mark, text),
+            'data': data}
 
     def update_aliases(self, aliases: list[str]) -> None:
         delete_ids = []
@@ -479,7 +485,7 @@ class Entity:
     def get_by_ids(
             ids: Iterable[int],
             types: bool = False,
-            aliases: bool = False,) -> list[Entity]:
+            aliases: bool = False, ) -> list[Entity]:
         entities = []
         for row in db.get_by_ids(ids, types, aliases):
             if row['id'] in g.types:

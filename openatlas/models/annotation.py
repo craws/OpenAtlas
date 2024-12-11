@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import Any, Optional
 
-from flask_login import current_user
-
 from openatlas.database import annotation as db
 
 
