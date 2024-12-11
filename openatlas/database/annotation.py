@@ -125,10 +125,10 @@ def update_annotation_text(data: dict[str, Any]) -> None:
         data)
 
 
-def delete_annotation_text(id_: int) -> None:
+def delete_annotations_text(source_id: int) -> None:
     g.cursor.execute(
-        'DELETE FROM model.annotation_text WHERE id = %(id)s;',
-        {'id': id_})
+        'DELETE FROM model.annotation_text WHERE source_id = %(id)s;',
+        {'id': source_id})
 
 
 def remove_entity_from_annotation_image(

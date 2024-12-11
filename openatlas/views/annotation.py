@@ -1,6 +1,5 @@
 from flask import flash, render_template, url_for
 from flask_babel import lazy_gettext as _
-from flask_login import current_user
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
@@ -38,9 +37,7 @@ def annotation_text_insert(id_: int) -> str | Response:
             [[0, 'desc']])
         for annotation in annotations:
             delete = ''
-            if is_authorized('editor') or (
-                    is_authorized('contributor')
-                    and current_user.id == annotation.user_id):
+            if is_authorized('contributor'):
                 delete = link(
                     _('delete'),
                     url_for('annotation_text_delete', id_=annotation.id),
@@ -125,9 +122,7 @@ def annotation_image_insert(id_: int) -> str | Response:
         rows = []
         for annotation in annotations:
             delete = ''
-            if is_authorized('editor') or (
-                    is_authorized('contributor')
-                    and current_user.id == annotation.user_id):
+            if is_authorized('contributor'):
                 delete = link(
                     _('delete'),
                     url_for('annotation_image_delete', id_=annotation.id),
@@ -186,23 +181,7 @@ def annotation_image_update(id_: int) -> str | Response:
 @required_group('contributor')
 def annotation_image_delete(id_: int) -> Response:
     annotation = AnnotationImage.get_by_id(id_)
-    if current_user.group == 'contributor' \
-            and annotation.user_id != current_user.id:
-        abort(403)  # pragma: no cover
     annotation.delete()
     flash(_('annotation deleted'), 'info')
     return redirect(
         url_for('annotation_image_insert', id_=annotation.image_id))
-
-
-@app.route('/annotation_text_delete/<int:id_>')
-@required_group('contributor')
-def annotation_text_delete(id_: int) -> Response:
-    annotation = AnnotationText.get_by_id(id_)
-    if current_user.group == 'contributor' \
-            and annotation.user_id != current_user.id:
-        abort(403)  # pragma: no cover
-    annotation.delete()
-    flash(_('annotation deleted'), 'info')
-    return redirect(
-        url_for('annotation_text_insert', id_=annotation.source_id))

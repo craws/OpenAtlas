@@ -83,8 +83,9 @@ class AnnotationText:
             'link_start': link_start,
             'link_end': link_end})
 
-    def delete(self) -> None:
-        db.delete_annotation_text(self.id)
+    @staticmethod
+    def delete_annotations_text(source_id: int) -> None:
+        db.delete_annotations_text(source_id)
 
     @staticmethod
     def get_by_id(id_: int) -> AnnotationText:

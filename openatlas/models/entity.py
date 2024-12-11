@@ -248,11 +248,12 @@ class Entity:
                 str(self.end_comment).strip() if self.end_comment else None,
             'description': self.update_description()})
 
-    def update_description(self):
+    def update_description(self) -> Optional[str]:
         if not self.description:
             return None
         if self.class_.name != 'source':
             return sanitize(self.description, 'text')
+        AnnotationText.delete_annotations_text(self.id)
         text = self.description
         replace_strings = [
             '<p>', '</p>', '<br class="ProseMirror-trailingBreak">']
@@ -270,9 +271,21 @@ class Entity:
                 data['text'])
         return processed_text['text']
 
+    def get_annotated_text(self):
+        text = self.description
+        for annotation in AnnotationText.get_by_source_id(self.id):
+            dict_ = {}
+            if annotation.entity_id:
+                dict_['id'] = annotation.entity_id
+            if annotation.text:
+                dict_['comment'] = annotation.text
+            inner_text = text[annotation.link_start: annotation.link_end]
+            string = f'<mark meta="{ json.dumps(dict_) }">{inner_text}</mark>'
+
+
     def process_text(self, text):
         data = []
-        current_offset = 1
+        current_offset = 0
         pattern = r'<mark meta="(.*?)">(.*?)</mark>'
 
         def replace_mark(match):
