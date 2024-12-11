@@ -12,7 +12,8 @@ from openatlas.forms.base_manager import (
     ActorBaseManager, ArtifactBaseManager, BaseManager, EventBaseManager,
     HierarchyBaseManager, PlaceBaseManager, TypeBaseManager)
 from openatlas.forms.field import (
-    DragNDropField, SubmitField, TableField, TableMultiField, TreeField)
+    DragNDropField, SubmitField, TableField, TableMultiField, TreeField,
+    TextAnnotationField, SubmitSourceField)
 from openatlas.forms.validation import file
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
@@ -576,7 +577,17 @@ class SourceManager(BaseManager):
     fields = ['name', 'continue', 'description']
 
     def add_description(self) -> None:
-        setattr(self.form_class, 'description', TextAreaField(_('content')))
+        linked_entities = []
+        text = ''
+        if self.entity:
+            # To do: transform for text annotation widget
+            text = self.entity.description
+            for e in self.entity.get_linked_entities('P67'):
+                linked_entities.append({'id': e.id, 'name': e.name})
+        setattr(self.form_class, 'description', TextAnnotationField(
+            label=_('content'),
+            source_text=text,
+            linked_entities=linked_entities))
 
     def additional_fields(self) -> dict[str, Any]:
         selection = None
@@ -592,14 +603,29 @@ class SourceManager(BaseManager):
                 Entity.get_by_class('artifact', True),
                 selection,
                 description=
-                _('Link artifacts as the information carrier of the source'))}
+                _('Link artifacts as the information carrier of the source')),
+            'hidden_annotation_text': HiddenField()}
 
     def process_form(self) -> None:
         super().process_form()
+        self.data['attributes']['description'] = \
+            self.form.hidden_annotation_text.data
         if not self.origin:
             self.data['links']['delete_inverse'].add('P128')
             if self.form.artifact.data:
                 self.add_link('P128', self.form.artifact.data, inverse=True)
+
+    def add_buttons(self) -> None:
+        setattr(
+            self.form_class,
+            'save',
+            SubmitSourceField(_('insert') if self.insert else _('save')))
+        if self.insert and 'continue' in self.fields:
+            setattr(
+                self.form_class,
+                'insert_and_continue',
+                SubmitSourceField(_('insert and continue')))
+            setattr(self.form_class, 'continue_', HiddenField())
 
 
 class SourceTranslationManager(BaseManager):

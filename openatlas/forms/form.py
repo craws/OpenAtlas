@@ -130,7 +130,6 @@ def get_table_form(classes: list[str], excluded: list[int]) -> str:
         'forms/form_table.html',
         table=table.display(classes[0]))
 
-
 def get_cidoc_form() -> Any:
     class Form(FlaskForm):
         pass

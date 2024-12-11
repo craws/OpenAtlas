@@ -136,7 +136,7 @@ $(document).ready(function () {
   }).on('autocomplete.select', function(evt,item) {
       $('input[data-reference-system=Wikidata]').val(item.id);
   });
-  
+
   /**
    * GND autocomplete
    * Documentation: https://bootstrap-autocomplete.readthedocs.io/en/latest/
@@ -169,7 +169,7 @@ $(document).ready(function () {
   }).on('autocomplete.select', function(evt,item) {
     $('input[data-reference-system=GND]').val(item.id.substring(item.id.lastIndexOf('/') + 1));
   });
-  
+
 });
 
 $.jstree.defaults.core.themes.dots = false;
@@ -544,4 +544,8 @@ function toggleMapWidth(element){
   parent.classList.toggle("col-lg-3")
   parent.classList.toggle("col-lg-7")
   element.classList.toggle("rotate-180")
+}
+
+function saveAnnotationText() {
+    return document.querySelector("[name='hidden_annotation_text']").value = document.querySelector("#editor .ProseMirror").innerHTML;
 }
