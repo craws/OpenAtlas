@@ -230,6 +230,11 @@ class Entity:
     def update_attributes(self, attributes: dict[str, Any]) -> None:
         for key, value in attributes.items():
             setattr(self, key, value)
+        if self.class_.name == 'source':
+            description = self.description
+        else:
+            description = sanitize(self.description, 'text') \
+                if self.description else None
         db.update({
             'id': self.id,
             'name': self.name.strip(),
@@ -242,9 +247,7 @@ class Entity:
                 if self.begin_comment else None,
             'end_comment':
                 str(self.end_comment).strip() if self.end_comment else None,
-            'description':
-                sanitize(self.description, 'text')
-                if self.description else None})
+            'description': description})
 
     def update_aliases(self, aliases: list[str]) -> None:
         delete_ids = []

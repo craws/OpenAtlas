@@ -224,16 +224,16 @@ class TextAnnotationField(Field):
 
     def __init__(
             self,
-            label=None,
-            validators=None,
-            source_text=None,
-            linked_entities=None,
-            **kwargs):
+            label: str,
+            validators: Optional[Any] = None,
+            source_text: Optional[str] = None,
+            linked_entities: Optional[list[Any]] = None,
+            **kwargs: Any) -> None:
         super().__init__(label, validators, **kwargs)
         self.source_text = source_text or ''
         self.linked_entities = linked_entities or []
 
-    def _value(self):
+    def _value(self) -> str:
         return self.data or ''
 
 

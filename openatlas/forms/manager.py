@@ -608,7 +608,8 @@ class SourceManager(BaseManager):
 
     def process_form(self) -> None:
         super().process_form()
-        print(self.form.hidden_annotation_text.data)
+        self.data['attributes']['description'] = \
+            self.form.hidden_annotation_text.data
         if not self.origin:
             self.data['links']['delete_inverse'].add('P128')
             if self.form.artifact.data:
