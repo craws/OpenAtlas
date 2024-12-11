@@ -547,5 +547,5 @@ function toggleMapWidth(element){
 }
 
 function saveAnnotationText() {
-    return document.querySelector("[name='hidden_annotation_text']").value = document.querySelector("#editor .ProseMirror").innerHTML;
+    return document.querySelector("[name='description']").value = document.querySelector("#editor .ProseMirror").innerHTML;
 }
