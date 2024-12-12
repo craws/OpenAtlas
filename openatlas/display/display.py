@@ -9,7 +9,8 @@ from openatlas.display.base_display import (
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, description, edit_link, format_entity_date, get_base_table_data,
+    button, description, display_annotation_text_links, edit_link,
+    format_entity_date, get_base_table_data,
     get_file_path, link, remove_link)
 from openatlas.display.util2 import is_authorized, uc_first
 from openatlas.models.entity import Entity
@@ -327,7 +328,9 @@ class SourceDisplay(BaseDisplay):
         self.add_note_tab()
 
     def description_html(self) -> str:
-        return description(self.entity.description, _('content'))
+        return description(
+            display_annotation_text_links(self.entity),
+            _('content'))
 
 
 class SourceTranslationDisplay(BaseDisplay):

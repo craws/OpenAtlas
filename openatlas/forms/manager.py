@@ -580,8 +580,8 @@ class SourceManager(BaseManager):
         linked_entities = []
         text = ''
         if self.entity:
-            # To do: transform for text annotation widget
-            text = self.entity.description
+            # Todo: transform for text annotation widget
+            text = self.entity.get_annotated_text()
             for e in self.entity.get_linked_entities('P67'):
                 linked_entities.append({'id': e.id, 'name': e.name})
         setattr(self.form_class, 'description', TextAnnotationField(
