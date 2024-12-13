@@ -7,8 +7,8 @@ UPDATE web.settings SET value = '8.9.0' WHERE name = 'database_version';
 
 -- Sync image annotation fields to text annotation fields
 ALTER TABLE web.annotation_image SET SCHEMA model;
-ALTER TABLE model.annotation_image ALTER COLUMN annotation DROP NOT NULL;
 ALTER TABLE model.annotation_image RENAME COLUMN annotation TO text;
+ALTER TABLE model.annotation_image ALTER COLUMN text DROP NOT NULL;
 ALTER TABLE model.annotation_image DROP COLUMN user_id;
 ALTER TABLE model.annotation_image ADD COLUMN modified timestamp without time zone;
 CREATE TRIGGER update_modified BEFORE UPDATE ON model.annotation_image FOR EACH ROW EXECUTE FUNCTION model.update_modified();
