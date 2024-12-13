@@ -880,7 +880,7 @@ def get_iiif_files_without_entity(entity_file_ids: list[int]) -> list[Any]:
 
 def get_orphaned_annotations() -> list[Any]:
     rows = []
-    for annotation in Annotation.get_orphaned_annotations():
+    for annotation in AnnotationImage.get_orphaned_annotations():
         file = Entity.get_by_id(annotation.image_id)
         entity = Entity.get_by_id(annotation.entity_id)
         rows.append([

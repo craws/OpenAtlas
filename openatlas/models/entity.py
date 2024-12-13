@@ -271,7 +271,7 @@ class Entity:
                 data['text'])
         return processed_text['text']
 
-    def get_annotated_text(self):
+    def get_annotated_text(self) -> str:
         offset = 0
         text = self.description
         for annotation in AnnotationText.get_by_source_id(self.id):
@@ -280,23 +280,22 @@ class Entity:
                 dict_['id'] = str(annotation.entity_id)
             if annotation.text:
                 dict_['comment'] = annotation.text
-            inner_text = text[annotation.link_start+ offset: annotation.link_end+offset]
+            inner_text = text[
+                annotation.link_start + offset: annotation.link_end + offset]
             meta = json.dumps(dict_).replace('"', '&quot;')
             mark = f'<mark meta="{meta}">{inner_text}</mark>'
             start = annotation.link_start + offset
             end = annotation.link_end + offset
             text = text[:start] + mark + text[end:]
             offset += (len(mark) - len(inner_text))
-        text = text.replace('\n', '<br>') if text else text
-        return text
+        return text.replace('\n', '<br>') if text else text
 
-
-    def process_text(self, text):
+    def process_text(self, text: str) -> dict[str, Any]:
         data = []
         current_offset = 0
         pattern = r'<mark meta="(.*?)">(.*?)</mark>'
 
-        def replace_mark(match):
+        def replace_mark(match: Any) -> str:
             nonlocal current_offset
             metadata = json.loads(match.group(1))
             inner_text = match.group(2)

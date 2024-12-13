@@ -28,7 +28,7 @@ def hierarchy_name_exists(form: Any, field: Any) -> None:
 
 
 def validate(form: FlaskForm, extra_validators: validators = None) -> bool:
-    valid = FlaskForm.validate(form)
+    valid = FlaskForm.validate(form, extra_validators)
     if hasattr(form, 'begin_year_from') and not validate_dates(form):
         valid = False
     for field_id, field in form.__dict__.items():

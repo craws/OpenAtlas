@@ -7,100 +7,11 @@ from werkzeug.wrappers import Response
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
-from openatlas.display.util import (
-    display_annotation_text_links, get_file_path, link, required_group)
+from openatlas.display.util import get_file_path, link, required_group
 from openatlas.display.util2 import format_date, is_authorized, manual
-from openatlas.forms.form import (
-    get_annotation_image_form, get_annotation_text_form)
-from openatlas.models.annotation import AnnotationImage, AnnotationText
+from openatlas.forms.form import get_annotation_image_form
+from openatlas.models.annotation import AnnotationImage
 from openatlas.models.entity import Entity
-
-
-@app.route('/annotation_text_insert/<int:id_>', methods=['GET', 'POST'])
-@required_group('contributor')
-def annotation_text_insert(id_: int) -> str | Response:
-    source = Entity.get_by_id(id_, types=True)
-    form = get_annotation_text_form(source.id)
-    if form.validate_on_submit():
-        AnnotationText.insert(
-            source_id=id_,
-            link_start=int(form.link_start.data),
-            link_end=int(form.link_end.data),
-            entity_id=int(form.entity.data) if form.entity.data else None,
-            text=form.text.data)
-        return redirect(url_for('annotation_text_insert', id_=source.id))
-    table = None
-    if annotations := AnnotationText.get_by_source_id(source.id):
-        table = Table(
-            ['date', 'text', 'entity', 'start', 'end'],
-            [],
-            [[0, 'desc']])
-        for annotation in annotations:
-            delete = ''
-            if is_authorized('contributor'):
-                delete = link(
-                    _('delete'),
-                    url_for('annotation_text_delete', id_=annotation.id),
-                    js="return confirm('" + _('delete annotation') + "?')")
-            table.rows.append([
-                format_date(annotation.created),
-                annotation.text,
-                link(Entity.get_by_id(annotation.entity_id))
-                if annotation.entity_id else '',
-                annotation.link_start,
-                annotation.link_end,
-                link(
-                    _('edit'),
-                    url_for('annotation_text_update', id_=annotation.id)),
-                delete])
-
-    return render_template(
-        'tabs.html',
-        tabs={
-            'annotation': Tab(
-                'annotation',
-                render_template(
-                    'annotate_text.html',
-                    entity=source,
-                    formatted_text=display_annotation_text_links(source)),
-                table,
-                [manual('tools/text_annotation')],
-                form=form)},
-        entity=source,
-        crumbs=[
-            [_('source'), url_for('index', view='source')],
-            source,
-            _('annotate')])
-
-
-@app.route('/annotation_text_update/<int:id_>', methods=['GET', 'POST'])
-@required_group('contributor')
-def annotation_text_update(id_: int) -> str | Response:
-    annotation = AnnotationText.get_by_id(id_)
-    source = Entity.get_by_id(annotation.source_id)
-    form = get_annotation_text_form(
-        annotation.source_id,
-        Entity.get_by_id(annotation.entity_id)
-        if annotation.entity_id else None,
-        insert=False)
-    if form.validate_on_submit():
-        annotation.update(
-            form.link_start.data,
-            form.link_end.data,
-            int(form.entity.data) if form.entity.data else None,
-            form.text.data)
-        return redirect(url_for('annotation_text_insert', id_=source.id))
-    form.text.data = annotation.text
-    form.entity.data = annotation.entity_id
-    form.link_start.data = annotation.link_start
-    form.link_end.data = annotation.link_end
-    return render_template(
-        'tabs.html',
-        tabs={'annotation': Tab('annotation', form=form)},
-        crumbs=[
-            [_('source'), url_for('index', view='source')],
-            source,
-            _('annotate')])
 
 
 @app.route('/annotation_image_insert/<int:id_>', methods=['GET', 'POST'])

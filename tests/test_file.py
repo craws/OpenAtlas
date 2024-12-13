@@ -217,7 +217,7 @@ class FileTest(TestBaseCase):
         assert b'annotate' in rv.data
 
         rv = c.post(
-            url_for('annotation_insert', id_=iiif_id),
+            url_for('annotation_image_insert', id_=iiif_id),
             data={
                 'coordinate': '1.5,1.6,1.4,9.6,8.6,9.6,8.6,1.6',
                 'text': 'An interesting annotation',

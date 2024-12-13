@@ -580,7 +580,6 @@ class SourceManager(BaseManager):
         linked_entities = []
         text = ''
         if self.entity:
-            # Todo: transform for text annotation widget
             text = self.entity.get_annotated_text()
             for e in self.entity.get_linked_entities('P67'):
                 linked_entities.append({'id': e.id, 'name': e.name})
