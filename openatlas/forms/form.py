@@ -7,7 +7,6 @@ from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import HiddenField, SelectMultipleField, StringField, widgets
-from wtforms.fields.numeric import IntegerField
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import InputRequired, URL
 
@@ -83,29 +82,6 @@ def get_annotation_image_form(
     return Form()
 
 
-def get_annotation_text_form(
-        source_id: int,
-        entity: Optional[Entity] = None,
-        insert: Optional[bool] = True) -> Any:
-
-    class Form(FlaskForm):
-        text = TextAreaField(_('annotation'))
-        link_start = IntegerField()
-        link_end = IntegerField()
-
-    if insert:
-        pass
-
-    setattr(
-        Form,
-        'entity',
-        TableField(
-            Entity.get_by_id(source_id).get_linked_entities('P67', sort=True),
-            entity))
-    setattr(Form, 'save', SubmitField(_('save')))
-    return Form()
-
-
 def get_table_form(classes: list[str], excluded: list[int]) -> str:
     entities = Entity.get_by_class(classes, types=True, aliases=True)
     table = Table([''] + g.table_headers[classes[0]], order=[[2, 'asc']])
@@ -129,6 +105,7 @@ def get_table_form(classes: list[str], excluded: list[int]) -> str:
     return render_template(
         'forms/form_table.html',
         table=table.display(classes[0]))
+
 
 def get_cidoc_form() -> Any:
     class Form(FlaskForm):

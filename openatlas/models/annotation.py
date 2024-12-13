@@ -70,26 +70,9 @@ class AnnotationText:
         self.text = data['text']
         self.created = data['created']
 
-    def update(
-            self,
-            link_start: int,
-            link_end: int,
-            entity_id: Optional[int] = None,
-            text: Optional[str] = None) -> None:
-        db.update_annotation_text({
-            'id': self.id,
-            'entity_id': entity_id,
-            'text': text,
-            'link_start': link_start,
-            'link_end': link_end})
-
     @staticmethod
     def delete_annotations_text(source_id: int) -> None:
         db.delete_annotations_text(source_id)
-
-    @staticmethod
-    def get_by_id(id_: int) -> AnnotationText:
-        return AnnotationText(db.get_annotation_text_by_id(id_))
 
     @staticmethod
     def get_by_source_id(source_id: int) -> list[AnnotationText]:

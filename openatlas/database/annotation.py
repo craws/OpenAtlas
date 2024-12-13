@@ -35,14 +35,6 @@ def get_annotation_image_by_id(id_: int) -> dict[str, Any]:
     return g.cursor.fetchone()
 
 
-
-def get_annotation_text_by_id(id_: int) -> dict[str, Any]:
-    g.cursor.execute(
-        ANNOTATION_TEXT_SELECT + ' WHERE id =  %(id)s;',
-        {'id': id_})
-    return g.cursor.fetchone()
-
-
 def get_annotation_image_by_file(image_id: int) -> list[dict[str, Any]]:
     g.cursor.execute(
         ANNOTATION_IMAGE_SELECT + ' WHERE image_id =  %(image_id)s;',
@@ -111,17 +103,6 @@ def delete_annotation_image(id_: int) -> None:
     g.cursor.execute(
         'DELETE FROM model.annotation_image WHERE id = %(id)s;',
         {'id': id_})
-
-
-def update_annotation_text(data: dict[str, Any]) -> None:
-    g.cursor.execute(
-        """
-        UPDATE model.annotation_text
-        SET (entity_id, text, link_start, link_end) =
-        (%(entity_id)s, %(text)s, %(link_start)s, %(link_end)s)
-        WHERE id = %(id)s;
-        """,
-        data)
 
 
 def delete_annotations_text(source_id: int) -> None:
