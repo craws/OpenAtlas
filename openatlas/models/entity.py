@@ -275,9 +275,9 @@ class Entity:
         offset = 0
         text = self.description
         for annotation in AnnotationText.get_by_source_id(self.id):
-            dict_ = {}
+            dict_ = {'annotationId': f'a-{annotation.id}'}
             if annotation.entity_id:
-                dict_['id'] = str(annotation.entity_id)
+                dict_['entityId'] = annotation.entity_id
             if annotation.text:
                 dict_['comment'] = annotation.text
             inner_text = text[
@@ -304,7 +304,7 @@ class Entity:
             adjusted_end = adjusted_start + len(inner_text)
             data.append({
                 'source_id': self.id,
-                'entity_id': metadata.get('id'),
+                'entity_id': metadata.get('entityId'),
                 'text': metadata.get('comment'),
                 'link_start': adjusted_start,
                 'link_end': adjusted_end})
