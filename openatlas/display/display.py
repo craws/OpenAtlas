@@ -303,7 +303,7 @@ class SourceDisplay(BaseDisplay):
                 'artifact': _('mentioned in the source'),
                 'event': _('mentioned in the source'),
                 'place': _('mentioned in the source'),
-                'text': _('mentioned in the source'),
+                'text': '',
                 'reference': '',
                 'file': ''}.items():
             self.tabs[name] = Tab(name, entity=entity, tooltip=tooltip)
