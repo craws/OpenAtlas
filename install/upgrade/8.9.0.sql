@@ -1,5 +1,8 @@
 BEGIN;
 
+-- Raise database version
+UPDATE web.settings SET value = '8.9.0' WHERE name = 'database_version';
+
 -- #2079: Text annotation
 
 -- Sync image annotation fields to text annotation fields
