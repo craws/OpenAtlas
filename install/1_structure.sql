@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 15.8 (Debian 15.8-0+deb12u1)
--- Dumped by pg_dump version 15.8 (Debian 15.8-0+deb12u1)
+-- Dumped from database version 15.10 (Debian 15.10-0+deb12u1)
+-- Dumped by pg_dump version 15.10 (Debian 15.10-0+deb12u1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -441,7 +441,7 @@ ALTER SEQUENCE model.annotation_image_id_seq OWNED BY model.annotation_image.id;
 
 
 --
--- Name: annotation_text_id_seq; Type: SEQUENCE; Schema: web; Owner: openatlas
+-- Name: annotation_text_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
 --
 
 CREATE SEQUENCE model.annotation_text_id_seq
