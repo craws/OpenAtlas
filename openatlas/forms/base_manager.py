@@ -302,7 +302,6 @@ class ActorBaseManager(BaseManager):
 
 
 class PlaceBaseManager(BaseManager):
-
     def insert_entity(self) -> None:
         super().insert_entity()
         self.entity.link(
@@ -313,15 +312,15 @@ class PlaceBaseManager(BaseManager):
 
     def get_place_info_for_insert(self) -> None:
         super().get_place_info_for_insert()
-        if self.origin:
-            structure = self.origin.get_structure_for_insert()
-            self.place_info['structure'] = structure
-            self.place_info['gis_data'] = Gis.get_all([self.origin], structure)
-            if current_user.settings['module_map_overlay'] \
-                    and self.origin.class_.view == 'place':
-                self.place_info['overlay'] = Overlay.get_by_object(self.origin)
-        else:
+        if not self.origin:
             self.place_info['gis_data'] = Gis.get_all()
+            return
+        structure = self.origin.get_structure_for_insert()
+        self.place_info['structure'] = structure
+        self.place_info['gis_data'] = Gis.get_all([self.origin], structure)
+        if current_user.settings['module_map_overlay'] \
+                and self.origin.class_.view == 'place':
+            self.place_info['overlay'] = Overlay.get_by_object(self.origin)
 
     def get_place_info_for_update(self) -> None:
         super().get_place_info_for_update()
@@ -382,11 +381,10 @@ class EventBaseManager(BaseManager):
             event_preceding = self.entity.get_linked_entity('P134')
             filter_ids = [self.entity.id] + [
                 e.id for e in self.entity.get_linked_entities_recursive('P9') +
-                self.entity.get_linked_entities_recursive('P134', inverse=True)
-            ]
-            if self.class_.name != 'move':
-                if place_ := self.entity.get_linked_entity('P7'):
-                    place = place_.get_linked_entity_safe('P53', True)
+                self.entity.get_linked_entities_recursive('P134', True)]
+            if self.class_.name != 'move' \
+                    and (place_ := self.entity.get_linked_entity('P7')):
+                place = place_.get_linked_entity_safe('P53', True)
         self.table_items = {
             'event_view': Entity.get_by_view('event', True, self.aliases),
             'place': Entity.get_by_class('place', True, self.aliases)}
