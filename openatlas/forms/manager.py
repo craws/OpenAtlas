@@ -162,16 +162,15 @@ class ArtifactManager(ArtifactBaseManager):
                 and self.origin.class_.view in ['artifact', 'place'] else None
         else:
             selection = self.entity.get_linked_entity('P46', inverse=True)
-        fields = super().additional_fields()
-        fields['super'] = TableField(
-            Entity.get_by_class(
-                g.view_class_mapping['place'] + ['artifact'],
-                types=True,
-                aliases=self.aliases),
-            selection,
-            filter_ids,
-            add_dynamic=['place'])
-        return fields
+        return super().additional_fields() | {
+            'super': TableField(
+                Entity.get_by_class(
+                    g.view_class_mapping['place'] + ['artifact'],
+                    types=True,
+                    aliases=self.aliases),
+                selection,
+                filter_ids,
+                add_dynamic=['place'])}
 
     def process_form(self) -> None:
         super().process_form()
@@ -191,11 +190,9 @@ class CreationManager(EventBaseManager):
                 selection = [self.origin]
         else:
             selection = self.entity.get_linked_entities('P94', sort=True)
-        fields = super().additional_fields()
-        fields['document'] = TableMultiField(
-            Entity.get_by_class('file'),
-            selection)
-        return fields
+        return super().additional_fields() | {
+            'document':
+                TableMultiField(Entity.get_by_class('file'), selection)}
 
     def process_form(self) -> None:
         super().process_form()
@@ -229,26 +226,26 @@ class FeatureManager(PlaceBaseManager):
 
     def add_buttons(self) -> None:
         super().add_buttons()
-        if not self.entity:
-            setattr(
-                self.form_class,
-                'insert_continue_sub',
-                SubmitField(
-                    _('insert and add') + ' ' + _('stratigraphic unit')))
+        if self.entity:
+            return
+        setattr(
+            self.form_class,
+            'insert_continue_sub',
+            SubmitField(_('insert and add') + ' ' + _('stratigraphic unit')))
 
     def additional_fields(self) -> dict[str, Any]:
-        fields = super().additional_fields()
         if self.insert:
             selection = self.origin if self.origin \
                 and self.origin.class_.name == 'place' else None
         else:
             selection = self.entity.get_linked_entity('P46', inverse=True)
-        fields['super'] = TableField(
-            Entity.get_by_class('place', True, self.aliases),
-            selection,
-            validators=[InputRequired()],
-            add_dynamic=['place'])
-        return fields
+        return super().additional_fields() | {
+            'super':
+                TableField(
+                    Entity.get_by_class('place', True, self.aliases),
+                    selection,
+                    validators=[InputRequired()],
+                    add_dynamic=['place'])}
 
     def process_form(self) -> None:
         super().process_form()
@@ -298,16 +295,15 @@ class HumanRemainsManager(ArtifactBaseManager):
                 and self.origin.class_.view in ['artifact', 'place'] else None
         else:
             selection = self.entity.get_linked_entity('P46', inverse=True)
-        fields = super().additional_fields()
-        fields['super'] = TableField(
-            Entity.get_by_class(
-                g.view_class_mapping['place'] + ['human remains'],
-                types=True,
-                aliases=self.aliases),
-            selection,
-            filter_ids,
-            add_dynamic=['place'])
-        return fields
+        return super().additional_fields() | {
+            'super': TableField(
+                Entity.get_by_class(
+                    g.view_class_mapping['place'] + ['human remains'],
+                    types=True,
+                    aliases=self.aliases),
+                selection,
+                filter_ids,
+                add_dynamic=['place'])}
 
     def process_form(self) -> None:
         super().process_form()
@@ -400,14 +396,13 @@ class ModificationManager(EventBaseManager):
                     artifacts.append(item)
                 elif item.cidoc_class.code == 'E18':
                     places.append(item)
-        fields = super().additional_fields()
-        fields['artifact'] = TableMultiField(
-            Entity.get_by_class('artifact', True),
-            artifacts)
-        fields['modified_place'] = TableMultiField(
-            self.table_items['place'],
-            places)
-        return fields
+        return super().additional_fields() | {
+            'artifact': TableMultiField(
+                Entity.get_by_class('artifact', True),
+                artifacts),
+            'modified_place': TableMultiField(
+                self.table_items['place'],
+                places)}
 
     def process_form(self) -> None:
         super().process_form()
@@ -425,7 +420,6 @@ class MoveManager(EventBaseManager):
     _('place from')
 
     def additional_fields(self) -> dict[str, Any]:
-        fields = super().additional_fields()
         place_from = None
         place_to = None
         data: dict[str, list[Any]] = {'artifact': [], 'person': []}
@@ -443,21 +437,21 @@ class MoveManager(EventBaseManager):
                 data['artifact'] = [self.origin]
             elif self.origin.class_.view == 'place':
                 place_from = self.origin
-        fields['place_from'] = TableField(
-            self.table_items['place'],
-            place_from,
-            add_dynamic=['place'])
-        fields['place_to'] = TableField(
-            self.table_items['place'],
-            place_to,
-            add_dynamic=['place'])
-        fields['moved_artifact'] = TableMultiField(
-            Entity.get_by_class('artifact', True),
-            data['artifact'])
-        fields['moved_person'] = TableMultiField(
-            Entity.get_by_class('person', aliases=self.aliases),
-            data['person'])
-        return fields
+        return super().additional_fields() | {
+            'place_from': TableField(
+                self.table_items['place'],
+                place_from,
+                add_dynamic=['place']),
+            'place_to': TableField(
+                self.table_items['place'],
+                place_to,
+                add_dynamic=['place']),
+            'moved_artifact': TableMultiField(
+                Entity.get_by_class('artifact', True),
+                data['artifact']),
+            'moved_person': TableMultiField(
+                Entity.get_by_class('person', aliases=self.aliases),
+                data['person'])}
 
     def process_form(self) -> None:
         super().process_form()
@@ -503,14 +497,13 @@ class PlaceManager(PlaceBaseManager):
 
 class ProductionManager(EventBaseManager):
     def additional_fields(self) -> dict[str, Any]:
-        fields = super().additional_fields()
         selection = None
         if not self.insert and self.entity:
             selection = self.entity.get_linked_entities('P108', sort=True)
-        fields['artifact'] = TableMultiField(
-            Entity.get_by_class('artifact', True),
-            selection)
-        return fields
+        return super().additional_fields() | {
+            'artifact': TableMultiField(
+                Entity.get_by_class('artifact', True),
+                selection)}
 
     def process_form(self) -> None:
         super().process_form()
@@ -574,7 +567,6 @@ class ReferenceSystemManager(BaseManager):
 
 
 class SourceManager(SourceBaseManager):
-
     def add_description(self) -> None:
         text = ''
         linked_entities = []
@@ -609,7 +601,6 @@ class SourceManager(SourceBaseManager):
 
 
 class SourceTranslationManager(SourceBaseManager):
-
     def add_description(self) -> None:
         text = ''
         linked_entities = []
@@ -652,17 +643,16 @@ class StratigraphicUnitManager(PlaceBaseManager):
                 SubmitField(_('insert and add') + ' ' + _('human remains')))
 
     def additional_fields(self) -> dict[str, Any]:
-        fields = super().additional_fields()
         selection = None
         if not self.insert and self.entity:
             selection = self.entity.get_linked_entity_safe('P46', inverse=True)
         elif self.origin and self.origin.class_.name == 'feature':
             selection = self.origin
-        fields['super'] = TableField(
+        return super().additional_fields() | {
+            'super': TableField(
                 Entity.get_by_class('feature', True),
                 selection,
-                validators=[InputRequired()])
-        return fields
+                validators=[InputRequired()])}
 
     def process_form(self) -> None:
         super().process_form()
