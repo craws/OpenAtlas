@@ -341,6 +341,11 @@ class SourceTranslationDisplay(BaseDisplay):
             self.entity.get_linked_entity_safe('P73', True),
             self.entity.name]
 
+    def description_html(self) -> str:
+        return description(
+            display_annotation_text_links(self.entity),
+            _('content'))
+
 
 class StratigraphicUnitDisplay(PlaceBaseDisplay):
 

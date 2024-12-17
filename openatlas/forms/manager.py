@@ -5,15 +5,15 @@ from flask import g, request, url_for
 from flask_babel import lazy_gettext as _
 from wtforms import (
     BooleanField, HiddenField, SelectField, SelectMultipleField, StringField,
-    TextAreaField, widgets)
+    widgets)
 from wtforms.validators import InputRequired, Optional, URL
 
 from openatlas.forms.base_manager import (
     ActorBaseManager, ArtifactBaseManager, BaseManager, EventBaseManager,
-    HierarchyBaseManager, PlaceBaseManager, TypeBaseManager)
+    HierarchyBaseManager, PlaceBaseManager, SourceBaseManager, TypeBaseManager)
 from openatlas.forms.field import (
-    DragNDropField, SubmitField, TableField, TableMultiField, TreeField,
-    TextAnnotationField, SubmitSourceField)
+    DragNDropField, SubmitField, TableField, TableMultiField,
+    TextAnnotationField, TreeField)
 from openatlas.forms.validation import file
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
@@ -573,12 +573,11 @@ class ReferenceSystemManager(BaseManager):
             'classes': self.form.classes.data if self.form.classes else None}
 
 
-class SourceManager(BaseManager):
-    fields = ['name', 'continue', 'description']
+class SourceManager(SourceBaseManager):
 
     def add_description(self) -> None:
-        linked_entities = []
         text = ''
+        linked_entities = []
         if self.entity:
             text = self.entity.get_annotated_text()
             for e in self.entity.get_linked_entities('P67'):
@@ -591,19 +590,15 @@ class SourceManager(BaseManager):
     def additional_fields(self) -> dict[str, Any]:
         selection = None
         if not self.insert and self.entity:
-            selection = self.entity.get_linked_entities(
-                'P128',
-                inverse=True,
-                sort=True)
+            selection = self.entity.get_linked_entities('P128', True, True)
         elif self.origin and self.origin.class_.name == 'artifact':
             selection = [self.origin]
-        return {
+        return super().additional_fields() | {
             'artifact': TableMultiField(
                 Entity.get_by_class('artifact', True),
                 selection,
                 description=
-                _('Link artifacts as the information carrier of the source')),
-            'description': HiddenField()}
+                _('Link artifacts as the information carrier of the source'))}
 
     def process_form(self) -> None:
         super().process_form()
@@ -612,31 +607,27 @@ class SourceManager(BaseManager):
             if self.form.artifact.data:
                 self.add_link('P128', self.form.artifact.data, inverse=True)
 
-    def add_buttons(self) -> None:
-        setattr(
-            self.form_class,
-            'save',
-            SubmitSourceField(_('insert') if self.insert else _('save')))
-        if self.insert and 'continue' in self.fields:
-            setattr(
-                self.form_class,
-                'insert_and_continue',
-                SubmitSourceField(_('insert and continue')))
-            setattr(self.form_class, 'continue_', HiddenField())
 
+class SourceTranslationManager(SourceBaseManager):
 
-class SourceTranslationManager(BaseManager):
-    fields = ['name', 'continue']
-
-    def additional_fields(self) -> dict[str, Any]:
-        return {'description': TextAreaField(_('content'))}
+    def add_description(self) -> None:
+        text = ''
+        linked_entities = []
+        if self.entity:
+            text = self.entity.get_annotated_text()
+            source = self.entity.get_linked_entity_safe('P73', True)
+            for e in source.get_linked_entities('P67'):
+                linked_entities.append({'id': e.id, 'name': e.name})
+        setattr(self.form_class, 'description', TextAnnotationField(
+            label=_('content'),
+            source_text=text,
+            linked_entities=linked_entities))
 
     def get_crumbs(self) -> list[Any]:
         if not self.origin:
             self.crumbs = [
                 [_('source'), url_for('index', view='source')],
-                self.entity.get_linked_entity('P73', True),
-                self.entity]
+                self.entity.get_linked_entity('P73', True)]
         return super().get_crumbs()
 
     def process_form(self) -> None:

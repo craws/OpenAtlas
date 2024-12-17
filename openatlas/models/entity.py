@@ -251,7 +251,7 @@ class Entity:
     def update_description(self) -> Optional[str]:
         if not self.description:
             return None
-        if self.class_.name != 'source':
+        if self.class_.name not in ['source', 'source_translation']:
             return sanitize(self.description, 'text')
         AnnotationText.delete_annotations_text(self.id)
         text = self.description
