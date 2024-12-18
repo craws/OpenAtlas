@@ -102,7 +102,7 @@ class Tab:
     def set_buttons(self, name: str, entity: Optional[Entity] = None) -> None:
         view = entity.class_.view if entity else None
         id_ = entity.id if entity else None
-        class_ = entity.class_ if entity else None
+        class_name = entity.class_.name if entity else None
         match name:
             case 'actor':
                 match view:
@@ -137,7 +137,12 @@ class Tab:
                             g.classes[item].label,
                             url_for('insert', class_=item, origin_id=id_)))
             case 'artifact':
-                if entity and entity.class_.name in [
+                if class_name == 'source':
+                    self.buttons.append(
+                        button(
+                            'link',
+                            url_for('link_insert', id_=id_, view='artifact')))
+                if class_name in [
                         'place',
                         'artifact',
                         'human_remains',
@@ -147,7 +152,7 @@ class Tab:
                         button(
                             _('add subunit'),
                             url_for('add_subunit', super_id=id_)))
-                if entity and entity.class_.name != 'human_remains':
+                if class_name != 'human_remains':
                     self.buttons.append(
                         button(
                             g.classes['artifact'].label,
@@ -155,7 +160,7 @@ class Tab:
                                 'insert',
                                 class_='artifact',
                                 origin_id=id_)))
-                if entity and entity.class_.name != 'artifact':
+                if class_name != 'artifact':
                     self.buttons.append(
                         button(
                             g.classes['human_remains'].label,
@@ -217,7 +222,7 @@ class Tab:
                                         origin_id=id_),
                                     tooltip_text=g.classes[item]
                                     .get_tooltip()))
-            case 'feature' if class_ and class_.name == 'place':
+            case 'feature' if class_name == 'place':
                 self.buttons.append(
                     button(
                         g.classes[name].label,
@@ -264,7 +269,7 @@ class Tab:
                 self.buttons.append(
                     button(_('note'), url_for('note_insert', entity_id=id_)))
             case 'place':
-                if class_ and class_.name == 'file':
+                if class_name == 'file':
                     self.buttons.append(
                         button(
                             'link',
@@ -305,7 +310,7 @@ class Tab:
                             g.classes[item].label,
                             url_for('insert', class_=item, origin_id=id_)))
             case 'source':
-                if class_ and class_.name == 'file':
+                if class_name == 'file':
                     self.buttons.append(
                         button(
                             _('link'),
@@ -322,12 +327,11 @@ class Tab:
                     button(
                         g.classes['source'].label,
                         url_for('insert', class_=name, origin_id=id_)))
-            case 'stratigraphic_unit':
-                if class_ and class_.name == 'feature':
-                    self.buttons.append(
-                        button(
-                            g.classes['stratigraphic_unit'].label,
-                            url_for('insert', class_=name, origin_id=id_)))
+            case 'stratigraphic_unit' if class_name == 'feature':
+                self.buttons.append(
+                    button(
+                        g.classes['stratigraphic_unit'].label,
+                        url_for('insert', class_=name, origin_id=id_)))
             case 'text':
                 self.buttons.append(button(
                     _('text'),
