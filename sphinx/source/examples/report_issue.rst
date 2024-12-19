@@ -32,5 +32,5 @@ The easiest way to report such a problem is via
 
 How to report
 -------------
-To report an issue on redmine you have to create an account. Of course your
-account is free of charge
+To report an issue, an account must first be created. This is of course completely free and all you need is a valid email address and a password.
+Activation is not automatic, but is carried out manually by the OpenAtlas team. This may take some time. Therefore, it might be best to create an account before it is needed to report bugs
