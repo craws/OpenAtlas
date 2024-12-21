@@ -38,14 +38,16 @@ Please refer to our [contributing guidelines](CONTRIBUTING.md)
 
 - **Stefan Eichert** - Idea, Concept and Data Modelling
 ([stefan.eichert@nhm-wien.ac.at](mailto:stefan.eichert@nhm-wien.ac.at))
+- **Nina Richards** - Project Management and Bioarchaeological Expertise
+([nina.richards@oeaw.ac.at](mailto:nina.richards@oeaw.ac.at))
 - **Alexander Watzinger** - Lead Developer and Concept
 ([alexander.watzinger@oeaw.ac.at](mailto:alexander.watzinger@oeaw.ac.at))
 - **Bernhard Koschiček-Krombholz** - Backend Development, API
 ([bernhard.koschicek-krombholz@oeaw.ac.at](mailto:bernhard.koschicek-krombholz@oeaw.ac.at))
-- **Nina Richards** - Bioarchaeological Expertise
-([nina.richards@oeaw.ac.at](mailto:nina.richards@oeaw.ac.at))
 - **Olivia Reichl** - Frontend Development
-([Olivia.Reichl@oeaw.ac.at](mailto:Olivia.Reichl@oeaw.ac.at)
+([Olivia.Reichl@oeaw.ac.at](mailto:Olivia.Reichl@oeaw.ac.at))
+- **Katharina Wünsche** - Frontend Development
+([Katharina Wuensche@oeaw.ac.at](mailto:Katharina Wuensche@oeaw.ac.at))
 - **Jan Belik** - Logo Design and Design Consulting
 ([buero@janbelik.com](mailto:buero@janbelik.com))
 
