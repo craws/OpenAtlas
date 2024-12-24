@@ -7,17 +7,22 @@
           <li class="nav-item" role="presentation">
             <a
                 class="fw-normal py-1 nav-link {% if loop.first %}active{% endif %}"
-                data-bs-toggle="tooltip"
+                data-bs-toggle="tab"
                 data-bs-placement="top"
-                title="{{ tab.tooltip }}"
                 role="tab"
                 type="button"
                 aria-selected="{% if active %}true{% else %}false{% endif %}"
                 href="#tab-{{ tab.name|replace('_', '-') }}">
+              <span
+              data-bs-toggle="tooltip"
+              title="{{ tab.tooltip }}"
+              data-bs-placement="top"
+              >
               {{ _(tab.name|replace('_', ' '))|uc_first }}
               {% if tab.table.rows|length %}
                 <span class="tab-counter">{{ '{0:,}'.format(tab.table.rows|length) }}</span>
               {% endif %}
+              </span>
             </a>
           </li>
         {% endfor %}
@@ -43,4 +48,5 @@
       </div>
     </div>
   </div>
+
 {% endblock %}

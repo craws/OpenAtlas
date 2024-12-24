@@ -16,7 +16,13 @@ class SourceTest(TestBaseCase):
 
         rv = c.post(
             url_for('insert', class_='source'),
-            data={'name': 'Necronomicon'})
+            data={
+                'name': 'Necronomicon',
+                'description': (
+                    'The <mark meta="{"annotationId":"c27",'
+                    f'"entityId":{artifact.id},'
+                    '"comment":"asdf"}">Necronomicon</mark>,'
+                    ' also referred to as the Book of the Dead')})
         source_id = rv.location.split('/')[-1]
 
         rv = c.get(url_for('insert', class_='source', origin_id=artifact.id))
@@ -38,7 +44,10 @@ class SourceTest(TestBaseCase):
             url_for('update', id_=source_id),
             data={
                 'name': 'Source updated',
-                'description': 'some description',
+                'description': (
+                    'The <mark meta="{"annotationId":"c27",'
+                    '"comment":"asdf"}">Necronomicon</mark>,'
+                    ' also referred to as the Book of the Dead'),
                 'artifact': [artifact.id]},
             follow_redirects=True)
         assert b'Source updated' in rv.data

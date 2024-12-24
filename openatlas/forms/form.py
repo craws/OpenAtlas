@@ -61,7 +61,7 @@ def get_add_reference_form(class_: str) -> Any:
     return Form()
 
 
-def get_annotation_form(
+def get_annotation_image_form(
         image_id: int,
         entity: Optional[Entity] = None,
         insert: Optional[bool] = True) -> Any:

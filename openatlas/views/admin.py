@@ -36,7 +36,7 @@ from openatlas.forms.setting import (
     ApiForm, ContentForm, FrontendForm, GeneralForm, LogForm, MailForm,
     MapForm, ModulesForm, SimilarForm, TestMailForm)
 from openatlas.forms.util import get_form_settings, set_form_settings
-from openatlas.models.annotation import Annotation
+from openatlas.models.annotation import AnnotationImage
 from openatlas.models.checks import (
     entities_linked_to_itself, invalid_cidoc_links, invalid_dates,
     orphaned_subunits, orphans as get_orphans, similar_named,
@@ -592,7 +592,7 @@ def admin_file_delete(filename: str) -> Response:
 @app.route('/admin/annotation/delete/<int:id_>')
 @required_group('editor')
 def admin_annotation_delete(id_: int) -> Response:
-    annotation = Annotation.get_by_id(id_)
+    annotation = AnnotationImage.get_by_id(id_)
     annotation.delete()
     flash(_('annotation deleted'), 'info')
     return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
@@ -613,7 +613,7 @@ def admin_annotation_relink(image_id: int, entity_id: int) -> Response:
 def admin_annotation_remove_entity(
         annotation_id: int,
         entity_id: int) -> Response:
-    Annotation.remove_entity_from_annotation(annotation_id, entity_id)
+    AnnotationImage.remove_entity_from_annotation(annotation_id, entity_id)
     flash(_('entity removed from annotation'), 'info')
     return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
 
@@ -880,7 +880,7 @@ def get_iiif_files_without_entity(entity_file_ids: list[int]) -> list[Any]:
 
 def get_orphaned_annotations() -> list[Any]:
     rows = []
-    for annotation in Annotation.get_orphaned_annotations():
+    for annotation in AnnotationImage.get_orphaned_annotations():
         file = Entity.get_by_id(annotation.image_id)
         entity = Entity.get_by_id(annotation.entity_id)
         rows.append([

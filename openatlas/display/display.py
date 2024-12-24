@@ -9,7 +9,8 @@ from openatlas.display.base_display import (
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, description, edit_link, format_entity_date, get_base_table_data,
+    button, description, display_annotation_text_links, edit_link,
+    format_entity_date, get_base_table_data,
     get_file_path, link, remove_link)
 from openatlas.display.util2 import is_authorized, uc_first
 from openatlas.models.entity import Entity
@@ -302,7 +303,7 @@ class SourceDisplay(BaseDisplay):
                 'artifact': _('mentioned in the source'),
                 'event': _('mentioned in the source'),
                 'place': _('mentioned in the source'),
-                'text': _('mentioned in the source'),
+                'text': '',
                 'reference': '',
                 'file': ''}.items():
             self.tabs[name] = Tab(name, entity=entity, tooltip=tooltip)
@@ -321,7 +322,9 @@ class SourceDisplay(BaseDisplay):
         self.add_note_tab()
 
     def description_html(self) -> str:
-        return description(self.entity.description, _('content'))
+        return description(
+            display_annotation_text_links(self.entity),
+            _('content'))
 
 
 class SourceTranslationDisplay(BaseDisplay):
@@ -337,6 +340,11 @@ class SourceTranslationDisplay(BaseDisplay):
             [_('source'), url_for('index', view='source')],
             self.entity.get_linked_entity_safe('P73', True),
             self.entity.name]
+
+    def description_html(self) -> str:
+        return description(
+            display_annotation_text_links(self.entity),
+            _('content'))
 
 
 class StratigraphicUnitDisplay(PlaceBaseDisplay):

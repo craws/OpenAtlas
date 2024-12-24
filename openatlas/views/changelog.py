@@ -17,10 +17,14 @@ def index_changelog() -> str:
 versions = {
     '8.9.0': ['TBA', {
         'feature': {
+            '2079': 'Text annotation',
+            '2369': 'Text annotation widget',
+            '2433': 'Link artifact from tab at source',
             '2389': 'Activity log for entities',
             '2381': 'Import only year dates',
             '2390': 'More hints about usage at sources',
-            '2391': 'IIIF: add reference '}}],
+            '2391': 'IIIF: add reference',
+            '2377': 'Refactor and minor improvements'}}],
     '8.8.0': ['2024-10-31', {
         'feature': {
             '2349': 'Stronger hints that notes are not part of the model',

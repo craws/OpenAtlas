@@ -15,7 +15,7 @@ from wtforms.validators import InputRequired
 from openatlas.forms.add_fields import (
     add_date_fields, add_reference_systems, add_types)
 from openatlas.forms.field import (
-    RemovableListField, SubmitField, TableField, TreeField)
+    RemovableListField, SubmitField, SubmitSourceField, TableField, TreeField)
 from openatlas.forms.populate import (
     populate_dates, populate_reference_systems, populate_types)
 from openatlas.forms.process import (
@@ -302,7 +302,6 @@ class ActorBaseManager(BaseManager):
 
 
 class PlaceBaseManager(BaseManager):
-
     def insert_entity(self) -> None:
         super().insert_entity()
         self.entity.link(
@@ -313,15 +312,15 @@ class PlaceBaseManager(BaseManager):
 
     def get_place_info_for_insert(self) -> None:
         super().get_place_info_for_insert()
-        if self.origin:
-            structure = self.origin.get_structure_for_insert()
-            self.place_info['structure'] = structure
-            self.place_info['gis_data'] = Gis.get_all([self.origin], structure)
-            if current_user.settings['module_map_overlay'] \
-                    and self.origin.class_.view == 'place':
-                self.place_info['overlay'] = Overlay.get_by_object(self.origin)
-        else:
+        if not self.origin:
             self.place_info['gis_data'] = Gis.get_all()
+            return
+        structure = self.origin.get_structure_for_insert()
+        self.place_info['structure'] = structure
+        self.place_info['gis_data'] = Gis.get_all([self.origin], structure)
+        if current_user.settings['module_map_overlay'] \
+                and self.origin.class_.view == 'place':
+            self.place_info['overlay'] = Overlay.get_by_object(self.origin)
 
     def get_place_info_for_update(self) -> None:
         super().get_place_info_for_update()
@@ -382,11 +381,10 @@ class EventBaseManager(BaseManager):
             event_preceding = self.entity.get_linked_entity('P134')
             filter_ids = [self.entity.id] + [
                 e.id for e in self.entity.get_linked_entities_recursive('P9') +
-                self.entity.get_linked_entities_recursive('P134', inverse=True)
-            ]
-            if self.class_.name != 'move':
-                if place_ := self.entity.get_linked_entity('P7'):
-                    place = place_.get_linked_entity_safe('P53', True)
+                self.entity.get_linked_entities_recursive('P134', True)]
+            if self.class_.name != 'move' \
+                    and (place_ := self.entity.get_linked_entity('P7')):
+                place = place_.get_linked_entity_safe('P53', True)
         self.table_items = {
             'event_view': Entity.get_by_view('event', True, self.aliases),
             'place': Entity.get_by_class('place', True, self.aliases)}
@@ -500,3 +498,22 @@ class TypeBaseManager(BaseManager):
         self.super_id = self.get_root().id
         if new_id := getattr(self.form, str(self.super_id)).data:
             self.super_id = int(new_id)
+
+
+class SourceBaseManager(BaseManager):
+    fields = ['name', 'continue', 'description']
+
+    def add_buttons(self) -> None:
+        setattr(
+            self.form_class,
+            'save',
+            SubmitSourceField(_('insert') if self.insert else _('save')))
+        if self.insert and 'continue' in self.fields:
+            setattr(
+                self.form_class,
+                'insert_and_continue',
+                SubmitSourceField(_('insert and continue')))
+            setattr(self.form_class, 'continue_', HiddenField())
+
+    def additional_fields(self) -> dict[str, Any]:
+        return {'description': HiddenField()}
