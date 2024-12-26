@@ -17,6 +17,7 @@ def index_changelog() -> str:
 versions = {
     '8.9.0': ['TBA', {
         'feature': {
+            '2421': 'Update CIDOC CRM to 7.1.3',
             '2079': 'Text annotation',
             '2369': 'Text annotation widget',
             '2433': 'Link artifact from tab at source',
