@@ -17,7 +17,6 @@ def index_changelog() -> str:
 versions = {
     '8.9.0': ['TBA', {
         'feature': {
-            '2421': 'Update CIDOC CRM to 7.1.3',
             '2079': 'Text annotation',
             '2369': 'Text annotation widget',
             '2433': 'Link artifact from tab at source',
@@ -25,6 +24,7 @@ versions = {
             '2381': 'Import only year dates',
             '2390': 'More hints about usage at sources',
             '2391': 'IIIF: add reference',
+            '2421': 'Update CIDOC CRM to 7.1.3',
             '2377': 'Refactor and minor improvements'}}],
     '8.8.0': ['2024-10-31', {
         'feature': {
