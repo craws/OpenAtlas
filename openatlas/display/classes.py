@@ -3,15 +3,15 @@ from __future__ import annotations
 from flask import g, url_for
 from flask_babel import lazy_gettext as _
 
-from openatlas.display.base_display import (
+from openatlas.display.classes_base import (
     ActorDisplay, BaseDisplay, EventsDisplay, PlaceBaseDisplay,
     ReferenceBaseDisplay, TypeBaseDisplay)
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
     button, description, display_annotation_text_links, edit_link,
-    format_entity_date, get_base_table_data,
-    get_file_path, link, remove_link)
+    format_entity_date, get_base_table_data, get_file_path, link,
+    remove_link)
 from openatlas.display.util2 import is_authorized, uc_first
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem

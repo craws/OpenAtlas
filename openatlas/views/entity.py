@@ -11,14 +11,14 @@ from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.database.connect import Transaction
-from openatlas.display import display
+from openatlas.display import classes
 from openatlas.display.image_processing import resize_image
 from openatlas.display.util import (
     button, check_iiif_activation, check_iiif_file_exist,
     convert_image_to_iiif, get_base_table_data, get_file_path,
     get_iiif_file_path, link, required_group)
 from openatlas.display.util2 import is_authorized
-from openatlas.forms.base_manager import BaseManager
+from openatlas.forms.manager_base import BaseManager
 from openatlas.forms.form import get_manager
 from openatlas.forms.util import was_modified
 from openatlas.models.entity import Entity
@@ -45,7 +45,7 @@ def view(id_: int) -> str | Response:
             abort(400)
     class_name = \
         f"{''.join(i.capitalize() for i in entity.class_.name.split('_'))}"
-    manager = getattr(display, f'{class_name}Display')(entity)
+    manager = getattr(classes, f'{class_name}Display')(entity)
     return render_template(
         'tabs.html',
         tabs=manager.tabs,

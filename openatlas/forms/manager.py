@@ -8,7 +8,7 @@ from wtforms import (
     widgets)
 from wtforms.validators import InputRequired, Optional, URL
 
-from openatlas.forms.base_manager import (
+from openatlas.forms.manager_base import (
     ActorBaseManager, ArtifactBaseManager, BaseManager, EventBaseManager,
     HierarchyBaseManager, PlaceBaseManager, SourceBaseManager, TypeBaseManager)
 from openatlas.forms.field import (
