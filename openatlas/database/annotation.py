@@ -47,6 +47,7 @@ def get_annotation_text_by_source(source_id: int) -> list[dict[str, Any]]:
         ANNOTATION_TEXT_SELECT +
         """
         WHERE source_id = %(source_id)s
+            AND NOT (entity_id IS NULL AND (text IS NULL OR text = ''))
         ORDER BY link_start;
         """,
         {'source_id': source_id})
