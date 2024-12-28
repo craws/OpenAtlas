@@ -70,6 +70,11 @@ Image Annotation
 With enabled IIIF it is possible to annotate images and link the annotation to
 entities via the :doc:`/tools/image_annotation` feature.
 
+Text Annotation
+---------------
+Text parts of sources can be annotated and linked to entities via the
+:doc:`/tools/text_annotation` feature.
+
 Data Exchange
 -------------
 OpenAtlas offers various possibilities to exchange data with other systems or

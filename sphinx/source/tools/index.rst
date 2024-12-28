@@ -8,6 +8,7 @@ Tools
    profile
    notes
    image_annotation
+   text_annotation
    map
    network
    anthropological_analyses
