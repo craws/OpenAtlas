@@ -159,14 +159,13 @@ def sex_update(id_: int) -> str | Response:
                description=description))
     setattr(Form, 'save', SubmitField(_('save')))
     form = Form()
-    types = get_sex_types(entity.id)
     if form.validate_on_submit():
         data = form.data
         data.pop('save', None)
         data.pop('csrf_token', None)
         try:
             Transaction.begin()
-            SexEstimation.save(entity, data, types)
+            SexEstimation.save(entity, data)
             Transaction.commit()
         except Exception as e:  # pragma: no cover
             Transaction.rollback()
@@ -174,8 +173,8 @@ def sex_update(id_: int) -> str | Response:
             flash(_('error transaction'), 'error')
         return redirect(url_for('sex', id_=entity.id))
 
-    for dict_ in types:
-        getattr(form, g.types[dict_['id']].name).data = dict_['description']
+    for item in get_sex_types(entity.id):
+        getattr(form, g.types[item['id']].name).data = item['description']
     return render_template(
         'tabs.html',
         tabs={
