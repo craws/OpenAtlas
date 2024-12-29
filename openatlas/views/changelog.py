@@ -37,8 +37,7 @@ versions = {
         'fix': {
             '2355': 'Deployment error at ACDH-CH repository',
             '2357': 'Wrong direction for reference links to files',
-            '2371': 'Broken export functions'}
-    }],
+            '2371': 'Broken export functions'}}],
     '8.7.0': ['2024-09-19', {
         'feature': {
             '2339': 'Dates: additional checks',
