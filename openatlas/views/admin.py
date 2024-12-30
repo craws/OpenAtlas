@@ -772,6 +772,7 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
     iiif_path = Path(g.settings['iiif_path'])
     if not upload_ident_with_iiif():
         paths['iiif'] = {'path': iiif_path, 'size': 0, 'mounted': False}
+    files_size = 40999999999
     if os.name == 'posix':
         keys = []
         for key, path in paths.items():
@@ -793,19 +794,19 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
                 path['mounted'] = True
             keys.append(key)
         files_size = sum(paths[key]['size'] for key in keys)
-    else:
-        files_size = 40999999999  # pragma: no cover
     stats = shutil.disk_usage(app.config['UPLOAD_PATH'])
-    percent_free = 100 - math.ceil(stats.free / (stats.total / 100))
-    percent_files = math.ceil(files_size / (stats.total / 100))
-    percent_export = math.ceil(paths['export']['size'] / (files_size / 100))
-    percent_upload = math.ceil(paths['upload']['size'] / (files_size / 100))
-    percent_iiif = 0
+    percent = {
+        'free': 100 - math.ceil(stats.free / (stats.total / 100)),
+        'project': math.ceil(files_size / (stats.total / 100)),
+        'export': math.ceil(paths['export']['size'] / (files_size / 100)),
+        'upload': math.ceil(paths['upload']['size'] / (files_size / 100)),
+        'iiif':  0}
     if not upload_ident_with_iiif():
-        percent_iiif = math.ceil(paths['iiif']['size'] / (files_size / 100))
-    percent_processed = math.ceil(
+        percent['iiif'] = math.ceil(paths['iiif']['size'] / (files_size / 100))
+    percent['processed'] = math.ceil(
         paths['processed']['size'] / (files_size / 100))
     other_files = stats.total - stats.free - files_size
+    percent['other'] = 100 - (percent['project'] + percent['free'])
     return {
         'total': convert_size(stats.total),
         'project': convert_size(files_size),
@@ -816,13 +817,7 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
             paths['iiif']['size'] if not upload_ident_with_iiif() else 0),
         'other_files': convert_size(other_files),
         'free': convert_size(stats.free),
-        'percent_used': percent_free,
-        'percent_project': percent_files,
-        'percent_export': percent_export,
-        'percent_upload': percent_upload,
-        'percent_processed': percent_processed,
-        'percent_iiif': percent_iiif,
-        'percent_other': 100 - (percent_files + percent_free),
+        'percent': percent,
         'mounted': [k for k, v in paths.items() if v['mounted']]}
 
 
