@@ -756,18 +756,24 @@ def admin_delete_orphaned_resized_images() -> Response:
 
 
 def get_disk_space_info() -> Optional[dict[str, Any]]:
+
+    def upload_ident_with_iiif() -> bool:
+        return app.config['UPLOAD_PATH'].resolve() == iiif_path.resolve()
+
     paths = {
         'export': {
             'path': app.config['EXPORT_PATH'], 'size': 0, 'mounted': False},
         'upload': {
             'path': app.config['UPLOAD_PATH'], 'size': 0, 'mounted': False},
-        'iiif': {
-            'path': g.settings['iiif_path'], 'size': 0, 'mounted': False},
         'processed': {
             'path': app.config['PROCESSED_IMAGE_PATH'],
             'size': 0,
             'mounted': False}}
+    iiif_path = Path(g.settings['iiif_path'])
+    if not upload_ident_with_iiif():
+        paths['iiif'] = {'path': iiif_path, 'size': 0, 'mounted': False}
     if os.name == 'posix':
+        keys = []
         for key, path in paths.items():
             if not os.access(path['path'], os.W_OK):  # pragma: no cover
                 continue
@@ -785,9 +791,8 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
             tmp = mounted.stdout.split()
             if '/mnt/' in tmp[-1]:  # pragma: no cover
                 path['mounted'] = True
-        files_size = sum(
-            paths[key]['size']
-            for key in ['export', 'upload', 'processed', 'iiif'])
+            keys.append(key)
+        files_size = sum(paths[key]['size'] for key in keys)
     else:
         files_size = 40999999999  # pragma: no cover
     stats = shutil.disk_usage(app.config['UPLOAD_PATH'])
@@ -795,7 +800,9 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
     percent_files = math.ceil(files_size / (stats.total / 100))
     percent_export = math.ceil(paths['export']['size'] / (files_size / 100))
     percent_upload = math.ceil(paths['upload']['size'] / (files_size / 100))
-    percent_iiif = math.ceil(paths['iiif']['size'] / (files_size / 100))
+    percent_iiif = 0
+    if not upload_ident_with_iiif():
+        percent_iiif = math.ceil(paths['iiif']['size'] / (files_size / 100))
     percent_processed = math.ceil(
         paths['processed']['size'] / (files_size / 100))
     other_files = stats.total - stats.free - files_size
@@ -805,7 +812,8 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
         'export': convert_size(paths['export']['size']),
         'upload': convert_size(paths['upload']['size']),
         'processed': convert_size(paths['processed']['size']),
-        'iiif': convert_size(paths['iiif']['size']),
+        'iiif': convert_size(
+            paths['iiif']['size'] if not upload_ident_with_iiif() else 0),
         'other_files': convert_size(other_files),
         'free': convert_size(stats.free),
         'percent_used': percent_free,
