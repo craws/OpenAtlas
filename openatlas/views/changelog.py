@@ -22,10 +22,12 @@ versions = {
             '2433': 'Link artifact from tab at source',
             '2389': 'Activity log for entities',
             '2381': 'Import only year dates',
-            '2390': 'More hints about usage at sources',
-            '2391': 'IIIF: add reference',
             '2421': 'Update CIDOC CRM to 7.1.3',
-            '2377': 'Refactor and minor improvements'}}],
+            '2390': 'More hints about usage at sources',
+            '2391': 'IIIF: Additional information for the manifest',
+            '2377': 'Refactor and minor improvements'},
+        'fix': {
+            '2443': 'Incorrect file statistic'}}],
     '8.8.0': ['2024-10-31', {
         'feature': {
             '2349': 'Stronger hints that notes are not part of the model',
