@@ -6,22 +6,20 @@ Text annotation
 The text annotation feature allows for marking text in a
 :doc:`/entity/source` (or source text) adding a comment and/or link to an
 entity. In that way the mention of a person, place, event ... can be linked to
-entity in OpenAtlas.
+an entity in OpenAtlas.
 
 Usage
 -----
-A text can be annotated when when adding or updating a :doc:`/entity/source`
+A text can be annotated when adding or updating a :doc:`/entity/source`
 (or source text) with following steps:
 
 * Mark the specific text part in the source with the left mouse button
-* Click on the **Annotate** button above the text field
-* Select the entity which is releated to the annotation and/or
-* Add a comment
+* Click the **Annotate** button above the text field
+* Select the entity which is releated to the annotation and/or add a comment
 * Click on add
 * Press the save button of the form to submit it
 
-After that the text annotations should already be visible in the source detail
-view:
+After that the text annotations is also visible in the source detail view:
 
 * Links to other entities are displayed
 * With mouse over you can read the comments
