@@ -123,9 +123,8 @@
 </div>
 {% if 'manager'|is_authorized %}
   <div style="float:left;margin-left:2em;">
-    <img src="{{ get_logo|safe }}" id="logo-preview" alt="Logo"
-         style="max-width:400px;"><br>
-    <div class="toolbar">
+    <img src="{{ get_logo|safe }}" id="logo-preview" alt="Logo" style="max-width:400px;"><br>
+    <div class="toolbar" style="margin-top:1em;">
       {% if g.settings.logo_file_id %}
         {{ _('remove custom logo')|button(url_for('logo_remove'))|safe }}
       {% else %}
