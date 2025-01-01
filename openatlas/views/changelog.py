@@ -15,7 +15,7 @@ def index_changelog() -> str:
 
 # pylint: disable=too-many-lines
 versions = {
-    '8.9.0': ['TBA', {
+    '8.9.0': ['2025-01-01', {
         'feature': {
             '2079': 'Text annotation',
             '2369': 'Text annotation widget',
