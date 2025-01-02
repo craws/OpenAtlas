@@ -1,4 +1,4 @@
-# util2.py functions don't need the model and help preventing circular imports
+# util2.py functions don't require the model (which prevents circular imports)
 from __future__ import annotations
 
 import math

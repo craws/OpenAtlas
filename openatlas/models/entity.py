@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import ast
+import json
+import re
 from typing import Any, Iterable, Optional, TYPE_CHECKING
 
 from flask import g, request
@@ -12,6 +14,7 @@ from openatlas.database import (
 from openatlas.display.util2 import (
     convert_size, datetime64_to_timestamp, format_date_part, sanitize,
     timestamp_to_datetime64)
+from openatlas.models.annotation import AnnotationText
 from openatlas.models.gis import Gis
 from openatlas.models.tools import get_carbon_link
 
@@ -242,9 +245,74 @@ class Entity:
                 if self.begin_comment else None,
             'end_comment':
                 str(self.end_comment).strip() if self.end_comment else None,
-            'description':
-                sanitize(self.description, 'text')
-                if self.description else None})
+            'description': self.update_description()})
+
+    def update_description(self) -> Optional[str]:
+        if not self.description:
+            return None
+        if self.class_.name not in ['source', 'source_translation']:
+            return sanitize(self.description, 'text')
+        AnnotationText.delete_annotations_text(self.id)
+        text = self.description
+        replace_strings = [
+            '<p>', '</p>', '<br class="ProseMirror-trailingBreak">']
+        for string in replace_strings:
+            text = text.replace(string, '')
+        text = re.sub(r'(<br>\s*)+$', '', text)
+        text = text.replace('<br>', '\n').replace('&quot;', '"')
+        processed_text = self.process_text(text)
+        for data in processed_text['data']:
+            AnnotationText.insert(
+                data['source_id'],
+                data['link_start'],
+                data['link_end'],
+                data['entity_id'],
+                data['text'])
+        return processed_text['text']
+
+    def get_annotated_text(self) -> str:
+        offset = 0
+        text = self.description
+        for annotation in AnnotationText.get_by_source_id(self.id):
+            dict_ = {'annotationId': f'a-{annotation.id}'}
+            if annotation.entity_id:
+                dict_['entityId'] = annotation.entity_id
+            if annotation.text:
+                dict_['comment'] = annotation.text
+            inner_text = text[
+                annotation.link_start + offset: annotation.link_end + offset]
+            meta = json.dumps(dict_).replace('"', '&quot;')
+            mark = f'<mark meta="{meta}">{inner_text}</mark>'
+            start = annotation.link_start + offset
+            end = annotation.link_end + offset
+            text = text[:start] + mark + text[end:]
+            offset += (len(mark) - len(inner_text))
+        return text.replace('\n', '<br>') if text else text
+
+    def process_text(self, text: str) -> dict[str, Any]:
+        data = []
+        current_offset = 0
+        pattern = r'<mark meta="(.*?)">(.*?)</mark>'
+
+        def replace_mark(match: Any) -> str:
+            nonlocal current_offset
+            metadata = json.loads(match.group(1))
+            inner_text = match.group(2)
+            start, end = match.span()
+            adjusted_start = start + current_offset
+            adjusted_end = adjusted_start + len(inner_text)
+            data.append({
+                'source_id': self.id,
+                'entity_id': metadata.get('entityId'),
+                'text': metadata.get('comment'),
+                'link_start': adjusted_start,
+                'link_end': adjusted_end})
+            current_offset += len(inner_text) - (end - start)
+            return inner_text
+
+        return {
+            'text': re.sub(pattern, replace_mark, text),
+            'data': data}
 
     def update_aliases(self, aliases: list[str]) -> None:
         delete_ids = []
@@ -436,7 +504,7 @@ class Entity:
     def get_by_ids(
             ids: Iterable[int],
             types: bool = False,
-            aliases: bool = False,) -> list[Entity]:
+            aliases: bool = False, ) -> list[Entity]:
         entities = []
         for row in db.get_by_ids(ids, types, aliases):
             if row['id'] in g.types:

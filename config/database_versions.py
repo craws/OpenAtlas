@@ -1,5 +1,6 @@
 # Used for automatic database upgrades and version checks
 DATABASE_VERSIONS = [
+    '8.9.0',
     '8.8.0',
     '8.6.0',
     '8.5.0',

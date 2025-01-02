@@ -1,26 +1,71 @@
---
--- PostgreSQL database dump
---
+BEGIN;
 
--- Dumped from database version 15.10 (Debian 15.10-0+deb12u1)
--- Dumped by pg_dump version 15.10 (Debian 15.10-0+deb12u1)
+-- Raise database version
+UPDATE web.settings SET value = '8.9.0' WHERE name = 'database_version';
 
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
+-- #2079: Text annotation
 
---
--- Data for Name: cidoc_class; Type: TABLE DATA; Schema: model; Owner: openatlas
---
+-- Sync image annotation fields to text annotation fields
+ALTER TABLE web.annotation_image SET SCHEMA model;
+ALTER TABLE model.annotation_image RENAME COLUMN annotation TO text;
+ALTER TABLE model.annotation_image ALTER COLUMN text DROP NOT NULL;
+ALTER TABLE model.annotation_image DROP COLUMN user_id;
+ALTER TABLE model.annotation_image ADD COLUMN modified timestamp without time zone;
+CREATE TRIGGER update_modified BEFORE UPDATE ON model.annotation_image FOR EACH ROW EXECUTE FUNCTION model.update_modified();
 
-INSERT INTO model.cidoc_class VALUES
+-- Text annotation
+ALTER TABLE IF EXISTS ONLY model.annotation_text DROP CONSTRAINT IF EXISTS annotation_text_user_id_fkey;
+ALTER TABLE IF EXISTS ONLY model.annotation_text DROP CONSTRAINT IF EXISTS annotation_text_source_id_fkey;
+ALTER TABLE IF EXISTS ONLY model.annotation_text DROP CONSTRAINT IF EXISTS annotation_text_entity_id_fkey;
+DROP TRIGGER IF EXISTS update_modified ON model.annotation_text;
+ALTER TABLE IF EXISTS ONLY model.annotation_text DROP CONSTRAINT IF EXISTS annotation_text_pkey;
+DROP TABLE IF EXISTS model.annotation_text;
+DROP SEQUENCE IF EXISTS model.annotation_text_id_seq;
+
+CREATE SEQUENCE model.annotation_text_id_seq START WITH 1 INCREMENT BY 1 NO MINVALUE MAXVALUE 2147483647 CACHE 1;
+ALTER TABLE model.annotation_text_id_seq OWNER TO openatlas;
+
+CREATE TABLE model.annotation_text (
+    id integer DEFAULT nextval('model.annotation_text_id_seq'::regclass) NOT NULL,
+    source_id integer NOT NULL,
+    entity_id integer,
+    link_start integer NOT NULL,
+    link_end integer NOT NULL,
+    text text,
+    created timestamp without time zone DEFAULT now() NOT NULL,
+    modified timestamp without time zone
+);
+ALTER TABLE model.annotation_text OWNER TO openatlas;
+
+ALTER TABLE ONLY model.annotation_text ADD CONSTRAINT annotation_text_pkey PRIMARY KEY (id);
+CREATE TRIGGER update_modified BEFORE UPDATE ON model.annotation_text FOR EACH ROW EXECUTE FUNCTION model.update_modified();
+ALTER TABLE ONLY model.annotation_text ADD CONSTRAINT annotation_text_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE ONLY model.annotation_text ADD CONSTRAINT annotation_text_source_id_fkey FOREIGN KEY (source_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-------------------------------------------------
+-- #2421: Update CIDOC CRM from 7.1.2 to 7.1.3 --
+-------------------------------------------------
+
+-- Drop foreign keys of model tables (recreated below after CIDOC update)
+ALTER TABLE model.entity DROP CONSTRAINT IF EXISTS entity_class_code_fkey;
+ALTER TABLE model.entity DROP CONSTRAINT IF EXISTS entity_openatlas_class_name_fkey;
+ALTER TABLE model.link DROP CONSTRAINT IF EXISTS link_property_code_fkey;
+ALTER TABLE model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_code_fkey;
+ALTER TABLE model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_sub_code_fkey;
+ALTER TABLE model.cidoc_class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_fkey;
+ALTER TABLE model.property DROP CONSTRAINT IF EXISTS property_domain_class_code_fkey;
+ALTER TABLE model.property DROP CONSTRAINT IF EXISTS property_range_class_code_fkey;
+ALTER TABLE model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_super_code_fkey;
+ALTER TABLE model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_sub_code_fkey;
+ALTER TABLE model.property_i18n DROP CONSTRAINT IF EXISTS property_i18n_property_code_fkey;
+ALTER TABLE model.openatlas_class DROP CONSTRAINT IF EXISTS openatlas_class_cidoc_class_code_fkey;
+ALTER TABLE web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_openatlas_class_openatlas_class_name_fkey;
+
+-- Remove former CIDOC
+TRUNCATE model.cidoc_class_inheritance, model.cidoc_class_i18n, model.cidoc_class, model.property_inheritance, model.property_i18n, model.property RESTART IDENTITY;
+
+-- Add new CIDOC
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES
 	(1, 'E16', 'Measurement', 'This class comprises actions measuring physical properties and other values that can be determined by a systematic, objective procedure of direct observation of particular states of physical reality.
 An instance of E16 Measurement may use simple counting or tools, such as yardsticks or radiation detection devices. The interest is in the method and care applied, so that the reliability of the result may be judged at a later stage, or research continued on the associated documents. The date of the event is important for dimensions, which may change value over time, such as the length of an object subject to shrinkage. Methods and devices employed should be associated with instances of E16 Measurement by properties such as P33 used specific technique: E29 Design or Procedure, P125 used object of type: E55 Type, P16 used specific object (was used for): E70 Thing, whereas basic techniques such as "carbon-14 dating" should be encoded using P2 has type (is type of): E55 Type. Details of methods and devices reused or reusable in other instances of E16 Measurement should be documented for these entities rather than the measurements themselves, whereas details of particular execution may be documented by free text or by instantiating adequate sub-activities, if the detail may be of interest for an overarching query.
 Regardless whether a measurement is made by an instrument or by human senses, it represents the initial transition from physical reality to information without any other documented information object in between within the reasoning chain that would represent the result of the interaction of the observer or device with reality. Therefore, determining properties of an instance of E90 Symbolic Object is regarded as an instance of E13 Attribute Assignment, which may be inferred from observing and measuring representative carriers. In the case that the carrier can be named, the property P16 used specific object (was used for) should be used to indicate the instance(s) of E18 Physical Thing that was used as the empirical basis for the attribute assignment. For instance, inferring properties of depicted items using image material, such as satellite images, is not regarded as an instance of E16 Measurement, but as a subsequent instance of E13 Attribute Assignment. Rather, only the production of the images, understood as arrays of radiation intensities, is regarded as an instance of E16 Measurement. The same reasoning holds for other sensor data.'),
@@ -250,12 +295,9 @@ Collective objects in the general sense, like a tomb full of gifts, a folder wit
 The temporal extent of an instance of E93 Presence typically is predetermined by the researcher so as to focus the investigation particularly on finding the spatial extent of the phenomenon by testing for its characteristic features. There are at least two basic directions such investigations might take. The investigation may wish to determine where something was during some time or it may wish to reconstruct the total passage of a phenomenon’s spacetime volume through an examination of discrete presences. Observation and measurement of features indicating the presence or absence of a phenomenon in some space allows for the progressive approximation of spatial extents through argumentation typically based on inclusion, exclusion and various overlaps.'),
 	(75, 'E99', 'Product Type', 'This class comprises types that stand as the models for instances of E22 Human-Made Object that are produced as the result of production activities using plans exact enough to result in one or more series of uniform, functionally and aesthetically identical and interchangeable items. The product type is the intended ideal form of the manufacture process. It is typical of instances of E22 Human-Made Object that conform to an instance of E99 Product Type that its component parts are interchangeable with component parts of other instances of E22 Human-Made Object made after the model of the same instance of E99 Product Type. Frequently, the uniform production according to a given instance of E99 Product Type is achieved by creating individual tools, such as moulds or print plates that are themselves carriers of the design of the product type. Modern tools may use the flexibility of electronically controlled devices to achieve such uniformity. The product type itself, i.e. the potentially unlimited series of aesthetically equivalent items, may be the target of artistic design, rather than the individual object. In extreme cases, only one instance of a product type may have been produced, such as in a “print on demand” process which was only triggered once. However, this should not be confused with industrial prototypes, such as car prototypes, which are produced prior to the production line being set up, or test the production line itself.');
 
+SELECT pg_catalog.setval('model.cidoc_class_id_seq', 75, true);
 
---
--- Data for Name: cidoc_class_i18n; Type: TABLE DATA; Schema: model; Owner: openatlas
---
-
-INSERT INTO model.cidoc_class_i18n VALUES
+INSERT INTO model.cidoc_class_i18n (id, class_code, language_code, text) VALUES
 	(1, 'E16', 'de', 'Messung'),
 	(2, 'E16', 'en', 'Measurement'),
 	(3, 'E16', 'fr', 'Mesurage'),
@@ -728,12 +770,9 @@ INSERT INTO model.cidoc_class_i18n VALUES
 	(470, 'E99', 'fr', 'Modèle de produit'),
 	(471, 'E99', 'ru', 'Тип Продукта');
 
+SELECT pg_catalog.setval('model.cidoc_class_i18n_id_seq', 471, true);
 
---
--- Data for Name: cidoc_class_inheritance; Type: TABLE DATA; Schema: model; Owner: openatlas
---
-
-INSERT INTO model.cidoc_class_inheritance VALUES
+INSERT INTO model.cidoc_class_inheritance (id, super_code, sub_code) VALUES
 	(1, 'E13', 'E16'),
 	(2, 'E73', 'E36'),
 	(3, 'E71', 'E28'),
@@ -823,12 +862,9 @@ INSERT INTO model.cidoc_class_inheritance VALUES
 	(87, 'E92', 'E93'),
 	(88, 'E55', 'E99');
 
+SELECT pg_catalog.setval('model.cidoc_class_inheritance_id_seq', 88, true);
 
---
--- Data for Name: property; Type: TABLE DATA; Schema: model; Owner: openatlas
---
-
-INSERT INTO model.property VALUES
+INSERT INTO model.property (id, code, range_class_code, domain_class_code, name, name_inverse, comment) VALUES
 	(1, 'P124', 'E18', 'E81', 'transformed', 'was transformed by', 'This property identifies the instance or instances E18 Physical Thing that have ceased to exist due to an instance of E81 Transformation.
 The item that has ceased to exist and was replaced by the result of the Transformation. The continuity between both items, the new and the old, is expressed by the links to the common instance of E81 Transformation.'),
 	(2, 'P37', 'E42', 'E15', 'assigned', 'was assigned by', 'This property records the identifier that was assigned to an item in an instance of E15 Identifier Assignment.
@@ -1240,12 +1276,9 @@ It is also a shortcut for the path from E1 CRM Entity through P1 is identified b
 	(149, 'OA8', 'E53', 'E77', 'begins in', 'is first appearance of', 'OA8 is used to link the beginning of a persistent item''s (E77) life span (or time of usage) with a certain place. E.g to document the birthplace of a person. E77 Persistent Item linked with a E53 Place: E77 (Persistent Item) - P92i (was brought into existence by) - E63 (Beginning of Existence) - P7 (took place at) - E53 (Place) Example: [Albert Einstein (E21)] was brought into existence by [Birth of Albert Einstein (E12)] took place at [Ulm (E53)]'),
 	(150, 'OA9', 'E53', 'E77', 'ends in', 'is last appearance of', 'OA9 is used to link the end of a persistent item''s (E77) life span (or time of usage) with a certain place. E.g to document a person''s place of death. E77 Persistent Item linked with a E53 Place: E77 (Persistent Item) - P93i (was taken out of existence by) - E64 (End of Existence) - P7 (took place at) - E53 (Place) Example: [Albert Einstein (E21)] was taken out of by [Death of Albert Einstein (E12)] took place at [Princeton (E53)]');
 
+SELECT pg_catalog.setval('model.property_id_seq', 150, true);
 
---
--- Data for Name: property_i18n; Type: TABLE DATA; Schema: model; Owner: openatlas
---
-
-INSERT INTO model.property_i18n VALUES
+INSERT INTO model.property_i18n (id, property_code, language_code, text, text_inverse) VALUES
 	(1, 'P124', 'de', 'wandelte um', 'wurde umgewandelt durch'),
 	(2, 'P124', 'en', 'transformed', 'was transformed by'),
 	(3, 'P124', 'fr', 'a transformé', 'a été transformé par'),
@@ -2131,17 +2164,14 @@ INSERT INTO model.property_i18n VALUES
 	(883, 'P1', 'zh', '被标识为', '标识'),
 	(884, 'OA7', 'en', 'has relationship to', NULL),
 	(885, 'OA7', 'de', 'hat Beziehung zu', NULL),
-	(887, 'OA8', 'de', 'beginnt in', 'ist erster Ort von'),
-	(886, 'OA8', 'en', 'begins in', 'is first appearance of'),
-	(889, 'OA9', 'de', 'endet in', 'ist letzter Ort von'),
-	(888, 'OA9', 'en', 'ends in', 'is last appearance of');
+	(886, 'OA8', 'en', 'begins in', NULL),
+	(887, 'OA8', 'de', 'beginnt in', NULL),
+	(888, 'OA9', 'en', 'ends in', NULL),
+	(889, 'OA9', 'de', 'endet in', NULL);
 
+SELECT pg_catalog.setval('model.property_i18n_id_seq', 889, true);
 
---
--- Data for Name: property_inheritance; Type: TABLE DATA; Schema: model; Owner: openatlas
---
-
-INSERT INTO model.property_inheritance VALUES
+INSERT INTO model.property_inheritance (id, super_code, sub_code) VALUES
 	(1, 'P93', 'P124'),
 	(2, 'P141', 'P37'),
 	(3, 'P92', 'P123'),
@@ -2227,50 +2257,27 @@ INSERT INTO model.property_inheritance VALUES
 	(83, 'P184', 'P185'),
 	(84, 'P10', 'P166');
 
-
---
--- Name: cidoc_class_i18n_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas
---
-
-SELECT pg_catalog.setval('model.cidoc_class_i18n_id_seq', 471, true);
-
-
---
--- Name: cidoc_class_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas
---
-
-SELECT pg_catalog.setval('model.cidoc_class_id_seq', 75, true);
-
-
---
--- Name: cidoc_class_inheritance_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas
---
-
-SELECT pg_catalog.setval('model.cidoc_class_inheritance_id_seq', 88, true);
-
-
---
--- Name: property_i18n_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas
---
-
-SELECT pg_catalog.setval('model.property_i18n_id_seq', 889, true);
-
-
---
--- Name: property_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas
---
-
-SELECT pg_catalog.setval('model.property_id_seq', 150, true);
-
-
---
--- Name: property_inheritance_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas
---
-
 SELECT pg_catalog.setval('model.property_inheritance_id_seq', 84, true);
 
+-- Add OpenAtlas properties translations
+UPDATE model.property_i18n set text_inverse = 'ist erster Ort von' WHERE property_code = 'OA8' AND language_code = 'de';
+UPDATE model.property_i18n set text_inverse = 'is first appearance of' WHERE property_code = 'OA8' AND language_code = 'en';
+UPDATE model.property_i18n set text_inverse = 'ist letzter Ort von' WHERE property_code = 'OA9' AND language_code = 'de';
+UPDATE model.property_i18n set text_inverse = 'is last appearance of' WHERE property_code = 'OA9' AND language_code = 'en';
 
---
--- PostgreSQL database dump complete
---
+-- Recreate foreign keys
+ALTER TABLE ONLY model.entity ADD CONSTRAINT entity_class_code_fkey FOREIGN KEY (cidoc_class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.link ADD CONSTRAINT link_property_code_fkey FOREIGN KEY (property_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.cidoc_class_inheritance ADD CONSTRAINT class_inheritance_super_code_fkey FOREIGN KEY (super_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.cidoc_class_inheritance ADD CONSTRAINT class_inheritance_sub_code_fkey FOREIGN KEY (sub_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.cidoc_class_i18n ADD CONSTRAINT class_i18n_class_code_fkey FOREIGN KEY (class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.property ADD CONSTRAINT property_domain_class_code_fkey FOREIGN KEY (domain_class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.property ADD CONSTRAINT property_range_class_code_fkey FOREIGN KEY (range_class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.property_inheritance ADD CONSTRAINT property_inheritance_super_code_fkey FOREIGN KEY (super_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.property_inheritance ADD CONSTRAINT property_inheritance_sub_code_fkey FOREIGN KEY (sub_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.property_i18n ADD CONSTRAINT property_i18n_property_code_fkey FOREIGN KEY (property_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.entity ADD CONSTRAINT entity_openatlas_class_name_fkey FOREIGN KEY (openatlas_class_name) REFERENCES model.openatlas_class(name) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.openatlas_class ADD CONSTRAINT openatlas_class_cidoc_class_code_fkey FOREIGN KEY (cidoc_class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY web.reference_system_openatlas_class ADD CONSTRAINT reference_system_openatlas_class_openatlas_class_name_fkey FOREIGN KEY (openatlas_class_name) REFERENCES model.openatlas_class(name) ON UPDATE CASCADE ON DELETE CASCADE;
 
+END;

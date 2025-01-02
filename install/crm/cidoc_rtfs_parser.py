@@ -3,25 +3,31 @@
 # This script is for developing purposes and not needed to install OpenAtlas.
 #
 # CIDOC CRM is used as basis for the underlying data model of OpenAtlas.
-# Currently, we are using CIDOC CRM 7.1.2 (June 2022):
-# https://cidoc-crm.org/rdfs/7.1.2/CIDOC_CRM_v7.1.2.rdf
+# Currently, we are using CIDOC CRM 7.1.3 (February 2024):
+# https://cidoc-crm.org/Version/version-7.1.3
 #
 # The script parses the rdfs file and imports it to a PostgreSQL database.
 # Installation of needed package:
 # apt-get install python3-rdflib
 #
-# Create a database named cidoc
-# $ createdb cidoc -O openatlas
-# $ psql cidoc -c "CREATE EXTENSION postgis; CREATE EXTENSION unaccent;"
-# $ cd install
-# $ cat 1_structure.sql 2_data_model.sql | psql -d cidoc -f -
+# Create a database named cidoc (as postgres user)
+# createdb cidoc -O openatlas
+# psql cidoc -c "CREATE EXTENSION postgis; CREATE EXTENSION unaccent;"
+# cd install
+# cat 1_structure.sql 2_data_model.sql | psql -d cidoc -f -
 #
-# Execute the script in install/crm:
-# $ python3 cidoc_rtfs_parser.py
+# Execute the script:
+# cd crm
+# python3 cidoc_rtfs_parser.py
 #
-# Table data can than be extracted to be joined in an upgrade SQL with e.g.
+# Table data can than be extracted to be joined in an upgrade SQL (see last CIDOC upgrade script) with e.g.
 # pg_dump --column-inserts --data-only --rows-per-insert=1000 --table=model.cidoc_class cidoc > class.sql
-#
+# pg_dump --column-inserts --data-only --rows-per-insert=1000 --table=model.cidoc_class_i18n cidoc > class_i18n.sql
+# pg_dump --column-inserts --data-only --rows-per-insert=1000 --table=model.cidoc_class_inheritance cidoc > class_inheritance.sql
+# pg_dump --column-inserts --data-only --rows-per-insert=1000 --table=model.property cidoc > property.sql
+# pg_dump --column-inserts --data-only --rows-per-insert=1000 --table=model.property_i18n cidoc > property_i18n.sql
+# pg_dump --column-inserts --data-only --rows-per-insert=1000 --table=model.property_inheritance cidoc > property_inheritance.sql
+
 # Following has to be added manually to the upgrade SQL
 # UPDATE model.property_i18n set text_inverse = 'ist erster Ort von' WHERE property_code = 'OA8' AND language_code = 'de';
 # UPDATE model.property_i18n set text_inverse = 'is first appearance of' WHERE property_code = 'OA8' AND language_code = 'en';
@@ -36,7 +42,7 @@ import psycopg2.extras
 from rdflib import URIRef
 from rdflib.graph import Graph
 
-FILENAME = 'CIDOC_CRM_v7.1.2.rdf'
+FILENAME = 'CIDOC_CRM_v7.1.3.rdf'
 CRM_URL = 'http://www.cidoc-crm.org/cidoc-crm/'
 
 EXCLUDE_PROPERTIES = [

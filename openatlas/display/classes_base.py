@@ -130,6 +130,8 @@ class BaseDisplay:
 
     def add_buttons(self) -> None:
         self.buttons = [manual(f'entity/{self.entity.class_.view}')]
+        if self.entity.class_.name == 'source_translation':
+            self.buttons = [manual('entity/source')]
         if is_authorized(self.entity.class_.write_access):
             if not self.problematic_type:
                 self.add_button_update()

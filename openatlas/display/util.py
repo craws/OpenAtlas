@@ -20,7 +20,9 @@ from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.display.image_processing import check_processed_image
-from openatlas.display.util2 import format_date, is_authorized, uc_first
+from openatlas.display.util2 import (
+    format_date, is_authorized, sanitize, uc_first)
+from openatlas.models.annotation import AnnotationText
 from openatlas.models.cidoc_class import CidocClass
 from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.content import get_translation
@@ -276,7 +278,7 @@ def profile_image(entity: Entity) -> str:
             if is_authorized('contributor'):
                 html += (' - ' + link(
                     _('annotate'),
-                    url_for('annotation_insert', id_=file_id),
+                    url_for('annotation_image_insert', id_=file_id),
                     external=True))
             if is_authorized('admin'):
                 html += ('<br>' + link(
@@ -642,3 +644,28 @@ def convert_image_to_iiif(id_: int, path: Optional[Path] = None) -> bool:
     except Exception:  # pragma: no cover
         return False
     return True
+
+
+def display_annotation_text_links(source: Entity) -> str:
+    offset = 0
+    text = source.description
+    for annotation in AnnotationText.get_by_source_id(source.id):
+        if not annotation.text and not annotation.entity_id:
+            continue  # pragma: no cover
+        title = f'title="{sanitize(annotation.text, "text")}"' \
+            if annotation.text else ''
+        if annotation.entity_id:
+            tag_open = f'<a href="/entity/{annotation.entity_id}" {title}>'
+            tag_close = '</a>'
+        else:
+            tag_open = f'<span style="color:green;" {title}>'
+            tag_close = '</span>'
+
+        position = annotation.link_start + offset
+        text = text[:position] + tag_open + text[position:]
+        offset += len(tag_open)
+
+        position = annotation.link_end + offset
+        text = text[:position] + tag_close + text[position:]
+        offset += len(tag_close)
+    return text

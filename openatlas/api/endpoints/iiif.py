@@ -15,7 +15,7 @@ from openatlas.api.resources.error import DisplayFileNotFoundError
 from openatlas.api.resources.parser import iiif
 from openatlas.api.resources.util import get_license_name, get_license_url
 from openatlas.display.util import check_iiif_file_exist
-from openatlas.models.annotation import Annotation
+from openatlas.models.annotation import AnnotationImage
 from openatlas.models.entity import Entity
 
 
@@ -54,8 +54,9 @@ class IIIFCanvas(Resource):
                 Parser(iiif.parse_args())))
 
     @staticmethod
-    def build_canvas(metadata: dict[str, Any], parser: Parser) -> dict[
-        str, Any]:
+    def build_canvas(
+            metadata: dict[str, Any],
+            parser: Parser) -> dict[str, Any]:
         entity = metadata['entity']
         mime_type, _ = mimetypes.guess_type(g.files[entity.id])
         return {
@@ -125,7 +126,7 @@ class IIIFAnnotationList(Resource):
 
     @staticmethod
     def build_annotation_list(image_id: int, parser: Parser) -> dict[str, Any]:
-        annotations_ = Annotation.get_by_file(image_id)
+        annotations_ = AnnotationImage.get_by_file(image_id)
         return {
             "@context": "https://iiif.io/api/presentation/2/context.json",
             "@id": url_for(
@@ -143,12 +144,12 @@ class IIIFAnnotation(Resource):
     def get(annotation_id: int) -> Response:
         return jsonify(
             IIIFAnnotation.build_annotation(
-                Annotation.get_by_id(annotation_id),
+                AnnotationImage.get_by_id(annotation_id),
                 Parser(iiif.parse_args())))
 
     @staticmethod
     def build_annotation(
-            annotation: Annotation,
+            annotation: AnnotationImage,
             parser: Parser) -> dict[str, Any]:
         entity_link = ''
         if annotation.entity_id:

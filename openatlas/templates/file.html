@@ -8,29 +8,29 @@
       <div
         class="progress-bar bg-primary"
         role="progressbar"
-        style="width: {{ disk_space_info.percent_used - disk_space_info.percent_project }}%"
-        aria-valuenow="{{ disk_space_info.percent_used - disk_space_info.percent_project }}"
+        style="width: {{ disk_space_info.percent.free - disk_space_info.percent.project }}%"
+        aria-valuenow="{{ disk_space_info.percent.free - disk_space_info.percent.project }}"
         aria-valuemin="0"
         aria-valuemax="100">
-        <b>{{ disk_space_info.percent_used - disk_space_info.percent_project }}%</b>
+        <b>{{ disk_space_info.percent.free - disk_space_info.percent.project }}%</b>
       </div>
       <div
         class="progress-bar bg-warning"
         role="progressbar"
-        style="width: {{ disk_space_info.percent_project }}%"
-        aria-valuenow="{{ disk_space_info.percent_project }}"
+        style="width: {{ disk_space_info.percent.project }}%"
+        aria-valuenow="{{ disk_space_info.percent.project }}"
         aria-valuemin="0"
         aria-valuemax="100">
-        <b>{{ disk_space_info.percent_project }}%</b>
+        <b>{{ disk_space_info.percent.project }}%</b>
       </div>
       <div
         class="progress-bar bg-gray"
         role="progressbar"
-        style="width: {{ 100 - disk_space_info.percent_used }}%"
-        aria-valuenow="{{ 100 - disk_space_info.percent_used }}"
+        style="width: {{ 100 - disk_space_info.percent.free }}%"
+        aria-valuenow="{{ 100 - disk_space_info.percent.free }}"
         aria-valuemin="0"
         aria-valuemax="100">
-        <b class="text-dark">{{ 100 - disk_space_info.percent_used }}%</b>
+        <b class="text-dark">{{ 100 - disk_space_info.percent.free }}%</b>
       </div>
     </div>
     <div>
@@ -62,38 +62,38 @@
       <div
         class="progress-bar bg-danger"
         role="progressbar"
-        style="width: {{ disk_space_info.percent_upload }}%"
-        aria-valuenow="{{ disk_space_info.percent_upload }}"
+        style="width: {{ disk_space_info.percent.upload }}%"
+        aria-valuenow="{{ disk_space_info.percent.upload }}"
         aria-valuemin="0"
         aria-valuemax="100">
-        <b>{{ disk_space_info.percent_upload }}%</b>
+        <b>{{ disk_space_info.percent.upload }}%</b>
       </div>
       <div
         class="progress-bar bg-success"
         role="progressbar"
-        style="width: {{ disk_space_info.percent_export }}%"
-        aria-valuenow="{{ disk_space_info.percent_export }}"
+        style="width: {{ disk_space_info.percent.export }}%"
+        aria-valuenow="{{ disk_space_info.percent.export }}"
         aria-valuemin="0"
         aria-valuemax="100">
-        <b>{{ disk_space_info.percent_export }}%</b>
+        <b>{{ disk_space_info.percent.export }}%</b>
       </div>
       <div
         class="progress-bar bg-info"
         role="progressbar"
-        style="width: {{ disk_space_info.percent_processed }}%"
-        aria-valuenow="{{ disk_space_info.percent_processed }}"
+        style="width: {{ disk_space_info.percent.processed }}%"
+        aria-valuenow="{{ disk_space_info.percent.processed }}"
         aria-valuemin="0"
         aria-valuemax="100">
-        <b class="text-dark">{{ disk_space_info.percent_processed }}%</b>
+        <b class="text-dark">{{ disk_space_info.percent.processed }}%</b>
       </div>
       <div
         class="progress-bar bg-dark"
         role="progressbar"
-        style="width: {{ disk_space_info.percent_iiif }}%"
-        aria-valuenow="{{ disk_space_info.percent_iiif }}"
+        style="width: {{ disk_space_info.percent.iiif }}%"
+        aria-valuenow="{{ disk_space_info.percent.iiif }}"
         aria-valuemin="0"
         aria-valuemax="100">
-        <b>{{ disk_space_info.percent_iiif }}%</b>
+        <b>{{ disk_space_info.percent.iiif }}%</b>
       </div>
     </div>
     <div>
@@ -123,9 +123,8 @@
 </div>
 {% if 'manager'|is_authorized %}
   <div style="float:left;margin-left:2em;">
-    <img src="{{ get_logo|safe }}" id="logo-preview" alt="Logo"
-         style="max-width:400px;"><br>
-    <div class="toolbar">
+    <img src="{{ get_logo|safe }}" id="logo-preview" alt="Logo" style="max-width:400px;"><br>
+    <div class="toolbar" style="margin-top:1em;">
       {% if g.settings.logo_file_id %}
         {{ _('remove custom logo')|button(url_for('logo_remove'))|safe }}
       {% else %}
