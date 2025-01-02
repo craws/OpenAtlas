@@ -36,7 +36,7 @@ def process_standard_fields(manager: Any) -> None:
                 'classes',
                 'inverse',
                 'creator',
-                'license_holder')) \
+                'license_holder',)) \
                 or field_type in [
                     'CSRFTokenField',
                     'HiddenField',
@@ -44,6 +44,7 @@ def process_standard_fields(manager: Any) -> None:
                     'DragNDropField',
                     'SelectField',
                     'SelectMultipleField',
+                    'SubmitSourceField',
                     'SubmitField',
                     'TableField',
                     'TableMultiField',

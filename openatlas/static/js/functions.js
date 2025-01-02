@@ -546,6 +546,10 @@ function toggleMapWidth(element){
   element.classList.toggle("rotate-180")
 }
 
+function saveAnnotationText() {
+    return document.querySelector("[name='description']").value = document.querySelector("#editor .ProseMirror").innerHTML;
+}
+
 document.addEventListener("DOMContentLoaded", function() {
     const inputField = document.getElementById("token_text");
 

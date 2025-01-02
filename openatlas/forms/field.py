@@ -209,6 +209,34 @@ class ValueFloatField(FloatField):
     pass
 
 
+class TextAnnotation(HiddenInput):
+    def __call__(self, field: Any, **kwargs: Any) -> str:
+        return super().__call__(field, **kwargs) + Markup(
+            render_template(
+                'text-annotation.html',
+                field=field,
+                source_text=field.data,
+                linked_entities=field.linked_entities))
+
+
+class TextAnnotationField(Field):
+    widget = TextAnnotation()
+
+    def __init__(
+            self,
+            label: str,
+            validators: Optional[Any] = None,
+            source_text: Optional[str] = None,
+            linked_entities: Optional[list[Any]] = None,
+            **kwargs: Any) -> None:
+        super().__init__(label, validators, **kwargs)
+        self.source_text = source_text or ''
+        self.linked_entities = linked_entities or []
+
+    def _value(self) -> str:
+        return self.data or ''
+
+
 class TableSelect(HiddenInput):
     def __call__(self, field: Any, **kwargs: Any) -> str:
 
@@ -456,6 +484,27 @@ class SubmitInput(Input):
 
 class SubmitField(BooleanField):
     widget = SubmitInput()
+
+
+class SubmitSourceInput(Input):
+    input_type = 'submit'
+
+    def __call__(self, field: Field, **kwargs: Any) -> str:
+        onclick_event = "saveAnnotationText();"
+        kwargs['class_'] = (kwargs['class_'] + ' uc-first') \
+            if 'class_' in kwargs else 'uc-first'
+        kwargs['onclick'] = onclick_event
+        return Markup(
+            f'''
+            <button
+             type="submit"
+             id="{field.id}"
+             {self.html_params(name=field.name, **kwargs)}
+             >{field.label.text}</button>''')
+
+
+class SubmitSourceField(BooleanField):
+    widget = SubmitSourceInput()
 
 
 def generate_password_field() -> CustomField:

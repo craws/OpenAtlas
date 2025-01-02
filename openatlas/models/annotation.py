@@ -2,47 +2,50 @@ from __future__ import annotations
 
 from typing import Any, Optional
 
-from flask_login import current_user
-
 from openatlas.database import annotation as db
 
 
-class Annotation:
+class AnnotationImage:
     def __init__(self, data: dict[str, Any]) -> None:
         self.id = data['id']
         self.image_id = data['image_id']
         self.entity_id = data['entity_id']
         self.coordinates = data['coordinates']
-        self.user_id = data['user_id']
-        self.text = data['annotation']
+        self.text = data['text']
         self.created = data['created']
 
     def update(
             self,
             entity_id: Optional[int] = None,
             text: Optional[str] = None) -> None:
-        db.update({'id': self.id, 'entity_id': entity_id, 'annotation': text})
+        db.update_annotation_image({
+            'id': self.id,
+            'entity_id': entity_id,
+            'text': text})
 
     def delete(self) -> None:
-        db.delete(self.id)
+        db.delete_annotation_image(self.id)
 
     @staticmethod
-    def get_by_id(id_: int) -> Annotation:
-        return Annotation(db.get_by_id(id_))
+    def get_by_id(id_: int) -> AnnotationImage:
+        return AnnotationImage(db.get_annotation_image_by_id(id_))
 
     @staticmethod
-    def get_by_file(image_id: int) -> list[Annotation]:
-        return [Annotation(row) for row in db.get_by_file(image_id)]
+    def get_by_file(image_id: int) -> list[AnnotationImage]:
+        return [
+            AnnotationImage(row) for row
+            in db.get_annotation_image_by_file(image_id)]
 
     @staticmethod
-    def get_orphaned_annotations() -> list[Annotation]:
-        return [Annotation(row) for row in db.get_orphaned_annotations()]
+    def get_orphaned_annotations() -> list[AnnotationImage]:
+        return [
+            AnnotationImage(row) for row in db.get_annotation_image_orphans()]
 
     @staticmethod
     def remove_entity_from_annotation(
             annotation_id: int,
             entity_id: int) -> None:
-        db.remove_entity(annotation_id, entity_id)
+        db.remove_entity_from_annotation_image(annotation_id, entity_id)
 
     @staticmethod
     def insert(
@@ -50,9 +53,43 @@ class Annotation:
             coordinates: str,
             entity_id: Optional[int] = None,
             text: Optional[str] = None) -> None:
-        db.insert({
+        db.insert_annotation_image({
             'image_id': image_id,
-            'user_id': current_user.id,
             'entity_id': entity_id or None,
             'coordinates': coordinates,
-            'annotation': text})
+            'text': text})
+
+
+class AnnotationText:
+    def __init__(self, data: dict[str, Any]) -> None:
+        self.id = data['id']
+        self.source_id = data['source_id']
+        self.entity_id = data['entity_id']
+        self.link_start = data['link_start']
+        self.link_end = data['link_end']
+        self.text = data['text']
+        self.created = data['created']
+
+    @staticmethod
+    def delete_annotations_text(source_id: int) -> None:
+        db.delete_annotations_text(source_id)
+
+    @staticmethod
+    def get_by_source_id(source_id: int) -> list[AnnotationText]:
+        return [
+            AnnotationText(row) for row
+            in db.get_annotation_text_by_source(source_id)]
+
+    @staticmethod
+    def insert(
+            source_id: int,
+            link_start: int,
+            link_end: int,
+            entity_id: Optional[int] = None,
+            text: Optional[str] = None) -> None:
+        db.insert_annotation_text({
+            'source_id': source_id,
+            'link_start': link_start,
+            'link_end': link_end,
+            'entity_id': entity_id,
+            'text': text})

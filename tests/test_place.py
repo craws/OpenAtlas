@@ -295,13 +295,13 @@ class PlaceTest(TestBaseCase):
             url_for('sex_update', id_=strati_id),
             data={'Glabella': 'Female'},
             follow_redirects=True)
-        assert b'-2.0' in rv.data
+        assert b'Female' in rv.data
 
         rv = c.post(
             url_for('sex_update', id_=strati_id),
-            data={'Glabella': 'Female'},
+            data={'Glabella': 'Female?'},
             follow_redirects=True)
-        assert b'-2.0' in rv.data
+        assert b'Female?' in rv.data
 
         rv = c.get(url_for('sex_update', id_=strati_id))
         assert b'Glabella' in rv.data

@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 15.8 (Debian 15.8-0+deb12u1)
--- Dumped by pg_dump version 15.8 (Debian 15.8-0+deb12u1)
+-- Dumped from database version 15.10 (Debian 15.10-0+deb12u1)
+-- Dumped by pg_dump version 15.10 (Debian 15.10-0+deb12u1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -33,9 +33,6 @@ ALTER TABLE IF EXISTS ONLY web.hierarchy DROP CONSTRAINT IF EXISTS hierarchy_id_
 ALTER TABLE IF EXISTS ONLY web.hierarchy_openatlas_class DROP CONSTRAINT IF EXISTS hierarchy_form_hierarchy_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_image_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_entity_id_fkey;
-ALTER TABLE IF EXISTS ONLY web.annotation_image DROP CONSTRAINT IF EXISTS annotation_image_user_id_fkey;
-ALTER TABLE IF EXISTS ONLY web.annotation_image DROP CONSTRAINT IF EXISTS annotation_image_image_id_fkey;
-ALTER TABLE IF EXISTS ONLY web.annotation_image DROP CONSTRAINT IF EXISTS annotation_image_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_range_class_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_super_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_sub_code_fkey;
@@ -55,6 +52,10 @@ ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_class_c
 ALTER TABLE IF EXISTS ONLY model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_sub_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.cidoc_class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_fkey;
+ALTER TABLE IF EXISTS ONLY model.annotation_text DROP CONSTRAINT IF EXISTS annotation_text_source_id_fkey;
+ALTER TABLE IF EXISTS ONLY model.annotation_text DROP CONSTRAINT IF EXISTS annotation_text_entity_id_fkey;
+ALTER TABLE IF EXISTS ONLY model.annotation_image DROP CONSTRAINT IF EXISTS annotation_image_image_id_fkey;
+ALTER TABLE IF EXISTS ONLY model.annotation_image DROP CONSTRAINT IF EXISTS annotation_image_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_project_id_fkey;
 ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_entity_id_fkey;
@@ -72,6 +73,8 @@ DROP TRIGGER IF EXISTS update_modified ON model.link;
 DROP TRIGGER IF EXISTS update_modified ON model.gis;
 DROP TRIGGER IF EXISTS update_modified ON model.file_info;
 DROP TRIGGER IF EXISTS update_modified ON model.entity;
+DROP TRIGGER IF EXISTS update_modified ON model.annotation_text;
+DROP TRIGGER IF EXISTS update_modified ON model.annotation_image;
 DROP TRIGGER IF EXISTS on_delete_entity ON model.entity;
 DROP TRIGGER IF EXISTS update_modified ON import.project;
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS user_username_key;
@@ -106,7 +109,6 @@ ALTER TABLE IF EXISTS ONLY web."group" DROP CONSTRAINT IF EXISTS group_name_key;
 ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_pkey;
 ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_entity_id_key;
 ALTER TABLE IF EXISTS ONLY web.type_none_selectable DROP CONSTRAINT IF EXISTS entity_id_key;
-ALTER TABLE IF EXISTS ONLY web.annotation_image DROP CONSTRAINT IF EXISTS annotation_image_pkey;
 ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_pkey;
 ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_pkey;
 ALTER TABLE IF EXISTS ONLY model.property_i18n DROP CONSTRAINT IF EXISTS property_i18n_property_code_language_code_key;
@@ -126,6 +128,8 @@ ALTER TABLE IF EXISTS ONLY model.cidoc_class_inheritance DROP CONSTRAINT IF EXIS
 ALTER TABLE IF EXISTS ONLY model.cidoc_class_i18n DROP CONSTRAINT IF EXISTS class_i18n_pkey;
 ALTER TABLE IF EXISTS ONLY model.cidoc_class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_language_code_key;
 ALTER TABLE IF EXISTS ONLY model.cidoc_class DROP CONSTRAINT IF EXISTS class_code_key;
+ALTER TABLE IF EXISTS ONLY model.annotation_text DROP CONSTRAINT IF EXISTS annotation_text_pkey;
+ALTER TABLE IF EXISTS ONLY model.annotation_image DROP CONSTRAINT IF EXISTS annotation_image_pkey;
 ALTER TABLE IF EXISTS ONLY import.project DROP CONSTRAINT IF EXISTS project_pkey;
 ALTER TABLE IF EXISTS ONLY import.project DROP CONSTRAINT IF EXISTS project_name_key;
 ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_project_id_origin_id_key;
@@ -136,6 +140,7 @@ ALTER TABLE IF EXISTS web.user_notes ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.user_log ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.user_bookmarks ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web."user" ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS web.type_none_selectable ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.system_log ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.settings ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.reference_system_openatlas_class ALTER COLUMN id DROP DEFAULT;
@@ -145,7 +150,6 @@ ALTER TABLE IF EXISTS web.hierarchy_openatlas_class ALTER COLUMN id DROP DEFAULT
 ALTER TABLE IF EXISTS web.hierarchy ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web."group" ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.entity_profile_image ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS web.annotation_image ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.property_inheritance ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.property_i18n ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.property ALTER COLUMN id DROP DEFAULT;
@@ -156,6 +160,7 @@ ALTER TABLE IF EXISTS model.entity ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.cidoc_class_inheritance ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.cidoc_class_i18n ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.cidoc_class ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS model.annotation_image ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS import.project ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS import.entity ALTER COLUMN id DROP DEFAULT;
 DROP SEQUENCE IF EXISTS web.user_tokens_id_seq;
@@ -170,8 +175,8 @@ DROP SEQUENCE IF EXISTS web.user_id_seq;
 DROP SEQUENCE IF EXISTS web.user_bookmarks_id_seq;
 DROP TABLE IF EXISTS web.user_bookmarks;
 DROP TABLE IF EXISTS web."user";
-DROP TABLE IF EXISTS web.type_none_selectable;
 DROP SEQUENCE IF EXISTS web.type_none_selectable_id_seq;
+DROP TABLE IF EXISTS web.type_none_selectable;
 DROP SEQUENCE IF EXISTS web.settings_id_seq;
 DROP TABLE IF EXISTS web.settings;
 DROP SEQUENCE IF EXISTS web.reference_system_form_id_seq;
@@ -191,8 +196,6 @@ DROP SEQUENCE IF EXISTS web.group_id_seq;
 DROP TABLE IF EXISTS web."group";
 DROP SEQUENCE IF EXISTS web.entity_profile_image_id_seq;
 DROP TABLE IF EXISTS web.entity_profile_image;
-DROP SEQUENCE IF EXISTS web.annotation_image_id_seq;
-DROP TABLE IF EXISTS web.annotation_image;
 DROP SEQUENCE IF EXISTS model.property_inheritance_id_seq;
 DROP TABLE IF EXISTS model.property_inheritance;
 DROP SEQUENCE IF EXISTS model.property_id_seq;
@@ -215,6 +218,10 @@ DROP SEQUENCE IF EXISTS model.cidoc_class_id_seq;
 DROP SEQUENCE IF EXISTS model.cidoc_class_i18n_id_seq;
 DROP TABLE IF EXISTS model.cidoc_class_i18n;
 DROP TABLE IF EXISTS model.cidoc_class;
+DROP TABLE IF EXISTS model.annotation_text;
+DROP SEQUENCE IF EXISTS model.annotation_text_id_seq;
+DROP SEQUENCE IF EXISTS model.annotation_image_id_seq;
+DROP TABLE IF EXISTS model.annotation_image;
 DROP SEQUENCE IF EXISTS import.project_id_seq;
 DROP TABLE IF EXISTS import.project;
 DROP SEQUENCE IF EXISTS import.entity_id_seq;
@@ -399,6 +406,76 @@ ALTER TABLE import.project_id_seq OWNER TO openatlas;
 
 ALTER SEQUENCE import.project_id_seq OWNED BY import.project.id;
 
+
+--
+-- Name: annotation_image; Type: TABLE; Schema: model; Owner: openatlas
+--
+
+CREATE TABLE model.annotation_image (
+    id integer NOT NULL,
+    image_id integer NOT NULL,
+    entity_id integer,
+    coordinates text NOT NULL,
+    text text,
+    created timestamp without time zone DEFAULT now() NOT NULL,
+    modified timestamp without time zone
+);
+
+
+ALTER TABLE model.annotation_image OWNER TO openatlas;
+
+--
+-- Name: annotation_image_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
+--
+
+CREATE SEQUENCE model.annotation_image_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE model.annotation_image_id_seq OWNER TO openatlas;
+
+--
+-- Name: annotation_image_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
+--
+
+ALTER SEQUENCE model.annotation_image_id_seq OWNED BY model.annotation_image.id;
+
+
+--
+-- Name: annotation_text_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
+--
+
+CREATE SEQUENCE model.annotation_text_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    MAXVALUE 2147483647
+    CACHE 1;
+
+
+ALTER TABLE model.annotation_text_id_seq OWNER TO openatlas;
+
+--
+-- Name: annotation_text; Type: TABLE; Schema: model; Owner: openatlas
+--
+
+CREATE TABLE model.annotation_text (
+    id integer DEFAULT nextval('model.annotation_text_id_seq'::regclass) NOT NULL,
+    source_id integer NOT NULL,
+    entity_id integer,
+    link_start integer NOT NULL,
+    link_end integer NOT NULL,
+    text text,
+    created timestamp without time zone DEFAULT now() NOT NULL,
+    modified timestamp without time zone
+);
+
+
+ALTER TABLE model.annotation_text OWNER TO openatlas;
 
 --
 -- Name: cidoc_class; Type: TABLE; Schema: model; Owner: openatlas
@@ -861,44 +938,6 @@ ALTER SEQUENCE model.property_inheritance_id_seq OWNED BY model.property_inherit
 
 
 --
--- Name: annotation_image; Type: TABLE; Schema: web; Owner: openatlas
---
-
-CREATE TABLE web.annotation_image (
-    id integer NOT NULL,
-    image_id integer NOT NULL,
-    entity_id integer,
-    coordinates text NOT NULL,
-    user_id integer,
-    annotation text NOT NULL,
-    created timestamp without time zone DEFAULT now() NOT NULL
-);
-
-
-ALTER TABLE web.annotation_image OWNER TO openatlas;
-
---
--- Name: annotation_image_id_seq; Type: SEQUENCE; Schema: web; Owner: openatlas
---
-
-CREATE SEQUENCE web.annotation_image_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE web.annotation_image_id_seq OWNER TO openatlas;
-
---
--- Name: annotation_image_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
---
-
-ALTER SEQUENCE web.annotation_image_id_seq OWNED BY web.annotation_image.id;
-
-
---
 -- Name: entity_profile_image; Type: TABLE; Schema: web; Owner: openatlas
 --
 
@@ -980,7 +1019,8 @@ CREATE TABLE web.hierarchy (
     created timestamp without time zone DEFAULT now() NOT NULL,
     modified timestamp without time zone,
     category text DEFAULT 'standard'::text NOT NULL,
-    required boolean DEFAULT false NOT NULL
+    required boolean DEFAULT false NOT NULL,
+    allow_top_level_selection boolean DEFAULT true
 );
 
 
@@ -1263,25 +1303,11 @@ ALTER SEQUENCE web.settings_id_seq OWNED BY web.settings.id;
 
 
 --
--- Name: type_none_selectable_id_seq; Type: SEQUENCE; Schema: web; Owner: openatlas
---
-
-CREATE SEQUENCE web.type_none_selectable_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    MAXVALUE 2147483647
-    CACHE 1;
-
-
-ALTER TABLE web.type_none_selectable_id_seq OWNER TO openatlas;
-
---
 -- Name: type_none_selectable; Type: TABLE; Schema: web; Owner: openatlas
 --
 
 CREATE TABLE web.type_none_selectable (
-    id integer DEFAULT nextval('web.type_none_selectable_id_seq'::regclass) NOT NULL,
+    id integer NOT NULL,
     entity_id integer NOT NULL,
     created timestamp without time zone DEFAULT now() NOT NULL
 );
@@ -1293,7 +1319,29 @@ ALTER TABLE web.type_none_selectable OWNER TO openatlas;
 -- Name: TABLE type_none_selectable; Type: COMMENT; Schema: web; Owner: openatlas
 --
 
-COMMENT ON TABLE web.type_none_selectable IS 'IDs of types that are not meant to be selected, e.g. a category';
+COMMENT ON TABLE web.type_none_selectable IS 'IDs of types that are not for selection, e.g. a category';
+
+
+--
+-- Name: type_none_selectable_id_seq; Type: SEQUENCE; Schema: web; Owner: openatlas
+--
+
+CREATE SEQUENCE web.type_none_selectable_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE web.type_none_selectable_id_seq OWNER TO openatlas;
+
+--
+-- Name: type_none_selectable_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
+--
+
+ALTER SEQUENCE web.type_none_selectable_id_seq OWNED BY web.type_none_selectable.id;
 
 
 --
@@ -1545,6 +1593,13 @@ ALTER TABLE ONLY import.project ALTER COLUMN id SET DEFAULT nextval('import.proj
 
 
 --
+-- Name: annotation_image id; Type: DEFAULT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.annotation_image ALTER COLUMN id SET DEFAULT nextval('model.annotation_image_id_seq'::regclass);
+
+
+--
 -- Name: cidoc_class id; Type: DEFAULT; Schema: model; Owner: openatlas
 --
 
@@ -1615,13 +1670,6 @@ ALTER TABLE ONLY model.property_inheritance ALTER COLUMN id SET DEFAULT nextval(
 
 
 --
--- Name: annotation_image id; Type: DEFAULT; Schema: web; Owner: openatlas
---
-
-ALTER TABLE ONLY web.annotation_image ALTER COLUMN id SET DEFAULT nextval('web.annotation_image_id_seq'::regclass);
-
-
---
 -- Name: entity_profile_image id; Type: DEFAULT; Schema: web; Owner: openatlas
 --
 
@@ -1682,6 +1730,13 @@ ALTER TABLE ONLY web.settings ALTER COLUMN id SET DEFAULT nextval('web.settings_
 --
 
 ALTER TABLE ONLY web.system_log ALTER COLUMN id SET DEFAULT nextval('web.log_id_seq'::regclass);
+
+
+--
+-- Name: type_none_selectable id; Type: DEFAULT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.type_none_selectable ALTER COLUMN id SET DEFAULT nextval('web.type_none_selectable_id_seq'::regclass);
 
 
 --
@@ -1756,6 +1811,22 @@ ALTER TABLE ONLY import.project
 
 ALTER TABLE ONLY import.project
     ADD CONSTRAINT project_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: annotation_image annotation_image_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.annotation_image
+    ADD CONSTRAINT annotation_image_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: annotation_text annotation_text_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.annotation_text
+    ADD CONSTRAINT annotation_text_pkey PRIMARY KEY (id);
 
 
 --
@@ -1908,14 +1979,6 @@ ALTER TABLE ONLY model.property_inheritance
 
 ALTER TABLE ONLY model.property
     ADD CONSTRAINT property_pkey PRIMARY KEY (id);
-
-
---
--- Name: annotation_image annotation_image_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
---
-
-ALTER TABLE ONLY web.annotation_image
-    ADD CONSTRAINT annotation_image_pkey PRIMARY KEY (id);
 
 
 --
@@ -2189,6 +2252,20 @@ CREATE TRIGGER on_delete_entity BEFORE DELETE ON model.entity FOR EACH ROW EXECU
 
 
 --
+-- Name: annotation_image update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
+--
+
+CREATE TRIGGER update_modified BEFORE UPDATE ON model.annotation_image FOR EACH ROW EXECUTE FUNCTION model.update_modified();
+
+
+--
+-- Name: annotation_text update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
+--
+
+CREATE TRIGGER update_modified BEFORE UPDATE ON model.annotation_text FOR EACH ROW EXECUTE FUNCTION model.update_modified();
+
+
+--
 -- Name: entity update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
 --
 
@@ -2308,6 +2385,38 @@ ALTER TABLE ONLY import.entity
 
 ALTER TABLE ONLY import.entity
     ADD CONSTRAINT entity_user_id_fkey FOREIGN KEY (user_id) REFERENCES web."user"(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: annotation_image annotation_image_entity_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.annotation_image
+    ADD CONSTRAINT annotation_image_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: annotation_image annotation_image_image_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.annotation_image
+    ADD CONSTRAINT annotation_image_image_id_fkey FOREIGN KEY (image_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: annotation_text annotation_text_entity_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.annotation_text
+    ADD CONSTRAINT annotation_text_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: annotation_text annotation_text_source_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.annotation_text
+    ADD CONSTRAINT annotation_text_source_id_fkey FOREIGN KEY (source_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -2460,30 +2569,6 @@ ALTER TABLE ONLY model.property_inheritance
 
 ALTER TABLE ONLY model.property
     ADD CONSTRAINT property_range_class_code_fkey FOREIGN KEY (range_class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: annotation_image annotation_image_entity_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
---
-
-ALTER TABLE ONLY web.annotation_image
-    ADD CONSTRAINT annotation_image_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE SET NULL;
-
-
---
--- Name: annotation_image annotation_image_image_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
---
-
-ALTER TABLE ONLY web.annotation_image
-    ADD CONSTRAINT annotation_image_image_id_fkey FOREIGN KEY (image_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: annotation_image annotation_image_user_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
---
-
-ALTER TABLE ONLY web.annotation_image
-    ADD CONSTRAINT annotation_image_user_id_fkey FOREIGN KEY (user_id) REFERENCES web."user"(id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --
