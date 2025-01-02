@@ -30,7 +30,6 @@ def note_view(id_: int) -> str:
             and note['user_id'] != current_user.id
             and not is_authorized('manager')):
         abort(403)
-
     entity = Entity.get_by_id(note['entity_id'])
     buttons: list[str] = [manual('tools/notes')]
     if note['user_id'] == current_user.id:
