@@ -24,6 +24,7 @@ class NoteForm(FlaskForm):
 
 
 @app.route('/note/view/<int:id_>')
+@required_group('readonly')
 def note_view(id_: int) -> str:
     note = User.get_note_by_id(id_)
     if (not note['public']
