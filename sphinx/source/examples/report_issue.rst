@@ -46,7 +46,7 @@ This may take some time. Therefore, it might be best to create an account
 before it is needed to report bugs.
 
 Create a new issue
-***************
+******************
 Once you are logged in, click the **Projects** link in the top left.
 
 .. image:: redmine_projects.png
