@@ -36,7 +36,7 @@ question.
 How to report an issue
 ----------------------
 
-Get a redmine account
+Get a Redmine account
 *********************
 To report an issue, an account must first be created. This is - of course -
 completely free of charge and all you need is a valid email address and a
