@@ -15,16 +15,20 @@ def index_changelog() -> str:
 
 # pylint: disable=too-many-lines
 versions = {
-    '8.9.0': ['TBA', {
+    '8.10.0': ['TBA', {}],
+    '8.9.0': ['2025-01-01', {
         'feature': {
             '2079': 'Text annotation',
             '2369': 'Text annotation widget',
             '2433': 'Link artifact from tab at source',
             '2389': 'Activity log for entities',
             '2381': 'Import only year dates',
+            '2421': 'Update CIDOC CRM to 7.1.3',
             '2390': 'More hints about usage at sources',
-            '2391': 'IIIF: add reference',
-            '2377': 'Refactor and minor improvements'}}],
+            '2391': 'IIIF: Additional information for the manifest',
+            '2377': 'Refactor and minor improvements'},
+        'fix': {
+            '2443': 'Incorrect file statistic'}}],
     '8.8.0': ['2024-10-31', {
         'feature': {
             '2349': 'Stronger hints that notes are not part of the model',
@@ -36,8 +40,7 @@ versions = {
         'fix': {
             '2355': 'Deployment error at ACDH-CH repository',
             '2357': 'Wrong direction for reference links to files',
-            '2371': 'Broken export functions'}
-    }],
+            '2371': 'Broken export functions'}}],
     '8.7.0': ['2024-09-19', {
         'feature': {
             '2339': 'Dates: additional checks',

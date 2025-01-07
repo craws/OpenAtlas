@@ -14,7 +14,7 @@ from openatlas import app
 from openatlas.display.table import Table
 from openatlas.display.util import get_base_table_data
 from openatlas.display.util2 import show_table_icons, uc_first
-from openatlas.forms import base_manager, manager
+from openatlas.forms import manager_base, manager
 from openatlas.forms.field import (
     SubmitField, TableCidocField, TableField, TableMultiField, TreeField)
 from openatlas.models.entity import Entity, Link
@@ -29,7 +29,7 @@ def get_manager(
         entity: Optional[Entity] = None,
         origin: Optional[Entity] = None,
         link_: Optional[Link] = None,
-        copy: Optional[bool] = False) -> base_manager.BaseManager:
+        copy: Optional[bool] = False) -> manager_base.BaseManager:
     name = entity.class_.name if entity and not class_name else class_name
     manager_name = ''.join(i.capitalize() for i in name.split('_'))
     manager_instance = getattr(manager, f'{manager_name}Manager')(

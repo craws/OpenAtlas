@@ -11,8 +11,12 @@ if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity, Link
 
 
-def get_sex_types(id_: int) -> list[dict[str, Any]]:
-    return db.get_sex_types(id_)
+def get_sex_types(entity_id: int) -> list[dict[str, Any]]:
+    return db.get_sex_types(entity_id)
+
+
+def delete_sex_types(entity_id: int) -> None:
+    return db.delete_sex_types(entity_id)
 
 
 def get_carbon_link(entity: Entity) -> Optional[Link]:
@@ -240,19 +244,11 @@ class SexEstimation:
         return None if weight == 0 else round(result / weight, 2)
 
     @staticmethod
-    def save(
-            entity: Entity,
-            data: dict[str, str],
-            types: list[dict[str, Any]]) -> None:
-        from openatlas.models.entity import Link
-        for dict_ in types:
-            Link.delete_(dict_['link_id'])
+    def save(entity: Entity, data: dict[str, str]) -> None:
+        delete_sex_types(entity.id)
         SexEstimation.prepare_feature_types()
-        for name, item in data.items():
-            entity.link(
-                'P2',
-                g.types[SexEstimation.features[name]['id']],
-                item)
+        for name, i in data.items():
+            entity.link('P2', g.types[SexEstimation.features[name]['id']], i)
 
     @staticmethod
     def get_types(entity: Entity) -> list[dict[str, Any]]:

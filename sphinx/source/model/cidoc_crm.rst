@@ -11,8 +11,8 @@ in connection with the International Council of Museums
 (`ICOM <https://icom.museum/en/>`_).
 
 In OpenAtlas its current version,
-`CIDOC CRM v7.1.2 <https://cidoc-crm.org/Version/version-7.1.2>`_ published in
-May 2021, is used as underlying data model of the database.
+`CIDOC CRM v7.1.3 <https://cidoc-crm.org/Version/version-7.1.3>`_ published in
+February 2024, is used as underlying data model of the database.
 
 A script is used to parse the specification and import it into a
 `PostgreSQL <https://www.postgresql.org/>`_ database (more information is

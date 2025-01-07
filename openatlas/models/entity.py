@@ -12,8 +12,7 @@ from openatlas import app
 from openatlas.database import (
     date, entity as db, link as db_link, tools as db_tools)
 from openatlas.display.util2 import (
-    convert_size, datetime64_to_timestamp, format_date_part,
-    sanitize,
+    convert_size, datetime64_to_timestamp, format_date_part, sanitize,
     timestamp_to_datetime64)
 from openatlas.models.annotation import AnnotationText
 from openatlas.models.gis import Gis

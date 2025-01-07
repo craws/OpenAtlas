@@ -15,8 +15,8 @@ An overview of the internal mapping and CIDOC CRM classes can be found
 
 All of these so called OpenAtlas classes can be mapped directly to the
 corresponding CIDOC CRM class. For all available classes and properties of
-CIDOC CRM (version 7.1.2) see
-`the CIDOC CRM documentation <https://cidoc-crm.org/Version/version-7.1.2>`_.
+CIDOC CRM (version 7.1.3) see
+`the CIDOC CRM documentation <https://cidoc-crm.org/Version/version-7.1.3>`_.
 
 Example:
 :cidoc_entity:`E18 - Physical Thing<e18-physical-thing>` "comprises all

@@ -110,7 +110,7 @@ class Api(ApiTestCase):
         assert rv['P2']['code']
 
         rv = c.get(url_for('api_04.properties', locale='fr', download=True))
-        assert rv.get_json()['P2']['name'] == 'est de type'
+        assert rv.get_json()['P2']['name'] == 'a pour type'
         rv = c.get(url_for('api_04.backend_details')).get_json()
         assert rv['version'] == app.config['VERSION']
         rv = c.get(url_for('api_04.backend_details', download=True)).get_json()

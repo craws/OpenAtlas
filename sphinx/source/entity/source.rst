@@ -16,7 +16,8 @@ Form fields
 * :doc:`/ui/name`
 * :doc:`type`
 * :doc:`/entity/artifact` - use if the source is part of an artifact
-* **Content** - a summary or the whole text of the source
+* **Content** - a summary or the whole text of the source.
+  :doc:`/tools/text_annotation` can be used.
 
 Can be linked via tabs to
 -------------------------
@@ -24,5 +25,8 @@ Can be linked via tabs to
   references
 * :doc:`reference` - link to the literature the source is documented in, e.g.
   editions of charters or secondary sources
-* **Translation** - add translations of the source or a comment
+* **Text** - add translations or similar to the source
 * :doc:`file`
+
+Text annotation
+---------------

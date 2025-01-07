@@ -24,8 +24,8 @@ from openatlas.views.admin import (
     count_files_to_convert, count_files_to_delete, get_disk_space_info)
 
 
-@required_group('readonly')
 @app.route('/file')
+@required_group('readonly')
 def file_index() -> str:
     tabs = {
         'settings': Tab(
@@ -87,12 +87,14 @@ def display_logo(filename: str) -> Any:
 
 
 @app.route('/set_profile_image/<int:id_>/<int:origin_id>')
+@required_group('contributor')
 def set_profile_image(id_: int, origin_id: int) -> Response:
     Entity.set_profile_image(id_, origin_id)
     return redirect(url_for('view', id_=origin_id))
 
 
 @app.route('/remove_profile_image/<int:entity_id>')
+@required_group('contributor')
 def remove_profile_image(entity_id: int) -> Response:
     entity = Entity.get_by_id(entity_id)
     entity.remove_profile_image()
