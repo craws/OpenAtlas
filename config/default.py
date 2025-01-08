@@ -1,4 +1,5 @@
 # Don't edit this file. To override settings please use instance/production.py
+import os
 from pathlib import Path
 
 from config.database_versions import DATABASE_VERSIONS
@@ -27,6 +28,8 @@ LANGUAGES = {
 # To override them (in instance/production.py) either use them like here
 # or use absolute paths like e.g. pathlib.Path('/some/location/somewhere')
 FILES_PATH = Path(__file__).parent.parent / 'files'
+if 'INSTANCE_PATH' in os.environ:
+    FILES_PATH = Path(os.environ['INSTANCE_PATH']) / 'files'
 EXPORT_PATH = Path(FILES_PATH) / 'export'
 UPLOAD_PATH = Path(FILES_PATH) / 'uploads'
 TMP_PATH = Path('/tmp')  # For processing files e.g. at import and export

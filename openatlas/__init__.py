@@ -1,4 +1,5 @@
 import locale
+import os
 from typing import Any, Optional
 
 from flask import Flask, Response, g, request, session
@@ -10,11 +11,15 @@ from psycopg2 import extras
 from openatlas.api.resources.error import AccessDeniedError
 from openatlas.database.connect import close_connection, open_connection
 
+instance_config_path = ''
+if 'INSTANCE_PATH' in os.environ:
+    instance_config_path = os.environ['INSTANCE_PATH'] + 'instance/'
+
 app: Flask = Flask(__name__, instance_relative_config=True)
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
 app.config.from_object('config.default')
 app.config.from_object('config.api')
-app.config.from_pyfile('production.py')
+app.config.from_pyfile(f'{instance_config_path}production.py')
 app.config['WTF_CSRF_TIME_LIMIT'] = None  # Set CSRF token valid for session
 
 locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
