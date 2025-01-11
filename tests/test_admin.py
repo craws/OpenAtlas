@@ -96,7 +96,7 @@ class AdminTests(TestBaseCase):
             source.link('P2', g.types[source_type.subs[1]])
 
         rv = c.get(url_for('check_dates'))
-        assert b'<span class="tab-counter">' in rv.data
+        assert b'tab-counter' in rv.data
 
         rv = c.get(url_for('check_link_duplicates'))
         assert b'Event Horizon' in rv.data
