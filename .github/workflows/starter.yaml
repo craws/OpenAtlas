@@ -40,7 +40,7 @@ jobs:
           else
             echo "environment=review/${{ github.ref_name }}"
             echo "environment=review/${{ github.ref_name }}" >> $GITHUB_OUTPUT
-            echo "environment_short=$(echo -n ${{ github.ref_name }} | sed s/feature_// | tr '_' '-' | tr '[:upper:]' '[:lower:]' )" >> $GITHUB_OUTPUT
+            echo "environment_short=$(echo -n ${{ github.ref_name }} | sed 's/feat\(ure\)\{0,1\}[_/]//' | tr '_' '-' | tr '[:upper:]' '[:lower:]' | cut -c -63 )" >> $GITHUB_OUTPUT
           fi
   build_openatlas:
     needs: [setup_workflow_env]
