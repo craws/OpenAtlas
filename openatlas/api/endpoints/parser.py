@@ -21,8 +21,6 @@ from openatlas.api.resources.error import (
 from openatlas.api.resources.search import get_search_values, search_entity
 from openatlas.api.resources.search_validation import (
     check_if_date_search, validate_search_parameters)
-from openatlas.api.resources.templates import (
-    geojson_pagination, linked_place_pagination, loud_pagination)
 from openatlas.api.resources.util import (
     flatten_list_and_remove_duplicates, get_geometric_collection,
     get_geoms_dict, get_location_link, get_reference_systems,
@@ -288,13 +286,6 @@ class Parser:
             os.environ['https_proxy'] = app.config['PROXIES']['https']
         graph = Graph().parse(data=json.dumps(data), format='json-ld')
         return graph.serialize(format=self.format, encoding='utf-8')
-
-    def get_entities_template(self) -> dict[str, Any]:
-        if self.format in ['geojson', 'geojson-v2']:
-            return geojson_pagination()
-        if self.format == 'loud':
-            return loud_pagination()
-        return linked_place_pagination(self)
 
     def is_valid_url(self) -> None:
         if self.url and isinstance(

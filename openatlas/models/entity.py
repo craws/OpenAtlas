@@ -654,6 +654,7 @@ class Link:
             self.last = format_date_part(self.end_to, 'year') \
                 if self.end_to else self.last
 
+
     def update(self) -> None:
         db_link.update({
             'id': self.id,
