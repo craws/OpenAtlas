@@ -17,6 +17,7 @@ General
    move_event
    places
    reference_systems
+   report_issue
    time_spans
    types
 

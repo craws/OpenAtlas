@@ -1,0 +1,256 @@
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How to report an issue &mdash; OpenAtlas 8.10.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Time Spans" href="time_spans.html" />
+    <link rel="prev" title="References Systems" href="reference_systems.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            OpenAtlas
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                8.10.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User interface</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../entity/index.html">Entity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../model/index.html">Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technical/api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technical/database_structure.html">Database Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technical/application_structure.html">Application Structure</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Help</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Examples</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#general">General</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#archaeological">Archaeological</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#historical">Historical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting/index.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAtlas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Examples</a></li>
+      <li class="breadcrumb-item active">How to report an issue</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="how-to-report-an-issue">
+<h1>How to report an issue<a class="headerlink" href="#how-to-report-an-issue" title="Permalink to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<p>This short tutorial describes the best way to report an issue.
+OpenAtlas uses <a class="reference external" href="https://www.redmine.org/">Redmine</a> as an issue
+tracker. It is a flexible project management web application that is open
+source and released under the terms of the
+<a class="reference external" href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.html">GNU General Public License v2</a>.</p>
+<p>In addition to being used as
+<a class="reference external" href="https://redmine.openatlas.eu/projects/uni">OpenAtlas issue tracker</a>, the
+application is used to publish
+<a class="reference external" href="https://redmine.openatlas.eu/">public meeting minutes</a>, for
+<a class="reference external" href="https://redmine.openatlas.eu/projects/uni/wiki">technical documentation</a> and
+to plan and document the project’s own
+<a class="reference external" href="https://redmine.openatlas.eu/projects/uni/roadmap">roadmap</a>.</p>
+<section id="where-to-report-redmine">
+<h2>Where to report - Redmine<a class="headerlink" href="#where-to-report-redmine" title="Permalink to this heading"></a></h2>
+<p>While using OpenAtlas, problems (bugs) can occur from time to time. This is
+due to the active and dynamic further development of the database system. If
+problems occur when using the application, it would be great if these
+get reported. This is the only way we as a team can ensure that bugs
+caused by the database itself can be rectified quickly and that data input
+works smoothly again.</p>
+<p>The easiest way to report such a problem is via
+<a class="reference external" href="https://redmine.openatlas.eu/projects/uni">OpenAtlas Redmine</a>.</p>
+<p>Besides reporting bugs in that way you can also request a new feature or ask a
+question.</p>
+</section>
+<section id="id1">
+<h2>How to report an issue<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h2>
+<section id="get-a-redmine-account">
+<h3>Get a Redmine account<a class="headerlink" href="#get-a-redmine-account" title="Permalink to this heading"></a></h3>
+<p>To report an issue, an account must first be created. This is - of course -
+completely free of charge and all you need is a valid email address and a
+password.
+Activation is not automatic, but is carried out manually by the OpenAtlas team.
+This may take some time. Therefore, it might be best to create an account
+before it is needed to report bugs.</p>
+</section>
+<section id="create-a-new-issue">
+<h3>Create a new issue<a class="headerlink" href="#create-a-new-issue" title="Permalink to this heading"></a></h3>
+<p>Once you are logged in, click the <strong>Projects</strong> link in the top left.</p>
+<a class="reference internal image-reference" href="../_images/redmine_projects.png"><img alt="../_images/redmine_projects.png" src="../_images/redmine_projects.png" style="width: 400px;" /></a>
+<p>Then click on OpenAtlas or OpenAtlas Discovery (depending on where the issue
+occurred). This will bring you to the overview page. On the top left you can
+find a <strong>+ Button</strong>. Hover over it with the mouse and select
+<strong>New issue</strong> which brings you to an empty form.</p>
+</section>
+<section id="fill-out-the-form">
+<h3>Fill out the form<a class="headerlink" href="#fill-out-the-form" title="Permalink to this heading"></a></h3>
+<p><strong>Don’t be alarmed</strong>, reporting bugs in Redmine is easy and uncomplicated even
+if the form asks for many details - we only ask you to fill in few
+information. Everything else will be taken care of by the OpenAtlas team.</p>
+<a class="reference internal image-reference" href="../_images/redmine_form.png"><img alt="../_images/redmine_form.png" src="../_images/redmine_form.png" style="width: 400px;" /></a>
+<p>There are only two important form fields:</p>
+<ul class="simple">
+<li><p><strong>Subject</strong> - please give a descriptive name for the issue you are reporting
+(similar to e.g. the subject of an email)</p></li>
+<li><p><strong>Description</strong> - please describe the issue you want to import. What happened
+and where in the OpenAtlas instance did it happen. If possible, we kindly
+ask you to provide a <strong>link</strong> to where you found the problem. This makes it
+easier for us to find and resolve the issue for you.</p></li>
+</ul>
+<p>All other fields are optional for you to fill out. But keep in mind that a
+screenshot of the issue (can be added at the end of the form via the Browse
+button) can facilitate our work. Other optional form fields:</p>
+<ul class="simple">
+<li><p>Project - provides a list of projects. You can pick from the drop down
+list in which project the issue happened</p></li>
+<li><p>Tracker - there are four different types of issues you can report:</p>
+<ul>
+<li><p>Bug: Report an error</p></li>
+<li><p>Features: Request a new feature such as a new function</p></li>
+<li><p>Question: Use to ask a question</p></li>
+<li><dl class="simple">
+<dt>Administration: Use for administrative tasks such as server upgrades or</dt><dd><p>planning an event</p>
+</dd>
+</dl>
+</li>
+</ul>
+</li>
+<li><p>Status - please leave status on new if it is not yours to work on</p>
+<ul>
+<li><p>New: A new issue</p></li>
+<li><p>Acknowledged: The issue has been recognized and accepted</p></li>
+<li><p>Assigned: Someone was assigned to work on it</p></li>
+<li><p>In progress: Someone is actively working on the issue</p></li>
+<li><dl class="simple">
+<dt>Resolved: The issue has been dealt with but is not fully resolved yet -</dt><dd><p>some more testing, etc. might be needed</p>
+</dd>
+</dl>
+</li>
+<li><p>Closed: The issue has been resolved</p></li>
+<li><p>Rejected: The issue was rejected and an explanation was given</p></li>
+<li><p>Duplicate: The issue was already reported</p></li>
+</ul>
+</li>
+<li><p>Priority - not in use within the OpenAtlas Redmine. The priority of issues
+is determined through their placement in the roadmap</p></li>
+<li><p>Assignee - please only choose yourself as assignee or leave it blank</p></li>
+<li><p>Target version - please leave blank. It is only needed for internal
+project planning</p></li>
+<li><p>Found in version: Only available for bugs, you can fill in the version
+number of your instance (can be found in the upper right corner of your
+OpenAtlas instance page)</p></li>
+</ul>
+<p>Afterwards you can press <strong>Create</strong> to save and send the issue to us or press
+<strong>Create and add another</strong> to save the issue and start a new issue form
+immediately.
+Planned future releases with corresponding issues can be viewed on the
+<a class="reference external" href="https://redmine.openatlas.eu/projects/uni/roadmap">OpenAtlas roadmap</a>.
+Please note that the development of OpenAtlas is a fluid process and
+planned releases of new features might change.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="reference_systems.html" class="btn btn-neutral float-left" title="References Systems" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="time_spans.html" class="btn btn-neutral float-right" title="Time Spans" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+        <p>CC BY 4.0, Alexander Watzinger and the OpenAtlas team</p>
+        <script type="text/javascript">
+            <!-- Adds target=_blank to external links -->
+            $(document).ready(function () {
+                $('a[href^="http://"], a[href^="https://"]').not('a[class*=internal]').attr('target', '_blank');
+            });
+        </script>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

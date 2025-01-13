@@ -15,7 +15,7 @@ A text can be annotated when adding or updating a :doc:`/entity/source`
 
 * Mark the specific text part in the source with the left mouse button
 * Click the **Annotate** button above the text field
-* Select the entity which is releated to the annotation and/or add a comment
+* Select the entity which is related to the annotation and/or add a comment
 * Click on add
 * Press the save button of the form to submit it
 

@@ -24,13 +24,13 @@ class NoteForm(FlaskForm):
 
 
 @app.route('/note/view/<int:id_>')
+@required_group('readonly')
 def note_view(id_: int) -> str:
     note = User.get_note_by_id(id_)
     if (not note['public']
             and note['user_id'] != current_user.id
             and not is_authorized('manager')):
         abort(403)
-
     entity = Entity.get_by_id(note['entity_id'])
     buttons: list[str] = [manual('tools/notes')]
     if note['user_id'] == current_user.id:

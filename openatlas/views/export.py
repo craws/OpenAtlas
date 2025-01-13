@@ -40,8 +40,9 @@ def export_execute(format_: str) -> Response:
 def export_sql() -> str:
     path = app.config['EXPORT_PATH']
     table = Table(['name', 'size'], order=[[0, 'desc']])
-    for file in [f for f in path.iterdir()
-                 if (path / f).is_file() and f.name != '.gitignore']:
+    for file in [
+            f for f in path.iterdir()
+            if (path / f).is_file() and f.name != '.gitignore']:
         data = [
             file.name,
             convert_size(file.stat().st_size),
