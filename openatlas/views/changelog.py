@@ -15,7 +15,12 @@ def index_changelog() -> str:
 
 # pylint: disable=too-many-lines
 versions = {
-    '8.10.0': ['TBA', {}],
+    '8.10.0': ['TBA', {
+        'feature': {
+            '2417': 'Make count from tabs more visible',
+            '2415': 'Manual: How to report an issue on redmine',
+            '2444': 'Refactor and minor improvements'}
+    }],
     '8.9.0': ['2025-01-01', {
         'feature': {
             '2079': 'Text annotation',

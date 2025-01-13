@@ -11,8 +11,7 @@ from openatlas.api.resources.error import (
     InvalidViewClassError, LastEntityError, LogicalOperatorError,
     NoLicenseError, NoSearchStringError, NotAPlaceError, NotATypeError,
     NotPublicError, OperatorError, OperatorNotSupported, QueryEmptyError,
-    UrlNotValid,
-    ValueNotIntegerError)
+    UrlNotValid, ValueNotIntegerError)
 
 
 @app.errorhandler(400)
@@ -76,8 +75,9 @@ def unprocessable_entity(e: Exception) -> tuple[str, int]:
 def access_denied(_e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'Access denied',
-        'message': 'You do not have access to the API. '
-                   'Please ask the data provider for permission.',
+        'message':
+            'You do not have access to the API. '
+            'Please ask the data provider for permission.',
         'url': request.url,
         'timestamp': datetime.now(),
         'status': 403}), 403
@@ -200,8 +200,7 @@ def no_license(_e: Exception) -> tuple[Any, int]:
 def not_public(_e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'Not public',
-        'message':
-            'This file is not public shareable.',
+        'message': 'This file is not public shareable.',
         'url': request.url,
         'timestamp': datetime.now(),
         'status': 409}), 409
@@ -294,8 +293,7 @@ def invalid_search_category(_e: Exception) -> tuple[Any, int]:
 def invalid_search_value(_e: InvalidSearchValueError) -> tuple[Any, int]:
     return jsonify({
         'title': 'Invalid search values',
-        'message':
-            f'Search value is invalid for {_e.category}: {_e.values} ',
+        'message': f'Search value is invalid for {_e.category}: {_e.values} ',
         'url': request.url,
         'timestamp': datetime.now(),
         'status': 400}), 400
@@ -310,7 +308,6 @@ def value_not_an_integer(_e: Exception) -> tuple[Any, int]:
         'url': request.url,
         'timestamp': datetime.now(),
         'status': 400}), 400
-
 
 
 @app.errorhandler(UrlNotValid)
