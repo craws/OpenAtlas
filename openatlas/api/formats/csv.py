@@ -127,12 +127,12 @@ def export_database_csv(tables: dict[str, Any], filename: str) -> Response:
                             f'{system_class}.csv', 'w') as file:
                         file.write(bytes(
                             pd.DataFrame(data=frame).to_csv(),
-                            encoding='utf8'))
+                            encoding='utf-8'))
             else:
                 with zipped_file.open(f'{name}.csv', 'w') as file:
                     file.write(bytes(
                         pd.DataFrame(data=entries).to_csv(),
-                        encoding='utf8'))
+                        encoding='utf-8'))
     return Response(
         archive.getvalue(),
         mimetype='application/zip',
