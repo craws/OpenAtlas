@@ -11,11 +11,20 @@ from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 
 
-def build_dataframe(
-        entity: Entity,
-        relations: bool = False) -> dict[str, Any]:
+def build_dataframe_with_relations(
+        entity_dict: dict[str, Any]) -> dict[str, Any]:
+    entity = entity_dict['entity']
+    data = build_dataframe(entity)
+    for key, value in get_csv_links(entity_dict).items():
+        data[key] = ' | '.join(list(map(str, value)))
+    for key, value in get_csv_types(entity_dict).items():
+        data[key] = ' | '.join(list(map(str, value)))
+    return data
+
+
+def build_dataframe(entity: Entity) -> dict[str, Any]:
     geom = get_csv_geom_entry(entity)
-    data = {
+    return {
         'id': str(entity.id),
         'name': entity.name,
         'description': entity.description,
@@ -29,12 +38,6 @@ def build_dataframe(
         'system_class': entity.class_.name,
         'geom_type': geom['type'],
         'coordinates': geom['coordinates']}
-    if relations:
-        for key, value in get_csv_links(entity).items():
-            data[key] = ' | '.join(list(map(str, value)))
-        for key, value in get_csv_types(entity).items():
-            data[key] = ' | '.join(list(map(str, value)))
-    return data
 
 
 def build_link_dataframe(link: Link) -> dict[str, Any]:
@@ -53,28 +56,28 @@ def build_link_dataframe(link: Link) -> dict[str, Any]:
         'end_comment': link.end_comment}
 
 
-def get_csv_types(entity: Entity) -> dict[Any, list[Any]]:
+def get_csv_types(entity_dict: dict[str, Any]) -> dict[Any, list[Any]]:
     types: dict[str, Any] = defaultdict(list)
-    for type_ in entity.types:
+    for type_ in entity_dict['entity'].types:
         hierarchy = [g.types[root].name for root in type_.root]
         value = ''
-        for link in Entity.get_links_of_entities(entity.id):
+        for link in entity_dict['links']:
             if link.range.id == type_.id and link.description:
                 value += link.description
                 if link.range.id == type_.id and type_.description:
                     value += f' {type_.description}'
         key = ' > '.join(map(str, hierarchy))
-        types[key].append(f"{type_.name}: {value or ''}")
+        types[key].append(type_.name + (f": {value}" if value else ''))
     return types
 
 
-def get_csv_links(entity: Entity) -> dict[str, Any]:
+def get_csv_links(entity_dict: dict[str, Any]) -> dict[str, Any]:
     links: dict[str, Any] = defaultdict(list)
-    for link in Entity.get_links_of_entities(entity.id):
+    for link in entity_dict['links']:
         key = f"{link.property.i18n['en'].replace(' ', '_')}_" \
               f"{link.range.class_.name}"
         links[key].append(link.range.name)
-    for link in Entity.get_links_of_entities(entity.id, inverse=True):
+    for link in entity_dict['links_inverse']:
         key = f"{link.property.i18n['en'].replace(' ', '_')}_" \
               f"{link.range.class_.name}"
         if link.property.i18n_inverse['en']:
@@ -124,12 +127,12 @@ def export_database_csv(tables: dict[str, Any], filename: str) -> Response:
                             f'{system_class}.csv', 'w') as file:
                         file.write(bytes(
                             pd.DataFrame(data=frame).to_csv(),
-                            encoding='utf8'))
+                            encoding='utf-8'))
             else:
                 with zipped_file.open(f'{name}.csv', 'w') as file:
                     file.write(bytes(
                         pd.DataFrame(data=entries).to_csv(),
-                        encoding='utf8'))
+                        encoding='utf-8'))
     return Response(
         archive.getvalue(),
         mimetype='application/zip',

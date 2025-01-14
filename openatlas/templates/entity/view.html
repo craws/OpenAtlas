@@ -10,7 +10,7 @@
     <div class="row g-1">
       <div class="col-12"><h1>{{ entity.name }}</h1></div>
       {% if frontend_link %}
-        {{ frontend_link|safe }}
+        <span>{{ frontend_link|safe }}</span>
       {% endif %}
       <div class="col-12 col-sm-auto">
         {{ entity|profile_image|safe }}

@@ -14,14 +14,15 @@
                 aria-selected="{% if active %}true{% else %}false{% endif %}"
                 href="#tab-{{ tab.name|replace('_', '-') }}">
               <span
-              data-bs-toggle="tooltip"
-              title="{{ tab.tooltip }}"
-              data-bs-placement="top"
-              >
-              {{ _(tab.name|replace('_', ' '))|uc_first }}
-              {% if tab.table.rows|length %}
-                <span class="tab-counter">{{ '{0:,}'.format(tab.table.rows|length) }}</span>
-              {% endif %}
+                  data-bs-toggle="tooltip"
+                  title="{{ tab.tooltip }}"
+                  data-bs-placement="top"
+                  class="d-flex gap-1">
+                {{ _(tab.name|replace('_', ' '))|uc_first }}
+                {% if tab.table.rows|length %}
+                <span class="tab-counter badge align-self-center">{{
+                  '{0:,}'.format(tab.table.rows|length) }}</span>
+                {% endif %}
               </span>
             </a>
           </li>

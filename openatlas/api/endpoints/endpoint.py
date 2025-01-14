@@ -11,15 +11,14 @@ from flask_restful import marshal
 from openatlas import app
 from openatlas.api.endpoints.parser import Parser
 from openatlas.api.formats.csv import (
-    build_dataframe, build_link_dataframe)
+    build_dataframe_with_relations, build_dataframe, build_link_dataframe)
 from openatlas.api.formats.loud import get_loud_entities
-from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.resolve_endpoints import (
     download, parse_loud_context)
 from openatlas.api.resources.templates import (
-    geojson_collection_template, linked_places_template, loud_template)
-from openatlas.api.resources.util import (
-    get_linked_entities_api, get_location_link, remove_duplicate_entities)
+    geojson_collection_template, geojson_pagination, linked_place_pagination,
+    linked_places_template, loud_pagination, loud_template)
+from openatlas.api.resources.util import  get_location_link
 from openatlas.models.entity import Entity, Link
 
 
@@ -27,9 +26,58 @@ class Endpoint:
     def __init__(
             self,
             entities: Entity | list[Entity],
-            parser: dict[str, Any]) -> None:
+            parser: dict[str, Any],
+            single: bool = False) -> None:
         self.entities = entities if isinstance(entities, list) else [entities]
         self.parser = Parser(parser)
+        self.pagination: dict[str, Any] = {}
+        self.single = single
+        self.entities_with_links: dict[int, dict[str, Any]] = {}
+        self.formated_entities: list[dict[str, Any]] = []
+
+    def get_links_for_entities(self) -> None:
+        if not self.entities:
+            return
+        for entity in self.entities:
+            self.entities_with_links[entity.id] = {
+                'entity': entity,
+                'links': [],
+                'links_inverse': []}
+        for link_ in self.link_parser_check():
+            self.entities_with_links[link_.domain.id]['links'].append(link_)
+        for link_ in self.link_parser_check(inverse=True):
+            self.entities_with_links[
+                link_.range.id]['links_inverse'].append(link_)
+
+    def get_pagination(self) -> None:
+        total = [e.id for e in self.entities]
+        count = len(total)
+        self.parser.limit = self.parser.limit or count
+        # List of start ids for the index/pages
+        e_list = []
+        if total:
+            e_list = list(itertools.islice(total, 0, None, self.parser.limit))
+        # Creating index
+        index = \
+            [{'page': i + 1, 'startId': id_} for i, id_ in enumerate(e_list)]
+        if self.parser.page:
+            self.parser.first = self.parser.get_by_page(index)
+        # Get which entity should be displayed (first or last)
+        if self.parser.last or self.parser.first:
+            total = self.parser.get_start_entity(total)
+        # Finding position in list of first entity
+        entity_list_index = 0
+        for index_, entity in enumerate(self.entities):
+            if entity.id == total[0]:
+                entity_list_index = index_
+                break
+        self.pagination = {
+            'count': count, 'index': index, 'entity_index': entity_list_index}
+
+    def reduce_entities_to_limit(self) -> None:
+        start_index = self.pagination['entity_index']
+        end_index = start_index + int(self.parser.limit)
+        self.entities = self.entities[start_index:end_index]
 
     def resolve_entities(self) -> Response | dict[str, Any]:
         if self.parser.type_id:
@@ -37,58 +85,42 @@ class Endpoint:
         if self.parser.search:
             self.entities = [
                 e for e in self.entities if self.parser.search_filter(e)]
+        self.remove_duplicates()
+        if self.parser.count == 'true':
+            return jsonify(len(self.entities))
+
+        self.sort_entities()
+        self.get_pagination()
+        self.reduce_entities_to_limit()
+        self.get_links_for_entities()
         if self.parser.export == 'csv':
             return self.export_entities_csv()
         if self.parser.export == 'csvNetwork':
             return self.export_csv_for_network_analysis()
-        self.remove_duplicate_entities()
-        self.sorting()
-        result = self.get_json_output()
+        self.get_entities_formatted()
+
         if self.parser.format in app.config['RDF_FORMATS']:  # pragma: no cover
             return Response(
-                self.parser.rdf_output(result['results']),
+                self.parser.rdf_output(self.formated_entities),
                 mimetype=app.config['RDF_FORMATS'][self.parser.format])
-        if self.parser.count == 'true':
-            return jsonify(result['pagination']['entities'])
+
+        result = self.get_json_output()
         if self.parser.download == 'true':
-            return download(result, self.parser.get_entities_template())
-        return marshal(result, self.parser.get_entities_template())
+            return download(result, self.get_entities_template(result))
+        return marshal(result, self.get_entities_template(result))
 
-    def resolve_entity(self) -> Response | dict[str, Any] | tuple[Any, int]:
-        if self.parser.export == 'csv':
-            return self.export_entities_csv()
-        if self.parser.export == 'csvNetwork':
-            return self.export_csv_for_network_analysis()
-        result = self.get_entity_formatted()
-        if (self.parser.format
-                in app.config['RDF_FORMATS']):  # pragma: no cover
-            return Response(
-                self.parser.rdf_output(result),
-                mimetype=app.config['RDF_FORMATS'][self.parser.format])
-        template = linked_places_template(self.parser)
-        if self.parser.format in ['geojson', 'geojson-v2']:
-            template = geojson_collection_template()
-        if self.parser.format == 'loud':
-            template = loud_template(result)
-        if self.parser.download:
-            return download(result, template)
-        return marshal(result, template), 200
-
-    def get_entity_formatted(self) -> dict[str, Any]:
-        if self.parser.format == 'geojson':
-            return self.get_geojson()
-        if self.parser.format == 'geojson-v2':
-            return self.get_geojson_v2()
-        entity = self.entities[0]
-        entity_dict = {
-            'entity': entity,
-            'links': ApiEntity.get_links_of_entities(entity.id),
-            'links_inverse': ApiEntity.get_links_of_entities(
-                entity.id, inverse=True)}
-        if self.parser.format == 'loud' \
-                or self.parser.format in app.config['RDF_FORMATS']:
-            return get_loud_entities(entity_dict, parse_loud_context())
-        return self.parser.get_linked_places_entity(entity_dict)
+    def get_json_output(self) -> dict[str, Any]:
+        if not self.single:
+            result = {
+                "results": self.formated_entities,
+                "pagination": {
+                    'entitiesPerPage': int(self.parser.limit),
+                    'entities': self.pagination['count'],
+                    'index': self.pagination['index'],
+                    'totalPages': len(self.pagination['index'])}}
+        else:
+            result = dict(self.formated_entities[0])
+        return result
 
     def filter_by_type(self) -> list[Entity]:
         result = []
@@ -99,25 +131,40 @@ class Endpoint:
         return result
 
     def export_entities_csv(self) -> Response:
-        frames = [build_dataframe(e, relations=True) for e in self.entities]
+        frames = [
+            build_dataframe_with_relations(e)
+            for e in self.entities_with_links.values()]
         return Response(
             pd.DataFrame(data=frames).to_csv(),
             mimetype='text/csv',
             headers={'Content-Disposition': 'attachment;filename=result.csv'})
 
     def export_csv_for_network_analysis(self) -> Response:
+        entities = []
+        links = []
+        for items in self.entities_with_links.values():
+            entities.append(items['entity'])
+            for link_ in items['links']:
+                entities.append(link_.range)
+                links.append(link_)
+            for link_inverse in items['links']:
+                entities.append(link_inverse.domain)
+                links.append(link_inverse)
+        self.entities = entities
+        self.remove_duplicates()
+        self.get_links_for_entities()
         archive = BytesIO()
         with zipfile.ZipFile(archive, 'w') as zipped_file:
             for key, frame in self.get_entities_grouped_by_class().items():
                 with zipped_file.open(f'{key}.csv', 'w') as file:
-                    file.write(bytes(
-                        pd.DataFrame(data=frame).to_csv(), encoding='utf8'))
+                    file.write(
+                        bytes(
+                            pd.DataFrame(data=frame).to_csv(),
+                            encoding='utf8'))
             with zipped_file.open('links.csv', 'w') as file:
-                link_frame = [
-                    build_link_dataframe(link_) for link_ in
-                    (self.link_parser_check()
-                     + self.link_parser_check(inverse=True))]
-                file.write(bytes(
+                link_frame = [build_link_dataframe(link_) for link_ in links]
+                file.write(
+                    bytes(
                     pd.DataFrame(data=link_frame).to_csv(), encoding='utf8'))
         return Response(
             archive.getvalue(),
@@ -125,14 +172,12 @@ class Endpoint:
             headers={'Content-Disposition': 'attachment;filename=oa_csv.zip'})
 
     def get_entities_grouped_by_class(self) -> dict[str, Any]:
-        self.entities += get_linked_entities_api([e.id for e in self.entities])
-        entities = remove_duplicate_entities(self.entities)
         grouped_entities = {}
         for class_, entities_ in groupby(
-                sorted(entities, key=lambda entity: entity.class_.name),
+                sorted(self.entities, key=lambda entity: entity.class_.name),
                 key=lambda entity: entity.class_.name):
             grouped_entities[class_] = \
-                [build_dataframe(entity) for entity in entities_]
+                    [build_dataframe(entity) for entity in entities_]
         return grouped_entities
 
     def link_parser_check(self, inverse: bool = False) -> list[Link]:
@@ -145,7 +190,7 @@ class Endpoint:
                 inverse=inverse)
         return links
 
-    def sorting(self) -> None:
+    def sort_entities(self) -> None:
         if 'latest' in request.path:
             return
 
@@ -154,64 +199,37 @@ class Endpoint:
             key=self.parser.get_key,
             reverse=bool(self.parser.sort == 'desc'))
 
-    def remove_duplicate_entities(self) -> None:
-        seen: set[int] = set()
-        seen_add = seen.add  # Faster than always call seen.add()
+    def remove_duplicates(self) -> None:
+        exists: set[int] = set()
+        add_ = exists.add  # Faster than always call exists.add()
         self.entities = \
-            [e for e in self.entities if not (e.id in seen or seen_add(e.id))]
+            [e for e in self.entities if not (e.id in exists or add_(e.id))]
 
-    def get_json_output(self) -> dict[str, Any]:
-        total = [e.id for e in self.entities]
-        count = len(total)
-        if self.parser.limit == 0:
-            self.parser.limit = count
-        e_list = []
-        if total:
-            e_list = list(itertools.islice(total, 0, None, self.parser.limit))
-        index = \
-            [{'page': num + 1, 'startId': i} for num, i in enumerate(e_list)]
-        if index:
-            self.parser.first = self.parser.get_by_page(index) \
-                if self.parser.page else self.parser.first
-        total = self.parser.get_start_entity(total) \
-            if self.parser.last or self.parser.first else total
-        j = [i for i, x in enumerate(self.entities) if x.id == total[0]]
-        formatted_entities = []
-        if self.entities:
-            self.entities = [e for idx, e in enumerate(self.entities[j[0]:])]
-            formatted_entities = self.get_entities_formatted()
-        return {
-            "results": formatted_entities,
-            "pagination": {
-                'entitiesPerPage': int(self.parser.limit),
-                'entities': count,
-                'index': index,
-                'totalPages': len(index)}}
-
-    def get_entities_formatted(self) -> list[dict[str, Any]]:
-        self.entities = self.entities[:int(self.parser.limit)]
-        if self.parser.format == 'geojson':
-            return [self.get_geojson()]
-        if self.parser.format == 'geojson-v2':
-            return [self.get_geojson_v2()]
-        entities_dict: dict[int, dict[str, Any]] = {}
-        for entity in self.entities:
-            entities_dict[entity.id] = {
-                'entity': entity,
-                'links': [],
-                'links_inverse': []}
-        for link_ in self.link_parser_check():
-            entities_dict[link_.domain.id]['links'].append(link_)
-        for link_ in self.link_parser_check(inverse=True):
-            entities_dict[link_.range.id]['links_inverse'].append(link_)
-        if self.parser.format == 'loud' \
-                or self.parser.format in app.config['RDF_FORMATS']:
-            return [
-                get_loud_entities(item, parse_loud_context())
-                for item in entities_dict.values()]
-        return [
-            self.parser.get_linked_places_entity(item)
-            for item in entities_dict.values()]
+    def get_entities_formatted(self) -> None:
+        if not self.entities:
+            return
+        entities = []
+        match self.parser.format:
+            case 'geojson':
+                entities = [self.get_geojson()]
+            case 'geojson-v2':
+                entities = [self.get_geojson_v2()]
+            case 'loud':
+                parsed_context = parse_loud_context()
+                entities = [
+                    get_loud_entities(item, parsed_context)
+                    for item in self.entities_with_links.values()]
+            case 'lp' | 'lpx':
+                entities = [
+                    self.parser.get_linked_places_entity(item)
+                    for item in self.entities_with_links.values()]
+            case _ if self.parser.format \
+                   in app.config['RDF_FORMATS']:  # pragma: no cover
+                parsed_context = parse_loud_context()
+                entities = [
+                    get_loud_entities(item, parsed_context)
+                    for item in self.entities_with_links.values()]
+        self.formated_entities = entities
 
     def get_geojson(self) -> dict[str, Any]:
         out = []
@@ -247,3 +265,19 @@ class Endpoint:
                     [l_.range.id for l_ in entity_links]):
                 out.append(self.parser.get_geojson_dict(entity, geom))
         return {'type': 'FeatureCollection', 'features': out}
+
+    def get_entities_template(self, result: dict[str, Any]) -> dict[str, Any]:
+        match self.parser.format:
+            case 'geojson' | 'geojson-v2':
+                template = geojson_collection_template()
+                if not self.single:
+                    template = geojson_pagination()
+            case 'loud':
+                template = loud_template(result)
+                if not self.single:
+                    template = loud_pagination()
+            case 'lp' | 'lpx' | _:
+                template = linked_places_template(self.parser)
+                if not self.single:
+                    template = linked_place_pagination(self.parser)
+        return template
