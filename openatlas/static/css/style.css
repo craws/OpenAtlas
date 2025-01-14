@@ -257,3 +257,12 @@ img.schema_image {
   min-width: 12.25rem;
 }
 
+.active > span > .tab-counter.badge {
+  color: var(--bs-primary);
+  background-color: white;
+}
+
+:not(.active) > span > .tab-counter.badge {
+  background-color: var(--bs-primary);
+  color: white;
+}

@@ -277,6 +277,7 @@ class Api(ApiTestCase):
                     export='csvNetwork'))]:
             assert b'Shire' in rv.data
             assert 'application/zip' in rv.headers.get('Content-Type')
+
         rv = c.get(
             url_for(
                 'api_04.linked_entities_by_properties_recursive',
