@@ -16,6 +16,7 @@ from openatlas.display.util import (
 from openatlas.display.util2 import is_authorized, manual
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
+from openatlas.models.bones import structure
 from openatlas.models.entity import Entity, Link
 from openatlas.models.tools import (
     SexEstimation, get_carbon_link, get_sex_types, update_carbon)
@@ -74,7 +75,8 @@ def tools_index(id_: int) -> str | Response:
                 button(
                     _('radiocarbon dating'),
                     url_for('carbon', id_=entity.id)),
-                button(_('sex estimation'), url_for('sex', id_=entity.id))])}
+                button(_('sex estimation'), url_for('sex', id_=entity.id)),
+                button(_('bone inventroy'), url_for('bones', id_=entity.id))])}
     return render_template(
         'tabs.html',
         tabs=tabs,
@@ -266,3 +268,24 @@ def carbon_update(id_: int) -> str | Response:
             [_('tools'), url_for('tools_index', id_=entity.id)],
             [_('radiocarbon dating'), url_for('carbon_update', id_=entity.id)],
             _('edit')])
+
+
+@app.route('/tools/bones/<int:id_>')
+@required_group('readonly')
+def bones(id_: int) -> str | Response:
+    entity = Entity.get_by_id(id_, types=True)
+    buttons = [manual('tools/anthropological_analyses')]
+    # types = Bones.get_types(entity)
+    if is_authorized('contributor'):
+        pass
+    return render_template(
+        'tabs.html',
+        entity=entity,
+        tabs={
+            'info': Tab(
+                'bones',
+                render_template('tools/bones.html', data=structure),
+                buttons=buttons)},
+        crumbs=start_crumbs(entity) + [
+            [_('tools'), url_for('tools_index', id_=entity.id)],
+            _('bone inventory')])
