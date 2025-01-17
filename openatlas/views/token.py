@@ -15,13 +15,13 @@ from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
-from openatlas.display.util import button, display_info, link, required_group
+from openatlas.display.util import button, link, required_group
 from openatlas.display.util2 import manual
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
-from openatlas.forms.util import get_form_settings
 from openatlas.models.token import Token
 from openatlas.models.user import User
+
 
 class GenerateTokenForm(FlaskForm):
     expiration = RadioField(
@@ -110,14 +110,13 @@ def generate_token() -> str | Response:
     if form.validate_on_submit():
         expiration = form.expiration.data
         token_name = form.token_name.data
-        user_id = int(form.user.data)
+        user_ = User.get_by_id(int(form.user.data))
         token = ''
         Transaction.begin()
         try:
-            token = generate_token(current_user.id, expiration, token_name,
-                                   user_id)
+            token = Token.generate_token( expiration, token_name, user_)
             Transaction.commit()
-            flash(_('token stored'), 'info')
+            flash(f"{_('token stored for')}: {user_.username}", 'info')
         except Exception as e:  # pragma: no cover
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
