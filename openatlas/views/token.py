@@ -58,11 +58,20 @@ def api_token(user_id: int = 0) -> str | Response:
     tabs['token'].buttons.append(
         button(_('generate'), url_for('generate_token')))
     tabs['token'].buttons.append(
-        button(_('revoke all tokens'), url_for('revoke_all_tokens')))
+        button(
+            _('revoke all tokens'),
+            url_for('revoke_all_tokens'),
+         onclick=f"return confirm('{_('revoke all tokens')}?')"))
     tabs['token'].buttons.append(
-        button(_('authorize all tokens'), url_for('authorize_all_tokens')))
+        button(
+            _('authorize all tokens'),
+            url_for('authorize_all_tokens'),
+         onclick=f"return confirm('{_('authorize all tokens')}?')"))
     tabs['token'].buttons.append(
-        button(_('delete revoked tokens'), url_for('delete_all_tokens')))
+        button(
+            _('delete revoked tokens'),
+            url_for('delete_all_tokens'),
+         onclick=f"return confirm('{_('delete all revoked tokens')}?')"))
     token_table = Table([
         _('name'),
         'jti',
@@ -75,7 +84,8 @@ def api_token(user_id: int = 0) -> str | Response:
     for token in Token.get_tokens(user_id):
         delete_link = link(
             _('delete'),
-            url_for('delete_token', id_=token['id']))
+            url_for('delete_token', id_=token['id']),
+            js=f"return confirm('" + _('delete') + "?')")
         revoke_link = link(
             _('revoke'),
             url_for('revoke_token', id_=token['id']))
