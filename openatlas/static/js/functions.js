@@ -552,6 +552,8 @@ function saveAnnotationText() {
 
 document.addEventListener("DOMContentLoaded", function() {
     const inputField = document.getElementById("token_text");
+    const containerFluid = document.getElementsByClassName("container-fluid");
+    const container = containerFluid[containerFluid.length - 1];
 
     if (inputField) {
         function createCopyIcon() {
@@ -561,26 +563,39 @@ document.addEventListener("DOMContentLoaded", function() {
                 copyIcon.style.cursor = "pointer";
                 copyIcon.style.display = "inline-flex";
                 copyIcon.style.alignItems = "center";
+                copyIcon.style.padding = "5px 10px";
+                copyIcon.style.backgroundColor = "#f1f1f1";
+                copyIcon.style.border = "1px solid #ccc";
+                copyIcon.style.borderRadius = "5px";
+                copyIcon.style.marginRight = "10px";
+                copyIcon.style.maxWidth = "100%";
+                copyIcon.style.wordBreak = "break-all"; // Force line breaks for single words
+                copyIcon.style.textAlign = "left"; // Ensure text alignment remains logical
                 copyIcon.title = "Copy to clipboard";
 
+                // Create the SVG icon
                 const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
                 svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
                 svg.setAttribute("viewBox", "0 0 448 512");
                 svg.setAttribute("width", "20");
                 svg.setAttribute("height", "20");
+                svg.style.flexShrink = "0"; // Prevent resizing
+                svg.style.marginRight = "5px"; // Add spacing between the icon and text
 
                 const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
                 path.setAttribute("d", "M208 0L332.1 0c12.7 0 24.9 5.1 33.9 14.1l67.9 67.9c9 9 14.1 21.2 14.1 33.9L448 336c0 26.5-21.5 48-48 48l-192 0c-26.5 0-48-21.5-48-48l0-288c0-26.5 21.5-48 48-48zM48 128l80 0 0 64-64 0 0 256 192 0 0-32 64 0 0 48c0 26.5-21.5 48-48 48L48 512c-26.5 0-48-21.5-48-48L0 176c0-26.5 21.5-48 48-48z");
 
                 svg.appendChild(path);
 
+                // Add the SVG and text to the span
                 copyIcon.appendChild(svg);
+                const textNode = document.createTextNode(inputField.value); // Create the text node
+                copyIcon.appendChild(textNode); // Append the text after the SVG
 
-                inputField.insertAdjacentElement("afterend", copyIcon);
+                container.insertAdjacentElement("beforeend", copyIcon);
 
                 copyIcon.addEventListener("click", function() {
                     inputField.select();
-                    inputField.setSelectionRange(0, 99999);
                     navigator.clipboard.writeText(inputField.value)
                         .then(() => {
                             showTooltip("Copied to clipboard!", copyIcon);
@@ -620,13 +635,18 @@ document.addEventListener("DOMContentLoaded", function() {
         createCopyIcon();
 
         inputField.addEventListener("input", function() {
+            const copyIcon = document.getElementById("copyIcon");
             if (inputField.value) {
-                createCopyIcon();
-            } else {
-                const copyIcon = document.getElementById("copyIcon");
-                if (copyIcon) {
-                    copyIcon.remove();
+                if (!copyIcon) {
+                    createCopyIcon();
+                } else {
+                    const svg = copyIcon.querySelector("svg");
+                    copyIcon.textContent = ""; // Clear previous content
+                    copyIcon.appendChild(svg); // Append the SVG first
+                    copyIcon.appendChild(document.createTextNode(inputField.value)); // Update text after SVG
                 }
+            } else if (copyIcon) {
+                copyIcon.remove();
             }
         });
     }

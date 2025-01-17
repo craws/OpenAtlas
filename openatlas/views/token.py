@@ -10,6 +10,7 @@ from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wtforms import RadioField, SelectField, StringField
+from wtforms.fields.simple import HiddenField
 
 from openatlas import app
 from openatlas.database.connect import Transaction
@@ -32,7 +33,7 @@ class GenerateTokenForm(FlaskForm):
         _('token name'),
         default=f"Token_{datetime.today().strftime('%Y-%m-%d')}")
     user = SelectField(_('user'), choices=(), default=0, coerce=int)
-    token_text = StringField(_('token'), render_kw={'readonly': True})
+    token_text = HiddenField()
     save = SubmitField(_('generate'))
 
 class ListTokenForm(FlaskForm):
