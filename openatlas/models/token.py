@@ -8,13 +8,10 @@ from openatlas.database import token as db
 from openatlas.models.user import User
 
 
-class ApiToken:
+class Token:
 
     @staticmethod
-    def generate_token(
-            expiration: str,
-                       token_name: str,
-                       user_id: int) -> None:
+    def generate_token(expiration: str, token_name: str, user_id: int) -> None:
         expires_delta = None
         match expiration:
             case '0':
@@ -39,22 +36,30 @@ class ApiToken:
             'valid_from': datetime.fromtimestamp(decoded_token['iat'])})
         return access_token
 
+    @staticmethod
+    def get_tokens(user_id: int) -> list[dict[str, Any]]:
+        return db.get_tokens(user_id)
 
+    @staticmethod
+    def revoke_jwt_token(id_: int) -> None:
+        return db.revoke_jwt_token(id_)
 
-    def get_tokens(self) -> list[dict[str, Any]]:
-        return db.get_tokens(self.id)
+    @staticmethod
+    def authorize_jwt_token(id_: int) -> None:
+        return db.authorize_jwt_token(id_)
 
-    def revoke_jwt_token(self, id_: int) -> None:
-        return db.revoke_jwt_token(self.id, id_)
+    @staticmethod
+    def delete_token(id_: int) -> None:
+        return db.delete_token(id_)
 
-    def authorize_jwt_token(self, id_: int) -> None:
-        return db.authorize_jwt_token(self.id, id_)
+    @staticmethod
+    def delete_all_revoked_tokens() -> None:
+        return db.delete_all_revoked_tokens()
 
-    def delete_token(self, id_: int) -> None:
-        return db.delete_token(self.id, id_)
+    @staticmethod
+    def revoke_all_tokens() -> None:
+        return db.revoke_all_tokens()
 
-    def delete_all_revoked_tokens(self) -> None:
-        return db.delete_all_revoked_tokens(self.id)
-
-    def revoke_all_tokens(self) -> None:
-        return db.revoke_all_tokens(self.id)
+    @staticmethod
+    def authorize_all_tokens() -> None:
+        return db.authorize_all_tokens()

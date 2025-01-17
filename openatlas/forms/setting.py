@@ -1,10 +1,7 @@
-from datetime import datetime
-
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (
     BooleanField, FieldList, IntegerField, SelectField, StringField)
-from wtforms.fields.choices import RadioField
 from wtforms.validators import Email, InputRequired, Optional, Regexp, URL
 
 from openatlas import app
@@ -164,16 +161,3 @@ class DisplayForm(FlaskForm):
     map_zoom_default = IntegerField(_('default map zoom'), [InputRequired()])
     map_zoom_max = IntegerField(_('max map zoom'), [InputRequired()])
     save = SubmitField(_('save'))
-
-
-class GenerateTokenForm(FlaskForm):
-    expiration = RadioField(
-        _('expiration'),
-        choices=[('0','One day'),('1','90 days'), ('2', 'no expiration date')],
-        default='0')
-    token_name = StringField(
-        _('token name'),
-        default=f"Token_{datetime.today().strftime('%Y-%m-%d')}")
-    user = SelectField(_('user'), choices=(), default=0, coerce=int)
-    token_text = StringField(_('token'), render_kw={'readonly': True})
-    save = SubmitField(_('generate'))

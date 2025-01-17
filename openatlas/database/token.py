@@ -3,15 +3,16 @@ from typing import Any
 from flask import g
 
 
-def get_tokens(id_: int) -> list[dict[str, Any]]:
+def get_tokens(user_id: int) -> list[dict[str, Any]]:
     g.cursor.execute(
-        """
+        f"""
         SELECT 
             id, user_id, jti, valid_from, valid_until, name, created, revoked,
             creator_id
         FROM web.user_tokens 
-        WHERE user_id = %(user_id)s;
-        """, {'user_id': id_})
+        WHERE TRUE
+            {'AND user_id = %(user_id)s' if int(user_id) else ''};
+        """, {'user_id': user_id})
     return [dict(row) for row in g.cursor.fetchall()]
 
 
@@ -25,43 +26,34 @@ def generate_token(data: dict[str, Any]) -> None:
         """, data)
 
 
-def revoke_jwt_token(user_id: int, id_: int) -> None:
+def revoke_jwt_token(id_: int) -> None:
     g.cursor.execute(
-        """
-        UPDATE web.user_tokens SET revoked=true
-        WHERE id = %(id)s AND user_id = %(user_id)s;
-        """, {'user_id': user_id, 'id': id_})
+        "UPDATE web.user_tokens SET revoked=true WHERE id = %(id)s;",
+        {'id': id_})
 
 
-def authorize_jwt_token(user_id: int, id_: int) -> None:
+def authorize_jwt_token(id_: int) -> None:
     g.cursor.execute(
-        """
-        UPDATE web.user_tokens SET revoked=false
-        WHERE id = %(id)s AND user_id = %(user_id)s;
-        """, {'user_id': user_id, 'id': id_})
+        "UPDATE web.user_tokens SET revoked=false WHERE id = %(id)s;",
+        {'id': id_})
 
 
-def delete_token(user_id: int, id_: int) -> None:
+def delete_token(id_: int) -> None:
     g.cursor.execute(
-        """
-        DELETE FROM web.user_tokens 
-        WHERE id = %(id)s AND user_id = %(user_id)s;
-        """, {'user_id': user_id, 'id': id_})
+        "DELETE FROM web.user_tokens WHERE id = %(id)s;",
+        {'id': id_})
 
 
-def delete_all_revoked_tokens(user_id: int) -> None:
-    g.cursor.execute(
-        """
-        DELETE FROM web.user_tokens 
-        WHERE user_id = %(user_id)s AND revoked = true;
-        """, {'user_id': user_id})
+def delete_all_revoked_tokens() -> None:
+    g.cursor.execute("DELETE FROM web.user_tokens WHERE revoked = true;")
 
 
-def revoke_all_tokens(user_id: int) -> None:
-    g.cursor.execute(
-        """
-        UPDATE web.user_tokens SET revoked=true WHERE user_id = %(user_id)s;
-        """, {'user_id': user_id})
+def authorize_all_tokens() -> None:
+    g.cursor.execute("UPDATE web.user_tokens SET revoked=false;")
+
+
+def revoke_all_tokens() -> None:
+    g.cursor.execute("UPDATE web.user_tokens SET revoked=true;")
 
 
 def check_token_revoked(jti: str) -> dict[str, Any]:

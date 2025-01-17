@@ -1,17 +1,16 @@
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from flask import flash, g, make_response, redirect, render_template, request, \
     url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user, login_required
-from werkzeug import Response
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
+from wtforms import RadioField, SelectField, StringField
 
-import openatlas.database
-from openatlas.database import token as db
 from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
@@ -19,24 +18,48 @@ from openatlas.display.table import Table
 from openatlas.display.util import button, display_info, link, required_group
 from openatlas.display.util2 import manual
 from openatlas.forms.display import display_form
-from openatlas.forms.setting import GenerateTokenForm
+from openatlas.forms.field import SubmitField
 from openatlas.forms.util import get_form_settings
+from openatlas.models.token import Token
 from openatlas.models.user import User
 
+class GenerateTokenForm(FlaskForm):
+    expiration = RadioField(
+        _('expiration'),
+        choices=[('0','One day'),('1','90 days'), ('2', 'no expiration date')],
+        default='0')
+    token_name = StringField(
+        _('token name'),
+        default=f"Token_{datetime.today().strftime('%Y-%m-%d')}")
+    user = SelectField(_('user'), choices=(), default=0, coerce=int)
+    token_text = StringField(_('token'), render_kw={'readonly': True})
+    save = SubmitField(_('generate'))
 
+class ListTokenForm(FlaskForm):
+    user = SelectField(_('user'), choices=(), default=0, coerce=int)
+    save = SubmitField(_('apply'))
 
-@app.route('/admin/api_token')
+@app.route('/admin/api_token', methods=['GET', 'POST'])
+@app.route('/admin/api_token/<int:user_id>', methods=['GET', 'POST'])
 @required_group('admin')
-def api_token() -> str | Response:
+def api_token(user_id: int = 0) -> str | Response:
+    form = ListTokenForm()
+    form.user.choices = [(0, _('all'))] + User.get_users_for_form()
+    user_id = user_id or 0
+    if form.validate_on_submit():
+        user_id = int(form.user.data)
+    form.user.data = user_id
     tabs = {
         'token': Tab(
             'token',
-            display_info(get_form_settings(GenerateTokenForm(), True)),
+            display_form(form),
             buttons=[manual('admin/api')])}
     tabs['token'].buttons.append(
         button(_('generate'), url_for('generate_token')))
     tabs['token'].buttons.append(
         button(_('revoke all tokens'), url_for('revoke_all_tokens')))
+    tabs['token'].buttons.append(
+        button(_('authorize all tokens'), url_for('authorize_all_tokens')))
     tabs['token'].buttons.append(
         button(_('delete revoked tokens'), url_for('delete_all_tokens')))
     token_table = Table([
@@ -48,7 +71,7 @@ def api_token() -> str | Response:
         _('creator'),
         _('revoked'),
         _('delete')])
-    for token in openatlas.database.token.get_tokens():
+    for token in Token.get_tokens(user_id):
         delete_link = link(
             _('delete'),
             url_for('delete_token', id_=token['id']))
@@ -118,41 +141,49 @@ def generate_token() -> str | Response:
             _('generate token')])
 
 
-@app.route('/profile/revoke_token/<int:id_>')
+@app.route('/admin/api_token/revoke_token/<int:id_>')
 @login_required
 def revoke_token(id_: int) -> str | Response:
-    db.revoke_jwt_token(id_)
+    Token.revoke_jwt_token(id_)
     flash(_('token revoked'), 'info')
-    return redirect(f"{url_for('profile_index')}#tab-token")
+    return redirect(f"{url_for('api_token')}")
 
 
-@app.route('/profile/authorize_token/<int:id_>')
+@app.route('/admin/api_token/authorize_token/<int:id_>')
 @login_required
 def authorize_token(id_: int) -> str | Response:
-    db.authorize_jwt_token(id_)
+    Token.authorize_jwt_token(id_)
     flash(_('token authorized'), 'info')
-    return redirect(f"{url_for('profile_index')}#tab-token")
+    return redirect(f"{url_for('api_token')}")
 
 
-@app.route('/profile/delete_token/<int:id_>')
+@app.route('/admin/api_token/delete_token/<int:id_>')
 @login_required
 def delete_token(id_: int) -> str | Response:
-    db.delete_token(id_)
+    Token.delete_token(id_)
     flash(_('token deleted'), 'info')
-    return redirect(f"{url_for('profile_index')}#tab-token")
+    return redirect(f"{url_for('api_token')}")
 
 
-@app.route('/profile/delete_revoked_tokens/')
+@app.route('/admin/api_token/delete_revoked_tokens/')
 @login_required
 def delete_all_tokens() -> str | Response:
-    db.delete_all_revoked_tokens()
+    Token.delete_all_revoked_tokens()
     flash(_('all revoked tokens deleted'), 'info')
-    return redirect(f"{url_for('profile_index')}#tab-token")
+    return redirect(f"{url_for('api_token')}")
 
 
-@app.route('/profile/revoke_all_tokens/')
+@app.route('/admin/api_token/revoke_all_tokens/')
 @login_required
 def revoke_all_tokens() -> str | Response:
-    db.revoke_all_tokens()
+    Token.revoke_all_tokens()
     flash(_('all tokens revoked'), 'info')
-    return redirect(f"{url_for('profile_index')}#tab-token")
+    return redirect(f"{url_for('api_token')}")
+
+@app.route('/admin/api_token/authorize_all_tokens/')
+@login_required
+def authorize_all_tokens() -> str | Response:
+    Token.authorize_all_tokens()
+    flash(_('all tokens revoked'), 'info')
+    return redirect(f"{url_for('api_token')}")
+
