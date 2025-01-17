@@ -2,7 +2,7 @@ from flask import url_for
 from flask_jwt_extended import decode_token
 
 from openatlas import app, check_if_token_revoked
-from openatlas.database.user import get_tokens
+from openatlas.database.token import get_tokens
 from tests.base import ProfileTestCase
 
 

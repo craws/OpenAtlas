@@ -11,7 +11,7 @@ from psycopg2 import extras
 
 from openatlas.api.resources.error import AccessDeniedError
 from openatlas.database.connect import close_connection, open_connection
-from openatlas.database.user import check_token_revoked
+from openatlas.database.token import check_token_revoked
 
 app: Flask = Flask(__name__, instance_relative_config=True)
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
@@ -29,7 +29,7 @@ from openatlas.api import api
 from openatlas.views import (
     admin, ajax, annotation, arche, changelog, entity, entity_index, error,
     export, file, hierarchy, index, imports, link, login, model, note, overlay,
-    profile, search, sql, tools, type as type_, user, vocabs)
+    profile, search, sql, token, tools, type as type_, user, vocabs)
 
 
 @babel.localeselector

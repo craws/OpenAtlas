@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 from typing import Any, Optional
 
 from flask import g, session
-from flask_jwt_extended import create_access_token, decode_token
 from flask_login import UserMixin, current_user
 
 from openatlas.database import user as db
@@ -82,48 +81,6 @@ class User(UserMixin):
 
     def get_entities(self) -> list[Entity]:
         return Entity.get_by_ids(db.get_user_entities(self.id), types=True)
-
-    def generate_token(self, expiration: str, token_name: str) -> None:
-        expires_delta = None
-        match expiration:
-            case '0':
-                expires_delta = timedelta(days=1)
-            case '1':
-                expires_delta = timedelta(days=90)
-        access_token = create_access_token(
-            identity=self.username,
-            additional_claims={'role': self.group},
-            expires_delta=expires_delta)  # type: ignore
-        decoded_token = decode_token(access_token, allow_expired=True)
-        valid_until = datetime.max
-        if expire := decoded_token.get('exp'):
-            valid_until = datetime.fromtimestamp(expire)
-        db.generate_token({
-            'jti': decoded_token['jti'],
-            'user_id': self.id,
-            'creator_id': self.id,
-            'name': token_name,
-            'valid_until': valid_until,
-            'valid_from': datetime.fromtimestamp(decoded_token['iat'])})
-        return access_token
-
-    def get_tokens(self) -> list[dict[str, Any]]:
-        return db.get_tokens(self.id)
-
-    def revoke_jwt_token(self, id_: int) -> None:
-        return db.revoke_jwt_token(self.id, id_)
-
-    def authorize_jwt_token(self, id_: int) -> None:
-        return db.authorize_jwt_token(self.id, id_)
-
-    def delete_token(self, id_: int) -> None:
-        return db.delete_token(self.id, id_)
-
-    def delete_all_revoked_tokens(self) -> None:
-        return db.delete_all_revoked_tokens(self.id)
-
-    def revoke_all_tokens(self) -> None:
-        return db.revoke_all_tokens(self.id)
 
     @staticmethod
     def get_all() -> list[User]:

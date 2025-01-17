@@ -166,7 +166,7 @@ class DisplayForm(FlaskForm):
     save = SubmitField(_('save'))
 
 
-class TokenForm(FlaskForm):
+class GenerateTokenForm(FlaskForm):
     expiration = RadioField(
         _('expiration'),
         choices=[('0','One day'),('1','90 days'), ('2', 'no expiration date')],
@@ -174,5 +174,6 @@ class TokenForm(FlaskForm):
     token_name = StringField(
         _('token name'),
         default=f"Token_{datetime.today().strftime('%Y-%m-%d')}")
+    user = SelectField(_('user'), choices=(), default=0, coerce=int)
     token_text = StringField(_('token'), render_kw={'readonly': True})
     save = SubmitField(_('generate'))

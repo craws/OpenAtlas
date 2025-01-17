@@ -6,7 +6,7 @@ import psycopg2
 from flask import url_for
 
 from openatlas import app
-from openatlas.database.user import get_tokens
+from openatlas.database.token import get_tokens
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 
