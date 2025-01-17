@@ -28,29 +28,29 @@ def fetch_wikidata(id_: str) -> dict[str, Any]:
         return {}
     try:
         info['title'] = data['entities'][id_]['labels']['en']['value']
-    except Exception:  # pragma: no cover
+    except KeyError:  # pragma: no cover
         pass
     try:
         info['aliases'] = [
             ' ' + v['value'] for v in data['entities'][id_]['aliases']['en']]
-    except Exception:  # pragma: no cover
+    except KeyError:  # pragma: no cover
         pass
     try:
         info['description'] = \
             data['entities'][id_]['descriptions']['en']['value']
-    except Exception:  # pragma: no cover
+    except KeyError:  # pragma: no cover
         pass
     try:
         info['founded by'] = [
             add_resolver_url(v['mainsnak']['datavalue']['value']['numeric-id'])
             for v in data['entities'][id_]['claims']['P112']]
-    except Exception:
+    except KeyError:
         pass
     try:
         info['nick names'] = [
             v['mainsnak']['datavalue']['value']['text']
             for v in data['entities'][id_]['claims']['P1449']]
-    except Exception:
+    except KeyError:
         pass
     try:
         info['official websites'] = [
@@ -59,19 +59,19 @@ def fetch_wikidata(id_: str) -> dict[str, Any]:
                 v['mainsnak']['datavalue']['value'],
                 external=True)
             for v in data['entities'][id_]['claims']['P856']]
-    except Exception:  # pragma: no cover
+    except KeyError:  # pragma: no cover
         pass
     try:
         info['categories'] = [
             add_resolver_url(v['mainsnak']['datavalue']['value']['numeric-id'])
             for v in data['entities'][id_]['claims']['P910']]
-    except Exception:  # pragma: no cover
+    except KeyError:  # pragma: no cover
         pass
     try:
         info['inception'] = \
             data['entities'][id_]['claims']['P571'][0]['mainsnak'][
                 'datavalue']['value']['time']
-    except Exception:  # pragma: no cover
+    except KeyError:  # pragma: no cover
         pass
     try:
         info['latitude'] = \
@@ -80,6 +80,6 @@ def fetch_wikidata(id_: str) -> dict[str, Any]:
         info['longitude'] = \
             data['entities'][id_]['claims']['P625'][0]['mainsnak'][
                 'datavalue']['value']['longitude']
-    except Exception:  # pragma: no cover
+    except KeyError:  # pragma: no cover
         pass
     return info
