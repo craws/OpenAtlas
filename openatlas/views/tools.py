@@ -36,7 +36,7 @@ def name_result(result: float) -> str:
     return ''  # pragma: no cover
 
 
-def start_crumbs(entity: Entity) -> list[Any]:
+def tools_start_crumbs(entity: Entity) -> list[Any]:
     crumbs: list[Any] = [[_('place'), url_for('index', view='place')]]
     for super_ in entity.get_structure()['supers']:
         crumbs.append(link(super_))
@@ -81,7 +81,7 @@ def tools_index(id_: int) -> str | Response:
         'tabs.html',
         tabs=tabs,
         entity=entity,
-        crumbs=start_crumbs(entity) + [_('tools')])
+        crumbs=tools_start_crumbs(entity) + [_('tools')])
 
 
 @app.route('/tools/sex/<int:id_>')
@@ -118,7 +118,7 @@ def sex(id_: int) -> str | Response:
                     data=data,
                     result=sex_result(entity)),
                 buttons=buttons)},
-        crumbs=start_crumbs(entity) + [
+        crumbs=tools_start_crumbs(entity) + [
             [_('tools'), url_for('tools_index', id_=entity.id)],
             _('sex estimation')])
 
@@ -186,7 +186,7 @@ def sex_update(id_: int) -> str | Response:
                     form,
                     manual_page='tools/anthropological_analyses'))},
         entity=entity,
-        crumbs=start_crumbs(entity) + [
+        crumbs=tools_start_crumbs(entity) + [
             [_('tools'), url_for('tools_index', id_=entity.id)],
             [_('sex estimation'), url_for('sex', id_=entity.id)],
             _('edit')])
@@ -211,7 +211,7 @@ def carbon(id_: int) -> str | Response:
                 'radiocarbon dating',
                 carbon_result(entity),
                 buttons=buttons)},
-        crumbs=start_crumbs(entity) + [
+        crumbs=tools_start_crumbs(entity) + [
             [_('tools'), url_for('tools_index', id_=entity.id)],
             _('radiocarbon dating')])
 
@@ -264,7 +264,7 @@ def carbon_update(id_: int) -> str | Response:
         'tabs.html',
         entity=entity,
         tabs={'info': Tab('radiocarbon dating', display_form(form))},
-        crumbs=start_crumbs(entity) + [
+        crumbs=tools_start_crumbs(entity) + [
             [_('tools'), url_for('tools_index', id_=entity.id)],
             [_('radiocarbon dating'), url_for('carbon_update', id_=entity.id)],
             _('edit')])
@@ -284,8 +284,44 @@ def bones(id_: int) -> str | Response:
         tabs={
             'info': Tab(
                 'bones',
-                render_template('tools/bones.html', data=structure),
+                render_template(
+                    'tools/bones.html',
+                    entity=entity,
+                    data=structure),
                 buttons=buttons)},
-        crumbs=start_crumbs(entity) + [
+        crumbs=tools_start_crumbs(entity) + [
             [_('tools'), url_for('tools_index', id_=entity.id)],
             _('bone inventory')])
+
+
+@app.route('/tools/bones_update/<int:id_>/<category>')
+@required_group('readonly')
+def bones_update(id_: int, category) -> str | Response:
+    entity = Entity.get_by_id(id_, types=True)
+    buttons = [manual('tools/anthropological_analyses')]
+    form = get_bones_form(entity, category)
+    # types = Bones.get_types(entity)
+    if is_authorized('contributor'):
+        pass
+    return render_template(
+        'tabs.html',
+        entity=entity,
+        tabs={
+            'info': Tab(
+                'bones',
+                content=category + display_form(form),
+                buttons=buttons)},
+        crumbs=tools_start_crumbs(entity) + [
+            [_('tools'), url_for('tools_index', id_=entity.id)],
+            _('bone inventory')])
+
+
+def get_bones_form(entity: Entity, category: str) -> Any:
+    class Form(FlaskForm):
+        pass
+
+    inventory = structure[category.replace('_', ' ')]
+    for name, item in inventory['subs'].items():
+        setattr(Form, name.replace(' ', '_'), SelectField(name))
+    setattr(Form, 'save', SubmitField(_('insert')))
+    return Form()

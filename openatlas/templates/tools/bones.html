@@ -1,3 +1,6 @@
 {% for name in data %}
-    <p>{{ name }}</p>
+  <p>
+    {{ name }}
+    <a href="{{ url_for('bones_update', id_=entity.id, category=name|replace(' ', '')) }}">{{ _('edit') }}</a>
+  </p>
 {% endfor %}
