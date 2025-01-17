@@ -156,120 +156,191 @@ structure = {
                                     'I2 L (62)': {'preservation': 'percent'},
                                     'C L (63)': {'preservation': 'percent'},
                                     'M1 L (64)': {'preservation': 'percent'},
-                                    'M2 L (65)': {'preservation': 'percent'},
-                                },
-                }}
-        }}}}}}
+                                    'M2 L (65)': {'preservation': 'percent'}}}
+                    }},
+                    'Mandible': {
+                        'preservation': None,
+                        'subs': {
+                            'Left side': {
+                                'preservation': None,
+                                'subs': {
+                                    'I1 L (71)': {'preservation': 'percent'},
+                                    'I2 L (72)': {'preservation': 'percent'},
+                                    'C L (73)': {'preservation': 'percent'},
+                                    'M1 L (74)': {'preservation': 'percent'},
+                                    'M2 L (75)': {'preservation': 'percent'}}},
+                            'Right side': {
+                                'preservation': None,
+                                'subs': {
+                                    'I1 R (81)': {'preservation': 'percent'},
+                                    'I2 R (82)': {'preservation': 'percent'},
+                                    'C R (83)': {'preservation': 'percent'},
+                                    'M1 R (84)': {'preservation': 'percent'},
+                                    'M2 R (85)': {'preservation': 'percent'}}}
+    }}}}}},
+    'Shoulder girdle': {
+        'preservation': None,
+        'subs': {
+            'Clavicle R': {
+                'preservation': 'percent',
+                'subs': {
+                    'Clavicula med. Epiphysis R': {'preservation': 'percent'},
+                    'Clavicula med. third R': {'preservation': 'percent'},
+                    'Clavicula mid. third R': {'preservation': 'percent'},
+                    'Clavicula lat. third R': {'preservation': 'percent'},
+                    'Clavicula lat. Epiphysis R': {'preservation': 'percent'}}
+            },
+            'Clavicle L': {
+                'preservation': 'percent',
+                'subs': {
+                    'Clavicula med. Epiphysis L': {'preservation': 'percent'},
+                    'Clavicula med. third L': {'preservation': 'percent'},
+                    'Clavicula mid. third L': {'preservation': 'percent'},
+                    'Clavicula lat. third L': {'preservation': 'percent'},
+                    'Clavicula lat. Epiphysis L': {'preservation': 'percent'}}
+            },
+            'Scapula R': {
+                'preservation': 'percent',
+                'subs': {
+                    'Body R': {'preservation': 'percent'},
+                    'Glenoid cavity R': {'preservation': 'percent'},
+                    'Acromion process R': {'preservation': 'percent'},
+                    'Coracoid process R': {'preservation': 'percent'}}},
+            'Scapula L': {
+                'preservation': 'percent',
+                'subs': {
+                    'Body L': {'preservation': 'percent'},
+                    'Glenoid cavity L': {'preservation': 'percent'},
+                    'Acromion process L': {'preservation': 'percent'},
+                    'Coracoid process L': {'preservation': 'percent'}}}}},
+    'Arms and hands': {
+        'preservation': None,
+        'subs': {
+            'Arm R': {
+                'preservation': None,
+                'subs': {
+                    'Humerus R': {
+                        'preservation': 'percent',
+                        'subs': {
+                            'Humerus - proximal epiphysis R':
+                                {'preservation': 'percent'},
+                            'Humerus - proximal third R':
+                                {'preservation': 'percent'},
+                            'Humerus - middle third R':
+                                {'preservation': 'percent'},
+                            'Humerus - distal third R':
+                                {'preservation': 'percent'},
+                            'Humerus - distal epiphysis R':
+                                {'preservation': 'percent'},
+                            'Glenohumeral R': {'preservation': 'percent'},
+                            'Capitulum R': {'preservation': 'percent'},
+                            'Trochlea R': {'preservation': 'percent'}}},
+                    'Ulna R': {
+                        'preservation': 'percent',
+                        'subs': {
+                            'Ulna - proximal epiphysis R':
+                                {'preservation': 'percent'},
+                            'Ulna - proximal third R':
+                                {'preservation': 'percent'},
+                            'Ulna - middle third R':
+                                {'preservation': 'percent'},
+                            'Ulna - distal third R':
+                                {'preservation': 'percent'},
+                            'Ulna - distal epiphysis R':
+                                {'preservation': 'percent'},
+                            'Trochlear notch R':
+                                {'preservation': 'percent'},
+                            'Radial notch R':
+                                {'preservation': 'percent'},
+                            'Ulna distal radioulnar R':
+                                {'preservation': 'percent'}}},
+                    'Radius R': {
+                        'preservation': 'percent',
+                        'subs': {
+                            'Radius - proximal epiphysis R':
+                                {'preservation': 'percent'},
+                            'Radius - proximal third R':
+                                {'preservation': 'percent'},
+                            'Radius - middle third R':
+                                {'preservation': 'percent'},
+                            'Radius - distal third R':
+                                {'preservation': 'percent'},
+                            'Radius - distal epiphysis R':
+                                {'preservation': 'percent'},
+                            'Articular fovea R':
+                                {'preservation': 'percent'},
+                            'Circumferentia art. R':
+                                {'preservation': 'percent'},
+                            'Radius distal Radioulnar R':
+                                {'preservation': 'percent'},
+                            'Scaphoid lat. R': {'preservation': 'percent'},
+                            'Lunate mes. R': {'preservation': 'percent'}}}}},
+            'Arm L': {
+                'preservation': None,
+                'subs': {
+                    'Humerus L': {
+                        'preservation': 'percent',
+                        'subs': {
+                            'Humerus - proximal epiphysis L':
+                                {'preservation': 'percent'},
+                            'Humerus - proximal third L':
+                                {'preservation': 'percent'},
+                            'Humerus - middle third L':
+                                {'preservation': 'percent'},
+                            'Humerus - distal third L':
+                                {'preservation': 'percent'},
+                            'Humerus - distal epiphysis L':
+                                {'preservation': 'percent'},
+                            'Glenohumeral L': {'preservation': 'percent'},
+                            'Capitulum L': {'preservation': 'percent'},
+                            'Trochlea L': {'preservation': 'percent'}}},
+                    'Ulna L': {
+                        'preservation': 'percent',
+                        'subs': {
+                            'Ulna - proximal epiphysis L':
+                                {'preservation': 'percent'},
+                            'Ulna - proximal third L':
+                                {'preservation': 'percent'},
+                            'Ulna - middle third L':
+                                {'preservation': 'percent'},
+                            'Ulna - distal third L':
+                                {'preservation': 'percent'},
+                            'Ulna - distal epiphysis L':
+                                {'preservation': 'percent'},
+                            'Trochlear notch L':
+                                {'preservation': 'percent'},
+                            'Radial notch L':
+                                {'preservation': 'percent'},
+                            'Ulna distal radioulnar L':
+                                {'preservation': 'percent'}}},
+                    'Radius L': {
+                        'preservation': 'percent',
+                        'subs': {
+                            'Radius - proximal epiphysis L':
+                                {'preservation': 'percent'},
+                            'Radius - proximal third L':
+                                {'preservation': 'percent'},
+                            'Radius - middle third L':
+                                {'preservation': 'percent'},
+                            'Radius - distal third L':
+                                {'preservation': 'percent'},
+                            'Radius - distal epiphysis L':
+                                {'preservation': 'percent'},
+                            'Articular fovea L':
+                                {'preservation': 'percent'},
+                            'Circumferentia art. L':
+                                {'preservation': 'percent'},
+                            'Radius distal Radioulnar L':
+                                {'preservation': 'percent'},
+                            'Scaphoid lat. L': {'preservation': 'percent'},
+                            'Lunate mes. L': {'preservation': 'percent'}}}}},
+
+}}}
 
 """
-Dentition
-
-    Permanent teeth
-
-    Deciduous
-        Maxilla
-            Left side
-        Mandible
-            Left side
-                I1 L (71)
-                I2 L (72)
-                C L (73)
-                M1 L (74)
-                M2 L (75)
-            Right side
-                I1 R (81)
-                I2 R (82)
-                C R (83)
-                M1 R (84)
-                M2 R (85)
-
-Shoulder girdle
-
-    Clavicle R
-        Clavicula med. Epiphysis R
-        Clavicula med. third R
-        Clavicula mid. third R
-        Clavicula lat. third R
-        Clavicula lat. Epiphysis R
-    Clavicle L
-        Clavicula med. Epiphysis L
-        Clavicula med. third L
-        Clavicula mid. third L
-        Clavicula lat. third L
-        Clavicula lat. Epiphysis L
-    Scapula R
-        Body R
-        Glenoid cavity R
-        Acromion process R
-        Coracoid process R
-    Scapula L
-        Body L
-        Glenoid cavity L
-        Acromion process L
-        Coracoid process L
 
 Inventory: Arms and hands
 
-    Arm R
-        Humerus R
-            Humerus - proximal epiphysis R
-            Humerus - proximal third R
-            Humerus - middle third R
-            Humerus - distal third R
-            Humerus - distal epiphysis R
-            Glenohumeral R
-            Capitulum R
-            Trochlea R
-        Ulna R
-            Ulna - proximal epiphysis R
-            Ulna - proximal third R
-            Ulna - middle third R
-            Ulna - distal third R
-            Ulna - distal epiphysis R
-            Trochlear notch R
-            Radial notch R
-            Ulna distal radioulnar R
-        Radius R
-            Radius - proximal epiphysis R
-            Radius - proximal third R
-            Radius - middle third R
-            Radius - distal third R
-            Radius - distal epiphysis R
-            Articular fovea R
-            Circumferentia art. R
-            Radius distal Radioulnar R
-            Scaphoid lat. R
-            Lunate mes. R
-    Arm left
-        Humerus L
-            Humerus - proximal epiphysis L
-            Humerus - proximal third L
-            Humerus - middle third L
-            Humerus - distal third L
-            Humerus - distal epiphysis L
-            Glenohumeral L
-            Capitulum L
-            Trochlea L
-        Ulna L
-            Ulna - proximal epiphysis L
-            Ulna - proximal third L
-            Ulna - middle third L
-            Ulna - distal third L
-            Ulna - distal epiphysis L
-            Trochlear notch L
-            Radial notch L
-            Ulna Distal radioulnar L
-        Radius L
-            Radius - proximal epiphysis L
-            Radius - proximal third L
-            Radius - middle third L
-            Radius - distal third L
-            Radius - distal epiphysis L
-            Articular fovea L
-            Circumferentia art. L
-            Radius distal Radioulnar L
-            Scaphoid lat. L
-            Lunate mes. L
     Hand R
         Carpals R
             Scaphoid R
