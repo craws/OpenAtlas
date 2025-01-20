@@ -1,9 +1,13 @@
+from datetime import datetime
 from typing import Any
 
 from flask import g
 
 
-def get_tokens(user_id: int) -> list[dict[str, Any]]:
+def get_tokens(
+        user_id: int,
+        revoked: str,
+        valid: str) -> list[dict[str, Any]]:
     g.cursor.execute(
         f"""
         SELECT 
@@ -11,8 +15,10 @@ def get_tokens(user_id: int) -> list[dict[str, Any]]:
             creator_id
         FROM web.user_tokens 
         WHERE TRUE
-            {'AND user_id = %(user_id)s' if int(user_id) else ''};
-        """, {'user_id': user_id})
+            {'AND user_id = %(user_id)s' if int(user_id) else ''}
+            {'AND revoked = %(revoked)s' if revoked != 'all' else ''}
+            {'AND valid_until ' +  valid + ' timestamp %(timestamp)s' if valid != 'all' else ''};
+        """, {'user_id': user_id, 'revoked': revoked, 'timestamp': str(datetime.now())})
     return [dict(row) for row in g.cursor.fetchall()]
 
 

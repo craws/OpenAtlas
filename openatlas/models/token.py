@@ -36,8 +36,11 @@ class Token:
         return access_token
 
     @staticmethod
-    def get_tokens(user_id: int) -> list[dict[str, Any]]:
-        return db.get_tokens(user_id)
+    def get_tokens(
+            user_id: int,
+            revoked: str,
+            valid: str) -> list[dict[str, Any]]:
+        return db.get_tokens(user_id, revoked, valid)
 
     @staticmethod
     def revoke_jwt_token(id_: int) -> None:

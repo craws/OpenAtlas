@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from flask import flash, g, make_response, redirect, render_template, request, \
     url_for
 from flask_babel import lazy_gettext as _
-from flask_login import current_user, login_required
+from flask_login import login_required
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
@@ -38,6 +38,18 @@ class GenerateTokenForm(FlaskForm):
 
 class ListTokenForm(FlaskForm):
     user = SelectField(_('user'), choices=(), default=0, coerce=int)
+    revoked = SelectField(
+        _('revoked'),
+        choices=(
+            ('all', _('all')),
+            ('true', _('revoked')),
+            ('false', _('not revoked'))))
+    valid = SelectField(
+        _('valid'),
+        choices=(
+            ('all', _('all')),
+            ('>', _('valid')),
+            ('<', _('not valid'))))
     save = SubmitField(_('apply'))
 
 @app.route('/admin/api_token', methods=['GET', 'POST'])
@@ -47,8 +59,12 @@ def api_token(user_id: int = 0) -> str | Response:
     form = ListTokenForm()
     form.user.choices = [(0, _('all'))] + User.get_users_for_form()
     user_id = user_id or 0
+    revoked = 'all'
+    valid = 'all'
     if form.validate_on_submit():
         user_id = int(form.user.data)
+        revoked = form.revoked.data
+        valid = form.valid.data
     form.user.data = user_id
     tabs = {
         'token': Tab(
@@ -81,7 +97,7 @@ def api_token(user_id: int = 0) -> str | Response:
         _('creator'),
         _('revoked'),
         _('delete')])
-    for token in Token.get_tokens(user_id):
+    for token in Token.get_tokens(user_id, revoked, valid):
         delete_link = link(
             _('delete'),
             url_for('delete_token', id_=token['id']),
