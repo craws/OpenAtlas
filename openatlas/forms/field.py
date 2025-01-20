@@ -401,16 +401,17 @@ class TreeSelect(HiddenInput):
                 if isinstance(field.data, list) else field.data
             selection = g.types[int(field.data)].name
             selected_ids.append(g.types[int(field.data)].id)
-        return Markup(render_template(
-            'forms/tree_select.html',
-            field=field,
-            selection=selection,
-            root=g.types[int(field.type_id)],
-            data=Type.get_tree_data(
-                int(field.type_id),
-                selected_ids,
-                field.filters_ids,
-                field.is_type_form))) + super().__call__(field, **kwargs)
+        return Markup(
+            render_template(
+                'forms/tree_select.html',
+                field=field,
+                selection=selection,
+                root=g.types[int(field.type_id)],
+                data=Type.get_tree_data(
+                    int(field.type_id),
+                    selected_ids,
+                    field.filters_ids,
+                    field.is_type_form))) + super().__call__(field, **kwargs)
 
 
 class TreeField(HiddenField):

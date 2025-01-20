@@ -3,6 +3,7 @@ from typing import Any
 from flask import flash, g, json, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
+from markupsafe import Markup
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wtforms import IntegerField, SelectField, StringField
@@ -20,6 +21,7 @@ from openatlas.models.bones import structure
 from openatlas.models.entity import Entity, Link
 from openatlas.models.tools import (
     SexEstimation, get_carbon_link, get_sex_types, update_carbon)
+from openatlas.models.type import Type
 
 
 def name_result(result: float) -> str:
@@ -275,7 +277,6 @@ def carbon_update(id_: int) -> str | Response:
 def bones(id_: int) -> str | Response:
     entity = Entity.get_by_id(id_, types=True)
     buttons = [manual('tools/anthropological_analyses')]
-    # types = Bones.get_types(entity)
     if is_authorized('contributor'):
         pass
     return render_template(
@@ -300,7 +301,6 @@ def bones_update(id_: int, category) -> str | Response:
     entity = Entity.get_by_id(id_, types=True)
     buttons = [manual('tools/anthropological_analyses')]
     form = get_bones_form(entity, category)
-    # types = Bones.get_types(entity)
     if is_authorized('contributor'):
         pass
     return render_template(
@@ -309,19 +309,73 @@ def bones_update(id_: int, category) -> str | Response:
         tabs={
             'info': Tab(
                 'bones',
-                content=category + display_form(form),
+                content=display_bone_form(form, category),
                 buttons=buttons)},
         crumbs=tools_start_crumbs(entity) + [
             [_('tools'), url_for('tools_index', id_=entity.id)],
-            _('bone inventory')])
+            [_('bone inventory'), url_for('bones', id_=entity.id)],
+            _('edit')])
 
 
 def get_bones_form(entity: Entity, category: str) -> Any:
     class Form(FlaskForm):
         pass
 
-    inventory = structure[category.replace('_', ' ')]
-    for name, item in inventory['subs'].items():
-        setattr(Form, name.replace(' ', '_'), SelectField(name))
+    inventory = structure[category.replace('-', ' ')]
+    options = {
+        g.types[id_].name: id_ for id_
+        in Type.get_hierarchy('Bone preservation').subs}
+
+    choices = [
+        (0, _('undefined')),
+        (options['0%'], '0%'),
+        (options['1-24%'], '1-24%'),
+        (options['25-74%'], '25-74%'),
+        (options['75-99%'], '75-99%'),
+        (options['100%'], '100%')]
+    if inventory['preservation'] == 'percent':
+        setattr(
+            Form,
+            category.replace(' ', '-'),
+            SelectField(category, choices=choices))
+    for label, sub in inventory['subs'].items():
+        add_bone_fields_recursive(Form, label, sub, choices)
     setattr(Form, 'save', SubmitField(_('insert')))
     return Form()
+
+
+def add_bone_fields_recursive(form, label, item, choices):
+    if item['preservation'] == 'percent':
+        setattr(
+            form,
+            label.replace(' ', '-'),
+            SelectField(label, choices=choices))
+    if 'subs' in item:
+        for label, sub in item['subs'].items():
+            add_bone_fields_recursive(form, label, sub, choices)
+
+
+def display_bone_form(form: Any, category: str) -> str:
+    # Todo: add manual page
+    html = Markup(
+        '<form method="post">'
+        f'{form.csrf_token}')
+    html += display_bone_row(form, category, structure[category])
+    return html + Markup('</form>')
+
+
+def display_bone_row(
+        form: Any,
+        label: str,
+        item: dict[str, Any],
+        offset: float = 0):
+    html = Markup(
+        f'<div style="margin:0.5em;margin-left:{0.5 + offset * 2}em">'
+        f'<span style="margin-right:2em;">{label}</span>')
+    if item['preservation'] == 'percent':
+        html += str(getattr(form, label.replace(' ', '-')))
+    html += Markup('</div>')
+    if 'subs' in item:
+        for label, sub in item['subs'].items():
+            html += display_bone_row(form, label, sub, offset + 0.5)
+    return html
