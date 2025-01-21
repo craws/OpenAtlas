@@ -217,7 +217,7 @@ structure = {
         'preservation': None,
         'subs': {
             'Arm R': {
-                'preservation': None,
+                'preservation': 'percent',
                 'subs': {
                     'Humerus R': {
                         'preservation': 'percent',
@@ -276,7 +276,7 @@ structure = {
                             'Scaphoid lat. R': {'preservation': 'percent'},
                             'Lunate mes. R': {'preservation': 'percent'}}}}},
             'Arm L': {
-                'preservation': None,
+                'preservation': 'percent',
                 'subs': {
                     'Humerus L': {
                         'preservation': 'percent',
@@ -334,55 +334,67 @@ structure = {
                                 {'preservation': 'percent'},
                             'Scaphoid lat. L': {'preservation': 'percent'},
                             'Lunate mes. L': {'preservation': 'percent'}}}}},
+            'Hand R': {
+                'preservation': 'percent',
+                'subs': {
+                    'Carpals R': {
+                        'preservation': None,
+                        'subs': {
+                            'Scaphoid R': {'preservation': 'percent'},
+                            'Lunate R': {'preservation': 'percent'},
+                            'Triquetrum R': {'preservation': 'percent'},
+                            'Capitulum R': {'preservation': 'percent'},
+                            'Hamatum R': {'preservation': 'percent'},
+                            'Trapezoideum R': {'preservation': 'percent'},
+                            'Trapezium R': {'preservation': 'percent'},
+                            'Pisiforme R': {'preservation': 'percent'}}},
+                    'Metacarpals R': {
+                        'preservation': None,
+                        'subs': {
+                            'Metacarpal 1 R': {'preservation': 'percent'},
+                            'Metacarpal 2 R': {'preservation': 'percent'},
+                            'Metacarpal 3 R': {'preservation': 'percent'},
+                            'Metacarpal 4 R': {'preservation': 'percent'},
+                            'Metacarpal 5 R': {'preservation': 'percent'}}},
+                    'Phalanges R': {
+                        'preservation': 'percent',
+                        'subs': {
+                            'Proximal phalanges R': {'preservation': 'number'},
+                            'Medial phalanges R': {'preservation': 'number'},
+                            'Distal phalanges R': {'preservation': 'number'},
+                            'Sesamoid R': {'preservation': 'number'}}}}},
+            'Hand L': {
+                'preservation': 'percent',
+                'subs': {
+                    'Carpals L': {
+                        'preservation': None,
+                        'subs': {
+                            'Scaphoid L': {'preservation': 'percent'},
+                            'Lunate L': {'preservation': 'percent'},
+                            'Triquetrum L': {'preservation': 'percent'},
+                            'Capitulum L': {'preservation': 'percent'},
+                            'Hamatum L': {'preservation': 'percent'},
+                            'Trapezoideum L': {'preservation': 'percent'},
+                            'Trapezium L': {'preservation': 'percent'},
+                            'Pisiforme L': {'preservation': 'percent'}}},
+                    'Metacarpals R': {
+                        'preservation': None,
+                        'subs': {
+                            'Metacarpal 1 L': {'preservation': 'percent'},
+                            'Metacarpal 2 L': {'preservation': 'percent'},
+                            'Metacarpal 3 L': {'preservation': 'percent'},
+                            'Metacarpal 4 L': {'preservation': 'percent'},
+                            'Metacarpal 5 L': {'preservation': 'percent'}}},
+                    'Phalanges R': {
+                        'preservation': 'percent',
+                        'subs': {
+                            'Proximal phalanges L': {'preservation': 'number'},
+                            'Medial phalanges L': {'preservation': 'number'},
+                            'Distal phalanges L': {'preservation': 'number'},
+                            'Sesamoid L': {'preservation': 'number'}}}}},
 
 }}}
-
 """
-
-Inventory: Arms and hands
-
-    Hand R
-        Carpals R
-            Scaphoid R
-            Lunate R
-            Triquetrum R
-            Capitulum R
-            Hamatum R
-            Trapezoideum R
-            Trapezium R
-            Pisiforme R
-        Metacarpals R
-            Metacarpal 1 R
-            Metacarpal 2 R
-            Metacarpal 3 R
-            Metacarpal 4 R
-            Metacarpal 5 R
-        Phalanges R
-            Proximal phalanges R (no)
-            Medial phalanges R (no)
-            Distal phalanges R (no)
-            Sesamoid R (no)
-    Hand L
-        Carpals L
-            Scaphoid L
-            Lunate L
-            Triquetrum L
-            Capitulum L
-            Hamatum L
-            Trapezoideum L
-            Trapezium L
-            Pisiforme L
-        Metacarpals L
-            Metacarpal 1 L
-            Metacarpal 2 L
-            Metacarpal 3 L
-            Metacarpal 4 L
-            Metacarpal 5 L
-        Phalanges L
-            Proximal phalanges L (no)
-            Medial phalanges L (no)
-            Distal phalanges L (no)
-            Sesamoid L (no)
 
 Axial skeleton
 

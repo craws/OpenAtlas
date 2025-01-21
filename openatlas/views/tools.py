@@ -307,8 +307,11 @@ def bones_update(id_: int, category) -> str | Response:
             'info': Tab(
                 'bones',
                 content=
-                Markup('<form method="post">{form.csrf_token}') +
-                bone_row(form, category, structure[category]) +
+                Markup(f'<form method="post">{form.csrf_token}') +
+                bone_row(
+                    form,
+                    category,
+                    structure[category.replace('_', ' ')]) +
                 Markup('</form>'),
                 buttons=[manual('tools/anthropological_analyses')])},
         crumbs=tools_start_crumbs(entity) + [
@@ -321,7 +324,7 @@ def bones_form(entity: Entity, category: str) -> Any:
     class Form(FlaskForm):
         pass
 
-    inventory = structure[category.replace('-', ' ')]
+    inventory = structure[category.replace('_', ' ')]
     options = {
         g.types[id_].name: id_ for id_
         in Type.get_hierarchy('Bone preservation').subs}
@@ -350,10 +353,11 @@ def bone_fields_recursive(form, label, item, choices):
             form,
             label.replace(' ', '-'),
             SelectField(label, choices=choices))
+    elif item['preservation'] == 'number':
+        setattr(form, label.replace(' ', '-'), IntegerField())
     if 'subs' in item:
         for label, sub in item['subs'].items():
             bone_fields_recursive(form, label, sub, choices)
-
 
 
 def bone_row(
@@ -363,8 +367,8 @@ def bone_row(
         offset: float = 0):
     html = Markup(
         f'<div style="margin:0.5em;margin-left:{0.5 + offset * 2}em">'
-        f'<span style="margin-right:2em;">{label}</span>')
-    if item['preservation'] == 'percent':
+        f'<span style="margin-right:2em;">{label.replace("_", " ")}</span>')
+    if item['preservation']:
         html += str(getattr(form, label.replace(' ', '-')))
     html += Markup('</div>')
     if 'subs' in item:
