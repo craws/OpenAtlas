@@ -67,7 +67,10 @@ def get_table(view: str) -> tuple[Table, str]:
                 entity.get_file_ext(),
                 entity.description]
             if show_table_icons():
-                data.insert(1, file_preview(entity.id))
+                data.insert(
+                    1,
+                    f'<a href="{url_for("view", id_=entity.id)}">'
+                    f'{file_preview(entity.id)}</a>')
             table.rows.append(data)
         file_info = (
             uc_first(_('files')) + ': ' +
