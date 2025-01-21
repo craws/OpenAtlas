@@ -296,28 +296,28 @@ def bones(id_: int) -> str | Response:
 
 
 @app.route('/tools/bones_update/<int:id_>/<category>')
-@required_group('readonly')
+@required_group('contributor')
 def bones_update(id_: int, category) -> str | Response:
     entity = Entity.get_by_id(id_, types=True)
-    buttons = [manual('tools/anthropological_analyses')]
-    form = get_bones_form(entity, category)
-    if is_authorized('contributor'):
-        pass
+    form = bones_form(entity, category)
     return render_template(
         'tabs.html',
         entity=entity,
         tabs={
             'info': Tab(
                 'bones',
-                content=display_bone_form(form, category),
-                buttons=buttons)},
+                content=
+                Markup('<form method="post">{form.csrf_token}') +
+                bone_row(form, category, structure[category]) +
+                Markup('</form>'),
+                buttons=[manual('tools/anthropological_analyses')])},
         crumbs=tools_start_crumbs(entity) + [
             [_('tools'), url_for('tools_index', id_=entity.id)],
             [_('bone inventory'), url_for('bones', id_=entity.id)],
             _('edit')])
 
 
-def get_bones_form(entity: Entity, category: str) -> Any:
+def bones_form(entity: Entity, category: str) -> Any:
     class Form(FlaskForm):
         pass
 
@@ -339,12 +339,12 @@ def get_bones_form(entity: Entity, category: str) -> Any:
             category.replace(' ', '-'),
             SelectField(category, choices=choices))
     for label, sub in inventory['subs'].items():
-        add_bone_fields_recursive(Form, label, sub, choices)
+        bone_fields_recursive(Form, label, sub, choices)
     setattr(Form, 'save', SubmitField(_('insert')))
     return Form()
 
 
-def add_bone_fields_recursive(form, label, item, choices):
+def bone_fields_recursive(form, label, item, choices):
     if item['preservation'] == 'percent':
         setattr(
             form,
@@ -352,19 +352,11 @@ def add_bone_fields_recursive(form, label, item, choices):
             SelectField(label, choices=choices))
     if 'subs' in item:
         for label, sub in item['subs'].items():
-            add_bone_fields_recursive(form, label, sub, choices)
+            bone_fields_recursive(form, label, sub, choices)
 
 
-def display_bone_form(form: Any, category: str) -> str:
-    # Todo: add manual page
-    html = Markup(
-        '<form method="post">'
-        f'{form.csrf_token}')
-    html += display_bone_row(form, category, structure[category])
-    return html + Markup('</form>')
 
-
-def display_bone_row(
+def bone_row(
         form: Any,
         label: str,
         item: dict[str, Any],
@@ -377,5 +369,5 @@ def display_bone_row(
     html += Markup('</div>')
     if 'subs' in item:
         for label, sub in item['subs'].items():
-            html += display_bone_row(form, label, sub, offset + 0.5)
+            html += bone_row(form, label, sub, offset + 0.5)
     return html
