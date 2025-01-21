@@ -2,6 +2,10 @@ BEGIN;
 
 -- Feature: Bone inventory (#1473)
 
+INSERT INTO model.openatlas_class (name, cidoc_class_code, alias_allowed, reference_system_allowed, new_types_allowed, write_access_group_name, layout_color, layout_icon, standard_type_id) VALUES
+  ('bone',          'E20',  false, true,  true,  'contributor', NULL, 'mdi-map-marker',   NULL);
+
+
 INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name) VALUES
     ('E55', 'type_tools', 'Bone preservation'),
     ('E55', 'type_tools', '0%'),

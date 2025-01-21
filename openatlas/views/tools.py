@@ -295,7 +295,7 @@ def bones(id_: int) -> str | Response:
             _('bone inventory')])
 
 
-@app.route('/tools/bones_update/<int:id_>/<category>')
+@app.route('/tools/bones_update/<int:id_>/<category>', methods=['GET', 'POST'])
 @required_group('contributor')
 def bones_update(id_: int, category) -> str | Response:
     entity = Entity.get_by_id(id_, types=True)
@@ -308,10 +308,11 @@ def bones_update(id_: int, category) -> str | Response:
                 'bones',
                 content=
                 Markup(f'<form method="post">{form.csrf_token}') +
-                bone_row(
+                bone_rows(
                     form,
                     category,
                     structure[category.replace('_', ' ')]) +
+                form.save +
                 Markup('</form>'),
                 buttons=[manual('tools/anthropological_analyses')])},
         crumbs=tools_start_crumbs(entity) + [
@@ -360,7 +361,7 @@ def bone_fields_recursive(form, label, item, choices):
             bone_fields_recursive(form, label, sub, choices)
 
 
-def bone_row(
+def bone_rows(
         form: Any,
         label: str,
         item: dict[str, Any],
@@ -373,5 +374,5 @@ def bone_row(
     html += Markup('</div>')
     if 'subs' in item:
         for label, sub in item['subs'].items():
-            html += bone_row(form, label, sub, offset + 0.5)
+            html += bone_rows(form, label, sub, offset + 0.5)
     return html
