@@ -11,17 +11,11 @@ from openatlas.models.user import User
 class Token:
 
     @staticmethod
-    def generate_token(expiration: str, token_name: str, user_: User) -> None:
-        expires_delta = None
-        match expiration:
-            case '0':
-                expires_delta = timedelta(days=1)
-            case '1':
-                expires_delta = timedelta(days=90)
+    def generate_token(expiration: int, token_name: str, user_: User) -> str:
         access_token = create_access_token(
             identity=user_.username,
             additional_claims={'role': user_.group},
-            expires_delta=expires_delta)  # type: ignore
+            expires_delta=timedelta(days=expiration) if expiration else False)
         decoded_token = decode_token(access_token, allow_expired=True)
         valid_until = datetime.max
         if expire := decoded_token.get('exp'):

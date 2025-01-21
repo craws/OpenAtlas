@@ -10,6 +10,7 @@ from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wtforms import RadioField, SelectField, StringField
+from wtforms.fields.numeric import IntegerField
 from wtforms.fields.simple import HiddenField
 
 from openatlas import app
@@ -25,10 +26,10 @@ from openatlas.models.user import User
 
 
 class GenerateTokenForm(FlaskForm):
-    expiration = RadioField(
+    expiration = IntegerField(
         _('expiration'),
-        choices=[('0','One day'),('1','90 days'), ('2', 'no expiration date')],
-        default='0')
+        default=30,
+        description='0 = ' + _("no expiration date"))
     token_name = StringField(
         _('token name'),
         default=f"Token_{datetime.today().strftime('%Y-%m-%d')}")
@@ -95,8 +96,7 @@ def api_token(user_id: int = 0) -> str | Response:
         _('valid until'),
         _('user'),
         _('creator'),
-        _('revoked'),
-        _('delete')])
+        _('revoked')])
     for token in Token.get_tokens(user_id, revoked, valid):
         delete_link = link(
             _('delete'),
@@ -114,8 +114,8 @@ def api_token(user_id: int = 0) -> str | Response:
             token['jti'],
             token['valid_from'],
             token['valid_until'],
-            User.get_by_id(token['user_id']).username,
-            User.get_by_id(token['creator_id']).username,
+            link(User.get_by_id(token['user_id'])),
+            link(User.get_by_id(token['creator_id'])),
             token['revoked'],
             revoke_link,
             delete_link])
@@ -141,7 +141,7 @@ def generate_token() -> str | Response:
         token = ''
         Transaction.begin()
         try:
-            token = Token.generate_token( expiration, token_name, user_)
+            token = Token.generate_token(expiration, token_name, user_)
             Transaction.commit()
             flash(f"{_('token stored for')}: {user_.username}", 'info')
         except Exception as e:  # pragma: no cover
@@ -159,7 +159,7 @@ def generate_token() -> str | Response:
     form.token_text.data = request.cookies.get('jwt_token')
     return render_template(
         'content.html',
-        content=display_form(form, manual_page='profile'),
+        content=display_form(form, manual_page='admin'),  # todo manual
         title=_('admin'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}"],
