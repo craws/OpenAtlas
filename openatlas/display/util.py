@@ -505,7 +505,7 @@ def link(
         html = link(
             object_.username,
             url_for('user_view', id_=object_.id),
-            class_='' if object_.active else 'inactive',
+            class_='' if object_.active else 'text-muted',
             uc_first_=False,
             external=external)
     return html
