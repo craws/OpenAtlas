@@ -1,5 +1,11 @@
 from __future__ import annotations
 
+from openatlas.models.entity import Entity
+
+
+def create_bones(entity: Entity, category: str):
+    pass
+
 structure = {
     'Skull': {
         'preservation': 'percent',

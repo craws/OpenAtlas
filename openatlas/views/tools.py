@@ -17,7 +17,7 @@ from openatlas.display.util import (
 from openatlas.display.util2 import is_authorized, manual
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
-from openatlas.models.bones import structure
+from openatlas.models.bones import create_bones, structure
 from openatlas.models.entity import Entity, Link
 from openatlas.models.tools import (
     SexEstimation, get_carbon_link, get_sex_types, update_carbon)
@@ -297,9 +297,15 @@ def bones(id_: int) -> str | Response:
 
 @app.route('/tools/bones_update/<int:id_>/<category>', methods=['GET', 'POST'])
 @required_group('contributor')
-def bones_update(id_: int, category) -> str | Response:
+def bones_update(id_: int, category: str) -> str | Response:
     entity = Entity.get_by_id(id_, types=True)
     form = bones_form(entity, category)
+    current_bones = structure[category.replace('_', ' ')]
+    if form.validate_on_submit():
+        if current_bones['preservation']:
+            current_bones['data'] = getattr(form, category).data
+        bones_add_form_data_to_structure(form, current_bones)
+        create_bones(entity, current_bones)
     return render_template(
         'tabs.html',
         entity=entity,
@@ -308,10 +314,7 @@ def bones_update(id_: int, category) -> str | Response:
                 'bones',
                 content=
                 Markup(f'<form method="post">{form.csrf_token}') +
-                bone_rows(
-                    form,
-                    category,
-                    structure[category.replace('_', ' ')]) +
+                bone_rows(form, category, current_bones) +
                 form.save +
                 Markup('</form>'),
                 buttons=[manual('tools/anthropological_analyses')])},
@@ -319,6 +322,18 @@ def bones_update(id_: int, category) -> str | Response:
             [_('tools'), url_for('tools_index', id_=entity.id)],
             [_('bone inventory'), url_for('bones', id_=entity.id)],
             _('edit')])
+
+
+def bones_add_form_data_to_structure(
+        form: FlaskForm,
+        structure_: dict[str, Any]):
+    if 'subs' in structure_:
+        for label, value in structure_['subs'].items():
+            if value['preservation']:
+                value['data'] = getattr(form, label.replace(' ', '-')).data
+            if 'subs' in value:
+                for item in value['subs'].values():
+                    bones_add_form_data_to_structure(form, item)
 
 
 def bones_form(entity: Entity, category: str) -> Any:
