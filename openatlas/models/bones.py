@@ -941,49 +941,63 @@ bone_inventory = {
                                 'preservation': 'percent'},
                             'Fibula talofibular L': {
                                 'preservation': 'percent'}}}}},
-        }}}
-
-"""
-Legs and Feet
-    Leg L
-    Foot R
-        Tarsals R
-            Calcaneus R
-            Talus R
-            Navicular R
-            Cuboid R
-            Medial cuneiform R
-            Intermediate cuneiform R
-            Lateral cuneiform R
-        Metatarsals R
-            Metatarsal 1 R
-            Metatarsal 2 R
-            Metatarsal 3 R
-            Metatarsal 4 R
-            Metatarsal 5 R
-        Phalanges R
-            Prox. Phalang. R (no)
-            Mid. Phalang. R (no)
-            Distal Phalang. R (no)
-            Sesamoid R (no.)
-    Foot L
-        Tarsals L
-            Calcaneus L
-            Talus L
-            Navicular L
-            Cuboid L
-            Medial cuneiform L
-            Intermediate cuneiform L
-            Lateral cuneiform L
-        Metatarsals L
-            Metatarsal 1 L
-            Metatarsal 2 L
-            Metatarsal 3 L
-            Metatarsal 4 L
-            Metatarsal 5 L
-        Phalanges L
-            Prox. Phalang. L (no)
-            Mid. Phalang. L (no)
-            Distal Phalang. L (no)
-            Sesamoid L (no.)
-"""
+            'Foot R': {
+                'preservation': 'percent',
+                'subs': {
+                    'Tarsals R': {
+                        'preservation': None,
+                        'subs': {
+                            'Calcaneus R': {'preservation': 'percent'},
+                            'Talus R': {'preservation': 'percent'},
+                            'Navicular R': {'preservation': 'percent'},
+                            'Cuboid R': {'preservation': 'percent'},
+                            'Medial cuneiform R': {'preservation': 'percent'},
+                            'Intermediate cuneiform R': {
+                                'preservation': 'percent'},
+                            'Lateral cuneiform R': {'preservation': 'percent'}
+                        }},
+                    'Metatarsals R': {
+                        'preservation': None,
+                        'subs': {
+                            'Metatarsal 1 R': {'preservation': 'percent'},
+                            'Metatarsal 2 R': {'preservation': 'percent'},
+                            'Metatarsal 3 R': {'preservation': 'percent'},
+                            'Metatarsal 4 R': {'preservation': 'percent'},
+                            'Metatarsal 5 R': {'preservation': 'percent'}}},
+                    'Phalanges R': {
+                        'preservation': 'percent',
+                        'subs': {
+                            'Prox. Phalang.': {'preservation': 'number'},
+                            'Mid. Phalang. R': {'preservation': 'number'},
+                            'Distal Phalang. R': {'preservation': 'number'},
+                            'Sesamoid R': {'preservation': 'number'}}}}},
+            'Foot L': {
+                'preservation': 'percent',
+                'subs': {
+                    'Tarsals L': {
+                        'preservation': None,
+                        'subs': {
+                            'Calcaneus L': {'preservation': 'percent'},
+                            'Talus L': {'preservation': 'percent'},
+                            'Navicular L': {'preservation': 'percent'},
+                            'Cuboid L': {'preservation': 'percent'},
+                            'Medial cuneiform L': {'preservation': 'percent'},
+                            'Intermediate cuneiform L': {
+                                'preservation': 'percent'},
+                            'Lateral cuneiform L': {'preservation': 'percent'}
+                        }},
+                    'Metatarsals L': {
+                        'preservation': None,
+                        'subs': {
+                            'Metatarsal 1 L': {'preservation': 'percent'},
+                            'Metatarsal 2 L': {'preservation': 'percent'},
+                            'Metatarsal 3 L': {'preservation': 'percent'},
+                            'Metatarsal 4 L': {'preservation': 'percent'},
+                            'Metatarsal 5 L': {'preservation': 'percent'}}},
+                    'Phalanges L': {
+                        'preservation': 'percent',
+                        'subs': {
+                            'Prox. Phalang.': {'preservation': 'number'},
+                            'Mid. Phalang. L': {'preservation': 'number'},
+                            'Distal Phalang. L': {'preservation': 'number'},
+                            'Sesamoid L': {'preservation': 'number'}}}}}}}}
