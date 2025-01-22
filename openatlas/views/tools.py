@@ -358,7 +358,7 @@ def bones_form(entity: Entity, category: str) -> Any:
             SelectField(category, choices=choices))
     for label, sub in inventory['subs'].items():
         bone_fields_recursive(Form, label, sub, choices)
-    setattr(Form, 'save', SubmitField(_('insert')))
+    setattr(Form, 'save', SubmitField(_('save')))
     return Form()
 
 
