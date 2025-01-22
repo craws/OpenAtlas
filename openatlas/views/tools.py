@@ -78,7 +78,7 @@ def tools_index(id_: int) -> str | Response:
                     _('radiocarbon dating'),
                     url_for('carbon', id_=entity.id)),
                 button(_('sex estimation'), url_for('sex', id_=entity.id)),
-                button(_('bone inventroy'), url_for('bones', id_=entity.id))])}
+                button(_('bone inventory'), url_for('bones', id_=entity.id))])}
     return render_template(
         'tabs.html',
         tabs=tabs,
