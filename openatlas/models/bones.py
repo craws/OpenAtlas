@@ -6,7 +6,8 @@ from openatlas.models.entity import Entity
 def create_bones(entity: Entity, category: str):
     pass
 
-structure = {
+
+bone_inventory = {
     'Skull': {
         'preservation': 'percent',
         'subs': {
@@ -114,7 +115,7 @@ structure = {
                                     'M1 L (26)': {'preservation': 'percent'},
                                     'M2 L (27)': {'preservation': 'percent'},
                                     'M3 L (28)': {'preservation': 'percent'}}}
-                            }},
+                        }},
                     'Mandible': {
                         'preservation': None,
                         'subs': {
@@ -163,7 +164,7 @@ structure = {
                                     'C L (63)': {'preservation': 'percent'},
                                     'M1 L (64)': {'preservation': 'percent'},
                                     'M2 L (65)': {'preservation': 'percent'}}}
-                    }},
+                        }},
                     'Mandible': {
                         'preservation': None,
                         'subs': {
@@ -183,7 +184,7 @@ structure = {
                                     'C R (83)': {'preservation': 'percent'},
                                     'M1 R (84)': {'preservation': 'percent'},
                                     'M2 R (85)': {'preservation': 'percent'}}}
-    }}}}}},
+                        }}}}}},
     'Shoulder girdle': {
         'preservation': None,
         'subs': {
@@ -397,60 +398,122 @@ structure = {
                             'Proximal phalanges L': {'preservation': 'number'},
                             'Medial phalanges L': {'preservation': 'number'},
                             'Distal phalanges L': {'preservation': 'number'},
-                            'Sesamoid L': {'preservation': 'number'}}}}},
+                            'Sesamoid L': {'preservation': 'number'}}}}}}},
+    'Axial skeleton': {
+        'preservation': None,
+        'subs': {
+            'Sternum': {
+                'preservation': 'percent',
+                'subs': {
+                    'Manubrium': {'preservation': 'percent'},
+                    'Xiphoid process': {'preservation': 'percent'},
+                    'Body': {'preservation': 'percent'}}},
+            'Ribs': {
+                'preservation': 'percent',
+                'subs': {
+                    'Right side': {
+                        'preservation': None,
+                        'subs': {
+                            'First rib R': {
+                                'preservation': 'percent',
+                                'subs': {
+                                    'First rib R head': {
+                                        'preservation': 'percent'},
+                                    'First rib R mid.': {
+                                        'preservation': 'percent'},
+                                    'First rib R stern.': {
+                                        'preservation': 'percent'}}},
+                            'Second rib R': {
+                                'preservation': 'percent',
+                                'subs': {
+                                    'Second rib R head': {
+                                        'preservation': 'percent'},
+                                    'Second rib R mid.': {
+                                        'preservation': 'percent'},
+                                    'Second rib R stern.': {
+                                        'preservation': 'percent'}}},
+                            'Third to tenth rib R': {
+                                'preservation': 'percent',
+                                'subs': {
+                                    'Third to tenth rib R head': {
+                                        'preservation': 'number'},
+                                    'Third to tenth rib R mid.': {
+                                        'preservation': 'number'},
+                                    'Third to tenth rib R stern.': {
+                                        'preservation': 'number'}}},
+                            'Eleventh rib R': {
+                                'preservation': 'percent',
+                                'subs': {
+                                    'Eleventh rib R head': {
+                                        'preservation': 'percent'},
+                                    'Eleventh rib R mid.': {
+                                        'preservation': 'percent'},
+                                    'Eleventh rib R stern.': {
+                                        'preservation': 'percent'}}},
+                            'Twelfth rib R': {
+                                'preservation': 'percent',
+                                'subs': {
+                                    'Twelfth rib R head': {
+                                        'preservation': 'percent'},
+                                    'Twelfth rib R mid.': {
+                                        'preservation': 'percent'},
+                                    'Twelfth rib R stern.': {
+                                        'preservation': 'percent'}}}}},
+                    'Left side': {
+                        'preservation': None,
+                        'subs': {
+                            'First rib L': {
+                                'preservation': 'percent',
+                                'subs': {
+                                    'First rib L head': {
+                                        'preservation': 'percent'},
+                                    'First rib L mid.': {
+                                        'preservation': 'percent'},
+                                    'First rib L stern.': {
+                                        'preservation': 'percent'}}},
+                            'Second rib L': {
+                                'preservation': 'percent',
+                                'subs': {
+                                    'Second rib L head': {
+                                        'preservation': 'percent'},
+                                    'Second rib L mid.': {
+                                        'preservation': 'percent'},
+                                    'Second rib L stern.': {
+                                        'preservation': 'percent'}}},
+                            'Third to tenth rib L': {
+                                'preservation': 'percent',
+                                'subs': {
+                                    'Third to tenth rib L head': {
+                                        'preservation': 'number'},
+                                    'Third to tenth rib L mid.': {
+                                        'preservation': 'number'},
+                                    'Third to tenth rib L stern.': {
+                                        'preservation': 'number'}}},
+                            'Eleventh rib L': {
+                                'preservation': 'percent',
+                                'subs': {
+                                    'Eleventh rib L head': {
+                                        'preservation': 'percent'},
+                                    'Eleventh rib L mid.': {
+                                        'preservation': 'percent'},
+                                    'Eleventh rib L stern.': {
+                                        'preservation': 'percent'}}},
+                            'Twelfth rib R': {
+                                'preservation': 'percent',
+                                'subs': {
+                                    'Twelfth rib L head': {
+                                        'preservation': 'percent'},
+                                    'Twelfth rib L mid.': {
+                                        'preservation': 'percent'},
+                                    'Twelfth rib L stern.': {
+                                        'preservation': 'percent'}}}}},
+}}}}}
 
-}}}
 """
-
 Axial skeleton
-
     Sternum
-        Manubrium
-        Body
-        Xiphoid process
     Ribs
-        Right side
-            First rib R
-                First rib R head
-                First rib R mid.
-                First rib R stern.
-            Second rib R
-                Second rib R head
-                Second rib R Mid.
-                Second rib R Stern.
-            Third to tenth rib R
-                Third to tenth rib R head (no)
-                Third to tenth rib R mid. (no)
-                Third to tenth rib R stern. (no)
-            Eleventh rib R
-                Eleventh rib R head
-                Eleventh rib R mid.
-                Eleventh rib R stern.
-            Twelfth rib R
-                Twelfth rib R head
-                Twelfth rib R mid.
-                Twelfth rib R stern.
         Left side
-            First rib L
-                First rib L head
-                First rib L mid.
-                First rib L stern.
-            Second rib L
-                Second rib L head
-                Second rib L Mid.
-                Second rib L Stern.
-            Third to tenth rib L
-                Third to tenth rib L head (no)
-                Third to tenth rib L mid. (no)
-                Third to tenth rib L stern. (no)
-            Eleventh rib L
-                Eleventh rib L head
-                Eleventh rib L mid.
-                Eleventh rib L stern.
-            Twelfth rib L
-                Twelfth rib L head
-                Twelfth rib L mid.
-                Twelfth rib L stern.
     Vertebral column
         Cervical vertebrae
             C01 (Atlas)

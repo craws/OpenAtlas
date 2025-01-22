@@ -17,7 +17,7 @@ from openatlas.display.util import (
 from openatlas.display.util2 import is_authorized, manual
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
-from openatlas.models.bones import create_bones, structure
+from openatlas.models.bones import create_bones, bone_inventory
 from openatlas.models.entity import Entity, Link
 from openatlas.models.tools import (
     SexEstimation, get_carbon_link, get_sex_types, update_carbon)
@@ -288,7 +288,7 @@ def bones(id_: int) -> str | Response:
                 render_template(
                     'tools/bones.html',
                     entity=entity,
-                    data=structure),
+                    data=bone_inventory),
                 buttons=buttons)},
         crumbs=tools_start_crumbs(entity) + [
             [_('tools'), url_for('tools_index', id_=entity.id)],
@@ -300,7 +300,7 @@ def bones(id_: int) -> str | Response:
 def bones_update(id_: int, category: str) -> str | Response:
     entity = Entity.get_by_id(id_, types=True)
     form = bones_form(entity, category)
-    current_bones = structure[category.replace('_', ' ')]
+    current_bones = bone_inventory[category.replace('_', ' ')]
     if form.validate_on_submit():
         if current_bones['preservation']:
             current_bones['data'] = getattr(form, category).data
@@ -340,11 +340,10 @@ def bones_form(entity: Entity, category: str) -> Any:
     class Form(FlaskForm):
         pass
 
-    inventory = structure[category.replace('_', ' ')]
+    inventory = bone_inventory[category.replace('_', ' ')]
     options = {
         g.types[id_].name: id_ for id_
         in Type.get_hierarchy('Bone preservation').subs}
-
     choices = [
         (0, _('undefined')),
         (options['0%'], '0%'),
