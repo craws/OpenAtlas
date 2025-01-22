@@ -506,216 +506,446 @@ bone_inventory = {
                                     'Twelfth rib L mid.': {
                                         'preservation': 'percent'},
                                     'Twelfth rib L stern.': {
-                                        'preservation': 'percent'}}}}},
-}}}}}
+                                        'preservation': 'percent'}}}}}}},
+            'Vertebral column': {
+                    'preservation': 'percent',
+                    'subs': {
+                        'Cervical vertebrae': {
+                            'preservation': None,
+                            'subs': {
+                                'C01 (Atlas)': {
+                                    'preservation': 'percent',
+                                    'subs': {
+                                        'C01 Body': {
+                                            'preservation': 'percent'},
+                                        'C01 Arch R': {
+                                            'preservation': 'percent'},
+                                        'C01 Arch L': {
+                                            'preservation': 'percent'}}},
+                                'C02 (Atlas)': {
+                                    'preservation': 'percent',
+                                    'subs': {
+                                        'C02 Body': {
+                                            'preservation': 'percent'},
+                                        'C02 Arch R': {
+                                            'preservation': 'percent'},
+                                        'C02 Arch L': {
+                                            'preservation': 'percent'}}},
+                                'C03': {
+                                    'preservation': 'percent',
+                                    'subs': {
+                                        'C03 Body': {
+                                            'preservation': 'percent'},
+                                        'C03 Arch R': {
+                                            'preservation': 'percent'},
+                                        'C03 Arch L': {
+                                            'preservation': 'percent'}}},
+                                'C04': {
+                                    'preservation': 'percent',
+                                    'subs': {
+                                        'C04 Body': {
+                                            'preservation': 'percent'},
+                                        'C04 Arch R': {
+                                            'preservation': 'percent'},
+                                        'C04 Arch L': {
+                                            'preservation': 'percent'}}},
+                                'C05': {
+                                    'preservation': 'percent',
+                                    'subs': {
+                                        'C05 Body': {
+                                            'preservation': 'percent'},
+                                        'C05 Arch R': {
+                                            'preservation': 'percent'},
+                                        'C05 Arch L': {
+                                            'preservation': 'percent'}}},
+                                'C06': {
+                                    'preservation': 'percent',
+                                    'subs': {
+                                        'C06 Body': {
+                                            'preservation': 'percent'},
+                                        'C06 Arch R': {
+                                            'preservation': 'percent'},
+                                        'C06 Arch L': {
+                                            'preservation': 'percent'}}},
+                                'C07': {
+                                    'preservation': 'percent',
+                                    'subs': {
+                                        'C07 Body': {
+                                            'preservation': 'percent'},
+                                        'C07 Arch R': {
+                                            'preservation': 'percent'},
+                                        'C07 Arch L': {
+                                            'preservation': 'percent'}}}}},
+                        'Thoracic vertebrae': {
+                            'preservation': None,
+                                'subs': {
+                                    'Th01': {
+                                        'preservation': 'percent',
+                                        'subs': {
+                                            'Th01 Body': {
+                                                'preservation': 'percent'},
+                                            'Th01 Arch R': {
+                                                'preservation': 'percent'},
+                                            'Th01 Arch L': {
+                                                'preservation': 'percent'}}},
+                                    'Th02': {
+                                        'preservation': 'percent',
+                                        'subs': {
+                                            'Th02 Body': {
+                                                'preservation': 'percent'},
+                                            'Th02 Arch R': {
+                                                'preservation': 'percent'},
+                                            'Th02 Arch L': {
+                                                'preservation': 'percent'}}},
+                                    'Th03': {
+                                        'preservation': 'percent',
+                                        'subs': {
+                                            'Th03 Body': {
+                                                'preservation': 'percent'},
+                                            'Th03 Arch R': {
+                                                'preservation': 'percent'},
+                                            'Th03 Arch L': {
+                                                'preservation': 'percent'}}},
+                                    'Th04': {
+                                        'preservation': 'percent',
+                                        'subs': {
+                                            'Th04 Body': {
+                                                'preservation': 'percent'},
+                                            'Th04 Arch R': {
+                                                'preservation': 'percent'},
+                                            'Th04 Arch L': {
+                                                'preservation': 'percent'}}},
+                                    'Th05': {
+                                        'preservation': 'percent',
+                                        'subs': {
+                                            'Th05 Body': {
+                                                'preservation': 'percent'},
+                                            'Th05 Arch R': {
+                                                'preservation': 'percent'},
+                                            'Th05 Arch L': {
+                                                'preservation': 'percent'}}},
+                                    'Th06': {
+                                        'preservation': 'percent',
+                                        'subs': {
+                                            'Th06 Body': {
+                                                'preservation': 'percent'},
+                                            'Th06 Arch R': {
+                                                'preservation': 'percent'},
+                                            'Th06 Arch L': {
+                                                'preservation': 'percent'}}},
+                                    'Th07': {
+                                        'preservation': 'percent',
+                                        'subs': {
+                                            'Th07 Body': {
+                                                'preservation': 'percent'},
+                                            'Th07 Arch R': {
+                                                'preservation': 'percent'},
+                                            'Th07 Arch L': {
+                                                'preservation': 'percent'}}},
+                                    'Th08': {
+                                        'preservation': 'percent',
+                                        'subs': {
+                                            'Th08 Body': {
+                                                'preservation': 'percent'},
+                                            'Th08 Arch R': {
+                                                'preservation': 'percent'},
+                                            'Th08 Arch L': {
+                                                'preservation': 'percent'}}},
+                                    'Th09': {
+                                        'preservation': 'percent',
+                                        'subs': {
+                                            'Th09 Body': {
+                                                'preservation': 'percent'},
+                                            'Th09 Arch R': {
+                                                'preservation': 'percent'},
+                                            'Th09 Arch L': {
+                                                'preservation': 'percent'}}},
+                                    'Th10': {
+                                        'preservation': 'percent',
+                                        'subs': {
+                                            'Th10 Body': {
+                                                'preservation': 'percent'},
+                                            'Th10 Arch R': {
+                                                'preservation': 'percent'},
+                                            'Th10 Arch L': {
+                                                'preservation': 'percent'}}},
+                                    'Th11': {
+                                        'preservation': 'percent',
+                                        'subs': {
+                                            'Th11 Body': {
+                                                'preservation': 'percent'},
+                                            'Th11 Arch R': {
+                                                'preservation': 'percent'},
+                                            'Th11 Arch L': {
+                                                'preservation': 'percent'}}},
+                                    'Th12': {
+                                        'preservation': 'percent',
+                                        'subs': {
+                                            'Th12 Body': {
+                                                'preservation': 'percent'},
+                                            'Th12 Arch R': {
+                                                'preservation': 'percent'},
+                                            'Th12 Arch L': {
+                                                'preservation': 'percent'}}}}},
+                        'Lumbar vertebrae': {
+                            'preservation': None,
+                            'subs': {
+                                'L01': {
+                                    'preservation': 'percent',
+                                    'subs': {
+                                        'L01 Body': {
+                                            'preservation': 'percent'},
+                                        'L01 Arch R': {
+                                            'preservation': 'percent'},
+                                        'L01 Arch L': {
+                                            'preservation': 'percent'}}},
+                                'L02': {
+                                    'preservation': 'percent',
+                                    'subs': {
+                                        'L02 Body': {
+                                            'preservation': 'percent'},
+                                        'L02 Arch R': {
+                                            'preservation': 'percent'},
+                                        'L02 Arch L': {
+                                            'preservation': 'percent'}}},
+                                'L03': {
+                                    'preservation': 'percent',
+                                    'subs': {
+                                        'L03 Body': {
+                                            'preservation': 'percent'},
+                                        'L03 Arch R': {
+                                            'preservation': 'percent'},
+                                        'L03 Arch L': {
+                                            'preservation': 'percent'}}},
+                                'L04': {
+                                    'preservation': 'percent',
+                                    'subs': {
+                                        'L04 Body': {
+                                            'preservation': 'percent'},
+                                        'L04 Arch R': {
+                                            'preservation': 'percent'},
+                                        'L04 Arch L': {
+                                            'preservation': 'percent'}}},
+                                'L05': {
+                                    'preservation': 'percent',
+                                    'subs': {
+                                        'L05 Body': {
+                                            'preservation': 'percent'},
+                                        'L05 Arch R': {
+                                            'preservation': 'percent'},
+                                        'L05 Arch L': {
+                                            'preservation': 'percent'}}}}},
+                        'Sacrum': {
+                            'preservation': None,
+                            'subs': {
+                                'S01': {
+                                    'preservation': 'percent',
+                                    'subs': {
+                                        'S01 Body': {
+                                            'preservation': 'percent'},
+                                        'S01 Arch R': {
+                                            'preservation': 'percent'},
+                                        'S01 Arch L': {
+                                            'preservation': 'percent'}}},
+                                'S02': {
+                                    'preservation': 'percent',
+                                    'subs': {
+                                        'S02 Body': {
+                                            'preservation': 'percent'},
+                                        'S02 Arch R': {
+                                            'preservation': 'percent'},
+                                        'S02 Arch L': {
+                                            'preservation': 'percent'}}},
+                                'S03': {
+                                    'preservation': 'percent',
+                                    'subs': {
+                                        'S03 Body': {
+                                            'preservation': 'percent'},
+                                        'S03 Arch R': {
+                                            'preservation': 'percent'},
+                                        'S03 Arch L': {
+                                            'preservation': 'percent'}}},
+                                'S04': {
+                                    'preservation': 'percent',
+                                    'subs': {
+                                        'S04 Body': {
+                                            'preservation': 'percent'},
+                                        'S04 Arch R': {
+                                            'preservation': 'percent'},
+                                        'S04 Arch L': {
+                                            'preservation': 'percent'}}},
+                                'S05': {
+                                    'preservation': 'percent',
+                                    'subs': {
+                                        'S05 Body': {
+                                            'preservation': 'percent'},
+                                        'S05 Arch R': {
+                                            'preservation': 'percent'},
+                                        'S05 Arch L': {
+                                            'preservation': 'percent'}}}}},
+                            'Coccyx': {'preservation': 'percent'}}}}},
+    'Pelvis': {
+        'preservation': None,
+        'subs': {
+            'Pelvis R': {
+                'preservation': 'percent',
+                'subs': {
+                    'Ilium R': {'preservation': 'percent'},
+                    'Ischium R': {'preservation': 'percent'},
+                    'Pubis R': {'preservation': 'percent'},
+                    'Auricular surface R': {'preservation': 'percent'},
+                    'Acetabulum R': {'preservation': 'percent'}}},
+            'Pelvis L': {
+                'preservation': 'percent',
+                'subs': {
+                    'Ilium L': {'preservation': 'percent'},
+                    'Ischium L': {'preservation': 'percent'},
+                    'Pubis L': {'preservation': 'percent'},
+                    'Auricular surface L': {'preservation': 'percent'},
+                    'Acetabulum L': {'preservation': 'percent'}}}}},
+
+    'Legs and Feet': {
+        'preservation': None,
+        'subs': {
+            'Leg R': {
+                'preservation': 'percent',
+                'subs': {
+                    'Femur R': {
+                        'preservation': 'percent',
+                        'subs': {
+                            'Femur - proximal epiphysis R': {
+                                'preservation': 'percent'},
+                            'Femur - proximal third R': {
+                                'preservation': 'percent'},
+                            'Femur - middle third R': {
+                                'preservation': 'percent'},
+                            'Femur - distal third R': {
+                                'preservation': 'percent'},
+                            'Femur - distal epiphysis R': {
+                                'preservation': 'percent'},
+                            'Femur head R': {
+                                'preservation': 'percent'},
+                            'Femur Femoropatella R': {
+                                'preservation': 'percent'},
+                            'Femur medial femorotibial R': {
+                                'preservation': 'percent'},
+                            'Femur lateral femorotibial R': {
+                                'preservation': 'percent'}}},
+                    'Patella R': {
+                        'preservation': 'percent',
+                        'subs': {
+                            'Patella Femoropatellar R': {
+                                'preservation': 'percent'}}},
+                    'Tibia R': {
+                        'preservation': 'percent',
+                        'subs': {
+                            'Tibia - proximal epiphysis R': {
+                                'preservation': 'percent'},
+                            'Tibia - proximal third R': {
+                                'preservation': 'percent'},
+                            'Tibia - middle third R': {
+                                'preservation': 'percent'},
+                            'Tibia - distal third R': {
+                                'preservation': 'percent'},
+                            'Tibia - distal epiphysis R': {
+                                'preservation': 'percent'},
+                            'Tibia medial femorotibial R': {
+                                'preservation': 'percent'},
+                            'Tibia lateral femorotibial R': {
+                                'preservation': 'percent'},
+                            'Tibia proximal tibiofibular R': {
+                                'preservation': 'percent'},
+                            'Tibia talocrural R': {
+                                'preservation': 'percent'}}},
+                    'Fibula R': {
+                        'preservation': 'percent',
+                        'subs': {
+                            'Fibula - proximal epiphysis R': {
+                                'preservation': 'percent'},
+                            'Fibula - proximal third R': {
+                                'preservation': 'percent'},
+                            'Fibula - middle third R': {
+                                'preservation': 'percent'},
+                            'Fibula - distal third R': {
+                                'preservation': 'percent'},
+                            'Fibula - distal epiphysis R': {
+                                'preservation': 'percent'},
+                            'Fibula prox. Tibiofibular R': {
+                                'preservation': 'percent'},
+                            'Fibula talofibular R': {
+                                'preservation': 'percent'}}}}},
+            'Leg L': {
+                'preservation': 'percent',
+                'subs': {
+                    'Femur L': {
+                        'preservation': 'percent',
+                        'subs': {
+                            'Femur - proximal epiphysis L': {
+                                'preservation': 'percent'},
+                            'Femur - proximal third L': {
+                                'preservation': 'percent'},
+                            'Femur - middle third L': {
+                                'preservation': 'percent'},
+                            'Femur - distal third L': {
+                                'preservation': 'percent'},
+                            'Femur - distal epiphysis L': {
+                                'preservation': 'percent'},
+                            'Femur head L': {
+                                'preservation': 'percent'},
+                            'Femur Femoropatella L': {
+                                'preservation': 'percent'},
+                            'Femur medial femorotibial L': {
+                                'preservation': 'percent'},
+                            'Femur lateral femorotibial L': {
+                                'preservation': 'percent'}}},
+                    'Patella L': {
+                        'preservation': 'percent',
+                        'subs': {
+                            'Patella Femoropatellar L': {
+                                'preservation': 'percent'}}},
+                    'Tibia L': {
+                        'preservation': 'percent',
+                        'subs': {
+                            'Tibia - proximal epiphysis L': {
+                                'preservation': 'percent'},
+                            'Tibia - proximal third L': {
+                                'preservation': 'percent'},
+                            'Tibia - middle third L': {
+                                'preservation': 'percent'},
+                            'Tibia - distal third L': {
+                                'preservation': 'percent'},
+                            'Tibia - distal epiphysis L': {
+                                'preservation': 'percent'},
+                            'Tibia medial femorotibial L': {
+                                'preservation': 'percent'},
+                            'Tibia lateral femorotibial L': {
+                                'preservation': 'percent'},
+                            'Tibia proximal tibiofibular L': {
+                                'preservation': 'percent'},
+                            'Tibia talocrural L': {
+                                'preservation': 'percent'}}},
+                    'Fibula L': {
+                        'preservation': 'percent',
+                        'subs': {
+                            'Fibula - proximal epiphysis L': {
+                                'preservation': 'percent'},
+                            'Fibula - proximal third L': {
+                                'preservation': 'percent'},
+                            'Fibula - middle third L': {
+                                'preservation': 'percent'},
+                            'Fibula - distal third L': {
+                                'preservation': 'percent'},
+                            'Fibula - distal epiphysis L': {
+                                'preservation': 'percent'},
+                            'Fibula prox. Tibiofibular L': {
+                                'preservation': 'percent'},
+                            'Fibula talofibular L': {
+                                'preservation': 'percent'}}}}},
+        }}}
 
 """
-Axial skeleton
-    Sternum
-    Ribs
-        Left side
-    Vertebral column
-        Cervical vertebrae
-            C01 (Atlas)
-                C01 Body
-                C01 Arch R
-                C01 Arch L
-            C02 (Axis)
-                C02 Body
-                C02 Arch R
-                C02 Arch L
-            C03
-                C03 Body
-                C03 Arch R
-                C03 Arch L
-            C04
-                C04 Body
-                C04 Arch R
-                C04 Arch L
-            C05
-                C05 Body
-                C05 Arch R
-                C05 Arch L
-            C06
-                C06 Body
-                C06 Arch R
-                C06 Arch L
-            C07
-                C07 Body
-                C07 Arch R
-                C07 Arch L
-        Thoracic vertebrae
-            Th01
-                Th01 Body
-                Th01 Arch R
-                Th01 Arch L
-            Th02
-                Th02 Body
-                Th02 Arch R
-                Th02 Arch L
-            Th03
-                Th03 Body
-                Th03 Arch R
-                Th03 Arch L
-            Th04
-                Th04 Body
-                Th04 Arch R
-                Th04 Arch L
-            Th05
-                Th05 Body
-                Th05 Arch R
-                Th05 Arch L
-            Th06
-                Th06 Body
-                Th06 Arch R
-                Th06 Arch L
-            Th07
-                Th07 Body
-                Th07 Arch R
-                Th07 Arch L
-            Th08
-                Th08 Body
-                Th08 Arch R
-                Th08 Arch L
-            Th09
-                Th09 Body
-                Th09 Arch R
-                Th09 Arch L
-            Th10
-                Th10 Body
-                Th10 Arch R
-                Th10 Arch L
-            Th11
-                Th11 Body
-                Th11 Arch R
-                Th11 Arch
-            Th12
-                Th12 Body
-                Th12 Arch R
-                Th12 Arch L
-        Lumbar vertebrae
-            L01
-                L01 body
-                L01 Arch R
-                L01 Arch L
-            L02
-                L02 body
-                L02 Arch R
-                L02 Arch L
-            L03
-                L03 body
-                L03 Arch R
-                L03 Arch L
-            L04
-                L04 body
-                L04 Arch R
-                L04 Arch L
-            L05
-                L05 body
-                L05 Arch R
-                L05 Arch L
-        Sacrum
-            S01
-                S01 body
-                S01 Arch R
-                S01 Arch L
-            S02
-                S02 body
-                S02 Arch R
-                S02 Arch L
-            S03
-                S03 body
-                S03 Arch R
-                S03 Arch L
-            S04
-                S04 body
-                S04 Arch R
-                S04 Arch L
-            S05
-                S05 body
-                S05 Arch R
-                S05 Arch L
-        Coccyx
-
-Pelvis
-
-    Pelvis R
-        Ilium R
-        Ischium R
-        Pubis R
-        Auricular surface R
-        Acetabulum R
-    Pelvis L
-        Ilium L
-        Ischium L
-        Pubis L
-        Auricular surface L
-        Acetabulum L
-
 Legs and Feet
-
-    Leg R
-        Femur R
-            Femur - proximal epiphysis R
-            Femur - proximal third R
-            Femur - middle third R
-            Femur - distal third R
-            Femur - distal epiphysis R
-            Femur head R
-            Femur Femoropatella R
-            Femur medial femorotibial R
-            Femur lateral femorotibial R
-        Patella R
-            Patella Femoropatellar R
-        Tibia R
-            Tibia - proximal epiphysis R
-            Tibia - proximal third R
-            Tibia - middle third R
-            Tibia - distal third R
-            Tibia - distal epiphysis R
-            Tibia medial femorotibial R
-            Tibia lateral femorotibial R
-            Tibia proximal tibiofibular R
-            Tibia talocrural R
-        Fibula R
-            Fibula - proximal epiphysis R
-            Fibula - proximal third R
-            Fibula - middle third R
-            Fibula - distal third R
-            Fibula - distal epiphysis R
-            Fibula prox. Tibiofibular R
-            Fibula talofibular R
     Leg L
-        Femur L
-            Femur - proximal epiphysis L
-            Femur - proximal third L
-            Femur - middle third L
-            Femur - distal third L
-            Femur - distal epiphysis L
-            Femur head L
-            Femur Femoropatella L
-            Femur medial femorotibial L
-            Femur lateral femorotibial L
-        Patella L
-            Patella Femoropatellar L
-        Tibia L
-            Tibia - proximal epiphysis L
-            Tibia - proximal third L
-            Tibia - middle third L
-            Tibia - distal third L
-            Tibia - distal epiphysis L
-            Tibia medial femorotibial L
-            Tibia lateral femorotibial L
-            Tibia proximal tibiofibular L
-            Tibia talocrural L
-        Fibula left
-            Fibula - proximal epiphysis L
-            Fibula - proximal third L
-            Fibula - middle third L
-            Fibula - distal third L
-            Fibula - distal epiphysis L
-            Fibula prox. Tibiofibular L
-            Fibula talofibular L
     Foot R
         Tarsals R
             Calcaneus R
