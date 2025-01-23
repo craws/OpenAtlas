@@ -3,8 +3,8 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 from typing import Any
 
-from flask import flash, g, make_response, redirect, render_template, request, \
-    url_for
+from flask import (
+    flash, g, make_response, redirect, render_template, request, url_for)
 from flask_babel import lazy_gettext as _
 from flask_login import login_required
 from flask_wtf import FlaskForm
@@ -30,7 +30,8 @@ class GenerateTokenForm(FlaskForm):
     expiration = IntegerField(
         _('expiration'),
         default=30,
-        description=_('expiration in days') + ', 0 = ' + _("no expiration date"))
+        description=
+        _('expiration in days') + ', 0 = ' + _("no expiration date"))
     token_name = StringField(
         _('token name'),
         default=f"Token_{datetime.today().strftime('%Y-%m-%d')}")

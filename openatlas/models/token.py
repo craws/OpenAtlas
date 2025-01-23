@@ -62,7 +62,8 @@ class Token:
 
     @staticmethod
     def delete_invalid_tokens() -> None:
-        return db.delete_invalid_tokens([user.id for user in User.get_all() if not user.active])
+        return db.delete_invalid_tokens(
+            [user.id for user in User.get_all() if not user.active])
 
     @staticmethod
     def is_valid(token: dict[str, Any], user: User) -> bool:
