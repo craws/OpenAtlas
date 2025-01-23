@@ -139,7 +139,7 @@ def check_if_token_revoked(
         jwt_payload: dict[str, Any]) -> bool:
     if not jwt_header['typ'] == 'JWT':
         return True
-    token = check_token_revoked(jwt_payload["jti"])
-    if token['revoked'] or token['valid_until'] < datetime.datetime.now():
+    token_ = check_token_revoked(jwt_payload["jti"])
+    if token_['revoked'] or token_['valid_until'] < datetime.datetime.now():
         return True
     return False

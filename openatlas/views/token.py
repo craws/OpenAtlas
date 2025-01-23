@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
+from typing import Any
 
 from flask import flash, g, make_response, redirect, render_template, request, \
     url_for
@@ -53,6 +54,9 @@ class ListTokenForm(FlaskForm):
             ('<', _('not valid'))))
     save = SubmitField(_('apply'))
 
+
+
+
 @app.route('/admin/api_token', methods=['GET', 'POST'])
 @app.route('/admin/api_token/<int:user_id>', methods=['GET', 'POST'])
 @required_group('admin')
@@ -90,6 +94,7 @@ def api_token(user_id: int = 0) -> str | Response:
             url_for('delete_all_tokens'),
          onclick=f"return confirm('{_('delete all revoked tokens')}?')"))
     token_table = Table([
+        _('valid'),
         _('name'),
         'jti',
         _('valid from'),
@@ -109,12 +114,14 @@ def api_token(user_id: int = 0) -> str | Response:
             revoke_link = link(
                 _('authorize'),
                 url_for('authorize_token', id_=token['id']))
+        user = User.get_by_id(token['user_id'])
         token_table.rows.append([
+            get_token_valid_column(token, user),
             token['name'],
             token['jti'],
             token['valid_from'],
             token['valid_until'],
-            link(User.get_by_id(token['user_id'])),
+            link(user),
             link(User.get_by_id(token['creator_id'])),
             token['revoked'],
             revoke_link,
@@ -127,6 +134,12 @@ def api_token(user_id: int = 0) -> str | Response:
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}"],
             _('token')])
+
+def get_token_valid_column(token: dict[str, Any], user: User) -> str:
+    html = '<span class="text-success bg-success">OK</span>'
+    if Token.check_validness_of_token(token, user):
+        html = '<span class="text-danger bg-danger">NO</span>'
+    return html
 
 
 @app.route('/admin/api_token/generate_token', methods=['GET', 'POST'])
