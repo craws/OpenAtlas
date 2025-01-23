@@ -10,7 +10,7 @@ from flask_login import login_required
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import RadioField, SelectField, StringField
+from wtforms import SelectField, StringField
 from wtforms.fields.numeric import IntegerField
 from wtforms.fields.simple import HiddenField
 
@@ -30,13 +30,14 @@ class GenerateTokenForm(FlaskForm):
     expiration = IntegerField(
         _('expiration'),
         default=30,
-        description='0 = ' + _("no expiration date"))
+        description=_('expiration in days') + ', 0 = ' + _("no expiration date"))
     token_name = StringField(
         _('token name'),
         default=f"Token_{datetime.today().strftime('%Y-%m-%d')}")
     user = SelectField(_('user'), choices=(), default=0, coerce=int)
     token_text = HiddenField()
     save = SubmitField(_('generate'))
+
 
 class ListTokenForm(FlaskForm):
     user = SelectField(_('user'), choices=(), default=0, coerce=int)
@@ -53,8 +54,6 @@ class ListTokenForm(FlaskForm):
             ('>', _('valid')),
             ('<', _('not valid'))))
     save = SubmitField(_('apply'))
-
-
 
 
 @app.route('/admin/api_token', methods=['GET', 'POST'])
@@ -82,17 +81,22 @@ def api_token(user_id: int = 0) -> str | Response:
         button(
             _('revoke all tokens'),
             url_for('revoke_all_tokens'),
-         onclick=f"return confirm('{_('revoke all tokens')}?')"))
+            onclick=f"return confirm('{_('revoke all tokens')}?')"))
     tabs['token'].buttons.append(
         button(
             _('authorize all tokens'),
             url_for('authorize_all_tokens'),
-         onclick=f"return confirm('{_('authorize all tokens')}?')"))
+            onclick=f"return confirm('{_('authorize all tokens')}?')"))
     tabs['token'].buttons.append(
         button(
             _('delete revoked tokens'),
             url_for('delete_all_tokens'),
-         onclick=f"return confirm('{_('delete all revoked tokens')}?')"))
+            onclick=f"return confirm('{_('delete all revoked tokens')}?')"))
+    tabs['token'].buttons.append(
+        button(
+            _('delete invalid tokens'),
+            url_for('delete_invalid_tokens'),
+            onclick=f"return confirm('{_('delete all invalid tokens')}?')"))
     token_table = Table([
         _('valid'),
         _('name'),
@@ -135,9 +139,10 @@ def api_token(user_id: int = 0) -> str | Response:
             [_('admin'), f"{url_for('admin_index')}"],
             _('token')])
 
+
 def get_token_valid_column(token: dict[str, Any], user: User) -> str:
     html = '<span class="text-success bg-success">OK</span>'
-    if Token.check_validness_of_token(token, user):
+    if not Token.is_valid(token, user):
         html = '<span class="text-danger bg-danger">NO</span>'
     return html
 
@@ -212,6 +217,14 @@ def delete_all_tokens() -> str | Response:
     return redirect(f"{url_for('api_token')}")
 
 
+@app.route('/admin/api_token/delete_invalid_tokens/')
+@login_required
+def delete_invalid_tokens() -> str | Response:
+    Token.delete_invalid_tokens()
+    flash(_('all invalid tokens deleted'), 'info')
+    return redirect(f"{url_for('api_token')}")
+
+
 @app.route('/admin/api_token/revoke_all_tokens/')
 @login_required
 def revoke_all_tokens() -> str | Response:
@@ -219,10 +232,10 @@ def revoke_all_tokens() -> str | Response:
     flash(_('all tokens revoked'), 'info')
     return redirect(f"{url_for('api_token')}")
 
+
 @app.route('/admin/api_token/authorize_all_tokens/')
 @login_required
 def authorize_all_tokens() -> str | Response:
     Token.authorize_all_tokens()
     flash(_('all tokens revoked'), 'info')
     return redirect(f"{url_for('api_token')}")
-

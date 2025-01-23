@@ -61,10 +61,13 @@ class Token:
         return db.authorize_all_tokens()
 
     @staticmethod
-    def check_validness_of_token(token: dict[str, Any], user: User) -> bool:
+    def delete_invalid_tokens() -> None:
+        return db.delete_invalid_tokens([user.id for user in User.get_all() if not user.active])
+
+    @staticmethod
+    def is_valid(token: dict[str, Any], user: User) -> bool:
         if token['revoked'] or token['valid_until'] < datetime.now():
             return False
         if not user.get_by_id(token['user_id']).active:
             return False
         return True
-

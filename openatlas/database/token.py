@@ -17,7 +17,7 @@ def get_tokens(
         WHERE TRUE
             {'AND user_id = %(user_id)s' if int(user_id) else ''}
             {'AND revoked = %(revoked)s' if revoked != 'all' else ''}
-            {'AND valid_until ' +  valid + ' timestamp %(timestamp)s' if valid != 'all' else ''};
+            {'AND valid_until ' + valid + ' timestamp %(timestamp)s' if valid != 'all' else ''};
         """, {'user_id': user_id, 'revoked': revoked, 'timestamp': str(datetime.now())})
     return [dict(row) for row in g.cursor.fetchall()]
 
@@ -60,6 +60,13 @@ def authorize_all_tokens() -> None:
 
 def revoke_all_tokens() -> None:
     g.cursor.execute("UPDATE web.user_tokens SET revoked=true;")
+
+
+def delete_invalid_tokens(inactive_user_ids: list[int]) -> None:
+    g.cursor.execute(f"""
+        DELETE FROM web.user_tokens
+        WHERE revoked = true OR valid_until < '{str(datetime.now())}' OR user_id IN %(inactive_user_ids)s;
+    """, {'inactive_user_ids': tuple(inactive_user_ids)})
 
 
 def check_token_revoked(jti: str) -> dict[str, Any]:
