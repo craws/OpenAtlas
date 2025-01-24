@@ -1,12 +1,9 @@
 from flask import url_for
-from flask_jwt_extended import decode_token
 
-from openatlas import app, check_incoming_tokens
-from openatlas.database.token import get_tokens
-from tests.base import ProfileTestCase
+from tests.base import TestBaseCase
 
 
-class ProfileTests(ProfileTestCase):
+class ProfileTests(TestBaseCase):
 
     def test_profile(self) -> None:
         c = self.client

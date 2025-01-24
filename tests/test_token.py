@@ -1,8 +1,8 @@
 from flask import url_for
 from flask_jwt_extended import decode_token
 
-from database.token import get_tokens
-from models.user import User
+from openatlas.database.token import get_tokens
+from openatlas.models.user import User
 from openatlas import app, check_incoming_tokens
 from tests.base import TestBaseCase
 
