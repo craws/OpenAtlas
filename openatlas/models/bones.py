@@ -1,9 +1,36 @@
 from __future__ import annotations
 
+from typing import Any
+
 from openatlas.models.entity import Entity
 
 
-def create_bones(entity: Entity, category: str):
+def create_bones(super_: Entity, name: str, category: dict[str, Any]):
+    bones_exist = False
+    for sub in super_.get_linked_entities('P46'):
+        if sub.name == name:
+            bones_exist = True
+            break
+    if not bones_exist:
+        add_bone(super_, name, category)
+        add_values()
+    else:
+        update_values()
+
+
+def add_bone(super_: Entity, name: str, category: dict[str, Any]):
+    entity = Entity.insert('bone', name)
+    entity.link('P46', super_, inverse=True)
+    if 'subs' in category:
+        for name, sub in category['subs'].items():
+            add_bone(entity, name, sub)
+
+
+def add_values():
+    pass
+
+
+def update_values():
     pass
 
 

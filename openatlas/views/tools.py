@@ -305,7 +305,15 @@ def bones_update(id_: int, category: str) -> str | Response:
         if current_bones['preservation']:
             current_bones['data'] = getattr(form, category).data
         bones_add_form_data_to_structure(form, current_bones)
-        create_bones(entity, current_bones)
+        try:
+            Transaction.begin()
+            create_bones(entity, category.replace('_', ' '), current_bones)
+            Transaction.commit()
+        except Exception as e:  # pragma: no cover
+            Transaction.rollback()
+            g.logger.log('error', 'database', 'transaction failed', e)
+            flash(_('error transaction'), 'error')
+
     return render_template(
         'tabs.html',
         entity=entity,
