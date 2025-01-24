@@ -17,6 +17,7 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 ALTER TABLE IF EXISTS ONLY web.user_tokens DROP CONSTRAINT IF EXISTS user_tokens_user_id_fkey;
+ALTER TABLE IF EXISTS ONLY web.user_tokens DROP CONSTRAINT IF EXISTS user_tokens_creator_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.user_settings DROP CONSTRAINT IF EXISTS user_settings_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.user_notes DROP CONSTRAINT IF EXISTS user_notes_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.user_notes DROP CONSTRAINT IF EXISTS user_notes_entity_id_fkey;
@@ -1545,13 +1546,14 @@ ALTER SEQUENCE web.user_settings_id_seq OWNED BY web.user_settings.id;
 CREATE TABLE web.user_tokens (
     id integer NOT NULL,
     user_id integer NOT NULL,
+    creator_id integer NOT NULL,
     name text,
     jti text,
     valid_from timestamp without time zone,
     valid_until timestamp without time zone,
     created timestamp without time zone DEFAULT now() NOT NULL,
     modified timestamp without time zone,
-    revoked boolean NOT NULL DEFAULT false
+    revoked boolean DEFAULT false NOT NULL
 );
 
 
@@ -2700,11 +2702,19 @@ ALTER TABLE ONLY web.user_settings
 
 
 --
+-- Name: user_tokens user_tokens_creator_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.user_tokens
+    ADD CONSTRAINT user_tokens_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES web."user"(id) ON UPDATE CASCADE;
+
+
+--
 -- Name: user_tokens user_tokens_user_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY web.user_tokens
-    ADD CONSTRAINT user_tokens_user_id_fkey FOREIGN KEY (user_id) REFERENCES web."user"(id) ON UPDATE CASCADE ON DELETE SET NULL;
+    ADD CONSTRAINT user_tokens_user_id_fkey FOREIGN KEY (user_id) REFERENCES web."user"(id) ON UPDATE CASCADE;
 
 
 --

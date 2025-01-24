@@ -91,7 +91,7 @@ def api_token(user_id: int = 0) -> str | Response:
     tabs['token'].buttons.append(
         button(
             _('delete revoked tokens'),
-            url_for('delete_all_tokens'),
+            url_for('delete_revoked_tokens'),
             onclick=f"return confirm('{_('delete all revoked tokens')}?')"))
     tabs['token'].buttons.append(
         button(
@@ -212,7 +212,7 @@ def delete_token(id_: int) -> str | Response:
 
 @app.route('/admin/api_token/delete_revoked_tokens/')
 @login_required
-def delete_all_tokens() -> str | Response:
+def delete_revoked_tokens() -> str | Response:
     Token.delete_all_revoked_tokens()
     flash(_('all revoked tokens deleted'), 'info')
     return redirect(f"{url_for('api_token')}")
@@ -238,5 +238,5 @@ def revoke_all_tokens() -> str | Response:
 @login_required
 def authorize_all_tokens() -> str | Response:
     Token.authorize_all_tokens()
-    flash(_('all tokens revoked'), 'info')
+    flash(_('all tokens authorize'), 'info')
     return redirect(f"{url_for('api_token')}")

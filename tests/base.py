@@ -85,14 +85,6 @@ class ApiTestCase(TestBaseCase):
                 and data['results'][0]['label'])
 
 
-class ProfileTestCase(TestBaseCase):
-    def setUp(self) -> None:
-        super().setUp()
-        with app.test_request_context():
-            app.preprocess_request()
-            self.token_id = get_tokens(self.alice_id)
-
-
 class ExportImportTestCase(TestBaseCase):
     def setUp(self) -> None:
         super().setUp()

@@ -19,8 +19,8 @@ CREATE TABLE IF NOT EXISTS web.user_tokens
     modified timestamp without time zone,
     revoked boolean NOT NULL DEFAULT false,
     CONSTRAINT user_tokens_pkey PRIMARY KEY (id),
-    CONSTRAINT user_tokens_user_id_fkey FOREIGN KEY (user_id) REFERENCES web."user" (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE,
-    CONSTRAINT user_tokens_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES web."user" (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
+    CONSTRAINT user_tokens_user_id_fkey FOREIGN KEY (user_id) REFERENCES web."user" (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE NO ACTION,
+    CONSTRAINT user_tokens_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES web."user" (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE NO ACTION
 );
 
 ALTER TABLE IF EXISTS web.user_tokens OWNER to openatlas;

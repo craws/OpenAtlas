@@ -134,11 +134,12 @@ def teardown_request(_exception: Optional[Any]) -> None:
 
 
 @jwt.token_in_blocklist_loader
-def check_if_token_revoked(
+def check_incoming_tokens(
         jwt_header: dict[str, Any],
         jwt_payload: dict[str, Any]) -> bool:
     if not jwt_header['typ'] == 'JWT':
         return True
+    # todo: add user active check. maybe add it to sql query
     token_ = check_token_revoked(jwt_payload["jti"])
     if token_['revoked'] or token_['valid_until'] < datetime.datetime.now():
         return True
