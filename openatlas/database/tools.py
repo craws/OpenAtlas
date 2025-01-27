@@ -21,7 +21,7 @@ def get_sex_types(entity_id: int) -> list[dict[str, Any]]:
 def delete_sex_types(entity_id: int) -> None:
     g.cursor.execute(
         """
-        DELETE FROM model.link WHERE id in (
+        DELETE FROM model.link WHERE id IN (
             SELECT l.id
             FROM model.entity e
             JOIN model.link l ON l.range_id = e.id
@@ -31,3 +31,16 @@ def delete_sex_types(entity_id: int) -> None:
                 AND e.name != 'Radiocarbon');
         """,
         {'id': entity_id})
+
+
+def remove_bone_preservation_type(entity_id: int, bone_name: str) -> None:
+    g.cursor.execute(
+        """
+        DELETE FROM model.link WHERE id IN (
+            SELECT l.id
+            FROM model.entity e
+            JOIN model.link l ON
+                l.domain_id = %(entity_id)s AND
+                (l.range_id = e.id AND e.name = %(bone_name)s));
+        """,
+        {'entity_id': entity_id, 'bone_name': bone_name})

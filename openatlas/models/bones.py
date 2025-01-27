@@ -2,38 +2,33 @@ from __future__ import annotations
 
 from typing import Any
 
+from openatlas.database.tools import remove_bone_preservation_type
 from openatlas.models.entity import Entity
 
 
 def create_bones(super_: Entity, name: str, category: dict[str, Any]):
-    bones_exist = False
+    add_bone(super_, name, category)
+
+
+def add_bone(
+        super_: Entity,
+        name: str,
+        category: dict[str, Any]):
+    bone = False
     for sub in super_.get_linked_entities('P46'):
         if sub.name == name:
-            bones_exist = True
+            bone = sub
             break
-    if not bones_exist:
-        add_bone(super_, name, category)
-        add_values(super_, category)
+    if not bone:
+        bone = Entity.insert('bone', name)
+        bone.link('P46', super_, inverse=True)
     else:
-        update_values(super_, category)
-
-
-def add_bone(super_: Entity, name: str, category: dict[str, Any]):
-    entity = Entity.insert('bone', name)
-    entity.link('P46', super_, inverse=True)
-    # entity.link('P2', )
+        remove_bone_preservation_type(bone.id, name)
+    if 'data' in category and category['data']:
+        bone.link('P2', Entity.get_by_id(int(category['data'])))
     if 'subs' in category:
         for name, sub in category['subs'].items():
-            # print(sub['data'])
-            add_bone(entity, name, sub)
-
-
-def add_values(entity: Entity, category: dict[str, Any]):
-    pass
-
-
-def update_values(entity: Entity, category: dict[str, Any]):
-    pass
+            add_bone(bone, name, sub)
 
 
 bone_inventory = {

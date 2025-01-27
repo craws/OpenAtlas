@@ -1,6 +1,6 @@
 from typing import Any
 
-from flask import flash, g, render_template, url_for
+from flask import flash, g, redirect, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from markupsafe import Markup
@@ -21,7 +21,7 @@ from openatlas.views.tools import tools_start_crumbs
 
 @app.route('/tools/bones/<int:id_>')
 @required_group('readonly')
-def bones(id_: int) -> str | Response:
+def bones(id_: int) -> str:
     entity = Entity.get_by_id(id_, types=True)
     buttons = [manual('tools/anthropological_analyses')]
     if is_authorized('contributor'):
@@ -47,20 +47,23 @@ def bones(id_: int) -> str | Response:
 def bones_update(id_: int, category: str) -> str | Response:
     entity = Entity.get_by_id(id_, types=True)
     form = bones_form(entity, category)
-    current_bones = bone_inventory[category.replace('_', ' ')]
+    structure = bone_inventory[category.replace('_', ' ')]
     if form.validate_on_submit():
-        if current_bones['preservation']:
-            current_bones['data'] = getattr(form, category).data
-        bones_add_form_data_to_structure(form, current_bones)
+        if structure['preservation']:
+            structure['data'] = getattr(form, category).data
+        add_form_data_to_structure(form, structure)
         try:
             Transaction.begin()
-            create_bones(entity, category.replace('_', ' '), current_bones)
+            create_bones(entity, category.replace('_', ' '), structure)
             Transaction.commit()
+            flash(_('info update'), 'info')
+            return redirect(url_for('bones', id_=entity.id))
         except Exception as e:  # pragma: no cover
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-
+    else:
+        add_data_to_structure(entity, structure)
     return render_template(
         'tabs.html',
         entity=entity,
@@ -69,8 +72,7 @@ def bones_update(id_: int, category: str) -> str | Response:
                 'bones',
                 content=
                 Markup(f'<form method="post">{form.csrf_token}') +
-                bone_rows(form, category, current_bones) +
-                form.save +
+                bone_rows(form, category, structure) + form.save +
                 Markup('</form>'),
                 buttons=[manual('tools/anthropological_analyses')])},
         crumbs=tools_start_crumbs(entity) + [
@@ -79,16 +81,20 @@ def bones_update(id_: int, category: str) -> str | Response:
             _('edit')])
 
 
-def bones_add_form_data_to_structure(
+def add_data_to_structure(entity: Entity, structure_: dict[str, Any]) -> None:
+    pass
+
+
+def add_form_data_to_structure(
         form: FlaskForm,
-        structure_: dict[str, Any]):
+        structure_: dict[str, Any]) -> None:
     if 'subs' in structure_:
         for label, value in structure_['subs'].items():
             if value['preservation']:
                 value['data'] = getattr(form, label.replace(' ', '-')).data
             if 'subs' in value:
                 for item in value['subs'].values():
-                    bones_add_form_data_to_structure(form, item)
+                    add_form_data_to_structure(form, item)
 
 
 def bones_form(entity: Entity, category: str) -> Any:
