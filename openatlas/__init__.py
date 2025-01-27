@@ -24,9 +24,9 @@ babel = Babel(app)
 from openatlas.models.logger import Logger
 from openatlas.api import api
 from openatlas.views import (
-    admin, ajax, annotation, arche, changelog, entity, entity_index, error,
-    export, file, hierarchy, index, imports, link, login, model, note, overlay,
-    profile, search, sql, tools, type as type_, user, vocabs)
+    admin, ajax, annotation, arche, bones, changelog, entity, entity_index,
+    error, export, file, hierarchy, index, imports, link, login, model, note,
+    overlay, profile, search, sql, tools, type as type_, user, vocabs)
 
 
 @babel.localeselector

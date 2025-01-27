@@ -9,6 +9,7 @@ from openatlas.database import openatlas_class as db
 
 view_class_mapping = {
     'actor': ['person', 'group'],
+    'bone': [],
     'event': [
         'activity', 'acquisition', 'creation', 'event', 'modification', 'move',
         'production'],

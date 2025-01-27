@@ -449,6 +449,8 @@ class PlaceBaseDisplay(BaseDisplay):
         self.structure = entity.get_structure()
         if self.structure:
             for item in self.structure['subunits']:
+                if item.class_.name == 'bone':
+                    continue
                 name = 'artifact' if item.class_.view == 'artifact' \
                     else item.class_.name
                 self.tabs[name].table.rows.append(get_base_table_data(item))

@@ -13,24 +13,26 @@ def create_bones(super_: Entity, name: str, category: dict[str, Any]):
             break
     if not bones_exist:
         add_bone(super_, name, category)
-        add_values()
+        add_values(super_, category)
     else:
-        update_values()
+        update_values(super_, category)
 
 
 def add_bone(super_: Entity, name: str, category: dict[str, Any]):
     entity = Entity.insert('bone', name)
     entity.link('P46', super_, inverse=True)
+    # entity.link('P2', )
     if 'subs' in category:
         for name, sub in category['subs'].items():
+            # print(sub['data'])
             add_bone(entity, name, sub)
 
 
-def add_values():
+def add_values(entity: Entity, category: dict[str, Any]):
     pass
 
 
-def update_values():
+def update_values(entity: Entity, category: dict[str, Any]):
     pass
 
 
