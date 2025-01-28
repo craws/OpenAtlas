@@ -41,12 +41,12 @@ class TestBaseCase(unittest.TestCase):
         connection.autocommit = True
         self.cursor = connection.cursor()
         for file_name in [
-            '0_extensions',
-            '1_structure',
-            '2_data_model',
-            '3_data_web',
-            '4_data_type',
-            'data_test']:
+                '0_extensions',
+                '1_structure',
+                '2_data_model',
+                '3_data_web',
+                '4_data_type',
+                'data_test']:
             with open(
                     Path(app.root_path).parent / 'install' /
                     f'{file_name}.sql', encoding='utf8') as sql_file:
