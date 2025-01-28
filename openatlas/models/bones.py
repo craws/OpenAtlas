@@ -4,10 +4,20 @@ from typing import Any
 
 from openatlas.database.tools import remove_bone_preservation_type
 from openatlas.models.entity import Entity
+from openatlas.models.type import Type
 
 
 def create_bones(super_: Entity, name: str, category: dict[str, Any]):
     add_bone(super_, name, category)
+
+
+def get_bones(entity: Entity) -> dict[str, Any]:
+    inventory = bone_inventory
+    for sub in entity.get_linked_entities('P46'):
+        if sub.name in bone_inventory.keys():
+            if type_ := sub.get_linked_entity('P2'):
+                inventory[sub.name]['data'] = type_.name
+    return inventory
 
 
 def add_bone(
@@ -23,7 +33,9 @@ def add_bone(
         bone = Entity.insert('bone', name)
         bone.link('P46', super_, inverse=True)
     else:
-        remove_bone_preservation_type(bone.id, name)
+        remove_bone_preservation_type(
+            bone.id,
+            Type.get_hierarchy('Bone preservation').subs)
     if 'data' in category and category['data']:
         bone.link('P2', Entity.get_by_id(int(category['data'])))
     if 'subs' in category:

@@ -13,7 +13,7 @@ from openatlas.display.tab import Tab
 from openatlas.display.util import required_group
 from openatlas.display.util2 import is_authorized, manual
 from openatlas.forms.field import SubmitField
-from openatlas.models.bones import bone_inventory, create_bones
+from openatlas.models.bones import bone_inventory, create_bones, get_bones
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 from openatlas.views.tools import tools_start_crumbs
@@ -26,6 +26,7 @@ def bones(id_: int) -> str:
     buttons = [manual('tools/anthropological_analyses')]
     if is_authorized('contributor'):
         pass
+    inventory = get_bones(entity)
     return render_template(
         'tabs.html',
         entity=entity,
@@ -35,7 +36,7 @@ def bones(id_: int) -> str:
                 render_template(
                     'tools/bones.html',
                     entity=entity,
-                    data=bone_inventory),
+                    data=inventory),
                 buttons=buttons)},
         crumbs=tools_start_crumbs(entity) + [
             [_('tools'), url_for('tools_index', id_=entity.id)],
@@ -62,8 +63,6 @@ def bones_update(id_: int, category: str) -> str | Response:
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-    else:
-        add_data_to_structure(entity, structure)
     return render_template(
         'tabs.html',
         entity=entity,
@@ -79,10 +78,6 @@ def bones_update(id_: int, category: str) -> str | Response:
             [_('tools'), url_for('tools_index', id_=entity.id)],
             [_('bone inventory'), url_for('bones', id_=entity.id)],
             _('edit')])
-
-
-def add_data_to_structure(entity: Entity, structure_: dict[str, Any]) -> None:
-    pass
 
 
 def add_form_data_to_structure(

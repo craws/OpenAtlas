@@ -1,8 +1,11 @@
-{% for name in data %}
+{% for name, item in data.items() %}
   <p>
     {{ name }}
     {% if 'contributor'|is_authorized %}
       {{ _('edit')|button(url_for('bones_update', id_=entity.id, category=name|replace(' ', '_')))|safe }}
+    {% endif %}<br>
+    {% if item.data %}
+      {{ item.data }}
     {% endif %}
   </p>
 {% endfor %}
