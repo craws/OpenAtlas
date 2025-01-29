@@ -5,7 +5,8 @@ API
 
 Description: :doc:`/technical/api`
 
-* **Public** (default=off)
+**Public** (default=off)
+------------------------
 
     * If turned off the API and files with a license can still be accessed by
 
@@ -16,3 +17,8 @@ Description: :doc:`/technical/api`
         license can be accessed without being logged in. This might be useful
         if you want to allow other systems to use your data without
         restrictions.
+
+**Token**
+---------
+
+API Tokens can be created to query the API if it is turned off.
