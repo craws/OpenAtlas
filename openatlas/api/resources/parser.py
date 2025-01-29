@@ -110,6 +110,13 @@ entity_.add_argument(
     choices=frozenset(app.config['API_FORMATS']),
     location='args')
 entity_.add_argument(
+    'annotations',
+    type=str,
+    help='{error_msg}',
+    case_sensitive=False,
+    choices=('html', 'none'),
+    location='args')
+entity_.add_argument(
     'type_id',
     type=int,
     help='{error_msg}',

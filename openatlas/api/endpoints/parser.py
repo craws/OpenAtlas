@@ -25,6 +25,7 @@ from openatlas.api.resources.util import (
     flatten_list_and_remove_duplicates, get_geometric_collection,
     get_geoms_dict, get_location_link, get_reference_systems,
     replace_empty_list_values_in_dict_with_none)
+from openatlas.display.util import description
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 
@@ -55,6 +56,7 @@ class Parser:
     system_classes = None
     image_size = None
     file_id = None
+    annotations: str = ''
     exclude_system_classes: list[str]
     linked_to_ids: list[int]
     url: str = ''
@@ -188,6 +190,12 @@ class Parser:
             return geoms
         return []
 
+    def get_annotations(self, entity: Entity) -> list[dict[str, Any]]:
+        description_ = entity.description
+        if entity.cidoc_class == 'E33' and self.annotations == 'html':
+            description_ = entity.get_annotated_text()
+        return [{'value': description_}] if 'description' in self.show else None
+
     def get_linked_places_entity(
             self,
             entity_dict: dict[str, Any]) -> dict[str, Any]:
@@ -213,8 +221,7 @@ class Parser:
                 if 'when' in self.show else None,
                 'links': get_reference_systems(links_inverse)
                 if 'links' in self.show else None,
-                'descriptions': [{'value': entity.description}]
-                if 'description' in self.show else None,
+                'descriptions': self.get_annotations(entity),
                 'names':
                     [{"alias": value} for value in entity.aliases.values()]
                     if entity.aliases and 'names' in self.show else None,
