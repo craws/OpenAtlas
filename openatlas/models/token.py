@@ -15,7 +15,7 @@ class Token:
         access_token = create_access_token(
             identity=user_.username,
             additional_claims={'role': user_.group},
-            expires_delta=timedelta(days=expiration) if expiration else False)
+            expires_delta=timedelta(days=expiration))
         decoded_token = decode_token(access_token, allow_expired=True)
         valid_until = datetime.max
         if expire := decoded_token.get('exp'):
@@ -69,6 +69,6 @@ class Token:
     def is_valid(token: dict[str, Any], user: User) -> bool:
         if token['revoked'] or token['valid_until'] < datetime.now():
             return False
-        if not user.get_by_id(token['user_id']).active:
+        if not user.get_by_id_without_bookmarks(token['user_id']).active:
             return False
         return True

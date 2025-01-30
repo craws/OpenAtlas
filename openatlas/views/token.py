@@ -8,7 +8,6 @@ from flask import (
 from flask_babel import lazy_gettext as _
 from flask_login import login_required
 from flask_wtf import FlaskForm
-from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wtforms import SelectField, StringField
 from wtforms.fields.numeric import IntegerField
@@ -111,7 +110,7 @@ def api_token(user_id: int = 0) -> str | Response:
         delete_link = link(
             _('delete'),
             url_for('delete_token', id_=token['id']),
-            js=f"return confirm('" + _('delete') + "?')")
+            js="return confirm('" + _('delete') + "?')")
         revoke_link = link(
             _('revoke'),
             url_for('revoke_token', id_=token['id']))
@@ -119,7 +118,7 @@ def api_token(user_id: int = 0) -> str | Response:
             revoke_link = link(
                 _('authorize'),
                 url_for('authorize_token', id_=token['id']))
-        user = User.get_by_id(token['user_id'])
+        user = User.get_by_id_without_bookmarks(token['user_id'])
         token_table.rows.append([
             get_token_valid_column(token, user),
             token['name'],
@@ -127,7 +126,7 @@ def api_token(user_id: int = 0) -> str | Response:
             token['valid_from'],
             token['valid_until'],
             link(user),
-            link(User.get_by_id(token['creator_id'])),
+            link(User.get_by_id_without_bookmarks(token['creator_id'])),
             token['revoked'],
             revoke_link,
             delete_link])
@@ -156,7 +155,7 @@ def generate_token() -> str | Response:
     if form.validate_on_submit():
         expiration = form.expiration.data
         token_name = form.token_name.data
-        user_ = User.get_by_id(int(form.user.data))
+        user_= User.get_by_id_without_bookmarks(int(form.user.data))
         token = ''
         Transaction.begin()
         try:

@@ -75,11 +75,11 @@ class TokenTests(TestBaseCase):
             app.config['ALLOWED_IPS'] = []
             g.settings['api_public'] = False
             c.get(url_for('logout'))
-            for token in jwt_token_strings:
-                decoded = decode_token(token)
+            for token_ in jwt_token_strings:
+                decoded = decode_token(token_)
                 rv = c.get(
                     url_for('api_04.class_mapping', locale='de'),
-                    headers={'Authorization': f'Bearer {token}'})
+                    headers={'Authorization': f'Bearer {token_}'})
                 if decoded['sub'] in ['Alice', 'Inactive']:
                     assert b'Token has been revoked' in rv.data
                 else:
@@ -100,4 +100,3 @@ class TokenTests(TestBaseCase):
             url_for('delete_token', id_=tokens[-1]['id']),
             follow_redirects=True)
         assert b'Token deleted' in rv.data
-
