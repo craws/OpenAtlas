@@ -178,7 +178,7 @@ def generate_token() -> str | Response:
     form.token_text.data = request.cookies.get('jwt_token')
     return render_template(
         'content.html',
-        content=display_form(form, manual_page='admin'),  # todo manual
+        content=display_form(form, manual_page='admin/api'),
         title=_('admin'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}"],

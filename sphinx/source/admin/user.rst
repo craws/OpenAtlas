@@ -1,8 +1,6 @@
 User
 ====
 
-.. _user:
-
 .. toctree::
 
 In the overview users and information on their group, email, created/last
