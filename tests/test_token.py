@@ -2,7 +2,6 @@ from flask import g, url_for
 from flask_jwt_extended import decode_token
 
 from openatlas.database.token import get_tokens
-from openatlas.models.user import User
 from openatlas import app, check_incoming_tokens
 from tests.base import TestBaseCase
 
@@ -77,17 +76,19 @@ class TokenTests(TestBaseCase):
             g.settings['api_public'] = False
             c.get(url_for('logout'))
             for token in jwt_token_strings:
-                #decoded = decode_token(token)
-                #check = check_incoming_tokens({'typ': 'JWT'}, decoded)
-                #assert check is True if decoded['sub'] in ['Alice', 'Inactive'] else False
-
-                # should fail if check_incoming_tokens checks for user active
+                decoded = decode_token(token)
                 rv = c.get(
                     url_for('api_04.class_mapping', locale='de'),
                     headers={'Authorization': f'Bearer {token}'})
-                assert b'results' in rv.data
+                if decoded['sub'] in ['Alice', 'Inactive']:
+                    assert b'Token has been revoked' in rv.data
+                else:
+                    assert b'results' in rv.data
 
-            # assert check_incoming_tokens({'typ': 'Unknown'}, decoded) is True
+            assert check_incoming_tokens({'typ': 'Unknown'}, decoded) is True
+            c.post(
+                url_for('login'),
+                data={'username': 'Alice', 'password': 'test'})
 
         rv = c.get(url_for('delete_revoked_tokens'), follow_redirects=True)
         assert b'All revoked tokens deleted' in rv.data

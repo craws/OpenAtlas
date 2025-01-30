@@ -17,8 +17,12 @@ def get_tokens(
         WHERE TRUE
             {'AND user_id = %(user_id)s' if int(user_id) else ''}
             {'AND revoked = %(revoked)s' if revoked != 'all' else ''}
-            {'AND valid_until ' + valid + ' timestamp %(timestamp)s' if valid != 'all' else ''};
-        """, {'user_id': user_id, 'revoked': revoked, 'timestamp': str(datetime.now())})
+            {'AND valid_until ' + valid + ' timestamp %(timestamp)s' 
+            if valid != 'all' else ''};
+        """, {
+            'user_id': user_id,
+            'revoked': revoked,
+            'timestamp': str(datetime.now())})
     return [dict(row) for row in g.cursor.fetchall()]
 
 
@@ -72,10 +76,12 @@ def delete_invalid_tokens(inactive_user_ids: list[int]) -> None:
 def check_token_revoked(jti: str) -> dict[str, Any]:
     g.cursor.execute(
         """
-        SELECT revoked, valid_until FROM web.user_tokens WHERE jti = %(jti)s;
+        SELECT t.revoked, t.valid_until, u.active
+        FROM web.user_tokens t 
+        LEFT JOIN web.user u ON t.user_id = u.id
+        WHERE jti = %(jti)s;
         """, {'jti': jti})
+    token = {'revoked': True, 'valid_until': True, 'active': True}
     if row := g.cursor.fetchone():
-        token = {'revoked': row[0], 'valid_until': row[1]}
-    else:
-        token = {'revoked': True, 'valid_until': True}
+        token = {'revoked': row[0], 'valid_until': row[1], 'active': row[2]}
     return token
