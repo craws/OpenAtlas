@@ -25,7 +25,7 @@ from openatlas.api.resources.util import (
     flatten_list_and_remove_duplicates, get_geometric_collection,
     get_geoms_dict, get_location_link, get_reference_systems,
     replace_empty_list_values_in_dict_with_none)
-from openatlas.display.util import description
+from openatlas.models.annotation import AnnotationText
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 
@@ -191,10 +191,16 @@ class Parser:
         return []
 
     def get_annotations(self, entity: Entity) -> list[dict[str, Any]]:
-        description_ = entity.description
-        if entity.cidoc_class == 'E33' and self.annotations == 'html':
-            description_ = entity.get_annotated_text()
-        return [{'value': description_}] if 'description' in self.show else None
+        description_ = {'value': entity.description}
+        if entity.cidoc_class.code == 'E33' and self.annotations == 'html':
+            description_['annotation_text'] = entity.get_annotated_text()
+            description_['annotations'] = [{
+                'source_id': a.source_id,
+                'entity_id': a.entity_id,
+                'link_start': a.link_start,
+                'link_end': a.link_end,
+                'text': a.text} for a in AnnotationText.get_by_source_id(entity.id)]
+        return [description_] if 'description' in self.show else None
 
     def get_linked_places_entity(
             self,

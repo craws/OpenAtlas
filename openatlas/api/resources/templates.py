@@ -103,7 +103,10 @@ def linked_places_template(parser: Parser) -> dict[str, Type[String]]:
         'earliest': fields.String,
         'latest': fields.String,
         'comment': fields.String}
-    description = {'value': fields.String}
+    description = {
+        'value': fields.String,
+        'annotation_text': fields.String,
+        'annotations': fields.Raw}
     timespans = {'start': fields.Nested(start), 'end': fields.Nested(end)}
     when = {'timespans': fields.List(fields.Nested(timespans))}
     relations = {
