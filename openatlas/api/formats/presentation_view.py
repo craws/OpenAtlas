@@ -1,11 +1,15 @@
 import mimetypes
+from collections import defaultdict
 from typing import Any
 
 from flask import g, url_for
 
-from openatlas.api.resources.util import get_iiif_manifest_and_path, \
+from openatlas.api.endpoints.parser import Parser
+from openatlas.api.formats.linked_places import get_lp_time
+from openatlas.api.resources.util import get_geometric_collection, \
+    get_iiif_manifest_and_path, \
     get_license_name, get_location_link, \
-    get_value_for_types
+    get_reference_systems, get_value_for_types
 from openatlas.display.util import get_file_path
 from openatlas.models.entity import Entity, Link
 
@@ -58,3 +62,56 @@ def get_presentation_files(links_inverse: list[Link]) -> list[dict[str, str]]:
         data.update(get_iiif_manifest_and_path(img_id))
         files.append(data)
     return files
+
+
+def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
+
+    links = Entity.get_links_of_entities(entity.id)
+    links_inverse= Entity.get_links_of_entities(entity.id, inverse=True)
+
+    data = {
+        "id": entity.id,
+        "systemClass": entity.class_.name,
+        "title": entity.name,
+        "description": entity.description,
+        "aliases": list(entity.aliases.values()),
+        "geometries": get_geometric_collection(entity, links, parser),
+        "when": get_lp_time(entity),
+        "types": get_presentation_types(entity, links),
+        "externalReferenceSystems": get_reference_systems(links_inverse),
+        "files": get_presentation_files(links_inverse)}
+    relations = defaultdict(list)
+    excluded=  ['type', 'object_location', 'file', 'appellation', 'reference_system']
+    for l in links:
+        if l.range.class_.name in excluded:
+            continue
+        relations[l.range.class_.name].append({
+        "id": l.range.id,
+        "systemClass": l.range.class_.name,
+        "title": l.range.name,
+        "description": l.range.description,
+        "aliases": list(l.range.aliases.values()),
+        "geometries": get_geometric_collection(l.range, links, parser),
+        "when": get_lp_time(l.range),
+       "standardType": {
+           'id': l.range.standard_type.id,
+           'title': l.range.standard_type.name},
+            } if l.range.standard_type else {})
+    for l in links_inverse:
+        if l.range.class_.name in excluded:
+            continue
+        relations[l.domain.class_.name].append({
+        "id": l.domain.id,
+        "systemClass": l.domain.class_.name,
+        "title": l.domain.name,
+        "description": l.domain.description,
+        "aliases": list(l.domain.aliases.values()),
+        "geometries": get_geometric_collection(l.domain, links, parser),
+        "when": get_lp_time(l.domain),
+        "standardType": {
+          'id': l.domain.standard_type.id ,
+          'title': l.domain.standard_type.name},
+            }if l.domain.standard_type else {})
+    data.update({'relations': relations})
+
+    return data

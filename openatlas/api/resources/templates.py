@@ -182,11 +182,13 @@ def loud_template(result: dict[str, Any]) -> dict[str, Any]:
         template[item] = fields.Raw
     return template
 
+
 def presentation_template(result: dict[str, Any]) -> dict[str, Any]:
     template = {}
     for item in result:
         template[item] = fields.Raw
     return template
+
 
 def subunit_template(id_: str) -> dict[str, List]:
     timespan = {

@@ -9,8 +9,7 @@ from openatlas.api.resources.util import (
     date_to_str, get_crm_relation, get_crm_relation_label_x,
     get_crm_relation_x, get_iiif_manifest_and_path, get_license_name,
     to_camel_case)
-from openatlas.display.util import (
-    check_iiif_activation, check_iiif_file_exist, get_file_path)
+from openatlas.display.util import get_file_path
 from openatlas.models.entity import Entity, Link
 
 if TYPE_CHECKING:  # pragma: no cover

@@ -15,8 +15,6 @@ from rdflib import Graph
 from openatlas import app
 from openatlas.api.formats.linked_places import (
     get_lp_file, get_lp_links, get_lp_time)
-from openatlas.api.formats.presentation_view import get_presentation_files, \
-    get_presentation_types
 from openatlas.api.resources.error import (
     EntityDoesNotExistError, InvalidSearchSyntax, InvalidSearchValueError,
     LastEntityError, UrlNotValid)
@@ -190,26 +188,6 @@ class Parser:
             return geoms
         return []
 
-    def get_presentation_view(
-            self,
-            entity_dict: dict[str, Any]) -> dict[str, Any]:
-        entity = entity_dict['entity']
-        links = entity_dict['links']
-        links_inverse = entity_dict['links_inverse']
-
-        data = {
-            "id": entity.id,
-            "systemClass": entity.class_.name,
-            "title": entity.name,
-            "description": entity.description,
-            "aliases": list(entity.aliases.values()),
-            "geometries": get_geometric_collection(entity, links, self),
-            "when": get_lp_time(entity),
-            "types": get_presentation_types(entity, links),
-            "externalReferenceSystems": get_reference_systems(links_inverse),
-            "files": get_presentation_files(links_inverse)
-        }
-        return data
 
     def get_linked_places_entity(
             self,
