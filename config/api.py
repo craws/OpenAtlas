@@ -26,7 +26,8 @@ JSON_FORMATS = {
     'lpx': 'application/ld+json',
     'loud': 'application/ld+json',
     'geojson': 'application/json',
-    'geojson-v2': 'application/json'}
+    'geojson-v2': 'application/json',
+    'presentation': 'application/json'}
 API_FORMATS = RDF_FORMATS | JSON_FORMATS
 
 LOGICAL_OPERATOR: list[str] = ['and', 'or']

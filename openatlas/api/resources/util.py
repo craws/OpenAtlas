@@ -1,8 +1,9 @@
 from typing import Any, Optional
 
-from flask import g, json
+from flask import g, json, url_for
 
 from openatlas.api.resources.api_entity import ApiEntity
+from openatlas.display.util import check_iiif_activation, check_iiif_file_exist
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 from openatlas.models.reference_system import ReferenceSystem
@@ -107,8 +108,7 @@ def remove_spaces_dashes(string: str) -> str:
     return string.replace(' ', '').replace('-', '')
 
 
-def get_reference_systems(
-        links_inverse: list[Link]) -> list[dict[str, Any]]:
+def get_reference_systems(links_inverse: list[Link]) -> list[dict[str, Any]]:
     ref = []
     for link_ in links_inverse:
         if isinstance(link_.domain, ReferenceSystem) and link_.type:
@@ -123,6 +123,19 @@ def get_reference_systems(
                 'referenceSystem': system.name})
     return ref
 
+def get_iiif_manifest_and_path(img_id: int) -> dict[str, str]:
+    iiif_manifest = ''
+    iiif_base_path= ''
+    if check_iiif_activation() and check_iiif_file_exist(img_id):
+        iiif_manifest = url_for(
+            'api.iiif_manifest',
+            version=g.settings['iiif_version'],
+            id_=img_id,
+            _external=True)
+        if g.files.get(img_id):
+            iiif_base_path = \
+                f"{g.settings['iiif_url']}{img_id}{g.files[img_id].suffix}"
+    return {'IIIFManifest': iiif_manifest, 'IIIFBasePath': iiif_base_path}
 
 def get_geometric_collection(
         entity: Entity,
@@ -257,3 +270,13 @@ def get_geoms_dict(geoms: list[dict[str, Any]]) -> Optional[dict[str, Any]]:
     if len(geoms) == 1:
         return geoms[0]
     return {'type': 'GeometryCollection', 'geometries': geoms}
+
+
+def get_value_for_types(type_: Entity, links: list[Link]) -> dict[str, str]:
+    type_dict = {}
+    for link in links:
+        if link.range.id == type_.id and link.description:
+            type_dict['value'] = link.description
+            if link.range.id == type_.id and type_.description:
+                type_dict['unit'] = type_.description
+    return type_dict

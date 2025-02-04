@@ -7,7 +7,8 @@ from flask import g, url_for
 
 from openatlas.api.resources.util import (
     date_to_str, get_crm_relation, get_crm_relation_label_x,
-    get_crm_relation_x, get_license_name, to_camel_case)
+    get_crm_relation_x, get_iiif_manifest_and_path, get_license_name,
+    to_camel_case)
 from openatlas.display.util import (
     check_iiif_activation, check_iiif_file_exist, get_file_path)
 from openatlas.models.entity import Entity, Link
@@ -73,23 +74,12 @@ def get_lp_file(links_inverse: list[Link]) -> list[dict[str, str]]:
     for link in links_inverse:
         if link.domain.class_.name != 'file':
             continue
-        iiif_manifest = ''
-        iiif_base_path= ''
         img_id = link.domain.id
-        if check_iiif_activation() and check_iiif_file_exist(img_id):
-            iiif_manifest = url_for(
-                'api.iiif_manifest',
-                version=g.settings['iiif_version'],
-                id_=img_id,
-                _external=True)
-            if g.files.get(img_id):
-                iiif_base_path =\
-                    f"{g.settings['iiif_url']}{img_id}{g.files[img_id].suffix}"
         path = get_file_path(img_id)
         mime_type = None
         if path:
             mime_type, _ = mimetypes.guess_type(path)
-        files.append({
+        data = {
             '@id': url_for(
                 'api.entity',
                 id_=img_id,
@@ -100,12 +90,13 @@ def get_lp_file(links_inverse: list[Link]) -> list[dict[str, str]]:
             'licenseHolder': link.domain.license_holder,
             'publicShareable': link.domain.public,
             'mimetype': mime_type,
-            'IIIFManifest': iiif_manifest,
-            'IIIFBasePath': iiif_base_path,
             'url': url_for(
                 'api.display',
                 filename=path.stem,
-                _external=True) if path else "N/A"})
+                _external=True) if path else "N/A"}
+        data.update(get_iiif_manifest_and_path(img_id))
+        files.append(data)
+
     return files
 
 

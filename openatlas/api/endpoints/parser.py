@@ -15,6 +15,8 @@ from rdflib import Graph
 from openatlas import app
 from openatlas.api.formats.linked_places import (
     get_lp_file, get_lp_links, get_lp_time)
+from openatlas.api.formats.presentation_view import get_presentation_files, \
+    get_presentation_types
 from openatlas.api.resources.error import (
     EntityDoesNotExistError, InvalidSearchSyntax, InvalidSearchValueError,
     LastEntityError, UrlNotValid)
@@ -24,7 +26,7 @@ from openatlas.api.resources.search_validation import (
 from openatlas.api.resources.util import (
     flatten_list_and_remove_duplicates, get_geometric_collection,
     get_geoms_dict, get_location_link, get_reference_systems,
-    replace_empty_list_values_in_dict_with_none)
+    get_value_for_types, replace_empty_list_values_in_dict_with_none)
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 
@@ -188,6 +190,27 @@ class Parser:
             return geoms
         return []
 
+    def get_presentation_view(
+            self,
+            entity_dict: dict[str, Any]) -> dict[str, Any]:
+        entity = entity_dict['entity']
+        links = entity_dict['links']
+        links_inverse = entity_dict['links_inverse']
+
+        data = {
+            "id": entity.id,
+            "systemClass": entity.class_.name,
+            "title": entity.name,
+            "description": entity.description,
+            "aliases": list(entity.aliases.values()),
+            "geometries": get_geometric_collection(entity, links, self),
+            "when": get_lp_time(entity),
+            "types": get_presentation_types(entity, links),
+            "externalReferenceSystems": get_reference_systems(links_inverse),
+            "files": get_presentation_files(links_inverse)
+        }
+        return data
+
     def get_linked_places_entity(
             self,
             entity_dict: dict[str, Any]) -> dict[str, Any]:
@@ -315,10 +338,6 @@ class Parser:
                     'identifier': url_for(
                         'api.entity', id_=g.types[root].id, _external=True)}
                     for root in type_.root]}
-            for link in links:
-                if link.range.id == type_.id and link.description:
-                    type_dict['value'] = link.description
-                    if link.range.id == type_.id and type_.description:
-                        type_dict['unit'] = type_.description
+            type_dict.update(get_value_for_types(type_, links))
             types.append(type_dict)
         return types

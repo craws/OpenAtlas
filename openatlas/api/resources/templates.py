@@ -79,6 +79,9 @@ def linked_places_template(parser: Parser) -> dict[str, Type[String]]:
         'IIIFBasePath': fields.String,
         'IIIFManifest': fields.String}
     links = {
+        'referenceURL': fields.String,
+        'id': fields.String,
+        'resolverURL': fields.String,
         'type': fields.String,
         'identifier': fields.String,
         'referenceSystem': fields.String}
@@ -179,6 +182,11 @@ def loud_template(result: dict[str, Any]) -> dict[str, Any]:
         template[item] = fields.Raw
     return template
 
+def presentation_template(result: dict[str, Any]) -> dict[str, Any]:
+    template = {}
+    for item in result:
+        template[item] = fields.Raw
+    return template
 
 def subunit_template(id_: str) -> dict[str, List]:
     timespan = {
