@@ -95,6 +95,10 @@ class User(UserMixin):
         return None  # e.g. obsolete session values
 
     @staticmethod
+    def get_by_id_without_bookmarks(user_id: int) -> User:
+        return User(db.get_by_id(user_id))
+
+    @staticmethod
     def get_by_reset_code(code: str) -> Optional[User]:
         user_data = db.get_by_reset_code(code)
         return User(user_data) if user_data else None

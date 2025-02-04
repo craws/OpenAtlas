@@ -265,5 +265,5 @@ If advanced layout is enabled, the detail view of an entity shows from which
 project the entity was imported, which user did the import and the
 origin ID value.
 
-**It is always a good idea to run :doc:`/admin/data_integrity_checks` after
-each import.**
+It is always a good idea to run :doc:`/admin/data_integrity_checks` after
+each import.

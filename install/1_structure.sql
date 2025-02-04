@@ -16,6 +16,8 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+ALTER TABLE IF EXISTS ONLY web.user_tokens DROP CONSTRAINT IF EXISTS user_tokens_user_id_fkey;
+ALTER TABLE IF EXISTS ONLY web.user_tokens DROP CONSTRAINT IF EXISTS user_tokens_creator_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.user_settings DROP CONSTRAINT IF EXISTS user_settings_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.user_notes DROP CONSTRAINT IF EXISTS user_notes_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.user_notes DROP CONSTRAINT IF EXISTS user_notes_entity_id_fkey;
@@ -77,6 +79,7 @@ DROP TRIGGER IF EXISTS update_modified ON model.annotation_image;
 DROP TRIGGER IF EXISTS on_delete_entity ON model.entity;
 DROP TRIGGER IF EXISTS update_modified ON import.project;
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS user_username_key;
+ALTER TABLE IF EXISTS ONLY web.user_tokens DROP CONSTRAINT IF EXISTS user_tokens_pkey;
 ALTER TABLE IF EXISTS ONLY web.user_settings DROP CONSTRAINT IF EXISTS user_settings_user_id_name_key;
 ALTER TABLE IF EXISTS ONLY web.user_settings DROP CONSTRAINT IF EXISTS user_settings_pkey;
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS user_pkey;
@@ -132,6 +135,7 @@ ALTER TABLE IF EXISTS ONLY import.project DROP CONSTRAINT IF EXISTS project_pkey
 ALTER TABLE IF EXISTS ONLY import.project DROP CONSTRAINT IF EXISTS project_name_key;
 ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_project_id_origin_id_key;
 ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_pkey;
+ALTER TABLE IF EXISTS web.user_tokens ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.user_settings ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.user_notes ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.user_log ALTER COLUMN id DROP DEFAULT;
@@ -160,6 +164,8 @@ ALTER TABLE IF EXISTS model.cidoc_class ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.annotation_image ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS import.project ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS import.entity ALTER COLUMN id DROP DEFAULT;
+DROP SEQUENCE IF EXISTS web.user_tokens_id_seq;
+DROP TABLE IF EXISTS web.user_tokens;
 DROP SEQUENCE IF EXISTS web.user_settings_id_seq;
 DROP TABLE IF EXISTS web.user_settings;
 DROP SEQUENCE IF EXISTS web.user_notes_id_seq;
@@ -1534,6 +1540,47 @@ ALTER SEQUENCE web.user_settings_id_seq OWNED BY web.user_settings.id;
 
 
 --
+-- Name: user_tokens; Type: TABLE; Schema: web; Owner: openatlas
+--
+
+CREATE TABLE web.user_tokens (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    creator_id integer NOT NULL,
+    name text,
+    jti text,
+    valid_from timestamp without time zone,
+    valid_until timestamp without time zone,
+    created timestamp without time zone DEFAULT now() NOT NULL,
+    modified timestamp without time zone,
+    revoked boolean DEFAULT false NOT NULL
+);
+
+
+ALTER TABLE web.user_tokens OWNER TO openatlas;
+
+--
+-- Name: user_tokens_id_seq; Type: SEQUENCE; Schema: web; Owner: openatlas
+--
+
+CREATE SEQUENCE web.user_tokens_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE web.user_tokens_id_seq OWNER TO openatlas;
+
+--
+-- Name: user_tokens_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
+--
+
+ALTER SEQUENCE web.user_tokens_id_seq OWNED BY web.user_tokens.id;
+
+
+--
 -- Name: entity id; Type: DEFAULT; Schema: import; Owner: openatlas
 --
 
@@ -1727,6 +1774,13 @@ ALTER TABLE ONLY web.user_notes ALTER COLUMN id SET DEFAULT nextval('web.user_no
 --
 
 ALTER TABLE ONLY web.user_settings ALTER COLUMN id SET DEFAULT nextval('web.user_settings_id_seq'::regclass);
+
+
+--
+-- Name: user_tokens id; Type: DEFAULT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.user_tokens ALTER COLUMN id SET DEFAULT nextval('web.user_tokens_id_seq'::regclass);
 
 
 --
@@ -2167,6 +2221,14 @@ ALTER TABLE ONLY web.user_settings
 
 ALTER TABLE ONLY web.user_settings
     ADD CONSTRAINT user_settings_user_id_name_key UNIQUE (user_id, name);
+
+
+--
+-- Name: user_tokens user_tokens_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.user_tokens
+    ADD CONSTRAINT user_tokens_pkey PRIMARY KEY (id);
 
 
 --
@@ -2637,6 +2699,22 @@ ALTER TABLE ONLY web.user_notes
 
 ALTER TABLE ONLY web.user_settings
     ADD CONSTRAINT user_settings_user_id_fkey FOREIGN KEY (user_id) REFERENCES web."user"(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: user_tokens user_tokens_creator_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.user_tokens
+    ADD CONSTRAINT user_tokens_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES web."user"(id) ON UPDATE CASCADE;
+
+
+--
+-- Name: user_tokens user_tokens_user_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.user_tokens
+    ADD CONSTRAINT user_tokens_user_id_fkey FOREIGN KEY (user_id) REFERENCES web."user"(id) ON UPDATE CASCADE;
 
 
 --

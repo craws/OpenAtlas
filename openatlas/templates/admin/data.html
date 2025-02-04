@@ -41,6 +41,9 @@
       {% if 'manager'|is_authorized %}
         <div class="col-auto">{{ _('edit')|button(url_for('settings', category='api'))|safe }}</div>
       {% endif %}
+      {% if 'admin'|is_authorized %}
+        <div class="col-auto">{{ _('api token')|button(url_for('api_token'))|safe }}</div>
+      {% endif %}
   </div>
   {{ info|display_info|safe }}
 {% endif %}
