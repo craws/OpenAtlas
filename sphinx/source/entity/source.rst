@@ -27,6 +27,3 @@ Can be linked via tabs to
   editions of charters or secondary sources
 * **Text** - add translations or similar to the source
 * :doc:`file`
-
-Text annotation
----------------
