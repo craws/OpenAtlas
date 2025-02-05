@@ -1,7 +1,8 @@
 import importlib
 
 import bcrypt
-from flask import flash, g, render_template, session, url_for
+from flask import flash, g, render_template, session, \
+    url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user, login_required
 from flask_wtf import FlaskForm
@@ -78,9 +79,9 @@ def profile_index() -> str:
             button(_('edit'), url_for('profile_settings', category='profile')),
             button(_('change password'), url_for('profile_password'))]
         tabs['modules'].buttons.append(
-                button(
-                    _('edit'),
-                    url_for('profile_settings', category='modules')))
+            button(
+                _('edit'),
+                url_for('profile_settings', category='modules')))
         tabs['display'].buttons.append(
             button(_('edit'), url_for('profile_settings', category='display')))
     return render_template(

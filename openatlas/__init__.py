@@ -1,14 +1,17 @@
 import locale
+import datetime
 from typing import Any, Optional
 
 from flask import Flask, Response, g, request, session
 from flask_babel import Babel
+from flask_jwt_extended import JWTManager, verify_jwt_in_request
 from flask_login import current_user
 from flask_wtf.csrf import CSRFProtect
 from psycopg2 import extras
 
 from openatlas.api.resources.error import AccessDeniedError
 from openatlas.database.connect import close_connection, open_connection
+from openatlas.database.token import check_token_revoked
 
 app: Flask = Flask(__name__, instance_relative_config=True)
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
@@ -16,9 +19,9 @@ app.config.from_object('config.default')
 app.config.from_object('config.api')
 app.config.from_pyfile('production.py')
 app.config['WTF_CSRF_TIME_LIMIT'] = None  # Set CSRF token valid for session
-
 locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
 babel = Babel(app)
+jwt = JWTManager(app)
 
 # pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position
 from openatlas.models.logger import Logger
@@ -26,7 +29,7 @@ from openatlas.api import api
 from openatlas.views import (
     admin, ajax, annotation, arche, bones, changelog, entity, entity_index,
     error, export, file, hierarchy, index, imports, link, login, model, note,
-    overlay, profile, search, sql, tools, type as type_, user, vocabs)
+    overlay, profile, search, sql, token, tools, type as type_, user, vocabs)
 
 
 @babel.localeselector
@@ -108,7 +111,10 @@ def setup_api() -> None:
         ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
         if not current_user.is_authenticated \
                 and not g.settings['api_public'] \
-                and ip not in app.config['ALLOWED_IPS']:
+                and ip not in app.config['ALLOWED_IPS'] \
+                and not verify_jwt_in_request(
+            optional=True,
+            locations='headers'):
             raise AccessDeniedError
 
 
@@ -125,3 +131,17 @@ def apply_caching(response: Response) -> Response:
 @app.teardown_request
 def teardown_request(_exception: Optional[Any]) -> None:
     close_connection()
+
+
+@jwt.token_in_blocklist_loader
+def check_incoming_tokens(
+        jwt_header: dict[str, Any],
+        jwt_payload: dict[str, Any]) -> bool:
+    if not jwt_header['typ'] == 'JWT':
+        return True
+    token_ = check_token_revoked(jwt_payload["jti"])
+    if token_['revoked'] \
+            or not token_['active'] \
+            or token_['valid_until'] < datetime.datetime.now():
+        return True
+    return False
