@@ -1,8 +1,7 @@
 import importlib
 
 import bcrypt
-from flask import flash, g, render_template, session, \
-    url_for
+from flask import flash, g, render_template, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user, login_required
 from flask_wtf import FlaskForm
