@@ -21,6 +21,7 @@ class CidocClass:
     @staticmethod
     def get_all(language: str) -> dict[str, CidocClass]:
         classes = {row['code']: CidocClass(row) for row in db.get_classes()}
+        print(classes)
         for row in db.get_hierarchy():
             classes[row['super_code']].sub.append(row['sub_code'])
             classes[row['sub_code']].super.append(row['super_code'])

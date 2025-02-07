@@ -4,26 +4,7 @@ from flask import g
 
 
 def get_properties() -> list[dict[str, Any]]:
-    g.cursor.execute(
-        """
-        SELECT
-            p.code,
-            p.comment,
-            p.domain_class_code,
-            p.range_class_code,
-            p.name,
-            p.name_inverse,
-            COUNT(l.id) AS count
-        FROM model.property p
-        LEFT JOIN model.link l ON p.code = l.property_code
-        GROUP BY (
-            p.code,
-            p.comment,
-            p.domain_class_code,
-            p.range_class_code,
-            p.name,
-            p.name_inverse);
-        """)
+    g.cursor.execute("SELECT * FROM model.cidoc_properties;")
     return list(g.cursor)
 
 

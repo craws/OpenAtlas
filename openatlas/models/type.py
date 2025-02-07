@@ -126,7 +126,11 @@ class Type(Entity):
     @staticmethod
     def get_all(with_count: bool) -> dict[int, Type]:
         types = {}
-        for row in db.get_types(with_count):
+        if with_count:
+            db_types = db.get_types_with_count()
+        else:
+            db_types = db.get_types_without_count()
+        for row in db_types:
             type_ = Type(row)
             types[type_.id] = type_
             type_.count = row['count'] or row['count_property']

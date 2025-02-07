@@ -308,16 +308,13 @@ def update_file_info(data: dict[str, Any]) -> None:
 
 
 def get_file_info() -> dict[int, dict[str, Any]]:
-    g.cursor.execute(
-        """
-        SELECT entity_id, public, creator, license_holder
-        FROM model.file_info;
-        """)
+    g.cursor.execute("SELECT * FROM model.get_file_info;")
     return {
         row['entity_id']: {
             'public': row['public'],
             'license_holder': row['license_holder'],
-            'creator': row['creator']} for row in list(g.cursor)}
+            'creator': row['creator']}
+        for row in g.cursor}
 
 
 def get_subunits_without_super(classes: list[str]) -> list[int]:

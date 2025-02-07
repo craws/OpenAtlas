@@ -3,56 +3,14 @@ from typing import Any
 from flask import g
 
 
-def get_types(with_count: bool) -> list[dict[str, Any]]:
-    sql = f"""
-        SELECT
-            e.id,
-            e.name,
-            e.cidoc_class_code,
-            e.description,
-            e.openatlas_class_name,
-            e.created,
-            e.modified,
-            es.id AS super_id,
-            {'COUNT(l2.id)' if with_count else '0'} AS count,
-            {'COUNT(l3.id)' if with_count else '0'} AS count_property,
-            COALESCE(to_char(e.begin_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
-                AS begin_from,
-            COALESCE(to_char(e.begin_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
-                AS begin_to,
-            COALESCE(to_char(e.end_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
-                AS end_from,
-            COALESCE(to_char(e.end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
-                AS end_to,
-            e.begin_comment,
-            e.end_comment,
-            tns.entity_id AS non_selectable
-
-        FROM model.entity e
-
-        -- Selectable or not
-        LEFT OUTER JOIN web.type_none_selectable tns ON e.id = tns.entity_id
-
-        -- Get super
-        LEFT JOIN model.link l ON e.id = l.domain_id
-            AND l.property_code IN ('P127', 'P89')
-        LEFT JOIN model.entity es ON l.range_id = es.id
-        """
-    if with_count:
-        sql += """
-            -- Get count
-            LEFT JOIN model.link l2 ON e.id = l2.range_id
-                AND l2.property_code IN ('P2', 'P89')
-            LEFT JOIN model.link l3 ON e.id = l3.type_id
-            """
-    sql += """
-        WHERE e.openatlas_class_name
-            IN ('administrative_unit', 'type', 'type_tools')
-        GROUP BY e.id, es.id, tns.entity_id
-        ORDER BY e.name;
-        """
-    g.cursor.execute(sql)
+def get_types_without_count() -> list[dict[str, Any]]:
+    g.cursor.execute("SELECT * FROM model.types_without_count;")
     return list(g.cursor)
+
+def get_types_with_count() -> list[dict[str, Any]]:
+    g.cursor.execute("SELECT * FROM model.types_with_count;")
+    return list(g.cursor)
+
 
 
 def get_hierarchies() -> list[dict[str, Any]]:

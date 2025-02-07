@@ -4,44 +4,7 @@ from flask import g
 
 
 def get_all() -> list[dict[str, Any]]:
-    g.cursor.execute(
-        """
-        SELECT
-            e.id, e.name,
-            e.cidoc_class_code,
-            e.description,
-            e.openatlas_class_name,
-            e.created,
-            e.modified,
-            rs.website_url,
-            rs.resolver_url,
-            rs.identifier_example,
-            rs.system,
-            COUNT(l.id) AS count,
-            array_to_json(
-                array_agg((t.range_id, t.description))
-                    FILTER (WHERE t.range_id IS NOT NULL)
-            ) AS types
-        FROM model.entity e
-        JOIN web.reference_system rs ON e.id = rs.entity_id
-        LEFT JOIN model.link l ON e.id = l.domain_id
-            AND l.property_code = 'P67'
-        LEFT JOIN model.link t ON e.id = t.domain_id
-            AND t.property_code = 'P2'
-        GROUP BY
-            e.id,
-            e.name,
-            e.cidoc_class_code,
-            e.description,
-            e.openatlas_class_name,
-            e.created,
-            e.modified,
-            rs.website_url,
-            rs.resolver_url,
-            rs.identifier_example,
-            rs.system,
-            rs.entity_id;
-        """)
+    g.cursor.execute("SELECT * FROM model.reference_systems")
     return list(g.cursor)
 
 

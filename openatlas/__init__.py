@@ -90,9 +90,10 @@ def before_request() -> None:
 def setup_files() -> None:
     from openatlas.models.entity import Entity
     g.files = {}
-    for file_ in app.config['UPLOAD_PATH'].iterdir():
-        if file_.stem.isdigit():
-            g.files[int(file_.stem)] = file_
+    g.files.update({
+        int(file_.stem): file_
+        for file_ in app.config['UPLOAD_PATH'].iterdir()
+        if file_.stem.isdigit()})
     app.config['MAX_CONTENT_LENGTH'] = \
         g.settings['file_upload_max_size'] * 1024 * 1024  # Max upload in MB
     g.display_file_ext = app.config['DISPLAY_FILE_EXT']

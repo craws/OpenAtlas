@@ -70,14 +70,24 @@ DROP TRIGGER IF EXISTS update_modified ON web.i18n;
 DROP TRIGGER IF EXISTS update_modified ON web.hierarchy_openatlas_class;
 DROP TRIGGER IF EXISTS update_modified ON web.hierarchy;
 DROP TRIGGER IF EXISTS update_modified ON web."group";
+DROP TRIGGER IF EXISTS trigger_refresh_reference_systems_view_web ON web.reference_system;
 DROP TRIGGER IF EXISTS update_modified ON model.link;
 DROP TRIGGER IF EXISTS update_modified ON model.gis;
 DROP TRIGGER IF EXISTS update_modified ON model.file_info;
 DROP TRIGGER IF EXISTS update_modified ON model.entity;
 DROP TRIGGER IF EXISTS update_modified ON model.annotation_text;
 DROP TRIGGER IF EXISTS update_modified ON model.annotation_image;
+DROP TRIGGER IF EXISTS trigger_refresh_types_views ON model.entity;
+DROP TRIGGER IF EXISTS trigger_refresh_reference_systems_view_entity ON model.entity;
+DROP TRIGGER IF EXISTS trigger_refresh_get_file_info_view ON model.entity;
 DROP TRIGGER IF EXISTS on_delete_entity ON model.entity;
 DROP TRIGGER IF EXISTS update_modified ON import.project;
+DROP INDEX IF EXISTS model.types_without_count_idx;
+DROP INDEX IF EXISTS model.types_with_count_idx;
+DROP INDEX IF EXISTS model.reference_systems_idx;
+DROP INDEX IF EXISTS model.get_file_info_idx;
+DROP INDEX IF EXISTS model.cidoc_properties_idx;
+DROP INDEX IF EXISTS model.cidoc_classes_idx;
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS user_username_key;
 ALTER TABLE IF EXISTS ONLY web.user_tokens DROP CONSTRAINT IF EXISTS user_tokens_pkey;
 ALTER TABLE IF EXISTS ONLY web.user_settings DROP CONSTRAINT IF EXISTS user_settings_user_id_name_key;
@@ -120,7 +130,6 @@ ALTER TABLE IF EXISTS ONLY model.openatlas_class DROP CONSTRAINT IF EXISTS opena
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_pkey;
 ALTER TABLE IF EXISTS ONLY model.gis DROP CONSTRAINT IF EXISTS gis_pkey;
 ALTER TABLE IF EXISTS ONLY model.file_info DROP CONSTRAINT IF EXISTS file_info_pkey;
-ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_pkey;
 ALTER TABLE IF EXISTS ONLY model.file_info DROP CONSTRAINT IF EXISTS entity_id_key;
 ALTER TABLE IF EXISTS ONLY model.cidoc_class DROP CONSTRAINT IF EXISTS class_pkey;
 ALTER TABLE IF EXISTS ONLY model.cidoc_class DROP CONSTRAINT IF EXISTS class_name_key;
@@ -135,6 +144,9 @@ ALTER TABLE IF EXISTS ONLY import.project DROP CONSTRAINT IF EXISTS project_pkey
 ALTER TABLE IF EXISTS ONLY import.project DROP CONSTRAINT IF EXISTS project_name_key;
 ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_project_id_origin_id_key;
 ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_pkey;
+DROP MATERIALIZED VIEW IF EXISTS model.types_without_count;
+DROP MATERIALIZED VIEW IF EXISTS model.types_with_count;
+ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_pkey;
 ALTER TABLE IF EXISTS web.user_tokens ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.user_settings ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.user_notes ALTER COLUMN id DROP DEFAULT;
@@ -182,7 +194,6 @@ DROP SEQUENCE IF EXISTS web.settings_id_seq;
 DROP TABLE IF EXISTS web.settings;
 DROP SEQUENCE IF EXISTS web.reference_system_form_id_seq;
 DROP TABLE IF EXISTS web.reference_system_openatlas_class;
-DROP TABLE IF EXISTS web.reference_system;
 DROP SEQUENCE IF EXISTS web.map_overlay_id_seq;
 DROP TABLE IF EXISTS web.map_overlay;
 DROP SEQUENCE IF EXISTS web.log_id_seq;
@@ -197,21 +208,26 @@ DROP SEQUENCE IF EXISTS web.group_id_seq;
 DROP TABLE IF EXISTS web."group";
 DROP SEQUENCE IF EXISTS web.entity_profile_image_id_seq;
 DROP TABLE IF EXISTS web.entity_profile_image;
+DROP MATERIALIZED VIEW IF EXISTS model.reference_systems;
+DROP TABLE IF EXISTS web.reference_system;
 DROP SEQUENCE IF EXISTS model.property_inheritance_id_seq;
 DROP TABLE IF EXISTS model.property_inheritance;
 DROP SEQUENCE IF EXISTS model.property_id_seq;
 DROP SEQUENCE IF EXISTS model.property_i18n_id_seq;
 DROP TABLE IF EXISTS model.property_i18n;
-DROP TABLE IF EXISTS model.property;
 DROP SEQUENCE IF EXISTS model.openatlas_class_id_seq;
 DROP TABLE IF EXISTS model.openatlas_class;
 DROP SEQUENCE IF EXISTS model.link_id_seq;
-DROP TABLE IF EXISTS model.link;
 DROP SEQUENCE IF EXISTS model.gis_id_seq;
 DROP TABLE IF EXISTS model.gis;
+DROP MATERIALIZED VIEW IF EXISTS model.get_file_info;
 DROP TABLE IF EXISTS model.file_info;
 DROP SEQUENCE IF EXISTS model.file_info_id_seq;
 DROP SEQUENCE IF EXISTS model.entity_id_seq;
+DROP MATERIALIZED VIEW IF EXISTS model.cidoc_properties;
+DROP TABLE IF EXISTS model.property;
+DROP TABLE IF EXISTS model.link;
+DROP MATERIALIZED VIEW IF EXISTS model.cidoc_classes;
 DROP TABLE IF EXISTS model.entity;
 DROP SEQUENCE IF EXISTS model.cidoc_class_inheritance_id_seq;
 DROP TABLE IF EXISTS model.cidoc_class_inheritance;
@@ -621,6 +637,84 @@ CREATE TABLE model.entity (
 ALTER TABLE model.entity OWNER TO openatlas;
 
 --
+-- Name: cidoc_classes; Type: MATERIALIZED VIEW; Schema: model; Owner: openatlas
+--
+
+CREATE MATERIALIZED VIEW model.cidoc_classes AS
+ SELECT c.code,
+    c.name,
+    c.comment,
+    count(e.id) AS count
+   FROM (model.cidoc_class c
+     LEFT JOIN model.entity e ON ((c.code = e.cidoc_class_code)))
+  GROUP BY c.code, c.name, c.comment
+  WITH NO DATA;
+
+
+ALTER TABLE model.cidoc_classes OWNER TO openatlas;
+
+--
+-- Name: link; Type: TABLE; Schema: model; Owner: openatlas
+--
+
+CREATE TABLE model.link (
+    id integer NOT NULL,
+    property_code text NOT NULL,
+    domain_id integer NOT NULL,
+    range_id integer NOT NULL,
+    description text,
+    created timestamp without time zone DEFAULT now() NOT NULL,
+    modified timestamp without time zone,
+    type_id integer,
+    begin_from timestamp without time zone,
+    begin_to timestamp without time zone,
+    begin_comment text,
+    end_from timestamp without time zone,
+    end_to timestamp without time zone,
+    end_comment text
+);
+
+
+ALTER TABLE model.link OWNER TO openatlas;
+
+--
+-- Name: property; Type: TABLE; Schema: model; Owner: openatlas
+--
+
+CREATE TABLE model.property (
+    id integer NOT NULL,
+    code text NOT NULL,
+    range_class_code text NOT NULL,
+    domain_class_code text NOT NULL,
+    name text NOT NULL,
+    name_inverse text,
+    comment text
+);
+
+
+ALTER TABLE model.property OWNER TO openatlas;
+
+--
+-- Name: cidoc_properties; Type: MATERIALIZED VIEW; Schema: model; Owner: openatlas
+--
+
+CREATE MATERIALIZED VIEW model.cidoc_properties AS
+ SELECT p.code,
+    p.comment,
+    p.domain_class_code,
+    p.range_class_code,
+    p.name,
+    p.name_inverse,
+    count(l.id) AS count
+   FROM (model.property p
+     LEFT JOIN model.link l ON ((p.code = l.property_code)))
+  GROUP BY p.code, p.comment, p.domain_class_code, p.range_class_code, p.name, p.name_inverse
+  WITH NO DATA;
+
+
+ALTER TABLE model.cidoc_properties OWNER TO openatlas;
+
+--
 -- Name: entity_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
 --
 
@@ -680,6 +774,21 @@ COMMENT ON TABLE model.file_info IS 'Indicates if public sharing of correspondin
 
 
 --
+-- Name: get_file_info; Type: MATERIALIZED VIEW; Schema: model; Owner: openatlas
+--
+
+CREATE MATERIALIZED VIEW model.get_file_info AS
+ SELECT file_info.entity_id,
+    file_info.public,
+    file_info.creator,
+    file_info.license_holder
+   FROM model.file_info
+  WITH NO DATA;
+
+
+ALTER TABLE model.get_file_info OWNER TO openatlas;
+
+--
 -- Name: gis; Type: TABLE; Schema: model; Owner: openatlas
 --
 
@@ -721,30 +830,6 @@ ALTER TABLE model.gis_id_seq OWNER TO openatlas;
 
 ALTER SEQUENCE model.gis_id_seq OWNED BY model.gis.id;
 
-
---
--- Name: link; Type: TABLE; Schema: model; Owner: openatlas
---
-
-CREATE TABLE model.link (
-    id integer NOT NULL,
-    property_code text NOT NULL,
-    domain_id integer NOT NULL,
-    range_id integer NOT NULL,
-    description text,
-    created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone,
-    type_id integer,
-    begin_from timestamp without time zone,
-    begin_to timestamp without time zone,
-    begin_comment text,
-    end_from timestamp without time zone,
-    end_to timestamp without time zone,
-    end_comment text
-);
-
-
-ALTER TABLE model.link OWNER TO openatlas;
 
 --
 -- Name: link_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
@@ -829,23 +914,6 @@ ALTER TABLE model.openatlas_class_id_seq OWNER TO openatlas;
 
 ALTER SEQUENCE model.openatlas_class_id_seq OWNED BY model.openatlas_class.id;
 
-
---
--- Name: property; Type: TABLE; Schema: model; Owner: openatlas
---
-
-CREATE TABLE model.property (
-    id integer NOT NULL,
-    code text NOT NULL,
-    range_class_code text NOT NULL,
-    domain_class_code text NOT NULL,
-    name text NOT NULL,
-    name_inverse text,
-    comment text
-);
-
-
-ALTER TABLE model.property OWNER TO openatlas;
 
 --
 -- Name: property_i18n; Type: TABLE; Schema: model; Owner: openatlas
@@ -937,6 +1005,59 @@ ALTER TABLE model.property_inheritance_id_seq OWNER TO openatlas;
 
 ALTER SEQUENCE model.property_inheritance_id_seq OWNED BY model.property_inheritance.id;
 
+
+--
+-- Name: reference_system; Type: TABLE; Schema: web; Owner: openatlas
+--
+
+CREATE TABLE web.reference_system (
+    entity_id integer NOT NULL,
+    name text NOT NULL,
+    resolver_url text,
+    website_url text,
+    identifier_example text,
+    system boolean DEFAULT false NOT NULL,
+    created timestamp without time zone,
+    modified timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE web.reference_system OWNER TO openatlas;
+
+--
+-- Name: COLUMN reference_system.system; Type: COMMENT; Schema: web; Owner: openatlas
+--
+
+COMMENT ON COLUMN web.reference_system.system IS 'True if integrated in the application. Can not be deleted or renamed in the UI.';
+
+
+--
+-- Name: reference_systems; Type: MATERIALIZED VIEW; Schema: model; Owner: openatlas
+--
+
+CREATE MATERIALIZED VIEW model.reference_systems AS
+ SELECT e.id,
+    e.name,
+    e.cidoc_class_code,
+    e.description,
+    e.openatlas_class_name,
+    e.created,
+    e.modified,
+    rs.website_url,
+    rs.resolver_url,
+    rs.identifier_example,
+    rs.system,
+    count(l.id) AS count,
+    array_to_json(array_agg(ROW(t.range_id, t.description)) FILTER (WHERE (t.range_id IS NOT NULL))) AS types
+   FROM (((model.entity e
+     JOIN web.reference_system rs ON ((e.id = rs.entity_id)))
+     LEFT JOIN model.link l ON (((e.id = l.domain_id) AND (l.property_code = 'P67'::text))))
+     LEFT JOIN model.link t ON (((e.id = t.domain_id) AND (t.property_code = 'P2'::text))))
+  GROUP BY e.id, e.name, e.cidoc_class_code, e.description, e.openatlas_class_name, e.created, e.modified, rs.website_url, rs.resolver_url, rs.identifier_example, rs.system, rs.entity_id
+  WITH NO DATA;
+
+
+ALTER TABLE model.reference_systems OWNER TO openatlas;
 
 --
 -- Name: entity_profile_image; Type: TABLE; Schema: web; Owner: openatlas
@@ -1207,31 +1328,6 @@ ALTER TABLE web.map_overlay_id_seq OWNER TO openatlas;
 --
 
 ALTER SEQUENCE web.map_overlay_id_seq OWNED BY web.map_overlay.id;
-
-
---
--- Name: reference_system; Type: TABLE; Schema: web; Owner: openatlas
---
-
-CREATE TABLE web.reference_system (
-    entity_id integer NOT NULL,
-    name text NOT NULL,
-    resolver_url text,
-    website_url text,
-    identifier_example text,
-    system boolean DEFAULT false NOT NULL,
-    created timestamp without time zone,
-    modified timestamp without time zone DEFAULT now() NOT NULL
-);
-
-
-ALTER TABLE web.reference_system OWNER TO openatlas;
-
---
--- Name: COLUMN reference_system.system; Type: COMMENT; Schema: web; Owner: openatlas
---
-
-COMMENT ON COLUMN web.reference_system.system IS 'True if integrated in the application. Can not be deleted or renamed in the UI.';
 
 
 --
@@ -1784,6 +1880,84 @@ ALTER TABLE ONLY web.user_tokens ALTER COLUMN id SET DEFAULT nextval('web.user_t
 
 
 --
+-- Name: entity entity_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.entity
+    ADD CONSTRAINT entity_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: types_with_count; Type: MATERIALIZED VIEW; Schema: model; Owner: openatlas
+--
+
+CREATE MATERIALIZED VIEW model.types_with_count AS
+ SELECT e.id,
+    e.name,
+    e.cidoc_class_code,
+    e.description,
+    e.openatlas_class_name,
+    e.created,
+    e.modified,
+    es.id AS super_id,
+    count(l2.id) AS count,
+    count(l3.id) AS count_property,
+    COALESCE(to_char(e.begin_from, 'YYYY-MM-DD HH24:MI:SS BC'::text), ''::text) AS begin_from,
+    COALESCE(to_char(e.begin_to, 'YYYY-MM-DD HH24:MI:SS BC'::text), ''::text) AS begin_to,
+    COALESCE(to_char(e.end_from, 'YYYY-MM-DD HH24:MI:SS BC'::text), ''::text) AS end_from,
+    COALESCE(to_char(e.end_to, 'YYYY-MM-DD HH24:MI:SS BC'::text), ''::text) AS end_to,
+    e.begin_comment,
+    e.end_comment,
+    tns.entity_id AS non_selectable
+   FROM (((((model.entity e
+     LEFT JOIN web.type_none_selectable tns ON ((e.id = tns.entity_id)))
+     LEFT JOIN model.link l ON (((e.id = l.domain_id) AND (l.property_code = ANY (ARRAY['P127'::text, 'P89'::text])))))
+     LEFT JOIN model.entity es ON ((l.range_id = es.id)))
+     LEFT JOIN model.link l2 ON (((e.id = l2.range_id) AND (l2.property_code = ANY (ARRAY['P2'::text, 'P89'::text])))))
+     LEFT JOIN model.link l3 ON ((e.id = l3.type_id)))
+  WHERE (e.openatlas_class_name = ANY (ARRAY['administrative_unit'::text, 'type'::text, 'type_tools'::text]))
+  GROUP BY e.id, es.id, tns.entity_id
+  ORDER BY e.name
+  WITH NO DATA;
+
+
+ALTER TABLE model.types_with_count OWNER TO openatlas;
+
+--
+-- Name: types_without_count; Type: MATERIALIZED VIEW; Schema: model; Owner: openatlas
+--
+
+CREATE MATERIALIZED VIEW model.types_without_count AS
+ SELECT e.id,
+    e.name,
+    e.cidoc_class_code,
+    e.description,
+    e.openatlas_class_name,
+    e.created,
+    e.modified,
+    es.id AS super_id,
+    0 AS count,
+    0 AS count_property,
+    COALESCE(to_char(e.begin_from, 'YYYY-MM-DD HH24:MI:SS BC'::text), ''::text) AS begin_from,
+    COALESCE(to_char(e.begin_to, 'YYYY-MM-DD HH24:MI:SS BC'::text), ''::text) AS begin_to,
+    COALESCE(to_char(e.end_from, 'YYYY-MM-DD HH24:MI:SS BC'::text), ''::text) AS end_from,
+    COALESCE(to_char(e.end_to, 'YYYY-MM-DD HH24:MI:SS BC'::text), ''::text) AS end_to,
+    e.begin_comment,
+    e.end_comment,
+    tns.entity_id AS non_selectable
+   FROM (((model.entity e
+     LEFT JOIN web.type_none_selectable tns ON ((e.id = tns.entity_id)))
+     LEFT JOIN model.link l ON (((e.id = l.domain_id) AND (l.property_code = ANY (ARRAY['P127'::text, 'P89'::text])))))
+     LEFT JOIN model.entity es ON ((l.range_id = es.id)))
+  WHERE (e.openatlas_class_name = ANY (ARRAY['administrative_unit'::text, 'type'::text, 'type_tools'::text]))
+  GROUP BY e.id, es.id, tns.entity_id
+  ORDER BY e.name
+  WITH NO DATA;
+
+
+ALTER TABLE model.types_without_count OWNER TO openatlas;
+
+--
 -- Name: entity entity_pkey; Type: CONSTRAINT; Schema: import; Owner: openatlas
 --
 
@@ -1893,14 +2067,6 @@ ALTER TABLE ONLY model.cidoc_class
 
 ALTER TABLE ONLY model.file_info
     ADD CONSTRAINT entity_id_key UNIQUE (entity_id);
-
-
---
--- Name: entity entity_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
---
-
-ALTER TABLE ONLY model.entity
-    ADD CONSTRAINT entity_pkey PRIMARY KEY (id);
 
 
 --
@@ -2240,6 +2406,48 @@ ALTER TABLE ONLY web."user"
 
 
 --
+-- Name: cidoc_classes_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE UNIQUE INDEX cidoc_classes_idx ON model.cidoc_classes USING btree (code);
+
+
+--
+-- Name: cidoc_properties_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE UNIQUE INDEX cidoc_properties_idx ON model.cidoc_properties USING btree (code);
+
+
+--
+-- Name: get_file_info_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE UNIQUE INDEX get_file_info_idx ON model.get_file_info USING btree (entity_id);
+
+
+--
+-- Name: reference_systems_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE UNIQUE INDEX reference_systems_idx ON model.reference_systems USING btree (id);
+
+
+--
+-- Name: types_with_count_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE UNIQUE INDEX types_with_count_idx ON model.types_with_count USING btree (id);
+
+
+--
+-- Name: types_without_count_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE UNIQUE INDEX types_without_count_idx ON model.types_without_count USING btree (id);
+
+
+--
 -- Name: project update_modified; Type: TRIGGER; Schema: import; Owner: openatlas
 --
 
@@ -2251,6 +2459,27 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON import.project FOR EACH ROW EXEC
 --
 
 CREATE TRIGGER on_delete_entity BEFORE DELETE ON model.entity FOR EACH ROW EXECUTE FUNCTION model.delete_entity_related();
+
+
+--
+-- Name: entity trigger_refresh_get_file_info_view; Type: TRIGGER; Schema: model; Owner: openatlas
+--
+
+CREATE TRIGGER trigger_refresh_get_file_info_view AFTER INSERT OR UPDATE ON model.entity FOR EACH ROW WHEN ((new.openatlas_class_name = 'file'::text)) EXECUTE FUNCTION public.refresh_get_file_info_view();
+
+
+--
+-- Name: entity trigger_refresh_reference_systems_view_entity; Type: TRIGGER; Schema: model; Owner: openatlas
+--
+
+CREATE TRIGGER trigger_refresh_reference_systems_view_entity AFTER INSERT OR UPDATE ON model.entity FOR EACH ROW WHEN ((new.openatlas_class_name = 'reference_system'::text)) EXECUTE FUNCTION public.refresh_reference_systems_view();
+
+
+--
+-- Name: entity trigger_refresh_types_views; Type: TRIGGER; Schema: model; Owner: openatlas
+--
+
+CREATE TRIGGER trigger_refresh_types_views AFTER INSERT OR UPDATE ON model.entity FOR EACH ROW WHEN ((new.openatlas_class_name = ANY (ARRAY['administrative_unit'::text, 'type'::text, 'type_tools'::text]))) EXECUTE FUNCTION public.refresh_types_views();
 
 
 --
@@ -2293,6 +2522,13 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON model.gis FOR EACH ROW EXECUTE F
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON model.link FOR EACH ROW EXECUTE FUNCTION model.update_modified();
+
+
+--
+-- Name: reference_system trigger_refresh_reference_systems_view_web; Type: TRIGGER; Schema: web; Owner: openatlas
+--
+
+CREATE TRIGGER trigger_refresh_reference_systems_view_web AFTER INSERT OR DELETE OR UPDATE ON web.reference_system FOR EACH ROW EXECUTE FUNCTION public.refresh_reference_systems_view();
 
 
 --

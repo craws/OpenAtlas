@@ -4,13 +4,7 @@ from flask import g
 
 
 def get_classes() -> list[dict[str, Any]]:
-    g.cursor.execute(
-        """
-        SELECT c.code, c.name, comment, COUNT(e.id) AS count
-        FROM model.cidoc_class c
-        LEFT JOIN model.entity e ON c.code = e.cidoc_class_code
-        GROUP BY (c.code, c.name, c.comment);
-        """)
+    g.cursor.execute("SELECT * FROM model.cidoc_classes;" )
     return list(g.cursor)
 
 
