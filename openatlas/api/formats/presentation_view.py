@@ -18,9 +18,10 @@ def get_presentation_types(
         entity: Entity,
         links: list[Link]) -> list[dict[str, Any]]:
     types = []
-    if entity.class_.view == 'place':
-        entity.types.update(get_location_link(links).range.types)
-    for type_ in entity.types:
+    location_types = {}
+    if entity.class_.view in ['place', 'artifact']:
+        location_types = get_location_link(links).range.types
+    for type_ in entity.types | location_types:
         type_dict = {
             'id': type_.id,
             'title': type_.name,
@@ -65,9 +66,51 @@ def get_presentation_files(links_inverse: list[Link]) -> list[dict[str, str]]:
 
 
 def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
+    if entity.class_.view in ['place', 'artifact']:
+        entity.location = entity.get_linked_entity_safe('P53', types=True)
 
-    links = Entity.get_links_of_entities(entity.id)
-    links_inverse= Entity.get_links_of_entities(entity.id, inverse=True)
+    links = Entity.get_links_of_entities([entity.id, entity.location.id])
+    links_inverse = Entity.get_links_of_entities(
+        [entity.id, entity.location.id], inverse=True)
+    event_ids = [
+        l.domain.id for l in links_inverse if l.domain.class_.view == 'event']
+    event_links = Entity.get_links_of_entities(
+        event_ids,
+        ['P7','P11', 'P14','P22','P23', 'P24', 'P25', 'P26', 'P27', 'P31', 'P108'])
+
+    excluded = [
+        'file',
+        'type',
+        'appellation',
+        'object_location', # Maybe not exclude, but if it comes, change it to place
+        'reference_system',
+        'administrative_unit']
+
+    related_entities = []
+    exists: set[int] = set()
+    for l in links + event_links:
+        if l.range.class_.name in excluded or l.range.id in exists:
+            continue
+        related_entities.append(l.range)
+    for l in links_inverse:
+        if l.domain.class_.name in excluded or l.domain.id in exists:
+            continue
+        related_entities.append(l.domain)
+
+    relations = defaultdict(list)
+    for rel_entity in related_entities:
+        relations[entity.class_.name].append({
+            "id": rel_entity.id,
+            "systemClass": rel_entity.class_.name,
+            "title": rel_entity.name,
+            "description": rel_entity.description,
+            "aliases": list(rel_entity.aliases.values()),
+            "geometries": get_geometric_collection(rel_entity, links, parser),
+            "when": get_lp_time(rel_entity),
+            "standardType": {
+                'id': rel_entity.standard_type.id,
+                'title': rel_entity.standard_type.name} if
+            rel_entity.standard_type else {}})
 
     data = {
         "id": entity.id,
@@ -80,38 +123,6 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         "types": get_presentation_types(entity, links),
         "externalReferenceSystems": get_reference_systems(links_inverse),
         "files": get_presentation_files(links_inverse)}
-    relations = defaultdict(list)
-    excluded=  ['type', 'object_location', 'file', 'appellation', 'reference_system']
-    for l in links:
-        if l.range.class_.name in excluded:
-            continue
-        relations[l.range.class_.name].append({
-        "id": l.range.id,
-        "systemClass": l.range.class_.name,
-        "title": l.range.name,
-        "description": l.range.description,
-        "aliases": list(l.range.aliases.values()),
-        "geometries": get_geometric_collection(l.range, links, parser),
-        "when": get_lp_time(l.range),
-       "standardType": {
-           'id': l.range.standard_type.id,
-           'title': l.range.standard_type.name},
-            } if l.range.standard_type else {})
-    for l in links_inverse:
-        if l.range.class_.name in excluded:
-            continue
-        relations[l.domain.class_.name].append({
-        "id": l.domain.id,
-        "systemClass": l.domain.class_.name,
-        "title": l.domain.name,
-        "description": l.domain.description,
-        "aliases": list(l.domain.aliases.values()),
-        "geometries": get_geometric_collection(l.domain, links, parser),
-        "when": get_lp_time(l.domain),
-        "standardType": {
-          'id': l.domain.standard_type.id ,
-          'title': l.domain.standard_type.name},
-            }if l.domain.standard_type else {})
     data.update({'relations': relations})
 
     return data
