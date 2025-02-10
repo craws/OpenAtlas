@@ -74,9 +74,11 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         [entity.id, entity.location.id], inverse=True)
     event_ids = [
         l.domain.id for l in links_inverse if l.domain.class_.view == 'event']
-    event_links = Entity.get_links_of_entities(
-        event_ids,
-        ['P7','P11', 'P14','P22','P23', 'P24', 'P25', 'P26', 'P27', 'P31', 'P108'])
+    event_links = []
+    if event_ids:
+        event_links = Entity.get_links_of_entities(
+            event_ids,
+            ['P7','P11', 'P14','P22','P23', 'P24', 'P25', 'P26', 'P27', 'P31', 'P108'])
 
     excluded = [
         'file',
