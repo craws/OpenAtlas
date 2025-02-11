@@ -57,14 +57,12 @@ class Endpoint:
         e_list = []
         if total:
             e_list = list(itertools.islice(total, 0, None, self.parser.limit))
-        # Creating index
         index = \
             [{'page': i + 1, 'startId': id_} for i, id_ in enumerate(e_list)]
         if self.parser.page:
             self.parser.first = self.parser.get_by_page(index)
-        # Get which entity should be displayed (first or last)
         if self.parser.last or self.parser.first:
-            total = self.parser.get_start_entity(total)
+            total = self.parser.set_start_entity(total)
         # Finding position in list of first entity
         entity_list_index = 0
         for index_, entity in enumerate(self.entities):
@@ -75,9 +73,8 @@ class Endpoint:
             'count': count, 'index': index, 'entity_index': entity_list_index}
 
     def reduce_entities_to_limit(self) -> None:
-        start_index = self.pagination['entity_index']
-        end_index = start_index + int(self.parser.limit)
-        self.entities = self.entities[start_index:end_index]
+        start = self.pagination['entity_index']
+        self.entities = self.entities[start:start + int(self.parser.limit)]
 
     def resolve_entities(self) -> Response | dict[str, Any]:
         if self.parser.type_id:
@@ -93,9 +90,9 @@ class Endpoint:
         self.reduce_entities_to_limit()
         self.get_links_for_entities()
         if self.parser.export == 'csv':
-            return self.export_entities_csv()
+            return self.export_csv_entities()
         if self.parser.export == 'csvNetwork':
-            return self.export_csv_for_network_analysis()
+            return self.export_csv_network()
         self.get_entities_formatted()
         if self.parser.format in app.config['RDF_FORMATS']:  # pragma: no cover
             return Response(
@@ -127,7 +124,7 @@ class Endpoint:
                 result.append(entity)
         return result
 
-    def export_entities_csv(self) -> Response:
+    def export_csv_entities(self) -> Response:
         frames = [
             build_dataframe_with_relations(e)
             for e in self.entities_with_links.values()]
@@ -136,7 +133,7 @@ class Endpoint:
             mimetype='text/csv',
             headers={'Content-Disposition': 'attachment;filename=result.csv'})
 
-    def export_csv_for_network_analysis(self) -> Response:
+    def export_csv_network(self) -> Response:
         entities = []
         links = []
         for items in self.entities_with_links.values():
