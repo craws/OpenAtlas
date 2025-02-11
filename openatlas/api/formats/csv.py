@@ -11,15 +11,6 @@ from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 
 
-def build_dataframe_with_relations(entity: dict[str, Any]) -> dict[str, Any]:
-    data = build_dataframe(entity['entity'])
-    for key, value in get_csv_links(entity).items():
-        data[key] = ' | '.join(list(map(str, value)))
-    for key, value in get_csv_types(entity).items():
-        data[key] = ' | '.join(list(map(str, value)))
-    return data
-
-
 def build_dataframe(entity: Entity) -> dict[str, Any]:
     geom = get_csv_geom_entry(entity)
     return {
