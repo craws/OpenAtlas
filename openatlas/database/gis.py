@@ -47,6 +47,31 @@ def get_by_ids(ids: list[int]) -> defaultdict[int, list[dict[str, Any]]]:
     return locations
 
 
+def get_by_place_ids(
+        ids: list[int]) -> defaultdict[int, list[dict[str, Any]]]:
+    g.cursor.execute(
+        """
+        SELECT
+            g.id,
+			l.domain_id as entity_id,
+            g.entity_id as location_id,
+            g.name,
+            g.description,
+            g.type,
+            public.ST_AsGeoJSON(geom_point) AS point,
+            public.ST_AsGeoJSON(geom_linestring) AS linestring,
+            public.ST_AsGeoJSON(geom_polygon) AS polygon
+		FROM model.link l
+        JOIN model.gis g ON l.range_id = g.entity_id
+		WHERE l.property_code = 'P53' AND l.domain_id IN %(ids)s;
+        """,
+        {'ids': tuple(ids)})
+    locations = defaultdict(list)
+    for row in list(g.cursor):
+        locations[row['entity_id']].append(get_geometry_dict(row))
+    return locations
+
+
 def get_geometry_dict(row: dict[str, Any]) -> dict[str, Any]:
     if row['point']:
         geometry = ast.literal_eval(row['point'])

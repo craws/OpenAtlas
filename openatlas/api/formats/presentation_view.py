@@ -6,12 +6,14 @@ from flask import g, url_for
 
 from openatlas.api.endpoints.parser import Parser
 from openatlas.api.formats.linked_places import get_lp_time
-from openatlas.api.resources.util import get_geometric_collection, \
+from openatlas.api.resources.util import get_geojson_geometries, \
+    get_geometric_collection, \
     get_iiif_manifest_and_path, \
     get_license_name, get_location_link, \
     get_reference_systems, get_value_for_types
 from openatlas.display.util import get_file_path
 from openatlas.models.entity import Entity, Link
+from openatlas.models.gis import Gis
 
 
 def get_presentation_types(
@@ -67,7 +69,7 @@ def get_presentation_files(links_inverse: list[Link]) -> list[dict[str, str]]:
 
 def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
     if entity.class_.view in ['place', 'artifact']:
-        entity.location = entity.get_linked_entity_safe('P53', types=True)
+        entity.location = entity.get_linked_entity_safe('P53')
 
     links = Entity.get_links_of_entities([entity.id, entity.location.id])
     links_inverse = Entity.get_links_of_entities(
@@ -84,30 +86,38 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         'file',
         'type',
         'appellation',
-        'object_location', # Maybe not exclude, but if it comes, change it to place
+        'object_location',
         'reference_system',
+        'external_reference',
         'administrative_unit']
 
     related_entities = []
     exists: set[int] = set()
+    geometric_entities = []
     for l in links + event_links:
         if l.range.class_.name in excluded or l.range.id in exists:
             continue
+        if l.range.class_.view in ['place', 'artifact']:
+            geometric_entities.append(l.range.id)
         related_entities.append(l.range)
     for l in links_inverse:
         if l.domain.class_.name in excluded or l.domain.id in exists:
             continue
+        if l.domain.class_.view in ['place', 'artifact']:
+            geometric_entities.append(l.domain.id)
         related_entities.append(l.domain)
+
+    geoms = Gis.get_by_place_ids(geometric_entities)
 
     relations = defaultdict(list)
     for rel_entity in related_entities:
-        relations[entity.class_.name].append({
+        relations[rel_entity.class_.name].append({
             "id": rel_entity.id,
             "systemClass": rel_entity.class_.name,
             "title": rel_entity.name,
             "description": rel_entity.description,
             "aliases": list(rel_entity.aliases.values()),
-            "geometries": get_geometric_collection(rel_entity, links, parser),
+            "geometries": get_geojson_geometries(geoms[rel_entity.id]),
             "when": get_lp_time(rel_entity),
             "standardType": {
                 'id': rel_entity.standard_type.id,
