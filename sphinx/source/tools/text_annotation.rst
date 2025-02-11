@@ -24,12 +24,8 @@ After that the text annotations is also visible in the source detail view:
 * Links to other entities are displayed
 * With mouse over you can read the comments
 
-Limitations
------------
-This is still considered an experimental feature and will be tested and
-improved. Feedback about it is welcome.
-
-**Current limitations**
+Current Limitations
+-------------------
 
 * Only entities that are already linked with the source can be chosen for
   annotation

@@ -1,8 +1,7 @@
 import importlib
 
 import bcrypt
-from flask import flash, g, render_template, session, \
-    url_for
+from flask import flash, g, render_template, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user, login_required
 from flask_wtf import FlaskForm
@@ -18,7 +17,7 @@ from openatlas.display.util import button, display_info
 from openatlas.display.util2 import manual, uc_first
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField, generate_password_field
-from openatlas.forms.setting import DisplayForm, ModulesForm
+from openatlas.forms.setting import DisplayForm, FrontendForm, ModulesForm
 from openatlas.forms.util import get_form_settings, set_form_settings
 
 
@@ -73,17 +72,23 @@ def profile_index() -> str:
         'display': Tab(
             'display',
             display_info(get_form_settings(DisplayForm(), True)),
+            buttons=[manual('tools/profile')]),
+        'frontend': Tab(
+            'presentation_site',
+            display_info(get_form_settings(FrontendForm(), True)),
             buttons=[manual('tools/profile')])}
     if not app.config['DEMO_MODE']:
         tabs['profile'].buttons += [
             button(_('edit'), url_for('profile_settings', category='profile')),
             button(_('change password'), url_for('profile_password'))]
         tabs['modules'].buttons.append(
-            button(
-                _('edit'),
-                url_for('profile_settings', category='modules')))
+            button(_('edit'), url_for('profile_settings', category='modules')))
         tabs['display'].buttons.append(
             button(_('edit'), url_for('profile_settings', category='display')))
+        tabs['frontend'].buttons.append(
+            button(
+                _('edit'),
+                url_for('profile_settings', category='frontend')))
     return render_template(
         'tabs.html',
         tabs=tabs,
@@ -97,6 +102,7 @@ def profile_settings(category: str) -> str | Response:
     form = getattr(
         importlib.import_module('openatlas.forms.setting'),
         f"{uc_first(category)}Form")()
+    tab = 'presentation-site' if category == 'frontend' else category
     if form.validate_on_submit():
         settings = {}
         for field in form:
@@ -122,14 +128,14 @@ def profile_settings(category: str) -> str | Response:
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        return redirect(f"{url_for('profile_index')}#tab-{category}")
+        return redirect(f"{url_for('profile_index')}#tab-{tab}")
     set_form_settings(form, True)
     return render_template(
         'content.html',
         content=display_form(form, manual_page='profile'),
         title=_('profile'),
         crumbs=[
-            [_('profile'), f"{url_for('profile_index')}#tab-{category}"],
+            [_('profile'), f"{url_for('profile_index')}#tab-{tab}"],
             _(category)])
 
 

@@ -87,15 +87,17 @@ class BaseDisplay:
 
     def add_info_tab_content(self) -> None:
         self.add_data()
+        resolver_url = g.settings['frontend_resolver_url']
         if hasattr(current_user, 'settings'):
             self.data |= get_system_data(self.entity)
+            resolver_url = current_user.settings['frontend_resolver_url']
         self.tabs['info'].buttons = self.buttons
         frontend_link = None
-        if url := g.settings['frontend_resolver_url']:
+        if resolver_url:
             frontend_link = link(
                 '<i class="fas fa-eye"></i> ' +
                 uc_first(_('presentation site')),
-                url + str(self.entity.id),
+                resolver_url + str(self.entity.id),
                 external=True)
         self.tabs['info'].content = render_template(
             'entity/view.html',

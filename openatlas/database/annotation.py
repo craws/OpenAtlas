@@ -35,22 +35,22 @@ def get_annotation_image_by_id(id_: int) -> dict[str, Any]:
     return g.cursor.fetchone()
 
 
-def get_annotation_image_by_file(image_id: int) -> list[dict[str, Any]]:
+def get_annotation_image_by_file_id(id_: int) -> list[dict[str, Any]]:
     g.cursor.execute(
-        ANNOTATION_IMAGE_SELECT + ' WHERE image_id =  %(image_id)s;',
-        {'image_id': image_id})
+        ANNOTATION_IMAGE_SELECT + ' WHERE image_id =  %(id)s;',
+        {'id': id_})
     return list(g.cursor)
 
 
-def get_annotation_text_by_source(source_id: int) -> list[dict[str, Any]]:
+def get_annotation_text_by_source_id(id_: int) -> list[dict[str, Any]]:
     g.cursor.execute(
         ANNOTATION_TEXT_SELECT +
         """
-        WHERE source_id = %(source_id)s
+        WHERE source_id = %(id)s
             AND NOT (entity_id IS NULL AND (text IS NULL OR text = ''))
         ORDER BY link_start;
         """,
-        {'source_id': source_id})
+        {'id': id_})
     return list(g.cursor)
 
 
