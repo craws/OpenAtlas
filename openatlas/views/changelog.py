@@ -18,9 +18,12 @@ versions = {
     '8.10.0': ['TBA', {
         'feature': {
             '2417': 'Make count from tabs more visible',
-            '2415': 'Manual: How to report an issue on redmine',
-            '2444': 'Refactor and minor improvements'}
-    }],
+            '2430': 'Override presentation site resolver URL',
+            '1233': 'API: External Authentication',
+            '2415': 'Manual: How to report an issue',
+            '2444': 'Refactor and minor improvements'},
+        'fix': {
+            '2468': "Some entities created in place tabs don't get linked"}}],
     '8.9.0': ['2025-01-01', {
         'feature': {
             '2079': 'Text annotation',
