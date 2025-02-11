@@ -125,6 +125,8 @@ class Parser:
                     found = False
                     break
                 found = True
+            if found:
+                return True
         return found
 
     def get_properties_for_links(self) -> list[str]:

@@ -88,7 +88,6 @@ class Endpoint:
         self.remove_duplicates()
         if self.parser.count == 'true':
             return jsonify(len(self.entities))
-
         self.sort_entities()
         self.get_pagination()
         self.reduce_entities_to_limit()
@@ -98,12 +97,10 @@ class Endpoint:
         if self.parser.export == 'csvNetwork':
             return self.export_csv_for_network_analysis()
         self.get_entities_formatted()
-
         if self.parser.format in app.config['RDF_FORMATS']:  # pragma: no cover
             return Response(
                 self.parser.rdf_output(self.formated_entities),
                 mimetype=app.config['RDF_FORMATS'][self.parser.format])
-
         result = self.get_json_output()
         if self.parser.download == 'true':
             return download(result, self.get_entities_template(result))
