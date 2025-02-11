@@ -43,10 +43,10 @@ def replace_empty_list_values_in_dict_with_none(
 
 def get_linked_entities_api(id_: int | list[int]) -> list[Entity]:
     domain = [link_.range for link_ in Entity.get_links_of_entities(id_)]
-    range_links = Entity.get_links_of_entities(id_, inverse=True)
-    range_ = [link_.domain for link_ in range_links]
-    entity = range_links[0].range
-    return [entity, *range_, *domain]
+    range_ = [
+        link_.domain for link_ in
+        Entity.get_links_of_entities(id_, inverse=True)]
+    return [*range_, *domain]
 
 
 def get_linked_entities_id_api(id_: int) -> list[Entity]:
