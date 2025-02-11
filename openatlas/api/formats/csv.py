@@ -11,13 +11,11 @@ from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 
 
-def build_dataframe_with_relations(
-        entity_dict: dict[str, Any]) -> dict[str, Any]:
-    entity = entity_dict['entity']
-    data = build_dataframe(entity)
-    for key, value in get_csv_links(entity_dict).items():
+def build_dataframe_with_relations(entity: dict[str, Any]) -> dict[str, Any]:
+    data = build_dataframe(entity['entity'])
+    for key, value in get_csv_links(entity).items():
         data[key] = ' | '.join(list(map(str, value)))
-    for key, value in get_csv_types(entity_dict).items():
+    for key, value in get_csv_types(entity).items():
         data[key] = ' | '.join(list(map(str, value)))
     return data
 
