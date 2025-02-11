@@ -125,6 +125,8 @@ class Parser:
                     found = False
                     break
                 found = True
+            if found:
+                return True
         return found
 
     def get_properties_for_links(self) -> list[str]:
@@ -157,14 +159,16 @@ class Parser:
         return \
             [entry['startId'] for entry in index if entry['page'] == page][0]
 
-    def get_start_entity(self, total: list[int]) -> list[Any]:
+    def set_start_entity(self, total: list[int]) -> list[Any]:
         if self.first and int(self.first) in total:
-            return list(itertools.islice(
-                total,
-                total.index(int(self.first)),
-                None))
+            return list(
+                itertools.islice(
+                    total,
+                    total.index(int(self.first)),
+                    None))
         if self.last and int(self.last) in total:
-            if not (out := list(itertools.islice(
+            if not (
+                out := list(itertools.islice(
                     total,
                     total.index(int(self.last)) + 1,
                     None))):

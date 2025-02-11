@@ -470,7 +470,7 @@ class Api(ApiTestCase):
                 "entityAliases": [{
                     "operator": "greaterThan", "values": ["Sûza"]}],
                 "typeID": [{"operator": "equal", "values": [1121212]}]}],
-            1: [{
+            2: [{
                 "valueTypeID": [{
                     "operator": "equal",
                     "values": [(height.id, 23.0)]}]}, {
@@ -524,7 +524,7 @@ class Api(ApiTestCase):
                     "operator": "greaterThanEqual",
                     "values": [(height.id, 23.0), (weight_.id, 999.0)],
                     "logicalOperator": "and"}]}],
-            2: [{
+            4: [{
                 "entityCidocClass": [{
                     "operator": "equal",
                     "values": ["E21"],
@@ -543,7 +543,8 @@ class Api(ApiTestCase):
                 "typeID": [{
                     "operator": "equal",
                     "values": [boundary_mark.id, height.id]}]}],
-            3: [{
+            5: [{"entityName": [{"operator": "like", "values": ["Fr"]}]}],
+            6: [{
                 "typeIDWithSubs": [{
                     "operator": "equal",
                     "values": [
@@ -552,7 +553,6 @@ class Api(ApiTestCase):
                 "entityDescription": [{
                     "operator": "like",
                     "values": ["FrOdO", "sam"]}]}],
-            5: [{"entityName": [{"operator": "like", "values": ["Fr"]}]}],
             9: [{
                 "relationToID": [{
                     "operator": "equal", "values": [place.id]}]}],
@@ -561,7 +561,7 @@ class Api(ApiTestCase):
                     "operator": "notEqual",
                     "values": [boundary_mark.id],
                     "logicalOperator": "and"}]}],
-            162: [{
+            163: [{
                 "typeName": [{
                     "operator": "notEqual",
                     "values": ["Boundary Mark", "Height"],
