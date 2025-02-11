@@ -54,3 +54,14 @@ ARCHE = {'id': None, 'url': None}
 
 # Used to connect to password protected Vocabs systems
 VOCABS_PASS = ''
+
+API_PRESENTATION_EXCLUDE_RELATION = [
+    'bone',
+    'file',
+    'type',
+    'appellation',
+    'object_location',
+    'type_tools'
+    'reference_system',
+    'external_reference',
+    'administrative_unit']

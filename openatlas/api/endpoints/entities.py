@@ -50,10 +50,11 @@ class GetEntitiesLinkedToEntity(Resource):
 class GetEntityPresentationView(Resource):
     @staticmethod
     def get(id_: int) -> tuple[Resource, int] | Response | dict[str, Any]:
-        result = get_presentation_view(
-            ApiEntity.get_by_id(id_, types=True, aliases=True),
-            entity_.parse_args())
-        return marshal(result, presentation_template(result))
+        return marshal(
+            get_presentation_view(
+                ApiEntity.get_by_id(id_, types=True, aliases=True),
+                entity_.parse_args()),
+            presentation_template())
 
 
 class GetLinkedEntitiesByPropertyRecursive(Resource):
