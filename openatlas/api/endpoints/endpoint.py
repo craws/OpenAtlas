@@ -11,14 +11,14 @@ from flask_restful import marshal
 from openatlas import app
 from openatlas.api.endpoints.parser import Parser
 from openatlas.api.formats.csv import (
-    build_dataframe_with_relations, build_dataframe, build_link_dataframe)
+    build_dataframe, build_dataframe_with_relations, build_link_dataframe)
 from openatlas.api.formats.loud import get_loud_entities
 from openatlas.api.resources.resolve_endpoints import (
     download, parse_loud_context)
 from openatlas.api.resources.templates import (
     geojson_collection_template, geojson_pagination, linked_place_pagination,
     linked_places_template, loud_pagination, loud_template)
-from openatlas.api.resources.util import  get_location_link
+from openatlas.api.resources.util import get_location_link
 from openatlas.models.entity import Entity, Link
 
 
@@ -162,7 +162,8 @@ class Endpoint:
                 link_frame = [build_link_dataframe(link_) for link_ in links]
                 file.write(
                     bytes(
-                    pd.DataFrame(data=link_frame).to_csv(), encoding='utf8'))
+                        pd.DataFrame(data=link_frame).to_csv(),
+                        encoding='utf8'))
         return Response(
             archive.getvalue(),
             mimetype='application/zip',
@@ -221,7 +222,7 @@ class Endpoint:
                     self.parser.get_linked_places_entity(item)
                     for item in self.entities_with_links.values()]
             case _ if self.parser.format \
-                   in app.config['RDF_FORMATS']:  # pragma: no cover
+                    in app.config['RDF_FORMATS']:  # pragma: no cover
                 parsed_context = parse_loud_context()
                 entities = [
                     get_loud_entities(item, parsed_context)
