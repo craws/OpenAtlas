@@ -11,9 +11,7 @@ from flask_restful import marshal
 from openatlas import app
 from openatlas.api.endpoints.parser import Parser
 from openatlas.api.formats.csv import (
-    build_dataframe,
-    build_dataframe_with_relations,
-    build_link_dataframe, get_csv_links, get_csv_types)
+    build_dataframe, build_link_dataframe, get_csv_links, get_csv_types)
 from openatlas.api.formats.loud import get_loud_entities
 from openatlas.api.resources.resolve_endpoints import (
     download, parse_loud_context)

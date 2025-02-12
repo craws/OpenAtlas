@@ -220,7 +220,7 @@ def presentation_template() -> dict[str, Any]:
         'relationTo': fields.Integer,
         'type': fields.String,
         'description': fields.String,
-        'when': fields.List(fields.Nested(timespans))}
+        'when': fields.Nested(timespans)}
     relations = {
         'id': fields.Integer,
         'systemClass': fields.String,
@@ -228,7 +228,7 @@ def presentation_template() -> dict[str, Any]:
         'description': fields.String,
         'aliases': fields.List(fields.String),
         'geometries': fields.Raw,
-        'when': fields.List(fields.Nested(timespans)),
+        'when': fields.Nested(timespans),
         'standardType': fields.Nested({
             'id': fields.Integer,
             'title': fields.String}),
@@ -247,7 +247,7 @@ def presentation_template() -> dict[str, Any]:
         'description': fields.String,
         'aliases': fields.List(fields.String),
         'geometries': fields.Raw,
-        'when': fields.List(fields.Nested(timespans)),
+        'when': fields.Nested(timespans),
         'types': fields.List(fields.Nested(types)),
         'externalReferenceSystems': fields.List(
             fields.Nested(external_references)),

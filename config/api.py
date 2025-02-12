@@ -59,9 +59,8 @@ API_PRESENTATION_EXCLUDE_RELATION = [
     'bone',
     'file',
     'type',
+    'type_tools'
     'appellation',
     'object_location',
-    'type_tools'
     'reference_system',
-    'external_reference',
     'administrative_unit']
