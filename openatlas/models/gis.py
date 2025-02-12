@@ -29,7 +29,8 @@ class Gis:
         return db.get_by_ids(ids)
 
     @staticmethod
-    def get_by_place_ids(ids: list[int]) -> defaultdict[int, list[dict[str, Any]]]:
+    def get_by_place_ids(
+            ids: list[int]) -> defaultdict[int, list[dict[str, Any]]]:
         return db.get_by_place_ids(ids)
 
     @staticmethod

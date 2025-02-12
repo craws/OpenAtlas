@@ -81,7 +81,7 @@ def get_relation_types_dict(
 
 
 def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
-    ids = [entity.id ]
+    ids = [entity.id]
     if entity.class_.view in ['place', 'artifact']:
         entity.location = entity.get_linked_entity_safe('P53')
         ids.append(entity.location.id)
@@ -118,7 +118,7 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         related_entities.append(l.domain)
         relation_types[l.domain.id].append(get_relation_types_dict(l))
 
-    geoms = {}
+    geoms: Any = {}
     if geometric_entities:
         geoms = Gis.get_by_place_ids(geometric_entities)
 
@@ -126,7 +126,7 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
     for rel_entity in related_entities:
         standard_type = {}
         if rel_entity.standard_type:
-            standard_type =  {
+            standard_type = {
                 'id': rel_entity.standard_type.id,
                 'title': rel_entity.standard_type.name}
         geometries = {}

@@ -233,7 +233,7 @@ def presentation_template() -> dict[str, Any]:
             'id': fields.Integer,
             'title': fields.String}),
         'relationTypes': fields.List(fields.Nested(relation_types))}
-    def get_relations():
+    def get_relations() -> fields:
         dict_ = {}
         for name in g.classes:
             if name in app.config['API_PRESENTATION_EXCLUDE_RELATION']:
