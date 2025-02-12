@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.5c",
+    "version": "0.4.6",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -123,6 +123,32 @@
                       "$ref": "#/components/schemas/GeoJSONModel"
                     }
                   ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
+    "/entity_presentation_view/{entityId}": {
+      "get": {
+        "tags": ["Entity Endpoint"],
+        "description": "Retrieves an Entity with its linked data for presentation sites",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/entityId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PresentationViewModel"
                 }
               }
             }
@@ -4630,7 +4656,491 @@
             }
           }
         }
+      },
+      "PresentationViewModel": {
+        "type": "object",
+        "required": [
+          "id",
+          "systemClass",
+          "title",
+          "description",
+          "geometries",
+          "when",
+          "types",
+          "externalReferenceSystems",
+          "files",
+          "relations"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "systemClass": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "geometries": {
+            "type": "object",
+            "required": [
+              "type",
+              "coordinates",
+              "title",
+              "description",
+              "shapeType"
+            ],
+            "properties": {
+              "type": {
+                "type": "string"
+              },
+              "coordinates": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              },
+              "title": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "shapeType": {
+                "type": "string"
+              }
+            }
+          },
+          "when": {
+            "$ref": "#/components/schemas/TimeRangeModel"
+          },
+          "types": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EntityTypeModel"
+            }
+          },
+          "externalReferenceSystems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExternalReferenceModel"
+            }
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "title",
+                "license",
+                "mimetype",
+                "url"
+              ],
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "license": {
+                  "type": "string"
+                },
+                "creator": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "licenseHolder": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "publicShareable": {
+                  "type": "boolean"
+                },
+                "mimetype": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "relations": {
+            "type": "object",
+            "properties": {
+              "acquisition": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RelatedEntityModel"
+                }
+              },
+              "activity": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RelatedEntityModel"
+                }
+              },
+              "actor_function": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RelatedEntityModel"
+                }
+              },
+              "actor_relation": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RelatedEntityModel"
+                }
+              },
+              "appellation": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RelatedEntityModel"
+                }
+              },
+              "artifact": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RelatedEntityModel"
+                }
+              },
+              "bibliography": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RelatedEntityModel"
+                }
+              },
+              "creation": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RelatedEntityModel"
+                }
+              },
+              "edition": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RelatedEntityModel"
+                }
+              },
+              "event": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RelatedEntityModel"
+                }
+              },
+              "external_reference": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RelatedEntityModel"
+                }
+              },
+              "feature": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RelatedEntityModel"
+                }
+              },
+              "file": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RelatedEntityModel"
+                }
+              },
+              "group": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RelatedEntityModel"
+                }
+              },
+              "human_remains": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RelatedEntityModel"
+                }
+              },
+              "involvement": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RelatedEntityModel"
+                }
+              },
+              "modification": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RelatedEntityModel"
+                }
+              },
+              "move": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RelatedEntityModel"
+                }
+              },
+              "person": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RelatedEntityModel"
+                }
+              },
+              "place": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RelatedEntityModel"
+                }
+              },
+              "production": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RelatedEntityModel"
+                }
+              },
+              "source": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RelatedEntityModel"
+                }
+              },
+              "source_translation": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RelatedEntityModel"
+                }
+              },
+              "stratigraphic_unit": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RelatedEntityModel"
+                }
+              }
+            }
+          }
+        }
+      },
+      "TimeRangeModel": {
+        "type": "object",
+        "required": [
+          "start",
+          "end"
+        ],
+        "properties": {
+          "start": {
+            "type": "object",
+            "required": [
+              "earliest",
+              "latest",
+              "comment"
+            ],
+            "properties": {
+              "earliest": {
+                "type": "string",
+                "format": "nullable"
+              },
+              "latest": {
+                "type": "string",
+                "format": "nullable"
+              },
+              "comment": {
+                "type": "string",
+                "format": "nullable"
+              }
+            }
+          },
+          "end": {
+            "type": "object",
+            "required": [
+              "earliest",
+              "latest",
+              "comment"
+            ],
+            "properties": {
+              "earliest": {
+                "type": "string",
+                "format": "nullable"
+              },
+              "latest": {
+                "type": "string",
+                "format": "nullable"
+              },
+              "comment": {
+                "type": "string",
+                "format": "nullable"
+              }
+            }
+          }
+        }
+      },
+      "EntityTypeModel": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "isStandard"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "descriptions": {
+            "type": "string",
+            "nullable": true
+          },
+          "isStandard": {
+            "type": "boolean"
+          },
+          "typeHierarchy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TypeHierarchyEntryModel"
+            }
+          }
+        }
+      },
+      "TypeHierarchyEntryModel": {
+        "type": "object",
+        "required": [
+          "label",
+          "identifier"
+        ],
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "descriptions": {
+            "type": "string",
+            "nullable": true
+          },
+          "identifier": {
+            "type": "string"
+          }
+        }
+      },
+      "ExternalReferenceModel": {
+        "type": "object",
+        "required": [
+          "type",
+          "identifier",
+          "referenceSystem",
+          "resolverURL",
+          "referenceURL",
+          "id"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "identifier": {
+            "type": "string"
+          },
+          "referenceSystem": {
+            "type": "string"
+          },
+          "resolverURL": {
+            "type": "string"
+          },
+          "referenceURL": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          }
+        }
+      },
+      "RelatedEntityModel": {
+        "type": "object",
+        "required": [
+          "id",
+          "systemClass",
+          "title",
+          "description",
+          "geometries",
+          "when"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "systemClass": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "geometries": {
+            "type": "object",
+            "nullable": true
+          },
+          "when": {
+            "$ref": "#/components/schemas/TimeRangeModel"
+          },
+          "standardType": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          },
+          "relationTypesModel": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationTypeModel"
+            }
+          }
+        }
+      },
+      "RelationTypeModel": {
+        "type": "object",
+        "required": [
+          "property",
+          "relationTo"
+        ],
+        "properties": {
+          "property": {
+            "type": "string"
+          },
+          "relationTo": {
+            "type": "integer"
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "when": {
+            "$ref": "#/components/schemas/TimeRangeModel"
+          }
+        }
       }
     }
   }
 }
+

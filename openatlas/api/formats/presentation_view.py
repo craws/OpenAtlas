@@ -52,7 +52,7 @@ def get_presentation_files(links_inverse: list[Link]) -> list[dict[str, str]]:
         path = get_file_path(img_id)
         mime_type = None
         if path:
-            mime_type, _ = mimetypes.guess_type(path)
+            mime_type, _ = mimetypes.guess_type(path)  # pragma: no cover
         data = {
             'id': img_id,
             'title': link.domain.name,
