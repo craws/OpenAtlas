@@ -15,7 +15,7 @@ def get_by_id(id_: int) -> list[dict[str, Any]]:
             g.type,
             public.ST_AsGeoJSON(geom_point) AS point,
             public.ST_AsGeoJSON(geom_linestring) AS linestring,
-            public.ST_AsGeoJSON(geom_polygon) AS polygon
+            public.ST_AsGeoJSON(ST_ForcePolygonCCW(geom_polygon)) AS polygon
         FROM model.entity place
         JOIN model.gis g ON place.id = g.entity_id
         WHERE place.id = %(id_)s;
@@ -35,7 +35,7 @@ def get_by_ids(ids: list[int]) -> defaultdict[int, list[dict[str, Any]]]:
             g.type,
             public.ST_AsGeoJSON(geom_point) AS point,
             public.ST_AsGeoJSON(geom_linestring) AS linestring,
-            public.ST_AsGeoJSON(geom_polygon) AS polygon
+            public.ST_AsGeoJSON(ST_ForcePolygonCCW(geom_polygon)) AS polygon
         FROM model.entity place
         JOIN model.gis g ON place.id = g.entity_id
         WHERE place.id IN %(ids)s;
@@ -60,7 +60,7 @@ def get_by_place_ids(
             g.type,
             public.ST_AsGeoJSON(geom_point) AS point,
             public.ST_AsGeoJSON(geom_linestring) AS linestring,
-            public.ST_AsGeoJSON(geom_polygon) AS polygon
+            public.ST_AsGeoJSON(ST_ForcePolygonCCW(geom_polygon)) AS polygon
 		FROM model.link l
         JOIN model.gis g ON l.range_id = g.entity_id
 		WHERE l.property_code = 'P53' AND l.domain_id IN %(ids)s;
@@ -166,7 +166,7 @@ def get_wkt_by_id(id_: int) -> list[dict[str, Any]]:
             g.type,
             public.ST_AsText(geom_point) AS point,
             public.ST_AsText(geom_linestring) AS linestring,
-            public.ST_AsText(geom_polygon) AS polygon
+            public.ST_AsText(ST_ForcePolygonCCW(geom_polygon)) AS polygon
         FROM model.entity place
         JOIN model.gis g ON place.id = g.entity_id
         WHERE place.id = %(id_)s;
@@ -201,7 +201,7 @@ def get_all(extra_ids: list[int]) -> list[dict[str, Any]]:
             g.type,
             public.ST_AsGeoJSON(geom_point) AS point,
             public.ST_AsGeoJSON(geom_linestring) AS linestring,
-            public.ST_AsGeoJSON(geom_polygon) AS polygon,
+            public.ST_AsGeoJSON(ST_ForcePolygonCCW(geom_polygon)) AS polygon,
             CASE WHEN geom_polygon IS NULL THEN NULL ELSE
                 public.ST_AsGeoJSON(public.ST_PointOnSurface(geom_polygon))
                 END AS polygon_point,
