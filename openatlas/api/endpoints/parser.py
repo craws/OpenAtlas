@@ -71,6 +71,8 @@ class Parser:
         self.is_valid_url()
         if self.url and not self.url.endswith('/'):
             self.url += '/'
+        if self.centroid:
+            self.centroid = parser['centroid'] == 'true'
 
     def set_search_param(self) -> None:
         try:
