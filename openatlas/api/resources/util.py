@@ -141,9 +141,10 @@ def get_geometric_collection(
         entity: Entity,
         links: list[Link],
         parser: Any) -> Optional[dict[str, Any]]:
+    geometry = None
     match entity.class_.view:
         case 'place' | 'artifact':
-            return get_geoms_by_entity(
+            geometry = get_geoms_by_entity(
                 get_location_id(links),
                 parser.centroid)
         case 'actor':
@@ -159,7 +160,7 @@ def get_geometric_collection(
                             centroids.append(centroid_result)
                 if centroids:
                     geoms.extend(centroids)  # pragma: no cover
-            return {
+            geometry = {
                 'type': 'GeometryCollection',
                 'geometries': [geom for sublist in geoms for geom in sublist]}
         case 'event':
@@ -175,12 +176,12 @@ def get_geometric_collection(
                             centroids.append(centroid_result)
                 if centroids:
                     geoms.extend(centroids)
-            return {
+            geometry = {
                 'type': 'GeometryCollection',
                 'geometries': [geom for sublist in geoms for geom in sublist]}
         case _ if entity.class_.name == 'object_location':
-            return get_geoms_by_entity(entity.id, parser.centroid)
-    return None
+            geometry = get_geoms_by_entity(entity.id, parser.centroid)
+    return geometry
 
 
 def get_location_id(links: list[Link]) -> int:
@@ -197,8 +198,10 @@ def get_location_link(links: list[Link]) -> Link:
 
 def get_geoms_by_entity(
         location_id: int,
-        centroid: Optional[bool] = False) -> dict[str, Any]:
+        centroid: Optional[bool] = False) -> Optional[dict[str, Any]]:
     geoms = Gis.get_by_id(location_id)
+    if not geoms:
+        return None
     if centroid:
         if centroid_result := Gis.get_centroids_by_id(location_id):
             geoms.extend(centroid_result)
