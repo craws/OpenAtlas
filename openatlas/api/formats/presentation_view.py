@@ -6,7 +6,7 @@ from flask import g, url_for
 
 from openatlas import app
 from openatlas.api.endpoints.parser import Parser
-from openatlas.api.formats.linked_places import get_lp_time
+from openatlas.api.formats.linked_places import get_presentation_time
 from openatlas.api.resources.util import (
     get_crm_relation_x, get_geojson_geometries, get_geometric_collection,
     get_iiif_manifest_and_path, get_license_name, get_location_link,
@@ -71,14 +71,18 @@ def get_presentation_files(links_inverse: list[Link]) -> list[dict[str, str]]:
 
 
 def get_relation_types_dict(
-        link_: Link, inverse: bool = False) -> dict[str, Any]:
-    return {
+        link_: Link,
+        parser: Parser,
+        inverse: bool = False) -> dict[str, Any]:
+    relation_types = {
         'property': get_crm_relation_x(link_, inverse),
         'relationTo': link_.domain.id if inverse else link_.range.id,
         'type': to_camel_case(link_.type.name) if link_.type else None,
         'description': link_.description,
-        'when': get_lp_time(link_)}
-
+        'when': get_presentation_time(link_)}
+    if parser.remove_empty_values:
+        relation_types = {k: v for k, v in relation_types.items() if v}
+    return relation_types
 
 def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
     ids = [entity.id]
@@ -88,14 +92,18 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
 
     links = Entity.get_links_of_entities(ids)
     links_inverse = Entity.get_links_of_entities(ids, inverse=True)
-    event_ids = [
-        l.domain.id for l in links_inverse if l.domain.class_.view == 'event']
+    if entity.class_.view == 'event':
+        event_ids = [
+            l.range.id for l in links if l.domain.class_.view == 'event']
+    else:
+        event_ids = [
+            l.domain.id for l in links_inverse if l.domain.class_.view == 'event']
     event_links = []
     if event_ids:
         event_links = Entity.get_links_of_entities(
             event_ids,
             ['P7', 'P11', 'P14', 'P22', 'P23', 'P24', 'P25', 'P26', 'P27',
-             'P31', 'P108'])
+             'P31', 'P108', 'P134', 'P9'])
 
     excluded = app.config['API_PRESENTATION_EXCLUDE_RELATION']
 
@@ -109,14 +117,14 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         if l.range.class_.view in ['place', 'artifact']:
             geometric_entities.append(l.range.id)
         related_entities.append(l.range)
-        relation_types[l.range.id].append(get_relation_types_dict(l, True))
+        relation_types[l.range.id].append(get_relation_types_dict(l,parser, True))
     for l in links_inverse:
         if l.domain.class_.name in excluded or l.domain.id in exists:
             continue
         if l.domain.class_.view in ['place', 'artifact']:
             geometric_entities.append(l.domain.id)
         related_entities.append(l.domain)
-        relation_types[l.domain.id].append(get_relation_types_dict(l))
+        relation_types[l.domain.id].append(get_relation_types_dict(l, parser))
 
     geoms: Any = {}
     if geometric_entities:
@@ -132,16 +140,20 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         geometries = {}
         if geoms.get(rel_entity.id):
             geometries = get_geojson_geometries(geoms[rel_entity.id])
-        relations[rel_entity.class_.name].append({
+        relation_dict= {
             'id': rel_entity.id,
             'systemClass': rel_entity.class_.name,
             'title': rel_entity.name,
             'description': rel_entity.description,
             'aliases': list(rel_entity.aliases.values()),
             'geometries': geometries,
-            'when': get_lp_time(rel_entity),
+            'when': get_presentation_time(rel_entity),
             'standardType': standard_type,
-            'relationTypes': relation_types[rel_entity.id]})
+            'relationTypes': relation_types[rel_entity.id]}
+        if parser.remove_empty_values:
+            relation_dict = {k: v for k, v in relation_dict.items() if v}
+
+        relations[rel_entity.class_.name].append(relation_dict)
 
     data = {
         'id': entity.id,
@@ -150,7 +162,7 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         'description': entity.description,
         'aliases': list(entity.aliases.values()),
         'geometries': get_geometric_collection(entity, links, parser),
-        'when': get_lp_time(entity),
+        'when': get_presentation_time(entity),
         'types': get_presentation_types(entity, links),
         'externalReferenceSystems': get_reference_systems(links_inverse),
         'files': get_presentation_files(links_inverse),
