@@ -15,6 +15,7 @@ def index_changelog() -> str:
 
 # pylint: disable=too-many-lines
 versions = {
+    '8.11.0': ['TBA', {}],
     '8.10.0': ['2025-02-14', {
         'feature': {
             '2417': 'Make count from tabs more visible',
