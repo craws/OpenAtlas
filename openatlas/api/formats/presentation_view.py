@@ -1,14 +1,16 @@
+from __future__ import annotations
+
 import mimetypes
 from collections import defaultdict
-from typing import Any
+from typing import Any, Optional
 
 from flask import g, url_for
 
 from openatlas import app
 from openatlas.api.endpoints.parser import Parser
-from openatlas.api.formats.linked_places import get_presentation_time
 from openatlas.api.resources.util import (
-    get_crm_relation_x, get_geojson_geometries, get_geometric_collection,
+    date_to_str, get_crm_relation_x, get_geojson_geometries,
+    get_geometric_collection,
     get_iiif_manifest_and_path, get_license_name, get_location_link,
     get_reference_systems, get_value_for_types, to_camel_case)
 from openatlas.display.util import get_file_path
@@ -169,3 +171,20 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         'relations': relations}
 
     return data
+
+
+def get_presentation_time(entity: Entity | Link) -> Optional[dict[str, Any]]:
+    dates = {}
+    if entity.begin_from or entity.begin_to:
+        begin = {
+            'earliest': date_to_str(entity.begin_from),
+            'latest': date_to_str(entity.begin_to),
+            'comment': entity.begin_comment}
+        dates['start'] = {k: v for k, v in begin.items() if v}
+    if entity.end_from or entity.end_to:
+        end = {
+            'earliest': date_to_str(entity.end_from),
+            'latest': date_to_str(entity.end_to),
+            'comment': entity.end_comment}
+        dates['end'] = {k: v for k, v in end.items() if v}
+    return dates

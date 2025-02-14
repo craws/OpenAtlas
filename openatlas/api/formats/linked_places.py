@@ -110,15 +110,4 @@ def get_lp_time(entity: Entity | Link) -> Optional[dict[str, Any]]:
             'latest': date_to_str(entity.end_to),
             'comment': entity.end_comment}}
 
-def get_presentation_time(entity: Entity | Link) -> Optional[dict[str, Any]]:
-    if not entity.begin_from or entity.end_from:
-        return {}
-    return {
-        'start': {
-            'earliest': date_to_str(entity.begin_from),
-            'latest': date_to_str(entity.begin_to),
-            'comment': entity.begin_comment},
-        'end': {
-            'earliest': date_to_str(entity.end_from),
-            'latest': date_to_str(entity.end_to),
-            'comment': entity.end_comment}}
+
