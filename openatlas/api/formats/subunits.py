@@ -53,10 +53,12 @@ def get_geometries_thanados(
         if geom['type'] == 'GeometryCollection':
             geometries = []
             for item in geom['geometries']:
+                if not item:
+                    continue
                 item['coordinates'] = transform_geometries_for_xml(item)
                 geometries.append(item)
             geom['geometries'] = [{'geom': item} for item in geometries]
-        else:
+        else:  # pragma: no cover
             geom['coordinates'] = transform_geometries_for_xml(geom)
     return geom
 

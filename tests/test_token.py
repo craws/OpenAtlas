@@ -78,7 +78,7 @@ class TokenTests(TestBaseCase):
             for token_ in jwt_token_strings:
                 decoded = decode_token(token_)
                 rv = c.get(
-                    url_for('api_04.class_mapping', locale='de'),
+                    url_for('api_04.class_mapping'),
                     headers={'Authorization': f'Bearer {token_}'})
                 if decoded['sub'] in ['Alice', 'Inactive']:
                     assert b'Token has been revoked' in rv.data

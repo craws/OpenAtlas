@@ -125,8 +125,8 @@ class Endpoint:
         frames = []
         for e in self.entities_with_links.values():
             data = build_dataframe(e['entity'])
-            for k, v in (get_csv_links(e) | get_csv_types(e)).items():
-                data[k] = ' | '.join(list(map(str, v)))
+            for key, value in (get_csv_links(e) | get_csv_types(e)).items():
+                data[key] = ' | '.join(list(map(str, value)))
             frames.append(data)
         return Response(
             pd.DataFrame(data=frames).to_csv(),

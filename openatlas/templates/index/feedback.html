@@ -7,13 +7,14 @@
     <li>
       <p>
         {{ _('feedback redmine') }}:
-        {{ "https://redmine.openatlas.eu"|link("https://redmine.openatlas.eu/projects/uni", external=True)|safe }}
+        {{'examples/report_issue'|manual|safe}}
+        ({{ "https://redmine.openatlas.eu"|link("https://redmine.openatlas.eu/projects/uni", external=True)|safe }})
       </p>
     </li>
     {% if g.settings.mail_recipients_feedback[0] %}
       <li>
         <p>
-          {{ _('feedback mail') }}
+          {{ _('feedback mail')|uc_first }}
           <a href="mailto:{{ g.settings.mail_recipients_feedback[0] }}">{{ g.settings.mail_recipients_feedback[0] }}</a>
         </p>
       </li>

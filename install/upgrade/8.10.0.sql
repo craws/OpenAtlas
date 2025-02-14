@@ -2,12 +2,9 @@ BEGIN;
 
 -- Raise database version
 UPDATE web.settings SET value = '8.10.0' WHERE name = 'database_version';
--- Upgrade 8.9.x to 8.10.0
--- Be sure to backup the database and read the upgrade notes before executing.
 
-
-CREATE TABLE IF NOT EXISTS web.user_tokens
-(
+-- #1233: API: External Authentication
+CREATE TABLE IF NOT EXISTS web.user_tokens (
     id integer NOT NULL,
     user_id integer NOT NULL,
     creator_id integer NOT NULL,
