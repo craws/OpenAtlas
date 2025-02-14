@@ -47,7 +47,7 @@ def get_by_ids(ids: list[int]) -> defaultdict[int, list[dict[str, Any]]]:
     return locations
 
 
-def get_by_place_ids(
+def get_by_entity_ids(
         ids: list[int]) -> defaultdict[int, list[dict[str, Any]]]:
     g.cursor.execute(
         """
@@ -63,7 +63,9 @@ def get_by_place_ids(
             public.ST_AsGeoJSON(ST_ForcePolygonCCW(geom_polygon)) AS polygon
 		FROM model.link l
         JOIN model.gis g ON l.range_id = g.entity_id
-		WHERE l.property_code = 'P53' AND l.domain_id IN %(ids)s;
+		WHERE l.property_code in 
+		    ('P53', 'P74', 'OA8', 'OA9', 'P7', 'P26', 'P27') 
+		AND l.domain_id IN %(ids)s;
         """,
         {'ids': tuple(ids)})
     locations = defaultdict(list)

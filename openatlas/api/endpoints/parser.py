@@ -136,7 +136,7 @@ class Parser:
         if self.relation_type:
             codes = self.relation_type
             if 'geometry' in self.show:
-                codes.append('P53')
+                codes.extend(['P53', 'P74', 'OA8', 'OA9', 'P7', 'P26', 'P27'])
             if 'types' in self.show:
                 codes.append('P2')
             if any(i in ['depictions', 'links'] for i in self.show):
@@ -225,10 +225,8 @@ class Parser:
                 'names':
                     [{"alias": value} for value in entity.aliases.values()]
                     if entity.aliases and 'names' in self.show else None,
-                'geometry': get_geometric_collection(
-                    entity,
-                    links,
-                    self) if 'geometry' in self.show else None,
+                'geometry': entity_dict['geometry']
+                if 'geometry' in self.show else None,
                 'relations': get_lp_links(links, links_inverse, self)
                 if 'relations' in self.show else None})]}
 

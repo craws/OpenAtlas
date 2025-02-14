@@ -18,8 +18,10 @@ from openatlas.api.resources.resolve_endpoints import (
 from openatlas.api.resources.templates import (
     geojson_collection_template, geojson_pagination, linked_place_pagination,
     linked_places_template, loud_pagination, loud_template)
-from openatlas.api.resources.util import get_location_link
+from openatlas.api.resources.util import get_geojson_geometries, \
+    get_location_link
 from openatlas.models.entity import Entity, Link
+from openatlas.models.gis import Gis
 
 
 class Endpoint:
@@ -42,12 +44,19 @@ class Endpoint:
             self.entities_with_links[entity.id] = {
                 'entity': entity,
                 'links': [],
-                'links_inverse': []}
+                'links_inverse': [],
+                'geometry': {}}
         for link_ in self.link_parser_check():
             self.entities_with_links[link_.domain.id]['links'].append(link_)
         for link_ in self.link_parser_check(inverse=True):
             self.entities_with_links[
                 link_.range.id]['links_inverse'].append(link_)
+        for id_, geom in Gis.get_by_entities(self.entities).items():
+            self.entities_with_links[
+                id_]['geometry'] = get_geojson_geometries(geom)
+
+
+
 
     def get_pagination(self) -> None:
         total = [e.id for e in self.entities]
