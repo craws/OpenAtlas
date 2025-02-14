@@ -237,5 +237,5 @@ def revoke_all_tokens() -> str | Response:
 @login_required
 def authorize_all_tokens() -> str | Response:
     Token.authorize_all_tokens()
-    flash(_('all tokens authorize'), 'info')
+    flash(_('all tokens authorized'), 'info')
     return redirect(f"{url_for('api_token')}")
