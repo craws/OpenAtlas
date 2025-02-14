@@ -135,7 +135,7 @@
     },
     "/entity_presentation_view/{entityId}": {
       "get": {
-        "tags": ["Entity Endpoint"],
+        "tags": ["Proposal"],
         "description": "Retrieves an Entity with its linked data for presentation sites",
         "parameters": [
           {
