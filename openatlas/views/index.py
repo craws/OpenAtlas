@@ -56,9 +56,11 @@ def overview() -> str:
                     external=True) if frontend_url else '']),
         'bookmarks': Tab(
             'bookmarks',
+            _('bookmarks'),
             table=Table(['name', 'class', 'begin', 'end'])),
         'notes': Tab(
             'notes',
+            _('notes'),
             buttons=[manual('tools/notes')],
             table=Table(
                 ['date', _('visibility'), 'entity', 'class', _('note')]))}

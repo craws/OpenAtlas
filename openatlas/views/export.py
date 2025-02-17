@@ -63,6 +63,7 @@ def export_sql() -> str:
         tabs={
             'export': Tab(
                 'export',
+                _('export'),
                 content=table.display(),
                 buttons=[
                     manual('admin/export'),

@@ -56,6 +56,7 @@ def admin_index() -> str:
     tabs = {
         'user': Tab(
             'user',
+            _('user'),
             table=get_user_table(users),
             buttons=[
                 manual('admin/user'),
@@ -66,13 +67,15 @@ def admin_index() -> str:
     if is_authorized('admin'):
         tabs['general'] = Tab(
             'general',
-            display_info(get_form_settings(GeneralForm())),
+            _('general'),
+            content=display_info(get_form_settings(GeneralForm())),
             buttons=[
                 manual('admin/general'),
                 button(_('edit'), url_for('settings', category='general')),
                 button(_('system log'), url_for('log'))])
-        tabs['email'] = Tab(
-            'email',
+        tabs['mail'] = Tab(
+            'mail',
+            _('email'),
             display_info(get_form_settings(MailForm())) + get_test_mail_form(),
             buttons=[
                 manual('admin/mail'),
@@ -80,31 +83,36 @@ def admin_index() -> str:
     if is_authorized('manager'):
         tabs['modules'] = Tab(
             'modules',
-            '<h1>' + uc_first(_('defaults for new user')) + '</h1>'
+            _('modules'),
+            content='<h1>' + uc_first(_('defaults for new user')) + '</h1>'
             + display_info(get_form_settings(ModulesForm())),
             buttons=[
                 manual('admin/modules'),
                 button(_('edit'), url_for('settings', category='modules'))])
         tabs['map'] = Tab(
             'map',
-            display_info(get_form_settings(MapForm())),
+            _('map'),
+            content=display_info(get_form_settings(MapForm())),
             buttons=[
                 manual('admin/map'),
                 button(_('edit'), url_for('settings', category='map'))])
         tabs['content'] = Tab(
             'content',
-            get_content_table(),
+            _('content'),
+            content=get_content_table(),
             buttons=[manual('admin/content')])
         tabs['frontend'] = Tab(
-            'presentation_site',
-            display_info(get_form_settings(FrontendForm())),
+            'frontend',
+            _('presentation site'),
+            content=display_info(get_form_settings(FrontendForm())),
             buttons=[
                 manual('admin/presentation_site'),
                 button(_('edit'), url_for('settings', category='frontend'))])
     if is_authorized('contributor'):
         tabs['data'] = Tab(
             'data',
-            render_template(
+            _('data'),
+            content=render_template(
                 'admin/data.html',
                 imports=Project.get_all(),
                 info=get_form_settings(ApiForm())))
@@ -317,15 +325,9 @@ def settings(category: str) -> str | Response:
     form = getattr(
         importlib.import_module('openatlas.forms.setting'),
         f"{uc_first(category)}Form")()
-    tab = (
-        category.replace('api', 'data')
-        .replace('mail', 'email')
-        .replace('frontend', 'presentation-site'))
+    tab = category.replace('api', 'data')
     redirect_url = f"{url_for('admin_index')}#tab-{tab}"
-    crumbs = [[
-        _('admin'),
-        f"{url_for('admin_index')}#tab-{tab}"],
-        _(category.replace('frontend', 'presentation site'))]
+    crumbs = [[_('admin'), f"{url_for('admin_index')}#tab-{tab}"], category]
     if category == 'file':
         redirect_url = f"{url_for('file_index')}"
         crumbs = [[_('file'), url_for('file_index')], _('settings')]
@@ -398,6 +400,7 @@ def check_dates() -> str:
     tabs = {
         'dates': Tab(
             'invalid_dates',
+            _('invalid dates'),
             table=Table([
                 'name',
                 'class',
@@ -407,15 +410,21 @@ def check_dates() -> str:
                 'description'])),
         'link_dates': Tab(
             'invalid_link_dates',
+            _('invalid link dates'),
             table=Table(['link', 'domain', 'range'])),
         'involvement_dates': Tab(
             'invalid_involvement_dates',
+            _('invalid involvement dates'),
             table=Table(
                 ['actor', 'event', 'class', 'involvement', 'description'])),
         'preceding_dates': Tab(
             'invalid_preceding_dates',
+            _('invalid preceding dates'),
             table=Table(['preceding', 'succeeding'])),
-        'sub_dates': Tab('invalid_sub_dates', table=Table(['super', 'sub']))}
+        'sub_dates': Tab(
+            'invalid_sub_dates',
+            _('invalid sub dates'),
+            table=Table(['super', 'sub']))}
     for entity in invalid_dates():
         tabs['dates'].table.rows.append([
             link(entity),
@@ -477,28 +486,35 @@ def orphans() -> str:
         'updated',
         'description']
     tabs = {
-        'orphans': Tab('orphans', table=Table(header)),
-        'unlinked': Tab('unlinked', table=Table(header)),
+        'orphans': Tab('orphans', _('orphans'), table=Table(header)),
+        'unlinked': Tab('unlinked', _('unlinked'), table=Table(header)),
         'types': Tab(
             'type',
             table=Table(
                 ['name', 'root'],
                 [[link(type_), link(g.types[type_.root[0]])]
                  for type_ in Type.get_type_orphans()])),
-        'missing_files': Tab('missing_files', table=Table(header)),
+        'missing_files': Tab(
+            'missing_files',
+            _('missing files'),
+            table=Table(header)),
         'orphaned_files': Tab(
             'orphaned_files',
+            _('orphaned files'),
             table=Table(['name', 'size', 'date', 'ext'])),
         'orphaned_iiif_files': Tab(
             'orphaned_iiif_files',
+            _('orphaned iiif files'),
             table=Table(['name', 'size', 'date', 'ext'])),
         'orphaned_annotations': Tab(
             'orphaned_annotations',
+            _('orphaned annotations'),
             table=Table(
                 ['image', 'entity', 'annotation', 'creation'],
                 get_orphaned_annotations())),
         'orphaned_subunits': Tab(
             'orphaned_subunits',
+            _('orphaned subunits'),
             table=Table(
                 ['id', 'name', 'class', 'created', 'modified', 'description'],
                 [[
@@ -510,6 +526,7 @@ def orphans() -> str:
                     e.description] for e in orphaned_subunits()])),
         'circular': Tab(
             'circular_dependencies',
+            _('circular dependencies'),
             table=Table(
                 ['entity'],
                 [[link(e)] for e in entities_linked_to_itself()]))}
@@ -761,10 +778,8 @@ def admin_delete_orphaned_resized_images() -> Response:
 
 
 def get_disk_space_info() -> Optional[dict[str, Any]]:
-
     def upload_ident_with_iiif() -> bool:
         return app.config['UPLOAD_PATH'].resolve() == iiif_path.resolve()
-
     paths = {
         'export': {
             'path': app.config['EXPORT_PATH'], 'size': 0, 'mounted': False},

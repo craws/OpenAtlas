@@ -210,9 +210,15 @@ def menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
     if origin:
         view_name = origin.class_.view
     html = ''
-    for item in [
-            'source', 'event', 'actor', 'place', 'artifact', 'reference',
-            'type', 'file']:
+    for item, label in {
+            'source': _('source'),
+            'event': _('event'),
+            'actor': _('actor'),
+            'place': _('place'),
+            'artifact': _('artifact'),
+            'reference': _('reference'),
+            'type': _('type'),
+            'file': _('file')}.items():
         active = ''
         request_parts = request.path.split('/')
         if view_name == item \
@@ -225,7 +231,7 @@ def menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
                     and g.class_view_mapping[name] == item:
                 active = 'active'
         html += link(
-            _(item),
+            label,
             url_for(f'{item}_index') if item in ['file', 'type']
             else url_for("index", view=item),
             f'nav-item nav-link fw-bold uc-first {active}')
