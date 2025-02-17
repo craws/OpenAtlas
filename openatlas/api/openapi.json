@@ -135,7 +135,9 @@
     },
     "/entity_presentation_view/{entityId}": {
       "get": {
-        "tags": ["Proposal"],
+        "tags": [
+          "Proposal"
+        ],
         "description": "Retrieves an Entity with its linked data for presentation sites",
         "parameters": [
           {
@@ -2341,10 +2343,7 @@
                 "type",
                 "crmClass",
                 "systemClass",
-                "viewClass",
-                "properties",
-                "descriptions",
-                "geometry"
+                "viewClass"
               ],
               "properties": {
                 "@id": {
@@ -4669,12 +4668,7 @@
           "systemClass",
           "title",
           "description",
-          "geometries",
-          "when",
-          "types",
-          "externalReferenceSystems",
-          "files",
-          "relations"
+          "aliases"
         ],
         "properties": {
           "id": {
@@ -4696,6 +4690,7 @@
             }
           },
           "geometries": {
+            "nullable": true,
             "type": "object",
             "required": [
               "type",
@@ -4726,21 +4721,25 @@
             }
           },
           "when": {
+            "nullable": true,
             "$ref": "#/components/schemas/TimeRangeModel"
           },
           "types": {
+            "nullable": true,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/EntityTypeModel"
             }
           },
           "externalReferenceSystems": {
+            "nullable": true,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ExternalReferenceModel"
             }
           },
           "files": {
+            "nullable": true,
             "type": "array",
             "items": {
               "type": "object",
@@ -4759,6 +4758,7 @@
                   "type": "string"
                 },
                 "license": {
+                  "nullable": true,
                   "type": "string"
                 },
                 "creator": {
@@ -4770,6 +4770,7 @@
                   "nullable": true
                 },
                 "publicShareable": {
+                  "nullable": true,
                   "type": "boolean"
                 },
                 "mimetype": {
@@ -4987,6 +4988,7 @@
       },
       "EntityTypeModel": {
         "type": "object",
+        "nullable": true,
         "required": [
           "id",
           "title",
@@ -5007,6 +5009,7 @@
             "type": "boolean"
           },
           "typeHierarchy": {
+            "nullable": true,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TypeHierarchyEntryModel"
@@ -5034,6 +5037,7 @@
         }
       },
       "ExternalReferenceModel": {
+        "nullable": true,
         "type": "object",
         "required": [
           "type",
@@ -5065,6 +5069,7 @@
         }
       },
       "RelatedEntityModel": {
+        "nullable": true,
         "type": "object",
         "required": [
           "id",
@@ -5120,6 +5125,7 @@
         }
       },
       "RelationTypeModel": {
+        "nullable": true,
         "type": "object",
         "required": [
           "property",
