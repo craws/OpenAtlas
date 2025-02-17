@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.6",
+    "version": "0.4.6a",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -2385,6 +2385,7 @@
                   }
                 },
                 "when": {
+                  "nullable": true,
                   "type": "object",
                   "properties": {
                     "timespans": {
@@ -2397,15 +2398,15 @@
                             "properties": {
                               "earliest": {
                                 "type": "string",
-                                "format": "nullable"
+                                "nullable": true
                               },
                               "latest": {
                                 "type": "string",
-                                "format": "nullable"
+                                "nullable": true
                               },
                               "comment": {
                                 "type": "string",
-                                "format": "nullable"
+                                "nullable": true
                               }
                             }
                           },
@@ -2414,15 +2415,15 @@
                             "properties": {
                               "earliest": {
                                 "type": "string",
-                                "format": "nullable"
+                                "nullable": true
                               },
                               "latest": {
                                 "type": "string",
-                                "format": "nullable"
+                                "nullable": true
                               },
                               "comment": {
                                 "type": "string",
-                                "format": "nullable"
+                                "nullable": true
                               }
                             }
                           }
@@ -2432,6 +2433,7 @@
                   }
                 },
                 "types": {
+                  "nullable": true,
                   "type": "array",
                   "items": {
                     "type": "object",
@@ -2444,7 +2446,7 @@
                       },
                       "descriptions": {
                         "type": "string",
-                        "format": "nullable"
+                        "nullable": true
                       },
                       "hierarchy": {
                         "type": "string"
@@ -2472,12 +2474,13 @@
                       },
                       "unit": {
                         "type": "string",
-                        "format": "nullable"
+                        "nullable": true
                       }
                     }
                   }
                 },
                 "relations": {
+                  "nullable": true,
                   "type": "array",
                   "items": {
                     "type": "object",
@@ -2496,13 +2499,14 @@
                       },
                       "relationDescription": {
                         "type": "string",
-                        "format": "nullable"
+                        "nullable": true
                       },
                       "type": {
                         "type": "string",
-                        "format": "nullable"
+                        "nullable": true
                       },
                       "when": {
+                        "nullable": true,
                         "type": "object",
                         "properties": {
                           "timespans": {
@@ -2515,15 +2519,15 @@
                                   "properties": {
                                     "earliest": {
                                       "type": "string",
-                                      "format": "nullable"
+                                      "nullable": true
                                     },
                                     "latest": {
                                       "type": "string",
-                                      "format": "nullable"
+                                      "nullable": true
                                     },
                                     "comment": {
                                       "type": "string",
-                                      "format": "nullable"
+                                      "nullable": true
                                     }
                                   }
                                 },
@@ -2532,15 +2536,15 @@
                                   "properties": {
                                     "earliest": {
                                       "type": "string",
-                                      "format": "nullable"
+                                      "nullable": true
                                     },
                                     "latest": {
                                       "type": "string",
-                                      "format": "nullable"
+                                      "nullable": true
                                     },
                                     "comment": {
                                       "type": "string",
-                                      "format": "nullable"
+                                      "nullable": true
                                     }
                                   }
                                 }
@@ -2554,15 +2558,15 @@
                 },
                 "names": {
                   "type": "string",
-                  "format": "nullable"
+                  "nullable": true
                 },
                 "links": {
                   "type": "string",
-                  "format": "nullable"
+                  "nullable": true
                 },
                 "depictions": {
                   "type": "array",
-                  "format": "nullable",
+                  "nullable": true,
                   "items": {
                     "type": "object",
                     "properties": {
@@ -2600,6 +2604,7 @@
                   }
                 },
                 "geometry": {
+                  "nullable": true,
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/Polygon"
@@ -2699,22 +2704,22 @@
                     },
                     "begin_latest": {
                       "type": "string",
-                      "format": "nullable"
+                      "nullable": true
                     },
                     "begin_comment": {
                       "type": "string",
-                      "format": "nullable"
+                      "nullable": true
                     },
                     "end_earliest": {
                       "type": "string"
                     },
                     "end_latest": {
                       "type": "string",
-                      "format": "nullable"
+                      "nullable": true
                     },
                     "end_comment": {
                       "type": "string",
-                      "format": "nullable"
+                      "nullable": true
                     },
                     "types": {
                       "type": "array",
@@ -4277,7 +4282,7 @@
                 },
                 "aliases": {
                   "type": "string",
-                  "format": "nullable"
+                  "nullable": true
                 },
                 "description": {
                   "type": "string"
@@ -4422,14 +4427,14 @@
                       },
                       "pages": {
                         "type": "string",
-                        "format": "nullable"
+                        "nullable": true
                       }
                     }
                   }
                 },
                 "files": {
                   "type": "string",
-                  "format": "nullable"
+                  "nullable": true
                 },
                 "types": {
                   "type": "array",
@@ -4461,11 +4466,11 @@
                       },
                       "value": {
                         "type": "string",
-                        "format": "nullable"
+                        "nullable": true
                       },
                       "unit": {
                         "type": "string",
-                        "format": "nullable"
+                        "nullable": true
                       },
                       "externalReferences": {
                         "type": "array",
@@ -4944,15 +4949,15 @@
             "properties": {
               "earliest": {
                 "type": "string",
-                "format": "nullable"
+                "nullable": true
               },
               "latest": {
                 "type": "string",
-                "format": "nullable"
+                "nullable": true
               },
               "comment": {
                 "type": "string",
-                "format": "nullable"
+                "nullable": true
               }
             }
           },
@@ -4966,15 +4971,15 @@
             "properties": {
               "earliest": {
                 "type": "string",
-                "format": "nullable"
+                "nullable": true
               },
               "latest": {
                 "type": "string",
-                "format": "nullable"
+                "nullable": true
               },
               "comment": {
                 "type": "string",
-                "format": "nullable"
+                "nullable": true
               }
             }
           }
