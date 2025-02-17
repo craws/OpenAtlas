@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.6",
+    "version": "0.4.6a",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -135,7 +135,9 @@
     },
     "/entity_presentation_view/{entityId}": {
       "get": {
-        "tags": ["Proposal"],
+        "tags": [
+          "Proposal"
+        ],
         "description": "Retrieves an Entity with its linked data for presentation sites",
         "parameters": [
           {
@@ -2341,10 +2343,7 @@
                 "type",
                 "crmClass",
                 "systemClass",
-                "viewClass",
-                "properties",
-                "descriptions",
-                "geometry"
+                "viewClass"
               ],
               "properties": {
                 "@id": {
@@ -2385,6 +2384,7 @@
                   }
                 },
                 "when": {
+                  "nullable": true,
                   "type": "object",
                   "properties": {
                     "timespans": {
@@ -2397,15 +2397,15 @@
                             "properties": {
                               "earliest": {
                                 "type": "string",
-                                "format": "nullable"
+                                "nullable": true
                               },
                               "latest": {
                                 "type": "string",
-                                "format": "nullable"
+                                "nullable": true
                               },
                               "comment": {
                                 "type": "string",
-                                "format": "nullable"
+                                "nullable": true
                               }
                             }
                           },
@@ -2414,15 +2414,15 @@
                             "properties": {
                               "earliest": {
                                 "type": "string",
-                                "format": "nullable"
+                                "nullable": true
                               },
                               "latest": {
                                 "type": "string",
-                                "format": "nullable"
+                                "nullable": true
                               },
                               "comment": {
                                 "type": "string",
-                                "format": "nullable"
+                                "nullable": true
                               }
                             }
                           }
@@ -2432,6 +2432,7 @@
                   }
                 },
                 "types": {
+                  "nullable": true,
                   "type": "array",
                   "items": {
                     "type": "object",
@@ -2444,7 +2445,7 @@
                       },
                       "descriptions": {
                         "type": "string",
-                        "format": "nullable"
+                        "nullable": true
                       },
                       "hierarchy": {
                         "type": "string"
@@ -2472,12 +2473,13 @@
                       },
                       "unit": {
                         "type": "string",
-                        "format": "nullable"
+                        "nullable": true
                       }
                     }
                   }
                 },
                 "relations": {
+                  "nullable": true,
                   "type": "array",
                   "items": {
                     "type": "object",
@@ -2496,13 +2498,14 @@
                       },
                       "relationDescription": {
                         "type": "string",
-                        "format": "nullable"
+                        "nullable": true
                       },
                       "type": {
                         "type": "string",
-                        "format": "nullable"
+                        "nullable": true
                       },
                       "when": {
+                        "nullable": true,
                         "type": "object",
                         "properties": {
                           "timespans": {
@@ -2515,15 +2518,15 @@
                                   "properties": {
                                     "earliest": {
                                       "type": "string",
-                                      "format": "nullable"
+                                      "nullable": true
                                     },
                                     "latest": {
                                       "type": "string",
-                                      "format": "nullable"
+                                      "nullable": true
                                     },
                                     "comment": {
                                       "type": "string",
-                                      "format": "nullable"
+                                      "nullable": true
                                     }
                                   }
                                 },
@@ -2532,15 +2535,15 @@
                                   "properties": {
                                     "earliest": {
                                       "type": "string",
-                                      "format": "nullable"
+                                      "nullable": true
                                     },
                                     "latest": {
                                       "type": "string",
-                                      "format": "nullable"
+                                      "nullable": true
                                     },
                                     "comment": {
                                       "type": "string",
-                                      "format": "nullable"
+                                      "nullable": true
                                     }
                                   }
                                 }
@@ -2554,15 +2557,15 @@
                 },
                 "names": {
                   "type": "string",
-                  "format": "nullable"
+                  "nullable": true
                 },
                 "links": {
                   "type": "string",
-                  "format": "nullable"
+                  "nullable": true
                 },
                 "depictions": {
                   "type": "array",
-                  "format": "nullable",
+                  "nullable": true,
                   "items": {
                     "type": "object",
                     "properties": {
@@ -2600,6 +2603,7 @@
                   }
                 },
                 "geometry": {
+                  "nullable": true,
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/Polygon"
@@ -2699,22 +2703,22 @@
                     },
                     "begin_latest": {
                       "type": "string",
-                      "format": "nullable"
+                      "nullable": true
                     },
                     "begin_comment": {
                       "type": "string",
-                      "format": "nullable"
+                      "nullable": true
                     },
                     "end_earliest": {
                       "type": "string"
                     },
                     "end_latest": {
                       "type": "string",
-                      "format": "nullable"
+                      "nullable": true
                     },
                     "end_comment": {
                       "type": "string",
-                      "format": "nullable"
+                      "nullable": true
                     },
                     "types": {
                       "type": "array",
@@ -4277,7 +4281,7 @@
                 },
                 "aliases": {
                   "type": "string",
-                  "format": "nullable"
+                  "nullable": true
                 },
                 "description": {
                   "type": "string"
@@ -4422,14 +4426,14 @@
                       },
                       "pages": {
                         "type": "string",
-                        "format": "nullable"
+                        "nullable": true
                       }
                     }
                   }
                 },
                 "files": {
                   "type": "string",
-                  "format": "nullable"
+                  "nullable": true
                 },
                 "types": {
                   "type": "array",
@@ -4461,11 +4465,11 @@
                       },
                       "value": {
                         "type": "string",
-                        "format": "nullable"
+                        "nullable": true
                       },
                       "unit": {
                         "type": "string",
-                        "format": "nullable"
+                        "nullable": true
                       },
                       "externalReferences": {
                         "type": "array",
@@ -4664,12 +4668,7 @@
           "systemClass",
           "title",
           "description",
-          "geometries",
-          "when",
-          "types",
-          "externalReferenceSystems",
-          "files",
-          "relations"
+          "aliases"
         ],
         "properties": {
           "id": {
@@ -4691,6 +4690,7 @@
             }
           },
           "geometries": {
+            "nullable": true,
             "type": "object",
             "required": [
               "type",
@@ -4721,21 +4721,25 @@
             }
           },
           "when": {
+            "nullable": true,
             "$ref": "#/components/schemas/TimeRangeModel"
           },
           "types": {
+            "nullable": true,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/EntityTypeModel"
             }
           },
           "externalReferenceSystems": {
+            "nullable": true,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ExternalReferenceModel"
             }
           },
           "files": {
+            "nullable": true,
             "type": "array",
             "items": {
               "type": "object",
@@ -4754,6 +4758,7 @@
                   "type": "string"
                 },
                 "license": {
+                  "nullable": true,
                   "type": "string"
                 },
                 "creator": {
@@ -4765,6 +4770,7 @@
                   "nullable": true
                 },
                 "publicShareable": {
+                  "nullable": true,
                   "type": "boolean"
                 },
                 "mimetype": {
@@ -4944,15 +4950,15 @@
             "properties": {
               "earliest": {
                 "type": "string",
-                "format": "nullable"
+                "nullable": true
               },
               "latest": {
                 "type": "string",
-                "format": "nullable"
+                "nullable": true
               },
               "comment": {
                 "type": "string",
-                "format": "nullable"
+                "nullable": true
               }
             }
           },
@@ -4966,15 +4972,15 @@
             "properties": {
               "earliest": {
                 "type": "string",
-                "format": "nullable"
+                "nullable": true
               },
               "latest": {
                 "type": "string",
-                "format": "nullable"
+                "nullable": true
               },
               "comment": {
                 "type": "string",
-                "format": "nullable"
+                "nullable": true
               }
             }
           }
@@ -4982,6 +4988,7 @@
       },
       "EntityTypeModel": {
         "type": "object",
+        "nullable": true,
         "required": [
           "id",
           "title",
@@ -5002,6 +5009,7 @@
             "type": "boolean"
           },
           "typeHierarchy": {
+            "nullable": true,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TypeHierarchyEntryModel"
@@ -5029,6 +5037,7 @@
         }
       },
       "ExternalReferenceModel": {
+        "nullable": true,
         "type": "object",
         "required": [
           "type",
@@ -5060,6 +5069,7 @@
         }
       },
       "RelatedEntityModel": {
+        "nullable": true,
         "type": "object",
         "required": [
           "id",
@@ -5115,6 +5125,7 @@
         }
       },
       "RelationTypeModel": {
+        "nullable": true,
         "type": "object",
         "required": [
           "property",
