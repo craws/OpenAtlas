@@ -226,11 +226,13 @@ def check_links() -> str:
             f"{link(row['range'])} ({row['range'].cidoc_class.code})"])
     return render_template(
         'tabs.html',
-        tabs={'links': Tab(
-            'links',
-            '' if table.rows else _('Congratulations, everything looks fine!'),
-            table,
-            [manual('admin/data_integrity_checks')])},
+        tabs={
+            'links': Tab(
+                'links',
+                content='' if table.rows
+                else _('Congratulations, everything looks fine!'),
+                table=table,
+                buttons=[manual('admin/data_integrity_checks')])},
         title=_('admin'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
@@ -383,7 +385,7 @@ def check_similar() -> str:
         if table and not table.rows else ''
     return render_template(
         'tabs.html',
-        tabs={'similar': Tab('similar', content, table=table)},
+        tabs={'similar': Tab('similar', content=content, table=table)},
         title=_('admin'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],

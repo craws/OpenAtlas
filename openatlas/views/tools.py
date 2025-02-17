@@ -68,7 +68,7 @@ def tools_index(id_: int) -> str | Response:
     tabs = {
         'info': Tab(
             'info',
-            carbon_result(entity) + sex_result(entity),
+            content=carbon_result(entity) + sex_result(entity),
             buttons=[
                 manual('tools/anthropological_analyses'),
                 button(
@@ -111,7 +111,7 @@ def sex(id_: int) -> str | Response:
         tabs={
             'info': Tab(
                 'sex estimation',
-                render_template(
+                content=render_template(
                     'tools/sex.html',
                     data=data,
                     result=sex_result(entity)),
@@ -180,7 +180,7 @@ def sex_update(id_: int) -> str | Response:
         tabs={
             'info': Tab(
                 'sex estimation',
-                display_form(
+                content=display_form(
                     form,
                     manual_page='tools/anthropological_analyses'))},
         entity=entity,
@@ -207,7 +207,7 @@ def carbon(id_: int) -> str | Response:
         tabs={
             'info': Tab(
                 'radiocarbon dating',
-                carbon_result(entity),
+                content=carbon_result(entity),
                 buttons=buttons)},
         crumbs=start_crumbs(entity) + [
             [_('tools'), url_for('tools_index', id_=entity.id)],
@@ -261,7 +261,7 @@ def carbon_update(id_: int) -> str | Response:
     return render_template(
         'tabs.html',
         entity=entity,
-        tabs={'info': Tab('radiocarbon dating', display_form(form))},
+        tabs={'info': Tab('radiocarbon dating', content=display_form(form))},
         crumbs=start_crumbs(entity) + [
             [_('tools'), url_for('tools_index', id_=entity.id)],
             [_('radiocarbon dating'), url_for('carbon_update', id_=entity.id)],

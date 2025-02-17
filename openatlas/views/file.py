@@ -30,7 +30,7 @@ def file_index() -> str:
     tabs = {
         'settings': Tab(
             'settings',
-            render_template(
+            content=render_template(
                 'file.html',
                 info=get_form_settings(FileForm()),
                 disk_space_info=get_disk_space_info()),
@@ -44,7 +44,7 @@ def file_index() -> str:
     if is_authorized('admin'):
         tabs['IIIF'] = Tab(
             'IIIF',
-            display_info(get_form_settings(IiifForm())),
+            content=display_info(get_form_settings(IiifForm())),
             buttons=[
                 manual('admin/iiif'),
                 button(_('edit'), url_for('settings', category='iiif')),

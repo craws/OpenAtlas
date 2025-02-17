@@ -24,7 +24,7 @@ def arche_index() -> str:
         tabs={
             'info': Tab(
                 'info',
-                display_info({
+                content=display_info({
                     k: str(v) for k, v in app.config['ARCHE'].items()}),
                 buttons=[manual('admin/arche')])},
         crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-data"], 'ARCHE'])

@@ -73,7 +73,7 @@ def api_token(user_id: int = 0) -> str | Response:
     tabs = {
         'token': Tab(
             'token',
-            display_form(form),
+            content=display_form(form),
             buttons=[manual('admin/api')])}
     tabs['token'].buttons.append(
         button(_('generate'), url_for('generate_token')))

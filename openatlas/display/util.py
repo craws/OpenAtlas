@@ -203,7 +203,7 @@ def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
 
 
 @app.template_filter()
-def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
+def menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
     view_name = ''
     if entity:
         view_name = entity.class_.view

@@ -57,7 +57,7 @@ def profile_index() -> str:
     tabs = {
         'profile': Tab(
             'profile',
-            display_info({
+            content=display_info({
                 _('name'): current_user.real_name,
                 _('email'): current_user.email,
                 _('show email'): str(_('on'))
@@ -67,15 +67,15 @@ def profile_index() -> str:
             buttons=[manual('tools/profile')]),
         'modules': Tab(
             'modules',
-            display_info(get_form_settings(ModulesForm(), True)),
+            content=display_info(get_form_settings(ModulesForm(), True)),
             buttons=[manual('tools/profile')]),
         'display': Tab(
             'display',
-            display_info(get_form_settings(DisplayForm(), True)),
+            content=display_info(get_form_settings(DisplayForm(), True)),
             buttons=[manual('tools/profile')]),
         'frontend': Tab(
             'presentation_site',
-            display_info(get_form_settings(FrontendForm(), True)),
+            content=display_info(get_form_settings(FrontendForm(), True)),
             buttons=[manual('tools/profile')])}
     if not app.config['DEMO_MODE']:
         tabs['profile'].buttons += [

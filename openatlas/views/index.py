@@ -28,7 +28,7 @@ def overview() -> str:
             tabs={
                 'info': Tab(
                     'info',
-                    render_template(
+                    content=render_template(
                         'index/index_guest.html',
                         intro=get_translation('intro')))},
             crumbs=['overview'])
