@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2025-02-13 18:27+0100\n"
-"PO-Revision-Date: 2025-02-13 18:34+0100\n"
+"PO-Revision-Date: 2025-02-17 16:49+0100\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language-Team: de <LL@li.org>\n"
 "Language: de\n"
@@ -1432,7 +1432,7 @@ msgstr "Alle auswählen"
 
 #: openatlas/templates/admin/data.html:1
 msgid "data integrity checks"
-msgstr "Datenintegrität-Tests"
+msgstr "Datenintegrität"
 
 #: openatlas/templates/admin/data.html:4 openatlas/views/admin.py:565
 #: openatlas/views/model.py:248
@@ -1457,7 +1457,7 @@ msgstr "Link-Duplikat"
 
 #: openatlas/templates/admin/data.html:11
 msgid "data transfer"
-msgstr "Daten-Transfer"
+msgstr "Datentransfer"
 
 #: openatlas/templates/admin/data.html:13
 #: openatlas/templates/util/translations.html:8 openatlas/views/imports.py:144
