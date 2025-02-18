@@ -45,6 +45,8 @@ def get_locale() -> str:
 
 @app.before_request
 def before_request() -> None:
+    import time
+    begin = time.time()
     from openatlas.models.openatlas_class import (
         OpenatlasClass, view_class_mapping)
     from openatlas.models.cidoc_property import CidocProperty
@@ -56,15 +58,40 @@ def before_request() -> None:
     if request.path.startswith('/static'):
         return  # Avoid files overhead if not using Apache with static alias
 
+    mark = time.time()
+    print(f'{(mark - begin):.2f} import')
+    step = mark
+
     g.logger = Logger()
     g.db = open_connection(app.config)
     g.db.autocommit = True
     g.cursor = g.db.cursor(cursor_factory=extras.DictCursor)
     g.settings = Settings.get_settings()
     session['language'] = get_locale()
+
+    mark = time.time()
+    print(f'{(step - mark):.2f} settings')
+    step = mark
+
     g.cidoc_classes = CidocClass.get_all(session['language'])
+
+    mark = time.time()
+    print(f'{(step - mark):.2f} classes')
+    step = mark
+
+
     g.properties = CidocProperty.get_all(session['language'])
+
+    mark = time.time()
+    print(f'{(step - mark):.2f} properties')
+    step = mark
+
     g.classes = OpenatlasClass.get_all()
+
+    mark = time.time()
+    print(f'{(step - mark):.2f} openatlas classes')
+    step = mark
+
     with_count = False
     if (request.path.startswith(('/type', '/api/type_tree/', '/admin/orphans'))
             or (request.path.startswith('/entity/') and
@@ -73,18 +100,52 @@ def before_request() -> None:
     g.types = Type.get_all(with_count)
     g.radiocarbon_type = Type.get_hierarchy('Radiocarbon')
     g.sex_type = Type.get_hierarchy('Features for sexing')
+
+    mark = time.time()
+    print(f'{(step - mark):.2f} types')
+    step = mark
+
     g.reference_match_type = Type.get_hierarchy('External reference match')
     g.reference_systems = ReferenceSystem.get_all()
+
+    mark = time.time()
+    print(f'{(step - mark):.2f} reference systems')
+    step = mark
+
     g.view_class_mapping = view_class_mapping
     g.class_view_mapping = OpenatlasClass.get_class_view_mapping()
+
+    mark = time.time()
+    print(f'{(step - mark):.2f} model mapping')
+    step = mark
+
+
     g.table_headers = OpenatlasClass.get_table_headers()
+
+    mark = time.time()
+    print(f'{(step - mark):.2f} table headers')
+    step = mark
+
+
     g.writable_paths = [
         app.config['EXPORT_PATH'],
         app.config['RESIZED_IMAGES'],
         app.config['UPLOAD_PATH'],
         app.config['TMP_PATH']]
     setup_files()
+
+    mark = time.time()
+    print(f'{(step - mark):.2f} files')
+    step = mark
+
     setup_api()
+
+    mark = time.time()
+    print(f'{(step - mark):.2f} API')
+    step = mark
+
+    end = time.time()
+    print(f"Total = {(end - begin):.2f}")
 
 
 def setup_files() -> None:
