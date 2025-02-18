@@ -57,7 +57,8 @@ def profile_index() -> str:
     tabs = {
         'profile': Tab(
             'profile',
-            display_info({
+            _('profile'),
+            content=display_info({
                 _('name'): current_user.real_name,
                 _('email'): current_user.email,
                 _('show email'): str(_('on'))
@@ -67,15 +68,18 @@ def profile_index() -> str:
             buttons=[manual('tools/profile')]),
         'modules': Tab(
             'modules',
-            display_info(get_form_settings(ModulesForm(), True)),
+            _('modules'),
+            content=display_info(get_form_settings(ModulesForm(), True)),
             buttons=[manual('tools/profile')]),
         'display': Tab(
             'display',
-            display_info(get_form_settings(DisplayForm(), True)),
+            _('display'),
+            content=display_info(get_form_settings(DisplayForm(), True)),
             buttons=[manual('tools/profile')]),
         'frontend': Tab(
-            'presentation_site',
-            display_info(get_form_settings(FrontendForm(), True)),
+            'frontend',
+            _('presentation site'),
+            content=display_info(get_form_settings(FrontendForm(), True)),
             buttons=[manual('tools/profile')])}
     if not app.config['DEMO_MODE']:
         tabs['profile'].buttons += [
@@ -102,7 +106,6 @@ def profile_settings(category: str) -> str | Response:
     form = getattr(
         importlib.import_module('openatlas.forms.setting'),
         f"{uc_first(category)}Form")()
-    tab = 'presentation-site' if category == 'frontend' else category
     if form.validate_on_submit():
         settings = {}
         for field in form:
@@ -128,14 +131,14 @@ def profile_settings(category: str) -> str | Response:
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        return redirect(f"{url_for('profile_index')}#tab-{tab}")
+        return redirect(f"{url_for('profile_index')}#tab-{category}")
     set_form_settings(form, True)
     return render_template(
         'content.html',
         content=display_form(form, manual_page='profile'),
         title=_('profile'),
         crumbs=[
-            [_('profile'), f"{url_for('profile_index')}#tab-{tab}"],
+            [_('profile'), f"{url_for('profile_index')}#tab-{category}"],
             _(category)])
 
 
@@ -155,6 +158,7 @@ def profile_password() -> str | Response:
         tabs={
             'password': Tab(
                 'password',
+                _('password'),
                 content=display_form(form, 'password-form'))},
         title=_('profile'),
         crumbs=[
