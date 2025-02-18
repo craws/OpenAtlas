@@ -32,7 +32,7 @@ class GenerateTokenForm(FlaskForm):
         description=
         _('expiration in days') + ', 0 = ' + _("no expiration date"))
     token_name = StringField(
-        _('token name'),
+        _('name'),
         default=f"Token_{datetime.today().strftime('%Y-%m-%d')}")
     user = SelectField(_('user'), choices=(), default=0, coerce=int)
     token_text = HiddenField()
@@ -182,7 +182,7 @@ def generate_token() -> str | Response:
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}"],
             [_('token'), f"{url_for('api_token')}"],
-            _('generate token')])
+            _('generate')])
 
 
 @app.route('/admin/api_token/revoke_token/<int:id_>')
@@ -213,7 +213,7 @@ def delete_token(id_: int) -> str | Response:
 @login_required
 def delete_revoked_tokens() -> str | Response:
     Token.delete_all_revoked_tokens()
-    flash(_('all revoked tokens deleted'), 'info')
+    flash(_('tokens deleted'), 'info')
     return redirect(f"{url_for('api_token')}")
 
 
@@ -221,7 +221,7 @@ def delete_revoked_tokens() -> str | Response:
 @login_required
 def delete_invalid_tokens() -> str | Response:
     Token.delete_invalid_tokens()
-    flash(_('all invalid tokens deleted'), 'info')
+    flash(_('tokens deleted'), 'info')
     return redirect(f"{url_for('api_token')}")
 
 
