@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-02-17 17:25+0100\n"
+"POT-Creation-Date: 2025-02-18 10:12+0100\n"
 "PO-Revision-Date: 2024-08-13 16:43+0200\n"
 "Last-Translator: Enric Rodellas <enricrodellas@gmail.com>\n"
 "Language: ca\n"
@@ -347,7 +347,8 @@ msgstr "ID per a importacions"
 #: openatlas/forms/manager.py:524 openatlas/forms/manager_base.py:141
 #: openatlas/views/arche.py:36 openatlas/views/imports.py:68
 #: openatlas/views/index.py:73 openatlas/views/profile.py:62
-#: openatlas/views/token.py:102 openatlas/views/vocabs.py:82
+#: openatlas/views/token.py:35 openatlas/views/token.py:102
+#: openatlas/views/vocabs.py:82
 msgid "name"
 msgstr "nom"
 
@@ -1457,8 +1458,9 @@ msgstr "crea imatges redimensionades"
 msgid "delete orphaned resized images"
 msgstr "elimina imatges redimensionadas orfes"
 
-#: openatlas/templates/admin/data.html:45
-msgid "api token"
+#: openatlas/templates/admin/data.html:45 openatlas/views/token.py:140
+#: openatlas/views/token.py:184
+msgid "token"
 msgstr ""
 
 #: openatlas/templates/entity/insert.html:7
@@ -2673,12 +2675,8 @@ msgstr ""
 msgid "no expiration date"
 msgstr "nota eliminada"
 
-#: openatlas/views/token.py:35
-#, fuzzy
-msgid "token name"
-msgstr "nom del lloc"
-
 #: openatlas/views/token.py:39 openatlas/views/token.py:79
+#: openatlas/views/token.py:185
 #, fuzzy
 msgid "generate"
 msgstr "generar contrasenya"
@@ -2741,15 +2739,6 @@ msgstr "elimina"
 msgid "authorize"
 msgstr ""
 
-#: openatlas/views/token.py:140 openatlas/views/token.py:184
-msgid "token"
-msgstr ""
-
-#: openatlas/views/token.py:185
-#, fuzzy
-msgid "generate token"
-msgstr "generar contrasenya"
-
 #: openatlas/views/token.py:192
 msgid "token revoked"
 msgstr ""
@@ -2763,14 +2752,10 @@ msgstr ""
 msgid "token deleted"
 msgstr "tipus eliminats"
 
-#: openatlas/views/token.py:216
-msgid "all revoked tokens deleted"
-msgstr ""
-
-#: openatlas/views/token.py:224
+#: openatlas/views/token.py:216 openatlas/views/token.py:224
 #, fuzzy
-msgid "all invalid tokens deleted"
-msgstr "dates invàlides"
+msgid "tokens deleted"
+msgstr "tipus eliminats"
 
 #: openatlas/views/token.py:232
 msgid "all tokens revoked"
@@ -2929,3 +2914,19 @@ msgstr "importar jerarquia"
 #: openatlas/views/vocabs.py:189
 msgid "You are about to import following hierarchy"
 msgstr "Esteu a punt d'importar la jerarquia següent"
+
+#~ msgid "api token"
+#~ msgstr ""
+
+#~ msgid "token name"
+#~ msgstr "nom del lloc"
+
+#~ msgid "generate token"
+#~ msgstr "generar contrasenya"
+
+#~ msgid "all revoked tokens deleted"
+#~ msgstr ""
+
+#~ msgid "all invalid tokens deleted"
+#~ msgstr "dates invàlides"
+

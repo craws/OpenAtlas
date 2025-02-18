@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-02-17 17:25+0100\n"
+"POT-Creation-Date: 2025-02-18 10:12+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -346,7 +346,8 @@ msgstr ""
 #: openatlas/forms/manager.py:524 openatlas/forms/manager_base.py:141
 #: openatlas/views/arche.py:36 openatlas/views/imports.py:68
 #: openatlas/views/index.py:73 openatlas/views/profile.py:62
-#: openatlas/views/token.py:102 openatlas/views/vocabs.py:82
+#: openatlas/views/token.py:35 openatlas/views/token.py:102
+#: openatlas/views/vocabs.py:82
 msgid "name"
 msgstr ""
 
@@ -1433,8 +1434,9 @@ msgstr ""
 msgid "delete orphaned resized images"
 msgstr ""
 
-#: openatlas/templates/admin/data.html:45
-msgid "api token"
+#: openatlas/templates/admin/data.html:45 openatlas/views/token.py:140
+#: openatlas/views/token.py:184
+msgid "token"
 msgstr ""
 
 #: openatlas/templates/entity/insert.html:7
@@ -2602,11 +2604,8 @@ msgstr ""
 msgid "no expiration date"
 msgstr ""
 
-#: openatlas/views/token.py:35
-msgid "token name"
-msgstr ""
-
 #: openatlas/views/token.py:39 openatlas/views/token.py:79
+#: openatlas/views/token.py:185
 msgid "generate"
 msgstr ""
 
@@ -2660,14 +2659,6 @@ msgstr ""
 msgid "authorize"
 msgstr ""
 
-#: openatlas/views/token.py:140 openatlas/views/token.py:184
-msgid "token"
-msgstr ""
-
-#: openatlas/views/token.py:185
-msgid "generate token"
-msgstr ""
-
 #: openatlas/views/token.py:192
 msgid "token revoked"
 msgstr ""
@@ -2680,12 +2671,8 @@ msgstr ""
 msgid "token deleted"
 msgstr ""
 
-#: openatlas/views/token.py:216
-msgid "all revoked tokens deleted"
-msgstr ""
-
-#: openatlas/views/token.py:224
-msgid "all invalid tokens deleted"
+#: openatlas/views/token.py:216 openatlas/views/token.py:224
+msgid "tokens deleted"
 msgstr ""
 
 #: openatlas/views/token.py:232
