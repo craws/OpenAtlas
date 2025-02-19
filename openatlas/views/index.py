@@ -28,10 +28,11 @@ def overview() -> str:
             tabs={
                 'info': Tab(
                     'info',
-                    render_template(
+                    content=render_template(
                         'index/index_guest.html',
                         intro=get_translation('intro')))},
             crumbs=['overview'])
+    frontend_url = current_user.settings['frontend_website_url']
     tabs = {
         'info': Tab(
             'info',
@@ -51,14 +52,15 @@ def overview() -> str:
                 link(
                     '<i class="fas fa-eye"></i> ' +
                     uc_first(_('presentation site')),
-                    g.settings['frontend_website_url'],
-                    external=True) if g.settings['frontend_website_url']
-                else '']),
+                    frontend_url,
+                    external=True) if frontend_url else '']),
         'bookmarks': Tab(
             'bookmarks',
+            _('bookmarks'),
             table=Table(['name', 'class', 'begin', 'end'])),
         'notes': Tab(
             'notes',
+            _('notes'),
             buttons=[manual('tools/notes')],
             table=Table(
                 ['date', _('visibility'), 'entity', 'class', _('note')]))}

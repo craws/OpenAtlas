@@ -120,13 +120,14 @@ class IIIFImage(Resource):
 class IIIFAnnotationList(Resource):
     @staticmethod
     def get(image_id: int) -> Response:
-        return jsonify(IIIFAnnotationList.build_annotation_list
-                       (image_id,
-                        Parser(iiif.parse_args())))
+        return jsonify(
+            IIIFAnnotationList.build_annotation_list(
+                image_id,
+                Parser(iiif.parse_args())))
 
     @staticmethod
     def build_annotation_list(image_id: int, parser: Parser) -> dict[str, Any]:
-        annotations_ = AnnotationImage.get_by_file(image_id)
+        annotations_ = AnnotationImage.get_by_file_id(image_id)
         return {
             "@context": "https://iiif.io/api/presentation/2/context.json",
             "@id": url_for(

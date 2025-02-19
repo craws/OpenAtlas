@@ -87,15 +87,17 @@ class BaseDisplay:
 
     def add_info_tab_content(self) -> None:
         self.add_data()
+        resolver_url = g.settings['frontend_resolver_url']
         if hasattr(current_user, 'settings'):
             self.data |= get_system_data(self.entity)
+            resolver_url = current_user.settings['frontend_resolver_url']
         self.tabs['info'].buttons = self.buttons
         frontend_link = None
-        if url := g.settings['frontend_resolver_url']:
+        if resolver_url:
             frontend_link = link(
                 '<i class="fas fa-eye"></i> ' +
                 uc_first(_('presentation site')),
-                url + str(self.entity.id),
+                resolver_url + str(self.entity.id),
                 external=True)
         self.tabs['info'].content = render_template(
             'entity/view.html',
@@ -259,6 +261,7 @@ class ActorDisplay(BaseDisplay):
                 'artifact', 'reference', 'file']:
             if entity.class_.name == 'group' or name != 'member':
                 self.tabs[name] = Tab(name, entity=entity)
+        self.tabs['member_of'].label = _('member of')
         self.add_reference_tables_data()
         self.event_links = \
             entity.get_links(['P11', 'P14', 'P22', 'P23', 'P25'], True)

@@ -1,12 +1,8 @@
 INSERT INTO model.entity (
-  cidoc_class_code, openatlas_class_name, name, description, begin_from, begin_to, begin_comment,
-  end_from, end_to, end_comment, created, modified
-) VALUES (
-  'E18', 'place', 'Shire','The Shire was the homeland of the hobbits.',
-  '2018-01-31', '2018-03-01', 'Begin of the shire', '2019-01-31',
-  '2019-03-01','Descent of Shire', '2022-09-21 16:38:01.923431',
-  '2022-09-21 16:38:05.923431'
-);
+  cidoc_class_code, openatlas_class_name, name, description, begin_from, begin_to, begin_comment, end_from, end_to, end_comment, created, modified)
+VALUES
+    ('E18', 'place', 'Shire','The Shire was the homeland of the hobbits.','2018-01-31', '2018-03-01', 'Begin of the shire', '2019-01-31',  '2019-03-01','Descent of Shire', '2022-09-21 16:38:01.923431','2022-09-21 16:38:05.923431'),
+    ('E21', 'person', 'Sam', 'That is Sam','200-01-31', '200-03-01', 'Begin of the shire', '700-01-31', '800-03-01','Descent of Shire', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name, description, modified)
 VALUES
@@ -25,7 +21,6 @@ VALUES
   ('E31', 'file', 'File not public', NULL, CURRENT_TIMESTAMP),
   ('E33', 'source', 'Silmarillion', NULL, CURRENT_TIMESTAMP),
   ('E21', 'person', 'Frodo', 'That is Frodo', CURRENT_TIMESTAMP),
-  ('E21', 'person', 'Sam', 'That is Sam', CURRENT_TIMESTAMP),
   ('E31', 'external_reference', 'https://lotr.fandom.com/', NULL, CURRENT_TIMESTAMP),
   ('E41', 'appellation', 'Sûza', NULL, CURRENT_TIMESTAMP),
   ('E41', 'appellation', 'The ring bearer', NULL, CURRENT_TIMESTAMP),

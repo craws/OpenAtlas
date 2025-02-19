@@ -253,7 +253,7 @@ class Entity:
         if self.class_.name not in ['source', 'source_translation']:
             return sanitize(self.description, 'text')
         AnnotationText.delete_annotations_text(self.id)
-        text = self.description
+        text = self.description.replace('</p><p>', '\n\n')
         replace_strings = [
             '<p>', '</p>', '<br class="ProseMirror-trailingBreak">']
         for string in replace_strings:
@@ -653,7 +653,6 @@ class Link:
                 if self.end_from else None
             self.last = format_date_part(self.end_to, 'year') \
                 if self.end_to else self.last
-
 
     def update(self) -> None:
         db_link.update({

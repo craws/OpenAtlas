@@ -31,10 +31,10 @@ class AnnotationImage:
         return AnnotationImage(db.get_annotation_image_by_id(id_))
 
     @staticmethod
-    def get_by_file(image_id: int) -> list[AnnotationImage]:
+    def get_by_file_id(id_: int) -> list[AnnotationImage]:
         return [
             AnnotationImage(row) for row
-            in db.get_annotation_image_by_file(image_id)]
+            in db.get_annotation_image_by_file_id(id_)]
 
     @staticmethod
     def get_orphaned_annotations() -> list[AnnotationImage]:
@@ -75,10 +75,10 @@ class AnnotationText:
         db.delete_annotations_text(source_id)
 
     @staticmethod
-    def get_by_source_id(source_id: int) -> list[AnnotationText]:
+    def get_by_source_id(id_: int) -> list[AnnotationText]:
         return [
             AnnotationText(row) for row
-            in db.get_annotation_text_by_source(source_id)]
+            in db.get_annotation_text_by_source_id(id_)]
 
     @staticmethod
     def insert(

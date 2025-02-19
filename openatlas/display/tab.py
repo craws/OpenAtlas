@@ -14,32 +14,13 @@ from openatlas.display.util2 import is_authorized, manual, uc_first
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
 
-# Needed for translations of tab titles
-_('bookmarks')
-_('circular dependencies')
-_('export')
-_('invalid dates')
-_('invalid link dates')
-_('invalid involvement dates')
-_('invalid preceding dates')
-_('invalid sub dates')
-_('member of')
-_('missing files')
-_('modules')
-_('notes')
-_('orphaned files')
-_('orphaned iiif files')
-_('orphaned subunits')
-_('presentation site')
-_('texts')
-_('unlinked')
-
 
 class Tab:
 
     def __init__(
             self,
             name: str,
+            label: Optional[str] = None,
             content: Optional[str] = None,
             table: Optional[Table] = None,
             buttons: Optional[list[str]] = None,
@@ -48,6 +29,7 @@ class Tab:
             tooltip: Optional[str] = None) -> None:
 
         self.name = name
+        self.label = uc_first(label or _(name))
         self.content = content
         self.entity = entity
         self.form = form

@@ -1,8 +1,9 @@
 from typing import Any, Optional
 
-from flask import g, json
+from flask import g, json, url_for
 
 from openatlas.api.resources.api_entity import ApiEntity
+from openatlas.display.util import check_iiif_activation, check_iiif_file_exist
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 from openatlas.models.reference_system import ReferenceSystem
@@ -107,8 +108,7 @@ def remove_spaces_dashes(string: str) -> str:
     return string.replace(' ', '').replace('-', '')
 
 
-def get_reference_systems(
-        links_inverse: list[Link]) -> list[dict[str, Any]]:
+def get_reference_systems(links_inverse: list[Link]) -> list[dict[str, Any]]:
     ref = []
     for link_ in links_inverse:
         if isinstance(link_.domain, ReferenceSystem) and link_.type:
@@ -123,14 +123,28 @@ def get_reference_systems(
                 'referenceSystem': system.name})
     return ref
 
+def get_iiif_manifest_and_path(img_id: int) -> dict[str, str]:
+    iiif_manifest = ''
+    iiif_base_path= ''
+    if check_iiif_activation() and check_iiif_file_exist(img_id):
+        iiif_manifest = url_for(
+            'api.iiif_manifest',
+            version=g.settings['iiif_version'],
+            id_=img_id,
+            _external=True)
+        if g.files.get(img_id):
+            iiif_base_path = \
+                f"{g.settings['iiif_url']}{img_id}{g.files[img_id].suffix}"
+    return {'IIIFManifest': iiif_manifest, 'IIIFBasePath': iiif_base_path}
 
 def get_geometric_collection(
         entity: Entity,
         links: list[Link],
         parser: Any) -> Optional[dict[str, Any]]:
+    geometry = None
     match entity.class_.view:
         case 'place' | 'artifact':
-            return get_geoms_by_entity(
+            geometry = get_geoms_by_entity(
                 get_location_id(links),
                 parser.centroid)
         case 'actor':
@@ -146,7 +160,7 @@ def get_geometric_collection(
                             centroids.append(centroid_result)
                 if centroids:
                     geoms.extend(centroids)  # pragma: no cover
-            return {
+            geometry = {
                 'type': 'GeometryCollection',
                 'geometries': [geom for sublist in geoms for geom in sublist]}
         case 'event':
@@ -162,12 +176,12 @@ def get_geometric_collection(
                             centroids.append(centroid_result)
                 if centroids:
                     geoms.extend(centroids)
-            return {
+            geometry = {
                 'type': 'GeometryCollection',
                 'geometries': [geom for sublist in geoms for geom in sublist]}
         case _ if entity.class_.name == 'object_location':
-            return get_geoms_by_entity(entity.id, parser.centroid)
-    return None
+            geometry = get_geoms_by_entity(entity.id, parser.centroid)
+    return geometry
 
 
 def get_location_id(links: list[Link]) -> int:
@@ -184,8 +198,10 @@ def get_location_link(links: list[Link]) -> Link:
 
 def get_geoms_by_entity(
         location_id: int,
-        centroid: Optional[bool] = False) -> dict[str, Any]:
+        centroid: Optional[bool] = False) -> Optional[dict[str, Any]]:
     geoms = Gis.get_by_id(location_id)
+    if not geoms:
+        return None
     if centroid:
         if centroid_result := Gis.get_centroids_by_id(location_id):
             geoms.extend(centroid_result)
@@ -257,3 +273,13 @@ def get_geoms_dict(geoms: list[dict[str, Any]]) -> Optional[dict[str, Any]]:
     if len(geoms) == 1:
         return geoms[0]
     return {'type': 'GeometryCollection', 'geometries': geoms}
+
+
+def get_value_for_types(type_: Entity, links: list[Link]) -> dict[str, str]:
+    type_dict = {}
+    for link in links:
+        if link.range.id == type_.id and link.description:
+            type_dict['value'] = link.description
+            if link.range.id == type_.id and type_.description:
+                type_dict['unit'] = type_.description
+    return type_dict

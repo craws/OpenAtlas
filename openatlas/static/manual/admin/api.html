@@ -113,29 +113,71 @@
 <div class="toctree-wrapper compound">
 </div>
 <p>Description: <a class="reference internal" href="../technical/api.html"><span class="doc">API</span></a></p>
-<ul>
-<li><p><strong>Public</strong> (default=off)</p>
+<section id="public-default-off">
+<h2><strong>Public</strong> (default=off)<a class="headerlink" href="#public-default-off" title="Permalink to this heading"></a></h2>
 <blockquote>
 <div><ul>
-<li><p>If turned off the API and files with a license can still be accessed by</p>
+<li><p>If turned off, the API can still be accessed by</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>A browser used b a logged in user</p></li>
+<li><p>A browser used by a logged in user</p></li>
+<li><p>A request is using a <a class="reference internal" href="#valid-token"><span class="std std-ref">Valid token</span></a></p></li>
 <li><p>If the IP of the request-computer is on the <strong>IP Whitelist</strong></p></li>
 </ul>
 </div></blockquote>
 </li>
+<li><p>If turned on the API and linked files with a license can be accessed without being logged in. This might be useful if you want to allow other systems to use your data without restrictions.</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="api-token">
+<h2><strong>API token</strong><a class="headerlink" href="#api-token" title="Permalink to this heading"></a></h2>
+<p>API Tokens can be created to query the API if it is turned off. Only Admins
+are allowed to create, revoke and delete tokens. Available options are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Generate</strong>: <a class="reference internal" href="#generate"><span class="std std-ref">Generate</span></a> a new token</p></li>
+<li><p><strong>Revoke all tokens</strong>: Revoke all available tokens</p></li>
+<li><p><strong>Authorize all tokens</strong>: All revoked tokens will be valid again</p></li>
+<li><p><strong>Delete revoked tokens</strong>: All revoked tokens will be deleted</p></li>
+<li><p><strong>Delete invalid tokens</strong>: All invalid tokens will be deleted (see <a class="reference internal" href="#valid-token"><span class="std std-ref">Valid token</span></a>)</p></li>
+</ul>
+</div></blockquote>
+<section id="valid-token">
+<span id="id1"></span><h3><strong>Valid token</strong><a class="headerlink" href="#valid-token" title="Permalink to this heading"></a></h3>
+<p>A token is valid if:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>valid from</strong> is greater than current date</p></li>
+<li><p><strong>revoked</strong> is <em>false</em>, meaning the token is not revoked</p></li>
+<li><p><a class="reference internal" href="user.html"><span class="doc">User</span></a> is active</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="generate">
+<span id="id2"></span><h3><strong>Generate</strong><a class="headerlink" href="#generate" title="Permalink to this heading"></a></h3>
+<ul class="simple">
 <li><dl class="simple">
-<dt>If turned on the API and linked files with a</dt><dd><p>license can be accessed without being logged in. This might be useful
-if you want to allow other systems to use your data without
-restrictions.</p>
+<dt><strong>Expiration</strong>:</dt><dd><p>Set how long a token is valid. Entered numbers are days. 0 means no expiration date.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>Token name</strong>:</dt><dd><p>To better distinguish between tokens, a individual name can be entered.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>User</strong>:</dt><dd><p>Select a <a class="reference internal" href="user.html"><span class="doc">User</span></a> for which the token will be created.</p>
 </dd>
 </dl>
 </li>
 </ul>
-</div></blockquote>
-</li>
-</ul>
+<p>After the <em>Generate</em> button is clicked, the site will reload and a grey box appears.
+In this box the token string will be visible and is copied on click.</p>
+<p><strong>Be aware</strong>, this is the only time, the token will be visible!</p>
+</section>
+</section>
 </section>
 
 

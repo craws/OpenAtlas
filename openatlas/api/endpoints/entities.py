@@ -1,13 +1,15 @@
 from typing import Any
 
 from flask import Response, g
-from flask_restful import Resource
+from flask_restful import Resource, marshal
 
 from openatlas.api.endpoints.endpoint import Endpoint
+from openatlas.api.formats.presentation_view import get_presentation_view
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.error import (
     InvalidLimitError, NotATypeError, QueryEmptyError)
 from openatlas.api.resources.parser import entity_, properties, query
+from openatlas.api.resources.templates import presentation_template
 from openatlas.api.resources.util import (
     get_entities_from_type_with_subs, get_entities_linked_to_special_type,
     get_entities_linked_to_special_type_recursive, get_linked_entities_api)
@@ -19,6 +21,7 @@ class GetByCidocClass(Resource):
         return Endpoint(
             ApiEntity.get_by_cidoc_classes([class_]),
             entity_.parse_args()).resolve_entities()
+
 
 class GetBySystemClass(Resource):
     @staticmethod
@@ -42,6 +45,16 @@ class GetEntitiesLinkedToEntity(Resource):
         return Endpoint(
             get_linked_entities_api(id_),
             entity_.parse_args()).resolve_entities()
+
+
+class GetEntityPresentationView(Resource):
+    @staticmethod
+    def get(id_: int) -> tuple[Resource, int] | Response | dict[str, Any]:
+        return marshal(
+            get_presentation_view(
+                ApiEntity.get_by_id(id_, types=True, aliases=True),
+                entity_.parse_args()),
+            presentation_template())
 
 
 class GetLinkedEntitiesByPropertyRecursive(Resource):
@@ -105,11 +118,11 @@ class GetQuery(Resource):
     def get() -> tuple[Resource, int] | Response | dict[str, Any]:
         parser = query.parse_args()
         if not any([
-                parser['entities'],
-                parser['cidoc_classes'],
-                parser['view_classes'],
-                parser['system_classes'],
-                parser['linked_entities']]):
+            parser['entities'],
+            parser['cidoc_classes'],
+            parser['view_classes'],
+            parser['system_classes'],
+            parser['linked_entities']]):
             raise QueryEmptyError
         entities = []
         if parser['entities']:

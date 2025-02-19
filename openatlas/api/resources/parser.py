@@ -150,7 +150,7 @@ entity_.add_argument(
     'centroid',
     type=str,
     case_sensitive=False,
-    default=False,
+    default='false',
     choices=('true', 'false'),
     location='args')
 
