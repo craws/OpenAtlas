@@ -15,7 +15,10 @@ def index_changelog() -> str:
 
 # pylint: disable=too-many-lines
 versions = {
-    '8.11.0': ['TBA', {}],
+    '8.10.1': ['TBA', {
+        'fix': {
+           '2481': 'Line breaks missing when copying to annotation widget',
+           '2482': 'Tabs: missing translations'}}],
     '8.10.0': ['2025-02-14', {
         'feature': {
             '2417': 'Make count from tabs more visible',
