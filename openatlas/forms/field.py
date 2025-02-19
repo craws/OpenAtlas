@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+from collections import OrderedDict
 from typing import Any, Optional
 
 from flask import g, render_template, request
@@ -248,12 +249,18 @@ class TableSelect(HiddenInput):
                     and g.classes[class_name_].hierarchies \
                     and g.classes[class_name_].standard_type_id:
                 standard_type_id = g.classes[class_name_].standard_type_id
+                types = OrderedDict({
+                    id_: g.types[id_] for id_ in
+                    g.classes[class_name_].hierarchies})
+                validators = [InputRequired()] if types[standard_type_id].required else []
                 setattr(
                     SimpleEntityForm,
                     f'{field.id}-{class_name_}-standard-type-dynamic',
                     TreeField(
                         str(standard_type_id),
-                        type_id=str(standard_type_id)))
+                        type_id=str(standard_type_id),
+                        validators=validators)
+                        )
             setattr(
                 SimpleEntityForm,
                 'description_dynamic',
