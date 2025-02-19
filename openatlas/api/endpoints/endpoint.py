@@ -18,8 +18,7 @@ from openatlas.api.resources.resolve_endpoints import (
 from openatlas.api.resources.templates import (
     geojson_collection_template, geojson_pagination, linked_place_pagination,
     linked_places_template, loud_pagination, loud_template)
-from openatlas.api.resources.util import geometry_to_geojson, \
-    get_location_link
+from openatlas.api.resources.util import get_location_link
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 
@@ -184,7 +183,7 @@ class Endpoint:
 
     def link_parser_check(self, inverse: bool = False) -> list[Link]:
         links = []
-        show_ = {'relations', 'types', 'depictions', 'links', 'geometry'}
+        show_ = {'relations', 'types', 'depictions', 'links'}
         if set(self.parser.show) & show_:
             links = Entity.get_links_of_entities(
                 [entity.id for entity in self.entities],
@@ -233,35 +232,24 @@ class Endpoint:
 
     def get_geojson(self) -> dict[str, Any]:
         out = []
-        links = Entity.get_links_of_entities(
-            [e.id for e in self.entities],
-            'P53')
-        for e in self.entities:
-            if e.class_.view == 'place':
-                entity_links = [x for x in links if x.domain.id == e.id]
-                e.types.update(get_location_link(entity_links).range.types)
-            if geoms := [
-                    self.parser.get_geojson_dict(e, geom)
-                    for geom in self.parser.get_geom(e)]:
-                out.extend(geoms)
+        for e in self.entities_with_links.values():
+            if e['entity'].class_.view == 'place':
+                e['entity'].types.update(
+                    get_location_link(e['links']).range.types)
+            if e['geometry']:
+                for geom in e['geometry']:
+                    out.append(self.parser.get_geojson_dict(e, geom))
             else:
                 out.append(self.parser.get_geojson_dict(e))
         return {'type': 'FeatureCollection', 'features': out}
 
     def get_geojson_v2(self) -> dict[str, Any]:
         out = []
-        property_codes = ['P53', 'P74', 'OA8', 'OA9', 'P7', 'P26', 'P27']
-        link_parser = self.link_parser_check()
-        links = [x for x in link_parser if x.property.code in property_codes]
-        for e in self.entities:
-            entity_links = [
-                link_ for link_ in links if link_.domain.id == e.id]
-            if e.class_.view == 'place':
-                e.types.update(get_location_link(entity_links).range.types)
-            if geom := self.parser.get_geoms_as_collection(
-                    e,
-                    [x.range.id for x in entity_links]):
-                out.append(self.parser.get_geojson_dict(e, geom))
+        for e in self.entities_with_links.values():
+            if e['entity'].class_.view == 'place':
+                e['entity'].types.update(
+                    get_location_link(e['links']).range.types)
+            out.append(self.parser.get_geojson_dict(e))
         return {'type': 'FeatureCollection', 'features': out}
 
     def get_entities_template(self, result: dict[str, Any]) -> dict[str, Any]:

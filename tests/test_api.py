@@ -48,8 +48,6 @@ class Api(ApiTestCase):
                         actor2 = entity
                     case 'Home of Baggins':
                         feature = entity
-                    case 'Location of Home of Baggins':
-                        feature_location = entity
                     case 'Sûza':
                         alias = entity
                     case 'Height':

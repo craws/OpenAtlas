@@ -1,11 +1,10 @@
-from collections import defaultdict
 from operator import attrgetter
 from typing import Any, Optional
 
 from flask import g
 
 from openatlas.api.resources.util import (
-    geometry_to_geojson, get_license_name, get_location_links,
+    geometry_to_geojson, get_license_name,
     get_reference_systems, remove_duplicate_entities,
     replace_empty_list_values_in_dict_with_none)
 from openatlas.display.util import get_file_path
@@ -54,7 +53,7 @@ def get_geometries_thanados(
             geometries = []
             for item in geom['geometries']:
                 if not item:
-                    continue
+                    continue  # pragma: no cover
                 item['coordinates'] = transform_geometries_for_xml(item)
                 geometries.append(item)
             geom['geometries'] = [{'geom': item} for item in geometries]
@@ -221,23 +220,13 @@ def get_subunits_from_id(
         link_dict[link_.domain.id]['links'].append(link_)
     for link_ in links_inverse:
         link_dict[link_.range.id]['links_inverse'].append(link_)
-    location_links = get_location_links(links)
-    location_ids = [l_.range.id for l_ in location_links]
-    location_geoms = Gis.get_by_ids(location_ids)
-
-    location_centroids = defaultdict(list)
+    for id_, geom in Gis.get_by_entities(entities).items():
+        link_dict[id_]['geoms'].extend(geom)
     if parser['centroid']:
-        location_centroids = Gis.get_centroids_by_ids(location_ids)
+        for id_, geom in \
+                Gis.get_centroids_by_entities(entities).items():
+            link_dict[id_]['geoms'].extend(geom)
 
-    for entity_ in entities:
-        for link_ in location_links:
-            if entity_.id == link_.domain.id:
-                entity_.location = link_.range
-                link_dict[entity_.id]['geoms'].extend(
-                    location_geoms[link_.range.id])
-                if parser['centroid'] and location_centroids:
-                    link_dict[entity_.id]['geoms'].extend(
-                        location_centroids[link_.range.id])
     external_reference = get_type_links_inverse(entities)
     entities_dict: dict[int, Any] = {}
     for entity_ in entities:

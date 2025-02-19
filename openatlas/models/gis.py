@@ -25,21 +25,9 @@ class Gis:
         return db.get_by_id(id_)
 
     @staticmethod
-    def get_by_ids(ids: list[int]) -> defaultdict[int, list[dict[str, Any]]]:
-        return db.get_by_ids(ids)
-
-    @staticmethod
     def get_by_entities(
             entities: list[Entity]) -> defaultdict[int, list[dict[str, Any]]]:
         return db.get_by_entity_ids([e.id for e in entities])
-
-    @staticmethod
-    def get_centroids_by_id(id_: int) -> Optional[list[dict[str, Any]]]:
-        return db.get_centroids_by_id(id_)
-
-    @staticmethod
-    def get_centroids_by_ids(ids: list[int]) -> defaultdict[int, list[Any]]:
-        return db.get_centroids_by_ids(ids)
 
     @staticmethod
     def get_centroids_by_entities(
@@ -54,7 +42,6 @@ class Gis:
     def get_all(
             objects: Optional[list[Entity]] = None,
             structure: Optional[dict[str, Any]] = None) -> dict[str, Any]:
-
         if not objects:
             objects = []
         all_: dict[str, list[Any]] = {

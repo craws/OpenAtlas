@@ -123,9 +123,10 @@ def get_reference_systems(links_inverse: list[Link]) -> list[dict[str, Any]]:
                 'referenceSystem': system.name})
     return ref
 
+
 def get_iiif_manifest_and_path(img_id: int) -> dict[str, str]:
     iiif_manifest = ''
-    iiif_base_path= ''
+    iiif_base_path = ''
     if check_iiif_activation() and check_iiif_file_exist(img_id):
         iiif_manifest = url_for(
             'api.iiif_manifest',
@@ -137,81 +138,14 @@ def get_iiif_manifest_and_path(img_id: int) -> dict[str, str]:
                 f"{g.settings['iiif_url']}{img_id}{g.files[img_id].suffix}"
     return {'IIIFManifest': iiif_manifest, 'IIIFBasePath': iiif_base_path}
 
-def get_geometric_collection(
-        entity: Entity,
-        links: list[Link],
-        parser: Any) -> Optional[dict[str, Any]]:
-    geometry = None
-    match entity.class_.view:
-        case 'place' | 'artifact':
-            geometry = get_geoms_by_entity(
-                get_location_id(links),
-                parser.centroid)
-        case 'actor':
-            geoms = [
-                Gis.get_by_id(link_.range.id) for link_ in links
-                if link_.property.code in ['P74', 'OA8', 'OA9']]
-            if parser.centroid:
-                centroids = []
-                for link_ in links:  # pragma: no cover
-                    if link_.property.code in ['P7', 'P26', 'P27']:
-                        if centroid_result := (
-                                Gis.get_centroids_by_id(link_.range.id)):
-                            centroids.append(centroid_result)
-                if centroids:
-                    geoms.extend(centroids)  # pragma: no cover
-            geometry = {
-                'type': 'GeometryCollection',
-                'geometries': [geom for sublist in geoms for geom in sublist]}
-        case 'event':
-            geoms = [
-                Gis.get_by_id(link_.range.id) for link_ in links
-                if link_.property.code in ['P7', 'P26', 'P27']]
-            if parser.centroid:
-                centroids = []
-                for link_ in links:
-                    if link_.property.code in ['P7', 'P26', 'P27']:
-                        if centroid_result := (
-                                Gis.get_centroids_by_id(link_.range.id)):
-                            centroids.append(centroid_result)
-                if centroids:
-                    geoms.extend(centroids)
-            geometry = {
-                'type': 'GeometryCollection',
-                'geometries': [geom for sublist in geoms for geom in sublist]}
-        case _ if entity.class_.name == 'object_location':
-            geometry = get_geoms_by_entity(entity.id, parser.centroid)
-    return geometry
-
-
-def get_location_id(links: list[Link]) -> int:
-    return [l_.range.id for l_ in links if l_.property.code == 'P53'][0]
-
-
-def get_location_links(links: list[Link]) -> list[Link]:
-    return [link_ for link_ in links if link_.property.code == 'P53']
-
 
 def get_location_link(links: list[Link]) -> Link:
     return [l_ for l_ in links if l_.property.code == 'P53'][0]
 
 
-def get_geoms_by_entity(
-        location_id: int,
-        centroid: Optional[bool] = False) -> Optional[dict[str, Any]]:
-    geoms = Gis.get_by_id(location_id)
-    if not geoms:
-        return None
-    if centroid:
-        if centroid_result := Gis.get_centroids_by_id(location_id):
-            geoms.extend(centroid_result)
-    if len(geoms) == 1:
-        return geoms[0]
-    return {'type': 'GeometryCollection', 'geometries': geoms}
-
-
 def geometry_to_geojson(
-        geoms: list[dict[str, Any]]) -> Optional[dict[str, Any]]:
+        geoms: Optional[list[dict[str, Any]]] = None) \
+        -> Optional[dict[str, Any]]:
     if not geoms:
         return None
     if len(geoms) == 1:
@@ -268,14 +202,6 @@ def get_crm_code(link_: Link, inverse: bool = False) -> str:
 
 def flatten_list_and_remove_duplicates(list_: list[Any]) -> list[Any]:
     return [item for sublist in list_ for item in sublist if item not in list_]
-
-
-def get_geoms_dict(geoms: list[dict[str, Any]]) -> Optional[dict[str, Any]]:
-    if len(geoms) == 0:
-        return None
-    if len(geoms) == 1:
-        return geoms[0]
-    return {'type': 'GeometryCollection', 'geometries': geoms}
 
 
 def get_value_for_types(type_: Entity, links: list[Link]) -> dict[str, str]:

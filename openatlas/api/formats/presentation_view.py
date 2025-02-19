@@ -5,7 +5,6 @@ from typing import Any
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.api.endpoints.parser import Parser
 from openatlas.api.formats.linked_places import get_lp_time
 from openatlas.api.resources.util import (
     get_crm_relation_x, geometry_to_geojson,
@@ -21,7 +20,7 @@ def get_presentation_types(
         links: list[Link]) -> list[dict[str, Any]]:
     types = []
     location_types = {}
-    if entity.class_.view in ['place', 'artifact']:
+    if entity.class_.view == 'place':
         location_types = get_location_link(links).range.types
     for type_ in entity.types | location_types:
         is_standard = False
@@ -121,29 +120,23 @@ def get_presentation_view(entity: Entity) -> dict[str, Any]:
             standard_type = {
                 'id': rel_entity.standard_type.id,
                 'title': rel_entity.standard_type.name}
-        geometries = {}
-        if geoms.get(rel_entity.id):
-            geometries = geometry_to_geojson(geoms[rel_entity.id])
         relations[rel_entity.class_.name].append({
             'id': rel_entity.id,
             'systemClass': rel_entity.class_.name,
             'title': rel_entity.name,
             'description': rel_entity.description,
             'aliases': list(rel_entity.aliases.values()),
-            'geometries': geometries,
+            'geometries': geometry_to_geojson(geoms.get(rel_entity.id)),
             'when': get_lp_time(rel_entity),
             'standardType': standard_type,
             'relationTypes': relation_types[rel_entity.id]})
-    geometries = {}
-    if geoms.get(entity.id):
-        geometries = geometry_to_geojson(geoms[entity.id])
     data = {
         'id': entity.id,
         'systemClass': entity.class_.name,
         'title': entity.name,
         'description': entity.description,
         'aliases': list(entity.aliases.values()),
-        'geometries': geometries,
+        'geometries': geometry_to_geojson(geoms.get(entity.id)),
         'when': get_lp_time(entity),
         'types': get_presentation_types(entity, links),
         'externalReferenceSystems': get_reference_systems(links_inverse),
