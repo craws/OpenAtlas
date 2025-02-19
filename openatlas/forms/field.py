@@ -259,8 +259,7 @@ class TableSelect(HiddenInput):
                     TreeField(
                         str(standard_type_id),
                         type_id=str(standard_type_id),
-                        validators=validators)
-                        )
+                        validators=validators))
             setattr(
                 SimpleEntityForm,
                 'description_dynamic',
