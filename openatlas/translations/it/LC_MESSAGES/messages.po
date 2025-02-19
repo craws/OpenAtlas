@@ -8,15 +8,16 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2025-02-18 10:12+0100\n"
-"PO-Revision-Date: 2025-02-19 14:26+0100\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: it\n"
+"PO-Revision-Date: 2025-02-19 14:36+0100\n"
+"Last-Translator: \n"
 "Language-Team: it <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.10.3\n"
+"X-Generator: Poedit 3.5\n"
 
 #: openatlas/api/endpoints/iiif.py:263 openatlas/display/classes.py:48
 #: openatlas/display/classes.py:340 openatlas/display/util.py:214
@@ -1269,7 +1270,7 @@ msgstr ""
 #: openatlas/views/profile.py:141 openatlas/views/profile.py:163
 #: openatlas/views/profile.py:165
 msgid "profile"
-msgstr ""
+msgstr "profilo"
 
 #: openatlas/templates/layout.html:122 openatlas/views/admin.py:122
 #: openatlas/views/admin.py:123 openatlas/views/admin.py:222
@@ -1311,7 +1312,7 @@ msgstr ""
 #: openatlas/views/login.py:102 openatlas/views/login.py:104
 #: openatlas/views/login.py:152
 msgid "login"
-msgstr ""
+msgstr "login"
 
 #: openatlas/templates/forms/table_multi_select.html:53
 #: openatlas/templates/forms/table_select.html:60
@@ -1459,8 +1460,8 @@ msgstr ""
 #: openatlas/templates/error/400.html:8 openatlas/templates/error/403.html:7
 #: openatlas/templates/error/404.html:12
 msgid ""
-"Use the back button of your browser or click <a href=\"/\">here</a> to go"
-" to the main page."
+"Use the back button of your browser or click <a href=\"/\">here</a> to go to "
+"the main page."
 msgstr ""
 
 #: openatlas/templates/error/400.html:11 openatlas/templates/error/403.html:10
@@ -1482,8 +1483,8 @@ msgstr ""
 
 #: openatlas/templates/error/404.html:9
 msgid ""
-"We searched a long time but this document does not exist. Maybe you "
-"mistyped or followed a broken link."
+"We searched a long time but this document does not exist. Maybe you mistyped "
+"or followed a broken link."
 msgstr ""
 
 #: openatlas/templates/error/418.html:8
@@ -1648,8 +1649,8 @@ msgstr ""
 
 #: openatlas/templates/sql/index.html:6
 msgid ""
-"Warning: direct database manipulation is dangerous and can result in data"
-" loss and/or an unusable application!"
+"Warning: direct database manipulation is dangerous and can result in data "
+"loss and/or an unusable application!"
 msgstr ""
 
 #: openatlas/templates/sql/index.html:10
@@ -1727,8 +1728,8 @@ msgstr ""
 
 #: openatlas/templates/type/required.html:10
 msgid ""
-"entities have no type. Be aware, that these than can't be updated, "
-"without setting this type."
+"entities have no type. Be aware, that these than can't be updated, without "
+"setting this type."
 msgstr ""
 
 #: openatlas/templates/type/required.html:13
@@ -2361,8 +2362,7 @@ msgstr ""
 
 #: openatlas/views/index.py:183
 msgid ""
-"You have successfully unsubscribed. You can subscribe again in your "
-"Profile."
+"You have successfully unsubscribed. You can subscribe again in your Profile."
 msgstr ""
 
 #: openatlas/views/index.py:189
@@ -2831,4 +2831,3 @@ msgstr ""
 #: openatlas/views/vocabs.py:189
 msgid "You are about to import following hierarchy"
 msgstr ""
-
