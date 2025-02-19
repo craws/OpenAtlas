@@ -22,7 +22,8 @@ from openatlas.api.resources.search import get_search_values, search_entity
 from openatlas.api.resources.search_validation import (
     check_if_date_search, validate_search_parameters)
 from openatlas.api.resources.util import (
-    flatten_list_and_remove_duplicates, get_geometric_collection,
+    flatten_list_and_remove_duplicates, geometry_to_geojson,
+    get_geometric_collection,
     get_geoms_dict, get_location_link, get_reference_systems,
     get_value_for_types, replace_empty_list_values_in_dict_with_none)
 from openatlas.models.entity import Entity, Link
@@ -225,7 +226,7 @@ class Parser:
                 'names':
                     [{"alias": value} for value in entity.aliases.values()]
                     if entity.aliases and 'names' in self.show else None,
-                'geometry': entity_dict['geometry']
+                'geometry': geometry_to_geojson(entity_dict['geometry'])
                 if 'geometry' in self.show else None,
                 'relations': get_lp_links(links, links_inverse, self)
                 if 'relations' in self.show else None})]}

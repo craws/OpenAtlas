@@ -8,7 +8,7 @@ from openatlas import app
 from openatlas.api.endpoints.parser import Parser
 from openatlas.api.formats.linked_places import get_lp_time
 from openatlas.api.resources.util import (
-    get_crm_relation_x, get_geojson_geometries,
+    get_crm_relation_x, geometry_to_geojson,
     get_iiif_manifest_and_path, get_license_name, get_location_link,
     get_reference_systems, get_value_for_types, to_camel_case)
 from openatlas.display.util import get_file_path
@@ -123,7 +123,7 @@ def get_presentation_view(entity: Entity) -> dict[str, Any]:
                 'title': rel_entity.standard_type.name}
         geometries = {}
         if geoms.get(rel_entity.id):
-            geometries = get_geojson_geometries(geoms[rel_entity.id])
+            geometries = geometry_to_geojson(geoms[rel_entity.id])
         relations[rel_entity.class_.name].append({
             'id': rel_entity.id,
             'systemClass': rel_entity.class_.name,
@@ -136,7 +136,7 @@ def get_presentation_view(entity: Entity) -> dict[str, Any]:
             'relationTypes': relation_types[rel_entity.id]})
     geometries = {}
     if geoms.get(entity.id):
-        geometries = get_geojson_geometries(geoms[entity.id])
+        geometries = geometry_to_geojson(geoms[entity.id])
     data = {
         'id': entity.id,
         'systemClass': entity.class_.name,

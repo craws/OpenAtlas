@@ -65,7 +65,11 @@ def get_by_entity_ids(
         JOIN model.gis g ON l.range_id = g.entity_id
 		WHERE l.property_code in 
 		    ('P53', 'P74', 'OA8', 'OA9', 'P7', 'P26', 'P27') 
-		AND l.domain_id IN %(ids)s;
+		AND l.domain_id IN %(ids)s
+		AND (
+            geom_point IS NOT NULL 
+            OR geom_linestring IS NOT NULL
+            OR geom_polygon IS NOT NULL);
         """,
         {'ids': tuple(ids)})
     locations = defaultdict(list)
@@ -141,6 +145,37 @@ def get_centroids_by_ids(ids: list[int]) -> defaultdict[int, list[Any]]:
         locations[row['entity_id']].append(get_centroid_dict(row))
     return locations
 
+
+def get_centroids_by_entities(ids: list[int]) -> defaultdict[int, list[Any]]:
+    g.cursor.execute(
+        """
+        SELECT
+            g.id,
+			l.domain_id as entity_id,
+            g.entity_id as location_id,
+            g.name,
+            g.description,
+            g.type,
+            CASE WHEN geom_linestring IS NULL THEN NULL ELSE
+                public.ST_AsGeoJSON(public.ST_PointOnSurface(geom_linestring))
+                END AS linestring_point,
+            CASE WHEN geom_polygon IS NULL THEN NULL ELSE
+                public.ST_AsGeoJSON(public.ST_PointOnSurface(geom_polygon))
+                END AS polygon_point
+		FROM model.link l
+        JOIN model.gis g ON l.range_id = g.entity_id
+		WHERE l.property_code in 
+		    ('P53', 'P74', 'OA8', 'OA9', 'P7', 'P26', 'P27') 
+		AND l.domain_id IN %(ids)s
+		AND (
+            geom_linestring IS NOT NULL 
+            OR geom_polygon IS NOT NULL);
+        """,
+        {'ids': tuple(ids)})
+    locations = defaultdict(list)
+    for row in list(g.cursor):
+        locations[row['entity_id']].append(get_centroid_dict(row))
+    return locations
 
 def get_centroid_dict(row: dict[str, Any]) -> dict[str, Any]:
     if row['linestring_point']:

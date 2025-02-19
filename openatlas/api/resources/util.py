@@ -210,7 +210,10 @@ def get_geoms_by_entity(
     return {'type': 'GeometryCollection', 'geometries': geoms}
 
 
-def get_geojson_geometries(geoms: list[dict[str, Any]]) -> dict[str, Any]:
+def geometry_to_geojson(
+        geoms: list[dict[str, Any]]) -> Optional[dict[str, Any]]:
+    if not geoms:
+        return None
     if len(geoms) == 1:
         return geoms[0]
     return {'type': 'GeometryCollection', 'geometries': geoms}

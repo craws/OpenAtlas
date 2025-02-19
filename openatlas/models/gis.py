@@ -42,6 +42,11 @@ class Gis:
         return db.get_centroids_by_ids(ids)
 
     @staticmethod
+    def get_centroids_by_entities(
+            entities: list[Entity]) -> defaultdict[int, list[Any]]:
+        return db.get_centroids_by_entities([e.id for e in entities])
+
+    @staticmethod
     def get_wkt_by_id(id_: int) -> list[dict[str, Any]]:
         return db.get_wkt_by_id(id_)
 
