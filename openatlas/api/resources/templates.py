@@ -3,13 +3,34 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import Any, TYPE_CHECKING, Type
 
+from flask import g
 from flask_restful import fields
 from flask_restful.fields import Integer, List, Nested, String
 
+from openatlas import app
 from openatlas.models.entity import Entity
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.api.endpoints.parser import Parser
+
+start = {
+    'earliest': fields.String,
+    'latest': fields.String,
+    'comment': fields.String}
+end = {
+    'earliest': fields.String,
+    'latest': fields.String,
+    'comment': fields.String}
+description = {'value': fields.String}
+timespans = {'start': fields.Nested(start), 'end': fields.Nested(end)}
+
+external_references = {
+    'type': fields.String,
+    'identifier': fields.String,
+    'referenceSystem': fields.String,
+    'resolverURL': fields.String,
+    'referenceURL': fields.String,
+    'id': fields.String}
 
 
 def geojson_template() -> dict[str, Any]:
@@ -79,6 +100,9 @@ def linked_places_template(parser: Parser) -> dict[str, Type[String]]:
         'IIIFBasePath': fields.String,
         'IIIFManifest': fields.String}
     links = {
+        'referenceURL': fields.String,
+        'id': fields.String,
+        'resolverURL': fields.String,
         'type': fields.String,
         'identifier': fields.String,
         'referenceSystem': fields.String}
@@ -95,16 +119,7 @@ def linked_places_template(parser: Parser) -> dict[str, Type[String]]:
         'unit': fields.String}
 
     names = {'alias': fields.String}
-    start = {
-        'earliest': fields.String,
-        'latest': fields.String,
-        'comment': fields.String}
-    end = {
-        'earliest': fields.String,
-        'latest': fields.String,
-        'comment': fields.String}
-    description = {'value': fields.String}
-    timespans = {'start': fields.Nested(start), 'end': fields.Nested(end)}
+
     when = {'timespans': fields.List(fields.Nested(timespans))}
     relations = {
         'label': fields.String,
@@ -180,19 +195,72 @@ def loud_template(result: dict[str, Any]) -> dict[str, Any]:
     return template
 
 
+def presentation_template() -> dict[str, Any]:
+    hierarchy = {
+        'label': fields.String,
+        'descriptions': fields.String,
+        'identifier': fields.String}
+    types = {
+        'id': fields.Integer,
+        'title': fields.String,
+        'descriptions': fields.String,
+        'isStandard': fields.Boolean,
+        'typeHierarchy': fields.List(fields.Nested(hierarchy))}
+    files = {
+        'id': fields.Integer,
+        'title': fields.String,
+        'license': fields.String,
+        'creator': fields.String,
+        'licenseHolder': fields.String,
+        'publicShareable': fields.String,
+        'mimetype': fields.String,
+        'url': fields.String}
+    relation_types = {
+        'property': fields.String,
+        'relationTo': fields.Integer,
+        'type': fields.String,
+        'description': fields.String,
+        'when': fields.Nested(timespans)}
+    relations = {
+        'id': fields.Integer,
+        'systemClass': fields.String,
+        'title': fields.String,
+        'description': fields.String,
+        'aliases': fields.List(fields.String),
+        'geometries': fields.Raw,
+        'when': fields.Nested(timespans),
+        'standardType': fields.Nested({
+            'id': fields.Integer,
+            'title': fields.String}),
+        'relationTypes': fields.List(fields.Nested(relation_types))}
+    def get_relations() -> fields:
+        dict_ = {}
+        for name in g.classes:
+            if name in app.config['API_PRESENTATION_EXCLUDE_RELATION']:
+                continue
+            dict_[name] =  fields.List(fields.Nested(relations))
+        return fields.Nested(dict_)
+    return {
+        'id': fields.Integer,
+        'systemClass': fields.String,
+        'title': fields.String,
+        'description': fields.String,
+        'aliases': fields.List(fields.String),
+        'geometries': fields.Raw,
+        'when': fields.Nested(timespans),
+        'types': fields.List(fields.Nested(types)),
+        'externalReferenceSystems': fields.List(
+            fields.Nested(external_references)),
+        'files': fields.List(fields.Nested(files)),
+        'relations': get_relations()}
+
+
 def subunit_template(id_: str) -> dict[str, List]:
     timespan = {
         'earliestBegin': fields.String,
         'latestBegin': fields.String,
         'earliestEnd': fields.String,
         'latestEnd': fields.String}
-    external_references = {
-        'type': fields.String,
-        'identifier': fields.String,
-        'referenceSystem': fields.String,
-        'resolverURL': fields.String,
-        'referenceURL': fields.String,
-        'id': fields.String}
     standard_type = {
         'name': fields.String,
         'id': fields.Integer,

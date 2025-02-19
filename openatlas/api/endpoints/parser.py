@@ -24,7 +24,7 @@ from openatlas.api.resources.search_validation import (
 from openatlas.api.resources.util import (
     flatten_list_and_remove_duplicates, get_geometric_collection,
     get_geoms_dict, get_location_link, get_reference_systems,
-    replace_empty_list_values_in_dict_with_none)
+    get_value_for_types, replace_empty_list_values_in_dict_with_none)
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 
@@ -71,6 +71,8 @@ class Parser:
         self.is_valid_url()
         if self.url and not self.url.endswith('/'):
             self.url += '/'
+        if self.centroid:
+            self.centroid = parser['centroid'] == 'true'
 
     def set_search_param(self) -> None:
         try:
@@ -125,6 +127,8 @@ class Parser:
                     found = False
                     break
                 found = True
+            if found:
+                return True
         return found
 
     def get_properties_for_links(self) -> list[str]:
@@ -157,14 +161,16 @@ class Parser:
         return \
             [entry['startId'] for entry in index if entry['page'] == page][0]
 
-    def get_start_entity(self, total: list[int]) -> list[Any]:
+    def set_start_entity(self, total: list[int]) -> list[Any]:
         if self.first and int(self.first) in total:
-            return list(itertools.islice(
-                total,
-                total.index(int(self.first)),
-                None))
+            return list(
+                itertools.islice(
+                    total,
+                    total.index(int(self.first)),
+                    None))
         if self.last and int(self.last) in total:
-            if not (out := list(itertools.islice(
+            if not (
+                out := list(itertools.islice(
                     total,
                     total.index(int(self.last)) + 1,
                     None))):
@@ -187,6 +193,7 @@ class Parser:
                     geoms.extend(centroid_result)
             return geoms
         return []
+
 
     def get_linked_places_entity(
             self,
@@ -315,10 +322,6 @@ class Parser:
                     'identifier': url_for(
                         'api.entity', id_=g.types[root].id, _external=True)}
                     for root in type_.root]}
-            for link in links:
-                if link.range.id == type_.id and link.description:
-                    type_dict['value'] = link.description
-                    if link.range.id == type_.id and type_.description:
-                        type_dict['unit'] = type_.description
+            type_dict.update(get_value_for_types(type_, links))
             types.append(type_dict)
         return types

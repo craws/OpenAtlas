@@ -156,8 +156,12 @@ class User(UserMixin):
             'table_show_icons': False,
             'show_email': False}
         for setting in g.settings:
-            if setting in \
-                    ['map_zoom_max', 'map_zoom_default', 'table_rows'] \
+            if setting in [
+                    'frontend_website_url',
+                    'frontend_resolver_url',
+                    'map_zoom_max',
+                    'map_zoom_default',
+                    'table_rows'] \
                     or setting.startswith('module_'):
                 settings[setting] = g.settings[setting]
         for row in db.get_settings(user_id):

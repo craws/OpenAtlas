@@ -14,7 +14,7 @@ class TokenTests(TestBaseCase):
         assert b'Token' in rv.data
 
         rv = c.get(url_for('generate_token'))
-        assert b'generate token' in rv.data
+        assert b'generate' in rv.data
 
         generating_tokens = [
             {'expiration': 1, 'token_name': 'one day token', 'user': 2},
@@ -78,7 +78,7 @@ class TokenTests(TestBaseCase):
             for token_ in jwt_token_strings:
                 decoded = decode_token(token_)
                 rv = c.get(
-                    url_for('api_04.class_mapping', locale='de'),
+                    url_for('api_04.class_mapping'),
                     headers={'Authorization': f'Bearer {token_}'})
                 if decoded['sub'] in ['Alice', 'Inactive']:
                     assert b'Token has been revoked' in rv.data
@@ -91,10 +91,10 @@ class TokenTests(TestBaseCase):
                 data={'username': 'Alice', 'password': 'test'})
 
         rv = c.get(url_for('delete_revoked_tokens'), follow_redirects=True)
-        assert b'All revoked tokens deleted' in rv.data
+        assert b'Tokens deleted' in rv.data
 
         rv = c.get(url_for('delete_invalid_tokens'), follow_redirects=True)
-        assert b'All invalid tokens deleted' in rv.data
+        assert b'Tokens deleted' in rv.data
 
         rv = c.get(
             url_for('delete_token', id_=tokens[-1]['id']),

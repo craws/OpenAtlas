@@ -49,7 +49,7 @@ class EventTest(TestBaseCase):
             'begin_month_from': '10',
             'begin_day_from': '8',
             'end_year_from': '1951',
-            'event_preceding': '',
+            'preceding_event': '',
             f'reference_system_id_{g.wikidata.id}':
                 ['Q123', self.precision_type.subs[0]]}
 
@@ -167,7 +167,7 @@ class EventTest(TestBaseCase):
             url_for('update', id_=event_id),
             data={
                 'name': 'Event with preceding',
-                'event_preceding': activity_id,
+                'preceding_event': activity_id,
                 'event_id': event_id},
             follow_redirects=True)
         assert b'Event with preceding' in rv.data
