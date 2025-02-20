@@ -133,7 +133,7 @@ class Parser:
     def get_properties_for_links(self) -> list[str]:
         codes: list[str] = []
         if self.relation_type:
-            codes = self.relation_type
+            codes = self.relation_type + ['P53']
             if 'geometry' in self.show:
                 codes.extend(['P53', 'P74', 'OA8', 'OA9', 'P7', 'P26', 'P27'])
             if 'types' in self.show:
