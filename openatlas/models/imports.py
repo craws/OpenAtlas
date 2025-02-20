@@ -104,7 +104,10 @@ def import_data_(project: Project, class_: str, data: list[Any]) -> None:
                     g.view_class_mapping['place'] +
                     g.view_class_mapping['artifact']):
                 class_ = value.lower().replace(' ', '_')
-        entity = Entity.insert(class_, row['name'], row.get('description'))
+        description = row.get('description')
+        if value := row.get('unit'):
+            description = value
+        entity = Entity.insert(class_, row['name'], description)
         db.import_data(
             project.id,
             entity.id,
@@ -123,14 +126,26 @@ def import_data_(project: Project, class_: str, data: list[Any]) -> None:
             'parent_id': row.get('parent_id'),
             'openatlas_parent_id':  row.get('openatlas_parent_id')}
     for entry in entities.values():
-        if entry['parent_id']:
-            entities[entry['parent_id']]['entity'].link(
-                'P46',
-                entry['entity'])
-        if entry['openatlas_parent_id']:
-            Entity.get_by_id(entry['openatlas_parent_id']).link(
-                'P46',
-                entry['entity'])
+        if entry['entity'].class_.name in (
+                    g.view_class_mapping['place'] +
+                    g.view_class_mapping['artifact']):
+            if entry['parent_id']:
+                entities[entry['parent_id']]['entity'].link(
+                    'P46',
+                    entry['entity'])
+            if entry['openatlas_parent_id']:
+                Entity.get_by_id(entry['openatlas_parent_id']).link(
+                    'P46',
+                    entry['entity'])
+        if entry['entity'].class_.name == 'type':
+            if entry['parent_id']:
+                entities[entry['parent_id']]['entity'].link(
+                    'P127',
+                    entry['entity'])
+            if entry['openatlas_parent_id']:
+                Entity.get_by_id(entry['openatlas_parent_id']).link(
+                    'P127',
+                    entry['entity'])
 
 
 def insert_dates(entity: Entity, row: dict[str, Any]) -> None:
