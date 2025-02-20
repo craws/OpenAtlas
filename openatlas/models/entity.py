@@ -235,16 +235,17 @@ class Entity:
             setattr(self, key, value)
         db.update({
             'id': self.id,
-            'name': self.name.strip(),
+            'name': sanitize(self.name, 'text'),
             'begin_from': datetime64_to_timestamp(self.begin_from),
             'begin_to': datetime64_to_timestamp(self.begin_to),
             'end_from': datetime64_to_timestamp(self.end_from),
             'end_to': datetime64_to_timestamp(self.end_to),
             'begin_comment':
-                str(self.begin_comment).strip()
+                sanitize(self.begin_comment, 'text')
                 if self.begin_comment else None,
             'end_comment':
-                str(self.end_comment).strip() if self.end_comment else None,
+                sanitize(self.end_comment, 'text')
+                if self.end_comment else None,
             'description': self.update_description()})
 
     def update_description(self) -> Optional[str]:
@@ -365,7 +366,7 @@ class Entity:
         if not new:
             db.update({
                 'id': self.location.id,
-                'name': f'Location of {str(self.name).strip()}',
+                'name': f"Location of {sanitize(self.name,'text')}",
                 'begin_from': None,
                 'begin_to': None,
                 'end_from': None,
@@ -382,7 +383,7 @@ class Entity:
     def remove_profile_image(self) -> None:
         db.remove_profile_image(self.id)
 
-    def get_name_directed(self, inverse: bool = False) -> str:
+    def get_name_directed(self, inverse: bool = False) -> str | None:
         """Returns name part of a directed type e.g. parent of (child of)"""
         name_parts = self.name.split(' (')
         if inverse and len(name_parts) > 1:
@@ -471,7 +472,7 @@ class Entity:
     def insert(class_: str, name: str, desc: Optional[str] = None) -> Entity:
         return Entity.get_by_id(
             db.insert({
-                'name': name.strip(),
+                'name': sanitize(name, 'text'),
                 'code': g.classes[class_].cidoc_class.code,
                 'openatlas_class_name': class_,
                 'description': sanitize(desc, 'text') if desc else None}))

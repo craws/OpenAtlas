@@ -18,14 +18,16 @@ from openatlas import app
 
 
 @app.template_filter()
-def sanitize(string: str, mode: Optional[str] = None) -> str:
+def sanitize(string: str | None, mode: Optional[str] = None) -> Optional[str]:
     if not string:
-        return ''
+        return None
     if mode == 'text':  # Remove HTML tags, keep linebreaks
         stripper = MLStripper()
         stripper.feed(string)
-        return stripper.get_data().strip()
-    return re.sub('[^A-Za-z0-9]+', '', string)  # Filter ASCII letters/numbers
+        sanitized = stripper.get_data().strip()
+    else:  # Filter ASCII letters/numbers
+        sanitized = re.sub('[^A-Za-z0-9]+', '', string)
+    return sanitized or None
 
 
 class MLStripper(HTMLParser):

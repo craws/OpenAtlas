@@ -181,12 +181,12 @@ class User(UserMixin):
     def insert_note(
             entity_id: int,
             user_id: int,
-            note: str,
+            note: str | None,
             public: bool) -> None:
         db.insert_note(user_id, entity_id, sanitize(note, 'text'), public)
 
     @staticmethod
-    def update_note(id_: int, note: str, public: bool) -> None:
+    def update_note(id_: int, note: str | None, public: bool) -> None:
         db.update_note(id_, sanitize(note, 'text'), public)
 
     @staticmethod
