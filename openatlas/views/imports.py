@@ -189,7 +189,7 @@ def import_project_view(id_: int) -> str:
                 ['source'] \
                 + g.view_class_mapping['event'] \
                 + g.view_class_mapping['actor'] \
-                + ['place', 'artifact', 'bibliography', 'edition']:
+                + ['place', 'artifact', 'bibliography', 'edition', 'type']:
             buttons.append(button(
                 _(class_),
                 url_for('import_data', project_id=project.id, class_=class_)))
@@ -271,7 +271,7 @@ def import_data(project_id: int, class_: str) -> str:
     table = None
     imported = False
     file_data = get_backup_file_data()
-    class_label = g.classes[class_].label
+    class_label = g.classes[class_.replace(' ', '_')].label
     checks = CheckHandler()
     if form.validate_on_submit():
         try:
@@ -396,6 +396,9 @@ def check_parent(entity_class: str, parent_class: str) -> bool:
             if (parent_class in
                     g.view_class_mapping['place'] + ['human_remains']):
                 return True
+        case 'type':
+            if parent_class == 'type':
+                return True
         case _:
             return False
     return False  # pragma: no cover
@@ -421,7 +424,9 @@ def get_clean_header(
 
 
 def get_allowed_columns(class_: str) -> dict[str, list[str]]:
-    columns = ['name', 'id', 'description', 'type_ids', 'value_types']
+    columns = ['name', 'id', 'description']
+    if class_ not in ['type']:
+        columns.extend(['type_ids', 'value_types'])
     if class_ not in g.view_class_mapping['reference']:
         columns.extend([
             'begin_from', 'begin_to', 'begin_comment',
@@ -431,10 +436,15 @@ def get_allowed_columns(class_: str) -> dict[str, list[str]]:
         columns.append('alias')
     if class_ in ['place', 'artifact']:
         columns.append('wkt')
-    if class_ in ['place']:
+    if class_ in ['place', 'type']:
+        columns.append([
+            'parent_id', 'openatlas_parent_id'])
+    if class_ == 'place':
         columns.extend([
-            'administrative_unit_id', 'historical_place_id', 'parent_id',
-            'openatlas_class', 'openatlas_parent_id'])
+            'administrative_unit_id', 'historical_place_id',
+            'openatlas_class'])
+    if class_ ==  'type':
+        columns.extend(['unit'])
     return {
         'allowed': columns,
         'valid': [],
