@@ -659,7 +659,7 @@ def display_annotation_text_links(source: Entity) -> str:
     for annotation in AnnotationText.get_by_source_id(source.id):
         if not annotation.text and not annotation.entity_id:
             continue  # pragma: no cover
-        title = f'title="{sanitize(annotation.text, "text")}"' \
+        title = f'title="{sanitize(annotation.text)}"' \
             if annotation.text else ''
         if annotation.entity_id:
             tag_open = f'<a href="/entity/{annotation.entity_id}" {title}>'

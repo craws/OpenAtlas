@@ -11,7 +11,10 @@ from openatlas.models.user import User
 class Token:
 
     @staticmethod
-    def generate_token(expiration: int, token_name: str, user_: User) -> str:
+    def generate_token(
+            expiration: int,
+            token_name: str | None,
+            user_: User) -> str:
         access_token = create_access_token(
             identity=user_.username,
             additional_claims={'role': user_.group},

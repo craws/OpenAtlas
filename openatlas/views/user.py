@@ -18,7 +18,7 @@ from openatlas.display.table import Table
 from openatlas.display.util import (
     button, description, display_info, link, required_group, send_mail)
 from openatlas.display.util2 import (
-    format_date, is_authorized, manual, uc_first)
+    format_date, is_authorized, manual, sanitize, uc_first)
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField, generate_password_field
 from openatlas.models.entity import Entity
@@ -239,10 +239,10 @@ def user_update(id_: int) -> str | Response:
     if user and form.validate_on_submit():
         # Active is always True for current user to prevent self deactivation
         user.active = True if user.id == current_user.id else form.active.data
-        user.real_name = form.real_name.data
-        user.username = form.username.data
+        user.real_name = sanitize(form.real_name.data)
+        user.username = sanitize(form.username.data)
         user.email = form.email.data
-        user.description = form.description.data
+        user.description = sanitize(form.description.data)
         user.group = form.group.data
         user.update()
         flash(_('info update'), 'info')
@@ -268,9 +268,9 @@ def user_insert() -> str | Response:
         del form.send_info
     if form.validate_on_submit():
         user_id = User.insert({
-            'username': form.username.data.strip(),
-            'real_name': form.real_name.data.strip(),
-            'info': form.description.data,
+            'username': sanitize(form.username.data),
+            'real_name': sanitize(form.real_name.data) or '',
+            'info': sanitize(form.description.data) or '',
             'email': form.email.data,
             'active': form.active.data,
             'group_name': form.group.data,
