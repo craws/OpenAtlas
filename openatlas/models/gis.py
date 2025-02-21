@@ -29,6 +29,11 @@ class Gis:
         return db.get_by_ids(ids)
 
     @staticmethod
+    def get_by_place_ids(
+            ids: list[int]) -> defaultdict[int, list[dict[str, Any]]]:
+        return db.get_by_place_ids(ids)
+
+    @staticmethod
     def get_centroids_by_id(id_: int) -> Optional[list[dict[str, Any]]]:
         return db.get_centroids_by_id(id_)
 
@@ -168,11 +173,9 @@ class Gis:
                     shape='linestring' if shape == 'line' else shape,
                     data={
                         'entity_id': entity.id,
-                        'name': sanitize(item['properties']['name'], 'text'),
+                        'name': sanitize(item['properties']['name']),
                         'description':
-                            sanitize(
-                                item['properties']['description'],
-                                'text'),
+                            sanitize(item['properties']['description']),
                         'type': item['properties']['shapeType'],
                         'geojson': json.dumps(item['geometry'])})
 
@@ -193,8 +196,8 @@ class Gis:
         db.insert_wkt({
             'entity_id': location.id,
             'description':
-                f"Imported geometry of {sanitize(entity.name, 'text')} "
-                f"from the {sanitize(project.name, 'text')} project",
+                f"Imported geometry of {sanitize(entity.name)} "
+                f"from the {sanitize(project.name)} project",
             'type': shape_type,
             'wkt': str(wkt_)},
             wkt_type)

@@ -40,10 +40,10 @@ class User(UserMixin):
     def update(self) -> None:
         db.update({
             'id': self.id,
-            'username': self.username.strip(),
-            'real_name': self.real_name.strip(),
+            'username': sanitize(self.username),
+            'real_name': sanitize(self.real_name) or '',
             'password': self.password,
-            'info': self.description,
+            'info': sanitize(self.description) or '',
             'email': self.email,
             'active': self.active,
             'group_name': self.group,
@@ -156,8 +156,12 @@ class User(UserMixin):
             'table_show_icons': False,
             'show_email': False}
         for setting in g.settings:
-            if setting in \
-                    ['map_zoom_max', 'map_zoom_default', 'table_rows'] \
+            if setting in [
+                    'frontend_website_url',
+                    'frontend_resolver_url',
+                    'map_zoom_max',
+                    'map_zoom_default',
+                    'table_rows'] \
                     or setting.startswith('module_'):
                 settings[setting] = g.settings[setting]
         for row in db.get_settings(user_id):
@@ -177,13 +181,13 @@ class User(UserMixin):
     def insert_note(
             entity_id: int,
             user_id: int,
-            note: str,
+            note: str | None,
             public: bool) -> None:
-        db.insert_note(user_id, entity_id, sanitize(note, 'text'), public)
+        db.insert_note(user_id, entity_id, sanitize(note), public)
 
     @staticmethod
-    def update_note(id_: int, note: str, public: bool) -> None:
-        db.update_note(id_, sanitize(note, 'text'), public)
+    def update_note(id_: int, note: str | None, public: bool) -> None:
+        db.update_note(id_, sanitize(note), public)
 
     @staticmethod
     def get_note_by_id(id_: int) -> dict[str, Any]:

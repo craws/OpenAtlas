@@ -248,7 +248,10 @@ class ActorBaseManager(BaseManager):
         ends_in = None
         self.table_items['place'] = \
             Entity.get_by_class('place', types=True, aliases=self.aliases)
-        if not self.insert:
+        if self.insert:
+            if self.origin and self.origin.class_.name == 'place':
+                residence = self.origin
+        else:
             if residence := self.entity.get_linked_entity('P74'):
                 residence = residence.get_linked_entity_safe('P53', True)
             if first := self.entity.get_linked_entity('OA8'):
@@ -271,8 +274,6 @@ class ActorBaseManager(BaseManager):
 
     def populate_insert(self) -> None:
         self.form.alias.append_entry('')
-        if self.origin and self.origin.class_.name == 'place':
-            self.form.residence.data = self.origin.id
 
     def process_form(self) -> None:
         super().process_form()
@@ -372,23 +373,28 @@ class EventBaseManager(BaseManager):
     fields = ['name', 'date', 'description', 'continue']
 
     def additional_fields(self) -> dict[str, Any]:
-        place = None
+        location = None
         super_event = None
-        event_preceding = None
+        preceding_event = None
         filter_ids = []
-        if not self.insert:
+        if self.insert:
+            if self.origin \
+                    and self.origin.class_.view == 'place' \
+                    and self.class_.name != 'move':
+                location = self.origin
+        else:
             super_event = self.entity.get_linked_entity('P9', inverse=True)
-            event_preceding = self.entity.get_linked_entity('P134')
+            preceding_event = self.entity.get_linked_entity('P134')
             filter_ids = [self.entity.id] + [
                 e.id for e in self.entity.get_linked_entities_recursive('P9') +
                 self.entity.get_linked_entities_recursive('P134', True)]
             if self.class_.name != 'move' \
                     and (place_ := self.entity.get_linked_entity('P7')):
-                place = place_.get_linked_entity_safe('P53', True)
+                location = place_.get_linked_entity_safe('P53', True)
         self.table_items = {
             'event_view': Entity.get_by_view('event', True, self.aliases),
             'place': Entity.get_by_class('place', True, self.aliases)}
-        self.table_items['event_preceding'] = [
+        self.table_items['preceding_event'] = [
             e for e in self.table_items['event_view']
             if e.class_.name != 'event']
         fields = {
@@ -398,22 +404,16 @@ class EventBaseManager(BaseManager):
                     super_event,
                     filter_ids)}
         if self.class_.name != 'event':
-            fields['event_preceding'] = TableField(
-                self.table_items['event_preceding'],
-                event_preceding,
+            fields['preceding_event'] = TableField(
+                self.table_items['preceding_event'],
+                preceding_event,
                 filter_ids)
         if self.class_.name != 'move':
             fields['location'] = TableField(
                 self.table_items['place'],
-                place,
+                location,
                 add_dynamic=['place'])
         return fields
-
-    def populate_insert(self) -> None:
-        if self.origin \
-                and self.origin.class_.view == 'place' \
-                and self.class_.name != 'move':
-            self.form.location.data = self.origin.id
 
     def process_form(self) -> None:
         super().process_form()
@@ -421,7 +421,7 @@ class EventBaseManager(BaseManager):
         self.add_link('P9', self.form.sub_event_of.data, inverse=True)
         if self.class_.name != 'event':
             self.data['links']['delete'].add('P134')
-            self.add_link('P134', self.form.event_preceding.data)
+            self.add_link('P134', self.form.preceding_event.data)
         if self.class_.name != 'move':
             self.data['links']['delete'].add('P7')
             if self.form.location.data:
@@ -485,9 +485,9 @@ class TypeBaseManager(BaseManager):
         super().populate_update()
         if hasattr(self.form, 'name_inverse'):
             name_parts = self.entity.name.split(' (')
-            self.form.name.data = name_parts[0]
+            self.form.name.data = name_parts[0].strip()
             if len(name_parts) > 1:
-                self.form.name_inverse.data = name_parts[1][:-1]
+                self.form.name_inverse.data = name_parts[1][:-1].strip()
         super_ = g.types[self.entity.root[-1]]
         root = g.types[self.entity.root[0]]
         if super_.id != root.id:

@@ -26,7 +26,8 @@ JSON_FORMATS = {
     'lpx': 'application/ld+json',
     'loud': 'application/ld+json',
     'geojson': 'application/json',
-    'geojson-v2': 'application/json'}
+    'geojson-v2': 'application/json',
+    'presentation': 'application/json'}
 API_FORMATS = RDF_FORMATS | JSON_FORMATS
 
 LOGICAL_OPERATOR: list[str] = ['and', 'or']
@@ -53,3 +54,13 @@ ARCHE = {'id': None, 'url': None}
 
 # Used to connect to password protected Vocabs systems
 VOCABS_PASS = ''
+
+API_PRESENTATION_EXCLUDE_RELATION = [
+    'bone',
+    'file',
+    'type',
+    'type_tools'
+    'appellation',
+    'object_location',
+    'reference_system',
+    'administrative_unit']

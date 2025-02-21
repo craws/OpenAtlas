@@ -57,13 +57,14 @@ def export_sql() -> str:
                     _('delete'),
                     url_for('delete_export', filename=file.name),
                     js=f"return confirm('{confirm}')"))
-            table.rows.append(data)
+        table.rows.append(data)
     return render_template(
         'tabs.html',
         tabs={
             'export': Tab(
                 'export',
-                table.display(),
+                _('export'),
+                content=table.display(),
                 buttons=[
                     manual('admin/export'),
                     button(

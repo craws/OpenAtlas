@@ -71,7 +71,7 @@
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav me-auto mb-4 mb-md-0">
         {% if current_user.is_authenticated %}
-          {{ entity|display_menu(origin=origin)|safe }}
+          {{ entity|menu(origin=origin)|safe }}
         {% endif %}
       </div>
       <div class="navbar">

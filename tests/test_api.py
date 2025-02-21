@@ -144,8 +144,8 @@ class Api(ApiTestCase):
         assert len(rv['results']) == 154
 
         for rv in [
-                c.get(url_for('api_04.geometric_entities')),
-                c.get(url_for('api_04.geometric_entities', download=True))]:
+            c.get(url_for('api_04.geometric_entities')),
+            c.get(url_for('api_04.geometric_entities', download=True))]:
             rv = rv.get_json()
             assert rv['features'][0]['geometry']['coordinates']
             assert rv['features'][0]['properties']['id']
@@ -195,7 +195,7 @@ class Api(ApiTestCase):
         assert links['referenceSystem'] == 'GeoNames'
         assert rv['geometry']['type'] == 'GeometryCollection'
         assert rv['geometry']['geometries'][1]['coordinates'] \
-            == [16.37069611, 48.208571233]
+               == [16.37069611, 48.208571233]
         assert rv['depictions'][0]['@id']
         assert rv['depictions'][0]['title'] == 'Picture with a License'
         assert rv['depictions'][0]['license'] == 'Public domain'
@@ -296,6 +296,26 @@ class Api(ApiTestCase):
         assert rv['results'][0]['features'][0]['properties']
 
         # Test Entities endpoints
+        rv = c.get(url_for('api_04.entity_presentation_view', id_=place.id))
+        rv = rv.get_json()
+        assert rv['id'] == place.id
+        assert rv['systemClass'] == place.class_.name
+        assert rv['title'] == place.name
+        assert rv['description'] == place.description
+        assert rv['geometries']
+        assert rv['when']['start']['earliest'] == "2018-01-31T00:00:00"
+        assert rv['types'][0]['id'] == boundary_mark.id
+        assert rv['externalReferenceSystems'][0]['type'] == "closeMatch"
+        assert rv['files'][0]['title'] == 'Picture with a License'
+        assert rv['relations']['feature']
+        assert rv['relations']['person']
+
+        rv = c.get(url_for('api_04.entity_presentation_view', id_=actor.id))
+        rv = rv.get_json()
+        assert rv['id'] == actor.id
+        assert rv['title'] == actor.name
+        assert rv['relations']['activity']
+
         for rv in [
             c.get(url_for('api_04.cidoc_class', class_='E21')),
             c.get(
@@ -438,13 +458,13 @@ class Api(ApiTestCase):
 
         # ---Type Endpoints---
         for rv in [
-                c.get(url_for('api_04.type_overview')),
-                c.get(url_for('api_04.type_overview', download=True))]:
+            c.get(url_for('api_04.type_overview')),
+            c.get(url_for('api_04.type_overview', download=True))]:
             assert 'Austria' in str(rv.get_json())
 
         for rv in [
-                c.get(url_for('api_04.type_by_view_class')),
-                c.get(url_for('api_04.type_by_view_class', download=True))]:
+            c.get(url_for('api_04.type_by_view_class')),
+            c.get(url_for('api_04.type_by_view_class', download=True))]:
             assert 'Boundary Mark' in str(rv.get_json())
         rv = c.get(url_for('api_04.type_tree'))
         assert rv.get_json()['typeTree']
@@ -454,23 +474,50 @@ class Api(ApiTestCase):
         assert rv.get_json() > 0
 
         # ---Test search---
-        search_string_constructor = {
-            0: [{
+        search_string_constructor = [
+            (0, [{
                 "entityAliases": [{
                     "operator": "equal",
                     "values": ["Sûza"],
                     "logicalOperator": "and"}],
                 "typeID": [{
-                    "operator": "equal", "values": [1121212],
+                    "operator": "equal",
+                    "values": [1121212],
                     "logicalOperator": "and"}]}, {
                 "valueTypeID": [{
                     "operator": "lesserThanEqual",
                     "values": [(height.id, 1.0), (weight_.id, 1.0)],
                     "logicalOperator": "and"}]}, {
                 "entityAliases": [{
-                    "operator": "greaterThan", "values": ["Sûza"]}],
-                "typeID": [{"operator": "equal", "values": [1121212]}]}],
-            1: [{
+                    "operator": "greaterThan",
+                    "values": ["Sûza"]}],
+                "typeID": [{"operator": "equal", "values": [1121212]}]}]),
+            (1, [{
+                "endFrom": [{
+                    "operator": "greaterThan",
+                    "values": ["2013-02-01"],
+                    "logicalOperator": "and"}]}]),
+            (1, [{
+                "endTo": [{
+                    "operator": "greaterThanEqual",
+                    "values": ["2019-03-01"],
+                    "logicalOperator": "and"}]}, ]),
+            (2, [{
+                "beginFrom": [{
+                    "operator": "lesserThan",
+                    "values": ["2020-01-01"],
+                    "logicalOperator": "and"}]}]),
+            (2, [{
+                "beginTo": [{
+                    "operator": "lesserThanEqual",
+                    "values": ["2018-03-01"],
+                    "logicalOperator": "and"}]}]),
+            (1, [{
+                "valueTypeID": [{
+                    "operator": "greaterThanEqual",
+                    "values": [(height.id, 23.0)],
+                    "logicalOperator": "or"}]}]),
+            (2, [{
                 "valueTypeID": [{
                     "operator": "equal",
                     "values": [(height.id, 23.0)]}]}, {
@@ -481,36 +528,9 @@ class Api(ApiTestCase):
                     "operator": "equal",
                     "values": ["Boundary Mark", "Height"],
                     "logicalOperator": "and"}]}, {
-                "beginFrom": [{
-                    "operator": "lesserThan",
-                    "values": ["2020-01-01"],
-                    "logicalOperator": "and"}]}, {
-                "beginFrom": [{
-                    "operator": "lesserThan",
-                    "values": ["2020-01-01"]}]}, {
-                "beginTo": [{
-                    "operator": "lesserThanEqual",
-                    "values": ["2018-03-01"],
-                    "logicalOperator": "and"}]}, {
-                "beginTo": [{
-                    "operator": "lesserThanEqual",
-                    "values": ["2018-03-01"]}]}, {
-                "endFrom": [{
-                    "operator": "greaterThan",
-                    "values": ["2013-02-01"],
-                    "logicalOperator": "and"}]}, {
-                "endFrom": [{
-                    "operator": "greaterThan",
-                    "values": ["2013-02-01"]}]}, {
-                "endTo": [{
-                    "operator": "greaterThanEqual",
-                    "values": ["2019-03-01"],
-                    "logicalOperator": "and"}]}, {
-                "endTo": [{
-                    "operator": "greaterThanEqual",
-                    "values": ["2019-03-01"]}]}, {
-                "entityAliases": [
-                    {"operator": "like", "values": ["S"]}]}, {
+                "entityAliases": [{
+                    "operator": "like",
+                    "values": ["S"]}]}, {
                 "typeName": [{
                     "operator": "like",
                     "values": ["Oun", "mark"],
@@ -523,8 +543,8 @@ class Api(ApiTestCase):
                 "valueTypeID": [{
                     "operator": "greaterThanEqual",
                     "values": [(height.id, 23.0), (weight_.id, 999.0)],
-                    "logicalOperator": "and"}]}],
-            2: [{
+                    "logicalOperator": "and"}]}]),
+            (4, [{
                 "entityCidocClass": [{
                     "operator": "equal",
                     "values": ["E21"],
@@ -542,26 +562,26 @@ class Api(ApiTestCase):
                     "logicalOperator": "and"}]}, {
                 "typeID": [{
                     "operator": "equal",
-                    "values": [boundary_mark.id, height.id]}]}],
-            3: [{
+                    "values": [boundary_mark.id, height.id]}]}]),
+            (5, [{"entityName": [{"operator": "like", "values": ["Fr"]}]}]),
+            (6, [{
                 "typeIDWithSubs": [{
                     "operator": "equal",
-                    "values": [
-                        boundary_mark.id, height.id,
-                        change_of_property.id]}]}, {
+                    "values": [boundary_mark.id, height.id,
+                               change_of_property.id]}]}, {
                 "entityDescription": [{
                     "operator": "like",
-                    "values": ["FrOdO", "sam"]}]}],
-            5: [{"entityName": [{"operator": "like", "values": ["Fr"]}]}],
-            9: [{
+                    "values": ["FrOdO", "sam"]}]}]),
+            (9, [{
                 "relationToID": [{
-                    "operator": "equal", "values": [place.id]}]}],
-            161: [{
+                    "operator": "equal",
+                    "values": [place.id]}]}]),
+            (161, [{
                 "typeIDWithSubs": [{
                     "operator": "notEqual",
                     "values": [boundary_mark.id],
-                    "logicalOperator": "and"}]}],
-            162: [{
+                    "logicalOperator": "and"}]}]),
+            (163, [{
                 "typeName": [{
                     "operator": "notEqual",
                     "values": ["Boundary Mark", "Height"],
@@ -574,10 +594,11 @@ class Api(ApiTestCase):
                     "operator": "notEqual",
                     "values": ["Sûza"],
                     "logicalOperator": "and"}]}, {
-                "entityName": [
-                    {"operator": "notEqual", "values": ["Mordor"]}]}]}
+                "entityName": [{
+                    "operator": "notEqual",
+                    "values": ["Mordor"]}]}])]
 
-        for count, search_string in search_string_constructor.items():
+        for count, search_string in search_string_constructor:
             rv = c.get(
                 url_for(
                     'api_04.query',
@@ -586,9 +607,10 @@ class Api(ApiTestCase):
             assert rv.get_json()['pagination']['entities'] == count
 
         for rv in [
-                c.get(url_for('api_04.subunits', id_=place.id)),
-                c.get(
-                    url_for('api_04.subunits', id_=place.id, download=True))]:
+            c.get(
+                url_for('api_04.subunits', id_=feature.id, centroid='false')),
+            c.get(
+                url_for('api_04.subunits', id_=place.id, download=True))]:
             assert 'application/json' in rv.headers.get('Content-Type')
         rv = rv.get_json()[str(place.id)]
         for item in rv:
@@ -626,15 +648,19 @@ class Api(ApiTestCase):
                         'api_04.entity',
                         id_=id_,
                         format=format_,
-                        centroid=True))
+                        centroid='true'))
                 assert b'(autogenerated)' in rv.data
                 assert 'application/json' in rv.headers.get('Content-Type')
                 rv = c.get(
-                    url_for('api_04.subunits', id_=place.id, centroid=True))
+                    url_for('api_04.subunits', id_=place.id, centroid='true'))
                 assert b'(autogenerated)' in rv.data
                 assert 'application/json' in rv.headers.get('Content-Type')
         rv = c.get(
-            url_for('api_04.view_class', class_='all', centroid=True, limit=0))
+            url_for(
+                'api_04.view_class',
+                class_='all',
+                centroid='true',
+                limit=0))
         assert b'(autogenerated)' in rv.data
         assert 'application/json' in rv.headers.get('Content-Type')
 
@@ -647,8 +673,8 @@ class Api(ApiTestCase):
 
         # Test Error Handling
         for rv in [
-                c.get(url_for('api_04.entity', id_=233423424)),
-                c.get(url_for('api_04.cidoc_class', class_='E18', last=1231))]:
+            c.get(url_for('api_04.entity', id_=233423424)),
+            c.get(url_for('api_04.cidoc_class', class_='E18', last=1231))]:
             rv = rv.get_json()
         assert 'Entity does not exist' in rv['title']
 
