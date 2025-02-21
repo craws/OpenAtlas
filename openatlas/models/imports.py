@@ -31,8 +31,8 @@ class Project:
     def update(self) -> None:
         db.update_project(
             self.id,
-            self.name,
-            sanitize(self.description, 'text') if self.description else None)
+            sanitize(self.name),
+            sanitize(self.description))
 
     @staticmethod
     def get_all() -> list[Project]:
@@ -53,9 +53,7 @@ class Project:
 
     @staticmethod
     def insert(name: str, description: Optional[str] = None) -> int:
-        return db.insert_project(
-            name,
-            sanitize(description, 'text') if description else None)
+        return db.insert_project(sanitize(name), sanitize(description))
 
 
 def get_origin_ids(project: Project, origin_ids: list[str]) -> list[str]:
@@ -233,5 +231,5 @@ def insert_gis(entity: Entity, row: dict[str, Any], project: Project) -> None:
 
 
 def clean_reference_pages(value: str) -> list[str]:
-    matches =  re.findall(r'([\w\-]*;[^;]*?(?=[\w\-]*;|$))', value)
+    matches = re.findall(r'([\w\-]*;[^;]*?(?=[\w\-]*;|$))', value)
     return [match.strip() for match in matches]

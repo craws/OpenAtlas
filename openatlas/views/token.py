@@ -18,7 +18,7 @@ from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import button, link, required_group
-from openatlas.display.util2 import manual
+from openatlas.display.util2 import manual, sanitize
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
 from openatlas.models.token import Token
@@ -29,8 +29,8 @@ class GenerateTokenForm(FlaskForm):
     expiration = IntegerField(
         _('expiration'),
         default=30,
-        description=
-        _('expiration in days') + ', 0 = ' + _("no expiration date"))
+        description=_('expiration in days')
+        + ', 0 = ' + _("no expiration date"))
     token_name = StringField(
         _('name'),
         default=f"Token_{datetime.today().strftime('%Y-%m-%d')}")
@@ -154,8 +154,8 @@ def generate_token() -> str | Response:
     form.user.choices = User.get_users_for_form()
     if form.validate_on_submit():
         expiration = form.expiration.data
-        token_name = form.token_name.data
-        user_= User.get_by_id_without_bookmarks(int(form.user.data))
+        token_name = sanitize(form.token_name.data)
+        user_ = User.get_by_id_without_bookmarks(int(form.user.data))
         token = ''
         Transaction.begin()
         try:

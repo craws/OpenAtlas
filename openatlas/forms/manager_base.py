@@ -485,9 +485,9 @@ class TypeBaseManager(BaseManager):
         super().populate_update()
         if hasattr(self.form, 'name_inverse'):
             name_parts = self.entity.name.split(' (')
-            self.form.name.data = name_parts[0]
+            self.form.name.data = name_parts[0].strip()
             if len(name_parts) > 1:
-                self.form.name_inverse.data = name_parts[1][:-1]
+                self.form.name_inverse.data = name_parts[1][:-1].strip()
         super_ = g.types[self.entity.root[-1]]
         root = g.types[self.entity.root[0]]
         if super_.id != root.id:

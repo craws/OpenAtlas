@@ -68,7 +68,7 @@ def hierarchy_update(id_: int) -> str | Response:
         Transaction.begin()
         try:
             hierarchy.update_hierarchy(
-                sanitize(manager.form.name.data, 'text'),
+                sanitize(manager.form.name.data),
                 manager.form.classes.data,
                 multiple=(
                     hierarchy.category == 'value'
