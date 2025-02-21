@@ -437,14 +437,12 @@ def get_allowed_columns(class_: str) -> dict[str, list[str]]:
     if class_ in ['place', 'artifact']:
         columns.append('wkt')
     if class_ in ['place', 'artifact', 'type']:
-        columns.append([
+        columns.extend([
             'parent_id', 'openatlas_parent_id'])
     if class_ == 'place':
         columns.extend([
             'administrative_unit_id', 'historical_place_id',
             'openatlas_class'])
-    if class_ ==  'type':
-        columns.extend(['unit'])
     return {
         'allowed': columns,
         'valid': [],
@@ -562,8 +560,9 @@ def check_cell_value(
                 entity = Entity.get_by_id(value)
             except ImATeapot:
                 checks.set_error('invalid_parent_id', id_)
+            openatlas_class = row.get('openatlas_class') or 'type'
             if entity and not check_parent(
-                    row['openatlas_class'],
+                    openatlas_class,
                     entity.class_.label):
                 checks.set_error('invalid_parent_class', id_)
         case _ if item.startswith('reference_system_') and value:

@@ -133,7 +133,7 @@ def import_data_(project: Project, class_: str, data: list[Any]) -> None:
                 entities[entry['parent_id']]['entity'].link(
                     'P46',
                     entry['entity'])
-            if entry['openatlas_parent_id']:
+            elif entry['openatlas_parent_id']:
                 Entity.get_by_id(entry['openatlas_parent_id']).link(
                     'P46',
                     entry['entity'])
@@ -141,11 +141,13 @@ def import_data_(project: Project, class_: str, data: list[Any]) -> None:
             if entry['parent_id']:
                 entities[entry['parent_id']]['entity'].link(
                     'P127',
-                    entry['entity'])
-            if entry['openatlas_parent_id']:
+                    entry['entity'],
+                    inverse=True)
+            elif entry['openatlas_parent_id']:
                 Entity.get_by_id(entry['openatlas_parent_id']).link(
                     'P127',
-                    entry['entity'])
+                    entry['entity'],
+                    inverse=True)
 
 
 def insert_dates(entity: Entity, row: dict[str, Any]) -> None:
