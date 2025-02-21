@@ -271,7 +271,7 @@ def import_data(project_id: int, class_: str) -> str:
     table = None
     imported = False
     file_data = get_backup_file_data()
-    class_label = g.classes[class_.replace(' ', '_')].label
+    class_label = g.classes[class_].label
     checks = CheckHandler()
     if form.validate_on_submit():
         try:
@@ -436,7 +436,7 @@ def get_allowed_columns(class_: str) -> dict[str, list[str]]:
         columns.append('alias')
     if class_ in ['place', 'artifact']:
         columns.append('wkt')
-    if class_ in ['place', 'type']:
+    if class_ in ['place', 'artifact', 'type']:
         columns.append([
             'parent_id', 'openatlas_parent_id'])
     if class_ == 'place':
