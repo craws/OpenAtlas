@@ -21,12 +21,12 @@ from openatlas import app
 def sanitize(string: str | None, mode: Optional[str] = None) -> Optional[str]:
     if not string:
         return None
-    if mode == 'text':  # Remove HTML tags, keep linebreaks
+    if mode == 'ascii':  # Filter ASCII letters/numbers
+        sanitized = re.sub('[^A-Za-z0-9]+', '', string)
+    else:  # Remove HTML tags, keep linebreaks
         stripper = MLStripper()
         stripper.feed(string)
         sanitized = stripper.get_data().strip()
-    else:  # Filter ASCII letters/numbers
-        sanitized = re.sub('[^A-Za-z0-9]+', '', string)
     return sanitized or None
 
 

@@ -235,24 +235,20 @@ class Entity:
             setattr(self, key, value)
         db.update({
             'id': self.id,
-            'name': sanitize(self.name, 'text'),
+            'name': sanitize(self.name),
             'begin_from': datetime64_to_timestamp(self.begin_from),
             'begin_to': datetime64_to_timestamp(self.begin_to),
             'end_from': datetime64_to_timestamp(self.end_from),
             'end_to': datetime64_to_timestamp(self.end_to),
-            'begin_comment':
-                sanitize(self.begin_comment, 'text')
-                if self.begin_comment else None,
-            'end_comment':
-                sanitize(self.end_comment, 'text')
-                if self.end_comment else None,
+            'begin_comment': sanitize(self.begin_comment),
+            'end_comment': sanitize(self.end_comment),
             'description': self.update_description()})
 
     def update_description(self) -> Optional[str]:
         if not self.description:
             return None
         if self.class_.name not in ['source', 'source_translation']:
-            return sanitize(self.description, 'text')
+            return sanitize(self.description)
         AnnotationText.delete_annotations_text(self.id)
         text = self.description.replace('</p><p>', '\n\n')
         replace_strings = [
@@ -366,7 +362,7 @@ class Entity:
         if not new:
             db.update({
                 'id': self.location.id,
-                'name': f"Location of {sanitize(self.name,'text')}",
+                'name': f"Location of {sanitize(self.name)}",
                 'begin_from': None,
                 'begin_to': None,
                 'end_from': None,
@@ -386,10 +382,8 @@ class Entity:
     def get_name_directed(self, inverse: bool = False) -> str | None:
         """Returns name part of a directed type e.g. parent of (child of)"""
         name_parts = self.name.split(' (')
-        if inverse and len(name_parts) > 1:
-            return sanitize(
-                name_parts[1][:-1],  # Remove closing bracket
-                'text')  # pragma: no cover
+        if inverse and len(name_parts) > 1:  # Remove closing bracket
+            return sanitize(name_parts[1][:-1])  # pragma: no cover
         return name_parts[0]
 
     def check_too_many_single_type_links(self) -> bool:
@@ -472,10 +466,10 @@ class Entity:
     def insert(class_: str, name: str, desc: Optional[str] = None) -> Entity:
         return Entity.get_by_id(
             db.insert({
-                'name': sanitize(name, 'text'),
+                'name': sanitize(name),
                 'code': g.classes[class_].cidoc_class.code,
                 'openatlas_class_name': class_,
-                'description': sanitize(desc, 'text') if desc else None}))
+                'description': sanitize(desc)}))
 
     @staticmethod
     def get_by_cidoc_class(

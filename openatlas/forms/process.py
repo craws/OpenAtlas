@@ -97,9 +97,8 @@ def process_standard_fields(manager: Any) -> None:
         elif key == 'public':
             manager.data['file_info'] = {
                 'public': bool(manager.form.public.data),
-                'creator': sanitize(manager.form.creator.data, 'text'),
-                'license_holder':
-                    sanitize(manager.form.license_holder.data, 'text')}
+                'creator': sanitize(manager.form.creator.data),
+                'license_holder': sanitize(manager.form.license_holder.data)}
         else:  # pragma: no cover
             abort(418, f'Form error: {key}, {field_type}, value={value}')
 
