@@ -105,8 +105,6 @@ def import_data_(project: Project, class_: str, data: list[Any]) -> None:
                     g.view_class_mapping['artifact']):
                 class_ = value.lower().replace(' ', '_')
         description = row.get('description')
-        if value := row.get('unit'):
-            description = value
         entity = Entity.insert(class_, row['name'], description)
         db.import_data(
             project.id,

@@ -1,0 +1,8 @@
+id,name,description,parent_id,openatlas_parent_id
+type_1,Blue,"",,""
+type_2,Indigo,,type_1,
+type_3,Dark Blue,,type_1,
+type_4,Ochre,,type_5,
+type_5,Brown,,,""
+type_6,Max height,,,""
+type_7,Min height,,,""

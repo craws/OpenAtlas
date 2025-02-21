@@ -185,6 +185,24 @@ class ExportImportTest(ExportImportTestCase):
                         place = entity
 
         data_frame = pd.read_csv(
+            self.static_path / 'example_type.csv',
+            keep_default_na=False)
+        data_frame.at[0, 'openatlas_parent_id'] = boundary_mark.id
+        data_frame.at[4, 'openatlas_parent_id'] = boundary_mark.id
+        data_frame.at[5, 'openatlas_parent_id'] = height.id
+        data_frame.at[6, 'openatlas_parent_id'] = height.id
+        data_frame.to_csv(
+            self.test_path / 'example_type.csv',
+            index=False)
+        with open(self.test_path / 'example_type.csv', 'rb') as file:
+            rv = c.post(
+                url_for('import_data', class_='type', project_id=p_id),
+                data={'file': file},
+                follow_redirects=True)
+        assert b'Ochre' in rv.data
+        (self.test_path / 'example_type.csv').unlink()
+
+        data_frame = pd.read_csv(
             self.test_path / 'invalid_3.csv',
             keep_default_na=False)
         data_frame.at[4, 'openatlas_parent_id'] = place.id
