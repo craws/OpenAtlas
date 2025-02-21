@@ -1,4 +1,5 @@
 import locale
+import datetime
 import os
 from typing import Any, Optional
 
@@ -10,6 +11,7 @@ from psycopg2 import extras
 
 from openatlas.api.resources.error import AccessDeniedError
 from openatlas.database.connect import close_connection, open_connection
+from openatlas.database.token import check_token_revoked
 
 instance_config_path = ''
 if 'INSTANCE_PATH' in os.environ:
@@ -24,6 +26,7 @@ app.config['WTF_CSRF_TIME_LIMIT'] = None  # Set CSRF token valid for session
 
 locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
 babel = Babel(app)
+jwt = JWTManager(app)
 
 # pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position
 from openatlas.models.logger import Logger
@@ -31,7 +34,7 @@ from openatlas.api import api
 from openatlas.views import (
     admin, ajax, annotation, arche, changelog, entity, entity_index, error,
     export, file, hierarchy, index, imports, link, login, model, note, overlay,
-    profile, search, sql, tools, type as type_, user, vocabs)
+    profile, search, sql, token, tools, type as type_, user, vocabs)
 
 
 @babel.localeselector
@@ -130,3 +133,17 @@ def apply_caching(response: Response) -> Response:
 @app.teardown_request
 def teardown_request(_exception: Optional[Any]) -> None:
     close_connection()
+
+
+@jwt.token_in_blocklist_loader
+def check_incoming_tokens(
+        jwt_header: dict[str, Any],
+        jwt_payload: dict[str, Any]) -> bool:
+    if not jwt_header['typ'] == 'JWT':
+        return True
+    token_ = check_token_revoked(jwt_payload["jti"])
+    if token_['revoked'] \
+            or not token_['active'] \
+            or token_['valid_until'] < datetime.datetime.now():
+        return True
+    return False

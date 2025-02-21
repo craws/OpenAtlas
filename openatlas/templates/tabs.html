@@ -18,9 +18,9 @@
                   title="{{ tab.tooltip }}"
                   data-bs-placement="top"
                   class="d-flex gap-1">
-                {{ _(tab.name|replace('_', ' '))|uc_first }}
+                {{ tab.label }}
                 {% if tab.table.rows|length %}
-                <span class="tab-counter badge align-self-center">{{
+                  <span class="tab-counter badge align-self-center">{{
                   '{0:,}'.format(tab.table.rows|length) }}</span>
                 {% endif %}
               </span>
@@ -39,7 +39,7 @@
               {{ tab.content|safe }}
             {% endif %}
             {% if tab.form %}
-              {{ tab.form|display_form |safe }}
+              {{ tab.form|display_form|safe }}
             {% endif %}
             {% if tab.table.rows %}
               {{ tab.table.display(tab.name)|safe }}

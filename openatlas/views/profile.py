@@ -14,10 +14,10 @@ from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.util import button, display_info
-from openatlas.display.util2 import manual, uc_first
+from openatlas.display.util2 import manual, sanitize, uc_first
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField, generate_password_field
-from openatlas.forms.setting import DisplayForm, ModulesForm
+from openatlas.forms.setting import DisplayForm, FrontendForm, ModulesForm
 from openatlas.forms.util import get_form_settings, set_form_settings
 
 
@@ -57,7 +57,8 @@ def profile_index() -> str:
     tabs = {
         'profile': Tab(
             'profile',
-            display_info({
+            _('profile'),
+            content=display_info({
                 _('name'): current_user.real_name,
                 _('email'): current_user.email,
                 _('show email'): str(_('on'))
@@ -67,22 +68,31 @@ def profile_index() -> str:
             buttons=[manual('tools/profile')]),
         'modules': Tab(
             'modules',
-            display_info(get_form_settings(ModulesForm(), True)),
+            _('modules'),
+            content=display_info(get_form_settings(ModulesForm(), True)),
             buttons=[manual('tools/profile')]),
         'display': Tab(
             'display',
-            display_info(get_form_settings(DisplayForm(), True)),
+            _('display'),
+            content=display_info(get_form_settings(DisplayForm(), True)),
+            buttons=[manual('tools/profile')]),
+        'frontend': Tab(
+            'frontend',
+            _('presentation site'),
+            content=display_info(get_form_settings(FrontendForm(), True)),
             buttons=[manual('tools/profile')])}
     if not app.config['DEMO_MODE']:
         tabs['profile'].buttons += [
             button(_('edit'), url_for('profile_settings', category='profile')),
             button(_('change password'), url_for('profile_password'))]
         tabs['modules'].buttons.append(
-                button(
-                    _('edit'),
-                    url_for('profile_settings', category='modules')))
+            button(_('edit'), url_for('profile_settings', category='modules')))
         tabs['display'].buttons.append(
             button(_('edit'), url_for('profile_settings', category='display')))
+        tabs['frontend'].buttons.append(
+            button(
+                _('edit'),
+                url_for('profile_settings', category='frontend')))
     return render_template(
         'tabs.html',
         tabs=tabs,
@@ -102,7 +112,7 @@ def profile_settings(category: str) -> str | Response:
             if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
                 continue
             if field.name == 'name':
-                current_user.real_name = field.data
+                current_user.real_name = sanitize(field.data)
             elif field.name == 'email':
                 current_user.email = field.data
             else:
@@ -148,6 +158,7 @@ def profile_password() -> str | Response:
         tabs={
             'password': Tab(
                 'password',
+                _('password'),
                 content=display_form(form, 'password-form'))},
         title=_('profile'),
         crumbs=[

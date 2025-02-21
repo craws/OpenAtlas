@@ -17,6 +17,15 @@ then run the database upgrade script, then restart Apache:
     sudo python3 install/upgrade/database_upgrade.py
     sudo service apache2 restart
 
+### 8.10.0 to 8.10.1
+A code base update (e.g. with git pull) and a webserver restart is sufficient.
+
+### 8.9.0 to 8.10.0
+8.10.0.sql is needed but will be taken care of by the database upgrade script.
+Additional Python packages are needed:
+
+    sudo apt install python3-jwt python3-python-flask-jwt-extended
+
 ### 8.8.0 to 8.9.0
 8.9.0.sql is needed but will be taken care of by the database upgrade script.
 

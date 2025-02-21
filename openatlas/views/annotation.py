@@ -29,7 +29,7 @@ def annotation_image_insert(id_: int) -> str | Response:
             text=form.text.data)
         return redirect(url_for('annotation_image_insert', id_=image.id))
     table = None
-    if annotations := AnnotationImage.get_by_file(image.id):
+    if annotations := AnnotationImage.get_by_file_id(image.id):
         rows = []
         for annotation in annotations:
             delete = ''
@@ -53,9 +53,9 @@ def annotation_image_insert(id_: int) -> str | Response:
         tabs={
             'annotation': Tab(
                 'annotation',
-                render_template('annotate_image.html', entity=image),
-                table,
-                [manual('tools/image_annotation')],
+                content=render_template('annotate_image.html', entity=image),
+                table=table,
+                buttons=[manual('tools/image_annotation')],
                 form=form)},
         entity=image,
         crumbs=[

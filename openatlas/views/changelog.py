@@ -15,12 +15,23 @@ def index_changelog() -> str:
 
 # pylint: disable=too-many-lines
 versions = {
-    '8.10.0': ['TBA', {
+    '8.10.1': ['2025-02-21', {
+        'fix': {
+           '2481': 'Line breaks missing when copying to annotation widget',
+           '2482': 'Tabs: missing translations',
+           '2488': 'Improved user input validation'}}],
+    '8.10.0': ['2025-02-14', {
         'feature': {
             '2417': 'Make count from tabs more visible',
-            '2415': 'Manual: How to report an issue on redmine',
-            '2444': 'Refactor and minor improvements'}
-    }],
+            '2430': 'Override presentation site URLs',
+            '2479': 'API: 0.4.6',
+            '1233': 'API: External Authentication',
+            '2450': 'API: Custom endpoint for presentation sites',
+            '2415': 'Manual: How to report an issue',
+            '2419': 'Documentation: publication page',
+            '2444': 'Refactor and minor improvements'},
+        'fix': {
+            '2468': "Some entities created in place tabs don't get linked"}}],
     '8.9.0': ['2025-01-01', {
         'feature': {
             '2079': 'Text annotation',

@@ -4,7 +4,7 @@ from pathlib import Path
 
 from config.database_versions import DATABASE_VERSIONS
 
-VERSION = '8.10.0'
+VERSION = '8.10.1'
 DATABASE_VERSION = DATABASE_VERSIONS[0]
 DEMO_MODE = False  # If activated some options are disabled, login is prefilled
 DEBUG = False
@@ -15,7 +15,7 @@ DATABASE_HOST = 'localhost'
 DATABASE_PORT = 5432
 DATABASE_PASS = 'CHANGE ME'
 MAIL_PASSWORD = 'CHANGE ME'
-SECRET_KEY = 'CHANGE ME'  # Used for cookies
+SECRET_KEY = 'CHANGE ME'  # Used for cookies and jwt tokens
 
 LANGUAGES = {
     'ca': 'Català',
