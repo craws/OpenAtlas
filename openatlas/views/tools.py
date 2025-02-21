@@ -68,7 +68,7 @@ def tools_index(id_: int) -> str | Response:
     tabs = {
         'info': Tab(
             'info',
-            carbon_result(entity) + sex_result(entity),
+            content=carbon_result(entity) + sex_result(entity),
             buttons=[
                 manual('tools/anthropological_analyses'),
                 button(
@@ -117,7 +117,7 @@ def sex(id_: int) -> str | Response:
                     data=data,
                     result=sex_result(entity)),
                 buttons=buttons)},
-        crumbs=tools_start_crumbs(entity) + [
+        crumbs=start_crumbs(entity) + [
             [_('tools'), url_for('tools_index', id_=entity.id)],
             _('sex estimation')])
 
@@ -185,7 +185,7 @@ def sex_update(id_: int) -> str | Response:
                     form,
                     manual_page='tools/anthropological_analyses'))},
         entity=entity,
-        crumbs=tools_start_crumbs(entity) + [
+        crumbs=start_crumbs(entity) + [
             [_('tools'), url_for('tools_index', id_=entity.id)],
             [_('sex estimation'), url_for('sex', id_=entity.id)],
             _('edit')])
@@ -210,7 +210,7 @@ def carbon(id_: int) -> str | Response:
                 'radiocarbon dating',
                 carbon_result(entity),
                 buttons=buttons)},
-        crumbs=tools_start_crumbs(entity) + [
+        crumbs=start_crumbs(entity) + [
             [_('tools'), url_for('tools_index', id_=entity.id)],
             _('radiocarbon dating')])
 
@@ -263,7 +263,7 @@ def carbon_update(id_: int) -> str | Response:
         'tabs.html',
         entity=entity,
         tabs={'info': Tab('radiocarbon dating', display_form(form))},
-        crumbs=tools_start_crumbs(entity) + [
+        crumbs=start_crumbs(entity) + [
             [_('tools'), url_for('tools_index', id_=entity.id)],
             [_('radiocarbon dating'), url_for('carbon_update', id_=entity.id)],
             _('edit')])

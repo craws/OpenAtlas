@@ -18,7 +18,7 @@ from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import button, link, required_group
-from openatlas.display.util2 import manual
+from openatlas.display.util2 import manual, sanitize
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
 from openatlas.models.token import Token
@@ -29,10 +29,10 @@ class GenerateTokenForm(FlaskForm):
     expiration = IntegerField(
         _('expiration'),
         default=30,
-        description=
-        _('expiration in days') + ', 0 = ' + _("no expiration date"))
+        description=_('expiration in days')
+        + ', 0 = ' + _("no expiration date"))
     token_name = StringField(
-        _('token name'),
+        _('name'),
         default=f"Token_{datetime.today().strftime('%Y-%m-%d')}")
     user = SelectField(_('user'), choices=(), default=0, coerce=int)
     token_text = HiddenField()
@@ -73,7 +73,7 @@ def api_token(user_id: int = 0) -> str | Response:
     tabs = {
         'token': Tab(
             'token',
-            display_form(form),
+            content=display_form(form),
             buttons=[manual('admin/api')])}
     tabs['token'].buttons.append(
         button(_('generate'), url_for('generate_token')))
@@ -154,8 +154,8 @@ def generate_token() -> str | Response:
     form.user.choices = User.get_users_for_form()
     if form.validate_on_submit():
         expiration = form.expiration.data
-        token_name = form.token_name.data
-        user_= User.get_by_id_without_bookmarks(int(form.user.data))
+        token_name = sanitize(form.token_name.data)
+        user_ = User.get_by_id_without_bookmarks(int(form.user.data))
         token = ''
         Transaction.begin()
         try:
@@ -182,7 +182,7 @@ def generate_token() -> str | Response:
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}"],
             [_('token'), f"{url_for('api_token')}"],
-            _('generate token')])
+            _('generate')])
 
 
 @app.route('/admin/api_token/revoke_token/<int:id_>')
@@ -213,7 +213,7 @@ def delete_token(id_: int) -> str | Response:
 @login_required
 def delete_revoked_tokens() -> str | Response:
     Token.delete_all_revoked_tokens()
-    flash(_('all revoked tokens deleted'), 'info')
+    flash(_('tokens deleted'), 'info')
     return redirect(f"{url_for('api_token')}")
 
 
@@ -221,7 +221,7 @@ def delete_revoked_tokens() -> str | Response:
 @login_required
 def delete_invalid_tokens() -> str | Response:
     Token.delete_invalid_tokens()
-    flash(_('all invalid tokens deleted'), 'info')
+    flash(_('tokens deleted'), 'info')
     return redirect(f"{url_for('api_token')}")
 
 

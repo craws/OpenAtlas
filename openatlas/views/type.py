@@ -55,7 +55,7 @@ def type_index() -> str:
             type_.chart_data = get_chart_data(type_)
             types[type_.category][type_] = render_template(
                 'forms/tree_select_item.html',
-                name=sanitize(type_.name),
+                name=sanitize(type_.name, 'ascii'),
                 data=walk_tree(type_.subs))
             for link_ in type_.get_links('P67', inverse=True):
                 if link_.domain.class_.view == 'reference_system':
@@ -110,7 +110,7 @@ def type_delete_recursive(id_: int) -> str | Response:
     tabs = {
         'info': Tab(
             'info',
-            _(
+            content=_(
                 'Warning: this type has subs and/or links to entities '
                 '(see tabs). Please check if you want to delete these subs '
                 'and links too.'),
