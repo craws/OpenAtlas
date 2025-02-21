@@ -12,15 +12,15 @@ def index_changelog() -> str:
         crumbs=[_('changelog')],
         versions=versions)
 
-
 # pylint: disable=too-many-lines
 versions = {
     '8.11.0': ['TBA', {}],
     '8.10.1': ['2025-02-21', {
         'fix': {
-           '2481': 'Line breaks missing when copying to annotation widget',
-           '2482': 'Tabs: missing translations',
-           '2488': 'Improved user input validation'}}],
+            '2481': 'Line breaks missing when copying to annotation widget',
+            '2482': 'Tabs: missing translations',
+            '2484': 'API: OpenAPI set geometry not required and nullable',
+            '2488': 'Improved user input validation'}}],
     '8.10.0': ['2025-02-14', {
         'feature': {
             '2417': 'Make count from tabs more visible',
