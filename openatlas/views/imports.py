@@ -426,7 +426,9 @@ def get_clean_header(
 def get_allowed_columns(class_: str) -> dict[str, list[str]]:
     columns = ['name', 'id', 'description']
     if class_ not in ['type']:
-        columns.extend(['type_ids', 'value_types'])
+        columns.extend([
+            'type_ids', 'value_types', 'origin_type_ids',
+            'origin_value_types'])
     if class_ not in g.view_class_mapping['reference']:
         columns.extend([
             'begin_from', 'begin_to', 'begin_comment',
@@ -516,7 +518,13 @@ def check_cell_value(
             origin_references = []
             for reference in clean_reference_pages(str(value)):
                 values = str(reference).split(';')
-                if not get_id_from_origin_id(project, values[0]):
+                if origin_id := get_id_from_origin_id(project, values[0]):
+                    try:
+                        ApiEntity.get_by_id(int(origin_id[0]))
+                    except EntityDoesNotExistError:
+                        values[0] = error_span(values[0])
+                        checks.set_warning('invalid_origin_reference_id', id_)
+                else:
                     checks.set_warning('invalid_origin_reference_id', id_)
                     values[0] = error_span(values[0])
                 origin_references.append(';'.join(values))
