@@ -463,10 +463,12 @@ def check_cell_value(
         if openatlas_class in g.classes:
             class_ = openatlas_class
     match item:
-        case 'type_ids' if value:
+        case ('type_ids' | 'origin_type_ids') if value:
             type_ids = []
             invalids_type_ids = []
             for type_id in str(value).split():
+                if item == 'origin_type_ids':
+                    type_id = get_id_from_origin_id(project, type_id)
                 if check_type_id(type_id, class_):
                     type_ids.append(type_id)
                 else:
@@ -480,10 +482,14 @@ def check_cell_value(
                 if type_id in invalids_type_ids:
                     type_ids[i] = error_span(type_id)
             value = ' '.join(type_ids)
-        case 'value_types' if value:
+        case ('value_types' | 'origin_value_types') if value:
             value_types = []
             for value_type in str(value).split():
                 values = str(value_type).split(';')
+                if item == 'origin_value_types':
+                    values[0] = get_id_from_origin_id(
+                        project,
+                        values[0])[0]
                 if len(values) != 2 or not values[1]:
                     value_types.append(error_span(value_type))
                     checks.set_warning('invalid_value_types', id_)
