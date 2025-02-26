@@ -125,6 +125,7 @@ def apply_caching(response: Response) -> Response:
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
     response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['Content-Security-Policy'] = app.config['CSP_HEADER']
     return response
 
 
