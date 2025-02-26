@@ -112,7 +112,7 @@ def import_data_(project: Project, class_: str, data: list[Any]) -> None:
         if class_ in ['place', 'person', 'group']:
             insert_alias(entity, row)
         insert_dates(entity, row)
-        link_types(entity, row, class_)
+        link_types(entity, row, class_, project)
         link_references(entity, row, class_, project)
         if class_ in g.view_class_mapping['place'] \
                 + g.view_class_mapping['artifact']:
@@ -162,19 +162,39 @@ def insert_alias(entity: Entity, row: dict[str, Any]) -> None:
             entity.link('P1', Entity.insert('appellation', alias_))
 
 
-def link_types(entity: Entity, row: dict[str, Any], class_: str) -> None:
-    if type_ids := row.get('type_ids'):
-        for type_id in str(type_ids).split():
-            if check_type_id(type_id, class_):
-                entity.link('P2', g.types[int(type_id)])
-    if data := row.get('value_types'):
+def link_types(
+        entity: Entity,
+        row: dict[str, Any],
+        class_: str,
+        project: Project) -> None:
+    type_ids: list[tuple[str, Optional[str]]] = []
+    if ids := row.get('type_ids'):
+        for type_id in str(ids).split():
+            type_ids.append((type_id, None))
+    elif ids := row.get('origin_type_ids'):
+        for id_ in str(ids).split():
+            if type_id := get_id_from_origin_id(project, id_)[0]:
+                type_ids.append((type_id, None))
+    elif data := row.get('value_types'):
         for value_types in str(data).split():
             value_type = value_types.split(';')
             number = value_type[1][1:] \
                 if value_type[1].startswith('-') else value_type[1]
-            if check_type_id(value_type[0], class_) and \
-                    (number.isdigit() or number.replace('.', '', 1).isdigit()):
-                entity.link('P2', g.types[int(value_type[0])], value_type[1])
+            if number.isdigit() or number.replace('.', '', 1).isdigit():
+                type_ids.append((value_type[0],  value_type[1]))
+    elif data := row.get('origin_value_types'):
+        for value_types in str(data).split():
+            type_id = get_id_from_origin_id(
+                        project,
+                        value_types[0])[0]
+            value_type = value_types.split(';')
+            number = value_type[1][1:] \
+                if value_type[1].startswith('-') else value_type[1]
+            if number.isdigit() or number.replace('.', '', 1).isdigit():
+                type_ids.append((type_id,  value_type[1]))
+    for type_tuple in type_ids:
+        if check_type_id(type_tuple[0], class_):
+            entity.link('P2', g.types[int(type_tuple[0])], type_tuple[1])
 
 
 def link_references(
