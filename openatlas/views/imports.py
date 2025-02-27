@@ -388,26 +388,27 @@ def check_data_for_table_representation(
 
 def check_parent(entity_class: str, parent_class: str) -> bool:
     parent_class = parent_class.lower()
+    is_parent = False
     match entity_class.lower():
         case 'feature':
             if parent_class == 'place':
-                return True
+                is_parent = True
         case 'stratigraphic_unit':
             if parent_class == 'feature':
-                return True
+                is_parent = True
         case 'artifact':
             if parent_class in g.view_class_mapping['place'] + ['artifact']:
-                return True
+                is_parent = True
         case 'human_remains':
             if (parent_class in
                     g.view_class_mapping['place'] + ['human_remains']):
-                return True
+                is_parent = True
         case 'type':
             if parent_class == 'type':
-                return True
+                is_parent = True
         case _:
-            return False
-    return False  # pragma: no cover
+            is_parent = False
+    return is_parent
 
 
 def get_clean_header(
@@ -472,16 +473,23 @@ def check_cell_value(
         case ('type_ids' | 'origin_type_ids') if value:
             type_ids = []
             invalids_type_ids = []
+            valid_ids = []
             for type_id in str(value).split():
                 if item == 'origin_type_ids':
-                    type_id = get_id_from_origin_id(project, type_id)
+                    if openatlas_id := get_id_from_origin_id(project, type_id):
+                        type_id = openatlas_id
+                    else:
+                        invalids_type_ids.append(type_id)
+                        checks.set_warning('invalid_type_origin_ids', id_)
+                type_ids.append(type_id)
                 if check_type_id(type_id, class_):
-                    type_ids.append(type_id)
+                    valid_ids.append(type_id)
                 else:
                     invalids_type_ids.append(type_id)
                     checks.set_warning('invalid_type_ids', id_)
-            for type_id in type_ids:
-                if type_id in check_single_type_duplicates(type_ids):
+            check_single_type = check_single_type_duplicates(valid_ids)
+            for type_id in valid_ids:
+                if type_id in check_single_type:
                     invalids_type_ids.append(type_id)
                     checks.set_error('single_type_duplicates', id_)
             for i, type_id in enumerate(type_ids):
@@ -493,7 +501,13 @@ def check_cell_value(
             for value_type in str(value).split():
                 values = str(value_type).split(';')
                 if item == 'origin_value_types':
-                    values[0] = get_id_from_origin_id(project, values[0])
+                    if openatlas_id := get_id_from_origin_id(
+                            project,
+                            values[0]):
+                        values[0] = openatlas_id
+                    else:
+                        checks.set_warning(
+                            'invalid_origin_value_type_ids', id_)
                 if len(values) != 2 or not values[1]:
                     value_types.append(error_span(value_type))
                     checks.set_warning('invalid_value_types', id_)
@@ -535,14 +549,12 @@ def check_cell_value(
                 for reference in clean_references:
                     values = str(reference).split(';')
                     if origin_id := get_id_from_origin_id(project, values[0]):
-                        try:
-                            ref = ApiEntity.get_by_id(int(origin_id))
-                            if not ref.class_.view == 'reference':
-                                raise EntityDoesNotExistError
-                        except EntityDoesNotExistError:
+                        ref = ApiEntity.get_by_id(int(origin_id))
+                        if not ref.class_.view == 'reference':
                             values[0] = error_span(values[0])
                             checks.set_warning(
-                                'invalid_origin_reference_id', id_)
+                                'invalid_origin_reference_id',
+                                id_)
                     else:
                         checks.set_warning('invalid_origin_reference_id', id_)
                         values[0] = error_span(values[0])

@@ -69,13 +69,6 @@ class ImportTest(ImportTestCase):
                 follow_redirects=True)
         assert b'Vienna' in rv.data
 
-        with open(self.static_path / 'example.csv', 'rb') as file:
-            rv = c.post(
-                url_for('import_data', class_='place', project_id=p_id),
-                data={'file': file, 'duplicate': True},
-                follow_redirects=True)
-        assert b'IDs already in database' in rv.data
-
         data_frame = pd.read_csv(
             self.test_path / 'import_type.csv',
             keep_default_na=False)
@@ -94,6 +87,21 @@ class ImportTest(ImportTestCase):
         assert b'Dam' in rv.data
         (self.test_path / 'example_type.csv').unlink()
 
+
+        with open(self.static_path / 'example.csv', 'rb') as file:
+            rv = c.post(
+                url_for('import_data', class_='place', project_id=p_id),
+                data={'file': file, 'duplicate': True},
+                follow_redirects=True)
+        assert b'IDs already in database' in rv.data
+
+
+        with open(self.test_path / 'import_type.csv', 'rb') as file:
+            rv = c.post(
+                url_for('import_data', class_='type', project_id=p_id),
+                data={'file': file, 'duplicate': True},
+                follow_redirects=True)
+        assert b'empty parend id' in rv.data
 
         with open(self.static_path / 'favicon.ico', 'rb') as file:
             rv = c.post(
@@ -212,6 +220,30 @@ class ImportTest(ImportTestCase):
         data_frame.at[2, 'id'] = 'new_place_3'
         data_frame.at[0, 'administrative_unit_id'] = austria.id
         data_frame.at[0, 'historical_place_id'] = carantania.id
+        data_frame.at[0, 'wkt'] = "POLYGON((16.1203 BLA, 16.606275))"
+        data_frame.at[0, 'reference_ids'] = \
+            f'{reference.id};IV {height.id};IV lit_1;55'
+        data_frame.at[0, 'origin_reference_ids'] = 'Lit_1;IV type_3; all'
+        data_frame.at[0, 'type_ids'] = ' '.join(
+            map(str, [austria.id, reference.id, place.id]))
+        data_frame.to_csv(self.test_path / 'example.csv', index=False)
+        with open(self.test_path / 'example.csv', 'rb') as file:
+            rv = c.post(
+                url_for('import_data', class_='place', project_id=p_id),
+                data={'file': file, 'duplicate': True},
+                follow_redirects=True)
+        assert b'invalid reference id' in rv.data
+        assert b'invalid origin reference id' in rv.data
+        assert b'invalid type ids' in rv.data
+
+        data_frame = pd.read_csv(
+            self.test_path / 'example.csv',
+            keep_default_na=False)
+        data_frame.at[0, 'id'] = 'new_place_11'
+        data_frame.at[1, 'id'] = 'new_place_22'
+        data_frame.at[2, 'id'] = 'new_place_33'
+        data_frame.at[0, 'administrative_unit_id'] = austria.id
+        data_frame.at[0, 'historical_place_id'] = carantania.id
         type_ids = [
             boundary_mark.id,
             infrastructure.id,
@@ -219,7 +251,6 @@ class ImportTest(ImportTestCase):
             place_type.id]
         data_frame.at[0, 'type_ids'] = ' '.join(map(str, type_ids))
         data_frame.at[0, 'value_types'] = f'{height.id};42'
-        data_frame.at[0, 'reference_ids'] = f'{reference.id};IV'
         data_frame.to_csv(self.test_path / 'example.csv', index=False)
         with open(self.test_path / 'example.csv', 'rb') as file:
             rv = c.post(
@@ -255,7 +286,11 @@ class ImportTest(ImportTestCase):
             keep_default_na=False)
         data_frame.at[7, 'openatlas_parent_id'] = place.id
         data_frame.at[7, 'origin_value_types'] = 'type_7;38'
-        data_frame.at[6, 'origin_value_types'] = 'type_7'
+        data_frame.at[2, 'origin_value_types'] = 'type_7;38'
+        data_frame.at[6, 'origin_value_types'] = 'type_6 type_7;25'
+        data_frame.at[5, 'origin_value_types'] = 'type_10'
+        data_frame.at[4, 'origin_type_ids'] = 'type_10'
+        data_frame.at[0, 'origin_type_ids'] = 'type_3'
         data_frame.to_csv(
             self.test_path / 'example_place_hierarchy.csv',
             index=False)
@@ -267,6 +302,8 @@ class ImportTest(ImportTestCase):
                 data={'file': file, 'duplicate': True},
                 follow_redirects=True)
             assert b'Bone' in rv.data
+            assert b'invalid type origin ids' in rv.data
+            assert b'invalid origin value type ids' in rv.data
         (self.test_path / 'example_place_hierarchy.csv').unlink()
 
         rv = c.get(url_for('import_project_view', id_=p_id))

@@ -61,9 +61,10 @@ def get_origin_ids(project: Project, origin_ids: list[str]) -> list[str]:
 
 
 def get_id_from_origin_id(project: Project, origin_id: str) -> Optional[str]:
+    openatlas_id = None
     if id_ := db.get_id_from_origin_id(project.id, origin_id):
-        id_ = str(id_[0])
-    return id_
+        openatlas_id = str(id_[0])
+    return openatlas_id
 
 
 def check_duplicates(class_: str, names: list[str]) -> list[str]:
@@ -176,8 +177,8 @@ def link_types(
             type_ids.append((type_id, None))
     if ids := row.get('origin_type_ids'):
         for id_ in str(ids).split():
-            if type_id := get_id_from_origin_id(project, id_):
-                type_ids.append((type_id, None))
+            if entity_id := get_id_from_origin_id(project, id_):
+                type_ids.append((entity_id, None))
     if data := row.get('value_types'):
         for value_types in str(data).split():
             value_type = value_types.split(';')
@@ -187,13 +188,14 @@ def link_types(
                 type_ids.append((value_type[0],  value_type[1]))
     if data := row.get('origin_value_types'):
         for value_types in str(data).split():
-            type_id = get_id_from_origin_id(project, value_types[0])
             value_type = value_types.split(';')
             if len(value_type) == 2:
-                number = value_type[1][1:] \
-                    if value_type[1].startswith('-') else value_type[1]
-                if number.isdigit() or number.replace('.', '', 1).isdigit():
-                    type_ids.append((type_id,  value_type[1]))
+                if entity_id := get_id_from_origin_id(project, value_type[0]):
+                    number = value_type[1][1:] \
+                        if value_type[1].startswith('-') else value_type[1]
+                    if (number.isdigit()
+                            or number.replace('.', '', 1).isdigit()):
+                        type_ids.append((entity_id,  value_type[1]))
     checked_type_ids = [
         type_tuple for type_tuple in type_ids
         if check_type_id(type_tuple[0], class_)]
