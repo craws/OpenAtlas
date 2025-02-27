@@ -1,6 +1,9 @@
+import os
+
 import pandas as pd
 from flask import url_for
 
+from models.export import current_date_for_filename
 from openatlas import app
 from openatlas.api.resources.api_entity import ApiEntity
 from tests.base import ImportTestCase
@@ -9,6 +12,37 @@ from tests.base import ImportTestCase
 class ImportTest(ImportTestCase):
 
     def test_import(self) -> None:
+        c = self.client
+        assert b'Export SQL' in c.get(url_for('export_sql')).data
+
+        date_ = current_date_for_filename()
+        rv = c.get(
+            url_for('export_execute', format_='sql'),
+            follow_redirects=True)
+        assert b'Data was exported' in rv.data
+
+        rv = c.get(url_for('download_sql', filename=f'{date_}_export.sql.7z'))
+        assert b'7z' in rv.data
+
+        rv = c.get(
+            url_for('export_execute', format_='dump'),
+            follow_redirects=True)
+        assert b'Data was exported' in rv.data
+
+        rv = c.get(url_for('download_sql', filename=f'{date_}_export.dump.7z'))
+        assert b'7z' in rv.data
+
+        assert b'Warning' in c.get(url_for('sql_index')).data
+        assert b'execute' in c.get(url_for('sql_execute')).data
+
+        rv = c.post(
+            url_for('sql_execute'),
+            data={'statement': 'SELECT * FROM web.user;'})
+        assert b'Alice' in rv.data
+
+        rv = c.post(url_for('sql_execute'), data={'statement': 'e'})
+        assert b'syntax error' in rv.data
+
         with app.test_request_context():
             app.preprocess_request()
             for entity in ApiEntity.get_by_cidoc_classes(['all']):
@@ -30,7 +64,6 @@ class ImportTest(ImportTestCase):
                     case 'Shire':
                         place = entity
 
-        c = self.client
         rv = c.get(url_for('import_project_insert'))
         assert b'name *' in rv.data
 
@@ -51,6 +84,9 @@ class ImportTest(ImportTestCase):
 
         rv = c.get(url_for('import_index'))
         assert b'X-Files' in rv.data
+
+        rv = c.get(url_for('import_data', class_='person', project_id=p_id))
+        assert b'file *' in rv.data
 
         with open(self.test_path / 'bibliography.csv', 'rb') as file:
             rv = c.post(
@@ -306,3 +342,20 @@ class ImportTest(ImportTestCase):
             url_for('import_project_delete', id_=p_id),
             follow_redirects=True)
         assert b'Project deleted' in rv.data
+
+        rv = c.get(
+            url_for('delete_export', filename=f'{date_}_export.sql.7z'),
+            follow_redirects=True)
+        if os.name == 'posix':
+            assert b'File deleted' in rv.data
+
+        rv = c.get(
+            url_for('delete_export', filename=f'{date_}_export.dump.7z'),
+            follow_redirects=True)
+        if os.name == 'posix':
+            assert b'File deleted' in rv.data
+
+        rv = c.get(
+            url_for('delete_export', filename='non_existing'),
+            follow_redirects=True)
+        assert b'An error occurred when trying to delete the f' in rv.data
