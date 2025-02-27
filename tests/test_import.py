@@ -53,6 +53,7 @@ class ImportTest(ImportTestCase):
         assert b'X-Files' in rv.data
 
         rv = c.get(url_for('import_data', class_='person', project_id=p_id))
+        print(rv.data)
         assert b'file *' in rv.data
 
         with open(self.test_path / 'bibliography.csv', 'rb') as file:
@@ -87,14 +88,12 @@ class ImportTest(ImportTestCase):
         assert b'Dam' in rv.data
         (self.test_path / 'example_type.csv').unlink()
 
-
         with open(self.static_path / 'example.csv', 'rb') as file:
             rv = c.post(
                 url_for('import_data', class_='place', project_id=p_id),
                 data={'file': file, 'duplicate': True},
                 follow_redirects=True)
         assert b'IDs already in database' in rv.data
-
 
         with open(self.test_path / 'import_type.csv', 'rb') as file:
             rv = c.post(
@@ -172,8 +171,6 @@ class ImportTest(ImportTestCase):
                 follow_redirects=True)
         assert b'invalid parent id' in rv.data
         (self.test_path / 'invalid_3_modified.csv').unlink()
-
-
 
         data_frame = pd.read_csv(
             self.test_path / 'invalid_3.csv',
