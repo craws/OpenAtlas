@@ -3,7 +3,7 @@ import os
 import pandas as pd
 from flask import url_for
 
-from models.export import current_date_for_filename
+from openatlas.models.export import current_date_for_filename
 from openatlas import app
 from openatlas.api.resources.api_entity import ApiEntity
 from tests.base import ImportTestCase
