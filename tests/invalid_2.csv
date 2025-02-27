@@ -1,4 +1,4 @@
 id,name,alias,description,begin_from,begin_to,begin_comment,end_from,end_to,end_comment,wkt,type_ids,value_types,reference_ids,reference_system_wikidata,reference_system_geon,administrative_unit_id,historical_place_id,not_existing_column
-place_1,Vienna,Wien,Capital of Austria,not_a_date,NaT,It was a rainy day.,,2049-12-31,We'll see about that.,"MULTILINESTRING ((10 10, 20 20, 10 40),(40 40, 30 30, 40 20, 30 10))",666,666;12B34,“666b;213;41 12b 666;IV”,123;away,juhhu;4545,777,888,
-place_1,,,,,,,,,,"MULTILINESTRING ((BLA 10, 20 20, 10 40),(40 40, 30 30, 40 20, 30 10))",,,,,,,,
+place_1,Vienna,Wien,Capital of Austria,not_a_date,NaT,It was a rainy day.,,2049-12-31,We'll see about that.,"MULTILINESTRING ((10 10, 20 20, 10 40),(40 40, 30 30, 40 20, 30 10))",666,666;12B34,23,123;away,juhhu;4545,777,888,
+place_1,,,,,,,,,,"MULTILINESTRING ((BLA 10, 20 20, 10 40),(40 40, 30 30, 40 20, 30 10))",,,35,,,,,
 place_1,Vienna,,,,,,,,,,,,,,,,,

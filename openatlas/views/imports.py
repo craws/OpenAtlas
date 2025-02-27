@@ -55,11 +55,14 @@ _('invalid reference id')
 _('invalid origin reference id')
 _('empty names')
 _('empty ids')
+_('empty parend id')
 _('missing name column')
 _('ids already in database')
 _('double ids in import')
 _('multiple parent ids')
 _('invalid openatlas parent id')
+_('invalid parent id')
+_('invalid parent class')
 
 
 class ProjectForm(FlaskForm):
@@ -347,6 +350,9 @@ def check_data_for_table_representation(
             continue
         if row.get('parent_id') and row.get('openatlas_parent_id'):
             checks.set_error('multiple_parent_ids', row.get('id'))
+        if class_ == 'type' and not (
+                row.get('parent_id') or row.get('openatlas_parent_id')):
+            checks.set_error('empty_parend_id', row.get('id'))
         table_row = []
         checked_row = {}
         for item in headers:
@@ -372,11 +378,11 @@ def check_data_for_table_representation(
         for row in checked_data:
             if parent_id := row.get('parent_id'):
                 if parent_id not in origin_ids:
-                    checks.set_error('invalid parent id', row.get('id'))
+                    checks.set_error('invalid_parent_id', row.get('id'))
                 if not check_parent(
                         row['openatlas_class'].replace(' ', '_'),
                         entity_dict[row['parent_id']]):
-                    checks.set_error('invalid parent class', row.get('id'))
+                    checks.set_error('invalid_parent_class', row.get('id'))
     return Table(headers, rows=table_data)
 
 
@@ -477,7 +483,7 @@ def check_cell_value(
             for type_id in type_ids:
                 if type_id in check_single_type_duplicates(type_ids):
                     invalids_type_ids.append(type_id)
-                    checks.set_warning('single_type_duplicates', id_)
+                    checks.set_error('single_type_duplicates', id_)
             for i, type_id in enumerate(type_ids):
                 if type_id in invalids_type_ids:
                     type_ids[i] = error_span(type_id)
@@ -487,9 +493,7 @@ def check_cell_value(
             for value_type in str(value).split():
                 values = str(value_type).split(';')
                 if item == 'origin_value_types':
-                    values[0] = get_id_from_origin_id(
-                        project,
-                        values[0])[0]
+                    values[0] = get_id_from_origin_id(project, values[0])
                 if len(values) != 2 or not values[1]:
                     value_types.append(error_span(value_type))
                     checks.set_warning('invalid_value_types', id_)
@@ -507,33 +511,44 @@ def check_cell_value(
             value = ' '.join(value_types)
         case 'reference_ids' if value:
             references = []
-            for reference in clean_reference_pages(str(value)):
-                values = str(reference).split(';')
-                if not values[0].isdigit():
-                    values[0] = error_span(values[0])
-                    checks.set_warning('invalid_reference_id', id_)
-                else:
-                    try:
-                        ApiEntity.get_by_id(int(values[0]))
-                    except EntityDoesNotExistError:
+            if clean_references := clean_reference_pages(str(value)):
+                for reference in clean_references:
+                    values = str(reference).split(';')
+                    if not values[0].isdigit():
                         values[0] = error_span(values[0])
                         checks.set_warning('invalid_reference_id', id_)
-                references.append(';'.join(values))
+                    else:
+                        try:
+                            ref = ApiEntity.get_by_id(int(values[0]))
+                            if not ref.class_.view == 'reference':
+                                raise EntityDoesNotExistError
+                        except EntityDoesNotExistError:
+                            values[0] = error_span(values[0])
+                            checks.set_warning('invalid_reference_id', id_)
+                    references.append(';'.join(values))
+            else:
+                checks.set_warning('invalid_reference_id', id_)
             value = ' '.join(references)
         case 'origin_reference_ids' if value:
             origin_references = []
-            for reference in clean_reference_pages(str(value)):
-                values = str(reference).split(';')
-                if origin_id := get_id_from_origin_id(project, values[0]):
-                    try:
-                        ApiEntity.get_by_id(int(origin_id[0]))
-                    except EntityDoesNotExistError:
-                        values[0] = error_span(values[0])
+            if clean_references := clean_reference_pages(str(value)):
+                for reference in clean_references:
+                    values = str(reference).split(';')
+                    if origin_id := get_id_from_origin_id(project, values[0]):
+                        try:
+                            ref = ApiEntity.get_by_id(int(origin_id))
+                            if not ref.class_.view == 'reference':
+                                raise EntityDoesNotExistError
+                        except EntityDoesNotExistError:
+                            values[0] = error_span(values[0])
+                            checks.set_warning(
+                                'invalid_origin_reference_id', id_)
+                    else:
                         checks.set_warning('invalid_origin_reference_id', id_)
-                else:
-                    checks.set_warning('invalid_origin_reference_id', id_)
-                    values[0] = error_span(values[0])
-                origin_references.append(';'.join(values))
+                        values[0] = error_span(values[0])
+                    origin_references.append(';'.join(values))
+            else:
+                checks.set_warning('invalid_origin_reference_id', id_)
             value = ' '.join(origin_references)
         case 'wkt' if value:
             try:

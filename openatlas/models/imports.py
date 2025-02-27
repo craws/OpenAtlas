@@ -60,8 +60,10 @@ def get_origin_ids(project: Project, origin_ids: list[str]) -> list[str]:
     return db.check_origin_ids(project.id, origin_ids)
 
 
-def get_id_from_origin_id(project: Project, origin_id: str) -> list[str]:
-    return db.get_id_from_origin_id(project.id, origin_id)
+def get_id_from_origin_id(project: Project, origin_id: str) -> Optional[str]:
+    if id_ := db.get_id_from_origin_id(project.id, origin_id):
+        id_ = str(id_[0])
+    return id_
 
 
 def check_duplicates(class_: str, names: list[str]) -> list[str]:
@@ -112,7 +114,8 @@ def import_data_(project: Project, class_: str, data: list[Any]) -> None:
         if class_ in ['place', 'person', 'group']:
             insert_alias(entity, row)
         insert_dates(entity, row)
-        link_types(entity, row, class_, project)
+        if entity.class_ != 'type':
+            link_types(entity, row, class_, project)
         link_references(entity, row, class_, project)
         if class_ in g.view_class_mapping['place'] \
                 + g.view_class_mapping['artifact']:
@@ -171,30 +174,31 @@ def link_types(
     if ids := row.get('type_ids'):
         for type_id in str(ids).split():
             type_ids.append((type_id, None))
-    elif ids := row.get('origin_type_ids'):
+    if ids := row.get('origin_type_ids'):
         for id_ in str(ids).split():
-            if type_id := get_id_from_origin_id(project, id_)[0]:
+            if type_id := get_id_from_origin_id(project, id_):
                 type_ids.append((type_id, None))
-    elif data := row.get('value_types'):
+    if data := row.get('value_types'):
         for value_types in str(data).split():
             value_type = value_types.split(';')
             number = value_type[1][1:] \
                 if value_type[1].startswith('-') else value_type[1]
             if number.isdigit() or number.replace('.', '', 1).isdigit():
                 type_ids.append((value_type[0],  value_type[1]))
-    elif data := row.get('origin_value_types'):
+    if data := row.get('origin_value_types'):
         for value_types in str(data).split():
-            type_id = get_id_from_origin_id(
-                        project,
-                        value_types[0])[0]
+            type_id = get_id_from_origin_id(project, value_types[0])
             value_type = value_types.split(';')
-            number = value_type[1][1:] \
-                if value_type[1].startswith('-') else value_type[1]
-            if number.isdigit() or number.replace('.', '', 1).isdigit():
-                type_ids.append((type_id,  value_type[1]))
-    for type_tuple in type_ids:
-        if check_type_id(type_tuple[0], class_):
-            entity.link('P2', g.types[int(type_tuple[0])], type_tuple[1])
+            if len(value_type) == 2:
+                number = value_type[1][1:] \
+                    if value_type[1].startswith('-') else value_type[1]
+                if number.isdigit() or number.replace('.', '', 1).isdigit():
+                    type_ids.append((type_id,  value_type[1]))
+    checked_type_ids = [
+        type_tuple for type_tuple in type_ids
+        if check_type_id(type_tuple[0], class_)]
+    for type_tuple in checked_type_ids:
+        entity.link('P2', g.types[int(type_tuple[0])], type_tuple[1])
 
 
 def link_references(
@@ -208,6 +212,8 @@ def link_references(
             if len(reference) <= 2 and reference[0].isdigit():
                 try:
                     ref_entity = ApiEntity.get_by_id(int(reference[0]))
+                    if not ref_entity.class_.view == 'reference':
+                        raise EntityDoesNotExistError
                 except EntityDoesNotExistError:
                     continue
                 page = reference[1] or None
@@ -216,9 +222,10 @@ def link_references(
         for references in clean_reference_pages(str(origin_ref_ids)):
             reference = references.split(';')
             if ref_id := get_id_from_origin_id(project, reference[0]):
-                ref_entity = ApiEntity.get_by_id(int(ref_id[0]))
-                page = reference[1] or None
-                ref_entity.link('P67', entity, page)
+                ref_entity = ApiEntity.get_by_id(int(ref_id))
+                if ref_entity.class_.view == 'reference':
+                    page = reference[1] or None
+                    ref_entity.link('P67', entity, page)
     match_types = get_match_types()
     systems = list(set(i for i in row if i.startswith('reference_system_')))
     for header in systems:

@@ -9,6 +9,27 @@ from tests.base import ImportTestCase
 class ImportTest(ImportTestCase):
 
     def test_import(self) -> None:
+        with app.test_request_context():
+            app.preprocess_request()
+            for entity in ApiEntity.get_by_cidoc_classes(['all']):
+                match entity.name:
+                    case 'Boundary Mark':
+                        boundary_mark = entity
+                    case 'Infrastructure':
+                        infrastructure = entity
+                    case 'Austria':
+                        austria = entity
+                    case 'Height':
+                        height = entity
+                    case 'Carantania':
+                        carantania = entity
+                    case 'Place':
+                        place_type = entity
+                    case 'https://lotr.fandom.com/':
+                        reference = entity
+                    case 'Shire':
+                        place = entity
+
         c = self.client
         rv = c.get(url_for('import_project_insert'))
         assert b'name *' in rv.data
@@ -55,6 +76,25 @@ class ImportTest(ImportTestCase):
                 follow_redirects=True)
         assert b'IDs already in database' in rv.data
 
+        data_frame = pd.read_csv(
+            self.test_path / 'import_type.csv',
+            keep_default_na=False)
+        data_frame.at[0, 'openatlas_parent_id'] = infrastructure.id
+        data_frame.at[4, 'openatlas_parent_id'] = infrastructure.id
+        data_frame.at[5, 'openatlas_parent_id'] = height.id
+        data_frame.at[6, 'openatlas_parent_id'] = height.id
+        data_frame.to_csv(
+            self.test_path / 'example_type.csv',
+            index=False)
+        with open(self.test_path / 'example_type.csv', 'rb') as file:
+            rv = c.post(
+                url_for('import_data', class_='type', project_id=p_id),
+                data={'file': file},
+                follow_redirects=True)
+        assert b'Dam' in rv.data
+        (self.test_path / 'example_type.csv').unlink()
+
+
         with open(self.static_path / 'favicon.ico', 'rb') as file:
             rv = c.post(
                 url_for('import_data', class_='place', project_id=p_id),
@@ -93,11 +133,11 @@ class ImportTest(ImportTestCase):
         assert b'invalid dates' in rv.data
         assert b'invalid value types' in rv.data
         assert b'invalid reference system value' in rv.data
+        assert b'invalid origin reference id' in rv.data
         assert b'invalid match type' in rv.data
         assert b'invalid openatlas class' in rv.data
         assert b'invalid parent class' in rv.data
         assert b'empty ids' in rv.data
-
         data_frame = pd.read_csv(
             self.test_path / 'invalid_3.csv',
             keep_default_na=False)
@@ -125,48 +165,7 @@ class ImportTest(ImportTestCase):
         assert b'invalid parent id' in rv.data
         (self.test_path / 'invalid_3_modified.csv').unlink()
 
-    def test_import2(self) -> None:
-        c = self.client
-        rv = c.post(url_for('import_project_insert'), data={'name': 'X-Files'})
-        p_id = rv.location.split('/')[-1]
-        with app.test_request_context():
-            app.preprocess_request()
-            for entity in ApiEntity.get_by_cidoc_classes(['all']):
-                match entity.name:
-                    case 'Boundary Mark':
-                        boundary_mark = entity
-                    case 'Infrastructure':
-                        infrastructure = entity
-                    case 'Austria':
-                        austria = entity
-                    case 'Height':
-                        height = entity
-                    case 'Carantania':
-                        carantania = entity
-                    case 'Place':
-                        place_type = entity
-                    case 'https://lotr.fandom.com/':
-                        reference = entity
-                    case 'Shire':
-                        place = entity
 
-        data_frame = pd.read_csv(
-            self.static_path / 'example_type.csv',
-            keep_default_na=False)
-        data_frame.at[0, 'openatlas_parent_id'] = boundary_mark.id
-        data_frame.at[4, 'openatlas_parent_id'] = boundary_mark.id
-        data_frame.at[5, 'openatlas_parent_id'] = height.id
-        data_frame.at[6, 'openatlas_parent_id'] = height.id
-        data_frame.to_csv(
-            self.test_path / 'example_type.csv',
-            index=False)
-        with open(self.test_path / 'example_type.csv', 'rb') as file:
-            rv = c.post(
-                url_for('import_data', class_='type', project_id=p_id),
-                data={'file': file},
-                follow_redirects=True)
-        assert b'Ochre' in rv.data
-        (self.test_path / 'example_type.csv').unlink()
 
         data_frame = pd.read_csv(
             self.test_path / 'invalid_3.csv',
@@ -203,7 +202,6 @@ class ImportTest(ImportTestCase):
                 data={'file': file},
                 follow_redirects=True)
         assert b'invalid parent class' in rv.data
-
         (self.test_path / 'invalid_3_modified.csv').unlink()
 
         data_frame = pd.read_csv(
@@ -222,7 +220,6 @@ class ImportTest(ImportTestCase):
         data_frame.at[0, 'type_ids'] = ' '.join(map(str, type_ids))
         data_frame.at[0, 'value_types'] = f'{height.id};42'
         data_frame.at[0, 'reference_ids'] = f'{reference.id};IV'
-        data_frame.at[0, 'wkt'] = "POLYGON((16.1203 BLA, 16.606275))"
         data_frame.to_csv(self.test_path / 'example.csv', index=False)
         with open(self.test_path / 'example.csv', 'rb') as file:
             rv = c.post(
@@ -230,8 +227,6 @@ class ImportTest(ImportTestCase):
                 data={'file': file, 'duplicate': True},
                 follow_redirects=True)
         assert b'single type duplicates' in rv.data
-        assert b'invalid origin reference id' in rv.data
-        assert b'Vienna' in rv.data
 
         with open(self.test_path / 'example.csv', 'rb') as file:
             rv = c.post(
@@ -239,12 +234,28 @@ class ImportTest(ImportTestCase):
                 data={'file': file, 'duplicate': True},
                 follow_redirects=True)
         assert b'invalid reference system class' in rv.data
+
+        data_frame = pd.read_csv(
+            self.test_path / 'example.csv',
+            keep_default_na=False)
+        data_frame.at[0, 'type_ids'] = ''
+        data_frame.at[0, 'origin_type_ids'] = 'type_1'
+        data_frame.to_csv(self.test_path / 'example.csv', index=False)
+        with open(self.test_path / 'example.csv', 'rb') as file:
+            rv = c.post(
+                url_for('import_data', class_='place', project_id=p_id),
+                data={'file': file, 'duplicate': True},
+                follow_redirects=True)
+        assert b'Vienna' in rv.data
+
         (self.test_path / 'example.csv').unlink()
 
         data_frame = pd.read_csv(
             self.static_path / 'example_place_hierarchy.csv',
             keep_default_na=False)
         data_frame.at[7, 'openatlas_parent_id'] = place.id
+        data_frame.at[7, 'origin_value_types'] = 'type_7;38'
+        data_frame.at[6, 'origin_value_types'] = 'type_7'
         data_frame.to_csv(
             self.test_path / 'example_place_hierarchy.csv',
             index=False)
