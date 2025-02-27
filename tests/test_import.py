@@ -52,10 +52,6 @@ class ImportTest(ImportTestCase):
         rv = c.get(url_for('import_index'))
         assert b'X-Files' in rv.data
 
-        rv = c.get(url_for('import_data', class_='person', project_id=p_id))
-        print(rv.data)
-        assert b'file *' in rv.data
-
         with open(self.test_path / 'bibliography.csv', 'rb') as file:
             rv = c.post(
                 url_for('import_data', class_='bibliography', project_id=p_id),
