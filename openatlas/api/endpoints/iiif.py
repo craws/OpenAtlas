@@ -276,7 +276,7 @@ class IIIFManifest(Resource):
                     _external=True),
             "@type": "sc:Manifest",
             "label": entity.name,
-            "description": entity.description,
+            "description": entity.description or "",
             "metadata": metadata,
             "seeAlso": see_also,
             "attribution": license_,
