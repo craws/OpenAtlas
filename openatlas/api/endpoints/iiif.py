@@ -62,7 +62,7 @@ class IIIFCanvas(Resource):
             "label": entity.name,
             "height": metadata['img_api']['height'],
             "width": metadata['img_api']['width'],
-            "description": entity.description or '',
+            "description": "",
             "images": [IIIFImage.build_image(metadata)],
             "otherContent": [{
                 "@id": url_for(
@@ -276,6 +276,7 @@ class IIIFManifest(Resource):
                     _external=True),
             "@type": "sc:Manifest",
             "label": entity.name,
+            "description": entity.description,
             "metadata": metadata,
             "seeAlso": see_also,
             "attribution": license_,
