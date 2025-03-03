@@ -66,8 +66,10 @@ def get_geometry_dict(row: dict[str, Any]) -> dict[str, Any]:
         if row['name'] else ''
     geometry['description'] = row['description'].replace('"', '\"') \
         if row['description'] else ''
-    geometry['shapeType'] = row['type'].replace('"', '\"') \
-        if row['type'] else ''
+    geometry['shapeType'] = (
+        row['type'].replace('"', '\"')) if row['type'] else ''
+    geometry['placeId'] = row.get('entity_id')
+    geometry['locationId'] = row.get('location_id')
     return geometry
 
 

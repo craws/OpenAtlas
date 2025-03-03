@@ -51,7 +51,7 @@ class Endpoint:
             self.entities_with_links[
                 link_.range.id]['links_inverse'].append(link_)
         for id_, geom in Gis.get_by_entities(self.entities).items():
-            self.entities_with_links[id_]['geometry'].extend( geom)
+            self.entities_with_links[id_]['geometry'].extend(geom)
         if self.parser.centroid:
             for id_, geom in \
                     Gis.get_centroids_by_entities(self.entities).items():
