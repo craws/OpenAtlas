@@ -2762,6 +2762,9 @@
           "description": {
             "type": "string"
           },
+          "locationId": {
+            "type": "string"
+          },
           "shapeType": {
             "type": "string",
             "enum": [
@@ -2798,6 +2801,9 @@
             "type": "string"
           },
           "description": {
+            "type": "string"
+          },
+          "locationId": {
             "type": "string"
           },
           "shapeType": {
@@ -2845,6 +2851,9 @@
             "type": "string"
           },
           "description": {
+            "type": "string"
+          },
+          "locationId": {
             "type": "string"
           },
           "shapeType": {
