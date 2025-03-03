@@ -62,7 +62,7 @@ class IIIFCanvas(Resource):
             "label": entity.name,
             "height": metadata['img_api']['height'],
             "width": metadata['img_api']['width'],
-            "description": entity.description,
+            "description": entity.description or '',
             "images": [IIIFImage.build_image(metadata)],
             "otherContent": [{
                 "@id": url_for(
