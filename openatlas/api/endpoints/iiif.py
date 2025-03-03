@@ -23,7 +23,7 @@ class IIIFSequence(Resource):
     @staticmethod
     def get(id_: int) -> Response:
         return jsonify(
-            {"@context": "https://iiif.io/api/presentation/2/context.json"} |
+            {"@context": "http://iiif.io/api/presentation/2/context.json"} |
             IIIFSequence.build_sequence(get_metadata(
                 ApiEntity.get_by_id(id_)),
                 Parser(iiif.parse_args())))
@@ -45,7 +45,7 @@ class IIIFCanvas(Resource):
     @staticmethod
     def get(id_: int) -> Response:
         return jsonify(
-            {"@context": "https://iiif.io/api/presentation/2/context.json"} |
+            {"@context": "http://iiif.io/api/presentation/2/context.json"} |
             IIIFCanvas.build_canvas(get_metadata(
                 ApiEntity.get_by_id(id_)),
                 Parser(iiif.parse_args())))
@@ -78,7 +78,7 @@ class IIIFCanvas(Resource):
                 "height": 200,
                 "width": 200,
                 "service": {
-                    "@context": "https://iiif.io/api/image/2/context.json",
+                    "@context": "http://iiif.io/api/image/2/context.json",
                     "@id": metadata['img_url'],
                     "profile": metadata['img_api']['profile']}}}
 
@@ -87,7 +87,7 @@ class IIIFImage(Resource):
     @staticmethod
     def get(id_: int) -> Response:
         return jsonify(
-            {"@context": "https://iiif.io/api/presentation/2/context.json"} |
+            {"@context": "http://iiif.io/api/presentation/2/context.json"} |
             IIIFImage.build_image(get_metadata(ApiEntity.get_by_id(id_))))
 
     @staticmethod
@@ -103,7 +103,7 @@ class IIIFImage(Resource):
                 "@type": "dctypes:Image",
                 "format": mime_type,
                 "service": {
-                    "@context": "https://iiif.io/api/image/2/context.json",
+                    "@context": "http://iiif.io/api/image/2/context.json",
                     "@id": metadata['img_url'],
                     "profile": metadata['img_api']['profile']},
                 "height": metadata['img_api']['height'],
@@ -115,7 +115,7 @@ class IIIFAnnotationList(Resource):
     @staticmethod
     def get(image_id: int) -> Response:
         return jsonify(
-            {"@context": "https://iiif.io/api/presentation/2/context.json"} |
+            {"@context": "http://iiif.io/api/presentation/2/context.json"} |
             IIIFAnnotationList.build_annotation_list(
                 image_id,
                 Parser(iiif.parse_args())))
@@ -138,7 +138,7 @@ class IIIFAnnotation(Resource):
     @staticmethod
     def get(annotation_id: int) -> Response:
         return jsonify(
-            {"@context": "https://iiif.io/api/presentation/2/context.json"} |
+            {"@context": "http://iiif.io/api/presentation/2/context.json"} |
             IIIFAnnotation.build_annotation(
                 AnnotationImage.get_by_id(annotation_id),
                 Parser(iiif.parse_args())))
@@ -267,7 +267,7 @@ class IIIFManifest(Resource):
                     "label": related_entity.range.name.capitalize(),
                     "format": related_entity.range.class_.name.capitalize()})
         return {
-            "@context": "https://iiif.io/api/presentation/2/context.json",
+            "@context": "http://iiif.io/api/presentation/2/context.json",
             "@id":
                 url_for(
                     'api.iiif_manifest',
@@ -302,6 +302,6 @@ def get_logo() -> dict[str, Any]:
             filename=g.settings['logo_file_id'],
             _external=True),
         "service": {
-            "@context": "https://iiif.io/api/image/2/context.json",
+            "@context": "http://iiif.io/api/image/2/context.json",
             "@id": url_for('overview', _external=True),
-            "profile": "https://iiif.io/api/image/2/level2.json"}}
+            "profile": "http://iiif.io/api/image/2/level2.json"}}
