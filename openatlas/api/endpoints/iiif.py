@@ -276,7 +276,9 @@ class IIIFManifest(Resource):
                     _external=True),
             "@type": "sc:Manifest",
             "label": entity.name,
-            "description": entity.description or "",
+            "description": [{
+                "@value": entity.description,
+                "@language": "en"}] if entity.description else "",
             "metadata": metadata,
             "seeAlso": see_also,
             "attribution": license_,
