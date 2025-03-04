@@ -118,11 +118,11 @@ class Activity:
 def get_diagnose_types(entries_: list[Entry]) -> dict[str, Entity]:
     diagnose_types_ = {}
     for e_ in entries_:
-        if e_.diagnose not in diagnose_types_:
-            print(e_.diagnose)
-            type_ = Entity.insert('type', e_.diagnose)
-            type_.link('P127', diagnose_hierarchy)
-            diagnose_types_[e_.diagnose] = type_
+        if e_.diagnose in diagnose_types_.keys():
+            continue
+        type_ = Entity.insert('type', e_.diagnose)
+        type_.link('P127', diagnose_hierarchy)
+        diagnose_types_[e_.diagnose] = type_
     return diagnose_types_
 
 
@@ -140,4 +140,3 @@ with app.test_request_context():
         source.link('P67', person)
         source.link('P67', activity)
         activity.link('P11', person)
-        break
