@@ -4,11 +4,10 @@ from typing import Any
 
 import pandas as pd
 
+from openatlas import app
 from openatlas.models.entity import Entity
 
 file_path = Path('files/sisters.csv')
-
-from openatlas import app
 
 
 class Entry:
@@ -38,12 +37,12 @@ class Entry:
 
 
 class Sister:
-    def __init__(self, entry: Entry) -> None:
-        self.name = entry.name
-        self.birthday = entry.birthday
-        self.death_date = entry.death_date
-        self.description = f'{entry.duties}\n\n{entry.bio}'
-        self.number = entry.number
+    def __init__(self, entry_: Entry) -> None:
+        self.name = entry_.name
+        self.birthday = entry_.birthday
+        self.death_date = entry_.death_date
+        self.description = f'{entry_.duties}\n\n{entry_.bio}'
+        self.number = entry_.number
 
     def insert_sister(self) -> Entity:
         sister_ = Entity.insert('person', self.name, self.description)
@@ -55,14 +54,14 @@ class Sister:
 
 
 class Function:
-    def __init__(self, entry: Entry) -> None:
-        self.profess = entry.profess
-        self.rank = entry.rank
+    def __init__(self, entry_: Entry) -> None:
+        self.profess = entry_.profess
+        self.rank = entry_.rank
 
 
-def parse_csv():
-    df = pd.read_csv(file_path, delimiter='\t', encoding='utf-8', dtype=str)
-    df = df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
+def parse_csv() -> list[Entry]:
+    data = pd.read_csv(file_path, delimiter='\t', encoding='utf-8', dtype=str)
+    data = data.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
 
     return [Entry({
         'number': row['Nummer'] if pd.notna(row['Stand']) else '',
@@ -74,7 +73,7 @@ def parse_csv():
         'bio': row['Biographische Details'] if pd.notna(
             row['Biographische Details']) else '',
         'duties': row['Ämterlisten'] if pd.notna(row['Ämterlisten']) else ''})
-        for _, row in df.iterrows()]
+        for _, row in data.iterrows()]
 
 
 def insert_rank_types(entries_: list[Entry]) -> dict[str, Any]:
