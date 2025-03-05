@@ -1,4 +1,6 @@
+from datetime import date, datetime
 from pathlib import Path
+from typing import Any
 
 import pandas as pd
 
@@ -9,20 +11,125 @@ file_path = Path('files/sisters.csv')
 from openatlas import app
 
 
+class Entry:
+    def __init__(self, attributes: dict[str, Any]) -> None:
+        self.number = attributes['number']
+        self.name = attributes['name']
+        self.birthday = self.convert_str_to_date(attributes['birthday'])
+        self.death_date = self.convert_str_to_date(attributes['deathday'])
+        self.profess = self.convert_str_to_date(attributes['profess'])
+        self.rank = attributes['rank']
+        self.bio = attributes['bio']
+        self.duties = attributes['duties']
+        self.sister = Sister(self)
+        self.function = Function(self)
+
+    @staticmethod
+    def convert_str_to_date(date_: str) -> date | None:
+        if not isinstance(date_, str):
+            return None
+        if date_.isdigit():
+            date_ = f'1.1.{date_}'
+        try:
+            converted_date = datetime.strptime(date_, '%d.%m.%Y').date()
+        except ValueError:
+            converted_date = None
+        return converted_date
+
+
+class Sister:
+    def __init__(self, entry: Entry) -> None:
+        self.name = entry.name
+        self.birthday = entry.birthday
+        self.death_date = entry.death_date
+        self.description = f'{entry.duties}\n\n{entry.bio}'
+        self.number = entry.number
+
+    def insert_sister(self) -> Entity:
+        sister_ = Entity.insert('person', self.name, self.description)
+        sister_.update({'attributes': {
+            'begin_from': self.birthday,
+            'end_from': self.death_date}})
+        sister_.link('P2', case_study)
+        return sister_
+
+
+class Function:
+    def __init__(self, entry: Entry) -> None:
+        self.profess = entry.profess
+        self.rank = entry.rank
+
+
 def parse_csv():
     df = pd.read_csv(file_path, delimiter='\t', encoding='utf-8', dtype=str)
     df = df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
 
-    for _, row in df.iterrows():
-        Entity.insert('person', row['Name'])
-        break
+    return [Entry({
+        'number': row['Nummer'] if pd.notna(row['Stand']) else '',
+        'name': row['Name'],
+        'birthday': row['Geburtsdatum'],
+        'profess': row['Professdatum'],
+        'deathday': row['Sterbedatum'],
+        'rank': row['Stand'] if pd.notna(row['Stand']) else 'N/A',
+        'bio': row['Biographische Details'] if pd.notna(
+            row['Biographische Details']) else '',
+        'duties': row['Ämterlisten'] if pd.notna(row['Ämterlisten']) else ''})
+        for _, row in df.iterrows()]
+
+
+def insert_rank_types(entries_: list[Entry]) -> dict[str, Any]:
+    stand_type = Entity.insert('type', 'Stand')
+    stand_type.link('P127', actor_function_hierarchy)
+    ranks_: dict[str, Entity] = {}
+    for entry_ in entries_:
+        if entry_.rank in ranks_ or not isinstance(entry_.rank, str):
+            continue
+        type_ = Entity.insert('type', entry_.rank)
+        type_.link('P127', stand_type)
+        ranks_[entry_.rank] = type_
+    return ranks_
 
 
 with app.test_request_context():
     app.preprocess_request()
-    parse_csv()
+    entries = parse_csv()
+    case_study = Entity.get_by_id(358)
+    actor_function_hierarchy = Entity.get_by_id(14)
+    elisabethinen_vienna = Entity.get_by_id(362)
+    rank_types = insert_rank_types(entries)
+    for entry in entries:
+        sister = entry.sister.insert_sister()
 
-    # df['Beginn'] = pd.to_datetime(
-    #     df['Beginn'],
-    #     format='%d.%m.%Y',
-    #     errors='coerce')
+        if not isinstance(entry.rank, str):
+            continue
+        function_link = sister.link(
+            'P107',
+            elisabethinen_vienna,
+            inverse=True,
+            type_id=rank_types[entry.rank].id)
+        #sister.update({
+        #   'attributes': {
+        #       'begin_from': entry.function.profess,
+        #       'begin_to': '',
+        #       'begin_comment': '',
+        #       'end_from': entry.sister.death_date,
+        #       'end_to': '',
+        #       'end_comment': ''},
+        #   'links': {
+        #       'insert': [{
+        #           'property': 'P107',
+        #           'range': elisabethinen_vienna,
+        #           'description': '',
+        #           'inverse': True,
+        #           'type_id': rank_types[entry.rank].id,
+        #           'return_link_id': False}],
+        #       'delete': set(),
+        #       'delete_inverse': set()},
+        #   'attributes_link': {
+        #       'begin_from': entry.function.profess,
+        #       'begin_to': '',
+        #       'begin_comment': '',
+        #       'end_from': entry.sister.death_date,
+        #       'end_to': '',
+        #       'end_comment': ''},
+        #})
