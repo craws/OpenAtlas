@@ -13,7 +13,6 @@ from openatlas import app
 from openatlas.models.entity import Entity
 
 FILE_PATH = Path('files/patientinnenbuch.csv')
-DATE_FORMAT = "%d.%m.%Y"
 SPINNER = itertools.cycle(["|", "/", "-", "\\"])
 COUNT = 0
 
