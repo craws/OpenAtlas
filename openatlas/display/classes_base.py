@@ -261,7 +261,7 @@ class ActorDisplay(BaseDisplay):
                 'artifact', 'reference', 'file']:
             if entity.class_.name == 'group' or name != 'member':
                 self.tabs[name] = Tab(name, entity=entity)
-        self.tabs['member_of'].label = _('member of')
+        self.tabs['member_of'].label = uc_first(_('member of'))
         self.add_reference_tables_data()
         self.event_links = \
             entity.get_links(['P11', 'P14', 'P22', 'P23', 'P25'], True)
