@@ -5,6 +5,7 @@ from typing import Any
 import pandas as pd
 
 from openatlas import app, before_request
+from openatlas.api.import_scripts.util import get_exact_match
 from openatlas.models.entity import Entity
 
 file_path = Path('files/sisters.csv')
@@ -102,6 +103,8 @@ with app.test_request_context():
     case_study = Entity.get_by_id(358)
     actor_function_hierarchy = Entity.get_by_id(14)
     elisabethinen_vienna = Entity.get_by_id(362)
+    professbook_ext_ref_sys = Entity.get_by_id(363)
+    exact_match = get_exact_match()
 
     entries = parse_csv()
     rank_types = insert_rank_types(entries)
@@ -132,5 +135,11 @@ with app.test_request_context():
                 'begin_comment': '',
                 'end_from': entry.sister.death_date[0],
                 'end_to': entry.sister.death_date[1],
-                'end_comment': ''}
-        }, new=True)
+                'end_comment': ''}},
+            new=True)
+        if entry.number:
+            professbook_ext_ref_sys.link(
+                'P67',
+                sister,
+                entry.number,
+                type_id=exact_match.id)
