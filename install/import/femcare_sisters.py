@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
-from flask import g
 
 from openatlas import app, before_request
 from openatlas.models.entity import Entity
@@ -22,28 +21,30 @@ class Entry:
         self.bio = attributes['bio']
         self.duties = attributes['duties']
         self.sister = Sister(self)
-        self.function = Function(self)
 
     @staticmethod
     def convert_str_to_date(date_: str) -> list[date | str]:
+        converted_dates: list[date | str] = ['', '']
         if not isinstance(date_, str):
-            return ['', '']
+            return converted_dates
         timespan = []
         if "????" in date_:
-            date_ = date_.replace('????', '')
+            date_ = date_.replace('????.', '')
             timespan.append(f'1.1.{date_}')
             timespan.append(f'31.12.{date_}')
         if "??" in date_:
-            date_ = date_.replace('??', '')
+            date_ = date_.replace('??.', '')
             timespan.append(f'1.{date_}')
             timespan.append(f'31.{date_}')
         try:
             if timespan:
-                converted_dates = [datetime.strptime(d, '%d.%m.%Y').date()for d in timespan]
+                converted_dates = [
+                    datetime.strptime(d, '%d.%m.%Y').date() for d in timespan]
             else:
-                converted_dates= [datetime.strptime(date_, '%d.%m.%Y').date(), '']
+                converted_dates = [
+                    datetime.strptime(date_, '%d.%m.%Y').date(), '']
         except ValueError:
-            converted_dates = ['', '']
+            pass
         return converted_dates
 
 
@@ -64,12 +65,6 @@ class Sister:
             'end_to': self.death_date[1]}})
         sister_.link('P2', case_study)
         return sister_
-
-
-class Function:
-    def __init__(self, entry_: Entry) -> None:
-        self.profess = entry_.profess
-        self.rank = entry_.rank
 
 
 def parse_csv() -> list[Entry]:
@@ -114,28 +109,28 @@ with app.test_request_context():
     for entry in entries:
         sister = entry.sister.insert_sister()
         sister.update_links({
-           'attributes': {
-               'begin_from': entry.function.profess[0],
-               'begin_to': entry.function.profess[1],
-               'begin_comment': '',
-               'end_from': entry.sister.death_date[0],
-               'end_to': entry.sister.death_date[1],
-               'end_comment': ''},
-           'links': {
-               'insert': [{
-                   'property': 'P107',
-                   'range': elisabethinen_vienna,
-                   'description': '',
-                   'inverse': True,
-                   'type_id': rank_types[entry.rank].id,
-                   'return_link_id': False}],
-               'delete': set(),
-               'delete_inverse': set()},
-           'attributes_link': {
-               'begin_from': entry.function.profess[0],
-               'begin_to': entry.function.profess[1],
-               'begin_comment': '',
-               'end_from': entry.sister.death_date[0],
-               'end_to': entry.sister.death_date[1],
-               'end_comment': ''}
+            'attributes': {
+                'begin_from': entry.profess[0],
+                'begin_to': entry.profess[1],
+                'begin_comment': '',
+                'end_from': entry.sister.death_date[0],
+                'end_to': entry.sister.death_date[1],
+                'end_comment': ''},
+            'links': {
+                'insert': [{
+                    'property': 'P107',
+                    'range': elisabethinen_vienna,
+                    'description': '',
+                    'inverse': True,
+                    'type_id': rank_types[entry.rank].id,
+                    'return_link_id': False}],
+                'delete': set(),
+                'delete_inverse': set()},
+            'attributes_link': {
+                'begin_from': entry.profess[0],
+                'begin_to': entry.profess[1],
+                'begin_comment': '',
+                'end_from': entry.sister.death_date[0],
+                'end_to': entry.sister.death_date[1],
+                'end_comment': ''}
         }, new=True)
