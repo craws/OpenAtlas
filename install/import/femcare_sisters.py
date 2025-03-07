@@ -1,3 +1,4 @@
+import math
 from datetime import date, datetime
 from pathlib import Path
 from typing import Any
@@ -16,7 +17,7 @@ class Entry:
         self.number = attributes['number']
         self.name = attributes['name']
         self.birthday = self.convert_str_to_date(attributes['birthday'])
-        self.death_date = self.convert_str_to_date(attributes['deathday'])
+        self.day_of_death = self.convert_str_to_date(attributes['day_of_death'])
         self.profess = self.convert_str_to_date(attributes['profess'])
         self.rank = attributes['rank']
         self.bio = attributes['bio']
@@ -53,17 +54,18 @@ class Sister:
     def __init__(self, entry_: Entry) -> None:
         self.name = entry_.name
         self.birthday = entry_.birthday
-        self.death_date = entry_.death_date
+        self.day_of_death = entry_.day_of_death
         self.description = f'{entry_.duties}\n\n{entry_.bio}'
         self.number = entry_.number
 
     def insert_sister(self) -> Entity:
         sister_ = Entity.insert('person', self.name, self.description)
-        sister_.update({'attributes': {
-            'begin_from': self.birthday[0],
-            'begin_to': self.birthday[1],
-            'end_from': self.death_date[0],
-            'end_to': self.death_date[1]}})
+        sister_.update({
+            'attributes': {
+                'begin_from': self.birthday[0],
+                'begin_to': self.birthday[1],
+                'end_from': self.day_of_death[0],
+                'end_to': self.day_of_death[1]}})
         sister_.link('P2', case_study)
         return sister_
 
@@ -71,13 +73,12 @@ class Sister:
 def parse_csv() -> list[Entry]:
     data = pd.read_csv(file_path, delimiter='\t', encoding='utf-8', dtype=str)
     data = data.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
-
     return [Entry({
         'number': row['Nummer'] if pd.notna(row['Stand']) else '',
         'name': row['Name'],
         'birthday': row['Geburtsdatum'],
         'profess': row['Professdatum'],
-        'deathday': row['Sterbedatum'],
+        'day_of_death': row['Sterbedatum'],
         'rank': row['Stand'] if pd.notna(row['Stand']) else 'N/A',
         'bio': row['Biographische Details'] if pd.notna(
             row['Biographische Details']) else '',
@@ -116,8 +117,8 @@ with app.test_request_context():
                 'begin_from': entry.profess[0],
                 'begin_to': entry.profess[1],
                 'begin_comment': '',
-                'end_from': entry.sister.death_date[0],
-                'end_to': entry.sister.death_date[1],
+                'end_from': entry.sister.day_of_death[0],
+                'end_to': entry.sister.day_of_death[1],
                 'end_comment': ''},
             'links': {
                 'insert': [{
@@ -133,11 +134,11 @@ with app.test_request_context():
                 'begin_from': entry.profess[0],
                 'begin_to': entry.profess[1],
                 'begin_comment': '',
-                'end_from': entry.sister.death_date[0],
-                'end_to': entry.sister.death_date[1],
+                'end_from': entry.sister.day_of_death[0],
+                'end_to': entry.sister.day_of_death[1],
                 'end_comment': ''}},
             new=True)
-        if entry.number:
+        if entry.number and isinstance(entry.number, str):
             professbook_ext_ref_sys.link(
                 'P67',
                 sister,
