@@ -7,6 +7,7 @@ from typing import Any, Optional
 
 import numpy as np
 import pandas as pd
+from flask import g
 from pandas import isnull
 
 from openatlas import app
@@ -147,6 +148,15 @@ with app.test_request_context():
     case_study = Entity.get_by_id(357)
     diagnose_hierarchy = Entity.get_by_id(359)
     death_type = Entity.get_by_id(361)
+
+    # Remove former data
+    for item in case_study.get_linked_entities('P2', True):
+        item.delete()
+
+    for type_id in diagnose_hierarchy.subs:  # type: ignore
+        g.types[type_id].delete()
+
+    # Insert import
     entries = parse_csv()
     diagnose_types = get_diagnose_types(entries)
     not_imported = []

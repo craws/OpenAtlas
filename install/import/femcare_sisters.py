@@ -105,6 +105,7 @@ def insert_rank_types(entries_: list[Entry]) -> dict[str, Any]:
 with app.test_request_context():
     app.preprocess_request()
     case_study = Entity.get_by_id(358)
+
     # Remove former data
     for item in case_study.get_linked_entities('P2', True):
         item.delete()
