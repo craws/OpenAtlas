@@ -15,6 +15,7 @@ from openatlas.models.entity import Entity
 FILE_PATH = Path('files/patientinnenbuch.csv')
 SPINNER = itertools.cycle(["|", "/", "-", "\\"])
 COUNT = 0
+# pylint: skip-file
 
 
 class Entry:
@@ -77,8 +78,10 @@ class Person:
             'begin_to': None,
             'end_from': self.death_date}
         if self.birth_year:
-            dates['begin_from'] = np.datetime64(self.birth_year, 'D')
-            dates['begin_to'] = np.datetime64(f'{self.birth_year}-12-31')
+            dates['begin_from'] = (
+                np.datetime64(self.birth_year, 'D'))  # type: ignore
+            dates['begin_to'] = np.datetime64(
+                f'{self.birth_year}-12-31')  # type: ignore
         person_.update({'attributes': dates})
         person_.link('P2', case_study)
         return person_

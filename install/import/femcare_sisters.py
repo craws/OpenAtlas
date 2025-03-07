@@ -9,9 +9,9 @@ from openatlas import app, before_request
 from openatlas.api.import_scripts.util import get_exact_match
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
-from tests.test_hierarchy import HierarchyTest
 
 file_path = Path('files/sisters.csv')
+# pylint: skip-file
 
 
 class Entry:
@@ -19,7 +19,8 @@ class Entry:
         self.number = attributes['number']
         self.name = attributes['name']
         self.birthday = self.convert_str_to_date(attributes['birthday'])
-        self.day_of_death = self.convert_str_to_date(attributes['day_of_death'])
+        self.day_of_death = self.convert_str_to_date(
+            attributes['day_of_death'])
         self.profess = self.convert_str_to_date(attributes['profess'])
         self.rank = attributes['rank']
         self.bio = attributes['bio']
