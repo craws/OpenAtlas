@@ -62,8 +62,12 @@ def before_request() -> None:
     g.cursor = g.db.cursor(cursor_factory=extras.DictCursor)
     g.settings = Settings.get_settings()
     session['language'] = get_locale()
-    g.cidoc_classes = CidocClass.get_all(session['language'])
-    g.properties = CidocProperty.get_all(session['language'])
+    g.cidoc_classes = CidocClass.get_all(
+        session['language'],
+        (request.path.startswith('/overview/model/cidoc_class_index')))
+    g.properties = CidocProperty.get_all(
+        session['language'],
+        (request.path.startswith('/overview/model/property')))
     g.classes = OpenatlasClass.get_all()
     with_count = False
     if (request.path.startswith(('/type', '/api/type_tree/', '/admin/orphans'))
