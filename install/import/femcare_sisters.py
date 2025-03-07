@@ -1,13 +1,15 @@
-import math
 from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
 import pandas as pd
+from flask import g
 
 from openatlas import app, before_request
 from openatlas.api.import_scripts.util import get_exact_match
 from openatlas.models.entity import Entity
+from openatlas.models.type import Type
+from tests.test_hierarchy import HierarchyTest
 
 file_path = Path('files/sisters.csv')
 
@@ -102,6 +104,16 @@ def insert_rank_types(entries_: list[Entry]) -> dict[str, Any]:
 with app.test_request_context():
     app.preprocess_request()
     case_study = Entity.get_by_id(358)
+    # Remove former data
+    for item in case_study.get_linked_entities('P2', True):
+        item.delete()
+    for type_id in Type.get_hierarchy('Actor function').subs:
+        if g.types[type_id].name == 'Stand':
+            for sub_id in g.types[type_id].get_sub_ids_recursive():
+                g.types[sub_id].delete()
+            g.types[type_id].delete()
+
+    # Insert import
     actor_function_hierarchy = Entity.get_by_id(14)
     elisabethinen_vienna = Entity.get_by_id(362)
     professbook_ext_ref_sys = Entity.get_by_id(363)
