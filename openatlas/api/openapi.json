@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.6b",
+    "version": "0.4.6c",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -1152,6 +1152,35 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SubunitsModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
+    "/chained_events/{entityId}": {
+      "get": {
+        "tags": [
+          "Proposal"
+        ],
+        "description": "Get the hierarchy of an event",
+        "operationId": "GetChainedEvents",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/entityId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChainEventModel"
                 }
               }
             }
@@ -5156,6 +5185,48 @@
           },
           "when": {
             "$ref": "#/components/schemas/TimeRangeModel"
+          }
+        }
+      },
+      "ChainEventModel": {
+        "type": "object",
+        "required": [
+          "name",
+          "id",
+          "system_class",
+          "geometry",
+          "children"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "system_class": {
+            "type": "string"
+          },
+          "geometry": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Polygon"
+              },
+              {
+                "$ref": "#/components/schemas/Point"
+              },
+              {
+                "$ref": "#/components/schemas/LineString"
+              },
+              {
+                "$ref": "#/components/schemas/GeometryCollection"
+              }
+            ]
+          },
+          "children": {
+            "nullable": true,
+            "$ref": "#/components/schemas/ChainEventModel"
           }
         }
       }

@@ -5,17 +5,18 @@ from typing import Any
 from flask import Response, g, jsonify
 from flask_restful import Resource, marshal
 
+from openatlas.api.endpoints.endpoint import Endpoint
 from openatlas.api.endpoints.parser import Parser
 from openatlas.api.formats.csv import export_database_csv
 from openatlas.api.formats.subunits import get_subunits_from_id
 from openatlas.api.formats.xml import export_database_xml
+from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.database_mapper import (
     get_all_entities_as_dict, get_all_links_as_dict, get_all_links_for_network,
     get_cidoc_hierarchy,
     get_classes, get_links_by_id_network, get_properties,
     get_property_hierarchy)
-from openatlas.api.resources.error import NotAPlaceError
-from openatlas.api.resources.api_entity import ApiEntity
+from openatlas.api.resources.error import EntityNotAnEventError, NotAPlaceError
 from openatlas.api.resources.parser import entity_, gis, network
 from openatlas.api.resources.resolve_endpoints import (
     download, resolve_subunits)
@@ -189,3 +190,17 @@ class GetNetworkVisualisation(Resource):
                     'systemClass': item['range_system_class'],
                     'relations': {item['domain_id']}}
         return output
+
+
+class GetChainedEvents(Resource):
+    @staticmethod
+    def get(id_: int) -> tuple[Resource, int] | Response | dict[str, Any]:
+        parser = entity_.parse_args()
+        if ApiEntity.get_by_id(id_).class_.view != 'event':
+            raise EntityNotAnEventError
+        root_id = get_linked_entities_recursive(id_, ['P134'], False)[-1]
+        return Endpoint(
+            ApiEntity.get_linked_entities_with_properties(
+                root_id,
+                ['P134']),
+            parser).get_chained_events(root_id)

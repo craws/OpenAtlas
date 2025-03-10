@@ -55,7 +55,6 @@ def before_request() -> None:
 
     if request.path.startswith('/static'):
         return  # Avoid files overhead if not using Apache with static alias
-
     g.logger = Logger()
     g.db = open_connection(app.config)
     g.db.autocommit = True
