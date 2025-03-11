@@ -278,9 +278,9 @@ class Endpoint:
             "children": self.walk_event_tree(event_root['links_inverse'])}
         return event_chain
 
-    def walk_event_tree(self, links_inverse: list[Link]):
+    def walk_event_tree(self, inverse_l: list[Link]) -> list[dict[str, Any]]:
         items = []
-        for links_ in links_inverse:
+        for links_ in inverse_l:
             if links_.property.code == 'P134':
                 items.append({
                     "name": links_.domain.name,
@@ -293,5 +293,3 @@ class Endpoint:
                             self.entities_with_links[links_.domain.id][
                                 'links_inverse'])})
         return items
-
-

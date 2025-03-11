@@ -196,9 +196,12 @@ class GetChainedEvents(Resource):
     @staticmethod
     def get(id_: int) -> tuple[Resource, int] | Response | dict[str, Any]:
         parser = entity_.parse_args()
-        if ApiEntity.get_by_id(id_).class_.view != 'event':
+        entity = ApiEntity.get_by_id(id_)
+        if entity.class_.view != 'event':
             raise EntityNotAnEventError
-        root_id = get_linked_entities_recursive(id_, ['P134'], False)[-1]
+        root_id = entity.id
+        if chained_ids := get_linked_entities_recursive(id_, ['P134'], False):
+            root_id = chained_ids[-1]
         return Endpoint(
             ApiEntity.get_linked_entities_with_properties(
                 root_id,

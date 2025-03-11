@@ -1167,7 +1167,7 @@
         "tags": [
           "Proposal"
         ],
-        "description": "Get the hierarchy of an event",
+        "description": "Get the chain of successive events also with forks but no super or sub events if they are not in the chain.",
         "operationId": "GetChainedEvents",
         "parameters": [
           {

@@ -99,6 +99,7 @@ VALUES
   ('OA8', (SELECT id FROM model.entity WHERE name='Location of Shire'), (SELECT id FROM model.entity WHERE name='Sam') ),
   ('P11', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='Travel to Mordor') ),
   ('P14', (SELECT id FROM model.entity WHERE name='Sam'), (SELECT id FROM model.entity WHERE name='Travel to Mordor') ),
+  ('P134', (SELECT id FROM model.entity WHERE name='Travel to Mordor'), (SELECT id FROM model.entity WHERE name='Exchange of the one ring') ),
   ('P7', (SELECT id FROM model.entity WHERE name='Location of Mordor'), (SELECT id FROM model.entity WHERE name='Travel to Mordor') );
 
 
