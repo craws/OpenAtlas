@@ -314,10 +314,9 @@ def get_file_info() -> dict[int, dict[str, Any]]:
         FROM model.file_info;
         """)
     return {
-        row['entity_id']: {
-            'public': row['public'],
-            'license_holder': row['license_holder'],
-            'creator': row['creator']} for row in list(g.cursor)}
+        row["entity_id"]: {
+            key: row[key] for key in ("public", "license_holder", "creator")}
+        for row in g.cursor}
 
 
 def get_subunits_without_super(classes: list[str]) -> list[int]:
