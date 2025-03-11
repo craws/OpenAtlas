@@ -60,6 +60,10 @@ def before_request() -> None:
     g.db.autocommit = True
     g.cursor = g.db.cursor(cursor_factory=extras.DictCursor)
     g.settings = Settings.get_settings()
+
+    if request.path.startswith('/display'):
+        return  # Avoid overheads for file display
+
     session['language'] = get_locale()
     g.cidoc_classes = CidocClass.get_all(
         session['language'],
