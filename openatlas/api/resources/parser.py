@@ -262,6 +262,7 @@ network.add_argument(
         "file",
         "group",
         "human_remains",
+        "modification",
         "move",
         "person",
         "place",

@@ -59,7 +59,9 @@ def check_origin_ids(project_id: int, origin_ids: list[str]) -> list[str]:
     return [row[0] for row in list(g.cursor)]
 
 
-def get_id_from_origin_id(project_id: int, origin_id: str) -> list[str]:
+def get_id_from_origin_id(
+        project_id: int,
+        origin_id: str) -> Optional[list[int]]:
     g.cursor.execute(
         """
         SELECT entity_id FROM import.entity

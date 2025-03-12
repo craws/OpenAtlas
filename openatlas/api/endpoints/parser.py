@@ -22,11 +22,10 @@ from openatlas.api.resources.search import get_search_values, search_entity
 from openatlas.api.resources.search_validation import (
     check_if_date_search, validate_search_parameters)
 from openatlas.api.resources.util import (
-    flatten_list_and_remove_duplicates, get_geometric_collection,
-    get_geoms_dict, get_location_link, get_reference_systems,
+    flatten_list_and_remove_duplicates, geometry_to_geojson,
+    get_location_link, get_reference_systems,
     get_value_for_types, replace_empty_list_values_in_dict_with_none)
 from openatlas.models.entity import Entity, Link
-from openatlas.models.gis import Gis
 
 
 class Parser:
@@ -134,9 +133,9 @@ class Parser:
     def get_properties_for_links(self) -> list[str]:
         codes: list[str] = []
         if self.relation_type:
-            codes = self.relation_type
+            codes = self.relation_type + ['P53']
             if 'geometry' in self.show:
-                codes.append('P53')
+                codes.extend(['P53', 'P74', 'OA8', 'OA9', 'P7', 'P26', 'P27'])
             if 'types' in self.show:
                 codes.append('P2')
             if any(i in ['depictions', 'links'] for i in self.show):
@@ -178,21 +177,6 @@ class Parser:
             return out
         raise EntityDoesNotExistError
 
-    def get_geom(self, entity: Entity, ) -> list[Any]:
-        if entity.class_.view == 'place' or entity.class_.name == 'artifact':
-            id_ = entity.get_linked_entity_safe('P53').id
-            geoms = Gis.get_by_id(id_)
-            if self.centroid:
-                if centroid_result := Gis.get_centroids_by_id(id_):
-                    geoms.extend(centroid_result)
-            return geoms
-        if entity.class_.name == 'object_location':
-            geoms = Gis.get_by_id(entity.id)
-            if self.centroid:
-                if centroid_result := Gis.get_centroids_by_id(entity.id):
-                    geoms.extend(centroid_result)
-            return geoms
-        return []
 
 
     def get_linked_places_entity(
@@ -225,20 +209,20 @@ class Parser:
                 'names':
                     [{"alias": value} for value in entity.aliases.values()]
                     if entity.aliases and 'names' in self.show else None,
-                'geometry': get_geometric_collection(
-                    entity,
-                    links,
-                    self) if 'geometry' in self.show else None,
+                'geometry': geometry_to_geojson(entity_dict['geometry'])
+                if 'geometry' in self.show else None,
                 'relations': get_lp_links(links, links_inverse, self)
                 if 'relations' in self.show else None})]}
 
     def get_geojson_dict(
             self,
-            entity: Entity,
-            geom: Optional[dict[str, Any]] = None) -> dict[str, Any]:
+            entity_dict: dict[str, Any],
+            geometry: Optional[dict[str, Any]] = None ) -> dict[str, Any]:
+        entity = entity_dict['entity']
+        geoms = geometry or geometry_to_geojson(entity_dict['geometry'])
         return replace_empty_list_values_in_dict_with_none({
             'type': 'Feature',
-            'geometry': geom,
+            'geometry': geoms,
             'properties': {
                 '@id': entity.id,
                 'systemClass': entity.class_.name,
@@ -266,22 +250,6 @@ class Parser:
                     for type_ in entity.types]
                 if 'types' in self.show else None}})
 
-    def get_geoms_as_collection(
-            self,
-            entity: Entity,
-            links: list[int]) -> Optional[dict[str, Any]]:
-        if entity.class_.name == 'object_location':
-            geoms: list[Any] = Gis.get_by_id(entity.id)
-            if self.centroid:
-                if centroid_result := Gis.get_centroids_by_id(entity.id):
-                    geoms.extend(centroid_result)
-            return get_geoms_dict(geoms)
-        if links:
-            geoms = [Gis.get_by_id(id_) for id_ in links]
-            if self.centroid:
-                geoms.extend([Gis.get_centroids_by_id(id_) for id_ in links])
-            return get_geoms_dict(flatten_list_and_remove_duplicates(geoms))
-        return None
 
     def rdf_output(
             self,

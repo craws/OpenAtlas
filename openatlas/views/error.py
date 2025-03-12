@@ -6,7 +6,8 @@ from flask import g, jsonify, render_template, request
 from openatlas import app
 from openatlas.api.resources.error import (
     AccessDeniedError, DisplayFileNotFoundError, EntityDoesNotExistError,
-    InvalidCidocClassCodeError, InvalidLimitError, InvalidSearchCategoryError,
+    EntityNotAnEventError, InvalidCidocClassCodeError, InvalidLimitError,
+    InvalidSearchCategoryError,
     InvalidSearchSyntax, InvalidSearchValueError, InvalidSystemClassError,
     InvalidViewClassError, LastEntityError, LogicalOperatorError,
     NoLicenseError, NoSearchStringError, NotAPlaceError, NotATypeError,
@@ -98,6 +99,16 @@ def entity_does_not_exist(_e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'Entity does not exist',
         'message': 'The requested entity does not exist in the database.',
+        'url': request.url,
+        'timestamp': datetime.now(),
+        'status': 404}), 404
+
+
+@app.errorhandler(EntityNotAnEventError)
+def entity_not_an_event(_e: Exception) -> tuple[Any, int]:
+    return jsonify({
+        'title': 'Entity is not an event',
+        'message': 'The requested entity has to be an event.',
         'url': request.url,
         'timestamp': datetime.now(),
         'status': 404}), 404

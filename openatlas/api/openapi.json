@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.6a",
+    "version": "0.4.7b",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -1162,6 +1162,35 @@
         }
       }
     },
+    "/chained_events/{entityId}": {
+      "get": {
+        "tags": [
+          "Proposal"
+        ],
+        "description": "Get the chain of successive events also with forks but no super or sub events if they are not in the chain.",
+        "operationId": "GetChainedEvents",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/entityId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChainEventModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
     "/geometric_entities/": {
       "get": {
         "tags": [
@@ -1466,8 +1495,8 @@
             "file",
             "group",
             "human_remains",
+            "modification",
             "move",
-            "object_location",
             "person",
             "place",
             "production",
@@ -1476,7 +1505,7 @@
             "source_translation",
             "stratigraphic_unit",
             "type",
-            "tools"
+            "type_tools"
           ]
         },
         "example": "acquisition"
@@ -2183,7 +2212,6 @@
               "group",
               "human_remains",
               "move",
-              "object_location",
               "person",
               "place",
               "production",
@@ -2219,6 +2247,7 @@
               "file",
               "group",
               "human_remains",
+              "modification",
               "move",
               "person",
               "place",
@@ -2764,6 +2793,9 @@
           "description": {
             "type": "string"
           },
+          "locationId": {
+            "type": "string"
+          },
           "shapeType": {
             "type": "string",
             "enum": [
@@ -2800,6 +2832,9 @@
             "type": "string"
           },
           "description": {
+            "type": "string"
+          },
+          "locationId": {
             "type": "string"
           },
           "shapeType": {
@@ -2847,6 +2882,9 @@
             "type": "string"
           },
           "description": {
+            "type": "string"
+          },
+          "locationId": {
             "type": "string"
           },
           "shapeType": {
@@ -4098,23 +4136,28 @@
       "SystemClassCountModel": {
         "type": "object",
         "required": [
-          "move",
-          "external_reference",
-          "bibliography",
-          "person",
           "acquisition",
-          "reference_system",
-          "feature",
-          "file",
           "activity",
-          "type",
           "administrative_unit",
           "artifact",
-          "source_translation",
-          "place",
-          "stratigraphic_unit",
+          "bibliography",
+          "creation",
           "edition",
+          "external_reference",
+          "event",
+          "feature",
+          "file",
           "group",
+          "human_remains",
+          "modification",
+          "move",
+          "person",
+          "place",
+          "production",
+          "reference_system",
+          "type",
+          "source_translation",
+          "stratigraphic_unit",
           "source"
         ],
         "properties": {
@@ -5149,6 +5192,48 @@
           },
           "when": {
             "$ref": "#/components/schemas/TimeRangeModel"
+          }
+        }
+      },
+      "ChainEventModel": {
+        "type": "object",
+        "required": [
+          "name",
+          "id",
+          "system_class",
+          "geometry",
+          "children"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "system_class": {
+            "type": "string"
+          },
+          "geometry": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Polygon"
+              },
+              {
+                "$ref": "#/components/schemas/Point"
+              },
+              {
+                "$ref": "#/components/schemas/LineString"
+              },
+              {
+                "$ref": "#/components/schemas/GeometryCollection"
+              }
+            ]
+          },
+          "children": {
+            "nullable": true,
+            "$ref": "#/components/schemas/ChainEventModel"
           }
         }
       }
