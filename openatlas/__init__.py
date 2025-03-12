@@ -1,5 +1,5 @@
-import locale
 import datetime
+import locale
 from typing import Any, Optional
 
 from flask import Flask, Response, g, request, session
@@ -55,7 +55,7 @@ def before_request() -> None:
     from openatlas.models.reference_system import ReferenceSystem
 
     if request.path.startswith('/static'):
-        return  # Avoid files overhead if not using Apache with static alias
+        return  # Avoid overheads if not using Apache with static alias
     g.logger = Logger()
     g.db = open_connection(app.config)
     g.db.autocommit = True
