@@ -17,9 +17,9 @@ def index_changelog() -> str:
 versions = {
     '8.11.0': ['TBA', {
         'feature': {
+            '2492': 'Performance improvement',
             '2416': 'Import of types',
-            '2491': 'API: New endpoint "chained_events"'
-        }
+            '2491': 'API: New endpoint "chained_events"'}
     }],
     '8.10.1': ['2025-02-21', {
         'fix': {
