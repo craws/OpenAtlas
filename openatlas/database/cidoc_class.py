@@ -3,13 +3,20 @@ from typing import Any
 from flask import g
 
 
-def get_classes() -> list[dict[str, Any]]:
+def get_classes(with_count: bool = False) -> list[dict[str, Any]]:
     g.cursor.execute(
-        """
-        SELECT c.code, c.name, comment, COUNT(e.id) AS count
+        f"""
+        SELECT
+            c.code,
+            c.name,
+            comment
+            {', COUNT(e.id) AS count' if with_count else ''}
         FROM model.cidoc_class c
-        LEFT JOIN model.entity e ON c.code = e.cidoc_class_code
-        GROUP BY (c.code, c.name, c.comment);
+            {
+            '''
+            LEFT JOIN model.entity e ON c.code = e.cidoc_class_code
+            GROUP BY (c.code, c.name, c.comment)''' if with_count else ''}
+        ;
         """)
     return list(g.cursor)
 

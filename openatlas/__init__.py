@@ -1,5 +1,5 @@
-import locale
 import datetime
+import locale
 from typing import Any, Optional
 
 from flask import Flask, Response, g, request, session
@@ -10,6 +10,7 @@ from flask_wtf.csrf import CSRFProtect
 from psycopg2 import extras
 
 from openatlas.api.resources.error import AccessDeniedError
+from openatlas.database.checks import check_type_count_needed
 from openatlas.database.connect import close_connection, open_connection
 from openatlas.database.token import check_token_revoked
 
@@ -54,23 +55,25 @@ def before_request() -> None:
     from openatlas.models.reference_system import ReferenceSystem
 
     if request.path.startswith('/static'):
-        return  # Avoid files overhead if not using Apache with static alias
-
+        return  # Avoid overheads if not using Apache with static alias
     g.logger = Logger()
     g.db = open_connection(app.config)
     g.db.autocommit = True
     g.cursor = g.db.cursor(cursor_factory=extras.DictCursor)
     g.settings = Settings.get_settings()
+
+    if request.path.startswith('/display'):
+        return  # Avoid overheads for file display
+
     session['language'] = get_locale()
-    g.cidoc_classes = CidocClass.get_all(session['language'])
-    g.properties = CidocProperty.get_all(session['language'])
+    g.cidoc_classes = CidocClass.get_all(
+        session['language'],
+        (request.path.startswith('/overview/model/cidoc_class_index')))
+    g.properties = CidocProperty.get_all(
+        session['language'],
+        (request.path.startswith('/overview/model/property')))
     g.classes = OpenatlasClass.get_all()
-    with_count = False
-    if (request.path.startswith(('/type', '/api/type_tree/', '/admin/orphans'))
-            or (request.path.startswith('/entity/') and
-                request.path.split('/entity/')[1].isdigit())):
-        with_count = True
-    g.types = Type.get_all(with_count)
+    g.types = Type.get_all(count_type())
     g.radiocarbon_type = Type.get_hierarchy('Radiocarbon')
     g.sex_type = Type.get_hierarchy('Features for sexing')
     g.reference_match_type = Type.get_hierarchy('External reference match')
@@ -116,6 +119,15 @@ def setup_api() -> None:
                     optional=True,
                     locations='headers'):
             raise AccessDeniedError
+
+
+def count_type() -> bool:
+    if request.path.startswith(('/type', '/api/type_tree/', '/admin/orphans')):
+        return True
+    if request.path.startswith('/entity/') and \
+            request.path.split('/entity/')[1].isdigit():
+        return check_type_count_needed(int(request.path.split('/entity/')[1]))
+    return False
 
 
 @app.after_request

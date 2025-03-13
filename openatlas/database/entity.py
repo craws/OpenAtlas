@@ -314,10 +314,9 @@ def get_file_info() -> dict[int, dict[str, Any]]:
         FROM model.file_info;
         """)
     return {
-        row['entity_id']: {
-            'public': row['public'],
-            'license_holder': row['license_holder'],
-            'creator': row['creator']} for row in list(g.cursor)}
+        row["entity_id"]: {
+            key: row[key] for key in ("public", "license_holder", "creator")}
+        for row in g.cursor}
 
 
 def get_subunits_without_super(classes: list[str]) -> list[int]:
@@ -392,16 +391,18 @@ def get_linked_entities_recursive(
     codes = codes if isinstance(codes, list) else [codes]
     g.cursor.execute(
         f"""
-        WITH RECURSIVE items AS (
-            SELECT {first}
-            FROM model.link
-            WHERE {second} = %(id_)s AND property_code IN %(code)s
-            UNION
-                SELECT l.{first} FROM model.link l
-                INNER JOIN items i ON
-                    l.{second} = i.{first}
-                    AND l.property_code IN %(code)s
-            ) SELECT {first} FROM items;
+            WITH RECURSIVE items AS (
+                SELECT {first}
+                FROM model.link
+                WHERE {second} = %(id_)s 
+                  AND property_code IN %(code)s
+                UNION ALL
+                SELECT l.{first}
+                FROM model.link l
+                JOIN items i ON l.{second} = i.{first}
+                WHERE l.property_code IN %(code)s
+            ) 
+            SELECT {first} FROM items;
         """,
         {'id_': id_, 'code': tuple(codes) if codes else ''})
     return [row[0] for row in list(g.cursor)]

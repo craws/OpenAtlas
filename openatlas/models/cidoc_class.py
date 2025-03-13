@@ -13,14 +13,17 @@ class CidocClass:
         self.name = data['name']
         self.code = data['code']
         self.comment = data['comment']
-        self.count = data['count']
+        self.count = data['count'] if 'count' in data else None
         self.i18n: dict[str, str] = {}
         self.sub: list[CidocClass] = []
         self.super: list[CidocClass] = []
 
     @staticmethod
-    def get_all(language: str) -> dict[str, CidocClass]:
-        classes = {row['code']: CidocClass(row) for row in db.get_classes()}
+    def get_all(
+            language: str,
+            with_count: bool = False) -> dict[str, CidocClass]:
+        classes = {
+            row['code']: CidocClass(row) for row in db.get_classes(with_count)}
         for row in db.get_hierarchy():
             classes[row['super_code']].sub.append(row['sub_code'])
             classes[row['sub_code']].super.append(row['super_code'])

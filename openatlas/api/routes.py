@@ -4,14 +4,16 @@ from openatlas.api.endpoints.display_image import (
     DisplayImage, LicensedFileOverview)
 from openatlas.api.endpoints.entities import (
     GetByCidocClass, GetBySystemClass, GetByViewClass,
-    GetEntitiesLinkedToEntity, GetEntity, GetEntityPresentationView, GetLatest,
+    GetEntitiesLinkedToEntity, GetEntity,
+    GetEntityPresentationView, GetLatest,
     GetLinkedEntitiesByPropertyRecursive, GetQuery, GetTypeEntities,
     GetTypeEntitiesAll)
 from openatlas.api.endpoints.iiif import (
     IIIFAnnotation, IIIFAnnotationList, IIIFCanvas, IIIFImage, IIIFManifest,
     IIIFSequence)
 from openatlas.api.endpoints.special import (
-    ExportDatabase, GetGeometricEntities, GetNetworkVisualisation,
+    ExportDatabase, GetChainedEvents, GetGeometricEntities,
+    GetNetworkVisualisation,
     GetSubunits)
 from openatlas.api.endpoints.type import (
     GetTypeByViewClass, GetTypeOverview, GetTypeTree)
@@ -55,7 +57,10 @@ special = [
     [GetSubunits, '/subunits/<int:id_>', 'subunits'],
     [GetNetworkVisualisation,
      '/network_visualisation/',
-     'network_visualisation']]
+     'network_visualisation'],
+    [GetChainedEvents,
+     '/chained_events/<int:id_>',
+     'chained_events']]
 
 display = [
     [DisplayImage, '/display/<path:filename>', 'display'],

@@ -16,13 +16,25 @@ class ReferenceSystem(Entity):
         self.placeholder = row['identifier_example']
         self.precision_default_id = \
             list(self.types)[0].id if self.types else None
-        self.count = row['count']
         self.system = row['system']
         self.classes: list[str] = []
 
     def update(self, data: dict[str, Any], new: bool = False) -> Optional[int]:
         self.update_system(data)
         return super().update(data, new)
+
+    def remove_class(self, class_name: str) -> None:
+        db.remove_class(self.id, class_name)
+
+    def update_system(self, data: dict[str, Any]) -> None:
+        db.update_system({
+            'entity_id': self.id,
+            'name': self.name,
+            'website_url': data['reference_system']['website_url'],
+            'resolver_url': data['reference_system']['resolver_url'],
+            'identifier_example': data['reference_system']['placeholder']})
+        if data['reference_system']['classes']:
+            db.add_classes(self.id, data['reference_system']['classes'])
 
     @staticmethod
     def get_all() -> dict[int, ReferenceSystem]:
@@ -37,18 +49,9 @@ class ReferenceSystem(Entity):
                 setattr(g, system.name.lower(), system)
         return systems
 
-    def remove_class(self, class_name: str) -> None:
-        db.remove_class(self.id, class_name)
-
-    def update_system(self, data: dict[str, Any]) -> None:
-        db.update_system({
-            'entity_id': self.id,
-            'name': self.name,
-            'website_url': data['reference_system']['website_url'],
-            'resolver_url': data['reference_system']['resolver_url'],
-            'identifier_example': data['reference_system']['placeholder']})
-        if data['reference_system']['classes']:
-            db.add_classes(self.id, data['reference_system']['classes'])
+    @staticmethod
+    def get_counts() -> dict[str, int]:
+        return db.get_counts()
 
     @staticmethod
     def insert_system(data: dict[str, str]) -> ReferenceSystem:
