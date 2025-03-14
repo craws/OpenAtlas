@@ -1,24 +1,90 @@
 # Used to join data from OpenAtlas projects to the demo version
 
-from datetime import date, datetime
-from pathlib import Path
+import time
 from typing import Any
 
-import pandas as pd
+import psycopg2.extras
 from flask import g
+from psycopg2 import extras
 
-from openatlas import app, before_request
-from openatlas.api.import_scripts.util import get_exact_match
+from openatlas import app
+from openatlas.database.imports import import_data
 from openatlas.models.entity import Entity
-from openatlas.models.type import Type
 
-file_path = Path('files/sisters.csv')
+DATABASE_NAME = 'openatlas_demo'
+DATABASE_USER = 'openatlas'
+DATABASE_PORT = '5432'
+DATABASE_HOST = 'localhost'
+DATABASE_PASS = "CHANGE ME"
+
+PROJECT_ID = 1
+IMPORT_USER_ID = 2
 
 
+def connect() -> Any:
+    return psycopg2.connect(
+        database=DATABASE_NAME,
+        user=DATABASE_USER,
+        password=DATABASE_PASS,
+        port=DATABASE_PORT,
+        host=DATABASE_HOST)
+
+
+start = time.time()
+connection = connect()
+cursor = connection.cursor(cursor_factory=extras.DictCursor)
+
+
+def cleanup():
+    with app.test_request_context():
+        app.preprocess_request()
+        g.cursor.execute(
+            """
+            DELETE FROM model.entity
+            WHERE id IN (
+                SELECT entity_id
+                FROM import.entity
+                WHERE project_id = %(project_id)s);
+            """, {'project_id': PROJECT_ID})
+        g.cursor.execute(
+            'DELETE FROM import.entity WHERE project_id = %(project_id)s;',
+            {'project_id': PROJECT_ID})
+
+
+cleanup()
+cursor.execute(
+    """
+    SELECT
+        id,
+        cidoc_class_code,
+        name,
+        description,
+        created,
+        modified,
+        begin_from,
+        begin_to,
+        begin_comment,
+        end_from,
+        end_to,
+        end_comment,
+        openatlas_class_name
+    FROM model.entity;
+    """)
 with app.test_request_context():
     app.preprocess_request()
-    case_study = Entity.get_by_id(358)
-
-    # Remove former data
-    for item in case_study.get_linked_entities('P2', True):
-        item.delete()
+    for row in list(cursor):
+        if row['openatlas_class_name'] not in [
+                'administrative_unit',
+                'object_location',
+                'type',
+                'type_tools']:
+            entity = Entity.insert(
+                row['openatlas_class_name'],
+                row['name'],
+                row['description'])
+            import_data(
+                PROJECT_ID,
+                entity.id,
+                IMPORT_USER_ID,
+                origin_id=row['id'])
+print(f'Execution time: {int(time.time() - start)} seconds')
