@@ -386,8 +386,10 @@ class PlaceBaseDisplay(BaseDisplay):
             self.tabs['actor'] = Tab('actor', entity=entity)
             self.tabs['feature'] = Tab('feature', entity=entity)
         elif entity.class_.name == 'feature':
-            self.tabs['stratigraphic_unit'] = \
-                Tab('stratigraphic_unit', entity=entity)
+            self.tabs['stratigraphic_unit'] = Tab(
+                'stratigraphic_unit',
+                _('stratigraphic unit'),
+                entity=entity)
         self.tabs['file'] = Tab('file', entity=entity)
         if entity.class_.view == 'place' \
                 and is_authorized('editor') \
