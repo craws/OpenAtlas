@@ -57,7 +57,6 @@ class Endpoint:
                     Gis.get_centroids_by_entities(self.entities).items():
                 self.entities_with_links[id_]['geometry'].extend(geom)
 
-
     def get_pagination(self) -> None:
         total = [e.id for e in self.entities]
         count = len(total)
@@ -224,7 +223,7 @@ class Endpoint:
                     self.parser.get_linked_places_entity(item)
                     for item in self.entities_with_links.values()]
             case _ if self.parser.format \
-                    in app.config['RDF_FORMATS']:  # pragma: no cover
+                      in app.config['RDF_FORMATS']:  # pragma: no cover
                 entities = [
                     get_loud_entities(item, parse_loud_context())
                     for item in self.entities_with_links.values()]
@@ -267,3 +266,30 @@ class Endpoint:
                 if not self.single:
                     template = linked_place_pagination(self.parser)
         return template
+
+    def get_chained_events(self, root_id: int) -> dict[str, Any]:
+        self.get_links_for_entities()
+        event_root = self.entities_with_links[root_id]
+        event_chain = {
+            "name": event_root['entity'].name,
+            "id": event_root['entity'].id,
+            "system_class": event_root['entity'].class_.name,
+            "geometries": event_root['geometry'],
+            "children": self.walk_event_tree(event_root['links_inverse'])}
+        return event_chain
+
+    def walk_event_tree(self, inverse_l: list[Link]) -> list[dict[str, Any]]:
+        items = []
+        for links_ in inverse_l:
+            if links_.property.code == 'P134':
+                items.append({
+                    "name": links_.domain.name,
+                    "id": links_.domain.id,
+                    "system_class": links_.domain.class_.name,
+                    "geometries":
+                        self.entities_with_links[links_.domain.id]['geometry'],
+                    "children":
+                        self.walk_event_tree(
+                            self.entities_with_links[links_.domain.id][
+                                'links_inverse'])})
+        return items

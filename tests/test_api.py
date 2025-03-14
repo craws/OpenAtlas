@@ -38,6 +38,8 @@ class Api(ApiTestCase):
                         boundary_mark = entity
                     case 'Travel to Mordor':
                         event = entity
+                    case 'Exchange of the one ring':
+                        event2 = entity
                     case 'Economical':
                         relation_sub = entity
                     case 'Austria':
@@ -130,7 +132,7 @@ class Api(ApiTestCase):
                 'api_04.network_visualisation',
                 exclude_system_classes='type'))
         rv = rv.get_json()
-        assert len(rv['results']) == 65
+        assert len(rv['results']) == 66
         rv = c.get(
             url_for(
                 'api_04.network_visualisation',
@@ -638,6 +640,16 @@ class Api(ApiTestCase):
                     download=True))]:
             assert b'Shire' in rv.data
 
+        rv = c.get(url_for('api_04.chained_events', id_=event.id))
+        rv = rv.get_json()
+        assert rv['name'] == event.name
+        assert rv['children'][0]['name'] == event2.name
+
+        rv = c.get(url_for('api_04.chained_events', id_=event2.id))
+        rv = rv.get_json()
+        assert rv['name'] == event.name
+        assert rv['children'][0]['name'] == event2.name
+
         # Test centroid
         for format_ in ['lp', 'geojson', 'geojson-v2']:
             rv = c.get(
@@ -804,6 +816,9 @@ class Api(ApiTestCase):
         rv = c.get(
             url_for('api_04.display', filename=f'{file_without_licences.id}'))
         assert 'No license' in rv.get_json()['title']
+
+        rv = c.get(url_for('api_04.chained_events', id_=place.id))
+        assert 'Entity is not an event' in rv.get_json()['title']
 
         rv = c.get(
             url_for('api_04.display', filename=f'{file_without_file.id}'))

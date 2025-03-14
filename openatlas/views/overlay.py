@@ -10,6 +10,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.display.util import button, required_group
+from openatlas.display.util2 import uc_first
 from openatlas.forms.field import SubmitField
 from openatlas.models.entity import Entity
 from openatlas.models.overlay import Overlay
@@ -25,7 +26,7 @@ class OverlayForm(FlaskForm):
     top_right_northing = FloatField('', [InputRequired()])
     bottom_left_easting = FloatField('', [InputRequired()])
     bottom_left_northing = FloatField('', [InputRequired()])
-    save = SubmitField(_('save'))
+    save = SubmitField(uc_first(_('save')))
 
 
 @app.route(
