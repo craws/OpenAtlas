@@ -30,7 +30,7 @@ class Entry:
         self.diagnose = attributes_['diagnose']
         self.age = attributes_['age']
         self.died = attributes_['died']
-        self.source = Source(self)
+        #self.source = Source(self)
         self.person = Person(self)
         self.activity = Activity(self)
 
@@ -41,16 +41,16 @@ class Entry:
         return datetime.strptime(date_, '%d.%m.%Y').date()
 
 
-class Source:
-
-    def __init__(self, entry_: Entry):
-        self.name = f'Patient record {entry_.number}'
-        self.text = entry_.text
-
-    def insert_source(self) -> Entity:
-        source_ = Entity.insert('source', self.name, self.text)
-        source_.link('P2', case_study)
-        return source_
+# class Source:
+#
+#     def __init__(self, entry_: Entry):
+#         self.name = f'Patient record {entry_.number}'
+#         self.text = entry_.text
+#
+#     def insert_source(self) -> Entity:
+#         source_ = Entity.insert('source', self.name, self.text)
+#         source_.link('P2', case_study)
+#         return source_
 
 
 class Person:
@@ -100,7 +100,7 @@ class Activity:
         self.died = entry_.died
 
     def insert_activity(self) -> Entity:
-        activity_ = Entity.insert('activity', self.name)
+        activity_ = Entity.insert('activity', self.name, self.text)
         activity_.update({
             'attributes': {
                 'begin_from': self.begin,
@@ -148,6 +148,7 @@ with app.test_request_context():
     case_study = Entity.get_by_id(357)
     diagnose_hierarchy = Entity.get_by_id(359)
     death_type = Entity.get_by_id(361)
+    source = Entity.get_by_id(143)
 
     # Remove former data
     for item in case_study.get_linked_entities('P2', True):
@@ -165,7 +166,7 @@ with app.test_request_context():
         if isnull(entry.number):
             not_imported.append(entry)
             continue
-        source = entry.source.insert_source()
+        #source = entry.source.insert_source()
         person = entry.person.insert_person()
         activity = entry.activity.insert_activity()
         activity.link('P2', diagnose_types[entry.diagnose])
