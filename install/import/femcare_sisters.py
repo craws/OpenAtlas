@@ -108,6 +108,8 @@ with app.test_request_context():
 
     # Remove former data
     for item in case_study.get_linked_entities('P2', True):
+        if item.id == 364:
+            continue
         item.delete()
     for type_id in Type.get_hierarchy('Actor function').subs:
         if g.types[type_id].name == 'Stand':
@@ -119,6 +121,7 @@ with app.test_request_context():
     actor_function_hierarchy = Entity.get_by_id(14)
     elisabethinen_vienna = Entity.get_by_id(362)
     professbook_ext_ref_sys = Entity.get_by_id(363)
+    source = Entity.get_by_id(364)
     exact_match = get_exact_match()
 
     entries = parse_csv()
@@ -152,6 +155,7 @@ with app.test_request_context():
                 'end_to': entry.sister.day_of_death[1],
                 'end_comment': ''}},
             new=True)
+        source.link('P67', sister)
         if entry.number and isinstance(entry.number, str):
             professbook_ext_ref_sys.link(
                 'P67',
