@@ -17,6 +17,7 @@ from openatlas.models.user import User
 ADMIN_PATH = Path('files/relic_admin.csv')
 GRAVE_PATH = Path('files/grave_fields.csv')
 FORTRESSES_PATH = Path('files/fortresses.csv')
+CHURCHES_PATH = Path('files/churches.csv')
 BIBLIOGRAPHY_PATH = Path('files/bibliography.csv')
 SPINNER = itertools.cycle(["|", "/", "-", "\\"])
 COUNT = 0
@@ -175,6 +176,22 @@ def import_fortresses() -> None:
     import_data_(project, 'place', result)
 
 
+def import_churches() -> None:
+    data = pd.read_csv(
+        CHURCHES_PATH, delimiter=',', encoding='utf-8', dtype=str)
+    data = data.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
+    data = data.fillna('')
+    result: list[dict[str, Any]] = []
+    for _, row in data.iterrows():
+        result.append(row.to_dict())
+    for row in result:
+        for key, value in row.items():
+            if key == 'cadastre':
+                row['administrative_unit_id'] = (
+                    str(admin_units['cadastre'][value.lower()]))
+    import_data_(project, 'place', result)
+
+
 def import_bibliography() -> None:
     data = pd.read_csv(
         BIBLIOGRAPHY_PATH, delimiter=',', encoding='utf-8', dtype=str)
@@ -202,3 +219,5 @@ if __name__ == "__main__":
         import_bibliography()
         print('Importing fortresses \n')
         import_fortresses()
+        print('Importing churches \n')
+        import_churches()
