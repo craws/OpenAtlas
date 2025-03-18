@@ -9,7 +9,7 @@ from wtforms import FloatField
 from wtforms.validators import InputRequired
 
 from openatlas import app
-from openatlas.display.util import button, required_group
+from openatlas.display.util import button, link, required_group
 from openatlas.display.util2 import uc_first
 from openatlas.forms.field import SubmitField
 from openatlas.models.entity import Entity
@@ -33,9 +33,7 @@ class OverlayForm(FlaskForm):
     '/overlay/insert/<int:image_id>/<int:place_id>',
     methods=['GET', 'POST'])
 @required_group('editor')
-def overlay_insert(
-        image_id: int,
-        place_id: int) -> str | Response:
+def overlay_insert(image_id: int, place_id: int) -> str | Response:
     form = OverlayForm()
     if form.validate_on_submit():
         Overlay.insert({
@@ -47,12 +45,13 @@ def overlay_insert(
             'bottom_left_northing': form.bottom_left_northing.data,
             'bottom_left_easting': form.bottom_left_easting.data})
         return redirect(f"{url_for('view', id_=place_id)}#tab-file")
+    place = Entity.get_by_id(place_id)
     return render_template(
         'overlay.html',
         form=form,
         crumbs=[
-            [_('place'), url_for('index', view='place')],
-            Entity.get_by_id(place_id),
+            link(place, index=True),
+            place,
             Entity.get_by_id(image_id),
             _('overlay')])
 
@@ -98,7 +97,7 @@ def overlay_update(place_id: int, overlay_id: int) -> str | Response:
                 url_for('overlay_remove', id_=overlay.id, place_id=place.id),
                 onclick=f"return confirm('{_('remove')}?');")],
         crumbs=[
-            [_('place'), url_for('index', view='place')],
+            link(place, index=True),
             place,
             Entity.get_by_id(overlay.image_id),
             _('update overlay')])

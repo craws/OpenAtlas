@@ -12,6 +12,7 @@ from wtforms import (
     widgets)
 from wtforms.validators import InputRequired
 
+from openatlas.display.util import link
 from openatlas.forms.add_fields import (
     add_date_fields, add_reference_systems, add_types)
 from openatlas.forms.field import (
@@ -467,8 +468,8 @@ class TypeBaseManager(BaseManager):
         getattr(self.form, str(self.get_root().id)).label.text = 'super'
 
     def get_crumbs(self) -> list[Any]:
-        self.crumbs = [[_('types'), url_for('type_index')]]
         type_ = self.origin or self.entity
+        self.crumbs = [link(type_, index=True)]
         self.crumbs += [g.types[type_id] for type_id in type_.root]
         return super().get_crumbs()
 

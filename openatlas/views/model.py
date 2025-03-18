@@ -281,11 +281,7 @@ def network(dimensions: Optional[int] = 0, id_: Optional[int] = None) -> str:
             entity.id,
             int(form.depth.data),
             dimensions)
-        crumbs = [
-            [_(entity.class_.view.replace('_', ' ')),
-             url_for('index', view=entity.class_.view)],
-            entity,
-            _('network')]
+        crumbs = [link(entity, index=True), entity, _('network')]
     else:
         json_data = Network.get_network_json(
             {c.name: getattr(form, c.name).data for c in classes},
