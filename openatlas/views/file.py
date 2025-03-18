@@ -115,10 +115,7 @@ def file_add(id_: int, view: str) -> str | Response:
             g.view_class_mapping[view],
             [e.id for e in entity.get_linked_entities('P67')]),
         title=entity.name,
-        crumbs=[
-            [_(entity.class_.view), url_for('index', view=entity.class_.view)],
-            entity,
-            f"{_('link')} {_(view)}"])
+        crumbs=[link(entity, index=True), entity, f"{_('link')} {_(view)}"])
 
 
 @app.route('/file/convert_iiif/<int:id_>')

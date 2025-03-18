@@ -64,8 +64,8 @@ def type_index() -> str:
         'type/index.html',
         buttons=[manual('entity/type')],
         types=types,
-        title=_('types'),
-        crumbs=[_('types')])
+        title=_('type'),
+        crumbs=[_('type')])
 
 
 @app.route('/type/delete/<int:id_>')
@@ -130,7 +130,7 @@ def type_delete_recursive(id_: int) -> str | Response:
         for item in get_entities_linked_to_type_recursive(type_.id, []):
             data = [link(item), item.class_.label, item.description]
             tabs['entities'].table.rows.append(data)
-    crumbs = [[_('types'), url_for('type_index')]]
+    crumbs = [[_('type'), url_for('type_index')]]
     if root:
         crumbs += [g.types[type_id] for type_id in type_.root]
     crumbs += [type_, _('delete')]
@@ -164,18 +164,15 @@ def type_move_entities(id_: int) -> str | Response:
         root=root,
         form=form,
         entity=type_,
-        crumbs=[
-            [_('types'), url_for('type_index')],
-            root,
-            type_,
-            _('move entities')])
+        crumbs=[link(type_, index=True), root, type_, _('move entities')])
 
 
 @app.route('/type/untyped/<int:id_>')
 @required_group('editor')
 def show_untyped_entities(id_: int) -> str:
+    type_ = g.types[id_]
     table = Table(['name', 'class', 'first', 'last', 'description'])
-    for entity in g.types[id_].get_untyped():
+    for entity in type_.get_untyped():
         table.rows.append([
             link(entity),
             entity.class_.label,
@@ -185,11 +182,8 @@ def show_untyped_entities(id_: int) -> str:
     return render_template(
         'content.html',
         content=table.display(),
-        entity=g.types[id_],
-        crumbs=[
-            [_('types'), url_for('type_index')],
-            link(g.types[id_]),
-            _('untyped entities')])
+        entity=type_,
+        crumbs=[link(type_, index=True), link(type_), _('untyped entities')])
 
 
 @app.route('/type/set-selectable/<int:id_>')
@@ -223,11 +217,9 @@ def show_multiple_linked_entities(id_: int) -> str:
             entity.first,
             entity.last,
             entity.description])
+    type_ = g.types[id_]
     return render_template(
         'content.html',
         content=table.display(),
         entity=g.types[id_],
-        crumbs=[
-            [_('types'), url_for('type_index')],
-            link(g.types[id_]),
-            _('untyped entities')])
+        crumbs=[link(type_, index=True), link(type_), _('untyped entities')])

@@ -53,10 +53,7 @@ class BaseDisplay:
         self.tabs = {'info': Tab('info')}
 
     def add_crumbs(self) -> None:
-        label = _(self.entity.class_.view.replace('_', ' '))
-        if self.entity.class_.view in ['event']:
-            label += f' ({self.entity.cidoc_class.name})'
-        self.crumbs = [[label, url_for('index', view=self.entity.class_.view)]]
+        self.crumbs = [link(self.entity, index=True)]
         if self.structure:
             for super_ in self.structure['supers']:
                 self.crumbs.append(link(super_))
@@ -497,7 +494,7 @@ class TypeBaseDisplay(BaseDisplay):
     entity: Type
 
     def add_crumbs(self) -> None:
-        self.crumbs = [[_('types'), url_for('type_index')]]
+        self.crumbs = [link(self.entity, index=True)]
         self.crumbs += [g.types[type_id] for type_id in self.entity.root]
         self.crumbs.append(self.entity.name)
 

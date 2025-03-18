@@ -36,7 +36,7 @@ def name_result(result: float) -> str:
 
 
 def start_crumbs(entity: Entity) -> list[Any]:
-    crumbs: list[Any] = [[_('place'), url_for('index', view='place')]]
+    crumbs: list[Any] = [link(entity, index=True)]
     for super_ in entity.get_structure()['supers']:
         crumbs.append(link(super_))
     crumbs.append(entity)
