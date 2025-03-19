@@ -175,6 +175,7 @@ with app.test_request_context():
         if COUNT % 15 == 0:
             sys.stdout.write(f"\rDeleting {next(SPINNER)}")
             sys.stdout.flush()
+    print('Former data removed\n')
 
     for type_id in diagnose_hierarchy.subs:  # type: ignore
         g.types[type_id].delete()
