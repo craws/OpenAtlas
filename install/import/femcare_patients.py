@@ -168,14 +168,14 @@ with app.test_request_context():
     source = Entity.get_by_id(143)
 
     # Remove former data
-    print('Remove former data\n')
+    print('Remove former data')
     for item in case_study.get_linked_entities('P2', True):
         item.delete()
         COUNT += 1
         if COUNT % 15 == 0:
             sys.stdout.write(f"\rDeleting {next(SPINNER)}")
             sys.stdout.flush()
-    print('Former data removed\n')
+    print('\nFormer data removed')
 
     for type_id in diagnose_hierarchy.subs:  # type: ignore
         g.types[type_id].delete()
@@ -184,10 +184,11 @@ with app.test_request_context():
     entries = parse_csv()
     print('Parsed CSV')
     diagnose_types = get_diagnose_types(entries)
-    print('Added diagnose types CSV')
+    print('Added diagnose types')
     origin_places = get_origin_places(entries)
     print('Added places')
 
+    print('Import CSV data')
     not_imported = []
     for entry in entries:
         if isnull(entry.number):
