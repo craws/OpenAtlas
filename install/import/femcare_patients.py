@@ -168,8 +168,13 @@ with app.test_request_context():
     source = Entity.get_by_id(143)
 
     # Remove former data
+    print('Remove former data\n')
     for item in case_study.get_linked_entities('P2', True):
         item.delete()
+        COUNT += 1
+        if COUNT % 15 == 0:
+            sys.stdout.write(f"\rDeleting {next(SPINNER)}")
+            sys.stdout.flush()
 
     for type_id in diagnose_hierarchy.subs:  # type: ignore
         g.types[type_id].delete()
