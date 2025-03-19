@@ -358,7 +358,8 @@ def settings(category: str) -> str | Response:
             g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(redirect_url)
-    set_form_settings(form)
+    if request.method == 'GET':
+        set_form_settings(form)
     manual_page = f"admin/{category.replace('frontend', 'presentation_site')}"
     return render_template(
         'content.html',
