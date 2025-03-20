@@ -1,7 +1,7 @@
 import itertools
 import time
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 import pandas as pd
 from flask import g
@@ -11,19 +11,44 @@ from openatlas import app, before_request
 from openatlas.display.util2 import datetime64_to_timestamp
 from openatlas.forms.util import form_to_datetime64
 from openatlas.models.entity import Entity
-from openatlas.models.imports import Project, import_data_
+from openatlas.models.imports import Project, get_id_from_origin_id, \
+    import_data_
 from openatlas.models.user import User
 
 ADMIN_PATH = Path('files/relic_admin.csv')
 GRAVE_PATH = Path('files/grave_fields.csv')
 FORTRESSES_PATH = Path('files/fortresses.csv')
 CHURCHES_PATH = Path('files/churches.csv')
+MONASTERIES_PATH = Path('files/monasteries.csv')
 BIBLIOGRAPHY_PATH = Path('files/bibliography.csv')
-SPINNER = itertools.cycle(["|", "/", "-", "\\"])
-COUNT = 0
 
 
 # pylint: skip-file
+def spinner_and_timer(import_func, message):
+    """Imports data with a spinning animation at the end of the line,
+    and measures execution time."""
+    spinner = itertools.cycle(["|", "/", "-", "\\"])
+    print(f"{message} ", end="", flush=True)
+
+    start_time = time.time()
+
+    try:
+        def import_with_visual_feedback():
+            for _ in range(50):
+                print(f"{message} {next(spinner)}", end="\r", flush=True)
+                time.sleep(0.1)
+            import_func()
+
+        import_with_visual_feedback()
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        print(f"{message} Done! (Took {elapsed_time:.2f} seconds)")
+    except Exception as e:
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        print(f"{message} Error: {e} (Took {elapsed_time:.2f} seconds)")
+    finally:
+        print("")
 
 
 class AdministrativeUnit:
@@ -36,13 +61,13 @@ class AdministrativeUnit:
 def parse_admin_units() -> list[AdministrativeUnit]:
     data = pd.read_csv(ADMIN_PATH, delimiter='\t', encoding='utf-8', dtype=str)
     data = data.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
-    result = []
+    admin_result = []
     for _, row in data.iterrows():
-        result.append(AdministrativeUnit({
+        admin_result.append(AdministrativeUnit({
             'region': row['region'],
             'district': row['district'],
             'cadastre': row['cadastre']}))
-    return result
+    return admin_result
 
 
 #################################
@@ -86,8 +111,6 @@ def import_and_get_administrative_units() -> dict[str, dict[str, Any]]:
     print(f'\n{len(regions_)} regions where imported.')
     print(f'\n{len(districts_)} districts where imported.')
     print(f'\n{len(cadastres_)} cadastres where imported.')
-    # print(f'{len(not_imported)} entries couldn\'t be imported.')
-    print(f"Execution time: {time.time() - start_time:.6f} seconds")
     return {
         'regions': regions_,
         'districts': districts_,
@@ -124,18 +147,16 @@ def import_and_get_administrative_units() -> dict[str, dict[str, Any]]:
 #    print(f'\n{len(regions)} regions where imported.')
 #    print(f'\n{len(districts)} districts where imported.')
 #    print(f'\n{len(cadastres)} cadastres where imported.')
-#    #print(f'{len(not_imported)} entries couldn\'t be imported.')
-#    print(f"Execution time: {time.time() - start_time:.6f} seconds")
 #    return {'cadastres': cadastres}
 
 def import_cemeteries() -> None:
     data = pd.read_csv(GRAVE_PATH, delimiter=',', encoding='utf-8', dtype=str)
     data = data.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
     data = data.fillna('')
-    result: list[dict[str, Any]] = []
+    cementary_result: list[dict[str, Any]] = []
     for _, row in data.iterrows():
-        result.append(row.to_dict())
-    for row in result:
+        cementary_result.append(row.to_dict())
+    for row in cementary_result:
         for key, value in row.items():
             if key in ['begin_from', 'begin_to', 'end_from', 'end_to']:
                 value = value.split('-')
@@ -152,7 +173,7 @@ def import_cemeteries() -> None:
                     admin_units['cadastres'][value.lower()])
             if key == 'id':
                 row['id'] = f'cemetery_{value}'
-    import_data_(project, 'place', result)
+    import_data_(project, 'place', cementary_result)
 
 
 def import_fortresses() -> None:
@@ -160,11 +181,11 @@ def import_fortresses() -> None:
         FORTRESSES_PATH, delimiter=',', encoding='utf-8', dtype=str)
     data = data.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
     data = data.fillna('')
-    result: list[dict[str, Any]] = []
+    fortress_result: list[dict[str, Any]] = []
     for _, row in data.iterrows():
-        result.append(row.to_dict())
+        fortress_result.append(row.to_dict())
     ref_key = 'reference_system_Archaeological_Map_of_the_Czech_Republic'
-    for row in result:
+    for row in fortress_result:
         for key, value in row.items():
             if key == 'District':
                 row['administrative_unit_id'] = (
@@ -173,7 +194,7 @@ def import_fortresses() -> None:
                 row['id'] = f'fortress_{value}'
             if key == ref_key and value:
                 row[ref_key] = f'{value};exact_match'
-    import_data_(project, 'place', result)
+    import_data_(project, 'place', fortress_result)
 
 
 def import_churches() -> None:
@@ -181,15 +202,193 @@ def import_churches() -> None:
         CHURCHES_PATH, delimiter=',', encoding='utf-8', dtype=str)
     data = data.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
     data = data.fillna('')
-    result: list[dict[str, Any]] = []
+    church_result: list[dict[str, Any]] = []
     for _, row in data.iterrows():
-        result.append(row.to_dict())
-    for row in result:
+        church_result.append(row.to_dict())
+    founders = {}
+    for row in church_result:
         for key, value in row.items():
+            if key in ['begin_from', 'begin_to', 'end_from',
+                       'end_to'] and value:
+                value = value.split('-')
+                value = [int(item) for item in value]
+                value = value + [None] * (3 - len(value))
+                value = datetime64_to_timestamp(form_to_datetime64(
+                    value[0],
+                    value[1],
+                    value[2],
+                    to_date=key in ['begin_to', 'end_to']))
+                row[key] = value if all(value) else ''
             if key == 'cadastre':
                 row['administrative_unit_id'] = (
-                    str(admin_units['cadastre'][value.lower()]))
-    import_data_(project, 'place', result)
+                    str(admin_units['cadastres'][value.lower()]))
+            if key == 'founder' and value:
+                founders[row['id']] = Entity.get_by_id(value)
+    import_data_(project, 'place', church_result)
+    for id_, founder in founders.items():
+        church = Entity.get_by_id(int(get_id_from_origin_id(project, id_)))
+        founding_event = Entity.insert(
+            'modification',
+            f'Foundation of {church.name}')
+        founding_event.link('P2', founding_event_type)
+        founding_event.link('P2', relic_type)
+        founding_event.link('P2', replico_type)
+        founding_event.link('P31', church)
+        founding_event.update_links(
+            get_update_links_dict('P14', founder, creator_type.id),
+            new=True)
+
+
+def get_update_links_dict(
+        property_: str,
+        range_: Entity,
+        type_id: Optional[int] = '',
+        # dates: Optional[dict[str, Any]],
+        inverse: Optional[bool] = False) -> dict[str, Any]:
+    return {
+        'attributes': {
+            'begin_from': '',
+            'begin_to': '',
+            'begin_comment': '',
+            'end_from': '',
+            'end_to': '',
+            'end_comment': ''},
+        'links': {
+            'insert': [{
+                'property': property_,
+                'range': range_,
+                'description': '',
+                'inverse': inverse,
+                'type_id': type_id,
+                'return_link_id': False}],
+            'delete': set(),
+            'delete_inverse': set()},
+        'attributes_link': {
+            'begin_from': '',
+            'begin_to': '',
+            'begin_comment': '',
+            'end_from': '',
+            'end_to': '',
+            'end_comment': ''}}
+
+
+def import_monasteries() -> None:
+    data = pd.read_csv(
+        MONASTERIES_PATH, delimiter=',', encoding='utf-8', dtype=str)
+    data = data.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
+    data = data.fillna('')
+    monasteries_result: list[dict[str, Any]] = []
+    for _, row in data.iterrows():
+        monasteries_result.append(row.to_dict())
+    founders = {}
+    possessor_1 = {}
+    possessor_2 = {}
+    for row in monasteries_result:
+        for key, value in row.items():
+            if (key in [
+                'begin_from', 'begin_to', 'end_from', 'end_to',
+                'p1_dating_from_earliest', 'p1_dating_from_latest',
+                'p1_dating_to_earliest', 'p1_dating_to_latest',
+                'p2_dating_from_earliest', 'p2_dating_from_latest',
+                'p2_dating_to_earliest', 'p2_dating_to_latest']
+                    and value):
+                value = value.split('-')
+                value = [int(item) for item in value]
+                value = value + [None] * (3 - len(value))
+                value = datetime64_to_timestamp(form_to_datetime64(
+                    value[0],
+                    value[1],
+                    value[2],
+                    to_date=key in ['begin_to', 'end_to']))
+                row[key] = value if all(value) else ''
+            if key == 'cadastre':
+                row['administrative_unit_id'] = (
+                    str(admin_units['cadastres'][value.lower()]))
+    for row in monasteries_result:
+        for key, value in row.items():
+            if key == 'founder' and value:
+                founders[row['id']] = Entity.get_by_id(value)
+            if key == 'possessor1_id' and value:
+                possessor_1[row['id']] = {
+                    'possessor': Entity.get_by_id(value),
+                    'founder': Entity.get_by_id(row.get('founder')) if row.get('founder') else None,
+                    'begin_from': row.get('p1_dating_from_earliest'),
+                    'begin_to': row.get('p1_dating_from_latest'),
+                    'end_from': row.get('p1_dating_to_earliest'),
+                    'end_to': row.get('p1_dating_to_latest')}
+            if key == 'possessor2_id' and value:
+                possessor_2[row['id']] = {
+                    'possessor': Entity.get_by_id(value),
+                    'founder': Entity.get_by_id(row.get('founder')) if row.get('founder') else None,
+                    'begin_from': row.get('p2_dating_from_earliest'),
+                    'begin_to': row.get('p2_dating_from_latest'),
+                    'end_from': row.get('p2_dating_to_earliest'),
+                    'end_to': row.get('p2_dating_to_latest')}
+
+    import_data_(project, 'place', monasteries_result)
+
+    for id_, founder in founders.items():
+        monastery = Entity.get_by_id(int(get_id_from_origin_id(project, id_)))
+        founding_event = Entity.insert(
+            'modification',
+            f'Foundation of {monastery.name}')
+        founding_event.link('P2', founding_event_type)
+        founding_event.link('P2', relic_type)
+        founding_event.link('P2', replico_type)
+        founding_event.link('P31', monastery)
+        founding_event.update_links(
+            get_update_links_dict('P14', founder, creator_type.id),
+            new=True)
+
+    for id_, possessor1 in possessor_1.items():
+        monastery = Entity.get_by_id(int(get_id_from_origin_id(project, id_)))
+        ownership1_event = Entity.insert(
+            'acquisition',
+            f'Ownership of {monastery.name}')
+        ownership1_event.update({
+            'attributes': {
+                'begin_from': possessor1['begin_from'],
+                'begin_to': possessor1['begin_to'],
+                'end_from': possessor1['end_from'],
+                'end_to': possessor1['end_to']}})
+        ownership1_event.link('P2', ownership_event_type)
+        ownership1_event.link('P2', relic_type)
+        ownership1_event.link('P2', replico_type)
+        ownership1_event.link('P24', monastery)
+        ownership1_event.update_links(
+            get_update_links_dict(
+                'P23', possessor1['possessor'], possessor_type.id),
+            new=True)
+        if possessor1['founder']:
+            ownership1_event.update_links(
+                get_update_links_dict(
+                    'P22', possessor1['founder'], proprietor_type.id),
+                new=True)
+
+    for id_, possessor2 in possessor_2.items():
+        monastery = Entity.get_by_id(int(get_id_from_origin_id(project, id_)))
+        ownership2_event = Entity.insert(
+            'acquisition',
+            f'Ownership of {monastery.name}')
+        ownership2_event.update({
+            'attributes': {
+                'begin_from': possessor2['begin_from'],
+                'begin_to': possessor2['begin_to'],
+                'end_from': possessor2['end_from'],
+                'end_to': possessor2['end_to']}})
+        ownership2_event.link('P2', ownership_event_type)
+        ownership2_event.link('P2', relic_type)
+        ownership2_event.link('P2', replico_type)
+        ownership2_event.link('P24', monastery)
+        ownership2_event.update_links(
+            get_update_links_dict(
+                'P23', possessor2['possessor'], possessor_type.id),
+            new=True)
+        if possessor2['founder']:
+            ownership2_event.update_links(
+                get_update_links_dict(
+                    'P22', possessor2['founder'], proprietor_type.id),
+                new=True)
 
 
 def import_bibliography() -> None:
@@ -197,10 +396,10 @@ def import_bibliography() -> None:
         BIBLIOGRAPHY_PATH, delimiter=',', encoding='utf-8', dtype=str)
     data = data.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
     data = data.fillna('')
-    result: list[dict[str, Any]] = []
+    bib_result: list[dict[str, Any]] = []
     for _, row in data.iterrows():
-        result.append(row.to_dict())
-    import_data_(project, 'bibliography', result)
+        bib_result.append(row.to_dict())
+    import_data_(project, 'bibliography', bib_result)
 
 
 if __name__ == "__main__":
@@ -209,15 +408,36 @@ if __name__ == "__main__":
         user = User.get_by_id(23)
         login_user(user)
         project = Project.get_by_id(5)
-        start_time = time.time()
+        founding_event_type = Entity.get_by_id(208862)
+        ownership_event_type = Entity.get_by_id(208839)
+        creator_type = Entity.get_by_id(19)
+        possessor_type = Entity.get_by_id(208860)
+        proprietor_type = Entity.get_by_id(208859)
+        relic_type = Entity.get_by_id(221174)
+        replico_type = Entity.get_by_id(198155)
+
         print('Importing administrative units \n')
+
         admin_units = import_and_get_administrative_units()
+
         before_request()
+
         print('Importing cemeteries \n')
-        # import_cemeteries()
+
+        import_cemeteries()
+
         print('Importing bibliography \n')
+
         import_bibliography()
+
         print('Importing fortresses \n')
+
         import_fortresses()
+
         print('Importing churches \n')
+
         import_churches()
+
+        print('Importing monasteries \n')
+
+        import_monasteries()
