@@ -30,7 +30,7 @@ class Entry:
         self.diagnose = attributes_['diagnose']
         self.age = attributes_['age']
         self.died = attributes_['died']
-        self.source = Source(self)
+        #self.source = Source(self)
         self.person = Person(self)
         self.activity = Activity(self)
 
@@ -41,16 +41,16 @@ class Entry:
         return datetime.strptime(date_, '%d.%m.%Y').date()
 
 
-class Source:
-
-    def __init__(self, entry_: Entry):
-        self.name = f'Patient record {entry_.number}'
-        self.text = entry_.text
-
-    def insert_source(self) -> Entity:
-        source_ = Entity.insert('source', self.name, self.text)
-        source_.link('P2', case_study)
-        return source_
+# class Source:
+#
+#     def __init__(self, entry_: Entry):
+#         self.name = f'Patient record {entry_.number}'
+#         self.text = entry_.text
+#
+#     def insert_source(self) -> Entity:
+#         source_ = Entity.insert('source', self.name, self.text)
+#         source_.link('P2', case_study)
+#         return source_
 
 
 class Person:
@@ -64,12 +64,12 @@ class Person:
         self.birth_year = self.get_year_of_birth()
         self.death_date = entry_.end if self.died else None
 
-    def get_year_of_birth(self) -> Optional[str]:
+    def get_year_of_birth(self) -> Optional[int]:
         birth_year = None
         if self.age and self.end:
-            birth_year = str(self.end.year - self.age)
+            birth_year = int(self.end.year - self.age)
         elif self.age and self.begin:
-            birth_year = str(self.begin.year - self.age)
+            birth_year = int(self.begin.year - self.age)
         return birth_year
 
     def insert_person(self) -> Entity:
@@ -79,10 +79,12 @@ class Person:
             'begin_to': None,
             'end_from': self.death_date}
         if self.birth_year:
+            birth_begin = str(self.birth_year - 1)
+            birth_end = str(self.birth_year + 1)
             dates['begin_from'] = (
-                np.datetime64(self.birth_year, 'D'))  # type: ignore
+                np.datetime64(birth_begin, 'D'))  # type: ignore
             dates['begin_to'] = np.datetime64(
-                f'{self.birth_year}-12-31')  # type: ignore
+                f'{birth_end}-12-31')  # type: ignore
         person_.update({'attributes': dates})
         person_.link('P2', case_study)
         return person_
@@ -100,7 +102,7 @@ class Activity:
         self.died = entry_.died
 
     def insert_activity(self) -> Entity:
-        activity_ = Entity.insert('activity', self.name)
+        activity_ = Entity.insert('activity', self.name, self.text)
         activity_.update({
             'attributes': {
                 'begin_from': self.begin,
@@ -142,36 +144,65 @@ def get_diagnose_types(entries_: list[Entry]) -> dict[str, Entity]:
     return diagnose_types_
 
 
+def get_origin_places(entries_: list[Entry]) -> dict[str, Entity]:
+    origin_places_: dict[str, Entity] = {}
+    for entry_ in entries_:
+        if not entry_.origin or entry_.origin in origin_places_:
+            continue
+        place = Entity.insert('place', entry_.origin)
+        place.link('P2', case_study)
+        location = Entity.insert(
+            'object_location',
+            f"Location of {entry_.origin}")
+        place.link('P53', location)
+        origin_places_[entry_.origin] = location
+    return origin_places_
+
+
 with app.test_request_context():
     app.preprocess_request()
     start_time = time.time()
     case_study = Entity.get_by_id(357)
     diagnose_hierarchy = Entity.get_by_id(359)
     death_type = Entity.get_by_id(361)
+    source = Entity.get_by_id(143)
 
     # Remove former data
+    print('Remove former data')
     for item in case_study.get_linked_entities('P2', True):
         item.delete()
+        COUNT += 1
+        if COUNT % 15 == 0:
+            sys.stdout.write(f"\rDeleting {next(SPINNER)}")
+            sys.stdout.flush()
+    print('\nFormer data removed')
 
     for type_id in diagnose_hierarchy.subs:  # type: ignore
         g.types[type_id].delete()
 
     # Insert import
     entries = parse_csv()
+    print('Parsed CSV')
     diagnose_types = get_diagnose_types(entries)
-    not_imported = []
+    print('Added diagnose types')
+    origin_places = get_origin_places(entries)
+    print('Added places')
 
+    print('Import CSV data')
+    not_imported = []
     for entry in entries:
         if isnull(entry.number):
             not_imported.append(entry)
             continue
-        source = entry.source.insert_source()
+        #source = entry.source.insert_source()
         person = entry.person.insert_person()
         activity = entry.activity.insert_activity()
         activity.link('P2', diagnose_types[entry.diagnose])
         source.link('P67', person)
         source.link('P67', activity)
         activity.link('P11', person)
+        if entry.origin:
+            person.link('OA8', origin_places[entry.origin])
         COUNT += 1
         if COUNT % 15 == 0:
             sys.stdout.write(f"\rProcessing {next(SPINNER)}")
