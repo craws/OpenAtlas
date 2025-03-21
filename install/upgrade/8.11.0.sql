@@ -25,15 +25,16 @@ ALTER SEQUENCE web.reference_system_api_id_seq OWNED BY web.reference_system_api
 ALTER TABLE ONLY web.reference_system_api ALTER COLUMN id
     SET DEFAULT nextval('web.reference_system_api_id_seq'::regclass);
 ALTER TABLE ONLY web.reference_system_api ADD CONSTRAINT reference_system_api_pkey PRIMARY KEY (id);
-ALTER TABLE ONLY web.reference_system ADD CONSTRAINT reference_system_reference_system_api_id_fkey
-    FOREIGN KEY (reference_system_api_id) REFERENCES web.reference_system_api(id)
+ALTER TABLE ONLY web.reference_system_api ADD CONSTRAINT reference_system_api_name_key UNIQUE (name);
+ALTER TABLE ONLY web.reference_system ADD CONSTRAINT reference_system_reference_system_api_name_fkey
+    FOREIGN KEY (reference_system_api_name) REFERENCES web.reference_system_api(name)
         ON UPDATE CASCADE ON DELETE SET NULL NOT VALID;
 
 INSERT INTO web.reference_system_api(name) VALUES
  ('Wikidata'), ('GeoNames'), ('GND'), ('APIS');
 
-UPDATE web.reference_system SET reference_system_api_id = (SELECT id from web.reference_system_api WHERE name = 'Wikidata') WHERE name = 'Wikidata';
-UPDATE web.reference_system SET reference_system_api_id = (SELECT id from web.reference_system_api WHERE name = 'GeoNames') WHERE name = 'GeoNames';
-UPDATE web.reference_system SET reference_system_api_id = (SELECT id from web.reference_system_api WHERE name = 'GND') WHERE name = 'GND';
+UPDATE web.reference_system SET reference_system_api_name = 'Wikidata' WHERE name = 'Wikidata';
+UPDATE web.reference_system SET reference_system_api_name = 'GeoNames' WHERE name = 'GeoNames';
+UPDATE web.reference_system SET reference_system_api_name = 'GND' WHERE name = 'GND';
 
 END;

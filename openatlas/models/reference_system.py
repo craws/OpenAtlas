@@ -17,6 +17,7 @@ class ReferenceSystem(Entity):
         self.precision_default_id = \
             list(self.types)[0].id if self.types else None
         self.system = row['system']
+        self.api = row['api']
         self.classes: list[str] = []
 
     def update(self, data: dict[str, Any], new: bool = False) -> Optional[int]:

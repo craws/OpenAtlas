@@ -14,6 +14,7 @@ def get_all() -> list[dict[str, Any]]:
             e.openatlas_class_name,
             e.created,
             e.modified,
+            e.reference_system_api_name AS api,
             rs.website_url,
             rs.resolver_url,
             rs.identifier_example,
