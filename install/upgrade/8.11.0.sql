@@ -11,6 +11,7 @@ CREATE TABLE web.reference_system_api (
     name text NOT NULL
 );
 ALTER TABLE web.reference_system_api OWNER TO openatlas;
+ALTER TABLE web.reference_system  ADD COLUMN reference_system_api_name text;
 
 CREATE SEQUENCE web.reference_system_api_id_seq
     AS integer
@@ -26,6 +27,7 @@ ALTER TABLE ONLY web.reference_system_api ALTER COLUMN id
     SET DEFAULT nextval('web.reference_system_api_id_seq'::regclass);
 ALTER TABLE ONLY web.reference_system_api ADD CONSTRAINT reference_system_api_pkey PRIMARY KEY (id);
 ALTER TABLE ONLY web.reference_system_api ADD CONSTRAINT reference_system_api_name_key UNIQUE (name);
+
 ALTER TABLE ONLY web.reference_system ADD CONSTRAINT reference_system_reference_system_api_name_fkey
     FOREIGN KEY (reference_system_api_name) REFERENCES web.reference_system_api(name)
         ON UPDATE CASCADE ON DELETE SET NULL NOT VALID;

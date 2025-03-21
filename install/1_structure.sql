@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 15.10 (Debian 15.10-0+deb12u1)
--- Dumped by pg_dump version 15.10 (Debian 15.10-0+deb12u1)
+-- Dumped from database version 15.12 (Debian 15.12-0+deb12u2)
+-- Dumped by pg_dump version 15.12 (Debian 15.12-0+deb12u2)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -25,6 +25,7 @@ ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS user_group_id_fk
 ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_bookmarks_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_bookmarks_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.type_none_selectable DROP CONSTRAINT IF EXISTS type_none_selectable_entity_id_fkey;
+ALTER TABLE IF EXISTS ONLY web.reference_system DROP CONSTRAINT IF EXISTS reference_system_reference_system_api_name_fkey;
 ALTER TABLE IF EXISTS ONLY web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_openatlas_class_openatlas_class_name_fkey;
 ALTER TABLE IF EXISTS ONLY web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_form_reference_system_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.reference_system DROP CONSTRAINT IF EXISTS reference_system_entity_id_fkey;
@@ -96,6 +97,8 @@ ALTER TABLE IF EXISTS ONLY web.reference_system DROP CONSTRAINT IF EXISTS refere
 ALTER TABLE IF EXISTS ONLY web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_openatlas_class_system_id_class_name_key;
 ALTER TABLE IF EXISTS ONLY web.reference_system DROP CONSTRAINT IF EXISTS reference_system_name_key;
 ALTER TABLE IF EXISTS ONLY web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_form_pkey;
+ALTER TABLE IF EXISTS ONLY web.reference_system_api DROP CONSTRAINT IF EXISTS reference_system_api_pkey;
+ALTER TABLE IF EXISTS ONLY web.reference_system_api DROP CONSTRAINT IF EXISTS reference_system_api_name_key;
 ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_pkey;
 ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_image_id_key;
 ALTER TABLE IF EXISTS ONLY web.system_log DROP CONSTRAINT IF EXISTS log_pkey;
@@ -145,6 +148,7 @@ ALTER TABLE IF EXISTS web.type_none_selectable ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.system_log ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.settings ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.reference_system_openatlas_class ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS web.reference_system_api ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.map_overlay ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.i18n ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.hierarchy_openatlas_class ALTER COLUMN id DROP DEFAULT;
@@ -182,6 +186,8 @@ DROP SEQUENCE IF EXISTS web.settings_id_seq;
 DROP TABLE IF EXISTS web.settings;
 DROP SEQUENCE IF EXISTS web.reference_system_form_id_seq;
 DROP TABLE IF EXISTS web.reference_system_openatlas_class;
+DROP SEQUENCE IF EXISTS web.reference_system_api_id_seq;
+DROP TABLE IF EXISTS web.reference_system_api;
 DROP TABLE IF EXISTS web.reference_system;
 DROP SEQUENCE IF EXISTS web.map_overlay_id_seq;
 DROP TABLE IF EXISTS web.map_overlay;
@@ -1221,7 +1227,8 @@ CREATE TABLE web.reference_system (
     identifier_example text,
     system boolean DEFAULT false NOT NULL,
     created timestamp without time zone,
-    modified timestamp without time zone DEFAULT now() NOT NULL
+    modified timestamp without time zone DEFAULT now() NOT NULL,
+    reference_system_api_name text
 );
 
 
@@ -1232,6 +1239,40 @@ ALTER TABLE web.reference_system OWNER TO openatlas;
 --
 
 COMMENT ON COLUMN web.reference_system.system IS 'True if integrated in the application. Can not be deleted or renamed in the UI.';
+
+
+--
+-- Name: reference_system_api; Type: TABLE; Schema: web; Owner: openatlas
+--
+
+CREATE TABLE web.reference_system_api (
+    id integer NOT NULL,
+    name text NOT NULL
+);
+
+
+ALTER TABLE web.reference_system_api OWNER TO openatlas;
+
+--
+-- Name: reference_system_api_id_seq; Type: SEQUENCE; Schema: web; Owner: openatlas
+--
+
+CREATE SEQUENCE web.reference_system_api_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE web.reference_system_api_id_seq OWNER TO openatlas;
+
+--
+-- Name: reference_system_api_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
+--
+
+ALTER SEQUENCE web.reference_system_api_id_seq OWNED BY web.reference_system_api.id;
 
 
 --
@@ -1714,6 +1755,13 @@ ALTER TABLE ONLY web.map_overlay ALTER COLUMN id SET DEFAULT nextval('web.map_ov
 
 
 --
+-- Name: reference_system_api id; Type: DEFAULT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.reference_system_api ALTER COLUMN id SET DEFAULT nextval('web.reference_system_api_id_seq'::regclass);
+
+
+--
 -- Name: reference_system_openatlas_class id; Type: DEFAULT; Schema: web; Owner: openatlas
 --
 
@@ -2093,6 +2141,22 @@ ALTER TABLE ONLY web.map_overlay
 
 ALTER TABLE ONLY web.map_overlay
     ADD CONSTRAINT map_overlay_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: reference_system_api reference_system_api_name_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.reference_system_api
+    ADD CONSTRAINT reference_system_api_name_key UNIQUE (name);
+
+
+--
+-- Name: reference_system_api reference_system_api_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.reference_system_api
+    ADD CONSTRAINT reference_system_api_pkey PRIMARY KEY (id);
 
 
 --
@@ -2643,6 +2707,14 @@ ALTER TABLE ONLY web.reference_system_openatlas_class
 
 ALTER TABLE ONLY web.reference_system_openatlas_class
     ADD CONSTRAINT reference_system_openatlas_class_openatlas_class_name_fkey FOREIGN KEY (openatlas_class_name) REFERENCES model.openatlas_class(name) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: reference_system reference_system_reference_system_api_name_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.reference_system
+    ADD CONSTRAINT reference_system_reference_system_api_name_fkey FOREIGN KEY (reference_system_api_name) REFERENCES web.reference_system_api(name) ON UPDATE CASCADE ON DELETE SET NULL NOT VALID;
 
 
 --
