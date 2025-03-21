@@ -488,7 +488,7 @@ def link(
         html = f'<a href="{url}"{class_}{js}{ext}>{object_}</a>'
     elif isinstance(object_, Entity) and index:
         html = link(
-            _(object_.class_.view) + (
+            _(object_.class_.view.replace('_', ' ')) + (
                 ' (' + uc_first(_(object_.class_.name)) + ')'
                 if _(object_.class_.view) == 'event' else ''),
             url_for('type_index') if object_.class_.view == 'type'
