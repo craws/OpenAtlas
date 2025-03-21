@@ -91,6 +91,7 @@ def get_table(view: str) -> tuple[Table, str]:
                 system.placeholder,
                 link(g.types[system.precision_default_id])
                 if system.precision_default_id else '',
+                system.api or '',
                 system.description])
     else:
         classes = 'place' if view == 'place' else g.view_class_mapping[view]

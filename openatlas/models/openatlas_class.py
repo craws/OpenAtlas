@@ -130,7 +130,7 @@ class OpenatlasClass:
             'reference': ['name', 'class', 'type', 'description'],
             'reference_system': [
                 'name', 'count', 'website URL', 'resolver URL', 'example ID',
-                'default precision', 'description'],
+                'default precision', 'API', 'description'],
             'source': ['name', 'type', 'description'],
             'subs': ['name', 'count', 'info'],
             'text': ['text', 'type', 'content'],

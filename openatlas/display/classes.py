@@ -256,6 +256,7 @@ class ReferenceSystemDisplay(BaseDisplay):
             self.entity.resolver_url,
             external=True)
         self.data[_('example ID')] = self.entity.placeholder
+        self.data[_('API')] = self.entity.api
 
     def add_tabs(self) -> None:
         super().add_tabs()

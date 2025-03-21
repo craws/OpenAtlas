@@ -536,6 +536,10 @@ class ReferenceSystemManager(BaseManager):
                 continue
             choices.append((class_.name, g.classes[class_.name].label))
         precision_id = str(g.reference_match_type.id)
+        if 'reference_api' not in g.settings:
+            g.settings['reference_api'] = ReferenceSystem.get_api_names()
+        api_choices = [('', '')] + [
+            (name, name) for name in  g.settings['reference_api']]
         return {
             'website_url': StringField(_('website URL'), [Optional(), URL()]),
             'resolver_url': StringField(
@@ -543,6 +547,7 @@ class ReferenceSystemManager(BaseManager):
                 [Optional(), URL()]),
             'placeholder': StringField(_('example ID')),
             precision_id: TreeField(precision_id),
+            'api': SelectField(_('API'), choices=api_choices, default=''),
             'classes': SelectMultipleField(
                 _('classes'),
                 choices=choices,
@@ -555,7 +560,9 @@ class ReferenceSystemManager(BaseManager):
             'name': self.form.name.data,
             'description': self.form.description.data,
             'website_url': self.form.website_url.data,
-            'resolver_url': self.form.resolver_url.data})
+            'resolver_url': self.form.resolver_url.data,
+            'api': self.form.api.data})
+
 
     def process_form(self) -> None:
         super().process_form()
@@ -563,6 +570,7 @@ class ReferenceSystemManager(BaseManager):
             'website_url': self.form.website_url.data,
             'resolver_url': self.form.resolver_url.data,
             'placeholder': self.form.placeholder.data,
+            'api': self.form.api.data,
             'classes': self.form.classes.data if self.form.classes else None}
 
 

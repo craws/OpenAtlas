@@ -33,7 +33,8 @@ class ReferenceSystem(Entity):
             'name': self.name,
             'website_url': data['reference_system']['website_url'],
             'resolver_url': data['reference_system']['resolver_url'],
-            'identifier_example': data['reference_system']['placeholder']})
+            'identifier_example': data['reference_system']['placeholder'],
+            'api': data['reference_system']['api'] or None})
         if data['reference_system']['classes']:
             db.add_classes(self.id, data['reference_system']['classes'])
 
@@ -55,6 +56,10 @@ class ReferenceSystem(Entity):
         return db.get_counts()
 
     @staticmethod
+    def get_api_names() -> list[str]:
+        return db.get_api_names()
+
+    @staticmethod
     def insert_system(data: dict[str, str]) -> ReferenceSystem:
         entity = Entity.insert(
             'reference_system',
@@ -64,5 +69,6 @@ class ReferenceSystem(Entity):
             'entity_id': entity.id,
             'name': entity.name,
             'website_url': data['website_url'] or None,
-            'resolver_url': data['resolver_url'] or None})
+            'resolver_url': data['resolver_url'] or None,
+            'api': data['api'] or None})
         return ReferenceSystem.get_all()[entity.id]
