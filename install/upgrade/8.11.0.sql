@@ -29,4 +29,11 @@ ALTER TABLE ONLY web.reference_system ADD CONSTRAINT reference_system_reference_
     FOREIGN KEY (reference_system_api_id) REFERENCES web.reference_system_api(id)
         ON UPDATE CASCADE ON DELETE SET NULL NOT VALID;
 
+INSERT INTO web.reference_system_api(name) VALUES
+ ('Wikidata'), ('GeoNames'), ('GND'), ('APIS');
+
+UPDATE web.reference_system SET reference_system_api_id = (SELECT id from web.reference_system_api WHERE name = 'Wikidata') WHERE name = 'Wikidata';
+UPDATE web.reference_system SET reference_system_api_id = (SELECT id from web.reference_system_api WHERE name = 'GeoNames') WHERE name = 'GeoNames';
+UPDATE web.reference_system SET reference_system_api_id = (SELECT id from web.reference_system_api WHERE name = 'GND') WHERE name = 'GND';
+
 END;
