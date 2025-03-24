@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.7c",
+    "version": "0.4.7d",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -1041,6 +1041,39 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
+    "/openapi_schema/": {
+      "get": {
+        "tags": [
+          "Administrative Endpoints"
+        ],
+        "description": "Retrieves OpenApi3 schema for this instance. Formats are `json` or `yaml`.",
+        "operationId": "openapi_schema",
+        "security": [],
+        "parameters": [
+          {
+            "name": "format",
+            "description": "Choose the format for the results.",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "json",
+                "yaml"
+              ]
+            },
+            "example": "json"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
           },
           "404": {
             "description": "Something went wrong. Please consult the error message."
