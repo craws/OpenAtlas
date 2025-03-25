@@ -816,7 +816,7 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
             keys.append(key)
         files_size = sum(paths[key]['size'] for key in keys)
     stats = shutil.disk_usage(app.config['UPLOAD_PATH'])
-    percent = {
+    percent: dict[str, int | Any] = {
         'free': 100 - math.ceil(stats.free / (stats.total / 100)),
         'project': math.ceil(files_size / (stats.total / 100)),
         'export': math.ceil(paths['export']['size'] / (files_size / 100)),
