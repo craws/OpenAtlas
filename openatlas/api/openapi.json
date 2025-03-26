@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.6a",
+    "version": "0.4.7d",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -109,6 +109,11 @@
             "$ref": "#/components/parameters/centroid"
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -142,6 +147,11 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/entityId"
+          }
+        ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
           }
         ],
         "responses": {
@@ -234,6 +244,11 @@
             "$ref": "#/components/parameters/locale"
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -309,6 +324,11 @@
           },
           {
             "$ref": "#/components/parameters/centroid"
+          }
+        ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
           }
         ],
         "responses": {
@@ -388,6 +408,11 @@
             "$ref": "#/components/parameters/centroid"
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -465,6 +490,11 @@
             "$ref": "#/components/parameters/centroid"
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -532,6 +562,11 @@
           },
           {
             "$ref": "#/components/parameters/centroid"
+          }
+        ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
           }
         ],
         "responses": {
@@ -611,6 +646,11 @@
             "$ref": "#/components/parameters/centroid"
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -688,6 +728,11 @@
             "$ref": "#/components/parameters/centroid"
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -763,6 +808,11 @@
           },
           {
             "$ref": "#/components/parameters/centroid"
+          }
+        ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
           }
         ],
         "responses": {
@@ -845,6 +895,11 @@
             "$ref": "#/components/parameters/centroid"
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -872,6 +927,11 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/download"
+          }
+        ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
           }
         ],
         "responses": {
@@ -903,6 +963,11 @@
             "$ref": "#/components/parameters/download"
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -932,6 +997,11 @@
             "$ref": "#/components/parameters/download"
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -956,6 +1026,11 @@
         ],
         "description": "Retrieves all OpenAtlas classes with their English label, CIDOC CRM mapping, view, icon and standard type ID.",
         "operationId": "Classes",
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -966,6 +1041,39 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
+    "/openapi_schema/": {
+      "get": {
+        "tags": [
+          "Administrative Endpoints"
+        ],
+        "description": "Retrieves OpenApi3 schema for this instance. Formats are `json` or `yaml`.",
+        "operationId": "openapi_schema",
+        "security": [],
+        "parameters": [
+          {
+            "name": "format",
+            "description": "Choose the format for the results.",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "json",
+                "yaml"
+              ]
+            },
+            "example": "json"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
           },
           "404": {
             "description": "Something went wrong. Please consult the error message."
@@ -986,6 +1094,11 @@
           },
           {
             "$ref": "#/components/parameters/download"
+          }
+        ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
           }
         ],
         "responses": {
@@ -1018,6 +1131,11 @@
           },
           {
             "$ref": "#/components/parameters/download"
+          }
+        ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
           }
         ],
         "responses": {
@@ -1055,6 +1173,11 @@
             "$ref": "#/components/parameters/download"
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -1084,6 +1207,11 @@
             "$ref": "#/components/parameters/download"
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -1111,6 +1239,11 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/type_id"
+          }
+        ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
           }
         ],
         "responses": {
@@ -1145,6 +1278,11 @@
             "$ref": "#/components/parameters/download"
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -1152,6 +1290,40 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SubunitsModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
+    "/chained_events/{entityId}": {
+      "get": {
+        "tags": [
+          "Proposal"
+        ],
+        "description": "Get the chain of successive events also with forks but no super or sub events if they are not in the chain.",
+        "operationId": "GetChainedEvents",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/entityId"
+          }
+        ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChainEventModel"
                 }
               }
             }
@@ -1178,6 +1350,11 @@
           },
           {
             "$ref": "#/components/parameters/count"
+          }
+        ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
           }
         ],
         "responses": {
@@ -1220,6 +1397,11 @@
             "example": "json"
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -1260,6 +1442,11 @@
                 "table"
               ]
             }
+          }
+        ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
           }
         ],
         "responses": {
@@ -1311,6 +1498,11 @@
             "$ref": "#/components/parameters/url"
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -1352,6 +1544,11 @@
             }
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -1371,6 +1568,13 @@
     }
   },
   "components": {
+    "securitySchemes": {
+      "bearerHttpAuthentication": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
     "parameters": {
       "entityId": {
         "name": "entityId",
@@ -1466,8 +1670,8 @@
             "file",
             "group",
             "human_remains",
+            "modification",
             "move",
-            "object_location",
             "person",
             "place",
             "production",
@@ -1476,7 +1680,7 @@
             "source_translation",
             "stratigraphic_unit",
             "type",
-            "tools"
+            "type_tools"
           ]
         },
         "example": "acquisition"
@@ -2183,7 +2387,6 @@
               "group",
               "human_remains",
               "move",
-              "object_location",
               "person",
               "place",
               "production",
@@ -2219,6 +2422,7 @@
               "file",
               "group",
               "human_remains",
+              "modification",
               "move",
               "person",
               "place",
@@ -2764,6 +2968,9 @@
           "description": {
             "type": "string"
           },
+          "locationId": {
+            "type": "string"
+          },
           "shapeType": {
             "type": "string",
             "enum": [
@@ -2800,6 +3007,9 @@
             "type": "string"
           },
           "description": {
+            "type": "string"
+          },
+          "locationId": {
             "type": "string"
           },
           "shapeType": {
@@ -2847,6 +3057,9 @@
             "type": "string"
           },
           "description": {
+            "type": "string"
+          },
+          "locationId": {
             "type": "string"
           },
           "shapeType": {
@@ -4098,23 +4311,28 @@
       "SystemClassCountModel": {
         "type": "object",
         "required": [
-          "move",
-          "external_reference",
-          "bibliography",
-          "person",
           "acquisition",
-          "reference_system",
-          "feature",
-          "file",
           "activity",
-          "type",
           "administrative_unit",
           "artifact",
-          "source_translation",
-          "place",
-          "stratigraphic_unit",
+          "bibliography",
+          "creation",
           "edition",
+          "external_reference",
+          "event",
+          "feature",
+          "file",
           "group",
+          "human_remains",
+          "modification",
+          "move",
+          "person",
+          "place",
+          "production",
+          "reference_system",
+          "type",
+          "source_translation",
+          "stratigraphic_unit",
           "source"
         ],
         "properties": {
@@ -5149,6 +5367,48 @@
           },
           "when": {
             "$ref": "#/components/schemas/TimeRangeModel"
+          }
+        }
+      },
+      "ChainEventModel": {
+        "type": "object",
+        "required": [
+          "name",
+          "id",
+          "system_class",
+          "geometry",
+          "children"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "system_class": {
+            "type": "string"
+          },
+          "geometry": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Polygon"
+              },
+              {
+                "$ref": "#/components/schemas/Point"
+              },
+              {
+                "$ref": "#/components/schemas/LineString"
+              },
+              {
+                "$ref": "#/components/schemas/GeometryCollection"
+              }
+            ]
+          },
+          "children": {
+            "nullable": true,
+            "$ref": "#/components/schemas/ChainEventModel"
           }
         }
       }

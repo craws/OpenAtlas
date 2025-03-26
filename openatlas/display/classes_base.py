@@ -53,10 +53,7 @@ class BaseDisplay:
         self.tabs = {'info': Tab('info')}
 
     def add_crumbs(self) -> None:
-        label = _(self.entity.class_.view.replace('_', ' '))
-        if self.entity.class_.view in ['event']:
-            label += f' ({self.entity.cidoc_class.name})'
-        self.crumbs = [[label, url_for('index', view=self.entity.class_.view)]]
+        self.crumbs = [link(self.entity, index=True)]
         if self.structure:
             for super_ in self.structure['supers']:
                 self.crumbs.append(link(super_))
@@ -261,7 +258,7 @@ class ActorDisplay(BaseDisplay):
                 'artifact', 'reference', 'file']:
             if entity.class_.name == 'group' or name != 'member':
                 self.tabs[name] = Tab(name, entity=entity)
-        self.tabs['member_of'].label = _('member of')
+        self.tabs['member_of'].label = uc_first(_('member of'))
         self.add_reference_tables_data()
         self.event_links = \
             entity.get_links(['P11', 'P14', 'P22', 'P23', 'P25'], True)
@@ -386,8 +383,10 @@ class PlaceBaseDisplay(BaseDisplay):
             self.tabs['actor'] = Tab('actor', entity=entity)
             self.tabs['feature'] = Tab('feature', entity=entity)
         elif entity.class_.name == 'feature':
-            self.tabs['stratigraphic_unit'] = \
-                Tab('stratigraphic_unit', entity=entity)
+            self.tabs['stratigraphic_unit'] = Tab(
+                'stratigraphic_unit',
+                _('stratigraphic unit'),
+                entity=entity)
         self.tabs['file'] = Tab('file', entity=entity)
         if entity.class_.view == 'place' \
                 and is_authorized('editor') \
@@ -495,7 +494,7 @@ class TypeBaseDisplay(BaseDisplay):
     entity: Type
 
     def add_crumbs(self) -> None:
-        self.crumbs = [[_('types'), url_for('type_index')]]
+        self.crumbs = [link(self.entity, index=True)]
         self.crumbs += [g.types[type_id] for type_id in self.entity.root]
         self.crumbs.append(self.entity.name)
 

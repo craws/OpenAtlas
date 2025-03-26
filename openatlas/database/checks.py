@@ -85,3 +85,16 @@ def get_invalid_links(data: dict[str, Any]) -> list[dict[str, int]]:
         """,
         data)
     return list(g.cursor)
+
+
+def check_type_count_needed(entity_id: int) -> bool:
+    g.cursor.execute(
+        """
+        SELECT id
+        FROM model.entity
+        WHERE id = %(entity_id)s
+            AND openatlas_class_name IN
+            ('administrative_unit', 'type', 'type_tools');
+        """,
+        {'entity_id': entity_id})
+    return bool(g.cursor.rowcount)

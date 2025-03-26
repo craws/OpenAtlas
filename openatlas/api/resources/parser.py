@@ -271,6 +271,7 @@ network.add_argument(
         "file",
         "group",
         "human_remains",
+        "modification",
         "move",
         "person",
         "place",
@@ -294,3 +295,12 @@ iiif.add_argument(
     type=str,
     help='{error_msg}',
     location='args')
+
+openapi = reqparse.RequestParser()
+openapi.add_argument(
+    'format',
+    type=str,
+    help='{error_msg}',
+    location='args',
+    default='json',
+    choices=('json', 'yaml'))

@@ -314,10 +314,9 @@ def get_file_info() -> dict[int, dict[str, Any]]:
         FROM model.file_info;
         """)
     return {
-        row['entity_id']: {
-            'public': row['public'],
-            'license_holder': row['license_holder'],
-            'creator': row['creator']} for row in list(g.cursor)}
+        row["entity_id"]: {
+            key: row[key] for key in ("public", "license_holder", "creator")}
+        for row in g.cursor}
 
 
 def get_subunits_without_super(classes: list[str]) -> list[int]:
@@ -396,7 +395,7 @@ def get_linked_entities_recursive(
             SELECT {first}
             FROM model.link
             WHERE {second} = %(id_)s AND property_code IN %(code)s
-            UNION
+            UNION 
                 SELECT l.{first} FROM model.link l
                 INNER JOIN items i ON
                     l.{second} = i.{first}

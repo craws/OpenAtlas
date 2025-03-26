@@ -12,6 +12,7 @@ from openatlas.display.util2 import (
     format_date, is_authorized, manual, show_table_icons, uc_first)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
+from openatlas.models.reference_system import ReferenceSystem
 
 
 @app.route('/index/<view>')
@@ -79,12 +80,12 @@ def get_table(view: str) -> tuple[Table, str]:
             _('public without license') +
             f", {format_number(stats['without_creator'])} " +
             _('public with license but without creator'))
-
     elif view == 'reference_system':
+        counts = ReferenceSystem.get_counts()
         for system in g.reference_systems.values():
             table.rows.append([
                 link(system),
-                system.count or '',
+                format_number(counts[system.id]) if counts[system.id] else '',
                 link(system.website_url, system.website_url, external=True),
                 link(system.resolver_url, system.resolver_url, external=True),
                 system.placeholder,

@@ -115,10 +115,7 @@ def file_add(id_: int, view: str) -> str | Response:
             g.view_class_mapping[view],
             [e.id for e in entity.get_linked_entities('P67')]),
         title=entity.name,
-        crumbs=[
-            [_(entity.class_.view), url_for('index', view=entity.class_.view)],
-            entity,
-            f"{_('link')} {_(view)}"])
+        crumbs=[link(entity, index=True), entity, f"{_('link')} {_(view)}"])
 
 
 @app.route('/file/convert_iiif/<int:id_>')
@@ -221,6 +218,9 @@ def logo(id_: Optional[int] = None) -> str | Response:
             link(_('set'), url_for('logo', id_=entity.id)),
             entity.name,
             link(entity.standard_type),
+            _('yes') if entity.public else None,
+            entity.creator,
+            entity.license_holder,
             entity.get_file_size(),
             entity.get_file_ext(),
             entity.description,

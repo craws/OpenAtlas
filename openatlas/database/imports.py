@@ -14,7 +14,7 @@ SQL = """
     LEFT JOIN import.entity e ON p.id = e.project_id """
 
 
-def insert_project(name: str, description: Optional[str]) -> int:
+def insert_project(name: str | None, description: str | None) -> int:
     g.cursor.execute(
         """
         INSERT INTO import.project (name, description)
@@ -59,7 +59,9 @@ def check_origin_ids(project_id: int, origin_ids: list[str]) -> list[str]:
     return [row[0] for row in list(g.cursor)]
 
 
-def get_id_from_origin_id(project_id: int, origin_id: str) -> list[str]:
+def get_id_from_origin_id(
+        project_id: int,
+        origin_id: str) -> Optional[list[int]]:
     g.cursor.execute(
         """
         SELECT entity_id FROM import.entity
@@ -79,7 +81,10 @@ def check_duplicates(class_: str, names: list[str]) -> list[str]:
     return [row[0] for row in list(g.cursor)]
 
 
-def update_project(id_: int, name: str, description: Optional[str]) -> None:
+def update_project(
+        id_: int,
+        name: str | None,
+        description: str | None) -> None:
     g.cursor.execute(
         """
         UPDATE import.project

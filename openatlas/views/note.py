@@ -50,10 +50,7 @@ def note_view(id_: int) -> str:
                 content='<h1>' + uc_first(_('note')) + f"</h1>{note['text']}",
                 buttons=buttons)},
         entity=entity,
-        crumbs=[
-            [_(entity.class_.view), url_for('index', view=entity.class_.view)],
-            link(entity),
-            _('note')])
+        crumbs=[link(entity, index=True), link(entity), _('note')])
 
 
 @app.route('/note/private/<int:id_>')
@@ -85,11 +82,7 @@ def note_insert(entity_id: int) -> str | Response:
         content='<p>' + _('notes info') + '</p>' +
         display_form(form, manual_page='tools/notes'),
         entity=entity,
-        crumbs=[
-            [_(entity.class_.view), url_for('index', view=entity.class_.view)],
-            entity,
-            '+ <span class="uc-first d-inline-block">'
-            + _('note') + '</span>'])
+        crumbs=[link(entity, index=True), entity, '+ ' + uc_first(_('note'))])
 
 
 @app.route('/note/update/<int:id_>', methods=['GET', 'POST'])
@@ -111,10 +104,7 @@ def note_update(id_: int) -> str | Response:
         'content.html',
         content=display_form(form),
         entity=entity,
-        crumbs=[
-            [_(entity.class_.view), url_for('index', view=entity.class_.view)],
-            entity,
-            _('edit note')])
+        crumbs=[link(entity, index=True), entity, _('edit note')])
 
 
 @app.route('/note/delete/<int:id_>', methods=['GET', 'POST'])

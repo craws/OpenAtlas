@@ -60,9 +60,7 @@ def process_standard_fields(manager: Any) -> None:
                         replace('(', ''). \
                         replace(')', '').strip()
                     name += f' ({inverse})'
-            if manager.entity.class_.name == 'type':
-                name = sanitize(name, 'text')
-            elif isinstance(manager.entity, ReferenceSystem) \
+            if isinstance(manager.entity, ReferenceSystem) \
                     and manager.entity.system:
                 name = manager.entity.name  # Prevent changing a system name
             manager.data['attributes']['name'] = name
@@ -98,9 +96,9 @@ def process_standard_fields(manager: Any) -> None:
                     type_id=value['precision'])
         elif key == 'public':
             manager.data['file_info'] = {
-                'public': manager.form.public.data,
-                'creator': manager.form.creator.data or None,
-                'license_holder': manager.form.license_holder.data or None}
+                'public': bool(manager.form.public.data),
+                'creator': sanitize(manager.form.creator.data),
+                'license_holder': sanitize(manager.form.license_holder.data)}
         else:  # pragma: no cover
             abort(418, f'Form error: {key}, {field_type}, value={value}')
 

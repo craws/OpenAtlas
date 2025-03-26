@@ -1,0 +1,8 @@
+id,name,description,parent_id,openatlas_parent_id
+type_1,Hydraulic Structure,,,
+type_2,Canal,,type_1,
+type_3,Dam,,type_1,
+type_4,Roads,,type_5,
+type_5,Traffic,,,
+type_6,Max height,cm,,
+type_7,Min height,cm,,

@@ -54,7 +54,7 @@ class GetEntityPresentationView(Resource):
         parser = presentation.parse_args()
         result = get_presentation_view(
             ApiEntity.get_by_id(id_, types=True, aliases=True),
-            presentation.parse_args())
+            parser)
         if parser.remove_empty_values:
             return result
         return marshal(result, presentation_template())

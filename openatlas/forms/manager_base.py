@@ -12,6 +12,7 @@ from wtforms import (
     widgets)
 from wtforms.validators import InputRequired
 
+from openatlas.display.util import link
 from openatlas.forms.add_fields import (
     add_date_fields, add_reference_systems, add_types)
 from openatlas.forms.field import (
@@ -467,8 +468,8 @@ class TypeBaseManager(BaseManager):
         getattr(self.form, str(self.get_root().id)).label.text = 'super'
 
     def get_crumbs(self) -> list[Any]:
-        self.crumbs = [[_('types'), url_for('type_index')]]
         type_ = self.origin or self.entity
+        self.crumbs = [link(type_, index=True)]
         self.crumbs += [g.types[type_id] for type_id in type_.root]
         return super().get_crumbs()
 
@@ -485,9 +486,9 @@ class TypeBaseManager(BaseManager):
         super().populate_update()
         if hasattr(self.form, 'name_inverse'):
             name_parts = self.entity.name.split(' (')
-            self.form.name.data = name_parts[0]
+            self.form.name.data = name_parts[0].strip()
             if len(name_parts) > 1:
-                self.form.name_inverse.data = name_parts[1][:-1]
+                self.form.name_inverse.data = name_parts[1][:-1].strip()
         super_ = g.types[self.entity.root[-1]]
         root = g.types[self.entity.root[0]]
         if super_.id != root.id:
