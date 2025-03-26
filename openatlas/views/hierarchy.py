@@ -28,11 +28,12 @@ def hierarchy_insert(category: str) -> str | Response:
                 category,
                 manager.form.classes.data,
                 bool(
-                    category == 'value' or
-                    (hasattr(manager.form, 'multiple')
-                     and manager.form.multiple.data)))
+                    category == 'value' or (
+                        hasattr(manager.form, 'multiple')
+                        and manager.form.multiple.data)))
             manager.process_form()
             manager.entity.update(manager.data, new=True)
+            g.logger.log_user(manager.entity.id, 'insert')
             Transaction.commit()
         except Exception as e:  # pragma: no cover
             Transaction.rollback()
@@ -68,7 +69,7 @@ def hierarchy_update(id_: int) -> str | Response:
         Transaction.begin()
         try:
             hierarchy.update_hierarchy(
-                sanitize(manager.form.name.data, 'text'),
+                sanitize(manager.form.name.data),
                 manager.form.classes.data,
                 multiple=(
                     hierarchy.category == 'value'
@@ -77,6 +78,7 @@ def hierarchy_update(id_: int) -> str | Response:
                     or has_multiple_links))
             manager.process_form()
             manager.entity.update(manager.data)
+            g.logger.log_user(manager.entity.id, 'update')
             Transaction.commit()
         except Exception as e:  # pragma: no cover
             Transaction.rollback()

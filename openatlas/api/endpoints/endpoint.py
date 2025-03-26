@@ -20,6 +20,7 @@ from openatlas.api.resources.templates import (
     linked_places_template, loud_pagination, loud_template)
 from openatlas.api.resources.util import get_location_link
 from openatlas.models.entity import Entity, Link
+from openatlas.models.gis import Gis
 
 
 class Endpoint:
@@ -42,12 +43,19 @@ class Endpoint:
             self.entities_with_links[entity.id] = {
                 'entity': entity,
                 'links': [],
-                'links_inverse': []}
+                'links_inverse': [],
+                'geometry': []}
         for link_ in self.link_parser_check():
             self.entities_with_links[link_.domain.id]['links'].append(link_)
         for link_ in self.link_parser_check(inverse=True):
             self.entities_with_links[
                 link_.range.id]['links_inverse'].append(link_)
+        for id_, geom in Gis.get_by_entities(self.entities).items():
+            self.entities_with_links[id_]['geometry'].extend(geom)
+        if self.parser.centroid:
+            for id_, geom in \
+                    Gis.get_centroids_by_entities(self.entities).items():
+                self.entities_with_links[id_]['geometry'].extend(geom)
 
     def get_pagination(self) -> None:
         total = [e.id for e in self.entities]
@@ -174,7 +182,7 @@ class Endpoint:
 
     def link_parser_check(self, inverse: bool = False) -> list[Link]:
         links = []
-        show_ = {'relations', 'types', 'depictions', 'links', 'geometry'}
+        show_ = {'relations', 'types', 'depictions', 'links'}
         if set(self.parser.show) & show_:
             links = Entity.get_links_of_entities(
                 [entity.id for entity in self.entities],
@@ -215,7 +223,7 @@ class Endpoint:
                     self.parser.get_linked_places_entity(item)
                     for item in self.entities_with_links.values()]
             case _ if self.parser.format \
-                    in app.config['RDF_FORMATS']:  # pragma: no cover
+                      in app.config['RDF_FORMATS']:  # pragma: no cover
                 entities = [
                     get_loud_entities(item, parse_loud_context())
                     for item in self.entities_with_links.values()]
@@ -223,35 +231,24 @@ class Endpoint:
 
     def get_geojson(self) -> dict[str, Any]:
         out = []
-        links = Entity.get_links_of_entities(
-            [e.id for e in self.entities],
-            'P53')
-        for e in self.entities:
-            if e.class_.view == 'place':
-                entity_links = [x for x in links if x.domain.id == e.id]
-                e.types.update(get_location_link(entity_links).range.types)
-            if geoms := [
-                    self.parser.get_geojson_dict(e, geom)
-                    for geom in self.parser.get_geom(e)]:
-                out.extend(geoms)
+        for e in self.entities_with_links.values():
+            if e['entity'].class_.view == 'place':
+                e['entity'].types.update(
+                    get_location_link(e['links']).range.types)
+            if e['geometry']:
+                for geom in e['geometry']:
+                    out.append(self.parser.get_geojson_dict(e, geom))
             else:
                 out.append(self.parser.get_geojson_dict(e))
         return {'type': 'FeatureCollection', 'features': out}
 
     def get_geojson_v2(self) -> dict[str, Any]:
         out = []
-        property_codes = ['P53', 'P74', 'OA8', 'OA9', 'P7', 'P26', 'P27']
-        link_parser = self.link_parser_check()
-        links = [x for x in link_parser if x.property.code in property_codes]
-        for e in self.entities:
-            entity_links = [
-                link_ for link_ in links if link_.domain.id == e.id]
-            if e.class_.view == 'place':
-                e.types.update(get_location_link(entity_links).range.types)
-            if geom := self.parser.get_geoms_as_collection(
-                    e,
-                    [x.range.id for x in entity_links]):
-                out.append(self.parser.get_geojson_dict(e, geom))
+        for e in self.entities_with_links.values():
+            if e['entity'].class_.view == 'place':
+                e['entity'].types.update(
+                    get_location_link(e['links']).range.types)
+            out.append(self.parser.get_geojson_dict(e))
         return {'type': 'FeatureCollection', 'features': out}
 
     def get_entities_template(self, result: dict[str, Any]) -> dict[str, Any]:
@@ -269,3 +266,30 @@ class Endpoint:
                 if not self.single:
                     template = linked_place_pagination(self.parser)
         return template
+
+    def get_chained_events(self, root_id: int) -> dict[str, Any]:
+        self.get_links_for_entities()
+        event_root = self.entities_with_links[root_id]
+        event_chain = {
+            "name": event_root['entity'].name,
+            "id": event_root['entity'].id,
+            "system_class": event_root['entity'].class_.name,
+            "geometries": event_root['geometry'],
+            "children": self.walk_event_tree(event_root['links_inverse'])}
+        return event_chain
+
+    def walk_event_tree(self, inverse_l: list[Link]) -> list[dict[str, Any]]:
+        items = []
+        for links_ in inverse_l:
+            if links_.property.code == 'P134':
+                items.append({
+                    "name": links_.domain.name,
+                    "id": links_.domain.id,
+                    "system_class": links_.domain.class_.name,
+                    "geometries":
+                        self.entities_with_links[links_.domain.id]['geometry'],
+                    "children":
+                        self.walk_event_tree(
+                            self.entities_with_links[links_.domain.id][
+                                'links_inverse'])})
+        return items

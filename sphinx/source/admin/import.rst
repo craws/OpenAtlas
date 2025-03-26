@@ -8,19 +8,23 @@ to import data directly from
 `CSV <https://en.wikipedia.org/wiki/Comma-separated_values>`_ files.
 Lists containing the following fields can be imported currently:
 
+* Origin IDs
 * Name
 * Alias
 * Description
 * Dates
 * GIS data
 * Types
+* Origin types
 * Value types
+* Origin value types
 * References
+* Origin references
 * Reference systems
 * Administrative unit
 * Historical place
-* Origin IDs
 * Place hierarchy
+* Type hierarchy
 
 Preparation
 -----------
@@ -77,8 +81,12 @@ imported and an error message will be displayed
 * **end_from** - used for dates, see :ref:`Dates import`
 * **end_to** - used for dates, see :ref:`Dates import`
 * **type_ids** - used for linking to a type, see :ref:`Types import`
-* **value_types** - used for linking to a value type, see :ref:`Value types
-  import`
+* **origin_type_ids** - used for linking to a type within the same project,
+  see :ref:`Origin types import`
+* **value_types** - used for linking to a value type,
+  see :ref:`Value types import`
+* **origin_value_types** - used for linking to a value type within the same
+  project, see :ref:`Origin value types import`
 * **reference_ids** - used for linking data to already existing references in
   the database, see :ref:`References import`
 * **origin_reference_ids** - used for linking data to already existing
@@ -139,6 +147,20 @@ can link all of the imported data to this.
 * the ID of a :doc:`/entity/type` can be found at the detail view of the
   specific :doc:`/entity/type` in your OpenAtlas instance
 
+.. _Origin types import:
+
+Origin types
+++++++++++++
+
+
+It is possible to link entities to one or multiple :doc:`/entity/type`, which
+were imported in the same project by their origin id.
+
+* Origin type IDs can be entered in the column **origin_type_ids**
+* you can enter multiple IDs, separated by a space
+* the origin ID of a :doc:`/entity/type` can be found at the detail view of the
+  specific :doc:`/entity/type` in your OpenAtlas instance
+
 .. _Value types import:
 
 Value types
@@ -149,6 +171,22 @@ when importing.
 * a Value :doc:`/entity/type` can be entered via the **value_types** column
 * type ID and corresponding value are separated by a semicolon (**;**), e.g.
   1234;-13.65
+* for each value :doc:`/entity/type` a value is required
+* multiple value type-value pairs are separated by a space
+* The ID of a value :doc:`/entity/type` can be found at the detail view of a
+  specific value :doc:`/entity/type` in your OpenAtlas instance
+
+.. _Origin value types import:
+
+Origin value types
+++++++++++++++++++
+It is possible to link entities to one or multiple origin value
+:doc:`/entity/type`, which were imported in the same project by their origin id.
+
+* a Value :doc:`/entity/type` can be entered via the **origin_value_types**
+  column
+* type ID and corresponding value are separated by a semicolon (**;**), e.g.
+  value_type_1;-13.65
 * for each value :doc:`/entity/type` a value is required
 * multiple value type-value pairs are separated by a space
 * The ID of a value :doc:`/entity/type` can be found at the detail view of a

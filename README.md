@@ -47,7 +47,7 @@ Please refer to our [contributing guidelines](CONTRIBUTING.md)
 - **Olivia Reichl** - Frontend Development
 ([Olivia.Reichl@oeaw.ac.at](mailto:Olivia.Reichl@oeaw.ac.at))
 - **Katharina Wünsche** - Frontend Development
-([Katharina Wuensche@oeaw.ac.at](mailto:Katharina Wuensche@oeaw.ac.at))
+([Katharina.Wuensche@oeaw.ac.at](mailto:Katharina.Wuensche@oeaw.ac.at))
 - **Jan Belik** - Logo Design and Design Consulting
 ([buero@janbelik.com](mailto:buero@janbelik.com))
 

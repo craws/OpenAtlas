@@ -84,7 +84,7 @@ class ApiTestCase(TestBaseCase):
                 and data['results'][0]['label'])
 
 
-class ExportImportTestCase(TestBaseCase):
+class ImportTestCase(TestBaseCase):
     def setUp(self) -> None:
         super().setUp()
         with open(

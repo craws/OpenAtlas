@@ -13,6 +13,10 @@ class EntityDoesNotExistError(Exception):
     pass
 
 
+class EntityNotAnEventError(Exception):
+    pass
+
+
 class InvalidCidocClassCodeError(Exception):
     pass
 

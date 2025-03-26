@@ -55,11 +55,14 @@ _('invalid reference id')
 _('invalid origin reference id')
 _('empty names')
 _('empty ids')
+_('empty parend id')
 _('missing name column')
 _('ids already in database')
 _('double ids in import')
 _('multiple parent ids')
 _('invalid openatlas parent id')
+_('invalid parent id')
+_('invalid parent class')
 
 
 class ProjectForm(FlaskForm):
@@ -189,7 +192,7 @@ def import_project_view(id_: int) -> str:
                 ['source'] \
                 + g.view_class_mapping['event'] \
                 + g.view_class_mapping['actor'] \
-                + ['place', 'artifact', 'bibliography', 'edition']:
+                + ['place', 'artifact', 'bibliography', 'edition', 'type']:
             buttons.append(button(
                 _(class_),
                 url_for('import_data', project_id=project.id, class_=class_)))
@@ -347,6 +350,9 @@ def check_data_for_table_representation(
             continue
         if row.get('parent_id') and row.get('openatlas_parent_id'):
             checks.set_error('multiple_parent_ids', row.get('id'))
+        if class_ == 'type' and not (
+                row.get('parent_id') or row.get('openatlas_parent_id')):
+            checks.set_error('empty_parend_id', row.get('id'))
         table_row = []
         checked_row = {}
         for item in headers:
@@ -372,33 +378,37 @@ def check_data_for_table_representation(
         for row in checked_data:
             if parent_id := row.get('parent_id'):
                 if parent_id not in origin_ids:
-                    checks.set_error('invalid parent id', row.get('id'))
+                    checks.set_error('invalid_parent_id', row.get('id'))
                 if not check_parent(
                         row['openatlas_class'].replace(' ', '_'),
                         entity_dict[row['parent_id']]):
-                    checks.set_error('invalid parent class', row.get('id'))
+                    checks.set_error('invalid_parent_class', row.get('id'))
     return Table(headers, rows=table_data)
 
 
 def check_parent(entity_class: str, parent_class: str) -> bool:
     parent_class = parent_class.lower()
+    is_parent = False
     match entity_class.lower():
         case 'feature':
             if parent_class == 'place':
-                return True
+                is_parent = True
         case 'stratigraphic_unit':
             if parent_class == 'feature':
-                return True
+                is_parent = True
         case 'artifact':
             if parent_class in g.view_class_mapping['place'] + ['artifact']:
-                return True
+                is_parent = True
         case 'human_remains':
             if (parent_class in
                     g.view_class_mapping['place'] + ['human_remains']):
-                return True
+                is_parent = True
+        case 'type':
+            if parent_class == 'type':
+                is_parent = True
         case _:
-            return False
-    return False  # pragma: no cover
+            is_parent = False
+    return is_parent
 
 
 def get_clean_header(
@@ -421,7 +431,11 @@ def get_clean_header(
 
 
 def get_allowed_columns(class_: str) -> dict[str, list[str]]:
-    columns = ['name', 'id', 'description', 'type_ids', 'value_types']
+    columns = ['name', 'id', 'description']
+    if class_ not in ['type']:
+        columns.extend([
+            'type_ids', 'value_types', 'origin_type_ids',
+            'origin_value_types'])
     if class_ not in g.view_class_mapping['reference']:
         columns.extend([
             'begin_from', 'begin_to', 'begin_comment',
@@ -431,10 +445,13 @@ def get_allowed_columns(class_: str) -> dict[str, list[str]]:
         columns.append('alias')
     if class_ in ['place', 'artifact']:
         columns.append('wkt')
-    if class_ in ['place']:
+    if class_ in ['place', 'artifact', 'type']:
         columns.extend([
-            'administrative_unit_id', 'historical_place_id', 'parent_id',
-            'openatlas_class', 'openatlas_parent_id'])
+            'parent_id', 'openatlas_parent_id'])
+    if class_ == 'place':
+        columns.extend([
+            'administrative_unit_id', 'historical_place_id',
+            'openatlas_class'])
     return {
         'allowed': columns,
         'valid': [],
@@ -453,27 +470,44 @@ def check_cell_value(
         if openatlas_class in g.classes:
             class_ = openatlas_class
     match item:
-        case 'type_ids' if value:
+        case ('type_ids' | 'origin_type_ids') if value:
             type_ids = []
             invalids_type_ids = []
+            valid_ids = []
             for type_id in str(value).split():
+                if item == 'origin_type_ids':
+                    if openatlas_id := get_id_from_origin_id(project, type_id):
+                        type_id = openatlas_id
+                    else:
+                        invalids_type_ids.append(type_id)
+                        checks.set_warning('invalid_type_origin_ids', id_)
+                type_ids.append(type_id)
                 if check_type_id(type_id, class_):
-                    type_ids.append(type_id)
+                    valid_ids.append(type_id)
                 else:
                     invalids_type_ids.append(type_id)
                     checks.set_warning('invalid_type_ids', id_)
-            for type_id in type_ids:
-                if type_id in check_single_type_duplicates(type_ids):
+            check_single_type = check_single_type_duplicates(valid_ids)
+            for type_id in valid_ids:
+                if type_id in check_single_type:
                     invalids_type_ids.append(type_id)
-                    checks.set_warning('single_type_duplicates', id_)
+                    checks.set_error('single_type_duplicates', id_)
             for i, type_id in enumerate(type_ids):
                 if type_id in invalids_type_ids:
                     type_ids[i] = error_span(type_id)
             value = ' '.join(type_ids)
-        case 'value_types' if value:
+        case ('value_types' | 'origin_value_types') if value:
             value_types = []
             for value_type in str(value).split():
                 values = str(value_type).split(';')
+                if item == 'origin_value_types':
+                    if openatlas_id := get_id_from_origin_id(
+                            project,
+                            values[0]):
+                        values[0] = openatlas_id
+                    else:
+                        checks.set_warning(
+                            'invalid_origin_value_type_ids', id_)
                 if len(values) != 2 or not values[1]:
                     value_types.append(error_span(value_type))
                     checks.set_warning('invalid_value_types', id_)
@@ -491,27 +525,42 @@ def check_cell_value(
             value = ' '.join(value_types)
         case 'reference_ids' if value:
             references = []
-            for reference in clean_reference_pages(str(value)):
-                values = str(reference).split(';')
-                if not values[0].isdigit():
-                    values[0] = error_span(values[0])
-                    checks.set_warning('invalid_reference_id', id_)
-                else:
-                    try:
-                        ApiEntity.get_by_id(int(values[0]))
-                    except EntityDoesNotExistError:
+            if clean_references := clean_reference_pages(str(value)):
+                for reference in clean_references:
+                    values = str(reference).split(';')
+                    if not values[0].isdigit():
                         values[0] = error_span(values[0])
                         checks.set_warning('invalid_reference_id', id_)
-                references.append(';'.join(values))
+                    else:
+                        try:
+                            ref = ApiEntity.get_by_id(int(values[0]))
+                            if not ref.class_.view == 'reference':
+                                raise EntityDoesNotExistError
+                        except EntityDoesNotExistError:
+                            values[0] = error_span(values[0])
+                            checks.set_warning('invalid_reference_id', id_)
+                    references.append(';'.join(values))
+            else:
+                checks.set_warning('invalid_reference_id', id_)
             value = ' '.join(references)
         case 'origin_reference_ids' if value:
             origin_references = []
-            for reference in clean_reference_pages(str(value)):
-                values = str(reference).split(';')
-                if not get_id_from_origin_id(project, values[0]):
-                    checks.set_warning('invalid_origin_reference_id', id_)
-                    values[0] = error_span(values[0])
-                origin_references.append(';'.join(values))
+            if clean_references := clean_reference_pages(str(value)):
+                for reference in clean_references:
+                    values = str(reference).split(';')
+                    if origin_id := get_id_from_origin_id(project, values[0]):
+                        ref = ApiEntity.get_by_id(int(origin_id))
+                        if not ref.class_.view == 'reference':
+                            values[0] = error_span(values[0])
+                            checks.set_warning(
+                                'invalid_origin_reference_id',
+                                id_)
+                    else:
+                        checks.set_warning('invalid_origin_reference_id', id_)
+                        values[0] = error_span(values[0])
+                    origin_references.append(';'.join(values))
+            else:
+                checks.set_warning('invalid_origin_reference_id', id_)
             value = ' '.join(origin_references)
         case 'wkt' if value:
             try:
@@ -552,8 +601,9 @@ def check_cell_value(
                 entity = Entity.get_by_id(value)
             except ImATeapot:
                 checks.set_error('invalid_parent_id', id_)
+            openatlas_class = row.get('openatlas_class') or 'type'
             if entity and not check_parent(
-                    row['openatlas_class'],
+                    openatlas_class,
                     entity.class_.label):
                 checks.set_error('invalid_parent_class', id_)
         case _ if item.startswith('reference_system_') and value:

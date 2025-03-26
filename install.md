@@ -181,29 +181,55 @@ Run tests with coverage
 
     nosetests3 -c tests/.noserc
 
-## Docker
-Be aware, the [Docker](https://www.docker.com/) installation is experimental
-and is **not** recommended for usage on a productive system.
+## Docker (Experimental)
 
-To run OpenAtlas as a Docker container clone the repository
+**Important:** The Docker installation for OpenAtlas is currently experimental and **not recommended for production environments.**
 
+To run OpenAtlas using Docker, follow these steps:
+
+1.  **Clone the Repository:**
+    ```bash
     git clone https://github.com/craws/OpenAtlas.git
+    cd OpenAtlas # Navigate into the cloned directory
+    ```
 
-Open an CLI in the directory where you cloned OpenAtlas and run
+2.  **Set Environment Variables:**
+    * Create a `.env` file in the same directory as the `docker-compose.yaml` file to store your database credentials.
+    * Use the following command to create the file and add the necessary variables:
+        ```bash
+        echo "POSTGRES_DB=openatlas\nPOSTGRES_PASSWORD=openatlas" > .env
+        ```
 
-    docker compose up --detach
+3.  **Start the Docker Containers:**
+    * In your terminal, within the OpenAtlas directory, run the following command to start the containers in detached mode (running in the background):
+        ```bash
+        docker compose up --detach
+        ```
 
-After the containers are build an OpenAtlas instance is available under
-**localhost:8080**.
+4.  **Access OpenAtlas:**
+    * Once the containers are built and running, OpenAtlas will be accessible at `http://localhost:8080`.
 
-Login with username **OpenAtlas** and password **change_me_PLEASE!** and change
-the password in your profile. You may want to check the admin area to set up
-default site settings, email and similar.
+5.  **Initial Login and Setup:**
+    * Log in using the default username: `OpenAtlas` and password: `change_me_PLEASE!`.
+    * **Immediately change the default password** in your user profile.
 
-### Restore database dump
-To restore a database SQL dump uncomment following command in
-./docker-compose.yml and modify the first path. Make sure that no previous
-database is installed (e.g. delete ./data/db/), as the dump will not be
-executed.
+### Restoring a Database Dump
 
-    - ./files/export/dump.sql:/docker-entrypoint-initdb.d/dump.sql
+To restore a database SQL dump:
+
+1.  **Uncomment and Modify:**
+    * Open the `docker-compose.yml` file.
+    * Uncomment the following line and modify the first path to point to your SQL dump file:
+        ```yaml
+        - ./files/export/dump.sql:/docker-entrypoint-initdb.d/dump.sql
+        ```
+        * Replace `./files/export/dump.sql` with the actual path to your `dump.sql` file on your local machine.
+
+2.  **Ensure Clean Database:**
+    * **Important:** Make sure no previous database is installed. For example, delete the `./data/db/` directory if it exists. The dump will only be executed when the database is initially created.
+
+3.  **Restart Docker Compose:**
+    * After modifying `docker-compose.yml`, restart the Docker containers:
+        ```bash
+        docker compose up --force-recreate --detach
+        ```

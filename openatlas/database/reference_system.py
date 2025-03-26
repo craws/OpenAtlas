@@ -7,7 +7,8 @@ def get_all() -> list[dict[str, Any]]:
     g.cursor.execute(
         """
         SELECT
-            e.id, e.name,
+            e.id,
+            e.name,
             e.cidoc_class_code,
             e.description,
             e.openatlas_class_name,
@@ -17,17 +18,13 @@ def get_all() -> list[dict[str, Any]]:
             rs.resolver_url,
             rs.identifier_example,
             rs.system,
-            COUNT(l.id) AS count,
             array_to_json(
                 array_agg((t.range_id, t.description))
                     FILTER (WHERE t.range_id IS NOT NULL)
             ) AS types
         FROM model.entity e
         JOIN web.reference_system rs ON e.id = rs.entity_id
-        LEFT JOIN model.link l ON e.id = l.domain_id
-            AND l.property_code = 'P67'
-        LEFT JOIN model.link t ON e.id = t.domain_id
-            AND t.property_code = 'P2'
+        LEFT JOIN model.link t ON e.id = t.domain_id AND t.property_code = 'P2'
         GROUP BY
             e.id,
             e.name,
@@ -43,6 +40,18 @@ def get_all() -> list[dict[str, Any]]:
             rs.entity_id;
         """)
     return list(g.cursor)
+
+
+def get_counts() -> dict[str, int]:
+    g.cursor.execute(
+        """
+        SELECT e.id, COUNT(l.id) AS count
+        FROM model.entity e
+        LEFT JOIN model.link l ON e.id = l.domain_id
+            AND l.property_code = 'P67'
+        GROUP BY e.id;
+        """)
+    return {row['id']: row['count'] for row in list(g.cursor)}
 
 
 def add_classes(entity_id: int, class_names: list[str]) -> None:

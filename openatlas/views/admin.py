@@ -128,7 +128,7 @@ def get_content_table() -> str:
     for item, languages in get_content().items():
         content = [_(item)]
         for language in app.config['LANGUAGES']:
-            content.append(sanitize(languages[language], 'text'))
+            content.append(sanitize(languages[language]))
         content.append(link(_('edit'), url_for('admin_content', item=item)))
         table.rows.append(content)
     return table.display()
@@ -345,7 +345,7 @@ def settings(category: str) -> str | Response:
             if field.type == 'BooleanField':
                 value = 'True' if field.data else ''
             if isinstance(value, str):
-                value = value.strip()
+                value = sanitize(value) if value else ''
             data[field.name] = value
         Transaction.begin()
         try:
@@ -358,7 +358,8 @@ def settings(category: str) -> str | Response:
             g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(redirect_url)
-    set_form_settings(form)
+    if request.method == 'GET':
+        set_form_settings(form)
     manual_page = f"admin/{category.replace('frontend', 'presentation_site')}"
     return render_template(
         'content.html',

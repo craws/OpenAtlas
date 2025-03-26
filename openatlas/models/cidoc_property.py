@@ -16,7 +16,7 @@ class CidocProperty:
         self.comment = data['comment']
         self.domain_class_code = data['domain_class_code']
         self.range_class_code = data['range_class_code']
-        self.count = data['count']
+        self.count = data['count'] if 'count' in data else None
         self.sub: list[int] = []
         self.super: list[int] = []
         self.i18n: dict[str, str] = {}
@@ -46,9 +46,12 @@ class CidocProperty:
         return False
 
     @staticmethod
-    def get_all(language: str) -> dict[str, CidocProperty]:
+    def get_all(
+            language: str,
+            with_count: bool = False) -> dict[str, CidocProperty]:
         properties = {
-            row['code']: CidocProperty(row) for row in db.get_properties()}
+            row['code']:
+                CidocProperty(row) for row in db.get_properties(with_count)}
         for row in db.get_hierarchy():
             properties[row['super_code']].sub.append(row['sub_code'])
             properties[row['sub_code']].super.append(row['super_code'])

@@ -52,8 +52,7 @@ class GetEntityPresentationView(Resource):
     def get(id_: int) -> tuple[Resource, int] | Response | dict[str, Any]:
         return marshal(
             get_presentation_view(
-                ApiEntity.get_by_id(id_, types=True, aliases=True),
-                entity_.parse_args()),
+                ApiEntity.get_by_id(id_, types=True, aliases=True)),
             presentation_template())
 
 

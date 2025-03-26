@@ -5,10 +5,9 @@ from typing import Any
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.api.endpoints.parser import Parser
 from openatlas.api.formats.linked_places import get_lp_time
 from openatlas.api.resources.util import (
-    get_crm_relation_x, get_geojson_geometries, get_geometric_collection,
+    get_crm_relation_x, geometry_to_geojson,
     get_iiif_manifest_and_path, get_license_name, get_location_link,
     get_reference_systems, get_value_for_types, to_camel_case)
 from openatlas.display.util import get_file_path
@@ -21,7 +20,7 @@ def get_presentation_types(
         links: list[Link]) -> list[dict[str, Any]]:
     types = []
     location_types = {}
-    if entity.class_.view in ['place', 'artifact']:
+    if entity.class_.view == 'place':
         location_types = get_location_link(links).range.types
     for type_ in entity.types | location_types:
         is_standard = False
@@ -80,7 +79,7 @@ def get_relation_types_dict(
         'when': get_lp_time(link_)}
 
 
-def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
+def get_presentation_view(entity: Entity) -> dict[str, Any]:
     ids = [entity.id]
     if entity.class_.view in ['place', 'artifact']:
         entity.location = entity.get_linked_entity_safe('P53')
@@ -99,29 +98,21 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
 
     excluded = app.config['API_PRESENTATION_EXCLUDE_RELATION']
 
-    related_entities = []
+    related_entities: list[Entity] = []
     exists: set[int] = set()
-    geometric_entities = []
     relation_types = defaultdict(list)
     for l in links + event_links:
         if l.range.class_.name in excluded or l.range.id in exists:
             continue
-        if l.range.class_.view in ['place', 'artifact']:
-            geometric_entities.append(l.range.id)
         related_entities.append(l.range)
         relation_types[l.range.id].append(get_relation_types_dict(l, True))
     for l in links_inverse:
         if l.domain.class_.name in excluded or l.domain.id in exists:
             continue
-        if l.domain.class_.view in ['place', 'artifact']:
-            geometric_entities.append(l.domain.id)
         related_entities.append(l.domain)
         relation_types[l.domain.id].append(get_relation_types_dict(l))
 
-    geoms: Any = {}
-    if geometric_entities:
-        geoms = Gis.get_by_place_ids(geometric_entities)
-
+    geoms = Gis.get_by_entities(related_entities + [entity])
     relations = defaultdict(list)
     for rel_entity in related_entities:
         standard_type = {}
@@ -129,27 +120,23 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
             standard_type = {
                 'id': rel_entity.standard_type.id,
                 'title': rel_entity.standard_type.name}
-        geometries = {}
-        if geoms.get(rel_entity.id):
-            geometries = get_geojson_geometries(geoms[rel_entity.id])
         relations[rel_entity.class_.name].append({
             'id': rel_entity.id,
             'systemClass': rel_entity.class_.name,
             'title': rel_entity.name,
             'description': rel_entity.description,
             'aliases': list(rel_entity.aliases.values()),
-            'geometries': geometries,
+            'geometries': geometry_to_geojson(geoms.get(rel_entity.id)),
             'when': get_lp_time(rel_entity),
             'standardType': standard_type,
             'relationTypes': relation_types[rel_entity.id]})
-
     data = {
         'id': entity.id,
         'systemClass': entity.class_.name,
         'title': entity.name,
         'description': entity.description,
         'aliases': list(entity.aliases.values()),
-        'geometries': get_geometric_collection(entity, links, parser),
+        'geometries': geometry_to_geojson(geoms.get(entity.id)),
         'when': get_lp_time(entity),
         'types': get_presentation_types(entity, links),
         'externalReferenceSystems': get_reference_systems(links_inverse),

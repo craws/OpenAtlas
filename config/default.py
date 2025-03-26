@@ -3,7 +3,7 @@ from pathlib import Path
 
 from config.database_versions import DATABASE_VERSIONS
 
-VERSION = '8.10.1'
+VERSION = '8.11.0'
 DATABASE_VERSION = DATABASE_VERSIONS[0]
 DEMO_MODE = False  # If activated some options are disabled, login is prefilled
 DEBUG = False
@@ -70,3 +70,5 @@ LOAD_WINDOWS_TEST_SQL = False
 # External APIs
 API_WIKIDATA = 'https://www.wikidata.org/w/api.php'
 API_GEONAMES = 'http://api.geonames.org/get'
+
+CSP_HEADER = "frame-ancestors 'self'"

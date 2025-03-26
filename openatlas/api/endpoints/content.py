@@ -1,10 +1,13 @@
-from flask import Response, g, session
+import json
+
+import yaml
+from flask import Response, g, make_response, session
 from flask_restful import Resource, marshal
 
 from openatlas import app
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.error import NotATypeError
-from openatlas.api.resources.parser import default, entity_, locale
+from openatlas.api.resources.parser import default, entity_, locale, openapi
 from openatlas.api.resources.resolve_endpoints import download
 from openatlas.api.resources.templates import (
     backend_details_template, class_mapping_template, class_overview_template,
@@ -95,3 +98,21 @@ class SystemClassCount(Resource):
         else:
             overview = ApiEntity.get_overview_counts()
         return marshal(overview, overview_template()), 200
+
+
+class GetOpenAPISchema(Resource):
+    @staticmethod
+    def get() -> tuple[Resource, int] | Response:
+        with open(
+                app.config['OPENAPI_INSTANCE_FILE'],
+                'r',
+                encoding='utf-8') as file:
+            data = json.load(file)
+        parser = openapi.parse_args()['format']
+        if parser == 'yaml':
+            data = yaml.dump(data)
+        response = make_response(data)
+        response.headers["Content-Disposition"] = \
+            f"attachment; filename=openapi.{parser}"
+        response.headers["Content-Type"] = f"application/{parser}"
+        return response

@@ -119,7 +119,7 @@ class OpenatlasClass:
             'event': ['name', 'class', 'type', 'begin', 'end', 'description'],
             'external_reference': ['name', 'class', 'type', 'description'],
             'file': [
-                'name', 'license', 'public', 'creator', 'license_holder',
+                'name', 'license', 'public', 'creator', 'license holder',
                 'size', 'extension', 'description'],
             'member': ['member', 'function', 'first', 'last', 'description'],
             'member_of': [

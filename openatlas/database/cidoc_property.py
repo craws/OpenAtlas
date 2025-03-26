@@ -3,26 +3,29 @@ from typing import Any
 from flask import g
 
 
-def get_properties() -> list[dict[str, Any]]:
+def get_properties(with_count: bool = False) -> list[dict[str, Any]]:
+
     g.cursor.execute(
-        """
+        f"""
         SELECT
             p.code,
             p.comment,
             p.domain_class_code,
             p.range_class_code,
             p.name,
-            p.name_inverse,
-            COUNT(l.id) AS count
+            p.name_inverse
+            {', COUNT(l.id) AS count' if with_count else ''}
         FROM model.property p
-        LEFT JOIN model.link l ON p.code = l.property_code
-        GROUP BY (
-            p.code,
-            p.comment,
-            p.domain_class_code,
-            p.range_class_code,
-            p.name,
-            p.name_inverse);
+            {'''
+            LEFT JOIN model.link l ON p.code = l.property_code
+            GROUP BY (
+                p.code,
+                p.comment,
+                p.domain_class_code,
+                p.range_class_code,
+                p.name,
+                p.name_inverse)''' if with_count else ''}
+        ;
         """)
     return list(g.cursor)
 

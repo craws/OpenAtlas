@@ -263,7 +263,7 @@ def get_note_by_id(id_: int) -> dict[str, Any]:
 def insert_note(
         user_id: int,
         entity_id: int,
-        note: str,
+        note: str | None,
         public: bool) -> None:
     g.cursor.execute(
         """
@@ -276,7 +276,7 @@ def insert_note(
             'public': public})
 
 
-def update_note(id_: int, note: str, public: bool) -> None:
+def update_note(id_: int, note: str | None, public: bool) -> None:
     g.cursor.execute(
         """
         UPDATE web.user_notes
