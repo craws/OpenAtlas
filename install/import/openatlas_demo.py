@@ -1,4 +1,6 @@
 # Used to join data from OpenAtlas projects to the demo version
+# Before running the script make sure you have configured the db to write to in
+# instance/production.py
 
 import time
 from typing import Any
@@ -11,12 +13,7 @@ from openatlas import app
 from openatlas.database.imports import import_data
 from openatlas.models.entity import Entity
 
-DATABASE_NAME = 'openatlas_demo'
-DATABASE_USER = 'openatlas'
-DATABASE_PORT = '5432'
-DATABASE_HOST = 'localhost'
-DATABASE_PASS = "CHANGE ME"
-
+DATABASE_NAME = 'openatlas_demo'  # The database to fetch data from
 PROJECT_ID = 1
 IMPORT_USER_ID = 2
 
@@ -24,10 +21,10 @@ IMPORT_USER_ID = 2
 def connect() -> Any:
     return psycopg2.connect(
         database=DATABASE_NAME,
-        user=DATABASE_USER,
-        password=DATABASE_PASS,
-        port=DATABASE_PORT,
-        host=DATABASE_HOST)
+        user=app.config['DATABASE_USER'],
+        password=app.config['DATABASE_PASS'],
+        port=app.config['DATABASE_PORT'],
+        host=app.config['DATABASE_HOST'])
 
 
 start = time.time()
