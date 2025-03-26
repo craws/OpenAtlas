@@ -2,6 +2,13 @@
 # Before running the script make sure you have configured the db to write to in
 # instance/production.py
 
+# This is work in progress: to do
+# * Import hierarchies, map the ones that already exist
+# * Import types, map the ones that already exist
+# * What about place locations?
+# * Link everything
+# * What about files?
+
 import time
 from typing import Any
 
@@ -12,6 +19,7 @@ from psycopg2 import extras
 from openatlas import app
 from openatlas.database.imports import import_data
 from openatlas.models.entity import Entity
+from openatlas.models.type import Type
 
 DATABASE_NAME = 'openatlas_demo'  # The database to fetch data from
 PROJECT_ID = 1
@@ -48,7 +56,33 @@ def cleanup():
             {'project_id': PROJECT_ID})
 
 
+def hierarchies():
+    cursor.execute(
+        """
+        SELECT
+            id,
+            name,
+            multiple,
+            directional,
+            created,
+            modified,
+            category,
+            required
+        FROM web.hierarchy;
+        """)
+    with app.test_request_context():
+        app.preprocess_request()
+        for item in list(cursor):
+            try:
+                if existing := Type.get_hierarchy(item['name']):
+                    print(f'Hierarchy exists: {existing.name}')
+            except:
+                print(f"New hierarchy: {item['name']}")
+
+
 cleanup()
+hierarchies()
+
 cursor.execute(
     """
     SELECT
@@ -72,7 +106,6 @@ with app.test_request_context():
     for row in list(cursor):
         if row['openatlas_class_name'] not in [
                 'administrative_unit',
-                'object_location',
                 'type',
                 'type_tools']:
             entity = Entity.insert(
