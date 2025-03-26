@@ -476,7 +476,8 @@ def link(
         class_: Optional[str] = '',
         uc_first_: Optional[bool] = True,
         js: Optional[str] = None,
-        external: bool = False) -> str:
+        external: bool = False,
+        index: bool = False) -> str:
     html = ''
     if isinstance(object_, (str, LazyString)):
         js = f' onclick="{js}"' if js else ''
@@ -485,6 +486,13 @@ def link(
             object_ = uc_first(object_)
         class_ = f' class="{class_.strip()}"' if class_ else ''
         html = f'<a href="{url}"{class_}{js}{ext}>{object_}</a>'
+    elif isinstance(object_, Entity) and index:
+        html = link(
+            _(object_.class_.view.replace('_', ' ')) + (
+                ' (' + uc_first(_(object_.class_.name)) + ')'
+                if _(object_.class_.view) == 'event' else ''),
+            url_for('type_index') if object_.class_.view == 'type'
+            else url_for('index', view=object_.class_.view))
     elif isinstance(object_, Entity):
         html = link(
             object_.name,

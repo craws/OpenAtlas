@@ -7,7 +7,7 @@ from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.database.connect import Transaction
-from openatlas.display.util import required_group
+from openatlas.display.util import link, required_group
 from openatlas.forms.display import display_form
 from openatlas.forms.form import (
     get_add_reference_form, get_manager, get_table_form)
@@ -37,10 +37,7 @@ def link_insert(id_: int, view: str) -> str | Response:
             g.view_class_mapping[view],
             [e.id for e in entity.get_linked_entities('P67')]),
         title=_(entity.class_.view),
-        crumbs=[
-            [_(entity.class_.view), url_for('index', view=entity.class_.view)],
-            entity,
-            _('link')])
+        crumbs=[link(entity, index=True), entity, _('link')])
 
 
 @app.route('/link/update/<int:id_>/<int:origin_id>', methods=['GET', 'POST'])
@@ -78,7 +75,7 @@ def link_update(id_: int, origin_id: int) -> str | Response:
         'content.html',
         content=display_form(manager.form),
         crumbs=[
-            [_(origin.class_.view), url_for('index', view=origin.class_.view)],
+            link(origin, index=True),
             origin,
             domain if origin.id != domain.id else range_,
             _('edit')])
@@ -117,10 +114,7 @@ def insert_relation(type_: str, origin_id: int) -> str | Response:
         'content.html',
         content=display_form(manager.form),
         origin=origin,
-        crumbs=[
-            [_(origin.class_.view), url_for('index', view=origin.class_.view)],
-            origin,
-            _(type_)])
+        crumbs=[link(origin, index=True), origin, _(type_)])
 
 
 def reference_link_update(link_: Link, origin: Entity) -> str | Response:
@@ -142,7 +136,7 @@ def reference_link_update(link_: Link, origin: Entity) -> str | Response:
         'content.html',
         content=display_form(form),
         crumbs=[
-            [_(origin.class_.view), url_for('index', view=origin.class_.view)],
+            link(origin, index=True),
             origin,
             link_.domain if link_.domain.id != origin.id else link_.range,
             _('edit')])
@@ -164,10 +158,7 @@ def reference_add(id_: int, view: str) -> str | Response:
         'content.html',
         content=display_form(form),
         title=_('reference'),
-        crumbs=[
-            [_('reference'), url_for('index', view='reference')],
-            reference,
-            _('link')])
+        crumbs=[link(reference, index=True), reference, _('link')])
 
 
 @app.route('/add/subunit/<int:super_id>', methods=['GET', 'POST'])
@@ -190,10 +181,7 @@ def add_subunit(super_id: int) -> str | Response:
             [super_.id] + get_subunits_without_super(classes)),
         entity=super_,
         title=super_.name,
-        crumbs=[
-            [_(super_.class_.view), url_for('index', view=super_.class_.view)],
-            super_,
-            _('add subunit')])
+        crumbs=[link(super_, index=True), super_, _('add subunit')])
 
 
 @app.route('/entity/add/file/<int:id_>', methods=['GET', 'POST'])
@@ -213,10 +201,7 @@ def entity_add_file(id_: int) -> str | Response:
             [e.id for e in entity.get_linked_entities('P67', inverse=True)]),
         entity=entity,
         title=entity.name,
-        crumbs=[
-            [_(entity.class_.view), url_for('index', view=entity.class_.view)],
-            entity,
-            f"{_('link')} {_('file')}"])
+        crumbs=[link(entity, index=True), entity, f"{_('link')} {_('file')}"])
 
 
 @app.route('/entity/add/source/<int:id_>', methods=['GET', 'POST'])
@@ -237,9 +222,9 @@ def entity_add_source(id_: int) -> str | Response:
             [e.id for e in entity.get_linked_entities('P67', inverse=True)]),
         title=entity.name,
         crumbs=[
-            [_(entity.class_.view), url_for('index', view=entity.class_.view)],
+            link(entity, index=True),
             entity,
-            f"{_('link')} {_('source')}"])
+            _('link') + ' ' + _('source')])
 
 
 @app.route('/entity/add/reference/<int:id_>', methods=['GET', 'POST'])
@@ -260,6 +245,6 @@ def entity_add_reference(id_: int) -> str | Response:
         content=display_form(form),
         entity=entity,
         crumbs=[
-            [_(entity.class_.view), url_for('index', view=entity.class_.view)],
+            link(entity, index=True),
             entity,
-            f"{_('link')} {_('reference')}"])
+            _('link') + ' ' + _('reference')])

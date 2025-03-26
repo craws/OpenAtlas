@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.7b",
+    "version": "0.4.7d",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -109,6 +109,11 @@
             "$ref": "#/components/parameters/centroid"
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -142,6 +147,11 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/entityId"
+          }
+        ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
           }
         ],
         "responses": {
@@ -234,6 +244,11 @@
             "$ref": "#/components/parameters/locale"
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -309,6 +324,11 @@
           },
           {
             "$ref": "#/components/parameters/centroid"
+          }
+        ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
           }
         ],
         "responses": {
@@ -388,6 +408,11 @@
             "$ref": "#/components/parameters/centroid"
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -465,6 +490,11 @@
             "$ref": "#/components/parameters/centroid"
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -532,6 +562,11 @@
           },
           {
             "$ref": "#/components/parameters/centroid"
+          }
+        ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
           }
         ],
         "responses": {
@@ -611,6 +646,11 @@
             "$ref": "#/components/parameters/centroid"
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -688,6 +728,11 @@
             "$ref": "#/components/parameters/centroid"
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -763,6 +808,11 @@
           },
           {
             "$ref": "#/components/parameters/centroid"
+          }
+        ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
           }
         ],
         "responses": {
@@ -845,6 +895,11 @@
             "$ref": "#/components/parameters/centroid"
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -872,6 +927,11 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/download"
+          }
+        ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
           }
         ],
         "responses": {
@@ -903,6 +963,11 @@
             "$ref": "#/components/parameters/download"
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -932,6 +997,11 @@
             "$ref": "#/components/parameters/download"
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -956,6 +1026,11 @@
         ],
         "description": "Retrieves all OpenAtlas classes with their English label, CIDOC CRM mapping, view, icon and standard type ID.",
         "operationId": "Classes",
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -966,6 +1041,39 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
+    "/openapi_schema/": {
+      "get": {
+        "tags": [
+          "Administrative Endpoints"
+        ],
+        "description": "Retrieves OpenApi3 schema for this instance. Formats are `json` or `yaml`.",
+        "operationId": "openapi_schema",
+        "security": [],
+        "parameters": [
+          {
+            "name": "format",
+            "description": "Choose the format for the results.",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "json",
+                "yaml"
+              ]
+            },
+            "example": "json"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
           },
           "404": {
             "description": "Something went wrong. Please consult the error message."
@@ -986,6 +1094,11 @@
           },
           {
             "$ref": "#/components/parameters/download"
+          }
+        ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
           }
         ],
         "responses": {
@@ -1018,6 +1131,11 @@
           },
           {
             "$ref": "#/components/parameters/download"
+          }
+        ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
           }
         ],
         "responses": {
@@ -1055,6 +1173,11 @@
             "$ref": "#/components/parameters/download"
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -1084,6 +1207,11 @@
             "$ref": "#/components/parameters/download"
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -1111,6 +1239,11 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/type_id"
+          }
+        ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
           }
         ],
         "responses": {
@@ -1145,6 +1278,11 @@
             "$ref": "#/components/parameters/download"
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -1172,6 +1310,11 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/entityId"
+          }
+        ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
           }
         ],
         "responses": {
@@ -1207,6 +1350,11 @@
           },
           {
             "$ref": "#/components/parameters/count"
+          }
+        ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
           }
         ],
         "responses": {
@@ -1249,6 +1397,11 @@
             "example": "json"
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -1289,6 +1442,11 @@
                 "table"
               ]
             }
+          }
+        ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
           }
         ],
         "responses": {
@@ -1340,6 +1498,11 @@
             "$ref": "#/components/parameters/url"
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -1381,6 +1544,11 @@
             }
           }
         ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -1400,6 +1568,13 @@
     }
   },
   "components": {
+    "securitySchemes": {
+      "bearerHttpAuthentication": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
     "parameters": {
       "entityId": {
         "name": "entityId",

@@ -58,10 +58,7 @@ def annotation_image_insert(id_: int) -> str | Response:
                 buttons=[manual('tools/image_annotation')],
                 form=form)},
         entity=image,
-        crumbs=[
-            [_('file'), url_for('index', view='file')],
-            image,
-            _('annotate')])
+        crumbs=[link(image, index=True), image, _('annotate')])
 
 
 @app.route('/annotation_image_update/<int:id_>', methods=['GET', 'POST'])

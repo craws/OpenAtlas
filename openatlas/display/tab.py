@@ -29,7 +29,7 @@ class Tab:
             tooltip: Optional[str] = None) -> None:
 
         self.name = name
-        self.label = uc_first(label or _(name))
+        self.label = uc_first(label or _(name.replace('_', ' ')))
         self.content = content
         self.entity = entity
         self.form = form

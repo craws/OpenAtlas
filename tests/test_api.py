@@ -113,6 +113,8 @@ class Api(ApiTestCase):
         assert rv.get_json()['P2']['name'] == 'a pour type'
         rv = c.get(url_for('api_04.backend_details')).get_json()
         assert rv['version'] == app.config['VERSION']
+        rv = c.get(url_for('api_04.openapi_schema', format='yaml'))
+        assert b'OpenAtlas API' in rv.data
         rv = c.get(url_for('api_04.backend_details', download=True)).get_json()
         assert rv['version'] == app.config['VERSION']
         rv = c.get(url_for('api_04.system_class_count')).get_json()

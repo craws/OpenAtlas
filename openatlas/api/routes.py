@@ -1,5 +1,6 @@
 from openatlas.api.endpoints.content import (
-    ClassMapping, Classes, GetBackendDetails, GetProperties, SystemClassCount)
+    ClassMapping, Classes, GetBackendDetails, GetOpenAPISchema, GetProperties,
+    SystemClassCount)
 from openatlas.api.endpoints.display_image import (
     DisplayImage, LicensedFileOverview)
 from openatlas.api.endpoints.entities import (
@@ -44,7 +45,8 @@ admin = [
     [GetProperties, '/properties/', 'properties'],
     [LicensedFileOverview, '/licensed_file_overview/',
      'licensed_file_overview'],
-    [Classes, '/classes/', 'classes']]
+    [Classes, '/classes/', 'classes'],
+    [GetOpenAPISchema, '/openapi_schema/', 'openapi_schema']]
 
 types = [
     [GetTypeByViewClass, '/type_by_view_class/', 'type_by_view_class'],
