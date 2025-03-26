@@ -126,7 +126,7 @@ def admin_index() -> str:
 def get_content_table() -> str:
     table = Table(['name'] + list(app.config['LANGUAGES']))
     for item, languages in get_content().items():
-        content = [_(item)]
+        content = [uc_first(_(item))]
         for language in app.config['LANGUAGES']:
             content.append(sanitize(languages[language]))
         content.append(link(_('edit'), url_for('admin_content', item=item)))
@@ -344,8 +344,6 @@ def settings(category: str) -> str | Response:
                 value = ' '.join(set(filter(None, field.data)))
             if field.type == 'BooleanField':
                 value = 'True' if field.data else ''
-            if isinstance(value, str):
-                value = sanitize(value) if value else ''
             data[field.name] = value
         Transaction.begin()
         try:
