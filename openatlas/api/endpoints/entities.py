@@ -4,6 +4,7 @@ from flask import Response, g
 from flask_restful import Resource, marshal
 
 from openatlas.api.endpoints.endpoint import Endpoint
+from openatlas.api.endpoints.parser import Parser
 from openatlas.api.formats.presentation_view import get_presentation_view
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.error import (
@@ -51,7 +52,7 @@ class GetEntitiesLinkedToEntity(Resource):
 class GetEntityPresentationView(Resource):
     @staticmethod
     def get(id_: int) -> tuple[Resource, int] | Response | dict[str, Any]:
-        parser = presentation.parse_args()
+        parser = Parser(presentation.parse_args())
         result = get_presentation_view(
             ApiEntity.get_by_id(id_, types=True, aliases=True),
             parser)

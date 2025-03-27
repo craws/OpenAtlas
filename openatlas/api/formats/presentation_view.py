@@ -126,11 +126,12 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
     geoms = Gis.get_by_entities(related_entities + [entity])
     relations = defaultdict(list)
     for rel_entity in related_entities:
-        standard_type = {}
+        standard_type_ = {}
         if rel_entity.standard_type:
-            standard_type = {
+            standard_type_ = {
                 'id': rel_entity.standard_type.id,
                 'title': rel_entity.standard_type.name}
+
 
         relation_dict= {
             'id': rel_entity.id,
@@ -140,7 +141,7 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
             'aliases': list(rel_entity.aliases.values()),
             'geometries': geometry_to_geojson(geoms.get(rel_entity.id)),
             'when': get_presentation_time(rel_entity),
-            'standardType': standard_type,
+            'standardType': standard_type_,
             'relationTypes': relation_types[rel_entity.id]}
         if parser.remove_empty_values:
             relation_dict = {k: v for k, v in relation_dict.items() if v}

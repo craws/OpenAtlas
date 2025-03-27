@@ -318,6 +318,15 @@ class Api(ApiTestCase):
         assert rv['title'] == actor.name
         assert rv['relations']['activity']
 
+        rv = c.get(
+            url_for(
+            'api_04.entity_presentation_view',
+                id_=event.id,
+                remove_empty_values='true'))
+        rv = rv.get_json()
+        assert rv['id'] == event.id
+        assert rv['title'] == event.name
+
         for rv in [
             c.get(url_for('api_04.cidoc_class', class_='E21')),
             c.get(
