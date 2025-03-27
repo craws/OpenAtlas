@@ -109,5 +109,3 @@ def get_lp_time(entity: Entity | Link) -> Optional[dict[str, Any]]:
             'earliest': date_to_str(entity.end_from),
             'latest': date_to_str(entity.end_to),
             'comment': entity.end_comment}}
-
-

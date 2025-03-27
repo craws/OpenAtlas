@@ -8,7 +8,6 @@ from flask import g, url_for
 
 from openatlas import app
 from openatlas.api.endpoints.parser import Parser
-from openatlas.api.formats.linked_places import get_lp_time
 from openatlas.api.resources.util import (
     date_to_str, get_crm_relation_x, geometry_to_geojson,
     get_iiif_manifest_and_path, get_license_name, get_location_link,
@@ -86,6 +85,7 @@ def get_relation_types_dict(
         relation_types = {k: v for k, v in relation_types.items() if v}
     return relation_types
 
+
 def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
     ids = [entity.id]
     if entity.class_.view in ['place', 'artifact']:
@@ -99,7 +99,8 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
             l.range.id for l in links if l.domain.class_.view == 'event']
     else:
         event_ids = [
-            l.domain.id for l in links_inverse if l.domain.class_.view == 'event']
+            l.domain.id for l in links_inverse
+            if l.domain.class_.view == 'event']
     event_links = []
     if event_ids:
         event_links = Entity.get_links_of_entities(
@@ -116,7 +117,8 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         if l.range.class_.name in excluded or l.range.id in exists:
             continue
         related_entities.append(l.range)
-        relation_types[l.range.id].append(get_relation_types_dict(l,parser, True))
+        relation_types[l.range.id].append(
+            get_relation_types_dict(l, parser, True))
     for l in links_inverse:
         if l.domain.class_.name in excluded or l.domain.id in exists:
             continue
@@ -132,8 +134,7 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
                 'id': rel_entity.standard_type.id,
                 'title': rel_entity.standard_type.name}
 
-
-        relation_dict= {
+        relation_dict = {
             'id': rel_entity.id,
             'systemClass': rel_entity.class_.name,
             'title': rel_entity.name,
