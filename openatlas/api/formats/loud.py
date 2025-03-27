@@ -6,7 +6,8 @@ from flask import url_for, g
 
 from openatlas import app
 from openatlas.api.resources.util import (
-    remove_spaces_dashes, date_to_str, get_crm_relation, get_crm_code)
+    remove_spaces_dashes, date_to_str, get_crm_relation, get_crm_code,
+    to_camel_case)
 from openatlas.display.util import get_file_path
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
@@ -16,7 +17,11 @@ from openatlas.models.type import Type
 def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
     def base_entity_dict() -> dict[str, Any]:
         return {
-            'id': url_for('api.entity', id_=data['entity'].id, _external=True),
+            'id': url_for(
+                'api.entity',
+                id_=data['entity'].id,
+                format='loud',
+                _external=True),
             'type': remove_spaces_dashes(
                 data['entity'].cidoc_class.i18n['en']),
             '_label': data['entity'].name,
@@ -27,18 +32,38 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
                 "content": data['entity'].name}]}
 
     def get_range_links() -> dict[str, Any]:
-        return {
-            'id': url_for('api.entity', id_=link_.range.id, _external=True),
+        property_ = {
+            'id': url_for(
+                'api.entity',
+                id_=link_.range.id,
+                format='loud',
+                _external=True),
             'type': loud[get_crm_code(link_).replace(' ', '_')],
             '_label': link_.range.name}
+        if link_.property.code == 'P67' and link_.description:
+            property_['content'] = link_.description
+            if link_.domain.cidoc_class.code == 'E32':
+                system = g.reference_systems[link_.domain.id]
+                property_[f"skos:{to_camel_case(g.types[link_.type.id].name).replace(' ', '_')}"] = f"{system.resolver_url or ''}{link_.description}"
+        return property_
 
     def get_domain_links() -> dict[str, Any]:
         property_ = {
-            'id': url_for('api.entity', id_=link_.domain.id, _external=True),
+            'id': url_for(
+                'api.entity',
+                id_=link_.domain.id,
+                format='loud',
+                _external=True),
             'type': loud[get_crm_code(link_, True).replace(' ', '_')],
             '_label': link_.domain.name}
         if standard_type := get_standard_type_loud(link_.domain.types):
             property_['classified_as'] = get_type_property(standard_type)
+        if link_.property.code == 'P67' and link_.description:
+            property_['content'] = link_.description
+            if link_.domain.cidoc_class.code == 'E32':
+                system = g.reference_systems[link_.domain.id]
+                property_[f"skos:{to_camel_case(g.types[link_.type.id].name).replace(' ', '_')}"] = f"{system.resolver_url or ''}{link_.description}"
+
         return property_
 
     properties_set = defaultdict(list)
@@ -101,7 +126,11 @@ def get_loud_images(entity: Entity, image_links: list[Link]) -> dict[str, Any]:
             continue  # pragma: no cover
         file_ = get_file_path(id_)
         image = {
-            'id': url_for('api.entity', id_=id_, _external=True),
+            'id': url_for(
+                'api.entity',
+                id_=id_,
+                format='loud',
+                _external=True),
             '_label': link_.domain.name,
             'type': 'DigitalObject',
             'format': mime_type,
@@ -131,7 +160,11 @@ def get_loud_timespan(entity: Entity) -> dict[str, Any]:
 
 def get_type_property(type_: Type) -> dict[str, Any]:
     return {
-        'id': url_for('api.entity', id_=type_.id, _external=True),
+        'id': url_for(
+            'api.entity',
+            id_=type_.id,
+            format='loud',
+            _external=True),
         'type': remove_spaces_dashes(type_.cidoc_class.i18n['en']),
         '_label': type_.name}
 
