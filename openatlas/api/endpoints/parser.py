@@ -57,6 +57,7 @@ class Parser:
     exclude_system_classes: list[str]
     linked_to_ids: list[int]
     url: str = ''
+    remove_empty_values = None
 
     def __init__(self, parser: dict[str, Any]):
         self.show = []
@@ -72,6 +73,8 @@ class Parser:
             self.url += '/'
         if self.centroid:
             self.centroid = parser['centroid'] == 'true'
+        if self.remove_empty_values:
+            self.remove_empty_values = parser['remove_empty_values'] == 'true'
 
     def set_search_param(self) -> None:
         try:

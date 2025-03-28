@@ -4,11 +4,13 @@ from flask import Response, g
 from flask_restful import Resource, marshal
 
 from openatlas.api.endpoints.endpoint import Endpoint
+from openatlas.api.endpoints.parser import Parser
 from openatlas.api.formats.presentation_view import get_presentation_view
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.error import (
     InvalidLimitError, NotATypeError, QueryEmptyError)
-from openatlas.api.resources.parser import entity_, properties, query
+from openatlas.api.resources.parser import entity_, presentation, properties, \
+    query
 from openatlas.api.resources.templates import presentation_template
 from openatlas.api.resources.util import (
     get_entities_from_type_with_subs, get_entities_linked_to_special_type,
@@ -50,10 +52,13 @@ class GetEntitiesLinkedToEntity(Resource):
 class GetEntityPresentationView(Resource):
     @staticmethod
     def get(id_: int) -> tuple[Resource, int] | Response | dict[str, Any]:
-        return marshal(
-            get_presentation_view(
-                ApiEntity.get_by_id(id_, types=True, aliases=True)),
-            presentation_template())
+        parser = Parser(presentation.parse_args())
+        result = get_presentation_view(
+            ApiEntity.get_by_id(id_, types=True, aliases=True),
+            parser)
+        if parser.remove_empty_values:
+            return result
+        return marshal(result, presentation_template())
 
 
 class GetLinkedEntitiesByPropertyRecursive(Resource):
