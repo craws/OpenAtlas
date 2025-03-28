@@ -3,8 +3,7 @@
 # instance/production.py
 
 # This is work in progress: to do
-# * Import hierarchies, map the ones that already exist
-# * Import types, map the ones that already exist
+# * Import new hierarchies and subs
 # * What about place locations?
 # * Link everything
 # * What about files?
@@ -38,6 +37,7 @@ def connect() -> Any:
 start = time.time()
 connection = connect()
 cursor = connection.cursor(cursor_factory=extras.DictCursor)
+id_map = {}  # Map imported entity ids to existing ones
 
 
 def cleanup():
@@ -73,11 +73,36 @@ def hierarchies():
     with app.test_request_context():
         app.preprocess_request()
         for item in list(cursor):
+            exists = False
             try:
                 if existing := Type.get_hierarchy(item['name']):
+                    exists = True
                     print(f'Hierarchy exists: {existing.name}')
-            except:
-                print(f"New hierarchy: {item['name']}")
+            except IndexError:
+                pass
+            if not exists:
+                insert_hierarchy(item)
+
+
+def insert_hierarchy(item):
+    print(f"New hierarchy: {item['name']}")
+    cursor.execute(
+        "SELECT description FROM model.entity WHERE id = %(id)s;",
+        {'id': item['id']})
+    description = cursor.fetchone()['description']
+    entity_ = Entity.insert('type', item['name'], description)
+    id_map[item['id']] = entity_.id
+    cursor.execute(
+        """
+        SELECT openatlas_class_name
+        FROM web.hierarchy_openatlas_class
+        WHERE hierarchy_id = %(id)s;
+        """, {'id': item['id']})
+    Type.insert_hierarchy(
+        entity_,
+        item['category'],
+        [x[0] for x in list(cursor)],
+        item['multiple'])
 
 
 cleanup()
