@@ -43,7 +43,9 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
         if link_.property.code == 'P2':
             if link_.description:
                 property_['value'] = link_.description
-                property_['unit'] = link_.range.description
+                property_['unit'] = {
+                    'type': "MeasurementUnit",
+                    '_label': link_.range.description}
         if link_.property.code == 'P67' and link_.description:
             property_['content'] = link_.description
             if link_.domain.cidoc_class.code == 'E32':
@@ -66,7 +68,9 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
         if link_.property.code == 'P2':
             if link_.description:
                 property_['value'] = link_.description
-                property_['unit'] = link_.domain.description
+                property_['unit'] = {
+                    'type': "MeasurementUnit",
+                    '_label': link_.domain.description}
         if link_.property.code == 'P67' and link_.description:
             property_['content'] = link_.description
             if link_.domain.cidoc_class.code == 'E32':
