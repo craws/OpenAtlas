@@ -272,6 +272,19 @@ def search(
     return list(g.cursor)
 
 
+def api_search(term: str, classes: list[str]) -> list[dict[str, Any]]:
+    g.cursor.execute(
+        select_sql() +
+        f"""
+        WHERE e.openatlas_class_name IN %(classes)s
+            AND UNACCENT(LOWER(e.name)) LIKE UNACCENT(LOWER(%(term)s))
+        GROUP BY e.id
+        ORDER BY e.name;
+        """,
+        {'term': f'{term}%', 'classes': tuple(classes)})
+    return list(g.cursor)
+
+
 def link(data: dict[str, Any]) -> int:
     g.cursor.execute(
         """

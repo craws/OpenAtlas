@@ -7,7 +7,8 @@ from openatlas.api.endpoints.entities import (
     GetByCidocClass, GetBySystemClass, GetByViewClass,
     GetEntitiesLinkedToEntity, GetEntity,
     GetEntityPresentationView, GetLatest,
-    GetLinkedEntitiesByPropertyRecursive, GetQuery, GetTypeEntities,
+    GetLinkedEntitiesByPropertyRecursive, GetQuery, GetSearchEntities,
+    GetTypeEntities,
     GetTypeEntitiesAll)
 from openatlas.api.endpoints.iiif import (
     IIIFAnnotation, IIIFAnnotationList, IIIFCanvas, IIIFImage, IIIFManifest,
@@ -57,6 +58,7 @@ special = [
     [ExportDatabase, '/export_database/<string:format_>', 'export_database'],
     [GetGeometricEntities, '/geometric_entities/', 'geometric_entities'],
     [GetSubunits, '/subunits/<int:id_>', 'subunits'],
+    [GetSearchEntities, '/search/<string:class_>/<string:term>', 'search'],
     [GetNetworkVisualisation,
      '/network_visualisation/',
      'network_visualisation'],

@@ -5,7 +5,7 @@ from itertools import groupby
 from typing import Any
 
 import pandas as pd
-from flask import Response, jsonify, request
+from flask import Response, jsonify, request, url_for
 from flask_restful import marshal
 
 from openatlas import app
@@ -18,7 +18,7 @@ from openatlas.api.resources.resolve_endpoints import (
 from openatlas.api.resources.templates import (
     geojson_collection_template, geojson_pagination, linked_place_pagination,
     linked_places_template, loud_pagination, loud_template)
-from openatlas.api.resources.util import get_location_link
+from openatlas.api.resources.util import date_to_str, get_location_link
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 
@@ -222,6 +222,15 @@ class Endpoint:
                 entities = [
                     self.parser.get_linked_places_entity(item)
                     for item in self.entities_with_links.values()]
+            case 'search':
+                entities = [{
+                    'name': entity.name,
+                    'id': url_for('api.entity', id_=entity.id, _external=True),
+                    'description': entity.description,
+                    'system_class': entity.class_.name,
+                    'begin': date_to_str(entity.begin_from or entity.begin_to),
+                    'end': date_to_str(entity.end_to or entity.end_from)}
+                    for entity in self.entities]
             case _ if self.parser.format \
                       in app.config['RDF_FORMATS']:  # pragma: no cover
                 entities = [
@@ -261,6 +270,8 @@ class Endpoint:
                 template = loud_template(result)
                 if not self.single:
                     template = loud_pagination()
+            case 'search':
+                template = loud_pagination()
             case _:
                 template = linked_places_template(self.parser)
                 if not self.single:

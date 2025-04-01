@@ -7,14 +7,16 @@ from openatlas.api.endpoints.endpoint import Endpoint
 from openatlas.api.endpoints.parser import Parser
 from openatlas.api.formats.presentation_view import get_presentation_view
 from openatlas.api.resources.api_entity import ApiEntity
+from openatlas.api.resources.database_mapper import get_api_simple_search
 from openatlas.api.resources.error import (
-    InvalidLimitError, NotATypeError, QueryEmptyError)
+    InvalidLimitError, InvalidSystemClassError, NotATypeError, QueryEmptyError)
 from openatlas.api.resources.parser import entity_, presentation, properties, \
     query
 from openatlas.api.resources.templates import presentation_template
 from openatlas.api.resources.util import (
     get_entities_from_type_with_subs, get_entities_linked_to_special_type,
     get_entities_linked_to_special_type_recursive, get_linked_entities_api)
+from openatlas.models.entity import Entity
 
 
 class GetByCidocClass(Resource):
@@ -146,4 +148,19 @@ class GetQuery(Resource):
                 ApiEntity.get_by_cidoc_classes(parser['cidoc_classes']))
         if parser['linked_entities']:
             entities.extend(get_linked_entities_api(parser['linked_entities']))
+        return Endpoint(entities, parser).resolve_entities()
+
+
+class GetSearchEntities(Resource):
+    @staticmethod
+    def get(term: str, class_: str) -> tuple[Resource, int] | Response | dict[str, Any]:
+        class_ = list(g.classes) if 'all' in class_ else [class_]
+        if not all(sc in g.classes for sc in class_):
+            raise InvalidSystemClassError
+
+        entities = [Entity(entry) for entry in  get_api_simple_search(term, class_)]
+        parser = entity_.parse_args()
+        parser['show'] = 'none'
+        parser['format'] = 'search'
+        parser['limit'] = 10
         return Endpoint(entities, parser).resolve_entities()
