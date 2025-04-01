@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.7d",
+    "version": "0.4.7e",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -5408,7 +5408,10 @@
           },
           "children": {
             "nullable": true,
-            "$ref": "#/components/schemas/ChainEventModel"
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChainEventModel"
+            }
           }
         }
       }
