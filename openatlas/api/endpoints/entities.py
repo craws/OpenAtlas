@@ -183,13 +183,13 @@ class GetSearchEntities(Resource):
 
 
 def join_lists_of_dicts_remove_duplicates(
-        a: list[dict[str, Any]],
-        b: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    a_set = {tuple(sorted(d.items())) for d in a}
-    result = list(a)
+        list_1: list[dict[str, Any]],
+        list_2: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    list_1_set = {tuple(sorted(d.items())) for d in list_1}
+    result = list(list_1)
 
-    for item in b:
-        if tuple(sorted(item.items())) not in a_set:
+    for item in list_2:
+        if tuple(sorted(item.items())) not in list_1_set:
             result.append(item)
-            a_set.add(tuple(sorted(item.items())))
+            list_1_set.add(tuple(sorted(item.items())))
     return result
