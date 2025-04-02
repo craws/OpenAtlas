@@ -272,6 +272,19 @@ def search(
     return list(g.cursor)
 
 
+def api_search(term: str, classes: list[str]) -> list[dict[str, Any]]:
+    g.cursor.execute(
+        select_sql() +
+        """
+            WHERE e.openatlas_class_name IN %(classes)s
+                AND UNACCENT(LOWER(e.name)) LIKE UNACCENT(LOWER(%(term)s))
+            GROUP BY e.id
+            ORDER BY e.name;
+        """,
+        {'term': f'{term}%', 'classes': tuple(classes)})
+    return list(g.cursor)
+
+
 def link(data: dict[str, Any]) -> int:
     g.cursor.execute(
         """
@@ -391,18 +404,16 @@ def get_linked_entities_recursive(
     codes = codes if isinstance(codes, list) else [codes]
     g.cursor.execute(
         f"""
-            WITH RECURSIVE items AS (
-                SELECT {first}
-                FROM model.link
-                WHERE {second} = %(id_)s 
-                  AND property_code IN %(code)s
-                UNION ALL
-                SELECT l.{first}
-                FROM model.link l
-                JOIN items i ON l.{second} = i.{first}
-                WHERE l.property_code IN %(code)s
-            ) 
-            SELECT {first} FROM items;
+        WITH RECURSIVE items AS (
+            SELECT {first}
+            FROM model.link
+            WHERE {second} = %(id_)s AND property_code IN %(code)s
+            UNION 
+                SELECT l.{first} FROM model.link l
+                INNER JOIN items i ON
+                    l.{second} = i.{first}
+                    AND l.property_code IN %(code)s
+            ) SELECT {first} FROM items;
         """,
         {'id_': id_, 'code': tuple(codes) if codes else ''})
     return [row[0] for row in list(g.cursor)]

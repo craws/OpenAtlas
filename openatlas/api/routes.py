@@ -1,12 +1,14 @@
 from openatlas.api.endpoints.content import (
-    ClassMapping, Classes, GetBackendDetails, GetProperties, SystemClassCount)
+    ClassMapping, Classes, GetBackendDetails, GetOpenAPISchema, GetProperties,
+    SystemClassCount)
 from openatlas.api.endpoints.display_image import (
     DisplayImage, LicensedFileOverview)
 from openatlas.api.endpoints.entities import (
     GetByCidocClass, GetBySystemClass, GetByViewClass,
     GetEntitiesLinkedToEntity, GetEntity,
     GetEntityPresentationView, GetLatest,
-    GetLinkedEntitiesByPropertyRecursive, GetQuery, GetTypeEntities,
+    GetLinkedEntitiesByPropertyRecursive, GetQuery, GetSearchEntities,
+    GetTypeEntities,
     GetTypeEntitiesAll)
 from openatlas.api.endpoints.iiif import (
     IIIFAnnotation, IIIFAnnotationList, IIIFCanvas, IIIFImage, IIIFManifest,
@@ -44,7 +46,8 @@ admin = [
     [GetProperties, '/properties/', 'properties'],
     [LicensedFileOverview, '/licensed_file_overview/',
      'licensed_file_overview'],
-    [Classes, '/classes/', 'classes']]
+    [Classes, '/classes/', 'classes'],
+    [GetOpenAPISchema, '/openapi_schema/', 'openapi_schema']]
 
 types = [
     [GetTypeByViewClass, '/type_by_view_class/', 'type_by_view_class'],
@@ -55,6 +58,7 @@ special = [
     [ExportDatabase, '/export_database/<string:format_>', 'export_database'],
     [GetGeometricEntities, '/geometric_entities/', 'geometric_entities'],
     [GetSubunits, '/subunits/<int:id_>', 'subunits'],
+    [GetSearchEntities, '/search/<string:class_>/<string:term>', 'search'],
     [GetNetworkVisualisation,
      '/network_visualisation/',
      'network_visualisation'],

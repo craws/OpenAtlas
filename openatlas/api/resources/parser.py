@@ -174,6 +174,15 @@ properties.add_argument(
         'OA7', 'P167', 'P102', 'P41', 'P138'),
     location='args')
 
+presentation = entity_.copy()
+presentation.add_argument(
+    'remove_empty_values',
+    type=str,
+    case_sensitive=False,
+    default='false',
+    choices=('true', 'false'),
+    location='args')
+
 query = entity_.copy()
 query.add_argument(
     'entities',
@@ -286,3 +295,12 @@ iiif.add_argument(
     type=str,
     help='{error_msg}',
     location='args')
+
+openapi = reqparse.RequestParser()
+openapi.add_argument(
+    'format',
+    type=str,
+    help='{error_msg}',
+    location='args',
+    default='json',
+    choices=('json', 'yaml'))

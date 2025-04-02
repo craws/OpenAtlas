@@ -5,6 +5,7 @@ from flask_jwt_extended import create_access_token, decode_token
 from flask_login import current_user
 
 from openatlas.database import token as db
+from openatlas.display.util2 import sanitize
 from openatlas.models.user import User
 
 
@@ -27,7 +28,7 @@ class Token:
             'jti': decoded_token['jti'],
             'user_id': user_.id,
             'creator_id': current_user.id,
-            'name': token_name,
+            'name': sanitize(token_name),
             'valid_until': valid_until,
             'valid_from': datetime.fromtimestamp(decoded_token['iat'])})
         return access_token
