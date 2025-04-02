@@ -174,6 +174,15 @@ properties.add_argument(
         'OA7', 'P167', 'P102', 'P41', 'P138'),
     location='args')
 
+presentation = entity_.copy()
+presentation.add_argument(
+    'remove_empty_values',
+    type=str,
+    case_sensitive=False,
+    default='false',
+    choices=('true', 'false'),
+    location='args')
+
 query = entity_.copy()
 query.add_argument(
     'entities',

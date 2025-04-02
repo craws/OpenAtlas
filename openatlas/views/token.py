@@ -18,7 +18,7 @@ from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import button, link, required_group
-from openatlas.display.util2 import manual, sanitize
+from openatlas.display.util2 import manual
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
 from openatlas.models.token import Token
@@ -153,13 +153,14 @@ def generate_token() -> str | Response:
     form = GenerateTokenForm()
     form.user.choices = User.get_users_for_form()
     if form.validate_on_submit():
-        expiration = form.expiration.data
-        token_name = sanitize(form.token_name.data)
         user_ = User.get_by_id_without_bookmarks(int(form.user.data))
         token = ''
         Transaction.begin()
         try:
-            token = Token.generate_token(expiration, token_name, user_)
+            token = Token.generate_token(
+                form.expiration.data,
+                form.token_name.data,
+                user_)
             Transaction.commit()
             flash(f"{_('token stored for')}: {user_.username}", 'info')
         except Exception as e:  # pragma: no cover

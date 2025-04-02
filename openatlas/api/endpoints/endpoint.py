@@ -5,7 +5,7 @@ from itertools import groupby
 from typing import Any
 
 import pandas as pd
-from flask import Response, jsonify, request
+from flask import Response, jsonify, request, url_for
 from flask_restful import marshal
 
 from openatlas import app
@@ -18,7 +18,7 @@ from openatlas.api.resources.resolve_endpoints import (
 from openatlas.api.resources.templates import (
     geojson_collection_template, geojson_pagination, linked_place_pagination,
     linked_places_template, loud_pagination, loud_template)
-from openatlas.api.resources.util import get_location_link
+from openatlas.api.resources.util import date_to_str, get_location_link
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 
@@ -110,6 +110,20 @@ class Endpoint:
         if self.parser.download == 'true':
             return download(result, self.get_entities_template(result))
         return marshal(result, self.get_entities_template(result))
+
+    def resolve_simple_search(self) -> Response | dict[str, Any]:
+        self.get_pagination()
+        self.reduce_entities_to_limit()
+        self.formated_entities = [{
+            'name': entity.name,
+            'id': url_for('api.entity', id_=entity.id, _external=True),
+            'description': entity.description,
+            'system_class': entity.class_.name,
+            'begin': date_to_str(entity.begin_from or entity.begin_to),
+            'end': date_to_str(entity.end_to or entity.end_from)}
+            for entity in self.entities]
+        result = self.get_json_output()
+        return marshal(result, loud_pagination())
 
     def get_json_output(self) -> dict[str, Any]:
         return dict(self.formated_entities[0]) if self.single else {
