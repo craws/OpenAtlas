@@ -320,7 +320,7 @@ class Api(ApiTestCase):
 
         rv = c.get(
             url_for(
-            'api_04.entity_presentation_view',
+                'api_04.entity_presentation_view',
                 id_=event.id,
                 remove_empty_values='true'))
         rv = rv.get_json()
@@ -691,6 +691,13 @@ class Api(ApiTestCase):
                 image_size='table'))
         self.assertTrue(rv.headers['Content-Type'].startswith('image'))
 
+        rv = c.get(url_for('api_04.search', class_='all', term='Fro'))
+        assert rv.get_json()['pagination']['entities'] == 1
+
+        rv = c.get(url_for('api_04.search', class_='type', term='i'))
+        print(rv.get_json()['pagination']['entities'])
+        assert rv.get_json()['pagination']['entities'] == 47
+
         # Test Error Handling
         for rv in [
             c.get(url_for('api_04.entity', id_=233423424)),
@@ -715,6 +722,9 @@ class Api(ApiTestCase):
         assert 'ID is last entity' in rv.get_json()['title']
 
         rv = c.get(url_for('api_04.system_class', class_='Wrong'))
+        assert 'Invalid system_classes value' in rv.get_json()['title']
+
+        rv = c.get(url_for('api_04.search', class_='False', term='Fro'))
         assert 'Invalid system_classes value' in rv.get_json()['title']
 
         rv = c.get(url_for('api_04.query'))

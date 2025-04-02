@@ -158,6 +158,7 @@ class GetSearchEntities(Resource):
             term: str,
             class_: str) -> tuple[Resource, int] | Response | dict[str, Any]:
         classes = list(g.classes) if 'all' in class_ else [class_]
+        classes = [class_ for class_ in classes if class_ != 'type_tools']
         if not all(sc in g.classes for sc in classes):
             raise InvalidSystemClassError
         simple_search = get_api_simple_search(term, classes)
