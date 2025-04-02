@@ -7,7 +7,8 @@ from openatlas.api.endpoints.endpoint import Endpoint
 from openatlas.api.endpoints.parser import Parser
 from openatlas.api.formats.presentation_view import get_presentation_view
 from openatlas.api.resources.api_entity import ApiEntity
-from openatlas.api.resources.database_mapper import get_api_simple_search
+from openatlas.api.resources.database_mapper import get_api_search, \
+    get_api_simple_search
 from openatlas.api.resources.error import (
     InvalidLimitError, InvalidSystemClassError, NotATypeError, QueryEmptyError)
 from openatlas.api.resources.parser import entity_, presentation, properties, \
@@ -153,14 +154,42 @@ class GetQuery(Resource):
 
 class GetSearchEntities(Resource):
     @staticmethod
-    def get(term: str, class_: str) -> tuple[Resource, int] | Response | dict[str, Any]:
-        class_ = list(g.classes) if 'all' in class_ else [class_]
-        if not all(sc in g.classes for sc in class_):
+    def get(
+            term: str,
+            class_: str) -> tuple[Resource, int] | Response | dict[str, Any]:
+        classes = list(g.classes) if 'all' in class_ else [class_]
+        if not all(sc in g.classes for sc in classes):
             raise InvalidSystemClassError
-
-        entities = [Entity(entry) for entry in  get_api_simple_search(term, class_)]
+        simple_search = get_api_simple_search(term, classes)
+        search = get_api_search(term, classes + ['appellation'])
+        data = join_lists_of_dicts_remove_duplicates(simple_search, search)
+        entities = []
+        for row in data:
+            if row['openatlas_class_name'] == 'appellation':
+                entity = Entity.get_linked_entity_safe_static(
+                    row['id'],
+                    'P1',
+                    True)
+                if entity.class_.name not in classes:
+                    continue
+            else:
+                entity = Entity(row)
+            if entity:
+                entities.append(entity)
         parser = entity_.parse_args()
-        parser['show'] = 'none'
         parser['format'] = 'search'
         parser['limit'] = 10
-        return Endpoint(entities, parser).resolve_entities()
+        return Endpoint(entities, parser).resolve_simple_search()
+
+
+def join_lists_of_dicts_remove_duplicates(
+        a: list[dict[str, Any]],
+        b: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    a_set = {tuple(sorted(d.items())) for d in a}
+    result = list(a)
+
+    for item in b:
+        if tuple(sorted(item.items())) not in a_set:
+            result.append(item)
+            a_set.add(tuple(sorted(item.items())))
+    return result

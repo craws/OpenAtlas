@@ -111,6 +111,20 @@ class Endpoint:
             return download(result, self.get_entities_template(result))
         return marshal(result, self.get_entities_template(result))
 
+    def resolve_simple_search(self) -> Response | dict[str, Any]:
+        self.get_pagination()
+        self.reduce_entities_to_limit()
+        self.formated_entities = [{
+            'name': entity.name,
+            'id': url_for('api.entity', id_=entity.id, _external=True),
+            'description': entity.description,
+            'system_class': entity.class_.name,
+            'begin': date_to_str(entity.begin_from or entity.begin_to),
+            'end': date_to_str(entity.end_to or entity.end_from)}
+            for entity in self.entities]
+        result = self.get_json_output()
+        return marshal(result, loud_pagination())
+
     def get_json_output(self) -> dict[str, Any]:
         return dict(self.formated_entities[0]) if self.single else {
             "results": self.formated_entities,
@@ -222,15 +236,6 @@ class Endpoint:
                 entities = [
                     self.parser.get_linked_places_entity(item)
                     for item in self.entities_with_links.values()]
-            case 'search':
-                entities = [{
-                    'name': entity.name,
-                    'id': url_for('api.entity', id_=entity.id, _external=True),
-                    'description': entity.description,
-                    'system_class': entity.class_.name,
-                    'begin': date_to_str(entity.begin_from or entity.begin_to),
-                    'end': date_to_str(entity.end_to or entity.end_from)}
-                    for entity in self.entities]
             case _ if self.parser.format \
                       in app.config['RDF_FORMATS']:  # pragma: no cover
                 entities = [
@@ -270,8 +275,6 @@ class Endpoint:
                 template = loud_template(result)
                 if not self.single:
                     template = loud_pagination()
-            case 'search':
-                template = loud_pagination()
             case _:
                 template = linked_places_template(self.parser)
                 if not self.single:

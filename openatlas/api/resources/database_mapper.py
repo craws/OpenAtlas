@@ -44,3 +44,8 @@ def get_api_simple_search(
         term: str,
         class_: list[str]) -> list[dict[str, Any]]:
     return db_entity.api_search(term, class_)
+
+def get_api_search(
+        term: str,
+        class_: list[str]) -> list[dict[str, Any]]:
+    return db_entity.search(term, class_)

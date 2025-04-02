@@ -1339,7 +1339,7 @@
         "tags": [
           "Proposal"
         ],
-        "description": "Search the database with a search term.",
+        "description": "Searches the database for entries matching a provided search term. \n  Results are ordered with exact prefix matches appearing first, followed by entries containing the search term within their name or appellation.",
         "operationId": "GetSearchEntities",
         "parameters": [
           {
