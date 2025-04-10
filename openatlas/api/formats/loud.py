@@ -46,12 +46,16 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
                 property_['unit'] = {
                     'type': "MeasurementUnit",
                     '_label': link_.range.description}
+        elif link_.type:
+            property_['classified_as'] = [get_type_property(g.types.get(link_.type.id))]
         if link_.property.code == 'P67' and link_.description:
             property_['content'] = link_.description
             if link_.domain.cidoc_class.code == 'E32':
                 system = g.reference_systems[link_.domain.id]
-                # todo: Change to la:equivalent
-                property_[f"skos:{to_camel_case(g.types[link_.type.id].name).replace(' ', '_')}"] = f"{system.resolver_url or ''}{link_.description}"
+                match_case = to_camel_case(
+                    g.types[link_.type.id].name).replace(' ', '_')
+                link_url = f"{system.resolver_url or ''}{link_.description}"
+                property_[f"skos:{match_case}"] = link_url
         return property_
 
     def get_domain_links() -> dict[str, Any]:
@@ -64,19 +68,23 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
             'type': loud[get_crm_code(link_, True).replace(' ', '_')],
             '_label': link_.domain.name}
         if standard_type := get_standard_type_loud(link_.domain.types):
-            property_['classified_as'] = get_type_property(standard_type)
+            property_['classified_as'] = [get_type_property(standard_type) ]
         if link_.property.code == 'P2':
             if link_.description:
                 property_['value'] = link_.description
                 property_['unit'] = {
                     'type': "MeasurementUnit",
                     '_label': link_.domain.description}
+        elif link_.type:
+            property_['classified_as'] = [get_type_property(g.types.get(link_.type.id))]
         if link_.property.code == 'P67' and link_.description:
             property_['content'] = link_.description
             if link_.domain.cidoc_class.code == 'E32':
                 system = g.reference_systems[link_.domain.id]
-                # todo: Change to la:equivalent
-                property_[f"skos:{to_camel_case(g.types[link_.type.id].name).replace(' ', '_')}"] = f"{system.resolver_url or ''}{link_.description}"
+                match_case = to_camel_case(
+                    g.types[link_.type.id].name).replace(' ', '_')
+                link_url = f"{system.resolver_url or ''}{link_.description}"
+                property_[f"skos:{match_case}"] = link_url
 
         return property_
 
