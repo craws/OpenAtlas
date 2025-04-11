@@ -23,8 +23,9 @@ versions = {
             '2494': 'API: 0.4.7',
             '2491': 'API: New endpoint "chained_events"',
             '2495': 'API: Simple search endpoint',
-            '2485': 'Refactor and minor improvements'}
-    }],
+            '2485': 'Refactor and minor improvements'},
+        'fix': {
+            '2501': 'Error when using ampersand (sometimes)'}}],
     '8.10.1': ['2025-02-21', {
         'fix': {
             '2481': 'Line breaks missing when copying to annotation widget',
