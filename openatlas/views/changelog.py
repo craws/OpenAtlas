@@ -19,8 +19,13 @@ versions = {
         'feature': {
             '2492': 'Performance improvement',
             '2416': 'Import of types',
-            '2491': 'API: New endpoint "chained_events"'}
-    }],
+            '2502': 'Link artifacts via the artifact tab in the file view',
+            '2494': 'API: 0.4.7',
+            '2491': 'API: New endpoint "chained_events"',
+            '2495': 'API: Simple search endpoint',
+            '2485': 'Refactor and minor improvements'},
+        'fix': {
+            '2501': 'Error when using ampersand (sometimes)'}}],
     '8.10.1': ['2025-02-21', {
         'fix': {
             '2481': 'Line breaks missing when copying to annotation widget',
