@@ -61,7 +61,7 @@ services:
       initdb:
         condition: service_completed_successfully
   discovery:
-    image: ghcr.io/acdh-oeaw/openatlas-discovery:latest
+    image: ghcr.io/acdh-oeaw/openatlas-discovery:develop
     ports:
       - "3000:3000"
     environment:
