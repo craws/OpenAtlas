@@ -60,6 +60,7 @@ services:
         condition: service_healthy
       initdb:
         condition: service_completed_successfully
+
   discovery:
     image: ghcr.io/acdh-oeaw/openatlas-discovery:develop
     ports:
