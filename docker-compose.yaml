@@ -1,4 +1,3 @@
-version: "3.9"
 services:
   postgres:
     image: "postgis/postgis:15-3.4"
@@ -28,8 +27,8 @@ services:
     build:
       context: .
       dockerfile: install/docker/Dockerfile
-    ports:
-      - "8080:8080"
+#    ports:
+#      - "8080:8080"
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_HOST=postgres
@@ -61,3 +60,23 @@ services:
         condition: service_healthy
       initdb:
         condition: service_completed_successfully
+  discovery:
+    image: ghcr.io/acdh-oeaw/openatlas-discovery:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - NUXT_PUBLIC_APP_BASE_URL=http://localhost:3000
+      - NUXT_PUBLIC_API_BASE_URL=http://localhost:8080/api/
+      - NUXT_PUBLIC_OPENAPI_BASE_URL=http://localhost:8080/openapi.json
+      - NUXT_PUBLIC_DATABASE=enabled
+      - NUXT_PUBLIC_BOTS=enabled
+      # - NUXT_PUBLIC_MAP_BASELAYER_URL_LIGHT=
+      # - NUXT_PUBLIC_MAP_BASELAYER_URL_DARK=
+      # - NUXT_PUBLIC_MAP_BASELAYER_ATTRIBUTION=
+      # - NUXT_PUBLIC_MATOMO_BASE_URL=
+      # - NUXT_PUBLIC_MATOMO_ID=
+      # - NUXT_PUBLIC_REDMINE_ID=
+    depends_on:
+      openatlas:
+        condition: service_started
+    restart: unless-stopped
