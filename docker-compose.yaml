@@ -70,7 +70,7 @@ services:
       - NUXT_PUBLIC_API_BASE_URL=http://localhost:8080/api/
       - NUXT_PUBLIC_OPENAPI_BASE_URL=http://localhost:8080/openapi.json
       - NUXT_PUBLIC_DATABASE=enabled
-      - NUXT_PUBLIC_BOTS=enabled
+      # - NUXT_PUBLIC_BOTS=enabled
       # - NUXT_PUBLIC_MAP_BASELAYER_URL_LIGHT=
       # - NUXT_PUBLIC_MAP_BASELAYER_URL_DARK=
       # - NUXT_PUBLIC_MAP_BASELAYER_ATTRIBUTION=
