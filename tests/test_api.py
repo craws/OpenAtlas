@@ -417,6 +417,13 @@ class Api(ApiTestCase):
         assert properties['title'] == place.name
         assert len(rv['results']) == 1
 
+        rv = c.get(
+            url_for(
+                'api_04.query',
+                cidoc_classes='E98',
+                page=1)).get_json()
+        assert len(rv['results']) == 0
+
         # Test Entities count
         rv = c.get(
             url_for(
