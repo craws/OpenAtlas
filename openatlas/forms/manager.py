@@ -25,7 +25,10 @@ class AcquisitionManager(EventBaseManager):
 
     def additional_fields(self) -> dict[str, Any]:
         data: dict[str, list[Any]] = {'place': [], 'artifact': []}
-        if not self.insert:
+        if self.insert:
+            if self.origin and self.origin.class_.view == 'artifact':
+                data['artifact'] = [self.origin]
+        else:
             for entity in self.entity.get_linked_entities('P24', sort=True):
                 data[
                     'artifact' if entity.class_.name == 'artifact'
@@ -390,7 +393,10 @@ class ModificationManager(EventBaseManager):
     def additional_fields(self) -> dict[str, Any]:
         artifacts = []
         places = []
-        if not self.insert:
+        if self.insert:
+            if self.origin and self.origin.class_.view == 'artifact':
+                artifacts = [self.origin]
+        else:
             for item in self.entity.get_linked_entities('P31', sort=True):
                 if item.class_.name == 'artifact':
                     artifacts.append(item)
@@ -497,13 +503,16 @@ class PlaceManager(PlaceBaseManager):
 
 class ProductionManager(EventBaseManager):
     def additional_fields(self) -> dict[str, Any]:
-        selection = None
+        artifacts = None
         if not self.insert and self.entity:
-            selection = self.entity.get_linked_entities('P108', sort=True)
+            artifacts = self.entity.get_linked_entities('P108', sort=True)
+        if self.insert:
+            if self.origin and self.origin.class_.view == 'artifact':
+                artifacts = [self.origin]
         return super().additional_fields() | {
             'artifact': TableMultiField(
                 Entity.get_by_class('artifact', True),
-                selection)}
+                artifacts)}
 
     def process_form(self) -> None:
         super().process_form()
