@@ -6,7 +6,8 @@ from flask import url_for, g
 
 from openatlas import app
 from openatlas.api.resources.util import (
-    remove_spaces_dashes, date_to_str, get_crm_relation, get_crm_code,
+    get_license_name, remove_spaces_dashes, date_to_str, get_crm_relation,
+    get_crm_code,
     to_camel_case)
 from openatlas.display.util import get_file_path
 from openatlas.models.entity import Entity, Link
@@ -47,7 +48,8 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
                     'type': "MeasurementUnit",
                     '_label': link_.range.description}
         elif link_.type:
-            property_['classified_as'] = [get_type_property(g.types.get(link_.type.id))]
+            property_['classified_as'] = [
+                get_type_property(g.types.get(link_.type.id))]
         if link_.property.code == 'P67' and link_.description:
             property_['content'] = link_.description
             if link_.domain.cidoc_class.code == 'E32':
@@ -68,7 +70,7 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
             'type': loud[get_crm_code(link_, True).replace(' ', '_')],
             '_label': link_.domain.name}
         if standard_type := get_standard_type_loud(link_.domain.types):
-            property_['classified_as'] = [get_type_property(standard_type) ]
+            property_['classified_as'] = [get_type_property(standard_type)]
         if link_.property.code == 'P2':
             if link_.description:
                 property_['value'] = link_.description
@@ -76,7 +78,8 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
                     'type': "MeasurementUnit",
                     '_label': link_.domain.description}
         elif link_.type:
-            property_['classified_as'] = [get_type_property(g.types.get(link_.type.id))]
+            property_['classified_as'] = [
+                get_type_property(g.types.get(link_.type.id))]
         if link_.property.code == 'P67' and link_.description:
             property_['content'] = link_.description
             if link_.domain.cidoc_class.code == 'E32':
@@ -122,8 +125,10 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
     if image_links:
         properties_set['representation'].append(
             get_loud_images(data['entity'], image_links))
-    return {'@context': app.config['API_CONTEXT']['LOUD']} | \
-        base_entity_dict() | properties_set
+
+    return ({'@context': app.config['API_CONTEXT']['LOUD']} |
+            base_entity_dict() |
+            properties_set)
 
 
 def get_loud_property_name(
@@ -163,8 +168,16 @@ def get_loud_images(entity: Entity, image_links: list[Link]) -> dict[str, Any]:
                     _external=True),
                 'type': 'DigitalObject',
                 '_label': 'ProfileImage' if id_ == profile_image else ''}]}
-        if type_ := get_standard_type_loud(link_.domain.types):
-            image['classified_as'] = get_type_property(type_)
+        if license_ := get_license_name(link_.domain):
+            image['classified_as'] = [{
+                'id': url_for(
+                    'api.entity',
+                    id_=license_.id,
+                    format='loud',
+                    _external=True),
+                'type': remove_spaces_dashes(license_.cidoc_class.i18n['en']),
+                '_label': license_.name,
+                'content': license_.name}]
         representation['digitally_shown_by'].append(image)
     return representation
 
