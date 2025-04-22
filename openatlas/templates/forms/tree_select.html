@@ -92,7 +92,8 @@
           </button>
           <button
             id="{{ field.id }}-add-type"
-            disabled type="button"
+            disabled
+            type="submit"
             class="btn btn-outline-primary btn-sm">{{ _('insert')|uc_first }}
           </button>
         </div>
@@ -121,12 +122,16 @@
       const typeId = await ajaxAddType(data, {{field.id}}, {{field.type_id}});
       selectFromTree('{{field.type_id}}', typeId, name);
       $(this).prop("disabled", false).text('{{ _('insert')|uc_first }}');
+      $(this).prop("type", "button");
       e.preventDefault();
     });
   </script>
 {% endif %}
 
 <script>
+  $("#{{ field.id }}-modal")?.on("hidden.bs.modal", function (e) {
+    $('#save').focus();
+  })
   variables['{{field.id}}-isAddDynamicall'] = '{{field.form}}' !== 'None';
   if (variables['{{field.id}}-isAddDynamicall'])
     $("#{{ field.id }}-modal .toolbar").hide()

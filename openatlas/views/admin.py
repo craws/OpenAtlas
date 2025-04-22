@@ -128,7 +128,7 @@ def get_content_table() -> str:
     for item, languages in get_content().items():
         content = [uc_first(_(item))]
         for language in app.config['LANGUAGES']:
-            content.append(sanitize(languages[language]))
+            content.append(sanitize(languages[language]) or '')
         content.append(link(_('edit'), url_for('admin_content', item=item)))
         table.rows.append(content)
     return table.display()
