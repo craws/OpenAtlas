@@ -157,11 +157,16 @@ class Parser:
                 return numpy.datetime64(date)
         return getattr(entity, self.column)
 
-    def get_by_page(self, index: list[dict[str, Any]]) -> dict[str, Any]:
-        page = (
-            self.page) if self.page < index[-1]['page'] else index[-1]['page']
-        return \
-            [entry['startId'] for entry in index if entry['page'] == page][0]
+    def get_by_page(
+            self,
+            index: list[dict[str, Any]]) -> dict[str, Any] | None:
+        if not index or not self.page:
+            return None
+        target_page = min(int(self.page), int(index[-1]['page']))
+        for entry in index:
+            if entry.get('page') == target_page:
+                return entry.get('startId')
+        return None  # pragma: no cover
 
     def set_start_entity(self, total: list[int]) -> list[Any]:
         if self.first and int(self.first) in total:
