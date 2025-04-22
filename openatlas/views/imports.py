@@ -55,7 +55,7 @@ _('invalid reference id')
 _('invalid origin reference id')
 _('empty names')
 _('empty ids')
-_('empty parend id')
+_('empty parent id')
 _('missing name column')
 _('ids already in database')
 _('double ids in import')
@@ -448,10 +448,10 @@ def get_allowed_columns(class_: str) -> dict[str, list[str]]:
     if class_ in ['place', 'artifact', 'type']:
         columns.extend([
             'parent_id', 'openatlas_parent_id'])
-    if class_ == 'place':
-        columns.extend([
-            'administrative_unit_id', 'historical_place_id',
-            'openatlas_class'])
+    if class_ in ['place', 'type']:
+        columns.extend(['openatlas_class'])
+    if class_ in ['place']:
+        columns.extend(['administrative_unit_id', 'historical_place_id'])
     return {
         'allowed': columns,
         'valid': [],
@@ -592,7 +592,8 @@ def check_cell_value(
         case 'openatlas_class' if value:
             if (value.lower().replace(' ', '_') not in
                     (g.view_class_mapping['place'] +
-                     g.view_class_mapping['artifact'])):
+                     g.view_class_mapping['artifact']+
+                     g.view_class_mapping['type'])):
                 value = error_span(value)
                 checks.set_warning('invalid_openatlas_class', id_)
         case 'openatlas_parent_id' if value:

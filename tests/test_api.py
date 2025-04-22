@@ -113,6 +113,8 @@ class Api(ApiTestCase):
         assert rv.get_json()['P2']['name'] == 'a pour type'
         rv = c.get(url_for('api_04.backend_details')).get_json()
         assert rv['version'] == app.config['VERSION']
+        rv = c.get(url_for('api_04.openapi_schema', format='yaml'))
+        assert b'OpenAtlas API' in rv.data
         rv = c.get(url_for('api_04.backend_details', download=True)).get_json()
         assert rv['version'] == app.config['VERSION']
         rv = c.get(url_for('api_04.system_class_count')).get_json()
@@ -316,6 +318,15 @@ class Api(ApiTestCase):
         assert rv['title'] == actor.name
         assert rv['relations']['activity']
 
+        rv = c.get(
+            url_for(
+                'api_04.entity_presentation_view',
+                id_=event.id,
+                remove_empty_values='true'))
+        rv = rv.get_json()
+        assert rv['id'] == event.id
+        assert rv['title'] == event.name
+
         for rv in [
             c.get(url_for('api_04.cidoc_class', class_='E21')),
             c.get(
@@ -405,6 +416,13 @@ class Api(ApiTestCase):
         properties = rv['results'][0]['features'][0]['properties']
         assert properties['title'] == place.name
         assert len(rv['results']) == 1
+
+        rv = c.get(
+            url_for(
+                'api_04.query',
+                cidoc_classes='E98',
+                page=1)).get_json()
+        assert len(rv['results']) == 0
 
         # Test Entities count
         rv = c.get(
@@ -680,6 +698,12 @@ class Api(ApiTestCase):
                 image_size='table'))
         self.assertTrue(rv.headers['Content-Type'].startswith('image'))
 
+        rv = c.get(url_for('api_04.search', class_='all', term='Fro'))
+        assert rv.get_json()['pagination']['entities'] == 1
+
+        rv = c.get(url_for('api_04.search', class_='type', term='i'))
+        assert rv.get_json()['pagination']['entities'] == 47
+
         # Test Error Handling
         for rv in [
             c.get(url_for('api_04.entity', id_=233423424)),
@@ -704,6 +728,9 @@ class Api(ApiTestCase):
         assert 'ID is last entity' in rv.get_json()['title']
 
         rv = c.get(url_for('api_04.system_class', class_='Wrong'))
+        assert 'Invalid system_classes value' in rv.get_json()['title']
+
+        rv = c.get(url_for('api_04.search', class_='False', term='Fro'))
         assert 'Invalid system_classes value' in rv.get_json()['title']
 
         rv = c.get(url_for('api_04.query'))
