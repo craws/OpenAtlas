@@ -1,6 +1,7 @@
 from typing import Any, Optional
 
 from openatlas.database import settings as db
+from openatlas.display.util2 import sanitize
 
 
 class Settings:
@@ -26,13 +27,14 @@ class Settings:
                     'mail_recipients_feedback',
                     'file_upload_allowed_extension']:
                 settings[name] = value.split(' ')
-
         return settings
 
     @staticmethod
     def update(data: dict[str, str]) -> None:
         for name, value in data.items():
-            db.update(name, value)
+            db.update(
+                name,
+                sanitize(value) or '' if isinstance(value, str) else value)
 
     @staticmethod
     def set_logo(file_id: Optional[int] = None) -> None:

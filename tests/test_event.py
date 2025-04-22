@@ -39,6 +39,10 @@ class EventTest(TestBaseCase):
         rv = c.get(url_for('insert', class_='move', origin_id=residence.id))
         assert b'Moved artifact' in rv.data
 
+        rv = c.get(
+            url_for('insert', class_='acquisition', origin_id=artifact.id))
+        assert b'+ Acquisition' in rv.data
+
         data = {
             'name': 'Second event',
             'given_place': [residence.id],
@@ -93,6 +97,10 @@ class EventTest(TestBaseCase):
         rv = c.get(url_for('update', id_=creation_id))
         assert b'A creation event' in rv.data
 
+        rv = c.get(
+            url_for('insert', class_='modification', origin_id=artifact.id))
+        assert b'+ Modification' in rv.data
+
         rv = c.post(
             url_for('insert', class_='modification'),
             data={
@@ -120,6 +128,10 @@ class EventTest(TestBaseCase):
 
         rv = c.get(url_for('update', id_=production_id))
         assert b'A productive event' in rv.data
+
+        rv = c.get(
+            url_for('insert', class_='production', origin_id=artifact.id))
+        assert b'+ Production' in rv.data
 
         rv = c.post(
             url_for('insert', class_='acquisition'),

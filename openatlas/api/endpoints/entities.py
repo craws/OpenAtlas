@@ -4,15 +4,20 @@ from flask import Response, g
 from flask_restful import Resource, marshal
 
 from openatlas.api.endpoints.endpoint import Endpoint
+from openatlas.api.endpoints.parser import Parser
 from openatlas.api.formats.presentation_view import get_presentation_view
 from openatlas.api.resources.api_entity import ApiEntity
+from openatlas.api.resources.database_mapper import get_api_search, \
+    get_api_simple_search
 from openatlas.api.resources.error import (
-    InvalidLimitError, NotATypeError, QueryEmptyError)
-from openatlas.api.resources.parser import entity_, properties, query
+    InvalidLimitError, InvalidSystemClassError, NotATypeError, QueryEmptyError)
+from openatlas.api.resources.parser import entity_, presentation, properties, \
+    query
 from openatlas.api.resources.templates import presentation_template
 from openatlas.api.resources.util import (
     get_entities_from_type_with_subs, get_entities_linked_to_special_type,
     get_entities_linked_to_special_type_recursive, get_linked_entities_api)
+from openatlas.models.entity import Entity
 
 
 class GetByCidocClass(Resource):
@@ -50,10 +55,13 @@ class GetEntitiesLinkedToEntity(Resource):
 class GetEntityPresentationView(Resource):
     @staticmethod
     def get(id_: int) -> tuple[Resource, int] | Response | dict[str, Any]:
-        return marshal(
-            get_presentation_view(
-                ApiEntity.get_by_id(id_, types=True, aliases=True)),
-            presentation_template())
+        parser = Parser(presentation.parse_args())
+        result = get_presentation_view(
+            ApiEntity.get_by_id(id_, types=True, aliases=True),
+            parser)
+        if parser.remove_empty_values:
+            return result
+        return marshal(result, presentation_template())
 
 
 class GetLinkedEntitiesByPropertyRecursive(Resource):
@@ -142,3 +150,47 @@ class GetQuery(Resource):
         if parser['linked_entities']:
             entities.extend(get_linked_entities_api(parser['linked_entities']))
         return Endpoint(entities, parser).resolve_entities()
+
+
+class GetSearchEntities(Resource):
+    @staticmethod
+    def get(
+            term: str,
+            class_: str) -> tuple[Resource, int] | Response | dict[str, Any]:
+        classes = list(g.classes) if 'all' in class_ else [class_]
+        classes = [class_ for class_ in classes if class_ != 'type_tools']
+        if not all(sc in g.classes for sc in classes):
+            raise InvalidSystemClassError
+        simple_search = get_api_simple_search(term, classes)
+        search = get_api_search(term, classes + ['appellation'])
+        data = join_lists_of_dicts_remove_duplicates(simple_search, search)
+        entities = []
+        for row in data:
+            if row['openatlas_class_name'] == 'appellation':
+                entity = Entity.get_linked_entity_safe_static(
+                    row['id'],
+                    'P1',
+                    True)
+                if entity.class_.name not in classes:
+                    continue
+            else:
+                entity = Entity(row)
+            if entity:
+                entities.append(entity)
+        parser = entity_.parse_args()
+        parser['format'] = 'search'
+        parser['limit'] = 10
+        return Endpoint(entities, parser).resolve_simple_search()
+
+
+def join_lists_of_dicts_remove_duplicates(
+        list_1: list[dict[str, Any]],
+        list_2: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    list_1_set = {tuple(sorted(d.items())) for d in list_1}
+    result = list(list_1)
+
+    for item in list_2:
+        if tuple(sorted(item.items())) not in list_1_set:
+            result.append(item)
+            list_1_set.add(tuple(sorted(item.items())))
+    return result

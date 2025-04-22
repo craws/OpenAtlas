@@ -81,11 +81,14 @@ class Tab:
                 if view == 'event':
                     self.table.header = g.table_headers['event']
 
-    def set_buttons(self, name: str, entity: Optional[Entity] = None) -> None:
+    def set_buttons(
+            self,
+            tab_name: str,
+            entity: Optional[Entity] = None) -> None:
         view = entity.class_.view if entity else None
         id_ = entity.id if entity else None
         class_name = entity.class_.name if entity else None
-        match name:
+        match tab_name:
             case 'actor':
                 match view:
                     case 'file':
@@ -119,7 +122,7 @@ class Tab:
                             g.classes[item].label,
                             url_for('insert', class_=item, origin_id=id_)))
             case 'artifact':
-                if class_name == 'source':
+                if class_name in ('source', 'file'):
                     self.buttons.append(
                         button(
                             'link',
@@ -207,21 +210,21 @@ class Tab:
             case 'feature' if class_name == 'place':
                 self.buttons.append(
                     button(
-                        g.classes[name].label,
-                        url_for('insert', class_=name, origin_id=id_)))
+                        g.classes[tab_name].label,
+                        url_for('insert', class_=tab_name, origin_id=id_)))
             case 'file':
                 if view == 'reference':
                     self.buttons.append(
                         button(
                             'link',
-                            url_for('reference_add', id_=id_, view=name)))
+                            url_for('reference_add', id_=id_, view=tab_name)))
                 else:
                     self.buttons.append(
                         button('link', url_for('entity_add_file', id_=id_)))
                 self.buttons.append(
                     button(
-                        g.classes[name].label,
-                        url_for('insert', class_=name, origin_id=id_)))
+                        g.classes[tab_name].label,
+                        url_for('insert', class_=tab_name, origin_id=id_)))
                 if entity and check_iiif_activation():
                     for file in entity.get_linked_entities('P67', True):
                         if (file.class_.view == 'file'
@@ -255,21 +258,21 @@ class Tab:
                     self.buttons.append(
                         button(
                             'link',
-                            url_for('file_add', id_=id_, view=name)))
+                            url_for('file_add', id_=id_, view=tab_name)))
                 elif view == 'reference':
                     self.buttons.append(
                         button(
                             'link',
-                            url_for('reference_add', id_=id_, view=name)))
+                            url_for('reference_add', id_=id_, view=tab_name)))
                 elif view == 'source':
                     self.buttons.append(
                         button(
                             'link',
-                            url_for('link_insert', id_=id_, view=name)))
+                            url_for('link_insert', id_=id_, view=tab_name)))
                 self.buttons.append(
                     button(
-                        g.classes[name].label,
-                        url_for('insert', class_=name, origin_id=id_)))
+                        g.classes[tab_name].label,
+                        url_for('insert', class_=tab_name, origin_id=id_)))
             case 'reference':
                 self.buttons.append(
                     button('link', url_for('entity_add_reference', id_=id_)))
@@ -296,24 +299,24 @@ class Tab:
                     self.buttons.append(
                         button(
                             _('link'),
-                            url_for('file_add', id_=id_, view=name)))
+                            url_for('file_add', id_=id_, view=tab_name)))
                 elif view == 'reference':
                     self.buttons.append(
                         button(
                             'link',
-                            url_for('reference_add', id_=id_, view=name)))
+                            url_for('reference_add', id_=id_, view=tab_name)))
                 else:
                     self.buttons.append(
                         button('link', url_for('entity_add_source', id_=id_)))
                 self.buttons.append(
                     button(
                         g.classes['source'].label,
-                        url_for('insert', class_=name, origin_id=id_)))
+                        url_for('insert', class_=tab_name, origin_id=id_)))
             case 'stratigraphic_unit' if class_name == 'feature':
                 self.buttons.append(
                     button(
                         g.classes['stratigraphic_unit'].label,
-                        url_for('insert', class_=name, origin_id=id_)))
+                        url_for('insert', class_=tab_name, origin_id=id_)))
             case 'text':
                 self.buttons.append(button(
                     _('text'),

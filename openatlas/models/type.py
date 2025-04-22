@@ -7,6 +7,7 @@ from flask import g
 
 from openatlas import app
 from openatlas.database import type as db
+from openatlas.display.util2 import sanitize
 from openatlas.models.entity import Entity
 
 
@@ -88,7 +89,7 @@ class Type(Entity):
             multiple: bool) -> None:
         db.update_hierarchy({
             'id': self.id,
-            'name': name,
+            'name': sanitize(name),
             'multiple': multiple})
         db.add_classes_to_hierarchy(self.id, classes)
 

@@ -126,9 +126,9 @@ def admin_index() -> str:
 def get_content_table() -> str:
     table = Table(['name'] + list(app.config['LANGUAGES']))
     for item, languages in get_content().items():
-        content = [_(item)]
+        content = [uc_first(_(item))]
         for language in app.config['LANGUAGES']:
-            content.append(sanitize(languages[language]))
+            content.append(sanitize(languages[language]) or '')
         content.append(link(_('edit'), url_for('admin_content', item=item)))
         table.rows.append(content)
     return table.display()
@@ -344,8 +344,6 @@ def settings(category: str) -> str | Response:
                 value = ' '.join(set(filter(None, field.data)))
             if field.type == 'BooleanField':
                 value = 'True' if field.data else ''
-            if isinstance(value, str):
-                value = sanitize(value) if value else ''
             data[field.name] = value
         Transaction.begin()
         try:
@@ -816,7 +814,7 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
             keys.append(key)
         files_size = sum(paths[key]['size'] for key in keys)
     stats = shutil.disk_usage(app.config['UPLOAD_PATH'])
-    percent = {
+    percent: dict[str, int | Any] = {
         'free': 100 - math.ceil(stats.free / (stats.total / 100)),
         'project': math.ceil(files_size / (stats.total / 100)),
         'export': math.ceil(paths['export']['size'] / (files_size / 100)),

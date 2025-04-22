@@ -239,10 +239,10 @@ def user_update(id_: int) -> str | Response:
     if user and form.validate_on_submit():
         # Active is always True for current user to prevent self deactivation
         user.active = True if user.id == current_user.id else form.active.data
-        user.real_name = sanitize(form.real_name.data)
-        user.username = sanitize(form.username.data)
+        user.real_name = form.real_name.data
+        user.username = form.username.data
         user.email = form.email.data
-        user.description = sanitize(form.description.data)
+        user.description = form.description.data
         user.group = form.group.data
         user.update()
         flash(_('info update'), 'info')

@@ -14,7 +14,7 @@ from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.util import button, display_info
-from openatlas.display.util2 import manual, sanitize, uc_first
+from openatlas.display.util2 import manual, uc_first
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField, generate_password_field
 from openatlas.forms.setting import DisplayForm, FrontendForm, ModulesForm
@@ -112,7 +112,7 @@ def profile_settings(category: str) -> str | Response:
             if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
                 continue
             if field.name == 'name':
-                current_user.real_name = sanitize(field.data)
+                current_user.real_name = field.data
             elif field.name == 'email':
                 current_user.email = field.data
             else:

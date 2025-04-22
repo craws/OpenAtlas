@@ -24,9 +24,11 @@ def sanitize(string: str | None, mode: Optional[str] = None) -> Optional[str]:
     if mode == 'ascii':  # Filter ASCII letters/numbers
         sanitized = re.sub('[^A-Za-z0-9]+', '', string)
     else:  # Remove HTML tags, keep linebreaks
+        string = string.replace('&', '&amp;')  # Fix for possible empty return
         stripper = MLStripper()
         stripper.feed(string)
         sanitized = stripper.get_data().strip()
+        sanitized.replace('&amp;', '&')
     return sanitized or None
 
 

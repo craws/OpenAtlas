@@ -8,7 +8,7 @@ from openatlas.database.connect import Transaction
 from openatlas.display.table import Table
 from openatlas.display.util import (
     get_entities_linked_to_type_recursive, link, required_group)
-from openatlas.display.util2 import sanitize, uc_first
+from openatlas.display.util2 import uc_first
 from openatlas.forms.display import display_form
 from openatlas.forms.form import get_manager
 from openatlas.models.entity import Entity
@@ -69,7 +69,7 @@ def hierarchy_update(id_: int) -> str | Response:
         Transaction.begin()
         try:
             hierarchy.update_hierarchy(
-                sanitize(manager.form.name.data),
+                manager.form.name.data,
                 manager.form.classes.data,
                 multiple=(
                     hierarchy.category == 'value'

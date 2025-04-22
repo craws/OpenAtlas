@@ -5,6 +5,7 @@ from typing import Any, Optional
 from flask import g
 
 from openatlas.database import reference_system as db
+from openatlas.display.util2 import sanitize
 from openatlas.models.entity import Entity
 
 
@@ -32,7 +33,8 @@ class ReferenceSystem(Entity):
             'name': self.name,
             'website_url': data['reference_system']['website_url'],
             'resolver_url': data['reference_system']['resolver_url'],
-            'identifier_example': data['reference_system']['placeholder']})
+            'identifier_example': sanitize(
+                data['reference_system']['placeholder'])})
         if data['reference_system']['classes']:
             db.add_classes(self.id, data['reference_system']['classes'])
 

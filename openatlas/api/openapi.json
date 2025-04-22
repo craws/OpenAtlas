@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.7d",
+    "version": "0.4.7f",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -1334,6 +1334,49 @@
         }
       }
     },
+    "/search/{system_class}/{term}": {
+      "get": {
+        "tags": [
+          "Proposal"
+        ],
+        "description": "Searches the database for entries matching a provided search term. \n  Results are ordered with exact prefix matches appearing first, followed by entries containing the search term within their name or appellation.",
+        "operationId": "GetSearchEntities",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/system_class"
+          },
+          {
+            "name": "term",
+            "description": "Search term",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntitiesOutputModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
     "/geometric_entities/": {
       "get": {
         "tags": [
@@ -2483,6 +2526,9 @@
                 },
                 {
                   "$ref": "#/components/schemas/GeoJSONModel"
+                },
+                {
+                  "$ref": "#/components/schemas/SearchModel"
                 }
               ]
             }
@@ -5408,9 +5454,52 @@
           },
           "children": {
             "nullable": true,
-            "$ref": "#/components/schemas/ChainEventModel"
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChainEventModel"
+            }
           }
         }
+      },
+      "SearchModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the entity"
+          },
+          "id": {
+            "type": "string",
+            "format": "uri",
+            "description": "The unique identifier URL of the entity"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "A description of the entity"
+          },
+          "system_class": {
+            "type": "string",
+            "description": "The system class of the entity"
+          },
+          "begin": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "The start date of the entity"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "The end date of the entity"
+          }
+        },
+        "required": [
+          "name",
+          "id",
+          "system_class"
+        ]
       }
     }
   }

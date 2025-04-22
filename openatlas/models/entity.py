@@ -161,7 +161,8 @@ class Entity:
                 'property_code': code,
                 'domain_id': domain.id,
                 'range_id': range_.id,
-                'description': description,
+                'description': sanitize(description)
+                if isinstance(description, str) else description,
                 'type_id': type_id})
             new_link_ids.append(id_)
         return new_link_ids
@@ -174,7 +175,7 @@ class Entity:
             inverse: bool = False) -> None:
         ids = ast.literal_eval(range_)
         ids = [int(i) for i in ids] if isinstance(ids, list) else [int(ids)]
-        self.link(code, Entity.get_by_ids(ids), description, inverse)
+        self.link(code, Entity.get_by_ids(ids), sanitize(description), inverse)
 
     def get_links(
             self,
@@ -659,10 +660,10 @@ class Link:
             'description': self.description,
             'begin_from': datetime64_to_timestamp(self.begin_from),
             'begin_to': datetime64_to_timestamp(self.begin_to),
-            'begin_comment': self.begin_comment,
+            'begin_comment': sanitize(self.begin_comment),
             'end_from': datetime64_to_timestamp(self.end_from),
             'end_to': datetime64_to_timestamp(self.end_to),
-            'end_comment': self.end_comment})
+            'end_comment': sanitize(self.end_comment)})
 
     def set_dates(self, data: dict[str, Any]) -> None:
         self.begin_from = data['begin_from']

@@ -5,7 +5,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Import &mdash; OpenAtlas 8.10.0 documentation</title>
+  <title>Import &mdash; OpenAtlas 8.11.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
@@ -35,7 +35,7 @@
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                8.10.0
+                8.11.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -117,19 +117,23 @@ to import data directly from
 <a class="reference external" href="https://en.wikipedia.org/wiki/Comma-separated_values">CSV</a> files.
 Lists containing the following fields can be imported currently:</p>
 <ul class="simple">
+<li><p>Origin IDs</p></li>
 <li><p>Name</p></li>
 <li><p>Alias</p></li>
 <li><p>Description</p></li>
 <li><p>Dates</p></li>
 <li><p>GIS data</p></li>
 <li><p>Types</p></li>
+<li><p>Origin types</p></li>
 <li><p>Value types</p></li>
+<li><p>Origin value types</p></li>
 <li><p>References</p></li>
+<li><p>Origin references</p></li>
 <li><p>Reference systems</p></li>
 <li><p>Administrative unit</p></li>
 <li><p>Historical place</p></li>
-<li><p>Origin IDs</p></li>
 <li><p>Place hierarchy</p></li>
+<li><p>Type hierarchy</p></li>
 </ul>
 <section id="preparation">
 <h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this heading"></a></h2>
@@ -186,7 +190,12 @@ get imported if a name is missing</p></li>
 <li><p><strong>end_from</strong> - used for dates, see <a class="reference internal" href="#dates-import"><span class="std std-ref">Dates</span></a></p></li>
 <li><p><strong>end_to</strong> - used for dates, see <a class="reference internal" href="#dates-import"><span class="std std-ref">Dates</span></a></p></li>
 <li><p><strong>type_ids</strong> - used for linking to a type, see <a class="reference internal" href="#types-import"><span class="std std-ref">Types</span></a></p></li>
-<li><p><strong>value_types</strong> - used for linking to a value type, see <a class="reference internal" href="#value-types-import"><span class="std std-ref">Value types</span></a></p></li>
+<li><p><strong>origin_type_ids</strong> - used for linking to a type within the same project,
+see <a class="reference internal" href="#origin-types-import"><span class="std std-ref">Origin types</span></a></p></li>
+<li><p><strong>value_types</strong> - used for linking to a value type,
+see <a class="reference internal" href="#value-types-import"><span class="std std-ref">Value types</span></a></p></li>
+<li><p><strong>origin_value_types</strong> - used for linking to a value type within the same
+project, see <a class="reference internal" href="#origin-value-types-import"><span class="std std-ref">Origin value types</span></a></p></li>
 <li><p><strong>reference_ids</strong> - used for linking data to already existing references in
 the database, see <a class="reference internal" href="#references-import"><span class="std std-ref">References</span></a></p></li>
 <li><p><strong>origin_reference_ids</strong> - used for linking data to already existing
@@ -242,6 +251,17 @@ can link all of the imported data to this.</p>
 specific <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> in your OpenAtlas instance</p></li>
 </ul>
 </section>
+<section id="origin-types">
+<span id="origin-types-import"></span><h3>Origin types<a class="headerlink" href="#origin-types" title="Permalink to this heading"></a></h3>
+<p>It is possible to link entities to one or multiple <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a>, which
+were imported in the same project by their origin id.</p>
+<ul class="simple">
+<li><p>Origin type IDs can be entered in the column <strong>origin_type_ids</strong></p></li>
+<li><p>you can enter multiple IDs, separated by a space</p></li>
+<li><p>the origin ID of a <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> can be found at the detail view of the
+specific <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> in your OpenAtlas instance</p></li>
+</ul>
+</section>
 <section id="value-types">
 <span id="value-types-import"></span><h3>Value types<a class="headerlink" href="#value-types" title="Permalink to this heading"></a></h3>
 <p>It is possible to link entities to one or multiple value <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a>
@@ -250,6 +270,21 @@ when importing.</p>
 <li><p>a Value <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> can be entered via the <strong>value_types</strong> column</p></li>
 <li><p>type ID and corresponding value are separated by a semicolon (<strong>;</strong>), e.g.
 1234;-13.65</p></li>
+<li><p>for each value <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> a value is required</p></li>
+<li><p>multiple value type-value pairs are separated by a space</p></li>
+<li><p>The ID of a value <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> can be found at the detail view of a
+specific value <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> in your OpenAtlas instance</p></li>
+</ul>
+</section>
+<section id="origin-value-types">
+<span id="origin-value-types-import"></span><h3>Origin value types<a class="headerlink" href="#origin-value-types" title="Permalink to this heading"></a></h3>
+<p>It is possible to link entities to one or multiple origin value
+<a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a>, which were imported in the same project by their origin id.</p>
+<ul class="simple">
+<li><p>a Value <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> can be entered via the <strong>origin_value_types</strong>
+column</p></li>
+<li><p>type ID and corresponding value are separated by a semicolon (<strong>;</strong>), e.g.
+value_type_1;-13.65</p></li>
 <li><p>for each value <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> a value is required</p></li>
 <li><p>multiple value type-value pairs are separated by a space</p></li>
 <li><p>The ID of a value <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> can be found at the detail view of a
