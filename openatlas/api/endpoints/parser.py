@@ -160,9 +160,9 @@ class Parser:
     def get_by_page(
             self,
             index: list[dict[str, Any]]) -> dict[str, Any] | None:
-        if not index:
+        if not index or not self.page:
             return None
-        target_page = min(self.page, index[-1]['page'])
+        target_page = min(int(self.page), int(index[-1]['page']))
         for entry in index:
             if entry.get('page') == target_page:
                 return entry.get('startId')
