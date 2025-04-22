@@ -90,7 +90,7 @@
           <button
             id="{{ field.id }}-add-{{ add_dynamical }}"
             disabled
-            type="button"
+            type="submit"
             class="btn btn-outline-primary btn-sm">{{ _('insert')|uc_first }}
           </button>
         </div>
@@ -99,12 +99,18 @@
   </div>
 
   <script>
+    $("#{{ field.id }}-modal").on("hidden.bs.modal", function (e) {
+      $('#save').focus();
+    })
     $("#add-{{ add_dynamical }}-modal-{{field.id}} #name_dynamic")
-      .on('keyup change', function () {
+      .on('keyup change', function (e) {
         if ($(this).val() === '')
           $('#{{field.id}}-add-{{ add_dynamical }}').attr('disabled', '')
         else
           $('#{{field.id}}-add-{{ add_dynamical }}').removeAttr('disabled')
+        if (e.key == "Enter"){
+          $('#{{field.id}}-add-{{ add_dynamical }}').click()
+        }
       });
 
     $('#{{field.id}}-add-{{ add_dynamical }}')
@@ -119,6 +125,7 @@
         const entityId = await ajaxAddEntity(data);
         /* await refillTable('{{ field.id }}', {{ field.filter_ids }}); */
         $(this).prop("disabled", false).text('{{ _('insert')|uc_first }}');
+        $(this).prop("type", "button")
         $('.modal').modal('hide');
         selectFromTable(undefined, '{{ field.id }}', entityId, name)
       });

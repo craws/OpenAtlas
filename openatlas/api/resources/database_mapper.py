@@ -36,5 +36,16 @@ def get_all_links_for_network(
     return db_link.get_all_links_for_network(system_classes)
 
 
-def get_links_by_id_network(ids: list[int])-> list[dict[str, Any]]:
+def get_links_by_id_network(ids: list[int]) -> list[dict[str, Any]]:
     return db_link.get_links_by_id_network(ids)
+
+
+def get_api_simple_search(
+        term: str,
+        class_: list[str]) -> list[dict[str, Any]]:
+    return db_entity.api_search(term, class_)
+
+def get_api_search(
+        term: str,
+        class_: list[str]) -> list[dict[str, Any]]:
+    return db_entity.search(term, class_)

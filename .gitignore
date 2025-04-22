@@ -40,3 +40,4 @@ env.sh
 .scannerwork/*
 
 .vscode
+/.env
