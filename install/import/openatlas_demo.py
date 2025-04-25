@@ -11,7 +11,7 @@
 import time
 from typing import Any
 
-import psycopg2.extras
+import psycopg2
 from flask import g
 from psycopg2 import extras
 
@@ -40,7 +40,7 @@ cursor = connection.cursor(cursor_factory=extras.DictCursor)
 id_map = {}  # Map imported entity ids to existing ones
 
 
-def cleanup():
+def cleanup() -> None:
     with app.test_request_context():
         app.preprocess_request()
         g.cursor.execute(
@@ -56,7 +56,7 @@ def cleanup():
             {'project_id': PROJECT_ID})
 
 
-def hierarchies():
+def hierarchies() -> None:
     cursor.execute(
         """
         SELECT
@@ -84,10 +84,10 @@ def hierarchies():
                 insert_hierarchy(item)
 
 
-def insert_hierarchy(item):
+def insert_hierarchy(item: dict[str, Any]) -> None:
     print(f"New hierarchy: {item['name']}")
     cursor.execute(
-        "SELECT description FROM model.entity WHERE id = %(id)s;",
+        'SELECT description FROM model.entity WHERE id = %(id)s;',
         {'id': item['id']})
     description = cursor.fetchone()['description']
     entity_ = Entity.insert('type', item['name'], description)
