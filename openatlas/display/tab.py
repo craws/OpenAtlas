@@ -127,6 +127,12 @@ class Tab:
                         button(
                             'link',
                             url_for('link_insert', id_=id_, view='artifact')))
+                if view == 'reference':
+                    self.buttons.append(
+                        button(
+                            'link',
+                            url_for('reference_add', id_=id_, view='artifact'))
+                        )
                 if class_name in [
                         'place',
                         'artifact',
