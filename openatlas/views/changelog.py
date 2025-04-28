@@ -17,6 +17,7 @@ def index_changelog() -> str:
 versions = {
     '8.12.0': ['TBA', {
         'feature': {
+            '2507': 'Link button for reference at artifact tab',
             '2499':
                 'Bundled Docker Image for OpenAtlas and OpenAtlas Discovery',
             '2523': 'Refactor and minor improvements'},
