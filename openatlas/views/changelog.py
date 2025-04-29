@@ -22,7 +22,8 @@ versions = {
                 'Bundled Docker Image for OpenAtlas and OpenAtlas Discovery',
             '2523': 'Refactor and minor improvements'},
         'fix': {
-            '2509': 'Wrong focus in edit view'}}],
+            '2509': 'Wrong focus in edit view',
+            '2524': 'Automatic scroll to insert/save button'}}],
     '8.11.0': ['2025-04-18', {
         'feature': {
             '2492': 'Performance improvement',
