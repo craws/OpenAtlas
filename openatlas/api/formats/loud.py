@@ -47,9 +47,10 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
                 property_['unit'] = {
                     'type': "MeasurementUnit",
                     '_label': link_.range.description}
+            property_['part_of'] = [get_type_property(g.types[link_.range.id])]
         elif link_.type:
             property_['classified_as'] = [
-                get_type_property(g.types.get(link_.type.id))]
+                get_type_property(g.types[link_.type.id])]
         if link_.property.code == 'P67' and link_.description:
             property_['content'] = link_.description
             if link_.domain.cidoc_class.code == 'E32':
@@ -69,8 +70,6 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
                 _external=True),
             'type': loud[get_crm_code(link_, True).replace(' ', '_')],
             '_label': link_.domain.name}
-        if standard_type := get_standard_type_loud(link_.domain.types):
-            property_['classified_as'] = [get_type_property(standard_type)]
         if link_.property.code == 'P2':
             if link_.description:
                 property_['value'] = link_.description
@@ -79,7 +78,7 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
                     '_label': link_.domain.description}
         elif link_.type:
             property_['classified_as'] = [
-                get_type_property(g.types.get(link_.type.id))]
+                get_type_property(g.types[link_.type.id])]
         if link_.property.code == 'P67' and link_.description:
             property_['content'] = link_.description
             if link_.domain.cidoc_class.code == 'E32':
@@ -135,7 +134,7 @@ def get_loud_property_name(
         loud: dict[str, str],
         link_: Link,
         inverse: bool = False) -> str:
-    name = 'broader'
+    name = 'part' if inverse else 'part_of'
     if not link_.property.code == 'P127':
         name = loud[get_crm_relation(link_, inverse).replace(' ', '_')]
     return name
@@ -194,7 +193,7 @@ def get_loud_timespan(entity: Entity) -> dict[str, Any]:
 
 
 def get_type_property(type_: Type) -> dict[str, Any]:
-    return {
+    property_ = {
         'id': url_for(
             'api.entity',
             id_=type_.id,
@@ -202,6 +201,9 @@ def get_type_property(type_: Type) -> dict[str, Any]:
             _external=True),
         'type': remove_spaces_dashes(type_.cidoc_class.i18n['en']),
         '_label': type_.name}
+    for super_type in [g.types[root] for root in type_.root]:
+        property_['part_of'] = [get_type_property(super_type)]
+    return property_
 
 
 def get_standard_type_loud(types: dict[Type, Any]) -> Optional[Type]:
