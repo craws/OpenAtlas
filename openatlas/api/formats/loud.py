@@ -2,13 +2,12 @@ import mimetypes
 from collections import defaultdict
 from typing import Any, Optional
 
-from flask import url_for, g
+from flask import g, url_for
 
 from openatlas import app
-from openatlas.api.resources.util import (
-    get_license_name, remove_spaces_dashes, date_to_str, get_crm_relation,
-    get_crm_code,
-    to_camel_case)
+from openatlas.api.resources.util import (date_to_str, get_crm_code,
+                                          get_crm_relation, get_license_type,
+                                          remove_spaces_dashes, to_camel_case)
 from openatlas.display.util import get_file_path
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
@@ -167,7 +166,7 @@ def get_loud_images(entity: Entity, image_links: list[Link]) -> dict[str, Any]:
                     _external=True),
                 'type': 'DigitalObject',
                 '_label': 'ProfileImage' if id_ == profile_image else ''}]}
-        if license_ := get_license_name(link_.domain):
+        if license_ := get_license_type(link_.domain):
             image['classified_as'] = [{
                 'id': url_for(
                     'api.entity',
