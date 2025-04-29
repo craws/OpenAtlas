@@ -480,10 +480,12 @@ class ReferenceBaseDisplay(BaseDisplay):
             range_ = link_.range
             data = get_base_table_data(range_)
             data.append(link_.description)
-            data.append(edit_link(url_for(
-                'link_update',
-                id_=link_.id,
-                origin_id=self.entity.id)))
+            data.append(
+                edit_link(
+                    url_for(
+                        'link_update',
+                        id_=link_.id,
+                        origin_id=self.entity.id)))
             data.append(
                 remove_link(
                     range_.name,

@@ -15,6 +15,14 @@ def index_changelog() -> str:
 
 # pylint: disable=too-many-lines
 versions = {
+    '8.12.0': ['TBA', {
+        'feature': {
+            '2507': 'Link button for reference at artifact tab',
+            '2499':
+                'Bundled Docker Image for OpenAtlas and OpenAtlas Discovery',
+            '2523': 'Refactor and minor improvements'},
+        'fix': {
+            '2509': 'Wrong focus in edit view'}}],
     '8.11.0': ['2025-04-18', {
         'feature': {
             '2492': 'Performance improvement',
