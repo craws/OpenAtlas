@@ -2,7 +2,7 @@ BEGIN;
 
 -- Raise database version
 
-UPDATE web.settings SET value = '8.11.0' WHERE name = 'database_version';
+-- UPDATE web.settings SET value = '8.11.0' WHERE name = 'database_version';
 
 -- #2319 APIS interface
 

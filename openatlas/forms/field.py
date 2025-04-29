@@ -122,7 +122,10 @@ class ReferenceInput(Input):
             field: ReferenceField,
             *args: Any,
             **kwargs: Any) -> str:
-        return render_template('forms/reference_field.html', field=field)
+        return render_template(
+            'forms/reference_field.html',
+            field=field,
+            api=g.reference_systems[field.reference_system_id].api)
 
 
 class ReferenceField(Field):
