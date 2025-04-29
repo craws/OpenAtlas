@@ -111,6 +111,34 @@ $(document).ready(function () {
   });
 
   /**
+   * APIS autocomplete
+   * Documentation: https://bootstrap-autocomplete.readthedocs.io/en/latest/
+   * Bootstrap version needs to be manually set d/t
+   */
+  $('input[data-reference-system=APIS]').autoComplete({
+    bootstrapVersion: '4',
+    resolver: 'custom',
+    formatResult: function (item) {
+      return {
+        value: item.id,
+        text: `${item.label} - ${item.description}<br/><small>${item.id}</small>`
+      };
+    },
+    events: {
+      search: function (qry, callback) {
+        $.ajax(
+            `https://nomansland-dev.acdh-ch-dev.oeaw.ac.at/apis/api/entities/?limit=10&search=${qry}`,
+        ).done(function (res) {
+            callback(res.search)
+        });
+      }
+    }
+  }).on('autocomplete.select', function(evt,item) {
+      $('input[data-reference-system=APIS]').val(item.id);
+  });
+
+
+  /**
    * Wikidata autocomplete
    * Documentation: https://bootstrap-autocomplete.readthedocs.io/en/latest/
    * Bootstrap version needs to be manually set d/t
