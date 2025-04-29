@@ -158,6 +158,6 @@
 
   $("#{{ field.id }}-modal").on("hidden.bs.modal", function (e) {
     selectFromTreeMulti({{ field.id }});
-    $('#save').focus();
+    document.getElementById("save")?.focus({preventScroll:true})
   })
 </script>
