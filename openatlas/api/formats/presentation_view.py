@@ -10,7 +10,6 @@ from openatlas import app
 from openatlas.api.endpoints.parser import Parser
 from openatlas.api.resources.util import (
     date_to_str, geometry_to_feature_collection, get_crm_relation_x,
-    geometry_to_geojson,
     get_iiif_manifest_and_path, get_license_name, get_location_link,
     get_reference_systems, get_value_for_types, to_camel_case)
 from openatlas.display.util import get_file_path
@@ -87,7 +86,8 @@ def get_relation_types_dict(
     return relation_types
 
 
-def get_presentation_references(links_inverse: list[Link]) -> list[dict[str, Any]]:
+def get_presentation_references(
+        links_inverse: list[Link]) -> list[dict[str, Any]]:
     references = []
     for link in links_inverse:
         if link.domain.class_.view != 'reference':
@@ -97,15 +97,14 @@ def get_presentation_references(links_inverse: list[Link]) -> list[dict[str, Any
             'systemClass': link.domain.class_.name,
             'title': link.domain.name,
             'citation': link.domain.description,
-            'pages': link.description }
+            'pages': link.description}
         if link.domain.standard_type:
             ref.update({
-                 'type': link.domain.standard_type.name ,
-                 'typeId': link.domain.standard_type.id
-
-            })
+                'type': link.domain.standard_type.name,
+                'typeId': link.domain.standard_type.id})
         references.append(ref)
     return references
+
 
 def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
     ids = [entity.id]
@@ -161,7 +160,8 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
             'title': rel_entity.name,
             'description': rel_entity.description,
             'aliases': list(rel_entity.aliases.values()),
-            'geometries': geometry_to_feature_collection(geoms.get(rel_entity.id)),
+            'geometries': geometry_to_feature_collection(
+                geoms.get(rel_entity.id)),
             'when': get_presentation_time(rel_entity),
             'standardType': standard_type_,
             'relationTypes': relation_types[rel_entity.id]}
