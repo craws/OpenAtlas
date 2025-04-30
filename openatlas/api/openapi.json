@@ -3031,14 +3031,6 @@
           }
         }
       },
-      "Position": {
-        "type": "array",
-        "minItems": 2,
-        "maxItems": 3,
-        "items": {
-          "type": "number"
-        }
-      },
       "LineString": {
         "type": "object",
         "required": [
@@ -3078,13 +3070,6 @@
           "$ref": "#/components/schemas/Position"
         },
         "minItems": 2
-      },
-      "LinearRing": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/Position"
-        },
-        "minItems": 4
       },
       "Polygon": {
         "type": "object",
@@ -4963,33 +4948,7 @@
           "geometries": {
             "nullable": true,
             "type": "object",
-            "required": [
-              "type",
-              "coordinates",
-              "title",
-              "description",
-              "shapeType"
-            ],
-            "properties": {
-              "type": {
-                "type": "string"
-              },
-              "coordinates": {
-                "type": "array",
-                "items": {
-                  "type": "number"
-                }
-              },
-              "title": {
-                "type": "string"
-              },
-              "description": {
-                "type": "string"
-              },
-              "shapeType": {
-                "type": "string"
-              }
-            }
+            "$ref": "#/components/schemas/Geometries"
           },
           "when": {
             "nullable": true,
@@ -5545,6 +5504,205 @@
           "id",
           "system_class"
         ]
+      },
+      "Position": {
+        "type": "array",
+        "items": {
+          "type": "number",
+          "format": "double"
+        },
+        "minItems": 2,
+        "description": "A single position represented as an array of numbers.\nThe first two elements MUST be longitude and latitude (in that order).\nAn optional third element represents altitude. More elements are discouraged.\nExample: [10.9787, 49.7606] or [10.9787, 49.7606, 150.5]"
+      },
+      "PositionArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Position"
+        },
+        "minItems": 2,
+        "description": "An array of two or more positions. Used for LineStrings."
+      },
+      "LinearRing": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Position"
+        },
+        "minItems": 4,
+        "description": "An array of four or more positions where the first and last positions are equivalent (they represent closed loops).\nUsed for defining polygon boundaries."
+      },
+      "PolygonCoordinates": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/LinearRing"
+        },
+        "minItems": 1,
+        "description": "An array of LinearRing coordinate arrays. The first element MUST be the exterior ring.\nSubsequent elements represent interior rings (holes)."
+      },
+      "GeoJSONPoint": {
+        "type": "object",
+        "required": [
+          "type",
+          "coordinates"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "Point"
+            ],
+            "description": "The GeoJSON geometry type."
+          },
+          "coordinates": {
+            "$ref": "#/components/schemas/Position"
+          }
+        },
+        "description": "A GeoJSON Point geometry."
+      },
+      "GeoJSONLineString": {
+        "type": "object",
+        "required": [
+          "type",
+          "coordinates"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "LineString"
+            ],
+            "description": "The GeoJSON geometry type."
+          },
+          "coordinates": {
+            "$ref": "#/components/schemas/PositionArray"
+          }
+        },
+        "description": "A GeoJSON LineString geometry."
+      },
+      "GeoJSONPolygon": {
+        "type": "object",
+        "required": [
+          "type",
+          "coordinates"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "Polygon"
+            ],
+            "description": "The GeoJSON geometry type."
+          },
+          "coordinates": {
+            "$ref": "#/components/schemas/PolygonCoordinates"
+          }
+        },
+        "description": "A GeoJSON Polygon geometry."
+      },
+      "GeoJsonGeometry": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/Point"
+          },
+          {
+            "$ref": "#/components/schemas/LineString"
+          },
+          {
+            "$ref": "#/components/schemas/Polygon"
+          }
+        ]
+      },
+      "FeatureProperties": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "A title for the feature."
+          },
+          "description": {
+            "type": "string",
+            "description": "A description of the feature."
+          },
+          "shapeType": {
+            "type": "string",
+            "description": "A custom identifier for the shape's role or type."
+          },
+          "locationId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "A specific identifier for the location."
+          }
+        }
+      },
+      "Feature": {
+        "type": "object",
+        "required": [
+          "type",
+          "geometry",
+          "properties"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "Feature"
+            ],
+            "description": "The GeoJSON object type."
+          },
+          "geometry": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GeoJsonGeometry"
+              }
+            ]
+          },
+          "properties": {
+            "nullable": true,
+            "$ref": "#/components/schemas/FeatureProperties"
+          }
+        },
+        "description": "A GeoJSON Feature object, linking a geometry to properties."
+      },
+      "FeatureCollection": {
+        "type": "object",
+        "required": [
+          "type",
+          "features"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "FeatureCollection"
+            ],
+            "description": "The GeoJSON object type."
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Feature"
+            }
+          }
+        },
+        "description": "A collection of GeoJSON Feature objects."
+      },
+      "Geometries": {
+        "nullable": true,
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/FeatureCollection"
+          },
+          {
+            "$ref": "#/components/schemas/GeoJSONPoint"
+          },
+          {
+            "$ref": "#/components/schemas/GeoJSONPolygon"
+          },
+          {
+            "$ref": "#/components/schemas/GeoJSONLineString"
+          }
+        ],
+        "description": "Represents geographic data associated with an entity.\nCan be explicitly null, a single GeoJSON geometry (Point, Polygon, or LineString),\nor a GeoJSON FeatureCollection containing Features with specific properties."
       }
     }
   }
