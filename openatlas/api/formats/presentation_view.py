@@ -86,6 +86,26 @@ def get_relation_types_dict(
     return relation_types
 
 
+def get_presentation_references(links_inverse: list[Link]) -> list[dict[str, Any]]:
+    references = []
+    for link in links_inverse:
+        if link.domain.class_.view != 'reference':
+            continue
+        ref = {
+            'id': link.domain.id,
+            'systemClass': link.domain.class_.name,
+            'title': link.domain.name,
+            'citation': link.domain.description,
+            'pages': link.description }
+        if link.domain.standard_type:
+            ref.update({
+                 'type': link.domain.standard_type.name ,
+                 'typeId': link.domain.standard_type.id
+
+            })
+        references.append(ref)
+    return references
+
 def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
     ids = [entity.id]
     if entity.class_.view in ['place', 'artifact']:
@@ -160,6 +180,7 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         'when': get_presentation_time(entity),
         'types': get_presentation_types(entity, links),
         'externalReferenceSystems': get_reference_systems(links_inverse),
+        'references': get_presentation_references(links_inverse),
         'files': get_presentation_files(links_inverse),
         'relations': relations}
 

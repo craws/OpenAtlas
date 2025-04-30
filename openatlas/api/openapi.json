@@ -5009,6 +5009,45 @@
               "$ref": "#/components/schemas/ExternalReferenceModel"
             }
           },
+          "references": {
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "systemClass",
+                "title",
+                "citation"
+              ],
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "systemClass": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "type": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "typeId": {
+                  "type": "integer",
+                  "nullable": true
+                },
+                "citation": {
+                  "type": "string"
+                },
+                "pages": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              }
+            }
+          },
           "files": {
             "nullable": true,
             "type": "array",
