@@ -205,7 +205,9 @@ def presentation_template() -> dict[str, Any]:
         'title': fields.String,
         'descriptions': fields.String,
         'isStandard': fields.Boolean,
-        'typeHierarchy': fields.List(fields.Nested(hierarchy))}
+        'typeHierarchy': fields.List(fields.Nested(hierarchy)),
+        'value': fields.Float,
+        'unit': fields.String}
     files = {
         'id': fields.Integer,
         'title': fields.String,
@@ -214,7 +216,9 @@ def presentation_template() -> dict[str, Any]:
         'licenseHolder': fields.String,
         'publicShareable': fields.String,
         'mimetype': fields.String,
-        'url': fields.String}
+        'url': fields.String,
+        'IIIFManifest': fields.String,
+        'IIIFBasePath': fields.String}
     relation_types = {
         'property': fields.String,
         'relationTo': fields.Integer,
@@ -243,6 +247,7 @@ def presentation_template() -> dict[str, Any]:
     return {
         'id': fields.Integer,
         'systemClass': fields.String,
+        'viewClass': fields.String,
         'title': fields.String,
         'description': fields.String,
         'aliases': fields.List(fields.String),

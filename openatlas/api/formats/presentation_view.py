@@ -152,6 +152,7 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
     data = {
         'id': entity.id,
         'systemClass': entity.class_.name,
+        'viewClass': entity.class_.view,
         'title': entity.name,
         'description': entity.description,
         'aliases': list(entity.aliases.values()),
