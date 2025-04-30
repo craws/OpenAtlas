@@ -110,7 +110,7 @@ VALUES
   ('P67', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='https://lotr.fandom.com/'), 'Fandom Wiki of lord of the rings', NULL),
   ('P2', (SELECT id FROM model.entity WHERE name='Height'), (SELECT id FROM model.entity WHERE name='Shire'), '23.0', NULL ),
   ('P2', (SELECT id FROM model.entity WHERE name='Weight'), (SELECT id FROM model.entity WHERE name='Shire'), '999.0', NULL ),
-  ('P2', (SELECT id FROM model.entity WHERE name='URL'), (SELECT id FROM model.entity WHERE name='https://lotr.fandom.com/'), NULL, NULL );
+  ('P2', (SELECT id FROM model.entity WHERE name='Link'), (SELECT id FROM model.entity WHERE name='https://lotr.fandom.com/'), NULL, NULL );
 
 INSERT INTO web.entity_profile_image (entity_id, image_id)
 VALUES ( (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='Picture with a License') )
