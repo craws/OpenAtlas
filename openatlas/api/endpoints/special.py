@@ -92,35 +92,57 @@ class GetSubunits(Resource):
             str(id_))
 
 
+def overwrite_object_locations_with_place(
+        links: list[dict[str, Any]],
+        exclude_: list[str]) -> list[dict[str, Any]]:
+    locations = {}
+    for l in links:
+        if l['property_code'] == 'P53':
+            locations[l['range_id']] = {
+                'range_id': l['domain_id'],
+                'range_name': l['domain_name'],
+                'range_system_class': l['domain_system_class']}
+
+    copy = links.copy()
+    for i, l in enumerate(copy):
+        if l['range_id'] in locations:
+            links[i].update(
+                range_id=locations[l['range_id']]['range_id'],
+                range_name=locations[l['range_id']]['range_name'],
+                range_system_class=locations[
+                    l['range_id']]['range_system_class'])
+        if (l['domain_id'] in locations
+                and "administrative_unit" not in exclude_):
+            links[i].update(
+                domain_id=locations[l['domain_id']]['range_id'],
+                domain_name=locations[
+                    l['domain_id']]['range_name'],
+                domain_ystem_class=locations[
+                    l['domain_id']]['range_system_class'])
+    return links
+
+def get_link_dictionary(links: list[dict[str, Any]]) -> dict[int, Any]:
+        output: dict[int, Any] = defaultdict(set)
+        for item in links:
+            if output.get(item['domain_id']):
+                output[item['domain_id']]['relations'].add(item['range_id'])
+            else:
+                output[item['domain_id']] = {
+                    'label': item['domain_name'],
+                    'systemClass': item['domain_system_class'],
+                    'relations': {item['range_id']}}
+            if output.get(item['range_id']):
+                output[item['range_id']]['relations'].add(item['domain_id'])
+            else:
+                output[item['range_id']] = {
+                    'label': item['range_name'],
+                    'systemClass': item['range_system_class'],
+                    'relations': {item['domain_id']}}
+        return output
+
 class GetNetworkVisualisation(Resource):
     @staticmethod
     def get() -> tuple[Resource, int] | Response | dict[str, Any]:
-        def overwrite_object_locations_with_place() -> None:
-            locations = {}
-            for l in links:
-                if l['property_code'] == 'P53':
-                    locations[l['range_id']] = {
-                        'range_id': l['domain_id'],
-                        'range_name': l['domain_name'],
-                        'range_system_class': l['domain_system_class']}
-
-            copy = links.copy()
-            for i, l in enumerate(copy):
-                if l['range_id'] in locations:
-                    links[i].update(
-                        range_id=locations[l['range_id']]['range_id'],
-                        range_name=locations[l['range_id']]['range_name'],
-                        range_system_class=locations[
-                            l['range_id']]['range_system_class'])
-                if (l['domain_id'] in locations
-                        and "administrative_unit" not in exclude_):
-                    links[i].update(
-                        domain_id=locations[l['domain_id']]['range_id'],
-                        domain_name=locations[
-                            l['domain_id']]['range_name'],
-                        domain_ystem_class=locations[
-                            l['domain_id']]['range_system_class'])
-
         system_classes = g.classes
         location_classes = [
             "administrative_unit",
@@ -157,8 +179,8 @@ class GetNetworkVisualisation(Resource):
         else:
             links = get_all_links_for_network(system_classes)
 
-        overwrite_object_locations_with_place()
-        link_dict = GetNetworkVisualisation.get_link_dictionary(links)
+        links = overwrite_object_locations_with_place(links, exclude_)
+        link_dict =get_link_dictionary(links)
 
         results: dict[str, Any] = {'results': []}
         for id_, dict_ in link_dict.items():
@@ -171,25 +193,6 @@ class GetNetworkVisualisation(Resource):
             return download(results, network_visualisation_template())
         return marshal(results, network_visualisation_template()), 200
 
-    @staticmethod
-    def get_link_dictionary(links: list[dict[str, Any]]) -> dict[int, Any]:
-        output: dict[int, Any] = defaultdict(set)
-        for item in links:
-            if output.get(item['domain_id']):
-                output[item['domain_id']]['relations'].add(item['range_id'])
-            else:
-                output[item['domain_id']] = {
-                    'label': item['domain_name'],
-                    'systemClass': item['domain_system_class'],
-                    'relations': {item['range_id']}}
-            if output.get(item['range_id']):
-                output[item['range_id']]['relations'].add(item['domain_id'])
-            else:
-                output[item['range_id']] = {
-                    'label': item['range_name'],
-                    'systemClass': item['range_system_class'],
-                    'relations': {item['domain_id']}}
-        return output
 
 
 class GetChainedEvents(Resource):

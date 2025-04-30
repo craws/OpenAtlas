@@ -62,6 +62,9 @@ special = [
     [GetNetworkVisualisation,
      '/network_visualisation/',
      'network_visualisation'],
+    #[GetEgoNetworkVisualisation,
+    # '/ego_network_visualisation/',
+    # 'ego_network_visualisation'],
     [GetChainedEvents,
      '/chained_events/<int:id_>',
      'chained_events']]
