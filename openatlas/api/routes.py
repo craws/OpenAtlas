@@ -14,7 +14,8 @@ from openatlas.api.endpoints.iiif import (
     IIIFAnnotation, IIIFAnnotationList, IIIFCanvas, IIIFImage, IIIFManifest,
     IIIFSequence)
 from openatlas.api.endpoints.special import (
-    ExportDatabase, GetChainedEvents, GetGeometricEntities,
+    ExportDatabase, GetChainedEvents, GetEgoNetworkVisualisation,
+    GetGeometricEntities,
     GetNetworkVisualisation,
     GetSubunits)
 from openatlas.api.endpoints.type import (
@@ -62,9 +63,9 @@ special = [
     [GetNetworkVisualisation,
      '/network_visualisation/',
      'network_visualisation'],
-    #[GetEgoNetworkVisualisation,
-    # '/ego_network_visualisation/',
-    # 'ego_network_visualisation'],
+    [GetEgoNetworkVisualisation,
+     '/ego_network_visualisation/<int:id_>',
+     'ego_network_visualisation'],
     [GetChainedEvents,
      '/chained_events/<int:id_>',
      'chained_events']]
