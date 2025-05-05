@@ -118,7 +118,6 @@ def get_network_visualisation(parser: Parser) -> dict[str, Any]:
 
 def get_ego_network_visualisation(id_: int, parser: Parser) -> dict[str, Any]:
     exclude_ = get_excluded_classes(parser)
-    depth = 1
     location_mapping = db.get_object_mapping()
     entity_ids = {id_}
     found_location_id = next(
@@ -127,7 +126,7 @@ def get_ego_network_visualisation(id_: int, parser: Parser) -> dict[str, Any]:
     if found_location_id is not None:
         entity_ids.add(found_location_id)
     all_ = []
-    for _ in range(depth):
+    for _ in range(parser.depth):
         for row in get_ego_network_filtered_classes(entity_ids, exclude_):
             entity_ids.add(row['domain_id'])
             entity_ids.add(row['range_id'])
