@@ -5,9 +5,9 @@ from typing import Any, Optional
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.api.resources.util import (date_to_str, get_crm_code,
-                                          get_crm_relation, get_license_type,
-                                          remove_spaces_dashes, to_camel_case)
+from openatlas.api.resources.util import (
+    date_to_str, get_crm_code, get_crm_relation, get_iiif_manifest_and_path,
+    get_license_type, get_license_url, remove_spaces_dashes, to_camel_case)
 from openatlas.display.util import get_file_path
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
@@ -121,8 +121,7 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
             image_links.append(link_)
 
     if image_links:
-        properties_set['representation'].append(
-            get_loud_images(data['entity'], image_links))
+        properties_set.update(get_loud_images(data['entity'], image_links))
 
     return ({'@context': app.config['API_CONTEXT']['LOUD']} |
             base_entity_dict() |
@@ -141,9 +140,8 @@ def get_loud_property_name(
 
 def get_loud_images(entity: Entity, image_links: list[Link]) -> dict[str, Any]:
     profile_image = Entity.get_profile_image_id(entity)
-    representation: dict[str, Any] = {
-        'type': 'VisualItem',
-        'digitally_shown_by': []}
+    representation = []
+    subject_of = []
     for link_ in image_links:
         id_ = link_.domain.id
         mime_type, _ = mimetypes.guess_type(g.files[id_])
@@ -159,6 +157,19 @@ def get_loud_images(entity: Entity, image_links: list[Link]) -> dict[str, Any]:
             '_label': link_.domain.name,
             'type': 'DigitalObject',
             'format': mime_type,
+            'right_held_by': [{
+                '_label': link_.domain.license_holder,
+                'type': 'Actor'}],
+            'created_by': [{
+                '_label': f'Creation of {link_.domain.name}',
+                'type': 'Creation',
+                'carried_out_by': [{
+                    '_label': link_.domain.creator,
+                    'type': 'Actor'}]}],
+            "classified_as": [{
+                "id": "https://vocab.getty.edu/aat/300215302",
+                "type": "Type",
+                "_label": "Digital Image"}],
             'access_point': [{
                 'id': url_for(
                     'api.display',
@@ -167,17 +178,40 @@ def get_loud_images(entity: Entity, image_links: list[Link]) -> dict[str, Any]:
                 'type': 'DigitalObject',
                 '_label': 'ProfileImage' if id_ == profile_image else ''}]}
         if license_ := get_license_type(link_.domain):
-            image['classified_as'] = [{
-                'id': url_for(
-                    'api.entity',
-                    id_=license_.id,
-                    format='loud',
-                    _external=True),
-                'type': remove_spaces_dashes(license_.cidoc_class.i18n['en']),
-                '_label': license_.name,
-                'content': license_.name}]
-        representation['digitally_shown_by'].append(image)
-    return representation
+            image['subject_to'] = [{
+                'type': "Right",
+                '_label': f'License of {link_.domain.name}',
+                "identified_by": [{
+                    'id': url_for(
+                        'api.entity',
+                        id_=license_.id,
+                        format='loud',
+                        _external=True),
+                    "type": "Name",
+                    "content": license_.name}],
+                "classified_as": [{
+                    "id": get_license_url(link_.domain),
+                    "type": "Type",
+                    "_label": license_.name}]}]
+        representation.append({
+            'type': 'VisualItem',
+            'digitally_shown_by': [image]})
+        if iiif := get_iiif_manifest_and_path(link_.domain.id):
+            subject_of.append({
+                "type": "LinguisticObject",
+                "digitally_carried_by": [{
+                    "type": "DigitalObject",
+                    "access_point": [{
+                        "id": iiif['IIIFManifest'],
+                        "type": "DigitalObject"}],
+                    "conforms_to": [{
+                        "id": "https://iiif.io/api/presentation/2.0/",
+                        "type": "InformationObject"}],
+                    "format":
+                        "application/ld+json;profile='https://iiif.io/api"
+                        "/presentation/2/context.json'"}]})
+    return {'representation': representation,
+            'subject_of': subject_of}
 
 
 def get_loud_timespan(entity: Entity) -> dict[str, Any]:
