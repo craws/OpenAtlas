@@ -1204,6 +1204,9 @@
         "operationId": "GetEgoNetworkVisualisation",
         "parameters": [
           {
+            "$ref": "#/components/parameters/entityId"
+          },
+          {
             "$ref": "#/components/parameters/depth"
           },
           {
