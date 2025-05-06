@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.8b",
+    "version": "0.4.8c",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -5369,6 +5369,7 @@
           },
           "geometries": {
             "type": "object",
+            "$ref": "#/components/schemas/Geometries",
             "nullable": true
           },
           "when": {
