@@ -21,6 +21,7 @@ versions = {
             '2499':
                 'Bundled Docker Image for OpenAtlas and OpenAtlas Discovery',
             '2523': 'Refactor and minor improvements',
+            '2526': 'API: Network visualization with depth',
             '2477': 'API: Presentation view improvements'},
         'fix': {
             '2509': 'Wrong focus in edit view',

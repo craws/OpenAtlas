@@ -1943,7 +1943,7 @@
       },
       "url": {
         "name": "url",
-        "description": "Provide a valid URL, e.g. https://openatlas.eu/. At an IIIF endpoint this will replace the base URL of all annotations.",
+        "description": "A valid URL to use as input (e.g., https://openatlas.eu/). When used with an IIIF endpoint, this value replaces the base URL in all annotations.",
         "in": "query",
         "schema": {
           "type": "string"
@@ -1951,7 +1951,7 @@
       },
       "limit": {
         "name": "limit",
-        "description": "Limits the entities displayed. Influences the performance of the request. Default value is 20. 0 means all available entities will be displayed.",
+        "description": "Limits the number of entities returned in the response. A lower value may improve performance. The default is 20. Set to 0 to return all available entities.",
         "in": "query",
         "schema": {
           "type": "integer"
@@ -1959,7 +1959,7 @@
       },
       "depth": {
         "name": "depth",
-        "description": "How many connection hops are included in the query.",
+        "description": "Specifies the number of connection hops to include in the query. Higher values may significantly increase processing time. Default is 1.",
         "in": "query",
         "schema": {
           "type": "integer"
@@ -1967,7 +1967,7 @@
       },
       "first": {
         "name": "first",
-        "description": "Begin results at the given entity id.",
+        "description": "Starts the result set at the specified entity ID.",
         "in": "query",
         "schema": {
           "type": "integer"
@@ -1975,7 +1975,7 @@
       },
       "last": {
         "name": "last",
-        "description": "Begin results after the given entity id.",
+        "description": "Starts the result set after the specified entity ID.",
         "in": "query",
         "schema": {
           "type": "integer"
@@ -1983,7 +1983,7 @@
       },
       "page": {
         "name": "page",
-        "description": "Jump to page number.",
+        "description": "Specifies the page number to retrieve in a paginated result set.",
         "in": "query",
         "schema": {
           "type": "integer"
@@ -1991,7 +1991,8 @@
       },
       "export": {
         "name": "export",
-        "description": "Export the entities into either a simple CSV representation or a zip file of CSV's especially designed for network analyses.",
+        "description": "Export the entities in either a simple CSV format or a ZIP file containing CSV files optimized for network analysis.",
+
         "in": "query",
         "schema": {
           "type": "string",
@@ -2003,7 +2004,8 @@
       },
       "format": {
         "name": "format",
-        "description": "Choose the format for the results.",
+        "description": "Specify the format for the returned results.",
+
         "in": "query",
         "schema": {
           "type": "string",
@@ -2023,7 +2025,8 @@
       },
       "type_id": {
         "name": "type_id",
-        "description": "Show only entities with the given type id or linked to it.",
+        "description": "Filter results to include only entities with the specified type ID or those linked to it.",
+
         "in": "query",
         "schema": {
           "type": "array",
@@ -2035,7 +2038,7 @@
       },
       "relation_type": {
         "name": "relation_type",
-        "description": "Displays only connections connected by the selected CIDOC CRM property code. If geometry, types, depictions and/or links is in the show parameter, these properties are also displayed.",
+        "description": "Filters results to show only connections linked by the selected CIDOC CRM property code. If 'geometry', 'types', 'depictions', or 'links' are specified in the 'show' parameter, these properties will also be displayed.",
         "in": "query",
         "schema": {
           "type": "array",
@@ -2199,7 +2202,7 @@
       },
       "properties": {
         "name": "properties",
-        "description": "Retrieves entities which are connected to the requested entity with the `property`",
+        "description": "Retrieves entities that are connected to the specified entity through the given `property`.",
         "in": "query",
         "required": true,
         "schema": {
@@ -2364,7 +2367,7 @@
       },
       "geometry": {
         "name": "geometry",
-        "description": "Filters which geometries will be received. Default is gisAll",
+        "description": "Filters the geometries to be included in the response. The default is 'gisAll'.",
         "in": "query",
         "schema": {
           "type": "array",
@@ -2384,7 +2387,7 @@
       },
       "entities": {
         "name": "entities",
-        "description": "Entity ids which will be requested",
+        "description": "The entity IDs to be requested.",
         "in": "query",
         "schema": {
           "type": "array",
@@ -2396,7 +2399,7 @@
       },
       "linked_entities": {
         "name": "linked_entities",
-        "description": "Entity IDs, from which all linked entities are requested",
+        "description": "The entity IDs for which all linked entities will be retrieved.",
         "in": "query",
         "schema": {
           "type": "array",
@@ -2408,7 +2411,7 @@
       },
       "cidoc_classes": {
         "name": "cidoc_classes",
-        "description": "CIDOC classes to be requested",
+        "description": "Retrieve entities based on the specified CIDOC classes.",
         "in": "query",
         "schema": {
           "type": "array",
@@ -2440,7 +2443,7 @@
       },
       "view_classes": {
         "name": "view_classes",
-        "description": "View classes to be requested",
+        "description": "Retrieve entities based on the specified view classes.",
         "in": "query",
         "schema": {
           "type": "array",
@@ -2465,7 +2468,7 @@
       },
       "system_classes": {
         "name": "system_classes",
-        "description": "System classes to be requested",
+        "description": "Retrieve entities based on the specified system classes",
         "in": "query",
         "schema": {
           "type": "array",
@@ -2502,7 +2505,7 @@
       },
       "exclude_system_classes": {
         "name": "exclude_system_classes",
-        "description": "System classes to be excluded from network",
+        "description": "Excludes entities with the selected system classes from the network.",
         "in": "query",
         "schema": {
           "type": "array",
@@ -2539,7 +2542,7 @@
       },
       "linked_to_ids": {
         "name": "linked_to_ids",
-        "description": "Show only entities, which are linked to given IDs",
+        "description": "Displays only entities that are linked to the specified IDs.",
         "in": "query",
         "schema": {
           "type": "array",
@@ -2551,7 +2554,7 @@
       },
       "image_size": {
         "name": "image_size",
-        "description": "Select which size of the image you want to display. Values are fixed but can be changed for each OpenAtlas instance. Thumbnail is 200px and table 100px.",
+        "description": "Select the desired image size to display. The available values are fixed but can be customized for each OpenAtlas instance. The 'thumbnail' size is 200px, and the 'table' size is 100px.",
         "in": "query",
         "schema": {
           "type": "string",
