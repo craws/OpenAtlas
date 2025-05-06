@@ -133,14 +133,12 @@ def get_ego_network_visualisation(id_: int, parser: Parser) -> dict[str, Any]:
             all_.append(row)
     links = [dict(t) for t in {frozenset(d.items()) for d in all_}]
     links = overwrite_object_locations_with_place(links, exclude_)
-
     link_dict = get_link_dictionary(links)
-    print(len(link_dict))
     results: dict[str, Any] = {'results': []}
-    for id_, dict_ in link_dict.items():
-        if linked_to_ids := parser.linked_to_ids:
-            if not set(linked_to_ids) & set(dict_['relations']):
+    for _id, dict_ in link_dict.items():
+        if parser.linked_to_ids:
+            if not set(parser.linked_to_ids) & set(dict_['relations']):
                 continue
-        dict_['id'] = id_
+        dict_['id'] = _id
         results['results'].append(dict_)
     return results

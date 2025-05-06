@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.8c",
+    "version": "0.4.8d",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -1195,6 +1195,49 @@
         }
       }
     },
+    "/ego_network_visualisation/{entityId}": {
+      "get": {
+        "tags": [
+          "Proposal"
+        ],
+        "description": "Retrieves a list of object with id, system_class, label and related ids connected to one entity.",
+        "operationId": "GetEgoNetworkVisualisation",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/depth"
+          },
+          {
+            "$ref": "#/components/parameters/exclude_system_classes"
+          },
+          {
+            "$ref": "#/components/parameters/linked_to_ids"
+          },
+          {
+            "$ref": "#/components/parameters/download"
+          }
+        ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NetworkVisualisationModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
     "/backend_details/": {
       "get": {
         "tags": [
@@ -1909,6 +1952,14 @@
       "limit": {
         "name": "limit",
         "description": "Limits the entities displayed. Influences the performance of the request. Default value is 20. 0 means all available entities will be displayed.",
+        "in": "query",
+        "schema": {
+          "type": "integer"
+        }
+      },
+      "depth": {
+        "name": "depth",
+        "description": "How many connection hops are included in the query.",
         "in": "query",
         "schema": {
           "type": "integer"
