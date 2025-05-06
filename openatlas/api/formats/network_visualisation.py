@@ -126,8 +126,13 @@ def get_ego_network_visualisation(id_: int, parser: Parser) -> dict[str, Any]:
     if found_location_id is not None:
         entity_ids.add(found_location_id)
     all_ = []
+    entities_count = 0
     for _ in range(parser.depth):
-        for row in get_ego_network_filtered_classes(entity_ids, exclude_):
+        entities = get_ego_network_filtered_classes(entity_ids, exclude_)
+        if entities_count == len(entities):
+            break
+        entities_count = len(entities)
+        for row in entities:
             entity_ids.add(row['domain_id'])
             entity_ids.add(row['range_id'])
             all_.append(row)
