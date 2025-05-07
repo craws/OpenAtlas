@@ -145,6 +145,29 @@ class Api(ApiTestCase):
         rv = rv.get_json()
         assert len(rv['results']) == 154
 
+
+        rv = c.get(
+            url_for(
+                'api_04.ego_network_visualisation',
+                id_=place.id,
+                exclude_system_classes='type'))
+        rv = rv.get_json()
+        assert len(rv['results']) == 8
+        rv = c.get(
+            url_for(
+                'api_04.ego_network_visualisation',
+                id_=place.id,
+                linked_to_ids=boundary_mark.id))
+        rv = rv.get_json()
+        assert len(rv['results']) == 1
+        rv = c.get(
+            url_for(
+                'api_04.ego_network_visualisation',
+                id_=place.id,
+                download=True))
+        rv = rv.get_json()
+        assert len(rv['results']) == 9
+
         for rv in [
             c.get(url_for('api_04.geometric_entities')),
             c.get(url_for('api_04.geometric_entities', download=True))]:

@@ -233,8 +233,13 @@ def user_update(id_: int) -> str | Response:
         abort(403)
     form = UserForm(obj=user)
     form.user_id = id_
-    del form.password, form.password2, form.send_info, \
-        form.insert_and_continue, form.show_passwords
+    del (
+        form.password,
+        form.password2,
+        form.send_info,
+        form.insert_and_continue,
+        form.show_passwords,
+        form.generate_password)
     form.group.choices = get_groups()
     if user and form.validate_on_submit():
         # Active is always True for current user to prevent self deactivation

@@ -13,6 +13,14 @@ function onActivateKeyInput(event) {
   return true;
 }
 
+function validateSubmitHandler (form) {
+  if (this.submitButton.id === "insert_and_continue") $('#continue_').val('yes');
+  if (this.submitButton.id === "insert_continue_sub") $('#continue_').val('sub');
+  if (this.submitButton.id === "insert_continue_human_remains") $('#continue_').val('human_remains');
+  $('button[type="submit"]').prop("disabled", true).text(translate.inProgress);
+  form.submit();
+}
+
 /* Show and hide function for value type input fields. Has to be outside of $(document).ready() */
 function switch_value_type(id, el) {
   if (el.hasAttribute('show')) {
@@ -149,7 +157,8 @@ $(document).ready(function () {
     rules: {
       password: {minlength: minimumPasswordLength},
       password2: {equalTo: '#password'}
-    }
+    },
+    submitHandler: validateSubmitHandler,
   });
 
   $('#file-form').validate({
@@ -173,13 +182,7 @@ $(document).ready(function () {
   .each(function () {
     $(this).validate({
       errorClass: "d-block error",
-      submitHandler: function (form) {
-        if (this.submitButton.id === "insert_and_continue") $('#continue_').val('yes');
-        if (this.submitButton.id === "insert_continue_sub") $('#continue_').val('sub');
-        if (this.submitButton.id === "insert_continue_human_remains") $('#continue_').val('human_remains');
-        $('button[type="submit"]').prop("disabled", true).text(translate.inProgress);
-        form.submit();
-      },
+      submitHandler: validateSubmitHandler,
     });
   });
 

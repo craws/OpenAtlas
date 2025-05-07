@@ -153,6 +153,30 @@ def geometry_to_geojson(
     return {'type': 'GeometryCollection', 'geometries': geoms}
 
 
+def geometry_to_feature_collection(
+        geoms: Optional[list[dict[str, Any]]] = None) \
+        -> Optional[dict[str, Any]]:
+    if not geoms:
+        return None
+    features = [generate_feature(geom) for geom in geoms]
+    if len(features) == 1:
+        return features[0]
+    return {'type': 'FeatureCollection', 'features': features}
+
+
+def generate_feature(geom: dict[str, Any]) -> dict[str, Any]:
+    return {
+        'type': 'Feature',
+        'geometry': {
+            'type': geom['type'],
+            'coordinates': geom['coordinates']},
+        'properties': {
+            'title': geom['title'],
+            'description': geom['description'],
+            'shapeType': geom['shapeType'],
+            'locationId': geom['locationId']}}
+
+
 def get_geometries(parser: dict[str, Any]) -> list[dict[str, Any]]:
     choices = [
         'gisPointAll', 'gisPointSupers', 'gisPointSubs',
