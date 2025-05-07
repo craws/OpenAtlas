@@ -16,6 +16,25 @@ from openatlas.models.type import Type
 
 def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
     def base_entity_dict() -> dict[str, Any]:
+        timespan = {'timespan': get_loud_timespan(data['entity'])}
+        if remove_spaces_dashes(
+                data['entity'].cidoc_class.i18n['en']) == 'Person':
+            born, death = {}, {}
+            if data["entity"].begin_from:
+                born = {'born': {
+                    'type': 'Birth',
+                    '_label': f'Birth of {data["entity"].name}',
+                    'timespan':
+                        {'type': 'TimeSpan'} |
+                        get_loud_begin_dates(data['entity'])}}
+            if data["entity"].end_from:
+                death = {'death_of': {
+                    'type': 'Death',
+                    '_label': f'Death of {data["entity"].name}',
+                    'timespan':
+                        {'type': 'TimeSpan'} |
+                        get_loud_end_dates(data['entity'])}}
+            timespan = born | death
         return {
             'id': url_for(
                 'api.entity',
@@ -26,10 +45,9 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
                 data['entity'].cidoc_class.i18n['en']),
             '_label': data['entity'].name,
             'content': data['entity'].description,
-            'timespan': get_loud_timespan(data['entity']),
             'identified_by': [{
                 "type": "Name",
-                "content": data['entity'].name}]}
+                "content": data['entity'].name}]} | timespan
 
     def get_range_links() -> dict[str, Any]:
         property_ = {
@@ -40,17 +58,21 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
                 _external=True),
             'type': loud[get_crm_code(link_).replace(' ', '_')],
             '_label': link_.range.name}
-        if link_.property.code == 'P2':
+        if link_.begin_from or link_.end_from:
+            property_['timespan'] = get_loud_timespan(link_)
+        code_ = link_.property.code
+        if code_ == 'P2':
             if link_.description:
                 property_['value'] = link_.description
                 property_['unit'] = {
                     'type': "MeasurementUnit",
                     '_label': link_.range.description}
-            property_['part_of'] = [get_type_property(g.types[link_.range.id])]
+            super_type = g.types[g.types[link_.range.id].root[-1]]
+            property_['part_of'] = [get_type_property(super_type)]
         elif link_.type:
             property_['classified_as'] = [
                 get_type_property(g.types[link_.type.id])]
-        if link_.property.code == 'P67' and link_.description:
+        if code_ == 'P67' and link_.description:
             property_['content'] = link_.description
             if link_.domain.cidoc_class.code == 'E32':
                 system = g.reference_systems[link_.domain.id]
@@ -58,6 +80,22 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
                     g.types[link_.type.id].name).replace(' ', '_')
                 link_url = f"{system.resolver_url or ''}{link_.description}"
                 property_[f"skos:{match_case}"] = link_url
+        if code_ == 'OA7':
+            property_ = [{
+                'type': 'Event',
+                '_label':
+                    f'Relationship between '
+                    f'{link_.domain.name} and {link_.range.name}',
+                'classified_as': [get_type_property(g.types[link_.type.id])],
+                'had_participant': [property_]}]
+        if code_ in ['OA8', 'OA9']:
+            property_ = {
+                'type': 'BeginningOfExistence'
+                if code_ == 'OA8' else 'EndOfExistence',
+                '_label':
+                    ('Birth of ' if code_ == 'OA8' else 'Death of ') +
+                    link_.domain.name,
+                'took_place_at': [property_]}
         return property_
 
     def get_domain_links() -> dict[str, Any]:
@@ -69,7 +107,10 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
                 _external=True),
             'type': loud[get_crm_code(link_, True).replace(' ', '_')],
             '_label': link_.domain.name}
-        if link_.property.code == 'P2':
+        if link_.begin_from or link_.end_from:
+            property_['timespan'] = get_loud_timespan(link_)
+        code_ = link_.property.code
+        if code_ == 'P2':
             if link_.description:
                 property_['value'] = link_.description
                 property_['unit'] = {
@@ -78,7 +119,7 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
         elif link_.type:
             property_['classified_as'] = [
                 get_type_property(g.types[link_.type.id])]
-        if link_.property.code == 'P67' and link_.description:
+        if code_ == 'P67' and link_.description:
             property_['content'] = link_.description
             if link_.domain.cidoc_class.code == 'E32':
                 system = g.reference_systems[link_.domain.id]
@@ -86,14 +127,33 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
                     g.types[link_.type.id].name).replace(' ', '_')
                 link_url = f"{system.resolver_url or ''}{link_.description}"
                 property_[f"skos:{match_case}"] = link_url
-
+        if code_ == 'OA7':
+            relationship = {
+                'type': 'Event',
+                '_label':
+                    f'Relationship between '
+                    f'{link_.range.name} and {link_.domain.name}',
+                'classified_as': [get_type_property(g.types[link_.type.id])],
+                'had_participant': [property_]}
+            property_ = [relationship]
+        if code_ in ['OA8', 'OA9']:
+            property_ = {
+                'type': 'BeginningOfExistence'
+                if code_ == 'OA8' else 'EndOfExistence',
+                '_label':
+                    ('Birth of ' if code_ == 'OA8' else 'Death of ') +
+                    link_.domain.name,
+                'took_place_at': [property_]}
         return property_
 
     properties_set = defaultdict(list)
     for link_ in data['links']:
-        if link_.property.code in ['OA7', 'OA8', 'OA9']:
-            continue
-        property_name = get_loud_property_name(loud, link_)
+        if link_.property.code in ['OA8', 'OA9']:
+            property_name = 'brought_into_existence_by'
+        elif link_.property.code == 'OA7':
+            property_name = 'participated_in'
+        else:
+            property_name = get_loud_property_name(loud, link_)
 
         if link_.property.code == 'P53':
             for geom in Gis.get_wkt_by_id(link_.range.id):
@@ -105,9 +165,14 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
 
     image_links = []
     for link_ in data['links_inverse']:
-        if link_.property.code in ['OA7', 'OA8', 'OA9']:
-            continue
-        property_name = get_loud_property_name(loud, link_, inverse=True)
+        if link_.property.code in ['OA8', 'OA9']:
+            property_name = 'brought_into_existence_by'
+            if link_.property.code == 'OA9':
+                property_name = 'taken_out_of_existence_by'
+        elif link_.property.code == 'OA7':
+            property_name = 'participated_in'
+        else:
+            property_name = get_loud_property_name(loud, link_, inverse=True)
 
         if link_.property.code == 'P53':
             for geom in Gis.get_wkt_by_id(link_.range.id):
@@ -210,18 +275,28 @@ def get_loud_images(entity: Entity, image_links: list[Link]) -> dict[str, Any]:
                     "format":
                         "application/ld+json;profile='https://iiif.io/api"
                         "/presentation/2/context.json'"}]})
-    return {'representation': representation,
-            'subject_of': subject_of}
+    return {
+        'representation': representation,
+        'subject_of': subject_of}
 
 
 def get_loud_timespan(entity: Entity) -> dict[str, Any]:
+    return ({'type': 'TimeSpan'} |
+            get_loud_begin_dates(entity) |
+            get_loud_end_dates(entity))
+
+
+def get_loud_begin_dates(entity: Entity) -> dict[str, Any]:
     return {
-        'type': 'TimeSpan',
         'begin_of_the_begin': date_to_str(entity.begin_from),
         'end_of_the_begin': date_to_str(entity.begin_to),
+        'beginning_is_qualified_by': entity.begin_comment}
+
+
+def get_loud_end_dates(entity: Entity) -> dict[str, Any]:
+    return {
         'begin_of_the_end': date_to_str(entity.end_from),
         'end_of_the_end': date_to_str(entity.end_to),
-        'beginning_is_qualified_by': entity.begin_comment,
         'end_is_qualified_by': entity.end_comment}
 
 
@@ -234,6 +309,8 @@ def get_type_property(type_: Type) -> dict[str, Any]:
             _external=True),
         'type': remove_spaces_dashes(type_.cidoc_class.i18n['en']),
         '_label': type_.name}
+    if type_.begin_from or type_.end_from:
+        property_['timespan'] = get_loud_timespan(type_)
     for super_type in [g.types[root] for root in type_.root]:
         property_['part_of'] = [get_type_property(super_type)]
     return property_
