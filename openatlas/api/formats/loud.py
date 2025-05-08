@@ -171,6 +171,9 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
                 property_name = 'taken_out_of_existence_by'
         elif link_.property.code == 'OA7':
             property_name = 'participated_in'
+        elif link_.domain.class_.name == 'file' and g.files.get(link_.domain.id):
+            image_links.append(link_)
+            continue
         else:
             property_name = get_loud_property_name(loud, link_, inverse=True)
 
@@ -181,9 +184,6 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
         else:
             base_property = get_domain_links()
             properties_set[property_name].append(base_property)
-
-        if link_.domain.class_.name == 'file' and g.files.get(link_.domain.id):
-            image_links.append(link_)
 
     if image_links:
         properties_set.update(get_loud_images(data['entity'], image_links))
