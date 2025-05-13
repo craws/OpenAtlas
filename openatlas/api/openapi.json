@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.8e",
+    "version": "0.4.8f",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -147,6 +147,12 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/entityId"
+          },
+          {
+            "$ref": "#/components/parameters/place_hierarchy"
+          },
+          {
+            "$ref": "#/components/parameters/remove_empty_values"
           }
         ],
         "security": [
@@ -1783,6 +1789,22 @@
       "download": {
         "name": "download",
         "description": "Download results",
+        "in": "query",
+        "schema": {
+          "type": "boolean"
+        }
+      },
+      "place_hierarchy": {
+        "name": "place_hierarchy",
+        "description": "Will include the whole place hierarchy. This means that instead of only getting entities linked to the requested entity, all entities, which are connected with the property *P46* are included in the result set. This can significantly increase the load time.",
+        "in": "query",
+        "schema": {
+          "type": "boolean"
+        }
+      },
+      "remove_empty_values": {
+        "name": "remove_empty_values",
+        "description": "This will remove any keys which are empty or have no values assigned, e.g. []. This can reduce the load time.",
         "in": "query",
         "schema": {
           "type": "boolean"

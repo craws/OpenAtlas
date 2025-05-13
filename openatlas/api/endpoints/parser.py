@@ -59,6 +59,7 @@ class Parser:
     url: str = ''
     remove_empty_values = None
     depth: int = 1
+    place_hierarchy = None
 
     def __init__(self, parser: dict[str, Any]):
         self.show = []
@@ -74,6 +75,8 @@ class Parser:
             self.url += '/'
         if self.centroid:
             self.centroid = parser['centroid'] == 'true'
+        if self.place_hierarchy:
+            self.place_hierarchy = parser['place_hierarchy'] == 'true'
         if self.remove_empty_values:
             self.remove_empty_values = parser['remove_empty_values'] == 'true'
 
