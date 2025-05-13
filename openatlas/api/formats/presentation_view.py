@@ -157,6 +157,7 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         relation_dict = {
             'id': rel_entity.id,
             'systemClass': rel_entity.class_.name,
+            'viewClass': rel_entity.class_.view,
             'title': rel_entity.name,
             'description': rel_entity.description,
             'aliases': list(rel_entity.aliases.values()),
