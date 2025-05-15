@@ -7,7 +7,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     apt install -y --no-install-recommends python3-flask-babel python3-flask-login python3-flaskext.wtf python3-markdown python3-numpy &&\
     apt install -y --no-install-recommends python3-pandas python3-jinja2 python3-flask-cors python3-flask-restful p7zip-full &&\
     apt install -y --no-install-recommends python3-wand python3-rdflib python3-requests python3-dicttoxml python3-flasgger &&\
-    apt install -y --no-install-recommends apache2 libapache2-mod-wsgi-py3 brotli python3-coverage python3-pytest python3-pytes-cov exiftran &&\
+    apt install -y --no-install-recommends apache2 libapache2-mod-wsgi-py3 brotli python3-coverage python3-pytest python3-pytest-cov exiftran &&\
     apt install -y --no-install-recommends iipimage-server libvips-tools python3-email-validator python3-svgwrite python3-shapely &&\
     apt install -y --no-install-recommends python3-validators python3-jwt python3-python-flask-jwt-extended &&\
     apt install -y --no-install-recommends gettext npm python3-pip git postgresql-client-15 python3-xmltodict &&\
