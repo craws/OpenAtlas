@@ -17,6 +17,12 @@ then run the database upgrade script, then restart Apache:
     sudo python3 install/upgrade/database_upgrade.py
     sudo service apache2 restart
 
+### 8.XX.XX to 8.XX.XX
+A code base update (e.g. with git pull) and a webserver restart is sufficient.
+Additional Python packages are needed:
+
+    sudo apt install python3-pytest python3-pytes-cov
+
 ### 8.11.0 to 8.12.0
 A code base update (e.g. with git pull) and a webserver restart is sufficient.
 

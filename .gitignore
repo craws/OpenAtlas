@@ -15,6 +15,7 @@ __pycache__/
 # tests
 .coverage
 cover
+htmlcov
 
 # created files
 files/
