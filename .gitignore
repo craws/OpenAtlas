@@ -13,8 +13,6 @@ __pycache__/
 *.pyc
 
 # tests
-.coverage
-cover
 htmlcov
 
 # created files

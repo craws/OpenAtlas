@@ -18,10 +18,12 @@ then run the database upgrade script, then restart Apache:
     sudo service apache2 restart
 
 ### 8.XX.XX to 8.XX.XX
-A code base update (e.g. with git pull) and a webserver restart is sufficient.
-Additional Python packages are needed:
+If you are using tests, additional Python packages are needed because we
+switched from nose to pytest tests.
 
     sudo apt install python3-pytest python3-pytes-cov
+
+Otherwise, a code base update and a webserver restart is sufficient.
 
 ### 8.11.0 to 8.12.0
 A code base update (e.g. with git pull) and a webserver restart is sufficient.
