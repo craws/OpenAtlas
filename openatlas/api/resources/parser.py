@@ -182,6 +182,12 @@ presentation.add_argument(
     default='false',
     choices=('true', 'false'),
     location='args')
+presentation.add_argument(
+    'place_hierarchy',
+    type=str,
+    default='false',
+    choices=('true', 'false'),
+    location='args')
 
 query = entity_.copy()
 query.add_argument(
@@ -287,6 +293,12 @@ network.add_argument(
     type=int,
     help='{error_msg}',
     action='append',
+    location='args')
+network.add_argument(
+    'depth',
+    type=int,
+    default=1,
+    help='{error_msg}',
     location='args')
 
 iiif = reqparse.RequestParser()

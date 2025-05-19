@@ -58,6 +58,8 @@ class Parser:
     linked_to_ids: list[int]
     url: str = ''
     remove_empty_values = None
+    depth: int = 1
+    place_hierarchy = None
 
     def __init__(self, parser: dict[str, Any]):
         self.show = []
@@ -73,6 +75,8 @@ class Parser:
             self.url += '/'
         if self.centroid:
             self.centroid = parser['centroid'] == 'true'
+        if self.place_hierarchy:
+            self.place_hierarchy = parser['place_hierarchy'] == 'true'
         if self.remove_empty_values:
             self.remove_empty_values = parser['remove_empty_values'] == 'true'
 
@@ -177,15 +181,13 @@ class Parser:
                     None))
         if self.last and int(self.last) in total:
             if not (
-                out := list(itertools.islice(
-                    total,
-                    total.index(int(self.last)) + 1,
-                    None))):
+                    out := list(itertools.islice(
+                        total,
+                        total.index(int(self.last)) + 1,
+                        None))):
                 raise LastEntityError
             return out
         raise EntityDoesNotExistError
-
-
 
     def get_linked_places_entity(
             self,
@@ -225,7 +227,7 @@ class Parser:
     def get_geojson_dict(
             self,
             entity_dict: dict[str, Any],
-            geometry: Optional[dict[str, Any]] = None ) -> dict[str, Any]:
+            geometry: Optional[dict[str, Any]] = None) -> dict[str, Any]:
         entity = entity_dict['entity']
         geoms = geometry or geometry_to_geojson(entity_dict['geometry'])
         return replace_empty_list_values_in_dict_with_none({
@@ -257,7 +259,6 @@ class Parser:
                         map(str, [g.types[root].name for root in type_.root]))}
                     for type_ in entity.types]
                 if 'types' in self.show else None}})
-
 
     def rdf_output(
             self,

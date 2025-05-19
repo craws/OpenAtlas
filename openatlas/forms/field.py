@@ -154,7 +154,7 @@ class ReferenceField(Field):
 
 class TableMultiSelect(HiddenInput):
     def __call__(self: Any, field: TableMultiField, **kwargs: Any) -> str:
-        if request and request.method == 'POST':
+        if request and request.method == 'POST':  # If validation failed
             field.selection = []
             if request.form[field.name]:
                 field.selection = \
@@ -267,7 +267,7 @@ class TableSelect(HiddenInput):
         for class_name in field.add_dynamical:
             field.forms[class_name] = get_form(class_name)
 
-        if request and request.method == 'POST':
+        if request and request.method == 'POST':  # If validation failed
             field.selection = \
                 Entity.get_by_id(int(request.form[field.name])) \
                 if request.form[field.name] else None

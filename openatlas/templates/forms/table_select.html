@@ -100,7 +100,7 @@
 
   <script>
     $("#{{ field.id }}-modal").on("hidden.bs.modal", function (e) {
-      $('#save').focus();
+      document.getElementById("save")?.focus({preventScroll:true})
     })
     $("#add-{{ add_dynamical }}-modal-{{field.id}} #name_dynamic")
       .on('keyup change', function (e) {

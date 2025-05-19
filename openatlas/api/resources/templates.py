@@ -205,7 +205,18 @@ def presentation_template() -> dict[str, Any]:
         'title': fields.String,
         'descriptions': fields.String,
         'isStandard': fields.Boolean,
-        'typeHierarchy': fields.List(fields.Nested(hierarchy))}
+        'typeHierarchy': fields.List(fields.Nested(hierarchy)),
+        'value': fields.Float,
+        'unit': fields.String}
+    references = {
+        'id': fields.Integer,
+        'systemClass': fields.String,
+        'title': fields.String,
+        'type': fields.String,
+        'typeId': fields.Integer,
+        'citation': fields.String,
+        'pages': fields.String
+    }
     files = {
         'id': fields.Integer,
         'title': fields.String,
@@ -214,7 +225,9 @@ def presentation_template() -> dict[str, Any]:
         'licenseHolder': fields.String,
         'publicShareable': fields.String,
         'mimetype': fields.String,
-        'url': fields.String}
+        'url': fields.String,
+        'IIIFManifest': fields.String,
+        'IIIFBasePath': fields.String}
     relation_types = {
         'property': fields.String,
         'relationTo': fields.Integer,
@@ -233,16 +246,19 @@ def presentation_template() -> dict[str, Any]:
             'id': fields.Integer,
             'title': fields.String}),
         'relationTypes': fields.List(fields.Nested(relation_types))}
+
     def get_relations() -> fields:
         dict_ = {}
         for name in g.classes:
             if name in app.config['API_PRESENTATION_EXCLUDE_RELATION']:
                 continue
-            dict_[name] =  fields.List(fields.Nested(relations))
+            dict_[name] = fields.List(fields.Nested(relations))
         return fields.Nested(dict_)
+
     return {
         'id': fields.Integer,
         'systemClass': fields.String,
+        'viewClass': fields.String,
         'title': fields.String,
         'description': fields.String,
         'aliases': fields.List(fields.String),
@@ -251,6 +267,7 @@ def presentation_template() -> dict[str, Any]:
         'types': fields.List(fields.Nested(types)),
         'externalReferenceSystems': fields.List(
             fields.Nested(external_references)),
+        'references': fields.List(fields.Nested(references)),
         'files': fields.List(fields.Nested(files)),
         'relations': get_relations()}
 

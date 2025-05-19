@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.7f",
+    "version": "0.4.8f",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -147,6 +147,12 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/entityId"
+          },
+          {
+            "$ref": "#/components/parameters/place_hierarchy"
+          },
+          {
+            "$ref": "#/components/parameters/remove_empty_values"
           }
         ],
         "security": [
@@ -1195,6 +1201,52 @@
         }
       }
     },
+    "/ego_network_visualisation/{entityId}": {
+      "get": {
+        "tags": [
+          "Proposal"
+        ],
+        "description": "Retrieves a list of object with id, system_class, label and related ids connected to one entity.",
+        "operationId": "GetEgoNetworkVisualisation",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/entityId"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          },
+          {
+            "$ref": "#/components/parameters/exclude_system_classes"
+          },
+          {
+            "$ref": "#/components/parameters/linked_to_ids"
+          },
+          {
+            "$ref": "#/components/parameters/download"
+          }
+        ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NetworkVisualisationModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
     "/backend_details/": {
       "get": {
         "tags": [
@@ -1353,6 +1405,12 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/limit"
+          },
+          {
+            "$ref": "#/components/parameters/page"
           }
         ],
         "security": [
@@ -1736,6 +1794,22 @@
           "type": "boolean"
         }
       },
+      "place_hierarchy": {
+        "name": "place_hierarchy",
+        "description": "Will include the whole place hierarchy. This means that instead of only getting entities linked to the requested entity, all entities, which are connected with the property *P46* are included in the result set. This can significantly increase the load time.",
+        "in": "query",
+        "schema": {
+          "type": "boolean"
+        }
+      },
+      "remove_empty_values": {
+        "name": "remove_empty_values",
+        "description": "This will remove any keys which are empty or have no values assigned, e.g. []. This can reduce the load time.",
+        "in": "query",
+        "schema": {
+          "type": "boolean"
+        }
+      },
       "count": {
         "name": "count",
         "description": "Show integer count of how many entities would the result give back",
@@ -1894,7 +1968,7 @@
       },
       "url": {
         "name": "url",
-        "description": "Provide a valid URL, e.g. https://openatlas.eu/. At an IIIF endpoint this will replace the base URL of all annotations.",
+        "description": "A valid URL to use as input (e.g., https://openatlas.eu/). When used with an IIIF endpoint, this value replaces the base URL in all annotations.",
         "in": "query",
         "schema": {
           "type": "string"
@@ -1902,7 +1976,15 @@
       },
       "limit": {
         "name": "limit",
-        "description": "Limits the entities displayed. Influences the performance of the request. Default value is 20. 0 means all available entities will be displayed.",
+        "description": "Limits the number of entities returned in the response. A lower value may improve performance. The default is 20. Set to 0 to return all available entities.",
+        "in": "query",
+        "schema": {
+          "type": "integer"
+        }
+      },
+      "depth": {
+        "name": "depth",
+        "description": "Specifies the number of connection hops to include in the query. Higher values may significantly increase processing time. Default is 1.",
         "in": "query",
         "schema": {
           "type": "integer"
@@ -1910,7 +1992,7 @@
       },
       "first": {
         "name": "first",
-        "description": "Begin results at the given entity id.",
+        "description": "Starts the result set at the specified entity ID.",
         "in": "query",
         "schema": {
           "type": "integer"
@@ -1918,7 +2000,7 @@
       },
       "last": {
         "name": "last",
-        "description": "Begin results after the given entity id.",
+        "description": "Starts the result set after the specified entity ID.",
         "in": "query",
         "schema": {
           "type": "integer"
@@ -1926,7 +2008,7 @@
       },
       "page": {
         "name": "page",
-        "description": "Jump to page number.",
+        "description": "Specifies the page number to retrieve in a paginated result set.",
         "in": "query",
         "schema": {
           "type": "integer"
@@ -1934,7 +2016,7 @@
       },
       "export": {
         "name": "export",
-        "description": "Export the entities into either a simple CSV representation or a zip file of CSV's especially designed for network analyses.",
+        "description": "Export the entities in either a simple CSV format or a ZIP file containing CSV files optimized for network analysis.",
         "in": "query",
         "schema": {
           "type": "string",
@@ -1946,7 +2028,7 @@
       },
       "format": {
         "name": "format",
-        "description": "Choose the format for the results.",
+        "description": "Specify the format for the returned results.",
         "in": "query",
         "schema": {
           "type": "string",
@@ -1966,7 +2048,7 @@
       },
       "type_id": {
         "name": "type_id",
-        "description": "Show only entities with the given type id or linked to it.",
+        "description": "Filter results to include only entities with the specified type ID or those linked to it.",
         "in": "query",
         "schema": {
           "type": "array",
@@ -1978,7 +2060,7 @@
       },
       "relation_type": {
         "name": "relation_type",
-        "description": "Displays only connections connected by the selected CIDOC CRM property code. If geometry, types, depictions and/or links is in the show parameter, these properties are also displayed.",
+        "description": "Filters results to show only connections linked by the selected CIDOC CRM property code. If 'geometry', 'types', 'depictions', or 'links' are specified in the 'show' parameter, these properties will also be displayed.",
         "in": "query",
         "schema": {
           "type": "array",
@@ -2142,7 +2224,7 @@
       },
       "properties": {
         "name": "properties",
-        "description": "Retrieves entities which are connected to the requested entity with the `property`",
+        "description": "Retrieves entities that are connected to the specified entity through the given `property`.",
         "in": "query",
         "required": true,
         "schema": {
@@ -2307,7 +2389,7 @@
       },
       "geometry": {
         "name": "geometry",
-        "description": "Filters which geometries will be received. Default is gisAll",
+        "description": "Filters the geometries to be included in the response. The default is 'gisAll'.",
         "in": "query",
         "schema": {
           "type": "array",
@@ -2327,7 +2409,7 @@
       },
       "entities": {
         "name": "entities",
-        "description": "Entity ids which will be requested",
+        "description": "The entity IDs to be requested.",
         "in": "query",
         "schema": {
           "type": "array",
@@ -2339,7 +2421,7 @@
       },
       "linked_entities": {
         "name": "linked_entities",
-        "description": "Entity IDs, from which all linked entities are requested",
+        "description": "The entity IDs for which all linked entities will be retrieved.",
         "in": "query",
         "schema": {
           "type": "array",
@@ -2351,7 +2433,7 @@
       },
       "cidoc_classes": {
         "name": "cidoc_classes",
-        "description": "CIDOC classes to be requested",
+        "description": "Retrieve entities based on the specified CIDOC classes.",
         "in": "query",
         "schema": {
           "type": "array",
@@ -2383,7 +2465,7 @@
       },
       "view_classes": {
         "name": "view_classes",
-        "description": "View classes to be requested",
+        "description": "Retrieve entities based on the specified view classes.",
         "in": "query",
         "schema": {
           "type": "array",
@@ -2408,7 +2490,7 @@
       },
       "system_classes": {
         "name": "system_classes",
-        "description": "System classes to be requested",
+        "description": "Retrieve entities based on the specified system classes",
         "in": "query",
         "schema": {
           "type": "array",
@@ -2445,7 +2527,7 @@
       },
       "exclude_system_classes": {
         "name": "exclude_system_classes",
-        "description": "System classes to be excluded from network",
+        "description": "Excludes entities with the selected system classes from the network.",
         "in": "query",
         "schema": {
           "type": "array",
@@ -2482,7 +2564,7 @@
       },
       "linked_to_ids": {
         "name": "linked_to_ids",
-        "description": "Show only entities, which are linked to given IDs",
+        "description": "Displays only entities that are linked to the specified IDs.",
         "in": "query",
         "schema": {
           "type": "array",
@@ -2494,7 +2576,7 @@
       },
       "image_size": {
         "name": "image_size",
-        "description": "Select which size of the image you want to display. Values are fixed but can be changed for each OpenAtlas instance. Thumbnail is 200px and table 100px.",
+        "description": "Select the desired image size to display. The available values are fixed but can be customized for each OpenAtlas instance. The 'thumbnail' size is 200px, and the 'table' size is 100px.",
         "in": "query",
         "schema": {
           "type": "string",
@@ -3025,14 +3107,6 @@
           }
         }
       },
-      "Position": {
-        "type": "array",
-        "minItems": 2,
-        "maxItems": 3,
-        "items": {
-          "type": "number"
-        }
-      },
       "LineString": {
         "type": "object",
         "required": [
@@ -3072,13 +3146,6 @@
           "$ref": "#/components/schemas/Position"
         },
         "minItems": 2
-      },
-      "LinearRing": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/Position"
-        },
-        "minItems": 4
       },
       "Polygon": {
         "type": "object",
@@ -4931,6 +4998,7 @@
         "required": [
           "id",
           "systemClass",
+          "viewClass",
           "title",
           "description",
           "aliases"
@@ -4940,6 +5008,9 @@
             "type": "integer"
           },
           "systemClass": {
+            "type": "string"
+          },
+          "viewClass": {
             "type": "string"
           },
           "title": {
@@ -4957,33 +5028,7 @@
           "geometries": {
             "nullable": true,
             "type": "object",
-            "required": [
-              "type",
-              "coordinates",
-              "title",
-              "description",
-              "shapeType"
-            ],
-            "properties": {
-              "type": {
-                "type": "string"
-              },
-              "coordinates": {
-                "type": "array",
-                "items": {
-                  "type": "number"
-                }
-              },
-              "title": {
-                "type": "string"
-              },
-              "description": {
-                "type": "string"
-              },
-              "shapeType": {
-                "type": "string"
-              }
-            }
+            "$ref": "#/components/schemas/Geometries"
           },
           "when": {
             "nullable": true,
@@ -5001,6 +5046,45 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ExternalReferenceModel"
+            }
+          },
+          "references": {
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "systemClass",
+                "title",
+                "citation"
+              ],
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "systemClass": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "type": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "typeId": {
+                  "type": "integer",
+                  "nullable": true
+                },
+                "citation": {
+                  "type": "string"
+                },
+                "pages": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              }
             }
           },
           "files": {
@@ -5042,6 +5126,12 @@
                   "type": "string"
                 },
                 "url": {
+                  "type": "string"
+                },
+                "IIIFManifest": {
+                  "type": "string"
+                },
+                "IIIFBasePath": {
                   "type": "string"
                 }
               }
@@ -5273,6 +5363,12 @@
           "isStandard": {
             "type": "boolean"
           },
+          "value": {
+            "type": "string"
+          },
+          "unit": {
+            "type": "string"
+          },
           "typeHierarchy": {
             "nullable": true,
             "type": "array",
@@ -5339,6 +5435,7 @@
         "required": [
           "id",
           "systemClass",
+          "viewClass",
           "title",
           "description",
           "geometries",
@@ -5349,6 +5446,9 @@
             "type": "integer"
           },
           "systemClass": {
+            "type": "string"
+          },
+          "viewClass": {
             "type": "string"
           },
           "title": {
@@ -5365,6 +5465,7 @@
           },
           "geometries": {
             "type": "object",
+            "$ref": "#/components/schemas/Geometries",
             "nullable": true
           },
           "when": {
@@ -5381,7 +5482,7 @@
               }
             }
           },
-          "relationTypesModel": {
+          "relationTypes": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/RelationTypeModel"
@@ -5500,6 +5601,205 @@
           "id",
           "system_class"
         ]
+      },
+      "Position": {
+        "type": "array",
+        "items": {
+          "type": "number",
+          "format": "double"
+        },
+        "minItems": 2,
+        "description": "A single position represented as an array of numbers.\nThe first two elements MUST be longitude and latitude (in that order).\nAn optional third element represents altitude. More elements are discouraged.\nExample: [10.9787, 49.7606] or [10.9787, 49.7606, 150.5]"
+      },
+      "PositionArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Position"
+        },
+        "minItems": 2,
+        "description": "An array of two or more positions. Used for LineStrings."
+      },
+      "LinearRing": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Position"
+        },
+        "minItems": 4,
+        "description": "An array of four or more positions where the first and last positions are equivalent (they represent closed loops).\nUsed for defining polygon boundaries."
+      },
+      "PolygonCoordinates": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/LinearRing"
+        },
+        "minItems": 1,
+        "description": "An array of LinearRing coordinate arrays. The first element MUST be the exterior ring.\nSubsequent elements represent interior rings (holes)."
+      },
+      "GeoJSONPoint": {
+        "type": "object",
+        "required": [
+          "type",
+          "coordinates"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "Point"
+            ],
+            "description": "The GeoJSON geometry type."
+          },
+          "coordinates": {
+            "$ref": "#/components/schemas/Position"
+          }
+        },
+        "description": "A GeoJSON Point geometry."
+      },
+      "GeoJSONLineString": {
+        "type": "object",
+        "required": [
+          "type",
+          "coordinates"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "LineString"
+            ],
+            "description": "The GeoJSON geometry type."
+          },
+          "coordinates": {
+            "$ref": "#/components/schemas/PositionArray"
+          }
+        },
+        "description": "A GeoJSON LineString geometry."
+      },
+      "GeoJSONPolygon": {
+        "type": "object",
+        "required": [
+          "type",
+          "coordinates"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "Polygon"
+            ],
+            "description": "The GeoJSON geometry type."
+          },
+          "coordinates": {
+            "$ref": "#/components/schemas/PolygonCoordinates"
+          }
+        },
+        "description": "A GeoJSON Polygon geometry."
+      },
+      "GeoJsonGeometry": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/Point"
+          },
+          {
+            "$ref": "#/components/schemas/LineString"
+          },
+          {
+            "$ref": "#/components/schemas/Polygon"
+          }
+        ]
+      },
+      "FeatureProperties": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "A title for the feature."
+          },
+          "description": {
+            "type": "string",
+            "description": "A description of the feature."
+          },
+          "shapeType": {
+            "type": "string",
+            "description": "A custom identifier for the shape's role or type."
+          },
+          "locationId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "A specific identifier for the location."
+          }
+        }
+      },
+      "Feature": {
+        "type": "object",
+        "required": [
+          "type",
+          "geometry",
+          "properties"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "Feature"
+            ],
+            "description": "The GeoJSON object type."
+          },
+          "geometry": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GeoJSONPoint"
+              },
+              {
+                "$ref": "#/components/schemas/GeoJSONPolygon"
+              },
+              {
+                "$ref": "#/components/schemas/GeoJSONLineString"
+              }
+            ]
+          },
+          "properties": {
+            "nullable": true,
+            "$ref": "#/components/schemas/FeatureProperties"
+          }
+        },
+        "description": "A GeoJSON Feature object, linking a geometry to properties."
+      },
+      "FeatureCollection": {
+        "type": "object",
+        "required": [
+          "type",
+          "features"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "FeatureCollection"
+            ],
+            "description": "The GeoJSON object type."
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Feature"
+            }
+          }
+        },
+        "description": "A collection of GeoJSON Feature objects."
+      },
+      "Geometries": {
+        "nullable": true,
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/FeatureCollection"
+          },
+          {
+            "$ref": "#/components/schemas/Feature"
+          }
+        ],
+        "description": "Represents geographic data associated with an entity.\nCan be explicitly null, a single GeoJSON geometry (Point, Polygon, or LineString),\nor a GeoJSON FeatureCollection containing Features with specific properties."
       }
     }
   }
