@@ -130,7 +130,7 @@
 
 <script>
   $("#{{ field.id }}-modal")?.on("hidden.bs.modal", function (e) {
-    $('#save').focus();
+   document.getElementById("save")?.focus({preventScroll:true})
   })
   variables['{{field.id}}-isAddDynamicall'] = '{{field.form}}' !== 'None';
   if (variables['{{field.id}}-isAddDynamicall'])

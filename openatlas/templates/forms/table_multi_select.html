@@ -60,6 +60,6 @@
 <script>
   $("#{{ field.id }}-modal").on("hidden.bs.modal", function (e) {
     selectFromTableMulti('{{ field.id }}');
-    $('#save').focus();
+    document.getElementById("save")?.focus({preventScroll:true})
   })
 </script>

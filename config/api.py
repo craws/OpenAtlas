@@ -63,4 +63,7 @@ API_PRESENTATION_EXCLUDE_RELATION = [
     'appellation',
     'object_location',
     'reference_system',
-    'administrative_unit']
+    'administrative_unit',
+    'bibliography',
+    'edition',
+    'external_reference']

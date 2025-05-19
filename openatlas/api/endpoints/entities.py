@@ -179,7 +179,6 @@ class GetSearchEntities(Resource):
                 entities.append(entity)
         parser = entity_.parse_args()
         parser['format'] = 'search'
-        parser['limit'] = 10
         return Endpoint(entities, parser).resolve_simple_search()
 
 

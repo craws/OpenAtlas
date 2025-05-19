@@ -145,6 +145,30 @@ class Api(ApiTestCase):
         rv = rv.get_json()
         assert len(rv['results']) == 154
 
+
+        rv = c.get(
+            url_for(
+                'api_04.ego_network_visualisation',
+                id_=place.id,
+                exclude_system_classes='type'))
+        rv = rv.get_json()
+        assert len(rv['results']) == 8
+        rv = c.get(
+            url_for(
+                'api_04.ego_network_visualisation',
+                id_=place.id,
+                depth=6,
+                linked_to_ids=boundary_mark.id))
+        rv = rv.get_json()
+        assert len(rv['results']) == 3
+        rv = c.get(
+            url_for(
+                'api_04.ego_network_visualisation',
+                id_=place.id,
+                download=True))
+        rv = rv.get_json()
+        assert len(rv['results']) == 9
+
         for rv in [
             c.get(url_for('api_04.geometric_entities')),
             c.get(url_for('api_04.geometric_entities', download=True))]:
@@ -298,7 +322,11 @@ class Api(ApiTestCase):
         assert rv['results'][0]['features'][0]['properties']
 
         # Test Entities endpoints
-        rv = c.get(url_for('api_04.entity_presentation_view', id_=place.id))
+        rv = c.get(
+            url_for(
+                'api_04.entity_presentation_view',
+                id_=place.id,
+                place_hierarchy='true'))
         rv = rv.get_json()
         assert rv['id'] == place.id
         assert rv['systemClass'] == place.class_.name
