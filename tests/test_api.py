@@ -322,7 +322,11 @@ class Api(ApiTestCase):
         assert rv['results'][0]['features'][0]['properties']
 
         # Test Entities endpoints
-        rv = c.get(url_for('api_04.entity_presentation_view', id_=place.id))
+        rv = c.get(
+            url_for(
+                'api_04.entity_presentation_view',
+                id_=place.id,
+                place_hierarchy='true'))
         rv = rv.get_json()
         assert rv['id'] == place.id
         assert rv['systemClass'] == place.class_.name

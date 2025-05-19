@@ -44,10 +44,12 @@ def get_presentation_types(
     return types
 
 
-def get_presentation_files(links_inverse: list[Link]) -> list[dict[str, str]]:
+def get_presentation_files(
+        links_inverse: list[Link],
+        entity_id: int) -> list[dict[str, str]]:
     files = []
     for link in links_inverse:
-        if link.domain.class_.name != 'file':
+        if link.domain.class_.name != 'file' or link.range.id != entity_id:
             continue
         img_id = link.domain.id
         path = get_file_path(img_id)
@@ -87,10 +89,12 @@ def get_relation_types_dict(
 
 
 def get_presentation_references(
-        links_inverse: list[Link]) -> list[dict[str, Any]]:
+        links_inverse: list[Link],
+        entity_id: int) -> list[dict[str, Any]]:
     references = []
     for link in links_inverse:
-        if link.domain.class_.view != 'reference':
+        if (link.domain.class_.view != 'reference'
+                or link.range.id != entity_id):
             continue
         ref = {
             'id': link.domain.id,
@@ -111,6 +115,12 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
     if entity.class_.view in ['place', 'artifact']:
         entity.location = entity.get_linked_entity_safe('P53')
         ids.append(entity.location.id)
+        if parser.place_hierarchy:
+            place_hierarchy = entity.get_linked_entity_ids_recursive('P46')
+            place_hierarchy.extend(entity.get_linked_entity_ids_recursive(
+                'P46',
+                inverse=True))
+            ids.extend(place_hierarchy)
 
     links = Entity.get_links_of_entities(ids)
     links_inverse = Entity.get_links_of_entities(ids, inverse=True)
@@ -134,20 +144,29 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
     exists: set[int] = set()
     relation_types = defaultdict(list)
     for l in links + event_links:
-        if l.range.class_.name in excluded or l.range.id in exists:
+        if (l.range.class_.name in excluded
+                or l.range.id in exists
+                or l.range.id == entity.id):
             continue
         related_entities.append(l.range)
         relation_types[l.range.id].append(
             get_relation_types_dict(l, parser, True))
     for l in links_inverse:
-        if l.domain.class_.name in excluded or l.domain.id in exists:
+        if (l.domain.class_.name in excluded
+                or l.domain.id in exists
+                or l.domain.id == entity.id):
             continue
         related_entities.append(l.domain)
         relation_types[l.domain.id].append(get_relation_types_dict(l, parser))
 
-    geoms = Gis.get_by_entities(related_entities + [entity])
+    exists_: set[int] = set()
+    add_ = exists_.add  # Faster than always call exists.add()
+    related_entities_ = \
+        [e for e in related_entities if not (e.id in exists_ or add_(e.id))]
+
+    geoms = Gis.get_by_entities(related_entities_ + [entity])
     relations = defaultdict(list)
-    for rel_entity in related_entities:
+    for rel_entity in related_entities_:
         standard_type_ = {}
         if rel_entity.standard_type:
             standard_type_ = {
@@ -157,6 +176,7 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         relation_dict = {
             'id': rel_entity.id,
             'systemClass': rel_entity.class_.name,
+            'viewClass': rel_entity.class_.view,
             'title': rel_entity.name,
             'description': rel_entity.description,
             'aliases': list(rel_entity.aliases.values()),
@@ -181,10 +201,9 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         'when': get_presentation_time(entity),
         'types': get_presentation_types(entity, links),
         'externalReferenceSystems': get_reference_systems(links_inverse),
-        'references': get_presentation_references(links_inverse),
-        'files': get_presentation_files(links_inverse),
+        'references': get_presentation_references(links_inverse, entity.id),
+        'files': get_presentation_files(links_inverse, entity.id),
         'relations': relations}
-
     return data
 
 
