@@ -24,33 +24,6 @@ BIBLIOGRAPHY_PATH = Path('files/bibliography.csv')
 
 
 # pylint: skip-file
-def spinner_and_timer(import_func, message):
-    """Imports data with a spinning animation at the end of the line,
-    and measures execution time."""
-    spinner = itertools.cycle(["|", "/", "-", "\\"])
-    print(f"{message} ", end="", flush=True)
-
-    start_time = time.time()
-
-    try:
-        def import_with_visual_feedback():
-            for _ in range(50):
-                print(f"{message} {next(spinner)}", end="\r", flush=True)
-                time.sleep(0.1)
-            import_func()
-
-        import_with_visual_feedback()
-        end_time = time.time()
-        elapsed_time = end_time - start_time
-        print(f"{message} Done! (Took {elapsed_time:.2f} seconds)")
-    except Exception as e:
-        end_time = time.time()
-        elapsed_time = end_time - start_time
-        print(f"{message} Error: {e} (Took {elapsed_time:.2f} seconds)")
-    finally:
-        print("")
-
-
 class AdministrativeUnit:
     def __init__(self, attributes_: dict[str, Any]) -> None:
         self.region = attributes_['region']
@@ -208,8 +181,8 @@ def import_churches() -> None:
     founders = {}
     for row in church_result:
         for key, value in row.items():
-            if key in ['begin_from', 'begin_to', 'end_from',
-                       'end_to'] and value:
+            if key in [
+                'begin_from', 'begin_to', 'end_from', 'end_to'] and value:
                 value = value.split('-')
                 value = [int(item) for item in value]
                 value = value + [None] * (3 - len(value))
@@ -230,6 +203,16 @@ def import_churches() -> None:
         founding_event = Entity.insert(
             'modification',
             f'Foundation of {church.name}')
+        founding_event.update({
+            'attributes': {
+                'begin_from': form_to_datetime64(
+                    church.begin_from.astype(object).year, 0, 0),
+                'begin_to': form_to_datetime64(
+                    church.begin_to.astype(object).year, 0, 0, to_date=True),
+                'end_from': form_to_datetime64(
+                    church.begin_from.astype(object).year, 0, 0),
+                'end_to': form_to_datetime64(
+                    church.begin_to.astype(object).year, 0, 0, to_date=True)}})
         founding_event.link('P2', founding_event_type)
         founding_event.link('P2', relic_type)
         founding_event.link('P2', replico_type)
@@ -243,7 +226,6 @@ def get_update_links_dict(
         property_: str,
         range_: Entity,
         type_id: Optional[int] = '',
-        # dates: Optional[dict[str, Any]],
         inverse: Optional[bool] = False) -> dict[str, Any]:
     return {
         'attributes': {
@@ -285,6 +267,10 @@ def import_monasteries() -> None:
     possessor_2 = {}
     for row in monasteries_result:
         for key, value in row.items():
+            if key in ['end_from']:
+                value = row['end_to']
+            if key in ['begin_to'] and not value:
+                value = row['begin_from'].split('-')[0]
             if (key in [
                 'begin_from', 'begin_to', 'end_from', 'end_to',
                 'p1_dating_from_earliest', 'p1_dating_from_latest',
@@ -299,7 +285,7 @@ def import_monasteries() -> None:
                     value[0],
                     value[1],
                     value[2],
-                    to_date=key in ['begin_to', 'end_to']))
+                    to_date=key in ['begin_to', 'end_to'] or 'latest' in key))
                 row[key] = value if all(value) else ''
             if key == 'cadastre':
                 row['administrative_unit_id'] = (
@@ -311,7 +297,8 @@ def import_monasteries() -> None:
             if key == 'possessor1_id' and value:
                 possessor_1[row['id']] = {
                     'possessor': Entity.get_by_id(value),
-                    'founder': Entity.get_by_id(row.get('founder')) if row.get('founder') else None,
+                    'founder': Entity.get_by_id(row.get('founder')) if row.get(
+                        'founder') else None,
                     'begin_from': row.get('p1_dating_from_earliest'),
                     'begin_to': row.get('p1_dating_from_latest'),
                     'end_from': row.get('p1_dating_to_earliest'),
@@ -319,7 +306,8 @@ def import_monasteries() -> None:
             if key == 'possessor2_id' and value:
                 possessor_2[row['id']] = {
                     'possessor': Entity.get_by_id(value),
-                    'founder': Entity.get_by_id(row.get('founder')) if row.get('founder') else None,
+                    'founder': Entity.get_by_id(row.get('founder')) if row.get(
+                        'founder') else None,
                     'begin_from': row.get('p2_dating_from_earliest'),
                     'begin_to': row.get('p2_dating_from_latest'),
                     'end_from': row.get('p2_dating_to_earliest'),
@@ -332,6 +320,16 @@ def import_monasteries() -> None:
         founding_event = Entity.insert(
             'modification',
             f'Foundation of {monastery.name}')
+        founding_event.update({
+            'attributes': {
+                'begin_from': form_to_datetime64(
+                    monastery.begin_from.astype(object).year, 0, 0),
+                'begin_to': form_to_datetime64(
+                    monastery.begin_from.astype(object).year, 0, 0, to_date=True),
+                'end_from': form_to_datetime64(
+                    monastery.begin_to.astype(object).year, 0, 0),
+                'end_to': form_to_datetime64(
+                    monastery.begin_to.astype(object).year, 0, 0, to_date=True)}})
         founding_event.link('P2', founding_event_type)
         founding_event.link('P2', relic_type)
         founding_event.link('P2', replico_type)
@@ -343,7 +341,7 @@ def import_monasteries() -> None:
     for id_, possessor1 in possessor_1.items():
         monastery = Entity.get_by_id(int(get_id_from_origin_id(project, id_)))
         ownership1_event = Entity.insert(
-            'acquisition',
+            'modification',
             f'Ownership of {monastery.name}')
         ownership1_event.update({
             'attributes': {
@@ -354,21 +352,17 @@ def import_monasteries() -> None:
         ownership1_event.link('P2', ownership_event_type)
         ownership1_event.link('P2', relic_type)
         ownership1_event.link('P2', replico_type)
-        ownership1_event.link('P24', monastery)
+        ownership1_event.link('P31', monastery)
         ownership1_event.update_links(
             get_update_links_dict(
-                'P23', possessor1['possessor'], possessor_type.id),
+                'P14', possessor1['possessor'], owner_type.id),
             new=True)
-        if possessor1['founder']:
-            ownership1_event.update_links(
-                get_update_links_dict(
-                    'P22', possessor1['founder'], proprietor_type.id),
-                new=True)
+
 
     for id_, possessor2 in possessor_2.items():
         monastery = Entity.get_by_id(int(get_id_from_origin_id(project, id_)))
         ownership2_event = Entity.insert(
-            'acquisition',
+            'modification',
             f'Ownership of {monastery.name}')
         ownership2_event.update({
             'attributes': {
@@ -379,16 +373,11 @@ def import_monasteries() -> None:
         ownership2_event.link('P2', ownership_event_type)
         ownership2_event.link('P2', relic_type)
         ownership2_event.link('P2', replico_type)
-        ownership2_event.link('P24', monastery)
+        ownership2_event.link('P31', monastery)
         ownership2_event.update_links(
             get_update_links_dict(
-                'P23', possessor2['possessor'], possessor_type.id),
+                'P14', possessor2['possessor'], owner_type.id),
             new=True)
-        if possessor2['founder']:
-            ownership2_event.update_links(
-                get_update_links_dict(
-                    'P22', possessor2['founder'], proprietor_type.id),
-                new=True)
 
 
 def import_bibliography() -> None:
@@ -404,6 +393,7 @@ def import_bibliography() -> None:
 
 if __name__ == "__main__":
     with app.test_request_context():
+        start_time = time.time()
         app.preprocess_request()
         user = User.get_by_id(23)
         login_user(user)
@@ -411,33 +401,46 @@ if __name__ == "__main__":
         founding_event_type = Entity.get_by_id(208862)
         ownership_event_type = Entity.get_by_id(208839)
         creator_type = Entity.get_by_id(19)
-        possessor_type = Entity.get_by_id(208860)
-        proprietor_type = Entity.get_by_id(208859)
+        owner_type= Entity.get_by_id(208851)
+        # possessor_type = Entity.get_by_id(208860)
+        # proprietor_type = Entity.get_by_id(208859)
         relic_type = Entity.get_by_id(221174)
         replico_type = Entity.get_by_id(198155)
 
         print('Importing administrative units \n')
-
+        start_time_ = time.time()
         admin_units = import_and_get_administrative_units()
+        print(f"Execution time: {time.time() - start_time_:.6f} seconds \n")
 
         before_request()
 
         print('Importing cemeteries \n')
 
+        start_time_ = time.time()
         import_cemeteries()
+        print(f"Execution time: {time.time() - start_time_:.6f} seconds \n")
 
         print('Importing bibliography \n')
 
+        start_time_ = time.time()
         import_bibliography()
+        print(f"Execution time: {time.time() - start_time_:.6f} seconds \n")
 
         print('Importing fortresses \n')
 
+        start_time_ = time.time()
         import_fortresses()
+        print(f"Execution time: {time.time() - start_time_:.6f} seconds \n")
 
         print('Importing churches \n')
 
+        start_time_ = time.time()
         import_churches()
+        print(f"Execution time: {time.time() - start_time_:.6f} seconds \n")
 
         print('Importing monasteries \n')
 
+        start_time_ = time.time()
         import_monasteries()
+        print(f"Execution time: {time.time() - start_time_:.6f} seconds \n")
+        print(f"Total execution time: {time.time() - start_time:.6f} seconds")
