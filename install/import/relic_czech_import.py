@@ -1,4 +1,3 @@
-import itertools
 import time
 from pathlib import Path
 from typing import Any, Optional
@@ -11,8 +10,8 @@ from openatlas import app, before_request
 from openatlas.display.util2 import datetime64_to_timestamp
 from openatlas.forms.util import form_to_datetime64
 from openatlas.models.entity import Entity
-from openatlas.models.imports import Project, get_id_from_origin_id, \
-    import_data_
+from openatlas.models.imports import (
+    Project, get_id_from_origin_id, import_data_)
 from openatlas.models.user import User
 
 ADMIN_PATH = Path('files/relic_admin.csv')
@@ -89,38 +88,6 @@ def import_and_get_administrative_units() -> dict[str, dict[str, Any]]:
         'districts': districts_,
         'cadastres': cadastres_}
 
-
-#######################
-# Code for RELIC Type #
-#######################
-
-# def import_and_get_administrative_units() -> dict[str, dict[str, Any]]:
-#    relic_type = Entity.get_by_id(255820)
-#    relic_admin_type = Entity.insert('type', 'Administrative units')
-#    relic_admin_type.link('P127', relic_type)
-#    entries = parse_csv()
-#    regions = {}
-#    districts = {}
-#    cadastres = {}
-#    for entry in entries:
-#        if entry.region.lower() not in regions:
-#            region = Entity.insert('type', entry.region)
-#            region.link('P127', relic_admin_type)
-#            regions[region.name.lower()] = region.id
-#        if entry.district.lower() not in districts:
-#            district = Entity.insert('type', entry.district)
-#            district.link('P127', Entity.get_by_id(regions[
-#            entry.region.lower()]))
-#            districts[district.name.lower()] = district.id
-#        if entry.cadastre.lower() not in cadastres:
-#            cadastre = Entity.insert('type', entry.cadastre)
-#            cadastre.link('P127', Entity.get_by_id(districts[
-#            entry.district.lower()]))
-#            cadastres[cadastre.name.lower()] = cadastre.id
-#    print(f'\n{len(regions)} regions where imported.')
-#    print(f'\n{len(districts)} districts where imported.')
-#    print(f'\n{len(cadastres)} cadastres where imported.')
-#    return {'cadastres': cadastres}
 
 def import_cemeteries() -> None:
     data = pd.read_csv(GRAVE_PATH, delimiter=',', encoding='utf-8', dtype=str)
@@ -325,11 +292,13 @@ def import_monasteries() -> None:
                 'begin_from': form_to_datetime64(
                     monastery.begin_from.astype(object).year, 0, 0),
                 'begin_to': form_to_datetime64(
-                    monastery.begin_from.astype(object).year, 0, 0, to_date=True),
+                    monastery.begin_from.astype(object).year, 0, 0,
+                    to_date=True),
                 'end_from': form_to_datetime64(
                     monastery.begin_to.astype(object).year, 0, 0),
                 'end_to': form_to_datetime64(
-                    monastery.begin_to.astype(object).year, 0, 0, to_date=True)}})
+                    monastery.begin_to.astype(object).year, 0, 0,
+                    to_date=True)}})
         founding_event.link('P2', founding_event_type)
         founding_event.link('P2', relic_type)
         founding_event.link('P2', replico_type)
@@ -357,7 +326,6 @@ def import_monasteries() -> None:
             get_update_links_dict(
                 'P14', possessor1['possessor'], owner_type.id),
             new=True)
-
 
     for id_, possessor2 in possessor_2.items():
         monastery = Entity.get_by_id(int(get_id_from_origin_id(project, id_)))
@@ -401,7 +369,7 @@ if __name__ == "__main__":
         founding_event_type = Entity.get_by_id(208862)
         ownership_event_type = Entity.get_by_id(208839)
         creator_type = Entity.get_by_id(19)
-        owner_type= Entity.get_by_id(208851)
+        owner_type = Entity.get_by_id(208851)
         # possessor_type = Entity.get_by_id(208860)
         # proprietor_type = Entity.get_by_id(208859)
         relic_type = Entity.get_by_id(221174)
