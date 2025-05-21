@@ -121,6 +121,14 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
                 'P46',
                 inverse=True))
             ids.extend(place_hierarchy)
+    if entity.class_.view in ['actor']:
+        for property_ in ['P74', 'OA8', 'OA9']:
+            if location := entity.get_linked_entity(property_):
+                ids.append(location.id)
+    if entity.class_.view in ['event']:
+        for property_ in ['P7', 'P26', 'P27']:
+            if location := entity.get_linked_entity(property_):
+                ids.append(location.id)
 
     links = Entity.get_links_of_entities(ids)
     links_inverse = Entity.get_links_of_entities(ids, inverse=True)
