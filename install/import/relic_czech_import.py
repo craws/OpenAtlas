@@ -166,20 +166,30 @@ def import_churches() -> None:
                 founders[row['id']] = Entity.get_by_id(value)
     import_data_(project, 'place', church_result)
     for id_, founder in founders.items():
-        church = Entity.get_by_id(int(get_id_from_origin_id(project, id_)))
+        if origin_id := get_id_from_origin_id(project, id_):
+            church = Entity.get_by_id(int(origin_id))
+        else:
+            continue
         founding_event = Entity.insert(
             'modification',
             f'Foundation of {church.name}')
-        founding_event.update({
-            'attributes': {
-                'begin_from': form_to_datetime64(
-                    church.begin_from.astype(object).year, 0, 0),
-                'begin_to': form_to_datetime64(
-                    church.begin_to.astype(object).year, 0, 0, to_date=True),
-                'end_from': form_to_datetime64(
-                    church.begin_from.astype(object).year, 0, 0),
-                'end_to': form_to_datetime64(
-                    church.begin_to.astype(object).year, 0, 0, to_date=True)}})
+        if church.begin_from and church.begin_to:
+            founding_event.update({
+                'attributes': {
+                    'begin_from': form_to_datetime64(
+                        church.begin_from.astype(object).year, 0, 0),
+                    'begin_to': form_to_datetime64(
+                        church.begin_to.astype(object).year,
+                        0,
+                        0,
+                        to_date=True),
+                    'end_from': form_to_datetime64(
+                        church.begin_from.astype(object).year, 0, 0),
+                    'end_to': form_to_datetime64(
+                        church.begin_to.astype(object).year,
+                        0,
+                        0,
+                        to_date=True)}})
         founding_event.link('P2', founding_event_type)
         founding_event.link('P2', relic_type)
         founding_event.link('P2', replico_type)
@@ -192,7 +202,7 @@ def import_churches() -> None:
 def get_update_links_dict(
         property_: str,
         range_: Entity,
-        type_id: Optional[int] = '',
+        type_id: Optional[int] = None,
         inverse: Optional[bool] = False) -> dict[str, Any]:
     return {
         'attributes': {
@@ -283,22 +293,26 @@ def import_monasteries() -> None:
     import_data_(project, 'place', monasteries_result)
 
     for id_, founder in founders.items():
-        monastery = Entity.get_by_id(int(get_id_from_origin_id(project, id_)))
+        if origin_id := get_id_from_origin_id(project, id_):
+            monastery = Entity.get_by_id(int(origin_id))
+        else:
+            continue
         founding_event = Entity.insert(
             'modification',
             f'Foundation of {monastery.name}')
-        founding_event.update({
-            'attributes': {
-                'begin_from': form_to_datetime64(
-                    monastery.begin_from.astype(object).year, 0, 0),
-                'begin_to': form_to_datetime64(
-                    monastery.begin_from.astype(object).year, 0, 0,
-                    to_date=True),
-                'end_from': form_to_datetime64(
-                    monastery.begin_to.astype(object).year, 0, 0),
-                'end_to': form_to_datetime64(
-                    monastery.begin_to.astype(object).year, 0, 0,
-                    to_date=True)}})
+        if monastery.begin_from and monastery.begin_to:
+            founding_event.update({
+                'attributes': {
+                    'begin_from': form_to_datetime64(
+                        monastery.begin_from.astype(object).year, 0, 0),
+                    'begin_to': form_to_datetime64(
+                        monastery.begin_from.astype(object).year, 0, 0,
+                        to_date=True),
+                    'end_from': form_to_datetime64(
+                        monastery.begin_to.astype(object).year, 0, 0),
+                    'end_to': form_to_datetime64(
+                        monastery.begin_to.astype(object).year, 0, 0,
+                        to_date=True)}})
         founding_event.link('P2', founding_event_type)
         founding_event.link('P2', relic_type)
         founding_event.link('P2', replico_type)
@@ -308,7 +322,10 @@ def import_monasteries() -> None:
             new=True)
 
     for id_, possessor1 in possessor_1.items():
-        monastery = Entity.get_by_id(int(get_id_from_origin_id(project, id_)))
+        if origin_id := get_id_from_origin_id(project, id_):
+            monastery = Entity.get_by_id(int(origin_id))
+        else:
+            continue
         ownership1_event = Entity.insert(
             'modification',
             f'Ownership of {monastery.name}')
@@ -328,7 +345,8 @@ def import_monasteries() -> None:
             new=True)
 
     for id_, possessor2 in possessor_2.items():
-        monastery = Entity.get_by_id(int(get_id_from_origin_id(project, id_)))
+        if origin_id := get_id_from_origin_id(project, id_):
+            monastery = Entity.get_by_id(int(origin_id))
         ownership2_event = Entity.insert(
             'modification',
             f'Ownership of {monastery.name}')

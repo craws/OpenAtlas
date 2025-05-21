@@ -223,7 +223,7 @@ def presentation_template() -> dict[str, Any]:
         'license': fields.String,
         'creator': fields.String,
         'licenseHolder': fields.String,
-        'publicShareable': fields.String,
+        'publicShareable': fields.Boolean,
         'mimetype': fields.String,
         'url': fields.String,
         'IIIFManifest': fields.String,

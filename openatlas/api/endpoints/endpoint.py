@@ -12,13 +12,17 @@ from openatlas import app
 from openatlas.api.endpoints.parser import Parser
 from openatlas.api.formats.csv import (
     build_dataframe, build_link_dataframe, get_csv_links, get_csv_types)
+from openatlas.api.formats.linked_places import get_lp_file, get_lp_links, \
+    get_lp_time
 from openatlas.api.formats.loud import get_loud_entities
 from openatlas.api.resources.resolve_endpoints import (
     download, parse_loud_context)
 from openatlas.api.resources.templates import (
     geojson_collection_template, geojson_pagination, linked_place_pagination,
     linked_places_template, loud_pagination, loud_template)
-from openatlas.api.resources.util import date_to_str, get_location_link
+from openatlas.api.resources.util import date_to_str, geometry_to_geojson, \
+    get_location_link, \
+    get_reference_systems, replace_empty_list_values_in_dict_with_none
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 
@@ -234,8 +238,8 @@ class Endpoint:
                     for item in self.entities_with_links.values()]
             case 'lp' | 'lpx':
                 entities = [
-                    self.parser.get_linked_places_entity(item)
-                    for item in self.entities_with_links.values()]
+                    self.get_linked_places_entity(_id)
+                    for _id in self.entities_with_links]
             case _ if self.parser.format \
                       in app.config['RDF_FORMATS']:  # pragma: no cover
                 entities = [
@@ -307,3 +311,45 @@ class Endpoint:
                             self.entities_with_links[links_.domain.id][
                                 'links_inverse'])})
         return items
+
+    def get_linked_places_entity(self, _id: int) -> dict[str, Any]:
+        entity = self.entities_with_links[_id]['entity']
+        links = self.entities_with_links[_id]['links']
+        links_inverse = self.entities_with_links[_id]['links_inverse']
+        geometry = self.entities_with_links[_id]['geometry']
+        crm = f"crm:{entity.cidoc_class.code} {entity.cidoc_class.i18n['en']}"
+        feature = {
+                '@id': url_for('api.entity', id_=entity.id, _external=True),
+                'type': 'Feature',
+                'crmClass': crm,
+                'viewClass': entity.class_.view,
+                'systemClass': entity.class_.name,
+                'properties': {'title': entity.name},
+                'types': self.parser.get_lp_types(entity, links)
+                if 'types' in self.parser.show else None,
+                'depictions': None,
+                'when': {'timespans': [get_lp_time(entity)]}
+                if 'when' in self.parser.show else None,
+                'links': get_reference_systems(links_inverse)
+                if 'links' in self.parser.show else None,
+                'descriptions': [{'value': entity.description}]
+                if 'description' in self.parser.show else None,
+                'names':
+                    [{"alias": value} for value in entity.aliases.values()]
+                    if entity.aliases and 'names' in self.parser.show else
+                    None,
+                'geometry': geometry_to_geojson(geometry)
+                if 'geometry' in self.parser.show else None,
+                'relations': get_lp_links(links, links_inverse, self.parser)
+                if 'relations' in self.parser.show else None}
+        if 'depictions' in self.parser.show:
+            if entity.class_.name == 'file':
+                feature['depictions'] = get_lp_file(entity)
+            else:
+                feature['depictions']= [
+                    get_lp_file(link.domain) for link in links_inverse
+                    if link.domain.class_.name == 'file']
+        return  {
+            'type': 'FeatureCollection',
+            '@context': app.config['API_CONTEXT']['LPF'],
+            'features': [replace_empty_list_values_in_dict_with_none(feature)]}
