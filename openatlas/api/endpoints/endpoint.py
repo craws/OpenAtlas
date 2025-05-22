@@ -375,11 +375,14 @@ class Endpoint:
             'systemClass': entity.class_.name,
             'viewClass': entity.class_.view,
             'description': entity.description,
-            'begin_from': date_to_str(entity.begin_from),
-            'begin_to': date_to_str(entity.begin_to),
-            'end_from': date_to_str(entity.end_from),
-            'end_to': date_to_str(entity.end_to),
-            'geometry': geometry_to_feature_collection(geometry)}
+            'beginFrom': date_to_str(entity.begin_from),
+            'beginTo': date_to_str(entity.begin_to),
+            'endFrom': date_to_str(entity.end_from),
+            'endTo': date_to_str(entity.end_to),
+            'geometry': geometry_to_feature_collection(geometry),
+            'mainImage': '',
+            'IIIFManifest': '',
+            'IIIFBasePath': ''}
         if entity.class_.name == 'file':
             files = [entity]
         else:
@@ -402,7 +405,7 @@ class Endpoint:
                             image = file
                             break
         if image:
-            output['main_image'] = url_for(
+            output['mainImage'] = url_for(
                 'api.display',
                 filename=image.id,
                 _external=True)
