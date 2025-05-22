@@ -1,4 +1,5 @@
 import itertools
+import mimetypes
 import zipfile
 from io import BytesIO
 from itertools import groupby
@@ -19,10 +20,13 @@ from openatlas.api.resources.resolve_endpoints import (
     download, parse_loud_context)
 from openatlas.api.resources.templates import (
     geojson_collection_template, geojson_pagination, linked_place_pagination,
-    linked_places_template, loud_pagination, loud_template)
-from openatlas.api.resources.util import date_to_str, geometry_to_geojson, \
-    get_location_link, \
+    linked_places_template, loud_pagination, loud_template,
+    table_view_template)
+from openatlas.api.resources.util import date_to_str, \
+    geometry_to_feature_collection, geometry_to_geojson, \
+    get_iiif_manifest_and_path, get_location_link, \
     get_reference_systems, replace_empty_list_values_in_dict_with_none
+from openatlas.display.util import get_file_path
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 
@@ -236,6 +240,10 @@ class Endpoint:
                 entities = [
                     get_loud_entities(item, parsed_context)
                     for item in self.entities_with_links.values()]
+            case 'table_view':
+                entities = [
+                    self.get_template_view(_id)
+                    for _id in self.entities_with_links]
             case 'lp' | 'lpx':
                 entities = [
                     self.get_linked_places_entity(_id)
@@ -279,6 +287,8 @@ class Endpoint:
                 template = loud_template(result)
                 if not self.single:
                     template = loud_pagination()
+            case 'table_view':
+                template = table_view_template()
             case _:
                 template = linked_places_template(self.parser)
                 if not self.single:
@@ -312,11 +322,11 @@ class Endpoint:
                                 'links_inverse'])})
         return items
 
-    def get_linked_places_entity(self, _id: int) -> dict[str, Any]:
-        entity = self.entities_with_links[_id]['entity']
-        links = self.entities_with_links[_id]['links']
-        links_inverse = self.entities_with_links[_id]['links_inverse']
-        geometry = self.entities_with_links[_id]['geometry']
+    def get_linked_places_entity(self, id_: int) -> dict[str, Any]:
+        entity = self.entities_with_links[id_]['entity']
+        links = self.entities_with_links[id_]['links']
+        links_inverse = self.entities_with_links[id_]['links_inverse']
+        geometry = self.entities_with_links[id_]['geometry']
         crm = f"crm:{entity.cidoc_class.code} {entity.cidoc_class.i18n['en']}"
         feature = {
                 '@id': url_for('api.entity', id_=entity.id, _external=True),
@@ -353,3 +363,68 @@ class Endpoint:
             'type': 'FeatureCollection',
             '@context': app.config['API_CONTEXT']['LPF'],
             'features': [replace_empty_list_values_in_dict_with_none(feature)]}
+
+    def get_template_view(self, id_: int) -> dict[str, Any]:
+        entity = self.entities_with_links[id_]['entity']
+        links = self.entities_with_links[id_]['links']
+        links_inverse = self.entities_with_links[id_]['links_inverse']
+        geometry = self.entities_with_links[id_]['geometry']
+        output= {
+            'id': entity.id,
+            'name': entity.name,
+            'systemClass': entity.class_.name,
+            'viewClass': entity.class_.view,
+            'description': entity.description,
+            'begin_from': date_to_str(entity.begin_from),
+            'begin_to': date_to_str(entity.begin_to),
+            'end_from': date_to_str(entity.end_from),
+            'end_to': date_to_str(entity.end_to),
+            'geometry': geometry_to_feature_collection(geometry)}
+        if entity.class_.name == 'file':
+            files = [entity]
+        else:
+            files = [link.domain for link in links_inverse
+                if link.domain.class_.name == 'file']
+        main_image = entity.get_profile_image_id()
+        image = None
+        if files:
+            for file in files:
+                if file.id == main_image and file.public:
+                    if path := get_file_path(file.id):
+                        mime_type, _ = mimetypes.guess_type(path)
+                        if 'image' in mime_type:
+                            image = file
+                            break
+                if file.public:
+                    if path := get_file_path(file.id):
+                        mime_type, _ = mimetypes.guess_type(path)
+                        if 'image' in mime_type:
+                            image = file
+                            break
+        if image:
+            output['main_image'] = url_for(
+                'api.display',
+                filename=image.id,
+                _external=True)
+            output.update(get_iiif_manifest_and_path(image.id))
+
+        return output
+
+
+def get_table_view_files(file: Entity) -> dict[str, Any]:
+    img_id = file.id
+    path = get_file_path(img_id)
+    mime_type = None
+    if path:
+        mime_type, _ = mimetypes.guess_type(path)
+    data = {
+        'id': img_id,
+        'title': file.name,
+        'publicShareable': file.public,
+        'mimetype': mime_type,
+        'url': url_for(
+            'api.display',
+            filename=path.stem,
+            _external=True) if path else "N/A"}
+    data.update(get_iiif_manifest_and_path(img_id))
+    return data
