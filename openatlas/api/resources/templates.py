@@ -190,8 +190,12 @@ def loud_pagination() -> dict[str, Any]:
 
 def table_view_template() -> dict[str, Any]:
     return {
-        "results": fields.List(fields.Raw),
-        "pagination": fields.Nested(pagination())}
+        'data': fields.List(fields.Raw),
+        'last_page': fields.Integer
+    }
+    #return {
+    #    "results": fields.List(fields.Raw),
+    #    "pagination": fields.Nested(pagination())}
 
 
 def loud_template(result: dict[str, Any]) -> dict[str, Any]:

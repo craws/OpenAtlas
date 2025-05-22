@@ -134,6 +134,10 @@ class Endpoint:
         return marshal(result, loud_pagination())
 
     def get_json_output(self) -> dict[str, Any]:
+        if self.parser.format == 'table_view':
+            return {
+                "data": self.formated_entities,
+                    'last_page': len(self.pagination['index'])}
         return dict(self.formated_entities[0]) if self.single else {
             "results": self.formated_entities,
             "pagination": {
@@ -403,7 +407,6 @@ class Endpoint:
                         mime_type, _ = mimetypes.guess_type(path)
                         if 'image' in mime_type:
                             image = file
-                            break
         if image:
             output['mainImage'] = url_for(
                 'api.display',
