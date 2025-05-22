@@ -416,21 +416,3 @@ class Endpoint:
 
         return output
 
-
-def get_table_view_files(file: Entity) -> dict[str, Any]:
-    img_id = file.id
-    path = get_file_path(img_id)
-    mime_type = None
-    if path:
-        mime_type, _ = mimetypes.guess_type(path)
-    data = {
-        'id': img_id,
-        'title': file.name,
-        'publicShareable': file.public,
-        'mimetype': mime_type,
-        'url': url_for(
-            'api.display',
-            filename=path.stem,
-            _external=True) if path else "N/A"}
-    data.update(get_iiif_manifest_and_path(img_id))
-    return data
