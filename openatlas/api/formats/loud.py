@@ -15,46 +15,13 @@ from openatlas.models.type import Type
 
 
 def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
-    def base_entity_dict() -> dict[str, Any]:
-        timespan = {'timespan': get_loud_timespan(data['entity'])}
-        if remove_spaces_dashes(
-                data['entity'].cidoc_class.i18n['en']) == 'Person':
-            born, death = {}, {}
-            if data["entity"].begin_from:
-                born = {'born': {
-                    'type': 'Birth',
-                    '_label': f'Birth of {data["entity"].name}',
-                    'timespan':
-                        {'type': 'TimeSpan'} |
-                        get_loud_begin_dates(data['entity'])}}
-            if data["entity"].end_from:
-                death = {'death_of': {
-                    'type': 'Death',
-                    '_label': f'Death of {data["entity"].name}',
-                    'timespan':
-                        {'type': 'TimeSpan'} |
-                        get_loud_end_dates(data['entity'])}}
-            timespan = born | death
-        return {
-            'id': url_for(
-                'api.entity',
-                id_=data['entity'].id,
-                format='loud',
-                _external=True),
-            'type': remove_spaces_dashes(
-                data['entity'].cidoc_class.i18n['en']),
-            '_label': data['entity'].name,
-            'content': data['entity'].description,
-            'identified_by': [{
-                "type": "Name",
-                "content": data['entity'].name}]} | timespan
+    entity = data['entity']
 
     def get_range_links() -> dict[str, Any]:
-        property_ = {
+        property_: Any = {
             'id': url_for(
                 'api.entity',
                 id_=link_.range.id,
-                format='loud',
                 _external=True),
             'type': loud[get_crm_code(link_).replace(' ', '_')],
             '_label': link_.range.name}
@@ -99,11 +66,10 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
         return property_
 
     def get_domain_links() -> dict[str, Any]:
-        property_ = {
+        property_: Any = {
             'id': url_for(
                 'api.entity',
                 id_=link_.domain.id,
-                format='loud',
                 _external=True),
             'type': loud[get_crm_code(link_, True).replace(' ', '_')],
             '_label': link_.domain.name}
@@ -128,14 +94,13 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
                 link_url = f"{system.resolver_url or ''}{link_.description}"
                 property_[f"skos:{match_case}"] = link_url
         if code_ == 'OA7':
-            relationship = {
+            property_ = [{
                 'type': 'Event',
                 '_label':
                     f'Relationship between '
                     f'{link_.range.name} and {link_.domain.name}',
                 'classified_as': [get_type_property(g.types[link_.type.id])],
-                'had_participant': [property_]}
-            property_ = [relationship]
+                'had_participant': [property_]}]
         if code_ in ['OA8', 'OA9']:
             property_ = {
                 'type': 'BeginningOfExistence'
@@ -171,7 +136,8 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
                 property_name = 'taken_out_of_existence_by'
         elif link_.property.code == 'OA7':
             property_name = 'participated_in'
-        elif link_.domain.class_.name == 'file' and g.files.get(link_.domain.id):
+        elif link_.domain.class_.name == 'file' and g.files.get(
+                link_.domain.id):
             image_links.append(link_)
             continue
         else:
@@ -186,11 +152,28 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
             properties_set[property_name].append(base_property)
 
     if image_links:
-        properties_set.update(get_loud_images(data['entity'], image_links))
+        properties_set.update(get_loud_images(entity, image_links))
 
     return ({'@context': app.config['API_CONTEXT']['LOUD']} |
-            base_entity_dict() |
+            base_entity_dict(entity) |
             properties_set)
+
+
+def base_entity_dict(entity: Entity) -> dict[str, Any]:
+    timespan = get_loud_timespan(entity) \
+        if entity.first or entity.last else {}
+    return {
+        'id': url_for(
+            'api.entity',
+            id_=entity.id,
+            _external=True),
+        'type': remove_spaces_dashes(
+            entity.cidoc_class.i18n['en']),
+        '_label': entity.name,
+        'content': entity.description,
+        'identified_by': [{
+            "type": "Name",
+            "content": entity.name}]} | timespan
 
 
 def get_loud_property_name(
@@ -217,7 +200,6 @@ def get_loud_images(entity: Entity, image_links: list[Link]) -> dict[str, Any]:
             'id': url_for(
                 'api.entity',
                 id_=id_,
-                format='loud',
                 _external=True),
             '_label': link_.domain.name,
             'type': 'DigitalObject',
@@ -281,9 +263,28 @@ def get_loud_images(entity: Entity, image_links: list[Link]) -> dict[str, Any]:
 
 
 def get_loud_timespan(entity: Entity) -> dict[str, Any]:
-    return ({'type': 'TimeSpan'} |
-            get_loud_begin_dates(entity) |
-            get_loud_end_dates(entity))
+    timespan = {'timespan': ({'type': 'TimeSpan'} |
+                             get_loud_begin_dates(entity) |
+                             get_loud_end_dates(entity))}
+    if not isinstance(entity, Link) and \
+            remove_spaces_dashes(entity.cidoc_class.i18n['en']) == 'Person':
+        born, death = {}, {}
+        if entity.begin_from:
+            born = {'born': {
+                'type': 'Birth',
+                '_label': f'Birth of {entity.name}',
+                'timespan':
+                    {'type': 'TimeSpan'} |
+                    get_loud_begin_dates(entity)}}
+        if entity.end_from:
+            death = {'death_of': {
+                'type': 'Death',
+                '_label': f'Death of {entity.name}',
+                'timespan':
+                    {'type': 'TimeSpan'} |
+                    get_loud_end_dates(entity)}}
+        timespan = born | death
+    return timespan
 
 
 def get_loud_begin_dates(entity: Entity) -> dict[str, Any]:
