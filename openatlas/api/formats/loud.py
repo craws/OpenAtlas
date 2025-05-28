@@ -13,6 +13,83 @@ from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 from openatlas.models.type import Type
 
+unit_map = {
+    'B': 'bytes',
+    'KB': 'kilobytes',
+    'MB': 'megabytes',
+    'GB': 'gigabytes',
+    'TB': 'terabytes'}
+
+
+def get_file_dimensions(entity: Entity) -> dict[str, Any]:
+    file_size = entity.get_file_size()
+    return {'dimension': [{
+        "type": "Dimension",
+        "_label": file_size,
+        "classified_as": [{
+            "id": "http://vocab.getty.edu/aat/300265863",
+            "type": "Type",
+            "_label": "File Size"}],
+        "value": int(file_size.split()[0]),
+        "unit": {
+            "id": "http://vocab.getty.edu/aat/300265870",
+            "type": "MeasurementUnit",
+            "_label": unit_map[file_size.split()[1]]}}]}
+
+
+def get_digital_object_details(entity: Entity) -> dict[str, Any]:
+    mime_type, _ = mimetypes.guess_type(g.files[entity.id])
+    file_ = get_file_path(entity.id)
+    digital_object = {
+        'format': mime_type,
+
+        'created_by': [{
+            '_label': f'Creation of {entity.name}',
+            'type': 'Creation',
+            'carried_out_by': [{
+                '_label': entity.creator,
+                'type': 'Actor'}]}],
+        "classified_as": [{
+            "id": "https://vocab.getty.edu/aat/300215302",
+            "type": "Type",
+            "_label": "Digital Image"}],
+        "access_point": [{
+            "id": url_for(
+                'api.display',
+                filename=file_.stem if file_ else '',
+                _external=True),
+            "type": "DigitalObject"}]}
+    if entity.license_holder:
+        digital_object.update({
+            'right_held_by': [{
+                '_label': entity.license_holder,
+                'type': 'Actor'}]})
+    if entity.creator:
+        digital_object.update({'created_by': [{
+            '_label': f'Creation of {entity.name}',
+            'type': 'Creation',
+            'carried_out_by': [{
+                '_label': entity.creator,
+                'type': 'Actor'}]}]})
+    if license_ := get_license_type(entity):
+        subject_to = {
+            'type': "Right",
+            '_label': f'License of {entity.name}',
+            "identified_by": [{
+                'id': url_for(
+                    'api.entity',
+                    id_=license_.id,
+                    _external=True),
+                "type": "Name",
+                "content": license_.name}]}
+        if license_url := get_license_url(entity):
+            subject_to['classified_as'] = [{
+                "id": license_url,
+                "type": "Type",
+                "_label": license_.name}]
+        digital_object.update({'subject_to': [subject_to]})
+    return digital_object
+
 
 def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
     entity = data['entity']
@@ -117,6 +194,8 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
             property_name = 'brought_into_existence_by'
         elif link_.property.code == 'OA7':
             property_name = 'participated_in'
+        elif link_.property.code == 'P67' and link_.domain.class_.name == 'file':
+            property_name = 'digitally_carries'
         else:
             property_name = get_loud_property_name(loud, link_)
 
@@ -128,7 +207,7 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
             base_property = get_range_links()
             properties_set[property_name].append(base_property)
 
-    image_links = []
+    file_links = []
     for link_ in data['links_inverse']:
         if link_.property.code in ['OA8', 'OA9']:
             property_name = 'brought_into_existence_by'
@@ -138,7 +217,7 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
             property_name = 'participated_in'
         elif link_.domain.class_.name == 'file' and g.files.get(
                 link_.domain.id):
-            image_links.append(link_)
+            file_links.append(link_)
             continue
         else:
             property_name = get_loud_property_name(loud, link_, inverse=True)
@@ -151,8 +230,12 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
             base_property = get_domain_links()
             properties_set[property_name].append(base_property)
 
-    if image_links:
-        properties_set.update(get_loud_images(entity, image_links))
+    if file_links:
+        properties_set.update(get_loud_images(file_links))
+
+    if entity.class_.name == 'file':
+        properties_set.update(get_file_dimensions(entity))
+        properties_set.update(get_digital_object_details(entity))
 
     return ({'@context': app.config['API_CONTEXT']['LOUD']} |
             base_entity_dict(entity) |
@@ -162,13 +245,15 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
 def base_entity_dict(entity: Entity) -> dict[str, Any]:
     timespan = get_loud_timespan(entity) \
         if entity.first or entity.last else {}
+    type_ = remove_spaces_dashes(entity.cidoc_class.i18n['en'])
+    if entity.class_.name == 'file':
+        type_ = 'DigitalObject'
     return {
         'id': url_for(
             'api.entity',
             id_=entity.id,
             _external=True),
-        'type': remove_spaces_dashes(
-            entity.cidoc_class.i18n['en']),
+        'type': type_,
         '_label': entity.name,
         'content': entity.description,
         'identified_by': [{
@@ -186,64 +271,23 @@ def get_loud_property_name(
     return name
 
 
-def get_loud_images(entity: Entity, image_links: list[Link]) -> dict[str, Any]:
-    profile_image = Entity.get_profile_image_id(entity)
+def get_loud_images(image_links: list[Link]) -> dict[str, Any]:
     representation = []
     subject_of = []
     for link_ in image_links:
-        id_ = link_.domain.id
-        mime_type, _ = mimetypes.guess_type(g.files[id_])
-        if not mime_type:
-            continue  # pragma: no cover
-        file_ = get_file_path(id_)
+        entity = link_.domain
         image = {
             'id': url_for(
                 'api.entity',
-                id_=id_,
+                id_=entity.id,
                 _external=True),
-            '_label': link_.domain.name,
-            'type': 'DigitalObject',
-            'format': mime_type,
-            'right_held_by': [{
-                '_label': link_.domain.license_holder,
-                'type': 'Actor'}],
-            'created_by': [{
-                '_label': f'Creation of {link_.domain.name}',
-                'type': 'Creation',
-                'carried_out_by': [{
-                    '_label': link_.domain.creator,
-                    'type': 'Actor'}]}],
-            "classified_as": [{
-                "id": "https://vocab.getty.edu/aat/300215302",
-                "type": "Type",
-                "_label": "Digital Image"}],
-            'access_point': [{
-                'id': url_for(
-                    'api.display',
-                    filename=file_.stem if file_ else '',
-                    _external=True),
-                'type': 'DigitalObject',
-                '_label': 'ProfileImage' if id_ == profile_image else ''}]}
-        if license_ := get_license_type(link_.domain):
-            image['subject_to'] = [{
-                'type': "Right",
-                '_label': f'License of {link_.domain.name}',
-                "identified_by": [{
-                    'id': url_for(
-                        'api.entity',
-                        id_=license_.id,
-                        format='loud',
-                        _external=True),
-                    "type": "Name",
-                    "content": license_.name}],
-                "classified_as": [{
-                    "id": get_license_url(link_.domain),
-                    "type": "Type",
-                    "_label": license_.name}]}]
+            '_label': entity.name,
+            'type': 'DigitalObject'}
+        image.update(get_digital_object_details(entity))
         representation.append({
             'type': 'VisualItem',
             'digitally_shown_by': [image]})
-        if iiif := get_iiif_manifest_and_path(link_.domain.id):
+        if iiif := get_iiif_manifest_and_path(entity.id):
             subject_of.append({
                 "type": "LinguisticObject",
                 "digitally_carried_by": [{
@@ -306,7 +350,6 @@ def get_type_property(type_: Type) -> dict[str, Any]:
         'id': url_for(
             'api.entity',
             id_=type_.id,
-            format='loud',
             _external=True),
         'type': remove_spaces_dashes(type_.cidoc_class.i18n['en']),
         '_label': type_.name}
