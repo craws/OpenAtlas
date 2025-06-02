@@ -11,6 +11,7 @@ from flask import g
 from pandas import isnull
 
 from openatlas import app
+from openatlas.api.import_scripts.util import get_exact_match
 from openatlas.models.entity import Entity
 
 FILE_PATH = Path('files/patientinnenbuch.csv')
@@ -23,6 +24,7 @@ class Entry:
     def __init__(self, attributes_: dict[str, Any]) -> None:
         self.text = attributes_['text']
         self.number = attributes_['number']
+        self.number_correct = attributes_['number_correct']
         self.begin = self.convert_str_to_date(attributes_['begin'])
         self.end = self.convert_str_to_date(attributes_['end'])
         self.persons_name = attributes_['persons_name']
@@ -121,6 +123,7 @@ def parse_csv() -> list[Entry]:
         result.append(Entry({
             'text': row['Originaltext'],
             'number': row['Nr.'],
+            'number_correct': row['Nr._korr.'],
             'begin': row['Beginn'],
             'end': row['Ende'],
             'persons_name': row['Name'] if pd.notna(
@@ -164,6 +167,8 @@ with app.test_request_context():
     start_time = time.time()
     case_study = Entity.get_by_id(357)
     diagnose_hierarchy = Entity.get_by_id(359)
+    patientinnenbuch_ext_ref_sys = Entity.get_by_id(707)
+    exact_match = get_exact_match()
     death_type = Entity.get_by_id(361)
     source = Entity.get_by_id(143)
 
@@ -203,6 +208,12 @@ with app.test_request_context():
         activity.link('P11', person)
         if entry.origin:
             person.link('OA8', origin_places[entry.origin])
+        if entry.number_correct and isinstance(entry.number_correct, str):
+            patientinnenbuch_ext_ref_sys.link(
+                'P67',
+                person,
+                entry.number_correct,
+                type_id=exact_match.id)
         COUNT += 1
         if COUNT % 15 == 0:
             sys.stdout.write(f"\rProcessing {next(SPINNER)}")
