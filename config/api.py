@@ -67,3 +67,6 @@ API_PRESENTATION_EXCLUDE_RELATION = [
     'bibliography',
     'edition',
     'external_reference']
+
+
+LOCATION_PROPERTIES = {'P53', 'P74', 'OA8', 'OA9', 'P7', 'P26', 'P27'}

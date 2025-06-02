@@ -40,10 +40,8 @@ def get_links_by_id_network(ids: list[int]) -> list[dict[str, Any]]:
     return db_link.get_links_by_id_network(ids)
 
 
-def get_ego_network_filtered_classes(
-        ids: set[int],
-        classes: list[str]) -> list[dict[str, Any]]:
-    return db_link.get_ego_network_filtered_classes(ids, classes)
+def get_place_linked_to_location_id(ids: list[int]) -> list[dict[str, Any]]:
+    return db_link.get_place_linked_to_location_id(ids)
 
 
 def get_api_simple_search(
