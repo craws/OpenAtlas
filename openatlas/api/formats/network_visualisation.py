@@ -3,12 +3,12 @@ from typing import Any
 
 from flask import g
 
-from openatlas.database import network as db
-from openatlas.database.entity import get_linked_entities_recursive
+from openatlas import app
 from openatlas.api.endpoints.parser import Parser
 from openatlas.api.resources.database_mapper import (
-    get_all_links_for_network, get_ego_network_filtered_classes,
-    get_links_by_id_network)
+    get_all_links_for_network, get_links_by_id_network,
+    get_place_linked_to_location_id)
+from openatlas.database.entity import get_linked_entities_recursive
 
 
 def overwrite_object_locations_with_place(
@@ -117,24 +117,26 @@ def get_network_visualisation(parser: Parser) -> dict[str, Any]:
 
 
 def get_ego_network_visualisation(id_: int, parser: Parser) -> dict[str, Any]:
-    exclude_ = get_excluded_classes(parser)
-    location_mapping = db.get_object_mapping()
-    entity_ids = {id_}
-    found_location_id = next(
-        (key for key, value in location_mapping.items() if value == id_),
-        None)
-    if found_location_id is not None:
-        entity_ids.add(found_location_id)
+    exclude_ = parser.exclude_system_classes or []
+    entity_ids = [id_]
     all_ = []
     entities_count = 0
     for _ in range(parser.depth):
-        entities = get_ego_network_filtered_classes(entity_ids, exclude_)
-        if entities_count == len(entities):
+        entities = get_links_by_id_network(entity_ids)
+        location_ids = [
+            e['range_id'] for e in entities
+            if e['property_code'] in app.config['LOCATION_PROPERTIES']]
+        if location_ids:
+            entities.extend(get_place_linked_to_location_id(location_ids))
+        if entities_count == len(entities):  # pragma: no cover
             break
         entities_count = len(entities)
         for row in entities:
-            entity_ids.add(row['domain_id'])
-            entity_ids.add(row['range_id'])
+            classes = [row['domain_system_class'], row['range_system_class']]
+            if any(item in string for item in classes for string in exclude_):
+                continue
+            entity_ids.append(row['domain_id'])
+            entity_ids.append(row['range_id'])
             all_.append(row)
     links = [dict(t) for t in {frozenset(d.items()) for d in all_}]
     links = overwrite_object_locations_with_place(links, exclude_)

@@ -206,10 +206,7 @@ def get_links_by_id_network(ids: list[int]) -> list[dict[str, Any]]:
         {'ids': tuple(ids)})
     return [dict(row) for row in g.cursor.fetchall()]
 
-
-def get_ego_network_filtered_classes(
-        ids: set[int],
-        classes: list[str]) -> list[dict[str, Any]]:
+def get_place_linked_to_location_id(ids: list[int]) -> list[dict[str, Any]]:
     g.cursor.execute(
         """
         SELECT l.id,
@@ -225,9 +222,8 @@ def get_ego_network_filtered_classes(
         FROM model.link l
                  JOIN model.entity de ON l.domain_id = de.id
                  JOIN model.entity re ON l.range_id = re.id
-        WHERE (l.range_id IN %(ids)s OR l.domain_id IN %(ids)s)
-          AND (de.openatlas_class_name NOT IN %(classes)s
-            AND re.openatlas_class_name NOT IN %(classes)s);
+        WHERE l.range_id IN %(ids)s 
+            AND l.property_code = 'P53';
         """,
-        {'ids': tuple(ids), 'classes': tuple(classes)})
+        {'ids': tuple(ids)})
     return [dict(row) for row in g.cursor.fetchall()]
