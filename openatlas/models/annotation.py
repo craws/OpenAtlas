@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any, Optional
 
 from openatlas.database import annotation as db
+from openatlas.display.util2 import sanitize
 
 
 class AnnotationImage:
@@ -21,7 +22,7 @@ class AnnotationImage:
         db.update_annotation_image({
             'id': self.id,
             'entity_id': entity_id,
-            'text': text})
+            'text': sanitize(text)})
 
     def delete(self) -> None:
         db.delete_annotation_image(self.id)
@@ -57,7 +58,7 @@ class AnnotationImage:
             'image_id': image_id,
             'entity_id': entity_id or None,
             'coordinates': coordinates,
-            'text': text})
+            'text': sanitize(text)})
 
 
 class AnnotationText:
@@ -92,4 +93,4 @@ class AnnotationText:
             'link_start': link_start,
             'link_end': link_end,
             'entity_id': entity_id,
-            'text': text})
+            'text': sanitize(text)})

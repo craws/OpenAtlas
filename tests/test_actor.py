@@ -53,6 +53,15 @@ class ActorTests(TestBaseCase):
             follow_redirects=True)
         assert b'An entry has been created' in rv.data
 
+        corrupted_data = data
+        corrupted_data["name"] = '<h1 class="test">Sigourney Weaver</h1>'
+        rv = c.post(
+            url_for('insert', class_='person'),
+            data=corrupted_data,
+            follow_redirects=True)
+        assert b'<h1 class="test">Sigourney Weaver</h1>' not in rv.data
+        assert b'Sigourney Weaver' in rv.data
+
         rv = c.post(
             url_for('insert', class_='person', origin_id=place.id),
             data=data,

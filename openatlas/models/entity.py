@@ -663,7 +663,7 @@ class Link:
             'domain_id': self.domain.id,
             'range_id': self.range.id,
             'type_id': self.type.id if self.type else None,
-            'description': self.description,
+            'description': sanitize(self.description),
             'begin_from': datetime64_to_timestamp(self.begin_from),
             'begin_to': datetime64_to_timestamp(self.begin_to),
             'begin_comment': sanitize(self.begin_comment),
