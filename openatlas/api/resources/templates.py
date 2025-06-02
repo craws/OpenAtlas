@@ -115,7 +115,7 @@ def linked_places_template(parser: Parser) -> dict[str, Type[String]]:
             'identifier': fields.String,
             'label': fields.String,
             'description': fields.String})),
-        'value': fields.Float,
+        'value': fields.String,
         'unit': fields.String}
 
     names = {'alias': fields.String}
