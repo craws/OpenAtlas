@@ -152,7 +152,14 @@ class Api(ApiTestCase):
                 id_=place.id,
                 exclude_system_classes='type'))
         rv = rv.get_json()
-        assert len(rv['results']) == 8
+        assert len(rv['results']) == 6
+        rv = c.get(
+            url_for(
+                'api_04.ego_network_visualisation',
+                id_=height.id,
+                exclude_system_classes='type'))
+        rv = rv.get_json()
+        assert len(rv['results']) == 0
         rv = c.get(
             url_for(
                 'api_04.ego_network_visualisation',
