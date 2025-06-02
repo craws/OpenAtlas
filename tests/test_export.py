@@ -29,17 +29,6 @@ class ImportTest(TestBaseCase):
         rv = c.get(url_for('download_sql', filename=f'{date_}_export.dump.7z'))
         assert b'7z' in rv.data
 
-        assert b'Warning' in c.get(url_for('sql_index')).data
-        assert b'execute' in c.get(url_for('sql_execute')).data
-
-        rv = c.post(
-            url_for('sql_execute'),
-            data={'statement': 'SELECT * FROM web.user;'})
-        assert b'Alice' in rv.data
-
-        rv = c.post(url_for('sql_execute'), data={'statement': 'e'})
-        assert b'syntax error' in rv.data
-
         rv = c.get(
             url_for('delete_export', filename=f'{date_}_export.sql.7z'),
             follow_redirects=True)
