@@ -179,13 +179,18 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
 
     geoms = Gis.get_by_entities(related_entities_ + [entity])
     relations = defaultdict(list)
+    geometries_for_overview = []
     for rel_entity in related_entities_:
         standard_type_ = {}
         if rel_entity.standard_type:
             standard_type_ = {
                 'id': rel_entity.standard_type.id,
                 'title': rel_entity.standard_type.name}
-
+        geometries = geometry_to_feature_collection(
+            rel_entity.id,
+            geoms.get(rel_entity.id))
+        if geometries:
+            geometries_for_overview.append(geometries)
         relation_dict = {
             'id': rel_entity.id,
             'systemClass': rel_entity.class_.name,
@@ -193,14 +198,12 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
             'title': rel_entity.name,
             'description': rel_entity.description,
             'aliases': list(rel_entity.aliases.values()),
-            'geometries': geometry_to_feature_collection(
-                geoms.get(rel_entity.id)),
+            'geometries': geometries,
             'when': get_presentation_time(rel_entity),
             'standardType': standard_type_,
             'relationTypes': relation_types[rel_entity.id]}
         if parser.remove_empty_values:
             relation_dict = {k: v for k, v in relation_dict.items() if v}
-
         relations[rel_entity.class_.name].append(relation_dict)
 
     data = {
@@ -210,7 +213,7 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         'title': entity.name,
         'description': entity.description,
         'aliases': list(entity.aliases.values()),
-        'geometries': geometry_to_feature_collection(geoms.get(entity.id)),
+        'geometries': geometries_for_overview,
         'when': get_presentation_time(entity),
         'types': get_presentation_types(entity, links),
         'externalReferenceSystems': get_reference_systems(links_inverse),
