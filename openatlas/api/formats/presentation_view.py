@@ -76,10 +76,14 @@ def get_presentation_files(
 def get_relation_types_dict(
         link_: Link,
         parser: Parser,
+        entity_id: int,
         inverse: bool = False) -> dict[str, Any]:
+    relation_to_id = link_.domain.id if inverse else link_.range.id
+    if link_.property.code == 'P53':
+        relation_to_id = entity_id
     relation_types = {
         'property': get_crm_relation_x(link_, inverse),
-        'relationTo': link_.domain.id if inverse else link_.range.id,
+        'relationTo': relation_to_id,
         'type': to_camel_case(link_.type.name) if link_.type else None,
         'description': link_.description,
         'when': get_presentation_time(link_)}
@@ -158,14 +162,15 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
             continue
         related_entities.append(l.range)
         relation_types[l.range.id].append(
-            get_relation_types_dict(l, parser, True))
+            get_relation_types_dict(l, parser, entity.id, True))
     for l in links_inverse:
         if (l.domain.class_.name in excluded
                 or l.domain.id in exists
                 or l.domain.id == entity.id):
             continue
         related_entities.append(l.domain)
-        relation_types[l.domain.id].append(get_relation_types_dict(l, parser))
+        relation_types[l.domain.id].append(
+            get_relation_types_dict(l, parser, entity.id))
 
     exists_: set[int] = set()
     add_ = exists_.add  # Faster than always call exists.add()
