@@ -32,7 +32,7 @@ def get_license_url(entity: Entity) -> Optional[str]:
     for type_ in entity.types:
         if g.types[type_.root[0]].name == 'License':
             for link_ in type_.get_links('P67', inverse=True):
-                if link_.domain.class_.label == "External reference":
+                if link_.domain.class_.name == "external_reference":
                     url = link_.domain.name
             break
     return url

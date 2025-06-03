@@ -153,6 +153,8 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
                 property_['unit'] = {
                     'type': "MeasurementUnit",
                     '_label': link_.domain.description}
+            super_type = g.types[g.types[link_.range.id].root[-1]]
+            property_['part_of'] = [get_type_property(super_type)]
         elif link_.type:
             property_['classified_as'] = [
                 get_type_property(g.types[link_.type.id])]
@@ -210,6 +212,7 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
         elif link_.property.code == 'OA7':
             property_name = 'participated_in'
         elif link_.property.code == 'P67':
+            property_name = 'refers_to'
             if link_.domain.class_.name == 'file':
                 property_name = 'digitally_carries'
         else:
@@ -254,7 +257,7 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
         properties_set['subject_of'].extend(
             get_loud_iiif_subject_of(file_links))
 
-    if entity.class_.name == 'file':
+    if entity.class_.name == 'file' and g.files.get(entity.id):
         properties_set.update(get_file_dimensions(entity))
         properties_set.update(get_digital_object_details(entity))
 
