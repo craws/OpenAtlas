@@ -13,8 +13,6 @@ from numpy import datetime64
 from rdflib import Graph
 
 from openatlas import app
-from openatlas.api.formats.linked_places import (
-    get_lp_file, get_lp_links, get_lp_time)
 from openatlas.api.resources.error import (
     EntityDoesNotExistError, InvalidSearchSyntax, InvalidSearchValueError,
     LastEntityError, UrlNotValid)
@@ -23,8 +21,8 @@ from openatlas.api.resources.search_validation import (
     check_if_date_search, validate_search_parameters)
 from openatlas.api.resources.util import (
     flatten_list_and_remove_duplicates, geometry_to_geojson,
-    get_location_link, get_reference_systems,
-    get_value_for_types, replace_empty_list_values_in_dict_with_none)
+    get_location_link, get_value_for_types,
+    replace_empty_list_values_in_dict_with_none)
 from openatlas.models.entity import Entity, Link
 
 
@@ -42,7 +40,7 @@ class Parser:
     page = None
     show: list[str]
     export = None
-    format = None
+    format: str = ''
     type_id: list[int]
     relation_type = None
     centroid = None
@@ -188,41 +186,6 @@ class Parser:
                 raise LastEntityError
             return out
         raise EntityDoesNotExistError
-
-    def get_linked_places_entity(
-            self,
-            entity_dict: dict[str, Any]) -> dict[str, Any]:
-        entity = entity_dict['entity']
-        links = entity_dict['links']
-        links_inverse = entity_dict['links_inverse']
-        return {
-            'type': 'FeatureCollection',
-            '@context': app.config['API_CONTEXT']['LPF'],
-            'features': [replace_empty_list_values_in_dict_with_none({
-                '@id': url_for('api.entity', id_=entity.id, _external=True),
-                'type': 'Feature',
-                'crmClass': f'crm:{entity.cidoc_class.code} '
-                            f"{entity.cidoc_class.i18n['en']}",
-                'viewClass': entity.class_.view,
-                'systemClass': entity.class_.name,
-                'properties': {'title': entity.name},
-                'types': self.get_lp_types(entity, links)
-                if 'types' in self.show else None,
-                'depictions': get_lp_file(links_inverse)
-                if 'depictions' in self.show else None,
-                'when': {'timespans': [get_lp_time(entity)]}
-                if 'when' in self.show else None,
-                'links': get_reference_systems(links_inverse)
-                if 'links' in self.show else None,
-                'descriptions': [{'value': entity.description}]
-                if 'description' in self.show else None,
-                'names':
-                    [{"alias": value} for value in entity.aliases.values()]
-                    if entity.aliases and 'names' in self.show else None,
-                'geometry': geometry_to_geojson(entity_dict['geometry'])
-                if 'geometry' in self.show else None,
-                'relations': get_lp_links(links, links_inverse, self)
-                if 'relations' in self.show else None})]}
 
     def get_geojson_dict(
             self,

@@ -60,7 +60,7 @@ def get_origin_ids(project: Project, origin_ids: list[str]) -> list[str]:
     return db.check_origin_ids(project.id, origin_ids)
 
 
-def get_id_from_origin_id(project: Project, origin_id: str) -> Optional[str]:
+def get_id_from_origin_id(project: Project, origin_id: str) -> str | None:
     openatlas_id = None
     if id_ := db.get_id_from_origin_id(project.id, origin_id):
         openatlas_id = str(id_[0])

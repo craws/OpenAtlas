@@ -115,7 +115,7 @@ def linked_places_template(parser: Parser) -> dict[str, Type[String]]:
             'identifier': fields.String,
             'label': fields.String,
             'description': fields.String})),
-        'value': fields.Float,
+        'value': fields.String,
         'unit': fields.String}
 
     names = {'alias': fields.String}
@@ -223,7 +223,7 @@ def presentation_template() -> dict[str, Any]:
         'license': fields.String,
         'creator': fields.String,
         'licenseHolder': fields.String,
-        'publicShareable': fields.String,
+        'publicShareable': fields.Boolean,
         'mimetype': fields.String,
         'url': fields.String,
         'IIIFManifest': fields.String,

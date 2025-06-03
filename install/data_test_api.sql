@@ -97,17 +97,21 @@ VALUES
   ('P2', (SELECT id FROM model.entity WHERE name='Public domain'), (SELECT id FROM model.entity WHERE name='File not public') ),
   ('P74', (SELECT id FROM model.entity WHERE name='Location of Shire'), (SELECT id FROM model.entity WHERE name='Sam') ),
   ('OA8', (SELECT id FROM model.entity WHERE name='Location of Shire'), (SELECT id FROM model.entity WHERE name='Sam') ),
+  ('OA9', (SELECT id FROM model.entity WHERE name='Location of Shire'), (SELECT id FROM model.entity WHERE name='Sam') ),
   ('P11', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='Travel to Mordor') ),
-  ('P14', (SELECT id FROM model.entity WHERE name='Sam'), (SELECT id FROM model.entity WHERE name='Travel to Mordor') ),
   ('P134', (SELECT id FROM model.entity WHERE name='Travel to Mordor'), (SELECT id FROM model.entity WHERE name='Exchange of the one ring') ),
   ('P7', (SELECT id FROM model.entity WHERE name='Location of Mordor'), (SELECT id FROM model.entity WHERE name='Travel to Mordor') );
 
+INSERT INTO model.link (property_code, range_id, domain_id, begin_from, end_from)
+VALUES
+  ('P14', (SELECT id FROM model.entity WHERE name='Sam'), (SELECT id FROM model.entity WHERE name='Travel to Mordor'), '2018-03-01', '2018-04-01' );
 
 INSERT INTO model.link (property_code, range_id, domain_id, description, type_id)
 VALUES
   ('P67', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='GeoNames'), '2761369', (SELECT id FROM model.entity WHERE name='close match') ),
   ('OA7', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='Sam'), NULL, (SELECT id FROM model.entity WHERE name='Economical') ),
   ('P67', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='https://lotr.fandom.com/'), 'Fandom Wiki of lord of the rings', NULL),
+  ('P67', (SELECT id FROM model.entity WHERE name='Public domain'), (SELECT id FROM model.entity WHERE name='https://lotr.fandom.com/'), 'Public domain', NULL),
   ('P2', (SELECT id FROM model.entity WHERE name='Height'), (SELECT id FROM model.entity WHERE name='Shire'), '23.0', NULL ),
   ('P2', (SELECT id FROM model.entity WHERE name='Weight'), (SELECT id FROM model.entity WHERE name='Shire'), '999.0', NULL ),
   ('P2', (SELECT id FROM model.entity WHERE name='Link'), (SELECT id FROM model.entity WHERE name='https://lotr.fandom.com/'), NULL, NULL );
@@ -122,3 +126,7 @@ VALUES
     ((SELECT id FROM model.entity WHERE name='File without file'), TRUE, 'Sam', 'Sam' ),
     ((SELECT id FROM model.entity WHERE name='Picture with a License'), TRUE, 'Sauron', 'Sauron' ),
     ((SELECT id FROM model.entity WHERE name='File not public'), FALSE, 'Sauron', 'Sauron' );
+
+UPDATE model.entity
+SET begin_from = CURRENT_DATE
+WHERE name = 'Economical';

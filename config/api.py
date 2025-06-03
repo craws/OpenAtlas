@@ -18,7 +18,7 @@ ALLOWED_IPS = ['127.0.0.1']
 RDF_FORMATS = {
     'pretty-xml': 'application/rdf+xml',
     'n3': 'text/rdf+n3',
-    'turtle': 'application/x-turtle',
+    'turtle': 'text/plain',
     'nt': 'text/plain',
     'xml': 'application/xml'}
 JSON_FORMATS = {
@@ -67,3 +67,6 @@ API_PRESENTATION_EXCLUDE_RELATION = [
     'bibliography',
     'edition',
     'external_reference']
+
+
+LOCATION_PROPERTIES = {'P53', 'P74', 'OA8', 'OA9', 'P7', 'P26', 'P27'}
