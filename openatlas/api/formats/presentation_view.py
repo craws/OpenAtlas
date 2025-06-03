@@ -76,10 +76,14 @@ def get_presentation_files(
 def get_relation_types_dict(
         link_: Link,
         parser: Parser,
+        entity_id: int,
         inverse: bool = False) -> dict[str, Any]:
+    relation_to_id = link_.domain.id if inverse else link_.range.id
+    if link_.property.code == 'P53':
+        relation_to_id = entity_id
     relation_types = {
         'property': get_crm_relation_x(link_, inverse),
-        'relationTo': link_.domain.id if inverse else link_.range.id,
+        'relationTo': relation_to_id,
         'type': to_camel_case(link_.type.name) if link_.type else None,
         'description': link_.description,
         'when': get_presentation_time(link_)}
@@ -121,6 +125,14 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
                 'P46',
                 inverse=True))
             ids.extend(place_hierarchy)
+    if entity.class_.view in ['actor']:
+        for property_ in ['P74', 'OA8', 'OA9']:
+            if location := entity.get_linked_entity(property_):
+                ids.append(location.id)
+    if entity.class_.view in ['event']:
+        for property_ in ['P7', 'P26', 'P27']:
+            if location := entity.get_linked_entity(property_):
+                ids.append(location.id)
 
     links = Entity.get_links_of_entities(ids)
     links_inverse = Entity.get_links_of_entities(ids, inverse=True)
@@ -150,14 +162,15 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
             continue
         related_entities.append(l.range)
         relation_types[l.range.id].append(
-            get_relation_types_dict(l, parser, True))
+            get_relation_types_dict(l, parser, entity.id, True))
     for l in links_inverse:
         if (l.domain.class_.name in excluded
                 or l.domain.id in exists
                 or l.domain.id == entity.id):
             continue
         related_entities.append(l.domain)
-        relation_types[l.domain.id].append(get_relation_types_dict(l, parser))
+        relation_types[l.domain.id].append(
+            get_relation_types_dict(l, parser, entity.id))
 
     exists_: set[int] = set()
     add_ = exists_.add  # Faster than always call exists.add()
@@ -166,13 +179,18 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
 
     geoms = Gis.get_by_entities(related_entities_ + [entity])
     relations = defaultdict(list)
+    geometries_for_overview = []
     for rel_entity in related_entities_:
         standard_type_ = {}
         if rel_entity.standard_type:
             standard_type_ = {
                 'id': rel_entity.standard_type.id,
                 'title': rel_entity.standard_type.name}
-
+        geometries = geometry_to_feature_collection(
+            rel_entity.id,
+            geoms.get(rel_entity.id))
+        if geometries:
+            geometries_for_overview.append(geometries)
         relation_dict = {
             'id': rel_entity.id,
             'systemClass': rel_entity.class_.name,
@@ -180,14 +198,12 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
             'title': rel_entity.name,
             'description': rel_entity.description,
             'aliases': list(rel_entity.aliases.values()),
-            'geometries': geometry_to_feature_collection(
-                geoms.get(rel_entity.id)),
+            'geometries': geometries,
             'when': get_presentation_time(rel_entity),
             'standardType': standard_type_,
             'relationTypes': relation_types[rel_entity.id]}
         if parser.remove_empty_values:
             relation_dict = {k: v for k, v in relation_dict.items() if v}
-
         relations[rel_entity.class_.name].append(relation_dict)
 
     data = {
@@ -197,7 +213,7 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         'title': entity.name,
         'description': entity.description,
         'aliases': list(entity.aliases.values()),
-        'geometries': geometry_to_feature_collection(geoms.get(entity.id)),
+        'geometries': geometries_for_overview,
         'when': get_presentation_time(entity),
         'types': get_presentation_types(entity, links),
         'externalReferenceSystems': get_reference_systems(links_inverse),

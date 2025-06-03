@@ -152,7 +152,14 @@ class Api(ApiTestCase):
                 id_=place.id,
                 exclude_system_classes='type'))
         rv = rv.get_json()
-        assert len(rv['results']) == 8
+        assert len(rv['results']) == 6
+        rv = c.get(
+            url_for(
+                'api_04.ego_network_visualisation',
+                id_=height.id,
+                exclude_system_classes='type'))
+        rv = rv.get_json()
+        assert len(rv['results']) == 0
         rv = c.get(
             url_for(
                 'api_04.ego_network_visualisation',
@@ -340,10 +347,10 @@ class Api(ApiTestCase):
         assert rv['relations']['feature']
         assert rv['relations']['person']
 
-        rv = c.get(url_for('api_04.entity_presentation_view', id_=actor.id))
+        rv = c.get(url_for('api_04.entity_presentation_view', id_=actor2.id))
         rv = rv.get_json()
-        assert rv['id'] == actor.id
-        assert rv['title'] == actor.name
+        assert rv['id'] == actor2.id
+        assert rv['title'] == actor2.name
         assert rv['relations']['activity']
 
         rv = c.get(
@@ -501,6 +508,16 @@ class Api(ApiTestCase):
         rv = rv.get_json()['results'][0]
         assert rv['type'] == 'Type'
         assert rv['_label'] == 'Abbot'
+
+
+        rv = c.get(
+            url_for(
+                'api_04.system_class',
+                class_='all',
+                limit=0,
+                locale='en',
+                format='turtle'))
+        assert b'Sam' in rv.data
 
         # ---Type Endpoints---
         for rv in [

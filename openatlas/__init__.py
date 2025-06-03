@@ -30,7 +30,7 @@ from openatlas.api import api
 from openatlas.views import (
     admin, ajax, annotation, arche, changelog, entity, entity_index, error,
     export, file, hierarchy, index, imports, link, login, model, note, overlay,
-    profile, search, sql, token, tools, type as type_, user, vocabs)
+    profile, search, token, tools, type as type_, user, vocabs)
 
 
 @babel.localeselector
