@@ -1,20 +1,16 @@
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Optional
-
 from typing import Any
-from unidecode import unidecode
+
 import pandas as pd
-from flask import g
 from flask_login import login_user
+from unidecode import unidecode
 
 from openatlas import app, before_request
-from openatlas.display.util2 import datetime64_to_timestamp
-from openatlas.forms.util import form_to_datetime64
 from openatlas.models.entity import Entity
 from openatlas.models.imports import (
-    Project, get_id_from_origin_id, import_data_)
+    Project, import_data_)
 from openatlas.models.user import User
 
 ADMIN_PATH = Path('files/zbiva_admin.csv')
@@ -63,17 +59,17 @@ def import_and_get_administrative_units() -> dict[str, dict[str, Any]]:
         cadastre_key = f"{district_key}>{cadastre_norm}"
 
         if region_key not in regions_:
-            region = Entity.insert('administrative_unit', entry.region)  # original name
+            region = Entity.insert('administrative_unit', entry.region)
             region.link('P89', admin_cz_type)
             regions_[region_key] = region.id
 
         if district_key not in districts_:
-            district = Entity.insert('administrative_unit', entry.district)  # original name
+            district = Entity.insert('administrative_unit', entry.district)
             district.link('P89', Entity.get_by_id(regions_[region_key]))
             districts_[district_key] = district.id
 
         if cadastre_key not in cadastres_:
-            cadastre = Entity.insert('administrative_unit', entry.cadastre)  # original name
+            cadastre = Entity.insert('administrative_unit', entry.cadastre)
             cadastre.link('P89', Entity.get_by_id(districts_[district_key]))
             cadastres_[cadastre_key] = cadastre.id
 
