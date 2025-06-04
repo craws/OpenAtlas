@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import Any, Optional
 
-from flask import g, render_template, url_for
+from flask import escape, g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
 
@@ -155,7 +155,7 @@ class BaseDisplay:
             info = g.logger.get_log_info(self.entity.id)
             if not info['creator'] or info['creator'].id != current_user.id:
                 return
-        msg = _('Delete %(name)s?', name=self.entity.name.replace('\'', ''))
+        msg = _('Delete %(name)s?', name=escape(self.entity.name.replace('\'', '')))
         self.buttons.append(button(
             _('delete'),
             url_for('delete', id_=self.entity.id),
