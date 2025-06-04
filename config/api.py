@@ -18,7 +18,7 @@ ALLOWED_IPS = ['127.0.0.1']
 RDF_FORMATS = {
     'pretty-xml': 'application/rdf+xml',
     'n3': 'text/rdf+n3',
-    'turtle': 'application/x-turtle',
+    'turtle': 'text/plain',
     'nt': 'text/plain',
     'xml': 'application/xml'}
 JSON_FORMATS = {

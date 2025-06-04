@@ -509,6 +509,16 @@ class Api(ApiTestCase):
         assert rv['type'] == 'Type'
         assert rv['_label'] == 'Abbot'
 
+
+        rv = c.get(
+            url_for(
+                'api_04.system_class',
+                class_='all',
+                limit=0,
+                locale='en',
+                format='turtle'))
+        assert b'Sam' in rv.data
+
         # ---Type Endpoints---
         for rv in [
             c.get(url_for('api_04.type_overview')),

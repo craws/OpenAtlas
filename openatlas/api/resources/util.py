@@ -1,5 +1,4 @@
 from typing import Any, Optional
-
 from flask import g, json, url_for
 
 from openatlas.api.resources.api_entity import ApiEntity
@@ -7,6 +6,7 @@ from openatlas.display.util import check_iiif_activation, check_iiif_file_exist
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 from openatlas.models.reference_system import ReferenceSystem
+from openatlas.models.type import Type
 
 
 def get_license_name(entity: Entity) -> Optional[str]:
@@ -18,12 +18,21 @@ def get_license_name(entity: Entity) -> Optional[str]:
     return license_
 
 
+def get_license_type(entity: Entity) -> Optional[Type]:
+    license_ = None
+    for type_ in entity.types:
+        if g.types[type_.root[0]].name == 'License':
+            license_ = type_
+            break
+    return license_
+
+
 def get_license_url(entity: Entity) -> Optional[str]:
     url = ''
     for type_ in entity.types:
         if g.types[type_.root[0]].name == 'License':
             for link_ in type_.get_links('P67', inverse=True):
-                if link_.domain.class_.label == "External reference":
+                if link_.domain.class_.name == "external_reference":
                     url = link_.domain.name
             break
     return url
