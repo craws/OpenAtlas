@@ -19,6 +19,7 @@ versions = {
         'feature': {
             '2507': 'Link button for reference at artifact tab',
             '2553': 'Removal of the SQL interface',
+            '2554': 'Refining input validation',
             '2526': 'API: Ego network visualization',
             '2477': 'API: Presentation view improvements',
             '2527': 'API: 0.4.8',
