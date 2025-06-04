@@ -25,6 +25,11 @@ switched from nose to pytest tests.
 
 Otherwise, a code base update and a webserver restart is sufficient.
 
+BeautifulSoup is needed to improve the input sanitization and strip HTML tags
+from user inputs such as names and descriptions.
+
+    sudo apt install python3-bs4
+
 ### 8.11.0 to 8.12.0
 A code base update (e.g. with git pull) and a webserver restart is sufficient.
 
@@ -101,9 +106,9 @@ To run tests, please add a new **tests** folder to your IIIF directory, e.g.:
     mkdir /var/www/iipsrv/tests
 
 ### 8.2.0 to 8.2.1
-This is a fix for installation, no need to update an existing instance. 
-In case you want to update it anyway, a git pull and apache restart would be 
-sufficient. 
+This is a fix for installation, no need to update an existing instance.
+In case you want to update it anyway, a git pull and apache restart would be
+sufficient.
 
 ### 8.1.x to 8.2.0
 No database updates are required but new node packages are needed:

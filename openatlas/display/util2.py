@@ -8,10 +8,12 @@ from pathlib import Path
 from typing import Any, Optional
 
 import numpy
-from flask import escape, g
+from flask import g
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from jinja2 import pass_context
+
+from bs4 import BeautifulSoup
 
 from openatlas import app
 
@@ -23,8 +25,9 @@ def sanitize(string: str | None, mode: Optional[str] = None) -> Optional[str]:
     if mode == 'ascii':  # Filter ASCII letters/numbers
         sanitized = re.sub('[^A-Za-z0-9]+', '', string)
     else:  # Remove HTML tags, keep linebreaks
-        sanitized = re.sub(r"<.*?>", "", string)
-        sanitized = str(escape(sanitized)).replace("&amp;", "&")
+        soup = BeautifulSoup(string)
+        sanitized = soup.get_text()
+        sanitized = sanitized.replace("<>", "")
 
     return sanitized or None
 
