@@ -2,7 +2,7 @@ import datetime
 import locale
 from typing import Any, Optional
 
-from flask import Flask, Response, g, request, session
+from flask import Flask, Response, g, redirect, request, session, url_for
 from flask_babel import Babel
 from flask_jwt_extended import JWTManager, verify_jwt_in_request
 from flask_login import current_user
@@ -88,6 +88,8 @@ def before_request() -> None:
         app.config['TMP_PATH']]
     setup_files()
     setup_api()
+    if True and request.endpoint !=  'user_insert':
+        return redirect(url_for('user_insert'))
 
 
 def setup_files() -> None:

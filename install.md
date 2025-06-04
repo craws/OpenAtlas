@@ -71,12 +71,6 @@ Import the SQL files:
     cd install
     cat 1_structure.sql 2_data_model.sql 3_data_web.sql 4_data_type.sql | psql -d openatlas -f -
 
-A user with username **OpenAtlas** is created with the password
-**change_me_PLEASE!**
-
-**Important**: change this account immediately. A warning will be displayed for
-admins until this account is changed.
-
 ### Configuration
 Copy instance/example_production.py to instance/production.py
 
@@ -100,9 +94,9 @@ Make the **files** directory writable for the Apache user, e.g.:
     sudo chown -R www-data files
 
 ### Finishing
-Login with username "OpenAtlas" and password "change_me_PLEASE!" and change the
-password in profile. You may want to check the admin area to set up default
-site settings, email and similar.
+First step at a new installation will be the creation of an admin account which
+you should do immediately. You may want to check the admin area to set up
+default site settings, email (import for password resets) and similar.
 
 ### Upgrade
 If you later like to upgrade the application be sure to read and follow the
