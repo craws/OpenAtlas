@@ -23,7 +23,8 @@ def sanitize(string: str | None, mode: Optional[str] = None) -> Optional[str]:
         return None
     if mode == 'ascii':
         return re.sub('[^A-Za-z0-9]+', '', string) or None
-    return BeautifulSoup(string, 'lxml').get_text().replace("<>", "") or None
+    return BeautifulSoup(string, "html.parser").get_text().replace("<>", "") \
+        or None
 
 
 def convert_size(size_bytes: int) -> str:
