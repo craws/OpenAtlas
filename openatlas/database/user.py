@@ -15,7 +15,7 @@ SQL = """
         u.password_reset_code, u.password_reset_date ,
         u.login_last_success, u.login_last_failure, u.login_failed_count,
         r.name AS group_name
-    FROM web."user" u
+    FROM web.user u
     LEFT JOIN web.group r ON u.group_id = r.id """
 
 
@@ -186,7 +186,7 @@ def insert(data: dict[str, Any]) -> int:
 
 def delete(id_: int) -> None:
     g.cursor.execute(
-        'DELETE FROM web."user" WHERE id = %(user_id)s;',
+        'DELETE FROM web.user WHERE id = %(user_id)s;',
         {'user_id': id_})
 
 
@@ -303,3 +303,14 @@ def get_user_entities(id_: int) -> list[int]:
         """,
         {'user_id': id_})
     return [row[0] for row in list(g.cursor)]
+
+
+def admins_available() -> bool:
+    g.cursor.execute(
+        """
+        SELECT u.id
+        FROM web.user u
+        LEFT JOIN web.group g ON u.group_id = g.id AND g.name = 'admin'
+        WHERE u.active = true;
+        """)
+    return bool(g.cursor.rowcount)

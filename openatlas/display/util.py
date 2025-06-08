@@ -9,7 +9,6 @@ from functools import wraps
 from pathlib import Path
 from typing import Any, Optional, TYPE_CHECKING
 
-from bcrypt import hashpw
 from flask import flash, g, render_template, request, url_for
 from flask_babel import LazyString, lazy_gettext as _
 from flask_login import current_user
@@ -419,17 +418,6 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
             f"current version is {g.settings['database_version']}")
     for path in g.writable_paths:
         check_write_access(path, warnings)
-    if is_authorized('admin'):
-        user = User.get_by_username('OpenAtlas')
-        if user and user.active:
-            hash_ = hashpw(
-                'change_me_PLEASE!'.encode('utf-8'),
-                user.password.encode('utf-8'))
-            if hash_ == user.password.encode('utf-8'):
-                warnings.append(
-                    '<p class="uc-first mb-0">' +
-                    _('user OpenAtlas with default password is still active') +
-                    '</p>')
     return \
         '<div class="alert alert-danger">' \
         f'{"<br>".join(warnings)}</div>' if warnings else ''

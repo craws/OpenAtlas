@@ -200,3 +200,7 @@ class User(UserMixin):
     @staticmethod
     def delete_note(id_: int) -> None:
         db.delete_note(id_)
+
+    @staticmethod
+    def admins_available() -> bool:
+        return db.admins_available()

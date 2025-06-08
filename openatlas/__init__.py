@@ -13,6 +13,7 @@ from openatlas.api.resources.error import AccessDeniedError
 from openatlas.database.checks import check_type_count_needed
 from openatlas.database.connect import close_connection, open_connection
 from openatlas.database.token import check_token_revoked
+from openatlas.database.user import admins_available
 
 app: Flask = Flask(__name__, instance_relative_config=True)
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
@@ -45,7 +46,7 @@ def get_locale() -> str:
 
 
 @app.before_request
-def before_request() -> None:
+def before_request() -> Response | None:
     from openatlas.models.openatlas_class import (
         OpenatlasClass, view_class_mapping)
     from openatlas.models.cidoc_property import CidocProperty
@@ -88,7 +89,7 @@ def before_request() -> None:
         app.config['TMP_PATH']]
     setup_files()
     setup_api()
-    if True and request.endpoint !=  'user_insert':
+    if not admins_available() and request.endpoint != 'user_insert':
         return redirect(url_for('user_insert'))
 
 

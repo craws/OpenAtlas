@@ -35,7 +35,6 @@ class IndexTests(TestBaseCase):
         app.config['EXPORT_PATH'] = Path('error')
         rv = c.get(url_for('view', id_=666), follow_redirects=True)
         assert b'teapot' in rv.data
-        assert b'OpenAtlas with default password is still' in rv.data
         assert b'Database version error is needed but current' in rv.data
         assert b'directory not writable' in rv.data
 

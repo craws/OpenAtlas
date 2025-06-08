@@ -266,8 +266,8 @@ def user_update(id_: int) -> str | Response:
 
 @app.route('/user/insert', methods=['GET', 'POST'])
 def user_insert() -> str | Response:
-    if not is_authorized('manager') and False:
-        abort(404)
+    if not is_authorized('manager') and User.admins_available():
+        abort(403)
     form = UserForm()
     form.group.choices = get_groups()
     if not g.settings['mail']:
