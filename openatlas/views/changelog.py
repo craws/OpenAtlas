@@ -22,6 +22,7 @@ versions = {
             '2554': 'Refining input validation',
             '2526': 'API: Ego network visualization',
             '2477': 'API: Presentation view improvements',
+            '2467': 'API: Enriched RDF dump',
             '2527': 'API: 0.4.8',
             '2532': 'Replace nose tests with pytest',
             '2499':
@@ -29,6 +30,7 @@ versions = {
             '2523': 'Refactor and minor improvements'},
         'fix': {
             '2437': 'Text annotation: widget line break bug',
+            '2489': "API: user with token can't be deleted",
             '2509': 'Wrong focus in edit view',
             '2524': 'Automatic scroll to insert/save button'}}],
     '8.11.0': ['2025-04-18', {

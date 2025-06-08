@@ -17,21 +17,20 @@ then run the database upgrade script, then restart Apache:
     sudo python3 install/upgrade/database_upgrade.py
     sudo service apache2 restart
 
-### 8.XX.XX to 8.XX.XX
-If you are using tests, additional Python packages are needed because we
-switched from nose to pytest tests.
+### 8.11.0 to 8.12.00
 
-    sudo apt install python3-pytest python3-pytes-cov
+#### Database upgrade
+8.12.0.sql is needed but will be taken care of by the database upgrade script.
 
-Otherwise, a code base update and a webserver restart is sufficient.
-
-BeautifulSoup is needed to improve the input sanitization and strip HTML tags
-from user inputs such as names and descriptions.
+#### Additional package
+The BeautifulSoup package is now used for improved input sanitization.
 
     sudo apt install python3-bs4
 
-### 8.11.0 to 8.12.0
-A code base update (e.g. with git pull) and a webserver restart is sufficient.
+#### Tests
+If using tests, additional packages are needed because we now use pytest.
+
+    sudo apt install python3-pytest python3-pytes-cov
 
 ### 8.10.* to 8.11.0
 A code base update (e.g. with git pull) and a webserver restart is sufficient.
