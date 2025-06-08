@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 15.10 (Debian 15.10-0+deb12u1)
--- Dumped by pg_dump version 15.10 (Debian 15.10-0+deb12u1)
+-- Dumped from database version 15.12 (Debian 15.12-0+deb12u2)
+-- Dumped by pg_dump version 15.12 (Debian 15.12-0+deb12u2)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -2706,7 +2706,7 @@ ALTER TABLE ONLY web.user_settings
 --
 
 ALTER TABLE ONLY web.user_tokens
-    ADD CONSTRAINT user_tokens_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES web."user"(id) ON UPDATE CASCADE;
+    ADD CONSTRAINT user_tokens_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES web."user"(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -2714,7 +2714,7 @@ ALTER TABLE ONLY web.user_tokens
 --
 
 ALTER TABLE ONLY web.user_tokens
-    ADD CONSTRAINT user_tokens_user_id_fkey FOREIGN KEY (user_id) REFERENCES web."user"(id) ON UPDATE CASCADE;
+    ADD CONSTRAINT user_tokens_user_id_fkey FOREIGN KEY (user_id) REFERENCES web."user"(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
