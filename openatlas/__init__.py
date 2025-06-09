@@ -2,12 +2,13 @@ import datetime
 import locale
 from typing import Any, Optional
 
-from flask import Flask, Response, g, redirect, request, session, url_for
+from flask import Flask, g, redirect, request, session, url_for
 from flask_babel import Babel
 from flask_jwt_extended import JWTManager, verify_jwt_in_request
 from flask_login import current_user
 from flask_wtf.csrf import CSRFProtect
 from psycopg2 import extras
+from werkzeug.wrappers import Response
 
 from openatlas.api.resources.error import AccessDeniedError
 from openatlas.database.checks import check_type_count_needed
@@ -56,7 +57,7 @@ def before_request() -> Response | None:
     from openatlas.models.reference_system import ReferenceSystem
 
     if request.path.startswith('/static'):
-        return  # Avoid overheads if not using Apache with static alias
+        return None  # Avoid overheads if not using Apache with static alias
     g.logger = Logger()
     g.db = open_connection(app.config)
     g.db.autocommit = True
@@ -64,7 +65,7 @@ def before_request() -> Response | None:
     g.settings = Settings.get_settings()
 
     if request.path.startswith('/display'):
-        return  # Avoid overheads for file display
+        return None  # Avoid overheads for file display
 
     session['language'] = get_locale()
     g.admins_available = admins_available()
@@ -93,6 +94,7 @@ def before_request() -> Response | None:
         app.config['TMP_PATH']]
     setup_files()
     setup_api()
+    return None
 
 
 def setup_files() -> None:
