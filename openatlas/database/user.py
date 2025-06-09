@@ -310,7 +310,7 @@ def admins_available() -> bool:
         """
         SELECT u.id
         FROM web.user u
-        LEFT JOIN web.group g ON u.group_id = g.id AND g.name = 'admin'
+        JOIN web.group g ON u.group_id = g.id AND g.name = 'admin'
         WHERE u.active = true;
         """)
     return bool(g.cursor.rowcount)

@@ -3,6 +3,7 @@ from pathlib import Path
 from flask import g, url_for
 
 from openatlas import app
+from openatlas.database.user import delete
 from tests.base import TestBaseCase
 
 
@@ -68,3 +69,21 @@ class IndexTests(TestBaseCase):
                 url_for('login'),
                 data={'username': 'inactive', 'password': '?'})
         assert b'Too many login attempts' in rv.data
+
+        rv = c.get(url_for('first_admin'), follow_redirects=True)
+        assert b'Forbidden' in rv.data
+
+        with app.test_request_context():
+            app.preprocess_request()
+            delete(self.alice_id)
+
+        rv = c.get(url_for('index_changelog'), follow_redirects=True)
+        assert b'Welcome to OpenAtlas' in rv.data
+
+        c.post(
+            url_for('first_admin'),
+            data={
+                'username': 'Ripley',
+                'email': 'ripley@nostromo.org',
+                'password': 'you_never_guess_this',
+                'password2': 'you_never_guess_this'})
