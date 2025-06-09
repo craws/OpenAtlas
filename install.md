@@ -21,7 +21,6 @@ that we are using to set up Debian servers for OpenAtlas installations.
 * [Requirements](#Requirements)
 * [IIIF](#IIIF) (optional)
 * [Tests](#Tests) (optional)
-* [Docker](#Docker) (alternative installation method)
 
 ## Requirements
 ### Python 3.11 and Flask 2.2.2
@@ -94,9 +93,10 @@ Make the **files** directory writable for the Apache user, e.g.:
     sudo chown -R www-data files
 
 ### Finishing
-First step at a new installation will be the creation of an admin account which
-you should do immediately. You may want to check the admin area to set up
-default site settings, email (import for password resets) and similar.
+First step after a new installation will be visiting the site in your browser
+and create an admin account, which you should do immediately. You may want to
+check the admin area to set up default site settings, email
+(important for password resets) and similar.
 
 ### Upgrade
 If you later like to upgrade the application be sure to read and follow the
