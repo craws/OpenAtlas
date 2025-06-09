@@ -67,6 +67,10 @@ def before_request() -> Response | None:
         return  # Avoid overheads for file display
 
     session['language'] = get_locale()
+    g.admins_available = admins_available()
+    if not g.admins_available \
+            and request.endpoint not in ['first_admin', 'set_locale']:
+        return redirect(url_for('first_admin'))
     g.cidoc_classes = CidocClass.get_all(
         session['language'],
         (request.path.startswith('/overview/model/cidoc_class_index')))
@@ -89,8 +93,6 @@ def before_request() -> Response | None:
         app.config['TMP_PATH']]
     setup_files()
     setup_api()
-    if not admins_available() and request.endpoint != 'user_insert':
-        return redirect(url_for('user_insert'))
 
 
 def setup_files() -> None:

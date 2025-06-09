@@ -265,9 +265,8 @@ def user_update(id_: int) -> str | Response:
 
 
 @app.route('/user/insert', methods=['GET', 'POST'])
+@required_group('manager')
 def user_insert() -> str | Response:
-    if not is_authorized('manager') and User.admins_available():
-        abort(403)
     form = UserForm()
     form.group.choices = get_groups()
     if not g.settings['mail']:
@@ -322,6 +321,32 @@ def user_insert() -> str | Response:
             [_('admin'), f"{url_for('admin_index')}#tab-user"],
             '+&nbsp;<span class="uc-first d-inline-block">' + _('user')
             + '</span>'])
+
+
+@app.route('/install', methods=['GET', 'POST'])
+def first_admin() -> str | Response:
+    if g.admins_available:
+        abort(403)
+    form = UserForm()
+    del form.send_info, form.active, form.group, form.insert_and_continue
+    if form.validate_on_submit():
+        User.insert({
+            'username': sanitize(form.username.data),
+            'real_name': sanitize(form.real_name.data) or '',
+            'info': sanitize(form.description.data) or '',
+            'email': None,
+            'active': True,
+            'group_name': 'admin',
+            'password': bcrypt.hashpw(
+                form.password.data.encode('utf-8'),
+                bcrypt.gensalt()).decode('utf-8')})
+        flash(_('user created'), 'info')
+        return redirect(url_for('login'))
+    return render_template(
+        'content.html',
+        content=display_form(form),
+        crumbs=[
+            _('Welcome to OpenAtlas. Please add an admin user to continue.')])
 
 
 def get_groups() -> list[tuple[str, str]]:
