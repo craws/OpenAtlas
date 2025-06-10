@@ -333,6 +333,7 @@ class Api(ApiTestCase):
             url_for(
                 'api_04.entity_presentation_view',
                 id_=place.id,
+                centroid='true',
                 place_hierarchy='true'))
         rv = rv.get_json()
         assert rv['id'] == place.id

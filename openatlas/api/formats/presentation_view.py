@@ -177,9 +177,13 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
     related_entities_ = \
         [e for e in related_entities if not (e.id in exists_ or add_(e.id))]
 
-    geoms = Gis.get_by_entities(related_entities_ + [entity])
+    all_entities = related_entities_ + [entity]
+    geoms = Gis.get_by_entities(all_entities)
+    if parser.centroid:
+        for id_, geom in \
+                Gis.get_centroids_by_entities(all_entities).items():
+            geoms[id_].extend(geom)
     relations = defaultdict(list)
-    geometries_for_overview = []
     for rel_entity in related_entities_:
         standard_type_ = {}
         if rel_entity.standard_type:
@@ -189,8 +193,6 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         geometries = geometry_to_feature_collection(
             rel_entity.id,
             geoms.get(rel_entity.id))
-        if geometries:
-            geometries_for_overview.append(geometries)
         relation_dict = {
             'id': rel_entity.id,
             'systemClass': rel_entity.class_.name,
@@ -213,7 +215,9 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         'title': entity.name,
         'description': entity.description,
         'aliases': list(entity.aliases.values()),
-        'geometries': geometries_for_overview,
+        'geometries': geometry_to_feature_collection(
+            entity.id,
+            geoms.get(entity.id)),
         'when': get_presentation_time(entity),
         'types': get_presentation_types(entity, links),
         'externalReferenceSystems': get_reference_systems(links_inverse),

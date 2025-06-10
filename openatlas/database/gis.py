@@ -117,6 +117,7 @@ def get_centroid_dict(row: dict[str, Any]) -> dict[str, Any]:
     geometry['description'] = row['description'].replace('"', '\"') \
         if row['description'] else ''
     geometry['shapeType'] = 'centerpoint'
+    geometry['locationId'] = row.get('location_id')
     return geometry
 
 
