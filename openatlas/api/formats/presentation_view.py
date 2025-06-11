@@ -81,6 +81,8 @@ def get_relation_types_dict(
     relation_to_id = link_.domain.id if inverse else link_.range.id
     if link_.property.code == 'P53':
         relation_to_id = entity_id
+    if link_.property.code in  ['P74', 'OA8', 'OA9', 'P7', 'P26', 'P27']:
+        relation_to_id = entity_id
     relation_types = {
         'property': get_crm_relation_x(link_, inverse),
         'relationTo': relation_to_id,
@@ -191,7 +193,7 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
                 'id': rel_entity.standard_type.id,
                 'title': rel_entity.standard_type.name}
         geometries = geometry_to_feature_collection(
-            rel_entity.id,
+            rel_entity.id, # This is wrong, this need to be the place.id!
             geoms.get(rel_entity.id))
         relation_dict = {
             'id': rel_entity.id,
@@ -215,15 +217,18 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         'title': entity.name,
         'description': entity.description,
         'aliases': list(entity.aliases.values()),
-        'geometries': geometry_to_feature_collection(
-            entity.id,
-            geoms.get(entity.id)),
+        'geometries': None,
         'when': get_presentation_time(entity),
         'types': get_presentation_types(entity, links),
         'externalReferenceSystems': get_reference_systems(links_inverse),
         'references': get_presentation_references(links_inverse, entity.id),
         'files': get_presentation_files(links_inverse, entity.id),
         'relations': relations}
+    if entity.class_.view in ['place', 'artifact']:
+        data['geometries'] = geometry_to_feature_collection(
+            entity.id,
+            geoms.get(entity.id))
+
     return data
 
 

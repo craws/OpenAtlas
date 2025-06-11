@@ -184,7 +184,7 @@ def generate_feature(place_id: int, geom: dict[str, Any]) -> dict[str, Any]:
             'title': geom['title'],
             'description': geom['description'],
             'shapeType': geom['shapeType'],
-            'placeId': place_id,
+            'placeId': geom['placeId'],
             'locationId': geom['locationId']}}
 
 
