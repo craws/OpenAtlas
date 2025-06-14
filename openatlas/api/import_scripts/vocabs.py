@@ -6,7 +6,6 @@ from openatlas.api.import_scripts.util import get_exact_match, vocabs_requests
 from openatlas.database import reference_system as db
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
-from openatlas.models.type import Type
 
 
 def import_vocabs_data(
@@ -27,13 +26,13 @@ def fetch_top_groups(
     duplicates = []
     if ref := get_vocabs_reference_system(details):
         for group in form_data['choices']:
-            if not Type.check_hierarchy_exists(group[1]) and \
+            if not Entity.check_hierarchy_exists(group[1]) and \
                     group[0] in form_data['top_concepts']:
                 hierarchy = Entity.insert(
                     'type',
                     group[1],
                     f'Automatically imported from {details["title"]}')
-                Type.insert_hierarchy(
+                Entity.insert_hierarchy(
                     hierarchy,
                     'custom', form_data['classes'],
                     form_data['multiple'])
@@ -47,7 +46,7 @@ def fetch_top_groups(
                     ref,
                     hierarchy)
                 count.append(group[0])
-            if Type.check_hierarchy_exists(group[1]) \
+            if Entity.check_hierarchy_exists(group[1]) \
                     and group[0] in form_data['top_concepts']:
                 duplicates.append(group[1])
     return count, duplicates
@@ -82,12 +81,12 @@ def fetch_top_level(
     if ref := get_vocabs_reference_system(details):
         for entry in req['topconcepts']:
             if entry['uri'] in form_data['top_concepts'] \
-                    and not Type.check_hierarchy_exists(entry['label']):
+                    and not Entity.check_hierarchy_exists(entry['label']):
                 hierarchy = Entity.insert(
                     'type',
                     entry['label'],
                     f'Automatically imported from {details["title"]}')
-                Type.insert_hierarchy(
+                Entity.insert_hierarchy(
                     hierarchy,
                     'custom', form_data['classes'],
                     form_data['multiple'])
@@ -101,7 +100,7 @@ def fetch_top_level(
                     ref,
                     hierarchy)
                 count.append(entry)
-            if Type.check_hierarchy_exists(entry['label']):
+            if Entity.check_hierarchy_exists(entry['label']):
                 duplicates.append(entry['label'])
     return count, duplicates
 

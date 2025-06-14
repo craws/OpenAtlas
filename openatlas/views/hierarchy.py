@@ -12,7 +12,6 @@ from openatlas.display.util2 import uc_first
 from openatlas.forms.display import display_form
 from openatlas.forms.form import get_manager
 from openatlas.models.entity import Entity
-from openatlas.models.type import Type
 
 
 @app.route('/hierarchy/insert/<category>', methods=['GET', 'POST'])
@@ -23,7 +22,7 @@ def hierarchy_insert(category: str) -> str | Response:
         try:
             Transaction.begin()
             manager.insert_entity()
-            Type.insert_hierarchy(
+            Entity.insert_hierarchy(
                 manager.entity,
                 category,
                 manager.form.classes.data,

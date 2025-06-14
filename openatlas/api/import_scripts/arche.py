@@ -10,7 +10,6 @@ from openatlas.api.import_scripts.util import (
 from openatlas.database import reference_system as db
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
-from openatlas.models.type import Type
 
 
 def fetch_collection_data() -> dict[str, Any]:
@@ -134,7 +133,7 @@ def get_exif(entries: dict[str, Any]) -> dict[str, Any]:
     return fetch_exif(single_img_id)
 
 
-def get_hierarchy_by_name(name: str) -> Optional[Type]:
+def get_hierarchy_by_name(name: str) -> Optional[Entity]:
     type_ = None
     for type_id in g.types:
         if g.types[type_id].name == name and not g.types[type_id].root:
@@ -142,7 +141,7 @@ def get_hierarchy_by_name(name: str) -> Optional[Type]:
     return type_
 
 
-def get_or_create_person(name: str, relevance: Type) -> Entity:
+def get_or_create_person(name: str, relevance: Entity) -> Entity:
     for entity in Entity.get_by_cidoc_class('E21'):
         if entity.name == name:
             return entity
@@ -155,7 +154,7 @@ def get_or_create_person_types() -> dict[str, Any]:
     hierarchy = get_hierarchy_by_name('Relevance')
     if not hierarchy:
         if hierarchy := Entity.insert('type', 'Relevance'):  # type: ignore
-            Type.insert_hierarchy(hierarchy, 'custom', ['person'], True)
+            Entity.insert_hierarchy(hierarchy, 'custom', ['person'], True)
     return {
         'photographer_type': get_or_create_type(hierarchy, 'Photographer'),
         'artist_type': get_or_create_type(hierarchy, 'Graffito artist')}

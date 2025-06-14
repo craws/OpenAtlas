@@ -6,7 +6,6 @@ from flask import g
 from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
-from openatlas.models.type import Type
 
 
 def get_or_create_type(hierarchy: Any, type_name: str) -> Entity:
@@ -18,7 +17,7 @@ def get_or_create_type(hierarchy: Any, type_name: str) -> Entity:
     return type_entity  # pragma: no cover
 
 
-def get_type_by_name(type_name: str) -> Optional[Type]:
+def get_type_by_name(type_name: str) -> Optional[Entity]:
     type_ = None
     for type_id in g.types:
         if g.types[type_id].name == type_name:
@@ -41,7 +40,7 @@ def get_exact_match() -> Entity:
     return get_or_create_type(g.reference_match_type, 'exact match')
 
 
-def get_match_types() -> dict[str, Type]:
+def get_match_types() -> dict[str, Entity]:
     match_dictionary = {}
     for match in [g.types[match] for match in g.reference_match_type.subs]:
         match match.name:

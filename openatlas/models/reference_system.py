@@ -24,8 +24,8 @@ class ReferenceSystem(Entity):
         self.update_system(data)
         return super().update(data, new)
 
-    def remove_class(self, class_name: str) -> None:
-        db.remove_class(self.id, class_name)
+    def remove_class(self, name: str) -> None:
+        db.remove_class(self.id, name)
 
     def update_system(self, data: dict[str, Any]) -> None:
         db.update_system({

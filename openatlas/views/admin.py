@@ -45,7 +45,6 @@ from openatlas.models.content import get_content, update_content
 from openatlas.models.entity import Entity, Link
 from openatlas.models.imports import Project
 from openatlas.models.settings import Settings
-from openatlas.models.type import Type
 from openatlas.models.user import User
 
 
@@ -492,7 +491,7 @@ def orphans() -> str:
             table=Table(
                 ['name', 'root'],
                 [[link(type_), link(g.types[type_.root[0]])]
-                 for type_ in Type.get_type_orphans()])),
+                 for type_ in Entity.get_type_orphans()])),
         'missing_files': Tab(
             'missing_files',
             _('missing files'),

@@ -8,7 +8,6 @@ from wtforms import validators
 
 from openatlas.forms.util import form_to_datetime64
 from openatlas.models.entity import Entity
-from openatlas.models.type import Type
 
 
 def file(_form: FlaskForm, field: Any) -> None:
@@ -23,7 +22,7 @@ def file(_form: FlaskForm, field: Any) -> None:
 def hierarchy_name_exists(form: Any, field: Any) -> None:
     if not hasattr(form, 'entity_id') or \
             Entity.get_by_id(int(form.entity_id.data)).name != form.name.data:
-        if Type.check_hierarchy_exists(form.name.data):
+        if Entity.check_hierarchy_exists(form.name.data):
             field.errors.append(_('error name exists'))
 
 

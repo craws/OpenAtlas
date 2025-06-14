@@ -20,8 +20,8 @@ from openatlas.display.util2 import is_authorized, manual
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
 from openatlas.forms.form import get_vocabs_form
+from openatlas.models.entity import Entity
 from openatlas.models.settings import Settings
-from openatlas.models.type import Type
 
 
 @app.route('/vocabs')
@@ -137,7 +137,7 @@ def vocabulary_import_view(category: str, id_: str) -> str | Response:
         classes = SelectMultipleField(
             _('classes'),
             description=_('tooltip hierarchy forms'),
-            choices=Type.get_class_choices(),
+            choices=Entity.get_class_choices(),
             option_widget=widgets.CheckboxInput(),
             widget=widgets.ListWidget(prefix_label=False))
         multiple = BooleanField(

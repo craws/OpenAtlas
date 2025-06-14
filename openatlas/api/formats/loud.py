@@ -11,7 +11,6 @@ from openatlas.api.resources.util import (
 from openatlas.display.util import get_file_path
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
-from openatlas.models.type import Type
 
 unit_map = {
     'B': 'bytes',
@@ -375,7 +374,7 @@ def get_loud_end_dates(entity: Entity) -> dict[str, Any]:
         'end_is_qualified_by': entity.end_comment}
 
 
-def get_type_property(type_: Type) -> dict[str, Any]:
+def get_type_property(type_: Entity) -> dict[str, Any]:
     property_ = {
         'id': url_for(
             'api.entity',
@@ -390,7 +389,7 @@ def get_type_property(type_: Type) -> dict[str, Any]:
     return property_
 
 
-def get_standard_type_loud(types: dict[Type, Any]) -> Optional[Type]:
+def get_standard_type_loud(types: dict[Entity, Any]) -> Optional[Entity]:
     standard = None
     for type_ in types:
         if type_.category == 'standard':

@@ -14,7 +14,6 @@ from openatlas.display.util import display_info, required_group
 from openatlas.display.util2 import uc_first
 from openatlas.forms.field import table
 from openatlas.models.entity import Entity
-from openatlas.models.type import Type
 from openatlas.models.user import User
 
 
@@ -51,7 +50,7 @@ def ajax_add_type() -> str:
 @app.route('/ajax/get_type_tree/<int:root_id>')
 @required_group('readonly')
 def ajax_get_type_tree(root_id: Optional[int] = None) -> str:
-    return str(Type.get_tree_data(root_id, []))
+    return str(Entity.get_tree_data(root_id, []))
 
 
 @app.route('/ajax/add_entity', methods=['POST'])

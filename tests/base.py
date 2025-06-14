@@ -7,7 +7,6 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
-from openatlas.models.type import Type
 
 
 class TestBaseCase(unittest.TestCase):
@@ -25,7 +24,7 @@ class TestBaseCase(unittest.TestCase):
                 app.preprocess_request()
                 self.alice_id = 1
                 self.precision_type = \
-                    Type.get_hierarchy('External reference match')
+                    Entity.get_hierarchy('External reference match')
                 self.test_path = Path(app.root_path).parent / 'tests'
                 self.static_path = Path(app.root_path) / 'static'
         app.app_context().push()
@@ -105,5 +104,5 @@ def insert(
     return entity
 
 
-def get_hierarchy(name: str) -> Type:
-    return Type.get_hierarchy(name)
+def get_hierarchy(name: str) -> Entity:
+    return Entity.get_hierarchy(name)

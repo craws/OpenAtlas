@@ -8,7 +8,6 @@ from flask import g
 from openatlas import app, before_request
 from openatlas.api.import_scripts.util import get_exact_match
 from openatlas.models.entity import Entity
-from openatlas.models.type import Type
 
 file_path = Path('files/sisters.csv')
 # pylint: skip-file
@@ -111,7 +110,7 @@ with app.test_request_context():
         if item.id == 364:
             continue
         item.delete()
-    for type_id in Type.get_hierarchy('Actor function').subs:
+    for type_id in Entity.get_hierarchy('Actor function').subs:
         if g.types[type_id].name == 'Stand':
             for sub_id in g.types[type_id].get_sub_ids_recursive():
                 g.types[sub_id].delete()

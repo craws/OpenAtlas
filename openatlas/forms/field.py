@@ -19,7 +19,6 @@ from openatlas.display.util import get_base_table_data
 from openatlas.display.util2 import is_authorized
 from openatlas.forms.util import string_to_entity_list
 from openatlas.models.entity import Entity
-from openatlas.models.type import Type
 
 
 class RemovableListInput(HiddenInput):
@@ -372,7 +371,7 @@ class TreeMultiSelect(HiddenInput):
             field=field,
             root=g.types[int(field.type_id)],
             selection=sorted(data, key=lambda k: g.types[k].name),
-            data=Type.get_tree_data(int(field.id), data))) \
+            data=Entity.get_tree_data(int(field.id), data))) \
             + super().__call__(field, **kwargs)
 
 
@@ -406,7 +405,7 @@ class TreeSelect(HiddenInput):
             field=field,
             selection=selection,
             root=g.types[int(field.type_id)],
-            data=Type.get_tree_data(
+            data=Entity.get_tree_data(
                 int(field.type_id),
                 selected_ids,
                 field.filters_ids,
@@ -515,7 +514,7 @@ def generate_password_field() -> CustomField:
             id="generate-password">{_("generate password")}</span>''')
 
 
-def value_type_expand_icon(type_: Type) -> str:
+def value_type_expand_icon(type_: Entity) -> str:
     return f'''
         <span onkeydown="
             if (onActivateKeyInput(event))

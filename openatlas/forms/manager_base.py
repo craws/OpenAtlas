@@ -27,7 +27,6 @@ from openatlas.forms.validation import hierarchy_name_exists, validate
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 from openatlas.models.overlay import Overlay
-from openatlas.models.type import Type
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.openatlas_class import OpenatlasClass
@@ -444,7 +443,7 @@ class HierarchyBaseManager(BaseManager):
             'classes': SelectMultipleField(
                 _('classes'),
                 description=_('tooltip hierarchy forms'),
-                choices=Type.get_class_choices(self.entity),
+                choices=Entity.get_class_choices(self.entity),
                 option_widget=widgets.CheckboxInput(),
                 widget=widgets.ListWidget(prefix_label=False))}
 
@@ -473,7 +472,7 @@ class TypeBaseManager(BaseManager):
         self.crumbs += [g.types[type_id] for type_id in type_.root]
         return super().get_crumbs()
 
-    def get_root(self) -> Type:
+    def get_root(self) -> Entity:
         type_ = self.origin or self.entity
         return g.types[type_.root[0]] if type_.root else type_
 

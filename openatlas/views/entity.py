@@ -18,13 +18,12 @@ from openatlas.display.util import (
     convert_image_to_iiif, get_base_table_data, get_file_path,
     get_iiif_file_path, link, required_group)
 from openatlas.display.util2 import is_authorized
-from openatlas.forms.manager_base import BaseManager
 from openatlas.forms.form import get_manager
+from openatlas.forms.manager_base import BaseManager
 from openatlas.forms.util import was_modified
 from openatlas.models.entity import Entity
 from openatlas.models.gis import InvalidGeomException
 from openatlas.models.reference_system import ReferenceSystem
-from openatlas.models.type import Type
 
 
 @app.route('/entity/<int:id_>')
@@ -191,7 +190,7 @@ def check_insert_access(class_: str) -> None:
 
 def check_update_access(entity: Entity) -> None:
     check_insert_access(entity.class_.name)
-    if isinstance(entity, Type) and (
+    if entity.class_.view == 'type' and (
             entity.category == 'system'
             or entity.category == 'standard' and not entity.root):
         abort(403)
@@ -308,8 +307,8 @@ def get_redirect_url(manager: BaseManager) -> str:
         if manager.entity.class_.name in ('administrative_unit', 'type') \
                 and manager.origin:
             root_id = manager.origin.root[0] \
-                if isinstance(manager.origin, Type) and manager.origin.root \
-                else manager.origin.id
+                if (manager.origin.class_.view == 'type'
+                    and manager.origin.root) else manager.origin.id
             super_id = getattr(manager.form, str(root_id)).data
             url = url_for(
                 'insert',

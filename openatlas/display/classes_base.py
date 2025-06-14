@@ -19,7 +19,6 @@ from openatlas.display.util2 import (
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 from openatlas.models.overlay import Overlay
-from openatlas.models.type import Type
 from openatlas.models.user import User
 from openatlas.views.entity_index import file_preview
 
@@ -499,8 +498,6 @@ class ReferenceBaseDisplay(BaseDisplay):
 
 
 class TypeBaseDisplay(BaseDisplay):
-    entity: Type
-
     def add_crumbs(self) -> None:
         self.crumbs = [link(self.entity, index=True)]
         self.crumbs += [g.types[type_id] for type_id in self.entity.root]

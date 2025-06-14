@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Any, Optional
 
 from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
@@ -14,14 +14,11 @@ from openatlas import app
 from openatlas.display.table import Table
 from openatlas.display.util import get_base_table_data
 from openatlas.display.util2 import show_table_icons, uc_first
-from openatlas.forms import manager_base, manager
+from openatlas.forms import manager, manager_base
 from openatlas.forms.field import (
     SubmitField, TableCidocField, TableField, TableMultiField, TreeField)
 from openatlas.models.entity import Entity, Link
 from openatlas.views.entity_index import file_preview
-
-if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.models.type import Type
 
 
 def get_manager(
@@ -122,7 +119,7 @@ def get_cidoc_form() -> Any:
     return Form()
 
 
-def get_move_form(type_: Type) -> Any:
+def get_move_form(type_: Entity) -> Any:
     class Form(FlaskForm):
         checkbox_values = HiddenField()
         selection = SelectMultipleField(

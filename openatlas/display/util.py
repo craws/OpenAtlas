@@ -7,7 +7,7 @@ from email.header import Header
 from email.mime.text import MIMEText
 from functools import wraps
 from pathlib import Path
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Any, Optional
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import LazyString, lazy_gettext as _
@@ -28,9 +28,6 @@ from openatlas.models.content import get_translation
 from openatlas.models.entity import Entity, Link
 from openatlas.models.imports import Project
 from openatlas.models.user import User
-
-if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.models.type import Type
 
 
 def remove_link(
@@ -148,7 +145,7 @@ def profile_image_table_link(entity: Entity, file: Entity, ext: str) -> str:
     return ''
 
 
-def get_chart_data(entity: Type) -> Optional[dict[str, Any]]:
+def get_chart_data(entity: Entity) -> Optional[dict[str, Any]]:
     if not entity.subs:
         return None
     data = {}

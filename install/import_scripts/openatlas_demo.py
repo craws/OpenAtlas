@@ -18,7 +18,6 @@ from psycopg2 import extras
 from openatlas import app
 from openatlas.database.imports import import_data
 from openatlas.models.entity import Entity
-from openatlas.models.type import Type
 
 DATABASE_NAME = 'openatlas_demo'  # The database to fetch data from
 PROJECT_ID = 1
@@ -75,7 +74,7 @@ def hierarchies() -> None:
         for item in list(cursor):
             exists = False
             try:
-                if existing := Type.get_hierarchy(item['name']):
+                if existing := Entity.get_hierarchy(item['name']):
                     exists = True
                     print(f'Hierarchy exists: {existing.name}')
             except IndexError:
@@ -98,7 +97,7 @@ def insert_hierarchy(item: dict[str, Any]) -> None:
         FROM web.hierarchy_openatlas_class
         WHERE hierarchy_id = %(id)s;
         """, {'id': item['id']})
-    Type.insert_hierarchy(
+    Entity.insert_hierarchy(
         entity_,
         item['category'],
         [x[0] for x in list(cursor)],

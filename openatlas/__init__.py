@@ -52,7 +52,7 @@ def before_request() -> Response | None:
         OpenatlasClass, view_class_mapping)
     from openatlas.models.cidoc_property import CidocProperty
     from openatlas.models.cidoc_class import CidocClass
-    from openatlas.models.type import Type
+    from openatlas.models.entity import Entity
     from openatlas.models.settings import Settings
     from openatlas.models.reference_system import ReferenceSystem
 
@@ -79,10 +79,10 @@ def before_request() -> Response | None:
         session['language'],
         (request.path.startswith('/overview/model/property')))
     g.classes = OpenatlasClass.get_all()
-    g.types = Type.get_all(count_type())
-    g.radiocarbon_type = Type.get_hierarchy('Radiocarbon')
-    g.sex_type = Type.get_hierarchy('Features for sexing')
-    g.reference_match_type = Type.get_hierarchy('External reference match')
+    g.types = Entity.get_all_types(count_type())
+    g.radiocarbon_type = Entity.get_hierarchy('Radiocarbon')
+    g.sex_type = Entity.get_hierarchy('Features for sexing')
+    g.reference_match_type = Entity.get_hierarchy('External reference match')
     g.reference_systems = ReferenceSystem.get_all()
     g.view_class_mapping = view_class_mapping
     g.class_view_mapping = OpenatlasClass.get_class_view_mapping()
