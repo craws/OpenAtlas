@@ -16,7 +16,7 @@ from openatlas.forms.field import SubmitField
 from openatlas.forms.form import get_cidoc_form
 from openatlas.models.entity import Entity
 from openatlas.models.network import Network
-from openatlas.models.openatlas_class import OpenatlasClass
+from openatlas.models.openatlas_class import get_class_count
 
 
 @app.route('/overview/model', methods=['GET', 'POST'])
@@ -80,7 +80,7 @@ def openatlas_class_index() -> str:
         defs=[
             {'orderDataType': 'cidoc-model', 'targets': [1]},
             {'sType': 'numeric', 'targets': [1]}])
-    class_count = OpenatlasClass.get_class_count()
+    class_count = get_class_count()
     for class_ in g.classes.values():
         table.rows.append([
             class_.label,
