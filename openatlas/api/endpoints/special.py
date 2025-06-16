@@ -1,22 +1,23 @@
 import json
 from typing import Any
 
-from flask import Response, jsonify
+from flask import Response, g, jsonify
 from flask_restful import Resource, marshal
 
-from openatlas.api.formats.network_visualisation import (
-    get_ego_network_visualisation, get_network_visualisation)
 from openatlas.api.endpoints.endpoint import Endpoint
 from openatlas.api.endpoints.parser import Parser
 from openatlas.api.formats.csv import export_database_csv
+from openatlas.api.formats.network_visualisation import (
+    get_ego_network_visualisation, get_network_visualisation)
 from openatlas.api.formats.subunits import get_subunits_from_id
 from openatlas.api.formats.xml import export_database_xml
 from openatlas.api.resources.api_entity import ApiEntity
+from openatlas.api.resources.arche import ArcheFileMetadata
 from openatlas.api.resources.database_mapper import (
     get_all_entities_as_dict, get_all_links_as_dict, get_cidoc_hierarchy,
     get_classes, get_properties, get_property_hierarchy)
 from openatlas.api.resources.error import EntityNotAnEventError, NotAPlaceError
-from openatlas.api.resources.parser import entity_, gis, network
+from openatlas.api.resources.parser import arche, entity_, gis, network
 from openatlas.api.resources.resolve_endpoints import (
     download, resolve_subunits)
 from openatlas.api.resources.templates import geometries_template, \
@@ -126,3 +127,54 @@ class GetChainedEvents(Resource):
                 root_id,
                 ['P134']),
             parser).get_chained_events(root_id)
+
+
+class GetFilesForArche(Resource):
+    @staticmethod
+    def get() -> tuple[Resource, int] | Response | dict[str, Any]:
+        parser = arche.parse_args()
+        entities = ApiEntity.get_by_system_classes(['file'])
+        if parser['type_id']:
+            entities = Endpoint(entities, parser).filter_by_type()
+        # external_metadata should be coming from the outside
+        external_metadata = {
+            'topCollection': 'test_project',
+            'language': 'en',
+            'depositor': 'https://orcid.org/0000-0001-7608-7446',
+            'acceptedDate': "2024-01-01",
+            'curator': '<https://orcid.org/0000-0002-1218-9635>',
+            'principalInvestigator': 'Jonny Doy',
+            'relatedDiscipline':
+                'https://vocabs.acdh.oeaw.ac.at/oefosdisciplines/601003'
+        }
+        license_urls = {}
+        data = []
+        for entity in entities:
+            if not g.files.get(entity.id):
+                continue
+            if not entity.public:
+                continue
+            if not entity.creator:
+                continue
+            if not entity.license_holder:
+                continue
+            if not entity.standard_type:
+                continue
+            if entity.standard_type.id not in license_urls:
+                for link_ in (
+                        entity.standard_type.get_links('P67', inverse=True)):
+                    if link_.domain.class_.name == "external_reference":
+                        license_urls[entity.standard_type.id] = (
+                            link_.domain.name)
+                        break
+                if entity.standard_type.id not in license_urls:
+                    continue
+            license_ = license_urls[entity.standard_type.id]
+            data.append(
+                ArcheFileMetadata.construct(
+                    entity,
+                    external_metadata,
+                    license_))
+        print(data)
+        # file_paths = {g.files.get(entity.id) for entity in entities}
+        return {'results': 'good'}

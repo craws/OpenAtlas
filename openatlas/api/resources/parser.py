@@ -316,3 +316,12 @@ openapi.add_argument(
     location='args',
     default='json',
     choices=('json', 'yaml'))
+
+
+arche = reqparse.RequestParser()
+arche.add_argument(
+    'type_id',
+    type=int,
+    action='append',
+    help='{error_msg}',
+    location='args')
