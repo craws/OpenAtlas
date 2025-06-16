@@ -3,6 +3,8 @@ from datetime import datetime
 from typing import Any, Optional
 
 from flask import g
+from rdflib import Graph, Literal, Namespace, URIRef
+from rdflib.namespace import RDF, XSD
 
 from openatlas.models.entity import Entity
 
@@ -67,3 +69,62 @@ class ArcheFileMetadata:
         obj.transfer_date = datetime.today().strftime('%Y-%m-%d')
         obj.binary_size = g.files[entity.id].stat().st_size
         return obj
+
+
+ACDH = Namespace("https://vocabs.acdh.oeaw.ac.at/schema#")
+
+def add_arche_file_metadata_to_graph(
+        graph: Graph,
+        metadata: ArcheFileMetadata) -> None:
+    subject_uri = URIRef(metadata.uri)
+
+
+    graph.add((subject_uri, RDF.type, ACDH.Resource))
+    for title_text, lang in metadata.titles:
+        graph.add((subject_uri, ACDH.hasTitle, Literal(title_text, lang=lang)))
+    if metadata.depositor:
+        graph.add((subject_uri, ACDH.hasDepositor, URIRef(metadata.depositor)))
+    if metadata.license:
+        graph.add((subject_uri, ACDH.hasLicense, URIRef(metadata.license)))
+    if metadata.licensor:
+        graph.add((subject_uri, ACDH.hasLicensor, URIRef(metadata.licensor)))
+    if metadata.metadata_creator:
+        graph.add((subject_uri, ACDH.hasMetadataCreator, URIRef(metadata.metadata_creator)))
+    if metadata.owner:
+        graph.add((subject_uri, ACDH.hasOwner, URIRef(metadata.owner)))
+    if metadata.rights_holder:
+        graph.add((subject_uri, ACDH.hasRightsHolder, URIRef(metadata.rights_holder)))
+    if metadata.is_part_of:
+        graph.add((subject_uri, ACDH.isPartOf, URIRef(metadata.is_part_of)))
+    if metadata.accepted_date:
+        graph.add((subject_uri, ACDH.hasAcceptedDate, Literal(metadata.accepted_date, datatype=XSD.date)))
+    if metadata.curator:
+        graph.add((subject_uri, ACDH.hasCurator, URIRef(metadata.curator)))
+    for desc_text, lang in metadata.descriptions:
+        graph.add((subject_uri, ACDH.hasDescription, Literal(desc_text, lang=lang)))
+    if metadata.language:
+        graph.add((subject_uri, ACDH.hasLanguage, URIRef(metadata.language)))
+    if metadata.principal_investigator:
+        graph.add((subject_uri, ACDH.hasPrincipalInvestigator, URIRef(metadata.principal_investigator)))
+    if metadata.related_discipline:
+        graph.add((subject_uri, ACDH.hasRelatedDiscipline, URIRef(metadata.related_discipline)))
+    if metadata.spatial_coverage:
+        graph.add((subject_uri, ACDH.hasSpatialCoverage, URIRef(metadata.spatial_coverage)))
+    if metadata.submission_date:
+        graph.add((subject_uri, ACDH.hasSubmissionDate, Literal(metadata.submission_date, datatype=XSD.date)))
+    if metadata.transfer_date:
+        graph.add((subject_uri, ACDH.hasTransferDate, Literal(metadata.transfer_date, datatype=XSD.date)))
+    if metadata.binary_size:
+        graph.add((subject_uri, ACDH.hasBinarySize, Literal(metadata.binary_size, datatype=XSD.integer)))
+    if metadata.created_start_date:
+        graph.add((subject_uri, ACDH.hasCreatedStartDate, Literal(metadata.created_start_date, datatype=XSD.date)))
+    if metadata.created_end_date:
+        graph.add((subject_uri, ACDH.hasCreatedEndDate, Literal(metadata.created_end_date, datatype=XSD.date)))
+    if metadata.creator:
+        graph.add((subject_uri, ACDH.hasCreator, URIRef(metadata.creator)))
+    for tc_text, lang in metadata.temporal_coverages:
+        graph.add((subject_uri, ACDH.hasTemporalCoverage, Literal(tc_text, lang=lang)))
+    if metadata.temporal_coverage_identifier:
+        graph.add((subject_uri, ACDH.hasTemporalCoverageIdentifier, Literal(metadata.temporal_coverage_identifier)))
+
+

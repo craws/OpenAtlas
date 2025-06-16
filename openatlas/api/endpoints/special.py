@@ -3,6 +3,7 @@ from typing import Any
 
 from flask import Response, g, jsonify
 from flask_restful import Resource, marshal
+from rdflib import Graph
 
 from openatlas.api.endpoints.endpoint import Endpoint
 from openatlas.api.endpoints.parser import Parser
@@ -12,7 +13,8 @@ from openatlas.api.formats.network_visualisation import (
 from openatlas.api.formats.subunits import get_subunits_from_id
 from openatlas.api.formats.xml import export_database_xml
 from openatlas.api.resources.api_entity import ApiEntity
-from openatlas.api.resources.arche import ArcheFileMetadata
+from openatlas.api.resources.arche import ACDH, ArcheFileMetadata, \
+    add_arche_file_metadata_to_graph
 from openatlas.api.resources.database_mapper import (
     get_all_entities_as_dict, get_all_links_as_dict, get_cidoc_hierarchy,
     get_classes, get_properties, get_property_hierarchy)
@@ -148,7 +150,7 @@ class GetFilesForArche(Resource):
                 'https://vocabs.acdh.oeaw.ac.at/oefosdisciplines/601003'
         }
         license_urls = {}
-        data = []
+        arche_metadata_list = []
         for entity in entities:
             if not g.files.get(entity.id):
                 continue
@@ -170,11 +172,21 @@ class GetFilesForArche(Resource):
                 if entity.standard_type.id not in license_urls:
                     continue
             license_ = license_urls[entity.standard_type.id]
-            data.append(
+            arche_metadata_list.append(
                 ArcheFileMetadata.construct(
                     entity,
                     external_metadata,
                     license_))
-        print(data)
+        print(arche_metadata_list)
+        graph = Graph()
+        graph.bind("acdh", ACDH)
+        for metadata_obj in arche_metadata_list:
+            add_arche_file_metadata_to_graph(graph, metadata_obj)
+        output_file_name = "arche_output.ttl"
+        graph= graph.serialize(format="turtle", encoding="utf-8")
         # file_paths = {g.files.get(entity.id) for entity in entities}
-        return {'results': 'good'}
+        return Response(
+                graph,
+                mimetype='text/turtle')
+
+
