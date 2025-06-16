@@ -44,7 +44,6 @@ class AdministrativeUnitDisplay(TypeBaseDisplay):
 class ArtifactDisplay(PlaceBaseDisplay):
 
     def add_data(self) -> None:
-        super().add_data()
         self.data[_('source')] = [
             link(source) for source
             in self.entity.get_linked_entities('P128', sort=True)]
@@ -67,7 +66,6 @@ class CreationDisplay(EventsDisplay):
 class FileDisplay(BaseDisplay):
 
     def add_data(self) -> None:
-        super().add_data()
         self.data[_('public sharing allowed')] = str(_('no'))
         if self.entity.public:
             self.data[_('public sharing allowed')] = str(_('yes'))
@@ -95,7 +93,6 @@ class FileDisplay(BaseDisplay):
         pass
 
     def add_tabs(self) -> None:
-        super().add_tabs()
         entity = self.entity
         for name in [
                 'source', 'event', 'actor', 'place', 'artifact', 'reference',
@@ -238,15 +235,14 @@ class ReferenceSystemDisplay(BaseDisplay):
     def add_button_copy(self) -> None:
         pass
 
-    def add_button_delete(self) -> None:
-        if not self.entity.classes and not self.entity.system:
-            super().add_button_delete()
+    # def add_button_delete(self) -> None:
+    #    if not self.entity.classes and not self.entity.system:
+    #        super().add_button_delete()
 
     def add_button_network(self) -> None:
         pass
 
     def add_data(self) -> None:
-        super().add_data()
         self.data[_('website URL')] = link(
             self.entity.website_url,
             self.entity.website_url,
@@ -258,7 +254,6 @@ class ReferenceSystemDisplay(BaseDisplay):
         self.data[_('example ID')] = self.entity.placeholder
 
     def add_tabs(self) -> None:
-        super().add_tabs()
         for name in self.entity.classes:
             self.tabs[name] = Tab(
                 name,
@@ -290,13 +285,11 @@ class SourceDisplay(BaseDisplay):
         pass
 
     def add_data(self) -> None:
-        super().add_data()
         self.data[_('artifact')] = [
             link(artifact) for artifact in
             self.entity.get_linked_entities('P128', inverse=True)]
 
     def add_tabs(self) -> None:
-        super().add_tabs()
         entity = self.entity
         for name, tooltip in {
                 'actor': _('mentioned in the source'),
@@ -318,8 +311,8 @@ class SourceDisplay(BaseDisplay):
             data.append(
                 remove_link(range_.name, link_, entity, range_.class_.view))
             self.tabs[range_.class_.view].table.rows.append(data)
-        self.add_reference_tables_data()
-        self.add_note_tab()
+        # self.add_reference_tables_data()
+        # self.add_note_tab()
 
     def description_html(self) -> str:
         return description(

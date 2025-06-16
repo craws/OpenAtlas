@@ -1,26 +1,22 @@
 from __future__ import annotations
 
-from collections import defaultdict
 from typing import Any, Optional
 
-from flask import g, render_template, url_for
+from flask import g, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
-from markupsafe import escape
 
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.util import (
-    bookmark_toggle, button, description, edit_link, format_entity_date,
-    get_appearance, get_base_table_data, get_chart_data, get_system_data,
-    link, profile_image_table_link, remove_link)
+    button, edit_link, format_entity_date,
+    get_appearance, get_base_table_data, get_chart_data, link,
+    profile_image_table_link, remove_link)
 from openatlas.display.util2 import (
-    format_date, is_authorized, manual, show_table_icons, uc_first)
+    is_authorized, uc_first)
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 from openatlas.models.overlay import Overlay
-from openatlas.models.user import User
-from openatlas.views.entity_index import file_preview
 
 
 class BaseDisplay:
@@ -39,200 +35,13 @@ class BaseDisplay:
         self.gis_data: dict[str, Any] = {}
         self.problematic_type = self.entity.check_too_many_single_type_links()
         self.entity.image_id = entity.get_profile_image_id()
-        self.add_tabs()
-        self.add_note_tab()
-        if 'file' in self.tabs and show_table_icons():
-            self.add_file_tab_thumbnails()
-        self.add_crumbs()
-        self.add_buttons()
-        if self.linked_places:
-            self.gis_data = Gis.get_all(self.linked_places)
-        self.add_info_tab_content()  # Call later because of profile image
 
-    def add_tabs(self) -> None:
-        self.tabs = {'info': Tab('info')}
 
-    def add_crumbs(self) -> None:
-        self.crumbs = [link(self.entity, index=True)]
-        if self.structure:
-            for super_ in self.structure['supers']:
-                self.crumbs.append(link(super_))
-        self.crumbs.append(self.entity.name)
-
-    def get_type_data(self) -> dict[str, Any]:
-        if self.entity.location:  # Add location types
-            self.entity.types.update(self.entity.location.types)
-        data: dict[str, Any] = defaultdict(list)
-        for type_, value in sorted(
-                self.entity.types.items(),
-                key=lambda x: x[0].name):
-            if self.entity.standard_type \
-                    and type_.id == self.entity.standard_type.id:
-                continue  # Standard type is already included
-            title = " > ".join([g.types[i].name for i in type_.root])
-            html = f'<span title="{title}">{link(type_)}</span>'
-            if type_.category == 'value':
-                html += f" {float(value):g} {type_.description or ''}"
-            data[g.types[type_.root[0]].name].append(html)
-        return {key: data[key] for key in sorted(data.keys())}
-
-    def add_file_tab_thumbnails(self) -> None:
-        self.tabs['file'].table.header.insert(1, _('icon'))
-        for row in self.tabs['file'].table.rows:
-            id_ = int(row[0].replace('<a href="/entity/', '').split('"')[0])
-            row.insert(1, file_preview(id_))
-
-    def add_info_tab_content(self) -> None:
-        self.add_data()
-        resolver_url = g.settings['frontend_resolver_url']
-        if hasattr(current_user, 'settings'):
-            self.data |= get_system_data(self.entity)
-            resolver_url = current_user.settings['frontend_resolver_url']
-        self.tabs['info'].buttons = self.buttons
-        frontend_link = None
-        if resolver_url:
-            frontend_link = link(
-                '<i class="fas fa-eye"></i> ' +
-                uc_first(_('presentation site')),
-                resolver_url + str(self.entity.id),
-                external=True)
-        self.tabs['info'].content = render_template(
-            'entity/view.html',
-            entity=self.entity,
-            frontend_link=frontend_link,
-            info_data=self.data,
-            gis_data=self.gis_data,
-            overlays=self.overlays,
-            chart_data=self.get_chart_data(),
-            description_html=self.description_html(),
-            problematic_type_id=self.problematic_type)
-
-    def description_html(self) -> str:
-        return description(self.entity.description)
-
-    def get_chart_data(self) -> Optional[dict[str, Any]]:
-        return None
-
-    def add_note_tab(self) -> None:
-        self.tabs['note'] = Tab(
-            'note',
-            buttons=[manual('tools/notes')],
-            entity=self.entity)
-        for note in current_user.get_notes_by_entity_id(self.entity.id):
-            data = [
-                format_date(note['created']),
-                _('public') if note['public'] else _('private'),
-                link(User.get_by_id(note['user_id'])),
-                note['text'],
-                link(_('view'), url_for('note_view', id_=note['id']))]
-            self.tabs['note'].table.rows.append(data)
-
-    def add_buttons(self) -> None:
-        self.buttons = [manual(f'entity/{self.entity.class_.view}')]
-        if self.entity.class_.name == 'source_translation':
-            self.buttons = [manual('entity/source')]
-        if is_authorized(self.entity.class_.write_access):
-            if not self.problematic_type:
-                self.add_button_update()
-                self.add_button_copy()
-            self.add_button_delete()
-        self.buttons.append(bookmark_toggle(self.entity.id))
-        self.add_button_network()
-        self.buttons.append(
-            render_template('util/api_links.html', entity=self.entity))
-        self.add_button_others()
-        if self.structure and len(self.structure['siblings']) > 1:
-            self.add_button_sibling_pager()
-
-    def add_button_copy(self) -> None:
-        self.buttons.append(
-            button(
-                _('copy'),
-                url_for('update', id_=self.entity.id, copy='copy_')))
-
-    def add_button_delete(self) -> None:
-        if current_user.group == 'contributor':
-            info = g.logger.get_log_info(self.entity.id)
-            if not info['creator'] or info['creator'].id != current_user.id:
-                return
-        msg = _(
-            'Delete %(name)s?',
-            name=escape(self.entity.name.replace('\'', '')))
-        self.buttons.append(button(
-            _('delete'),
-            url_for('delete', id_=self.entity.id),
-            onclick=f"return confirm('{msg}')"))
-
-    def add_button_update(self) -> None:
-        self.buttons.append(
-            button(_('edit'), url_for('update', id_=self.entity.id)))
-
-    def add_button_network(self) -> None:
-        self.buttons.append(
-            button(
-                _('network'),
-                url_for('network', dimensions=0, id_=self.entity.id)))
-
-    def add_button_others(self) -> None:
-        pass
-
-    def add_button_sibling_pager(self) -> None:
-        prev_id = None
-        next_id = None
-        position = None
-        self.structure['siblings'].sort(key=lambda x: x.id)
-        for counter, sibling in enumerate(self.structure['siblings']):
-            position = counter + 1
-            prev_id = sibling.id if sibling.id < self.entity.id else prev_id
-            if sibling.id > self.entity.id:
-                next_id = sibling.id
-                position = counter
-                break
-        if prev_id:
-            self.buttons.append(button('<', url_for('view', id_=prev_id)))
-        if next_id:
-            self.buttons.append(button('>', url_for('view', id_=next_id)))
-        self.buttons.append(
-            f'{position} ' + _('of') + f" {len(self.structure['siblings'])}")
-
-    def add_data(self) -> None:
-        self.data = {
-            _('alias'): list(self.entity.aliases.values()),
-            _('begin'): format_entity_date(self.entity, 'begin'),
-            _('end'): format_entity_date(self.entity, 'end')}
-        if self.entity.standard_type:
-            var = ' > '.join(
-                [g.types[id_].name for id_ in self.entity.standard_type.root])
-            self.data[_('type')] = \
-                f'<span title="{var}">{link(self.entity.standard_type)}</span>'
-        self.data.update(self.get_type_data())
-
-    def add_reference_tables_data(self) -> None:
-        entity = self.entity
-        for link_ in entity.get_links('P67', inverse=True):
-            domain = link_.domain
-            data = get_base_table_data(domain)
-            if domain.class_.view == 'file':
-                ext = data[6]
-                data.append(profile_image_table_link(entity, domain, ext))
-                if not entity.image_id and ext in g.display_file_ext:
-                    entity.image_id = domain.id
-            elif domain.class_.view != 'source':
-                data.append(link_.description)
-                data.append(edit_link(
-                    url_for('link_update', id_=link_.id, origin_id=entity.id)))
-                if domain.class_.view == 'reference_system':
-                    entity.reference_systems.append(link_)
-                    continue
-            data.append(
-                remove_link(domain.name, link_, entity, domain.class_.view))
-            self.tabs[domain.class_.view].table.rows.append(data)
 
 
 class ActorDisplay(BaseDisplay):
 
     def add_data(self) -> None:
-        super().add_data()
         if begin_place := self.entity.get_linked_entity('OA8'):
             begin_object = begin_place.get_linked_entity_safe('P53', True)
             self.linked_places.append(begin_object)
@@ -253,7 +62,6 @@ class ActorDisplay(BaseDisplay):
             self.data[_('appears last')] = appears_last
 
     def add_tabs(self) -> None:
-        super().add_tabs()
         entity = self.entity
         for name in [
                 'source', 'event', 'relation', 'member_of', 'member',
@@ -264,7 +72,7 @@ class ActorDisplay(BaseDisplay):
         self.tabs['relation'].label = uc_first(_('relation'))
         if 'member' in self.tabs:
             self.tabs['member'].label = uc_first(_('member'))
-        self.add_reference_tables_data()
+        # self.add_reference_tables_data()
         self.event_links = \
             entity.get_links(['P11', 'P14', 'P22', 'P23', 'P25'], True)
         for link_ in self.event_links:
@@ -328,7 +136,6 @@ class ActorDisplay(BaseDisplay):
 class EventsDisplay(BaseDisplay):
 
     def add_data(self) -> None:
-        super().add_data()
         self.data[_('sub event of')] = \
             link(self.entity.get_linked_entity('P9', inverse=True))
         self.data[_('preceding event')] = \
@@ -345,11 +152,10 @@ class EventsDisplay(BaseDisplay):
                 link(place.get_linked_entity_safe('P53', True))
 
     def add_tabs(self) -> None:
-        super().add_tabs()
         entity = self.entity
         for name in ['subs', 'source', 'actor', 'reference', 'file']:
             self.tabs[name] = Tab(name, entity=entity)
-        self.add_reference_tables_data()
+        # self.add_reference_tables_data()
         for sub in entity.get_linked_entities('P9', types=True, sort=True):
             self.tabs['subs'].table.rows.append(get_base_table_data(sub))
         self.tabs['actor'].table.header.insert(5, _('activity'))
@@ -375,12 +181,11 @@ class EventsDisplay(BaseDisplay):
 
 class PlaceBaseDisplay(BaseDisplay):
 
-    def add_button_delete(self) -> None:
-        if not self.entity.get_linked_entities('P46'):
-            super().add_button_delete()
+    #def add_button_delete(self) -> None:
+    #    if not self.entity.get_linked_entities('P46'):
+    #        super().add_button_delete()
 
     def add_tabs(self) -> None:
-        super().add_tabs()
         entity = self.entity
         for name in ['source', 'event', 'reference', 'artifact']:
             self.tabs[name] = Tab(name, entity=entity)
@@ -473,7 +278,6 @@ class ReferenceBaseDisplay(BaseDisplay):
         pass
 
     def add_tabs(self) -> None:
-        super().add_tabs()
         for name in [
                 'source', 'event', 'actor', 'place', 'artifact', 'file',
                 'type']:
@@ -529,12 +333,11 @@ class TypeBaseDisplay(BaseDisplay):
                         _('set unselectable'),
                         url_for('type_unset_selectable', id_=self.entity.id)))
 
-    def add_button_update(self) -> None:
-        if self.entity.category != 'system':
-            super().add_button_update()
+    #def add_button_update(self) -> None:
+    #    if self.entity.category != 'system':
+    #        super().add_button_update()
 
     def add_data(self) -> None:
-        super().add_data()
         self.data[_('super')] = link(g.types[self.entity.root[-1]])
         if self.entity.category == 'value':
             self.data[_('unit')] = self.entity.description
@@ -543,13 +346,12 @@ class TypeBaseDisplay(BaseDisplay):
         self.data[_('ID for imports')] = self.entity.id
 
     def add_tabs(self) -> None:
-        super().add_tabs()
         entity = self.entity
         self.tabs['subs'] = Tab('subs', entity=entity)
         self.tabs['entities'] = Tab('entities', entity=entity)
         self.tabs['file'] = Tab('file', entity=entity)
         self.tabs['reference'] = Tab('reference', entity=entity)
-        self.add_reference_tables_data()
+        # self.add_reference_tables_data()
         for sub_id in entity.subs:
             self.tabs['subs'].table.rows.append([
                 link(g.types[sub_id]),

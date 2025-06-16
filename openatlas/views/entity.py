@@ -11,7 +11,7 @@ from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.database.connect import Transaction
-from openatlas.display import classes
+from openatlas.display.display import Display
 from openatlas.display.image_processing import resize_image
 from openatlas.display.util import (
     button, check_iiif_activation, check_iiif_file_exist,
@@ -42,15 +42,13 @@ def view(id_: int) -> str | Response:
         if not entity.class_.view:
             flash(_("This entity can't be viewed directly."), 'error')
             abort(400)
-    class_name = \
-        f"{''.join(i.capitalize() for i in entity.class_.name.split('_'))}"
-    manager = getattr(classes, f'{class_name}Display')(entity)
+    display = Display(entity)
     return render_template(
         'tabs.html',
-        tabs=manager.tabs,
+        tabs=Display(entity).tabs,
         entity=entity,
-        gis_data=manager.gis_data,
-        crumbs=manager.crumbs)
+        gis_data=display.gis_data,
+        crumbs=display.crumbs)
 
 
 @app.route(
