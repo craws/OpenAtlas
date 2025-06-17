@@ -76,8 +76,8 @@ class OpenatlasClass:
         for item, classes in view_class_mapping.items():
             if name in classes:
                 self.view = item
-        self.attributes = attributes,
-        self.relations = relations,
+        self.attributes = attributes
+        self.relations = relations
         self.display = display
 
     def get_tooltip(self) -> Optional[str]:
@@ -167,6 +167,8 @@ def get_model(class_name: str) -> dict[str, Any]:
         item['required'] = item[
             'required'] if 'required' in item else False
     data['display'] = {} if 'display' not in data else data['display']
+    data['display']['buttons'] = {} if 'buttons' not in data['display'] \
+        else data['display']['buttons']
     data['relations'] = {} if 'relations' not in data else data[
         'relations']
     for name, relation in data['relations'].items():

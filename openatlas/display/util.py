@@ -660,11 +660,9 @@ def display_annotation_text_links(source: Entity) -> str:
         else:
             tag_open = f'<span style="color:green;" {title}>'
             tag_close = '</span>'
-
         position = annotation.link_start + offset
         text = text[:position] + tag_open + text[position:]
         offset += len(tag_open)
-
         position = annotation.link_end + offset
         text = text[:position] + tag_close + text[position:]
         offset += len(tag_close)

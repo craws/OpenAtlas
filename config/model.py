@@ -1,4 +1,5 @@
 from typing import Any
+from flask_babel import lazy_gettext as _
 
 model: dict[str, Any] = {
     'acquisition': {
@@ -14,18 +15,13 @@ model: dict[str, Any] = {
                 'property': 'has type',
                 'multiple': True,
                 'inverse': True}},
-        'display': {
-            'columns': [
-                'readout',
-                'published',
-                'name',
-                'tag',
-                'author',
-                'info']}},
+        'display': {'buttons': ['network']}},
     'activity': {
-        'attributes': {}},
+        'attributes': {},
+        'display': {'buttons': ['network']}},
     'actor_function': {
-        'attributes': {}},
+        'attributes': {},
+        'display': {'buttons': ['network']}},
     'actor_relation': {
         'attributes': {}},
     'administrative_unit': {
@@ -33,47 +29,61 @@ model: dict[str, Any] = {
     'appellation': {
         'attributes': {}},
     'artifact': {
-        'attributes': {}},
+        'attributes': {},
+        'display': {'buttons': ['network']}},
     'bibliography': {
         'attributes': {}},
     'creation': {
-        'attributes': {}},
+        'attributes': {},
+        'display': {'buttons': ['network']}},
     'edition': {
         'attributes': {}},
     'event': {
-        'attributes': {}},
+        'attributes': {},
+        'display': {'buttons': ['network']}},
     'external_reference': {
         'attributes': {}},
     'feature': {
-        'attributes': {}},
+        'attributes': {},
+        'display': {'buttons': ['network']}},
     'file': {
         'attributes': {}},
     'group': {
-        'attributes': {}},
+        'attributes': {},
+        'display': {'buttons': ['network']}},
     'human_remains': {
-        'attributes': {}},
+        'attributes': {},
+        'display': {'buttons': ['network']}},
     'involvement': {
         'attributes': {}},
     'modification': {
-        'attributes': {}},
+        'attributes': {},
+        'display': {'buttons': ['network']}},
     'move': {
-        'attributes': {}},
+        'attributes': {},
+        'display': {'buttons': ['network']}},
     'object_location': {
         'attributes': {}},
     'person': {
-        'attributes': {}},
+        'attributes': {},
+        'display': {'buttons': ['network']}},
     'place': {
-        'attributes': {}},
+        'attributes': {},
+        'display': {'buttons': ['network']}},
     'production': {
-        'attributes': {}},
+        'attributes': {},
+        'display': {'buttons': ['network']}},
     'reference_system': {
         'attributes': {}},
     'source': {
-        'attributes': {}},
+        'attributes': {
+            'name': {'required': True},
+            'description': {'label': _('content'), 'annotated': True}}},
     'source_translation': {
         'attributes': {}},
     'stratigraphic_unit': {
-        'attributes': {}},
+        'attributes': {},
+        'display': {'buttons': ['network']}},
     'type': {
         'attributes': {}},
     'type_tools': {

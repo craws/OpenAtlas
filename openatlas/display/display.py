@@ -8,8 +8,8 @@ from markupsafe import escape
 
 from openatlas.display.tab import Tab
 from openatlas.display.util import (
-    bookmark_toggle, button, description, edit_link, format_entity_date,
-    get_base_table_data, get_system_data,
+    bookmark_toggle, button, description, display_annotation_text_links,
+    edit_link, format_entity_date, get_base_table_data, get_system_data,
     link, profile_image_table_link, remove_link)
 from openatlas.display.util2 import (
     format_date, is_authorized, manual, show_table_icons, uc_first)
@@ -92,6 +92,15 @@ class Display:
                 uc_first(_('presentation site')),
                 resolver_url + str(self.entity.id),
                 external=True)
+        description_ = self.entity.description
+        description_label = ''
+        if self.entity.class_.attributes['description']:
+            if 'label' in self.entity.class_.attributes['description']:
+                description_label = \
+                    self.entity.class_.attributes['description']['label']
+            if 'annotated' in self.entity.class_.attributes['description'] \
+                    and self.entity.class_.attributes['description']:
+                description_ = display_annotation_text_links(self.entity)
         self.tabs['info'].content = render_template(
             'entity/view.html',
             entity=self.entity,
@@ -99,15 +108,12 @@ class Display:
             info_data=self.data,
             gis_data=self.gis_data,
             overlays=self.overlays,
-            chart_data=self.get_chart_data(),
-            description_html=self.description_html(),
+            # chart_data=self.get_chart_data(),
+            description_html=description(description_, description_label),
             problematic_type_id=self.problematic_type)
 
-    def description_html(self) -> str:
-        return description(self.entity.description)
-
-    def get_chart_data(self) -> Optional[dict[str, Any]]:
-        return None
+    # def get_chart_data(self) -> Optional[dict[str, Any]]:
+    #    return None
 
     def add_note_tab(self) -> None:
         self.tabs['note'] = Tab(
@@ -133,7 +139,11 @@ class Display:
                 self.add_button_copy()
             self.add_button_delete()
         self.buttons.append(bookmark_toggle(self.entity.id))
-        self.add_button_network()
+        if 'network' in self.entity.class_.display['buttons']:
+            self.buttons.append(
+                button(
+                    _('network'),
+                    url_for('network', dimensions=0, id_=self.entity.id)))
         self.buttons.append(
             render_template('util/api_links.html', entity=self.entity))
         self.add_button_others()
@@ -162,12 +172,6 @@ class Display:
     def add_button_update(self) -> None:
         self.buttons.append(
             button(_('edit'), url_for('update', id_=self.entity.id)))
-
-    def add_button_network(self) -> None:
-        self.buttons.append(
-            button(
-                _('network'),
-                url_for('network', dimensions=0, id_=self.entity.id)))
 
     def add_button_others(self) -> None:
         pass

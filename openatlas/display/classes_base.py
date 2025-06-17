@@ -9,9 +9,8 @@ from flask_login import current_user
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.util import (
-    button, edit_link, format_entity_date,
-    get_appearance, get_base_table_data, get_chart_data, link,
-    profile_image_table_link, remove_link)
+    button, edit_link, format_entity_date, get_appearance, get_base_table_data,
+    get_chart_data, link, profile_image_table_link, remove_link)
 from openatlas.display.util2 import (
     is_authorized, uc_first)
 from openatlas.models.entity import Entity, Link
@@ -35,8 +34,6 @@ class BaseDisplay:
         self.gis_data: dict[str, Any] = {}
         self.problematic_type = self.entity.check_too_many_single_type_links()
         self.entity.image_id = entity.get_profile_image_id()
-
-
 
 
 class ActorDisplay(BaseDisplay):
@@ -181,7 +178,7 @@ class EventsDisplay(BaseDisplay):
 
 class PlaceBaseDisplay(BaseDisplay):
 
-    #def add_button_delete(self) -> None:
+    # def add_button_delete(self) -> None:
     #    if not self.entity.get_linked_entities('P46'):
     #        super().add_button_delete()
 
@@ -274,9 +271,6 @@ class PlaceBaseDisplay(BaseDisplay):
 
 class ReferenceBaseDisplay(BaseDisplay):
 
-    def add_button_network(self) -> None:
-        pass
-
     def add_tabs(self) -> None:
         for name in [
                 'source', 'event', 'actor', 'place', 'artifact', 'file',
@@ -317,9 +311,6 @@ class TypeBaseDisplay(BaseDisplay):
                 url = url_for('type_delete_recursive', id_=self.entity.id)
             self.buttons.append(button(_('delete'), url))
 
-    def add_button_network(self) -> None:
-        pass
-
     def add_button_others(self) -> None:
         if is_authorized('editor') and self.entity.category != 'value':
             if not self.entity.selectable:
@@ -333,7 +324,7 @@ class TypeBaseDisplay(BaseDisplay):
                         _('set unselectable'),
                         url_for('type_unset_selectable', id_=self.entity.id)))
 
-    #def add_button_update(self) -> None:
+    # def add_button_update(self) -> None:
     #    if self.entity.category != 'system':
     #        super().add_button_update()
 

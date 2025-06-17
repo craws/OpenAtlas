@@ -10,8 +10,7 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
     button, description, display_annotation_text_links, edit_link,
-    format_entity_date, get_base_table_data, get_file_path, link,
-    remove_link)
+    format_entity_date, get_base_table_data, get_file_path, link, remove_link)
 from openatlas.display.util2 import is_authorized, uc_first
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
@@ -87,9 +86,6 @@ class FileDisplay(BaseDisplay):
             '<span class="error">' + uc_first(_("missing file")) + '</span>')
 
     def add_button_copy(self) -> None:
-        pass
-
-    def add_button_network(self) -> None:
         pass
 
     def add_tabs(self) -> None:
@@ -239,9 +235,6 @@ class ReferenceSystemDisplay(BaseDisplay):
     #    if not self.entity.classes and not self.entity.system:
     #        super().add_button_delete()
 
-    def add_button_network(self) -> None:
-        pass
-
     def add_data(self) -> None:
         self.data[_('website URL')] = link(
             self.entity.website_url,
@@ -281,9 +274,6 @@ class ReferenceSystemDisplay(BaseDisplay):
 
 class SourceDisplay(BaseDisplay):
 
-    def add_button_network(self) -> None:
-        pass
-
     def add_data(self) -> None:
         self.data[_('artifact')] = [
             link(artifact) for artifact in
@@ -314,18 +304,10 @@ class SourceDisplay(BaseDisplay):
         # self.add_reference_tables_data()
         # self.add_note_tab()
 
-    def description_html(self) -> str:
-        return description(
-            display_annotation_text_links(self.entity),
-            _('content'))
-
 
 class SourceTranslationDisplay(BaseDisplay):
 
     def add_button_copy(self) -> None:
-        pass
-
-    def add_button_network(self) -> None:
         pass
 
     def add_crumbs(self) -> None:
