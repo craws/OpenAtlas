@@ -78,7 +78,18 @@ model: dict[str, Any] = {
     'source': {
         'attributes': {
             'name': {'required': True},
-            'description': {'label': _('content'), 'annotated': True}}},
+            'description': {'label': _('content'), 'annotated': True}},
+        'relations': {},
+        'display': {
+            'tabs': {
+                'actor': {},
+                'artifact': {},
+                'event': {},
+                'place': {},
+                'text': {},
+                'reference': {},
+                'file': {},
+                'note': {}}}},
     'source_translation': {
         'attributes': {}},
     'stratigraphic_unit': {
@@ -87,5 +98,4 @@ model: dict[str, Any] = {
     'type': {
         'attributes': {}},
     'type_tools': {
-        'attributes': {}},
-}
+        'attributes': {}}}

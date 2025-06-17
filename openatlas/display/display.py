@@ -45,9 +45,6 @@ class Display:
             self.gis_data = Gis.get_all(self.linked_places)
         self.add_info_tab_content()  # Call later because of profile image
 
-    def add_tabs(self) -> None:
-        self.tabs = {'info': Tab('info')}
-
     def add_crumbs(self) -> None:
         self.crumbs = [link(self.entity, index=True)]
         if self.structure:
@@ -115,6 +112,31 @@ class Display:
     # def get_chart_data(self) -> Optional[dict[str, Any]]:
     #    return None
 
+    def add_tabs(self) -> None:
+        self.tabs = {'info': Tab('info')}
+        if 'tabs' not in self.entity.class_.display:
+            return
+        return
+        for name, tab in self.entity.class_.display['tabs'].items():
+            relation = self.entity.class_.relations[name]
+            entities = []
+            for e in self.entity.get_linked_entities(
+                    relation['property'],
+                    relation['class'],
+                    relation['inverse']):
+                entities.append(e)
+                if relation['property'] == 'has file':
+                    self.entity.image = self.entity.image or e
+            # self.tabs[name] = Tab(
+            #    name,
+            #    table=entity_table(
+            #        relation['class'][0]
+            #        if isinstance(relation['class'], list)
+            #        else relation['class'],
+            #        entities,
+            #        self.entity,
+            #        columns=tab['columns'] if 'columns' in tab else None))
+
     def add_note_tab(self) -> None:
         self.tabs['note'] = Tab(
             'note',
@@ -146,7 +168,6 @@ class Display:
                     url_for('network', dimensions=0, id_=self.entity.id)))
         self.buttons.append(
             render_template('util/api_links.html', entity=self.entity))
-        self.add_button_others()
         if self.structure and len(self.structure['siblings']) > 1:
             self.add_button_sibling_pager()
 
@@ -172,9 +193,6 @@ class Display:
     def add_button_update(self) -> None:
         self.buttons.append(
             button(_('edit'), url_for('update', id_=self.entity.id)))
-
-    def add_button_others(self) -> None:
-        pass
 
     def add_button_sibling_pager(self) -> None:
         prev_id = None
