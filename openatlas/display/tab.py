@@ -232,7 +232,9 @@ class Tab:
                         g.classes[tab_name].label,
                         url_for('insert', class_=tab_name, origin_id=id_)))
                 if entity and check_iiif_activation():
-                    for file in entity.get_linked_entities('P67', True):
+                    for file in entity.get_linked_entities(
+                            'P67',
+                            inverse=True):
                         if (file.class_.view == 'file'
                                 and check_iiif_file_exist(file.id)):
                             self.buttons.append(

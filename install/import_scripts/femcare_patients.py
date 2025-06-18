@@ -174,7 +174,7 @@ with app.test_request_context():
 
     # Remove former data
     print('Remove former data')
-    for item in case_study.get_linked_entities('P2', True):
+    for item in case_study.get_linked_entities('P2', inverse=True):
         item.delete()
         COUNT += 1
         if COUNT % 15 == 0:
@@ -182,7 +182,7 @@ with app.test_request_context():
             sys.stdout.flush()
     print('\nFormer data removed')
 
-    for type_id in diagnose_hierarchy.subs:  # type: ignore
+    for type_id in diagnose_hierarchy.subs:
         g.types[type_id].delete()
 
     # Insert import

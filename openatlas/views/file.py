@@ -136,7 +136,7 @@ def view_iiif(id_: int) -> str:
     if entity.class_.view == 'file' and check_iiif_file_exist(id_):
         manifests.append(get_manifest_url(id_))
     else:
-        for file_ in entity.get_linked_entities('P67', True):
+        for file_ in entity.get_linked_entities('P67', inverse=True):
             if file_.class_.view == 'file' and check_iiif_file_exist(file_.id):
                 manifests.append(get_manifest_url(file_.id))
     return render_template('iiif.html', manifests=manifests)

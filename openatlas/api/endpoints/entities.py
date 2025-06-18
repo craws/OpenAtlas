@@ -170,7 +170,7 @@ class GetSearchEntities(Resource):
                 entity = Entity.get_linked_entity_safe_static(
                     row['id'],
                     'P1',
-                    True)
+                    inverse=True)
                 if entity.class_.name not in classes:
                     continue
             else:

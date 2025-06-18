@@ -646,10 +646,10 @@ def convert_image_to_iiif(id_: int, path: Optional[Path] = None) -> bool:
     return True
 
 
-def display_annotation_text_links(source: Entity) -> str:
+def display_annotation_text_links(entity: Entity) -> str:
     offset = 0
-    text = source.description
-    for annotation in AnnotationText.get_by_source_id(source.id):
+    text = entity.description
+    for annotation in AnnotationText.get_by_source_id(entity.id):
         if not annotation.text and not annotation.entity_id:
             continue  # pragma: no cover
         title = f'title="{sanitize(annotation.text)}"' \

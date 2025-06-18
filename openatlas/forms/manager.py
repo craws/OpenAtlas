@@ -591,7 +591,10 @@ class SourceManager(SourceBaseManager):
     def additional_fields(self) -> dict[str, Any]:
         selection = None
         if not self.insert and self.entity:
-            selection = self.entity.get_linked_entities('P128', True, True)
+            selection = self.entity.get_linked_entities(
+                'P128',
+                inverse=True,
+                types=True)
         elif self.origin and self.origin.class_.name == 'artifact':
             selection = [self.origin]
         return super().additional_fields() | {

@@ -470,25 +470,53 @@ def delete_reference_system_links(entity_id: int) -> None:
             'entity_id': entity_id})
 
 
-def get_linked_entities(id_: int, codes: list[str]) -> list[int]:
-    g.cursor.execute(
-        """
-        SELECT range_id
-        FROM model.link
-        WHERE domain_id = %(id_)s AND property_code IN %(codes)s;
-        """,
-        {'id_': id_, 'codes': tuple(codes)})
+def get_linked_entities(
+        id_: int,
+        codes: list[str],
+        classes: Optional[list[str]] = None) -> list[int]:
+    if classes:
+        g.cursor.execute(
+            """
+            SELECT range_id
+            FROM model.link l
+            JOIN model.entity e ON l.domain_id = %(id_)s
+                AND e.class_name IN %(classes)s
+                AND property_code IN %(codes)s;
+            """,
+            {'id_': id_, 'classes': tuple (classes), 'codes': tuple(codes)})
+    else:
+        g.cursor.execute(
+            """
+            SELECT range_id
+            FROM model.link
+            WHERE domain_id = %(id_)s AND property_code IN %(codes)s;
+            """,
+            {'id_': id_, 'codes': tuple(codes)})
     return [row[0] for row in list(g.cursor)]
 
 
-def get_linked_entities_inverse(id_: int, codes: list[str]) -> list[int]:
-    g.cursor.execute(
-        """
-        SELECT domain_id
-        FROM model.link
-        WHERE range_id = %(id_)s AND property_code IN %(codes)s;
-        """,
-        {'id_': id_, 'codes': tuple(codes)})
+def get_linked_entities_inverse(
+        id_: int,
+        codes: list[str],
+        classes: Optional[list[str]] = None) -> list[int]:
+    if classes:
+        g.cursor.execute(
+            """
+            SELECT l.domain_id
+            FROM model.link l
+            JOIN model.entity e ON l.range_id = %(id_)s
+                AND e.class_name IN %(classes)s
+                AND l.property_code IN %(codes)s;
+            """,
+            {'id_': id_, 'classes': tuple (classes), 'codes': tuple(codes)})
+    else:
+        g.cursor.execute(
+            """
+            SELECT domain_id
+            FROM model.link
+            WHERE range_id = %(id_)s AND property_code IN %(codes)s;
+            """,
+            {'id_': id_, 'codes': tuple(codes)})
     return [row[0] for row in list(g.cursor)]
 
 

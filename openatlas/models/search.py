@@ -25,7 +25,7 @@ def search(data: dict[str, Any]) -> list[Entity]:
             entity = Entity.get_linked_entity_safe_static(
                 row['id'],
                 'P1',
-                True)
+                inverse=True)
             if entity.class_.name not in data['classes']:
                 continue
         else:

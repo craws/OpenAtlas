@@ -106,7 +106,7 @@ with app.test_request_context():
     case_study = Entity.get_by_id(358)
 
     # Remove former data
-    for item in case_study.get_linked_entities('P2', True):
+    for item in case_study.get_linked_entities('P2', inverse=True):
         if item.id == 364:
             continue
         item.delete()

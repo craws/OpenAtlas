@@ -134,8 +134,8 @@ def get_move_form(type_: Entity) -> Any:
     setattr(Form, str(root.id), TreeField(str(root.id)))
     choices = []
     if root.class_.name == 'administrative_unit':
-        for entity in type_.get_linked_entities('P89', True, sort=True):
-            place = entity.get_linked_entity('P53', True)
+        for entity in type_.get_linked_entities('P89', inverse=True, sort=True):
+            place = entity.get_linked_entity('P53', inverse=True)
             if place:
                 choices.append((entity.id, place.name))
     elif root.name in app.config['PROPERTY_TYPES']:
@@ -144,7 +144,7 @@ def get_move_form(type_: Entity) -> Any:
             range_ = Entity.get_by_id(row['range_id'])
             choices.append((row['id'], domain.name + ' - ' + range_.name))
     else:
-        for entity in type_.get_linked_entities('P2', True):
+        for entity in type_.get_linked_entities('P2', inverse=True):
             choices.append((entity.id, entity.name))
     form = Form(obj=type_)
     form.selection.choices = choices

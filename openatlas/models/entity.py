@@ -120,18 +120,20 @@ class Entity:
         return Entity.get_linked_entity_safe_static(
             self.id,
             code,
-            inverse,
-            types)
+            inverse=inverse,
+            types=types)
 
     def get_linked_entities(
             self,
             code: str | list[str],
+            classes: Optional[list[str]] = None,
             inverse: bool = False,
             types: bool = False,
             sort: bool = False) -> list[Entity]:
         return Entity.get_linked_entities_static(
             self.id,
             code,
+            classes,
             inverse=inverse,
             types=types,
             sort=sort)
@@ -683,11 +685,13 @@ class Entity:
     def get_linked_entity_static(
             id_: int,
             code: str,
+            classes: Optional[list[str]] = None,
             inverse: bool = False,
             types: bool = False) -> Optional[Entity]:
         result = Entity.get_linked_entities_static(
             id_,
             code,
+            classes,
             inverse=inverse,
             types=types)
         if len(result) > 1:  # pragma: no cover
@@ -702,13 +706,14 @@ class Entity:
     def get_linked_entities_static(
             id_: int,
             codes: str | list[str],
+            classes: Optional[list[str]] = None,
             inverse: bool = False,
             types: bool = False,
             sort: bool = False) -> list[Entity]:
         codes = codes if isinstance(codes, list) else [codes]
         entities = Entity.get_by_ids(
-            db.get_linked_entities_inverse(id_, codes) if inverse
-            else db.get_linked_entities(id_, codes),
+            db.get_linked_entities_inverse(id_, codes, classes) if inverse
+            else db.get_linked_entities(id_, codes, classes),
             types=types)
         if sort and entities:
             entities.sort(key=lambda x: x.name)
@@ -718,9 +723,15 @@ class Entity:
     def get_linked_entity_safe_static(
             id_: int,
             code: str,
+            classes: Optional[list[str]] = None,
             inverse: bool = False,
             types: bool = False) -> Entity:
-        entity = Entity.get_linked_entity_static(id_, code, inverse, types)
+        entity = Entity.get_linked_entity_static(
+            id_,
+            code,
+            classes,
+            inverse,
+            types)
         if not entity:  # pragma: no cover
             g.logger.log(
                 'error',

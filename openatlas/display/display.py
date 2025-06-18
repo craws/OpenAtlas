@@ -91,7 +91,7 @@ class Display:
                 external=True)
         description_ = self.entity.description
         description_label = ''
-        if self.entity.class_.attributes['description']:
+        if 'description' in self.entity.class_.attributes and description_:
             if 'label' in self.entity.class_.attributes['description']:
                 description_label = \
                     self.entity.class_.attributes['description']['label']

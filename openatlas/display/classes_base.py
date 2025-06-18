@@ -246,10 +246,12 @@ class PlaceBaseDisplay(BaseDisplay):
         entity.location = entity.get_linked_entity_safe('P53', types=True)
         event_ids = []  # Keep track of event ids to prevent event doubles
         for event in \
-                entity.get_linked_entities(['P24', 'P25', 'P108'], True) + \
+                entity.get_linked_entities(
+                    ['P24', 'P25', 'P108'],
+                    inverse=True) + \
                 entity.location.get_linked_entities(
                     ['P7', 'P26', 'P27'],
-                    True):
+                    inverse=True):
             if event.id not in event_ids:
                 self.events.append(event)
                 self.tabs['event'].table.rows.append(
