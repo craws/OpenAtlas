@@ -290,11 +290,6 @@ class SourceDisplay(BaseDisplay):
                 'reference': '',
                 'file': ''}.items():
             self.tabs[name] = Tab(name, entity=entity, tooltip=tooltip)
-        for text in entity.get_linked_entities('P73', types=True):
-            self.tabs['text'].table.rows.append([
-                link(text),
-                next(iter(text.types)).name if text.types else '',
-                text.description])
         for link_ in entity.get_links('P67'):
             range_ = link_.range
             data = get_base_table_data(range_)
@@ -302,7 +297,6 @@ class SourceDisplay(BaseDisplay):
                 remove_link(range_.name, link_, entity, range_.class_.view))
             self.tabs[range_.class_.view].table.rows.append(data)
         # self.add_reference_tables_data()
-        # self.add_note_tab()
 
 
 class SourceTranslationDisplay(BaseDisplay):

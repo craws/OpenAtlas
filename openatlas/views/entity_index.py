@@ -13,7 +13,7 @@ from openatlas.display.util2 import (
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.reference_system import ReferenceSystem
-
+from openatlas.display.table import entity_table
 
 @app.route('/index/<view>')
 @required_group('readonly')
@@ -94,8 +94,7 @@ def get_table(view: str) -> tuple[Table, str]:
                 system.description])
     else:
         classes = 'place' if view == 'place' else g.view_class_mapping[view]
-        entities = Entity.get_by_class(classes, types=True, aliases=True)
-        table.rows = [get_base_table_data(entity) for entity in entities]
+        table = entity_table(view, Entity.get_by_class(classes, types=True, aliases=True))
     return table, file_info
 
 

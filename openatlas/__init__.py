@@ -79,6 +79,7 @@ def before_request() -> Response | None:
     g.properties = CidocProperty.get_all(
         session['language'],
         (request.path.startswith('/overview/model/property')))
+    g.table_headers = get_table_headers()
     g.classes = get_classes()
     g.types = Entity.get_all_types(count_type())
     g.radiocarbon_type = Entity.get_hierarchy('Radiocarbon')
@@ -87,7 +88,6 @@ def before_request() -> Response | None:
     g.reference_systems = ReferenceSystem.get_all()
     g.view_class_mapping = view_class_mapping
     g.class_view_mapping = get_class_view_mapping()
-    g.table_headers = get_table_headers()
     g.writable_paths = [
         app.config['EXPORT_PATH'],
         app.config['RESIZED_IMAGES'],

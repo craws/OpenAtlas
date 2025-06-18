@@ -480,7 +480,7 @@ def get_linked_entities(
             SELECT range_id
             FROM model.link l
             JOIN model.entity e ON l.domain_id = %(id_)s
-                AND e.class_name IN %(classes)s
+                AND e.openatlas_class_name IN %(classes)s
                 AND property_code IN %(codes)s;
             """,
             {'id_': id_, 'classes': tuple (classes), 'codes': tuple(codes)})
@@ -505,7 +505,7 @@ def get_linked_entities_inverse(
             SELECT l.domain_id
             FROM model.link l
             JOIN model.entity e ON l.range_id = %(id_)s
-                AND e.class_name IN %(classes)s
+                AND e.openatlas_class_name IN %(classes)s
                 AND l.property_code IN %(codes)s;
             """,
             {'id_': id_, 'classes': tuple (classes), 'codes': tuple(codes)})

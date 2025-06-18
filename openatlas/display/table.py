@@ -1,10 +1,12 @@
 from typing import Any, Optional
 
-from flask import json, render_template
+from flask import g, json, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 
-from openatlas.display.util2 import uc_first
+from openatlas.display.util import link
+from openatlas.display.util2 import convert_size, uc_first
+from openatlas.models.entity import Entity
 
 # Needed for translations
 _('previous')
@@ -54,3 +56,55 @@ class Table:
             table=self,
             name=name,
             data=json.dumps(data))
+
+
+def entity_table(
+        class_: str,
+        entities: list[Entity],
+        entity: Optional[Entity] = None) -> Table:
+    columns = g.table_headers[class_]
+    table = Table(columns)
+    file_stats = g.file_info
+    for e in entities:
+        data = []
+        for name in columns:
+            html: str | list[str] = 'no table function'
+            match name:
+                # case 'begin' | 'date':
+                #    html = link(e.begin)
+                # case 'delete':
+                #    html = remove_link(e, entity)
+                case 'ext':
+                    html = file_stats[e.id]['ext'] \
+                        if e.id in file_stats else 'N/A'
+                case 'description' | 'content':
+                    html = e.description or ''
+                # case name if name in g.classes[class_].relations:
+                #    html = display_relations(
+                #        e,
+                #        g.classes[class_].relations[name])
+                case 'name':
+                    html = link(e)
+                case 'profile' if entity and entity.image_id:
+                    html = 'Profile' if e.id == entity.image_id else link(
+                        'profile',
+                        url_for('file_profile', id_=e.id, entity_id=entity.id))
+                # case 'related':
+                #    relative = e.get_linked_entity_safe('has relation', True)
+                #    if entity and relative.id == entity.id:
+                #        relative = e.get_linked_entity_safe('has related')
+                #    html = link(relative)
+                # case 'relation type' if entity:
+                #    html = e.types[0].get_name_directed(
+                #        e.get_linked_entity_safe('has relation', True).id
+                #        != entity.id)
+                case 'size':
+                    html = convert_size(file_stats[e.id]['size']) \
+                        if e.id in file_stats else 'N/A'
+                case 'type':
+                    html = e.standard_type.name if e.standard_type else ''
+                # case 'update':
+                #    html = link_update(e, entity)
+            data.append(html)
+        table.rows.append(data)
+    return table

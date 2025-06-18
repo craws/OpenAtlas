@@ -1,4 +1,5 @@
 from typing import Any
+
 from flask_babel import lazy_gettext as _
 
 model: dict[str, Any] = {
@@ -8,13 +9,7 @@ model: dict[str, Any] = {
             'info': {},
             'end': {'label': 'readout', 'required': True},
             'begin': {'label': 'published'}},
-        'relations': {
-            'book': {
-                'label': 'tags',
-                'class': 'type',
-                'property': 'has type',
-                'multiple': True,
-                'inverse': True}},
+        'relations': {},
         'display': {'buttons': ['network']}},
     'activity': {
         'attributes': {},
@@ -79,14 +74,19 @@ model: dict[str, Any] = {
         'attributes': {
             'name': {'required': True},
             'description': {'label': _('content'), 'annotated': True}},
-        'relations': {},
+        'relations': {
+            'text': {
+                'class': 'source_translation',
+                'property': 'P73',
+                'multiple': True}
+        },
         'display': {
             'tabs': {
+                'text': {},
                 'actor': {},
                 'artifact': {},
                 'event': {},
                 'place': {},
-                'text': {},
                 'reference': {},
                 'file': {},
                 'note': {}}}},

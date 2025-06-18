@@ -7,6 +7,7 @@ from flask_login import current_user
 from markupsafe import escape
 
 from openatlas.display.tab import Tab
+from openatlas.display.table import entity_table
 from openatlas.display.util import (
     bookmark_toggle, button, description, display_annotation_text_links,
     edit_link, format_entity_date, get_base_table_data, get_system_data,
@@ -36,7 +37,6 @@ class Display:
         self.problematic_type = self.entity.check_too_many_single_type_links()
         self.entity.image_id = entity.get_profile_image_id()
         self.add_tabs()
-        self.add_note_tab()
         if 'file' in self.tabs and show_table_icons():
             self.add_file_tab_thumbnails()
         self.add_crumbs()
@@ -116,26 +116,29 @@ class Display:
         self.tabs = {'info': Tab('info')}
         if 'tabs' not in self.entity.class_.display:
             return
-        return
         for name, tab in self.entity.class_.display['tabs'].items():
-            relation = self.entity.class_.relations[name]
-            entities = []
-            for e in self.entity.get_linked_entities(
-                    relation['property'],
-                    relation['class'],
-                    relation['inverse']):
-                entities.append(e)
-                if relation['property'] == 'has file':
-                    self.entity.image = self.entity.image or e
-            # self.tabs[name] = Tab(
-            #    name,
-            #    table=entity_table(
-            #        relation['class'][0]
-            #        if isinstance(relation['class'], list)
-            #        else relation['class'],
-            #        entities,
-            #        self.entity,
-            #        columns=tab['columns'] if 'columns' in tab else None))
+            if name == 'note':
+                self.add_note_tab()
+                continue
+            if name in self.entity.class_.relations:
+                relation = self.entity.class_.relations[name]
+                entities = []
+                for e in self.entity.get_linked_entities(
+                        relation['property'],
+                        relation['class'],
+                        relation['inverse'],
+                        types=True):
+                    entities.append(e)
+                    if relation['property'] == 'has file':
+                        self.entity.image_id = self.entity.image_id or e.id
+                self.tabs[name] = Tab(
+                   name,
+                   table=entity_table(
+                       relation['class'][0]
+                       if isinstance(relation['class'], list)
+                       else relation['class'],
+                       entities,
+                       self.entity))
 
     def add_note_tab(self) -> None:
         self.tabs['note'] = Tab(

@@ -115,7 +115,8 @@ def get_table_headers() -> dict[str, list[str]]:
         'reference_system': [
             'name', 'count', 'website URL', 'resolver URL', 'example ID',
             'default precision', 'description'],
-        'source': ['name', 'type', 'description'],
+        'source': ['name', 'type', 'content'],
+        'source_translation': ['name', 'type', 'content'],
         'subs': ['name', 'count', 'info'],
         'text': ['text', 'type', 'content'],
         'type': ['name', 'description']}
