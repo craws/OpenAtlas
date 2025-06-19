@@ -61,8 +61,10 @@ class Table:
 def entity_table(
         class_: str,
         entities: list[Entity],
-        entity: Optional[Entity] = None) -> Table:
-    columns = g.table_headers[class_]
+        entity: Optional[Entity] = None,
+        additional_columns: Optional[list[str]] = None) -> Table:
+    columns = g.table_headers[class_] + (
+        additional_columns if additional_columns else [])
     table = Table(columns)
     file_stats = g.file_info
     for e in entities:
@@ -70,15 +72,19 @@ def entity_table(
         for name in columns:
             html: str | list[str] = 'no table function'
             match name:
-                # case 'begin' | 'date':
-                #    html = link(e.begin)
+                case 'begin':
+                    html = e.first
+                case 'class':
+                    html = e.class_.label
                 # case 'delete':
                 #    html = remove_link(e, entity)
+                case 'description' | 'content':
+                    html = e.description or ''
+                case 'end':
+                    html = e.last
                 case 'ext':
                     html = file_stats[e.id]['ext'] \
                         if e.id in file_stats else 'N/A'
-                case 'description' | 'content':
-                    html = e.description or ''
                 # case name if name in g.classes[class_].relations:
                 #    html = display_relations(
                 #        e,
@@ -89,6 +95,8 @@ def entity_table(
                     html = 'Profile' if e.id == entity.image_id else link(
                         'profile',
                         url_for('file_profile', id_=e.id, entity_id=entity.id))
+                case 'remove':
+                    html = 'Todo'
                 # case 'related':
                 #    relative = e.get_linked_entity_safe('has relation', True)
                 #    if entity and relative.id == entity.id:

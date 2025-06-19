@@ -130,6 +130,14 @@ class Entity:
             inverse: bool = False,
             types: bool = False,
             sort: bool = False) -> list[Entity]:
+        print('wtf')
+        print(len(Entity.get_linked_entities_static(
+            self.id,
+            code,
+            classes,
+            inverse=inverse,
+            types=types,
+            sort=sort)))
         return Entity.get_linked_entities_static(
             self.id,
             code,

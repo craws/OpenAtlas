@@ -2,6 +2,20 @@ from typing import Any
 
 from flask_babel import lazy_gettext as _
 
+view_class_mapping = {
+    'actor': ['person', 'group'],
+    'event': [
+        'activity', 'acquisition', 'creation', 'event', 'modification', 'move',
+        'production'],
+    'file': ['file'],
+    'artifact': ['artifact', 'human_remains'],
+    'place': ['feature', 'place', 'stratigraphic_unit'],
+    'reference': ['bibliography', 'edition', 'external_reference'],
+    'reference_system': ['reference_system'],
+    'source': ['source'],
+    'type': ['administrative_unit', 'type'],
+    'source_translation': ['source_translation']}
+
 model: dict[str, Any] = {
     'acquisition': {
         'attributes': {
@@ -78,15 +92,39 @@ model: dict[str, Any] = {
             'text': {
                 'class': 'source_translation',
                 'property': 'P73',
-                'multiple': True}
+                'multiple': True},
+            'actor': {
+                'class': view_class_mapping['actor'],
+                'property': 'P67',
+                'multiple': True},
+            'artifact': {
+                'class': view_class_mapping['artifact'],
+                'property': 'P67',
+                'multiple': True},
+            'event': {
+                'class': view_class_mapping['event'],
+                'property': 'P67',
+                'multiple': True},
+            'place': {
+                'class': view_class_mapping['place'],
+                'property': 'P67',
+                'multiple': True},
         },
         'display': {
             'tabs': {
                 'text': {},
-                'actor': {},
-                'artifact': {},
-                'event': {},
-                'place': {},
+                'actor': {
+                    'additional_columns': ['remove'],
+                    'tooltip': _('mentioned in the source')},
+                'artifact': {
+                    'additional_columns': ['remove'],
+                    'tooltip': _('mentioned in the source')},
+                'event': {
+                    'additional_columns': ['remove'],
+                    'tooltip': _('mentioned in the source')},
+                'place': {
+                    'additional_columns': ['remove'],
+                    'tooltip': _('mentioned in the source')},
                 'reference': {},
                 'file': {},
                 'note': {}}}},

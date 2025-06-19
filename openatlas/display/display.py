@@ -121,7 +121,9 @@ class Display:
                 self.add_note_tab()
                 continue
             if name in self.entity.class_.relations:
+                print(name)
                 relation = self.entity.class_.relations[name]
+                print(relation)
                 entities = []
                 for e in self.entity.get_linked_entities(
                         relation['property'],
@@ -131,14 +133,18 @@ class Display:
                     entities.append(e)
                     if relation['property'] == 'has file':
                         self.entity.image_id = self.entity.image_id or e.id
+                print(len(entities))
                 self.tabs[name] = Tab(
-                   name,
-                   table=entity_table(
-                       relation['class'][0]
-                       if isinstance(relation['class'], list)
-                       else relation['class'],
-                       entities,
-                       self.entity))
+                    name,
+                    table=entity_table(
+                        relation['class'][0]
+                        if isinstance(relation['class'], list)
+                        else relation['class'],
+                        entities,
+                        self.entity,
+                        tab['additional_columns']
+                        if 'additional_columns' in tab else None),
+                    tooltip=tab['tooltip'] if 'tooltip' in tab else None)
 
     def add_note_tab(self) -> None:
         self.tabs['note'] = Tab(

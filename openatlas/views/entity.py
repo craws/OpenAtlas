@@ -45,7 +45,7 @@ def view(id_: int) -> str | Response:
     display = Display(entity)
     return render_template(
         'tabs.html',
-        tabs=Display(entity).tabs,
+        tabs=display.tabs,
         entity=entity,
         gis_data=display.gis_data,
         crumbs=display.crumbs)

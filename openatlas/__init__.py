@@ -10,6 +10,7 @@ from flask_wtf.csrf import CSRFProtect
 from psycopg2 import extras
 from werkzeug.wrappers import Response
 
+from config.model import view_class_mapping
 from openatlas.api.resources.error import AccessDeniedError
 from openatlas.database.checks import check_type_count_needed
 from openatlas.database.connect import close_connection, open_connection
@@ -50,7 +51,6 @@ def get_locale() -> str:
 
 @app.before_request
 def before_request() -> Response | None:
-    from openatlas.models.openatlas_class import view_class_mapping
     from openatlas.models.cidoc_property import CidocProperty
     from openatlas.models.cidoc_class import CidocClass
     from openatlas.models.entity import Entity
