@@ -34,7 +34,7 @@ class ReferenceTest(TestBaseCase):
 
         with app.test_request_context():
             app.preprocess_request()
-            link_id = batman.get_links('P67', True)[0].id
+            link_id = batman.get_links('P67', inverse=True)[0].id
 
         rv = c.post(
             url_for('link_update', id_=link_id, origin_id=reference_id),

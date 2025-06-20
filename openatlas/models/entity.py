@@ -130,14 +130,6 @@ class Entity:
             inverse: bool = False,
             types: bool = False,
             sort: bool = False) -> list[Entity]:
-        print('wtf')
-        print(len(Entity.get_linked_entities_static(
-            self.id,
-            code,
-            classes,
-            inverse=inverse,
-            types=types,
-            sort=sort)))
         return Entity.get_linked_entities_static(
             self.id,
             code,
@@ -212,8 +204,9 @@ class Entity:
     def get_links(
             self,
             codes: str | list[str],
+            classes: Optional[list[str]] = None,
             inverse: bool = False) -> list[Link]:
-        return Entity.get_links_of_entities(self.id, codes, inverse)
+        return Entity.get_links_of_entities(self.id, codes, classes, inverse)
 
     def delete(self) -> None:
         Entity.delete_(self.id)
@@ -670,11 +663,12 @@ class Entity:
     def get_links_of_entities(
             entity_ids: int | list[int],
             codes: str | list[str] | None = None,
+            classes: Optional[list[str]] = None,
             inverse: bool = False) -> list[Link]:
         result = set()
         if codes:
             codes = codes if isinstance(codes, list) else [str(codes)]
-        rows = db.get_links_of_entities(entity_ids, codes, inverse)
+        rows = db.get_links_of_entities(entity_ids, codes, classes, inverse)
         for row in rows:
             result.add(row['domain_id'])
             result.add(row['range_id'])

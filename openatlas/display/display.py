@@ -121,30 +121,38 @@ class Display:
                 self.add_note_tab()
                 continue
             if name in self.entity.class_.relations:
-                print(name)
                 relation = self.entity.class_.relations[name]
-                print(relation)
-                entities = []
-                for e in self.entity.get_linked_entities(
-                        relation['property'],
-                        relation['class'],
-                        relation['inverse'],
-                        types=True):
-                    entities.append(e)
-                    if relation['property'] == 'has file':
-                        self.entity.image_id = self.entity.image_id or e.id
-                print(len(entities))
+                items = []
+                if tab and {'remove', 'update'}.intersection(
+                        set(tab['additional_columns'])):
+                    for item in self.entity.get_links(
+                            relation['property'],
+                            relation['class'],
+                            relation['inverse']):
+                        items.append(item)
+                else:
+                    for item in self.entity.get_linked_entities(
+                            relation['property'],
+                            relation['class'],
+                            relation['inverse'],
+                            types=True):
+                        items.append(item)
+                        if relation['property'] == 'has file':
+                            self.entity.image_id = \
+                                self.entity.image_id or item.id
                 self.tabs[name] = Tab(
                     name,
                     table=entity_table(
                         relation['class'][0]
                         if isinstance(relation['class'], list)
                         else relation['class'],
-                        entities,
+                        items,
                         self.entity,
-                        tab['additional_columns']
-                        if 'additional_columns' in tab else None),
-                    tooltip=tab['tooltip'] if 'tooltip' in tab else None)
+                        tab['additional_columns'] if tab else [],
+                        relation['inverse']),
+                    entity=self.entity,
+                    tooltip=tab['tooltip'] if tab and 'tooltip' in tab
+                    else None)
 
     def add_note_tab(self) -> None:
         self.tabs['note'] = Tab(

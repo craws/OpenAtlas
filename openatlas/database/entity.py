@@ -422,6 +422,7 @@ def get_linked_entities_recursive(
 def get_links_of_entities(
         ids: int | list[int],
         codes: str | list[str] | None,
+        classes: Optional[list[str]] = None,
         inverse: bool = False) -> list[dict[str, Any]]:
     sql = f"""
         SELECT
@@ -447,6 +448,8 @@ def get_links_of_entities(
     if codes:
         codes = codes if isinstance(codes, list) else [codes]
         sql += ' AND l.property_code IN %(codes)s '
+    if classes:
+        sql += ' AND e.openatlas_class_name IN %(classes)s '
     sql += f"""
         WHERE l.{'range' if inverse else 'domain'}_id IN %(entities)s
         GROUP BY l.id, e.name
@@ -454,7 +457,8 @@ def get_links_of_entities(
     g.cursor.execute(
         sql, {
             'entities': tuple(ids if isinstance(ids, list) else [ids]),
-            'codes': tuple(codes) if codes else ''})
+            'codes': tuple(codes) if codes else '',
+            'classes': tuple(classes)})
     return list(g.cursor)
 
 
@@ -477,13 +481,14 @@ def get_linked_entities(
     if classes:
         g.cursor.execute(
             """
-            SELECT range_id
+            SELECT e.id
             FROM model.link l
-            JOIN model.entity e ON l.domain_id = %(id_)s
+            JOIN model.entity e ON l.range_id = e.id
+                AND l.domain_id = %(id_)s
                 AND e.openatlas_class_name IN %(classes)s
-                AND property_code IN %(codes)s;
+                AND l.property_code IN %(codes)s;
             """,
-            {'id_': id_, 'classes': tuple (classes), 'codes': tuple(codes)})
+            {'id_': id_, 'classes': tuple(classes), 'codes': tuple(codes)})
     else:
         g.cursor.execute(
             """
@@ -504,11 +509,12 @@ def get_linked_entities_inverse(
             """
             SELECT l.domain_id
             FROM model.link l
-            JOIN model.entity e ON l.range_id = %(id_)s
+            JOIN model.entity e ON l.domain_id = e.id
+                AND l.range_id = %(id_)s
                 AND e.openatlas_class_name IN %(classes)s
                 AND l.property_code IN %(codes)s;
             """,
-            {'id_': id_, 'classes': tuple (classes), 'codes': tuple(codes)})
+            {'id_': id_, 'classes': tuple(classes), 'codes': tuple(codes)})
     else:
         g.cursor.execute(
             """

@@ -8,6 +8,7 @@ from flask_babel import lazy_gettext as _
 from config.model import model, view_class_mapping
 from openatlas.database import openatlas_class as db
 
+
 class OpenatlasClass:
     # Needed class label translations
     _('acquisition')
@@ -155,6 +156,8 @@ def get_model(class_name: str) -> dict[str, Any]:
     data['display'] = {} if 'display' not in data else data['display']
     data['display']['buttons'] = {} if 'buttons' not in data['display'] \
         else data['display']['buttons']
+    data['display']['additional_columns'] = [] if 'additional_columns' \
+        not in data['display'] else data['display']['additional_columns']
     data['relations'] = {} if 'relations' not in data else data[
         'relations']
     for name, relation in data['relations'].items():

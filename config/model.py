@@ -109,7 +109,10 @@ model: dict[str, Any] = {
                 'class': view_class_mapping['place'],
                 'property': 'P67',
                 'multiple': True},
-        },
+            'reference': {
+                'class': view_class_mapping['reference'],
+                'property': 'P67',
+                'inverse': True}},
         'display': {
             'tabs': {
                 'text': {},
@@ -125,7 +128,8 @@ model: dict[str, Any] = {
                 'place': {
                     'additional_columns': ['remove'],
                     'tooltip': _('mentioned in the source')},
-                'reference': {},
+                'reference': {
+                    'additional_columns': ['page', 'remove', 'update']},
                 'file': {},
                 'note': {}}}},
     'source_translation': {

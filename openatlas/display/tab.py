@@ -34,52 +34,10 @@ class Tab:
         self.entity = entity
         self.form = form
         self.table = table or Table()
-        self.set_table_headers(name, entity)
         self.buttons: list[str] = buttons or [manual(f'entity/{name}')]
         self.tooltip = uc_first(tooltip) if tooltip else ''
         if is_authorized('contributor'):
             self.set_buttons(name, entity)
-
-    def set_table_headers(
-            self,
-            name: str,
-            entity: Optional[Entity] = None) -> None:
-        view = entity.class_.view if entity else None
-        if entity and not self.table.header:
-            self.table.header = g.table_headers[name]
-        if name == 'reference' or entity and entity.class_.view == 'reference':
-            self.table.header = self.table.header + ['page']
-        match name:
-            case 'actor' if view == 'place':
-                self.table.header = [
-                    'actor',
-                    'property',
-                    'class',
-                    'first',
-                    'last',
-                    'description']
-            case 'actor' if view == 'event':
-                self.table.header = [
-                    'actor',
-                    'class',
-                    'involvement',
-                    'first',
-                    'last',
-                    'description']
-            case 'event' if view == 'actor':
-                self.table.header = [
-                    'event',
-                    'class',
-                    'involvement',
-                    'first',
-                    'last',
-                    'description']
-            case 'file' if view != 'reference':
-                self.table.header += [_('main image')]
-            case 'subs':
-                self.table.header = [_('name'), _('count'), _('info')]
-                if view == 'event':
-                    self.table.header = g.table_headers['event']
 
     def set_buttons(
             self,

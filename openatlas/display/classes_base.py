@@ -70,8 +70,9 @@ class ActorDisplay(BaseDisplay):
         if 'member' in self.tabs:
             self.tabs['member'].label = uc_first(_('member'))
         # self.add_reference_tables_data()
-        self.event_links = \
-            entity.get_links(['P11', 'P14', 'P22', 'P23', 'P25'], True)
+        self.event_links = entity.get_links(
+            ['P11', 'P14', 'P22', 'P23', 'P25'],
+            inverse=True)
         for link_ in self.event_links:
             event = link_.domain
             link_.object_ = None  # Needed for first/last appearance
@@ -96,7 +97,8 @@ class ActorDisplay(BaseDisplay):
                 edit_link(
                     url_for('link_update', id_=link_.id, origin_id=entity.id)),
                 remove_link(link_.domain.name, link_, entity, 'event')])
-        for link_ in entity.get_links('OA7') + entity.get_links('OA7', True):
+        for link_ in entity.get_links('OA7') + \
+                entity.get_links('OA7', inverse=True):
             related = link_.range \
                 if entity.id == link_.domain.id else link_.domain
             self.tabs['relation'].table.rows.append([
@@ -110,7 +112,7 @@ class ActorDisplay(BaseDisplay):
                 edit_link(
                     url_for('link_update', id_=link_.id, origin_id=entity.id)),
                 remove_link(related.name, link_, entity, 'relation')])
-        for link_ in entity.get_links('P107', True):
+        for link_ in entity.get_links('P107', inverse=True):
             self.tabs['member_of'].table.rows.append([
                 link(link_.domain),
                 link(link_.type),
@@ -120,7 +122,7 @@ class ActorDisplay(BaseDisplay):
                 edit_link(
                     url_for('link_update', id_=link_.id, origin_id=entity.id)),
                 remove_link(link_.domain.name, link_, entity, 'member-of')])
-        for link_ in entity.get_links('P52', True):
+        for link_ in entity.get_links('P52', inverse=True):
             self.tabs['artifact'].table.rows.append([
                 link(link_.domain),
                 link_.domain.class_.label,

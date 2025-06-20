@@ -101,7 +101,7 @@ class FileDisplay(BaseDisplay):
             data.append(
                 remove_link(range_.name, link_, entity, range_.class_.view))
             self.tabs[range_.class_.view].table.rows.append(data)
-        for link_ in entity.get_links(['P67', 'P94'], True):
+        for link_ in entity.get_links(['P67', 'P94'], inverse=True):
             data = get_base_table_data(link_.domain)
             data.append(link_.description)
             data.append(edit_link(
@@ -193,7 +193,7 @@ class PlaceDisplay(PlaceBaseDisplay):
         if self.entity.location:
             for link_ in self.entity.location.get_links(
                     ['P74', 'OA8', 'OA9'],
-                    True):
+                    inverse=True):
                 actor = Entity.get_by_id(link_.domain.id)
                 self.tabs['actor'].table.rows.append([
                     link(actor),
@@ -282,21 +282,9 @@ class SourceDisplay(BaseDisplay):
     def add_tabs(self) -> None:
         entity = self.entity
         for name, tooltip in {
-                'actor': _('mentioned in the source'),
-                'artifact': _('mentioned in the source'),
-                'event': _('mentioned in the source'),
-                'place': _('mentioned in the source'),
-                'text': '',
                 'reference': '',
                 'file': ''}.items():
             self.tabs[name] = Tab(name, entity=entity, tooltip=tooltip)
-        for link_ in entity.get_links('P67'):
-            range_ = link_.range
-            data = get_base_table_data(range_)
-            data.append(
-                remove_link(range_.name, link_, entity, range_.class_.view))
-            self.tabs[range_.class_.view].table.rows.append(data)
-        # self.add_reference_tables_data()
 
 
 class SourceTranslationDisplay(BaseDisplay):

@@ -4,9 +4,9 @@ from flask import g, json, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 
-from openatlas.display.util import link
+from openatlas.display.util import edit_link, link, remove_link
 from openatlas.display.util2 import convert_size, uc_first
-from openatlas.models.entity import Entity
+from openatlas.models.entity import Entity, Link
 
 # Needed for translations
 _('previous')
@@ -38,7 +38,8 @@ class Table:
             'data': self.rows,
             'stateSave': 'true',
             'columns': [{
-                    'title': uc_first(_(name)) if name else '',
+                    'title': uc_first(_(name)) if name and
+                    name not in ['update', 'remove'] else '',
                     'className': 'dt-body-right'
                     if name in ['count', 'size'] else ''}
                 for name in self.header] + [
@@ -60,14 +61,18 @@ class Table:
 
 def entity_table(
         class_: str,
-        entities: list[Entity],
+        items: list[Entity] | list[Link],
         entity: Optional[Entity] = None,
-        additional_columns: Optional[list[str]] = None) -> Table:
-    columns = g.table_headers[class_] + (
-        additional_columns if additional_columns else [])
+        additional_columns: Optional[list[str]] = None,
+        inverse: Optional[bool] = False) -> Table:
+    columns = (g.table_headers[g.classes[class_].view]) + additional_columns
     table = Table(columns)
     file_stats = g.file_info
-    for e in entities:
+    for item in items:
+        if isinstance(item, Link):
+            e = item.domain if inverse else item.range
+        else:
+            e = item
         data = []
         for name in columns:
             html: str | list[str] = 'no table function'
@@ -91,12 +96,14 @@ def entity_table(
                 #        g.classes[class_].relations[name])
                 case 'name':
                     html = link(e)
+                case 'page':
+                    html = item.description
                 case 'profile' if entity and entity.image_id:
                     html = 'Profile' if e.id == entity.image_id else link(
                         'profile',
                         url_for('file_profile', id_=e.id, entity_id=entity.id))
                 case 'remove':
-                    html = 'Todo'
+                    html = remove_link(e.name, item, entity, e.class_.view)
                 # case 'related':
                 #    relative = e.get_linked_entity_safe('has relation', True)
                 #    if entity and relative.id == entity.id:
@@ -111,8 +118,12 @@ def entity_table(
                         if e.id in file_stats else 'N/A'
                 case 'type':
                     html = e.standard_type.name if e.standard_type else ''
-                # case 'update':
-                #    html = link_update(e, entity)
+                case 'update':
+                    html = edit_link(
+                        url_for(
+                            'link_update',
+                            id_=item.id,
+                            origin_id=entity.id))
             data.append(html)
         table.rows.append(data)
     return table
