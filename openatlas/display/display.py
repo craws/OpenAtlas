@@ -130,6 +130,13 @@ class Display:
                             relation['class'],
                             relation['inverse']):
                         items.append(item)
+                        if relation['property'] == 'P67' \
+                                and relation['class'] == ['file'] \
+                                and not self.entity.image_id \
+                                and item.domain.get_file_ext() in  \
+                                    g.display_file_ext:
+                            self.entity.image_id = \
+                                self.entity.image_id or item.domain.id
                 else:
                     for item in self.entity.get_linked_entities(
                             relation['property'],
@@ -137,9 +144,7 @@ class Display:
                             relation['inverse'],
                             types=True):
                         items.append(item)
-                        if relation['property'] == 'has file':
-                            self.entity.image_id = \
-                                self.entity.image_id or item.id
+
                 self.tabs[name] = Tab(
                     name,
                     table=entity_table(

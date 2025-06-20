@@ -112,7 +112,13 @@ model: dict[str, Any] = {
             'reference': {
                 'class': view_class_mapping['reference'],
                 'property': 'P67',
-                'inverse': True}},
+                'inverse': True,
+                'multiple': True},
+            'file': {
+                'class': view_class_mapping['file'],
+                'property': 'P67',
+                'inverse': True,
+                'multiple': True}},
         'display': {
             'tabs': {
                 'text': {},
@@ -130,7 +136,7 @@ model: dict[str, Any] = {
                     'tooltip': _('mentioned in the source')},
                 'reference': {
                     'additional_columns': ['page', 'remove', 'update']},
-                'file': {},
+                'file': {'additional_columns': ['main image', 'remove']},
                 'note': {}}}},
     'source_translation': {
         'attributes': {}},

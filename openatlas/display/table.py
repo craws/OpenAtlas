@@ -4,8 +4,9 @@ from flask import g, json, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 
-from openatlas.display.util import edit_link, link, remove_link
-from openatlas.display.util2 import convert_size, uc_first
+from openatlas.display.util import (
+    edit_link, link, profile_image_table_link, remove_link)
+from openatlas.display.util2 import uc_first
 from openatlas.models.entity import Entity, Link
 
 # Needed for translations
@@ -38,13 +39,14 @@ class Table:
             'data': self.rows,
             'stateSave': 'true',
             'columns': [{
-                    'title': uc_first(_(name)) if name and
-                    name not in ['update', 'remove'] else '',
-                    'className': 'dt-body-right'
-                    if name in ['count', 'size'] else ''}
-                for name in self.header] + [
-                {'title': '', 'className': ''}
-                for _item in range(len(self.rows[0]) - len(self.header))],
+                'title':
+                    uc_first(_(name)) if name and name
+                    not in ['update', 'remove'] else '',
+                'className':
+                    'dt-body-right' if name in ['count', 'size'] else ''}
+                    for name in self.header] + [
+                    {'title': '', 'className': ''} for _item in
+                    range(len(self.rows[0]) - len(self.header))],
             'paging': self.paging,
             'pageLength': current_user.settings['table_rows'],
             'autoWidth': 'false'}
@@ -65,9 +67,9 @@ def entity_table(
         entity: Optional[Entity] = None,
         additional_columns: Optional[list[str]] = None,
         inverse: Optional[bool] = False) -> Table:
-    columns = (g.table_headers[g.classes[class_].view]) + additional_columns
+    columns = g.table_headers[g.classes[class_].view] + (
+        additional_columns if additional_columns else [])
     table = Table(columns)
-    file_stats = g.file_info
     for item in items:
         if isinstance(item, Link):
             e = item.domain if inverse else item.range
@@ -81,15 +83,19 @@ def entity_table(
                     html = e.first
                 case 'class':
                     html = e.class_.label
-                # case 'delete':
-                #    html = remove_link(e, entity)
+                case 'creator':
+                    html = g.file_info[e.id]['creator']
                 case 'description' | 'content':
                     html = e.description or ''
                 case 'end':
                     html = e.last
-                case 'ext':
-                    html = file_stats[e.id]['ext'] \
-                        if e.id in file_stats else 'N/A'
+                case 'extension':
+                    html = e.get_file_ext()
+                case 'license holder':
+                    html = g.file_info[e.id]['license_holder']
+                case 'main image':
+                    html = \
+                        profile_image_table_link(entity, e, e.get_file_ext())
                 # case name if name in g.classes[class_].relations:
                 #    html = display_relations(
                 #        e,
@@ -102,6 +108,8 @@ def entity_table(
                     html = 'Profile' if e.id == entity.image_id else link(
                         'profile',
                         url_for('file_profile', id_=e.id, entity_id=entity.id))
+                case 'public':
+                    html = _('yes') if g.file_info[e.id]['public'] else None
                 case 'remove':
                     html = remove_link(e.name, item, entity, e.class_.view)
                 # case 'related':
@@ -114,9 +122,8 @@ def entity_table(
                 #        e.get_linked_entity_safe('has relation', True).id
                 #        != entity.id)
                 case 'size':
-                    html = convert_size(file_stats[e.id]['size']) \
-                        if e.id in file_stats else 'N/A'
-                case 'type':
+                    html = e.get_file_size()
+                case 'type' | 'license':
                     html = e.standard_type.name if e.standard_type else ''
                 case 'update':
                     html = edit_link(

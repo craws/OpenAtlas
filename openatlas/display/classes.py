@@ -279,13 +279,6 @@ class SourceDisplay(BaseDisplay):
             link(artifact) for artifact in
             self.entity.get_linked_entities('P128', inverse=True)]
 
-    def add_tabs(self) -> None:
-        entity = self.entity
-        for name, tooltip in {
-                'reference': '',
-                'file': ''}.items():
-            self.tabs[name] = Tab(name, entity=entity, tooltip=tooltip)
-
 
 class SourceTranslationDisplay(BaseDisplay):
 
