@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Optional, Union
+from typing import Any, Optional
 from urllib.parse import urlparse
 
 from flask import g
@@ -20,7 +20,7 @@ def is_valid_url(url: str) -> bool:
     except Exception:
         return False
 
-def create_uri(value: Union[str, list[str]]) -> Union[URIRef, list[URIRef]]:
+def create_uri(value: str | list[str]) -> URIRef | list[URIRef]:
     if isinstance(value, list):
         return [create_uri(v) for v in value]
     if is_valid_url(value):
@@ -28,9 +28,11 @@ def create_uri(value: Union[str, list[str]]) -> Union[URIRef, list[URIRef]]:
     safe_name = value.strip().replace(" ", "_").replace(',', '')
     return URIRef(f"https://id.acdh.oeaw.ac.at/{safe_name}")
 
-def ensure_person(graph: Graph, name_or_names: Union[str, list[str]]):
-    names = name_or_names if isinstance(name_or_names, list) else [name_or_names]
+def ensure_person(graph: Graph, names: str | list[str]) -> None:
+    names = names if isinstance(names, list) else [names]
     for name in names:
+        if is_valid_url(name):
+            continue
         uri = create_uri(name)
         if str(uri) not in PERSONS_EMITTED:
             graph.add((uri, RDF.type, ACDH.Person))

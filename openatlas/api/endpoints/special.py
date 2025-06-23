@@ -1,6 +1,7 @@
 import json
 from typing import Any
 
+from fiona.crs import defaultdict
 from flask import Response, g, jsonify
 from flask_restful import Resource, marshal
 from rdflib import Graph
@@ -141,27 +142,38 @@ class GetFilesForArche(Resource):
         # external_metadata should be coming from a external script filled out
         #   by the ARCHE team
         external_metadata = {
-            'topCollection': 'test_project',
+            'topCollection': 'bitem',
             'language': 'en',
             'depositor': 'https://orcid.org/0000-0001-7608-7446',
             'acceptedDate': "2024-01-01",
-            'curator': 'https://orcid.org/0000-0002-1218-9635',
-            'principalInvestigator': ['Jonny Doy', 'Holy Guacamole'],
+            'curator': [
+                'https://orcid.org/0000-0002-1218-9635',
+                'https://orcid.org/0000-0001-7608-7446'],
+            'principalInvestigator': ['Viola Winkler', 'Roland Filzwieser'],
             'relatedDiscipline':
                 'https://vocabs.acdh.oeaw.ac.at/oefosdisciplines/601003'
         }
         license_urls = {}
         arche_metadata_list = []
+        missing = defaultdict(list)
+        checking = set()
         for entity in entities:
             if not g.files.get(entity.id):
-                continue
+                missing['no_file'].append(entity)
+                checking.add(entity.id)
             if not entity.public:
-                continue
-            if not entity.creator:
-                continue
-            if not entity.license_holder:
-                continue
+                missing['not_public'].append(entity)
+                checking.add(entity.id)
             if not entity.standard_type:
+                missing['no_license'].append(entity)
+                checking.add(entity.id)
+            if not entity.creator:
+                missing['no_creator'].append(entity)
+                checking.add(entity.id)
+            if not entity.license_holder:
+                missing['no_license_holder'].append(entity)
+                checking.add(entity.id)
+            if entity.id in checking:
                 continue
             if entity.standard_type.id not in license_urls:
                 for link_ in (
@@ -183,10 +195,10 @@ class GetFilesForArche(Resource):
         for metadata_obj in arche_metadata_list:
             add_arche_file_metadata_to_graph(graph, metadata_obj)
         # output_file_name = "arche_output.ttl"
-        graph= graph.serialize(format="turtle", encoding="utf-8")
+        graph = graph.serialize(format="turtle", encoding="utf-8")
         # file_paths = {g.files.get(entity.id) for entity in entities}
+        print(len(checking))
+        print(missing)
         return Response(
-                graph,
-                mimetype='text/turtle')
-
-
+            graph,
+            mimetype='text/turtle')
