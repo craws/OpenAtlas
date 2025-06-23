@@ -10,14 +10,13 @@ from rdflib.namespace import RDF, XSD
 from openatlas.models.entity import Entity
 
 ACDH = Namespace("https://vocabs.acdh.oeaw.ac.at/schema#")
-
 PERSONS_EMITTED = set()
 
 def is_valid_url(url: str) -> bool:
     try:
         parsed = urlparse(url)
         return parsed.scheme in ("http", "https") and bool(parsed.netloc)
-    except Exception:
+    except ValueError:
         return False
 
 def create_uri(value: str | list[str]) -> URIRef | list[URIRef]:
@@ -25,13 +24,13 @@ def create_uri(value: str | list[str]) -> URIRef | list[URIRef]:
         return [create_uri(v) for v in value]
     if is_valid_url(value):
         return URIRef(value)
-    safe_name = value.strip().replace(" ", "_").replace(',', '')
+    safe_name = value.strip().replace(" ", "_").replace(",", "").replace("/", "_").lower()
     return URIRef(f"https://id.acdh.oeaw.ac.at/{safe_name}")
 
 def ensure_person(graph: Graph, names: str | list[str]) -> None:
     names = names if isinstance(names, list) else [names]
     for name in names:
-        if is_valid_url(name):
+        if not name or is_valid_url(name):
             continue
         uri = create_uri(name)
         if str(uri) not in PERSONS_EMITTED:
@@ -66,7 +65,7 @@ class ArcheFileMetadata:
     spatial_coverage: Optional[str] = None
     submission_date: Optional[str] = None
     transfer_date: Optional[str] = None
-    binary_size: Optional[str] = None
+    binary_size: Optional[int] = None
     created_start_date: Optional[str] = None
     created_end_date: Optional[str] = None
     creator: Optional[str] = None
