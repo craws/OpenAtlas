@@ -1,8 +1,11 @@
 import json
+import tempfile
+import zipfile
+from io import BytesIO
 from typing import Any
 
 from fiona.crs import defaultdict
-from flask import Response, g, jsonify
+from flask import Response, g, jsonify, url_for
 from flask_restful import Resource, marshal
 from rdflib import Graph
 
@@ -27,6 +30,7 @@ from openatlas.api.resources.templates import geometries_template, \
     network_visualisation_template
 from openatlas.api.resources.util import get_geometries
 from openatlas.database.entity import get_linked_entities_recursive
+from openatlas.models.entity import Entity
 from openatlas.models.export import current_date_for_filename
 
 
@@ -139,9 +143,9 @@ class GetFilesForArche(Resource):
         entities = ApiEntity.get_by_system_classes(['file'])
         if parser['type_id']:
             entities = Endpoint(entities, parser).filter_by_type()
-        # external_metadata should be coming from a external script filled out
+        # ext_metadata should be coming from a external script filled out
         #   by the ARCHE team
-        external_metadata = {
+        ext_metadata = {
             'topCollection': 'bitem',
             'language': 'en',
             'depositor': 'https://orcid.org/0000-0001-7608-7446',
@@ -155,23 +159,24 @@ class GetFilesForArche(Resource):
         }
         license_urls = {}
         arche_metadata_list = []
-        missing = defaultdict(list)
+        missing = defaultdict(set)
         checking = set()
+        files_path = set()
         for entity in entities:
             if not g.files.get(entity.id):
-                missing['no_file'].append(entity)
+                missing['No files'].add((entity.id, entity.name))
                 checking.add(entity.id)
             if not entity.public:
-                missing['not_public'].append(entity)
+                missing['Not public'].add((entity.id, entity.name))
                 checking.add(entity.id)
             if not entity.standard_type:
-                missing['no_license'].append(entity)
+                missing['No license'].add((entity.id, entity.name))
                 checking.add(entity.id)
             if not entity.creator:
-                missing['no_creator'].append(entity)
+                missing['No creator'].add((entity.id, entity.name))
                 checking.add(entity.id)
             if not entity.license_holder:
-                missing['no_license_holder'].append(entity)
+                missing['No license holder'].add((entity.id, entity.name))
                 checking.add(entity.id)
             if entity.id in checking:
                 continue
@@ -188,17 +193,45 @@ class GetFilesForArche(Resource):
             arche_metadata_list.append(
                 ArcheFileMetadata.construct(
                     entity,
-                    external_metadata,
+                    ext_metadata,
                     license_))
+            files_path.add(g.files.get(entity.id))
+
         graph = Graph()
         graph.bind("acdh", ACDH)
         for metadata_obj in arche_metadata_list:
             add_arche_file_metadata_to_graph(graph, metadata_obj)
         # output_file_name = "arche_output.ttl"
         graph = graph.serialize(format="turtle", encoding="utf-8")
-        # file_paths = {g.files.get(entity.id) for entity in entities}
         print(len(checking))
         print(missing)
+        missing_files = {}
+        problematic_files = create_failed_files_md(missing)
+        with tempfile.NamedTemporaryFile(
+                mode='w+',
+                suffix='.md',
+                delete=False) as tmp_md:
+            tmp_md.write("\n".join(problematic_files))
+            tmp_md_path = tmp_md.name
+        arche_file = BytesIO()
+        with zipfile.ZipFile(arche_file, 'w') as zipf:
+            zipf.write(tmp_md_path, arcname='problematic_files.md')
+            zipf.writestr('files.ttl', graph)
+
         return Response(
-            graph,
-            mimetype='text/turtle')
+            arche_file.getvalue(),
+        mimetype='application/zip',
+        headers={
+            'Content-Disposition':
+                f'attachment;filename={ext_metadata["topCollection"]}.zip'})
+
+
+def create_failed_files_md(missing: dict[str, set[tuple[int, str]]]) -> list[str]:
+    text = []
+    for topic, entities in missing.items():
+        text.append(f'# {topic} ({len(entities)})')
+        for entity in entities:
+            text.append(
+                f'\t* {entity[0]} - {entity[1]} - '
+                f'{url_for("view", id_=entity[0], _external=True)}')
+    return text
