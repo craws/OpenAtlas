@@ -30,7 +30,6 @@ from openatlas.api.resources.templates import geometries_template, \
     network_visualisation_template
 from openatlas.api.resources.util import get_geometries
 from openatlas.database.entity import get_linked_entities_recursive
-from openatlas.models.entity import Entity
 from openatlas.models.export import current_date_for_filename
 
 
@@ -146,7 +145,7 @@ class GetFilesForArche(Resource):
         # ext_metadata should be coming from a external script filled out
         #   by the ARCHE team
         ext_metadata = {
-            'topCollection': 'bitem',
+            'topCollection': 'bItem',
             'language': 'en',
             'depositor': 'https://orcid.org/0000-0001-7608-7446',
             'acceptedDate': "2024-01-01",
@@ -201,22 +200,27 @@ class GetFilesForArche(Resource):
         graph.bind("acdh", ACDH)
         for metadata_obj in arche_metadata_list:
             add_arche_file_metadata_to_graph(graph, metadata_obj)
-        # output_file_name = "arche_output.ttl"
         graph = graph.serialize(format="turtle", encoding="utf-8")
-        print(len(checking))
-        print(missing)
-        missing_files = {}
-        problematic_files = create_failed_files_md(missing)
+
         with tempfile.NamedTemporaryFile(
                 mode='w+',
                 suffix='.md',
                 delete=False) as tmp_md:
-            tmp_md.write("\n".join(problematic_files))
+            tmp_md.write("\n".join(create_failed_files_md(missing)))
             tmp_md_path = tmp_md.name
+
+        files_by_extension = defaultdict(list)
+        for f in files_path:
+            files_by_extension[normalize_extension(f.suffix)].append(f)
+
         arche_file = BytesIO()
         with zipfile.ZipFile(arche_file, 'w') as zipf:
             zipf.write(tmp_md_path, arcname='problematic_files.md')
             zipf.writestr('files.ttl', graph)
+
+            for ext, files_list in files_by_extension.items():
+                for file_path in files_list:
+                    zipf.write(file_path, arcname=f'{ext}/{file_path.name}')
 
         return Response(
             arche_file.getvalue(),
@@ -226,7 +230,8 @@ class GetFilesForArche(Resource):
                 f'attachment;filename={ext_metadata["topCollection"]}.zip'})
 
 
-def create_failed_files_md(missing: dict[str, set[tuple[int, str]]]) -> list[str]:
+def create_failed_files_md(
+        missing: dict[str, set[tuple[int, str]]]) -> list[str]:
     text = []
     for topic, entities in missing.items():
         text.append(f'# {topic} ({len(entities)})')
@@ -235,3 +240,11 @@ def create_failed_files_md(missing: dict[str, set[tuple[int, str]]]) -> list[str
                 f'\t* {entity[0]} - {entity[1]} - '
                 f'{url_for("view", id_=entity[0], _external=True)}')
     return text
+
+
+
+def normalize_extension(ext: str) -> str:
+    ext = ext.lower().lstrip('.')
+    if ext == 'jpg':
+        return 'jpeg'
+    return ext
