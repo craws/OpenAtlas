@@ -138,14 +138,15 @@ class GetFilesForArche(Resource):
         entities = ApiEntity.get_by_system_classes(['file'])
         if parser['type_id']:
             entities = Endpoint(entities, parser).filter_by_type()
-        # external_metadata should be coming from the outside
+        # external_metadata should be coming from a external script filled out
+        #   by the ARCHE team
         external_metadata = {
             'topCollection': 'test_project',
             'language': 'en',
             'depositor': 'https://orcid.org/0000-0001-7608-7446',
             'acceptedDate': "2024-01-01",
-            'curator': '<https://orcid.org/0000-0002-1218-9635>',
-            'principalInvestigator': 'Jonny Doy',
+            'curator': 'https://orcid.org/0000-0002-1218-9635',
+            'principalInvestigator': ['Jonny Doy', 'Holy Guacamole'],
             'relatedDiscipline':
                 'https://vocabs.acdh.oeaw.ac.at/oefosdisciplines/601003'
         }
@@ -177,12 +178,11 @@ class GetFilesForArche(Resource):
                     entity,
                     external_metadata,
                     license_))
-        print(arche_metadata_list)
         graph = Graph()
         graph.bind("acdh", ACDH)
         for metadata_obj in arche_metadata_list:
             add_arche_file_metadata_to_graph(graph, metadata_obj)
-        output_file_name = "arche_output.ttl"
+        # output_file_name = "arche_output.ttl"
         graph= graph.serialize(format="turtle", encoding="utf-8")
         # file_paths = {g.files.get(entity.id) for entity in entities}
         return Response(
