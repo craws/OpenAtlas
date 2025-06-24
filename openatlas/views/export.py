@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 
 from flask import flash, g, render_template, send_from_directory, url_for
 from flask_babel import lazy_gettext as _
@@ -42,8 +41,8 @@ def export_sql() -> str:
     path = app.config['EXPORT_PATH']
     table = Table(['name', 'size'], order=[[0, 'desc']])
     for file in [
-            f for f in path.iterdir()
-            if (path / f).is_file() and f.name != '.gitignore']:
+        f for f in path.iterdir()
+        if (path / f).is_file() and f.name != '.gitignore']:
         data = [
             file.name,
             convert_size(file.stat().st_size),
@@ -93,16 +92,15 @@ def delete_export(filename: str) -> Response:
     return redirect(url_for('export_sql'))
 
 
-
 @app.route('/export/arche')
 @required_group('manager')
 def export_arche() -> str:
     path = app.config['EXPORT_PATH']
     table = Table(['name', 'size'], order=[[0, 'desc']])
-    for file in [
-            f for f in path.iterdir()
-            if (path / f).is_file() and f.name != '.gitignore']:
-        if 'export' in file.name:
+    for file in path.iterdir():
+        if (not file.is_file()
+                or file.name == '.gitignore'
+                or 'export' in file.name):
             continue
         data = [
             file.name,
@@ -129,34 +127,25 @@ def export_arche() -> str:
                 buttons=[
                     manual('admin/export'),
                     button(
-                         _('export') + ' ARCHE',
+                        _('export') + ' ARCHE',
                         url_for('arche_execute')),
-                    ])},
+                ])},
         title=_('export') + ' ARCHE',
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
-             _('export') + ' ARCHE'])
+            _('export') + ' ARCHE'])
 
 
 @app.route('/export/arche/execute')
 @required_group('admin')
 def arche_execute() -> Response:
+    # Todo: get stripped sql dump
+
     if os.access(app.config['EXPORT_PATH'], os.W_OK):
-        if sql_export('sql'):
-            g.logger.log('info', 'database', 'SQL export')
+        if arche_export():
+            g.logger.log('info', 'database', 'ARCHE export')
             flash(_('data was exported'), 'info')
         else:  # pragma: no cover
-            g.logger.log('error', 'database', 'SQL export failed')
+            g.logger.log('error', 'database', 'ARCHE export failed')
             flash(_('export failed'), 'error')
-
-
-    sql = get_latest_file(app.config['EXPORT_PATH'])
-    arche_export(sql)
-
-    return redirect(url_for('export_sql'))
-
-
-def get_latest_file(directory: str) -> Path | None:
-    path = Path(directory)
-    files = [f for f in path.iterdir() if f.is_file()]
-    return max(files, key=lambda f: f.stat().st_mtime, default=None)
+    return redirect(url_for('export_arche'))

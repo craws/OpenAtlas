@@ -72,3 +72,13 @@ API_WIKIDATA = 'https://www.wikidata.org/w/api.php'
 API_GEONAMES = 'http://api.geonames.org/get'
 
 CSP_HEADER = "frame-ancestors 'self'"
+
+ARCHE_METADATA = {
+    'topCollection': '',
+    'language': 'en',
+    'depositor': '',
+    'acceptedDate': '',
+    'curator': [],
+    'principalInvestigator': [],
+    'relatedDiscipline': [],
+    'typeIds': []}

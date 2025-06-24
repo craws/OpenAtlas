@@ -5,11 +5,10 @@ import tempfile
 import zipfile
 from collections import defaultdict
 from datetime import datetime
-from io import BytesIO
 from pathlib import Path
 from typing import Any, Optional
 
-from flask import Response, g, url_for
+from flask import g, url_for
 from rdflib import Graph
 
 from openatlas import app
@@ -60,22 +59,8 @@ def sql_export(format_: str, postfix: Optional[str] = '') -> bool:
     return True
 
 
-def arche_export(sql: Path) -> Any:
-    ext_metadata = {
-        'topCollection': 'bItem',
-        'language': 'en',
-        'depositor': 'https://orcid.org/0000-0001-7608-7446',
-        'acceptedDate': "2024-01-01",
-        'curator': [
-            'https://orcid.org/0000-0002-1218-9635',
-            'https://orcid.org/0000-0001-7608-7446'],
-        'principalInvestigator': ['Viola Winkler', 'Roland Filzwieser'],
-        'relatedDiscipline':
-            ['https://vocabs.acdh.oeaw.ac.at/oefosdisciplines/601003'],
-        'typeIds': [
-            196063, 234465, 229739, 198233, 197085, 197087
-            ]}
-
+def arche_export() -> Any:
+    ext_metadata = app.config['ARCHE_METADATA']
     entities = Entity.get_by_class(['file'], types=True, aliases=True)
     if ext_metadata.get('typeIds'):
         entities = filter_by_type(entities, ext_metadata.get('typeIds'))
@@ -123,7 +108,7 @@ def arche_export(sql: Path) -> Any:
     graph.bind("acdh", ACDH)
     for metadata_obj in arche_metadata_list:
         add_arche_file_metadata_to_graph(graph, metadata_obj)
-    graph = graph.serialize(format="turtle", encoding="utf-8")
+    graph = graph.serialize(format="turtle")
 
     with tempfile.NamedTemporaryFile(
             mode='w+',
@@ -136,22 +121,40 @@ def arche_export(sql: Path) -> Any:
     for f in files_path:
         files_by_extension[normalize_extension(f.suffix)].append(f)
 
-    arche_file = BytesIO()
-    with zipfile.ZipFile(arche_file, 'w') as zipf:
-        zipf.write(tmp_md_path, arcname='problematic_files.md')
-        zipf.writestr('files.ttl', graph)
-        zipf.write(sql, arcname='SQL dump')
-        for ext, files_list in files_by_extension.items():
-            for file_path in files_list:
-                zipf.write(file_path, arcname=f'{ext}/{file_path.name}')
 
-    return Response(
-        arche_file.getvalue(),
-        mimetype='application/zip',
-        headers={
-            'Content-Disposition':
-                f'attachment;filename='
-                f'{ext_metadata["topCollection"]}.zip'})
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_path = Path(temp_dir)
+
+        md_path = temp_path / 'problematic_files.md'
+        md_path.write_text(Path(tmp_md_path).read_text())
+
+        ttl_path = temp_path / 'files.ttl'
+        ttl_path.write_text(graph)
+
+        # sql_path = temp_path / 'SQL dump'
+        # sql_path.write_text(Path(sql).read_text())
+
+        for ext, files_list in files_by_extension.items():
+            ext_dir = temp_path / ext
+            ext_dir.mkdir(parents=True, exist_ok=True)
+            for file_path in files_list:
+                (ext_dir / file_path.name).write_bytes(Path(file_path).read_bytes())
+
+        export_path = app.config['EXPORT_PATH']
+        export_path.mkdir(parents=True, exist_ok=True)
+
+        archive_name = f"{current_date_for_filename()}_{ext_metadata['topCollection']}.7z"
+        archive_file = export_path / archive_name
+
+        with zipfile.ZipFile(archive_file, 'w') as archive:
+            archive.write(md_path, arcname='problematic_files.md')
+            archive.write(ttl_path, arcname='files.ttl')
+            #archive.write(sql_path, arcname='SQL dump')
+            for ext, files_list in files_by_extension.items():
+                for file_path in files_list:
+                    archive.write(temp_path / ext / file_path.name, arcname=f'{ext}/{file_path.name}')
+
+        return archive_file
 
 
 def create_failed_files_md(
