@@ -5,7 +5,7 @@ from io import BytesIO
 from typing import Any
 
 from fiona.crs import defaultdict
-from flask import Response, g, jsonify, url_for
+from flask import Response, g, jsonify, request, url_for
 from flask_restful import Resource, marshal
 from rdflib import Graph
 
@@ -17,8 +17,8 @@ from openatlas.api.formats.network_visualisation import (
 from openatlas.api.formats.subunits import get_subunits_from_id
 from openatlas.api.formats.xml import export_database_xml
 from openatlas.api.resources.api_entity import ApiEntity
-from openatlas.api.resources.arche import ACDH, ArcheFileMetadata, \
-    add_arche_file_metadata_to_graph
+from openatlas.api.external.arche import (ACDH, ArcheFileMetadata, \
+                                          add_arche_file_metadata_to_graph)
 from openatlas.api.resources.database_mapper import (
     get_all_entities_as_dict, get_all_links_as_dict, get_cidoc_hierarchy,
     get_classes, get_properties, get_property_hierarchy)
@@ -139,11 +139,6 @@ class GetFilesForArche(Resource):
     @staticmethod
     def get() -> tuple[Resource, int] | Response | dict[str, Any]:
         parser = arche.parse_args()
-        entities = ApiEntity.get_by_system_classes(['file'])
-        if parser['type_id']:
-            entities = Endpoint(entities, parser).filter_by_type()
-        # ext_metadata should be coming from a external script filled out
-        #   by the ARCHE team
         ext_metadata = {
             'topCollection': 'bItem',
             'language': 'en',
@@ -154,8 +149,15 @@ class GetFilesForArche(Resource):
                 'https://orcid.org/0000-0001-7608-7446'],
             'principalInvestigator': ['Viola Winkler', 'Roland Filzwieser'],
             'relatedDiscipline':
-                'https://vocabs.acdh.oeaw.ac.at/oefosdisciplines/601003'
-        }
+                ['https://vocabs.acdh.oeaw.ac.at/oefosdisciplines/601003'],
+            'typeIds': [
+                '196063', '234465', '229739', '198233', '197085', '197087'
+                ]}
+
+        entities = ApiEntity.get_by_system_classes(['file'])
+        if ext_metadata.get('typeIds'):
+            parser['type_id'] = ext_metadata.get('typeIds')
+            entities = Endpoint(entities, parser).filter_by_type()
         license_urls = {}
         arche_metadata_list = []
         missing = defaultdict(set)
@@ -224,10 +226,11 @@ class GetFilesForArche(Resource):
 
         return Response(
             arche_file.getvalue(),
-        mimetype='application/zip',
-        headers={
-            'Content-Disposition':
-                f'attachment;filename={ext_metadata["topCollection"]}.zip'})
+            mimetype='application/zip',
+            headers={
+                'Content-Disposition':
+                    f'attachment;filename='
+                    f'{ext_metadata["topCollection"]}.zip'})
 
 
 def create_failed_files_md(
@@ -240,7 +243,6 @@ def create_failed_files_md(
                 f'\t* {entity[0]} - {entity[1]} - '
                 f'{url_for("view", id_=entity[0], _external=True)}')
     return text
-
 
 
 def normalize_extension(ext: str) -> str:

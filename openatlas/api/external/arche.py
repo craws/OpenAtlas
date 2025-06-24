@@ -151,7 +151,8 @@ def add_arche_file_metadata_to_graph(
         for uri in create_uri(metadata.principal_investigator) if isinstance(metadata.principal_investigator, list) else [create_uri(metadata.principal_investigator)]:
             graph.add((subject_uri, ACDH.hasPrincipalInvestigator, uri))
     if metadata.related_discipline:
-        graph.add((subject_uri, ACDH.hasRelatedDiscipline, URIRef(metadata.related_discipline)))
+        for related_discipline in metadata.related_discipline:
+            graph.add((subject_uri, ACDH.hasRelatedDiscipline, URIRef(related_discipline)))
     if metadata.spatial_coverage:
         graph.add((subject_uri, ACDH.hasSpatialCoverage, URIRef(metadata.spatial_coverage)))
     if metadata.submission_date:
