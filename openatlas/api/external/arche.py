@@ -7,6 +7,7 @@ from flask import g
 from rdflib import Graph, Literal, Namespace, URIRef
 from rdflib.namespace import RDF, XSD
 
+
 from openatlas.models.entity import Entity
 
 ACDH = Namespace("https://vocabs.acdh.oeaw.ac.at/schema#")

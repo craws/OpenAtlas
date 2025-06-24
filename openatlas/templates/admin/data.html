@@ -16,6 +16,7 @@
     <div class="col-auto">{{ ('XML ' + _('export'))|button(url_for('api.export_database', format_='xml'))|safe }}</div>
     {% if 'manager'|is_authorized %}
       <div class="col-auto">{{ ('SQL ' + _('export'))|button(url_for('export_sql'))|safe }}</div>
+      <div class="col-auto">{{ ('ARCHE ' + _('export'))|button(url_for('export_arche'))|safe }}</div>
     {% endif %}
     {% if config.ARCHE['id'] %}
        <div class="col-auto">{{ 'ARCHE'|button(url_for('arche_index'))|safe }}</div>
