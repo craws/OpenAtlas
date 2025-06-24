@@ -5,7 +5,7 @@ from io import BytesIO
 from typing import Any
 
 from fiona.crs import defaultdict
-from flask import Response, g, jsonify, request, url_for
+from flask import Response, g, jsonify, url_for
 from flask_restful import Resource, marshal
 from rdflib import Graph
 
@@ -151,13 +151,15 @@ class GetFilesForArche(Resource):
             'relatedDiscipline':
                 ['https://vocabs.acdh.oeaw.ac.at/oefosdisciplines/601003'],
             'typeIds': [
-                '196063', '234465', '229739', '198233', '197085', '197087'
+                196063, 234465, 229739, 198233, 197085, 197087
                 ]}
 
         entities = ApiEntity.get_by_system_classes(['file'])
         if ext_metadata.get('typeIds'):
+            print(ext_metadata.get('typeIds'))
             parser['type_id'] = ext_metadata.get('typeIds')
             entities = Endpoint(entities, parser).filter_by_type()
+            print(len(entities))
         license_urls = {}
         arche_metadata_list = []
         missing = defaultdict(set)

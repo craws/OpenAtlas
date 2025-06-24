@@ -80,7 +80,9 @@ class ArcheFileMetadata:
             license_: str) -> 'ArcheFileMetadata':
         part_of = f"https://id.acdh.oeaw.ac.at/{metadata['topCollection']}"
         titles = [(entity.name, metadata['language'])]
-        obj = cls(uri=f"{part_of}/{g.files[entity.id].name}", titles=titles)
+        obj = cls(
+            uri=f"{part_of}/{g.files[entity.id].suffix[1:]}/{g.files[entity.id].name}",
+            titles=titles)
         obj.depositor = metadata['depositor']
         obj.license = license_
         obj.licensor = entity.creator
