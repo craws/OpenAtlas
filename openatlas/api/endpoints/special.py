@@ -126,5 +126,3 @@ class GetChainedEvents(Resource):
                 root_id,
                 ['P134']),
             parser).get_chained_events(root_id)
-
-

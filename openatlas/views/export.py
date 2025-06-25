@@ -55,7 +55,10 @@ def export_sql() -> str:
             data.append(
                 link(
                     _('delete'),
-                    url_for('delete_export', filename=file.name),
+                    url_for(
+                        'delete_export',
+                        view='export_sql',
+                        filename=file.name),
                     js=f"return confirm('{confirm}')"))
         table.rows.append(data)
     return render_template(
@@ -79,9 +82,9 @@ def export_sql() -> str:
             _('export SQL')])
 
 
-@app.route('/delete_export/<filename>')
+@app.route('/delete_export/<view>/<filename>')
 @required_group('admin')
-def delete_export(filename: str) -> Response:
+def delete_export(view:str, filename: str) -> Response:
     try:
         (app.config['EXPORT_PATH'] / filename).unlink()
         g.logger.log('info', 'file', 'SQL file deleted')
@@ -89,7 +92,7 @@ def delete_export(filename: str) -> Response:
     except Exception as e:
         g.logger.log('error', 'file', 'SQL file deletion failed', e)
         flash(_('error file delete'), 'error')
-    return redirect(url_for('export_sql'))
+    return redirect(url_for(view))
 
 
 @app.route('/export/arche')
@@ -114,7 +117,10 @@ def export_arche() -> str:
             data.append(
                 link(
                     _('delete'),
-                    url_for('delete_export', filename=file.name),
+                    url_for(
+                        'delete_export',
+                        view='export_arche',
+                        filename=file.name),
                     js=f"return confirm('{confirm}')"))
         table.rows.append(data)
     return render_template(

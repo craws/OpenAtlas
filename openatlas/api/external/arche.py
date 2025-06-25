@@ -25,7 +25,11 @@ def create_uri(value: str | list[str]) -> URIRef | list[URIRef]:
         return [create_uri(v) for v in value]
     if is_valid_url(value):
         return URIRef(value)
-    safe_name = value.strip().replace(" ", "_").replace(",", "").replace("/", "_").lower()
+    safe_name = (value.strip()
+                 .replace(" ", "_")
+                 .replace(",", "_")
+                 .replace("/", "_")
+                 .lower())
     return URIRef(f"https://id.acdh.oeaw.ac.at/{safe_name}")
 
 def ensure_person(graph: Graph, names: str | list[str]) -> None:
@@ -81,8 +85,9 @@ class ArcheFileMetadata:
             license_: str) -> 'ArcheFileMetadata':
         part_of = f"https://id.acdh.oeaw.ac.at/{metadata['topCollection']}"
         titles = [(entity.name, metadata['language'])]
+        file_info = (g.files[entity.id].suffix[1:], g.files[entity.id].name)
         obj = cls(
-            uri=f"{part_of}/{g.files[entity.id].suffix[1:]}/{g.files[entity.id].name}",
+            uri=f"{part_of}/{file_info[0]}/{file_info[1]}",
             titles=titles)
         obj.depositor = metadata['depositor']
         obj.license = license_
@@ -114,67 +119,105 @@ def add_arche_file_metadata_to_graph(
 
     if metadata.depositor:
         ensure_person(graph, metadata.depositor)
-        for uri in create_uri(metadata.depositor) if isinstance(metadata.depositor, list) else [create_uri(metadata.depositor)]:
+        for uri in create_uri(metadata.depositor) \
+                if isinstance(metadata.depositor, list) \
+                else [create_uri(metadata.depositor)]:
             graph.add((subject_uri, ACDH.hasDepositor, uri))
     if metadata.license:
         graph.add((subject_uri, ACDH.hasLicense, URIRef(metadata.license)))
     if metadata.licensor:
         ensure_person(graph, metadata.licensor)
-        for uri in create_uri(metadata.licensor) if isinstance(metadata.licensor, list) else [create_uri(metadata.licensor)]:
+        for uri in create_uri(metadata.licensor) \
+                if isinstance(metadata.licensor, list) \
+                else [create_uri(metadata.licensor)]:
             graph.add((subject_uri, ACDH.hasLicensor, uri))
     if metadata.metadata_creator:
         ensure_person(graph, metadata.metadata_creator)
-        for uri in create_uri(metadata.metadata_creator) if isinstance(metadata.metadata_creator, list) else [create_uri(metadata.metadata_creator)]:
+        for uri in create_uri(metadata.metadata_creator) \
+                if isinstance(metadata.metadata_creator, list) \
+                else [create_uri(metadata.metadata_creator)]:
             graph.add((subject_uri, ACDH.hasMetadataCreator, uri))
     if metadata.owner:
         ensure_person(graph, metadata.owner)
-        for uri in create_uri(metadata.owner) if isinstance(metadata.owner, list) else [create_uri(metadata.owner)]:
+        for uri in create_uri(metadata.owner) \
+                if isinstance(metadata.owner, list) \
+                else [create_uri(metadata.owner)]:
             graph.add((subject_uri, ACDH.hasOwner, uri))
     if metadata.rights_holder:
         ensure_person(graph, metadata.rights_holder)
-        for uri in create_uri(metadata.rights_holder) if isinstance(metadata.rights_holder, list) else [create_uri(metadata.rights_holder)]:
+        for uri in create_uri(metadata.rights_holder) \
+                if isinstance(metadata.rights_holder, list) \
+                else [create_uri(metadata.rights_holder)]:
             graph.add((subject_uri, ACDH.hasRightsHolder, uri))
 
     if metadata.is_part_of:
         graph.add((subject_uri, ACDH.isPartOf, URIRef(metadata.is_part_of)))
     if metadata.accepted_date:
-        graph.add((subject_uri, ACDH.hasAcceptedDate, Literal(metadata.accepted_date, datatype=XSD.date)))
+        graph.add((subject_uri,
+                   ACDH.hasAcceptedDate,
+                   Literal(metadata.accepted_date, datatype=XSD.date)))
     if metadata.curator:
         ensure_person(graph, metadata.curator)
-        for uri in create_uri(metadata.curator) if isinstance(metadata.curator, list) else [create_uri(metadata.curator)]:
+        for uri in create_uri(metadata.curator) \
+                if isinstance(metadata.curator, list) \
+                else [create_uri(metadata.curator)]:
             graph.add((subject_uri, ACDH.hasCurator, uri))
 
     for desc_text, lang in metadata.descriptions:
-        graph.add((subject_uri, ACDH.hasDescription, Literal(desc_text, lang=lang)))
+        graph.add((subject_uri,
+                   ACDH.hasDescription,
+                   Literal(desc_text, lang=lang)))
 
     if metadata.language:
         graph.add((subject_uri, ACDH.hasLanguage, URIRef(metadata.language)))
     if metadata.principal_investigator:
         ensure_person(graph, metadata.principal_investigator)
-        for uri in create_uri(metadata.principal_investigator) if isinstance(metadata.principal_investigator, list) else [create_uri(metadata.principal_investigator)]:
+        for uri in create_uri(metadata.principal_investigator) \
+                if isinstance(metadata.principal_investigator, list) \
+                else [create_uri(metadata.principal_investigator)]:
             graph.add((subject_uri, ACDH.hasPrincipalInvestigator, uri))
     if metadata.related_discipline:
         for related_discipline in metadata.related_discipline:
-            graph.add((subject_uri, ACDH.hasRelatedDiscipline, URIRef(related_discipline)))
+            graph.add((subject_uri,
+                       ACDH.hasRelatedDiscipline,
+                       URIRef(related_discipline)))
     if metadata.spatial_coverage:
-        graph.add((subject_uri, ACDH.hasSpatialCoverage, URIRef(metadata.spatial_coverage)))
+        graph.add((subject_uri,
+                   ACDH.hasSpatialCoverage,
+                   URIRef(metadata.spatial_coverage)))
     if metadata.submission_date:
-        graph.add((subject_uri, ACDH.hasSubmissionDate, Literal(metadata.submission_date, datatype=XSD.date)))
+        graph.add((subject_uri,
+                   ACDH.hasSubmissionDate,
+                   Literal(metadata.submission_date, datatype=XSD.date)))
     if metadata.transfer_date:
-        graph.add((subject_uri, ACDH.hasTransferDate, Literal(metadata.transfer_date, datatype=XSD.date)))
+        graph.add((subject_uri,
+                   ACDH.hasTransferDate,
+                   Literal(metadata.transfer_date, datatype=XSD.date)))
     if metadata.binary_size:
-        graph.add((subject_uri, ACDH.hasBinarySize, Literal(metadata.binary_size, datatype=XSD.integer)))
+        graph.add((subject_uri,
+                   ACDH.hasBinarySize,
+                   Literal(metadata.binary_size, datatype=XSD.integer)))
     if metadata.created_start_date:
-        graph.add((subject_uri, ACDH.hasCreatedStartDate, Literal(metadata.created_start_date, datatype=XSD.date)))
+        graph.add((subject_uri,
+                   ACDH.hasCreatedStartDate,
+                   Literal(metadata.created_start_date, datatype=XSD.date)))
     if metadata.created_end_date:
-        graph.add((subject_uri, ACDH.hasCreatedEndDate, Literal(metadata.created_end_date, datatype=XSD.date)))
+        graph.add((subject_uri,
+                   ACDH.hasCreatedEndDate,
+                   Literal(metadata.created_end_date, datatype=XSD.date)))
     if metadata.creator:
         ensure_person(graph, metadata.creator)
-        for uri in create_uri(metadata.creator) if isinstance(metadata.creator, list) else [create_uri(metadata.creator)]:
+        for uri in create_uri(metadata.creator) \
+                if isinstance(metadata.creator, list)\
+                else [create_uri(metadata.creator)]:
             graph.add((subject_uri, ACDH.hasCreator, uri))
 
     for tc_text, lang in metadata.temporal_coverages:
-        graph.add((subject_uri, ACDH.hasTemporalCoverage, Literal(tc_text, lang=lang)))
+        graph.add((subject_uri,
+                   ACDH.hasTemporalCoverage,
+                   Literal(tc_text, lang=lang)))
 
     if metadata.temporal_coverage_identifier:
-        graph.add((subject_uri, ACDH.hasTemporalCoverageIdentifier, Literal(metadata.temporal_coverage_identifier)))
+        graph.add((subject_uri,
+                   ACDH.hasTemporalCoverageIdentifier,
+                   Literal(metadata.temporal_coverage_identifier)))
