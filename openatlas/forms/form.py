@@ -165,7 +165,3 @@ def get_vocabs_form() -> Any:  # pragma: no cover
         save = SubmitField(_('save'))
 
     return Form()
-
-def get_rdf_form() -> Any:
-    class Form(FlaskForm):
-        format = SelectField('Format', validators=[DataRequired()], choices=[])
