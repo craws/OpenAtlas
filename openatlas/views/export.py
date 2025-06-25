@@ -2,12 +2,9 @@ import os
 
 from flask import flash, g, render_template, send_from_directory, url_for
 from flask_babel import lazy_gettext as _
-from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
-from forms.display import display_form
-from forms.form import get_rdf_form
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
