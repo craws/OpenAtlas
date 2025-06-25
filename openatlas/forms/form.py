@@ -6,9 +6,10 @@ from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
-from wtforms import HiddenField, SelectMultipleField, StringField, widgets
+from wtforms import HiddenField, SelectField, SelectMultipleField, StringField, \
+    widgets
 from wtforms.fields.simple import TextAreaField
-from wtforms.validators import InputRequired, URL
+from wtforms.validators import DataRequired, InputRequired, URL
 
 from openatlas import app
 from openatlas.display.table import Table
@@ -164,3 +165,7 @@ def get_vocabs_form() -> Any:  # pragma: no cover
         save = SubmitField(_('save'))
 
     return Form()
+
+def get_rdf_form() -> Any:
+    class Form(FlaskForm):
+        format = SelectField('Format', validators=[DataRequired()], choices=[])
