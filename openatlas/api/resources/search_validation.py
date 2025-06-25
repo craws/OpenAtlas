@@ -26,6 +26,8 @@ def validate_search_parameters(category: str, values: dict[str, Any]) -> None:
     if category in app.config['INT_VALUES']:
         if values['operator'] not in ['equal', 'notEqual']:
             raise OperatorNotSupported
+        if not isinstance(values['values'], list):
+            raise NoSearchStringError(category)
         for value in values['values']:
             if not isinstance(value, int):
                 if not value.isdigit():
