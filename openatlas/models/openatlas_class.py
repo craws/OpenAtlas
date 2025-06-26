@@ -20,6 +20,7 @@ class OpenatlasClass:
     _('creation')
     _('external reference')
     _('feature')
+    _('information carrier')  # Not an OpenAtlas class, used at source display
     _('involvement')
     _('modification')
     _('move')
@@ -171,6 +172,6 @@ def get_model(class_name: str) -> dict[str, Any]:
                     case 'inverse' | 'multiple' | 'required':
                         relation[item] = False
                     case 'mode':
-                        relation[item] = None
+                        relation[item] = 'tab'
         relation['selected'] = [] if relation['multiple'] else None
     return data

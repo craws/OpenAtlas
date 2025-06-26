@@ -133,8 +133,8 @@ class Display:
                         if relation['property'] == 'P67' \
                                 and relation['class'] == ['file'] \
                                 and not self.entity.image_id \
-                                and item.domain.get_file_ext() in  \
-                                    g.display_file_ext:
+                                and item.domain.get_file_ext() in \
+                                g.display_file_ext:
                             self.entity.image_id = \
                                 self.entity.image_id or item.domain.id
                 else:
@@ -246,6 +246,13 @@ class Display:
             self.data[_('type')] = \
                 f'<span title="{var}">{link(self.entity.standard_type)}</span>'
         self.data.update(self.get_type_data())
+        for name, relation in self.entity.class_.relations.items():
+            if relation['mode'] == 'direct':
+                self.data[name] = [
+                    link(e) for e in self.entity.get_linked_entities(
+                        relation['property'],
+                        relation['class'],
+                        relation['inverse'])]
 
     def add_reference_tables_data(self) -> None:
         entity = self.entity

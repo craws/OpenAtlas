@@ -272,14 +272,6 @@ class ReferenceSystemDisplay(BaseDisplay):
                         class_name=name))]
 
 
-class SourceDisplay(BaseDisplay):
-
-    def add_data(self) -> None:
-        self.data[_('artifact')] = [
-            link(artifact) for artifact in
-            self.entity.get_linked_entities('P128', inverse=True)]
-
-
 class SourceTranslationDisplay(BaseDisplay):
 
     def add_button_copy(self) -> None:
