@@ -52,12 +52,12 @@ class IndexTests(TestBaseCase):
         assert b'Password' in rv.data
 
         rv = c.post(url_for('login'), data={'username': '-', 'password': '?'})
-        assert b'No user with this name found' in rv.data
+        assert b'Invalid user or password' in rv.data
 
         rv = c.post(
             url_for('login'),
             data={'username': 'Alice', 'password': 'wrong'})
-        assert b'Wrong Password' in rv.data
+        assert b'Invalid user or password' in rv.data
 
         rv = c.post(
             url_for('login'),

@@ -16,6 +16,9 @@ def index_changelog() -> str:
 # pylint: disable=too-many-lines
 versions = {
     '8.13.0': ['TBA', {}],
+    '8.12.1': ['2025-06-29', {
+        'feature': {
+            '2569': 'New login error messages'}}],
     '8.12.0': ['2025-06-09', {
         'feature': {
             '2507': 'Link button for reference at artifact tab',
