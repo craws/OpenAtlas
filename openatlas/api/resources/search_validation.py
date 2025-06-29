@@ -16,7 +16,7 @@ def validate_search_parameters(category: str, values: dict[str, Any]) -> None:
         raise LogicalOperatorError
     if values['operator'] not in app.config['COMPARE_OPERATORS']:
         raise OperatorError
-    if not values["values"]:
+    if not values["values"] or not isinstance(values['values'], list):
         raise NoSearchStringError(category)
     if category in ['beginFrom', 'beginTo', 'endFrom', 'endTo']:
         if len(values["values"]) > 1:
