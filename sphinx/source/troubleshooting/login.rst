@@ -5,26 +5,19 @@ Login
 
 Depending on the issue, please try the following solutions to log in.
 
-Wrong Password
---------------
+Invalid user or password
+------------------------
+
+You have entered an incorrect password and/or the username doesn't exist
+(anymore).
 
 You can activate the **show password** checkbox to see the entered password
 and make sure that the problem isn't keyboard related, e.g. if capslock is
 turned on.
 
-If email was configured at your instance you can request a new password by
+If email was configured at this instance you can request a new password by
 clicking the **Forgot your password?** link. It is directly located underneath
 the login button.
-
-
-No user with this name found
-----------------------------
-
-Either you misspelled the username or the user doesn't exist (anymore).
-
-If there is a **Forgot your password?** link below the login button you can
-request a new password with your email address. When the new password is sent,
-the information will also contain the username.
 
 This user is not activated
 --------------------------
