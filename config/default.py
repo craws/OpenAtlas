@@ -3,7 +3,7 @@ from pathlib import Path
 
 from config.database_versions import DATABASE_VERSIONS
 
-VERSION = '8.12.0'
+VERSION = '8.12.1'
 DATABASE_VERSION = DATABASE_VERSIONS[0]
 DEMO_MODE = False  # If activated some options are disabled, login is prefilled
 DEBUG = False
