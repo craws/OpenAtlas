@@ -17,7 +17,7 @@ def index_changelog() -> str:
 versions = {
     '8.13.0': ['TBA', {
         'features': {
-            '2572': 'Updated translations for Spanish and Catalan',
+            '2571': 'Update Catalan and Spanish translations',
             '2466': 'API: export files with ARCHE RDF metadata'
         }
     }],
