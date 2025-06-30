@@ -15,7 +15,12 @@ def index_changelog() -> str:
 
 # pylint: disable=too-many-lines
 versions = {
-    '8.13.0': ['TBA', {}],
+    '8.13.0': ['TBA', {
+        'features': {
+            '2572': 'Updated translations for Spanish and Catalan',
+            '2466': 'API: export files with ARCHE RDF metadata'
+        }
+    }],
     '8.12.1': ['2025-06-29', {
         'feature': {
             '2569': 'New login error messages'}}],
