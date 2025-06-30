@@ -15,6 +15,7 @@ def index_changelog() -> str:
 
 # pylint: disable=too-many-lines
 versions = {
+    '8.13.0': ['TBA', {}],
     '8.12.1': ['2025-06-29', {
         'feature': {
             '2569': 'New login error messages'}}],
