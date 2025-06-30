@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-06-09 17:29+0200\n"
+"POT-Creation-Date: 2025-06-30 08:50+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2404,12 +2404,8 @@ msgstr ""
 msgid "error inactive"
 msgstr ""
 
-#: openatlas/views/login.py:93 openatlas/views/profile.py:38
-msgid "error wrong password"
-msgstr ""
-
-#: openatlas/views/login.py:99
-msgid "error username"
+#: openatlas/views/login.py:93 openatlas/views/login.py:99
+msgid "Invalid user or password"
 msgstr ""
 
 #: openatlas/views/login.py:120
@@ -2547,6 +2543,10 @@ msgstr ""
 
 #: openatlas/views/profile.py:29 openatlas/views/user.py:40
 msgid "show passwords"
+msgstr ""
+
+#: openatlas/views/profile.py:38
+msgid "error wrong password"
 msgstr ""
 
 #: openatlas/views/profile.py:41 openatlas/views/profile.py:42
