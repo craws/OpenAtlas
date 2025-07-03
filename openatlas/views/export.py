@@ -13,9 +13,9 @@ from openatlas.display.util2 import convert_size, is_authorized, manual
 from openatlas.models.export import arche_export, sql_export
 
 
-@app.route('/download/sql/<filename>')
+@app.route('/download/export/<filename>')
 @required_group('manager')
-def download_sql(filename: str) -> Response:
+def download_export(filename: str) -> Response:
     return send_from_directory(
         app.config['EXPORT_PATH'],
         filename,
@@ -48,7 +48,7 @@ def export_sql() -> str:
             convert_size(file.stat().st_size),
             link(
                 _('download'),
-                url_for('download_sql', filename=file.name))]
+                url_for('download_export', filename=file.name))]
         if is_authorized('admin') \
                 and os.access(app.config['EXPORT_PATH'], os.W_OK):
             confirm = _('Delete %(name)s?', name=file.name.replace("'", ''))
@@ -110,7 +110,7 @@ def export_arche() -> str:
             convert_size(file.stat().st_size),
             link(
                 _('download'),
-                url_for('download_sql', filename=file.name))]
+                url_for('download_export', filename=file.name))]
         if is_authorized('admin') \
                 and os.access(app.config['EXPORT_PATH'], os.W_OK):
             confirm = _('Delete %(name)s?', name=file.name.replace("'", ''))
