@@ -159,7 +159,9 @@
             </a>
           </div>
         {% endif %}
-        <a class="btn btn-warning btn-sm mx-1" href="/login">{{ _('login')|uc_first }}</a>
+        {% if g.admins_available %}
+          <a class="btn btn-warning btn-sm mx-1" href="/login">{{ _('login')|uc_first }}</a>
+        {% endif %}
       {% endif %}
     </div>
   </div>
@@ -170,7 +172,11 @@
     </div>
     <div>
         {{ g.settings.site_name }}
-        <a href="{{ url_for('index_changelog') }}">{{ config.VERSION }}</a>
+        {% if g.admins_available %}
+          <a href="{{ url_for('index_changelog') }}">{{ config.VERSION }}</a>
+        {% else %}
+          {{ config.VERSION }}
+        {% endif %}
     </div>
 </nav>
 {% with messages = get_flashed_messages(with_categories=true) %}

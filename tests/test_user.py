@@ -93,13 +93,17 @@ class UserTests(TestBaseCase):
         assert b'Bookmark' in rv.data
 
         c.get(url_for('logout'))
+
+        rv = c.get(url_for('user_activity'), follow_redirects=True)
+        assert b'Login' in rv.data
+
         rv = c.get(url_for('user_insert'), follow_redirects=True)
         assert b'Forgot your password?' not in rv.data
 
         c.post(
             url_for('login'),
             data={'username': 'Editor', 'password': 'test'})
-        rv = c.get(url_for('user_insert'))
+        rv = c.get(url_for('user_delete', id_=person.id))
         assert b'403 - Forbidden' in rv.data
 
         rv = c.post(url_for('insert', class_='reference_system'))

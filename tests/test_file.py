@@ -225,6 +225,17 @@ class FileTest(TestBaseCase):
             follow_redirects=True)
         assert b'An interesting annotation' in rv.data
 
+        rv = c.post(
+            url_for('annotation_image_insert', id_=iiif_id),
+            data={
+                'coordinate': '1.6,1.6,1.4,9.6,8.6,9.6,8.6,1.6',
+                'text': '<h1>Test Annotation</h1>',
+                'entity': place.id
+                },
+            follow_redirects=True)
+        assert b'<h1>Test Annotation</h1>' not in rv.data
+        assert b'Test Annotation' in rv.data
+
         rv = c.get(url_for('view_iiif', id_=iiif_id))
         assert b'Mirador' in rv.data
 

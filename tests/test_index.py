@@ -3,6 +3,7 @@ from pathlib import Path
 from flask import g, url_for
 
 from openatlas import app
+from openatlas.database.user import delete
 from tests.base import TestBaseCase
 
 
@@ -35,7 +36,6 @@ class IndexTests(TestBaseCase):
         app.config['EXPORT_PATH'] = Path('error')
         rv = c.get(url_for('view', id_=666), follow_redirects=True)
         assert b'teapot' in rv.data
-        assert b'OpenAtlas with default password is still' in rv.data
         assert b'Database version error is needed but current' in rv.data
         assert b'directory not writable' in rv.data
 
@@ -52,12 +52,12 @@ class IndexTests(TestBaseCase):
         assert b'Password' in rv.data
 
         rv = c.post(url_for('login'), data={'username': '-', 'password': '?'})
-        assert b'No user with this name found' in rv.data
+        assert b'Invalid user or password' in rv.data
 
         rv = c.post(
             url_for('login'),
             data={'username': 'Alice', 'password': 'wrong'})
-        assert b'Wrong Password' in rv.data
+        assert b'Invalid user or password' in rv.data
 
         rv = c.post(
             url_for('login'),
@@ -69,3 +69,21 @@ class IndexTests(TestBaseCase):
                 url_for('login'),
                 data={'username': 'inactive', 'password': '?'})
         assert b'Too many login attempts' in rv.data
+
+        rv = c.get(url_for('first_admin'), follow_redirects=True)
+        assert b'Forbidden' in rv.data
+
+        with app.test_request_context():
+            app.preprocess_request()
+            delete(self.alice_id)
+
+        rv = c.get(url_for('index_changelog'), follow_redirects=True)
+        assert b'Welcome to OpenAtlas' in rv.data
+
+        c.post(
+            url_for('first_admin'),
+            data={
+                'username': 'Ripley',
+                'email': 'ripley@nostromo.org',
+                'password': 'you_never_guess_this',
+                'password2': 'you_never_guess_this'})

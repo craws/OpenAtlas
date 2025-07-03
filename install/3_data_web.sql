@@ -7,15 +7,8 @@ INSERT INTO web.group (name) VALUES
   ('manager'),
   ('readonly');
 
-INSERT INTO web.user (username, password, active, email, group_id) VALUES (
-  'OpenAtlas',
-  '$2b$12$O.apSfFsSbpmYLDW/0QgyeHHenbiT0D72NLgOOQ4Rkju/oS15rJTu',
-  true,
-  'test@example.com',
-  (SELECT id FROM web.group WHERE name = 'admin'));
-
 INSERT INTO web.settings (name, value) VALUES
-  ('database_version', '8.10.0'),
+  ('database_version', '8.12.0'),
   ('api_public', ''),
   ('default_language', 'en'),
   ('table_rows', '25'),

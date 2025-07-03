@@ -2,17 +2,19 @@ import datetime
 import locale
 from typing import Any, Optional
 
-from flask import Flask, Response, g, request, session
+from flask import Flask, g, redirect, request, session, url_for
 from flask_babel import Babel
 from flask_jwt_extended import JWTManager, verify_jwt_in_request
 from flask_login import current_user
 from flask_wtf.csrf import CSRFProtect
 from psycopg2 import extras
+from werkzeug.wrappers import Response
 
 from openatlas.api.resources.error import AccessDeniedError
 from openatlas.database.checks import check_type_count_needed
 from openatlas.database.connect import close_connection, open_connection
 from openatlas.database.token import check_token_revoked
+from openatlas.database.user import admins_available
 
 app: Flask = Flask(__name__, instance_relative_config=True)
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
@@ -45,7 +47,7 @@ def get_locale() -> str:
 
 
 @app.before_request
-def before_request() -> None:
+def before_request() -> Response | None:
     from openatlas.models.openatlas_class import (
         OpenatlasClass, view_class_mapping)
     from openatlas.models.cidoc_property import CidocProperty
@@ -55,7 +57,7 @@ def before_request() -> None:
     from openatlas.models.reference_system import ReferenceSystem
 
     if request.path.startswith('/static'):
-        return  # Avoid overheads if not using Apache with static alias
+        return None  # Avoid overheads if not using Apache with static alias
     g.logger = Logger()
     g.db = open_connection(app.config)
     g.db.autocommit = True
@@ -63,9 +65,13 @@ def before_request() -> None:
     g.settings = Settings.get_settings()
 
     if request.path.startswith('/display'):
-        return  # Avoid overheads for file display
+        return None  # Avoid overheads for file display
 
     session['language'] = get_locale()
+    g.admins_available = admins_available()
+    if not g.admins_available \
+            and request.endpoint not in ['first_admin', 'set_locale']:
+        return redirect(url_for('first_admin'))
     g.cidoc_classes = CidocClass.get_all(
         session['language'],
         (request.path.startswith('/overview/model/cidoc_class_index')))
@@ -88,6 +94,7 @@ def before_request() -> None:
         app.config['TMP_PATH']]
     setup_files()
     setup_api()
+    return None
 
 
 def setup_files() -> None:

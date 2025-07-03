@@ -15,18 +15,32 @@ def index_changelog() -> str:
 
 # pylint: disable=too-many-lines
 versions = {
-    '8.12.0': ['TBA', {
+    '8.13.0': ['TBA', {
+        'features': {
+            '2571': 'Update Catalan and Spanish translations',
+            '2466': 'API: export files with ARCHE RDF metadata'
+        }
+    }],
+    '8.12.1': ['2025-06-29', {
+        'feature': {
+            '2569': 'New login error messages'}}],
+    '8.12.0': ['2025-06-09', {
         'feature': {
             '2507': 'Link button for reference at artifact tab',
             '2553': 'Removal of the SQL interface',
+            '2554': 'Refining input validation',
+            '2527': 'API: 0.4.8',
             '2526': 'API: Ego network visualization',
             '2477': 'API: Presentation view improvements',
-            '2527': 'API: 0.4.8',
+            '2467': 'API: Enriched RDF dump',
             '2532': 'Replace nose tests with pytest',
             '2499':
                 'Bundled Docker Image for OpenAtlas and OpenAtlas Discovery',
-            '2523': 'Refactor and minor improvements',},
+            '2555': 'Change installation, remove OpenAtlas user',
+            '2523': 'Refactor and minor improvements'},
         'fix': {
+            '2437': 'Text annotation: widget line break bug',
+            '2489': "API: user with token can't be deleted",
             '2509': 'Wrong focus in edit view',
             '2524': 'Automatic scroll to insert/save button'}}],
     '8.11.0': ['2025-04-18', {

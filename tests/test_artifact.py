@@ -80,7 +80,7 @@ class ArtifactTest(TestBaseCase):
         assert b'The entry has been deleted' in rv.data
 
         rv = c.get(url_for('user_view', id_=self.alice_id))
-        assert b'<a href="/user/entities/2">1</a>' in rv.data
+        assert b'<a href="/user/entities/1">1</a>' in rv.data
 
         rv = c.get(url_for('admin_index'))
         assert b'>1</a>' in rv.data
@@ -92,7 +92,7 @@ class ArtifactTest(TestBaseCase):
         assert b'An entry has been created' in rv.data
 
         rv = c.get(url_for('user_view', id_=self.alice_id))
-        assert b'<a href="/user/entities/2">2</a>' in rv.data
+        assert b'<a href="/user/entities/1">2</a>' in rv.data
 
         rv = c.get(url_for('user_entities', id_=self.alice_id))
         assert b'This will be continued' in rv.data

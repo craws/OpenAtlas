@@ -2778,7 +2778,7 @@ ALTER TABLE ONLY web.user_settings
 --
 
 ALTER TABLE ONLY web.user_tokens
-    ADD CONSTRAINT user_tokens_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES web."user"(id) ON UPDATE CASCADE;
+    ADD CONSTRAINT user_tokens_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES web."user"(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -2786,7 +2786,7 @@ ALTER TABLE ONLY web.user_tokens
 --
 
 ALTER TABLE ONLY web.user_tokens
-    ADD CONSTRAINT user_tokens_user_id_fkey FOREIGN KEY (user_id) REFERENCES web."user"(id) ON UPDATE CASCADE;
+    ADD CONSTRAINT user_tokens_user_id_fkey FOREIGN KEY (user_id) REFERENCES web."user"(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

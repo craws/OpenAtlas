@@ -17,20 +17,18 @@ class TokenTests(TestBaseCase):
         assert b'generate' in rv.data
 
         generating_tokens = [
-            {'expiration': 1, 'token_name': 'one day token', 'user': 2},
-            {'expiration': 20, 'token_name': '20 day token', 'user': 5},
-            {'expiration': 90, 'token_name': '90 day token', 'user': 4},
-            {'expiration': 30, 'token_name': '30 day token', 'user': 3},
-            {'expiration': 0, 'token_name': 'indefinite token', 'user': 1}]
+            {'expiration': 1, 'token_name': 'one day token', 'user': 1},
+            {'expiration': 20, 'token_name': '20 day token', 'user': 4},
+            {'expiration': 90, 'token_name': '90 day token', 'user': 3},
+            {'expiration': 30, 'token_name': '30 day token', 'user': 2},
+            {'expiration': 0, 'token_name': 'indefinite token', 'user': 2}]
 
         jwt_token_strings = []
-
         for token in generating_tokens:
             rv = c.post(url_for('generate_token'), data=token)
             for part in rv.headers['Set-Cookie'].split(';'):
                 if 'jwt_token=' in part:
-                    jwt_token_strings.append(
-                        part.replace('jwt_token=', '').strip())
+                    jwt_token_strings.append(part.replace('jwt_token=', ''))
                     break
 
         for token in generating_tokens:

@@ -323,6 +323,32 @@ def user_insert() -> str | Response:
             + '</span>'])
 
 
+@app.route('/install', methods=['GET', 'POST'])
+def first_admin() -> str | Response:
+    if g.admins_available:
+        abort(403)
+    form = UserForm()
+    del form.send_info, form.active, form.group, form.insert_and_continue
+    if form.validate_on_submit():
+        User.insert({
+            'username': sanitize(form.username.data),
+            'real_name': sanitize(form.real_name.data) or '',
+            'info': sanitize(form.description.data) or '',
+            'email': None,
+            'active': True,
+            'group_name': 'admin',
+            'password': bcrypt.hashpw(
+                form.password.data.encode('utf-8'),
+                bcrypt.gensalt()).decode('utf-8')})
+        flash(_('user created'), 'info')
+        return redirect(url_for('login'))
+    return render_template(
+        'content.html',
+        content=display_form(form),
+        crumbs=[
+            _('Welcome to OpenAtlas. Please add an admin user to continue.')])
+
+
 def get_groups() -> list[tuple[str, str]]:
     choices = [(name, name) for name in [  # Weakest to strongest permissions
         'readonly',

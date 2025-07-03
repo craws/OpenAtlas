@@ -4,11 +4,11 @@ from __future__ import annotations
 import math
 import re
 from datetime import datetime, timedelta
-from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any, Optional
 
 import numpy
+from bs4 import BeautifulSoup
 from flask import g
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
@@ -21,34 +21,10 @@ from openatlas import app
 def sanitize(string: str | None, mode: Optional[str] = None) -> Optional[str]:
     if not string:
         return None
-    if mode == 'ascii':  # Filter ASCII letters/numbers
-        sanitized = re.sub('[^A-Za-z0-9]+', '', string)
-    else:  # Remove HTML tags, keep linebreaks
-        string = string.replace('&', '&amp;')  # Fix for possible empty return
-        stripper = MLStripper()
-        stripper.feed(string)
-        sanitized = stripper.get_data().strip()
-        sanitized.replace('&amp;', '&')
-    return sanitized or None
-
-
-class MLStripper(HTMLParser):
-
-    def error(self, message: str) -> None:
-        pass  # pragma: no cover
-
-    def __init__(self) -> None:
-        super().__init__()
-        self.reset()
-        self.strict = False
-        self.convert_charrefs = True
-        self.fed: list[str] = []
-
-    def handle_data(self, data: Any) -> None:
-        self.fed.append(data)
-
-    def get_data(self) -> str:
-        return ''.join(self.fed)
+    if mode == 'ascii':
+        return re.sub('[^A-Za-z0-9]+', '', string) or None
+    return BeautifulSoup(string, "html.parser").get_text().replace("<>", "") \
+        or None
 
 
 def convert_size(size_bytes: int) -> str:
@@ -121,7 +97,7 @@ def is_authorized(context: str, group: Optional[str] = None) -> bool:
         group = context
     if not current_user.is_authenticated or not hasattr(current_user, 'group'):
         return False
-    match current_user.group:
+    match str(current_user.group):
         case 'admin':
             authorized = True
         case 'manager' if group in ['editor', 'contributor', 'readonly']:

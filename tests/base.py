@@ -23,7 +23,7 @@ class TestBaseCase(unittest.TestCase):
                 data={'username': 'Alice', 'password': 'test'})
             with app.test_request_context():
                 app.preprocess_request()
-                self.alice_id = 2
+                self.alice_id = 1
                 self.precision_type = \
                     Type.get_hierarchy('External reference match')
                 self.test_path = Path(app.root_path).parent / 'tests'
