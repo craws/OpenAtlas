@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-06-09 17:29+0200\n"
+"POT-Creation-Date: 2025-06-30 08:50+0200\n"
 "PO-Revision-Date: 2025-02-18 10:19+0100\n"
 "Last-Translator: Clément Besnier <clem@clementbesnier.fr>\n"
 "Language: fr\n"
@@ -2528,13 +2528,9 @@ msgstr ""
 msgid "error inactive"
 msgstr "Cette utilisateur n'est pas activé"
 
-#: openatlas/views/login.py:93 openatlas/views/profile.py:38
-msgid "error wrong password"
-msgstr "mot de passe incorrect"
-
-#: openatlas/views/login.py:99
-msgid "error username"
-msgstr "aucun utilisateur n'a ce nom d'utilisateur"
+#: openatlas/views/login.py:93 openatlas/views/login.py:99
+msgid "Invalid user or password"
+msgstr ""
 
 #: openatlas/views/login.py:120
 #, python-format
@@ -2680,6 +2676,10 @@ msgstr "répéter les mots de passe"
 #: openatlas/views/profile.py:29 openatlas/views/user.py:40
 msgid "show passwords"
 msgstr "montrer les mots de passe"
+
+#: openatlas/views/profile.py:38
+msgid "error wrong password"
+msgstr "mot de passe incorrect"
 
 #: openatlas/views/profile.py:41 openatlas/views/profile.py:42
 #: openatlas/views/user.py:65 openatlas/views/user.py:66
@@ -3003,4 +3003,7 @@ msgstr "Vous êtes sur le point d'importer la hiérarchie suivante"
 
 #~ msgid "SQL executed"
 #~ msgstr "exécuté par SQL"
+
+#~ msgid "error username"
+#~ msgstr "aucun utilisateur n'a ce nom d'utilisateur"
 

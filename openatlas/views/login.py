@@ -90,13 +90,13 @@ def login() -> str | Response:
                 user.login_failed_count += 1
                 user.login_last_failure = datetime.now()
                 user.update()
-                flash(_('error wrong password'), 'error')
+                flash(_('Invalid user or password'), 'error')
         else:
             g.logger.log(
                 'notice',
                 'auth',
                 f"Wrong username: {request.form['username']}")
-            flash(_('error username'), 'error')
+            flash(_('Invalid user or password'), 'error')
     return render_template(
         'login.html',
         title=_('login'),

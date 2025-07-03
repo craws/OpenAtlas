@@ -887,6 +887,17 @@ class Api(ApiTestCase):
         assert 'Invalid logical operator' in rv.get_json()['title']
 
         rv = c.get(
+            url_for(
+                'api_04.view_class',
+                class_='place',
+                search={
+                    "typeID": [{
+                        "operator": "notEqual",
+                        "values": 1,
+                        "logicalOperator": "or"}]}))
+        assert 'No search value' in rv.get_json()['title']
+
+        rv = c.get(
             url_for('api_04.display', filename=f'{file_without_licences.id}'))
         assert 'No license' in rv.get_json()['title']
 
