@@ -348,6 +348,10 @@ class Api(ApiTestCase):
         assert rv['relations']['feature']
         assert rv['relations']['person']
 
+        rv = c.get(url_for('api_04.entity_presentation_view', id_=place.id))
+        rv = rv.get_json()
+        assert rv['id'] == place.id
+
         rv = c.get(url_for('api_04.entity_presentation_view', id_=actor2.id))
         rv = rv.get_json()
         assert rv['id'] == actor2.id
