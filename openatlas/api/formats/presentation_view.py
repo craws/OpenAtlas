@@ -192,9 +192,7 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
             standard_type_ = {
                 'id': rel_entity.standard_type.id,
                 'title': rel_entity.standard_type.name}
-        geometries = geometry_to_feature_collection(
-            rel_entity.id, # This is wrong, this need to be the place.id!
-            geoms.get(rel_entity.id))
+        geometries = geometry_to_feature_collection(geoms.get(rel_entity.id))
         relation_dict = {
             'id': rel_entity.id,
             'systemClass': rel_entity.class_.name,
@@ -226,7 +224,6 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         'relations': relations}
     if entity.class_.view in ['place', 'artifact']:
         data['geometries'] = geometry_to_feature_collection(
-            entity.id,
             geoms.get(entity.id))
 
     return data

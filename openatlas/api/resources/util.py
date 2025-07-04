@@ -163,18 +163,17 @@ def geometry_to_geojson(
 
 
 def geometry_to_feature_collection(
-        place_id: int,
         geoms: Optional[list[dict[str, Any]]] = None) \
         -> Optional[dict[str, Any]]:
     if not geoms:
         return None
-    features = [generate_feature(place_id, geom) for geom in geoms]
+    features = [generate_feature(geom) for geom in geoms]
     if len(features) == 1:
         return features[0]
     return {'type': 'FeatureCollection', 'features': features}
 
 
-def generate_feature(place_id: int, geom: dict[str, Any]) -> dict[str, Any]:
+def generate_feature(geom: dict[str, Any]) -> dict[str, Any]:
     return {
         'type': 'Feature',
         'geometry': {
@@ -184,7 +183,7 @@ def generate_feature(place_id: int, geom: dict[str, Any]) -> dict[str, Any]:
             'title': geom['title'],
             'description': geom['description'],
             'shapeType': geom['shapeType'],
-            'placeId': geom['placeId'],
+            'entityId': geom['placeId'],
             'locationId': geom['locationId']}}
 
 

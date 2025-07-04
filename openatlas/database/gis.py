@@ -23,37 +23,6 @@ def get_by_id(id_: int) -> list[dict[str, Any]]:
         {'id_': id_})
     return [get_geometry_dict(row) for row in list(g.cursor)]
 
-# Todo: maybe make this as default for presentation view. So we always get the
-#  location ids through the links, then grab the information through the
-#  location id. This should solve all problems
-def get_by_location_ids(
-        location_ids: list[int]) -> defaultdict[int, list[dict[str, Any]]]:
-    g.cursor.execute(
-        """
-        SELECT
-            g.id,
-			l.domain_id as entity_id,
-            g.entity_id as location_id,
-            g.name,
-            g.description,
-            g.type,
-            public.ST_AsGeoJSON(geom_point) AS point,
-            public.ST_AsGeoJSON(geom_linestring) AS linestring,
-            public.ST_AsGeoJSON(ST_ForcePolygonCCW(geom_polygon)) AS polygon
-		FROM model.link l
-        JOIN model.gis g ON l.range_id = g.entity_id
-		WHERE l.property_code = 'P53' 
-		AND l.range_id IN %(ids)s
-		AND (
-            geom_point IS NOT NULL 
-            OR geom_linestring IS NOT NULL
-            OR geom_polygon IS NOT NULL);
-        """,
-        {'ids': tuple(location_ids)})
-    locations = defaultdict(list)
-    for row in list(g.cursor):
-        locations[row['entity_id']].append(get_geometry_dict(row))
-    return locations
 
 def get_by_entity_ids(
         ids: list[int]) -> defaultdict[int, list[dict[str, Any]]]:
@@ -150,6 +119,7 @@ def get_centroid_dict(row: dict[str, Any]) -> dict[str, Any]:
         if row['description'] else ''
     geometry['shapeType'] = 'centerpoint'
     geometry['locationId'] = row.get('location_id')
+    geometry['placeId'] = row.get('entity_id')
     return geometry
 
 
