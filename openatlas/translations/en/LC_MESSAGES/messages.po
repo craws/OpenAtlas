@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-06-09 17:29+0200\n"
-"PO-Revision-Date: 2025-06-09 17:30+0200\n"
+"POT-Creation-Date: 2025-06-30 08:50+0200\n"
+"PO-Revision-Date: 2025-06-30 08:52+0200\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language-Team: en <LL@li.org>\n"
 "Language: en\n"
@@ -2446,13 +2446,9 @@ msgstr "too many login attempts. You can try again after a few minutes."
 msgid "error inactive"
 msgstr "this user is not activated"
 
-#: openatlas/views/login.py:93 openatlas/views/profile.py:38
-msgid "error wrong password"
-msgstr "wrong Password"
-
-#: openatlas/views/login.py:99
-msgid "error username"
-msgstr "no user with this name found"
+#: openatlas/views/login.py:93 openatlas/views/login.py:99
+msgid "Invalid user or password"
+msgstr "Invalid user or password"
 
 #: openatlas/views/login.py:120
 #, python-format
@@ -2594,6 +2590,10 @@ msgstr "repeat password"
 #: openatlas/views/profile.py:29 openatlas/views/user.py:40
 msgid "show passwords"
 msgstr "show passwords"
+
+#: openatlas/views/profile.py:38
+msgid "error wrong password"
+msgstr "wrong Password"
 
 #: openatlas/views/profile.py:41 openatlas/views/profile.py:42
 #: openatlas/views/user.py:65 openatlas/views/user.py:66
@@ -2906,3 +2906,6 @@ msgstr "You are about to import following hierarchy"
 
 #~ msgid "SQL executed"
 #~ msgstr "SQL executed"
+
+#~ msgid "error username"
+#~ msgstr "no user with this name found"

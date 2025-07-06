@@ -69,6 +69,7 @@ def get_geometry_dict(row: dict[str, Any]) -> dict[str, Any]:
     geometry['shapeType'] = (
         row['type'].replace('"', '\"')) if row['type'] else ''
     geometry['locationId'] = row.get('location_id')
+    geometry['placeId'] = row.get('entity_id')
     return geometry
 
 
@@ -117,6 +118,8 @@ def get_centroid_dict(row: dict[str, Any]) -> dict[str, Any]:
     geometry['description'] = row['description'].replace('"', '\"') \
         if row['description'] else ''
     geometry['shapeType'] = 'centerpoint'
+    geometry['locationId'] = row.get('location_id')
+    geometry['placeId'] = row.get('entity_id')
     return geometry
 
 

@@ -17,7 +17,10 @@ then run the database upgrade script, then restart Apache:
     sudo python3 install/upgrade/database_upgrade.py
     sudo service apache2 restart
 
-### 8.11.0 to 8.12.00
+### 8.12.0 to 8.12.1
+A code base update (e.g. with git pull) and a webserver restart is sufficient.
+
+### 8.11.0 to 8.12.0
 
 #### Database upgrade
 8.12.0.sql is needed but will be taken care of by the database upgrade script.
