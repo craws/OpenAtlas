@@ -88,7 +88,7 @@ class InvalidSearchCategoryError(Exception):
 
 
 class InvalidSearchValueError(Exception):
-    def __init__(self, category: str, values: dict[str, Any]) -> None:
+    def __init__(self, category: str, values: Any) -> None:
         super().__init__()
         self.category = category
         self.values = values
