@@ -81,7 +81,7 @@ def get_relation_types_dict(
     relation_to_id = link_.domain.id if inverse else link_.range.id
     if link_.property.code == 'P53':
         relation_to_id = entity_id
-    if link_.property.code in  ['P74', 'OA8', 'OA9', 'P7', 'P26', 'P27']:
+    if link_.property.code in ['P74', 'OA8', 'OA9', 'P7', 'P26', 'P27']:
         relation_to_id = entity_id
     relation_types = {
         'property': get_crm_relation_x(link_, inverse),
@@ -213,7 +213,8 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         'systemClass': entity.class_.name,
         'viewClass': entity.class_.view,
         'title': entity.name,
-        'description': entity.description,
+        'description': entity.get_annotated_text()
+        if entity.class_.name == 'source' else entity.description,
         'aliases': list(entity.aliases.values()),
         'geometries': None,
         'when': get_presentation_time(entity),
