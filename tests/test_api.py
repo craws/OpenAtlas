@@ -333,6 +333,7 @@ class Api(ApiTestCase):
             url_for(
                 'api_04.entity_presentation_view',
                 id_=place.id,
+                centroid='true',
                 place_hierarchy='true'))
         rv = rv.get_json()
         assert rv['id'] == place.id
@@ -346,6 +347,10 @@ class Api(ApiTestCase):
         assert rv['files'][0]['title'] == 'Picture with a License'
         assert rv['relations']['feature']
         assert rv['relations']['person']
+
+        rv = c.get(url_for('api_04.entity_presentation_view', id_=place.id))
+        rv = rv.get_json()
+        assert rv['id'] == place.id
 
         rv = c.get(url_for('api_04.entity_presentation_view', id_=actor2.id))
         rv = rv.get_json()

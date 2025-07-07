@@ -81,6 +81,8 @@ def get_relation_types_dict(
     relation_to_id = link_.domain.id if inverse else link_.range.id
     if link_.property.code == 'P53':
         relation_to_id = entity_id
+    if link_.property.code in ['P74', 'OA8', 'OA9', 'P7', 'P26', 'P27']:
+        relation_to_id = entity_id
     relation_types = {
         'property': get_crm_relation_x(link_, inverse),
         'relationTo': relation_to_id,
@@ -177,20 +179,20 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
     related_entities_ = \
         [e for e in related_entities if not (e.id in exists_ or add_(e.id))]
 
-    geoms = Gis.get_by_entities(related_entities_ + [entity])
+    all_entities = related_entities_ + [entity]
+    geoms = Gis.get_by_entities(all_entities)
+    if parser.centroid:
+        for id_, geom in \
+                Gis.get_centroids_by_entities(all_entities).items():
+            geoms[id_].extend(geom)
     relations = defaultdict(list)
-    geometries_for_overview = []
     for rel_entity in related_entities_:
         standard_type_ = {}
         if rel_entity.standard_type:
             standard_type_ = {
                 'id': rel_entity.standard_type.id,
                 'title': rel_entity.standard_type.name}
-        geometries = geometry_to_feature_collection(
-            rel_entity.id,
-            geoms.get(rel_entity.id))
-        if geometries:
-            geometries_for_overview.append(geometries)
+        geometries = geometry_to_feature_collection(geoms.get(rel_entity.id))
         relation_dict = {
             'id': rel_entity.id,
             'systemClass': rel_entity.class_.name,
@@ -211,15 +213,20 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         'systemClass': entity.class_.name,
         'viewClass': entity.class_.view,
         'title': entity.name,
-        'description': entity.description,
+        'description': entity.get_annotated_text()
+        if entity.class_.name == 'source' else entity.description,
         'aliases': list(entity.aliases.values()),
-        'geometries': geometries_for_overview,
+        'geometries': None,
         'when': get_presentation_time(entity),
         'types': get_presentation_types(entity, links),
         'externalReferenceSystems': get_reference_systems(links_inverse),
         'references': get_presentation_references(links_inverse, entity.id),
         'files': get_presentation_files(links_inverse, entity.id),
         'relations': relations}
+    if entity.class_.view in ['place', 'artifact']:
+        data['geometries'] = geometry_to_feature_collection(
+            geoms.get(entity.id))
+
     return data
 
 
