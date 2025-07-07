@@ -2,7 +2,7 @@ BEGIN;
 
 -- Raise database version
 
--- UPDATE web.settings SET value = '8.11.0' WHERE name = 'database_version';
+-- UPDATE web.settings SET value = '8.13.0' WHERE name = 'database_version';
 
 -- #2319 APIS interface
 
@@ -33,7 +33,7 @@ ALTER TABLE ONLY web.reference_system ADD CONSTRAINT reference_system_reference_
         ON UPDATE CASCADE ON DELETE SET NULL NOT VALID;
 
 INSERT INTO web.reference_system_api(name) VALUES
- ('Wikidata'), ('GeoNames'), ('GND'), ('APIS');
+ ('Wikidata'), ('GeoNames'), ('GND'), ('APIS'), ('OpenAtlas');
 
 UPDATE web.reference_system SET reference_system_api_name = 'Wikidata' WHERE name = 'Wikidata';
 UPDATE web.reference_system SET reference_system_api_name = 'GeoNames' WHERE name = 'GeoNames';
