@@ -18,7 +18,8 @@ class ImportTest(TestBaseCase):
             follow_redirects=True)
         assert b'Data was exported' in rv.data
 
-        rv = c.get(url_for('download_export', filename=f'{date_}_export.sql.7z'))
+        rv = c.get(
+            url_for('download_export', filename=f'{date_}_export.sql.7z'))
         assert b'7z' in rv.data
 
         rv = c.get(
@@ -26,22 +27,32 @@ class ImportTest(TestBaseCase):
             follow_redirects=True)
         assert b'Data was exported' in rv.data
 
-        rv = c.get(url_for('download_export', filename=f'{date_}_export.dump.7z'))
+        rv = c.get(
+            url_for('download_export', filename=f'{date_}_export.dump.7z'))
         assert b'7z' in rv.data
 
         rv = c.get(
-            url_for('delete_export', filename=f'{date_}_export.sql.7z'),
+            url_for(
+                'delete_export',
+                view='export_sql',
+                filename=f'{date_}_export.sql.7z'),
             follow_redirects=True)
         if os.name == 'posix':
             assert b'File deleted' in rv.data
 
         rv = c.get(
-            url_for('delete_export', filename=f'{date_}_export.dump.7z'),
+            url_for(
+                'delete_export',
+                view='export_sql',
+                filename=f'{date_}_export.dump.7z'),
             follow_redirects=True)
         if os.name == 'posix':
             assert b'File deleted' in rv.data
 
         rv = c.get(
-            url_for('delete_export', filename='non_existing'),
+            url_for(
+                'delete_export',
+                view='export_sql',
+                filename='non_existing'),
             follow_redirects=True)
         assert b'An error occurred when trying to delete the f' in rv.data
