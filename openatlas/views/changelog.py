@@ -18,6 +18,7 @@ versions = {
     '8.13.0': ['TBA', {
         'features': {
             '2571': 'Update Catalan and Spanish translations',
+            '2574': 'Update French translations',
             '2466': 'API: export files with ARCHE RDF metadata'
         }
     }],
