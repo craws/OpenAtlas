@@ -78,6 +78,29 @@ def arche_export() -> Any:
         tmp_md.write("\n".join(create_failed_files_md(arche_data['missing'])))
         tmp_md_path = tmp_md.name
 
+    with tempfile.NamedTemporaryFile(
+            mode='w+',
+            suffix='.sql',
+            delete=False) as tmp_sql:
+        command = [
+            'pg_dump',
+             '-h', app.config['DATABASE_HOST'],
+             '-d', app.config['DATABASE_NAME'],
+             '-U', app.config['DATABASE_USER'],
+             '-p', str(app.config['DATABASE_PORT']),
+             '--schema=model',
+             '--schema=public',
+             '--schema=import']
+        subprocess.run(
+            command,
+            stdout=tmp_sql,
+            env={
+                'PGPASSWORD': app.config['DATABASE_PASS'],
+                'SYSTEMROOT': os.environ[
+                    'SYSTEMROOT'] if 'SYSTEMROOT' in os.environ else ''},
+            check=True)
+        tmp_sql_path = tmp_sql.name
+
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_path = Path(temp_dir)
 
@@ -86,9 +109,6 @@ def arche_export() -> Any:
 
         ttl_path = temp_path / 'files.ttl'
         ttl_path.write_text(arche_data['graph'])
-
-        # sql_path = temp_path / 'SQL dump'
-        # sql_path.write_text(Path(sql).read_text())
 
         for ext, files_list in files_by_extension.items():
             ext_dir = temp_path / ext
@@ -107,7 +127,7 @@ def arche_export() -> Any:
         with zipfile.ZipFile(archive_file, 'w') as archive:
             archive.write(md_path, arcname='problematic_files.md')
             archive.write(ttl_path, arcname='files.ttl')
-            # archive.write(sql_path, arcname='SQL dump')
+            archive.write(tmp_sql_path, arcname='database_dump.sql')
             for ext, files_list in files_by_extension.items():
                 for file_path in files_list:
                     archive.write(
