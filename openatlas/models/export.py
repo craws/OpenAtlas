@@ -114,7 +114,8 @@ def arche_export() -> Any:
         temp_path = Path(temp_dir)
 
         md_path = temp_path / 'problematic_files.md'
-        md_path.write_text(Path(tmp_md_path).read_text(), encoding='utf-8')
+        md_path.write_text(
+            Path(tmp_md_path).read_text(encoding='utf-8'), encoding='utf-8')
 
         ttl_path = temp_path / 'files.ttl'
         ttl_path.write_text(arche_metadata['graph'])
