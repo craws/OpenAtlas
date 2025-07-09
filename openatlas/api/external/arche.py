@@ -66,7 +66,7 @@ class ArcheFileMetadata:
     related_discipline: Optional[str] = None
     # If an image is linked to a place/artifact and the top level of this
     # entity is a place with geonames, than take the geonames link.
-    # This will be very expansive.
+    # This will be very expensive.
     spatial_coverage: Optional[str] = None
     submission_date: Optional[str] = None
     transfer_date: Optional[str] = None

@@ -12,8 +12,10 @@ from flask import g, url_for
 from rdflib import Graph
 
 from openatlas import app
+from openatlas.api.endpoints.endpoint import Endpoint
 from openatlas.api.external.arche import ACDH, ArcheFileMetadata, \
     add_arche_file_metadata_to_graph
+from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.models.entity import Entity
 
 
@@ -61,21 +63,28 @@ def sql_export(format_: str, postfix: Optional[str] = '') -> bool:
 
 def arche_export() -> Any:
     ext_metadata = app.config['ARCHE_METADATA']
-    entities = Entity.get_by_class(['file'], types=True, aliases=True)
+    file_entities = Entity.get_by_class(['file'], types=True, aliases=True)
     if ext_metadata.get('typeIds'):
-        entities = filter_by_type(entities, ext_metadata.get('typeIds'))
-
-    arche_data = get_arche_data(entities)
-
+        file_entities = filter_by_type(
+            file_entities,
+            ext_metadata.get('typeIds'))
+    arche_metadata = get_arche_metadata(file_entities)
     files_by_extension = defaultdict(list)
-    for f in arche_data['files_path']:
+    for f in arche_metadata['files_path']:
         files_by_extension[normalize_extension(f.suffix)].append(f)
+
+    rdf_dump = Endpoint(
+        ApiEntity.get_by_system_classes(['all']),
+        {'type_id': ext_metadata.get('typeIds'),
+         'limit': 0,
+         'format': 'turtle'}).resolve_entities()
 
     with tempfile.NamedTemporaryFile(
             mode='w+',
             suffix='.md',
             delete=False) as tmp_md:
-        tmp_md.write("\n".join(create_failed_files_md(arche_data['missing'])))
+        tmp_md.write("\n".join(
+            create_failed_files_md(arche_metadata['missing'])))
         tmp_md_path = tmp_md.name
 
     with tempfile.NamedTemporaryFile(
@@ -84,13 +93,13 @@ def arche_export() -> Any:
             delete=False) as tmp_sql:
         command = [
             'pg_dump',
-             '-h', app.config['DATABASE_HOST'],
-             '-d', app.config['DATABASE_NAME'],
-             '-U', app.config['DATABASE_USER'],
-             '-p', str(app.config['DATABASE_PORT']),
-             '--schema=model',
-             '--schema=public',
-             '--schema=import']
+            '-h', app.config['DATABASE_HOST'],
+            '-d', app.config['DATABASE_NAME'],
+            '-U', app.config['DATABASE_USER'],
+            '-p', str(app.config['DATABASE_PORT']),
+            '--schema=model',
+            '--schema=public',
+            '--schema=import']
         subprocess.run(
             command,
             stdout=tmp_sql,
@@ -108,7 +117,10 @@ def arche_export() -> Any:
         md_path.write_text(Path(tmp_md_path).read_text(), encoding='utf-8')
 
         ttl_path = temp_path / 'files.ttl'
-        ttl_path.write_text(arche_data['graph'])
+        ttl_path.write_text(arche_metadata['graph'])
+
+        rdf_path = temp_path / 'rdf_dump.ttl'
+        rdf_path.write_text(rdf_dump.get_data(as_text=True))
 
         for ext, files_list in files_by_extension.items():
             ext_dir = temp_path / ext
@@ -120,14 +132,16 @@ def arche_export() -> Any:
         export_path = app.config['EXPORT_PATH']
         export_path.mkdir(parents=True, exist_ok=True)
 
-        archive_name = (f"{current_date_for_filename()}_"
-                        f"{ext_metadata['topCollection']}.7z")
+        archive_name = (
+            f"{current_date_for_filename()}_"
+            f"{ext_metadata['topCollection'].replace(' ', '_')}.zip")
         archive_file = export_path / archive_name
 
         with zipfile.ZipFile(archive_file, 'w') as archive:
             archive.write(md_path, arcname='problematic_files.md')
             archive.write(ttl_path, arcname='files.ttl')
             archive.write(tmp_sql_path, arcname='database_dump.sql')
+            archive.write(rdf_path, arcname='rdf_dump.ttl')
             for ext, files_list in files_by_extension.items():
                 for file_path in files_list:
                     archive.write(
@@ -167,7 +181,7 @@ def filter_by_type(
     return result
 
 
-def get_arche_data(entities: list[Entity]) -> dict[str, Any]:
+def get_arche_metadata(entities: list[Entity]) -> dict[str, Any]:
     ext_metadata = app.config['ARCHE_METADATA']
     license_urls = {}
     arche_metadata_list = []

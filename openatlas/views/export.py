@@ -145,8 +145,6 @@ def export_arche() -> str:
 @app.route('/export/arche/execute')
 @required_group('admin')
 def arche_execute() -> Response:
-    # Todo: get stripped sql dump
-
     if os.access(app.config['EXPORT_PATH'], os.W_OK):
         if arche_export():
             g.logger.log('info', 'database', 'ARCHE export')

@@ -31,7 +31,7 @@ class Parser:
     count = None
     locale = None
     sort = None
-    column: str = ''
+    column: str = 'name'
     search: str = ''
     search_param: list[list[dict[str, Any]]]
     limit: int = 0
