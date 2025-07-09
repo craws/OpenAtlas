@@ -36,19 +36,22 @@ class Entity:
     selectable = True
 
     def __init__(self, data: dict[str, Any]) -> None:
-        self.id = data['id']
-        self.name = data['name']
-        self.description = data['description']
-        self.created = data['created']
-        self.modified = data['modified']
-        self.cidoc_class = g.cidoc_classes[data['cidoc_class_code']]
+        self.id = 0
+        #self.id = data['id']
+        for name, value in data.items():
+            setattr(self, name, value)
+        #self.name = data['name']
+        #self.description = data['description']
+        #self.created = data['created']
+        #self.modified = data['modified']
+        #self.cidoc_class = g.cidoc_classes[data['cidoc_class_code']]
         self.class_ = g.classes[data['openatlas_class_name']]
-        self.reference_systems: list[Link] = []
-        self.origin_id: Optional[int] = None  # When coming from another entity
-        self.image_id: Optional[int] = None  # Profile image
-        self.location: Optional[Entity] = None  # Respective location if place
+        #self.reference_systems: list[Link] = []
+        #self.origin_id: Optional[int] = None  # When coming from another entity
+        #self.image_id: Optional[int] = None  # Profile image
+        #self.location: Optional[Entity] = None  # Respective location if place
         self.types = {}
-        self.standard_type = None
+        #self.standard_type = None
 
         self.root: list[int] = []
         self.subs: list[int] = []
@@ -92,14 +95,14 @@ class Entity:
             self.last = format_date_part(self.end_to, 'year') \
                 if self.end_to else self.last
 
-        if self.class_.name == 'file':
-            self.public = False
-            self.creator = None
-            self.license_holder = None
-            if self.id in g.file_info:
-                self.public = g.file_info[self.id]['public']
-                self.creator = g.file_info[self.id]['creator']
-                self.license_holder = g.file_info[self.id]['license_holder']
+        #if self.class_.name == 'file':
+        #    self.public = False
+        #    self.creator = None
+        #    self.license_holder = None
+        #    if self.id in g.file_info:
+        #        self.public = g.file_info[self.id]['public']
+        #        self.creator = g.file_info[self.id]['creator']
+        #        self.license_holder = g.file_info[self.id]['license_holder']
 
     def get_linked_entity(
             self,

@@ -66,7 +66,6 @@ class BaseManager:
             validate = validate
 
         self.form_class = Form
-        self.add_name_fields()
         for id_, field in self.top_fields().items():
             setattr(Form, id_, field)
         add_types(self)
@@ -132,17 +131,6 @@ class BaseManager:
             'description',
             TextAreaField(_('description'), render_kw={'rows': 5}))
 
-    def add_name_fields(self) -> None:
-        if 'name' in self.fields:
-            setattr(
-                self.form_class,
-                'name',
-                StringField(
-                    _('name'),
-                    [InputRequired()],
-                    render_kw={'autofocus': True}))
-        if 'alias' in self.fields:
-            setattr(self.form_class, 'alias', FieldList(RemovableListField()))
 
     def update_entity(self, new: bool = False) -> None:
         self.continue_link_id = self.entity.update(self.data, new)

@@ -18,6 +18,7 @@ from openatlas.display.util import (
     convert_image_to_iiif, get_base_table_data, get_file_path,
     get_iiif_file_path, link, required_group)
 from openatlas.display.util2 import is_authorized
+from openatlas.forms.entity_form import get_entity_form
 from openatlas.forms.form import get_manager
 from openatlas.forms.manager_base import BaseManager
 from openatlas.forms.util import was_modified
@@ -73,22 +74,24 @@ def reference_system_remove_class(system_id: int, class_name: str) -> Response:
 @required_group('contributor')
 def insert(class_: str, origin_id: Optional[int] = None) -> str | Response:
     check_insert_access(class_)
+    entity = Entity({'openatlas_class_name': class_})
     origin = Entity.get_by_id(origin_id) if origin_id else None
-    manager = get_manager(class_, origin=origin)
-    if manager.form.validate_on_submit():
-        if class_ == 'file':
-            return redirect(insert_files(manager))
-        return redirect(save(manager))
+    form = get_entity_form(entity, origin)
+    #manager = get_manager(class_, origin=origin)
+    #if manager.form.validate_on_submit():
+    #    if class_ == 'file':
+    #        return redirect(insert_files(manager))
+    #    return redirect(save(manager))
     return render_template(
         'entity/insert.html',
-        form=manager.form,
+        form=form,
         class_name=class_,
         view_name=g.classes[class_].view,
-        gis_data=manager.place_info['gis_data'],
+        #gis_data=manager.place_info['gis_data'],
         writable=os.access(app.config['UPLOAD_PATH'], os.W_OK),
-        overlays=manager.place_info['overlays'],
-        title=_(g.classes[class_].view),
-        crumbs=manager.get_crumbs())
+        #overlays=manager.place_info['overlays'],
+        title=_(g.classes[class_].view))
+        #crumbs=manager.get_crumbs())
 
 
 @app.route('/update/<int:id_>', methods=['GET', 'POST'])
