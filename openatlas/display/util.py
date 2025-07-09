@@ -66,13 +66,14 @@ def ext_references(links: list[Link]) -> str:
         html += \
             f' ({g.types[link_.type.id].name} ' + _('at') + \
             f' {link(link_.domain)})'
-        if system.name in ['GeoNames', 'GND', 'Wikidata']:
-            name = system.name.lower()
+        if system.api in ['GeoNames', 'GND', 'Wikidata', 'OpenAtlas']:
+            name = system.api.lower()
             html += (
                 f' <span id="{name}-switch" class="uc-first '
-                f'{app.config["CSS"]["button"]["secondary"]}"'
+                f'{app.config["CSS"]["button"]["secondary"]}" '
                 f'onclick="ajax{uc_first(name)}Info'
-                f'(\'{link_.description}\')">' + _('show') + '</span>'
+                f'(\'{link_.description}\', \'{system.resolver_url}\')">'
+                + _('show') + '</span>'
                 f'<div id="{name}-info-div" class="bg-gray"></div>')
         html += '<br>'
     return html

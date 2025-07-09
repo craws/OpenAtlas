@@ -125,6 +125,7 @@ class ReferenceInput(Input):
         return render_template(
             'forms/reference_field.html',
             field=field,
+            website_url=g.reference_systems[field.reference_system_id].website_url,
             api=g.reference_systems[field.reference_system_id].api)
 
 

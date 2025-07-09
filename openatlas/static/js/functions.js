@@ -137,6 +137,48 @@ $(document).ready(function () {
       $('input[data-reference-system=APIS]').val(item.id);
   });
 
+  /**
+   * OpenAtlas autocomplete
+   * Documentation: https://bootstrap-autocomplete.readthedocs.io/en/latest/
+   * Bootstrap version needs to be manually set d/t
+   */
+   $('input[data-reference-system=OpenAtlas]').each(function() {
+    const $input = $(this);
+    const website_url = $input.data('reference-system-website');
+
+    $input.autoComplete({
+      bootstrapVersion: '4',
+      resolver: 'custom',
+      formatResult: function (item) {
+        return {
+          value: item.id,
+          text: `${item.name} - ${item.description || ''} (${item.id.split('/').pop()})`
+        };
+      },
+      events: {
+        search: function (qry, callback) {
+          $.ajax(`${website_url}/api/0.4/search/all/${qry}?limit=10`)
+            .done(function (res) {
+              if (Array.isArray(res.results)) {
+                callback(res.results);
+              } else {
+                callback([]);
+              }
+            })
+            .fail(function () {
+              callback([]);
+            });
+        }
+      }
+    }).on('autocomplete.select', function(evt, item) {
+      let id = item.value || item.id || item;
+      id = id.split('/').pop();
+      $input.val(id); // Set input value
+    });
+  });
+
+
+
 
   /**
    * Wikidata autocomplete
@@ -254,11 +296,11 @@ async function ajaxAddEntity(data) {
   return newEntityId;
 }
 
-async function ajaxWikidataInfo(data) {
+async function ajaxWikidataInfo(id, url) {
   $.ajax({
     type: 'post',
     url: '/ajax/wikidata_info',
-    data: 'id_=' + data,
+    data: 'id_=' + id,
     success: function (info) {
       $('#wikidata-info-div').html(info);
       $('#wikidata-switch').hide();
@@ -266,11 +308,11 @@ async function ajaxWikidataInfo(data) {
   });
 }
 
-async function ajaxGeonamesInfo(data) {
+async function ajaxGeonamesInfo(id, url) {
   $.ajax({
     type: 'post',
     url: '/ajax/geonames_info',
-    data: 'id_=' + data,
+    data: 'id_=' + id,
     success: function (info) {
       $('#geonames-info-div').html(info);
       $('#geonames-switch').hide();
@@ -278,14 +320,29 @@ async function ajaxGeonamesInfo(data) {
   });
 }
 
-async function ajaxGndInfo(data) {
+async function ajaxGndInfo(id, url) {
   $.ajax({
     type: 'post',
     url: '/ajax/gnd_info',
-    data: 'id_=' + data,
+    data: 'id_=' + id,
     success: function (info) {
       $('#gnd-info-div').html(info);
       $('#gnd-switch').hide();
+    }
+  });
+}
+
+async function ajaxOpenatlasInfo(id, url) {
+  $.ajax({
+    type: 'post',
+    url: '/ajax/openatlas_info',
+    data: {
+      id_: id,
+      url: url
+    },
+    success: function (info) {
+      $('#openatlas-info-div').html(info);
+      $('#openatlas-switch').hide();
     }
   });
 }
