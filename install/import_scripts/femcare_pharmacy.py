@@ -18,7 +18,7 @@ class Entry:
     translation: str
 
 
-def parse_csv():
+def parse_csv() -> list[Entry]:
     df = pd.read_csv(FILE_PATH, delimiter=';', header=None)
     entries = []
     for index, row in df.iloc[1:].iterrows():
@@ -137,7 +137,7 @@ with app.test_request_context():
 
         description_ = entry.translation
         if not description_:
-            description_ = None
+            description_ = ''
 
         type_ = Entity.insert('type', name, description_)
         linked_to_specific_category = False
