@@ -185,7 +185,7 @@ def filter_by_type(
 def get_arche_metadata(entities: list[Entity]) -> dict[str, Any]:
     ext_metadata = app.config['ARCHE_METADATA']
     license_urls = {}
-    arche_metadata_list = set()
+    arche_metadata_list = []
     missing = defaultdict(set)
     files_path = set()
     for entity in entities:
@@ -210,7 +210,7 @@ def get_arche_metadata(entities: list[Entity]) -> dict[str, Any]:
                     break
             if entity.standard_type.id not in license_urls:
                 continue
-        arche_metadata_list.add(
+        arche_metadata_list.append(
             ArcheFileMetadata.construct(
                 entity,
                 ext_metadata,
