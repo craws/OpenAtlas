@@ -99,7 +99,7 @@ class ArcheFileMetadata:
         obj.is_part_of = part_of
         obj.accepted_date = metadata['acceptedDate']
         obj.curator = metadata['curator']
-        obj.descriptions = [(entity.name, metadata['language'])]
+        obj.descriptions = [(entity.description, metadata['language'])]
         obj.principal_investigator = metadata['principalInvestigator']
         obj.related_discipline = metadata['relatedDiscipline']
         obj.spatial_coverage = ''

@@ -78,7 +78,7 @@ def arche_export() -> Any:
         {'type_id': ext_metadata.get('typeIds'),
          'limit': 0,
          'format': 'turtle'}).resolve_entities()
-
+    tempfile.tempdir = str(app.config['TMP_PATH'])
     with tempfile.NamedTemporaryFile(
             mode='w+',
             suffix='.md',
