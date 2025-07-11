@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 import numpy
-from flask import g, url_for
+from flask import g, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
@@ -15,6 +15,7 @@ from wtforms import StringField
 from openatlas import app
 from openatlas.display.util import get_file_path
 from openatlas.models.entity import Entity, Link
+from openatlas.models.openatlas_class import OpenatlasClass
 
 
 def get_form_settings(form: Any, profile: bool = False) -> dict[str, str]:
@@ -142,6 +143,31 @@ def form_to_datetime64(
     except ValueError:
         return None
     return date_time
+
+
+def form_crumbs(
+        entity: Entity,
+        origin: Entity) -> list[Any]:
+    label = origin.class_.name if origin \
+        else g.classes[entity.class_.name].view
+    if label in g.class_view_mapping:
+        label = g.class_view_mapping[label]
+    crumbs: list[Any] = [[
+        _(label.replace('_', ' ')),
+        url_for(
+            'index',
+            view=origin.class_.view if origin
+            else g.classes[entity.class_.name].view)]]
+    # if place_info['structure']:
+    #    crumbs += place_info['structure']['supers']
+    if origin:
+        crumbs.append(origin)
+    if not entity.id:
+        crumbs.append(f'+ {g.classes[entity.class_.name].label}')
+    else:
+        crumbs.append(entity)
+        crumbs.append(_('copy') if 'copy_' in request.path else _('edit'))
+    return crumbs
 
 
 class GlobalSearchForm(FlaskForm):

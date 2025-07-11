@@ -64,7 +64,6 @@ class BaseManager:
             validate = validate
 
         self.form_class = Form
-        add_types(self)
         add_reference_systems(self)
         if self.entity:
             setattr(Form, 'entity_id', HiddenField())
@@ -94,30 +93,6 @@ class BaseManager:
             'gis_data': None,
             'overlays': None,
             'location': None}
-
-    def get_crumbs(self) -> list[Any]:
-        if not self.crumbs:
-            label = self.origin.class_.name if self.origin \
-                else g.classes[self.class_.name].view
-            if label in g.class_view_mapping:
-                label = g.class_view_mapping[label]
-            self.crumbs = [[
-                _(label.replace('_', ' ')),
-                url_for(
-                    'index',
-                    view=self.origin.class_.view if self.origin
-                    else g.classes[self.class_.name].view)]]
-        if self.place_info['structure']:
-            self.crumbs += self.place_info['structure']['supers']
-        elif self.origin:
-            self.crumbs.append(self.origin)
-        if self.insert:
-            self.crumbs.append(f'+ {g.classes[self.class_.name].label}')
-        else:
-            self.crumbs.append(self.entity)
-            self.crumbs.append(
-                _('copy') if 'copy_' in request.path else _('edit'))
-        return self.crumbs
 
     def add_description(self) -> None:
         setattr(

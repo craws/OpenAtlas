@@ -21,7 +21,7 @@ from openatlas.display.util2 import is_authorized
 from openatlas.forms.entity_form import get_entity_form
 from openatlas.forms.form import get_manager
 from openatlas.forms.manager_base import BaseManager
-from openatlas.forms.util import was_modified
+from openatlas.forms.util import form_crumbs, was_modified
 from openatlas.models.entity import Entity
 from openatlas.models.gis import InvalidGeomException
 from openatlas.models.reference_system import ReferenceSystem
@@ -77,11 +77,11 @@ def insert(class_: str, origin_id: Optional[int] = None) -> str | Response:
     entity = Entity({'openatlas_class_name': class_})
     origin = Entity.get_by_id(origin_id) if origin_id else None
     form = get_entity_form(entity, origin)
-    #manager = get_manager(class_, origin=origin)
-    #if manager.form.validate_on_submit():
-    #    if class_ == 'file':
-    #        return redirect(insert_files(manager))
-    #    return redirect(save(manager))
+    if form.validate_on_submit():
+        pass
+        # if class_ == 'file':
+        #    return redirect(insert_files(manager))
+        # return redirect(save(manager))
     return render_template(
         'entity/insert.html',
         form=form,
@@ -90,8 +90,8 @@ def insert(class_: str, origin_id: Optional[int] = None) -> str | Response:
         #gis_data=manager.place_info['gis_data'],
         writable=os.access(app.config['UPLOAD_PATH'], os.W_OK),
         #overlays=manager.place_info['overlays'],
-        title=_(g.classes[class_].view))
-        #crumbs=manager.get_crumbs())
+        title=_(g.classes[class_].view),
+        crumbs=form_crumbs(entity, origin))
 
 
 @app.route('/update/<int:id_>', methods=['GET', 'POST'])
