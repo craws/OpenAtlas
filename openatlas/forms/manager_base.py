@@ -8,15 +8,13 @@ from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (
-    FieldList, HiddenField, SelectMultipleField, StringField, TextAreaField,
-    widgets)
-from wtforms.validators import InputRequired
+    HiddenField, SelectMultipleField, StringField, TextAreaField, widgets)
 
 from openatlas.display.util import link
 from openatlas.forms.add_fields import (
-    add_date_fields, add_reference_systems, add_types)
+    add_date_fields, add_reference_systems)
 from openatlas.forms.field import (
-    RemovableListField, SubmitField, SubmitSourceField, TableField, TreeField)
+    SubmitField, SubmitSourceField, TableField, TreeField)
 from openatlas.forms.populate import (
     populate_dates, populate_reference_systems, populate_types)
 from openatlas.forms.process import (
@@ -66,11 +64,7 @@ class BaseManager:
             validate = validate
 
         self.form_class = Form
-        for id_, field in self.top_fields().items():
-            setattr(Form, id_, field)
         add_types(self)
-        for id_, field in self.additional_fields().items():
-            setattr(Form, id_, field)
         add_reference_systems(self)
         if self.entity:
             setattr(Form, 'entity_id', HiddenField())
@@ -131,7 +125,6 @@ class BaseManager:
             'description',
             TextAreaField(_('description'), render_kw={'rows': 5}))
 
-
     def update_entity(self, new: bool = False) -> None:
         self.continue_link_id = self.entity.update(self.data, new)
 
@@ -149,12 +142,6 @@ class BaseManager:
                 'insert_and_continue',
                 SubmitField(_('insert and continue')))
             setattr(self.form_class, 'continue_', HiddenField())
-
-    def additional_fields(self) -> dict[str, Any]:
-        return {}
-
-    def top_fields(self) -> dict[str, Any]:
-        return {}
 
     def get_link_type(self) -> Optional[Entity]:
         # Returns base type of link, e.g. involvement between actor and event

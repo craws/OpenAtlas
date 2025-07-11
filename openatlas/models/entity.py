@@ -36,43 +36,23 @@ class Entity:
     selectable = True
 
     def __init__(self, data: dict[str, Any]) -> None:
-        self.id = 0
-        #self.id = data['id']
-        for name, value in data.items():
-            setattr(self, name, value)
-        #self.name = data['name']
-        #self.description = data['description']
-        #self.created = data['created']
-        #self.modified = data['modified']
-        #self.cidoc_class = g.cidoc_classes[data['cidoc_class_code']]
         self.class_ = g.classes[data['openatlas_class_name']]
-        #self.reference_systems: list[Link] = []
-        #self.origin_id: Optional[int] = None  # When coming from another entity
-        #self.image_id: Optional[int] = None  # Profile image
-        #self.location: Optional[Entity] = None  # Respective location if place
+        self.cidoc_class = self.class_.cidoc_class
+        self.id = 0
+        self.name = None
+        self.aliases = {}
+        self.description = None
+        self.created = None
+        self.modified = None
+        self.reference_systems: list[Link] = []
+        self.origin_id: Optional[int] = None  # When coming from another entity
+        self.image_id: Optional[int] = None  # Profile image
+        self.location: Optional[Entity] = None  # Respective location if place
         self.types = {}
-        #self.standard_type = None
-
+        self.standard_type = None
         self.root: list[int] = []
         self.subs: list[int] = []
         self.classes: list[str] = []
-
-        if 'types' in data and data['types']:
-            for item in data['types']:  # f1 = type id, f2 = value
-                type_ = g.types[item['f1']]
-                if type_.class_.name == 'type_tools':
-                    continue
-                self.types[type_] = item['f2']
-                if type_.category == 'standard':
-                    self.standard_type = type_
-
-        self.aliases = {}
-        if 'aliases' in data and data['aliases']:
-            for alias in data['aliases']:  # f1 = alias id, f2 = alias name
-                self.aliases[alias['f1']] = alias['f2']
-            self.aliases = dict(
-                sorted(self.aliases.items(), key=lambda item_: item_[1]))
-
         self.begin_from = None
         self.begin_to = None
         self.begin_comment = None
@@ -81,6 +61,27 @@ class Entity:
         self.end_comment = None
         self.first = None
         self.last = None
+        for name, value in data.items():
+            if not value and value != 0:
+                continue
+            match name:
+                case 'types':
+                    for item in value:  # f1 = type id, f2 = value
+                        type_ = g.types[item['f1']]
+                        if type_.class_.name == 'type_tools':
+                            continue
+                        self.types[type_] = item['f2']
+                        if type_.category == 'standard':
+                            self.standard_type = type_
+                case 'aliases':
+                    for alias in data['aliases']:  # f1 = id, f2 = name
+                        self.aliases[alias['f1']] = alias['f2']
+                    self.aliases = dict(
+                        sorted(
+                            self.aliases.items(),
+                            key=lambda item_: item_[1]))
+                case _:
+                    setattr(self, name, value)
         if 'begin_from' in data:
             self.begin_from = timestamp_to_datetime64(data['begin_from'])
             self.begin_to = timestamp_to_datetime64(data['begin_to'])
@@ -94,15 +95,14 @@ class Entity:
                 if self.end_from else None
             self.last = format_date_part(self.end_to, 'year') \
                 if self.end_to else self.last
-
-        #if self.class_.name == 'file':
-        #    self.public = False
-        #    self.creator = None
-        #    self.license_holder = None
-        #    if self.id in g.file_info:
-        #        self.public = g.file_info[self.id]['public']
-        #        self.creator = g.file_info[self.id]['creator']
-        #        self.license_holder = g.file_info[self.id]['license_holder']
+        if self.class_.name == 'file':
+            self.public = False
+            self.creator = None
+            self.license_holder = None
+            if self.id in g.file_info:
+                self.public = g.file_info[self.id]['public']
+                self.creator = g.file_info[self.id]['creator']
+                self.license_holder = g.file_info[self.id]['license_holder']
 
     def get_linked_entity(
             self,

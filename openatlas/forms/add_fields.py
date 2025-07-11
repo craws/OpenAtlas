@@ -1,19 +1,16 @@
 from __future__ import annotations
 
-from collections import OrderedDict
 from typing import Any
 
 from flask import g
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
-from wtforms import IntegerField, StringField, TextAreaField
+from wtforms import IntegerField, StringField
 from wtforms.validators import (
-    InputRequired, NoneOf, NumberRange, Optional as OptionalValidator)
+    NoneOf, NumberRange, Optional as OptionalValidator)
 
-from openatlas.display.util2 import is_authorized
 from openatlas.forms.field import (
-    ReferenceField, TreeField, TreeMultiField, ValueTypeField,
-    ValueTypeRootField)
+    ReferenceField, ValueTypeField)
 
 
 def add_reference_systems(manager: Any) -> None:
@@ -216,49 +213,3 @@ def add_value_type_fields(form_class: FlaskForm, subs: list[int]) -> None:
             str(sub.id),
             ValueTypeField(sub.name, sub.id, [OptionalValidator()]))
         add_value_type_fields(form_class, sub.subs)
-
-
-def add_types(manager: Any) -> None:
-    if manager.class_.name in g.classes \
-            and g.classes[manager.class_.name].hierarchies:
-        types = OrderedDict({
-            id_: g.types[id_] for id_ in
-            g.classes[manager.class_.name].hierarchies})
-        if g.classes[manager.class_.name].standard_type_id in types:
-            types.move_to_end(  # Standard type to top
-                g.classes[manager.class_.name].standard_type_id,
-                last=False)
-        for type_ in types.values():
-
-            class AddDynamicType(FlaskForm):
-                pass
-
-            setattr(AddDynamicType, 'name-dynamic', StringField(_('name')))
-            setattr(
-                AddDynamicType,
-                f'{type_.id}-dynamic',
-                TreeField(str(type_.id), type_id=str(type_.id)))
-            setattr(
-                AddDynamicType,
-                'description-dynamic',
-                TextAreaField(_('description')))
-            form = AddDynamicType() if is_authorized('editor') else None
-            if form:
-                getattr(form, f'{type_.id}-dynamic').label.text = 'super'
-            validators = [InputRequired()] if type_.required else []
-            if type_.category == 'value':
-                setattr(
-                    manager.form_class,
-                    str(type_.id),
-                    ValueTypeRootField(str(type_.name), type_.id))
-                add_value_type_fields(manager.form_class, type_.subs)
-            elif type_.multiple:
-                setattr(
-                    manager.form_class,
-                    str(type_.id),
-                    TreeMultiField(str(type_.id), validators, form=form))
-            else:
-                setattr(
-                    manager.form_class,
-                    str(type_.id),
-                    TreeField(str(type_.id), validators, form=form))

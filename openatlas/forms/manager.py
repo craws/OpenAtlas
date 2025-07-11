@@ -524,7 +524,6 @@ class ReferenceSystemManager(BaseManager):
     fields = ['name', 'description']
 
     def add_name_fields(self) -> None:
-        super().add_name_fields()
         if self.entity and self.entity.system:
             setattr(
                 self.form_class,
