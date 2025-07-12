@@ -1,6 +1,6 @@
 from typing import Any
 
-from flask_babel import lazy_gettext as _
+from config.model_classes.source import source_model
 
 view_class_mapping = {
     'actor': ['person', 'group'],
@@ -84,70 +84,7 @@ model: dict[str, Any] = {
         'display': {'buttons': ['network']}},
     'reference_system': {
         'attributes': {}},
-    'source': {
-        'attributes': {
-            'name': {'required': True},
-            'description': {'label': _('content'), 'annotated': True}},
-        'relations': {
-            'text': {
-                'class': 'source_translation',
-                'property': 'P73',
-                'multiple': True},
-            'actor': {
-                'class': view_class_mapping['actor'],
-                'property': 'P67',
-                'multiple': True},
-            'artifact': {
-                'class': view_class_mapping['artifact'],
-                'property': 'P67',
-                'multiple': True},
-            'information_carrier': {
-                'class': ['artifact'],
-                'property': 'P128',
-                'inverse': True,
-                'multiple': True,
-                'mode': 'direct',
-                'label': _('information carrier'),
-                'description': _(
-                    'Link artifacts as the information carrier of the source')
-            },
-            'event': {
-                'class': view_class_mapping['event'],
-                'property': 'P67',
-                'multiple': True},
-            'place': {
-                'class': view_class_mapping['place'],
-                'property': 'P67',
-                'multiple': True},
-            'reference': {
-                'class': view_class_mapping['reference'],
-                'property': 'P67',
-                'inverse': True,
-                'multiple': True},
-            'file': {
-                'class': view_class_mapping['file'],
-                'property': 'P67',
-                'inverse': True,
-                'multiple': True}},
-        'display': {
-            'tabs': {
-                'text': {},
-                'actor': {
-                    'additional_columns': ['remove'],
-                    'tooltip': _('mentioned in the source')},
-                'artifact': {
-                    'additional_columns': ['remove'],
-                    'tooltip': _('mentioned in the source')},
-                'event': {
-                    'additional_columns': ['remove'],
-                    'tooltip': _('mentioned in the source')},
-                'place': {
-                    'additional_columns': ['remove'],
-                    'tooltip': _('mentioned in the source')},
-                'reference': {
-                    'additional_columns': ['page', 'remove', 'update']},
-                'file': {'additional_columns': ['main image', 'remove']},
-                'note': {}}}},
+    'source': source_model(view_class_mapping),
     'source_translation': {
         'attributes': {}},
     'stratigraphic_unit': {
