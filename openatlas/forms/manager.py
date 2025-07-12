@@ -228,7 +228,6 @@ class FeatureManager(PlaceBaseManager):
     fields = ['name', 'date', 'description', 'continue', 'map']
 
     def add_buttons(self) -> None:
-        super().add_buttons()
         if self.entity:
             return
         setattr(
@@ -242,7 +241,7 @@ class FeatureManager(PlaceBaseManager):
                 and self.origin.class_.name == 'place' else None
         else:
             selection = self.entity.get_linked_entity('P46', inverse=True)
-        return super().additional_fields() | {
+        return {
             'super':
                 TableField(
                     Entity.get_by_class('place', True, self.aliases),
@@ -490,7 +489,6 @@ class PlaceManager(PlaceBaseManager):
     fields = ['name', 'alias', 'date', 'description', 'continue', 'map']
 
     def add_buttons(self) -> None:
-        super().add_buttons()
         if not self.entity:
             setattr(
                 self.form_class,
@@ -642,7 +640,6 @@ class StratigraphicUnitManager(PlaceBaseManager):
     fields = ['name', 'date', 'description', 'continue', 'map']
 
     def add_buttons(self) -> None:
-        super().add_buttons()
         if not self.entity:
             setattr(
                 self.form_class,
@@ -659,7 +656,7 @@ class StratigraphicUnitManager(PlaceBaseManager):
             selection = self.entity.get_linked_entity_safe('P46', inverse=True)
         elif self.origin and self.origin.class_.name == 'feature':
             selection = self.origin
-        return super().additional_fields() | {
+        return {
             'super': TableField(
                 Entity.get_by_class('feature', True),
                 selection,

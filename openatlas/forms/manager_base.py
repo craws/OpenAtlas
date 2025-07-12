@@ -3,7 +3,7 @@ from __future__ import annotations
 import time
 from typing import Any, Optional, TYPE_CHECKING
 
-from flask import g, request, url_for
+from flask import g
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
@@ -14,7 +14,7 @@ from openatlas.display.util import link
 from openatlas.forms.add_fields import (
     add_date_fields, add_reference_systems)
 from openatlas.forms.field import (
-    SubmitField, SubmitSourceField, TableField, TreeField)
+    SubmitSourceField, TableField, TreeField)
 from openatlas.forms.populate import (
     populate_dates, populate_reference_systems, populate_types)
 from openatlas.forms.process import (
@@ -77,7 +77,6 @@ class BaseManager:
             setattr(Form, 'gis_points', HiddenField(default='[]'))
             setattr(Form, 'gis_polygons', HiddenField(default='[]'))
             setattr(Form, 'gis_lines', HiddenField(default='[]'))
-        self.add_buttons()
         self.form: Any = Form(obj=self.link_ or self.entity)
         self.customize_labels()
 
@@ -105,18 +104,6 @@ class BaseManager:
 
     def customize_labels(self) -> None:
         pass
-
-    def add_buttons(self) -> None:
-        setattr(
-            self.form_class,
-            'save',
-            SubmitField(_('insert') if self.insert else _('save')))
-        if self.insert and 'continue' in self.fields:
-            setattr(
-                self.form_class,
-                'insert_and_continue',
-                SubmitField(_('insert and continue')))
-            setattr(self.form_class, 'continue_', HiddenField())
 
     def get_link_type(self) -> Optional[Entity]:
         # Returns base type of link, e.g. involvement between actor and event

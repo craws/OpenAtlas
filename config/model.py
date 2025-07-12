@@ -101,12 +101,16 @@ model: dict[str, Any] = {
                 'class': view_class_mapping['artifact'],
                 'property': 'P67',
                 'multiple': True},
-            'information carrier': {
+            'information_carrier': {
                 'class': ['artifact'],
                 'property': 'P128',
                 'inverse': True,
                 'multiple': True,
-                'mode': 'direct'},
+                'mode': 'direct',
+                'label': _('information carrier'),
+                'description': _(
+                    'Link artifacts as the information carrier of the source')
+            },
             'event': {
                 'class': view_class_mapping['event'],
                 'property': 'P67',

@@ -10,8 +10,8 @@ from wtforms.validators import InputRequired
 from openatlas.display.util2 import is_authorized
 from openatlas.forms.add_fields import add_value_type_fields
 from openatlas.forms.field import (
-    RemovableListField, SubmitField, TreeField, TreeMultiField,
-    ValueTypeRootField)
+    RemovableListField, SubmitField, TableField, TableMultiField, TreeField,
+    TreeMultiField, ValueTypeRootField)
 from openatlas.models.entity import Entity
 from openatlas.models.openatlas_class import OpenatlasClass
 
@@ -22,6 +22,7 @@ def get_entity_form(entity: Entity, origin: Optional[Entity] = None) -> Any:
 
     add_name_fields(entity, Form)
     add_types(entity.class_, Form)
+    add_relations(entity, origin, Form)
     add_buttons(entity, Form)
     form: Any = Form(obj=entity)
     return form
@@ -42,7 +43,7 @@ def add_name_fields(entity: Entity, form: Any) -> None:
 
 def add_buttons(entity: Entity, form: Any) -> None:
     setattr(form, 'save', SubmitField(_('save') if entity.id else _('save')))
-    if not entity.id: # and 'continue' in self.fields:
+    if not entity.id:  # Todo: and 'continue' in self.fields:
         setattr(
             form,
             'insert_and_continue',
@@ -90,3 +91,49 @@ def add_types(class_: OpenatlasClass, form: Any) -> None:
                     TreeField(str(type_.id), validators, form=add_form))
 
 
+def add_relations(entity: Entity, origin: Entity | None, form: Any) -> None:
+    entities = {}  # Collect entities per class to prevent multiple fetching
+    for name, relation in entity.class_.relations.items():
+        if relation['mode'] != 'direct':
+            continue
+        validators = [InputRequired()] if relation['required'] else None
+        items = []
+        for class_ in relation['class']:
+            if class_ not in entities:
+                entities[class_] = Entity.get_by_class(class_, True)
+            items += entities[class_]
+        if relation['multiple']:
+            selection: Any = []
+            if entity.id:
+                selection = entity.get_linked_entities(
+                    relation['property'],
+                    relation['class'],
+                    inverse=relation['inverse'])
+            elif origin and origin.class_.name in relation['class']:
+                selection = [origin]
+            setattr(
+                form,
+                name,
+                TableMultiField(
+                    items,
+                    selection,
+                    description=relation['description'],
+                    label=relation['label'],
+                    validators=validators))
+        else:
+            selection = None
+            if entity.id:
+                selection = entity.get_linked_entity(
+                    relation['property'],
+                    relation['class'],
+                    relation['inverse'])
+            elif origin and origin.class_.name in relation['class']:
+                selection = origin
+            setattr(
+                form,
+                name,
+                TableField(
+                    items,
+                    selection,
+                    description=relation['description'],
+                    validators=validators))
