@@ -10,8 +10,9 @@ from wtforms.validators import InputRequired
 from openatlas.display.util2 import is_authorized
 from openatlas.forms.add_fields import add_value_type_fields
 from openatlas.forms.field import (
-    RemovableListField, SubmitField, TableField, TableMultiField, TreeField,
-    TreeMultiField, ValueTypeRootField)
+    RemovableListField, SubmitField, SubmitAnnotationField, TableField,
+    TableMultiField, TextAnnotationField, TreeField, TreeMultiField,
+    ValueTypeRootField)
 from openatlas.models.entity import Entity
 from openatlas.models.openatlas_class import OpenatlasClass
 
@@ -20,15 +21,16 @@ def get_entity_form(entity: Entity, origin: Optional[Entity] = None) -> Any:
     class Form(FlaskForm):
         pass
 
-    add_name_fields(entity, Form)
-    add_types(entity.class_, Form)
-    add_relations(entity, origin, Form)
-    add_buttons(entity, Form)
+    add_name_fields(Form, entity)
+    add_types(Form, entity.class_)
+    add_relations(Form, entity, origin)
+    add_description(Form, entity)
+    add_buttons(Form, entity)
     form: Any = Form(obj=entity)
     return form
 
 
-def add_name_fields(entity: Entity, form: Any) -> None:
+def add_name_fields(form: Any, entity: Entity) -> None:
     if 'name' in entity.class_.attributes:
         setattr(
             form,
@@ -41,17 +43,43 @@ def add_name_fields(entity: Entity, form: Any) -> None:
         setattr(form, 'alias', FieldList(RemovableListField()))
 
 
-def add_buttons(entity: Entity, form: Any) -> None:
-    setattr(form, 'save', SubmitField(_('save') if entity.id else _('save')))
-    if not entity.id:  # Todo: and 'continue' in self.fields:
-        setattr(
-            form,
-            'insert_and_continue',
-            SubmitField(_('insert and continue')))
+def add_buttons(form: Any, entity: Entity) -> None:
+    field = SubmitField
+    if 'description' in entity.class_.attributes \
+            and 'annotated' in entity.class_.attributes['description']:
+        field = SubmitAnnotationField
+    setattr(form, 'save', field(_('save') if entity.id else _('insert')))
+    if not entity.id and entity.class_.display['form']['insert_and_continue']:
+        setattr(form, 'insert_and_continue', field(_('insert and continue')))
         setattr(form, 'continue_', HiddenField())
 
 
-def add_types(class_: OpenatlasClass, form: Any) -> None:
+def add_description(form: Any, entity: Entity) -> None:
+    if 'description' not in entity.class_.attributes:
+        return
+    if 'annotated' not in entity.class_.attributes['description']:
+        setattr(
+            form,
+            'description',
+            TextAreaField(_('description'), render_kw={'rows': 8}))
+        return
+    text = ''
+    linked_entities = []
+    if entity.id:
+        text = entity.get_annotated_text()
+        for e in entity.get_linked_entities('P67'):
+            linked_entities.append({'id': e.id, 'name': e.name})
+    setattr(
+            form,
+            'annotation',
+            TextAnnotationField(
+                label=entity.class_.attributes['description']['label'],
+                source_text=text,
+                linked_entities=linked_entities))
+    setattr(form, 'description', HiddenField())
+
+
+def add_types(form: Any, class_: OpenatlasClass) -> None:
     if class_.hierarchies:
         types = OrderedDict({id_: g.types[id_] for id_ in class_.hierarchies})
         if class_.standard_type_id in types:
@@ -91,7 +119,7 @@ def add_types(class_: OpenatlasClass, form: Any) -> None:
                     TreeField(str(type_.id), validators, form=add_form))
 
 
-def add_relations(entity: Entity, origin: Entity | None, form: Any) -> None:
+def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
     entities = {}  # Collect entities per class to prevent multiple fetching
     for name, relation in entity.class_.relations.items():
         if relation['mode'] != 'direct':

@@ -10,7 +10,7 @@ from wtforms.validators import InputRequired, Optional, URL
 
 from openatlas.forms.manager_base import (
     ActorBaseManager, ArtifactBaseManager, BaseManager, EventBaseManager,
-    HierarchyBaseManager, PlaceBaseManager, SourceBaseManager, TypeBaseManager)
+    HierarchyBaseManager, PlaceBaseManager, TypeBaseManager)
 from openatlas.forms.field import (
     DragNDropField, SubmitField, TableField, TableMultiField,
     TextAnnotationField, TreeField)
@@ -572,19 +572,7 @@ class ReferenceSystemManager(BaseManager):
             'classes': self.form.classes.data if self.form.classes else None}
 
 
-class SourceManager(SourceBaseManager):
-    def add_description(self) -> None:
-        text = ''
-        linked_entities = []
-        if self.entity:
-            text = self.entity.get_annotated_text()
-            for e in self.entity.get_linked_entities('P67'):
-                linked_entities.append({'id': e.id, 'name': e.name})
-        setattr(self.form_class, 'description', TextAnnotationField(
-            label=_('content'),
-            source_text=text,
-            linked_entities=linked_entities))
-
+class SourceManager(BaseManager):
     def additional_fields(self) -> dict[str, Any]:
         selection = None
         if not self.insert and self.entity:
@@ -609,7 +597,7 @@ class SourceManager(SourceBaseManager):
                 self.add_link('P128', self.form.artifact.data, inverse=True)
 
 
-class SourceTranslationManager(SourceBaseManager):
+class SourceTranslationManager(BaseManager):
     def add_description(self) -> None:
         text = ''
         linked_entities = []

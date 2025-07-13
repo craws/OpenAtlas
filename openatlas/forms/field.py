@@ -485,7 +485,7 @@ class SubmitField(BooleanField):
     widget = SubmitInput()
 
 
-class SubmitSourceInput(Input):
+class SubmitAnnotationInput(Input):
     input_type = 'submit'
 
     def __call__(self, field: Field, **kwargs: Any) -> str:
@@ -502,8 +502,8 @@ class SubmitSourceInput(Input):
              >{field.label.text}</button>''')
 
 
-class SubmitSourceField(BooleanField):
-    widget = SubmitSourceInput()
+class SubmitAnnotationField(BooleanField):
+    widget = SubmitAnnotationInput()
 
 
 def generate_password_field() -> CustomField:

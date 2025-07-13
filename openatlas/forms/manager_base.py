@@ -7,14 +7,11 @@ from flask import g
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
-from wtforms import (
-    HiddenField, SelectMultipleField, StringField, TextAreaField, widgets)
+from wtforms import HiddenField, SelectMultipleField, StringField, widgets
 
 from openatlas.display.util import link
-from openatlas.forms.add_fields import (
-    add_date_fields, add_reference_systems)
-from openatlas.forms.field import (
-    SubmitSourceField, TableField, TreeField)
+from openatlas.forms.add_fields import add_date_fields, add_reference_systems
+from openatlas.forms.field import TableField, TreeField
 from openatlas.forms.populate import (
     populate_dates, populate_reference_systems, populate_types)
 from openatlas.forms.process import (
@@ -71,8 +68,6 @@ class BaseManager:
             add_date_fields(self.form_class, bool(
                 current_user.settings['module_time']
                 or (entity and check_if_entity_has_time(entity))))
-        if 'description' in self.fields:
-            self.add_description()
         if 'map' in self.fields:
             setattr(Form, 'gis_points', HiddenField(default='[]'))
             setattr(Form, 'gis_polygons', HiddenField(default='[]'))
@@ -92,12 +87,6 @@ class BaseManager:
             'gis_data': None,
             'overlays': None,
             'location': None}
-
-    def add_description(self) -> None:
-        setattr(
-            self.form_class,
-            'description',
-            TextAreaField(_('description'), render_kw={'rows': 5}))
 
     def update_entity(self, new: bool = False) -> None:
         self.continue_link_id = self.entity.update(self.data, new)
@@ -435,22 +424,3 @@ class TypeBaseManager(BaseManager):
         self.super_id = self.get_root().id
         if new_id := getattr(self.form, str(self.super_id)).data:
             self.super_id = int(new_id)
-
-
-class SourceBaseManager(BaseManager):
-    fields = ['name', 'continue', 'description']
-
-    def add_buttons(self) -> None:
-        setattr(
-            self.form_class,
-            'save',
-            SubmitSourceField(_('insert') if self.insert else _('save')))
-        if self.insert and 'continue' in self.fields:
-            setattr(
-                self.form_class,
-                'insert_and_continue',
-                SubmitSourceField(_('insert and continue')))
-            setattr(self.form_class, 'continue_', HiddenField())
-
-    def additional_fields(self) -> dict[str, Any]:
-        return {'description': HiddenField()}

@@ -48,6 +48,8 @@ def source_model(mapping):
                 'inverse': True,
                 'multiple': True}},
         'display': {
+            'form': {
+                'insert_and_continue': True},
             'tabs': {
                 'text': {},
                 'actor': {
