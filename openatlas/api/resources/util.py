@@ -1,4 +1,5 @@
 from typing import Any, Optional
+
 from flask import g, json, url_for
 
 from openatlas.api.resources.api_entity import ApiEntity
@@ -27,6 +28,7 @@ def get_license_type(entity: Entity) -> Optional[Type]:
     return license_
 
 
+
 def get_license_url(entity: Entity) -> Optional[str]:
     url = ''
     for type_ in entity.types:
@@ -37,6 +39,34 @@ def get_license_url(entity: Entity) -> Optional[str]:
             break
     return url
 
+def get_license_ids_with_links() -> dict[int, str]:
+    type_ids = collect_all_sub_ids_of_hierarchy(Type.get_hierarchy('License').subs)
+    license_links = Entity.get_links_of_entities(type_ids, 'P67', inverse=True)
+    url_dict = {}
+    for link_ in license_links:
+        if link_.domain.class_.name == "external_reference":
+            url_dict[link_.range.id] = link_.domain.name
+    return url_dict
+
+
+def collect_all_sub_ids_of_hierarchy(start_ids: list[int]) -> list[int]:
+    seen = set()
+    queue = list(start_ids)
+
+    for current_id in queue:  # queue grows as we iterate
+        if current_id in seen:
+            continue
+
+        seen.add(current_id)
+        type_obj = g.types.get(current_id)
+        if not type_obj:
+            continue
+
+        for sub_id in type_obj.subs:
+            if sub_id not in seen and sub_id not in queue:
+                queue.append(sub_id)
+
+    return list(seen)
 
 def to_camel_case(i: str) -> str:
     return (i[0] + i.title().translate(" ")[1:] if i else i).replace(" ", "")

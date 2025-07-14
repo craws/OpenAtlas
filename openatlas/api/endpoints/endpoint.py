@@ -21,7 +21,7 @@ from openatlas.api.resources.templates import (
     geojson_collection_template, geojson_pagination, linked_place_pagination,
     linked_places_template, loud_pagination, loud_template)
 from openatlas.api.resources.util import date_to_str, geometry_to_geojson, \
-    get_location_link, \
+    get_license_ids_with_links, get_location_link, \
     get_reference_systems, replace_empty_list_values_in_dict_with_none
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
@@ -233,8 +233,9 @@ class Endpoint:
                 entities = [self.get_geojson_v2()]
             case 'loud':
                 parsed_context = parse_loud_context()
+                license_links = get_license_ids_with_links()
                 entities = [
-                    get_loud_entities(item, parsed_context)
+                    get_loud_entities(item, parsed_context, license_links)
                     for item in self.entities_with_links.values()]
             case 'lp' | 'lpx':
                 entities = [
@@ -242,8 +243,12 @@ class Endpoint:
                     for _id in self.entities_with_links]
             case _ if self.parser.format \
                       in app.config['RDF_FORMATS']:  # pragma: no cover
+                license_links = get_license_ids_with_links()
                 entities = [
-                    get_loud_entities(item, parse_loud_context())
+                    get_loud_entities(
+                        item,
+                        parse_loud_context(),
+                        license_links)
                     for item in self.entities_with_links.values()]
         self.formated_entities = entities
 
@@ -319,37 +324,37 @@ class Endpoint:
         geometry = self.entities_with_links[_id]['geometry']
         crm = f"crm:{entity.cidoc_class.code} {entity.cidoc_class.i18n['en']}"
         feature = {
-                '@id': url_for('api.entity', id_=entity.id, _external=True),
-                'type': 'Feature',
-                'crmClass': crm,
-                'viewClass': entity.class_.view,
-                'systemClass': entity.class_.name,
-                'properties': {'title': entity.name},
-                'types': self.parser.get_lp_types(entity, links)
-                if 'types' in self.parser.show else None,
-                'depictions': None,
-                'when': {'timespans': [get_lp_time(entity)]}
-                if 'when' in self.parser.show else None,
-                'links': get_reference_systems(links_inverse)
-                if 'links' in self.parser.show else None,
-                'descriptions': [{'value': entity.description}]
-                if 'description' in self.parser.show else None,
-                'names':
-                    [{"alias": value} for value in entity.aliases.values()]
-                    if entity.aliases and 'names' in self.parser.show else
-                    None,
-                'geometry': geometry_to_geojson(geometry)
-                if 'geometry' in self.parser.show else None,
-                'relations': get_lp_links(links, links_inverse, self.parser)
-                if 'relations' in self.parser.show else None}
+            '@id': url_for('api.entity', id_=entity.id, _external=True),
+            'type': 'Feature',
+            'crmClass': crm,
+            'viewClass': entity.class_.view,
+            'systemClass': entity.class_.name,
+            'properties': {'title': entity.name},
+            'types': self.parser.get_lp_types(entity, links)
+            if 'types' in self.parser.show else None,
+            'depictions': None,
+            'when': {'timespans': [get_lp_time(entity)]}
+            if 'when' in self.parser.show else None,
+            'links': get_reference_systems(links_inverse)
+            if 'links' in self.parser.show else None,
+            'descriptions': [{'value': entity.description}]
+            if 'description' in self.parser.show else None,
+            'names':
+                [{"alias": value} for value in entity.aliases.values()]
+                if entity.aliases and 'names' in self.parser.show else
+                None,
+            'geometry': geometry_to_geojson(geometry)
+            if 'geometry' in self.parser.show else None,
+            'relations': get_lp_links(links, links_inverse, self.parser)
+            if 'relations' in self.parser.show else None}
         if 'depictions' in self.parser.show:
             if entity.class_.name == 'file':
                 feature['depictions'] = get_lp_file(entity)
             else:
-                feature['depictions']= [
+                feature['depictions'] = [
                     get_lp_file(link.domain) for link in links_inverse
                     if link.domain.class_.name == 'file']
-        return  {
+        return {
             'type': 'FeatureCollection',
             '@context': app.config['API_CONTEXT']['LPF'],
             'features': [replace_empty_list_values_in_dict_with_none(feature)]}
