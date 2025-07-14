@@ -151,16 +151,13 @@ def get_classes() -> dict[str, OpenatlasClass]:
 def get_model(class_name: str) -> dict[str, Any]:
     data: dict[str, Any] = model[class_name]
     for name, item in data['attributes'].items():
-        item['label'] = item['label'] if 'label' in item else name
-        item['required'] = item[
-            'required'] if 'required' in item else False
-    data['display'] = {} if 'display' not in data else data['display']
-    data['display']['buttons'] = {} if 'buttons' not in data['display'] \
-        else data['display']['buttons']
-    data['display']['additional_columns'] = [] if 'additional_columns' \
-        not in data['display'] else data['display']['additional_columns']
-    data['relations'] = {} if 'relations' not in data else data[
-        'relations']
+        item['label'] = item.get('label', name)
+        item['required'] = item.get('required', False)
+    data['display'] = data.get('display', {})
+    data['display']['buttons'] = data['display'].get('buttons', {})
+    data['display']['additional_columns'] = \
+        data['display'].get('additional_columns', [])
+    data['relations'] = data.get('relations', {})
     for name, relation in data['relations'].items():
         relation['class'] = relation['class'] \
             if isinstance(relation['class'], list) else [relation['class']]
