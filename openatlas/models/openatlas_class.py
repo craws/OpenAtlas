@@ -5,7 +5,8 @@ from typing import Any, Optional
 from flask import g
 from flask_babel import lazy_gettext as _
 
-from config.model import model, view_class_mapping
+from config.model.model import model
+from config.model.class_groups import class_groups
 from openatlas.database import openatlas_class as db
 
 
@@ -60,7 +61,7 @@ class OpenatlasClass:
         self.reference_systems = reference_system_ids
         self.new_types_allowed = new_types_allowed
         self.icon = icon
-        for item, classes in view_class_mapping.items():
+        for item, classes in class_groups.items():
             if name in classes:
                 self.view = item
         self.attributes = attributes
@@ -108,7 +109,7 @@ def get_table_headers() -> dict[str, list[str]]:
         'text': ['text', 'type', 'content'],
         'type': ['name', 'description']}
     for view in ['actor', 'artifact', 'event', 'place']:
-        for class_ in view_class_mapping[view]:
+        for class_ in class_groups[view]:
             headers[class_] = headers[view]
     return headers
 
@@ -119,7 +120,7 @@ def get_class_count() -> dict[str, int]:
 
 def get_class_view_mapping() -> dict['str', 'str']:
     mapping = {}
-    for view, classes in view_class_mapping.items():
+    for view, classes in class_groups.items():
         for class_ in classes:
             mapping[class_] = view
     return mapping
@@ -161,14 +162,10 @@ def get_model(class_name: str) -> dict[str, Any]:
     for name, relation in data['relations'].items():
         relation['class'] = relation['class'] \
             if isinstance(relation['class'], list) else [relation['class']]
-        for item in ['inverse', 'label', 'mode', 'multiple', 'required']:
-            if item not in relation:
-                match item:
-                    case 'label':
-                        relation[item] = name
-                    case 'inverse' | 'multiple' | 'required':
-                        relation[item] = False
-                    case 'mode':
-                        relation[item] = 'tab'
+        relation['inverse'] = relation.get('inverse', False)
+        relation['multiple'] = relation.get('multiple', False)
+        relation['required'] = relation.get('required', False)
+        relation['label'] = relation.get('label', name)
+        relation['mode'] = relation.get('mode', 'tab')
         relation['selected'] = [] if relation['multiple'] else None
     return data

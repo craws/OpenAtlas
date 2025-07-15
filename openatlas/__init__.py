@@ -10,7 +10,7 @@ from flask_wtf.csrf import CSRFProtect
 from psycopg2 import extras
 from werkzeug.wrappers import Response
 
-from config.model import view_class_mapping
+from config.model.class_groups import class_groups
 from openatlas.api.resources.error import AccessDeniedError
 from openatlas.database.checks import check_type_count_needed
 from openatlas.database.connect import close_connection, open_connection
@@ -86,7 +86,7 @@ def before_request() -> Response | None:
     g.sex_type = Entity.get_hierarchy('Features for sexing')
     g.reference_match_type = Entity.get_hierarchy('External reference match')
     g.reference_systems = ReferenceSystem.get_all()
-    g.view_class_mapping = view_class_mapping
+    g.view_class_mapping = class_groups
     g.class_view_mapping = get_class_view_mapping()
     g.writable_paths = [
         app.config['EXPORT_PATH'],

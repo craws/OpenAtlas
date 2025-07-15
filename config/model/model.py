@@ -1,20 +1,6 @@
 from typing import Any
 
-from config.model_classes.source import source_model
-
-view_class_mapping = {
-    'actor': ['person', 'group'],
-    'event': [
-        'activity', 'acquisition', 'creation', 'event', 'modification', 'move',
-        'production'],
-    'file': ['file'],
-    'artifact': ['artifact', 'human_remains'],
-    'place': ['feature', 'place', 'stratigraphic_unit'],
-    'reference': ['bibliography', 'edition', 'external_reference'],
-    'reference_system': ['reference_system'],
-    'source': ['source'],
-    'type': ['administrative_unit', 'type'],
-    'source_translation': ['source_translation']}
+from config.model.classes import source
 
 model: dict[str, Any] = {
     'acquisition': {
@@ -84,7 +70,7 @@ model: dict[str, Any] = {
         'display': {'buttons': ['network']}},
     'reference_system': {
         'attributes': {}},
-    'source': source_model(view_class_mapping),
+    'source': source.model,
     'source_translation': {
         'attributes': {}},
     'stratigraphic_unit': {

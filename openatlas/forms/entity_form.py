@@ -145,7 +145,7 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
                 TableMultiField(
                     items,
                     selection,
-                    description=relation['description'],
+                    description=relation['tooltip'],
                     label=relation['label'],
                     validators=validators))
         else:
