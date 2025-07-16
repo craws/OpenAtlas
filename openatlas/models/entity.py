@@ -581,14 +581,6 @@ class Entity:
                 entities.append(Entity(row))
         return entities
 
-    @staticmethod
-    def insert(class_: str, name: str, desc: Optional[str] = None) -> Entity:
-        return Entity.get_by_id(
-            db.insert({
-                'name': sanitize(name),
-                'code': g.classes[class_].cidoc_class.code,
-                'openatlas_class_name': class_,
-                'description': sanitize(desc)}))
 
     @staticmethod
     def get_by_cidoc_class(
@@ -873,6 +865,16 @@ class Entity:
             and node.category not in ['system', 'tools']
             and node.count < 1
             and not node.subs]
+
+
+def insert(data: dict[str, Any]) -> Entity:
+    for item in [
+            'begin_from', 'begin_to', 'begin_comment',
+            'end_from', 'end_to', 'end_comment', 'description']:
+        data[item] = data.get(item, None)
+    for item in ['name', 'description']:
+        data[item] = sanitize(data[item])
+    return Entity.get_by_id(db.insert(data))
 
 
 class Link:

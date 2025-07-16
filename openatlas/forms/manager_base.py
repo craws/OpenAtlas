@@ -17,7 +17,7 @@ from openatlas.forms.populate import (
 from openatlas.forms.process import (
     process_dates, process_origin, process_standard_fields)
 from openatlas.forms.util import (
-    check_if_entity_has_time, string_to_entity_list)
+    check_if_entity_has_time, convert)
 from openatlas.forms.validation import hierarchy_name_exists, validate
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
@@ -129,7 +129,7 @@ class BaseManager:
             return
         self.data['links']['insert'].append({
             'property': property_,
-            'range': string_to_entity_list(range_)
+            'range': convert(range_)
             if isinstance(range_, str) else range_,
             'description': description,
             'inverse': inverse,

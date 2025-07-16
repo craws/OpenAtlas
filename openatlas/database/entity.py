@@ -145,13 +145,30 @@ def get_all_entities() -> list[dict[str, Any]]:
 def insert(data: dict[str, Any]) -> int:
     g.cursor.execute(
         """
-        INSERT INTO model.entity
-            (name, openatlas_class_name, cidoc_class_code, description)
-        VALUES
-            (%(name)s, %(openatlas_class_name)s, %(code)s, %(description)s)
-        RETURNING id;
-        """,
-        data)
+        INSERT INTO model.entity (
+            name,
+            openatlas_class_name,
+            cidoc_class_code,
+            description,
+            begin_from,
+            begin_to,
+            begin_comment,
+            end_from,
+            end_to,
+            end_comment
+        ) VALUES (
+            %(name)s,
+            %(openatlas_class_name)s,
+            %(cidoc_class_code)s,
+            %(description)s,
+            %(begin_from)s,
+            %(begin_to)s,
+            %(begin_comment)s,
+            %(end_from)s,
+            %(end_to)s,
+            %(end_comment)s)
+        RETURNING id;"""
+        , data)
     return g.cursor.fetchone()['id']
 
 

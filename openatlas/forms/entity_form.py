@@ -10,10 +10,11 @@ from wtforms.validators import InputRequired
 from openatlas.display.util2 import is_authorized
 from openatlas.forms.add_fields import add_value_type_fields
 from openatlas.forms.field import (
-    RemovableListField, SubmitField, SubmitAnnotationField, TableField,
+    RemovableListField, SubmitAnnotationField, SubmitField, TableField,
     TableMultiField, TextAnnotationField, TreeField, TreeMultiField,
     ValueTypeRootField)
-from openatlas.models.entity import Entity
+from openatlas.forms.util import convert
+from openatlas.models.entity import Entity, insert
 from openatlas.models.openatlas_class import OpenatlasClass
 
 
@@ -165,3 +166,68 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
                     selection,
                     description=relation['description'],
                     validators=validators))
+
+
+def process_form_data(entity: Entity, form: Any) -> Entity:
+    data = {
+        'name': entity.class_.name,
+        'openatlas_class_name': entity.class_.name,
+        'cidoc_class_code' : entity.class_.cidoc_class.code,
+        'description' : entity.description,
+        'begin_from' : entity.begin_from,
+        'begin_to' : entity.begin_to,
+        'begin_comment' : entity.begin_comment,
+        'end_from' : entity.end_from,
+        'end_to' : entity.end_to,
+        'end_comment' : entity.end_comment}
+    for attr in entity.class_.attributes:
+        data[attr] = None
+        if getattr(form, attr).data or getattr(form, attr).data == 0:
+            value = getattr(form, attr).data
+            data[attr] = value.strip() if isinstance(value, str) else value
+    if entity.id:
+        update_entity(entity, form, data)
+    else:
+        entity = insert_entity(form, data)
+    process_relations(entity, form)
+    return entity
+
+
+def process_relations(entity: Entity, form: Any) -> None:
+    for name, relation in entity.class_.relations.items():
+        if relation['mode'] == 'tab':
+            continue
+        #if hasattr(form, name) and (ids := convert(getattr(form, name).data)):
+        #    entity.link(relation['property'], ids, relation['inverse'])
+
+
+def insert_entity(form: Any, data: dict[str, Any]) -> Entity:
+    entity = insert(data)
+    #if hasattr(form, 'file'):
+    #    file = request.files['file']
+    #    ext = secure_filename(str(file.filename)).rsplit('.', 1)[1].lower()
+    #    path = app.config['UPLOAD_DIR'] / f'{entity.id}.{ext}'
+    #    file.save(str(path))
+    #    if f'.{ext}' in app.config['IMAGE_EXTENSIONS']:
+    #        call(f'exiftran -ai {path}', shell=True)  # Fix rotation
+    return entity
+
+
+def update_entity(entity: Entity, form: Any, data: dict[str, Any]) -> None:
+    delete_links: dict[str, Any] = {'property': [], 'property_inverse': []}
+    for i in entity.class_.relations.values():
+        if i['mode'] != 'tab':
+            if i['inverse']:
+                delete_links['property_inverse'].append(i['property'])
+            else:
+                delete_links['property'].append(i['property'])
+    if delete_links['property_inverse']:
+        entity.delete_links(delete_links['property_inverse'], True)
+    if delete_links['property']:
+        entity.delete_links(delete_links['property'])
+    if entity.class_.name in ['place', 'type']:
+        new_super = g.types[entity.root[0]]
+        if data1 := getattr(form, new_super.name).data:
+            new_super = g.types[int(convert(data1)[0])]
+        entity.link('has super', new_super.id)
+    entity.update(data)

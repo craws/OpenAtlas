@@ -17,7 +17,7 @@ from openatlas import app
 from openatlas.display.table import Table
 from openatlas.display.util import get_base_table_data
 from openatlas.display.util2 import is_authorized
-from openatlas.forms.util import string_to_entity_list
+from openatlas.forms.util import convert
 from openatlas.models.entity import Entity
 
 
@@ -154,9 +154,9 @@ class TableMultiSelect(HiddenInput):
             field.selection = []
             if request.form[field.name]:
                 field.selection = \
-                    string_to_entity_list(request.form[field.name])
+                    Entity.get_by_ids(convert(request.form[field.name]))
         if field.selection:
-            field.data = [e.id for e in field.selection]
+            field.data = str([e.id for e in field.selection])
             field.data_list = sorted([e.name for e in field.selection])
         field.table = table_multi(
             field.entities,

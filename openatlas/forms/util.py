@@ -15,7 +15,6 @@ from wtforms import StringField
 from openatlas import app
 from openatlas.display.util import get_file_path
 from openatlas.models.entity import Entity, Link
-from openatlas.models.openatlas_class import OpenatlasClass
 
 
 def get_form_settings(form: Any, profile: bool = False) -> dict[str, str]:
@@ -44,10 +43,13 @@ def get_form_settings(form: Any, profile: bool = False) -> dict[str, str]:
     return settings
 
 
-def string_to_entity_list(string: str) -> list[Entity]:
-    ids = ast.literal_eval(string)
-    ids = [int(id_) for id_ in ids] if isinstance(ids, list) else [int(ids)]
-    return Entity.get_by_ids(ids)
+def convert(value: str) -> list[int]:
+    if not value:
+        return []
+    if isinstance(value, list):
+        return value
+    ids = ast.literal_eval(value)
+    return ids if isinstance(ids, list) else [int(ids)]
 
 
 def set_form_settings(form: Any, profile: bool = False) -> None:
