@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import ast
 import json
-import re
 from typing import Any, Iterable, Optional
 
 from flask import g, request
@@ -233,7 +232,8 @@ class Entity:
             new: bool = False) -> Optional[int]:
         continue_link_id = None
         if 'attributes' in data:
-            self.update_attributes(data['attributes'])
+            pass
+            # self.update_attributes(data['attributes'])
         if 'aliases' in data:
             self.update_aliases(data['aliases'])
         if 'administrative_units' in data \
@@ -271,30 +271,9 @@ class Entity:
             'end_to': datetime64_to_timestamp(self.end_to),
             'begin_comment': sanitize(self.begin_comment),
             'end_comment': sanitize(self.end_comment),
-            'description': self.update_description()})
+            # 'description': self.update_description()
+        })
 
-    def update_description(self) -> Optional[str]:
-        if not self.description:
-            return None
-        if self.class_.name not in ['source', 'source_translation']:
-            return sanitize(self.description)
-        AnnotationText.delete_annotations_text(self.id)
-        text = self.description.replace('</p><p>', '\n\n')
-        replace_strings = [
-            '<p>', '</p>', '<br class="ProseMirror-trailingBreak">']
-        for string in replace_strings:
-            text = text.replace(string, '')
-        text = re.sub(r'(<br>\s*)+$', '', text)
-        text = text.replace('<br>', '\n').replace('&quot;', '"')
-        processed_text = self.process_text(text)
-        for data in processed_text['data']:
-            AnnotationText.insert(
-                data['source_id'],
-                data['link_start'],
-                data['link_end'],
-                data['entity_id'],
-                data['text'])
-        return processed_text['text']
 
     def get_annotated_text(self) -> str:
         offset = 0
@@ -314,31 +293,6 @@ class Entity:
             text = text[:start] + mark + text[end:]
             offset += (len(mark) - len(inner_text))
         return text.replace('\n', '<br>') if text else text
-
-    def process_text(self, text: str) -> dict[str, Any]:
-        data = []
-        current_offset = 0
-        pattern = r'<mark meta="(.*?)">(.*?)</mark>'
-
-        def replace_mark(match: Any) -> str:
-            nonlocal current_offset
-            metadata = json.loads(match.group(1))
-            inner_text = match.group(2)
-            start, end = match.span()
-            adjusted_start = start + current_offset
-            adjusted_end = adjusted_start + len(inner_text)
-            data.append({
-                'source_id': self.id,
-                'entity_id': metadata.get('entityId'),
-                'text': metadata.get('comment'),
-                'link_start': adjusted_start,
-                'link_end': adjusted_end})
-            current_offset += len(inner_text) - (end - start)
-            return inner_text
-
-        return {
-            'text': re.sub(pattern, replace_mark, text),
-            'data': data}
 
     def update_aliases(self, aliases: list[str]) -> None:
         delete_ids = []
@@ -868,13 +822,28 @@ class Entity:
 
 
 def insert(data: dict[str, Any]) -> Entity:
+    annotation_data = []
+    attributes = g.classes[data['openatlas_class_name']].attributes
+    if 'description' in attributes \
+            and 'annotated' in attributes['description']:
+        result = AnnotationText.extract_annotations(data['description'])
+        data['description'] = result['text']
+        annotation_data = result['data']
     for item in [
             'begin_from', 'begin_to', 'begin_comment',
             'end_from', 'end_to', 'end_comment', 'description']:
         data[item] = data.get(item, None)
     for item in ['name', 'description']:
         data[item] = sanitize(data[item])
-    return Entity.get_by_id(db.insert(data))
+    entity = Entity.get_by_id(db.insert(data))
+    for annotation in annotation_data:
+        AnnotationText.insert(
+            entity.id,
+            annotation['link_start'],
+            annotation['link_end'],
+            annotation['entity_id'],
+            annotation['text'])
+    return entity
 
 
 class Link:

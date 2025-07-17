@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+import re
 from typing import Any, Optional
 
 from openatlas.database import annotation as db
@@ -70,6 +72,36 @@ class AnnotationText:
         self.link_end = data['link_end']
         self.text = data['text']
         self.created = data['created']
+
+    @staticmethod
+    def extract_annotations(text: str) -> dict[str, Any]:
+        if not text:
+            return {'text': None, 'data': []}
+
+        def replace_mark(match: Any) -> str:
+            nonlocal current_offset
+            metadata = json.loads(match.group(1))
+            inner_text = match.group(2)
+            start, end = match.span()
+            adjusted_start = start + current_offset
+            adjusted_end = adjusted_start + len(inner_text)
+            data.append({
+                'entity_id': metadata.get('entityId'),
+                'text': metadata.get('comment'),
+                'link_start': adjusted_start,
+                'link_end': adjusted_end})
+            current_offset += len(inner_text) - (end - start)
+            return inner_text
+
+        data = []
+        current_offset = 0
+        pattern = r'<mark meta="(.*?)">(.*?)</mark>'
+        text = text.replace('</p><p>', '\n\n')
+        for item in ['<p>', '</p>' '<br class="ProseMirror-trailingBreak">']:
+            text = text.replace(item, '')
+        text = re.sub(r'(<br>\s*)+$', '', text)
+        text = text.replace('<br>', '\n').replace('&quot;', '"')
+        return {'text': re.sub(pattern, replace_mark, text), 'data': data}
 
     @staticmethod
     def delete_annotations_text(source_id: int) -> None:
