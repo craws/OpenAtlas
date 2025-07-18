@@ -5,26 +5,6 @@ from flask import g
 from openatlas.display.util2 import format_date_part
 
 
-def populate_types(manager: Any) -> None:
-    types: dict[Any, Any] = manager.link_.types \
-        if manager.link_ else manager.entity.types
-    if manager.entity and manager.entity.class_.name == 'place':
-        if location := \
-                manager.entity.get_linked_entity_safe('P53', types=True):
-            types |= location.types  # Admin. units and historical places
-    type_data: dict[int, list[int]] = {}
-    for type_, value in types.items():
-        root = g.types[type_.root[0]] if type_.root else type
-        if root.id not in type_data:
-            type_data[root.id] = []
-        type_data[root.id].append(type_.id)
-        if root.category == 'value':
-            getattr(manager.form, str(type_.id)).data = value
-    for root_id, types_ in type_data.items():
-        if hasattr(manager.form, str(root_id)):
-            getattr(manager.form, str(root_id)).data = types_
-
-
 def populate_reference_systems(manager: Any) -> None:
     if not manager.entity:
         return  # It's a link update which have no reference systems

@@ -12,7 +12,7 @@ from openatlas.display.util import link
 from openatlas.forms.add_fields import add_date_fields, add_reference_systems
 from openatlas.forms.field import TableField, TreeField
 from openatlas.forms.populate import (
-    populate_dates, populate_reference_systems, populate_types)
+    populate_dates, populate_reference_systems)
 from openatlas.forms.process import (
     process_dates, process_origin, process_standard_fields)
 from openatlas.forms.util import check_if_entity_has_time, convert
@@ -105,7 +105,6 @@ class BaseManager:
     def populate_update(self) -> None:
         if self.entity and not self.copy:
             self.form.entity_id.data = self.entity.id
-        populate_types(self)
         populate_reference_systems(self)
         if 'date' in self.fields:
             populate_dates(self)

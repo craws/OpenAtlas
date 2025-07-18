@@ -66,20 +66,6 @@ def process_standard_fields(manager: Any) -> None:
             manager.data['attributes']['name'] = name
         elif key == 'alias':
             manager.data['aliases'] = value
-        elif field_type in ['TreeField', 'TreeMultiField']:
-
-            if manager.class_.name in \
-                    ['actor_function', 'actor_relation', 'involvement']:
-                continue
-            if g.types[int(getattr(manager.form, key).id)].class_.name \
-                    == 'administrative_unit':
-                if 'administrative_units' not in manager.data:
-                    manager.data['administrative_units'] = []
-                manager.data['administrative_units'] += value
-            elif not manager.entity or manager.entity.class_.view != 'type':
-                manager.data['links']['delete'].add('P2')
-                manager.add_link('P2', [g.types[id_] for id_ in value])
-
         elif field_type == 'ValueTypeField':
             if value is not None:  # Allow the number zero
                 manager.add_link('P2', g.types[int(key)], value)
