@@ -82,12 +82,13 @@ class ArcheFileMetadata:
             cls,
             entity: Entity,
             metadata: dict[str, Any],
+            type_name: str,
             license_: str) -> 'ArcheFileMetadata':
         part_of = f"https://id.acdh.oeaw.ac.at/{metadata['topCollection']}"
         titles = [(entity.name, metadata['language'])]
         file_info = (g.files[entity.id].suffix[1:], g.files[entity.id].name)
         obj = cls(
-            uri=f"{part_of}/{file_info[0]}/{file_info[1]}",
+            uri=f"{part_of}/{type_name}/{file_info[0]}/{file_info[1]}",
             titles=titles)
         obj.depositor = metadata['depositor']
         obj.license = license_

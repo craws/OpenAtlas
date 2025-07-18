@@ -61,21 +61,24 @@ def sql_export(format_: str, postfix: Optional[str] = '') -> bool:
     return True
 
 
-def arche_export() -> Any:
-    ext_metadata = app.config['ARCHE_METADATA']
+def arche_export() -> bool:
+    external_metadata = app.config['ARCHE_METADATA']
     file_entities = Entity.get_by_class(['file'], types=True, aliases=True)
-    if ext_metadata.get('typeIds'):
-        file_entities = filter_by_type(
-            file_entities,
-            ext_metadata.get('typeIds'))
-    arche_metadata = get_arche_metadata(file_entities)
-    files_by_extension = defaultdict(list)
-    for f in arche_metadata['files_path']:
-        files_by_extension[normalize_extension(f.suffix)].append(f)
+    if type_ids := external_metadata.get('typeIds'):
+        file_entities = filter_by_type(file_entities, type_ids)
 
+    arche_file_metadata = get_arche_metadata(
+        file_entities,
+        set(type_ids),
+        external_metadata['topCollection'])
+    files_by_extension = defaultdict(lambda: defaultdict(set))
+    for entity_id, path_set in arche_file_metadata['files_by_types'].items():
+        for f in path_set:
+            ext = normalize_extension(f.suffix)
+            files_by_extension[entity_id][ext].add(f)
     rdf_dump = Endpoint(
         ApiEntity.get_by_system_classes(['all']),
-        {'type_id': ext_metadata.get('typeIds'),
+        {'type_id': type_ids,
          'limit': 0,
          'format': 'turtle'}).resolve_entities()
     tempfile.tempdir = str(app.config['TMP_PATH'])
@@ -84,7 +87,7 @@ def arche_export() -> Any:
             suffix='.md',
             delete=False) as tmp_md:
         tmp_md.write("\n".join(
-            create_failed_files_md(arche_metadata['missing'])))
+            create_failed_files_md(arche_file_metadata['missing'])))
         tmp_md_path = tmp_md.name
 
     with tempfile.NamedTemporaryFile(
@@ -118,24 +121,26 @@ def arche_export() -> Any:
             Path(tmp_md_path).read_text(encoding='utf-8'), encoding='utf-8')
 
         ttl_path = temp_path / 'files.ttl'
-        ttl_path.write_text(arche_metadata['graph'])
+        ttl_path.write_text(arche_file_metadata['graph'])
 
         rdf_path = temp_path / 'rdf_dump.ttl'
         rdf_path.write_text(rdf_dump.get_data(as_text=True))
 
-        for ext, files_list in files_by_extension.items():
-            ext_dir = temp_path / ext
-            ext_dir.mkdir(parents=True, exist_ok=True)
-            for file_path in files_list:
-                (ext_dir / file_path.name).write_bytes(
-                    Path(file_path).read_bytes())
+        for type_name, ext_map in files_by_extension.items():
+            for ext, files_set in ext_map.items():
+                ext_dir = temp_path / type_name / ext
+                ext_dir.mkdir(parents=True, exist_ok=True)
+                for file_path in files_set:
+                    (ext_dir / file_path.name).write_bytes(
+                        file_path.read_bytes())
+
 
         export_path = app.config['EXPORT_PATH']
         export_path.mkdir(parents=True, exist_ok=True)
 
         archive_name = (
             f"{current_date_for_filename()}_"
-            f"{ext_metadata['topCollection'].replace(' ', '_')}.zip")
+            f"{external_metadata['topCollection'].replace(' ', '_')}.zip")
         archive_file = export_path / archive_name
 
         with zipfile.ZipFile(archive_file, 'w') as archive:
@@ -143,11 +148,14 @@ def arche_export() -> Any:
             archive.write(ttl_path, arcname='files.ttl')
             archive.write(tmp_sql_path, arcname='database_dump.sql')
             archive.write(rdf_path, arcname='rdf_dump.ttl')
-            for ext, files_list in files_by_extension.items():
-                for file_path in files_list:
-                    archive.write(
-                        temp_path / ext / file_path.name,
-                        arcname=f'{ext}/{file_path.name}')
+
+            for type_name, ext_map in files_by_extension.items():
+                for ext, files_set in ext_map.items():
+                    for file_path in files_set:
+                        archive.write(
+                            temp_path / type_name / ext / file_path.name,
+                            arcname=f'{type_name}/{ext}/{file_path.name}')
+
         return archive_file
 
 
@@ -182,12 +190,15 @@ def filter_by_type(
     return result
 
 
-def get_arche_metadata(entities: list[Entity]) -> dict[str, Any]:
+def get_arche_metadata(
+        entities: list[Entity],
+        type_ids: set[int],
+        top_collection: str) -> dict[str, Any]:
     ext_metadata = app.config['ARCHE_METADATA']
     license_urls = {}
     arche_metadata_list = []
     missing = defaultdict(set)
-    files_path = set()
+    files_by_types = defaultdict(set)
     for entity in entities:
         if not g.files.get(entity.id):
             missing['No files'].add((entity.id, entity.name))
@@ -210,12 +221,26 @@ def get_arche_metadata(entities: list[Entity]) -> dict[str, Any]:
                     break
             if entity.standard_type.id not in license_urls:
                 continue
-        arche_metadata_list.append(
-            ArcheFileMetadata.construct(
-                entity,
-                ext_metadata,
-                license_urls[entity.standard_type.id]))
-        files_path.add(g.files.get(entity.id))
+        if type_ids:
+            for type_ in entity.types:
+                if type_.id in type_ids:
+                    type_name = g.types[type_.id].name.replace(' ', '_')
+                    files_by_types[type_name].add(g.files.get(entity.id))
+                    arche_metadata_list.append(
+                        ArcheFileMetadata.construct(
+                            entity,
+                            ext_metadata,
+                            type_name,
+                            license_urls[entity.standard_type.id]))
+        else:
+            files_by_types[top_collection].add(g.files.get(entity.id))
+            arche_metadata_list.append(
+                ArcheFileMetadata.construct(
+                    entity,
+                    ext_metadata,
+                    top_collection,
+                    license_urls[entity.standard_type.id]))
+
 
     graph = Graph()
     graph.bind("acdh", ACDH)
@@ -224,4 +249,4 @@ def get_arche_metadata(entities: list[Entity]) -> dict[str, Any]:
     return {
         'graph': graph.serialize(format="turtle"),
         'missing': missing,
-        'files_path': files_path}
+        'files_by_types': files_by_types}
