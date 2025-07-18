@@ -204,8 +204,11 @@ def process_relations(entity: Entity, form: Any) -> None:
     for name, relation in entity.class_.relations.items():
         if relation['mode'] == 'tab':
             continue
-        #if hasattr(form, name) and (ids := convert(getattr(form, name).data)):
-        #    entity.link(relation['property'], ids, relation['inverse'])
+        if hasattr(form, name) and (ids := convert(getattr(form, name).data)):
+            entity.link(
+                relation['property'],
+                Entity.get_by_ids(ids),
+                inverse=relation['inverse'])
 
 
 def insert_entity(form: Any, data: dict[str, Any]) -> Entity:

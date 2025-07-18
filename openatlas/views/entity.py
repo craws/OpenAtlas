@@ -104,9 +104,9 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
         if template := was_modified_template(entity, form):
             return template
         return redirect(save(entity, None, form))
-    #if not manager.form.is_submitted():
+    # if not manager.form.is_submitted():
     #    manager.populate_update()
-    #if entity.class_.view in ['artifact', 'place']:
+    # if entity.class_.view in ['artifact', 'place']:
     #    manager.entity.image_id = manager.entity.get_profile_image_id()
     #    if not manager.entity.image_id:
     #        for link_ in manager.entity.get_links('P67', inverse=True):
@@ -120,11 +120,10 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
         form=form,
         entity=entity,
         class_name=entity.class_.view,
-        #gis_data=manager.place_info['gis_data'],
-        #overlays=manager.place_info['overlays'],
+        # gis_data=manager.place_info['gis_data'],
+        # overlays=manager.place_info['overlays'],
         title=entity.name,
-        #crumbs=manager.get_crumbs()
-    )
+        crumbs=form_crumbs(entity))
 
 
 @app.route('/delete/<int:id_>')
@@ -271,7 +270,7 @@ def get_redirect_url(entity: Entity) -> str:
     #        id_=manager.continue_link_id,
     #        origin_id=manager.origin.id)
     url = url_for('view', id_=entity.id)
-    #if manager.origin and manager.entity.class_.name not in \
+    # if manager.origin and manager.entity.class_.name not in \
     #        ('administrative_unit', 'source_translation', 'type'):
     #    url = \
     #        f"{url_for('view', id_=manager.origin.id)}" \
@@ -282,7 +281,7 @@ def get_redirect_url(entity: Entity) -> str:
     #            in ['place', 'feature', 'stratigraphic_unit'] \
     #            and manager.entity.class_.view != 'actor':
     #        url = url_for('view', id_=manager.entity.id)
-    #if hasattr(manager.form, 'continue_') \
+    # if hasattr(manager.form, 'continue_') \
     #        and manager.form.continue_.data == 'yes':
     #    url = url_for(
     #        'insert',
@@ -298,7 +297,7 @@ def get_redirect_url(entity: Entity) -> str:
     #            'insert',
     #            class_=manager.entity.class_.name,
     #            origin_id=str(super_id) if super_id else root_id)
-    #elif hasattr(manager.form, 'continue_') \
+    # elif hasattr(manager.form, 'continue_') \
     #        and manager.form.continue_.data in ['sub', 'human_remains']:
     #    class_ = manager.form.continue_.data
     #    if class_ == 'sub':

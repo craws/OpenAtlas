@@ -136,9 +136,7 @@ def form_to_datetime64(
     return date_time
 
 
-def form_crumbs(
-        entity: Entity,
-        origin: Entity) -> list[Any]:
+def form_crumbs(entity: Entity, origin: Optional[Entity] = None) -> list[Any]:
     label = origin.class_.name if origin \
         else g.classes[entity.class_.name].view
     if label in g.class_view_mapping:

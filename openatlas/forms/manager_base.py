@@ -15,8 +15,7 @@ from openatlas.forms.populate import (
     populate_dates, populate_reference_systems, populate_types)
 from openatlas.forms.process import (
     process_dates, process_origin, process_standard_fields)
-from openatlas.forms.util import (
-    check_if_entity_has_time, convert)
+from openatlas.forms.util import check_if_entity_has_time, convert
 from openatlas.forms.validation import hierarchy_name_exists, validate
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
@@ -277,7 +276,7 @@ class ArtifactBaseManager(PlaceBaseManager):
                     add_dynamic=['person', 'group'])}
 
     def get_crumbs(self) -> list[Any]:
-        crumbs = super().get_crumbs()
+        crumbs = []
         if self.place_info['structure'] and self.origin:
             if count := len([
                 i for i in self.place_info['structure']['siblings']
@@ -394,7 +393,7 @@ class TypeBaseManager(BaseManager):
         type_ = self.origin or self.entity
         self.crumbs = [link(type_, index=True)]
         self.crumbs += [g.types[type_id] for type_id in type_.root]
-        return super().get_crumbs()
+        return self.crumbs
 
     def get_root(self) -> Entity:
         type_ = self.origin or self.entity
