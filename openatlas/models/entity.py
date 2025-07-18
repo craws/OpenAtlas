@@ -837,12 +837,8 @@ def insert(data: dict[str, Any]) -> Entity:
         data[item] = sanitize(data[item])
     entity = Entity.get_by_id(db.insert(data))
     for annotation in annotation_data:
-        AnnotationText.insert(
-            entity.id,
-            annotation['link_start'],
-            annotation['link_end'],
-            annotation['entity_id'],
-            annotation['text'])
+        annotation['source_id'] = entity.id
+        AnnotationText.insert(annotation)
     return entity
 
 

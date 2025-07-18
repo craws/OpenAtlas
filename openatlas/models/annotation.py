@@ -114,15 +114,5 @@ class AnnotationText:
             in db.get_annotation_text_by_source_id(id_)]
 
     @staticmethod
-    def insert(
-            source_id: int,
-            link_start: int,
-            link_end: int,
-            entity_id: Optional[int] = None,
-            text: Optional[str] = None) -> None:
-        db.insert_annotation_text({
-            'source_id': source_id,
-            'link_start': link_start,
-            'link_end': link_end,
-            'entity_id': entity_id,
-            'text': sanitize(text)})
+    def insert(data: dict[str, Any]) -> None:
+        db.insert_annotation_text(data)
