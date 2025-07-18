@@ -88,43 +88,37 @@ def add_description(form: Any, entity: Entity) -> None:
 
 
 def add_types(form: Any, class_: OpenatlasClass) -> None:
-    if class_.hierarchies:
-        types = OrderedDict({id_: g.types[id_] for id_ in class_.hierarchies})
-        if class_.standard_type_id in types:
-            types.move_to_end(class_.standard_type_id, last=False)
-        for type_ in types.values():
+    if not class_.hierarchies:
+        return
+    types = OrderedDict({id_: g.types[id_] for id_ in class_.hierarchies})
+    if class_.standard_type_id in types:
+        types.move_to_end(class_.standard_type_id, last=False)
+    for type_ in types.values():
+        add_form = None
+        if is_authorized('editor'):
             class AddDynamicType(FlaskForm):
                 pass
 
-            setattr(AddDynamicType, 'name-dynamic', StringField(_('name')))
+            setattr(AddDynamicType, 'name-dynamic', StringField(_('super')))
             setattr(
                 AddDynamicType,
                 f'{type_.id}-dynamic',
-                TreeField(str(type_.id), type_id=str(type_.id)))
+                TreeField(str(type_.id) + '*', type_id=str(type_.id)))
             setattr(
                 AddDynamicType,
                 'description-dynamic',
                 TextAreaField(_('description')))
-            add_form = AddDynamicType() if is_authorized('editor') else None
-            if add_form:
-                getattr(add_form, f'{type_.id}-dynamic').label.text = 'super'
-            validators = [InputRequired()] if type_.required else []
-            if type_.category == 'value':
-                setattr(
-                    form,
-                    str(type_.id),
-                    ValueTypeRootField(type_.name, type_.id))
-                add_value_type_fields(form, type_.subs)
-            elif type_.multiple:
-                setattr(
-                    form,
-                    str(type_.id),
-                    TreeMultiField(str(type_.id), validators, form=add_form))
-            else:
-                setattr(
-                    form,
-                    str(type_.id),
-                    TreeField(str(type_.id), validators, form=add_form))
+            add_form = AddDynamicType()
+        validators = [InputRequired()] if type_.required else []
+        if type_.category == 'value':
+            field = ValueTypeRootField(type_.name, type_.id)
+        elif type_.multiple:
+            field = TreeMultiField(str(type_.id), validators, form=add_form)
+        else:
+            field = TreeField(str(type_.id), validators, form=add_form)
+        setattr(form, str(type_.id), field)
+        if type_.category == 'value':
+            add_value_type_fields(form, type_.subs)
 
 
 def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:

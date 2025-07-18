@@ -64,11 +64,10 @@ def process_standard_fields(manager: Any) -> None:
                     and manager.entity.system:
                 name = manager.entity.name  # Prevent changing a system name
             manager.data['attributes']['name'] = name
-        elif key == 'description':
-            manager.data['attributes'][key] = manager.form.data[key]
         elif key == 'alias':
             manager.data['aliases'] = value
         elif field_type in ['TreeField', 'TreeMultiField']:
+
             if manager.class_.name in \
                     ['actor_function', 'actor_relation', 'involvement']:
                 continue
@@ -80,6 +79,7 @@ def process_standard_fields(manager: Any) -> None:
             elif not manager.entity or manager.entity.class_.view != 'type':
                 manager.data['links']['delete'].add('P2')
                 manager.add_link('P2', [g.types[id_] for id_ in value])
+
         elif field_type == 'ValueTypeField':
             if value is not None:  # Allow the number zero
                 manager.add_link('P2', g.types[int(key)], value)
