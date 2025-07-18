@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import ast
-from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
 
@@ -78,16 +77,6 @@ def set_form_settings(form: Any, profile: bool = False) -> None:
             field.data = ''  # If missing setting after an update
             continue
         field.data = g.settings[field.name]
-
-
-def was_modified(form: Any, entity: Entity) -> bool:
-    if not entity.modified or not form.opened.data:
-        return False
-    if entity.modified < datetime.fromtimestamp(
-            float(form.opened.data)):
-        return False
-    g.logger.log('info', 'multi user', 'Overwrite denied')
-    return True
 
 
 def form_to_datetime64(

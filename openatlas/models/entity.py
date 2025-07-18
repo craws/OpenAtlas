@@ -226,27 +226,37 @@ class Entity:
                     return
         db.delete_links_by_codes(self.id, codes, inverse)
 
-    def update(
-            self,
-            data: dict[str, Any],
-            new: bool = False) -> Optional[int]:
-        continue_link_id = None
-        if 'attributes' in data:
-            pass
-            # self.update_attributes(data['attributes'])
-        if 'aliases' in data:
-            self.update_aliases(data['aliases'])
-        if 'administrative_units' in data \
-                and self.class_.name != 'administrative_unit':
-            self.update_administrative_units(data['administrative_units'], new)
-        if 'links' in data:
-            continue_link_id = self.update_links(data, new)
-        if 'gis' in data:
-            self.update_gis(data['gis'], new)
-        if self.class_.name == 'file':
-            data['file_info']['entity_id'] = self.id
-            db.update_file_info(data['file_info'])
-        return continue_link_id
+    def update(self, data: dict[str, Any]) -> None:
+        data['id'] = self.id
+        annotation_data = []
+        attributes = g.classes[data['openatlas_class_name']].attributes
+        if 'description' in attributes \
+                and 'annotated' in attributes['description']:
+            result = AnnotationText.extract_annotations(data['description'])
+            data['description'] = result['text']
+            annotation_data = result['data']
+            AnnotationText.delete_annotations_text(self.id)
+        for item in ['name', 'description']:
+            data[item] = sanitize(data[item])
+        db.update(data)
+        for annotation in annotation_data:
+            annotation['source_id'] = self.id
+            AnnotationText.insert(annotation)
+
+        #continue_link_id = None
+        #if 'aliases' in data:
+        #    self.update_aliases(data['aliases'])
+        #if 'administrative_units' in data \
+        #        and self.class_.name != 'administrative_unit':
+        #    self.update_administrative_units(data['administrative_units'], new)
+        #if 'links' in data:
+        #    continue_link_id = self.update_links(data, new)
+        #if 'gis' in data:
+         #   self.update_gis(data['gis'], new)
+        #if self.class_.name == 'file':
+        #    data['file_info']['entity_id'] = self.id
+        #    db.update_file_info(data['file_info'])
+        #return continue_link_id
 
     def update_administrative_units(
             self,
@@ -534,7 +544,6 @@ class Entity:
             if ext in app.config['DISPLAY_FILE_EXT']:
                 entities.append(Entity(row))
         return entities
-
 
     @staticmethod
     def get_by_cidoc_class(

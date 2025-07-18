@@ -1,7 +1,8 @@
+import time
 from collections import OrderedDict
 from typing import Any, Optional
 
-from flask import g
+from flask import g, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import FieldList, HiddenField, StringField, TextAreaField
@@ -14,13 +15,15 @@ from openatlas.forms.field import (
     TableMultiField, TextAnnotationField, TreeField, TreeMultiField,
     ValueTypeRootField)
 from openatlas.forms.util import convert
+from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity, insert
 from openatlas.models.openatlas_class import OpenatlasClass
 
 
 def get_entity_form(entity: Entity, origin: Optional[Entity] = None) -> Any:
     class Form(FlaskForm):
-        pass
+        opened = HiddenField()
+        validate = validate
 
     add_name_fields(Form, entity)
     add_types(Form, entity.class_)
@@ -28,6 +31,10 @@ def get_entity_form(entity: Entity, origin: Optional[Entity] = None) -> Any:
     add_description(Form, entity)
     add_buttons(Form, entity)
     form: Any = Form(obj=entity)
+    if request.method == 'GET' and entity.id:
+        populate_update(form, entity)
+    # elif request.method == 'GET' and entity.id:
+    #    populate_insert(form, entity, origin, date)
     return form
 
 
@@ -172,14 +179,14 @@ def process_form_data(entity: Entity, form: Any) -> Entity:
     data = {
         'name': entity.class_.name,
         'openatlas_class_name': entity.class_.name,
-        'cidoc_class_code' : entity.class_.cidoc_class.code,
-        'description' : entity.description,
-        'begin_from' : entity.begin_from,
-        'begin_to' : entity.begin_to,
-        'begin_comment' : entity.begin_comment,
-        'end_from' : entity.end_from,
-        'end_to' : entity.end_to,
-        'end_comment' : entity.end_comment}
+        'cidoc_class_code': entity.class_.cidoc_class.code,
+        'description': entity.description,
+        'begin_from': entity.begin_from,
+        'begin_to': entity.begin_to,
+        'begin_comment': entity.begin_comment,
+        'end_from': entity.end_from,
+        'end_to': entity.end_to,
+        'end_comment': entity.end_comment}
     for attr in entity.class_.attributes:
         data[attr] = None
         if getattr(form, attr).data or getattr(form, attr).data == 0:
@@ -231,3 +238,7 @@ def update_entity(entity: Entity, form: Any, data: dict[str, Any]) -> None:
             new_super = g.types[int(convert(data1)[0])]
         entity.link('has super', new_super.id)
     entity.update(data)
+
+
+def populate_update(form: Any, entity: Entity) -> None:
+    form.opened.data = time.time()

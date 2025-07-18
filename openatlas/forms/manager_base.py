@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import time
 from typing import Any, Optional, TYPE_CHECKING
 
 from flask import g
@@ -105,7 +104,6 @@ class BaseManager:
         pass
 
     def populate_update(self) -> None:
-        self.form.opened.data = time.time()
         if self.entity and not self.copy:
             self.form.entity_id.data = self.entity.id
         populate_types(self)

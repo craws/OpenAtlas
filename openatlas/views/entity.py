@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from subprocess import call
 from typing import Any, Optional
 
@@ -15,13 +16,12 @@ from openatlas.display.display import Display
 from openatlas.display.image_processing import resize_image
 from openatlas.display.util import (
     button, check_iiif_activation, check_iiif_file_exist,
-    convert_image_to_iiif, get_base_table_data, get_file_path,
-    get_iiif_file_path, link, required_group)
+    convert_image_to_iiif, get_file_path, get_iiif_file_path, link,
+    required_group)
 from openatlas.display.util2 import is_authorized
 from openatlas.forms.entity_form import get_entity_form, process_form_data
-from openatlas.forms.form import get_manager
 from openatlas.forms.manager_base import BaseManager
-from openatlas.forms.util import form_crumbs, was_modified
+from openatlas.forms.util import form_crumbs
 from openatlas.models.entity import Entity
 from openatlas.models.gis import InvalidGeomException
 from openatlas.models.reference_system import ReferenceSystem
@@ -99,44 +99,32 @@ def insert(class_: str, origin_id: Optional[int] = None) -> str | Response:
 def update(id_: int, copy: Optional[str] = None) -> str | Response:
     entity = Entity.get_by_id(id_, types=True, aliases=True)
     check_update_access(entity)
-    if entity.check_too_many_single_type_links():
-        abort(422)
-    manager = get_manager(entity=entity, copy=bool(copy))
-    if manager.form.validate_on_submit():
-        if was_modified(manager.form, entity):
-            del manager.form.save
-            modifier = link(
-                g.logger.get_log_info(entity.id)['modifier'],
-                external=True)
-            flash(
-                _('error modified by %(username)s', username=modifier) +
-                button(_('reload'), url_for('update', id_=entity.id)),
-                'error')
-            return render_template(
-                'entity/update.html',
-                form=manager.form,
-                entity=entity)
-        return redirect(save(manager))
-    if not manager.form.is_submitted():
-        manager.populate_update()
-    if entity.class_.view in ['artifact', 'place']:
-        manager.entity.image_id = manager.entity.get_profile_image_id()
-        if not manager.entity.image_id:
-            for link_ in manager.entity.get_links('P67', inverse=True):
-                if link_.domain.class_.view == 'file' \
-                        and get_base_table_data(link_.domain)[6] \
-                        in g.display_file_ext:
-                    manager.entity.image_id = link_.domain.id
-                    break
+    form = get_entity_form(entity)
+    if form.validate_on_submit():
+        if template := was_modified_template(entity, form):
+            return template
+        return redirect(save(entity, None, form))
+    #if not manager.form.is_submitted():
+    #    manager.populate_update()
+    #if entity.class_.view in ['artifact', 'place']:
+    #    manager.entity.image_id = manager.entity.get_profile_image_id()
+    #    if not manager.entity.image_id:
+    #        for link_ in manager.entity.get_links('P67', inverse=True):
+    #            if link_.domain.class_.view == 'file' \
+    #                    and get_base_table_data(link_.domain)[6] \
+    #                    in g.display_file_ext:
+    #                manager.entity.image_id = link_.domain.id
+    #                break
     return render_template(
         'entity/update.html',
-        form=manager.form,
+        form=form,
         entity=entity,
         class_name=entity.class_.view,
-        gis_data=manager.place_info['gis_data'],
-        overlays=manager.place_info['overlays'],
+        #gis_data=manager.place_info['gis_data'],
+        #overlays=manager.place_info['overlays'],
         title=entity.name,
-        crumbs=manager.get_crumbs())
+        #crumbs=manager.get_crumbs()
+    )
 
 
 @app.route('/delete/<int:id_>')
@@ -194,6 +182,8 @@ def check_update_access(entity: Entity) -> None:
             entity.category == 'system'
             or entity.category == 'standard' and not entity.root):
         abort(403)
+    if entity.check_too_many_single_type_links():
+        abort(422)
 
 
 def insert_files(manager: BaseManager) -> str:
@@ -331,3 +321,20 @@ def delete_files(id_: int) -> None:
     if g.settings['iiif'] and check_iiif_file_exist(id_):
         if path := get_iiif_file_path(id_):
             path.unlink()
+
+
+def was_modified_template(entity: Entity, form: Any) -> str | None:
+    if not entity.modified \
+            or not form.opened.data \
+            or entity.modified < \
+            datetime.fromtimestamp(float(form.opened.data)):
+        return
+    del form.save
+    g.logger.log('info', 'multi user', 'Overwrite denied')
+    flash(
+        _('error modified by %(username)s', username=link(
+            g.logger.get_log_info(entity.id)['modifier'],
+            external=True)) +
+        button(_('reload'), url_for('update', id_=entity.id)),
+        'error')
+    return render_template('entity/update.html', form=form, entity=entity)
