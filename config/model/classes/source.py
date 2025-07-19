@@ -47,6 +47,7 @@ model = {
             'inverse': True,
             'multiple': True}},
     'display': {
+        'buttons': ['copy'],
         'form': {'insert_and_continue': True},
         'tabs': {
             'text': {},

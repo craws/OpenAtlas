@@ -47,6 +47,10 @@ class Display:
 
     def add_crumbs(self) -> None:
         self.crumbs = [link(self.entity, index=True)]
+        if self.entity.class_.name == 'source_translation':
+            self.crumbs = [
+                [_('source'), url_for('index', view='source')],
+                self.entity.get_linked_entity_safe('P73', True)]
         if self.structure:
             for super_ in self.structure['supers']:
                 self.crumbs.append(link(super_))
@@ -194,10 +198,11 @@ class Display:
             self.add_button_sibling_pager()
 
     def add_button_copy(self) -> None:
-        self.buttons.append(
-            button(
-                _('copy'),
-                url_for('update', id_=self.entity.id, copy='copy_')))
+        if 'copy' in self.entity.class_.display['buttons']:
+            self.buttons.append(
+                button(
+                    _('copy'),
+                    url_for('update', id_=self.entity.id, copy='copy_')))
 
     def add_button_delete(self) -> None:
         if current_user.group == 'contributor':
@@ -248,7 +253,7 @@ class Display:
         self.data.update(self.get_type_data())
         for name, relation in self.entity.class_.relations.items():
             if relation['mode'] == 'direct':
-                self.data[name] = [
+                self.data[relation['label']] = [
                     link(e) for e in self.entity.get_linked_entities(
                         relation['property'],
                         relation['class'],

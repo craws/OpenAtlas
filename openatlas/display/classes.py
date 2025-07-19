@@ -9,8 +9,8 @@ from openatlas.display.classes_base import (
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, description, display_annotation_text_links, edit_link,
-    format_entity_date, get_base_table_data, get_file_path, link, remove_link)
+    button, description, edit_link, format_entity_date, get_base_table_data,
+    get_file_path, link, remove_link)
 from openatlas.display.util2 import is_authorized, uc_first
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
@@ -270,23 +270,6 @@ class ReferenceSystemDisplay(BaseDisplay):
                         'reference_system_remove_class',
                         system_id=self.entity.id,
                         class_name=name))]
-
-
-class SourceTranslationDisplay(BaseDisplay):
-
-    def add_button_copy(self) -> None:
-        pass
-
-    def add_crumbs(self) -> None:
-        self.crumbs = [
-            [_('source'), url_for('index', view='source')],
-            self.entity.get_linked_entity_safe('P73', True),
-            self.entity.name]
-
-    def description_html(self) -> str:
-        return description(
-            display_annotation_text_links(self.entity),
-            _('content'))
 
 
 class StratigraphicUnitDisplay(PlaceBaseDisplay):

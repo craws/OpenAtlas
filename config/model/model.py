@@ -1,6 +1,6 @@
 from typing import Any
 
-from config.model.classes import source
+from config.model.classes import source, source_translation
 
 model: dict[str, Any] = {
     'acquisition': {
@@ -71,8 +71,7 @@ model: dict[str, Any] = {
     'reference_system': {
         'attributes': {}},
     'source': source.model,
-    'source_translation': {
-        'attributes': {}},
+    'source_translation': source_translation.model,
     'stratigraphic_unit': {
         'attributes': {},
         'display': {'buttons': ['network']}},

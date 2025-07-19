@@ -28,7 +28,7 @@ def get_entity_form(entity: Entity, origin: Optional[Entity] = None) -> Any:
     add_name_fields(Form, entity)
     add_types(Form, entity.class_)
     add_relations(Form, entity, origin)
-    add_description(Form, entity)
+    add_description(Form, entity, origin)
     add_buttons(Form, entity)
     form: Any = Form(obj=entity)
     if request.method == 'GET' and entity.id:
@@ -62,7 +62,10 @@ def add_buttons(form: Any, entity: Entity) -> None:
         setattr(form, 'continue_', HiddenField())
 
 
-def add_description(form: Any, entity: Entity) -> None:
+def add_description(
+        form: Any,
+        entity: Entity,
+        origin: Optional[Entity] = None) -> None:
     if 'description' not in entity.class_.attributes:
         return
     if 'annotated' not in entity.class_.attributes['description']:
@@ -71,10 +74,20 @@ def add_description(form: Any, entity: Entity) -> None:
             'description',
             TextAreaField(_('description'), render_kw={'rows': 8}))
         return
-    text = ''
+    text = entity.get_annotated_text() if entity.id else ''
     linked_entities = []
-    if entity.id:
-        text = entity.get_annotated_text()
+    if entity.class_.name == 'source_translation':
+        if origin:
+            source = origin
+        else:
+            source = entity.get_linked_entity('P73', inverse=True)
+        linked_entities = [
+            {'id': e.id, 'name': e.name}
+            for e in source.get_linked_entities('P67')]
+    elif entity.id:
+        linked_entities = [
+            {'id': e.id, 'name': e.name}
+            for e in entity.get_linked_entities('P67')]
         for e in entity.get_linked_entities('P67'):
             linked_entities.append({'id': e.id, 'name': e.name})
     setattr(
@@ -165,7 +178,7 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
                 TableField(
                     items,
                     selection,
-                    description=relation['description'],
+                    description=relation['tooltip'],
                     validators=validators))
 
 

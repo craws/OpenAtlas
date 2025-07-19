@@ -168,4 +168,5 @@ def get_model(class_name: str) -> dict[str, Any]:
         relation['label'] = relation.get('label', name)
         relation['mode'] = relation.get('mode', 'tab')
         relation['selected'] = [] if relation['multiple'] else None
+        relation['tooltip'] = relation.get('tooltip', None)
     return data
