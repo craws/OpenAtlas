@@ -19,8 +19,9 @@ versions = {
         'features': {
             '2571': 'Update Catalan and Spanish translations',
             '2574': 'Update French translations',
-            '2466': 'API: export files with ARCHE RDF metadata',
-            '2563': 'API: Presentation view improvements'
+            '2434': 'API: Text annotation for presentation view',
+            '2563': 'API: Presentation view improvements',
+            '2466': 'API: Export files with ARCHE RDF metadata'
         }
     }],
     '8.12.1': ['2025-06-29', {
