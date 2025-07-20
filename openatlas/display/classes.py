@@ -32,10 +32,6 @@ class AcquisitionDisplay(EventsDisplay):
             self.entity.get_linked_entities('P24', sort=True)]
 
 
-class ActivityDisplay(EventsDisplay):
-    pass
-
-
 class AdministrativeUnitDisplay(TypeBaseDisplay):
     pass
 

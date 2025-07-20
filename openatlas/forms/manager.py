@@ -1,19 +1,18 @@
 import ast
 from typing import Any
 
-from flask import g, request, url_for
+from flask import g, request
 from flask_babel import lazy_gettext as _
 from wtforms import (
     BooleanField, HiddenField, SelectField, SelectMultipleField, StringField,
     widgets)
 from wtforms.validators import InputRequired, Optional, URL
 
+from openatlas.forms.field import (
+    DragNDropField, SubmitField, TableField, TableMultiField, TreeField)
 from openatlas.forms.manager_base import (
     ActorBaseManager, ArtifactBaseManager, BaseManager, EventBaseManager,
     HierarchyBaseManager, PlaceBaseManager, TypeBaseManager)
-from openatlas.forms.field import (
-    DragNDropField, SubmitField, TableField, TableMultiField,
-    TextAnnotationField, TreeField)
 from openatlas.forms.validation import file
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
@@ -572,58 +571,6 @@ class ReferenceSystemManager(BaseManager):
             'classes': self.form.classes.data if self.form.classes else None}
 
 
-class SourceManager(BaseManager):
-    def additional_fields(self) -> dict[str, Any]:
-        selection = None
-        if not self.insert and self.entity:
-            selection = self.entity.get_linked_entities(
-                'P128',
-                inverse=True,
-                types=True)
-        elif self.origin and self.origin.class_.name == 'artifact':
-            selection = [self.origin]
-        return super().additional_fields() | {
-            'artifact': TableMultiField(
-                Entity.get_by_class('artifact', True),
-                selection,
-                description=
-                _('Link artifacts as the information carrier of the source'))}
-
-    def process_form(self) -> None:
-        super().process_form()
-        if not self.origin:
-            self.data['links']['delete_inverse'].add('P128')
-            if self.form.artifact.data:
-                self.add_link('P128', self.form.artifact.data, inverse=True)
-
-
-class SourceTranslationManager(BaseManager):
-    def add_description(self) -> None:
-        text = ''
-        linked_entities = []
-        if self.entity:
-            text = self.entity.get_annotated_text()
-            source = self.entity.get_linked_entity_safe('P73', True)
-            for e in source.get_linked_entities('P67'):
-                linked_entities.append({'id': e.id, 'name': e.name})
-        setattr(self.form_class, 'description', TextAnnotationField(
-            label=_('content'),
-            source_text=text,
-            linked_entities=linked_entities))
-
-    def get_crumbs(self) -> list[Any]:
-        if not self.origin:
-            self.crumbs = [
-                [_('source'), url_for('index', view='source')],
-                self.entity.get_linked_entity('P73', True)]
-        return super().get_crumbs()
-
-    def process_form(self) -> None:
-        super().process_form()
-        if self.origin:
-            self.add_link('P73', self.origin, inverse=True)
-
-
 class StratigraphicUnitManager(PlaceBaseManager):
     fields = ['name', 'date', 'description', 'continue', 'map']
 
@@ -661,7 +608,6 @@ class StratigraphicUnitManager(PlaceBaseManager):
 
 class TypeManager(TypeBaseManager):
     def add_description(self) -> None:
-        super().add_description()
         if self.get_root().category == 'value':
             del self.form_class.description  # pylint: disable=no-member
             setattr(self.form_class, 'description', StringField(_('unit')))
