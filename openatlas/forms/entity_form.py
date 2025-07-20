@@ -74,29 +74,18 @@ def add_description(
             'description',
             TextAreaField(_('description'), render_kw={'rows': 8}))
         return
-    text = entity.get_annotated_text() if entity.id else ''
-    linked_entities = []
+    source = entity
     if entity.class_.name == 'source_translation':
-        if origin:
-            source = origin
-        else:
-            source = entity.get_linked_entity('P73', inverse=True)
-        linked_entities = [
-            {'id': e.id, 'name': e.name}
-            for e in source.get_linked_entities('P67')]
-    elif entity.id:
-        linked_entities = [
-            {'id': e.id, 'name': e.name}
-            for e in entity.get_linked_entities('P67')]
-        for e in entity.get_linked_entities('P67'):
-            linked_entities.append({'id': e.id, 'name': e.name})
+        source = origin or entity.get_linked_entity('P73', inverse=True)
     setattr(
             form,
             'annotation',
             TextAnnotationField(
                 label=entity.class_.attributes['description']['label'],
-                source_text=text,
-                linked_entities=linked_entities))
+                source_text=entity.get_annotated_text() if entity.id else '',
+                linked_entities=[
+                    {'id': e.id, 'name': e.name}
+                    for e in source.get_linked_entities('P67')]))
     setattr(form, 'description', HiddenField())
 
 
