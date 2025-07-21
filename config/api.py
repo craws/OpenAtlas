@@ -1,9 +1,10 @@
+# Don't edit this file. To override settings please use instance/production.py
 from pathlib import Path
 
 API_VERSIONS = ['0.4']
 
-OPENAPI_FILE = (Path(
-    __file__).parent.parent / 'openatlas' / 'api' / 'openapi.json')
+OPENAPI_FILE = \
+    Path(__file__).parent.parent / 'openatlas' / 'api' / 'openapi.json'
 OPENAPI_INSTANCE_FILE = Path(__file__).parent.parent / 'files' / 'openapi.json'
 
 API_CONTEXT = {
