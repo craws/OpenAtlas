@@ -11,8 +11,7 @@ from openatlas.display.tab import Tab
 from openatlas.display.util import (
     button, edit_link, format_entity_date, get_appearance, get_base_table_data,
     get_chart_data, link, profile_image_table_link, remove_link)
-from openatlas.display.util2 import (
-    is_authorized, uc_first)
+from openatlas.display.util2 import is_authorized, uc_first
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 from openatlas.models.overlay import Overlay

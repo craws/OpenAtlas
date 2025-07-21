@@ -129,6 +129,7 @@ class Display:
                 items = []
                 if tab and {'remove', 'update'}.intersection(
                         set(tab['additional_columns'])):
+
                     for item in self.entity.get_links(
                             relation['property'],
                             relation['class'],
@@ -252,7 +253,7 @@ class Display:
                 f'<span title="{var}">{link(self.entity.standard_type)}</span>'
         self.data.update(self.get_type_data())
         for name, relation in self.entity.class_.relations.items():
-            if relation['mode'] == 'direct':
+            if relation['mode'] in ['direct', 'display']:
                 self.data[relation['label']] = [
                     link(e) for e in self.entity.get_linked_entities(
                         relation['property'],
