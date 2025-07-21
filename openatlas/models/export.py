@@ -135,13 +135,13 @@ def arche_export() -> bool:
                         file_path.read_bytes())
 
 
-        export_path = app.config['EXPORT_PATH']
-        export_path.mkdir(parents=True, exist_ok=True)
+        tmp_path = app.config['TMP_PATH']
+        tmp_path.mkdir(parents=True, exist_ok=True)
 
         archive_name = (
             f"{current_date_for_filename()}_"
             f"{external_metadata['topCollection'].replace(' ', '_')}.zip")
-        archive_file = export_path / archive_name
+        archive_file = tmp_path / archive_name
 
         with zipfile.ZipFile(archive_file, 'w') as archive:
             archive.write(md_path, arcname='problematic_files.md')
@@ -155,6 +155,12 @@ def arche_export() -> bool:
                         archive.write(
                             temp_path / type_name / ext / file_path.name,
                             arcname=f'{type_name}/{ext}/{file_path.name}')
+
+        export_dir = app.config['EXPORT_PATH']
+        export_dir.mkdir(parents=True, exist_ok=True)
+
+        final_archive_path = export_dir / archive_name
+        archive_file.replace(final_archive_path)
 
         return archive_file
 
