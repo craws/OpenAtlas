@@ -115,20 +115,26 @@ def arche_export() -> bool:
 
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_path = Path(temp_dir)
+        data_path = temp_path / 'data'
+        data_path.mkdir(parents=True, exist_ok=True)
+        metadata_path = temp_path / 'metadata'
+        metadata_path.mkdir(parents=True, exist_ok=True)
+        debug_path = temp_path / 'debug'
+        debug_path.mkdir(parents=True, exist_ok=True)
 
-        md_path = temp_path / 'problematic_files.md'
+        md_path = debug_path / 'problematic_files.md'
         md_path.write_text(
             Path(tmp_md_path).read_text(encoding='utf-8'), encoding='utf-8')
 
-        ttl_path = temp_path / 'files.ttl'
+        ttl_path = metadata_path / 'files.ttl'
         ttl_path.write_text(arche_file_metadata['graph'])
 
-        rdf_path = temp_path / 'rdf_dump.ttl'
+        rdf_path = data_path / 'rdf_dump.ttl'
         rdf_path.write_text(rdf_dump.get_data(as_text=True))
 
         for type_name, ext_map in files_by_extension.items():
             for ext, files_set in ext_map.items():
-                ext_dir = temp_path / type_name / ext
+                ext_dir = data_path / type_name / ext
                 ext_dir.mkdir(parents=True, exist_ok=True)
                 for file_path in files_set:
                     (ext_dir / file_path.name).write_bytes(
@@ -153,7 +159,7 @@ def arche_export() -> bool:
                 for ext, files_set in ext_map.items():
                     for file_path in files_set:
                         archive.write(
-                            temp_path / type_name / ext / file_path.name,
+                            data_path / type_name / ext / file_path.name,
                             arcname=f'{type_name}/{ext}/{file_path.name}')
 
         export_dir = app.config['EXPORT_PATH']
