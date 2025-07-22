@@ -53,7 +53,6 @@ class ArcheFileMetadata:
     # metadata_creator should be user like g.logger.get_log_info(entity.id)
     # but this needs way to long (each file need an extra sql query)
     metadata_creator: Optional[str] = None
-    owner: Optional[str] = None
     rights_holder: Optional[str] = None
     is_part_of: Optional[str] = None
     accepted_date: Optional[str] = None
@@ -64,16 +63,13 @@ class ArcheFileMetadata:
     language: Optional[str] = None
     principal_investigator: Optional[str] = None
     related_discipline: Optional[str] = None
-    # If an image is linked to a place/artifact and the top level of this
-    # entity is a place with geonames, than take the geonames link.
-    # This will be very expensive.
-    spatial_coverage: Optional[str] = None
     submission_date: Optional[str] = None
     transfer_date: Optional[str] = None
     binary_size: Optional[int] = None
     created_start_date: Optional[str] = None
     created_end_date: Optional[str] = None
     creator: Optional[str] = None
+    spatial_coverage: Optional[str] = None
     temporal_coverages: list[tuple[str, str]] = field(default_factory=list)
     temporal_coverage_identifier: Optional[str] = None
 
@@ -92,9 +88,8 @@ class ArcheFileMetadata:
             titles=titles)
         obj.depositor = metadata['depositor']
         obj.license = license_
-        obj.licensor = entity.creator
+        obj.licensor = entity.license_holder
         obj.metadata_creator = entity.creator
-        obj.owner = entity.license_holder
         obj.rights_holder = entity.license_holder
         obj.creator = entity.creator
         obj.is_part_of = part_of
@@ -132,18 +127,6 @@ def add_arche_file_metadata_to_graph(
                 if isinstance(metadata.licensor, list) \
                 else [create_uri(metadata.licensor)]:
             graph.add((subject_uri, ACDH.hasLicensor, uri))
-    if metadata.metadata_creator:
-        ensure_person(graph, metadata.metadata_creator)
-        for uri in create_uri(metadata.metadata_creator) \
-                if isinstance(metadata.metadata_creator, list) \
-                else [create_uri(metadata.metadata_creator)]:
-            graph.add((subject_uri, ACDH.hasMetadataCreator, uri))
-    if metadata.owner:
-        ensure_person(graph, metadata.owner)
-        for uri in create_uri(metadata.owner) \
-                if isinstance(metadata.owner, list) \
-                else [create_uri(metadata.owner)]:
-            graph.add((subject_uri, ACDH.hasOwner, uri))
     if metadata.rights_holder:
         ensure_person(graph, metadata.rights_holder)
         for uri in create_uri(metadata.rights_holder) \

@@ -76,8 +76,9 @@ CSP_HEADER = "frame-ancestors 'self'"
 ARCHE_METADATA = {
     'topCollection': '',
     'language': 'en',
-    'depositor': '',
+    'depositor': [],
     'acceptedDate': '',
+    'hasMetadataCreator': [],
     'curator': [],
     'principalInvestigator': [],
     'relatedDiscipline': [],
