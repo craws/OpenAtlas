@@ -129,12 +129,14 @@ def get_ego_network_visualisation(id_: int, parser: Parser) -> dict[str, Any]:
         if location_ids:
             entities.extend(get_place_linked_to_location_id(location_ids))
         if entities_count == len(entities):  # pragma: no cover
-            break
+            break  # Stop loop if no additional results
         entities_count = len(entities)
         for row in entities:
             classes = [row['domain_system_class'], row['range_system_class']]
             if any(item in string for item in classes for string in exclude_):
-                continue
+                # todo: wahrscheinlich die Stelle
+                if row['range_id'] not in parser.linked_to_ids:
+                    continue
             entity_ids.append(row['domain_id'])
             entity_ids.append(row['range_id'])
             all_.append(row)
@@ -143,9 +145,9 @@ def get_ego_network_visualisation(id_: int, parser: Parser) -> dict[str, Any]:
     link_dict = get_link_dictionary(links)
     results: dict[str, Any] = {'results': []}
     for _id, dict_ in link_dict.items():
-        if parser.linked_to_ids:
-            if not set(parser.linked_to_ids) & set(dict_['relations']):
-                continue
+        if parser.linked_to_ids and not \
+                set(parser.linked_to_ids) & set(dict_['relations']):
+            continue
         dict_['id'] = _id
         results['results'].append(dict_)
     return results
