@@ -34,6 +34,27 @@ class BaseDisplay:
         self.problematic_type = self.entity.check_too_many_single_type_links()
         self.entity.image_id = entity.get_profile_image_id()
 
+    def add_reference_tables_data(self) -> None:
+        entity = self.entity
+        for link_ in entity.get_links('P67', inverse=True):
+            domain = link_.domain
+            data = get_base_table_data(domain)
+            if domain.class_.view == 'file':
+                ext = data[6]
+                data.append(profile_image_table_link(entity, domain, ext))
+                if not entity.image_id and ext in g.display_file_ext:
+                    entity.image_id = domain.id
+            elif domain.class_.view != 'source':
+                data.append(link_.description)
+                data.append(edit_link(
+                    url_for('link_update', id_=link_.id, origin_id=entity.id)))
+                if domain.class_.view == 'reference_system':
+                    entity.reference_systems.append(link_)
+                    continue
+            data.append(
+                remove_link(domain.name, link_, entity, domain.class_.view))
+            self.tabs[domain.class_.view].table.rows.append(data)
+
 
 class ActorDisplay(BaseDisplay):
 
@@ -153,7 +174,7 @@ class EventsDisplay(BaseDisplay):
         entity = self.entity
         for name in ['subs', 'source', 'actor', 'reference', 'file']:
             self.tabs[name] = Tab(name, entity=entity)
-        # self.add_reference_tables_data()
+        self.add_reference_tables_data()
         for sub in entity.get_linked_entities('P9', types=True, sort=True):
             self.tabs['subs'].table.rows.append(get_base_table_data(sub))
         self.tabs['actor'].table.header.insert(5, _('activity'))

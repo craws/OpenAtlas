@@ -63,6 +63,8 @@ model = {
             'place': {
                 'additional_columns': ['remove'],
                 'tooltip': _('mentioned in the source')},
-            'reference': {'additional_columns': ['page', 'remove', 'update']},
+            'reference': {
+                'additional_columns': ['page', 'update', 'remove'],
+                'mode': 'link'},
             'file': {'additional_columns': ['main image', 'remove']},
             'note': {}}}}

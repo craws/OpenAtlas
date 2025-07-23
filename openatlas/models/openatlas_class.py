@@ -158,7 +158,9 @@ def get_model(class_name: str) -> dict[str, Any]:
     data['display']['buttons'] = data['display'].get('buttons', {})
     data['display']['tabs'] = data['display'].get('tabs', {})
     for tab in data['display']['tabs'].values():
+        tab['columns'] = tab.get('columns', None)
         tab['additional_columns'] = tab.get('additional_columns', [])
+        tab['mode'] = tab.get('mode', None)
     data['relations'] = data.get('relations', {})
     for name, relation in data['relations'].items():
         relation['class'] = relation['class'] \

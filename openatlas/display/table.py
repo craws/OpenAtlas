@@ -65,20 +65,25 @@ def entity_table(
         class_: str,
         items: list[Entity] | list[Link],
         entity: Optional[Entity] = None,
+        columns: Optional[list[str]] = None,
         additional_columns: Optional[list[str]] = None,
         inverse: Optional[bool] = False) -> Table:
-    columns = g.table_headers[g.classes[class_].view] + (
-        additional_columns if additional_columns else [])
+    if not columns:
+        columns = (g.table_headers[g.classes[class_].view] + (
+        additional_columns if additional_columns else []))
     table = Table(columns)
     for item in items:
+        e = item
+        range_ = None
         if isinstance(item, Link):
             e = item.domain if inverse else item.range
-        else:
-            e = item
+            range_ = item.range if inverse else item.domain
         data = []
         for name in columns:
             html: str | list[str] = 'no table function'
             match name:
+                case 'activity':
+                    html = item.property.name_inverse
                 case 'begin':
                     html = e.first
                 case 'class':
@@ -86,16 +91,26 @@ def entity_table(
                 case 'creator':
                     html = g.file_info[e.id]['creator']
                 case 'description' | 'content':
-                    html = e.description or ''
+                    html = item.description or ''
                 case 'end':
                     html = e.last
                 case 'extension':
                     html = e.get_file_ext()
+                case 'first':
+                    html = item.first or \
+                        f'<span class="text-muted">{range_.first}</span>' \
+                        if range_.first else ''
+                case 'involvement':
+                    html = item.type.name if item.type else ''
+                case 'last':
+                    html = item.last or \
+                        f'<span class="text-muted">{range_.last}</span>' \
+                        if range_.last else ''
                 case 'license holder':
                     html = g.file_info[e.id]['license_holder']
                 case 'main image':
                     html = \
-                        profile_image_table_link(entity, e, e.get_file_ext())
+                        profile_image_table_link(e, e, e.get_file_ext())
                 # case name if name in g.classes[class_].relations:
                 #    html = display_relations(
                 #        e,
@@ -104,14 +119,14 @@ def entity_table(
                     html = link(e)
                 case 'page':
                     html = item.description
-                case 'profile' if entity and entity.image_id:
+                case 'profile' if e and e.image_id:
                     html = 'Profile' if e.id == entity.image_id else link(
                         'profile',
                         url_for('file_profile', id_=e.id, entity_id=entity.id))
                 case 'public':
                     html = _('yes') if g.file_info[e.id]['public'] else None
                 case 'remove':
-                    html = remove_link(e.name, item, entity, e.class_.view)
+                    html = remove_link(e.name, item, e, e.class_.view)
                 # case 'related':
                 #    relative = e.get_linked_entity_safe('has relation', True)
                 #    if entity and relative.id == entity.id:

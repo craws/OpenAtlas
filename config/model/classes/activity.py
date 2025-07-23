@@ -57,7 +57,13 @@ model = {
         'tabs': {
             'subs': {},
             'source': {'additional_columns': ['remove']},
-            'actor': {'additional_columns': ['relation type']},
-            'reference': {},
+            'actor': {
+                'mode': 'link',
+                'columns': [
+                    'name', 'class', 'involvement', 'first', 'last',
+                    'activity', 'description', 'update', 'remove']},
+            'reference': {
+                'mode': 'link',
+                'additional_columns': ['page', 'update', 'remove']},
             'file': {'additional_columns': ['main image', 'remove']},
             'note': {}}}}

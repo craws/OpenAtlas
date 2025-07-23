@@ -10,8 +10,7 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import entity_table
 from openatlas.display.util import (
     bookmark_toggle, button, description, display_annotation_text_links,
-    edit_link, format_entity_date, get_base_table_data, get_system_data,
-    link, profile_image_table_link, remove_link)
+    format_entity_date, get_system_data, link)
 from openatlas.display.util2 import (
     format_date, is_authorized, manual, show_table_icons, uc_first)
 from openatlas.models.entity import Entity, Link
@@ -127,9 +126,7 @@ class Display:
             if name in self.entity.class_.relations:
                 relation = self.entity.class_.relations[name]
                 items = []
-                if tab and {'remove', 'update'}.intersection(
-                        set(tab['additional_columns'])):
-
+                if tab['mode'] == 'link':
                     for item in self.entity.get_links(
                             relation['property'],
                             relation['class'],
@@ -149,7 +146,6 @@ class Display:
                             relation['inverse'],
                             types=True):
                         items.append(item)
-
                 self.tabs[name] = Tab(
                     name,
                     table=entity_table(
@@ -158,7 +154,8 @@ class Display:
                         else relation['class'],
                         items,
                         self.entity,
-                        tab['additional_columns'] if tab else [],
+                        tab['columns'],
+                        tab['additional_columns'],
                         relation['inverse']),
                     entity=self.entity,
                     tooltip=tab['tooltip'] if tab and 'tooltip' in tab
@@ -259,24 +256,3 @@ class Display:
                         relation['property'],
                         relation['class'],
                         relation['inverse'])]
-
-    def add_reference_tables_data(self) -> None:
-        entity = self.entity
-        for link_ in entity.get_links('P67', inverse=True):
-            domain = link_.domain
-            data = get_base_table_data(domain)
-            if domain.class_.view == 'file':
-                ext = data[6]
-                data.append(profile_image_table_link(entity, domain, ext))
-                if not entity.image_id and ext in g.display_file_ext:
-                    entity.image_id = domain.id
-            elif domain.class_.view != 'source':
-                data.append(link_.description)
-                data.append(edit_link(
-                    url_for('link_update', id_=link_.id, origin_id=entity.id)))
-                if domain.class_.view == 'reference_system':
-                    entity.reference_systems.append(link_)
-                    continue
-            data.append(
-                remove_link(domain.name, link_, entity, domain.class_.view))
-            self.tabs[domain.class_.view].table.rows.append(data)

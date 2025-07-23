@@ -96,10 +96,7 @@ def get_table(view: str) -> tuple[Table, str]:
         classes = 'place' if view == 'place' else g.view_class_mapping[view]
         table = entity_table(
             view,
-            Entity.get_by_class(
-                classes,
-                types=True,
-                aliases=True))
+            Entity.get_by_class(classes, types=True, aliases=True))
     return table, file_info
 
 
