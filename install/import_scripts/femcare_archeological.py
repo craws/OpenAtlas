@@ -125,7 +125,7 @@ def parse_stratigraphic_units() -> list[ParsedStratigraphicUnit]:
             name=row[1].strip(),
             layer=row[2].strip(),
             skeleton=int(row[3]) if pd.notna(row[3]) else None,
-            feature=f"feature_{int(row[0])}".strip() if pd.notna(row[4]) else '')
+            feature=f"feature_{int(row[4])}".strip() if pd.notna(row[4]) else '')
         se.append(entry_obj)
     return se
 
@@ -236,7 +236,7 @@ def merge_units(
             layer=su.layer,
             skeleton=su.skeleton,
             feature=su.feature,
-            description=ind.description if ind else None,
+            description=ind.description if ind else [],
             probe_type=ind.probe_type if ind else None,
             find_type=ind.find_type if ind else None,
             position=ind.position if ind else None,
@@ -292,35 +292,34 @@ with app.test_request_context():
 
     # Get data out of documents
     features = parse_features()
-    strati_units = merge_units(parse_stratigraphic_units(), get_individuals())
+    stratigrahic_units = merge_units(parse_stratigraphic_units(), get_individuals())
     finds = parse_finds()
 
+    # Build type dictionaries from Feature
+    cut_types = build_types(features, cut_hierarchy, 'cut')
 
     # Build type dictionaries from StratigraphicUnit
-    probe_types = build_types(strati_units, probe_hierarchy, 'probe_type')
-    find_types = build_types(strati_units, find_hierarchy, 'find_type')
-    position_types = build_types(strati_units, position_hierarchy, 'position')
-    orientation_types = build_types(strati_units, orientation_hierarchy, 'orientation')
-    preservation_types = build_types(strati_units, preservation_hierarchy, 'preservation')
-    dislocation_types = build_types(strati_units, dislocation_hierarchy, 'dislocation')
-    age_types = build_types(strati_units, age_hierarchy, 'age')
-    extraction_types = build_types(strati_units, extraction_hierarchy, 'extraction')
-    layer_types = build_types(strati_units, layer_hierarchy, 'layer')
+    probe_types = build_types(stratigrahic_units, probe_hierarchy, 'probe_type')
+    find_types = build_types(stratigrahic_units, find_hierarchy, 'find_type')
+    position_types = build_types(stratigrahic_units, position_hierarchy, 'position')
+    orientation_types = build_types(stratigrahic_units, orientation_hierarchy, 'orientation')
+    preservation_types = build_types(stratigrahic_units, preservation_hierarchy, 'preservation')
+    dislocation_types = build_types(stratigrahic_units, dislocation_hierarchy, 'dislocation')
+    age_types = build_types(stratigrahic_units, age_hierarchy, 'age')
+    extraction_types = build_types(stratigrahic_units, extraction_hierarchy, 'extraction')
+    layer_types = build_types(stratigrahic_units, layer_hierarchy, 'layer')
 
     # Build type dictionaries from Find
     material_types = build_types(finds, material_hierarchy, 'material')
     designation_types = build_types(finds, designation_hierarchy, 'designation')
     dating_types = build_types(finds, dating_hierarchy, 'dating')
 
-    # Build type dictionaries from Feature
-    cut_types = build_types(features, cut_hierarchy, 'cut')
-
 
     print(DEBUG_MSG)
 
-    added_features: dict[str, Entity]
+    added_features: dict[str, Entity] = {}
     for entry in features:
-        feature = Entity.insert('feature', entry.name, desc=entry.description)
+        feature = Entity.insert('feature', entry.name, entry.description)
         feature.link('P2', case_study)
         if entry.cut:
             feature.link('P2', cut_types[entry.cut])
@@ -336,3 +335,41 @@ with app.test_request_context():
         feature.link('P53', location)
         added_features[entry.id_] = feature
 
+    added_stratigraphic: dict[str, Entity] = {}
+    for entry in stratigrahic_units:
+        su = Entity.insert(
+            'stratigraphic_unit',
+            entry.name,
+            '\n'.join(entry.description))
+        su.link('P2', case_study)
+        su.link('P46', added_features[entry.feature], inverse=True)
+        ref_sys_su.link(
+            'P67',
+            feature,
+            str(entry.se_id),
+            type_id=exact_match.id)
+        location = Entity.insert(
+            'object_location',
+            f"Location of {entry.name}")
+        su.link('P53', location)
+
+        if entry.probe_type:
+            su.link('P2', probe_types[entry.probe_type])
+        if entry.find_type:
+            su.link('P2', find_types[entry.find_type])
+        if entry.position:
+            su.link('P2', position_types[entry.position])
+        if entry.orientation:
+            su.link('P2', orientation_types[entry.orientation])
+        if entry.preservation:
+            su.link('P2', preservation_types[entry.preservation])
+        if entry.dislocation:
+            su.link('P2', dislocation_types[entry.dislocation])
+        if entry.age:
+            su.link('P2', age_types[entry.age])
+        if entry.extraction:
+            su.link('P2', extraction_types[entry.extraction])
+        if entry.layer:
+            su.link('P2', layer_types[entry.layer])
+
+        added_stratigraphic[entry.id_] = su
