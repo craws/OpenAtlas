@@ -45,14 +45,13 @@ class Feature:
 
 
 @dataclass
-class StratigraphicUnits:
+class ParsedStratigraphicUnit:
     id_: str
     se_id: int
     name: str
     layer: str  # SE/IF -> Type
     skeleton: Optional[int]
     feature: str
-    individual: repr(Individual)
 
 
 @dataclass
@@ -69,12 +68,29 @@ class Find:
     openatlas_class: str
 
 
+@dataclass
+class StratigraphicUnit:
+    id_: str
+    se_id: int
+    name: str
+    layer: str
+    skeleton: Optional[int]
+    feature: str
+    description: Optional[list[str]] = None
+    probe_type: Optional[str] = None
+    find_type: Optional[str] = None
+    position: Optional[str] = None
+    orientation: Optional[str] = None
+    preservation: Optional[str] = None
+    dislocation: Optional[str] = None
+    age: Optional[str] = None
+    extraction: Optional[str] = None
 
 # Todo: Do not forget, to handle situation, if no stratigraphic is available,
 #   then go for feature, if no feature is available then go for place
 # Todo: split  "menschl. Kn." to human remains
-def parse_features(file_path: Path) -> list[Feature]:
-    df = pd.read_csv(file_path, delimiter=',')
+def parse_features() -> list[Feature]:
+    df = pd.read_csv(FILE_PATH / 'features.csv', delimiter=',')
     features_ = []
     current_cut = ''
     for index, row in df.iterrows():
@@ -84,8 +100,8 @@ def parse_features(file_path: Path) -> list[Feature]:
         se_raw = row[2]
         se_list = se_raw.split(", ") if pd.notna(se_raw) else []
         entry_obj = Feature(
-            id_=f"feature_{row[0]}".strip(),
-            obj_id=row[0],
+            id_=f"feature_{int(row[0])}".strip(),
+            obj_id=int(row[0]),
             name=row[1].strip(),
             se=se_list,
             description=row[3],
@@ -94,43 +110,43 @@ def parse_features(file_path: Path) -> list[Feature]:
     return features_
 
 
-def parse_stratigraphic_units(file_path: Path) -> list[StratigraphicUnits]:
-    df = pd.read_csv(file_path, delimiter=',')
+def parse_stratigraphic_units() -> list[ParsedStratigraphicUnit]:
+    df = pd.read_csv(FILE_PATH / 'se.csv', delimiter=',')
     se = []
     for index, row in df.iterrows():
         if pd.isna(row[2]) or row[2] == '':
             continue
         if pd.isna(row[4]) or row[4] == 0:
-            DEBUG_MSG['no_feature_available'].append(row[0])
+            DEBUG_MSG['no_feature_available'].append(int(row[0]))
             continue
-        entry_obj = StratigraphicUnits(
-            id_=f"stratigraphic_{row[0]}".strip(),
-            se_id=row[0],
+        entry_obj = ParsedStratigraphicUnit(
+            id_=f"stratigraphic_{int(row[0])}".strip(),
+            se_id=int(row[0]),
             name=row[1].strip(),
             layer=row[2].strip(),
             skeleton=int(row[3]) if pd.notna(row[3]) else None,
-            feature=f"feature_{row[4]}".strip() if pd.notna(row[4]) else '')
+            feature=f"feature_{int(row[0])}".strip() if pd.notna(row[4]) else '')
         se.append(entry_obj)
     return se
 
 
-def parse_finds(file_path: Path) -> list[StratigraphicUnits]:
-    df = pd.read_csv(file_path, delimiter=',')
+def parse_finds() -> list[ParsedStratigraphicUnit]:
+    df = pd.read_csv(FILE_PATH / 'finds.csv', delimiter=',')
     finds_ = []
     for index, row in df.iterrows():
-        stratigraphic_unit=f"stratigraphic_{row[1]}".strip()
+        stratigraphic_unit=f"stratigraphic_{int(row[0])}".strip()
         if row[1] == '-':
             stratigraphic_unit = ''
-        feature=f"feature_{row[4]}".strip()
+        feature=f"feature_{int(row[0])}".strip()
         if row[4] == '-':
             feature=''
 
         entry_obj = Find(
-            id_=f"find_{row[0]}".strip(),
-            f_id=row[0],
+            id_=f"find_{int(row[0])}".strip(),
+            f_id=int(row[0]),
             stratigraphic_unit=stratigraphic_unit,
             feature=feature,
-            name=f"Fund {row[0]}",
+            name=f"Fund {int(row[0])}",
             material=row[6],
             designation=row[7],
             description=row[8],
@@ -204,21 +220,41 @@ def get_individuals() -> list[Individual]:
             extraction=extraction))
     return output
 
+def merge_units(
+    strat_units: list[ParsedStratigraphicUnit],
+    individuals: list[Individual]) -> list[StratigraphicUnit]:
+    individual_lookup = {int(ind.se_id): ind for ind in individuals}
+    merged = []
+    for su in strat_units:
+        ind = individual_lookup.get(int(su.se_id))
+        merged.append(StratigraphicUnit(
+            id_=su.id_,
+            se_id=su.se_id,
+            name=su.name,
+            layer=su.layer,
+            skeleton=su.skeleton,
+            feature=su.feature,
+            description=ind.description if ind else None,
+            probe_type=ind.probe_type if ind else None,
+            find_type=ind.find_type if ind else None,
+            position=ind.position if ind else None,
+            orientation=ind.orientation if ind else None,
+            preservation=ind.preservation if ind else None,
+            dislocation=ind.dislocation if ind else None,
+            age=ind.age if ind else None,
+            extraction=ind.extraction if ind else None))
+    return merged
+
+
 
 with app.test_request_context():
     app.preprocess_request()
     case_study = Entity.get_by_id(16305)
     place = Entity.get_by_id(145)
 
-    features = parse_features(FILE_PATH / 'features.csv')
-
-    stratigraphic_units = parse_stratigraphic_units(FILE_PATH / 'se.csv')
-
-    finds = parse_finds(FILE_PATH / 'finds.csv')
-
-    individuals = get_individuals()
-
-
+    features = parse_features()
+    strati_units = merge_units(parse_stratigraphic_units(), get_individuals())
+    finds = parse_finds()
 
     print(DEBUG_MSG)
 
