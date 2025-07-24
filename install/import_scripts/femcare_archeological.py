@@ -24,15 +24,25 @@ DEBUG_MSG = defaultdict(list)
 @dataclass
 class Individual:
     se_id: int
+    individual_id: int
     description: list
-    probe_type: str   # -> Type
-    find_type: str  # -> Type
-    position: str  # -> Type
-    orientation: str  # -> Type
-    preservation: str  # -> Type
-    dislocation:str  # -> Type
-    age:str  # -> Type
-    extraction:str  # -> Type
+    probe_type: str
+    find_type: str
+    position: str
+    orientation: str
+    preservation: str
+    dislocation:str
+    age:str
+    extraction:str
+
+@dataclass
+class ParsedStratigraphicUnit:
+    id_: str
+    se_id: int
+    name: str
+    layer: str
+    skeleton: Optional[int]
+    feature: str
 
 @dataclass
 class Feature:
@@ -43,26 +53,15 @@ class Feature:
     description: str
     cut: str
 
-
-@dataclass
-class ParsedStratigraphicUnit:
-    id_: str
-    se_id: int
-    name: str
-    layer: str  # SE/IF -> Type
-    skeleton: Optional[int]
-    feature: str
-
-
 @dataclass
 class Find:
     id_: str
     f_id: int
     name: str
-    material: str  # -> Type
-    designation: str  # -> Type
+    material: str
+    designation: str
     description: str
-    dating: str  # -> Type
+    dating: str
     stratigraphic_unit: str
     feature: str
     openatlas_class: str
@@ -162,7 +161,7 @@ def get_individuals() -> list[Individual]:
     for docx_file in SKELETON_PATH.glob('*.docx'):
         doc = docx.Document(docx_file)
 
-        se_id = probe_type = find_type = None
+        se_id = probe_type = find_type = individual_id = None
         position = orientation = preservation = dislocation = None
         age = extraction = None
         description = []
@@ -178,7 +177,8 @@ def get_individuals() -> list[Individual]:
 
                         if row_num == 0:
                             se_id = cells[4].text.replace('SE:', '').strip()
-
+                        elif row_num == 1:
+                            individual_id = cells[1].text.replace('Individuum:', '').strip()
                         elif row_num == 2 and 'uf078' in repr(cells[1].text):
                             probe_type = cells[2].text.replace('Art:', '').strip()
 
@@ -208,7 +208,8 @@ def get_individuals() -> list[Individual]:
                                 description.append(text)
 
         output.append(Individual(
-            se_id=se_id,
+            se_id=int(se_id),
+            individual_id=int(individual_id),
             description=description,
             probe_type=probe_type,
             find_type=find_type,
@@ -245,6 +246,50 @@ def merge_units(
             extraction=ind.extraction if ind else None))
     return merged
 
+# def get_diagnose_types(entries_: list[Entry]) -> dict[str, Entity]:
+#     diagnose_types_: dict[str, Entity] = {}
+#     for entry_ in entries_:
+#         if entry_.diagnose in diagnose_types_:
+#             continue
+#         type_ = Entity.insert('type', entry_.diagnose)
+#         type_.link('P127', diagnose_hierarchy)
+#         diagnose_types_[entry_.diagnose] = type_
+#     return diagnose_types_
+
+def build_probe_types(entities: list[StratigraphicUnit]) -> dict[str, Entity]:
+    types: dict[str, Entity] = {}
+    for entry in entities:
+        if entry.probe_type in types:
+            continue
+        type_ = Entity.insert('type', entry.probe_type)
+        type_.link('P127', probe_hierarchy)
+        types[entry.probe_type] = type_
+    return types
+
+def build_find_types(entities: list[StratigraphicUnit]) -> dict[str, Entity]:
+    types: dict[str, Entity] = {}
+    for entry in entities:
+        if entry.find_type in types:
+            continue
+        type_ = Entity.insert('type', entry.find_type)
+        type_.link('P127', find_hierarchy)
+        types[entry.find_type] = type_
+    return types
+
+def build_types(
+    entities: list,
+    hierarchy: Entity,
+    attribute: str) -> dict[str, Entity]:
+    types: dict[str, Entity] = {}
+    for entry in entities:
+        key = getattr(entry, attribute, None)
+        if not key or key in types:
+            continue
+        type_ = Entity.insert('type', key)
+        type_.link('P127', hierarchy)
+        types[key] = type_
+    return types
+
 
 
 with app.test_request_context():
@@ -252,9 +297,47 @@ with app.test_request_context():
     case_study = Entity.get_by_id(16305)
     place = Entity.get_by_id(145)
 
+    # Get OpenAtlas reference systems
+    ref_sys_finds = Entity.get_by_id(16307)
+    ref_sys_indi = Entity.get_by_id(321)
+    ref_sys_feat = Entity.get_by_id(16306)
+    ref_sys_su = Entity.get_by_id(16308)
+
+    # Get OpenAtlas hierarchies
+    probe_hierarchy = Entity.get_by_id(16309)
+    find_hierarchy = Entity.get_by_id(16310)
+    position_hierarchy = Entity.get_by_id(16311)
+    orientation_hierarchy = Entity.get_by_id(16312)
+    preservation_hierarchy = Entity.get_by_id(16313)
+    dislocation_hierarchy = Entity.get_by_id(16314)
+    age_hierarchy = Entity.get_by_id(16315)
+    extraction_hierarchy = Entity.get_by_id(16316)
+    layer_hierarchy = Entity.get_by_id(16317)
+    material_hierarchy = Entity.get_by_id(16318)
+    designation_hierarchy = Entity.get_by_id(16319)
+    dating_hierarchy = Entity.get_by_id(16320)
+
+    # Get data out of documents
     features = parse_features()
     strati_units = merge_units(parse_stratigraphic_units(), get_individuals())
     finds = parse_finds()
+
+
+    # Build type dictionaries from StratigraphicUnit
+    probe_types = build_types(strati_units, probe_hierarchy, 'probe_type')
+    find_types = build_types(strati_units, find_hierarchy, 'find_type')
+    position_types = build_types(strati_units, position_hierarchy, 'position')
+    orientation_types = build_types(strati_units, orientation_hierarchy, 'orientation')
+    preservation_types = build_types(strati_units, preservation_hierarchy, 'preservation')
+    dislocation_types = build_types(strati_units, dislocation_hierarchy, 'dislocation')
+    age_types = build_types(strati_units, age_hierarchy, 'age')
+    extraction_types = build_types(strati_units, extraction_hierarchy, 'extraction')
+    layer_types = build_types(strati_units, layer_hierarchy, 'layer')
+
+    # Build type dictionaries from Find
+    material_types = build_types(finds, material_hierarchy, 'material')
+    designation_types = build_types(finds, designation_hierarchy, 'designation')
+    dating_types = build_types(finds, dating_hierarchy, 'dating')
 
     print(DEBUG_MSG)
 
