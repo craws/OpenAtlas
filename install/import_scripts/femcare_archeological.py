@@ -146,10 +146,10 @@ def parse_finds() -> list[ParsedStratigraphicUnit]:
             stratigraphic_unit=stratigraphic_unit,
             feature=feature,
             name=f"Fund {int(row[0])}",
-            material=row[6],
-            designation=row[7],
-            description=row[8],
-            dating=row[9],
+            material=row[6] if pd.notna(row[6]) else '',
+            designation=row[7] if pd.notna(row[7]) else '',
+            description=row[8] if pd.notna(row[8]) else '',
+            dating=row[9] if pd.notna(row[9]) else '',
             openatlas_class='human_remains'
             if row[6] == 'menschl. Kn.' else 'artifact' )
         finds_.append(entry_obj)
@@ -183,7 +183,7 @@ def get_individuals() -> list[Individual]:
                             probe_type = cells[2].text.replace('Art:', '').strip()
 
                         elif row_num == 3 and 'uf078' in repr(cells[1].text):
-                            find_type = cells[2].text
+                            find_type = cells[2].text.strip()
 
                 case 3:
                     for row_num, row in enumerate(table.rows):
@@ -209,7 +209,7 @@ def get_individuals() -> list[Individual]:
 
         output.append(Individual(
             se_id=int(se_id),
-            individual_id=int(individual_id),
+            individual_id=individual_id,
             description=description,
             probe_type=probe_type,
             find_type=find_type,
@@ -245,36 +245,6 @@ def merge_units(
             age=ind.age if ind else None,
             extraction=ind.extraction if ind else None))
     return merged
-
-# def get_diagnose_types(entries_: list[Entry]) -> dict[str, Entity]:
-#     diagnose_types_: dict[str, Entity] = {}
-#     for entry_ in entries_:
-#         if entry_.diagnose in diagnose_types_:
-#             continue
-#         type_ = Entity.insert('type', entry_.diagnose)
-#         type_.link('P127', diagnose_hierarchy)
-#         diagnose_types_[entry_.diagnose] = type_
-#     return diagnose_types_
-
-def build_probe_types(entities: list[StratigraphicUnit]) -> dict[str, Entity]:
-    types: dict[str, Entity] = {}
-    for entry in entities:
-        if entry.probe_type in types:
-            continue
-        type_ = Entity.insert('type', entry.probe_type)
-        type_.link('P127', probe_hierarchy)
-        types[entry.probe_type] = type_
-    return types
-
-def build_find_types(entities: list[StratigraphicUnit]) -> dict[str, Entity]:
-    types: dict[str, Entity] = {}
-    for entry in entities:
-        if entry.find_type in types:
-            continue
-        type_ = Entity.insert('type', entry.find_type)
-        type_.link('P127', find_hierarchy)
-        types[entry.find_type] = type_
-    return types
 
 def build_types(
     entities: list,
