@@ -7,6 +7,7 @@ import docx
 import pandas as pd
 
 from openatlas import app
+from openatlas.api.import_scripts.util import get_exact_match
 from openatlas.models.entity import Entity
 
 FILE_PATH = Path('files/femcare')
@@ -103,7 +104,7 @@ def parse_features() -> list[Feature]:
             obj_id=int(row[0]),
             name=row[1].strip(),
             se=se_list,
-            description=row[3],
+            description=row[3] if pd.notna(row[3]) else None,
             cut=current_cut.strip())
         features_.append(entry_obj)
     return features_
@@ -264,6 +265,7 @@ def build_types(
 
 with app.test_request_context():
     app.preprocess_request()
+    exact_match = get_exact_match()
     case_study = Entity.get_by_id(16305)
     place = Entity.get_by_id(145)
 
@@ -286,6 +288,7 @@ with app.test_request_context():
     material_hierarchy = Entity.get_by_id(16318)
     designation_hierarchy = Entity.get_by_id(16319)
     dating_hierarchy = Entity.get_by_id(16320)
+    cut_hierarchy = Entity.get_by_id(16323)
 
     # Get data out of documents
     features = parse_features()
@@ -309,5 +312,27 @@ with app.test_request_context():
     designation_types = build_types(finds, designation_hierarchy, 'designation')
     dating_types = build_types(finds, dating_hierarchy, 'dating')
 
+    # Build type dictionaries from Feature
+    cut_types = build_types(features, cut_hierarchy, 'cut')
+
+
     print(DEBUG_MSG)
+
+    added_features: dict[str, Entity]
+    for entry in features:
+        feature = Entity.insert('feature', entry.name, desc=entry.description)
+        feature.link('P2', case_study)
+        if entry.cut:
+            feature.link('P2', cut_types[entry.cut])
+        feature.link('P46', place, inverse=True)
+        ref_sys_feat.link(
+            'P67',
+            feature,
+            str(entry.obj_id),
+            type_id=exact_match.id)
+        location = Entity.insert(
+            'object_location',
+            f"Location of {entry.name}")
+        feature.link('P53', location)
+        added_features[entry.id_] = feature
 
