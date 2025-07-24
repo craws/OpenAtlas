@@ -130,22 +130,22 @@ def parse_stratigraphic_units() -> list[ParsedStratigraphicUnit]:
     return se
 
 
-def parse_finds() -> list[ParsedStratigraphicUnit]:
+def parse_finds() -> list[Find]:
     df = pd.read_csv(FILE_PATH / 'finds.csv', delimiter=',')
     finds_ = []
     for index, row in df.iterrows():
         stratigraphic_unit=f"stratigraphic_{int(row[0])}".strip()
         if row[1] == '-':
             stratigraphic_unit = ''
-        feature=f"feature_{int(row[0])}".strip()
+        feature_=f"feature_{int(row[0])}".strip()
         if row[4] == '-':
-            feature=''
+            feature_=''
 
         entry_obj = Find(
             id_=f"find_{int(row[0])}".strip(),
             f_id=int(row[0]),
             stratigraphic_unit=stratigraphic_unit,
-            feature=feature,
+            feature=feature_,
             name=f"Fund {int(row[0])}",
             material=row[6] if pd.notna(row[6]) else '',
             designation=row[7] if pd.notna(row[7]) else '',
@@ -315,7 +315,7 @@ with app.test_request_context():
     dating_types = build_types(finds, dating_hierarchy, 'dating')
 
 
-    print(DEBUG_MSG)
+
 
     added_features: dict[str, Entity] = {}
     for entry in features:
@@ -345,7 +345,7 @@ with app.test_request_context():
         su.link('P46', added_features[entry.feature], inverse=True)
         ref_sys_su.link(
             'P67',
-            feature,
+            su,
             str(entry.se_id),
             type_id=exact_match.id)
         location = Entity.insert(
@@ -373,3 +373,43 @@ with app.test_request_context():
             su.link('P2', layer_types[entry.layer])
 
         added_stratigraphic[entry.id_] = su
+
+    added_finds: dict[str, Entity] = {}
+    for entry in finds:
+        # Todo: Discuss how to handle Object 0
+        if entry.stratigraphic_unit in ['stratigraphic_1', 'stratigraphic_2']:
+            continue
+
+        system_class= 'artifact'
+        if entry.material == 'menschl. Kn.':
+            system_class = 'human_remains'
+        find = Entity.insert(system_class, entry.name, entry.description)
+        find.link('P2', case_study)
+        if entry.stratigraphic_unit:
+            link_to_entity = added_stratigraphic[entry.stratigraphic_unit]
+        elif entry.feature:
+            link_to_entity = added_features[entry.feature]
+        else:
+            link_to_entity = place
+        find.link('P46', link_to_entity, inverse=True)
+
+        ref_sys_finds.link(
+            'P67',
+            find,
+            str(entry.f_id),
+            type_id=exact_match.id)
+        location = Entity.insert(
+            'object_location',
+            f"Location of {entry.name}")
+        find.link('P53', location)
+
+
+        if entry.material:
+            su.link('P2', material_types[entry.material])
+        if entry.designation:
+            su.link('P2', designation_types[entry.designation])
+        if entry.dating:
+            su.link('P2', dating_types[entry.dating])
+
+
+    print(DEBUG_MSG)
