@@ -3,8 +3,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
+import docx
 import pandas as pd
-
 
 from openatlas import app
 from openatlas.models.entity import Entity
@@ -18,12 +18,26 @@ DEBUG_MSG = defaultdict(list)
 
 # Todo:
 #   * External Reference System for objnr, senr and fnr
-#   * I did install new package for reading docx: python3-pypandoc
+#   * I did install new package for reading docx: python3-docx
+
+
+@dataclass
+class Individual:
+    se_id: int
+    description: list
+    probe_type: str   # -> Type
+    find_type: str  # -> Type
+    position: str  # -> Type
+    orientation: str  # -> Type
+    preservation: str  # -> Type
+    dislocation:str  # -> Type
+    age:str  # -> Type
+    extraction:str  # -> Type
 
 @dataclass
 class Feature:
     id_: str
-    objnr: int
+    obj_id: int
     name: str
     se: list[str]
     description: str
@@ -33,17 +47,18 @@ class Feature:
 @dataclass
 class StratigraphicUnits:
     id_: str
-    senr: int
+    se_id: int
     name: str
     layer: str  # SE/IF -> Type
     skeleton: Optional[int]
     feature: str
+    individual: repr(Individual)
 
 
 @dataclass
 class Find:
     id_: str
-    fnr: int
+    f_id: int
     name: str
     material: str  # -> Type
     designation: str  # -> Type
@@ -52,6 +67,8 @@ class Find:
     stratigraphic_unit: str
     feature: str
     openatlas_class: str
+
+
 
 # Todo: Do not forget, to handle situation, if no stratigraphic is available,
 #   then go for feature, if no feature is available then go for place
@@ -68,7 +85,7 @@ def parse_features(file_path: Path) -> list[Feature]:
         se_list = se_raw.split(", ") if pd.notna(se_raw) else []
         entry_obj = Feature(
             id_=f"feature_{row[0]}".strip(),
-            objnr=row[0],
+            obj_id=row[0],
             name=row[1].strip(),
             se=se_list,
             description=row[3],
@@ -88,7 +105,7 @@ def parse_stratigraphic_units(file_path: Path) -> list[StratigraphicUnits]:
             continue
         entry_obj = StratigraphicUnits(
             id_=f"stratigraphic_{row[0]}".strip(),
-            senr=row[0],
+            se_id=row[0],
             name=row[1].strip(),
             layer=row[2].strip(),
             skeleton=int(row[3]) if pd.notna(row[3]) else None,
@@ -110,7 +127,7 @@ def parse_finds(file_path: Path) -> list[StratigraphicUnits]:
 
         entry_obj = Find(
             id_=f"find_{row[0]}".strip(),
-            fnr=row[0],
+            f_id=row[0],
             stratigraphic_unit=stratigraphic_unit,
             feature=feature,
             name=f"Fund {row[0]}",
@@ -118,9 +135,74 @@ def parse_finds(file_path: Path) -> list[StratigraphicUnits]:
             designation=row[7],
             description=row[8],
             dating=row[9],
-            openatlas_class='human_remains' if row[6] == 'menschl. Kn.' else 'artifact' )
+            openatlas_class='human_remains'
+            if row[6] == 'menschl. Kn.' else 'artifact' )
         finds_.append(entry_obj)
     return finds_
+
+
+def get_individuals() -> list[Individual]:
+    output=[]
+    for docx_file in SKELETON_PATH.glob('*.docx'):
+        doc = docx.Document(docx_file)
+
+        se_id = probe_type = find_type = None
+        position = orientation = preservation = dislocation = None
+        age = extraction = None
+        description = []
+
+        if not doc.tables:
+            continue
+
+        for table_num, table in enumerate(doc.tables):
+            match table_num:
+                case 1:
+                    for row_num, row in enumerate(table.rows):
+                        cells = row.cells
+
+                        if row_num == 0:
+                            se_id = cells[4].text.replace('SE:', '').strip()
+
+                        elif row_num == 2 and 'uf078' in repr(cells[1].text):
+                            probe_type = cells[2].text.replace('Art:', '').strip()
+
+                        elif row_num == 3 and 'uf078' in repr(cells[1].text):
+                            find_type = cells[2].text
+
+                case 3:
+                    for row_num, row in enumerate(table.rows):
+                        cells = row.cells
+
+                        if row_num == 0:
+                            position = cells[0].text.replace('Lage:', '').strip()
+                            orientation = cells[1].text.replace('Orientierung:', '').strip()
+
+                        elif row_num == 1:
+                            preservation = cells[0].text.replace('Erhaltungszustand:', '').strip()
+                            dislocation = cells[1].text.replace('Dislozierung:', '').strip()
+
+                        elif row_num == 2:
+                            age = cells[0].text.replace('Alter:', '').strip()
+                            extraction = cells[1].text.replace('Bergung:', '').strip()
+
+                        elif row_num in range(3, 8):
+                            text = cells[0].text
+                            parts = text.split(':', 1)
+                            if len(parts) == 2 and parts[1].strip() not in ['-', '']:
+                                description.append(text)
+
+        output.append(Individual(
+            se_id=se_id,
+            description=description,
+            probe_type=probe_type,
+            find_type=find_type,
+            position=position,
+            orientation=orientation,
+            preservation=preservation,
+            dislocation=dislocation,
+            age=age,
+            extraction=extraction))
+    return output
 
 
 with app.test_request_context():
@@ -134,8 +216,9 @@ with app.test_request_context():
 
     finds = parse_finds(FILE_PATH / 'finds.csv')
 
+    individuals = get_individuals()
+
 
 
     print(DEBUG_MSG)
-
 
