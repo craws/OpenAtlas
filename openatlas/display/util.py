@@ -194,7 +194,7 @@ def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
     if for_table:
         return \
             f'<a href="#" id="bookmark{entity_id}" onclick="{onclick}">' \
-            f'{label}</a>'
+            f'{uc_first(label)}</a>'
     return button(label, id_=f'bookmark{entity_id}', onclick=onclick)
 
 
