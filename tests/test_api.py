@@ -140,7 +140,7 @@ class Api(ApiTestCase):
                 'api_04.network_visualisation',
                 linked_to_ids=boundary_mark.id))
         rv = rv.get_json()
-        assert len(rv['results']) == 3
+        assert len(rv['results']) == 10
         rv = c.get(url_for('api_04.network_visualisation', download=True))
         rv = rv.get_json()
         assert len(rv['results']) == 154
@@ -164,10 +164,10 @@ class Api(ApiTestCase):
             url_for(
                 'api_04.ego_network_visualisation',
                 id_=place.id,
-                depth=6,
+                depth=10,
                 linked_to_ids=boundary_mark.id))
         rv = rv.get_json()
-        assert len(rv['results']) == 3
+        assert len(rv['results']) == 2
         rv = c.get(
             url_for(
                 'api_04.ego_network_visualisation',
