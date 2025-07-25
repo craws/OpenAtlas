@@ -40,8 +40,6 @@ class Display:
             self.add_file_tab_thumbnails()
         self.add_crumbs()
         self.add_buttons()
-        if self.linked_places:
-            self.gis_data = Gis.get_all(self.linked_places)
         self.add_info_tab_content()  # Call later because of profile image
 
     def add_crumbs(self) -> None:
@@ -80,6 +78,8 @@ class Display:
 
     def add_info_tab_content(self) -> None:
         self.add_data()
+        if self.linked_places:
+            self.gis_data = Gis.get_all(self.linked_places)
         resolver_url = g.settings['frontend_resolver_url']
         if hasattr(current_user, 'settings'):
             self.data |= get_system_data(self.entity)
@@ -251,8 +251,12 @@ class Display:
         self.data.update(self.get_type_data())
         for name, relation in self.entity.class_.relations.items():
             if relation['mode'] in ['direct', 'display']:
-                self.data[relation['label']] = [
-                    link(e) for e in self.entity.get_linked_entities(
+                self.data[relation['label']] = []
+                for e in self.entity.get_linked_entities(
                         relation['property'],
                         relation['class'],
-                        relation['inverse'])]
+                        relation['inverse']):
+                    if e.class_.name == 'object_location':
+                        e = e.get_linked_entity_safe('P53', True)
+                        self.linked_places.append(e)
+                    self.data[relation['label']].append(link(e))

@@ -5,7 +5,7 @@ from config.model.class_groups import class_groups
 model = {
     'attributes': {
         'name': {'required': True},
-        'description': {'label': _('content'), 'annotated': True}},
+        'description': {'annotated': True}},
     'relations': {
         'actor': {
             'class': class_groups['actor'],
@@ -20,6 +20,10 @@ model = {
             'property': 'P67',
             'inverse': True,
             'multiple': True},
+        'location': {
+            'class': 'object_location',
+            'property': 'P7',
+            'mode': 'direct'},
         'file': {
             'class': class_groups['file'],
             'property': 'P67',
