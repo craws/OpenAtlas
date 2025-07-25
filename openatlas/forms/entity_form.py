@@ -131,8 +131,9 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
         validators = [InputRequired()] if relation['required'] else None
         items = []
         for class_ in relation['class']:
+            class_ = 'place' if class_ == 'object_location' else class_
             if class_ not in entities:
-                entities[class_] = Entity.get_by_class(class_, True)
+                entities[class_] = Entity.get_by_class(class_, True, True)
             items += entities[class_]
         if relation['multiple']:
             selection: Any = []

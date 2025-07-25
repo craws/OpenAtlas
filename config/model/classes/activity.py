@@ -5,7 +5,7 @@ from config.model.class_groups import class_groups
 model = {
     'attributes': {
         'name': {'required': True},
-        'description': {'annotated': True}},
+        'description': {}},
     'relations': {
         'actor': {
             'class': class_groups['actor'],

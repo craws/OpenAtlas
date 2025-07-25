@@ -5,7 +5,8 @@ from flask_babel import lazy_gettext as _
 from flask_login import current_user
 
 from openatlas.display.util import (
-    edit_link, link, profile_image_table_link, remove_link)
+    edit_link, format_name_and_aliases, link, profile_image_table_link,
+    remove_link)
 from openatlas.display.util2 import uc_first
 from openatlas.models.entity import Entity, Link
 
@@ -70,7 +71,7 @@ def entity_table(
         inverse: Optional[bool] = False) -> Table:
     if not columns:
         columns = (g.table_headers[g.classes[class_].view] + (
-        additional_columns if additional_columns else []))
+            additional_columns if additional_columns else []))
     table = Table(columns)
     for item in items:
         e = item
@@ -116,7 +117,7 @@ def entity_table(
                 #        e,
                 #        g.classes[class_].relations[name])
                 case 'name':
-                    html = link(e)
+                    html = format_name_and_aliases(e, True)
                 case 'page':
                     html = item.description
                 case 'profile' if e and e.image_id:
