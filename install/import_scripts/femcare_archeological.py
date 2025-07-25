@@ -147,9 +147,9 @@ def parse_finds() -> list[Find]:
             if row[1] == '-':
                 stratigraphic_unit = ''
             elif '/' in row[1]:
-                DEBUG_MSG['multiple_SE_in_finds'].append(row[1])
+                DEBUG_MSG['multiple_SE_in_finds'].append(row[0])
             elif '?' in row[1]:
-                DEBUG_MSG['undecided_SE_in_finds'].append(row[1])
+                DEBUG_MSG['undecided_SE_in_finds'].append(row[0])
             else:
                 stratigraphic_unit = f"stratigraphic_{int(row[1])}".strip()
         feature_ = ''
