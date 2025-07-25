@@ -68,7 +68,8 @@ def entity_table(
         entity: Optional[Entity] = None,
         columns: Optional[list[str]] = None,
         additional_columns: Optional[list[str]] = None,
-        inverse: Optional[bool] = False) -> Table:
+        inverse: Optional[bool] = False,
+        table_field_id: Optional[str] = None) -> Table:
     if not columns:
         columns = (g.table_headers[g.classes[class_].view] + (
             additional_columns if additional_columns else []))
@@ -117,7 +118,10 @@ def entity_table(
                 #        e,
                 #        g.classes[class_].relations[name])
                 case 'name':
-                    html = format_name_and_aliases(e, True)
+                    html = format_name_and_aliases_for_form(
+                        e,
+                        table_field_id) if table_field_id \
+                        else format_name_and_aliases(e, True)
                 case 'page':
                     html = item.description
                 case 'profile' if e and e.image_id:
@@ -150,3 +154,15 @@ def entity_table(
             data.append(html)
         table.rows.append(data)
     return table
+
+
+def format_name_and_aliases_for_form(entity: Entity, field_id: str) -> str:
+    link_ = \
+        f"""<a value="{entity.name}"  href='#' onclick="selectFromTable(this,
+        '{field_id}', {entity.id})">{entity.name}</a>"""
+    if entity.aliases:
+        html = f'<p>{link_}</p>'
+        for i, alias in enumerate(entity.aliases.values()):
+            html += alias if i else f'<p>{alias}</p>'
+        return html
+    return link_

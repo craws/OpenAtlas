@@ -14,7 +14,7 @@ from wtforms.validators import InputRequired
 from wtforms.widgets import FileInput, HiddenInput, Input, TextInput
 
 from openatlas import app
-from openatlas.display.table import Table
+from openatlas.display.table import Table, entity_table
 from openatlas.display.util import get_base_table_data
 from openatlas.display.util2 import is_authorized
 from openatlas.forms.util import convert
@@ -329,12 +329,12 @@ def table(
         table_id: str,
         entities: list[Entity],
         filter_ids: Optional[list[int]] = None) -> Table:
-    table_ = Table(
-        g.table_headers[entities[0].class_.name if entities else 'place'])
-    for e in [e for e in entities if not filter_ids or e.id not in filter_ids]:
-        data = get_base_table_data(e, show_links=False)
-        data[0] = format_name_and_aliases(e, table_id)
-        table_.rows.append(data)
+    if entities:
+        table_ = entity_table(
+            entities[0].class_.view,
+            entities,
+            g.table_headers[entities[0].class_.view],
+            table_field_id=table_id)
     return table_
 
 
