@@ -184,7 +184,7 @@ def get_all_links_for_network(
     return [dict(row) for row in g.cursor.fetchall()]
 
 
-def get_links_by_id_network(ids: list[int]) -> list[dict[str, Any]]:
+def get_links_by_id_network(ids: set[int]) -> list[dict[str, Any]]:
     g.cursor.execute(
         """
         SELECT l.id,
@@ -195,8 +195,7 @@ def get_links_by_id_network(ids: list[int]) -> list[dict[str, Any]]:
                l.range_id,
                re.name                 AS range_name,
                re.openatlas_class_name AS range_system_class,
-               l.description,
-               l.type_id
+               l.description
         FROM model.link l
                  JOIN model.entity de ON l.domain_id = de.id
                  JOIN model.entity re ON l.range_id = re.id
@@ -217,8 +216,7 @@ def get_place_linked_to_location_id(ids: list[int]) -> list[dict[str, Any]]:
                l.range_id,
                re.name                 AS range_name,
                re.openatlas_class_name AS range_system_class,
-               l.description,
-               l.type_id
+               l.description
         FROM model.link l
                  JOIN model.entity de ON l.domain_id = de.id
                  JOIN model.entity re ON l.range_id = re.id
@@ -227,3 +225,20 @@ def get_place_linked_to_location_id(ids: list[int]) -> list[dict[str, Any]]:
         """,
         {'ids': tuple(ids)})
     return [dict(row) for row in g.cursor.fetchall()]
+
+
+def get_types_linked_to_network_ids(
+        ids: set[int],
+        type_ids: set[int]) -> set[int]:
+    g.cursor.execute(
+        """
+        SELECT 
+               l.domain_id AS entity_id
+        FROM model.link l
+                 JOIN model.entity de ON l.domain_id = de.id
+                 JOIN model.entity re ON l.range_id = re.id
+        WHERE l.range_id IN %(ids)s AND l.domain_id IN %(ids)s
+            AND l.property_code = 'P2';
+        """,
+        {'ids': tuple(ids), 'type_ids': tuple(type_ids)})
+    return {row['entity_id'] for row in g.cursor.fetchall()}

@@ -7,13 +7,13 @@ from openatlas import app
 from openatlas.api.endpoints.parser import Parser
 from openatlas.api.resources.database_mapper import (
     get_all_links_for_network, get_links_by_id_network,
-    get_place_linked_to_location_id)
+    get_place_linked_to_location_id, get_types_linked_to_network_ids)
 from openatlas.database.entity import get_linked_entities_recursive
 
 
 def overwrite_object_locations_with_place(
         links: list[dict[str, Any]],
-        exclude_: list[str]) -> list[dict[str, Any]]:
+        exclude_: set[str]) -> list[dict[str, Any]]:
     locations = {}
     for l in links:
         if l['property_code'] == 'P53':
@@ -61,17 +61,17 @@ def get_link_dictionary(links: list[dict[str, Any]]) -> dict[int, Any]:
     return output
 
 
-def get_excluded_classes(parser: Parser) -> list[str]:
-    location_classes = [
+def get_excluded_classes(parser: Parser) -> set[str]:
+    location_classes = {
         "administrative_unit",
         "artifact",
         "feature",
         "human_remains",
         "place",
-        "stratigraphic_unit"]
-    exclude = parser.exclude_system_classes or []
+        "stratigraphic_unit"}
+    exclude = set(parser.exclude_system_classes or [])
     if all(item in location_classes for item in exclude):
-        exclude += ['object_location']
+        exclude.add('object_location')
     return exclude
 
 
@@ -117,37 +117,64 @@ def get_network_visualisation(parser: Parser) -> dict[str, Any]:
 
 
 def get_ego_network_visualisation(id_: int, parser: Parser) -> dict[str, Any]:
-    exclude_ = parser.exclude_system_classes or []
-    entity_ids = [id_]
-    all_ = []
-    entities_count = 0
+    entity_ids = {id_}
+    all_links = []
+    previous_link_count = 0
+
     for _ in range(parser.depth):
-        entities = get_links_by_id_network(entity_ids)
-        location_ids = [
-            e['range_id'] for e in entities
-            if e['property_code'] in app.config['LOCATION_PROPERTIES']]
+        links = get_links_by_id_network(entity_ids)
+
+        # Add place links for location-related properties
+        location_ids = []
+        for link in links:
+            if link['property_code'] in app.config['LOCATION_PROPERTIES']:
+                location_ids.append(link['range_id'])
+
         if location_ids:
-            entities.extend(get_place_linked_to_location_id(location_ids))
-        if entities_count == len(entities):  # pragma: no cover
-            break  # Stop loop if no additional results
-        entities_count = len(entities)
-        for row in entities:
-            classes = [row['domain_system_class'], row['range_system_class']]
-            if any(item in string for item in classes for string in exclude_):
-                # todo: wahrscheinlich die Stelle
-                if row['range_id'] not in parser.linked_to_ids:
-                    continue
-            entity_ids.append(row['domain_id'])
-            entity_ids.append(row['range_id'])
-            all_.append(row)
-    links = [dict(t) for t in {frozenset(d.items()) for d in all_}]
-    links = overwrite_object_locations_with_place(links, exclude_)
-    link_dict = get_link_dictionary(links)
-    results: dict[str, Any] = {'results': []}
-    for _id, dict_ in link_dict.items():
-        if parser.linked_to_ids and not \
-                set(parser.linked_to_ids) & set(dict_['relations']):
-            continue
-        dict_['id'] = _id
-        results['results'].append(dict_)
+            location_links = get_place_linked_to_location_id(location_ids)
+            links.extend(location_links)
+
+        # Stop early if no new links were added
+        if len(links) == previous_link_count:  # pragma: no cover
+            break
+        previous_link_count = len(links)
+
+        for link in links:
+            entity_ids.add(link['domain_id'])
+            entity_ids.add(link['range_id'])
+            all_links.append(link)
+
+    if parser.linked_to_ids:
+        linked_to_ids = set(parser.linked_to_ids)
+        valid_type_links = get_types_linked_to_network_ids(
+            entity_ids,
+            linked_to_ids)
+
+        filtered_links = []
+        for link in all_links:
+            link_ids = {link['domain_id'], link['range_id']}
+            if link_ids.issubset(valid_type_links):
+                filtered_links.append(link)
+        all_links = filtered_links
+
+    exclude_classes = set(parser.exclude_system_classes or [])
+    filtered_links = []
+    for link in all_links:
+        link_classes = {
+            link['domain_system_class'],
+            link['range_system_class']}
+        if link_classes.isdisjoint(exclude_classes):
+            filtered_links.append(link)
+    all_links = filtered_links
+
+    updated_links = overwrite_object_locations_with_place(
+        all_links,
+        exclude_classes)
+
+    link_dict = get_link_dictionary(updated_links)
+
+    results = {'results': []}
+    for node_id, node_data in link_dict.items():
+        node_data['id'] = node_id
+        results['results'].append(node_data)
     return results
