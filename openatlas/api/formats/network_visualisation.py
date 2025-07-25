@@ -8,7 +8,6 @@ from openatlas.api.endpoints.parser import Parser
 from openatlas.api.resources.database_mapper import (
     get_all_links_for_network, get_links_by_id_network,
     get_place_linked_to_location_id, get_types_linked_to_network_ids)
-from openatlas.database.entity import get_linked_entities_recursive
 
 
 def overwrite_object_locations_with_place(
@@ -76,43 +75,40 @@ def get_excluded_classes(parser: Parser) -> set[str]:
 
 
 def get_network_visualisation(parser: Parser) -> dict[str, Any]:
-    system_classes = g.classes
-    exclude_ = get_excluded_classes(parser)
-    if exclude_:
-        system_classes = [s for s in system_classes if s not in exclude_]
+    exclude_classes = get_excluded_classes(parser)
+    included_classes = [
+        cls for cls in g.classes if cls not in exclude_classes]
 
-    if linked_to_ids := parser.linked_to_ids:
-        ids = []
-        for id_ in linked_to_ids:
-            ids += get_linked_entities_recursive(
-                id_,
-                list(g.properties),
-                True)
-            ids += get_linked_entities_recursive(
-                id_,
-                list(g.properties),
-                False)
-        all_ = get_links_by_id_network(ids + linked_to_ids)
-        links = []
-        if exclude_:
-            for link_ in all_:
-                if (link_['domain_system_class'] not in exclude_
-                        or link_['range_system_class'] not in exclude_):
-                    links.append(link_)
-    else:
-        links = get_all_links_for_network(system_classes)
+    links = get_all_links_for_network(included_classes)
+    links = overwrite_object_locations_with_place(links, exclude_classes)
 
-    links = overwrite_object_locations_with_place(links, exclude_)
-    link_dict = get_link_dictionary(links)
+    entity_ids = set()
+    filtered_links = []
+    for link in links:
+        classes = {
+            link['domain_system_class'],
+            link['range_system_class']}
+        if classes.isdisjoint(exclude_classes):
+            entity_ids.add(link['domain_id'])
+            entity_ids.add(link['range_id'])
+            filtered_links.append(link)
+    links = filtered_links
+
+    if parser.linked_to_ids:
+        linked_to_ids = set(parser.linked_to_ids)
+        valid_type_links = get_types_linked_to_network_ids(
+            entity_ids,
+            linked_to_ids)
+        filtered_links = []
+        for link in links:
+            if {link['domain_id'], link['range_id']} & valid_type_links:
+                filtered_links.append(link)
+        links = filtered_links
 
     results: dict[str, Any] = {'results': []}
-    for id_, dict_ in link_dict.items():
-        if linked_to_ids:
-            if not set(linked_to_ids) & set(dict_['relations']):
-                continue
-        dict_['id'] = id_
-        results['results'].append(dict_)
-
+    for node_id, node_data in get_link_dictionary(links).items():
+        node_data['id'] = node_id
+        results['results'].append(node_data)
     return results
 
 
@@ -144,6 +140,20 @@ def get_ego_network_visualisation(id_: int, parser: Parser) -> dict[str, Any]:
             entity_ids.add(link['range_id'])
             all_links.append(link)
 
+    exclude_classes = set(parser.exclude_system_classes or [])
+    all_links = overwrite_object_locations_with_place(
+        all_links,
+        exclude_classes)
+
+    filtered_links = []
+    for link in all_links:
+        link_classes = {
+            link['domain_system_class'],
+            link['range_system_class']}
+        if link_classes.isdisjoint(exclude_classes):
+            filtered_links.append(link)
+    all_links = filtered_links
+
     if parser.linked_to_ids:
         linked_to_ids = set(parser.linked_to_ids)
         valid_type_links = get_types_linked_to_network_ids(
@@ -157,24 +167,8 @@ def get_ego_network_visualisation(id_: int, parser: Parser) -> dict[str, Any]:
                 filtered_links.append(link)
         all_links = filtered_links
 
-    exclude_classes = set(parser.exclude_system_classes or [])
-    filtered_links = []
-    for link in all_links:
-        link_classes = {
-            link['domain_system_class'],
-            link['range_system_class']}
-        if link_classes.isdisjoint(exclude_classes):
-            filtered_links.append(link)
-    all_links = filtered_links
-
-    updated_links = overwrite_object_locations_with_place(
-        all_links,
-        exclude_classes)
-
-    link_dict = get_link_dictionary(updated_links)
-
     results = {'results': []}
-    for node_id, node_data in link_dict.items():
+    for node_id, node_data in get_link_dictionary(all_links).items():
         node_data['id'] = node_id
         results['results'].append(node_data)
     return results

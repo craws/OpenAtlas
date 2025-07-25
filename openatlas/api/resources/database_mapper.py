@@ -46,7 +46,7 @@ def get_place_linked_to_location_id(ids: list[int]) -> list[dict[str, Any]]:
 
 def get_types_linked_to_network_ids(
         ids: set[int],
-        type_ids: set[int]) -> list[dict[str, Any]]:
+        type_ids: set[int]) -> set[int]:
     return db_link.get_types_linked_to_network_ids(ids, type_ids)
 
 

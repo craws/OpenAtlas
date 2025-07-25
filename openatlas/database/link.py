@@ -205,6 +205,7 @@ def get_links_by_id_network(ids: set[int]) -> list[dict[str, Any]]:
         {'ids': tuple(ids)})
     return [dict(row) for row in g.cursor.fetchall()]
 
+
 def get_place_linked_to_location_id(ids: list[int]) -> list[dict[str, Any]]:
     g.cursor.execute(
         """
@@ -220,8 +221,8 @@ def get_place_linked_to_location_id(ids: list[int]) -> list[dict[str, Any]]:
         FROM model.link l
                  JOIN model.entity de ON l.domain_id = de.id
                  JOIN model.entity re ON l.range_id = re.id
-        WHERE l.range_id IN %(ids)s 
-            AND l.property_code = 'P53';
+        WHERE l.range_id IN %(ids)s
+          AND l.property_code = 'P53';
         """,
         {'ids': tuple(ids)})
     return [dict(row) for row in g.cursor.fetchall()]
@@ -232,13 +233,13 @@ def get_types_linked_to_network_ids(
         type_ids: set[int]) -> set[int]:
     g.cursor.execute(
         """
-        SELECT 
-               l.domain_id AS entity_id
+        SELECT l.domain_id AS entity_id
         FROM model.link l
                  JOIN model.entity de ON l.domain_id = de.id
                  JOIN model.entity re ON l.range_id = re.id
-        WHERE l.range_id IN %(ids)s AND l.domain_id IN %(ids)s
-            AND l.property_code = 'P2';
+        WHERE l.range_id IN %(type_ids)s
+          AND l.domain_id IN %(ids)s
+          AND l.property_code = 'P2';
         """,
         {'ids': tuple(ids), 'type_ids': tuple(type_ids)})
     return {row['entity_id'] for row in g.cursor.fetchall()}
