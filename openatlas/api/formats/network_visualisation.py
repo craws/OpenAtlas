@@ -120,6 +120,11 @@ def get_ego_network_visualisation(id_: int, parser: Parser) -> dict[str, Any]:
     for _ in range(parser.depth):
         links = get_links_by_id_network(entity_ids)
 
+        # Stop early if no new links were added
+        if len(links) == previous_link_count:
+            break
+        previous_link_count = len(links)
+
         # Add place links for location-related properties
         location_ids = []
         for link in links:
@@ -129,11 +134,6 @@ def get_ego_network_visualisation(id_: int, parser: Parser) -> dict[str, Any]:
         if location_ids:
             location_links = get_place_linked_to_location_id(location_ids)
             links.extend(location_links)
-
-        # Stop early if no new links were added
-        if len(links) == previous_link_count:
-            break
-        previous_link_count = len(links)
 
         for link in links:
             entity_ids.add(link['domain_id'])
@@ -167,7 +167,7 @@ def get_ego_network_visualisation(id_: int, parser: Parser) -> dict[str, Any]:
                 filtered_links.append(link)
         all_links = filtered_links
 
-    results = {'results': []}
+    results: dict[str, Any] = {'results': []}
     for node_id, node_data in get_link_dictionary(all_links).items():
         node_data['id'] = node_id
         results['results'].append(node_data)
