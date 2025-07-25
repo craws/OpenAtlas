@@ -131,7 +131,7 @@ def get_ego_network_visualisation(id_: int, parser: Parser) -> dict[str, Any]:
             links.extend(location_links)
 
         # Stop early if no new links were added
-        if len(links) == previous_link_count:  # pragma: no cover
+        if len(links) == previous_link_count:
             break
         previous_link_count = len(links)
 
