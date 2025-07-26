@@ -158,10 +158,7 @@ class TableMultiSelect(HiddenInput):
         if field.selection:
             field.data = str([e.id for e in field.selection])
             field.data_list = sorted([e.name for e in field.selection])
-        field.table = table_multi(
-            field.entities,
-            field.selection,
-            field.filter_ids)
+        field.table = table_multi(field.entities, field.selection)
         return super().__call__(field, **kwargs) + Markup(
             render_template('forms/table_multi_select.html', field=field))
 
@@ -173,28 +170,22 @@ class TableMultiField(HiddenField):
             self,
             entities: list[Entity],
             selection: Optional[list[Entity]] = None,
-            filter_ids: Optional[list[int]] = None,
             description: Optional[str] = None,
             **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.entities = entities
         self.selection = selection or []
-        self.filter_ids = filter_ids or []
         self.description = description
 
 
-def table_multi(
-        entities: list[Entity],
-        selection: list[Entity],
-        filter_ids: list[int]) -> Table:
-    filter_ids = filter_ids or []
+def table_multi(entities: list[Entity], selection: list[Entity]) -> Table:
     selection_ids = [e.id for e in selection] if selection else []
     view = entities[0].class_.view if entities else 'place'
     table_ = Table(
         [''] + g.table_headers[view],
         order=[[0, 'desc'], [1, 'asc']],
         defs=[{'orderDataType': 'dom-checkbox', 'targets': 0}])
-    for e in [e for e in entities if e.id not in filter_ids]:
+    for e in entities:
         row = get_base_table_data(e, show_links=False)
         row.insert(
             0,
@@ -262,21 +253,19 @@ class TableSelect(HiddenInput):
         field.forms = {}
         for class_name in field.add_dynamical:
             field.forms[class_name] = get_form(class_name)
-
         if request and request.method == 'POST':  # If validation failed
             field.selection = \
                 Entity.get_by_id(int(request.form[field.name])) \
                 if request.form[field.name] else None
-
-        field.data = ''
-        field.data_string = ''
-        if field.selection:
-            field.data = field.selection.id
-            field.data_string = field.selection.name
+        field.data = field.selection.id if field.selection else ''
+        field.data_string = field.selection.name if field.selection else ''
         if field.id == 'entity':
             field.table = table_annotation(field.entities)
         else:
-            field.table = table(field.id, field.entities)
+            field.table = entity_table(
+                field.entities[0].class_.view,
+                field.entities,
+                table_field_id=field.id)
         return super().__call__(field, **kwargs) + Markup(
             render_template('forms/table_select.html', field=field))
 
@@ -321,16 +310,6 @@ class TableCidocField(HiddenField):
         super().__init__(validators=[InputRequired()], **kwargs)
         self.items = items
         self.selection = None
-
-
-def table(table_id: str, entities: list[Entity]) -> Table:
-    if entities:
-        table_ = entity_table(
-            entities[0].class_.view,
-            entities,
-            g.table_headers[entities[0].class_.view],
-            table_field_id=table_id)
-    return table_
 
 
 def table_annotation(entities: list[Entity]) -> Table:
@@ -403,7 +382,6 @@ class TreeSelect(HiddenInput):
             data=Entity.get_tree_data(
                 int(field.type_id),
                 selected_ids,
-                field.filters_ids,
                 field.is_type_form))) + super().__call__(field, **kwargs)
 
 
@@ -414,14 +392,12 @@ class TreeField(HiddenField):
             label: str,
             validators: Any = None,
             type_id: str = '',
-            filter_ids: Optional[list[int]] = None,
             is_type_form: Optional[bool] = False,
             form: Any = None,
             **kwargs: Any) -> None:
         super().__init__(label, validators, **kwargs)
         self.form = form
         self.type_id = type_id or self.id
-        self.filters_ids = filter_ids
         self.is_type_form = is_type_form
 
     widget = TreeSelect()

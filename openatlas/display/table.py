@@ -70,10 +70,8 @@ def entity_table(
         additional_columns: Optional[list[str]] = None,
         inverse: Optional[bool] = False,
         table_field_id: Optional[str] = None) -> Table:
-    if not columns:
-        columns = (g.table_headers[g.classes[class_].view] + (
-            additional_columns if additional_columns else []))
-    table = Table(columns)
+    columns = columns or g.table_headers[g.classes[class_].view]
+    table = Table(columns + (additional_columns if additional_columns else []))
     for item in entities:
         e = item
         range_ = None

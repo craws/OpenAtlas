@@ -1,9 +1,7 @@
-import json
 from typing import Optional
 
 from flask import Response, abort, g, jsonify, request
 from flask_babel import lazy_gettext as _
-from flask_login import current_user
 
 from openatlas import app
 from openatlas.api.external.geonames import fetch_geonames
@@ -12,8 +10,7 @@ from openatlas.api.external.wikidata import fetch_wikidata
 from openatlas.database.connect import Transaction
 from openatlas.display.util import display_info, required_group
 from openatlas.display.util2 import uc_first
-from openatlas.forms.field import table
-from openatlas.models.entity import Entity
+from openatlas.models.entity import Entity, insert
 from openatlas.models.user import User
 
 
@@ -29,14 +26,16 @@ def ajax_bookmark() -> Response:
 @required_group('editor')
 def ajax_add_type() -> str:
     link = {'E55': 'P127', 'E53': 'P89'}
-    cidoc_name = {'E55': 'type', 'E53': 'administrative_unit'}
+    openatlas_class_name = {'E55': 'type', 'E53': 'administrative_unit'}
     cidoc_code = g.types[int(request.form['superType'])].cidoc_class.code
     Transaction.begin()
     try:
-        entity = Entity.insert(
-            cidoc_name[cidoc_code],
-            request.form['name'],
-            request.form['description'])
+        entity = insert(
+            data={
+                'name': request.form['name'],
+                'openatlas_class_name': openatlas_class_name,
+                'cidoc_class_code': cidoc_code,
+                'description': request.form['description']})
         entity.link(link[cidoc_code], g.types[int(request.form['superType'])])
         g.logger.log_user(entity.id, 'insert')
         Transaction.commit()
@@ -58,7 +57,7 @@ def ajax_get_type_tree(root_id: Optional[int] = None) -> str:
 def ajax_create_entity() -> str:
     Transaction.begin()
     try:
-        entity = Entity.insert(
+        entity = insert(
             request.form['entityName'],
             request.form['name'],
             request.form['description'])
@@ -66,7 +65,7 @@ def ajax_create_entity() -> str:
                 ['artifact', 'feature', 'place', 'stratigraphic_unit']:
             entity.link(
                 'P53',
-                Entity.insert(
+                insert(
                     'object_location',
                     f'Location of {request.form["name"]}'))
         if 'standardType' in request.form and request.form['standardType']:
