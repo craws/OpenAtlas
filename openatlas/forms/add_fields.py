@@ -10,23 +10,23 @@ from wtforms import IntegerField, StringField
 from wtforms.validators import (
     NoneOf, NumberRange, Optional as OptionalValidator)
 
-from openatlas.forms.field import (
-    ReferenceField, ValueTypeField)
+from openatlas.forms.field import ReferenceField, ValueTypeField
 from openatlas.forms.util import check_if_entity_has_time
 from openatlas.models.entity import Entity
+from openatlas.models.openatlas_class import OpenatlasClass
 
 
-def add_reference_systems(manager: Any) -> None:
+def add_reference_systems(form: Any, class_: OpenatlasClass) -> None:
     precisions = [('', '')] + [
         (str(g.types[id_].id), g.types[id_].name)
         for id_ in g.reference_match_type.subs]
-    systems = list(g.reference_systems.values())
-    systems.sort(key=lambda x: x.name.casefold())
-    for system in systems:
-        if manager.class_.name not in system.classes:
+    reference_systems = list(g.reference_systems.values())
+    reference_systems.sort(key=lambda x: x.name.casefold())
+    for system in reference_systems:
+        if class_.name not in system.classes:
             continue
         setattr(
-            manager.form_class,
+            form,
             f'reference_system_id_{system.id}',
             ReferenceField(
                 system.name,

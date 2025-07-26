@@ -9,7 +9,6 @@ from flask_wtf import FlaskForm
 from wtforms import HiddenField, SelectMultipleField, StringField, widgets
 
 from openatlas.display.util import link
-from openatlas.forms.add_fields import add_reference_systems
 from openatlas.forms.field import TableField, TreeField
 from openatlas.forms.populate import populate_dates, populate_reference_systems
 from openatlas.forms.process import (
@@ -58,7 +57,6 @@ class BaseManager:
             validate = validate
 
         self.form_class = Form
-        add_reference_systems(self)
         if self.entity:
             setattr(Form, 'entity_id', HiddenField())
         if 'map' in self.fields:
