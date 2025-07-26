@@ -9,7 +9,7 @@ from wtforms import FieldList, HiddenField, StringField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas.display.util2 import is_authorized
-from openatlas.forms.add_fields import add_value_type_fields
+from openatlas.forms.add_fields import add_date_fields, add_value_type_fields
 from openatlas.forms.field import (
     RemovableListField, SubmitAnnotationField, SubmitField, TableField,
     TableMultiField, TextAnnotationField, TreeField, TreeMultiField,
@@ -28,6 +28,7 @@ def get_entity_form(entity: Entity, origin: Optional[Entity] = None) -> Any:
     add_name_fields(Form, entity)
     add_types(Form, entity.class_)
     add_relations(Form, entity, origin)
+    add_date_fields(Form, entity)
     add_description(Form, entity, origin)
     add_buttons(Form, entity)
     form: Any = Form(obj=entity)

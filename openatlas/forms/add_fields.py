@@ -4,6 +4,7 @@ from typing import Any
 
 from flask import g
 from flask_babel import lazy_gettext as _
+from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import IntegerField, StringField
 from wtforms.validators import (
@@ -11,6 +12,8 @@ from wtforms.validators import (
 
 from openatlas.forms.field import (
     ReferenceField, ValueTypeField)
+from openatlas.forms.util import check_if_entity_has_time
+from openatlas.models.entity import Entity
 
 
 def add_reference_systems(manager: Any) -> None:
@@ -36,7 +39,9 @@ def add_reference_systems(manager: Any) -> None:
                     'precision': str(system.precision_default_id)}))
 
 
-def add_date_fields(form_class: Any, has_time: bool) -> None:
+def add_date_fields(form_class: Any, entity: Entity) -> None:
+    if 'dates' not in entity.class_.attributes:
+        return
     validator_second = [OptionalValidator(), NumberRange(min=0, max=59)]
     validator_minute = [OptionalValidator(), NumberRange(min=0, max=59)]
     validator_hour = [OptionalValidator(), NumberRange(min=0, max=23)]
@@ -46,7 +51,9 @@ def add_date_fields(form_class: Any, has_time: bool) -> None:
         OptionalValidator(),
         NumberRange(min=-4713, max=9999),
         NoneOf([0])]
-
+    has_time = bool(
+        current_user.settings['module_time']
+        or (entity and check_if_entity_has_time(entity)))
     setattr(
         form_class,
         'begin_year_from',

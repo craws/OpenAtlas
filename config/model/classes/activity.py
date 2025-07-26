@@ -5,7 +5,8 @@ from config.model.class_groups import class_groups
 model = {
     'attributes': {
         'name': {'required': True},
-        'description': {}},
+        'description': {},
+        'dates': {}},
     'relations': {
         'actor': {
             'class': class_groups['actor'],
@@ -20,10 +21,6 @@ model = {
             'property': 'P67',
             'inverse': True,
             'multiple': True},
-        'location': {
-            'class': 'object_location',
-            'property': 'P7',
-            'mode': 'direct'},
         'file': {
             'class': class_groups['file'],
             'property': 'P67',
@@ -54,7 +51,11 @@ model = {
             'class': class_groups['event'],
             'property': 'P134',
             'mode': 'direct',
-            'label': _('preceding event')}},
+            'label': _('preceding event')},
+        'location': {
+            'class': 'object_location',
+            'property': 'P7',
+            'mode': 'direct'}},
     'display': {
         'buttons': ['copy', 'network'],
         'form': {'insert_and_continue': True},

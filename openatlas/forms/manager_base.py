@@ -9,13 +9,12 @@ from flask_wtf import FlaskForm
 from wtforms import HiddenField, SelectMultipleField, StringField, widgets
 
 from openatlas.display.util import link
-from openatlas.forms.add_fields import add_date_fields, add_reference_systems
+from openatlas.forms.add_fields import add_reference_systems
 from openatlas.forms.field import TableField, TreeField
-from openatlas.forms.populate import (
-    populate_dates, populate_reference_systems)
+from openatlas.forms.populate import populate_dates, populate_reference_systems
 from openatlas.forms.process import (
     process_dates, process_origin, process_standard_fields)
-from openatlas.forms.util import check_if_entity_has_time, convert
+from openatlas.forms.util import convert
 from openatlas.forms.validation import hierarchy_name_exists, validate
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
@@ -62,10 +61,6 @@ class BaseManager:
         add_reference_systems(self)
         if self.entity:
             setattr(Form, 'entity_id', HiddenField())
-        if 'date' in self.fields:
-            add_date_fields(self.form_class, bool(
-                current_user.settings['module_time']
-                or (entity and check_if_entity_has_time(entity))))
         if 'map' in self.fields:
             setattr(Form, 'gis_points', HiddenField(default='[]'))
             setattr(Form, 'gis_polygons', HiddenField(default='[]'))
