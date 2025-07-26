@@ -65,8 +65,8 @@ model = {
             'actor': {
                 'mode': 'link',
                 'columns': [
-                    'name', 'class', 'involvement', 'first', 'last',
-                    'activity', 'description', 'update', 'remove']},
+                    'name', 'class', 'activity', 'involvement', 'first',
+                    'last', 'comment', 'update', 'remove']},
             'reference': {
                 'mode': 'link',
                 'additional_columns': ['page', 'update', 'remove']},

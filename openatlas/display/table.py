@@ -71,7 +71,8 @@ def entity_table(
         inverse: Optional[bool] = False,
         table_field_id: Optional[str] = None) -> Table:
     columns = columns or g.table_headers[g.classes[class_].view]
-    table = Table(columns + (additional_columns if additional_columns else []))
+    columns += additional_columns if additional_columns else []
+    table = Table(columns)
     for item in entities:
         e = item
         range_ = None
@@ -90,8 +91,10 @@ def entity_table(
                     html = e.class_.label
                 case 'creator':
                     html = g.file_info[e.id]['creator']
-                case 'description' | 'content':
-                    html = item.description or ''
+                case 'content' | 'description':
+                    html = e.description
+                case 'comment' | 'page':
+                    html = item.description
                 case 'end':
                     html = e.last
                 case 'extension':
@@ -120,12 +123,14 @@ def entity_table(
                         e,
                         table_field_id) if table_field_id \
                         else format_name_and_aliases(e, True)
-                case 'page':
-                    html = item.description
                 case 'profile' if e and e.image_id:
-                    html = 'Profile' if e.id == entity_viewed.image_id else link(
-                        'profile',
-                        url_for('file_profile', id_=e.id, entity_id=entity_viewed.id))
+                    html = 'Profile' if e.id == entity_viewed.image_id \
+                        else link(
+                            'profile',
+                            url_for(
+                                'file_profile',
+                                id_=e.id,
+                                entity_id=entity_viewed.id))
                 case 'public':
                     html = _('yes') if g.file_info[e.id]['public'] else None
                 case 'remove':
