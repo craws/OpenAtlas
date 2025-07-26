@@ -80,19 +80,6 @@ def ajax_create_entity() -> str:
     return str(entity.id)
 
 
-@app.route('/ajax/get_entity_table/<string:content_domain>', methods=['POST'])
-@required_group('readonly')
-def ajax_get_entity_table(content_domain: str) -> str:
-    table_ = table(
-        content_domain,
-        Entity.get_by_class(
-            content_domain,
-            True,
-            current_user.settings['table_show_aliases']),
-        json.loads(request.form['filterIds']) or [])
-    return table_.display(content_domain)
-
-
 @app.route('/ajax/wikidata_info', methods=['POST'])
 @required_group('readonly')
 def ajax_wikidata_info() -> str:

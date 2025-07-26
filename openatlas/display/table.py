@@ -64,8 +64,8 @@ class Table:
 
 def entity_table(
         class_: str,
-        items: list[Entity] | list[Link],
-        entity: Optional[Entity] = None,
+        entities: list[Entity] | list[Link],
+        entity_viewed: Optional[Entity] = None,
         columns: Optional[list[str]] = None,
         additional_columns: Optional[list[str]] = None,
         inverse: Optional[bool] = False,
@@ -74,7 +74,7 @@ def entity_table(
         columns = (g.table_headers[g.classes[class_].view] + (
             additional_columns if additional_columns else []))
     table = Table(columns)
-    for item in items:
+    for item in entities:
         e = item
         range_ = None
         if isinstance(item, Link):
@@ -125,9 +125,9 @@ def entity_table(
                 case 'page':
                     html = item.description
                 case 'profile' if e and e.image_id:
-                    html = 'Profile' if e.id == entity.image_id else link(
+                    html = 'Profile' if e.id == entity_viewed.image_id else link(
                         'profile',
-                        url_for('file_profile', id_=e.id, entity_id=entity.id))
+                        url_for('file_profile', id_=e.id, entity_id=entity_viewed.id))
                 case 'public':
                     html = _('yes') if g.file_info[e.id]['public'] else None
                 case 'remove':
@@ -150,7 +150,7 @@ def entity_table(
                         url_for(
                             'link_update',
                             id_=item.id,
-                            origin_id=entity.id))
+                            origin_id=entity_viewed.id))
             data.append(html)
         table.rows.append(data)
     return table

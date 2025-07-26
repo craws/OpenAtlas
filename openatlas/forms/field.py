@@ -276,7 +276,7 @@ class TableSelect(HiddenInput):
         if field.id == 'entity':
             field.table = table_annotation(field.entities)
         else:
-            field.table = table(field.id, field.entities, field.filter_ids)
+            field.table = table(field.id, field.entities)
         return super().__call__(field, **kwargs) + Markup(
             render_template('forms/table_select.html', field=field))
 
@@ -288,14 +288,12 @@ class TableField(HiddenField):
             self,
             entities: list[Entity],
             selection: Optional[Entity] = None,
-            filter_ids: Optional[list[int]] = None,
             validators: Optional[Any] = None,
             add_dynamic: Optional[list[str]] = None,
             **kwargs: Any) -> None:
         super().__init__(validators=validators, **kwargs)
         self.entities = entities
         self.selection = selection
-        self.filter_ids = filter_ids or []
         self.add_dynamical = \
             (add_dynamic or []) if is_authorized('editor') else []
         self.add_dynamical.reverse()  # Reverse needed (CSS .float-end)
@@ -325,10 +323,7 @@ class TableCidocField(HiddenField):
         self.selection = None
 
 
-def table(
-        table_id: str,
-        entities: list[Entity],
-        filter_ids: Optional[list[int]] = None) -> Table:
+def table(table_id: str, entities: list[Entity]) -> Table:
     if entities:
         table_ = entity_table(
             entities[0].class_.view,
