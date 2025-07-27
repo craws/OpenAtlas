@@ -1,24 +1,18 @@
 import time
-from collections import OrderedDict
 from typing import Any, Optional
 
 from flask import g, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
-from wtforms import FieldList, HiddenField, StringField, TextAreaField
-from wtforms.validators import InputRequired
+from wtforms import HiddenField
 
-from openatlas.display.util2 import is_authorized
 from openatlas.forms.add_fields import (
-    add_date_fields, add_reference_systems, add_value_type_fields)
-from openatlas.forms.field import (
-    RemovableListField, SubmitAnnotationField, SubmitField, TableField,
-    TableMultiField, TextAnnotationField, TreeField, TreeMultiField,
-    ValueTypeRootField)
+    add_date_fields, add_description, add_name_fields, add_reference_systems,
+    add_relations, add_types)
+from openatlas.forms.field import SubmitAnnotationField, SubmitField
 from openatlas.forms.util import convert
 from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity, insert
-from openatlas.models.openatlas_class import OpenatlasClass
 
 
 def get_entity_form(entity: Entity, origin: Optional[Entity] = None) -> Any:
@@ -41,19 +35,6 @@ def get_entity_form(entity: Entity, origin: Optional[Entity] = None) -> Any:
     return form
 
 
-def add_name_fields(form: Any, entity: Entity) -> None:
-    if 'name' in entity.class_.attributes:
-        setattr(
-            form,
-            'name',
-            StringField(
-                _('name'),
-                validators=[InputRequired()],
-                render_kw={'autofocus': True}))
-    if 'alias' in entity.class_.attributes:
-        setattr(form, 'alias', FieldList(RemovableListField()))
-
-
 def add_buttons(form: Any, entity: Entity) -> None:
     field = SubmitField
     if 'description' in entity.class_.attributes \
@@ -63,116 +44,6 @@ def add_buttons(form: Any, entity: Entity) -> None:
     if not entity.id and entity.class_.display['form']['insert_and_continue']:
         setattr(form, 'insert_and_continue', field(_('insert and continue')))
         setattr(form, 'continue_', HiddenField())
-
-
-def add_description(
-        form: Any,
-        entity: Entity,
-        origin: Optional[Entity] = None) -> None:
-    if 'description' not in entity.class_.attributes:
-        return
-    if 'annotated' not in entity.class_.attributes['description']:
-        setattr(
-            form,
-            'description',
-            TextAreaField(_('description'), render_kw={'rows': 8}))
-        return
-    source = entity
-    if entity.class_.name == 'source_translation':
-        source = origin or entity.get_linked_entity('P73', inverse=True)
-    setattr(
-            form,
-            'annotation',
-            TextAnnotationField(
-                label=entity.class_.attributes['description']['label'],
-                source_text=entity.get_annotated_text() if entity.id else '',
-                linked_entities=[
-                    {'id': e.id, 'name': e.name}
-                    for e in source.get_linked_entities('P67')]))
-    setattr(form, 'description', HiddenField())
-
-
-def add_types(form: Any, class_: OpenatlasClass) -> None:
-    if not class_.hierarchies:
-        return
-    types = OrderedDict({id_: g.types[id_] for id_ in class_.hierarchies})
-    if class_.standard_type_id in types:
-        types.move_to_end(class_.standard_type_id, last=False)
-    for type_ in types.values():
-        add_form = None
-        if is_authorized('editor'):
-            class AddDynamicType(FlaskForm):
-                pass
-
-            setattr(AddDynamicType, 'name-dynamic', StringField(_('super')))
-            setattr(
-                AddDynamicType,
-                f'{type_.id}-dynamic',
-                TreeField(str(type_.id) + '*', type_id=str(type_.id)))
-            setattr(
-                AddDynamicType,
-                'description-dynamic',
-                TextAreaField(_('description')))
-            add_form = AddDynamicType()
-        validators = [InputRequired()] if type_.required else []
-        if type_.category == 'value':
-            field = ValueTypeRootField(type_.name, type_.id)
-        elif type_.multiple:
-            field = TreeMultiField(str(type_.id), validators, form=add_form)
-        else:
-            field = TreeField(str(type_.id), validators, form=add_form)
-        setattr(form, str(type_.id), field)
-        if type_.category == 'value':
-            add_value_type_fields(form, type_.subs)
-
-
-def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
-    entities = {}  # Collect entities per class to prevent multiple fetching
-    for name, relation in entity.class_.relations.items():
-        if relation['mode'] != 'direct':
-            continue
-        validators = [InputRequired()] if relation['required'] else None
-        items = []
-        for class_ in relation['class']:
-            class_ = 'place' if class_ == 'object_location' else class_
-            if class_ not in entities:
-                entities[class_] = Entity.get_by_class(class_, True, True)
-            items += entities[class_]
-        if relation['multiple']:
-            selection: Any = []
-            if entity.id:
-                selection = entity.get_linked_entities(
-                    relation['property'],
-                    relation['class'],
-                    inverse=relation['inverse'])
-            elif origin and origin.class_.name in relation['class']:
-                selection = [origin]
-            setattr(
-                form,
-                name,
-                TableMultiField(
-                    items,
-                    selection,
-                    description=relation['tooltip'],
-                    label=relation['label'],
-                    validators=validators))
-        else:
-            selection = None
-            if entity.id:
-                selection = entity.get_linked_entity(
-                    relation['property'],
-                    relation['class'],
-                    relation['inverse'])
-            elif origin and origin.class_.name in relation['class']:
-                selection = origin
-            setattr(
-                form,
-                name,
-                TableField(
-                    items,
-                    selection,
-                    description=relation['tooltip'],
-                    validators=validators))
 
 
 def process_form_data(entity: Entity, form: Any) -> Entity:
@@ -228,7 +99,7 @@ def process_relations(entity: Entity, form: Any) -> None:
 
 def insert_entity(form: Any, data: dict[str, Any]) -> Entity:
     entity = insert(data)
-    #if hasattr(form, 'file'):
+    # if hasattr(form, 'file'):
     #    file = request.files['file']
     #    ext = secure_filename(str(file.filename)).rsplit('.', 1)[1].lower()
     #    path = app.config['UPLOAD_DIR'] / f'{entity.id}.{ext}'
