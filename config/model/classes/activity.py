@@ -6,7 +6,7 @@ model = {
     'attributes': {
         'name': {'required': True},
         'description': {},
-        'dates': {}},
+        'date': {}},
     'relations': {
         'actor': {
             'class': class_groups['actor'],

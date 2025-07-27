@@ -14,9 +14,9 @@ from wtforms.validators import (
 
 from openatlas.display.util2 import is_authorized
 from openatlas.forms.field import (
-    ReferenceField, RemovableListField, TableField, TableMultiField,
-    TextAnnotationField, TreeField, TreeMultiField, ValueTypeField,
-    ValueTypeRootField)
+    ReferenceField, RemovableListField, SubmitAnnotationField, SubmitField,
+    TableField, TableMultiField, TextAnnotationField, TreeField,
+    TreeMultiField, ValueTypeField, ValueTypeRootField)
 from openatlas.forms.util import check_if_entity_has_time
 from openatlas.models.entity import Entity
 from openatlas.models.openatlas_class import OpenatlasClass
@@ -154,10 +154,11 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
             if entity.id:
                 selection = entity.get_linked_entity(
                     relation['property'],
-                    relation['class'],
                     relation['inverse'])
             elif origin and origin.class_.name in relation['class']:
                 selection = origin
+            if selection and selection.class_.name == 'object_location':
+                selection = selection.get_linked_entity_safe('P53', True)
             setattr(
                 form,
                 name,
@@ -169,7 +170,7 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
 
 
 def add_date_fields(form_class: Any, entity: Entity) -> None:
-    if 'dates' not in entity.class_.attributes:
+    if 'date' not in entity.class_.attributes:
         return
     validator_second = [OptionalValidator(), NumberRange(min=0, max=59)]
     validator_minute = [OptionalValidator(), NumberRange(min=0, max=59)]
@@ -349,3 +350,14 @@ def add_value_type_fields(form_class: FlaskForm, subs: list[int]) -> None:
             str(sub.id),
             ValueTypeField(sub.name, sub.id, [OptionalValidator()]))
         add_value_type_fields(form_class, sub.subs)
+
+
+def add_buttons(form: Any, entity: Entity) -> None:
+    field = SubmitField
+    if 'description' in entity.class_.attributes \
+            and 'annotated' in entity.class_.attributes['description']:
+        field = SubmitAnnotationField
+    setattr(form, 'save', field(_('save') if entity.id else _('insert')))
+    if not entity.id and entity.class_.display['form']['insert_and_continue']:
+        setattr(form, 'insert_and_continue', field(_('insert and continue')))
+        setattr(form, 'continue_', HiddenField())

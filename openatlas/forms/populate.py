@@ -1,30 +1,29 @@
 from typing import Any
 
-from flask import g
-
 from openatlas.display.util2 import format_date_part
+from openatlas.models.entity import Entity, Link
 
 
-def populate_reference_systems(manager: Any) -> None:
-    if not manager.entity:
-        return  # It's a link update which have no reference systems
+def populate_reference_systems(form: Any, entity: Entity | Link) -> None:
+    # if not entity.id:
+    #    return  # It's a link update which have no reference systems
     system_links = {
-        link_.domain.id:  # Can't use isinstance for class check here
-        link_ for link_ in manager.entity.get_links('P67', inverse=True)
-        if link_.domain.class_.name == 'reference_system'}
-    for key in manager.form.data:
-        field = getattr(manager.form, key)
-        if field.id.startswith('reference_system_id_'):
-            system_id = int(field.id.replace('reference_system_id_', ''))
-            if system_id in system_links:
-                field.data = {
-                    'value': system_links[system_id].description,
-                    'precision': str(system_links[system_id].type.id)}
+        link_.domain.id:
+        link_ for link_ in entity.get_links(
+            'P67',
+            ['reference_system'],
+            inverse=True)}
+    # for key in form.data:
+    #    field = getattr(form, key)
+    #    if field.id.startswith('reference_system_id_'):
+    #        system_id = int(field.id.replace('reference_system_id_', ''))
+    #        if system_id in system_links:
+    #            field.data = {
+    #                'value': system_links[system_id].description,
+    #                'precision': str(system_links[system_id].type.id)}
 
 
-def populate_dates(manager: Any) -> None:
-    form = manager.form
-    item = manager.link_ or manager.entity
+def populate_dates(form: Any, item: Entity | Link) -> None:
     if item.begin_from:
         form.begin_year_from.data = format_date_part(item.begin_from, 'year')
         form.begin_month_from.data = format_date_part(item.begin_from, 'month')

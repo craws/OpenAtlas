@@ -2,14 +2,13 @@ import time
 from typing import Any, Optional
 
 from flask import g, request
-from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import HiddenField
 
 from openatlas.forms.add_fields import (
-    add_date_fields, add_description, add_name_fields, add_reference_systems,
-    add_relations, add_types)
-from openatlas.forms.field import SubmitAnnotationField, SubmitField
+    add_buttons, add_date_fields, add_description, add_name_fields,
+    add_reference_systems, add_relations, add_types)
+from openatlas.forms.populate import populate_dates
 from openatlas.forms.util import convert
 from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity, insert
@@ -29,21 +28,10 @@ def get_entity_form(entity: Entity, origin: Optional[Entity] = None) -> Any:
     add_buttons(Form, entity)
     form: Any = Form(obj=entity)
     if request.method == 'GET' and entity.id:
-        populate_update(entity, form)
+        populate_update(form, entity)
     # elif request.method == 'GET' and entity.id:
     #    populate_insert(form, entity, origin, date)
     return form
-
-
-def add_buttons(form: Any, entity: Entity) -> None:
-    field = SubmitField
-    if 'description' in entity.class_.attributes \
-            and 'annotated' in entity.class_.attributes['description']:
-        field = SubmitAnnotationField
-    setattr(form, 'save', field(_('save') if entity.id else _('insert')))
-    if not entity.id and entity.class_.display['form']['insert_and_continue']:
-        setattr(form, 'insert_and_continue', field(_('insert and continue')))
-        setattr(form, 'continue_', HiddenField())
 
 
 def process_form_data(entity: Entity, form: Any) -> Entity:
@@ -125,7 +113,7 @@ def delete_links(entity: Entity) -> None:
         entity.delete_links(links['property'])
 
 
-def populate_update(entity: Entity, form: Any) -> None:
+def populate_update(form: Any, entity: Entity) -> None:
     form.opened.data = time.time()  # Todo: what if POST because of not valid?
     # Todo: deal with link types
     # types: dict[Any, Any] = manager.link_.types \
@@ -135,6 +123,17 @@ def populate_update(entity: Entity, form: Any) -> None:
     #     if location := \
     #             manager.entity.get_linked_entity_safe('P53', types=True):
     #        types |= location.types  # Admin. units and historical places
+    # Todo: implement copy
+    # if entity.id and not copy:
+    #     form.entity_id.data = entity.id
+    # populate_reference_systems(self)
+    if 'date' in entity.class_.attributes:
+        populate_dates(form, entity)
+    #if hasattr(self.form, 'alias'):
+    #    for alias in self.entity.aliases.values():
+    #        self.form.alias.append_entry(alias)
+    #    self.form.alias.append_entry('')
+
     type_data: dict[int, list[int]] = {}
     for type_, value in entity.types.items():
         root = g.types[type_.root[0]] if type_.root else type

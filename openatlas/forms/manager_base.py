@@ -10,7 +10,6 @@ from wtforms import HiddenField, SelectMultipleField, StringField, widgets
 
 from openatlas.display.util import link
 from openatlas.forms.field import TableField, TreeField
-from openatlas.forms.populate import populate_dates, populate_reference_systems
 from openatlas.forms.process import (
     process_dates, process_origin, process_standard_fields)
 from openatlas.forms.util import convert
@@ -64,7 +63,6 @@ class BaseManager:
             setattr(Form, 'gis_polygons', HiddenField(default='[]'))
             setattr(Form, 'gis_lines', HiddenField(default='[]'))
         self.form: Any = Form(obj=self.link_ or self.entity)
-        self.customize_labels()
 
     def get_place_info_for_insert(self) -> None:
         self.place_info = {
@@ -82,29 +80,12 @@ class BaseManager:
     def update_entity(self, new: bool = False) -> None:
         self.continue_link_id = self.entity.update(self.data, new)
 
-    def customize_labels(self) -> None:
-        pass
-
     def get_link_type(self) -> Optional[Entity]:
         # Returns base type of link, e.g. involvement between actor and event
         for field in self.form:
             if isinstance(field, TreeField) and field.data:
                 return g.types[int(field.data)]
         return None
-
-    def populate_insert(self) -> None:
-        pass
-
-    def populate_update(self) -> None:
-        if self.entity and not self.copy:
-            self.form.entity_id.data = self.entity.id
-        populate_reference_systems(self)
-        if 'date' in self.fields:
-            populate_dates(self)
-        if hasattr(self.form, 'alias'):
-            for alias in self.entity.aliases.values():
-                self.form.alias.append_entry(alias)
-            self.form.alias.append_entry('')
 
     def add_link(
             self,
