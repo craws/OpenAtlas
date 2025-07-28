@@ -6,12 +6,13 @@ from urllib.parse import quote, urlparse, urlunparse
 from flask import g
 from rdflib import Graph, Literal, Namespace, URIRef
 from rdflib.namespace import RDF, XSD
-
+from unidecode import unidecode
 
 from openatlas.models.entity import Entity
 
 ACDH = Namespace("https://vocabs.acdh.oeaw.ac.at/schema#")
 PERSONS_EMITTED = set()
+
 
 def is_valid_url(url: str) -> bool:
     try:
@@ -19,6 +20,7 @@ def is_valid_url(url: str) -> bool:
         return parsed.scheme in ("http", "https") and bool(parsed.netloc)
     except ValueError:
         return False
+
 
 def create_uri(value: str | list[str]) -> URIRef | list[URIRef]:
     if isinstance(value, list):
@@ -30,7 +32,8 @@ def create_uri(value: str | list[str]) -> URIRef | list[URIRef]:
                  .replace(",", "_")
                  .replace("/", "_")
                  .lower())
-    return URIRef(url_to_ascii_safe(f"https://id.acdh.oeaw.ac.at/{safe_name}"))
+    return URIRef(transliterate_url(f"https://id.acdh.oeaw.ac.at/{safe_name}"))
+
 
 def ensure_person(graph: Graph, names: str | list[str]) -> None:
     names = names if isinstance(names, list) else [names]
@@ -42,6 +45,7 @@ def ensure_person(graph: Graph, names: str | list[str]) -> None:
             graph.add((uri, RDF.type, ACDH.Person))
             graph.add((uri, ACDH.hasTitle, Literal(name, lang="und")))
             PERSONS_EMITTED.add(str(uri))
+
 
 @dataclass
 class ArcheFileMetadata:
@@ -106,19 +110,23 @@ class ArcheFileMetadata:
         return obj
 
 
-def url_to_ascii_safe(url: str) -> str:
+def transliterate_url(url):
     parsed = urlparse(url)
-    safe_path = quote(parsed.path)
-    safe_query = quote(parsed.query, safe='=&')
-    safe_fragment = quote(parsed.fragment)
-    ascii_url = urlunparse((
+    path = parsed.path
+    try:
+        path = path.encode('latin1').decode('utf-8')
+    except UnicodeDecodeError:
+        pass
+    ascii_path = unidecode(path)
+    ascii_path = ascii_path.replace(' ', '_')
+    return urlunparse((
         parsed.scheme,
         parsed.netloc,
-        safe_path,
+        ascii_path,
         parsed.params,
-        safe_query,
-        safe_fragment ))
-    return ascii_url
+        parsed.query,
+        parsed.fragment))
+
 
 def add_arche_file_metadata_to_graph(
         graph: Graph,
@@ -209,7 +217,7 @@ def add_arche_file_metadata_to_graph(
     if metadata.creator:
         ensure_person(graph, metadata.creator)
         for uri in create_uri(metadata.creator) \
-                if isinstance(metadata.creator, list)\
+                if isinstance(metadata.creator, list) \
                 else [create_uri(metadata.creator)]:
             graph.add((subject_uri, ACDH.hasCreator, uri))
 
