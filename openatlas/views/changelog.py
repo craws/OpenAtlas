@@ -22,6 +22,9 @@ versions = {
             '2434': 'API: Text annotation for presentation view',
             '2563': 'API: Presentation view improvements',
             '2466': 'API: Export files with ARCHE RDF metadata'
+        },
+        'fix': {
+            '2586': 'API: Problems with linked_to_ids at Network visualisation'
         }
     }],
     '8.12.1': ['2025-06-29', {
