@@ -81,6 +81,7 @@ def arche_export() -> bool:
         {'type_id': type_ids,
          'limit': 0,
          'format': 'turtle'}).resolve_entities()
+
     tempfile.tempdir = str(app.config['TMP_PATH'])
     with tempfile.NamedTemporaryFile(
             mode='w+',
@@ -115,26 +116,20 @@ def arche_export() -> bool:
 
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_path = Path(temp_dir)
-        data_path = temp_path / 'data'
-        data_path.mkdir(parents=True, exist_ok=True)
-        metadata_path = temp_path / 'metadata'
-        metadata_path.mkdir(parents=True, exist_ok=True)
-        debug_path = temp_path / 'debug'
-        debug_path.mkdir(parents=True, exist_ok=True)
 
-        md_path = debug_path / 'problematic_files.md'
+        md_path = temp_path / 'problematic_files.md'
         md_path.write_text(
             Path(tmp_md_path).read_text(encoding='utf-8'), encoding='utf-8')
 
-        ttl_path = metadata_path / 'files.ttl'
+        ttl_path = temp_path / 'files.ttl'
         ttl_path.write_text(arche_file_metadata['graph'])
 
-        rdf_path = data_path / 'rdf_dump.ttl'
+        rdf_path = temp_path / 'rdf_dump.ttl'
         rdf_path.write_text(rdf_dump.get_data(as_text=True))
 
         for type_name, ext_map in files_by_extension.items():
             for ext, files_set in ext_map.items():
-                ext_dir = data_path / type_name / ext
+                ext_dir = temp_path / type_name / ext
                 ext_dir.mkdir(parents=True, exist_ok=True)
                 for file_path in files_set:
                     (ext_dir / file_path.name).write_bytes(
@@ -150,17 +145,17 @@ def arche_export() -> bool:
         archive_file = tmp_path / archive_name
 
         with zipfile.ZipFile(archive_file, 'w') as archive:
-            archive.write(md_path, arcname='problematic_files.md')
-            archive.write(ttl_path, arcname='files.ttl')
-            archive.write(tmp_sql_path, arcname='database_dump.sql')
-            archive.write(rdf_path, arcname='rdf_dump.ttl')
+            archive.write(md_path, arcname='debug/problematic_files.md')
+            archive.write(ttl_path, arcname='metadata/files.ttl')
+            archive.write(tmp_sql_path, arcname='data/database_dump.sql')
+            archive.write(rdf_path, arcname='data/rdf_dump.ttl')
 
             for type_name, ext_map in files_by_extension.items():
                 for ext, files_set in ext_map.items():
                     for file_path in files_set:
                         archive.write(
-                            data_path / type_name / ext / file_path.name,
-                            arcname=f'{type_name}/{ext}/{file_path.name}')
+                            temp_path / type_name / ext / file_path.name,
+                            arcname=f'data/{type_name}/{ext}/{file_path.name}')
 
         export_dir = app.config['EXPORT_PATH']
         export_dir.mkdir(parents=True, exist_ok=True)
