@@ -201,6 +201,24 @@ def get_arche_metadata(
         entities: list[Entity],
         type_ids: set[int],
         top_collection: str) -> dict[str, Any]:
+    #linked_publications = Entity.get_links_of_entities(
+    #    [e.id for e in entities],
+    #    'P67',
+    #    inverse=True)
+    #publications: dict[int, list[tuple[Entity, str]]] = defaultdict(list)
+    #for link in linked_publications:
+    #    publications[link.range.id].append((link.domain, link.description))
+    #print([', '.join([e.domain.name for e in linked_publications])])
+    #linked_entities = Entity.get_links_of_entities(
+    #    [e.id for e in entities],
+    #    'P67')
+    #actors : dict[int, list[Entity]] = defaultdict(list)
+    #places: dict[int, list[Entity]] = defaultdict(list)
+    #for link in linked_entities:
+    #    if link.range.system_class.view == 'actor':
+    #        actors[link.domain.id].append(link.range)
+    #    if link.range.system_class.name == 'place':
+    #        places[link.domain.id].append(link.range)
     ext_metadata = app.config['ARCHE_METADATA']
     license_urls = {}
     arche_metadata_list = []
@@ -246,6 +264,7 @@ def get_arche_metadata(
                     entity,
                     ext_metadata,
                     top_collection,
+                    # publications[entity.id],
                     license_urls[entity.standard_type.id]))
 
 

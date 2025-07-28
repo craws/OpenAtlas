@@ -70,6 +70,7 @@ class ArcheFileMetadata:
     created_end_date: Optional[str] = None
     creator: Optional[str] = None
     spatial_coverage: Optional[str] = None
+    has_publications: Optional[list[tuple[Entity, str]]] = None
     temporal_coverages: list[tuple[str, str]] = field(default_factory=list)
     temporal_coverage_identifier: Optional[str] = None
 
@@ -79,6 +80,7 @@ class ArcheFileMetadata:
             entity: Entity,
             metadata: dict[str, Any],
             type_name: str,
+            # publication: list[tuple[Entity, str]],
             license_: str) -> 'ArcheFileMetadata':
         part_of = f"https://id.acdh.oeaw.ac.at/{metadata['topCollection']}"
         titles = [(entity.name, metadata['language'])]
