@@ -4,7 +4,7 @@ from typing import Any
 from flask import g
 from werkzeug.exceptions import abort
 
-from openatlas.display.util2 import sanitize
+from openatlas.display.util2 import datetime64_to_timestamp, sanitize
 from openatlas.forms.util import form_to_datetime64
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
@@ -125,7 +125,7 @@ def process_origin(manager: Any) -> None:
             manager.add_link('P67', manager.origin, inverse=True)
 
 
-def process_dates(manager: Any) -> dict[str, Any]:
+def process_date(form: Any, entity: Entity) -> dict[str, Any]:
     data: dict[str, Any] = {
         'begin_from': None,
         'begin_to': None,
@@ -133,7 +133,6 @@ def process_dates(manager: Any) -> dict[str, Any]:
         'end_from': None,
         'end_to': None,
         'end_comment': None}
-    form = manager.form
     if hasattr(form, 'begin_year_from') and form.begin_year_from.data:
         data['begin_comment'] = form.begin_comment.data
         data['begin_from'] = form_to_datetime64(
@@ -174,4 +173,10 @@ def process_dates(manager: Any) -> dict[str, Any]:
             form.end_minute_to.data if 'end_hour_from' in form else None,
             form.end_second_to.data if 'end_hour_from' in form else None,
             to_date=True)
-    return data
+    return {
+        'begin_from': datetime64_to_timestamp(data['begin_from']),
+        'begin_to':  datetime64_to_timestamp(data['begin_to']),
+        'begin_comment': data['begin_comment'],
+        'end_from':  datetime64_to_timestamp(data['end_from']),
+        'end_to':  datetime64_to_timestamp(data['end_to']),
+        'end_comment': data['end_comment']}

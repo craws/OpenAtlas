@@ -10,8 +10,7 @@ from wtforms import HiddenField, SelectMultipleField, StringField, widgets
 
 from openatlas.display.util import link
 from openatlas.forms.field import TableField, TreeField
-from openatlas.forms.process import (
-    process_dates, process_origin, process_standard_fields)
+from openatlas.forms.process import process_origin, process_standard_fields
 from openatlas.forms.util import convert
 from openatlas.forms.validation import hierarchy_name_exists, validate
 from openatlas.models.entity import Entity, Link
@@ -108,7 +107,6 @@ class BaseManager:
 
     def process_form(self) -> None:
         self.data: dict[str, Any] = {
-            'attributes': process_dates(self),
             'links': {
                 'insert': [],
                 'delete': set(),
@@ -130,7 +128,7 @@ class BaseManager:
 
     def process_link_form(self) -> None:
         self.link_.description = self.form.description.data
-        self.link_.set_dates(process_dates(self))
+        # self.link_.set_dates(process_dates(self))
 
 
 class ActorBaseManager(BaseManager):

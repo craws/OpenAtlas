@@ -142,10 +142,6 @@ class ActorRelationManager(BaseManager):
             self.form.inverse.data = True
 
 
-class ActivityManager(EventBaseManager):
-    pass
-
-
 class AdministrativeUnitManager(TypeBaseManager):
     def process_form(self) -> None:
         super().process_form()

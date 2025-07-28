@@ -9,6 +9,7 @@ from openatlas.forms.add_fields import (
     add_buttons, add_date_fields, add_description, add_name_fields,
     add_reference_systems, add_relations, add_types)
 from openatlas.forms.populate import populate_dates
+from openatlas.forms.process import process_date
 from openatlas.forms.util import convert
 from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity, insert
@@ -48,7 +49,9 @@ def process_form_data(entity: Entity, form: Any) -> Entity:
         'end_comment': entity.end_comment}
     for attr in entity.class_.attributes:
         data[attr] = None
-        if getattr(form, attr).data or getattr(form, attr).data == 0:
+        if attr == 'date':
+            data.update(process_date(form, entity))
+        elif getattr(form, attr).data or getattr(form, attr).data == 0:
             value = getattr(form, attr).data
             data[attr] = value.strip() if isinstance(value, str) else value
     if entity.id:
@@ -79,9 +82,15 @@ def process_relations(entity: Entity, form: Any) -> None:
         if relation['mode'] == 'tab':
             continue
         if hasattr(form, name) and (ids := convert(getattr(form, name).data)):
+            entities = Entity.get_by_ids(ids)
+            if 'object_location' in relation['class']:
+                locations = []
+                for place in entities:
+                    locations.append(place.get_linked_entity_safe('P53'))
+                entities = locations
             entity.link(
                 relation['property'],
-                Entity.get_by_ids(ids),
+                entities,
                 inverse=relation['inverse'])
 
 
