@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Optional
-from urllib.parse import urlparse
+from urllib.parse import quote, urlparse, urlunparse
 
 from flask import g
 from rdflib import Graph, Literal, Namespace, URIRef
@@ -30,7 +30,7 @@ def create_uri(value: str | list[str]) -> URIRef | list[URIRef]:
                  .replace(",", "_")
                  .replace("/", "_")
                  .lower())
-    return URIRef(f"https://id.acdh.oeaw.ac.at/{safe_name}")
+    return URIRef(url_to_ascii_safe(f"https://id.acdh.oeaw.ac.at/{safe_name}"))
 
 def ensure_person(graph: Graph, names: str | list[str]) -> None:
     names = names if isinstance(names, list) else [names]
@@ -102,6 +102,21 @@ class ArcheFileMetadata:
         obj.transfer_date = datetime.today().strftime('%Y-%m-%d')
         obj.binary_size = g.files[entity.id].stat().st_size
         return obj
+
+
+def url_to_ascii_safe(url: str) -> str:
+    parsed = urlparse(url)
+    safe_path = quote(parsed.path)
+    safe_query = quote(parsed.query, safe='=&')
+    safe_fragment = quote(parsed.fragment)
+    ascii_url = urlunparse((
+        parsed.scheme,
+        parsed.netloc,
+        safe_path,
+        parsed.params,
+        safe_query,
+        safe_fragment ))
+    return ascii_url
 
 def add_arche_file_metadata_to_graph(
         graph: Graph,
