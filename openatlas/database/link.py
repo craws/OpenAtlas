@@ -2,6 +2,8 @@ from typing import Any
 
 from flask import g
 
+from openatlas import app
+
 
 def update(data: dict[str, Any]) -> None:
     g.cursor.execute(
@@ -222,9 +224,10 @@ def get_place_linked_to_location_id(ids: list[int]) -> list[dict[str, Any]]:
                  JOIN model.entity de ON l.domain_id = de.id
                  JOIN model.entity re ON l.range_id = re.id
         WHERE l.range_id IN %(ids)s
-          AND l.property_code = 'P53';
-        """,
-        {'ids': tuple(ids)})
+          AND l.property_code IN %(properties)s;
+        """, {
+            'ids': tuple(ids),
+            'properties': tuple(app.config['LOCATION_PROPERTIES'])})
     return [dict(row) for row in g.cursor.fetchall()]
 
 
