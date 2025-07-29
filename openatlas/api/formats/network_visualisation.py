@@ -130,7 +130,6 @@ def get_ego_network_visualisation(id_: int, parser: Parser) -> dict[str, Any]:
         for link in links:
             if link['property_code'] in app.config['LOCATION_PROPERTIES']:
                 location_ids.append(link['range_id'])
-
         if location_ids:
             location_links = get_place_linked_to_location_id(location_ids)
             links.extend(location_links)
