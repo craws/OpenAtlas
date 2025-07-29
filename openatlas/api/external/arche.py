@@ -21,7 +21,6 @@ def is_arche_likeable_uri(uri: str) -> bool:
     for rule in arche_uri_rules:
         if search(rule['match'], uri):
             return True
-    print(False)
     return False
 
 
@@ -104,7 +103,7 @@ def transliterate_url(url):
         parsed.query,
         parsed.fragment))
 
-
+# todo: Check if everything is really needed and if everything is getting data
 def add_arche_file_metadata_to_graph(
         graph: Graph,
         metadata: ArcheFileMetadata) -> None:
