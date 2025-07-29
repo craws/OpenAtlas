@@ -17,21 +17,6 @@ from openatlas.models.reference_system import ReferenceSystem
 from openatlas.views.tools import carbon_result, sex_result
 
 
-class AcquisitionDisplay(EventsDisplay):
-
-    def add_data(self) -> None:
-        super().add_data()
-        self.data[_('recipient')] = [
-            link(actor) for actor in
-            self.entity.get_linked_entities('P22', sort=True)]
-        self.data[_('donor')] = [
-            link(donor) for donor in
-            self.entity.get_linked_entities('P23', sort=True)]
-        self.data[_('given object')] = [
-            link(item) for item in
-            self.entity.get_linked_entities('P24', sort=True)]
-
-
 class AdministrativeUnitDisplay(TypeBaseDisplay):
     pass
 

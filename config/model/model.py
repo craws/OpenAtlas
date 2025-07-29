@@ -1,16 +1,10 @@
 from typing import Any
 
-from config.model.classes import activity, source, source_translation
+from config.model.classes import (
+    acquisition, activity, source, source_translation)
 
 model: dict[str, Any] = {
-    'acquisition': {
-        'attributes': {
-            'name': {'required': True},
-            'info': {},
-            'end': {'label': 'readout', 'required': True},
-            'begin': {'label': 'published'}},
-        'relations': {},
-        'display': {'buttons': ['network']}},
+    'acquisition': acquisition.model,
     'activity': activity.model,
     'actor_function': {
         'attributes': {},

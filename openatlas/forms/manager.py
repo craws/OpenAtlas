@@ -18,36 +18,6 @@ from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
 
 
-class AcquisitionManager(EventBaseManager):
-    _('given place')
-    _('given artifact')
-
-    def additional_fields(self) -> dict[str, Any]:
-        data: dict[str, list[Any]] = {'place': [], 'artifact': []}
-        if self.insert:
-            if self.origin and self.origin.class_.view == 'artifact':
-                data['artifact'] = [self.origin]
-        else:
-            for entity in self.entity.get_linked_entities('P24', sort=True):
-                data[
-                    'artifact' if entity.class_.name == 'artifact'
-                    else 'place'].append(entity)
-        fields = super().additional_fields()
-        fields['given_place'] = TableMultiField(
-            self.table_items['place'],
-            data['place'])
-        fields['given_artifact'] = TableMultiField(
-            Entity.get_by_class('artifact', True),
-            data['artifact'])
-        return fields
-
-    def process_form(self) -> None:
-        super().process_form()
-        self.data['links']['delete'].add('P24')
-        self.add_link('P24', self.form.given_place.data)
-        self.add_link('P24', self.form.given_artifact.data)
-
-
 class ActorFunctionManager(BaseManager):
     fields = ['date', 'description', 'continue']
 
