@@ -233,18 +233,25 @@ def get_place_and_actor_relations(
 
     return dict(relations)
 
+
+def get_publications(entities: list[Entity]) -> dict[int, Any]:
+    linked_publications = Entity.get_links_of_entities(
+       [e.id for e in entities],
+       'P67',
+       inverse=True)
+    publications: dict[int, list[tuple[Entity, str]]] = defaultdict(list)
+    for link in linked_publications:
+       publications[link.range.id].append((link.domain, link.description))
+
+
+    print([', '.join([e.domain.name for e in linked_publications])])
+
 def get_arche_metadata(
         entities: list[Entity],
         type_ids: set[int],
         top_collection: str) -> dict[str, Any]:
-    # linked_publications = Entity.get_links_of_entities(
-    #    [e.id for e in entities],
-    #    'P67',
-    #    inverse=True)
-    # publications: dict[int, list[tuple[Entity, str]]] = defaultdict(list)
-    # for link in linked_publications:
-    #    publications[link.range.id].append((link.domain, link.description))
-    # print([', '.join([e.domain.name for e in linked_publications])])
+    # Todo: start here again
+    publications = get_publications(entities)
     relations = get_place_and_actor_relations(entities)
     license_urls = {}
     arche_metadata_list = []
@@ -290,7 +297,6 @@ def get_arche_metadata(
                     entity,
                     top_collection,
                     relations.get(entity.id),
-                    # publications[entity.id],
                     license_urls[entity.standard_type.id]))
 
     graph = Graph()
