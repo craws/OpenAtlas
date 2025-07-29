@@ -1,14 +1,28 @@
-from typing import Any, Optional
+import json
+import urllib.request
+from re import search
+from typing import Any
 from urllib.parse import urlparse, urlunparse
 
 from rdflib import Graph, Literal, Namespace, URIRef
 from rdflib.namespace import RDF, XSD
 from unidecode import unidecode
 
+from openatlas import app
 from openatlas.api.external.arche_class import ArcheFileMetadata
 
 ACDH = Namespace("https://vocabs.acdh.oeaw.ac.at/schema#")
 ENTITIES_EMITTED = set()
+
+with urllib.request.urlopen(app.config['ARCHE_URI_RULES']) as response:
+    arche_uri_rules = json.load(response)
+
+def is_arche_likeable_uri(uri: str) -> bool:
+    for rule in arche_uri_rules:
+        if search(rule['match'], uri):
+            return True
+    print(False)
+    return False
 
 
 def is_valid_url(url: str) -> bool:
@@ -34,8 +48,7 @@ def create_uri(value: str | list[str]) -> URIRef | list[URIRef]:
 # Todo: use ensure_person_new. Refactor code to new function
 def ensure_person(
         graph: Graph,
-        names: str | list[str],
-        ref_link: Optional[str] = None) -> None:
+        names: str | list[str]) -> None:
     names = names if isinstance(names, list) else [names]
     for name in names:
         if not name or is_valid_url(name):
@@ -44,30 +57,35 @@ def ensure_person(
         if str(uri) not in ENTITIES_EMITTED:
             graph.add((uri, RDF.type, ACDH.Person))
             graph.add((uri, ACDH.hasTitle, Literal(name, lang="und")))
-            if ref_link:
-                graph.add((uri, ACDH.hasIdentifier, URIRef(ref_link)))
             ENTITIES_EMITTED.add(str(uri))
+
+
 
 
 def ensure_entity_exist(
         graph: Graph,
         acdh_property: Any,
-        name: str,
-        ref_links: Optional[list[str]] = None,
-        description: Optional[str] = None) -> None:
+        entity_details: dict[str, Any]) -> None:
+    name = entity_details['name']
     if not name:  # or is_valid_url(name):
         return None
     uri = create_uri(name)
     if str(uri) not in ENTITIES_EMITTED:
         graph.add((uri, RDF.type, acdh_property))
         graph.add((uri, ACDH.hasTitle, Literal(name, lang="und")))
-        if description:
+        if description := entity_details['description']:
             graph.add(
                 (uri, ACDH.hasDescription, Literal(description, lang="und")))
-        if ref_links:
-            for ref_link in ref_links:
-                if is_valid_url(ref_link):
+        for ref_sys in entity_details['reference_systems']:
+            if ref_link := ref_sys[0]:
+                if (is_valid_url(ref_link)
+                        and is_arche_likeable_uri(ref_link)):
                     graph.add((uri, ACDH.hasIdentifier, URIRef(ref_link)))
+                else:
+                    graph.add((
+                        uri,
+                        ACDH.hasNonLinkedIdentifier,
+                        Literal(f"{ref_sys[1]}:{ref_link}", lang="und")))
         ENTITIES_EMITTED.add(str(uri))
     return None
 
@@ -181,9 +199,7 @@ def add_arche_file_metadata_to_graph(
             ensure_entity_exist(
                 graph,
                 ACDH.Person,
-                actor['name'],
-                actor['ref_links'],
-                actor['description'])
+                actor)
             graph.add((subject_uri, ACDH.hasActor, create_uri(actor['name'])))
 
     if metadata.spatial_coverages:
@@ -191,9 +207,7 @@ def add_arche_file_metadata_to_graph(
             ensure_entity_exist(
                 graph,
                 ACDH.Place,
-                place['name'],
-                place['ref_links'],
-                place['description'])
+                place)
             graph.add((
                 subject_uri,
                 ACDH.hasSpatialCoverage,

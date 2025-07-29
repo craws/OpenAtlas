@@ -71,15 +71,16 @@ class ArcheFileMetadata:
         places = []
         if relations:
             for relation in relations:
-                reference_identifiers = []
+                ref_system_info: list[tuple[str, str]] = []
                 for ref in relation['ref_systems']:
                     if (ref['referenceSystem']
                             in metadata['exclude_reference_systems']):
                         continue
-                    reference_identifiers.append(ref['identifier'])
+                    ref_system_info.append(
+                        (ref['identifier'], ref['referenceSystem']))
                 values = {
                     'name': relation['entity'].name,
-                    'ref_links': reference_identifiers,
+                    'reference_systems': ref_system_info,
                     'description': relation['entity'].description}
                 if relation['entity'].class_.name == 'place':
                     places.append(values)

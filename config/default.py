@@ -84,3 +84,6 @@ ARCHE_METADATA = {
     'relatedDiscipline': [],
     'typeIds': [],
     'exclude_reference_systems': []}
+
+ARCHE_URI_RULES = ('https://raw.githubusercontent.com/acdh-oeaw/arche-assets'
+                   '/refs/heads/master/AcdhArcheAssets/uriNormRules.json')
