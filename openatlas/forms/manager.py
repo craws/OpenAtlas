@@ -150,24 +150,6 @@ class BibliographyManager(BaseManager):
     fields = ['name', 'description', 'continue']
 
 
-class CreationManager(EventBaseManager):
-    def additional_fields(self) -> dict[str, Any]:
-        selection = None
-        if self.insert:
-            if self.origin and self.origin.class_.name == 'file':
-                selection = [self.origin]
-        else:
-            selection = self.entity.get_linked_entities('P94', sort=True)
-        return super().additional_fields() | {
-            'document':
-                TableMultiField(Entity.get_by_class('file'), selection)}
-
-    def process_form(self) -> None:
-        super().process_form()
-        self.data['links']['delete'].add('P94')
-        self.add_link('P94', self.form.document.data)
-
-
 class EditionManager(BaseManager):
     fields = ['name', 'description', 'continue']
 

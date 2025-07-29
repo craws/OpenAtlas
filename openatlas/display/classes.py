@@ -34,15 +34,6 @@ class BibliographyDisplay(ReferenceBaseDisplay):
     pass
 
 
-class CreationDisplay(EventsDisplay):
-
-    def add_data(self) -> None:
-        super().add_data()
-        self.data[_('document')] = [
-            link(file_) for file_
-            in self.entity.get_linked_entities('P94', sort=True)]
-
-
 class FileDisplay(BaseDisplay):
 
     def add_data(self) -> None:
