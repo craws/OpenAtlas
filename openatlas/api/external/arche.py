@@ -200,7 +200,7 @@ def add_arche_file_metadata_to_graph(
                 graph,
                 ACDH.Person,
                 actor)
-            graph.add((subject_uri, ACDH.hasActor, create_uri(actor['name'])))
+            graph.add((subject_uri, ACDH.hasActor, create_uri(actor['id'])))
 
     if metadata.spatial_coverages:
         for place in metadata.spatial_coverages:
@@ -211,7 +211,7 @@ def add_arche_file_metadata_to_graph(
             graph.add((
                 subject_uri,
                 ACDH.hasSpatialCoverage,
-                create_uri(place['name'])))
+                create_uri(place['id'])))
 
 
 

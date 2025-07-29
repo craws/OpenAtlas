@@ -48,7 +48,8 @@ class ArcheFileMetadata:
             license_: str) -> 'ArcheFileMetadata':
         metadata = app.config['ARCHE_METADATA']
         part_of = f"https://id.acdh.oeaw.ac.at/{metadata['topCollection']}"
-        titles = [(entity.name, metadata['language'])]
+        # titles = [(entity.name, metadata['language'])]
+        titles = [(entity.name, 'und')]
         file_info = (g.files[entity.id].suffix[1:], g.files[entity.id].name)
         obj = cls(
             uri=f"{part_of}/{type_name}/{file_info[0]}/{file_info[1]}",
@@ -62,7 +63,8 @@ class ArcheFileMetadata:
         obj.is_part_of = part_of
         obj.accepted_date = metadata['acceptedDate']
         obj.curator = metadata['curator']
-        obj.descriptions = [(entity.description, metadata['language'])]
+        # obj.descriptions = [(entity.description, metadata['language'])]
+        obj.descriptions = [(entity.description, 'und')]
         obj.principal_investigator = metadata['principalInvestigator']
         obj.related_discipline = metadata['relatedDiscipline']
         obj.transfer_date = datetime.today().strftime('%Y-%m-%d')
@@ -79,6 +81,7 @@ class ArcheFileMetadata:
                     ref_system_info.append(
                         (ref['identifier'], ref['referenceSystem']))
                 values = {
+                    'id': relation['entity'].id,
                     'name': relation['entity'].name,
                     'reference_systems': ref_system_info,
                     'description': relation['entity'].description}
