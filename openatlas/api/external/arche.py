@@ -1,18 +1,14 @@
-from dataclasses import dataclass, field
-from datetime import datetime
 from typing import Any, Optional
 from urllib.parse import urlparse, urlunparse
 
-from flask import g
 from rdflib import Graph, Literal, Namespace, URIRef
 from rdflib.namespace import RDF, XSD
 from unidecode import unidecode
 
-from openatlas import app
-from openatlas.models.entity import Entity
+from openatlas.api.external.arche_class import ArcheFileMetadata
 
 ACDH = Namespace("https://vocabs.acdh.oeaw.ac.at/schema#")
-PERSONS_EMITTED = set()
+ENTITIES_EMITTED = set()
 
 
 def is_valid_url(url: str) -> bool:
@@ -35,87 +31,51 @@ def create_uri(value: str | list[str]) -> URIRef | list[URIRef]:
                  .lower())
     return URIRef(transliterate_url(f"https://id.acdh.oeaw.ac.at/{safe_name}"))
 
-
-def ensure_person(graph: Graph, names: str | list[str]) -> None:
+# Todo: use ensure_person_new. Refactor code to new function
+def ensure_person(
+        graph: Graph,
+        names: str | list[str],
+        ref_link: Optional[str] = None) -> None:
     names = names if isinstance(names, list) else [names]
     for name in names:
         if not name or is_valid_url(name):
             continue
         uri = create_uri(name)
-        if str(uri) not in PERSONS_EMITTED:
+        if str(uri) not in ENTITIES_EMITTED:
             graph.add((uri, RDF.type, ACDH.Person))
             graph.add((uri, ACDH.hasTitle, Literal(name, lang="und")))
-            PERSONS_EMITTED.add(str(uri))
+            if ref_link:
+                graph.add((uri, ACDH.hasIdentifier, URIRef(ref_link)))
+            ENTITIES_EMITTED.add(str(uri))
 
 
-@dataclass
-class ArcheFileMetadata:
-    uri: str
-    titles: list[tuple[str, str]]
-    depositor: Optional[str] = None
-    license: Optional[str] = None
-    licensor: Optional[str] = None
-    metadata_creator: Optional[str] = None
-    rights_holder: Optional[str] = None
-    is_part_of: Optional[str] = None
-    accepted_date: Optional[str] = None
-    curator: Optional[str] = None
-    # Descriptions should also include information about the linked
-    # entities like places and persons.
-    descriptions: list[tuple[str, str]] = field(default_factory=list)
-    language: Optional[str] = None
-    principal_investigator: Optional[str] = None
-    related_discipline: Optional[str] = None
-    submission_date: Optional[str] = None
-    transfer_date: Optional[str] = None
-    binary_size: Optional[int] = None
-    created_start_date: Optional[str] = None
-    created_end_date: Optional[str] = None
-    creator: Optional[str] = None
-    spatial_coverage: Optional[str] = None
-    has_publications: Optional[list[tuple[Entity, str]]] = None
-    temporal_coverages: list[tuple[str, str]] = field(default_factory=list)
-    temporal_coverage_identifier: Optional[str] = None
+def ensure_entity_exist(
+        graph: Graph,
+        acdh_property: Any,
+        name: str,
+        ref_links: Optional[list[str]] = None,
+        description: Optional[str] = None) -> None:
+    if not name:  # or is_valid_url(name):
+        return None
+    uri = create_uri(name)
+    if str(uri) not in ENTITIES_EMITTED:
+        graph.add((uri, RDF.type, acdh_property))
+        graph.add((uri, ACDH.hasTitle, Literal(name, lang="und")))
+        if description:
+            graph.add(
+                (uri, ACDH.hasDescription, Literal(description, lang="und")))
+        if ref_links:
+            for ref_link in ref_links:
+                if is_valid_url(ref_link):
+                    graph.add((uri, ACDH.hasIdentifier, URIRef(ref_link)))
+        ENTITIES_EMITTED.add(str(uri))
+    return None
 
-    @classmethod
-    def construct(
-            cls,
-            entity: Entity,
-            type_name: str,
-            # publication: list[tuple[Entity, str]],
-            license_: str) -> 'ArcheFileMetadata':
-        metadata = app.config['ARCHE_METADATA']
-        part_of = f"https://id.acdh.oeaw.ac.at/{metadata['topCollection']}"
-        titles = [(entity.name, metadata['language'])]
-        file_info = (g.files[entity.id].suffix[1:], g.files[entity.id].name)
-        obj = cls(
-            uri=f"{part_of}/{type_name}/{file_info[0]}/{file_info[1]}",
-            titles=titles)
-        obj.depositor = metadata['depositor']
-        obj.license = license_
-        obj.licensor = entity.license_holder
-        obj.metadata_creator = metadata['hasMetadataCreator']
-        obj.rights_holder = entity.license_holder
-        obj.creator = entity.creator
-        obj.is_part_of = part_of
-        obj.accepted_date = metadata['acceptedDate']
-        obj.curator = metadata['curator']
-        obj.descriptions = [(entity.description, metadata['language'])]
-        obj.principal_investigator = metadata['principalInvestigator']
-        obj.related_discipline = metadata['relatedDiscipline']
-        obj.spatial_coverage = ''
-        obj.transfer_date = datetime.today().strftime('%Y-%m-%d')
-        obj.binary_size = g.files[entity.id].stat().st_size
-        return obj
 
 
 def transliterate_url(url):
     parsed = urlparse(url)
     path = parsed.path
-    try:
-        path = path.encode('latin1').decode('utf-8')
-    except UnicodeDecodeError:
-        pass
     ascii_path = unidecode(path)
     ascii_path = ascii_path.replace(' ', '_')
     return urlunparse((
@@ -189,10 +149,6 @@ def add_arche_file_metadata_to_graph(
             graph.add((subject_uri,
                        ACDH.hasRelatedDiscipline,
                        URIRef(related_discipline)))
-    if metadata.spatial_coverage:
-        graph.add((subject_uri,
-                   ACDH.hasSpatialCoverage,
-                   URIRef(metadata.spatial_coverage)))
     if metadata.submission_date:
         graph.add((subject_uri,
                    ACDH.hasSubmissionDate,
@@ -219,6 +175,31 @@ def add_arche_file_metadata_to_graph(
                 if isinstance(metadata.creator, list) \
                 else [create_uri(metadata.creator)]:
             graph.add((subject_uri, ACDH.hasCreator, uri))
+
+    if metadata.actors:
+        for actor in metadata.actors:
+            ensure_entity_exist(
+                graph,
+                ACDH.Person,
+                actor['name'],
+                actor['ref_links'],
+                actor['description'])
+            graph.add((subject_uri, ACDH.hasActor, create_uri(actor['name'])))
+
+    if metadata.spatial_coverages:
+        for place in metadata.spatial_coverages:
+            ensure_entity_exist(
+                graph,
+                ACDH.Place,
+                place['name'],
+                place['ref_links'],
+                place['description'])
+            graph.add((
+                subject_uri,
+                ACDH.hasSpatialCoverage,
+                create_uri(place['name'])))
+
+
 
     for tc_text, lang in metadata.temporal_coverages:
         graph.add((subject_uri,

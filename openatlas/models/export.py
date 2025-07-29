@@ -13,9 +13,10 @@ from rdflib import Graph
 
 from openatlas import app
 from openatlas.api.endpoints.endpoint import Endpoint
-from openatlas.api.external.arche import ACDH, ArcheFileMetadata, \
-    add_arche_file_metadata_to_graph
+from openatlas.api.external.arche import ACDH, add_arche_file_metadata_to_graph
+from openatlas.api.external.arche_class import ArcheFileMetadata
 from openatlas.api.resources.api_entity import ApiEntity
+from openatlas.api.resources.util import get_reference_systems
 from openatlas.models.entity import Entity
 
 
@@ -135,7 +136,6 @@ def arche_export() -> bool:
                     (ext_dir / file_path.name).write_bytes(
                         file_path.read_bytes())
 
-
         tmp_path = app.config['TMP_PATH']
         tmp_path.mkdir(parents=True, exist_ok=True)
 
@@ -196,29 +196,56 @@ def filter_by_type(
             result.append(entity)
     return result
 
+def get_place_and_actor_relations(
+        entities: list[Entity]) -> dict[int, list[dict[str, Any]]]:
+    linked_entities = Entity.get_links_of_entities(
+        [e.id for e in entities],
+        'P67')
+    file_to_related_entity_ids: dict[int, list[int]] = defaultdict(list)
+    places_and_actors: dict[int, dict[str, Any]] = {}
+    for link in linked_entities:
+        if (link.range.class_.view == 'actor'
+                or link.range.class_.name == 'place'):
+            places_and_actors[link.range.id] = {
+                'entity': link.range,
+                'links_inverse': [],
+                'ref_systems': []}
+            file_to_related_entity_ids[link.domain.id].append(
+                link.range.id)
+
+    inverse_links = Entity.get_links_of_entities(
+        list(places_and_actors.keys()),
+        'P67',
+        inverse=True)
+
+    for link_ in inverse_links:
+        places_and_actors[link_.range.id]['links_inverse'].append(link_)
+
+    for entity_dict in places_and_actors.values():
+        places_and_actors[
+            entity_dict['entity'].id]['ref_systems'].extend(
+            get_reference_systems(entity_dict['links_inverse']))
+
+    relations: defaultdict[int, list[dict[str, Any]]]= defaultdict(list)
+    for file_id, entity_ids in file_to_related_entity_ids.items():
+        for id_ in entity_ids:
+            relations[file_id].append(places_and_actors[id_])
+
+    return dict(relations)
 
 def get_arche_metadata(
         entities: list[Entity],
         type_ids: set[int],
         top_collection: str) -> dict[str, Any]:
-    #linked_publications = Entity.get_links_of_entities(
+    # linked_publications = Entity.get_links_of_entities(
     #    [e.id for e in entities],
     #    'P67',
     #    inverse=True)
-    #publications: dict[int, list[tuple[Entity, str]]] = defaultdict(list)
-    #for link in linked_publications:
+    # publications: dict[int, list[tuple[Entity, str]]] = defaultdict(list)
+    # for link in linked_publications:
     #    publications[link.range.id].append((link.domain, link.description))
-    #print([', '.join([e.domain.name for e in linked_publications])])
-    #linked_entities = Entity.get_links_of_entities(
-    #    [e.id for e in entities],
-    #    'P67')
-    #actors : dict[int, list[Entity]] = defaultdict(list)
-    #places: dict[int, list[Entity]] = defaultdict(list)
-    #for link in linked_entities:
-    #    if link.range.system_class.view == 'actor':
-    #        actors[link.domain.id].append(link.range)
-    #    if link.range.system_class.name == 'place':
-    #        places[link.domain.id].append(link.range)
+    # print([', '.join([e.domain.name for e in linked_publications])])
+    relations = get_place_and_actor_relations(entities)
     license_urls = {}
     arche_metadata_list = []
     missing = defaultdict(set)
@@ -254,6 +281,7 @@ def get_arche_metadata(
                         ArcheFileMetadata.construct(
                             entity,
                             type_name,
+                            relations.get(entity.id),
                             license_urls[entity.standard_type.id]))
         else:
             files_by_types[top_collection].add(g.files.get(entity.id))
@@ -261,9 +289,9 @@ def get_arche_metadata(
                 ArcheFileMetadata.construct(
                     entity,
                     top_collection,
+                    relations.get(entity.id),
                     # publications[entity.id],
                     license_urls[entity.standard_type.id]))
-
 
     graph = Graph()
     graph.bind("acdh", ACDH)

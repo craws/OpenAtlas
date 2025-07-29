@@ -82,4 +82,5 @@ ARCHE_METADATA = {
     'curator': [],
     'principalInvestigator': [],
     'relatedDiscipline': [],
-    'typeIds': []}
+    'typeIds': [],
+    'exclude_reference_systems': []}
