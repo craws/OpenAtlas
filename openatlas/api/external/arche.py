@@ -1,13 +1,14 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Optional
-from urllib.parse import quote, urlparse, urlunparse
+from urllib.parse import urlparse, urlunparse
 
 from flask import g
 from rdflib import Graph, Literal, Namespace, URIRef
 from rdflib.namespace import RDF, XSD
 from unidecode import unidecode
 
+from openatlas import app
 from openatlas.models.entity import Entity
 
 ACDH = Namespace("https://vocabs.acdh.oeaw.ac.at/schema#")
@@ -54,8 +55,6 @@ class ArcheFileMetadata:
     depositor: Optional[str] = None
     license: Optional[str] = None
     licensor: Optional[str] = None
-    # metadata_creator should be user like g.logger.get_log_info(entity.id)
-    # but this needs way to long (each file need an extra sql query)
     metadata_creator: Optional[str] = None
     rights_holder: Optional[str] = None
     is_part_of: Optional[str] = None
@@ -82,10 +81,10 @@ class ArcheFileMetadata:
     def construct(
             cls,
             entity: Entity,
-            metadata: dict[str, Any],
             type_name: str,
             # publication: list[tuple[Entity, str]],
             license_: str) -> 'ArcheFileMetadata':
+        metadata = app.config['ARCHE_METADATA']
         part_of = f"https://id.acdh.oeaw.ac.at/{metadata['topCollection']}"
         titles = [(entity.name, metadata['language'])]
         file_info = (g.files[entity.id].suffix[1:], g.files[entity.id].name)
@@ -95,7 +94,7 @@ class ArcheFileMetadata:
         obj.depositor = metadata['depositor']
         obj.license = license_
         obj.licensor = entity.license_holder
-        obj.metadata_creator = entity.creator
+        obj.metadata_creator = metadata['hasMetadataCreator']
         obj.rights_holder = entity.license_holder
         obj.creator = entity.creator
         obj.is_part_of = part_of

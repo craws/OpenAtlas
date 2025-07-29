@@ -219,7 +219,6 @@ def get_arche_metadata(
     #        actors[link.domain.id].append(link.range)
     #    if link.range.system_class.name == 'place':
     #        places[link.domain.id].append(link.range)
-    ext_metadata = app.config['ARCHE_METADATA']
     license_urls = {}
     arche_metadata_list = []
     missing = defaultdict(set)
@@ -254,7 +253,6 @@ def get_arche_metadata(
                     arche_metadata_list.append(
                         ArcheFileMetadata.construct(
                             entity,
-                            ext_metadata,
                             type_name,
                             license_urls[entity.standard_type.id]))
         else:
@@ -262,7 +260,6 @@ def get_arche_metadata(
             arche_metadata_list.append(
                 ArcheFileMetadata.construct(
                     entity,
-                    ext_metadata,
                     top_collection,
                     # publications[entity.id],
                     license_urls[entity.standard_type.id]))
