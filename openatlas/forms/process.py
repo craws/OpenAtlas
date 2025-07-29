@@ -69,17 +69,6 @@ def process_standard_fields(manager: Any) -> None:
         elif field_type == 'ValueTypeField':
             if value is not None:  # Allow the number zero
                 manager.add_link('P2', g.types[int(key)], value)
-        elif key.startswith('reference_system_id_'):
-            system = Entity.get_by_id(
-                int(key.replace('reference_system_id_', '')))
-            manager.data['links']['delete_reference_system'] = True
-            if value['value']:
-                manager.add_link(
-                    'P67',
-                    system,
-                    value['value'],
-                    inverse=True,
-                    type_id=value['precision'])
         elif key == 'public':
             manager.data['file_info'] = {
                 'public': bool(manager.form.public.data),

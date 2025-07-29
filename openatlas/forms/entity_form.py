@@ -8,7 +8,7 @@ from wtforms import HiddenField
 from openatlas.forms.add_fields import (
     add_buttons, add_date_fields, add_description, add_name_fields,
     add_reference_systems, add_relations, add_types)
-from openatlas.forms.populate import populate_dates
+from openatlas.forms.populate import populate_dates, populate_reference_systems
 from openatlas.forms.process import process_date
 from openatlas.forms.util import convert
 from openatlas.forms.validation import validate
@@ -61,13 +61,29 @@ def process_form_data(entity: Entity, form: Any) -> Entity:
         entity = insert_entity(form, data)
     process_types(entity, form)
     process_relations(entity, form)
+    process_reference_systems(entity, form)
     return entity
+
+
+def process_reference_systems(entity: Entity, form: Any):
+    entity.delete_links(['P67'])
+    for system in g.reference_systems.values():
+        if entity.class_.name not in system.classes:
+            continue
+        data = getattr(form, f'reference_system_id_{system.id}').data
+        if data['value']:
+            entity.link(
+                'P67',
+                system,
+                data['value'],
+                inverse=True,
+                type_id=data['precision'])
 
 
 def process_types(entity: Entity, form: Any) -> None:
     for type_ in [g.types[id_] for id_ in entity.class_.hierarchies]:
         if data := convert(getattr(form, str(type_.id)).data):
-            # if entity.class_.name in \ # Todo: check still needed?
+            # if entity.class_.name in \ # Todo: check needed?
             #         ['actor_function', 'actor_relation', 'involvement']:
             #    continue
             if type_.class_.name == 'administrative_unit':
@@ -116,6 +132,7 @@ def delete_links(entity: Entity) -> None:
                 links['property_inverse'].append(item['property'])
             else:
                 links['property'].append(item['property'])
+    links['property_inverse'].append('P67')  # e.g. reference systems
     if links['property_inverse']:
         entity.delete_links(links['property_inverse'], True)
     if links['property']:
@@ -135,7 +152,7 @@ def populate_update(form: Any, entity: Entity) -> None:
     # Todo: implement copy
     # if entity.id and not copy:
     #     form.entity_id.data = entity.id
-    # populate_reference_systems(self)
+    populate_reference_systems(form, entity)
     if 'date' in entity.class_.attributes:
         populate_dates(form, entity)
     #if hasattr(self.form, 'alias'):
