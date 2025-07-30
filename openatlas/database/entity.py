@@ -167,8 +167,8 @@ def insert(data: dict[str, Any]) -> int:
             %(end_from)s,
             %(end_to)s,
             %(end_comment)s)
-        RETURNING id;"""
-        , data)
+        RETURNING id;""",
+        data)
     return g.cursor.fetchone()['id']
 
 
@@ -553,6 +553,26 @@ def delete_links_by_codes(
             AND {'range_id' if inverse else 'domain_id'} = %(id)s;
         """,
         {'id': entity_id, 'codes': tuple(codes)})
+
+
+def delete_links_by_codes_and_class(
+        entity_id: int,
+        codes: list[str],
+        classes: list[str],
+        inverse: bool = False) -> None:
+    g.cursor.execute(
+        f"""
+        DELETE FROM model.link l
+        USING model.entity e
+        WHERE
+            l.{'range_id' if inverse else 'domain_id'} = e.id
+            AND e.openatlas_class_name IN %(classes)s
+            AND l.property_code IN %(codes)s
+            AND e.id = %(id)s;
+        """, {
+            'id': entity_id,
+            'codes': tuple(codes),
+            'classes': tuple(classes)})
 
 
 def remove_types(id_: int, exclude_ids: list[int]) -> None:

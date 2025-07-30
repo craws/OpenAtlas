@@ -123,20 +123,14 @@ def insert_entity(form: Any, data: dict[str, Any]) -> Entity:
 
 
 def delete_links(entity: Entity) -> None:
-    links: dict[str, Any] = {'property': [], 'property_inverse': []}
-    links['property_inverse'].append('P67')  # e.g. reference systems
-    if entity.class_.hierarchies:
-        links['property'].append('P2')  # Todo: what about place types?
-    for item in entity.class_.relations.values():
-        if item['mode'] == 'direct':
-            if item['inverse']:
-                links['property_inverse'].append(item['property'])
-            else:
-                links['property'].append(item['property'])
-    if links['property_inverse']:
-        entity.delete_links(links['property_inverse'], True)
-    if links['property']:
-        entity.delete_links(links['property'])
+    if entity.class_.hierarchies:  # Todo: what about place types?
+        entity.delete_links_by_code_and_class(['P2'], ['E55'])
+    for relation in entity.class_.relations.values():
+        if relation['mode'] == 'direct':
+            entity.delete_links_by_code_and_class(
+                relation['property'],
+                relation['class'],
+                relation['inverse'])
 
 
 def populate_update(form: Any, entity: Entity) -> None:

@@ -43,7 +43,6 @@ class Entity:
         self.description = None
         self.created = None
         self.modified = None
-        self.reference_systems: list[Link] = []
         self.origin_id: Optional[int] = None  # When coming from another entity
         self.image_id: Optional[int] = None  # Profile image
         self.location: Optional[Entity] = None  # Respective location if place
@@ -212,6 +211,13 @@ class Entity:
 
     def delete(self) -> None:
         Entity.delete_(self.id)
+
+    def delete_links_by_code_and_class(
+            self,
+            codes: list[str],
+            classes: list[str],
+            inverse: bool = False) -> None:
+        db.delete_links_by_codes_and_class(self.id, codes, classes, inverse)
 
     def delete_links(self, codes: list[str], inverse: bool = False) -> None:
         if self.class_.name == 'stratigraphic_unit' \
