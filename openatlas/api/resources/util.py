@@ -2,7 +2,6 @@ from typing import Any, Optional
 
 from flask import g, json, url_for
 
-from models.entity import Entity
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.display.util import check_iiif_activation, check_iiif_file_exist
 from openatlas.models.entity import Entity, Link
@@ -41,7 +40,8 @@ def get_license_url(entity: Entity) -> Optional[str]:
     return url
 
 def get_license_ids_with_links() -> dict[int, str]:
-    type_ids = collect_all_sub_ids_of_hierarchy(Type.get_hierarchy('License').subs)
+    type_ids = collect_all_sub_ids_of_hierarchy(
+        Type.get_hierarchy('License').subs)
     license_links = Entity.get_links_of_entities(type_ids, 'P67', inverse=True)
     url_dict = {}
     for link_ in license_links:

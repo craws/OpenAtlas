@@ -4,7 +4,6 @@ from typing import Any
 from flask import Response, g, jsonify
 from flask_restful import Resource, marshal
 
-from models.entity import Entity
 from openatlas.api.endpoints.endpoint import Endpoint
 from openatlas.api.endpoints.parser import Parser
 from openatlas.api.formats.csv import export_database_csv
@@ -22,11 +21,11 @@ from openatlas.api.resources.resolve_endpoints import (
     download, resolve_subunits)
 from openatlas.api.resources.templates import geometries_template, \
     network_visualisation_template
-from openatlas.api.resources.util import get_geometries
+from openatlas.api.resources.util import filter_by_type, get_geometries
 from openatlas.database.entity import get_linked_entities_recursive
+from openatlas.models.entity import Entity
 from openatlas.models.export import current_date_for_filename, \
     get_arche_metadata
-from api.resources.util import filter_by_type
 
 
 class GetGeometricEntities(Resource):
@@ -147,4 +146,3 @@ class GetArcheMetadata(Resource):
                 set(type_ids),
                 top_collection),
                 mimetype='text/plain')
-

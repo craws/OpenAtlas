@@ -25,7 +25,7 @@ def is_arche_likeable_uri(uri: str) -> bool:
     return False
 
 
-def is_valid_url(url: str) -> bool:  #Todo: Maybe rewrite with also DOI ?
+def is_valid_url(url: str) -> bool:
     try:
         parsed = urlparse(url)
         return parsed.scheme in ("http", "https") and bool(parsed.netloc)
@@ -92,7 +92,7 @@ def ensure_entity_exist(
 
 
 
-def transliterate_url(url):
+def transliterate_url(url: str)-> str:
     parsed = urlparse(url)
     path = parsed.path
     ascii_path = unidecode(path)

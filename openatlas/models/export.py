@@ -11,13 +11,12 @@ from typing import Any, Optional
 from flask import g, url_for
 from rdflib import Graph
 
-from api.resources.util import filter_by_type
 from openatlas import app
 from openatlas.api.endpoints.endpoint import Endpoint
 from openatlas.api.external.arche import ACDH, add_arche_file_metadata_to_graph
 from openatlas.api.external.arche_class import ArcheFileMetadata
 from openatlas.api.resources.api_entity import ApiEntity
-from openatlas.api.resources.util import get_reference_systems
+from openatlas.api.resources.util import filter_by_type, get_reference_systems
 from openatlas.models.entity import Entity
 
 
@@ -73,7 +72,7 @@ def arche_export() -> bool:
         file_entities,
         type_ids,
         external_metadata['topCollection'])
-    files_by_extension = defaultdict(lambda: defaultdict(set))
+    files_by_extension: Any = defaultdict(lambda: defaultdict(set))
     for entity_id, path_set in sorted_files.items():
         for f in path_set:
             ext = normalize_extension(f.suffix)
@@ -279,7 +278,7 @@ def get_arche_metadata(
         type_ids: set[int],
         top_collection: str) -> str:
     # Todo: start here again
-    # publications = get_publications(entities)
+    publications = get_publications(entities)
     relations = get_place_and_actor_relations(entities)
     license_urls = {}
     arche_metadata_list = []
