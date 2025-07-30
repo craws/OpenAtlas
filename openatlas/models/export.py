@@ -11,6 +11,7 @@ from typing import Any, Optional
 from flask import g, url_for
 from rdflib import Graph
 
+from api.resources.util import filter_by_type
 from openatlas import app
 from openatlas.api.endpoints.endpoint import Endpoint
 from openatlas.api.external.arche import ACDH, add_arche_file_metadata_to_graph
@@ -68,12 +69,12 @@ def arche_export() -> bool:
     if type_ids := external_metadata.get('typeIds'):
         file_entities = filter_by_type(file_entities, type_ids)
 
-    arche_file_metadata = get_arche_metadata(
+    sorted_files = sort_files_by_types(
         file_entities,
-        set(type_ids),
+        type_ids,
         external_metadata['topCollection'])
     files_by_extension = defaultdict(lambda: defaultdict(set))
-    for entity_id, path_set in arche_file_metadata['files_by_types'].items():
+    for entity_id, path_set in sorted_files.items():
         for f in path_set:
             ext = normalize_extension(f.suffix)
             files_by_extension[entity_id][ext].add(f)
@@ -89,7 +90,7 @@ def arche_export() -> bool:
             suffix='.md',
             delete=False) as tmp_md:
         tmp_md.write("\n".join(
-            create_failed_files_md(arche_file_metadata['missing'])))
+            create_failed_files_md(check_files_for_arche(file_entities))))
         tmp_md_path = tmp_md.name
 
     with tempfile.NamedTemporaryFile(
@@ -123,7 +124,10 @@ def arche_export() -> bool:
             Path(tmp_md_path).read_text(encoding='utf-8'), encoding='utf-8')
 
         ttl_path = temp_path / 'files.ttl'
-        ttl_path.write_text(arche_file_metadata['graph'])
+        ttl_path.write_text(get_arche_metadata(
+            file_entities,
+            set(type_ids),
+            external_metadata['topCollection']))
 
         rdf_path = temp_path / 'rdf_dump.ttl'
         rdf_path.write_text(rdf_dump.get_data(as_text=True))
@@ -185,17 +189,6 @@ def normalize_extension(ext: str) -> str:
     return ext
 
 
-def filter_by_type(
-        entities: list[Entity],
-        type_ids: list[int]) -> list[Entity]:
-    result = []
-    for entity in entities:
-        if any(
-                id_ in [type_.id for type_ in entity.types]
-                for id_ in type_ids):
-            result.append(entity)
-    return result
-
 def get_place_and_actor_relations(
         entities: list[Entity]) -> dict[int, list[dict[str, Any]]]:
     linked_entities = Entity.get_links_of_entities(
@@ -226,7 +219,7 @@ def get_place_and_actor_relations(
             entity_dict['entity'].id]['ref_systems'].extend(
             get_reference_systems(entity_dict['links_inverse']))
 
-    relations: defaultdict[int, list[dict[str, Any]]]= defaultdict(list)
+    relations: defaultdict[int, list[dict[str, Any]]] = defaultdict(list)
     for file_id, entity_ids in file_to_related_entity_ids.items():
         for id_ in entity_ids:
             relations[file_id].append(places_and_actors[id_])
@@ -236,27 +229,36 @@ def get_place_and_actor_relations(
 
 def get_publications(entities: list[Entity]) -> dict[int, Any]:
     linked_publications = Entity.get_links_of_entities(
-       [e.id for e in entities],
-       'P67',
-       inverse=True)
+        [e.id for e in entities],
+        'P67',
+        inverse=True)
     publications: dict[int, list[tuple[Entity, str]]] = defaultdict(list)
     for link in linked_publications:
-       publications[link.range.id].append((link.domain, link.description))
-
+        publications[link.range.id].append((link.domain, link.description))
 
     print([', '.join([e.domain.name for e in linked_publications])])
 
-def get_arche_metadata(
+def sort_files_by_types(
         entities: list[Entity],
         type_ids: set[int],
-        top_collection: str) -> dict[str, Any]:
-    # Todo: start here again
-    publications = get_publications(entities)
-    relations = get_place_and_actor_relations(entities)
-    license_urls = {}
-    arche_metadata_list = []
-    missing = defaultdict(set)
+        top_collection: str) -> dict[str, set[Path]]:
+
     files_by_types = defaultdict(set)
+    for entity in entities:
+        if not g.files.get(entity.id) or not entity.standard_type:
+            continue
+        if type_ids:
+            for type_ in entity.types:
+                if type_.id in type_ids:
+                    type_name = g.types[type_.id].name.replace(' ', '_')
+                    files_by_types[type_name].add(g.files.get(entity.id))
+        else:
+            files_by_types[top_collection].add(g.files.get(entity.id))
+    return dict(files_by_types)
+
+def check_files_for_arche(
+        entities: list[Entity]) -> dict[str, set[tuple[int, str]]]:
+    missing = defaultdict(set)
     for entity in entities:
         if not g.files.get(entity.id):
             missing['No files'].add((entity.id, entity.name))
@@ -270,6 +272,20 @@ def get_arche_metadata(
             missing['No creator'].add((entity.id, entity.name))
         if not entity.license_holder:
             missing['No license holder'].add((entity.id, entity.name))
+    return dict(missing)
+
+def get_arche_metadata(
+        entities: list[Entity],
+        type_ids: set[int],
+        top_collection: str) -> str:
+    # Todo: start here again
+    # publications = get_publications(entities)
+    relations = get_place_and_actor_relations(entities)
+    license_urls = {}
+    arche_metadata_list = []
+    for entity in entities:
+        if not g.files.get(entity.id) or not entity.standard_type:
+            continue
         if entity.standard_type.id not in license_urls:
             for link_ in (
                     entity.standard_type.get_links('P67', inverse=True)):
@@ -283,7 +299,6 @@ def get_arche_metadata(
             for type_ in entity.types:
                 if type_.id in type_ids:
                     type_name = g.types[type_.id].name.replace(' ', '_')
-                    files_by_types[type_name].add(g.files.get(entity.id))
                     arche_metadata_list.append(
                         ArcheFileMetadata.construct(
                             entity,
@@ -291,7 +306,6 @@ def get_arche_metadata(
                             relations.get(entity.id),
                             license_urls[entity.standard_type.id]))
         else:
-            files_by_types[top_collection].add(g.files.get(entity.id))
             arche_metadata_list.append(
                 ArcheFileMetadata.construct(
                     entity,
@@ -303,7 +317,4 @@ def get_arche_metadata(
     graph.bind("acdh", ACDH)
     for metadata_obj in arche_metadata_list:
         add_arche_file_metadata_to_graph(graph, metadata_obj)
-    return {
-        'graph': graph.serialize(format="turtle"),
-        'missing': missing,
-        'files_by_types': files_by_types}
+    return graph.serialize(format="turtle")

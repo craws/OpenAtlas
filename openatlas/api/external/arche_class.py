@@ -81,7 +81,7 @@ class ArcheFileMetadata:
                     ref_system_info.append(
                         (ref['identifier'], ref['referenceSystem']))
                 values = {
-                    'id': relation['entity'].id,
+                    'id': str(relation['entity'].id),
                     'name': relation['entity'].name,
                     'reference_systems': ref_system_info,
                     'description': relation['entity'].description}

@@ -2,6 +2,7 @@ from typing import Any, Optional
 
 from flask import g, json, url_for
 
+from models.entity import Entity
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.display.util import check_iiif_activation, check_iiif_file_exist
 from openatlas.models.entity import Entity, Link
@@ -276,3 +277,15 @@ def get_value_for_types(type_: Entity, links: list[Link]) -> dict[str, str]:
             if link.range.id == type_.id and type_.description:
                 type_dict['unit'] = type_.description
     return type_dict
+
+
+def filter_by_type(
+        entities: list[Entity],
+        type_ids: list[int]) -> list[Entity]:
+    result = []
+    for entity in entities:
+        if any(
+                id_ in [type_.id for type_ in entity.types]
+                for id_ in type_ids):
+            result.append(entity)
+    return result

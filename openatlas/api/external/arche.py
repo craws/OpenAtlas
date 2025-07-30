@@ -25,7 +25,7 @@ def is_arche_likeable_uri(uri: str) -> bool:
     return False
 
 
-def is_valid_url(url: str) -> bool:
+def is_valid_url(url: str) -> bool:  #Todo: Maybe rewrite with also DOI ?
     try:
         parsed = urlparse(url)
         return parsed.scheme in ("http", "https") and bool(parsed.netloc)
@@ -45,7 +45,7 @@ def create_uri(value: str | list[str]) -> URIRef | list[URIRef]:
                  .lower())
     return URIRef(transliterate_url(f"https://id.acdh.oeaw.ac.at/{safe_name}"))
 
-# Todo: use ensure_person_new. Refactor code to new function
+# todo add hasMetdataCreator to both "ensure_*" functions
 def ensure_person(
         graph: Graph,
         names: str | list[str]) -> None:
@@ -57,25 +57,26 @@ def ensure_person(
         if str(uri) not in ENTITIES_EMITTED:
             graph.add((uri, RDF.type, ACDH.Person))
             graph.add((uri, ACDH.hasTitle, Literal(name, lang="und")))
+            graph.add((uri, ACDH.hasIdentifier, uri))
             ENTITIES_EMITTED.add(str(uri))
-
-
-
 
 def ensure_entity_exist(
         graph: Graph,
         acdh_property: Any,
         entity_details: dict[str, Any]) -> None:
     name = entity_details['name']
-    if not name:  # or is_valid_url(name):
+    if not name:
         return None
-    uri = create_uri(name)
+    uri = create_uri(entity_details['id'])
     if str(uri) not in ENTITIES_EMITTED:
         graph.add((uri, RDF.type, acdh_property))
         graph.add((uri, ACDH.hasTitle, Literal(name, lang="und")))
+        if is_valid_url(name):
+            graph.add((uri, ACDH.hasUrl, URIRef(name)))
         if description := entity_details['description']:
             graph.add(
                 (uri, ACDH.hasDescription, Literal(description, lang="und")))
+        graph.add((uri, ACDH.hasIdentifier, uri))
         for ref_sys in entity_details['reference_systems']:
             if ref_link := ref_sys[0]:
                 if (is_valid_url(ref_link)
@@ -193,26 +194,28 @@ def add_arche_file_metadata_to_graph(
                 if isinstance(metadata.creator, list) \
                 else [create_uri(metadata.creator)]:
             graph.add((subject_uri, ACDH.hasCreator, uri))
+    if metadata.metadata_creator:
+        ensure_person(graph, metadata.metadata_creator)
+        for uri in create_uri(metadata.metadata_creator) \
+                if isinstance(metadata.metadata_creator, list) \
+                else [create_uri(metadata.metadata_creator)]:
+            graph.add((subject_uri, ACDH.hasMetadataCreator, uri))
 
     if metadata.actors:
         for actor in metadata.actors:
-            ensure_entity_exist(
-                graph,
-                ACDH.Person,
-                actor)
-            graph.add((subject_uri, ACDH.hasActor, create_uri(actor['id'])))
+            ensure_entity_exist(graph, ACDH.Person, actor)
+            graph.add((
+                subject_uri,
+                ACDH.hasActor,
+                create_uri(actor['id'])))
 
     if metadata.spatial_coverages:
         for place in metadata.spatial_coverages:
-            ensure_entity_exist(
-                graph,
-                ACDH.Place,
-                place)
+            ensure_entity_exist(graph,ACDH.Place,place)
             graph.add((
                 subject_uri,
                 ACDH.hasSpatialCoverage,
                 create_uri(place['id'])))
-
 
 
     for tc_text, lang in metadata.temporal_coverages:

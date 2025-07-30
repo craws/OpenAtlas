@@ -320,8 +320,13 @@ openapi.add_argument(
 
 arche = reqparse.RequestParser()
 arche.add_argument(
-    'type_id',
+    'type_ids',
     type=int,
     action='append',
+    help='{error_msg}',
+    location='args')
+arche.add_argument(
+    'top_collection',
+    type=str,
     help='{error_msg}',
     location='args')

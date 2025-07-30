@@ -1,9 +1,10 @@
 import json
 from typing import Any
 
-from flask import Response, jsonify
+from flask import Response, g, jsonify
 from flask_restful import Resource, marshal
 
+from models.entity import Entity
 from openatlas.api.endpoints.endpoint import Endpoint
 from openatlas.api.endpoints.parser import Parser
 from openatlas.api.formats.csv import export_database_csv
@@ -16,14 +17,16 @@ from openatlas.api.resources.database_mapper import (
     get_all_entities_as_dict, get_all_links_as_dict, get_cidoc_hierarchy,
     get_classes, get_properties, get_property_hierarchy)
 from openatlas.api.resources.error import EntityNotAnEventError, NotAPlaceError
-from openatlas.api.resources.parser import entity_, gis, network
+from openatlas.api.resources.parser import arche, entity_, gis, network
 from openatlas.api.resources.resolve_endpoints import (
     download, resolve_subunits)
 from openatlas.api.resources.templates import geometries_template, \
     network_visualisation_template
 from openatlas.api.resources.util import get_geometries
 from openatlas.database.entity import get_linked_entities_recursive
-from openatlas.models.export import current_date_for_filename
+from openatlas.models.export import current_date_for_filename, \
+    get_arche_metadata
+from api.resources.util import filter_by_type
 
 
 class GetGeometricEntities(Resource):
@@ -126,3 +129,22 @@ class GetChainedEvents(Resource):
                 root_id,
                 ['P134']),
             parser).get_chained_events(root_id)
+
+
+class GetArcheMetadata(Resource):
+    @staticmethod
+    def get() -> Response:
+        parser = arche.parse_args()
+        top_collection =parser['top_collection']
+        if not top_collection:
+            top_collection =g.settings['site_name']
+        file_entities = Entity.get_by_class(['file'], types=True, aliases=True)
+        if type_ids := parser.get('type_ids'):
+            file_entities = filter_by_type(file_entities, type_ids)
+        return  Response(
+                get_arche_metadata(
+                file_entities,
+                set(type_ids),
+                top_collection),
+                mimetype='text/plain')
+
