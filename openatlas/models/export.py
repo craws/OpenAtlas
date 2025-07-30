@@ -226,7 +226,8 @@ def get_place_and_actor_relations(
     return dict(relations)
 
 
-def get_publications(entities: list[Entity]) -> dict[int, Any]:
+def get_publications(
+        entities: list[Entity]) -> dict[int, list[tuple[Entity, str]]]:
     linked_publications = Entity.get_links_of_entities(
         [e.id for e in entities],
         'P67',
@@ -234,14 +235,13 @@ def get_publications(entities: list[Entity]) -> dict[int, Any]:
     publications: dict[int, list[tuple[Entity, str]]] = defaultdict(list)
     for link in linked_publications:
         publications[link.range.id].append((link.domain, link.description))
+    return dict(publications)
 
-    print([', '.join([e.domain.name for e in linked_publications])])
 
 def sort_files_by_types(
         entities: list[Entity],
         type_ids: set[int],
         top_collection: str) -> dict[str, set[Path]]:
-
     files_by_types = defaultdict(set)
     for entity in entities:
         if not g.files.get(entity.id) or not entity.standard_type:
@@ -254,6 +254,7 @@ def sort_files_by_types(
         else:
             files_by_types[top_collection].add(g.files.get(entity.id))
     return dict(files_by_types)
+
 
 def check_files_for_arche(
         entities: list[Entity]) -> dict[str, set[tuple[int, str]]]:
@@ -273,11 +274,11 @@ def check_files_for_arche(
             missing['No license holder'].add((entity.id, entity.name))
     return dict(missing)
 
+
 def get_arche_metadata(
         entities: list[Entity],
         type_ids: set[int],
         top_collection: str) -> str:
-    # Todo: start here again
     publications = get_publications(entities)
     relations = get_place_and_actor_relations(entities)
     license_urls = {}
@@ -303,6 +304,7 @@ def get_arche_metadata(
                             entity,
                             type_name,
                             relations.get(entity.id),
+                            publications.get(entity.id),
                             license_urls[entity.standard_type.id]))
         else:
             arche_metadata_list.append(
@@ -310,6 +312,7 @@ def get_arche_metadata(
                     entity,
                     top_collection,
                     relations.get(entity.id),
+                    publications.get(entity.id),
                     license_urls[entity.standard_type.id]))
 
     graph = Graph()

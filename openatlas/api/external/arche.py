@@ -10,12 +10,14 @@ from unidecode import unidecode
 
 from openatlas import app
 from openatlas.api.external.arche_class import ArcheFileMetadata
+from openatlas.models.entity import Entity
 
 ACDH = Namespace("https://vocabs.acdh.oeaw.ac.at/schema#")
 ENTITIES_EMITTED = set()
 
 with urllib.request.urlopen(app.config['ARCHE_URI_RULES']) as response:
     arche_uri_rules = json.load(response)
+
 
 def is_arche_likeable_uri(uri: str) -> bool:
     for rule in arche_uri_rules:
@@ -45,8 +47,8 @@ def create_uri(value: str | list[str]) -> URIRef | list[URIRef]:
                  .lower())
     return URIRef(transliterate_url(f"https://id.acdh.oeaw.ac.at/{safe_name}"))
 
-# todo add hasMetdataCreator to both "ensure_*" functions
-def ensure_person(
+
+def ensure_person_exist(
         graph: Graph,
         names: str | list[str]) -> None:
     names = names if isinstance(names, list) else [names]
@@ -60,16 +62,31 @@ def ensure_person(
             graph.add((uri, ACDH.hasIdentifier, uri))
             ENTITIES_EMITTED.add(str(uri))
 
+
+def ensure_publication_exist(
+        graph: Graph,
+        publication: Entity,
+        pages: str) -> None:
+    uri = create_uri(str(publication.id))
+    if str(uri) not in ENTITIES_EMITTED:
+        graph.add((uri, RDF.type, ACDH.Publication))
+        name = publication.name
+        graph.add((uri, ACDH.hasTitle, Literal(name, lang="und")))
+        graph.add((uri, ACDH.hasIdentifier, URIRef(uri)))
+        if is_valid_url(name) and 'doi' in name.lower():
+            graph.add((uri, ACDH.hasIdentifier, URIRef(name)))
+        if pages:
+            graph.add((uri, ACDH.hasPages, Literal(pages, lang="und")))
+
+
 def ensure_entity_exist(
         graph: Graph,
         acdh_property: Any,
         entity_details: dict[str, Any]) -> None:
-    name = entity_details['name']
-    if not name:
-        return None
     uri = create_uri(entity_details['id'])
     if str(uri) not in ENTITIES_EMITTED:
         graph.add((uri, RDF.type, acdh_property))
+        name = entity_details['name']
         graph.add((uri, ACDH.hasTitle, Literal(name, lang="und")))
         if is_valid_url(name):
             graph.add((uri, ACDH.hasUrl, URIRef(name)))
@@ -91,8 +108,7 @@ def ensure_entity_exist(
     return None
 
 
-
-def transliterate_url(url: str)-> str:
+def transliterate_url(url: str) -> str:
     parsed = urlparse(url)
     path = parsed.path
     ascii_path = unidecode(path)
@@ -117,7 +133,7 @@ def add_arche_file_metadata_to_graph(
         graph.add((subject_uri, ACDH.hasTitle, Literal(title_text, lang=lang)))
 
     if metadata.depositor:
-        ensure_person(graph, metadata.depositor)
+        ensure_person_exist(graph, metadata.depositor)
         for uri in create_uri(metadata.depositor) \
                 if isinstance(metadata.depositor, list) \
                 else [create_uri(metadata.depositor)]:
@@ -125,13 +141,13 @@ def add_arche_file_metadata_to_graph(
     if metadata.license:
         graph.add((subject_uri, ACDH.hasLicense, URIRef(metadata.license)))
     if metadata.licensor:
-        ensure_person(graph, metadata.licensor)
+        ensure_person_exist(graph, metadata.licensor)
         for uri in create_uri(metadata.licensor) \
                 if isinstance(metadata.licensor, list) \
                 else [create_uri(metadata.licensor)]:
             graph.add((subject_uri, ACDH.hasLicensor, uri))
     if metadata.rights_holder:
-        ensure_person(graph, metadata.rights_holder)
+        ensure_person_exist(graph, metadata.rights_holder)
         for uri in create_uri(metadata.rights_holder) \
                 if isinstance(metadata.rights_holder, list) \
                 else [create_uri(metadata.rights_holder)]:
@@ -144,7 +160,7 @@ def add_arche_file_metadata_to_graph(
                    ACDH.hasAcceptedDate,
                    Literal(metadata.accepted_date, datatype=XSD.date)))
     if metadata.curator:
-        ensure_person(graph, metadata.curator)
+        ensure_person_exist(graph, metadata.curator)
         for uri in create_uri(metadata.curator) \
                 if isinstance(metadata.curator, list) \
                 else [create_uri(metadata.curator)]:
@@ -158,7 +174,7 @@ def add_arche_file_metadata_to_graph(
     if metadata.language:
         graph.add((subject_uri, ACDH.hasLanguage, URIRef(metadata.language)))
     if metadata.principal_investigator:
-        ensure_person(graph, metadata.principal_investigator)
+        ensure_person_exist(graph, metadata.principal_investigator)
         for uri in create_uri(metadata.principal_investigator) \
                 if isinstance(metadata.principal_investigator, list) \
                 else [create_uri(metadata.principal_investigator)]:
@@ -189,13 +205,13 @@ def add_arche_file_metadata_to_graph(
                    ACDH.hasCreatedEndDate,
                    Literal(metadata.created_end_date, datatype=XSD.date)))
     if metadata.creator:
-        ensure_person(graph, metadata.creator)
+        ensure_person_exist(graph, metadata.creator)
         for uri in create_uri(metadata.creator) \
                 if isinstance(metadata.creator, list) \
                 else [create_uri(metadata.creator)]:
             graph.add((subject_uri, ACDH.hasCreator, uri))
     if metadata.metadata_creator:
-        ensure_person(graph, metadata.metadata_creator)
+        ensure_person_exist(graph, metadata.metadata_creator)
         for uri in create_uri(metadata.metadata_creator) \
                 if isinstance(metadata.metadata_creator, list) \
                 else [create_uri(metadata.metadata_creator)]:
@@ -211,12 +227,19 @@ def add_arche_file_metadata_to_graph(
 
     if metadata.spatial_coverages:
         for place in metadata.spatial_coverages:
-            ensure_entity_exist(graph,ACDH.Place,place)
+            ensure_entity_exist(graph, ACDH.Place, place)
             graph.add((
                 subject_uri,
                 ACDH.hasSpatialCoverage,
                 create_uri(place['id'])))
 
+    if metadata.has_publications:
+        for publication in metadata.has_publications:
+            ensure_publication_exist(graph, publication[0], publication[1])
+            graph.add((
+                subject_uri,
+                ACDH.isSourceOf,
+                create_uri(str(publication[0].id))))
 
     for tc_text, lang in metadata.temporal_coverages:
         graph.add((subject_uri,

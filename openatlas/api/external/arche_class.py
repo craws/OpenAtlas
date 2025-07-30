@@ -44,7 +44,7 @@ class ArcheFileMetadata:
             entity: Entity,
             type_name: str,
             relations: list[dict[str, Any]],
-            # publication: list[tuple[Entity, str]],
+            publications: list[tuple[Entity, str]],
             license_: str) -> 'ArcheFileMetadata':
         metadata = app.config['ARCHE_METADATA']
         part_of = f"https://id.acdh.oeaw.ac.at/{metadata['topCollection']}"
@@ -91,4 +91,5 @@ class ArcheFileMetadata:
                     actors.append(values)
         obj.actors = actors
         obj.spatial_coverages = places
+        obj.has_publications = publications
         return obj
