@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-06-30 08:50+0200\n"
+"POT-Creation-Date: 2025-07-30 14:09+0200\n"
 "PO-Revision-Date: 2025-02-18 10:19+0100\n"
 "Last-Translator: Clément Besnier <clem@clementbesnier.fr>\n"
 "Language: fr\n"
@@ -16,7 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.17.0\n"
+"Generated-By: Babel 2.10.3\n"
 
 #: openatlas/api/endpoints/iiif.py:257 openatlas/display/classes.py:48
 #: openatlas/display/classes.py:340 openatlas/display/util.py:213
@@ -1873,7 +1873,9 @@ msgstr "points"
 #: openatlas/templates/util/translations.html:28
 #, fuzzy
 msgid "map_info_wkt"
-msgstr "entrez un texte WKT pour le dessiner sur la carte. Les formes géométriques disponibles sont : POINT, LINESTRING et POLYGON."
+msgstr ""
+"entrez un texte WKT pour le dessiner sur la carte. Les formes "
+"géométriques disponibles sont : POINT, LINESTRING et POLYGON."
 
 #: openatlas/templates/util/translations.html:29
 msgid "search by location name or postcode"
@@ -2942,7 +2944,9 @@ msgstr "Echec de l'envoi des informations du compte à %(email)s"
 
 #: openatlas/views/user.py:349
 msgid "Welcome to OpenAtlas. Please add an admin user to continue."
-msgstr "Bienvenue sur OpenAtlas. Veuillez ajoutez un administrateur pour continuer."
+msgstr ""
+"Bienvenue sur OpenAtlas. Veuillez ajoutez un administrateur pour "
+"continuer."
 
 #: openatlas/views/vocabs.py:44
 msgid "show vocabularies"
