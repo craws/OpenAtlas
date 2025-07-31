@@ -1,7 +1,8 @@
 from typing import Any
 
 from config.model.classes import (
-    acquisition, activity, creation, event, source, source_translation)
+    acquisition, activity, creation, event, modification, source,
+    source_translation)
 
 model: dict[str, Any] = {
     'acquisition': acquisition.model,
@@ -39,9 +40,7 @@ model: dict[str, Any] = {
         'display': {'buttons': ['network']}},
     'involvement': {
         'attributes': {}},
-    'modification': {
-        'attributes': {},
-        'display': {'buttons': ['network']}},
+    'modification': modification.model,
     'move': {
         'attributes': {},
         'display': {'buttons': ['network']}},

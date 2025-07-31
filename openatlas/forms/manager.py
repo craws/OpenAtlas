@@ -333,38 +333,6 @@ class InvolvementManager(BaseManager):
         self.link_.property = g.properties[self.form.activity.data]
 
 
-class ModificationManager(EventBaseManager):
-    _('modified place')
-
-    def additional_fields(self) -> dict[str, Any]:
-        artifacts = []
-        places = []
-        if self.insert:
-            if self.origin and self.origin.class_.view == 'artifact':
-                artifacts = [self.origin]
-        else:
-            for item in self.entity.get_linked_entities('P31', sort=True):
-                if item.class_.name == 'artifact':
-                    artifacts.append(item)
-                elif item.cidoc_class.code == 'E18':
-                    places.append(item)
-        return super().additional_fields() | {
-            'artifact': TableMultiField(
-                Entity.get_by_class('artifact', True),
-                artifacts),
-            'modified_place': TableMultiField(
-                self.table_items['place'],
-                places)}
-
-    def process_form(self) -> None:
-        super().process_form()
-        self.data['links']['delete'].add('P31')
-        if self.form.artifact.data:
-            self.add_link('P31', self.form.artifact.data)
-        if self.form.modified_place.data:
-            self.add_link('P31', self.form.modified_place.data)
-
-
 class MoveManager(EventBaseManager):
     _('moved artifact')
     _('moved person')

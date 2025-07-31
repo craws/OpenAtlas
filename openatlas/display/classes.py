@@ -90,10 +90,6 @@ class EditionDisplay(ReferenceBaseDisplay):
     pass
 
 
-class EventDisplay(EventsDisplay):
-    pass
-
-
 class ExternalReferenceDisplay(ReferenceBaseDisplay):
     pass
 
@@ -122,15 +118,6 @@ class GroupDisplay(ActorDisplay):
 
 class HumanRemainsDisplay(ArtifactDisplay):
     pass
-
-
-class ModificationDisplay(EventsDisplay):
-
-    def add_data(self) -> None:
-        super().add_data()
-        self.data[_('object')] = [
-            link(entity) for entity
-            in self.entity.get_linked_entities('P31', sort=True)]
 
 
 class MoveDisplay(EventsDisplay):

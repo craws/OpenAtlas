@@ -124,10 +124,10 @@ def insert_entity(form: Any, data: dict[str, Any]) -> Entity:
 
 def delete_links(entity: Entity) -> None:
     if entity.class_.hierarchies:  # Todo: what about place types?
-        entity.delete_links_by_code_and_class(['P2'], ['E55'])
+        entity.delete_links_by_property_and_class('P2', ['type'])
     for relation in entity.class_.relations.values():
         if relation['mode'] == 'direct':
-            entity.delete_links_by_code_and_class(
+            entity.delete_links_by_property_and_class(
                 relation['property'],
                 relation['class'],
                 relation['inverse'])

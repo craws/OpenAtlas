@@ -20,7 +20,7 @@ model = {
             'property': 'P67',
             'multiple': True},
         'information_carrier': {
-            'class': ['artifact'],
+            'class': 'artifact',
             'property': 'P128',
             'inverse': True,
             'multiple': True,

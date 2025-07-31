@@ -212,12 +212,12 @@ class Entity:
     def delete(self) -> None:
         Entity.delete_(self.id)
 
-    def delete_links_by_code_and_class(
+    def delete_links_by_property_and_class(
             self,
-            codes: list[str],
+            property: property,
             classes: list[str],
             inverse: bool = False) -> None:
-        db.delete_links_by_codes_and_class(self.id, codes, classes, inverse)
+        db.delete_links_by_property_and_class(self.id, property, classes, inverse)
 
     def delete_links(self, codes: list[str], inverse: bool = False) -> None:
         if self.class_.name == 'stratigraphic_unit' \

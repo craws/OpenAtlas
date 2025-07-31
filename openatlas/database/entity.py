@@ -555,23 +555,25 @@ def delete_links_by_codes(
         {'id': entity_id, 'codes': tuple(codes)})
 
 
-def delete_links_by_codes_and_class(
+def delete_links_by_property_and_class(
         entity_id: int,
-        codes: list[str],
+        property_code: str,
         classes: list[str],
         inverse: bool = False) -> None:
     g.cursor.execute(
         f"""
-        DELETE FROM model.link l
-        USING model.entity e
-        WHERE
-            l.{'range_id' if inverse else 'domain_id'} = e.id
-            AND e.openatlas_class_name IN %(classes)s
-            AND l.property_code IN %(codes)s
-            AND e.id = %(id)s;
+        DELETE FROM model.link WHERE id IN (
+            SELECT l.id FROM model.link l
+            JOIN model.entity e ON
+                l.{'range' if inverse else 'domain'}_id = e.id
+                AND l.property_code = %(property_code)s
+                AND e.id = %(id)s
+            JOIN model.entity e2 ON
+                e2.id = l.{'domain' if inverse else 'range'}_id
+                AND e2.openatlas_class_name IN %(classes)s);
         """, {
             'id': entity_id,
-            'codes': tuple(codes),
+            'property_code': property_code,
             'classes': tuple(classes)})
 
 
