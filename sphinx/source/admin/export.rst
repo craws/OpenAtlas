@@ -89,11 +89,16 @@ Export ARCHE
 
 A dedicated export is available to generate data suitable for ingestion into `ARCHE <https://arche.acdh.oeaw.ac.at/>`_, the ACDH repository system. This feature is intended for administrative use only.
 
+See also:
+
+* `ARCHE Deposition Process <https://arche.acdh.oeaw.ac.at/browser/deposition-process>`_
+* `ARCHE Metadata Schema <https://acdh-oeaw.github.io/arche-schema/>`_
+
 * Only available for **admin users**
-* Generates a **ZIP** archive ready to be transfered to ARCHE
-* Output includes metadata, files, RDF and SQL dumps, and debug information in ARCHE-compatible structure
+* Generates a **ZIP** archive ready to be transferred to ARCHE
+* Output includes metadata, files, RDF and SQL dumps, and debug information in an ARCHE-compatible structure
 * The process may take **significant time** and consume **large disk space**
-* ZIP file is saved in the ``files/export`` directory
+* The ZIP file is saved in the ``files/export`` directory
 
 .. note::
 
@@ -150,15 +155,15 @@ Here is an example configuration:
 
 .. note::
 
-   For all fields that refer to people (e.g., ``depositor``, ``curator``, ``hasMetadataCreator``), you can use either a **persistent identifier** (preferably `ORCID <https://orcid.org/>`_, but also `GND <https://www.dnb.de/EN/gnd>`_ or `ISNI <https://isni.org/>`_) or a **plain name**. Use persistent identifiers whenever possible for better interoperability.
+   For all fields that refer to people (e.g., ``depositor``, ``curator``, ``hasMetadataCreator``), you can use either a **persistent identifier** (preferably `ORCID <https://orcid.org/>`_, but also `GND <https://www.dnb.de/EN/gnd>`_, `ISNI <https://isni.org/>`_, `VIAF <https://viaf.org/>`_, or `Wikidata <https://www.wikidata.org/>`_) or a **plain name**. Use persistent identifiers whenever possible for better interoperability.
 
-* ``topCollection``: ARCHE top-level collection identifier
+* ``topCollection``: ARCHE top-level collection identifier (usually provided in coordination with the ARCHE team)
 * ``language``: Language code of the metadata (e.g. ``'en'``)
 * ``depositor``: List of persons responsible for the deposit
 * ``acceptedDate``: ISO date string of when the data was accepted for deposit
-* ``hasMetadataCreator``: List of metadata creators
-* ``curator``: List of collection curators
-* ``principalInvestigator``: List of principal investigators
+* ``hasMetadataCreator``: List of people responsible for the ARCHE metadata
+* ``curator``: List of ARCHE curators
+* ``principalInvestigator``: List of principal investigators for this project
 * ``relatedDiscipline``: URLs to vocabularies defining the `related disciplines <https://vocabs.acdh.oeaw.ac.at/oefos/en/>`_
 * ``typeIds`` *(optional)*: Restrict exported files to those linked with specific type IDs
 * ``exclude_reference_systems`` *(optional)*: List of reference system labels to be excluded from the export
