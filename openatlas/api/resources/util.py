@@ -40,7 +40,8 @@ def get_license_url(entity: Entity) -> Optional[str]:
     return url
 
 def get_license_ids_with_links() -> dict[int, str]:
-    type_ids = collect_all_sub_ids_of_hierarchy(Type.get_hierarchy('License').subs)
+    type_ids = collect_all_sub_ids_of_hierarchy(
+        Type.get_hierarchy('License').subs)
     license_links = Entity.get_links_of_entities(type_ids, 'P67', inverse=True)
     url_dict = {}
     for link_ in license_links:
@@ -276,3 +277,15 @@ def get_value_for_types(type_: Entity, links: list[Link]) -> dict[str, str]:
             if link.range.id == type_.id and type_.description:
                 type_dict['unit'] = type_.description
     return type_dict
+
+
+def filter_by_type(
+        entities: list[Entity],
+        type_ids: list[int]) -> list[Entity]:
+    result = []
+    for entity in entities:
+        if any(
+                id_ in [type_.id for type_ in entity.types]
+                for id_ in type_ids):
+            result.append(entity)
+    return result

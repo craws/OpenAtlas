@@ -134,7 +134,7 @@ def export_arche() -> str:
                     manual('admin/export'),
                     button(
                         _('export') + ' ARCHE',
-                        url_for('arche_execute')),
+                        url_for('arche_execute'))
                 ])},
         title=_('export') + ' ARCHE',
         crumbs=[

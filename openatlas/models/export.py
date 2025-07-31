@@ -1,3 +1,4 @@
+import hashlib
 import os
 import shutil
 import subprocess
@@ -5,7 +6,7 @@ import tempfile
 import zipfile
 from collections import defaultdict
 from datetime import datetime
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, Optional
 
 from flask import g, url_for
@@ -16,7 +17,7 @@ from openatlas.api.endpoints.endpoint import Endpoint
 from openatlas.api.external.arche import ACDH, add_arche_file_metadata_to_graph
 from openatlas.api.external.arche_class import ArcheFileMetadata
 from openatlas.api.resources.api_entity import ApiEntity
-from openatlas.api.resources.util import get_reference_systems
+from openatlas.api.resources.util import filter_by_type, get_reference_systems
 from openatlas.models.entity import Entity
 
 
@@ -68,12 +69,12 @@ def arche_export() -> bool:
     if type_ids := external_metadata.get('typeIds'):
         file_entities = filter_by_type(file_entities, type_ids)
 
-    arche_file_metadata = get_arche_metadata(
+    sorted_files = sort_files_by_types(
         file_entities,
-        set(type_ids),
+        type_ids,
         external_metadata['topCollection'])
-    files_by_extension = defaultdict(lambda: defaultdict(set))
-    for entity_id, path_set in arche_file_metadata['files_by_types'].items():
+    files_by_extension: Any = defaultdict(lambda: defaultdict(set))
+    for entity_id, path_set in sorted_files.items():
         for f in path_set:
             ext = normalize_extension(f.suffix)
             files_by_extension[entity_id][ext].add(f)
@@ -89,7 +90,7 @@ def arche_export() -> bool:
             suffix='.md',
             delete=False) as tmp_md:
         tmp_md.write("\n".join(
-            create_failed_files_md(arche_file_metadata['missing'])))
+            create_failed_files_md(check_files_for_arche(file_entities))))
         tmp_md_path = tmp_md.name
 
     with tempfile.NamedTemporaryFile(
@@ -123,7 +124,10 @@ def arche_export() -> bool:
             Path(tmp_md_path).read_text(encoding='utf-8'), encoding='utf-8')
 
         ttl_path = temp_path / 'files.ttl'
-        ttl_path.write_text(arche_file_metadata['graph'])
+        ttl_path.write_text(get_arche_metadata(
+            file_entities,
+            set(type_ids),
+            external_metadata['topCollection']))
 
         rdf_path = temp_path / 'rdf_dump.ttl'
         rdf_path.write_text(rdf_dump.get_data(as_text=True))
@@ -157,6 +161,27 @@ def arche_export() -> bool:
                             temp_path / type_name / ext / file_path.name,
                             arcname=f'data/{type_name}/{ext}/{file_path.name}')
 
+        # Reopen archive to gather statistics
+        with zipfile.ZipFile(archive_file, 'a') as archive:
+            infos = archive.infolist()
+            total_size = os.path.getsize(archive_file)
+            total_files = sum(1 for i in infos if not i.filename.endswith('/'))
+            all_dirs = set()
+            for info in infos:
+                path = PurePosixPath(info.filename)
+                all_dirs.update(path.parents)
+            all_dirs.discard(PurePosixPath("."))
+            total_dirs = len(all_dirs)
+            total_entries = len(infos)
+            stat_md = (f" # Archive Statistics"
+                       f"- **Total size**: {total_size} bytes  "
+                       f"- **Total entries**: {total_entries} "
+                       f"- **Files**: {total_files} "
+                       f"- **Directories**: {total_dirs}")
+            stat_path = temp_path / "file_statistic.md"
+            stat_path.write_text(stat_md, encoding="utf-8")
+            archive.write(stat_path, arcname='debug/file_statistic.md')
+
         export_dir = app.config['EXPORT_PATH']
         export_dir.mkdir(parents=True, exist_ok=True)
 
@@ -184,17 +209,6 @@ def normalize_extension(ext: str) -> str:
         return 'jpeg'
     return ext
 
-
-def filter_by_type(
-        entities: list[Entity],
-        type_ids: list[int]) -> list[Entity]:
-    result = []
-    for entity in entities:
-        if any(
-                id_ in [type_.id for type_ in entity.types]
-                for id_ in type_ids):
-            result.append(entity)
-    return result
 
 def get_place_and_actor_relations(
         entities: list[Entity]) -> dict[int, list[dict[str, Any]]]:
@@ -226,7 +240,7 @@ def get_place_and_actor_relations(
             entity_dict['entity'].id]['ref_systems'].extend(
             get_reference_systems(entity_dict['links_inverse']))
 
-    relations: defaultdict[int, list[dict[str, Any]]]= defaultdict(list)
+    relations: defaultdict[int, list[dict[str, Any]]] = defaultdict(list)
     for file_id, entity_ids in file_to_related_entity_ids.items():
         for id_ in entity_ids:
             relations[file_id].append(places_and_actors[id_])
@@ -234,30 +248,81 @@ def get_place_and_actor_relations(
     return dict(relations)
 
 
-def get_publications(entities: list[Entity]) -> dict[int, Any]:
+def get_publications(
+        entities: list[Entity]) -> dict[int, list[tuple[Entity, str]]]:
     linked_publications = Entity.get_links_of_entities(
-       [e.id for e in entities],
-       'P67',
-       inverse=True)
+        [e.id for e in entities],
+        'P67',
+        inverse=True)
     publications: dict[int, list[tuple[Entity, str]]] = defaultdict(list)
     for link in linked_publications:
-       publications[link.range.id].append((link.domain, link.description))
+        publications[link.range.id].append((link.domain, link.description))
+    return dict(publications)
 
 
-    print([', '.join([e.domain.name for e in linked_publications])])
-
-def get_arche_metadata(
+def sort_files_by_types(
         entities: list[Entity],
         type_ids: set[int],
-        top_collection: str) -> dict[str, Any]:
-    # Todo: start here again
-    publications = get_publications(entities)
-    relations = get_place_and_actor_relations(entities)
-    license_urls = {}
-    arche_metadata_list = []
-    missing = defaultdict(set)
+        top_collection: str) -> dict[str, set[Path]]:
     files_by_types = defaultdict(set)
     for entity in entities:
+        if not g.files.get(entity.id) or not entity.standard_type:
+            continue
+        if type_ids:
+            for type_ in entity.types:
+                if type_.id in type_ids:
+                    type_name = g.types[type_.id].name.replace(' ', '_')
+                    files_by_types[type_name].add(g.files.get(entity.id))
+        else:
+            files_by_types[top_collection].add(g.files.get(entity.id))
+    return dict(files_by_types)
+
+
+def hash_file(path: Path, chunk_size: int = 8192) -> str:
+    """Generate SHA256 hash of a file."""
+    sha256 = hashlib.sha256()
+    with path.open('rb') as f:
+        for chunk in iter(lambda: f.read(chunk_size), b''):
+            sha256.update(chunk)
+    return sha256.hexdigest()
+
+
+def find_duplicates(entity_ids: set[int]) -> dict[str, set[tuple[int, str]]]:
+    size_map = defaultdict(list)
+    for file_id, path in g.files.items():
+        if file_id not in entity_ids:
+            continue
+        size = path.stat().st_size
+        size_map[size].append((file_id, path))
+
+    duplicates = set()
+    for files in size_map.values():
+        if len(files) < 2:
+            continue  # Only one file of this size — skip
+        hash_map = {}
+        for file_id, path in files:
+            try:
+                file_hash = hash_file(path)
+            except Exception as e:
+                g.logger.log(
+                    'info',
+                    'hashing',
+                    f'failed to hash filer{file_id}: {e}')
+                continue
+            if file_hash in hash_map:
+                original_id = hash_map[file_hash]
+                duplicates.add((file_id, f'is duplicate of {original_id}'))
+            else:
+                hash_map[file_hash] = file_id
+    return {'Duplicates': duplicates}
+
+
+def check_files_for_arche(
+        entities: list[Entity]) -> dict[str, set[tuple[int, str]]]:
+    missing = defaultdict(set)
+    entity_ids = set()
+    for entity in entities:
+        entity_ids.add(entity.id)
         if not g.files.get(entity.id):
             missing['No files'].add((entity.id, entity.name))
             continue
@@ -270,6 +335,21 @@ def get_arche_metadata(
             missing['No creator'].add((entity.id, entity.name))
         if not entity.license_holder:
             missing['No license holder'].add((entity.id, entity.name))
+    missing.update(find_duplicates(entity_ids))
+    return dict(missing)
+
+
+def get_arche_metadata(
+        entities: list[Entity],
+        type_ids: set[int],
+        top_collection: str) -> str:
+    publications = get_publications(entities)
+    relations = get_place_and_actor_relations(entities)
+    license_urls = {}
+    arche_metadata_list = []
+    for entity in entities:
+        if not g.files.get(entity.id) or not entity.standard_type:
+            continue
         if entity.standard_type.id not in license_urls:
             for link_ in (
                     entity.standard_type.get_links('P67', inverse=True)):
@@ -283,27 +363,24 @@ def get_arche_metadata(
             for type_ in entity.types:
                 if type_.id in type_ids:
                     type_name = g.types[type_.id].name.replace(' ', '_')
-                    files_by_types[type_name].add(g.files.get(entity.id))
                     arche_metadata_list.append(
                         ArcheFileMetadata.construct(
                             entity,
                             type_name,
                             relations.get(entity.id),
+                            publications.get(entity.id),
                             license_urls[entity.standard_type.id]))
         else:
-            files_by_types[top_collection].add(g.files.get(entity.id))
             arche_metadata_list.append(
                 ArcheFileMetadata.construct(
                     entity,
                     top_collection,
                     relations.get(entity.id),
+                    publications.get(entity.id),
                     license_urls[entity.standard_type.id]))
 
     graph = Graph()
     graph.bind("acdh", ACDH)
     for metadata_obj in arche_metadata_list:
         add_arche_file_metadata_to_graph(graph, metadata_obj)
-    return {
-        'graph': graph.serialize(format="turtle"),
-        'missing': missing,
-        'files_by_types': files_by_types}
+    return graph.serialize(format="turtle")
