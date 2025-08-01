@@ -9,8 +9,8 @@ from openatlas.display.classes_base import (
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, description, edit_link, format_entity_date, get_base_table_data,
-    get_file_path, link, remove_link)
+    button, description, edit_link, get_base_table_data, get_file_path, link,
+    remove_link)
 from openatlas.display.util2 import is_authorized, uc_first
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
@@ -118,27 +118,6 @@ class GroupDisplay(ActorDisplay):
 
 class HumanRemainsDisplay(ArtifactDisplay):
     pass
-
-
-class MoveDisplay(EventsDisplay):
-
-    def add_data(self) -> None:
-        super().add_data()
-        if from_ := self.entity.get_linked_entity('P27'):
-            self.data[_('begin')] = format_entity_date(
-                self.entity,
-                'begin',
-                from_.get_linked_entity_safe('P53', True))
-        if to := self.entity.get_linked_entity('P26'):
-            self.data[_('end')] = format_entity_date(
-                self.entity,
-                'end',
-                to.get_linked_entity_safe('P53', True))
-        moved: dict[str, list[str]] = {'actor': [], 'artifact': []}
-        for entity in self.entity.get_linked_entities('P25', sort=True):
-            moved[entity.class_.view].append(link(entity))
-        self.data[_('person')] = moved['actor']
-        self.data[_('artifact')] = moved['artifact']
 
 
 class PersonDisplay(ActorDisplay):

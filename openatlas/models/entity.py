@@ -105,11 +105,13 @@ class Entity:
     def get_linked_entity(
             self,
             code: str,
+            classes: Optional[list[str]] = None,
             inverse: bool = False,
             types: bool = False) -> Optional[Entity]:
         return Entity.get_linked_entity_static(
             self.id,
             code,
+            classes,
             inverse=inverse,
             types=types)
 

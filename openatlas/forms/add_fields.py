@@ -154,6 +154,7 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
             if entity.id:
                 selection = entity.get_linked_entity(
                     relation['property'],
+                    relation['class'],
                     relation['inverse'])
             elif origin and origin.class_.name in relation['class']:
                 selection = origin

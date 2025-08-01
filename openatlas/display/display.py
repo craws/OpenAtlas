@@ -264,4 +264,11 @@ class Display:
                     if e.class_.name == 'object_location':
                         e = e.get_linked_entity_safe('P53', True)
                         self.linked_places.append(e)
-                    self.data[relation['label']].append(link(e))
+                    if name == 'place_from':
+                        self.data['begin'] = \
+                            format_entity_date(self.entity, 'begin', e)
+                    elif name == 'place_to':
+                        self.data['end'] = \
+                            format_entity_date(self.entity, 'end', e)
+                    else:
+                        self.data[relation['label']].append(link(e))

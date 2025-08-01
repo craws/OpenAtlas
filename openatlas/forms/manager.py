@@ -107,7 +107,6 @@ class ActorRelationManager(BaseManager):
             self.link_.range = new_range
 
     def populate_update(self) -> None:
-        super().populate_update()
         if self.origin.id == self.link_.range.id:
             self.form.inverse.data = True
 
@@ -223,7 +222,6 @@ class FileManager(BaseManager):
         return fields
 
     def populate_update(self) -> None:
-        super().populate_update()
         self.form.public.data = self.entity.public
         self.form.creator.data = self.entity.creator
         self.form.license_holder.data = self.entity.license_holder
@@ -299,7 +297,6 @@ class InvolvementManager(BaseManager):
         return fields
 
     def populate_update(self) -> None:
-        super().populate_update()
         self.form.activity.data = self.link_.property.code
 
     def process_form(self) -> None:
@@ -331,67 +328,6 @@ class InvolvementManager(BaseManager):
             str(g.classes['involvement'].standard_type_id)).data
         self.link_.type = g.types[int(type_id)] if type_id else None
         self.link_.property = g.properties[self.form.activity.data]
-
-
-class MoveManager(EventBaseManager):
-    _('moved artifact')
-    _('moved person')
-    _('place to')
-    _('place from')
-
-    def additional_fields(self) -> dict[str, Any]:
-        place_from = None
-        place_to = None
-        data: dict[str, list[Any]] = {'artifact': [], 'person': []}
-        if self.entity:
-            if place := self.entity.get_linked_entity('P27'):
-                place_from = place.get_linked_entity_safe('P53', True)
-            if place := self.entity.get_linked_entity('P26'):
-                place_to = place.get_linked_entity_safe('P53', True)
-            for linked_entity in self.entity.get_linked_entities(
-                    'P25',
-                    sort=True):
-                data[linked_entity.class_.name].append(linked_entity)
-        elif self.origin:
-            if self.origin.class_.view == 'artifact':
-                data['artifact'] = [self.origin]
-            elif self.origin.class_.view == 'place':
-                place_from = self.origin
-        return super().additional_fields() | {
-            'place_from': TableField(
-                self.table_items['place'],
-                place_from,
-                add_dynamic=['place']),
-            'place_to': TableField(
-                self.table_items['place'],
-                place_to,
-                add_dynamic=['place']),
-            'moved_artifact': TableMultiField(
-                Entity.get_by_class('artifact', True),
-                data['artifact']),
-            'moved_person': TableMultiField(
-                Entity.get_by_class('person', aliases=self.aliases),
-                data['person'])}
-
-    def process_form(self) -> None:
-        super().process_form()
-        self.data['links']['delete'].update(['P25', 'P26', 'P27'])
-        if self.form.moved_artifact.data:
-            self.add_link('P25', self.form.moved_artifact.data)
-        if self.form.moved_person.data:
-            self.add_link('P25', self.form.moved_person.data)
-        if self.form.place_from.data:
-            self.add_link(
-                'P27',
-                Entity.get_linked_entity_safe_static(
-                    int(self.form.place_from.data),
-                    'P53'))
-        if self.form.place_to.data:
-            self.add_link(
-                'P26',
-                Entity.get_linked_entity_safe_static(
-                    int(self.form.place_to.data),
-                    'P53'))
 
 
 class PersonManager(ActorBaseManager):

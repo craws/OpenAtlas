@@ -263,7 +263,7 @@ class TableSelect(HiddenInput):
             field.table = table_annotation(field.entities)
         else:
             field.table = entity_table(
-                field.entities[0].class_.view,
+                field.entities[0].class_.name,
                 field.entities,
                 table_field_id=field.id)
         return super().__call__(field, **kwargs) + Markup(
