@@ -2,7 +2,7 @@ from flask_babel import lazy_gettext as _
 
 from config.model.class_groups import class_groups
 
-model = {
+source = {
     'attributes': {
         'name': {
             'required': True},
@@ -74,4 +74,24 @@ model = {
                 'mode': 'link'},
             'file': {
                 'additional_columns': ['main image', 'remove']},
+            'note': {}}}}
+
+source_translation = {
+    'attributes': {
+        'name': {
+            'required': True},
+        'description': {
+            'label': _('content'),
+            'annotated': True}},
+    'relations': {
+        'source': {
+            'class': 'source',
+            'property': 'P73',
+            'inverse': True,
+            'required': True,
+            'mode': 'direct'}},
+    'display': {
+        'form': {
+            'insert_and_continue': True},
+        'tabs': {
             'note': {}}}}

@@ -1,7 +1,6 @@
 from typing import Any
 
-from config.model.classes import (
-    event, source, source_translation)
+from config.model.classes import event, source
 
 model: dict[str, Any] = {
     'acquisition': event.acquisition,
@@ -52,8 +51,8 @@ model: dict[str, Any] = {
     'production': event.production,
     'reference_system': {
         'attributes': {}},
-    'source': source.model,
-    'source_translation': source_translation.model,
+    'source': source.source,
+    'source_translation': source.source_translation,
     'stratigraphic_unit': {
         'attributes': {},
         'display': {'buttons': ['network']}},
