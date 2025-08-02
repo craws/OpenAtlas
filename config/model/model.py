@@ -1,13 +1,11 @@
 from typing import Any
 
 from config.model.classes import (
-    acquisition, activity, creation, event, modification, move, production,
-    source,
-    source_translation)
+    event, source, source_translation)
 
 model: dict[str, Any] = {
-    'acquisition': acquisition.model,
-    'activity': activity.model,
+    'acquisition': event.acquisition,
+    'activity': event.activity,
     'actor_function': {
         'attributes': {},
         'display': {'buttons': ['network']}},
@@ -22,10 +20,10 @@ model: dict[str, Any] = {
         'display': {'buttons': ['network']}},
     'bibliography': {
         'attributes': {}},
-    'creation': creation.model,
+    'creation': event.creation,
     'edition': {
         'attributes': {}},
-    'event': event.model,
+    'event': event.event,
     'external_reference': {
         'attributes': {}},
     'feature': {
@@ -41,8 +39,8 @@ model: dict[str, Any] = {
         'display': {'buttons': ['network']}},
     'involvement': {
         'attributes': {}},
-    'modification': modification.model,
-    'move': move.model,
+    'modification': event.modification,
+    'move': event.move,
     'object_location': {
         'attributes': {}},
     'person': {
@@ -51,7 +49,7 @@ model: dict[str, Any] = {
     'place': {
         'attributes': {},
         'display': {'buttons': ['network']}},
-    'production': production.model,
+    'production': event.production,
     'reference_system': {
         'attributes': {}},
     'source': source.model,
