@@ -4,8 +4,8 @@ from flask import g, url_for
 from flask_babel import lazy_gettext as _
 
 from openatlas.display.classes_base import (
-    ActorDisplay, BaseDisplay, EventsDisplay, PlaceBaseDisplay,
-    ReferenceBaseDisplay, TypeBaseDisplay)
+    ActorDisplay, BaseDisplay, PlaceBaseDisplay, ReferenceBaseDisplay,
+    TypeBaseDisplay)
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
@@ -152,15 +152,6 @@ class PlaceDisplay(PlaceBaseDisplay):
                         link(actor),
                         f"{_('participated at an event')}",
                         event.class_.name, '', '', ''])
-
-
-class ProductionDisplay(EventsDisplay):
-
-    def add_data(self) -> None:
-        super().add_data()
-        self.data[_('produced')] = [
-            link(item) for item
-            in self.entity.get_linked_entities('P108', sort=True)]
 
 
 class ReferenceSystemDisplay(BaseDisplay):

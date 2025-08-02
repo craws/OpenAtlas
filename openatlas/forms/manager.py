@@ -350,25 +350,6 @@ class PlaceManager(PlaceBaseManager):
         self.form.alias.append_entry('')
 
 
-class ProductionManager(EventBaseManager):
-    def additional_fields(self) -> dict[str, Any]:
-        artifacts = None
-        if not self.insert and self.entity:
-            artifacts = self.entity.get_linked_entities('P108', sort=True)
-        if self.insert:
-            if self.origin and self.origin.class_.view == 'artifact':
-                artifacts = [self.origin]
-        return super().additional_fields() | {
-            'artifact': TableMultiField(
-                Entity.get_by_class('artifact', True),
-                artifacts)}
-
-    def process_form(self) -> None:
-        super().process_form()
-        self.data['links']['delete'].add('P108')
-        self.add_link('P108', self.form.artifact.data)
-
-
 class ReferenceSystemManager(BaseManager):
     fields = ['name', 'description']
 

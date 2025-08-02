@@ -149,52 +149,6 @@ class ActorDisplay(BaseDisplay):
                 link_.domain.description])
 
 
-class EventsDisplay(BaseDisplay):
-
-    def add_data(self) -> None:
-        self.data[_('sub event of')] = \
-            link(self.entity.get_linked_entity('P9', inverse=True))
-        self.data[_('preceding event')] = \
-            link(self.entity.get_linked_entity('P134'))
-        self.data[_('succeeding event')] = \
-            '<br>'.join([
-                link(e)
-                for e in self.entity.get_linked_entities(
-                    'P134',
-                    inverse=True,
-                    sort=True)])
-        if place := self.entity.get_linked_entity('P7'):
-            self.data[_('location')] = \
-                link(place.get_linked_entity_safe('P53', True))
-
-    def add_tabs(self) -> None:
-        entity = self.entity
-        for name in ['subs', 'source', 'actor', 'reference', 'file']:
-            self.tabs[name] = Tab(name, entity=entity)
-        self.add_reference_tables_data()
-        for sub in entity.get_linked_entities('P9', types=True, sort=True):
-            self.tabs['subs'].table.rows.append(get_base_table_data(sub))
-        self.tabs['actor'].table.header.insert(5, _('activity'))
-        for link_ in entity.get_links(['P11', 'P14', 'P22', 'P23']):
-            self.tabs['actor'].table.rows.append([
-                link(link_.range),
-                link_.range.class_.label,
-                link_.type.name if link_.type else '',
-                link_.first
-                or f'<span class="text-muted">{entity.first}</span>'
-                if entity.first else '',
-                link_.last or f'<span class="text-muted">{entity.last}</span>'
-                if entity.last else '',
-                g.properties[link_.property.code].name_inverse,
-                link_.description,
-                edit_link(
-                    url_for('link_update', id_=link_.id, origin_id=entity.id)),
-                remove_link(link_.range.name, link_, entity, 'actor')])
-        self.linked_places = [
-            location.get_linked_entity_safe('P53', True) for location
-            in entity.get_linked_entities(['P7', 'P26', 'P27'], sort=True)]
-
-
 class PlaceBaseDisplay(BaseDisplay):
 
     # def add_button_delete(self) -> None:
