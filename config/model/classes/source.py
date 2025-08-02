@@ -4,10 +4,14 @@ from config.model.class_groups import class_groups
 
 model = {
     'attributes': {
-        'name': {'required': True},
-        'description': {'label': _('content'), 'annotated': True}},
+        'name': {
+            'required': True},
+        'description': {
+            'label': _('content'),
+            'annotated': True}},
     'relations': {
         'text': {
+            'label': _('text'),
             'class': 'source_translation',
             'property': 'P73',
             'multiple': True},
@@ -20,12 +24,12 @@ model = {
             'property': 'P67',
             'multiple': True},
         'information_carrier': {
+            'label': _('information carrier'),
             'class': 'artifact',
             'property': 'P128',
             'inverse': True,
             'multiple': True,
             'mode': 'direct',
-            'label': _('information carrier'),
             'tooltip': _(
                 'Link artifacts as the information carrier of the source')},
         'event': {
@@ -41,14 +45,16 @@ model = {
             'property': 'P67',
             'inverse': True,
             'multiple': True},
-        'file': {
+        'document': {
+            'label': _('file'),
             'class': class_groups['file'],
             'property': 'P67',
             'inverse': True,
             'multiple': True}},
     'display': {
         'buttons': ['copy'],
-        'form': {'insert_and_continue': True},
+        'form': {
+            'insert_and_continue': True},
         'tabs': {
             'text': {},
             'actor': {
@@ -66,5 +72,6 @@ model = {
             'reference': {
                 'additional_columns': ['page', 'update', 'remove'],
                 'mode': 'link'},
-            'file': {'additional_columns': ['main image', 'remove']},
+            'file': {
+                'additional_columns': ['main image', 'remove']},
             'note': {}}}}

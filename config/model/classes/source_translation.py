@@ -2,8 +2,11 @@ from flask_babel import lazy_gettext as _
 
 model = {
     'attributes': {
-        'name': {'required': True},
-        'description': {'label': _('content'), 'annotated': True}},
+        'name': {
+            'required': True},
+        'description': {
+            'label': _('content'),
+            'annotated': True}},
     'relations': {
         'source': {
             'class': 'source',
@@ -12,6 +15,7 @@ model = {
             'required': True,
             'mode': 'direct'}},
     'display': {
-        'form': {'insert_and_continue': True},
+        'form': {
+            'insert_and_continue': True},
         'tabs': {
             'note': {}}}}

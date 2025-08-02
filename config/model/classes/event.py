@@ -6,7 +6,8 @@ from config.model.class_groups import class_groups
 
 model = {
     'attributes': {
-        'name': {'required': True},
+        'name': {
+            'required': True},
         'description': {},
         'date': {}},
     'relations': {
@@ -48,7 +49,8 @@ model = {
         'form': {'insert_and_continue': True},
         'tabs': {
             'subs': {},
-            'source': {'additional_columns': ['remove']},
+            'source': {
+                'additional_columns': ['remove']},
             'actor': {
                 'mode': 'link',
                 'columns': [
@@ -57,7 +59,8 @@ model = {
             'reference': {
                 'mode': 'link',
                 'additional_columns': ['page', 'update', 'remove']},
-            'file': {'additional_columns': ['main image', 'remove']},
+            'file': {
+                'additional_columns': ['main image', 'remove']},
             'note': {}}}}
 
 additional_relations = {
