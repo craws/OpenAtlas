@@ -132,10 +132,6 @@ class BaseManager:
 
 
 class ActorBaseManager(BaseManager):
-    fields = ['name', 'alias', 'date', 'description', 'continue']
-    _('begins in')
-    _('ends in')
-
     def additional_fields(self) -> dict[str, Any]:
         residence = None
         begins_in = None
@@ -165,9 +161,6 @@ class ActorBaseManager(BaseManager):
                 self.table_items['place'],
                 ends_in,
                 add_dynamic=['place'])}
-
-    def populate_insert(self) -> None:
-        self.form.alias.append_entry('')
 
     def process_form(self) -> None:
         super().process_form()

@@ -166,6 +166,7 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
                 TableField(
                     items,
                     selection,
+                    label=relation['label'],
                     description=relation['tooltip'],
                     validators=validators))
 

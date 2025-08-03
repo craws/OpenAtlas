@@ -1,7 +1,49 @@
+import time
 from typing import Any
+
+from flask import g
 
 from openatlas.display.util2 import format_date_part
 from openatlas.models.entity import Entity, Link
+
+
+def populate_insert(form: Any, entity: Entity) -> None:
+    if hasattr(form, 'alias'):
+        form.alias.append_entry('')
+
+
+def populate_update(form: Any, entity: Entity) -> None:
+    form.opened.data = time.time()  # Todo: what if POST because of not valid?
+    # Todo: deal with link types
+    # types: dict[Any, Any] = manager.link_.types \
+    #    if manager.link_ else manager.entity.types
+    # Todo: deal with place types
+    # if manager.entity and manager.entity.class_.name == 'place':
+    #     if location := \
+    #             manager.entity.get_linked_entity_safe('P53', types=True):
+    #        types |= location.types  # Admin. units and historical places
+    # Todo: implement copy
+    # if entity.id and not copy:
+    #     form.entity_id.data = entity.id
+    populate_reference_systems(form, entity)
+    if 'date' in entity.class_.attributes:
+        populate_dates(form, entity)
+    #if hasattr(self.form, 'alias'):
+    #    for alias in self.entity.aliases.values():
+    #        self.form.alias.append_entry(alias)
+    #    self.form.alias.append_entry('')
+
+    type_data: dict[int, list[int]] = {}
+    for type_, value in entity.types.items():
+        root = g.types[type_.root[0]] if type_.root else type
+        if root.id not in type_data:
+            type_data[root.id] = []
+        type_data[root.id].append(type_.id)
+        if root.category == 'value':
+            getattr(form, str(type_.id)).data = value
+    for root_id, types_ in type_data.items():
+        if hasattr(form, str(root_id)):
+            getattr(form, str(root_id)).data = types_
 
 
 def populate_reference_systems(form: Any, entity: Entity) -> None:

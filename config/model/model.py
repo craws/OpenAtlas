@@ -1,6 +1,6 @@
 from typing import Any
 
-from config.model.classes import event, source
+from config.model.classes import actor, event, source
 
 model: dict[str, Any] = {
     'acquisition': event.acquisition,
@@ -42,9 +42,7 @@ model: dict[str, Any] = {
     'move': event.move,
     'object_location': {
         'attributes': {}},
-    'person': {
-        'attributes': {},
-        'display': {'buttons': ['network']}},
+    'person': actor.person,
     'place': {
         'attributes': {},
         'display': {'buttons': ['network']}},

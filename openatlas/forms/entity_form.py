@@ -1,4 +1,4 @@
-import time
+
 from typing import Any, Optional
 
 from flask import g, request
@@ -8,7 +8,7 @@ from wtforms import HiddenField
 from openatlas.forms.add_fields import (
     add_buttons, add_date_fields, add_description, add_name_fields,
     add_reference_systems, add_relations, add_types)
-from openatlas.forms.populate import populate_dates, populate_reference_systems
+from openatlas.forms.populate import populate_insert, populate_update
 from openatlas.forms.process import process_date
 from openatlas.forms.util import convert
 from openatlas.forms.validation import validate
@@ -30,8 +30,8 @@ def get_entity_form(entity: Entity, origin: Optional[Entity] = None) -> Any:
     form: Any = Form(obj=entity)
     if request.method == 'GET' and entity.id:
         populate_update(form, entity)
-    # elif request.method == 'GET' and entity.id:
-    #    populate_insert(form, entity, origin, date)
+    elif request.method == 'GET' and entity.id:
+        populate_insert(form, entity)
     return form
 
 
@@ -131,37 +131,3 @@ def delete_links(entity: Entity) -> None:
                 relation['property'],
                 relation['class'],
                 relation['inverse'])
-
-
-def populate_update(form: Any, entity: Entity) -> None:
-    form.opened.data = time.time()  # Todo: what if POST because of not valid?
-    # Todo: deal with link types
-    # types: dict[Any, Any] = manager.link_.types \
-    #    if manager.link_ else manager.entity.types
-    # Todo: deal with place types
-    # if manager.entity and manager.entity.class_.name == 'place':
-    #     if location := \
-    #             manager.entity.get_linked_entity_safe('P53', types=True):
-    #        types |= location.types  # Admin. units and historical places
-    # Todo: implement copy
-    # if entity.id and not copy:
-    #     form.entity_id.data = entity.id
-    populate_reference_systems(form, entity)
-    if 'date' in entity.class_.attributes:
-        populate_dates(form, entity)
-    #if hasattr(self.form, 'alias'):
-    #    for alias in self.entity.aliases.values():
-    #        self.form.alias.append_entry(alias)
-    #    self.form.alias.append_entry('')
-
-    type_data: dict[int, list[int]] = {}
-    for type_, value in entity.types.items():
-        root = g.types[type_.root[0]] if type_.root else type
-        if root.id not in type_data:
-            type_data[root.id] = []
-        type_data[root.id].append(type_.id)
-        if root.category == 'value':
-            getattr(form, str(type_.id)).data = value
-    for root_id, types_ in type_data.items():
-        if hasattr(form, str(root_id)):
-            getattr(form, str(root_id)).data = types_

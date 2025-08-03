@@ -330,12 +330,6 @@ class InvolvementManager(BaseManager):
         self.link_.property = g.properties[self.form.activity.data]
 
 
-class PersonManager(ActorBaseManager):
-    def customize_labels(self) -> None:
-        self.form.begins_in.label.text = _('born in')
-        self.form.ends_in.label.text = _('died in')
-
-
 class PlaceManager(PlaceBaseManager):
     fields = ['name', 'alias', 'date', 'description', 'continue', 'map']
 

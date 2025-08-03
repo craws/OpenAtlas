@@ -12,24 +12,29 @@ model = {
         'date': {}},
     'relations': {
         'actor': {
+            'label': _('actor'),
             'class': class_groups['actor'],
             'property': ['P11', 'P14', 'P22', 'P23'],
             'multiple': True},
         'subs': {
+            'label': _('subs'),
             'class': class_groups['event'],
             'property': 'P9',
             'multiple': True},
         'source': {
+            'label': _('source'),
             'class': 'source',
             'property': 'P67',
             'inverse': True,
             'multiple': True},
         'file': {
+            'label': _('file'),
             'class': class_groups['file'],
             'property': 'P67',
             'inverse': True,
             'multiple': True},
         'reference': {
+            'label': _('reference'),
             'class': class_groups['reference'],
             'property': 'P67',
             'inverse': True,
