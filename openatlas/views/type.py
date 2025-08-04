@@ -122,7 +122,7 @@ def type_delete_recursive(id_: int) -> str | Response:
         tabs['subs'].table.rows.append([link(sub), sub.count, sub.description])
     if root_name in app.config['PROPERTY_TYPES']:
         for row in Link.get_links_by_type_recursive(type_, []):
-            tabs['entities'].table.header = [_('domain'), _('range')]
+            tabs['entities'].table.columns = [_('domain'), _('range')]
             tabs['entities'].table.rows.append([
                 link(Entity.get_by_id(row['domain_id'])),
                 link(Entity.get_by_id(row['range_id']))])

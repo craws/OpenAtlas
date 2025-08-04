@@ -55,7 +55,7 @@ class OpenatlasClass:
         self.standard_type_id = standard_type_id
         self.network_color = color
         self.write_access = write_access or 'contributor'
-        self.view = None
+        self.group = None
         self.alias_allowed = alias_allowed
         self.reference_system_allowed = reference_system_allowed
         self.reference_systems = reference_system_ids
@@ -63,7 +63,7 @@ class OpenatlasClass:
         self.icon = icon
         for item, classes in class_groups.items():
             if name in classes:
-                self.view = item
+                self.group = item
         self.attributes = attributes
         self.relations = relations
         self.display = display
@@ -80,38 +80,6 @@ class OpenatlasClass:
         if self.cidoc_class.code in tooltips:
             return tooltips[self.cidoc_class.code]
         return None
-
-
-def get_table_columns() -> dict[str, list[str]]:
-    columns = {
-        'actor': ['name', 'class', 'begin', 'end', 'description'],
-        'artifact': [
-            'name', 'class', 'type', 'begin', 'end', 'description'],
-        'entities': ['name', 'class', 'info'],
-        'event': ['name', 'class', 'type', 'begin', 'end', 'description'],
-        'external_reference': ['name', 'class', 'type', 'description'],
-        'file': [
-            'name', 'license', 'public', 'creator', 'license holder',
-            'size', 'extension', 'description'],
-        'member': ['member', 'function', 'first', 'last', 'description'],
-        'member_of': [
-            'member of', 'function', 'first', 'last', 'description'],
-        'note': ['date', 'visibility', 'user', 'note'],
-        'place': ['name', 'class', 'type', 'begin', 'end', 'description'],
-        'relation': ['relation', 'actor', 'first', 'last', 'description'],
-        'reference': ['name', 'class', 'type', 'description'],
-        'reference_system': [
-            'name', 'count', 'website URL', 'resolver URL', 'example ID',
-            'default precision', 'description'],
-        'source': ['name', 'type', 'content'],
-        'source_translation': ['name', 'type', 'content'],
-        'subs': ['name', 'count', 'info'],
-        'text': ['text', 'type', 'content'],
-        'type': ['name', 'description']}
-    for view in ['actor', 'artifact', 'event', 'place']:
-        for class_ in class_groups[view]:
-            columns[class_] = columns[view]
-    return columns
 
 
 def get_class_count() -> dict[str, int]:

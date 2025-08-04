@@ -22,12 +22,12 @@ class Table:
 
     def __init__(
             self,
-            header: Optional[list[str]] = None,
+            columns: Optional[list[str]] = None,
             rows: Optional[list[Any]] = None,
             order: Optional[list[list[int | str]]] = None,
             defs: Optional[list[dict[str, Any]]] = None,
             paging: bool = True) -> None:
-        self.header = header or []
+        self.columns = columns or []
         self.rows = rows or []
         self.paging = paging
         self.order = order or ''
@@ -45,9 +45,9 @@ class Table:
                     not in ['update', 'remove'] else '',
                 'className':
                     'dt-body-right' if name in ['count', 'size'] else ''}
-                    for name in self.header] + [
+                    for name in self.columns] + [
                     {'title': '', 'className': ''} for _item in
-                    range(len(self.rows[0]) - len(self.header))],
+                    range(len(self.rows[0]) - len(self.columns))],
             'paging': self.paging,
             'pageLength': current_user.settings['table_rows'],
             'autoWidth': 'false'}
@@ -73,11 +73,11 @@ def entity_table(
         return None
     if not columns:
         if isinstance(items[0], Entity):
-            columns = g.table_columns[items[0].class_.view]
+            columns = items[0].class_.group['table_headers']
         elif inverse:
-            columns = g.table_columns[items[0].domain.class_.view]
+            columns = items[0].domain.class_.group['table_headers']
         else:
-            columns = g.table_columns[items[0].range.class_.view]
+            columns = items[0].range.class_.class_.group['table_headers']
     columns += additional_columns if additional_columns else []
     table = Table(columns)
     for item in items:

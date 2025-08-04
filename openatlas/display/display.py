@@ -71,7 +71,7 @@ class Display:
         return {key: data[key] for key in sorted(data.keys())}
 
     def add_file_tab_thumbnails(self) -> None:
-        self.tabs['file'].table.header.insert(1, _('icon'))
+        self.tabs['file'].table.columns.insert(1, _('icon'))
         for row in self.tabs['file'].table.rows:
             id_ = int(row[0].replace('<a href="/entity/', '').split('"')[0])
             row.insert(1, file_preview(id_))

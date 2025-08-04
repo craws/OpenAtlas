@@ -19,7 +19,8 @@ from openatlas.display.table import entity_table
 @required_group('readonly')
 def index(view: str) -> str | Response:
     buttons = [manual(f'entity/{view}')]
-    for name in g.view_class_mapping[view] if view != 'place' else ['place']:
+    for name in g.view_class_mapping[view]['classes'] \
+            if view != 'place' else ['place']:
         if is_authorized(g.classes[name].write_access):
             buttons.append(
                 button(
@@ -43,44 +44,47 @@ def index(view: str) -> str | Response:
 
 def get_table(view: str) -> tuple[Table, str]:
     file_info = ''
-    table = Table(g.table_columns[view])
-    if view == 'file':
-        stats = {'public': 0, 'without_license': 0, 'without_creator': 0}
-        table.order = [[0, 'desc']]
-        table.header = ['date'] + table.header
-        if show_table_icons():
-            table.header.insert(1, _('icon'))
-        for entity in Entity.get_by_class('file', types=True):
-            if entity.public:
-                stats['public'] += 1
-                if not entity.standard_type:
-                    stats['without_license'] += 1
-                elif not entity.creator:
-                    stats['without_creator'] += 1
-            data = [
-                format_date(entity.created),
-                link(entity),
-                link(entity.standard_type),
-                _('yes') if entity.public else None,
-                entity.creator,
-                entity.license_holder,
-                entity.get_file_size(),
-                entity.get_file_ext(),
-                entity.description]
-            if show_table_icons():
-                data.insert(
-                    1,
-                    f'<a href="{url_for("view", id_=entity.id)}">'
-                    f'{file_preview(entity.id)}</a>')
-            table.rows.append(data)
-        file_info = (
-            uc_first(_('files')) + ': ' +
-            f"{format_number(stats['public'])} " + _('public') +
-            f", {format_number(stats['without_license'])} " +
-            _('public without license') +
-            f", {format_number(stats['without_creator'])} " +
-            _('public with license but without creator'))
-    elif view == 'reference_system':
+    # table = Table(g.table_columns[view])
+    # if view == 'file':
+    #     stats = {'public': 0, 'without_license': 0, 'without_creator': 0}
+    #     table.order = [[0, 'desc']]
+    #     table.header = ['date'] + table.header
+    #     if show_table_icons():
+    #         table.header.insert(1, _('icon'))
+    #     for entity in Entity.get_by_class('file', types=True):
+    #         if entity.public:
+    #             stats['public'] += 1
+    #             if not entity.standard_type:
+    #                 stats['without_license'] += 1
+    #             elif not entity.creator:
+    #                 stats['without_creator'] += 1
+    #         data = [
+    #             format_date(entity.created),
+    #             link(entity),
+    #             link(entity.standard_type),
+    #             _('yes') if entity.public else None,
+    #             entity.creator,
+    #             entity.license_holder,
+    #             entity.get_file_size(),
+    #             entity.get_file_ext(),
+    #             entity.description]
+    #         if show_table_icons():
+    #             data.insert(
+    #                 1,
+    #                 f'<a href="{url_for("view", id_=entity.id)}">'
+    #                 f'{file_preview(entity.id)}</a>')
+    #         table.rows.append(data)
+    #     file_info = (
+    #         uc_first(_('files')) + ': ' +
+    #         f"{format_number(stats['public'])} " + _('public') +
+    #         f", {format_number(stats['without_license'])} " +
+    #         _('public without license') +
+    #         f", {format_number(stats['without_creator'])} " +
+    #         _('public with license but without creator'))
+    if view == 'reference_system':
+        table = Table([
+             'name', 'count', 'website URL', 'resolver URL', 'example ID',
+             'default precision', 'description'])
         counts = ReferenceSystem.get_counts()
         for system in g.reference_systems.values():
             table.rows.append([
@@ -95,7 +99,8 @@ def get_table(view: str) -> tuple[Table, str]:
     else:
         table = entity_table(
             Entity.get_by_class(
-                'place' if view == 'place' else g.view_class_mapping[view],
+                'place' if view == 'place'
+                else g.view_class_mapping[view]['classes'],
                 types=True,
                 aliases=True))
     return table, file_info

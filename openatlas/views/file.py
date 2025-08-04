@@ -208,7 +208,10 @@ def logo(id_: Optional[int] = None) -> str | Response:
     if id_:
         Settings.set_logo(id_)
         return redirect(url_for('file_index'))
-    table = Table([''] + g.table_columns['file'] + ['date'])
+    entities = Entity.get_display_files()
+    table = Table(
+        [''] + entities[0].class_.group['table_headers']
+        if entities else [] + ['date'])
     for entity in Entity.get_display_files():
         date = 'N/A'
         if entity.id in g.files:

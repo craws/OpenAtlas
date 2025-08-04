@@ -168,7 +168,7 @@ def get_user_table(users: list[User]) -> Table:
         'last login', 'entities'],
         defs=[{'className': 'dt-body-right', 'targets': 7}])
     if is_authorized('manager'):
-        table.header.append(_('info'))
+        table.columns.append(_('info'))
     for user in users:
         user_entities = ''
         if count := User.get_created_entities_count(user.id):

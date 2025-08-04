@@ -180,9 +180,8 @@ class TableMultiField(HiddenField):
 
 def table_multi(entities: list[Entity], selection: list[Entity]) -> Table:
     selection_ids = [e.id for e in selection] if selection else []
-    view = entities[0].class_.view if entities else 'place'
     table_ = Table(
-        [''] + g.table_columns[view],
+        [''] + entities[0].class_.group['table_headers'] if entities else [],
         order=[[0, 'desc'], [1, 'asc']],
         defs=[{'orderDataType': 'dom-checkbox', 'targets': 0}])
     for e in entities:
