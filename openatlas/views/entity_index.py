@@ -14,6 +14,7 @@ from openatlas.models.gis import Gis
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.display.table import entity_table
 
+
 @app.route('/index/<view>')
 @required_group('readonly')
 def index(view: str) -> str | Response:
@@ -42,7 +43,7 @@ def index(view: str) -> str | Response:
 
 def get_table(view: str) -> tuple[Table, str]:
     file_info = ''
-    table = Table(g.table_headers[view])
+    table = Table(g.table_columns[view])
     if view == 'file':
         stats = {'public': 0, 'without_license': 0, 'without_creator': 0}
         table.order = [[0, 'desc']]
@@ -92,10 +93,11 @@ def get_table(view: str) -> tuple[Table, str]:
                 if system.precision_default_id else '',
                 system.description])
     else:
-        classes = 'place' if view == 'place' else g.view_class_mapping[view]
         table = entity_table(
-            view,
-            Entity.get_by_class(classes, types=True, aliases=True))
+            Entity.get_by_class(
+                'place' if view == 'place' else g.view_class_mapping[view],
+                types=True,
+                aliases=True))
     return table, file_info
 
 

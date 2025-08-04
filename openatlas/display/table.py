@@ -63,17 +63,24 @@ class Table:
 
 
 def entity_table(
-        class_: str,
-        entities: list[Entity] | list[Link],
+        items: list[Entity] | list[Link],
         entity_viewed: Optional[Entity] = None,
         columns: Optional[list[str]] = None,
         additional_columns: Optional[list[str]] = None,
         inverse: Optional[bool] = False,
-        table_field_id: Optional[str] = None) -> Table:
-    columns = columns or g.table_headers[g.classes[class_].view]
+        table_field_id: Optional[str] = None) -> Table | None:
+    if not items:
+        return None
+    if not columns:
+        if isinstance(items[0], Entity):
+            columns = g.table_columns[items[0].class_.view]
+        elif inverse:
+            columns = g.table_columns[items[0].domain.class_.view]
+        else:
+            columns = g.table_columns[items[0].range.class_.view]
     columns += additional_columns if additional_columns else []
     table = Table(columns)
-    for item in entities:
+    for item in items:
         e = item
         range_ = None
         if isinstance(item, Link):

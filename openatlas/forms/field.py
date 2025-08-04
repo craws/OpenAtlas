@@ -182,7 +182,7 @@ def table_multi(entities: list[Entity], selection: list[Entity]) -> Table:
     selection_ids = [e.id for e in selection] if selection else []
     view = entities[0].class_.view if entities else 'place'
     table_ = Table(
-        [''] + g.table_headers[view],
+        [''] + g.table_columns[view],
         order=[[0, 'desc'], [1, 'asc']],
         defs=[{'orderDataType': 'dom-checkbox', 'targets': 0}])
     for e in entities:
@@ -262,10 +262,7 @@ class TableSelect(HiddenInput):
         if field.id == 'entity':
             field.table = table_annotation(field.entities)
         else:
-            field.table = entity_table(
-                field.entities[0].class_.name,
-                field.entities,
-                table_field_id=field.id)
+            field.table = entity_table(field.entities, table_field_id=field.id)
         return super().__call__(field, **kwargs) + Markup(
             render_template('forms/table_select.html', field=field))
 

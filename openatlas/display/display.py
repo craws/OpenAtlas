@@ -154,9 +154,6 @@ class Display:
                 self.tabs[name] = Tab(
                     name,
                     table=entity_table(
-                        relation['class'][0]
-                        if isinstance(relation['class'], list)
-                        else relation['class'],
                         items,
                         self.entity,
                         tab['columns'],

@@ -17,7 +17,7 @@ from openatlas.database.connect import close_connection, open_connection
 from openatlas.database.token import check_token_revoked
 from openatlas.database.user import admins_available
 from openatlas.models.openatlas_class import (
-    get_class_view_mapping, get_classes, get_table_headers)
+    get_class_view_mapping, get_classes, get_table_columns)
 
 app: Flask = Flask(__name__, instance_relative_config=True)
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
@@ -79,7 +79,7 @@ def before_request() -> Response | None:
     g.properties = CidocProperty.get_all(
         session['language'],
         (request.path.startswith('/overview/model/property')))
-    g.table_headers = get_table_headers()
+    g.table_columns = get_table_columns()
     g.classes = get_classes()
     g.types = Entity.get_all_types(count_type())
     g.radiocarbon_type = Entity.get_hierarchy('Radiocarbon')

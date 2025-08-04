@@ -82,8 +82,8 @@ class OpenatlasClass:
         return None
 
 
-def get_table_headers() -> dict[str, list[str]]:
-    headers = {
+def get_table_columns() -> dict[str, list[str]]:
+    columns = {
         'actor': ['name', 'class', 'begin', 'end', 'description'],
         'artifact': [
             'name', 'class', 'type', 'begin', 'end', 'description'],
@@ -110,8 +110,8 @@ def get_table_headers() -> dict[str, list[str]]:
         'type': ['name', 'description']}
     for view in ['actor', 'artifact', 'event', 'place']:
         for class_ in class_groups[view]:
-            headers[class_] = headers[view]
-    return headers
+            columns[class_] = columns[view]
+    return columns
 
 
 def get_class_count() -> dict[str, int]:

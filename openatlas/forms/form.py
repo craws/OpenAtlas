@@ -81,7 +81,7 @@ def get_annotation_image_form(
 
 def get_table_form(classes: list[str], excluded: list[int]) -> str:
     entities = Entity.get_by_class(classes, types=True, aliases=True)
-    table = Table([''] + g.table_headers[classes[0]], order=[[2, 'asc']])
+    table = Table([''] + g.table_columns[classes[0]], order=[[2, 'asc']])
     if classes[0] == 'file' and show_table_icons():
         table.header.insert(1, _('icon'))
     for entity in entities:
