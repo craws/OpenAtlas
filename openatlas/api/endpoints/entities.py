@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 from flask import Response, g
 from flask_restful import Resource, marshal
@@ -155,15 +155,17 @@ class GetQuery(Resource):
 class GetSearchEntities(Resource):
     @staticmethod
     def get(
-            term: str,
-            class_: str) -> tuple[Resource, int] | Response | dict[str, Any]:
+            class_: str,
+            term: Optional[str] = "") -> tuple[Resource, int] | Response | dict[str, Any]:
         classes = list(g.classes) if 'all' in class_ else [class_]
         classes = [class_ for class_ in classes if class_ != 'type_tools']
         if not all(sc in g.classes for sc in classes):
             raise InvalidSystemClassError
         simple_search = get_api_simple_search(term, classes)
-        search = get_api_search(term, classes + ['appellation'])
-        data = join_lists_of_dicts_remove_duplicates(simple_search, search)
+        data = simple_search
+        if term:
+            search = get_api_search(term, classes + ['appellation'])
+            data = join_lists_of_dicts_remove_duplicates(simple_search, search)
         entities = []
         for row in data:
             if row['openatlas_class_name'] == 'appellation':

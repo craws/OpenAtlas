@@ -59,6 +59,7 @@ special = [
     [ExportDatabase, '/export_database/<string:format_>', 'export_database'],
     [GetGeometricEntities, '/geometric_entities/', 'geometric_entities'],
     [GetSubunits, '/subunits/<int:id_>', 'subunits'],
+    [GetSearchEntities, '/search/<string:class_>', 'search_no_term'],
     [GetSearchEntities, '/search/<string:class_>/<string:term>', 'search'],
     [GetNetworkVisualisation,
      '/network_visualisation/',
