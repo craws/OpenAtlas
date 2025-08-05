@@ -583,6 +583,73 @@ def orphans() -> str:
             _('orphans')])
 
 
+@app.route('/check_files')
+@required_group('contributor')
+def check_files() -> str:
+    # Todo:
+    #   - No Creator
+    #   - No license holder
+    #   - Not public
+    #   - No license
+    #   - No files
+    #   - Duplicated Files
+    header = [
+        'name',
+        'type',
+        'system type',
+        'created',
+        'updated',
+        'description']
+    tabs = {
+        'no_creator': Tab('no_creator', _('no creator'), table=Table(header)),
+        'no_license_holder': Tab('no_license_holder', _('no license holder'), table=Table(header)),
+        'not_public': Tab('not_public', _('not public'),table=Table(header)),
+        'no_license': Tab('no_license',_('no license'),table=Table(header)),
+        'missing_files': Tab(
+            'missing_files',
+            _('missing files'),
+            table=Table(header)),
+        'duplicated_files': Tab(
+            'duplicated_files',
+            _('duplicated files'),
+            table=Table(header))}
+
+    for tab in tabs.values():
+        tab.buttons = [manual('admin/data_integrity_checks')]
+
+    entity_file_ids = set()
+    for entity in Entity.get_by_class('file', types=True):
+        entity_file_ids.add(entity.id)
+        entity_for_table = [
+                link(entity),
+                link(entity.standard_type),
+                entity.class_.label,
+                format_date(entity.created),
+                format_date(entity.modified),
+                entity.description]
+        if not get_file_path(entity):
+            tabs['missing_files'].table.rows.append(entity_for_table)
+        if not entity.public:
+            tabs['not_public'].table.rows.append(entity_for_table)
+        if not entity.creator:
+            tabs['no_creator'].table.rows.append(entity_for_table)
+        if not entity.license_holder:
+            tabs['no_license_holder'].table.rows.append(entity_for_table)
+        if not entity.standard_type:
+            tabs['no_license'].table.rows.append(entity_for_table)
+
+    # duplicated_files = find_duplicates(entity_file_ids)
+
+
+    return render_template(
+        'tabs.html',
+        tabs=tabs,
+        title=_('admin'),
+        crumbs=[
+            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            _('orphans')])
+
+
 @app.route('/admin/file/delete/<filename>')
 @required_group('editor')
 def admin_file_delete(filename: str) -> Response:

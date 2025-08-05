@@ -6,6 +6,7 @@
   <div class="col-auto">{{ _('similar names')|button(url_for('check_similar'))|safe }}</div>
   <div class="col-auto">{{ _('links')|button(url_for('check_links'))|safe }}</div>
   <div class="col-auto">{{ _('link duplicates')|button(url_for('check_link_duplicates'))|safe }}</div>
+  <div class="col-auto">{{ _('check files')|button(url_for('check_files'))|safe }}</div>
 </div>
 {% if 'manager'|is_authorized or imports %}
   <h1 class="mb-1">{{ _('data transfer')|uc_first }}</h1>

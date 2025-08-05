@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import hashlib
 import os
 import shutil
@@ -287,36 +289,6 @@ def hash_file(path: Path, chunk_size: int = 8192) -> str:
     return sha256.hexdigest()
 
 
-def find_duplicates(entity_ids: set[int]) -> dict[str, set[tuple[int, str]]]:
-    size_map = defaultdict(list)
-    for file_id, path in g.files.items():
-        if file_id not in entity_ids:
-            continue
-        size = path.stat().st_size
-        size_map[size].append((file_id, path))
-
-    duplicates = set()
-    for files in size_map.values():
-        if len(files) < 2:
-            continue  # Only one file of this size — skip
-        hash_map = {}
-        for file_id, path in files:
-            try:
-                file_hash = hash_file(path)
-            except Exception as e:
-                g.logger.log(
-                    'info',
-                    'hashing',
-                    f'failed to hash filer{file_id}: {e}')
-                continue
-            if file_hash in hash_map:
-                original_id = hash_map[file_hash]
-                duplicates.add((file_id, f'is duplicate of {original_id}'))
-            else:
-                hash_map[file_hash] = file_id
-    return {'Duplicates': duplicates}
-
-
 def check_files_for_arche(
         entities: list[Entity]) -> dict[str, set[tuple[int, str]]]:
     missing = defaultdict(set)
@@ -335,7 +307,9 @@ def check_files_for_arche(
             missing['No creator'].add((entity.id, entity.name))
         if not entity.license_holder:
             missing['No license holder'].add((entity.id, entity.name))
-    missing.update(find_duplicates(entity_ids))
+    for duplicate in find_duplicates(entity_ids):
+        missing['Duplicates'].add(
+            (duplicate[0], f'is duplicate of {duplicate[1]}'))
     return dict(missing)
 
 
@@ -384,3 +358,33 @@ def get_arche_metadata(
     for metadata_obj in arche_metadata_list:
         add_arche_file_metadata_to_graph(graph, metadata_obj)
     return graph.serialize(format="turtle")
+
+
+def find_duplicates(entity_ids: set[int]) -> set[tuple[int, int]]:
+    size_map = defaultdict(list)
+    for file_id, path in g.files.items():
+        if file_id not in entity_ids:
+            continue
+        size = path.stat().st_size
+        size_map[size].append((file_id, path))
+
+    duplicates = set()
+    for files in size_map.values():
+        if len(files) < 2:
+            continue  # Only one file of this size — skip
+        hash_map = {}
+        for file_id, path in files:
+            try:
+                file_hash = hash_file(path)
+            except Exception as e:
+                g.logger.log(
+                    'info',
+                    'hashing',
+                    f'failed to hash filer{file_id}: {e}')
+                continue
+            if file_hash in hash_map:
+                original_id = hash_map[file_hash]
+                duplicates.add((file_id, original_id))
+            else:
+                hash_map[file_hash] = file_id
+    return duplicates
