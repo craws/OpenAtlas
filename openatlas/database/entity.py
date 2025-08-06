@@ -272,7 +272,9 @@ def search(
     return list(g.cursor)
 
 
-def api_search(term: str, classes: list[str]) -> list[dict[str, Any]]:
+def api_search(
+        classes: list[str],
+        term: Optional[str]) -> list[dict[str, Any]]:
     g.cursor.execute(
         select_sql() +
         """
