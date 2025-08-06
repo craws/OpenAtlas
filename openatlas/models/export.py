@@ -168,7 +168,7 @@ def arche_export() -> bool:
             infos = archive.infolist()
             total_size = os.path.getsize(archive_file)
             total_files = sum(1 for i in infos if not i.filename.endswith('/'))
-            all_dirs = set()
+            all_dirs: set[PurePosixPath] = set()
             for info in infos:
                 path = PurePosixPath(info.filename)
                 all_dirs.update(path.parents)
@@ -372,7 +372,7 @@ def find_duplicates(entity_ids: set[int]) -> set[tuple[int, int]]:
     for files in size_map.values():
         if len(files) < 2:
             continue  # Only one file of this size — skip
-        hash_map = {}
+        hash_map: dict[str, int] = {}
         for file_id, path in files:
             try:
                 file_hash = hash_file(path)

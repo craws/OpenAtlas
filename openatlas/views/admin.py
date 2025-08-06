@@ -43,6 +43,7 @@ from openatlas.models.checks import (
     single_type_duplicates)
 from openatlas.models.content import get_content, update_content
 from openatlas.models.entity import Entity, Link
+from openatlas.models.export import find_duplicates
 from openatlas.models.imports import Project
 from openatlas.models.settings import Settings
 from openatlas.models.type import Type
@@ -85,7 +86,7 @@ def admin_index() -> str:
             'modules',
             _('modules'),
             content='<h1>' + uc_first(_('defaults for new user')) + '</h1>'
-            + display_info(get_form_settings(ModulesForm())),
+                    + display_info(get_form_settings(ModulesForm())),
             buttons=[
                 manual('admin/modules'),
                 button(_('edit'), url_for('settings', category='modules'))])
@@ -181,7 +182,7 @@ def get_user_table(users: list[User]) -> Table:
             user.real_name,
             user.group,
             user.email if is_authorized('manager')
-            or user.settings['show_email'] else '',
+                          or user.settings['show_email'] else '',
             _('yes') if user.settings['newsletter'] else '',
             format_date(user.created),
             format_date(user.login_last_success),
@@ -477,13 +478,7 @@ def check_dates() -> str:
 @required_group('contributor')
 def orphans() -> str:
     header = [
-        'name',
-        'class',
-        'type',
-        'system type',
-        'created',
-        'updated',
-        'description']
+        'name', 'class', 'type', 'created', 'updated', 'description']
     tabs = {
         'orphans': Tab('orphans', _('orphans'), table=Table(header)),
         'unlinked': Tab('unlinked', _('unlinked'), table=Table(header)),
@@ -535,13 +530,13 @@ def orphans() -> str:
         tabs[
             'unlinked'
             if entity.class_.view else 'orphans'].table.rows.append([
-                link(entity),
-                link(entity.class_),
-                link(entity.standard_type),
-                entity.class_.label,
-                format_date(entity.created),
-                format_date(entity.modified),
-                entity.description])
+            link(entity),
+            link(entity.class_),
+            link(entity.standard_type),
+            entity.class_.label,
+            format_date(entity.created),
+            format_date(entity.modified),
+            entity.description])
 
     entity_file_ids = []
     for entity in Entity.get_by_class('file', types=True):
@@ -586,13 +581,6 @@ def orphans() -> str:
 @app.route('/check_files')
 @required_group('contributor')
 def check_files() -> str:
-    # Todo:
-    #   - No Creator
-    #   - No license holder
-    #   - Not public
-    #   - No license
-    #   - No files
-    #   - Duplicated Files
     header = [
         'name',
         'type',
@@ -602,9 +590,12 @@ def check_files() -> str:
         'description']
     tabs = {
         'no_creator': Tab('no_creator', _('no creator'), table=Table(header)),
-        'no_license_holder': Tab('no_license_holder', _('no license holder'), table=Table(header)),
-        'not_public': Tab('not_public', _('not public'),table=Table(header)),
-        'no_license': Tab('no_license',_('no license'),table=Table(header)),
+        'no_license_holder': Tab(
+            'no_license_holder',
+            _('no license holder'),
+            table=Table(header)),
+        'not_public': Tab('not_public', _('not public'), table=Table(header)),
+        'no_license': Tab('no_license', _('no license'), table=Table(header)),
         'missing_files': Tab(
             'missing_files',
             _('missing files'),
@@ -612,21 +603,20 @@ def check_files() -> str:
         'duplicated_files': Tab(
             'duplicated_files',
             _('duplicated files'),
-            table=Table(header))}
+            table=Table(['domain', 'range']))}
 
     for tab in tabs.values():
         tab.buttons = [manual('admin/data_integrity_checks')]
 
-    entity_file_ids = set()
+    entities: list[Entity] = Entity.get_by_class('file', types=True)
     for entity in Entity.get_by_class('file', types=True):
-        entity_file_ids.add(entity.id)
         entity_for_table = [
-                link(entity),
-                link(entity.standard_type),
-                entity.class_.label,
-                format_date(entity.created),
-                format_date(entity.modified),
-                entity.description]
+            link(entity),
+            link(entity.standard_type),
+            entity.class_.label,
+            format_date(entity.created),
+            format_date(entity.modified),
+            entity.description]
         if not get_file_path(entity):
             tabs['missing_files'].table.rows.append(entity_for_table)
         if not entity.public:
@@ -638,8 +628,17 @@ def check_files() -> str:
         if not entity.standard_type:
             tabs['no_license'].table.rows.append(entity_for_table)
 
-    # duplicated_files = find_duplicates(entity_file_ids)
-
+    duplicated_files = find_duplicates({e.id for e in entities})
+    all_duplicate_ids = set().union(*duplicated_files)
+    duplicate_entities = Entity.get_by_ids(list(all_duplicate_ids))
+    duplicate_entity_map = {e.id: e for e in duplicate_entities}
+    for duplicate_group in duplicated_files:
+        entity1 = duplicate_entity_map.get(duplicate_group[0])
+        entity2 = duplicate_entity_map.get(duplicate_group[1])
+        if entity1 and entity2:
+            tabs['duplicated_files'].table.rows.append([
+                link(entity1),
+                link(entity2)])
 
     return render_template(
         'tabs.html',
@@ -846,6 +845,7 @@ def admin_delete_orphaned_resized_images() -> Response:
 def get_disk_space_info() -> Optional[dict[str, Any]]:
     def upload_ident_with_iiif() -> bool:
         return app.config['UPLOAD_PATH'].resolve() == iiif_path.resolve()
+
     paths = {
         'export': {
             'path': app.config['EXPORT_PATH'], 'size': 0, 'mounted': False},
@@ -865,10 +865,10 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
             if not os.access(path['path'], os.W_OK):  # pragma: no cover
                 continue
             size = run(
-                    ['du', '-sb', path['path']],
-                    capture_output=True,
-                    text=True,
-                    check=True)
+                ['du', '-sb', path['path']],
+                capture_output=True,
+                text=True,
+                check=True)
             path['size'] = int(size.stdout.split()[0])
             mounted = run(
                 ['df', path['path']],
@@ -886,7 +886,7 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
         'project': math.ceil(files_size / (stats.total / 100)),
         'export': math.ceil(paths['export']['size'] / (files_size / 100)),
         'upload': math.ceil(paths['upload']['size'] / (files_size / 100)),
-        'iiif':  0}
+        'iiif': 0}
     if not upload_ident_with_iiif():
         percent['iiif'] = math.ceil(paths['iiif']['size'] / (files_size / 100))
     percent['processed'] = math.ceil(
