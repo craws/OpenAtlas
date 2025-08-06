@@ -43,7 +43,7 @@ class Tab:
             self,
             tab_name: str,
             entity: Optional[Entity] = None) -> None:
-        view = entity.class_.view if entity else None
+        view = entity.class_.group['name'] if entity else None
         id_ = entity.id if entity else None
         class_name = entity.class_.name if entity else None
         match tab_name:
@@ -74,7 +74,7 @@ class Tab:
                                 'insert_relation',
                                 type_='involvement',
                                 origin_id=id_)))
-                for item in g.view_class_mapping['actor']:
+                for item in g.class_groups['actor']['classes']:
                     self.buttons.append(
                         button(
                             g.classes[item].label,
@@ -242,7 +242,7 @@ class Tab:
             case 'reference':
                 self.buttons.append(
                     button('link', url_for('entity_add_reference', id_=id_)))
-                for item in g.view_class_mapping['reference']:
+                for item in g.class_groups['reference']['classes']:
                     self.buttons.append(
                         button(
                             g.classes[item].label,

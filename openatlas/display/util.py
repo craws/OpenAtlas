@@ -199,11 +199,11 @@ def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
 
 @app.template_filter()
 def menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
-    view_name = ''
-    if entity:
-        view_name = entity.class_.view
+    group = ''
+    if entity.id:
+        group = entity.class_.group['name']
     if origin:
-        view_name = origin.class_.view
+        group = origin.class_.group['name']
     html = ''
     for item, label in {
             'source': _('source'),
@@ -216,7 +216,7 @@ def menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
             'file': _('file')}.items():
         active = ''
         request_parts = request.path.split('/')
-        if view_name == item \
+        if group == item \
                 or request.path.startswith(f'/{item}') \
                 or request.path.startswith(f'/index/{item}'):
             active = 'active'
@@ -470,11 +470,11 @@ def link(
         html = f'<a href="{url}"{class_}{js}{ext}>{object_}</a>'
     elif isinstance(object_, Entity) and index:
         html = link(
-            _(object_.class_.view.replace('_', ' ')) + (
+            _(object_.class_.group['name'].replace('_', ' ')) + (
                 ' (' + uc_first(_(object_.class_.name)) + ')'
-                if _(object_.class_.view) == 'event' else ''),
-            url_for('type_index') if object_.class_.view == 'type'
-            else url_for('index', view=object_.class_.view))
+                if object_.class_.group['name'] == 'event' else ''),
+            url_for('type_index') if object_.class_.group['name'] == 'type'
+            else url_for('index', view=object_.class_.group['name']))
     elif isinstance(object_, Entity):
         html = link(
             object_.name,

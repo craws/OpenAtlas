@@ -542,7 +542,10 @@ class Entity:
             view: str,
             types: bool = False,
             aliases: bool = False) -> list[Entity]:
-        return Entity.get_by_class(g.view_class_mapping[view], types, aliases)
+        return Entity.get_by_class(
+            g.class_groups[view]['classes'],
+            types,
+            aliases)
 
     @staticmethod
     def get_display_files() -> list[Entity]:

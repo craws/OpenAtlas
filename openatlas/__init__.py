@@ -86,7 +86,6 @@ def before_request() -> Response | None:
     g.reference_match_type = Entity.get_hierarchy('External reference match')
     g.reference_systems = ReferenceSystem.get_all()
     g.class_groups = class_groups
-    g.class_view_mapping = get_class_view_mapping()
     g.writable_paths = [
         app.config['EXPORT_PATH'],
         app.config['RESIZED_IMAGES'],

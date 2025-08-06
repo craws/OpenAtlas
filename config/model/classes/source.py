@@ -16,11 +16,11 @@ source = {
             'property': 'P73',
             'multiple': True},
         'actor': {
-            'class': class_groups['actor'],
+            'class': class_groups['actor']['classes'],
             'property': 'P67',
             'multiple': True},
         'artifact': {
-            'class': class_groups['artifact'],
+            'class': class_groups['artifact']['classes'],
             'property': 'P67',
             'multiple': True},
         'information_carrier': {
@@ -33,21 +33,21 @@ source = {
             'tooltip': _(
                 'Link artifacts as the information carrier of the source')},
         'event': {
-            'class': class_groups['event'],
+            'class': class_groups['event']['classes'],
             'property': 'P67',
             'multiple': True},
         'place': {
-            'class': class_groups['place'],
+            'class': class_groups['place']['classes'],
             'property': 'P67',
             'multiple': True},
         'reference': {
-            'class': class_groups['reference'],
+            'class': class_groups['reference']['classes'],
             'property': 'P67',
             'inverse': True,
             'multiple': True},
         'document': {
             'label': _('file'),
-            'class': class_groups['file'],
+            'class': class_groups['file']['classes'],
             'property': 'P67',
             'inverse': True,
             'multiple': True}},

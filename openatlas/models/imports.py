@@ -102,8 +102,8 @@ def import_data_(project: Project, class_: str, data: list[Any]) -> None:
     for row in data:
         if value := row.get('openatlas_class'):
             if value.lower().replace(' ', '_') in (
-                    g.view_class_mapping['place'] +
-                    g.view_class_mapping['artifact']):
+                    g.class_groups['place']['classes'] +
+                    g.class_groups['artifact']['classes']):
                 class_ = value.lower().replace(' ', '_')
         description = row.get('description')
         entity = Entity.insert(class_, row['name'], description)
@@ -118,8 +118,8 @@ def import_data_(project: Project, class_: str, data: list[Any]) -> None:
         if entity.class_ != 'type':
             link_types(entity, row, class_, project)
         link_references(entity, row, class_, project)
-        if class_ in g.view_class_mapping['place'] \
-                + g.view_class_mapping['artifact']:
+        if class_ in g.class_groups['place']['classes'] \
+                + g.class_groups['artifact']['classes']:
             insert_gis(entity, row, project)
         entities[row.get('id')] = {
             'entity': entity,
@@ -127,8 +127,8 @@ def import_data_(project: Project, class_: str, data: list[Any]) -> None:
             'openatlas_parent_id':  row.get('openatlas_parent_id')}
     for entry in entities.values():
         if entry['entity'].class_.name in (
-                    g.view_class_mapping['place'] +
-                    g.view_class_mapping['artifact']):
+                    g.class_groups['place']['classes'] +
+                    g.class_groups['artifact']['classes']):
             if entry['parent_id']:
                 entities[entry['parent_id']]['entity'].link(
                     'P46',

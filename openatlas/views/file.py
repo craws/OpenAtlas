@@ -112,7 +112,7 @@ def file_add(id_: int, view: str) -> str | Response:
     return render_template(
         'content.html',
         content=get_table_form(
-            g.view_class_mapping[view],
+            g.class_groups[view]['classes'],
             [e.id for e in entity.get_linked_entities('P67')]),
         title=entity.name,
         crumbs=[link(entity, index=True), entity, f"{_('link')} {_(view)}"])

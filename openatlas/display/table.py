@@ -73,11 +73,11 @@ def entity_table(
         return None
     if not columns:
         if isinstance(items[0], Entity):
-            columns = items[0].class_.group['table_headers']
+            columns = items[0].class_.group['table_columns']
         elif inverse:
-            columns = items[0].domain.class_.group['table_headers']
+            columns = items[0].domain.class_.group['table_columns']
         else:
-            columns = items[0].range.class_.class_.group['table_headers']
+            columns = items[0].range.class_.class_.group['table_columns']
     columns += additional_columns if additional_columns else []
     table = Table(columns)
     for item in items:
@@ -141,7 +141,11 @@ def entity_table(
                 case 'public':
                     html = _('yes') if g.file_info[e.id]['public'] else None
                 case 'remove':
-                    html = remove_link(e.name, item, e, e.class_.view)
+                    html = remove_link(
+                        e.name,
+                        item,
+                        e,
+                        e.class_.group['classes'])
                 # case 'related':
                 #    relative = e.get_linked_entity_safe('has relation', True)
                 #    if entity and relative.id == entity.id:

@@ -178,7 +178,7 @@ class Display:
             self.tabs['note'].table.rows.append(data)
 
     def add_buttons(self) -> None:
-        self.buttons = [manual(f'entity/{self.entity.class_.view}')]
+        self.buttons = [manual(f"entity/{self.entity.class_.group['name']}")]
         if self.entity.class_.name == 'source_translation':
             self.buttons = [manual('entity/source')]
         if is_authorized(self.entity.class_.write_access):

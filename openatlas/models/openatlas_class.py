@@ -55,15 +55,15 @@ class OpenatlasClass:
         self.standard_type_id = standard_type_id
         self.network_color = color
         self.write_access = write_access or 'contributor'
-        self.group = None
         self.alias_allowed = alias_allowed
         self.reference_system_allowed = reference_system_allowed
         self.reference_systems = reference_system_ids
         self.new_types_allowed = new_types_allowed
         self.icon = icon
-        for item, classes in class_groups.items():
-            if name in classes:
-                self.group = item
+        self.group = None
+        for data in class_groups.values():
+            if name in data['classes']:
+                self.group = data
         self.attributes = attributes
         self.relations = relations
         self.display = display

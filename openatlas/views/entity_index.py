@@ -19,7 +19,7 @@ from openatlas.display.table import entity_table
 @required_group('readonly')
 def index(view: str) -> str | Response:
     buttons = [manual(f'entity/{view}')]
-    for name in g.view_class_mapping[view]['classes'] \
+    for name in g.class_groups[view]['classes'] \
             if view != 'place' else ['place']:
         if is_authorized(g.classes[name].write_access):
             buttons.append(
@@ -100,7 +100,7 @@ def get_table(view: str) -> tuple[Table, str]:
         table = entity_table(
             Entity.get_by_class(
                 'place' if view == 'place'
-                else g.view_class_mapping[view]['classes'],
+                else g.class_groups[view]['classes'],
                 types=True,
                 aliases=True))
     return table, file_info

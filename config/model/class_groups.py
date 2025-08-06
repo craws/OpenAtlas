@@ -1,39 +1,49 @@
 class_groups = {
     'actor': {
+        'name': 'actor',
         'classes': ['person', 'group'],
         'table_columns': ['name', 'class', 'begin', 'end', 'description']},
     'artifact': {
+        'name': 'artifact',
         'classes': ['artifact', 'human_remains'],
         'table_columns': [
             'name', 'class', 'type', 'begin', 'end', 'description']},
     'event': {
+        'name': 'event',
         'classes': [
             'activity', 'acquisition', 'creation', 'event', 'modification',
             'move', 'production'],
         'table_columns': [
             'name', 'class', 'type', 'begin', 'end', 'description']},
     'file': {
+        'name': 'file',
         'classes': ['file'],
         'table_columns': [
             'name', 'license', 'public', 'creator', 'license holder',
             'size', 'extension', 'description']},
     'place': {
+        'name': 'place',
         'classes': ['feature', 'place', 'stratigraphic_unit'],
         'table_columns': [
             'name', 'class', 'type', 'begin', 'end', 'description']},
     'reference': {
+        'name': 'reference',
         'classes': ['bibliography', 'edition', 'external_reference'],
         'table_columns': ['name', 'class', 'type', 'description']},
     'reference_system': {
+        'name': 'reference_system',
         'classes': ['reference_system'],
         'table_columns': ['name', 'class', 'type', 'description']},
     'source': {
+        'name': 'source',
         'classes': ['source'],
         'table_columns': ['name', 'type', 'content']},
     'source_translation': {
+        'name': 'source_translation',
         'classes': ['source_translation'],
         'table_columns': ['name', 'type', 'content']},
     'type': {
+        'name': 'type',
         'classes': ['administrative_unit', 'type'],
         'table_columns': ['name', 'description']}}
 
