@@ -289,12 +289,16 @@ def search(
     return list(g.cursor)
 
 
-def api_search(term: str, classes: list[str]) -> list[dict[str, Any]]:
+def api_search(
+        classes: list[str],
+        term: Optional[str]) -> list[dict[str, Any]]:
     g.cursor.execute(
         select_sql() +
         """
             WHERE e.openatlas_class_name IN %(classes)s
-                AND UNACCENT(LOWER(e.name)) LIKE UNACCENT(LOWER(%(term)s))
+                AND (
+                    %(term)s = '' 
+                    OR UNACCENT(LOWER(e.name)) LIKE UNACCENT(LOWER(%(term)s)))
             GROUP BY e.id
             ORDER BY e.name;
         """,
