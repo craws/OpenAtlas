@@ -152,7 +152,7 @@ class Api(ApiTestCase):
                 id_=place.id,
                 exclude_system_classes='type'))
         rv = rv.get_json()
-        assert len(rv['results']) == 6
+        assert len(rv['results']) == 7
         rv = c.get(
             url_for(
                 'api_04.ego_network_visualisation',
@@ -174,7 +174,7 @@ class Api(ApiTestCase):
                 id_=place.id,
                 download=True))
         rv = rv.get_json()
-        assert len(rv['results']) == 9
+        assert len(rv['results']) == 10
 
         for rv in [
             c.get(url_for('api_04.geometric_entities')),
@@ -753,6 +753,9 @@ class Api(ApiTestCase):
 
         rv = c.get(url_for('api_04.search', class_='type', term='i'))
         assert rv.get_json()['pagination']['entities'] == 47
+
+        rv = c.get(url_for('api_04.search', class_='person'))
+        assert rv.get_json()['pagination']['entities'] == 2
 
         # Test Error Handling
         for rv in [
