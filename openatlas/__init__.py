@@ -16,8 +16,7 @@ from openatlas.database.checks import check_type_count_needed
 from openatlas.database.connect import close_connection, open_connection
 from openatlas.database.token import check_token_revoked
 from openatlas.database.user import admins_available
-from openatlas.models.openatlas_class import (
-    get_class_view_mapping, get_classes)
+from openatlas.models.openatlas_class import get_classes
 
 app: Flask = Flask(__name__, instance_relative_config=True)
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected

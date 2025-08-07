@@ -200,7 +200,7 @@ def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
 @app.template_filter()
 def menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
     group = ''
-    if entity.id:
+    if entity:
         group = entity.class_.group['name']
     if origin:
         group = origin.class_.group['name']
@@ -221,7 +221,7 @@ def menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
                 or request.path.startswith(f'/index/{item}'):
             active = 'active'
         elif len(request_parts) > 2 and request.path.startswith('/insert/'):
-            if g.class_view_mapping.get(request_parts[2]) == item:
+            if g.classes[request_parts[2]].class_.group.name == item:
                 active = 'active'
         html += link(
             label,

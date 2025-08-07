@@ -21,6 +21,9 @@ class_groups = {
         'table_columns': [
             'name', 'license', 'public', 'creator', 'license holder',
             'size', 'extension', 'description']},
+    #'object_location': {
+    #    'name': 'object_location',
+    #    'classes': ['object_location']},
     'place': {
         'name': 'place',
         'classes': ['feature', 'place', 'stratigraphic_unit'],

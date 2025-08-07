@@ -85,15 +85,6 @@ class OpenatlasClass:
 def get_class_count() -> dict[str, int]:
     return db.get_class_count()
 
-
-def get_class_view_mapping() -> dict['str', 'str']:
-    mapping = {}
-    for view, classes in class_groups.items():
-        for class_ in classes:
-            mapping[class_] = view
-    return mapping
-
-
 def get_classes() -> dict[str, OpenatlasClass]:
     classes = {}
     for row in db.get_classes():

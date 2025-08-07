@@ -606,16 +606,20 @@ class Entity:
 
     @staticmethod
     def get_overview_counts() -> dict[str, int]:
-        return db.get_overview_counts(g.class_view_mapping)
+        return db.get_overview_counts(g.classes)
 
     @staticmethod
     def get_overview_counts_by_type(ids: list[int]) -> dict[str, int]:
-        return db.get_overview_counts_by_type(ids, g.class_view_mapping)
+        # Todo: fix after new classes
+        return {}
+        # return db.get_overview_counts_by_type(ids, g.class_view_mapping)
 
     @staticmethod
     def get_latest(limit: int) -> list[Entity]:
-        return [
-            Entity(row) for row in db.get_latest(g.class_view_mapping, limit)]
+        # Todo: fix after new classes
+        return []
+        # return [
+        #    Entity(row) for row in db.get_latest(g.class_view_mapping, limit)]
 
     @staticmethod
     def set_profile_image(id_: int, origin_id: int) -> None:

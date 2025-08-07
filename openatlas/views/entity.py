@@ -3,7 +3,7 @@ from datetime import datetime
 from subprocess import call
 from typing import Any, Optional
 
-from flask import flash, g, render_template, url_for
+from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from werkzeug.exceptions import abort
@@ -21,7 +21,6 @@ from openatlas.display.util import (
 from openatlas.display.util2 import is_authorized
 from openatlas.forms.entity_form import get_entity_form, process_form_data
 from openatlas.forms.manager_base import BaseManager
-from openatlas.forms.util import form_crumbs
 from openatlas.models.entity import Entity
 from openatlas.models.gis import InvalidGeomException
 from openatlas.models.reference_system import ReferenceSystem
@@ -167,6 +166,28 @@ def delete(id_: int) -> Response:
     g.logger.log_user(id_, 'delete')
     flash(_('entity deleted'), 'info')
     return redirect(url)
+
+def form_crumbs(entity: Entity, origin: Optional[Entity] = None) -> list[Any]:
+    label = origin.class_.name if origin \
+        else g.classes[entity.class_.name].view
+    if label in g.class_view_mapping:
+        label = g.class_view_mapping[label]
+    crumbs: list[Any] = [[
+        _(label.replace('_', ' ')),
+        url_for(
+            'index',
+            view=origin.class_.view if origin
+            else g.classes[entity.class_.name].view)]]
+    # if place_info['structure']:
+    #    crumbs += place_info['structure']['supers']
+    if origin:
+        crumbs.append(origin)
+    if not entity.id:
+        crumbs.append(f'+ {g.classes[entity.class_.name].label}')
+    else:
+        crumbs.append(entity)
+        crumbs.append(_('copy') if 'copy_' in request.path else _('edit'))
+    return crumbs
 
 
 def check_insert_access(class_: str) -> None:

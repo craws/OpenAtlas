@@ -92,13 +92,16 @@ def overview() -> str:
             note['text'],
             link(_("view"), url_for("note_view", id_=note["id"]))])
     for name, count in Entity.get_overview_counts().items():
-        url = url_for('index', view=g.class_view_mapping[name])
+        if not g.classes[name].group:
+            continue
+        url = ''
+        if name not in [
+                'feature', 'stratigraphic_unit', 'source_translation']:
+            url = url_for('index', view=g.classes[name].group['name'])
         if name == 'administrative_unit':
             url = f"{url_for('type_index')}#menu-tab-place"
         elif name == 'type':
             url = url_for('type_index')
-        elif name in ['feature', 'stratigraphic_unit', 'source_translation']:
-            url = ''
         tables['overview'].rows.append([
             link(g.classes[name].label, url) if url else g.classes[name].label,
             format_number(count)])
