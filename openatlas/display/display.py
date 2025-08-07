@@ -151,6 +151,34 @@ class Display:
                             relation['inverse'],
                             types=True):
                         items.append(item)
+                buttons = [manual(f'entity/{name}')]
+                if is_authorized('contributor'):
+                    buttons.append(
+                        button(
+                            _('link'),
+                            url_for(
+                                'link_insert2',
+                                id_=self.entity.id,
+                                relation_name=name)))
+                    pass
+                    #     case 'source':
+                    #         if class_name == 'file':
+                    #             self.buttons.append(
+                    #                 button(
+                    #                     _('link'),
+                    #                     url_for('file_add', id_=id_, view=tab_name)))
+                    #         elif view == 'reference':
+                    #             self.buttons.append(
+                    #                 button(
+                    #                     'link',
+                    #                     url_for('reference_add', id_=id_, view=tab_name)))
+                    #         else:
+                    #             self.buttons.append(
+                    #                 button('link', url_for('entity_add_source', id_=id_)))
+                    #         self.buttons.append(
+                    #             button(
+                    #                 g.classes['source'].label,
+                    #                 url_for('insert', class_=tab_name, origin_id=id_)))
                 self.tabs[name] = Tab(
                     name,
                     table=entity_table(
@@ -159,9 +187,11 @@ class Display:
                         tab['columns'],
                         tab['additional_columns'],
                         relation['inverse']),
+                    buttons=buttons,
                     entity=self.entity,
                     tooltip=tab['tooltip'] if tab and 'tooltip' in tab
                     else None)
+
 
     def add_note_tab(self) -> None:
         self.tabs['note'] = Tab(

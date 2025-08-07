@@ -39,6 +39,28 @@ def link_insert(id_: int, view: str) -> str | Response:
         title=_(entity.class_.group['name']),
         crumbs=[link(entity, index=True), entity, _('link')])
 
+@app.route('/link/insert2/<int:id_>/<relation_name>', methods=['GET', 'POST'])
+@required_group('contributor')
+def link_insert2(id_: int, relation_name: str) -> str | Response:
+    entity = Entity.get_by_id(id_)
+    relation = entity.class_.relations[relation_name]
+    if request.method == 'POST':
+        if request.form['checkbox_values']:
+            entity.link_string(
+                relation['property'],
+                request.form['checkbox_values'],
+                inverse=relation['inverse'])
+        return redirect(f"{url_for('view', id_=entity.id)}#tab-{relation_name}")
+    return render_template(
+        'content.html',
+        content=get_table_form(
+            relation['class'],
+            [e.id for e in entity.get_linked_entities(
+                relation['property'],
+                inverse=relation['inverse'])]),
+        title=_(entity.class_.group['name']),
+        crumbs=[link(entity, index=True), entity, _('link')])
+
 
 @app.route('/link/update/<int:id_>/<int:origin_id>', methods=['GET', 'POST'])
 @required_group('contributor')
