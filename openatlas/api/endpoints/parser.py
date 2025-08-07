@@ -199,7 +199,7 @@ class Parser:
             'properties': {
                 '@id': entity.id,
                 'systemClass': entity.class_.name,
-                'viewClass': entity.class_.view,
+                'viewClass': entity.class_.group['name'],
                 'name': entity.name,
                 'description': entity.description
                 if 'description' in self.show else None,
@@ -245,7 +245,7 @@ class Parser:
             entity: Entity,
             links: list[Link]) -> list[dict[str, Any]]:
         types = []
-        if entity.class_.view == 'place':
+        if entity.class_.group['name'] == 'place':
             entity.types.update(get_location_link(links).range.types)
         for type_ in entity.types:
             type_dict = {

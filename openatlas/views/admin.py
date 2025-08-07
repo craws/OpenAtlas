@@ -371,7 +371,7 @@ def check_similar() -> str:
     form = SimilarForm()
     form.classes.choices = [
         (class_.name, class_.label)
-        for name, class_ in g.classes.items() if class_.label and class_.view]
+        for name, class_ in g.classes.items() if class_.label and class_.group['name']]
     table = None
     if form.validate_on_submit():
         table = Table(['name', _('count')])
@@ -533,7 +533,7 @@ def orphans() -> str:
     for entity in get_orphans():
         tabs[
             'unlinked'
-            if entity.class_.view else 'orphans'].table.rows.append([
+            if entity.class_.group['name'] else 'orphans'].table.rows.append([
                 link(entity),
                 link(entity.class_),
                 link(entity.standard_type),

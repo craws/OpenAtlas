@@ -40,7 +40,7 @@ def view(id_: int) -> str | Response:
     else:
         entity = Entity.get_by_id(id_, types=True, aliases=True)
         # Todo: fix after new classes
-        # if not entity.class_.view:
+        # if not entity.class_.group['name']:
         #    flash(_("This entity can't be viewed directly."), 'error')
         #    abort(400)
     display = Display(entity)
@@ -85,11 +85,11 @@ def insert(class_: str, origin_id: Optional[int] = None) -> str | Response:
         'entity/insert.html',
         form=form,
         class_name=class_,
-        view_name=g.classes[class_].view,
+        view_name=g.classes[class_].group['name'],
         #gis_data=manager.place_info['gis_data'],
         writable=os.access(app.config['UPLOAD_PATH'], os.W_OK),
         #overlays=manager.place_info['overlays'],
-        title=_(g.classes[class_].view),
+        title=_(g.classes[class_].group['name']),
         crumbs=form_crumbs(entity, origin))
 
 
@@ -106,11 +106,11 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
         return redirect(save(entity, None, form))
     # if not manager.form.is_submitted():
     #    manager.populate_update()
-    # if entity.class_.view in ['artifact', 'place']:
+    # if entity.class_.group['name'] in ['artifact', 'place']:
     #    manager.entity.image_id = manager.entity.get_profile_image_id()
     #    if not manager.entity.image_id:
     #        for link_ in manager.entity.get_links('P67', inverse=True):
-    #            if link_.domain.class_.view == 'file' \
+    #            if link_.domain.class_.group['name'] == 'file' \
     #                    and get_base_table_data(link_.domain)[6] \
     #                    in g.display_file_ext:
     #                manager.entity.image_id = link_.domain.id
@@ -119,7 +119,6 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
         'entity/update.html',
         form=form,
         entity=entity,
-        class_name=entity.class_.view,
         # gis_data=manager.place_info['gis_data'],
         # overlays=manager.place_info['overlays'],
         title=entity.name,
@@ -136,14 +135,14 @@ def delete(id_: int) -> Response:
     entity = Entity.get_by_id(id_)
     if not is_authorized(entity.class_.write_access):
         abort(403)
-    url = url_for('index', view=entity.class_.view)
+    url = url_for('index', view=entity.class_.group['name'])
     if isinstance(entity, ReferenceSystem):
         if entity.system:
             abort(403)
         if entity.classes:
             flash(_('Deletion not possible if classes are attached'), 'error')
             return redirect(url_for('view', id_=id_))
-    elif entity.class_.view in ['artifact', 'place']:
+    elif entity.class_.group['name'] in ['artifact', 'place']:
         if entity.get_linked_entities('P46'):
             flash(_('Deletion not possible if subunits exists'), 'error')
             return redirect(url_for('view', id_=id_))
@@ -168,16 +167,15 @@ def delete(id_: int) -> Response:
     return redirect(url)
 
 def form_crumbs(entity: Entity, origin: Optional[Entity] = None) -> list[Any]:
-    label = origin.class_.name if origin \
-        else g.classes[entity.class_.name].view
-    if label in g.class_view_mapping:
-        label = g.class_view_mapping[label]
+    label = origin.class_.name if origin else entity.class_.group['name']
+    #if label in g.class_view_mapping:
+    #    label = g.class_view_mapping[label]
     crumbs: list[Any] = [[
         _(label.replace('_', ' ')),
         url_for(
             'index',
-            view=origin.class_.view if origin
-            else g.classes[entity.class_.name].view)]]
+            view=origin.class_.group['name'] if origin
+            else entity.class_.group['name'])]]
     # if place_info['structure']:
     #    crumbs += place_info['structure']['supers']
     if origin:
@@ -192,14 +190,14 @@ def form_crumbs(entity: Entity, origin: Optional[Entity] = None) -> list[Any]:
 
 def check_insert_access(class_: str) -> None:
     if class_ not in g.classes \
-            or not g.classes[class_].view \
+            or not g.classes[class_].group \
             or not is_authorized(g.classes[class_].write_access):
         abort(403)
 
 
 def check_update_access(entity: Entity) -> None:
     check_insert_access(entity.class_.name)
-    if entity.class_.view == 'type' and (
+    if entity.class_.group['name'] == 'type' and (
             entity.category == 'system'
             or entity.category == 'standard' and not entity.root):
         abort(403)
@@ -244,7 +242,7 @@ def insert_files(manager: BaseManager) -> str:
             (app.config['UPLOAD_PATH'] / filename).unlink()
         g.logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
-        url = url_for('index', view=g.classes['file'].view)
+        url = url_for('index', view=g.classes['file'].group['name'])
     return url
 
 
@@ -263,7 +261,7 @@ def save(entity: Entity, origin: Entity | None, form: Any) -> str:
         Transaction.rollback()
         g.logger.log('error', 'database', 'invalid geom', e)
         flash(_('Invalid geom entered'), 'error')
-        url = url_for('index', view=entity.class_.view)
+        url = url_for('index', view=entity.class_.group['name'])
         if action == 'update' and entity.id:
             url = url_for(
                 'update',
@@ -281,7 +279,7 @@ def save(entity: Entity, origin: Entity | None, form: Any) -> str:
         else:
             url = url_for('type_index') if \
                 entity.class_.name in ['administrative_unit', 'type'] else \
-                url_for('index', view=entity.class_.view)
+                url_for('index', view=entity.class_.group['name'])
     return url
 
 
@@ -296,12 +294,12 @@ def get_redirect_url(entity: Entity) -> str:
     #        ('administrative_unit', 'source_translation', 'type'):
     #    url = \
     #        f"{url_for('view', id_=manager.origin.id)}" \
-    #        f"#tab-{manager.entity.class_.view}"
+    #        f"#tab-{manager.entity.class_.group['name']}"
     #    if manager.entity.class_.name == 'file':
     #        url = f"{url_for('view', id_=manager.origin.id)}#tab-file"
-    #    elif manager.origin.class_.view \
+    #    elif manager.origin.class_.group['name'] \
     #            in ['place', 'feature', 'stratigraphic_unit'] \
-    #            and manager.entity.class_.view != 'actor':
+    #            and manager.entity.class_.group['name'] != 'actor':
     #        url = url_for('view', id_=manager.entity.id)
     # if hasattr(manager.form, 'continue_') \
     #        and manager.form.continue_.data == 'yes':
@@ -312,7 +310,7 @@ def get_redirect_url(entity: Entity) -> str:
     #    if manager.entity.class_.name in ('administrative_unit', 'type') \
     #            and manager.origin:
     #        root_id = manager.origin.root[0] \
-    #            if (manager.origin.class_.view == 'type'
+    #            if (manager.origin.class_.group['name'] == 'type'
     #                and manager.origin.root) else manager.origin.id
     #        super_id = getattr(manager.form, str(root_id)).data
     #        url = url_for(

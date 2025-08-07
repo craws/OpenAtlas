@@ -255,7 +255,7 @@ def profile_image(entity: Entity) -> str:
                 filename=path_.name)
 
     external = False
-    if entity.class_.view == 'file':
+    if entity.class_.group['name'] == 'file':
         external = True
         if path.suffix.lower() not in g.display_file_ext:
             return '<p class="uc-first">' + _('no preview available') + '</p>'
@@ -313,7 +313,7 @@ def format_name_and_aliases(entity: Entity, show_links: bool) -> str:
 
 def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
     data: list[Any] = [format_name_and_aliases(entity, show_links)]
-    if entity.class_.view in [
+    if entity.class_.group['name'] in [
             'actor', 'artifact', 'event', 'place', 'reference']:
         data.append(entity.class_.label)
     if entity.class_.standard_type_id:
@@ -324,7 +324,7 @@ def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
         data.append(entity.license_holder)
         data.append(entity.get_file_size())
         data.append(entity.get_file_ext())
-    if entity.class_.view in ['actor', 'artifact', 'event', 'place']:
+    if entity.class_.group['name'] in ['actor', 'artifact', 'event', 'place']:
         data.append(entity.first)
         data.append(entity.last)
     data.append(entity.description)

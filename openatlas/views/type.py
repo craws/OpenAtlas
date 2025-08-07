@@ -58,7 +58,7 @@ def type_index() -> str:
                 name=sanitize(type_.name, 'ascii'),
                 data=walk_tree(type_.subs))
             for link_ in type_.get_links('P67', inverse=True):
-                if link_.domain.class_.view == 'reference_system':
+                if link_.domain.class_.group['name'] == 'reference_system':
                     type_.reference_systems.append(link_)
     return render_template(
         'type/index.html',

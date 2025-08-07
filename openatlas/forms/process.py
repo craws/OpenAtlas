@@ -81,8 +81,8 @@ def process_standard_fields(manager: Any) -> None:
 def process_origin(manager: Any) -> None:
     if not manager.entity:
         return
-    if manager.origin.class_.view == 'reference':
-        if manager.entity.class_.name == 'file':
+    if manager.origin.class_.group['name'] == 'reference':
+        if manager.entity.class_.group['name'] == 'file':
             manager.add_link(
                 'P67',
                 manager.origin,
@@ -94,18 +94,18 @@ def process_origin(manager: Any) -> None:
                 manager.origin,
                 inverse=True,
                 return_link_id=True)
-    elif manager.entity.class_.name == 'file' \
-            or (manager.entity.class_.view in ['reference', 'source']
+    elif manager.entity.class_.group['name'] == 'file' \
+            or (manager.entity.class_.group['name'] in ['reference', 'source']
                 and manager.origin.class_.name != 'file'):
         manager.add_link(
             'P67',
             manager.origin,
-            return_link_id=bool(manager.entity.class_.view == 'reference'))
+            return_link_id=bool(manager.entity.class_.group['name'] == 'reference'))
     elif manager.origin.class_.name == 'source' \
             and manager.entity.class_.name != 'source_translation':
         manager.add_link('P67', manager.origin, inverse=True)
     elif manager.origin.class_.name == 'file':
-        if manager.entity.class_.view == 'reference':
+        if manager.entity.class_.group['name'] == 'reference':
             manager.add_link(
                 'P67',
                 manager.origin,

@@ -214,7 +214,7 @@ def link_references(
             if len(reference) <= 2 and reference[0].isdigit():
                 try:
                     ref_entity = ApiEntity.get_by_id(int(reference[0]))
-                    if not ref_entity.class_.view == 'reference':
+                    if not ref_entity.class_.group['name'] == 'reference':
                         raise EntityDoesNotExistError
                 except EntityDoesNotExistError:
                     continue
@@ -225,7 +225,7 @@ def link_references(
             reference = references.split(';')
             if ref_id := get_id_from_origin_id(project, reference[0]):
                 ref_entity = ApiEntity.get_by_id(int(ref_id))
-                if ref_entity.class_.view == 'reference':
+                if ref_entity.class_.group['name'] == 'reference':
                     page = reference[1] or None
                     ref_entity.link('P67', entity, page)
     match_types = get_match_types()

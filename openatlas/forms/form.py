@@ -82,7 +82,7 @@ def get_annotation_image_form(
 def get_table_form(classes: list[str], excluded: list[int]) -> str:
     entities = Entity.get_by_class(classes, types=True, aliases=True)
     table = Table(
-        [''] + entities[0].class_.group['table_headers'] if entities else [],
+        [''] + entities[0].class_.group['table_columns'] if entities else [],
         order=[[2, 'asc']])
     if classes[0] == 'file' and show_table_icons():
         table.columns.insert(1, _('icon'))

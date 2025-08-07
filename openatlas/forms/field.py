@@ -181,7 +181,7 @@ class TableMultiField(HiddenField):
 def table_multi(entities: list[Entity], selection: list[Entity]) -> Table:
     selection_ids = [e.id for e in selection] if selection else []
     table_ = Table(
-        [''] + entities[0].class_.group['table_headers'] if entities else [],
+        [''] + entities[0].class_.group['table_columns'] if entities else [],
         order=[[0, 'desc'], [1, 'asc']],
         defs=[{'orderDataType': 'dom-checkbox', 'targets': 0}])
     for e in entities:

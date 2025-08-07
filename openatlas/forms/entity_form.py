@@ -89,7 +89,7 @@ def process_types(entity: Entity, form: Any) -> None:
             if type_.class_.name == 'administrative_unit':
                 pass
                 # manager.data['administrative_units'] += value
-            else:  # if entity.class_.view != 'type': # Todo: check needed?
+            else:  # if entity.class_.group['name'] != 'type': # Todo: check needed?
                 entity.link('P2', [g.types[id_] for id_ in data])
 
 

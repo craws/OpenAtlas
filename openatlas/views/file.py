@@ -133,11 +133,11 @@ def make_iiif_available(id_: int) -> Response:
 def view_iiif(id_: int) -> str:
     entity = Entity.get_by_id(id_)
     manifests = []
-    if entity.class_.view == 'file' and check_iiif_file_exist(id_):
+    if entity.class_.group['name'] == 'file' and check_iiif_file_exist(id_):
         manifests.append(get_manifest_url(id_))
     else:
         for file_ in entity.get_linked_entities('P67', inverse=True):
-            if file_.class_.view == 'file' and check_iiif_file_exist(file_.id):
+            if file_.class_.group['name'] == 'file' and check_iiif_file_exist(file_.id):
                 manifests.append(get_manifest_url(file_.id))
     return render_template('iiif.html', manifests=manifests)
 
@@ -210,7 +210,7 @@ def logo(id_: Optional[int] = None) -> str | Response:
         return redirect(url_for('file_index'))
     entities = Entity.get_display_files()
     table = Table(
-        [''] + entities[0].class_.group['table_headers']
+        [''] + entities[0].class_.group['table_columns']
         if entities else [] + ['date'])
     for entity in Entity.get_display_files():
         date = 'N/A'

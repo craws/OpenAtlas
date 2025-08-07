@@ -1,16 +1,16 @@
 {% extends 'layout.html' %}
 {% block content %}
-  {% if entity.class_.view not in ['artifact', 'place'] %}
+  {% if entity.class_.group['name'] not in ['artifact', 'place'] %}
     <div class="container">
-      {{ form|display_form(manual_page='entity/' + entity.class_.view)|safe }}
-      {{ entity.class_.view|display_citation_example|safe }}
+      {{ form|display_form(manual_page='entity/' + entity.class_.group['name'])|safe }}
+      {{ entity.class_.group['name']|display_citation_example|safe }}
     </div>
   {% else %}
     <div class="row">
       <div class="col">
         <div class="row">
           <div id='map-info-display'>
-            {{ form|display_form(manual_page='entity/' + entity.class_.view)|safe }}
+            {{ form|display_form(manual_page='entity/' + entity.class_.group['name'])|safe }}
           </div>
           {{ entity|profile_image|safe }}
         </div>

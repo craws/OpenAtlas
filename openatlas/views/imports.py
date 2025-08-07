@@ -535,7 +535,7 @@ def check_cell_value(
                     else:
                         try:
                             ref = ApiEntity.get_by_id(int(values[0]))
-                            if not ref.class_.view == 'reference':
+                            if not ref.class_.group['name'] == 'reference':
                                 raise EntityDoesNotExistError
                         except EntityDoesNotExistError:
                             values[0] = error_span(values[0])
@@ -551,7 +551,7 @@ def check_cell_value(
                     values = str(reference).split(';')
                     if origin_id := get_id_from_origin_id(project, values[0]):
                         ref = ApiEntity.get_by_id(int(origin_id))
-                        if not ref.class_.view == 'reference':
+                        if not ref.class_.group['name'] == 'reference':
                             values[0] = error_span(values[0])
                             checks.set_warning(
                                 'invalid_origin_reference_id',

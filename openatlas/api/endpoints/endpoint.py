@@ -250,7 +250,7 @@ class Endpoint:
     def get_geojson(self) -> dict[str, Any]:
         out = []
         for e in self.entities_with_links.values():
-            if e['entity'].class_.view == 'place':
+            if e['entity'].class_.group['name'] == 'place':
                 e['entity'].types.update(
                     get_location_link(e['links']).range.types)
             if e['geometry']:
@@ -263,7 +263,7 @@ class Endpoint:
     def get_geojson_v2(self) -> dict[str, Any]:
         out = []
         for e in self.entities_with_links.values():
-            if e['entity'].class_.view == 'place':
+            if e['entity'].class_.group['name'] == 'place':
                 e['entity'].types.update(
                     get_location_link(e['links']).range.types)
             out.append(self.parser.get_geojson_dict(e))
@@ -322,7 +322,7 @@ class Endpoint:
                 '@id': url_for('api.entity', id_=entity.id, _external=True),
                 'type': 'Feature',
                 'crmClass': crm,
-                'viewClass': entity.class_.view,
+                'viewClass': entity.class_.group['name'],
                 'systemClass': entity.class_.name,
                 'properties': {'title': entity.name},
                 'types': self.parser.get_lp_types(entity, links)
