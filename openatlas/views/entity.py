@@ -72,7 +72,10 @@ def reference_system_remove_class(system_id: int, class_name: str) -> Response:
 @app.route('/insert/<class_>', methods=['GET', 'POST'])
 @app.route('/insert/<class_>/<int:origin_id>', methods=['GET', 'POST'])
 @required_group('contributor')
-def insert(class_: str, origin_id: Optional[int] = None) -> str | Response:
+def insert(
+        class_: str,
+        origin_id: Optional[int] = None,
+        relation: Optional[dict] = None) -> str | Response:
     check_insert_access(class_)
     entity = Entity({'openatlas_class_name': class_})
     origin = Entity.get_by_id(origin_id) if origin_id else None

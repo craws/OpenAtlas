@@ -153,13 +153,22 @@ class Display:
                         items.append(item)
                 buttons = [manual(f'entity/{name}')]
                 if is_authorized('contributor'):
-                    buttons.append(
-                        button(
-                            _('link'),
-                            url_for(
-                                'link_insert2',
-                                id_=self.entity.id,
-                                relation_name=name)))
+                    if 'link' in tab['buttons']:
+                        buttons.append(
+                            button(
+                                _('link'),
+                                url_for(
+                                    'link_insert2',
+                                    id_=self.entity.id,
+                                    relation_name=name)))
+                    if 'insert' in tab['buttons']:
+                        buttons.append(
+                            button(
+                                _('insert'),
+                                url_for(
+                                    'insert',
+                                    origin_id=self.entity.id,
+                                    relation=name)))
                     pass
                     #     case 'source':
                     #         if class_name == 'file':

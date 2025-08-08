@@ -56,24 +56,31 @@ source = {
         'form': {
             'insert_and_continue': True},
         'tabs': {
-            'text': {},
+            'text': {
+                'buttons': ['insert']},
             'actor': {
                 'additional_columns': ['remove'],
+                'buttons': ['link', 'insert'],
                 'tooltip': _('mentioned in the source')},
             'artifact': {
                 'additional_columns': ['remove'],
+                'buttons': ['link', 'insert'],
                 'tooltip': _('mentioned in the source')},
             'event': {
                 'additional_columns': ['remove'],
+                'buttons': ['link', 'insert'],
                 'tooltip': _('mentioned in the source')},
             'place': {
                 'additional_columns': ['remove'],
+                'buttons': ['link', 'insert'],
                 'tooltip': _('mentioned in the source')},
             'reference': {
                 'additional_columns': ['page', 'update', 'remove'],
+                'buttons': ['link', 'insert'],
                 'mode': 'link'},
             'file': {
-                'additional_columns': ['main image', 'remove']},
+                'additional_columns': ['main image', 'remove'],
+                'buttons': ['link', 'insert']},
             'note': {}}}}
 
 source_translation = {
