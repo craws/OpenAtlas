@@ -70,7 +70,9 @@ def reference_system_remove_class(system_id: int, class_name: str) -> Response:
 
 
 @app.route('/insert/<class_>', methods=['GET', 'POST'])
-@app.route('/insert/<class_>/<int:origin_id>', methods=['GET', 'POST'])
+@app.route(
+    '/insert/<class_>/<int:origin_id>/<relation>',
+    methods=['GET', 'POST'])
 @required_group('contributor')
 def insert(
         class_: str,
@@ -78,12 +80,15 @@ def insert(
         relation: Optional[dict] = None) -> str | Response:
     check_insert_access(class_)
     entity = Entity({'openatlas_class_name': class_})
-    origin = Entity.get_by_id(origin_id) if origin_id else None
+    origin = None
+    if origin_id:
+        origin = Entity.get_by_id(origin_id)
+        relation = g.classes[origin.class_.name].relations[relation]
     form = get_entity_form(entity, origin)
     if form.validate_on_submit():
         # if class_ == 'file':
         #    return redirect(insert_files(manager))
-        return redirect(save(entity, origin, form))
+        return redirect(save(entity, form, origin, relation))
     return render_template(
         'entity/insert.html',
         form=form,
@@ -106,9 +111,7 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
     if form.validate_on_submit():
         if template := was_modified_template(entity, form):
             return template
-        return redirect(save(entity, None, form))
-    # if not manager.form.is_submitted():
-    #    manager.populate_update()
+        return redirect(save(entity, form))
     # if entity.class_.group['name'] in ['artifact', 'place']:
     #    manager.entity.image_id = manager.entity.get_profile_image_id()
     #    if not manager.entity.image_id:
@@ -149,11 +152,11 @@ def delete(id_: int) -> Response:
         if entity.get_linked_entities('P46'):
             flash(_('Deletion not possible if subunits exists'), 'error')
             return redirect(url_for('view', id_=id_))
-        if entity.class_.name != 'place' \
-                and (parent := entity.get_linked_entity('P46', True)):
-            url = \
-                f"{url_for('view', id_=parent.id)}" \
-                f"#tab-{entity.class_.name.replace('_', '-')}"
+        # if entity.class_.name != 'place' \
+        #        and (parent := entity.get_linked_entity('P46', True)):
+        #    url = \
+        #        f"{url_for('view', id_=parent.id)}" \
+        #        f"#tab-{entity.class_.name.replace('_', '-')}"
     elif entity.class_.name == 'source_translation':
         source = entity.get_linked_entity_safe('P73', inverse=True)
         url = f"{url_for('view', id_=source.id)}#tab-text"
@@ -168,6 +171,7 @@ def delete(id_: int) -> Response:
     g.logger.log_user(id_, 'delete')
     flash(_('entity deleted'), 'info')
     return redirect(url)
+
 
 def form_crumbs(entity: Entity, origin: Optional[Entity] = None) -> list[Any]:
     label = origin.class_.name if origin else entity.class_.group['name']
@@ -249,7 +253,11 @@ def insert_files(manager: BaseManager) -> str:
     return url
 
 
-def save(entity: Entity, origin: Entity | None, form: Any) -> str:
+def save(
+        entity: Entity,
+        form: Any,
+        origin: Optional[Entity] = None,
+        relation: Optional[dict['str', Any]] = None) -> str:
     action = 'update' if entity.id else 'insert'
     Transaction.begin()
     try:

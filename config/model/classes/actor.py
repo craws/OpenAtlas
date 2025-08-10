@@ -15,17 +15,17 @@ person = {
         'residence': {
             'label': _('residence'),
             'class': 'object_location',
-            'property': ['P74'],
+            'property': 'P74',
             'mode': 'direct'},
         'begins_in': {
             'label': _('born in'),
             'class': 'object_location',
-            'property': ['OA8'],
+            'property': 'OA8',
             'mode': 'direct'},
         'ends_in': {
             'label': _('died in'),
             'class': 'object_location',
-            'property': ['OA9'],
+            'property': 'OA9',
             'mode': 'direct'}},
     'display': {
         'buttons': ['copy', 'network'],

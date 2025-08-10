@@ -64,8 +64,6 @@ def process_standard_fields(manager: Any) -> None:
                     and manager.entity.system:
                 name = manager.entity.name  # Prevent changing a system name
             manager.data['attributes']['name'] = name
-        elif key == 'alias':
-            manager.data['aliases'] = value
         elif field_type == 'ValueTypeField':
             if value is not None:  # Allow the number zero
                 manager.add_link('P2', g.types[int(key)], value)

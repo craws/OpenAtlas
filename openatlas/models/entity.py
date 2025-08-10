@@ -216,10 +216,14 @@ class Entity:
 
     def delete_links_by_property_and_class(
             self,
-            property: property,
+            property_: str,
             classes: list[str],
             inverse: bool = False) -> None:
-        db.delete_links_by_property_and_class(self.id, property, classes, inverse)
+        db.delete_links_by_property_and_class(
+            self.id,
+            property_,
+            classes,
+            inverse)
 
     def delete_links(self, codes: list[str], inverse: bool = False) -> None:
         if self.class_.name == 'stratigraphic_unit' \
@@ -250,21 +254,21 @@ class Entity:
         for annotation in annotation_data:
             annotation['source_id'] = self.id
             AnnotationText.insert(annotation)
+        if 'alias' in attributes:
+            self.update_aliases(data['alias'])
 
-        #continue_link_id = None
-        #if 'aliases' in data:
-        #    self.update_aliases(data['aliases'])
-        #if 'administrative_units' in data \
+        # continue_link_id = None
+        # if 'administrative_units' in data \
         #        and self.class_.name != 'administrative_unit':
-        #    self.update_administrative_units(data['administrative_units'], new)
-        #if 'links' in data:
+        #   self.update_administrative_units(data['administrative_units'], new)
+        # if 'links' in data:
         #    continue_link_id = self.update_links(data, new)
-        #if 'gis' in data:
-         #   self.update_gis(data['gis'], new)
-        #if self.class_.name == 'file':
+        # if 'gis' in data:
+        #   self.update_gis(data['gis'], new)
+        # if self.class_.name == 'file':
         #    data['file_info']['entity_id'] = self.id
         #    db.update_file_info(data['file_info'])
-        #return continue_link_id
+        # return continue_link_id
 
     def update_administrative_units(
             self,
@@ -291,7 +295,6 @@ class Entity:
             'end_comment': sanitize(self.end_comment),
             # 'description': self.update_description()
         })
-
 
     def get_annotated_text(self) -> str:
         offset = 0
@@ -322,7 +325,11 @@ class Entity:
         Entity.delete_(delete_ids)
         for alias in aliases:
             if alias.strip():
-                self.link('P1', Entity.insert('appellation', alias))
+                self.link(
+                    'P1',
+                    insert({
+                        'name': alias,
+                        'openatlas_class_name': 'appellation'}))
 
     def update_links(self, data: dict[str, Any], new: bool) -> Optional[int]:
         if not new:
@@ -616,10 +623,7 @@ class Entity:
 
     @staticmethod
     def get_latest(limit: int) -> list[Entity]:
-        # Todo: fix after new classes
-        return []
-        # return [
-        #    Entity(row) for row in db.get_latest(g.class_view_mapping, limit)]
+        return [Entity(r) for r in db.get_latest(g.classes, limit)]
 
     @staticmethod
     def set_profile_image(id_: int, origin_id: int) -> None:
@@ -860,6 +864,8 @@ def insert(data: dict[str, Any]) -> Entity:
     for item in ['name', 'description']:
         data[item] = sanitize(data[item])
     entity = Entity.get_by_id(db.insert(data))
+    if 'alias' in attributes:
+        entity.update_aliases(data['alias'])
     for annotation in annotation_data:
         annotation['source_id'] = entity.id
         AnnotationText.insert(annotation)

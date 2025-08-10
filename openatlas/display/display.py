@@ -162,14 +162,15 @@ class Display:
                                     id_=self.entity.id,
                                     relation_name=name)))
                     if 'insert' in tab['buttons']:
-                        buttons.append(
-                            button(
-                                _('insert'),
-                                url_for(
-                                    'insert',
-                                    origin_id=self.entity.id,
-                                    relation=name)))
-                    pass
+                        for class_ in relation['class']:
+                            buttons.append(
+                                button(
+                                    g.classes[class_].label,
+                                    url_for(
+                                        'insert',
+                                        class_=class_,
+                                        origin_id=self.entity.id,
+                                        relation=name)))
                     #     case 'source':
                     #         if class_name == 'file':
                     #             self.buttons.append(
@@ -200,7 +201,6 @@ class Display:
                     entity=self.entity,
                     tooltip=tab['tooltip'] if tab and 'tooltip' in tab
                     else None)
-
 
     def add_note_tab(self) -> None:
         self.tabs['note'] = Tab(

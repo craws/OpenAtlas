@@ -221,7 +221,7 @@ def menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
                 or request.path.startswith(f'/index/{item}'):
             active = 'active'
         elif len(request_parts) > 2 and request.path.startswith('/insert/'):
-            if g.classes[request_parts[2]].class_.group.name == item:
+            if g.classes[request_parts[2]].group['name'] == item:
                 active = 'active'
         html += link(
             label,
