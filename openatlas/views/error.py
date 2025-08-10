@@ -167,7 +167,7 @@ def invalid_view_class(_e: Exception) -> tuple[Any, int]:
         'title': 'Invalid view_classes value',
         'message':
             'The view_classes value is invalid, use "all" or '
-            + str(list(g.view_class_mapping)),
+            + str(list(g.class_groups)),
         'url': request.url,
         'timestamp': datetime.now(),
         'status': 400}), 400

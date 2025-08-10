@@ -112,7 +112,7 @@ def file_add(id_: int, view: str) -> str | Response:
     return render_template(
         'content.html',
         content=get_table_form(
-            g.view_class_mapping[view],
+            g.class_groups[view]['classes'],
             [e.id for e in entity.get_linked_entities('P67')]),
         title=entity.name,
         crumbs=[link(entity, index=True), entity, f"{_('link')} {_(view)}"])
@@ -133,11 +133,11 @@ def make_iiif_available(id_: int) -> Response:
 def view_iiif(id_: int) -> str:
     entity = Entity.get_by_id(id_)
     manifests = []
-    if entity.class_.view == 'file' and check_iiif_file_exist(id_):
+    if entity.class_.group['name'] == 'file' and check_iiif_file_exist(id_):
         manifests.append(get_manifest_url(id_))
     else:
         for file_ in entity.get_linked_entities('P67', inverse=True):
-            if file_.class_.view == 'file' and check_iiif_file_exist(file_.id):
+            if file_.class_.group['name'] == 'file' and check_iiif_file_exist(file_.id):
                 manifests.append(get_manifest_url(file_.id))
     return render_template('iiif.html', manifests=manifests)
 
@@ -208,7 +208,10 @@ def logo(id_: Optional[int] = None) -> str | Response:
     if id_:
         Settings.set_logo(id_)
         return redirect(url_for('file_index'))
-    table = Table([''] + g.table_columns['file'] + ['date'])
+    entities = Entity.get_display_files()
+    table = Table(
+        [''] + entities[0].class_.group['table_columns']
+        if entities else [] + ['date'])
     for entity in Entity.get_display_files():
         date = 'N/A'
         if entity.id in g.files:

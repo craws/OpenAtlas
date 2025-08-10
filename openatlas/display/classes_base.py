@@ -171,7 +171,7 @@ class PlaceBaseDisplay(BaseDisplay):
         if entity.class_.view == 'place' \
                 and is_authorized('editor') \
                 and current_user.settings['module_map_overlay']:
-            self.tabs['file'].table.header.append(_('overlay'))
+            self.tabs['file'].table.columns.append(_('overlay'))
 
         for link_ in entity.get_links(['P31', 'P67'], inverse=True):
             domain = link_.domain
@@ -321,7 +321,7 @@ class TypeBaseDisplay(BaseDisplay):
                 g.types[sub_id].count,
                 g.types[sub_id].description])
         if entity.category == 'value':
-            self.tabs['entities'].table.header = \
+            self.tabs['entities'].table.columns = \
                 [_('name'), _('value'), _('class'), _('info')]
         classes_ = [
             'feature',
@@ -331,10 +331,10 @@ class TypeBaseDisplay(BaseDisplay):
         possible_sub_unit = False
         if any(item in g.types[entity.root[0]].classes for item in classes_):
             possible_sub_unit = True
-            self.tabs['entities'].table.header.append('place')
+            self.tabs['entities'].table.columns.append('place')
         root = g.types[entity.root[0]] if entity.root else entity
         if root.name in app.config['PROPERTY_TYPES']:
-            self.tabs['entities'].table.header = [_('domain'), _('range')]
+            self.tabs['entities'].table.columns = [_('domain'), _('range')]
             for row in Link.get_links_by_type(entity):
                 self.tabs['entities'].table.rows.append([
                     link(Entity.get_by_id(row['domain_id'])),

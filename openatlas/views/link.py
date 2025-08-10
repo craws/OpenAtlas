@@ -34,9 +34,31 @@ def link_insert(id_: int, view: str) -> str | Response:
     return render_template(
         'content.html',
         content=get_table_form(
-            g.view_class_mapping[view],
+            g.class_groups[view]['classes'],
             [e.id for e in entity.get_linked_entities('P67')]),
-        title=_(entity.class_.view),
+        title=_(entity.class_.group['name']),
+        crumbs=[link(entity, index=True), entity, _('link')])
+
+@app.route('/link/insert2/<int:id_>/<relation_name>', methods=['GET', 'POST'])
+@required_group('contributor')
+def link_insert2(id_: int, relation_name: str) -> str | Response:
+    entity = Entity.get_by_id(id_)
+    relation = entity.class_.relations[relation_name]
+    if request.method == 'POST':
+        if request.form['checkbox_values']:
+            entity.link_string(
+                relation['property'],
+                request.form['checkbox_values'],
+                inverse=relation['inverse'])
+        return redirect(f"{url_for('view', id_=entity.id)}#tab-{relation_name}")
+    return render_template(
+        'content.html',
+        content=get_table_form(
+            relation['class'],
+            [e.id for e in entity.get_linked_entities(
+                relation['property'],
+                inverse=relation['inverse'])]),
+        title=_(entity.class_.group['name']),
         crumbs=[link(entity, index=True), entity, _('link')])
 
 
@@ -47,10 +69,10 @@ def link_update(id_: int, origin_id: int) -> str | Response:
     domain = Entity.get_by_id(link_.domain.id)
     range_ = Entity.get_by_id(link_.range.id)
     origin = Entity.get_by_id(origin_id)
-    if 'reference' in [domain.class_.view, range_.class_.view]:
+    if 'reference' in [domain.class_.group['name'], range_.class_.group['name']]:
         return reference_link_update(link_, origin)
     manager_name = 'involvement'
-    tab = 'actor' if origin.class_.view == 'event' else 'event'
+    tab = 'actor' if origin.class_.group['name'] == 'event' else 'event'
     if link_.property.code == 'OA7':
         manager_name = 'actor_relation'
         tab = 'relation'
@@ -106,7 +128,7 @@ def insert_relation(type_: str, origin_id: int) -> str | Response:
             'actor_relation': 'relation',
             'event': 'event',
             'involvement':
-                'actor' if origin.class_.view == 'event' else 'event',
+                'actor' if origin.class_.group['name'] == 'event' else 'event',
             'member': 'member',
             'membership': 'member-of'}
         return redirect(f"{url_for('view', id_=origin.id)}#tab-{tabs[type_]}")
@@ -125,7 +147,7 @@ def reference_link_update(link_: Link, origin: Entity) -> str | Response:
         link_.description = form.page.data
         link_.update()
         flash(_('info update'), 'info')
-        tab = link_.range.class_.view if origin.class_.view == 'reference' \
+        tab = link_.range.class_.group['name'] if origin.class_.group['name'] == 'reference' \
             else 'reference'
         return redirect(f"{url_for('view', id_=origin.id)}#tab-{tab}")
     form.save.label.text = _('save')

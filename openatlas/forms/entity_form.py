@@ -30,7 +30,7 @@ def get_entity_form(entity: Entity, origin: Optional[Entity] = None) -> Any:
     form: Any = Form(obj=entity)
     if request.method == 'GET' and entity.id:
         populate_update(form, entity)
-    elif request.method == 'GET' and entity.id:
+    elif request.method == 'GET':
         populate_insert(form, entity)
     return form
 
@@ -39,7 +39,6 @@ def process_form_data(entity: Entity, form: Any) -> Entity:
     data = {
         'name': entity.class_.name,
         'openatlas_class_name': entity.class_.name,
-        'cidoc_class_code': entity.class_.cidoc_class.code,
         'description': entity.description,
         'begin_from': entity.begin_from,
         'begin_to': entity.begin_to,
@@ -89,7 +88,7 @@ def process_types(entity: Entity, form: Any) -> None:
             if type_.class_.name == 'administrative_unit':
                 pass
                 # manager.data['administrative_units'] += value
-            else:  # if entity.class_.view != 'type': # Todo: check needed?
+            else:  # if entity.class_.group['name'] != 'type': # Todo: check needed?
                 entity.link('P2', [g.types[id_] for id_ in data])
 
 

@@ -13,12 +13,12 @@ model = {
     'relations': {
         'actor': {
             'label': _('actor'),
-            'class': class_groups['actor'],
+            'class': class_groups['actor']['classes'],
             'property': ['P11', 'P14', 'P22', 'P23'],
             'multiple': True},
         'subs': {
             'label': _('subs'),
-            'class': class_groups['event'],
+            'class': class_groups['event']['classes'],
             'property': 'P9',
             'multiple': True},
         'source': {
@@ -29,23 +29,23 @@ model = {
             'multiple': True},
         'file': {
             'label': _('file'),
-            'class': class_groups['file'],
+            'class': class_groups['file']['classes'],
             'property': 'P67',
             'inverse': True,
             'multiple': True},
         'reference': {
             'label': _('reference'),
-            'class': class_groups['reference'],
+            'class': class_groups['reference']['classes'],
             'property': 'P67',
             'inverse': True,
             'multiple': True},
         'sub_event': {
             'label': _('sub event'),
-            'class': class_groups['event'],
+            'class': class_groups['event']['classes'],
             'property': 'P9'},
         'sub_event_of': {
             'label': _('sub event of'),
-            'class': class_groups['event'],
+            'class': class_groups['event']['classes'],
             'property': 'P9',
             'inverse': True,
             'mode': 'direct'}},
@@ -71,13 +71,13 @@ model = {
 additional_relations = {
     'succeeding_event': {
         'label': _('succeeding event'),
-        'class': class_groups['event'],
+        'class': class_groups['event']['classes'],
         'property': 'P134',
         'inverse': True,
         'mode': 'display'},
     'preceding_event': {
         'label': _('preceding event'),
-        'class': class_groups['event'],
+        'class': class_groups['event']['classes'],
         'property': 'P134',
         'mode': 'direct'},
     'location': {

@@ -102,8 +102,8 @@ def import_data_(project: Project, class_: str, data: list[Any]) -> None:
     for row in data:
         if value := row.get('openatlas_class'):
             if value.lower().replace(' ', '_') in (
-                    g.view_class_mapping['place'] +
-                    g.view_class_mapping['artifact']):
+                    g.class_groups['place']['classes'] +
+                    g.class_groups['artifact']['classes']):
                 class_ = value.lower().replace(' ', '_')
         description = row.get('description')
         entity = Entity.insert(class_, row['name'], description)
@@ -118,8 +118,8 @@ def import_data_(project: Project, class_: str, data: list[Any]) -> None:
         if entity.class_ != 'type':
             link_types(entity, row, class_, project)
         link_references(entity, row, class_, project)
-        if class_ in g.view_class_mapping['place'] \
-                + g.view_class_mapping['artifact']:
+        if class_ in g.class_groups['place']['classes'] \
+                + g.class_groups['artifact']['classes']:
             insert_gis(entity, row, project)
         entities[row.get('id')] = {
             'entity': entity,
@@ -127,8 +127,8 @@ def import_data_(project: Project, class_: str, data: list[Any]) -> None:
             'openatlas_parent_id':  row.get('openatlas_parent_id')}
     for entry in entities.values():
         if entry['entity'].class_.name in (
-                    g.view_class_mapping['place'] +
-                    g.view_class_mapping['artifact']):
+                    g.class_groups['place']['classes'] +
+                    g.class_groups['artifact']['classes']):
             if entry['parent_id']:
                 entities[entry['parent_id']]['entity'].link(
                     'P46',
@@ -214,7 +214,7 @@ def link_references(
             if len(reference) <= 2 and reference[0].isdigit():
                 try:
                     ref_entity = ApiEntity.get_by_id(int(reference[0]))
-                    if not ref_entity.class_.view == 'reference':
+                    if not ref_entity.class_.group['name'] == 'reference':
                         raise EntityDoesNotExistError
                 except EntityDoesNotExistError:
                     continue
@@ -225,7 +225,7 @@ def link_references(
             reference = references.split(';')
             if ref_id := get_id_from_origin_id(project, reference[0]):
                 ref_entity = ApiEntity.get_by_id(int(ref_id))
-                if ref_entity.class_.view == 'reference':
+                if ref_entity.class_.group['name'] == 'reference':
                     page = reference[1] or None
                     ref_entity.link('P67', entity, page)
     match_types = get_match_types()

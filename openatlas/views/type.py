@@ -58,7 +58,7 @@ def type_index() -> str:
                 name=sanitize(type_.name, 'ascii'),
                 data=walk_tree(type_.subs))
             for link_ in type_.get_links('P67', inverse=True):
-                if link_.domain.class_.view == 'reference_system':
+                if link_.domain.class_.group['name'] == 'reference_system':
                     type_.reference_systems.append(link_)
     return render_template(
         'type/index.html',
@@ -122,7 +122,7 @@ def type_delete_recursive(id_: int) -> str | Response:
         tabs['subs'].table.rows.append([link(sub), sub.count, sub.description])
     if root_name in app.config['PROPERTY_TYPES']:
         for row in Link.get_links_by_type_recursive(type_, []):
-            tabs['entities'].table.header = [_('domain'), _('range')]
+            tabs['entities'].table.columns = [_('domain'), _('range')]
             tabs['entities'].table.rows.append([
                 link(Entity.get_by_id(row['domain_id'])),
                 link(Entity.get_by_id(row['range_id']))])

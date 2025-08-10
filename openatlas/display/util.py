@@ -199,11 +199,11 @@ def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
 
 @app.template_filter()
 def menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
-    view_name = ''
+    group = ''
     if entity:
-        view_name = entity.class_.view
+        group = entity.class_.group['name']
     if origin:
-        view_name = origin.class_.view
+        group = origin.class_.group['name']
     html = ''
     for item, label in {
             'source': _('source'),
@@ -216,12 +216,12 @@ def menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
             'file': _('file')}.items():
         active = ''
         request_parts = request.path.split('/')
-        if view_name == item \
+        if group == item \
                 or request.path.startswith(f'/{item}') \
                 or request.path.startswith(f'/index/{item}'):
             active = 'active'
         elif len(request_parts) > 2 and request.path.startswith('/insert/'):
-            if g.class_view_mapping.get(request_parts[2]) == item:
+            if g.classes[request_parts[2]].group['name'] == item:
                 active = 'active'
         html += link(
             label,
@@ -255,7 +255,7 @@ def profile_image(entity: Entity) -> str:
                 filename=path_.name)
 
     external = False
-    if entity.class_.view == 'file':
+    if entity.class_.group['name'] == 'file':
         external = True
         if path.suffix.lower() not in g.display_file_ext:
             return '<p class="uc-first">' + _('no preview available') + '</p>'
@@ -313,7 +313,7 @@ def format_name_and_aliases(entity: Entity, show_links: bool) -> str:
 
 def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
     data: list[Any] = [format_name_and_aliases(entity, show_links)]
-    if entity.class_.view in [
+    if entity.class_.group['name'] in [
             'actor', 'artifact', 'event', 'place', 'reference']:
         data.append(entity.class_.label)
     if entity.class_.standard_type_id:
@@ -324,7 +324,7 @@ def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
         data.append(entity.license_holder)
         data.append(entity.get_file_size())
         data.append(entity.get_file_ext())
-    if entity.class_.view in ['actor', 'artifact', 'event', 'place']:
+    if entity.class_.group['name'] in ['actor', 'artifact', 'event', 'place']:
         data.append(entity.first)
         data.append(entity.last)
     data.append(entity.description)
@@ -470,11 +470,11 @@ def link(
         html = f'<a href="{url}"{class_}{js}{ext}>{object_}</a>'
     elif isinstance(object_, Entity) and index:
         html = link(
-            _(object_.class_.view.replace('_', ' ')) + (
+            _(object_.class_.group['name'].replace('_', ' ')) + (
                 ' (' + uc_first(_(object_.class_.name)) + ')'
-                if _(object_.class_.view) == 'event' else ''),
-            url_for('type_index') if object_.class_.view == 'type'
-            else url_for('index', view=object_.class_.view))
+                if object_.class_.group['name'] == 'event' else ''),
+            url_for('type_index') if object_.class_.group['name'] == 'type'
+            else url_for('index', view=object_.class_.group['name']))
     elif isinstance(object_, Entity):
         html = link(
             object_.name,

@@ -190,8 +190,8 @@ def import_project_view(id_: int) -> str:
         buttons = []
         for class_ in \
                 ['source'] \
-                + g.view_class_mapping['event'] \
-                + g.view_class_mapping['actor'] \
+                + g.class_groups['event']['classes'] \
+                + g.class_groups['actor']['classes'] \
                 + ['place', 'artifact', 'bibliography', 'edition', 'type']:
             buttons.append(button(
                 _(class_),
@@ -397,11 +397,12 @@ def check_parent(entity_class: str, parent_class: str) -> bool:
             if parent_class == 'feature':
                 is_parent = True
         case 'artifact':
-            if parent_class in g.view_class_mapping['place'] + ['artifact']:
+            if parent_class in \
+                    g.class_groups['place']['classes'] + ['artifact']:
                 is_parent = True
         case 'human_remains':
             if (parent_class in
-                    g.view_class_mapping['place'] + ['human_remains']):
+                    g.class_groups['place']['classes'] + ['human_remains']):
                 is_parent = True
         case 'type':
             if parent_class == 'type':
@@ -436,7 +437,7 @@ def get_allowed_columns(class_: str) -> dict[str, list[str]]:
         columns.extend([
             'type_ids', 'value_types', 'origin_type_ids',
             'origin_value_types'])
-    if class_ not in g.view_class_mapping['reference']:
+    if class_ not in g.class_groups['reference']['classes']:
         columns.extend([
             'begin_from', 'begin_to', 'begin_comment',
             'end_from', 'end_to', 'end_comment',
@@ -534,7 +535,7 @@ def check_cell_value(
                     else:
                         try:
                             ref = ApiEntity.get_by_id(int(values[0]))
-                            if not ref.class_.view == 'reference':
+                            if not ref.class_.group['name'] == 'reference':
                                 raise EntityDoesNotExistError
                         except EntityDoesNotExistError:
                             values[0] = error_span(values[0])
@@ -550,7 +551,7 @@ def check_cell_value(
                     values = str(reference).split(';')
                     if origin_id := get_id_from_origin_id(project, values[0]):
                         ref = ApiEntity.get_by_id(int(origin_id))
-                        if not ref.class_.view == 'reference':
+                        if not ref.class_.group['name'] == 'reference':
                             values[0] = error_span(values[0])
                             checks.set_warning(
                                 'invalid_origin_reference_id',
@@ -590,10 +591,10 @@ def check_cell_value(
                 value = error_span(value)
                 checks.set_warning('invalid_administrative_units', id_)
         case 'openatlas_class' if value:
-            if (value.lower().replace(' ', '_') not in
-                    (g.view_class_mapping['place'] +
-                     g.view_class_mapping['artifact']+
-                     g.view_class_mapping['type'])):
+            if (value.lower().replace(' ', '_') not in (
+                    g.class_groups['place']['classes'] +
+                    g.class_groups['artifact']['classes']+
+                    g.class_groups['type']['classes'])):
                 value = error_span(value)
                 checks.set_warning('invalid_openatlas_class', id_)
         case 'openatlas_parent_id' if value:

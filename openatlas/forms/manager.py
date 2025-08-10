@@ -132,7 +132,7 @@ class ArtifactManager(ArtifactBaseManager):
         return super().additional_fields() | {
             'super': TableField(
                 Entity.get_by_class(
-                    g.view_class_mapping['place'] + ['artifact'],
+                    g.class_groups['place']['classes'] + ['artifact'],
                     types=True,
                     aliases=self.aliases),
                 selection,
@@ -245,7 +245,7 @@ class HumanRemainsManager(ArtifactBaseManager):
         return super().additional_fields() | {
             'super': TableField(
                 Entity.get_by_class(
-                    g.view_class_mapping['place'] + ['human remains'],
+                    g.class_groups['place']['classes'] + ['human remains'],
                     types=True,
                     aliases=self.aliases),
                 selection,

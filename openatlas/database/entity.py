@@ -143,6 +143,8 @@ def get_all_entities() -> list[dict[str, Any]]:
 
 
 def insert(data: dict[str, Any]) -> int:
+    data['cidoc_class_code'] = \
+        g.classes[data['openatlas_class_name']].cidoc_class.code
     g.cursor.execute(
         """
         INSERT INTO model.entity (

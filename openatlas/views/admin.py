@@ -168,7 +168,7 @@ def get_user_table(users: list[User]) -> Table:
         'last login', 'entities'],
         defs=[{'className': 'dt-body-right', 'targets': 7}])
     if is_authorized('manager'):
-        table.header.append(_('info'))
+        table.columns.append(_('info'))
     for user in users:
         user_entities = ''
         if count := User.get_created_entities_count(user.id):
@@ -371,7 +371,7 @@ def check_similar() -> str:
     form = SimilarForm()
     form.classes.choices = [
         (class_.name, class_.label)
-        for name, class_ in g.classes.items() if class_.label and class_.view]
+        for name, class_ in g.classes.items() if class_.label and class_.group['name']]
     table = None
     if form.validate_on_submit():
         table = Table(['name', _('count')])
@@ -533,7 +533,7 @@ def orphans() -> str:
     for entity in get_orphans():
         tabs[
             'unlinked'
-            if entity.class_.view else 'orphans'].table.rows.append([
+            if entity.class_.group['name'] else 'orphans'].table.rows.append([
                 link(entity),
                 link(entity.class_),
                 link(entity.standard_type),

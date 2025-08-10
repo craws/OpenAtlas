@@ -71,7 +71,7 @@ class Display:
         return {key: data[key] for key in sorted(data.keys())}
 
     def add_file_tab_thumbnails(self) -> None:
-        self.tabs['file'].table.header.insert(1, _('icon'))
+        self.tabs['file'].table.columns.insert(1, _('icon'))
         for row in self.tabs['file'].table.rows:
             id_ = int(row[0].replace('<a href="/entity/', '').split('"')[0])
             row.insert(1, file_preview(id_))
@@ -151,6 +151,44 @@ class Display:
                             relation['inverse'],
                             types=True):
                         items.append(item)
+                buttons = [manual(f'entity/{name}')]
+                if is_authorized('contributor'):
+                    if 'link' in tab['buttons']:
+                        buttons.append(
+                            button(
+                                _('link'),
+                                url_for(
+                                    'link_insert2',
+                                    id_=self.entity.id,
+                                    relation_name=name)))
+                    if 'insert' in tab['buttons']:
+                        for class_ in relation['class']:
+                            buttons.append(
+                                button(
+                                    g.classes[class_].label,
+                                    url_for(
+                                        'insert',
+                                        class_=class_,
+                                        origin_id=self.entity.id,
+                                        relation=name)))
+                    #     case 'source':
+                    #         if class_name == 'file':
+                    #             self.buttons.append(
+                    #                 button(
+                    #                     _('link'),
+                    #                     url_for('file_add', id_=id_, view=tab_name)))
+                    #         elif view == 'reference':
+                    #             self.buttons.append(
+                    #                 button(
+                    #                     'link',
+                    #                     url_for('reference_add', id_=id_, view=tab_name)))
+                    #         else:
+                    #             self.buttons.append(
+                    #                 button('link', url_for('entity_add_source', id_=id_)))
+                    #         self.buttons.append(
+                    #             button(
+                    #                 g.classes['source'].label,
+                    #                 url_for('insert', class_=tab_name, origin_id=id_)))
                 self.tabs[name] = Tab(
                     name,
                     table=entity_table(
@@ -159,6 +197,7 @@ class Display:
                         tab['columns'],
                         tab['additional_columns'],
                         relation['inverse']),
+                    buttons=buttons,
                     entity=self.entity,
                     tooltip=tab['tooltip'] if tab and 'tooltip' in tab
                     else None)
@@ -178,7 +217,7 @@ class Display:
             self.tabs['note'].table.rows.append(data)
 
     def add_buttons(self) -> None:
-        self.buttons = [manual(f'entity/{self.entity.class_.view}')]
+        self.buttons = [manual(f"entity/{self.entity.class_.group['name']}")]
         if self.entity.class_.name == 'source_translation':
             self.buttons = [manual('entity/source')]
         if is_authorized(self.entity.class_.write_access):

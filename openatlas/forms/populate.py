@@ -28,10 +28,10 @@ def populate_update(form: Any, entity: Entity) -> None:
     populate_reference_systems(form, entity)
     if 'date' in entity.class_.attributes:
         populate_dates(form, entity)
-    #if hasattr(self.form, 'alias'):
-    #    for alias in self.entity.aliases.values():
-    #        self.form.alias.append_entry(alias)
-    #    self.form.alias.append_entry('')
+    if hasattr(form, 'alias'):
+        for alias in entity.aliases.values():
+            form.alias.append_entry(alias)
+        form.alias.append_entry('')
 
     type_data: dict[int, list[int]] = {}
     for type_, value in entity.types.items():

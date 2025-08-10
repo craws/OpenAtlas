@@ -240,7 +240,7 @@ class IIIFManifest(Resource):
     @staticmethod
     def get_manifest_version_2(id_: int, parser: Parser) -> dict[str, Any]:
         entity = ApiEntity.get_by_id(id_, types=True)
-        if entity.class_.view != 'file' and not check_iiif_file_exist(id_):
+        if entity.class_.group['name'] != 'file' and not check_iiif_file_exist(id_):
             raise DisplayFileNotFoundError
         license_ = get_license_name(entity)
         if entity.license_holder:
@@ -289,7 +289,7 @@ class IIIFManifest(Resource):
 
 
 def get_metadata(entity: Entity) -> dict[str, Any]:
-    if entity.class_.view != 'file' and not check_iiif_file_exist(entity.id):
+    if entity.class_.group['name'] != 'file' and not check_iiif_file_exist(entity.id):
         raise DisplayFileNotFoundError
     ext = '.tiff' if g.settings['iiif_conversion'] else entity.get_file_ext()
     image_url = f"{g.settings['iiif_url']}{entity.id}{ext}"

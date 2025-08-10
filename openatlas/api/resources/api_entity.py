@@ -28,11 +28,12 @@ class ApiEntity(Entity):
 
     @staticmethod
     def get_by_view_classes(codes: list[str]) -> list[Entity]:
-        codes = list(g.view_class_mapping) if 'all' in codes else codes
-        if not all(c in g.view_class_mapping for c in codes):
+        # Todo: fix after new classes
+        codes = list(g.class_groups['classes']) if 'all' in codes else codes
+        if not all(code in g.class_groups['classes'] for code in codes):
             raise InvalidViewClassError
         return Entity.get_by_class(
-            sum([g.view_class_mapping[i] for i in codes], []),
+            sum([g.class_groups['classes'][code] for code in codes], []),
             types=True,
             aliases=True)
 
