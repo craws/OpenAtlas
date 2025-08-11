@@ -267,7 +267,7 @@ def save(
                 inverse=relation['inverse'])
         g.logger.log_user(entity.id, action)
         Transaction.commit()
-        url = get_redirect_url(entity, origin, relation_name)
+        url = get_redirect_url(entity, form, origin, relation_name)
         flash(
             _('entity created') if action == 'insert' else _('info update'),
             'info')
@@ -299,32 +299,19 @@ def save(
 
 def get_redirect_url(
         entity: Entity,
+        form: Any,
         origin: Entity | None,
         relation_name: str | None) -> str:
     url = url_for('view', id_=entity.id)
     if origin and relation_name:
         url = url_for('view', id_=origin.id) + f"#tab-{relation_name}"
+    if hasattr(form, 'continue_') and form.continue_.data == 'yes':
+        url = request.url
     # if manager.continue_link_id and manager.origin:
     #    return url_for(
     #        'link_update',
     #        id_=manager.continue_link_id,
     #        origin_id=manager.origin.id)
-    # if hasattr(manager.form, 'continue_') \
-    #        and manager.form.continue_.data == 'yes':
-    #    url = url_for(
-    #        'insert',
-    #        class_=manager.entity.class_.name,
-    #        origin_id=manager.origin.id if manager.origin else None)
-    #    if manager.entity.class_.name in ('administrative_unit', 'type') \
-    #            and manager.origin:
-    #        root_id = manager.origin.root[0] \
-    #            if (manager.origin.class_.group['name'] == 'type'
-    #                and manager.origin.root) else manager.origin.id
-    #        super_id = getattr(manager.form, str(root_id)).data
-    #        url = url_for(
-    #            'insert',
-    #            class_=manager.entity.class_.name,
-    #            origin_id=str(super_id) if super_id else root_id)
     # elif hasattr(manager.form, 'continue_') \
     #        and manager.form.continue_.data in ['sub', 'human_remains']:
     #    class_ = manager.form.continue_.data

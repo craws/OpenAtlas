@@ -139,6 +139,7 @@ def entity_table(
                 case 'public':
                     html = _('yes') if g.file_info[e.id]['public'] else None
                 case 'remove':
+                    # Todo: group won't always work. Tab or rel. name needed
                     html = remove_link(
                         e.name,
                         item,
