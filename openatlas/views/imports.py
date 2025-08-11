@@ -337,7 +337,7 @@ def check_data_for_table_representation(
     file_path = app.config['TMP_PATH'] / secure_filename(str(file_.filename))
     file_.save(str(file_path))
     data_frame = pd.read_csv(file_path, keep_default_na=False, dtype=str)
-    headers = get_clean_header(data_frame, class_, checks)
+    columns = get_clean_header(data_frame, class_, checks)
     table_data = []
     origin_ids = []
     names = []
@@ -355,7 +355,7 @@ def check_data_for_table_representation(
             checks.set_error('empty_parend_id', row.get('id'))
         table_row = []
         checked_row = {}
-        for item in headers:
+        for item in columns:
             table_row.append(
                 check_cell_value(row, item, class_, checks, project))
             checked_row[item] = row[item]
@@ -371,7 +371,7 @@ def check_data_for_table_representation(
         checks.set_error('double_ids_in_import', ', '.join(doubles))
     if origin_ids and (existing := get_origin_ids(project, origin_ids)):
         checks.set_error('ids_already_in_database', ', '.join(existing))
-    if 'openatlas_class' in headers:
+    if 'openatlas_class' in columns:
         entity_dict: dict[str, Any] = {
             row.get('id'): row['openatlas_class'].replace(' ', '_')
             for row in checked_data}
@@ -383,7 +383,7 @@ def check_data_for_table_representation(
                         row['openatlas_class'].replace(' ', '_'),
                         entity_dict[row['parent_id']]):
                     checks.set_error('invalid_parent_class', row.get('id'))
-    return Table(headers, rows=table_data)
+    return Table(columns, rows=table_data)
 
 
 def check_parent(entity_class: str, parent_class: str) -> bool:

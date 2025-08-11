@@ -26,16 +26,25 @@ person = {
             'label': _('died in'),
             'class': 'object_location',
             'property': 'OA9',
-            'mode': 'direct'}},
+            'mode': 'direct'},
+        'source': {
+            'class': 'source',
+            'property': 'P67',
+            'multiple': True,
+            'inverse': True
+        }},
     'display': {
         'buttons': ['copy', 'network'],
         'form': {'insert_and_continue': True},
         'tabs': {
             'source': {
-                'additional_columns': ['remove']},
+                'additional_columns': ['remove'],
+                'buttons': ['link', 'insert']},
             'reference': {
                 'mode': 'link',
-                'additional_columns': ['page', 'update', 'remove']},
+                'additional_columns': ['page', 'update', 'remove'],
+                'buttons': ['link', 'insert']},
             'file': {
-                'additional_columns': ['main image', 'remove']},
+                'additional_columns': ['main image', 'remove'],
+                'buttons': ['link', 'insert']},
             'note': {}}}}

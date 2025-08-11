@@ -33,7 +33,7 @@ def arche_index() -> str:
 @app.route('/arche/fetch')
 @required_group('manager')
 def arche_fetch() -> str:  # pragma: no cover
-    table = Table(header=['ID', _('name')])
+    table = Table(['ID', _('name')])
     for entries in fetch_collection_data().values():
         table.rows.append([entries['collection_id'], entries['filename']])
     tabs = {

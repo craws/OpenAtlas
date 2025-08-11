@@ -475,7 +475,7 @@ def check_dates() -> str:
 @app.route('/orphans')
 @required_group('contributor')
 def orphans() -> str:
-    header = [
+    columns = [
         'name',
         'class',
         'type',
@@ -484,8 +484,8 @@ def orphans() -> str:
         'updated',
         'description']
     tabs = {
-        'orphans': Tab('orphans', _('orphans'), table=Table(header)),
-        'unlinked': Tab('unlinked', _('unlinked'), table=Table(header)),
+        'orphans': Tab('orphans', _('orphans'), table=Table(columns)),
+        'unlinked': Tab('unlinked', _('unlinked'), table=Table(columns)),
         'types': Tab(
             'type',
             table=Table(
@@ -495,7 +495,7 @@ def orphans() -> str:
         'missing_files': Tab(
             'missing_files',
             _('missing files'),
-            table=Table(header)),
+            table=Table(columns)),
         'orphaned_files': Tab(
             'orphaned_files',
             _('orphaned files'),

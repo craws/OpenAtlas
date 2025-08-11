@@ -48,9 +48,9 @@ def get_table(view: str) -> tuple[Table, str]:
     # if view == 'file':
     #     stats = {'public': 0, 'without_license': 0, 'without_creator': 0}
     #     table.order = [[0, 'desc']]
-    #     table.header = ['date'] + table.header
+    #     table.columns = ['date'] + table.columns
     #     if show_table_icons():
-    #         table.header.insert(1, _('icon'))
+    #         table.columns.insert(1, _('icon'))
     #     for entity in Entity.get_by_class('file', types=True):
     #         if entity.public:
     #             stats['public'] += 1

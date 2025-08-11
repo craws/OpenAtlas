@@ -78,7 +78,7 @@ def entity_table(
             columns = items[0].domain.class_.group['table_columns']
         else:
             columns = items[0].range.class_.class_.group['table_columns']
-    columns += additional_columns if additional_columns else []
+    columns = columns + (additional_columns or [])
     table = Table(columns)
     for item in items:
         e = item

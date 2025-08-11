@@ -120,6 +120,7 @@ def get_model(class_name: str) -> dict[str, Any]:
         tab['columns'] = tab.get('columns', None)
         tab['additional_columns'] = tab.get('additional_columns', [])
         tab['mode'] = tab.get('mode', None)
+        tab['buttons'] = tab.get('buttons', [])
     data['relations'] = data.get('relations', {})
     for name, relation in data['relations'].items():
         relation['class'] = relation['class'] \

@@ -159,7 +159,7 @@ def type_move_entities(id_: int) -> str | Response:
     return render_template(
         'type/move.html',
         table=Table(
-            header=['#', _('selection')],
+            ['#', _('selection')],
             rows=[[item, item.label.text] for item in form.selection]),
         root=root,
         form=form,
