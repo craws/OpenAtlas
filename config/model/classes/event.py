@@ -63,9 +63,11 @@ model = {
                     'last', 'comment', 'update', 'remove']},
             'reference': {
                 'mode': 'link',
-                'additional_columns': ['page', 'update', 'remove']},
+                'additional_columns': ['page', 'update', 'remove'],
+                'buttons': ['link', 'insert']},
             'file': {
-                'additional_columns': ['main image', 'remove']},
+                'additional_columns': ['main image', 'remove'],
+                'buttons': ['link', 'insert']},
             'note': {}}}}
 
 additional_relations = {

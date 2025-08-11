@@ -119,8 +119,10 @@ def entity_table(
                 case 'license holder':
                     html = g.file_info[e.id]['license_holder']
                 case 'main image':
-                    html = \
-                        profile_image_table_link(e, e, e.get_file_ext())
+                    html = profile_image_table_link(
+                        entity_viewed,
+                        e,
+                        e.get_file_ext())
                 # case name if name in g.classes[class_].relations:
                 #    html = display_relations(
                 #        e,

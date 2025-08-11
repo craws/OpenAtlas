@@ -10,7 +10,7 @@ from openatlas.database.connect import Transaction
 from openatlas.display.util import link, required_group
 from openatlas.forms.display import display_form
 from openatlas.forms.form import (
-    get_add_reference_form, get_manager, get_table_form)
+    get_add_reference_form, get_link_form, get_manager, get_table_form)
 from openatlas.models.entity import Entity, Link
 from openatlas.models.search import get_subunits_without_super
 
@@ -35,13 +35,17 @@ def link_insert(id_: int, relation_name: str) -> str | Response:
                 request.form['checkbox_values'],
                 inverse=relation['inverse'])
         return redirect(f"{url_for('view', id_=entity.id)}#tab-{relation_name}")
-    return render_template(
-        'content.html',
-        content=get_table_form(
+    if 'additional_fields' in relation:
+        form = get_link_form()
+    else:
+        form = get_table_form(
             relation['class'],
             [e.id for e in entity.get_linked_entities(
                 relation['property'],
-                inverse=relation['inverse'])]),
+                inverse=relation['inverse'])])
+    return render_template(
+        'content.html',
+        content=form,
         title=_(entity.class_.group['name']),
         crumbs=[link(entity, index=True), entity, _('link')])
 

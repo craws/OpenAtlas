@@ -4,6 +4,8 @@ from flask_babel import lazy_gettext as _
 
 from config.model.class_groups import class_groups
 
+'relation', 'member_of', 'member', 'artifact'
+
 person = {
     'attributes': {
         'name': {
@@ -31,8 +33,26 @@ person = {
             'class': 'source',
             'property': 'P67',
             'multiple': True,
-            'inverse': True
-        }},
+            'inverse': True},
+        'event': {
+            'label': _('event'),
+            'class': class_groups['event']['classes'],
+            'property': ['P11', 'P14', 'P22', 'P23'],
+            'inverse': True,
+            'multiple': True},
+        'file': {
+            'label': _('file'),
+            'class': class_groups['file']['classes'],
+            'property': 'P67',
+            'inverse': True,
+            'multiple': True},
+        'reference': {
+            'label': _('reference'),
+            'class': class_groups['reference']['classes'],
+            'property': 'P67',
+            'inverse': True,
+            'multiple': True},
+    },
     'display': {
         'buttons': ['copy', 'network'],
         'form': {'insert_and_continue': True},
@@ -40,6 +60,9 @@ person = {
             'source': {
                 'additional_columns': ['remove'],
                 'buttons': ['link', 'insert']},
+            'event': {
+                'additional_columns': ['update', 'remove'],
+                'buttons': ['link']},
             'reference': {
                 'mode': 'link',
                 'additional_columns': ['page', 'update', 'remove'],

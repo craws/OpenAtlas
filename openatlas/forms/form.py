@@ -79,6 +79,10 @@ def get_annotation_image_form(
     return Form()
 
 
+def get_link_form() -> str:
+    return ''
+
+
 def get_table_form(classes: list[str], excluded: list[int]) -> str:
     entities = Entity.get_by_class(classes, types=True, aliases=True)
     table = Table(

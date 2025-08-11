@@ -44,7 +44,8 @@ source = {
             'class': class_groups['reference']['classes'],
             'property': 'P67',
             'inverse': True,
-            'multiple': True},
+            'multiple': True,
+            'additional_fields': ['page']},
         'document': {
             'label': _('file'),
             'class': class_groups['file']['classes'],
