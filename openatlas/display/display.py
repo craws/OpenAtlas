@@ -158,7 +158,7 @@ class Display:
                             button(
                                 _('link'),
                                 url_for(
-                                    'link_insert2',
+                                    'link_insert',
                                     id_=self.entity.id,
                                     relation_name=name)))
                     if 'insert' in tab['buttons']:
@@ -182,9 +182,6 @@ class Display:
                     #                 button(
                     #                     'link',
                     #                     url_for('reference_add', id_=id_, view=tab_name)))
-                    #         else:
-                    #             self.buttons.append(
-                    #                 button('link', url_for('entity_add_source', id_=id_)))
                     #         self.buttons.append(
                     #             button(
                     #                 g.classes['source'].label,

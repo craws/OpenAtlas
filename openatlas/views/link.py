@@ -23,26 +23,9 @@ def link_delete(id_: int, origin_id: int) -> Response:
     return redirect(url_for('view', id_=origin_id))
 
 
-@app.route('/link/insert/<int:id_>/<view>', methods=['GET', 'POST'])
+@app.route('/link/insert/<int:id_>/<relation_name>', methods=['GET', 'POST'])
 @required_group('contributor')
-def link_insert(id_: int, view: str) -> str | Response:
-    entity = Entity.get_by_id(id_)
-    if request.method == 'POST':
-        if request.form['checkbox_values']:
-            entity.link_string('P67', request.form['checkbox_values'])
-        return redirect(f"{url_for('view', id_=entity.id)}#tab-{view}")
-    return render_template(
-        'content.html',
-        content=get_table_form(
-            g.class_groups[view]['classes'],
-            [e.id for e in entity.get_linked_entities('P67')]),
-        title=_(entity.class_.group['name']),
-        crumbs=[link(entity, index=True), entity, _('link')])
-
-
-@app.route('/link/insert2/<int:id_>/<relation_name>', methods=['GET', 'POST'])
-@required_group('contributor')
-def link_insert2(id_: int, relation_name: str) -> str | Response:
+def link_insert(id_: int, relation_name: str) -> str | Response:
     entity = Entity.get_by_id(id_)
     relation = entity.class_.relations[relation_name]
     if request.method == 'POST':
@@ -225,29 +208,6 @@ def entity_add_file(id_: int) -> str | Response:
         entity=entity,
         title=entity.name,
         crumbs=[link(entity, index=True), entity, f"{_('link')} {_('file')}"])
-
-
-@app.route('/entity/add/source/<int:id_>', methods=['GET', 'POST'])
-@required_group('contributor')
-def entity_add_source(id_: int) -> str | Response:
-    entity = Entity.get_by_id(id_)
-    if request.method == 'POST':
-        if request.form['checkbox_values']:
-            entity.link_string(
-                'P67',
-                request.form['checkbox_values'],
-                inverse=True)
-        return redirect(f"{url_for('view', id_=id_)}#tab-source")
-    return render_template(
-        'content.html',
-        content=get_table_form(
-            ['source'],
-            [e.id for e in entity.get_linked_entities('P67', inverse=True)]),
-        title=entity.name,
-        crumbs=[
-            link(entity, index=True),
-            entity,
-            _('link') + ' ' + _('source')])
 
 
 @app.route('/entity/add/reference/<int:id_>', methods=['GET', 'POST'])
