@@ -131,26 +131,18 @@ class Display:
             if name in self.entity.class_.relations:
                 relation = self.entity.class_.relations[name]
                 items = []
-                if tab['mode'] == 'link':
-                    for item in self.entity.get_links(
-                            relation['property'],
-                            relation['class'],
-                            relation['inverse']):
-                        items.append(item)
-                        if relation['property'] == 'P67' \
-                                and relation['class'] == ['file'] \
-                                and not self.entity.image_id \
-                                and item.domain.get_file_ext() in \
-                                g.display_file_ext:
-                            self.entity.image_id = \
-                                self.entity.image_id or item.domain.id
-                else:
-                    for item in self.entity.get_linked_entities(
-                            relation['property'],
-                            relation['class'],
-                            relation['inverse'],
-                            types=True):
-                        items.append(item)
+                for item in self.entity.get_links(
+                        relation['property'],
+                        relation['class'],
+                        relation['inverse']):
+                    items.append(item)
+                    if relation['property'] == 'P67' \
+                            and relation['class'] == ['file'] \
+                            and not self.entity.image_id \
+                            and item.domain.get_file_ext() in \
+                            g.display_file_ext:
+                        self.entity.image_id = \
+                            self.entity.image_id or item.domain.id
                 buttons = [manual(f'entity/{name}')]
                 if is_authorized('contributor'):
                     if 'link' in tab['buttons']:

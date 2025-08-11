@@ -76,42 +76,6 @@ def process_standard_fields(manager: Any) -> None:
             abort(418, f'Form error: {key}, {field_type}, value={value}')
 
 
-def process_origin(manager: Any) -> None:
-    if not manager.entity:
-        return
-    if manager.origin.class_.group['name'] == 'reference':
-        if manager.entity.class_.group['name'] == 'file':
-            manager.add_link(
-                'P67',
-                manager.origin,
-                manager.form.page.data,
-                inverse=True)
-        else:
-            manager.add_link(
-                'P67',
-                manager.origin,
-                inverse=True,
-                return_link_id=True)
-    elif manager.entity.class_.group['name'] == 'file' \
-            or (manager.entity.class_.group['name'] in ['reference', 'source']
-                and manager.origin.class_.name != 'file'):
-        manager.add_link(
-            'P67',
-            manager.origin,
-            return_link_id=bool(manager.entity.class_.group['name'] == 'reference'))
-    elif manager.origin.class_.name == 'source' \
-            and manager.entity.class_.name != 'source_translation':
-        manager.add_link('P67', manager.origin, inverse=True)
-    elif manager.origin.class_.name == 'file':
-        if manager.entity.class_.group['name'] == 'reference':
-            manager.add_link(
-                'P67',
-                manager.origin,
-                return_link_id=True)
-        elif manager.entity.class_.name != 'creation':
-            manager.add_link('P67', manager.origin, inverse=True)
-
-
 def process_date(form: Any, entity: Entity) -> dict[str, Any]:
     data: dict[str, Any] = {
         'begin_from': None,

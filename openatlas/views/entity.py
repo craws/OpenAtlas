@@ -77,13 +77,10 @@ def reference_system_remove_class(system_id: int, class_name: str) -> Response:
 def insert(
         class_: str,
         origin_id: Optional[int] = None,
-        relation: Optional[dict] = None) -> str | Response:
+        relation: Optional[str] = None) -> str | Response:
     check_insert_access(class_)
     entity = Entity({'openatlas_class_name': class_})
-    origin = None
-    if origin_id:
-        origin = Entity.get_by_id(origin_id)
-        relation = g.classes[origin.class_.name].relations[relation]
+    origin = Entity.get_by_id(origin_id) if origin_id else None
     form = get_entity_form(entity, origin)
     if form.validate_on_submit():
         # if class_ == 'file':
@@ -257,14 +254,20 @@ def save(
         entity: Entity,
         form: Any,
         origin: Optional[Entity] = None,
-        relation: Optional[dict['str', Any]] = None) -> str:
+        relation_name: Optional[str] = None) -> str:
     action = 'update' if entity.id else 'insert'
     Transaction.begin()
     try:
         entity = process_form_data(entity, form)
+        if origin and relation_name:
+            relation = g.classes[origin.class_.name].relations[relation_name]
+            origin.link(
+                relation['property'],
+                entity,
+                inverse=relation['inverse'])
         g.logger.log_user(entity.id, action)
         Transaction.commit()
-        url = get_redirect_url(entity)
+        url = get_redirect_url(entity, origin, relation_name)
         flash(
             _('entity created') if action == 'insert' else _('info update'),
             'info')
@@ -294,24 +297,18 @@ def save(
     return url
 
 
-def get_redirect_url(entity: Entity) -> str:
-    #if manager.continue_link_id and manager.origin:
+def get_redirect_url(
+        entity: Entity,
+        origin: Entity | None,
+        relation_name: str | None) -> str:
+    url = url_for('view', id_=entity.id)
+    if origin and relation_name:
+        url = url_for('view', id_=origin.id) + f"#tab-{relation_name}"
+    # if manager.continue_link_id and manager.origin:
     #    return url_for(
     #        'link_update',
     #        id_=manager.continue_link_id,
     #        origin_id=manager.origin.id)
-    url = url_for('view', id_=entity.id)
-    # if manager.origin and manager.entity.class_.name not in \
-    #        ('administrative_unit', 'source_translation', 'type'):
-    #    url = \
-    #        f"{url_for('view', id_=manager.origin.id)}" \
-    #        f"#tab-{manager.entity.class_.group['name']}"
-    #    if manager.entity.class_.name == 'file':
-    #        url = f"{url_for('view', id_=manager.origin.id)}#tab-file"
-    #    elif manager.origin.class_.group['name'] \
-    #            in ['place', 'feature', 'stratigraphic_unit'] \
-    #            and manager.entity.class_.group['name'] != 'actor':
-    #        url = url_for('view', id_=manager.entity.id)
     # if hasattr(manager.form, 'continue_') \
     #        and manager.form.continue_.data == 'yes':
     #    url = url_for(

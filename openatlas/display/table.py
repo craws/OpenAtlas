@@ -77,7 +77,7 @@ def entity_table(
         elif inverse:
             columns = items[0].domain.class_.group['table_columns']
         else:
-            columns = items[0].range.class_.class_.group['table_columns']
+            columns = items[0].range.class_.group['table_columns']
     columns = columns + (additional_columns or [])
     table = Table(columns)
     for item in items:
@@ -144,8 +144,8 @@ def entity_table(
                     html = remove_link(
                         e.name,
                         item,
-                        e,
-                        e.class_.group['classes'])
+                        entity_viewed,
+                        e.class_.group['name'])
                 # case 'related':
                 #    relative = e.get_linked_entity_safe('has relation', True)
                 #    if entity and relative.id == entity.id:

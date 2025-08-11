@@ -10,7 +10,7 @@ from wtforms import HiddenField, SelectMultipleField, StringField, widgets
 
 from openatlas.display.util import link
 from openatlas.forms.field import TableField, TreeField
-from openatlas.forms.process import process_origin, process_standard_fields
+from openatlas.forms.process import process_standard_fields
 from openatlas.forms.util import convert
 from openatlas.forms.validation import hierarchy_name_exists, validate
 from openatlas.models.entity import Entity, Link
@@ -112,8 +112,6 @@ class BaseManager:
                 'delete': set(),
                 'delete_inverse': set()}}
         process_standard_fields(self)
-        if self.origin:
-            process_origin(self)
         if 'map' in self.fields:
             self.data['gis'] = {
                 shape: getattr(self.form, f'gis_{shape}s').data
