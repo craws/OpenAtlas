@@ -132,4 +132,5 @@ def get_model(class_name: str) -> dict[str, Any]:
         relation['mode'] = relation.get('mode', 'tab')
         relation['selected'] = [] if relation['multiple'] else None
         relation['tooltip'] = relation.get('tooltip', None)
+        relation['additional_fields'] = relation.get('additional_fields', None)
     return data

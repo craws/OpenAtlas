@@ -150,7 +150,9 @@ class Display:
                             button(
                                 _('link'),
                                 url_for(
-                                    'link_insert',
+                                    'link_insert_detail'
+                                    if relation['additional_fields']
+                                    else 'link_insert',
                                     id_=self.entity.id,
                                     relation_name=name)))
                     if 'insert' in tab['buttons']:

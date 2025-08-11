@@ -545,16 +545,6 @@ class Entity:
             Entity(row) for row in db.get_by_class(classes, types, aliases)]
 
     @staticmethod
-    def get_by_view(
-            view: str,
-            types: bool = False,
-            aliases: bool = False) -> list[Entity]:
-        return Entity.get_by_class(
-            g.class_groups[view]['classes'],
-            types,
-            aliases)
-
-    @staticmethod
     def get_display_files() -> list[Entity]:
         entities = []
         for row in db.get_by_class('file', types=True):

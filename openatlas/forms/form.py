@@ -40,24 +40,6 @@ def get_manager(
     return manager_instance
 
 
-def get_add_reference_form(class_: str) -> Any:
-    class Form(FlaskForm):
-        pass
-
-    setattr(
-        Form,
-        class_,
-        TableMultiField(
-            Entity.get_by_view(
-                class_,
-                types=True,
-                aliases=current_user.settings['table_show_aliases']),
-            validators=[InputRequired()]))
-    setattr(Form, 'page', StringField(_('page')))
-    setattr(Form, 'save', SubmitField(_('insert')))
-    return Form()
-
-
 def get_annotation_image_form(
         image_id: int,
         entity: Optional[Entity] = None,
@@ -79,8 +61,27 @@ def get_annotation_image_form(
     return Form()
 
 
-def get_link_form() -> str:
-    return ''
+def get_link_form(entity: Entity, relation_name: str) -> Any:
+    class Form(FlaskForm):
+        pass
+
+    relation = entity.class_.relations[relation_name]
+    entities = Entity.get_by_class(
+        relation['class'],
+        types=True,
+        aliases=current_user.settings['table_show_aliases'])
+    setattr(
+        Form,
+        relation_name,
+        TableMultiField(entities, validators=[InputRequired()])
+        if relation['multiple'] else
+        TableField(entities, validators=[InputRequired()]))
+    for item in relation['additional_fields']:
+        match item:
+            case 'description' | 'page':
+                setattr(Form, 'description', StringField(_(item)))
+    setattr(Form, 'save', SubmitField(_('insert')))
+    return Form()
 
 
 def get_table_form(classes: list[str], excluded: list[int]) -> str:

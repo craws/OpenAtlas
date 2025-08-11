@@ -9,11 +9,11 @@ from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.util import link, required_group
 from openatlas.forms.display import display_form
-from openatlas.forms.form import (
-    get_add_reference_form, get_link_form, get_manager, get_table_form)
+from openatlas.forms.form import get_link_form, get_manager, get_table_form
 from openatlas.models.entity import Entity, Link
 from openatlas.models.search import get_subunits_without_super
 
+_('page')  # This translation is needed for reference table views
 
 @app.route('/link/delete/<int:id_>/<int:origin_id>', methods=['GET', 'POST'])
 @required_group('contributor')
@@ -34,20 +34,56 @@ def link_insert(id_: int, relation_name: str) -> str | Response:
                 relation['property'],
                 request.form['checkbox_values'],
                 inverse=relation['inverse'])
-        return redirect(f"{url_for('view', id_=entity.id)}#tab-{relation_name}")
-    if 'additional_fields' in relation:
-        form = get_link_form()
-    else:
-        form = get_table_form(
-            relation['class'],
-            [e.id for e in entity.get_linked_entities(
-                relation['property'],
-                inverse=relation['inverse'])])
+        return redirect(
+            f"{url_for('view', id_=entity.id)}#tab-{relation_name}")
+    content = get_table_form(
+        relation['class'],
+        [e.id for e in entity.get_linked_entities(
+            relation['property'],
+            inverse=relation['inverse'])])
     return render_template(
         'content.html',
-        content=form,
+        content=content,
         title=_(entity.class_.group['name']),
         crumbs=[link(entity, index=True), entity, _('link')])
+
+
+@app.route('/link/insert_detail/<int:id_>/<relation_name>', methods=['GET', 'POST'])
+@required_group('contributor')
+def link_insert_detail(id_: int, relation_name: str) -> str | Response:
+    entity = Entity.get_by_id(id_)
+    form = get_link_form(entity, relation_name)
+    relation = entity.class_.relations[relation_name]
+    if form.validate_on_submit():
+        ids = ast.literal_eval(getattr(form, relation_name).data)
+        ids = ids if isinstance(ids, list) else [int(ids)]
+        entity.link(
+            relation['property'],
+            Entity.get_by_ids(ids),
+            form.description.data if 'description' in form else None,
+            relation['inverse'])
+        return redirect(
+            f"{url_for('view', id_=entity.id)}#tab-{relation_name}")
+    return render_template(
+        'content.html',
+        content=display_form(form),
+        title=_(entity.class_.group['name']),
+        crumbs=[link(entity, index=True), entity, _('link')])
+
+#     reference = Entity.get_by_id(id_)
+#     form = get_add_reference_form(view)
+#     if form.validate_on_submit():
+#         ids = ast.literal_eval(getattr(form, view).data)
+#         ids = ids if isinstance(ids, list) else [int(ids)]
+#         reference.link('P67', Entity.get_by_ids(ids), form.page.data)
+#         return redirect(f"{url_for('view', id_=reference.id)}#tab-{view}")
+#     if reference.class_.name == 'external_reference':
+#         form.page.label.text = _('link text')
+#     return render_template(
+#         'content.html',
+#         content=display_form(form),
+#         title=_('reference'),
+#         crumbs=[link(reference, index=True), reference, _('link')])
 
 
 @app.route('/link/update/<int:id_>/<int:origin_id>', methods=['GET', 'POST'])
@@ -57,8 +93,8 @@ def link_update(id_: int, origin_id: int) -> str | Response:
     domain = Entity.get_by_id(link_.domain.id)
     range_ = Entity.get_by_id(link_.range.id)
     origin = Entity.get_by_id(origin_id)
-    if 'reference' in [domain.class_.group['name'], range_.class_.group['name']]:
-        return reference_link_update(link_, origin)
+    #if 'reference' in [domain.class_.group['name'], range_.class_.group['name']]:
+    #    return reference_link_update(link_, origin)
     manager_name = 'involvement'
     tab = 'actor' if origin.class_.group['name'] == 'event' else 'event'
     if link_.property.code == 'OA7':
@@ -127,48 +163,48 @@ def insert_relation(type_: str, origin_id: int) -> str | Response:
         crumbs=[link(origin, index=True), origin, _(type_)])
 
 
-def reference_link_update(link_: Link, origin: Entity) -> str | Response:
-    origin = Entity.get_by_id(origin.id)
-    form = get_add_reference_form('reference')
-    del form.reference
-    if form.validate_on_submit():
-        link_.description = form.page.data
-        link_.update()
-        flash(_('info update'), 'info')
-        tab = link_.range.class_.group['name'] if origin.class_.group['name'] == 'reference' \
-            else 'reference'
-        return redirect(f"{url_for('view', id_=origin.id)}#tab-{tab}")
-    form.save.label.text = _('save')
-    form.page.data = link_.description
-    if link_.domain.class_.name == 'external_reference':
-        form.page.label.text = _('link text')
-    return render_template(
-        'content.html',
-        content=display_form(form),
-        crumbs=[
-            link(origin, index=True),
-            origin,
-            link_.domain if link_.domain.id != origin.id else link_.range,
-            _('edit')])
+# def reference_link_update(link_: Link, origin: Entity) -> str | Response:
+#     origin = Entity.get_by_id(origin.id)
+#     form = get_add_reference_form('reference')
+#     del form.reference
+#     if form.validate_on_submit():
+#         link_.description = form.page.data
+#         link_.update()
+#         flash(_('info update'), 'info')
+#         tab = link_.range.class_.group['name'] if origin.class_.group['name'] == 'reference' \
+#             else 'reference'
+#         return redirect(f"{url_for('view', id_=origin.id)}#tab-{tab}")
+#     form.save.label.text = _('save')
+#     form.page.data = link_.description
+#     if link_.domain.class_.name == 'external_reference':
+#         form.page.label.text = _('link text')
+#     return render_template(
+#         'content.html',
+#         content=display_form(form),
+#         crumbs=[
+#             link(origin, index=True),
+#             origin,
+#             link_.domain if link_.domain.id != origin.id else link_.range,
+#             _('edit')])
 
 
-@app.route('/reference/add/<int:id_>/<view>', methods=['GET', 'POST'])
-@required_group('contributor')
-def reference_add(id_: int, view: str) -> str | Response:
-    reference = Entity.get_by_id(id_)
-    form = get_add_reference_form(view)
-    if form.validate_on_submit():
-        ids = ast.literal_eval(getattr(form, view).data)
-        ids = ids if isinstance(ids, list) else [int(ids)]
-        reference.link('P67', Entity.get_by_ids(ids), form.page.data)
-        return redirect(f"{url_for('view', id_=reference.id)}#tab-{view}")
-    if reference.class_.name == 'external_reference':
-        form.page.label.text = _('link text')
-    return render_template(
-        'content.html',
-        content=display_form(form),
-        title=_('reference'),
-        crumbs=[link(reference, index=True), reference, _('link')])
+# @app.route('/reference/add/<int:id_>/<view>', methods=['GET', 'POST'])
+# @required_group('contributor')
+# def reference_add(id_: int, view: str) -> str | Response:
+#     reference = Entity.get_by_id(id_)
+#     form = get_add_reference_form(view)
+#     if form.validate_on_submit():
+#         ids = ast.literal_eval(getattr(form, view).data)
+#         ids = ids if isinstance(ids, list) else [int(ids)]
+#         reference.link('P67', Entity.get_by_ids(ids), form.page.data)
+#         return redirect(f"{url_for('view', id_=reference.id)}#tab-{view}")
+#     if reference.class_.name == 'external_reference':
+#         form.page.label.text = _('link text')
+#     return render_template(
+#         'content.html',
+#         content=display_form(form),
+#         title=_('reference'),
+#         crumbs=[link(reference, index=True), reference, _('link')])
 
 
 @app.route('/add/subunit/<int:super_id>', methods=['GET', 'POST'])
@@ -214,24 +250,24 @@ def entity_add_file(id_: int) -> str | Response:
         crumbs=[link(entity, index=True), entity, f"{_('link')} {_('file')}"])
 
 
-@app.route('/entity/add/reference/<int:id_>', methods=['GET', 'POST'])
-@required_group('contributor')
-def entity_add_reference(id_: int) -> str | Response:
-    entity = Entity.get_by_id(id_)
-    form = get_add_reference_form('reference')
-    if form.validate_on_submit():
-        entity.link_string(
-            'P67',
-            form.reference.data,
-            description=form.page.data,
-            inverse=True)
-        return redirect(f"{url_for('view', id_=id_)}#tab-reference")
-    form.page.label.text = _('page / link text')
-    return render_template(
-        'content.html',
-        content=display_form(form),
-        entity=entity,
-        crumbs=[
-            link(entity, index=True),
-            entity,
-            _('link') + ' ' + _('reference')])
+# @app.route('/entity/add/reference/<int:id_>', methods=['GET', 'POST'])
+# @required_group('contributor')
+# def entity_add_reference(id_: int) -> str | Response:
+#     entity = Entity.get_by_id(id_)
+#     form = get_add_reference_form('reference')
+#     if form.validate_on_submit():
+#         entity.link_string(
+#             'P67',
+#             form.reference.data,
+#             description=form.page.data,
+#             inverse=True)
+#         return redirect(f"{url_for('view', id_=id_)}#tab-reference")
+#     form.page.label.text = _('page / link text')
+#     return render_template(
+#         'content.html',
+#         content=display_form(form),
+#         entity=entity,
+#         crumbs=[
+#             link(entity, index=True),
+#             entity,
+#             _('link') + ' ' + _('reference')])

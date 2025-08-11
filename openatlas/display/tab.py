@@ -36,17 +36,7 @@ class Tab:
         self.table = table or Table()
         self.buttons: list[str] = buttons  # or [manual(f'entity/{name}')] ?
         self.tooltip = uc_first(tooltip) if tooltip else ''
-        if is_authorized('contributor'):
-            self.set_buttons(name, entity)
 
-    def set_buttons(
-            self,
-            tab_name: str,
-            entity: Optional[Entity] = None) -> None:
-        pass
-        # view = entity.class_.group['name'] if entity else None
-        # id_ = entity.id if entity else None
-        # class_name = entity.class_.name if entity else None
         # match tab_name:
         #     case 'actor':
         #         match view:
