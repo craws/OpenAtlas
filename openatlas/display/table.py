@@ -68,7 +68,7 @@ def entity_table(
         columns: Optional[list[str]] = None,
         additional_columns: Optional[list[str]] = None,
         inverse: Optional[bool] = False,
-        table_field_id: Optional[str] = None) -> Table | None:
+        table_id: Optional[str] = None) -> Table | None:
     if not items:
         return None
     if not columns:
@@ -126,10 +126,8 @@ def entity_table(
                 #        e,
                 #        g.classes[class_].relations[name])
                 case 'name':
-                    html = format_name_and_aliases_for_form(
-                        e,
-                        table_field_id) if table_field_id \
-                        else format_name_and_aliases(e, True)
+                    html = format_name_and_aliases_for_form(e, table_id) \
+                        if table_id else format_name_and_aliases(e, True)
                 case 'profile' if e and e.image_id:
                     html = 'Profile' if e.id == entity_viewed.image_id \
                         else link(
