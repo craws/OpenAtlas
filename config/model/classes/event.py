@@ -13,40 +13,41 @@ model = {
     'relations': {
         'actor': {
             'label': _('actor'),
-            'class': class_groups['actor']['classes'],
-            'property': ['P11', 'P14', 'P22', 'P23'],
+            'classes': class_groups['actor']['classes'],
+            'properties': ['P11', 'P14', 'P22', 'P23'],
             'multiple': True},
         'subs': {
             'label': _('subs'),
-            'class': class_groups['event']['classes'],
-            'property': 'P9',
+            'classes': class_groups['event']['classes'],
+            'properties': 'P9',
             'multiple': True},
         'source': {
             'label': _('source'),
-            'class': 'source',
-            'property': 'P67',
+            'classes': 'source',
+            'properties': 'P67',
             'inverse': True,
             'multiple': True},
         'file': {
             'label': _('file'),
-            'class': class_groups['file']['classes'],
-            'property': 'P67',
+            'classes': class_groups['file']['classes'],
+            'properties': 'P67',
             'inverse': True,
-            'multiple': True},
+            'multiple': True,
+            'additional_fields': ['page']},
         'reference': {
             'label': _('reference'),
-            'class': class_groups['reference']['classes'],
-            'property': 'P67',
+            'classes': class_groups['reference']['classes'],
+            'properties': 'P67',
             'inverse': True,
             'multiple': True},
         'sub_event': {
             'label': _('sub event'),
-            'class': class_groups['event']['classes'],
-            'property': 'P9'},
+            'classes': class_groups['event']['classes'],
+            'properties': 'P9'},
         'sub_event_of': {
             'label': _('sub event of'),
-            'class': class_groups['event']['classes'],
-            'property': 'P9',
+            'classes': class_groups['event']['classes'],
+            'properties': 'P9',
             'inverse': True,
             'mode': 'direct'}},
     'display': {
@@ -59,7 +60,7 @@ model = {
             'actor': {
                 'mode': 'link',
                 'columns': [
-                    'name', 'class', 'activity', 'involvement', 'first',
+                    'name', 'classes', 'activity', 'involvement', 'first',
                     'last', 'comment', 'update', 'remove']},
             'reference': {
                 'mode': 'link',
@@ -73,19 +74,19 @@ model = {
 additional_relations = {
     'succeeding_event': {
         'label': _('succeeding event'),
-        'class': class_groups['event']['classes'],
-        'property': 'P134',
+        'classes': class_groups['event']['classes'],
+        'properties': 'P134',
         'inverse': True,
         'mode': 'display'},
     'preceding_event': {
         'label': _('preceding event'),
-        'class': class_groups['event']['classes'],
-        'property': 'P134',
+        'classes': class_groups['event']['classes'],
+        'properties': 'P134',
         'mode': 'direct'},
     'location': {
         'label': _('location'),
-        'class': 'object_location',
-        'property': 'P7',
+        'classes': 'object_location',
+        'properties': 'P7',
         'mode': 'direct'}}
 
 activity = copy.deepcopy(model)
@@ -101,26 +102,26 @@ acquisition['relations'] = acquisition['relations'] | {
     'location': additional_relations['location'],
     'recipient': {
         'label': _('recipient'),
-        'class': class_groups['actor'],
-        'property': 'P22',
+        'classes': class_groups['actor'],
+        'properties': 'P22',
         'mode': 'display',
         'multiple': True},
     'donor': {
         'label': _('donor'),
-        'class': class_groups['actor'],
-        'property': 'P23',
+        'classes': class_groups['actor'],
+        'properties': 'P23',
         'mode': 'display',
         'multiple': True},
     'given_place': {
         'label': _('given place'),
-        'class': 'place',
-        'property': 'P24',
+        'classes': 'place',
+        'properties': 'P24',
         'mode': 'direct',
         'multiple': True},
     'given_artifact': {
         'label': _('given artifact'),
-        'class': 'artifact',
-        'property': 'P24',
+        'classes': 'artifact',
+        'properties': 'P24',
         'mode': 'direct',
         'multiple': True}}
 
@@ -131,8 +132,8 @@ creation['relations'] = creation['relations'] | {
     'location': additional_relations['location'],
     'document': {
         'label': _('file'),
-        'class': 'file',
-        'property': 'P94',
+        'classes': 'file',
+        'properties': 'P94',
         'multiple': True,
         'mode': 'direct'}}
 
@@ -147,14 +148,14 @@ modification['relations'] = modification['relations'] | {
     'location': additional_relations['location'],
     'modified_object': {
         'label': _('modified object'),
-        'class': class_groups['artifact'],
-        'property': 'P31',
+        'classes': class_groups['artifact'],
+        'properties': 'P31',
         'multiple': True,
         'mode': 'direct'},
     'modified_place': {
         'label': _('modified place'),
-        'class': 'place',
-        'property': 'P31',
+        'classes': 'place',
+        'properties': 'P31',
         'multiple': True,
         'mode': 'direct'}}
 
@@ -164,24 +165,24 @@ move['relations'] = move['relations'] | {
     'preceding_event': additional_relations['preceding_event'],
     'place_from': {
         'label': _('place from'),
-        'class': 'object_location',
-        'property': 'P27',
+        'classes': 'object_location',
+        'properties': 'P27',
         'mode': 'direct'},
     'place_to': {
         'label': _('place to'),
-        'class': 'object_location',
-        'property': 'P26',
+        'classes': 'object_location',
+        'properties': 'P26',
         'mode': 'direct'},
     'moved_person': {
         'label': _('moved person'),
-        'class': 'person',
-        'property': 'P25',
+        'classes': 'person',
+        'properties': 'P25',
         'multiple': True,
         'mode': 'direct'},
     'moved_object': {
         'label': _('moved object'),
-        'class': class_groups['artifact'],
-        'property': 'P25',
+        'classes': class_groups['artifact'],
+        'properties': 'P25',
         'multiple': True,
         'mode': 'direct'}}
 
@@ -192,7 +193,7 @@ production['relations'] = production['relations'] | {
     'location': additional_relations['location'],
     'produced_artifact': {
         'label': _('produced artifact'),
-        'class': 'artifact',
-        'property': 'P108',
+        'classes': 'artifact',
+        'properties': 'P108',
         'multiple': True,
         'mode': 'direct'}}

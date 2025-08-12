@@ -81,9 +81,16 @@ class OpenatlasClass:
             return tooltips[self.cidoc_class.code]
         return None
 
+    def get_relation_by_property(self, property: str) -> dict[str, Any] | None:
+        for relation in self.relations:
+            if property in relation['properties']:
+                return relation
+        return None
+
 
 def get_class_count() -> dict[str, int]:
     return db.get_class_count()
+
 
 def get_classes() -> dict[str, OpenatlasClass]:
     classes = {}
@@ -123,8 +130,13 @@ def get_model(class_name: str) -> dict[str, Any]:
         tab['buttons'] = tab.get('buttons', [])
     data['relations'] = data.get('relations', {})
     for name, relation in data['relations'].items():
-        relation['class'] = relation['class'] \
-            if isinstance(relation['class'], list) else [relation['class']]
+        relation['name'] = name
+        relation['classes'] = relation['classes'] \
+            if isinstance(relation['classes'], list) \
+            else [relation['classes']]
+        relation['properties'] = relation['properties'] \
+            if isinstance(relation['properties'], list) \
+            else [relation['properties']]
         relation['inverse'] = relation.get('inverse', False)
         relation['multiple'] = relation.get('multiple', False)
         relation['required'] = relation.get('required', False)

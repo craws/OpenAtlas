@@ -61,18 +61,17 @@ def get_annotation_image_form(
     return Form()
 
 
-def get_link_form(entity: Entity, relation_name: str) -> Any:
+def get_link_form(relation: dict[str, Any]) -> Any:
     class Form(FlaskForm):
         pass
 
-    relation = entity.class_.relations[relation_name]
     entities = Entity.get_by_class(
-        relation['class'],
+        relation['classes'],
         types=True,
         aliases=current_user.settings['table_show_aliases'])
     setattr(
         Form,
-        relation_name,
+        relation['name'],
         TableMultiField(entities, validators=[InputRequired()])
         if relation['multiple'] else
         TableField(entities, validators=[InputRequired()]))

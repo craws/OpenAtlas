@@ -30,16 +30,18 @@ def link_insert(id_: int, relation_name: str) -> str | Response:
     relation = entity.class_.relations[relation_name]
     if request.method == 'POST':
         if request.form['checkbox_values']:
+            # Todo: properties can be multiple?
             entity.link_string(
-                relation['property'],
+                relation['properties'][0],
                 request.form['checkbox_values'],
                 inverse=relation['inverse'])
         return redirect(
             f"{url_for('view', id_=entity.id)}#tab-{relation_name}")
+    # Todo: properties can be multiple?
     content = get_table_form(
-        relation['class'],
+        relation['classes'],
         [e.id for e in entity.get_linked_entities(
-            relation['property'],
+            relation['properties'][0],
             inverse=relation['inverse'])])
     return render_template(
         'content.html',
@@ -52,13 +54,14 @@ def link_insert(id_: int, relation_name: str) -> str | Response:
 @required_group('contributor')
 def link_insert_detail(id_: int, relation_name: str) -> str | Response:
     entity = Entity.get_by_id(id_)
-    form = get_link_form(entity, relation_name)
     relation = entity.class_.relations[relation_name]
+    form = get_link_form(relation)
     if form.validate_on_submit():
         ids = ast.literal_eval(getattr(form, relation_name).data)
         ids = ids if isinstance(ids, list) else [int(ids)]
+        # Todo: properties can be multiple?
         entity.link(
-            relation['property'],
+            relation['properties'][0],
             Entity.get_by_ids(ids),
             form.description.data if 'description' in form else None,
             relation['inverse'])
@@ -92,34 +95,38 @@ def link_update(id_: int, origin_id: int) -> str | Response:
     link_ = Link.get_by_id(id_)
     domain = Entity.get_by_id(link_.domain.id)
     range_ = Entity.get_by_id(link_.range.id)
-    origin = Entity.get_by_id(origin_id)
+    origin = domain if origin_id == domain.id else range_
+    relation = origin.class_.get_relation_by_property(link_.property.code)
+    form = get_link_form(relation)
+    # origin = Entity.get_by_id(origin_id)
+    # form = get_link_form(origin, relation_name, )
     #if 'reference' in [domain.class_.group['name'], range_.class_.group['name']]:
     #    return reference_link_update(link_, origin)
-    manager_name = 'involvement'
-    tab = 'actor' if origin.class_.group['name'] == 'event' else 'event'
-    if link_.property.code == 'OA7':
-        manager_name = 'actor_relation'
-        tab = 'relation'
-    elif link_.property.code == 'P107':
-        manager_name = 'actor_function'
-        tab = f"member{'-of' if origin.id == range_.id else ''}"
-    manager = get_manager(manager_name, origin=origin, link_=link_)
-    if manager.form.validate_on_submit():
-        Transaction.begin()
-        try:
-            manager.process_link_form()
-            manager.link_.update()
-            Transaction.commit()
-        except Exception as e:  # pragma: no cover
-            Transaction.rollback()
-            g.logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
-        return redirect(f"{url_for('view', id_=origin.id)}#tab-{tab}")
-    if not manager.form.errors:
-        manager.populate_update()
+    # manager_name = 'involvement'
+    # tab = 'actor' if origin.class_.group['name'] == 'event' else 'event'
+    # if link_.property.code == 'OA7':
+    #     manager_name = 'actor_relation'
+    #     tab = 'relation'
+    # elif link_.property.code == 'P107':
+    #     manager_name = 'actor_function'
+    #     tab = f"member{'-of' if origin.id == range_.id else ''}"
+    # manager = get_manager(manager_name, origin=origin, link_=link_)
+    # if manager.form.validate_on_submit():
+    #     Transaction.begin()
+    #     try:
+    #         manager.process_link_form()
+    #         manager.link_.update()
+    #         Transaction.commit()
+    #     except Exception as e:  # pragma: no cover
+    #         Transaction.rollback()
+    #         g.logger.log('error', 'database', 'transaction failed', e)
+    #         flash(_('error transaction'), 'error')
+    #     return redirect(f"{url_for('view', id_=origin.id)}#tab-{tab}")
+    # if not manager.form.errors:
+    #     manager.populate_update()
     return render_template(
         'content.html',
-        content=display_form(manager.form),
+        content=display_form(form),
         crumbs=[
             link(origin, index=True),
             origin,

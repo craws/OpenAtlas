@@ -132,12 +132,12 @@ class Display:
                 relation = self.entity.class_.relations[name]
                 items = []
                 for item in self.entity.get_links(
-                        relation['property'],
-                        relation['class'],
+                        relation['properties'],
+                        relation['classes'],
                         relation['inverse']):
                     items.append(item)
-                    if relation['property'] == 'P67' \
-                            and relation['class'] == ['file'] \
+                    if relation['properties'] == ['P67'] \
+                            and relation['classes'] == ['file'] \
                             and not self.entity.image_id \
                             and item.domain.get_file_ext() in \
                             g.display_file_ext:
@@ -156,7 +156,7 @@ class Display:
                                     id_=self.entity.id,
                                     relation_name=name)))
                     if 'insert' in tab['buttons']:
-                        for class_ in relation['class']:
+                        for class_ in relation['classes']:
                             buttons.append(
                                 button(
                                     g.classes[class_].label,
@@ -285,8 +285,8 @@ class Display:
             if relation['mode'] in ['direct', 'display']:
                 self.data[relation['label']] = []
                 for e in self.entity.get_linked_entities(
-                        relation['property'],
-                        relation['class'],
+                        relation['properties'],
+                        relation['classes'],
                         relation['inverse']):
                     if e.class_.name == 'object_location':
                         e = e.get_linked_entity_safe('P53', True)

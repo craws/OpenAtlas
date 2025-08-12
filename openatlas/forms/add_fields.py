@@ -126,7 +126,7 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
             continue
         validators = [InputRequired()] if relation['required'] else None
         items = []
-        for class_ in relation['class']:
+        for class_ in relation['classes']:
             class_ = 'place' if class_ == 'object_location' else class_
             if class_ not in entities:
                 entities[class_] = Entity.get_by_class(class_, True, True)
@@ -135,10 +135,10 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
             selection: Any = []
             if entity.id:
                 selection = entity.get_linked_entities(
-                    relation['property'],
-                    relation['class'],
+                    relation['properties'],
+                    relation['classes'],
                     inverse=relation['inverse'])
-            elif origin and origin.class_.name in relation['class']:
+            elif origin and origin.class_.name in relation['classes']:
                 selection = [origin]
             setattr(
                 form,
@@ -153,10 +153,10 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
             selection = None
             if entity.id:
                 selection = entity.get_linked_entity(
-                    relation['property'],
-                    relation['class'],
+                    relation['properties'],
+                    relation['classes'],
                     relation['inverse'])
-            elif origin and origin.class_.name in relation['class']:
+            elif origin and origin.class_.name in relation['classes']:
                 selection = origin
             if selection and selection.class_.name == 'object_location':
                 selection = selection.get_linked_entity_safe('P53', True)

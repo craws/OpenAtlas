@@ -98,13 +98,14 @@ def process_relations(entity: Entity, form: Any) -> None:
             continue
         if hasattr(form, name) and (ids := convert(getattr(form, name).data)):
             entities = Entity.get_by_ids(ids)
-            if 'object_location' in relation['class']:
+            if 'object_location' in relation['classes']:
                 locations = []
                 for place in entities:
                     locations.append(place.get_linked_entity_safe('P53'))
                 entities = locations
+            # Todo: properties can be multiple?
             entity.link(
-                relation['property'],
+                relation['properties'][0],
                 entities,
                 inverse=relation['inverse'])
 
@@ -127,6 +128,6 @@ def delete_links(entity: Entity) -> None:
     for relation in entity.class_.relations.values():
         if relation['mode'] == 'direct':
             entity.delete_links_by_property_and_class(
-                relation['property'],
-                relation['class'],
+                relation['properties'],
+                relation['classes'],
                 relation['inverse'])
