@@ -67,17 +67,20 @@ def entity_table(
         entity_viewed: Optional[Entity] = None,
         columns: Optional[list[str]] = None,
         additional_columns: Optional[list[str]] = None,
-        inverse: Optional[bool] = False,
+        relation: Optional[dict[Any, str]] = None,
         table_id: Optional[str] = None) -> Table | None:
     if not items:
         return None
+    inverse = relation and relation['inverse']
     if not columns:
-        if isinstance(items[0], Entity):
-            columns = items[0].class_.group['table_columns']
-        elif inverse:
-            columns = items[0].domain.class_.group['table_columns']
-        else:
-            columns = items[0].range.class_.group['table_columns']
+        item = items[0]
+        if isinstance(item, Entity):
+            columns = item.class_.group['table_columns']
+        if isinstance(item, Link):
+            if inverse:
+                columns = item.domain.class_.group['table_columns']
+            else:
+                columns = item.range.class_.group['table_columns']
     columns = columns + (additional_columns or [])
     table = Table(columns)
     for item in items:
@@ -165,7 +168,8 @@ def entity_table(
                         url_for(
                             'link_update',
                             id_=item.id,
-                            origin_id=entity_viewed.id))
+                            origin_id=entity_viewed.id,
+                            relation=relation['name']))
             data.append(html)
         table.rows.append(data)
     return table

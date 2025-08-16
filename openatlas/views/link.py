@@ -9,11 +9,13 @@ from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.util import link, required_group
 from openatlas.forms.display import display_form
-from openatlas.forms.form import get_link_form, get_manager, get_table_form
+from openatlas.forms.form import (
+    get_link_form, get_link_update_form, get_manager, get_table_form)
 from openatlas.models.entity import Entity, Link
 from openatlas.models.search import get_subunits_without_super
 
 _('page')  # This translation is needed for reference table views
+
 
 @app.route('/link/delete/<int:id_>/<int:origin_id>', methods=['GET', 'POST'])
 @required_group('contributor')
@@ -50,7 +52,9 @@ def link_insert(id_: int, relation_name: str) -> str | Response:
         crumbs=[link(entity, index=True), entity, _('link')])
 
 
-@app.route('/link/insert_detail/<int:id_>/<relation_name>', methods=['GET', 'POST'])
+@app.route(
+    '/link/insert_detail/<int:id_>/<relation_name>',
+    methods=['GET', 'POST'])
 @required_group('contributor')
 def link_insert_detail(id_: int, relation_name: str) -> str | Response:
     entity = Entity.get_by_id(id_)
@@ -89,18 +93,22 @@ def link_insert_detail(id_: int, relation_name: str) -> str | Response:
 #         crumbs=[link(reference, index=True), reference, _('link')])
 
 
-@app.route('/link/update/<int:id_>/<int:origin_id>', methods=['GET', 'POST'])
+@app.route(
+    '/link/update/<int:id_>/<int:origin_id>/<relation>',
+    methods=['GET', 'POST'])
 @required_group('contributor')
-def link_update(id_: int, origin_id: int) -> str | Response:
+def link_update(id_: int, origin_id: int, relation: str) -> str | Response:
     link_ = Link.get_by_id(id_)
     domain = Entity.get_by_id(link_.domain.id)
     range_ = Entity.get_by_id(link_.range.id)
     origin = domain if origin_id == domain.id else range_
-    relation = origin.class_.get_relation_by_property(link_.property.code)
-    form = get_link_form(relation)
+    target = range_ if origin_id == domain.id else domain
+    relation = origin.class_.relations[relation]
+    form = get_link_update_form(link_, relation)
     # origin = Entity.get_by_id(origin_id)
     # form = get_link_form(origin, relation_name, )
-    #if 'reference' in [domain.class_.group['name'], range_.class_.group['name']]:
+    # if 'reference' in
+    #       [domain.class_.group['name'], range_.class_.group['name']]:
     #    return reference_link_update(link_, origin)
     # manager_name = 'involvement'
     # tab = 'actor' if origin.class_.group['name'] == 'event' else 'event'
@@ -122,15 +130,15 @@ def link_update(id_: int, origin_id: int) -> str | Response:
     #         g.logger.log('error', 'database', 'transaction failed', e)
     #         flash(_('error transaction'), 'error')
     #     return redirect(f"{url_for('view', id_=origin.id)}#tab-{tab}")
-    # if not manager.form.errors:
-    #     manager.populate_update()
     return render_template(
         'content.html',
         content=display_form(form),
         crumbs=[
             link(origin, index=True),
-            origin,
-            domain if origin.id != domain.id else range_,
+            link(
+                origin.name,
+                url_for('view', id_=origin.id) + f"#tab-{relation['name']}"),
+            target,
             _('edit')])
 
 
@@ -178,8 +186,8 @@ def insert_relation(type_: str, origin_id: int) -> str | Response:
 #         link_.description = form.page.data
 #         link_.update()
 #         flash(_('info update'), 'info')
-#         tab = link_.range.class_.group['name'] if origin.class_.group['name'] == 'reference' \
-#             else 'reference'
+#         tab = link_.range.class_.group['name']
+#           if origin.class_.group['name'] == 'reference' else 'reference'
 #         return redirect(f"{url_for('view', id_=origin.id)}#tab-{tab}")
 #     form.save.label.text = _('save')
 #     form.page.data = link_.description

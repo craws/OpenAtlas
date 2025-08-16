@@ -83,6 +83,22 @@ def get_link_form(relation: dict[str, Any]) -> Any:
     return Form()
 
 
+def get_link_update_form(link_: Link, relation: dict[str, Any]) -> Any:
+    class Form(FlaskForm):
+        pass
+
+    for item in relation['additional_fields']:
+        match item:
+            case 'description' | 'page':
+                setattr(Form, 'description', StringField(_(item)))
+    setattr(Form, 'save', SubmitField(_('save')))
+    form = Form()
+    if request.method == 'GET':
+        if hasattr(form, 'description'):
+            getattr(form, 'description').data = link_.description
+    return form
+
+
 def get_table_form(classes: list[str], excluded: list[int]) -> str:
     entities = Entity.get_by_class(classes, types=True, aliases=True)
     table = Table(

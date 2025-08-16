@@ -187,7 +187,7 @@ class Display:
                         self.entity,
                         tab['columns'],
                         tab['additional_columns'],
-                        relation['inverse']),
+                        relation),
                     buttons=buttons,
                     entity=self.entity,
                     tooltip=tab['tooltip'] if tab and 'tooltip' in tab
