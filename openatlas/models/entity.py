@@ -893,14 +893,14 @@ class Link:
             self.last = format_date_part(self.end_to, 'year') \
                 if self.end_to else self.last
 
-    def update(self) -> None:
+    def update(self, data: dict[str, Any]) -> None:
         db_link.update({
             'id': self.id,
             'property_code': self.property.code,
             'domain_id': self.domain.id,
             'range_id': self.range.id,
             'type_id': self.type.id if self.type else None,
-            'description': sanitize(self.description),
+            'description': sanitize(data.get('description', self.description)),
             'begin_from': datetime64_to_timestamp(self.begin_from),
             'begin_to': datetime64_to_timestamp(self.begin_to),
             'begin_comment': sanitize(self.begin_comment),

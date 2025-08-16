@@ -77,21 +77,6 @@ def link_insert_detail(id_: int, relation_name: str) -> str | Response:
         title=_(entity.class_.group['name']),
         crumbs=[link(entity, index=True), entity, _('link')])
 
-#     reference = Entity.get_by_id(id_)
-#     form = get_add_reference_form(view)
-#     if form.validate_on_submit():
-#         ids = ast.literal_eval(getattr(form, view).data)
-#         ids = ids if isinstance(ids, list) else [int(ids)]
-#         reference.link('P67', Entity.get_by_ids(ids), form.page.data)
-#         return redirect(f"{url_for('view', id_=reference.id)}#tab-{view}")
-#     if reference.class_.name == 'external_reference':
-#         form.page.label.text = _('link text')
-#     return render_template(
-#         'content.html',
-#         content=display_form(form),
-#         title=_('reference'),
-#         crumbs=[link(reference, index=True), reference, _('link')])
-
 
 @app.route(
     '/link/update/<int:id_>/<int:origin_id>/<relation>',
@@ -105,39 +90,25 @@ def link_update(id_: int, origin_id: int, relation: str) -> str | Response:
     target = range_ if origin_id == domain.id else domain
     relation = origin.class_.relations[relation]
     form = link_update_form(link_, relation)
-    # origin = Entity.get_by_id(origin_id)
-    # form = get_link_form(origin, relation_name, )
-    # if 'reference' in
-    #       [domain.class_.group['name'], range_.class_.group['name']]:
-    #    return reference_link_update(link_, origin)
-    # manager_name = 'involvement'
-    # tab = 'actor' if origin.class_.group['name'] == 'event' else 'event'
-    # if link_.property.code == 'OA7':
-    #     manager_name = 'actor_relation'
-    #     tab = 'relation'
-    # elif link_.property.code == 'P107':
-    #     manager_name = 'actor_function'
-    #     tab = f"member{'-of' if origin.id == range_.id else ''}"
-    # manager = get_manager(manager_name, origin=origin, link_=link_)
-    # if manager.form.validate_on_submit():
-    #     Transaction.begin()
-    #     try:
-    #         manager.process_link_form()
-    #         manager.link_.update()
-    #         Transaction.commit()
-    #     except Exception as e:  # pragma: no cover
-    #         Transaction.rollback()
-    #         g.logger.log('error', 'database', 'transaction failed', e)
-    #         flash(_('error transaction'), 'error')
-    #     return redirect(f"{url_for('view', id_=origin.id)}#tab-{tab}")
+    origin_url = url_for('view', id_=origin.id) + f"#tab-{relation['name']}"
+    if form.validate_on_submit():
+        try:
+            link_.update({
+                'description': form.description.data
+                if hasattr(form, 'description') else None
+            })
+            flash(_('info update'), 'info')
+        except Exception as e:  # pragma: no cover
+            Transaction.rollback()
+            g.logger.log('error', 'database', 'transaction failed', e)
+            flash(_('error transaction'), 'error')
+        return redirect(origin_url)
     return render_template(
         'content.html',
         content=display_form(form),
         crumbs=[
             link(origin, index=True),
-            link(
-                origin.name,
-                url_for('view', id_=origin.id) + f"#tab-{relation['name']}"),
+            link(origin.name, origin_url),
             target,
             _('edit')])
 
@@ -153,7 +124,7 @@ def insert_relation(type_: str, origin_id: int) -> str | Response:
         Transaction.begin()
         try:
             manager.process_form()
-            manager.update_link()
+            # manager.update_link()
             Transaction.commit()
         except Exception as e:  # pragma: no cover
             Transaction.rollback()
@@ -176,50 +147,6 @@ def insert_relation(type_: str, origin_id: int) -> str | Response:
         content=display_form(manager.form),
         origin=origin,
         crumbs=[link(origin, index=True), origin, _(type_)])
-
-
-# def reference_link_update(link_: Link, origin: Entity) -> str | Response:
-#     origin = Entity.get_by_id(origin.id)
-#     form = get_add_reference_form('reference')
-#     del form.reference
-#     if form.validate_on_submit():
-#         link_.description = form.page.data
-#         link_.update()
-#         flash(_('info update'), 'info')
-#         tab = link_.range.class_.group['name']
-#           if origin.class_.group['name'] == 'reference' else 'reference'
-#         return redirect(f"{url_for('view', id_=origin.id)}#tab-{tab}")
-#     form.save.label.text = _('save')
-#     form.page.data = link_.description
-#     if link_.domain.class_.name == 'external_reference':
-#         form.page.label.text = _('link text')
-#     return render_template(
-#         'content.html',
-#         content=display_form(form),
-#         crumbs=[
-#             link(origin, index=True),
-#             origin,
-#             link_.domain if link_.domain.id != origin.id else link_.range,
-#             _('edit')])
-
-
-# @app.route('/reference/add/<int:id_>/<view>', methods=['GET', 'POST'])
-# @required_group('contributor')
-# def reference_add(id_: int, view: str) -> str | Response:
-#     reference = Entity.get_by_id(id_)
-#     form = get_add_reference_form(view)
-#     if form.validate_on_submit():
-#         ids = ast.literal_eval(getattr(form, view).data)
-#         ids = ids if isinstance(ids, list) else [int(ids)]
-#         reference.link('P67', Entity.get_by_ids(ids), form.page.data)
-#         return redirect(f"{url_for('view', id_=reference.id)}#tab-{view}")
-#     if reference.class_.name == 'external_reference':
-#         form.page.label.text = _('link text')
-#     return render_template(
-#         'content.html',
-#         content=display_form(form),
-#         title=_('reference'),
-#         crumbs=[link(reference, index=True), reference, _('link')])
 
 
 @app.route('/add/subunit/<int:super_id>', methods=['GET', 'POST'])
@@ -263,26 +190,3 @@ def entity_add_file(id_: int) -> str | Response:
         entity=entity,
         title=entity.name,
         crumbs=[link(entity, index=True), entity, f"{_('link')} {_('file')}"])
-
-
-# @app.route('/entity/add/reference/<int:id_>', methods=['GET', 'POST'])
-# @required_group('contributor')
-# def entity_add_reference(id_: int) -> str | Response:
-#     entity = Entity.get_by_id(id_)
-#     form = get_add_reference_form('reference')
-#     if form.validate_on_submit():
-#         entity.link_string(
-#             'P67',
-#             form.reference.data,
-#             description=form.page.data,
-#             inverse=True)
-#         return redirect(f"{url_for('view', id_=id_)}#tab-reference")
-#     form.page.label.text = _('page / link text')
-#     return render_template(
-#         'content.html',
-#         content=display_form(form),
-#         entity=entity,
-#         crumbs=[
-#             link(entity, index=True),
-#             entity,
-#             _('link') + ' ' + _('reference')])
