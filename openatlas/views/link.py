@@ -10,7 +10,7 @@ from openatlas.database.connect import Transaction
 from openatlas.display.util import link, required_group
 from openatlas.forms.display import display_form
 from openatlas.forms.form import (
-    get_link_form, get_link_update_form, get_manager, get_table_form)
+    get_manager, link_form, link_update_form, table_form)
 from openatlas.models.entity import Entity, Link
 from openatlas.models.search import get_subunits_without_super
 
@@ -40,7 +40,7 @@ def link_insert(id_: int, relation_name: str) -> str | Response:
         return redirect(
             f"{url_for('view', id_=entity.id)}#tab-{relation_name}")
     # Todo: properties can be multiple?
-    content = get_table_form(
+    content = table_form(
         relation['classes'],
         [e.id for e in entity.get_linked_entities(
             relation['properties'][0],
@@ -59,7 +59,7 @@ def link_insert(id_: int, relation_name: str) -> str | Response:
 def link_insert_detail(id_: int, relation_name: str) -> str | Response:
     entity = Entity.get_by_id(id_)
     relation = entity.class_.relations[relation_name]
-    form = get_link_form(relation)
+    form = link_form(relation)
     if form.validate_on_submit():
         ids = ast.literal_eval(getattr(form, relation_name).data)
         ids = ids if isinstance(ids, list) else [int(ids)]
@@ -104,7 +104,7 @@ def link_update(id_: int, origin_id: int, relation: str) -> str | Response:
     origin = domain if origin_id == domain.id else range_
     target = range_ if origin_id == domain.id else domain
     relation = origin.class_.relations[relation]
-    form = get_link_update_form(link_, relation)
+    form = link_update_form(link_, relation)
     # origin = Entity.get_by_id(origin_id)
     # form = get_link_form(origin, relation_name, )
     # if 'reference' in
@@ -237,7 +237,7 @@ def add_subunit(super_id: int) -> str | Response:
         classes.append('human_remains')
     return render_template(
         'content.html',
-        content=get_table_form(
+        content=table_form(
             classes,
             [super_.id] + get_subunits_without_super(classes)),
         entity=super_,
@@ -257,7 +257,7 @@ def entity_add_file(id_: int) -> str | Response:
         return redirect(f"{url_for('view', id_=id_)}#tab-file")
     return render_template(
         'content.html',
-        content=get_table_form(
+        content=table_form(
             ['file'],
             [e.id for e in entity.get_linked_entities('P67', inverse=True)]),
         entity=entity,

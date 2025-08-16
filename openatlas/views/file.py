@@ -15,7 +15,7 @@ from openatlas.display.util import (
     convert_image_to_iiif, delete_iiif_image, display_info, link,
     required_group)
 from openatlas.display.util2 import format_date, is_authorized, manual
-from openatlas.forms.form import get_table_form
+from openatlas.forms.form import table_form
 from openatlas.forms.setting import FileForm, IiifForm
 from openatlas.forms.util import get_form_settings
 from openatlas.models.entity import Entity
@@ -111,7 +111,7 @@ def file_add(id_: int, view: str) -> str | Response:
         return redirect(f"{url_for('view', id_=entity.id)}#tab-{view}")
     return render_template(
         'content.html',
-        content=get_table_form(
+        content=table_form(
             g.class_groups[view]['classes'],
             [e.id for e in entity.get_linked_entities('P67')]),
         title=entity.name,

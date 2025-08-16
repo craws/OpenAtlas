@@ -17,7 +17,7 @@ from openatlas.display.util import (
     required_group)
 from openatlas.display.util2 import manual, sanitize
 from openatlas.forms.field import SubmitField
-from openatlas.forms.form import get_move_form
+from openatlas.forms.form import move_form
 from openatlas.models.entity import Entity, Link
 
 
@@ -144,7 +144,7 @@ def type_move_entities(id_: int) -> str | Response:
     root = g.types[type_.root[0]]
     if root.category in ['system', 'value']:
         abort(403)
-    form = get_move_form(type_)
+    form = move_form(type_)
     if form.validate_on_submit():
         Transaction.begin()
         type_.move_entities(

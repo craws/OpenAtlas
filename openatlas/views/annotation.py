@@ -9,7 +9,7 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import get_file_path, link, required_group
 from openatlas.display.util2 import format_date, is_authorized, manual
-from openatlas.forms.form import get_annotation_image_form
+from openatlas.forms.form import annotate_image_form
 from openatlas.models.annotation import AnnotationImage
 from openatlas.models.entity import Entity
 
@@ -20,7 +20,7 @@ def annotation_image_insert(id_: int) -> str | Response:
     image = Entity.get_by_id(id_, types=True, aliases=True)
     if not get_file_path(image.id):
         return abort(404)  # pragma: no cover
-    form = get_annotation_image_form(image.id)
+    form = annotate_image_form(image.id)
     if form.validate_on_submit():
         AnnotationImage.insert(
             image_id=id_,
@@ -65,7 +65,7 @@ def annotation_image_insert(id_: int) -> str | Response:
 @required_group('contributor')
 def annotation_image_update(id_: int) -> str | Response:
     annotation = AnnotationImage.get_by_id(id_)
-    form = get_annotation_image_form(
+    form = annotate_image_form(
         annotation.image_id,
         Entity.get_by_id(annotation.entity_id)
         if annotation.entity_id else None,

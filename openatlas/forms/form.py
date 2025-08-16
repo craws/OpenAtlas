@@ -40,7 +40,7 @@ def get_manager(
     return manager_instance
 
 
-def get_annotation_image_form(
+def annotate_image_form(
         image_id: int,
         entity: Optional[Entity] = None,
         insert: Optional[bool] = True) -> Any:
@@ -61,7 +61,7 @@ def get_annotation_image_form(
     return Form()
 
 
-def get_link_form(relation: dict[str, Any]) -> Any:
+def link_form(relation: dict[str, Any]) -> Any:
     class Form(FlaskForm):
         pass
 
@@ -83,7 +83,7 @@ def get_link_form(relation: dict[str, Any]) -> Any:
     return Form()
 
 
-def get_link_update_form(link_: Link, relation: dict[str, Any]) -> Any:
+def link_update_form(link_: Link, relation: dict[str, Any]) -> Any:
     class Form(FlaskForm):
         pass
 
@@ -99,7 +99,7 @@ def get_link_update_form(link_: Link, relation: dict[str, Any]) -> Any:
     return form
 
 
-def get_table_form(classes: list[str], excluded: list[int]) -> str:
+def table_form(classes: list[str], excluded: list[int]) -> str:
     entities = Entity.get_by_class(classes, types=True, aliases=True)
     table = Table(
         [''] + entities[0].class_.group['table_columns'] if entities else [],
@@ -126,7 +126,7 @@ def get_table_form(classes: list[str], excluded: list[int]) -> str:
         table=table.display(classes[0]))
 
 
-def get_cidoc_form() -> Any:
+def cidoc_form() -> Any:
     class Form(FlaskForm):
         pass
 
@@ -141,7 +141,7 @@ def get_cidoc_form() -> Any:
     return Form()
 
 
-def get_move_form(type_: Entity) -> Any:
+def move_form(type_: Entity) -> Any:
     class Form(FlaskForm):
         checkbox_values = HiddenField()
         selection = SelectMultipleField(

@@ -13,7 +13,7 @@ from openatlas.display.table import Table
 from openatlas.display.util import button, link, required_group
 from openatlas.display.util2 import manual, uc_first
 from openatlas.forms.field import SubmitField
-from openatlas.forms.form import get_cidoc_form
+from openatlas.forms.form import cidoc_form
 from openatlas.models.entity import Entity
 from openatlas.models.network import Network
 from openatlas.models.openatlas_class import get_class_count
@@ -22,7 +22,7 @@ from openatlas.models.openatlas_class import get_class_count
 @app.route('/overview/model', methods=['GET', 'POST'])
 @required_group('readonly')
 def model_index() -> str:
-    form = get_cidoc_form()
+    form = cidoc_form()
     result = None
     if form.validate_on_submit():
         domain = g.cidoc_classes[form.domain.data]
