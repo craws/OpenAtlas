@@ -53,6 +53,16 @@ class_groups = {
         'table_columns': ['name', 'description']}}
 
 standard_relations = {
+    'file': {
+        'relation': {
+            'label': _('file'),
+            'classes': class_groups['file']['classes'],
+            'properties': 'P67',
+            'inverse': True,
+            'multiple': True},
+        'tab': {
+            'additional_columns': ['main image', 'remove'],
+            'buttons': ['link', 'insert']}},
     'reference': {
         'relation': {
             'label': _('reference'),
@@ -65,16 +75,17 @@ standard_relations = {
             'mode': 'link',
             'additional_columns': ['page', 'update', 'remove'],
             'buttons': ['link', 'insert']}},
-    'file': {
+    'source': {
         'relation': {
-            'label': _('file'),
-            'classes': class_groups['file']['classes'],
+            'label': _('source'),
+            'classes': 'source',
             'properties': 'P67',
             'inverse': True,
             'multiple': True},
         'tab': {
-            'additional_columns': ['main image', 'remove'],
-            'buttons': ['link', 'insert']}}}
+            'additional_columns': ['remove'],
+            'buttons': ['link', 'insert']},
+    }}
 
 # Todo: remove after finishing new classes
 # def get_table_columns() -> dict[str, list[str]]:

@@ -21,12 +21,7 @@ model = {
             'classes': class_groups['event']['classes'],
             'properties': 'P9',
             'multiple': True},
-        'source': {
-            'label': _('source'),
-            'classes': 'source',
-            'properties': 'P67',
-            'inverse': True,
-            'multiple': True},
+        'source': standard_relations['source']['relation'],
         'file': standard_relations['file']['relation'],
         'reference': standard_relations['reference']['relation'],
         'sub_event': {
@@ -44,12 +39,11 @@ model = {
         'form': {'insert_and_continue': True},
         'tabs': {
             'subs': {},
-            'source': {
-                'additional_columns': ['remove']},
+            'source': standard_relations['source']['tab'],
             'actor': {
                 'mode': 'link',
                 'columns': [
-                    'name', 'classes', 'activity', 'involvement', 'first',
+                    'name', 'class', 'activity', 'involvement', 'first',
                     'last', 'comment', 'update', 'remove']},
             'reference': standard_relations['reference']['tab'],
             'file': standard_relations['file']['tab'],
@@ -86,13 +80,13 @@ acquisition['relations'] = acquisition['relations'] | {
     'location': additional_relations['location'],
     'recipient': {
         'label': _('recipient'),
-        'classes': class_groups['actor'],
+        'classes': class_groups['actor']['classes'],
         'properties': 'P22',
         'mode': 'display',
         'multiple': True},
     'donor': {
         'label': _('donor'),
-        'classes': class_groups['actor'],
+        'classes': class_groups['actor']['classes'],
         'properties': 'P23',
         'mode': 'display',
         'multiple': True},
@@ -132,7 +126,7 @@ modification['relations'] = modification['relations'] | {
     'location': additional_relations['location'],
     'modified_object': {
         'label': _('modified object'),
-        'classes': class_groups['artifact'],
+        'classes': class_groups['artifact']['classes'],
         'properties': 'P31',
         'multiple': True,
         'mode': 'direct'},
@@ -165,7 +159,7 @@ move['relations'] = move['relations'] | {
         'mode': 'direct'},
     'moved_object': {
         'label': _('moved object'),
-        'classes': class_groups['artifact'],
+        'classes': class_groups['artifact']['classes'],
         'properties': 'P25',
         'multiple': True,
         'mode': 'direct'}}

@@ -4,8 +4,6 @@ from flask_babel import lazy_gettext as _
 
 from config.model.class_groups import class_groups, standard_relations
 
-'relation', 'member_of', 'member', 'artifact'
-
 person = {
     'attributes': {
         'name': {
@@ -14,11 +12,6 @@ person = {
         'description': {},
         'date': {}},
     'relations': {
-        'residence': {
-            'label': _('residence'),
-            'classes': 'object_location',
-            'properties': 'P74',
-            'mode': 'direct'},
         'begins_in': {
             'label': _('born in'),
             'classes': 'object_location',
@@ -29,28 +22,29 @@ person = {
             'classes': 'object_location',
             'properties': 'OA9',
             'mode': 'direct'},
-        'source': {
-            'classes': 'source',
-            'properties': 'P67',
-            'multiple': True,
-            'inverse': True},
         'event': {
             'label': _('event'),
             'classes': class_groups['event']['classes'],
             'properties': ['P11', 'P14', 'P22', 'P23'],
             'inverse': True,
             'multiple': True},
+        'residence': {
+            'label': _('residence'),
+            'classes': 'object_location',
+            'properties': 'P74',
+            'mode': 'direct'},
+        'source': standard_relations['source']['relation'],
         'file': standard_relations['file']['relation'],
         'reference': standard_relations['reference']['relation']},
     'display': {
         'buttons': ['copy', 'network'],
         'form': {'insert_and_continue': True},
         'tabs': {
-            'source': {
-                'additional_columns': ['remove'],
-                'buttons': ['link', 'insert']},
+            'source': standard_relations['source']['tab'],
             'event': {
-                'additional_columns': ['update', 'remove'],
+                'columns': [
+                    'name', 'class', 'activity', 'involvement', 'first',
+                    'last', 'comment', 'update', 'remove'],
                 'buttons': ['link']},
             'reference': standard_relations['reference']['tab'],
             'file': standard_relations['file']['tab'],
