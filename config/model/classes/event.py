@@ -2,7 +2,7 @@ import copy
 
 from flask_babel import lazy_gettext as _
 
-from config.model.class_groups import class_groups
+from config.model.class_groups import class_groups, standard_relations
 
 model = {
     'attributes': {
@@ -27,19 +27,8 @@ model = {
             'properties': 'P67',
             'inverse': True,
             'multiple': True},
-        'file': {
-            'label': _('file'),
-            'classes': class_groups['file']['classes'],
-            'properties': 'P67',
-            'inverse': True,
-            'multiple': True,
-            'additional_fields': ['page']},
-        'reference': {
-            'label': _('reference'),
-            'classes': class_groups['reference']['classes'],
-            'properties': 'P67',
-            'inverse': True,
-            'multiple': True},
+        'file': standard_relations['file']['relation'],
+        'reference': standard_relations['reference']['relation'],
         'sub_event': {
             'label': _('sub event'),
             'classes': class_groups['event']['classes'],
@@ -62,13 +51,8 @@ model = {
                 'columns': [
                     'name', 'classes', 'activity', 'involvement', 'first',
                     'last', 'comment', 'update', 'remove']},
-            'reference': {
-                'mode': 'link',
-                'additional_columns': ['page', 'update', 'remove'],
-                'buttons': ['link', 'insert']},
-            'file': {
-                'additional_columns': ['main image', 'remove'],
-                'buttons': ['link', 'insert']},
+            'reference': standard_relations['reference']['tab'],
+            'file': standard_relations['file']['tab'],
             'note': {}}}}
 
 additional_relations = {

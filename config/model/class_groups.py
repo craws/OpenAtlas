@@ -1,3 +1,5 @@
+from flask_babel import lazy_gettext as _
+
 class_groups = {
     'actor': {
         'name': 'actor',
@@ -21,7 +23,7 @@ class_groups = {
         'table_columns': [
             'name', 'license', 'public', 'creator', 'license holder',
             'size', 'extension', 'description']},
-    #'object_location': {
+    # 'object_location': {
     #    'name': 'object_location',
     #    'classes': ['object_location']},
     'place': {
@@ -50,11 +52,34 @@ class_groups = {
         'classes': ['administrative_unit', 'type'],
         'table_columns': ['name', 'description']}}
 
+standard_relations = {
+    'reference': {
+        'relation': {
+            'label': _('reference'),
+            'classes': class_groups['reference']['classes'],
+            'properties': 'P67',
+            'inverse': True,
+            'multiple': True,
+            'additional_fields': ['page']},
+        'tab': {
+            'mode': 'link',
+            'additional_columns': ['page', 'update', 'remove'],
+            'buttons': ['link', 'insert']}},
+    'file': {
+        'relation': {
+            'label': _('file'),
+            'classes': class_groups['file']['classes'],
+            'properties': 'P67',
+            'inverse': True,
+            'multiple': True},
+        'tab': {
+            'additional_columns': ['main image', 'remove'],
+            'buttons': ['link', 'insert']}}}
+
 # Todo: remove after finishing new classes
 # def get_table_columns() -> dict[str, list[str]]:
 #     columns = {
 #         'entities': ['name', 'class', 'info'],
-#         'external_reference': ['name', 'class', 'type', 'description'],
 #         'member': ['member', 'function', 'first', 'last', 'description'],
 #         'member_of': [
 #             'member of', 'function', 'first', 'last', 'description'],
@@ -65,7 +90,3 @@ class_groups = {
 #             'default precision', 'description'],
 #         'subs': ['name', 'count', 'info'],
 #         'text': ['text', 'type', 'content']}
-#     for view in ['actor', 'artifact', 'event', 'place']:
-#         for class_ in class_groups[view]:
-#             columns[class_] = columns[view]
-#     return columns

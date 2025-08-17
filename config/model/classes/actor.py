@@ -2,7 +2,7 @@ import copy
 
 from flask_babel import lazy_gettext as _
 
-from config.model.class_groups import class_groups
+from config.model.class_groups import class_groups, standard_relations
 
 'relation', 'member_of', 'member', 'artifact'
 
@@ -40,20 +40,8 @@ person = {
             'properties': ['P11', 'P14', 'P22', 'P23'],
             'inverse': True,
             'multiple': True},
-        'file': {
-            'label': _('file'),
-            'classes': class_groups['file']['classes'],
-            'properties': 'P67',
-            'inverse': True,
-            'multiple': True},
-        'reference': {
-            'label': _('reference'),
-            'classes': class_groups['reference']['classes'],
-            'properties': 'P67',
-            'inverse': True,
-            'multiple': True,
-            'additional_fields': ['page']},
-    },
+        'file': standard_relations['file']['relation'],
+        'reference': standard_relations['reference']['relation']},
     'display': {
         'buttons': ['copy', 'network'],
         'form': {'insert_and_continue': True},
@@ -64,11 +52,6 @@ person = {
             'event': {
                 'additional_columns': ['update', 'remove'],
                 'buttons': ['link']},
-            'reference': {
-                'mode': 'link',
-                'additional_columns': ['page', 'update', 'remove'],
-                'buttons': ['link', 'insert']},
-            'file': {
-                'additional_columns': ['main image', 'remove'],
-                'buttons': ['link', 'insert']},
+            'reference': standard_relations['reference']['tab'],
+            'file': standard_relations['file']['tab'],
             'note': {}}}}
