@@ -1,3 +1,4 @@
+import re
 from typing import Optional
 
 from flask import g, render_template, url_for
@@ -237,9 +238,9 @@ class NetworkForm(FlaskForm):
         _('height'),
         default=600,
         validators=[InputRequired()])
-    charge = StringField(
+    charge = IntegerField(
         _('charge'),
-        default=str(-80),
+        default=-80,
         validators=[InputRequired()])
     distance = IntegerField(
         _('distance'),
@@ -275,16 +276,24 @@ def network(dimensions: Optional[int] = 0, id_: Optional[int] = None) -> str:
     form.classes.choices = [
         (class_.name, class_.label)
         for class_ in [x for x in classes if x.name != 'object_location']]
+    colors = {}
+    for class_ in classes:
+        color_code = getattr(form, class_.name).data
+        colors[class_.name] = class_.network_color
+        getattr(form, class_.name).data = class_.network_color
+        if re.match(r"^(#)?[A-Fa-f0-9]+$", color_code):
+            colors[class_.name] = color_code
+            getattr(form, class_.name).data = color_code
     if entity:
         json_data = Network.get_ego_network_json(
-            {c.name: getattr(form, c.name).data for c in classes},
+            colors,
             entity.id,
             int(form.depth.data),
             dimensions)
         crumbs = [link(entity, index=True), entity, _('network')]
     else:
         json_data = Network.get_network_json(
-            {c.name: getattr(form, c.name).data for c in classes},
+            colors,
             bool(form.orphans.data),
             dimensions)
         crumbs = [
