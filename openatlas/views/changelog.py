@@ -17,6 +17,7 @@ def index_changelog() -> str:
 versions = {
     '8.13.0': ['TBA', {
         'features': {
+            '2592': 'Polish UI translations',
             '2571': 'Update Catalan and Spanish translations',
             '2574': 'Update French translations',
             '2434': 'API: Text annotation for presentation view',
