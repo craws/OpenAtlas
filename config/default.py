@@ -22,7 +22,7 @@ LANGUAGES = {
     'en': 'English',
     'es': 'Español',
     'fr': 'Français',
-    'pl': 'Polska'}
+    'pl': 'Polski'}
 
 # Paths are implemented operating system independent using pathlib.
 # To override them (in instance/production.py) either use them like here
