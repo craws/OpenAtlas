@@ -29,7 +29,7 @@
     aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
-      <div class="modal-header">
+      <div class="modal-header justify-content-between">
         <h5 class="modal-title">
           {{ root.name|uc_first }}
         </h5>
@@ -42,9 +42,9 @@
         </button>
       </div>
       <div class="modal-body">
-        <div class="d-flex">
+        <div class="d-flex mb-2">
           <input
-              class="tree-filter {{ config.CSS.string_field }}"
+              class="tree-filter  {{ config.CSS.string_field }}"
               id="{{ field.id }}-tree-search"
               placeholder="{{ _('type to search')|uc_first }}"
               type="text">
@@ -71,7 +71,7 @@
   <div class="modal fade" id="add-type-modal-{{ field.id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
-        <div class="modal-header">
+        <div class="modal-header justify-content-between">
           <h5 class="modal-title">{{ _('Add Type to %(hierarchy)s', hierarchy= _(root.name)|uc_first|safe) }}</h5>
           <button
               type="button"
