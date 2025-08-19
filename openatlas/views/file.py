@@ -1,4 +1,5 @@
 from datetime import datetime
+from pathlib import Path
 from typing import Any, Optional
 
 from flask import (
@@ -74,16 +75,23 @@ def download(filename: str) -> Any:
 @app.route('/display/<path:filename>')
 @required_group('readonly')
 def display_file(filename: str) -> Any:
-    if request.args.get('size'):
-        return send_from_directory(
-            app.config['RESIZED_IMAGES'] / request.args.get('size'),
+    if size := request.args.get('size'):
+        if not size.isdigit() or size not in app.config['IMAGE_SIZE'].values():
+            abort(400)
+        return send_from_directory(  # pragma: no cover
+            app.config['RESIZED_IMAGES'] / size,
             filename)
     return send_from_directory(app.config['UPLOAD_PATH'], filename)
 
 
 @app.route('/display_logo/<path:filename>')
 def display_logo(filename: str) -> Any:
-    return send_from_directory(app.config['UPLOAD_PATH'], filename)
+    path = Path(filename)
+    if path.stem == g.settings['logo_file_id']:
+        return send_from_directory(  # pragma: no cover
+            app.config['UPLOAD_PATH'],
+            f"{g.settings['logo_file_id']}{path.suffix}")
+    abort(404)
 
 
 @app.route('/set_profile_image/<int:id_>/<int:origin_id>')
