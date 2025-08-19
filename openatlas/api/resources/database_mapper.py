@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 from openatlas.database import (
     cidoc_class as db_class,
@@ -51,9 +51,9 @@ def get_types_linked_to_network_ids(
 
 
 def get_api_simple_search(
-        term: str,
-        class_: list[str]) -> list[dict[str, Any]]:
-    return db_entity.api_search(term, class_)
+        class_: list[str],
+        term: Optional[str]) -> list[dict[str, Any]]:
+    return db_entity.api_search(class_, term)
 
 
 def get_api_search(

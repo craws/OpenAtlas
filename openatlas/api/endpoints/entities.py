@@ -12,7 +12,7 @@ from openatlas.api.resources.database_mapper import get_api_search, \
 from openatlas.api.resources.error import (
     InvalidLimitError, InvalidSystemClassError, NotATypeError, QueryEmptyError)
 from openatlas.api.resources.parser import entity_, presentation, properties, \
-    query
+    query, search_parser
 from openatlas.api.resources.templates import presentation_template
 from openatlas.api.resources.util import (
     get_entities_from_type_with_subs, get_entities_linked_to_special_type,
@@ -154,16 +154,19 @@ class GetQuery(Resource):
 
 class GetSearchEntities(Resource):
     @staticmethod
-    def get(
-            term: str,
-            class_: str) -> tuple[Resource, int] | Response | dict[str, Any]:
+    def get(class_: str) -> tuple[Resource, int] | Response | dict[str, Any]:
+        parser = search_parser.parse_args()
+        parser['format'] = 'search'
+        term = parser['term']
         classes = list(g.classes) if 'all' in class_ else [class_]
         classes = [class_ for class_ in classes if class_ != 'type_tools']
         if not all(sc in g.classes for sc in classes):
             raise InvalidSystemClassError
-        simple_search = get_api_simple_search(term, classes)
-        search = get_api_search(term, classes + ['appellation'])
-        data = join_lists_of_dicts_remove_duplicates(simple_search, search)
+        simple_search = get_api_simple_search(classes, term)
+        data = simple_search
+        if term:
+            search = get_api_search(term, classes + ['appellation'])
+            data = join_lists_of_dicts_remove_duplicates(simple_search, search)
         entities = []
         for row in data:
             if row['openatlas_class_name'] == 'appellation':
@@ -177,8 +180,6 @@ class GetSearchEntities(Resource):
                 entity = Entity(row)
             if entity:
                 entities.append(entity)
-        parser = entity_.parse_args()
-        parser['format'] = 'search'
         return Endpoint(entities, parser).resolve_simple_search()
 
 

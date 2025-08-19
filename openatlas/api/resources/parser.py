@@ -316,3 +316,11 @@ openapi.add_argument(
     location='args',
     default='json',
     choices=('json', 'yaml'))
+
+search_parser = entity_.copy()
+search_parser.add_argument(
+    'term',
+    type=str,
+    default='',
+    help='{error_msg}',
+    location='args')
