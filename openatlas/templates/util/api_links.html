@@ -7,6 +7,10 @@
     <li>{{ "Linked Open Art"|link(url_for('api.entity', id_=entity.id, format='loud'), external=True)|safe }}</li>
     <li>{{ "GeoJSON"|link(url_for('api.entity', id_=entity.id, format='geojson'), external=True)|safe }}</li>
     <li>{{ "GeoJSON v2"|link(url_for('api.entity', id_=entity.id, format='geojson-v2'), external=True)|safe }}</li>
+    {% if entity.class_.name == 'place' %}
+      <li>{{ "THANADOS"|link(url_for('api.subunits', id_=entity.id), external=True)|safe }}</li>
+      <li>{{ "ARIADNEplus"|link(url_for('api.subunits', id_=entity.id, format='xml'), external=True)|safe }}</li>
+    {% endif %}
   </ul>
 </div>
 <div class="btn-group me-2">
