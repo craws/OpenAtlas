@@ -18,16 +18,22 @@ class ImportTest(TestBaseCase):
             follow_redirects=True)
         assert b'Data was exported' in rv.data
 
-        rv = c.get(url_for('download_sql', filename=f'{date_}_export.sql.7z'))
-        assert b'7z' in rv.data
+        with c.get(
+                url_for(
+                    'download_sql',
+                    filename=f'{date_}_export.sql.7z')) as rv:
+            assert b'7z' in rv.data
 
         rv = c.get(
             url_for('export_execute', format_='dump'),
             follow_redirects=True)
         assert b'Data was exported' in rv.data
 
-        rv = c.get(url_for('download_sql', filename=f'{date_}_export.dump.7z'))
-        assert b'7z' in rv.data
+        with c.get(
+                url_for(
+                    'download_sql',
+                    filename=f'{date_}_export.dump.7z')) as rv:
+            assert b'7z' in rv.data
 
         rv = c.get(
             url_for('delete_export', filename=f'{date_}_export.sql.7z'),

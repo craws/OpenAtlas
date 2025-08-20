@@ -73,15 +73,16 @@ class ImageTest(TestBaseCase):
         rv = c.get(url_for('index', view='file'))
         assert b'Test_File' in rv.data
 
-        rv = c.get(url_for('display_file', filename=file_name))
-        assert b'\xff' in rv.data
+        with c.get(url_for('display_file', filename=file_name)) as rv:
+            assert b'\xff' in rv.data
 
-        c.get(
+        with c.get(
             url_for(
                 'display_file',
                 filename=file_name,
-                size=app.config['IMAGE_SIZE']['thumbnail']))
-        # assert b'\xff' in rv.data  # GitHub struggles with this test
+                size=app.config['IMAGE_SIZE']['thumbnail'])) as rv:
+            # assert b'\xff' in rv.data  # GitHub struggles with this test
+            pass
 
         rv = c.get(url_for('display_file', filename=file_name, size='500'))
         assert b'400 Bad Request' in rv.data
