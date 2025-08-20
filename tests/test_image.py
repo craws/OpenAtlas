@@ -83,6 +83,9 @@ class ImageTest(TestBaseCase):
                 size=app.config['IMAGE_SIZE']['thumbnail']))
         # assert b'\xff' in rv.data  # GitHub struggles with this test
 
+        rv = c.get(url_for('display_file', filename=file_name, size='500'))
+        assert b'400 Bad Request' in rv.data
+
         c.get(
             url_for('api.display', filename=file_name, image_size='thumbnail'))
         # assert b'\xff' in rv.data  # GitHub struggles with this test

@@ -60,7 +60,7 @@ special = [
     [ExportDatabase, '/export_database/<string:format_>', 'export_database'],
     [GetGeometricEntities, '/geometric_entities/', 'geometric_entities'],
     [GetSubunits, '/subunits/<int:id_>', 'subunits'],
-    [GetSearchEntities, '/search/<string:class_>/<string:term>', 'search'],
+    [GetSearchEntities, '/search/<string:class_>', 'search'],
     [GetArcheMetadata, '/arche_metadata/', 'arche_metadata'],
     [GetNetworkVisualisation,
      '/network_visualisation/',

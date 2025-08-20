@@ -317,6 +317,14 @@ openapi.add_argument(
     default='json',
     choices=('json', 'yaml'))
 
+search_parser = entity_.copy()
+search_parser.add_argument(
+    'term',
+    type=str,
+    default='',
+    help='{error_msg}',
+    location='args')
+
 
 arche = reqparse.RequestParser()
 arche.add_argument(

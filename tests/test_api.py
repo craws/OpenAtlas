@@ -754,6 +754,9 @@ class Api(ApiTestCase):
         rv = c.get(url_for('api_04.search', class_='type', term='i'))
         assert rv.get_json()['pagination']['entities'] == 47
 
+        rv = c.get(url_for('api_04.search', class_='person'))
+        assert rv.get_json()['pagination']['entities'] == 2
+
         # Test Error Handling
         for rv in [
             c.get(url_for('api_04.entity', id_=233423424)),
