@@ -152,10 +152,13 @@ class GlobalSearchForm(FlaskForm):
 def inject_template_functions() -> dict[str, str | GlobalSearchForm]:
     def get_logo() -> str:
         if g.settings['logo_file_id']:
-            if path := get_file_path(int(g.settings['logo_file_id'])):
-                return url_for(
-                    'display_logo',
-                    filename=f"{g.settings['logo_file_id']}{path.suffix}")
+            try:
+                if path := get_file_path(int(g.settings['logo_file_id'])):
+                    return url_for(
+                        'display_logo',
+                        filename=f"{g.settings['logo_file_id']}{path.suffix}")
+            except:  # pragma: no cover
+                pass
         return str(Path('/static') / 'images' / 'layout' / 'logo.png')
     return {
         'get_logo': get_logo(),

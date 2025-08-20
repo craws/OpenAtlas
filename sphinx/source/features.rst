@@ -49,9 +49,10 @@ project.
 
    * Catalan
    * English
-   * German
-   * Spanish
    * French
+   * German
+   * Polish
+   * Spanish
 
 .. image:: /ui.png
 
