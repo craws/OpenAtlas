@@ -80,6 +80,7 @@ def arche_export() -> bool:
         for f in path_set:
             ext = normalize_extension(f.suffix)
             files_by_extension[entity_id][ext].add(f)
+
     rdf_dump = Endpoint(
         ApiEntity.get_by_system_classes(['all']),
         {'type_id': type_ids,
@@ -95,28 +96,6 @@ def arche_export() -> bool:
             create_failed_files_md(check_files_for_arche(file_entities))))
         tmp_md_path = tmp_md.name
 
-    with tempfile.NamedTemporaryFile(
-            mode='w+',
-            suffix='.sql',
-            delete=False) as tmp_sql:
-        command = [
-            'pg_dump',
-            '-h', app.config['DATABASE_HOST'],
-            '-d', app.config['DATABASE_NAME'],
-            '-U', app.config['DATABASE_USER'],
-            '-p', str(app.config['DATABASE_PORT']),
-            '--schema=model',
-            '--schema=public',
-            '--schema=import']
-        subprocess.run(
-            command,
-            stdout=tmp_sql,
-            env={
-                'PGPASSWORD': app.config['DATABASE_PASS'],
-                'SYSTEMROOT': os.environ[
-                    'SYSTEMROOT'] if 'SYSTEMROOT' in os.environ else ''},
-            check=True)
-        tmp_sql_path = tmp_sql.name
 
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_path = Path(temp_dir)
@@ -153,7 +132,7 @@ def arche_export() -> bool:
         with zipfile.ZipFile(archive_file, 'w') as archive:
             archive.write(md_path, arcname='debug/problematic_files.md')
             archive.write(ttl_path, arcname='metadata/files.ttl')
-            archive.write(tmp_sql_path, arcname='data/database_dump.sql')
+            archive.write(open_tmp_sql_file(), arcname='data/database.sql')
             archive.write(rdf_path, arcname='data/rdf_dump.ttl')
 
             for type_name, ext_map in files_by_extension.items():
@@ -175,10 +154,10 @@ def arche_export() -> bool:
             all_dirs.discard(PurePosixPath("."))
             total_dirs = len(all_dirs)
             total_entries = len(infos)
-            stat_md = (f" # Archive Statistics"
-                       f"- **Total size**: {total_size} bytes  "
-                       f"- **Total entries**: {total_entries} "
-                       f"- **Files**: {total_files} "
+            stat_md = (f" # Archive Statistics \n"
+                       f"- **Total size**: {total_size} bytes\n "
+                       f"- **Total entries**: {total_entries}\n"
+                       f"- **Files**: {total_files}\n"
                        f"- **Directories**: {total_dirs}")
             stat_path = temp_path / "file_statistic.md"
             stat_path.write_text(stat_md, encoding="utf-8")
@@ -388,3 +367,27 @@ def find_duplicates(entity_ids: set[int]) -> set[tuple[int, int]]:
             else:
                 hash_map[file_hash] = file_id
     return duplicates
+
+def open_tmp_sql_file() -> str:
+    with tempfile.NamedTemporaryFile(
+            mode='w+',
+            suffix='.sql',
+            delete=False) as tmp_sql:
+        command = [
+            'pg_dump',
+            '-h', app.config['DATABASE_HOST'],
+            '-d', app.config['DATABASE_NAME'],
+            '-U', app.config['DATABASE_USER'],
+            '-p', str(app.config['DATABASE_PORT']),
+            '--schema=model',
+            '--schema=public',
+            '--schema=import']
+        subprocess.run(
+            command,
+            stdout=tmp_sql,
+            env={
+                'PGPASSWORD': app.config['DATABASE_PASS'],
+                'SYSTEMROOT': os.environ[
+                    'SYSTEMROOT'] if 'SYSTEMROOT' in os.environ else ''},
+            check=True)
+        return tmp_sql.name
