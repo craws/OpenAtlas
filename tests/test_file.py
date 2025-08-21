@@ -30,6 +30,9 @@ class FileTest(TestBaseCase):
                 follow_redirects=True)
         assert b'An entry has been created' in rv.data
 
+        rv = c.get(url_for('display_logo', filename='no.logo'))
+        assert b'404' in rv.data
+
         with app.test_request_context():
             app.preprocess_request()
             files = Entity.get_by_class('file')

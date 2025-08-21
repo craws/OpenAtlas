@@ -410,8 +410,9 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
         warnings.append(
             f"Database version {app.config['DATABASE_VERSION']} is needed but "
             f"current version is {g.settings['database_version']}")
-    for path in g.writable_paths:
-        check_write_access(path, warnings)
+    if hasattr(g, 'writable_paths'):
+        for path in g.writable_paths:
+            check_write_access(path, warnings)
     return \
         '<div class="alert alert-danger">' \
         f'{"<br>".join(warnings)}</div>' if warnings else ''
@@ -440,7 +441,7 @@ def get_file_path(
         entity: int | Entity,
         size: Optional[str] = None) -> Optional[Path]:
     id_ = entity if isinstance(entity, int) else entity.id
-    if id_ not in g.files:
+    if not hasattr(g, 'files') or id_ not in g.files:
         return None
     ext = g.files[id_].suffix
     if size:

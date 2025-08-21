@@ -3,7 +3,7 @@ from pathlib import Path
 
 from config.database_versions import DATABASE_VERSIONS
 
-VERSION = '8.13.0'
+VERSION = '8.14.0'
 DATABASE_VERSION = DATABASE_VERSIONS[0]
 DEMO_MODE = False  # If activated some options are disabled, login is prefilled
 DEBUG = False
@@ -21,7 +21,8 @@ LANGUAGES = {
     'de': 'Deutsch',
     'en': 'English',
     'es': 'Español',
-    'fr': 'Français'}
+    'fr': 'Français',
+    'pl': 'Polski'}
 
 # Paths are implemented operating system independent using pathlib.
 # To override them (in instance/production.py) either use them like here
