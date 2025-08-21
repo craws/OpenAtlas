@@ -1,5 +1,6 @@
 from pathlib import Path
 from shutil import copyfile
+from typing import Any
 
 from flask import g, url_for
 
@@ -22,7 +23,7 @@ class ImageTest(TestBaseCase):
         # Resizing through UI insert
         with open(Path(app.root_path) / 'static'
                   / 'images' / 'layout' / 'logo.png', 'rb') as img:
-            rv = c.post(
+            rv: Any = c.post(
                 url_for('insert', class_='file', origin_id=place.id),
                 data={'name': 'OpenAtlas logo', 'file': img},
                 follow_redirects=True)
@@ -80,7 +81,7 @@ class ImageTest(TestBaseCase):
             url_for(
                 'display_file',
                 filename=file_name,
-                size=app.config['IMAGE_SIZE']['thumbnail'])) as rv:
+                size=app.config['IMAGE_SIZE']['thumbnail'])) as _rv:
             # assert b'\xff' in rv.data  # GitHub struggles with this test
             pass
 

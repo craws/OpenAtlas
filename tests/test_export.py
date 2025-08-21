@@ -1,4 +1,5 @@
 import os
+from typing import Any
 
 from flask import url_for
 
@@ -13,7 +14,7 @@ class ImportTest(TestBaseCase):
         assert b'Export SQL' in c.get(url_for('export_sql')).data
 
         date_ = current_date_for_filename()
-        rv = c.get(
+        rv: Any = c.get(
             url_for('export_execute', format_='sql'),
             follow_redirects=True)
         assert b'Data was exported' in rv.data
