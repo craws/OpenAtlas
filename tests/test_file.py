@@ -30,7 +30,7 @@ class FileTest(TestBaseCase):
                 follow_redirects=True)
         assert b'An entry has been created' in rv.data
 
-        rv = c.get(url_for('display_logo', filename='no.logo'))
+        rv = c.get(url_for('display_custom_logo', ext='no.logo'))
         assert b'404' in rv.data
 
         with app.test_request_context():
@@ -95,7 +95,7 @@ class FileTest(TestBaseCase):
         assert b'IIIF files are deleted' in rv.data
 
         filename = f'{iiif_id}.png'
-        with c.get(url_for('display_logo', filename=filename)):
+        with c.get(url_for('display_custom_logo', ext=".png")):
             pass
 
         with c.get(url_for('download', filename=filename)):
