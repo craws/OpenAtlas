@@ -1,11 +1,12 @@
 import os
+from typing import Any
 
 import pandas as pd
 from flask import url_for
 
-from openatlas.models.export import current_date_for_filename
 from openatlas import app
 from openatlas.api.resources.api_entity import ApiEntity
+from openatlas.models.export import current_date_for_filename
 from tests.base import ImportTestCase
 
 
@@ -37,7 +38,7 @@ class ImportTest(ImportTestCase):
         assert b'Export SQL' in c.get(url_for('export_sql')).data
 
         date_ = current_date_for_filename()
-        rv = c.get(
+        rv: Any = c.get(
             url_for('export_execute', format_='sql'),
             follow_redirects=True)
         assert b'Data was exported' in rv.data
