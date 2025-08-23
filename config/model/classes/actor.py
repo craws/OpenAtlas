@@ -28,6 +28,12 @@ person = {
             'properties': ['P11', 'P14', 'P22', 'P23'],
             'inverse': True,
             'multiple': True},
+        'relation': {
+            'label': _('relation'),
+            'classes': 'person',
+            'properties': 'OA7',
+            'additional_fields': ['date']
+        },
         'residence': {
             'label': _('residence'),
             'classes': 'object_location',
@@ -46,6 +52,10 @@ person = {
                     'name', 'class', 'activity', 'involvement', 'first',
                     'last', 'comment', 'update', 'remove'],
                 'buttons': ['link']},
+            'relation': {
+                'additional_columns': ['remove'],
+                'buttons': ['link']
+            },
             'reference': standard_relations['reference']['tab'],
             'file': standard_relations['file']['tab'],
             'note': {}}}}

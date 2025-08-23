@@ -171,9 +171,7 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
                     validators=validators))
 
 
-def add_date_fields(form_class: Any, entity: Entity) -> None:
-    if 'date' not in entity.class_.attributes:
-        return
+def add_date_fields(form_class: Any, entity: Optional[Entity] = None) -> None:
     validator_second = [OptionalValidator(), NumberRange(min=0, max=59)]
     validator_minute = [OptionalValidator(), NumberRange(min=0, max=59)]
     validator_hour = [OptionalValidator(), NumberRange(min=0, max=23)]

@@ -15,6 +15,7 @@ from openatlas.display.table import Table
 from openatlas.display.util import get_base_table_data
 from openatlas.display.util2 import show_table_icons, uc_first
 from openatlas.forms import manager, manager_base
+from openatlas.forms.add_fields import add_date_fields
 from openatlas.forms.field import (
     SubmitField, TableCidocField, TableField, TableMultiField, TreeField)
 from openatlas.models.entity import Entity, Link
@@ -77,6 +78,9 @@ def link_form(relation: dict[str, Any]) -> Any:
         TableField(entities, validators=[InputRequired()]))
     for item in relation['additional_fields']:
         match item:
+            case 'date':
+                # Todo: what about time fields if already used there?
+                add_date_fields(Form)
             case 'description' | 'page':
                 setattr(Form, 'description', StringField(_(item)))
     setattr(Form, 'save', SubmitField(_('insert')))
