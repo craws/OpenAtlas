@@ -88,7 +88,7 @@ class Endpoint:
         start = self.pagination['entity_index']
         self.entities = self.entities[start:start + int(self.parser.limit)]
 
-    def resolve_entities(self) -> Response | dict[str, Any]:
+    def resolve(self) -> Response | dict[str, Any]:
         if self.parser.type_id:
             self.entities = self.filter_by_type()
         if self.parser.search:

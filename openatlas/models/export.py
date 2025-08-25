@@ -68,84 +68,80 @@ def sql_export(format_: str, postfix: Optional[str] = '') -> bool:
 def arche_export() -> bool:
     external_metadata = app.config['ARCHE_METADATA']
     file_entities = Entity.get_by_class(['file'], types=True, aliases=True)
-    if type_ids := external_metadata.get('typeIds'):
+    type_ids = external_metadata.get('typeIds')
+    if type_ids:
         file_entities = filter_by_type(file_entities, type_ids)
 
     sorted_files = sort_files_by_types(
         file_entities,
         type_ids,
         external_metadata['topCollection'])
-    files_by_extension: Any = defaultdict(lambda: defaultdict(set))
+
+    files_by_extension: dict[str, dict[str, set]] = defaultdict(
+        lambda: defaultdict(set))
     for entity_id, path_set in sorted_files.items():
         for f in path_set:
             ext = normalize_extension(f.suffix)
             files_by_extension[entity_id][ext].add(f)
 
-    rdf_dump = Endpoint(
-        ApiEntity.get_by_system_classes(['all']),
-        {'type_id': type_ids,
-         'limit': 0,
-         'format': 'turtle'}).resolve_entities()
+    archive_name = (
+        f"{current_date_for_filename()}_"
+        f"{external_metadata['topCollection'].replace(' ', '_')}.zip")
 
     tempfile.tempdir = str(app.config['TMP_PATH'])
-    with tempfile.NamedTemporaryFile(
-            mode='w+',
-            suffix='.md',
-            delete=False) as tmp_md:
-        tmp_md.write("\n".join(
-            create_failed_files_md(check_files_for_arche(file_entities))))
-        tmp_md_path = tmp_md.name
-
+    export_dir = app.config['EXPORT_PATH']
+    export_dir.mkdir(parents=True, exist_ok=True)
+    final_archive_path = export_dir / archive_name
+    tmp_archive_path = Path(tempfile.mkdtemp()) / archive_name
 
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_path = Path(temp_dir)
 
-        md_path = temp_path / 'problematic_files.md'
-        md_path.write_text(
-            Path(tmp_md_path).read_text(encoding='utf-8'), encoding='utf-8')
+        failed_files_md = "\n".join(
+            create_failed_files_md(check_files_for_arche(file_entities)))
+        (temp_path / 'problematic_files.md').write_text(
+            failed_files_md,
+            encoding='utf-8')
 
-        ttl_path = temp_path / 'files.ttl'
-        ttl_path.write_text(get_arche_metadata(
+        files_arche_turtle = get_arche_metadata(
             file_entities,
-            set(type_ids),
-            external_metadata['topCollection']))
+            set(type_ids) if type_ids else set(),
+            external_metadata['topCollection'])
+        (temp_path / 'files.ttl').write_text(
+            files_arche_turtle,
+            encoding='utf-8')
 
-        rdf_path = temp_path / 'rdf_dump.ttl'
-        rdf_path.write_text(rdf_dump.get_data(as_text=True))
+        rdf_dump = Endpoint(
+            ApiEntity.get_by_system_classes(['all']),
+            {'type_id': type_ids, 'limit': 0, 'format': 'turtle'}).resolve()
+        rdf_content = rdf_dump.get_data(as_text=True)
+        (temp_path / 'rdf_dump.ttl').write_text(rdf_content, encoding='utf-8')
 
-        for type_name, ext_map in files_by_extension.items():
-            for ext, files_set in ext_map.items():
-                ext_dir = temp_path / type_name / ext
-                ext_dir.mkdir(parents=True, exist_ok=True)
-                for file_path in files_set:
-                    (ext_dir / file_path.name).write_bytes(
-                        file_path.read_bytes())
-
-        tmp_path = app.config['TMP_PATH']
-        tmp_path.mkdir(parents=True, exist_ok=True)
-
-        archive_name = (
-            f"{current_date_for_filename()}_"
-            f"{external_metadata['topCollection'].replace(' ', '_')}.zip")
-        archive_file = tmp_path / archive_name
-
-        with zipfile.ZipFile(archive_file, 'w') as archive:
-            archive.write(md_path, arcname='debug/problematic_files.md')
-            archive.write(ttl_path, arcname='metadata/files.ttl')
+        with zipfile.ZipFile(
+                tmp_archive_path,
+                'w',
+                compression=zipfile.ZIP_DEFLATED) as archive:
             archive.write(open_tmp_sql_file(), arcname='data/database.sql')
-            archive.write(rdf_path, arcname='data/rdf_dump.ttl')
+            archive.write(
+                temp_path / 'problematic_files.md',
+                arcname='debug/problematic_files.md')
+            archive.write(
+                temp_path / 'files.ttl',
+                arcname='metadata/files.ttl')
+            archive.write(
+                temp_path / 'rdf_dump.ttl',
+                arcname='data/rdf_dump.ttl')
 
             for type_name, ext_map in files_by_extension.items():
                 for ext, files_set in ext_map.items():
                     for file_path in files_set:
-                        archive.write(
-                            temp_path / type_name / ext / file_path.name,
-                            arcname=f'data/{type_name}/{ext}/{file_path.name}')
+                        with file_path.open('rb') as f:
+                            archive.writestr(
+                                f'data/{type_name}/{ext}/{file_path.name}',
+                                f.read())
 
-        # Reopen archive to gather statistics
-        with zipfile.ZipFile(archive_file, 'a') as archive:
             infos = archive.infolist()
-            total_size = os.path.getsize(archive_file)
+            total_size = sum(info.file_size for info in infos)
             total_files = sum(1 for i in infos if not i.filename.endswith('/'))
             all_dirs: set[PurePosixPath] = set()
             for info in infos:
@@ -154,22 +150,18 @@ def arche_export() -> bool:
             all_dirs.discard(PurePosixPath("."))
             total_dirs = len(all_dirs)
             total_entries = len(infos)
-            stat_md = (f" # Archive Statistics \n"
-                       f"- **Total size**: {total_size} bytes\n "
-                       f"- **Total entries**: {total_entries}\n"
-                       f"- **Files**: {total_files}\n"
-                       f"- **Directories**: {total_dirs}")
-            stat_path = temp_path / "file_statistic.md"
-            stat_path.write_text(stat_md, encoding="utf-8")
-            archive.write(stat_path, arcname='debug/file_statistic.md')
 
-        export_dir = app.config['EXPORT_PATH']
-        export_dir.mkdir(parents=True, exist_ok=True)
+            stat_md = (
+                f"# Archive Statistics\n"
+                f"- **Total size**: {total_size} bytes\n"
+                f"- **Total entries**: {total_entries}\n"
+                f"- **Files**: {total_files}\n"
+                f"- **Directories**: {total_dirs}\n")
+            archive.writestr('debug/file_statistic.md', stat_md)
 
-        final_archive_path = export_dir / archive_name
-        archive_file.replace(final_archive_path)
+    tmp_archive_path.replace(final_archive_path)
 
-        return archive_file
+    return final_archive_path
 
 
 def create_failed_files_md(
@@ -367,6 +359,7 @@ def find_duplicates(entity_ids: set[int]) -> set[tuple[int, int]]:
             else:
                 hash_map[file_hash] = file_id
     return duplicates
+
 
 def open_tmp_sql_file() -> str:
     with tempfile.NamedTemporaryFile(
