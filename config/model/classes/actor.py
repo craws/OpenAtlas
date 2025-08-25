@@ -1,5 +1,3 @@
-import copy
-
 from flask_babel import lazy_gettext as _
 
 from config.model.class_groups import class_groups, standard_relations
@@ -50,7 +48,7 @@ person = {
             'event': {
                 'columns': [
                     'name', 'class', 'activity', 'involvement', 'first',
-                    'last', 'comment', 'update', 'remove'],
+                    'last', 'comment'],
                 'buttons': ['link']},
             'relation': {
                 'additional_columns': ['remove'],

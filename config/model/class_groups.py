@@ -61,7 +61,7 @@ standard_relations = {
             'inverse': True,
             'multiple': True},
         'tab': {
-            'additional_columns': ['main image', 'remove'],
+            'additional_columns': ['main image'],
             'buttons': ['link', 'insert']}},
     'reference': {
         'relation': {
@@ -73,7 +73,7 @@ standard_relations = {
             'additional_fields': ['page']},
         'tab': {
             'mode': 'link',
-            'additional_columns': ['page', 'update', 'remove'],
+            'additional_columns': ['page'],
             'buttons': ['link', 'insert']}},
     'source': {
         'relation': {
@@ -83,7 +83,6 @@ standard_relations = {
             'inverse': True,
             'multiple': True},
         'tab': {
-            'additional_columns': ['remove'],
             'buttons': ['link', 'insert']},
     }}
 

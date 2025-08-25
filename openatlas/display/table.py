@@ -82,6 +82,10 @@ def entity_table(
             else:
                 columns = item.range.class_.group['table_columns']
     columns = columns + (additional_columns or [])
+    if relation['mode'] == 'tab':
+        if relation['additional_fields']:
+            columns.append('update')
+        columns.append('remove')
     table = Table(columns)
     for item in items:
         e = item
