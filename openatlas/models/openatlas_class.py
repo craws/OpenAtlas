@@ -112,7 +112,7 @@ def get_classes() -> dict[str, OpenatlasClass]:
 def get_model(class_name: str) -> dict[str, Any]:
     data: dict[str, Any] = model[class_name]
     for name, item in data['attributes'].items():
-        item['label'] = item.get('label', name)
+        item['label'] = item.get('label', _(name))
         item['required'] = item.get('required', False)
     data['display'] = data.get('display', {})
     data['display']['buttons'] = data['display'].get('buttons', {})
@@ -133,7 +133,7 @@ def get_model(class_name: str) -> dict[str, Any]:
         relation['inverse'] = relation.get('inverse', False)
         relation['multiple'] = relation.get('multiple', False)
         relation['required'] = relation.get('required', False)
-        relation['label'] = relation.get('label', name)
+        relation['label'] = relation.get('label', _(name))
         relation['mode'] = relation.get('mode', 'tab')
         relation['selected'] = [] if relation['multiple'] else None
         relation['tooltip'] = relation.get('tooltip', None)

@@ -182,6 +182,7 @@ class Display:
                     #                 url_for('insert', class_=tab_name, origin_id=id_)))
                 self.tabs[name] = Tab(
                     name,
+                    relation['label'],
                     table=entity_table(
                         items,
                         self.entity,
