@@ -72,7 +72,6 @@ standard_relations = {
             'multiple': True,
             'additional_fields': ['page']},
         'tab': {
-            'mode': 'link',
             'additional_columns': ['page'],
             'buttons': ['link', 'insert']}},
     'source': {

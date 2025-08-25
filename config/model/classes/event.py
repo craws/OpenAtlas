@@ -41,7 +41,6 @@ model = {
             'subs': {},
             'source': standard_relations['source']['tab'],
             'actor': {
-                'mode': 'link',
                 'columns': [
                     'name', 'class', 'activity', 'involvement', 'first',
                     'last', 'comment']},
