@@ -50,19 +50,15 @@ source = {
             'text': {
                 'buttons': ['insert']},
             'actor': {
-                'additional_columns': ['remove'],
                 'buttons': ['link', 'insert'],
                 'tooltip': _('mentioned in the source')},
             'artifact': {
-                'additional_columns': ['remove'],
                 'buttons': ['link', 'insert'],
                 'tooltip': _('mentioned in the source')},
             'event': {
-                'additional_columns': ['remove'],
                 'buttons': ['link', 'insert'],
                 'tooltip': _('mentioned in the source')},
             'place': {
-                'additional_columns': ['remove'],
                 'buttons': ['link', 'insert'],
                 'tooltip': _('mentioned in the source')},
             'reference': standard_relations['reference']['tab'],

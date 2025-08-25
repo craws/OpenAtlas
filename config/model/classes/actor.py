@@ -2,6 +2,10 @@ from flask_babel import lazy_gettext as _
 
 from config.model.class_groups import class_groups, standard_relations
 
+# Needed for translation at event tab
+_('first')
+_('last')
+
 person = {
     'attributes': {
         'name': {
@@ -30,8 +34,8 @@ person = {
             'label': _('relation'),
             'classes': 'person',
             'properties': 'OA7',
-            'additional_fields': ['date']
-        },
+            'mode': 'tab_directed',
+            'additional_fields': ['domain', 'date', 'description']},
         'residence': {
             'label': _('residence'),
             'classes': 'object_location',
@@ -48,11 +52,11 @@ person = {
             'event': {
                 'columns': [
                     'name', 'class', 'activity', 'involvement', 'first',
-                    'last', 'comment'],
+                    'last', 'description'],
                 'buttons': ['link']},
             'relation': {
-                'additional_columns': ['remove'],
-                'buttons': ['link']
+                'buttons': ['link'],
+                'columns': ['name', 'begin', 'end', 'description'],
             },
             'reference': standard_relations['reference']['tab'],
             'file': standard_relations['file']['tab'],

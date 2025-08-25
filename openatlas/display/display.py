@@ -153,7 +153,7 @@ class Display:
                                     'link_insert_detail'
                                     if relation['additional_fields']
                                     else 'link_insert',
-                                    id_=self.entity.id,
+                                    origin_id=self.entity.id,
                                     relation_name=name)))
                     if 'insert' in tab['buttons']:
                         for class_ in relation['classes']:

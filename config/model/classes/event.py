@@ -43,7 +43,7 @@ model = {
             'actor': {
                 'columns': [
                     'name', 'class', 'activity', 'involvement', 'first',
-                    'last', 'comment']},
+                    'last', 'description']},
             'reference': standard_relations['reference']['tab'],
             'file': standard_relations['file']['tab'],
             'note': {}}}}
