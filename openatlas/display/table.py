@@ -107,7 +107,7 @@ def entity_table(
                     html = g.file_info[e.id]['creator']
                 case 'content' | 'description':
                     html = e.description
-                    if name in relation['additional_fields']:
+                    if relation and name in relation['additional_fields']:
                         html = item.description
                 case 'page':
                     html = item.description
