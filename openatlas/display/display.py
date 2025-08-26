@@ -122,77 +122,76 @@ class Display:
 
     def add_tabs(self) -> None:
         self.tabs = {'info': Tab('info')}
-        if 'tabs' not in self.entity.class_.display:
-            return
-        for name, tab in self.entity.class_.display['tabs'].items():
+        for name, relation in self.entity.class_.relations.items():
+            if not relation['tab']:
+                continue
+            items = []
+            for item in self.entity.get_links(
+                    relation['properties'],
+                    relation['classes'],
+                    relation['inverse']):
+                items.append(item)
+                if relation['properties'] == ['P67'] \
+                        and relation['classes'] == ['file'] \
+                        and not self.entity.image_id \
+                        and item.domain.get_file_ext() in \
+                        g.display_file_ext:
+                    self.entity.image_id = \
+                        self.entity.image_id or item.domain.id
+            buttons = [manual(f'entity/{name}')]
+            if is_authorized('contributor'):
+                if 'link' in relation['tab']['buttons']:
+                    buttons.append(
+                        button(
+                            _('link'),
+                            url_for(
+                                'link_insert_detail'
+                                if relation['additional_fields']
+                                else 'link_insert',
+                                origin_id=self.entity.id,
+                                relation_name=name)))
+                if 'insert' in relation['tab']['buttons']:
+                    for class_ in relation['classes']:
+                        buttons.append(
+                            button(
+                                g.classes[class_].label,
+                                url_for(
+                                    'insert',
+                                    class_=class_,
+                                    origin_id=self.entity.id,
+                                    relation=name)))
+                #     case 'source':
+                #         if class_name == 'file':
+                #             self.buttons.append(
+                #                 button(
+                #                     _('link'),
+                #                     url_for('file_add', id_=id_, view=tab_name)))
+                #         elif view == 'reference':
+                #             self.buttons.append(
+                #                 button(
+                #                     'link',
+                #                     url_for('reference_add', id_=id_, view=tab_name)))
+                #         self.buttons.append(
+                #             button(
+                #                 g.classes['source'].label,
+                #                 url_for('insert', class_=tab_name, origin_id=id_)))
+            self.tabs[name] = Tab(
+                name,
+                relation['label'],
+                table=entity_table(
+                    items,
+                    self.entity,
+                    relation['tab']['columns'],
+                    relation['tab']['additional_columns'],
+                    relation),
+                buttons=buttons,
+                entity=self.entity,
+                tooltip=relation['tab']['tooltip'])
+
+        for name in self.entity.class_.display['additional_tabs']:
             if name == 'note':
                 self.add_note_tab()
                 continue
-            if name in self.entity.class_.relations:
-                relation = self.entity.class_.relations[name]
-                items = []
-                for item in self.entity.get_links(
-                        relation['properties'],
-                        relation['classes'],
-                        relation['inverse']):
-                    items.append(item)
-                    if relation['properties'] == ['P67'] \
-                            and relation['classes'] == ['file'] \
-                            and not self.entity.image_id \
-                            and item.domain.get_file_ext() in \
-                            g.display_file_ext:
-                        self.entity.image_id = \
-                            self.entity.image_id or item.domain.id
-                buttons = [manual(f'entity/{name}')]
-                if is_authorized('contributor'):
-                    if 'link' in tab['buttons']:
-                        buttons.append(
-                            button(
-                                _('link'),
-                                url_for(
-                                    'link_insert_detail'
-                                    if relation['additional_fields']
-                                    else 'link_insert',
-                                    origin_id=self.entity.id,
-                                    relation_name=name)))
-                    if 'insert' in tab['buttons']:
-                        for class_ in relation['classes']:
-                            buttons.append(
-                                button(
-                                    g.classes[class_].label,
-                                    url_for(
-                                        'insert',
-                                        class_=class_,
-                                        origin_id=self.entity.id,
-                                        relation=name)))
-                    #     case 'source':
-                    #         if class_name == 'file':
-                    #             self.buttons.append(
-                    #                 button(
-                    #                     _('link'),
-                    #                     url_for('file_add', id_=id_, view=tab_name)))
-                    #         elif view == 'reference':
-                    #             self.buttons.append(
-                    #                 button(
-                    #                     'link',
-                    #                     url_for('reference_add', id_=id_, view=tab_name)))
-                    #         self.buttons.append(
-                    #             button(
-                    #                 g.classes['source'].label,
-                    #                 url_for('insert', class_=tab_name, origin_id=id_)))
-                self.tabs[name] = Tab(
-                    name,
-                    relation['label'],
-                    table=entity_table(
-                        items,
-                        self.entity,
-                        tab['columns'],
-                        tab['additional_columns'],
-                        relation),
-                    buttons=buttons,
-                    entity=self.entity,
-                    tooltip=tab['tooltip'] if tab and 'tooltip' in tab
-                    else None)
 
     def add_note_tab(self) -> None:
         self.tabs['note'] = Tab(

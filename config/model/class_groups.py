@@ -54,36 +54,32 @@ class_groups = {
 
 standard_relations = {
     'file': {
-        'relation': {
-            'label': _('file'),
-            'classes': class_groups['file']['classes'],
-            'properties': 'P67',
-            'inverse': True,
-            'multiple': True},
+        'label': _('file'),
+        'classes': class_groups['file']['classes'],
+        'properties': 'P67',
+        'inverse': True,
+        'multiple': True,
         'tab': {
             'additional_columns': ['main image'],
             'buttons': ['link', 'insert']}},
     'reference': {
-        'relation': {
-            'label': _('reference'),
-            'classes': class_groups['reference']['classes'],
-            'properties': 'P67',
-            'inverse': True,
-            'multiple': True,
-            'additional_fields': ['page']},
+        'label': _('reference'),
+        'classes': class_groups['reference']['classes'],
+        'properties': 'P67',
+        'inverse': True,
+        'multiple': True,
+        'additional_fields': ['page'],
         'tab': {
             'columns': ['name', 'class', 'type', 'page'],
             'buttons': ['link', 'insert']}},
     'source': {
-        'relation': {
-            'label': _('source'),
-            'classes': 'source',
-            'properties': 'P67',
-            'inverse': True,
-            'multiple': True},
+        'label': _('source'),
+        'classes': 'source',
+        'properties': 'P67',
+        'inverse': True,
+        'multiple': True,
         'tab': {
-            'buttons': ['link', 'insert']},
-    }}
+            'buttons': ['link', 'insert']}}}
 
 # Todo: remove after finishing new classes
 # def get_table_columns() -> dict[str, list[str]]:

@@ -259,13 +259,6 @@ def save(
     Transaction.begin()
     try:
         entity = process_form_data(entity, form)
-        if origin and relation_name:
-            # Todo: properties can be multiple?
-            relation = g.classes[origin.class_.name].relations[relation_name]
-            origin.link(
-                relation['properties'][0],
-                entity,
-                inverse=relation['inverse'])
         g.logger.log_user(entity.id, action)
         Transaction.commit()
         url = get_redirect_url(entity, form, origin, relation_name)

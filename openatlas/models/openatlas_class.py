@@ -115,12 +115,9 @@ def get_model(class_name: str) -> dict[str, Any]:
         item['label'] = item.get('label', _(name))
         item['required'] = item.get('required', False)
     data['display'] = data.get('display', {})
+    data['display']['additional_tabs'] = \
+        data['display'].get('additional_tabs', {})
     data['display']['buttons'] = data['display'].get('buttons', {})
-    data['display']['tabs'] = data['display'].get('tabs', {})
-    for tab in data['display']['tabs'].values():
-        tab['columns'] = tab.get('columns', None)
-        tab['additional_columns'] = tab.get('additional_columns', [])
-        tab['buttons'] = tab.get('buttons', [])
     data['relations'] = data.get('relations', {})
     for name, relation in data['relations'].items():
         relation['name'] = name
@@ -138,4 +135,11 @@ def get_model(class_name: str) -> dict[str, Any]:
         relation['selected'] = [] if relation['multiple'] else None
         relation['tooltip'] = relation.get('tooltip', None)
         relation['additional_fields'] = relation.get('additional_fields', [])
+        relation['tab'] = relation.get('tab', None)
+        if relation['tab']:
+            relation['tab']['additional_columns'] = \
+                relation['tab'].get('additional_columns', [])
+            relation['tab']['buttons'] = relation['tab'].get('buttons', [])
+            relation['tab']['columns'] = relation['tab'].get('columns', None)
+            relation['tab']['tooltip'] = relation['tab'].get('tooltip', None)
     return data

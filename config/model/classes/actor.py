@@ -29,35 +29,32 @@ person = {
             'classes': class_groups['event']['classes'],
             'properties': ['P11', 'P14', 'P22', 'P23'],
             'inverse': True,
-            'multiple': True},
+            'multiple': True,
+            'tab': {
+                'columns': [
+                    'name', 'class', 'activity', 'involvement', 'first',
+                    'last', 'description'],
+                'buttons': ['link']}},
         'relation': {
             'label': _('relation'),
             'classes': 'person',
             'properties': 'OA7',
             'mode': 'tab_directed',
-            'additional_fields': ['domain', 'date', 'description']},
+            'additional_fields': ['domain', 'date', 'description'],
+            'tab': {
+                'buttons': ['link'],
+                'columns': ['name', 'begin', 'end', 'description']}},
         'residence': {
             'label': _('residence'),
             'classes': 'object_location',
             'properties': 'P74',
             'mode': 'direct'},
-        'source': standard_relations['source']['relation'],
-        'file': standard_relations['file']['relation'],
-        'reference': standard_relations['reference']['relation']},
+        'source': standard_relations['source'],
+        'file': standard_relations['file'],
+        'reference': standard_relations['reference']},
     'display': {
         'buttons': ['copy', 'network'],
-        'form': {'insert_and_continue': True},
-        'tabs': {
-            'source': standard_relations['source']['tab'],
-            'event': {
-                'columns': [
-                    'name', 'class', 'activity', 'involvement', 'first',
-                    'last', 'description'],
-                'buttons': ['link']},
-            'relation': {
-                'buttons': ['link'],
-                'columns': ['name', 'begin', 'end', 'description'],
-            },
-            'reference': standard_relations['reference']['tab'],
-            'file': standard_relations['file']['tab'],
+        'form': {
+            'insert_and_continue': True},
+        'additional_tabs': {
             'note': {}}}}
