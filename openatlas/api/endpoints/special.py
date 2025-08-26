@@ -25,7 +25,7 @@ from openatlas.api.resources.util import filter_by_type, get_geometries
 from openatlas.database.entity import get_linked_entities_recursive
 from openatlas.models.entity import Entity
 from openatlas.models.export import current_date_for_filename, \
-    get_arche_metadata
+    get_arche_file_turtle_graph
 
 
 class GetGeometricEntities(Resource):
@@ -141,7 +141,7 @@ class GetArcheMetadata(Resource):
         if type_ids := parser.get('type_ids'):
             file_entities = filter_by_type(file_entities, type_ids)
         return Response(
-            get_arche_metadata(
+            get_arche_file_turtle_graph(
                 file_entities,
                 set(type_ids),
                 top_collection),

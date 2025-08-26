@@ -4,15 +4,15 @@ from re import search
 from typing import Any
 from urllib.parse import urlparse, urlunparse
 
-from rdflib import Graph, Literal, Namespace, URIRef
+from rdflib import Graph, Literal, URIRef
 from rdflib.namespace import RDF, XSD
 from unidecode import unidecode
 
+from config.default import ACDH
 from openatlas import app
 from openatlas.api.external.arche_class import ArcheFileMetadata
 from openatlas.models.entity import Entity
 
-ACDH = Namespace("https://vocabs.acdh.oeaw.ac.at/schema#")
 ENTITIES_EMITTED = set()
 
 with urllib.request.urlopen(app.config['ARCHE_URI_RULES']) as response:

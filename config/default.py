@@ -1,6 +1,8 @@
 # Don't edit this file. To override settings please use instance/production.py
 from pathlib import Path
 
+from rdflib import Namespace
+
 from config.database_versions import DATABASE_VERSIONS
 
 VERSION = '8.14.0'
@@ -74,6 +76,17 @@ API_GEONAMES = 'http://api.geonames.org/get'
 
 CSP_HEADER = "frame-ancestors 'self'"
 
+
+# ---------------------------------------------------------------------
+# ARCHE export
+# ---------------------------------------------------------------------
+
+ACDH = Namespace("https://vocabs.acdh.oeaw.ac.at/schema#")
+
+ARCHE_URI_RULES = 'https://raw.githubusercontent.com/acdh-oeaw/arche-assets' \
+                   '/refs/heads/master/AcdhArcheAssets/uriNormRules.json'
+
+# ARCHE metadata configuration. This should be overwritten in production.py
 ARCHE_METADATA = {
     'topCollection': '',
     'language': 'en',
@@ -84,7 +97,6 @@ ARCHE_METADATA = {
     'principalInvestigator': [],
     'relatedDiscipline': [],
     'typeIds': [],
-    'exclude_reference_systems': []}
+    'excludeReferenceSystems': []}
 
-ARCHE_URI_RULES = ('https://raw.githubusercontent.com/acdh-oeaw/arche-assets'
-                   '/refs/heads/master/AcdhArcheAssets/uriNormRules.json')
+

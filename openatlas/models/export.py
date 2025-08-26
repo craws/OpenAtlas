@@ -16,7 +16,8 @@ from rdflib import Graph
 
 from openatlas import app
 from openatlas.api.endpoints.endpoint import Endpoint
-from openatlas.api.external.arche import ACDH, add_arche_file_metadata_to_graph
+from openatlas.api.external.arche import add_arche_file_metadata_to_graph
+from config.default import ACDH
 from openatlas.api.external.arche_class import ArcheFileMetadata
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.util import filter_by_type, get_reference_systems
@@ -103,7 +104,7 @@ def arche_export() -> bool:
             failed_files_md,
             encoding='utf-8')
 
-        files_arche_turtle = get_arche_metadata(
+        files_arche_turtle = get_arche_file_turtle_graph(
             file_entities,
             set(type_ids) if type_ids else set(),
             external_metadata['topCollection'])
@@ -284,25 +285,36 @@ def check_files_for_arche(
     return dict(missing)
 
 
-def get_arche_metadata(
+def get_arche_file_turtle_graph(
         entities: list[Entity],
         type_ids: set[int],
         top_collection: str) -> str:
+    graph = Graph()
+    graph.bind("acdh", ACDH)
+    metadata = get_arche_file_metadata(entities, type_ids, top_collection)
+    for metadata_obj in metadata:
+        add_arche_file_metadata_to_graph(graph, metadata_obj)
+    return graph.serialize(format="turtle")
+
+
+def get_arche_file_metadata(
+        entities: list[Entity],
+        type_ids: set[int],
+        top_collection: str) -> list[ArcheFileMetadata]:
     publications = get_publications(entities)
     relations = get_place_and_actor_relations(entities)
     license_urls = {}
     arche_metadata_list = []
     for entity in entities:
-        if not g.files.get(entity.id) or not entity.standard_type:
+        standard_type = entity.standard_type
+        if not g.files.get(entity.id) or not standard_type:
             continue
-        if entity.standard_type.id not in license_urls:
-            for link_ in (
-                    entity.standard_type.get_links('P67', inverse=True)):
+        if standard_type.id not in license_urls:
+            for link_ in standard_type.get_links('P67', inverse=True):
                 if link_.domain.class_.name == "external_reference":
-                    license_urls[entity.standard_type.id] = (
-                        link_.domain.name)
+                    license_urls[standard_type.id] = link_.domain.name
                     break
-            if entity.standard_type.id not in license_urls:
+            if standard_type.id not in license_urls:
                 continue
         if type_ids:
             for type_ in entity.types:
@@ -314,7 +326,7 @@ def get_arche_metadata(
                             type_name,
                             relations.get(entity.id),
                             publications.get(entity.id),
-                            license_urls[entity.standard_type.id]))
+                            license_urls[standard_type.id]))
         else:
             arche_metadata_list.append(
                 ArcheFileMetadata.construct(
@@ -322,13 +334,8 @@ def get_arche_metadata(
                     top_collection,
                     relations.get(entity.id),
                     publications.get(entity.id),
-                    license_urls[entity.standard_type.id]))
-
-    graph = Graph()
-    graph.bind("acdh", ACDH)
-    for metadata_obj in arche_metadata_list:
-        add_arche_file_metadata_to_graph(graph, metadata_obj)
-    return graph.serialize(format="turtle")
+                    license_urls[standard_type.id]))
+    return arche_metadata_list
 
 
 def find_duplicates(entity_ids: set[int]) -> set[tuple[int, int]]:

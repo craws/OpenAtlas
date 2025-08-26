@@ -8,7 +8,7 @@ from werkzeug.wrappers import Response
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
-from openatlas.display.util import button, link, required_group
+from openatlas.display.util import button, display_info, link, required_group
 from openatlas.display.util2 import convert_size, is_authorized, manual
 from openatlas.models.export import arche_export, sql_export
 
@@ -123,9 +123,32 @@ def export_arche() -> str:
                         filename=file.name),
                     js=f"return confirm('{confirm}')"))
         table.rows.append(data)
+    metadata = app.config['ARCHE_METADATA']
+    info_content = {
+        'top collection': metadata.get('topCollection'),
+        'language': metadata.get('language'),
+        'depositor': ', '.join(metadata.get('depositor', [])),
+        'acceptedDate': metadata.get('acceptedDate'),
+        'curator': ', '.join(metadata.get('curator', [])),
+        'principalInvestigator':
+          ', '.join(metadata.get('principalInvestigator', [])),
+        'hasMetadataCreator':
+          ', '.join(metadata.get('hasMetadataCreator', [])),
+        'relatedDiscipline': ', '.join(
+          metadata.get('relatedDiscipline', [])),
+        'excludeReferenceSystems':
+          ', '.join(metadata.get('excludeReferenceSystems', [])),
+        'typeIds':
+            ', '.join(
+                [link(str(type_id), url_for('view', id_=type_id))
+                 for type_id in metadata.get('typeIds', [])])}
     return render_template(
         'tabs.html',
         tabs={
+            'info': Tab(
+                'info',
+                content=display_info(info_content),
+                buttons=[manual('admin/export')]),
             'export': Tab(
                 'export',
                 _('export'),

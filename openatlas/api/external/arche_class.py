@@ -76,7 +76,7 @@ class ArcheFileMetadata:
                 ref_system_info: list[tuple[str, str]] = []
                 for ref in relation['ref_systems']:
                     if (ref['referenceSystem']
-                            in metadata['exclude_reference_systems']):
+                            in metadata['excludeReferenceSystems']):
                         continue
                     ref_system_info.append(
                         (ref['identifier'], ref['referenceSystem']))
