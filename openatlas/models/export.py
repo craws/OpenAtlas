@@ -104,13 +104,14 @@ def arche_export() -> bool:
             failed_files_md,
             encoding='utf-8')
 
-        files_arche_turtle = get_arche_file_turtle_graph(
-            file_entities,
-            set(type_ids) if type_ids else set(),
-            external_metadata['topCollection'])
-        (temp_path / 'files.ttl').write_text(
-            files_arche_turtle,
-            encoding='utf-8')
+        if file_entities:
+            files_arche_turtle = get_arche_file_turtle_graph(
+                file_entities,
+                set(type_ids) if type_ids else set(),
+                external_metadata['topCollection'])
+            (temp_path / 'files.ttl').write_text(
+                files_arche_turtle,
+                encoding='utf-8')
 
         rdf_dump = Endpoint(
             ApiEntity.get_by_system_classes(['all']),
@@ -126,9 +127,10 @@ def arche_export() -> bool:
             archive.write(
                 temp_path / 'problematic_files.md',
                 arcname='debug/problematic_files.md')
-            archive.write(
-                temp_path / 'files.ttl',
-                arcname='metadata/files.ttl')
+            if file_entities:
+                archive.write(
+                    temp_path / 'files.ttl',
+                    arcname='metadata/files.ttl')
             archive.write(
                 temp_path / 'rdf_dump.ttl',
                 arcname='data/rdf_dump.ttl')
