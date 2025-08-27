@@ -20,6 +20,7 @@ from wtforms import StringField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app
+from openatlas.api.resources.util import filter_by_type
 from openatlas.database.connect import Transaction
 from openatlas.display.image_processing import (
     create_resized_images, delete_orphaned_resized_images)
@@ -579,12 +580,12 @@ def orphans() -> str:
 
 
 @app.route('/check_files')
+@app.route('/check_files/<arche>')
 @required_group('contributor')
-def check_files() -> str:
+def check_files(arche: Optional[str] = None) -> str:
     header = [
         'name',
         'type',
-        'system type',
         'created',
         'updated',
         'description']
@@ -609,11 +610,14 @@ def check_files() -> str:
         tab.buttons = [manual('admin/data_integrity_checks')]
 
     entities: list[Entity] = Entity.get_by_class('file', types=True)
-    for entity in Entity.get_by_class('file', types=True):
+    if arche:
+        type_ids = app.config['ARCHE_METADATA'].get('typeIds')
+        if type_ids:
+            entities = filter_by_type(entities, type_ids)
+    for entity in entities:
         entity_for_table = [
             link(entity),
             link(entity.standard_type),
-            entity.class_.label,
             format_date(entity.created),
             format_date(entity.modified),
             entity.description]
@@ -646,7 +650,9 @@ def check_files() -> str:
         title=_('admin'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
-            _('orphans')])
+            [_('export') + ' ARCHE', f"{url_for('export_arche')}" ]
+            if arche else None,
+            _('check files')])
 
 
 @app.route('/admin/file/delete/<filename>')
