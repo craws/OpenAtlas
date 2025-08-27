@@ -146,11 +146,11 @@ def arche_export() -> bool:
             infos = archive.infolist()
             total_size = sum(info.file_size for info in infos)
             total_files = sum(1 for i in infos if not i.filename.endswith('/'))
-            all_dirs: set[PurePosixPath] = set()
+            all_dirs: set[Path] = set()
             for info in infos:
-                path = PurePosixPath(info.filename)
+                path = Path(info.filename)
                 all_dirs.update(path.parents)
-            all_dirs.discard(PurePosixPath("."))
+            all_dirs.discard(Path("."))
             total_dirs = len(all_dirs)
             total_entries = len(infos)
 
