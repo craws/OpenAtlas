@@ -87,7 +87,9 @@ The file name starts with the current date and time, for example
 Export ARCHE
 ------------
 
-A dedicated export is available to generate data suitable for ingestion into `ARCHE <https://arche.acdh.oeaw.ac.at/>`_, the ACDH repository system. This feature is intended for administrative use only.
+A dedicated export is available to generate data suitable for ingestion into
+`ARCHE <https://arche.acdh.oeaw.ac.at/>`_, the ACDH repository system.
+This feature is intended for administrative use only.
 
 See also:
 
@@ -96,18 +98,36 @@ See also:
 
 * Only available for **admin users**
 * Generates a **ZIP** archive ready to be transferred to ARCHE
-* Output includes metadata, files, RDF and SQL dumps, and debug information in an ARCHE-compatible structure
+* Output includes metadata, files, RDF and SQL dumps, and debug information
+  in an ARCHE-compatible structure
 * The process may take **significant time** and consume **large disk space**
 * The ZIP file is saved in the ``files/export`` directory
 
 .. note::
 
-   This export is **not** listed among the standard user exports and is only available to administrators due to performance and data sensitivity concerns.
+   This export is **not** listed among the standard user exports and is only
+   available to administrators due to performance and data sensitivity concerns.
+
+Tabs
+****
+
+* **Info**
+  Displays the data entered in ``production.py``.
+  Provides a button to check ARCHE files.
+  Only files associated with ``typeIds`` (if any are defined) are checked.
+  More information on the file checker can be found in
+  :doc:`admin/data_integrity_checks`.
+
+* **Export**
+  Shows the exported files.
+  Allows administrators to start and manage the ARCHE export.
 
 Configuration
 *************
 
-To make use of the ARCHE export functionality, specific metadata must be provided in the ``production.py`` settings file using the ``ARCHE_METADATA`` dictionary.
+To make use of the ARCHE export functionality, specific metadata must be
+provided in the ``production.py`` settings file using the
+``ARCHE_METADATA`` dictionary.
 
 Here is an example configuration:
 
@@ -151,23 +171,35 @@ Here is an example configuration:
         ]
     }
 
-**Description of fields:**
+Description of fields
+*********************
 
 .. note::
 
-   For all fields that refer to people (e.g., ``depositor``, ``curator``, ``hasMetadataCreator``), you can use either a **persistent identifier** (preferably `ORCID <https://orcid.org/>`_, but also `GND <https://www.dnb.de/EN/gnd>`_, `ISNI <https://isni.org/>`_, `VIAF <https://viaf.org/>`_, or `Wikidata <https://www.wikidata.org/>`_) or a **plain name**. Use persistent identifiers whenever possible for better interoperability.
+   For all fields that refer to people (e.g., ``depositor``, ``curator``,
+   ``hasMetadataCreator``), you can use either a **persistent identifier**
+   (preferably `ORCID <https://orcid.org/>`_, but also
+   `GND <https://www.dnb.de/EN/gnd>`_, `ISNI <https://isni.org/>`_,
+   `VIAF <https://viaf.org/>`_, or `Wikidata <https://www.wikidata.org/>`_)
+   or a **plain name**. Use persistent identifiers whenever possible for
+   better interoperability.
 
-* ``topCollection``: ARCHE top-level collection identifier (usually provided in coordination with the ARCHE team)
+* ``topCollection``: ARCHE top-level collection identifier
+  (usually provided in coordination with the ARCHE team)
 * ``language``: Language code of the metadata (e.g. ``'en'``)
 * ``depositor``: List of persons responsible for the deposit
 * ``acceptedDate``: ISO date string of when the data was accepted for deposit
 * ``hasMetadataCreator``: List of people responsible for the ARCHE metadata
 * ``curator``: List of ARCHE curators
 * ``principalInvestigator``: List of principal investigators for this project
-* ``relatedDiscipline``: URLs to vocabularies defining the `related disciplines <https://vocabs.acdh.oeaw.ac.at/oefos/en/>`_
-* ``typeIds`` *(optional)*: Restrict exported files to those linked with specific type IDs
-* ``exclude_reference_systems`` *(optional)*: List of reference system labels to be excluded from the export
+* ``relatedDiscipline``: URLs to vocabularies defining the
+  `related disciplines <https://vocabs.acdh.oeaw.ac.at/oefos/en/>`_
+* ``typeIds`` *(optional)*: Restrict exported files to those linked
+  with specific type IDs
+* ``excludeReferenceSystems`` *(optional)*: List of reference system
+  labels to be excluded from the export
 
 .. note::
 
-   If ``typeIds`` or ``exclude_reference_systems`` are empty, all files and reference systems are considered.
+   If ``typeIds`` or ``exclude_reference_systems`` are empty, all files
+   and reference systems are considered.
