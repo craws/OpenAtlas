@@ -81,6 +81,12 @@ class ImportTest(TestBaseCase):
         filename = f'{date_}_{collection_name.replace(" ", "_")}.zip'
 
         rv = c.get(
+             url_for('check_files', arche='arche'),
+            follow_redirects=True)
+        assert b'No license' in rv.data
+
+
+        rv = c.get(
             url_for('arche_execute'),
             follow_redirects=True)
         assert b'Data was exported' in rv.data

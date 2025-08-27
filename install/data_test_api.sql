@@ -1,31 +1,33 @@
-INSERT INTO model.entity (
-  cidoc_class_code, openatlas_class_name, name, description, begin_from, begin_to, begin_comment, end_from, end_to, end_comment, created, modified)
+INSERT INTO model.entity (cidoc_class_code, name, description, created, modified, begin_from, begin_to, begin_comment, end_from, end_to, end_comment, openatlas_class_name)
 VALUES
-    ('E18', 'place', 'Shire','The Shire was the homeland of the hobbits.','2018-01-31', '2018-03-01', 'Begin of the shire', '2019-01-31',  '2019-03-01','Descent of Shire', '2022-09-21 16:38:01.923431','2022-09-21 16:38:05.923431'),
-    ('E21', 'person', 'Sam', 'That is Sam','200-01-31', '200-03-01', 'Begin of the shire', '700-01-31', '800-03-01','Descent of Shire', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-
-INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name, description, modified)
-VALUES
-  ('E53', 'object_location', 'Location of Shire', NULL, CURRENT_TIMESTAMP),
-  ('E18', 'place', 'Mordor', 'The heart of evil.', CURRENT_TIMESTAMP),
-  ('E53', 'object_location', 'Location of Mordor', NULL, CURRENT_TIMESTAMP),
-  ('E22', 'artifact', 'The One Ring', NULL, CURRENT_TIMESTAMP),
-  ('E53', 'object_location', 'Location of The One Ring', NULL, CURRENT_TIMESTAMP),
-  ('E18', 'feature', 'Home of Baggins', NULL, CURRENT_TIMESTAMP),
-  ('E53', 'object_location', 'Location of Home of Baggins', NULL, CURRENT_TIMESTAMP),
-  ('E18', 'stratigraphic_unit', 'Bar', NULL, CURRENT_TIMESTAMP),
-  ('E53', 'object_location', 'Location of Bar', NULL, CURRENT_TIMESTAMP),
-  ('E31', 'file', 'Picture with a License', NULL, CURRENT_TIMESTAMP),
-  ('E31', 'file', 'File without license', NULL, CURRENT_TIMESTAMP),
-  ('E31', 'file', 'File without file', NULL, CURRENT_TIMESTAMP),
-  ('E31', 'file', 'File not public', NULL, CURRENT_TIMESTAMP),
-  ('E33', 'source', 'Silmarillion', NULL, CURRENT_TIMESTAMP),
-  ('E21', 'person', 'Frodo', 'That is Frodo', CURRENT_TIMESTAMP),
-  ('E31', 'external_reference', 'https://lotr.fandom.com/', NULL, CURRENT_TIMESTAMP),
-  ('E41', 'appellation', 'Sûza', NULL, CURRENT_TIMESTAMP),
-  ('E41', 'appellation', 'The ring bearer', NULL, CURRENT_TIMESTAMP),
-  ('E7', 'activity', 'Travel to Mordor', NULL, CURRENT_TIMESTAMP),
-  ('E7', 'activity', 'Exchange of the one ring', NULL, CURRENT_TIMESTAMP);
+('E18', 'Shire', 'The Shire was the homeland of the hobbits.', '2022-09-21 16:38:01.923431', '2025-08-27 15:37:01.715232', '2018-01-31 00:00:00', '2018-03-01 00:00:00', 'Begin of the shire', '2019-01-31 00:00:00', '2019-03-01 00:00:00', 'Descent of Shire', 'place'),
+('E21', 'Sam', 'That is Sam', '2025-08-27 15:24:05.202781', '2025-08-27 15:36:01.595807', '0200-01-31 00:00:00', '0200-03-01 00:00:00', 'Begin of the shire', '0700-01-31 00:00:00', '0800-03-01 00:00:00', 'Descent of Shire', 'person'),
+('E53', 'Location of Shire', NULL, '2025-08-27 15:24:05.202781', '2025-08-27 15:37:01.715232', NULL, NULL, NULL, NULL, NULL, NULL, 'object_location'),
+('E18', 'Mordor', 'The heart of evil.', '2025-08-27 15:24:05.202781', '2025-08-27 15:36:19.728937', NULL, NULL, NULL, NULL, NULL, NULL, 'place'),
+('E53', 'Location of Mordor', NULL, '2025-08-27 15:24:05.202781', '2025-08-27 15:36:19.728937', NULL, NULL, NULL, NULL, NULL, NULL, 'object_location'),
+('E22', 'The One Ring', NULL, '2025-08-27 15:24:05.202781', '2025-08-27 15:38:43.726496', NULL, NULL, NULL, NULL, NULL, NULL, 'artifact'),
+('E53', 'Location of The One Ring', NULL, '2025-08-27 15:24:05.202781', '2025-08-27 15:38:43.726496', NULL, NULL, NULL, NULL, NULL, NULL, 'object_location'),
+('E18', 'Home of Baggins', NULL, '2025-08-27 15:24:05.202781', '2025-08-27 15:38:00.620933', NULL, NULL, NULL, NULL, NULL, NULL, 'feature'),
+('E53', 'Location of Home of Baggins', NULL, '2025-08-27 15:24:05.202781', '2025-08-27 15:38:00.620933', NULL, NULL, NULL, NULL, NULL, NULL, 'object_location'),
+('E18', 'Bar', NULL, '2025-08-27 15:24:05.202781', '2025-08-27 15:37:40.920348', NULL, NULL, NULL, NULL, NULL, NULL, 'stratigraphic_unit'),
+('E53', 'Location of Bar', NULL, '2025-08-27 15:24:05.202781', '2025-08-27 15:37:40.920348', NULL, NULL, NULL, NULL, NULL, NULL, 'object_location'),
+('E31', 'Picture with a License', NULL, '2025-08-27 15:24:05.202781', '2025-08-27 15:40:29.388652', NULL, NULL, NULL, NULL, NULL, NULL, 'file'),
+('E31', 'File without license', NULL, '2025-08-27 15:24:05.202781', '2025-08-27 15:24:05.202781', NULL, NULL, NULL, NULL, NULL, NULL, 'file'),
+('E31', 'File without file', NULL, '2025-08-27 15:24:05.202781', '2025-08-27 15:40:11.757184', NULL, NULL, NULL, NULL, NULL, NULL, 'file'),
+('E31', 'File not public', NULL, '2025-08-27 15:24:05.202781', '2025-08-27 15:40:04.307029', NULL, NULL, NULL, NULL, NULL, NULL, 'file'),
+('E33', 'Silmarillion', '', '2025-08-27 15:24:05.202781', '2025-08-27 15:34:06.603921', NULL, NULL, NULL, NULL, NULL, NULL, 'source'),
+('E21', 'Frodo', 'That is Frodo', '2025-08-27 15:24:05.202781', '2025-08-27 15:35:32.323442', NULL, NULL, NULL, NULL, NULL, NULL, 'person'),
+('E31', 'https://lotr.fandom.com/', NULL, '2025-08-27 15:24:05.202781', '2025-08-27 15:38:53.269067', NULL, NULL, NULL, NULL, NULL, NULL, 'external_reference'),
+('E41', 'Sûza', NULL, '2025-08-27 15:24:05.202781', '2025-08-27 15:24:05.202781', NULL, NULL, NULL, NULL, NULL, NULL, 'appellation'),
+('E41', 'The ring bearer', NULL, '2025-08-27 15:24:05.202781', '2025-08-27 15:24:05.202781', NULL, NULL, NULL, NULL, NULL, NULL, 'appellation'),
+('E7', 'Travel to Mordor', NULL, '2025-08-27 15:24:05.202781', '2025-08-27 15:34:52.025982', NULL, NULL, NULL, NULL, NULL, NULL, 'activity'),
+('E7', 'Exchange of the one ring', NULL, '2025-08-27 15:24:05.202781', '2025-08-27 15:34:28.368813', NULL, NULL, NULL, NULL, NULL, NULL, 'activity'),
+('E55', 'Case Study', NULL, '2025-08-27 15:28:46.173775', '2025-08-27 15:28:46.173775', NULL, NULL, NULL, NULL, NULL, NULL, 'type'),
+('E55', 'Lord of the rings', NULL, '2025-08-27 15:29:16.305918', '2025-08-27 15:29:16.305918', NULL, NULL, NULL, NULL, NULL, NULL, 'type'),
+('E55', 'Tavern', NULL, '2025-08-27 15:37:39.494569', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'type'),
+('E55', 'Hills', NULL, '2025-08-27 15:37:59.191057', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'type'),
+('E55', 'Ring', NULL, '2025-08-27 15:38:35.112386', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'type'),
+('E31', 'https://en.wikipedia.org/wiki/Public_domain', NULL, '2025-08-27 15:39:45.792383', '2025-08-27 15:39:45.792383', NULL, NULL, NULL, NULL, NULL, NULL, 'external_reference');
 
 
 INSERT INTO model.gis (entity_id, name, description, type, geom_point, geom_polygon, geom_linestring)
@@ -74,51 +76,83 @@ VALUES
   NULL);
 
 
-INSERT INTO model.link (property_code, range_id, domain_id)
-VALUES
-  ('P2', (SELECT id FROM model.entity WHERE name='Boundary Mark'), (SELECT id FROM model.entity WHERE name='Shire')),
-  ('P2', (SELECT id FROM model.entity WHERE name='Boundary Mark'), (SELECT id FROM model.entity WHERE name='Mordor')),
-  ('P2', (SELECT id FROM model.entity WHERE name='Exchange'), (SELECT id FROM model.entity WHERE name='Exchange of the one ring')),
-  ('P1', (SELECT id FROM model.entity WHERE name='Sûza'), (SELECT id FROM model.entity WHERE name='Shire')),
-  ('P1', (SELECT id FROM model.entity WHERE name='The ring bearer'), (SELECT id FROM model.entity WHERE name='Frodo')),
-  ('P46', (SELECT id FROM model.entity WHERE name='Home of Baggins'), (SELECT id FROM model.entity WHERE name='Shire')),
-  ('P46', (SELECT id FROM model.entity WHERE name='Bar'), (SELECT id FROM model.entity WHERE name='Home of Baggins')),
-  ('P89', (SELECT id FROM model.entity WHERE name='Austria'), (SELECT id FROM model.entity WHERE name='Location of Shire') ),
-  ('P53', (SELECT id FROM model.entity WHERE name='Location of Shire'), (SELECT id FROM model.entity WHERE name='Shire') ),
-  ('P53', (SELECT id FROM model.entity WHERE name='Location of Mordor'), (SELECT id FROM model.entity WHERE name='Mordor') ),
-  ('P53', (SELECT id FROM model.entity WHERE name='Location of The One Ring'), (SELECT id FROM model.entity WHERE name='The One Ring') ),
-  ('P53', (SELECT id FROM model.entity WHERE name='Location of Home of Baggins'), (SELECT id FROM model.entity WHERE name='Home of Baggins') ),
-  ('P53', (SELECT id FROM model.entity WHERE name='Location of Bar'), (SELECT id FROM model.entity WHERE name='Bar') ),
-  ('P67', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='Picture with a License') ),
-  ('P67', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='File without license') ),
-  ('P52', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='The One Ring') ),
-  ('P2', (SELECT id FROM model.entity WHERE name='Public domain'), (SELECT id FROM model.entity WHERE name='Picture with a License') ),
-  ('P2', (SELECT id FROM model.entity WHERE name='Public domain'), (SELECT id FROM model.entity WHERE name='File without file') ),
-  ('P2', (SELECT id FROM model.entity WHERE name='Public domain'), (SELECT id FROM model.entity WHERE name='File not public') ),
-  ('P74', (SELECT id FROM model.entity WHERE name='Location of Shire'), (SELECT id FROM model.entity WHERE name='Sam') ),
-  ('OA8', (SELECT id FROM model.entity WHERE name='Location of Shire'), (SELECT id FROM model.entity WHERE name='Sam') ),
-  ('OA9', (SELECT id FROM model.entity WHERE name='Location of Shire'), (SELECT id FROM model.entity WHERE name='Sam') ),
-  ('P11', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='Travel to Mordor') ),
-  ('P134', (SELECT id FROM model.entity WHERE name='Travel to Mordor'), (SELECT id FROM model.entity WHERE name='Exchange of the one ring') ),
-  ('P7', (SELECT id FROM model.entity WHERE name='Location of Mordor'), (SELECT id FROM model.entity WHERE name='Travel to Mordor') );
-
-INSERT INTO model.link (property_code, range_id, domain_id, begin_from, end_from)
-VALUES
-  ('P14', (SELECT id FROM model.entity WHERE name='Sam'), (SELECT id FROM model.entity WHERE name='Travel to Mordor'), '2018-03-01', '2018-04-01' );
-
-INSERT INTO model.link (property_code, range_id, domain_id, description, type_id)
-VALUES
-  ('P67', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='GeoNames'), '2761369', (SELECT id FROM model.entity WHERE name='close match') ),
-  ('OA7', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='Sam'), NULL, (SELECT id FROM model.entity WHERE name='Economical') ),
-  ('P67', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='https://lotr.fandom.com/'), 'Fandom Wiki of lord of the rings', NULL),
-  ('P67', (SELECT id FROM model.entity WHERE name='Public domain'), (SELECT id FROM model.entity WHERE name='https://lotr.fandom.com/'), 'Public domain', NULL),
-  ('P2', (SELECT id FROM model.entity WHERE name='Height'), (SELECT id FROM model.entity WHERE name='Shire'), '23.0', NULL ),
-  ('P2', (SELECT id FROM model.entity WHERE name='Weight'), (SELECT id FROM model.entity WHERE name='Shire'), '999.0', NULL ),
-  ('P2', (SELECT id FROM model.entity WHERE name='Link'), (SELECT id FROM model.entity WHERE name='https://lotr.fandom.com/'), NULL, NULL );
 
 INSERT INTO web.entity_profile_image (entity_id, image_id)
 VALUES ( (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='Picture with a License') )
 ON CONFLICT (entity_id) DO UPDATE SET image_id=(SELECT id FROM model.entity WHERE name='Picture with a License');
+
+INSERT INTO model.link (property_code, domain_id, range_id, description, type_id, begin_from, begin_to, begin_comment, end_from, end_to, end_comment)
+VALUES
+('P1', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='Sûza'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P1', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='The ring bearer'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P53', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='Location of Shire'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P53', (SELECT id FROM model.entity WHERE name='Mordor'), (SELECT id FROM model.entity WHERE name='Location of Mordor'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P53', (SELECT id FROM model.entity WHERE name='The One Ring'), (SELECT id FROM model.entity WHERE name='Location of The One Ring'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P53', (SELECT id FROM model.entity WHERE name='Home of Baggins'), (SELECT id FROM model.entity WHERE name='Location of Home of Baggins'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P53', (SELECT id FROM model.entity WHERE name='Bar'), (SELECT id FROM model.entity WHERE name='Location of Bar'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P67', (SELECT id FROM model.entity WHERE name='Picture with a License'), (SELECT id FROM model.entity WHERE name='Shire'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P67', (SELECT id FROM model.entity WHERE name='File without license'), (SELECT id FROM model.entity WHERE name='Frodo'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P11', (SELECT id FROM model.entity WHERE name='Travel to Mordor'), (SELECT id FROM model.entity WHERE name='Frodo'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P14', (SELECT id FROM model.entity WHERE name='Travel to Mordor'), (SELECT id FROM model.entity WHERE name='Sam'), NULL, NULL, NULL, NULL, '2018-03-01 00:00:00', NULL, NULL, '2018-04-01 00:00:00'),
+('OA7', (SELECT id FROM model.entity WHERE name='Sam'), (SELECT id FROM model.entity WHERE name='Frodo'), NULL, (SELECT id FROM model.entity WHERE name='Economical'), NULL, NULL, NULL, NULL, NULL, NULL),
+('P67', (SELECT id FROM model.entity WHERE name='https://lotr.fandom.com/'), (SELECT id FROM model.entity WHERE name='Shire'), 'Fandom Wiki of lord of the rings', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P67', (SELECT id FROM model.entity WHERE name='https://lotr.fandom.com/'), (SELECT id FROM model.entity WHERE name='Public domain'), 'Public domain', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P67', (SELECT id FROM model.entity WHERE name='Wikidata'), (SELECT id FROM model.entity WHERE name='Lord of the rings'), 'Q15228', (SELECT id FROM model.entity WHERE name='exact match'), NULL, NULL, NULL, NULL, NULL, NULL),
+('P127', (SELECT id FROM model.entity WHERE name='Lord of the rings'), (SELECT id FROM model.entity WHERE name='Case Study'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='Silmarillion'), (SELECT id FROM model.entity WHERE name='Testament'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='Silmarillion'), (SELECT id FROM model.entity WHERE name='Lord of the rings'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='Exchange of the one ring'), (SELECT id FROM model.entity WHERE name='Exchange'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='Exchange of the one ring'), (SELECT id FROM model.entity WHERE name='Lord of the rings'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P134', (SELECT id FROM model.entity WHERE name='Exchange of the one ring'), (SELECT id FROM model.entity WHERE name='Travel to Mordor'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='Travel to Mordor'), 37, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='Travel to Mordor'), (SELECT id FROM model.entity WHERE name='Lord of the rings'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P7', (SELECT id FROM model.entity WHERE name='Travel to Mordor'), (SELECT id FROM model.entity WHERE name='Location of Mordor'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='Lord of the rings'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='Male'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P67', (SELECT id FROM model.entity WHERE name='Wikidata'), (SELECT id FROM model.entity WHERE name='Frodo'), 'Q177329',  (SELECT id FROM model.entity WHERE name='exact match'), NULL,NULL, NULL, NULL, NULL, NULL),
+('P74', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='Location of Shire'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('OA8', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='Location of Shire'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('OA9', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='Location of Shire'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='Sam'), (SELECT id FROM model.entity WHERE name='Lord of the rings'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='Sam'), (SELECT id FROM model.entity WHERE name='Male'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P67', (SELECT id FROM model.entity WHERE name='Wikidata'), (SELECT id FROM model.entity WHERE name='Sam'), 'Q219473', (SELECT id FROM model.entity WHERE name='exact match'),NULL, NULL,  NULL, NULL, NULL, NULL),
+('P74', (SELECT id FROM model.entity WHERE name='Sam'), (SELECT id FROM model.entity WHERE name='Location of Shire'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('OA8', (SELECT id FROM model.entity WHERE name='Sam'), (SELECT id FROM model.entity WHERE name='Location of Shire'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('OA9', (SELECT id FROM model.entity WHERE name='Sam'), (SELECT id FROM model.entity WHERE name='Location of Shire'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='Mordor'), (SELECT id FROM model.entity WHERE name='Boundary Mark'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='Mordor'), (SELECT id FROM model.entity WHERE name='Lord of the rings'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P67', (SELECT id FROM model.entity WHERE name='Wikidata'), (SELECT id FROM model.entity WHERE name='Mordor'), 'Q202886', (SELECT id FROM model.entity WHERE name='exact match'),NULL, NULL,  NULL, NULL, NULL, NULL),
+('P89', (SELECT id FROM model.entity WHERE name='Location of Shire'), (SELECT id FROM model.entity WHERE name='Austria'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='Boundary Mark'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='Lord of the rings'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='Height'), '23.0', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='Weight'), '999.0', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P67', (SELECT id FROM model.entity WHERE name='GeoNames'), (SELECT id FROM model.entity WHERE name='Shire'), '2761369',  (SELECT id FROM model.entity WHERE name='close match'), NULL, NULL,NULL, NULL, NULL, NULL),
+('P67', (SELECT id FROM model.entity WHERE name='Wikidata'), (SELECT id FROM model.entity WHERE name='Shire'), 'Q218728', (SELECT id FROM model.entity WHERE name='exact match'), NULL, NULL, NULL, NULL, NULL, NULL),
+('P127', (SELECT id FROM model.entity WHERE name='Tavern'), (SELECT id FROM model.entity WHERE name='Stratigraphic unit'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='Bar'), (SELECT id FROM model.entity WHERE name='Tavern'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='Bar'), (SELECT id FROM model.entity WHERE name='Lord of the rings'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P46', (SELECT id FROM model.entity WHERE name='Home of Baggins'), (SELECT id FROM model.entity WHERE name='Bar'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P127', (SELECT id FROM model.entity WHERE name='Hills'), (SELECT id FROM model.entity WHERE name='Feature'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='Home of Baggins'), (SELECT id FROM model.entity WHERE name='Hills'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='Home of Baggins'), (SELECT id FROM model.entity WHERE name='Lord of the rings'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P46', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='Home of Baggins'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P127', (SELECT id FROM model.entity WHERE name='Ring'), (SELECT id FROM model.entity WHERE name='Artifact'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='The One Ring'), (SELECT id FROM model.entity WHERE name='Ring'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='The One Ring'), (SELECT id FROM model.entity WHERE name='Lord of the rings'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P52', (SELECT id FROM model.entity WHERE name='The One Ring'), (SELECT id FROM model.entity WHERE name='Frodo'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P46', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='The One Ring'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='https://lotr.fandom.com/'), (SELECT id FROM model.entity WHERE name='Link'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='https://lotr.fandom.com/'), (SELECT id FROM model.entity WHERE name='Lord of the rings'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='https://en.wikipedia.org/wiki/Public_domain'), (SELECT id FROM model.entity WHERE name='Link'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P67', (SELECT id FROM model.entity WHERE name='https://en.wikipedia.org/wiki/Public_domain'), (SELECT id FROM model.entity WHERE name='Public domain'), 'https://en.wikipedia.org/wiki/Public_domain', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='File not public'), (SELECT id FROM model.entity WHERE name='Public domain'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='File not public'), (SELECT id FROM model.entity WHERE name='Lord of the rings'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='File without file'), (SELECT id FROM model.entity WHERE name='Public domain'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='File without file'), (SELECT id FROM model.entity WHERE name='Lord of the rings'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='Picture with a License'), (SELECT id FROM model.entity WHERE name='Public domain'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('P2', (SELECT id FROM model.entity WHERE name='Picture with a License'), (SELECT id FROM model.entity WHERE name='Lord of the rings'), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+
 
 INSERT INTO model.file_info (entity_id, public, creator, license_holder)
 VALUES
