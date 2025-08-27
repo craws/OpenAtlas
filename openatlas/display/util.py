@@ -272,9 +272,9 @@ def profile_image(entity: Entity) -> str:
         f'<img style="max-width:{width}px" alt="{entity.name}" src="{src}">',
         url,
         external=external)
-    if (entity.class_.name == 'file'
-            and check_iiif_activation()
-            and g.files[file_id].suffix in g.display_file_ext):
+    if entity.class_.name == 'file' \
+            and check_iiif_activation() \
+            and g.files[file_id].suffix in g.display_file_ext:
         if check_iiif_file_exist(file_id) \
                 or not g.settings['iiif_conversion']:
             html += ('<br>' + link(
@@ -416,8 +416,9 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
         warnings.append(
             f"Database version {app.config['DATABASE_VERSION']} is needed but "
             f"current version is {g.settings['database_version']}")
-    for path in g.writable_paths:
-        check_write_access(path, warnings)
+    if hasattr(g, 'writable_paths'):
+        for path in g.writable_paths:
+            check_write_access(path, warnings)
     return \
         '<div class="alert alert-danger">' \
         f'{"<br>".join(warnings)}</div>' if warnings else ''
@@ -446,15 +447,25 @@ def get_file_path(
         entity: int | Entity,
         size: Optional[str] = None) -> Optional[Path]:
     id_ = entity if isinstance(entity, int) else entity.id
-    if id_ not in g.files:
+    if not hasattr(g, 'files') or id_ not in g.files:
         return None
     ext = g.files[id_].suffix
     if size:
         if ext in app.config['PROCESSABLE_EXT']:
             ext = app.config['PROCESSED_EXT']  # pragma: no cover
         path = app.config['RESIZED_IMAGES'] / size / f"{id_}{ext}"
-        return path if os.path.exists(path) else None
-    return app.config['UPLOAD_PATH'] / f"{id_}{ext}"
+    else:
+        path = app.config['UPLOAD_PATH'] / f"{id_}{ext}"
+    return path if os.path.exists(path) else None
+
+
+@pass_context  # Prevent Jinja2 context caching
+@app.template_filter()
+def get_logo_url(_context: str, _unneeded_var: str) -> str:
+    if g.settings['logo_file_id'] \
+            and (path := get_file_path(int(g.settings['logo_file_id']))):
+        return url_for('display_custom_logo', ext=path.suffix)
+    return "/static/images/layout/logo.png"
 
 
 @app.template_filter()
