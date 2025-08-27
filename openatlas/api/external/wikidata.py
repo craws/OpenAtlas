@@ -21,6 +21,7 @@ def fetch_wikidata(id_: str) -> dict[str, Any]:
     try:
         data = requests.get(
             app.config['API_WIKIDATA'],
+            headers=app.config['USER_AGENT'],
             params=params,
             proxies=app.config['PROXIES'],
             timeout=10).json()
