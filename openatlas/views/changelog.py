@@ -17,7 +17,12 @@ def index_changelog() -> str:
 versions = {
     '8.14.0': ['TBA', {
         'features': {
-            '2598': 'Refactor and minor improvements'
+            '2605': 'Display root type id',
+            '2596': 'Finish Polish translation',
+            '2466': 'API: Export files with ARCHE RDF metadata',
+            '2598': 'Refactor and minor improvements'},
+        'fixes': {
+            '2599': 'Broken Wikidata info function',
         }
     }],
     '8.13.0': ['2025-08-19', {
