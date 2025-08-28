@@ -47,6 +47,7 @@ def annotate_image_form(
         insert: Optional[bool] = True) -> Any:
     class Form(FlaskForm):
         text = TextAreaField(_('annotation'))
+
     if insert:
         setattr(
             Form,
@@ -62,9 +63,22 @@ def annotate_image_form(
     return Form()
 
 
-def link_form(relation: dict[str, Any]) -> Any:
+def link_form(origin: Entity, relation: dict[str, Any]) -> Any:
     class Form(FlaskForm):
         pass
+
+    if 'domain' in relation['additional_fields']:
+        domain_entities = Entity.get_by_class(
+            origin.class_.name,
+            types=True,
+            aliases=current_user.settings['table_show_aliases'])
+        setattr(
+            Form,
+            'domain',
+            TableField(
+                domain_entities,
+                selection=origin,
+                validators=[InputRequired()]))
 
     entities = Entity.get_by_class(
         relation['classes'],
@@ -76,12 +90,15 @@ def link_form(relation: dict[str, Any]) -> Any:
         TableMultiField(entities, validators=[InputRequired()])
         if relation['multiple'] else
         TableField(entities, validators=[InputRequired()]))
+
     for item in relation['additional_fields']:
         match item:
             case 'date':
                 # Todo: what about time fields if already used there?
                 add_date_fields(Form)
-            case 'description' | 'page':
+            case 'description':
+                setattr(Form, 'description', TextAreaField(_(item)))
+            case 'page':
                 setattr(Form, 'description', StringField(_(item)))
     setattr(Form, 'save', SubmitField(_('insert')))
     return Form()
@@ -160,7 +177,10 @@ def move_form(type_: Entity) -> Any:
     setattr(Form, str(root.id), TreeField(str(root.id)))
     choices = []
     if root.class_.name == 'administrative_unit':
-        for entity in type_.get_linked_entities('P89', inverse=True, sort=True):
+        for entity in type_.get_linked_entities(
+                'P89',
+                inverse=True,
+                sort=True):
             place = entity.get_linked_entity('P53', inverse=True)
             if place:
                 choices.append((entity.id, place.name))

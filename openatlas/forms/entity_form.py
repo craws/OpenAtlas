@@ -128,7 +128,8 @@ def delete_links(entity: Entity) -> None:
         entity.delete_links_by_property_and_class('P2', ['type'])
     for relation in entity.class_.relations.values():
         if relation['mode'] == 'direct':
-            entity.delete_links_by_property_and_class(
-                relation['properties'],
-                relation['classes'],
-                relation['inverse'])
+            for property_ in relation['properties']:
+                entity.delete_links_by_property_and_class(
+                    property_,
+                    relation['classes'],
+                    relation['inverse'])

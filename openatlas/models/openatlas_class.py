@@ -112,16 +112,12 @@ def get_classes() -> dict[str, OpenatlasClass]:
 def get_model(class_name: str) -> dict[str, Any]:
     data: dict[str, Any] = model[class_name]
     for name, item in data['attributes'].items():
-        item['label'] = item.get('label', name)
+        item['label'] = item.get('label', _(name))
         item['required'] = item.get('required', False)
     data['display'] = data.get('display', {})
+    data['display']['additional_tabs'] = \
+        data['display'].get('additional_tabs', {})
     data['display']['buttons'] = data['display'].get('buttons', {})
-    data['display']['tabs'] = data['display'].get('tabs', {})
-    for tab in data['display']['tabs'].values():
-        tab['columns'] = tab.get('columns', None)
-        tab['additional_columns'] = tab.get('additional_columns', [])
-        tab['mode'] = tab.get('mode', None)
-        tab['buttons'] = tab.get('buttons', [])
     data['relations'] = data.get('relations', {})
     for name, relation in data['relations'].items():
         relation['name'] = name
@@ -134,9 +130,16 @@ def get_model(class_name: str) -> dict[str, Any]:
         relation['inverse'] = relation.get('inverse', False)
         relation['multiple'] = relation.get('multiple', False)
         relation['required'] = relation.get('required', False)
-        relation['label'] = relation.get('label', name)
+        relation['label'] = relation.get('label', _(name))
         relation['mode'] = relation.get('mode', 'tab')
         relation['selected'] = [] if relation['multiple'] else None
         relation['tooltip'] = relation.get('tooltip', None)
         relation['additional_fields'] = relation.get('additional_fields', [])
+        relation['tab'] = relation.get('tab', None)
+        if relation['tab']:
+            relation['tab']['additional_columns'] = \
+                relation['tab'].get('additional_columns', [])
+            relation['tab']['buttons'] = relation['tab'].get('buttons', [])
+            relation['tab']['columns'] = relation['tab'].get('columns', None)
+            relation['tab']['tooltip'] = relation['tab'].get('tooltip', None)
     return data

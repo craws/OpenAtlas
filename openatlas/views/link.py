@@ -25,57 +25,57 @@ def link_delete(id_: int, origin_id: int) -> Response:
     return redirect(url_for('view', id_=origin_id))
 
 
-@app.route('/link/insert/<int:id_>/<relation_name>', methods=['GET', 'POST'])
+@app.route('/link/insert/<int:origin_id>/<relation_name>', methods=['GET', 'POST'])
 @required_group('contributor')
-def link_insert(id_: int, relation_name: str) -> str | Response:
-    entity = Entity.get_by_id(id_)
-    relation = entity.class_.relations[relation_name]
+def link_insert(origin_id: int, relation_name: str) -> str | Response:
+    origin = Entity.get_by_id(origin_id)
+    relation = origin.class_.relations[relation_name]
     if request.method == 'POST':
         if request.form['checkbox_values']:
             # Todo: properties can be multiple?
-            entity.link_string(
+            origin.link_string(
                 relation['properties'][0],
                 request.form['checkbox_values'],
                 inverse=relation['inverse'])
         return redirect(
-            f"{url_for('view', id_=entity.id)}#tab-{relation_name}")
+            f"{url_for('view', id_=origin.id)}#tab-{relation_name}")
     # Todo: properties can be multiple?
     content = table_form(
         relation['classes'],
-        [e.id for e in entity.get_linked_entities(
+        [e.id for e in origin.get_linked_entities(
             relation['properties'][0],
             inverse=relation['inverse'])])
     return render_template(
         'content.html',
         content=content,
-        title=_(entity.class_.group['name']),
-        crumbs=[link(entity, index=True), entity, _('link')])
+        title=_(origin.class_.group['name']),
+        crumbs=[link(origin, index=True), origin, _('link')])
 
 
 @app.route(
-    '/link/insert_detail/<int:id_>/<relation_name>',
+    '/link/insert_detail/<int:origin_id>/<relation_name>',
     methods=['GET', 'POST'])
 @required_group('contributor')
-def link_insert_detail(id_: int, relation_name: str) -> str | Response:
-    entity = Entity.get_by_id(id_)
-    relation = entity.class_.relations[relation_name]
-    form = link_form(relation)
+def link_insert_detail(origin_id: int, relation_name: str) -> str | Response:
+    origin = Entity.get_by_id(origin_id)
+    relation = origin.class_.relations[relation_name]
+    form = link_form(origin, relation)
     if form.validate_on_submit():
         ids = ast.literal_eval(getattr(form, relation_name).data)
         ids = ids if isinstance(ids, list) else [int(ids)]
         # Todo: properties can be multiple?
-        entity.link(
+        origin.link(
             relation['properties'][0],
             Entity.get_by_ids(ids),
             form.description.data if 'description' in form else None,
             relation['inverse'])
         return redirect(
-            f"{url_for('view', id_=entity.id)}#tab-{relation_name}")
+            f"{url_for('view', id_=origin.id)}#tab-{relation_name}")
     return render_template(
         'content.html',
         content=display_form(form),
-        title=_(entity.class_.group['name']),
-        crumbs=[link(entity, index=True), entity, _('link')])
+        title=_(origin.class_.group['name']),
+        crumbs=[link(origin, index=True), origin, _('link')])
 
 
 @app.route(

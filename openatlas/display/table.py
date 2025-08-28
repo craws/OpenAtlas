@@ -82,6 +82,10 @@ def entity_table(
             else:
                 columns = item.range.class_.group['table_columns']
     columns = columns + (additional_columns or [])
+    if relation and relation['mode'].startswith('tab'):
+        if relation['additional_fields']:
+            columns.append('update')
+        columns.append('remove')
     table = Table(columns)
     for item in items:
         e = item
@@ -103,7 +107,9 @@ def entity_table(
                     html = g.file_info[e.id]['creator']
                 case 'content' | 'description':
                     html = e.description
-                case 'comment' | 'page':
+                    if relation and name in relation['additional_fields']:
+                        html = item.description
+                case 'page':
                     html = item.description
                 case 'end':
                     html = e.last

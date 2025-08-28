@@ -74,14 +74,14 @@ def add_description(
     if entity.class_.name == 'source_translation':
         source = origin or entity.get_linked_entity('P73', inverse=True)
     setattr(
-            form,
-            'annotation',
-            TextAnnotationField(
-                label=entity.class_.attributes['description']['label'],
-                source_text=entity.get_annotated_text() if entity.id else '',
-                linked_entities=[
-                    {'id': e.id, 'name': e.name}
-                    for e in source.get_linked_entities('P67')]))
+        form,
+        'annotation',
+        TextAnnotationField(
+            label=entity.class_.attributes['description']['label'],
+            source_text=entity.get_annotated_text() if entity.id else '',
+            linked_entities=[
+                {'id': e.id, 'name': e.name}
+                for e in source.get_linked_entities('P67')]))
     setattr(form, 'description', HiddenField())
 
 

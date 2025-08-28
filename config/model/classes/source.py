@@ -14,15 +14,23 @@ source = {
             'label': _('text'),
             'classes': 'source_translation',
             'properties': 'P73',
-            'multiple': True},
+            'multiple': True,
+            'tab':{
+                'buttons': ['insert']}},
         'actor': {
             'classes': class_groups['actor']['classes'],
             'properties': 'P67',
-            'multiple': True},
+            'multiple': True,
+            'tab': {
+                'buttons': ['link', 'insert'],
+                'tooltip': _('mentioned in the source')}},
         'artifact': {
             'classes': class_groups['artifact']['classes'],
             'properties': 'P67',
-            'multiple': True},
+            'multiple': True,
+            'tab': {
+                'buttons': ['link', 'insert'],
+                'tooltip': _('mentioned in the source')}},
         'information_carrier': {
             'label': _('information carrier'),
             'classes': 'artifact',
@@ -35,38 +43,24 @@ source = {
         'event': {
             'classes': class_groups['event']['classes'],
             'properties': 'P67',
-            'multiple': True},
+            'multiple': True,
+            'tab': {
+                'buttons': ['link', 'insert'],
+                'tooltip': _('mentioned in the source')}},
         'place': {
             'classes': class_groups['place']['classes'],
             'properties': 'P67',
-            'multiple': True},
-        'file': standard_relations['file']['relation'],
-        'reference': standard_relations['reference']['relation']},
+            'multiple': True,
+            'tab': {
+                'buttons': ['link', 'insert'],
+                'tooltip': _('mentioned in the source')}},
+        'file': standard_relations['file'],
+        'reference': standard_relations['reference']},
     'display': {
         'buttons': ['copy'],
         'form': {
             'insert_and_continue': True},
-        'tabs': {
-            'text': {
-                'buttons': ['insert']},
-            'actor': {
-                'additional_columns': ['remove'],
-                'buttons': ['link', 'insert'],
-                'tooltip': _('mentioned in the source')},
-            'artifact': {
-                'additional_columns': ['remove'],
-                'buttons': ['link', 'insert'],
-                'tooltip': _('mentioned in the source')},
-            'event': {
-                'additional_columns': ['remove'],
-                'buttons': ['link', 'insert'],
-                'tooltip': _('mentioned in the source')},
-            'place': {
-                'additional_columns': ['remove'],
-                'buttons': ['link', 'insert'],
-                'tooltip': _('mentioned in the source')},
-            'reference': standard_relations['reference']['tab'],
-            'file': standard_relations['file']['tab'],
+        'additional_tabs': {
             'note': {}}}}
 
 source_translation = {
@@ -86,5 +80,5 @@ source_translation = {
     'display': {
         'form': {
             'insert_and_continue': True},
-        'tabs': {
+        'additional_tabs': {
             'note': {}}}}

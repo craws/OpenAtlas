@@ -15,15 +15,20 @@ model = {
             'label': _('actor'),
             'classes': class_groups['actor']['classes'],
             'properties': ['P11', 'P14', 'P22', 'P23'],
-            'multiple': True},
+            'multiple': True,
+            'tab': {
+                'columns': [
+                    'name', 'class', 'activity', 'involvement', 'first',
+                    'last', 'description']}},
         'subs': {
             'label': _('subs'),
             'classes': class_groups['event']['classes'],
             'properties': 'P9',
-            'multiple': True},
-        'source': standard_relations['source']['relation'],
-        'file': standard_relations['file']['relation'],
-        'reference': standard_relations['reference']['relation'],
+            'multiple': True,
+            'tab': {}},
+        'source': standard_relations['source'],
+        'file': standard_relations['file'],
+        'reference': standard_relations['reference'],
         'sub_event': {
             'label': _('sub event'),
             'classes': class_groups['event']['classes'],
@@ -37,16 +42,7 @@ model = {
     'display': {
         'buttons': ['copy', 'network'],
         'form': {'insert_and_continue': True},
-        'tabs': {
-            'subs': {},
-            'source': standard_relations['source']['tab'],
-            'actor': {
-                'mode': 'link',
-                'columns': [
-                    'name', 'class', 'activity', 'involvement', 'first',
-                    'last', 'comment', 'update', 'remove']},
-            'reference': standard_relations['reference']['tab'],
-            'file': standard_relations['file']['tab'],
+        'additional_tabs': {
             'note': {}}}}
 
 additional_relations = {
