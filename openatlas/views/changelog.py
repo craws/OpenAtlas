@@ -21,7 +21,7 @@ versions = {
             '2596': 'Finish Polish translation',
             '2466': 'API: Export files with ARCHE RDF metadata',
             '2598': 'Refactor and minor improvements'},
-        'fixes': {
+        'fix': {
             '2599': 'Broken Wikidata info function',
         }
     }],
