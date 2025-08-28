@@ -174,3 +174,7 @@ VALUES
 UPDATE model.entity
 SET begin_from = CURRENT_DATE
 WHERE name = 'Economical';
+
+
+INSERT INTO web.hierarchy (id, name, multiple, category)
+VALUES ((SELECT id FROM model.entity WHERE name='Case Study'), 'Case Study', true, 'custom');
