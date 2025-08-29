@@ -25,7 +25,9 @@ def link_delete(id_: int, origin_id: int) -> Response:
     return redirect(url_for('view', id_=origin_id))
 
 
-@app.route('/link/insert/<int:origin_id>/<relation_name>', methods=['GET', 'POST'])
+@app.route(
+    '/link/insert/<int:origin_id>/<relation_name>',
+    methods=['GET', 'POST'])
 @required_group('contributor')
 def link_insert(origin_id: int, relation_name: str) -> str | Response:
     origin = Entity.get_by_id(origin_id)
@@ -63,12 +65,17 @@ def link_insert_detail(origin_id: int, relation_name: str) -> str | Response:
     if form.validate_on_submit():
         ids = ast.literal_eval(getattr(form, relation_name).data)
         ids = ids if isinstance(ids, list) else [int(ids)]
-        # Todo: properties can be multiple?
+        type_id = None
+        for item in relation['additional_fields']:
+            if item in ['Actor function', 'Actor relation', 'Involvement']:
+                link_type = Entity.get_hierarchy(item)
+                type_id = getattr(form, str(link_type.id)).data or None
         origin.link(
             relation['properties'][0],
             Entity.get_by_ids(ids),
             form.description.data if 'description' in form else None,
-            relation['inverse'])
+            relation['inverse'],
+            type_id)
         return redirect(
             f"{url_for('view', id_=origin.id)}#tab-{relation_name}")
     return render_template(

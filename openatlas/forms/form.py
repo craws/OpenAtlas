@@ -15,7 +15,7 @@ from openatlas.display.table import Table
 from openatlas.display.util import get_base_table_data
 from openatlas.display.util2 import show_table_icons, uc_first
 from openatlas.forms import manager, manager_base
-from openatlas.forms.add_fields import add_date_fields
+from openatlas.forms.add_fields import add_date_fields, add_type
 from openatlas.forms.field import (
     SubmitField, TableCidocField, TableField, TableMultiField, TreeField)
 from openatlas.models.entity import Entity, Link
@@ -68,7 +68,7 @@ def link_form(origin: Entity, relation: dict[str, Any]) -> Any:
         pass
 
     if 'domain' in relation['additional_fields']:
-        domain_entities = Entity.get_by_class(
+        entities = Entity.get_by_class(
             origin.class_.name,
             types=True,
             aliases=current_user.settings['table_show_aliases'])
@@ -76,7 +76,7 @@ def link_form(origin: Entity, relation: dict[str, Any]) -> Any:
             Form,
             'domain',
             TableField(
-                domain_entities,
+                entities,
                 selection=origin,
                 validators=[InputRequired()]))
 
@@ -100,6 +100,8 @@ def link_form(origin: Entity, relation: dict[str, Any]) -> Any:
                 setattr(Form, 'description', TextAreaField(_(item)))
             case 'page':
                 setattr(Form, 'description', StringField(_(item)))
+            case 'Actor relation' | 'Actor function' | 'Involvement':
+                add_type(Form, Entity.get_hierarchy(item))
     setattr(Form, 'save', SubmitField(_('insert')))
     return Form()
 
@@ -168,9 +170,9 @@ def move_form(type_: Entity) -> Any:
         selection = SelectMultipleField(
             '',
             [InputRequired()],
-            coerce=int,
-            option_widget=widgets.CheckboxInput(),
-            widget=widgets.ListWidget(prefix_label=False))
+            coerce=int)
+        #    option_widget=widgets.CheckboxInput(),
+        #    widget=widgets.ListWidget(prefix_label=False))
         save = SubmitField(uc_first(_('move entities')))
 
     root = g.types[type_.root[0]]

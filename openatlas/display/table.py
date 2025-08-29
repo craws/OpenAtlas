@@ -100,7 +100,7 @@ def entity_table(
                 case 'activity':
                     html = item.property.name_inverse
                 case 'begin':
-                    html = e.first
+                    html = item.first
                 case 'class':
                     html = e.class_.label
                 case 'creator':
@@ -112,14 +112,14 @@ def entity_table(
                 case 'page':
                     html = item.description
                 case 'end':
-                    html = e.last
+                    html = item.last
                 case 'extension':
                     html = e.get_file_ext()
                 case 'first':
                     html = item.first or \
                         f'<span class="text-muted">{range_.first}</span>' \
                         if range_.first else ''
-                case 'involvement':
+                case 'involvement' | 'function' | 'relation':
                     html = item.type.name if item.type else ''
                 case 'last':
                     html = item.last or \
@@ -150,12 +150,10 @@ def entity_table(
                 case 'public':
                     html = _('yes') if g.file_info[e.id]['public'] else None
                 case 'remove':
-                    # Todo: group won't always work. Tab or rel. name needed
-                    html = remove_link(
-                        e.name,
-                        item,
-                        entity_viewed,
-                        e.class_.group['name'])
+                    tab_id = e.class_.group['name']
+                    if relation and relation['mode'] == 'tab_directed':
+                        tab_id = relation['name']
+                    html = remove_link(e.name, item, entity_viewed, tab_id)
                 # case 'related':
                 #    relative = e.get_linked_entity_safe('has relation', True)
                 #    if entity and relative.id == entity.id:

@@ -32,18 +32,32 @@ person = {
             'multiple': True,
             'tab': {
                 'columns': [
-                    'name', 'class', 'activity', 'involvement', 'first',
-                    'last', 'description'],
+                    'name',
+                    'class',
+                    'activity',
+                    'involvement',
+                    'first',
+                    'last',
+                    'description'],
                 'buttons': ['link']}},
-        'relation': {
+        'relative': {
             'label': _('relation'),
             'classes': 'person',
             'properties': 'OA7',
             'mode': 'tab_directed',
-            'additional_fields': ['domain', 'date', 'description'],
+            'additional_fields': [
+                'domain',
+                'Actor relation',
+                'date',
+                'description'],
             'tab': {
                 'buttons': ['link'],
-                'columns': ['name', 'begin', 'end', 'description']}},
+                'columns': [
+                    'name',
+                    'relation',
+                    'begin',
+                    'end',
+                    'description']}},
         'residence': {
             'label': _('residence'),
             'classes': 'object_location',

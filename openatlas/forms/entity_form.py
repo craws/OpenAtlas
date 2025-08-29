@@ -6,8 +6,8 @@ from flask_wtf import FlaskForm
 from wtforms import HiddenField
 
 from openatlas.forms.add_fields import (
-    add_buttons, add_date_fields, add_description, add_name_fields,
-    add_reference_systems, add_relations, add_types)
+    add_buttons, add_class_types, add_date_fields, add_description,
+    add_name_fields, add_reference_systems, add_relations)
 from openatlas.forms.populate import populate_insert, populate_update
 from openatlas.forms.process import process_date
 from openatlas.forms.util import convert
@@ -21,7 +21,7 @@ def get_entity_form(entity: Entity, origin: Optional[Entity] = None) -> Any:
         validate = validate
 
     add_name_fields(Form, entity)
-    add_types(Form, entity.class_)
+    add_class_types(Form, entity.class_)
     add_relations(Form, entity, origin)
     add_reference_systems(Form, entity.class_)
     if 'date' in entity.class_.attributes:
@@ -89,7 +89,7 @@ def process_types(entity: Entity, form: Any) -> None:
             if type_.class_.name == 'administrative_unit':
                 pass
                 # manager.data['administrative_units'] += value
-            else:  # if entity.class_.group['name'] != 'type': # Todo: check needed?
+            else:  # if entity.class_.group['name'] != 'type': # Todo: needed?
                 entity.link('P2', [g.types[id_] for id_ in data])
 
 
