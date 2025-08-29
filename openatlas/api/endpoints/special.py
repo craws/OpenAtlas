@@ -128,21 +128,3 @@ class GetChainedEvents(Resource):
                 root_id,
                 ['P134']),
             parser).get_chained_events(root_id)
-
-
-class GetArcheMetadata(Resource):
-    @staticmethod
-    def get() -> Response:
-        parser = arche.parse_args()
-        top_collection = parser['top_collection']
-        if not top_collection:
-            top_collection = g.settings['site_name']
-        file_entities = Entity.get_by_class(['file'], types=True, aliases=True)
-        if type_ids := parser.get('type_ids'):
-            file_entities = filter_by_type(file_entities, type_ids)
-        return Response(
-            get_arche_file_turtle_graph(
-                file_entities,
-                set(type_ids),
-                top_collection),
-            mimetype='text/plain')

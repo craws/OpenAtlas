@@ -136,16 +136,16 @@ class Api(ApiTestCase):
                 'api_04.network_visualisation',
                 exclude_system_classes='type'))
         rv = rv.get_json()
-        assert len(rv['results']) == 67
+        assert len(rv['results']) == 68
         rv = c.get(
             url_for(
                 'api_04.network_visualisation',
                 linked_to_ids=boundary_mark.id))
         rv = rv.get_json()
-        assert len(rv['results']) == 13
+        assert len(rv['results']) == 14
         rv = c.get(url_for('api_04.network_visualisation', download=True))
         rv = rv.get_json()
-        assert len(rv['results']) == 162
+        assert len(rv['results']) == 163
 
 
         rv = c.get(
@@ -154,7 +154,7 @@ class Api(ApiTestCase):
                 id_=place.id,
                 exclude_system_classes='type'))
         rv = rv.get_json()
-        assert len(rv['results']) == 10
+        assert len(rv['results']) == 11
         rv = c.get(
             url_for(
                 'api_04.ego_network_visualisation',
@@ -176,7 +176,7 @@ class Api(ApiTestCase):
                 id_=place.id,
                 download=True))
         rv = rv.get_json()
-        assert len(rv['results']) == 14
+        assert len(rv['results']) == 15
 
         for rv in [
             c.get(url_for('api_04.geometric_entities')),
@@ -633,8 +633,8 @@ class Api(ApiTestCase):
                 "typeID": [{
                     "operator": "equal",
                     "values": [boundary_mark.id, height.id]}]}]),
-            (5, [{"entityName": [{"operator": "like", "values": ["Fr"]}]}]),
-            (6, [{
+            (6, [{"entityName": [{"operator": "like", "values": ["Fr"]}]}]),
+            (7, [{
                 "typeIDWithSubs": [{
                     "operator": "equal",
                     "values": [boundary_mark.id, height.id,
@@ -642,16 +642,16 @@ class Api(ApiTestCase):
                 "entityDescription": [{
                     "operator": "like",
                     "values": ["FrOdO", "sam"]}]}]),
-            (12, [{
+            (13, [{
                 "relationToID": [{
                     "operator": "equal",
                     "values": [place.id]}]}]),
-            (167, [{
+            (168, [{
                 "typeIDWithSubs": [{
                     "operator": "notEqual",
                     "values": [boundary_mark.id],
                     "logicalOperator": "and"}]}]),
-            (169, [{
+            (170, [{
                 "typeName": [{
                     "operator": "notEqual",
                     "values": ["Boundary Mark", "Height"],
@@ -751,7 +751,7 @@ class Api(ApiTestCase):
             self.assertTrue(rv.headers['Content-Type'].startswith('image'))
 
         rv = c.get(url_for('api_04.search', class_='all', term='Fro'))
-        assert rv.get_json()['pagination']['entities'] == 1
+        assert rv.get_json()['pagination']['entities'] == 2
 
         rv = c.get(url_for('api_04.search', class_='type', term='i'))
         assert rv.get_json()['pagination']['entities'] == 50

@@ -271,12 +271,10 @@ def check_files_for_arche(
         entity_ids.add(entity.id)
         if not g.files.get(entity.id):
             missing['No files'].add((entity.id, entity.name))
-            continue
         if not entity.public:
             missing['Not public'].add((entity.id, entity.name))
         if not entity.standard_type:
             missing['No license'].add((entity.id, entity.name))
-            continue
         if not entity.creator:
             missing['No creator'].add((entity.id, entity.name))
         if not entity.license_holder:
@@ -311,13 +309,16 @@ def get_arche_file_metadata(
         standard_type = entity.standard_type
         if not g.files.get(entity.id) or not standard_type:
             continue
-        if standard_type.id not in license_urls:
-            for link_ in standard_type.get_links('P67', inverse=True):
-                if link_.domain.class_.name == "external_reference":
-                    license_urls[standard_type.id] = link_.domain.name
-                    break
-            if standard_type.id not in license_urls:
-                continue
+        if standard_type.id in license_urls:
+            continue
+        url = None
+        for link_ in standard_type.get_links('P67', inverse=True):
+            if link_.domain.class_.name == "external_reference":
+                url = link_.domain.name
+                break
+        if url is None:
+            continue
+        license_urls[standard_type.id] = url
         if type_ids:
             for type_ in entity.types:
                 if type_.id in type_ids:
@@ -356,7 +357,7 @@ def find_duplicates(entity_ids: set[int]) -> set[tuple[int, int]]:
         for file_id, path in files:
             try:
                 file_hash = hash_file(path)
-            except Exception as e:
+            except Exception as e:  # pragma: no cover
                 g.logger.log(
                     'info',
                     'hashing',

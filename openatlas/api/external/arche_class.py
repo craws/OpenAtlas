@@ -53,7 +53,8 @@ class ArcheFileMetadata:
         titles = [(entity.name, 'und')]
         file_info = (g.files[entity.id].suffix[1:], g.files[entity.id].name)
         obj = cls(
-            uri=f"{part_of}/{type_name}/{file_info[0]}/{file_info[1]}",
+            uri=f"{part_of}/{type_name.replace(' ', '_')}/"
+                f"{file_info[0]}/{file_info[1]}",
             titles=titles)
         obj.depositor = metadata['depositor']
         obj.license = license_

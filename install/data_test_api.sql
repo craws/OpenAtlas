@@ -22,6 +22,7 @@ VALUES
   ('E33', 'source', 'Silmarillion', NULL, CURRENT_TIMESTAMP),
   ('E21', 'person', 'Frodo', 'That is Frodo', CURRENT_TIMESTAMP),
   ('E31', 'external_reference', 'https://lotr.fandom.com/', NULL, CURRENT_TIMESTAMP),
+  ('E31', 'bibliography', 'Frodo et. al.', 'Book of Frodo and his friends', CURRENT_TIMESTAMP),
   ('E41', 'appellation', 'Sûza', NULL, CURRENT_TIMESTAMP),
   ('E41', 'appellation', 'The ring bearer', NULL, CURRENT_TIMESTAMP),
   ('E7', 'activity', 'Travel to Mordor', NULL, CURRENT_TIMESTAMP),
@@ -128,6 +129,7 @@ VALUES
   ('P53', (SELECT id FROM model.entity WHERE name='Location of Home of Baggins'), (SELECT id FROM model.entity WHERE name='Home of Baggins') ),
   ('P53', (SELECT id FROM model.entity WHERE name='Location of Bar'), (SELECT id FROM model.entity WHERE name='Bar') ),
   ('P67', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='Picture with a License') ),
+  ('P67', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='Picture with a License') ),
   ('P67', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='File without license') ),
   ('P52', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='The One Ring') ),
   ('P2', (SELECT id FROM model.entity WHERE name='Public domain'), (SELECT id FROM model.entity WHERE name='Picture with a License') ),
@@ -146,6 +148,9 @@ VALUES
 
 INSERT INTO model.link (property_code, range_id, domain_id, description, type_id)
 VALUES
+  ('P67', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='Frodo et. al.'), '987', NULL ),
+  ('P67', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='Frodo et. al.'), '234', NULL ),
+  ('P67', (SELECT id FROM model.entity WHERE name='Picture with a License'), (SELECT id FROM model.entity WHERE name='Frodo et. al.'), '112', NULL ),
   ('P67', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='GeoNames'), '2761369', (SELECT id FROM model.entity WHERE name='close match') ),
   ('P67', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='Wikidata'), 'Q218728', (SELECT id FROM model.entity WHERE name='exact match') ),
   ('P67', (SELECT id FROM model.entity WHERE name='Mordor'), (SELECT id FROM model.entity WHERE name='Wikidata'), 'Q202886', (SELECT id FROM model.entity WHERE name='exact match') ),
@@ -166,10 +171,10 @@ ON CONFLICT (entity_id) DO UPDATE SET image_id=(SELECT id FROM model.entity WHER
 
 INSERT INTO model.file_info (entity_id, public, creator, license_holder)
 VALUES
-    ((SELECT id FROM model.entity WHERE name='File without license'), TRUE, 'Frodo', 'Frodo' ),
-    ((SELECT id FROM model.entity WHERE name='File without file'), TRUE, 'Sam', 'Sam' ),
-    ((SELECT id FROM model.entity WHERE name='Picture with a License'), TRUE, 'Sauron', 'Sauron' ),
-    ((SELECT id FROM model.entity WHERE name='File not public'), FALSE, 'Sauron', 'Sauron' );
+    ((SELECT id FROM model.entity WHERE name='File without license'), TRUE, 'Frodo', NULL ),
+    ((SELECT id FROM model.entity WHERE name='File without file'), TRUE, NULL, 'Sam' ),
+    ((SELECT id FROM model.entity WHERE name='Picture with a License'), TRUE, NULL, 'Sauron' ),
+    ((SELECT id FROM model.entity WHERE name='File not public'), FALSE, 'Sauron', NULL );
 
 UPDATE model.entity
 SET begin_from = CURRENT_DATE

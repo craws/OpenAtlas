@@ -96,44 +96,44 @@ class ImportTest(ImportTestCase):
                         file_with_license = entity
                     case 'File not public':
                         file_not_public = entity
-
+                    case 'CC BY 4.0':
+                        cc_by_license = entity
+                    case 'Frodo':
+                        actor = entity
+            openatlas_logo.link('P67', actor)
+            openatlas_logo.link('P2', cc_by_license)
         file_path = app.config['UPLOAD_PATH']
         openatlas_logo_path = file_path / f'{openatlas_logo.id}.png'
         file_without_license_path = (
                 file_path / f'{file_without_license.id}.png')
         file_with_license_path = file_path / f'{file_with_license.id}.png'
-        file_not_public_path = file_path / f'{file_not_public.id}.png'
+        file_not_public_path = file_path / f'{file_not_public.id}.jpg'
         shutil.copy(openatlas_logo_path, file_without_license_path)
         shutil.copy(openatlas_logo_path, file_with_license_path)
-        shutil.copy(openatlas_logo_path, file_not_public_path)
+        shutil.copy(logo_path / '422.jpg', file_not_public_path)
 
-        app.config['ARCHE_METADATA'] = {
-            'topCollection': 'test collection',
-            'language': 'en',
-            'depositor': 'Sauron',
-            'acceptedDate': "2024-01-01",
-            'curator': ['Frodo', 'Sam'],
-            'principalInvestigator': ['Gandalf'],
-            'hasMetadataCreator': ['Gimli'],
-            'relatedDiscipline':
-                ['https://vocabs.acdh.oeaw.ac.at/oefosdisciplines/601003'],
-            'typeIds': [case_study.id],
-            'excludeReferenceSystems': []}
+
 
         date_ = current_date_for_filename()
         collection_name = app.config["ARCHE_METADATA"]["topCollection"]
-        filename = f'{date_}_{collection_name.replace(" ", "_")}.zip'
 
-        rv = c.get(
-            url_for('check_files', arche='arche'),
-            follow_redirects=True)
-        assert b'No license' in rv.data
+
 
         rv = c.get(
             url_for('arche_execute'),
             follow_redirects=True)
         assert b'Data was exported' in rv.data
 
+        # Run ARCHE export again with typeIds and without GeoNames
+        app.config['ARCHE_METADATA']['typeIds'] = [case_study.id]
+        app.config['ARCHE_METADATA']['excludeReferenceSystems'] = ['GeoNames']
+
+        rv = c.get(
+            url_for('arche_execute'),
+            follow_redirects=True)
+        assert b'Data was exported' in rv.data
+
+        filename = f'{date_}_{collection_name.replace(" ", "_")}.zip'
         rv = c.get(url_for('download_export', filename=filename))
         assert b'PK' in rv.data
 
@@ -145,6 +145,11 @@ class ImportTest(ImportTestCase):
             follow_redirects=True)
         if os.name == 'posix':
             assert b'File deleted' in rv.data
+
+        rv = c.get(
+            url_for('check_files', arche='arche'),
+            follow_redirects=True)
+        assert b'No license' in rv.data
 
         openatlas_logo_path.unlink()
         file_without_license_path.unlink()

@@ -125,7 +125,7 @@ def export_arche() -> str:
         table.rows.append(data)
     metadata = app.config['ARCHE_METADATA']
     info_content = {
-        'top collection': metadata.get('topCollection'),
+        'topCollection': metadata.get('topCollection'),
         'language': metadata.get('language'),
         'depositor': ', '.join(metadata.get('depositor', [])),
         'acceptedDate': metadata.get('acceptedDate'),

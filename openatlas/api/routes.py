@@ -5,20 +5,15 @@ from openatlas.api.endpoints.display_image import (
     DisplayImage, LicensedFileOverview)
 from openatlas.api.endpoints.entities import (
     GetByCidocClass, GetBySystemClass, GetByViewClass,
-    GetEntitiesLinkedToEntity, GetEntity,
-    GetEntityPresentationView, GetLatest,
+    GetEntitiesLinkedToEntity, GetEntity, GetEntityPresentationView, GetLatest,
     GetLinkedEntitiesByPropertyRecursive, GetQuery, GetSearchEntities,
-    GetTypeEntities,
-    GetTypeEntitiesAll)
+    GetTypeEntities, GetTypeEntitiesAll)
 from openatlas.api.endpoints.iiif import (
     IIIFAnnotation, IIIFAnnotationList, IIIFCanvas, IIIFImage, IIIFManifest,
     IIIFSequence)
 from openatlas.api.endpoints.special import (
-    ExportDatabase, GetArcheMetadata, GetChainedEvents,
-    GetEgoNetworkVisualisation,
-    GetGeometricEntities,
-    GetNetworkVisualisation,
-    GetSubunits)
+    ExportDatabase, GetChainedEvents, GetEgoNetworkVisualisation,
+    GetGeometricEntities, GetNetworkVisualisation, GetSubunits)
 from openatlas.api.endpoints.type import (
     GetTypeByViewClass, GetTypeOverview, GetTypeTree)
 
@@ -61,7 +56,6 @@ special = [
     [GetGeometricEntities, '/geometric_entities/', 'geometric_entities'],
     [GetSubunits, '/subunits/<int:id_>', 'subunits'],
     [GetSearchEntities, '/search/<string:class_>', 'search'],
-    [GetArcheMetadata, '/arche_metadata/', 'arche_metadata'],
     [GetNetworkVisualisation,
      '/network_visualisation/',
      'network_visualisation'],
