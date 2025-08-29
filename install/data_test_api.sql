@@ -87,6 +87,8 @@ VALUES
   ('P127', (SELECT id FROM model.entity WHERE name='Stratigraphic unit'), (SELECT id FROM model.entity WHERE name='Tavern')),
   ('P127', (SELECT id FROM model.entity WHERE name='Feature'), (SELECT id FROM model.entity WHERE name='Hills')),
   ('P127', (SELECT id FROM model.entity WHERE name='Artifact'), (SELECT id FROM model.entity WHERE name='Ring')),
+  ('P127', (SELECT id FROM model.entity WHERE name='Public domain'), (SELECT id FROM model.entity WHERE name='CC BY 4.0')),
+  ('P127', (SELECT id FROM model.entity WHERE name='Public domain'), (SELECT id FROM model.entity WHERE name='CC BY-SA 4.0')),
   ('P2', (SELECT id FROM model.entity WHERE name='Boundary Mark'), (SELECT id FROM model.entity WHERE name='Shire')),
   ('P2', (SELECT id FROM model.entity WHERE name='Boundary Mark'), (SELECT id FROM model.entity WHERE name='Mordor')),
   ('P2', (SELECT id FROM model.entity WHERE name='Exchange'), (SELECT id FROM model.entity WHERE name='Exchange of the one ring')),
@@ -163,7 +165,9 @@ VALUES
   ('P2', (SELECT id FROM model.entity WHERE name='Height'), (SELECT id FROM model.entity WHERE name='Shire'), '23.0', NULL ),
   ('P2', (SELECT id FROM model.entity WHERE name='Weight'), (SELECT id FROM model.entity WHERE name='Shire'), '999.0', NULL ),
   ('P2', (SELECT id FROM model.entity WHERE name='Link'), (SELECT id FROM model.entity WHERE name='https://lotr.fandom.com/'), NULL, NULL ),
-  ('P2', (SELECT id FROM model.entity WHERE name='Public domain'), (SELECT id FROM model.entity WHERE name='https://en.wikipedia.org/wiki/Public_domain'), 'https://en.wikipedia.org/wiki/Public_domain', NULL );
+  ('P2', (SELECT id FROM model.entity WHERE name='Public domain'), (SELECT id FROM model.entity WHERE name='https://en.wikipedia.org/wiki/Public_domain'), 'https://en.wikipedia.org/wiki/Public_domain', NULL ),
+  ('P2', (SELECT id FROM model.entity WHERE name='CC BY 4.0'), (SELECT id FROM model.entity WHERE name='https://en.wikipedia.org/wiki/Public_domain'), 'https://creativecommons.org/licenses/by/4.0/deed.de', NULL ),
+  ('P2', (SELECT id FROM model.entity WHERE name='CC BY-SA 4.0'), (SELECT id FROM model.entity WHERE name='https://en.wikipedia.org/wiki/Public_domain'), 'https://creativecommons.org/licenses/by-sa/4.0/deed.de', NULL );
 
 INSERT INTO web.entity_profile_image (entity_id, image_id)
 VALUES ( (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='Picture with a License') )
@@ -173,7 +177,7 @@ INSERT INTO model.file_info (entity_id, public, creator, license_holder)
 VALUES
     ((SELECT id FROM model.entity WHERE name='File without license'), TRUE, 'Frodo', NULL ),
     ((SELECT id FROM model.entity WHERE name='File without file'), TRUE, NULL, 'Sam' ),
-    ((SELECT id FROM model.entity WHERE name='Picture with a License'), TRUE, NULL, 'Sauron' ),
+    ((SELECT id FROM model.entity WHERE name='Picture with a License'), TRUE, 'Sauron', 'Sauron' ),
     ((SELECT id FROM model.entity WHERE name='File not public'), FALSE, 'Sauron', NULL );
 
 UPDATE model.entity

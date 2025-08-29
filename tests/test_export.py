@@ -100,8 +100,11 @@ class ImportTest(ImportTestCase):
                         cc_by_license = entity
                     case 'Frodo':
                         actor = entity
+
             openatlas_logo.link('P67', actor)
             openatlas_logo.link('P2', cc_by_license)
+            openatlas_logo.link('P2', case_study)
+
         file_path = app.config['UPLOAD_PATH']
         openatlas_logo_path = file_path / f'{openatlas_logo.id}.png'
         file_without_license_path = (

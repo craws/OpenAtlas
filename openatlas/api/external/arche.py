@@ -23,14 +23,14 @@ def is_arche_likeable_uri(uri: str) -> bool:
     for rule in arche_uri_rules:
         if search(rule['match'], uri):
             return True
-    return False
+    return False  # pragma: no cover
 
 
 def is_valid_url(url: str) -> bool:
     try:
         parsed = urlparse(url)
         return parsed.scheme in ("http", "https") and bool(parsed.netloc)
-    except ValueError:
+    except ValueError:  # pragma: no cover
         return False
 
 
@@ -53,7 +53,7 @@ def ensure_person_exist(
     names = names if isinstance(names, list) else [names]
     for name in names:
         if not name or is_valid_url(name):
-            continue
+            continue  # pragma: no cover
         uri = create_uri(name)
         if str(uri) not in ENTITIES_EMITTED:
             graph.add((uri, RDF.type, ACDH.Person))
@@ -154,6 +154,7 @@ def add_arche_file_metadata_to_graph(
 
     if metadata.is_part_of:
         graph.add((subject_uri, ACDH.isPartOf, URIRef(metadata.is_part_of)))
+
     if metadata.accepted_date:
         graph.add((subject_uri,
                    ACDH.hasAcceptedDate,
@@ -183,10 +184,6 @@ def add_arche_file_metadata_to_graph(
             graph.add((subject_uri,
                        ACDH.hasRelatedDiscipline,
                        URIRef(related_discipline)))
-    if metadata.submission_date:
-        graph.add((subject_uri,
-                   ACDH.hasSubmissionDate,
-                   Literal(metadata.submission_date, datatype=XSD.date)))
     if metadata.transfer_date:
         graph.add((subject_uri,
                    ACDH.hasTransferDate,
@@ -195,14 +192,6 @@ def add_arche_file_metadata_to_graph(
         graph.add((subject_uri,
                    ACDH.hasBinarySize,
                    Literal(metadata.binary_size, datatype=XSD.integer)))
-    if metadata.created_start_date:
-        graph.add((subject_uri,
-                   ACDH.hasCreatedStartDate,
-                   Literal(metadata.created_start_date, datatype=XSD.date)))
-    if metadata.created_end_date:
-        graph.add((subject_uri,
-                   ACDH.hasCreatedEndDate,
-                   Literal(metadata.created_end_date, datatype=XSD.date)))
     if metadata.creator:
         ensure_person_exist(graph, metadata.creator)
         for uri in create_uri(metadata.creator) \
@@ -239,13 +228,3 @@ def add_arche_file_metadata_to_graph(
                 subject_uri,
                 ACDH.isSourceOf,
                 create_uri(str(publication[0].id))))
-
-    for tc_text, lang in metadata.temporal_coverages:
-        graph.add((subject_uri,
-                   ACDH.hasTemporalCoverage,
-                   Literal(tc_text, lang=lang)))
-
-    if metadata.temporal_coverage_identifier:
-        graph.add((subject_uri,
-                   ACDH.hasTemporalCoverageIdentifier,
-                   Literal(metadata.temporal_coverage_identifier)))

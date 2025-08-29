@@ -526,6 +526,15 @@ class Api(ApiTestCase):
                 format='turtle'))
         assert b'Sam' in rv.data
 
+        rv = c.get(
+            url_for(
+                'api_04.system_class',
+                class_='all',
+                limit=0,
+                locale='en',
+                format='loud'))
+        assert b'Sam' in rv.data
+
         # ---Type Endpoints---
         for rv in [
             c.get(url_for('api_04.type_overview')),

@@ -26,17 +26,12 @@ class ArcheFileMetadata:
     language: Optional[str] = None
     principal_investigator: Optional[str] = None
     related_discipline: Optional[str] = None
-    submission_date: Optional[str] = None
     transfer_date: Optional[str] = None
     binary_size: Optional[int] = None
-    created_start_date: Optional[str] = None
-    created_end_date: Optional[str] = None
     creator: Optional[str] = None
     actors: Optional[list[dict[str, str | list[str]]]] = None
     spatial_coverages: Optional[list[dict[str, str | list[str]]]] = None
     has_publications: Optional[list[tuple[Entity, str]]] = None
-    temporal_coverages: list[tuple[str, str]] = field(default_factory=list)
-    temporal_coverage_identifier: Optional[str] = None
 
     @classmethod
     def construct(
@@ -46,10 +41,10 @@ class ArcheFileMetadata:
             relations: list[dict[str, Any]],
             publications: list[tuple[Entity, str]],
             license_: str) -> 'ArcheFileMetadata':
+        print(entity.name)
         metadata = app.config['ARCHE_METADATA']
         part_of = "https://id.acdh.oeaw.ac.at/" \
                    f"{metadata['topCollection'].replace(' ', '_')}"
-        # titles = [(entity.name, metadata['language'])]
         titles = [(entity.name, 'und')]
         file_info = (g.files[entity.id].suffix[1:], g.files[entity.id].name)
         obj = cls(
@@ -57,6 +52,7 @@ class ArcheFileMetadata:
                 f"{file_info[0]}/{file_info[1]}",
             titles=titles)
         obj.depositor = metadata['depositor']
+        obj.language = metadata['language']
         obj.license = license_
         obj.licensor = entity.license_holder
         obj.metadata_creator = metadata['hasMetadataCreator']
@@ -65,7 +61,6 @@ class ArcheFileMetadata:
         obj.is_part_of = part_of
         obj.accepted_date = metadata['acceptedDate']
         obj.curator = metadata['curator']
-        # obj.descriptions = [(entity.description, metadata['language'])]
         obj.descriptions = [(entity.description, 'und')]
         obj.principal_investigator = metadata['principalInvestigator']
         obj.related_discipline = metadata['relatedDiscipline']
