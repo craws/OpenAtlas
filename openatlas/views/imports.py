@@ -336,7 +336,11 @@ def check_data_for_table_representation(
     file_ = request.files['file']
     file_path = app.config['TMP_PATH'] / secure_filename(str(file_.filename))
     file_.save(str(file_path))
-    data_frame = pd.read_csv(file_path, keep_default_na=False, dtype=str)
+    data_frame = pd.read_csv(
+        file_path,
+        keep_default_na=False,
+        dtype=str,
+        skipinitialspace=True)
     columns = get_clean_header(data_frame, class_, checks)
     table_data = []
     origin_ids = []
