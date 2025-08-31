@@ -161,7 +161,8 @@ class Entity:
              range_: Entity | list[Entity],
              description: Optional[str] = None,
              inverse: bool = False,
-             type_id: Optional[int] = None) -> list[int]:
+             type_id: Optional[int] = None,
+             dates: Optional[dict] = None) -> list[int]:
         property_ = g.properties[code]
         entities = range_ if isinstance(range_, list) else [range_]
         new_link_ids = []
@@ -184,13 +185,21 @@ class Entity:
                     f" > {code} > {range_.class_.cidoc_class.code}"
                 g.logger.log('error', 'model', text)
                 abort(400, text)
-            id_ = db.link({
+            data = {
                 'property_code': code,
                 'domain_id': domain.id,
                 'range_id': range_.id,
                 'description': sanitize(description)
                 if isinstance(description, str) else description,
-                'type_id': type_id})
+                'type_id': type_id}
+            data.update(dates or {
+                'begin_from': None,
+                'begin_to': None,
+                'begin_comment': None,
+                'end_from': None,
+                'end_to': None,
+                'end_comment': None})
+            id_ = db.link(data)
             new_link_ids.append(id_)
         return new_link_ids
 
@@ -894,7 +903,7 @@ class Link:
                 if self.end_to else self.last
 
     def update(self, data: dict[str, Any]) -> None:
-        db_link.update({
+        update_data = {
             'id': self.id,
             'property_code': self.property.code,
             'domain_id': self.domain.id,
@@ -906,7 +915,9 @@ class Link:
             'begin_comment': sanitize(self.begin_comment),
             'end_from': datetime64_to_timestamp(self.end_from),
             'end_to': datetime64_to_timestamp(self.end_to),
-            'end_comment': sanitize(self.end_comment)})
+            'end_comment': sanitize(self.end_comment)}
+        update_data.update(data)
+        db_link.update(update_data)
 
     def set_dates(self, data: dict[str, Any]) -> None:
         self.begin_from = data['begin_from']

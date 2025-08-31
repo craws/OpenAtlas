@@ -178,11 +178,23 @@ def update(data: dict[str, Any]) -> None:
     g.cursor.execute(
         """
         UPDATE model.entity SET (
-            name, description, begin_from, begin_to, begin_comment,
-            end_from, end_to, end_comment
+            name,
+            description,
+            begin_from,
+            begin_to,
+            begin_comment,
+            end_from,
+            end_to,
+            end_comment
         ) = (
-            %(name)s, %(description)s, %(begin_from)s, %(begin_to)s,
-            %(begin_comment)s, %(end_from)s, %(end_to)s, %(end_comment)s)
+            %(name)s,
+            %(description)s,
+            %(begin_from)s,
+            %(begin_to)s,
+            %(begin_comment)s,
+            %(end_from)s,
+            %(end_to)s,
+            %(end_comment)s)
         WHERE id = %(id)s;
         """,
         data)
@@ -312,10 +324,29 @@ def link(data: dict[str, Any]) -> int:
     g.cursor.execute(
         """
         INSERT INTO model.link (
-            property_code, domain_id, range_id, description, type_id
+            property_code,
+            domain_id,
+            range_id,
+            description,
+            type_id,
+            begin_from,
+            begin_to,
+            begin_comment,
+            end_from,
+            end_to,
+            end_comment
         ) VALUES (
-            %(property_code)s, %(domain_id)s, %(range_id)s, %(description)s,
-            %(type_id)s
+            %(property_code)s,
+            %(domain_id)s,
+            %(range_id)s,
+            %(description)s,
+            %(type_id)s,
+            %(begin_from)s,
+            %(begin_to)s,
+            %(begin_comment)s,
+            %(end_from)s,
+            %(end_to)s,
+            %(end_comment)s
         ) RETURNING id;
         """,
         data)

@@ -76,7 +76,7 @@ def process_standard_fields(manager: Any) -> None:
             abort(418, f'Form error: {key}, {field_type}, value={value}')
 
 
-def process_date(form: Any, entity: Entity) -> dict[str, Any]:
+def process_date(form: Any) -> dict[str, Any]:
     data: dict[str, Any] = {
         'begin_from': None,
         'begin_to': None,

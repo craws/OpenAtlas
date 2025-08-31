@@ -11,6 +11,7 @@ from openatlas.display.util import link, required_group
 from openatlas.forms.display import display_form
 from openatlas.forms.form import (
     get_manager, link_form, link_update_form, table_form)
+from openatlas.forms.process import process_date
 from openatlas.models.entity import Entity, Link
 from openatlas.models.search import get_subunits_without_super
 
@@ -75,7 +76,8 @@ def link_insert_detail(origin_id: int, relation_name: str) -> str | Response:
             Entity.get_by_ids(ids),
             form.description.data if 'description' in form else None,
             relation['inverse'],
-            type_id)
+            type_id,
+            dates=process_date(form))
         return redirect(
             f"{url_for('view', id_=origin.id)}#tab-{relation_name}")
     return render_template(
@@ -99,11 +101,12 @@ def link_update(id_: int, origin_id: int, relation: str) -> str | Response:
     form = link_update_form(link_, relation)
     origin_url = url_for('view', id_=origin.id) + f"#tab-{relation['name']}"
     if form.validate_on_submit():
+        data = {
+            'description': form.description.data
+            if hasattr(form, 'description') else None}
+        data.update(process_date(form))
         try:
-            link_.update({
-                'description': form.description.data
-                if hasattr(form, 'description') else None
-            })
+            link_.update(data)
             flash(_('info update'), 'info')
         except Exception as e:  # pragma: no cover
             Transaction.rollback()

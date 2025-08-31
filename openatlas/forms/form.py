@@ -18,6 +18,7 @@ from openatlas.forms import manager, manager_base
 from openatlas.forms.add_fields import add_date_fields, add_type
 from openatlas.forms.field import (
     SubmitField, TableCidocField, TableField, TableMultiField, TreeField)
+from openatlas.forms.populate import populate_dates
 from openatlas.models.entity import Entity, Link
 from openatlas.views.entity_index import file_preview
 
@@ -63,6 +64,20 @@ def annotate_image_form(
     return Form()
 
 
+def add_additional_link_fields(form: Any, relation: dict[str, Any]) -> None:
+    for item in relation['additional_fields']:
+        match item:
+            case 'date':
+                # Todo: what about time fields if already used there?
+                add_date_fields(form)
+            case 'description':
+                setattr(form, 'description', TextAreaField(_(item)))
+            case 'page':
+                setattr(form, 'description', StringField(_(item)))
+            case 'Actor relation' | 'Actor function' | 'Involvement':
+                add_type(form, Entity.get_hierarchy(item))
+
+
 def link_form(origin: Entity, relation: dict[str, Any]) -> Any:
     class Form(FlaskForm):
         pass
@@ -90,18 +105,7 @@ def link_form(origin: Entity, relation: dict[str, Any]) -> Any:
         TableMultiField(entities, validators=[InputRequired()])
         if relation['multiple'] else
         TableField(entities, validators=[InputRequired()]))
-
-    for item in relation['additional_fields']:
-        match item:
-            case 'date':
-                # Todo: what about time fields if already used there?
-                add_date_fields(Form)
-            case 'description':
-                setattr(Form, 'description', TextAreaField(_(item)))
-            case 'page':
-                setattr(Form, 'description', StringField(_(item)))
-            case 'Actor relation' | 'Actor function' | 'Involvement':
-                add_type(Form, Entity.get_hierarchy(item))
+    add_additional_link_fields(Form, relation)
     setattr(Form, 'save', SubmitField(_('insert')))
     return Form()
 
@@ -110,15 +114,20 @@ def link_update_form(link_: Link, relation: dict[str, Any]) -> Any:
     class Form(FlaskForm):
         pass
 
-    for item in relation['additional_fields']:
-        match item:
-            case 'description' | 'page':
-                setattr(Form, 'description', StringField(_(item)))
+    add_additional_link_fields(Form, relation)
     setattr(Form, 'save', SubmitField(_('save')))
     form = Form()
     if request.method == 'GET':
-        if hasattr(form, 'description'):
-            getattr(form, 'description').data = link_.description
+        for item in relation['additional_fields']:
+            match item:
+                case 'date':
+                    populate_dates(form, link_)
+                case 'description':
+                    getattr(form, 'description').data = link_.description
+                case 'page':
+                    setattr(form, 'description', StringField(_(item)))
+                case 'Actor relation' | 'Actor function' | 'Involvement':
+                    add_type(form, Entity.get_hierarchy(item))
     return form
 
 

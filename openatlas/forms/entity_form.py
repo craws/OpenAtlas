@@ -50,7 +50,7 @@ def process_form_data(entity: Entity, form: Any) -> Entity:
     for attr in entity.class_.attributes:
         data[attr] = None
         if attr == 'date':
-            data.update(process_date(form, entity))
+            data.update(process_date(form))
         elif getattr(form, attr).data or getattr(form, attr).data == 0:
             value = getattr(form, attr).data
             data[attr] = value.strip() if isinstance(value, str) else value
