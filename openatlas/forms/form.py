@@ -94,7 +94,8 @@ def link_form(origin: Entity, relation: dict[str, Any]) -> Any:
                 entities,
                 selection=origin,
                 validators=[InputRequired()]))
-
+    if 'type' in relation:
+        add_type(Form, Entity.get_hierarchy(relation['type']))
     entities = Entity.get_by_class(
         relation['classes'],
         types=True,
@@ -114,20 +115,23 @@ def link_update_form(link_: Link, relation: dict[str, Any]) -> Any:
     class Form(FlaskForm):
         pass
 
+    hierarchy = None
+    if 'type' in relation:
+        hierarchy = Entity.get_hierarchy(relation['type'])
+        add_type(Form, hierarchy)
     add_additional_link_fields(Form, relation)
     setattr(Form, 'save', SubmitField(_('save')))
     form = Form()
     if request.method == 'GET':
+        if hierarchy:
+            getattr(form, str(hierarchy.id)).data = \
+                link_.type.id if link_.type else None
         for item in relation['additional_fields']:
             match item:
                 case 'date':
                     populate_dates(form, link_)
-                case 'description':
+                case 'description' | 'page':
                     getattr(form, 'description').data = link_.description
-                case 'page':
-                    setattr(form, 'description', StringField(_(item)))
-                case 'Actor relation' | 'Actor function' | 'Involvement':
-                    add_type(form, Entity.get_hierarchy(item))
     return form
 
 

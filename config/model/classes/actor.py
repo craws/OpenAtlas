@@ -2,7 +2,8 @@ from flask_babel import lazy_gettext as _
 
 from config.model.class_groups import class_groups, standard_relations
 
-# Needed for translation at event tab
+# Todo: Needed for translation, used to differentiate special case to show
+# event dates in grey in case no relation dates - should be solved differently
 _('first')
 _('last')
 
@@ -45,9 +46,9 @@ person = {
             'classes': 'person',
             'properties': 'OA7',
             'mode': 'tab_directed',
+            'type': 'Actor relation',
             'additional_fields': [
                 'domain',
-                'Actor relation',
                 'date',
                 'description'],
             'tab': {

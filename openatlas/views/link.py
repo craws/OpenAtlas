@@ -67,10 +67,9 @@ def link_insert_detail(origin_id: int, relation_name: str) -> str | Response:
         ids = ast.literal_eval(getattr(form, relation_name).data)
         ids = ids if isinstance(ids, list) else [int(ids)]
         type_id = None
-        for item in relation['additional_fields']:
-            if item in ['Actor function', 'Actor relation', 'Involvement']:
-                link_type = Entity.get_hierarchy(item)
-                type_id = getattr(form, str(link_type.id)).data or None
+        if 'type' in relation:
+            hierarchy = Entity.get_hierarchy(relation['type'])
+            type_id = getattr(form, str(hierarchy.id)).data or None
         origin.link(
             relation['properties'][0],
             Entity.get_by_ids(ids),
@@ -104,6 +103,9 @@ def link_update(id_: int, origin_id: int, relation: str) -> str | Response:
         data = {
             'description': form.description.data
             if hasattr(form, 'description') else None}
+        if 'type' in relation:
+            hierarchy = Entity.get_hierarchy(relation['type'])
+            data['type_id'] = getattr(form, str(hierarchy.id)).data or None
         data.update(process_date(form))
         try:
             link_.update(data)
