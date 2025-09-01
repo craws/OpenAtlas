@@ -8,7 +8,8 @@ from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import get_file_path, link, required_group
-from openatlas.display.util2 import format_date, is_authorized, manual
+from openatlas.display.util2 import is_authorized, manual
+from openatlas.models.dates import format_date
 from openatlas.forms.form import annotate_image_form
 from openatlas.models.annotation import AnnotationImage
 from openatlas.models.entity import Entity

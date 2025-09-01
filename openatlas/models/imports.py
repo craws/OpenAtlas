@@ -124,11 +124,11 @@ def import_data_(project: Project, class_: str, data: list[Any]) -> None:
         entities[row.get('id')] = {
             'entity': entity,
             'parent_id': row.get('parent_id'),
-            'openatlas_parent_id':  row.get('openatlas_parent_id')}
+            'openatlas_parent_id': row.get('openatlas_parent_id')}
     for entry in entities.values():
         if entry['entity'].class_.name in (
-                    g.class_groups['place']['classes'] +
-                    g.class_groups['artifact']['classes']):
+                g.class_groups['place']['classes'] +
+                g.class_groups['artifact']['classes']):
             if entry['parent_id']:
                 entities[entry['parent_id']]['entity'].link(
                     'P46',
@@ -151,13 +151,14 @@ def import_data_(project: Project, class_: str, data: list[Any]) -> None:
 
 
 def insert_dates(entity: Entity, row: dict[str, Any]) -> None:
-    entity.update({'attributes': {
-        'begin_from': row.get('begin_from'),
-        'begin_to': row.get('begin_to'),
-        'begin_comment': row.get('begin_comment'),
-        'end_from': row.get('end_from'),
-        'end_to': row.get('end_to'),
-        'end_comment': row.get('end_comment')}})
+    entity.update({
+        'attributes': {
+            'begin_from': row.get('begin_from'),
+            'begin_to': row.get('begin_to'),
+            'begin_comment': row.get('begin_comment'),
+            'end_from': row.get('end_from'),
+            'end_to': row.get('end_to'),
+            'end_comment': row.get('end_comment')}})
 
 
 def insert_alias(entity: Entity, row: dict[str, Any]) -> None:
@@ -185,7 +186,7 @@ def link_types(
             number = value_type[1][1:] \
                 if value_type[1].startswith('-') else value_type[1]
             if number.isdigit() or number.replace('.', '', 1).isdigit():
-                type_ids.append((value_type[0],  value_type[1]))
+                type_ids.append((value_type[0], value_type[1]))
     if data := row.get('origin_value_types'):
         for value_types in str(data).split():
             value_type = value_types.split(';')
@@ -195,7 +196,7 @@ def link_types(
                         if value_type[1].startswith('-') else value_type[1]
                     if (number.isdigit()
                             or number.replace('.', '', 1).isdigit()):
-                        type_ids.append((entity_id,  value_type[1]))
+                        type_ids.append((entity_id, value_type[1]))
     checked_type_ids = [
         type_tuple for type_tuple in type_ids
         if check_type_id(type_tuple[0], class_)]
@@ -264,10 +265,10 @@ def insert_gis(entity: Entity, row: dict[str, Any], project: Project) -> None:
             wkt_ = None
         if wkt_:
             if wkt_.geom_type in [
-                    'MultiPoint',
-                    'MultiLineString',
-                    'MultiPolygon',
-                    'GeometryCollection']:
+                'MultiPoint',
+                'MultiLineString',
+                'MultiPolygon',
+                'GeometryCollection']:
                 for poly in wkt_:
                     Gis.insert_wkt(entity, location, project, poly)
             else:

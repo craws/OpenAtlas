@@ -17,7 +17,7 @@ from openatlas.forms.field import (
     ReferenceField, RemovableListField, SubmitAnnotationField, SubmitField,
     TableField, TableMultiField, TextAnnotationField, TreeField,
     TreeMultiField, ValueTypeField, ValueTypeRootField)
-from openatlas.forms.util import check_if_entity_has_time
+from openatlas.models.dates import check_if_entity_has_time
 from openatlas.models.entity import Entity
 from openatlas.models.openatlas_class import OpenatlasClass
 
@@ -187,7 +187,7 @@ def add_date_fields(form_class: Any, entity: Optional[Entity] = None) -> None:
         NoneOf([0])]
     has_time = bool(
         current_user.settings['module_time']
-        or (entity and check_if_entity_has_time(entity)))
+        or (entity and check_if_entity_has_time(entity.dates)))
     setattr(
         form_class,
         'begin_year_from',

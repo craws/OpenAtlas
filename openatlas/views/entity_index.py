@@ -8,7 +8,8 @@ from openatlas.display.table import Table
 from openatlas.display.util import (
     button, check_iiif_file_exist, get_file_path, link, required_group)
 from openatlas.display.util2 import (
-    format_date, is_authorized, manual, show_table_icons, uc_first)
+    is_authorized, manual, show_table_icons, uc_first)
+from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.reference_system import ReferenceSystem

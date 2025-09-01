@@ -67,7 +67,7 @@ def annotate_image_form(
 def add_additional_link_fields(form: Any, relation: dict[str, Any]) -> None:
     for item in relation['additional_fields']:
         match item:
-            case 'date':
+            case 'dates':
                 # Todo: what about time fields if already used there?
                 add_date_fields(form)
             case 'description':
@@ -128,8 +128,8 @@ def link_update_form(link_: Link, relation: dict[str, Any]) -> Any:
                 link_.type.id if link_.type else None
         for item in relation['additional_fields']:
             match item:
-                case 'date':
-                    populate_dates(form, link_)
+                case 'dates':
+                    populate_dates(form, link_.dates)
                 case 'description' | 'page':
                     getattr(form, 'description').data = link_.description
     return form

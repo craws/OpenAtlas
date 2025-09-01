@@ -11,7 +11,7 @@ from openatlas.display.util import link, required_group
 from openatlas.forms.display import display_form
 from openatlas.forms.form import (
     get_manager, link_form, link_update_form, table_form)
-from openatlas.forms.process import process_date
+from openatlas.forms.process import process_dates
 from openatlas.models.entity import Entity, Link
 from openatlas.models.search import get_subunits_without_super
 
@@ -76,7 +76,7 @@ def link_insert_detail(origin_id: int, relation_name: str) -> str | Response:
             form.description.data if 'description' in form else None,
             relation['inverse'],
             type_id,
-            dates=process_date(form))
+            dates=process_dates(form))
         return redirect(
             f"{url_for('view', id_=origin.id)}#tab-{relation_name}")
     return render_template(
@@ -106,7 +106,7 @@ def link_update(id_: int, origin_id: int, relation: str) -> str | Response:
         if 'type' in relation:
             hierarchy = Entity.get_hierarchy(relation['type'])
             data['type_id'] = getattr(form, str(hierarchy.id)).data or None
-        data.update(process_date(form))
+        data.update(process_dates(form))
         try:
             link_.update(data)
             flash(_('info update'), 'info')

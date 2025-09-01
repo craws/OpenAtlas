@@ -1,0 +1,128 @@
+from __future__ import annotations
+
+from datetime import datetime
+from typing import Any, Optional, TYPE_CHECKING
+
+import numpy
+from flask_babel import lazy_gettext as _
+
+
+
+if TYPE_CHECKING:  # pragma: no cover
+    from openatlas.models.entity import Entity
+
+
+class Dates:
+    def __init__(self, data: dict[str, Any]) -> None:
+        self.begin_from = timestamp_to_datetime64(data.get('begin_from'))
+        self.begin_to = timestamp_to_datetime64(data.get('begin_to'))
+        self.begin_comment = data.get('begin_comment')
+        self.end_from = timestamp_to_datetime64(data.get('end_from'))
+        self.end_to = timestamp_to_datetime64(data.get('end_to'))
+        self.end_comment = data.get('end_comment')
+        self.first = format_date_part(self.begin_from, 'year') \
+            if self.begin_from else None
+        self.last = format_date_part(self.end_from, 'year') \
+            if self.end_from else None
+        self.last = format_date_part(self.end_to, 'year') \
+            if self.end_to else None
+
+    def to_timestamp(self) -> dict[str, Any]:
+        from openatlas.display.util2 import sanitize
+        return {
+            'begin_from': datetime64_to_timestamp(self.begin_from),
+            'begin_to':  datetime64_to_timestamp(self.begin_to),
+            'begin_comment': sanitize(self.begin_comment),
+            'end_from':  datetime64_to_timestamp(self.end_from),
+            'end_to':  datetime64_to_timestamp(self.end_to),
+            'end_comment': sanitize(self.end_comment)}
+
+
+def timestamp_to_datetime64(string: str | None) -> numpy.datetime64 | None:
+    if not string:
+        return None
+    string_list = string.split(' ')
+    if 'BC' in string_list:
+        parts = string_list[0].split('-')
+        date = f'-{int(parts[0]) - 1}-{parts[1]}-{parts[2]}T{string_list[1]}'
+        return numpy.datetime64(date)
+    return numpy.datetime64(f'{string_list[0]}T{string_list[1]}')
+
+
+def format_date_part(date: numpy.datetime64, part: str) -> str:
+    string = str(date).split(' ', maxsplit=1)[0]
+    bc = False
+    if string.startswith('-') or string.startswith('0000'):
+        bc = True
+        string = string[1:]
+    string = string.replace('T', '-').replace(':', '-')
+    parts = string.split('-')
+    if part == 'year':  # If it's a negative year, add one year
+        return f'-{int(parts[0]) + 1}' if bc else f'{int(parts[0])}'
+    if part == 'month':
+        return parts[1]
+    if part == 'hour':
+        return parts[3]
+    if part == 'minute':
+        return parts[4]
+    if part == 'second':
+        return parts[5]
+    return parts[2]
+
+
+def datetime64_to_timestamp(date: Optional[numpy.datetime64]) -> Optional[str]:
+    if not date:
+        return None
+    string = str(date)
+    postfix = ''
+    if string.startswith('-') or string.startswith('0000'):
+        string = string[1:]
+        postfix = ' BC'
+    string = string.replace('T', '-').replace(':', '-').replace(' ', '-')
+    parts = string.split('-')
+    year = int(parts[0]) + 1 if postfix else int(parts[0])
+    hour = 0
+    minute = 0
+    second = 0
+    if len(parts) > 3:
+        hour = int(parts[3])
+        minute = int(parts[4])
+        second = int(parts[5])
+    return \
+        f'{year:04}-{int(parts[1]):02}-{int(parts[2]):02} ' \
+        f'{hour:02}:{minute:02}:{second:02}{postfix}'
+
+
+def format_date(value: datetime | numpy.datetime64) -> str:
+    if not value:
+        return ''
+    if isinstance(value, numpy.datetime64):
+        date_ = datetime64_to_timestamp(value)
+        return date_.lstrip('0').replace(' 00:00:00', '') if date_ else ''
+    return value.date().isoformat().replace(' 00:00:00', '')
+
+
+def format_entity_date(
+        dates: Dates,
+        type_: str,  # begin or end
+        object_: Optional[Entity] = None) -> str:
+    from openatlas.display.util import link
+    html = link(object_) if object_ else ''
+    if getattr(dates, f'{type_}_from'):
+        html += ', ' if html else ''
+        if getattr(dates, f'{type_}_to'):
+            html += _(
+                'between %(begin)s and %(end)s',
+                begin=format_date(getattr(dates, f'{type_}_from')),
+                end=format_date(getattr(dates, f'{type_}_to')))
+        else:
+            html += format_date(getattr(dates, f'{type_}_from'))
+    comment = getattr(dates, f'{type_}_comment')
+    return html + (f" ({comment})" if comment else '')
+
+
+def check_if_entity_has_time(dates: Dates) -> bool:
+    for date_ in [dates.begin_from, dates.begin_to, dates.end_from, dates.end_to]:
+        if date_ and '00:00:00' not in str(date_):
+            return True
+    return False

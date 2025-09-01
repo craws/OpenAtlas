@@ -18,7 +18,8 @@ from openatlas.display.table import Table
 from openatlas.display.util import (
     button, description, display_info, link, required_group, send_mail)
 from openatlas.display.util2 import (
-    format_date, is_authorized, manual, sanitize, uc_first)
+    is_authorized, manual, sanitize, uc_first)
+from openatlas.models.dates import format_date
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField, generate_password_field
 from openatlas.models.entity import Entity

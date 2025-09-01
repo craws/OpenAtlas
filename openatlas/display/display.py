@@ -10,9 +10,10 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import entity_table
 from openatlas.display.util import (
     bookmark_toggle, button, description, display_annotation_text_links,
-    format_entity_date, get_system_data, link, reference_systems)
+    get_system_data, link, reference_systems)
 from openatlas.display.util2 import (
-    format_date, is_authorized, manual, show_table_icons, uc_first)
+    is_authorized, manual, show_table_icons, uc_first)
+from openatlas.models.dates import format_date, format_entity_date
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 from openatlas.models.user import User
@@ -273,8 +274,8 @@ class Display:
     def add_data(self) -> None:
         self.data = {
             _('alias'): list(self.entity.aliases.values()),
-            _('begin'): format_entity_date(self.entity, 'begin'),
-            _('end'): format_entity_date(self.entity, 'end')}
+            _('begin'): format_entity_date(self.entity.dates, 'begin'),
+            _('end'): format_entity_date(self.entity.dates, 'end')}
         if self.entity.standard_type:
             var = ' > '.join(
                 [g.types[id_].name for id_ in self.entity.standard_type.root])
@@ -293,9 +294,9 @@ class Display:
                         self.linked_places.append(e)
                     if name == 'place_from':
                         self.data['begin'] = \
-                            format_entity_date(self.entity, 'begin', e)
+                            format_entity_date(self.entity.dates, 'begin', e)
                     elif name == 'place_to':
                         self.data['end'] = \
-                            format_entity_date(self.entity, 'end', e)
+                            format_entity_date(self.entity.dates, 'end', e)
                     else:
                         self.data[relation['label']].append(link(e))

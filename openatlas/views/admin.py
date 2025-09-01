@@ -29,7 +29,8 @@ from openatlas.display.util import (
     button, check_iiif_activation, check_iiif_file_exist, display_info,
     get_file_path, link, required_group, send_mail)
 from openatlas.display.util2 import (
-    convert_size, format_date, is_authorized, manual, sanitize, uc_first)
+    convert_size, is_authorized, manual, sanitize, uc_first)
+from openatlas.models.dates import format_date
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
 from openatlas.forms.setting import (

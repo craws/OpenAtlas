@@ -20,7 +20,8 @@ from werkzeug.wrappers import Response
 from openatlas import app
 from openatlas.display.image_processing import check_processed_image
 from openatlas.display.util2 import (
-    format_date, is_authorized, sanitize, uc_first)
+    is_authorized, sanitize, uc_first)
+from openatlas.models.dates import format_date, format_entity_date
 from openatlas.models.annotation import AnnotationText
 from openatlas.models.cidoc_class import CidocClass
 from openatlas.models.cidoc_property import CidocProperty
@@ -84,51 +85,33 @@ def get_appearance(event_links: list[Link]) -> tuple[str, str]:
         event = link_.domain
         actor = link_.range
         event_link = link(_('event'), url_for('view', id_=event.id))
-        if not actor.first:
-            if link_.first \
-                    and (not first_year or int(link_.first) < int(first_year)):
-                first_year = link_.first
+        if not actor.dates.first:
+            if link_.dates.first \
+                    and (not first_year or int(link_.dates.first) < int(first_year)):
+                first_year = link_.dates.first
                 first_string = \
-                    f"{format_entity_date(link_, 'begin', link_.object_)} " \
+                    f"{format_entity_date(link_.dates, 'begin', link_.object_)} " \
                     f"{_('at an')} {event_link}"
             elif event.first \
-                    and (not first_year or int(event.first) < int(first_year)):
-                first_year = event.first
+                    and (not first_year or int(event.dates.first) < int(first_year)):
+                first_year = event.dates.first
                 first_string = \
-                    f"{format_entity_date(event, 'begin', link_.object_)}" \
+                    f"{format_entity_date(event.dates, 'begin', link_.object_)}" \
                     f" {_('at an')} {event_link}"
-        if not actor.last:
-            if link_.last \
-                    and (not last_year or int(link_.last) > int(last_year)):
-                last_year = link_.last
+        if not actor.dates.last:
+            if link_.dates.last \
+                    and (not last_year or int(link_.dates.last) > int(last_year)):
+                last_year = link_.dates.last
                 last_string = \
-                    f"{format_entity_date(link_, 'end', link_.object_)} " \
+                    f"{format_entity_date(link_.dates, 'end', link_.object_)} " \
                     f"{_('at an')} {event_link}"
-            elif event.last \
-                    and (not last_year or int(event.last) > int(last_year)):
-                last_year = event.last
+            elif event.dates.last \
+                    and (not last_year or int(event.dates.last) > int(last_year)):
+                last_year = event.dates.last
                 last_string = \
-                    f"{format_entity_date(event, 'end', link_.object_)} " \
+                    f"{format_entity_date(event.dates, 'end', link_.object_)} " \
                     f"{_('at an')} {event_link}"
     return first_string, last_string
-
-
-def format_entity_date(
-        entity: Entity | Link,
-        type_: str,  # begin or end
-        object_: Optional[Entity] = None) -> str:
-    html = link(object_) if object_ else ''
-    if getattr(entity, f'{type_}_from'):
-        html += ', ' if html else ''
-        if getattr(entity, f'{type_}_to'):
-            html += _(
-                'between %(begin)s and %(end)s',
-                begin=format_date(getattr(entity, f'{type_}_from')),
-                end=format_date(getattr(entity, f'{type_}_to')))
-        else:
-            html += format_date(getattr(entity, f'{type_}_from'))
-    comment = getattr(entity, f'{type_}_comment')
-    return html + (f" ({comment})" if comment else '')
 
 
 def profile_image_table_link(entity: Entity, file: Entity, ext: str) -> str:
@@ -325,8 +308,8 @@ def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
         data.append(entity.get_file_size())
         data.append(entity.get_file_ext())
     if entity.class_.group['name'] in ['actor', 'artifact', 'event', 'place']:
-        data.append(entity.first)
-        data.append(entity.last)
+        data.append(entity.dates.first)
+        data.append(entity.dates.last)
     data.append(entity.description)
     return data
 

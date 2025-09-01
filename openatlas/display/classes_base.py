@@ -9,8 +9,9 @@ from flask_login import current_user
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.util import (
-    button, edit_link, format_entity_date, get_appearance, get_base_table_data,
+    button, edit_link, get_appearance, get_base_table_data,
     get_chart_data, link, profile_image_table_link, remove_link)
+from openatlas.models.dates import format_entity_date
 from openatlas.display.util2 import is_authorized, uc_first
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis

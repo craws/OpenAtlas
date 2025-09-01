@@ -14,7 +14,8 @@ from openatlas.display.util import (
     button, check_iiif_activation, check_iiif_file_exist,
     convert_image_to_iiif, delete_iiif_image, display_info, link,
     required_group)
-from openatlas.display.util2 import format_date, is_authorized, manual
+from openatlas.display.util2 import is_authorized, manual
+from openatlas.models.dates import format_date
 from openatlas.forms.form import table_form
 from openatlas.forms.setting import FileForm, IiifForm
 from openatlas.forms.util import get_form_settings

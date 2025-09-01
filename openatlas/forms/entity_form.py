@@ -9,7 +9,7 @@ from openatlas.forms.add_fields import (
     add_buttons, add_class_types, add_date_fields, add_description,
     add_name_fields, add_reference_systems, add_relations)
 from openatlas.forms.populate import populate_insert, populate_update
-from openatlas.forms.process import process_date
+from openatlas.forms.process import process_dates
 from openatlas.forms.util import convert
 from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity, insert
@@ -24,7 +24,7 @@ def get_entity_form(entity: Entity, origin: Optional[Entity] = None) -> Any:
     add_class_types(Form, entity.class_)
     add_relations(Form, entity, origin)
     add_reference_systems(Form, entity.class_)
-    if 'date' in entity.class_.attributes:
+    if 'dates' in entity.class_.attributes:
         add_date_fields(Form, entity)
     add_description(Form, entity, origin)
     add_buttons(Form, entity)
@@ -41,16 +41,16 @@ def process_form_data(entity: Entity, form: Any) -> Entity:
         'name': entity.class_.name,
         'openatlas_class_name': entity.class_.name,
         'description': entity.description,
-        'begin_from': entity.begin_from,
-        'begin_to': entity.begin_to,
-        'begin_comment': entity.begin_comment,
-        'end_from': entity.end_from,
-        'end_to': entity.end_to,
-        'end_comment': entity.end_comment}
+        'begin_from': entity.dates.begin_from,
+        'begin_to': entity.dates.begin_to,
+        'begin_comment': entity.dates.begin_comment,
+        'end_from': entity.dates.end_from,
+        'end_to': entity.dates.end_to,
+        'end_comment': entity.dates.end_comment}
     for attr in entity.class_.attributes:
         data[attr] = None
-        if attr == 'date':
-            data.update(process_date(form))
+        if attr == 'dates':
+            data.update(process_dates(form))
         elif getattr(form, attr).data or getattr(form, attr).data == 0:
             value = getattr(form, attr).data
             data[attr] = value.strip() if isinstance(value, str) else value

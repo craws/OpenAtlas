@@ -26,8 +26,9 @@ from openatlas.display.table import Table
 from openatlas.display.util import (
     button, button_bar, description, link, required_group)
 from openatlas.display.util2 import (
-    datetime64_to_timestamp, format_date, get_backup_file_data, is_authorized,
+    get_backup_file_data, is_authorized,
     manual, uc_first)
+from openatlas.models.dates import datetime64_to_timestamp, format_date
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
 from openatlas.forms.util import form_to_datetime64

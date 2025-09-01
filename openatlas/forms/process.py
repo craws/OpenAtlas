@@ -4,7 +4,8 @@ from typing import Any
 from flask import g
 from werkzeug.exceptions import abort
 
-from openatlas.display.util2 import datetime64_to_timestamp, sanitize
+from openatlas.display.util2 import sanitize
+from openatlas.models.dates import Dates, datetime64_to_timestamp
 from openatlas.forms.util import form_to_datetime64
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
@@ -76,24 +77,18 @@ def process_standard_fields(manager: Any) -> None:
             abort(418, f'Form error: {key}, {field_type}, value={value}')
 
 
-def process_date(form: Any) -> dict[str, Any]:
-    data: dict[str, Any] = {
-        'begin_from': None,
-        'begin_to': None,
-        'begin_comment': None,
-        'end_from': None,
-        'end_to': None,
-        'end_comment': None}
+def process_dates(form: Any) -> dict[str, Any]:
+    dates = Dates({})
     if hasattr(form, 'begin_year_from') and form.begin_year_from.data:
-        data['begin_comment'] = form.begin_comment.data
-        data['begin_from'] = form_to_datetime64(
+        dates.begin_comment = form.begin_comment.data
+        dates.begin_from = form_to_datetime64(
             form.begin_year_from.data,
             form.begin_month_from.data,
             form.begin_day_from.data,
             form.begin_hour_from.data if 'begin_hour_from' in form else None,
             form.begin_minute_from.data if 'begin_hour_from' in form else None,
             form.begin_second_from.data if 'begin_hour_from' in form else None)
-        data['begin_to'] = form_to_datetime64(
+        dates.begin_to = form_to_datetime64(
             form.begin_year_to.data or (
                 form.begin_year_from.data if not
                 form.begin_day_from.data else None),
@@ -106,15 +101,15 @@ def process_date(form: Any) -> dict[str, Any]:
             form.begin_second_to.data if 'begin_hour_from' in form else None,
             to_date=True)
     if hasattr(form, 'end_year_from') and form.end_year_from.data:
-        data['end_comment'] = form.end_comment.data
-        data['end_from'] = form_to_datetime64(
+        dates.end_comment = form.end_comment.data
+        dates.end_from = form_to_datetime64(
             form.end_year_from.data,
             form.end_month_from.data,
             form.end_day_from.data,
             form.end_hour_from.data if 'end_hour_from' in form else None,
             form.end_minute_from.data if 'end_hour_from' in form else None,
             form.end_second_from.data if 'end_hour_from' in form else None)
-        data['end_to'] = form_to_datetime64(
+        dates.end_to = form_to_datetime64(
             form.end_year_to.data or
             (form.end_year_from.data if not form.end_day_from.data else None),
             form.end_month_to.data or
@@ -124,10 +119,4 @@ def process_date(form: Any) -> dict[str, Any]:
             form.end_minute_to.data if 'end_hour_from' in form else None,
             form.end_second_to.data if 'end_hour_from' in form else None,
             to_date=True)
-    return {
-        'begin_from': datetime64_to_timestamp(data['begin_from']),
-        'begin_to':  datetime64_to_timestamp(data['begin_to']),
-        'begin_comment': data['begin_comment'],
-        'end_from':  datetime64_to_timestamp(data['end_from']),
-        'end_to':  datetime64_to_timestamp(data['end_to']),
-        'end_comment': data['end_comment']}
+    return dates.to_timestamp()

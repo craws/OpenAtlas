@@ -10,10 +10,9 @@ from werkzeug.exceptions import abort
 from openatlas import app
 from openatlas.database import (
     date, entity as db, link as db_link, tools as db_tools)
-from openatlas.display.util2 import (
-    convert_size, datetime64_to_timestamp, format_date_part, sanitize,
-    timestamp_to_datetime64)
+from openatlas.display.util2 import convert_size, sanitize
 from openatlas.models.annotation import AnnotationText
+from openatlas.models.dates import Dates
 from openatlas.models.gis import Gis
 from openatlas.models.tools import get_carbon_link
 
@@ -51,14 +50,7 @@ class Entity:
         self.root: list[int] = []
         self.subs: list[int] = []
         self.classes: list[str] = []
-        self.begin_from = None
-        self.begin_to = None
-        self.begin_comment = None
-        self.end_from = None
-        self.end_to = None
-        self.end_comment = None
-        self.first = None
-        self.last = None
+        self.dates = Dates(data)
         for name, value in data.items():
             if not value and value != 0:
                 continue
@@ -80,19 +72,6 @@ class Entity:
                             key=lambda item_: item_[1]))
                 case _:
                     setattr(self, name, value)
-        if 'begin_from' in data:
-            self.begin_from = timestamp_to_datetime64(data['begin_from'])
-            self.begin_to = timestamp_to_datetime64(data['begin_to'])
-            self.begin_comment = data['begin_comment']
-            self.end_from = timestamp_to_datetime64(data['end_from'])
-            self.end_to = timestamp_to_datetime64(data['end_to'])
-            self.end_comment = data['end_comment']
-            self.first = format_date_part(self.begin_from, 'year') \
-                if self.begin_from else None
-            self.last = format_date_part(self.end_from, 'year') \
-                if self.end_from else None
-            self.last = format_date_part(self.end_to, 'year') \
-                if self.end_to else self.last
         if self.class_.name == 'file':
             self.public = False
             self.creator = None
@@ -289,21 +268,6 @@ class Entity:
             self.location.delete_links(['P89'])
         if units:
             self.location.link('P89', [g.types[id_] for id_ in units])
-
-    def update_attributes(self, attributes: dict[str, Any]) -> None:
-        for key, value in attributes.items():
-            setattr(self, key, value)
-        db.update({
-            'id': self.id,
-            'name': sanitize(self.name),
-            'begin_from': datetime64_to_timestamp(self.begin_from),
-            'begin_to': datetime64_to_timestamp(self.begin_to),
-            'end_from': datetime64_to_timestamp(self.end_from),
-            'end_to': datetime64_to_timestamp(self.end_to),
-            'begin_comment': sanitize(self.begin_comment),
-            'end_comment': sanitize(self.end_comment),
-            # 'description': self.update_description()
-        })
 
     def get_annotated_text(self) -> str:
         offset = 0
@@ -859,7 +823,7 @@ def insert(data: dict[str, Any]) -> Entity:
     for item in [
             'begin_from', 'begin_to', 'begin_comment',
             'end_from', 'end_to', 'end_comment', 'description']:
-        data[item] = data.get(item, None)
+        data[item] = data.get(item)
     for item in ['name', 'description']:
         data[item] = sanitize(data[item])
     entity = Entity.get_by_id(db.insert(data))
@@ -888,44 +852,19 @@ class Link:
         self.types: dict[Entity, None] = {}
         if 'type_id' in row and row['type_id']:
             self.types[g.types[row['type_id']]] = None
-        if 'begin_from' in row:
-            self.begin_from = timestamp_to_datetime64(row['begin_from'])
-            self.begin_to = timestamp_to_datetime64(row['begin_to'])
-            self.begin_comment = row['begin_comment']
-            self.end_from = timestamp_to_datetime64(row['end_from'])
-            self.end_to = timestamp_to_datetime64(row['end_to'])
-            self.end_comment = row['end_comment']
-            self.first = format_date_part(self.begin_from, 'year') \
-                if self.begin_from else None
-            self.last = format_date_part(self.end_from, 'year') \
-                if self.end_from else None
-            self.last = format_date_part(self.end_to, 'year') \
-                if self.end_to else self.last
+        self.dates = Dates(row)
 
     def update(self, data: dict[str, Any]) -> None:
-        update_data = {
+        attributes = {
             'id': self.id,
             'property_code': self.property.code,
             'domain_id': self.domain.id,
             'range_id': self.range.id,
             'type_id': self.type.id if self.type else None,
-            'description': sanitize(data.get('description', self.description)),
-            'begin_from': datetime64_to_timestamp(self.begin_from),
-            'begin_to': datetime64_to_timestamp(self.begin_to),
-            'begin_comment': sanitize(self.begin_comment),
-            'end_from': datetime64_to_timestamp(self.end_from),
-            'end_to': datetime64_to_timestamp(self.end_to),
-            'end_comment': sanitize(self.end_comment)}
-        update_data.update(data)
-        db_link.update(update_data)
-
-    def set_dates(self, data: dict[str, Any]) -> None:
-        self.begin_from = data['begin_from']
-        self.begin_to = data['begin_to']
-        self.begin_comment = data['begin_comment']
-        self.end_from = data['end_from']
-        self.end_to = data['end_to']
-        self.end_comment = data['end_comment']
+            'description': sanitize(data.get('description', self.description))}
+        attributes.update(self.dates.to_timestamp())
+        attributes.update(data)
+        db_link.update(attributes)
 
     @staticmethod
     def get_by_id(id_: int) -> Link:

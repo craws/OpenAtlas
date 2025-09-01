@@ -12,7 +12,8 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
     bookmark_toggle, button, link, required_group, send_mail)
-from openatlas.display.util2 import format_date, manual, uc_first
+from openatlas.display.util2 import manual, uc_first
+from openatlas.models.dates import format_date
 from openatlas.forms.field import SubmitField
 from openatlas.models.content import get_translation
 from openatlas.models.entity import Entity
@@ -110,8 +111,8 @@ def overview() -> str:
             format_date(entity.created),
             link(entity),
             entity.class_.label,
-            entity.first,
-            entity.last,
+            entity.dates.first,
+            entity.dates.last,
             link(g.logger.get_log_info(entity.id)['creator'])])
     tabs['info'].content = render_template('index/index.html', tables=tables)
     return render_template('tabs.html', tabs=tabs, crumbs=['overview'])

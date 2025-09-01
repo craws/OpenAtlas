@@ -100,7 +100,7 @@ def entity_table(
                 case 'activity':
                     html = item.property.name_inverse
                 case 'begin':
-                    html = item.first
+                    html = item.dates.first
                 case 'class':
                     html = e.class_.label
                 case 'creator':
@@ -112,19 +112,21 @@ def entity_table(
                 case 'page':
                     html = item.description
                 case 'end':
-                    html = item.last
+                    html = item.dates.last
                 case 'extension':
                     html = e.get_file_ext()
                 case 'first':
-                    html = item.first or \
-                        f'<span class="text-muted">{range_.first}</span>' \
-                        if range_.first else ''
+                    html = item.dates.first or \
+                        '<span class="text-muted">' \
+                        f'{range_.dates.first}</span>' \
+                        if range_.dates.first else ''
                 case 'involvement' | 'function' | 'relation':
                     html = item.type.name if item.type else ''
                 case 'last':
-                    html = item.last or \
-                        f'<span class="text-muted">{range_.last}</span>' \
-                        if range_.last else ''
+                    html = item.dates.last or \
+                        '<span class="text-muted">' \
+                        f'{range_.dates.last}</span>' \
+                        if range_.dates.last else ''
                 case 'license holder':
                     html = g.file_info[e.id]['license_holder']
                 case 'main image':

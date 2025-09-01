@@ -13,7 +13,7 @@ person = {
             'required': True},
         'alias': {},
         'description': {},
-        'date': {}},
+        'dates': {}},
     'relations': {
         'begins_in': {
             'label': _('born in'),
@@ -49,7 +49,7 @@ person = {
             'type': 'Actor relation',
             'additional_fields': [
                 'domain',
-                'date',
+                'dates',
                 'description'],
             'tab': {
                 'buttons': ['link'],

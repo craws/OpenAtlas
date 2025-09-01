@@ -203,17 +203,17 @@ class Parser:
                 'name': entity.name,
                 'description': entity.description
                 if 'description' in self.show else None,
-                'begin_earliest': entity.begin_from
+                'begin_earliest': entity.dates.begin_from
                 if 'when' in self.show else None,
-                'begin_latest': entity.begin_to
+                'begin_latest': entity.dates.begin_to
                 if 'when' in self.show else None,
-                'begin_comment': entity.begin_comment
+                'begin_comment': entity.dates.begin_comment
                 if 'when' in self.show else None,
-                'end_earliest': entity.end_from
+                'end_earliest': entity.dates.end_from
                 if 'when' in self.show else None,
-                'end_latest': entity.end_to
+                'end_latest': entity.dates.end_to
                 if 'when' in self.show else None,
-                'end_comment': entity.end_comment
+                'end_comment': entity.dates.end_comment
                 if 'when' in self.show else None,
                 'types': [{
                     'typeName': type_.name,

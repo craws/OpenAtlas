@@ -11,7 +11,6 @@ from flask_wtf import FlaskForm
 from wtforms import StringField
 
 from openatlas import app
-from openatlas.models.entity import Entity, Link
 
 
 def get_form_settings(form: Any, profile: bool = False) -> dict[str, str]:
@@ -143,8 +142,3 @@ def inject_template_functions() -> dict[str, str | GlobalSearchForm]:
     return {'search_form': GlobalSearchForm(prefix='global')}
 
 
-def check_if_entity_has_time(item: Entity | Link) -> bool:
-    for date_ in [item.begin_from, item.begin_to, item.end_from, item.end_to]:
-        if date_ and '00:00:00' not in str(date_):
-            return True
-    return False

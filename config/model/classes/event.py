@@ -9,7 +9,7 @@ model = {
         'name': {
             'required': True},
         'description': {},
-        'date': {}},
+        'dates': {}},
     'relations': {
         'actor': {
             'label': _('actor'),

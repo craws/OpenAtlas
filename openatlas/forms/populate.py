@@ -3,8 +3,8 @@ from typing import Any
 
 from flask import g
 
-from openatlas.display.util2 import format_date_part
-from openatlas.models.entity import Entity, Link
+from openatlas.models.dates import Dates, format_date_part
+from openatlas.models.entity import Entity
 
 
 def populate_insert(form: Any, entity: Entity) -> None:
@@ -26,8 +26,8 @@ def populate_update(form: Any, entity: Entity) -> None:
     # if entity.id and not copy:
     #     form.entity_id.data = entity.id
     populate_reference_systems(form, entity)
-    if 'date' in entity.class_.attributes:
-        populate_dates(form, entity)
+    if 'dates' in entity.class_.attributes:
+        populate_dates(form, entity.dates)
     if hasattr(form, 'alias'):
         for alias in entity.aliases.values():
             form.alias.append_entry(alias)
@@ -53,48 +53,37 @@ def populate_reference_systems(form: Any, entity: Entity) -> None:
             'precision': str(link_.type.id)}
 
 
-def populate_dates(form: Any, item: Entity | Link) -> None:
-    if item.begin_from:
-        form.begin_year_from.data = format_date_part(item.begin_from, 'year')
-        form.begin_month_from.data = format_date_part(item.begin_from, 'month')
-        form.begin_day_from.data = format_date_part(item.begin_from, 'day')
-        if 'begin_hour_from' in form:
-            form.begin_hour_from.data = \
-                format_date_part(item.begin_from, 'hour')
-            form.begin_minute_from.data = \
-                format_date_part(item.begin_from, 'minute')
-            form.begin_second_from.data = \
-                format_date_part(item.begin_from, 'second')
-        form.begin_comment.data = item.begin_comment
-        if item.begin_to:
-            form.begin_year_to.data = format_date_part(item.begin_to, 'year')
-            form.begin_month_to.data = format_date_part(item.begin_to, 'month')
-            form.begin_day_to.data = format_date_part(item.begin_to, 'day')
+def populate_dates(form: Any, dates: Dates) -> None:
+    for item in ['begin', 'end']:
+        from_ = getattr(dates, f'{item}_from')
+        to = getattr(dates, f'{item}_to')
+        if from_:
+            getattr(form, f'{item}_year_from').data = \
+                format_date_part(from_, 'year')
+            getattr(form, f'{item}_month_from').data = \
+                format_date_part(from_, 'month')
+            getattr(form, f'{item}_day_from').data = \
+                format_date_part(from_, 'day')
             if 'begin_hour_from' in form:
-                form.begin_hour_to.data = \
-                    format_date_part(item.begin_to, 'hour')
-                form.begin_minute_to.data = \
-                    format_date_part(item.begin_to, 'minute')
-                form.begin_second_to.data = \
-                    format_date_part(item.begin_to, 'second')
-    if item.end_from:
-        form.end_year_from.data = format_date_part(item.end_from, 'year')
-        form.end_month_from.data = format_date_part(item.end_from, 'month')
-        form.end_day_from.data = format_date_part(item.end_from, 'day')
-        if 'begin_hour_from' in form:
-            form.end_hour_from.data = format_date_part(item.end_from, 'hour')
-            form.end_minute_from.data = \
-                format_date_part(item.end_from, 'minute')
-            form.end_second_from.data = \
-                format_date_part(item.end_from, 'second')
-        form.end_comment.data = item.end_comment
-        if item.end_to:
-            form.end_year_to.data = format_date_part(item.end_to, 'year')
-            form.end_month_to.data = format_date_part(item.end_to, 'month')
-            form.end_day_to.data = format_date_part(item.end_to, 'day')
-            if 'begin_hour_from' in form:
-                form.end_hour_to.data = format_date_part(item.end_to, 'hour')
-                form.end_minute_to.data = \
-                    format_date_part(item.end_to, 'minute')
-                form.end_second_to.data = \
-                    format_date_part(item.end_to, 'second')
+                getattr(form, f'{item}_hour_from').data = \
+                    format_date_part(from_, 'hour')
+                getattr(form, f'{item}_minute_from').data = \
+                    format_date_part(from_, 'minute')
+                getattr(form, f'{item}_second_from').data = \
+                    format_date_part(from_, 'second')
+            form.begin_comment.data = dates.begin_comment
+            if to:
+                getattr(form, f'{item}_year_to').data = \
+                    format_date_part(to, 'year')
+                getattr(form, f'{item}_month_to').data = \
+                    format_date_part(to, 'month')
+                getattr(form, f'{item}_day_to').data = \
+                    format_date_part(to, 'day')
+                if 'begin_hour_from' in form:
+                    getattr(form, f'{item}_hour_to').data = \
+                        format_date_part(to, 'hour')
+                    getattr(form, f'{item}_minute_to').data = \
+                        format_date_part(to, 'minute')
+                    getattr(form, f'{item}_second_to').data = \
+                        format_date_part(to, 'second')
+                form.end_comment.data = dates.end_comment
