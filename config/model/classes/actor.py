@@ -46,7 +46,7 @@ person = {
             'label': _('relation'),
             'classes': 'person',
             'properties': 'OA7',
-            'mode': 'tab_directed',
+            'mode': 'tab',
             'type': 'Actor relation',
             'additional_fields': [
                 'domain',
@@ -65,7 +65,7 @@ person = {
             'classes': 'group',
             'properties': 'P107',
             'inverse': True,
-            'mode': 'tab_directed',
+            'mode': 'tab',
             'type': 'Actor function',
             'additional_fields': [
                 'domain',

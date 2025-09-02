@@ -153,7 +153,7 @@ def entity_table(
                     html = _('yes') if g.file_info[e.id]['public'] else None
                 case 'remove':
                     tab_id = e.class_.group['name']
-                    if relation and relation['mode'] == 'tab_directed':
+                    if relation and relation['mode'] == 'tab':
                         tab_id = relation['name']
                     html = remove_link(
                         e.name,
