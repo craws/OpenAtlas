@@ -100,7 +100,9 @@ def entity_table(
                 case 'activity':
                     html = item.property.name_inverse
                 case 'begin':
-                    html = item.dates.first
+                    html = e.dates.first
+                    if relation and 'dates' in relation['additional_fields']:
+                        html = item.dates.first
                 case 'class':
                     html = e.class_.label
                 case 'creator':
@@ -172,7 +174,7 @@ def entity_table(
                 case 'size':
                     html = e.get_file_size()
                 case 'type' | 'license':
-                    html = e.standard_type.name if e.standard_type else ''
+                    html = link(e.standard_type)
                 case 'update':
                     html = edit_link(
                         url_for(

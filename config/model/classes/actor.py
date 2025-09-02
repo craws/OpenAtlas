@@ -46,7 +46,6 @@ person = {
             'label': _('relation'),
             'classes': 'person',
             'properties': 'OA7',
-            'mode': 'tab',
             'type': 'Actor relation',
             'additional_fields': [
                 'domain',
@@ -65,7 +64,6 @@ person = {
             'classes': 'group',
             'properties': 'P107',
             'inverse': True,
-            'mode': 'tab',
             'type': 'Actor function',
             'additional_fields': [
                 'domain',
@@ -76,6 +74,20 @@ person = {
                 'columns': [
                     'name',
                     'function',
+                    'begin',
+                    'end',
+                    'description']}},
+        'artifact': {
+            'label': _('artifact'),
+            'classes': class_groups['artifact']['classes'],
+            'properties': 'P52',
+            'inverse': True,
+            'tab': {
+                'buttons': ['insert'],
+                'columns': [
+                    'name',
+                    'class',
+                    'type',
                     'begin',
                     'end',
                     'description']}},
