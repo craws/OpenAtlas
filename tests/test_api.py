@@ -136,16 +136,16 @@ class Api(ApiTestCase):
                 'api_04.network_visualisation',
                 exclude_system_classes='type'))
         rv = rv.get_json()
-        assert len(rv['results']) == 68
+        assert len(rv['results']) == 70
         rv = c.get(
             url_for(
                 'api_04.network_visualisation',
                 linked_to_ids=boundary_mark.id))
         rv = rv.get_json()
-        assert len(rv['results']) == 14
+        assert len(rv['results']) == 15
         rv = c.get(url_for('api_04.network_visualisation', download=True))
         rv = rv.get_json()
-        assert len(rv['results']) == 163
+        assert len(rv['results']) == 165
 
 
         rv = c.get(
@@ -154,7 +154,7 @@ class Api(ApiTestCase):
                 id_=place.id,
                 exclude_system_classes='type'))
         rv = rv.get_json()
-        assert len(rv['results']) == 11
+        assert len(rv['results']) == 12
         rv = c.get(
             url_for(
                 'api_04.ego_network_visualisation',
@@ -176,7 +176,7 @@ class Api(ApiTestCase):
                 id_=place.id,
                 download=True))
         rv = rv.get_json()
-        assert len(rv['results']) == 15
+        assert len(rv['results']) == 16
 
         for rv in [
             c.get(url_for('api_04.geometric_entities')),
@@ -443,7 +443,7 @@ class Api(ApiTestCase):
                 system_classes='person',
                 limit=0,
                 first=actor2.id)).get_json()
-        assert rv['pagination']['entities'] == 8
+        assert rv['pagination']['entities'] == 9
 
         # Test page parameter
         rv = c.get(
@@ -475,7 +475,7 @@ class Api(ApiTestCase):
                 view_classes='artifact',
                 system_classes='person',
                 count=True))
-        assert rv.get_json() == 8
+        assert rv.get_json() == 9
 
         rv = c.get(url_for('api_04.geometric_entities', count=True))
         assert rv.get_json() == 6
@@ -623,7 +623,7 @@ class Api(ApiTestCase):
                     "operator": "greaterThanEqual",
                     "values": [(height.id, 23.0), (weight_.id, 999.0)],
                     "logicalOperator": "and"}]}]),
-            (4, [{
+            (5, [{
                 "entityCidocClass": [{
                     "operator": "equal",
                     "values": ["E21"],
@@ -651,16 +651,16 @@ class Api(ApiTestCase):
                 "entityDescription": [{
                     "operator": "like",
                     "values": ["FrOdO", "sam"]}]}]),
-            (13, [{
+            (14, [{
                 "relationToID": [{
                     "operator": "equal",
                     "values": [place.id]}]}]),
-            (168, [{
+            (170, [{
                 "typeIDWithSubs": [{
                     "operator": "notEqual",
                     "values": [boundary_mark.id],
                     "logicalOperator": "and"}]}]),
-            (170, [{
+            (172, [{
                 "typeName": [{
                     "operator": "notEqual",
                     "values": ["Boundary Mark", "Height"],
@@ -766,7 +766,7 @@ class Api(ApiTestCase):
         assert rv.get_json()['pagination']['entities'] == 50
 
         rv = c.get(url_for('api_04.search', class_='person'))
-        assert rv.get_json()['pagination']['entities'] == 2
+        assert rv.get_json()['pagination']['entities'] == 3
 
         # Test Error Handling
         for rv in [

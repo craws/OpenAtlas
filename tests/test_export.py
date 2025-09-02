@@ -80,6 +80,14 @@ class ImportTest(ImportTestCase):
                     'public': True},
                 follow_redirects=True)
 
+        rv = c.post(
+            url_for('insert', class_='reference_system'),
+            data={
+                'name': 'Ring References',
+                'website_url': 'https://ring_references.org',
+                'resolver_url': 'https://ring_references.org',
+                'classes': ['place', 'person']})
+
         with app.test_request_context():
             app.preprocess_request()
             for entity in ApiEntity.get_by_cidoc_classes(['all']):
@@ -100,10 +108,18 @@ class ImportTest(ImportTestCase):
                         cc_by_license = entity
                     case 'Frodo':
                         actor = entity
+                    case 'Ring References':
+                        ext_ref_sys = entity
+                    case 'exact match':
+                        exact_match = entity
+                    case 'http://viaf.org/viaf/95218067':
+                        tolkien = entity
 
             openatlas_logo.link('P67', actor)
             openatlas_logo.link('P2', cc_by_license)
             openatlas_logo.link('P2', case_study)
+            actor.link('P67', ext_ref_sys, 'Frodo', True, exact_match.id)
+            tolkien.link('P67', ext_ref_sys, 'Tolkien', True, exact_match.id)
 
         file_path = app.config['UPLOAD_PATH']
         openatlas_logo_path = file_path / f'{openatlas_logo.id}.png'

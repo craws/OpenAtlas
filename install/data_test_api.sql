@@ -21,6 +21,7 @@ VALUES
   ('E31', 'file', 'File not public', NULL, CURRENT_TIMESTAMP),
   ('E33', 'source', 'Silmarillion', NULL, CURRENT_TIMESTAMP),
   ('E21', 'person', 'Frodo', 'That is Frodo', CURRENT_TIMESTAMP),
+  ('E21', 'person', 'http://viaf.org/viaf/95218067', 'John Ronald Reuel Tolkien', CURRENT_TIMESTAMP),
   ('E31', 'external_reference', 'https://lotr.fandom.com/', NULL, CURRENT_TIMESTAMP),
   ('E31', 'bibliography', 'Frodo et. al.', 'Book of Frodo and his friends', CURRENT_TIMESTAMP),
   ('E41', 'appellation', 'Sûza', NULL, CURRENT_TIMESTAMP),
@@ -32,7 +33,8 @@ VALUES
   ('E55', 'type', 'Tavern', NULL, CURRENT_TIMESTAMP),
   ('E55', 'type', 'Hills', NULL, CURRENT_TIMESTAMP),
   ('E55', 'type', 'Ring', NULL, CURRENT_TIMESTAMP),
-  ('E31', 'external_reference', 'https://en.wikipedia.org/wiki/Public_domain', NULL, CURRENT_TIMESTAMP);
+  ('E31', 'external_reference', 'https://en.wikipedia.org/wiki/Public_domain', NULL, CURRENT_TIMESTAMP),
+  ('E31', 'external_reference', 'https://doi.org/10.2307/j.ctv1vtz8mq.3', NULL, CURRENT_TIMESTAMP);
 
 
 INSERT INTO model.gis (entity_id, name, description, type, geom_point, geom_polygon, geom_linestring)
@@ -97,6 +99,7 @@ VALUES
   ('P2', (SELECT id FROM model.entity WHERE name='Lord of the rings'), (SELECT id FROM model.entity WHERE name='Home of Baggins')),
   ('P2', (SELECT id FROM model.entity WHERE name='Hills'), (SELECT id FROM model.entity WHERE name='Home of Baggins')),
   ('P2', (SELECT id FROM model.entity WHERE name='Lord of the rings'), (SELECT id FROM model.entity WHERE name='Silmarillion')),
+  ('P2', (SELECT id FROM model.entity WHERE name='Lord of the rings'), (SELECT id FROM model.entity WHERE name='http://viaf.org/viaf/95218067')),
   ('P2', (SELECT id FROM model.entity WHERE name='Lord of the rings'), (SELECT id FROM model.entity WHERE name='Picture with a License')),
   ('P2', (SELECT id FROM model.entity WHERE name='Lord of the rings'), (SELECT id FROM model.entity WHERE name='File without file')),
   ('P2', (SELECT id FROM model.entity WHERE name='Lord of the rings'), (SELECT id FROM model.entity WHERE name='File not public')),
@@ -132,6 +135,7 @@ VALUES
   ('P53', (SELECT id FROM model.entity WHERE name='Location of Bar'), (SELECT id FROM model.entity WHERE name='Bar') ),
   ('P67', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='Picture with a License') ),
   ('P67', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='Picture with a License') ),
+  ('P67', (SELECT id FROM model.entity WHERE name='http://viaf.org/viaf/95218067'), (SELECT id FROM model.entity WHERE name='Picture with a License') ),
   ('P67', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='File without license') ),
   ('P52', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='The One Ring') ),
   ('P2', (SELECT id FROM model.entity WHERE name='Public domain'), (SELECT id FROM model.entity WHERE name='Picture with a License') ),
@@ -153,6 +157,7 @@ VALUES
   ('P67', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='Frodo et. al.'), '987', NULL ),
   ('P67', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='Frodo et. al.'), '234', NULL ),
   ('P67', (SELECT id FROM model.entity WHERE name='Picture with a License'), (SELECT id FROM model.entity WHERE name='Frodo et. al.'), '112', NULL ),
+  ('P67', (SELECT id FROM model.entity WHERE name='Picture with a License'), (SELECT id FROM model.entity WHERE name='https://doi.org/10.2307/j.ctv1vtz8mq.3'), NULL, NULL ),
   ('P67', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='GeoNames'), '2761369', (SELECT id FROM model.entity WHERE name='close match') ),
   ('P67', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='Wikidata'), 'Q218728', (SELECT id FROM model.entity WHERE name='exact match') ),
   ('P67', (SELECT id FROM model.entity WHERE name='Mordor'), (SELECT id FROM model.entity WHERE name='Wikidata'), 'Q202886', (SELECT id FROM model.entity WHERE name='exact match') ),
@@ -160,7 +165,10 @@ VALUES
   ('P67', (SELECT id FROM model.entity WHERE name='Sam'), (SELECT id FROM model.entity WHERE name='Wikidata'), 'Q219473', (SELECT id FROM model.entity WHERE name='exact match') ),
   ('P67', (SELECT id FROM model.entity WHERE name='Lord of the rings'), (SELECT id FROM model.entity WHERE name='Wikidata'), 'Q15228', (SELECT id FROM model.entity WHERE name='exact match') ),
   ('OA7', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='Sam'), NULL, (SELECT id FROM model.entity WHERE name='Economical') ),
+  ('P67', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='https://doi.org/10.2307/j.ctv1vtz8mq.3'), 'Studying The Lord of the Rings', NULL ),
   ('P67', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='https://lotr.fandom.com/'), 'Fandom Wiki of lord of the rings', NULL),
+  ('P67', (SELECT id FROM model.entity WHERE name='http://viaf.org/viaf/95218067'), (SELECT id FROM model.entity WHERE name='https://lotr.fandom.com/'), 'Fandom Wiki of lord of the rings', NULL),
+  ('P67', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='https://doi.org/10.2307/j.ctv1vtz8mq.3'), 'Studying The Lord of the Rings', NULL),
   ('P67', (SELECT id FROM model.entity WHERE name='Public domain'), (SELECT id FROM model.entity WHERE name='https://lotr.fandom.com/'), 'Public domain', NULL),
   ('P2', (SELECT id FROM model.entity WHERE name='Height'), (SELECT id FROM model.entity WHERE name='Shire'), '23.0', NULL ),
   ('P2', (SELECT id FROM model.entity WHERE name='Weight'), (SELECT id FROM model.entity WHERE name='Shire'), '999.0', NULL ),
@@ -177,7 +185,7 @@ INSERT INTO model.file_info (entity_id, public, creator, license_holder)
 VALUES
     ((SELECT id FROM model.entity WHERE name='File without license'), TRUE, 'Frodo', NULL ),
     ((SELECT id FROM model.entity WHERE name='File without file'), TRUE, NULL, 'Sam' ),
-    ((SELECT id FROM model.entity WHERE name='Picture with a License'), TRUE, 'Sauron', 'Sauron' ),
+    ((SELECT id FROM model.entity WHERE name='Picture with a License'), TRUE, 'http://viaf.org/viaf/95218067', 'Sauron' ),
     ((SELECT id FROM model.entity WHERE name='File not public'), FALSE, 'Sauron', NULL );
 
 UPDATE model.entity
