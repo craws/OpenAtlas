@@ -1,3 +1,5 @@
+import copy
+
 from flask_babel import lazy_gettext as _
 
 from config.model.class_groups import class_groups, standard_relations
@@ -15,6 +17,11 @@ person = {
         'description': {},
         'dates': {}},
     'relations': {
+        'residence': {
+            'label': _('residence'),
+            'classes': 'object_location',
+            'properties': 'P74',
+            'mode': 'direct'},
         'begins_in': {
             'label': _('born in'),
             'classes': 'object_location',
@@ -91,11 +98,6 @@ person = {
                     'begin',
                     'end',
                     'description']}},
-        'residence': {
-            'label': _('residence'),
-            'classes': 'object_location',
-            'properties': 'P74',
-            'mode': 'direct'},
         'reference': standard_relations['reference'],
         'file': standard_relations['file']},
     'display': {
@@ -104,3 +106,5 @@ person = {
             'insert_and_continue': True},
         'additional_tabs': {
             'note': {}}}}
+
+group = copy.deepcopy(person)

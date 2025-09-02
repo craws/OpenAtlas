@@ -30,9 +30,7 @@ model: dict[str, Any] = {
         'display': {'buttons': ['network']}},
     'file': {
         'attributes': {}},
-    'group': {
-        'attributes': {},
-        'display': {'buttons': ['network']}},
+    'group': actor.group,
     'human_remains': {
         'attributes': {},
         'display': {'buttons': ['network']}},
