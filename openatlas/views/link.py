@@ -42,7 +42,8 @@ def link_insert(origin_id: int, relation_name: str) -> str | Response:
                 request.form['checkbox_values'],
                 inverse=relation['inverse'])
         return redirect(
-            f"{url_for('view', id_=origin.id)}#tab-{relation_name}")
+            f"{url_for('view', id_=origin.id)}#tab-" +
+            relation_name.replace('_', '-'))
     # Todo: properties can be multiple?
     content = table_form(
         relation['classes'],
@@ -79,7 +80,8 @@ def link_insert_detail(origin_id: int, relation_name: str) -> str | Response:
             type_id,
             dates=process_dates(form))
         return redirect(
-            f"{url_for('view', id_=origin.id)}#tab-{relation_name}")
+            f"{url_for('view', id_=origin.id)}#tab-" +
+            relation_name.replace('_', '-'))
     return render_template(
         'content.html',
         content=display_form(form),
@@ -102,7 +104,8 @@ def link_update(id_: int, origin_id: int, relation: str) -> str | Response:
     target = range_ if origin_id == domain.id else domain
     relation = origin.class_.relations[relation]
     form = link_update_form(link_, relation)
-    origin_url = url_for('view', id_=origin.id) + f"#tab-{relation['name']}"
+    origin_url = url_for('view', id_=origin.id) + \
+        f"#tab-{relation['name'].replace('_', '-')}"
     if form.validate_on_submit():
         data = {
             'description': form.description.data

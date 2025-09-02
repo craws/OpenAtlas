@@ -25,6 +25,7 @@ person = {
             'classes': 'object_location',
             'properties': 'OA9',
             'mode': 'direct'},
+        'source': standard_relations['source'],
         'event': {
             'label': _('event'),
             'classes': class_groups['event']['classes'],
@@ -59,14 +60,32 @@ person = {
                     'begin',
                     'end',
                     'description']}},
+        'member_of': {
+            'label': _('member of'),
+            'classes': 'group',
+            'properties': 'P107',
+            'inverse': True,
+            'mode': 'tab_directed',
+            'type': 'Actor function',
+            'additional_fields': [
+                'domain',
+                'dates',
+                'description'],
+            'tab': {
+                'buttons': ['link', 'insert'],
+                'columns': [
+                    'name',
+                    'function',
+                    'begin',
+                    'end',
+                    'description']}},
         'residence': {
             'label': _('residence'),
             'classes': 'object_location',
             'properties': 'P74',
             'mode': 'direct'},
-        'source': standard_relations['source'],
-        'file': standard_relations['file'],
-        'reference': standard_relations['reference']},
+        'reference': standard_relations['reference'],
+        'file': standard_relations['file']},
     'display': {
         'buttons': ['copy', 'network'],
         'form': {
