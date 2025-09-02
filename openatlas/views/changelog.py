@@ -14,17 +14,18 @@ def index_changelog() -> str:
 
 
 # pylint: disable=too-many-lines
+
 versions = {
-    '8.14.0': ['TBA', {
+    '8.14.0': ['2025-09-02', {
         'feature': {
             '2605': 'Display root type id',
-            '2596': 'Finish Polish translation',
-            '2466': 'API: Export files with ARCHE RDF metadata',
+            '2606': 'Handling unnecessary white spaces in CSV imports',
+            '2596': 'Finished Polish translation',
             '2598': 'Refactor and minor improvements'},
         'fix': {
-            '2599': 'Broken Wikidata info function',
-        }
-    }],
+            '2575': 'Text annotation: Layout issues',
+            '2579':'Text annotation: Display issue at update',
+            '2599': 'Broken Wikidata info function'}}],
     '8.13.0': ['2025-08-19', {
         'feature': {
             '2592': 'Polish UI translations',
