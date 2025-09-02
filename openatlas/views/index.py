@@ -80,8 +80,8 @@ def overview() -> str:
         tabs['bookmarks'].table.rows.append([
             link(entity),
             entity.class_.label,
-            entity.first,
-            entity.last,
+            entity.dates.first,
+            entity.dates.last,
             bookmark_toggle(entity.id, True)])
     for note in User.get_notes_by_user_id(current_user.id):
         entity = Entity.get_by_id(note['entity_id'])

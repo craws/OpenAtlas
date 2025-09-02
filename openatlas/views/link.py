@@ -8,6 +8,7 @@ from werkzeug.wrappers import Response
 from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.util import link, required_group
+from openatlas.display.util2 import uc_first
 from openatlas.forms.display import display_form
 from openatlas.forms.form import (
     get_manager, link_form, link_update_form, table_form)
@@ -83,7 +84,10 @@ def link_insert_detail(origin_id: int, relation_name: str) -> str | Response:
         'content.html',
         content=display_form(form),
         title=_(origin.class_.group['name']),
-        crumbs=[link(origin, index=True), origin, _('link')])
+        crumbs=[
+            link(origin, index=True),
+            origin,
+            '+ ' + uc_first(relation['label'])])
 
 
 @app.route(

@@ -52,7 +52,7 @@ person = {
                 'dates',
                 'description'],
             'tab': {
-                'buttons': ['link'],
+                'buttons': ['link', 'insert'],
                 'columns': [
                     'name',
                     'relation',
