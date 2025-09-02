@@ -133,13 +133,13 @@ def get_model(class_name: str) -> dict[str, Any]:
         relation['label'] = relation.get('label', _(name))
         relation['mode'] = relation.get('mode', 'tab')
         relation['selected'] = [] if relation['multiple'] else None
-        relation['tooltip'] = relation.get('tooltip', None)
+        relation['tooltip'] = relation.get('tooltip')
         relation['additional_fields'] = relation.get('additional_fields', [])
-        relation['tab'] = relation.get('tab', None)
+        relation['tab'] = relation.get('tab')
         if relation['tab']:
             relation['tab']['additional_columns'] = \
                 relation['tab'].get('additional_columns', [])
             relation['tab']['buttons'] = relation['tab'].get('buttons', [])
-            relation['tab']['columns'] = relation['tab'].get('columns', None)
-            relation['tab']['tooltip'] = relation['tab'].get('tooltip', None)
+            relation['tab']['columns'] = relation['tab'].get('columns')
+            relation['tab']['tooltip'] = relation['tab'].get('tooltip')
     return data
