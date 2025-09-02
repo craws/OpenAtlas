@@ -124,7 +124,7 @@ high-quality, attributed digital objects online at scale. Be aware that:
 
 ### Installation
 
-    sudo apt install iipimage-server libvips-tools libapache2-mod-fcgid 
+    sudo apt install iipimage-server libvips-tools libapache2-mod-fcgid
     sudo a2enmod fcgid
     sudo service apache2 restart
 
