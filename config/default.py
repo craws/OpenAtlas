@@ -31,6 +31,7 @@ LANGUAGES = {
 # or use absolute paths like e.g. pathlib.Path('/some/location/somewhere')
 FILES_PATH = Path(__file__).parent.parent / 'files'
 EXPORT_PATH = Path(FILES_PATH) / 'export'
+ARCHE_PATH = Path(EXPORT_PATH) / 'arche'
 UPLOAD_PATH = Path(FILES_PATH) / 'uploads'
 TMP_PATH = Path('/tmp')  # For processing files e.g. at import and export
 

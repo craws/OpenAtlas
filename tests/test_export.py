@@ -145,7 +145,7 @@ class ImportTest(ImportTestCase):
         date_ = current_date_for_filename()
         collection_name = app.config["ARCHE_METADATA"]["topCollection"]
         filename = f'{date_}_{collection_name.replace(" ", "_")}.zip'
-        rv = c.get(url_for('download_export', filename=filename))
+        rv = c.get(url_for('download_arche_export', filename=filename))
         assert b'PK' in rv.data
 
         rv = c.get(

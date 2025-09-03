@@ -90,14 +90,14 @@ def arche_export() -> bool:
         f"{external_metadata['topCollection'].replace(' ', '_')}.zip")
 
     tempfile.tempdir = str(app.config['TMP_PATH'])
-    export_dir = app.config['EXPORT_PATH']
-    export_dir.mkdir(parents=True, exist_ok=True)
-    final_archive_path = export_dir / archive_name
-    tmp_archive_path = Path(tempfile.mkdtemp()) / archive_name
+
+    arche_dir = app.config['ARCHE_PATH']
+    arche_dir.mkdir(parents=True, exist_ok=True)
+    final_archive_path = arche_dir / archive_name
 
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_path = Path(temp_dir)
-
+        tmp_archive_path = temp_path / archive_name
         failed_files_md = "\n".join(
             create_failed_files_md(check_files_for_arche(file_entities)))
         (temp_path / 'problematic_files.md').write_text(
@@ -162,8 +162,7 @@ def arche_export() -> bool:
                 f"- **Directories**: {total_dirs}\n")
             archive.writestr('debug/file_statistic.md', stat_md)
 
-    tmp_archive_path.replace(final_archive_path)
-
+        shutil.move(str(tmp_archive_path), str(final_archive_path))
     return final_archive_path
 
 

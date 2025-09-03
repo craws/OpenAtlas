@@ -22,6 +22,31 @@ def download_export(filename: str) -> Response:
         as_attachment=True)
 
 
+@app.route('/download/export/arche/<filename>')
+@required_group('manager')
+def download_arche_export(filename: str) -> Response:
+    return send_from_directory(
+        app.config['ARCHE_PATH'],
+        filename,
+        as_attachment=True)
+
+
+@app.route('/delete_export/<view>/<filename>')
+@required_group('admin')
+def delete_export(view: str, filename: str) -> Response:
+    path = app.config['EXPORT_PATH']
+    if view == 'export_arche':
+        path = app.config['ARCHE_PATH']
+    try:
+        (path / filename).unlink()
+        g.logger.log('info', 'file', 'SQL file deleted')
+        flash(_('file deleted'), 'info')
+    except Exception as e:
+        g.logger.log('error', 'file', 'SQL file deletion failed', e)
+        flash(_('error file delete'), 'error')
+    return redirect(url_for(view, _anchor='tab-export'))
+
+
 @app.route('/export/execute/<format_>')
 @required_group('manager')
 def export_execute(format_: str) -> Response:
@@ -82,23 +107,10 @@ def export_sql() -> str:
             _('export SQL')])
 
 
-@app.route('/delete_export/<view>/<filename>')
-@required_group('admin')
-def delete_export(view: str, filename: str) -> Response:
-    try:
-        (app.config['EXPORT_PATH'] / filename).unlink()
-        g.logger.log('info', 'file', 'SQL file deleted')
-        flash(_('file deleted'), 'info')
-    except Exception as e:
-        g.logger.log('error', 'file', 'SQL file deletion failed', e)
-        flash(_('error file delete'), 'error')
-    return redirect(url_for(view))
-
-
 @app.route('/export/arche')
 @required_group('manager')
 def export_arche() -> str:
-    path = app.config['EXPORT_PATH']
+    path = app.config['ARCHE_PATH']
     table = Table(['name', 'size'], order=[[0, 'desc']])
     for file in path.iterdir():
         if (not file.is_file()
@@ -110,9 +122,8 @@ def export_arche() -> str:
             convert_size(file.stat().st_size),
             link(
                 _('download'),
-                url_for('download_export', filename=file.name))]
-        if is_authorized('admin') \
-                and os.access(app.config['EXPORT_PATH'], os.W_OK):
+                url_for('download_arche_export', filename=file.name))]
+        if is_authorized('admin') and os.access(path, os.W_OK):
             confirm = _('Delete %(name)s?', name=file.name.replace("'", ''))
             data.append(
                 link(
@@ -131,13 +142,13 @@ def export_arche() -> str:
         'acceptedDate': metadata.get('acceptedDate'),
         'curator': ', '.join(metadata.get('curator', [])),
         'principalInvestigator':
-          ', '.join(metadata.get('principalInvestigator', [])),
+            ', '.join(metadata.get('principalInvestigator', [])),
         'hasMetadataCreator':
-          ', '.join(metadata.get('hasMetadataCreator', [])),
+            ', '.join(metadata.get('hasMetadataCreator', [])),
         'relatedDiscipline': ', '.join(
-          metadata.get('relatedDiscipline', [])),
+            metadata.get('relatedDiscipline', [])),
         'excludeReferenceSystems':
-          ', '.join(metadata.get('excludeReferenceSystems', [])),
+            ', '.join(metadata.get('excludeReferenceSystems', [])),
         'typeIds':
             ', '.join(
                 [link(str(type_id), url_for('view', id_=type_id))
@@ -149,9 +160,9 @@ def export_arche() -> str:
                 'info',
                 content=display_info(info_content),
                 buttons=[manual('admin/export'),
-                    button(
-                        'ARCHE ' + _('file checker'),
-                        url_for('check_files', arche='arche'))]),
+                         button(
+                             'ARCHE ' + _('file checker'),
+                             url_for('check_files', arche='arche'))]),
             'export': Tab(
                 'export',
                 _('export'),
@@ -171,11 +182,11 @@ def export_arche() -> str:
 @app.route('/export/arche/execute')
 @required_group('admin')
 def arche_execute() -> Response:
-    if os.access(app.config['EXPORT_PATH'], os.W_OK):
+    if os.access(app.config['ARCHE_PATH'], os.W_OK):
         if arche_export():
             g.logger.log('info', 'database', 'ARCHE export')
             flash(_('data was exported'), 'info')
         else:  # pragma: no cover
             g.logger.log('error', 'database', 'ARCHE export failed')
             flash(_('export failed'), 'error')
-    return redirect(url_for('export_arche'))
+    return redirect(url_for('export_arche', _anchor='tab-export'))
