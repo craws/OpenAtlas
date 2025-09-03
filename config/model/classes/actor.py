@@ -9,7 +9,7 @@ from config.model.class_groups import class_groups, standard_relations
 _('first')
 _('last')
 
-person = {
+group = {
     'attributes': {
         'name': {
             'required': True},
@@ -84,6 +84,23 @@ person = {
                     'begin',
                     'end',
                     'description']}},
+        'member': {
+            'label': _('member'),
+            'classes': class_groups['actor']['classes'],
+            'properties': 'P107',
+            'type': 'Actor function',
+            'additional_fields': [
+                'domain',
+                'dates',
+                'description'],
+            'tab': {
+                'buttons': ['link', 'insert'],
+                'columns': [
+                    'name',
+                    'function',
+                    'begin',
+                    'end',
+                    'description']}},
         'artifact': {
             'label': _('artifact'),
             'classes': class_groups['artifact']['classes'],
@@ -107,4 +124,5 @@ person = {
         'additional_tabs': {
             'note': {}}}}
 
-group = copy.deepcopy(person)
+person = copy.deepcopy(group)
+del person['relations']['member']
