@@ -66,7 +66,10 @@ def process_form_data(entity: Entity, form: Any) -> Entity:
 
 
 def process_reference_systems(entity: Entity, form: Any):
-    entity.delete_links(['P67'])
+    entity.delete_links_by_property_and_class(
+        'P67',
+        ['reference_system'],
+        inverse=True)
     for system in g.reference_systems.values():
         if entity.class_.name not in system.classes:
             continue
