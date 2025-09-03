@@ -79,7 +79,8 @@ def get_csv_links(entity_dict: dict[str, Any]) -> dict[str, Any]:
 
 def get_csv_geom_entry(entity: Entity) -> dict[str, None]:
     geom = {'type': None, 'coordinates': None}
-    if entity.class_.group['name'] == 'place' or entity.class_.name == 'artifact':
+    if entity.class_.group['name'] == 'place' \
+            or entity.class_.name == 'artifact':
         geom = get_csv_geometry(entity.get_linked_entity_safe('P53'))
     elif entity.class_.name == 'object_location':
         geom = get_csv_geometry(entity)

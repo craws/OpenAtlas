@@ -7,8 +7,7 @@ from flask import g
 from flask_login import login_user
 
 from openatlas import app, before_request
-from openatlas.models.dates import datetime64_to_timestamp
-from openatlas.forms.util import form_to_datetime64
+from openatlas.models.dates import datetime64_to_timestamp, form_to_datetime64
 from openatlas.models.entity import Entity
 from openatlas.models.imports import (
     Project, get_id_from_origin_id, import_data_)

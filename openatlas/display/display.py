@@ -161,21 +161,21 @@ class Display:
                                     class_=class_,
                                     origin_id=self.entity.id,
                                     relation=name)))
-                #     case 'source':
-                #         if class_name == 'file':
-                #             self.buttons.append(
-                #                 button(
-                #                     _('link'),
-                #                     url_for('file_add', id_=id_, view=tab_name)))
-                #         elif view == 'reference':
-                #             self.buttons.append(
-                #                 button(
-                #                     'link',
-                #                     url_for('reference_add', id_=id_, view=tab_name)))
-                #         self.buttons.append(
-                #             button(
-                #                 g.classes['source'].label,
-                #                 url_for('insert', class_=tab_name, origin_id=id_)))
+    #     case 'source':
+    #         if class_name == 'file':
+    #             self.buttons.append(
+    #                 button(
+    #                     _('link'),
+    #                     url_for('file_add', id_=id_, view=tab_name)))
+    #         elif view == 'reference':
+    #             self.buttons.append(
+    #                 button(
+    #                     'link',
+    #                     url_for('reference_add', id_=id_, view=tab_name)))
+    #         self.buttons.append(
+    #             button(
+    #                 g.classes['source'].label,
+    #                 url_for('insert', class_=tab_name, origin_id=id_)))
             self.tabs[name] = Tab(
                 name,
                 relation['label'],

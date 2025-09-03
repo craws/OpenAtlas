@@ -19,13 +19,12 @@ from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.display.image_processing import check_processed_image
-from openatlas.display.util2 import (
-    is_authorized, sanitize, uc_first)
-from openatlas.models.dates import format_date, format_entity_date
+from openatlas.display.util2 import is_authorized, sanitize, uc_first
 from openatlas.models.annotation import AnnotationText
 from openatlas.models.cidoc_class import CidocClass
 from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.content import get_translation
+from openatlas.models.dates import format_date, format_entity_date
 from openatlas.models.entity import Entity, Link
 from openatlas.models.imports import Project
 from openatlas.models.user import User

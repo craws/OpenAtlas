@@ -28,10 +28,10 @@ from openatlas.display.util import (
 from openatlas.display.util2 import (
     get_backup_file_data, is_authorized,
     manual, uc_first)
-from openatlas.models.dates import datetime64_to_timestamp, format_date
+from openatlas.models.dates import datetime64_to_timestamp, form_to_datetime64, \
+    format_date
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
-from openatlas.forms.util import form_to_datetime64
 from openatlas.models.entity import Entity
 from openatlas.models.imports import (
     Project, check_duplicates, check_single_type_duplicates, check_type_id,

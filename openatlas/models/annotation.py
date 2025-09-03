@@ -97,7 +97,7 @@ class AnnotationText:
         current_offset = 0
         pattern = r'<mark meta="(.*?)">(.*?)</mark>'
         text = text.replace('</p><p>', '\n\n')
-        for item in ['<p>', '</p>' '<br class="ProseMirror-trailingBreak">']:
+        for item in ['<p>', '</p>', '<br class="ProseMirror-trailingBreak">']:
             text = text.replace(item, '')
         text = re.sub(r'(<br>\s*)+$', '', text)
         text = text.replace('<br>', '\n').replace('&quot;', '"')

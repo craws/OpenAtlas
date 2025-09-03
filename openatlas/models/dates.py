@@ -6,8 +6,6 @@ from typing import Any, Optional, TYPE_CHECKING
 import numpy
 from flask_babel import lazy_gettext as _
 
-
-
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
 
@@ -122,7 +120,68 @@ def format_entity_date(
 
 
 def check_if_entity_has_time(dates: Dates) -> bool:
-    for date_ in [dates.begin_from, dates.begin_to, dates.end_from, dates.end_to]:
+    for date_ in [
+            dates.begin_from,
+            dates.begin_to,
+            dates.end_from,
+            dates.end_to]:
         if date_ and '00:00:00' not in str(date_):
             return True
     return False
+
+
+def form_to_datetime64(
+        year: Any,
+        month: Any,
+        day: Any,
+        hour: Optional[Any] = None,
+        minute: Optional[Any] = None,
+        second: Optional[Any] = None,
+        to_date: bool = False) -> Optional[numpy.datetime64]:
+    if not year:
+        return None
+    year = year if year > 0 else year + 1
+
+    def is_leap_year(year_: int) -> bool:
+        if year_ % 400 == 0:  # e.g. 2000
+            return True
+        if year_ % 100 == 0:  # e.g. 1000
+            return False
+        if year_ % 4 == 0:  # e.g. 1996
+            return True
+        return False
+
+    def get_last_day_of_month(year_: int, month_: int) -> int:
+        months_days: dict[int, int] = {
+            1: 31, 2: 28, 3: 31, 4: 30, 5: 31, 6: 30, 7: 31, 8: 31, 9: 30,
+            10: 31, 11: 30, 12: 31}
+        months_days_leap: dict[int, int] = {
+            1: 31, 2: 29, 3: 31, 4: 30, 5: 31, 6: 30, 7: 31, 8: 31, 9: 30,
+            10: 31, 11: 30, 12: 31}
+        date_lookup = months_days_leap \
+            if is_leap_year(year_) else months_days
+        return date_lookup[month_]
+
+    if month:
+        month = f'{month:02}'
+    elif to_date:
+        month = '12'
+    else:
+        month = '01'
+
+    if day:
+        day = f'{day:02}'
+    elif to_date:
+        day = f'{get_last_day_of_month(int(year), int(month)):02}'
+    else:
+        day = '01'
+
+    hour = f'{hour:02}' if hour else '00'
+    minute = f'{minute:02}' if minute else '00'
+    second = f'{second:02}' if second else '00'
+    try:
+        date_time = numpy.datetime64(
+            f'{year}-{month}-{day}T{hour}:{minute}:{second}')
+    except ValueError:
+        return None
+    return date_time

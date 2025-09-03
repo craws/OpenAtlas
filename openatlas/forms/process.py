@@ -5,9 +5,7 @@ from flask import g
 from werkzeug.exceptions import abort
 
 from openatlas.display.util2 import sanitize
-from openatlas.models.dates import Dates, datetime64_to_timestamp
-from openatlas.forms.util import form_to_datetime64
-from openatlas.models.entity import Entity
+from openatlas.models.dates import Dates, form_to_datetime64
 from openatlas.models.reference_system import ReferenceSystem
 
 

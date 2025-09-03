@@ -372,7 +372,8 @@ def check_similar() -> str:
     form = SimilarForm()
     form.classes.choices = [
         (class_.name, class_.label)
-        for name, class_ in g.classes.items() if class_.label and class_.group['name']]
+        for name, class_ in g.classes.items()
+        if class_.label and class_.group['name']]
     table = None
     if form.validate_on_submit():
         table = Table(['name', _('count')])

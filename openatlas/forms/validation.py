@@ -6,7 +6,7 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import validators
 
-from openatlas.forms.util import form_to_datetime64
+from openatlas.models.dates import form_to_datetime64
 from openatlas.models.entity import Entity
 
 
@@ -26,7 +26,7 @@ def hierarchy_name_exists(form: Any, field: Any) -> None:
             field.errors.append(_('error name exists'))
 
 
-def validate(form: FlaskForm, extra_validators: validators = None) -> bool:
+def validate(form: FlaskForm, extra_validators: Any = None) -> bool:
     valid = FlaskForm.validate(form, extra_validators)
     if hasattr(form, 'begin_year_from') and not validate_dates(form):
         valid = False
