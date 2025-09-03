@@ -18,8 +18,10 @@ ARCHE_METADATA = {
     'language': 'en',
     'depositor': ['Alice', 'https://orcid.org/0000-0001-7608-7446'],
     'acceptedDate': "2024-01-01",
-    'hasMetadataCreator': ['https://orcid.org/0000-0003-2576-2266',
-                           'https://orcid.org/0000-0001-7608-7446', 'Alice'],
+    'hasMetadataCreator': [
+        'https://orcid.org/0000-0003-2576-2266',
+        'https://orcid.org/0000-0001-7608-7446',
+        'Alice'],
     'curator': [
         'https://orcid.org/0000-0003-2576-2266',
         'https://orcid.org/0000-0002-4911-8451',
