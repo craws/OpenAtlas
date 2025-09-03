@@ -254,7 +254,6 @@ def sort_files_by_types(
 
 
 def hash_file(path: Path, chunk_size: int = 8192) -> str:
-    """Generate SHA256 hash of a file."""
     sha256 = hashlib.sha256()
     with path.open('rb') as f:
         for chunk in iter(lambda: f.read(chunk_size), b''):

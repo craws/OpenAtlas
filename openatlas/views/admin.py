@@ -478,8 +478,7 @@ def check_dates() -> str:
 @app.route('/orphans')
 @required_group('contributor')
 def orphans() -> str:
-    header = [
-        'name', 'class', 'type', 'created', 'updated', 'description']
+    header = ['name', 'class', 'type', 'created', 'updated', 'description']
     tabs = {
         'orphans': Tab('orphans', _('orphans'), table=Table(header)),
         'unlinked': Tab('unlinked', _('unlinked'), table=Table(header)),
@@ -531,13 +530,13 @@ def orphans() -> str:
         tabs[
             'unlinked'
             if entity.class_.view else 'orphans'].table.rows.append([
-            link(entity),
-            link(entity.class_),
-            link(entity.standard_type),
-            entity.class_.label,
-            format_date(entity.created),
-            format_date(entity.modified),
-            entity.description])
+                link(entity),
+                link(entity.class_),
+                link(entity.standard_type),
+                entity.class_.label,
+                format_date(entity.created),
+                format_date(entity.modified),
+                entity.description])
 
     entity_file_ids = []
     for entity in Entity.get_by_class('file', types=True):
@@ -866,10 +865,10 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
             if not os.access(path['path'], os.W_OK):  # pragma: no cover
                 continue
             size = run(
-                ['du', '-sb', path['path']],
-                capture_output=True,
-                text=True,
-                check=True)
+                    ['du', '-sb', path['path']],
+                    capture_output=True,
+                    text=True,
+                    check=True)
             path['size'] = int(size.stdout.split()[0])
             mounted = run(
                 ['df', path['path']],

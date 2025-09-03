@@ -6,8 +6,7 @@ from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
-from wtforms import (
-    HiddenField, SelectMultipleField, StringField, widgets)
+from wtforms import HiddenField, SelectMultipleField, StringField, widgets
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import InputRequired, URL
 
@@ -15,7 +14,7 @@ from openatlas import app
 from openatlas.display.table import Table
 from openatlas.display.util import get_base_table_data
 from openatlas.display.util2 import show_table_icons, uc_first
-from openatlas.forms import manager, manager_base
+from openatlas.forms import manager_base, manager
 from openatlas.forms.field import (
     SubmitField, TableCidocField, TableField, TableMultiField, TreeField)
 from openatlas.models.entity import Entity, Link

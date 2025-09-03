@@ -324,17 +324,3 @@ search_parser.add_argument(
     default='',
     help='{error_msg}',
     location='args')
-
-
-arche = reqparse.RequestParser()
-arche.add_argument(
-    'type_ids',
-    type=int,
-    action='append',
-    help='{error_msg}',
-    location='args')
-arche.add_argument(
-    'top_collection',
-    type=str,
-    help='{error_msg}',
-    location='args')

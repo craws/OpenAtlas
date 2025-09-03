@@ -20,9 +20,10 @@ from openatlas.api.resources.resolve_endpoints import (
 from openatlas.api.resources.templates import (
     geojson_collection_template, geojson_pagination, linked_place_pagination,
     linked_places_template, loud_pagination, loud_template)
-from openatlas.api.resources.util import date_to_str, geometry_to_geojson, \
-    get_license_ids_with_links, get_location_link, \
-    get_reference_systems, replace_empty_list_values_in_dict_with_none
+from openatlas.api.resources.util import (
+    date_to_str, geometry_to_geojson, get_license_ids_with_links,
+    get_location_link, get_reference_systems,
+    replace_empty_list_values_in_dict_with_none)
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 
