@@ -1,7 +1,7 @@
 import json
 from typing import Any
 
-from flask import Response, g, jsonify
+from flask import Response, jsonify
 from flask_restful import Resource, marshal
 
 from openatlas.api.endpoints.endpoint import Endpoint
@@ -16,16 +16,14 @@ from openatlas.api.resources.database_mapper import (
     get_all_entities_as_dict, get_all_links_as_dict, get_cidoc_hierarchy,
     get_classes, get_properties, get_property_hierarchy)
 from openatlas.api.resources.error import EntityNotAnEventError, NotAPlaceError
-from openatlas.api.resources.parser import arche, entity_, gis, network
+from openatlas.api.resources.parser import entity_, gis, network
 from openatlas.api.resources.resolve_endpoints import (
     download, resolve_subunits)
 from openatlas.api.resources.templates import geometries_template, \
     network_visualisation_template
-from openatlas.api.resources.util import filter_by_type, get_geometries
+from openatlas.api.resources.util import get_geometries
 from openatlas.database.entity import get_linked_entities_recursive
-from openatlas.models.entity import Entity
-from openatlas.models.export import current_date_for_filename, \
-    get_arche_file_turtle_graph
+from openatlas.models.export import current_date_for_filename
 
 
 class GetGeometricEntities(Resource):

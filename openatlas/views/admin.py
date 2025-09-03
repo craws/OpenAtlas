@@ -583,12 +583,7 @@ def orphans() -> str:
 @app.route('/check_files/<arche>')
 @required_group('contributor')
 def check_files(arche: Optional[str] = None) -> str:
-    header = [
-        'name',
-        'type',
-        'created',
-        'updated',
-        'description']
+    header = ['name', 'type', 'created', 'updated', 'description']
     tabs = {
         'no_creator': Tab('no_creator', _('no creator'), table=Table(header)),
         'no_license_holder': Tab(
@@ -650,7 +645,7 @@ def check_files(arche: Optional[str] = None) -> str:
         title=_('admin'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
-            [_('export') + ' ARCHE', f"{url_for('export_arche')}" ]
+            [_('export') + ' ARCHE', f"{url_for('export_arche')}"]
             if arche else None,
             _('check files')])
 

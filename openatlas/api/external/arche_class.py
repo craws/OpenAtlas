@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 from flask import g
 
@@ -12,26 +12,26 @@ from openatlas.models.entity import Entity
 class ArcheFileMetadata:
     uri: str
     titles: list[tuple[str, str]]
-    depositor: Optional[str] = None
-    license: Optional[str] = None
-    licensor: Optional[str] = None
-    metadata_creator: Optional[str] = None
-    rights_holder: Optional[str] = None
-    is_part_of: Optional[str] = None
-    accepted_date: Optional[str] = None
-    curator: Optional[str] = None
+    depositors: str | list[str] | None = None
+    license: str | None = None
+    licensors: str | list[str] | None  = None
+    metadata_creators: str | list[str] | None  = None
+    rights_holders: str | list[str] | None  = None
+    is_part_of: str | None = None
+    accepted_date: str | None = None
+    curators: str | list[str] | None  = None
     # Descriptions should also include information about the linked
     # entities like places and persons.
     descriptions: list[tuple[str, str]] = field(default_factory=list)
-    language: Optional[str] = None
-    principal_investigator: Optional[str] = None
-    related_discipline: Optional[str] = None
-    transfer_date: Optional[str] = None
-    binary_size: Optional[int] = None
-    creator: Optional[str] = None
-    actors: Optional[list[dict[str, str | list[str]]]] = None
-    spatial_coverages: Optional[list[dict[str, str | list[str]]]] = None
-    has_publications: Optional[list[tuple[Entity, str]]] = None
+    language: str | None = None
+    principal_investigators: str | list[str] | None  = None
+    related_disciplines: str | list[str] | None  = None
+    transfer_date: str | None = None
+    binary_size: int | None = None
+    creators: str | list[str] | None = None
+    actors: list[dict[str, str | list[str]]] | None = None
+    spatial_coverages: list[dict[str, str | list[str]]] | None = None
+    has_publications: list[tuple[Entity, str]] | None = None
 
     @classmethod
     def construct(
@@ -41,7 +41,6 @@ class ArcheFileMetadata:
             relations: list[dict[str, Any]],
             publications: list[tuple[Entity, str]],
             license_: str) -> 'ArcheFileMetadata':
-        print(entity.name)
         metadata = app.config['ARCHE_METADATA']
         part_of = "https://id.acdh.oeaw.ac.at/" \
                    f"{metadata['topCollection'].replace(' ', '_')}"
@@ -51,19 +50,19 @@ class ArcheFileMetadata:
             uri=f"{part_of}/{type_name.replace(' ', '_')}/"
                 f"{file_info[0]}/{file_info[1]}",
             titles=titles)
-        obj.depositor = metadata['depositor']
+        obj.depositors = metadata['depositor']
         obj.language = metadata['language']
         obj.license = license_
-        obj.licensor = entity.license_holder
-        obj.metadata_creator = metadata['hasMetadataCreator']
-        obj.rights_holder = entity.license_holder
-        obj.creator = entity.creator
+        obj.licensors = entity.license_holder
+        obj.metadata_creators = metadata['hasMetadataCreator']
+        obj.rights_holders = entity.license_holder
+        obj.creators = entity.creator
         obj.is_part_of = part_of
         obj.accepted_date = metadata['acceptedDate']
-        obj.curator = metadata['curator']
+        obj.curators = metadata['curator']
         obj.descriptions = [(entity.description, 'und')]
-        obj.principal_investigator = metadata['principalInvestigator']
-        obj.related_discipline = metadata['relatedDiscipline']
+        obj.principal_investigators = metadata['principalInvestigator']
+        obj.related_disciplines = metadata['relatedDiscipline']
         obj.transfer_date = datetime.today().strftime('%Y-%m-%d')
         obj.binary_size = g.files[entity.id].stat().st_size
         actors = []

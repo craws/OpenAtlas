@@ -9,15 +9,15 @@ import zipfile
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Optional, cast
 
-from flask import g, url_for
+from flask import Response, g, url_for
 from rdflib import Graph
 
+from config.default import ACDH
 from openatlas import app
 from openatlas.api.endpoints.endpoint import Endpoint
 from openatlas.api.external.arche import add_arche_file_metadata_to_graph
-from config.default import ACDH
 from openatlas.api.external.arche_class import ArcheFileMetadata
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.util import filter_by_type, get_reference_systems
@@ -78,7 +78,7 @@ def arche_export() -> bool:
         type_ids,
         external_metadata['topCollection'])
 
-    files_by_extension: dict[str, dict[str, set]] = defaultdict(
+    files_by_extension: dict[str, dict[str, set[Path]]] = defaultdict(
         lambda: defaultdict(set))
     for entity_id, path_set in sorted_files.items():
         for f in path_set:
@@ -113,9 +113,9 @@ def arche_export() -> bool:
                 files_arche_turtle,
                 encoding='utf-8')
 
-        rdf_dump = Endpoint(
+        rdf_dump = cast(Response, Endpoint(
             ApiEntity.get_by_system_classes(['all']),
-            {'type_id': type_ids, 'limit': 0, 'format': 'turtle'}).resolve()
+            {'type_id': type_ids, 'limit': 0, 'format': 'turtle'}).resolve())
         rdf_content = rdf_dump.get_data(as_text=True)
         (temp_path / 'rdf_dump.ttl').write_text(rdf_content, encoding='utf-8')
 
@@ -138,10 +138,10 @@ def arche_export() -> bool:
             for type_name, ext_map in files_by_extension.items():
                 for ext, files_set in ext_map.items():
                     for file_path in files_set:
-                        with file_path.open('rb') as f:
+                        with file_path.open('rb') as file:
                             archive.writestr(
                                 f'data/{type_name}/{ext}/{file_path.name}',
-                                f.read())
+                                file.read())
 
             infos = archive.infolist()
             total_size = sum(info.file_size for info in infos)
@@ -290,7 +290,7 @@ def get_arche_file_turtle_graph(
         type_ids: set[int],
         top_collection: str) -> str:
     graph = Graph()
-    graph.bind("acdh", ACDH)
+    graph.bind("acdh", ACDH)  # type: ignore
     metadata = get_arche_file_metadata(entities, type_ids, top_collection)
     for metadata_obj in metadata:
         add_arche_file_metadata_to_graph(graph, metadata_obj)
@@ -327,16 +327,16 @@ def get_arche_file_metadata(
                         ArcheFileMetadata.construct(
                             entity,
                             type_name,
-                            relations.get(entity.id),
-                            publications.get(entity.id),
+                            relations.get(entity.id, []),
+                            publications.get(entity.id, []),
                             license_urls[standard_type.id]))
         else:
             arche_metadata_list.append(
                 ArcheFileMetadata.construct(
                     entity,
                     top_collection,
-                    relations.get(entity.id),
-                    publications.get(entity.id),
+                    relations.get(entity.id, []),
+                    publications.get(entity.id, []),
                     license_urls[standard_type.id]))
     return arche_metadata_list
 
