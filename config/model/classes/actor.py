@@ -39,14 +39,19 @@ group = {
             'properties': ['P11', 'P14', 'P22', 'P23'],
             'inverse': True,
             'multiple': True,
+            'type': 'Involvement',
+            'additional_fields': [
+                'domain',
+                'dates',
+                'description'],
             'tab': {
                 'columns': [
                     'name',
                     'class',
                     'activity',
                     'involvement',
-                    'first',
-                    'last',
+                    'begin',
+                    'end',
                     'description'],
                 'buttons': ['link']}},
         'relative': {

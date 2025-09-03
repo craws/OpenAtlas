@@ -16,7 +16,13 @@ model = {
             'classes': class_groups['actor']['classes'],
             'properties': ['P11', 'P14', 'P22', 'P23'],
             'multiple': True,
+            'type': 'Involvement',
+            'additional_fields': [
+                'domain',
+                'dates',
+                'description'],
             'tab': {
+                'buttons': ['link', 'insert'],
                 'columns': [
                     'name', 'class', 'activity', 'involvement', 'first',
                     'last', 'description']}},

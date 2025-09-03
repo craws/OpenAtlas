@@ -5,11 +5,6 @@ from config.model.classes import actor, event, source
 model: dict[str, Any] = {
     'acquisition': event.acquisition,
     'activity': event.activity,
-    'actor_function': {
-        'attributes': {},
-        'display': {'buttons': ['network']}},
-    'actor_relation': {
-        'attributes': {}},
     'administrative_unit': {
         'attributes': {}},
     'appellation': {
@@ -34,8 +29,6 @@ model: dict[str, Any] = {
     'human_remains': {
         'attributes': {},
         'display': {'buttons': ['network']}},
-    'involvement': {
-        'attributes': {}},
     'modification': event.modification,
     'move': event.move,
     'object_location': {

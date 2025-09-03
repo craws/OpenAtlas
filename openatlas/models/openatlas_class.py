@@ -89,23 +89,24 @@ def get_class_count() -> dict[str, int]:
 def get_classes() -> dict[str, OpenatlasClass]:
     classes = {}
     for row in db.get_classes():
-        model_ = get_model(row['name'])
-        classes[row['name']] = OpenatlasClass(
-            name=row['name'],
-            cidoc_class=row['cidoc_class_code'],
-            standard_type_id=row['standard_type_id'],
-            alias_allowed=row['alias_allowed'],
-            reference_system_allowed=row['reference_system_allowed'],
-            reference_system_ids=row['system_ids']
-            if row['system_ids'] else [],
-            new_types_allowed=row['new_types_allowed'],
-            write_access=row['write_access_group_name'],
-            color=row['layout_color'],
-            hierarchies=row['hierarchies'],
-            icon=row['layout_icon'],
-            attributes=model_['attributes'],
-            relations=model_['relations'],
-            display=model_['display'])
+        if row['name'] in model:  # Todo: remove condition after new classes
+            model_ = get_model(row['name'])
+            classes[row['name']] = OpenatlasClass(
+                name=row['name'],
+                cidoc_class=row['cidoc_class_code'],
+                standard_type_id=row['standard_type_id'],
+                alias_allowed=row['alias_allowed'],
+                reference_system_allowed=row['reference_system_allowed'],
+                reference_system_ids=row['system_ids']
+                if row['system_ids'] else [],
+                new_types_allowed=row['new_types_allowed'],
+                write_access=row['write_access_group_name'],
+                color=row['layout_color'],
+                hierarchies=row['hierarchies'],
+                icon=row['layout_icon'],
+                attributes=model_['attributes'],
+                relations=model_['relations'],
+                display=model_['display'])
     return classes
 
 

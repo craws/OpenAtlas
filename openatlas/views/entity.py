@@ -39,10 +39,9 @@ def view(id_: int) -> str | Response:
         entity = g.reference_systems[id_]
     else:
         entity = Entity.get_by_id(id_, types=True, aliases=True)
-        # Todo: fix after new classes
-        # if not entity.class_.group['name']:
-        #    flash(_("This entity can't be viewed directly."), 'error')
-        #    abort(400)
+        if not entity.class_.group['name']:
+            flash(_("This entity can't be viewed directly."), 'error')
+            abort(400)
     display = Display(entity)
     return render_template(
         'tabs.html',

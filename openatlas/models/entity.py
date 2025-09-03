@@ -586,7 +586,11 @@ class Entity:
 
     @staticmethod
     def get_latest(limit: int) -> list[Entity]:
-        return [Entity(r) for r in db.get_latest(g.classes, limit)]
+        view_classes = []
+        for class_ in g.classes.values():
+            if class_.group:
+                view_classes.append(class_.name)
+        return [Entity(r) for r in db.get_latest(view_classes, limit)]
 
     @staticmethod
     def set_profile_image(id_: int, origin_id: int) -> None:
