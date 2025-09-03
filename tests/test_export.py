@@ -80,7 +80,7 @@ class ImportTest(ImportTestCase):
                     'public': True},
                 follow_redirects=True)
 
-        rv = c.post(
+        c.post(
             url_for('insert', class_='reference_system'),
             data={
                 'name': 'Ring References',
@@ -98,8 +98,6 @@ class ImportTest(ImportTestCase):
                         openatlas_logo = entity
                     case 'File without license':
                         file_without_license = entity
-                    case 'File without file':
-                        file_no_file = entity
                     case 'Picture with a License':
                         file_with_license = entity
                     case 'File not public':
@@ -112,7 +110,7 @@ class ImportTest(ImportTestCase):
                         ext_ref_sys = entity
                     case 'exact match':
                         exact_match = entity
-                    case 'http://viaf.org/viaf/95218067':
+                    case 'https://viaf.org/viaf/95218067':
                         tolkien = entity
 
             openatlas_logo.link('P67', actor)
@@ -131,13 +129,6 @@ class ImportTest(ImportTestCase):
         shutil.copy(openatlas_logo_path, file_with_license_path)
         shutil.copy(logo_path / '422.jpg', file_not_public_path)
 
-
-
-        date_ = current_date_for_filename()
-        collection_name = app.config["ARCHE_METADATA"]["topCollection"]
-
-
-
         rv = c.get(
             url_for('arche_execute'),
             follow_redirects=True)
@@ -146,12 +137,13 @@ class ImportTest(ImportTestCase):
         # Run ARCHE export again with typeIds and without GeoNames
         app.config['ARCHE_METADATA']['typeIds'] = [case_study.id]
         app.config['ARCHE_METADATA']['excludeReferenceSystems'] = ['GeoNames']
-
         rv = c.get(
             url_for('arche_execute'),
             follow_redirects=True)
         assert b'Data was exported' in rv.data
 
+        date_ = current_date_for_filename()
+        collection_name = app.config["ARCHE_METADATA"]["topCollection"]
         filename = f'{date_}_{collection_name.replace(" ", "_")}.zip'
         rv = c.get(url_for('download_export', filename=filename))
         assert b'PK' in rv.data

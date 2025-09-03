@@ -111,6 +111,7 @@ VALUES
   ('P2', (SELECT id FROM model.entity WHERE name='Lord of the rings'), (SELECT id FROM model.entity WHERE name='Shire')),
   ('P2', (SELECT id FROM model.entity WHERE name='Lord of the rings'), (SELECT id FROM model.entity WHERE name='Mordor')),
   ('P2', (SELECT id FROM model.entity WHERE name='Lord of the rings'), (SELECT id FROM model.entity WHERE name='Sam')),
+  ('P2', (SELECT id FROM model.entity WHERE name='Lord of the rings'), (SELECT id FROM model.entity WHERE name='File without license')),
   ('P2', (SELECT id FROM model.entity WHERE name='Lord of the rings'), (SELECT id FROM model.entity WHERE name='Frodo')),
   ('P74', (SELECT id FROM model.entity WHERE name='Location of Shire'), (SELECT id FROM model.entity WHERE name='Frodo')),
   ('OA8', (SELECT id FROM model.entity WHERE name='Location of Shire'), (SELECT id FROM model.entity WHERE name='Frodo')),
@@ -183,7 +184,7 @@ ON CONFLICT (entity_id) DO UPDATE SET image_id=(SELECT id FROM model.entity WHER
 
 INSERT INTO model.file_info (entity_id, public, creator, license_holder)
 VALUES
-    ((SELECT id FROM model.entity WHERE name='File without license'), TRUE, 'Frodo', NULL ),
+    ((SELECT id FROM model.entity WHERE name='File without license'), TRUE, 'http://viaf.org/viaf/95218067', NULL ),
     ((SELECT id FROM model.entity WHERE name='File without file'), TRUE, NULL, 'Sam' ),
     ((SELECT id FROM model.entity WHERE name='Picture with a License'), TRUE, 'http://viaf.org/viaf/95218067', 'Sauron' ),
     ((SELECT id FROM model.entity WHERE name='File not public'), FALSE, 'Sauron', NULL );

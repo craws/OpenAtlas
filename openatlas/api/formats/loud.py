@@ -78,7 +78,7 @@ def get_digital_object_details(
                     _external=True),
                 "type": "Name",
                 "content": license_.name}]}
-        if url := license_url.get(entity.id):
+        if url := license_url.get(license_.id):
             subject_to['classified_as'] = [{
                 "id": url,
                 "type": "Type",

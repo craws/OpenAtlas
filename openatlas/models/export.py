@@ -8,7 +8,7 @@ import tempfile
 import zipfile
 from collections import defaultdict
 from datetime import datetime
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 from typing import Any, Optional
 
 from flask import g, url_for
@@ -269,8 +269,6 @@ def check_files_for_arche(
     entity_ids = set()
     for entity in entities:
         entity_ids.add(entity.id)
-        # Todo: get without license to test
-        print(entity.name)
         if not g.files.get(entity.id):
             missing['No files'].add((entity.id, entity.name))
         if not entity.public:
