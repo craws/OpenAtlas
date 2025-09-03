@@ -202,7 +202,7 @@ class Entity:
     def delete(self) -> None:
         Entity.delete_(self.id)
 
-    def delete_links_by_property_and_class(
+    def delete_links(
             self,
             property_: str,
             classes: list[str],
@@ -213,7 +213,11 @@ class Entity:
             classes,
             inverse)
 
-    def delete_links(self, codes: list[str], inverse: bool = False) -> None:
+    def delete_links_old(
+            self,
+            codes: list[str],
+            inverse: bool = False) -> None:
+        # Todo: remove this function after new classes
         if self.class_.name == 'stratigraphic_unit' \
                 and 'P2' in codes \
                 and not inverse:
@@ -265,7 +269,7 @@ class Entity:
         if not self.location:
             self.location = self.get_linked_entity_safe('P53')
         if not new:
-            self.location.delete_links(['P89'])
+            self.location.delete_links_old(['P89'])
         if units:
             self.location.link('P89', [g.types[id_] for id_ in units])
 
@@ -307,10 +311,10 @@ class Entity:
     def update_links(self, data: dict[str, Any], new: bool) -> Optional[int]:
         if not new:
             if 'delete' in data['links'] and data['links']['delete']:
-                self.delete_links(data['links']['delete'])
+                self.delete_links_old(data['links']['delete'])
             if 'delete_inverse' in data['links'] \
                     and data['links']['delete_inverse']:
-                self.delete_links(data['links']['delete_inverse'], True)
+                self.delete_links_old(data['links']['delete_inverse'], True)
             if 'delete_reference_system' in data['links'] \
                     and data['links']['delete_reference_system']:
                 db.delete_reference_system_links(self.id)

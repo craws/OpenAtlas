@@ -66,10 +66,7 @@ def process_form_data(entity: Entity, form: Any) -> Entity:
 
 
 def process_reference_systems(entity: Entity, form: Any):
-    entity.delete_links_by_property_and_class(
-        'P67',
-        ['reference_system'],
-        inverse=True)
+    entity.delete_links('P67', ['reference_system'], inverse=True)
     for system in g.reference_systems.values():
         if entity.class_.name not in system.classes:
             continue
@@ -128,11 +125,11 @@ def insert_entity(form: Any, data: dict[str, Any]) -> Entity:
 
 def delete_links(entity: Entity) -> None:
     if entity.class_.hierarchies:  # Todo: what about place types?
-        entity.delete_links_by_property_and_class('P2', ['type'])
+        entity.delete_links('P2', ['type'])
     for relation in entity.class_.relations.values():
         if relation['mode'] == 'direct':
             for property_ in relation['properties']:
-                entity.delete_links_by_property_and_class(
+                entity.delete_links(
                     property_,
                     relation['classes'],
                     relation['inverse'])
