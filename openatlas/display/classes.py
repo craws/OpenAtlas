@@ -9,8 +9,7 @@ from openatlas.display.classes_base import (
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, description, edit_link, get_base_table_data, get_file_path, link,
-    remove_link)
+    button, description, edit_link, get_file_path, link, remove_link)
 from openatlas.display.util2 import is_authorized, uc_first
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
@@ -69,21 +68,22 @@ class FileDisplay(BaseDisplay):
         entity.image_id = entity.id if get_file_path(entity.id) else None
         for link_ in entity.get_links('P67'):
             range_ = link_.range
-            data = get_base_table_data(range_)
-            data.append(
-                remove_link(range_.name, link_, entity, range_.class_.view))
-            self.tabs[range_.class_.view].table.rows.append(data)
+            #data = get_base_table_data(range_)
+            #data.append(
+             #   remove_link(range_.name, link_, entity, range_.class_.view))
+            #self.tabs[range_.class_.view].table.rows.append(data)
         for link_ in entity.get_links(['P67', 'P94'], inverse=True):
-            data = get_base_table_data(link_.domain)
-            data.append(link_.description)
-            data.append(edit_link(
-                url_for('link_update', id_=link_.id, origin_id=entity.id)))
-            data.append(remove_link(
-                link_.domain.name,
-                link_,
-                entity,
-                link_.domain.class_.view))
-            self.tabs[link_.domain.class_.view].table.rows.append(data)
+            pass
+            #data = get_base_table_data(link_.domain)
+            #data.append(link_.description)
+            #data.append(edit_link(
+            #    url_for('link_update', id_=link_.id, origin_id=entity.id)))
+            #data.append(remove_link(
+            #    link_.domain.name,
+            #    link_,
+            #    entity,
+            #    link_.domain.class_.view))
+            #self.tabs[link_.domain.class_.view].table.rows.append(data)
 
 
 class EditionDisplay(ReferenceBaseDisplay):

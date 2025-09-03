@@ -86,7 +86,9 @@ def entity_table(
         if relation['additional_fields']:
             columns.append('update')
         columns.append('remove')
-    table = Table(columns)
+    table = Table(
+        columns,
+        order=[[2, 'asc']] if columns[0] == 'checkbox' else None)
     for item in items:
         e = item
         range_ = None
@@ -99,6 +101,13 @@ def entity_table(
             match name:
                 case 'activity':
                     html = item.property.name_inverse
+                case 'checkbox':
+                    html = f"""
+                        <input
+                            id="selection-{e.id}"
+                            name="values"
+                            type="checkbox"
+                            value="{e.id}">"""
                 case 'begin':
                     html = e.dates.first
                     if relation and 'dates' in relation['additional_fields']:

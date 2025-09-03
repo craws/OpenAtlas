@@ -293,26 +293,6 @@ def format_name_and_aliases(entity: Entity, show_links: bool) -> str:
         f'{"".join(f"<p>{alias}</p>" for alias in entity.aliases.values())}'
 
 
-def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
-    data: list[Any] = [format_name_and_aliases(entity, show_links)]
-    if entity.class_.group['name'] in [
-            'actor', 'artifact', 'event', 'place', 'reference']:
-        data.append(entity.class_.label)
-    if entity.class_.standard_type_id:
-        data.append(entity.standard_type.name if entity.standard_type else '')
-    if entity.class_.name == 'file':
-        data.append(_('yes') if entity.public else None)
-        data.append(entity.creator)
-        data.append(entity.license_holder)
-        data.append(entity.get_file_size())
-        data.append(entity.get_file_ext())
-    if entity.class_.group['name'] in ['actor', 'artifact', 'event', 'place']:
-        data.append(entity.dates.first)
-        data.append(entity.dates.last)
-    data.append(entity.description)
-    return data
-
-
 def required_group(group: str) -> Any:
     def wrapper(func: Any) -> Any:
         @wraps(func)

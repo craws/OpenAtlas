@@ -9,7 +9,7 @@ from flask_login import current_user
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.util import (
-    button, edit_link, get_appearance, get_base_table_data,
+    button, edit_link, get_appearance,
     get_chart_data, link, profile_image_table_link, remove_link)
 from openatlas.models.dates import format_entity_date
 from openatlas.display.util2 import is_authorized, uc_first
@@ -39,19 +39,19 @@ class BaseDisplay:
         entity = self.entity
         for link_ in entity.get_links('P67', inverse=True):
             domain = link_.domain
-            data = get_base_table_data(domain)
-            if domain.class_.view == 'file':
-                ext = data[6]
-                data.append(profile_image_table_link(entity, domain, ext))
-                if not entity.image_id and ext in g.display_file_ext:
-                    entity.image_id = domain.id
-            elif domain.class_.view != 'source':
-                data.append(link_.description)
-                data.append(edit_link(
-                    url_for('link_update', id_=link_.id, origin_id=entity.id)))
-            data.append(
-                remove_link(domain.name, link_, entity, domain.class_.view))
-            self.tabs[domain.class_.view].table.rows.append(data)
+            #data = get_base_table_data(domain)
+            #if domain.class_.view == 'file':
+            #    ext = data[6]
+            #    data.append(profile_image_table_link(entity, domain, ext))
+            #    if not entity.image_id and ext in g.display_file_ext:
+            #        entity.image_id = domain.id
+            #elif domain.class_.view != 'source':
+            #    data.append(link_.description)
+            #    data.append(edit_link(
+            #        url_for('link_update', id_=link_.id, origin_id=entity.id)))
+            #data.append(
+            #    remove_link(domain.name, link_, entity, domain.class_.view))
+            #self.tabs[domain.class_.view].table.rows.append(data)
 
 
 class ActorDisplay(BaseDisplay):
@@ -175,43 +175,43 @@ class PlaceBaseDisplay(BaseDisplay):
 
         for link_ in entity.get_links(['P31', 'P67'], inverse=True):
             domain = link_.domain
-            data = get_base_table_data(domain)
-            if domain.class_.view in ['event']:
-                self.tabs[domain.class_.view].table.rows.append(data)
-                continue
-            if domain.class_.view == 'file':
-                ext = data[6]
-                data.append(profile_image_table_link(entity, domain, ext))
-                if not entity.image_id and ext in g.display_file_ext:
-                    entity.image_id = domain.id
-                if entity.class_.view == 'place' \
-                        and is_authorized('editor') \
-                        and current_user.settings['module_map_overlay']:
-                    content = ''
-                    if ext in app.config['DISPLAY_FILE_EXT']:
-                        overlays = Overlay.get_by_object(entity)
-                        if domain.id in overlays and (html_link := edit_link(
-                                url_for(
-                                    'overlay_update',
-                                    place_id=entity.id,
-                                    overlay_id=overlays[domain.id].id))):
-                            content += html_link
-                        else:
-                            content = link(
-                                _('link'),
-                                url_for(
-                                    'overlay_insert',
-                                    image_id=domain.id,
-                                    place_id=entity.id,
-                                    link_id=link_.id))
-                    data.append(content)
-            if domain.class_.view not in ['source', 'file']:
-                data.append(link_.description)
-                data.append(edit_link(
-                    url_for('link_update', id_=link_.id, origin_id=entity.id)))
-            data.append(
-                remove_link(domain.name, link_, entity, domain.class_.view))
-            self.tabs[domain.class_.view].table.rows.append(data)
+            #data = get_base_table_data(domain)
+            # if domain.class_.view in ['event']:
+            #     self.tabs[domain.class_.view].table.rows.append(data)
+            #     continue
+            # if domain.class_.view == 'file':
+            #     ext = data[6]
+            #     data.append(profile_image_table_link(entity, domain, ext))
+            #     if not entity.image_id and ext in g.display_file_ext:
+            #         entity.image_id = domain.id
+            #     if entity.class_.view == 'place' \
+            #             and is_authorized('editor') \
+            #             and current_user.settings['module_map_overlay']:
+            #         content = ''
+            #         if ext in app.config['DISPLAY_FILE_EXT']:
+            #             overlays = Overlay.get_by_object(entity)
+            #             if domain.id in overlays and (html_link := edit_link(
+            #                     url_for(
+            #                         'overlay_update',
+            #                         place_id=entity.id,
+            #                         overlay_id=overlays[domain.id].id))):
+            #                 content += html_link
+            #             else:
+            #                 content = link(
+            #                     _('link'),
+            #                     url_for(
+            #                         'overlay_insert',
+            #                         image_id=domain.id,
+            #                         place_id=entity.id,
+            #                         link_id=link_.id))
+            #         data.append(content)
+            # if domain.class_.view not in ['source', 'file']:
+            #     data.append(link_.description)
+            #     data.append(edit_link(
+            #         url_for('link_update', id_=link_.id, origin_id=entity.id)))
+            # data.append(
+            #     remove_link(domain.name, link_, entity, domain.class_.view))
+            # self.tabs[domain.class_.view].table.rows.append(data)
 
         entity.location = entity.get_linked_entity_safe('P53', types=True)
         event_ids = []  # Keep track of event ids to prevent event doubles
@@ -224,15 +224,15 @@ class PlaceBaseDisplay(BaseDisplay):
                     inverse=True):
             if event.id not in event_ids:
                 self.events.append(event)
-                self.tabs['event'].table.rows.append(
-                    get_base_table_data(event))
+                #self.tabs['event'].table.rows.append(
+                #    get_base_table_data(event))
                 event_ids.append(event.id)
         self.structure = entity.get_structure()
         if self.structure:
             for item in self.structure['subunits']:
                 name = 'artifact' if item.class_.view == 'artifact' \
                     else item.class_.name
-                self.tabs[name].table.rows.append(get_base_table_data(item))
+                #self.tabs[name].table.rows.append(get_base_table_data(item))
         self.gis_data = Gis.get_all([entity], self.structure)
         if self.gis_data['gisPointSelected'] == '[]' \
                 and self.gis_data['gisPolygonSelected'] == '[]' \
@@ -250,21 +250,21 @@ class ReferenceBaseDisplay(BaseDisplay):
             self.tabs[name] = Tab(name, entity=self.entity)
         for link_ in self.entity.get_links('P67'):
             range_ = link_.range
-            data = get_base_table_data(range_)
-            data.append(link_.description)
-            data.append(
-                edit_link(
-                    url_for(
-                        'link_update',
-                        id_=link_.id,
-                        origin_id=self.entity.id)))
-            data.append(
-                remove_link(
-                    range_.name,
-                    link_,
-                    self.entity,
-                    range_.class_.view))
-            self.tabs[range_.class_.view].table.rows.append(data)
+            # data = get_base_table_data(range_)
+            # data.append(link_.description)
+            # data.append(
+            #     edit_link(
+            #         url_for(
+            #             'link_update',
+            #             id_=link_.id,
+            #             origin_id=self.entity.id)))
+            # data.append(
+            #     remove_link(
+            #         range_.name,
+            #         link_,
+            #         self.entity,
+            #         range_.class_.view))
+            # self.tabs[range_.class_.view].table.rows.append(data)
 
 
 class TypeBaseDisplay(BaseDisplay):

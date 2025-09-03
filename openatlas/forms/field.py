@@ -15,7 +15,6 @@ from wtforms.widgets import FileInput, HiddenInput, Input, TextInput
 
 from openatlas import app
 from openatlas.display.table import Table, entity_table
-from openatlas.display.util import get_base_table_data
 from openatlas.display.util2 import is_authorized
 from openatlas.forms.util import convert
 from openatlas.models.entity import Entity
@@ -180,18 +179,21 @@ class TableMultiField(HiddenField):
 
 def table_multi(entities: list[Entity], selection: list[Entity]) -> Table:
     selection_ids = [e.id for e in selection] if selection else []
-    table_ = Table(
-        [''] + entities[0].class_.group['table_columns'] if entities else [],
-        order=[[0, 'desc'], [1, 'asc']],
-        defs=[{'orderDataType': 'dom-checkbox', 'targets': 0}])
-    for e in entities:
-        row = get_base_table_data(e, show_links=False)
-        row.insert(
-            0,
-            f'<input type="checkbox" value="{e.name}" id="{e.id}" '
-            f'{" checked" if e.id in selection_ids else ""}>')
-        table_.rows.append(row)
-    return table_
+    print(entities[0].class_.group['table_columns'])
+    table = entity_table(
+        entities,
+        [''] + entities[0].class_.group['table_columns'] if entities else [])
+    #table_ = Table(
+    #    order=[[0, 'desc'], [1, 'asc']],
+    #    defs=[{'orderDataType': 'dom-checkbox', 'targets': 0}])
+    #for e in entities:
+    #    row = get_base_table_data(e, show_links=False)
+    #    row.insert(
+     #       0,
+    #        f'<input type="checkbox" value="{e.name}" id="{e.id}" '
+    #        f'{" checked" if e.id in selection_ids else ""}>')
+    #    table_.rows.append(row)
+    return table
 
 
 class ValueFloatField(FloatField):

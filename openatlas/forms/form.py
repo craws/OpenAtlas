@@ -11,8 +11,7 @@ from wtforms.fields.simple import TextAreaField
 from wtforms.validators import InputRequired, URL
 
 from openatlas import app
-from openatlas.display.table import Table
-from openatlas.display.util import get_base_table_data
+from openatlas.display.table import Table, entity_table
 from openatlas.display.util2 import show_table_icons, uc_first
 from openatlas.forms import manager, manager_base
 from openatlas.forms.add_fields import add_date_fields, add_type
@@ -136,27 +135,18 @@ def link_update_form(link_: Link, relation: dict[str, Any]) -> Any:
 
 
 def table_form(classes: list[str], excluded: list[int]) -> str:
-    entities = Entity.get_by_class(classes, types=True, aliases=True)
-    table = Table(
-        [''] + entities[0].class_.group['table_columns'] if entities else [],
-        order=[[2, 'asc']])
-    if classes[0] == 'file' and show_table_icons():
-        table.columns.insert(1, _('icon'))
-    for entity in entities:
+    entities = []
+    for entity in Entity.get_by_class(classes, types=True, aliases=True):
         if entity.id not in excluded:
-            input_ = f"""
-                <input
-                    id="selection-{entity.id}"
-                    name="values"
-                    type="checkbox"
-                    value="{entity.id}">"""
-            rows = [input_]
-            if classes[0] == 'file' and show_table_icons():
-                rows.append(file_preview(entity.id))
-            rows.extend(get_base_table_data(entity, show_links=False))
-            table.rows.append(rows)
-    if not table.rows:
+            entities.append(entity)
+    if not entities:
         return '<p class="uc-first">' + _('no entries') + '</p>'
+    table = entity_table(
+        entities,
+        columns=['checkbox'] + entities[0].class_.group['table_columns']
+        if entities else [])
+    # if classes[0] == 'file' and show_table_icons():
+    #    table.columns.insert(1, _('icon'))
     return render_template(
         'forms/form_table.html',
         table=table.display(classes[0]))
