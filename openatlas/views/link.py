@@ -104,8 +104,9 @@ def link_update(id_: int, origin_id: int, relation: str) -> str | Response:
     target = range_ if origin_id == domain.id else domain
     relation = origin.class_.relations[relation]
     form = link_update_form(link_, relation)
-    origin_url = url_for('view', id_=origin.id) + \
-        f"#tab-{relation['name'].replace('_', '-')}"
+    origin_url = (
+        f"{url_for('view', id_=origin.id)}#tab-" +
+        relation['name'].replace('_', '-'))
     if form.validate_on_submit():
         data = {
             'description': form.description.data

@@ -157,11 +157,7 @@ def entity_table(
                     tab_id = e.class_.group['name']
                     if relation and relation['mode'] == 'tab':
                         tab_id = relation['name']
-                    html = remove_link(
-                        e.name,
-                        item,
-                        entity_viewed,
-                        tab_id.replace('_', '-'))
+                    html = remove_link(e.name, item, entity_viewed, tab_id)
                 # case 'related':
                 #    relative = e.get_linked_entity_safe('has relation', True)
                 #    if entity and relative.id == entity.id:

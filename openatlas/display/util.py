@@ -42,7 +42,7 @@ def remove_link(
     url = url_for('link_delete', id_=link_.id, origin_id=origin.id)
     return link(
         _('remove'),
-        f'{url}#tab-{tab}' if tab else url,
+        f"{url}#tab-{tab.replace('_', '-')}" if tab else url,
         js=f"return confirm('{confirm}')")
 
 
