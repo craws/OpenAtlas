@@ -32,6 +32,7 @@ LANGUAGES = {
 FILES_PATH = Path(__file__).parent.parent / 'files'
 EXPORT_PATH = Path(FILES_PATH) / 'export'
 ARCHE_PATH = Path(EXPORT_PATH) / 'arche'
+RDF_PATH = Path(EXPORT_PATH) / 'rdf'
 UPLOAD_PATH = Path(FILES_PATH) / 'uploads'
 TMP_PATH = Path('/tmp')  # For processing files e.g. at import and export
 

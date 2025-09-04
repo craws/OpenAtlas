@@ -21,9 +21,14 @@ then run the database upgrade script, then restart Apache:
 No database update is required but an additional Python package is needed:
 
 #### Additional package
-The unidecode package is used to transliterate URLs to ASCII.
+The unidecode package is used to transliterate URLs to ASCII. 
+The lxml package is used for faster and better xml creation.
 
-    sudo apt install python3-unidecode
+    sudo apt install python3-unidecode python3-lxml
+
+To keep the installed packages clean, python3-dicttoxml can be removed:
+
+    sudo apt remove python3-dicttoxml 
 
 ### 8.13.0 to 8.14.0
 A code base update (e.g. with git pull) and a webserver restart is sufficient.

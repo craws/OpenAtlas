@@ -392,3 +392,7 @@ def open_tmp_sql_file() -> str:
                     'SYSTEMROOT'] if 'SYSTEMROOT' in os.environ else ''},
             check=True)
         return tmp_sql.name
+
+
+def rdf_export(format_: str) -> Response:
+    pass

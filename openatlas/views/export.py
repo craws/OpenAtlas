@@ -10,7 +10,7 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import button, display_info, link, required_group
 from openatlas.display.util2 import convert_size, is_authorized, manual
-from openatlas.models.export import arche_export, sql_export
+from openatlas.models.export import arche_export, rdf_export, sql_export
 
 
 @app.route('/download/export/<filename>')
@@ -37,6 +37,8 @@ def delete_export(view: str, filename: str) -> Response:
     path = app.config['EXPORT_PATH']
     if view == 'export_arche':
         path = app.config['ARCHE_PATH']
+    if view == 'export_rdf':
+        path = app.config['RDF_PATH']
     try:
         (path / filename).unlink()
         g.logger.log('info', 'file', 'SQL file deleted')
@@ -188,5 +190,69 @@ def arche_execute() -> Response:
             flash(_('data was exported'), 'info')
         else:  # pragma: no cover
             g.logger.log('error', 'database', 'ARCHE export failed')
+            flash(_('export failed'), 'error')
+    return redirect(url_for('export_arche', _anchor='tab-export'))
+
+
+@app.route('/export/rdf')
+@required_group('manager')
+def export_rdf() -> str:
+    path = app.config['RDF_PATH']
+    table = Table(['name', 'size'], order=[[0, 'desc']])
+    for file in path.iterdir():
+        if (not file.is_file()
+                or file.name == '.gitignore'
+                or 'export' in file.name):
+            continue
+        data = [
+            file.name,
+            convert_size(file.stat().st_size),
+            link(
+                _('download'),
+                url_for('download_rdf_export', filename=file.name))]
+        if is_authorized('admin') and os.access(path, os.W_OK):
+            confirm = _('Delete %(name)s?', name=file.name.replace("'", ''))
+            data.append(
+                link(
+                    _('delete'),
+                    url_for(
+                        'delete_export',
+                        view='export_rdf',
+                        filename=file.name),
+                    js=f"return confirm('{confirm}')"))
+        table.rows.append(data)
+
+    return render_template(
+        'tabs.html',
+        tabs={
+            'export': Tab(
+                'export',
+                _('export'),
+                content=table.display(),
+                buttons=[
+                    manual('admin/export'),
+                    button(
+                        _('export') + ' turtle',
+                        url_for('rdf_execute', format_='turtle'))
+                ])},
+        title=_('export') + ' RDF',
+        crumbs=[
+            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            _('export') + ' RDF'])
+
+
+@app.route('/export/rdf/execute/<format_>')
+@required_group('admin')
+def rdf_execute(format_: str) -> Response:
+    if format_ not in app.config['RDF_FORMATS']:
+        g.logger.log('error', 'export', 'Wrong RDF format for export')
+        flash(_('export failed'), 'error')
+        return redirect(url_for('export_arche', _anchor='tab-export'))
+    if os.access(app.config['RDF_PATH'], os.W_OK):
+        if rdf_export(format_):
+            g.logger.log('info', 'database', 'RDF export')
+            flash(_('data was exported'), 'info')
+        else:  # pragma: no cover
+            g.logger.log('error', 'database', 'RDF export failed')
             flash(_('export failed'), 'error')
     return redirect(url_for('export_arche', _anchor='tab-export'))

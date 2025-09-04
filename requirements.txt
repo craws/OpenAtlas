@@ -1,6 +1,5 @@
 bcrypt~=3.2.2
 beautifulsoup4~=4.11.2
-dicttoxml==1.7.15
 email-validator==1.3.0
 flasgger==0.9.5
 flask-babel==2.0.0
@@ -38,3 +37,6 @@ validators~=0.20.0
 # pytes-cov==4.0.0
 
 
+
+lxml~=4.9.2
+PyYAML~=6.0
