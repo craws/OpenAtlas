@@ -124,13 +124,16 @@ def get_loud_entities(
                 link_url = f"{system.resolver_url or ''}{link_.description}"
                 property_[f"skos:{match_case}"] = link_url
         if code_ == 'OA7':
-            property_ = [{
+            relationship = {
                 'type': 'Event',
                 '_label':
                     f'Relationship between '
                     f'{link_.domain.name} and {link_.range.name}',
-                'classified_as': [get_type_property(g.types[link_.type.id])],
-                'had_participant': [property_]}]
+                'had_participant': [property_]}
+            if link_.type:
+                relationship['classified_as']= [
+                    get_type_property(g.types[link_.type.id])]
+            property_ = [relationship]
         if code_ in ['OA8', 'OA9']:
             property_ = {
                 'type': 'BeginningOfExistence'
@@ -193,13 +196,16 @@ def get_loud_entities(
                                 link_.domain.name,
                             "type": "DigitalObject"}]}]}
         if code_ == 'OA7':
-            property_ = [{
+            relationship = {
                 'type': 'Event',
                 '_label':
                     f'Relationship between '
                     f'{link_.range.name} and {link_.domain.name}',
-                'classified_as': [get_type_property(g.types[link_.type.id])],
-                'had_participant': [property_]}]
+                'had_participant': [property_]}
+            if link_.type:
+                relationship['classified_as']= [
+                    get_type_property(g.types[link_.type.id])]
+            property_ = [relationship]
         if code_ in ['OA8', 'OA9']:
             property_ = {
                 'type': 'BeginningOfExistence'
