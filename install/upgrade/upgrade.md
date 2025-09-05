@@ -30,6 +30,10 @@ To keep the installed packages clean, python3-dicttoxml can be removed:
 
     sudo apt remove python3-dicttoxml 
 
+To move already exported SQL files to the new directory please run:
+
+    mv /var/www/openatlas/files/export/*7z /var/www/openatlas/files/export/sql/
+
 ### 8.13.0 to 8.14.0
 A code base update (e.g. with git pull) and a webserver restart is sufficient.
 
