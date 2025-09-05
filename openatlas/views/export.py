@@ -195,7 +195,6 @@ def rdf_execute(format_: str) -> Response:
 def build_export_table(view: str) -> Table:
     path = get_export_path(view)
     table = Table(['name', 'size'], order=[[0, 'desc']])
-    print(path)
     for file in path.iterdir():
         if not file.is_file() or file.name == '.gitignore':
             continue

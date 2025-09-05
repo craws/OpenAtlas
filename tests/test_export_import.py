@@ -46,6 +46,7 @@ class ImportTest(ImportTestCase):
         with c.get(
                 url_for(
                     'download_export',
+                    view='sql',
                     filename=f'{date_}_export.sql.7z')) as rv:
             assert b'7z' in rv.data
 
@@ -58,6 +59,7 @@ class ImportTest(ImportTestCase):
         with c.get(
                 url_for(
                     'download_export',
+                    view='sql',
                     filename=f'{date_}_export.dump.7z')) as rv:
             assert b'7z' in rv.data
 
@@ -343,7 +345,7 @@ class ImportTest(ImportTestCase):
         rv = c.get(
             url_for(
                 'delete_export',
-                view='export_sql',
+                view='sql',
                 filename=f'{date_}_export.sql.7z'),
             follow_redirects=True)
         if os.name == 'posix':
@@ -352,7 +354,7 @@ class ImportTest(ImportTestCase):
         rv = c.get(
             url_for(
                 'delete_export',
-                view='export_sql',
+                view='sql',
                 filename=f'{date_}_export.dump.7z'),
             follow_redirects=True)
         if os.name == 'posix':
@@ -361,7 +363,7 @@ class ImportTest(ImportTestCase):
         rv = c.get(
             url_for(
                 'delete_export',
-                view='export_sql',
+                view='sql',
                 filename='non_existing'),
             follow_redirects=True)
         assert b'An error occurred when trying to delete the f' in rv.data

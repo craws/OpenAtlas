@@ -3,7 +3,7 @@
   {% if file_data.file %}
     <div class="toolbar">
       {{ _('latest backup')|uc_first }}: {{ file_data.file }}, {{ file_data.size }}
-      {{ _('download')|button(url_for('download_export', filename=file_data.file))|safe }}
+      {{ _('download')|button(url_for('download_export', view='sql', filename=file_data.file))|safe }}
     </div>
   {% endif %}
   {% if file_data.backup_too_old %}

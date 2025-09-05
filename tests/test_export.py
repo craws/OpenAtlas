@@ -26,6 +26,7 @@ class ImportTest(ImportTestCase):
         with c.get(
                 url_for(
                     'download_export',
+                    view='sql',
                     filename=f'{date_}_export.sql.7z')) as rv:
             assert b'7z' in rv.data
 
@@ -37,13 +38,14 @@ class ImportTest(ImportTestCase):
         with c.get(
                 url_for(
                     'download_export',
+                    view='sql',
                     filename=f'{date_}_export.dump.7z')) as rv:
             assert b'7z' in rv.data
 
         rv = c.get(
             url_for(
                 'delete_export',
-                view='export_sql',
+                view='sql',
                 filename=f'{date_}_export.sql.7z'),
             follow_redirects=True)
         if os.name == 'posix':
@@ -52,17 +54,14 @@ class ImportTest(ImportTestCase):
         rv = c.get(
             url_for(
                 'delete_export',
-                view='export_sql',
+                view='sql',
                 filename=f'{date_}_export.dump.7z'),
             follow_redirects=True)
         if os.name == 'posix':
             assert b'File deleted' in rv.data
 
         rv = c.get(
-            url_for(
-                'delete_export',
-                view='export_sql',
-                filename='non_existing'),
+            url_for('delete_export',view='sql',filename='non_existing'),
             follow_redirects=True)
         assert b'An error occurred when trying to delete the f' in rv.data
 
@@ -145,13 +144,13 @@ class ImportTest(ImportTestCase):
         date_ = current_date_for_filename()
         collection_name = app.config["ARCHE_METADATA"]["topCollection"]
         filename = f'{date_}_{collection_name.replace(" ", "_")}.zip'
-        rv = c.get(url_for('download_arche_export', filename=filename))
+        rv = c.get(url_for('download_export', view='arche', filename=filename))
         assert b'PK' in rv.data
 
         rv = c.get(
             url_for(
                 'delete_export',
-                view='export_arche',
+                view='arche',
                 filename=filename),
             follow_redirects=True)
         if os.name == 'posix':
