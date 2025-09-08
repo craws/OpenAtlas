@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any, Optional
 
 from flask import g, json, render_template, url_for
@@ -5,8 +7,7 @@ from flask_babel import lazy_gettext as _
 from flask_login import current_user
 
 from openatlas.display.util import (
-    edit_link, format_name_and_aliases, link, profile_image_table_link,
-    remove_link)
+    edit_link, link, profile_image_table_link, remove_link)
 from openatlas.display.util2 import uc_first
 from openatlas.models.entity import Entity, Link
 
@@ -68,7 +69,8 @@ def entity_table(
         columns: Optional[list[str]] = None,
         additional_columns: Optional[list[str]] = None,
         relation: Optional[dict[Any, str]] = None,
-        table_id: Optional[str] = None) -> Table | None:
+        table_id: Optional[str] = None,
+        forms: Optional[dict[str, Any]] = None) -> Table | None:
     if not items:
         return None
     inverse = relation and relation['inverse']
@@ -86,9 +88,12 @@ def entity_table(
         if relation['additional_fields']:
             columns.append('update')
         columns.append('remove')
+
     table = Table(
         columns,
-        order=[[2, 'asc']] if columns[0] == 'checkbox' else None)
+        order=[[0, "desc"], [1, "asc"]] if columns[0] == 'checkbox' else None,
+        defs=[{"orderDataType": "dom-checkbox", "targets": 0}]
+        if columns[0] == 'checkbox' else None)
     for item in items:
         e = item
         range_ = None
@@ -104,10 +109,12 @@ def entity_table(
                 case 'checkbox':
                     html = f"""
                         <input
-                            id="selection-{e.id}"
+                            id="{e.id}"
                             name="values"
                             type="checkbox"
-                            value="{e.id}">"""
+                            value="{e.name}" {
+                            "checked" if e.id in forms.get('selection_ids', [])
+                            else ""}>"""
                 case 'begin':
                     html = e.dates.first
                     if relation and 'dates' in relation['additional_fields']:
@@ -150,8 +157,7 @@ def entity_table(
                 #        e,
                 #        g.classes[class_].relations[name])
                 case 'name':
-                    html = format_name_and_aliases_for_form(e, table_id) \
-                        if table_id else format_name_and_aliases(e, True)
+                    html = format_name_and_aliases(e, table_id, forms)
                 case 'profile' if e and e.image_id:
                     html = 'Profile' if e.id == entity_viewed.image_id \
                         else link(
@@ -192,13 +198,25 @@ def entity_table(
     return table
 
 
-def format_name_and_aliases_for_form(entity: Entity, field_id: str) -> str:
-    link_ = \
-        f"""<a value="{entity.name}"  href='#' onclick="selectFromTable(this,
-        '{field_id}', {entity.id})">{entity.name}</a>"""
-    if entity.aliases:
+def format_name_and_aliases(
+        entity: Entity,
+        table_id: str,
+        forms: dict[str, Any]) -> str:
+    if forms and forms.get('mode') == 'single':
+        link_ = f"""
+            <a value="{entity.name}"
+                href='#'
+                onclick="selectFromTable(this,'{table_id}', {entity.id})"
+                    >{entity.name}</a>"""
+        if not entity.aliases:
+            return link_
         html = f'<p>{link_}</p>'
         for i, alias in enumerate(entity.aliases.values()):
             html += alias if i else f'<p>{alias}</p>'
         return html
-    return link_
+    name = entity.name if forms else link(entity)
+    if not entity.aliases or not current_user.settings['table_show_aliases']:
+        return name
+    return \
+        f'{name}' \
+        f'{"".join(f"<p>{alias}</p>" for alias in entity.aliases.values())}'

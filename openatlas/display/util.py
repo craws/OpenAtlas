@@ -284,15 +284,6 @@ def get_js_messages(lang: str) -> str:
     return f'<script src="/{js_message_file}"></script>'
 
 
-def format_name_and_aliases(entity: Entity, show_links: bool) -> str:
-    name = link(entity) if show_links else entity.name
-    if not entity.aliases or not current_user.settings['table_show_aliases']:
-        return name
-    return \
-        f'{name}' \
-        f'{"".join(f"<p>{alias}</p>" for alias in entity.aliases.values())}'
-
-
 def required_group(group: str) -> Any:
     def wrapper(func: Any) -> Any:
         @wraps(func)

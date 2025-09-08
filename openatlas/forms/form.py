@@ -144,7 +144,8 @@ def table_form(classes: list[str], excluded: list[int]) -> str:
     table = entity_table(
         entities,
         columns=['checkbox'] + entities[0].class_.group['table_columns']
-        if entities else [])
+        if entities else [],
+        forms={'excluded': excluded})
     # if classes[0] == 'file' and show_table_icons():
     #    table.columns.insert(1, _('icon'))
     return render_template(
