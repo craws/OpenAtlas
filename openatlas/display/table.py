@@ -112,7 +112,7 @@ def entity_table(
                             id="{e.id}"
                             name="values"
                             type="checkbox"
-                            value="{e.name}" {
+                            value="{e.id}" {
                             "checked" if e.id in forms.get('selection_ids', [])
                             else ""}>"""
                 case 'begin':
