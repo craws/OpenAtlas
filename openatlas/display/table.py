@@ -186,6 +186,8 @@ def entity_table(
                     html = e.get_file_size()
                 case 'type' | 'license':
                     html = link(e.standard_type)
+                    if forms:
+                        html = e.standard_type.name if e.standard_type else ''
                 case 'update':
                     html = edit_link(
                         url_for(
