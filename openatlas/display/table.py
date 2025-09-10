@@ -43,7 +43,7 @@ class Table:
             'columns': [{
                 'title':
                     uc_first(_(name)) if name and name
-                    not in ['update', 'remove'] else '',
+                    not in ['checkbox', 'remove', 'update'] else '',
                 'className':
                     'dt-body-right' if name in ['count', 'size'] else ''}
                     for name in self.columns] + [
@@ -89,11 +89,13 @@ def entity_table(
             columns.append('update')
         columns.append('remove')
 
-    table = Table(
-        columns,
-        order=[[0, "desc"], [1, "asc"]] if columns[0] == 'checkbox' else None,
-        defs=[{"orderDataType": "dom-checkbox", "targets": 0}]
-        if columns[0] == 'checkbox' else None)
+    order = None
+    defs = None
+    if columns[0] == 'checkbox':
+        order = [[0, "desc"], [1, "asc"]]
+        defs = [{"orderDataType": "dom-checkbox", "targets": 0}]
+    table = Table(columns, order=order, defs=defs)
+
     for item in items:
         e = item
         range_ = None
@@ -102,7 +104,7 @@ def entity_table(
             range_ = item.range if inverse else item.domain
         data = []
         for name in columns:
-            html: str | list[str] = 'no table function'
+            html = 'no table function'
             match name:
                 case 'activity':
                     html = item.property.name_inverse
@@ -113,8 +115,8 @@ def entity_table(
                             name="values"
                             type="checkbox"
                             data-entity-name="{sanitize(e.name)}"
-                            value="{e.id}" {"checked" if e.id in
-                                            forms.get('selection_ids', [])
+                            value="{e.id}" {
+                            "checked" if e.id in forms.get('selection_ids', [])
                             else ""}>"""
                 case 'begin':
                     html = e.dates.first

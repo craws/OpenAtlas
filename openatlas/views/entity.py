@@ -90,9 +90,9 @@ def insert(
         form=form,
         class_name=class_,
         view_name=g.classes[class_].group['name'],
-        #gis_data=manager.place_info['gis_data'],
+        # gis_data=manager.place_info['gis_data'],
         writable=os.access(app.config['UPLOAD_PATH'], os.W_OK),
-        #overlays=manager.place_info['overlays'],
+        # overlays=manager.place_info['overlays'],
         title=_(g.classes[class_].group['name']),
         crumbs=form_crumbs(entity, origin))
 
@@ -171,7 +171,7 @@ def delete(id_: int) -> Response:
 
 def form_crumbs(entity: Entity, origin: Optional[Entity] = None) -> list[Any]:
     label = origin.class_.name if origin else entity.class_.group['name']
-    #if label in g.class_view_mapping:
+    # if label in g.class_view_mapping:
     #    label = g.class_view_mapping[label]
     crumbs: list[Any] = [[
         _(label.replace('_', ' ')),
