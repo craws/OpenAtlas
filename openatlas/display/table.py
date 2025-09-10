@@ -113,8 +113,8 @@ def entity_table(
                             name="values"
                             type="checkbox"
                             data-entity-name="{sanitize(e.name)}"
-                            value="{e.id}" {
-                            "checked" if e.id in forms.get('selection_ids', [])
+                            value="{e.id}" {"checked" if e.id in
+                                            forms.get('selection_ids', [])
                             else ""}>"""
                 case 'begin':
                     html = e.dates.first
