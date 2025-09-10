@@ -245,10 +245,11 @@ class Endpoint:
             case _ if self.parser.format \
                       in app.config['RDF_FORMATS']:  # pragma: no cover
                 license_links = get_license_ids_with_links()
+                parsed_context = parse_loud_context()
                 entities = [
                     get_loud_entities(
                         item,
-                        parse_loud_context(),
+                        parsed_context,
                         license_links)
                     for item in self.entities_with_links.values()]
         self.formated_entities = entities
