@@ -8,7 +8,7 @@ from flask_login import current_user
 
 from openatlas.display.util import (
     edit_link, link, profile_image_table_link, remove_link)
-from openatlas.display.util2 import uc_first
+from openatlas.display.util2 import sanitize, uc_first
 from openatlas.models.entity import Entity, Link
 
 # Needed for translations
@@ -112,6 +112,7 @@ def entity_table(
                             id="{e.id}"
                             name="values"
                             type="checkbox"
+                            data-entity-name="{sanitize(e.name)}"
                             value="{e.id}" {
                             "checked" if e.id in forms.get('selection_ids', [])
                             else ""}>"""

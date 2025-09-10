@@ -380,7 +380,7 @@ function selectFromTableMulti(name) {
   $('#' + name + '_table').DataTable().rows().nodes().to$().find('input[type="checkbox"]').each(
     function () {
       if ($(this).is(':checked')) {
-        checkedNames.push({name:$(this).val(),id:$(this).attr('id')});
+        checkedNames.push({name:$(this).attr("data-entity-name"),id:$(this).attr('id')});
         ids.push($(this).attr('id'));
       }
     });
