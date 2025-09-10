@@ -157,12 +157,12 @@ class TableMultiSelect(HiddenInput):
         if field.selection:
             field.data = str([e.id for e in field.selection])
             field.data_list = sorted([e.name for e in field.selection])
-            field.table = entity_table(
-                field.entities,
-                columns=['checkbox'] +
-                field.entities[0].class_.group['table_columns']
-                if field.entities else [],
-                forms={'selection_ids': [e.id for e in field.selection]})
+        field.table = entity_table(
+            field.entities,
+            columns=['checkbox'] +
+            field.entities[0].class_.group['table_columns']
+            if field.entities else [],
+            forms={'selection_ids': [e.id for e in field.selection]})
         return super().__call__(field, **kwargs) + Markup(
             render_template('forms/table_multi_select.html', field=field))
 

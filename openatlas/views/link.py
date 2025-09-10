@@ -1,4 +1,5 @@
 import ast
+from typing import Optional
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -60,11 +61,17 @@ def link_insert(origin_id: int, relation_name: str) -> str | Response:
 @app.route(
     '/link/insert_detail/<int:origin_id>/<relation_name>',
     methods=['GET', 'POST'])
+@app.route(
+    '/link/insert_detail/<int:origin_id>/<relation_name>/<selection_id>',
+    methods=['GET', 'POST'])
 @required_group('contributor')
-def link_insert_detail(origin_id: int, relation_name: str) -> str | Response:
+def link_insert_detail(
+        origin_id: int,
+        relation_name: str,
+        selection_id: Optional[int] = None) -> str | Response:
     origin = Entity.get_by_id(origin_id)
     relation = origin.class_.relations[relation_name]
-    form = link_form(origin, relation)
+    form = link_form(origin, relation, selection_id)
     if form.validate_on_submit():
         ids = ast.literal_eval(getattr(form, relation_name).data)
         ids = ids if isinstance(ids, list) else [int(ids)]

@@ -297,7 +297,20 @@ def get_redirect_url(
         relation_name: str | None) -> str:
     url = url_for('view', id_=entity.id)
     if origin and relation_name:
-        url = url_for('view', id_=origin.id) + f"#tab-{relation_name}"
+        relation = origin.class_.relations[relation_name]
+        if relation['additional_fields']:
+            url = url_for(
+                'link_insert_detail',
+                origin_id=origin.id,
+                relation_name=relation_name,
+                selection_id=entity.id)
+        else:
+            origin.link(
+                relation['properties'][0],
+                entity,
+                inverse=relation['inverse'])
+            url = url_for('view', id_=origin.id) + f"#tab-{relation_name}"
+
     if hasattr(form, 'continue_') and form.continue_.data == 'yes':
         url = request.url
     # if manager.continue_link_id and manager.origin:

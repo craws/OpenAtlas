@@ -77,10 +77,15 @@ def add_additional_link_fields(form: Any, relation: dict[str, Any]) -> None:
                 add_type(form, Entity.get_hierarchy(item))
 
 
-def link_form(origin: Entity, relation: dict[str, Any]) -> Any:
+def link_form(
+        origin: Entity,
+        relation: dict[str, Any],
+        selection_id: Optional[int] = None) -> Any:
     class Form(FlaskForm):
         pass
 
+    selection = Entity.get_by_id(selection_id) if selection_id else None
+    validators = [InputRequired()]
     if 'domain' in relation['additional_fields']:
         entities = Entity.get_by_class(
             origin.class_.name,
@@ -89,22 +94,19 @@ def link_form(origin: Entity, relation: dict[str, Any]) -> Any:
         setattr(
             Form,
             'domain',
-            TableField(
-                entities,
-                selection=origin,
-                validators=[InputRequired()]))
+            TableField(entities, selection=origin, validators=validators))
     if 'type' in relation:
         add_type(Form, Entity.get_hierarchy(relation['type']))
     entities = Entity.get_by_class(
         relation['classes'],
         types=True,
         aliases=current_user.settings['table_show_aliases'])
-    setattr(
-        Form,
-        relation['name'],
-        TableMultiField(entities, validators=[InputRequired()])
-        if relation['multiple'] else
-        TableField(entities, validators=[InputRequired()]))
+    table = TableMultiField(
+        entities,
+        selection=[selection] if selection else None,
+        validators=validators) if relation['multiple'] else \
+        TableField(entities, selection=selection, validators=validators)
+    setattr(Form, relation['name'], table)
     add_additional_link_fields(Form, relation)
     setattr(Form, 'save', SubmitField(_('insert')))
     return Form()
