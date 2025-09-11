@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import ast
 import itertools
+import os
 from typing import Any, Optional
 
 import numpy
@@ -23,7 +24,9 @@ from openatlas.api.resources.util import (
     get_location_link, get_value_for_types,
     replace_empty_list_values_in_dict_with_none)
 from openatlas.models.entity import Entity, Link
+
 linked_art_context = get_loud_context()
+
 
 class Parser:
     download = None
@@ -222,147 +225,11 @@ class Parser:
                     for type_ in entity.types]
                 if 'types' in self.show else None}})
 
-    #def rdf_output(
-    #        self,
-    #        data: list[dict[str, Any]] | dict[str, Any]) \
-    #        -> Any:  # pragma: nocover
-    #    if 'http' in app.config['PROXIES']:
-    #        os.environ['http_proxy'] = app.config['PROXIES']['http']
-    #    if 'https' in app.config['PROXIES']:
-    #        os.environ['https_proxy'] = app.config['PROXIES']['https']
-    #    graph = Graph().parse(data=json.dumps(data), format='json-ld')
-    #    return graph.serialize(format=self.format, encoding='utf-8')
-
-
     def is_valid_url(self) -> None:
         if self.url and isinstance(
                 validators.url(self.url),
                 validators.ValidationFailure):
             raise UrlNotValid(self.url)
-
-    def _add_namespaces(self, graph: Graph, context: dict):
-        """
-        Adds namespaces from the @context block to the RDF graph.
-        """
-        for prefix, uri in context["@context"].items():
-            if isinstance(uri, str):
-                if uri.endswith('/') or uri.endswith('#'):
-                    graph.bind(prefix, Namespace(uri))
-
-    def _add_triples_from_linked_art(self, graph: Graph, data: dict, parent_subject=None, parent_predicate=None):
-        """
-        Recursively processes a Linked Art JSON-LD dictionary and adds triples to the graph.
-        """
-        if isinstance(data, list):
-            for item in data:
-                self._add_triples_from_linked_art(graph, item, parent_subject, parent_predicate)
-            return
-
-        if not isinstance(data, dict):
-            return
-
-        subject_uri = data.get('id')
-        if not subject_uri:
-            # If no id, it's a blank node
-            subject = BNode()
-            if parent_subject and parent_predicate:
-                graph.add((parent_subject, parent_predicate, subject))
-        else:
-            subject = URIRef(subject_uri)
-
-        # Add the type triple for the current subject
-        if data.get('type'):
-            graph.add((subject, RDF.type, URIRef(data.get('type'))))
-
-        for key, value in data.items():
-            if key in ['id', 'type', '@context', 'results']:
-                continue
-
-            # Determine the predicate
-            predicate = None
-            if key in linked_art_context["@context"]:
-                context_entry = linked_art_context["@context"][key]
-                if isinstance(context_entry, str):
-                    predicate = URIRef(context_entry)
-                elif isinstance(context_entry, dict) and '@id' in context_entry:
-                    predicate_uri_string = context_entry['@id']
-                    if ':' in predicate_uri_string:
-                        prefix, localname = predicate_uri_string.split(':', 1)
-                        prefix_uri = linked_art_context["@context"].get(prefix)
-                        if isinstance(prefix_uri, str):
-                             predicate = URIRef(prefix_uri + localname)
-                        else:
-                            print(f"Warning: Could not resolve prefix '{prefix}' for key '{key}'")
-                    else:
-                        predicate = URIRef(predicate_uri_string)
-            elif ':' in key:
-                prefix, localname = key.split(':', 1)
-                context_uri = linked_art_context["@context"].get(prefix)
-                if isinstance(context_uri, str):
-                    predicate = URIRef(context_uri + localname)
-                elif isinstance(context_uri, dict):
-                    predicate = URIRef(context_uri['@id'] + localname)
-                else:
-                    print(f"Warning: Unknown prefix '{prefix}' for key '{key}'")
-            else:
-                print(f"Warning: Cannot resolve local property '{key}' without a prefix.")
-
-            if not predicate:
-                continue
-
-
-
-            if isinstance(value, dict):
-                object_uri = value.get('id')
-                if object_uri:
-                    graph.add((subject, predicate, URIRef(object_uri)))
-                    self._add_triples_from_linked_art(graph, value)
-                else:
-                    # This is an inline object (blank node).
-                    # The recursive call will handle adding triples from it.
-                    # No need to add a triple here, it will be added when the new subject is created.
-                    self._add_triples_from_linked_art(graph, value, subject, predicate)
-
-            elif isinstance(value, list):
-                for item in value:
-                    if isinstance(item, dict):
-                        object_uri = item.get('id')
-                        if object_uri:
-                            graph.add((subject, predicate, URIRef(object_uri)))
-                            self._add_triples_from_linked_art(graph, item)
-                        else:
-                            # This is an inline object (blank node) in a list.
-                            # The recursive call will handle adding triples from it.
-                            self._add_triples_from_linked_art(graph, item, subject, predicate)
-                    else:
-                        graph.add((subject, predicate, Literal(item)))
-            else:
-                graph.add((subject, predicate, Literal(value)))
-    # todo: move the rdf functions away from parser to own file
-    # todo: go through each step and clean up
-    #   fix part_of issue
-    #   make linked art context better available, maybe with g.?
-
-    def rdf_output(self, data: list[dict[str, Any]] | dict[str, Any]) -> Any:
-        """
-        Manually parses JSON-LD data and serializes it to an RDF graph.
-        """
-        graph = Graph()
-        self._add_namespaces(graph, linked_art_context)
-
-        # Handle the 'results' key if it exists
-        if isinstance(data, dict) and 'results' in data:
-            data = data['results']
-
-        self._add_triples_from_linked_art(graph, data)
-
-        # The existing function part for proxies and serialization.
-        # if 'http' in app.config['PROXIES']:
-        #     os.environ['http_proxy'] = app.config['PROXIES']['http']
-        # if 'https' in app.config['PROXIES']:
-        #     os.environ['https_proxy'] = app.config['PROXIES']['https']
-
-        return graph.serialize(format=self.format, encoding='utf-8')
 
     @staticmethod
     def get_lp_types(

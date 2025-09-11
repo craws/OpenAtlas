@@ -2,7 +2,7 @@ import itertools
 import zipfile
 from io import BytesIO
 from itertools import groupby
-from typing import Any
+from typing import Any, Iterator
 
 import pandas as pd
 from flask import Response, jsonify, request, url_for
@@ -15,6 +15,7 @@ from openatlas.api.formats.csv import (
 from openatlas.api.formats.linked_places import get_lp_file, get_lp_links, \
     get_lp_time
 from openatlas.api.formats.loud import get_loud_entities
+from openatlas.api.formats.rdf import rdf_output
 from openatlas.api.resources.resolve_endpoints import (
     download, parse_loud_context)
 from openatlas.api.resources.templates import (
@@ -39,7 +40,8 @@ class Endpoint:
         self.pagination: dict[str, Any] = {}
         self.single = single
         self.entities_with_links: dict[int, dict[str, Any]] = {}
-        self.formated_entities: list[dict[str, Any]] = []
+        self.formated_entities: list[dict[str, Any]] | Iterator[
+            dict[str, Any]] = []
 
     def get_links_for_entities(self) -> None:
         if not self.entities:
@@ -109,7 +111,7 @@ class Endpoint:
         self.get_entities_formatted()
         if self.parser.format in app.config['RDF_FORMATS']:  # pragma: no cover
             return Response(
-                self.parser.rdf_output(self.formated_entities),
+                rdf_output(self.formated_entities, self.parser.format),
                 mimetype=app.config['RDF_FORMATS'][self.parser.format])
         result = self.get_json_output()
         if self.parser.download == 'true':
@@ -246,12 +248,12 @@ class Endpoint:
                       in app.config['RDF_FORMATS']:  # pragma: no cover
                 license_links = get_license_ids_with_links()
                 parsed_context = parse_loud_context()
-                entities = [
+                entities = (
                     get_loud_entities(
                         item,
                         parsed_context,
                         license_links)
-                    for item in self.entities_with_links.values()]
+                    for item in self.entities_with_links.values())
         self.formated_entities = entities
 
     def get_geojson(self) -> dict[str, Any]:
