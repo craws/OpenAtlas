@@ -19,6 +19,7 @@ from openatlas import app
 from openatlas.api.endpoints.endpoint import Endpoint
 from openatlas.api.external.arche import add_arche_file_metadata_to_graph
 from openatlas.api.external.arche_class import ArcheFileMetadata
+from openatlas.api.formats.rdf import rdf_export_to_file
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.util import filter_by_type, get_reference_systems
 from openatlas.models.entity import Entity
@@ -393,6 +394,10 @@ def open_tmp_sql_file() -> str:
             check=True)
         return tmp_sql.name
 
+# todo: start here again to make export
+def rdf_export() -> None:
+    file = app.config['RDF_PATH'] \
+           / f'{current_date_for_filename()}_export.nt'
+    data = ({'test': 'str'})
 
-def rdf_export(format_: str) -> Response:
-    pass
+    rdf_export_to_file(data, file)

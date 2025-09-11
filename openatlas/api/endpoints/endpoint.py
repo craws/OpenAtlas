@@ -15,7 +15,7 @@ from openatlas.api.formats.csv import (
 from openatlas.api.formats.linked_places import get_lp_file, get_lp_links, \
     get_lp_time
 from openatlas.api.formats.loud import get_loud_entities
-from openatlas.api.formats.rdf import rdf_output
+from openatlas.api.formats.rdf import rdf_export_to_file, rdf_output
 from openatlas.api.resources.resolve_endpoints import (
     download, parse_loud_context)
 from openatlas.api.resources.templates import (
@@ -110,6 +110,11 @@ class Endpoint:
             return self.export_csv_network()
         self.get_entities_formatted()
         if self.parser.format in app.config['RDF_FORMATS']:  # pragma: no cover
+           # todo: remove this if, but think about how to handle the download/export
+            if self.parser.format== 'nt':
+                rdf_export_to_file(self.formated_entities,
+                 app.config['RDF_PATH'] \
+           / f'rdf_export.nt'                  )
             return Response(
                 rdf_output(self.formated_entities, self.parser.format),
                 mimetype=app.config['RDF_FORMATS'][self.parser.format])

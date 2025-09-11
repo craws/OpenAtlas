@@ -166,8 +166,8 @@ def export_rdf() -> str:
                 buttons=[
                     manual('admin/export'),
                     button(
-                        _('export') + ' turtle',
-                        url_for('rdf_execute', format_='turtle'))
+                        _('export') + ' RDF',
+                        url_for('rdf_execute'))
                 ])},
         title=_('export') + ' RDF',
         crumbs=[
@@ -175,15 +175,11 @@ def export_rdf() -> str:
             _('export') + ' RDF'])
 
 
-@app.route('/export/rdf/execute/<format_>')
+@app.route('/export/rdf/execute')
 @required_group('admin')
-def rdf_execute(format_: str) -> Response:
-    if format_ not in app.config['RDF_FORMATS']:
-        g.logger.log('error', 'export', 'Wrong RDF format for export')
-        flash(_('export failed'), 'error')
-        return redirect(url_for('export_rdf', _anchor='tab-export'))
+def rdf_execute() -> Response:
     if os.access(app.config['RDF_PATH'], os.W_OK):
-        if rdf_export(format_):
+        if rdf_export():
             g.logger.log('info', 'database', 'RDF export')
             flash(_('data was exported'), 'info')
         else:  # pragma: no cover

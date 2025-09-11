@@ -127,3 +127,33 @@ def rdf_output(data: Iterator[dict[str, Any]], format_: str) -> Any:
         os.environ['https_proxy'] = app.config['PROXIES']['https']
 
     return graph.serialize(format=format_, encoding='utf-8')
+
+def rdf_export_to_file(
+    data: Iterator[dict[str, Any]],
+    rdf_export_path: str):
+    """
+    Manually parses JSON-LD data from an iterator and streams it as
+    N-Triples to a local file, avoiding loading the entire graph into memory.
+    """
+    if 'http' in app.config['PROXIES']:
+        os.environ['http_proxy'] = app.config['PROXIES']['http']
+    if 'https' in app.config['PROXIES']:
+        os.environ['https_proxy'] = app.config['PROXIES']['https']
+
+    with open(rdf_export_path, 'wb') as output_file:
+            # We can't serialize namespaces to N-Triples as they are not part of the format,
+            # so we will skip this step and directly process the data.
+
+            # Process and write each item from the iterator as a separate graph
+            for item in data:
+                # Create a new, temporary graph for each item to avoid
+                # memory issues.
+                temp_graph = Graph()
+                _add_triples_from_linked_art(temp_graph, item)
+
+                # Serialize the temporary graph and append to the output file.
+                # Using 'nt' (N-Triples) is a reliable way to stream.
+                for triple in temp_graph.serialize(format='nt').splitlines():
+                    if triple:
+                        # Encode the string 'triple' to bytes before writing
+                        output_file.write(triple.encode('utf-8') + b'\n')
