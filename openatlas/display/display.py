@@ -195,10 +195,13 @@ class Display:
                 continue
 
     def add_note_tab(self) -> None:
-        self.tabs['note'] = Tab(
-            'note',
-            buttons=[manual('tools/notes')],
-            entity=self.entity)
+        buttons = [manual('tools/notes')]
+        if is_authorized('contributor'):
+            buttons.append(
+                button(
+                    _('note'),
+                    url_for('note_insert', entity_id=self.entity.id)))
+        self.tabs['note'] = Tab('note', buttons=buttons, entity=self.entity)
         for note in current_user.get_notes_by_entity_id(self.entity.id):
             data = [
                 format_date(note['created']),

@@ -62,7 +62,6 @@ def overview() -> str:
         'notes': Tab(
             'notes',
             _('notes'),
-            buttons=[manual('tools/notes')],
             table=Table(
                 ['date', _('visibility'), 'entity', 'class', _('note')]))}
     tables = {
@@ -92,6 +91,8 @@ def overview() -> str:
             entity.class_.label,
             note['text'],
             link(_("view"), url_for("note_view", id_=note["id"]))])
+    if tabs['notes'].table.rows:
+        tabs['notes'].buttons = [manual('tools/notes')]
     for name, count in Entity.get_overview_counts().items():
         if not g.classes[name].group:
             continue
