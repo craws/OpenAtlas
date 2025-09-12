@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from flask import g
 from flask_babel import lazy_gettext as _
 
-from config.model.model import model
 from config.model.class_groups import class_groups
+from config.model.model import model
 from openatlas.database import openatlas_class as db
 
 
@@ -68,19 +68,6 @@ class OpenatlasClass:
         self.relations = relations
         self.display = display
 
-    def get_tooltip(self) -> Optional[str]:
-        tooltips = {
-            'E5': _('events not performed by actors, e.g. a natural disaster'),
-            'E7': _('the most common, e.g. a battle, a meeting or a wedding'),
-            'E8': _('mapping a change of property'),
-            'E9': _('movement of artifacts or persons'),
-            'E11': _('modification of artifacts'),
-            'E12': _('creation of artifacts'),
-            'E65': _('creation of documents (files)')}
-        if self.cidoc_class.code in tooltips:
-            return tooltips[self.cidoc_class.code]
-        return None
-
 
 def get_class_count() -> dict[str, int]:
     return db.get_class_count()
@@ -116,6 +103,7 @@ def get_model(class_name: str) -> dict[str, Any]:
         item['label'] = item.get('label', _(name))
         item['required'] = item.get('required', False)
     data['display'] = data.get('display', {})
+    data['display']['tooltip'] = data['display'].get('tooltip')
     data['display']['additional_tabs'] = \
         data['display'].get('additional_tabs', {})
     data['display']['buttons'] = data['display'].get('buttons', {})

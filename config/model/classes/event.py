@@ -48,8 +48,7 @@ model = {
     'display': {
         'buttons': ['copy', 'network'],
         'form': {'insert_and_continue': True},
-        'additional_tabs': {
-            'note': {}}}}
+        'additional_tabs': {'note': {}}}}
 
 additional_relations = {
     'succeeding_event': {
@@ -70,12 +69,15 @@ additional_relations = {
         'mode': 'direct'}}
 
 activity = copy.deepcopy(model)
+activity['display']['tooltip'] = \
+    _('the most common, e.g. a battle, a meeting or a wedding')
 activity['relations'] = activity['relations'] | {
     'succeeding_event': additional_relations['succeeding_event'],
     'preceding_event': additional_relations['preceding_event'],
     'location': additional_relations['location']}
 
 acquisition = copy.deepcopy(model)
+acquisition['display']['tooltip'] = _('mapping a change of property')
 acquisition['relations'] = acquisition['relations'] | {
     'succeeding_event': additional_relations['succeeding_event'],
     'preceding_event': additional_relations['preceding_event'],
@@ -106,6 +108,7 @@ acquisition['relations'] = acquisition['relations'] | {
         'multiple': True}}
 
 creation = copy.deepcopy(model)
+creation['display']['tooltip'] = _('creation of documents (files)')
 creation['relations'] = creation['relations'] | {
     'succeeding_event': additional_relations['succeeding_event'],
     'preceding_event': additional_relations['preceding_event'],
@@ -118,10 +121,13 @@ creation['relations'] = creation['relations'] | {
         'mode': 'direct'}}
 
 event = copy.deepcopy(model)
+event['display']['tooltip'] = \
+    _('events not performed by actors, e.g. a natural disaster')
 event['relations'] = event['relations'] | {
     'location': additional_relations['location']}
 
 modification = copy.deepcopy(model)
+modification['display']['tooltip'] = _('modification of artifacts')
 modification['relations'] = modification['relations'] | {
     'succeeding_event': additional_relations['succeeding_event'],
     'preceding_event': additional_relations['preceding_event'],
@@ -140,6 +146,7 @@ modification['relations'] = modification['relations'] | {
         'mode': 'direct'}}
 
 move = copy.deepcopy(model)
+move['display']['tooltip'] = _('movement of artifacts or persons')
 move['relations'] = move['relations'] | {
     'succeeding_event': additional_relations['succeeding_event'],
     'preceding_event': additional_relations['preceding_event'],
@@ -167,6 +174,7 @@ move['relations'] = move['relations'] | {
         'mode': 'direct'}}
 
 production = copy.deepcopy(model)
+production['display']['tooltip'] = _('creation of artifacts')
 production['relations'] = production['relations'] | {
     'succeeding_event': additional_relations['succeeding_event'],
     'preceding_event': additional_relations['preceding_event'],

@@ -160,7 +160,9 @@ class Display:
                                     'insert',
                                     class_=class_,
                                     origin_id=self.entity.id,
-                                    relation=name)))
+                                    relation=name),
+                                tooltip_text=
+                                g.classes[class_].display['tooltip']))
     #     case 'source':
     #         if class_name == 'file':
     #             self.buttons.append(
