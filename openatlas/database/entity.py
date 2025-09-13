@@ -476,7 +476,7 @@ def get_linked_entities_recursive(
 def get_links_of_entities(
         ids: int | list[int],
         codes: str | list[str] | None,
-        classes: Optional[list[str]] = None,
+        classes: list[str] | None,
         inverse: bool = False) -> list[dict[str, Any]]:
     sql = f"""
         SELECT
@@ -511,8 +511,8 @@ def get_links_of_entities(
     g.cursor.execute(
         sql, {
             'entities': tuple(ids if isinstance(ids, list) else [ids]),
-            'codes': tuple(codes) if codes else '',
-            'classes': tuple(classes)})
+            'codes': tuple(codes) if codes else None,
+            'classes': tuple(classes) if classes else None})
     return list(g.cursor)
 
 

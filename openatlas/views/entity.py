@@ -237,7 +237,7 @@ def insert_files(manager: BaseManager) -> str:
             manager.update_entity()
             g.logger.log_user(manager.entity.id, 'insert')
         Transaction.commit()
-        url = get_redirect_url(manager)
+        url = link_origin_and_get_url(manager)
         flash(_('entity created'), 'info')
     except Exception as e:  # pragma: no cover
         Transaction.rollback()
@@ -260,7 +260,7 @@ def save(
         entity = process_form_data(entity, form)
         g.logger.log_user(entity.id, action)
         Transaction.commit()
-        url = get_redirect_url(entity, form, origin, relation_name)
+        url = link_origin_and_get_url(entity, form, origin, relation_name)
         flash(
             _('entity created') if action == 'insert' else _('info update'),
             'info')
@@ -290,13 +290,13 @@ def save(
     return url
 
 
-def get_redirect_url(
+def link_origin_and_get_url(
         entity: Entity,
         form: Any,
         origin: Entity | None,
         relation_name: str | None) -> str:
     url = url_for('view', id_=entity.id)
-    if origin and relation_name:
+    if entity.class_.group['name'] != 'type' and origin and relation_name:
         relation = origin.class_.relations[relation_name]
         if relation['additional_fields']:
             url = url_for(

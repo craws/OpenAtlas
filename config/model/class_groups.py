@@ -80,18 +80,3 @@ standard_relations = {
         'multiple': True,
         'tab': {
             'buttons': ['link', 'insert']}}}
-
-# Todo: remove after finishing new classes
-# def get_table_columns() -> dict[str, list[str]]:
-#     columns = {
-#         'entities': ['name', 'class', 'info'],
-#         'member': ['member', 'function', 'first', 'last', 'description'],
-#         'member_of': [
-#             'member of', 'function', 'first', 'last', 'description'],
-#         'note': ['date', 'visibility', 'user', 'note'],
-#         'relation': ['relation', 'actor', 'first', 'last', 'description'],
-#         'reference_system': [
-#             'name', 'count', 'website URL', 'resolver URL', 'example ID',
-#             'default precision', 'description'],
-#         'subs': ['name', 'count', 'info'],
-#         'text': ['text', 'type', 'content']}

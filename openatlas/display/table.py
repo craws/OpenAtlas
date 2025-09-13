@@ -72,7 +72,7 @@ def entity_table(
         table_id: Optional[str] = None,
         forms: Optional[dict[str, Any]] = None) -> Table | None:
     if not items:
-        return None
+        return Table()
     inverse = relation and relation['inverse']
     if not columns:
         item = items[0]

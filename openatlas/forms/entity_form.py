@@ -59,7 +59,8 @@ def process_form_data(entity: Entity, form: Any) -> Entity:
         entity.update(data)
     else:
         entity = insert_entity(form, data)
-    process_types(entity, form)
+    if entity.class_.hierarchies:
+        process_types(entity, form)
     process_relations(entity, form)
     process_reference_systems(entity, form)
     return entity
@@ -83,12 +84,9 @@ def process_reference_systems(entity: Entity, form: Any):
 def process_types(entity: Entity, form: Any) -> None:
     for type_ in [g.types[id_] for id_ in entity.class_.hierarchies]:
         if data := convert(getattr(form, str(type_.id)).data):
-            # if entity.class_.name in \ # Todo: check needed?
-            #         ['actor_function', 'actor_relation', 'involvement']:
-            #    continue
             if type_.class_.name == 'administrative_unit':
-                pass
                 # manager.data['administrative_units'] += value
+                pass
             else:  # if entity.class_.group['name'] != 'type': # Todo: needed?
                 entity.link('P2', [g.types[id_] for id_ in data])
 

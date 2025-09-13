@@ -124,7 +124,7 @@ class Display:
     def add_tabs(self) -> None:
         self.tabs = {'info': Tab('info')}
         for name, relation in self.entity.class_.relations.items():
-            if not relation['tab']:
+            if not relation['mode'] == 'tab':
                 continue
             items = []
             for item in self.entity.get_links(
@@ -163,21 +163,6 @@ class Display:
                                     relation=name),
                                 tooltip_text=
                                 g.classes[class_].display['tooltip']))
-    #     case 'source':
-    #         if class_name == 'file':
-    #             self.buttons.append(
-    #                 button(
-    #                     _('link'),
-    #                     url_for('file_add', id_=id_, view=tab_name)))
-    #         elif view == 'reference':
-    #             self.buttons.append(
-    #                 button(
-    #                     'link',
-    #                     url_for('reference_add', id_=id_, view=tab_name)))
-    #         self.buttons.append(
-    #             button(
-    #                 g.classes['source'].label,
-    #                 url_for('insert', class_=tab_name, origin_id=id_)))
             self.tabs[name] = Tab(
                 name,
                 relation['label'],

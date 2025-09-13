@@ -58,6 +58,9 @@ def before_request() -> Response | None:
 
     if request.path.startswith('/static'):
         return None  # Avoid overheads if not using Apache with static alias
+    if request.path == '/index/type':
+        return redirect('/type')  # Type index has its own view
+
     g.logger = Logger()
     g.db = open_connection(app.config)
     g.db.autocommit = True

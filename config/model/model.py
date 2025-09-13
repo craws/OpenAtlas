@@ -1,6 +1,6 @@
 from typing import Any
 
-from config.model.classes import actor, event, source
+from config.model.classes import actor, event, source, type
 
 model: dict[str, Any] = {
     'acquisition': event.acquisition,
@@ -45,7 +45,6 @@ model: dict[str, Any] = {
     'stratigraphic_unit': {
         'attributes': {},
         'display': {'buttons': ['network']}},
-    'type': {
-        'attributes': {}},
+    'type': type.type_,
     'type_tools': {
         'attributes': {}}}
