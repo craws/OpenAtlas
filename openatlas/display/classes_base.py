@@ -268,13 +268,6 @@ class ReferenceBaseDisplay(BaseDisplay):
 
 
 class TypeBaseDisplay(BaseDisplay):
-    def add_crumbs(self) -> None:
-        self.crumbs = [link(self.entity, index=True)]
-        self.crumbs += [g.types[type_id] for type_id in self.entity.root]
-        self.crumbs.append(self.entity.name)
-
-    def add_button_copy(self) -> None:
-        pass
 
     def add_button_delete(self) -> None:
         if self.entity.category != 'system':

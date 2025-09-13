@@ -41,12 +41,8 @@ class_groups = {
         'table_columns': ['name', 'class', 'type', 'description']},
     'source': {
         'name': 'source',
-        'classes': ['source'],
-        'table_columns': ['name', 'type', 'content']},
-    'source_translation': {
-        'name': 'source_translation',
-        'classes': ['source_translation'],
-        'table_columns': ['name', 'type', 'content']},
+        'classes': ['source', 'source_translation'],
+        'table_columns': ['name', 'class', 'type', 'content']},
     'type': {
         'name': 'type',
         'classes': ['administrative_unit', 'type'],

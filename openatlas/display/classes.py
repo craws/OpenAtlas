@@ -215,7 +215,3 @@ class StratigraphicUnitDisplay(PlaceBaseDisplay):
             if sex_estimation := sex_result(self.entity):
                 html += f"<p>{sex_estimation}</p>"
         return html + description(self.entity.description)
-
-
-class TypeDisplay(TypeBaseDisplay):
-    pass
