@@ -95,7 +95,6 @@ def entity_table(
         order = [[0, "desc"], [1, "asc"]]
         defs = [{"orderDataType": "dom-checkbox", "targets": 0}]
     table = Table(columns, order=order, defs=defs)
-
     for item in items:
         e = item
         range_ = None
@@ -175,7 +174,10 @@ def entity_table(
                     tab_id = e.class_.group['name']
                     if relation and relation['mode'] == 'tab':
                         tab_id = relation['name']
-                    html = remove_link(e.name, item, entity_viewed, tab_id)
+                    html = ''
+                    if not hasattr(entity_viewed, 'root') \
+                            or not g.types[entity_viewed.root[0]].required:
+                        html = remove_link(e.name, item, entity_viewed, tab_id)
                 # case 'related':
                 #    relative = e.get_linked_entity_safe('has relation', True)
                 #    if entity and relative.id == entity.id:

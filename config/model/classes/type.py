@@ -13,7 +13,8 @@ type_ = {
             'label': _('super'),
             'classes': 'type',
             'properties': 'P127',
-            'mode': 'direct'},
+            'mode': 'direct',
+            'required': True},
         'subs': {
             'label': _('subs'),
             'classes': 'type',
