@@ -34,8 +34,7 @@ bibliography = {
             'multiple': True,
             'additional_fields': ['page'],
             'tab': {
-                'columns': ['name', 'class', 'type', 'page', 'description'],
-                'buttons': ['link']}},
+                'columns': ['name', 'class', 'type', 'page', 'description']}},
         'file': standard_relations['file']},
     'display': {
         'buttons': ['copy'],
