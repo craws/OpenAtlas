@@ -175,7 +175,7 @@ def entity_table(
                     if relation and relation['mode'] == 'tab':
                         tab_id = relation['name']
                     html = ''
-                    if not hasattr(entity_viewed, 'root') \
+                    if not entity_viewed.root \
                             or not g.types[entity_viewed.root[0]].required:
                         html = remove_link(e.name, item, entity_viewed, tab_id)
                 # case 'related':

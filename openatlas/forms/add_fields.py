@@ -10,7 +10,7 @@ from flask_wtf import FlaskForm
 from wtforms import (
     FieldList, HiddenField, IntegerField, StringField, TextAreaField)
 from wtforms.validators import (
-    InputRequired, NoneOf, NumberRange, Optional as OptionalValidator)
+    InputRequired, NoneOf, NumberRange, Optional as OptionalValidator, URL)
 
 from openatlas.display.util2 import is_authorized
 from openatlas.forms.field import (

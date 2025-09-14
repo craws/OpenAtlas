@@ -145,18 +145,6 @@ class ArtifactManager(ArtifactBaseManager):
             self.add_link('P46', self.form.super.data, inverse=True)
 
 
-class BibliographyManager(BaseManager):
-    fields = ['name', 'description', 'continue']
-
-
-class EditionManager(BaseManager):
-    fields = ['name', 'description', 'continue']
-
-
-class EventManager(EventBaseManager):
-    pass
-
-
 class ExternalReferenceManager(BaseManager):
     fields = ['url', 'description', 'continue']
 

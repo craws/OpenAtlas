@@ -9,13 +9,11 @@ from flask_login import current_user
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.util import (
-    button, edit_link, get_appearance,
-    get_chart_data, link, profile_image_table_link, remove_link)
-from openatlas.models.dates import format_entity_date
+    button, edit_link, get_appearance, get_chart_data, link, remove_link)
 from openatlas.display.util2 import is_authorized, uc_first
+from openatlas.models.dates import format_entity_date
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
-from openatlas.models.overlay import Overlay
 
 
 class BaseDisplay:
@@ -239,32 +237,6 @@ class PlaceBaseDisplay(BaseDisplay):
                 and self.gis_data['gisLineSelected'] == '[]' \
                 and (not self.structure or not self.structure['supers']):
             self.gis_data = {}
-
-
-class ReferenceBaseDisplay(BaseDisplay):
-
-    def add_tabs(self) -> None:
-        for name in [
-                'source', 'event', 'actor', 'place', 'artifact', 'file',
-                'type']:
-            self.tabs[name] = Tab(name, entity=self.entity)
-        for link_ in self.entity.get_links('P67'):
-            range_ = link_.range
-            # data = get_base_table_data(range_)
-            # data.append(link_.description)
-            # data.append(
-            #     edit_link(
-            #         url_for(
-            #             'link_update',
-            #             id_=link_.id,
-            #             origin_id=self.entity.id)))
-            # data.append(
-            #     remove_link(
-            #         range_.name,
-            #         link_,
-            #         self.entity,
-            #         range_.class_.view))
-            # self.tabs[range_.class_.view].table.rows.append(data)
 
 
 class TypeBaseDisplay(BaseDisplay):

@@ -29,10 +29,6 @@ class ArtifactDisplay(PlaceBaseDisplay):
         self.data[_('owned by')] = link(self.entity.get_linked_entity('P52'))
 
 
-class BibliographyDisplay(ReferenceBaseDisplay):
-    pass
-
-
 class FileDisplay(BaseDisplay):
 
     def add_data(self) -> None:
@@ -86,18 +82,6 @@ class FileDisplay(BaseDisplay):
             #self.tabs[link_.domain.class_.view].table.rows.append(data)
 
 
-class EditionDisplay(ReferenceBaseDisplay):
-    pass
-
-
-class ExternalReferenceDisplay(ReferenceBaseDisplay):
-    pass
-
-
-class FeatureDisplay(PlaceBaseDisplay):
-    pass
-
-
 class GroupDisplay(ActorDisplay):
 
     def add_tabs(self) -> None:
@@ -114,14 +98,6 @@ class GroupDisplay(ActorDisplay):
                     id_=link_.id,
                     origin_id=self.entity.id)),
                 remove_link(link_.range.name, link_, self.entity, 'member')])
-
-
-class HumanRemainsDisplay(ArtifactDisplay):
-    pass
-
-
-class PersonDisplay(ActorDisplay):
-    pass
 
 
 class PlaceDisplay(PlaceBaseDisplay):

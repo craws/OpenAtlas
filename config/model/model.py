@@ -1,6 +1,6 @@
 from typing import Any
 
-from config.model.classes import actor, event, source, type
+from config.model.classes import actor, event, reference, source, type
 
 model: dict[str, Any] = {
     'acquisition': event.acquisition,
@@ -12,14 +12,11 @@ model: dict[str, Any] = {
     'artifact': {
         'attributes': {},
         'display': {'buttons': ['network']}},
-    'bibliography': {
-        'attributes': {}},
+    'bibliography': reference.bibliography,
     'creation': event.creation,
-    'edition': {
-        'attributes': {}},
+    'edition': reference.edition,
     'event': event.event,
-    'external_reference': {
-        'attributes': {}},
+    'external_reference': reference.external_reference,
     'feature': {
         'attributes': {},
         'display': {'buttons': ['network']}},

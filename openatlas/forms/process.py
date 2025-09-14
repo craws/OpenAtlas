@@ -2,7 +2,6 @@ import ast
 from typing import Any
 
 from flask import g
-from werkzeug.exceptions import abort
 
 from openatlas.display.util2 import sanitize
 from openatlas.models.dates import Dates, form_to_datetime64
@@ -22,33 +21,6 @@ def process_standard_fields(manager: Any) -> None:
                 value = ids if isinstance(ids, list) else [int(ids)]
             else:
                 value = []
-        if key.startswith((
-                'begin_',
-                'end_',
-                'name_inverse',
-                'multiple',
-                'page',
-                'reference_system_precision_',
-                'website_url',
-                'resolver_url',
-                'placeholder',
-                'classes',
-                'inverse',
-                'creator',
-                'license_holder',)) \
-                or field_type in [
-                    'CSRFTokenField',
-                    'HiddenField',
-                    'MultipleFileField',
-                    'DragNDropField',
-                    'SelectField',
-                    'SelectMultipleField',
-                    'SubmitSourceField',
-                    'SubmitField',
-                    'TableField',
-                    'TableMultiField',
-                    'ValueTypeRootField']:
-            continue
         if key == 'name':
             name = manager.form.data['name']
             if hasattr(manager.form, 'name_inverse'):
@@ -71,8 +43,6 @@ def process_standard_fields(manager: Any) -> None:
                 'public': bool(manager.form.public.data),
                 'creator': sanitize(manager.form.creator.data),
                 'license_holder': sanitize(manager.form.license_holder.data)}
-        else:  # pragma: no cover
-            abort(418, f'Form error: {key}, {field_type}, value={value}')
 
 
 def process_dates(form: Any) -> dict[str, Any]:
