@@ -2,14 +2,12 @@ from __future__ import annotations
 
 import ast
 import itertools
-import os
 from typing import Any, Optional
 
 import numpy
 import validators
 from flask import g, url_for
 from numpy import datetime64
-from rdflib import BNode, Graph, Literal, Namespace, RDF, URIRef
 
 from openatlas import app
 from openatlas.api.resources.error import (

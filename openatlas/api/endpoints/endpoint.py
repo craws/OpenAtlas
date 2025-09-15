@@ -15,7 +15,7 @@ from openatlas.api.formats.csv import (
 from openatlas.api.formats.linked_places import get_lp_file, get_lp_links, \
     get_lp_time
 from openatlas.api.formats.loud import get_loud_entities
-from openatlas.api.formats.rdf import rdf_export_to_file, rdf_output
+from openatlas.api.formats.rdf import rdf_output
 from openatlas.api.resources.resolve_endpoints import (
     download, parse_loud_context)
 from openatlas.api.resources.templates import (
@@ -40,8 +40,8 @@ class Endpoint:
         self.pagination: dict[str, Any] = {}
         self.single = single
         self.entities_with_links: dict[int, dict[str, Any]] = {}
-        self.formated_entities: list[dict[str, Any]] | Iterator[
-            dict[str, Any]] = []
+        self.formated_entities: list[dict[str, Any]] = []
+        self.generator_entities: Iterator[dict[str, Any]]  = iter(())
 
     def get_links_for_entities(self) -> None:
         if not self.entities:
@@ -110,13 +110,8 @@ class Endpoint:
             return self.export_csv_network()
         self.get_entities_formatted()
         if self.parser.format in app.config['RDF_FORMATS']:  # pragma: no cover
-           # todo: remove this if, but think about how to handle the download/export
-            if self.parser.format== 'nt':
-                rdf_export_to_file(self.formated_entities,
-                 app.config['RDF_PATH'] \
-           / f'rdf_export.nt'                  )
             return Response(
-                rdf_output(self.formated_entities, self.parser.format),
+                rdf_output(self.generator_entities, self.parser.format),
                 mimetype=app.config['RDF_FORMATS'][self.parser.format])
         result = self.get_json_output()
         if self.parser.download == 'true':
@@ -233,33 +228,31 @@ class Endpoint:
     def get_entities_formatted(self) -> None:
         if not self.entities:
             return
-        entities = []
         match self.parser.format:
             case 'geojson':
-                entities = [self.get_geojson()]
+                self.formated_entities = [self.get_geojson()]
             case 'geojson-v2':
-                entities = [self.get_geojson_v2()]
+                self.formated_entities = [self.get_geojson_v2()]
             case 'loud':
                 parsed_context = parse_loud_context()
                 license_links = get_license_ids_with_links()
-                entities = [
+                self.formated_entities = [
                     get_loud_entities(item, parsed_context, license_links)
                     for item in self.entities_with_links.values()]
             case 'lp' | 'lpx':
-                entities = [
+                self.formated_entities = [
                     self.get_linked_places_entity(_id)
                     for _id in self.entities_with_links]
             case _ if self.parser.format \
                       in app.config['RDF_FORMATS']:  # pragma: no cover
                 license_links = get_license_ids_with_links()
                 parsed_context = parse_loud_context()
-                entities = (
+                self.generator_entities = (
                     get_loud_entities(
                         item,
                         parsed_context,
                         license_links)
                     for item in self.entities_with_links.values())
-        self.formated_entities = entities
 
     def get_geojson(self) -> dict[str, Any]:
         out = []
@@ -325,6 +318,11 @@ class Endpoint:
                             self.entities_with_links[links_.domain.id][
                                 'links_inverse'])})
         return items
+
+    def prepare_rdf_export_data(self) -> Iterator[dict[str, Any]]:
+        self.get_links_for_entities()
+        self.get_entities_formatted()
+        return self.generator_entities
 
     def get_linked_places_entity(self, _id: int) -> dict[str, Any]:
         entity = self.entities_with_links[_id]['entity']

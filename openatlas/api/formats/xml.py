@@ -53,6 +53,6 @@ def export_database_xml(tables: dict[str, Any], filename: str) -> Response:
 def clean_text(text: Any) -> str:
     if text is None:
         return ""
-    s = str(text)
+    string_ = str(text)
     # Remove all illegal XML control ASCII characters
-    return re.compile(r"[\x00-\x08\x0B\x0C\x0E-\x1F]").sub("", s)
+    return re.compile(r"[\x00-\x08\x0B\x0C\x0E-\x1F]").sub("", string_)

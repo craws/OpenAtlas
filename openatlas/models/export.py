@@ -394,10 +394,10 @@ def open_tmp_sql_file() -> str:
             check=True)
         return tmp_sql.name
 
-# todo: start here again to make export
-def rdf_export() -> None:
-    file = app.config['RDF_PATH'] \
-           / f'{current_date_for_filename()}_export.nt'
-    data = ({'test': 'str'})
 
-    rdf_export_to_file(data, file)
+def rdf_export() -> str:
+    return rdf_export_to_file(
+        Endpoint(
+            ApiEntity.get_by_system_classes(['all']),
+            {'format': 'nt'}).prepare_rdf_export_data(),
+        app.config['RDF_PATH'] / f'{current_date_for_filename()}_export.nt')

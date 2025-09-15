@@ -155,7 +155,6 @@ def arche_execute() -> Response:
 @required_group('manager')
 def export_rdf() -> str:
     table = build_export_table('rdf')
-
     return render_template(
         'tabs.html',
         tabs={
@@ -166,7 +165,7 @@ def export_rdf() -> str:
                 buttons=[
                     manual('admin/export'),
                     button(
-                        _('export') + ' RDF',
+                        _('export') + ' RDF/NT',
                         url_for('rdf_execute'))
                 ])},
         title=_('export') + ' RDF',
