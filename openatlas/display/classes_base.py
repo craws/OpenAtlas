@@ -8,10 +8,8 @@ from flask_login import current_user
 
 from openatlas import app
 from openatlas.display.tab import Tab
-from openatlas.display.util import (
-    button, edit_link, get_appearance, get_chart_data, link, remove_link)
-from openatlas.display.util2 import is_authorized, uc_first
-from openatlas.models.dates import format_entity_date
+from openatlas.display.util import button, link
+from openatlas.display.util2 import is_authorized
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 
@@ -32,119 +30,6 @@ class BaseDisplay:
         self.gis_data: dict[str, Any] = {}
         self.problematic_type = self.entity.check_too_many_single_type_links()
         self.entity.image_id = entity.get_profile_image_id()
-
-    def add_reference_tables_data(self) -> None:
-        entity = self.entity
-        for link_ in entity.get_links('P67', inverse=True):
-            domain = link_.domain
-            #data = get_base_table_data(domain)
-            #if domain.class_.view == 'file':
-            #    ext = data[6]
-            #    data.append(profile_image_table_link(entity, domain, ext))
-            #    if not entity.image_id and ext in g.display_file_ext:
-            #        entity.image_id = domain.id
-            #elif domain.class_.view != 'source':
-            #    data.append(link_.description)
-            #    data.append(edit_link(
-            #        url_for('link_update', id_=link_.id, origin_id=entity.id)))
-            #data.append(
-            #    remove_link(domain.name, link_, entity, domain.class_.view))
-            #self.tabs[domain.class_.view].table.rows.append(data)
-
-
-class ActorDisplay(BaseDisplay):
-
-    def add_data(self) -> None:
-        if begin_place := self.entity.get_linked_entity('OA8'):
-            begin_object = begin_place.get_linked_entity_safe('P53', True)
-            self.linked_places.append(begin_object)
-            self.data[_('begin')] = \
-                format_entity_date(self.entity, 'begin', begin_object)
-        if end_place := self.entity.get_linked_entity('OA9'):
-            end_object = end_place.get_linked_entity_safe('P53', True)
-            self.linked_places.append(end_object)
-            self.data[_('end')] = \
-                format_entity_date(self.entity, 'end', end_object)
-        if residence := self.entity.get_linked_entity('P74'):
-            residence_object = residence.get_linked_entity_safe('P53', True)
-            self.linked_places.append(residence_object)
-            self.data[_('residence')] = link(residence_object)
-        if self.event_links:
-            appears_first, appears_last = get_appearance(self.event_links)
-            self.data[_('appears first')] = appears_first
-            self.data[_('appears last')] = appears_last
-
-    def add_tabs(self) -> None:
-        entity = self.entity
-        for name in [
-                'source', 'event', 'relation', 'member_of', 'member',
-                'artifact', 'reference', 'file']:
-            if entity.class_.name == 'group' or name != 'member':
-                self.tabs[name] = Tab(name, entity=entity)
-        self.tabs['member_of'].label = uc_first(_('member of'))
-        self.tabs['relation'].label = uc_first(_('relation'))
-        if 'member' in self.tabs:
-            self.tabs['member'].label = uc_first(_('member'))
-        self.event_links = entity.get_links(
-            ['P11', 'P14', 'P22', 'P23', 'P25'],
-            inverse=True)
-        for link_ in self.event_links:
-            event = link_.domain
-            link_.object_ = None  # Needed for first/last appearance
-            for place in event.get_linked_entities(
-                    ['P7', 'P26', 'P27'],
-                    sort=True):
-                link_.object_ = place.get_linked_entity_safe('P53', True)
-                self.linked_places.append(link_.object_)
-            self.tabs['event'].table.rows.append([
-                link(event),
-                event.class_.label,
-                _('moved')
-                if link_.property.code == 'P25' else link(link_.type),
-                link_.first or (
-                    f'<span class="text-muted">{event.first}</span>'
-                    if event.first else ''),
-                link_.last or (
-                    f'<span class="text-muted">{event.last}</span>'
-                    if event.last else ''),
-                link_.description,
-                '' if link_.property.code == 'P25' else
-                edit_link(
-                    url_for('link_update', id_=link_.id, origin_id=entity.id)),
-                remove_link(link_.domain.name, link_, entity, 'event')])
-        for link_ in entity.get_links('OA7') + \
-                entity.get_links('OA7', inverse=True):
-            related = link_.range \
-                if entity.id == link_.domain.id else link_.domain
-            self.tabs['relation'].table.rows.append([
-                '' if not link_.type else link(
-                    link_.type.get_name_directed(entity.id != link_.domain.id),
-                    url_for('view', id_=link_.type.id)),
-                link(related),
-                link_.first,
-                link_.last,
-                link_.description,
-                edit_link(
-                    url_for('link_update', id_=link_.id, origin_id=entity.id)),
-                remove_link(related.name, link_, entity, 'relation')])
-        for link_ in entity.get_links('P107', inverse=True):
-            self.tabs['member_of'].table.rows.append([
-                link(link_.domain),
-                link(link_.type),
-                link_.first,
-                link_.last,
-                link_.description,
-                edit_link(
-                    url_for('link_update', id_=link_.id, origin_id=entity.id)),
-                remove_link(link_.domain.name, link_, entity, 'member-of')])
-        for link_ in entity.get_links('P52', inverse=True):
-            self.tabs['artifact'].table.rows.append([
-                link(link_.domain),
-                link_.domain.class_.label,
-                link(link_.domain.standard_type),
-                link_.domain.first,
-                link_.domain.last,
-                link_.domain.description])
 
 
 class PlaceBaseDisplay(BaseDisplay):
@@ -171,9 +56,10 @@ class PlaceBaseDisplay(BaseDisplay):
                 and current_user.settings['module_map_overlay']:
             self.tabs['file'].table.columns.append(_('overlay'))
 
-        for link_ in entity.get_links(['P31', 'P67'], inverse=True):
-            domain = link_.domain
-            #data = get_base_table_data(domain)
+        for _link_ in entity.get_links(['P31', 'P67'], inverse=True):
+            pass
+            # domain = link_.domain
+            # data = get_base_table_data(domain)
             # if domain.class_.view in ['event']:
             #     self.tabs[domain.class_.view].table.rows.append(data)
             #     continue
@@ -206,7 +92,7 @@ class PlaceBaseDisplay(BaseDisplay):
             # if domain.class_.view not in ['source', 'file']:
             #     data.append(link_.description)
             #     data.append(edit_link(
-            #         url_for('link_update', id_=link_.id, origin_id=entity.id)))
+            #       url_for('link_update', id_=link_.id, origin_id=entity.id)))
             # data.append(
             #     remove_link(domain.name, link_, entity, domain.class_.view))
             # self.tabs[domain.class_.view].table.rows.append(data)
@@ -222,15 +108,16 @@ class PlaceBaseDisplay(BaseDisplay):
                     inverse=True):
             if event.id not in event_ids:
                 self.events.append(event)
-                #self.tabs['event'].table.rows.append(
+                # self.tabs['event'].table.rows.append(
                 #    get_base_table_data(event))
                 event_ids.append(event.id)
         self.structure = entity.get_structure()
         if self.structure:
-            for item in self.structure['subunits']:
-                name = 'artifact' if item.class_.view == 'artifact' \
-                    else item.class_.name
-                #self.tabs[name].table.rows.append(get_base_table_data(item))
+            for _item in self.structure['subunits']:
+                pass
+                # name = 'artifact' if item.class_.view == 'artifact' \
+                #    else item.class_.name
+                # self.tabs[name].table.rows.append(get_base_table_data(item))
         self.gis_data = Gis.get_all([entity], self.structure)
         if self.gis_data['gisPointSelected'] == '[]' \
                 and self.gis_data['gisPolygonSelected'] == '[]' \
@@ -336,6 +223,3 @@ class TypeBaseDisplay(BaseDisplay):
                 button(
                     _('move entities'),
                     url_for('type_move_entities', id_=entity.id)))
-
-    def get_chart_data(self) -> Optional[dict[str, Any]]:
-        return get_chart_data(self.entity)

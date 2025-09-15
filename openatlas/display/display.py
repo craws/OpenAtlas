@@ -10,7 +10,7 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import entity_table
 from openatlas.display.util import (
     bookmark_toggle, button, description, display_annotation_text_links,
-    get_system_data, link, reference_systems)
+    get_chart_data, get_system_data, link, reference_systems)
 from openatlas.display.util2 import (
     is_authorized, manual, show_table_icons, uc_first)
 from openatlas.models.dates import format_date, format_entity_date
@@ -113,7 +113,7 @@ class Display:
             info_data=self.data,
             gis_data=self.gis_data,
             overlays=self.overlays,
-            # chart_data=self.get_chart_data(),
+            chart_data=get_chart_data(self.entity),
             reference_systems=reference_systems(
                 self.entity.get_links(
                     'P67',

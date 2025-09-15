@@ -3,21 +3,14 @@ from __future__ import annotations
 from flask import g, url_for
 from flask_babel import lazy_gettext as _
 
-from openatlas.display.classes_base import (
-    ActorDisplay, BaseDisplay, PlaceBaseDisplay, ReferenceBaseDisplay,
-    TypeBaseDisplay)
+from openatlas.display.classes_base import BaseDisplay, PlaceBaseDisplay
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
-from openatlas.display.util import (
-    button, description, edit_link, get_file_path, link, remove_link)
+from openatlas.display.util import button, description, get_file_path, link
 from openatlas.display.util2 import is_authorized, uc_first
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.views.tools import carbon_result, sex_result
-
-
-class AdministrativeUnitDisplay(TypeBaseDisplay):
-    pass
 
 
 class ArtifactDisplay(PlaceBaseDisplay):
@@ -80,24 +73,6 @@ class FileDisplay(BaseDisplay):
             #    entity,
             #    link_.domain.class_.view))
             #self.tabs[link_.domain.class_.view].table.rows.append(data)
-
-
-class GroupDisplay(ActorDisplay):
-
-    def add_tabs(self) -> None:
-        super().add_tabs()
-        for link_ in self.entity.get_links('P107'):
-            self.tabs['member'].table.rows.append([
-                link(link_.range),
-                link(link_.type),
-                link_.first,
-                link_.last,
-                link_.description,
-                edit_link(url_for(
-                    'link_update',
-                    id_=link_.id,
-                    origin_id=self.entity.id)),
-                remove_link(link_.range.name, link_, self.entity, 'member')])
 
 
 class PlaceDisplay(PlaceBaseDisplay):
