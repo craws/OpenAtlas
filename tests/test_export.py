@@ -168,6 +168,14 @@ class ImportTest(ImportTestCase):
             follow_redirects=True)
         assert b'Data was exported' in rv.data
 
+        rv = c.get(
+            url_for(
+                'delete_export',
+                view='rdf',
+                filename=f'{date_}_export.nt'),
+            follow_redirects=True)
+        if os.name == 'posix':
+            assert b'File deleted' in rv.data
 
         openatlas_logo_path.unlink()
         file_without_license_path.unlink()

@@ -22,7 +22,7 @@ def _add_namespaces(graph: Graph, context: dict[str, Any]) -> None:
     for prefix, uri in context["@context"].items():
         if isinstance(uri, str):
             if uri.endswith('/') or uri.endswith('#'):
-                graph.bind(prefix, Namespace(uri))
+                graph.bind(prefix, Namespace(uri))  # type: ignore
 
 
 def _resolve_predicate(key: str) -> URIRef | None:
@@ -51,8 +51,8 @@ def _get_subject(
     if subject_uri:
         return URIRef(subject_uri)
 
-    subject = BNode()
-    if parent_subject and parent_predicate:
+    subject = BNode()  # type: ignore
+    if parent_subject is not None and parent_predicate is not None:
         graph.add((parent_subject, parent_predicate, subject))
     return subject
 
@@ -60,13 +60,12 @@ def _get_subject(
 def _handle_value(
         graph: Graph,
         subject: URIRef | BNode,
-        predicate: URIRef | None,
-        value: list[dict[str, Any]] | dict[str, Any]) -> None:
+        predicate: URIRef,
+        value: list[dict[str, Any]] | dict[str, Any] | Any) -> None:
     if isinstance(value, dict):
         object_uri = value.get("id")
         if object_uri:
             graph.add((subject, predicate, URIRef(object_uri)))
-        # if no id, let recursion in _add_triples_from_linked_art handle it
     elif isinstance(value, list):
         for item in value:
             if isinstance(item, dict) and item.get("id"):
@@ -84,6 +83,8 @@ def _add_triples_from_linked_art(
         data: list[dict[str, Any]] | dict[str, Any],
         parent_subject: URIRef | BNode | None = None,
         parent_predicate: URIRef | None = None) -> None:
+    if not isinstance(data, dict):  # pragma: no cover - mypy
+        return
 
     subject = _get_subject(data, graph, parent_subject, parent_predicate)
 
@@ -95,6 +96,8 @@ def _add_triples_from_linked_art(
             continue
 
         predicate = _resolve_predicate(key)
+        if not predicate:  # pragma: no cover - mypy
+            continue
 
         _handle_value(graph, subject, predicate, value)
 
