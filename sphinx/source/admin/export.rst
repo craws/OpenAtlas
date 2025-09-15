@@ -10,7 +10,7 @@ Export SQL
 
 * Be aware, especially when sharing, that **user data**, e.g. email addresses,
   are included in the database backups
-* SQL dumps are saved in the **files/export** folder
+* SQL dumps are saved in the **files/sql/export** folder
 * A warning will appear if the directory isn't writable
 * File names begin with date and time e.g. 2018-08-23_1533_export.sql
 * Existing backups are shown in a list and can be downloaded or deleted
@@ -34,6 +34,16 @@ of used operating system and if line breaks are used or not
 .. code-block::
 
    pg_restore -d openatlas -1 export.dump
+
+
+Export RDF/NT
+-------------
+
+* RDF/NT dumps are saved in the **files/rdf/export** folder
+* A warning will appear if the directory isn't writable
+* File names begin with date and time e.g. 2018-08-23_1533_export.nt
+* Existing backups are shown in a list and can be downloaded or deleted
+* Only N-Triples (NT) are available, because of its efficiency
 
 
 Export CSV
@@ -101,7 +111,7 @@ See also:
 * Output includes metadata, files, RDF and SQL dumps, and debug information
   in an ARCHE-compatible structure
 * The process may take **significant time** and consume **large disk space**
-* The ZIP file is saved in the ``files/export`` directory
+* The ZIP file is saved in the ``files/arche/export`` directory
 
 .. note::
 

@@ -161,6 +161,14 @@ class ImportTest(ImportTestCase):
             follow_redirects=True)
         assert b'No license' in rv.data
 
+
+        assert b'export RDF/NT' in c.get(url_for('export_rdf')).data
+        rv = c.get(
+            url_for('rdf_execute'),
+            follow_redirects=True)
+        assert b'Data was exported' in rv.data
+
+
         openatlas_logo_path.unlink()
         file_without_license_path.unlink()
         file_with_license_path.unlink()

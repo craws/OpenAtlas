@@ -109,7 +109,7 @@ class Endpoint:
         if self.parser.export == 'csvNetwork':
             return self.export_csv_network()
         self.get_entities_formatted()
-        if self.parser.format in app.config['RDF_FORMATS']:  # pragma: no cover
+        if self.parser.format in app.config['RDF_FORMATS']:
             return Response(
                 rdf_output(self.generator_entities, self.parser.format),
                 mimetype=app.config['RDF_FORMATS'][self.parser.format])

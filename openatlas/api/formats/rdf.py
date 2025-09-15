@@ -11,7 +11,7 @@ from openatlas.api.resources.resolve_endpoints import get_loud_context
 _linked_art_context = get_loud_context()
 
 
-def _set_proxies() -> None:
+def _set_proxies() -> None:  # pragma: no cover
     if 'http' in app.config['PROXIES']:
         os.environ['http_proxy'] = app.config['PROXIES']['http']
     if 'https' in app.config['PROXIES']:
@@ -30,8 +30,6 @@ def _resolve_predicate(key: str) -> URIRef | None:
 
     if isinstance(context_entry, dict) and "@id" in context_entry:
         predicate_uri_string = context_entry["@id"]
-    elif isinstance(context_entry, str):
-        predicate_uri_string = context_entry
     else:
         predicate_uri_string = key
 
@@ -86,17 +84,6 @@ def _add_triples_from_linked_art(
         data: list[dict[str, Any]] | dict[str, Any],
         parent_subject: URIRef | BNode | None = None,
         parent_predicate: URIRef | None = None) -> None:
-    if isinstance(data, list):
-        for item in data:
-            _add_triples_from_linked_art(
-                graph,
-                item,
-                parent_subject,
-                parent_predicate)
-        return
-
-    if not isinstance(data, dict):
-        return
 
     subject = _get_subject(data, graph, parent_subject, parent_predicate)
 
@@ -108,8 +95,6 @@ def _add_triples_from_linked_art(
             continue
 
         predicate = _resolve_predicate(key)
-        if not predicate:
-            continue
 
         _handle_value(graph, subject, predicate, value)
 

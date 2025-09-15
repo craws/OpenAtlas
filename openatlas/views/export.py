@@ -22,7 +22,7 @@ def get_export_path(view: str) -> Path:
             path = app.config['RDF_PATH']
         case 'sql':
             path = app.config['SQL_PATH']
-        case _:
+        case _:  # pragma: no cover
             path = app.config['EXPORT_PATH']
     return path
 
@@ -67,7 +67,6 @@ def export_execute(format_: str) -> Response:
 @required_group('manager')
 def export_sql() -> str:
     table = build_export_table('sql')
-    print(table)
     return render_template(
         'tabs.html',
         tabs={
