@@ -68,19 +68,6 @@ def type_index() -> str:
         crumbs=[_('type')])
 
 
-@app.route('/type/delete/<int:id_>')
-@required_group('editor')
-def type_delete(id_: int) -> Response:
-    type_ = g.types[id_]
-    if type_.category == 'system' or type_.subs or type_.count:
-        abort(403)
-    root = g.types[type_.root[0]] if type_.root else None  # Before deleting
-    type_.delete()
-    flash(_('entity deleted'), 'info')
-    return redirect(
-        url_for('view', id_=root.id) if root else url_for('type_index'))
-
-
 @app.route('/type/delete_recursive/<int:id_>', methods=['GET', 'POST'])
 @required_group('editor')
 def type_delete_recursive(id_: int) -> str | Response:

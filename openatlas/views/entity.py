@@ -144,6 +144,13 @@ def delete(id_: int) -> Response:
         if entity.classes:
             flash(_('Deletion not possible if classes are attached'), 'error')
             return redirect(url_for('view', id_=id_))
+    elif entity.class_.group['name'] == 'type':
+        if entity.category == 'system':
+            abort(403)
+        if entity.subs or entity.count:
+            return redirect(url_for('type_delete_recursive', id_=entity.id))
+        root = g.types[entity.root[0]] if entity.root else None
+        url = url_for('view', id_=root.id) if root else url_for('type_index')
     elif entity.class_.group['name'] in ['artifact', 'place']:
         if entity.get_linked_entities('P46'):
             flash(_('Deletion not possible if subunits exists'), 'error')
@@ -348,7 +355,7 @@ def was_modified_template(entity: Entity, form: Any) -> str | None:
             or not form.opened.data \
             or entity.modified < \
             datetime.fromtimestamp(float(form.opened.data)):
-        return
+        return None
     del form.save
     g.logger.log('info', 'multi user', 'Overwrite denied')
     flash(
