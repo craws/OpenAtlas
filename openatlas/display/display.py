@@ -206,30 +206,49 @@ class Display:
         self.buttons = [manual(f"entity/{self.entity.class_.group['name']}")]
         if self.entity.class_.name == 'source_translation':
             self.buttons = [manual('entity/source')]
-        if is_authorized(self.entity.class_.write_access):
-            if not self.problematic_type:
-                self.add_button_update()
-                self.add_button_copy()
-            self.add_button_delete()
+        self.add_button_update()
+        self.add_button_delete()
+        for item in self.entity.class_.display['buttons']:
+            match item:
+                case 'copy' if is_authorized(self.entity.class_.write_access):
+                    self.buttons.append(
+                        button(
+                            _('copy'),
+                            url_for(
+                                'update',
+                                id_=self.entity.id,
+                                copy='copy_')))
+                case 'network':
+                    self.buttons.append(
+                        button(
+                            _('network'),
+                            url_for(
+                                'network',
+                                dimensions=0,
+                                id_=self.entity.id)))
+                case 'selectable' if is_authorized('editor'):
+                    self.add_button_selectable()
         self.buttons.append(bookmark_toggle(self.entity.id))
-        if 'network' in self.entity.class_.display['buttons']:
-            self.buttons.append(
-                button(
-                    _('network'),
-                    url_for('network', dimensions=0, id_=self.entity.id)))
         self.buttons.append(
             render_template('util/api_links.html', entity=self.entity))
         if self.structure and len(self.structure['siblings']) > 1:
             self.add_button_sibling_pager()
 
-    def add_button_copy(self) -> None:
-        if 'copy' in self.entity.class_.display['buttons']:
+    def add_button_selectable(self) -> None:
+        if not self.entity.selectable:
             self.buttons.append(
                 button(
-                    _('copy'),
-                    url_for('update', id_=self.entity.id, copy='copy_')))
+                    _('set selectable'),
+                    url_for('type_set_selectable', id_=self.entity.id)))
+        elif not self.entity.count:
+            self.buttons.append(
+                button(
+                    _('set unselectable'),
+                    url_for('type_unset_selectable', id_=self.entity.id)))
 
     def add_button_delete(self) -> None:
+        if not is_authorized(self.entity.class_.write_access):
+            return
         if current_user.group == 'contributor':
             info = g.logger.get_log_info(self.entity.id)
             if not info['creator'] or info['creator'].id != current_user.id:
@@ -243,6 +262,9 @@ class Display:
             onclick=f"return confirm('{msg}')"))
 
     def add_button_update(self) -> None:
+        if not is_authorized(self.entity.class_.write_access) \
+                or self.problematic_type:
+            return
         self.buttons.append(
             button(_('edit'), url_for('update', id_=self.entity.id)))
 

@@ -1,6 +1,6 @@
 from flask_babel import lazy_gettext as _
 
-from config.model.class_groups import class_groups, standard_relations
+from config.model.class_groups import standard_relations
 
 type_ = {
     'attributes': {
@@ -32,6 +32,7 @@ type_ = {
         'file': standard_relations['file'],
         'reference': standard_relations['reference']},
     'display': {
+        'buttons': ['selectable'],
         'form': {
             'insert_and_continue': True},
         'additional_tabs': {

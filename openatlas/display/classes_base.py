@@ -128,30 +128,6 @@ class PlaceBaseDisplay(BaseDisplay):
 
 class TypeBaseDisplay(BaseDisplay):
 
-    def add_button_delete(self) -> None:
-        if self.entity.category != 'system':
-            url = url_for('type_delete', id_=self.entity.id)
-            if self.entity.count or self.entity.subs:
-                url = url_for('type_delete_recursive', id_=self.entity.id)
-            self.buttons.append(button(_('delete'), url))
-
-    def add_button_others(self) -> None:
-        if is_authorized('editor') and self.entity.category != 'value':
-            if not self.entity.selectable:
-                self.buttons.append(
-                    button(
-                        _('set selectable'),
-                        url_for('type_set_selectable', id_=self.entity.id)))
-            elif not self.entity.count:
-                self.buttons.append(
-                    button(
-                        _('set unselectable'),
-                        url_for('type_unset_selectable', id_=self.entity.id)))
-
-    # def add_button_update(self) -> None:
-    #    if self.entity.category != 'system':
-    #        super().add_button_update()
-
     def add_data(self) -> None:
         self.data[_('super')] = link(g.types[self.entity.root[-1]])
         if self.entity.category == 'value':
