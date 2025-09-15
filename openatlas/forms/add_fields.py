@@ -28,11 +28,20 @@ def add_name_fields(form: Any, entity: Entity) -> None:
             form,
             'name',
             StringField(
-                _('name'),
-                validators=[InputRequired()],
+                entity.class_.attributes['name']['label'],
+                validators=get_validators(entity.class_.attributes['name']),
                 render_kw={'autofocus': True}))
     if 'alias' in entity.class_.attributes:
         setattr(form, 'alias', FieldList(RemovableListField()))
+
+
+def get_validators(item: dict[str, Any]):
+    validators = []
+    if item['required']:
+        validators.append(InputRequired())
+    if item.get('format') == 'url':
+        validators.append(URL())
+    return validators
 
 
 def add_reference_systems(form: Any, class_: OpenatlasClass) -> None:

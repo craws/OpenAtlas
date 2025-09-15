@@ -49,4 +49,5 @@ edition = copy.deepcopy(bibliography)
 external_reference = copy.deepcopy(bibliography)
 external_reference['attributes']['name'] = {
     'label': _('URL'),
+    'format': 'url',
     'required': True}
