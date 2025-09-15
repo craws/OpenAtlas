@@ -59,11 +59,7 @@
                             type="text"></div>
                         {% if 'editor'|is_authorized and type_.category != 'system' %}
                           <div class="col-auto">
-                            {% if category == 'place' %}
-                              {{ _('place')|button(url_for('insert', class_='administrative_unit', origin_id=type_.id))|safe }}
-                            {% else %}
-                              {{ _('type')|button(url_for('insert', class_='type', origin_id=type_.id))|safe }}
-                            {% endif %}
+                            {{ _('type')|button(url_for('insert', class_=type_.class_.name, origin_id=type_.id, relation='subs'))|safe }}
                           </div>
                         {% endif %}
                         {% if category in ['custom', 'value'] and 'manager'|is_authorized %}
