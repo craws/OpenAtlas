@@ -11,6 +11,7 @@ model = {
         'description': {},
         'dates': {}},
     'relations': {
+        'source': standard_relations['source'],
         'actor': {
             'label': _('actor'),
             'classes': class_groups['actor']['classes'],
@@ -32,9 +33,6 @@ model = {
             'properties': 'P9',
             'multiple': True,
             'tab': {}},
-        'source': standard_relations['source'],
-        'file': standard_relations['file'],
-        'reference': standard_relations['reference'],
         'sub_event': {
             'label': _('sub event'),
             'classes': class_groups['event']['classes'],
@@ -44,7 +42,9 @@ model = {
             'classes': class_groups['event']['classes'],
             'properties': 'P9',
             'inverse': True,
-            'mode': 'direct'}},
+            'mode': 'direct'},
+        'reference': standard_relations['reference'],
+        'file': standard_relations['file']},
     'display': {
         'buttons': ['copy', 'network'],
         'form': {'insert_and_continue': True},

@@ -54,8 +54,8 @@ source = {
             'tab': {
                 'buttons': ['link', 'insert'],
                 'tooltip': _('mentioned in the source')}},
-        'file': standard_relations['file'],
-        'reference': standard_relations['reference']},
+        'reference': standard_relations['reference'],
+        'file': standard_relations['file']},
     'display': {
         'buttons': ['copy'],
         'form': {

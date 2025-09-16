@@ -29,8 +29,8 @@ type_ = {
             'properties': 'P2',
             'inverse': True,
             'multiple': True},
-        'file': standard_relations['file'],
-        'reference': standard_relations['reference']},
+        'reference': standard_relations['reference'],
+        'file': standard_relations['file']},
     'display': {
         'buttons': ['selectable'],
         'form': {
