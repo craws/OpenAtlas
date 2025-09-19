@@ -20,6 +20,7 @@ artifact = {
             'label': _('super'),
             'classes': ['artifact'] + class_groups['place']['classes'],
             'properties': 'P46',
+            'inverse': True,
             'mode': 'direct'},
         'source': standard_relations['source'],
         'event': {
@@ -29,11 +30,10 @@ artifact = {
             'multiple': True,
             'tab': {
                 'buttons': ['insert']}},
-        'artifact': {
+        'subs': {
             'label': _('subs'),
             'classes': 'artifact',
             'properties': 'P46',
-            'inverse': True,
             'multiple': True,
             'tab': {
                 'buttons': ['link', 'insert']}},

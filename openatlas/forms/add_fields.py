@@ -144,6 +144,16 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
             if class_ not in entities:
                 entities[class_] = Entity.get_by_class(class_, True, True)
             items += entities[class_]
+
+        # Todo: more elegant way to filter?
+        filter_ids = []
+        if 'P46' in relation['properties']:
+            filter_ids = [entity.id] + [
+                e.id for e in entity.get_linked_entities_recursive('P46')]
+        for item in items:
+            if item.id in filter_ids:
+                items.remove(item)
+
         if relation['multiple']:
             selection: Any = []
             if entity.id:

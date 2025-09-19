@@ -87,8 +87,7 @@ def entity_table(
     if relation and relation['mode'].startswith('tab'):
         if relation['additional_fields']:
             columns.append('update')
-        if relation['name'] != 'subs':  # Prevents breaking of hierarchies
-            columns.append('remove')
+        columns.append('remove')
 
     order = None
     defs = None

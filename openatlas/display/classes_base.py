@@ -112,12 +112,6 @@ class PlaceBaseDisplay(BaseDisplay):
                 #    get_base_table_data(event))
                 event_ids.append(event.id)
         self.structure = entity.get_structure()
-        if self.structure:
-            for _item in self.structure['subunits']:
-                pass
-                # name = 'artifact' if item.class_.view == 'artifact' \
-                #    else item.class_.name
-                # self.tabs[name].table.rows.append(get_base_table_data(item))
         self.gis_data = Gis.get_all([entity], self.structure)
         if self.gis_data['gisPointSelected'] == '[]' \
                 and self.gis_data['gisPolygonSelected'] == '[]' \
