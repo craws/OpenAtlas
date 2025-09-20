@@ -147,12 +147,16 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
 
         # Todo: more elegant way to filter?
         filter_ids = []
-        if 'P46' in relation['properties']:
+        if relation['name'] in ['subs', 'super']:
             filter_ids = [entity.id] + [
-                e.id for e in entity.get_linked_entities_recursive('P46')]
+                e.id for e in entity.get_linked_entities_recursive(
+                    relation['properties'][0],
+                    relation['name'] == 'subs' and relation['inverse'])]
+
+        filtered_items = []
         for item in items:
-            if item.id in filter_ids:
-                items.remove(item)
+            if item.id not in filter_ids:
+                filtered_items.append(item)
 
         if relation['multiple']:
             selection: Any = []
@@ -167,7 +171,7 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
                 form,
                 name,
                 TableMultiField(
-                    items,
+                    filtered_items,
                     selection,
                     description=relation['tooltip'],
                     label=relation['label'],
@@ -187,7 +191,7 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
                 form,
                 name,
                 TableField(
-                    items,
+                    filtered_items,
                     selection,
                     label=relation['label'],
                     description=relation['tooltip'],

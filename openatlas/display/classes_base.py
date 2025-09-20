@@ -16,7 +16,6 @@ from openatlas.models.gis import Gis
 
 class BaseDisplay:
     buttons: list[str]
-    crumbs: list[Any]
     data: dict[str, Any]
     overlays = None
     tabs: dict[str, Tab]

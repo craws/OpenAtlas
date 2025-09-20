@@ -8,7 +8,7 @@ from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.database.connect import Transaction
-from openatlas.display.util import link, required_group
+from openatlas.display.util import hierarchy_crumbs, link, required_group
 from openatlas.display.util2 import uc_first
 from openatlas.forms.display import display_form
 from openatlas.forms.form import (
@@ -37,7 +37,6 @@ def link_insert(origin_id: int, relation_name: str) -> str | Response:
     relation = origin.class_.relations[relation_name]
     if request.method == 'POST':
         if request.form['checkbox_values']:
-            # Todo: properties can be multiple?
             origin.link_string(
                 relation['properties'][0],
                 request.form['checkbox_values'],
@@ -45,7 +44,6 @@ def link_insert(origin_id: int, relation_name: str) -> str | Response:
         return redirect(
             f"{url_for('view', id_=origin.id)}#tab-" +
             relation_name.replace('_', '-'))
-    # Todo: properties can be multiple?
     content = table_form(
         relation['classes'],
         [e.id for e in origin.get_linked_entities(
@@ -55,7 +53,7 @@ def link_insert(origin_id: int, relation_name: str) -> str | Response:
         'content.html',
         content=content,
         title=_(origin.class_.group['name']),
-        crumbs=[link(origin, index=True), origin, _('link')])
+        crumbs=hierarchy_crumbs(origin) + [origin, _('link')])
 
 
 @app.route(

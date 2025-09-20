@@ -85,30 +85,32 @@ def get_appearance(event_links: list[Link]) -> tuple[str, str]:
         actor = link_.range
         event_link = link(_('event'), url_for('view', id_=event.id))
         if not actor.dates.first:
-            if link_.dates.first \
-                    and (not first_year or int(link_.dates.first) < int(first_year)):
+            if link_.dates.first and (
+                    not first_year
+                    or int(link_.dates.first) < int(first_year)):
                 first_year = link_.dates.first
                 first_string = \
-                    f"{format_entity_date(link_.dates, 'begin', link_.object_)} " \
+                    format_entity_date(link_.dates, 'begin', link_.object_) + \
                     f"{_('at an')} {event_link}"
-            elif event.first \
-                    and (not first_year or int(event.dates.first) < int(first_year)):
+            elif event.first and (
+                    not first_year
+                    or int(event.dates.first) < int(first_year)):
                 first_year = event.dates.first
                 first_string = \
-                    f"{format_entity_date(event.dates, 'begin', link_.object_)}" \
+                    format_entity_date(event.dates, 'begin', link_.object_) + \
                     f" {_('at an')} {event_link}"
         if not actor.dates.last:
-            if link_.dates.last \
-                    and (not last_year or int(link_.dates.last) > int(last_year)):
+            if link_.dates.last and (
+                    not last_year or int(link_.dates.last) > int(last_year)):
                 last_year = link_.dates.last
                 last_string = \
-                    f"{format_entity_date(link_.dates, 'end', link_.object_)} " \
+                    format_entity_date(link_.dates, 'end', link_.object_) + \
                     f"{_('at an')} {event_link}"
-            elif event.dates.last \
-                    and (not last_year or int(event.dates.last) > int(last_year)):
+            elif event.dates.last and (
+                    not last_year or int(event.dates.last) > int(last_year)):
                 last_year = event.dates.last
                 last_string = \
-                    f"{format_entity_date(event.dates, 'end', link_.object_)} " \
+                    format_entity_date(event.dates, 'end', link_.object_) + \
                     f"{_('at an')} {event_link}"
     return first_string, last_string
 
@@ -519,20 +521,6 @@ def display_citation_example(code: str) -> str:
 
 
 @app.template_filter()
-def breadcrumb(crumbs: list[Any]) -> str:
-    items = []
-    for item in crumbs:
-        if isinstance(item, list):
-            items.append(
-                f'<a href="{item[1]}" class="uc-first">{str(item[0])}</a>')
-        elif isinstance(item, (str, LazyString)):
-            items.append(f'<span class="uc-first">{item}</span>')
-        elif item:
-            items.append(link(item))
-    return '&nbsp;>&nbsp; '.join(items)
-
-
-@app.template_filter()
 def display_info(data: dict[str, Any]) -> str:
     return render_template('util/info_data.html', data=data)
 
@@ -628,3 +616,30 @@ def display_annotation_text_links(entity: Entity) -> str:
         text = text[:position] + tag_close + text[position:]
         offset += len(tag_close)
     return text
+
+
+def hierarchy_crumbs(entity: Entity) -> list[str]:
+    crumbs = [link(entity, index=True)]
+    for relation in entity.class_.relations.values():
+        if relation['name'] == 'super' \
+                or (entity.class_.name == 'source_translation'
+                    and relation['name'] == 'source'):
+            crumbs += [
+                e for e in entity.get_linked_entities_recursive(
+                    relation['properties'][0],
+                    relation['inverse'])]
+    return crumbs
+
+
+@app.template_filter()
+def display_crumbs(crumbs: list[Any]) -> str:
+    items = []
+    for item in crumbs:
+        if isinstance(item, list):
+            items.append(
+                f'<a href="{item[1]}" class="uc-first">{str(item[0])}</a>')
+        elif isinstance(item, (str, LazyString)):
+            items.append(f'<span class="uc-first">{item}</span>')
+        elif item:
+            items.append(link(item))
+    return '&nbsp;>&nbsp; '.join(items)

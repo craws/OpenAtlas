@@ -22,7 +22,6 @@ from openatlas.views.entity_index import file_preview
 
 class Display:
     buttons: list[str]
-    crumbs: list[Any]
     data: dict[str, Any]
     overlays = None
     tabs: dict[str, Tab]
@@ -39,24 +38,8 @@ class Display:
         self.add_tabs()
         if 'file' in self.tabs and show_table_icons():
             self.add_file_tab_thumbnails()
-        self.add_crumbs()
         self.add_buttons()
         self.add_info_tab_content()  # Call later because of profile image
-
-    def add_crumbs(self) -> None:
-        self.crumbs = [link(self.entity, index=True)]
-        for relation in self.entity.class_.relations.values():
-            for property_ in relation['properties']:
-                if property_ in ['P73'] and relation['inverse'] \
-                        or property_ in ['P127'] and not relation['inverse']:
-                    self.crumbs += [
-                        e for e in self.entity.get_linked_entities_recursive(
-                            property_,
-                            relation['inverse'])]
-        # if self.structure:
-        #    for super_ in self.structure['supers']:
-        #        self.crumbs.append(link(super_))
-        self.crumbs.append(self.entity.name)
 
     def get_type_data(self) -> dict[str, Any]:
         if self.entity.location:  # Add location types

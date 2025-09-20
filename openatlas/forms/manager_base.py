@@ -8,7 +8,6 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import HiddenField, SelectMultipleField, StringField, widgets
 
-from openatlas.display.util import link
 from openatlas.forms.field import TableField, TreeField
 from openatlas.forms.process import process_standard_fields
 from openatlas.forms.util import convert
@@ -347,12 +346,6 @@ class TypeBaseManager(BaseManager):
     def customize_labels(self) -> None:
         getattr(self.form, str(self.get_root().id)).label.text = 'super'
 
-    def get_crumbs(self) -> list[Any]:
-        type_ = self.origin or self.entity
-        self.crumbs = [link(type_, index=True)]
-        self.crumbs += [g.types[type_id] for type_id in type_.root]
-        return self.crumbs
-
     def get_root(self) -> Entity:
         type_ = self.origin or self.entity
         return g.types[type_.root[0]] if type_.root else type_
@@ -363,7 +356,6 @@ class TypeBaseManager(BaseManager):
             if self.origin.id != root_id else None
 
     def populate_update(self) -> None:
-        super().populate_update()
         if hasattr(self.form, 'name_inverse'):
             name_parts = self.entity.name.split(' (')
             self.form.name.data = name_parts[0].strip()

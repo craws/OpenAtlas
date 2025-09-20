@@ -16,8 +16,8 @@ from openatlas.display.display import Display
 from openatlas.display.image_processing import resize_image
 from openatlas.display.util import (
     button, check_iiif_activation, check_iiif_file_exist,
-    convert_image_to_iiif, get_file_path, get_iiif_file_path, link,
-    required_group)
+    convert_image_to_iiif, get_file_path, get_iiif_file_path, hierarchy_crumbs,
+    link, required_group)
 from openatlas.display.util2 import is_authorized
 from openatlas.forms.entity_form import get_entity_form, process_form_data
 from openatlas.forms.manager_base import BaseManager
@@ -48,7 +48,7 @@ def view(id_: int) -> str | Response:
         tabs=display.tabs,
         entity=entity,
         gis_data=display.gis_data,
-        crumbs=display.crumbs)
+        crumbs=hierarchy_crumbs(entity) + [entity.name])
 
 
 @app.route(
@@ -94,7 +94,8 @@ def insert(
         writable=os.access(app.config['UPLOAD_PATH'], os.W_OK),
         # overlays=manager.place_info['overlays'],
         title=_(g.classes[class_].group['name']),
-        crumbs=form_crumbs(entity, origin))
+        crumbs=hierarchy_crumbs(origin or entity) + \
+        [origin, f'+ {g.classes[class_].label}'])
 
 
 @app.route('/update/<int:id_>', methods=['GET', 'POST'])
@@ -124,7 +125,7 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
         # gis_data=manager.place_info['gis_data'],
         # overlays=manager.place_info['overlays'],
         title=entity.name,
-        crumbs=form_crumbs(entity))
+        crumbs=hierarchy_crumbs(entity) + [entity, _('edit')])
 
 
 @app.route('/delete/<int:id_>')
@@ -174,28 +175,6 @@ def delete(id_: int) -> Response:
     g.logger.log_user(id_, 'delete')
     flash(_('entity deleted'), 'info')
     return redirect(url)
-
-
-def form_crumbs(entity: Entity, origin: Optional[Entity] = None) -> list[Any]:
-    label = origin.class_.name if origin else entity.class_.group['name']
-    # if label in g.class_view_mapping:
-    #    label = g.class_view_mapping[label]
-    crumbs: list[Any] = [[
-        _(label.replace('_', ' ')),
-        url_for(
-            'index',
-            view=origin.class_.group['name'] if origin
-            else entity.class_.group['name'])]]
-    # if place_info['structure']:
-    #    crumbs += place_info['structure']['supers']
-    if origin:
-        crumbs.append(origin)
-    if not entity.id:
-        crumbs.append(f'+ {g.classes[entity.class_.name].label}')
-    else:
-        crumbs.append(entity)
-        crumbs.append(_('copy') if 'copy_' in request.path else _('edit'))
-    return crumbs
 
 
 def check_insert_access(class_: str) -> None:

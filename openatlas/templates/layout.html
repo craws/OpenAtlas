@@ -183,7 +183,7 @@
 </nav>
 <nav aria-label="breadcrumb" class="d-flex justify-content-between p-3 mb-3 bg-gray">
   <div class="breadcrumb mb-0">
-    {{ crumbs|breadcrumb|safe }}
+    {{ crumbs|display_crumbs|safe }}
   </div>
   <div>
     {{ g.settings.site_name }}
