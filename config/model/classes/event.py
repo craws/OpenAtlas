@@ -32,12 +32,9 @@ model = {
             'classes': class_groups['event']['classes'],
             'properties': 'P9',
             'multiple': True,
-            'tab': {}},
-        'sub_event': {
-            'label': _('sub event'),
-            'classes': class_groups['event']['classes'],
-            'properties': 'P9'},
-        'sub_event_of': {
+            'tab': {
+                'buttons': ['link', 'insert']}},
+        'super': {
             'label': _('sub event of'),
             'classes': class_groups['event']['classes'],
             'properties': 'P9',

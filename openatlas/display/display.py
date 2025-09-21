@@ -126,7 +126,7 @@ class Display:
                         g.display_file_ext:
                     self.entity.image_id = \
                         self.entity.image_id or item.domain.id
-            buttons = [manual(f'entity/{name}')]
+            buttons = [link_] if (link_ := manual(f'entity/{name}')) else []
             if is_authorized('contributor'):
                 if 'link' in relation['tab']['buttons']:
                     buttons.append(
@@ -186,7 +186,9 @@ class Display:
             self.tabs['note'].table.rows.append(data)
 
     def add_buttons(self) -> None:
-        self.buttons = [manual(f"entity/{self.entity.class_.group['name']}")]
+        self.buttons = []
+        if manual_link := manual(f"entity/{self.entity.class_.group['name']}"):
+            self.buttons.append(manual_link)
         if self.entity.class_.name == 'source_translation':
             self.buttons = [manual('entity/source')]
         self.add_button_update()

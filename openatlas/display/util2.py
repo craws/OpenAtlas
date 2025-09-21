@@ -64,17 +64,17 @@ def uc_first(string: str) -> str:
 
 
 @app.template_filter()
-def manual(site: str) -> str:
+def manual(site: str) -> str | None:
     """ If the manual page exists, return the link to it"""
     parts = site.split('/')
     if len(parts) < 2 or parts[1] in ['entities', 'info', 'subs']:
-        return ''
+        return None
     path = \
         Path(app.root_path) / 'static' / 'manual' / parts[0] / \
         (parts[1] + '.html')
     if not path.exists():
         # print(f'Missing manual link: {path}')
-        return ''
+        return None
     return \
         '<a title="' + uc_first(_('manual')) + '" ' \
         f'href="/static/manual/{site}.html" class="manual" ' \
