@@ -32,6 +32,4 @@ class Tab:
         self.form = form
         self.table = table or Table()
         self.tooltip = uc_first(tooltip)
-
-        # Todo: or [manual(f'entity/{name}')] needed?
         self.buttons: list[str] = buttons

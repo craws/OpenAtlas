@@ -379,12 +379,14 @@ def add_value_type_fields(form_class: FlaskForm, subs: list[int]) -> None:
         add_value_type_fields(form_class, sub.subs)
 
 
-def add_buttons(form: Any, entity: Entity) -> None:
+def add_buttons(form: Any, entity: Entity, relation: dict[str, Any]) -> None:
     field = SubmitField
     if 'description' in entity.class_.attributes \
             and 'annotated' in entity.class_.attributes['description']:
         field = SubmitAnnotationField
     setattr(form, 'save', field(_('save') if entity.id else _('insert')))
-    if not entity.id and entity.class_.display['form']['insert_and_continue']:
+    if not entity.id \
+            and entity.class_.display['form']['insert_and_continue'] \
+            and not relation.get('additional_fields'):
         setattr(form, 'insert_and_continue', field(_('insert and continue')))
         setattr(form, 'continue_', HiddenField())

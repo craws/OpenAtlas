@@ -80,7 +80,7 @@ def insert(
     check_insert_access(class_)
     entity = Entity({'openatlas_class_name': class_})
     origin = Entity.get_by_id(origin_id) if origin_id else None
-    form = get_entity_form(entity, origin)
+    form = get_entity_form(entity, origin, relation)
     if form.validate_on_submit():
         # if class_ == 'file':
         #    return redirect(insert_files(manager))
@@ -223,7 +223,7 @@ def insert_files(manager: BaseManager) -> str:
             manager.update_entity()
             g.logger.log_user(manager.entity.id, 'insert')
         Transaction.commit()
-        url = link_origin_and_get_url(manager)
+        url = get_redirect_url(manager)
         flash(_('entity created'), 'info')
     except Exception as e:  # pragma: no cover
         Transaction.rollback()
@@ -243,10 +243,10 @@ def save(
     action = 'update' if entity.id else 'insert'
     Transaction.begin()
     try:
-        entity = process_form_data(entity, form)
+        entity = process_form_data(entity, form, origin, relation_name)
         g.logger.log_user(entity.id, action)
         Transaction.commit()
-        url = link_origin_and_get_url(entity, form, origin, relation_name)
+        url = get_redirect_url(entity, form, origin, relation_name)
         flash(
             _('entity created') if action == 'insert' else _('info update'),
             'info')
@@ -276,12 +276,14 @@ def save(
     return url
 
 
-def link_origin_and_get_url(
+def get_redirect_url(
         entity: Entity,
         form: Any,
         origin: Entity | None,
         relation_name: str | None) -> str:
     url = url_for('view', id_=entity.id)
+    if hasattr(form, 'continue_') and form.continue_.data == 'yes':
+        url = request.url
     if entity.class_.group['name'] != 'type' and origin and relation_name:
         relation = origin.class_.relations[relation_name]
         if relation['additional_fields']:
@@ -290,21 +292,9 @@ def link_origin_and_get_url(
                 origin_id=origin.id,
                 relation_name=relation_name,
                 selection_id=entity.id)
-        else:
-            origin.link(
-                relation['properties'][0],
-                entity,
-                inverse=relation['inverse'])
+        elif not hasattr(form, 'continue_') or form.continue_.data != 'yes':
             url = url_for('view', id_=origin.id) + f"#tab-{relation_name}"
-
-    if hasattr(form, 'continue_') and form.continue_.data == 'yes':
-        url = request.url
-    # if manager.continue_link_id and manager.origin:
-    #    return url_for(
-    #        'link_update',
-    #        id_=manager.continue_link_id,
-    #        origin_id=manager.origin.id)
-    # elif hasattr(manager.form, 'continue_') \
+    # if hasattr(manager.form, 'continue_') \
     #        and manager.form.continue_.data in ['sub', 'human_remains']:
     #    class_ = manager.form.continue_.data
     #    if class_ == 'sub':

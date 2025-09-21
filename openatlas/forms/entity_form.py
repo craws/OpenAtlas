@@ -15,7 +15,11 @@ from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity, insert
 
 
-def get_entity_form(entity: Entity, origin: Optional[Entity] = None) -> Any:
+def get_entity_form(
+        entity: Entity,
+        origin: Optional[Entity] = None,
+        relation: Optional[str] = None) -> Any:
+
     class Form(FlaskForm):
         opened = HiddenField()
         validate = validate
@@ -27,7 +31,10 @@ def get_entity_form(entity: Entity, origin: Optional[Entity] = None) -> Any:
     if 'dates' in entity.class_.attributes:
         add_date_fields(Form, entity)
     add_description(Form, entity, origin)
-    add_buttons(Form, entity)
+    add_buttons(
+        Form,
+        entity,
+        origin.class_.relations[relation] if origin and relation else {})
     form: Any = Form(obj=entity)
     if request.method == 'GET' and entity.id:
         populate_update(form, entity)
@@ -36,7 +43,11 @@ def get_entity_form(entity: Entity, origin: Optional[Entity] = None) -> Any:
     return form
 
 
-def process_form_data(entity: Entity, form: Any) -> Entity:
+def process_form_data(
+        entity: Entity,
+        form: Any,
+        origin: Entity | None,
+        relation_name: str | None) -> Entity:
     data = {
         'name': entity.class_.name,
         'openatlas_class_name': entity.class_.name,
@@ -61,7 +72,7 @@ def process_form_data(entity: Entity, form: Any) -> Entity:
         entity = insert_entity(form, data)
     if entity.class_.hierarchies:
         process_types(entity, form)
-    process_relations(entity, form)
+    process_relations(entity, form, origin, relation_name)
     process_reference_systems(entity, form)
     return entity
 
@@ -91,7 +102,11 @@ def process_types(entity: Entity, form: Any) -> None:
                 entity.link('P2', [g.types[id_] for id_ in data])
 
 
-def process_relations(entity: Entity, form: Any) -> None:
+def process_relations(
+        entity: Entity,
+        form: Any,
+        origin: Entity | None,
+        relation_name: str | None) -> None:
     for name, relation in entity.class_.relations.items():
         if relation['mode'] == 'tab':
             continue
@@ -102,10 +117,17 @@ def process_relations(entity: Entity, form: Any) -> None:
                 for place in entities:
                     locations.append(place.get_linked_entity_safe('P53'))
                 entities = locations
-            # Todo: properties can be multiple?
             entity.link(
                 relation['properties'][0],
                 entities,
+                inverse=relation['inverse'])
+    # Todo: will be linked twice in case it's also a direct relation in form
+    if entity.class_.group['name'] != 'type' and origin and relation_name:
+        relation = origin.class_.relations[relation_name]
+        if not relation['additional_fields']:
+            origin.link(
+                relation['properties'][0],
+                entity,
                 inverse=relation['inverse'])
 
 
