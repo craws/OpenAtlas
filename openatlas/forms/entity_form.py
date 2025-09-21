@@ -5,6 +5,7 @@ from flask import g, request
 from flask_wtf import FlaskForm
 from wtforms import HiddenField
 
+from openatlas.database.connect import Transaction
 from openatlas.forms.add_fields import (
     add_buttons, add_class_types, add_date_fields, add_description,
     add_name_fields, add_reference_systems, add_relations)
@@ -13,6 +14,7 @@ from openatlas.forms.process import process_dates
 from openatlas.forms.util import convert
 from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity, insert
+from openatlas.models.gis import InvalidGeomException
 
 
 def get_entity_form(
@@ -65,15 +67,26 @@ def process_form_data(
         elif getattr(form, attr).data or getattr(form, attr).data == 0:
             value = getattr(form, attr).data
             data[attr] = value.strip() if isinstance(value, str) else value
-    if entity.id:
-        delete_links(entity)
-        entity.update(data)
-    else:
-        entity = insert_entity(form, data)
-    if entity.class_.hierarchies:
-        process_types(entity, form)
-    process_relations(entity, form, origin, relation_name)
-    process_reference_systems(entity, form)
+    try:
+        Transaction.begin()
+        if entity.id:
+            delete_links(entity)
+            entity.update(data)
+        else:
+            entity = insert_entity(form, data)
+        if entity.class_.hierarchies:
+            process_types(entity, form)
+        process_relations(entity, form, origin, relation_name)
+        process_reference_systems(entity, form)
+        Transaction.commit()
+    except InvalidGeomException as e:
+        Transaction.rollback()
+        g.logger.log('error', 'database', 'invalid geom', e)
+        raise e from None
+    except Exception as e:
+        Transaction.rollback()
+        g.logger.log('error', 'database', 'transaction failed', e)
+        raise e from None
     return entity
 
 

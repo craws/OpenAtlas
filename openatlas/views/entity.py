@@ -11,7 +11,6 @@ from werkzeug.utils import redirect, secure_filename
 from werkzeug.wrappers import Response
 
 from openatlas import app
-from openatlas.database.connect import Transaction
 from openatlas.display.display import Display
 from openatlas.display.image_processing import resize_image
 from openatlas.display.util import (
@@ -197,7 +196,7 @@ def check_update_access(entity: Entity) -> None:
 def insert_files(manager: BaseManager) -> str:
     filenames = []
     try:
-        Transaction.begin()
+        # Transaction.begin()
         entity_name = manager.form.name.data.strip()
         for count, file in enumerate(manager.form.file.data):
             manager.entity = insert('file', file.filename)
@@ -222,11 +221,11 @@ def insert_files(manager: BaseManager) -> str:
             manager.process_form()
             manager.update_entity()
             g.logger.log_user(manager.entity.id, 'insert')
-        Transaction.commit()
-        url = get_redirect_url(manager)
+        # Transaction.commit()
+        url = redirect_url_insert(manager)
         flash(_('entity created'), 'info')
     except Exception as e:  # pragma: no cover
-        Transaction.rollback()
+        # Transaction.rollback()
         for filename in filenames:
             (app.config['UPLOAD_PATH'] / filename).unlink()
         g.logger.log('error', 'database', 'transaction failed', e)
@@ -241,42 +240,32 @@ def save(
         origin: Optional[Entity] = None,
         relation_name: Optional[str] = None) -> str:
     action = 'update' if entity.id else 'insert'
-    Transaction.begin()
+    url = url_for('index', view=entity.class_.group['name'])
     try:
         entity = process_form_data(entity, form, origin, relation_name)
         g.logger.log_user(entity.id, action)
-        Transaction.commit()
-        url = get_redirect_url(entity, form, origin, relation_name)
+        url = redirect_url_insert(entity, form, origin, relation_name)
         flash(
             _('entity created') if action == 'insert' else _('info update'),
             'info')
     except InvalidGeomException as e:
-        Transaction.rollback()
-        g.logger.log('error', 'database', 'invalid geom', e)
         flash(_('Invalid geom entered'), 'error')
-        url = url_for('index', view=entity.class_.group['name'])
         if action == 'update' and entity.id:
             url = url_for(
                 'update',
                 id_=entity.id,
                 origin_id=origin.id if origin else None)
     except Exception as e:
-        Transaction.rollback()
-        g.logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
         if action == 'update' and entity.id:
             url = url_for(
                 'update',
                 id_=entity.id,
                 origin_id=origin.id if origin else None)
-        else:
-            url = url_for('type_index') if \
-                entity.class_.name in ['administrative_unit', 'type'] else \
-                url_for('index', view=entity.class_.group['name'])
     return url
 
 
-def get_redirect_url(
+def redirect_url_insert(
         entity: Entity,
         form: Any,
         origin: Entity | None,
