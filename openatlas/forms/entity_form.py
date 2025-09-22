@@ -120,6 +120,9 @@ def process_relations(
         form: Any,
         origin: Entity | None,
         relation_name: str | None) -> None:
+    origin_already_linked = False
+    origin_relation = origin.class_.relations[relation_name] \
+        if origin else None
     for name, relation in entity.class_.relations.items():
         if relation['mode'] == 'tab':
             continue
@@ -134,14 +137,18 @@ def process_relations(
                 relation['properties'][0],
                 entities,
                 inverse=relation['inverse'])
-    # Todo: will be linked twice in case it's also a direct relation in form
-    if entity.class_.group['name'] != 'type' and origin and relation_name:
-        relation = origin.class_.relations[relation_name]
-        if not relation['additional_fields']:
-            origin.link(
-                relation['properties'][0],
-                entity,
-                inverse=relation['inverse'])
+        if (origin_relation and
+                entity.class_.name in origin_relation['classes']
+                and origin_relation['properties'][0] in relation['properties']
+                and origin_relation['inverse'] != relation['inverse']):
+            origin_already_linked = True
+    if origin_relation \
+            and not origin_relation['additional_fields'] \
+            and not origin_already_linked:
+        origin.link(
+            origin_relation['properties'][0],
+            entity,
+            inverse=origin_relation['inverse'])
 
 
 def insert_entity(form: Any, data: dict[str, Any]) -> Entity:
