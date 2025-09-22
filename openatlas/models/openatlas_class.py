@@ -132,3 +132,15 @@ def get_model(class_name: str) -> dict[str, Any]:
             relation['tab']['columns'] = relation['tab'].get('columns')
             relation['tab']['tooltip'] = relation['tab'].get('tooltip')
     return data
+
+
+def get_reverse_relation(
+        class_: OpenatlasClass,
+        relation: dict[str, Any],
+        reverse_class: OpenatlasClass) -> dict[str, Any] | None:
+    for reverse_relation in reverse_class.relations.values():
+        if class_.name in reverse_relation['classes'] \
+                and relation['property'] == reverse_relation['property'] \
+                and relation['inverse'] != reverse_relation['inverse']:
+            return reverse_relation
+    return None

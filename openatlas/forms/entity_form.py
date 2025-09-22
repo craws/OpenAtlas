@@ -15,6 +15,7 @@ from openatlas.forms.util import convert
 from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity, insert
 from openatlas.models.gis import InvalidGeomException
+from openatlas.models.openatlas_class import get_reverse_relation
 
 
 def get_entity_form(
@@ -120,9 +121,6 @@ def process_relations(
         form: Any,
         origin: Entity | None,
         relation_name: str | None) -> None:
-    origin_already_linked = False
-    origin_relation = origin.class_.relations[relation_name] \
-        if origin else None
     for name, relation in entity.class_.relations.items():
         if relation['mode'] == 'tab':
             continue
@@ -137,18 +135,16 @@ def process_relations(
                 relation['property'],
                 entities,
                 inverse=relation['inverse'])
-        if (origin_relation and
-                entity.class_.name in origin_relation['classes']
-                and origin_relation['property'] == relation['property']
-                and origin_relation['inverse'] != relation['inverse']):
-            origin_already_linked = True
-    if origin_relation \
-            and not origin_relation['additional_fields'] \
-            and not origin_already_linked:
-        origin.link(
-            origin_relation['property'],
-            entity,
-            inverse=origin_relation['inverse'])
+    if origin and relation_name:
+        relation = get_reverse_relation(
+            origin.class_,
+            origin.class_.relations[relation_name],
+            entity.class_)
+        if not relation or relation['mode'] != 'direct':
+            entity.link(
+                relation['property'],
+                origin,
+                inverse=relation['inverse'])
 
 
 def insert_entity(form: Any, data: dict[str, Any]) -> Entity:
