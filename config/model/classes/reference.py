@@ -9,7 +9,7 @@ from config.model.class_groups import class_groups, standard_relations
 def get_relation(classes: str | list[str]) -> dict[str, Any]:
     return {
         'classes': classes,
-        'properties': 'P67',
+        'property': 'P67',
         'multiple': True,
         'additional_fields': ['page'],
         'tab': {
@@ -30,7 +30,7 @@ bibliography = {
         'artifact': get_relation(class_groups['artifact']['classes']),
         'type': {
             'classes': class_groups['type']['classes'],
-            'properties': 'P67',
+            'property': 'P67',
             'multiple': True,
             'additional_fields': ['page'],
             'tab': {

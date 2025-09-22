@@ -13,20 +13,20 @@ source = {
         'text': {
             'label': _('text'),
             'classes': 'source_translation',
-            'properties': 'P73',
+            'property': 'P73',
             'multiple': True,
             'tab':{
                 'buttons': ['insert']}},
         'actor': {
             'classes': class_groups['actor']['classes'],
-            'properties': 'P67',
+            'property': 'P67',
             'multiple': True,
             'tab': {
                 'buttons': ['link', 'insert'],
                 'tooltip': _('mentioned in the source')}},
         'artifact': {
             'classes': class_groups['artifact']['classes'],
-            'properties': 'P67',
+            'property': 'P67',
             'multiple': True,
             'tab': {
                 'buttons': ['link', 'insert'],
@@ -34,7 +34,7 @@ source = {
         'information_carrier': {
             'label': _('information carrier'),
             'classes': 'artifact',
-            'properties': 'P128',
+            'property': 'P128',
             'inverse': True,
             'multiple': True,
             'mode': 'direct',
@@ -42,14 +42,14 @@ source = {
                 'Link artifacts as the information carrier of the source')},
         'event': {
             'classes': class_groups['event']['classes'],
-            'properties': 'P67',
+            'property': 'P67',
             'multiple': True,
             'tab': {
                 'buttons': ['link', 'insert'],
                 'tooltip': _('mentioned in the source')}},
         'place': {
             'classes': class_groups['place']['classes'],
-            'properties': 'P67',
+            'property': 'P67',
             'multiple': True,
             'tab': {
                 'buttons': ['link', 'insert'],
@@ -73,7 +73,7 @@ source_translation = {
     'relations': {
         'source': {
             'classes': 'source',
-            'properties': 'P73',
+            'property': 'P73',
             'inverse': True,
             'required': True,
             'mode': 'direct'}},

@@ -115,11 +115,11 @@ class Display:
                 continue
             items = []
             for item in self.entity.get_links(
-                    relation['properties'],
+                    relation['property'],
                     relation['classes'],
                     relation['inverse']):
                 items.append(item)
-                if relation['properties'] == ['P67'] \
+                if relation['property'] == 'P67' \
                         and relation['classes'] == ['file'] \
                         and not self.entity.image_id \
                         and item.domain.get_file_ext() in \
@@ -287,7 +287,7 @@ class Display:
             if relation['mode'] in ['direct', 'display']:
                 self.data[relation['label']] = []
                 for e in self.entity.get_linked_entities(
-                        relation['properties'],
+                        relation['property'],
                         relation['classes'],
                         relation['inverse']):
                     if e.class_.name == 'object_location':

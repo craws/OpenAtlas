@@ -90,7 +90,7 @@ def add_description(
             source_text=entity.get_annotated_text() if entity.id else '',
             linked_entities=[
                 {'id': e.id, 'name': e.name}
-                for e in source.get_linked_entities('P67')]))
+                for e in source.get_linked_entities('P67')] if source else []))
     setattr(form, 'description', HiddenField())
 
 
@@ -150,7 +150,7 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
         if relation['name'] in ['subs', 'super']:
             filter_ids = [entity.id] + [
                 e.id for e in entity.get_linked_entities_recursive(
-                    relation['properties'][0],
+                    relation['property'],
                     relation['name'] == 'subs' and relation['inverse'])]
 
         filtered_items = []
@@ -162,7 +162,7 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
             selection: Any = []
             if entity.id:
                 selection = entity.get_linked_entities(
-                    relation['properties'],
+                    relation['property'],
                     relation['classes'],
                     inverse=relation['inverse'])
             elif origin and origin.class_.name in relation['classes']:
@@ -180,7 +180,7 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
             selection = None
             if entity.id:
                 selection = entity.get_linked_entity(
-                    relation['properties'],
+                    relation['property'],
                     relation['classes'],
                     relation['inverse'])
             elif origin and origin.class_.name in relation['classes']:

@@ -38,7 +38,7 @@ def link_insert(origin_id: int, relation_name: str) -> str | Response:
     if request.method == 'POST':
         if request.form['checkbox_values']:
             origin.link_string(
-                relation['properties'][0],
+                relation['property'],
                 request.form['checkbox_values'],
                 inverse=relation['inverse'])
         return redirect(
@@ -47,7 +47,7 @@ def link_insert(origin_id: int, relation_name: str) -> str | Response:
     content = table_form(
         relation['classes'],
         [e.id for e in origin.get_linked_entities(
-            relation['properties'][0],
+            relation['property'],
             inverse=relation['inverse'])])
     return render_template(
         'content.html',
@@ -78,7 +78,7 @@ def link_insert_detail(
             hierarchy = Entity.get_hierarchy(relation['type'])
             type_id = getattr(form, str(hierarchy.id)).data or None
         origin.link(
-            relation['properties'][0],
+            relation['property'],
             Entity.get_by_ids(ids),
             form.description.data if 'description' in form else None,
             relation['inverse'],

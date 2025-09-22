@@ -52,7 +52,7 @@ standard_relations = {
     'file': {
         'label': _('file'),
         'classes': class_groups['file']['classes'],
-        'properties': 'P67',
+        'property': 'P67',
         'inverse': True,
         'multiple': True,
         'tab': {
@@ -61,7 +61,7 @@ standard_relations = {
     'reference': {
         'label': _('reference'),
         'classes': class_groups['reference']['classes'],
-        'properties': 'P67',
+        'property': 'P67',
         'inverse': True,
         'multiple': True,
         'additional_fields': ['page'],
@@ -71,7 +71,7 @@ standard_relations = {
     'source': {
         'label': _('source'),
         'classes': 'source',
-        'properties': 'P67',
+        'property': 'P67',
         'inverse': True,
         'multiple': True,
         'tab': {

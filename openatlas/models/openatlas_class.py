@@ -116,9 +116,6 @@ def get_model(class_name: str) -> dict[str, Any]:
         relation['classes'] = relation['classes'] \
             if isinstance(relation['classes'], list) \
             else [relation['classes']]
-        relation['properties'] = relation['properties'] \
-            if isinstance(relation['properties'], list) \
-            else [relation['properties']]
         relation['inverse'] = relation.get('inverse', False)
         relation['multiple'] = relation.get('multiple', False)
         relation['required'] = relation.get('required', False)

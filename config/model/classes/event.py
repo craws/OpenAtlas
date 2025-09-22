@@ -15,7 +15,7 @@ model = {
         'actor': {
             'label': _('actor'),
             'classes': class_groups['actor']['classes'],
-            'properties': ['P11', 'P14', 'P22', 'P23'],
+            'property': 'P11', # Todo: 'P14', 'P22', 'P23'
             'multiple': True,
             'type': 'Involvement',
             'additional_fields': [
@@ -30,14 +30,14 @@ model = {
         'subs': {
             'label': _('subs'),
             'classes': class_groups['event']['classes'],
-            'properties': 'P9',
+            'property': 'P9',
             'multiple': True,
             'tab': {
                 'buttons': ['link', 'insert']}},
         'super': {
             'label': _('sub event of'),
             'classes': class_groups['event']['classes'],
-            'properties': 'P9',
+            'property': 'P9',
             'inverse': True,
             'mode': 'direct'},
         'reference': standard_relations['reference'],
@@ -51,18 +51,18 @@ additional_relations = {
     'succeeding_event': {
         'label': _('succeeding event'),
         'classes': class_groups['event']['classes'],
-        'properties': 'P134',
+        'property': 'P134',
         'inverse': True,
         'mode': 'display'},
     'preceding_event': {
         'label': _('preceding event'),
         'classes': class_groups['event']['classes'],
-        'properties': 'P134',
+        'property': 'P134',
         'mode': 'direct'},
     'location': {
         'label': _('location'),
         'classes': 'object_location',
-        'properties': 'P7',
+        'property': 'P7',
         'mode': 'direct'}}
 
 activity = copy.deepcopy(model)
@@ -82,25 +82,25 @@ acquisition['relations'] = acquisition['relations'] | {
     'recipient': {
         'label': _('recipient'),
         'classes': class_groups['actor']['classes'],
-        'properties': 'P22',
+        'property': 'P22',
         'mode': 'display',
         'multiple': True},
     'donor': {
         'label': _('donor'),
         'classes': class_groups['actor']['classes'],
-        'properties': 'P23',
+        'property': 'P23',
         'mode': 'display',
         'multiple': True},
     'given_place': {
         'label': _('given place'),
         'classes': 'place',
-        'properties': 'P24',
+        'property': 'P24',
         'mode': 'direct',
         'multiple': True},
     'given_artifact': {
         'label': _('given artifact'),
         'classes': 'artifact',
-        'properties': 'P24',
+        'property': 'P24',
         'mode': 'direct',
         'multiple': True}}
 
@@ -113,7 +113,7 @@ creation['relations'] = creation['relations'] | {
     'document': {
         'label': _('file'),
         'classes': 'file',
-        'properties': 'P94',
+        'property': 'P94',
         'multiple': True,
         'mode': 'direct'}}
 
@@ -132,13 +132,13 @@ modification['relations'] = modification['relations'] | {
     'modified_object': {
         'label': _('modified object'),
         'classes': class_groups['artifact']['classes'],
-        'properties': 'P31',
+        'property': 'P31',
         'multiple': True,
         'mode': 'direct'},
     'modified_place': {
         'label': _('modified place'),
         'classes': 'place',
-        'properties': 'P31',
+        'property': 'P31',
         'multiple': True,
         'mode': 'direct'}}
 
@@ -150,23 +150,23 @@ move['relations'] = move['relations'] | {
     'place_from': {
         'label': _('place from'),
         'classes': 'object_location',
-        'properties': 'P27',
+        'property': 'P27',
         'mode': 'direct'},
     'place_to': {
         'label': _('place to'),
         'classes': 'object_location',
-        'properties': 'P26',
+        'property': 'P26',
         'mode': 'direct'},
     'moved_person': {
         'label': _('moved person'),
         'classes': 'person',
-        'properties': 'P25',
+        'property': 'P25',
         'multiple': True,
         'mode': 'direct'},
     'moved_object': {
         'label': _('moved object'),
         'classes': class_groups['artifact']['classes'],
-        'properties': 'P25',
+        'property': 'P25',
         'multiple': True,
         'mode': 'direct'}}
 
@@ -179,6 +179,6 @@ production['relations'] = production['relations'] | {
     'produced_artifact': {
         'label': _('produced artifact'),
         'classes': 'artifact',
-        'properties': 'P108',
+        'property': 'P108',
         'multiple': True,
         'mode': 'direct'}}

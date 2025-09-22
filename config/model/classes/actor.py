@@ -20,23 +20,23 @@ group = {
         'residence': {
             'label': _('residence'),
             'classes': 'object_location',
-            'properties': 'P74',
+            'property': 'P74',
             'mode': 'direct'},
         'begins_in': {
             'label': _('born in'),
             'classes': 'object_location',
-            'properties': 'OA8',
+            'property': 'OA8',
             'mode': 'direct'},
         'ends_in': {
             'label': _('died in'),
             'classes': 'object_location',
-            'properties': 'OA9',
+            'property': 'OA9',
             'mode': 'direct'},
         'source': standard_relations['source'],
         'event': {
             'label': _('event'),
             'classes': class_groups['event']['classes'],
-            'properties': ['P11', 'P14', 'P22', 'P23'],
+            'property': 'P11', # Todo: 'P14', 'P22', 'P23'
             'inverse': True,
             'multiple': True,
             'type': 'Involvement',
@@ -57,7 +57,7 @@ group = {
         'relative': {
             'label': _('relation'),
             'classes': 'person',
-            'properties': 'OA7',
+            'property': 'OA7',
             'type': 'Actor relation',
             'additional_fields': [
                 'domain',
@@ -74,7 +74,7 @@ group = {
         'member_of': {
             'label': _('member of'),
             'classes': 'group',
-            'properties': 'P107',
+            'property': 'P107',
             'inverse': True,
             'type': 'Actor function',
             'additional_fields': [
@@ -92,7 +92,7 @@ group = {
         'member': {
             'label': _('member'),
             'classes': class_groups['actor']['classes'],
-            'properties': 'P107',
+            'property': 'P107',
             'type': 'Actor function',
             'additional_fields': [
                 'domain',
@@ -109,7 +109,7 @@ group = {
         'artifact': {
             'label': _('artifact'),
             'classes': class_groups['artifact']['classes'],
-            'properties': 'P52',
+            'property': 'P52',
             'inverse': True,
             'tab': {
                 'buttons': ['insert'],

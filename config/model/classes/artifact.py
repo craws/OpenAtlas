@@ -12,20 +12,20 @@ artifact = {
         'actor': {
             'label': _('owned by'),
             'classes': class_groups['actor']['classes'],
-            'properties': 'P52',
+            'property': 'P52',
             'mode': 'direct',
             'tab': {
                 'buttons': ['insert']}},
         'super': {
             'label': _('super'),
             'classes': ['artifact'] + class_groups['place']['classes'],
-            'properties': 'P46',
+            'property': 'P46',
             'inverse': True,
             'mode': 'direct'},
         'source': standard_relations['source'],
         'event': {
             'classes': ['acquisition', 'modification', 'move', 'production'],
-            'properties': ['P24', 'P25', 'P31', 'P108'],
+            'property': 'P24', # Todo: 'P25', 'P31', 'P108'
             'inverse': True,
             'multiple': True,
             'tab': {
@@ -33,7 +33,7 @@ artifact = {
         'subs': {
             'label': _('subs'),
             'classes': 'artifact',
-            'properties': 'P46',
+            'property': 'P46',
             'multiple': True,
             'tab': {
                 'buttons': ['link', 'insert']}},

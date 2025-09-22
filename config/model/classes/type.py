@@ -12,13 +12,13 @@ type_ = {
         'super': {
             'label': _('super'),
             'classes': 'type',
-            'properties': 'P127',
+            'property': 'P127',
             'mode': 'direct',
             'required': True},
         'subs': {
             'label': _('subs'),
             'classes': 'type',
-            'properties': 'P127',
+            'property': 'P127',
             'multiple': True,
             'inverse': True,
             'tab': {
@@ -26,7 +26,7 @@ type_ = {
         'entities': {
             'label': _('entities'),
             'classes': [],
-            'properties': 'P2',
+            'property': 'P2',
             'inverse': True,
             'multiple': True},
         'reference': standard_relations['reference'],
