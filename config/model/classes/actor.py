@@ -4,12 +4,16 @@ from flask_babel import lazy_gettext as _
 
 from config.model.class_groups import class_groups, standard_relations
 
-# Todo: Needed for translation, used to differentiate special case to show
-# event dates in grey in case no relation dates - should be solved differently
-_('first')
-_('last')
+# Todo: Needed for translation, to be removed after implemented
+_('first'), _('last')  # event dates in grey in case no relation dates
+_('administrative unit')
+_('feature')
+_('involvement')
+_('object location')
+_('type tools')
 
 group = {
+    'label': _('group'),
     'attributes': {
         'name': {
             'required': True},
@@ -34,9 +38,9 @@ group = {
             'mode': 'direct'},
         'source': standard_relations['source'],
         'event': {
-            'label': _('event'),
+            'label': class_groups['event']['label'],
             'classes': class_groups['event']['classes'],
-            'property': 'P11', # Todo: 'P14', 'P22', 'P23'
+            'property': 'P11',  # Todo: 'P14', 'P22', 'P23'
             'inverse': True,
             'multiple': True,
             'type': 'Involvement',
@@ -107,7 +111,7 @@ group = {
                     'end',
                     'description']}},
         'artifact': {
-            'label': _('artifact'),
+            'label': class_groups['artifact']['label'],
             'classes': class_groups['artifact']['classes'],
             'property': 'P52',
             'inverse': True,
@@ -130,4 +134,5 @@ group = {
             'note': {}}}}
 
 person = copy.deepcopy(group)
+person['label'] = _('person')
 del person['relations']['member']

@@ -3,6 +3,7 @@ from flask_babel import lazy_gettext as _
 from config.model.class_groups import class_groups, standard_relations
 
 source = {
+    'label': _('source'),
     'attributes': {
         'name': {
             'required': True},
@@ -18,6 +19,7 @@ source = {
             'tab':{
                 'buttons': ['insert']}},
         'actor': {
+            'label': class_groups['actor']['label'],
             'classes': class_groups['actor']['classes'],
             'property': 'P67',
             'multiple': True,
@@ -25,6 +27,7 @@ source = {
                 'buttons': ['link', 'insert'],
                 'tooltip': _('mentioned in the source')}},
         'artifact': {
+            'label': class_groups['artifact']['label'],
             'classes': class_groups['artifact']['classes'],
             'property': 'P67',
             'multiple': True,
@@ -41,6 +44,7 @@ source = {
             'tooltip': _(
                 'Link artifacts as the information carrier of the source')},
         'event': {
+            'label': class_groups['event']['label'],
             'classes': class_groups['event']['classes'],
             'property': 'P67',
             'multiple': True,
@@ -48,6 +52,7 @@ source = {
                 'buttons': ['link', 'insert'],
                 'tooltip': _('mentioned in the source')}},
         'place': {
+            'label': class_groups['place']['label'],
             'classes': class_groups['place']['classes'],
             'property': 'P67',
             'multiple': True,
@@ -64,6 +69,7 @@ source = {
             'note': {}}}}
 
 source_translation = {
+    'label': _('source translation'),
     'attributes': {
         'name': {
             'required': True},

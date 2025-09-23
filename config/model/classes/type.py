@@ -3,6 +3,7 @@ from flask_babel import lazy_gettext as _
 from config.model.class_groups import standard_relations
 
 type_ = {
+    'label': _('type'),
     'attributes': {
         'name': {
             'required': True},

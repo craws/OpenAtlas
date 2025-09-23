@@ -18,6 +18,7 @@ def get_relation(classes: str | list[str]) -> dict[str, Any]:
 
 
 bibliography = {
+    'label': _('bibliography'),
     'attributes': {
         'name': {
             'required': True},
@@ -29,6 +30,7 @@ bibliography = {
         'place': get_relation('place'),
         'artifact': get_relation(class_groups['artifact']['classes']),
         'type': {
+            'label': class_groups['type']['label'],
             'classes': class_groups['type']['classes'],
             'property': 'P67',
             'multiple': True,
@@ -44,9 +46,10 @@ bibliography = {
             'note': {}}}}
 
 edition = copy.deepcopy(bibliography)
+edition['label'] = _('edition')
 
-# Todo: solve URL field with validatior instead name field
 external_reference = copy.deepcopy(bibliography)
+external_reference['label'] = _('external reference')
 external_reference['attributes']['name'] = {
     'label': _('URL'),
     'format': 'url',

@@ -11,25 +11,6 @@ from openatlas.database import openatlas_class as db
 
 
 class OpenatlasClass:
-    # Needed class label translations
-    _('acquisition')
-    _('actor relation')
-    _('actor function')
-    _('administrative unit')
-    _('appellation')
-    _('bibliography')
-    _('creation')
-    _('external reference')
-    _('feature')
-    _('information carrier')  # Not an OpenAtlas class, used at source display
-    _('involvement')
-    _('modification')
-    _('move')
-    _('production')
-    _('object location')
-    _('source translation')
-    _('type tools')
-
     def __init__(
             self,
             name: str,
@@ -43,12 +24,8 @@ class OpenatlasClass:
             color: str | None,
             write_access: str | None,
             icon: str | None,
-            attributes: dict[str, Any],
-            relations: dict[str, Any],
-            display: dict[str, Any]) -> None:
+            model_: dict[str, Any]) -> None:
         self.name = name
-        label = _(name.replace('_', ' '))
-        self.label = str(label)[0].upper() + str(label)[1:]
         self.cidoc_class = g.cidoc_classes[cidoc_class] \
             if cidoc_class else None
         self.hierarchies = hierarchies
@@ -64,9 +41,10 @@ class OpenatlasClass:
         for data in class_groups.values():
             if name in data['classes']:
                 self.group = data
-        self.attributes = attributes
-        self.relations = relations
-        self.display = display
+        self.label = model_['label']
+        self.attributes = model_['attributes']
+        self.relations = model_['relations']
+        self.display = model_['display']
 
 
 def get_class_count() -> dict[str, int]:
@@ -77,9 +55,9 @@ def get_classes() -> dict[str, OpenatlasClass]:
     classes = {}
     for row in db.get_classes():
         if row['name'] in model:  # Todo: remove condition after new classes
-            model_ = get_model(row['name'])
             classes[row['name']] = OpenatlasClass(
                 name=row['name'],
+                model_ = get_model(row['name']),
                 cidoc_class=row['cidoc_class_code'],
                 standard_type_id=row['standard_type_id'],
                 alias_allowed=row['alias_allowed'],
@@ -90,15 +68,13 @@ def get_classes() -> dict[str, OpenatlasClass]:
                 write_access=row['write_access_group_name'],
                 color=row['layout_color'],
                 hierarchies=row['hierarchies'],
-                icon=row['layout_icon'],
-                attributes=model_['attributes'],
-                relations=model_['relations'],
-                display=model_['display'])
+                icon=row['layout_icon'])
     return classes
 
 
 def get_model(class_name: str) -> dict[str, Any]:
     data: dict[str, Any] = model[class_name]
+    data['label'] = data.get('label', _(class_name))
     for name, item in data['attributes'].items():
         item['label'] = item.get('label', _(name))
         item['required'] = item.get('required', False)

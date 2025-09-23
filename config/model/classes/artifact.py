@@ -3,6 +3,7 @@ from flask_babel import lazy_gettext as _
 from config.model.class_groups import class_groups, standard_relations
 
 artifact = {
+    'label': _('artifact'),
     'attributes': {
         'name': {
             'required': True},

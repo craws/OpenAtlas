@@ -4,7 +4,7 @@ from flask_babel import lazy_gettext as _
 
 from config.model.class_groups import class_groups, standard_relations
 
-model = {
+class_ = {
     'attributes': {
         'name': {
             'required': True},
@@ -13,7 +13,7 @@ model = {
     'relations': {
         'source': standard_relations['source'],
         'actor': {
-            'label': _('actor'),
+            'label': class_groups['actor']['label'],
             'classes': class_groups['actor']['classes'],
             'property': 'P11', # Todo: 'P14', 'P22', 'P23'
             'multiple': True,
@@ -47,7 +47,7 @@ model = {
         'form': {'insert_and_continue': True},
         'additional_tabs': {'note': {}}}}
 
-additional_relations = {
+relations = {
     'succeeding_event': {
         'label': _('succeeding event'),
         'classes': class_groups['event']['classes'],
@@ -65,20 +65,22 @@ additional_relations = {
         'property': 'P7',
         'mode': 'direct'}}
 
-activity = copy.deepcopy(model)
+activity = copy.deepcopy(class_)
+activity['label'] = _('activity')
 activity['display']['tooltip'] = \
     _('the most common, e.g. a battle, a meeting or a wedding')
 activity['relations'] = activity['relations'] | {
-    'succeeding_event': additional_relations['succeeding_event'],
-    'preceding_event': additional_relations['preceding_event'],
-    'location': additional_relations['location']}
+    'succeeding_event': relations['succeeding_event'],
+    'preceding_event': relations['preceding_event'],
+    'location': relations['location']}
 
-acquisition = copy.deepcopy(model)
+acquisition = copy.deepcopy(class_)
+acquisition['label'] = _('acquisition')
 acquisition['display']['tooltip'] = _('mapping a change of property')
 acquisition['relations'] = acquisition['relations'] | {
-    'succeeding_event': additional_relations['succeeding_event'],
-    'preceding_event': additional_relations['preceding_event'],
-    'location': additional_relations['location'],
+    'succeeding_event': relations['succeeding_event'],
+    'preceding_event': relations['preceding_event'],
+    'location': relations['location'],
     'recipient': {
         'label': _('recipient'),
         'classes': class_groups['actor']['classes'],
@@ -104,12 +106,13 @@ acquisition['relations'] = acquisition['relations'] | {
         'mode': 'direct',
         'multiple': True}}
 
-creation = copy.deepcopy(model)
+creation = copy.deepcopy(class_)
+creation['label'] = _('creation')
 creation['display']['tooltip'] = _('creation of documents (files)')
 creation['relations'] = creation['relations'] | {
-    'succeeding_event': additional_relations['succeeding_event'],
-    'preceding_event': additional_relations['preceding_event'],
-    'location': additional_relations['location'],
+    'succeeding_event': relations['succeeding_event'],
+    'preceding_event': relations['preceding_event'],
+    'location': relations['location'],
     'document': {
         'label': _('file'),
         'classes': 'file',
@@ -117,18 +120,20 @@ creation['relations'] = creation['relations'] | {
         'multiple': True,
         'mode': 'direct'}}
 
-event = copy.deepcopy(model)
+event = copy.deepcopy(class_)
+event['label'] = _('event')
 event['display']['tooltip'] = \
     _('events not performed by actors, e.g. a natural disaster')
 event['relations'] = event['relations'] | {
-    'location': additional_relations['location']}
+    'location': relations['location']}
 
-modification = copy.deepcopy(model)
+modification = copy.deepcopy(class_)
+modification['label'] = _('modification')
 modification['display']['tooltip'] = _('modification of artifacts')
 modification['relations'] = modification['relations'] | {
-    'succeeding_event': additional_relations['succeeding_event'],
-    'preceding_event': additional_relations['preceding_event'],
-    'location': additional_relations['location'],
+    'succeeding_event': relations['succeeding_event'],
+    'preceding_event': relations['preceding_event'],
+    'location': relations['location'],
     'modified_object': {
         'label': _('modified object'),
         'classes': class_groups['artifact']['classes'],
@@ -142,11 +147,12 @@ modification['relations'] = modification['relations'] | {
         'multiple': True,
         'mode': 'direct'}}
 
-move = copy.deepcopy(model)
+move = copy.deepcopy(class_)
+move['label'] = _('move')
 move['display']['tooltip'] = _('movement of artifacts or persons')
 move['relations'] = move['relations'] | {
-    'succeeding_event': additional_relations['succeeding_event'],
-    'preceding_event': additional_relations['preceding_event'],
+    'succeeding_event': relations['succeeding_event'],
+    'preceding_event': relations['preceding_event'],
     'place_from': {
         'label': _('place from'),
         'classes': 'object_location',
@@ -170,12 +176,13 @@ move['relations'] = move['relations'] | {
         'multiple': True,
         'mode': 'direct'}}
 
-production = copy.deepcopy(model)
+production = copy.deepcopy(class_)
+production['production'] = _('production')
 production['display']['tooltip'] = _('creation of artifacts')
 production['relations'] = production['relations'] | {
-    'succeeding_event': additional_relations['succeeding_event'],
-    'preceding_event': additional_relations['preceding_event'],
-    'location': additional_relations['location'],
+    'succeeding_event': relations['succeeding_event'],
+    'preceding_event': relations['preceding_event'],
+    'location': relations['location'],
     'produced_artifact': {
         'label': _('produced artifact'),
         'classes': 'artifact',
