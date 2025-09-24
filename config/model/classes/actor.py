@@ -37,22 +37,35 @@ group = {
             'property': 'OA9',
             'mode': 'direct'},
         'source': standard_relations['source'],
-        'event': {
-            'label': class_groups['event']['label'],
+        'performed': {
+            'label': _('performed'),
             'classes': class_groups['event']['classes'],
-            'property': 'P11',  # Todo: 'P14', 'P22', 'P23'
+            'property': 'P14',
             'inverse': True,
             'multiple': True,
             'type': 'Involvement',
-            'additional_fields': [
-                'domain',
-                'dates',
-                'description'],
+            'additional_fields': ['dates', 'description'],
             'tab': {
                 'columns': [
                     'name',
                     'class',
-                    'activity',
+                    'involvement',
+                    'begin',
+                    'end',
+                    'description'],
+                'buttons': ['link']}},
+        'participated': {
+            'label': _('participated'),
+            'classes': class_groups['event']['classes'],
+            'property': 'P11',
+            'inverse': True,
+            'multiple': True,
+            'type': 'Involvement',
+            'additional_fields': ['dates', 'description'],
+            'tab': {
+                'columns': [
+                    'name',
+                    'class',
                     'involvement',
                     'begin',
                     'end',
@@ -63,10 +76,7 @@ group = {
             'classes': 'person',
             'property': 'OA7',
             'type': 'Actor relation',
-            'additional_fields': [
-                'domain',
-                'dates',
-                'description'],
+            'additional_fields': ['domain', 'dates', 'description'],
             'tab': {
                 'buttons': ['link', 'insert'],
                 'columns': [
@@ -81,10 +91,7 @@ group = {
             'property': 'P107',
             'inverse': True,
             'type': 'Actor function',
-            'additional_fields': [
-                'domain',
-                'dates',
-                'description'],
+            'additional_fields': ['dates', 'description'],
             'tab': {
                 'buttons': ['link', 'insert'],
                 'columns': [
@@ -98,10 +105,7 @@ group = {
             'classes': class_groups['actor']['classes'],
             'property': 'P107',
             'type': 'Actor function',
-            'additional_fields': [
-                'domain',
-                'dates',
-                'description'],
+            'additional_fields': ['dates', 'description'],
             'tab': {
                 'buttons': ['link', 'insert'],
                 'columns': [

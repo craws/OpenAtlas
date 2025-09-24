@@ -136,15 +136,17 @@ def process_relations(
                 entities,
                 inverse=relation['inverse'])
     if origin and relation_name:
-        relation = get_reverse_relation(
-            origin.class_,
-            origin.class_.relations[relation_name],
-            entity.class_)
-        if not relation or relation['mode'] != 'direct':
-            entity.link(
-                relation['property'],
-                origin,
-                inverse=relation['inverse'])
+        origin_relation = origin.class_.relations[relation_name]
+        if not origin.class_.relations[relation_name]['additional_fields']:
+            relation = get_reverse_relation(
+                origin.class_,
+                origin_relation,
+                entity.class_)
+            if not relation or relation['mode'] != 'direct':
+                origin.link(
+                    origin_relation['property'],
+                    entity,
+                    inverse=origin_relation['inverse'])
 
 
 def insert_entity(form: Any, data: dict[str, Any]) -> Entity:

@@ -12,16 +12,25 @@ class_ = {
         'dates': {}},
     'relations': {
         'source': standard_relations['source'],
-        'actor': {
-            'label': class_groups['actor']['label'],
+        'performer': {
+            'label': _('performer'),
             'classes': class_groups['actor']['classes'],
-            'property': 'P11', # Todo: 'P14', 'P22', 'P23'
+            'property': 'P14',
             'multiple': True,
             'type': 'Involvement',
-            'additional_fields': [
-                'domain',
-                'dates',
-                'description'],
+            'additional_fields': ['dates', 'description'],
+            'tab': {
+                'buttons': ['link', 'insert'],
+                'columns': [
+                    'name', 'class', 'activity', 'involvement', 'first',
+                    'last', 'description']}},
+        'participant': {
+            'label': _('participant'),
+            'classes': class_groups['actor']['classes'],
+            'property': 'P11',
+            'multiple': True,
+            'type': 'Involvement',
+            'additional_fields': ['dates', 'description'],
             'tab': {
                 'buttons': ['link', 'insert'],
                 'columns': [
@@ -85,13 +94,13 @@ acquisition['relations'] = acquisition['relations'] | {
         'label': _('recipient'),
         'classes': class_groups['actor']['classes'],
         'property': 'P22',
-        'mode': 'display',
+        'mode': 'direct',
         'multiple': True},
     'donor': {
         'label': _('donor'),
         'classes': class_groups['actor']['classes'],
         'property': 'P23',
-        'mode': 'display',
+        'mode': 'direct',
         'multiple': True},
     'given_place': {
         'label': _('given place'),
