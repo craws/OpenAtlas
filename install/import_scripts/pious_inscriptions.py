@@ -37,7 +37,6 @@ def clean_data() -> None:
 
 def get_admin_units():
     admin_units_: dict[str, Entity] = {}
-    province_control: dict[str, Entity] = {}
     for entry in data:
         if entry['site'] in admin_units_:
             continue
@@ -48,17 +47,24 @@ def get_admin_units():
             split_site = entry['site'].split(',')
             site_name = split_site[0]
             province_name = split_site[1].strip()
-            if province_name in province_control:
-                continue
-            province = Entity.insert('administrative_unit', province_name)
-            province.link('P89', admin_hierarchy)
-            province_control[province_name] = province
 
         unit = Entity.insert('administrative_unit', site_name)
-        unit.link('P89', province_control.get(province_name) or admin_hierarchy)
+        unit.link('P89', provinces.get(province_name) or admin_hierarchy)
         admin_units_[entry['site']] = unit
     return admin_units_
 
+def get_provinces():
+    provinces_: dict[str, Entity] = {}
+    for entry in data:
+        if ", Province of" in entry['site']:
+            split_site = entry['site'].split(',')
+            province_name = split_site[1].strip()
+            if province_name in provinces_:
+                continue
+            province = Entity.insert('administrative_unit', province_name)
+            province.link('P89', admin_hierarchy)
+            provinces_[province_name] = province
+    return provinces_
 
 def get_places():
     places_: dict[str, Entity] = {}
@@ -87,5 +93,6 @@ with app.test_request_context():
     app.preprocess_request()
     case_study = Entity.get_by_id(784)
     admin_hierarchy = Entity.get_by_id(81)
+    provinces = get_provinces()
     admin_units = get_admin_units()
     places = get_places()
