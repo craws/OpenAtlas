@@ -8,16 +8,13 @@ from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.database.connect import Transaction
+from openatlas.display.table import entity_table
 from openatlas.display.util import hierarchy_crumbs, link, required_group
 from openatlas.display.util2 import uc_first
 from openatlas.forms.display import display_form
-from openatlas.forms.form import (
-    get_manager, link_form, link_update_form, table_form)
+from openatlas.forms.form import get_manager, link_form, link_update_form
 from openatlas.forms.process import process_dates
 from openatlas.models.entity import Entity, Link
-from openatlas.models.search import get_subunits_without_super
-
-_('page')  # This translation is needed for reference table views
 
 
 @app.route('/link/delete/<int:id_>/<int:origin_id>', methods=['GET', 'POST'])
@@ -35,6 +32,7 @@ def link_delete(id_: int, origin_id: int) -> Response:
 def link_insert(origin_id: int, relation_name: str) -> str | Response:
     origin = Entity.get_by_id(origin_id)
     relation = origin.class_.relations[relation_name]
+
     if request.method == 'POST':
         if request.form['checkbox_values']:
             origin.link_string(
@@ -44,16 +42,32 @@ def link_insert(origin_id: int, relation_name: str) -> str | Response:
         return redirect(
             f"{url_for('view', id_=origin.id)}#tab-" +
             relation_name.replace('_', '-'))
-    content = table_form(
-        relation['classes'],
-        [e.id for e in origin.get_linked_entities(
-            relation['property'],
-            inverse=relation['inverse'])])
+
+    entities = []
+    excluded = [e.id for e in origin.get_linked_entities(
+        relation['property'],
+        inverse=relation['inverse'])]
+    for entity in Entity.get_by_class(
+            relation['classes'],
+            types=True,
+            aliases=True):
+        if entity.id not in excluded:
+            entities.append(entity)
+    table = entity_table(
+        entities,
+        columns=['checkbox'] + entities[0].class_.group['table_columns']
+        if entities else [],
+        forms={'excluded': excluded})
+
+    # Todo: implement file column
+    # if classes[0] == 'file' and show_table_icons():
+    #    table.columns.insert(1, _('icon'))
     return render_template(
         'content.html',
-        content=content,
-        title=_(origin.class_.group['name']),
-        crumbs=hierarchy_crumbs(origin) + [origin, _('link')])
+        content=render_template('forms/link_form.html', table=table.display()),
+        title=relation['label'],
+        crumbs=hierarchy_crumbs(origin) + [
+            link(origin), f"+ {relation['label']}"])
 
 
 @app.route(
@@ -172,46 +186,3 @@ def insert_relation(type_: str, origin_id: int) -> str | Response:
         content=display_form(manager.form),
         origin=origin,
         crumbs=[link(origin, index=True), origin, _(type_)])
-
-
-@app.route('/add/subunit/<int:super_id>', methods=['GET', 'POST'])
-@required_group('contributor')
-def add_subunit(super_id: int) -> str | Response:
-    super_ = Entity.get_by_id(super_id)
-    if request.method == 'POST':
-        if request.form['checkbox_values']:
-            super_.link_string('P46', request.form['checkbox_values'])
-        return redirect(f"{url_for('view', id_=super_.id)}#tab-artifact")
-    classes = []
-    if super_.class_.name != 'human_remains':
-        classes.append('artifact')
-    if super_.class_.name != 'artifact':
-        classes.append('human_remains')
-    return render_template(
-        'content.html',
-        content=table_form(
-            classes,
-            [super_.id] + get_subunits_without_super(classes)),
-        entity=super_,
-        title=super_.name,
-        crumbs=[link(super_, index=True), super_, _('add subunit')])
-
-
-@app.route('/entity/add/file/<int:id_>', methods=['GET', 'POST'])
-@required_group('contributor')
-def entity_add_file(id_: int) -> str | Response:
-    entity = Entity.get_by_id(id_)
-    if request.method == 'POST':
-        if request.form['checkbox_values']:
-            entity.link_string(
-                'P67',
-                request.form['checkbox_values'], inverse=True)
-        return redirect(f"{url_for('view', id_=id_)}#tab-file")
-    return render_template(
-        'content.html',
-        content=table_form(
-            ['file'],
-            [e.id for e in entity.get_linked_entities('P67', inverse=True)]),
-        entity=entity,
-        title=entity.name,
-        crumbs=[link(entity, index=True), entity, f"{_('link')} {_('file')}"])

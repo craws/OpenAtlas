@@ -15,10 +15,9 @@ from openatlas.display.util import (
     convert_image_to_iiif, delete_iiif_image, display_info, link,
     required_group)
 from openatlas.display.util2 import is_authorized, manual
-from openatlas.models.dates import format_date
-from openatlas.forms.form import table_form
 from openatlas.forms.setting import FileForm, IiifForm
 from openatlas.forms.util import get_form_settings
+from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity
 from openatlas.models.settings import Settings
 from openatlas.views.admin import (
@@ -106,23 +105,6 @@ def remove_profile_image(entity_id: int) -> Response:
     return redirect(url_for('view', id_=entity.id))
 
 
-@app.route('/file/add/<int:id_>/<view>', methods=['GET', 'POST'])
-@required_group('contributor')
-def file_add(id_: int, view: str) -> str | Response:
-    entity = Entity.get_by_id(id_)
-    if request.method == 'POST':
-        if request.form['checkbox_values']:
-            entity.link_string('P67', request.form['checkbox_values'])
-        return redirect(f"{url_for('view', id_=entity.id)}#tab-{view}")
-    return render_template(
-        'content.html',
-        content=table_form(
-            g.class_groups[view]['classes'],
-            [e.id for e in entity.get_linked_entities('P67')]),
-        title=entity.name,
-        crumbs=[link(entity, index=True), entity, f"{_('link')} {_(view)}"])
-
-
 @app.route('/file/convert_iiif/<int:id_>')
 @required_group('contributor')
 def make_iiif_available(id_: int) -> Response:
@@ -142,7 +124,8 @@ def view_iiif(id_: int) -> str:
         manifests.append(get_manifest_url(id_))
     else:
         for file_ in entity.get_linked_entities('P67', inverse=True):
-            if file_.class_.group['name'] == 'file' and check_iiif_file_exist(file_.id):
+            if file_.class_.group['name'] == 'file' \
+                    and check_iiif_file_exist(file_.id):
                 manifests.append(get_manifest_url(file_.id))
     return render_template('iiif.html', manifests=manifests)
 

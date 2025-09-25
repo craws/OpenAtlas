@@ -1,7 +1,18 @@
 from typing import Any
 
+from flask_babel import lazy_gettext as _
+
 from config.model.classes import (
     actor, artifact, event, reference, source, type)
+
+# Todo: Needed for translation, to be removed after implemented
+_('first'), _('last')  # event dates in grey in case no relation dates
+_('administrative unit')
+_('feature')
+_('involvement')
+_('object location')
+_('type tools')
+_('page')
 
 model: dict[str, Any] = {
     'acquisition': event.acquisition,

@@ -136,25 +136,6 @@ def link_update_form(link_: Link, relation: dict[str, Any]) -> Any:
     return form
 
 
-def table_form(classes: list[str], excluded: list[int]) -> str:
-    entities = []
-    for entity in Entity.get_by_class(classes, types=True, aliases=True):
-        if entity.id not in excluded:
-            entities.append(entity)
-    if not entities:
-        return '<p class="uc-first">' + _('no entries') + '</p>'
-    table = entity_table(
-        entities,
-        columns=['checkbox'] + entities[0].class_.group['table_columns']
-        if entities else [],
-        forms={'excluded': excluded})
-    # if classes[0] == 'file' and show_table_icons():
-    #    table.columns.insert(1, _('icon'))
-    return render_template(
-        'forms/form_table.html',
-        table=table.display(classes[0]))
-
-
 def cidoc_form() -> Any:
     class Form(FlaskForm):
         pass

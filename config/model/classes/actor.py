@@ -4,14 +4,6 @@ from flask_babel import lazy_gettext as _
 
 from config.model.class_groups import class_groups, standard_relations
 
-# Todo: Needed for translation, to be removed after implemented
-_('first'), _('last')  # event dates in grey in case no relation dates
-_('administrative unit')
-_('feature')
-_('involvement')
-_('object location')
-_('type tools')
-
 group = {
     'label': _('group'),
     'attributes': {
