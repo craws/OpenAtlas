@@ -10,6 +10,7 @@ from openatlas.display.util import (
     edit_link, link, profile_image_table_link, remove_link)
 from openatlas.display.util2 import sanitize, uc_first
 from openatlas.models.entity import Entity, Link
+from openatlas.models.openatlas_class import get_reverse_relation
 
 # Needed for translations
 _('previous')
@@ -65,7 +66,7 @@ class Table:
 
 def entity_table(
         items: list[Entity] | list[Link],
-        entity_viewed: Optional[Entity] = None,
+        origin: Optional[Entity] = None,
         columns: Optional[list[str]] = None,
         additional_columns: Optional[list[str]] = None,
         relation: Optional[dict[Any, str]] = None,
@@ -74,20 +75,28 @@ def entity_table(
     if not items:
         return Table()
     inverse = relation and relation['inverse']
-    if not columns:
-        item = items[0]
-        if isinstance(item, Entity):
-            columns = item.class_.group['table_columns']
-        if isinstance(item, Link):
-            if inverse:
-                columns = item.domain.class_.group['table_columns']
-            else:
-                columns = item.range.class_.group['table_columns']
-    columns = columns + (additional_columns or [])
+
+    item = items[0]
+    if isinstance(item, Entity):
+        item_class = item.class_
+        default_columns = item.class_.group['table_columns']
+    if isinstance(item, Link):
+        if inverse:
+            item_class = item.domain.class_
+            default_columns = item.domain.class_.group['table_columns']
+        else:
+            item_class = item.range.class_
+            default_columns = item.range.class_.group['table_columns']
+    columns = (columns or default_columns) + (additional_columns or [])
+
     if relation and relation['mode'].startswith('tab'):
         if relation['additional_fields']:
             columns.append('update')
-        columns.append('remove')
+        if not get_reverse_relation(
+                origin.class_,
+                relation,
+                item_class)['required']:
+            columns.append('remove')
 
     order = None
     defs = None
@@ -151,7 +160,7 @@ def entity_table(
                     html = g.file_info[e.id]['license_holder']
                 case 'main image':
                     html = profile_image_table_link(
-                        entity_viewed,
+                        origin,
                         e,
                         e.get_file_ext())
                 # case name if name in g.classes[class_].relations:
@@ -161,13 +170,9 @@ def entity_table(
                 case 'name':
                     html = format_name_and_aliases(e, table_id, forms)
                 case 'profile' if e and e.image_id:
-                    html = 'Profile' if e.id == entity_viewed.image_id \
-                        else link(
-                            'profile',
-                            url_for(
-                                'file_profile',
-                                id_=e.id,
-                                entity_id=entity_viewed.id))
+                    html = 'Profile' if e.id == origin.image_id else link(
+                        'profile',
+                        url_for('file_profile', id_=e.id, entity_id=origin.id))
                 case 'public':
                     html = _('yes') if g.file_info[e.id]['public'] else None
                 case 'remove':
@@ -175,9 +180,8 @@ def entity_table(
                     if relation and relation['mode'] == 'tab':
                         tab_id = relation['name']
                     html = ''
-                    if not entity_viewed.root \
-                            or not g.types[entity_viewed.root[0]].required:
-                        html = remove_link(e.name, item, entity_viewed, tab_id)
+                    if not origin.root or not g.types[origin.root[0]].required:
+                        html = remove_link(e.name, item, origin, tab_id)
                 # case 'related':
                 #    relative = e.get_linked_entity_safe('has relation', True)
                 #    if entity and relative.id == entity.id:
@@ -198,7 +202,7 @@ def entity_table(
                         url_for(
                             'link_update',
                             id_=item.id,
-                            origin_id=entity_viewed.id,
+                            origin_id=origin.id,
                             relation=relation['name']))
             data.append(html)
         table.rows.append(data)
