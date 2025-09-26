@@ -12,7 +12,8 @@ from openatlas.display.table import entity_table
 from openatlas.display.util import hierarchy_crumbs, link, required_group
 from openatlas.display.util2 import uc_first
 from openatlas.forms.display import display_form
-from openatlas.forms.form import get_manager, link_form, link_update_form
+from openatlas.forms.form import filter_entities, get_manager, link_form, \
+    link_update_form
 from openatlas.forms.process import process_dates
 from openatlas.models.entity import Entity, Link
 
@@ -43,31 +44,20 @@ def link_insert(origin_id: int, relation_name: str) -> str | Response:
             f"{url_for('view', id_=origin.id)}#tab-" +
             relation_name.replace('_', '-'))
 
-    entities = []
-    excluded = [e.id for e in origin.get_linked_entities(
-        relation['property'],
-        inverse=relation['inverse'])]
-    for entity in Entity.get_by_class(
-            relation['classes'],
-            types=True,
-            aliases=True):
-        if entity.id not in excluded:
-            entities.append(entity)
+    entities = [entity for entity in Entity.get_by_class(
+        relation['classes'],
+        types=True,
+        aliases=True)]
     table = entity_table(
-        entities,
-        columns=['checkbox'] + entities[0].class_.group['table_columns']
-        if entities else [],
-        forms={'excluded': excluded})
-
-    # Todo: implement file column
-    # if classes[0] == 'file' and show_table_icons():
-    #    table.columns.insert(1, _('icon'))
+        filter_entities(origin, entities, relation, is_link_form=True),
+        forms={'checkbox': True})
     return render_template(
         'content.html',
-        content=render_template('forms/link_form.html', table=table.display()),
+        content=render_template('forms/link_form.html', table=table),
         title=relation['label'],
         crumbs=hierarchy_crumbs(origin) + [
-            link(origin), f"+ {relation['label']}"])
+            link(origin),
+            f"+ {relation['label']}"])
 
 
 @app.route(

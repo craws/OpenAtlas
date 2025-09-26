@@ -87,7 +87,19 @@ def entity_table(
         else:
             item_class = item.range.class_
             default_columns = item.range.class_.group['table_columns']
+
+    order = None
+    defs = None
+    forms = forms or {}
     columns = (columns or default_columns) + (additional_columns or [])
+    if forms.get('checkbox'):
+        columns.insert(0, 'checkbox')
+        order = [[0, "desc"], [1, "asc"]]
+        defs = [{"orderDataType": "dom-checkbox", "targets": 0}]
+
+    # Todo: implement file column
+    # if classes[0] == 'file' and show_table_icons():
+    #    table.columns.insert(1, _('icon'))
 
     if relation and relation['mode'].startswith('tab'):
         if relation['additional_fields']:
@@ -98,11 +110,6 @@ def entity_table(
                 item_class)['required']:
             columns.append('remove')
 
-    order = None
-    defs = None
-    if columns[0] == 'checkbox':
-        order = [[0, "desc"], [1, "asc"]]
-        defs = [{"orderDataType": "dom-checkbox", "targets": 0}]
     table = Table(columns, order=order, defs=defs)
     for item in items:
         e = item
@@ -213,12 +220,12 @@ def format_name_and_aliases(
         entity: Entity,
         table_id: str,
         forms: dict[str, Any]) -> str:
-    if forms and forms.get('mode') == 'single':
+    if forms.get('mode') == 'single':
         link_ = f"""
             <a value="{entity.name}"
-                href='#'
+                href="#"
                 onclick="selectFromTable(this,'{table_id}', {entity.id})"
-                    >{entity.name}</a>"""
+            >{entity.name}</a>"""
         if not entity.aliases:
             return link_
         html = f'<p>{link_}</p>'

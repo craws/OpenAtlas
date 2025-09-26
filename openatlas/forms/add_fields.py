@@ -133,30 +133,19 @@ def add_type(form: Any, type_: Entity):
 
 
 def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
+    from openatlas.forms.form import filter_entities
     entities = {}  # Collect entities per class to prevent multiple fetching
     for name, relation in entity.class_.relations.items():
         if relation['mode'] != 'direct':
             continue
         validators = [InputRequired()] if relation['required'] else None
+
         items = []
         for class_ in relation['classes']:
             class_ = 'place' if class_ == 'object_location' else class_
             if class_ not in entities:
                 entities[class_] = Entity.get_by_class(class_, True, True)
             items += entities[class_]
-
-        # Todo: more elegant way to filter?
-        filter_ids = []
-        if relation['name'] in ['subs', 'super']:
-            filter_ids = [entity.id] + [
-                e.id for e in entity.get_linked_entities_recursive(
-                    relation['property'],
-                    relation['name'] == 'subs' and relation['inverse'])]
-
-        filtered_items = []
-        for item in items:
-            if item.id not in filter_ids:
-                filtered_items.append(item)
 
         if relation['multiple']:
             selection: Any = []
@@ -171,7 +160,7 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
                 form,
                 name,
                 TableMultiField(
-                    filtered_items,
+                    filter_entities(entity, items, relation),
                     selection,
                     description=relation['tooltip'],
                     label=relation['label'],
@@ -191,7 +180,7 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
                 form,
                 name,
                 TableField(
-                    filtered_items,
+                    filter_entities(entity, items, relation),
                     selection,
                     label=relation['label'],
                     description=relation['tooltip'],

@@ -2,24 +2,22 @@ from __future__ import annotations
 
 from typing import Any, Optional
 
-from flask import g, render_template, request
+from flask import g, request
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
-from wtforms import HiddenField, SelectMultipleField, StringField, widgets
+from wtforms import HiddenField, SelectMultipleField, StringField
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import InputRequired, URL
 
 from openatlas import app
-from openatlas.display.table import Table, entity_table
-from openatlas.display.util2 import show_table_icons, uc_first
+from openatlas.display.util2 import uc_first
 from openatlas.forms import manager, manager_base
 from openatlas.forms.add_fields import add_date_fields, add_type
 from openatlas.forms.field import (
     SubmitField, TableCidocField, TableField, TableMultiField, TreeField)
 from openatlas.forms.populate import populate_dates
 from openatlas.models.entity import Entity, Link
-from openatlas.views.entity_index import file_preview
 
 
 def get_manager(
@@ -39,6 +37,25 @@ def get_manager(
     if request.method != 'POST' and not entity and not link_:
         manager_instance.populate_insert()
     return manager_instance
+
+
+def filter_entities(
+        entity: Entity,
+        items: list[Entity],
+        relation: dict[str, Any],
+        is_link_form=False) -> list[Entity]:
+    filter_ids = [entity.id]
+    if relation['name'] in ['subs', 'super']:
+        filter_ids += [
+            e.id for e in entity.get_linked_entities_recursive(
+                relation['property'],
+                relation['name'] == 'subs' and relation['inverse'])]
+    elif is_link_form:
+        filter_ids += [
+            e.id for e in entity.get_linked_entities(
+                relation['property'],
+                inverse=relation['inverse'])]
+    return [item for item in items if item.id not in filter_ids]
 
 
 def annotate_image_form(
