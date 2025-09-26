@@ -119,7 +119,6 @@ def add_row(
     return render_template(
         'forms/form_row.html',
         field=field,
-        label=label,
         value=value,
         field_css=field_css.strip(),
         row_css=row_css)
