@@ -181,6 +181,20 @@ class TableMultiField(HiddenField):
         self.description = description
 
 
+class LinkTableSelect(HiddenInput):
+    def __call__(self: Any, field: LinkTableField, **kwargs: Any) -> str:
+        return super().__call__(field, **kwargs) \
+            + Markup(field.table.display())
+
+
+class LinkTableField(HiddenField):
+    widget = LinkTableSelect()
+
+    def __init__(self, table: Table, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self.table = table
+
+
 class ValueFloatField(FloatField):
     pass
 

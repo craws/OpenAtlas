@@ -8,12 +8,11 @@ from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.database.connect import Transaction
-from openatlas.display.table import entity_table
 from openatlas.display.util import hierarchy_crumbs, link, required_group
 from openatlas.display.util2 import uc_first
 from openatlas.forms.display import display_form
-from openatlas.forms.form import filter_entities, get_manager, link_form, \
-    link_update_form
+from openatlas.forms.form import (
+    get_manager, link_detail_form, link_form, link_update_form)
 from openatlas.forms.process import process_dates
 from openatlas.models.entity import Entity, Link
 
@@ -33,8 +32,8 @@ def link_delete(id_: int, origin_id: int) -> Response:
 def link_insert(origin_id: int, relation_name: str) -> str | Response:
     origin = Entity.get_by_id(origin_id)
     relation = origin.class_.relations[relation_name]
-
-    if request.method == 'POST':
+    form = link_form(origin, relation)
+    if form.validate_on_submit():
         if request.form['checkbox_values']:
             origin.link_string(
                 relation['property'],
@@ -43,17 +42,9 @@ def link_insert(origin_id: int, relation_name: str) -> str | Response:
         return redirect(
             f"{url_for('view', id_=origin.id)}#tab-" +
             relation_name.replace('_', '-'))
-
-    entities = [entity for entity in Entity.get_by_class(
-        relation['classes'],
-        types=True,
-        aliases=True)]
-    table = entity_table(
-        filter_entities(origin, entities, relation, is_link_form=True),
-        forms={'checkbox': True})
     return render_template(
         'content.html',
-        content=render_template('forms/link_form.html', table=table),
+        content=display_form(form, 'checkbox-form'),
         title=relation['label'],
         crumbs=hierarchy_crumbs(origin) + [
             link(origin),
@@ -73,7 +64,7 @@ def link_insert_detail(
         selection_id: Optional[int] = None) -> str | Response:
     origin = Entity.get_by_id(origin_id)
     relation = origin.class_.relations[relation_name]
-    form = link_form(origin, relation, selection_id)
+    form = link_detail_form(origin, relation, selection_id)
     if form.validate_on_submit():
         ids = ast.literal_eval(getattr(form, relation_name).data)
         ids = ids if isinstance(ids, list) else [int(ids)]

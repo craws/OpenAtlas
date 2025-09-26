@@ -11,11 +11,13 @@ from wtforms.fields.simple import TextAreaField
 from wtforms.validators import InputRequired, URL
 
 from openatlas import app
+from openatlas.display.table import entity_table
 from openatlas.display.util2 import uc_first
 from openatlas.forms import manager, manager_base
 from openatlas.forms.add_fields import add_date_fields, add_type
 from openatlas.forms.field import (
-    SubmitField, TableCidocField, TableField, TableMultiField, TreeField)
+    LinkTableField, SubmitField, TableCidocField, TableField, TableMultiField,
+    TreeField)
 from openatlas.forms.populate import populate_dates
 from openatlas.models.entity import Entity, Link
 
@@ -94,7 +96,25 @@ def add_additional_link_fields(form: Any, relation: dict[str, Any]) -> None:
                 add_type(form, Entity.get_hierarchy(item))
 
 
-def link_form(
+def link_form(origin: Entity, relation: dict[str, Any]) -> Any:
+    class Form(FlaskForm):
+        pass
+
+    entities = [entity for entity in Entity.get_by_class(
+        relation['classes'],
+        types=True,
+        aliases=True)]
+    table = entity_table(
+        filter_entities(origin, entities, relation, is_link_form=True),
+        forms={'checkbox': True})
+    setattr(Form, 'checkbox_values', HiddenField())
+    setattr(Form, relation['name'], LinkTableField(table=table, label=''))
+    if table.rows:
+        setattr(Form, 'save', SubmitField(_('save')))
+    return Form('checkbox-form')
+
+
+def link_detail_form(
         origin: Entity,
         relation: dict[str, Any],
         selection_id: Optional[int] = None) -> Any:
