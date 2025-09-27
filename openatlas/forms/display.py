@@ -26,7 +26,8 @@ def html_form(
         if field.id.startswith('insert_'):
             continue  # These will be added in combination with other fields
         if isinstance(field, ValueTypeField):
-            html += add_row(field, '', field(), row_css=field.selectors)
+            field.label.text = ''
+            html += add_row(field, value=field(), row_css=field.selectors)
             continue
         if field.type in ['CSRFTokenField', 'HiddenField']:
             html += f' {field}'
@@ -39,9 +40,9 @@ def html_form(
                 and not reference_systems_fields_errors:
             if not reference_systems_added:
                 reference_systems_added = True
+                field.label.text = _('reference system')
                 html += add_row(
                     None,
-                    _('reference system'),
                     '<span id="reference-system-switcher" class="uc-first '
                     f'{app.config["CSS"]["button"]["secondary"]}">'
                     + _('show') + '</span>')
@@ -64,7 +65,8 @@ def html_form(
                 label += ' *'
             if not hasattr(field, 'is_type_form') or not field.is_type_form:
                 field.description = type_.description
-            html += add_row(field, label)
+            field.label.text = label
+            html += add_row(field)
             continue
         if field.id == 'save':
             class_ = \
@@ -80,9 +82,9 @@ def html_form(
                     form.insert_continue_human_remains(class_=class_))
             buttons = list(
                 map(lambda x: f'<div class="col-auto">{x}</div>', buttons))
+            field.label.text = ''
             html += add_row(
                 field,
-                '',  # Setting label to '' to keep button row label empty
                 '<div class="row g-1 align-items-center ">'
                 f'{"".join(buttons)}</div>')
             continue
@@ -94,7 +96,6 @@ def html_form(
 
 def add_row(
         field: Optional[Field],
-        label: Optional[str] = None,
         value: Optional[str] = None,
         form_id: Optional[str] = None,
         row_css: Optional[str] = None) -> str:
