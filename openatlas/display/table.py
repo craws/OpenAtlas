@@ -138,7 +138,7 @@ def entity_table(
                     if relation and 'dates' in relation['additional_fields']:
                         html = item.dates.first
                 case 'class':
-                    html = e.class_.label
+                    html = uc_first(e.class_.label)
                 case 'creator':
                     html = g.file_info[e.id]['creator']
                 case 'content' | 'description':

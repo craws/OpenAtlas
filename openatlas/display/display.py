@@ -66,7 +66,10 @@ class Display:
 
     def add_info_tab_content(self) -> None:
         self.add_data()
-        if self.linked_places:
+        if self.entity.class_.attributes.get('location'):
+            self.structure = self.entity.get_structure()
+            self.gis_data = Gis.get_all([self.entity], self.structure)
+        elif self.linked_places:
             self.gis_data = Gis.get_all(self.linked_places)
         resolver_url = g.settings['frontend_resolver_url']
         if hasattr(current_user, 'settings'):

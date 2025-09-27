@@ -56,10 +56,6 @@ class BaseManager:
         self.form_class = Form
         if self.entity:
             setattr(Form, 'entity_id', HiddenField())
-        if 'map' in self.fields:
-            setattr(Form, 'gis_points', HiddenField(default='[]'))
-            setattr(Form, 'gis_polygons', HiddenField(default='[]'))
-            setattr(Form, 'gis_lines', HiddenField(default='[]'))
         self.form: Any = Form(obj=self.link_ or self.entity)
 
     def get_place_info_for_insert(self) -> None:
@@ -105,16 +101,7 @@ class BaseManager:
             'type_id': type_id})
 
     def process_form(self) -> None:
-        self.data: dict[str, Any] = {
-            'links': {
-                'insert': [],
-                'delete': set(),
-                'delete_inverse': set()}}
         process_standard_fields(self)
-        if 'map' in self.fields:
-            self.data['gis'] = {
-                shape: getattr(self.form, f'gis_{shape}s').data
-                for shape in ['point', 'line', 'polygon']}
 
     def insert_entity(self) -> None:
         self.entity = Entity.insert(self.class_.name, self.form.name.data)
@@ -183,14 +170,6 @@ class ActorBaseManager(BaseManager):
 
 
 class PlaceBaseManager(BaseManager):
-    def insert_entity(self) -> None:
-        super().insert_entity()
-        self.entity.link(
-            'P53',
-            Entity.insert(
-                'object_location',
-                f'Location of {self.form.name.data}'))
-
     def get_place_info_for_insert(self) -> None:
         super().get_place_info_for_insert()
         if not self.origin:
@@ -215,23 +194,6 @@ class PlaceBaseManager(BaseManager):
 
 
 class ArtifactBaseManager(PlaceBaseManager):
-    fields = ['name', 'date', 'description', 'continue', 'map']
-
-    def additional_fields(self) -> dict[str, Any]:
-        if self.insert:
-            owner = self.origin if self.origin \
-                and self.origin.class_.view == 'actor' else None
-        else:
-            owner = self.entity.get_linked_entity('P52')
-        self.table_items['actor'] = \
-            Entity.get_by_view('actor', aliases=self.aliases)
-        return {
-            'owned_by':
-                TableField(
-                    self.table_items['actor'],
-                    owner,
-                    add_dynamic=['person', 'group'])}
-
     def get_crumbs(self) -> list[Any]:
         crumbs = []
         if self.place_info['structure'] and self.origin:
@@ -240,13 +202,6 @@ class ArtifactBaseManager(PlaceBaseManager):
                     if i.class_.name == self.class_.name]):
                 crumbs[-1] = crumbs[-1] + f' ({count} {_("exists")})'
         return crumbs
-
-    def process_form(self) -> None:
-        super().process_form()
-        self.data['links']['delete'].add('P52')
-        self.data['links']['delete_inverse'].add('P46')
-        if self.form.owned_by.data:
-            self.add_link('P52', self.form.owned_by.data)
 
 
 class EventBaseManager(BaseManager):

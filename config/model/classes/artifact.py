@@ -8,7 +8,8 @@ artifact = {
         'name': {
             'required': True},
         'description': {},
-        'dates': {}},
+        'dates': {},
+        'location': {}},
     'relations': {
         'actor': {
             'label': _('owned by'),

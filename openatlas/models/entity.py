@@ -72,6 +72,7 @@ class Entity:
                             key=lambda item_: item_[1]))
                 case _:
                     setattr(self, name, value)
+
         if self.class_.name == 'file':
             self.public = False
             self.creator = None
@@ -248,6 +249,8 @@ class Entity:
             AnnotationText.insert(annotation)
         if 'alias' in attributes:
             self.update_aliases(data['alias'])
+        if 'location' in attributes:
+            self.update_gis(data['gis'])
 
         # continue_link_id = None
         # if 'administrative_units' in data \
@@ -336,27 +339,24 @@ class Entity:
                     item.end_from = data['attributes_link']['end_from']
                     item.end_to = data['attributes_link']['end_to']
                     item.end_comment = data['attributes_link']['end_comment']
-                    item.update()
+                    # item.update()
             if link_['return_link_id']:
                 continue_link_id = ids[0]
         return continue_link_id
 
-    def update_gis(self, gis_data: dict[str, Any], new: bool) -> None:
-        if not self.location:
-            self.location = self.get_linked_entity_safe('P53')
-        if not new:
+    def update_gis(self, gis_data: dict[str, Any], new: bool = False) -> None:
+        if new:
+            location = insert({
+                'name': f'Location of {self.name}',
+                'openatlas_class_name': 'object_location'})
+            self.link('P53', location)
+        else:
+            location = self.get_linked_entity_safe('P53')
             db.update({
-                'id': self.location.id,
-                'name': f"Location of {sanitize(self.name)}",
-                'begin_from': None,
-                'begin_to': None,
-                'end_from': None,
-                'end_to': None,
-                'begin_comment': None,
-                'end_comment': None,
-                'description': None})
-            Gis.delete_by_entity(self.location)
-        Gis.insert(self.location, gis_data)
+                'id': location.id,
+                'name': f"Location of {sanitize(self.name)}"})
+            Gis.delete_by_entity(location)
+        Gis.insert(location, gis_data)
 
     def get_profile_image_id(self) -> Optional[int]:
         return db.get_profile_image_id(self.id)
@@ -584,9 +584,7 @@ class Entity:
 
     @staticmethod
     def get_overview_counts_by_type(ids: list[int]) -> dict[str, int]:
-        # Todo: fix after new classes
-        return {}
-        # return db.get_overview_counts_by_type(ids, g.class_view_mapping)
+        return db.get_overview_counts_by_type(ids, g.class_view_mapping)
 
     @staticmethod
     def get_latest(limit: int) -> list[Entity]:
@@ -840,6 +838,8 @@ def insert(data: dict[str, Any]) -> Entity:
     for annotation in annotation_data:
         annotation['source_id'] = entity.id
         AnnotationText.insert(annotation)
+    if 'location' in attributes:
+        entity.update_gis(data['gis'], new=True)
     return entity
 
 

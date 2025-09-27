@@ -31,8 +31,11 @@ def get_entity_form(
     add_class_types(Form, entity.class_)
     add_relations(Form, entity, origin)
     add_reference_systems(Form, entity.class_)
-    if 'dates' in entity.class_.attributes:
+    if entity.class_.attributes.get('dates'):
         add_date_fields(Form, entity)
+    if entity.class_.attributes.get('location'):
+        for shape in ['points', 'polygons', 'lines']:
+            setattr(Form, f'gis_{shape}', HiddenField(default='[]'))
     add_description(Form, entity, origin)
     add_buttons(
         Form,
@@ -65,6 +68,10 @@ def process_form_data(
         data[attr] = None
         if attr == 'dates':
             data.update(process_dates(form))
+        elif attr == 'location':
+            data['gis'] = {
+                shape: getattr(form, f'gis_{shape}s').data
+                for shape in ['point', 'line', 'polygon']}
         elif getattr(form, attr).data or getattr(form, attr).data == 0:
             value = getattr(form, attr).data
             data[attr] = value.strip() if isinstance(value, str) else value

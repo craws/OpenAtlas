@@ -265,10 +265,10 @@ def insert_gis(entity: Entity, row: dict[str, Any], project: Project) -> None:
             wkt_ = None
         if wkt_:
             if wkt_.geom_type in [
-                'MultiPoint',
-                'MultiLineString',
-                'MultiPolygon',
-                'GeometryCollection']:
+                    'MultiPoint',
+                    'MultiLineString',
+                    'MultiPolygon',
+                    'GeometryCollection']:
                 for poly in wkt_:
                     Gis.insert_wkt(entity, location, project, poly)
             else:

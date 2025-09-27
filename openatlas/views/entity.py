@@ -17,11 +17,11 @@ from openatlas.display.util import (
     button, check_iiif_activation, check_iiif_file_exist,
     convert_image_to_iiif, get_file_path, get_iiif_file_path, hierarchy_crumbs,
     link, required_group)
-from openatlas.display.util2 import is_authorized
+from openatlas.display.util2 import is_authorized, uc_first
 from openatlas.forms.entity_form import get_entity_form, process_form_data
 from openatlas.forms.manager_base import BaseManager
 from openatlas.models.entity import Entity
-from openatlas.models.gis import InvalidGeomException
+from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.reference_system import ReferenceSystem
 
 
@@ -84,17 +84,19 @@ def insert(
         # if class_ == 'file':
         #    return redirect(insert_files(manager))
         return redirect(save(entity, form, origin, relation))
+    gis_data = None
+    if entity.class_.attributes.get('location') and not origin:
+        gis_data = Gis.get_all()
     return render_template(
         'entity/insert.html',
         form=form,
-        class_name=class_,
-        view_name=g.classes[class_].group['name'],
-        # gis_data=manager.place_info['gis_data'],
+        class_=entity.class_,
+        gis_data=gis_data,
         writable=os.access(app.config['UPLOAD_PATH'], os.W_OK),
         # overlays=manager.place_info['overlays'],
-        title=_(g.classes[class_].group['name']),
+        title=_(entity.class_.group['name']),
         crumbs=hierarchy_crumbs(origin or entity) + \
-        [origin, f'+ {g.classes[class_].label}'])
+        [origin, f'+ {uc_first(entity.class_.label)}'])
 
 
 @app.route('/update/<int:id_>', methods=['GET', 'POST'])
@@ -108,6 +110,19 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
         if template := was_modified_template(entity, form):
             return template
         return redirect(save(entity, form))
+    place_info = {}
+    if entity.class_.attributes.get('location'):
+        entity.location = entity.location \
+            or entity.get_linked_entity_safe('P53')
+        structure = entity.get_structure_for_insert()
+        place_info = {
+            'structure': structure,
+            'gis_data': Gis.get_all([entity], structure),
+            'overlays': None,
+            'location': None}
+    # if current_user.settings['module_map_overlay'] \
+    #        and self.origin.class_.view == 'place':
+    #    self.place_info['overlay'] = Overlay.get_by_object(self.origin)
     # if entity.class_.group['name'] in ['artifact', 'place']:
     #    manager.entity.image_id = manager.entity.get_profile_image_id()
     #    if not manager.entity.image_id:
@@ -121,7 +136,7 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
         'entity/update.html',
         form=form,
         entity=entity,
-        # gis_data=manager.place_info['gis_data'],
+        gis_data=place_info.get('gis_data'),
         # overlays=manager.place_info['overlays'],
         title=entity.name,
         crumbs=hierarchy_crumbs(entity) + [entity, _('edit')])

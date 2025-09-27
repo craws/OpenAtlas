@@ -175,6 +175,15 @@ def insert(data: dict[str, Any]) -> int:
 
 
 def update(data: dict[str, Any]) -> None:
+    for item in [
+            'begin_from',
+            'begin_to',
+            'end_from',
+            'end_to',
+            'begin_comment',
+            'end_comment',
+            'description']:
+        data[item] = data.get(item)
     g.cursor.execute(
         """
         UPDATE model.entity SET (
