@@ -51,8 +51,8 @@ def filter_entities(
         filter_ids += [
             e.id for e in entity.get_linked_entities_recursive(
                 relation['property'],
-                relation['name'] == 'subs' and relation['inverse'])]
-    elif is_link_form:
+                relation['name'] == 'subs')]
+    if is_link_form:
         filter_ids += [
             e.id for e in entity.get_linked_entities(
                 relation['property'],

@@ -110,7 +110,7 @@ acquisition['relations'] = acquisition['relations'] | {
         'multiple': True},
     'given_artifact': {
         'label': _('given artifact'),
-        'classes': 'artifact',
+        'classes': class_groups['artifact']['classes'],
         'property': 'P24',
         'mode': 'direct',
         'multiple': True}}

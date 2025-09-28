@@ -33,9 +33,7 @@ model: dict[str, Any] = {
     'file': {
         'attributes': {}},
     'group': actor.group,
-    'human_remains': {
-        'attributes': {},
-        'display': {'buttons': ['network']}},
+    'human_remains': artifact.human_remains,
     'modification': event.modification,
     'move': event.move,
     'object_location': {
