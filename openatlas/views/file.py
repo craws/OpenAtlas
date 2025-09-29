@@ -38,7 +38,7 @@ def file_index() -> str:
                 manual('entity/file'),
                 button(_('edit'), url_for('settings', category='file'))
                 if is_authorized('manager') else '',
-                button(_('list'), url_for('index', view='file')),
+                button(_('list'), url_for('index', group='file')),
                 button(_('file'), url_for('insert', class_='file'))
                 if is_authorized('contributor') else ''])}
     if is_authorized('admin'):

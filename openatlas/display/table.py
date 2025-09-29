@@ -140,7 +140,8 @@ def entity_table(
                 case 'class':
                     html = uc_first(e.class_.label)
                 case 'creator':
-                    html = g.file_info[e.id]['creator']
+                    if g.file_info.get(e.id):
+                        html = g.file_info[e.id]['creator']
                 case 'content' | 'description':
                     html = e.description
                     if relation and name in relation['additional_fields']:
@@ -164,7 +165,8 @@ def entity_table(
                         f'{range_.dates.last}</span>' \
                         if range_.dates.last else ''
                 case 'license holder':
-                    html = g.file_info[e.id]['license_holder']
+                    if g.file_info.get(e.id):
+                        html = g.file_info[e.id]['license_holder']
                 case 'main image':
                     html = profile_image_table_link(
                         origin,
@@ -181,7 +183,8 @@ def entity_table(
                         'profile',
                         url_for('file_profile', id_=e.id, entity_id=origin.id))
                 case 'public':
-                    html = _('yes') if g.file_info[e.id]['public'] else None
+                    if g.file_info.get(e.id):
+                        html = _('yes') if g.file_info[e.id]['public'] else None
                 case 'remove':
                     tab_id = e.class_.group['name']
                     if relation and relation['mode'] == 'tab':

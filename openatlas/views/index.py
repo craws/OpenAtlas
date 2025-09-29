@@ -46,7 +46,7 @@ def overview() -> str:
                 button(_('model'), url_for('model_index')),
                 button(
                     _('reference systems'),
-                    url_for('index', view='reference_system')),
+                    url_for('index', group='reference_system')),
                 button(
                     _('network visualization'),
                     url_for('network', dimensions=0)),
@@ -99,7 +99,7 @@ def overview() -> str:
         url = ''
         if name not in [
                 'feature', 'stratigraphic_unit', 'source_translation']:
-            url = url_for('index', view=g.classes[name].group['name'])
+            url = url_for('index', group=g.classes[name].group['name'])
         if name == 'administrative_unit':
             url = f"{url_for('type_index')}#menu-tab-place"
         elif name == 'type':

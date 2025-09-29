@@ -81,7 +81,7 @@ def annotation_image_update(id_: int) -> str | Response:
         'tabs.html',
         tabs={'annotation': Tab('annotation', form=form)},
         crumbs=[
-            [_('file'), url_for('index', view='file')],
+            [_('file'), url_for('index', group='file')],
             Entity.get_by_id(annotation.image_id),
             _('annotate')])
 

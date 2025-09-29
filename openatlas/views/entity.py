@@ -152,7 +152,7 @@ def delete(id_: int) -> Response:
     entity = Entity.get_by_id(id_)
     if not is_authorized(entity.class_.write_access):
         abort(403)
-    url = url_for('index', view=entity.class_.group['name'])
+    url = url_for('index', group=entity.class_.group['name'])
     if isinstance(entity, ReferenceSystem):
         if entity.system:
             abort(403)
@@ -245,7 +245,7 @@ def insert_files(manager: BaseManager) -> str:
             (app.config['UPLOAD_PATH'] / filename).unlink()
         g.logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
-        url = url_for('index', view=g.classes['file'].group['name'])
+        url = url_for('index', group=g.classes['file'].group['name'])
     return url
 
 
@@ -255,7 +255,7 @@ def save(
         origin: Optional[Entity] = None,
         relation_name: Optional[str] = None) -> str:
     action = 'update' if entity.id else 'insert'
-    url = url_for('index', view=entity.class_.group['name'])
+    url = url_for('index', group=entity.class_.group['name'])
     try:
         entity = process_form_data(entity, form, origin, relation_name)
         g.logger.log_user(entity.id, action)

@@ -7,79 +7,82 @@ from openatlas.display.image_processing import check_processed_image
 from openatlas.display.table import Table, entity_table
 from openatlas.display.util import (
     button, check_iiif_file_exist, get_file_path, link, required_group)
-from openatlas.display.util2 import is_authorized, manual
+from openatlas.display.util2 import is_authorized, manual, show_table_icons, \
+    uc_first
+from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.reference_system import ReferenceSystem
 
 
-@app.route('/index/<view>')
+@app.route('/index/<group>')
 @required_group('readonly')
-def index(view: str) -> str | Response:
-    buttons = [manual(f'entity/{view}')]
-    for name in g.class_groups[view]['classes'] \
-            if view != 'place' else ['place']:
+def index(group: str) -> str | Response:
+    buttons = [manual(f'entity/{group}')]
+    for name in g.class_groups[group]['classes'] \
+            if group != 'place' else ['place']:
         if is_authorized(g.classes[name].write_access):
             buttons.append(
                 button(
                     g.classes[name].label,
                     url_for('insert', class_=name),
                     tooltip_text=g.classes[name].display['tooltip']))
-    crumbs = [_(view).replace('_', ' ')]
-    if view == 'file':
+    crumbs = [_(group).replace('_', ' ')]
+    if group == 'file':
         crumbs = [[_('file'), url_for('file_index')], _('files')]
-    table, file_info = get_table(view)
+    table, file_info = get_table(group)
     return render_template(
         'entity/index.html',
-        class_=view,
+        class_=group,
         table=table,
         file_info=file_info,
         buttons=buttons,
-        gis_data=Gis.get_all() if view == 'place' else None,
-        title=_(view.replace('_', ' ')),
+        gis_data=Gis.get_all() if group == 'place' else None,
+        title=_(group.replace('_', ' ')),
         crumbs=crumbs)
 
 
-def get_table(view: str) -> tuple[Table, str]:
+def get_table(group: str) -> tuple[Table, str]:
     file_info = ''
-    # table = Table(g.table_columns[view])
-    # if view == 'file':
-    #     stats = {'public': 0, 'without_license': 0, 'without_creator': 0}
-    #     table.order = [[0, 'desc']]
-    #     table.columns = ['date'] + table.columns
-    #     if show_table_icons():
-    #         table.columns.insert(1, _('icon'))
-    #     for entity in Entity.get_by_class('file', types=True):
-    #         if entity.public:
-    #             stats['public'] += 1
-    #             if not entity.standard_type:
-    #                 stats['without_license'] += 1
-    #             elif not entity.creator:
-    #                 stats['without_creator'] += 1
-    #         data = [
-    #             format_date(entity.created),
-    #             link(entity),
-    #             link(entity.standard_type),
-    #             _('yes') if entity.public else None,
-    #             entity.creator,
-    #             entity.license_holder,
-    #             entity.get_file_size(),
-    #             entity.get_file_ext(),
-    #             entity.description]
-    #         if show_table_icons():
-    #             data.insert(
-    #                 1,
-    #                 f'<a href="{url_for("view", id_=entity.id)}">'
-    #                 f'{file_preview(entity.id)}</a>')
-    #         table.rows.append(data)
-    #     file_info = (
-    #         uc_first(_('files')) + ': ' +
-    #         f"{format_number(stats['public'])} " + _('public') +
-    #         f", {format_number(stats['without_license'])} " +
-    #         _('public without license') +
-    #         f", {format_number(stats['without_creator'])} " +
-    #         _('public with license but without creator'))
-    if view == 'reference_system':
+    if group == 'file':
+        entities = Entity.get_by_class('file', types=True)
+        table = entity_table(entities)
+        # stats = {'public': 0, 'without_license': 0, 'without_creator': 0}
+        # table.order = [[0, 'desc']]
+        # table.columns = ['date'] + table.columns
+        # if show_table_icons():
+        #     table.columns.insert(1, _('icon'))
+        # for entity in entities:
+        #     if entity.public:
+        #         stats['public'] += 1
+        #         if not entity.standard_type:
+        #             stats['without_license'] += 1
+        #         elif not entity.creator:
+        #             stats['without_creator'] += 1
+        #     data = [
+        #         format_date(entity.created),
+        #         link(entity),
+        #         link(entity.standard_type),
+        #         _('yes') if entity.public else None,
+        #         entity.creator,
+        #         entity.license_holder,
+        #         entity.get_file_size(),
+        #         entity.get_file_ext(),
+        #         entity.description]
+        #     if show_table_icons():
+        #         data.insert(
+        #             1,
+        #             f'<a href="{url_for("view", id_=entity.id)}">'
+        #             f'{file_preview(entity.id)}</a>')
+        #     table.rows.append(data)
+        # file_info = (
+        #     uc_first(_('files')) + ': ' +
+        #     f"{format_number(stats['public'])} " + _('public') +
+        #     f", {format_number(stats['without_license'])} " +
+        #     _('public without license') +
+        #     f", {format_number(stats['without_creator'])} " +
+        #     _('public with license but without creator'))
+    elif group == 'reference_system':
         table = Table([
              'name', 'count', 'website URL', 'resolver URL', 'example ID',
              'default precision', 'description'])
@@ -97,8 +100,8 @@ def get_table(view: str) -> tuple[Table, str]:
     else:
         table = entity_table(
             Entity.get_by_class(
-                'place' if view == 'place'
-                else g.class_groups[view]['classes'],
+                'place' if group == 'place'
+                else g.class_groups[group]['classes'],
                 types=True,
                 aliases=True))
     return table, file_info
