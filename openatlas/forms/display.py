@@ -61,8 +61,6 @@ def html_form(
                 label = _('type')
             if field.label.text == 'super':
                 label = _('super')
-            if field.flags.required and field.label.text:
-                label += ' *'
             if not hasattr(field, 'is_type_form') or not field.is_type_form:
                 field.description = type_.description
             field.label.text = label
