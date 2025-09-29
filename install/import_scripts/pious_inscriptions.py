@@ -134,4 +134,3 @@ with app.test_request_context():
     places = get_places()
     current_locations = get_current_location_types()
     artifacts = get_artifacts()
-    sources = get_sources()
