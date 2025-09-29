@@ -13,6 +13,7 @@ from openatlas.api.resources.util import (
     get_iiif_manifest_and_path, get_license_name, get_location_link,
     get_reference_systems, get_value_for_types, to_camel_case)
 from openatlas.display.util import get_file_path
+from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 
@@ -79,8 +80,6 @@ def get_relation_types_dict(
         entity_id: int,
         inverse: bool = False) -> dict[str, Any]:
     relation_to_id = link_.domain.id if inverse else link_.range.id
-    if link_.property.code == 'P53':
-        relation_to_id = entity_id
     if link_.property.code in ['P74', 'OA8', 'OA9', 'P7', 'P26', 'P27']:
         relation_to_id = entity_id
     relation_types = {
@@ -89,6 +88,22 @@ def get_relation_types_dict(
         'type': to_camel_case(link_.type.name) if link_.type else None,
         'description': link_.description,
         'when': get_presentation_time(link_)}
+    if parser.remove_empty_values:
+        relation_types = {k: v for k, v in relation_types.items() if v}
+    return relation_types
+
+
+def get_relation_types_dict_for_locations(
+        entity_id: int,
+        property_: CidocProperty,
+        parser: Parser) -> dict[str, Any]:
+    property_string = f"i_{property_.i18n_inverse['en'].replace(' ', '_')}"
+    relation_types = {
+        'property': f"crm:{property_.code}{property_string}",
+        'relationTo': entity_id,
+        'type': None,
+        'description': None,
+        'when': None}
     if parser.remove_empty_values:
         relation_types = {k: v for k, v in relation_types.items() if v}
     return relation_types
@@ -127,14 +142,6 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
                 'P46',
                 inverse=True))
             ids.extend(place_hierarchy)
-    if entity.class_.view in ['actor']:
-        for property_ in ['P74', 'OA8', 'OA9']:
-            if location := entity.get_linked_entity(property_):
-                ids.append(location.id)
-    if entity.class_.view in ['event']:
-        for property_ in ['P7', 'P26', 'P27']:
-            if location := entity.get_linked_entity(property_):
-                ids.append(location.id)
 
     links = Entity.get_links_of_entities(ids)
     links_inverse = Entity.get_links_of_entities(ids, inverse=True)
@@ -174,6 +181,28 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         relation_types[l.domain.id].append(
             get_relation_types_dict(l, parser, entity.id))
 
+    places: list[Entity] = []
+    if entity.class_.view in {'actor', 'event'}:
+        if location_links := Entity.get_links_of_entities(
+                entity.id,
+                ['P74', 'OA8', 'OA9', 'P7', 'P26', 'P27']):
+            property_mapping = {}
+            location_ids = []
+            for link_ in location_links:
+                property_mapping[link_.range.id] = link_.property
+                location_ids.append(link_.range.id)
+            for link_ in Entity.get_links_of_entities(
+                    location_ids,
+                    'P53',
+                    inverse=True):
+                places.append(link_.domain)
+                relation_types[link_.domain.id].append(
+                    get_relation_types_dict_for_locations(
+                        entity.id,
+                        property_mapping[link_.range.id],
+                        parser))
+
+    related_entities = related_entities + places
     exists_: set[int] = set()
     add_ = exists_.add  # Faster than always call exists.add()
     related_entities_ = \
