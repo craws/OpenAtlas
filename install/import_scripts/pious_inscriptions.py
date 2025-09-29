@@ -101,8 +101,6 @@ def get_current_location_types()-> dict[str, Entity]:
 def get_artifacts() -> dict[str, Entity]:
     artifacts_: dict[str, Entity] = {}
     for entry in data:
-        if entry['id_string'] in artifacts_:
-            continue
         # todo: Maybe move commentary to source itself as new text with
         #   type "commentary"
         description = f"""
@@ -112,12 +110,11 @@ def get_artifacts() -> dict[str, Entity]:
             'object_location',
             f"Location of {entry['id_string']}")
         artifact.link('P53', location)
-        #artifact.link('P46', places[entry['id_string']])
+        artifact.link('P46', places[entry['id_string']], inverse=True)
         if entry.get('current_location'):
             artifact.link('P2', current_locations[entry['current_location']])
+
     return artifacts_
-
-
 
 
 data = get_pious_data_from_db()
@@ -137,3 +134,4 @@ with app.test_request_context():
     places = get_places()
     current_locations = get_current_location_types()
     artifacts = get_artifacts()
+    sources = get_sources()
