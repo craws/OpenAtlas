@@ -12,8 +12,8 @@ from openatlas import app
 from openatlas.api.endpoints.parser import Parser
 from openatlas.api.formats.csv import (
     build_dataframe, build_link_dataframe, get_csv_links, get_csv_types)
-from openatlas.api.formats.linked_places import get_lp_file, get_lp_links, \
-    get_lp_time
+from openatlas.api.formats.linked_places import (
+    get_lp_file, get_lp_links, get_lp_time)
 from openatlas.api.formats.loud import get_loud_entities
 from openatlas.api.formats.rdf import rdf_output
 from openatlas.api.resources.resolve_endpoints import (
@@ -41,7 +41,7 @@ class Endpoint:
         self.single = single
         self.entities_with_links: dict[int, dict[str, Any]] = {}
         self.formated_entities: list[dict[str, Any]] = []
-        self.generator_entities: Iterator[dict[str, Any]]  = iter(())
+        self.generator_entities: Iterator[dict[str, Any]] = iter(())
 
     def get_links_for_entities(self) -> None:
         if not self.entities:

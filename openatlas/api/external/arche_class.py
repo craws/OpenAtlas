@@ -14,18 +14,16 @@ class ArcheFileMetadata:
     titles: list[tuple[str, str]]
     depositors: str | list[str] | None = None
     license: str | None = None
-    licensors: str | list[str] | None  = None
-    metadata_creators: str | list[str] | None  = None
-    rights_holders: str | list[str] | None  = None
+    licensors: str | list[str] | None = None
+    metadata_creators: str | list[str] | None = None
+    rights_holders: str | list[str] | None = None
     is_part_of: str | None = None
     accepted_date: str | None = None
-    curators: str | list[str] | None  = None
-    # Descriptions should also include information about the linked
-    # entities like places and persons.
+    curators: str | list[str] | None = None
     descriptions: list[tuple[str, str]] = field(default_factory=list)
     language: str | None = None
-    principal_investigators: str | list[str] | None  = None
-    related_disciplines: str | list[str] | None  = None
+    principal_investigators: str | list[str] | None = None
+    related_disciplines: str | list[str] | None = None
     transfer_date: str | None = None
     binary_size: int | None = None
     creators: str | list[str] | None = None
@@ -43,7 +41,7 @@ class ArcheFileMetadata:
             license_: str) -> 'ArcheFileMetadata':
         metadata = app.config['ARCHE_METADATA']
         part_of = "https://id.acdh.oeaw.ac.at/" \
-                   f"{metadata['topCollection'].replace(' ', '_')}"
+            f"{metadata['topCollection'].replace(' ', '_')}"
         titles = [(entity.name, 'und')]
         file_info = (g.files[entity.id].suffix[1:], g.files[entity.id].name)
         obj = cls(

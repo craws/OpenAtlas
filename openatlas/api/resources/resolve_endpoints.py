@@ -45,6 +45,7 @@ def parse_loud_context() -> dict[str, str]:
                             output[value2['@id']] = key2
     return output
 
+
 def get_loud_context() -> dict[str, Any]:
     file_path = pathlib.Path(app.root_path) / 'api' / 'linked-art.json'
 

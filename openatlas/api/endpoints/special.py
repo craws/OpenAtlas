@@ -19,8 +19,8 @@ from openatlas.api.resources.error import EntityNotAnEventError, NotAPlaceError
 from openatlas.api.resources.parser import entity_, gis, network
 from openatlas.api.resources.resolve_endpoints import (
     download, resolve_subunits)
-from openatlas.api.resources.templates import geometries_template, \
-    network_visualisation_template
+from openatlas.api.resources.templates import (
+    geometries_template, network_visualisation_template)
 from openatlas.api.resources.util import get_geometries
 from openatlas.database.entity import get_linked_entities_recursive
 from openatlas.models.export import current_date_for_filename

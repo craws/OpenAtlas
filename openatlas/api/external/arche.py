@@ -36,11 +36,12 @@ def is_valid_url(url: str) -> bool:
 def create_single_uri(value: str) -> URIRef:
     if is_valid_url(value):
         return URIRef(value)
-    safe_name = (value.strip()
-                 .replace(" ", "_")
-                 .replace(",", "_")
-                 .replace("/", "_")
-                 .lower())
+    safe_name = (
+        value.strip()
+        .replace(" ", "_")
+        .replace(",", "_")
+        .replace("/", "_")
+        .lower())
     return URIRef(transliterate_url(f"https://id.acdh.oeaw.ac.at/{safe_name}"))
 
 
@@ -48,6 +49,7 @@ def create_uri(value: str | list[str]) -> list[URIRef]:
     if isinstance(value, list):
         return [create_single_uri(v) for v in value]
     return [create_single_uri(value)]
+
 
 def ensure_person_exist(
         graph: Graph,

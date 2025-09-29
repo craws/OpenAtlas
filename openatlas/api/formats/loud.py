@@ -131,7 +131,7 @@ def get_loud_entities(
                     f'{link_.domain.name} and {link_.range.name}',
                 'had_participant': [property_]}
             if link_.type:
-                relationship['classified_as']= [
+                relationship['classified_as'] = [
                     get_type_property(g.types[link_.type.id])]
             property_ = [relationship]
         if code_ in ['OA8', 'OA9']:
@@ -203,7 +203,7 @@ def get_loud_entities(
                     f'{link_.range.name} and {link_.domain.name}',
                 'had_participant': [property_]}
             if link_.type:
-                relationship['classified_as']= [
+                relationship['classified_as'] = [
                     get_type_property(g.types[link_.type.id])]
             property_ = [relationship]
         if code_ in ['OA8', 'OA9']:

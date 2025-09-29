@@ -77,22 +77,17 @@ LOAD_WINDOWS_TEST_SQL = False
 API_WIKIDATA = 'https://www.wikidata.org/w/api.php'
 API_GEONAMES = 'http://api.geonames.org/get'
 USER_AGENT = {
-    "User-Agent": f"OpenAtlas/{VERSION} (https://github.com/craws/OpenAtlas; "
-                  "openatlas@oeaw.ac.at)"}
+    "User-Agent":
+        f"OpenAtlas/{VERSION} (https://github.com/craws/OpenAtlas; "
+        "openatlas@oeaw.ac.at)"}
 
 CSP_HEADER = "frame-ancestors 'self'"
 
-
-# ---------------------------------------------------------------------
 # ARCHE export
-# ---------------------------------------------------------------------
-
 ACDH = Namespace("https://vocabs.acdh.oeaw.ac.at/schema#")  # type: ignore
-
-ARCHE_URI_RULES = 'https://raw.githubusercontent.com/acdh-oeaw/arche-assets' \
-                   '/refs/heads/master/AcdhArcheAssets/uriNormRules.json'
-
-# ARCHE metadata configuration. This should be overwritten in production.py
+ARCHE_URI_RULES = \
+    'https://raw.githubusercontent.com/acdh-oeaw/arche-assets' \
+    '/refs/heads/master/AcdhArcheAssets/uriNormRules.json'
 ARCHE_METADATA = {
     'topCollection': '',
     'language': 'en',

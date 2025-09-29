@@ -15,11 +15,11 @@ def subunit_xml(result: dict[str, Any]) -> bytes:
         root,
         pretty_print=True,
         xml_declaration=True,
-        encoding="utf-8"    )
+        encoding="utf-8")
     return xml_bytes
 
 
-def dict_to_xml(tag: str, data: Any) -> etree.Element:
+def dict_to_xml(tag: str, data: Any) -> etree.Element:  # type: ignore
     elem = etree.Element(tag)
     if isinstance(data, dict):
         for key, val in data.items():

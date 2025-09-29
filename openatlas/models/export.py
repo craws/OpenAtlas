@@ -181,9 +181,7 @@ def create_failed_files_md(
 
 def normalize_extension(ext: str) -> str:
     ext = ext.lower().lstrip('.')
-    if ext == 'jpg':
-        return 'jpeg'
-    return ext
+    return 'jpeg' if ext == 'jpg' else ext
 
 
 def get_place_and_actor_relations(
