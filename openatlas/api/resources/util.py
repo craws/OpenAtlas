@@ -228,9 +228,9 @@ def get_crm_relation_label_x(link_: Link, inverse: bool = False) -> str:
 
 
 def get_crm_relation_x(link_: Link, inverse: bool = False) -> str:
-    property_ = f"i_{link_.property.i18n_inverse['en']}" \
-        if inverse and link_.property.i18n_inverse['en'] \
-        else f"_{link_.property.i18n['en']}"
+    property_ = f"_{link_.property.i18n['en']}"
+    if inverse and link_.property.i18n_inverse['en']:
+        property_ = f"i_{link_.property.i18n_inverse['en']}"
     return f"crm:{link_.property.code}{property_.replace(' ', '_')}"
 
 
