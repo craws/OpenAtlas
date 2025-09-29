@@ -7,7 +7,7 @@ from flask import g, url_for
 from openatlas import app
 from openatlas.api.resources.util import (
     date_to_str, get_crm_code, get_crm_relation, get_iiif_manifest_and_path,
-    get_license_type, get_license_url, remove_spaces_dashes, to_camel_case)
+    get_license_type, remove_spaces_dashes, to_camel_case)
 from openatlas.display.util import get_file_path
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
@@ -36,7 +36,9 @@ def get_file_dimensions(entity: Entity) -> dict[str, Any]:
             "_label": unit_map[file_size.split()[1]]}}]}
 
 
-def get_digital_object_details(entity: Entity) -> dict[str, Any]:
+def get_digital_object_details(
+        entity: Entity,
+        license_url: dict[int, str]) -> dict[str, Any]:
     mime_type, _ = mimetypes.guess_type(g.files[entity.id])
     file_ = get_file_path(entity.id)
     digital_object: dict[str, Any] = {
@@ -75,16 +77,19 @@ def get_digital_object_details(entity: Entity) -> dict[str, Any]:
                     _external=True),
                 "type": "Name",
                 "content": license_.name}]}
-        if license_url := get_license_url(entity):
+        if url := license_url.get(license_.id):
             subject_to['classified_as'] = [{
-                "id": license_url,
+                "id": url,
                 "type": "Type",
                 "_label": license_.name}]
         digital_object.update({'subject_to': [subject_to]})
     return digital_object
 
 
-def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
+def get_loud_entities(
+        data: dict[str, Any],
+        loud: dict[str, str],
+        license_url: dict[int, str]) -> Any:
     entity = data['entity']
 
     def get_range_links() -> dict[str, Any]:
@@ -125,7 +130,7 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
                     f'{link_.domain.name} and {link_.range.name}',
                 'had_participant': [property_]}
             if link_.type:
-                relationship['classified_as']= [
+                relationship['classified_as'] = [
                     get_type_property(g.types[link_.type.id])]
             property_ = [relationship]
         if code_ in ['OA8', 'OA9']:
@@ -197,7 +202,7 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
                     f'{link_.range.name} and {link_.domain.name}',
                 'had_participant': [property_]}
             if link_.type:
-                relationship['classified_as']= [
+                relationship['classified_as'] = [
                     get_type_property(g.types[link_.type.id])]
             property_ = [relationship]
         if code_ in ['OA8', 'OA9']:
@@ -258,13 +263,13 @@ def get_loud_entities(data: dict[str, Any], loud: dict[str, str]) -> Any:
 
     if file_links:
         properties_set['representation'].extend(
-            get_loud_representations(file_links))
+            get_loud_representations(file_links, license_url))
         properties_set['subject_of'].extend(
             get_loud_iiif_subject_of(file_links))
 
     if entity.class_.name == 'file' and g.files.get(entity.id):
         properties_set.update(get_file_dimensions(entity))
-        properties_set.update(get_digital_object_details(entity))
+        properties_set.update(get_digital_object_details(entity, license_url))
 
     return ({'@context': app.config['API_CONTEXT']['LOUD']} |
             base_entity_dict(entity) |
@@ -300,7 +305,9 @@ def get_loud_property_name(
     return name
 
 
-def get_loud_representations(image_links: list[Link]) -> list[dict[str, Any]]:
+def get_loud_representations(
+        image_links: list[Link],
+        license_url: dict[int, str]) -> list[dict[str, Any]]:
     representation = []
     for link_ in image_links:
         entity = link_.domain
@@ -311,7 +318,7 @@ def get_loud_representations(image_links: list[Link]) -> list[dict[str, Any]]:
                 _external=True),
             '_label': entity.name,
             'type': 'DigitalObject'}
-        image.update(get_digital_object_details(entity))
+        image.update(get_digital_object_details(entity, license_url))
         representation.append({
             'type': 'VisualItem',
             'digitally_shown_by': [image]})

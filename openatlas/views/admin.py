@@ -20,6 +20,7 @@ from wtforms import StringField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app
+from openatlas.api.resources.util import filter_by_type
 from openatlas.database.connect import Transaction
 from openatlas.display.image_processing import (
     create_resized_images, delete_orphaned_resized_images)
@@ -44,6 +45,7 @@ from openatlas.models.checks import (
     single_type_duplicates)
 from openatlas.models.content import get_content, update_content
 from openatlas.models.entity import Entity, Link
+from openatlas.models.export import find_duplicates
 from openatlas.models.imports import Project
 from openatlas.models.settings import Settings
 from openatlas.models.user import User
@@ -85,7 +87,7 @@ def admin_index() -> str:
             'modules',
             _('modules'),
             content='<h1>' + uc_first(_('defaults for new user')) + '</h1>'
-            + display_info(get_form_settings(ModulesForm())),
+                    + display_info(get_form_settings(ModulesForm())),
             buttons=[
                 manual('admin/modules'),
                 button(_('edit'), url_for('settings', category='modules'))])
@@ -481,7 +483,6 @@ def orphans() -> str:
         'name',
         'class',
         'type',
-        'system type',
         'created',
         'updated',
         'description']
@@ -582,6 +583,77 @@ def orphans() -> str:
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
             _('orphans')])
+
+
+@app.route('/check_files')
+@app.route('/check_files/<arche>')
+@required_group('contributor')
+def check_files(arche: Optional[str] = None) -> str:
+    columns = ['name', 'type', 'created', 'updated', 'description']
+    tabs = {
+        'no_creator': Tab('no_creator', _('no creator'), table=Table(columns)),
+        'no_license_holder': Tab(
+            'no_license_holder',
+            _('no license holder'),
+            table=Table(columns)),
+        'not_public': Tab('not_public', _('not public'), table=Table(columns)),
+        'no_license': Tab('no_license', _('no license'), table=Table(columns)),
+        'missing_files': Tab(
+            'missing_files',
+            _('missing files'),
+            table=Table(columns)),
+        'duplicated_files': Tab(
+            'duplicated_files',
+            _('duplicated files'),
+            table=Table(['domain', 'range']))}
+
+    for tab in tabs.values():
+        tab.buttons = [manual('admin/data_integrity_checks')]
+
+    entities: list[Entity] = Entity.get_by_class('file', types=True)
+    if arche:
+        type_ids = app.config['ARCHE_METADATA'].get('typeIds')
+        if type_ids:
+            entities = filter_by_type(entities, type_ids)
+    for entity in entities:
+        entity_for_table = [
+            link(entity),
+            link(entity.standard_type),
+            format_date(entity.created),
+            format_date(entity.modified),
+            entity.description]
+        if not get_file_path(entity):
+            tabs['missing_files'].table.rows.append(entity_for_table)
+        if not entity.public:
+            tabs['not_public'].table.rows.append(entity_for_table)
+        if not entity.creator:
+            tabs['no_creator'].table.rows.append(entity_for_table)
+        if not entity.license_holder:
+            tabs['no_license_holder'].table.rows.append(entity_for_table)
+        if not entity.standard_type:
+            tabs['no_license'].table.rows.append(entity_for_table)
+
+    duplicated_files = find_duplicates({e.id for e in entities})
+    all_duplicate_ids = set().union(*duplicated_files)
+    duplicate_entities = Entity.get_by_ids(list(all_duplicate_ids))
+    duplicate_entity_map = {e.id: e for e in duplicate_entities}
+    for duplicate_group in duplicated_files:
+        entity1 = duplicate_entity_map.get(duplicate_group[0])
+        entity2 = duplicate_entity_map.get(duplicate_group[1])
+        if entity1 and entity2:
+            tabs['duplicated_files'].table.rows.append([
+                link(entity1),
+                link(entity2)])
+
+    return render_template(
+        'tabs.html',
+        tabs=tabs,
+        title=_('admin'),
+        crumbs=[
+            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            [_('export') + ' ARCHE', f"{url_for('export_arche')}"]
+            if arche else None,
+            _('check files')])
 
 
 @app.route('/admin/file/delete/<filename>')
@@ -780,6 +852,7 @@ def admin_delete_orphaned_resized_images() -> Response:
 def get_disk_space_info() -> Optional[dict[str, Any]]:
     def upload_ident_with_iiif() -> bool:
         return app.config['UPLOAD_PATH'].resolve() == iiif_path.resolve()
+
     paths = {
         'export': {
             'path': app.config['EXPORT_PATH'], 'size': 0, 'mounted': False},
@@ -820,7 +893,7 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
         'project': math.ceil(files_size / (stats.total / 100)),
         'export': math.ceil(paths['export']['size'] / (files_size / 100)),
         'upload': math.ceil(paths['upload']['size'] / (files_size / 100)),
-        'iiif':  0}
+        'iiif': 0}
     if not upload_ident_with_iiif():
         percent['iiif'] = math.ceil(paths['iiif']['size'] / (files_size / 100))
     percent['processed'] = math.ceil(

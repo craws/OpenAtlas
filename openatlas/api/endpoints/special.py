@@ -4,11 +4,11 @@ from typing import Any
 from flask import Response, jsonify
 from flask_restful import Resource, marshal
 
-from openatlas.api.formats.network_visualisation import (
-    get_ego_network_visualisation, get_network_visualisation)
 from openatlas.api.endpoints.endpoint import Endpoint
 from openatlas.api.endpoints.parser import Parser
 from openatlas.api.formats.csv import export_database_csv
+from openatlas.api.formats.network_visualisation import (
+    get_ego_network_visualisation, get_network_visualisation)
 from openatlas.api.formats.subunits import get_subunits_from_id
 from openatlas.api.formats.xml import export_database_xml
 from openatlas.api.resources.api_entity import ApiEntity
@@ -19,8 +19,8 @@ from openatlas.api.resources.error import EntityNotAnEventError, NotAPlaceError
 from openatlas.api.resources.parser import entity_, gis, network
 from openatlas.api.resources.resolve_endpoints import (
     download, resolve_subunits)
-from openatlas.api.resources.templates import geometries_template, \
-    network_visualisation_template
+from openatlas.api.resources.templates import (
+    geometries_template, network_visualisation_template)
 from openatlas.api.resources.util import get_geometries
 from openatlas.database.entity import get_linked_entities_recursive
 from openatlas.models.export import current_date_for_filename

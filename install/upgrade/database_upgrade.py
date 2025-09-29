@@ -24,8 +24,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 # pylint: disable=wrong-import-position
 from config.database_versions import DATABASE_VERSIONS
 from config.default import (
-    DATABASE_PASS, VERSION, DATABASE_VERSION, DATABASE_NAME, DATABASE_USER,
-    DATABASE_HOST, DATABASE_PORT, EXPORT_PATH)
+    DATABASE_PASS, DATABASE_VERSION, DATABASE_NAME, DATABASE_USER,
+    DATABASE_HOST, DATABASE_PORT, SQL_PATH, VERSION)
 from instance import production
 from openatlas.database.connect import open_connection
 from openatlas.database import settings as db_settings
@@ -107,7 +107,7 @@ def check_database_version_supported() -> None:
 
 
 def backup_database() -> None:
-    path = EXPORT_PATH
+    path = SQL_PATH
     if not os.access(path, os.W_OK):
         finish(
             f'Directory for database backup not writeable ({path}). Aborting!')
