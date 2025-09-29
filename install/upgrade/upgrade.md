@@ -21,18 +21,23 @@ then run the database upgrade script, then restart Apache:
 No database update is required but an additional Python package is needed:
 
 #### Additional package
-The unidecode package is used to transliterate URLs to ASCII. 
+The unidecode package is used to transliterate URLs to ASCII.
 The lxml package is used for faster and better xml creation.
 
     sudo apt install python3-unidecode python3-lxml
 
-To keep the installed packages clean, python3-dicttoxml can be removed:
+python3-dicttoxml can be removed:
 
-    sudo apt remove python3-dicttoxml 
+    sudo apt remove python3-dicttoxml
 
-To move already exported SQL files to the new directory please run:
+#### New export directory structure
+To adapt already exported SQL file paths to the new directory structure:
 
     mv /var/www/openatlas/files/export/*7z /var/www/openatlas/files/export/sql/
+
+#### Tests (Optional)
+For full test coverage, copy *ARCHE_METADATA* from 
+'instance/example_testing.py' to 'testing.py'.
 
 ### 8.13.0 to 8.14.0
 A code base update (e.g. with git pull) and a webserver restart is sufficient.
