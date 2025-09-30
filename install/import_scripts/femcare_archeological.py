@@ -207,8 +207,8 @@ def get_individuals() -> list[Individual]:
                         cells = row.cells
 
                         if row_num == 0:
-                            position = cells[0].text.replace('Lage:',
-                                                             '').strip()
+                            position = cells[0].text.replace(
+                                'Lage:','').strip()
                             orientation = \
                                 (cells[1].text.replace('Orientierung:', '')
                                  .strip())
