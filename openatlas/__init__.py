@@ -90,6 +90,9 @@ def before_request() -> Response | None:
     g.writable_paths = [
         app.config['EXPORT_PATH'],
         app.config['RESIZED_IMAGES'],
+        app.config['ARCHE_PATH'],
+        app.config['RDF_PATH'],
+        app.config['SQL_PATH'],
         app.config['UPLOAD_PATH'],
         app.config['TMP_PATH']]
     setup_files()

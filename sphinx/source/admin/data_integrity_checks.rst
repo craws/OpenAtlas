@@ -148,3 +148,24 @@ and data volume this might take some time. The following options are given:
 The function uses the `fuzzywuzzy <https://pypi.org/project/fuzzywuzzy/>`_
 package which uses the
 `Levenshtein Distance <https://en.wikipedia.org/wiki/Levenshtein_distance>`_.
+
+Check files
+-----------
+
+In this section, all files are checked for completeness and consistency.
+Further information about file entities can be found in the manual under
+:doc:`entity/file`.
+
+Missing information
+*******************
+* **No creator**: Files without a creator entered.
+* **No license holder**: Files without a license holder entered.
+* **Not public**: Files that are not publicly accessible.
+* **No license**: Files where no license was assigned.
+
+File integrity
+**************
+* **Missing files**: A file entity was created but has no associated file.
+* **Duplicated files**: Lists all files that share the same SHA value.
+  In such cases, the files themselves are duplicates, but their metadata
+  entries differ.

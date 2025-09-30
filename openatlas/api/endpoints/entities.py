@@ -25,7 +25,7 @@ class GetByCidocClass(Resource):
     def get(class_: str) -> tuple[Resource, int] | Response | dict[str, Any]:
         return Endpoint(
             ApiEntity.get_by_cidoc_classes([class_]),
-            entity_.parse_args()).resolve_entities()
+            entity_.parse_args()).resolve()
 
 
 class GetBySystemClass(Resource):
@@ -33,7 +33,7 @@ class GetBySystemClass(Resource):
     def get(class_: str) -> tuple[Resource, int] | Response | dict[str, Any]:
         return Endpoint(
             ApiEntity.get_by_system_classes([class_]),
-            entity_.parse_args()).resolve_entities()
+            entity_.parse_args()).resolve()
 
 
 class GetByViewClass(Resource):
@@ -41,7 +41,7 @@ class GetByViewClass(Resource):
     def get(class_: str) -> tuple[Resource, int] | Response | dict[str, Any]:
         return Endpoint(
             ApiEntity.get_by_view_classes([class_]),
-            entity_.parse_args()).resolve_entities()
+            entity_.parse_args()).resolve()
 
 
 class GetEntitiesLinkedToEntity(Resource):
@@ -49,7 +49,7 @@ class GetEntitiesLinkedToEntity(Resource):
     def get(id_: int) -> tuple[Resource, int] | Response | dict[str, Any]:
         return Endpoint(
             get_linked_entities_api(id_),
-            entity_.parse_args()).resolve_entities()
+            entity_.parse_args()).resolve()
 
 
 class GetEntityPresentationView(Resource):
@@ -72,7 +72,7 @@ class GetLinkedEntitiesByPropertyRecursive(Resource):
             ApiEntity.get_linked_entities_with_properties(
                 id_,
                 parser['properties']),
-            parser).resolve_entities()
+            parser).resolve()
 
 
 class GetEntity(Resource):
@@ -81,7 +81,7 @@ class GetEntity(Resource):
         return Endpoint(
             ApiEntity.get_by_id(id_, types=True, aliases=True),
             entity_.parse_args(),
-            single=True).resolve_entities()
+            single=True).resolve()
 
 
 class GetLatest(Resource):
@@ -91,7 +91,7 @@ class GetLatest(Resource):
             raise InvalidLimitError
         return Endpoint(
             ApiEntity.get_latest(limit),
-            entity_.parse_args()).resolve_entities()
+            entity_.parse_args()).resolve()
 
 
 class GetTypeEntities(Resource):
@@ -104,7 +104,7 @@ class GetTypeEntities(Resource):
                 inverse=True,
                 types=True)):
             entities = get_entities_linked_to_special_type(id_)
-        return Endpoint(entities, entity_.parse_args()).resolve_entities()
+        return Endpoint(entities, entity_.parse_args()).resolve()
 
 
 class GetTypeEntitiesAll(Resource):
@@ -117,7 +117,7 @@ class GetTypeEntitiesAll(Resource):
                 get_entities_linked_to_special_type_recursive(id_, []),
                 types=True,
                 aliases=True)
-        return Endpoint(entities, entity_.parse_args()).resolve_entities()
+        return Endpoint(entities, entity_.parse_args()).resolve()
 
 
 class GetQuery(Resource):
@@ -149,7 +149,7 @@ class GetQuery(Resource):
                 ApiEntity.get_by_cidoc_classes(parser['cidoc_classes']))
         if parser['linked_entities']:
             entities.extend(get_linked_entities_api(parser['linked_entities']))
-        return Endpoint(entities, parser).resolve_entities()
+        return Endpoint(entities, parser).resolve()
 
 
 class GetSearchEntities(Resource):

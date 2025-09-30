@@ -3,6 +3,7 @@ ignore=openatlas.wsgi
 disable=C0111, broad-except, duplicate-code
 good-names=bc, c, e, ex, f, i, id, ip, j, js, k, l, op, Run, rv, to, x, y, _
 min-public-methods=1 # default=2 but isn't useful when working with inheritance
+extension-pkg-allow-list=lxml
 
 [FORMAT]
 max-line-length=79
