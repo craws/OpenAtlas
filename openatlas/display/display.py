@@ -10,7 +10,7 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import entity_table
 from openatlas.display.util import (
     bookmark_toggle, button, description, display_annotation_text_links,
-    get_chart_data, get_system_data, link, reference_systems)
+    get_chart_data, get_file_path, get_system_data, link, reference_systems)
 from openatlas.display.util2 import (
     is_authorized, manual, show_table_icons, uc_first)
 from openatlas.models.dates import format_date, format_entity_date
@@ -219,6 +219,20 @@ class Display:
         self.buttons.append(bookmark_toggle(self.entity.id))
         self.buttons.append(
             render_template('util/api_links.html', entity=self.entity))
+        for item in self.entity.class_.display['buttons']:
+            match item:
+                case 'download':
+                    if path := get_file_path(self.entity.id):
+                        self.buttons.append(
+                            button(
+                                _('download'),
+                                url_for('download', filename=path.name)))
+                    else:
+                        self.buttons.append(
+                            '<span class="error">' \
+                            + uc_first(_("missing file")) \
+                            + '</span>')
+
         if self.structure and len(self.structure['siblings']) > 1:
             self.add_button_sibling_pager()
 

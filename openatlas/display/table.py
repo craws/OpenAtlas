@@ -45,12 +45,13 @@ class Table:
             'columns': [{
                 'title':
                     uc_first(_(name)) if name and name
-                    not in ['checkbox', 'remove', 'update'] else '',
+                                         not in ['checkbox', 'remove',
+                                                 'update'] else '',
                 'className':
                     'dt-body-right' if name in ['count', 'size'] else ''}
-                    for name in self.columns] + [
-                    {'title': '', 'className': ''} for _item in
-                    range(len(self.rows[0]) - len(self.columns))],
+                           for name in self.columns] + [
+                           {'title': '', 'className': ''} for _item in
+                           range(len(self.rows[0]) - len(self.columns))],
             'paging': self.paging,
             'pageLength': current_user.settings['table_rows'],
             'autoWidth': 'false'}
@@ -73,6 +74,7 @@ def entity_table(
         relation: Optional[dict[Any, str]] = None,
         table_id: Optional[str] = None,
         forms: Optional[dict[str, Any]] = None) -> Table | None:
+    from openatlas.views.entity_index import file_preview
     if not items:
         return Table()
     inverse = relation and relation['inverse']
@@ -114,7 +116,6 @@ def entity_table(
         if reverse_relation and not reverse_relation.get("required", True):
             columns.append("remove")
 
-
     table = Table(columns, order=order, defs=defs)
     for item in items:
         e = item
@@ -140,8 +141,8 @@ def entity_table(
                             type="checkbox"
                             data-entity-name="{sanitize(e.name)}"
                             value="{e.id}" {
-                            "checked" if e.id in forms.get('selection_ids', [])
-                            else ""}>"""
+                    "checked" if e.id in forms.get('selection_ids', [])
+                    else ""}>"""
                 case 'class':
                     html = uc_first(e.class_.label)
                 case 'created':
@@ -164,6 +165,9 @@ def entity_table(
                         '<span class="text-muted">' \
                         f'{range_.dates.first}</span>' \
                         if range_.dates.first else ''
+                case 'icon':
+                    html = f'<a href="{url_for("view", id_=e.id)}">' \
+                        f'{file_preview(e.id)}</a>'
                 case 'involvement' | 'function' | 'relation':
                     html = item.type.name if item.type else ''
                 case 'last':
@@ -191,7 +195,8 @@ def entity_table(
                         url_for('file_profile', id_=e.id, entity_id=origin.id))
                 case 'public':
                     if g.file_info.get(e.id):
-                        html = _('yes') if g.file_info[e.id]['public'] else None
+                        html = _('yes') if g.file_info[e.id][
+                            'public'] else None
                 case 'remove':
                     tab_id = e.class_.group['name']
                     if relation and relation['mode'] == 'tab':

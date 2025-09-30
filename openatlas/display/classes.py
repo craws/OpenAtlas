@@ -37,16 +37,7 @@ class FileDisplay(BaseDisplay):
         self.data[_('size')] = self.entity.get_file_size()
         self.data[_('extension')] = self.entity.get_file_ext()
 
-    def add_button_others(self) -> None:
-        if path := get_file_path(self.entity.id):
-            self.buttons.append(
-                button(_('download'), url_for('download', filename=path.name)))
-            return
-        self.buttons.append(
-            '<span class="error">' + uc_first(_("missing file")) + '</span>')
 
-    def add_button_copy(self) -> None:
-        pass
 
     def add_tabs(self) -> None:
         entity = self.entity

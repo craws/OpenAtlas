@@ -9,7 +9,7 @@ file: dict[str, Any] = {
     'attributes': {
         'name': {
             'required': True},
-        'description': {}},
+        'description': {},},
     'relations': {
         'actor': {
             'label': _('owned by'),
@@ -20,5 +20,8 @@ file: dict[str, Any] = {
                 'buttons': ['insert']}},
         'reference': standard_relations['reference']},
     'display': {
+        'buttons': ['download'],
+        'form': {
+            'insert_and_continue': True},
         'additional_tabs': {
             'note': {}}}}
