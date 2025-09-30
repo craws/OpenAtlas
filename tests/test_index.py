@@ -11,7 +11,8 @@ class IndexTests(TestBaseCase):
 
     def test_index(self) -> None:
         c = self.client
-        assert 'x00' in str(c.get('/static/favicon.ico').data)
+        with c.get('/static/favicon.ico') as rv:
+            assert 'x00' in str(rv.data)
 
         rv = c.get(url_for('index_changelog'))
         assert b'is needed but current version is' not in rv.data

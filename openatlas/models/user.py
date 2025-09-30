@@ -60,6 +60,8 @@ class User(UserMixin):
     def update_settings(self, settings: dict[str, Any]) -> None:
         for name, value in settings.items():
             db.update_settings(self.id, name, value)
+            if name == 'language':
+                current_user.settings['language'] = value
 
     def remove_newsletter(self) -> None:
         db.remove_newsletter(self.id)

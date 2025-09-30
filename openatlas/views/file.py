@@ -1,5 +1,4 @@
 from datetime import datetime
-from pathlib import Path
 from typing import Any, Optional
 
 from flask import (
@@ -84,14 +83,11 @@ def display_file(filename: str) -> Any:
     return send_from_directory(app.config['UPLOAD_PATH'], filename)
 
 
-@app.route('/display_logo/<path:filename>')
-def display_logo(filename: str) -> Any:
-    path = Path(filename)
-    if path.stem == g.settings['logo_file_id']:
-        return send_from_directory(  # pragma: no cover
-            app.config['UPLOAD_PATH'],
-            f"{g.settings['logo_file_id']}{path.suffix}")
-    abort(404)
+@app.route('/display/custom_logo/<ext>')
+def display_custom_logo(ext: str) -> Any:
+    return send_from_directory(
+        app.config['UPLOAD_PATH'],
+        g.settings['logo_file_id'] + ext)
 
 
 @app.route('/set_profile_image/<int:id_>/<int:origin_id>')

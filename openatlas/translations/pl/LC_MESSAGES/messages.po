@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2025-07-30 14:29+0200\n"
-"PO-Revision-Date: 2025-08-19 12:37+0200\n"
+"PO-Revision-Date: 2025-08-27 15:58+0200\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language-Team: pl <LL@li.org>\n"
 "Language: pl\n"
@@ -134,7 +134,7 @@ msgstr "strona URL"
 #: openatlas/display/classes.py:254 openatlas/forms/manager.py:551
 #: openatlas/forms/setting.py:109
 msgid "resolver URL"
-msgstr ""
+msgstr "rezolwer URL"
 
 #: openatlas/display/classes.py:258 openatlas/forms/manager.py:553
 msgid "example ID"
@@ -266,7 +266,7 @@ msgstr "typ"
 
 #: openatlas/display/classes_base.py:250
 msgid "residence"
-msgstr ""
+msgstr "miejsce zamieszkania"
 
 #: openatlas/display/classes_base.py:253
 msgid "appears first"
@@ -332,11 +332,11 @@ msgstr "link"
 
 #: openatlas/display/classes_base.py:527
 msgid "set selectable"
-msgstr ""
+msgstr "ustaw  wybierany"
 
 #: openatlas/display/classes_base.py:532
 msgid "set unselectable"
-msgstr ""
+msgstr "ustaw niewybieralny"
 
 #: openatlas/display/classes_base.py:541 openatlas/forms/display.py:62
 #: openatlas/templates/model/cidoc_class_view.html:13
@@ -350,7 +350,7 @@ msgstr "jednostka"
 
 #: openatlas/display/classes_base.py:544
 msgid "selectable"
-msgstr ""
+msgstr "do wyboru"
 
 #: openatlas/display/classes_base.py:546
 msgid "ID for imports"
@@ -467,7 +467,7 @@ msgstr "zewnętrzne systemy odniesienia"
 #: openatlas/views/login.py:127 openatlas/views/login.py:178
 #: openatlas/views/user.py:293
 msgid "at"
-msgstr ""
+msgstr "na"
 
 #: openatlas/display/util.py:90 openatlas/display/util.py:214
 msgid "event"
@@ -489,7 +489,7 @@ msgstr "nie ustawiono"
 
 #: openatlas/display/util.py:146 openatlas/views/file.py:218
 msgid "set"
-msgstr ""
+msgstr "ustaw"
 
 #: openatlas/display/util.py:176
 msgid "created"
@@ -601,27 +601,27 @@ msgstr "YYYY"
 #: openatlas/forms/add_fields.py:63 openatlas/forms/add_fields.py:100
 #: openatlas/forms/add_fields.py:141 openatlas/forms/add_fields.py:178
 msgid "MM"
-msgstr ""
+msgstr "MM"
 
 #: openatlas/forms/add_fields.py:69 openatlas/forms/add_fields.py:106
 #: openatlas/forms/add_fields.py:147 openatlas/forms/add_fields.py:184
 msgid "DD"
-msgstr ""
+msgstr "DD"
 
 #: openatlas/forms/add_fields.py:76 openatlas/forms/add_fields.py:113
 #: openatlas/forms/add_fields.py:154 openatlas/forms/add_fields.py:191
 msgid "hh"
-msgstr ""
+msgstr "gg"
 
 #: openatlas/forms/add_fields.py:82 openatlas/forms/add_fields.py:119
 #: openatlas/forms/add_fields.py:160 openatlas/forms/add_fields.py:197
 msgid "mm"
-msgstr ""
+msgstr "mm"
 
 #: openatlas/forms/add_fields.py:88 openatlas/forms/add_fields.py:125
 #: openatlas/forms/add_fields.py:166 openatlas/forms/add_fields.py:203
 msgid "ss"
-msgstr ""
+msgstr "ss"
 
 #: openatlas/forms/add_fields.py:130 openatlas/forms/add_fields.py:208
 msgid "comment"
@@ -859,7 +859,7 @@ msgstr "odbiornik poczty testowej"
 
 #: openatlas/forms/setting.py:47
 msgid "send test mail"
-msgstr ""
+msgstr "wyślij pocztę testową"
 
 #: openatlas/forms/setting.py:51
 msgid "mail"
@@ -1008,7 +1008,7 @@ msgstr "e-mail z podpowiedzią"
 
 #: openatlas/forms/setting.py:138 openatlas/views/profile.py:64
 msgid "show email"
-msgstr ""
+msgstr "pokaż email"
 
 #: openatlas/forms/setting.py:139
 msgid "tooltip show email"
@@ -1039,23 +1039,23 @@ msgstr "wiersze tabeli podpowiedzi"
 
 #: openatlas/forms/setting.py:155
 msgid "show aliases in tables"
-msgstr ""
+msgstr "pokaż aliasy w tabelach"
 
 #: openatlas/forms/setting.py:156
 msgid "show icons in tables"
-msgstr ""
+msgstr "pokaż obrazy w tablice"
 
 #: openatlas/forms/setting.py:158
 msgid "show created and modified information"
-msgstr ""
+msgstr "pokaż stworzone i zmodyfikowane informacje"
 
 #: openatlas/forms/setting.py:159
 msgid "show import information"
-msgstr ""
+msgstr "pokaż informacje importu"
 
 #: openatlas/forms/setting.py:160
 msgid "show CIDOC class"
-msgstr ""
+msgstr "pokaż klasę CIDOC"
 
 #: openatlas/forms/util.py:34 openatlas/views/profile.py:64
 #: openatlas/views/profile.py:66
@@ -1279,7 +1279,7 @@ msgstr "zapowiedź"
 
 #: openatlas/templates/layout.html:86 openatlas/templates/search.html:9
 msgid "search term"
-msgstr ""
+msgstr "szukaj słowa kluczowego"
 
 #: openatlas/templates/index/index.html:15 openatlas/templates/layout.html:119
 #: openatlas/views/profile.py:60 openatlas/views/profile.py:99
@@ -1594,7 +1594,7 @@ msgstr "chcesz otrzymywać aktualizacje? Aktywuj newsletter w swoim"
 
 #: openatlas/templates/index/index.html:29
 msgid "Show all activity"
-msgstr ""
+msgstr "Pokaż całą aktywność"
 
 #: openatlas/templates/index/index_guest.html:6
 msgid "text_intro"
@@ -1603,7 +1603,7 @@ msgstr "wprowadzenie_tekstowe"
 #: openatlas/templates/model/cidoc_class_view.html:19
 #: openatlas/templates/model/property_view.html:19
 msgid "subs"
-msgstr ""
+msgstr "subs"
 
 #: openatlas/templates/model/cidoc_class_view.html:25
 msgid "domain for"
@@ -1628,7 +1628,7 @@ msgstr "sprawdź poprawność linków"
 
 #: openatlas/templates/model/index.html:19
 msgid "result for"
-msgstr ""
+msgstr "wynik dla"
 
 #: openatlas/templates/model/index.html:26
 msgid "valid link"
@@ -1661,7 +1661,7 @@ msgstr "opcje sieciowe"
 
 #: openatlas/templates/model/network.html:81
 msgid "show orphans"
-msgstr ""
+msgstr "pokaż osierocone"
 
 #: openatlas/templates/sql/index.html:6
 msgid ""
@@ -1703,7 +1703,7 @@ msgstr "hierarchia"
 
 #: openatlas/templates/type/index.html:89 openatlas/views/type.py:162
 msgid "selection"
-msgstr ""
+msgstr "selekcja"
 
 #: openatlas/templates/type/index.html:90
 msgid "single"
@@ -1772,11 +1772,11 @@ msgstr "szczegóły"
 
 #: openatlas/templates/util/translations.html:11
 msgid "show more"
-msgstr ""
+msgstr "pokaż więcej"
 
 #: openatlas/templates/util/translations.html:12
 msgid "show less"
-msgstr ""
+msgstr "pokaż mniej"
 
 #: openatlas/templates/util/translations.html:16
 msgid "map_clear"
@@ -1930,7 +1930,7 @@ msgstr "link usunięty"
 
 #: openatlas/views/admin.py:333
 msgid "settings"
-msgstr ""
+msgstr "ustawienia"
 
 #: openatlas/views/admin.py:336
 msgid "IIIF"
@@ -2062,7 +2062,7 @@ msgstr "obrazy zostały stworzone"
 
 #: openatlas/views/admin.py:775
 msgid "resized orphaned images were deleted"
-msgstr ""
+msgstr "usunięto osierocone obrazy o zmienionym rozmiarze"
 
 #: openatlas/views/admin.py:913 openatlas/views/admin.py:918
 msgid "relink entity"
@@ -2445,7 +2445,7 @@ msgstr "hasło"
 
 #: openatlas/views/login.py:39
 msgid "show password"
-msgstr ""
+msgstr "pokaż hasło"
 
 #: openatlas/views/login.py:45
 msgid "submit"
@@ -2475,7 +2475,7 @@ msgstr "Otrzymaliśmy żądanie zresetowania hasła dla %(username)s"
 
 #: openatlas/views/login.py:128
 msgid "reset password link"
-msgstr ""
+msgstr "zresetuj link hasła"
 
 #: openatlas/views/login.py:130
 msgid "The link is valid for"
@@ -2578,7 +2578,7 @@ msgstr "klasyk"
 
 #: openatlas/views/note.py:43
 msgid "set private"
-msgstr ""
+msgstr "ustaw prywatny"
 
 #: openatlas/views/note.py:63 openatlas/views/note.py:98
 msgid "note updated"
@@ -2614,7 +2614,7 @@ msgstr "powtórz hasło"
 
 #: openatlas/views/profile.py:29 openatlas/views/user.py:40
 msgid "show passwords"
-msgstr ""
+msgstr "pokaż hasła"
 
 #: openatlas/views/profile.py:38
 msgid "error wrong password"
@@ -2787,7 +2787,7 @@ msgstr "odpowiada"
 #: openatlas/views/tools.py:51 openatlas/views/tools.py:77
 #: openatlas/views/tools.py:121 openatlas/views/tools.py:189
 msgid "sex estimation"
-msgstr ""
+msgstr "rozpoznawanie płci"
 
 #: openatlas/views/tools.py:223
 msgid "laboratory"
@@ -2839,7 +2839,7 @@ msgstr "grupa"
 
 #: openatlas/views/user.py:43
 msgid "send account information"
-msgstr ""
+msgstr "wyślij informacje konta"
 
 #: openatlas/views/user.py:57
 msgid "error username exists"
@@ -2882,7 +2882,7 @@ msgstr "Informacje o koncie dla %(username)s"
 #: openatlas/views/user.py:299
 #, python-format
 msgid "Sent account information mail to %(email)s."
-msgstr ""
+msgstr "Wyślij wiadomość informacyjną konta na  %(email)s."
 
 #: openatlas/views/user.py:304
 #, python-format
@@ -2895,7 +2895,7 @@ msgstr "Witaj w OpenAtlas. Aby kontynuować, dodaj użytkownika administratora."
 
 #: openatlas/views/vocabs.py:44
 msgid "show vocabularies"
-msgstr ""
+msgstr "pokaż słownictwo"
 
 #: openatlas/views/vocabs.py:85
 msgid "languages"

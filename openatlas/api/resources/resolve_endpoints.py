@@ -46,6 +46,13 @@ def parse_loud_context() -> dict[str, str]:
     return output
 
 
+def get_loud_context() -> dict[str, Any]:
+    file_path = pathlib.Path(app.root_path) / 'api' / 'linked-art.json'
+
+    with file_path.open("r", encoding="utf-8") as f:
+        return json.load(f)
+
+
 def download(
         data: list[Any] | dict[Any, Any],
         template: dict[str, Any]) -> Response:
