@@ -77,9 +77,6 @@ def entity_table(
     inverse = relation and relation['inverse']
 
     item = items[0]
-    if isinstance(item, Entity):
-        item_class = item.class_
-        default_columns = item.class_.group['table_columns']
     if isinstance(item, Link):
         if inverse:
             item_class = item.domain.class_
@@ -87,6 +84,9 @@ def entity_table(
         else:
             item_class = item.range.class_
             default_columns = item.range.class_.group['table_columns']
+    else:
+        item_class = item.class_
+        default_columns = item.class_.group['table_columns']
 
     order = None
     defs = None
@@ -104,11 +104,13 @@ def entity_table(
     if relation and relation['mode'].startswith('tab'):
         if relation['additional_fields']:
             columns.append('update')
-        if not get_reverse_relation(
-                origin.class_,
-                relation,
-                item_class)['required']:
-            columns.append('remove')
+        reverse_relation = get_reverse_relation(
+            origin.class_,
+            relation,
+            item_class)
+        if reverse_relation and not reverse_relation.get("required", True):
+            columns.append("remove")
+
 
     table = Table(columns, order=order, defs=defs)
     for item in items:
