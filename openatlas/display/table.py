@@ -9,6 +9,7 @@ from flask_login import current_user
 from openatlas.display.util import (
     edit_link, link, profile_image_table_link, remove_link)
 from openatlas.display.util2 import sanitize, uc_first
+from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity, Link
 from openatlas.models.openatlas_class import get_reverse_relation
 
@@ -96,6 +97,8 @@ def entity_table(
         columns.insert(0, 'checkbox')
         order = [[0, "desc"], [1, "asc"]]
         defs = [{"orderDataType": "dom-checkbox", "targets": 0}]
+    elif columns[0] == 'created':
+        order = [[0, "desc"]]
 
     # Todo: implement file column
     # if classes[0] == 'file' and show_table_icons():
@@ -125,6 +128,10 @@ def entity_table(
             match name:
                 case 'activity':
                     html = item.property.name_inverse
+                case 'begin':
+                    html = e.dates.first
+                    if relation and 'dates' in relation['additional_fields']:
+                        html = item.dates.first
                 case 'checkbox':
                     html = f"""
                         <input
@@ -135,12 +142,10 @@ def entity_table(
                             value="{e.id}" {
                             "checked" if e.id in forms.get('selection_ids', [])
                             else ""}>"""
-                case 'begin':
-                    html = e.dates.first
-                    if relation and 'dates' in relation['additional_fields']:
-                        html = item.dates.first
                 case 'class':
                     html = uc_first(e.class_.label)
+                case 'created':
+                    html = format_date(e.created)
                 case 'creator':
                     if g.file_info.get(e.id):
                         html = g.file_info[e.id]['creator']

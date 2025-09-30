@@ -25,8 +25,8 @@ class_groups = {
         'label': _('file'),
         'classes': ['file'],
         'table_columns': [
-            'name', 'license', 'public', 'creator', 'license holder',
-            'size', 'extension', 'description']},
+            'created', 'icon', 'name', 'license', 'public', 'creator',
+            'license holder', 'size', 'extension', 'description']},
     # 'object_location': {
     #    'name': 'object_location',
     #    'classes': ['object_location']},
