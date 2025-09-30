@@ -2,17 +2,19 @@
 from typing import Any, Optional
 
 from flask import g, request
+from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import HiddenField
 
 from openatlas.database.connect import Transaction
 from openatlas.forms.add_fields import (
     add_buttons, add_class_types, add_date_fields, add_description,
-    add_name_fields, add_reference_systems, add_relations)
+    add_name_fields, add_reference_systems, add_relations, get_validators)
+from openatlas.forms.field import DragNDropField
 from openatlas.forms.populate import populate_insert, populate_update
 from openatlas.forms.process import process_dates
 from openatlas.forms.util import convert
-from openatlas.forms.validation import validate
+from openatlas.forms.validation import file, validate
 from openatlas.models.entity import Entity, insert
 from openatlas.models.gis import InvalidGeomException
 from openatlas.models.openatlas_class import get_reverse_relation
@@ -31,12 +33,24 @@ def get_entity_form(
     add_class_types(Form, entity.class_)
     add_relations(Form, entity, origin)
     add_reference_systems(Form, entity.class_)
-    if entity.class_.attributes.get('dates'):
-        add_date_fields(Form, entity)
-    if entity.class_.attributes.get('location'):
-        for shape in ['points', 'polygons', 'lines']:
-            setattr(Form, f'gis_{shape}', HiddenField(default='[]'))
-    add_description(Form, entity, origin)
+    for key, value in entity.class_.attributes.items():
+        match key:
+            case 'dates':
+                add_date_fields(Form, entity)
+            case 'description':
+                add_description(Form, entity, origin)
+            case 'file':
+                if not entity.id:
+                    setattr(
+                        Form,
+                        'file',
+                        DragNDropField(
+                            _('file'),
+                        validators=get_validators(value)))
+                    setattr(Form, 'validate_file', file)
+            case 'location':
+                for shape in ['points', 'polygons', 'lines']:
+                    setattr(Form, f'gis_{shape}', HiddenField(default='[]'))
     add_buttons(
         Form,
         entity,
@@ -65,16 +79,19 @@ def process_form_data(
         'end_to': entity.dates.end_to,
         'end_comment': entity.dates.end_comment}
     for attr in entity.class_.attributes:
-        data[attr] = None
-        if attr == 'dates':
-            data.update(process_dates(form))
-        elif attr == 'location':
-            data['gis'] = {
-                shape: getattr(form, f'gis_{shape}s').data
-                for shape in ['point', 'line', 'polygon']}
-        elif getattr(form, attr).data or getattr(form, attr).data == 0:
-            value = getattr(form, attr).data
-            data[attr] = value.strip() if isinstance(value, str) else value
+        match attr:
+            case 'dates':
+                data.update(process_dates(form))
+            case 'location':
+                data['gis'] = {
+                    shape: getattr(form, f'gis_{shape}s').data
+                    for shape in ['point', 'line', 'polygon']}
+            case _ if getattr(form, attr).data or \
+                    getattr(form, attr).data == 0:
+                value = getattr(form, attr).data
+                data[attr] = value.strip() if isinstance(value, str) else value
+            case _:
+                data[attr] = None
     try:
         Transaction.begin()
         if entity.id:

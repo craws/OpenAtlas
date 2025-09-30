@@ -1,25 +1,22 @@
 import os
 from datetime import datetime
-from subprocess import call
 from typing import Any, Optional
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from werkzeug.exceptions import abort
-from werkzeug.utils import redirect, secure_filename
+from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.display.display import Display
-from openatlas.display.image_processing import resize_image
 from openatlas.display.util import (
-    button, check_iiif_activation, check_iiif_file_exist,
-    convert_image_to_iiif, get_file_path, get_iiif_file_path, hierarchy_crumbs,
+    button, check_iiif_file_exist,
+    get_file_path, get_iiif_file_path, hierarchy_crumbs,
     link, required_group)
 from openatlas.display.util2 import is_authorized, uc_first
 from openatlas.forms.entity_form import get_entity_form, process_form_data
-from openatlas.forms.manager_base import BaseManager
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.reference_system import ReferenceSystem
@@ -96,7 +93,7 @@ def insert(
         # overlays=manager.place_info['overlays'],
         title=_(entity.class_.group['name']),
         crumbs=hierarchy_crumbs(origin or entity) + \
-        [origin, f'+ {uc_first(entity.class_.label)}'])
+               [origin, f'+ {uc_first(entity.class_.label)}'])
 
 
 @app.route('/update/<int:id_>', methods=['GET', 'POST'])
@@ -113,7 +110,7 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
     place_info = {}
     if entity.class_.attributes.get('location'):
         entity.location = entity.location \
-            or entity.get_linked_entity_safe('P53')
+                          or entity.get_linked_entity_safe('P53')
         structure = entity.get_structure_for_insert()
         place_info = {
             'structure': structure,
@@ -206,47 +203,6 @@ def check_update_access(entity: Entity) -> None:
         abort(403)
     if entity.check_too_many_single_type_links():
         abort(422)
-
-
-def insert_files(manager: BaseManager) -> str:
-    filenames = []
-    try:
-        # Transaction.begin()
-        entity_name = manager.form.name.data.strip()
-        for count, file in enumerate(manager.form.file.data):
-            manager.entity = insert('file', file.filename)
-            # Add 'a' to prevent emtpy temporary filename, has no side effects
-            filename = secure_filename(f'a{file.filename}')
-            name = f"{manager.entity.id}.{filename.rsplit('.', 1)[1].lower()}"
-            ext = secure_filename(file.filename).rsplit('.', 1)[1].lower()
-            path = app.config['UPLOAD_PATH'] / name
-            file.save(str(path))
-            if f'.{ext}' in g.display_file_ext:
-                call(f'exiftran -ai {path}', shell=True)  # Fix rotation
-            filenames.append(name)
-            if g.settings['image_processing']:
-                resize_image(name)
-            if (g.settings['iiif_conversion']
-                    and check_iiif_activation()
-                    and g.settings['iiif_convert_on_upload']):
-                convert_image_to_iiif(manager.entity.id, path)
-            if len(manager.form.file.data) > 1:
-                manager.form.name.data = \
-                    f'{entity_name}_{str(count + 1).zfill(2)}'
-            manager.process_form()
-            manager.update_entity()
-            g.logger.log_user(manager.entity.id, 'insert')
-        # Transaction.commit()
-        url = redirect_url_insert(manager)
-        flash(_('entity created'), 'info')
-    except Exception as e:  # pragma: no cover
-        # Transaction.rollback()
-        for filename in filenames:
-            (app.config['UPLOAD_PATH'] / filename).unlink()
-        g.logger.log('error', 'database', 'transaction failed', e)
-        flash(_('error transaction'), 'error')
-        url = url_for('index', group=g.classes['file'].group['name'])
-    return url
 
 
 def save(

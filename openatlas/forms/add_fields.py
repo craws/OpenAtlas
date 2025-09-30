@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import OrderedDict
 from typing import Any, Optional
 
+from attr import attributes
 from flask import g
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
@@ -71,13 +72,15 @@ def add_description(
         form: Any,
         entity: Entity,
         origin: Optional[Entity] = None) -> None:
-    if 'description' not in entity.class_.attributes:
-        return
-    if 'annotated' not in entity.class_.attributes['description']:
+    attribute_description = entity.class_.attributes['description']
+    if 'annotated' not in attribute_description:
         setattr(
             form,
             'description',
-            TextAreaField(_('description'), render_kw={'rows': 8}))
+            TextAreaField(
+                _('description'),
+                render_kw={'rows': 8},
+                validators=get_validators(attribute_description)))
         return
     source = entity
     if entity.class_.name == 'source_translation':
@@ -86,7 +89,7 @@ def add_description(
         form,
         'annotation',
         TextAnnotationField(
-            label=entity.class_.attributes['description']['label'],
+            label=attribute_description['label'],
             source_text=entity.get_annotated_text() if entity.id else '',
             linked_entities=[
                 {'id': e.id, 'name': e.name}

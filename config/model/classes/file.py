@@ -9,7 +9,9 @@ file: dict[str, Any] = {
     'attributes': {
         'name': {
             'required': True},
-        'description': {},},
+        'file': {
+            'required': True},
+        'description': {}},
     'relations': {
         'actor': {
             'label': _('owned by'),
