@@ -12,11 +12,11 @@ from werkzeug.wrappers import Response
 from openatlas import app
 from openatlas.display.display import Display
 from openatlas.display.util import (
-    button, check_iiif_file_exist,
-    get_file_path, get_iiif_file_path, hierarchy_crumbs,
-    link, required_group)
+    button, check_iiif_file_exist, get_file_path, get_iiif_file_path,
+    hierarchy_crumbs, link, required_group)
 from openatlas.display.util2 import is_authorized, uc_first
 from openatlas.forms.entity_form import get_entity_form, process_form_data
+from openatlas.forms.process import process_files
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.reference_system import ReferenceSystem
@@ -93,7 +93,7 @@ def insert(
         # overlays=manager.place_info['overlays'],
         title=_(entity.class_.group['name']),
         crumbs=hierarchy_crumbs(origin or entity) + \
-               [origin, f'+ {uc_first(entity.class_.label)}'])
+        [origin, f'+ {uc_first(entity.class_.label)}'])
 
 
 @app.route('/update/<int:id_>', methods=['GET', 'POST'])
@@ -110,7 +110,7 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
     place_info = {}
     if entity.class_.attributes.get('location'):
         entity.location = entity.location \
-                          or entity.get_linked_entity_safe('P53')
+            or entity.get_linked_entity_safe('P53')
         structure = entity.get_structure_for_insert()
         place_info = {
             'structure': structure,
@@ -213,7 +213,10 @@ def save(
     action = 'update' if entity.id else 'insert'
     url = url_for('index', group=entity.class_.group['name'])
     try:
-        entity = process_form_data(entity, form, origin, relation_name)
+        if hasattr(form, 'file'):
+            entity = process_files(form, origin, relation_name)
+        else:
+            entity = process_form_data(entity, form, origin, relation_name)
         g.logger.log_user(entity.id, action)
         url = redirect_url_insert(entity, form, origin, relation_name)
         flash(

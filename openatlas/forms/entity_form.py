@@ -46,7 +46,7 @@ def get_entity_form(
                         'file',
                         DragNDropField(
                             _('file'),
-                        validators=get_validators(value)))
+                            validators=get_validators(value)))
                     setattr(Form, 'validate_file', file)
             case 'location':
                 for shape in ['points', 'polygons', 'lines']:
@@ -86,8 +86,8 @@ def process_form_data(
                 data['gis'] = {
                     shape: getattr(form, f'gis_{shape}s').data
                     for shape in ['point', 'line', 'polygon']}
-            case _ if getattr(form, attr).data or \
-                    getattr(form, attr).data == 0:
+            case _ if hasattr(form, attr) and (
+                    getattr(form, attr).data or getattr(form, attr).data == 0):
                 value = getattr(form, attr).data
                 data[attr] = value.strip() if isinstance(value, str) else value
             case _:
