@@ -175,75 +175,200 @@ def parse_finds() -> list[Find]:
     return finds_
 
 
-def get_individuals() -> list[Individual]:
-    output = []
-    for docx_file in SKELETON_PATH.glob('*.docx'):
-        doc = docx.Document(docx_file)
+# def get_individuals() -> list[Individual]:
+#     output = []
+#     for docx_file in SKELETON_PATH.glob('*.docx'):
+#         doc = docx.Document(docx_file)
+#
+#         se_id = probe_type = find_type = None
+#         position = orientation = preservation = dislocation = None
+#         age = extraction = None
+#         description = []
+#
+#         if not doc.tables:
+#             continue
+#
+#         for table_num, table in enumerate(doc.tables):
+#             match table_num:
+#                 case 1:
+#                     for row_num, row in enumerate(table.rows):
+#                         cells = row.cells
+#
+#                         if row_num == 0:
+#                             se_id = cells[4].text.replace('SE:', '').strip()
+#                         elif row_num == 2 and 'uf078' in repr(cells[1].text):
+#                             probe_type = \
+#                                 cells[2].text.replace('Art:', '').strip()
+#                         elif row_num == 3 and 'uf078' in repr(cells[1].text):
+#                             find_type = cells[2].text.strip()
+#
+#                 case 3:
+#                     for row_num, row in enumerate(table.rows):
+#                         cells = row.cells
+#
+#                         if row_num == 0:
+#                             position = cells[0].text.replace(
+#                                 'Lage:','').strip()
+#                             orientation = \
+#                                 (cells[1].text.replace('Orientierung:', '')
+#                                  .strip())
+#
+#                         elif row_num == 1:
+#                             preservation = \
+#                                 (cells[0].text.
+#                                  replace('Erhaltungszustand:', '').strip())
+#                             dislocation = \
+#                                 (cells[1].text.replace('Dislozierung:', '')
+#                                  .strip())
+#
+#                         elif row_num == 2:
+#                             age = cells[0].text.replace('Alter:', '').strip()
+#                             extraction = \
+#                                 cells[1].text.replace('Bergung:', '').strip()
+#
+#                         elif row_num in range(3, 8):
+#                             text = cells[0].text
+#                             parts = text.split(':', 1)
+#                             if len(parts) == 2 and \
+#                                     parts[1].strip() not in ['-', '']:
+#                                 description.append(text)
+#
+#         output.append(Individual(
+#             se_id=int(se_id),
+#             description=description,
+#             probe_type=probe_type,
+#             find_type=find_type,
+#             position=position,
+#             orientation=orientation,
+#             preservation=preservation,
+#             dislocation=dislocation,
+#             age=age,
+#             extraction=extraction))
+#     return output
 
-        se_id = probe_type = find_type = None
-        position = orientation = preservation = dislocation = None
-        age = extraction = None
-        description = []
+import re
+from pdfminer.high_level import extract_text
 
-        if not doc.tables:
+# --- helpers for PDF parsing ---
+
+LABEL_PATTERN = re.compile(r"^\s*([A-Za-zÄÖÜäöüß/ \-]+)\s*:\s*(.*)$")
+
+def _norm(s: str | None) -> str | None:
+    if not s:
+        return None
+    s = " ".join(s.split())
+    return s if s not in ("", "-") else None
+
+def _is_label_line(line: str) -> bool:
+    return bool(LABEL_PATTERN.match(line))
+
+def _collect_until_next_label(start_idx: int, lines: list[str], break_tokens=("SE:",)) -> str:
+    """Collects the value on the same line after ':' plus continuation lines until next label or break."""
+    first = lines[start_idx]
+    m = LABEL_PATTERN.match(first)
+    if not m:
+        return ""
+    acc = [m.group(2).strip()]
+    i = start_idx + 1
+    while i < len(lines):
+        line = lines[i].strip()
+        if not line:
+            i += 1
             continue
+        if any(line.startswith(tok) for tok in break_tokens) or _is_label_line(line):
+            break
+        acc.append(line)
+        i += 1
+    return " ".join(" ".join(acc).split())
 
-        for table_num, table in enumerate(doc.tables):
-            match table_num:
-                case 1:
-                    for row_num, row in enumerate(table.rows):
-                        cells = row.cells
+def _split_sections_by_se(full_text: str) -> list[str]:
+    anchors = list(re.finditer(r"\bSE\s*:\s*\d+\b", full_text))
+    if not anchors:
+        return [full_text]
+    sections = []
+    for idx, m in enumerate(anchors):
+        start = m.start()
+        end = anchors[idx+1].start() if idx+1 < len(anchors) else len(full_text)
+        sections.append(full_text[start:end])
+    return sections
 
-                        if row_num == 0:
-                            se_id = cells[4].text.replace('SE:', '').strip()
-                        elif row_num == 2 and 'uf078' in repr(cells[1].text):
-                            probe_type = \
-                                cells[2].text.replace('Art:', '').strip()
-                        elif row_num == 3 and 'uf078' in repr(cells[1].text):
-                            find_type = cells[2].text.strip()
+def _parse_section(section_text: str) -> Individual | None:
+    lines = [l.rstrip() for l in section_text.splitlines()]
+    # find SE id
+    se_id = None
+    for line in lines:
+        m = re.search(r"\bSE\s*:\s*(\d+)\b", line)
+        if m:
+            se_id = int(m.group(1))
+            break
+    if se_id is None:
+        return None
 
-                case 3:
-                    for row_num, row in enumerate(table.rows):
-                        cells = row.cells
+    def fetch(label: str) -> str | None:
+        for idx, line in enumerate(lines):
+            if re.match(rf"^\s*{re.escape(label)}\s*:", line):
+                return _norm(_collect_until_next_label(idx, lines))
+        return None
 
-                        if row_num == 0:
-                            position = cells[0].text.replace(
-                                'Lage:','').strip()
-                            orientation = \
-                                (cells[1].text.replace('Orientierung:', '')
-                                 .strip())
+    position     = fetch("Lage")
+    orientation  = fetch("Orientierung")
+    preservation = fetch("Erhaltungszustand")
+    dislocation  = fetch("Dislozierung")
+    age          = fetch("Alter")
+    extraction   = fetch("Bergung")
+    probe_type   = fetch("Art")
 
-                        elif row_num == 1:
-                            preservation = \
-                                (cells[0].text.
-                                 replace('Erhaltungszustand:', '').strip())
-                            dislocation = \
-                                (cells[1].text.replace('Dislozierung:', '')
-                                 .strip())
+    # handle find_type with flexible labels
+    find_type = None
+    for candidate in ("Fundart", "Fund", "Befund", "Bestattungsart"):
+        find_type = fetch(candidate)
+        if find_type:
+            break
 
-                        elif row_num == 2:
-                            age = cells[0].text.replace('Alter:', '').strip()
-                            extraction = \
-                                cells[1].text.replace('Bergung:', '').strip()
+    # description = any other label/value not in the core set
+    core_labels = {"se","art","lage","orientierung","erhaltungszustand",
+                   "dislozierung","alter","bergung","fundart","fund","befund",
+                   "bestattungsart"}
+    description = []
+    for idx, line in enumerate(lines):
+        m = LABEL_PATTERN.match(line)
+        if not m:
+            continue
+        label, value = m.group(1).strip(), m.group(2).strip()
+        if label.lower() in core_labels:
+            continue
+        if value in ("", "-"):
+            value = _collect_until_next_label(idx, lines)
+        value = _norm(value)
+        if value:
+            description.append(f"{label}: {value}")
 
-                        elif row_num in range(3, 8):
-                            text = cells[0].text
-                            parts = text.split(':', 1)
-                            if len(parts) == 2 and \
-                                    parts[1].strip() not in ['-', '']:
-                                description.append(text)
+    return Individual(
+        se_id=se_id,
+        description=description,
+        probe_type=probe_type,
+        find_type=find_type,
+        position=position,
+        orientation=orientation,
+        preservation=preservation,
+        dislocation=dislocation,
+        age=age,
+        extraction=extraction)
 
-        output.append(Individual(
-            se_id=int(se_id),
-            description=description,
-            probe_type=probe_type,
-            find_type=find_type,
-            position=position,
-            orientation=orientation,
-            preservation=preservation,
-            dislocation=dislocation,
-            age=age,
-            extraction=extraction))
+# --- main entrypoint replacing your old DOCX parser ---
+
+def get_individuals() -> list[Individual]:
+    """Parse all SE-Protokolle PDFs and return Individuals."""
+    pdf_dir = FILE_PATH / "06_SE Protokollblätter"
+    output: list[Individual] = []
+
+    for pdf_file in sorted(pdf_dir.glob("Schnitt *_SE-Protokolle.pdf")):
+        text = extract_text(str(pdf_file))
+        sections = _split_sections_by_se(text)
+        for sec in sections:
+            ind = _parse_section(sec)
+            if ind:
+                output.append(ind)
     return output
 
 
