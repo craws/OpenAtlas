@@ -505,7 +505,6 @@ def button_bar(buttons: list[Any]) -> str:
     def add_col(input_: str) -> str:
         return \
             f'<div class="col-auto d-flex align-items-center">{input_}</div>'
-
     return \
         '<div class="row my-2 g-1">' \
         f'{" ".join([str(b) for b in list(map(add_col, buttons))])}' \

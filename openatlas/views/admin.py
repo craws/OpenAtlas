@@ -31,12 +31,11 @@ from openatlas.display.util import (
     get_file_path, link, required_group, send_mail)
 from openatlas.display.util2 import (
     convert_size, is_authorized, manual, sanitize, uc_first)
-from openatlas.models.dates import format_date
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
 from openatlas.forms.setting import (
-    ApiForm, ContentForm, FrontendForm, GeneralForm, LogForm, MailForm,
-    MapForm, ModulesForm, SimilarForm, TestMailForm)
+    ApiForm, ContentForm, FileForm, FrontendForm, GeneralForm, IiifForm,
+    LogForm, MailForm, MapForm, ModulesForm, SimilarForm, TestMailForm)
 from openatlas.forms.util import get_form_settings, set_form_settings
 from openatlas.models.annotation import AnnotationImage
 from openatlas.models.checks import (
@@ -44,6 +43,7 @@ from openatlas.models.checks import (
     orphaned_subunits, orphans as get_orphans, similar_named,
     single_type_duplicates)
 from openatlas.models.content import get_content, update_content
+from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity, Link
 from openatlas.models.export import find_duplicates
 from openatlas.models.imports import Project
@@ -56,6 +56,17 @@ from openatlas.models.user import User
 def admin_index() -> str:
     users = User.get_all()
     tabs = {
+        'file': Tab(
+            'file',
+            _('files'),
+            content=render_template(
+                'file.html',
+                info=get_form_settings(FileForm()),
+                disk_space_info=get_disk_space_info()),
+            buttons=[
+                manual('entity/file'),
+                button(_('edit'), url_for('settings', category='file'))
+                if is_authorized('manager') else '']),
         'user': Tab(
             'user',
             _('user'),
@@ -82,6 +93,20 @@ def admin_index() -> str:
             buttons=[
                 manual('admin/mail'),
                 button(_('edit'), url_for('settings', category='mail'))])
+        tabs['iiif'] = Tab(
+            'iiif',
+            _('IIIF'),
+            content=display_info(get_form_settings(IiifForm())),
+            buttons=[
+                manual('admin/iiif'),
+                button(_('edit'), url_for('settings', category='iiif')),
+                button(
+                    _('convert all files') + f' ({count_files_to_convert()})',
+                    url_for('convert_iiif_files')),
+                button(
+                    _('delete all IIIF files') +
+                    f' ({count_files_to_delete()})',
+                    url_for('delete_iiif_files'))])
     if is_authorized('manager'):
         tabs['modules'] = Tab(
             'modules',
@@ -329,13 +354,7 @@ def settings(category: str) -> str | Response:
         f"{uc_first(category)}Form")()
     tab = category.replace('api', 'data')
     redirect_url = f"{url_for('admin_index')}#tab-{tab}"
-    crumbs = [[_('admin'), f"{url_for('admin_index')}#tab-{tab}"], category]
-    if category == 'file':
-        redirect_url = f"{url_for('file_index')}"
-        crumbs = [[_('file'), url_for('file_index')], _('settings')]
-    elif category == 'iiif':
-        redirect_url = f"{url_for('file_index')}#tab-IIIF"
-        crumbs = [[_('file'), url_for('file_index')], _('IIIF')]
+    crumbs = [[_('admin'), f"{url_for('admin_index')}#tab-{tab}"], _(category)]
     if form.validate_on_submit():
         data = {}
         for field in form:

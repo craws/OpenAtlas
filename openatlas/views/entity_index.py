@@ -7,9 +7,7 @@ from openatlas.display.image_processing import check_processed_image
 from openatlas.display.table import Table, entity_table
 from openatlas.display.util import (
     button, check_iiif_file_exist, get_file_path, link, required_group)
-from openatlas.display.util2 import is_authorized, manual, show_table_icons, \
-    uc_first
-from openatlas.models.dates import format_date
+from openatlas.display.util2 import is_authorized, manual
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.reference_system import ReferenceSystem
@@ -28,8 +26,6 @@ def index(group: str) -> str | Response:
                     url_for('insert', class_=name),
                     tooltip_text=g.classes[name].display['tooltip']))
     crumbs = [_(group).replace('_', ' ')]
-    if group == 'file':
-        crumbs = [[_('file'), url_for('file_index')], _('files')]
     table, file_info = get_table(group)
     return render_template(
         'entity/index.html',

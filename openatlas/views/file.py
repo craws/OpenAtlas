@@ -11,55 +11,11 @@ from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, check_iiif_activation, check_iiif_file_exist,
-    convert_image_to_iiif, delete_iiif_image, display_info, link,
-    required_group)
-from openatlas.display.util2 import is_authorized, manual
-from openatlas.forms.setting import FileForm, IiifForm
-from openatlas.forms.util import get_form_settings
+    check_iiif_activation, check_iiif_file_exist, convert_image_to_iiif,
+    delete_iiif_image, link, required_group)
 from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity
 from openatlas.models.settings import Settings
-from openatlas.views.admin import (
-    count_files_to_convert, count_files_to_delete, get_disk_space_info)
-
-
-@app.route('/file')
-@required_group('readonly')
-def file_index() -> str:
-    tabs = {
-        'settings': Tab(
-            'settings',
-            content=render_template(
-                'file.html',
-                info=get_form_settings(FileForm()),
-                disk_space_info=get_disk_space_info()),
-            buttons=[
-                manual('entity/file'),
-                button(_('edit'), url_for('settings', category='file'))
-                if is_authorized('manager') else '',
-                button(_('list'), url_for('index', group='file')),
-                button(_('file'), url_for('insert', class_='file'))
-                if is_authorized('contributor') else ''])}
-    if is_authorized('admin'):
-        tabs['IIIF'] = Tab(
-            'IIIF',
-            content=display_info(get_form_settings(IiifForm())),
-            buttons=[
-                manual('admin/iiif'),
-                button(_('edit'), url_for('settings', category='iiif')),
-                button(
-                    _('convert all files') + f' ({count_files_to_convert()})',
-                    url_for('convert_iiif_files')),
-                button(
-                    _('delete all IIIF files') +
-                    f' ({count_files_to_delete()})',
-                    url_for('delete_iiif_files'))])
-    return render_template(
-        'tabs.html',
-        title=_('file'),
-        tabs=tabs,
-        crumbs=[_('file')])
 
 
 @app.route('/download/<path:filename>')
@@ -142,7 +98,7 @@ def get_manifest_url(id_: int) -> str:
 @required_group('admin')
 def convert_iiif_files() -> Response:
     convert()
-    return redirect(url_for('file_index') + '#tab-IIIF')
+    return redirect(f"{url_for('admin_index')}#tab-iiif")
 
 
 def convert() -> None:
@@ -173,7 +129,7 @@ def delete_iiif_file(id_: int) -> Response:
 @required_group('admin')
 def delete_iiif_files() -> Response:
     delete_all_iiif_files()
-    return redirect(url_for('file_index') + '#tab-IIIF')
+    return redirect(f"{url_for('admin_index')}#tab-iiif")
 
 
 def delete_all_iiif_files() -> None:
@@ -195,7 +151,7 @@ def logo(id_: Optional[int] = None) -> str | Response:
         abort(418)  # pragma: no cover - logo already set
     if id_:
         Settings.set_logo(id_)
-        return redirect(url_for('file_index'))
+        return redirect(f"{url_for('admin_index')}#tab-file")
     entities = Entity.get_display_files()
     table = Table(
         [''] + entities[0].class_.group['table_columns']
@@ -220,11 +176,11 @@ def logo(id_: Optional[int] = None) -> str | Response:
         'tabs.html',
         tabs={'logo': Tab('logo', table=table)},
         title=_('logo'),
-        crumbs=[[_('file'), url_for('file_index')], _('logo')])
+        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-file"], _('logo')])
 
 
 @app.route('/logo/remove')
 @required_group('manager')
 def logo_remove() -> Response:
     Settings.set_logo()
-    return redirect(url_for('file_index'))
+    return redirect(f"{url_for('admin_index')}#tab-file")
