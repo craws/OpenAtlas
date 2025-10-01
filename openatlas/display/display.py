@@ -11,13 +11,11 @@ from openatlas.display.table import entity_table
 from openatlas.display.util import (
     bookmark_toggle, button, description, display_annotation_text_links,
     get_chart_data, get_file_path, get_system_data, link, reference_systems)
-from openatlas.display.util2 import (
-    is_authorized, manual, show_table_icons, uc_first)
+from openatlas.display.util2 import is_authorized, manual, uc_first
 from openatlas.models.dates import format_date, format_entity_date
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 from openatlas.models.user import User
-from openatlas.views.entity_index import file_preview
 
 
 class Display:
@@ -34,10 +32,11 @@ class Display:
         self.structure: dict[str, list[Entity]] = {}
         self.gis_data: dict[str, Any] = {}
         self.problematic_type = self.entity.check_too_many_single_type_links()
-        self.entity.image_id = entity.get_profile_image_id()
+        if entity.class_.attributes.get('file'):
+            entity.image_id = entity.id if get_file_path(entity.id) else None
+        else:
+            entity.image_id = entity.get_profile_image_id()
         self.add_tabs()
-        if 'file' in self.tabs and show_table_icons():
-            self.add_file_tab_thumbnails()
         self.add_buttons()
         self.add_info_tab_content()  # Call later because of profile image
 
@@ -57,12 +56,6 @@ class Display:
                 html += f" {float(value):g} {type_.description or ''}"
             data[g.types[type_.root[0]].name].append(html)
         return {key: data[key] for key in sorted(data.keys())}
-
-    def add_file_tab_thumbnails(self) -> None:
-        self.tabs['file'].table.columns.insert(1, _('icon'))
-        for row in self.tabs['file'].table.rows:
-            id_ = int(row[0].replace('<a href="/entity/', '').split('"')[0])
-            row.insert(1, file_preview(id_))
 
     def add_info_tab_content(self) -> None:
         self.add_data()
@@ -229,8 +222,8 @@ class Display:
                                 url_for('download', filename=path.name)))
                     else:
                         self.buttons.append(
-                            '<span class="error">' \
-                            + uc_first(_("missing file")) \
+                            '<span class="error">'
+                            + uc_first(_("missing file"))
                             + '</span>')
 
         if self.structure and len(self.structure['siblings']) > 1:

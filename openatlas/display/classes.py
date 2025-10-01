@@ -7,7 +7,7 @@ from openatlas.display.classes_base import BaseDisplay, PlaceBaseDisplay
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import button, description, get_file_path, link
-from openatlas.display.util2 import is_authorized, uc_first
+from openatlas.display.util2 import is_authorized
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.views.tools import carbon_result, sex_result
@@ -36,8 +36,6 @@ class FileDisplay(BaseDisplay):
         self.data[_('license holder')] = self.entity.license_holder
         self.data[_('size')] = self.entity.get_file_size()
         self.data[_('extension')] = self.entity.get_file_ext()
-
-
 
     def add_tabs(self) -> None:
         entity = self.entity

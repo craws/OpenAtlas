@@ -150,6 +150,8 @@ def delete(id_: int) -> Response:
     if not is_authorized(entity.class_.write_access):
         abort(403)
     url = url_for('index', group=entity.class_.group['name'])
+
+    # Todo: replace these class conditions with config conditions
     if isinstance(entity, ReferenceSystem):
         if entity.system:
             abort(403)
