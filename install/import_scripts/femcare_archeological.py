@@ -2,7 +2,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
-
+import fitz
 import docx
 import pandas as pd
 
@@ -371,6 +371,33 @@ def get_individuals() -> list[Individual]:
                 output.append(ind)
     return output
 
+def extract_images_from_pdfs():
+    out_dir = FILE_PATH / "skelett_mannchen"
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    pdf_dir = FILE_PATH / "06_SE Protokollblätter"
+
+    for pdf_file in sorted(pdf_dir.glob("Schnitt *_SE-Protokolle.pdf")):
+        doc = fitz.open(pdf_file)
+        for page_index, page in enumerate(doc):
+            text = page.get_text()
+            # Try to detect SE number in the page text
+            m = re.search(r"\bSE\s*:\s*(\d+)\b", text)
+            se_number = m.group(1) if m else f"{pdf_file.stem}_p{page_index+1}"
+
+            images = page.get_images(full=True)
+            for img_index, img in enumerate(images):
+                xref = img[0]
+                pix = fitz.Pixmap(doc, xref)
+                if pix.n > 3:  # has alpha
+                    pix = fitz.Pixmap(fitz.csRGB, pix)
+                img_path = out_dir / f"SE {se_number}.jpg"
+                # If multiple images per SE, add suffix
+                if img_index > 0 and img_path.exists():
+                    img_path = out_dir / f"SE {se_number}_{img_index+1}.jpg"
+                pix.save(img_path)
+                pix = None  # free memory
+        doc.close()
 
 def merge_units(
         strat_units: list[ParsedStratigraphicUnit],
@@ -476,6 +503,8 @@ with app.test_request_context():
         parse_stratigraphic_units(),
         get_individuals())
     finds = parse_finds()
+
+    extract_images_from_pdfs()
 
     # Build type dictionaries from Feature
     feature_types = build_types(features, import_feature_type, 'type')
