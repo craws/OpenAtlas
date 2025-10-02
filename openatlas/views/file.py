@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Any, Optional
 
 from flask import (
@@ -9,11 +8,10 @@ from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.display.tab import Tab
-from openatlas.display.table import Table
+from openatlas.display.table import entity_table
 from openatlas.display.util import (
     check_iiif_activation, check_iiif_file_exist, convert_image_to_iiif,
-    delete_iiif_image, link, required_group)
-from openatlas.models.dates import format_date
+    delete_iiif_image, required_group)
 from openatlas.models.entity import Entity
 from openatlas.models.settings import Settings
 
@@ -152,26 +150,10 @@ def logo(id_: Optional[int] = None) -> str | Response:
     if id_:
         Settings.set_logo(id_)
         return redirect(f"{url_for('admin_index')}#tab-file")
-    entities = Entity.get_display_files()
-    table = Table(
-        [''] + entities[0].class_.group['table_columns']
-        if entities else [] + ['date'])
-    for entity in Entity.get_display_files():
-        date = 'N/A'
-        if entity.id in g.files:
-            date = format_date(
-                datetime.fromtimestamp(g.files[entity.id].stat().st_ctime))
-        table.rows.append([
-            link(_('set'), url_for('logo', id_=entity.id)),
-            entity.name,
-            link(entity.standard_type),
-            _('yes') if entity.public else None,
-            entity.creator,
-            entity.license_holder,
-            entity.get_file_size(),
-            entity.get_file_ext(),
-            entity.description,
-            date])
+    table = entity_table(
+        Entity.get_display_files(),
+        columns=['set logo'] + g.class_groups['file']['table_columns'],
+        forms={'mode': 'logo'})
     return render_template(
         'tabs.html',
         tabs={'logo': Tab('logo', table=table)},

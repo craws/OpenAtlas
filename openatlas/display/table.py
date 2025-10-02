@@ -39,14 +39,13 @@ class Table:
     def display(self, name: str = 'default') -> str:
         if not self.rows:
             return '<p class="uc-first">' + _('no entries') + '</p>'
+        no_title = ['checkbox', 'remove', 'set logo', 'update']
         data = {
             'data': self.rows,
             'stateSave': 'true',
             'columns': [{
                 'title':
-                    uc_first(_(name)) if name and name
-                                         not in ['checkbox', 'remove',
-                                                 'update'] else '',
+                    uc_first(_(name)) if name and name not in no_title else '',
                 'className':
                     'dt-body-right' if name in ['count', 'size'] else ''}
                            for name in self.columns] + [
@@ -75,8 +74,10 @@ def entity_table(
         table_id: Optional[str] = None,
         forms: Optional[dict[str, Any]] = None) -> Table | None:
     from openatlas.views.entity_index import file_preview
+
     if not items:
         return Table()
+
     inverse = relation and relation['inverse']
 
     item = items[0]
@@ -154,8 +155,6 @@ def entity_table(
                     html = e.description
                     if relation and name in relation['additional_fields']:
                         html = item.description
-                case 'page':
-                    html = item.description
                 case 'end':
                     html = item.dates.last
                 case 'extension':
@@ -189,6 +188,8 @@ def entity_table(
                 #        g.classes[class_].relations[name])
                 case 'name':
                     html = format_name_and_aliases(e, table_id, forms)
+                case 'page':
+                    html = item.description
                 case 'profile' if e and e.image_id:
                     html = 'Profile' if e.id == origin.image_id else link(
                         'profile',
@@ -213,6 +214,8 @@ def entity_table(
                 #    html = e.types[0].get_name_directed(
                 #        e.get_linked_entity_safe('has relation', True).id
                 #        != entity.id)
+                case 'set logo':
+                    html = link(_('set'), url_for('logo', id_=e.id))
                 case 'size':
                     html = e.get_file_size()
                 case 'type' | 'license':
