@@ -311,3 +311,10 @@ class Display:
                             format_entity_date(self.entity.dates, 'end', e)
                     else:
                         self.data[relation['label']].append(link(e))
+        for name, item in \
+                self.entity.class_.display['additional_information'].items():
+            match name:
+                case 'file_extension':
+                    self.data[item['label']] = self.entity.get_file_ext()
+                case 'file_size':
+                    self.data[item['label']] = self.entity.get_file_size()

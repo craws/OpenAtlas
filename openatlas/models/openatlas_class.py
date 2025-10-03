@@ -57,7 +57,7 @@ def get_classes() -> dict[str, OpenatlasClass]:
         if row['name'] in model:  # Todo: remove condition after new classes
             classes[row['name']] = OpenatlasClass(
                 name=row['name'],
-                model_ = get_model(row['name']),
+                model_=get_model(row['name']),
                 cidoc_class=row['cidoc_class_code'],
                 standard_type_id=row['standard_type_id'],
                 alias_allowed=row['alias_allowed'],
@@ -86,6 +86,10 @@ def get_model(class_name: str) -> dict[str, Any]:
     data['display']['form'] = data['display'].get('form', {})
     data['display']['form']['insert_and_continue'] = \
         data['display']['form'].get('insert_and_continue', False)
+    data['display']['additional_information'] = \
+        data['display'].get('additional_information', {})
+    for name, item in data['display']['additional_information'].items():
+        item['label'] = item.get('label', _(name))
     data['relations'] = data.get('relations', {})
     for name, relation in data['relations'].items():
         relation['name'] = name

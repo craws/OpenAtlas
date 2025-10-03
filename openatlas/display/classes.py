@@ -6,7 +6,7 @@ from flask_babel import lazy_gettext as _
 from openatlas.display.classes_base import BaseDisplay, PlaceBaseDisplay
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
-from openatlas.display.util import button, description, get_file_path, link
+from openatlas.display.util import button, description, link
 from openatlas.display.util2 import is_authorized
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
@@ -34,8 +34,6 @@ class FileDisplay(BaseDisplay):
                     '</span>')
         self.data[_('creator')] = self.entity.creator
         self.data[_('license holder')] = self.entity.license_holder
-        self.data[_('size')] = self.entity.get_file_size()
-        self.data[_('extension')] = self.entity.get_file_ext()
 
     def add_tabs(self) -> None:
         entity = self.entity
@@ -43,7 +41,6 @@ class FileDisplay(BaseDisplay):
                 'source', 'event', 'actor', 'place', 'artifact', 'reference',
                 'type']:
             self.tabs[name] = Tab(name, entity=entity)
-        entity.image_id = entity.id if get_file_path(entity.id) else None
         for link_ in entity.get_links('P67'):
             range_ = link_.range
             #data = get_base_table_data(range_)

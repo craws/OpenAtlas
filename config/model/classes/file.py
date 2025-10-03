@@ -26,4 +26,7 @@ file: dict[str, Any] = {
         'form': {
             'insert_and_continue': True},
         'additional_tabs': {
-            'note': {}}}}
+            'note': {}},
+        'additional_information': {
+            'file_size': {'label': _('size')},
+            'file_extension': {'label': _('extension')}}}}
