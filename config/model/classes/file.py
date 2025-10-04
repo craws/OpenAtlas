@@ -4,6 +4,14 @@ from flask_babel import lazy_gettext as _
 
 from config.model.class_groups import class_groups, standard_relations
 
+
+def relation(name: str) -> dict[str, Any]:
+    return {
+        'classes': class_groups[name]['classes'],
+        'property': 'P67',
+        'tab': {'buttons': ['link', 'insert']}}
+
+
 file: dict[str, Any] = {
     'label': _('file'),
     'attributes': {
@@ -13,14 +21,13 @@ file: dict[str, Any] = {
             'required': True},
         'description': {}},
     'relations': {
-        'actor': {
-            'label': _('owned by'),
-            'classes': class_groups['actor']['classes'],
-            'property': 'P52',
-            'mode': 'direct',
-            'tab': {
-                'buttons': ['insert']}},
-        'reference': standard_relations['reference']},
+        'source': relation('source'),
+        'event': relation('event'),
+        'actor': relation('actor'),
+        'place': relation('place'),
+        'artifact': relation('artifact'),
+        'reference': standard_relations['reference'],
+        'type': relation('type')},
     'display': {
         'buttons': ['download'],
         'form': {

@@ -117,7 +117,8 @@ def get_appearance(event_links: list[Link]) -> tuple[str, str]:
 
 def profile_image_table_link(entity: Entity, file: Entity, ext: str) -> str:
     if is_authorized('contributor'):
-        if file.id == entity.image_id:
+        if file.id == entity.image_id and \
+                file.id == entity.get_profile_image_id():
             return link(
                 _('unset'),
                 url_for('remove_profile_image', entity_id=entity.id))
