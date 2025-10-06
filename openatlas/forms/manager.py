@@ -11,8 +11,8 @@ from wtforms.validators import InputRequired, Optional, URL
 from openatlas.forms.field import (
     DragNDropField, SubmitField, TableField, TableMultiField, TreeField)
 from openatlas.forms.manager_base import (
-    ActorBaseManager, ArtifactBaseManager, BaseManager, EventBaseManager,
-    HierarchyBaseManager, PlaceBaseManager, TypeBaseManager)
+    ActorBaseManager, ArtifactBaseManager, BaseManager, HierarchyBaseManager,
+    PlaceBaseManager, TypeBaseManager)
 from openatlas.forms.validation import file
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
@@ -126,7 +126,8 @@ class ArtifactManager(ArtifactBaseManager):
                 e.id for e in self.entity.get_linked_entities_recursive('P46')]
         if self.insert:
             selection = self.origin if self.origin \
-                and self.origin.class_.view in ['artifact', 'place'] else None
+                                       and self.origin.class_.view in [
+                                           'artifact', 'place'] else None
         else:
             selection = self.entity.get_linked_entity('P46', inverse=True)
         return super().additional_fields() | {
@@ -171,8 +172,9 @@ class FeatureManager(PlaceBaseManager):
 
     def additional_fields(self) -> dict[str, Any]:
         if self.insert:
-            selection = self.origin if self.origin \
-                and self.origin.class_.name == 'place' else None
+            selection = self.origin if (self.origin \
+                                       and self.origin.class_.name ==
+                                        'place') else None
         else:
             selection = self.entity.get_linked_entity('P46', inverse=True)
         return {
@@ -227,7 +229,8 @@ class HumanRemainsManager(ArtifactBaseManager):
                 e.id for e in self.entity.get_linked_entities_recursive('P46')]
         if self.insert:
             selection = self.origin if self.origin \
-                and self.origin.class_.view in ['artifact', 'place'] else None
+                                       and self.origin.class_.view in [
+                                           'artifact', 'place'] else None
         else:
             selection = self.entity.get_linked_entity('P46', inverse=True)
         return super().additional_fields() | {
@@ -275,8 +278,8 @@ class InvolvementManager(BaseManager):
                 validators=[InputRequired()])
         choices = [('P11', g.properties['P11'].name)]
         if event_class_name in [
-                'acquisition', 'activity', 'creation', 'modification',
-                'production']:
+            'acquisition', 'activity', 'creation', 'modification',
+            'production']:
             choices.append(('P14', g.properties['P14'].name))
             if event_class_name == 'acquisition':
                 choices.append(('P22', g.properties['P22'].name))

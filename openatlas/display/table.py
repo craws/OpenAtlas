@@ -149,6 +149,7 @@ def entity_table(
                 case 'created':
                     html = format_date(e.created)
                 case 'creator':
+                    html = ''
                     if g.file_info.get(e.id):
                         html = g.file_info[e.id]['creator']
                 case 'content' | 'description':
@@ -175,6 +176,7 @@ def entity_table(
                         f'{range_.dates.last}</span>' \
                         if range_.dates.last else ''
                 case 'license holder':
+                    html = ''
                     if g.file_info.get(e.id):
                         html = g.file_info[e.id]['license_holder']
                 case 'main image':
@@ -195,9 +197,9 @@ def entity_table(
                         'profile',
                         url_for('file_profile', id_=e.id, entity_id=origin.id))
                 case 'public':
+                    html = ''
                     if g.file_info.get(e.id):
-                        html = _('yes') if g.file_info[e.id][
-                            'public'] else None
+                        html = _('yes') if g.file_info[e.id]['public'] else ''
                 case 'remove':
                     tab_id = e.class_.group['name']
                     if relation and relation['mode'] == 'tab':

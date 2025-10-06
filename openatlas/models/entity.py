@@ -231,6 +231,14 @@ class Entity:
                     return
         db.delete_links_by_codes(self.id, codes, inverse)
 
+    def save_file_info(self, data: dict[str, Any]) -> None:
+        if 'file' in g.classes[data['openatlas_class_name']].attributes:
+            db.update_file_info({
+                'entity_id': self.id,
+                'creator': data.get('creator'),
+                'license_holder': data.get('license_holder'),
+                'public': data.get('public', False)})
+
     def update(self, data: dict[str, Any]) -> None:
         data['id'] = self.id
         annotation_data = []
@@ -251,6 +259,7 @@ class Entity:
             self.update_aliases(data['alias'])
         if 'location' in attributes:
             self.update_gis(data['gis'])
+        self.save_file_info(data)
 
         # continue_link_id = None
         # if 'administrative_units' in data \
@@ -813,9 +822,9 @@ class Entity:
         return [
             node for key, node in g.types.items()
             if node.root
-            and node.category not in ['system', 'tools']
-            and node.count < 1
-            and not node.subs]
+               and node.category not in ['system', 'tools']
+               and node.count < 1
+               and not node.subs]
 
 
 def insert(data: dict[str, Any]) -> Entity:
@@ -840,6 +849,7 @@ def insert(data: dict[str, Any]) -> Entity:
         AnnotationText.insert(annotation)
     if 'location' in attributes:
         entity.update_gis(data['gis'], new=True)
+    entity.save_file_info(data)
     return entity
 
 

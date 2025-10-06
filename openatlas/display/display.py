@@ -293,6 +293,12 @@ class Display:
             self.data[_('type')] = \
                 f'<span title="{var}">{link(self.entity.standard_type)}</span>'
         self.data.update(self.get_type_data())
+        for name, attribute in self.entity.class_.attributes.items():
+            if name in ['public', 'creator', 'license_holder']:
+                value = getattr(self.entity, name)
+                if isinstance(value, bool):
+                    value = _('yes') if value else _('no')
+                self.data[attribute['label']] = str(value)
         for name, relation in self.entity.class_.relations.items():
             if relation['mode'] in ['direct', 'display']:
                 self.data[relation['label']] = []

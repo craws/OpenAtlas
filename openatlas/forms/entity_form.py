@@ -1,10 +1,8 @@
-
 from typing import Any, Optional
 
 from flask import g, request
-from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
-from wtforms import HiddenField
+from wtforms import BooleanField, HiddenField, StringField
 
 from openatlas.database.connect import Transaction
 from openatlas.forms.add_fields import (
@@ -24,7 +22,6 @@ def get_entity_form(
         entity: Entity,
         origin: Optional[Entity] = None,
         relation: Optional[str] = None) -> Any:
-
     class Form(FlaskForm):
         opened = HiddenField()
         validate = validate
@@ -35,6 +32,13 @@ def get_entity_form(
     add_reference_systems(Form, entity.class_)
     for key, value in entity.class_.attributes.items():
         match key:
+            case 'creator' | 'license_holder':
+                setattr(
+                    Form,
+                    key,
+                    StringField(
+                        value['label'],
+                        validators=get_validators(value)))
             case 'dates':
                 add_date_fields(Form, entity)
             case 'description':
@@ -45,12 +49,19 @@ def get_entity_form(
                         Form,
                         'file',
                         DragNDropField(
-                            _('file'),
+                            value['label'],
                             validators=get_validators(value)))
                     setattr(Form, 'validate_file', file)
             case 'location':
                 for shape in ['points', 'polygons', 'lines']:
                     setattr(Form, f'gis_{shape}', HiddenField(default='[]'))
+            case 'public':
+                setattr(
+                    Form,
+                    'public',
+                    BooleanField(
+                        value['label'],
+                        validators=get_validators(value)))
     add_buttons(
         Form,
         entity,
@@ -98,7 +109,7 @@ def process_form_data(
             delete_links(entity)
             entity.update(data)
         else:
-            entity = insert_entity(form, data)
+            entity = insert(data)
         if entity.class_.hierarchies:
             process_types(entity, form)
         process_relations(entity, form, origin, relation_name)
@@ -171,18 +182,6 @@ def process_relations(
                     origin_relation['property'],
                     entity,
                     inverse=origin_relation['inverse'])
-
-
-def insert_entity(form: Any, data: dict[str, Any]) -> Entity:
-    entity = insert(data)
-    # if hasattr(form, 'file'):
-    #    file = request.files['file']
-    #    ext = secure_filename(str(file.filename)).rsplit('.', 1)[1].lower()
-    #    path = app.config['UPLOAD_DIR'] / f'{entity.id}.{ext}'
-    #    file.save(str(path))
-    #    if f'.{ext}' in app.config['IMAGE_EXTENSIONS']:
-    #        call(f'exiftran -ai {path}', shell=True)  # Fix rotation
-    return entity
 
 
 def delete_links(entity: Entity) -> None:

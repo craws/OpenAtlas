@@ -4,7 +4,6 @@ from typing import Any
 from flask import g, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
-from wtforms import validators
 
 from openatlas.models.dates import form_to_datetime64
 from openatlas.models.entity import Entity
