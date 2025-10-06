@@ -115,20 +115,6 @@ acquisition['relations'] = acquisition['relations'] | {
         'mode': 'direct',
         'multiple': True}}
 
-creation = copy.deepcopy(class_)
-creation['label'] = _('creation')
-creation['display']['tooltip'] = _('creation of documents (files)')
-creation['relations'] = creation['relations'] | {
-    'succeeding_event': relations['succeeding_event'],
-    'preceding_event': relations['preceding_event'],
-    'location': relations['location'],
-    'document': {
-        'label': _('file'),
-        'classes': 'file',
-        'property': 'P94',
-        'multiple': True,
-        'mode': 'direct'}}
-
 event = copy.deepcopy(class_)
 event['label'] = _('event')
 event['display']['tooltip'] = \

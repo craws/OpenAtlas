@@ -16,8 +16,8 @@ class_groups = {
         'name': 'event',
         'label': _('event'),
         'classes': [
-            'activity', 'acquisition', 'creation', 'event', 'modification',
-            'move', 'production'],
+            'activity', 'acquisition', 'event', 'modification', 'move',
+            'production'],
         'table_columns': [
             'name', 'class', 'type', 'begin', 'end', 'description']},
     'file': {

@@ -23,7 +23,6 @@ model: dict[str, Any] = {
         'attributes': {}},
     'artifact': artifact.artifact,
     'bibliography': reference.bibliography,
-    'creation': event.creation,
     'edition': reference.edition,
     'event': event.event,
     'external_reference': reference.external_reference,

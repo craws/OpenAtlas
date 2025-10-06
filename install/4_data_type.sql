@@ -368,7 +368,6 @@ INSERT INTO model.openatlas_class (name, cidoc_class_code, alias_allowed, refere
   ('appellation',          'E41', false, false, false, 'contributor', NULL,      NULL,             NULL),
   ('artifact',             'E22', false, true,  true,  'contributor', '#EE82EE', 'mdi-shapes',     (SELECT id FROM model.entity WHERE name = 'Artifact' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
   ('bibliography',         'E31', false, false, true,  'contributor', NULL,      'mdi-text-box',   (SELECT id FROM model.entity WHERE name = 'Bibliography' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-  ('creation',             'E65',  false, true,  true,  'contributor', '#0000FF', 'mdi-calendar',   (SELECT id FROM model.entity WHERE name = 'Event' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
   ('edition',              'E31', false, false, true,  'contributor', NULL,      'mdi-text-box',   (SELECT id FROM model.entity WHERE name = 'Edition' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
   ('event',                'E5',  false, true,  true,  'contributor', '#0000FF', 'mdi-calendar',   (SELECT id FROM model.entity WHERE name = 'Event' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
   ('external_reference',   'E31', false, false, true,  'contributor', NULL,      'mdi-text-box',   (SELECT id FROM model.entity WHERE name = 'External reference' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
@@ -388,15 +387,12 @@ INSERT INTO model.openatlas_class (name, cidoc_class_code, alias_allowed, refere
   ('stratigraphic_unit',   'E18', false, true,  true,  'contributor', NULL,      'mdi-map-marker', (SELECT id FROM model.entity WHERE name = 'Stratigraphic unit' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1));
 
 INSERT INTO web.hierarchy_openatlas_class (hierarchy_id, openatlas_class_name) VALUES
-  ((SELECT id FROM web.hierarchy WHERE name='Actor function'), 'actor_function'),
-  ((SELECT id FROM web.hierarchy WHERE name='Actor relation'), 'actor_relation'),
   ((SELECT id FROM web.hierarchy WHERE name='Administrative unit'), 'place'),
   ((SELECT id FROM web.hierarchy WHERE name='Artifact'), 'artifact'),
   ((SELECT id FROM web.hierarchy WHERE name='Bibliography'), 'bibliography'),
   ((SELECT id FROM web.hierarchy WHERE name='Edition'), 'edition'),
   ((SELECT id FROM web.hierarchy WHERE name='Event'), 'acquisition'),
   ((SELECT id FROM web.hierarchy WHERE name='Event'), 'activity'),
-  ((SELECT id FROM web.hierarchy WHERE name='Event'), 'creation'),
   ((SELECT id FROM web.hierarchy WHERE name='Event'), 'event'),
   ((SELECT id FROM web.hierarchy WHERE name='Event'), 'modification'),
   ((SELECT id FROM web.hierarchy WHERE name='Event'), 'move'),
@@ -405,7 +401,6 @@ INSERT INTO web.hierarchy_openatlas_class (hierarchy_id, openatlas_class_name) V
   ((SELECT id FROM web.hierarchy WHERE name='Feature'), 'feature'),
   ((SELECT id FROM web.hierarchy WHERE name='Historical place'), 'place'),
   ((SELECT id FROM web.hierarchy WHERE name='Human remains'), 'human_remains'),
-  ((SELECT id FROM web.hierarchy WHERE name='Involvement'), 'involvement'),
   ((SELECT id FROM web.hierarchy WHERE name='License'), 'file'),
   ((SELECT id FROM web.hierarchy WHERE name='Place'), 'place'),
   ((SELECT id FROM web.hierarchy WHERE name='Source'), 'source'),

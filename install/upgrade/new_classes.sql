@@ -5,7 +5,12 @@ BEGIN;
 
 -- New classes (#2464)
 
+
+-- Transform creation events to production events (#2634)
+UPDATE model.entity SET (cidoc_class_code, openatlas_class_name) = ('E12', 'production') WHERE openatlas_class_name = 'creation';
+DELETE FROM model.link WHERE property_code = 'P94';
+
 -- Remove obsolete class definitions
-DELETE FROM model.openatlas_class WHERE name IN ('actor_function', 'actor_relation', 'involvement');
+DELETE FROM model.openatlas_class WHERE name IN ('actor_function', 'actor_relation', 'creation', 'involvement');
 
 END;
