@@ -16,7 +16,19 @@ def index_changelog() -> str:
 # pylint: disable=too-many-lines
 
 versions = {
-    '8.15.0': ['TBA', {}],
+    '8.15.0': ['TBA', {
+        'feature': {
+            '2551': 'Admin interface for generating RDF dumps',
+            '2568': 'Admin interface for generating ARCHE dumps',
+            '2580': 'Report generation for ARCHE import issues',
+            '2590': 'Bigger info button',
+            '2626': 'API: 4.10.0',
+            '2466': 'API: Export files with ARCHE RDF metadata'},
+        'fix': {
+            '2621':
+                'Irrelevant entries linked to entities in '
+                'entity_presentation_view endpoint',
+            '2625': 'Empty count in /type_tree/ endpoint'}}],
     '8.14.0': ['2025-09-02', {
         'feature': {
             '2605': 'Display root type id',
@@ -25,7 +37,7 @@ versions = {
             '2598': 'Refactor and minor improvements'},
         'fix': {
             '2575': 'Text annotation: Layout issues',
-            '2579':'Text annotation: Display issue at update',
+            '2579': 'Text annotation: Display issue at update',
             '2599': 'Broken Wikidata info function'}}],
     '8.13.0': ['2025-08-19', {
         'feature': {

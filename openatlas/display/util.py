@@ -388,8 +388,12 @@ def tooltip(text: str) -> str:
         return ''
     title = text.replace('"', "'")
     return (
-        '<span>'
-        f'<i class="fas fa-info-circle tooltipicon" title="{title}"></i>'
+        f"""<span
+        data-bs-toggle="tooltip"
+        data-bs-placement="top"
+        data-bs-custom-class="custom-tooltip"
+        data-bs-title="{title}">"""
+        '<i class="fas fa-info-circle fs-6 tooltipicon"></i>'
         '</span>')
 
 
