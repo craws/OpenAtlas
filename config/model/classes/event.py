@@ -50,46 +50,36 @@ class_ = {
             'inverse': True,
             'mode': 'direct'},
         'reference': standard_relations['reference'],
-        'file': standard_relations['file']},
+        'file': standard_relations['file'],
+        'succeeding_event': {
+            'label': _('succeeding event'),
+            'classes': class_groups['event']['classes'],
+            'property': 'P134',
+            'inverse': True,
+            'mode': 'display'},
+        'preceding_event': {
+            'label': _('preceding event'),
+            'classes': class_groups['event']['classes'],
+            'property': 'P134',
+            'mode': 'direct'},
+        'location': {
+            'label': _('location'),
+            'classes': 'object_location',
+            'property': 'P7',
+            'mode': 'direct'}},
     'display': {
         'buttons': ['copy', 'network'],
         'form': {'insert_and_continue': True},
         'additional_tabs': {'note': {}}}}
-
-relations = {
-    'succeeding_event': {
-        'label': _('succeeding event'),
-        'classes': class_groups['event']['classes'],
-        'property': 'P134',
-        'inverse': True,
-        'mode': 'display'},
-    'preceding_event': {
-        'label': _('preceding event'),
-        'classes': class_groups['event']['classes'],
-        'property': 'P134',
-        'mode': 'direct'},
-    'location': {
-        'label': _('location'),
-        'classes': 'object_location',
-        'property': 'P7',
-        'mode': 'direct'}}
-
 activity = copy.deepcopy(class_)
 activity['label'] = _('activity')
 activity['display']['tooltip'] = \
     _('the most common, e.g. a battle, a meeting or a wedding')
-activity['relations'] = activity['relations'] | {
-    'succeeding_event': relations['succeeding_event'],
-    'preceding_event': relations['preceding_event'],
-    'location': relations['location']}
 
 acquisition = copy.deepcopy(class_)
 acquisition['label'] = _('acquisition')
 acquisition['display']['tooltip'] = _('mapping a change of property')
 acquisition['relations'] = acquisition['relations'] | {
-    'succeeding_event': relations['succeeding_event'],
-    'preceding_event': relations['preceding_event'],
-    'location': relations['location'],
     'recipient': {
         'label': _('recipient'),
         'classes': class_groups['actor']['classes'],
@@ -115,20 +105,10 @@ acquisition['relations'] = acquisition['relations'] | {
         'mode': 'direct',
         'multiple': True}}
 
-event = copy.deepcopy(class_)
-event['label'] = _('event')
-event['display']['tooltip'] = \
-    _('events not performed by actors, e.g. a natural disaster')
-event['relations'] = event['relations'] | {
-    'location': relations['location']}
-
 modification = copy.deepcopy(class_)
 modification['label'] = _('modification')
 modification['display']['tooltip'] = _('modification of artifacts')
 modification['relations'] = modification['relations'] | {
-    'succeeding_event': relations['succeeding_event'],
-    'preceding_event': relations['preceding_event'],
-    'location': relations['location'],
     'modified_object': {
         'label': _('modified object'),
         'classes': class_groups['artifact']['classes'],
@@ -143,11 +123,10 @@ modification['relations'] = modification['relations'] | {
         'mode': 'direct'}}
 
 move = copy.deepcopy(class_)
+del move['relations']['location']
 move['label'] = _('move')
 move['display']['tooltip'] = _('movement of artifacts or persons')
 move['relations'] = move['relations'] | {
-    'succeeding_event': relations['succeeding_event'],
-    'preceding_event': relations['preceding_event'],
     'place_from': {
         'label': _('place from'),
         'classes': 'object_location',
@@ -175,9 +154,6 @@ production = copy.deepcopy(class_)
 production['production'] = _('production')
 production['display']['tooltip'] = _('creation of artifacts')
 production['relations'] = production['relations'] | {
-    'succeeding_event': relations['succeeding_event'],
-    'preceding_event': relations['preceding_event'],
-    'location': relations['location'],
     'produced_artifact': {
         'label': _('produced artifact'),
         'classes': 'artifact',

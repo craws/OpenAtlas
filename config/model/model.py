@@ -24,7 +24,6 @@ model: dict[str, Any] = {
     'artifact': artifact.artifact,
     'bibliography': reference.bibliography,
     'edition': reference.edition,
-    'event': event.event,
     'external_reference': reference.external_reference,
     'feature': {
         'attributes': {},

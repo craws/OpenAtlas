@@ -9,11 +9,10 @@ from wtforms import (
 from wtforms.validators import InputRequired, Optional, URL
 
 from openatlas.forms.field import (
-    DragNDropField, SubmitField, TableField, TableMultiField, TreeField)
+    SubmitField, TableField, TableMultiField, TreeField)
 from openatlas.forms.manager_base import (
-    ActorBaseManager, ArtifactBaseManager, BaseManager, HierarchyBaseManager,
-    PlaceBaseManager, TypeBaseManager)
-from openatlas.forms.validation import file
+    ArtifactBaseManager, BaseManager, HierarchyBaseManager, PlaceBaseManager,
+    TypeBaseManager)
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
 
@@ -126,8 +125,7 @@ class ArtifactManager(ArtifactBaseManager):
                 e.id for e in self.entity.get_linked_entities_recursive('P46')]
         if self.insert:
             selection = self.origin if self.origin \
-                                       and self.origin.class_.view in [
-                                           'artifact', 'place'] else None
+                and self.origin.class_.view in ['artifact', 'place'] else None
         else:
             selection = self.entity.get_linked_entity('P46', inverse=True)
         return super().additional_fields() | {
@@ -172,9 +170,8 @@ class FeatureManager(PlaceBaseManager):
 
     def additional_fields(self) -> dict[str, Any]:
         if self.insert:
-            selection = self.origin if (self.origin \
-                                       and self.origin.class_.name ==
-                                        'place') else None
+            selection = self.origin if (
+                self.origin  and self.origin.class_.name == 'place') else None
         else:
             selection = self.entity.get_linked_entity('P46', inverse=True)
         return {
@@ -192,33 +189,6 @@ class FeatureManager(PlaceBaseManager):
             'P46',
             Entity.get_by_id(int(self.form.super.data)),
             inverse=True)
-
-
-class FileManager(BaseManager):
-    fields = ['name', 'description']
-
-    def additional_fields(self) -> dict[str, Any]:
-        fields = {}
-        if not self.entity:
-            fields['file'] = DragNDropField(_('file'), [InputRequired()])
-            setattr(self.form_class, 'validate_file', file)
-        fields['public'] = BooleanField(_('public sharing allowed'))
-        fields['creator'] = StringField(_('creator'))
-        fields['license_holder'] = StringField(_('license holder'))
-        if not self.entity \
-                and self.origin \
-                and self.origin.class_.view == 'reference':
-            fields['page'] = StringField(_('page'))
-        return fields
-
-    def populate_update(self) -> None:
-        self.form.public.data = self.entity.public
-        self.form.creator.data = self.entity.creator
-        self.form.license_holder.data = self.entity.license_holder
-
-
-class GroupManager(ActorBaseManager):
-    pass
 
 
 class HumanRemainsManager(ArtifactBaseManager):
