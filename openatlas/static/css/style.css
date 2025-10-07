@@ -266,3 +266,7 @@ img.schema_image {
   background-color: var(--bs-primary);
   color: white;
 }
+
+.tooltip-inner {
+    text-align: left;
+}
