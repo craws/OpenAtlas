@@ -431,7 +431,11 @@ def get_individuals() -> list[Individual]:
                 output.append(ind)
     return output
 
+import hashlib
+import os
+
 def extract_images_from_pdfs():
+    """Extract images from SE PDFs and remove duplicate (e.g. logo) images."""
     out_dir = FILE_PATH / "skelett_mannchen"
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -441,23 +445,41 @@ def extract_images_from_pdfs():
         doc = fitz.open(pdf_file)
         for page_index, page in enumerate(doc):
             text = page.get_text()
-            # Try to detect SE number in the page text
+            # detect SE number
             m = re.search(r"\bSE\s*:\s*(\d+)\b", text)
             se_number = m.group(1) if m else f"{pdf_file.stem}_p{page_index+1}"
 
-            images = page.get_images(full=True)
-            for img_index, img in enumerate(images):
+            for img_index, img in enumerate(page.get_images(full=True)):
                 xref = img[0]
                 pix = fitz.Pixmap(doc, xref)
-                if pix.n > 3:  # has alpha
+                if pix.n > 3:  # convert RGBA → RGB
                     pix = fitz.Pixmap(fitz.csRGB, pix)
-                img_path = out_dir / f"SE {se_number}.jpg"
-                # If multiple images per SE, add suffix
-                if img_index > 0 and img_path.exists():
-                    img_path = out_dir / f"SE {se_number}_{img_index+1}.jpg"
+                img_path = out_dir / f"SE {se_number}_{page_index+1}_{img_index+1}.jpg"
                 pix.save(img_path)
-                pix = None  # free memory
+                pix = None
         doc.close()
+
+    # --- remove duplicates ---
+    seen = {}
+    for img_file in sorted(out_dir.glob("*.jpg")):
+        size = os.path.getsize(img_file)
+        if size not in seen:
+            seen[size] = [img_file]
+            continue
+        if size > 150_000:
+            continue
+        # potential duplicates → hash check
+        current_hash = hashlib.sha256(img_file.read_bytes()).hexdigest()
+        is_duplicate = False
+        for existing in seen[size]:
+            existing_hash = hashlib.sha256(existing.read_bytes()).hexdigest()
+            if current_hash == existing_hash:
+                img_file.unlink(missing_ok=True)  # remove duplicate
+                is_duplicate = True
+                break
+        if not is_duplicate:
+            seen[size].append(img_file)
+
 
 def merge_units(
         strat_units: list[ParsedStratigraphicUnit],
@@ -564,8 +586,7 @@ with app.test_request_context():
         get_individuals())
     finds = parse_finds()
 
-    # Todo: it works, just for performance commented it out
-    # extract_images_from_pdfs()
+    extract_images_from_pdfs()
 
     # Build type dictionaries from Feature
     feature_types = build_types(features, import_feature_type, 'type')
