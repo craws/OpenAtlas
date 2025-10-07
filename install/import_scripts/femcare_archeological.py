@@ -263,9 +263,8 @@ def _is_label_line(line: str) -> bool:
     return bool(LABEL_PATTERN.match(line))
 
 def _collect_until_next_label(start_idx: int, lines: list[str], break_tokens=("SE:",)) -> str:
-    """Collects the value on the same line after ':' plus continuation lines until next label or break."""
-    first = lines[start_idx]
-    m = LABEL_PATTERN.match(first)
+    """Collect text for a field until the next label or header-like line."""
+    m = LABEL_PATTERN.match(lines[start_idx])
     if not m:
         return ""
     acc = [m.group(2).strip()]
@@ -275,11 +274,28 @@ def _collect_until_next_label(start_idx: int, lines: list[str], break_tokens=("S
         if not line:
             i += 1
             continue
-        if any(line.startswith(tok) for tok in break_tokens) or _is_label_line(line):
+
+        # Stop if the line looks like a new label or header
+        if any(line.startswith(tok) for tok in break_tokens):
             break
+        if LABEL_PATTERN.match(line):
+            break
+        if re.match(r"^[A-ZÄÖÜ][A-Za-zÄÖÜäöüß\s\-]{2,}:", line):
+            break
+        if any(header in line for header in [
+            "Erhaltene", "Position", "Beschreibung", "Skizze", "Dokumentation"
+        ]):
+            break
+
         acc.append(line)
         i += 1
-    return " ".join(" ".join(acc).split())
+
+    text = " ".join(acc).strip()
+    # Shorten if field is supposed to be a short code like "Bergung" or "Alter"
+    if m.group(1).strip().lower() in ("bergung", "alter") and len(text.split()) > 6:
+        text = " ".join(text.split()[:5])
+    return text
+
 
 def _split_sections_by_se(full_text: str) -> list[str]:
     anchors = list(re.finditer(r"\bSE\s*:\s*\d+\b", full_text))
@@ -325,23 +341,67 @@ def _parse_section(section_text: str) -> Individual | None:
         if find_type:
             break
 
-    # description = any other label/value not in the core set
-    core_labels = {"se","art","lage","orientierung","erhaltungszustand",
-                   "dislozierung","alter","bergung","fundart","fund","befund",
-                   "bestattungsart"}
+    # --- description: only keep specific meaningful fields ---
+    wanted_labels = [
+        "Position(Objekt)",
+        "Grabkonstruktion",
+        "Fundmaterial",
+        "Grabmarkierung/ -überbau und -form",
+        "Anmerkungen/ Skizze",
+    ]
+
     description = []
     for idx, line in enumerate(lines):
         m = LABEL_PATTERN.match(line)
         if not m:
             continue
-        label, value = m.group(1).strip(), m.group(2).strip()
-        if label.lower() in core_labels:
+
+        label = m.group(1).strip()
+        if label not in wanted_labels:
             continue
+
+        value = m.group(2).strip()
+
+        # --- Handle cases where value is below the label (next 1–2 lines) ---
         if value in ("", "-"):
-            value = _collect_until_next_label(idx, lines)
-        value = _norm(value)
-        if value:
-            description.append(f"{label}: {value}")
+            for offset in (1, 2):
+                if idx + offset < len(lines):
+                    nxt = lines[idx + offset].strip()
+                    # skip empty or label-like lines
+                    if nxt and not LABEL_PATTERN.match(nxt):
+                        value = nxt
+                        break
+
+        # --- Skip if still empty or only '-' ---
+        if not value or value == "-":
+            continue
+
+        # --- Collect continuation lines, but stop early at known headers ---
+        cont = []
+        for j in range(idx + 1, len(lines)):
+            nxt = lines[j].strip()
+            if not nxt:
+                continue
+            if LABEL_PATTERN.match(nxt):
+                break
+            if re.match(r"^(Darstellung|Anmerkungen|Datum|BearbeiterIn|MNr|KG|MBez)\b", nxt):
+                break
+            if any(h in nxt for h in [
+                "Darstellung der stratigraphischen Verhältnisse",
+                "Anmerkungen", "Datum", "BearbeiterIn", "MNr"
+            ]):
+                break
+            cont.append(nxt)
+
+        # Prefer continuation text if found, otherwise current value
+        text_value = " ".join(cont).strip() if cont else value
+        text_value = _norm(text_value)
+        if not text_value or text_value == "-":
+            continue
+
+        # Keep the label in output
+        description.append(f"{label}: {text_value}")
+
 
     return Individual(
         se_id=se_id,
@@ -504,7 +564,8 @@ with app.test_request_context():
         get_individuals())
     finds = parse_finds()
 
-    extract_images_from_pdfs()
+    # Todo: it works, just for performance commented it out
+    # extract_images_from_pdfs()
 
     # Build type dictionaries from Feature
     feature_types = build_types(features, import_feature_type, 'type')
