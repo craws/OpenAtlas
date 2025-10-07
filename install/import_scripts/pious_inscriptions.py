@@ -216,9 +216,9 @@ def insert_artifacts_and_sources() -> None:
 
 
 # If no database is available, comment the next 3 lines
-data = get_pious_data_from_db()
-df = pd.DataFrame(data)
-df.to_csv("files/inscriptions.csv", index=False, encoding="utf-8")
+# data = get_pious_data_from_db()
+# df = pd.DataFrame(data)
+# df.to_csv("files/inscriptions.csv", index=False, encoding="utf-8")
 data = get_pious_data_from_csv()
 clean_data()
 
