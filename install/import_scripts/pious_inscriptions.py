@@ -104,6 +104,12 @@ def get_current_location_types() -> dict[str, Entity]:
     return current_locations_
 
 
+def clean_description_text(string: str) -> str | None:
+    if string == '***':
+        string = None
+    return string
+
+
 def insert_artifacts_and_sources() -> None:
     for entry in data:
         # Artifact
@@ -115,40 +121,49 @@ def insert_artifacts_and_sources() -> None:
             f"Location of {entry['id_string']}")
         artifact.link('P53', location)
         artifact.link('P46', places[entry['id_string']], inverse=True)
-        if entry.get('current_location'):
-            artifact.link('P2', current_locations[entry['current_location']])
+        # if entry.get('current_location'):
+        #     artifact.link('P2', current_locations[entry['current_location']])
         # Todo: add images
 
         # Source
-        source_desc = f"{entry['commentary']}\n\n{entry['source']}"
+        commentary = clean_description_text(entry['commentary'])
+        if commentary:
+            commentary = f"{commentary}\n\n"
+        source_desc = f"{commentary or ''}{entry['source']}"
         source = Entity.insert('source', entry['id_string'], source_desc)
         source.link('P2', inscription_type)
         source.link('P2', language_types[entry.get('language') or 'Greek'])
         source.link('P128', artifact, inverse=True)
-        transcription = Entity.insert(
-            'source_translation',
-            f'Transcription of {entry["id_string"]}',
-            entry['transcription'])
-        transcription.link('P2', original_text_type)
-        transcription.link('P73', source, inverse=True)
-        transcription_corrected = Entity.insert(
-            'source_translation',
-            f'Corrected transcription of {entry["id_string"]}',
-            entry['transcription_corrected'])
-        transcription_corrected.link('P2', original_text_corrected_type)
-        transcription_corrected.link('P73', source, inverse=True)
-        transcription_simplified = Entity.insert(
-            'source_translation',
-            f'Simplified transcription of {entry["id_string"]}',
-            entry['transcription_simplified'])
-        transcription_simplified.link('P2', original_text_normalized_type)
-        transcription_simplified.link('P73', source, inverse=True)
-        translation = Entity.insert(
-            'source_translation',
-            f'Translation of {entry["id_string"]}',
-            entry['translation'])
-        translation.link('P2', translation_type)
-        translation.link('P73', source, inverse=True)
+
+        if clean_description_text(entry['transcription']):
+            transcription = Entity.insert(
+                'source_translation',
+                f'Transcription of {entry["id_string"]}',
+                clean_description_text(entry['transcription']))
+            transcription.link('P2', original_text_type)
+            transcription.link('P73', source, inverse=True)
+        if clean_description_text(entry['transcription_corrected']):
+            transcription_corrected = Entity.insert(
+                'source_translation',
+                f'Corrected transcription of {entry["id_string"]}',
+                clean_description_text(entry['transcription_corrected']))
+            transcription_corrected.link('P2', original_text_corrected_type)
+            transcription_corrected.link('P73', source, inverse=True)
+        if clean_description_text(entry['transcription_simplified']):
+            transcription_simplified = Entity.insert(
+                'source_translation',
+                f'Simplified transcription of {entry["id_string"]}',
+                clean_description_text(entry['transcription_simplified']))
+            transcription_simplified.link('P2', original_text_normalized_type)
+            transcription_simplified.link('P73', source, inverse=True)
+        if clean_description_text(entry['translation']):
+            translation = Entity.insert(
+                'source_translation',
+                f'Translation of {entry["id_string"]}',
+                clean_description_text(entry['translation']))
+            translation.link('P2', translation_type)
+            translation.link('P73', source, inverse=True)
+
 
 # If no database is available, comment the next 3 lines
 data = get_pious_data_from_db()
