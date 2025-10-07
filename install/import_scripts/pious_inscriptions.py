@@ -5,7 +5,11 @@ import pandas as pd
 from psycopg2 import connect, extras
 
 from openatlas import app
+from openatlas.database import imports as db
 from openatlas.models.entity import Entity
+
+PROJECT_ID = 4
+CURRENT_USER = 13  # BKK
 
 
 def get_pious_data_from_db() -> list[dict[str, Any]]:
@@ -54,6 +58,11 @@ def get_admin_units() -> dict[str, Entity]:
         unit = Entity.insert('administrative_unit', site_name)
         unit.link('P89', provinces.get(province_name) or admin_hierarchy)
         admin_units_[entry['site']] = unit
+        db.import_data(
+            PROJECT_ID,
+            unit.id,
+            CURRENT_USER,
+            None)
     return admin_units_
 
 
@@ -68,6 +77,11 @@ def get_provinces() -> dict[str, Entity]:
             province = Entity.insert('administrative_unit', province_name)
             province.link('P89', admin_hierarchy)
             provinces_[province_name] = province
+            db.import_data(
+                PROJECT_ID,
+                province.id,
+                CURRENT_USER,
+                None)
     return provinces_
 
 
@@ -88,20 +102,25 @@ def get_places() -> dict[str, Entity]:
         location.link('P89', admin_units[entry['site']])
         places_control_group[entry['placement']] = place
         places_[entry['id_string']] = place
+        db.import_data(
+            PROJECT_ID,
+            place.id,
+            CURRENT_USER,
+            None)
     return places_
 
 
-def get_current_location_types() -> dict[str, Entity]:
-    current_locations_: dict[str, Entity] = {}
-    for entry in data:
-        if not entry.get('current_location'):
-            continue
-        if entry['current_location'] in current_locations_:
-            continue
-        current_location = Entity.insert('type', entry['current_location'])
-        current_location.link('P127', current_location_hierarchy)
-        current_locations_[entry['current_location']] = current_location
-    return current_locations_
+# def get_current_location_types() -> dict[str, Entity]:
+#     current_locations_: dict[str, Entity] = {}
+#     for entry in data:
+#         if not entry.get('current_location'):
+#             continue
+#         if entry['current_location'] in current_locations_:
+#             continue
+#         current_location = Entity.insert('type', entry['current_location'])
+#         current_location.link('P127', current_location_hierarchy)
+#         current_locations_[entry['current_location']] = current_location
+#     return current_locations_
 
 
 def clean_description_text(string: str) -> str | None:
@@ -124,6 +143,11 @@ def insert_artifacts_and_sources() -> None:
         artifact.link('P53', location)
         artifact.link('P46', places[entry['id_string']], inverse=True)
         artifact.link('P2', case_study)
+        db.import_data(
+            PROJECT_ID,
+            artifact.id,
+            CURRENT_USER,
+            None)
 
         # Source
         commentary = clean_description_text(entry['commentary'])
@@ -135,6 +159,11 @@ def insert_artifacts_and_sources() -> None:
         source.link('P2', inscription_type)
         # source.link('P2', language_types[entry.get('language') or 'Greek'])
         source.link('P128', artifact, inverse=True)
+        db.import_data(
+            PROJECT_ID,
+            source.id,
+            CURRENT_USER,
+            None)
 
         if clean_description_text(entry['transcription']):
             transcription = Entity.insert(
@@ -143,6 +172,11 @@ def insert_artifacts_and_sources() -> None:
                 clean_description_text(entry['transcription']))
             transcription.link('P2', original_text_type)
             transcription.link('P73', source, inverse=True)
+            db.import_data(
+                PROJECT_ID,
+                transcription.id,
+                CURRENT_USER,
+                None)
         if clean_description_text(entry['transcription_corrected']):
             transcription_corrected = Entity.insert(
                 'source_translation',
@@ -150,6 +184,11 @@ def insert_artifacts_and_sources() -> None:
                 clean_description_text(entry['transcription_corrected']))
             transcription_corrected.link('P2', original_text_corrected_type)
             transcription_corrected.link('P73', source, inverse=True)
+            db.import_data(
+                PROJECT_ID,
+                transcription_corrected.id,
+                CURRENT_USER,
+                None)
         if clean_description_text(entry['transcription_simplified']):
             transcription_simplified = Entity.insert(
                 'source_translation',
@@ -157,6 +196,11 @@ def insert_artifacts_and_sources() -> None:
                 clean_description_text(entry['transcription_simplified']))
             transcription_simplified.link('P2', original_text_normalized_type)
             transcription_simplified.link('P73', source, inverse=True)
+            db.import_data(
+                PROJECT_ID,
+                transcription_simplified.id,
+                CURRENT_USER,
+                None)
         if clean_description_text(entry['translation']):
             translation = Entity.insert(
                 'source_translation',
@@ -164,6 +208,11 @@ def insert_artifacts_and_sources() -> None:
                 clean_description_text(entry['translation']))
             translation.link('P2', translation_type)
             translation.link('P73', source, inverse=True)
+            db.import_data(
+                PROJECT_ID,
+                translation.id,
+                CURRENT_USER,
+                None)
 
 
 # If no database is available, comment the next 3 lines
@@ -189,5 +238,5 @@ with app.test_request_context():
     provinces = get_provinces()
     admin_units = get_admin_units()
     places = get_places()
-    current_locations = get_current_location_types()
+    # current_locations = get_current_location_types()
     insert_artifacts_and_sources()
