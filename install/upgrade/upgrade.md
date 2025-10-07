@@ -35,6 +35,11 @@ To adapt already exported SQL file paths to the new directory structure:
 
     mv /var/www/openatlas/files/export/*7z /var/www/openatlas/files/export/sql/
 
+Be aware, that the owner of the folders might not be www-data:
+
+    cd /var/www/openatlas
+    sudo chown www-data files/export/arche/ files/export/rdf/ files/export/sql/
+
 #### Tests (Optional)
 For full test coverage, copy *ARCHE_METADATA* from 
 'instance/example_testing.py' to 'testing.py'.

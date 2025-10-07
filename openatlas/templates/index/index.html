@@ -1,9 +1,9 @@
 <p class="mt-3">
   {{ _('hello')|uc_first }} <strong>{{ current_user.username }}</strong>.
   {% if session.login_previous_success %}
-    {{ _('last login')|uc_first }}: {{ session.login_previous_success }}.
+    {{ _('last login')|uc_first }}: {{ session.login_previous_success.strftime('%Y-%m-%d %H:%M') }}.
     {% if session.login_previous_failures > 0 %}
-      - {{ _('failed logins')|uc_first }}: {{ session.login_previous_failures }}
+      {{ _('failed logins')|uc_first }}: <span class="error">{{ session.login_previous_failures }}</span>
     {% endif %}
   {% else %}
     {{ _('first login') }}
