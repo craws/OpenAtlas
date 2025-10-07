@@ -434,7 +434,7 @@ def get_individuals() -> list[Individual]:
 import hashlib
 import os
 
-def extract_images_from_pdfs():
+def extract_images_from_pdfs() -> None:
     """Extract images from SE PDFs and remove duplicate (e.g. logo) images."""
     out_dir = FILE_PATH / "skelett_mannchen"
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -448,13 +448,16 @@ def extract_images_from_pdfs():
             # detect SE number
             m = re.search(r"\bSE\s*:\s*(\d+)\b", text)
             se_number = m.group(1) if m else f"{pdf_file.stem}_p{page_index+1}"
+            # detect Ind number
+            i = re.search(r"\bIndividuum\s*:\s*(\d+)\b", text)
+            ind_number = i.group(1) if i else f"{pdf_file.stem}_p{page_index+1}"
 
             for img_index, img in enumerate(page.get_images(full=True)):
                 xref = img[0]
                 pix = fitz.Pixmap(doc, xref)
                 if pix.n > 3:  # convert RGBA → RGB
                     pix = fitz.Pixmap(fitz.csRGB, pix)
-                img_path = out_dir / f"SE {se_number}_{page_index+1}_{img_index+1}.jpg"
+                img_path = out_dir / f"SE {se_number}_{ind_number}_{img_index+1}.jpg"
                 pix.save(img_path)
                 pix = None
         doc.close()
