@@ -98,7 +98,6 @@ def get_current_location_types() -> dict[str, Entity]:
             continue
         if entry['current_location'] in current_locations_:
             continue
-        print(entry.get('current_location'))
         current_location = Entity.insert('type', entry['current_location'])
         current_location.link('P127', current_location_hierarchy)
         current_locations_[entry['current_location']] = current_location
@@ -116,13 +115,12 @@ def insert_artifacts_and_sources() -> None:
             f"Location of {entry['id_string']}")
         artifact.link('P53', location)
         artifact.link('P46', places[entry['id_string']], inverse=True)
-        print(entry.get('current_location'))
         if entry.get('current_location'):
             artifact.link('P2', current_locations[entry['current_location']])
         # Todo: add images
 
         # Source
-        source_desc = f"{entry['commentary']}\n{entry['source']}"
+        source_desc = f"{entry['commentary']}\n\n{entry['source']}"
         source = Entity.insert('source', entry['id_string'], source_desc)
         source.link('P2', inscription_type)
         source.link('P2', language_types[entry.get('language') or 'Greek'])
