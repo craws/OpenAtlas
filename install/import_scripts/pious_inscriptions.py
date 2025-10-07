@@ -114,16 +114,16 @@ def insert_artifacts_and_sources() -> None:
     for entry in data:
         # Artifact
         artifact_desc = f"""
-        {entry['date']}\n{entry['site2']}\n{entry['description']}"""
+            {clean_description_text(entry['date']) or ''}\n
+            {clean_description_text(entry['site2']) or ''}\n
+            {clean_description_text(entry['description']) or ''}"""
         artifact = Entity.insert('artifact', entry['id_string'], artifact_desc)
         location = Entity.insert(
             'object_location',
             f"Location of {entry['id_string']}")
         artifact.link('P53', location)
         artifact.link('P46', places[entry['id_string']], inverse=True)
-        # if entry.get('current_location'):
-        #     artifact.link('P2', current_locations[entry['current_location']])
-        # Todo: add images
+        artifact.link('P2', case_study)
 
         # Source
         commentary = clean_description_text(entry['commentary'])
@@ -131,8 +131,9 @@ def insert_artifacts_and_sources() -> None:
             commentary = f"{commentary}\n\n"
         source_desc = f"{commentary or ''}{entry['source']}"
         source = Entity.insert('source', entry['id_string'], source_desc)
+        source.link('P2', case_study)
         source.link('P2', inscription_type)
-        source.link('P2', language_types[entry.get('language') or 'Greek'])
+        # source.link('P2', language_types[entry.get('language') or 'Greek'])
         source.link('P128', artifact, inverse=True)
 
         if clean_description_text(entry['transcription']):
@@ -175,16 +176,16 @@ clean_data()
 with app.test_request_context():
     app.preprocess_request()
     case_study = Entity.get_by_id(784)
-    admin_hierarchy = Entity.get_by_id(81)
+    admin_hierarchy = Entity.get_by_id(794)
     current_location_hierarchy = Entity.get_by_id(786)
     inscription_type = Entity.get_by_id(787)
     original_text_type = Entity.get_by_id(96)
     original_text_corrected_type = Entity.get_by_id(788)
     original_text_normalized_type = Entity.get_by_id(789)
     translation_type = Entity.get_by_id(97)
-    language_types = {
-        'Greek': Entity.get_by_id(792),
-        'Russian': Entity.get_by_id(791)}
+    # language_types = {
+    #   'Greek': Entity.get_by_id(792),
+    #   'Russian': Entity.get_by_id(791)}
     provinces = get_provinces()
     admin_units = get_admin_units()
     places = get_places()
