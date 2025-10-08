@@ -103,10 +103,6 @@ def entity_table(
     elif columns[0] == 'created':
         order = [[0, "desc"]]
 
-    # Todo: implement file column
-    # if classes[0] == 'file' and show_table_icons():
-    #    table.columns.insert(1, _('icon'))
-
     if relation and relation['mode'].startswith('tab'):
         if relation['additional_fields']:
             columns.append('update')

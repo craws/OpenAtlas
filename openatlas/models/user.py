@@ -155,7 +155,6 @@ class User(UserMixin):
             'language': session['language'],
             'newsletter': False,
             'table_show_aliases': True,
-            'table_show_icons': False,
             'show_email': False}
         for setting in g.settings:
             if setting in [

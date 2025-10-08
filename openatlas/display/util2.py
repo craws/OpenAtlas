@@ -8,7 +8,6 @@ from pathlib import Path
 from typing import Any, Optional
 
 from bs4 import BeautifulSoup
-from flask import g
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from jinja2 import pass_context
@@ -102,8 +101,3 @@ def get_backup_file_data() -> dict[str, Any]:
         file_data['size'] = convert_size(latest_file.stat().st_size)
         file_data['date'] = format_date(latest_file_date)
     return file_data
-
-
-def show_table_icons() -> bool:
-    return current_user.settings['table_show_icons'] \
-        and (g.settings['image_processing'] or g.settings['iiif'])

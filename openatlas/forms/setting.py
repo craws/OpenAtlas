@@ -153,7 +153,6 @@ class DisplayForm(FlaskForm):
         choices=list(app.config['TABLE_ROWS'].items()),
         coerce=int)
     table_show_aliases = BooleanField(_('show aliases in tables'))
-    table_show_icons = BooleanField(_('show icons in tables'))
     entity_show_dates = BooleanField(
         _('show created and modified information'))
     entity_show_import = BooleanField(_('show import information'))

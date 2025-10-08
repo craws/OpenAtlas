@@ -25,60 +25,18 @@ def index(group: str) -> str | Response:
                     g.classes[name].label,
                     url_for('insert', class_=name),
                     tooltip_text=g.classes[name].display['tooltip']))
-    crumbs = [_(group).replace('_', ' ')]
-    table, file_info = get_table(group)
     return render_template(
         'entity/index.html',
         class_=group,
-        table=table,
-        file_info=file_info,
+        table=get_table(group),
         buttons=buttons,
         gis_data=Gis.get_all() if group == 'place' else None,
         title=_(group.replace('_', ' ')),
-        crumbs=crumbs)
+        crumbs=[_(group).replace('_', ' ')])
 
 
-def get_table(group: str) -> tuple[Table, str]:
-    file_info = ''
-    if group == 'file':
-        entities = Entity.get_by_class('file', types=True)
-        table = entity_table(entities)
-        # stats = {'public': 0, 'without_license': 0, 'without_creator': 0}
-        # table.order = [[0, 'desc']]
-        # table.columns = ['date'] + table.columns
-        # if show_table_icons():
-        #     table.columns.insert(1, _('icon'))
-        # for entity in entities:
-        #     if entity.public:
-        #         stats['public'] += 1
-        #         if not entity.standard_type:
-        #             stats['without_license'] += 1
-        #         elif not entity.creator:
-        #             stats['without_creator'] += 1
-        #     data = [
-        #         format_date(entity.created),
-        #         link(entity),
-        #         link(entity.standard_type),
-        #         _('yes') if entity.public else None,
-        #         entity.creator,
-        #         entity.license_holder,
-        #         entity.get_file_size(),
-        #         entity.get_file_ext(),
-        #         entity.description]
-        #     if show_table_icons():
-        #         data.insert(
-        #             1,
-        #             f'<a href="{url_for("view", id_=entity.id)}">'
-        #             f'{file_preview(entity.id)}</a>')
-        #     table.rows.append(data)
-        # file_info = (
-        #     uc_first(_('files')) + ': ' +
-        #     f"{format_number(stats['public'])} " + _('public') +
-        #     f", {format_number(stats['without_license'])} " +
-        #     _('public without license') +
-        #     f", {format_number(stats['without_creator'])} " +
-        #     _('public with license but without creator'))
-    elif group == 'reference_system':
+def get_table(group: str) -> Table:
+    if group == 'reference_system':
         table = Table([
              'name', 'count', 'website URL', 'resolver URL', 'example ID',
              'default precision', 'description'])
@@ -100,7 +58,7 @@ def get_table(group: str) -> tuple[Table, str]:
                 else g.class_groups[group]['classes'],
                 types=True,
                 aliases=True))
-    return table, file_info
+    return table
 
 
 def file_preview(entity_id: int) -> str:

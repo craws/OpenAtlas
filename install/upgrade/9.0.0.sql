@@ -13,4 +13,7 @@ DELETE FROM model.link WHERE property_code = 'P94';
 -- Remove obsolete class definitions
 DELETE FROM model.openatlas_class WHERE name IN ('actor_function', 'actor_relation', 'creation', 'event', 'involvement');
 
+-- Delete removed table icon option
+DELETE FROM web.user_settings WHERE value = 'table_show_icons';
+
 END;
