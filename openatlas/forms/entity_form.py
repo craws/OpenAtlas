@@ -32,7 +32,7 @@ def get_entity_form(
     add_reference_systems(Form, entity.class_)
     for key, value in entity.class_.attributes.items():
         match key:
-            case 'creator' | 'license_holder':
+            case 'creator' | 'placeholder' | 'license_holder' | 'resolver_url' | 'website_url':
                 setattr(
                     Form,
                     key,

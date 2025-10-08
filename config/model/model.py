@@ -3,7 +3,7 @@ from typing import Any
 from flask_babel import lazy_gettext as _
 
 from config.model.classes import (
-    actor, artifact, event, file, reference, source, type)
+    actor, artifact, event, file, reference, reference_system, source, type)
 
 # Todo: Needed for translation, to be removed after implemented
 _('first'), _('last')  # event dates in grey in case no relation dates
@@ -40,8 +40,7 @@ model: dict[str, Any] = {
         'attributes': {},
         'display': {'buttons': ['network']}},
     'production': event.production,
-    'reference_system': {
-        'attributes': {}},
+    'reference_system': reference_system.reference_system,
     'source': source.source,
     'source_translation': source.source_translation,
     'stratigraphic_unit': {
