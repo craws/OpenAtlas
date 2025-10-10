@@ -42,7 +42,8 @@ def html_form(
                 reference_systems_added = True
                 field.label.text = _('reference system')
                 html += add_row(
-                    None,
+                    label=_('reference system'),
+                    value=\
                     '<span id="reference-system-switcher" class="uc-first '
                     f'{app.config["CSS"]["button"]["secondary"]}">'
                     + _('show') + '</span>')
@@ -93,8 +94,9 @@ def html_form(
 
 
 def add_row(
-        field: Optional[Field],
+        field: Optional[Field] = None,
         value: Optional[str] = None,
+        label: Optional[str] = None,
         form_id: Optional[str] = None,
         row_css: Optional[str] = None) -> str:
     row_css = row_css or ''
@@ -118,6 +120,7 @@ def add_row(
     return render_template(
         'forms/form_row.html',
         field=field,
+        label=label,
         value=value,
         field_css=field_css.strip(),
         row_css=row_css)

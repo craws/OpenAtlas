@@ -10,8 +10,8 @@ group = {
         'name': {
             'required': True},
         'alias': {},
-        'description': {},
-        'dates': {}},
+        'dates': {},
+        'description': {}},
     'relations': {
         'residence': {
             'label': _('residence'),

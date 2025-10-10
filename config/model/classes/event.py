@@ -8,8 +8,8 @@ class_ = {
     'attributes': {
         'name': {
             'required': True},
-        'description': {},
-        'dates': {}},
+        'dates': {},
+        'description': {}},
     'relations': {
         'source': standard_relations['source'],
         'performer': {

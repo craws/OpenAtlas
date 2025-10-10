@@ -10,8 +10,8 @@ artifact: dict[str, Any] = {
     'attributes': {
         'name': {
             'required': True},
-        'description': {},
         'dates': {},
+        'description': {},
         'location': {}},
     'relations': {
         'actor': {
