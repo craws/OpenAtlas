@@ -236,10 +236,10 @@ def remove_profile_image(id_: int) -> None:
         {'id': id_})
 
 
-def delete(ids: list[int]) -> None:  # Triggers psql delete_entity_related
+def delete(id_) -> None:  # Triggers psql delete_entity_related
     g.cursor.execute(
-        'DELETE FROM model.entity WHERE id IN %(ids)s;',
-        {'ids': tuple(ids)})
+        'DELETE FROM model.entity WHERE id = %(id)s;',
+        {'id': id_})
 
 
 def select_sql(types: bool = False, aliases: bool = False) -> str:

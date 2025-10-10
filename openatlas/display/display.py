@@ -242,12 +242,9 @@ class Display:
                     url_for('type_unset_selectable', id_=self.entity.id)))
 
     def add_button_delete(self) -> None:
-        if not is_authorized(self.entity.class_.write_access):
+        from openatlas.views.entity import deletion_possible
+        if not deletion_possible(self.entity):
             return
-        if current_user.group == 'contributor':
-            info = g.logger.get_log_info(self.entity.id)
-            if not info['creator'] or info['creator'].id != current_user.id:
-                return
         msg = _(
             'Delete %(name)s?',
             name=escape(self.entity.name.replace('\'', '')))
@@ -294,11 +291,15 @@ class Display:
                 f'<span title="{var}">{link(self.entity.standard_type)}</span>'
         self.data.update(self.get_type_data())
         for name, attribute in self.entity.class_.attributes.items():
-            if name in ['public', 'creator', 'license_holder']:
-                value = getattr(self.entity, name)
-                if isinstance(value, bool):
-                    value = _('yes') if value else _('no')
-                self.data[attribute['label']] = str(value)
+            if name in [
+                    'creator', 'license_holder', 'placeholder', 'public',
+                    'resolver_url', 'website_url']:
+                if value := getattr(self.entity, name):
+                    if isinstance(value, bool):
+                        value = _('yes') if value else _('no')
+                    elif attribute.get('format') == 'url':
+                        value = link(value, value, external=True)
+                    self.data[attribute['label']] = str(value)
         for name, relation in self.entity.class_.relations.items():
             if relation['mode'] in ['direct', 'display']:
                 self.data[relation['label']] = []

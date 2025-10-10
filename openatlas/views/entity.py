@@ -139,28 +139,31 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
         crumbs=hierarchy_crumbs(entity) + [entity, _('edit')])
 
 
+def deletion_possible(entity: Entity) -> bool:
+    if not is_authorized(entity.class_.write_access):
+        return False
+    if current_user.group == 'contributor':
+        info = g.logger.get_log_info(entity.id)
+        if not info['creator'] or info['creator'].id != current_user.id:
+            return False
+    match entity.class_.group['name']:
+        case 'reference_system' if entity.system or entity.classes:
+            return False
+        case 'type' if entity.system:
+            return False
+    return True
+
+
 @app.route('/delete/<int:id_>')
 @required_group('contributor')
 def delete(id_: int) -> Response:
-    if current_user.group == 'contributor':
-        info = g.logger.get_log_info(id_)
-        if not info['creator'] or info['creator'].id != current_user.id:
-            abort(403)
     entity = Entity.get_by_id(id_)
-    if not is_authorized(entity.class_.write_access):
+    if not deletion_possible(entity):
         abort(403)
     url = url_for('index', group=entity.class_.group['name'])
 
     # Todo: replace these class conditions with config conditions
-    if isinstance(entity, ReferenceSystem):
-        if entity.system:
-            abort(403)
-        if entity.classes:
-            flash(_('Deletion not possible if classes are attached'), 'error')
-            return redirect(url_for('view', id_=id_))
-    elif entity.class_.group['name'] == 'type':
-        if entity.category == 'system':
-            abort(403)
+    if entity.class_.group['name'] == 'type':
         if entity.subs or entity.count:
             return redirect(url_for('type_delete_recursive', id_=entity.id))
         root = g.types[entity.root[0]] if entity.root else None

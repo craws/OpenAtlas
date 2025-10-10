@@ -201,7 +201,7 @@ class Entity:
         return Entity.get_links_of_entities(self.id, codes, classes, inverse)
 
     def delete(self) -> None:
-        Entity.delete_(self.id)
+        db.delete(self.id)
 
     def delete_links(
             self,
@@ -305,13 +305,11 @@ class Entity:
         return text.replace('\n', '<br>') if text else text
 
     def update_aliases(self, aliases: list[str]) -> None:
-        delete_ids = []
         for id_, alias in self.aliases.items():
             if alias in aliases:
                 aliases.remove(alias)
             else:
-                delete_ids.append(id_)
-        Entity.delete_(delete_ids)
+                Entity.get_by_id(id_).delete()
         for alias in aliases:
             if alias.strip():
                 self.link(
@@ -510,11 +508,6 @@ class Entity:
     @staticmethod
     def get_file_info() -> dict[int, Any]:
         return db.get_file_info()
-
-    @staticmethod
-    def delete_(id_: int | list[int]) -> None:
-        if id_:
-            db.delete(id_ if isinstance(id_, list) else [id_])
 
     @staticmethod
     def get_by_class(
@@ -822,9 +815,9 @@ class Entity:
         return [
             node for key, node in g.types.items()
             if node.root
-               and node.category not in ['system', 'tools']
-               and node.count < 1
-               and not node.subs]
+            and node.category not in ['system', 'tools']
+            and node.count < 1
+            and not node.subs]
 
 
 def insert(data: dict[str, Any]) -> Entity:
