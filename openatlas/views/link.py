@@ -12,7 +12,8 @@ from openatlas.display.util import hierarchy_crumbs, link, required_group
 from openatlas.display.util2 import uc_first
 from openatlas.forms.display import display_form
 from openatlas.forms.form import (
-    get_manager, link_detail_form, link_form, link_update_form)
+    link_detail_form, link_form, link_update_form)
+from openatlas.forms.manager_base import ActorRelationManager
 from openatlas.forms.process import process_dates
 from openatlas.models.entity import Entity, Link
 
@@ -137,9 +138,7 @@ def link_update(id_: int, origin_id: int, relation: str) -> str | Response:
 @required_group('contributor')
 def insert_relation(type_: str, origin_id: int) -> str | Response:
     origin = Entity.get_by_id(origin_id)
-    manager = get_manager(
-        'actor_function' if type_.startswith('member') else type_,
-        origin=origin)
+    manager = ActorRelationManager()
     if manager.form.validate_on_submit():
         Transaction.begin()
         try:

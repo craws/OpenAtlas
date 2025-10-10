@@ -10,14 +10,14 @@ from openatlas.display.util import (
     get_entities_linked_to_type_recursive, link, required_group)
 from openatlas.display.util2 import uc_first
 from openatlas.forms.display import display_form
-from openatlas.forms.form import get_manager
+from openatlas.forms.manager_base import HierarchyBaseManager
 from openatlas.models.entity import Entity
 
 
 @app.route('/hierarchy/insert/<category>', methods=['GET', 'POST'])
 @required_group('manager')
 def hierarchy_insert(category: str) -> str | Response:
-    manager = get_manager(f'hierarchy_{category}')
+    manager = HierarchyBaseManager()
     if manager.form.validate_on_submit():
         try:
             Transaction.begin()
@@ -56,7 +56,7 @@ def hierarchy_update(id_: int) -> str | Response:
     hierarchy = g.types[id_]
     if hierarchy.category in ('standard', 'system'):
         abort(403)
-    manager = get_manager(f'hierarchy_{hierarchy.category}', entity=hierarchy)
+    manager = HierarchyBaseManager()
     linked_entities = set()
     has_multiple_links = False
     for entity in get_entities_linked_to_type_recursive(id_, []):

@@ -13,32 +13,12 @@ from wtforms.validators import InputRequired, URL
 from openatlas import app
 from openatlas.display.table import entity_table
 from openatlas.display.util2 import uc_first
-from openatlas.forms import manager, manager_base
 from openatlas.forms.add_fields import add_date_fields, add_type
 from openatlas.forms.field import (
     LinkTableField, SubmitField, TableCidocField, TableField, TableMultiField,
     TreeField)
 from openatlas.forms.populate import populate_dates
 from openatlas.models.entity import Entity, Link
-
-
-def get_manager(
-        class_name: Optional[str] = None,
-        entity: Optional[Entity] = None,
-        origin: Optional[Entity] = None,
-        link_: Optional[Link] = None,
-        copy: Optional[bool] = False) -> manager_base.BaseManager:
-    name = entity.class_.name if entity and not class_name else class_name
-    manager_name = ''.join(i.capitalize() for i in name.split('_'))
-    manager_instance = getattr(manager, f'{manager_name}Manager')(
-        class_=g.classes['type' if name.startswith('hierarchy') else name],
-        entity=entity,
-        origin=origin,
-        link_=link_,
-        copy=copy)
-    if request.method != 'POST' and not entity and not link_:
-        manager_instance.populate_insert()
-    return manager_instance
 
 
 def filter_entities(

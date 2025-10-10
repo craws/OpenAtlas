@@ -1,20 +1,26 @@
 from __future__ import annotations
 
+import ast
 from typing import Any, Optional, TYPE_CHECKING
 
-from flask import g
+from flask import g, request
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
-from wtforms import HiddenField, SelectMultipleField, StringField, widgets
+from wtforms import (
+    BooleanField, HiddenField, SelectField, SelectMultipleField, StringField,
+    widgets)
+from wtforms.validators import InputRequired, Optional, URL
 
-from openatlas.forms.field import TableField, TreeField
+from openatlas.forms.field import (
+    SubmitField, TableField, TableMultiField, TreeField)
 from openatlas.forms.process import process_standard_fields
 from openatlas.forms.util import convert
 from openatlas.forms.validation import hierarchy_name_exists, validate
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 from openatlas.models.overlay import Overlay
+from openatlas.models.reference_system import ReferenceSystem
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.openatlas_class import OpenatlasClass
@@ -102,9 +108,6 @@ class BaseManager:
 
     def process_form(self) -> None:
         process_standard_fields(self)
-
-    def insert_entity(self) -> None:
-        self.entity = Entity.insert(self.class_.name, self.form.name.data)
 
     def process_link_form(self) -> None:
         self.link_.description = self.form.description.data
@@ -261,3 +264,392 @@ class TypeBaseManager(BaseManager):
         self.super_id = self.get_root().id
         if new_id := getattr(self.form, str(self.super_id)).data:
             self.super_id = int(new_id)
+
+
+class ActorFunctionManager(BaseManager):
+    fields = ['date', 'description', 'continue']
+
+    def top_fields(self) -> dict[str, Any]:
+        if self.link_:
+            return {}
+        if 'membership' in request.url:
+            field_name = 'group'
+            entities = Entity.get_by_class('group', aliases=self.aliases)
+        else:
+            field_name = 'actor'
+            entities = Entity.get_by_class('actor', aliases=self.aliases)
+        return {
+            'member_origin_id': HiddenField(),
+            field_name:
+                TableMultiField(
+                    entities,
+                    filter_ids=[self.origin.id],
+                    validators=[InputRequired()])}
+
+    def populate_insert(self) -> None:
+        self.form.member_origin_id.data = self.origin.id
+
+    def process_form(self) -> None:
+        super().process_form()
+        link_type = self.get_link_type()
+        class_ = 'group' if hasattr(self.form, 'group') else 'actor'
+        for actor in Entity.get_by_ids(
+                ast.literal_eval(getattr(self.form, class_).data)):
+            self.add_link(
+                'P107',
+                actor,
+                self.form.description.data,
+                inverse=(class_ == 'group'),
+                type_id=link_type.id if link_type else None)
+
+    def process_link_form(self) -> None:
+        super().process_link_form()
+        type_id = getattr(
+            self.form,
+            str(g.classes['actor_function'].standard_type_id)).data
+        self.link_.type = g.types[int(type_id)] if type_id else None
+
+
+class ActorRelationManager(BaseManager):
+    fields = ['date', 'description', 'continue']
+
+    def top_fields(self) -> dict[str, Any]:
+        fields = {}
+        if not self.link_:
+            fields['actor'] = TableMultiField(
+                Entity.get_by_class('person', aliases=self.aliases),
+                filter_ids=[self.origin.id],
+                validators=[InputRequired()])
+            fields['relation_origin_id'] = HiddenField()
+        return fields
+
+    def additional_fields(self) -> dict[str, Any]:
+        return {'inverse': BooleanField(_('inverse'))}
+
+    def populate_insert(self) -> None:
+        self.form.relation_origin_id.data = self.origin.id
+
+    def process_form(self) -> None:
+        super().process_form()
+        for actor in Entity.get_by_ids(
+                ast.literal_eval(self.form.actor.data)):
+            link_type = self.get_link_type()
+            self.add_link(
+                'OA7',
+                actor,
+                self.form.description.data,
+                inverse=bool(self.form.inverse.data),
+                type_id=link_type.id if link_type else None)
+
+    def process_link_form(self) -> None:
+        super().process_link_form()
+        type_id = getattr(
+            self.form,
+            str(g.classes['actor_relation'].standard_type_id)).data
+        self.link_.type = g.types[int(type_id)] if type_id else None
+        inverse = self.form.inverse.data
+        if (self.origin.id == self.link_.domain.id and inverse) or \
+                (self.origin.id == self.link_.range.id and not inverse):
+            new_range = self.link_.domain
+            self.link_.domain = self.link_.range
+            self.link_.range = new_range
+
+    def populate_update(self) -> None:
+        if self.origin.id == self.link_.range.id:
+            self.form.inverse.data = True
+
+
+class AdministrativeUnitManager(TypeBaseManager):
+    def process_form(self) -> None:
+        super().process_form()
+        self.data['links']['delete'].add('P89')
+        self.add_link('P89', g.types[self.super_id])
+
+
+class ArtifactManager(ArtifactBaseManager):
+    def additional_fields(self) -> dict[str, Any]:
+        filter_ids = []
+        if self.entity:
+            filter_ids = [self.entity.id] + [
+                e.id for e in self.entity.get_linked_entities_recursive('P46')]
+        if self.insert:
+            selection = self.origin if self.origin \
+                and self.origin.class_.view in ['artifact', 'place'] else None
+        else:
+            selection = self.entity.get_linked_entity('P46', inverse=True)
+        return {
+            'super': TableField(
+                Entity.get_by_class(
+                    g.class_groups['place']['classes'] + ['artifact'],
+                    types=True,
+                    aliases=self.aliases),
+                selection,
+                filter_ids,
+                add_dynamic=['place'])}
+
+    def process_form(self) -> None:
+        super().process_form()
+        if self.form.super.data:
+            self.add_link('P46', self.form.super.data, inverse=True)
+
+
+class ExternalReferenceManager(BaseManager):
+    fields = ['url', 'description', 'continue']
+
+    def add_name_fields(self) -> None:
+        setattr(
+            self.form_class,
+            'name',
+            StringField(
+                _('URL'),
+                [InputRequired(), URL()],
+                render_kw={'autofocus': True}))
+
+
+class FeatureManager(PlaceBaseManager):
+    fields = ['name', 'date', 'description', 'continue', 'map']
+
+    def add_buttons(self) -> None:
+        if self.entity:
+            return
+        setattr(
+            self.form_class,
+            'insert_continue_sub',
+            SubmitField(_('insert and add') + ' ' + _('stratigraphic unit')))
+
+    def additional_fields(self) -> dict[str, Any]:
+        if self.insert:
+            selection = self.origin if (
+                self.origin  and self.origin.class_.name == 'place') else None
+        else:
+            selection = self.entity.get_linked_entity('P46', inverse=True)
+        return {
+            'super':
+                TableField(
+                    Entity.get_by_class('place', True, self.aliases),
+                    selection,
+                    validators=[InputRequired()],
+                    add_dynamic=['place'])}
+
+    def process_form(self) -> None:
+        super().process_form()
+        self.data['links']['delete_inverse'].add('P46')
+        self.add_link(
+            'P46',
+            Entity.get_by_id(int(self.form.super.data)),
+            inverse=True)
+
+
+class HumanRemainsManager(ArtifactBaseManager):
+    def additional_fields(self) -> dict[str, Any]:
+        filter_ids = []
+        if self.entity:
+            filter_ids = [self.entity.id] + [
+                e.id for e in self.entity.get_linked_entities_recursive('P46')]
+        if self.insert:
+            selection = self.origin if self.origin \
+                                       and self.origin.class_.view in [
+                                           'artifact', 'place'] else None
+        else:
+            selection = self.entity.get_linked_entity('P46', inverse=True)
+        return {
+            'super': TableField(
+                Entity.get_by_class(
+                    g.class_groups['place']['classes'] + ['human remains'],
+                    types=True,
+                    aliases=self.aliases),
+                selection,
+                filter_ids,
+                add_dynamic=['place'])}
+
+    def process_form(self) -> None:
+        super().process_form()
+        if self.form.super.data:
+            self.add_link('P46', self.form.super.data, inverse=True)
+
+
+class HierarchyCustomManager(HierarchyBaseManager):
+    def additional_fields(self) -> dict[str, Any]:
+        tooltip = _('tooltip hierarchy multiple')
+        return {
+            **{'multiple': BooleanField(_('multiple'), description=tooltip)},
+            **super().additional_fields()}
+
+
+class HierarchyValueManager(HierarchyBaseManager):
+    pass
+
+
+class InvolvementManager(BaseManager):
+    fields = ['date', 'description', 'continue']
+
+    def top_fields(self) -> dict[str, Any]:
+        event_class_name = ''
+        if self.link_:
+            event_class_name = self.link_.domain.class_.name
+        elif self.origin and self.origin.class_.view != 'actor':
+            event_class_name = self.origin.class_.name
+        fields = {}
+        if self.insert and self.origin:
+            class_ = 'actor' if self.origin.class_.view == 'event' else 'event'
+            fields[class_] = TableMultiField(
+                Entity.get_by_class(class_, True, self.aliases),
+                validators=[InputRequired()])
+        choices = [('P11', g.properties['P11'].name)]
+        if event_class_name in [
+            'acquisition', 'activity', 'modification', 'production']:
+            choices.append(('P14', g.properties['P14'].name))
+            if event_class_name == 'acquisition':
+                choices.append(('P22', g.properties['P22'].name))
+                choices.append(('P23', g.properties['P23'].name))
+        fields['activity'] = SelectField(_('activity'), choices=choices)
+        return fields
+
+    def populate_update(self) -> None:
+        self.form.activity.data = self.link_.property.code
+
+    def process_form(self) -> None:
+        super().process_form()
+        if self.origin.class_.view == 'event':
+            actors = Entity.get_by_ids(ast.literal_eval(self.form.actor.data))
+            for actor in actors:
+                link_type = self.get_link_type()
+                self.add_link(
+                    self.form.activity.data,
+                    actor,
+                    self.form.description.data,
+                    type_id=link_type.id if link_type else None)
+        else:
+            events = Entity.get_by_ids(ast.literal_eval(self.form.event.data))
+            for event in events:
+                link_type = self.get_link_type()
+                self.add_link(
+                    self.form.activity.data,
+                    event,
+                    self.form.description.data,
+                    inverse=True,
+                    type_id=link_type.id if link_type else None)
+
+    def process_link_form(self) -> None:
+        super().process_link_form()
+        type_id = getattr(
+            self.form,
+            str(g.classes['involvement'].standard_type_id)).data
+        self.link_.type = g.types[int(type_id)] if type_id else None
+        self.link_.property = g.properties[self.form.activity.data]
+
+
+class PlaceManager(PlaceBaseManager):
+    fields = ['name', 'alias', 'date', 'description', 'continue', 'map']
+
+    def add_buttons(self) -> None:
+        if not self.entity:
+            setattr(
+                self.form_class,
+                'insert_continue_sub',
+                SubmitField(_('insert and add') + ' ' + _('feature')))
+
+    def populate_insert(self) -> None:
+        self.form.alias.append_entry('')
+
+
+class ReferenceSystemManager(BaseManager):
+    fields = ['name', 'description']
+
+    def add_name_fields(self) -> None:
+        if self.entity and self.entity.system:
+            setattr(
+                self.form_class,
+                'name',
+                StringField(
+                    _('name'),
+                    render_kw={'autofocus': True, 'readonly': True}))
+
+    def additional_fields(self) -> dict[str, Any]:
+        choices = []
+        for class_ in g.classes.values():
+            if not class_.reference_system_allowed \
+                    or (self.entity and class_.name in self.entity.classes) \
+                    or (
+                    self.entity
+                    and self.entity.name == 'GeoNames'
+                    and class_.name != 'Place'):
+                continue
+            choices.append((class_.name, g.classes[class_.name].label))
+        precision_id = str(g.reference_match_type.id)
+        return {
+            'website_url': StringField(_('website URL'), [Optional(), URL()]),
+            'resolver_url': StringField(
+                _('resolver URL'),
+                [Optional(), URL()]),
+            'placeholder': StringField(_('example ID')),
+            precision_id: TreeField(precision_id),
+            'classes': SelectMultipleField(
+                _('classes'),
+                choices=choices,
+                option_widget=widgets.CheckboxInput(),
+                widget=widgets.ListWidget(prefix_label=False))
+            if choices else None}
+
+    def insert_entity(self) -> None:
+        self.entity = ReferenceSystem.insert_system({
+            'name': self.form.name.data,
+            'description': self.form.description.data,
+            'website_url': self.form.website_url.data,
+            'resolver_url': self.form.resolver_url.data})
+
+    def process_form(self) -> None:
+        super().process_form()
+        self.data['reference_system'] = {
+            'website_url': self.form.website_url.data,
+            'resolver_url': self.form.resolver_url.data,
+            'placeholder': self.form.placeholder.data,
+            'classes': self.form.classes.data if self.form.classes else None}
+
+
+class StratigraphicUnitManager(PlaceBaseManager):
+    fields = ['name', 'date', 'description', 'continue', 'map']
+
+    def add_buttons(self) -> None:
+        if not self.entity:
+            setattr(
+                self.form_class,
+                'insert_continue_sub',
+                SubmitField(_('insert and add') + ' ' + _('artifact')))
+            setattr(
+                self.form_class,
+                'insert_continue_human_remains',
+                SubmitField(_('insert and add') + ' ' + _('human remains')))
+
+    def additional_fields(self) -> dict[str, Any]:
+        selection = None
+        if not self.insert and self.entity:
+            selection = self.entity.get_linked_entity_safe('P46', inverse=True)
+        elif self.origin and self.origin.class_.name == 'feature':
+            selection = self.origin
+        return {
+            'super': TableField(
+                Entity.get_by_class('feature', True),
+                selection,
+                validators=[InputRequired()])}
+
+    def process_form(self) -> None:
+        super().process_form()
+        self.data['links']['delete_inverse'].add('P46')
+        self.add_link(
+            'P46',
+            Entity.get_by_id(int(self.form.super.data)),
+            inverse=True)
+
+
+class TypeManager(TypeBaseManager):
+    def add_description(self) -> None:
+        if self.get_root().category == 'value':
+            del self.form_class.description  # pylint: disable=no-member
+            setattr(self.form_class, 'description', StringField(_('unit')))
+
+    def process_form(self) -> None:
+        super().process_form()
+        self.data['links']['delete'].add('P127')
+        self.add_link('P127', g.types[self.super_id])
+
