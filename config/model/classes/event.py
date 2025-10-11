@@ -10,6 +10,7 @@ class_ = {
             'required': True},
         'dates': {},
         'description': {}},
+    'extra': ['reference_system'],
     'relations': {
         'source': standard_relations['source'],
         'performer': {

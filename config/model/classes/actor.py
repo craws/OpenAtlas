@@ -12,6 +12,7 @@ group = {
         'alias': {},
         'dates': {},
         'description': {}},
+    'extra': ['reference_system'],
     'relations': {
         'residence': {
             'label': _('residence'),

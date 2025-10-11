@@ -7,8 +7,9 @@ type_ = {
     'attributes': {
         'name': {
             'required': True},
-        'description': {},
-        'dates': {}},
+        'dates': {},
+        'description': {}},
+    'extra': ['reference_system'],
     'relations': {
         'super': {
             'label': _('super'),

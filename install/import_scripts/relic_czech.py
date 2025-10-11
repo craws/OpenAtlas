@@ -148,7 +148,7 @@ def import_churches() -> None:
     for row in church_result:
         for key, value in row.items():
             if key in [
-                'begin_from', 'begin_to', 'end_from', 'end_to'] and value:
+                    'begin_from', 'begin_to', 'end_from', 'end_to'] and value:
                 value = value.split('-')
                 value = [int(item) for item in value]
                 value = value + [None] * (3 - len(value))

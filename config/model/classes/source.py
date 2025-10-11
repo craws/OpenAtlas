@@ -10,6 +10,7 @@ source = {
         'description': {
             'label': _('content'),
             'annotated': True}},
+    'extra': ['reference_system'],
     'relations': {
         'text': {
             'label': _('text'),

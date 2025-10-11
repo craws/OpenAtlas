@@ -26,6 +26,7 @@ file: dict[str, Any] = {
         'license_holder': {
             'label': _('license holder')},
         'description': {}},
+    'extra': ['reference_system'],
     'relations': {
         'source': relation('source'),
         'event': relation('event'),

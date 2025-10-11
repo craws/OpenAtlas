@@ -16,10 +16,10 @@ reference_system: dict[str, Any] = {
             'format': 'url'},
         'placeholder': {
             'label': _('example ID')},
-        'precision_default': {
+        'reference_system_precision_default': {
             'label': _('precision default')},
-        'classes': {
-            'label': _('')},
+        'reference_system_classes': {
+            'label': _('classes')},
         'description': {}},
     'display': {
         'buttons': ['insert'],

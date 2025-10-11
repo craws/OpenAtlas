@@ -1,14 +1,17 @@
 from typing import Any, Optional
 
 from flask import g, request
+from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, HiddenField, StringField
+from wtforms import (
+    BooleanField, HiddenField, SelectMultipleField, StringField, widgets)
 
 from openatlas.database.connect import Transaction
+from openatlas.display.util2 import uc_first
 from openatlas.forms.add_fields import (
     add_buttons, add_class_types, add_date_fields, add_description,
     add_name_fields, add_reference_systems, add_relations, get_validators)
-from openatlas.forms.field import DragNDropField
+from openatlas.forms.field import DragNDropField, TreeField
 from openatlas.forms.populate import populate_insert, populate_update
 from openatlas.forms.process import process_dates
 from openatlas.forms.util import convert
@@ -32,7 +35,8 @@ def get_entity_form(
     add_reference_systems(Form, entity.class_)
     for key, value in entity.class_.attributes.items():
         match key:
-            case 'creator' | 'placeholder' | 'license_holder' | 'resolver_url' | 'website_url':
+            case 'creator' | 'placeholder' | 'license_holder' | \
+                 'resolver_url' | 'website_url':
                 setattr(
                     Form,
                     key,
@@ -62,6 +66,24 @@ def get_entity_form(
                     BooleanField(
                         value['label'],
                         validators=get_validators(value)))
+            case 'reference_system_precision_default':
+                setattr(
+                    Form,
+                    str(g.reference_match_type.id),
+                    TreeField(
+                        str(g.reference_match_type.id),
+                        type_id=str(g.reference_match_type.id)))
+            case 'reference_system_classes':
+                if choices := get_reference_system_class_choices(entity):
+                    setattr(
+                        Form,
+                        'classes',
+                        SelectMultipleField(
+                            _('classes'),
+                            choices=choices,  # type: ignore
+                            option_widget=widgets.CheckboxInput(),
+                            widget=widgets.ListWidget(prefix_label=False)))
+
     add_buttons(
         Form,
         entity,
@@ -72,6 +94,20 @@ def get_entity_form(
     elif request.method == 'GET':
         populate_insert(form, entity)
     return form
+
+
+def get_reference_system_class_choices(entity: Entity) -> list[tuple]:
+    choices = []
+    for class_ in g.classes.values():
+        if 'reference_system' in class_.extra \
+                and class_.name not in entity.classes \
+                and not (
+                    entity.name == 'GeoNames'
+                    and class_.name not in g.class_groups['place']['classes']):
+            choices.append((
+                class_.name,
+                uc_first(g.classes[class_.name].label)))
+    return choices
 
 
 def process_form_data(

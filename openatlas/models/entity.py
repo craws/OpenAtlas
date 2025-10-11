@@ -232,19 +232,16 @@ class Entity:
         db.delete_links_by_codes(self.id, codes, inverse)
 
     def save_file_info(self, data: dict[str, Any]) -> None:
-        if 'file' in g.classes[data['openatlas_class_name']].attributes:
-            db.update_file_info({
-                'entity_id': self.id,
-                'creator': data.get('creator'),
-                'license_holder': data.get('license_holder'),
-                'public': data.get('public', False)})
+        db.update_file_info({
+            'entity_id': self.id,
+            'creator': data.get('creator'),
+            'license_holder': data.get('license_holder'),
+            'public': data.get('public', False)})
 
     def update(self, data: dict[str, Any]) -> None:
         data['id'] = self.id
         annotation_data = []
-        attributes = g.classes[data['openatlas_class_name']].attributes
-        if 'description' in attributes \
-                and 'annotated' in attributes['description']:
+        if self.class_.attributes.get('description', []).get('annotated'):
             result = AnnotationText.extract_annotations(data['description'])
             data['description'] = result['text']
             annotation_data = result['data']
@@ -255,11 +252,14 @@ class Entity:
         for annotation in annotation_data:
             annotation['source_id'] = self.id
             AnnotationText.insert(annotation)
-        if 'alias' in attributes:
-            self.update_aliases(data['alias'])
-        if 'location' in attributes:
-            self.update_gis(data['gis'])
-        self.save_file_info(data)
+        for attribute in self.class_.attributes:
+            match attribute:
+                case 'alias':
+                    self.update_aliases(data['alias'])
+                case 'location':
+                    self.update_gis(data['gis'])
+                case 'file':
+                    self.save_file_info(data)
 
         # continue_link_id = None
         # if 'administrative_units' in data \
@@ -309,7 +309,7 @@ class Entity:
             if alias in aliases:
                 aliases.remove(alias)
             else:
-                Entity.get_by_id(id_).delete()
+                Entity.get_by_id(int(id_)).delete()
         for alias in aliases:
             if alias.strip():
                 self.link(
@@ -835,14 +835,17 @@ def insert(data: dict[str, Any]) -> Entity:
     for item in ['name', 'description']:
         data[item] = sanitize(data[item])
     entity = Entity.get_by_id(db.insert(data))
-    if 'alias' in attributes:
-        entity.update_aliases(data['alias'])
+    for attribute in attributes:
+        match attribute:
+            case 'alias':
+                entity.update_aliases(data['alias'])
+            case 'location':
+                entity.update_gis(data['gis'], new=True)
+            case 'file':
+                entity.save_file_info(data)
     for annotation in annotation_data:
         annotation['source_id'] = entity.id
         AnnotationText.insert(annotation)
-    if 'location' in attributes:
-        entity.update_gis(data['gis'], new=True)
-    entity.save_file_info(data)
     return entity
 
 

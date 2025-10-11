@@ -45,6 +45,7 @@ class OpenatlasClass:
         self.attributes = model_['attributes']
         self.relations = model_['relations']
         self.display = model_['display']
+        self.extra = model_['extra']
 
 
 def get_class_count() -> dict[str, int]:
@@ -90,6 +91,7 @@ def get_model(class_name: str) -> dict[str, Any]:
         data['display'].get('additional_information', {})
     for name, item in data['display']['additional_information'].items():
         item['label'] = item.get('label', _(name))
+    data['extra'] = data.get('extra', [])
     data['relations'] = data.get('relations', {})
     for name, relation in data['relations'].items():
         relation['name'] = name

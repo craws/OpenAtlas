@@ -13,6 +13,7 @@ artifact: dict[str, Any] = {
         'dates': {},
         'description': {},
         'location': {}},
+    'extra': ['reference_system'],
     'relations': {
         'actor': {
             'label': _('owned by'),

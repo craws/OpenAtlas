@@ -565,32 +565,6 @@ class ReferenceSystemManager(BaseManager):
                     _('name'),
                     render_kw={'autofocus': True, 'readonly': True}))
 
-    def additional_fields(self) -> dict[str, Any]:
-        choices = []
-        for class_ in g.classes.values():
-            if not class_.reference_system_allowed \
-                    or (self.entity and class_.name in self.entity.classes) \
-                    or (
-                    self.entity
-                    and self.entity.name == 'GeoNames'
-                    and class_.name != 'Place'):
-                continue
-            choices.append((class_.name, g.classes[class_.name].label))
-        precision_id = str(g.reference_match_type.id)
-        return {
-            'website_url': StringField(_('website URL'), [Optional(), URL()]),
-            'resolver_url': StringField(
-                _('resolver URL'),
-                [Optional(), URL()]),
-            'placeholder': StringField(_('example ID')),
-            precision_id: TreeField(precision_id),
-            'classes': SelectMultipleField(
-                _('classes'),
-                choices=choices,
-                option_widget=widgets.CheckboxInput(),
-                widget=widgets.ListWidget(prefix_label=False))
-            if choices else None}
-
     def insert_entity(self) -> None:
         self.entity = ReferenceSystem.insert_system({
             'name': self.form.name.data,
