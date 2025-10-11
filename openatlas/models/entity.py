@@ -318,6 +318,7 @@ class Entity:
                         'name': alias,
                         'openatlas_class_name': 'appellation'}))
 
+    # Todo: Only used for imports. Has to be adapted and maybe move there?
     def update_links(self, data: dict[str, Any], new: bool) -> Optional[int]:
         if not new:
             if 'delete' in data['links'] and data['links']['delete']:
