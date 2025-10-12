@@ -16,8 +16,6 @@ reference_system: dict[str, Any] = {
             'format': 'url'},
         'placeholder': {
             'label': _('example ID')},
-        'reference_system_precision_default': {
-            'label': _('precision default')},
         'reference_system_classes': {
             'label': _('classes')},
         'description': {}},

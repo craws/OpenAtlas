@@ -66,18 +66,11 @@ def get_entity_form(
                     BooleanField(
                         value['label'],
                         validators=get_validators(value)))
-            case 'reference_system_precision_default':
-                setattr(
-                    Form,
-                    str(g.reference_match_type.id),
-                    TreeField(
-                        str(g.reference_match_type.id),
-                        type_id=str(g.reference_match_type.id)))
             case 'reference_system_classes':
                 if choices := get_reference_system_class_choices(entity):
                     setattr(
                         Form,
-                        'classes',
+                        'reference_system_classes',
                         SelectMultipleField(
                             _('classes'),
                             choices=choices,  # type: ignore

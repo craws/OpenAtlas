@@ -16,4 +16,7 @@ DELETE FROM model.openatlas_class WHERE name IN ('actor_function', 'actor_relati
 -- Delete removed table icon option
 DELETE FROM web.user_settings WHERE value = 'table_show_icons';
 
+-- Add missing type relation for External reference match
+INSERT INTO web.hierarchy_openatlas_class (hierarchy_id, openatlas_class_name) VALUES ((SELECT id FROM web.hierarchy WHERE name='External reference match'), 'reference_system');
+
 END;

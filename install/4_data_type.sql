@@ -388,6 +388,7 @@ INSERT INTO web.hierarchy_openatlas_class (hierarchy_id, openatlas_class_name) V
   ((SELECT id FROM web.hierarchy WHERE name='Administrative unit'), 'place'),
   ((SELECT id FROM web.hierarchy WHERE name='Artifact'), 'artifact'),
   ((SELECT id FROM web.hierarchy WHERE name='Bibliography'), 'bibliography'),
+  ((SELECT id FROM web.hierarchy WHERE name='Dimensions'), 'artifact'),
   ((SELECT id FROM web.hierarchy WHERE name='Edition'), 'edition'),
   ((SELECT id FROM web.hierarchy WHERE name='Event'), 'acquisition'),
   ((SELECT id FROM web.hierarchy WHERE name='Event'), 'activity'),
@@ -400,12 +401,11 @@ INSERT INTO web.hierarchy_openatlas_class (hierarchy_id, openatlas_class_name) V
   ((SELECT id FROM web.hierarchy WHERE name='Human remains'), 'human_remains'),
   ((SELECT id FROM web.hierarchy WHERE name='License'), 'file'),
   ((SELECT id FROM web.hierarchy WHERE name='Place'), 'place'),
+  ((SELECT id FROM web.hierarchy WHERE name='External reference match'), 'reference_system'),
+  ((SELECT id FROM web.hierarchy WHERE name='Sex'), 'person'),
   ((SELECT id FROM web.hierarchy WHERE name='Source'), 'source'),
   ((SELECT id FROM web.hierarchy WHERE name='Source translation'), 'source_translation'),
-  ((SELECT id FROM web.hierarchy WHERE name='Stratigraphic unit'), 'stratigraphic_unit'),
-
-  ((SELECT id FROM web.hierarchy WHERE name='Dimensions'), 'artifact'),
-  ((SELECT id FROM web.hierarchy WHERE name='Sex'), 'person');
+  ((SELECT id FROM web.hierarchy WHERE name='Stratigraphic unit'), 'stratigraphic_unit');
 
 -- External Reference Systems
 INSERT INTO model.entity (name, cidoc_class_code, description, openatlas_class_name) VALUES

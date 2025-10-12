@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from flask import g
 
 from openatlas.database import reference_system as db
-from openatlas.display.util2 import sanitize
 from openatlas.models.entity import Entity
 
 
@@ -20,23 +19,8 @@ class ReferenceSystem(Entity):
         self.system = row['system']
         self.classes: list[str] = []
 
-    def update(self, data: dict[str, Any], new: bool = False) -> Optional[int]:
-        self.update_system(data)
-        return super().update(data, new)
-
     def remove_class(self, name: str) -> None:
         db.remove_class(self.id, name)
-
-    def update_system(self, data: dict[str, Any]) -> None:
-        db.update_system({
-            'entity_id': self.id,
-            'name': self.name,
-            'website_url': data['reference_system']['website_url'],
-            'resolver_url': data['reference_system']['resolver_url'],
-            'identifier_example': sanitize(
-                data['reference_system']['placeholder'])})
-        if data['reference_system']['classes']:
-            db.add_classes(self.id, data['reference_system']['classes'])
 
     @staticmethod
     def get_all() -> dict[int, ReferenceSystem]:

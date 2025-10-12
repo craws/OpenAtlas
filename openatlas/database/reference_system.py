@@ -54,17 +54,6 @@ def get_counts() -> dict[str, int]:
     return {row['id']: row['count'] for row in list(g.cursor)}
 
 
-def add_classes(entity_id: int, names: list[str]) -> None:
-    for name in names:
-        g.cursor.execute(
-            """
-            INSERT INTO web.reference_system_openatlas_class (
-                reference_system_id, openatlas_class_name
-            ) VALUES (%(entity_id)s, %(name)s);
-            """,
-            {'entity_id': entity_id, 'name': name})
-
-
 def remove_class(entity_id: int, name: str) -> None:
     g.cursor.execute(
         """
@@ -73,25 +62,6 @@ def remove_class(entity_id: int, name: str) -> None:
             AND openatlas_class_name = %(class_name)s;
         """,
         {'reference_system_id': entity_id, 'class_name': name})
-
-
-def update_system(data: dict[str, Any]) -> None:
-    g.cursor.execute(
-        """
-        UPDATE web.reference_system
-        SET (
-            name,
-            website_url,
-            resolver_url,
-            identifier_example
-        ) = (
-            %(name)s,
-            %(website_url)s,
-            %(resolver_url)s,
-            %(identifier_example)s
-        ) WHERE entity_id = %(entity_id)s;
-        """,
-        data)
 
 
 def insert_system(data: dict[str, Any]) -> None:

@@ -820,3 +820,33 @@ def remove_entity_links(type_id: int, entity_id: int) -> None:
             AND property_code = 'P2';
         """,
         {'entity_id': entity_id, 'type_id': type_id})
+
+
+def update_reference_system(data: dict[str, Any]) -> None:
+    g.cursor.execute(
+        """
+        UPDATE web.reference_system
+        SET (
+            name,
+            website_url,
+            resolver_url,
+            identifier_example
+        ) = (
+            %(name)s,
+            %(website_url)s,
+            %(resolver_url)s,
+            %(identifier_example)s
+        ) WHERE entity_id = %(entity_id)s;
+        """,
+        data)
+
+
+def add_reference_system_classes(entity_id: int, names: list[str]) -> None:
+    for name in names:
+        g.cursor.execute(
+            """
+            INSERT INTO web.reference_system_openatlas_class (
+                reference_system_id, openatlas_class_name
+            ) VALUES (%(entity_id)s, %(name)s);
+            """,
+            {'entity_id': entity_id, 'name': name})

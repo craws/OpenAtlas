@@ -260,6 +260,17 @@ class Entity:
                     self.update_gis(data['gis'])
                 case 'file':
                     self.save_file_info(data)
+                case 'resolver_url':
+                    db.update_reference_system({
+                        'entity_id': self.id,
+                        'name': self.name,
+                        'website_url': data['website_url'],
+                        'resolver_url': data['resolver_url'],
+                        'identifier_example': sanitize(data['placeholder'])})
+                    if data['reference_system_classes']:
+                        db.add_reference_system_classes(
+                            self.id,
+                            data['reference_system_classes'])
 
         # continue_link_id = None
         # if 'administrative_units' in data \
@@ -267,11 +278,6 @@ class Entity:
         #   self.update_administrative_units(data['administrative_units'], new)
         # if 'links' in data:
         #    continue_link_id = self.update_links(data, new)
-        # if 'gis' in data:
-        #   self.update_gis(data['gis'], new)
-        # if self.class_.name == 'file':
-        #    data['file_info']['entity_id'] = self.id
-        #    db.update_file_info(data['file_info'])
         # return continue_link_id
 
     def update_administrative_units(
