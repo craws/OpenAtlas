@@ -46,9 +46,6 @@ def get_validators(item: dict[str, Any]):
 
 
 def add_reference_systems(form: Any, class_: OpenatlasClass) -> None:
-    precisions = [('', '')] + [
-        (str(g.types[id_].id), g.types[id_].name)
-        for id_ in g.reference_match_type.subs]
     reference_systems = list(g.reference_systems.values())
     reference_systems.sort(key=lambda x: x.name.casefold())
     for system in reference_systems:
@@ -61,11 +58,14 @@ def add_reference_systems(form: Any, class_: OpenatlasClass) -> None:
                 system.name,
                 description=system.description,
                 placeholder=system.placeholder,
-                choices=precisions,
+                choices=[('', '')] + [
+                    (str(g.types[id_].id), g.types[id_].name)
+                    for id_ in g.reference_match_type.subs],
                 reference_system_id=system.id,
                 default={
                     'value': '',
-                    'precision': str(system.precision_default_id)}))
+                    'precision': str(next(iter(system.types)).id)
+                    if system.types else None}))
 
 
 def add_description(

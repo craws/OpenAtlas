@@ -5,7 +5,6 @@ from flask import g
 
 from openatlas import app
 from openatlas.models.entity import Entity
-from openatlas.models.reference_system import ReferenceSystem
 
 
 def get_or_create_type(hierarchy: Any, type_name: str) -> Entity:
@@ -26,7 +25,7 @@ def get_type_by_name(type_name: str) -> Optional[Entity]:
     return type_
 
 
-def get_reference_system_by_name(name: str) -> Optional[ReferenceSystem]:
+def get_reference_system_by_name(name: str) -> Optional[Entity]:
     reference_system = None
     name = name.lower().replace('_', ' ')
     for id_ in g.reference_systems:

@@ -1,4 +1,3 @@
-import ast
 from subprocess import call
 from typing import Any
 
@@ -8,47 +7,8 @@ from werkzeug.utils import secure_filename
 from openatlas import app
 from openatlas.display.image_processing import resize_image
 from openatlas.display.util import check_iiif_activation, convert_image_to_iiif
-from openatlas.display.util2 import sanitize
 from openatlas.models.dates import Dates, form_to_datetime64
 from openatlas.models.entity import Entity
-from openatlas.models.reference_system import ReferenceSystem
-
-
-def process_standard_fields(manager: Any) -> None:
-    for key, value in manager.form.data.items():
-        field_type = getattr(manager.form, key).type
-        if field_type in [
-                'TreeField',
-                'TreeMultiField',
-                'TableField',
-                'TableMultiField']:
-            if value:
-                ids = ast.literal_eval(value)
-                value = ids if isinstance(ids, list) else [int(ids)]
-            else:
-                value = []
-        if key == 'name':
-            name = manager.form.data['name']
-            if hasattr(manager.form, 'name_inverse'):
-                name = manager.form.name.data.replace(
-                    '(', '').replace(')', '').strip()
-                if manager.form.name_inverse.data.strip():
-                    inverse = manager.form.name_inverse.data. \
-                        replace('(', ''). \
-                        replace(')', '').strip()
-                    name += f' ({inverse})'
-            if isinstance(manager.entity, ReferenceSystem) \
-                    and manager.entity.system:
-                name = manager.entity.name  # Prevent changing a system name
-            manager.data['attributes']['name'] = name
-        elif field_type == 'ValueTypeField':
-            if value is not None:  # Allow the number zero
-                manager.add_link('P2', g.types[int(key)], value)
-        elif key == 'public':
-            manager.data['file_info'] = {
-                'public': bool(manager.form.public.data),
-                'creator': sanitize(manager.form.creator.data),
-                'license_holder': sanitize(manager.form.license_holder.data)}
 
 
 def process_dates(form: Any) -> dict[str, Any]:

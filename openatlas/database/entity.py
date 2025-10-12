@@ -869,3 +869,64 @@ def add_reference_system_classes(entity_id: int, names: list[str]) -> None:
             ) VALUES (%(entity_id)s, %(name)s);
             """,
             {'entity_id': entity_id, 'name': name})
+
+
+def remove_reference_system_class(entity_id: int, name: str) -> None:
+    g.cursor.execute(
+        """
+        DELETE FROM web.reference_system_openatlas_class
+        WHERE reference_system_id = %(reference_system_id)s
+            AND openatlas_class_name = %(class_name)s;
+        """,
+        {'reference_system_id': entity_id, 'class_name': name})
+
+
+def reference_system_counts() -> dict[str, int]:
+    g.cursor.execute(
+        """
+        SELECT e.id, COUNT(l.id) AS count
+        FROM model.entity e
+        LEFT JOIN model.link l ON e.id = l.domain_id
+            AND l.property_code = 'P67'
+        GROUP BY e.id;
+        """)
+    return {row['id']: row['count'] for row in list(g.cursor)}
+
+
+def get_reference_systems() -> list[dict[str, Any]]:
+    g.cursor.execute(
+        """
+        SELECT
+            e.id,
+            e.name,
+            e.cidoc_class_code,
+            e.description,
+            e.openatlas_class_name,
+            e.created,
+            e.modified,
+            rs.website_url,
+            rs.resolver_url,
+            rs.identifier_example,
+            rs.system,
+            array_to_json(
+                array_agg((t.range_id, t.description))
+                    FILTER (WHERE t.range_id IS NOT NULL)
+            ) AS types
+        FROM model.entity e
+        JOIN web.reference_system rs ON e.id = rs.entity_id
+        LEFT JOIN model.link t ON e.id = t.domain_id AND t.property_code = 'P2'
+        GROUP BY
+            e.id,
+            e.name,
+            e.cidoc_class_code,
+            e.description,
+            e.openatlas_class_name,
+            e.created,
+            e.modified,
+            rs.website_url,
+            rs.resolver_url,
+            rs.identifier_example,
+            rs.system,
+            rs.entity_id;
+        """)
+    return list(g.cursor)

@@ -44,7 +44,9 @@ class_groups = {
         'name': 'reference_system',
         'label': _('reference system'),
         'classes': ['reference_system'],
-        'table_columns': ['name', 'class', 'type', 'description']},
+        'table_columns': [
+            'name', 'count', 'website_url', 'resolver_url', 'placeholder',
+            'default_precision', 'description']},
     'source': {
         'name': 'source',
         'label': _('source'),

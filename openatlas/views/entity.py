@@ -11,15 +11,15 @@ from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.display.display import Display
+from openatlas.display.table import entity_table
 from openatlas.display.util import (
     button, check_iiif_file_exist, get_file_path, get_iiif_file_path,
     hierarchy_crumbs, link, required_group)
-from openatlas.display.util2 import is_authorized, uc_first
+from openatlas.display.util2 import is_authorized, manual, uc_first
 from openatlas.forms.entity_form import get_entity_form, process_form_data
 from openatlas.forms.process import process_files
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
-from openatlas.models.reference_system import ReferenceSystem
 
 
 @app.route('/entity/<int:id_>')
@@ -48,15 +48,15 @@ def view(id_: int) -> str | Response:
 
 
 @app.route(
-    '/reference_system/remove_class/<int:system_id>/<class_name>',
+    '/reference_system/remove_class/<int:system_id>/<name>',
     methods=['GET', 'POST'])
 @required_group('manager')
-def reference_system_remove_class(system_id: int, class_name: str) -> Response:
+def reference_system_remove_class(system_id: int, name: str) -> Response:
     for link_ in g.reference_systems[system_id].get_links('P67'):
-        if link_.range.class_.name == class_name:
+        if link_.range.class_.name == name:
             abort(403)  # Abort because there are linked entities
     try:
-        g.reference_systems[system_id].remove_class(class_name)
+        g.reference_systems[system_id].remove_reference_system_class(name)
         flash(_('info update'), 'info')
     except Exception as e:  # pragma: no cover
         g.logger.log('error', 'database', 'remove class failed', e)
@@ -302,3 +302,33 @@ def was_modified_template(entity: Entity, form: Any) -> str | None:
         button(_('reload'), url_for('update', id_=entity.id)),
         'error')
     return render_template('entity/update.html', form=form, entity=entity)
+
+
+@app.route('/index/<group>')
+@required_group('readonly')
+def index(group: str) -> str | Response:
+    classes = ['place'] if group == 'place' else \
+        g.class_groups[group].get('classes', [group])
+    if group == 'reference_system':
+        entities = list(g.reference_systems.values())
+        counts = Entity.reference_system_counts()
+        for entity in entities:
+            entity.count = counts[entity.id]
+    else:
+        entities = Entity.get_by_class(classes, types=True, aliases=True)
+    buttons = [manual(f'entity/{group}')]
+    for class_ in classes:
+        if is_authorized(g.classes[class_].write_access):
+            buttons.append(
+                button(
+                    g.classes[class_].label,
+                    url_for('insert', class_=class_),
+                    tooltip_text=g.classes[class_].display['tooltip']))
+    return render_template(
+        'entity/index.html',
+        class_=group,
+        table=entity_table(entities),
+        buttons=buttons,
+        gis_data=Gis.get_all() if group == 'place' else None,
+        title=_(group.replace('_', ' ')),
+        crumbs=[_(group).replace('_', ' ')])

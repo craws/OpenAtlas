@@ -3,11 +3,14 @@ from __future__ import annotations
 from typing import Any, Optional
 
 from flask import g, json, render_template, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
 
+from openatlas import app
+from openatlas.display.image_processing import check_processed_image
 from openatlas.display.util import (
-    edit_link, link, profile_image_table_link, remove_link)
+    check_iiif_file_exist, edit_link, get_file_path, link,
+    profile_image_table_link, remove_link)
 from openatlas.display.util2 import sanitize, uc_first
 from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity, Link
@@ -45,7 +48,8 @@ class Table:
             'stateSave': 'true',
             'columns': [{
                 'title':
-                    uc_first(_(name)) if name and name not in no_title else '',
+                    uc_first(_(name.replace('_', ' ')))
+                    if name and name not in no_title else '',
                 'className':
                     'dt-body-right' if name in ['count', 'size'] else ''}
                            for name in self.columns] + [
@@ -73,13 +77,10 @@ def entity_table(
         relation: Optional[dict[Any, str]] = None,
         table_id: Optional[str] = None,
         forms: Optional[dict[str, Any]] = None) -> Table | None:
-    from openatlas.views.entity_index import file_preview
-
     if not items:
         return Table()
 
     inverse = relation and relation['inverse']
-
     item = items[0]
     if isinstance(item, Link):
         if inverse:
@@ -152,6 +153,10 @@ def entity_table(
                     html = e.description
                     if relation and name in relation['additional_fields']:
                         html = item.description
+                case 'count':
+                    html = format_number(e.count)
+                case 'default_precision':
+                    html = link(next(iter(e.types), None))
                 case 'end':
                     html = item.dates.last
                 case 'extension':
@@ -188,6 +193,8 @@ def entity_table(
                     html = format_name_and_aliases(e, table_id, forms)
                 case 'page':
                     html = item.description
+                case 'placeholder':
+                    html = e.placeholder
                 case 'profile' if e and e.image_id:
                     html = 'Profile' if e.id == origin.image_id else link(
                         'profile',
@@ -226,7 +233,10 @@ def entity_table(
                             'link_update',
                             id_=item.id,
                             origin_id=origin.id,
-                            relation=relation['name']))
+                            relation=relation['name'])),
+                case 'resolver_url' | 'website_url':
+                    url = getattr(e, name)
+                    html = link(url, url, external=True) if url else ''
             data.append(html)
         table.rows.append(data)
     return table
@@ -254,3 +264,27 @@ def format_name_and_aliases(
     return \
         f'{name}' \
         f'{"".join(f"<p>{alias}</p>" for alias in entity.aliases.values())}'
+
+
+def file_preview(entity_id: int) -> str:
+    size = app.config['IMAGE_SIZE']['table']
+    param = "loading='lazy' alt='image' max-width='100px' max-height='100px'"
+    if g.settings['iiif'] and check_iiif_file_exist(entity_id):
+        ext = '.tiff' if g.settings['iiif_conversion'] \
+            else g.files[entity_id].suffix
+        url =\
+            f"{g.settings['iiif_url']}{entity_id}{ext}" \
+            f"/full/!100,100/0/default.jpg"
+        return f"<img src='{url}' {param}>"
+    if icon := get_file_path(entity_id, app.config['IMAGE_SIZE']['table']):
+        url = url_for('display_file', filename=icon.name, size=size)
+        return f"<img src='{url}' {param}>"
+    if g.settings['image_processing']:
+        path = get_file_path(entity_id)
+        if path and check_processed_image(path.name):
+            if icon := get_file_path(
+                    entity_id,
+                    app.config['IMAGE_SIZE']['table']):
+                url = url_for('display_file', filename=icon.name, size=size)
+                return f"<img src='{url}' {param}>"
+    return ''

@@ -40,7 +40,6 @@ def html_form(
                 and not reference_systems_fields_errors:
             if not reference_systems_added:
                 reference_systems_added = True
-                field.label.text = _('reference system')
                 html += add_row(
                     label=_('reference system'),
                     value=\

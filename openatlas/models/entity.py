@@ -52,6 +52,7 @@ class Entity:
         self.subs: list[int] = []
         self.classes: list[str] = []
         self.dates = Dates(data)
+
         for name, value in data.items():
             if not value and value != 0:
                 continue
@@ -73,7 +74,6 @@ class Entity:
                             key=lambda item_: item_[1]))
                 case _:
                     setattr(self, name, value)
-
         if self.class_.name == 'file':
             self.public = False
             self.creator = None
@@ -82,6 +82,12 @@ class Entity:
                 self.public = g.file_info[self.id]['public']
                 self.creator = g.file_info[self.id]['creator']
                 self.license_holder = g.file_info[self.id]['license_holder']
+        if self.class_.name == 'reference_system' and 'website_url' in data:
+            self.website_url = data['website_url']
+            self.resolver_url = data['resolver_url']
+            self.placeholder = data['identifier_example']
+            self.system = data['system']
+            self.classes: list[str] = []
 
     def get_linked_entity(
             self,
@@ -598,11 +604,11 @@ class Entity:
 
     @staticmethod
     def get_latest(limit: int) -> list[Entity]:
-        view_classes = []
+        classes = []
         for class_ in g.classes.values():
-            if class_.group:
-                view_classes.append(class_.name)
-        return [Entity(r) for r in db.get_latest(view_classes, limit)]
+            if class_.group and class_.name != 'reference_system':
+                classes.append(class_.name)
+        return [Entity(r) for r in db.get_latest(classes, limit)]
 
     @staticmethod
     def set_profile_image(id_: int, origin_id: int) -> None:
@@ -826,6 +832,23 @@ class Entity:
             and node.category not in ['system', 'tools']
             and node.count < 1
             and not node.subs]
+
+    @staticmethod
+    def reference_system_counts() -> dict[str, int]:
+        return db.reference_system_counts()
+
+    @staticmethod
+    def get_reference_systems() -> dict[int, Entity]:
+        systems = {}
+        for row in db.get_reference_systems():
+            system = Entity(row)
+            for class_ in g.classes.values():
+                if system.id in class_.reference_systems:
+                    system.classes.append(class_.name)
+            systems[system.id] = system
+            if system.system:
+                setattr(g, system.name.lower(), system)
+        return systems
 
 
 def insert(data: dict[str, Any]) -> Entity:

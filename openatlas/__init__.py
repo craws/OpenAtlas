@@ -32,9 +32,9 @@ jwt = JWTManager(app)
 from openatlas.models.logger import Logger
 from openatlas.api import api
 from openatlas.views import (
-    admin, ajax, annotation, arche, changelog, entity, entity_index, error,
-    export, file, hierarchy, index, imports, link, login, model, note, overlay,
-    profile, search, token, tools, type as type_, user, vocabs)
+    admin, ajax, annotation, arche, changelog, entity, error, export, file,
+    hierarchy, index, imports, link, login, model, note, overlay, profile,
+    search, token, tools, type as type_, user, vocabs)
 
 
 @babel.localeselector
@@ -54,7 +54,6 @@ def before_request() -> Response | None:
     from openatlas.models.cidoc_class import CidocClass
     from openatlas.models.entity import Entity
     from openatlas.models.settings import Settings
-    from openatlas.models.reference_system import ReferenceSystem
 
     if request.path.startswith('/static'):
         return None  # Avoid overheads if not using Apache with static alias
@@ -86,7 +85,7 @@ def before_request() -> Response | None:
     g.radiocarbon_type = Entity.get_hierarchy('Radiocarbon')
     g.sex_type = Entity.get_hierarchy('Features for sexing')
     g.reference_match_type = Entity.get_hierarchy('External reference match')
-    g.reference_systems = ReferenceSystem.get_all()
+    g.reference_systems = Entity.get_reference_systems()
     g.class_groups = class_groups
     g.writable_paths = [
         app.config['EXPORT_PATH'],

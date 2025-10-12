@@ -14,16 +14,36 @@ from wtforms.validators import InputRequired, Optional, URL
 
 from openatlas.forms.field import (
     SubmitField, TableField, TableMultiField, TreeField)
-from openatlas.forms.process import process_standard_fields
 from openatlas.forms.util import convert
 from openatlas.forms.validation import hierarchy_name_exists, validate
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 from openatlas.models.overlay import Overlay
-from openatlas.models.reference_system import ReferenceSystem
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.openatlas_class import OpenatlasClass
+
+
+def process_standard_fields(manager: Any) -> None:
+    for key, value in manager.form.data.items():
+        field_type = getattr(manager.form, key).type
+        if key == 'name':
+            name = manager.form.data['name']
+            if hasattr(manager.form, 'name_inverse'):
+                name = manager.form.name.data.replace(
+                    '(', '').replace(')', '').strip()
+                if manager.form.name_inverse.data.strip():
+                    inverse = manager.form.name_inverse.data. \
+                        replace('(', ''). \
+                        replace(')', '').strip()
+                    name += f' ({inverse})'
+            # if isinstance(manager.entity, ReferenceSystem) \
+            #        and manager.entity.system:
+            #    name = manager.entity.name  # Prevent changing a system name
+            manager.data['attributes']['name'] = name
+        elif field_type == 'ValueTypeField':
+            if value is not None:  # Allow the number zero
+                manager.add_link('P2', g.types[int(key)], value)
 
 
 class BaseManager:
@@ -551,34 +571,6 @@ class PlaceManager(PlaceBaseManager):
 
     def populate_insert(self) -> None:
         self.form.alias.append_entry('')
-
-
-class ReferenceSystemManager(BaseManager):
-    fields = ['name', 'description']
-
-    def add_name_fields(self) -> None:
-        if self.entity and self.entity.system:
-            setattr(
-                self.form_class,
-                'name',
-                StringField(
-                    _('name'),
-                    render_kw={'autofocus': True, 'readonly': True}))
-
-    def insert_entity(self) -> None:
-        self.entity = ReferenceSystem.insert_system({
-            'name': self.form.name.data,
-            'description': self.form.description.data,
-            'website_url': self.form.website_url.data,
-            'resolver_url': self.form.resolver_url.data})
-
-    def process_form(self) -> None:
-        super().process_form()
-        self.data['reference_system'] = {
-            'website_url': self.form.website_url.data,
-            'resolver_url': self.form.resolver_url.data,
-            'placeholder': self.form.placeholder.data,
-            'classes': self.form.classes.data if self.form.classes else None}
 
 
 class StratigraphicUnitManager(PlaceBaseManager):

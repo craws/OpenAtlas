@@ -6,7 +6,6 @@ from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.display.util import check_iiif_activation, check_iiif_file_exist
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
-from openatlas.models.reference_system import ReferenceSystem
 
 
 def get_license_name(entity: Entity) -> Optional[str]:
@@ -27,7 +26,6 @@ def get_license_type(entity: Entity) -> Optional[Entity]:
     return license_
 
 
-
 def get_license_url(entity: Entity) -> Optional[str]:
     url = ''
     for type_ in entity.types:
@@ -38,14 +36,16 @@ def get_license_url(entity: Entity) -> Optional[str]:
             break
     return url
 
+
 def get_license_ids_with_links() -> dict[int, str]:
-    type_ids = Type.get_hierarchy('License').get_sub_ids_recursive()
+    type_ids = Entity.get_hierarchy('License').get_sub_ids_recursive()
     license_links = Entity.get_links_of_entities(type_ids, 'P67', inverse=True)
     url_dict = {}
     for link_ in license_links:
         if link_.domain.class_.name == "external_reference":
             url_dict[link_.range.id] = link_.domain.name
     return url_dict
+
 
 def to_camel_case(i: str) -> str:
     return (i[0] + i.title().translate(" ")[1:] if i else i).replace(" ", "")
@@ -129,7 +129,7 @@ def remove_spaces_dashes(string: str) -> str:
 def get_reference_systems(links_inverse: list[Link]) -> list[dict[str, Any]]:
     ref = []
     for link_ in links_inverse:
-        if isinstance(link_.domain, ReferenceSystem) and link_.type:
+        if isinstance(link_.domain, Entity) and link_.type:
             system = g.reference_systems[link_.domain.id]
             ref.append({
                 'referenceURL': system.website_url,

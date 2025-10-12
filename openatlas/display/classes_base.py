@@ -12,7 +12,6 @@ from openatlas.display.table import Table
 from openatlas.display.util import button, description, link
 from openatlas.display.util2 import is_authorized
 from openatlas.models.entity import Entity, Link
-from openatlas.models.reference_system import ReferenceSystem
 from openatlas.views.tools import carbon_result, sex_result
 
 
@@ -244,26 +243,6 @@ class PlaceDisplay(PlaceBaseDisplay):
 
 
 class ReferenceSystemDisplay(BaseDisplay):
-    entity: ReferenceSystem
-
-    def add_button_copy(self) -> None:
-        pass
-
-    # def add_button_delete(self) -> None:
-    #    if not self.entity.classes and not self.entity.system:
-    #        super().add_button_delete()
-
-    def add_data(self) -> None:
-        self.data[_('website URL')] = link(
-            self.entity.website_url,
-            self.entity.website_url,
-            external=True)
-        self.data[_('resolver URL')] = link(
-            self.entity.resolver_url,
-            self.entity.resolver_url,
-            external=True)
-        self.data[_('example ID')] = self.entity.placeholder
-
     def add_tabs(self) -> None:
         for name in self.entity.classes:
             self.tabs[name] = Tab(
