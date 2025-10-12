@@ -3,7 +3,6 @@ from __future__ import annotations
 from collections import OrderedDict
 from typing import Any, Optional
 
-from attr import attributes
 from flask import g
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
@@ -42,6 +41,7 @@ def get_validators(item: dict[str, Any]):
         validators.append(InputRequired())
     if item.get('format') == 'url':
         validators.append(URL())
+        validators.append(OptionalValidator())
     return validators
 
 

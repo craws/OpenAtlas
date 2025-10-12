@@ -38,16 +38,3 @@ class ReferenceSystem(Entity):
     @staticmethod
     def get_counts() -> dict[str, int]:
         return db.get_counts()
-
-    @staticmethod
-    def insert_system(data: dict[str, str]) -> ReferenceSystem:
-        entity = Entity.insert(
-            'reference_system',
-            data['name'],
-            data['description'])
-        db.insert_system({
-            'entity_id': entity.id,
-            'name': entity.name,
-            'website_url': data['website_url'] or None,
-            'resolver_url': data['resolver_url'] or None})
-        return ReferenceSystem.get_all()[entity.id]

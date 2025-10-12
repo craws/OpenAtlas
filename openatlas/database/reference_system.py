@@ -62,20 +62,3 @@ def remove_class(entity_id: int, name: str) -> None:
             AND openatlas_class_name = %(class_name)s;
         """,
         {'reference_system_id': entity_id, 'class_name': name})
-
-
-def insert_system(data: dict[str, Any]) -> None:
-    g.cursor.execute(
-        """
-        INSERT INTO web.reference_system (
-            entity_id,
-            name,
-            website_url,
-            resolver_url)
-        VALUES (
-            %(entity_id)s,
-            %(name)s,
-            %(website_url)s,
-            %(resolver_url)s);
-        """,
-        data)

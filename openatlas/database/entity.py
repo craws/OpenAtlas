@@ -822,6 +822,25 @@ def remove_entity_links(type_id: int, entity_id: int) -> None:
         {'entity_id': entity_id, 'type_id': type_id})
 
 
+def insert_reference_system(data: dict[str, Any]) -> None:
+    g.cursor.execute(
+        """
+        INSERT INTO web.reference_system (
+            entity_id,
+            name,
+            website_url,
+            resolver_url,
+            identifier_example)
+        VALUES (
+            %(entity_id)s,
+            %(name)s,
+            %(website_url)s,
+            %(resolver_url)s,
+            %(identifier_example)s);
+        """,
+        data)
+
+
 def update_reference_system(data: dict[str, Any]) -> None:
     g.cursor.execute(
         """

@@ -32,6 +32,7 @@ class Entity:
     required = False
     directional = False
     selectable = True
+    system = False
 
     def __init__(self, data: dict[str, Any]) -> None:
         self.class_ = g.classes[data['openatlas_class_name']]
@@ -850,6 +851,17 @@ def insert(data: dict[str, Any]) -> Entity:
                 entity.update_gis(data['gis'], new=True)
             case 'file':
                 entity.save_file_info(data)
+            case 'resolver_url':
+                db.insert_reference_system({
+                    'entity_id': entity.id,
+                    'name': entity.name,
+                    'website_url': data['website_url'],
+                    'resolver_url': data['resolver_url'],
+                    'identifier_example': sanitize(data['placeholder'])})
+                if data['reference_system_classes']:
+                    db.add_reference_system_classes(
+                        entity.id,
+                        data['reference_system_classes'])
     for annotation in annotation_data:
         annotation['source_id'] = entity.id
         AnnotationText.insert(annotation)
