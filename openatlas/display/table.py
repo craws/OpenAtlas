@@ -111,7 +111,7 @@ def entity_table(
             origin.class_,
             relation,
             item_class)
-        if reverse_relation and not reverse_relation.get("required", True):
+        if not reverse_relation or not reverse_relation.get("required", True):
             columns.append("remove")
 
     table = Table(columns, order=order, defs=defs)
