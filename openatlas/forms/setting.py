@@ -105,8 +105,8 @@ class MapForm(FlaskForm):
 
 
 class FrontendForm(FlaskForm):
-    frontend_website_url = StringField(_('website URL'), [Optional(), URL()])
-    frontend_resolver_url = StringField(_('resolver URL'), [Optional(), URL()])
+    frontend_website_url = StringField(_('website url'), [Optional(), URL()])
+    frontend_resolver_url = StringField(_('resolver url'), [Optional(), URL()])
     save = SubmitField(_('save'))
 
 

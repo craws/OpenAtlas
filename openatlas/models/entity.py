@@ -85,7 +85,7 @@ class Entity:
         if self.class_.name == 'reference_system' and 'website_url' in data:
             self.website_url = data['website_url']
             self.resolver_url = data['resolver_url']
-            self.placeholder = data['identifier_example']
+            self.example_id = data['identifier_example']
             self.system = data['system']
             self.classes: list[str] = []
 
@@ -273,7 +273,7 @@ class Entity:
                         'name': self.name,
                         'website_url': data['website_url'],
                         'resolver_url': data['resolver_url'],
-                        'identifier_example': sanitize(data['placeholder'])})
+                        'identifier_example': sanitize(data['example_id'])})
                     if data['reference_system_classes']:
                         db.add_reference_system_classes(
                             self.id,
@@ -880,7 +880,7 @@ def insert(data: dict[str, Any]) -> Entity:
                     'name': entity.name,
                     'website_url': data['website_url'],
                     'resolver_url': data['resolver_url'],
-                    'identifier_example': sanitize(data['placeholder'])})
+                    'identifier_example': sanitize(data['example_id'])})
                 if data['reference_system_classes']:
                     db.add_reference_system_classes(
                         entity.id,

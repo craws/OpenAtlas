@@ -292,7 +292,7 @@ class Display:
         self.data.update(self.get_type_data())
         for name, attribute in self.entity.class_.attributes.items():
             if name in [
-                    'creator', 'license_holder', 'placeholder', 'public',
+                    'creator', 'example_id', 'license_holder', 'public',
                     'resolver_url', 'website_url']:
                 if value := getattr(self.entity, name):
                     if isinstance(value, bool):

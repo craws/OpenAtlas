@@ -25,19 +25,35 @@ from openatlas.models.gis import Gis, InvalidGeomException
 @app.route('/entity/<int:id_>')
 @required_group('readonly')
 def view(id_: int) -> str | Response:
-    if id_ in g.types:  # Types have their own view
-        entity = g.types[id_]
-        if not entity.root:
+    entity = Entity.get_by_id(id_, types=True, aliases=True)
+    if not entity.class_.group:
+        flash(_("This entity can't be viewed directly."), 'error')
+        abort(400)
+    match entity.class_.group.get('name'):
+        case 'type' if not entity.root:  # Types have their own view
             return redirect(
                 f"{url_for('type_index')}"
                 f"#menu-tab-{entity.category}_collapse-{id_}")
-    elif id_ in g.reference_systems:
-        entity = g.reference_systems[id_]
-    else:
-        entity = Entity.get_by_id(id_, types=True, aliases=True)
-        if not entity.class_.group['name']:
-            flash(_("This entity can't be viewed directly."), 'error')
-            abort(400)
+        case 'reference_system':
+            entity.class_.relations = {}
+            for name in entity.classes:
+                entity.class_.relations[name] = {
+                    'name': name,
+                    'label': _(name),
+                    'classes': [name],
+                    'property': 'P67',
+                    'mode': 'tab',
+                    'inverse': False,
+                    'additional_fields': [],
+                    'multiple': True,
+                    'tab': {
+                        'buttons': [],
+                        'tooltip': None,
+                        'columns': [
+                            'name',
+                            'external_reference_match',
+                            'precision'],
+                        'additional_columns': None}}
     display = Display(entity)
     return render_template(
         'tabs.html',

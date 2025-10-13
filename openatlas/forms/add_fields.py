@@ -57,7 +57,7 @@ def add_reference_systems(form: Any, class_: OpenatlasClass) -> None:
             ReferenceField(
                 system.name,
                 description=system.description,
-                placeholder=system.placeholder,
+                placeholder=system.example_id,
                 choices=[('', '')] + [
                     (str(g.types[id_].id), g.types[id_].name)
                     for id_ in g.reference_match_type.subs],

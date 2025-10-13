@@ -45,7 +45,7 @@ class_groups = {
         'label': _('reference system'),
         'classes': ['reference_system'],
         'table_columns': [
-            'name', 'count', 'website_url', 'resolver_url', 'placeholder',
+            'name', 'count', 'website_url', 'resolver_url', 'example_id',
             'default_precision', 'description']},
     'source': {
         'name': 'source',
