@@ -413,19 +413,6 @@ class ArtifactManager(ArtifactBaseManager):
             self.add_link('P46', self.form.super.data, inverse=True)
 
 
-class ExternalReferenceManager(BaseManager):
-    fields = ['url', 'description', 'continue']
-
-    def add_name_fields(self) -> None:
-        setattr(
-            self.form_class,
-            'name',
-            StringField(
-                _('URL'),
-                [InputRequired(), URL()],
-                render_kw={'autofocus': True}))
-
-
 class FeatureManager(PlaceBaseManager):
     fields = ['name', 'date', 'description', 'continue', 'map']
 

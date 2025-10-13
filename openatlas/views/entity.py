@@ -47,7 +47,7 @@ def view(id_: int) -> str | Response:
                     'additional_fields': [],
                     'multiple': True,
                     'tab': {
-                        'buttons': [],
+                        'buttons': ['remove_reference_system_class'],
                         'tooltip': None,
                         'columns': [
                             'name',
@@ -63,16 +63,14 @@ def view(id_: int) -> str | Response:
         crumbs=hierarchy_crumbs(entity) + [entity.name])
 
 
-@app.route(
-    '/reference_system/remove_class/<int:system_id>/<name>',
-    methods=['GET', 'POST'])
+@app.route('/reference_system/remove_class/<int:system_id>/<name>')
 @required_group('manager')
 def reference_system_remove_class(system_id: int, name: str) -> Response:
-    for link_ in g.reference_systems[system_id].get_links('P67'):
-        if link_.range.class_.name == name:
-            abort(403)  # Abort because there are linked entities
+    system = g.reference_systems[system_id]
+    if system.get_links('P67', [name]):
+        abort(403)  # Abort because there are linked entities
     try:
-        g.reference_systems[system_id].remove_reference_system_class(name)
+        system.remove_reference_system_class(name)
         flash(_('info update'), 'info')
     except Exception as e:  # pragma: no cover
         g.logger.log('error', 'database', 'remove class failed', e)
@@ -94,8 +92,6 @@ def insert(
     origin = Entity.get_by_id(origin_id) if origin_id else None
     form = get_entity_form(entity, origin, relation)
     if form.validate_on_submit():
-        # if class_ == 'file':
-        #    return redirect(insert_files(manager))
         return redirect(save(entity, form, origin, relation))
     gis_data = None
     if entity.class_.attributes.get('location') and not origin:

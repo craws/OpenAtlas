@@ -459,6 +459,9 @@ class Entity:
     def remove_class(self, name: str) -> None:
         db.remove_class(self.id, name)
 
+    def remove_reference_system_class(self, name: str) -> None:
+        db.remove_reference_system_class(self.id, name)
+
     def remove_entity_links(self, entity_id: int) -> None:
         db.remove_entity_links(self.id, entity_id)
 
