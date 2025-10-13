@@ -1,21 +1,26 @@
+from subprocess import call
 from typing import Any, Optional
 
 from flask import g, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
+from werkzeug.utils import secure_filename
 from wtforms import (
     BooleanField, HiddenField, SelectMultipleField, StringField, widgets)
 
+from openatlas import app
 from openatlas.database.connect import Transaction
+from openatlas.display.image_processing import resize_image
+from openatlas.display.util import check_iiif_activation, convert_image_to_iiif
 from openatlas.display.util2 import uc_first
 from openatlas.forms.add_fields import (
     add_buttons, add_class_types, add_date_fields, add_description,
     add_name_fields, add_reference_systems, add_relations, get_validators)
-from openatlas.forms.field import DragNDropField, TreeField
+from openatlas.forms.field import DragNDropField
 from openatlas.forms.populate import populate_insert, populate_update
-from openatlas.forms.process import process_dates
 from openatlas.forms.util import convert
 from openatlas.forms.validation import file, validate
+from openatlas.models.dates import Dates, form_to_datetime64
 from openatlas.models.entity import Entity, insert
 from openatlas.models.gis import InvalidGeomException
 from openatlas.models.openatlas_class import get_reverse_relation
@@ -25,6 +30,7 @@ def get_entity_form(
         entity: Entity,
         origin: Optional[Entity] = None,
         relation: Optional[str] = None) -> Any:
+
     class Form(FlaskForm):
         opened = HiddenField()
         validate = validate
@@ -109,7 +115,7 @@ def process_form_data(
         origin: Entity | None,
         relation_name: str | None) -> Entity:
     data = {
-        'name': entity.class_.name,
+        'name': entity.name,
         'openatlas_class_name': entity.class_.name,
         'description': entity.description,
         'begin_from': entity.dates.begin_from,
@@ -126,6 +132,8 @@ def process_form_data(
                 data['gis'] = {
                     shape: getattr(form, f'gis_{shape}s').data
                     for shape in ['point', 'line', 'polygon']}
+            case 'name' if entity.system:
+                pass  # Prevent name change of system entities
             case _ if hasattr(form, attr) and (
                     getattr(form, attr).data or getattr(form, attr).data == 0):
                 value = getattr(form, attr).data
@@ -222,3 +230,87 @@ def delete_links(entity: Entity) -> None:
                 relation['property'],
                 relation['classes'],
                 relation['inverse'])
+
+
+def process_dates(form: Any) -> dict[str, Any]:
+    dates = Dates({})
+    if hasattr(form, 'begin_year_from') and form.begin_year_from.data:
+        dates.begin_comment = form.begin_comment.data
+        dates.begin_from = form_to_datetime64(
+            form.begin_year_from.data,
+            form.begin_month_from.data,
+            form.begin_day_from.data,
+            form.begin_hour_from.data if 'begin_hour_from' in form else None,
+            form.begin_minute_from.data if 'begin_hour_from' in form else None,
+            form.begin_second_from.data if 'begin_hour_from' in form else None)
+        dates.begin_to = form_to_datetime64(
+            form.begin_year_to.data or (
+                form.begin_year_from.data if not
+                form.begin_day_from.data else None),
+            form.begin_month_to.data or (
+                form.begin_month_from.data if not
+                form.begin_day_from.data else None),
+            form.begin_day_to.data,
+            form.begin_hour_to.data if 'begin_hour_from' in form else None,
+            form.begin_minute_to.data if 'begin_hour_from' in form else None,
+            form.begin_second_to.data if 'begin_hour_from' in form else None,
+            to_date=True)
+    if hasattr(form, 'end_year_from') and form.end_year_from.data:
+        dates.end_comment = form.end_comment.data
+        dates.end_from = form_to_datetime64(
+            form.end_year_from.data,
+            form.end_month_from.data,
+            form.end_day_from.data,
+            form.end_hour_from.data if 'end_hour_from' in form else None,
+            form.end_minute_from.data if 'end_hour_from' in form else None,
+            form.end_second_from.data if 'end_hour_from' in form else None)
+        dates.end_to = form_to_datetime64(
+            form.end_year_to.data or
+            (form.end_year_from.data if not form.end_day_from.data else None),
+            form.end_month_to.data or
+            (form.end_month_from.data if not form.end_day_from.data else None),
+            form.end_day_to.data,
+            form.end_hour_to.data if 'end_hour_from' in form else None,
+            form.end_minute_to.data if 'end_hour_from' in form else None,
+            form.end_second_to.data if 'end_hour_from' in form else None,
+            to_date=True)
+    return dates.to_timestamp()
+
+
+def process_files(
+        form: Any,
+        origin: Entity | None,
+        relation_name: str | None) -> Entity:
+    filenames = []
+    entity = None
+    try:
+        entity_name = form.name.data.strip()
+        for count, file in enumerate(form.file.data):
+            if len(form.file.data) > 1:
+                form.name.data = f'{entity_name}_{str(count + 1).zfill(2)}'
+            entity = process_form_data(
+                Entity({'openatlas_class_name': 'file'}),
+                form,
+                origin,
+                relation_name)
+
+            # Add 'a' to prevent emtpy temporary filename, has no side effects
+            filename = secure_filename(f'a{file.filename}')
+            ext = filename.rsplit('.', 1)[1].lower()
+            name = f"{entity.id}.{ext}"
+            path = app.config['UPLOAD_PATH'] / name
+            file.save(str(path))
+
+            if f'.{ext}' in g.display_file_ext:
+                call(f'exiftran -ai {path}', shell=True)  # Fix rotation
+            filenames.append(name)
+            if g.settings['image_processing']:
+                resize_image(name)
+            if g.settings['iiif_conversion'] \
+                    and check_iiif_activation() \
+                    and g.settings['iiif_convert_on_upload']:
+                convert_image_to_iiif(entity.id, path)
+    except Exception as e:
+        g.logger.log('error', 'database', 'file upload failed', e)
+        raise e from None
+    return entity

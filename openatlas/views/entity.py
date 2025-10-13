@@ -16,8 +16,8 @@ from openatlas.display.util import (
     button, check_iiif_file_exist, get_file_path, get_iiif_file_path,
     hierarchy_crumbs, link, required_group)
 from openatlas.display.util2 import is_authorized, manual, uc_first
-from openatlas.forms.entity_form import get_entity_form, process_form_data
-from openatlas.forms.process import process_files
+from openatlas.forms.entity_form import (
+    get_entity_form, process_files, process_form_data)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
 
