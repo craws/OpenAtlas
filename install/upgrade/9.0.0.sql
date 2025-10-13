@@ -19,4 +19,9 @@ DELETE FROM web.user_settings WHERE value = 'table_show_icons';
 -- Add missing type relation for External reference match
 INSERT INTO web.hierarchy_openatlas_class (hierarchy_id, openatlas_class_name) VALUES ((SELECT id FROM web.hierarchy WHERE name='External reference match'), 'reference_system');
 
+
+-- Drop obsolete OpenAtlas class fields
+ALTER TABLE model.openatlas_class DROP COLUMN IF EXISTS alias_allowed;
+ALTER TABLE model.openatlas_class DROP COLUMN IF EXISTS reference_system_allowed;
+
 END;
