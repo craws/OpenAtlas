@@ -313,7 +313,7 @@ class Display:
                                 and not self.entity.standard_type:
                             value += (
                                 ' <span class="error">'
-                                + _('but license is missing')
+                                + _('but license is missing ')
                                 + '</span>')
                     elif attribute.get('format') == 'url':
                         value = link(value, value, external=True)
