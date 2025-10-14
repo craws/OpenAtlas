@@ -143,6 +143,7 @@ def insert_artifacts_and_sources() -> None:
         artifact.link('P53', location)
         artifact.link('P46', places[entry['id_string']], inverse=True)
         artifact.link('P2', case_study)
+        artifact.link('P2', inscription_type_artifact)
         db.import_data(
             PROJECT_ID,
             artifact.id,
@@ -168,7 +169,7 @@ def insert_artifacts_and_sources() -> None:
         if clean_description_text(entry['transcription']):
             transcription = Entity.insert(
                 'source_translation',
-                f'Transcription of {entry["id_string"]}',
+                f'Diplomatic of {entry["id_string"]}',
                 clean_description_text(entry['transcription']))
             transcription.link('P2', original_text_type)
             transcription.link('P73', source, inverse=True)
@@ -180,7 +181,7 @@ def insert_artifacts_and_sources() -> None:
         if clean_description_text(entry['transcription_corrected']):
             transcription_corrected = Entity.insert(
                 'source_translation',
-                f'Corrected transcription of {entry["id_string"]}',
+                f'Edition of {entry["id_string"]}',
                 clean_description_text(entry['transcription_corrected']))
             transcription_corrected.link('P2', original_text_corrected_type)
             transcription_corrected.link('P73', source, inverse=True)
@@ -189,18 +190,19 @@ def insert_artifacts_and_sources() -> None:
                 transcription_corrected.id,
                 CURRENT_USER,
                 None)
-        if clean_description_text(entry['transcription_simplified']):
-            transcription_simplified = Entity.insert(
-                'source_translation',
-                f'Simplified transcription of {entry["id_string"]}',
-                clean_description_text(entry['transcription_simplified']))
-            transcription_simplified.link('P2', original_text_normalized_type)
-            transcription_simplified.link('P73', source, inverse=True)
-            db.import_data(
-                PROJECT_ID,
-                transcription_simplified.id,
-                CURRENT_USER,
-                None)
+        # Not wanted
+        # if clean_description_text(entry['transcription_simplified']):
+        #     transcription_simplified = Entity.insert(
+        #         'source_translation',
+        #         f'Simplified transcription of {entry["id_string"]}',
+        #         clean_description_text(entry['transcription_simplified']))
+        #     transcription_simplified.link('P2', original_text_normalized_type)
+        #     transcription_simplified.link('P73', source, inverse=True)
+        #     db.import_data(
+        #         PROJECT_ID,
+        #         transcription_simplified.id,
+        #         CURRENT_USER,
+        #         None)
         if clean_description_text(entry['translation']):
             translation = Entity.insert(
                 'source_translation',
@@ -228,6 +230,7 @@ with app.test_request_context():
     admin_hierarchy = Entity.get_by_id(794)
     current_location_hierarchy = Entity.get_by_id(786)
     inscription_type = Entity.get_by_id(787)
+    inscription_type_artifact = Entity.get_by_id(7199)
     original_text_type = Entity.get_by_id(96)
     original_text_corrected_type = Entity.get_by_id(788)
     original_text_normalized_type = Entity.get_by_id(789)
