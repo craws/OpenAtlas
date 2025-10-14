@@ -91,8 +91,6 @@ def openatlas_class_index() -> str:
             uc_first(_((class_.group['name'].replace("_", " "))))
             if class_.group['name'] else '',
             class_.write_access,
-            _('allowed') if class_.alias_allowed else '',
-            _('allowed') if class_.reference_system_allowed else '',
             _('allowed') if class_.new_types_allowed else '',
             class_.network_color,
             class_.icon,

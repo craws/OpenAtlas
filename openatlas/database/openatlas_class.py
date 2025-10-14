@@ -22,8 +22,6 @@ def get_classes() -> list[dict[str, Any]]:
             c.name,
             c.cidoc_class_code,
             c.standard_type_id,
-            c.alias_allowed,
-            c.reference_system_allowed,
             c.new_types_allowed,
             c.write_access_group_name,
             c.layout_color,

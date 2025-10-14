@@ -11,7 +11,7 @@ def search(data: dict[str, Any]) -> list[Entity]:
     if not data['term']:
         return []
     for class_ in data['classes']:
-        if g.classes[class_].alias_allowed:
+        if g.classes[class_].attributes.get('alias'):
             data['classes'].append('appellation')
             break
     entities = []

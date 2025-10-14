@@ -534,7 +534,7 @@ class Entity:
         if aliases:  # For performance: check classes if they can have an alias
             aliases = False
             for class_ in classes if isinstance(classes, list) else [classes]:
-                if g.classes[class_].alias_allowed:
+                if g.classes[class_].attributes.get('alias'):
                     aliases = True
                     break
         return [

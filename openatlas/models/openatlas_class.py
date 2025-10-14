@@ -16,8 +16,6 @@ class OpenatlasClass:
             name: str,
             cidoc_class: str | None,
             hierarchies: list[int],
-            alias_allowed: bool,
-            reference_system_allowed: bool,
             reference_system_ids: list[int],
             new_types_allowed: bool,
             standard_type_id: int | None,
@@ -32,8 +30,6 @@ class OpenatlasClass:
         self.standard_type_id = standard_type_id
         self.network_color = color
         self.write_access = write_access or 'contributor'
-        self.alias_allowed = alias_allowed
-        self.reference_system_allowed = reference_system_allowed
         self.reference_systems = reference_system_ids
         self.new_types_allowed = new_types_allowed
         self.icon = icon
@@ -61,8 +57,6 @@ def get_classes() -> dict[str, OpenatlasClass]:
                 model_=get_model(row['name']),
                 cidoc_class=row['cidoc_class_code'],
                 standard_type_id=row['standard_type_id'],
-                alias_allowed=row['alias_allowed'],
-                reference_system_allowed=row['reference_system_allowed'],
                 reference_system_ids=row['system_ids']
                 if row['system_ids'] else [],
                 new_types_allowed=row['new_types_allowed'],
