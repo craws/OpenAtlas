@@ -8,7 +8,6 @@ from flask_login import current_user
 
 from openatlas import app
 from openatlas.display.tab import Tab
-from openatlas.display.table import Table
 from openatlas.display.util import button, description, link
 from openatlas.display.util2 import is_authorized
 from openatlas.models.entity import Entity, Link
@@ -162,17 +161,6 @@ class TypeBaseDisplay(BaseDisplay):
                     url_for('type_move_entities', id_=entity.id)))
 
 
-
-
-class ArtifactDisplay(PlaceBaseDisplay):
-
-    def add_data(self) -> None:
-        self.data[_('source')] = [
-            link(source) for source
-            in self.entity.get_linked_entities('P128', sort=True)]
-        self.data[_('owned by')] = link(self.entity.get_linked_entity('P52'))
-
-
 class FileDisplay(BaseDisplay):
 
     def add_data(self) -> None:
@@ -183,8 +171,6 @@ class FileDisplay(BaseDisplay):
                 self.data[_('public sharing allowed')] = str(_('yes')) + (
                     ' <span class="error">' + _('but license is missing ') +
                     '</span>')
-        self.data[_('creator')] = self.entity.creator
-        self.data[_('license holder')] = self.entity.license_holder
 
     def add_tabs(self) -> None:
         entity = self.entity
@@ -240,33 +226,6 @@ class PlaceDisplay(PlaceBaseDisplay):
                         link(actor),
                         f"{_('participated at an event')}",
                         event.class_.name, '', '', ''])
-
-
-class ReferenceSystemDisplay(BaseDisplay):
-    def add_tabs(self) -> None:
-        for name in self.entity.classes:
-            self.tabs[name] = Tab(
-                name,
-                entity=self.entity,
-                table=Table([_('entity'), 'id', _('precision')]))
-        for link_ in self.entity.get_links('P67'):
-            self.tabs[link_.range.class_.name].table.rows.append([
-                link(link_.range),
-                link(
-                    link_.description,
-                    f'{self.entity.resolver_url}{link_.description}',
-                    external=True)
-                if self.entity.resolver_url else link_.description,
-                link_.type.name])
-        for name in self.entity.classes:
-            self.tabs[name].buttons = []
-            if not self.tabs[name].table.rows and is_authorized('manager'):
-                self.tabs[name].buttons = [button(
-                    _('remove'),
-                    url_for(
-                        'reference_system_remove_class',
-                        system_id=self.entity.id,
-                        class_name=name))]
 
 
 class StratigraphicUnitDisplay(PlaceBaseDisplay):

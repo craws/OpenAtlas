@@ -11,10 +11,9 @@ from openatlas.database.connect import Transaction
 from openatlas.display.util import hierarchy_crumbs, link, required_group
 from openatlas.display.util2 import uc_first
 from openatlas.forms.display import display_form
+from openatlas.forms.entity_form import process_dates
 from openatlas.forms.form import (
     link_detail_form, link_form, link_update_form)
-from openatlas.forms.manager_base import ActorRelationManager
-from openatlas.forms.process import process_dates
 from openatlas.models.entity import Entity, Link
 
 
@@ -132,37 +131,3 @@ def link_update(id_: int, origin_id: int, relation: str) -> str | Response:
             link(origin.name, origin_url),
             target,
             _('edit')])
-
-
-@app.route('/insert/relation/<type_>/<int:origin_id>', methods=['GET', 'POST'])
-@required_group('contributor')
-def insert_relation(type_: str, origin_id: int) -> str | Response:
-    origin = Entity.get_by_id(origin_id)
-    manager = ActorRelationManager()
-    if manager.form.validate_on_submit():
-        Transaction.begin()
-        try:
-            manager.process_form()
-            # manager.update_link()
-            Transaction.commit()
-        except Exception as e:  # pragma: no cover
-            Transaction.rollback()
-            g.logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
-        if hasattr(manager.form, 'continue_') \
-                and manager.form.continue_.data == 'yes':
-            return redirect(
-                url_for('insert_relation', type_=type_, origin_id=origin_id))
-        tabs = {
-            'actor_relation': 'relation',
-            'event': 'event',
-            'involvement':
-                'actor' if origin.class_.group['name'] == 'event' else 'event',
-            'member': 'member',
-            'membership': 'member-of'}
-        return redirect(f"{url_for('view', id_=origin.id)}#tab-{tabs[type_]}")
-    return render_template(
-        'content.html',
-        content=display_form(manager.form),
-        origin=origin,
-        crumbs=[link(origin, index=True), origin, _(type_)])

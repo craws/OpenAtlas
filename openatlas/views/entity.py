@@ -16,8 +16,8 @@ from openatlas.display.util import (
     button, check_iiif_file_exist, get_file_path, get_iiif_file_path,
     hierarchy_crumbs, link, required_group)
 from openatlas.display.util2 import is_authorized, manual, uc_first
-from openatlas.forms.entity_form import get_entity_form, process_form_data
-from openatlas.forms.process import process_files
+from openatlas.forms.entity_form import (
+    get_entity_form, process_files, process_form_data)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
 
@@ -25,19 +25,35 @@ from openatlas.models.gis import Gis, InvalidGeomException
 @app.route('/entity/<int:id_>')
 @required_group('readonly')
 def view(id_: int) -> str | Response:
-    if id_ in g.types:  # Types have their own view
-        entity = g.types[id_]
-        if not entity.root:
+    entity = Entity.get_by_id(id_, types=True, aliases=True)
+    if not entity.class_.group:
+        flash(_("This entity can't be viewed directly."), 'error')
+        abort(400)
+    match entity.class_.group.get('name'):
+        case 'type' if not entity.root:  # Types have their own view
             return redirect(
                 f"{url_for('type_index')}"
                 f"#menu-tab-{entity.category}_collapse-{id_}")
-    elif id_ in g.reference_systems:
-        entity = g.reference_systems[id_]
-    else:
-        entity = Entity.get_by_id(id_, types=True, aliases=True)
-        if not entity.class_.group['name']:
-            flash(_("This entity can't be viewed directly."), 'error')
-            abort(400)
+        case 'reference_system':
+            entity.class_.relations = {}
+            for name in entity.classes:
+                entity.class_.relations[name] = {
+                    'name': name,
+                    'label': _(name),
+                    'classes': [name],
+                    'property': 'P67',
+                    'mode': 'tab',
+                    'inverse': False,
+                    'additional_fields': [],
+                    'multiple': True,
+                    'tab': {
+                        'buttons': ['remove_reference_system_class'],
+                        'tooltip': None,
+                        'columns': [
+                            'name',
+                            'external_reference_match',
+                            'precision'],
+                        'additional_columns': None}}
     display = Display(entity)
     return render_template(
         'tabs.html',
@@ -47,16 +63,14 @@ def view(id_: int) -> str | Response:
         crumbs=hierarchy_crumbs(entity) + [entity.name])
 
 
-@app.route(
-    '/reference_system/remove_class/<int:system_id>/<name>',
-    methods=['GET', 'POST'])
+@app.route('/reference_system/remove_class/<int:system_id>/<name>')
 @required_group('manager')
 def reference_system_remove_class(system_id: int, name: str) -> Response:
-    for link_ in g.reference_systems[system_id].get_links('P67'):
-        if link_.range.class_.name == name:
-            abort(403)  # Abort because there are linked entities
+    system = g.reference_systems[system_id]
+    if system.get_links('P67', [name]):
+        abort(403)  # Abort because there are linked entities
     try:
-        g.reference_systems[system_id].remove_reference_system_class(name)
+        system.remove_reference_system_class(name)
         flash(_('info update'), 'info')
     except Exception as e:  # pragma: no cover
         g.logger.log('error', 'database', 'remove class failed', e)
@@ -78,8 +92,6 @@ def insert(
     origin = Entity.get_by_id(origin_id) if origin_id else None
     form = get_entity_form(entity, origin, relation)
     if form.validate_on_submit():
-        # if class_ == 'file':
-        #    return redirect(insert_files(manager))
         return redirect(save(entity, form, origin, relation))
     gis_data = None
     if entity.class_.attributes.get('location') and not origin:

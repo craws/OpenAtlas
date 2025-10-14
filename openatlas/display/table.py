@@ -159,6 +159,8 @@ def entity_table(
                     html = link(next(iter(e.types), None))
                 case 'end':
                     html = item.dates.last
+                case 'example_id':
+                    html = e.example_id
                 case 'extension':
                     html = e.get_file_ext()
                 case 'first':
@@ -193,8 +195,8 @@ def entity_table(
                     html = format_name_and_aliases(e, table_id, forms)
                 case 'page':
                     html = item.description
-                case 'placeholder':
-                    html = e.placeholder
+                case 'precision':
+                    html = item.type.name
                 case 'profile' if e and e.image_id:
                     html = 'Profile' if e.id == origin.image_id else link(
                         'profile',
@@ -203,6 +205,13 @@ def entity_table(
                     html = ''
                     if g.file_info.get(e.id):
                         html = _('yes') if g.file_info[e.id]['public'] else ''
+                case 'external_reference_match':
+                    html = item.description
+                    if url := origin.resolver_url:
+                        html = link(
+                            item.description,
+                            url + item.description,
+                            external=True)
                 case 'remove':
                     tab_id = e.class_.group['name']
                     if relation and relation['mode'] == 'tab':

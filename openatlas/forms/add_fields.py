@@ -30,7 +30,8 @@ def add_name_fields(form: Any, entity: Entity) -> None:
             StringField(
                 entity.class_.attributes['name']['label'],
                 validators=get_validators(entity.class_.attributes['name']),
-                render_kw={'autofocus': True}))
+                render_kw={
+                    'readonly' if entity.system else 'autofocus': True}))
     if 'alias' in entity.class_.attributes:
         setattr(form, 'alias', FieldList(RemovableListField()))
 
@@ -57,7 +58,7 @@ def add_reference_systems(form: Any, class_: OpenatlasClass) -> None:
             ReferenceField(
                 system.name,
                 description=system.description,
-                placeholder=system.placeholder,
+                placeholder=system.example_id,
                 choices=[('', '')] + [
                     (str(g.types[id_].id), g.types[id_].name)
                     for id_ in g.reference_match_type.subs],

@@ -9,16 +9,17 @@ reference_system: dict[str, Any] = {
         'name': {
             'required': True},
         'website_url': {
-            'label': _('website URL'),
+            'label': _('website url'),
             'format': 'url'},
         'resolver_url': {
-            'label': _('resolver URL'),
+            'label': _('resolver url'),
             'format': 'url'},
-        'placeholder': {
-            'label': _('example ID')},
+        'example_id': {
+            'label': _('example id')},
         'reference_system_classes': {
             'label': _('classes')},
         'description': {}},
+    'relations': {},  # Added dynamically from database
     'display': {
         'buttons': ['insert'],
         'form': {

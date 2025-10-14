@@ -124,28 +124,39 @@ class Display:
                         self.entity.image_id or item.domain.id
             buttons = [link_] if (link_ := manual(f'entity/{name}')) else []
             if is_authorized('contributor'):
-                if 'link' in relation['tab']['buttons']:
-                    buttons.append(
-                        button(
-                            _('link'),
-                            url_for(
-                                'link_insert_detail'
-                                if relation['additional_fields']
-                                else 'link_insert',
-                                origin_id=self.entity.id,
-                                relation_name=name)))
-                if 'insert' in relation['tab']['buttons']:
-                    for class_ in relation['classes']:
-                        buttons.append(
-                            button(
-                                g.classes[class_].label,
-                                url_for(
-                                    'insert',
-                                    class_=class_,
-                                    origin_id=self.entity.id,
-                                    relation=name),
-                                tooltip_text=
-                                g.classes[class_].display['tooltip']))
+                for button_name in relation['tab']['buttons']:
+                    match button_name:
+                        case 'link':
+                            buttons.append(
+                                button(
+                                    _('link'),
+                                    url_for(
+                                        'link_insert_detail'
+                                        if relation['additional_fields']
+                                        else 'link_insert',
+                                        origin_id=self.entity.id,
+                                        relation_name=name)))
+                        case 'insert':
+                            for class_ in relation['classes']:
+                                buttons.append(
+                                    button(
+                                        g.classes[class_].label,
+                                        url_for(
+                                            'insert',
+                                            class_=class_,
+                                            origin_id=self.entity.id,
+                                            relation=name),
+                                        tooltip_text=
+                                        g.classes[class_].display['tooltip']))
+                        case 'remove_reference_system_class' if not items \
+                                and is_authorized('manager'):
+                            buttons.append(
+                                button(
+                                    _('remove'),
+                                    url_for(
+                                        'reference_system_remove_class',
+                                        system_id=self.entity.id,
+                                        name=name)))
             self.tabs[name] = Tab(
                 name,
                 relation['label'],
@@ -292,7 +303,7 @@ class Display:
         self.data.update(self.get_type_data())
         for name, attribute in self.entity.class_.attributes.items():
             if name in [
-                    'creator', 'license_holder', 'placeholder', 'public',
+                    'creator', 'example_id', 'license_holder', 'public',
                     'resolver_url', 'website_url']:
                 if value := getattr(self.entity, name):
                     if isinstance(value, bool):
