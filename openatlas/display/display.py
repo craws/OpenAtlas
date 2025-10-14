@@ -308,6 +308,13 @@ class Display:
                 if value := getattr(self.entity, name):
                     if isinstance(value, bool):
                         value = _('yes') if value else _('no')
+                        if name == 'public' \
+                                and value \
+                                and not self.entity.standard_type:
+                            value += (
+                                ' <span class="error">'
+                                + _('but license is missing')
+                                + '</span>')
                     elif attribute.get('format') == 'url':
                         value = link(value, value, external=True)
                     self.data[attribute['label']] = str(value)

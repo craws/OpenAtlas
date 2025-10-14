@@ -161,43 +161,6 @@ class TypeBaseDisplay(BaseDisplay):
                     url_for('type_move_entities', id_=entity.id)))
 
 
-class FileDisplay(BaseDisplay):
-
-    def add_data(self) -> None:
-        self.data[_('public sharing allowed')] = str(_('no'))
-        if self.entity.public:
-            self.data[_('public sharing allowed')] = str(_('yes'))
-            if not self.entity.standard_type:
-                self.data[_('public sharing allowed')] = str(_('yes')) + (
-                    ' <span class="error">' + _('but license is missing ') +
-                    '</span>')
-
-    def add_tabs(self) -> None:
-        entity = self.entity
-        for name in [
-                'source', 'event', 'actor', 'place', 'artifact', 'reference',
-                'type']:
-            self.tabs[name] = Tab(name, entity=entity)
-        for link_ in entity.get_links('P67'):
-            range_ = link_.range
-            #data = get_base_table_data(range_)
-            #data.append(
-             #   remove_link(range_.name, link_, entity, range_.class_.view))
-            #self.tabs[range_.class_.view].table.rows.append(data)
-        for link_ in entity.get_links(['P67', 'P94'], inverse=True):
-            pass
-            #data = get_base_table_data(link_.domain)
-            #data.append(link_.description)
-            #data.append(edit_link(
-            #    url_for('link_update', id_=link_.id, origin_id=entity.id)))
-            #data.append(remove_link(
-            #    link_.domain.name,
-            #    link_,
-            #    entity,
-            #    link_.domain.class_.view))
-            #self.tabs[link_.domain.class_.view].table.rows.append(data)
-
-
 class PlaceDisplay(PlaceBaseDisplay):
 
     def add_tabs(self) -> None:
