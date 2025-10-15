@@ -3,16 +3,17 @@
 OpenAtlas Bone Vocabulary Parser (Step 1: Parse hierarchy from .docx)
 Python 3.11, uses `python-docx` (import as `docx`) at runtime.
 
-Parses bullet hierarchy and entries of the form:
-  Name (EN, DE; Anno: URL or -; Wikidata: URL or QID or -; Terminologia Anatomica: A02.0.00.000 or -)
-Also supports leading notation like "T06 - Latin Label".
-Expands embedded DOCX hyperlinks to their target URLs so linked Q-IDs/labels parse correctly.
+Robustly parses entries of the form:
+  Latin [may contain (...) itself] (EN, DE; Anno: ...; Wikidata: ...; Terminologia Anatomica: ...)
+
+Key fixes:
+- Keeps parentheses that belong to the Latin label.
+- Extracts only the final metadata block in trailing parentheses when it contains expected keys or the EN, DE pair.
+- Works with embedded DOCX hyperlinks (expands to URLs).
 
 Outputs:
 - JSON tree with nodes and warnings
 - CSV of issues
-
-Configure FILE_PATH to your .docx location (relative or absolute).
 """
 
 from __future__ import annotations
@@ -38,7 +39,6 @@ _TA_LOOSE_RE = re.compile(r"A\d{2}\.\d{1,2}\.\d{2}\.\d{2,3}")
 _URL_RE = re.compile(r"https?://\S+")
 _QID_RE = re.compile(r"^Q\d+$")
 _NOTATION_RE = re.compile(r"^\s*([A-Za-z0-9]{1,5})\s*-\s*(.+)$")
-_PARENS_RE = re.compile(r"\((.*)\)\s*$")
 
 NS = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main",
       "r": "http://schemas.openxmlformats.org/officeDocument/2006/relationships"}
@@ -122,22 +122,50 @@ def fallback_level_from_indent(p: Paragraph) -> Optional[int]:
         return None
 
 
+def find_trailing_metadata_block(text: str) -> Optional[Tuple[int, int, str]]:
+    s = text.rstrip()
+    if not s.endswith(")"):
+        return None
+    depth = 0
+    for i in range(len(s) - 1, -1, -1):
+        ch = s[i]
+        if ch == ")":
+            depth += 1
+        elif ch == "(":
+            depth -= 1
+            if depth == 0:
+                start = i
+                end = len(s) - 1
+                content = s[start + 1 : end]
+                if looks_like_metadata(content):
+                    return start, end, content
+                return None
+    return None
+
+
+def looks_like_metadata(content: str) -> bool:
+    c = content.strip()
+    if "Anno:" in c or "Wikidata:" in c or "Terminologia" in c:
+        return True
+    if ";" in c and "," in c:
+        return True
+    return False
+
+
 def is_effective_bullet(p: Paragraph) -> bool:
     if extract_list_level(p) is not None:
         return True
-    txt = p.text.strip()
-    if not txt:
-        return False
-    return bool(_PARENS_RE.search(txt))
+    expanded = paragraph_text_with_hyperlinks(p)
+    return find_trailing_metadata_block(expanded) is not None
 
 
 def split_head_and_parens(text: str) -> Tuple[str, Optional[str]]:
-    m = _PARENS_RE.search(text)
+    m = find_trailing_metadata_block(text)
     if not m:
         return normalize_space(text), None
-    head = normalize_space(text[: m.start()].rstrip(" -—"))
-    content = normalize_space(m.group(1))
-    return head, content
+    start, end, content = m
+    head = normalize_space(text[:start].rstrip(" -—"))
+    return head, normalize_space(content)
 
 
 def parse_refs(field_value: str, kind: str, warn: List[str]) -> List[ExternalRef]:
