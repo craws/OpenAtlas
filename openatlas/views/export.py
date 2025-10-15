@@ -174,7 +174,7 @@ def export_rdf() -> str:
 
 
 @app.route('/export/rdf/execute')
-@required_group('admin')
+@required_group('manager')
 def rdf_execute() -> Response:
     if os.access(app.config['RDF_PATH'], os.W_OK):
         if rdf_export():
