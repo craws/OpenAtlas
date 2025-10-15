@@ -130,7 +130,7 @@ def export_arche() -> str:
                     button(
                         _('export') + ' ARCHE',
                         url_for('arche_execute'))
-                ])},
+                    if is_authorized('admin') else ''])},
         title=_('export') + ' ARCHE',
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
