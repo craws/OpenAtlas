@@ -48,7 +48,7 @@ def link_insert(origin_id: int, relation_name: str) -> str | Response:
         title=relation['label'],
         crumbs=hierarchy_crumbs(origin) + [
             link(origin),
-            f"+ {relation['label']}"])
+            f"+ {uc_first(relation['label'])}"])
 
 
 @app.route(

@@ -85,6 +85,13 @@ class Display:
             if 'annotated' in self.entity.class_.attributes['description'] \
                     and self.entity.class_.attributes['description']:
                 description_ = display_annotation_text_links(self.entity)
+        reference_systems_display = ''
+        if 'reference_system' in self.entity.class_.extra:
+            reference_systems_display = reference_systems(
+                self.entity.get_links(
+                    'P67',
+                    ['reference_system'],
+                    inverse=True))
         self.tabs['info'].content = render_template(
             'entity/view.html',
             entity=self.entity,
@@ -93,11 +100,7 @@ class Display:
             gis_data=self.gis_data,
             overlays=self.overlays,
             chart_data=get_chart_data(self.entity),
-            reference_systems=reference_systems(
-                self.entity.get_links(
-                    'P67',
-                    ['reference_system'],
-                    inverse=True)),
+            reference_systems=reference_systems_display,
             description_html=description(description_, description_label),
             problematic_type_id=self.problematic_type)
 

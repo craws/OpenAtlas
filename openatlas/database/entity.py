@@ -395,15 +395,19 @@ def get_file_info() -> dict[int, dict[str, Any]]:
         for row in g.cursor}
 
 
-def get_subunits_without_super(classes: list[str]) -> list[int]:
+def get_entity_ids_with_links(
+        property_: str,
+        classes: list[str],
+        inverse: bool) -> list[int]:
     g.cursor.execute(
-        """
+        f"""
         SELECT e.id
         FROM model.entity e
-        JOIN model.link l ON e.id = l.range_id AND l.property_code = 'P46'
+        JOIN model.link l ON e.id = l.{'domain' if inverse else 'range'}_id
+            AND l.property_code = %(property)s
         WHERE e.openatlas_class_name IN %(classes)s;
         """,
-        {'classes': tuple(classes)})
+        {'property': property_, 'classes': tuple(classes)})
     return [row[0] for row in list(g.cursor)]
 
 

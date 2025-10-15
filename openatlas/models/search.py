@@ -63,7 +63,3 @@ def check_dates(entity: Entity, data: dict[str, Any]) -> bool:
             if date and date <= data['to_date']:
                 end_ok = True
     return bool(begin_ok and end_ok)
-
-
-def get_subunits_without_super(classes: list[str]) -> list[int]:
-    return db.get_subunits_without_super(classes)

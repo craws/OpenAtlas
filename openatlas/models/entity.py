@@ -977,3 +977,10 @@ class Link:
     @staticmethod
     def delete_link_duplicates() -> int:
         return db_link.delete_link_duplicates()
+
+
+def get_entity_ids_with_links(
+        property_: str,
+        classes: list[str],
+        inverse: bool) -> list[int]:
+    return db.get_entity_ids_with_links(property_, classes, inverse)
