@@ -130,7 +130,7 @@ def export_arche() -> str:
                     button(
                         _('export') + ' ARCHE',
                         url_for('arche_execute'))
-                ])},
+                    if is_authorized('admin') else ''])},
         title=_('export') + ' ARCHE',
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
@@ -174,7 +174,7 @@ def export_rdf() -> str:
 
 
 @app.route('/export/rdf/execute')
-@required_group('admin')
+@required_group('manager')
 def rdf_execute() -> Response:
     if os.access(app.config['RDF_PATH'], os.W_OK):
         if rdf_export():
