@@ -111,11 +111,12 @@ def get_relation_types_dict_for_locations(
 
 def get_presentation_references(
         links_inverse: list[Link],
-        entity_id: int) -> list[dict[str, Any]]:
+        entity_ids: list[int]) -> list[dict[str, Any]]:
     references = []
+
     for link in links_inverse:
-        if (link.domain.class_.view != 'reference'
-                or link.range.id != entity_id):
+        if link.domain.class_.view != 'reference' or  \
+                link.range.id not in entity_ids:
             continue
         ref = {
             'id': link.domain.id,
@@ -133,14 +134,16 @@ def get_presentation_references(
 
 def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
     ids = [entity.id]
+    root_ids = []
     if entity.class_.view in ['place', 'artifact']:
         entity.location = entity.get_linked_entity_safe('P53')
         ids.append(entity.location.id)
         if parser.place_hierarchy:
             place_hierarchy = entity.get_linked_entity_ids_recursive('P46')
-            place_hierarchy.extend(entity.get_linked_entity_ids_recursive(
+            root_ids = entity.get_linked_entity_ids_recursive(
                 'P46',
-                inverse=True))
+                inverse=True)
+            place_hierarchy.extend(root_ids)
             ids.extend(place_hierarchy)
 
     links = Entity.get_links_of_entities(ids)
@@ -249,7 +252,9 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         'when': get_presentation_time(entity),
         'types': get_presentation_types(entity, links),
         'externalReferenceSystems': get_reference_systems(links_inverse),
-        'references': get_presentation_references(links_inverse, entity.id),
+        'references': get_presentation_references(
+            links_inverse,
+            [entity.id, *root_ids]),
         'files': get_presentation_files(links_inverse, entity.id),
         'relations': relations}
     if entity.class_.view in ['place', 'artifact']:
