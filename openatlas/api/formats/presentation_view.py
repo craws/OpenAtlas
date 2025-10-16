@@ -134,7 +134,7 @@ def get_presentation_references(
 
 def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
     ids = [entity.id]
-    root_ids = []
+    root_ids: list[int] = []
     if entity.class_.view in ['place', 'artifact']:
         entity.location = entity.get_linked_entity_safe('P53')
         ids.append(entity.location.id)
