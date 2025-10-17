@@ -1,3 +1,5 @@
+from typing import Any
+
 from flask_babel import lazy_gettext as _
 
 from config.model.class_groups import class_groups, standard_relations
@@ -11,7 +13,7 @@ relations = {
         'tab': {
             'buttons': ['link', 'insert']}}}
 
-place = {
+place: dict[str, Any] = {
     'label': _('place'),
     'attributes': {
         'name': {
@@ -39,6 +41,7 @@ place = {
             'insert_and_continue': True},
         'additional_tabs': {
             'note': {}}}}
+place['relations']['file']['tab']['additional_columns'] += ['overlay']
 
 feature = {
     'label': _('feature'),

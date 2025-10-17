@@ -4,12 +4,10 @@ from typing import Any, Optional
 
 from flask import g, url_for
 from flask_babel import format_number, lazy_gettext as _
-from flask_login import current_user
 
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.util import button, description, link
-from openatlas.display.util2 import is_authorized
 from openatlas.models.entity import Entity, Link
 from openatlas.views.tools import carbon_result, sex_result
 
@@ -17,7 +15,6 @@ from openatlas.views.tools import carbon_result, sex_result
 class BaseDisplay:
     buttons: list[str]
     data: dict[str, Any]
-    overlays = None
     tabs: dict[str, Tab]
 
     def __init__(self, entity: Entity) -> None:
@@ -48,41 +45,6 @@ class PlaceBaseDisplay(BaseDisplay):
                 'stratigraphic_unit',
                 _('stratigraphic unit'),
                 entity=entity)
-        self.tabs['file'] = Tab('file', entity=entity)
-        if entity.class_.view == 'place' \
-                and is_authorized('editor') \
-                and current_user.settings['module_map_overlay']:
-            self.tabs['file'].table.columns.append(_('overlay'))
-
-        for _link_ in entity.get_links(['P31', 'P67'], inverse=True):
-            pass
-            # domain = link_.domain
-            # data = get_base_table_data(domain)
-            # if domain.class_.view == 'file':
-            #     ext = data[6]
-            #     data.append(profile_image_table_link(entity, domain, ext))
-            #     if entity.class_.view == 'place' \
-            #             and is_authorized('editor') \
-            #             and current_user.settings['module_map_overlay']:
-            #         content = ''
-            #         if ext in app.config['DISPLAY_FILE_EXT']:
-            #             overlays = Overlay.get_by_object(entity)
-            #             if domain.id in overlays and (html_link := edit_link(
-            #                     url_for(
-            #                         'overlay_update',
-            #                         place_id=entity.id,
-            #                         overlay_id=overlays[domain.id].id))):
-            #                 content += html_link
-            #             else:
-            #                 content = link(
-            #                     _('link'),
-            #                     url_for(
-            #                         'overlay_insert',
-            #                         image_id=domain.id,
-            #                         place_id=entity.id,
-            #                         link_id=link_.id))
-            #         data.append(content)
-
         entity.location = entity.get_linked_entity_safe('P53', types=True)
 
 

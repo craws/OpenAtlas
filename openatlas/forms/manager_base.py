@@ -10,7 +10,7 @@ from flask_wtf import FlaskForm
 from wtforms import (
     BooleanField, HiddenField, SelectField, SelectMultipleField, StringField,
     widgets)
-from wtforms.validators import InputRequired, Optional, URL
+from wtforms.validators import InputRequired, Optional
 
 from openatlas.forms.field import (
     SubmitField, TableField, TableMultiField, TreeField)
@@ -18,7 +18,6 @@ from openatlas.forms.util import convert
 from openatlas.forms.validation import hierarchy_name_exists, validate
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
-from openatlas.models.overlay import Overlay
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.openatlas_class import OpenatlasClass
@@ -70,11 +69,6 @@ class BaseManager:
         self.aliases = current_user.settings['table_show_aliases']
         self.table_items: dict[str, list[Entity]] = {}
 
-        if self.insert:
-            self.get_place_info_for_insert()
-        else:
-            self.get_place_info_for_update()
-
         class Form(FlaskForm):
             opened = HiddenField()
             validate = validate
@@ -83,19 +77,6 @@ class BaseManager:
         if self.entity:
             setattr(Form, 'entity_id', HiddenField())
         self.form: Any = Form(obj=self.link_ or self.entity)
-
-    def get_place_info_for_insert(self) -> None:
-        self.place_info = {
-            'structure': None,
-            'gis_data': None,
-            'overlays': None}
-
-    def get_place_info_for_update(self) -> None:
-        self.place_info = {
-            'structure': None,
-            'gis_data': None,
-            'overlays': None,
-            'location': None}
 
     def update_entity(self, new: bool = False) -> None:
         self.continue_link_id = self.entity.update(self.data, new)
@@ -194,24 +175,17 @@ class ActorBaseManager(BaseManager):
 
 class PlaceBaseManager(BaseManager):
     def get_place_info_for_insert(self) -> None:
-        super().get_place_info_for_insert()
         if not self.origin:
             self.place_info['gis_data'] = Gis.get_all()
             return
         structure = self.origin.get_structure_for_insert()
         self.place_info['structure'] = structure
         self.place_info['gis_data'] = Gis.get_all([self.origin], structure)
-        if current_user.settings['module_map_overlay'] \
-                and self.origin.class_.view == 'place':
-            self.place_info['overlay'] = Overlay.get_by_object(self.origin)
 
     def get_place_info_for_update(self) -> None:
-        super().get_place_info_for_update()
         structure = self.entity.get_structure()
         self.place_info['structure'] = structure
         self.place_info['gis_data'] = Gis.get_all([self.entity], structure)
-        if current_user.settings['module_map_overlay']:
-            self.place_info['overlays'] = Overlay.get_by_object(self.entity)
         self.place_info['location'] = \
             self.entity.get_linked_entity_safe('P53', types=True)
 

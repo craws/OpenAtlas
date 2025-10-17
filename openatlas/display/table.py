@@ -11,10 +11,11 @@ from openatlas.display.image_processing import check_processed_image
 from openatlas.display.util import (
     check_iiif_file_exist, edit_link, get_file_path, link,
     profile_image_table_link, remove_link)
-from openatlas.display.util2 import sanitize, uc_first
+from openatlas.display.util2 import is_authorized, sanitize, uc_first
 from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity, Link
 from openatlas.models.openatlas_class import get_reverse_relation
+from openatlas.models.overlay import Overlay
 
 # Needed for translations
 _('previous')
@@ -52,9 +53,9 @@ class Table:
                     if name and name not in no_title else '',
                 'className':
                     'dt-body-right' if name in ['count', 'size'] else ''}
-                           for name in self.columns] + [
-                           {'title': '', 'className': ''} for _item in
-                           range(len(self.rows[0]) - len(self.columns))],
+                    for name in self.columns] + [
+                        {'title': '', 'className': ''} for _item in
+                        range(len(self.rows[0]) - len(self.columns))],
             'paging': self.paging,
             'pageLength': current_user.settings['table_rows'],
             'autoWidth': 'false'}
@@ -114,6 +115,7 @@ def entity_table(
         if not reverse_relation or not reverse_relation.get("required", True):
             columns.append("remove")
 
+    overlays = Overlay.get_by_object(origin) if 'overlay' in columns else {}
     table = Table(columns, order=order, defs=defs)
     for item in items:
         e = item
@@ -163,6 +165,13 @@ def entity_table(
                     html = e.example_id
                 case 'extension':
                     html = e.get_file_ext()
+                case 'external_reference_match':
+                    html = item.description
+                    if url := origin.resolver_url:
+                        html = link(
+                            item.description,
+                            url + item.description,
+                            external=True)
                 case 'first':
                     html = item.dates.first or \
                         '<span class="text-muted">' \
@@ -187,10 +196,6 @@ def entity_table(
                         origin,
                         e,
                         e.get_file_ext())
-                # case name if name in g.classes[class_].relations:
-                #    html = display_relations(
-                #        e,
-                #        g.classes[class_].relations[name])
                 case 'name':
                     html = format_name_and_aliases(e, table_id, forms)
                 case 'page':
@@ -201,17 +206,29 @@ def entity_table(
                     html = 'Profile' if e.id == origin.image_id else link(
                         'profile',
                         url_for('file_profile', id_=e.id, entity_id=origin.id))
+                case 'overlay':
+                    html = ''
+                    if is_authorized('editor') \
+                            and current_user.settings['module_map_overlay'] \
+                            and e.get_file_ext() \
+                            in app.config['DISPLAY_FILE_EXT']:
+                        if e.id in overlays:
+                            html = edit_link(
+                                url_for(
+                                    'overlay_update',
+                                    place_id=origin.id,
+                                    overlay_id=overlays[e.id].id))
+                        else:
+                            html = link(
+                                _('link'),
+                                url_for(
+                                    'overlay_insert',
+                                    image_id=e.id,
+                                    place_id=origin.id))
                 case 'public':
                     html = ''
                     if g.file_info.get(e.id):
                         html = _('yes') if g.file_info[e.id]['public'] else ''
-                case 'external_reference_match':
-                    html = item.description
-                    if url := origin.resolver_url:
-                        html = link(
-                            item.description,
-                            url + item.description,
-                            external=True)
                 case 'remove':
                     tab_id = e.class_.group['name']
                     if relation and relation['mode'] == 'tab':
@@ -219,15 +236,6 @@ def entity_table(
                     html = ''
                     if not origin.root or not g.types[origin.root[0]].required:
                         html = remove_link(e.name, item, origin, tab_id)
-                # case 'related':
-                #    relative = e.get_linked_entity_safe('has relation', True)
-                #    if entity and relative.id == entity.id:
-                #        relative = e.get_linked_entity_safe('has related')
-                #    html = link(relative)
-                # case 'relation type' if entity:
-                #    html = e.types[0].get_name_directed(
-                #        e.get_linked_entity_safe('has relation', True).id
-                #        != entity.id)
                 case 'set logo':
                     html = link(_('set'), url_for('logo', id_=e.id))
                 case 'size':

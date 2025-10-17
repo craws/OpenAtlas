@@ -20,6 +20,7 @@ from openatlas.forms.entity_form import (
     get_entity_form, process_files, process_form_data)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
+from openatlas.models.overlay import Overlay
 
 
 @app.route('/entity/<int:id_>')
@@ -93,19 +94,25 @@ def insert(
     form = get_entity_form(entity, origin, relation)
     if form.validate_on_submit():
         return redirect(save(entity, form, origin, relation))
-    gis_data = None
-    if entity.class_.attributes.get('location') and not origin:
-        gis_data = Gis.get_all()
     return render_template(
         'entity/insert.html',
         form=form,
         class_=entity.class_,
-        gis_data=gis_data,
+        gis_data=Gis.get_all() if entity.class_.attributes.get('location')
+        else None,
         writable=os.access(app.config['UPLOAD_PATH'], os.W_OK),
-        # overlays=manager.place_info['overlays'],
+        overlays=get_overlays(origin),
         title=_(entity.class_.group['name']),
-        crumbs=hierarchy_crumbs(origin or entity) + \
+        crumbs=hierarchy_crumbs(origin or entity) +
         [origin, f'+ {uc_first(entity.class_.label)}'])
+
+
+def get_overlays(entity: Entity) -> dict[int, Overlay]:
+    if entity \
+            and entity.class_.group['name'] == 'place' \
+            and current_user.settings['module_map_overlay']:
+        return Overlay.get_by_object(entity)
+    return {}
 
 
 @app.route('/update/<int:id_>', methods=['GET', 'POST'])
@@ -119,19 +126,12 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
         if template := was_modified_template(entity, form):
             return template
         return redirect(save(entity, form))
-    place_info = {}
+    gis_data = None
     if entity.class_.attributes.get('location'):
         entity.location = entity.location \
             or entity.get_linked_entity_safe('P53')
-        structure = entity.get_structure_for_insert()
-        place_info = {
-            'structure': structure,
-            'gis_data': Gis.get_all([entity], structure),
-            'overlays': None,
-            'location': None}
-    # if current_user.settings['module_map_overlay'] \
-    #        and self.origin.class_.view == 'place':
-    #    self.place_info['overlay'] = Overlay.get_by_object(self.origin)
+        # Todo: why is get_structure_for_insert called at update?
+        gis_data = Gis.get_all([entity], entity.get_structure_for_insert())
     # if entity.class_.group['name'] in ['artifact', 'place']:
     #    manager.entity.image_id = manager.entity.get_profile_image_id()
     #    if not manager.entity.image_id:
@@ -145,8 +145,8 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
         'entity/update.html',
         form=form,
         entity=entity,
-        gis_data=place_info.get('gis_data'),
-        # overlays=manager.place_info['overlays'],
+        gis_data=gis_data,
+        overlays=get_overlays(entity),
         title=entity.name,
         crumbs=hierarchy_crumbs(entity) + [entity, _('edit')])
 

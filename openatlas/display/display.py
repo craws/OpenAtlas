@@ -21,7 +21,6 @@ from openatlas.models.user import User
 class Display:
     buttons: list[str]
     data: dict[str, Any]
-    overlays = None
     tabs: dict[str, Tab]
 
     def __init__(self, entity: Entity) -> None:
@@ -98,7 +97,6 @@ class Display:
             frontend_link=frontend_link,
             info_data=self.data,
             gis_data=self.gis_data,
-            overlays=self.overlays,
             chart_data=get_chart_data(self.entity),
             reference_systems=reference_systems_display,
             description_html=description(description_, description_label),
@@ -149,8 +147,8 @@ class Display:
                                             class_=class_,
                                             origin_id=self.entity.id,
                                             relation=name),
-                                        tooltip_text=
-                                        g.classes[class_].display['tooltip']))
+                                        tooltip_text=g.classes[class_].
+                                        display['tooltip']))
                         case 'remove_reference_system_class' if not items \
                                 and is_authorized('manager'):
                             buttons.append(

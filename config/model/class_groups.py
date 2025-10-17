@@ -26,15 +26,11 @@ class_groups = {
         'table_columns': [
             'created', 'icon', 'name', 'license', 'public', 'creator',
             'license holder', 'size', 'extension', 'description']},
-    # 'object_location': {
-    #    'name': 'object_location',
-    #    'classes': ['object_location']},
     'place': {
         'name': 'place',
         'label': _('place'),
         'classes': ['feature', 'place', 'stratigraphic_unit'],
-        'table_columns': [
-            'name', 'class', 'type', 'begin', 'end', 'description']},
+        'table_columns': ['name', 'type', 'begin', 'end', 'description']},
     'reference': {
         'name': 'reference',
         'label': _('reference'),
