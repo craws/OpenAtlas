@@ -184,11 +184,15 @@ def delete(id_: int) -> Response:
         if entity.get_linked_entities('P46'):
             flash(_('Deletion not possible if subunits exists'), 'error')
             return redirect(url_for('view', id_=id_))
-        # if entity.class_.name != 'place' \
-        #        and (parent := entity.get_linked_entity('P46', True)):
-        #    url = \
-        #        f"{url_for('view', id_=parent.id)}" \
-        #        f"#tab-{entity.class_.name.replace('_', '-')}"
+        if entity.class_.name != 'place' \
+                and (parent := entity.get_linked_entity(
+                    'P46',
+                    g.class_groups['place']['classes'] +
+                    g.class_groups['artifact']['classes'],
+                    True)):
+            url = \
+                f"{url_for('view', id_=parent.id)}" \
+                f"#tab-{entity.class_.name.replace('_', '-')}"
     elif entity.class_.name == 'source_translation':
         source = entity.get_linked_entity_safe('P73', inverse=True)
         url = f"{url_for('view', id_=source.id)}#tab-text"

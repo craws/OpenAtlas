@@ -24,6 +24,13 @@ place = {
     'relations': {
         'source': standard_relations['source'],
         'artifact': relations['artifact'],
+        'feature': {
+            'label': _('feature'),
+            'classes': 'feature',
+            'property': 'P46',
+            'multiple': True,
+            'tab': {
+                'buttons': ['insert']}},
         'reference': standard_relations['reference'],
         'file': standard_relations['file']},
     'display': {
@@ -43,6 +50,13 @@ feature = {
         'location': {}},
     'extra': ['reference_system'],
     'relations': {
+        'super': {
+            'label': _('required'),
+            'classes': 'place',
+            'property': 'P46',
+            'required': True,
+            'inverse': True,
+            'mode': 'direct'},
         'source': standard_relations['source'],
         'artifact': relations['artifact'],
         'reference': standard_relations['reference'],
