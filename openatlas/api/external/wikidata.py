@@ -45,7 +45,7 @@ def fetch_wikidata(id_: str) -> dict[str, Any]:
         info['founded by'] = [
             add_resolver_url(v['mainsnak']['datavalue']['value']['numeric-id'])
             for v in data['entities'][id_]['claims']['P112']]
-    except KeyError:
+    except KeyError:  # pragma: no cover
         pass
     try:
         info['nick names'] = [
