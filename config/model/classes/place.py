@@ -54,7 +54,7 @@ feature = {
     'extra': ['reference_system'],
     'relations': {
         'super': {
-            'label': _('required'),
+            'label': _('super'),
             'classes': 'place',
             'property': 'P46',
             'required': True,
