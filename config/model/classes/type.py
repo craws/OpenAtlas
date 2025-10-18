@@ -35,7 +35,6 @@ type_ = {
         'file': standard_relations['file']},
     'display': {
         'buttons': ['selectable'],
-        'form': {
-            'insert_and_continue': True},
+        'form_buttons': ['insert_and_continue'],
         'additional_tabs': {
             'note': {}}}}

@@ -107,10 +107,10 @@ class Gis:
                         item['properties']['objectType'] = \
                             type_.name.replace('"', '\"')
                         break
-            #if structure \
-            #        and structure['supers'] \
-            #        and row['object_id'] == structure['supers'][-1].id:
-            #    extra['supers'].append(item)
+            if structure \
+                    and structure['supers'] \
+                    and row['object_id'] == structure['supers'][-1].id:
+                extra['supers'].append(item)
             if row['object_id'] in object_ids:
                 selected[shape].append(item)
             elif row['object_id'] in subunit_ids:

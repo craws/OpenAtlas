@@ -378,8 +378,32 @@ def add_buttons(form: Any, entity: Entity, relation: dict[str, Any]) -> None:
             and 'annotated' in entity.class_.attributes['description']:
         field = SubmitAnnotationField
     setattr(form, 'save', field(_('save') if entity.id else _('insert')))
-    if not entity.id \
-            and entity.class_.display['form']['insert_and_continue'] \
-            and not relation.get('additional_fields'):
-        setattr(form, 'insert_and_continue', field(_('insert and continue')))
-        setattr(form, 'continue_', HiddenField())
+    if not entity.id:
+        for item in entity.class_.display['form_buttons']:
+            match item:
+                case 'insert_and_continue' \
+                        if not relation.get('additional_fields'):
+                    setattr(
+                        form,
+                        item,
+                        field(_('insert and continue')))
+                    setattr(form, 'continue_', HiddenField())
+                case 'insert_continue_sub':
+                    label = 'unknown'
+                    match entity.class_.name:
+                        case 'place':
+                            label = 'feature'
+                        case 'feature':
+                            label = 'stratigraphic unit'
+                        case 'stratigraphic_unit':
+                            label = 'artifact'
+                    setattr(
+                        form,
+                        item,
+                        SubmitField(_('insert and add') + ' ' + _(label)))
+                case 'insert_continue_human_remains':
+                    setattr(
+                        form,
+                        item,
+                        SubmitField(
+                            _('insert and add') + ' ' + _('human remains')))

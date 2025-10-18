@@ -12,12 +12,10 @@ from wtforms import (
     widgets)
 from wtforms.validators import InputRequired, Optional
 
-from openatlas.forms.field import (
-    SubmitField, TableField, TableMultiField, TreeField)
+from openatlas.forms.field import TableField, TableMultiField, TreeField
 from openatlas.forms.util import convert
 from openatlas.forms.validation import hierarchy_name_exists, validate
 from openatlas.models.entity import Entity, Link
-from openatlas.models.gis import Gis
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.openatlas_class import OpenatlasClass
@@ -171,34 +169,6 @@ class ActorBaseManager(BaseManager):
                     self.origin,
                     return_link_id=True,
                     inverse=True)
-
-
-class PlaceBaseManager(BaseManager):
-    def get_place_info_for_insert(self) -> None:
-        if not self.origin:
-            self.place_info['gis_data'] = Gis.get_all()
-            return
-        structure = self.origin.get_structure_for_insert()
-        self.place_info['structure'] = structure
-        self.place_info['gis_data'] = Gis.get_all([self.origin], structure)
-
-    def get_place_info_for_update(self) -> None:
-        structure = self.entity.get_structure()
-        self.place_info['structure'] = structure
-        self.place_info['gis_data'] = Gis.get_all([self.entity], structure)
-        self.place_info['location'] = \
-            self.entity.get_linked_entity_safe('P53', types=True)
-
-
-class ArtifactBaseManager(PlaceBaseManager):
-    def get_crumbs(self) -> list[Any]:
-        crumbs = []
-        if self.place_info['structure'] and self.origin:
-            if count := len([
-                i for i in self.place_info['structure']['siblings']
-                    if i.class_.name == self.class_.name]):
-                crumbs[-1] = crumbs[-1] + f' ({count} {_("exists")})'
-        return crumbs
 
 
 class HierarchyBaseManager(BaseManager):
@@ -360,95 +330,6 @@ class AdministrativeUnitManager(TypeBaseManager):
         self.add_link('P89', g.types[self.super_id])
 
 
-class ArtifactManager(ArtifactBaseManager):
-    def additional_fields(self) -> dict[str, Any]:
-        filter_ids = []
-        if self.entity:
-            filter_ids = [self.entity.id] + [
-                e.id for e in self.entity.get_linked_entities_recursive('P46')]
-        if self.insert:
-            selection = self.origin if self.origin \
-                and self.origin.class_.view in ['artifact', 'place'] else None
-        else:
-            selection = self.entity.get_linked_entity('P46', inverse=True)
-        return {
-            'super': TableField(
-                Entity.get_by_class(
-                    g.class_groups['place']['classes'] + ['artifact'],
-                    types=True,
-                    aliases=self.aliases),
-                selection,
-                filter_ids,
-                add_dynamic=['place'])}
-
-    def process_form(self) -> None:
-        super().process_form()
-        if self.form.super.data:
-            self.add_link('P46', self.form.super.data, inverse=True)
-
-
-class FeatureManager(PlaceBaseManager):
-    fields = ['name', 'date', 'description', 'continue', 'map']
-
-    def add_buttons(self) -> None:
-        if self.entity:
-            return
-        setattr(
-            self.form_class,
-            'insert_continue_sub',
-            SubmitField(_('insert and add') + ' ' + _('stratigraphic unit')))
-
-    def additional_fields(self) -> dict[str, Any]:
-        if self.insert:
-            selection = self.origin if (
-                self.origin  and self.origin.class_.name == 'place') else None
-        else:
-            selection = self.entity.get_linked_entity('P46', inverse=True)
-        return {
-            'super':
-                TableField(
-                    Entity.get_by_class('place', True, self.aliases),
-                    selection,
-                    validators=[InputRequired()],
-                    add_dynamic=['place'])}
-
-    def process_form(self) -> None:
-        super().process_form()
-        self.data['links']['delete_inverse'].add('P46')
-        self.add_link(
-            'P46',
-            Entity.get_by_id(int(self.form.super.data)),
-            inverse=True)
-
-
-class HumanRemainsManager(ArtifactBaseManager):
-    def additional_fields(self) -> dict[str, Any]:
-        filter_ids = []
-        if self.entity:
-            filter_ids = [self.entity.id] + [
-                e.id for e in self.entity.get_linked_entities_recursive('P46')]
-        if self.insert:
-            selection = self.origin if self.origin \
-                                       and self.origin.class_.view in [
-                                           'artifact', 'place'] else None
-        else:
-            selection = self.entity.get_linked_entity('P46', inverse=True)
-        return {
-            'super': TableField(
-                Entity.get_by_class(
-                    g.class_groups['place']['classes'] + ['human remains'],
-                    types=True,
-                    aliases=self.aliases),
-                selection,
-                filter_ids,
-                add_dynamic=['place'])}
-
-    def process_form(self) -> None:
-        super().process_form()
-        if self.form.super.data:
-            self.add_link('P46', self.form.super.data, inverse=True)
-
-
 class HierarchyCustomManager(HierarchyBaseManager):
     def additional_fields(self) -> dict[str, Any]:
         tooltip = _('tooltip hierarchy multiple')
@@ -518,55 +399,6 @@ class InvolvementManager(BaseManager):
             str(g.classes['involvement'].standard_type_id)).data
         self.link_.type = g.types[int(type_id)] if type_id else None
         self.link_.property = g.properties[self.form.activity.data]
-
-
-class PlaceManager(PlaceBaseManager):
-    fields = ['name', 'alias', 'date', 'description', 'continue', 'map']
-
-    def add_buttons(self) -> None:
-        if not self.entity:
-            setattr(
-                self.form_class,
-                'insert_continue_sub',
-                SubmitField(_('insert and add') + ' ' + _('feature')))
-
-    def populate_insert(self) -> None:
-        self.form.alias.append_entry('')
-
-
-class StratigraphicUnitManager(PlaceBaseManager):
-    fields = ['name', 'date', 'description', 'continue', 'map']
-
-    def add_buttons(self) -> None:
-        if not self.entity:
-            setattr(
-                self.form_class,
-                'insert_continue_sub',
-                SubmitField(_('insert and add') + ' ' + _('artifact')))
-            setattr(
-                self.form_class,
-                'insert_continue_human_remains',
-                SubmitField(_('insert and add') + ' ' + _('human remains')))
-
-    def additional_fields(self) -> dict[str, Any]:
-        selection = None
-        if not self.insert and self.entity:
-            selection = self.entity.get_linked_entity_safe('P46', inverse=True)
-        elif self.origin and self.origin.class_.name == 'feature':
-            selection = self.origin
-        return {
-            'super': TableField(
-                Entity.get_by_class('feature', True),
-                selection,
-                validators=[InputRequired()])}
-
-    def process_form(self) -> None:
-        super().process_form()
-        self.data['links']['delete_inverse'].add('P46')
-        self.add_link(
-            'P46',
-            Entity.get_by_id(int(self.form.super.data)),
-            inverse=True)
 
 
 class TypeManager(TypeBaseManager):

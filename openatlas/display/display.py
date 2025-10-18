@@ -16,6 +16,7 @@ from openatlas.models.dates import format_date, format_entity_date
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 from openatlas.models.user import User
+from openatlas.views.tools import carbon_result, sex_result
 
 
 class Display:
@@ -37,7 +38,9 @@ class Display:
             entity.image_id = entity.get_profile_image_id()
         self.add_tabs()
         self.add_buttons()
-        self.add_info_tab_content()  # Call later because of profile image
+        self.add_info_tab_content()
+        if len(self.structure.get('siblings', [])) > 1:
+            self.add_button_sibling_pager()
 
     def get_type_data(self) -> dict[str, Any]:
         if self.entity.location:  # Add location types
@@ -75,15 +78,22 @@ class Display:
                 uc_first(_('presentation site')),
                 resolver_url + str(self.entity.id),
                 external=True)
+        text = ''
+        if 'stratigraphic_tools' in self.entity.class_.display['buttons']:
+            if radiocarbon := carbon_result(self.entity):
+                text += f"<p>{radiocarbon}</p>"
+            if sex_estimation := sex_result(self.entity):
+                text += f"<p>{sex_estimation}</p>"
         description_ = self.entity.description
-        description_label = ''
+        label = ''
         if 'description' in self.entity.class_.attributes and description_:
             if 'label' in self.entity.class_.attributes['description']:
-                description_label = \
-                    self.entity.class_.attributes['description']['label']
+                label = self.entity.class_.attributes['description']['label']
             if 'annotated' in self.entity.class_.attributes['description'] \
                     and self.entity.class_.attributes['description']:
                 description_ = display_annotation_text_links(self.entity)
+        text += description(description_, label)
+
         reference_systems_display = ''
         if 'reference_system' in self.entity.class_.extra:
             reference_systems_display = reference_systems(
@@ -99,7 +109,7 @@ class Display:
             gis_data=self.gis_data,
             chart_data=get_chart_data(self.entity),
             reference_systems=reference_systems_display,
-            description_html=description(description_, description_label),
+            description_html=text,
             problematic_type_id=self.problematic_type)
 
     # def get_chart_data(self) -> Optional[dict[str, Any]]:
@@ -211,6 +221,17 @@ class Display:
                                 'update',
                                 id_=self.entity.id,
                                 copy='copy_')))
+
+                case 'download':
+                    if path := get_file_path(self.entity.id):
+                        self.buttons.append(
+                            button(
+                                _('download'),
+                                url_for('download', filename=path.name)))
+                    else:
+                        self.buttons.append(
+                            '<span class="error">'
+                            + uc_first(_("missing file")) + '</span>')
                 case 'network':
                     self.buttons.append(
                         button(
@@ -221,25 +242,14 @@ class Display:
                                 id_=self.entity.id)))
                 case 'selectable' if is_authorized('editor'):
                     self.add_button_selectable()
+                case 'stratigraphic_tools' if is_authorized('editor'):
+                    self.buttons.append(
+                        button(
+                            _('tools'),
+                            url_for('tools_index', id_=self.entity.id)))
         self.buttons.append(bookmark_toggle(self.entity.id))
         self.buttons.append(
             render_template('util/api_links.html', entity=self.entity))
-        for item in self.entity.class_.display['buttons']:
-            match item:
-                case 'download':
-                    if path := get_file_path(self.entity.id):
-                        self.buttons.append(
-                            button(
-                                _('download'),
-                                url_for('download', filename=path.name)))
-                    else:
-                        self.buttons.append(
-                            '<span class="error">'
-                            + uc_first(_("missing file"))
-                            + '</span>')
-
-        if self.structure and len(self.structure['siblings']) > 1:
-            self.add_button_sibling_pager()
 
     def add_button_selectable(self) -> None:
         if not self.entity.selectable:

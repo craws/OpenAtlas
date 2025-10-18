@@ -37,8 +37,7 @@ file: dict[str, Any] = {
         'type': relation('type')},
     'display': {
         'buttons': ['download'],
-        'form': {
-            'insert_and_continue': True},
+        'form_buttons': ['insert_and_continue'],
         'additional_tabs': {
             'note': {}},
         'additional_information': {

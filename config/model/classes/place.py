@@ -1,17 +1,17 @@
+import copy
 from typing import Any
 
 from flask_babel import lazy_gettext as _
 
 from config.model.class_groups import class_groups, standard_relations
 
-relations = {
-    'artifact': {
-        'label': _('artifact'),
-        'classes': class_groups['artifact']['classes'],
-        'property': 'P46',
-        'multiple': True,
-        'tab': {
-            'buttons': ['link', 'insert']}}}
+artifact_relation = {
+    'label': _('artifact'),
+    'classes': class_groups['artifact']['classes'],
+    'property': 'P46',
+    'multiple': True,
+    'tab': {
+        'buttons': ['link', 'insert']}}
 
 place: dict[str, Any] = {
     'label': _('place'),
@@ -25,9 +25,8 @@ place: dict[str, Any] = {
     'extra': ['reference_system'],
     'relations': {
         'source': standard_relations['source'],
-        'artifact': relations['artifact'],
+        'artifact': artifact_relation,
         'feature': {
-            'label': _('feature'),
             'classes': 'feature',
             'property': 'P46',
             'multiple': True,
@@ -36,14 +35,13 @@ place: dict[str, Any] = {
         'reference': standard_relations['reference'],
         'file': standard_relations['file']},
     'display': {
-        'buttons': ['copy', 'network'],
-        'form': {
-            'insert_and_continue': True},
+        'buttons': ['copy', 'network', ],
+        'form_buttons': ['insert_and_continue', 'insert_continue_sub'],
         'additional_tabs': {
             'note': {}}}}
 place['relations']['file']['tab']['additional_columns'] += ['overlay']
 
-feature = {
+feature: dict[str, Any] = {
     'label': _('feature'),
     'attributes': {
         'name': {
@@ -61,12 +59,47 @@ feature = {
             'inverse': True,
             'mode': 'direct'},
         'source': standard_relations['source'],
-        'artifact': relations['artifact'],
+        'artifact': artifact_relation,
+        'stratigraphic_unit': {
+            'classes': 'stratigraphic_unit',
+            'property': 'P46',
+            'multiple': True,
+            'tab': {
+                'buttons': ['insert']}},
         'reference': standard_relations['reference'],
         'file': standard_relations['file']},
     'display': {
         'buttons': ['copy', 'network'],
-        'form': {
-            'insert_and_continue': True},
+        'form_buttons': ['insert_and_continue', 'insert_continue_sub'],
+        'additional_tabs': {
+            'note': {}}}}
+
+stratigraphic_unit: dict[str, Any] = {
+    'label': _('stratigraphic unit'),
+    'attributes': {
+        'name': {
+            'required': True},
+        'dates': {},
+        'description': {},
+        'location': {}},
+    'extra': ['reference_system'],
+    'relations': {
+        'super': {
+            'label': _('super'),
+            'classes': 'feature',
+            'property': 'P46',
+            'required': True,
+            'inverse': True,
+            'mode': 'direct'},
+        'source': standard_relations['source'],
+        'artifact': artifact_relation,
+        'reference': standard_relations['reference'],
+        'file': standard_relations['file']},
+    'display': {
+        'buttons': ['copy', 'network', 'stratigraphic_tools'],
+        'form_buttons': [
+            'insert_and_continue',
+            'insert_continue_sub',
+            'insert_continue_human_remains'],
         'additional_tabs': {
             'note': {}}}}

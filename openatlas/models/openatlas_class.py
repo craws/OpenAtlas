@@ -78,9 +78,7 @@ def get_model(class_name: str) -> dict[str, Any]:
     data['display']['additional_tabs'] = \
         data['display'].get('additional_tabs', {})
     data['display']['buttons'] = data['display'].get('buttons', {})
-    data['display']['form'] = data['display'].get('form', {})
-    data['display']['form']['insert_and_continue'] = \
-        data['display']['form'].get('insert_and_continue', False)
+    data['display']['form_buttons'] = data['display'].get('form_buttons', [])
     data['display']['additional_information'] = \
         data['display'].get('additional_information', {})
     for name, item in data['display']['additional_information'].items():
@@ -95,7 +93,7 @@ def get_model(class_name: str) -> dict[str, Any]:
         relation['inverse'] = relation.get('inverse', False)
         relation['multiple'] = relation.get('multiple', False)
         relation['required'] = relation.get('required', False)
-        relation['label'] = relation.get('label', _(name))
+        relation['label'] = relation.get('label', _(name.replace('_', ' ')))
         relation['mode'] = relation.get('mode', 'tab')
         relation['selected'] = [] if relation['multiple'] else None
         relation['tooltip'] = relation.get('tooltip')

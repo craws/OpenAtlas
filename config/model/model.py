@@ -18,10 +18,8 @@ _('page')
 model: dict[str, Any] = {
     'acquisition': event.acquisition,
     'activity': event.activity,
-    'administrative_unit': {
-        'attributes': {}},
-    'appellation': {
-        'attributes': {}},
+    'administrative_unit': {'attributes': {}},
+    'appellation': {'attributes': {}},
     'artifact': artifact.artifact,
     'bibliography': reference.bibliography,
     'edition': reference.edition,
@@ -32,17 +30,13 @@ model: dict[str, Any] = {
     'human_remains': artifact.human_remains,
     'modification': event.modification,
     'move': event.move,
-    'object_location': {
-        'attributes': {}},
+    'object_location': {'attributes': {}},
     'person': actor.person,
     'place': place.place,
     'production': event.production,
     'reference_system': reference_system.reference_system,
     'source': source.source,
     'source_translation': source.source_translation,
-    'stratigraphic_unit': {
-        'attributes': {},
-        'display': {'buttons': ['network']}},
+    'stratigraphic_unit': place.stratigraphic_unit,
     'type': type.type_,
-    'type_tools': {
-        'attributes': {}}}
+    'type_tools': {'attributes': {}}}

@@ -22,7 +22,6 @@ reference_system: dict[str, Any] = {
     'relations': {},  # Added dynamically from database
     'display': {
         'buttons': ['insert'],
-        'form': {
-            'insert_and_continue': True},
+        'form_buttons': ['insert_and_continue'],
         'additional_tabs': {
             'note': {}}}}

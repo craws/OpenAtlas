@@ -95,17 +95,34 @@ def insert(
     form = get_entity_form(entity, origin, relation)
     if form.validate_on_submit():
         return redirect(save(entity, form, origin, relation))
+    structure = None
+    gis_data = None
+    if entity.class_.attributes.get('location'):
+        structure = origin.get_structure_for_insert() if origin else None
+        gis_data = Gis.get_all(structure=structure)
     return render_template(
         'entity/insert.html',
         form=form,
         class_=entity.class_,
-        gis_data=Gis.get_all() if entity.class_.attributes.get('location')
-        else None,
+        gis_data=gis_data,
         writable=os.access(app.config['UPLOAD_PATH'], os.W_OK),
         overlays=get_overlays(origin),
         title=_(entity.class_.group['name']),
-        crumbs=hierarchy_crumbs(origin or entity) +
-        [origin, f'+ {uc_first(entity.class_.label)}'])
+        crumbs=crumbs_for_insert(entity, origin, structure))
+
+
+def crumbs_for_insert(
+        entity: Entity,
+        origin: Entity | None,
+        structure: dict[str, Any] | None) -> list[Any]:
+    crumbs = hierarchy_crumbs(origin or entity) + \
+        [origin, f'+ {uc_first(entity.class_.label)}']
+    if entity.class_.group['name'] == 'artifact' and origin and structure:
+        if count := len([
+            i for i in structure['siblings']
+                if i.class_.name == entity.class_.name]):
+            crumbs.append(f' ({count} {_("exists")})')
+    return crumbs
 
 
 def get_overlays(entity: Entity) -> dict[int, Overlay]:
@@ -131,8 +148,7 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
     if entity.class_.attributes.get('location'):
         entity.location = entity.location \
             or entity.get_linked_entity_safe('P53')
-        # Todo: why is get_structure_for_insert called at update?
-        gis_data = Gis.get_all([entity], entity.get_structure_for_insert())
+        gis_data = Gis.get_all([entity], entity.get_structure())
     # if entity.class_.group['name'] in ['artifact', 'place']:
     #    manager.entity.image_id = manager.entity.get_profile_image_id()
     #    if not manager.entity.image_id:
@@ -291,18 +307,22 @@ def redirect_url_insert(
                 selection_id=entity.id)
         elif not hasattr(form, 'continue_') or form.continue_.data != 'yes':
             url = url_for('view', id_=origin.id) + f"#tab-{relation_name}"
-    # if hasattr(manager.form, 'continue_') \
-    #        and manager.form.continue_.data in ['sub', 'human_remains']:
-    #    class_ = manager.form.continue_.data
-    #    if class_ == 'sub':
-    #        match manager.entity.class_.name:
-    #            case 'place':
-    #                class_ = 'feature'
-    #            case 'feature':
-    #                class_ = 'stratigraphic_unit'
-    #            case 'stratigraphic_unit':
-    #                class_ = 'artifact'
-    #    url = url_for('insert', class_=class_, origin_id=manager.entity.id)
+    if hasattr(form, 'continue_') \
+            and form.continue_.data in ['sub', 'human_remains']:
+        class_ = form.continue_.data
+        if class_ == 'sub':
+            match entity.class_.name:
+                case 'place':
+                    class_ = 'feature'
+                case 'feature':
+                    class_ = 'stratigraphic_unit'
+                case 'stratigraphic_unit':
+                    class_ = 'artifact'
+        url = url_for(
+            'insert',
+            class_=class_,
+            origin_id=entity.id,
+            relation=class_.replace('human_remains', 'artifact'))
     return url
 
 

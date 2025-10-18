@@ -70,7 +70,7 @@ class_ = {
             'mode': 'direct'}},
     'display': {
         'buttons': ['copy', 'network'],
-        'form': {'insert_and_continue': True},
+        'form_buttons': ['insert_and_continue'],
         'additional_tabs': {'note': {}}}}
 activity = copy.deepcopy(class_)
 activity['label'] = _('activity')

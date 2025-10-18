@@ -7,9 +7,8 @@ from flask_babel import format_number, lazy_gettext as _
 
 from openatlas import app
 from openatlas.display.tab import Tab
-from openatlas.display.util import button, description, link
+from openatlas.display.util import button, link
 from openatlas.models.entity import Entity, Link
-from openatlas.views.tools import carbon_result, sex_result
 
 
 class BaseDisplay:
@@ -29,23 +28,10 @@ class BaseDisplay:
 
 class PlaceBaseDisplay(BaseDisplay):
 
-    # def add_button_delete(self) -> None:
-    #    if not self.entity.get_linked_entities('P46'):
-    #        super().add_button_delete()
-
     def add_tabs(self) -> None:
-        entity = self.entity
-        for name in ['source', 'event', 'reference', 'artifact']:
-            self.tabs[name] = Tab(name, entity=entity)
-        if entity.class_.name == 'place':
-            self.tabs['actor'] = Tab('actor', entity=entity)
-            self.tabs['feature'] = Tab('feature', entity=entity)
-        elif entity.class_.name == 'feature':
-            self.tabs['stratigraphic_unit'] = Tab(
-                'stratigraphic_unit',
-                _('stratigraphic unit'),
-                entity=entity)
-        entity.location = entity.get_linked_entity_safe('P53', types=True)
+        self.tabs['event'] = Tab('event', entity=self.entity)
+        if self.entity.class_.name == 'place':
+            self.tabs['actor'] = Tab('actor', entity=self.entity)
 
 
 class TypeBaseDisplay(BaseDisplay):
@@ -126,7 +112,6 @@ class TypeBaseDisplay(BaseDisplay):
 class PlaceDisplay(PlaceBaseDisplay):
 
     def add_tabs(self) -> None:
-        super().add_tabs()
         if self.entity.location:
             for link_ in self.entity.location.get_links(
                     ['P74', 'OA8', 'OA9'],
@@ -151,19 +136,3 @@ class PlaceDisplay(PlaceBaseDisplay):
                         link(actor),
                         f"{_('participated at an event')}",
                         event.class_.name, '', '', ''])
-
-
-class StratigraphicUnitDisplay(PlaceBaseDisplay):
-
-    def add_button_others(self) -> None:
-        self.buttons.append(
-            button(_('tools'), url_for('tools_index', id_=self.entity.id)))
-
-    def description_html(self) -> str:
-        html = ''
-        if self.entity.class_.name == 'stratigraphic_unit':
-            if radiocarbon := carbon_result(self.entity):
-                html += f"<p>{radiocarbon}</p>"
-            if sex_estimation := sex_result(self.entity):
-                html += f"<p>{sex_estimation}</p>"
-        return html + description(self.entity.description)
