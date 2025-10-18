@@ -20,6 +20,7 @@ from openatlas.forms.entity_form import (
     get_entity_form, process_files, process_form_data)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
+from openatlas.models.openatlas_class import get_reverse_relation
 from openatlas.models.overlay import Overlay
 
 
@@ -157,6 +158,18 @@ def deletion_possible(entity: Entity) -> bool:
     if current_user.group == 'contributor':
         info = g.logger.get_log_info(entity.id)
         if not info['creator'] or info['creator'].id != current_user.id:
+            return False
+    for relation in entity.class_.relations.values():
+        reverse_relation = get_reverse_relation(
+            entity.class_,
+            relation,
+            g.classes[relation['classes'][0]])
+        if reverse_relation \
+                and reverse_relation.get('required') \
+                and entity.get_linked_entities(
+                    relation['property'],
+                    relation['classes'],
+                    relation['inverse']):
             return False
     match entity.class_.group['name']:
         case 'reference_system' if entity.system or entity.classes:

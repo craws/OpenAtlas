@@ -113,7 +113,7 @@ def entity_table(
             relation,
             item_class)
         if not reverse_relation or not reverse_relation.get("required", True):
-            columns.append("remove")
+            columns.append('remove')
 
     overlays = Overlay.get_by_object(origin) if 'overlay' in columns else {}
     table = Table(columns, order=order, defs=defs)
