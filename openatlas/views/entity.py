@@ -175,6 +175,8 @@ def deletion_possible(entity: Entity) -> bool:
         info = g.logger.get_log_info(entity.id)
         if not info['creator'] or info['creator'].id != current_user.id:
             return False
+    if entity.class_.group['name'] == 'type':
+        return True  # Type (recursive) deletion is taken care of at delete()
     for relation in entity.class_.relations.values():
         reverse_relation = get_reverse_relation(
             entity.class_,

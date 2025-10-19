@@ -243,7 +243,7 @@ class TableSelect(HiddenInput):
                     f'{field.id}-{class_name_}-standard-type-dynamic',
                     TreeField(
                         str(standard_type_id),
-                        type_id=str(standard_type_id)))
+                        type_id=standard_type_id))
             setattr(
                 SimpleEntityForm,
                 'description_dynamic',
@@ -359,7 +359,7 @@ class TreeMultiField(HiddenField):
             **kwargs: Any) -> None:
         super().__init__(label, validators, **kwargs)
         self.form = form
-        self.type_id = type_id or self.id
+        self.type_id = type_id or int(self.id)
 
     widget = TreeMultiSelect()
 
@@ -374,15 +374,17 @@ class TreeSelect(HiddenInput):
                 if isinstance(field.data, list) else field.data
             selection = g.types[int(field.data)].name
             selected_ids.append(g.types[int(field.data)].id)
-        return Markup(render_template(
-            'forms/tree_select.html',
-            field=field,
-            selection=selection,
-            root=g.types[int(field.type_id)],
-            data=Entity.get_tree_data(
-                int(field.type_id),
-                selected_ids,
-                field.is_type_form))) + super().__call__(field, **kwargs)
+        return Markup(
+            render_template(
+                'forms/tree_select.html',
+                field=field,
+                selection=selection,
+                root=g.types[field.type_id],
+                data=Entity.get_tree_data(
+                    field.type_id,
+                    selected_ids,
+                    field.filter_ids,
+                    field.is_type_form))) + super().__call__(field, **kwargs)
 
 
 class TreeField(HiddenField):
@@ -391,13 +393,15 @@ class TreeField(HiddenField):
             self,
             label: str,
             validators: Any = None,
-            type_id: str = '',
+            type_id: Optional[int] = None,
+            filter_ids: Optional[list[int]] = None,
             is_type_form: Optional[bool] = False,
             form: Any = None,
             **kwargs: Any) -> None:
         super().__init__(label, validators, **kwargs)
         self.form = form
-        self.type_id = type_id or self.id
+        self.type_id = type_id or int(self.id)
+        self.filter_ids = filter_ids
         self.is_type_form = is_type_form
 
     widget = TreeSelect()

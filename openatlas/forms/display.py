@@ -53,7 +53,7 @@ def html_form(
                 html += add_dates(form)
             continue
         if field.type in ['TreeField', 'TreeMultiField', 'ValueTypeRootField']:
-            type_ = g.types[int(field.type_id)]
+            type_ = g.types[field.type_id]
             if not type_.subs:
                 continue
             label = type_.name

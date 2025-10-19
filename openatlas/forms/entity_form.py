@@ -210,11 +210,11 @@ def process_relations(
     if origin and relation_name:
         origin_relation = origin.class_.relations[relation_name]
         if not origin.class_.relations[relation_name]['additional_fields']:
-            relation = get_reverse_relation(
+            reverse_relation = get_reverse_relation(
                 origin.class_,
                 origin_relation,
                 entity.class_)
-            if not relation or relation['mode'] != 'direct':
+            if not reverse_relation or reverse_relation['mode'] != 'direct':
                 origin.link(
                     origin_relation['property'],
                     entity,

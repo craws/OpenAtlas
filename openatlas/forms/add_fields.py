@@ -118,7 +118,7 @@ def add_type(form: Any, type_: Entity):
         setattr(
             AddDynamicType,
             f'{type_.id}-dynamic',
-            TreeField(str(type_.id) + '*', type_id=str(type_.id)))
+            TreeField(str(type_.id) + '*', type_id=type_.id))
         setattr(
             AddDynamicType,
             'description-dynamic',
@@ -150,8 +150,22 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
             if class_ not in entities:
                 entities[class_] = Entity.get_by_class(class_, True, True)
             items += entities[class_]
-
-        if relation['multiple']:
+        if 'type' in relation['classes']:
+            root = g.types[entity.root[0]] if entity.root else origin
+            setattr(
+                form,
+                relation['name'],
+                TreeField(
+                    relation['label'],
+                    type_id=root.id,
+                    # filter_ids=[entity.id] if entity else [],
+                    is_type_form=True))
+            if root.directional:
+                setattr(
+                    form,
+                    'name_inverse',
+                    StringField(_('inverse')))
+        elif relation['multiple']:
             selection: Any = []
             if entity.id:
                 selection = entity.get_linked_entities(
