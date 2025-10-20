@@ -158,7 +158,7 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
                 TreeField(
                     relation['label'],
                     type_id=root.id,
-                    # filter_ids=[entity.id] if entity else [],
+                    filter_ids=[entity.id] if entity else [],
                     is_type_form=True))
             if root.directional:
                 setattr(

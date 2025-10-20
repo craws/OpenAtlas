@@ -204,8 +204,6 @@ def delete(id_: int) -> Response:
     if not deletion_possible(entity):
         abort(403)
     url = url_for('index', group=entity.class_.group['name'])
-
-    # Todo: replace these class conditions with config conditions
     if entity.class_.group['name'] == 'type':
         if entity.subs or entity.count:
             return redirect(url_for('type_delete_recursive', id_=entity.id))
@@ -299,6 +297,14 @@ def redirect_url_insert(
     url = url_for('view', id_=entity.id)
     if hasattr(form, 'continue_') and form.continue_.data == 'yes':
         url = request.url
+        if entity.class_.group['name'] == 'type' and origin:
+            if not (super_id := getattr(form, 'super').data):
+                super_id = origin.root[0] if origin.root else origin.id
+            url = url_for(
+                'insert',
+                class_=entity.class_.name,
+                origin_id=str(super_id),
+                relation=relation_name)
     if entity.class_.group['name'] != 'type' and origin and relation_name:
         relation = origin.class_.relations[relation_name]
         if relation['additional_fields']:

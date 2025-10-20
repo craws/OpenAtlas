@@ -624,10 +624,13 @@ def display_annotation_text_links(entity: Entity) -> str:
 
 def hierarchy_crumbs(entity: Entity) -> list[str]:
     crumbs = [link(entity, index=True)]
+    if entity.class_.group['name'] == 'type':
+        return crumbs + [
+            g.types[id_] for id_ in entity.root] if entity.root else crumbs
     for relation in entity.class_.relations.values():
-        if relation['name'] == 'super' \
-                or (entity.class_.name == 'source_translation'
-                    and relation['name'] == 'source'):
+        if relation['name'] == 'super' or (
+                entity.class_.name == 'source_translation'
+                and relation['name'] == 'source'):
             crumbs += [
                 e for e in entity.get_linked_entities_recursive(
                     relation['property'],

@@ -37,7 +37,6 @@ class PlaceBaseDisplay(BaseDisplay):
 class TypeBaseDisplay(BaseDisplay):
 
     def add_data(self) -> None:
-        self.data[_('super')] = link(g.types[self.entity.root[-1]])
         if self.entity.category == 'value':
             self.data[_('unit')] = self.entity.description
         self.data[_('selectable')] = str(_('yes')) \

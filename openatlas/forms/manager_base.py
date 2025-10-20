@@ -187,30 +187,13 @@ class HierarchyBaseManager(BaseManager):
 
 class TypeBaseManager(BaseManager):
     fields = ['name', 'date', 'description', 'continue']
-    super_id: int
 
     def additional_fields(self) -> dict[str, Any]:
         root = self.get_root()
-        fields = {
-            str(root.id): TreeField(
-                str(root.id),
-                filter_ids=[self.entity.id] if self.entity else [],
-                is_type_form=True)}
+        fields = {}
         if root.directional:
             fields['name_inverse'] = StringField(_('inverse'))
         return fields
-
-    def customize_labels(self) -> None:
-        getattr(self.form, str(self.get_root().id)).label.text = 'super'
-
-    def get_root(self) -> Entity:
-        type_ = self.origin or self.entity
-        return g.types[type_.root[0]] if type_.root else type_
-
-    def populate_insert(self) -> None:
-        root_id = self.origin.root[0] if self.origin.root else self.origin.id
-        getattr(self.form, str(root_id)).data = self.origin.id \
-            if self.origin.id != root_id else None
 
     def populate_update(self) -> None:
         if hasattr(self.form, 'name_inverse'):
@@ -218,16 +201,6 @@ class TypeBaseManager(BaseManager):
             self.form.name.data = name_parts[0].strip()
             if len(name_parts) > 1:
                 self.form.name_inverse.data = name_parts[1][:-1].strip()
-        super_ = g.types[self.entity.root[-1]]
-        root = g.types[self.entity.root[0]]
-        if super_.id != root.id:
-            getattr(self.form, str(root.id)).data = super_.id
-
-    def process_form(self) -> None:
-        super().process_form()
-        self.super_id = self.get_root().id
-        if new_id := getattr(self.form, str(self.super_id)).data:
-            self.super_id = int(new_id)
 
 
 class ActorFunctionManager(BaseManager):
@@ -404,11 +377,6 @@ class InvolvementManager(BaseManager):
 class TypeManager(TypeBaseManager):
     def add_description(self) -> None:
         if self.get_root().category == 'value':
-            del self.form_class.description  # pylint: disable=no-member
+            del self.form_class.description
             setattr(self.form_class, 'description', StringField(_('unit')))
-
-    def process_form(self) -> None:
-        super().process_form()
-        self.data['links']['delete'].add('P127')
-        self.add_link('P127', g.types[self.super_id])
 

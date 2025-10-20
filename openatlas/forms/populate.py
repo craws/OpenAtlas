@@ -7,9 +7,11 @@ from openatlas.models.dates import Dates, format_date_part
 from openatlas.models.entity import Entity
 
 
-def populate_insert(form: Any) -> None:
+def populate_insert(form: Any, entity: Entity, origin: Entity | None) -> None:
     if hasattr(form, 'alias'):
         form.alias.append_entry('')
+    if entity.class_.group['name'] == 'type' and origin and origin.root:
+        getattr(form, 'super').data = origin.id
 
 
 def populate_update(form: Any, entity: Entity) -> None:
