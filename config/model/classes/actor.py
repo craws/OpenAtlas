@@ -46,7 +46,7 @@ group = {
                     'begin',
                     'end',
                     'description'],
-                'buttons': ['link']}},
+                'buttons': ['link', 'insert']}},
         'participated': {
             'label': _('participated'),
             'classes': class_groups['event']['classes'],
@@ -63,7 +63,7 @@ group = {
                     'begin',
                     'end',
                     'description'],
-                'buttons': ['link']}},
+                'buttons': ['link', 'insert']}},
         'relative': {
             'label': _('relation'),
             'classes': 'person',

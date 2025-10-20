@@ -52,17 +52,17 @@ class_ = {
             'mode': 'direct'},
         'reference': standard_relations['reference'],
         'file': standard_relations['file'],
+        'preceding_event': {
+            'label': _('preceding event'),
+            'classes': class_groups['event']['classes'],
+            'property': 'P134',
+            'mode': 'direct'},
         'succeeding_event': {
             'label': _('succeeding event'),
             'classes': class_groups['event']['classes'],
             'property': 'P134',
             'inverse': True,
             'mode': 'display'},
-        'preceding_event': {
-            'label': _('preceding event'),
-            'classes': class_groups['event']['classes'],
-            'property': 'P134',
-            'mode': 'direct'},
         'location': {
             'label': _('location'),
             'classes': 'object_location',

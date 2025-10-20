@@ -195,7 +195,7 @@ def process_relations(
         origin: Entity | None,
         relation_name: str | None) -> None:
     for name, relation in entity.class_.relations.items():
-        if relation['mode'] == 'tab':
+        if relation['mode'] != 'direct':
             continue
         ids = convert(getattr(form, name).data)
         if entity.class_.group['name'] == 'type' \
