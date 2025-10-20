@@ -7,16 +7,13 @@ from openatlas.models.dates import Dates, format_date_part
 from openatlas.models.entity import Entity
 
 
-def populate_insert(form: Any, entity: Entity) -> None:
+def populate_insert(form: Any) -> None:
     if hasattr(form, 'alias'):
         form.alias.append_entry('')
 
 
 def populate_update(form: Any, entity: Entity) -> None:
-    form.opened.data = time.time()  # Todo: what if POST because of not valid?
-    # Todo: deal with link types
-    # types: dict[Any, Any] = manager.link_.types \
-    #    if manager.link_ else manager.entity.types
+    form.opened.data = time.time()
     # Todo: deal with place types
     # if manager.entity and manager.entity.class_.name == 'place':
     #     if location := \
@@ -44,6 +41,10 @@ def populate_update(form: Any, entity: Entity) -> None:
     for root_id, types_ in type_data.items():
         if hasattr(form, str(root_id)):
             getattr(form, str(root_id)).data = types_
+
+    if entity.class_.group['name'] == 'type':
+        if len(entity.root) > 1:
+            getattr(form, 'super').data = entity.root[-1]
 
 
 def populate_reference_systems(form: Any, entity: Entity) -> None:

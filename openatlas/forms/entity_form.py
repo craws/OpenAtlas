@@ -88,10 +88,11 @@ def get_entity_form(
         entity,
         origin.class_.relations[relation] if origin and relation else {})
     form: Any = Form(obj=entity)
-    if request.method == 'GET' and entity.id:
-        populate_update(form, entity)
-    elif request.method == 'GET':
-        populate_insert(form, entity)
+    if request.method == 'GET':
+        if entity.id:
+            populate_update(form, entity)
+        else:
+            populate_insert(form)
     return form
 
 
@@ -196,7 +197,12 @@ def process_relations(
     for name, relation in entity.class_.relations.items():
         if relation['mode'] == 'tab':
             continue
-        if hasattr(form, name) and (ids := convert(getattr(form, name).data)):
+        ids = convert(getattr(form, name).data)
+        if entity.class_.group['name'] == 'type' \
+                and relation['name'] == 'super' \
+                and not ids:
+            ids = [entity.root[0] if entity.root else origin.id]
+        if hasattr(form, name) and ids:
             entities = Entity.get_by_ids(ids)
             if 'object_location' in relation['classes']:
                 locations = []
@@ -207,6 +213,7 @@ def process_relations(
                 relation['property'],
                 entities,
                 inverse=relation['inverse'])
+
     if origin and relation_name:
         origin_relation = origin.class_.relations[relation_name]
         if not origin.class_.relations[relation_name]['additional_fields']:
