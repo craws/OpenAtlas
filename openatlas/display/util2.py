@@ -138,7 +138,7 @@ def manual(site: str) -> str:
 
 
 def get_backup_file_data() -> dict[str, Any]:
-    path = app.config['EXPORT_PATH']
+    path = app.config['SQL_PATH']
     latest_file = None
     latest_file_date = None
     for file in [

@@ -1,9 +1,11 @@
 # Don't edit this file. To override settings please use instance/production.py
 from pathlib import Path
 
+from rdflib import Namespace
+
 from config.database_versions import DATABASE_VERSIONS
 
-VERSION = '8.14.0'
+VERSION = '8.15.0'
 DATABASE_VERSION = DATABASE_VERSIONS[0]
 DEMO_MODE = False  # If activated some options are disabled, login is prefilled
 DEBUG = False
@@ -29,6 +31,9 @@ LANGUAGES = {
 # or use absolute paths like e.g. pathlib.Path('/some/location/somewhere')
 FILES_PATH = Path(__file__).parent.parent / 'files'
 EXPORT_PATH = Path(FILES_PATH) / 'export'
+SQL_PATH = Path(EXPORT_PATH) / 'sql'
+ARCHE_PATH = Path(EXPORT_PATH) / 'arche'
+RDF_PATH = Path(EXPORT_PATH) / 'rdf'
 UPLOAD_PATH = Path(FILES_PATH) / 'uploads'
 TMP_PATH = Path('/tmp')  # For processing files e.g. at import and export
 
@@ -72,7 +77,25 @@ LOAD_WINDOWS_TEST_SQL = False
 API_WIKIDATA = 'https://www.wikidata.org/w/api.php'
 API_GEONAMES = 'http://api.geonames.org/get'
 USER_AGENT = {
-    "User-Agent": f"OpenAtlas/{VERSION} (https://github.com/craws/OpenAtlas; "
-                  "openatlas@oeaw.ac.at)"}
+    "User-Agent":
+        f"OpenAtlas/{VERSION} (https://github.com/craws/OpenAtlas; "
+        "openatlas@oeaw.ac.at)"}
 
 CSP_HEADER = "frame-ancestors 'self'"
+
+# ARCHE export
+ACDH = Namespace("https://vocabs.acdh.oeaw.ac.at/schema#")  # type: ignore
+ARCHE_URI_RULES = \
+    'https://raw.githubusercontent.com/acdh-oeaw/arche-assets' \
+    '/refs/heads/master/AcdhArcheAssets/uriNormRules.json'
+ARCHE_METADATA = {
+    'topCollection': '',
+    'language': 'en',
+    'depositor': [],
+    'acceptedDate': '',
+    'hasMetadataCreator': [],
+    'curator': [],
+    'principalInvestigator': [],
+    'relatedDiscipline': [],
+    'typeIds': [],
+    'excludeReferenceSystems': []}
