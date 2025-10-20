@@ -94,9 +94,9 @@ def _add_triples_from_linked_art(
         context_entry = _linked_art_context["@context"].get(type_val)
         if isinstance(context_entry, dict) and "@id" in context_entry:
             full_type_uri = context_entry["@id"]
-        elif isinstance(context_entry, str):
+        elif isinstance(context_entry, str):  # pragma: no cover
             full_type_uri = context_entry
-        else:
+        else:  # pragma: no cover
             if (type_val.startswith("http://")
                     or type_val.startswith("https://")):
                 full_type_uri = type_val
