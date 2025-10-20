@@ -2,18 +2,16 @@ from __future__ import annotations
 
 import ast
 from datetime import datetime
-from pathlib import Path
 from typing import Any, Optional
 
 import numpy
-from flask import g, url_for
+from flask import g
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField
 
 from openatlas import app
-from openatlas.display.util import get_file_path
 from openatlas.models.entity import Entity, Link
 
 
@@ -150,19 +148,7 @@ class GlobalSearchForm(FlaskForm):
 
 @app.context_processor
 def inject_template_functions() -> dict[str, str | GlobalSearchForm]:
-    def get_logo() -> str:
-        if g.settings['logo_file_id']:
-            try:
-                if path := get_file_path(int(g.settings['logo_file_id'])):
-                    return url_for(
-                        'display_logo',
-                        filename=f"{g.settings['logo_file_id']}{path.suffix}")
-            except:  # pragma: no cover
-                pass
-        return str(Path('/static') / 'images' / 'layout' / 'logo.png')
-    return {
-        'get_logo': get_logo(),
-        'search_form': GlobalSearchForm(prefix='global')}
+    return {'search_form': GlobalSearchForm(prefix='global')}
 
 
 def check_if_entity_has_time(item: Entity | Link) -> bool:

@@ -272,9 +272,9 @@ def profile_image(entity: Entity) -> str:
         f'<img style="max-width:{width}px" alt="{entity.name}" src="{src}">',
         url,
         external=external)
-    if (entity.class_.name == 'file'
-            and check_iiif_activation()
-            and g.files[file_id].suffix in g.display_file_ext):
+    if entity.class_.name == 'file' \
+            and check_iiif_activation() \
+            and g.files[file_id].suffix in g.display_file_ext:
         if check_iiif_file_exist(file_id) \
                 or not g.settings['iiif_conversion']:
             html += ('<br>' + link(
@@ -438,8 +438,12 @@ def tooltip(text: str) -> str:
         return ''
     title = text.replace('"', "'")
     return (
-        '<span>'
-        f'<i class="fas fa-info-circle tooltipicon" title="{title}"></i>'
+        f"""<span
+        data-bs-toggle="tooltip"
+        data-bs-placement="top"
+        data-bs-custom-class="custom-tooltip"
+        data-bs-title="{title}">"""
+        '<i class="fas fa-info-circle fs-6 tooltipicon"></i>'
         '</span>')
 
 
@@ -454,8 +458,18 @@ def get_file_path(
         if ext in app.config['PROCESSABLE_EXT']:
             ext = app.config['PROCESSED_EXT']  # pragma: no cover
         path = app.config['RESIZED_IMAGES'] / size / f"{id_}{ext}"
-        return path if os.path.exists(path) else None
-    return app.config['UPLOAD_PATH'] / f"{id_}{ext}"
+    else:
+        path = app.config['UPLOAD_PATH'] / f"{id_}{ext}"
+    return path if os.path.exists(path) else None
+
+
+@pass_context  # Prevent Jinja2 context caching
+@app.template_filter()
+def get_logo_url(_context: str, _unneeded_var: str) -> str:
+    if g.settings['logo_file_id'] \
+            and (path := get_file_path(int(g.settings['logo_file_id']))):
+        return url_for('display_custom_logo', ext=path.suffix)
+    return "/static/images/layout/logo.png"
 
 
 @app.template_filter()
