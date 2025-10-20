@@ -24,6 +24,10 @@ def _add_namespaces(graph: Graph, context: dict[str, Any]) -> None:
             if uri.endswith('/') or uri.endswith('#'):
                 graph.bind(prefix, Namespace(uri))  # type: ignore
 
+    graph.bind("crm", Namespace("http://www.cidoc-crm.org/cidoc-crm/"))
+    graph.bind("la", Namespace("https://linked.art/ns/terms/"))
+    graph.bind("rdfs", Namespace("http://www.w3.org/2000/01/rdf-schema#"))
+    graph.bind("rdf", Namespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#"))
 
 def _resolve_predicate(key: str) -> URIRef | None:
     context_entry = _linked_art_context["@context"].get(key)
