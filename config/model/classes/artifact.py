@@ -29,13 +29,6 @@ artifact: dict[str, Any] = {
             'inverse': True,
             'mode': 'direct'},
         'source': standard_relations['source'],
-        'event': {
-            'classes': ['acquisition', 'modification', 'move', 'production'],
-            'property': 'P24',  # Todo: 'P25', 'P31', 'P108'
-            'inverse': True,
-            'multiple': True,
-            'tab': {
-                'buttons': ['insert']}},
         'subs': {
             'label': _('subs'),
             'classes': 'artifact',
@@ -43,6 +36,34 @@ artifact: dict[str, Any] = {
             'multiple': True,
             'tab': {
                 'buttons': ['link', 'insert']}},
+        'acquisition': {
+            'classes': 'acquisition',
+            'property': 'P24',
+            'inverse': True,
+            'multiple': True,
+            'tab': {
+                'buttons': ['link', 'insert']}},
+        'modification': {
+            'classes': 'modification',
+            'property': 'P31',
+            'inverse': True,
+            'multiple': True,
+            'tab': {
+                'buttons': ['link', 'insert']}},
+        'move': {
+            'classes':  'move',
+            'property': 'P25',
+            'inverse': True,
+            'multiple': True,
+            'tab': {
+                'buttons': ['link', 'insert']}},
+        'production': {
+            'classes':  'production',
+            'property': 'P108',
+            'inverse': True,
+            'multiple': True,
+            'tab': {
+                'buttons': ['link','insert']}},
         'reference': standard_relations['reference'],
         'file': standard_relations['file']},
     'display': {
