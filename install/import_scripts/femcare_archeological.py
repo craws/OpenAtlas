@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 import fitz
-import docx
 import pandas as pd
 
 from openatlas import app
@@ -16,11 +15,6 @@ SKELETON_PATH = FILE_PATH / 'skeletons'
 # pylint: skip-file
 
 DEBUG_MSG = defaultdict(list)
-
-
-# Todo:
-#   * I did install new package for reading docx: python3-docx
-
 
 @dataclass
 class Individual:
@@ -547,6 +541,14 @@ with app.test_request_context():
     app.preprocess_request()
     exact_match = get_exact_match()
     case_study = Entity.get_by_id(16305)
+
+        # Remove former data
+    print('Remove former data')
+    for item in case_study.get_linked_entities('P2', True):
+        item.delete()
+    print('\nFormer data removed')
+
+
     place = Entity.get_by_id(145)
     feature_main_type = Entity.get_by_id(72)
     import_feature_type = Entity.insert('type', 'imported')
