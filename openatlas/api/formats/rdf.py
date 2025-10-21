@@ -24,6 +24,10 @@ def _add_namespaces(graph: Graph, context: dict[str, Any]) -> None:
             if uri.endswith('/') or uri.endswith('#'):
                 graph.bind(prefix, Namespace(uri))  # type: ignore
 
+    graph.bind("crm", Namespace("http://www.cidoc-crm.org/cidoc-crm/"))
+    graph.bind("la", Namespace("https://linked.art/ns/terms/"))
+    graph.bind("rdfs", Namespace("http://www.w3.org/2000/01/rdf-schema#"))
+    graph.bind("rdf", Namespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#"))
 
 def _resolve_predicate(key: str) -> URIRef | None:
     context_entry = _linked_art_context["@context"].get(key)
@@ -89,7 +93,29 @@ def _add_triples_from_linked_art(
     subject = _get_subject(data, graph, parent_subject, parent_predicate)
 
     if data.get("type"):
-        graph.add((subject, RDF.type, URIRef(data["type"])))
+        type_val = data["type"]
+
+        if type_val.startswith(("http://", "https://")):
+            full_type_uri = type_val
+
+        elif ":" in type_val:
+            prefix, local = type_val.split(":", 1)
+            prefix_uri = _linked_art_context["@context"].get(prefix)
+            if isinstance(prefix_uri, str):
+                full_type_uri = prefix_uri + local
+            else:
+                la_base = _linked_art_context["@context"].get("la") \
+                    or "https://linked.art/ns/terms/"
+                full_type_uri = f"{la_base}{type_val}"
+
+        else:
+            la_base = _linked_art_context["@context"].get("la") \
+                or "https://linked.art/ns/terms/"
+            full_type_uri = f"{la_base}{type_val}"
+
+        graph.add((subject, RDF.type, URIRef(full_type_uri)))
+
+
 
     for key, value in data.items():
         if key in {"id", "type", "@context"}:

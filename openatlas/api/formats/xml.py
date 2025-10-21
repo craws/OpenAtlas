@@ -19,7 +19,7 @@ def subunit_xml(result: dict[str, Any]) -> bytes:
     return xml_bytes
 
 
-def dict_to_xml(tag: str, data: Any) -> etree.Element:  # type: ignore
+def dict_to_xml(tag: str, data: Any) -> etree.Element:
     elem = etree.Element(tag)
     if isinstance(data, dict):
         for key, val in data.items():
