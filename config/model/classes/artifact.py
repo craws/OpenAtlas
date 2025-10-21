@@ -77,3 +77,4 @@ human_remains['label'] = _('human remains')
 human_remains['relations']['super']['classes'] = \
     ['human_remains'] + class_groups['place']['classes']
 human_remains['relations']['subs']['classes'] = 'human_remains'
+del human_remains['relations']['production']

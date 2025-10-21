@@ -1,4 +1,3 @@
-import copy
 from typing import Any
 
 from flask_babel import lazy_gettext as _
@@ -32,6 +31,21 @@ place: dict[str, Any] = {
             'multiple': True,
             'tab': {
                 'buttons': ['insert']}},
+        'acquisition': {
+            'classes': 'acquisition',
+            'property': 'P24',
+            'inverse': True,
+            'multiple': True,
+            'tab': {
+                'buttons': ['link', 'insert']}},
+        'event_location': {
+            'label': _('event location'),
+            'classes': [
+                'activity', 'acquisition', 'modification', 'production'],
+            'property': 'P7',
+            'inverse': True,
+            'tab': {
+                'buttons': ['link', 'insert']}},
         'reference': standard_relations['reference'],
         'file': standard_relations['file']},
     'display': {
