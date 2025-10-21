@@ -95,21 +95,26 @@ def _add_triples_from_linked_art(
     if data.get("type"):
         type_val = data["type"]
 
-        context_entry = _linked_art_context["@context"].get(type_val)
-        if isinstance(context_entry, dict) and "@id" in context_entry:
-            full_type_uri = context_entry["@id"]
-        elif isinstance(context_entry, str):  # pragma: no cover
-            full_type_uri = context_entry
-        else:  # pragma: no cover
-            if (type_val.startswith("http://")
-                    or type_val.startswith("https://")):
-                full_type_uri = type_val
+        if type_val.startswith(("http://", "https://")):
+            full_type_uri = type_val
+
+        elif ":" in type_val:
+            prefix, local = type_val.split(":", 1)
+            prefix_uri = _linked_art_context["@context"].get(prefix)
+            if isinstance(prefix_uri, str):
+                full_type_uri = prefix_uri + local
             else:
-                la_base = (_linked_art_context["@context"].get("la")
-                           or "https://linked.art/ns/terms/")
+                la_base = _linked_art_context["@context"].get("la") \
+                    or "https://linked.art/ns/terms/"
                 full_type_uri = f"{la_base}{type_val}"
 
+        else:
+            la_base = _linked_art_context["@context"].get("la") \
+                or "https://linked.art/ns/terms/"
+            full_type_uri = f"{la_base}{type_val}"
+
         graph.add((subject, RDF.type, URIRef(full_type_uri)))
+
 
 
     for key, value in data.items():
