@@ -5,8 +5,7 @@ from config.model.class_groups import standard_relations
 type_ = {
     'label': _('type'),
     'attributes': {
-        'name': {
-            'required': True},
+        'name': {'required': True},
         'dates': {},
         'description': {}},
     'extra': ['reference_system'],
@@ -23,8 +22,7 @@ type_ = {
             'property': 'P127',
             'multiple': True,
             'inverse': True,
-            'tab': {
-               'buttons': ['insert']}},
+            'tab': {'buttons': ['insert']}},
         'entities': {
             'label': _('entities'),
             'classes': [],
@@ -36,5 +34,5 @@ type_ = {
     'display': {
         'buttons': ['selectable'],
         'form_buttons': ['insert_and_continue'],
-        'additional_tabs': {
-            'note': {}}}}
+        'additional_tabs': {'note': {}},
+        'additional_information': {'type_information': {}}}}

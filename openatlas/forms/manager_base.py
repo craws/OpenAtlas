@@ -24,21 +24,7 @@ if TYPE_CHECKING:  # pragma: no cover
 def process_standard_fields(manager: Any) -> None:
     for key, value in manager.form.data.items():
         field_type = getattr(manager.form, key).type
-        if key == 'name':
-            name = manager.form.data['name']
-            if hasattr(manager.form, 'name_inverse'):
-                name = manager.form.name.data.replace(
-                    '(', '').replace(')', '').strip()
-                if manager.form.name_inverse.data.strip():
-                    inverse = manager.form.name_inverse.data. \
-                        replace('(', ''). \
-                        replace(')', '').strip()
-                    name += f' ({inverse})'
-            # if isinstance(manager.entity, ReferenceSystem) \
-            #        and manager.entity.system:
-            #    name = manager.entity.name  # Prevent changing a system name
-            manager.data['attributes']['name'] = name
-        elif field_type == 'ValueTypeField':
+        if field_type == 'ValueTypeField':
             if value is not None:  # Allow the number zero
                 manager.add_link('P2', g.types[int(key)], value)
 
@@ -185,23 +171,6 @@ class HierarchyBaseManager(BaseManager):
                 widget=widgets.ListWidget(prefix_label=False))}
 
 
-class TypeBaseManager(BaseManager):
-    fields = ['name', 'date', 'description', 'continue']
-
-    def additional_fields(self) -> dict[str, Any]:
-        root = self.get_root()
-        fields = {}
-        if root.directional:
-            fields['name_inverse'] = StringField(_('inverse'))
-        return fields
-
-    def populate_update(self) -> None:
-        if hasattr(self.form, 'name_inverse'):
-            name_parts = self.entity.name.split(' (')
-            self.form.name.data = name_parts[0].strip()
-            if len(name_parts) > 1:
-                self.form.name_inverse.data = name_parts[1][:-1].strip()
-
 
 class ActorFunctionManager(BaseManager):
     fields = ['date', 'description', 'continue']
@@ -296,7 +265,7 @@ class ActorRelationManager(BaseManager):
             self.form.inverse.data = True
 
 
-class AdministrativeUnitManager(TypeBaseManager):
+class AdministrativeUnitManager(BaseManager):
     def process_form(self) -> None:
         super().process_form()
         self.data['links']['delete'].add('P89')
@@ -374,7 +343,7 @@ class InvolvementManager(BaseManager):
         self.link_.property = g.properties[self.form.activity.data]
 
 
-class TypeManager(TypeBaseManager):
+class TypeManager(BaseManager):
     def add_description(self) -> None:
         if self.get_root().category == 'value':
             del self.form_class.description

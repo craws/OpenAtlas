@@ -354,3 +354,9 @@ class Display:
                     self.data[item['label']] = self.entity.get_file_ext()
                 case 'file_size':
                     self.data[item['label']] = self.entity.get_file_size()
+                case 'type_information':
+                    if self.entity.category == 'value':
+                        self.data[_('unit')] = self.entity.description
+                    self.data[_('selectable')] = str(_('yes')) \
+                        if self.entity.selectable else str(_('no'))
+                    self.data[_('ID for imports')] = self.entity.id

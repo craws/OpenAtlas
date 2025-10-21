@@ -135,6 +135,13 @@ def process_form_data(
                     for shape in ['point', 'line', 'polygon']}
             case 'name' if entity.system:
                 pass  # Prevent name change of system entities
+            case 'name' if hasattr(form, 'name_inverse'):
+                data[attr] = form.name.data.replace('(', '') \
+                    .replace(')', '').strip()
+                if form.name_inverse.data.strip():
+                    inverse = form.name_inverse.data \
+                        .replace('(', '').replace(')', '').strip()
+                    data[attr] += f' ({inverse})'
             case _ if hasattr(form, attr) and (
                     getattr(form, attr).data or getattr(form, attr).data == 0):
                 value = getattr(form, attr).data

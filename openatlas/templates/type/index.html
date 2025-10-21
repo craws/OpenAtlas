@@ -87,7 +87,7 @@
                           <br>
                           {% if category in ['custom', 'place', 'standard'] %}
                             <strong>{{ _('required')|uc_first }}</strong>:
-                            {{ _('true') if type_.required else _('false') }}
+                            {{ _('yes') if type_.required else _('no') }}
                             {% if 'manager'|is_authorized %}
                               {% if type_.required %}
                                 (<a href="{{ url_for('required_remove', id_=type_.id) }}">{{ _('remove required') }}</a>)

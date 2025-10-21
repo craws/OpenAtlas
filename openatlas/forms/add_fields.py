@@ -161,10 +161,7 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
                     filter_ids=[entity.id] if entity else [],
                     is_type_form=True))
             if root.directional:
-                setattr(
-                    form,
-                    'name_inverse',
-                    StringField(_('inverse')))
+                setattr(form, 'name_inverse', StringField(_('inverse')))
         elif relation['multiple']:
             selection: Any = []
             if entity.id:

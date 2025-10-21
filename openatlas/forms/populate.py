@@ -24,6 +24,11 @@ def populate_update(form: Any, entity: Entity) -> None:
     # Todo: implement copy
     # if entity.id and not copy:
     #     form.entity_id.data = entity.id
+    if hasattr(form, 'name_inverse'):
+        name_parts = entity.name.split(' (')
+        form.name.data = name_parts[0].strip()
+        if len(name_parts) > 1:
+            form.name_inverse.data = name_parts[1][:-1].strip()
     populate_reference_systems(form, entity)
     if 'dates' in entity.class_.attributes:
         populate_dates(form, entity.dates)
