@@ -759,6 +759,10 @@ class Api(ApiTestCase):
                 image_size='table')) as rv:
             self.assertTrue(rv.headers['Content-Type'].startswith('image'))
 
+        with c.get(
+            url_for('api_04.files_of_entities', entities=place.id)) as rv:
+            self.assertTrue(rv.get_json()[str(place.id)])
+
         rv = c.get(url_for('api_04.search', class_='all', term='Fro'))
         assert rv.get_json()['pagination']['entities'] == 2
 

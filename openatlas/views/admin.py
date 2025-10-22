@@ -844,6 +844,8 @@ def admin_delete_orphaned_resized_images() -> Response:
 
 def get_disk_space_info() -> Optional[dict[str, Any]]:
     def upload_ident_with_iiif() -> bool:
+        if not iiif_path:
+            return False
         return app.config['UPLOAD_PATH'].resolve() == iiif_path.resolve()
 
     paths = {

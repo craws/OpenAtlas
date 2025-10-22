@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.10a",
+    "version": "0.4.10b",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -1571,6 +1571,92 @@
                   "format": "binary"
                 }
               }
+            }
+          },
+          "404": {
+            "description": "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
+    "/files_of_entities/": {
+      "get": {
+        "tags": [
+          "Proposal"
+        ],
+        "description": "Takes in entities IDs and retrieves a json with the entity IDs as keys and a list of file information for all images linked to that entity.",
+        "operationId": "DisplayImage",
+        "parameters": [
+          {
+            "name": "entities",
+            "description": "The entity IDs to be requested.",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "license": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "creator": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "licenseHolder": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "publicShareable": {
+                      "nullable": true,
+                      "type": "boolean"
+                    },
+                    "mimetype": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "IIIFManifest": {
+                      "type": "string"
+                    },
+                    "IIIFBasePath": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "license",
+                    "mimetype",
+                    "publicShareable",
+                    "title",
+                    "url"
+                  ]
+                }
+              }
+            },
+            "explode": true
+          }
+        ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
             }
           },
           "404": {

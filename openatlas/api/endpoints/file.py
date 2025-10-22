@@ -1,20 +1,23 @@
 import mimetypes
+from collections import defaultdict
 from pathlib import Path as Pathlib_path
 from typing import Any
 
-from flask import Response, g, send_file, url_for
+from flask import Response, g, jsonify, send_file, url_for
 from flask_restful import Resource, marshal
 
 from openatlas import app
+from openatlas.api.formats.presentation_view import get_presentation_files
 from openatlas.api.resources.error import (
     DisplayFileNotFoundError, NoLicenseError, NotPublicError)
 from openatlas.api.resources.api_entity import ApiEntity
-from openatlas.api.resources.parser import files, image
+from openatlas.api.resources.parser import files, image, query
 from openatlas.api.resources.resolve_endpoints import download
 from openatlas.api.resources.templates import licensed_file_template
 from openatlas.api.resources.util import get_license_name
 from openatlas.display.util import (
     check_iiif_activation, check_iiif_file_exist, get_file_path)
+from openatlas.models.entity import Entity
 
 
 class DisplayImage(Resource):
@@ -79,3 +82,21 @@ class LicensedFileOverview(Resource):
         if parser['download']:
             return download(files_dict, licensed_file_template(entities))
         return marshal(files_dict, licensed_file_template(entities)), 200
+
+
+class EntityFiles(Resource):
+    @staticmethod
+    def get() -> Response:
+        parser = query.parse_args()
+        links = Entity.get_links_of_entities(
+            parser['entities'],
+            'P67',
+            True)
+        dict_ = defaultdict(list)
+        for link_ in links:
+            if link_.domain.class_.name == 'file':
+                dict_[link_.range.id].append(link_)
+        output_dict = {}
+        for id_, links in dict_.items():
+            output_dict[id_] = get_presentation_files(links, id_)
+        return jsonify(output_dict)
