@@ -29,21 +29,40 @@ def _add_namespaces(graph: Graph, context: dict[str, Any]) -> None:
     graph.bind("rdfs", Namespace("http://www.w3.org/2000/01/rdf-schema#"))
     graph.bind("rdf", Namespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#"))
 
-def _resolve_predicate(key: str) -> URIRef | None:
-    context_entry = _linked_art_context["@context"].get(key)
 
-    if isinstance(context_entry, dict) and "@id" in context_entry:
-        predicate_uri_string = context_entry["@id"]
-    else:
-        predicate_uri_string = key
+def _expand_curie(curie: str) -> str:
+    if ":" not in curie:
+        return curie
+    ctx = _linked_art_context.get("@context", {})
+    prefix, local = curie.split(":", 1)
+    base = ctx.get(prefix)
+    if isinstance(base, str):
+        return base + local
+    return curie
 
-    if ":" in predicate_uri_string:
-        prefix, localname = predicate_uri_string.split(":", 1)
-        prefix_uri = _linked_art_context["@context"].get(prefix)
-        if isinstance(prefix_uri, str):
-            return URIRef(prefix_uri + localname)
 
-    return URIRef(predicate_uri_string)
+def _resolve_predicate(key: str,
+                       data_type: str | None = None) -> URIRef | None:
+    ctx = _linked_art_context.get("@context", {})
+
+    if data_type and data_type in ctx:
+        td = ctx[data_type]
+        if isinstance(td, dict):
+            tctx = td.get("@context")
+            if isinstance(tctx, dict) and key in tctx:
+                entry = tctx[key]
+                if isinstance(entry, dict) and "@id" in entry:
+                    return URIRef(_expand_curie(entry["@id"]))
+                if isinstance(entry, str):
+                    return URIRef(_expand_curie(entry))
+
+    entry = ctx.get(key)
+    if isinstance(entry, dict) and "@id" in entry:
+        return URIRef(_expand_curie(entry["@id"]))
+    if isinstance(entry, str):
+        return URIRef(_expand_curie(entry))
+
+    return None
 
 
 def _get_subject(
@@ -92,36 +111,30 @@ def _add_triples_from_linked_art(
 
     subject = _get_subject(data, graph, parent_subject, parent_predicate)
 
-    if data.get("type"):
-        type_val = data["type"]
+    data_type = data.get("type")
+    if data_type:
+        ctx = _linked_art_context.get("@context", {})
+        type_uri: str | None = None
 
-        if type_val.startswith(("http://", "https://")):
-            full_type_uri = type_val
+        if ":" in data_type:
+            type_uri = _expand_curie(data_type)
 
-        elif ":" in type_val:
-            prefix, local = type_val.split(":", 1)
-            prefix_uri = _linked_art_context["@context"].get(prefix)
-            if isinstance(prefix_uri, str):
-                full_type_uri = prefix_uri + local
-            else:
-                la_base = _linked_art_context["@context"].get("la") \
-                    or "https://linked.art/ns/terms/"
-                full_type_uri = f"{la_base}{type_val}"
+        elif isinstance(ctx.get(data_type), dict):
+            entry = ctx[data_type]
+            if "@id" in entry:
+                type_uri = _expand_curie(entry["@id"])
 
-        else:
-            la_base = _linked_art_context["@context"].get("la") \
-                or "https://linked.art/ns/terms/"
-            full_type_uri = f"{la_base}{type_val}"
+        if not type_uri:
+            la_base = ctx.get("la") or "https://linked.art/ns/terms/"
+            type_uri = la_base + data_type
 
-        graph.add((subject, RDF.type, URIRef(full_type_uri)))
-
-
+        graph.add((subject, RDF.type, URIRef(type_uri)))
 
     for key, value in data.items():
         if key in {"id", "type", "@context"}:
             continue
 
-        predicate = _resolve_predicate(key)
+        predicate = _resolve_predicate(key, data_type)  # <-- FIXED line
         if not predicate:  # pragma: no cover - mypy
             continue
 
