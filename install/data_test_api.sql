@@ -182,6 +182,9 @@ INSERT INTO web.entity_profile_image (entity_id, image_id)
 VALUES ( (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='Picture with a License') )
 ON CONFLICT (entity_id) DO UPDATE SET image_id=(SELECT id FROM model.entity WHERE name='Picture with a License');
 
+INSERT INTO web.map_overlay (image_id, bounding_box)
+        VALUES ((SELECT id FROM model.entity WHERE name='Picture with a License'), '[[48.58653,15.64356],[48.58709,15.64294]]');
+
 INSERT INTO model.file_info (entity_id, public, creator, license_holder)
 VALUES
     ((SELECT id FROM model.entity WHERE name='File without license'), TRUE, 'https://viaf.org/viaf/95218067', NULL ),

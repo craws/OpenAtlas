@@ -48,15 +48,14 @@ def get_presentation_types(
 
 
 def get_file_dict(
-        img_id: int,
         link: Link,
-        overlay: Overlay = None) -> dict[str, str]:
-    path = get_file_path(img_id)
+        overlay: Optional[Overlay] = None) -> dict[str, str]:
+    path = get_file_path(link.domain.id)
     mime_type = None
     if path:
         mime_type, _ = mimetypes.guess_type(path)  # pragma: no cover
     data = {
-        'id': img_id,
+        'id': link.domain.id,
         'title': link.domain.name,
         'license': get_license_name(link.domain),
         'creator': link.domain.creator,
@@ -67,7 +66,7 @@ def get_file_dict(
             'api.display',
             filename=path.stem,
             _external=True) if path else 'N/A'}
-    data.update(get_iiif_manifest_and_path(img_id))
+    data.update(get_iiif_manifest_and_path(link.domain.id))
     if overlay:
         data.update({'overlay': overlay.bounding_box})
     return data
@@ -81,19 +80,20 @@ def get_presentation_files(
     files = []
     file_links = [
         link_ for link_ in links_inverse if link_.domain.class_.name == 'file']
+    if not file_links:
+        return []
     overlays = {
         row['image_id']: Overlay(row) for row
         in get_by_object([l.domain.id for l in file_links])}
     for link_ in file_links:
-        file_id = link_.domain.id
         if parser.place_hierarchy \
                 and parser.map_overlay \
                 and link_.range.id in root_ids:
             if overlay := overlays.get(link_.domain.id):
-                files.append(get_file_dict(file_id, link_, overlay))
+                files.append(get_file_dict(link_, overlay))
         elif link_.range.id == entity_id:
             files.append(
-                get_file_dict(file_id, link_, overlays.get(link_.domain.id)))
+                get_file_dict(link_, overlays.get(link_.domain.id)))
     return files
 
 
