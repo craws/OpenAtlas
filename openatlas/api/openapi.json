@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.10b",
+    "version": "0.4.10c",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -150,6 +150,9 @@
           },
           {
             "$ref": "#/components/parameters/place_hierarchy"
+          },
+          {
+            "$ref": "#/components/parameters/map_overlay"
           },
           {
             "$ref": "#/components/parameters/remove_empty_values"
@@ -1888,6 +1891,14 @@
       "place_hierarchy": {
         "name": "place_hierarchy",
         "description": "Will include the whole place hierarchy. This means that instead of only getting entities linked to the requested entity, all entities, which are connected with the property *P46* are included in the result set. This can significantly increase the load time.",
+        "in": "query",
+        "schema": {
+          "type": "boolean"
+        }
+      },
+      "map_overlay": {
+        "name": "map_overlay",
+        "description": "Will add the map overlay information for images if available.",
         "in": "query",
         "schema": {
           "type": "boolean"
