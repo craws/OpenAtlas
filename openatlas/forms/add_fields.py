@@ -74,6 +74,9 @@ def add_description(
         entity: Entity,
         origin: Optional[Entity] = None) -> None:
     attribute_description = entity.class_.attributes['description']
+    if entity.category == 'value':
+        setattr(form, 'description', StringField(_('unit')))
+        return
     if 'annotated' not in attribute_description:
         setattr(
             form,

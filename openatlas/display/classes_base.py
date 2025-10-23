@@ -1,7 +1,5 @@
 from __future__ import annotations, annotations
 
-from typing import Any, Optional
-
 from flask import g, url_for
 from flask_babel import format_number, lazy_gettext as _
 
@@ -12,17 +10,11 @@ from openatlas.models.entity import Entity, Link
 
 
 class BaseDisplay:
-    buttons: list[str]
-    data: dict[str, Any]
     tabs: dict[str, Tab]
 
     def __init__(self, entity: Entity) -> None:
         self.entity = entity
         self.events: list[Entity] = []
-        self.event_links: Optional[list[Link]] = []
-        self.linked_places: list[Entity] = []
-        self.structure: dict[str, list[Entity]] = {}
-        self.gis_data: dict[str, Any] = {}
         self.problematic_type = self.entity.check_too_many_single_type_links()
 
 
@@ -36,24 +28,9 @@ class PlaceBaseDisplay(BaseDisplay):
 
 class TypeBaseDisplay(BaseDisplay):
 
-    def add_data(self) -> None:
-        if self.entity.category == 'value':
-            self.data[_('unit')] = self.entity.description
-        self.data[_('selectable')] = str(_('yes')) \
-            if self.entity.selectable else str(_('no'))
-        self.data[_('ID for imports')] = self.entity.id
-
     def add_tabs(self) -> None:
         entity = self.entity
-        self.tabs['subs'] = Tab('subs', entity=entity)
         self.tabs['entities'] = Tab('entities', entity=entity)
-        self.tabs['file'] = Tab('file', entity=entity)
-        self.tabs['reference'] = Tab('reference', entity=entity)
-        for sub_id in entity.subs:
-            self.tabs['subs'].table.rows.append([
-                link(g.types[sub_id]),
-                g.types[sub_id].count,
-                g.types[sub_id].description])
         if entity.category == 'value':
             self.tabs['entities'].table.columns = \
                 [_('name'), _('value'), _('class'), _('info')]

@@ -8,11 +8,10 @@ from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (
-    BooleanField, HiddenField, SelectField, SelectMultipleField, StringField,
-    widgets)
+    BooleanField, HiddenField, SelectField, SelectMultipleField, widgets)
 from wtforms.validators import InputRequired, Optional
 
-from openatlas.forms.field import TableField, TableMultiField, TreeField
+from openatlas.forms.field import TableMultiField, TreeField
 from openatlas.forms.util import convert
 from openatlas.forms.validation import hierarchy_name_exists, validate
 from openatlas.models.entity import Entity, Link
@@ -62,9 +61,6 @@ class BaseManager:
             setattr(Form, 'entity_id', HiddenField())
         self.form: Any = Form(obj=self.link_ or self.entity)
 
-    def update_entity(self, new: bool = False) -> None:
-        self.continue_link_id = self.entity.update(self.data, new)
-
     def get_link_type(self) -> Optional[Entity]:
         # Returns base type of link, e.g. involvement between actor and event
         for field in self.form:
@@ -94,54 +90,10 @@ class BaseManager:
     def process_form(self) -> None:
         process_standard_fields(self)
 
-    def process_link_form(self) -> None:
-        self.link_.description = self.form.description.data
-        # self.link_.set_dates(process_dates(self))
-
 
 class ActorBaseManager(BaseManager):
-    def additional_fields(self) -> dict[str, Any]:
-        residence = None
-        begins_in = None
-        ends_in = None
-        self.table_items['place'] = \
-            Entity.get_by_class('place', types=True, aliases=self.aliases)
-        if self.insert:
-            if self.origin and self.origin.class_.name == 'place':
-                residence = self.origin
-        else:
-            if residence := self.entity.get_linked_entity('P74'):
-                residence = residence.get_linked_entity_safe('P53', True)
-            if first := self.entity.get_linked_entity('OA8'):
-                begins_in = first.get_linked_entity_safe('P53', True)
-            if last := self.entity.get_linked_entity('OA9'):
-                ends_in = last.get_linked_entity_safe('P53', True)
-        return {
-            'residence': TableField(
-                self.table_items['place'],
-                residence,
-                add_dynamic=['place']),
-            'begins_in': TableField(
-                self.table_items['place'],
-                begins_in,
-                add_dynamic=['place']),
-            'ends_in': TableField(
-                self.table_items['place'],
-                ends_in,
-                add_dynamic=['place'])}
 
     def process_form(self) -> None:
-        super().process_form()
-        self.data['links']['delete'].update(['P74', 'OA8', 'OA9'])
-        if self.form.residence.data:
-            residence = Entity.get_by_id(int(self.form.residence.data))
-            self.add_link('P74', residence.get_linked_entity_safe('P53'))
-        if self.form.begins_in.data:
-            begin_place = Entity.get_by_id(int(self.form.begins_in.data))
-            self.add_link('OA8', begin_place.get_linked_entity_safe('P53'))
-        if self.form.ends_in.data:
-            end_place = Entity.get_by_id(int(self.form.ends_in.data))
-            self.add_link('OA9', end_place.get_linked_entity_safe('P53'))
         if self.origin:
             if self.origin.class_.view == 'event':
                 self.add_link(
@@ -169,7 +121,6 @@ class HierarchyBaseManager(BaseManager):
                 choices=Entity.get_class_choices(self.entity),
                 option_widget=widgets.CheckboxInput(),
                 widget=widgets.ListWidget(prefix_label=False))}
-
 
 
 class ActorFunctionManager(BaseManager):
@@ -209,7 +160,6 @@ class ActorFunctionManager(BaseManager):
                 type_id=link_type.id if link_type else None)
 
     def process_link_form(self) -> None:
-        super().process_link_form()
         type_id = getattr(
             self.form,
             str(g.classes['actor_function'].standard_type_id)).data
@@ -248,7 +198,6 @@ class ActorRelationManager(BaseManager):
                 type_id=link_type.id if link_type else None)
 
     def process_link_form(self) -> None:
-        super().process_link_form()
         type_id = getattr(
             self.form,
             str(g.classes['actor_relation'].standard_type_id)).data
@@ -278,10 +227,6 @@ class HierarchyCustomManager(HierarchyBaseManager):
         return {
             **{'multiple': BooleanField(_('multiple'), description=tooltip)},
             **super().additional_fields()}
-
-
-class HierarchyValueManager(HierarchyBaseManager):
-    pass
 
 
 class InvolvementManager(BaseManager):
@@ -335,17 +280,8 @@ class InvolvementManager(BaseManager):
                     type_id=link_type.id if link_type else None)
 
     def process_link_form(self) -> None:
-        super().process_link_form()
         type_id = getattr(
             self.form,
             str(g.classes['involvement'].standard_type_id)).data
         self.link_.type = g.types[int(type_id)] if type_id else None
         self.link_.property = g.properties[self.form.activity.data]
-
-
-class TypeManager(BaseManager):
-    def add_description(self) -> None:
-        if self.get_root().category == 'value':
-            del self.form_class.description
-            setattr(self.form_class, 'description', StringField(_('unit')))
-

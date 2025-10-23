@@ -22,7 +22,9 @@ type_ = {
             'property': 'P127',
             'multiple': True,
             'inverse': True,
-            'tab': {'buttons': ['insert']}},
+            'tab': {
+                'buttons': ['insert'],
+                'columns': ['name', 'count', 'description']}},
         'entities': {
             'label': _('entities'),
             'classes': [],

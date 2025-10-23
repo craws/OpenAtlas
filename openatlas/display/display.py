@@ -92,7 +92,8 @@ class Display:
             if 'annotated' in self.entity.class_.attributes['description'] \
                     and self.entity.class_.attributes['description']:
                 description_ = display_annotation_text_links(self.entity)
-        text += description(description_, label)
+        if self.entity.category != 'value':
+            text += description(description_, label)
 
         reference_systems_display = ''
         if 'reference_system' in self.entity.class_.extra:
@@ -111,9 +112,6 @@ class Display:
             reference_systems=reference_systems_display,
             description_html=text,
             problematic_type_id=self.problematic_type)
-
-    # def get_chart_data(self) -> Optional[dict[str, Any]]:
-    #    return None
 
     def add_tabs(self) -> None:
         self.tabs = {'info': Tab('info')}
@@ -257,7 +255,7 @@ class Display:
                 button(
                     _('set selectable'),
                     url_for('type_set_selectable', id_=self.entity.id)))
-        elif not self.entity.count:
+        elif not self.entity.count and self.entity.category != 'value':
             self.buttons.append(
                 button(
                     _('set unselectable'),
