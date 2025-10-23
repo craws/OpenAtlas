@@ -58,6 +58,7 @@ class Parser:
     remove_empty_values = None
     depth: int = 1
     place_hierarchy = None
+    map_overlay = None
 
     def __init__(self, parser: dict[str, Any]):
         self.show = []
@@ -73,6 +74,8 @@ class Parser:
             self.url += '/'
         if self.centroid:
             self.centroid = parser['centroid'] == 'true'
+        if self.map_overlay:
+            self.map_overlay = parser['map_overlay'] == 'true'
         if self.place_hierarchy:
             self.place_hierarchy = parser['place_hierarchy'] == 'true'
         if self.remove_empty_values:
