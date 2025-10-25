@@ -166,13 +166,17 @@ class Display:
                                         'reference_system_remove_class',
                                         system_id=self.entity.id,
                                         name=name)))
+            columns = relation['tab']['columns']
+            if self.entity.category == 'value' \
+                    and relation['name'] == 'entities':
+                columns = ['name', 'value', 'class', 'description']
             self.tabs[name] = Tab(
                 name,
                 relation['label'],
                 table=entity_table(
                     items,
                     self.entity,
-                    relation['tab']['columns'],
+                    columns,
                     relation['tab']['additional_columns'],
                     relation),
                 buttons=buttons,

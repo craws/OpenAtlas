@@ -254,6 +254,8 @@ def entity_table(
                 case 'resolver_url' | 'website_url':
                     url = getattr(e, name)
                     html = link(url, url, external=True) if url else ''
+                case 'value':
+                    html = format_number(item.description)
             data.append(html)
         table.rows.append(data)
     return table
