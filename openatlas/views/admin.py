@@ -30,7 +30,7 @@ from openatlas.display.util import (
     button, check_iiif_activation, check_iiif_file_exist, display_info,
     get_file_path, link, required_group, send_mail)
 from openatlas.display.util2 import (
-    convert_size, is_authorized, manual, sanitize, uc_first)
+    convert_size, display_bool, is_authorized, manual, sanitize, uc_first)
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
 from openatlas.forms.setting import (
@@ -209,7 +209,7 @@ def get_user_table(users: list[User]) -> Table:
             user.group,
             user.email if is_authorized('manager')
             or user.settings['show_email'] else '',
-            _('yes') if user.settings['newsletter'] else '',
+            display_bool(user.settings['newsletter'], False),
             format_date(user.created),
             format_date(user.login_last_success),
             user_entities]
@@ -930,8 +930,8 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
         'upload': convert_size(paths['upload']['size']),
         'processed': convert_size(paths['processed']['size']),
         'iiif': convert_size(
-            paths['iiif']['size'] \
-                if iiif_path and not upload_ident_with_iiif() else 0),
+            paths['iiif']['size'] if iiif_path and not upload_ident_with_iiif()
+            else 0),
         'other_files': convert_size(other_files),
         'free': convert_size(stats.free),
         'percent': percent,

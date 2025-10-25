@@ -34,6 +34,10 @@ def convert_size(size_bytes: int) -> str:
     return f"{int(size_bytes / math.pow(1024, i))} {size_name[i]}"
 
 
+def display_bool(value: bool, show_false: bool = True):
+    return str(_('yes')) if value else str(_('no')) if show_false else ''
+
+
 @pass_context  # Prevent Jinja2 context caching
 @app.template_filter()
 def is_authorized(context: str, group: Optional[str] = None) -> bool:

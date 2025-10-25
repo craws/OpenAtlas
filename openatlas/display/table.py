@@ -11,7 +11,8 @@ from openatlas.display.image_processing import check_processed_image
 from openatlas.display.util import (
     check_iiif_file_exist, edit_link, get_file_path, link,
     profile_image_table_link, remove_link)
-from openatlas.display.util2 import is_authorized, sanitize, uc_first
+from openatlas.display.util2 import (
+    display_bool, is_authorized, sanitize, uc_first)
 from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity, Link
 from openatlas.models.openatlas_class import get_reverse_relation
@@ -228,7 +229,7 @@ def entity_table(
                 case 'public':
                     html = ''
                     if g.file_info.get(e.id):
-                        html = _('yes') if g.file_info[e.id]['public'] else ''
+                        html = display_bool(g.file_info[e.id]['public'], False)
                 case 'remove':
                     tab_id = e.class_.group['name']
                     if relation and relation['mode'] == 'tab':

@@ -11,7 +11,8 @@ from openatlas.display.table import entity_table
 from openatlas.display.util import (
     bookmark_toggle, button, description, display_annotation_text_links,
     get_chart_data, get_file_path, get_system_data, link, reference_systems)
-from openatlas.display.util2 import is_authorized, manual, uc_first
+from openatlas.display.util2 import (
+    display_bool, is_authorized, manual, uc_first)
 from openatlas.models.dates import format_date, format_entity_date
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
@@ -320,7 +321,7 @@ class Display:
                     'resolver_url', 'website_url']:
                 if value := getattr(self.entity, name):
                     if isinstance(value, bool):
-                        value = _('yes') if value else _('no')
+                        value = display_bool(value)
                         if name == 'public' \
                                 and value \
                                 and not self.entity.standard_type:
@@ -359,6 +360,6 @@ class Display:
                 case 'type_information':
                     if self.entity.category == 'value':
                         self.data[_('unit')] = self.entity.description
-                    self.data[_('selectable')] = str(_('yes')) \
-                        if self.entity.selectable else str(_('no'))
+                    self.data[_('selectable')] = display_bool(
+                        self.entity.selectable)
                     self.data[_('ID for imports')] = self.entity.id
