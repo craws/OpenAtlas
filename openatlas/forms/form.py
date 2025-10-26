@@ -6,7 +6,7 @@ from flask import g, request
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
-from wtforms import HiddenField, SelectMultipleField, StringField
+from wtforms import HiddenField, SelectMultipleField, StringField, widgets
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import InputRequired, URL
 
@@ -184,9 +184,9 @@ def move_form(type_: Entity) -> Any:
         selection = SelectMultipleField(
             '',
             [InputRequired()],
-            coerce=int)
-        #    option_widget=widgets.CheckboxInput(),
-        #    widget=widgets.ListWidget(prefix_label=False))
+            coerce=int,
+            option_widget=widgets.CheckboxInput(),  # type: ignore
+            widget=widgets.ListWidget(prefix_label=False))  # type: ignore
         save = SubmitField(uc_first(_('move entities')))
 
     root = g.types[type_.root[0]]

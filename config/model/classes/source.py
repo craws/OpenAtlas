@@ -17,7 +17,7 @@ source = {
             'classes': 'source_translation',
             'property': 'P73',
             'multiple': True,
-            'tab':{
+            'tab': {
                 'buttons': ['insert']}},
         'actor': {
             'label': class_groups['actor']['label'],

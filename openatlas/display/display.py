@@ -161,6 +161,15 @@ class Display:
                                             relation=name),
                                         tooltip_text=g.classes[class_].
                                         display['tooltip']))
+                        case 'move' if items:
+                            root = g.types[self.entity.root[0]]
+                            if root.category not in ['system', 'value']:
+                                buttons.append(
+                                    button(
+                                        _('move entities'),
+                                        url_for(
+                                            'type_move_entities',
+                                            id_=self.entity.id)))
                         case 'remove_reference_system_class' if not items \
                                 and is_authorized('manager'):
                             buttons.append(

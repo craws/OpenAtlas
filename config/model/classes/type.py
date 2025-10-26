@@ -30,7 +30,9 @@ type_ = {
             'classes': [],
             'property': 'P2',
             'inverse': True,
-            'multiple': True},
+            'multiple': True,
+            'tab': {
+                'buttons': ['move']}},
         'reference': standard_relations['reference'],
         'file': standard_relations['file']},
     'display': {
@@ -68,7 +70,9 @@ administrative_unit = {
             'classes': 'object_location',
             'property': 'P89',
             'inverse': True,
-            'multiple': True},
+            'multiple': True,
+            'tab': {
+                'buttons': ['move']}},
         'reference': standard_relations['reference'],
         'file': standard_relations['file']},
     'display': {
