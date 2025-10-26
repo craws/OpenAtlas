@@ -6,7 +6,7 @@ import psycopg2
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.entity import Entity
+from openatlas.models.entity import Entity, insert as entity_insert
 
 
 class TestBaseCase(unittest.TestCase):
@@ -95,14 +95,22 @@ class ImportTestCase(TestBaseCase):
 def insert(
         class_: str,
         name: str,
-        description: Optional[str] = None) -> Entity:
-    entity = Entity.insert(class_, name, description)
+        description: Optional[str] = None,
+        begin_to: Optional[str] = None) -> Entity:
+    entity = entity_insert({
+        'name': name,
+        'openatlas_class_name': class_,
+        'description': description,
+        'begin_to': begin_to})
     if class_ in ['artifact', 'feature', 'place', 'stratigraphic_unit']:
         entity.link(
             'P53',
-            Entity.insert('object_location', f'Location of {name}'))
+            entity_insert({
+                'name': f'Location of {name}',
+                'openatlas_class_name': 'object_location',
+                'description': description}))
     return entity
 
 
-# def get_hierarchy(name: str) -> Type:
-#     return Type.get_hierarchy(name)
+def get_hierarchy(name: str) -> Entity:
+    return Entity.get_hierarchy(name)

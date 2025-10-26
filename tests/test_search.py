@@ -10,8 +10,7 @@ class SearchTest(TestBaseCase):
         c = self.client
         with app.test_request_context():
             app.preprocess_request()
-            person = insert('person', 'Waldo')
-            person.update({'attributes': {'begin_to': '2018-01-01'}})
+            person = insert('person', 'Waldo', begin_to='2018-01-01')
             person.link('P1', insert('appellation', 'Waldo alias'))
             object_ = insert('place', 'Waldorf')
             object_.link('P1', insert('appellation', 'Waldorf alias'))

@@ -561,7 +561,8 @@ class Entity:
     def get_by_id(
             id_: int,
             types: bool = False,
-            aliases: bool = False) -> Entity:
+            aliases: bool = False,
+            with_location: bool = True) -> Entity:
         if id_ in g.types:
             return g.types[id_]
         if id_ in g.reference_systems:
@@ -572,7 +573,7 @@ class Entity:
                 raise AttributeError
             abort(418)
         entity = Entity(data)
-        if entity.class_.name == 'place':
+        if entity.class_.name == 'place' and with_location:
             entity.location = entity.get_linked_entity_safe('P53', types=True)
             if types:
                 entity.types.update(entity.location.types)
@@ -873,12 +874,12 @@ def insert(data: dict[str, Any]) -> Entity:
         data[item] = data.get(item)
     for item in ['name', 'description']:
         data[item] = sanitize(data[item])
-    entity = Entity.get_by_id(db.insert(data))
+    entity = Entity.get_by_id(db.insert(data), with_location=False)
     for attribute in attributes:
         match attribute:
-            case 'alias':
+            case 'alias' if 'alias' in data:
                 entity.update_aliases(data['alias'])
-            case 'location':
+            case 'location' if 'gis' in data:
                 entity.update_gis(data['gis'], new=True)
             case 'file':
                 entity.save_file_info(data)

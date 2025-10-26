@@ -345,6 +345,7 @@ INSERT INTO web.hierarchy (id, name, category, multiple, directional) VALUES
   ((SELECT id FROM model.entity WHERE name='Bibliography'), 'Bibliography', 'standard', False, False),
   ((SELECT id FROM model.entity WHERE name='Dimensions'), 'Dimensions', 'value', True, False),
   ((SELECT id FROM model.entity WHERE name='Edition'), 'Edition', 'standard', False, False),
+  ((SELECT id FROM model.entity WHERE name='Event'), 'Event', 'standard', False, False),
   ((SELECT id FROM model.entity WHERE name='External reference'), 'External reference', 'standard', False, False),
   ((SELECT id FROM model.entity WHERE name='External reference match'), 'External reference match', 'system', False, False),
   ((SELECT id FROM model.entity WHERE name='Feature'), 'Feature', 'standard', False, False),
