@@ -80,7 +80,8 @@ def get_overview_counts(classes: list[str]) -> dict[str, int]:
         SELECT openatlas_class_name AS name, COUNT(openatlas_class_name)
         FROM model.entity
         WHERE openatlas_class_name IN %(classes)s
-        GROUP BY openatlas_class_name;
+        GROUP BY openatlas_class_name
+        ORDER BY openatlas_class_name;
         """,
         {'classes': tuple(classes)})
     return {row['name']: row['count'] for row in list(g.cursor)}

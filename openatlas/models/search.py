@@ -38,16 +38,16 @@ def search(data: dict[str, Any]) -> list[Entity]:
 def check_dates(entity: Entity, data: dict[str, Any]) -> bool:
     if not data['from_date'] and not data['to_date']:
         return True
-    if not entity.begin_from \
-            and not entity.begin_to \
-            and not entity.end_from \
-            and not entity.end_to:
+    if not entity.dates.begin_from \
+            and not entity.dates.begin_to \
+            and not entity.dates.end_from \
+            and not entity.dates.end_to:
         return bool(data['include_dateless'])
     dates = [
-        entity.begin_from,
-        entity.begin_to,
-        entity.end_from,
-        entity.end_to]
+        entity.dates.begin_from,
+        entity.dates.begin_to,
+        entity.dates.end_from,
+        entity.dates.end_to]
     begin_ok = False
     if not data['from_date']:
         begin_ok = True
