@@ -20,14 +20,6 @@ if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.openatlas_class import OpenatlasClass
 
 
-def process_standard_fields(manager: Any) -> None:
-    for key, value in manager.form.data.items():
-        field_type = getattr(manager.form, key).type
-        if field_type == 'ValueTypeField':
-            if value is not None:  # Allow the number zero
-                manager.add_link('P2', g.types[int(key)], value)
-
-
 class BaseManager:
     fields: list[str] = []
     continue_link_id: Optional[int] = None
@@ -87,9 +79,6 @@ class BaseManager:
             'return_link_id': return_link_id,
             'type_id': type_id})
 
-    def process_form(self) -> None:
-        process_standard_fields(self)
-
 
 class ActorBaseManager(BaseManager):
 
@@ -147,7 +136,6 @@ class ActorFunctionManager(BaseManager):
         self.form.member_origin_id.data = self.origin.id
 
     def process_form(self) -> None:
-        super().process_form()
         link_type = self.get_link_type()
         class_ = 'group' if hasattr(self.form, 'group') else 'actor'
         for actor in Entity.get_by_ids(
@@ -186,7 +174,6 @@ class ActorRelationManager(BaseManager):
         self.form.relation_origin_id.data = self.origin.id
 
     def process_form(self) -> None:
-        super().process_form()
         for actor in Entity.get_by_ids(
                 ast.literal_eval(self.form.actor.data)):
             link_type = self.get_link_type()
@@ -251,7 +238,6 @@ class InvolvementManager(BaseManager):
         self.form.activity.data = self.link_.property.code
 
     def process_form(self) -> None:
-        super().process_form()
         if self.origin.class_.view == 'event':
             actors = Entity.get_by_ids(ast.literal_eval(self.form.actor.data))
             for actor in actors:

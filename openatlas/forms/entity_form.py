@@ -187,6 +187,10 @@ def process_reference_systems(entity: Entity, form: Any):
 
 
 def process_types(entity: Entity, form: Any) -> None:
+    for key, value in form.data.items():
+        if getattr(form, key).type == 'ValueTypeField':
+            if value is not None:  # Allow the number zero
+                entity.link('P2', g.types[int(key)], value)
     for type_ in [g.types[id_] for id_ in entity.class_.hierarchies]:
         if data := convert(getattr(form, str(type_.id)).data):
             if type_.class_.name == 'administrative_unit':
