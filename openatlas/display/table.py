@@ -81,7 +81,6 @@ def entity_table(
         forms: Optional[dict[str, Any]] = None) -> Table | None:
     if not items:
         return Table()
-
     inverse = relation and relation['inverse']
     item = items[0]
     if isinstance(item, Link):
@@ -94,7 +93,6 @@ def entity_table(
     else:
         item_class = item.class_
         default_columns = item.class_.group['table_columns']
-
     order = None
     defs = None
     forms = forms or {}
@@ -124,6 +122,8 @@ def entity_table(
         if isinstance(item, Link):
             e = item.domain if inverse else item.range
             range_ = item.range if inverse else item.domain
+            if range_.class_.name == 'object_location':
+                e = e.get_linked_entity('P89', ['place'], False, True)
         data = []
         for name in columns:
             html = 'no table function'

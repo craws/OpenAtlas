@@ -16,11 +16,6 @@ def populate_insert(form: Any, entity: Entity, origin: Entity | None) -> None:
 
 def populate_update(form: Any, entity: Entity) -> None:
     form.opened.data = time.time()
-    # Todo: deal with place types
-    # if manager.entity and manager.entity.class_.name == 'place':
-    #     if location := \
-    #             manager.entity.get_linked_entity_safe('P53', types=True):
-    #        types |= location.types  # Admin. units and historical places
     # Todo: implement copy
     # if entity.id and not copy:
     #     form.entity_id.data = entity.id

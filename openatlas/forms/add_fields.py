@@ -146,14 +146,13 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
         if relation['mode'] != 'direct':
             continue
         validators = [InputRequired()] if relation['required'] else None
-
         items = []
         for class_ in relation['classes']:
             class_ = 'place' if class_ == 'object_location' else class_
             if class_ not in entities:
                 entities[class_] = Entity.get_by_class(class_, True, True)
             items += entities[class_]
-        if 'type' in relation['classes']:
+        if relation['classes'] in [['type'], ['administrative_unit']]:
             root = g.types[entity.root[0]] if entity.root else origin
             setattr(
                 form,

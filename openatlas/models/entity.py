@@ -16,7 +16,7 @@ from openatlas.models.dates import Dates
 from openatlas.models.gis import Gis
 from openatlas.models.tools import get_carbon_link
 
-# Property types work differently, e.g. no move functionality
+# Todo: remove? Property types work differently, e.g. no move functionality
 app.config['PROPERTY_TYPES'] = [
     'Actor relation',
     'Actor function',
@@ -571,7 +571,12 @@ class Entity:
             if 'activity' in request.path:  # Re-raise if in user activity view
                 raise AttributeError
             abort(418)
-        return Entity(data)
+        entity = Entity(data)
+        if entity.class_.name == 'place':
+            entity.location = entity.get_linked_entity_safe('P53', types=True)
+            if types:
+                entity.types.update(entity.location.types)
+        return entity
 
     @staticmethod
     def get_by_ids(

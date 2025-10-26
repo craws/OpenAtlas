@@ -44,8 +44,6 @@ class Display:
             self.add_button_sibling_pager()
 
     def get_type_data(self) -> dict[str, Any]:
-        if self.entity.location:  # Add location types
-            self.entity.types.update(self.entity.location.types)
         data: dict[str, Any] = defaultdict(list)
         for type_, value in sorted(
                 self.entity.types.items(),
@@ -124,6 +122,11 @@ class Display:
                     relation['property'],
                     relation['classes'],
                     relation['inverse']):
+                if item.domain.class_.name == 'object_location':
+                    item.domain = item.domain.get_linked_entity_safe(
+                        'P53',
+                        inverse=True,
+                        types=True)
                 items.append(item)
                 if relation['property'] == 'P67' \
                         and relation['classes'] == ['file'] \

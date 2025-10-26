@@ -38,3 +38,41 @@ type_ = {
         'form_buttons': ['insert_and_continue'],
         'additional_tabs': {'note': {}},
         'additional_information': {'type_information': {}}}}
+
+
+administrative_unit = {
+    'label': _('administrative unit'),
+    'attributes': {
+        'name': {'required': True},
+        'dates': {},
+        'description': {}},
+    'extra': ['reference_system'],
+    'relations': {
+        'super': {
+            'label': _('super'),
+            'classes': 'administrative_unit',
+            'property': 'P89',
+            'mode': 'direct',
+            'required': True},
+        'subs': {
+            'label': _('subs'),
+            'classes': 'administrative_unit',
+            'property': 'P89',
+            'multiple': True,
+            'inverse': True,
+            'tab': {
+                'buttons': ['insert'],
+                'columns': ['name', 'count', 'description']}},
+        'entities': {
+            'label': _('entities'),
+            'classes': 'object_location',
+            'property': 'P89',
+            'inverse': True,
+            'multiple': True},
+        'reference': standard_relations['reference'],
+        'file': standard_relations['file']},
+    'display': {
+        'buttons': ['selectable'],
+        'form_buttons': ['insert_and_continue'],
+        'additional_tabs': {'note': {}},
+        'additional_information': {'type_information': {}}}}

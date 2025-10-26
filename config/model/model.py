@@ -7,18 +7,16 @@ from config.model.classes import (
     type)
 
 # Todo: Needed for translation, to be removed after implemented
-_('first'), _('last')  # event dates in grey in case no relation dates
-_('administrative unit')
-_('feature')
+_('first')
+_('last')
 _('involvement')
-_('object location')
 _('type tools')
 _('page')
 
 model: dict[str, Any] = {
     'acquisition': event.acquisition,
     'activity': event.activity,
-    'administrative_unit': {'attributes': {}},
+    'administrative_unit': type.administrative_unit,
     'appellation': {'attributes': {}},
     'artifact': artifact.artifact,
     'bibliography': reference.bibliography,
@@ -30,7 +28,7 @@ model: dict[str, Any] = {
     'human_remains': artifact.human_remains,
     'modification': event.modification,
     'move': event.move,
-    'object_location': {'attributes': {}},
+    'object_location': {'label': _('object location'), 'attributes': {}},
     'person': actor.person,
     'place': place.place,
     'production': event.production,

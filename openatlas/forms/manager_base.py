@@ -214,13 +214,6 @@ class ActorRelationManager(BaseManager):
             self.form.inverse.data = True
 
 
-class AdministrativeUnitManager(BaseManager):
-    def process_form(self) -> None:
-        super().process_form()
-        self.data['links']['delete'].add('P89')
-        self.add_link('P89', g.types[self.super_id])
-
-
 class HierarchyCustomManager(HierarchyBaseManager):
     def additional_fields(self) -> dict[str, Any]:
         tooltip = _('tooltip hierarchy multiple')
