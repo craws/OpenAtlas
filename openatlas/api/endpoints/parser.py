@@ -7,7 +7,6 @@ from typing import Any, Optional
 import numpy
 import validators
 from flask import g, url_for
-from numpy import datetime64
 
 from openatlas import app
 from openatlas.api.resources.error import (
@@ -150,16 +149,16 @@ class Parser:
                 codes.append('P67')
         return codes
 
-    def get_key(self, entity: Entity) -> datetime64 | str:
+    def get_key(self, entity: Entity) -> str:
         if self.column == 'cidoc_class':
             return entity.cidoc_class.name
         if self.column == 'system_class':
             return entity.class_.name
         if self.column in ['begin_from', 'begin_to', 'end_from', 'end_to']:
-            if not getattr(entity, self.column):
+            if not getattr(entity.dates, self.column):
                 date = ("-" if self.sort == 'desc' else "") \
                        + '9999999-01-01T00:00:00'
-                return numpy.datetime64(date)
+                return str(date)
         return getattr(entity, self.column)
 
     def get_by_page(
@@ -202,7 +201,7 @@ class Parser:
             'properties': {
                 '@id': entity.id,
                 'systemClass': entity.class_.name,
-                'viewClass': entity.class_.group['name'],
+                'viewClass': entity.class_.group.get('name'),
                 'name': entity.name,
                 'description': entity.description
                 if 'description' in self.show else None,
@@ -237,7 +236,7 @@ class Parser:
             entity: Entity,
             links: list[Link]) -> list[dict[str, Any]]:
         types = []
-        if entity.class_.group['name'] == 'place':
+        if entity.class_.group.get('name') == 'place':
             entity.types.update(get_location_link(links).range.types)
         for type_ in entity.types:
             type_dict = {

@@ -121,13 +121,13 @@ def value_to_be_searched(entity: Entity, param: dict[str, Any])  -> Any:
         case "typeID" | "typeIDWithSubs":
             value = [type_.id for type_ in entity.types]
         case "beginFrom":
-            value = entity.begin_from
+            value = entity.dates.begin_from
         case "beginTo":
-            value = entity.begin_to
+            value = entity.dates.begin_to
         case "endFrom":
-            value = entity.end_from
+            value = entity.dates.end_from
         case "endTo":
-            value = entity.end_to
+            value = entity.dates.end_to
         case "valueTypeID":
             value = []
             for link_ in param['value_type_links']:

@@ -86,7 +86,6 @@ def before_request() -> Response | None:
     g.sex_type = Entity.get_hierarchy('Features for sexing')
     g.reference_match_type = Entity.get_hierarchy('External reference match')
     g.reference_systems = Entity.get_reference_systems()
-    g.class_groups = class_groups
     g.writable_paths = [
         app.config['EXPORT_PATH'],
         app.config['RESIZED_IMAGES'],

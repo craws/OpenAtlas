@@ -33,8 +33,8 @@ class OpenatlasClass:
         self.reference_systems = reference_system_ids
         self.new_types_allowed = new_types_allowed
         self.icon = icon
-        self.group = None
-        for data in class_groups.values():
+        self.group = {}
+        for data in g.class_groups.values():
             if name in data['classes']:
                 self.group = data
         self.label = model_['label']
@@ -49,6 +49,7 @@ def get_class_count() -> dict[str, int]:
 
 
 def get_classes() -> dict[str, OpenatlasClass]:
+    g.class_groups = class_groups
     classes = {}
     for row in db.get_classes():
         if row['name'] in model:  # Todo: remove condition after new classes

@@ -26,7 +26,7 @@ def get_presentation_types(
         links: list[Link]) -> list[dict[str, Any]]:
     types = []
     location_types = {}
-    if entity.class_.group['name'] == 'place':
+    if entity.class_.group.get('name') == 'place':
         location_types = get_location_link(links).range.types
     for type_ in entity.types | location_types:
         is_standard = False
@@ -159,7 +159,7 @@ def get_presentation_references(
 def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
     ids = [entity.id]
     root_ids: list[int] = []
-    if entity.class_.group['name'] in ['place', 'artifact']:
+    if entity.class_.group.get('name') in ['place', 'artifact']:
         entity.location = entity.get_linked_entity_safe('P53')
         ids.append(entity.location.id)
         if parser.place_hierarchy:
@@ -172,13 +172,13 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
 
     links = Entity.get_links_of_entities(ids)
     links_inverse = Entity.get_links_of_entities(ids, inverse=True)
-    if entity.class_.group['name'] == 'event':
+    if entity.class_.group.get('name') == 'event':
         event_ids = [
-            l.range.id for l in links if l.domain.class_.group['name'] == 'event']
+            l.range.id for l in links if l.domain.class_.group.get('name') == 'event']
     else:
         event_ids = [
             l.domain.id for l in links_inverse
-            if l.domain.class_.group['name'] == 'event']
+            if l.domain.class_.group.get('name') == 'event']
     event_links = []
     if event_ids:
         event_links = Entity.get_links_of_entities(
@@ -209,7 +209,7 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
             get_relation_types_dict(l, parser, entity.id))
 
     places: list[Entity] = []
-    if entity.class_.group in ['actor', 'event']:
+    if entity.class_.group.get('name') in ['actor', 'event']:
         if location_links := Entity.get_links_of_entities(
                 entity.id,
                 ['P74', 'OA8', 'OA9', 'P7', 'P26', 'P27']):
@@ -252,7 +252,7 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         relation_dict = {
             'id': rel_entity.id,
             'systemClass': rel_entity.class_.name,
-            'viewClass': rel_entity.class_.group['name'],
+            'viewClass': rel_entity.class_.group.get('name'),
             'title': rel_entity.name,
             'description': rel_entity.description,
             'aliases': list(rel_entity.aliases.values()),
@@ -267,7 +267,7 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
     data = {
         'id': entity.id,
         'systemClass': entity.class_.name,
-        'viewClass': entity.class_.group['name'],
+        'viewClass': entity.class_.group.get('name'),
         'title': entity.name,
         'description': entity.get_annotated_text()
         if entity.class_.name == 'source' else entity.description,
@@ -285,7 +285,7 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
             parser,
             root_ids),
         'relations': relations}
-    if entity.class_.group['name'] in ['place', 'artifact']:
+    if entity.class_.group.get('name') in ['place', 'artifact']:
         data['geometries'] = geometry_to_feature_collection(
             geoms.get(entity.id))
 

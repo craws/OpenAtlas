@@ -31,7 +31,10 @@ class ApiEntity(Entity):
         codes: list[str] = list(g.class_groups) if "all" in codes_ else codes_
         if [code for code in codes if code not in g.class_groups]:
             raise InvalidViewClassError
-        return Entity.get_by_class(codes, types=True, aliases=True)
+        classes =[]
+        for code in codes:
+            classes.extend(g.class_groups[code]['classes'])
+        return Entity.get_by_class(classes, types=True, aliases=True)
 
     @staticmethod
     def get_by_system_classes(classes: list[str]) -> list[Entity]:

@@ -95,8 +95,6 @@ class Api(ApiTestCase):
         rv = c.get(url_for('flasgger.apidocs'))
         assert b'Flasgger' in rv.data
 
-        #return  # Todo: continue tests
-
         # ---Content Endpoints---
         rv = c.get(url_for('api_04.classes')).get_json()
         assert self.get_classes(rv)
@@ -148,7 +146,6 @@ class Api(ApiTestCase):
         rv = c.get(url_for('api_04.network_visualisation', download=True))
         rv = rv.get_json()
         assert len(rv['results']) == 165
-
 
         rv = c.get(
             url_for(
@@ -523,7 +520,6 @@ class Api(ApiTestCase):
         assert rv['type'] == 'Type'
         assert rv['_label'] == 'Abbot'
 
-
         rv = c.get(
             url_for(
                 'api_04.system_class',
@@ -760,14 +756,14 @@ class Api(ApiTestCase):
         assert 'application/json' in rv.headers.get('Content-Type')
 
         with c.get(
-            url_for(
-                'api_04.display',
-                filename=f'{file.id}',
-                image_size='table')) as rv:
+                url_for(
+                    'api_04.display',
+                    filename=f'{file.id}',
+                    image_size='table')) as rv:
             self.assertTrue(rv.headers['Content-Type'].startswith('image'))
 
         with c.get(
-            url_for('api_04.files_of_entities', entities=place.id)) as rv:
+                url_for('api_04.files_of_entities', entities=place.id)) as rv:
             self.assertTrue(rv.get_json()[str(place.id)])
 
         rv = c.get(url_for('api_04.search', class_='all', term='Fro'))

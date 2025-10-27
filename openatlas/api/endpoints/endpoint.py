@@ -126,8 +126,10 @@ class Endpoint:
             'id': url_for('api.entity', id_=entity.id, _external=True),
             'description': entity.description,
             'system_class': entity.class_.name,
-            'begin': date_to_str(entity.begin_from or entity.begin_to),
-            'end': date_to_str(entity.end_to or entity.end_from)}
+            'begin': date_to_str(
+                entity.dates.begin_from or entity.dates.begin_to),
+            'end': date_to_str(
+                entity.dates.end_to or entity.dates.end_from)}
             for entity in self.entities]
         result = self.get_json_output()
         return marshal(result, loud_pagination())
@@ -257,7 +259,7 @@ class Endpoint:
     def get_geojson(self) -> dict[str, Any]:
         out = []
         for e in self.entities_with_links.values():
-            if e['entity'].class_.group['name'] == 'place':
+            if e['entity'].class_.group.get('name') == 'place':
                 e['entity'].types.update(
                     get_location_link(e['links']).range.types)
             if e['geometry']:
@@ -270,7 +272,7 @@ class Endpoint:
     def get_geojson_v2(self) -> dict[str, Any]:
         out = []
         for e in self.entities_with_links.values():
-            if e['entity'].class_.group['name'] == 'place':
+            if e['entity'].class_.group.get('name') == 'place':
                 e['entity'].types.update(
                     get_location_link(e['links']).range.types)
             out.append(self.parser.get_geojson_dict(e))
@@ -334,7 +336,7 @@ class Endpoint:
             '@id': url_for('api.entity', id_=entity.id, _external=True),
             'type': 'Feature',
             'crmClass': crm,
-            'viewClass': entity.class_.group['name'],
+            'viewClass': entity.class_.group.get('name'),
             'systemClass': entity.class_.name,
             'properties': {'title': entity.name},
             'types': self.parser.get_lp_types(entity, links)
