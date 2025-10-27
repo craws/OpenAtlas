@@ -8,7 +8,8 @@ from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (
-    FieldList, HiddenField, IntegerField, StringField, TextAreaField)
+    BooleanField, FieldList, HiddenField, IntegerField, SelectMultipleField,
+    StringField, TextAreaField, widgets)
 from wtforms.validators import (
     InputRequired, NoneOf, NumberRange, Optional as OptionalValidator, URL)
 
@@ -153,17 +154,28 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
                 entities[class_] = Entity.get_by_class(class_, True, True)
             items += entities[class_]
         if relation['classes'] in [['type'], ['administrative_unit']]:
-            root = g.types[entity.root[0]] if entity.root else origin
-            setattr(
-                form,
-                relation['name'],
-                TreeField(
-                    relation['label'],
-                    type_id=root.id,
-                    filter_ids=[entity.id] if entity else [],
-                    is_type_form=True))
-            if root.directional:
-                setattr(form, 'name_inverse', StringField(_('inverse')))
+            if root := g.types[entity.root[0]] if entity.root else origin:
+                setattr(
+                    form,
+                    relation['name'],
+                    TreeField(
+                        relation['label'],
+                        type_id=root.id,
+                        filter_ids=[entity.id] if entity else [],
+                        is_type_form=True))
+                if root.directional:
+                    setattr(form, 'name_inverse', StringField(_('inverse')))
+            else:  # It's a root type (hierarchy)
+                if entity.category == 'custom':
+                    form.multiple = BooleanField(
+                        _('multiple'),
+                        description=_('tooltip hierarchy multiple'))
+                form.classes = SelectMultipleField(
+                    _('classes'),
+                    description=_('tooltip hierarchy forms'),
+                    choices=Entity.get_class_choices(entity),
+                    option_widget=widgets.CheckboxInput(),  # type: ignore
+                    widget=widgets.ListWidget(prefix_label=False))
         elif relation['multiple']:
             selection: Any = []
             if entity.id:
@@ -205,6 +217,8 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
 
 
 def add_date_fields(form_class: Any, entity: Optional[Entity] = None) -> None:
+    if entity.class_.group['name'] == 'type' and not entity.root:
+        return None
     validator_second = [OptionalValidator(), NumberRange(min=0, max=59)]
     validator_minute = [OptionalValidator(), NumberRange(min=0, max=59)]
     validator_hour = [OptionalValidator(), NumberRange(min=0, max=23)]

@@ -7,13 +7,12 @@ from flask import g, request
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
-from wtforms import (
-    BooleanField, HiddenField, SelectField, SelectMultipleField, widgets)
+from wtforms import BooleanField, HiddenField, SelectField
 from wtforms.validators import InputRequired, Optional
 
 from openatlas.forms.field import TableMultiField, TreeField
 from openatlas.forms.util import convert
-from openatlas.forms.validation import hierarchy_name_exists, validate
+from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity, Link
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -96,20 +95,6 @@ class ActorBaseManager(BaseManager):
                     self.origin,
                     return_link_id=True,
                     inverse=True)
-
-
-class HierarchyBaseManager(BaseManager):
-    fields = ['name', 'description']
-
-    def additional_fields(self) -> dict[str, Any]:
-        setattr(self.form_class, 'validate_name', hierarchy_name_exists)
-        return {
-            'classes': SelectMultipleField(
-                _('classes'),
-                description=_('tooltip hierarchy forms'),
-                choices=Entity.get_class_choices(self.entity),
-                option_widget=widgets.CheckboxInput(),
-                widget=widgets.ListWidget(prefix_label=False))}
 
 
 class ActorFunctionManager(BaseManager):
@@ -199,14 +184,6 @@ class ActorRelationManager(BaseManager):
     def populate_update(self) -> None:
         if self.origin.id == self.link_.range.id:
             self.form.inverse.data = True
-
-
-class HierarchyCustomManager(HierarchyBaseManager):
-    def additional_fields(self) -> dict[str, Any]:
-        tooltip = _('tooltip hierarchy multiple')
-        return {
-            **{'multiple': BooleanField(_('multiple'), description=tooltip)},
-            **super().additional_fields()}
 
 
 class InvolvementManager(BaseManager):
