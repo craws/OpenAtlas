@@ -15,6 +15,7 @@ from openatlas.api.resources.util import (
 from openatlas.database.overlay import get_by_object
 from openatlas.display.util import get_file_path
 from openatlas.models.cidoc_property import CidocProperty
+from openatlas.models.dates import Dates
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 from openatlas.models.overlay import Overlay
@@ -110,7 +111,7 @@ def get_relation_types_dict(
         'relationTo': relation_to_id,
         'type': to_camel_case(link_.type.name) if link_.type else None,
         'description': link_.description,
-        'when': get_presentation_time(link_)}
+        'when': get_presentation_time(link_.dates)}
     if parser.remove_empty_values:
         relation_types = {k: v for k, v in relation_types.items() if v}
     return relation_types
@@ -158,7 +159,7 @@ def get_presentation_references(
 def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
     ids = [entity.id]
     root_ids: list[int] = []
-    if entity.class_.group in ['place', 'artifact']:
+    if entity.class_.group['name'] in ['place', 'artifact']:
         entity.location = entity.get_linked_entity_safe('P53')
         ids.append(entity.location.id)
         if parser.place_hierarchy:
@@ -208,7 +209,7 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
             get_relation_types_dict(l, parser, entity.id))
 
     places: list[Entity] = []
-    if entity.class_.view in {'actor', 'event'}:
+    if entity.class_.group in ['actor', 'event']:
         if location_links := Entity.get_links_of_entities(
                 entity.id,
                 ['P74', 'OA8', 'OA9', 'P7', 'P26', 'P27']):
@@ -256,7 +257,7 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
             'description': rel_entity.description,
             'aliases': list(rel_entity.aliases.values()),
             'geometries': geometries,
-            'when': get_presentation_time(rel_entity),
+            'when': get_presentation_time(rel_entity.dates),
             'standardType': standard_type_,
             'relationTypes': relation_types[rel_entity.id]}
         if parser.remove_empty_values:
@@ -272,7 +273,7 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         if entity.class_.name == 'source' else entity.description,
         'aliases': list(entity.aliases.values()),
         'geometries': None,
-        'when': get_presentation_time(entity),
+        'when': get_presentation_time(entity.dates),
         'types': get_presentation_types(entity, links),
         'externalReferenceSystems': get_reference_systems(links_inverse),
         'references': get_presentation_references(
@@ -291,18 +292,18 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
     return data
 
 
-def get_presentation_time(entity: Entity | Link) -> Optional[dict[str, Any]]:
-    dates = {}
-    if entity.begin_from or entity.begin_to:
+def get_presentation_time(dates: Dates) -> Optional[dict[str, Any]]:
+    time = {}
+    if dates.begin_from or dates.begin_to:
         begin = {
-            'earliest': date_to_str(entity.begin_from),
-            'latest': date_to_str(entity.begin_to),
-            'comment': entity.begin_comment}
-        dates['start'] = {k: v for k, v in begin.items() if v}
-    if entity.end_from or entity.end_to:
+            'earliest': date_to_str(dates.begin_from),
+            'latest': date_to_str(dates.begin_to),
+            'comment': dates.begin_comment}
+        time['start'] = {k: v for k, v in begin.items() if v}
+    if dates.end_from or dates.end_to:
         end = {
-            'earliest': date_to_str(entity.end_from),
-            'latest': date_to_str(entity.end_to),
-            'comment': entity.end_comment}
-        dates['end'] = {k: v for k, v in end.items() if v}
-    return dates
+            'earliest': date_to_str(dates.end_from),
+            'latest': date_to_str(dates.end_to),
+            'comment': dates.end_comment}
+        time['end'] = {k: v for k, v in end.items() if v}
+    return time

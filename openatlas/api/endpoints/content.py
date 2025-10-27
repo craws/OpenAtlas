@@ -42,7 +42,7 @@ class Classes(Resource):
         return marshal([{
             "systemClass": item.name,
             "crmClass": item.cidoc_class.code if item.cidoc_class else None,
-            "view": item.class_.group['name'],
+            "view": item.group['name'] if item.group else None,
             "standardTypeId": item.standard_type_id,
             "icon": item.icon,
             "en": item.label} for item in g.classes.values()],
@@ -59,7 +59,7 @@ class ClassMapping(Resource):
                 "systemClass": class_.name,
                 "crmClass":
                     class_.cidoc_class.code if class_.cidoc_class else None,
-                "view": class_.group['name'],
+                 "view": class_.group['name'] if class_.group else None,
                 "standardTypeId": class_.standard_type_id,
                 "icon": class_.icon} for class_ in g.classes.values()]}
         if locale.parse_args()['download']:

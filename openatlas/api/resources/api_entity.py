@@ -27,15 +27,11 @@ class ApiEntity(Entity):
         return Entity.get_by_cidoc_class(codes, types=True, aliases=True)
 
     @staticmethod
-    def get_by_view_classes(codes: list[str]) -> list[Entity]:
-        # Todo: fix after new classes
-        codes = list(g.class_groups['classes']) if 'all' in codes else codes
-        if not all(code in g.class_groups['classes'] for code in codes):
+    def get_by_view_classes(codes_: list[str]) -> list[Entity]:
+        codes: list[str] = list(g.class_groups) if "all" in codes_ else codes_
+        if [code for code in codes if code not in g.class_groups]:
             raise InvalidViewClassError
-        return Entity.get_by_class(
-            sum([g.class_groups['classes'][code] for code in codes], []),
-            types=True,
-            aliases=True)
+        return Entity.get_by_class(codes, types=True, aliases=True)
 
     @staticmethod
     def get_by_system_classes(classes: list[str]) -> list[Entity]:

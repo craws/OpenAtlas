@@ -129,7 +129,9 @@ def remove_spaces_dashes(string: str) -> str:
 def get_reference_systems(links_inverse: list[Link]) -> list[dict[str, Any]]:
     ref = []
     for link_ in links_inverse:
-        if isinstance(link_.domain, Entity) and link_.type:
+        if isinstance(link_.domain, Entity) \
+                and link_.type \
+                and g.reference_systems.get(link_.domain.id):
             system = g.reference_systems[link_.domain.id]
             ref.append({
                 'referenceURL': system.website_url,

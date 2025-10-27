@@ -609,7 +609,7 @@ class Entity:
 
     @staticmethod
     def get_overview_counts_by_type(ids: list[int]) -> dict[str, int]:
-        return db.get_overview_counts_by_type(ids, g.class_view_mapping)
+        return db.get_overview_counts_by_type(ids, g.classes.keys())
 
     @staticmethod
     def get_latest(limit: int) -> list[Entity]:
