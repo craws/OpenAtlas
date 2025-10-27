@@ -25,6 +25,7 @@ from openatlas.api.resources.util import (
     date_to_str, geometry_to_geojson, get_license_ids_with_links,
     get_location_link, get_reference_systems,
     replace_empty_list_values_in_dict_with_none)
+from openatlas.display.table import entity_table
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 
@@ -103,6 +104,9 @@ class Endpoint:
         self.sort_entities()
         self.get_pagination()
         self.reduce_entities_to_limit()
+        if self.parser.format == 'table_row':
+            return entity_table(items=self.entities, columns=self.parser.table_columns).rows
+
         self.get_links_for_entities()
         if self.parser.export == 'csv':
             return self.export_csv_entities()

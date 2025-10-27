@@ -227,6 +227,15 @@ query.add_argument(
     help="{error_msg}",
     location='args')
 
+table_row = query.copy()
+table_row.add_argument(
+    'table_columns',
+    type=str,
+    action='append',
+    help="{error_msg}",
+    location='args')
+
+
 gis = default.copy()
 gis.add_argument(
     'geometry',

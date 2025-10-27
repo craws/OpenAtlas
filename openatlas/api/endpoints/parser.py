@@ -51,6 +51,7 @@ class Parser:
     system_classes = None
     image_size = None
     file_id = None
+    table_columns = None
     exclude_system_classes: list[str]
     linked_to_ids: list[int]
     url: str = ''
@@ -151,15 +152,15 @@ class Parser:
 
     def get_key(self, entity: Entity) -> str:
         if self.column == 'cidoc_class':
-            return entity.cidoc_class.name
+            return entity.cidoc_class.name.lower()
         if self.column == 'system_class':
-            return entity.class_.name
+            return entity.class_.name.lower()
         if self.column in ['begin_from', 'begin_to', 'end_from', 'end_to']:
             if not getattr(entity.dates, self.column):
                 date = ("-" if self.sort == 'desc' else "") \
                        + '9999999-01-01T00:00:00'
                 return str(date)
-        return getattr(entity, self.column)
+        return getattr(entity, self.column).lower()
 
     def get_by_page(
             self,

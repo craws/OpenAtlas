@@ -5,7 +5,7 @@ from openatlas.api.endpoints.entities import (
     GetByCidocClass, GetBySystemClass, GetByViewClass,
     GetEntitiesLinkedToEntity, GetEntity, GetEntityPresentationView, GetLatest,
     GetLinkedEntitiesByPropertyRecursive, GetQuery, GetSearchEntities,
-    GetTypeEntities, GetTypeEntitiesAll)
+    GetTableRows, GetTypeEntities, GetTypeEntitiesAll)
 from openatlas.api.endpoints.file import DisplayImage, EntityFiles, \
     LicensedFileOverview
 from openatlas.api.endpoints.iiif import (
@@ -34,7 +34,8 @@ entity = [
      'entities_linked_to_entity'],
     [GetEntityPresentationView,
      '/entity_presentation_view/<int:id_>',
-     'entity_presentation_view']]
+     'entity_presentation_view'],
+    [GetTableRows, '/get_table_rows/', 'get_table_rows']]
 
 admin = [
     [SystemClassCount, '/system_class_count/', 'system_class_count'],
