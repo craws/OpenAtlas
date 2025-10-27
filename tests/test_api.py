@@ -350,9 +350,14 @@ class Api(ApiTestCase):
         assert rv['relations']['feature']
         assert rv['relations']['person']
 
-        rv = c.get(url_for('api_04.entity_presentation_view', id_=place.id))
+        rv = c.get(
+            url_for(
+                'api_04.entity_presentation_view',
+                id_=feature.id,
+                place_hierarchy='true',
+                map_overlay='true'))
         rv = rv.get_json()
-        assert rv['id'] == place.id
+        assert rv['id'] == feature.id
 
         rv = c.get(url_for('api_04.entity_presentation_view', id_=actor2.id))
         rv = rv.get_json()
@@ -758,6 +763,10 @@ class Api(ApiTestCase):
                 filename=f'{file.id}',
                 image_size='table')) as rv:
             self.assertTrue(rv.headers['Content-Type'].startswith('image'))
+
+        with c.get(
+            url_for('api_04.files_of_entities', entities=place.id)) as rv:
+            self.assertTrue(rv.get_json()[str(place.id)])
 
         rv = c.get(url_for('api_04.search', class_='all', term='Fro'))
         assert rv.get_json()['pagination']['entities'] == 2

@@ -1,13 +1,13 @@
 from openatlas.api.endpoints.content import (
     ClassMapping, Classes, GetBackendDetails, GetOpenAPISchema, GetProperties,
     SystemClassCount)
-from openatlas.api.endpoints.display_image import (
-    DisplayImage, LicensedFileOverview)
 from openatlas.api.endpoints.entities import (
     GetByCidocClass, GetBySystemClass, GetByViewClass,
     GetEntitiesLinkedToEntity, GetEntity, GetEntityPresentationView, GetLatest,
     GetLinkedEntitiesByPropertyRecursive, GetQuery, GetSearchEntities,
     GetTypeEntities, GetTypeEntitiesAll)
+from openatlas.api.endpoints.file import DisplayImage, EntityFiles, \
+    LicensedFileOverview
 from openatlas.api.endpoints.iiif import (
     IIIFAnnotation, IIIFAnnotationList, IIIFCanvas, IIIFImage, IIIFManifest,
     IIIFSequence)
@@ -68,6 +68,7 @@ special = [
 
 display = [
     [DisplayImage, '/display/<path:filename>', 'display'],
+    [EntityFiles, '/files_of_entities/', 'files_of_entities'],
     [IIIFManifest, '/iiif_manifest/<int:version>/<int:id_>', 'iiif_manifest'],
     [IIIFImage, '/iiif_image/<int:id_>.json', 'iiif_image'],
     [IIIFCanvas, '/iiif_canvas/<int:id_>.json', 'iiif_canvas'],
