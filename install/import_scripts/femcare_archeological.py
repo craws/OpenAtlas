@@ -1,7 +1,10 @@
+import hashlib
+import os
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
+
 import fitz
 import pandas as pd
 
@@ -291,18 +294,8 @@ def _collect_until_next_label(start_idx: int, lines: list[str], break_tokens=("S
     return text
 
 
-def _split_sections_by_se(full_text: str) -> list[str]:
-    anchors = list(re.finditer(r"\bSE\s*:\s*\d+\b", full_text))
-    if not anchors:
-        return [full_text]
-    sections = []
-    for idx, m in enumerate(anchors):
-        start = m.start()
-        end = anchors[idx+1].start() if idx+1 < len(anchors) else len(full_text)
-        sections.append(full_text[start:end])
-    return sections
 
-def _parse_section(section_text: str) -> Individual | None:
+def parse_section(section_text: str) -> Individual | None:
     lines = [l.rstrip() for l in section_text.splitlines()]
     # find SE id
     se_id = None
@@ -337,11 +330,11 @@ def _parse_section(section_text: str) -> Individual | None:
 
     # --- description: only keep specific meaningful fields ---
     wanted_labels = [
-        "Position(Objekt)",
+        "Position",
         "Grabkonstruktion",
         "Fundmaterial",
-        "Grabmarkierung/ -überbau und -form",
-        "Anmerkungen/ Skizze",
+        "Grabmarkierung",
+        "Anmerkungen",
     ]
 
     description = []
@@ -350,11 +343,11 @@ def _parse_section(section_text: str) -> Individual | None:
         if not m:
             continue
 
-        label = m.group(1).strip()
+        label = m.group(1)
         if label not in wanted_labels:
             continue
 
-        value = m.group(2).strip()
+        value = m.group(2)
 
         # --- Handle cases where value is below the label (next 1–2 lines) ---
         if value in ("", "-"):
@@ -409,8 +402,18 @@ def _parse_section(section_text: str) -> Individual | None:
         age=age,
         extraction=extraction)
 
-# --- main entrypoint replacing your old DOCX parser ---
+def split_sections_by_se(full_text: str) -> list[str]:
+    anchors = list(re.finditer(r"\bSE\s*:\s*\d+\b", full_text))
+    if not anchors:
+        return [full_text]
+    sections = []
+    for idx, m in enumerate(anchors):
+        start = m.start()
+        end = anchors[idx+1].start() if idx+1 < len(anchors) else len(full_text)
+        sections.append(full_text[start:end])
+    return sections
 
+# todo: start here for SE
 def get_individuals() -> list[Individual]:
     """Parse all SE-Protokolle PDFs and return Individuals."""
     pdf_dir = FILE_PATH / "06_SE Protokollblätter"
@@ -418,16 +421,15 @@ def get_individuals() -> list[Individual]:
 
     for pdf_file in sorted(pdf_dir.glob("Schnitt *_SE-Protokolle.pdf")):
         text = extract_text(str(pdf_file))
-        sections = _split_sections_by_se(text)
+        sections = split_sections_by_se(text)
         for sec in sections:
-            ind = _parse_section(sec)
+            ind = parse_section(sec)
             if ind:
                 output.append(ind)
     return output
 
-import hashlib
-import os
 
+# Todo: start here for images
 def extract_images_from_pdfs() -> None:
     """Extract images from SE PDFs and remove duplicate (e.g. logo) images."""
     out_dir = FILE_PATH / "skelett_mannchen"
@@ -510,8 +512,8 @@ def build_types(
         hierarchy: Entity,
         attribute: str) -> dict[str, Entity]:
     types: dict[str, Entity] = {}
-    for entry in entities:
-        key = getattr(entry, attribute, None)
+    for entry_ in entities:
+        key = getattr(entry_, attribute, None)
         if not key or key in types:
             continue
         type_ = Entity.insert('type', key)
@@ -524,11 +526,11 @@ def build_find_types(
         entities: list,
         attribute: str) -> dict[str, Entity]:
     types: dict[str, Entity] = {}
-    for entry in entities:
+    for entry_ in entities:
         hierarchy = import_artifact_type
-        if entry.material == 'menschl. Kn.':
+        if entry_.material == 'menschl. Kn.':
             hierarchy = import_hr_type
-        key = getattr(entry, attribute, None)
+        key = getattr(entry_, attribute, None)
         if not key or key in types:
             continue
         type_ = Entity.insert('type', key)
@@ -590,8 +592,8 @@ with app.test_request_context():
         parse_stratigraphic_units(),
         get_individuals())
     finds = parse_finds()
-
-    extract_images_from_pdfs()
+    # Todo commented  just for performance,
+    # extract_images_from_pdfs()
 
     # Build type dictionaries from Feature
     feature_types = build_types(features, import_feature_type, 'type')
