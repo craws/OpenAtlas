@@ -21,9 +21,12 @@ class TypeTest(TestBaseCase):
         rv = c.get(url_for('view', id_=historical_type.subs[0]))
         assert b'Historical place' in rv.data
 
-        return  # Todo: continue tests
-
-        rv = c.get(url_for('insert', class_='type', origin_id=actor_type.id))
+        rv = c.get(
+            url_for(
+                'insert',
+                class_='type',
+                origin_id=actor_type.id,
+                relation='subs'))
         assert b'Actor relation' in rv.data
 
         data = {
@@ -32,7 +35,11 @@ class TypeTest(TestBaseCase):
             'description': 'Very important!',
             actor_type.id: actor_type.subs[0]}
         rv = c.post(
-            url_for('insert', class_='type', origin_id=actor_type.id),
+            url_for(
+                'insert',
+                class_='type',
+                origin_id=actor_type.id,
+                relation='subs'),
             data=data)
         type_id = rv.location.split('/')[-1]
 
@@ -51,10 +58,16 @@ class TypeTest(TestBaseCase):
 
         data['continue_'] = 'yes'
         rv = c.post(
-            url_for('insert', class_='type', origin_id=actor_type.id),
+            url_for(
+                'insert',
+                class_='type',
+                origin_id=actor_type.id,
+                relation='subs'),
             data=data,
             follow_redirects=True)
         assert b'An entry has been created' in rv.data
+
+        return  # Todo: continue tests
 
         rv = c.post(
             url_for('ajax_add_type'),
@@ -75,7 +88,8 @@ class TypeTest(TestBaseCase):
             url_for(
                 'insert',
                 class_='administrative_unit',
-                origin_id=admin_unit.subs[0]),
+                origin_id=admin_unit.subs[0],
+                relation='subs'),
             data={'name': 'admin unit'},
             follow_redirects=True)
         assert b'An entry has been created' in rv.data

@@ -21,26 +21,29 @@ def hierarchy_insert(category: str) -> str | Response:
     hierarchy.category = category
     form = get_entity_form(hierarchy)
     if form.validate_on_submit():
-        try:
-            Transaction.begin()
-            hierarchy = process_form_data(hierarchy, form, None, None)
-            Entity.insert_hierarchy(
-                hierarchy,
-                category,
-                form.classes.data,
-                bool(
-                    category == 'value' or (
-                        hasattr(form, 'multiple')
-                        and form.multiple.data)))
-            g.logger.log_user(hierarchy.id, 'insert')
-            Transaction.commit()
-        except Exception as e:  # pragma: no cover
-            Transaction.rollback()
-            g.logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
-            abort(418)
-        flash(_('entity created'), 'info')
-        return redirect(f"{url_for('type_index')}#menu-tab-{category}")
+        if Entity.check_hierarchy_exists(form.name.data):
+            form.name.errors.append(_('error name exists'))
+        else:
+            try:
+                Transaction.begin()
+                hierarchy = process_form_data(hierarchy, form, None, None)
+                Entity.insert_hierarchy(
+                    hierarchy,
+                    category,
+                    form.classes.data,
+                    bool(
+                        category == 'value' or (
+                            hasattr(form, 'multiple')
+                            and form.multiple.data)))
+                g.logger.log_user(hierarchy.id, 'insert')
+                Transaction.commit()
+            except Exception as e:  # pragma: no cover
+                Transaction.rollback()
+                g.logger.log('error', 'database', 'transaction failed', e)
+                flash(_('error transaction'), 'error')
+                abort(418)
+            flash(_('entity created'), 'info')
+            return redirect(f"{url_for('type_index')}#menu-tab-{category}")
     return render_template(
         'content.html',
         content=display_form(form, manual_page='entity/type'),
@@ -65,27 +68,32 @@ def hierarchy_update(id_: int) -> str | Response:
             break
         linked_entities.add(entity.id)
     if form.validate_on_submit():
-        Transaction.begin()
-        try:
-            hierarchy.update_hierarchy(
-                form.name.data,
-                form.classes.data,
-                multiple=(
-                    hierarchy.category == 'value'
-                    or (hasattr(form, 'multiple') and form.multiple.data)
-                    or has_multiple_links))
-            process_form_data(hierarchy, form, None, None)
-            g.logger.log_user(hierarchy.id, 'update')
-            Transaction.commit()
-        except Exception as e:  # pragma: no cover
-            Transaction.rollback()
-            g.logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
-            abort(418)
-        flash(_('info update'), 'info')
-        tab = 'value' if g.types[id_].category == 'value' else 'custom'
-        return redirect(
-            f"{url_for('type_index')}#menu-tab-{tab}_collapse-{hierarchy.id}")
+        if form.name.data != hierarchy.name \
+                and Entity.check_hierarchy_exists(form.name.data):
+            form.name.errors.append(_('error name exists'))
+        else:
+            Transaction.begin()
+            try:
+                hierarchy.update_hierarchy(
+                    form.name.data,
+                    form.classes.data,
+                    multiple=(
+                        hierarchy.category == 'value'
+                        or (hasattr(form, 'multiple') and form.multiple.data)
+                        or has_multiple_links))
+                process_form_data(hierarchy, form, None, None)
+                g.logger.log_user(hierarchy.id, 'update')
+                Transaction.commit()
+            except Exception as e:  # pragma: no cover
+                Transaction.rollback()
+                g.logger.log('error', 'database', 'transaction failed', e)
+                flash(_('error transaction'), 'error')
+                abort(418)
+            flash(_('info update'), 'info')
+            tab = 'value' if g.types[id_].category == 'value' else 'custom'
+            return redirect(
+                f"{url_for('type_index')}"
+                f"#menu-tab-{tab}_collapse-{hierarchy.id}")
     if hasattr(form, 'multiple') and has_multiple_links:
         form.multiple.render_kw = {'disabled': 'disabled'}
     table = Table(['class', 'count'], paging=False)

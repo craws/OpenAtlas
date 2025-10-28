@@ -21,8 +21,6 @@ class HierarchyTest(TestBaseCase):
             follow_redirects=True)
         assert b'An entry has been created' in rv.data
 
-        return  # Todo: continue tests
-
         rv = c.post(
             url_for('hierarchy_insert', category='custom'),
             data=data,
@@ -62,7 +60,11 @@ class HierarchyTest(TestBaseCase):
         assert b'Changes have been saved' in rv.data
 
         rv = c.post(
-            url_for('insert', class_='type', origin_id=hierarchy.id),
+            url_for(
+                'insert',
+                class_='type',
+                origin_id=hierarchy.id,
+                relation='subs'),
             data={'name': 'Secret type', 'description': 'Very important!'})
         type_id = rv.location.split('/')[-1]
 
@@ -71,7 +73,7 @@ class HierarchyTest(TestBaseCase):
             follow_redirects=True)
         assert b'Changes have been saved' in rv.data
 
-        rv = c.get(url_for('type_delete', id_=type_id), follow_redirects=True)
+        rv = c.get(url_for('delete', id_=type_id), follow_redirects=True)
         assert b'deleted' in rv.data
 
         rv = c.post(
