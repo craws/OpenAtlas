@@ -79,9 +79,9 @@ class ArcheFileMetadata:
                     'name': relation['entity'].name,
                     'reference_systems': ref_system_info,
                     'description': relation['entity'].description}
-                if relation['entity'].class_.name == 'place':
+                if relation['entity'].class_.group['name'] == 'place':
                     places.append(values)
-                if relation['entity'].class_.view == 'actor':
+                if relation['entity'].class_.group['name']  == 'actor':
                     actors.append(values)
         obj.actors = actors
         obj.spatial_coverages = places

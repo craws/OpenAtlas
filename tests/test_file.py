@@ -77,10 +77,11 @@ class FileTest(TestBaseCase):
         rv = c.get(url_for('update', id_=iiif_id))
         assert b'License' in rv.data
 
-        return  # Todo: continue tests
-
         rv = c.post(
-            url_for('insert', class_='external_reference', origin_id=iiif_id),
+            url_for(
+                'link_insert_detail',
+                relation_name='reference',
+                origin_id=iiif_id),
             data={'name': 'https://openatlas.eu'},
             follow_redirects=True)
         assert b'page' in rv.data
@@ -128,16 +129,21 @@ class FileTest(TestBaseCase):
         assert b'Unset' not in rv.data
 
         rv = c.post(
-            url_for('reference_add', id_=reference.id, view='file'),
-            data={'file': iiif_id, 'page': '777'},
+            url_for(
+                'link_insert_detail',
+                origin_id=reference.id,
+                relation_name='file'),
+            data={'file': iiif_id},
             follow_redirects=True)
-        assert b'777' in rv.data
+        assert b'Ancient Books' in rv.data
 
         rv = c.post(
             url_for('update', id_=iiif_id),
             data={'name': 'Updated file'},
             follow_redirects=True)
         assert b'Changes have been saved' in rv.data
+
+        return  # Todo: continue tests
 
         rv = c.get(url_for('file_add', id_=iiif_id, view='actor'))
         assert b'link actor' in rv.data
