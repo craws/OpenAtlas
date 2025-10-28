@@ -152,7 +152,7 @@ def logo(id_: Optional[int] = None) -> str | Response:
         return redirect(f"{url_for('admin_index')}#tab-file")
     table = entity_table(
         Entity.get_display_files(),
-        columns=['set logo'] + g.class_groups['file']['table_columns'],
+        columns=['set_logo'] + g.class_groups['file']['table_columns'],
         forms={'mode': 'logo'})
     return render_template(
         'tabs.html',

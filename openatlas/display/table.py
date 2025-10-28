@@ -44,7 +44,7 @@ class Table:
     def display(self, name: str = 'default') -> str:
         if not self.rows:
             return '<p class="uc-first">' + _('no entries') + '</p>'
-        no_title = ['checkbox', 'remove', 'set logo', 'update']
+        no_title = ['checkbox', 'remove', 'set_logo', 'update']
         data = {
             'data': self.rows,
             'stateSave': 'true',
@@ -188,11 +188,11 @@ def entity_table(
                         '<span class="text-muted">' \
                         f'{range_.dates.last}</span>' \
                         if range_.dates.last else ''
-                case 'license holder':
+                case 'license_holder':
                     html = ''
                     if g.file_info.get(e.id):
                         html = g.file_info[e.id]['license_holder']
-                case 'main image':
+                case 'main_image':
                     html = profile_image_table_link(
                         origin,
                         e,
@@ -237,7 +237,7 @@ def entity_table(
                     html = ''
                     if not origin.root or not g.types[origin.root[0]].required:
                         html = remove_link(e.name, item, origin, tab_id)
-                case 'set logo':
+                case 'set_logo':
                     html = link(_('set'), url_for('logo', id_=e.id))
                 case 'size':
                     html = e.get_file_size()
