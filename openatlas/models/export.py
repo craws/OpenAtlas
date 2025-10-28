@@ -192,8 +192,8 @@ def get_place_and_actor_relations(
     file_to_related_entity_ids: dict[int, list[int]] = defaultdict(list)
     places_and_actors: dict[int, dict[str, Any]] = {}
     for link in linked_entities:
-        if (link.range.class_.view == 'actor'
-                or link.range.class_.name == 'place'):
+        if (link.range.class_.group['name'] == 'actor'
+                or link.range.class_.group['name']  == 'place'):
             places_and_actors[link.range.id] = {
                 'entity': link.range,
                 'links_inverse': [],

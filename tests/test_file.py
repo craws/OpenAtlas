@@ -77,10 +77,11 @@ class FileTest(TestBaseCase):
         rv = c.get(url_for('update', id_=iiif_id))
         assert b'License' in rv.data
 
-        return  # Todo: continue tests
-
         rv = c.post(
-            url_for('insert', class_='external_reference', origin_id=iiif_id),
+            url_for(
+                'link_insert_detail',
+                relation_name='reference',
+                origin_id=iiif_id),
             data={'name': 'https://openatlas.eu'},
             follow_redirects=True)
         assert b'page' in rv.data
@@ -126,6 +127,8 @@ class FileTest(TestBaseCase):
             url_for('remove_profile_image', entity_id=place.id),
             follow_redirects=True)
         assert b'Unset' not in rv.data
+
+        return  # Todo: continue tests
 
         rv = c.post(
             url_for('reference_add', id_=reference.id, view='file'),
