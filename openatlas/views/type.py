@@ -14,7 +14,7 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
     get_chart_data, get_entities_linked_to_type_recursive, link,
-    required_group)
+    reference_systems, required_group)
 from openatlas.display.util2 import manual, sanitize
 from openatlas.forms.field import SubmitField
 from openatlas.forms.form import move_form
@@ -57,9 +57,7 @@ def type_index() -> str:
                 'forms/tree_select_item.html',
                 name=sanitize(type_.name, 'ascii'),
                 data=walk_tree(type_.subs))
-            for link_ in type_.get_links('P67', inverse=True):
-                if link_.domain.class_.group['name'] == 'reference_system':
-                    type_.reference_systems.append(link_)
+            type_.reference_systems_display = reference_systems(type_)
     return render_template(
         'type/index.html',
         buttons=[manual('entity/type')],

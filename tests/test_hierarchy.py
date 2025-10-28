@@ -1,3 +1,5 @@
+from typing import Any
+
 from flask import g, url_for
 
 from tests.base import TestBaseCase, get_hierarchy
@@ -7,10 +9,8 @@ class HierarchyTest(TestBaseCase):
 
     def test_hierarchy(self) -> None:
 
-        return  # Todo: continue tests
-
         c = self.client
-        data = {
+        data: dict[str, Any] = {
             'name': 'Geronimo',
             'classes': ['file', 'group', 'move', 'person', 'place', 'source'],
             'multiple': True,
@@ -20,6 +20,8 @@ class HierarchyTest(TestBaseCase):
             data=data,
             follow_redirects=True)
         assert b'An entry has been created' in rv.data
+
+        return  # Todo: continue tests
 
         rv = c.post(
             url_for('hierarchy_insert', category='custom'),

@@ -94,13 +94,7 @@ class Display:
         if self.entity.category != 'value':
             text += description(description_, label)
 
-        reference_systems_display = ''
-        if 'reference_system' in self.entity.class_.extra:
-            reference_systems_display = reference_systems(
-                self.entity.get_links(
-                    'P67',
-                    ['reference_system'],
-                    inverse=True))
+        reference_systems_display = reference_systems(self.entity)
         self.tabs['info'].content = render_template(
             'entity/view.html',
             entity=self.entity,

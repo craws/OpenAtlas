@@ -49,8 +49,12 @@ def edit_link(url: str) -> Optional[str]:
     return link(_('edit'), url) if is_authorized('contributor') else None
 
 
-def reference_systems(links: list[Link]) -> str:
-    if not links:
+def reference_systems(entity: Entity) -> str:
+    if 'reference_system' not in entity.class_.extra \
+        or not (links := entity.get_links(
+            'P67',
+            ['reference_system'],
+            inverse=True)):
         return ''
     html = '<h2 class="uc-first">' + _("external reference systems") + '</h2>'
     for link_ in links:

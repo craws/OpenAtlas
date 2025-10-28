@@ -205,14 +205,14 @@ def process_relations(
         origin: Entity | None,
         relation_name: str | None) -> None:
     for name, relation in entity.class_.relations.items():
-        if relation['mode'] != 'direct':
+        if relation['mode'] != 'direct' or not hasattr(form, name):
             continue
         ids = convert(getattr(form, name).data)
         if entity.class_.group['name'] == 'type' \
                 and relation['name'] == 'super' \
                 and not ids:
             ids = [entity.root[0] if entity.root else origin.id]
-        if hasattr(form, name) and ids:
+        if ids:
             entities = Entity.get_by_ids(ids)
             if 'object_location' in relation['classes']:
                 locations = []
