@@ -122,8 +122,8 @@ def entity_table(
         if isinstance(item, Link):
             e = item.domain if inverse else item.range
             range_ = item.range if inverse else item.domain
-            if range_.class_.name == 'object_location':
-                e = e.get_linked_entity('P89', ['place'], False, True)
+            if e.class_.name == 'object_location':
+                e = e.get_linked_entity_safe('P53', inverse=False, types=True)
         data = []
         for name in columns:
             html = 'no table function'

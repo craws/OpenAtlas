@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Any
 
 from flask import g, render_template, url_for
 from flask_babel import lazy_gettext as _
@@ -14,7 +14,7 @@ from openatlas.display.util import (
 from openatlas.display.util2 import (
     display_bool, is_authorized, manual, uc_first)
 from openatlas.models.dates import format_date, format_entity_date
-from openatlas.models.entity import Entity, Link
+from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.user import User
 from openatlas.views.tools import carbon_result, sex_result
@@ -28,7 +28,6 @@ class Display:
     def __init__(self, entity: Entity) -> None:
         self.entity = entity
         self.events: list[Entity] = []
-        self.event_links: Optional[list[Link]] = []
         self.linked_places: list[Entity] = []
         self.structure: dict[str, list[Entity]] = {}
         self.gis_data: dict[str, Any] = {}
@@ -111,8 +110,14 @@ class Display:
         for name, relation in self.entity.class_.relations.items():
             if not relation['mode'] == 'tab':
                 continue
+            entity_for_links = self.entity
+            if name in [
+                    'event_location',
+                    'move_from_location',
+                    'move_to_location']:
+                entity_for_links = self.entity.location
             items = []
-            for item in self.entity.get_links(
+            for item in entity_for_links.get_links(
                     relation['property'],
                     relation['classes'],
                     relation['inverse']):

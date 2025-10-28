@@ -35,9 +35,14 @@ place: dict[str, Any] = {
             'classes': 'acquisition',
             'property': 'P24',
             'inverse': True,
-            'multiple': True,
             'tab': {
-                'buttons': ['link', 'insert']}},
+                'buttons': ['insert']}},
+        'modification': {
+            'classes': 'modification',
+            'property': 'P31',
+            'inverse': True,
+            'tab': {
+                'buttons': ['insert']}},
         'event_location': {
             'label': _('event location'),
             'classes': [
@@ -45,7 +50,21 @@ place: dict[str, Any] = {
             'property': 'P7',
             'inverse': True,
             'tab': {
-                'buttons': ['link', 'insert']}},
+                'buttons': ['insert']}},
+        'move_from_location': {
+            'label': _('move from location'),
+            'classes': 'move',
+            'property': 'P27',
+            'inverse': True,
+            'tab': {
+                'buttons': ['insert']}},
+        'move_to_location': {
+            'label': _('move to location'),
+            'classes': 'move',
+            'property': 'P26',
+            'inverse': True,
+            'tab': {
+                'buttons': ['insert']}},
         'reference': standard_relations['reference'],
         'file': standard_relations['file']},
     'display': {
