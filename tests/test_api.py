@@ -460,7 +460,7 @@ class Api(ApiTestCase):
                 limit=1,
                 page=7)).get_json()
         properties = rv['results'][0]['features'][0]['properties']
-        assert properties['title'] == place.name
+        assert properties['title'] == actor2.name
         assert len(rv['results']) == 1
 
         rv = c.get(

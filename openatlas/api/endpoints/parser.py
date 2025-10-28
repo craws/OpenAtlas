@@ -160,7 +160,7 @@ class Parser:
                 date = ("-" if self.sort == 'desc' else "") \
                        + '9999999-01-01T00:00:00'
                 return str(date)
-        return getattr(entity, self.column).lower()
+        return str(getattr(entity, self.column)).lower()
 
     def get_by_page(
             self,

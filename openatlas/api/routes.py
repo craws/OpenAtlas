@@ -35,7 +35,7 @@ entity = [
     [GetEntityPresentationView,
      '/entity_presentation_view/<int:id_>',
      'entity_presentation_view'],
-    [GetTableRows, '/get_table_rows/', 'get_table_rows']]
+    [GetTableRows, '/table_rows/', 'table_rows']]
 
 admin = [
     [SystemClassCount, '/system_class_count/', 'system_class_count'],

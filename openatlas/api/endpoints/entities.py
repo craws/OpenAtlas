@@ -12,7 +12,7 @@ from openatlas.api.resources.database_mapper import get_api_search, \
 from openatlas.api.resources.error import (
     InvalidLimitError, InvalidSystemClassError, NotATypeError, QueryEmptyError)
 from openatlas.api.resources.parser import entity_, presentation, properties, \
-    query, search_parser, table_row
+    query, search_parser
 from openatlas.api.resources.templates import presentation_template
 from openatlas.api.resources.util import (
     get_entities_from_type_with_subs, get_entities_linked_to_special_type,
@@ -35,15 +35,6 @@ class GetBySystemClass(Resource):
             ApiEntity.get_by_system_classes([class_]),
             entity_.parse_args()).resolve()
 
-
-class GetTableRows(Resource):
-    @staticmethod
-    def get() -> tuple[Resource, int] | Response | dict[str, Any]:
-        parser = table_row.parse_args()
-        parser['format'] = 'table_row'
-        return Endpoint(
-            ApiEntity.get_by_system_classes(parser['system_classes']),
-            parser).resolve()
 
 
 class GetByViewClass(Resource):
@@ -129,11 +120,21 @@ class GetTypeEntitiesAll(Resource):
                 aliases=True)
         return Endpoint(entities, entity_.parse_args()).resolve()
 
-
-class GetQuery(Resource):
+class GetTableRows(Resource):
     @staticmethod
     def get() -> tuple[Resource, int] | Response | dict[str, Any]:
         parser = query.parse_args()
+        parser['format'] = 'table_row'
+        return GetQuery.get(parser)
+
+
+class GetQuery(Resource):
+    @staticmethod
+    def get(
+            parser: dict[str, Any] | None = None) \
+            -> tuple[Resource, int] | Response | dict[str, Any]:
+        if parser is None:
+            parser = query.parse_args()
         if not any([
             parser['entities'],
             parser['cidoc_classes'],

@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.10d",
+    "version": "0.4.11a",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -268,6 +268,89 @@
               "application/ld+json": {
                 "schema": {
                   "$ref": "#/components/schemas/EntitiesOutputModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
+    "/table_rows/": {
+      "get": {
+        "tags": [
+          "Proposal",
+          "Entity Query Endpoint"
+        ],
+        "description": "",
+        "operationId": "GetTableRows",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/entities"
+          },
+          {
+            "$ref": "#/components/parameters/view_classes"
+          },
+          {
+            "$ref": "#/components/parameters/system_classes"
+          },
+          {
+            "$ref": "#/components/parameters/cidoc_classes"
+          },
+          {
+            "$ref": "#/components/parameters/linked_entities"
+          },
+          {
+            "$ref": "#/components/parameters/download"
+          },
+          {
+            "$ref": "#/components/parameters/count"
+          },
+          {
+            "$ref": "#/components/parameters/centroid"
+          },
+          {
+            "$ref": "#/components/parameters/show"
+          },
+          {
+            "$ref": "#/components/parameters/column"
+          },
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/search"
+          },
+          {
+            "$ref": "#/components/parameters/first"
+          },
+          {
+            "$ref": "#/components/parameters/last"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/limit"
+          },
+          {
+            "$ref": "#/components/parameters/type_id"
+          }
+        ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/ld+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableRowModel"
                 }
               }
             }
@@ -5897,6 +5980,16 @@
           }
         ],
         "description": "Represents geographic data associated with an entity.\nCan be explicitly null, a single GeoJSON geometry (Point, Polygon, or LineString),\nor a GeoJSON FeatureCollection containing Features with specific properties."
+      },
+      "TableRowModel": {
+        "type": "array",
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "nullable": true
+          }
+        }
       }
     }
   }
