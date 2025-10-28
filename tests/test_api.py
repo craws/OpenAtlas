@@ -506,6 +506,23 @@ class Api(ApiTestCase):
             assert rv['properties']['@id']
             assert rv['properties']['systemClass']
 
+        for rv in [c.get(
+                url_for(
+                    'api_04.query',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
+                    system_classes='person',
+                    format='table_row')),
+            c.get(
+                url_for(
+                    'api_04.table_rows',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
+                    system_classes='person'))]:
+            rv = rv.get_json()
+            assert 'Bar' in rv[0][0]
+            assert 'The One Ring' in rv[-1][0]
+
         # Test entities with Linked Open Usable Data Format
         rv = c.get(
             url_for(
