@@ -205,6 +205,11 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
                 selection = origin
             if selection and selection.class_.name == 'object_location':
                 selection = selection.get_linked_entity_safe('P53', True)
+            add_dynamic = []
+            if relation['add_dynamic']:
+                add_dynamic = [
+                    item.replace('object_location', 'place')
+                    for item in relation['classes']]
             setattr(
                 form,
                 name,
@@ -213,12 +218,13 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
                     selection,
                     label=relation['label'],
                     description=relation['tooltip'],
-                    validators=validators))
+                    validators=validators,
+                    add_dynamic=add_dynamic))
 
 
 def add_date_fields(form_class: Any, entity: Optional[Entity] = None) -> None:
     if entity.class_.group['name'] == 'type' and not entity.root:
-        return None
+        return
     validator_second = [OptionalValidator(), NumberRange(min=0, max=59)]
     validator_minute = [OptionalValidator(), NumberRange(min=0, max=59)]
     validator_hour = [OptionalValidator(), NumberRange(min=0, max=23)]

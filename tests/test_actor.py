@@ -113,8 +113,6 @@ class ActorTests(TestBaseCase):
             follow_redirects=True)
         assert b'Changes have been saved' in rv.data
 
-        return  # Todo: continue tests
-
         rv = c.post(
             url_for('ajax_create_entity'),
             data={
@@ -123,6 +121,8 @@ class ActorTests(TestBaseCase):
                 'standardType': get_hierarchy('Artifact').id,
                 'description': 'AI'})
         assert rv.data.isdigit()
+
+        return  # Todo: continue tests
 
         rv = c.post(
             url_for('ajax_get_entity_table', content_domain='artifact'),

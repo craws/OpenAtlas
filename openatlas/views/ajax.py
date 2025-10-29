@@ -56,17 +56,10 @@ def ajax_get_type_tree(root_id: Optional[int] = None) -> str:
 def ajax_create_entity() -> str:
     Transaction.begin()
     try:
-        entity = insert(
-            request.form['entityName'],
-            request.form['name'],
-            request.form['description'])
-        if request.form['entityName'] in \
-                ['artifact', 'feature', 'place', 'stratigraphic_unit']:
-            entity.link(
-                'P53',
-                insert(
-                    'object_location',
-                    f'Location of {request.form["name"]}'))
+        entity = insert({
+            'name': request.form['name'],
+            'openatlas_class_name': request.form['entityName'],
+            'description': request.form['description']})
         if 'standardType' in request.form and request.form['standardType']:
             entity.link('P2', g.types[int(request.form['standardType'])])
         g.logger.log_user(entity.id, 'insert')

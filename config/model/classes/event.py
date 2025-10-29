@@ -56,7 +56,8 @@ class_ = {
             'label': _('preceding event'),
             'classes': class_groups['event']['classes'],
             'property': 'P134',
-            'mode': 'direct'},
+            'mode': 'direct',
+            'add_dynamic': True},
         'succeeding_event': {
             'label': _('succeeding event'),
             'classes': class_groups['event']['classes'],
@@ -67,7 +68,8 @@ class_ = {
             'label': _('location'),
             'classes': 'object_location',
             'property': 'P7',
-            'mode': 'direct'}},
+            'mode': 'direct',
+            'add_dynamic': True}},
     'display': {
         'buttons': ['copy', 'network'],
         'form_buttons': ['insert_and_continue'],
@@ -132,12 +134,14 @@ move['relations'] = move['relations'] | {
         'label': _('place from'),
         'classes': 'object_location',
         'property': 'P27',
-        'mode': 'direct'},
+        'mode': 'direct',
+        'add_dynamic': True},
     'place_to': {
         'label': _('place to'),
         'classes': 'object_location',
         'property': 'P26',
-        'mode': 'direct'},
+        'mode': 'direct',
+        'add_dynamic': True},
     'moved_person': {
         'label': _('moved person'),
         'classes': 'person',

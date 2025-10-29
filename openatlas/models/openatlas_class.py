@@ -96,6 +96,7 @@ def get_model(class_name: str) -> dict[str, Any]:
         relation['required'] = relation.get('required', False)
         relation['label'] = relation.get('label', _(name.replace('_', ' ')))
         relation['mode'] = relation.get('mode', 'tab')
+        relation['add_dynamic'] = relation.get('add_dynamic', False)
         relation['selected'] = [] if relation['multiple'] else None
         relation['tooltip'] = relation.get('tooltip')
         relation['additional_fields'] = relation.get('additional_fields', [])

@@ -377,7 +377,8 @@ class Entity:
                 'id': location.id,
                 'name': f"Location of {sanitize(self.name)}"})
             Gis.delete_by_entity(location)
-        Gis.insert(location, gis_data)
+        if gis_data:
+            Gis.insert(location, gis_data)
 
     def get_profile_image_id(self) -> Optional[int]:
         return db.get_profile_image_id(self.id)
@@ -879,8 +880,8 @@ def insert(data: dict[str, Any]) -> Entity:
         match attribute:
             case 'alias' if 'alias' in data:
                 entity.update_aliases(data['alias'])
-            case 'location' if 'gis' in data:
-                entity.update_gis(data['gis'], new=True)
+            case 'location':
+                entity.update_gis(data.get('gis', {}), new=True)
             case 'file':
                 entity.save_file_info(data)
             case 'resolver_url':

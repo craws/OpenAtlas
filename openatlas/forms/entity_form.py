@@ -194,7 +194,9 @@ def process_types(entity: Entity, form: Any) -> None:
     for type_ in [g.types[id_] for id_ in entity.class_.hierarchies]:
         if data := convert(getattr(form, str(type_.id)).data):
             if type_.class_.name == 'administrative_unit':
-                entity.location.link('P89', [g.types[id_] for id_ in data])
+                location = entity.location \
+                    or entity.get_linked_entity_safe('P53')
+                location.link('P89', [g.types[id_] for id_ in data])
             else:
                 entity.link('P2', [g.types[id_] for id_ in data])
 

@@ -18,17 +18,20 @@ group = {
             'label': _('residence'),
             'classes': 'object_location',
             'property': 'P74',
-            'mode': 'direct'},
+            'mode': 'direct',
+            'add_dynamic': True},
         'begins_in': {
             'label': _('born in'),
             'classes': 'object_location',
             'property': 'OA8',
-            'mode': 'direct'},
+            'mode': 'direct',
+            'add_dynamic': True},
         'ends_in': {
             'label': _('died in'),
             'classes': 'object_location',
             'property': 'OA9',
-            'mode': 'direct'},
+            'mode': 'direct',
+            'add_dynamic': True},
         'source': standard_relations['source'],
         'performed': {
             'label': _('performed'),

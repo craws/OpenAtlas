@@ -102,13 +102,6 @@ def insert(
         'openatlas_class_name': class_,
         'description': description,
         'begin_to': begin_to})
-    if class_ in ['artifact', 'feature', 'place', 'stratigraphic_unit']:
-        entity.link(
-            'P53',
-            entity_insert({
-                'name': f'Location of {name}',
-                'openatlas_class_name': 'object_location',
-                'description': description}))
     return entity
 
 
