@@ -122,17 +122,12 @@ class ActorTests(TestBaseCase):
                 'description': 'AI'})
         assert rv.data.isdigit()
 
-        return  # Todo: continue tests
-
-        rv = c.post(
-            url_for('ajax_get_entity_table', content_domain='artifact'),
-            data={'filterIds': str([])})
-        assert b'Bishop' in rv.data
-
         rv = c.get(
             url_for('link_delete', origin_id=actor_id, id_=666),
             follow_redirects=True)
         assert b'removed' in rv.data
+
+        return  # Todo: continue tests
 
         rv = c.get(
             url_for('insert_relation', origin_id=group.id, type_='member'))

@@ -143,9 +143,10 @@ class FileTest(TestBaseCase):
             follow_redirects=True)
         assert b'Changes have been saved' in rv.data
 
-        return  # Todo: continue tests
+        rv = c.get(
+            url_for('link_insert', origin_id=iiif_id, relation_name='actor'))
 
-        rv = c.get(url_for('file_add', id_=iiif_id, view='actor'))
+        return  # Todo: continue tests - Breadcrumb needs to be changed
         assert b'link actor' in rv.data
 
         rv = c.post(

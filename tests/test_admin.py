@@ -83,8 +83,6 @@ class AdminTests(TestBaseCase):
             follow_redirects=True)
         assert b'An error occurred when trying to delete' in rv.data
 
-        return  # Todo: continue tests
-
         with app.test_request_context():
             app.preprocess_request()
             event = insert('acquisition', 'Event Horizon')
@@ -107,7 +105,10 @@ class AdminTests(TestBaseCase):
             involvement.begin_from = form_to_datetime64(2017, 1, 31)
             involvement.begin_to = form_to_datetime64(2017, 1, 1)
             involvement.end_from = form_to_datetime64(2017, 1, 1)
+
+            return  # Todo: continue tests
             involvement.update()
+
             source = insert('source', 'Tha source')
             source.link('P67', event)
             source.link('P67', event)

@@ -18,12 +18,13 @@ class DateTest(TestBaseCase):
                 'end_year_from': 1996,
                 'end_year_to': 1996}
 
-            return  # Todo: continue tests
-
             rv = c.post(
                 url_for('insert', class_='place'),
                 data=data,
                 follow_redirects=True)
+
+            return  # Todo: continue tests
+
             assert b'Date place' in rv.data
 
             data['begin_day_from'] = 31

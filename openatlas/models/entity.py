@@ -254,7 +254,7 @@ class Entity:
             annotation_data = result['data']
             AnnotationText.delete_annotations_text(self.id)
         for item in ['name', 'description']:
-            data[item] = sanitize(data[item])
+            data[item] = sanitize(data.get(item, getattr(self, item)))
         db.update(data)
         for annotation in annotation_data:
             annotation['source_id'] = self.id
@@ -262,7 +262,7 @@ class Entity:
         for attribute in self.class_.attributes:
             match attribute:
                 case 'alias':
-                    self.update_aliases(data['alias'])
+                    self.update_aliases(data.get('alias', []))
                 case 'location':
                     self.update_gis(data['gis'])
                 case 'file':
