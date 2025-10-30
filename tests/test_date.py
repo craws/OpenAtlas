@@ -22,9 +22,6 @@ class DateTest(TestBaseCase):
                 url_for('insert', class_='place'),
                 data=data,
                 follow_redirects=True)
-
-            return  # Todo: continue tests
-
             assert b'Date place' in rv.data
 
             data['begin_day_from'] = 31

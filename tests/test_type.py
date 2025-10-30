@@ -67,8 +67,6 @@ class TypeTest(TestBaseCase):
             follow_redirects=True)
         assert b'An entry has been created' in rv.data
 
-        return  # Todo: continue tests
-
         rv = c.post(
             url_for('ajax_add_type'),
             data={
@@ -90,12 +88,9 @@ class TypeTest(TestBaseCase):
                 class_='administrative_unit',
                 origin_id=admin_unit.subs[0],
                 relation='subs'),
-            data={'name': 'admin unit'},
+            data={'name': 'admin unit', admin_unit.id: admin_unit.subs[0]},
             follow_redirects=True)
         assert b'An entry has been created' in rv.data
-
-        rv = c.get(url_for('update', id_=admin_unit.subs[0]))
-        assert b'admin unit' in rv.data
 
         rv = c.get(url_for('view', id_=dimension_type.subs[0]))
         assert b'Unit' in rv.data
@@ -126,6 +121,8 @@ class TypeTest(TestBaseCase):
 
         rv = c.get(url_for('show_untyped_entities', id_=sex.id))
         assert b'no entries' in rv.data
+
+        return  # Todo: continue tests - refactor show_untyped_entities table
 
         rv = c.get(url_for('show_untyped_entities', id_=admin_unit.id))
         assert b'Home' in rv.data

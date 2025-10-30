@@ -26,20 +26,25 @@ class ReferenceTest(TestBaseCase):
             follow_redirects=True)
         assert b'https://d-nb.info' in rv.data
 
-        return  # Todo: continue tests
-
         rv = c.post(
-            url_for('reference_add', id_=reference_id, view='actor'),
+            url_for(
+                'link_insert_detail',
+                origin_id=reference_id,
+                relation_name='actor'),
             data={'actor': batman.id},
             follow_redirects=True)
         assert b'https://d-nb.info' in rv.data
 
         with app.test_request_context():
             app.preprocess_request()
-            link_id = batman.get_links('P67', True)[0].id
+            links = batman.get_links('P67', ['external_reference'], True)
 
         rv = c.post(
-            url_for('link_update', id_=link_id, origin_id=reference_id),
+            url_for(
+                'link_update',
+                id_=links[0].id,
+                origin_id=reference_id,
+                relation='actor'),
             data={'page': '666'},
             follow_redirects=True)
         assert b'Changes have been saved' in rv.data

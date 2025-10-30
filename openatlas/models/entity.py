@@ -8,13 +8,11 @@ from flask import g, request
 from werkzeug.exceptions import abort
 
 from openatlas import app
-from openatlas.database import (
-    date, entity as db, link as db_link, tools as db_tools)
+from openatlas.database import date, entity as db, link as db_link
 from openatlas.display.util2 import convert_size, sanitize
 from openatlas.models.annotation import AnnotationText
 from openatlas.models.dates import Dates
 from openatlas.models.gis import Gis
-from openatlas.models.tools import get_carbon_link
 
 # Todo: remove? Property types work differently, e.g. no move functionality
 app.config['PROPERTY_TYPES'] = [
@@ -221,23 +219,6 @@ class Entity:
             classes,
             inverse)
 
-    def delete_links_old(
-            self,
-            codes: list[str],
-            inverse: bool = False) -> None:
-        # Todo: remove this function after new classes
-        if self.class_.name == 'stratigraphic_unit' \
-                and 'P2' in codes \
-                and not inverse:
-            exclude_ids = g.sex_type.get_sub_ids_recursive()
-            exclude_ids.append(g.radiocarbon_type.id)
-            if db_tools.get_sex_types(self.id) or get_carbon_link(self):
-                db.remove_types(self.id, exclude_ids)
-                codes.remove('P2')
-                if not codes:
-                    return
-        db.delete_links_by_codes(self.id, codes, inverse)
-
     def save_file_info(self, data: dict[str, Any]) -> None:
         db.update_file_info({
             'entity_id': self.id,
@@ -279,25 +260,6 @@ class Entity:
                             self.id,
                             data['reference_system_classes'])
 
-        # continue_link_id = None
-        # if 'administrative_units' in data \
-        #        and self.class_.name != 'administrative_unit':
-        #   self.update_administrative_units(data['administrative_units'], new)
-        # if 'links' in data:
-        #    continue_link_id = self.update_links(data, new)
-        # return continue_link_id
-
-    def update_administrative_units(
-            self,
-            units: dict[str, list[int]],
-            new: bool) -> None:
-        if not self.location:
-            self.location = self.get_linked_entity_safe('P53')
-        if not new:
-            self.location.delete_links_old(['P89'])
-        if units:
-            self.location.link('P89', [g.types[id_] for id_ in units])
-
     def get_annotated_text(self) -> str:
         offset = 0
         text = self.description
@@ -330,40 +292,6 @@ class Entity:
                     insert({
                         'name': alias,
                         'openatlas_class_name': 'appellation'}))
-
-    # Todo: Only used for imports. Has to be adapted and maybe move there?
-    def update_links(self, data: dict[str, Any], new: bool) -> Optional[int]:
-        if not new:
-            if 'delete' in data['links'] and data['links']['delete']:
-                self.delete_links_old(data['links']['delete'])
-            if 'delete_inverse' in data['links'] \
-                    and data['links']['delete_inverse']:
-                self.delete_links_old(data['links']['delete_inverse'], True)
-            if 'delete_reference_system' in data['links'] \
-                    and data['links']['delete_reference_system']:
-                db.delete_reference_system_links(self.id)
-        continue_link_id = None
-        for link_ in data['links']['insert']:
-            ids = self.link(
-                link_['property'],
-                link_['range'],
-                link_['description'],
-                link_['inverse'],
-                link_['type_id'])
-            if 'attributes_link' in data:
-                for id_ in ids:
-                    item = Link.get_by_id(id_)
-                    item.begin_from = data['attributes_link']['begin_from']
-                    item.begin_to = data['attributes_link']['begin_to']
-                    item.begin_comment = \
-                        data['attributes_link']['begin_comment']
-                    item.end_from = data['attributes_link']['end_from']
-                    item.end_to = data['attributes_link']['end_to']
-                    item.end_comment = data['attributes_link']['end_comment']
-                    # item.update()
-            if link_['return_link_id']:
-                continue_link_id = ids[0]
-        return continue_link_id
 
     def update_gis(self, gis_data: dict[str, Any], new: bool = False) -> None:
         if new:
@@ -879,7 +807,7 @@ def insert(data: dict[str, Any]) -> Entity:
     for attribute in attributes:
         match attribute:
             case 'alias' if 'alias' in data:
-                entity.update_aliases(data['alias'])
+                entity.update_aliases(data['alias'] or [])
             case 'location':
                 entity.update_gis(data.get('gis', {}), new=True)
             case 'file':

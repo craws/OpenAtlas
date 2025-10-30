@@ -128,8 +128,6 @@ class ImportTest(ImportTestCase):
         shutil.copy(openatlas_logo_path, file_with_license_path)
         shutil.copy(logo_path / '422.jpg', file_not_public_path)
 
-        # return  # Todo: continue tests
-
         rv = c.get(
             url_for('arche_execute'),
             follow_redirects=True)

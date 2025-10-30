@@ -68,8 +68,6 @@ class TokenTests(TestBaseCase):
             follow_redirects=True)
         assert b'Token revoked' in rv.data
 
-        return  # Todo: continue tests
-
         with app.test_request_context():
             app.preprocess_request()
             app.config['ALLOWED_IPS'] = []

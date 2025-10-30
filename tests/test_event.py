@@ -34,12 +34,10 @@ class EventTest(TestBaseCase):
 
         rv = c.get(
             url_for('insert', class_='activity', origin_id=residence.id))
-        assert b'location' in rv.data
-
-        return  # Todo: continue tests
+        assert b'Location' in rv.data
 
         rv = c.get(url_for('insert', class_='move', origin_id=residence.id))
-        assert b'Moved artifact' in rv.data
+        assert b'Moved object' in rv.data
 
         rv = c.get(
             url_for('insert', class_='acquisition', origin_id=artifact.id))
@@ -56,11 +54,15 @@ class EventTest(TestBaseCase):
             'begin_day_from': '8',
             'end_year_from': '1951',
             'preceding_event': '',
+            'super': '',
             f'reference_system_id_{g.wikidata.id}':
                 ['Q123', self.precision_type.subs[0]]}
 
         rv = c.post(url_for('insert', class_='acquisition'), data=data)
         event_id = rv.location.split('/')[-1]
+
+        # Event above isn't created (html says 400 key error "super")
+        return  # Todo: continue tests
 
         data['end_year_from'] = '7'
         rv = c.post(url_for('insert', class_='acquisition'), data=data)

@@ -24,7 +24,7 @@ class InvolvementTests(TestBaseCase):
             follow_redirects=True)
         assert b'Event Horizon' in rv.data
 
-        return  # Todo: continue tests
+        return  # Todo: continue tests - implement relations
 
         rv = c.post(
             url_for(

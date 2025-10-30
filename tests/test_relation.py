@@ -13,7 +13,7 @@ class RelationTests(TestBaseCase):
             actor = insert('person', 'Connor MacLeod')
             related = insert('person', 'The Kurgan')
 
-        return  # Todo: continue tests
+        return  # Todo: continue tests - implement relations
 
         rv = c.get(
             url_for(

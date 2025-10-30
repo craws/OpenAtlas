@@ -155,14 +155,15 @@ def type_move_entities(id_: int) -> str | Response:
 @app.route('/type/untyped/<int:id_>')
 @required_group('editor')
 def show_untyped_entities(id_: int) -> str:
+    # Todo: refactor show_untyped_entities table
     type_ = g.types[id_]
     table = Table(['name', 'class', 'first', 'last', 'description'])
     for entity in type_.get_untyped():
         table.rows.append([
             link(entity),
             entity.class_.label,
-            entity.first,
-            entity.last,
+            entity.begin,
+            entity.end,
             entity.description])
     return render_template(
         'content.html',

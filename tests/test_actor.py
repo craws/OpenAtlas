@@ -127,7 +127,7 @@ class ActorTests(TestBaseCase):
             follow_redirects=True)
         assert b'removed' in rv.data
 
-        return  # Todo: continue tests
+        return  # Todo: continue tests - implement relations
 
         rv = c.get(
             url_for('insert_relation', origin_id=group.id, type_='member'))

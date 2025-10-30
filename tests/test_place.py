@@ -70,7 +70,7 @@ class PlaceTest(TestBaseCase):
             data=data,
             follow_redirects=True)
 
-        return  # Todo: continue tests
+        return  # Todo: continue tests - above place isn't created
 
         assert b'Necronomicon' in rv.data
 

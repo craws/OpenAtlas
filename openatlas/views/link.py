@@ -62,7 +62,6 @@ def link_insert_detail(
         origin_id: int,
         relation_name: str,
         selection_id: Optional[int] = None) -> str | Response:
-    print(relation_name)
     origin = Entity.get_by_id(origin_id)
     relation = origin.class_.relations[relation_name]
     form = link_detail_form(origin, relation, selection_id)

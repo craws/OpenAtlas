@@ -106,7 +106,7 @@ class AdminTests(TestBaseCase):
             involvement.begin_to = form_to_datetime64(2017, 1, 1)
             involvement.end_from = form_to_datetime64(2017, 1, 1)
 
-            return  # Todo: continue tests
+            return  # Todo: continue tests - implement relations
             involvement.update()
 
             source = insert('source', 'Tha source')

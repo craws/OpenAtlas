@@ -12,7 +12,6 @@ class SourceTest(TestBaseCase):
             app.preprocess_request()
             gillian = insert('person', 'Gillian Anderson Gillian Anderson')
             artifact = insert('artifact', 'Artifact with inscription')
-            reference = insert('external_reference', 'https://d-nb.info')
 
         rv = c.post(
             url_for('insert', class_='source'),
@@ -28,13 +27,12 @@ class SourceTest(TestBaseCase):
         rv = c.get(url_for('insert', class_='source', origin_id=artifact.id))
         assert b'Artifact with inscription' in rv.data
 
-        return  # Todo: continue tests
-
-        rv = c.get(url_for('link_insert', id_=source_id, view='actor'))
+        rv = c.get(
+            url_for('link_insert', origin_id=source_id, relation_name='actor'))
         assert b'Gillian' in rv.data
 
         rv = c.post(
-            url_for('link_insert', id_=source_id, view='actor'),
+            url_for('link_insert', origin_id=source_id, relation_name='actor'),
             data={'checkbox_values': [gillian.id]},
             follow_redirects=True)
         assert b'Gillian' in rv.data
@@ -54,15 +52,6 @@ class SourceTest(TestBaseCase):
             follow_redirects=True)
         assert b'Source updated' in rv.data
 
-        rv = c.get(url_for('entity_add_reference', id_=source_id))
-        assert b'link reference' in rv.data
-
-        rv = c.post(
-            url_for('entity_add_reference', id_=source_id),
-            data={'reference': reference.id, 'page': '777'},
-            follow_redirects=True)
-        assert b'777' in rv.data
-
         rv = c.get(
             url_for(
                 'insert',
@@ -74,8 +63,9 @@ class SourceTest(TestBaseCase):
             url_for(
                 'insert',
                 class_='source_translation',
-                origin_id=source_id),
-            data={'name': 'Translation continued', 'continue_': 'yes'},
+                origin_id=source_id,
+                relation='text'),
+            data={'name': 'continue', 'source': source_id, 'continue_': 'yes'},
             follow_redirects=True)
         assert b'+' in rv.data
 
@@ -83,8 +73,8 @@ class SourceTest(TestBaseCase):
             url_for(
                 'insert',
                 class_='source_translation',
-                origin_id=source_id),
-            data={'name': 'Test translation'})
+                relation='text'),
+            data={'name': 'Test translation', 'source': source_id})
         translation_id = rv.location.split('/')[-1]
 
         rv = c.get(url_for('update', id_=translation_id))
@@ -92,13 +82,19 @@ class SourceTest(TestBaseCase):
 
         rv = c.post(
             url_for('update', id_=translation_id),
-            data={'name': 'Translation updated', 'opened': '9999999999'},
+            data={
+                'name': 'Translation updated',
+                'source': source_id,
+                'opened': '9999999999'},
             follow_redirects=True)
-        assert b'Translation updated' in rv.data
+        assert b'Changes have been saved' in rv.data
 
         rv = c.post(
             url_for('update', id_=translation_id),
-            data={'name': 'Translation updated', 'opened': '1000000000'},
+            data={
+                'name': 'Translation updated',
+                'source': source_id,
+                'opened': '1000000000'},
             follow_redirects=True)
         assert b'because it has been modified' in rv.data
 

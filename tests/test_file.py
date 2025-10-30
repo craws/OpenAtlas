@@ -287,7 +287,7 @@ class FileTest(TestBaseCase):
 
         with app.test_request_context():
             app.preprocess_request()
-            iiif_file.delete_links_old(['P67'])
+            iiif_file.delete_links(['P67'])
 
         rv = c.get(url_for('orphans'))
         assert b'File keeper' in rv.data
@@ -302,7 +302,7 @@ class FileTest(TestBaseCase):
 
         with app.test_request_context():
             app.preprocess_request()
-            iiif_file.delete_links_old(['P67'])
+            iiif_file.delete_links(['P67'])
 
         rv = c.get(
             url_for(
@@ -332,7 +332,7 @@ class FileTest(TestBaseCase):
 
         with app.test_request_context():
             app.preprocess_request()
-            iiif_file.delete_links_old(['P67'])
+            iiif_file.delete_links(['P67'])
 
         rv = c.get(
             url_for('admin_annotation_delete', id_=2),
