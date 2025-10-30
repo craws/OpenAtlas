@@ -141,7 +141,9 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
     check_update_access(entity)
     form = get_entity_form(entity)
     if form.validate_on_submit():
-        if template := was_modified_template(entity, form):
+        if copy:
+            entity.id = 0
+        elif template := was_modified_template(entity, form):
             return template
         return redirect(save(entity, form))
     gis_data = None
@@ -149,6 +151,7 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
         entity.location = entity.location \
             or entity.get_linked_entity_safe('P53')
         gis_data = Gis.get_all([entity], entity.get_structure())
+    # Todo: re-activate showing images of super for place entities
     # if entity.class_.group['name'] in ['artifact', 'place']:
     #    manager.entity.image_id = manager.entity.get_profile_image_id()
     #    if not manager.entity.image_id:
@@ -165,7 +168,8 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
         gis_data=gis_data,
         overlays=get_overlays(entity),
         title=entity.name,
-        crumbs=hierarchy_crumbs(entity) + [entity, _('edit')])
+        crumbs=hierarchy_crumbs(entity) +
+            [entity, _('copy') if copy else _('edit')])
 
 
 def deletion_possible(entity: Entity) -> bool:

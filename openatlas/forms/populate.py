@@ -16,9 +16,6 @@ def populate_insert(form: Any, entity: Entity, origin: Entity | None) -> None:
 
 def populate_update(form: Any, entity: Entity) -> None:
     form.opened.data = time.time()
-    # Todo: implement copy
-    # if entity.id and not copy:
-    #     form.entity_id.data = entity.id
     if hasattr(form, 'name_inverse'):
         name_parts = entity.name.split(' (')
         form.name.data = name_parts[0].strip()
