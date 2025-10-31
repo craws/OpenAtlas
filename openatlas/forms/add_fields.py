@@ -118,11 +118,11 @@ def add_type(form: Any, type_: Entity):
         class AddDynamicType(FlaskForm):
             pass
 
-        setattr(AddDynamicType, 'name-dynamic', StringField(_('super')))
+        setattr(AddDynamicType, 'name-dynamic', StringField(_('name')))
         setattr(
             AddDynamicType,
             f'{type_.id}-dynamic',
-            TreeField(str(type_.id) + '*', type_id=type_.id))
+            TreeField(_('super'), type_id=type_.id, is_type_form=True))
         setattr(
             AddDynamicType,
             'description-dynamic',

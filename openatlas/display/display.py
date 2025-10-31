@@ -32,7 +32,6 @@ class Display:
         self.structure: dict[str, list[Entity]] = {}
         self.gis_data: dict[str, Any] = {}
         self.problematic_type = self.entity.check_too_many_single_type_links()
-        print()
         if entity.class_.attributes.get('file'):
             entity.image_id = entity.id if get_file_path(entity.id) else None
         else:
