@@ -223,7 +223,7 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
 
 
 def add_date_fields(form_class: Any, entity: Optional[Entity] = None) -> None:
-    if entity.class_.group['name'] == 'type' and not entity.root:
+    if entity and entity.class_.group['name'] == 'type' and not entity.root:
         return
     validator_second = [OptionalValidator(), NumberRange(min=0, max=59)]
     validator_minute = [OptionalValidator(), NumberRange(min=0, max=59)]
