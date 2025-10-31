@@ -374,6 +374,14 @@ class Api(ApiTestCase):
         assert rv['id'] == event.id
         assert rv['title'] == event.name
 
+        rv = c.get(
+            url_for(
+                'api_04.entity_presentation_view',
+                id_=file.id))
+        rv = rv.get_json()
+        assert rv['id'] == file.id
+        assert rv['title'] == file.name
+
         for rv in [
             c.get(url_for('api_04.cidoc_class', class_='E21')),
             c.get(
