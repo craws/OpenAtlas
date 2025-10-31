@@ -321,7 +321,7 @@ class Entity:
             return sanitize(name_parts[1][:-1])  # pragma: no cover
         return name_parts[0]
 
-    def check_too_many_single_type_links(self) -> bool:
+    def check_too_many_single_type_links(self) -> Entity | None:
         type_dict: dict[int, int] = {}
         for type_ in self.types:
             if type_.root[0] in type_dict:
@@ -330,8 +330,8 @@ class Entity:
             type_dict[type_.root[0]] = 1
         for id_, count in type_dict.items():
             if count > 1 and not g.types[id_].multiple:
-                return True
-        return False
+                return g.types[id_]
+        return None
 
     def get_structure(self) -> dict[str, list[Entity]]:
         structure: dict[str, list[Entity]] = {

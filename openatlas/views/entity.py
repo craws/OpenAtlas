@@ -139,6 +139,8 @@ def get_overlays(entity: Entity) -> dict[int, Overlay]:
 def update(id_: int, copy: Optional[str] = None) -> str | Response:
     entity = Entity.get_by_id(id_, types=True, aliases=True)
     check_update_access(entity)
+    if entity.check_too_many_single_type_links():
+        abort(422)
     form = get_entity_form(entity)
     if form.validate_on_submit():
         if copy:

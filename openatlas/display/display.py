@@ -32,6 +32,7 @@ class Display:
         self.structure: dict[str, list[Entity]] = {}
         self.gis_data: dict[str, Any] = {}
         self.problematic_type = self.entity.check_too_many_single_type_links()
+        print()
         if entity.class_.attributes.get('file'):
             entity.image_id = entity.id if get_file_path(entity.id) else None
         else:
@@ -103,7 +104,7 @@ class Display:
             chart_data=get_chart_data(self.entity),
             reference_systems=reference_systems_display,
             description_html=text,
-            problematic_type_id=self.problematic_type)
+            problematic_type=self.problematic_type)
 
     def add_tabs(self) -> None:
         self.tabs = {'info': Tab('info')}
