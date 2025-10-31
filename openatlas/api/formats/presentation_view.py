@@ -74,7 +74,7 @@ def get_file_dict(
 
 def get_presentation_files(
         links_inverse: list[Link],
-        entity_id: int,
+        entity: Entity,
         parser: Parser,
         root_ids: Optional[list[int]] = None) -> list[dict[str, str]]:
     files = []
@@ -91,9 +91,13 @@ def get_presentation_files(
                 and link_.range.id in root_ids:
             if overlay := overlays.get(link_.domain.id):
                 files.append(get_file_dict(link_, overlay))
-        elif link_.range.id == entity_id:
+        elif link_.range.id == entity.id:
             files.append(
                 get_file_dict(link_, overlays.get(link_.domain.id)))
+        elif entity.class_.name == 'file' and link_.domain.id == entity.id:
+            files.append(
+                get_file_dict(link_, overlays.get(link_.domain.id)))
+            break
     return files
 
 
@@ -279,8 +283,8 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
             links_inverse,
             [entity.id, *root_ids]),
         'files': get_presentation_files(
-            links_inverse,
-            entity.id,
+            links if entity.class_.name == 'file' else links_inverse,
+            entity,
             parser,
             root_ids),
         'relations': relations}
