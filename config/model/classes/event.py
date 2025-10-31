@@ -23,8 +23,8 @@ class_ = {
             'tab': {
                 'buttons': ['link', 'insert'],
                 'columns': [
-                    'name', 'class', 'activity', 'involvement', 'first',
-                    'last', 'description']}},
+                    'name', 'class', 'involvement',
+                    'begin', 'end', 'description']}},
         'participant': {
             'label': _('participant'),
             'classes': class_groups['actor']['classes'],
@@ -35,8 +35,8 @@ class_ = {
             'tab': {
                 'buttons': ['link', 'insert'],
                 'columns': [
-                    'name', 'class', 'activity', 'involvement', 'first',
-                    'last', 'description']}},
+                    'name', 'class', 'involvement',
+                    'begin', 'end', 'description']}},
         'subs': {
             'label': _('subs'),
             'classes': class_groups['event']['classes'],

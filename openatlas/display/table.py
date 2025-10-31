@@ -131,9 +131,7 @@ def entity_table(
                 case 'activity':
                     html = item.property.name_inverse
                 case 'begin':
-                    html = e.dates.first
-                    if relation and 'dates' in relation['additional_fields']:
-                        html = item.dates.first
+                    html = table_date('first', e, range_, item)
                 case 'checkbox':
                     html = f"""
                         <input
@@ -161,7 +159,7 @@ def entity_table(
                 case 'default_precision':
                     html = link(next(iter(e.types), None))
                 case 'end':
-                    html = item.dates.last
+                    html = table_date('last', e, range_, item)
                 case 'example_id':
                     html = e.example_id
                 case 'extension':
@@ -173,21 +171,11 @@ def entity_table(
                             item.description,
                             url + item.description,
                             external=True)
-                case 'first':
-                    html = item.dates.first or \
-                        '<span class="text-muted">' \
-                        f'{range_.dates.first}</span>' \
-                        if range_.dates.first else ''
                 case 'icon':
                     html = f'<a href="{url_for("view", id_=e.id)}">' \
                         f'{file_preview(e.id)}</a>'
                 case 'involvement' | 'function' | 'relation':
                     html = item.type.name if item.type else ''
-                case 'last':
-                    html = item.dates.last or \
-                        '<span class="text-muted">' \
-                        f'{range_.dates.last}</span>' \
-                        if range_.dates.last else ''
                 case 'license holder':
                     html = ''
                     if g.file_info.get(e.id):
@@ -308,3 +296,22 @@ def file_preview(entity_id: int) -> str:
                 url = url_for('display_file', filename=icon.name, size=size)
                 return f"<img src='{url}' {param}>"
     return ''
+
+
+def table_date(
+        mode: str,
+        e: Entity,
+        range_: Entity | None,
+        item: Link | Entity | None) -> str:
+    html = getattr(e.dates, mode)
+    if range_ and not (html := getattr(item.dates, mode)):
+        if e.class_.group['name'] == 'actor' \
+                and range_.class_.group['name'] == 'event' \
+                and getattr(range_.dates, mode):
+            html = getattr(range_.dates, mode)
+        elif e.class_.group['name'] == 'event' \
+                and range_.class_.group['name'] == 'actor' \
+                and getattr(e.dates, mode):
+            html = getattr(e.dates, mode)
+        html = f'<span class="text-muted">{html}</span>' if html else ''
+    return html

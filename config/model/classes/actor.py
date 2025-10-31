@@ -43,12 +43,8 @@ group = {
             'additional_fields': ['dates', 'description'],
             'tab': {
                 'columns': [
-                    'name',
-                    'class',
-                    'involvement',
-                    'begin',
-                    'end',
-                    'description'],
+                    'name', 'class', 'involvement',
+                    'begin', 'end', 'description'],
                 'buttons': ['link', 'insert']}},
         'participated': {
             'label': _('participated'),
@@ -60,12 +56,8 @@ group = {
             'additional_fields': ['dates', 'description'],
             'tab': {
                 'columns': [
-                    'name',
-                    'class',
-                    'involvement',
-                    'begin',
-                    'end',
-                    'description'],
+                    'name', 'class', 'involvement',
+                    'begin', 'end', 'description'],
                 'buttons': ['link', 'insert']}},
         'relative': {
             'label': _('relation'),
