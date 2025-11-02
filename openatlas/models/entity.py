@@ -177,13 +177,14 @@ class Entity:
                 'description': sanitize(description)
                 if isinstance(description, str) else description,
                 'type_id': type_id}
-            data.update(dates or {
-                'begin_from': None,
-                'begin_to': None,
-                'begin_comment': None,
-                'end_from': None,
-                'end_to': None,
-                'end_comment': None})
+            data.update(
+                dates or {
+                    'begin_from': None,
+                    'begin_to': None,
+                    'begin_comment': None,
+                    'end_from': None,
+                    'end_to': None,
+                    'end_comment': None})
             id_ = db.link(data)
             new_link_ids.append(id_)
         return new_link_ids

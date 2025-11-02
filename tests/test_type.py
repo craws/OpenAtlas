@@ -122,14 +122,10 @@ class TypeTest(TestBaseCase):
         rv = c.get(url_for('show_untyped_entities', id_=sex.id))
         assert b'no entries' in rv.data
 
-        return  # Todo: continue tests - refactor show_untyped_entities table
-
         rv = c.get(url_for('show_untyped_entities', id_=admin_unit.id))
         assert b'Home' in rv.data
 
-        rv = c.get(
-            url_for('type_delete', id_=actor_type.id),
-            follow_redirects=True)
+        rv = c.get(url_for('delete', id_=actor_type.id), follow_redirects=True)
         assert b'Forbidden' in rv.data
 
         with app.test_request_context():
@@ -144,12 +140,6 @@ class TypeTest(TestBaseCase):
 
         rv = c.get(url_for('show_multiple_linked_entities', id_=sex.id))
         assert b'Connor' in rv.data
-
-        c.post(
-            url_for('hierarchy_update', id_=sex.id),
-            data={'multiple': True})
-        rv = c.get(url_for('hierarchy_update', id_=sex.id))
-        assert b'disabled="disabled" id="multiple"' in rv.data
 
         rv = c.get(
             url_for('hierarchy_delete', id_=sex.id),

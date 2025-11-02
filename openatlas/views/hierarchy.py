@@ -94,7 +94,7 @@ def hierarchy_update(id_: int) -> str | Response:
             return redirect(
                 f"{url_for('type_index')}"
                 f"#menu-tab-{tab}_collapse-{hierarchy.id}")
-    if hasattr(form, 'multiple') and has_multiple_links:
+    if hasattr(form, 'multiple') and has_multiple_links and hierarchy.multiple:
         form.multiple.render_kw = {'disabled': 'disabled'}
     table = Table(['class', 'count'], paging=False)
     for name in hierarchy.classes:

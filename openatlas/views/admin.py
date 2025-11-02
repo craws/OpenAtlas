@@ -392,9 +392,8 @@ def settings(category: str) -> str | Response:
 def check_similar() -> str:
     form = SimilarForm()
     form.classes.choices = [
-        (class_.name, class_.label)
-        for name, class_ in g.classes.items()
-        if class_.label and class_.group['name']]
+        (class_.name, uc_first(class_.label))
+        for name, class_ in g.classes.items() if class_.group]
     table = None
     if form.validate_on_submit():
         table = Table(['name', _('count')])
@@ -455,13 +454,17 @@ def check_dates() -> str:
             format_date(entity.modified),
             entity.description])
     for item in Link.get_invalid_link_dates():
+        url = ''
+        # Todo: fix link update link
+        # url = url_for('link_update', id_=item.id, origin_id=item.domain.id)
         tabs['link_dates'].table.rows.append([
-            link(
-                item.property.name,
-                url_for('link_update', id_=item.id, origin_id=item.domain.id)),
+            link(item.property.name, url),
             link(item.domain),
             link(item.range)])
     for link_ in Link.invalid_involvement_dates():
+        url = ''
+        # Todo: fix link update link
+        # url = url_for('link_update', id_=link_.id, origin_id=actor.id)
         event = link_.domain
         actor = link_.range
         data = [
@@ -470,9 +473,7 @@ def check_dates() -> str:
             event.class_.label,
             link_.type.name if link_.type else '',
             link_.description,
-            link(
-                _('edit'),
-                url_for('link_update', id_=link_.id, origin_id=actor.id))]
+            link(_('edit'), url)]
         tabs['involvement_dates'].table.rows.append(data)
     for link_ in Link.invalid_preceding_dates():
         tabs['preceding_dates'].table.rows.append([
