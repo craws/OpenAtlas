@@ -10,10 +10,11 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import entity_table
 from openatlas.display.util import (
     bookmark_toggle, button, description, display_annotation_text_links,
-    get_chart_data, get_file_path, get_system_data, link, reference_systems)
+    format_entity_date, get_appearance, get_chart_data, get_file_path,
+    get_system_data, link, reference_systems)
 from openatlas.display.util2 import (
     display_bool, is_authorized, manual, uc_first)
-from openatlas.models.dates import format_date, format_entity_date
+from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.user import User
@@ -320,6 +321,11 @@ class Display:
             _('alias'): list(self.entity.aliases.values()),
             _('begin'): format_entity_date(self.entity.dates, 'begin'),
             _('end'): format_entity_date(self.entity.dates, 'end')}
+        if self.entity.class_.group['name'] == 'actor' \
+                and not (self.entity.dates.first and self.entity.dates.last):
+            appears_first, appears_last = get_appearance(self.entity)
+            self.data[_('appears first')] = appears_first
+            self.data[_('appears last')] = appears_last
         if self.entity.standard_type:
             var = ' > '.join(
                 [g.types[id_].name for id_ in self.entity.standard_type.root])

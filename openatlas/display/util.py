@@ -24,7 +24,7 @@ from openatlas.models.annotation import AnnotationText
 from openatlas.models.cidoc_class import CidocClass
 from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.content import get_translation
-from openatlas.models.dates import format_date, format_entity_date
+from openatlas.models.dates import Dates, format_date
 from openatlas.models.entity import Entity, Link
 from openatlas.models.imports import Project
 from openatlas.models.user import User
@@ -78,13 +78,16 @@ def reference_systems(entity: Entity) -> str:
     return html
 
 
-def get_appearance(event_links: list[Link]) -> tuple[str, str]:
+def get_appearance(entity: Entity) -> tuple[str, str]:
     # Get first/last appearance year from events for actors without begin/end
     first_year = None
     last_year = None
     first_string = ''
     last_string = ''
-    for link_ in event_links:
+    for link_ in entity.get_links(
+            ['P11', 'P14', 'P25'],
+            classes=g.class_groups['event']['classes'],
+            inverse=True):
         event = link_.domain
         actor = link_.range
         event_link = link(_('event'), url_for('view', id_=event.id))
@@ -94,28 +97,28 @@ def get_appearance(event_links: list[Link]) -> tuple[str, str]:
                     or int(link_.dates.first) < int(first_year)):
                 first_year = link_.dates.first
                 first_string = \
-                    format_entity_date(link_.dates, 'begin', link_.object_) + \
-                    f"{_('at an')} {event_link}"
-            elif event.first and (
+                    format_entity_date(link_.dates, 'begin') + \
+                    ' ' + _('at an') + ' ' + event_link
+            elif event.dates.first and (
                     not first_year
                     or int(event.dates.first) < int(first_year)):
                 first_year = event.dates.first
                 first_string = \
-                    format_entity_date(event.dates, 'begin', link_.object_) + \
-                    f" {_('at an')} {event_link}"
+                    format_entity_date(event.dates, 'begin') + \
+                    ' ' + _('at an') + ' ' + event_link
         if not actor.dates.last:
             if link_.dates.last and (
                     not last_year or int(link_.dates.last) > int(last_year)):
                 last_year = link_.dates.last
                 last_string = \
-                    format_entity_date(link_.dates, 'end', link_.object_) + \
-                    f"{_('at an')} {event_link}"
+                    format_entity_date(link_.dates, 'end') + \
+                    ' ' + _('at an') + ' ' + event_link
             elif event.dates.last and (
                     not last_year or int(event.dates.last) > int(last_year)):
                 last_year = event.dates.last
                 last_string = \
-                    format_entity_date(event.dates, 'end', link_.object_) + \
-                    f"{_('at an')} {event_link}"
+                    format_entity_date(event.dates, 'end') + \
+                    ' ' + _('at an') + ' ' + event_link
     return first_string, last_string
 
 
@@ -184,6 +187,23 @@ def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
             f'<a href="#" id="bookmark{entity_id}" onclick="{onclick}">' \
             f'{uc_first(label)}</a>'
     return button(label, id_=f'bookmark{entity_id}', onclick=onclick)
+
+
+def format_entity_date(
+        dates: Dates,
+        mode: str,
+        object_: Optional[Entity] = None) -> str:
+    html = link(object_) if object_ else ''
+    if getattr(dates, f'{mode}_from'):
+        html += ', ' if html else ''
+        if getattr(dates, f'{mode}_to'):
+            html += _(
+                'between %(begin)s and %(end)s',
+                begin=format_date(getattr(dates, f'{mode}_from')),
+                end=format_date(getattr(dates, f'{mode}_to')))
+        else:
+            html += format_date(getattr(dates, f'{mode}_from'))
+    return html
 
 
 @app.template_filter()

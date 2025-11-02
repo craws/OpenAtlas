@@ -100,23 +100,7 @@ def format_date(value: datetime | numpy.datetime64) -> str:
     return value.date().isoformat().replace(' 00:00:00', '')
 
 
-def format_entity_date(
-        dates: Dates,
-        type_: str,  # begin or end
-        object_: Optional[Entity] = None) -> str:
-    from openatlas.display.util import link
-    html = link(object_) if object_ else ''
-    if getattr(dates, f'{type_}_from'):
-        html += ', ' if html else ''
-        if getattr(dates, f'{type_}_to'):
-            html += _(
-                'between %(begin)s and %(end)s',
-                begin=format_date(getattr(dates, f'{type_}_from')),
-                end=format_date(getattr(dates, f'{type_}_to')))
-        else:
-            html += format_date(getattr(dates, f'{type_}_from'))
-    comment = getattr(dates, f'{type_}_comment')
-    return html + (f" ({comment})" if comment else '')
+
 
 
 def check_if_entity_has_time(dates: Dates) -> bool:
