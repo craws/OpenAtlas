@@ -136,7 +136,7 @@ class Api(ApiTestCase):
                 'api_04.network_visualisation',
                 exclude_system_classes='type'))
         rv = rv.get_json()
-        assert len(rv['results']) == 70
+        assert len(rv['results']) == 71
         rv = c.get(
             url_for(
                 'api_04.network_visualisation',
@@ -145,7 +145,7 @@ class Api(ApiTestCase):
         assert len(rv['results']) == 15
         rv = c.get(url_for('api_04.network_visualisation', download=True))
         rv = rv.get_json()
-        assert len(rv['results']) == 165
+        assert len(rv['results']) == 166
 
 
         rv = c.get(
@@ -594,12 +594,12 @@ class Api(ApiTestCase):
                     "operator": "greaterThanEqual",
                     "values": ["2019-03-01"],
                     "logicalOperator": "and"}]}, ]),
-            (2, [{
+            (3, [{
                 "beginFrom": [{
                     "operator": "lesserThan",
                     "values": ["2020-01-01"],
                     "logicalOperator": "and"}]}]),
-            (2, [{
+            (3, [{
                 "beginTo": [{
                     "operator": "lesserThanEqual",
                     "values": ["2018-03-01"],
@@ -668,12 +668,12 @@ class Api(ApiTestCase):
                 "relationToID": [{
                     "operator": "equal",
                     "values": [place.id]}]}]),
-            (170, [{
+            (171, [{
                 "typeIDWithSubs": [{
                     "operator": "notEqual",
                     "values": [boundary_mark.id],
                     "logicalOperator": "and"}]}]),
-            (172, [{
+            (173, [{
                 "typeName": [{
                     "operator": "notEqual",
                     "values": ["Boundary Mark", "Height"],

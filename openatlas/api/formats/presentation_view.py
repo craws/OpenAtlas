@@ -140,7 +140,7 @@ def get_presentation_references(
         links_inverse: list[Link],
         entity_ids: list[int]) -> list[dict[str, Any]]:
     references = []
-    check_for_duplicates = defaultdict(int)
+    check_for_duplicates: dict[str, int] = defaultdict(int)
     for link in links_inverse:
         if link.domain.class_.view != 'reference' \
                 or link.range.id not in entity_ids \
