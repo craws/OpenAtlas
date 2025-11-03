@@ -153,16 +153,6 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
         entity.location = entity.location \
             or entity.get_linked_entity_safe('P53')
         gis_data = Gis.get_all([entity], entity.get_structure())
-    # Todo: re-activate showing images of super for place entities
-    # if entity.class_.group['name'] in ['artifact', 'place']:
-    #    manager.entity.image_id = manager.entity.get_profile_image_id()
-    #    if not manager.entity.image_id:
-    #        for link_ in manager.entity.get_links('P67', inverse=True):
-    #            if link_.domain.class_.group['name'] == 'file' \
-    #                    and get_base_table_data(link_.domain)[6] \
-    #                    in g.display_file_ext:
-    #                manager.entity.image_id = link_.domain.id
-    #                break
     return render_template(
         'entity/update.html',
         form=form,
@@ -171,7 +161,7 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
         overlays=get_overlays(entity),
         title=entity.name,
         crumbs=hierarchy_crumbs(entity) +
-            [entity, _('copy') if copy else _('edit')])
+        [entity, _('copy') if copy else _('edit')])
 
 
 def deletion_possible(entity: Entity) -> bool:

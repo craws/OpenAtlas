@@ -38,7 +38,7 @@ def filter_entities(
             entity.class_,
             relation,
             g.classes[relation['classes'][0]])
-        if not reverse_relation or not reverse_relation['multiple']:
+        if reverse_relation and not reverse_relation['multiple']:
             filter_ids += get_entity_ids_with_links(
                 relation['property'],
                 relation['classes'],
