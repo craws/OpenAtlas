@@ -2,7 +2,8 @@ INSERT INTO model.entity (
   cidoc_class_code, openatlas_class_name, name, description, begin_from, begin_to, begin_comment, end_from, end_to, end_comment, created, modified)
 VALUES
     ('E18', 'place', 'Shire','The Shire was the homeland of the hobbits.','2018-01-31', '2018-03-01', 'Begin of the shire', '2019-01-31',  '2019-03-01','Descent of Shire', '2022-09-21 16:38:01.923431','2022-09-21 16:38:05.923431'),
-    ('E21', 'person', 'Sam', 'That is Sam','200-01-31', '200-03-01', 'Begin of the shire', '700-01-31', '800-03-01','Descent of Shire', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+    ('E21', 'person', 'Sam', 'That is Sam','200-01-31', '200-03-01', 'Begin of the shire', '700-01-31', '800-03-01','Descent of Shire', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('E74', 'group', 'The Fellowship', '','215-01-31', '216-05-23', '', '700-01-31', '800-03-01','', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name, description, modified)
 VALUES
@@ -146,6 +147,8 @@ VALUES
   ('OA8', (SELECT id FROM model.entity WHERE name='Location of Shire'), (SELECT id FROM model.entity WHERE name='Sam') ),
   ('OA9', (SELECT id FROM model.entity WHERE name='Location of Shire'), (SELECT id FROM model.entity WHERE name='Sam') ),
   ('P11', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='Travel to Mordor') ),
+  ('P11', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='The Fellowship') ),
+  ('P11', (SELECT id FROM model.entity WHERE name='Sam'), (SELECT id FROM model.entity WHERE name='The Fellowship') ),
   ('P134', (SELECT id FROM model.entity WHERE name='Travel to Mordor'), (SELECT id FROM model.entity WHERE name='Exchange of the one ring') ),
   ('P7', (SELECT id FROM model.entity WHERE name='Location of Mordor'), (SELECT id FROM model.entity WHERE name='Travel to Mordor') );
 
