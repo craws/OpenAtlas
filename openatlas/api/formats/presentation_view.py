@@ -75,7 +75,7 @@ def get_file_dict(
 
 def get_presentation_files(
         links_inverse: list[Link],
-        entity_id: int,
+        entity: Entity,
         parser: Parser,
         root_ids: Optional[list[int]] = None) -> list[dict[str, str]]:
     files = []
@@ -92,9 +92,13 @@ def get_presentation_files(
                 and link_.range.id in root_ids:
             if overlay := overlays.get(link_.domain.id):
                 files.append(get_file_dict(link_, overlay))
-        elif link_.range.id == entity_id:
+        elif link_.range.id == entity.id:
             files.append(
                 get_file_dict(link_, overlays.get(link_.domain.id)))
+        elif entity.class_.name == 'file' and link_.domain.id == entity.id:
+            files.append(
+                get_file_dict(link_, overlays.get(link_.domain.id)))
+            break
     return files
 
 
@@ -137,10 +141,11 @@ def get_presentation_references(
         links_inverse: list[Link],
         entity_ids: list[int]) -> list[dict[str, Any]]:
     references = []
-
+    check_for_duplicates: dict[str, int] = defaultdict(int)
     for link in links_inverse:
-        if (link.domain.class_.group['name'] != 'reference'
-                or link.range.id not in entity_ids):
+        if link.domain.class_.group['name'] != 'reference' \
+                or link.range.id not in entity_ids \
+                or check_for_duplicates[link.domain.id] == link.description:
             continue
         ref = {
             'id': link.domain.id,
@@ -152,6 +157,7 @@ def get_presentation_references(
             ref.update({
                 'type': link.domain.standard_type.name,
                 'typeId': link.domain.standard_type.id})
+        check_for_duplicates[link.domain.id] = link.description
         references.append(ref)
     return references
 
@@ -163,10 +169,13 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         entity.location = entity.get_linked_entity_safe('P53')
         ids.append(entity.location.id)
         if parser.place_hierarchy:
-            place_hierarchy = entity.get_linked_entity_ids_recursive('P46')
-            root_ids = entity.get_linked_entity_ids_recursive(
+            root_ids = Entity.get_linked_entity_ids_recursive(
+                entity.id,
                 'P46',
                 inverse=True)
+            root_id = root_ids[-1] if root_ids else entity.id
+            place_hierarchy = Entity.get_linked_entity_ids_recursive(root_id,
+                                                                     'P46')
             place_hierarchy.extend(root_ids)
             ids.extend(place_hierarchy)
 
@@ -280,8 +289,8 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
             links_inverse,
             [entity.id, *root_ids]),
         'files': get_presentation_files(
-            links_inverse,
-            entity.id,
+            links if entity.class_.name == 'file' else links_inverse,
+            entity,
             parser,
             root_ids),
         'relations': relations}
