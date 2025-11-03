@@ -19,7 +19,7 @@ from openatlas.forms.field import (
     TableField, TableMultiField, TextAnnotationField, TreeField,
     TreeMultiField, ValueTypeField, ValueTypeRootField)
 from openatlas.models.dates import check_if_entity_has_time
-from openatlas.models.entity import Entity
+from openatlas.models.entity import Entity, Link
 from openatlas.models.openatlas_class import OpenatlasClass
 
 
@@ -175,7 +175,8 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
                     description=_('tooltip hierarchy forms'),
                     choices=Entity.get_class_choices(entity),
                     option_widget=widgets.CheckboxInput(),  # type: ignore
-                    widget=widgets.ListWidget(prefix_label=False))
+                    widget=widgets.ListWidget(  # type: ignore
+                        prefix_label=False))
         elif relation['multiple']:
             selection: Any = []
             if entity.id:
@@ -222,8 +223,13 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
                     add_dynamic=add_dynamic))
 
 
-def add_date_fields(form_class: Any, entity: Optional[Entity] = None) -> None:
-    if entity and entity.class_.group['name'] == 'type' and not entity.root:
+def add_date_fields(
+        form_class: Any,
+        item: Optional[Entity | Link] = None) -> None:
+    if item \
+            and hasattr(item, 'group') \
+            and item.class_.group['name'] == 'type' \
+            and not item.root:
         return
     validator_second = [OptionalValidator(), NumberRange(min=0, max=59)]
     validator_minute = [OptionalValidator(), NumberRange(min=0, max=59)]
@@ -236,7 +242,7 @@ def add_date_fields(form_class: Any, entity: Optional[Entity] = None) -> None:
         NoneOf([0])]
     has_time = bool(
         current_user.settings['module_time']
-        or (entity and check_if_entity_has_time(entity.dates)))
+        or (item and check_if_entity_has_time(item.dates)))
     setattr(
         form_class,
         'begin_year_from',

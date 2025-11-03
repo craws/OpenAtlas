@@ -72,12 +72,14 @@ def annotate_image_form(
     return Form()
 
 
-def add_additional_link_fields(form: Any, relation: dict[str, Any]) -> None:
+def add_additional_link_fields(
+        form: Any,
+        relation: dict[str, Any],
+        link_: Optional[Link] = None) -> None:
     for item in relation['additional_fields']:
         match item:
             case 'dates':
-                # Todo: what about time fields if already used there?
-                add_date_fields(form)
+                add_date_fields(form, link_)
             case 'description':
                 setattr(form, 'description', TextAreaField(_(item)))
             case 'page':
@@ -147,7 +149,7 @@ def link_update_form(link_: Link, relation: dict[str, Any]) -> Any:
     if 'type' in relation:
         hierarchy = Entity.get_hierarchy(relation['type'])
         add_type(Form, hierarchy)
-    add_additional_link_fields(Form, relation)
+    add_additional_link_fields(Form, relation, link_)
     setattr(Form, 'save', SubmitField(_('save')))
     form = Form()
     if request.method == 'GET':
