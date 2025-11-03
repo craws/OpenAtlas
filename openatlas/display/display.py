@@ -179,6 +179,12 @@ class Display:
                                         'reference_system_remove_class',
                                         system_id=self.entity.id,
                                         name=name)))
+
+                        case 'show_all_iiif':
+                            buttons.append(
+                                button(
+                                    _('view all IIIF images'),
+                                    url_for('view_iiif', id_=self.entity.id)))
             columns = relation['tab']['columns']
             if self.entity.category == 'value' \
                     and relation['name'] == 'entities':

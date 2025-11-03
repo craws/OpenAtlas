@@ -63,7 +63,7 @@ standard_relations = {
         'multiple': True,
         'tab': {
             'additional_columns': ['main image'],
-            'buttons': ['link', 'insert']}},
+            'buttons': ['link', 'insert', 'show_all_iiif']}},
     'reference': {
         'label': class_groups['reference']['label'],
         'classes': class_groups['reference']['classes'],

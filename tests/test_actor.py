@@ -127,30 +127,40 @@ class ActorTests(TestBaseCase):
             follow_redirects=True)
         assert b'removed' in rv.data
 
-        return  # Todo: continue tests - implement relations
-
         rv = c.get(
-            url_for('insert_relation', origin_id=group.id, type_='member'))
+            url_for(
+                'link_insert_detail',
+                origin_id=group.id,
+                relation_name='member'))
         assert b'Actor function' in rv.data
 
         rv = c.post(
-            url_for('insert_relation', origin_id=actor_id, type_='membership'),
-            data={'group': str([group.id])},
+            url_for(
+                'link_insert_detail',
+                origin_id=actor_id,
+                relation_name='member_of'),
+            data={'member_of': [group.id]},
             follow_redirects=True)
         assert b'LV-426 colony' in rv.data
 
         rv = c.post(
-            url_for('insert_relation', origin_id=group.id, type_='member'),
-            data={'actor': str([actor_id]), 'continue_': 'yes'},
+            url_for(
+                'link_insert_detail',
+                origin_id=group.id,
+                relation_name='member'),
+            data={'member': [actor_id]},
             follow_redirects=True)
-        assert b'Ripley' in rv.data
+        assert b'LV-426 colony' in rv.data
 
         with app.test_request_context():
             app.preprocess_request()
             link_ = group.get_links('P107')[0]
 
         rv = c.post(
-            url_for('link_update', id_=link_.id, origin_id=group.id),
+            url_for(
+                'link_update', id_=link_.id,
+                origin_id=group.id,
+                relation="member"),
             data={'description': 'We are here to help you'},
             follow_redirects=True)
         assert b'We are here to help you' in rv.data

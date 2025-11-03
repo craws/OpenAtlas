@@ -8,6 +8,7 @@ from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.database.connect import Transaction
+from openatlas.display.tab import Tab
 from openatlas.display.util import hierarchy_crumbs, link, required_group
 from openatlas.display.util2 import uc_first
 from openatlas.forms.display import display_form
@@ -42,13 +43,18 @@ def link_insert(origin_id: int, relation_name: str) -> str | Response:
         return redirect(
             f"{url_for('view', id_=origin.id)}#tab-" +
             relation_name.replace('_', '-'))
+    tabs = {
+        'link': Tab(
+            'link',
+            relation['label'],
+            content=display_form(form, 'checkbox-form'))}
     return render_template(
-        'content.html',
-        content=display_form(form, 'checkbox-form'),
+        'tabs.html',
+        tabs=tabs,
         title=relation['label'],
         crumbs=hierarchy_crumbs(origin) + [
             link(origin),
-            f"+ {uc_first(relation['label'])}"])
+            uc_first(relation['label'])])
 
 
 @app.route(
