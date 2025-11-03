@@ -14,7 +14,6 @@ from openatlas.models.annotation import AnnotationText
 from openatlas.models.dates import Dates
 from openatlas.models.gis import Gis
 
-# Todo: remove? Property types work differently, e.g. no move functionality
 app.config['PROPERTY_TYPES'] = [
     'Actor relation',
     'Actor function',
@@ -472,6 +471,7 @@ class Entity:
             if ext in app.config['DISPLAY_FILE_EXT']:
                 entities.append(Entity(row))
         return entities
+
     @staticmethod
     def get_linked_entity_ids_recursive(
             entity_id: int,

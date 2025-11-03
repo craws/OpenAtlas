@@ -179,7 +179,6 @@ class Display:
                                         'reference_system_remove_class',
                                         system_id=self.entity.id,
                                         name=name)))
-
                         case 'show_all_iiif':
                             buttons.append(
                                 button(
