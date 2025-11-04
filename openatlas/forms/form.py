@@ -18,6 +18,7 @@ from openatlas.forms.field import (
     LinkTableField, SubmitField, TableCidocField, TableField, TableMultiField,
     TreeField)
 from openatlas.forms.populate import populate_dates
+from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity, Link, get_entity_ids_with_links
 from openatlas.models.openatlas_class import get_reverse_relation
 
@@ -111,7 +112,7 @@ def link_detail_form(
         relation: dict[str, Any],
         selection_id: Optional[int] = None) -> Any:
     class Form(FlaskForm):
-        pass
+        validate = validate
 
     selection = Entity.get_by_id(selection_id) if selection_id else None
     validators = [InputRequired()]
@@ -143,7 +144,7 @@ def link_detail_form(
 
 def link_update_form(link_: Link, relation: dict[str, Any]) -> Any:
     class Form(FlaskForm):
-        pass
+        validate = validate
 
     hierarchy = None
     if 'type' in relation:
