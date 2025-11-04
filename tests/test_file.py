@@ -52,6 +52,14 @@ class FileTest(TestBaseCase):
                 follow_redirects=True)
         assert b'An entry has been created' in rv.data
 
+        rv = c.get(url_for('resize_images'), follow_redirects=True)
+        assert b'Images were created' in rv.data
+
+        rv = c.get(
+            url_for('admin_delete_orphaned_resized_images'),
+            follow_redirects=True)
+        assert b'Resized orphaned images were deleted' in rv.data
+
         with open(logo, 'rb') as img:
             data = {
                 'name': 'IIIF File',
