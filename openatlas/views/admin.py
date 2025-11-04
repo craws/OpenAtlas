@@ -454,11 +454,8 @@ def check_dates() -> str:
             format_date(entity.modified),
             entity.description])
     for link_ in Link.get_invalid_link_dates():
-        url = ''
-        # Todo: fix link update link
-        # url = url_for('link_update', id_=item.id, origin_id=item.domain.id)
         tabs['link_dates'].table.rows.append([
-            link(link_.property.name, url),
+            link(link_.property.name, get_update_link_for_link(link_)),
             link(link_.domain),
             link(link_.range)])
     for link_ in Link.invalid_involvement_dates():
@@ -469,8 +466,7 @@ def check_dates() -> str:
             link(event),
             event.class_.label,
             link_.type.name if link_.type else '',
-            link_.description,
-            link(_('edit'), get_update_link_for_link(link_))]
+            link_.description]
         tabs['involvement_dates'].table.rows.append(data)
     for link_ in Link.invalid_preceding_dates():
         tabs['preceding_dates'].table.rows.append([
