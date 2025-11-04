@@ -52,6 +52,14 @@ class FileTest(TestBaseCase):
                 follow_redirects=True)
         assert b'An entry has been created' in rv.data
 
+        rv = c.get(url_for('resize_images'), follow_redirects=True)
+        assert b'Images were created' in rv.data
+
+        rv = c.get(
+            url_for('admin_delete_orphaned_resized_images'),
+            follow_redirects=True)
+        assert b'Resized orphaned images were deleted' in rv.data
+
         with open(logo, 'rb') as img:
             data = {
                 'name': 'IIIF File',
@@ -286,13 +294,9 @@ class FileTest(TestBaseCase):
                 annotation_id=annotation_id.replace('.json', '')))
         assert bool(annotation_id in rv.get_json()['@id'])
 
-        return  # Todo: continue tests
-        # Entity.delete_links() missing 1 required
-        # positional argument: 'classes'
-
         with app.test_request_context():
             app.preprocess_request()
-            iiif_file.delete_links(['P67'])
+            iiif_file.delete_links('P67', classes=['file', 'place'])
 
         rv = c.get(url_for('orphans'))
         assert b'File keeper' in rv.data
@@ -307,7 +311,7 @@ class FileTest(TestBaseCase):
 
         with app.test_request_context():
             app.preprocess_request()
-            iiif_file.delete_links(['P67'])
+            iiif_file.delete_links('P67', classes=['file', 'place'])
 
         rv = c.get(
             url_for(
@@ -337,7 +341,7 @@ class FileTest(TestBaseCase):
 
         with app.test_request_context():
             app.preprocess_request()
-            iiif_file.delete_links(['P67'])
+            iiif_file.delete_links('P67', classes=['file', 'place'])
 
         rv = c.get(
             url_for('admin_annotation_delete', id_=2),

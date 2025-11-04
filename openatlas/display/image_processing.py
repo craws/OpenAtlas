@@ -46,9 +46,10 @@ def image_resizing(name: str, format_: str, size: str) -> bool:
 
 def check_processed_image(filename: str) -> bool:
     file_format = '.' + filename.split('.', 1)[1].lower()
+    check = False
     try:
         if file_format in g.display_file_ext:
-            return loop_through_processed_folders(
+            check = loop_through_processed_folders(
                 filename.rsplit('.', 1)[0].lower(),
                 file_format)
     except OSError as e:  # pragma: no cover
@@ -57,7 +58,7 @@ def check_processed_image(filename: str) -> bool:
             'image processing',
             'failed to validate file as image',
             e)
-    return False
+    return check
 
 
 def loop_through_processed_folders(name: str, file_format: str) -> bool:
