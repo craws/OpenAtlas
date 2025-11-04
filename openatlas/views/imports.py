@@ -339,9 +339,10 @@ def check_data_for_table_representation(
     file_.save(str(file_path))
     data_frame = pd.read_csv(
         file_path,
-        keep_default_na=False,
         dtype=str,
-        skipinitialspace=True)
+        skipinitialspace=True,
+        keep_default_na=True,
+        na_values=['']).where(pd.notna, None)
     columns = get_clean_header(data_frame, class_, checks)
     table_data = []
     origin_ids = []

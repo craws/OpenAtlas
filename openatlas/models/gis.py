@@ -157,6 +157,8 @@ class Gis:
     @staticmethod
     def insert(entity: Entity, data: dict[str, Any]) -> None:
         for shape in ['point', 'line', 'polygon']:
+            if not data.get(shape):
+                continue
             for item in json.loads(data[shape]):
                 if item['properties']['shapeType'] != 'centerpoint' \
                         and not db.test_geom(json.dumps(item['geometry'])):
