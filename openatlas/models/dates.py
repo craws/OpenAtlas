@@ -1,13 +1,9 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Any, Optional
 
 import numpy
-from flask_babel import lazy_gettext as _
-
-if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.models.entity import Entity
 
 
 class Dates:
@@ -98,9 +94,6 @@ def format_date(value: datetime | numpy.datetime64) -> str:
         date_ = datetime64_to_timestamp(value)
         return date_.lstrip('0').replace(' 00:00:00', '') if date_ else ''
     return value.date().isoformat().replace(' 00:00:00', '')
-
-
-
 
 
 def check_if_entity_has_time(dates: Dates) -> bool:
