@@ -90,35 +90,28 @@ def get_appearance(entity: Entity) -> tuple[str, str]:
             inverse=True):
         event = link_.domain
         actor = link_.range
-        event_link = link(_('event'), url_for('view', id_=event.id))
+        html = ' ' + _('at an') + ' ' + \
+            link(_('event'), url_for('view', id_=event.id))
         if not actor.dates.first:
             if link_.dates.first and (
                     not first_year
                     or int(link_.dates.first) < int(first_year)):
                 first_year = link_.dates.first
-                first_string = \
-                    format_entity_date(link_.dates, 'begin') + \
-                    ' ' + _('at an') + ' ' + event_link
+                first_string = format_entity_date(link_.dates, 'begin') + html
             elif event.dates.first and (
                     not first_year
                     or int(event.dates.first) < int(first_year)):
                 first_year = event.dates.first
-                first_string = \
-                    format_entity_date(event.dates, 'begin') + \
-                    ' ' + _('at an') + ' ' + event_link
+                first_string = format_entity_date(event.dates, 'begin') + html
         if not actor.dates.last:
             if link_.dates.last and (
                     not last_year or int(link_.dates.last) > int(last_year)):
                 last_year = link_.dates.last
-                last_string = \
-                    format_entity_date(link_.dates, 'end') + \
-                    ' ' + _('at an') + ' ' + event_link
+                last_string = format_entity_date(link_.dates, 'end') + html
             elif event.dates.last and (
                     not last_year or int(event.dates.last) > int(last_year)):
                 last_year = event.dates.last
-                last_string = \
-                    format_entity_date(event.dates, 'end') + \
-                    ' ' + _('at an') + ' ' + event_link
+                last_string = format_entity_date(event.dates, 'end') + html
     return first_string, last_string
 
 
@@ -241,7 +234,7 @@ def menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
 
 
 @app.template_filter()
-def profile_image(entity: Entity) -> str:
+def profile_image(entity: Entity, link_image: Optional[bool] = True) -> str:
     if not entity.image_id or not (path := get_file_path(entity.image_id)):
         return ''
     file_id = entity.image_id
@@ -270,11 +263,10 @@ def profile_image(entity: Entity) -> str:
             return '<p class="uc-first">' + _('no preview available') + '</p>'
     else:
         url = url_for('view', id_=entity.image_id)
-
-    html = link(
-        f'<img style="max-width:{width}px" alt="{entity.name}" src="{src}">',
-        url,
-        external=external)
+    html = f'<img style="max-width:{width}px" alt="{entity.name}" src="{src}">'
+    if not link_image:
+        return html
+    html = link(html, url, external=external)
     if entity.class_.name == 'file' \
             and check_iiif_activation() \
             and g.files[file_id].suffix in g.display_file_ext:
