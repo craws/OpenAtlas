@@ -156,6 +156,8 @@ def entity_table(
                         html = item.description
                 case 'count':
                     html = format_number(e.count)
+                case 'domain':
+                    html = link(e)
                 case 'default_precision':
                     html = link(next(iter(e.types), None))
                 case 'end':
@@ -218,6 +220,8 @@ def entity_table(
                     html = ''
                     if g.file_info.get(e.id):
                         html = display_bool(g.file_info[e.id]['public'], False)
+                case 'range':
+                    html = link(range_)
                 case 'remove':
                     tab_id = e.class_.group['name']
                     if relation and relation['mode'] == 'tab':

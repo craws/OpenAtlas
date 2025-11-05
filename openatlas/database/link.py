@@ -67,7 +67,7 @@ def get_by_id(id_: int) -> dict[str, Any]:
     return g.cursor.fetchone()
 
 
-def get_links_by_type(type_id: int) -> list[dict[str, Any]]:
+def get_links_by_type(type_id: int) -> list[list[int]]:
     g.cursor.execute(
         """
         SELECT id, domain_id, range_id
