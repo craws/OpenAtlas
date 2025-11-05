@@ -5,7 +5,6 @@ from flask import g, url_for
 from openatlas import app
 from openatlas.database import entity as db
 from openatlas.models.dates import form_to_datetime64
-from openatlas.models.entity import Link
 from openatlas.models.logger import Logger
 from tests.base import TestBaseCase, get_hierarchy, insert
 
@@ -101,23 +100,16 @@ class AdminTests(TestBaseCase):
                 'attributes': {
                     'begin_from': '2018-01-31',
                     'begin_to': '2018-01-01'}})
-            involvement = Link.get_by_id(
-                event.link(
-                    'P11',
-                    person,
-                    dates={
-                        'begin_from': '2017-01-31',
-                        'begin_to': '2017-01-01',
-                        'begin_comment': None,
-                        'end_from': '2017-01-01',
-                        'end_to': None,
-                        'end_comment': None})[0])
-            #involvement.begin_from = form_to_datetime64(2017, 1, 31)
-            #involvement.begin_to = form_to_datetime64(2017, 1, 1)
-            #involvement.end_from = form_to_datetime64(2017, 1, 1)
-
-            # Todo: continue tests - implement relations
-            #involvement.update({})
+            event.link(
+                'P11',
+                person,
+                dates={
+                    'begin_from': '2017-01-31',
+                    'begin_to': '2017-01-01',
+                    'begin_comment': None,
+                    'end_from': '2017-01-01',
+                    'end_to': None,
+                    'end_comment': None})
 
             source = insert('source', 'Tha source')
             source.link('P67', event)

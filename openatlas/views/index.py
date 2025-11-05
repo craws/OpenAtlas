@@ -134,7 +134,6 @@ def set_locale(language: str) -> Response:
 @app.route('/overview/feedback', methods=['GET', 'POST'])
 @required_group('readonly')
 def index_feedback() -> str | Response:
-
     class FeedbackForm(FlaskForm):
         subject = SelectField(
             _('subject'),

@@ -9,19 +9,19 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wtforms import (
     BooleanField, HiddenField, PasswordField, SelectField, StringField,
-    TextAreaField, validators)
+    TextAreaField)
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app
 from openatlas.display.tab import Tab
-from openatlas.display.table import Table
+from openatlas.display.table import Table, entity_table
 from openatlas.display.util import (
     button, description, display_info, link, required_group, send_mail)
 from openatlas.display.util2 import (
     is_authorized, manual, sanitize, uc_first)
-from openatlas.models.dates import format_date
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField, generate_password_field
+from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
 
@@ -46,7 +46,7 @@ class UserForm(FlaskForm):
     insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
 
-    def validate(self, extra_validators: validators = None) -> bool:
+    def validate(self, extra_validators: Any = None) -> bool:
         valid = FlaskForm.validate(self)
         username = ''
         user_email = ''
@@ -199,22 +199,11 @@ def user_delete(id_: int) -> Response:
 @app.route('/user/entities/<int:id_>')
 @required_group('readonly')
 def user_entities(id_: int) -> str:
-    table = Table([
-        'name',
-        'class',
-        'type',
-        'begin',
-        'end',
-        'created'])
+    table = Table()
     if user := User.get_by_id(id_):
-        for entity in user.get_entities():
-            table.rows.append([
-                link(entity),
-                entity.class_.label,
-                link(entity.standard_type),
-                entity.first,
-                entity.last,
-                format_date(entity.created)])
+        table = entity_table(
+            user.get_entities(),
+            columns=['name', 'class', 'type', 'begin', 'end', 'created'])
     return render_template(
         'content.html',
         content=table.display(),

@@ -7,7 +7,6 @@ from flask_login import current_user
 from markupsafe import escape
 
 from openatlas import app
-from openatlas.database.link import get_links_by_type
 from openatlas.display.tab import Tab
 from openatlas.display.table import entity_table
 from openatlas.display.util import (
@@ -17,8 +16,7 @@ from openatlas.display.util import (
 from openatlas.display.util2 import (
     display_bool, is_authorized, manual, uc_first)
 from openatlas.models.dates import format_date
-from openatlas.models.entity import Entity
-from openatlas.models.entity import Link
+from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 from openatlas.models.user import User
 from openatlas.views.tools import carbon_result, sex_result
@@ -112,7 +110,6 @@ class Display:
     def add_tabs(self) -> None:
         self.tabs = {'info': Tab('info')}
         for name, relation in self.entity.class_.relations.items():
-            print(name)
             if not relation['mode'] == 'tab':
                 continue
             entity_for_links = self.entity

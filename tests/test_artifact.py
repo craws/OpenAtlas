@@ -22,25 +22,30 @@ class ArtifactTest(TestBaseCase):
             url_for('insert', class_='artifact'),
             data={
                 'name': 'Love-letter',
-                'owned_by': actor.id,
+                'actor': actor.id,
                 'super': place.id})
         artifact_id = rv.location.split('/')[-1]
-
-        return  # Todo: continue tests - artifact above isn't created
 
         rv = c.get(url_for('view', id_=actor.id))
         assert b'Love-letter' in rv.data
 
-        rv = c.get(url_for('add_subunit', super_id=place.id))
+        rv = c.get(
+            url_for(
+                'link_insert',
+                origin_id=place.id,
+                relation_name='artifact'))
         assert b'Love-letter' not in rv.data
 
         rv = c.post(
-            url_for('add_subunit', super_id=place.id),
+            url_for(
+                'link_insert',
+                origin_id=place.id,
+                relation_name='artifact'),
             data={'checkbox_values': [sub_artifact.id]},
             follow_redirects=True)
         assert b'Sub artifact' in rv.data
 
-        rv = c.get(url_for('index', view='artifact'))
+        rv = c.get(url_for('index', group='artifact'))
         assert b'Love-letter' in rv.data
 
         rv = c.get(url_for('update', id_=artifact_id))
@@ -55,11 +60,18 @@ class ArtifactTest(TestBaseCase):
             follow_redirects=True)
         assert b'Changes have been saved' in rv.data
 
-        rv = c.get(url_for('entity_add_source', id_=artifact_id))
-        assert b'link source' in rv.data
+        rv = c.get(
+            url_for(
+                'link_insert',
+                origin_id=artifact_id,
+                relation_name='source'))
+        assert b'Source' in rv.data
 
         rv = c.post(
-            url_for('entity_add_source', id_=artifact_id),
+            url_for(
+                'link_insert',
+                origin_id=artifact_id,
+                relation_name='source'),
             data={'checkbox_values': str([source.id])},
             follow_redirects=True)
         assert b'Necronomicon' in rv.data

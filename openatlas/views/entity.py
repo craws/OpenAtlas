@@ -153,15 +153,16 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
         entity.location = entity.location \
             or entity.get_linked_entity_safe('P53')
         gis_data = Gis.get_all([entity], entity.get_structure())
-    if entity.class_.name == ('file'):
+    if entity.class_.name == 'file':
         entity.image_id = entity.id
     elif entity.class_.relations.get('file'):
         entity.image_id = entity.get_profile_image_id()
         if not entity.image_id:
             for link_ in entity.get_links('P67', ['file'], inverse=True):
-                if g.files[link_.domain.id].suffix in g.display_file_ext:
-                    entity.image_id = link_.domain.id
-                    break
+                if file_ := g.files.get(link_.domain.id):
+                    if file_.suffix in g.display_file_ext:
+                        entity.image_id = link_.domain.id
+                        break
     return render_template(
         'entity/update.html',
         form=form,
@@ -277,7 +278,7 @@ def save(
         flash(
             _('entity created') if action == 'insert' else _('info update'),
             'info')
-    except InvalidGeomException as e:
+    except InvalidGeomException:
         flash(_('Invalid geom entered'), 'error')
         if action == 'update' and entity.id:
             url = url_for(

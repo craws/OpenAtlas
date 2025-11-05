@@ -308,7 +308,9 @@ def table_date(
         range_: Entity | None,
         item: Link | Entity | None) -> str:
     html = getattr(e.dates, mode)
-    if range_ and not (html := getattr(item.dates, mode)):
+    if range_ \
+            and range_.class_.group \
+            and not (html := getattr(item.dates, mode)):
         if e.class_.group['name'] == 'actor' \
                 and range_.class_.group['name'] == 'event' \
                 and getattr(range_.dates, mode):
