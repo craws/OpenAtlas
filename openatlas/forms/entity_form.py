@@ -306,7 +306,7 @@ def process_files(
     entity = None
     try:
         entity_name = form.name.data.strip()
-        for count, file in enumerate(form.file.data):
+        for count, file_ in enumerate(form.file.data):
             if len(form.file.data) > 1:
                 form.name.data = f'{entity_name}_{str(count + 1).zfill(2)}'
             entity = process_form_data(
@@ -316,11 +316,11 @@ def process_files(
                 relation_name)
 
             # Add 'a' to prevent emtpy temporary filename, has no side effects
-            filename = secure_filename(f'a{file.filename}')
+            filename = secure_filename(f'a{file_.filename}')
             ext = filename.rsplit('.', 1)[1].lower()
             name = f"{entity.id}.{ext}"
             path = app.config['UPLOAD_PATH'] / name
-            file.save(str(path))
+            file_.save(str(path))
 
             if f'.{ext}' in g.display_file_ext:
                 call(f'exiftran -ai {path}', shell=True)  # Fix rotation
@@ -331,7 +331,7 @@ def process_files(
                     and check_iiif_activation() \
                     and g.settings['iiif_convert_on_upload']:
                 convert_image_to_iiif(entity.id, path)
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         g.logger.log('error', 'database', 'file upload failed', e)
         raise e from None
     return entity

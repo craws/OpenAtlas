@@ -106,7 +106,7 @@ class TypeTest(TestBaseCase):
         rv = c.get(url_for('insert', class_='person'))
         assert b'sex' in rv.data
 
-        rv = c.get(url_for('type_index'))
+        rv = c.get('/index/type', follow_redirects=True)
         assert b'sex' in rv.data
 
         rv = c.get(

@@ -554,13 +554,6 @@ class Entity:
         db.set_profile_image(id_, origin_id)
 
     @staticmethod
-    def get_roots(
-            property_code: str,
-            ids: list[int],
-            inverse: bool = False) -> dict[int, Any]:
-        return db.get_roots(property_code, ids, inverse)
-
-    @staticmethod
     def get_links_of_entities(
             entity_ids: int | list[int],
             codes: str | list[str] | None = None,
