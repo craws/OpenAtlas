@@ -27,7 +27,7 @@ class ReferenceSystemTest(TestBaseCase):
                 'name': 'Wikipedia',
                 'website_url': 'https://wikipedia.org',
                 'resolver_url': 'https://wikipedia.org',
-                'classes': ['place']})
+                'reference_system_classes': ['place']})
         wikipedia_id = rv.location.split('/')[-1]
 
         rv = c.post(
@@ -36,19 +36,16 @@ class ReferenceSystemTest(TestBaseCase):
                 'name': 'Another system to test forms with more than 3',
                 'website_url': '',
                 'resolver_url': '',
-                'classes': ['place']},
+                'reference_system_classes': ['place']},
             follow_redirects=True)
         assert b'An entry has been created' in rv.data
 
         rv = c.get(url_for('insert', class_='place'))
         assert b'reference-system-switch' in rv.data
 
-        # Todo: continue tests - somehow wikipedia is deleted
-        # although shouldn't be allowed because of attached classes
-
-        # rv = c.get(
-        #     url_for('delete', id_=wikipedia_id), follow_redirects=True)
-        # assert b'403 - Forbidden' in rv.data
+        rv = c.get(
+            url_for('delete', id_=wikipedia_id), follow_redirects=True)
+        assert b'403 - Forbidden' in rv.data
 
         rv = c.get(
             url_for(
