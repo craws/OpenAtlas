@@ -29,7 +29,7 @@ class_groups = {
     'place': {
         'name': 'place',
         'label': _('place'),
-        'classes': ['feature', 'place', 'stratigraphic_unit'],
+        'classes': ['place', 'feature', 'stratigraphic_unit'],
         'table_columns': ['name', 'type', 'begin', 'end', 'description']},
     'reference': {
         'name': 'reference',
