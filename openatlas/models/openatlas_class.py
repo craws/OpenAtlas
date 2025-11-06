@@ -39,9 +39,36 @@ class OpenatlasClass:
                 self.group = data
         self.label = model_['label']
         self.attributes = model_['attributes']
-        self.relations = model_['relations']
+        self.relations = {}
+        for name, relation in model_['relations'].items():
+            self.relations[name] = Relation(name, relation)
         self.display = model_['display']
         self.extra = model_['extra']
+
+
+class Relation:
+    def __init__(self, name: str, data: dict[str, Any]) -> None:
+        self.name = name
+        self.property = data['property']
+        self.classes = data['classes'] if isinstance(data['classes'], list) \
+            else [data['classes']]
+        self.inverse = data.get('inverse', False)
+        self.multiple = data.get('multiple', False)
+        self.selected = [] if self.multiple else None
+        self.required = data.get('required', False)
+        self.label = data.get('label', _(self.name.replace('_', ' ')))
+        self.mode = data.get('mode', 'tab')
+        self.add_dynamic = data.get('add_dynamic', False)
+        self.tooltip = data.get('tooltip')
+        self.additional_fields = data.get('additional_fields', [])
+        self.type = data.get('type')
+        if self.mode == 'tab':
+            self.tab = data.get('tab', {})
+            self.tab['additional_columns'] = \
+                data['tab'].get('additional_columns', [])
+            self.tab['buttons'] = data['tab'].get('buttons', [])
+            self.tab['columns'] = data['tab'].get('columns')
+            self.tab['tooltip'] = data['tab'].get('tooltip')
 
 
 def get_class_count() -> dict[str, int]:
@@ -86,37 +113,16 @@ def get_model(class_name: str) -> dict[str, Any]:
         item['label'] = item.get('label', _(name))
     data['extra'] = data.get('extra', [])
     data['relations'] = data.get('relations', {})
-    for name, relation in data['relations'].items():
-        relation['name'] = name
-        relation['classes'] = relation['classes'] \
-            if isinstance(relation['classes'], list) \
-            else [relation['classes']]
-        relation['inverse'] = relation.get('inverse', False)
-        relation['multiple'] = relation.get('multiple', False)
-        relation['required'] = relation.get('required', False)
-        relation['label'] = relation.get('label', _(name.replace('_', ' ')))
-        relation['mode'] = relation.get('mode', 'tab')
-        relation['add_dynamic'] = relation.get('add_dynamic', False)
-        relation['selected'] = [] if relation['multiple'] else None
-        relation['tooltip'] = relation.get('tooltip')
-        relation['additional_fields'] = relation.get('additional_fields', [])
-        if relation['mode'] == 'tab':
-            relation['tab'] = relation.get('tab', {})
-            relation['tab']['additional_columns'] = \
-                relation['tab'].get('additional_columns', [])
-            relation['tab']['buttons'] = relation['tab'].get('buttons', [])
-            relation['tab']['columns'] = relation['tab'].get('columns')
-            relation['tab']['tooltip'] = relation['tab'].get('tooltip')
     return data
 
 
 def get_reverse_relation(
         class_: OpenatlasClass,
-        relation: dict[str, Any],
-        reverse_class: OpenatlasClass) -> dict[str, Any] | None:
+        relation: Relation,
+        reverse_class: OpenatlasClass) -> Relation | None:
     for reverse_relation in reverse_class.relations.values():
-        if class_.name in reverse_relation['classes'] \
-                and relation['property'] == reverse_relation['property'] \
-                and relation['inverse'] != reverse_relation['inverse']:
+        if class_.name in reverse_relation.classes \
+                and relation.property == reverse_relation.property \
+                and relation.inverse != reverse_relation.inverse:
             return reverse_relation
     return None

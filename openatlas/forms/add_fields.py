@@ -20,7 +20,7 @@ from openatlas.forms.field import (
     TreeMultiField, ValueTypeField, ValueTypeRootField)
 from openatlas.models.dates import check_if_entity_has_time
 from openatlas.models.entity import Entity, Link
-from openatlas.models.openatlas_class import OpenatlasClass
+from openatlas.models.openatlas_class import OpenatlasClass, Relation
 
 
 def add_name_fields(form: Any, entity: Entity) -> None:
@@ -144,22 +144,22 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
     from openatlas.forms.form import filter_entities
     entities = {}  # Collect entities per class to prevent multiple fetching
     for name, relation in entity.class_.relations.items():
-        if relation['mode'] != 'direct':
+        if relation.mode != 'direct':
             continue
-        validators = [InputRequired()] if relation['required'] else None
+        validators = [InputRequired()] if relation.required else None
         items = []
-        for class_ in relation['classes']:
+        for class_ in relation.classes:
             class_ = 'place' if class_ == 'object_location' else class_
             if class_ not in entities:
                 entities[class_] = Entity.get_by_class(class_, True, True)
             items += entities[class_]
-        if relation['classes'] in [['type'], ['administrative_unit']]:
+        if relation.classes in [['type'], ['administrative_unit']]:
             if root := g.types[entity.root[0]] if entity.root else origin:
                 setattr(
                     form,
-                    relation['name'],
+                    relation.name,
                     TreeField(
-                        relation['label'],
+                        relation.label,
                         type_id=root.id,
                         filter_ids=[entity.id] if entity else [],
                         is_type_form=True))
@@ -177,14 +177,14 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
                     option_widget=widgets.CheckboxInput(),  # type: ignore
                     widget=widgets.ListWidget(  # type: ignore
                         prefix_label=False))
-        elif relation['multiple']:
+        elif relation.multiple:
             selection: Any = []
             if entity.id:
                 selection = entity.get_linked_entities(
-                    relation['property'],
-                    relation['classes'],
-                    inverse=relation['inverse'])
-            elif origin and origin.class_.name in relation['classes']:
+                    relation.property,
+                    relation.classes,
+                    inverse=relation.inverse)
+            elif origin and origin.class_.name in relation.classes:
                 selection = [origin]
             setattr(
                 form,
@@ -192,33 +192,33 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
                 TableMultiField(
                     filter_entities(entity, items, relation),
                     selection,
-                    description=relation['tooltip'],
-                    label=relation['label'],
+                    description=relation.tooltip,
+                    label=relation.label,
                     validators=validators))
         else:
             selection = None
             if entity.id:
                 selection = entity.get_linked_entity(
-                    relation['property'],
-                    relation['classes'],
-                    relation['inverse'])
-            elif origin and origin.class_.name in relation['classes']:
+                    relation.property,
+                    relation.classes,
+                    relation.inverse)
+            elif origin and origin.class_.name in relation.classes:
                 selection = origin
             if selection and selection.class_.name == 'object_location':
                 selection = selection.get_linked_entity_safe('P53', True)
             add_dynamic = []
-            if relation['add_dynamic']:
+            if relation.add_dynamic:
                 add_dynamic = [
                     item.replace('object_location', 'place')
-                    for item in relation['classes']]
+                    for item in relation.classes]
             setattr(
                 form,
                 name,
                 TableField(
                     filter_entities(entity, items, relation),
                     selection,
-                    label=relation['label'],
-                    description=relation['tooltip'],
+                    label=relation.label,
+                    description=relation.tooltip,
                     validators=validators,
                     add_dynamic=add_dynamic))
 
@@ -411,7 +411,7 @@ def add_value_type_fields(form_class: FlaskForm, subs: list[int]) -> None:
         add_value_type_fields(form_class, sub.subs)
 
 
-def add_buttons(form: Any, entity: Entity, relation: dict[str, Any]) -> None:
+def add_buttons(form: Any, entity: Entity, relation: Relation) -> None:
     field = SubmitField
     if 'description' in entity.class_.attributes \
             and 'annotated' in entity.class_.attributes['description']:
@@ -420,8 +420,8 @@ def add_buttons(form: Any, entity: Entity, relation: dict[str, Any]) -> None:
     if not entity.id:
         for item in entity.class_.display['form_buttons']:
             match item:
-                case 'insert_and_continue' \
-                        if not relation.get('additional_fields'):
+                case 'insert_and_continue' if not relation \
+                        or not relation.additional_fields:
                     setattr(
                         form,
                         item,

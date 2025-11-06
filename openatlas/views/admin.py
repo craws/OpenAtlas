@@ -448,7 +448,7 @@ def check_dates() -> str:
     for entity in invalid_dates():
         tabs['dates'].table.rows.append([
             link(entity),
-            entity.class_.label,
+            uc_first(entity.class_.label),
             link(entity.standard_type),
             format_date(entity.created),
             format_date(entity.modified),
@@ -464,7 +464,7 @@ def check_dates() -> str:
         data = [
             link(actor),
             link(event),
-            event.class_.label,
+            uc_first(event.class_.label),
             link_.type.name if link_.type else '',
             link_.description]
         tabs['involvement_dates'].table.rows.append(data)

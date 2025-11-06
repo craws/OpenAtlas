@@ -37,24 +37,24 @@ def link_insert(origin_id: int, relation_name: str) -> str | Response:
     if form.validate_on_submit():
         if request.form['checkbox_values']:
             origin.link_string(
-                relation['property'],
+                relation.property,
                 request.form['checkbox_values'],
-                inverse=relation['inverse'])
+                inverse=relation.inverse)
         return redirect(
             f"{url_for('view', id_=origin.id)}#tab-" +
             relation_name.replace('_', '-'))
     tabs = {
         'link': Tab(
             'link',
-            relation['label'],
+            relation.label,
             content=display_form(form, 'checkbox-form'))}
     return render_template(
         'tabs.html',
         tabs=tabs,
-        title=relation['label'],
+        title=relation.label,
         crumbs=hierarchy_crumbs(origin) + [
             link(origin),
-            uc_first(relation['label'])])
+            uc_first(relation.label)])
 
 
 @app.route(
@@ -75,14 +75,14 @@ def link_insert_detail(
         ids = ast.literal_eval(getattr(form, relation_name).data)
         ids = ids if isinstance(ids, list) else [int(ids)]
         type_id = None
-        if 'type' in relation:
-            hierarchy = Entity.get_hierarchy(relation['type'])
+        if relation.type:
+            hierarchy = Entity.get_hierarchy(relation.type)
             type_id = getattr(form, str(hierarchy.id)).data or None
         origin.link(
-            relation['property'],
+            relation.property,
             Entity.get_by_ids(ids),
             form.description.data if 'description' in form else None,
-            relation['inverse'],
+            relation.inverse,
             type_id,
             dates=process_dates(form))
         return redirect(
@@ -92,10 +92,7 @@ def link_insert_detail(
         'content.html',
         content=display_form(form),
         title=_(origin.class_.group['name']),
-        crumbs=[
-            link(origin, index=True),
-            origin,
-            '+ ' + uc_first(relation['label'])])
+        crumbs=[link(origin, index=True), origin, uc_first(relation.label)])
 
 
 @app.route(
@@ -112,14 +109,16 @@ def link_update(id_: int, origin_id: int, relation: str) -> str | Response:
     form = link_update_form(link_, relation)
     origin_url = (
         f"{url_for('view', id_=origin.id)}#tab-" +
-        relation['name'].replace('_', '-'))
+        relation.name.replace('_', '-'))
     if form.validate_on_submit():
         data = {
             'description': form.description.data
             if hasattr(form, 'description') else None}
-        if 'type' in relation:
-            hierarchy = Entity.get_hierarchy(relation['type'])
-            data['type_id'] = getattr(form, str(hierarchy.id)).data or None
+        if relation.type:
+            hierarchy = Entity.get_hierarchy(relation.type)
+            data['type_id'] = getattr(
+                form,
+                str(hierarchy.id)).data or None
         data.update(process_dates(form))
         try:
             link_.update(data)

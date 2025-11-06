@@ -82,11 +82,10 @@ def get_entity_form(
                             choices=choices,  # type: ignore
                             option_widget=widgets.CheckboxInput(),
                             widget=widgets.ListWidget(prefix_label=False)))
-
     add_buttons(
         Form,
         entity,
-        origin.class_.relations[relation] if origin and relation else {})
+        origin.class_.relations[relation] if origin and relation else None)
     form: Any = Form(obj=entity)
     if request.method == 'GET':
         if entity.id:
@@ -207,37 +206,34 @@ def process_relations(
         origin: Entity | None,
         relation_name: str | None) -> None:
     for name, relation in entity.class_.relations.items():
-        if relation['mode'] != 'direct' or not hasattr(form, name):
+        if relation.mode != 'direct' or not hasattr(form, name):
             continue
         ids = convert(getattr(form, name).data)
         if entity.class_.group['name'] == 'type' \
-                and relation['name'] == 'super' \
+                and relation.name == 'super' \
                 and not ids:
             ids = [entity.root[0] if entity.root else origin.id]
         if ids:
             entities = Entity.get_by_ids(ids)
-            if 'object_location' in relation['classes']:
+            if 'object_location' in relation.classes:
                 locations = []
                 for place in entities:
                     locations.append(place.get_linked_entity_safe('P53'))
                 entities = locations
-            entity.link(
-                relation['property'],
-                entities,
-                inverse=relation['inverse'])
+            entity.link(relation.property, entities, inverse=relation.inverse)
 
     if origin and relation_name:
         origin_relation = origin.class_.relations[relation_name]
-        if not origin.class_.relations[relation_name]['additional_fields']:
+        if not origin.class_.relations[relation_name].additional_fields:
             reverse_relation = get_reverse_relation(
                 origin.class_,
                 origin_relation,
                 entity.class_)
-            if not reverse_relation or reverse_relation['mode'] != 'direct':
+            if not reverse_relation or reverse_relation.mode != 'direct':
                 origin.link(
-                    origin_relation['property'],
+                    origin_relation.property,
                     entity,
-                    inverse=origin_relation['inverse'])
+                    inverse=origin_relation.inverse)
 
 
 def delete_links(entity: Entity) -> None:
@@ -245,12 +241,9 @@ def delete_links(entity: Entity) -> None:
         entity.delete_links('P2', ['type'])
         if entity.location:
             entity.location.delete_links('P89', ['administrative_unit'])
-    for relation in entity.class_.relations.values():
-        if relation['mode'] == 'direct':
-            entity.delete_links(
-                relation['property'],
-                relation['classes'],
-                relation['inverse'])
+    for r in entity.class_.relations.values():
+        if r.mode == 'direct':
+            entity.delete_links(r.property, r.classes, r.inverse)
 
 
 def process_dates(form: Any) -> dict[str, Any]:

@@ -644,13 +644,13 @@ def hierarchy_crumbs(entity: Entity) -> list[str]:
         return crumbs + [
             g.types[id_] for id_ in entity.root] if entity.root else crumbs
     for relation in entity.class_.relations.values():
-        if relation['name'] == 'super' or (
+        if relation.name == 'super' or (
                 entity.class_.name == 'source_translation'
-                and relation['name'] == 'source'):
+                and relation.name == 'source'):
             crumbs += [
                 e for e in entity.get_linked_entities_recursive(
-                    relation['property'],
-                    relation['inverse'])]
+                    relation.property,
+                    relation.inverse)]
     return crumbs
 
 
@@ -673,14 +673,14 @@ def get_update_link_for_link(link_: Link) -> str:
     range_ = link_.range.class_.name
     property_ = link_.property.code
     for name, relation in g.classes[domain].relations.items():
-        if relation['property'] == property_ and range_ in relation['classes']:
+        if relation.property == property_ and range_ in relation.classes:
             return url_for(
                 'link_update',
                 id_=link_.id,
                 origin_id=link_.domain.id,
                 relation=name)
     for name, relation in g.classes[range_].relations.items():
-        if relation['property'] == property_ and domain in relation['classes']:
+        if relation.property == property_ and domain in relation.classes:
             return url_for(
                 'link_update',
                 id_=link_.id,

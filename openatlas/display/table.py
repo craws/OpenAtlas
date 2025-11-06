@@ -15,7 +15,7 @@ from openatlas.display.util2 import (
     display_bool, is_authorized, sanitize, uc_first)
 from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity, Link
-from openatlas.models.openatlas_class import get_reverse_relation
+from openatlas.models.openatlas_class import Relation, get_reverse_relation
 from openatlas.models.overlay import Overlay
 
 # Needed for translations
@@ -76,12 +76,12 @@ def entity_table(
         origin: Optional[Entity] = None,
         columns: Optional[list[str]] = None,
         additional_columns: Optional[list[str]] = None,
-        relation: Optional[dict[Any, str]] = None,
+        relation: Relation = None,
         table_id: Optional[str] = None,
         forms: Optional[dict[str, Any]] = None) -> Table | None:
     if not items:
         return Table()
-    inverse = relation and relation['inverse']
+    inverse = relation and relation.inverse
     item = items[0]
     if isinstance(item, Link):
         if inverse:
@@ -97,6 +97,7 @@ def entity_table(
     defs = None
     forms = forms or {}
     columns = (columns or default_columns) + (additional_columns or [])
+
     if forms.get('checkbox'):
         columns.insert(0, 'checkbox')
         order = [[0, "desc"], [1, "asc"]]
@@ -104,14 +105,14 @@ def entity_table(
     elif columns[0] == 'created':
         order = [[0, "desc"]]
 
-    if relation and relation['mode'].startswith('tab'):
-        if relation['additional_fields']:
+    if relation and relation.mode.startswith('tab'):
+        if relation.additional_fields:
             columns.append('update')
         reverse_relation = get_reverse_relation(
             origin.class_,
             relation,
             item_class)
-        if not reverse_relation or not reverse_relation.get("required", True):
+        if not reverse_relation or not reverse_relation.required:
             columns.append('remove')
 
     overlays = Overlay.get_by_object(origin) if 'overlay' in columns else {}
@@ -152,7 +153,7 @@ def entity_table(
                         html = g.file_info[e.id]['creator']
                 case 'content' | 'description':
                     html = e.description
-                    if relation and name in relation['additional_fields']:
+                    if relation and name in relation.additional_fields:
                         html = item.description
                 case 'count':
                     html = format_number(e.count)
@@ -178,11 +179,11 @@ def entity_table(
                         f'{file_preview(e.id)}</a>'
                 case 'involvement' | 'function' | 'relation':
                     html = item.type.name if item.type else ''
-                case 'license holder':
+                case 'license_holder':
                     html = ''
                     if g.file_info.get(e.id):
                         html = g.file_info[e.id]['license_holder']
-                case 'main image':
+                case 'main_image':
                     html = profile_image_table_link(
                         origin,
                         e,
@@ -224,8 +225,8 @@ def entity_table(
                     html = link(range_)
                 case 'remove':
                     tab_id = e.class_.group['name']
-                    if relation and relation['mode'] == 'tab':
-                        tab_id = relation['name']
+                    if relation and relation.mode == 'tab':
+                        tab_id = relation.name
                     html = ''
                     if not origin.root or not g.types[origin.root[0]].required:
                         html = remove_link(e.name, item, origin, tab_id)
@@ -243,7 +244,7 @@ def entity_table(
                             'link_update',
                             id_=item.id,
                             origin_id=origin.id,
-                            relation=relation['name'])),
+                            relation=relation.name)),
                 case 'resolver_url' | 'website_url':
                     url = getattr(e, name)
                     html = link(url, url, external=True) if url else ''

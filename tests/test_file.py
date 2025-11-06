@@ -160,7 +160,10 @@ class FileTest(TestBaseCase):
         assert b'File keeper' in rv.data
 
         rv = c.post(
-            url_for('link_insert', origin_id=get_hierarchy('Sex').subs[0], relation_name='file'),
+            url_for(
+                'link_insert',
+                origin_id=get_hierarchy('Sex').subs[0],
+                relation_name='file'),
             data={'checkbox_values': [iiif_id]},
             follow_redirects=True)
         assert b'Updated file' in rv.data

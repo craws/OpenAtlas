@@ -859,7 +859,7 @@ class Link:
         return Link(db_link.get_by_id(id_))
 
     @staticmethod
-    def get_links_by_type(type_: Entity) -> list[list[int]]:
+    def get_links_by_type(type_: Entity) -> list[dict[str, Any]]:
         return db_link.get_links_by_type(type_.id)
 
     @staticmethod

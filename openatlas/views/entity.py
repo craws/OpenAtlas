@@ -20,7 +20,7 @@ from openatlas.forms.entity_form import (
     get_entity_form, process_files, process_form_data)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
-from openatlas.models.openatlas_class import get_reverse_relation
+from openatlas.models.openatlas_class import Relation, get_reverse_relation
 from openatlas.models.overlay import Overlay
 
 
@@ -39,23 +39,18 @@ def view(id_: int) -> str | Response:
         case 'reference_system':
             entity.class_.relations = {}
             for name in entity.classes:
-                entity.class_.relations[name] = {
+                entity.class_.relations[name] = Relation(name, {
                     'name': name,
                     'label': _(name),
                     'classes': [name],
                     'property': 'P67',
-                    'mode': 'tab',
-                    'inverse': False,
-                    'additional_fields': [],
                     'multiple': True,
                     'tab': {
                         'buttons': ['remove_reference_system_class'],
-                        'tooltip': None,
                         'columns': [
                             'name',
                             'external_reference_match',
-                            'precision'],
-                        'additional_columns': None}}
+                            'precision']}})
     display = Display(entity)
     return render_template(
         'tabs.html',
@@ -187,13 +182,13 @@ def deletion_possible(entity: Entity) -> bool:
         reverse_relation = get_reverse_relation(
             entity.class_,
             relation,
-            g.classes[relation['classes'][0]])
+            g.classes[relation.classes[0]])
         if reverse_relation \
-                and reverse_relation.get('required') \
+                and reverse_relation.required \
                 and entity.get_linked_entities(
-                    relation['property'],
-                    relation['classes'],
-                    relation['inverse']):
+                    relation.property,
+                    relation.classes,
+                    relation.inverse):
             return False
     match entity.class_.group['name']:
         case 'reference_system' if entity.system or entity.classes:
@@ -285,7 +280,7 @@ def save(
                 'update',
                 id_=entity.id,
                 origin_id=origin.id if origin else None)
-    except Exception as e:
+    except Exception:
         flash(_('error transaction'), 'error')
         if action == 'update' and entity.id:
             url = url_for(
@@ -313,7 +308,7 @@ def redirect_url_insert(
                 relation=relation_name)
     if entity.class_.group['name'] != 'type' and origin and relation_name:
         relation = origin.class_.relations[relation_name]
-        if relation['additional_fields']:
+        if relation.additional_fields:
             url = url_for(
                 'link_insert_detail',
                 origin_id=origin.id,

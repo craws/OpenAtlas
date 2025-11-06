@@ -236,7 +236,6 @@ class PlaceTest(TestBaseCase):
         del data['continue_']
         rv = c.post(url_for('insert', class_='feature'), data=data)
         feat_id = rv.location.split('/')[-1]
-        print(rv.data)
 
         rv = c.get(url_for('update', id_=feat_id))
         assert b'Val-hall' in rv.data

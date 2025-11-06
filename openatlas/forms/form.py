@@ -20,34 +20,34 @@ from openatlas.forms.field import (
 from openatlas.forms.populate import populate_dates
 from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity, Link, get_entity_ids_with_links
-from openatlas.models.openatlas_class import get_reverse_relation
+from openatlas.models.openatlas_class import Relation, get_reverse_relation
 
 
 def filter_entities(
         entity: Entity,
         items: list[Entity],
-        relation: dict[str, Any],
+        relation: Relation,
         is_link_form=False) -> list[Entity]:
     filter_ids = [entity.id]
-    if relation['name'] in ['subs', 'super']:
+    if relation.name in ['subs', 'super']:
         filter_ids += [
             e.id for e in entity.get_linked_entities_recursive(
-                relation['property'],
-                relation['name'] == 'subs')]
+                relation.property,
+                relation.name == 'subs')]
     if is_link_form:
         reverse_relation = get_reverse_relation(
             entity.class_,
             relation,
-            g.classes[relation['classes'][0]])
-        if reverse_relation and not reverse_relation['multiple']:
+            g.classes[relation.classes[0]])
+        if reverse_relation and not reverse_relation.multiple:
             filter_ids += get_entity_ids_with_links(
-                relation['property'],
-                relation['classes'],
-                relation['inverse'])
+                relation.property,
+                relation.classes,
+                relation.inverse)
         filter_ids += [
             e.id for e in entity.get_linked_entities(
-                relation['property'],
-                inverse=relation['inverse'])]
+                relation.property,
+                inverse=relation.inverse)]
     return [item for item in items if item.id not in filter_ids]
 
 
@@ -75,9 +75,9 @@ def annotate_image_form(
 
 def add_additional_link_fields(
         form: Any,
-        relation: dict[str, Any],
+        relation: Relation,
         link_: Optional[Link] = None) -> None:
-    for item in relation['additional_fields']:
+    for item in relation.additional_fields:
         match item:
             case 'dates':
                 add_date_fields(form, link_)
@@ -89,19 +89,19 @@ def add_additional_link_fields(
                 add_type(form, Entity.get_hierarchy(item))
 
 
-def link_form(origin: Entity, relation: dict[str, Any]) -> Any:
+def link_form(origin: Entity, relation: Relation) -> Any:
     class Form(FlaskForm):
         pass
 
     entities = [entity for entity in Entity.get_by_class(
-        relation['classes'],
+        relation.classes,
         types=True,
         aliases=True)]
     table = entity_table(
         filter_entities(origin, entities, relation, is_link_form=True),
         forms={'checkbox': True})
     setattr(Form, 'checkbox_values', HiddenField())
-    setattr(Form, relation['name'], LinkTableField(table=table, label=''))
+    setattr(Form, relation.name, LinkTableField(table=table, label=''))
     if table.rows:
         setattr(Form, 'save', SubmitField(_('save')))
     return Form('checkbox-form')
@@ -109,14 +109,14 @@ def link_form(origin: Entity, relation: dict[str, Any]) -> Any:
 
 def link_detail_form(
         origin: Entity,
-        relation: dict[str, Any],
+        relation: Relation,
         selection_id: Optional[int] = None) -> Any:
     class Form(FlaskForm):
         validate = validate
 
     selection = Entity.get_by_id(selection_id) if selection_id else None
     validators = [InputRequired()]
-    if 'domain' in relation['additional_fields']:
+    if 'domain' in relation.additional_fields:
         entities = Entity.get_by_class(
             origin.class_.name,
             types=True,
@@ -125,30 +125,30 @@ def link_detail_form(
             Form,
             'domain',
             TableField(entities, selection=origin, validators=validators))
-    if 'type' in relation:
-        add_type(Form, Entity.get_hierarchy(relation['type']))
+    if relation.type:
+        add_type(Form, Entity.get_hierarchy(relation.type))
     entities = Entity.get_by_class(
-        relation['classes'],
+        relation.classes,
         types=True,
         aliases=current_user.settings['table_show_aliases'])
     table = TableMultiField(
         entities,
         selection=[selection] if selection else None,
-        validators=validators) if relation['multiple'] else \
+        validators=validators) if relation.multiple else \
         TableField(entities, selection=selection, validators=validators)
-    setattr(Form, relation['name'], table)
+    setattr(Form, relation.name, table)
     add_additional_link_fields(Form, relation)
     setattr(Form, 'save', SubmitField(_('insert')))
     return Form()
 
 
-def link_update_form(link_: Link, relation: dict[str, Any]) -> Any:
+def link_update_form(link_: Link, relation: Relation) -> Any:
     class Form(FlaskForm):
         validate = validate
 
     hierarchy = None
-    if 'type' in relation:
-        hierarchy = Entity.get_hierarchy(relation['type'])
+    if relation.type:
+        hierarchy = Entity.get_hierarchy(relation.type)
         add_type(Form, hierarchy)
     add_additional_link_fields(Form, relation, link_)
     setattr(Form, 'save', SubmitField(_('save')))
@@ -157,7 +157,7 @@ def link_update_form(link_: Link, relation: dict[str, Any]) -> Any:
         if hierarchy:
             getattr(form, str(hierarchy.id)).data = \
                 link_.type.id if link_.type else None
-        for item in relation['additional_fields']:
+        for item in relation.additional_fields:
             match item:
                 case 'dates':
                     populate_dates(form, link_.dates)

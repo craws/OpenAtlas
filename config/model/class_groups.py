@@ -25,7 +25,7 @@ class_groups = {
         'classes': ['file'],
         'table_columns': [
             'created', 'icon', 'name', 'license', 'public', 'creator',
-            'license holder', 'size', 'extension', 'description']},
+            'license_holder', 'size', 'extension', 'description']},
     'place': {
         'name': 'place',
         'label': _('place'),
@@ -62,7 +62,7 @@ standard_relations = {
         'inverse': True,
         'multiple': True,
         'tab': {
-            'additional_columns': ['main image'],
+            'additional_columns': ['main_image'],
             'buttons': ['link', 'insert', 'show_all_iiif']}},
     'reference': {
         'label': class_groups['reference']['label'],

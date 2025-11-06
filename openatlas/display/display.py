@@ -109,8 +109,9 @@ class Display:
 
     def add_tabs(self) -> None:
         self.tabs = {'info': Tab('info')}
+
         for name, relation in self.entity.class_.relations.items():
-            if not relation['mode'] == 'tab':
+            if not relation.mode == 'tab':
                 continue
             entity_for_links = self.entity
             if name in [
@@ -120,17 +121,17 @@ class Display:
                 entity_for_links = self.entity.location
             items = []
             for item in entity_for_links.get_links(
-                    relation['property'],
-                    relation['classes'],
-                    relation['inverse']):
+                    relation.property,
+                    relation.classes,
+                    relation.inverse):
                 if item.domain.class_.name == 'object_location':
                     item.domain = item.domain.get_linked_entity_safe(
                         'P53',
                         inverse=True,
                         types=True)
                 items.append(item)
-                if relation['property'] == 'P67' \
-                        and relation['classes'] == ['file'] \
+                if relation.property == 'P67' \
+                        and relation.classes == ['file'] \
                         and not self.entity.image_id \
                         and item.domain.get_file_ext() in \
                         g.display_file_ext:
@@ -138,7 +139,7 @@ class Display:
                         self.entity.image_id or item.domain.id
             buttons = [link_] if (link_ := manual(f'entity/{name}')) else []
             if is_authorized('contributor'):
-                for button_name in relation['tab']['buttons']:
+                for button_name in relation.tab['buttons']:
                     match button_name:
                         case 'link':
                             buttons.append(
@@ -146,12 +147,12 @@ class Display:
                                     _('link'),
                                     url_for(
                                         'link_insert_detail'
-                                        if relation['additional_fields']
+                                        if relation.additional_fields
                                         else 'link_insert',
                                         origin_id=self.entity.id,
                                         relation_name=name)))
                         case 'insert':
-                            for class_ in relation['classes']:
+                            for class_ in relation.classes:
                                 buttons.append(
                                     button(
                                         g.classes[class_].label,
@@ -185,9 +186,8 @@ class Display:
                                 button(
                                     _('view all IIIF images'),
                                     url_for('view_iiif', id_=self.entity.id)))
-            columns = relation['tab']['columns']
-            if self.entity.category == 'value' \
-                    and relation['name'] == 'entities':
+            columns = relation.tab['columns']
+            if self.entity.category == 'value' and relation.name == 'entities':
                 columns = ['name', 'value', 'class', 'description']
             if self.entity.root and g.types[self.entity.root[0]].name \
                     in app.config['PROPERTY_TYPES']:
@@ -197,16 +197,16 @@ class Display:
                     items.append(Link.get_by_id(row[0]))
             self.tabs[name] = Tab(
                 name,
-                relation['label'],
+                relation.label,
                 table=entity_table(
                     items,
                     self.entity,
                     columns,
-                    relation['tab']['additional_columns'],
+                    relation.tab['additional_columns'] if relation else [],
                     relation),
                 buttons=buttons,
                 entity=self.entity,
-                tooltip=relation['tab']['tooltip'])
+                tooltip=relation.tab['tooltip'])
 
         for name in self.entity.class_.display['additional_tabs']:
             if name == 'note':
@@ -362,12 +362,12 @@ class Display:
                         value = link(value, value, external=True)
                     self.data[attribute['label']] = str(value)
         for name, relation in self.entity.class_.relations.items():
-            if relation['mode'] in ['direct', 'display']:
-                self.data[relation['label']] = []
+            if relation.mode in ['direct', 'display']:
+                self.data[relation.label] = []
                 for e in self.entity.get_linked_entities(
-                        relation['property'],
-                        relation['classes'],
-                        relation['inverse']):
+                        relation.property,
+                        relation.classes,
+                        relation.inverse):
                     if e.class_.name == 'object_location':
                         e = e.get_linked_entity_safe('P53', True)
                         self.linked_places.append(e)
@@ -378,7 +378,7 @@ class Display:
                         self.data['end'] = \
                             format_entity_date(self.entity.dates, 'end', e)
                     else:
-                        self.data[relation['label']].append(link(e))
+                        self.data[relation.label].append(link(e))
         for name, item in \
                 self.entity.class_.display['additional_information'].items():
             match name:
