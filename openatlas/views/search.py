@@ -28,8 +28,8 @@ class SearchForm(FlaskForm):
         _('classes'),
         [InputRequired()],
         choices=(),
-        option_widget=widgets.CheckboxInput(),  # type: ignore
-        widget=widgets.ListWidget(prefix_label=False))  # type: ignore
+        option_widget=widgets.CheckboxInput(),
+        widget=widgets.ListWidget(prefix_label=False))
     search = SubmitField(_('search'))
     validator_day = [Optional(), NumberRange(min=1, max=31)]
     validator_month = [Optional(), NumberRange(min=1, max=12)]
@@ -69,7 +69,7 @@ class SearchForm(FlaskForm):
             self.end_day.data,
             to_date=True)
         if from_date and to_date and from_date > to_date:
-            self.begin_year.errors.append(  # type: ignore
+            self.begin_year.errors.append(
                 _('Begin dates cannot start after end dates.'))
             valid = False
         return valid

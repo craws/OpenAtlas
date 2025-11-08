@@ -73,13 +73,14 @@ def get_entity_form(
                         value['label'],
                         validators=get_validators(value)))
             case 'reference_system_classes':
-                if choices := get_reference_system_class_choices(entity):
+                if choices := reference_system_class_choices(entity):
+                    # noinspection PyTypeChecker
                     setattr(
                         Form,
                         'reference_system_classes',
                         SelectMultipleField(
                             _('classes'),
-                            choices=choices,  # type: ignore
+                            choices=choices,
                             option_widget=widgets.CheckboxInput(),
                             widget=widgets.ListWidget(prefix_label=False)))
     add_buttons(
@@ -95,7 +96,7 @@ def get_entity_form(
     return form
 
 
-def get_reference_system_class_choices(entity: Entity) -> list[tuple]:
+def reference_system_class_choices(entity: Entity) -> list[tuple[str, str]]:
     choices = []
     for class_ in g.classes.values():
         if 'reference_system' in class_.extra \
@@ -170,7 +171,7 @@ def process_form_data(
     return entity
 
 
-def process_reference_systems(entity: Entity, form: Any):
+def process_reference_systems(entity: Entity, form: Any) -> None:
     entity.delete_links('P67', ['reference_system'], inverse=True)
     for system in g.reference_systems.values():
         if entity.class_.name not in system.classes:

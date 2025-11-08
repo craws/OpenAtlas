@@ -27,7 +27,7 @@ def filter_entities(
         entity: Entity,
         items: list[Entity],
         relation: Relation,
-        is_link_form=False) -> list[Entity]:
+        is_link_form: bool = False) -> list[Entity]:
     filter_ids = [entity.id]
     if relation.name in ['subs', 'super']:
         filter_ids += [
@@ -93,10 +93,7 @@ def link_form(origin: Entity, relation: Relation) -> Any:
     class Form(FlaskForm):
         pass
 
-    entities = [entity for entity in Entity.get_by_class(
-        relation.classes,
-        types=True,
-        aliases=True)]
+    entities = Entity.get_by_class(relation.classes, types=True, aliases=True)
     table = entity_table(
         filter_entities(origin, entities, relation, is_link_form=True),
         forms={'checkbox': True})
@@ -184,12 +181,13 @@ def cidoc_form() -> Any:
 def move_form(type_: Entity) -> Any:
     class Form(FlaskForm):
         checkbox_values = HiddenField()
+        # noinspection PyTypeChecker
         selection = SelectMultipleField(
             '',
             [InputRequired()],
             coerce=int,
-            option_widget=widgets.CheckboxInput(),  # type: ignore
-            widget=widgets.ListWidget(prefix_label=False))  # type: ignore
+            option_widget=widgets.CheckboxInput(),
+            widget=widgets.ListWidget(prefix_label=False))
         save = SubmitField(uc_first(_('move entities')))
 
     root = g.types[type_.root[0]]

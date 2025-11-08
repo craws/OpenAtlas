@@ -4,7 +4,7 @@ from flask_babel import lazy_gettext as _
 
 from config.model.classes import (
     actor, artifact, event, file, place, reference, reference_system, source,
-    type)
+    type_)
 
 # Todo: Needed for translation, to be removed after implemented
 _('involvement')
@@ -13,7 +13,7 @@ _('page')
 model: dict[str, Any] = {
     'acquisition': event.acquisition,
     'activity': event.activity,
-    'administrative_unit': type.administrative_unit,
+    'administrative_unit': type_.administrative_unit,
     'appellation': {'attributes': {}},
     'artifact': artifact.artifact,
     'bibliography': reference.bibliography,
@@ -33,5 +33,5 @@ model: dict[str, Any] = {
     'source': source.source,
     'source_translation': source.source_translation,
     'stratigraphic_unit': place.stratigraphic_unit,
-    'type': type.type_,
+    'type': type_.type_,
     'type_tools': {'attributes': {}}}

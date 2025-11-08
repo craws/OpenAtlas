@@ -171,5 +171,5 @@ def get_arche_reference_system() -> Entity:
             'website_url': 'https://arche.acdh.oeaw.ac.at/',
             'resolver_url': f"{app.config['ARCHE']['url']}/browser/detail/"})
     if 'artifact' not in system.classes:
-        db.add_classes(system.id, ['artifact'])
+        db.add_classes_to_hierarchy(system.id, ['artifact'])
     return system

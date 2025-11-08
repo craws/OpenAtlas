@@ -183,7 +183,8 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
     links_inverse = Entity.get_links_of_entities(ids, inverse=True)
     if entity.class_.group.get('name') == 'event':
         event_ids = [
-            l.range.id for l in links if l.domain.class_.group.get('name') == 'event']
+            l.range.id for l in links
+            if l.domain.class_.group.get('name') == 'event']
     else:
         event_ids = [
             l.domain.id for l in links_inverse

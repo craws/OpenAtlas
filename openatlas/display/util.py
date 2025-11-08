@@ -647,10 +647,9 @@ def hierarchy_crumbs(entity: Entity) -> list[str]:
         if relation.name == 'super' or (
                 entity.class_.name == 'source_translation'
                 and relation.name == 'source'):
-            crumbs += [
-                e for e in entity.get_linked_entities_recursive(
-                    relation.property,
-                    relation.inverse)]
+            crumbs += entity.get_linked_entities_recursive(
+                relation.property,
+                relation.inverse)
     return crumbs
 
 

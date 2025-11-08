@@ -281,7 +281,8 @@ def get_coordinates_from_wkt(coordinates: str) -> dict[str, Any]:
     return {k: json.dumps(v) for k, v in sorted_by_shape.items()}
 
 
-def convert_wkt_to_geojson(wkt_: Polygon | Point | LineString):
+def convert_wkt_to_geojson(
+        wkt_: Polygon | Point | LineString) -> dict[str, Any]:
     shape_type = ''
     match str(wkt_.type).lower():  # wkt_.geom_type for 2.1.0
         case 'point':

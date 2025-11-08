@@ -36,8 +36,8 @@ class OpenatlasClass:
         self.label = model_['label']
         self.attributes = model_['attributes']
         self.relations = {}
-        for name, relation in model_['relations'].items():
-            self.relations[name] = Relation(name, relation)
+        for name_, relation in model_['relations'].items():
+            self.relations[name_] = Relation(name_, relation)
         self.display = model_['display']
         self.extra = model_['extra']
 
@@ -50,7 +50,6 @@ class Relation:
             else [data['classes']]
         self.inverse = data.get('inverse', False)
         self.multiple = data.get('multiple', False)
-        self.selected = [] if self.multiple else None
         self.required = data.get('required', False)
         self.label = data.get('label', _(self.name.replace('_', ' ')))
         self.mode = data.get('mode', 'tab')

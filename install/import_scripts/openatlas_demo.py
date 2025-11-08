@@ -16,7 +16,6 @@ from flask import g
 from psycopg2 import extras
 
 from openatlas import app
-from openatlas.database.imports import import_data
 from openatlas.models.entity import Entity
 
 DATABASE_NAME = 'openatlas_demo'  # The database to fetch data from
@@ -88,20 +87,20 @@ def insert_hierarchy(item: dict[str, Any]) -> None:
     cursor.execute(
         'SELECT description FROM model.entity WHERE id = %(id)s;',
         {'id': item['id']})
-    description = cursor.fetchone()['description']
-    entity_ = Entity.insert('type', item['name'], description)
-    id_map[item['id']] = entity_.id
-    cursor.execute(
-        """
-        SELECT openatlas_class_name
-        FROM web.hierarchy_openatlas_class
-        WHERE hierarchy_id = %(id)s;
-        """, {'id': item['id']})
-    Entity.insert_hierarchy(
-        entity_,
-        item['category'],
-        [x[0] for x in list(cursor)],
-        item['multiple'])
+    # description = cursor.fetchone()['description']
+    # entity_ = insert('type', item['name'], description)
+    # id_map[item['id']] = entity_.id
+    # cursor.execute(
+    #    """
+    #    SELECT openatlas_class_name
+    #    FROM web.hierarchy_openatlas_class
+    #    WHERE hierarchy_id = %(id)s;
+    #    """, {'id': item['id']})
+    # Entity.insert_hierarchy(
+    #    entity_,
+    #    item['category'],
+    #    [x[0] for x in list(cursor)],
+    #   item['multiple'])
 
 
 cleanup()
@@ -127,18 +126,18 @@ cursor.execute(
     """)
 with app.test_request_context():
     app.preprocess_request()
-    for row in list(cursor):
-        if row['openatlas_class_name'] not in [
-                'administrative_unit',
-                'type',
-                'type_tools']:
-            entity = Entity.insert(
-                row['openatlas_class_name'],
-                row['name'],
-                row['description'])
-            import_data(
-                PROJECT_ID,
-                entity.id,
-                IMPORT_USER_ID,
-                origin_id=row['id'])
+    # for row in list(cursor):
+    #     if row['openatlas_class_name'] not in [
+    #             'administrative_unit',
+    #             'type',
+    #             'type_tools']:
+    #         entity = insert(
+    #             row['openatlas_class_name'],
+    #             row['name'],
+    #             row['description'])
+    #         import_data(
+    #             PROJECT_ID,
+    #             entity.id,
+    #             IMPORT_USER_ID,
+    #             origin_id=row['id'])
 print(f'Execution time: {int(time.time() - start)} seconds')

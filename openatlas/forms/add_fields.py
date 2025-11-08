@@ -37,7 +37,7 @@ def add_name_fields(form: Any, entity: Entity) -> None:
         setattr(form, 'alias', FieldList(RemovableListField()))
 
 
-def get_validators(item: dict[str, Any]):
+def get_validators(item: dict[str, Any]) -> list[Any]:
     validators = []
     if item['required']:
         validators.append(InputRequired())
@@ -87,7 +87,7 @@ def add_description(
                 render_kw={'rows': 8},
                 validators=get_validators(attribute_description)))
         return
-    source = entity
+    source: Entity | None = entity
     if entity.class_.name == 'source_translation':
         source = origin or entity.get_linked_entity('P73', inverse=True)
     setattr(
@@ -106,13 +106,13 @@ def add_class_types(form: Any, class_: OpenatlasClass) -> None:
     if not class_.hierarchies:
         return
     types = OrderedDict({id_: g.types[id_] for id_ in class_.hierarchies})
-    if class_.standard_type_id in types:
+    if class_.standard_type_id:
         types.move_to_end(class_.standard_type_id, last=False)
     for type_ in types.values():
         add_type(form, type_)
 
 
-def add_type(form: Any, type_: Entity):
+def add_type(form: Any, type_: Entity) -> None:
     add_form = None
     if is_authorized('editor'):
         class AddDynamicType(FlaskForm):
@@ -170,13 +170,13 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
                     form.multiple = BooleanField(
                         _('multiple'),
                         description=_('tooltip hierarchy multiple'))
+                # noinspection PyTypeChecker
                 form.classes = SelectMultipleField(
                     _('classes'),
                     description=_('tooltip hierarchy forms'),
                     choices=Entity.get_class_choices(entity),
-                    option_widget=widgets.CheckboxInput(),  # type: ignore
-                    widget=widgets.ListWidget(  # type: ignore
-                        prefix_label=False))
+                    option_widget=widgets.CheckboxInput(),
+                    widget=widgets.ListWidget(prefix_label=False))
         elif relation.multiple:
             selection: Any = []
             if entity.id:

@@ -237,7 +237,7 @@ def remove_profile_image(id_: int) -> None:
         {'id': id_})
 
 
-def delete(id_) -> None:  # Triggers psql delete_entity_related
+def delete(id_: int) -> None:  # Triggers psql delete_entity_related
     g.cursor.execute(
         'DELETE FROM model.entity WHERE id = %(id)s;',
         {'id': id_})

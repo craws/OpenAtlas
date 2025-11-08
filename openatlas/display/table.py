@@ -244,7 +244,7 @@ def entity_table(
                             'link_update',
                             id_=item.id,
                             origin_id=origin.id,
-                            relation=relation.name)),
+                            relation=relation.name))
                 case 'resolver_url' | 'website_url':
                     url = getattr(e, name)
                     html = link(url, url, external=True) if url else ''
