@@ -43,9 +43,7 @@ class Overlay:
                 f"{data['bottom_left_easting']}]]"})
 
     @staticmethod
-    def get_by_object(object_: Entity | None) -> dict[int, Overlay]:
-        if not object_:
-            return {}
+    def get_by_object(object_: Entity) -> dict[int, Overlay]:
         places = [object_] + list(
             object_.get_linked_entities_recursive('P46', True))
         ids = []

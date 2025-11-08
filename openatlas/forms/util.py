@@ -41,8 +41,6 @@ def get_form_settings(form: Any, profile: bool = False) -> dict[str, str]:
 def convert(value: str) -> list[int]:
     if not value:
         return []
-    if isinstance(value, list):
-        return value
     ids = ast.literal_eval(value)
     return ids if isinstance(ids, list) else [int(ids)]
 
