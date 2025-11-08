@@ -65,8 +65,8 @@ source = {
     'display': {
         'buttons': ['copy'],
         'form_buttons': ['insert_and_continue'],
-        'additional_tabs': {
-            'note': {}}}}
+        'additional_tabs': {'note': {}},
+        'network_color': '#FFA500'}}
 
 source_translation = {
     'label': _('source translation'),

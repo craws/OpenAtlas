@@ -70,8 +70,8 @@ place: dict[str, Any] = {
     'display': {
         'buttons': ['copy', 'network', ],
         'form_buttons': ['insert_and_continue', 'insert_continue_sub'],
-        'additional_tabs': {
-            'note': {}}}}
+        'additional_tabs': {'note': {}},
+        'network_color': '#FF0000'}}
 place['relations']['file']['tab']['additional_columns'] += ['overlay']
 
 feature: dict[str, Any] = {
@@ -104,8 +104,7 @@ feature: dict[str, Any] = {
     'display': {
         'buttons': ['copy', 'network'],
         'form_buttons': ['insert_and_continue', 'insert_continue_sub'],
-        'additional_tabs': {
-            'note': {}}}}
+        'additional_tabs': {'note': {}}}}
 
 stratigraphic_unit: dict[str, Any] = {
     'label': _('stratigraphic unit'),

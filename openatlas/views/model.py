@@ -70,13 +70,10 @@ def openatlas_class_index() -> str:
         'name',
         f"CIDOC {_('class')}",
         _('standard type'),
-        _('view'),
+        _('group'),
         _('write access'),
-        'alias',
         _('reference system'),
         'add type',
-        _('color'),
-        _('icon'),
         'count'],
         defs=[
             {'orderDataType': 'cidoc-model', 'targets': [1]},
@@ -89,11 +86,10 @@ def openatlas_class_index() -> str:
             link(g.types[class_.standard_type_id])
             if class_.standard_type_id else '',
             uc_first(_((class_.group['name'].replace("_", " "))))
-            if class_.group['name'] else '',
+            if class_.group.get('name') else '',
             class_.write_access,
+            _('allowed') if 'reference_system' in class_.extra else '',
             _('allowed') if class_.new_types_allowed else '',
-            class_.network_color,
-            class_.icon,
             format_number(class_count[class_.name])
             if class_count[class_.name] else ''])
     return render_template(
@@ -262,13 +258,20 @@ class NetworkForm(FlaskForm):
 @required_group('readonly')
 def network(dimensions: Optional[int] = 0, id_: Optional[int] = None) -> str:
     entity = Entity.get_by_id(id_) if id_ else None
-    classes = [c for c in g.classes.values() if c.network_color]
-    for class_ in classes:
-        setattr(NetworkForm, class_.name, StringField(
-            default=class_.network_color,
-            render_kw={
-                'data-huebee': True,
-                'class': f'data-huebee {app.config["CSS"]["string_field"]}'}))
+    render_kw = {
+       'data-huebee': True,
+       'class': f'data-huebee {app.config["CSS"]["string_field"]}'}
+    classes = []
+    for class_ in g.classes.values():
+        color = class_.display.get('network_color')
+        if class_.name == 'object_location':
+            color = g.classes['place'].display.get('network_color')
+        if color:
+            classes.append(class_)
+            setattr(
+                NetworkForm,
+                class_.name,
+                StringField(default=color, render_kw=render_kw))
     setattr(NetworkForm, 'save', SubmitField(_('apply')))
     form = NetworkForm()
     form.classes.choices = [
@@ -276,12 +279,11 @@ def network(dimensions: Optional[int] = 0, id_: Optional[int] = None) -> str:
         for class_ in [x for x in classes if x.name != 'object_location']]
     colors = {}
     for class_ in classes:
-        color_code = getattr(form, class_.name).data
-        colors[class_.name] = class_.network_color
-        getattr(form, class_.name).data = class_.network_color
-        if re.match(r"^(#)?[A-Fa-f0-9]+$", color_code):
-            colors[class_.name] = color_code
-            getattr(form, class_.name).data = color_code
+        color_code = class_.display.get('network_color')
+        if re.match(r"^(#)?[A-Fa-f0-9]+$", getattr(form, class_.name).data):
+            color_code = getattr(form, class_.name).data
+        colors[class_.name] = color_code
+        getattr(form, class_.name).data = color_code
     if entity:
         json_data = Network.get_ego_network_json(
             colors,

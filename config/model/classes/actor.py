@@ -1,10 +1,11 @@
 import copy
+from typing import Any
 
 from flask_babel import lazy_gettext as _
 
 from config.model.class_groups import class_groups, standard_relations
 
-group = {
+group: dict[str, Any] = {
     'label': _('group'),
     'attributes': {
         'name': {
@@ -121,9 +122,10 @@ group = {
     'display': {
         'buttons': ['copy', 'network'],
         'form_buttons': ['insert_and_continue'],
-        'additional_tabs': {
-            'note': {}}}}
+        'additional_tabs': {'note': {}},
+        'network_color': '#34623C'}}
 
 person = copy.deepcopy(group)
 person['label'] = _('person')
+person['display']['network_color'] = '#34B522'
 del person['relations']['member']

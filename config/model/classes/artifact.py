@@ -70,11 +70,12 @@ artifact: dict[str, Any] = {
     'display': {
         'buttons': ['copy', 'network'],
         'form_buttons': ['insert_and_continue'],
-        'additional_tabs': {
-            'note': {}}}}
+        'additional_tabs': {'note': {}},
+        'network_color': '#EE82EE'}}
 
 human_remains = copy.deepcopy(artifact)
 human_remains['label'] = _('human remains')
+human_remains['display']['network_color'] = None
 human_remains['relations']['super']['classes'] = \
     ['human_remains'] + class_groups['place']['classes']
 human_remains['relations']['subs']['classes'] = 'human_remains'

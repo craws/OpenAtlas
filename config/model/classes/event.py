@@ -73,7 +73,8 @@ class_ = {
     'display': {
         'buttons': ['copy', 'network'],
         'form_buttons': ['insert_and_continue'],
-        'additional_tabs': {'note': {}}}}
+        'additional_tabs': {'note': {}},
+        'network_color': '#0000FF'}}
 activity = copy.deepcopy(class_)
 activity['label'] = _('activity')
 activity['display']['tooltip'] = \

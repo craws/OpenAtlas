@@ -24,8 +24,6 @@ def get_classes() -> list[dict[str, Any]]:
             c.standard_type_id,
             c.new_types_allowed,
             c.write_access_group_name,
-            c.layout_color,
-            c.layout_icon,
             hierarchies,
             system_ids
         FROM model.openatlas_class c,

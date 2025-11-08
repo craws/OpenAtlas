@@ -9,9 +9,8 @@ class ModelTests(TestBaseCase):
     def test_model(self) -> None:
         c = self.client
 
-        # Todo: continue tests - implement new OpenAtlas class data
-        # rv = c.get(url_for('openatlas_class_index'))
-        # assert b'Involvement' in rv.data
+        rv = c.get(url_for('openatlas_class_index'))
+        assert b'contributor' in rv.data
 
         rv = c.get(url_for('cidoc_class_index'))
         assert b'E1' in rv.data

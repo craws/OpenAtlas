@@ -19,20 +19,16 @@ class OpenatlasClass:
             reference_system_ids: list[int],
             new_types_allowed: bool,
             standard_type_id: int | None,
-            color: str | None,
             write_access: str | None,
-            icon: str | None,
             model_: dict[str, Any]) -> None:
         self.name = name
         self.cidoc_class = g.cidoc_classes[cidoc_class] \
             if cidoc_class else None
         self.hierarchies = hierarchies
         self.standard_type_id = standard_type_id
-        self.network_color = color
         self.write_access = write_access or 'contributor'
         self.reference_systems = reference_system_ids
         self.new_types_allowed = new_types_allowed
-        self.icon = icon
         self.group = {}
         for data in g.class_groups.values():
             if name in data['classes']:
@@ -89,15 +85,14 @@ def get_classes() -> dict[str, OpenatlasClass]:
                 if row['system_ids'] else [],
                 new_types_allowed=row['new_types_allowed'],
                 write_access=row['write_access_group_name'],
-                color=row['layout_color'],
-                hierarchies=row['hierarchies'],
-                icon=row['layout_icon'])
+                hierarchies=row['hierarchies'])
     return classes
 
 
 def get_model(class_name: str) -> dict[str, Any]:
     data: dict[str, Any] = model[class_name]
-    data['label'] = data.get('label', _(class_name))
+    label = data.get('label', _(class_name.replace('_', ' ')))
+    data['label'] = str(label)[0].upper() + str(label)[1:]
     for name, item in data['attributes'].items():
         item['label'] = item.get('label', _(name))
         item['required'] = item.get('required', False)

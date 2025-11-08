@@ -5,37 +5,43 @@ class_groups = {
         'name': 'actor',
         'label': _('actor'),
         'classes': ['person', 'group'],
-        'table_columns': ['name', 'class', 'begin', 'end', 'description']},
+        'table_columns': ['name', 'class', 'begin', 'end', 'description'],
+        'icon': 'mdi-account'},
     'artifact': {
         'name': 'artifact',
         'label': _('artifact'),
         'classes': ['artifact', 'human_remains'],
         'table_columns': [
-            'name', 'class', 'type', 'begin', 'end', 'description']},
+            'name', 'class', 'type', 'begin', 'end', 'description'],
+        'icon': 'mdi-shapes'},
     'event': {
         'name': 'event',
         'label': _('event'),
         'classes': [
             'activity', 'acquisition', 'modification', 'move', 'production'],
         'table_columns': [
-            'name', 'class', 'type', 'begin', 'end', 'description']},
+            'name', 'class', 'type', 'begin', 'end', 'description'],
+        'icon': 'mdi-calendar'},
     'file': {
         'name': 'file',
         'label': _('file'),
         'classes': ['file'],
         'table_columns': [
             'created', 'icon', 'name', 'license', 'public', 'creator',
-            'license_holder', 'size', 'extension', 'description']},
+            'license_holder', 'size', 'extension', 'description'],
+        'icon': 'mdi-text-box'},
     'place': {
         'name': 'place',
         'label': _('place'),
         'classes': ['place', 'feature', 'stratigraphic_unit'],
-        'table_columns': ['name', 'type', 'begin', 'end', 'description']},
+        'table_columns': ['name', 'type', 'begin', 'end', 'description'],
+        'icon': 'mdi-map-marker'},
     'reference': {
         'name': 'reference',
         'label': _('reference'),
         'classes': ['bibliography', 'edition', 'external_reference'],
-        'table_columns': ['name', 'class', 'type', 'description']},
+        'table_columns': ['name', 'class', 'type', 'description'],
+        'icon': 'mdi-text-box'},
     'reference_system': {
         'name': 'reference_system',
         'label': _('reference system'),
@@ -47,7 +53,8 @@ class_groups = {
         'name': 'source',
         'label': _('source'),
         'classes': ['source', 'source_translation'],
-        'table_columns': ['name', 'class', 'type', 'content']},
+        'table_columns': ['name', 'class', 'type', 'content'],
+        'icon': 'mdi-text-box'},
     'type': {
         'name': 'type',
         'label': _('type'),
