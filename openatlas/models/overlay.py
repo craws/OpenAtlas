@@ -12,7 +12,7 @@ if TYPE_CHECKING:  # pragma: no cover
 class Overlay:
     def __init__(self, row: dict[str, Any]) -> None:
         self.id = row['id']
-        self.name = row['name'] if 'name' in row else ''
+        self.name = row.get('name')
         self.image_id = row['image_id']
         self.bounding_box = row['bounding_box']
         path = get_file_path(row['image_id'])
