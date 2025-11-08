@@ -75,17 +75,16 @@ def get_classes() -> dict[str, OpenatlasClass]:
     g.class_groups = class_groups
     classes = {}
     for row in db.get_classes():
-        if row['name'] in model:  # Todo: remove condition after new classes
-            classes[row['name']] = OpenatlasClass(
-                name=row['name'],
-                model_=get_model(row['name']),
-                cidoc_class=row['cidoc_class_code'],
-                standard_type_id=row['standard_type_id'],
-                reference_system_ids=row['system_ids']
-                if row['system_ids'] else [],
-                new_types_allowed=row['new_types_allowed'],
-                write_access=row['write_access_group_name'],
-                hierarchies=row['hierarchies'])
+        classes[row['name']] = OpenatlasClass(
+            name=row['name'],
+            model_=get_model(row['name']),
+            cidoc_class=row['cidoc_class_code'],
+            standard_type_id=row['standard_type_id'],
+            reference_system_ids=row['system_ids']
+            if row['system_ids'] else [],
+            new_types_allowed=row['new_types_allowed'],
+            write_access=row['write_access_group_name'],
+            hierarchies=row['hierarchies'])
     return classes
 
 

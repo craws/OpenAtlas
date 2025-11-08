@@ -1,7 +1,7 @@
 BEGIN;
 
 -- Raise database version
--- UPDATE web.settings SET value = '9.0.0' WHERE name = 'database_version';
+UPDATE web.settings SET value = '9.0.0' WHERE name = 'database_version';
 
 -- OpenAtlas 9.0.0 (#2464)
 
@@ -27,5 +27,7 @@ INSERT INTO web.hierarchy_openatlas_class (hierarchy_id, openatlas_class_name) V
 -- Remove obsolete OpenAtlas class fields
 ALTER TABLE model.openatlas_class DROP COLUMN IF EXISTS alias_allowed;
 ALTER TABLE model.openatlas_class DROP COLUMN IF EXISTS reference_system_allowed;
+ALTER TABLE model.openatlas_class DROP COLUMN IF EXISTS layout_color;
+ALTER TABLE model.openatlas_class DROP COLUMN IF EXISTS layout_icon;
 
 END;

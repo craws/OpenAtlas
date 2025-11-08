@@ -1,9 +1,9 @@
 -- Default types and OpenAtlas classes
 
-INSERT INTO model.openatlas_class (name, cidoc_class_code, alias_allowed, reference_system_allowed, new_types_allowed, write_access_group_name, layout_color, layout_icon, standard_type_id) VALUES
-  ('administrative_unit',  'E53', false, false, false, 'contributor', NULL,      'mdi-map-marker', NULL),
-  ('type',                 'E55', false, true,  false, 'editor',      NULL,      NULL,             NULL),
-  ('type_tools',    'E55', false, false, false, 'admin',       NULL,      NULL,             NULL);
+INSERT INTO model.openatlas_class (name, cidoc_class_code, new_types_allowed, write_access_group_name, standard_type_id) VALUES
+  ('administrative_unit',  'E53', false, 'editor',  NULL),
+  ('type',                 'E55', false, 'editor',  NULL),
+  ('type_tools',           'E55', false, 'admin',   NULL);
 
 INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name, description) VALUES
   ('E55', 'type', 'Bibliography', 'Categories for bibliographical entries as used for example in BibTeX, e.g. Book, Inbook, Article etc.'),
@@ -362,28 +362,28 @@ INSERT INTO web.hierarchy (id, name, category, multiple, directional) VALUES
   ((SELECT id FROM model.entity WHERE name='Stratigraphic unit'), 'Stratigraphic unit', 'standard', False, False);
 
 
-INSERT INTO model.openatlas_class (name, cidoc_class_code, alias_allowed, reference_system_allowed, new_types_allowed, write_access_group_name, standard_type_id) VALUES
-  ('acquisition',          'E8',  false, true,  true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Event' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-  ('activity',             'E7',  false, true,  true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Event' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-  ('appellation',          'E41', false, false, false, 'contributor', NULL),
-  ('artifact',             'E22', false, true,  true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Artifact' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-  ('bibliography',         'E31', false, false, true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Bibliography' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-  ('edition',              'E31', false, false, true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Edition' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-  ('external_reference',   'E31', false, false, true,  'contributor', (SELECT id FROM model.entity WHERE name = 'External reference' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-  ('feature',              'E18', false, true,  true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Feature' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-  ('file',                 'E31', false, false, true,  'contributor', (SELECT id FROM model.entity WHERE name = 'License' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-  ('group',                'E74', true,  true,  true,  'contributor', NULL),
-  ('human_remains',        'E20', false, true,  true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Human remains' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-  ('modification',         'E11', false, true,  true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Event' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-  ('move',                  'E9', false, true,  true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Event' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-  ('object_location',      'E53', false, false, false, 'contributor', NULL),
-  ('person',               'E21', true,  true,  true,  'contributor', NULL),
-  ('place',                'E18', true,  true,  true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Place' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-  ('production',           'E12', false, true,  true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Event' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-  ('reference_system',     'E32', false, false, false, 'manager',     NULL),
-  ('source',               'E33', false, true,  true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Source' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-  ('source_translation',   'E33', false, false, false, 'contributor', NULL),
-  ('stratigraphic_unit',   'E18', false, true,  true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Stratigraphic unit' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1));
+INSERT INTO model.openatlas_class (name, cidoc_class_code, new_types_allowed, write_access_group_name, standard_type_id) VALUES
+  ('acquisition',          'E8',  true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Event' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+  ('activity',             'E7',  true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Event' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+  ('appellation',          'E41', false, 'contributor', NULL),
+  ('artifact',             'E22', true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Artifact' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+  ('bibliography',         'E31', true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Bibliography' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+  ('edition',              'E31', true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Edition' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+  ('external_reference',   'E31', true,  'contributor', (SELECT id FROM model.entity WHERE name = 'External reference' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+  ('feature',              'E18', true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Feature' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+  ('file',                 'E31', true,  'contributor', (SELECT id FROM model.entity WHERE name = 'License' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+  ('group',                'E74', true,  'contributor', NULL),
+  ('human_remains',        'E20', true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Human remains' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+  ('modification',         'E11', true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Event' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+  ('move',                  'E9', true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Event' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+  ('object_location',      'E53', false, 'contributor', NULL),
+  ('person',               'E21', true,  'contributor', NULL),
+  ('place',                'E18', true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Place' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+  ('production',           'E12', true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Event' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+  ('reference_system',     'E32', false, 'manager',     NULL),
+  ('source',               'E33', true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Source' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+  ('source_translation',   'E33', false, 'contributor', NULL),
+  ('stratigraphic_unit',   'E18', true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Stratigraphic unit' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1));
 
 INSERT INTO web.hierarchy_openatlas_class (hierarchy_id, openatlas_class_name) VALUES
   ((SELECT id FROM web.hierarchy WHERE name='Administrative unit'), 'place'),
