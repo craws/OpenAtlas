@@ -8,6 +8,8 @@ from config.model.classes import (
 
 # Todo: Needed for translation, to be removed after implemented
 _('involvement')
+_('actor function')
+_('actor relation')
 _('page')
 
 model: dict[str, Any] = {

@@ -104,9 +104,7 @@ def reference_system_class_choices(entity: Entity) -> list[tuple[str, str]]:
                 and not (
                     entity.name == 'GeoNames'
                     and class_.name not in g.class_groups['place']['classes']):
-            choices.append((
-                class_.name,
-                uc_first(g.classes[class_.name].label)))
+            choices.append((class_.name, g.classes[class_.name].label))
     return choices
 
 

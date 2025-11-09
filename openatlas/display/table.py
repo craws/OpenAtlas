@@ -145,7 +145,7 @@ def entity_table(
                     "checked" if e.id in forms.get('selection_ids', [])
                     else ""}>"""
                 case 'class':
-                    html = uc_first(e.class_.label)
+                    html = e.class_.label
                 case 'created':
                     html = format_date(e.created)
                 case 'creator':

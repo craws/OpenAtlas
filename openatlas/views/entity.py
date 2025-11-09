@@ -112,7 +112,7 @@ def crumbs_for_insert(
         origin: Entity | None,
         structure: dict[str, Any] | None) -> list[Any]:
     crumbs = hierarchy_crumbs(origin or entity) + \
-        [origin, f'+ {uc_first(entity.class_.label)}']
+        [origin, f'+ {entity.class_.label}']
     if entity.class_.group['name'] == 'artifact' and origin and structure:
         if count := len([
             i for i in structure['siblings']

@@ -7,15 +7,15 @@ from werkzeug.wrappers import Response
 from wtforms import SelectField, TextAreaField
 from wtforms.validators import InputRequired
 
-from openatlas import app
+from openatlas import app, get_classes
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
     bookmark_toggle, button, link, required_group, send_mail)
 from openatlas.display.util2 import manual, uc_first
-from openatlas.models.dates import format_date
 from openatlas.forms.field import SubmitField
 from openatlas.models.content import get_translation
+from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
 
@@ -78,7 +78,7 @@ def overview() -> str:
         entity = Entity.get_by_id(entity_id)
         tabs['bookmarks'].table.rows.append([
             link(entity),
-            uc_first(entity.class_.label),
+            entity.class_.label,
             entity.dates.first,
             entity.dates.last,
             bookmark_toggle(entity.id, True)])
@@ -88,7 +88,7 @@ def overview() -> str:
             format_date(note['created']),
             _('public') if note['public'] else _('private'),
             link(entity),
-            uc_first(entity.class_.label),
+            entity.class_.label,
             note['text'],
             link(_("view"), url_for("note_view", id_=note["id"]))])
     if tabs['notes'].table.rows:
@@ -103,14 +103,13 @@ def overview() -> str:
         if name == 'administrative_unit':
             url = f"{url_for('index', group='type')}#menu-tab-place"
         tables['overview'].rows.append([
-            link(g.classes[name].label, url) if url
-            else uc_first(g.classes[name].label),
+            link(g.classes[name].label, url) if url else g.classes[name].label,
             format_number(count)])
     for entity in Entity.get_latest(15):
         tables['latest'].rows.append([
             format_date(entity.created),
             link(entity),
-            uc_first(entity.class_.label),
+            entity.class_.label,
             entity.dates.first,
             entity.dates.last,
             link(g.logger.get_log_info(entity.id)['creator'])])

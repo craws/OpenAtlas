@@ -122,8 +122,8 @@ def setup_api() -> None:
                 and not g.settings['api_public'] \
                 and ip not in app.config['ALLOWED_IPS'] \
                 and not verify_jwt_in_request(
-            optional=True,
-            locations='headers'):
+                    optional=True,
+                    locations='headers'):
             raise AccessDeniedError
 
 

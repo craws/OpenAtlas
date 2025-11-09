@@ -392,7 +392,7 @@ def settings(category: str) -> str | Response:
 def check_similar() -> str:
     form = SimilarForm()
     form.classes.choices = [
-        (class_.name, uc_first(class_.label))
+        (class_.name, class_.label)
         for name, class_ in g.classes.items() if class_.group]
     table = None
     if form.validate_on_submit():
@@ -448,7 +448,7 @@ def check_dates() -> str:
     for entity in invalid_dates():
         tabs['dates'].table.rows.append([
             link(entity),
-            uc_first(entity.class_.label),
+            entity.class_.label,
             link(entity.standard_type),
             format_date(entity.created),
             format_date(entity.modified),
@@ -464,7 +464,7 @@ def check_dates() -> str:
         data = [
             link(actor),
             link(event),
-            uc_first(event.class_.label),
+            event.class_.label,
             link_.type.name if link_.type else '',
             link_.description]
         tabs['involvement_dates'].table.rows.append(data)

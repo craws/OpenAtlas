@@ -101,7 +101,7 @@ def hierarchy_update(id_: int) -> str | Response:
     for name in hierarchy.classes:
         count = hierarchy.get_count_by_class(name)
         table.rows.append([
-            uc_first(g.classes[name].label),
+            g.classes[name].label,
             format_number(count) if count else link(
                 _('remove'),
                 url_for('remove_class', id_=hierarchy.id, name=name))])

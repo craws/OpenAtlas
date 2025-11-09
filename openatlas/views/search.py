@@ -83,8 +83,7 @@ def search_index() -> str:
         if count and g.classes[name].group]
     form = SearchForm()
     getattr(form, 'search').label.text = uc_first(_('search'))
-    form.classes.choices = [
-        (name, uc_first(g.classes[name].label)) for name in classes]
+    form.classes.choices = [(name, g.classes[name].label) for name in classes]
     form.classes.default = classes
     form.classes.process(request.form)
     table = Table()

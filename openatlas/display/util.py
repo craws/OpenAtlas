@@ -452,8 +452,7 @@ def link(
         html = f'<a href="{url}"{class_}{js}{ext}>{object_}</a>'
     elif isinstance(object_, Entity) and index:
         html = link(
-            _(object_.class_.group['name'].replace('_', ' ')) + (
-                ' (' + uc_first(_(object_.class_.name)) + ')'
+            object_.class_.group['label'] + (f' ({object_.class_.label})'
                 if object_.class_.group['name'] == 'event' else ''),
             url_for('index', group=object_.class_.group['name']))
     elif isinstance(object_, Entity):

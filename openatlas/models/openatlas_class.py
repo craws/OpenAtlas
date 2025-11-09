@@ -33,7 +33,8 @@ class OpenatlasClass:
         for data in g.class_groups.values():
             if name in data['classes']:
                 self.group = data
-        self.label = model_['label']
+        label = model_.get('label', _(name.replace('_', ' ')))
+        self.label = str(label)[0].upper() + str(label)[1:]
         self.attributes = model_['attributes']
         self.relations = {}
         for name_, relation in model_['relations'].items():
@@ -89,8 +90,6 @@ def get_classes() -> dict[str, OpenatlasClass]:
 
 def get_model(class_name: str) -> dict[str, Any]:
     data: dict[str, Any] = model[class_name]
-    label = data.get('label', _(class_name.replace('_', ' ')))
-    data['label'] = str(label)[0].upper() + str(label)[1:]
     for name, item in data['attributes'].items():
         item['label'] = item.get('label', _(name))
         item['required'] = item.get('required', False)
