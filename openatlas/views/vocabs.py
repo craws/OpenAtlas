@@ -127,12 +127,14 @@ def vocabulary_import_view(category: str, id_: str) -> str | Response:
     details = fetch_vocabulary_details(id_)
 
     class ImportVocabsHierarchyForm(FlaskForm):
+        # noinspection PyTypeChecker
         concepts = SelectMultipleField(
             _('top concepts') if category == 'hierarchy' else _('groups'),
             choices=fetch_top_concept_details(id_) if category == 'hierarchy'
             else fetch_top_group_details(id_),
             option_widget=widgets.CheckboxInput(),
             widget=widgets.ListWidget(prefix_label=False))
+        # noinspection PyTypeChecker
         classes = SelectMultipleField(
             _('classes'),
             description=_('tooltip hierarchy forms'),

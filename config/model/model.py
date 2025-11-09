@@ -6,7 +6,7 @@ from config.model.classes import (
     actor, artifact, event, file, place, reference, reference_system, source,
     type_)
 
-# Todo: Needed for translation, to be removed after implemented
+# Needed for translations
 _('involvement')
 _('actor function')
 _('actor relation')

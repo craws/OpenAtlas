@@ -24,6 +24,7 @@ class SearchForm(FlaskForm):
         render_kw={'autofocus': True})
     own = BooleanField(_('Only entities edited by me'))
     desc = BooleanField(_('Also search in description'))
+    # noinspection PyTypeChecker
     classes = SelectMultipleField(
         _('classes'),
         [InputRequired()],

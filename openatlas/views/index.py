@@ -7,7 +7,7 @@ from werkzeug.wrappers import Response
 from wtforms import SelectField, TextAreaField
 from wtforms.validators import InputRequired
 
-from openatlas import app, get_classes
+from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (

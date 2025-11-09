@@ -12,7 +12,6 @@ from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.image_processing import resize_image
 from openatlas.display.util import check_iiif_activation, convert_image_to_iiif
-from openatlas.display.util2 import uc_first
 from openatlas.forms.add_fields import (
     add_buttons, add_class_types, add_date_fields, add_description,
     add_name_fields, add_reference_systems, add_relations, get_validators)

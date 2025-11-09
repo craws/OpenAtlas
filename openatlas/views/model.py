@@ -245,6 +245,7 @@ class NetworkForm(FlaskForm):
         _('depth'),
         default=1,
         choices=[(x, str(x)) for x in range(1, 13)])
+    # noinspection PyTypeChecker
     classes = SelectMultipleField(
         _('colors'),
         widget=widgets.ListWidget(prefix_label=False))
