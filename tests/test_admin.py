@@ -21,7 +21,8 @@ class AdminTests(TestBaseCase):
             person = insert('person', 'Oliver Twist')
             insert('person', 'Oliver Twist')
             insert('file', 'Forsaken file')
-            insert('feature', 'Forsaken subunit')
+            feature = insert('feature', 'Forsaken subunit')
+            feature.link('P2', g.types[get_hierarchy('Feature').subs[0]])
             invalid = insert('artifact', 'Invalid linked entity')
             db.link({
                 'property_code': 'P86',
@@ -39,7 +40,9 @@ class AdminTests(TestBaseCase):
         self.client.post(  # Login again after Logger statements above
             url_for('login'),
             data={'username': 'Alice', 'password': 'test'})
-        assert b'Oliver Twist' in c.get(url_for('orphans')).data
+
+        rv = c.get(url_for('orphans'))
+        assert b'Oliver Twist' in rv.data and b'Grave' not in rv.data
 
         rv = c.get(url_for('log'))
         assert b'Login' in rv.data
