@@ -212,18 +212,6 @@ def insert(data: dict[str, Any], shape: str) -> None:
         data)
 
 
-def insert_wkt(data: dict[str, Any], shape: str) -> None:
-    g.cursor.execute(
-        f"""
-        INSERT INTO model.gis (
-            entity_id, name, description, type, geom_{shape}
-        ) VALUES (
-            %(entity_id)s, '', %(description)s, %(type)s,
-            public.ST_SetSRID(public.ST_GeomFromText(%(wkt)s),4326));
-        """,
-        data)
-
-
 def delete_by_entity_id(id_: int) -> None:
     g.cursor.execute(
         'DELETE FROM model.gis WHERE entity_id = %(id)s;',

@@ -5,14 +5,12 @@ from collections import defaultdict
 from typing import Any, Optional, TYPE_CHECKING
 
 from flask import g, json
-from shapely.geometry import Point, Polygon, LineString
 
 from openatlas.database import gis as db
 from openatlas.display.util2 import sanitize
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
-    from openatlas.models.imports import Project
 
 
 class InvalidGeomException(Exception):
@@ -172,29 +170,6 @@ class Gis:
                             sanitize(item['properties']['description']),
                         'type': item['properties']['shapeType'],
                         'geojson': json.dumps(item['geometry'])})
-
-    @staticmethod
-    def insert_wkt(
-            entity: Entity,
-            location: Entity,
-            project: Project,
-            wkt_: Polygon | Point | LineString) -> None:
-        shape_type = ''
-        match wkt_type := str(wkt_.type).lower():
-            case 'point':
-                shape_type = 'centerpoint'
-            case 'linestring':
-                shape_type = 'polyline'
-            case 'polygon':
-                shape_type = 'shape'
-        db.insert_wkt({
-            'entity_id': location.id,
-            'description':
-                f"Imported geometry of {sanitize(entity.name)} "
-                f"from the {sanitize(project.name)} project",
-            'type': shape_type,
-            'wkt': str(wkt_)},
-            wkt_type)
 
     @staticmethod
     def delete_by_entity(entity: Entity) -> None:

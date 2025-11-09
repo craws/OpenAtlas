@@ -52,6 +52,7 @@ def link_insert(origin_id: int, relation_name: str) -> str | Response:
         'tabs.html',
         tabs=tabs,
         title=relation.label,
+        entity=origin,
         crumbs=hierarchy_crumbs(origin) + [
             link(origin),
             uc_first(relation.label)])
@@ -90,6 +91,7 @@ def link_insert_detail(
             relation_name.replace('_', '-'))
     return render_template(
         'content.html',
+        entity=origin,
         content=display_form(form),
         title=_(origin.class_.group['name']),
         crumbs=[link(origin, index=True), origin, uc_first(relation.label)])
@@ -130,6 +132,7 @@ def link_update(id_: int, origin_id: int, relation: str) -> str | Response:
         return redirect(origin_url)
     return render_template(
         'content.html',
+        entity=origin,
         content=display_form(form),
         crumbs=[
             link(origin, index=True),

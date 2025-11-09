@@ -260,16 +260,16 @@ def link_admin_units(location: Entity, row: dict[str, Any]) -> None:
 
 def get_coordinates_from_wkt(coordinates: str) -> dict[str, Any]:
     try:
-        wkt_ = wkt.loads(coordinates)
+        wkt_: Any = wkt.loads(coordinates)
     except WKTReadingError:
         wkt_ = None
     geometries = []
     if wkt_:
         if wkt_.geom_type in [
-            'MultiPoint',
-            'MultiLineString',
-            'MultiPolygon',
-            'GeometryCollection']:
+                'MultiPoint',
+                'MultiLineString',
+                'MultiPolygon',
+                'GeometryCollection']:
             for poly in wkt_:
                 geometries.append(convert_wkt_to_geojson(poly))
         else:

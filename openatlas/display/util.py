@@ -200,13 +200,9 @@ def format_entity_date(
 
 
 @app.template_filter()
-def menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
-    group = ''
-    if entity:
-        group = entity.class_.group['name']
-    if origin:
-        group = origin.class_.group['name']
+def menu(entity: Optional[Entity]) -> str:
     html = ''
+    group = entity.class_.group['name'] if entity else ''
     for item, label in {
             'source': _('source'),
             'event': _('event'),
@@ -533,7 +529,7 @@ def button_bar(buttons: list[Any]) -> str:
 
 
 @app.template_filter()
-def display_citation_example(code: str) -> str:
+def citation_example(code: str) -> str:
     html = ''
     if code == 'reference' and (text := get_translation('citation_example')):
         html = '<h1 class="uc-first">' + _('citation_example') + f'</h1>{text}'

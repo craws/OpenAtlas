@@ -479,18 +479,6 @@ def get_links_of_entities(
     return list(g.cursor)
 
 
-def delete_reference_system_links(entity_id: int) -> None:
-    g.cursor.execute(
-        """
-        DELETE FROM model.link l
-        WHERE property_code = 'P67'
-            AND domain_id IN %(systems_ids)s
-            AND range_id = %(entity_id)s;
-        """, {
-            'systems_ids': tuple(g.reference_systems.keys()),
-            'entity_id': entity_id})
-
-
 def get_linked_entities(
         id_: int,
         codes: list[str],
