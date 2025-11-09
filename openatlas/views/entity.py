@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Any, Optional
 
 from flask import flash, g, render_template, request, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
@@ -13,9 +13,10 @@ from openatlas import app
 from openatlas.display.display import Display
 from openatlas.display.table import entity_table
 from openatlas.display.util import (
-    button, check_iiif_file_exist, get_file_path, get_iiif_file_path,
-    hierarchy_crumbs, link, required_group)
-from openatlas.display.util2 import is_authorized, manual, uc_first
+    button, check_iiif_file_exist, get_chart_data, get_file_path,
+    get_iiif_file_path,
+    hierarchy_crumbs, link, reference_systems, required_group)
+from openatlas.display.util2 import is_authorized, manual, sanitize, uc_first
 from openatlas.forms.entity_form import (
     get_entity_form, process_files, process_form_data)
 from openatlas.models.entity import Entity
@@ -32,9 +33,9 @@ def view(id_: int) -> str | Response:
         flash(_("This entity can't be viewed directly."), 'error')
         abort(400)
     match entity.class_.group.get('name'):
-        case 'type' if not entity.root:  # Types have their own view
+        case 'type' if not entity.root:
             return redirect(
-                f"{url_for('type_index')}"
+                f"{url_for('index', group='type')}"
                 f"#menu-tab-{entity.category}_collapse-{id_}")
         case 'reference_system':
             entity.class_.relations = {}
@@ -209,7 +210,8 @@ def delete(id_: int) -> Response:
         if entity.subs or entity.count:
             return redirect(url_for('type_delete_recursive', id_=entity.id))
         root = g.types[entity.root[0]] if entity.root else None
-        url = url_for('view', id_=root.id) if root else url_for('type_index')
+        url = url_for('view', id_=root.id) if root \
+            else url_for('index', group='type')
     elif entity.class_.group['name'] in ['artifact', 'place']:
         if entity.get_linked_entities('P46'):
             flash(_('Deletion not possible if subunits exists'), 'error')
@@ -286,7 +288,7 @@ def save(
             url = url_for(
                 'update',
                 id_=entity.id,
-                origin_id=origin.id if origin else None)
+                origin_id=origin.id if origin else None)  # pragma: no cover
     return url
 
 
@@ -365,6 +367,28 @@ def was_modified_template(entity: Entity, form: Any) -> str | None:
 @app.route('/index/<group>')
 @required_group('readonly')
 def index(group: str) -> str | Response:
+    if group == 'type':
+        types: dict[str, dict[Entity, str]] = {
+            'standard': {},
+            'custom': {},
+            'place': {},
+            'value': {},
+            'system': {}}
+        for type_ in [type_ for type_ in g.types.values() if not type_.root]:
+            if type_.category in types:
+                type_.chart_data = get_chart_data(type_)
+                types[type_.category][type_] = render_template(
+                    'forms/tree_select_item.html',
+                    name=sanitize(type_.name, 'ascii'),
+                    data=walk_tree(type_.subs))
+                type_.reference_systems_display = reference_systems(type_)
+        return render_template(
+            'type/index.html',
+            buttons=[manual('entity/type')],
+            types=types,
+            title=_('type'),
+            crumbs=[_('type')])
+
     classes = ['place'] if group == 'place' else \
         g.class_groups[group].get('classes', [group])
     if group == 'reference_system':
@@ -390,3 +414,23 @@ def index(group: str) -> str | Response:
         gis_data=Gis.get_all() if group == 'place' else None,
         title=_(group.replace('_', ' ')),
         crumbs=[_(group).replace('_', ' ')])
+
+
+def walk_tree(types: list[int]) -> list[dict[str, Any]]:
+    items = []
+    for id_ in types:
+        item = g.types[id_]
+        count_subs = f' ({format_number(item.count_subs)})' \
+            if item.count_subs else ''
+        name = item.name.replace("'", "&apos;")
+        if item.selectable:
+            text = f'{name} {format_number(item.count)}{count_subs}'
+        else:
+            text = f'<span class="text-muted">{name}{count_subs}</span>'
+        items.append({
+            'id': item.id,
+            'href': url_for('view', id_=item.id),
+            'a_attr': {'href': url_for('view', id_=item.id)},
+            'text': text,
+            'children': walk_tree(item.subs)})
+    return items

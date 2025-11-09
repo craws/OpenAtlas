@@ -179,7 +179,7 @@ def vocabulary_import_view(category: str, id_: str) -> str | Response:
             Transaction.rollback()
             g.logger.log('error', 'import', 'import failed', e)
             flash(_('error transaction'), 'error')
-        return redirect(f"{url_for('type_index')}#menu-tab-custom")
+        return redirect(f"{url_for('index', group='type')}#menu-tab-custom")
     return render_template(
         'tabs.html',
         tabs={

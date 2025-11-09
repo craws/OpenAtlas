@@ -15,7 +15,7 @@
             role="tab"
             aria-selected="{% if loop.index == 1 %}true{% else %}false{% endif %}"
             href="#menu-tab-{{ category }}">
-          {{ category|uc_first + ' ' + _('types') }}
+          {{ category|uc_first }}
         </a>
       </li>
     {% endfor %}

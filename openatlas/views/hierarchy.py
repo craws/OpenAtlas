@@ -43,13 +43,14 @@ def hierarchy_insert(category: str) -> str | Response:
                 flash(_('error transaction'), 'error')
                 abort(418)
             flash(_('entity created'), 'info')
-            return redirect(f"{url_for('type_index')}#menu-tab-{category}")
+            return redirect(
+                f"{url_for('index', group='type')}#menu-tab-{category}")
     return render_template(
         'content.html',
         content=display_form(form, manual_page='entity/type'),
-        title=_('types'),
+        title=_('type'),
         crumbs=[
-            [_('types'), url_for('type_index')],
+            [_('type'), url_for('index', group='type')],
             '+ ' + uc_first(_(category))])
 
 
@@ -92,7 +93,7 @@ def hierarchy_update(id_: int) -> str | Response:
             flash(_('info update'), 'info')
             tab = 'value' if g.types[id_].category == 'value' else 'custom'
             return redirect(
-                f"{url_for('type_index')}"
+                f"{url_for('index', group='type')}"
                 f"#menu-tab-{tab}_collapse-{hierarchy.id}")
     if hasattr(form, 'multiple') and has_multiple_links and hierarchy.multiple:
         form.multiple.render_kw = {'disabled': 'disabled'}
@@ -113,8 +114,11 @@ def hierarchy_update(id_: int) -> str | Response:
               </div>
               <div class="col-12 col-sm-6">{table.display()}</div>
             </div>''',
-        title=_('types'),
-        crumbs=[[_('types'), url_for('type_index')], hierarchy, _('edit')])
+        title=_('type'),
+        crumbs=[
+            [_('type'), url_for('index', group='type')],
+            hierarchy,
+            _('edit')])
 
 
 @app.route('/hierarchy/remove_class/<int:id_>/<name>')
@@ -141,7 +145,8 @@ def hierarchy_delete(id_: int) -> Response:
         return redirect(url_for('type_delete_recursive', id_=id_))
     type_.delete()
     flash(_('entity deleted'), 'info')
-    return redirect(f"{url_for('type_index')}#menu-tab-{type_.category}")
+    return redirect(
+        f"{url_for('index', group='type')}#menu-tab-{type_.category}")
 
 
 @app.route('/hierarchy/required_risk/<int:id_>')
@@ -153,7 +158,10 @@ def required_risk(id_: int) -> str:
         id_=id_,
         entity=entity,
         untyped_count=format_number(len(g.types[id_].get_untyped())),
-        crumbs=[[_('types'), url_for('type_index')], entity, _('required')])
+        crumbs=[
+            [_('type'), url_for('index', group='type')],
+            entity,
+            _('required')])
 
 
 @app.route('/hierarchy/required_add/<int:id_>')

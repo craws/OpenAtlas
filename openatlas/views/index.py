@@ -101,9 +101,7 @@ def overview() -> str:
                 'feature', 'stratigraphic_unit', 'source_translation']:
             url = url_for('index', group=g.classes[name].group['name'])
         if name == 'administrative_unit':
-            url = f"{url_for('type_index')}#menu-tab-place"
-        elif name == 'type':
-            url = url_for('type_index')
+            url = f"{url_for('index', group='type')}#menu-tab-place"
         tables['overview'].rows.append([
             link(g.classes[name].label, url) if url
             else uc_first(g.classes[name].label),

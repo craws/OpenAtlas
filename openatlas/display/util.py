@@ -223,8 +223,7 @@ def menu(entity: Optional[Entity]) -> str:
                 active = 'active'
         html += link(
             label,
-            url_for(f'{item}_index') if item == 'type'
-            else url_for('index', group=item),
+            url_for('index', group=item),
             f'nav-item nav-link fw-bold uc-first {active}')
     return html
 
@@ -456,8 +455,7 @@ def link(
             _(object_.class_.group['name'].replace('_', ' ')) + (
                 ' (' + uc_first(_(object_.class_.name)) + ')'
                 if object_.class_.group['name'] == 'event' else ''),
-            url_for('type_index') if object_.class_.group['name'] == 'type'
-            else url_for('index', group=object_.class_.group['name']))
+            url_for('index', group=object_.class_.group['name']))
     elif isinstance(object_, Entity):
         html = link(
             object_.name,
