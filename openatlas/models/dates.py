@@ -87,7 +87,7 @@ def datetime64_to_timestamp(date: Optional[numpy.datetime64]) -> Optional[str]:
         f'{hour:02}:{minute:02}:{second:02}{postfix}'
 
 
-def format_date(value: datetime | numpy.datetime64) -> str:
+def format_date(value: datetime | numpy.datetime64 | None) -> str:
     if not value:
         return ''
     if isinstance(value, numpy.datetime64):

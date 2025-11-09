@@ -227,7 +227,7 @@ def add_date_fields(
         form_class: Any,
         item: Optional[Entity | Link] = None) -> None:
     if item \
-            and hasattr(item, 'group') \
+            and isinstance(item, Entity) \
             and item.class_.group['name'] == 'type' \
             and not item.root:
         return

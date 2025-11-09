@@ -66,7 +66,7 @@ class ImageTest(TestBaseCase):
             copyfile(
                 Path(app.root_path) / 'static' / 'manifest.json',
                 Path(app.config['UPLOAD_PATH'] / f'{file_json.id}.json'))
-            safe_resize_image(file2.id, '.png', size="???")
+            safe_resize_image(str(file2.id), '.png', size="???")
             profile_image(file_pathless)
 
         rv = c.get(url_for('view', id_=file_json.id))

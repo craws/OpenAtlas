@@ -295,7 +295,7 @@ def process_dates(form: Any) -> dict[str, Any]:
 def process_files(
         form: Any,
         origin: Entity | None,
-        relation_name: str | None) -> Entity:
+        relation_name: str | None) -> Entity | None:
     filenames = []
     entity = None
     try:

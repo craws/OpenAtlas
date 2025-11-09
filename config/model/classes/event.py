@@ -1,4 +1,5 @@
 import copy
+from typing import Any
 
 from flask_babel import lazy_gettext as _
 
@@ -75,12 +76,13 @@ class_ = {
         'form_buttons': ['insert_and_continue'],
         'additional_tabs': {'note': {}},
         'network_color': '#0000FF'}}
-activity = copy.deepcopy(class_)
+
+activity: dict[str, Any] = copy.deepcopy(class_)
 activity['label'] = _('activity')
 activity['display']['tooltip'] = \
     _('the most common, e.g. a battle, a meeting or a wedding')
 
-acquisition = copy.deepcopy(class_)
+acquisition: dict[str, Any] = copy.deepcopy(class_)
 acquisition['label'] = _('acquisition')
 acquisition['display']['tooltip'] = _('mapping a change of property')
 acquisition['relations'] = acquisition['relations'] | {
@@ -109,7 +111,7 @@ acquisition['relations'] = acquisition['relations'] | {
         'mode': 'direct',
         'multiple': True}}
 
-modification = copy.deepcopy(class_)
+modification: dict[str, Any] = copy.deepcopy(class_)
 modification['label'] = _('modification')
 modification['display']['tooltip'] = _('modification of artifacts')
 modification['relations'] = modification['relations'] | {
@@ -126,7 +128,7 @@ modification['relations'] = modification['relations'] | {
         'multiple': True,
         'mode': 'direct'}}
 
-move = copy.deepcopy(class_)
+move: dict[str, Any] = copy.deepcopy(class_)
 del move['relations']['location']
 move['label'] = _('move')
 move['display']['tooltip'] = _('movement of artifacts or persons')
@@ -156,7 +158,7 @@ move['relations'] = move['relations'] | {
         'multiple': True,
         'mode': 'direct'}}
 
-production = copy.deepcopy(class_)
+production: dict[str, Any] = copy.deepcopy(class_)
 production['production'] = _('production')
 production['display']['tooltip'] = _('creation of artifacts')
 production['relations'] = production['relations'] | {

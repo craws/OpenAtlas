@@ -76,9 +76,9 @@ def entity_table(
         origin: Optional[Entity] = None,
         columns: Optional[list[str]] = None,
         additional_columns: Optional[list[str]] = None,
-        relation: Relation = None,
+        relation: Optional[Relation] = None,
         table_id: Optional[str] = None,
-        forms: Optional[dict[str, Any]] = None) -> Table | None:
+        forms: Optional[dict[str, Any]] = None) -> Table:
     if not items:
         return Table()
     inverse = relation and relation.inverse

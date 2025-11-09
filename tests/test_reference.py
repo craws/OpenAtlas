@@ -14,7 +14,7 @@ class ReferenceTest(TestBaseCase):
 
         rv = c.post(
             url_for('insert', class_='external_reference'),
-            data={'name': 'https://openatlas.eu',  'description': 'No'})
+            data={'name': 'https://openatlas.eu'})
         reference_id = rv.location.split('/')[-1]
 
         rv = c.get(url_for('update', id_=reference_id))
@@ -22,7 +22,7 @@ class ReferenceTest(TestBaseCase):
 
         rv = c.post(
             url_for('update', id_=reference_id),
-            data={'name': 'https://d-nb.info',  'description': 'No'},
+            data={'name': 'https://d-nb.info'},
             follow_redirects=True)
         assert b'https://d-nb.info' in rv.data
 
@@ -48,3 +48,9 @@ class ReferenceTest(TestBaseCase):
             data={'page': '666'},
             follow_redirects=True)
         assert b'Changes have been saved' in rv.data
+
+        rv = c.post(
+            url_for('update', id_=reference_id, copy='copy_'),
+            data={'name': 'https://openatlas.eu'},
+            follow_redirects=True)
+        assert b'An entry has been created' in rv.data

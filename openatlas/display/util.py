@@ -540,7 +540,7 @@ def display_info(data: dict[str, Any]) -> str:
 
 
 @app.template_filter()
-def description(text: str, label: Optional[str] = '') -> str:
+def description(text: str | None, label: Optional[str] = '') -> str:
     return '' if not text else \
         f'<h2 class="uc-first fw-bold">{label or _("description")}</h2>' \
         f'<div class="description more">{"<br>".join(text.splitlines())}</div>'

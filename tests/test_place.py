@@ -240,6 +240,7 @@ class PlaceTest(TestBaseCase):
         rv = c.get(url_for('update', id_=feat_id))
         assert b'Val-hall' in rv.data
 
+        data['continue_'] = 'sub'
         rv = c.get(
             url_for('insert', class_='stratigraphic_unit', origin_id=feat_id),
             data=data)
@@ -247,6 +248,7 @@ class PlaceTest(TestBaseCase):
 
         data['name'] = "I'm a stratigraphic unit"
         data['super'] = feat_id
+        del data['continue_']
         rv = c.post(
             url_for('insert', class_='stratigraphic_unit', origin_id=feat_id),
             data=data)

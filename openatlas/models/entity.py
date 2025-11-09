@@ -35,7 +35,7 @@ class Entity:
         self.class_ = g.classes[data['openatlas_class_name']]
         self.cidoc_class = self.class_.cidoc_class
         self.id = 0
-        self.name = None
+        self.name = ''
         self.aliases = {}
         self.description = None
         self.created = None
@@ -84,7 +84,6 @@ class Entity:
             self.resolver_url = data['resolver_url']
             self.example_id = data['identifier_example']
             self.system = data['system']
-            self.classes: list[str] = []
 
     def get_linked_entity(
             self,
@@ -256,7 +255,7 @@ class Entity:
 
     def get_annotated_text(self) -> str:
         offset = 0
-        text = self.description
+        text = self.description or ''
         for annotation in AnnotationText.get_by_source_id(self.id):
             dict_ = {'annotationId': f'a-{annotation.id}'}
             if annotation.entity_id:
@@ -271,7 +270,7 @@ class Entity:
             end = annotation.link_end + offset
             text = text[:start] + mark + text[end:]
             offset += (len(mark) - len(inner_text))
-        return text.replace('\n', '<br>') if text else text
+        return text.replace('\n', '<br>')
 
     def update_aliases(self, aliases: list[str]) -> None:
         for id_, alias in self.aliases.items():
