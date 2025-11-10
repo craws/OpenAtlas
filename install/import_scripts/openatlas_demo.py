@@ -35,7 +35,7 @@ def connect() -> Any:
 start = time.time()
 connection = connect()
 cursor = connection.cursor(cursor_factory=extras.DictCursor)
-id_map = {}  # Map imported entity ids to existing ones
+id_map: dict[int, int] = {}  # Map imported entity ids to existing ones
 
 
 def cleanup() -> None:

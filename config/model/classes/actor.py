@@ -62,7 +62,7 @@ group: dict[str, Any] = {
                 'buttons': ['link', 'insert']}},
         'relative': {
             'label': _('relation'),
-            'classes': 'person',
+            'classes': class_groups['actor']['classes'],
             'property': 'OA7',
             'type': 'Actor relation',
             'additional_fields': ['domain', 'dates', 'description'],
