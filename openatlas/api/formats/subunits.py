@@ -207,8 +207,10 @@ def get_subunits_from_id(
     links = Entity.get_links_of_entities([e.id for e in entities])
     links_inverse = (
         Entity.get_links_of_entities([e.id for e in entities], inverse=True))
-    latest_modified = max(
-        entity.modified for entity in entities if entity.modified)
+    latest_modified = None
+    if entity.modified:
+        latest_modified = max(
+            entity.modified for entity in entities if entity.modified)
 
     link_dict: dict[int, dict[str, list[Any]]] = {}
     for entity_ in entities:

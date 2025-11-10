@@ -50,7 +50,7 @@ def get_presentation_types(
 
 def get_file_dict(
         link: Link,
-        overlay: Optional[Overlay] = None) -> dict[str, str]:
+        overlay: Optional[Overlay] = None) -> dict[str, Any]:
     path = get_file_path(link.domain.id)
     mime_type = None
     if path:
@@ -141,7 +141,7 @@ def get_presentation_references(
         links_inverse: list[Link],
         entity_ids: list[int]) -> list[dict[str, Any]]:
     references = []
-    check_for_duplicates: dict[str, int] = defaultdict(int)
+    check_for_duplicates: dict[int, str] = defaultdict(str)
     for link in links_inverse:
         if link.domain.class_.group['name'] != 'reference' \
                 or link.range.id not in entity_ids \

@@ -136,7 +136,8 @@ def import_data_(project: Project, class_: str, data: list[Any]) -> None:
         if entity.class_ != 'type':
             link_types(entity, row, class_, project)
         link_references(entity, row, class_, project)
-        link_admin_units(entity.location, row)
+        if entity.location:
+            link_admin_units(entity.location, row)
         entities[row.get('id')] = {
             'entity': entity,
             'parent_id': row.get('parent_id'),
