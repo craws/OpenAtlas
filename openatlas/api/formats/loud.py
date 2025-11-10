@@ -353,24 +353,41 @@ def get_loud_timespan(entity: Entity) -> dict[str, Any]:
             {'type': 'TimeSpan'} |
             get_loud_begin_dates(entity) |
             get_loud_end_dates(entity))}
-    if not isinstance(entity, Link) and \
-            remove_spaces_dashes(entity.cidoc_class.i18n['en']) == 'Person':
-        born, death = {}, {}
-        if entity.begin_from:
-            born = {'born': {
-                'type': 'Birth',
-                '_label': f'Birth of {entity.name}',
-                'timespan':
-                    {'type': 'TimeSpan'} |
-                    get_loud_begin_dates(entity)}}
-        if entity.end_from:
-            death = {'death_of': {
-                'type': 'Death',
-                '_label': f'Death of {entity.name}',
-                'timespan':
-                    {'type': 'TimeSpan'} |
-                    get_loud_end_dates(entity)}}
-        timespan = born | death
+    if not isinstance(entity, Link):
+        if remove_spaces_dashes(entity.cidoc_class.i18n['en']) == 'Person':
+            born, death = {}, {}
+            if entity.begin_from:
+                born = {'born': {
+                    'type': 'Birth',
+                    '_label': f'Birth of {entity.name}',
+                    'timespan':
+                        {'type': 'TimeSpan'} |
+                        get_loud_begin_dates(entity)}}
+            if entity.end_from:
+                death = {'death_of': {
+                    'type': 'Death',
+                    '_label': f'Death of {entity.name}',
+                    'timespan':
+                        {'type': 'TimeSpan'} |
+                        get_loud_end_dates(entity)}}
+            timespan = born | death
+        if remove_spaces_dashes(entity.cidoc_class.i18n['en']) == 'Group':
+            formed, dissolved = {}, {}
+            if entity.begin_from:
+                formed = {'formed_by': {
+                    'type': 'Formation',
+                    '_label': f'Founding of {entity.name}',
+                    'timespan':
+                        {'type': 'TimeSpan'} |
+                        get_loud_begin_dates(entity)}}
+            if entity.end_from:
+                dissolved = {'dissolved_by': {
+                    'type': 'Dissolution',
+                    '_label': f'Dissolution of {entity.name}',
+                    'timespan':
+                        {'type': 'TimeSpan'} |
+                        get_loud_end_dates(entity)}}
+            timespan = formed | dissolved
     return timespan
 
 

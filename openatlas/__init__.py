@@ -134,7 +134,7 @@ def setup_api() -> None:
 def count_type() -> bool:
     prefixes = [
         '/type',
-        '/admin/orphans',
+        '/orphans',
         '/api/type_tree',
         *[f'/api/{v}/type_tree' for v in app.config['API_VERSIONS']]]
     if request.path.startswith(tuple(prefixes)):
