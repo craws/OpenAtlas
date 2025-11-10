@@ -102,7 +102,7 @@ def insert(
         class_=entity.class_,
         gis_data=gis_data,
         writable=os.access(app.config['UPLOAD_PATH'], os.W_OK),
-        overlays=get_overlays(origin),
+        overlays=get_overlays(origin) if origin else None,
         title=_(entity.class_.group['name']),
         crumbs=crumbs_for_insert(entity, origin, structure))
 
@@ -122,8 +122,7 @@ def crumbs_for_insert(
 
 
 def get_overlays(entity: Entity) -> dict[int, Overlay]:
-    if entity \
-            and entity.class_.group['name'] == 'place' \
+    if entity.class_.group['name'] == 'place' \
             and current_user.settings['module_map_overlay']:
         return Overlay.get_by_object(entity)
     return {}

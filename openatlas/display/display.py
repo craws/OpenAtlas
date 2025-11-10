@@ -192,9 +192,9 @@ class Display:
             if self.entity.root and g.types[self.entity.root[0]].name \
                     in app.config['PROPERTY_TYPES']:
                 columns = ['domain', 'range']
-                items = []
-                for row in Link.get_links_by_type(self.entity):
-                    items.append(Link.get_by_id(row[0]))
+                items = [
+                    Link.get_by_id(row['id']) for row in
+                    Link.get_links_by_type(self.entity)]
             self.tabs[name] = Tab(
                 name,
                 relation.label,
