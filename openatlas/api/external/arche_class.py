@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any
+from typing import Any, Optional
 
 from flask import g
 
@@ -20,7 +20,7 @@ class ArcheFileMetadata:
     is_part_of: str | None = None
     accepted_date: str | None = None
     curators: str | list[str] | None = None
-    descriptions: list[tuple[str, str]] | None = None
+    descriptions: list[tuple[Any, str]] | None = None
     language: str | None = None
     principal_investigators: str | list[str] | None = None
     related_disciplines: str | list[str] | None = None
