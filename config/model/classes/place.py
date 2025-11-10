@@ -65,6 +65,13 @@ place: dict[str, Any] = {
             'inverse': True,
             'tab': {
                 'buttons': ['insert']}},
+        'residence': {
+            'label': _('residence'),
+            'classes': class_groups['actor']['classes'],
+            'property': 'P74',
+            'inverse': True,
+            'tab': {
+                'buttons': ['insert']}},
         'reference': standard_relations['reference'],
         'file': standard_relations['file']},
     'display': {
