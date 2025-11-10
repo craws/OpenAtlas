@@ -14,10 +14,7 @@ class RelationTests(TestBaseCase):
             related = insert('person', 'The Kurgan')
 
         rv = c.get(
-            url_for(
-                'link_insert_detail',
-                origin_id=actor.id,
-                relation_name='relative'))
+            url_for('link_insert_detail', origin_id=actor.id, name='relative'))
         assert b'Actor relation' in rv.data
 
         relation = get_hierarchy('Actor relation')
@@ -34,10 +31,7 @@ class RelationTests(TestBaseCase):
             'end_year_from': '2049',
             'end_year_to': '2050'}
         rv = c.post(
-            url_for(
-                'link_insert_detail',
-                origin_id=actor.id,
-                relation_name='relative'),
+            url_for('link_insert_detail', origin_id=actor.id, name='relative'),
             data=data,
             follow_redirects=True)
         assert b'The Kurgan' in rv.data
@@ -75,7 +69,7 @@ class RelationTests(TestBaseCase):
                 'link_update',
                 id_=link_.id,
                 origin_id=related.id,
-                relation='relative'))
+                name='relative'))
         assert b'Connor' in rv.data
 
         rv = c.post(
@@ -83,7 +77,7 @@ class RelationTests(TestBaseCase):
                 'link_update',
                 id_=link_.id,
                 origin_id=actor.id,
-                relation='relative'),
+                name='relative'),
             data={'description': 'There can be only one', 'inverse': True},
             follow_redirects=True)
         assert b'only one' in rv.data

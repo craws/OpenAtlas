@@ -29,18 +29,11 @@ class ArtifactTest(TestBaseCase):
         rv = c.get(url_for('view', id_=actor.id))
         assert b'Love-letter' in rv.data
 
-        rv = c.get(
-            url_for(
-                'link_insert',
-                origin_id=place.id,
-                relation_name='artifact'))
+        rv = c.get(url_for('link_insert', origin_id=place.id, name='artifact'))
         assert b'Love-letter' not in rv.data
 
         rv = c.post(
-            url_for(
-                'link_insert',
-                origin_id=place.id,
-                relation_name='artifact'),
+            url_for('link_insert', origin_id=place.id, name='artifact'),
             data={'checkbox_values': [sub_artifact.id]},
             follow_redirects=True)
         assert b'Sub artifact' in rv.data
@@ -61,17 +54,11 @@ class ArtifactTest(TestBaseCase):
         assert b'Changes have been saved' in rv.data
 
         rv = c.get(
-            url_for(
-                'link_insert',
-                origin_id=artifact_id,
-                relation_name='source'))
+            url_for('link_insert', origin_id=artifact_id, name='source'))
         assert b'Source' in rv.data
 
         rv = c.post(
-            url_for(
-                'link_insert',
-                origin_id=artifact_id,
-                relation_name='source'),
+            url_for('link_insert', origin_id=artifact_id, name='source'),
             data={'checkbox_values': str([source.id])},
             follow_redirects=True)
         assert b'Necronomicon' in rv.data

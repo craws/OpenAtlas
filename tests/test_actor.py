@@ -128,26 +128,20 @@ class ActorTests(TestBaseCase):
         assert b'removed' in rv.data
 
         rv = c.get(
-            url_for(
-                'link_insert_detail',
-                origin_id=group.id,
-                relation_name='member'))
+            url_for('link_insert_detail', origin_id=group.id, name='member'))
         assert b'Actor function' in rv.data
 
         rv = c.post(
             url_for(
                 'link_insert_detail',
                 origin_id=actor_id,
-                relation_name='member_of'),
+                name='member_of'),
             data={'member_of': [group.id]},
             follow_redirects=True)
         assert b'LV-426 colony' in rv.data
 
         rv = c.post(
-            url_for(
-                'link_insert_detail',
-                origin_id=group.id,
-                relation_name='member'),
+            url_for('link_insert_detail', origin_id=group.id, name='member'),
             data={'member': [actor_id]},
             follow_redirects=True)
         assert b'LV-426 colony' in rv.data
@@ -160,7 +154,7 @@ class ActorTests(TestBaseCase):
             url_for(
                 'link_update', id_=link_.id,
                 origin_id=group.id,
-                relation="member"),
+                name="member"),
             data={'description': 'We are here to help you'},
             follow_redirects=True)
         assert b'We are here to help you' in rv.data

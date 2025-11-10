@@ -28,7 +28,7 @@ class InvolvementTests(TestBaseCase):
             url_for(
                 'link_insert_detail',
                 origin_id=actor.id,
-                relation_name='participated'),
+                name='participated'),
             data={
                 'participated': event.id,
                 'begin_year_from': '950',
@@ -40,7 +40,7 @@ class InvolvementTests(TestBaseCase):
             url_for(
                 'link_insert_detail',
                 origin_id=event.id,
-                relation_name='recipient'),
+                name='recipient'),
             data={'recipient': actor.id, 'continue_': 'yes'},
             follow_redirects=True)
         assert b'Event Horizon' in rv.data

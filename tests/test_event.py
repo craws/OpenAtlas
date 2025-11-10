@@ -141,7 +141,7 @@ class EventTest(TestBaseCase):
         assert b'An entry has been created' in rv.data
 
         rv = c.post(
-            url_for('link_insert', origin_id=event_id, relation_name='file'),
+            url_for('link_insert', origin_id=event_id, name='file'),
             data={'checkbox_values': str([file.id])},
             follow_redirects=True)
         assert b'X-Files' in rv.data

@@ -452,7 +452,8 @@ def link(
         html = f'<a href="{url}"{class_}{js}{ext}>{object_}</a>'
     elif isinstance(object_, Entity) and index:
         html = link(
-            object_.class_.group['label'] + (f' ({object_.class_.label})'
+            object_.class_.group['label'] + (
+                f' ({object_.class_.label})'
                 if object_.class_.group['name'] == 'event' else ''),
             url_for('index', group=object_.class_.group['name']))
     elif isinstance(object_, Entity):
@@ -670,12 +671,12 @@ def get_update_link_for_link(link_: Link) -> str:
                 'link_update',
                 id_=link_.id,
                 origin_id=link_.domain.id,
-                relation=name)
+                name=name)
     for name, relation in g.classes[range_].relations.items():
         if relation.property == property_ and domain in relation.classes:
             return url_for(
                 'link_update',
                 id_=link_.id,
                 origin_id=link_.range.id,
-                relation=name)
+                name=name)
     return ''

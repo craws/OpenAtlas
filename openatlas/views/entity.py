@@ -262,16 +262,16 @@ def save(
         entity: Entity,
         form: Any,
         origin: Optional[Entity] = None,
-        relation_name: Optional[str] = None) -> str:
+        relation: Optional[str] = None) -> str:
     action = 'update' if entity.id else 'insert'
     url = url_for('index', group=entity.class_.group['name'])
     try:
         if hasattr(form, 'file'):
-            entity = process_files(form, origin, relation_name)
+            entity = process_files(form, origin, relation)
         else:
-            entity = process_form_data(entity, form, origin, relation_name)
+            entity = process_form_data(entity, form, origin, relation)
         g.logger.log_user(entity.id, action)
-        url = redirect_url_insert(entity, form, origin, relation_name)
+        url = redirect_url_insert(entity, form, origin, relation)
         flash(
             _('entity created') if action == 'insert' else _('info update'),
             'info')
@@ -314,10 +314,12 @@ def redirect_url_insert(
             url = url_for(
                 'link_insert_detail',
                 origin_id=origin.id,
-                relation_name=relation_name,
+                relation=relation,
                 selection_id=entity.id)
         elif not hasattr(form, 'continue_') or form.continue_.data != 'yes':
-            url = url_for('view', id_=origin.id) + f"#tab-{relation_name}"
+            url = url_for(
+                'view',
+                id_=origin.id) + f"#tab-{relation_name.replace('_', '-')}"
     if hasattr(form, 'continue_') \
             and form.continue_.data in ['sub', 'human_remains']:
         class_ = form.continue_.data

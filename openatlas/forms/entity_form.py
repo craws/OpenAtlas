@@ -111,7 +111,7 @@ def process_form_data(
         entity: Entity,
         form: Any,
         origin: Entity | None,
-        relation_name: str | None) -> Entity:
+        relation: str | None) -> Entity:
     data = {
         'name': entity.name,
         'openatlas_class_name': entity.class_.name,
@@ -154,7 +154,7 @@ def process_form_data(
             entity = insert(data)
         if entity.class_.hierarchies:
             process_types(entity, form)
-        process_relations(entity, form, origin, relation_name)
+        process_relations(entity, form, origin, relation)
         process_reference_systems(entity, form)
         Transaction.commit()
     except InvalidGeomException as e:
@@ -292,7 +292,7 @@ def process_dates(form: Any) -> dict[str, Any]:
 def process_files(
         form: Any,
         origin: Entity | None,
-        relation_name: str | None) -> Entity | None:
+        relation: str | None) -> Entity | None:
     filenames = []
     entity = None
     try:
@@ -304,15 +304,13 @@ def process_files(
                 Entity({'openatlas_class_name': 'file'}),
                 form,
                 origin,
-                relation_name)
-
+                relation)
             # Add 'a' to prevent emtpy temporary filename, has no side effects
             filename = secure_filename(f'a{file_.filename}')
             ext = filename.rsplit('.', 1)[1].lower()
             name = f"{entity.id}.{ext}"
             path = app.config['UPLOAD_PATH'] / name
             file_.save(str(path))
-
             if f'.{ext}' in g.display_file_ext:
                 call(f'exiftran -ai {path}', shell=True)  # Fix rotation
             filenames.append(name)

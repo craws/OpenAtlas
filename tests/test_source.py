@@ -27,12 +27,11 @@ class SourceTest(TestBaseCase):
         rv = c.get(url_for('insert', class_='source', origin_id=artifact.id))
         assert b'Artifact with inscription' in rv.data
 
-        rv = c.get(
-            url_for('link_insert', origin_id=source_id, relation_name='actor'))
+        rv = c.get(url_for('link_insert', origin_id=source_id, name='actor'))
         assert b'Gillian' in rv.data
 
         rv = c.post(
-            url_for('link_insert', origin_id=source_id, relation_name='actor'),
+            url_for('link_insert', origin_id=source_id, name='actor'),
             data={'checkbox_values': [gillian.id]},
             follow_redirects=True)
         assert b'Gillian' in rv.data

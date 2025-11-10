@@ -150,7 +150,7 @@ class Display:
                                         if relation.additional_fields
                                         else 'link_insert',
                                         origin_id=self.entity.id,
-                                        relation_name=name)))
+                                        name=name)))
                         case 'insert':
                             for class_ in relation.classes:
                                 buttons.append(

@@ -188,23 +188,17 @@ class PlaceTest(TestBaseCase):
         assert b'42' in rv.data
 
         rv = c.post(
-            url_for('link_insert', origin_id=place.id, relation_name='file'),
+            url_for('link_insert', origin_id=place.id, name='file'),
             data={'checkbox_values': str([file.id])},
             follow_redirects=True)
         assert b'X-Files' in rv.data
 
         rv = c.get(
-            url_for(
-                'link_insert',
-                origin_id=reference.id,
-                relation_name='place'))
+            url_for('link_insert', origin_id=reference.id, name='place'))
         assert b'Val-hall' in rv.data
 
         rv = c.get(
-            url_for(
-                'link_insert',
-                origin_id=place.id,
-                relation_name='reference'))
+            url_for('link_insert', origin_id=place.id, name='reference'))
         assert b'https://d-nb.info' in rv.data
 
         rv = c.post(

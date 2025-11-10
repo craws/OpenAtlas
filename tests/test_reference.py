@@ -30,7 +30,7 @@ class ReferenceTest(TestBaseCase):
             url_for(
                 'link_insert_detail',
                 origin_id=reference_id,
-                relation_name='actor'),
+                name='actor'),
             data={'actor': batman.id},
             follow_redirects=True)
         assert b'https://d-nb.info' in rv.data
@@ -44,7 +44,7 @@ class ReferenceTest(TestBaseCase):
                 'link_update',
                 id_=links[0].id,
                 origin_id=reference_id,
-                relation='actor'),
+                name='actor'),
             data={'page': '666'},
             follow_redirects=True)
         assert b'Changes have been saved' in rv.data

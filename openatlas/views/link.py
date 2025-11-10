@@ -26,13 +26,11 @@ def link_delete(id_: int, origin_id: int) -> Response:
     return redirect(url_for('view', id_=origin_id))
 
 
-@app.route(
-    '/link/insert/<int:origin_id>/<relation_name>',
-    methods=['GET', 'POST'])
+@app.route('/link/insert/<int:origin_id>/<name>', methods=['GET', 'POST'])
 @required_group('contributor')
-def link_insert(origin_id: int, relation_name: str) -> str | Response:
+def link_insert(origin_id: int, name: str) -> str | Response:
     origin = Entity.get_by_id(origin_id)
-    relation = origin.class_.relations[relation_name]
+    relation = origin.class_.relations[name]
     form = link_form(origin, relation)
     if form.validate_on_submit():
         if request.form['checkbox_values']:
@@ -41,8 +39,7 @@ def link_insert(origin_id: int, relation_name: str) -> str | Response:
                 request.form['checkbox_values'],
                 inverse=relation.inverse)
         return redirect(
-            f"{url_for('view', id_=origin.id)}#tab-" +
-            relation_name.replace('_', '-'))
+            f"{url_for('view', id_=origin.id)}#tab-" + name.replace('_', '-'))
     tabs = {
         'link': Tab(
             'link',
@@ -59,21 +56,21 @@ def link_insert(origin_id: int, relation_name: str) -> str | Response:
 
 
 @app.route(
-    '/link/insert_detail/<int:origin_id>/<relation_name>',
+    '/link/insert_detail/<int:origin_id>/<name>',
     methods=['GET', 'POST'])
 @app.route(
-    '/link/insert_detail/<int:origin_id>/<relation_name>/<selection_id>',
+    '/link/insert_detail/<int:origin_id>/<name>/<selection_id>',
     methods=['GET', 'POST'])
 @required_group('contributor')
 def link_insert_detail(
         origin_id: int,
-        relation_name: str,
+        name: str,
         selection_id: Optional[int] = None) -> str | Response:
     origin = Entity.get_by_id(origin_id)
-    relation = origin.class_.relations[relation_name]
+    relation = origin.class_.relations[name]
     form = link_detail_form(origin, relation, selection_id)
     if form.validate_on_submit():
-        ids = ast.literal_eval(getattr(form, relation_name).data)
+        ids = ast.literal_eval(getattr(form, name).data)
         ids = ids if isinstance(ids, list) else [int(ids)]
         type_id = None
         if relation.type:
@@ -87,8 +84,7 @@ def link_insert_detail(
             type_id,
             dates=process_dates(form))
         return redirect(
-            f"{url_for('view', id_=origin.id)}#tab-" +
-            relation_name.replace('_', '-'))
+            f"{url_for('view', id_=origin.id)}#tab-" + name.replace('_', '-'))
     return render_template(
         'content.html',
         entity=origin,
@@ -98,20 +94,17 @@ def link_insert_detail(
 
 
 @app.route(
-    '/link/update/<int:id_>/<int:origin_id>/<relation>',
+    '/link/update/<int:id_>/<int:origin_id>/<name>',
     methods=['GET', 'POST'])
 @required_group('contributor')
-def link_update(id_: int, origin_id: int, relation: str) -> str | Response:
+def link_update(id_: int, origin_id: int, name: str) -> str | Response:
     link_ = Link.get_by_id(id_)
     domain = Entity.get_by_id(link_.domain.id)
     range_ = Entity.get_by_id(link_.range.id)
     origin = domain if origin_id == domain.id else range_
     target = range_ if origin_id == domain.id else domain
-    relation = origin.class_.relations[relation]
+    relation = origin.class_.relations[name]
     form = link_update_form(link_, relation)
-    origin_url = (
-        f"{url_for('view', id_=origin.id)}#tab-" +
-        relation.name.replace('_', '-'))
     if form.validate_on_submit():
         data = {
             'description': form.description.data
@@ -129,13 +122,10 @@ def link_update(id_: int, origin_id: int, relation: str) -> str | Response:
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        return redirect(origin_url)
+        return redirect(
+            f"{url_for('view', id_=origin.id)}#tab-" + name.replace('_', '-'))
     return render_template(
         'content.html',
         entity=origin,
         content=display_form(form),
-        crumbs=[
-            link(origin, index=True),
-            link(origin.name, origin_url),
-            target,
-            _('edit')])
+        crumbs=[link(origin, index=True), link(origin), target, _('edit')])
