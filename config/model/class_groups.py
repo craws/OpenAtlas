@@ -79,7 +79,7 @@ standard_relations = {
         'multiple': True,
         'additional_fields': ['page'],
         'tab': {
-            'columns': ['name', 'class', 'type', 'page'],
+            'columns': ['name', 'class', 'type', 'page', 'description'],
             'buttons': ['link', 'insert']}},
     'source': {
         'classes': 'source',

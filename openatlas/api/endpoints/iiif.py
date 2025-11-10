@@ -259,7 +259,8 @@ class IIIFManifest(Resource):
                     "value": f"<a href={url} target=_blank>{text}</a>"})
         if entity.creator:
             metadata.append({
-                "label": _('creator').capitalize(), "value": entity.creator})
+                "label": _('creator').capitalize(),
+                "value": entity.creator})
         see_also = []
         if related_entities := entity.get_links('P67'):
             for related_entity in related_entities:
