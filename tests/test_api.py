@@ -527,7 +527,7 @@ class Api(ApiTestCase):
                     cidoc_classes='E18',
                     view_classes='artifact',
                     system_classes='person'))]:
-            rv = rv.get_json()
+            rv = rv.get_json()['results']
             assert 'Bar' in rv[0][0]
             assert 'The One Ring' in rv[-1][0]
 
