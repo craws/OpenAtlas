@@ -105,9 +105,15 @@ class Endpoint:
         self.get_pagination()
         self.reduce_entities_to_limit()
         if self.parser.format == 'table_row':
-            return entity_table(
-                items=self.entities,
-                columns=self.parser.table_columns).rows
+            return {
+                "results": entity_table(
+                    items=self.entities,
+                    columns=self.parser.table_columns).rows,
+                "pagination": {
+                    'entitiesPerPage': int(self.parser.limit),
+                    'entities': self.pagination['count'],
+                    'index': self.pagination['index'],
+                    'totalPages': len(self.pagination['index'])}}
         self.get_links_for_entities()
         if self.parser.export == 'csv':
             return self.export_csv_entities()

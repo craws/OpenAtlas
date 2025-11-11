@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.11b",
+    "version": "0.4.11c",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -5983,12 +5983,24 @@
         "description": "Represents geographic data associated with an entity.\nCan be explicitly null, a single GeoJSON geometry (Point, Polygon, or LineString),\nor a GeoJSON FeatureCollection containing Features with specific properties."
       },
       "TableRowModel": {
-        "type": "array",
-        "items": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "nullable": true
+        "type": "object",
+        "required": [
+          "pagination",
+          "results"
+        ],
+        "properties": {
+          "pagination": {
+            "$ref": "#/components/schemas/PaginationModel"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "nullable": true
+              }
+            }
           }
         }
       }
