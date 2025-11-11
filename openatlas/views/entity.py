@@ -42,7 +42,7 @@ def view(id_: int) -> str | Response:
             for name in entity.classes:
                 entity.class_.relations[name] = Relation(name, {
                     'name': name,
-                    'label': _(name),
+                    'label': _(name.replace('_', ' ')),
                     'classes': [name],
                     'property': 'P67',
                     'multiple': True,

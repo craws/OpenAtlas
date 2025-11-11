@@ -100,9 +100,7 @@ def reference_system_class_choices(entity: Entity) -> list[tuple[str, str]]:
     for class_ in g.classes.values():
         if 'reference_system' in class_.extra \
                 and class_.name not in entity.classes \
-                and not (
-                    entity.name == 'GeoNames'
-                    and class_.name not in g.class_groups['place']['classes']):
+                and not entity.name == 'GeoNames':
             choices.append((class_.name, g.classes[class_.name].label))
     return choices
 
