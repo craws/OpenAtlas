@@ -13,7 +13,7 @@ class CidocClass:
         self.name = data['name']
         self.code = data['code']
         self.comment = data['comment']
-        self.count = data['count'] if 'count' in data else None
+        self.count = data.get('count')
         self.i18n: dict[str, str] = {}
         self.sub: list[CidocClass] = []
         self.super: list[CidocClass] = []

@@ -20,6 +20,7 @@ artifact: dict[str, Any] = {
             'classes': class_groups['actor']['classes'],
             'property': 'P52',
             'mode': 'direct',
+            'add_dynamic': True,
             'tab': {
                 'buttons': ['insert']}},
         'super': {
@@ -63,17 +64,18 @@ artifact: dict[str, Any] = {
             'inverse': True,
             'multiple': True,
             'tab': {
-                'buttons': ['link','insert']}},
+                'buttons': ['link', 'insert']}},
         'reference': standard_relations['reference'],
         'file': standard_relations['file']},
     'display': {
         'buttons': ['copy', 'network'],
         'form_buttons': ['insert_and_continue'],
-        'additional_tabs': {
-            'note': {}}}}
+        'additional_tabs': {'note': {}},
+        'network_color': '#EE82EE'}}
 
 human_remains = copy.deepcopy(artifact)
 human_remains['label'] = _('human remains')
+human_remains['display']['network_color'] = None
 human_remains['relations']['super']['classes'] = \
     ['human_remains'] + class_groups['place']['classes']
 human_remains['relations']['subs']['classes'] = 'human_remains'

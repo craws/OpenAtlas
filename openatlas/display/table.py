@@ -15,7 +15,7 @@ from openatlas.display.util2 import (
     display_bool, is_authorized, sanitize, uc_first)
 from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity, Link
-from openatlas.models.openatlas_class import get_reverse_relation
+from openatlas.models.openatlas_class import Relation, get_reverse_relation
 from openatlas.models.overlay import Overlay
 
 # Needed for translations
@@ -44,7 +44,7 @@ class Table:
     def display(self, name: str = 'default') -> str:
         if not self.rows:
             return '<p class="uc-first">' + _('no entries') + '</p>'
-        no_title = ['checkbox', 'remove', 'set_logo', 'update']
+        no_title = ['checkbox', 'remove', 'set logo', 'update']
         data = {
             'data': self.rows,
             'stateSave': 'true',
@@ -76,12 +76,12 @@ def entity_table(
         origin: Optional[Entity] = None,
         columns: Optional[list[str]] = None,
         additional_columns: Optional[list[str]] = None,
-        relation: Optional[dict[Any, str]] = None,
+        relation: Optional[Relation] = None,
         table_id: Optional[str] = None,
-        forms: Optional[dict[str, Any]] = None) -> Table | None:
+        forms: Optional[dict[str, Any]] = None) -> Table:
     if not items:
         return Table()
-    inverse = relation and relation['inverse']
+    inverse = relation and relation.inverse
     item = items[0]
     if isinstance(item, Link):
         if inverse:
@@ -97,6 +97,7 @@ def entity_table(
     defs = None
     forms = forms or {}
     columns = (columns or default_columns) + (additional_columns or [])
+
     if forms.get('checkbox'):
         columns.insert(0, 'checkbox')
         order = [[0, "desc"], [1, "asc"]]
@@ -104,17 +105,18 @@ def entity_table(
     elif columns[0] == 'created':
         order = [[0, "desc"]]
 
-    if relation and relation['mode'].startswith('tab'):
-        if relation['additional_fields']:
+    if origin and relation and relation.mode.startswith('tab'):
+        if relation.additional_fields:
             columns.append('update')
         reverse_relation = get_reverse_relation(
             origin.class_,
             relation,
             item_class)
-        if not reverse_relation or not reverse_relation.get("required", True):
+        if not reverse_relation or not reverse_relation.required:
             columns.append('remove')
 
-    overlays = Overlay.get_by_object(origin) if 'overlay' in columns else {}
+    overlays = Overlay.get_by_object(origin) \
+        if origin and 'overlay' in columns else {}
     table = Table(columns, order=order, defs=defs)
     for item in items:
         e = item
@@ -122,8 +124,8 @@ def entity_table(
         if isinstance(item, Link):
             e = item.domain if inverse else item.range
             range_ = item.range if inverse else item.domain
-            if range_.class_.name == 'object_location':
-                e = e.get_linked_entity('P89', ['place'], False, True)
+            if e.class_.name == 'object_location':
+                e = e.get_linked_entity_safe('P53', inverse=False, types=True)
         data = []
         for name in columns:
             html = 'no table function'
@@ -131,10 +133,8 @@ def entity_table(
                 case 'activity':
                     html = item.property.name_inverse
                 case 'begin':
-                    html = e.dates.first
-                    if relation and 'dates' in relation['additional_fields']:
-                        html = item.dates.first
-                case 'checkbox':
+                    html = table_date('first', e, range_, item)
+                case 'checkbox' if isinstance(e, Entity):
                     html = f"""
                         <input
                             id="{e.id}"
@@ -144,9 +144,9 @@ def entity_table(
                             value="{e.id}" {
                     "checked" if e.id in forms.get('selection_ids', [])
                     else ""}>"""
-                case 'class':
-                    html = uc_first(e.class_.label)
-                case 'created':
+                case 'class' if isinstance(e, Entity):
+                    html = e.class_.label
+                case 'created' if isinstance(e, Entity):
                     html = format_date(e.created)
                 case 'creator':
                     html = ''
@@ -154,45 +154,37 @@ def entity_table(
                         html = g.file_info[e.id]['creator']
                 case 'content' | 'description':
                     html = e.description
-                    if relation and name in relation['additional_fields']:
+                    if relation and name in relation.additional_fields:
                         html = item.description
-                case 'count':
+                case 'count' if isinstance(e, Entity):
                     html = format_number(e.count)
+                case 'domain':
+                    html = link(e)
                 case 'default_precision':
                     html = link(next(iter(e.types), None))
-                case 'end':
-                    html = item.dates.last
-                case 'example_id':
+                case 'end' if isinstance(e, Entity):
+                    html = table_date('last', e, range_, item)
+                case 'example_id' if isinstance(e, Entity):
                     html = e.example_id
-                case 'extension':
+                case 'extension' if isinstance(e, Entity):
                     html = e.get_file_ext()
-                case 'external_reference_match':
+                case 'external_reference_match' if origin:
                     html = item.description
                     if url := origin.resolver_url:
                         html = link(
                             item.description,
                             url + item.description,
                             external=True)
-                case 'first':
-                    html = item.dates.first or \
-                        '<span class="text-muted">' \
-                        f'{range_.dates.first}</span>' \
-                        if range_.dates.first else ''
                 case 'icon':
                     html = f'<a href="{url_for("view", id_=e.id)}">' \
                         f'{file_preview(e.id)}</a>'
                 case 'involvement' | 'function' | 'relation':
                     html = item.type.name if item.type else ''
-                case 'last':
-                    html = item.dates.last or \
-                        '<span class="text-muted">' \
-                        f'{range_.dates.last}</span>' \
-                        if range_.dates.last else ''
                 case 'license_holder':
                     html = ''
                     if g.file_info.get(e.id):
                         html = g.file_info[e.id]['license_holder']
-                case 'main_image':
+                case 'main_image' if isinstance(e, Entity):
                     html = profile_image_table_link(
                         origin,
                         e,
@@ -201,7 +193,7 @@ def entity_table(
                     html = format_name_and_aliases(e, table_id, forms)
                 case 'page':
                     html = item.description
-                case 'precision':
+                case 'precision' if isinstance(e, Link):
                     html = item.type.name
                 case 'profile' if e and e.image_id:
                     html = 'Profile' if e.id == origin.image_id else link(
@@ -230,14 +222,16 @@ def entity_table(
                     html = ''
                     if g.file_info.get(e.id):
                         html = display_bool(g.file_info[e.id]['public'], False)
+                case 'range':
+                    html = link(range_)
                 case 'remove':
                     tab_id = e.class_.group['name']
-                    if relation and relation['mode'] == 'tab':
-                        tab_id = relation['name']
+                    if relation and relation.mode == 'tab':
+                        tab_id = relation.name
                     html = ''
                     if not origin.root or not g.types[origin.root[0]].required:
                         html = remove_link(e.name, item, origin, tab_id)
-                case 'set_logo':
+                case 'set logo':
                     html = link(_('set'), url_for('logo', id_=e.id))
                 case 'size':
                     html = e.get_file_size()
@@ -251,7 +245,7 @@ def entity_table(
                             'link_update',
                             id_=item.id,
                             origin_id=origin.id,
-                            relation=relation['name'])),
+                            name=relation.name))
                 case 'resolver_url' | 'website_url':
                     url = getattr(e, name)
                     html = link(url, url, external=True) if url else ''
@@ -308,3 +302,24 @@ def file_preview(entity_id: int) -> str:
                 url = url_for('display_file', filename=icon.name, size=size)
                 return f"<img src='{url}' {param}>"
     return ''
+
+
+def table_date(
+        mode: str,
+        e: Entity,
+        range_: Entity | None,
+        item: Link | Entity | None) -> str:
+    html = getattr(e.dates, mode)
+    if range_ \
+            and range_.class_.group \
+            and not (html := getattr(item.dates, mode)):
+        if e.class_.group['name'] == 'actor' \
+                and range_.class_.group['name'] == 'event' \
+                and getattr(range_.dates, mode):
+            html = getattr(range_.dates, mode)
+        elif e.class_.group['name'] == 'event' \
+                and range_.class_.group['name'] == 'actor' \
+                and getattr(e.dates, mode):
+            html = getattr(e.dates, mode)
+        html = f'<span class="text-muted">{html}</span>' if html else ''
+    return html

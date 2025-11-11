@@ -237,7 +237,7 @@ def remove_profile_image(id_: int) -> None:
         {'id': id_})
 
 
-def delete(id_) -> None:  # Triggers psql delete_entity_related
+def delete(id_: int) -> None:  # Triggers psql delete_entity_related
     g.cursor.execute(
         'DELETE FROM model.entity WHERE id = %(id)s;',
         {'id': id_})
@@ -412,57 +412,6 @@ def get_entity_ids_with_links(
     return [row[0] for row in list(g.cursor)]
 
 
-def get_roots(
-        property_code: str,
-        ids: list[int],
-        inverse: bool = False) -> dict[int, Any]:
-    first = 'domain_id' if inverse else 'range_id'
-    second = 'range_id' if inverse else 'domain_id'
-    g.cursor.execute(
-        f"""
-        WITH RECURSIVE parent_tree AS (
-            SELECT
-                p.parent_id,
-                p.child_id,
-                ARRAY [p.child_id] AS path,
-                1 AS depth
-            FROM (
-                SELECT {first} AS parent_id, {second} AS child_id
-                FROM model.link WHERE property_code = %(property_code)s
-            ) p
-            WHERE p.child_id IN %(ids)s
-            UNION ALL
-            SELECT
-                t.parent_id,
-                t.child_id,
-                pt.path || ARRAY [t.child_id],
-                pt.depth + 1
-            FROM (
-                SELECT {first} AS parent_id, {second} AS child_id
-                FROM model.link WHERE property_code = %(property_code)s
-            ) t
-            JOIN parent_tree pt ON pt.parent_id = t.child_id
-        ),
-        root_nodes AS (
-            SELECT DISTINCT ON (path[1]) path[1] AS child_id,
-                parent_id AS top_level
-            FROM parent_tree
-            WHERE parent_id IS NOT NULL
-            ORDER BY path[1], depth DESC
-        )
-        SELECT DISTINCT a.child_id AS start_node, r.top_level, e.name
-        FROM root_nodes r
-        JOIN parent_tree a ON a.child_id = r.child_id
-        JOIN model.entity e ON e.id = r.top_level
-        ORDER BY a.child_id;
-        """,
-        {'ids': tuple(ids), 'property_code': property_code})
-    return {
-        row['start_node']: {
-            'id': row['top_level'],
-            'name': row['name']} for row in list(g.cursor)}
-
-
 def get_linked_entities_recursive(
         id_: int,
         codes: list[str] | str,
@@ -530,18 +479,6 @@ def get_links_of_entities(
     return list(g.cursor)
 
 
-def delete_reference_system_links(entity_id: int) -> None:
-    g.cursor.execute(
-        """
-        DELETE FROM model.link l
-        WHERE property_code = 'P67'
-            AND domain_id IN %(systems_ids)s
-            AND range_id = %(entity_id)s;
-        """, {
-            'systems_ids': tuple(g.reference_systems.keys()),
-            'entity_id': entity_id})
-
-
 def get_linked_entities(
         id_: int,
         codes: list[str],
@@ -594,18 +531,6 @@ def get_linked_entities_inverse(
     return [row[0] for row in list(g.cursor)]
 
 
-def delete_links_by_codes(
-        entity_id: int,
-        codes: list[str], inverse: bool = False) -> None:
-    g.cursor.execute(
-        f"""
-        DELETE FROM model.link
-        WHERE property_code IN %(codes)s
-            AND {'range_id' if inverse else 'domain_id'} = %(id)s;
-        """,
-        {'id': entity_id, 'codes': tuple(codes)})
-
-
 def delete_links_by_property_and_class(
         entity_id: int,
         property_code: str,
@@ -626,17 +551,6 @@ def delete_links_by_property_and_class(
             'id': entity_id,
             'property_code': property_code,
             'classes': tuple(classes)})
-
-
-def remove_types(id_: int, exclude_ids: list[int]) -> None:
-    g.cursor.execute(
-        """
-        DELETE FROM model.link
-        WHERE property_code = 'P2'
-            AND domain_id = %(id)s
-            AND range_id NOT IN %(exclude_ids)s;
-        """,
-        {'id': id_, 'exclude_ids': tuple(exclude_ids)})
 
 
 def get_types(with_count: bool) -> list[dict[str, Any]]:

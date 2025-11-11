@@ -24,7 +24,7 @@ from openatlas.models.annotation import AnnotationText
 from openatlas.models.cidoc_class import CidocClass
 from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.content import get_translation
-from openatlas.models.dates import format_date, format_entity_date
+from openatlas.models.dates import Dates, format_date
 from openatlas.models.entity import Entity, Link
 from openatlas.models.imports import Project
 from openatlas.models.user import User
@@ -49,8 +49,12 @@ def edit_link(url: str) -> Optional[str]:
     return link(_('edit'), url) if is_authorized('contributor') else None
 
 
-def reference_systems(links: list[Link]) -> str:
-    if not links:
+def reference_systems(entity: Entity) -> str:
+    if 'reference_system' not in entity.class_.extra \
+        or not (links := entity.get_links(
+            'P67',
+            ['reference_system'],
+            inverse=True)):
         return ''
     html = '<h2 class="uc-first">' + _("external reference systems") + '</h2>'
     for link_ in links:
@@ -74,44 +78,40 @@ def reference_systems(links: list[Link]) -> str:
     return html
 
 
-def get_appearance(event_links: list[Link]) -> tuple[str, str]:
+def get_appearance(entity: Entity) -> tuple[str, str]:
     # Get first/last appearance year from events for actors without begin/end
     first_year = None
     last_year = None
     first_string = ''
     last_string = ''
-    for link_ in event_links:
+    for link_ in entity.get_links(
+            ['P11', 'P14', 'P25'],
+            classes=g.class_groups['event']['classes'],
+            inverse=True):
         event = link_.domain
         actor = link_.range
-        event_link = link(_('event'), url_for('view', id_=event.id))
+        html = ' ' + _('at an') + ' ' + \
+            link(_('event'), url_for('view', id_=event.id))
         if not actor.dates.first:
             if link_.dates.first and (
                     not first_year
                     or int(link_.dates.first) < int(first_year)):
                 first_year = link_.dates.first
-                first_string = \
-                    format_entity_date(link_.dates, 'begin', link_.object_) + \
-                    f"{_('at an')} {event_link}"
-            elif event.first and (
+                first_string = format_entity_date(link_.dates, 'begin') + html
+            elif event.dates.first and (
                     not first_year
                     or int(event.dates.first) < int(first_year)):
                 first_year = event.dates.first
-                first_string = \
-                    format_entity_date(event.dates, 'begin', link_.object_) + \
-                    f" {_('at an')} {event_link}"
+                first_string = format_entity_date(event.dates, 'begin') + html
         if not actor.dates.last:
             if link_.dates.last and (
                     not last_year or int(link_.dates.last) > int(last_year)):
                 last_year = link_.dates.last
-                last_string = \
-                    format_entity_date(link_.dates, 'end', link_.object_) + \
-                    f"{_('at an')} {event_link}"
+                last_string = format_entity_date(link_.dates, 'end') + html
             elif event.dates.last and (
                     not last_year or int(event.dates.last) > int(last_year)):
                 last_year = event.dates.last
-                last_string = \
-                    format_entity_date(event.dates, 'end', link_.object_) + \
-                    f"{_('at an')} {event_link}"
+                last_string = format_entity_date(event.dates, 'end') + html
     return first_string, last_string
 
 
@@ -182,14 +182,27 @@ def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
     return button(label, id_=f'bookmark{entity_id}', onclick=onclick)
 
 
+def format_entity_date(
+        dates: Dates,
+        mode: str,
+        object_: Optional[Entity] = None) -> str:
+    html = link(object_) if object_ else ''
+    if getattr(dates, f'{mode}_from'):
+        html += ', ' if html else ''
+        if getattr(dates, f'{mode}_to'):
+            html += _(
+                'between %(begin)s and %(end)s',
+                begin=format_date(getattr(dates, f'{mode}_from')),
+                end=format_date(getattr(dates, f'{mode}_to')))
+        else:
+            html += format_date(getattr(dates, f'{mode}_from'))
+    return html
+
+
 @app.template_filter()
-def menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
-    group = ''
-    if entity:
-        group = entity.class_.group['name']
-    if origin:
-        group = origin.class_.group['name']
+def menu(entity: Optional[Entity]) -> str:
     html = ''
+    group = entity.class_.group['name'] if entity else ''
     for item, label in {
             'source': _('source'),
             'event': _('event'),
@@ -210,14 +223,13 @@ def menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
                 active = 'active'
         html += link(
             label,
-            url_for(f'{item}_index') if item == 'type'
-            else url_for('index', group=item),
+            url_for('index', group=item),
             f'nav-item nav-link fw-bold uc-first {active}')
     return html
 
 
 @app.template_filter()
-def profile_image(entity: Entity) -> str:
+def profile_image(entity: Entity, link_image: Optional[bool] = True) -> str:
     if not entity.image_id or not (path := get_file_path(entity.image_id)):
         return ''
     file_id = entity.image_id
@@ -246,11 +258,10 @@ def profile_image(entity: Entity) -> str:
             return '<p class="uc-first">' + _('no preview available') + '</p>'
     else:
         url = url_for('view', id_=entity.image_id)
-
-    html = link(
-        f'<img style="max-width:{width}px" alt="{entity.name}" src="{src}">',
-        url,
-        external=external)
+    html = f'<img style="max-width:{width}px" alt="{entity.name}" src="{src}">'
+    if not link_image:
+        return html
+    html = link(html, url, external=external)
     if entity.class_.name == 'file' \
             and check_iiif_activation() \
             and g.files[file_id].suffix in g.display_file_ext:
@@ -441,11 +452,10 @@ def link(
         html = f'<a href="{url}"{class_}{js}{ext}>{object_}</a>'
     elif isinstance(object_, Entity) and index:
         html = link(
-            _(object_.class_.group['name'].replace('_', ' ')) + (
-                ' (' + uc_first(_(object_.class_.name)) + ')'
+            object_.class_.group['label'] + (
+                f' ({object_.class_.label})'
                 if object_.class_.group['name'] == 'event' else ''),
-            url_for('type_index') if object_.class_.group['name'] == 'type'
-            else url_for('index', group=object_.class_.group['name']))
+            url_for('index', group=object_.class_.group['name']))
     elif isinstance(object_, Entity):
         html = link(
             object_.name,
@@ -517,7 +527,7 @@ def button_bar(buttons: list[Any]) -> str:
 
 
 @app.template_filter()
-def display_citation_example(code: str) -> str:
+def citation_example(code: str) -> str:
     html = ''
     if code == 'reference' and (text := get_translation('citation_example')):
         html = '<h1 class="uc-first">' + _('citation_example') + f'</h1>{text}'
@@ -530,7 +540,7 @@ def display_info(data: dict[str, Any]) -> str:
 
 
 @app.template_filter()
-def description(text: str, label: Optional[str] = '') -> str:
+def description(text: str | None, label: Optional[str] = '') -> str:
     return '' if not text else \
         f'<h2 class="uc-first fw-bold">{label or _("description")}</h2>' \
         f'<div class="description more">{"<br>".join(text.splitlines())}</div>'
@@ -628,13 +638,12 @@ def hierarchy_crumbs(entity: Entity) -> list[str]:
         return crumbs + [
             g.types[id_] for id_ in entity.root] if entity.root else crumbs
     for relation in entity.class_.relations.values():
-        if relation['name'] == 'super' or (
+        if relation.name == 'super' or (
                 entity.class_.name == 'source_translation'
-                and relation['name'] == 'source'):
-            crumbs += [
-                e for e in entity.get_linked_entities_recursive(
-                    relation['property'],
-                    relation['inverse'])]
+                and relation.name == 'source'):
+            crumbs += entity.get_linked_entities_recursive(
+                relation.property,
+                relation.inverse)
     return crumbs
 
 
@@ -650,3 +659,24 @@ def display_crumbs(crumbs: list[Any]) -> str:
         elif item:
             items.append(link(item))
     return '&nbsp;>&nbsp; '.join(items)
+
+
+def get_update_link_for_link(link_: Link) -> str:
+    domain = link_.domain.class_.name
+    range_ = link_.range.class_.name
+    property_ = link_.property.code
+    for name, relation in g.classes[domain].relations.items():
+        if relation.property == property_ and range_ in relation.classes:
+            return url_for(
+                'link_update',
+                id_=link_.id,
+                origin_id=link_.domain.id,
+                name=name)
+    for name, relation in g.classes[range_].relations.items():
+        if relation.property == property_ and domain in relation.classes:
+            return url_for(
+                'link_update',
+                id_=link_.id,
+                origin_id=link_.range.id,
+                name=name)
+    return ''

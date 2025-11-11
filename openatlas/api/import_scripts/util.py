@@ -4,16 +4,16 @@ import requests
 from flask import g
 
 from openatlas import app
-from openatlas.models.entity import Entity
+from openatlas.models.entity import Entity, insert
 
 
 def get_or_create_type(hierarchy: Any, type_name: str) -> Entity:
     if type_ := get_type_by_name(type_name):
         if type_.root[0] == hierarchy.id:
             return type_
-    type_entity = Entity.insert('type', type_name)  # pragma: no cover
-    type_entity.link('P127', hierarchy)  # pragma: no cover
-    return type_entity  # pragma: no cover
+    type_entity = insert({'openatlas_class_name': 'type', 'name': type_name})
+    type_entity.link('P127', hierarchy)
+    return type_entity
 
 
 def get_type_by_name(type_name: str) -> Optional[Entity]:

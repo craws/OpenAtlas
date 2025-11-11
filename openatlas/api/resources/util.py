@@ -67,7 +67,7 @@ def get_linked_entities_api(id_: int | list[int]) -> list[Entity]:
     return [*range_, *domain]
 
 
-def get_linked_entities_id_api(id_: int) -> list[Entity]:
+def get_linked_entities_id_api(id_: int) -> list[int]:
     domain_ids = [
         link_.range.id for link_ in Entity.get_links_of_entities(id_)]
     range_ids = [

@@ -31,8 +31,7 @@ def update_carbon(
         data: dict[str, Any],
         link_: Optional[Link]) -> None:
     if link_:
-        link_.description = json.dumps(data)
-        link_.update()
+        link_.update({'description': json.dumps(data)})
     else:
         entity.link('P2', g.radiocarbon_type, json.dumps(data))
 

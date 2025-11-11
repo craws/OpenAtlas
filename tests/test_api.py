@@ -136,7 +136,7 @@ class Api(ApiTestCase):
                 'api_04.network_visualisation',
                 exclude_system_classes='type'))
         rv = rv.get_json()
-        assert len(rv['results']) == 70
+        assert len(rv['results']) == 71
         rv = c.get(
             url_for(
                 'api_04.network_visualisation',
@@ -145,7 +145,7 @@ class Api(ApiTestCase):
         assert len(rv['results']) == 15
         rv = c.get(url_for('api_04.network_visualisation', download=True))
         rv = rv.get_json()
-        assert len(rv['results']) == 165
+        assert len(rv['results']) == 166
 
         rv = c.get(
             url_for(
@@ -178,8 +178,8 @@ class Api(ApiTestCase):
         assert len(rv['results']) == 16
 
         for rv in [
-            c.get(url_for('api_04.geometric_entities')),
-            c.get(url_for('api_04.geometric_entities', download=True))]:
+                c.get(url_for('api_04.geometric_entities')),
+                c.get(url_for('api_04.geometric_entities', download=True))]:
             rv = rv.get_json()
             assert rv['features'][0]['geometry']['coordinates']
             assert rv['features'][0]['properties']['id']
@@ -373,6 +373,14 @@ class Api(ApiTestCase):
         assert rv['id'] == event.id
         assert rv['title'] == event.name
 
+        rv = c.get(
+            url_for(
+                'api_04.entity_presentation_view',
+                id_=file.id))
+        rv = rv.get_json()
+        assert rv['id'] == file.id
+        assert rv['title'] == file.name
+
         for rv in [
             c.get(url_for('api_04.cidoc_class', class_='E21')),
             c.get(
@@ -557,13 +565,13 @@ class Api(ApiTestCase):
 
         # ---Type Endpoints---
         for rv in [
-            c.get(url_for('api_04.type_overview')),
-            c.get(url_for('api_04.type_overview', download=True))]:
+                c.get(url_for('api_04.type_overview')),
+                c.get(url_for('api_04.type_overview', download=True))]:
             assert 'Austria' in str(rv.get_json())
 
         for rv in [
-            c.get(url_for('api_04.type_by_view_class')),
-            c.get(url_for('api_04.type_by_view_class', download=True))]:
+                c.get(url_for('api_04.type_by_view_class')),
+                c.get(url_for('api_04.type_by_view_class', download=True))]:
             assert 'Boundary Mark' in str(rv.get_json())
         rv = c.get(url_for('api_04.type_tree'))
         assert rv.get_json()['typeTree']
@@ -601,12 +609,12 @@ class Api(ApiTestCase):
                     "operator": "greaterThanEqual",
                     "values": ["2019-03-01"],
                     "logicalOperator": "and"}]}, ]),
-            (2, [{
+            (3, [{
                 "beginFrom": [{
                     "operator": "lesserThan",
                     "values": ["2020-01-01"],
                     "logicalOperator": "and"}]}]),
-            (2, [{
+            (3, [{
                 "beginTo": [{
                     "operator": "lesserThanEqual",
                     "values": ["2018-03-01"],
@@ -675,12 +683,12 @@ class Api(ApiTestCase):
                 "relationToID": [{
                     "operator": "equal",
                     "values": [place.id]}]}]),
-            (170, [{
+            (171, [{
                 "typeIDWithSubs": [{
                     "operator": "notEqual",
                     "values": [boundary_mark.id],
                     "logicalOperator": "and"}]}]),
-            (172, [{
+            (173, [{
                 "typeName": [{
                     "operator": "notEqual",
                     "values": ["Boundary Mark", "Height"],
@@ -794,8 +802,8 @@ class Api(ApiTestCase):
 
         # Test Error Handling
         for rv in [
-            c.get(url_for('api_04.entity', id_=233423424)),
-            c.get(url_for('api_04.cidoc_class', class_='E18', last=1231))]:
+                c.get(url_for('api_04.entity', id_=233423424)),
+                c.get(url_for('api_04.cidoc_class', class_='E18', last=1231))]:
             rv = rv.get_json()
         assert 'Entity does not exist' in rv['title']
 

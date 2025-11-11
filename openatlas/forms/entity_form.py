@@ -12,7 +12,6 @@ from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.image_processing import resize_image
 from openatlas.display.util import check_iiif_activation, convert_image_to_iiif
-from openatlas.display.util2 import uc_first
 from openatlas.forms.add_fields import (
     add_buttons, add_class_types, add_date_fields, add_description,
     add_name_fields, add_reference_systems, add_relations, get_validators)
@@ -73,20 +72,20 @@ def get_entity_form(
                         value['label'],
                         validators=get_validators(value)))
             case 'reference_system_classes':
-                if choices := get_reference_system_class_choices(entity):
+                if choices := reference_system_class_choices(entity):
+                    # noinspection PyTypeChecker
                     setattr(
                         Form,
                         'reference_system_classes',
                         SelectMultipleField(
                             _('classes'),
-                            choices=choices,  # type: ignore
+                            choices=choices,
                             option_widget=widgets.CheckboxInput(),
                             widget=widgets.ListWidget(prefix_label=False)))
-
     add_buttons(
         Form,
         entity,
-        origin.class_.relations[relation] if origin and relation else {})
+        origin.class_.relations[relation] if origin and relation else None)
     form: Any = Form(obj=entity)
     if request.method == 'GET':
         if entity.id:
@@ -96,7 +95,7 @@ def get_entity_form(
     return form
 
 
-def get_reference_system_class_choices(entity: Entity) -> list[tuple]:
+def reference_system_class_choices(entity: Entity) -> list[tuple[str, str]]:
     choices = []
     for class_ in g.classes.values():
         if 'reference_system' in class_.extra \
@@ -104,9 +103,7 @@ def get_reference_system_class_choices(entity: Entity) -> list[tuple]:
                 and not (
                     entity.name == 'GeoNames'
                     and class_.name not in g.class_groups['place']['classes']):
-            choices.append((
-                class_.name,
-                uc_first(g.classes[class_.name].label)))
+            choices.append((class_.name, g.classes[class_.name].label))
     return choices
 
 
@@ -114,7 +111,7 @@ def process_form_data(
         entity: Entity,
         form: Any,
         origin: Entity | None,
-        relation_name: str | None) -> Entity:
+        relation: str | None) -> Entity:
     data = {
         'name': entity.name,
         'openatlas_class_name': entity.class_.name,
@@ -157,7 +154,7 @@ def process_form_data(
             entity = insert(data)
         if entity.class_.hierarchies:
             process_types(entity, form)
-        process_relations(entity, form, origin, relation_name)
+        process_relations(entity, form, origin, relation)
         process_reference_systems(entity, form)
         Transaction.commit()
     except InvalidGeomException as e:
@@ -171,7 +168,7 @@ def process_form_data(
     return entity
 
 
-def process_reference_systems(entity: Entity, form: Any):
+def process_reference_systems(entity: Entity, form: Any) -> None:
     entity.delete_links('P67', ['reference_system'], inverse=True)
     for system in g.reference_systems.values():
         if entity.class_.name not in system.classes:
@@ -194,7 +191,9 @@ def process_types(entity: Entity, form: Any) -> None:
     for type_ in [g.types[id_] for id_ in entity.class_.hierarchies]:
         if data := convert(getattr(form, str(type_.id)).data):
             if type_.class_.name == 'administrative_unit':
-                entity.location.link('P89', [g.types[id_] for id_ in data])
+                location = entity.location \
+                    or entity.get_linked_entity_safe('P53')
+                location.link('P89', [g.types[id_] for id_ in data])
             else:
                 entity.link('P2', [g.types[id_] for id_ in data])
 
@@ -205,37 +204,34 @@ def process_relations(
         origin: Entity | None,
         relation_name: str | None) -> None:
     for name, relation in entity.class_.relations.items():
-        if relation['mode'] != 'direct':
+        if relation.mode != 'direct' or not hasattr(form, name):
             continue
         ids = convert(getattr(form, name).data)
         if entity.class_.group['name'] == 'type' \
-                and relation['name'] == 'super' \
+                and relation.name == 'super' \
                 and not ids:
             ids = [entity.root[0] if entity.root else origin.id]
-        if hasattr(form, name) and ids:
+        if ids:
             entities = Entity.get_by_ids(ids)
-            if 'object_location' in relation['classes']:
+            if 'object_location' in relation.classes:
                 locations = []
                 for place in entities:
                     locations.append(place.get_linked_entity_safe('P53'))
                 entities = locations
-            entity.link(
-                relation['property'],
-                entities,
-                inverse=relation['inverse'])
+            entity.link(relation.property, entities, inverse=relation.inverse)
 
     if origin and relation_name:
         origin_relation = origin.class_.relations[relation_name]
-        if not origin.class_.relations[relation_name]['additional_fields']:
+        if not origin.class_.relations[relation_name].additional_fields:
             reverse_relation = get_reverse_relation(
                 origin.class_,
                 origin_relation,
                 entity.class_)
-            if not reverse_relation or reverse_relation['mode'] != 'direct':
+            if not reverse_relation or reverse_relation.mode != 'direct':
                 origin.link(
-                    origin_relation['property'],
+                    origin_relation.property,
                     entity,
-                    inverse=origin_relation['inverse'])
+                    inverse=origin_relation.inverse)
 
 
 def delete_links(entity: Entity) -> None:
@@ -243,12 +239,9 @@ def delete_links(entity: Entity) -> None:
         entity.delete_links('P2', ['type'])
         if entity.location:
             entity.location.delete_links('P89', ['administrative_unit'])
-    for relation in entity.class_.relations.values():
-        if relation['mode'] == 'direct':
-            entity.delete_links(
-                relation['property'],
-                relation['classes'],
-                relation['inverse'])
+    for r in entity.class_.relations.values():
+        if r.mode == 'direct':
+            entity.delete_links(r.property, r.classes, r.inverse)
 
 
 def process_dates(form: Any) -> dict[str, Any]:
@@ -299,27 +292,25 @@ def process_dates(form: Any) -> dict[str, Any]:
 def process_files(
         form: Any,
         origin: Entity | None,
-        relation_name: str | None) -> Entity:
+        relation: str | None) -> Entity | None:
     filenames = []
     entity = None
     try:
         entity_name = form.name.data.strip()
-        for count, file in enumerate(form.file.data):
+        for count, file_ in enumerate(form.file.data):
             if len(form.file.data) > 1:
                 form.name.data = f'{entity_name}_{str(count + 1).zfill(2)}'
             entity = process_form_data(
                 Entity({'openatlas_class_name': 'file'}),
                 form,
                 origin,
-                relation_name)
-
+                relation)
             # Add 'a' to prevent emtpy temporary filename, has no side effects
-            filename = secure_filename(f'a{file.filename}')
+            filename = secure_filename(f'a{file_.filename}')
             ext = filename.rsplit('.', 1)[1].lower()
             name = f"{entity.id}.{ext}"
             path = app.config['UPLOAD_PATH'] / name
-            file.save(str(path))
-
+            file_.save(str(path))
             if f'.{ext}' in g.display_file_ext:
                 call(f'exiftran -ai {path}', shell=True)  # Fix rotation
             filenames.append(name)
@@ -329,7 +320,7 @@ def process_files(
                     and check_iiif_activation() \
                     and g.settings['iiif_convert_on_upload']:
                 convert_image_to_iiif(entity.id, path)
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         g.logger.log('error', 'database', 'file upload failed', e)
         raise e from None
     return entity

@@ -16,7 +16,7 @@ class CidocProperty:
         self.comment = data['comment']
         self.domain_class_code = data['domain_class_code']
         self.range_class_code = data['range_class_code']
-        self.count = data['count'] if 'count' in data else None
+        self.count = data.get('count')
         self.sub: list[int] = []
         self.super: list[int] = []
         self.i18n: dict[str, str] = {}

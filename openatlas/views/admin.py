@@ -28,7 +28,7 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
     button, check_iiif_activation, check_iiif_file_exist, display_info,
-    get_file_path, link, required_group, send_mail)
+    get_file_path, link, required_group, get_update_link_for_link, send_mail)
 from openatlas.display.util2 import (
     convert_size, display_bool, is_authorized, manual, sanitize, uc_first)
 from openatlas.forms.display import display_form
@@ -393,8 +393,7 @@ def check_similar() -> str:
     form = SimilarForm()
     form.classes.choices = [
         (class_.name, class_.label)
-        for name, class_ in g.classes.items()
-        if class_.label and class_.group['name']]
+        for name, class_ in g.classes.items() if class_.group]
     table = None
     if form.validate_on_submit():
         table = Table(['name', _('count')])
@@ -454,13 +453,11 @@ def check_dates() -> str:
             format_date(entity.created),
             format_date(entity.modified),
             entity.description])
-    for item in Link.get_invalid_link_dates():
+    for link_ in Link.get_invalid_link_dates():
         tabs['link_dates'].table.rows.append([
-            link(
-                item.property.name,
-                url_for('link_update', id_=item.id, origin_id=item.domain.id)),
-            link(item.domain),
-            link(item.range)])
+            link(link_.property.name, get_update_link_for_link(link_)),
+            link(link_.domain),
+            link(link_.range)])
     for link_ in Link.invalid_involvement_dates():
         event = link_.domain
         actor = link_.range
@@ -469,10 +466,7 @@ def check_dates() -> str:
             link(event),
             event.class_.label,
             link_.type.name if link_.type else '',
-            link_.description,
-            link(
-                _('edit'),
-                url_for('link_update', id_=link_.id, origin_id=actor.id))]
+            link_.description]
         tabs['involvement_dates'].table.rows.append(data)
     for link_ in Link.invalid_preceding_dates():
         tabs['preceding_dates'].table.rows.append([

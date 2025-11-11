@@ -112,7 +112,7 @@ class EntityFiles(Resource):
     @staticmethod
     def get_file_dict(
             entity: Entity,
-            overlay: Optional[Overlay] = None) -> dict[str, str]:
+            overlay: Optional[Overlay] = None) -> dict[str, Any]:
         path = get_file_path(entity.id)
         mime_type = None
         if path:

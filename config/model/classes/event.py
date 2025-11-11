@@ -1,4 +1,5 @@
 import copy
+from typing import Any
 
 from flask_babel import lazy_gettext as _
 
@@ -23,8 +24,8 @@ class_ = {
             'tab': {
                 'buttons': ['link', 'insert'],
                 'columns': [
-                    'name', 'class', 'activity', 'involvement', 'first',
-                    'last', 'description']}},
+                    'name', 'class', 'involvement',
+                    'begin', 'end', 'description']}},
         'participant': {
             'label': _('participant'),
             'classes': class_groups['actor']['classes'],
@@ -35,8 +36,8 @@ class_ = {
             'tab': {
                 'buttons': ['link', 'insert'],
                 'columns': [
-                    'name', 'class', 'activity', 'involvement', 'first',
-                    'last', 'description']}},
+                    'name', 'class', 'involvement',
+                    'begin', 'end', 'description']}},
         'subs': {
             'label': _('subs'),
             'classes': class_groups['event']['classes'],
@@ -56,7 +57,8 @@ class_ = {
             'label': _('preceding event'),
             'classes': class_groups['event']['classes'],
             'property': 'P134',
-            'mode': 'direct'},
+            'mode': 'direct',
+            'add_dynamic': True},
         'succeeding_event': {
             'label': _('succeeding event'),
             'classes': class_groups['event']['classes'],
@@ -67,17 +69,20 @@ class_ = {
             'label': _('location'),
             'classes': 'object_location',
             'property': 'P7',
-            'mode': 'direct'}},
+            'mode': 'direct',
+            'add_dynamic': True}},
     'display': {
         'buttons': ['copy', 'network'],
         'form_buttons': ['insert_and_continue'],
-        'additional_tabs': {'note': {}}}}
-activity = copy.deepcopy(class_)
+        'additional_tabs': {'note': {}},
+        'network_color': '#0000FF'}}
+
+activity: dict[str, Any] = copy.deepcopy(class_)
 activity['label'] = _('activity')
 activity['display']['tooltip'] = \
     _('the most common, e.g. a battle, a meeting or a wedding')
 
-acquisition = copy.deepcopy(class_)
+acquisition: dict[str, Any] = copy.deepcopy(class_)
 acquisition['label'] = _('acquisition')
 acquisition['display']['tooltip'] = _('mapping a change of property')
 acquisition['relations'] = acquisition['relations'] | {
@@ -106,7 +111,7 @@ acquisition['relations'] = acquisition['relations'] | {
         'mode': 'direct',
         'multiple': True}}
 
-modification = copy.deepcopy(class_)
+modification: dict[str, Any] = copy.deepcopy(class_)
 modification['label'] = _('modification')
 modification['display']['tooltip'] = _('modification of artifacts')
 modification['relations'] = modification['relations'] | {
@@ -123,7 +128,7 @@ modification['relations'] = modification['relations'] | {
         'multiple': True,
         'mode': 'direct'}}
 
-move = copy.deepcopy(class_)
+move: dict[str, Any] = copy.deepcopy(class_)
 del move['relations']['location']
 move['label'] = _('move')
 move['display']['tooltip'] = _('movement of artifacts or persons')
@@ -132,12 +137,14 @@ move['relations'] = move['relations'] | {
         'label': _('place from'),
         'classes': 'object_location',
         'property': 'P27',
-        'mode': 'direct'},
+        'mode': 'direct',
+        'add_dynamic': True},
     'place_to': {
         'label': _('place to'),
         'classes': 'object_location',
         'property': 'P26',
-        'mode': 'direct'},
+        'mode': 'direct',
+        'add_dynamic': True},
     'moved_person': {
         'label': _('moved person'),
         'classes': 'person',
@@ -151,7 +158,7 @@ move['relations'] = move['relations'] | {
         'multiple': True,
         'mode': 'direct'}}
 
-production = copy.deepcopy(class_)
+production: dict[str, Any] = copy.deepcopy(class_)
 production['production'] = _('production')
 production['display']['tooltip'] = _('creation of artifacts')
 production['relations'] = production['relations'] | {

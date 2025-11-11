@@ -29,9 +29,6 @@ class PlaceTest(TestBaseCase):
             url_for('insert', class_='place', origin_id=reference.id),
             data=data,
             follow_redirects=True)
-
-        return  # Todo: continue tests
-
         assert b'Asgard' in rv.data and b'An entry has been' in rv.data
 
         place_type = get_hierarchy('Place')
@@ -69,7 +66,11 @@ class PlaceTest(TestBaseCase):
                 "description": "",
                 "shapeType": "shape"}}]"""
         rv = c.post(
-            url_for('insert', class_='place', origin_id=source.id),
+            url_for(
+                'insert',
+                class_='place',
+                origin_id=source.id,
+                relation='place'),
             data=data,
             follow_redirects=True)
         assert b'Necronomicon' in rv.data
@@ -187,16 +188,18 @@ class PlaceTest(TestBaseCase):
         assert b'42' in rv.data
 
         rv = c.post(
-            url_for('entity_add_file', id_=place.id),
+            url_for('link_insert', origin_id=place.id, name='file'),
             data={'checkbox_values': str([file.id])},
             follow_redirects=True)
         assert b'X-Files' in rv.data
 
-        rv = c.get(url_for('reference_add', id_=reference.id, view='place'))
+        rv = c.get(
+            url_for('link_insert', origin_id=reference.id, name='place'))
         assert b'Val-hall' in rv.data
 
-        rv = c.get(url_for('entity_add_reference', id_=place.id))
-        assert b'link reference' in rv.data
+        rv = c.get(
+            url_for('link_insert', origin_id=place.id, name='reference'))
+        assert b'https://d-nb.info' in rv.data
 
         rv = c.post(
             url_for('type_move_entities', id_=unit_type.subs[0]),
@@ -224,14 +227,14 @@ class PlaceTest(TestBaseCase):
         assert b'insert and add strati' in rv.data
 
         data['name'] = "It's not a bug, it's a feature!"
-        rv = c.post(
-            url_for('insert', class_='feature', origin_id=place.id),
-            data=data)
+        del data['continue_']
+        rv = c.post(url_for('insert', class_='feature'), data=data)
         feat_id = rv.location.split('/')[-1]
 
         rv = c.get(url_for('update', id_=feat_id))
         assert b'Val-hall' in rv.data
 
+        data['continue_'] = 'sub'
         rv = c.get(
             url_for('insert', class_='stratigraphic_unit', origin_id=feat_id),
             data=data)
@@ -239,6 +242,7 @@ class PlaceTest(TestBaseCase):
 
         data['name'] = "I'm a stratigraphic unit"
         data['super'] = feat_id
+        del data['continue_']
         rv = c.post(
             url_for('insert', class_='stratigraphic_unit', origin_id=feat_id),
             data=data)
@@ -277,7 +281,11 @@ class PlaceTest(TestBaseCase):
         human_remains_id = rv.location.split('/')[-1]
 
         rv = c.get(
-            url_for('insert', class_='human_remains', origin_id=strati_id))
+            url_for(
+                'insert',
+                class_='human_remains',
+                origin_id=strati_id,
+                relation='artifact'))
         assert b'exists' in rv.data
 
         rv = c.get(url_for('update', id_=human_remains_id))
@@ -352,4 +360,4 @@ class PlaceTest(TestBaseCase):
         assert b'You never' in rv.data
 
         rv = c.get(url_for('delete', id_=place.id), follow_redirects=True)
-        assert b'not possible if subunits' in rv.data
+        assert b'403' in rv.data

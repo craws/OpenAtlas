@@ -24,12 +24,13 @@ class SearchForm(FlaskForm):
         render_kw={'autofocus': True})
     own = BooleanField(_('Only entities edited by me'))
     desc = BooleanField(_('Also search in description'))
+    # noinspection PyTypeChecker
     classes = SelectMultipleField(
         _('classes'),
         [InputRequired()],
         choices=(),
-        option_widget=widgets.CheckboxInput(),  # type: ignore
-        widget=widgets.ListWidget(prefix_label=False))  # type: ignore
+        option_widget=widgets.CheckboxInput(),
+        widget=widgets.ListWidget(prefix_label=False))
     search = SubmitField(_('search'))
     validator_day = [Optional(), NumberRange(min=1, max=31)]
     validator_month = [Optional(), NumberRange(min=1, max=12)]
@@ -69,7 +70,7 @@ class SearchForm(FlaskForm):
             self.end_day.data,
             to_date=True)
         if from_date and to_date and from_date > to_date:
-            self.begin_year.errors.append(  # type: ignore
+            self.begin_year.errors.append(
                 _('Begin dates cannot start after end dates.'))
             valid = False
         return valid
@@ -83,8 +84,7 @@ def search_index() -> str:
         if count and g.classes[name].group]
     form = SearchForm()
     getattr(form, 'search').label.text = uc_first(_('search'))
-    form.classes.choices = [
-        (name, uc_first(g.classes[name].label)) for name in classes]
+    form.classes.choices = [(name, g.classes[name].label) for name in classes]
     form.classes.default = classes
     form.classes.process(request.form)
     table = Table()

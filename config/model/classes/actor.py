@@ -1,10 +1,11 @@
 import copy
+from typing import Any
 
 from flask_babel import lazy_gettext as _
 
 from config.model.class_groups import class_groups, standard_relations
 
-group = {
+group: dict[str, Any] = {
     'label': _('group'),
     'attributes': {
         'name': {
@@ -18,17 +19,20 @@ group = {
             'label': _('residence'),
             'classes': 'object_location',
             'property': 'P74',
-            'mode': 'direct'},
+            'mode': 'direct',
+            'add_dynamic': True},
         'begins_in': {
             'label': _('born in'),
             'classes': 'object_location',
             'property': 'OA8',
-            'mode': 'direct'},
+            'mode': 'direct',
+            'add_dynamic': True},
         'ends_in': {
             'label': _('died in'),
             'classes': 'object_location',
             'property': 'OA9',
-            'mode': 'direct'},
+            'mode': 'direct',
+            'add_dynamic': True},
         'source': standard_relations['source'],
         'performed': {
             'label': _('performed'),
@@ -40,12 +44,8 @@ group = {
             'additional_fields': ['dates', 'description'],
             'tab': {
                 'columns': [
-                    'name',
-                    'class',
-                    'involvement',
-                    'begin',
-                    'end',
-                    'description'],
+                    'name', 'class', 'involvement',
+                    'begin', 'end', 'description'],
                 'buttons': ['link', 'insert']}},
         'participated': {
             'label': _('participated'),
@@ -57,16 +57,12 @@ group = {
             'additional_fields': ['dates', 'description'],
             'tab': {
                 'columns': [
-                    'name',
-                    'class',
-                    'involvement',
-                    'begin',
-                    'end',
-                    'description'],
+                    'name', 'class', 'involvement',
+                    'begin', 'end', 'description'],
                 'buttons': ['link', 'insert']}},
         'relative': {
             'label': _('relation'),
-            'classes': 'person',
+            'classes': class_groups['actor']['classes'],
             'property': 'OA7',
             'type': 'Actor relation',
             'additional_fields': ['domain', 'dates', 'description'],
@@ -126,9 +122,10 @@ group = {
     'display': {
         'buttons': ['copy', 'network'],
         'form_buttons': ['insert_and_continue'],
-        'additional_tabs': {
-            'note': {}}}}
+        'additional_tabs': {'note': {}},
+        'network_color': '#34623C'}}
 
 person = copy.deepcopy(group)
 person['label'] = _('person')
+person['display']['network_color'] = '#34B522'
 del person['relations']['member']

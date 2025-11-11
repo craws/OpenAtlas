@@ -113,8 +113,6 @@ class ActorTests(TestBaseCase):
             follow_redirects=True)
         assert b'Changes have been saved' in rv.data
 
-        return  # Todo: continue tests
-
         rv = c.post(
             url_for('ajax_create_entity'),
             data={
@@ -124,38 +122,39 @@ class ActorTests(TestBaseCase):
                 'description': 'AI'})
         assert rv.data.isdigit()
 
-        rv = c.post(
-            url_for('ajax_get_entity_table', content_domain='artifact'),
-            data={'filterIds': str([])})
-        assert b'Bishop' in rv.data
-
         rv = c.get(
             url_for('link_delete', origin_id=actor_id, id_=666),
             follow_redirects=True)
         assert b'removed' in rv.data
 
         rv = c.get(
-            url_for('insert_relation', origin_id=group.id, type_='member'))
+            url_for('link_insert_detail', origin_id=group.id, name='member'))
         assert b'Actor function' in rv.data
 
         rv = c.post(
-            url_for('insert_relation', origin_id=actor_id, type_='membership'),
-            data={'group': str([group.id])},
+            url_for(
+                'link_insert_detail',
+                origin_id=actor_id,
+                name='member_of'),
+            data={'member_of': [group.id]},
             follow_redirects=True)
         assert b'LV-426 colony' in rv.data
 
         rv = c.post(
-            url_for('insert_relation', origin_id=group.id, type_='member'),
-            data={'actor': str([actor_id]), 'continue_': 'yes'},
+            url_for('link_insert_detail', origin_id=group.id, name='member'),
+            data={'member': [actor_id]},
             follow_redirects=True)
-        assert b'Ripley' in rv.data
+        assert b'LV-426 colony' in rv.data
 
         with app.test_request_context():
             app.preprocess_request()
             link_ = group.get_links('P107')[0]
 
         rv = c.post(
-            url_for('link_update', id_=link_.id, origin_id=group.id),
+            url_for(
+                'link_update', id_=link_.id,
+                origin_id=group.id,
+                name="member"),
             data={'description': 'We are here to help you'},
             follow_redirects=True)
         assert b'We are here to help you' in rv.data

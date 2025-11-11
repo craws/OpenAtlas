@@ -12,7 +12,7 @@ if TYPE_CHECKING:  # pragma: no cover
 class Overlay:
     def __init__(self, row: dict[str, Any]) -> None:
         self.id = row['id']
-        self.name = row['name'] if 'name' in row else ''
+        self.name = row.get('name')
         self.image_id = row['image_id']
         self.bounding_box = row['bounding_box']
         path = get_file_path(row['image_id'])
@@ -43,9 +43,7 @@ class Overlay:
                 f"{data['bottom_left_easting']}]]"})
 
     @staticmethod
-    def get_by_object(object_: Entity | None) -> dict[int, Overlay]:
-        if not object_:
-            return {}
+    def get_by_object(object_: Entity) -> dict[int, Overlay]:
         places = [object_] + list(
             object_.get_linked_entities_recursive('P46', True))
         ids = []

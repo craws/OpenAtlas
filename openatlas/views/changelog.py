@@ -16,6 +16,11 @@ def index_changelog() -> str:
 # pylint: disable=too-many-lines
 
 versions = {
+    '9.0.0': ['TBA', {
+        'features': {
+            '2464': 'OpenAtlas major version 9.0.0',
+            '2634': 'Removal of creation and event class, changed acquisition',
+            '2657': 'API: 4.11.0'}}],
     '8.15.0': ['TBA', {
         'feature': {
             '2551': 'Admin interface for generating RDF dumps',

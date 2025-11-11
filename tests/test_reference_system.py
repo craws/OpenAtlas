@@ -12,17 +12,14 @@ class ReferenceSystemTest(TestBaseCase):
         rv = c.post(url_for('ajax_wikidata_info'), data={'id_': 'Q304037'})
         assert b'National Library of Austria' in rv.data
 
-        return  # Todo: continue tests
-
         rv = c.post(url_for('ajax_geonames_info'), data={'id_': '747712'})
         assert b'Edirne' in rv.data
-
 
         rv = c.post(url_for('ajax_gnd_info'), data={'id_': '118584596'})
         assert b'Mozart' in rv.data
 
         rv = c.get(url_for('insert', class_='reference_system'))
-        assert b'resolver URL' in rv.data
+        assert b'resolver url' in rv.data
 
         rv = c.post(
             url_for('insert', class_='reference_system'),
@@ -30,7 +27,7 @@ class ReferenceSystemTest(TestBaseCase):
                 'name': 'Wikipedia',
                 'website_url': 'https://wikipedia.org',
                 'resolver_url': 'https://wikipedia.org',
-                'classes': ['place']})
+                'reference_system_classes': ['place']})
         wikipedia_id = rv.location.split('/')[-1]
 
         rv = c.post(
@@ -39,21 +36,22 @@ class ReferenceSystemTest(TestBaseCase):
                 'name': 'Another system to test forms with more than 3',
                 'website_url': '',
                 'resolver_url': '',
-                'classes': ['place']},
+                'reference_system_classes': ['place']},
             follow_redirects=True)
         assert b'An entry has been created' in rv.data
 
         rv = c.get(url_for('insert', class_='place'))
         assert b'reference-system-switch' in rv.data
 
-        rv = c.get(url_for('delete', id_=wikipedia_id), follow_redirects=True)
-        assert b'Deletion not possible if classes are attached' in rv.data
+        rv = c.get(
+            url_for('delete', id_=wikipedia_id), follow_redirects=True)
+        assert b'403 - Forbidden' in rv.data
 
         rv = c.get(
             url_for(
                 'reference_system_remove_class',
                 system_id=wikipedia_id,
-                class_name='place'),
+                name='place'),
             follow_redirects=True)
         assert b'Changes have been saved' in rv.data
 
@@ -61,14 +59,15 @@ class ReferenceSystemTest(TestBaseCase):
         assert b'The entry has been deleted' in rv.data
 
         rv = c.get(url_for('update', id_=g.geonames.id))
-        assert b'website URL' in rv.data
+        assert b'website url' in rv.data
 
         data: dict[Any, Any] = {
             'name': 'GeoNames',
             self.precision_type.id: self.precision_type.subs[0],
             'website_url': 'https://www.geonames2.org/',
             'resolver_url': 'https://www.geonames2.org/',
-            'placeholder': ''}
+            'placeholder': '',
+            'reference_system_classes': ['feature']}
         rv = c.post(
             url_for('update', id_=g.geonames.id),
             data=data,
@@ -107,7 +106,7 @@ class ReferenceSystemTest(TestBaseCase):
             url_for(
                 'reference_system_remove_class',
                 system_id=g.wikidata.id,
-                class_name='person'),
+                name='person'),
             follow_redirects=True)
         assert b'403 - Forbidden' in rv.data
 

@@ -24,7 +24,11 @@ class ImageTest(TestBaseCase):
         with open(Path(app.root_path) / 'static'
                   / 'images' / 'layout' / 'logo.png', 'rb') as img:
             rv: Any = c.post(
-                url_for('insert', class_='file', origin_id=place.id),
+                url_for(
+                    'insert',
+                    class_='file',
+                    origin_id=place.id,
+                    relation='file'),
                 data={'name': 'OpenAtlas logo', 'file': img},
                 follow_redirects=True)
         assert b'An entry has been created' in rv.data
@@ -33,8 +37,6 @@ class ImageTest(TestBaseCase):
             app.preprocess_request()
             files = Entity.get_by_class('file')
             file_id = files[0].id
-
-        return  # Todo: continue tests
 
         rv = c.get(
             url_for('set_profile_image', id_=file_id, origin_id=place.id),
@@ -64,7 +66,7 @@ class ImageTest(TestBaseCase):
             copyfile(
                 Path(app.root_path) / 'static' / 'manifest.json',
                 Path(app.config['UPLOAD_PATH'] / f'{file_json.id}.json'))
-            safe_resize_image(file2.id, '.png', size="???")
+            safe_resize_image(str(file2.id), '.png', size="???")
             profile_image(file_pathless)
 
         rv = c.get(url_for('view', id_=file_json.id))
@@ -73,7 +75,7 @@ class ImageTest(TestBaseCase):
         rv = c.get(url_for('view', id_=file_pathless.id))
         assert b'Missing file' in rv.data
 
-        rv = c.get(url_for('index', view='file'))
+        rv = c.get(url_for('index', group='file'))
         assert b'Test_File' in rv.data
 
         with c.get(url_for('display_file', filename=file_name)) as rv:

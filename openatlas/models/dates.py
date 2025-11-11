@@ -1,13 +1,9 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Any, Optional
 
 import numpy
-from flask_babel import lazy_gettext as _
-
-if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.models.entity import Entity
 
 
 class Dates:
@@ -91,32 +87,13 @@ def datetime64_to_timestamp(date: Optional[numpy.datetime64]) -> Optional[str]:
         f'{hour:02}:{minute:02}:{second:02}{postfix}'
 
 
-def format_date(value: datetime | numpy.datetime64) -> str:
+def format_date(value: datetime | numpy.datetime64 | None) -> str:
     if not value:
         return ''
     if isinstance(value, numpy.datetime64):
         date_ = datetime64_to_timestamp(value)
         return date_.lstrip('0').replace(' 00:00:00', '') if date_ else ''
     return value.date().isoformat().replace(' 00:00:00', '')
-
-
-def format_entity_date(
-        dates: Dates,
-        type_: str,  # begin or end
-        object_: Optional[Entity] = None) -> str:
-    from openatlas.display.util import link
-    html = link(object_) if object_ else ''
-    if getattr(dates, f'{type_}_from'):
-        html += ', ' if html else ''
-        if getattr(dates, f'{type_}_to'):
-            html += _(
-                'between %(begin)s and %(end)s',
-                begin=format_date(getattr(dates, f'{type_}_from')),
-                end=format_date(getattr(dates, f'{type_}_to')))
-        else:
-            html += format_date(getattr(dates, f'{type_}_from'))
-    comment = getattr(dates, f'{type_}_comment')
-    return html + (f" ({comment})" if comment else '')
 
 
 def check_if_entity_has_time(dates: Dates) -> bool:

@@ -10,7 +10,6 @@ from flask_wtf.csrf import CSRFProtect
 from psycopg2 import extras
 from werkzeug.wrappers import Response
 
-from config.model.class_groups import class_groups
 from openatlas.api.resources.error import AccessDeniedError
 from openatlas.database.checks import check_type_count_needed
 from openatlas.database.connect import close_connection, open_connection
@@ -57,8 +56,6 @@ def before_request() -> Response | None:
 
     if request.path.startswith('/static'):
         return None  # Avoid overheads if not using Apache with static alias
-    if request.path == '/index/type':
-        return redirect('/type')  # Type index has its own view
 
     g.logger = Logger()
     g.db = open_connection(app.config)
@@ -125,15 +122,15 @@ def setup_api() -> None:
                 and not g.settings['api_public'] \
                 and ip not in app.config['ALLOWED_IPS'] \
                 and not verify_jwt_in_request(
-            optional=True,
-            locations='headers'):
+                    optional=True,
+                    locations='headers'):
             raise AccessDeniedError
 
 
 def count_type() -> bool:
     prefixes = [
-        '/type',
-        '/admin/orphans',
+        '/index/type',
+        '/orphans',
         '/api/type_tree',
         *[f'/api/{v}/type_tree' for v in app.config['API_VERSIONS']]]
     if request.path.startswith(tuple(prefixes)):

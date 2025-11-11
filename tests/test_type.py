@@ -21,9 +21,12 @@ class TypeTest(TestBaseCase):
         rv = c.get(url_for('view', id_=historical_type.subs[0]))
         assert b'Historical place' in rv.data
 
-        return  # Todo: continue tests
-
-        rv = c.get(url_for('insert', class_='type', origin_id=actor_type.id))
+        rv = c.get(
+            url_for(
+                'insert',
+                class_='type',
+                origin_id=actor_type.id,
+                relation='subs'))
         assert b'Actor relation' in rv.data
 
         data = {
@@ -32,7 +35,11 @@ class TypeTest(TestBaseCase):
             'description': 'Very important!',
             actor_type.id: actor_type.subs[0]}
         rv = c.post(
-            url_for('insert', class_='type', origin_id=actor_type.id),
+            url_for(
+                'insert',
+                class_='type',
+                origin_id=actor_type.id,
+                relation='subs'),
             data=data)
         type_id = rv.location.split('/')[-1]
 
@@ -49,9 +56,33 @@ class TypeTest(TestBaseCase):
             follow_redirects=True)
         assert b'Changes have been saved' in rv.data
 
+        rv = c.get(
+            url_for(
+                'insert',
+                class_='type',
+                origin_id=type_id,
+                relation='subs'))
+        assert b'My secret type' in rv.data
+
+        rv = c.post(
+            url_for(
+                'insert',
+                class_='type',
+                origin_id=type_id,
+                relation='subs'),
+            data={'name': 'My sub type', actor_type.id: type_id})
+        sub_type_id = rv.location.split('/')[-1]
+
+        rv = c.get(url_for('update', id_=sub_type_id))
+        assert b'My sub type' in rv.data
+
         data['continue_'] = 'yes'
         rv = c.post(
-            url_for('insert', class_='type', origin_id=actor_type.id),
+            url_for(
+                'insert',
+                class_='type',
+                origin_id=actor_type.id,
+                relation='subs'),
             data=data,
             follow_redirects=True)
         assert b'An entry has been created' in rv.data
@@ -75,13 +106,11 @@ class TypeTest(TestBaseCase):
             url_for(
                 'insert',
                 class_='administrative_unit',
-                origin_id=admin_unit.subs[0]),
-            data={'name': 'admin unit'},
+                origin_id=admin_unit.subs[0],
+                relation='subs'),
+            data={'name': 'admin unit', admin_unit.id: admin_unit.subs[0]},
             follow_redirects=True)
         assert b'An entry has been created' in rv.data
-
-        rv = c.get(url_for('update', id_=admin_unit.subs[0]))
-        assert b'admin unit' in rv.data
 
         rv = c.get(url_for('view', id_=dimension_type.subs[0]))
         assert b'Unit' in rv.data
@@ -97,7 +126,7 @@ class TypeTest(TestBaseCase):
         rv = c.get(url_for('insert', class_='person'))
         assert b'sex' in rv.data
 
-        rv = c.get(url_for('type_index'))
+        rv = c.get(url_for('index', group='type'))
         assert b'sex' in rv.data
 
         rv = c.get(
@@ -116,9 +145,7 @@ class TypeTest(TestBaseCase):
         rv = c.get(url_for('show_untyped_entities', id_=admin_unit.id))
         assert b'Home' in rv.data
 
-        rv = c.get(
-            url_for('type_delete', id_=actor_type.id),
-            follow_redirects=True)
+        rv = c.get(url_for('delete', id_=actor_type.id), follow_redirects=True)
         assert b'Forbidden' in rv.data
 
         with app.test_request_context():
@@ -133,12 +160,6 @@ class TypeTest(TestBaseCase):
 
         rv = c.get(url_for('show_multiple_linked_entities', id_=sex.id))
         assert b'Connor' in rv.data
-
-        c.post(
-            url_for('hierarchy_update', id_=sex.id),
-            data={'multiple': True})
-        rv = c.get(url_for('hierarchy_update', id_=sex.id))
-        assert b'disabled="disabled" id="multiple"' in rv.data
 
         rv = c.get(
             url_for('hierarchy_delete', id_=sex.id),

@@ -10,44 +10,47 @@ from openatlas.display.util import (
     get_entities_linked_to_type_recursive, link, required_group)
 from openatlas.display.util2 import uc_first
 from openatlas.forms.display import display_form
-from openatlas.forms.entity_form import get_entity_form
+from openatlas.forms.entity_form import get_entity_form, process_form_data
 from openatlas.models.entity import Entity
 
 
 @app.route('/hierarchy/insert/<category>', methods=['GET', 'POST'])
 @required_group('manager')
 def hierarchy_insert(category: str) -> str | Response:
-    form = get_entity_form()
-    # manager = HierarchyManager()
-    # if manager.form.validate_on_submit():
-    #     try:
-    #         Transaction.begin()
-    #         manager.insert_entity()
-    #         Entity.insert_hierarchy(
-    #             manager.entity,
-    #             category,
-    #             manager.form.classes.data,
-    #             bool(
-    #                 category == 'value' or (
-    #                     hasattr(manager.form, 'multiple')
-    #                     and manager.form.multiple.data)))
-    #         manager.process_form()
-    #         manager.entity.update(manager.data, new=True)
-    #         g.logger.log_user(manager.entity.id, 'insert')
-    #         Transaction.commit()
-    #     except Exception as e:  # pragma: no cover
-    #         Transaction.rollback()
-    #         g.logger.log('error', 'database', 'transaction failed', e)
-    #         flash(_('error transaction'), 'error')
-    #         abort(418)
-    #     flash(_('entity created'), 'info')
-    #     return redirect(f"{url_for('type_index')}#menu-tab-{category}")
+    hierarchy = Entity({'openatlas_class_name': 'type'})
+    hierarchy.category = category
+    form = get_entity_form(hierarchy)
+    if form.validate_on_submit():
+        if Entity.check_hierarchy_exists(form.name.data):
+            form.name.errors.append(_('error name exists'))
+        else:
+            try:
+                Transaction.begin()
+                hierarchy = process_form_data(hierarchy, form, None, None)
+                Entity.insert_hierarchy(
+                    hierarchy,
+                    category,
+                    form.classes.data,
+                    bool(
+                        category == 'value' or (
+                            hasattr(form, 'multiple')
+                            and form.multiple.data)))
+                g.logger.log_user(hierarchy.id, 'insert')
+                Transaction.commit()
+            except Exception as e:  # pragma: no cover
+                Transaction.rollback()
+                g.logger.log('error', 'database', 'transaction failed', e)
+                flash(_('error transaction'), 'error')
+                abort(418)
+            flash(_('entity created'), 'info')
+            return redirect(
+                f"{url_for('index', group='type')}#menu-tab-{category}")
     return render_template(
         'content.html',
         content=display_form(form, manual_page='entity/type'),
-        title=_('types'),
+        title=_('type'),
         crumbs=[
-            [_('types'), url_for('type_index')],
+            [_('type'), url_for('index', group='type')],
             '+ ' + uc_first(_(category))])
 
 
@@ -66,36 +69,39 @@ def hierarchy_update(id_: int) -> str | Response:
             break
         linked_entities.add(entity.id)
     if form.validate_on_submit():
-        Transaction.begin()
-        try:
-            hierarchy.update_hierarchy(
-                form.name.data,
-                form.classes.data,
-                multiple=(
-                    hierarchy.category == 'value'
-                    or (hasattr(form, 'multiple')
-                        and form.multiple.data)
-                    or has_multiple_links))
-            # manager.process_form()
-            # manager.entity.update(manager.data)
-            g.logger.log_user(hierarchy.entity.id, 'update')
-            Transaction.commit()
-        except Exception as e:  # pragma: no cover
-            Transaction.rollback()
-            g.logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
-            abort(418)
-        flash(_('info update'), 'info')
-        tab = 'value' if g.types[id_].category == 'value' else 'custom'
-        return redirect(
-            f"{url_for('type_index')}#menu-tab-{tab}_collapse-{hierarchy.id}")
-    if hasattr(form, 'multiple') and has_multiple_links:
+        if form.name.data != hierarchy.name \
+                and Entity.check_hierarchy_exists(form.name.data):
+            form.name.errors.append(_('error name exists'))
+        else:
+            Transaction.begin()
+            try:
+                hierarchy.update_hierarchy(
+                    form.name.data,
+                    form.classes.data,
+                    multiple=(
+                        hierarchy.category == 'value'
+                        or (hasattr(form, 'multiple') and form.multiple.data)
+                        or has_multiple_links))
+                process_form_data(hierarchy, form, None, None)
+                g.logger.log_user(hierarchy.id, 'update')
+                Transaction.commit()
+            except Exception as e:  # pragma: no cover
+                Transaction.rollback()
+                g.logger.log('error', 'database', 'transaction failed', e)
+                flash(_('error transaction'), 'error')
+                abort(418)
+            flash(_('info update'), 'info')
+            tab = 'value' if g.types[id_].category == 'value' else 'custom'
+            return redirect(
+                f"{url_for('index', group='type')}"
+                f"#menu-tab-{tab}_collapse-{hierarchy.id}")
+    if hasattr(form, 'multiple') and has_multiple_links and hierarchy.multiple:
         form.multiple.render_kw = {'disabled': 'disabled'}
     table = Table(['class', 'count'], paging=False)
     for name in hierarchy.classes:
         count = hierarchy.get_count_by_class(name)
         table.rows.append([
-            uc_first(g.classes[name].label),
+            g.classes[name].label,
             format_number(count) if count else link(
                 _('remove'),
                 url_for('remove_class', id_=hierarchy.id, name=name))])
@@ -108,8 +114,11 @@ def hierarchy_update(id_: int) -> str | Response:
               </div>
               <div class="col-12 col-sm-6">{table.display()}</div>
             </div>''',
-        title=_('types'),
-        crumbs=[[_('types'), url_for('type_index')], hierarchy, _('edit')])
+        title=_('type'),
+        crumbs=[
+            [_('type'), url_for('index', group='type')],
+            hierarchy,
+            _('edit')])
 
 
 @app.route('/hierarchy/remove_class/<int:id_>/<name>')
@@ -136,7 +145,8 @@ def hierarchy_delete(id_: int) -> Response:
         return redirect(url_for('type_delete_recursive', id_=id_))
     type_.delete()
     flash(_('entity deleted'), 'info')
-    return redirect(f"{url_for('type_index')}#menu-tab-{type_.category}")
+    return redirect(
+        f"{url_for('index', group='type')}#menu-tab-{type_.category}")
 
 
 @app.route('/hierarchy/required_risk/<int:id_>')
@@ -148,7 +158,10 @@ def required_risk(id_: int) -> str:
         id_=id_,
         entity=entity,
         untyped_count=format_number(len(g.types[id_].get_untyped())),
-        crumbs=[[_('types'), url_for('type_index')], entity, _('required')])
+        crumbs=[
+            [_('type'), url_for('index', group='type')],
+            entity,
+            _('required')])
 
 
 @app.route('/hierarchy/required_add/<int:id_>')

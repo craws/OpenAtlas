@@ -93,7 +93,7 @@ class AnnotationText:
             current_offset += len(inner_text) - (end - start)
             return inner_text
 
-        data = []
+        data: list[dict[str, Any]] = []
         current_offset = 0
         pattern = r'<mark meta="(.*?)">(.*?)</mark>'
         text = text.replace('</p><p>', '\n\n')

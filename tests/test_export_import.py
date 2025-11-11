@@ -119,7 +119,6 @@ class ImportTest(ImportTestCase):
         assert b'Dam' in rv.data
         (self.test_path / 'example_type.csv').unlink()
 
-        return  # Todo: continue tests
 
         with open(self.static_path / 'example.csv', 'rb') as file:
             rv = c.post(

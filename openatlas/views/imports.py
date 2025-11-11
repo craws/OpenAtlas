@@ -28,10 +28,10 @@ from openatlas.display.util import (
 from openatlas.display.util2 import (
     get_backup_file_data, is_authorized,
     manual, uc_first)
-from openatlas.models.dates import datetime64_to_timestamp, form_to_datetime64, \
-    format_date
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
+from openatlas.models.dates import (
+    datetime64_to_timestamp, form_to_datetime64, format_date)
 from openatlas.models.entity import Entity
 from openatlas.models.imports import (
     Project, check_duplicates, check_single_type_duplicates, check_type_id,
@@ -339,9 +339,10 @@ def check_data_for_table_representation(
     file_.save(str(file_path))
     data_frame = pd.read_csv(
         file_path,
-        keep_default_na=False,
         dtype=str,
-        skipinitialspace=True)
+        skipinitialspace=True,
+        keep_default_na=True,
+        na_values=['']).where(pd.notna, None)
     columns = get_clean_header(data_frame, class_, checks)
     table_data = []
     origin_ids = []

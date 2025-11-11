@@ -1,7 +1,5 @@
-from typing import Any
-
 from flask import abort, flash, g, render_template, url_for
-from flask_babel import format_number, lazy_gettext as _
+from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
@@ -11,67 +9,18 @@ from wtforms.validators import InputRequired
 from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
-from openatlas.display.table import Table
+from openatlas.display.table import Table, entity_table
 from openatlas.display.util import (
-    get_chart_data, get_entities_linked_to_type_recursive, link,
-    required_group)
-from openatlas.display.util2 import manual, sanitize
+    get_entities_linked_to_type_recursive, link, required_group)
+from openatlas.display.util2 import uc_first
 from openatlas.forms.field import SubmitField
 from openatlas.forms.form import move_form
 from openatlas.models.entity import Entity, Link
 
 
-def walk_tree(types: list[int]) -> list[dict[str, Any]]:
-    items = []
-    for id_ in types:
-        item = g.types[id_]
-        count_subs = f' ({format_number(item.count_subs)})' \
-            if item.count_subs else ''
-        name = item.name.replace("'", "&apos;")
-        if item.selectable:
-            text = f'{name} {format_number(item.count)}{count_subs}'
-        else:
-            text = f'<span class="text-muted">{name}{count_subs}</span>'
-        items.append({
-            'id': item.id,
-            'href': url_for('view', id_=item.id),
-            'a_attr': {'href': url_for('view', id_=item.id)},
-            'text': text,
-            'children': walk_tree(item.subs)})
-    return items
-
-
-@app.route('/type')
-@required_group('readonly')
-def type_index() -> str:
-    types: dict[str, dict[Entity, str]] = {
-        'standard': {},
-        'custom': {},
-        'place': {},
-        'value': {},
-        'system': {}}
-    for type_ in [type_ for type_ in g.types.values() if not type_.root]:
-        if type_.category in types:
-            type_.chart_data = get_chart_data(type_)
-            types[type_.category][type_] = render_template(
-                'forms/tree_select_item.html',
-                name=sanitize(type_.name, 'ascii'),
-                data=walk_tree(type_.subs))
-            for link_ in type_.get_links('P67', inverse=True):
-                if link_.domain.class_.group['name'] == 'reference_system':
-                    type_.reference_systems.append(link_)
-    return render_template(
-        'type/index.html',
-        buttons=[manual('entity/type')],
-        types=types,
-        title=_('type'),
-        crumbs=[_('type')])
-
-
 @app.route('/type/delete_recursive/<int:id_>', methods=['GET', 'POST'])
 @required_group('editor')
 def type_delete_recursive(id_: int) -> str | Response:
-
     class DeleteRecursiveTypesForm(FlaskForm):
         confirm_delete = BooleanField(
             _("I'm sure to delete this type, it's subs and links"),
@@ -93,7 +42,8 @@ def type_delete_recursive(id_: int) -> str | Response:
         flash(_('types deleted'), 'info')
         g.logger.log_user(id_, 'Recursive type delete')
         return redirect(
-            url_for('view', id_=root.id) if root else url_for('type_index'))
+            url_for('view', id_=root.id) if root
+            else url_for('index', group='type'))
     tabs = {
         'info': Tab(
             'info',
@@ -117,7 +67,7 @@ def type_delete_recursive(id_: int) -> str | Response:
         for item in get_entities_linked_to_type_recursive(type_.id, []):
             data = [link(item), item.class_.label, item.description]
             tabs['entities'].table.rows.append(data)
-    crumbs = [[_('type'), url_for('type_index')]]
+    crumbs = [[_('type'), url_for('index', group='type')]]
     if root:
         crumbs += [g.types[type_id] for type_id in type_.root]
     crumbs += [type_, _('delete')]
@@ -140,7 +90,7 @@ def type_move_entities(id_: int) -> str | Response:
         Transaction.commit()
         flash(_('Entities were updated'), 'success')
         return redirect(
-            f"{url_for('type_index')}"
+            f"{url_for('index', group='type')}"
             f"#menu-tab-{type_.category}_collapse-{root.id}")
     getattr(form, str(root.id)).data = type_.id
     return render_template(
@@ -158,17 +108,18 @@ def type_move_entities(id_: int) -> str | Response:
 @required_group('editor')
 def show_untyped_entities(id_: int) -> str:
     type_ = g.types[id_]
-    table = Table(['name', 'class', 'first', 'last', 'description'])
-    for entity in type_.get_untyped():
-        table.rows.append([
-            link(entity),
-            entity.class_.label,
-            entity.first,
-            entity.last,
-            entity.description])
+    table = entity_table(
+        type_.get_untyped(),
+        columns=['name', 'class', 'begin', 'end', 'description'])
+    tabs = {
+        'untyped': Tab(
+            'untyped',
+            _('untyped entities'),
+            table=table,
+            content=_('no entries') if not table.rows else '')}
     return render_template(
-        'content.html',
-        content=table.display(),
+        'tabs.html',
+        tabs=tabs,
         entity=type_,
         crumbs=[link(type_, index=True), link(type_), _('untyped entities')])
 
@@ -190,23 +141,30 @@ def type_unset_selectable(id_: int) -> Response:
 @app.route('/type/multiple_linked/<int:id_>')
 @required_group('editor')
 def show_multiple_linked_entities(id_: int) -> str:
-    linked_entities = set()
+    type_ = g.types[id_]
+    linked_entity_ids = set()
+    already_tracked_ids = set()
     multiple_linked_entities = []
     for entity in get_entities_linked_to_type_recursive(id_, []):
-        if entity.id in linked_entities:
+        if entity.id in linked_entity_ids \
+                and entity.id not in already_tracked_ids:
             multiple_linked_entities.append(entity)
-        linked_entities.add(entity.id)
-    table = Table(['name', 'class', 'first', 'last', 'description'])
-    for entity in multiple_linked_entities:
-        table.rows.append([
-            link(entity),
-            entity.class_.label,
-            entity.first,
-            entity.last,
-            entity.description])
-    type_ = g.types[id_]
+            already_tracked_ids.add(entity.id)
+        linked_entity_ids.add(entity.id)
+    table = entity_table(
+        multiple_linked_entities,
+        columns=['name', 'class', 'begin', 'end', 'description'])
+    tabs = {
+        'untyped': Tab(
+            'multiple_linked',
+            _('multiple linked entities'),
+            table=table,
+            content=uc_first(_('no entries')) if not table.rows else '')}
     return render_template(
-        'content.html',
-        content=table.display(),
-        entity=g.types[id_],
-        crumbs=[link(type_, index=True), link(type_), _('untyped entities')])
+        'tabs.html',
+        tabs=tabs,
+        entity=type_,
+        crumbs=[
+            link(type_, index=True),
+            link(type_),
+            _('multiple linked entities')])

@@ -11,7 +11,8 @@ class ApiEntity(Entity):
     def get_by_id(
             id_: int,
             types: bool = False,
-            aliases: bool = False) -> Entity:
+            aliases: bool = False,
+            with_location: bool = True) -> Entity:
         try:
             entity = Entity.get_by_id(id_, types=types, aliases=aliases)
         except Exception as e:
@@ -31,7 +32,7 @@ class ApiEntity(Entity):
         codes: list[str] = list(g.class_groups) if "all" in codes_ else codes_
         if [code for code in codes if code not in g.class_groups]:
             raise InvalidViewClassError
-        classes =[]
+        classes = []
         for code in codes:
             classes.extend(g.class_groups[code]['classes'])
         return Entity.get_by_class(classes, types=True, aliases=True)
@@ -50,9 +51,10 @@ class ApiEntity(Entity):
         if 'all' in properties:
             properties = list(g.properties)
         entity = ApiEntity.get_by_id(id_, types=True)
-        return ([entity]
-                + entity.get_linked_entities_recursive(properties, types=True)
-                + entity.get_linked_entities_recursive(
+        return (
+            [entity]
+            + entity.get_linked_entities_recursive(properties, types=True)
+            + entity.get_linked_entities_recursive(
                     properties,
                     inverse=True,
                     types=True))

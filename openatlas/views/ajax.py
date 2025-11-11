@@ -25,18 +25,17 @@ def ajax_bookmark() -> Response:
 @app.route('/ajax/addtype', methods=['POST'])
 @required_group('editor')
 def ajax_add_type() -> str:
+    root: Entity = g.types[int(request.form['superType'])]
     link = {'E55': 'P127', 'E53': 'P89'}
-    openatlas_class_name = {'E55': 'type', 'E53': 'administrative_unit'}
-    cidoc_code = g.types[int(request.form['superType'])].cidoc_class.code
     Transaction.begin()
     try:
         entity = insert(
             data={
                 'name': request.form['name'],
-                'openatlas_class_name': openatlas_class_name,
-                'cidoc_class_code': cidoc_code,
+                'openatlas_class_name': root.class_.name,
+                'cidoc_class_code': root.cidoc_class.code,
                 'description': request.form['description']})
-        entity.link(link[cidoc_code], g.types[int(request.form['superType'])])
+        entity.link(link[root.cidoc_class.code], root)
         g.logger.log_user(entity.id, 'insert')
         Transaction.commit()
     except Exception as _e:  # pragma: no cover
@@ -57,17 +56,10 @@ def ajax_get_type_tree(root_id: Optional[int] = None) -> str:
 def ajax_create_entity() -> str:
     Transaction.begin()
     try:
-        entity = insert(
-            request.form['entityName'],
-            request.form['name'],
-            request.form['description'])
-        if request.form['entityName'] in \
-                ['artifact', 'feature', 'place', 'stratigraphic_unit']:
-            entity.link(
-                'P53',
-                insert(
-                    'object_location',
-                    f'Location of {request.form["name"]}'))
+        entity = insert({
+            'name': request.form['name'],
+            'openatlas_class_name': request.form['entityName'],
+            'description': request.form['description']})
         if 'standardType' in request.form and request.form['standardType']:
             entity.link('P2', g.types[int(request.form['standardType'])])
         g.logger.log_user(entity.id, 'insert')

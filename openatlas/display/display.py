@@ -1,19 +1,21 @@
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Any
 
 from flask import g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from markupsafe import escape
 
+from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.table import entity_table
 from openatlas.display.util import (
     bookmark_toggle, button, description, display_annotation_text_links,
-    get_chart_data, get_file_path, get_system_data, link, reference_systems)
+    format_entity_date, get_appearance, get_chart_data, get_file_path,
+    get_system_data, link, reference_systems)
 from openatlas.display.util2 import (
     display_bool, is_authorized, manual, uc_first)
-from openatlas.models.dates import format_date, format_entity_date
+from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
 from openatlas.models.user import User
@@ -28,7 +30,6 @@ class Display:
     def __init__(self, entity: Entity) -> None:
         self.entity = entity
         self.events: list[Entity] = []
-        self.event_links: Optional[list[Link]] = []
         self.linked_places: list[Entity] = []
         self.structure: dict[str, list[Entity]] = {}
         self.gis_data: dict[str, Any] = {}
@@ -94,13 +95,7 @@ class Display:
         if self.entity.category != 'value':
             text += description(description_, label)
 
-        reference_systems_display = ''
-        if 'reference_system' in self.entity.class_.extra:
-            reference_systems_display = reference_systems(
-                self.entity.get_links(
-                    'P67',
-                    ['reference_system'],
-                    inverse=True))
+        reference_systems_display = reference_systems(self.entity)
         self.tabs['info'].content = render_template(
             'entity/view.html',
             entity=self.entity,
@@ -110,26 +105,33 @@ class Display:
             chart_data=get_chart_data(self.entity),
             reference_systems=reference_systems_display,
             description_html=text,
-            problematic_type_id=self.problematic_type)
+            problematic_type=self.problematic_type)
 
     def add_tabs(self) -> None:
         self.tabs = {'info': Tab('info')}
+
         for name, relation in self.entity.class_.relations.items():
-            if not relation['mode'] == 'tab':
+            if not relation.mode == 'tab':
                 continue
+            entity_for_links = self.entity
+            if name in [
+                    'event_location',
+                    'move_from_location',
+                    'move_to_location']:
+                entity_for_links = self.entity.location
             items = []
-            for item in self.entity.get_links(
-                    relation['property'],
-                    relation['classes'],
-                    relation['inverse']):
+            for item in entity_for_links.get_links(
+                    relation.property,
+                    relation.classes,
+                    relation.inverse):
                 if item.domain.class_.name == 'object_location':
                     item.domain = item.domain.get_linked_entity_safe(
                         'P53',
                         inverse=True,
                         types=True)
                 items.append(item)
-                if relation['property'] == 'P67' \
-                        and relation['classes'] == ['file'] \
+                if relation.property == 'P67' \
+                        and relation.classes == ['file'] \
                         and not self.entity.image_id \
                         and item.domain.get_file_ext() in \
                         g.display_file_ext:
@@ -137,7 +139,7 @@ class Display:
                         self.entity.image_id or item.domain.id
             buttons = [link_] if (link_ := manual(f'entity/{name}')) else []
             if is_authorized('contributor'):
-                for button_name in relation['tab']['buttons']:
+                for button_name in relation.tab['buttons']:
                     match button_name:
                         case 'link':
                             buttons.append(
@@ -145,12 +147,12 @@ class Display:
                                     _('link'),
                                     url_for(
                                         'link_insert_detail'
-                                        if relation['additional_fields']
+                                        if relation.additional_fields
                                         else 'link_insert',
                                         origin_id=self.entity.id,
-                                        relation_name=name)))
+                                        name=name)))
                         case 'insert':
-                            for class_ in relation['classes']:
+                            for class_ in relation.classes:
                                 buttons.append(
                                     button(
                                         g.classes[class_].label,
@@ -179,22 +181,32 @@ class Display:
                                         'reference_system_remove_class',
                                         system_id=self.entity.id,
                                         name=name)))
-            columns = relation['tab']['columns']
-            if self.entity.category == 'value' \
-                    and relation['name'] == 'entities':
+                        case 'show_all_iiif':
+                            buttons.append(
+                                button(
+                                    _('view all IIIF images'),
+                                    url_for('view_iiif', id_=self.entity.id)))
+            columns = relation.tab['columns']
+            if self.entity.category == 'value' and relation.name == 'entities':
                 columns = ['name', 'value', 'class', 'description']
+            if self.entity.root and g.types[self.entity.root[0]].name \
+                    in app.config['PROPERTY_TYPES']:
+                columns = ['domain', 'range']
+                items = [
+                    Link.get_by_id(row['id']) for row in
+                    Link.get_links_by_type(self.entity)]
             self.tabs[name] = Tab(
                 name,
-                relation['label'],
+                relation.label,
                 table=entity_table(
                     items,
                     self.entity,
                     columns,
-                    relation['tab']['additional_columns'],
+                    relation.tab['additional_columns'] if relation else [],
                     relation),
                 buttons=buttons,
                 entity=self.entity,
-                tooltip=relation['tab']['tooltip'])
+                tooltip=relation.tab['tooltip'])
 
         for name in self.entity.class_.display['additional_tabs']:
             if name == 'note':
@@ -321,6 +333,11 @@ class Display:
             _('alias'): list(self.entity.aliases.values()),
             _('begin'): format_entity_date(self.entity.dates, 'begin'),
             _('end'): format_entity_date(self.entity.dates, 'end')}
+        if self.entity.class_.group['name'] == 'actor' \
+                and not (self.entity.dates.first and self.entity.dates.last):
+            appears_first, appears_last = get_appearance(self.entity)
+            self.data[_('appears first')] = appears_first
+            self.data[_('appears last')] = appears_last
         if self.entity.standard_type:
             var = ' > '.join(
                 [g.types[id_].name for id_ in self.entity.standard_type.root])
@@ -345,12 +362,12 @@ class Display:
                         value = link(value, value, external=True)
                     self.data[attribute['label']] = str(value)
         for name, relation in self.entity.class_.relations.items():
-            if relation['mode'] in ['direct', 'display']:
-                self.data[relation['label']] = []
+            if relation.mode in ['direct', 'display']:
+                self.data[relation.label] = []
                 for e in self.entity.get_linked_entities(
-                        relation['property'],
-                        relation['classes'],
-                        relation['inverse']):
+                        relation.property,
+                        relation.classes,
+                        relation.inverse):
                     if e.class_.name == 'object_location':
                         e = e.get_linked_entity_safe('P53', True)
                         self.linked_places.append(e)
@@ -361,7 +378,7 @@ class Display:
                         self.data['end'] = \
                             format_entity_date(self.entity.dates, 'end', e)
                     else:
-                        self.data[relation['label']].append(link(e))
+                        self.data[relation.label].append(link(e))
         for name, item in \
                 self.entity.class_.display['additional_information'].items():
             match name:

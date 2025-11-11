@@ -9,6 +9,7 @@ def relation(name: str) -> dict[str, Any]:
     return {
         'classes': class_groups[name]['classes'],
         'property': 'P67',
+        'multiple': True,
         'tab': {'buttons': ['link', 'insert']}}
 
 

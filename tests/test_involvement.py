@@ -24,16 +24,13 @@ class InvolvementTests(TestBaseCase):
             follow_redirects=True)
         assert b'Event Horizon' in rv.data
 
-        return  # Todo: continue tests
-
         rv = c.post(
             url_for(
-                'insert_relation',
-                type_='involvement',
-                origin_id=actor.id),
+                'link_insert_detail',
+                origin_id=actor.id,
+                name='participated'),
             data={
-                'event': str([event.id]),
-                'activity': 'P11',
+                'participated': event.id,
                 'begin_year_from': '950',
                 'end_year_from': '1950'},
             follow_redirects=True)
@@ -41,27 +38,12 @@ class InvolvementTests(TestBaseCase):
 
         rv = c.post(
             url_for(
-                'insert_relation',
-                type_='involvement',
-                origin_id=event.id),
-            data={
-                'actor': str([actor.id]),
-                'continue_': 'yes',
-                'activity': 'P22'},
+                'link_insert_detail',
+                origin_id=event.id,
+                name='recipient'),
+            data={'recipient': actor.id, 'continue_': 'yes'},
             follow_redirects=True)
         assert b'Event Horizon' in rv.data
 
         rv = c.get(url_for('view', id_=event.id))
         assert b'Event Horizon' in rv.data
-
-        with app.test_request_context():
-            app.preprocess_request()
-            link_ = event.get_links('P22')[0]
-
-        rv = c.post(
-            url_for('link_update', id_=link_.id, origin_id=actor.id),
-            data={
-                'description': 'Infinite Space - Infinite Terror',
-                'activity': 'P23'},
-            follow_redirects=True)
-        assert b'Infinite Space - Infinite Terror' in rv.data

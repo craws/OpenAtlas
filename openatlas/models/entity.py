@@ -8,15 +8,12 @@ from flask import g, request
 from werkzeug.exceptions import abort
 
 from openatlas import app
-from openatlas.database import (
-    date, entity as db, link as db_link, tools as db_tools)
+from openatlas.database import date, entity as db, link as db_link
 from openatlas.display.util2 import convert_size, sanitize
 from openatlas.models.annotation import AnnotationText
 from openatlas.models.dates import Dates
 from openatlas.models.gis import Gis
-from openatlas.models.tools import get_carbon_link
 
-# Todo: remove? Property types work differently, e.g. no move functionality
 app.config['PROPERTY_TYPES'] = [
     'Actor relation',
     'Actor function',
@@ -38,7 +35,7 @@ class Entity:
         self.class_ = g.classes[data['openatlas_class_name']]
         self.cidoc_class = self.class_.cidoc_class
         self.id = 0
-        self.name = None
+        self.name = ''
         self.aliases = {}
         self.description = None
         self.created = None
@@ -87,7 +84,6 @@ class Entity:
             self.resolver_url = data['resolver_url']
             self.example_id = data['identifier_example']
             self.system = data['system']
-            self.classes: list[str] = []
 
     def get_linked_entity(
             self,
@@ -128,12 +124,6 @@ class Entity:
             types=types,
             sort=sort)
 
-    def get_linked_entity_ids_recursive(
-            self,
-            codes: list[str] | str,
-            inverse: bool = False) -> list[int]:
-        return db.get_linked_entities_recursive(self.id, codes, inverse)
-
     def get_linked_entities_recursive(
             self,
             codes: list[str] | str,
@@ -149,7 +139,7 @@ class Entity:
              description: Optional[str] = None,
              inverse: bool = False,
              type_id: Optional[int] = None,
-             dates: Optional[dict] = None) -> list[int]:
+             dates: Optional[dict[str, Any]] = None) -> list[int]:
         property_ = g.properties[code]
         entities = range_ if isinstance(range_, list) else [range_]
         new_link_ids = []
@@ -179,13 +169,14 @@ class Entity:
                 'description': sanitize(description)
                 if isinstance(description, str) else description,
                 'type_id': type_id}
-            data.update(dates or {
-                'begin_from': None,
-                'begin_to': None,
-                'begin_comment': None,
-                'end_from': None,
-                'end_to': None,
-                'end_comment': None})
+            data.update(
+                dates or {
+                    'begin_from': None,
+                    'begin_to': None,
+                    'begin_comment': None,
+                    'end_from': None,
+                    'end_to': None,
+                    'end_comment': None})
             id_ = db.link(data)
             new_link_ids.append(id_)
         return new_link_ids
@@ -221,23 +212,6 @@ class Entity:
             classes,
             inverse)
 
-    def delete_links_old(
-            self,
-            codes: list[str],
-            inverse: bool = False) -> None:
-        # Todo: remove this function after new classes
-        if self.class_.name == 'stratigraphic_unit' \
-                and 'P2' in codes \
-                and not inverse:
-            exclude_ids = g.sex_type.get_sub_ids_recursive()
-            exclude_ids.append(g.radiocarbon_type.id)
-            if db_tools.get_sex_types(self.id) or get_carbon_link(self):
-                db.remove_types(self.id, exclude_ids)
-                codes.remove('P2')
-                if not codes:
-                    return
-        db.delete_links_by_codes(self.id, codes, inverse)
-
     def save_file_info(self, data: dict[str, Any]) -> None:
         db.update_file_info({
             'entity_id': self.id,
@@ -254,7 +228,7 @@ class Entity:
             annotation_data = result['data']
             AnnotationText.delete_annotations_text(self.id)
         for item in ['name', 'description']:
-            data[item] = sanitize(data[item])
+            data[item] = sanitize(data.get(item, getattr(self, item)))
         db.update(data)
         for annotation in annotation_data:
             annotation['source_id'] = self.id
@@ -262,7 +236,7 @@ class Entity:
         for attribute in self.class_.attributes:
             match attribute:
                 case 'alias':
-                    self.update_aliases(data['alias'])
+                    self.update_aliases(data.get('alias', []))
                 case 'location':
                     self.update_gis(data['gis'])
                 case 'file':
@@ -279,28 +253,9 @@ class Entity:
                             self.id,
                             data['reference_system_classes'])
 
-        # continue_link_id = None
-        # if 'administrative_units' in data \
-        #        and self.class_.name != 'administrative_unit':
-        #   self.update_administrative_units(data['administrative_units'], new)
-        # if 'links' in data:
-        #    continue_link_id = self.update_links(data, new)
-        # return continue_link_id
-
-    def update_administrative_units(
-            self,
-            units: dict[str, list[int]],
-            new: bool) -> None:
-        if not self.location:
-            self.location = self.get_linked_entity_safe('P53')
-        if not new:
-            self.location.delete_links_old(['P89'])
-        if units:
-            self.location.link('P89', [g.types[id_] for id_ in units])
-
     def get_annotated_text(self) -> str:
         offset = 0
-        text = self.description
+        text = self.description or ''
         for annotation in AnnotationText.get_by_source_id(self.id):
             dict_ = {'annotationId': f'a-{annotation.id}'}
             if annotation.entity_id:
@@ -315,7 +270,7 @@ class Entity:
             end = annotation.link_end + offset
             text = text[:start] + mark + text[end:]
             offset += (len(mark) - len(inner_text))
-        return text.replace('\n', '<br>') if text else text
+        return text.replace('\n', '<br>')
 
     def update_aliases(self, aliases: list[str]) -> None:
         for id_, alias in self.aliases.items():
@@ -331,40 +286,6 @@ class Entity:
                         'name': alias,
                         'openatlas_class_name': 'appellation'}))
 
-    # Todo: Only used for imports. Has to be adapted and maybe move there?
-    def update_links(self, data: dict[str, Any], new: bool) -> Optional[int]:
-        if not new:
-            if 'delete' in data['links'] and data['links']['delete']:
-                self.delete_links_old(data['links']['delete'])
-            if 'delete_inverse' in data['links'] \
-                    and data['links']['delete_inverse']:
-                self.delete_links_old(data['links']['delete_inverse'], True)
-            if 'delete_reference_system' in data['links'] \
-                    and data['links']['delete_reference_system']:
-                db.delete_reference_system_links(self.id)
-        continue_link_id = None
-        for link_ in data['links']['insert']:
-            ids = self.link(
-                link_['property'],
-                link_['range'],
-                link_['description'],
-                link_['inverse'],
-                link_['type_id'])
-            if 'attributes_link' in data:
-                for id_ in ids:
-                    item = Link.get_by_id(id_)
-                    item.begin_from = data['attributes_link']['begin_from']
-                    item.begin_to = data['attributes_link']['begin_to']
-                    item.begin_comment = \
-                        data['attributes_link']['begin_comment']
-                    item.end_from = data['attributes_link']['end_from']
-                    item.end_to = data['attributes_link']['end_to']
-                    item.end_comment = data['attributes_link']['end_comment']
-                    # item.update()
-            if link_['return_link_id']:
-                continue_link_id = ids[0]
-        return continue_link_id
-
     def update_gis(self, gis_data: dict[str, Any], new: bool = False) -> None:
         if new:
             location = insert({
@@ -377,7 +298,8 @@ class Entity:
                 'id': location.id,
                 'name': f"Location of {sanitize(self.name)}"})
             Gis.delete_by_entity(location)
-        Gis.insert(location, gis_data)
+        if gis_data:
+            Gis.insert(location, gis_data)
 
     def get_profile_image_id(self) -> Optional[int]:
         return db.get_profile_image_id(self.id)
@@ -392,7 +314,7 @@ class Entity:
             return sanitize(name_parts[1][:-1])  # pragma: no cover
         return name_parts[0]
 
-    def check_too_many_single_type_links(self) -> bool:
+    def check_too_many_single_type_links(self) -> Entity | None:
         type_dict: dict[int, int] = {}
         for type_ in self.types:
             if type_.root[0] in type_dict:
@@ -401,8 +323,8 @@ class Entity:
             type_dict[type_.root[0]] = 1
         for id_, count in type_dict.items():
             if count > 1 and not g.types[id_].multiple:
-                return True
-        return False
+                return g.types[id_]
+        return None
 
     def get_structure(self) -> dict[str, list[Entity]]:
         structure: dict[str, list[Entity]] = {
@@ -550,6 +472,13 @@ class Entity:
         return entities
 
     @staticmethod
+    def get_linked_entity_ids_recursive(
+            entity_id: int,
+            codes: list[str] | str,
+            inverse: bool = False) -> list[int]:
+        return db.get_linked_entities_recursive(entity_id, codes, inverse)
+
+    @staticmethod
     def get_by_cidoc_class(
             code: str | list[str],
             types: bool = False,
@@ -622,13 +551,6 @@ class Entity:
     @staticmethod
     def set_profile_image(id_: int, origin_id: int) -> None:
         db.set_profile_image(id_, origin_id)
-
-    @staticmethod
-    def get_roots(
-            property_code: str,
-            ids: list[int],
-            inverse: bool = False) -> dict[int, Any]:
-        return db.get_roots(property_code, ids, inverse)
 
     @staticmethod
     def get_links_of_entities(
@@ -878,9 +800,9 @@ def insert(data: dict[str, Any]) -> Entity:
     for attribute in attributes:
         match attribute:
             case 'alias' if 'alias' in data:
-                entity.update_aliases(data['alias'])
-            case 'location' if 'gis' in data:
-                entity.update_gis(data['gis'], new=True)
+                entity.update_aliases(data['alias'] or [])
+            case 'location':
+                entity.update_gis(data.get('gis', {}), new=True)
             case 'file':
                 entity.save_file_info(data)
             case 'resolver_url':

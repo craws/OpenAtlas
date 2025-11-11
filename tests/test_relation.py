@@ -13,19 +13,15 @@ class RelationTests(TestBaseCase):
             actor = insert('person', 'Connor MacLeod')
             related = insert('person', 'The Kurgan')
 
-        return  # Todo: continue tests
-
         rv = c.get(
-            url_for(
-                'insert_relation',
-                origin_id=actor.id,
-                type_='actor_relation'))
+            url_for('link_insert_detail', origin_id=actor.id, name='relative'))
         assert b'Actor relation' in rv.data
 
         relation = get_hierarchy('Actor relation')
         sub_id = relation.subs[0]
         data = {
-            'actor': str([related.id]),
+            'domain': actor.id,
+            'relative': related.id,
             relation.id: sub_id,
             'inverse': None,
             'begin_year_from': '-1949',
@@ -35,10 +31,7 @@ class RelationTests(TestBaseCase):
             'end_year_from': '2049',
             'end_year_to': '2050'}
         rv = c.post(
-            url_for(
-                'insert_relation',
-                origin_id=actor.id,
-                type_='actor_relation'),
+            url_for('link_insert_detail', origin_id=actor.id, name='relative'),
             data=data,
             follow_redirects=True)
         assert b'The Kurgan' in rv.data
@@ -71,11 +64,20 @@ class RelationTests(TestBaseCase):
             follow_redirects=True)
         assert b'Entities were updated' in rv.data
 
-        rv = c.get(url_for('link_update', id_=link_.id, origin_id=related.id))
+        rv = c.get(
+            url_for(
+                'link_update',
+                id_=link_.id,
+                origin_id=related.id,
+                name='relative'))
         assert b'Connor' in rv.data
 
         rv = c.post(
-            url_for('link_update', id_=link_.id, origin_id=actor.id),
+            url_for(
+                'link_update',
+                id_=link_.id,
+                origin_id=actor.id,
+                name='relative'),
             data={'description': 'There can be only one', 'inverse': True},
             follow_redirects=True)
         assert b'only one' in rv.data

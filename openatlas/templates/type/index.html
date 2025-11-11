@@ -15,7 +15,7 @@
             role="tab"
             aria-selected="{% if loop.index == 1 %}true{% else %}false{% endif %}"
             href="#menu-tab-{{ category }}">
-          {{ category|uc_first + ' ' + _('types') }}
+          {{ category|uc_first }}
         </a>
       </li>
     {% endfor %}
@@ -123,7 +123,7 @@
                       {% if not type_.subs %}
                         <p class="error">{{ _("this type has no subs and won't show in forms")|uc_first }}.</p>
                       {% endif %}
-                      {{ reference_systems|safe }}
+                      {{ type_.reference_systems_display|safe }}
                       {% if type_.description %}
                         <div class="description">
                           <strong>{{ _('description')|uc_first }}</strong>

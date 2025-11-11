@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any
+from typing import Any, Optional
 
 from flask import g
 
@@ -20,7 +20,7 @@ class ArcheFileMetadata:
     is_part_of: str | None = None
     accepted_date: str | None = None
     curators: str | list[str] | None = None
-    descriptions: list[tuple[str, str]] = field(default_factory=list)
+    descriptions: list[tuple[Any, str]] | None = None
     language: str | None = None
     principal_investigators: str | list[str] | None = None
     related_disciplines: str | list[str] | None = None
@@ -41,7 +41,7 @@ class ArcheFileMetadata:
             license_: str) -> 'ArcheFileMetadata':
         metadata = app.config['ARCHE_METADATA']
         part_of = "https://id.acdh.oeaw.ac.at/" \
-            f"{metadata['topCollection'].replace(' ', '_')}"
+                  f"{metadata['topCollection'].replace(' ', '_')}"
         titles = [(entity.name, 'und')]
         file_info = (g.files[entity.id].suffix[1:], g.files[entity.id].name)
         obj = cls(
@@ -58,7 +58,8 @@ class ArcheFileMetadata:
         obj.is_part_of = part_of
         obj.accepted_date = metadata['acceptedDate']
         obj.curators = metadata['curator']
-        obj.descriptions = [(entity.description, 'und')]
+        obj.descriptions = [
+            (entity.description, 'und')] if entity.description else None
         obj.principal_investigators = metadata['principalInvestigator']
         obj.related_disciplines = metadata['relatedDiscipline']
         obj.transfer_date = datetime.today().strftime('%Y-%m-%d')
@@ -79,9 +80,9 @@ class ArcheFileMetadata:
                     'name': relation['entity'].name,
                     'reference_systems': ref_system_info,
                     'description': relation['entity'].description}
-                if relation['entity'].class_.name == 'place':
+                if relation['entity'].class_.group['name'] == 'place':
                     places.append(values)
-                if relation['entity'].class_.view == 'actor':
+                if relation['entity'].class_.group['name'] == 'actor':
                     actors.append(values)
         obj.actors = actors
         obj.spatial_coverages = places

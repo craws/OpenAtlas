@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Any, Optional
 
 from flask import flash, g, render_template, request, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
@@ -13,14 +13,15 @@ from openatlas import app
 from openatlas.display.display import Display
 from openatlas.display.table import entity_table
 from openatlas.display.util import (
-    button, check_iiif_file_exist, get_file_path, get_iiif_file_path,
-    hierarchy_crumbs, link, required_group)
-from openatlas.display.util2 import is_authorized, manual, uc_first
+    button, check_iiif_file_exist, get_chart_data, get_file_path,
+    get_iiif_file_path, hierarchy_crumbs, link, reference_systems,
+    required_group)
+from openatlas.display.util2 import is_authorized, manual, sanitize
 from openatlas.forms.entity_form import (
     get_entity_form, process_files, process_form_data)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
-from openatlas.models.openatlas_class import get_reverse_relation
+from openatlas.models.openatlas_class import Relation, get_reverse_relation
 from openatlas.models.overlay import Overlay
 
 
@@ -32,30 +33,25 @@ def view(id_: int) -> str | Response:
         flash(_("This entity can't be viewed directly."), 'error')
         abort(400)
     match entity.class_.group.get('name'):
-        case 'type' if not entity.root:  # Types have their own view
+        case 'type' if not entity.root:
             return redirect(
-                f"{url_for('type_index')}"
+                f"{url_for('index', group='type')}"
                 f"#menu-tab-{entity.category}_collapse-{id_}")
         case 'reference_system':
             entity.class_.relations = {}
             for name in entity.classes:
-                entity.class_.relations[name] = {
+                entity.class_.relations[name] = Relation(name, {
                     'name': name,
                     'label': _(name),
                     'classes': [name],
                     'property': 'P67',
-                    'mode': 'tab',
-                    'inverse': False,
-                    'additional_fields': [],
                     'multiple': True,
                     'tab': {
                         'buttons': ['remove_reference_system_class'],
-                        'tooltip': None,
                         'columns': [
                             'name',
                             'external_reference_match',
-                            'precision'],
-                        'additional_columns': None}}
+                            'precision']}})
     display = Display(entity)
     return render_template(
         'tabs.html',
@@ -106,7 +102,7 @@ def insert(
         class_=entity.class_,
         gis_data=gis_data,
         writable=os.access(app.config['UPLOAD_PATH'], os.W_OK),
-        overlays=get_overlays(origin),
+        overlays=get_overlays(origin) if origin else None,
         title=_(entity.class_.group['name']),
         crumbs=crumbs_for_insert(entity, origin, structure))
 
@@ -116,7 +112,7 @@ def crumbs_for_insert(
         origin: Entity | None,
         structure: dict[str, Any] | None) -> list[Any]:
     crumbs = hierarchy_crumbs(origin or entity) + \
-        [origin, f'+ {uc_first(entity.class_.label)}']
+        [origin, f'+ {entity.class_.label}']
     if entity.class_.group['name'] == 'artifact' and origin and structure:
         if count := len([
             i for i in structure['siblings']
@@ -126,8 +122,7 @@ def crumbs_for_insert(
 
 
 def get_overlays(entity: Entity) -> dict[int, Overlay]:
-    if entity \
-            and entity.class_.group['name'] == 'place' \
+    if entity.class_.group['name'] == 'place' \
             and current_user.settings['module_map_overlay']:
         return Overlay.get_by_object(entity)
     return {}
@@ -139,9 +134,13 @@ def get_overlays(entity: Entity) -> dict[int, Overlay]:
 def update(id_: int, copy: Optional[str] = None) -> str | Response:
     entity = Entity.get_by_id(id_, types=True, aliases=True)
     check_update_access(entity)
+    if entity.check_too_many_single_type_links():
+        abort(422)
     form = get_entity_form(entity)
     if form.validate_on_submit():
-        if template := was_modified_template(entity, form):
+        if copy:
+            entity.id = 0
+        elif template := was_modified_template(entity, form):
             return template
         return redirect(save(entity, form))
     gis_data = None
@@ -149,15 +148,16 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
         entity.location = entity.location \
             or entity.get_linked_entity_safe('P53')
         gis_data = Gis.get_all([entity], entity.get_structure())
-    # if entity.class_.group['name'] in ['artifact', 'place']:
-    #    manager.entity.image_id = manager.entity.get_profile_image_id()
-    #    if not manager.entity.image_id:
-    #        for link_ in manager.entity.get_links('P67', inverse=True):
-    #            if link_.domain.class_.group['name'] == 'file' \
-    #                    and get_base_table_data(link_.domain)[6] \
-    #                    in g.display_file_ext:
-    #                manager.entity.image_id = link_.domain.id
-    #                break
+    if entity.class_.name == 'file':
+        entity.image_id = entity.id
+    elif entity.class_.relations.get('file'):
+        entity.image_id = entity.get_profile_image_id()
+        if not entity.image_id:
+            for link_ in entity.get_links('P67', ['file'], inverse=True):
+                if file_ := g.files.get(link_.domain.id):
+                    if file_.suffix in g.display_file_ext:
+                        entity.image_id = link_.domain.id
+                        break
     return render_template(
         'entity/update.html',
         form=form,
@@ -165,7 +165,8 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
         gis_data=gis_data,
         overlays=get_overlays(entity),
         title=entity.name,
-        crumbs=hierarchy_crumbs(entity) + [entity, _('edit')])
+        crumbs=hierarchy_crumbs(entity) +
+        [entity, _('copy') if copy else _('edit')])
 
 
 def deletion_possible(entity: Entity) -> bool:
@@ -181,13 +182,13 @@ def deletion_possible(entity: Entity) -> bool:
         reverse_relation = get_reverse_relation(
             entity.class_,
             relation,
-            g.classes[relation['classes'][0]])
+            g.classes[relation.classes[0]])
         if reverse_relation \
-                and reverse_relation.get('required') \
+                and reverse_relation.required \
                 and entity.get_linked_entities(
-                    relation['property'],
-                    relation['classes'],
-                    relation['inverse']):
+                    relation.property,
+                    relation.classes,
+                    relation.inverse):
             return False
     match entity.class_.group['name']:
         case 'reference_system' if entity.system or entity.classes:
@@ -208,7 +209,8 @@ def delete(id_: int) -> Response:
         if entity.subs or entity.count:
             return redirect(url_for('type_delete_recursive', id_=entity.id))
         root = g.types[entity.root[0]] if entity.root else None
-        url = url_for('view', id_=root.id) if root else url_for('type_index')
+        url = url_for('view', id_=root.id) if root \
+            else url_for('index', group='type')
     elif entity.class_.group['name'] in ['artifact', 'place']:
         if entity.get_linked_entities('P46'):
             flash(_('Deletion not possible if subunits exists'), 'error')
@@ -259,33 +261,33 @@ def save(
         entity: Entity,
         form: Any,
         origin: Optional[Entity] = None,
-        relation_name: Optional[str] = None) -> str:
+        relation: Optional[str] = None) -> str:
     action = 'update' if entity.id else 'insert'
     url = url_for('index', group=entity.class_.group['name'])
     try:
         if hasattr(form, 'file'):
-            entity = process_files(form, origin, relation_name)
+            entity = process_files(form, origin, relation)
         else:
-            entity = process_form_data(entity, form, origin, relation_name)
+            entity = process_form_data(entity, form, origin, relation)
         g.logger.log_user(entity.id, action)
-        url = redirect_url_insert(entity, form, origin, relation_name)
+        url = redirect_url_insert(entity, form, origin, relation)
         flash(
             _('entity created') if action == 'insert' else _('info update'),
             'info')
-    except InvalidGeomException as e:
+    except InvalidGeomException:
         flash(_('Invalid geom entered'), 'error')
         if action == 'update' and entity.id:
             url = url_for(
                 'update',
                 id_=entity.id,
                 origin_id=origin.id if origin else None)
-    except Exception as e:
+    except Exception:
         flash(_('error transaction'), 'error')
         if action == 'update' and entity.id:
             url = url_for(
                 'update',
                 id_=entity.id,
-                origin_id=origin.id if origin else None)
+                origin_id=origin.id if origin else None)  # pragma: no cover
     return url
 
 
@@ -307,14 +309,16 @@ def redirect_url_insert(
                 relation=relation_name)
     if entity.class_.group['name'] != 'type' and origin and relation_name:
         relation = origin.class_.relations[relation_name]
-        if relation['additional_fields']:
+        if relation.additional_fields:
             url = url_for(
                 'link_insert_detail',
                 origin_id=origin.id,
-                relation_name=relation_name,
+                name=relation_name,
                 selection_id=entity.id)
         elif not hasattr(form, 'continue_') or form.continue_.data != 'yes':
-            url = url_for('view', id_=origin.id) + f"#tab-{relation_name}"
+            url = url_for(
+                'view',
+                id_=origin.id) + f"#tab-{relation_name.replace('_', '-')}"
     if hasattr(form, 'continue_') \
             and form.continue_.data in ['sub', 'human_remains']:
         class_ = form.continue_.data
@@ -364,6 +368,28 @@ def was_modified_template(entity: Entity, form: Any) -> str | None:
 @app.route('/index/<group>')
 @required_group('readonly')
 def index(group: str) -> str | Response:
+    if group == 'type':
+        types: dict[str, dict[Entity, str]] = {
+            'standard': {},
+            'custom': {},
+            'place': {},
+            'value': {},
+            'system': {}}
+        for type_ in [type_ for type_ in g.types.values() if not type_.root]:
+            if type_.category in types:
+                type_.chart_data = get_chart_data(type_)
+                types[type_.category][type_] = render_template(
+                    'forms/tree_select_item.html',
+                    name=sanitize(type_.name, 'ascii'),
+                    data=walk_tree(type_.subs))
+                type_.reference_systems_display = reference_systems(type_)
+        return render_template(
+            'type/index.html',
+            buttons=[manual('entity/type')],
+            types=types,
+            title=_('type'),
+            crumbs=[_('type')])
+
     classes = ['place'] if group == 'place' else \
         g.class_groups[group].get('classes', [group])
     if group == 'reference_system':
@@ -389,3 +415,23 @@ def index(group: str) -> str | Response:
         gis_data=Gis.get_all() if group == 'place' else None,
         title=_(group.replace('_', ' ')),
         crumbs=[_(group).replace('_', ' ')])
+
+
+def walk_tree(types: list[int]) -> list[dict[str, Any]]:
+    items = []
+    for id_ in types:
+        item = g.types[id_]
+        count_subs = f' ({format_number(item.count_subs)})' \
+            if item.count_subs else ''
+        name = item.name.replace("'", "&apos;")
+        if item.selectable:
+            text = f'{name} {format_number(item.count)}{count_subs}'
+        else:
+            text = f'<span class="text-muted">{name}{count_subs}</span>'
+        items.append({
+            'id': item.id,
+            'href': url_for('view', id_=item.id),
+            'a_attr': {'href': url_for('view', id_=item.id)},
+            'text': text,
+            'children': walk_tree(item.subs)})
+    return items
