@@ -22,13 +22,13 @@ group: dict[str, Any] = {
             'mode': 'direct',
             'add_dynamic': True},
         'begins_in': {
-            'label': _('born in'),
+            'label': _('begins in'),
             'classes': 'object_location',
             'property': 'OA8',
             'mode': 'direct',
             'add_dynamic': True},
         'ends_in': {
-            'label': _('died in'),
+            'label': _('ends in'),
             'classes': 'object_location',
             'property': 'OA9',
             'mode': 'direct',
@@ -128,4 +128,6 @@ group: dict[str, Any] = {
 person = copy.deepcopy(group)
 person['label'] = _('person')
 person['display']['network_color'] = '#34B522'
+person['relations']['begins_in']['label'] = _('born in')
+person['relations']['ends_in']['label'] = _('died in')
 del person['relations']['member']
