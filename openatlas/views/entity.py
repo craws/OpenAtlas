@@ -410,7 +410,7 @@ def index(group: str) -> str | Response:
     return render_template(
         'entity/index.html',
         class_=group,
-        table=entity_table(entities),
+        table=entity_table(entities, system_classes=classes),
         buttons=buttons,
         gis_data=Gis.get_all() if group == 'place' else None,
         title=_(group.replace('_', ' ')),

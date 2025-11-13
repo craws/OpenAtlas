@@ -1,15 +1,7 @@
-<table id="{{ name }}_table" class="data-table table table-hover table-striped" style="width:100%"></table>
-<style type="text/css">
-  {% if not table.columns or not table.paging %}
-    #{{ name }}_table_wrapper .row:first-of-type {display:none;}
-  {% endif %}
-</style>
+
+<link rel="stylesheet" href="/static/vendor/table-widget/oa-table-widget.css">
+<script src="/static/vendor/table-widget/table-widget.iife.js"></script>
+<div id="{{ name }}_table"></div>
 <script>
-  $(document).ready(function() {
-    $('#{{ name }}_table').DataTable({{ data|safe }});
-    overflow();
-    $('#{{ name }}_table').on('page.dt', () => overflow());
-    $('#{{ name }}_table').on('search.dt', () => overflow());
-    $('input[type="search"]').focus();
-  });
+ OATableWidget.createTableWidget("#{{ name }}_table", {{data | safe}});
 </script>

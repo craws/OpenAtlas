@@ -34,21 +34,26 @@ class Table:
             rows: Optional[list[Any]] = None,
             order: Optional[list[list[int | str]]] = None,
             defs: Optional[list[dict[str, Any]]] = None,
-            paging: bool = True) -> None:
+            paging: bool = True,
+            system_classes: Optional[list[str]] = None) -> None:
         self.columns = columns or []
         self.rows = rows or []
         self.paging = paging
         self.order = order or ''
         self.defs = defs or []
+        self.system_classes = system_classes
+
 
     def display(self, name: str = 'default') -> str:
         if not self.rows:
             return '<p class="uc-first">' + _('no entries') + '</p>'
         no_title = ['checkbox', 'remove', 'set logo', 'update']
         data = {
-            'data': self.rows,
+            'full_data': self.defs,
+            'data': self.rows if self.system_classes is None else None,
             'stateSave': 'true',
             'columns': [{
+                'key': name,
                 'title':
                     uc_first(_(name.replace('_', ' ')))
                     if name and name not in no_title else '',
@@ -59,7 +64,8 @@ class Table:
                         range(len(self.rows[0]) - len(self.columns))],
             'paging': self.paging,
             'pageLength': current_user.settings['table_rows'],
-            'autoWidth': 'false'}
+            'autoWidth': 'false',
+            'systemClasses': self.system_classes}
         if self.order:
             data['order'] = self.order
         if self.defs:
@@ -77,6 +83,7 @@ def entity_table(
         columns: Optional[list[str]] = None,
         additional_columns: Optional[list[str]] = None,
         relation: Optional[Relation] = None,
+        system_classes: Optional[list[str]] = None,
         table_id: Optional[str] = None,
         forms: Optional[dict[str, Any]] = None) -> Table:
     if not items:
@@ -117,7 +124,7 @@ def entity_table(
 
     overlays = Overlay.get_by_object(origin) \
         if origin and 'overlay' in columns else {}
-    table = Table(columns, order=order, defs=defs)
+    table = Table(columns, order=order, defs=defs, system_classes=system_classes)
     for item in items:
         e = item
         range_ = None
