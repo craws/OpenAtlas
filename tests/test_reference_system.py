@@ -66,7 +66,8 @@ class ReferenceSystemTest(TestBaseCase):
             self.precision_type.id: self.precision_type.subs[0],
             'website_url': 'https://www.geonames2.org/',
             'resolver_url': 'https://www.geonames2.org/',
-            'placeholder': ''}
+            'placeholder': '',
+            'reference_system_classes': ['feature']}
         rv = c.post(
             url_for('update', id_=g.geonames.id),
             data=data,

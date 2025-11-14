@@ -531,18 +531,6 @@ def get_linked_entities_inverse(
     return [row[0] for row in list(g.cursor)]
 
 
-def delete_links_by_codes(
-        entity_id: int,
-        codes: list[str], inverse: bool = False) -> None:
-    g.cursor.execute(
-        f"""
-        DELETE FROM model.link
-        WHERE property_code IN %(codes)s
-            AND {'range_id' if inverse else 'domain_id'} = %(id)s;
-        """,
-        {'id': entity_id, 'codes': tuple(codes)})
-
-
 def delete_links_by_property_and_class(
         entity_id: int,
         property_code: str,
@@ -563,17 +551,6 @@ def delete_links_by_property_and_class(
             'id': entity_id,
             'property_code': property_code,
             'classes': tuple(classes)})
-
-
-def remove_types(id_: int, exclude_ids: list[int]) -> None:
-    g.cursor.execute(
-        """
-        DELETE FROM model.link
-        WHERE property_code = 'P2'
-            AND domain_id = %(id)s
-            AND range_id NOT IN %(exclude_ids)s;
-        """,
-        {'id': id_, 'exclude_ids': tuple(exclude_ids)})
 
 
 def get_types(with_count: bool) -> list[dict[str, Any]]:

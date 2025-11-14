@@ -56,6 +56,26 @@ class TypeTest(TestBaseCase):
             follow_redirects=True)
         assert b'Changes have been saved' in rv.data
 
+        rv = c.get(
+            url_for(
+                'insert',
+                class_='type',
+                origin_id=type_id,
+                relation='subs'))
+        assert b'My secret type' in rv.data
+
+        rv = c.post(
+            url_for(
+                'insert',
+                class_='type',
+                origin_id=type_id,
+                relation='subs'),
+            data={'name': 'My sub type', actor_type.id: type_id})
+        sub_type_id = rv.location.split('/')[-1]
+
+        rv = c.get(url_for('update', id_=sub_type_id))
+        assert b'My sub type' in rv.data
+
         data['continue_'] = 'yes'
         rv = c.post(
             url_for(

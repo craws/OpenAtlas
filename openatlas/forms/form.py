@@ -128,11 +128,17 @@ def link_detail_form(
         relation.classes,
         types=True,
         aliases=current_user.settings['table_show_aliases'])
-    table = TableMultiField(
-        entities,
-        selection=[selection] if selection else None,
-        validators=validators) if relation.multiple else \
-        TableField(entities, selection=selection, validators=validators)
+    entities = filter_entities(origin, entities, relation)
+    if relation.multiple:
+        table = TableMultiField(
+            entities,
+            selection=[selection] if selection else None,
+            validators=validators)
+    else:
+        table = TableField(
+            entities,
+            selection=selection,
+            validators=validators)
     setattr(Form, relation.name, table)
     add_additional_link_fields(Form, relation)
     setattr(Form, 'save', SubmitField(_('insert')))

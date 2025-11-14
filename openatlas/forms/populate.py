@@ -41,9 +41,8 @@ def populate_update(form: Any, entity: Entity) -> None:
         if hasattr(form, str(root_id)):
             getattr(form, str(root_id)).data = types_
 
-    if entity.class_.group['name'] == 'type':
-        if len(entity.root) > 1:
-            getattr(form, 'super').data = entity.root[-1]
+    if entity.class_.group['name'] == 'type' and len(entity.root) > 1:
+        getattr(form, 'super').data = entity.root[-1]
 
 
 def populate_reference_systems(form: Any, entity: Entity) -> None:

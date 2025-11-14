@@ -405,7 +405,7 @@ def get_loud_end_dates(entity: Entity) -> dict[str, Any]:
 
 
 def get_type_property(type_: Entity) -> dict[str, Any]:
-    property_ = {
+    property_: dict[str, Any] = {
         'id': url_for(
             'api.entity',
             id_=type_.id,

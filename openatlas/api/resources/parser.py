@@ -146,6 +146,12 @@ entity_.add_argument(
     default='false',
     choices=('true', 'false'),
     location='args')
+entity_.add_argument(
+    'table_columns',
+    type=str,
+    action='append',
+    help="{error_msg}",
+    location='args')
 
 properties = entity_.copy()
 properties.add_argument(
@@ -226,6 +232,8 @@ query.add_argument(
     action='append',
     help="{error_msg}",
     location='args')
+
+
 
 gis = default.copy()
 gis.add_argument(

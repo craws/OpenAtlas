@@ -42,7 +42,7 @@ def view(id_: int) -> str | Response:
             for name in entity.classes:
                 entity.class_.relations[name] = Relation(name, {
                     'name': name,
-                    'label': _(name),
+                    'label': _(name.replace('_', ' ')),
                     'classes': [name],
                     'property': 'P67',
                     'multiple': True,
@@ -313,7 +313,7 @@ def redirect_url_insert(
             url = url_for(
                 'link_insert_detail',
                 origin_id=origin.id,
-                relation=relation,
+                name=relation_name,
                 selection_id=entity.id)
         elif not hasattr(form, 'continue_') or form.continue_.data != 'yes':
             url = url_for(

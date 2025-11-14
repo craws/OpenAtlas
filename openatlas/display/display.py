@@ -114,10 +114,7 @@ class Display:
             if not relation.mode == 'tab':
                 continue
             entity_for_links = self.entity
-            if name in [
-                    'event_location',
-                    'move_from_location',
-                    'move_to_location']:
+            if relation.via_location and self.entity.class_.name == 'place':
                 entity_for_links = self.entity.location
             items = []
             for item in entity_for_links.get_links(

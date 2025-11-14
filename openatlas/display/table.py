@@ -105,7 +105,7 @@ def entity_table(
     elif columns[0] == 'created':
         order = [[0, "desc"]]
 
-    if relation and relation.mode.startswith('tab'):
+    if origin and relation and relation.mode.startswith('tab'):
         if relation.additional_fields:
             columns.append('update')
         reverse_relation = get_reverse_relation(
@@ -134,7 +134,7 @@ def entity_table(
                     html = item.property.name_inverse
                 case 'begin':
                     html = table_date('first', e, range_, item)
-                case 'checkbox':
+                case 'checkbox' if isinstance(e, Entity):
                     html = f"""
                         <input
                             id="{e.id}"
@@ -144,9 +144,9 @@ def entity_table(
                             value="{e.id}" {
                     "checked" if e.id in forms.get('selection_ids', [])
                     else ""}>"""
-                case 'class':
+                case 'class' if isinstance(e, Entity):
                     html = e.class_.label
-                case 'created':
+                case 'created' if isinstance(e, Entity):
                     html = format_date(e.created)
                 case 'creator':
                     html = ''
@@ -156,19 +156,19 @@ def entity_table(
                     html = e.description
                     if relation and name in relation.additional_fields:
                         html = item.description
-                case 'count':
+                case 'count' if isinstance(e, Entity):
                     html = format_number(e.count)
                 case 'domain':
                     html = link(e)
                 case 'default_precision':
                     html = link(next(iter(e.types), None))
-                case 'end':
+                case 'end' if isinstance(e, Entity):
                     html = table_date('last', e, range_, item)
-                case 'example_id':
+                case 'example_id' if isinstance(e, Entity):
                     html = e.example_id
-                case 'extension':
+                case 'extension' if isinstance(e, Entity):
                     html = e.get_file_ext()
-                case 'external_reference_match':
+                case 'external_reference_match' if origin:
                     html = item.description
                     if url := origin.resolver_url:
                         html = link(
@@ -184,7 +184,7 @@ def entity_table(
                     html = ''
                     if g.file_info.get(e.id):
                         html = g.file_info[e.id]['license_holder']
-                case 'main_image':
+                case 'main_image' if isinstance(e, Entity):
                     html = profile_image_table_link(
                         origin,
                         e,
@@ -193,7 +193,7 @@ def entity_table(
                     html = format_name_and_aliases(e, table_id, forms)
                 case 'page':
                     html = item.description
-                case 'precision':
+                case 'precision' if isinstance(e, Link):
                     html = item.type.name
                 case 'profile' if e and e.image_id:
                     html = 'Profile' if e.id == origin.image_id else link(

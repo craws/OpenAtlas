@@ -57,6 +57,7 @@ class Relation:
         self.add_dynamic = data.get('add_dynamic', False)
         self.tooltip = data.get('tooltip')
         self.additional_fields = data.get('additional_fields', [])
+        self.via_location = data.get('via_location', False)
         self.type = data.get('type')
         if self.mode == 'tab':
             self.tab = data.get('tab', {})

@@ -167,11 +167,12 @@ def add_arche_file_metadata_to_graph(
         for uri in create_uri(metadata.curators):
             graph.add((subject_uri, ACDH.hasCurator, uri))
 
-    for desc_text, lang in metadata.descriptions:
-        graph.add((
-            subject_uri,
-            ACDH.hasDescription,
-            Literal(desc_text, lang=lang)))
+    if metadata.descriptions:
+        for desc_text, lang in metadata.descriptions:
+            graph.add((
+                subject_uri,
+                ACDH.hasDescription,
+                Literal(desc_text, lang=lang)))
 
     if metadata.language:
         graph.add((subject_uri, ACDH.hasLanguage, URIRef(metadata.language)))

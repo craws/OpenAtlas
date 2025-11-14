@@ -37,7 +37,15 @@ bibliography = {
             'additional_fields': ['page'],
             'tab': {
                 'columns': ['name', 'class', 'page', 'description']}},
-        'file': standard_relations['file']},
+        'file': {
+            'label': class_groups['file']['label'],
+            'classes': class_groups['file']['classes'],
+            'property': 'P67',
+            'multiple': True,
+            'additional_fields': ['page'],
+            'tab': {
+                'buttons': ['link', 'insert'],
+                'columns': ['name', 'type', 'page', 'description']}}},
     'display': {
         'buttons': ['copy'],
         'form_buttons': ['insert_and_continue'],
