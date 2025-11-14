@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import shutil
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Optional
 
@@ -14,7 +14,8 @@ from openatlas.api.import_scripts.util import get_exact_match
 from openatlas.models.entity import Entity
 
 FILE_PATH = Path('files/femcare')
-SKELETON_PATH = FILE_PATH / '06_SE Protokollblätter' / 'Elisabethinen_SE Protokolle'
+SKELETON_PATH = FILE_PATH / '06_SE Protokollblätter' / ('Elisabethinen_SE '
+                                                        'Protokolle')
 SKELETON_IMAGE_PATH = FILE_PATH / 'skelett_mannchen'
 UPLOAD = FILE_PATH / 'uploads'
 
@@ -28,7 +29,7 @@ class Individual:
     se_id: int
     description: list
     probe_type: str
-    #find_type: str
+    # find_type: str
     position: str
     orientation: str
     preservation: str
@@ -175,6 +176,7 @@ def parse_finds() -> list[Find]:
         finds_.append(entry_obj)
     return finds_
 
+
 def parse_individual_docx(file_path: Path) -> Optional[Individual]:
     """Parse one DOCX file by reading table 2 and 4 directly."""
     doc = Document(file_path)
@@ -184,12 +186,12 @@ def parse_individual_docx(file_path: Path) -> Optional[Individual]:
 
     # --- Table 2: contains SE id and general attributes ---
     t2 = tables[1]
-    text_t2 = " ".join(c.text.strip() for c in t2._cells)
     se_id = None
-    for token in text_t2.split():
-        if token.startswith("SE"):
+    for token in t2._cells:
+        if token.text.startswith("SE"):
             try:
-                se_id = int(token.replace("SE", "").replace(":", "").strip())
+                se_id = int(
+                    token.text.replace("SE", "").replace(":", "").strip())
                 break
             except ValueError:
                 continue
@@ -198,7 +200,6 @@ def parse_individual_docx(file_path: Path) -> Optional[Individual]:
 
     # --- Table 4: contains main archaeological info ---
     t4 = tables[3]
-
     fields = {
         "Lage": "",
         "Orientierung": "",
@@ -218,32 +219,30 @@ def parse_individual_docx(file_path: Path) -> Optional[Individual]:
         "Anmerkungen/ Skizze",
     }
 
-    # each row should have 2 cells: label + value
     for row in t4.rows:
         cells = row.cells
         if len(cells) < 1:
             continue
-        label = cells[0].text.strip()
-        value = cells[1].text.strip() if len(cells) > 1 else ""
-
+        text = " ".join(c.text.strip() for c in cells)
+        splited_text = text.split(':')
+        label = splited_text[0].strip()
+        value = splited_text[1].strip() if len(splited_text) > 1 else ""
         if label in fields:
             fields[label] = value
         elif label in desc_labels:
             description_parts.append(f"{label}: {value}")
-
-    description = "\n".join(description_parts).strip()
-
-    return Individual(
+    # description = "\n".join(description_parts).strip()
+    ind = Individual(
         se_id=se_id,
-        description=description,
+        description=description_parts,
         probe_type=fields["Art"],
         position=fields["Lage"],
         orientation=fields["Orientierung"],
         preservation=fields["Erhaltungszustand"],
         dislocation=fields["Dislozierung"],
         age=fields["Alter"],
-        extraction=fields["Bergung"],
-    )
+        extraction=fields["Bergung"])
+    return ind
 
 
 def get_individuals() -> list[Individual]:
@@ -255,10 +254,11 @@ def get_individuals() -> list[Individual]:
             output.append(ind)
     return output
 
+
 def merge_units(
         strat_units: list[ParsedStratigraphicUnit],
         individuals: list[Individual]) -> list[StratigraphicUnit]:
-    individual_lookup = {int(ind.se_id): ind for ind in individuals}
+    individual_lookup = {ind.se_id: ind for ind in individuals}
     merged = []
     for strat_unit in strat_units:
         ind = individual_lookup.get(int(strat_unit.se_id))
@@ -272,7 +272,7 @@ def merge_units(
             individual_id=strat_unit.individual_id,
             description=ind.description if ind else [],
             probe_type=ind.probe_type if ind else None,
-            #find_type=ind.find_type if ind else None,
+            # find_type=ind.find_type if ind else None,
             position=ind.position if ind else None,
             orientation=ind.orientation if ind else None,
             preservation=ind.preservation if ind else None,
