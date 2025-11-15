@@ -126,7 +126,7 @@ Tabs
   Provides a button to check ARCHE files.
   Only files associated with ``typeIds`` (if any are defined) are checked.
   More information on the file checker can be found in
-  :doc:`admin/data_integrity_checks`.
+  :doc:`/admin/data_integrity_checks`.
 
 * **Export**
   Shows the exported files.
