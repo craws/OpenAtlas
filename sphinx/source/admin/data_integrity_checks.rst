@@ -154,7 +154,7 @@ Check files
 
 In this section, all files are checked for completeness and consistency.
 Further information about file entities can be found in the manual under
-:doc:`entity/file`.
+:doc:`/entity/file`.
 
 Missing information
 *******************

@@ -18,7 +18,7 @@ then run the database upgrade script, then restart Apache:
     sudo service apache2 restart
 
 ### 8.14.0 to 8.15.0
-No database update is required but an additional Python package is needed:
+No database update is required but additional Python packages are needed:
 
 #### Additional package
 The unidecode package is used to transliterate URLs to ASCII.
