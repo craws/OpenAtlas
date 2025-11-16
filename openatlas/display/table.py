@@ -193,12 +193,6 @@ def entity_table(
                     html = format_name_and_aliases(e, table_id, forms)
                 case 'page':
                     html = item.description
-                case 'precision' if isinstance(e, Link):
-                    html = item.type.name
-                case 'profile' if e and e.image_id:
-                    html = 'Profile' if e.id == origin.image_id else link(
-                        'profile',
-                        url_for('file_profile', id_=e.id, entity_id=origin.id))
                 case 'overlay':
                     html = ''
                     if is_authorized('editor') \

@@ -21,14 +21,26 @@ class ReferenceSystemTest(TestBaseCase):
         rv = c.get(url_for('insert', class_='reference_system'))
         assert b'resolver url' in rv.data
 
-        rv = c.post(
-            url_for('insert', class_='reference_system'),
-            data={
-                'name': 'Wikipedia',
-                'website_url': 'https://wikipedia.org',
-                'resolver_url': 'https://wikipedia.org',
-                'reference_system_classes': ['place']})
+        data: Any = {
+            'name': 'Wikipedia',
+            'website_url': 'https://wikipedia.org',
+            'resolver_url': 'https://wikipedia.org'}
+        rv = c.post(url_for('insert', class_='reference_system'), data=data)
         wikipedia_id = rv.location.split('/')[-1]
+
+        data['reference_system_classes'] = ['place']
+        rv = c.post(
+            url_for('update', id_=wikipedia_id),
+            data=data,
+            follow_redirects=True)
+        assert b'Changes have been saved' in rv.data
+
+        data['name'] = 'No name change for system classes'
+        rv = c.post(
+            url_for('update', id_=g.geonames.id),
+            data=data,
+            follow_redirects=True)
+        assert b'Changes have been saved' in rv.data and b'GeoNames' in rv.data
 
         rv = c.post(
             url_for('insert', class_='reference_system'),
@@ -60,19 +72,6 @@ class ReferenceSystemTest(TestBaseCase):
 
         rv = c.get(url_for('update', id_=g.geonames.id))
         assert b'website url' in rv.data
-
-        data: dict[Any, Any] = {
-            'name': 'GeoNames',
-            self.precision_type.id: self.precision_type.subs[0],
-            'website_url': 'https://www.geonames2.org/',
-            'resolver_url': 'https://www.geonames2.org/',
-            'placeholder': '',
-            'reference_system_classes': ['feature']}
-        rv = c.post(
-            url_for('update', id_=g.geonames.id),
-            data=data,
-            follow_redirects=True)
-        assert b'Changes have been saved' in rv.data
 
         rv = c.post(
             url_for('insert', class_='person'),
