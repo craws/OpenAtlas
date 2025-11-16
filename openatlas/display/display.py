@@ -34,10 +34,7 @@ class Display:
         self.structure: dict[str, list[Entity]] = {}
         self.gis_data: dict[str, Any] = {}
         self.problematic_type = self.entity.check_too_many_single_type_links()
-        if entity.class_.attributes.get('file'):
-            entity.image_id = entity.id if get_file_path(entity.id) else None
-        else:
-            entity.image_id = entity.get_profile_image_id()
+        self.entity.image_id = entity.get_profile_image_id()
         self.add_tabs()
         self.add_buttons()
         self.add_info_tab_content()
@@ -127,13 +124,6 @@ class Display:
                         inverse=True,
                         types=True)
                 items.append(item)
-                if relation.property == 'P67' \
-                        and relation.classes == ['file'] \
-                        and not self.entity.image_id \
-                        and item.domain.get_file_ext() in \
-                        g.display_file_ext:
-                    self.entity.image_id = \
-                        self.entity.image_id or item.domain.id
             buttons = [link_] if (link_ := manual(f'entity/{name}')) else []
             if is_authorized('contributor'):
                 for button_name in relation.tab['buttons']:

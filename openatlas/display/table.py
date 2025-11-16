@@ -9,8 +9,7 @@ from flask_login import current_user
 from openatlas import app
 from openatlas.display.image_processing import check_processed_image
 from openatlas.display.util import (
-    check_iiif_file_exist, edit_link, get_file_path, link,
-    profile_image_table_link, remove_link)
+    check_iiif_file_exist, edit_link, get_file_path, link, remove_link)
 from openatlas.display.util2 import (
     display_bool, is_authorized, sanitize, uc_first)
 from openatlas.models.dates import format_date
@@ -185,10 +184,7 @@ def entity_table(
                     if g.file_info.get(e.id):
                         html = g.file_info[e.id]['license_holder']
                 case 'main_image' if isinstance(e, Entity):
-                    html = profile_image_table_link(
-                        origin,
-                        e,
-                        e.get_file_ext())
+                    html = profile_image_table_link(origin, e)
                 case 'name':
                     html = format_name_and_aliases(e, table_id, forms)
                 case 'page':
@@ -317,3 +313,13 @@ def table_date(
             html = getattr(e.dates, mode)
         html = f'<span class="text-muted">{html}</span>' if html else ''
     return html
+
+
+def profile_image_table_link(entity: Entity, file: Entity) -> str:
+    if is_authorized('contributor') \
+            and file.id != entity.image_id \
+            and file.get_file_ext() in g.display_file_ext:
+        return link(
+                _('set'),
+                url_for('set_profile_image', id_=file.id, origin_id=entity.id))
+    return ''

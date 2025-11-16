@@ -120,11 +120,6 @@ class FileTest(TestBaseCase):
                 follow_redirects=True)
         assert b'File type not allowed' in rv.data
 
-        rv = c.get(
-            url_for('remove_profile_image', entity_id=place.id),
-            follow_redirects=True)
-        assert b'Unset' not in rv.data
-
         rv = c.post(
             url_for('link_insert_detail', origin_id=reference.id, name='file'),
             data={'file': iiif_id},

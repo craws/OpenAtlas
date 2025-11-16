@@ -231,12 +231,6 @@ def set_profile_image(id_: int, origin_id: int) -> None:
         {'entity_id': origin_id, 'image_id': id_})
 
 
-def remove_profile_image(id_: int) -> None:
-    g.cursor.execute(
-        'DELETE FROM web.entity_profile_image WHERE entity_id = %(id)s;',
-        {'id': id_})
-
-
 def delete(id_: int) -> None:  # Triggers psql delete_entity_related
     g.cursor.execute(
         'DELETE FROM model.entity WHERE id = %(id)s;',

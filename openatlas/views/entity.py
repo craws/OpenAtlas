@@ -142,20 +142,11 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
             return template
         return redirect(save(entity, form))
     gis_data = None
+    entity.image_id = entity.get_profile_image_id()
     if entity.class_.attributes.get('location'):
         entity.location = entity.location \
             or entity.get_linked_entity_safe('P53')
         gis_data = Gis.get_all([entity], entity.get_structure())
-    if entity.class_.name == 'file':
-        entity.image_id = entity.id
-    elif entity.class_.relations.get('file'):
-        entity.image_id = entity.get_profile_image_id()
-        if not entity.image_id:
-            for link_ in entity.get_links('P67', ['file'], inverse=True):
-                if file_ := g.files.get(link_.domain.id):
-                    if file_.suffix in g.display_file_ext:
-                        entity.image_id = link_.domain.id
-                        break
     return render_template(
         'entity/update.html',
         form=form,
