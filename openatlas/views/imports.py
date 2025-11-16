@@ -8,7 +8,7 @@ from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import FlaskForm
 from pandas import DataFrame, Series
 from shapely import wkt
-from shapely.errors import WKTReadingError
+from shapely.errors import ShapelyError
 from werkzeug.exceptions import ImATeapot
 from werkzeug.utils import redirect, secure_filename
 from werkzeug.wrappers import Response
@@ -572,7 +572,7 @@ def check_cell_value(
         case 'wkt' if value:
             try:
                 wkt.loads(row[item])
-            except WKTReadingError:
+            except ShapelyError:
                 value = error_span(value)
                 checks.set_warning('invalid_coordinates', id_)
         case 'begin_from' | 'begin_to' | 'end_from' | 'end_to' if value:

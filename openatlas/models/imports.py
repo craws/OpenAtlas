@@ -8,7 +8,7 @@ from typing import Any, Optional
 from flask import g
 from flask_login import current_user
 from shapely import wkt
-from shapely.errors import WKTReadingError
+from shapely.errors import ShapelyError
 from shapely.geometry import Point, Polygon, mapping, LineString
 
 from openatlas.api.import_scripts.util import (
@@ -262,7 +262,7 @@ def link_admin_units(location: Entity, row: dict[str, Any]) -> None:
 def get_coordinates_from_wkt(coordinates: str) -> dict[str, Any]:
     try:
         wkt_: Any = wkt.loads(coordinates)
-    except WKTReadingError:
+    except ShapelyError:
         wkt_ = None
     geometries = []
     if wkt_:

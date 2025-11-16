@@ -1,4 +1,4 @@
-FROM debian:12
+FROM debian:13
 
 RUN --mount=type=cache,target=/var/cache/apt \
     export DEBIAN_FRONTEND=noninteractive &&\
