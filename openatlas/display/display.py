@@ -10,9 +10,9 @@ from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.table import entity_table
 from openatlas.display.util import (
-    bookmark_toggle, button, description, display_annotation_text_links,
-    format_entity_date, get_appearance, get_chart_data, get_file_path,
-    get_system_data, link, reference_systems)
+    bookmark_toggle, button, button_bar, description,
+    display_annotation_text_links, format_entity_date, get_appearance,
+    get_chart_data, get_file_path, get_system_data, link, reference_systems)
 from openatlas.display.util2 import (
     display_bool, is_authorized, manual, uc_first)
 from openatlas.models.dates import format_date
@@ -199,6 +199,21 @@ class Display:
             if name == 'note':
                 self.add_note_tab()
                 continue
+
+        empty_tabs = []
+        for name, tab in self.tabs.items():
+            if name != 'info' and not tab.table.rows:
+                empty_tabs.append(name)
+        if empty_tabs:
+            self.tabs['additional'] = Tab(
+                'additional',
+                '+ ' + uc_first(_('relation')),
+                '')
+            for name in empty_tabs:
+                self.tabs['additional'].content += \
+                    f"<h2>{self.tabs[name].label}</h2>" + \
+                    button_bar(self.tabs[name].buttons)
+                del self.tabs[name]
 
     def add_note_tab(self) -> None:
         buttons = [manual('tools/notes')]
