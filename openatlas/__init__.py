@@ -24,7 +24,6 @@ app.config.from_object('config.api')
 app.config.from_pyfile('production.py')
 app.config['WTF_CSRF_TIME_LIMIT'] = None  # Set CSRF token valid for session
 locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
-babel = Babel(app)
 jwt = JWTManager(app)
 
 # pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position
@@ -36,7 +35,6 @@ from openatlas.views import (
     search, token, tools, type as type_, user, vocabs)
 
 
-@babel.localeselector
 def get_locale() -> str:
     if request.path.startswith('/api/') \
             and request.args.get('locale') in app.config['LANGUAGES']:
@@ -46,6 +44,7 @@ def get_locale() -> str:
     best_match = request.accept_languages.best_match(app.config['LANGUAGES'])
     return best_match or g.settings['default_language']
 
+babel = Babel(app, locale_selector=get_locale)
 
 @app.before_request
 def before_request() -> Response | None:
