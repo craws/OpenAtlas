@@ -16,6 +16,10 @@ def index_changelog() -> str:
 # pylint: disable=too-many-lines
 
 versions = {
+    '8.15.1': ['2025-11-17', {
+        'fix': {
+            '2679': 'API: Duplicated operationId in OpenAPI',
+            '2668': 'ARCHE: Solve proxy issues'}}],
     '8.15.0': ['2025-11-15', {
         'feature': {
             '2593': 'File checker',
