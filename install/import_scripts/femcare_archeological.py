@@ -207,17 +207,7 @@ def parse_individual_docx(file_path: Path) -> Optional[Individual]:
         "Dislozierung": "",
         "Alter": "",
         "Bergung": "",
-        "Art": "",
-    }
-
-    description_parts: list[str] = []
-    desc_labels = {
-        "Position(Objekt)+Beschreibung",
-        "Grabkonstruktion",
-        "Fundmaterial",
-        "Grabmarkierung/ -überbau und -form",
-        "Anmerkungen/ Skizze",
-    }
+        "Art": ""}
 
     for row in t4.rows:
         cells = row.cells
@@ -230,6 +220,15 @@ def parse_individual_docx(file_path: Path) -> Optional[Individual]:
             value = splited_text[1].strip() if len(splited_text) > 1 else ""
             if label in fields:
                 fields[label] = value
+
+    description_parts: list[str] = []
+    desc_labels = {
+        "Position(Objekt)+Beschreibung",
+        "Grabkonstruktion",
+        "Fundmaterial",
+        "Grabmarkierung/ -überbau und -form",
+        "Anmerkungen/ Skizze"}
+
     for row in t4.rows:
         cells = row.cells
         if len(cells) < 1:
@@ -238,11 +237,8 @@ def parse_individual_docx(file_path: Path) -> Optional[Individual]:
         label = splited_text[0].strip()
         value = splited_text[1].strip() if len(splited_text) > 1 else ""
         if label in desc_labels and value and value is not '-':
-
             description_parts.append(f"{label}: {value}")
-    #print(description_parts)
-    #print('++++++++++++++++++++++')
-    # description = "\n".join(description_parts).strip()
+
     ind = Individual(
         se_id=se_id,
         description=description_parts,
@@ -389,8 +385,6 @@ with app.test_request_context():
         parse_stratigraphic_units(),
         get_individuals())
     finds = parse_finds()
-    # Todo commented  just for performance,
-    # extract_images_from_pdfs()
 
     # Build type dictionaries from Feature
     feature_types = build_types(features, import_feature_type, 'type')
