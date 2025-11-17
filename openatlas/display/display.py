@@ -240,7 +240,6 @@ class Display:
         if self.entity.class_.name == 'source_translation':
             self.buttons = [manual('entity/source')]
         self.add_button_update()
-        self.add_button_delete()
         for item in self.entity.class_.display['buttons']:
             match item:
                 case 'copy' if is_authorized(self.entity.class_.write_access):
@@ -250,7 +249,9 @@ class Display:
                             url_for(
                                 'update',
                                 id_=self.entity.id,
-                                copy='copy_')))
+                                copy='copy_'),
+                            icon_name='fa-clone',
+                            css_class='me-2'))
 
                 case 'download':
                     if path := get_file_path(self.entity.id):
@@ -277,9 +278,11 @@ class Display:
                         button(
                             _('tools'),
                             url_for('tools_index', id_=self.entity.id)))
-        self.buttons.append(bookmark_toggle(self.entity.id))
+
         self.buttons.append(
             render_template('util/api_links.html', entity=self.entity))
+        self.buttons.append(bookmark_toggle(self.entity.id))
+        self.add_button_delete()
 
     def add_button_selectable(self) -> None:
         if not self.entity.selectable:
@@ -300,17 +303,22 @@ class Display:
         msg = _(
             'Delete %(name)s?',
             name=escape(self.entity.name.replace('\'', '')))
-        self.buttons.append(button(
-            _('delete'),
-            url_for('delete', id_=self.entity.id),
-            onclick=f"return confirm('{msg}')"))
+        self.buttons.append(
+            button(
+                _('delete'),
+                url_for('delete', id_=self.entity.id),
+                onclick=f"return confirm('{msg}')",
+                icon_name='fa-trash'))
 
     def add_button_update(self) -> None:
         if not is_authorized(self.entity.class_.write_access) \
                 or self.problematic_type:
             return
         self.buttons.append(
-            button(_('edit'), url_for('update', id_=self.entity.id)))
+            button(
+                _('edit'),
+                url_for('update', id_=self.entity.id),
+                icon_name='fa-pen'))
 
     def add_button_sibling_pager(self) -> None:
         prev_id = None
