@@ -1,11 +1,10 @@
-import json
-import urllib.request
 from re import search
 from typing import Any
 from urllib.parse import urlparse, urlunparse
 
 import requests
-from rdflib import Graph, Literal, URIRef, RDF, XSD
+from flask import abort, g
+from rdflib import Graph, Literal, RDF, URIRef, XSD
 from unidecode import unidecode
 
 from config.default import ACDH
@@ -15,16 +14,17 @@ from openatlas.models.entity import Entity
 
 ENTITIES_EMITTED = set()
 
-#with urllib.request.urlopen(app.config['ARCHE_URI_RULES']) as response:
-#    arche_uri_rules = json.load(response)
-
-arche_uri_rules = requests.get(
-    app.config['ARCHE_URI_RULES'],
-    proxies=app.config['PROXIES'],
-    timeout=10).json()
 
 def is_arche_likeable_uri(uri: str) -> bool:
-    for rule in arche_uri_rules:
+    if not g.arche_uri_rules:
+        try:
+            g.arche_uri_rules = requests.get(
+                app.config['ARCHE_URI_RULES'],
+                proxies=app.config['PROXIES'],
+                timeout=10).json()
+        except Exception:  # pragma: no cover
+            abort(400, 'ARCHE not reachable')
+    for rule in g.arche_uri_rules:
         if search(rule['match'], uri):
             return True
     return False  # pragma: no cover
@@ -105,8 +105,7 @@ def ensure_entity_exist(
         graph.add((uri, ACDH.hasIdentifier, uri))
         for ref_sys in entity_details['reference_systems']:
             if ref_link := ref_sys[0]:
-                if (is_valid_url(ref_link)
-                        and is_arche_likeable_uri(ref_link)):
+                if is_valid_url(ref_link) and is_arche_likeable_uri(ref_link):
                     graph.add((uri, ACDH.hasIdentifier, URIRef(ref_link)))
                 else:
                     graph.add((
