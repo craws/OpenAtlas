@@ -1588,7 +1588,7 @@
           "Proposal"
         ],
         "description": "Retrieves a json with the entity IDs as keys and a list of file information for all images.",
-        "operationId": "DisplayImage",
+        "operationId": "FilesOfEntities",
         "parameters": [
         ],
         "security": [
