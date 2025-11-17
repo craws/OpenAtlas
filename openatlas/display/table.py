@@ -221,7 +221,7 @@ def entity_table(
                     html = ''
                     if not origin.root or not g.types[origin.root[0]].required:
                         html = remove_link(e.name, item, origin, tab_id)
-                case 'set logo':
+                case 'set_logo':
                     html = link(_('set'), url_for('logo', id_=e.id))
                 case 'size':
                     html = e.get_file_size()
