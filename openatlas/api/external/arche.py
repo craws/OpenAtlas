@@ -4,6 +4,7 @@ from re import search
 from typing import Any
 from urllib.parse import urlparse, urlunparse
 
+import requests
 from rdflib import Graph, Literal, URIRef, RDF, XSD
 from unidecode import unidecode
 
@@ -14,9 +15,13 @@ from openatlas.models.entity import Entity
 
 ENTITIES_EMITTED = set()
 
-with urllib.request.urlopen(app.config['ARCHE_URI_RULES']) as response:
-    arche_uri_rules = json.load(response)
+#with urllib.request.urlopen(app.config['ARCHE_URI_RULES']) as response:
+#    arche_uri_rules = json.load(response)
 
+arche_uri_rules = requests.get(
+    app.config['ARCHE_URI_RULES'],
+    proxies=app.config['PROXIES'],
+    timeout=10).json()
 
 def is_arche_likeable_uri(uri: str) -> bool:
     for rule in arche_uri_rules:
