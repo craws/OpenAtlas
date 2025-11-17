@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import shutil
 from collections import defaultdict
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
@@ -234,19 +234,14 @@ def parse_individual_docx(file_path: Path) -> Optional[Individual]:
         cells = row.cells
         if len(cells) < 1:
             continue
-        text = " ".join(c.text.strip() for c in cells)
-        splited_text = text.split(':')
+        splited_text = cells[0].text.split(':')
         label = splited_text[0].strip()
         value = splited_text[1].strip() if len(splited_text) > 1 else ""
-        if label in desc_labels:
-            if se_id == 335:
-                print(text)
-                print(label)
-                print(value)
-                print("----------")
+        if label in desc_labels and value and value is not '-':
+
             description_parts.append(f"{label}: {value}")
-    print(description_parts)
-    print('++++++++++++++++++++++')
+    #print(description_parts)
+    #print('++++++++++++++++++++++')
     # description = "\n".join(description_parts).strip()
     ind = Individual(
         se_id=se_id,
@@ -262,10 +257,13 @@ def parse_individual_docx(file_path: Path) -> Optional[Individual]:
 
 
 def get_individuals() -> list[Individual]:
-    """Iterate all Ind_*_SE_*.docx and extract Individuals."""
     output: list[Individual] = []
-    for file in sorted(SKELETON_PATH.glob("Ind_*_SE_*.docx")):
-        ind = parse_individual_docx(file)
+    for file1 in sorted(SKELETON_PATH.glob("Ind_*_SE_*.docx")):
+        ind = parse_individual_docx(file1)
+        if ind:
+            output.append(ind)
+    for file2 in sorted(SKELETON_PATH.glob("SE_*_Ind_*.docx")):
+        ind = parse_individual_docx(file2)
         if ind:
             output.append(ind)
     return output
