@@ -16,45 +16,6 @@ $(document).ready(function () {
 
   $('[data-bs-toggle="popover"]').popover(); // Popovers init
 
-  /* DataTables - sort for checkbox columns */
-  $.fn.dataTable.ext.order['dom-checkbox'] = function (settings, col) {
-    return this.api().column(col, {order: 'index'}).nodes().map(function (td, i) {
-      return $('input', td).prop('checked') ? '1' : '0';
-    });
-  };
-
-  /* DataTables - sort for CIDOC model */
-  $.fn.dataTable.ext.order["cidoc-model"] = function (settings, col) {
-    return this.api()
-      .column(col, { order: "index" })
-      .nodes()
-      .map((td) =>
-        parseInt(
-          td?.firstChild?.innerText
-            ?.replace("OA", "100")
-            ?.replace(/[\D]*/, "") || "0",
-          10
-        )
-      );
-  };
-
-  /* DataTables - ignore special characters for search */
-  var searchType = jQuery.fn.DataTable.ext.type.search;
-  searchType.string = function (data) {
-    return !data ?
-      '' :
-      typeof data === 'string' ?
-        removeAccents(data) :
-          data;
-  };
-  searchType.html = function (data) {
-    return !data ?
-      '' :
-      typeof data === 'string' ?
-        removeAccents(data.replace(/<.*?>/g, '')) :
-          data;
-  };
-
   /* When selecting a file for upload: if name is empty, fill with filename without extension */
   $('#file').on("change", function () {
     setFilesOfDropField([...$('#file')[0].files])
@@ -173,10 +134,6 @@ $(document).ready(function () {
 });
 
 $.jstree.defaults.core.themes.dots = false;
-
-$.extend(true, $.fn.dataTable.defaults, {
-  "initComplete": processUcFirst
-});
 
 /**
  * Sets default text size to a multiple of 0.2em via body stylesheet
@@ -377,7 +334,7 @@ function deselectFromTable(tableName, nodeId) {
 function selectFromTableMulti(name) {
   let checkedNames = [];
   let ids = [];
-  $('#' + name + '_table').DataTable().rows().nodes().to$().find('input[type="checkbox"]').each(
+  $('#' + name + '_table').find('input[type="checkbox"]').each(
     function () {
       if ($(this).is(':checked')) {
         checkedNames.push({name:$(this).attr("data-entity-name"),id:$(this).attr('id')});

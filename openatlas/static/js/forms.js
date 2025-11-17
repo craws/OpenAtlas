@@ -42,10 +42,10 @@ function switch_value_type(id, el) {
 
 $(document).ready(function () {
 
-  /* Write selected DataTables checkboxes to hidden input */
+  /* Write selected table checkboxes to hidden input */
   $('#checkbox-form').submit((a) => {
     ids = [];
-    $('#checkbox-form .dataTable').DataTable().rows().nodes().to$().find('input[type="checkbox"]').each(
+    $('#checkbox-form .table').find('input[type="checkbox"]').each(
       function () {
         if ($(this).is(':checked')) {
           ids.push($(this).attr('value'));

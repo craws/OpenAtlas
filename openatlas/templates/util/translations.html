@@ -34,9 +34,4 @@
     translate.draw_geometry = {{ _('draw geometry')|uc_first|safe|tojson }};
     translate.import_wkt = {{ _('import wkt')|uc_first|safe|tojson }};
 
-    $.extend($.fn.dataTable.defaults, {
-        language: {
-            url: '/static/vendor/datatables_net/{{ session.language | safe}}.json'
-        }
-    });
 </script>
