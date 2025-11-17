@@ -223,14 +223,30 @@ def parse_individual_docx(file_path: Path) -> Optional[Individual]:
         cells = row.cells
         if len(cells) < 1:
             continue
+        for cell in cells:
+            text = cell.text.strip()
+            splited_text = text.split(':')
+            label = splited_text[0].strip()
+            value = splited_text[1].strip() if len(splited_text) > 1 else ""
+            if label in fields:
+                fields[label] = value
+    for row in t4.rows:
+        cells = row.cells
+        if len(cells) < 1:
+            continue
         text = " ".join(c.text.strip() for c in cells)
         splited_text = text.split(':')
         label = splited_text[0].strip()
         value = splited_text[1].strip() if len(splited_text) > 1 else ""
-        if label in fields:
-            fields[label] = value
-        elif label in desc_labels:
+        if label in desc_labels:
+            if se_id == 335:
+                print(text)
+                print(label)
+                print(value)
+                print("----------")
             description_parts.append(f"{label}: {value}")
+    print(description_parts)
+    print('++++++++++++++++++++++')
     # description = "\n".join(description_parts).strip()
     ind = Individual(
         se_id=se_id,
