@@ -210,9 +210,10 @@ class Display:
                 '+ ' + uc_first(_('relation')),
                 '')
             for name in empty_tabs:
-                self.tabs['additional'].content += \
-                    f"<h2>{self.tabs[name].label}</h2>" + \
-                    button_bar(self.tabs[name].buttons)
+                if self.tabs[name].buttons:
+                    self.tabs['additional'].content += \
+                        f"<h2>{self.tabs[name].label}</h2>" + \
+                        button_bar(self.tabs[name].buttons)
                 del self.tabs[name]
 
     def add_note_tab(self) -> None:

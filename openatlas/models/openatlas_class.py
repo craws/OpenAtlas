@@ -62,10 +62,10 @@ class Relation:
         if self.mode == 'tab':
             self.tab = data.get('tab', {})
             self.tab['additional_columns'] = \
-                data['tab'].get('additional_columns', [])
-            self.tab['buttons'] = data['tab'].get('buttons', [])
-            self.tab['columns'] = data['tab'].get('columns')
-            self.tab['tooltip'] = data['tab'].get('tooltip')
+                self.tab.get('additional_columns', [])
+            self.tab['buttons'] = self.tab.get('buttons', [])
+            self.tab['columns'] = self.tab.get('columns')
+            self.tab['tooltip'] = self.tab.get('tooltip')
 
 
 def get_class_count() -> dict[str, int]:
