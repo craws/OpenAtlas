@@ -36,7 +36,7 @@ def get_entity_form(
 
     add_name_fields(Form, entity)
     add_class_types(Form, entity.class_)
-    add_relations(Form, entity, origin)
+    add_relations(Form, entity, origin, relation)
     add_reference_systems(Form, entity.class_)
     for key, value in entity.class_.attributes.items():
         match key:

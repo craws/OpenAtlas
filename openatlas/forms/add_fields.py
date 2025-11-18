@@ -20,7 +20,8 @@ from openatlas.forms.field import (
     TreeMultiField, ValueTypeField, ValueTypeRootField)
 from openatlas.models.dates import check_if_entity_has_time
 from openatlas.models.entity import Entity, Link
-from openatlas.models.openatlas_class import OpenatlasClass, Relation
+from openatlas.models.openatlas_class import (
+    OpenatlasClass, Relation, get_reverse_relation)
 
 
 def add_name_fields(form: Any, entity: Entity) -> None:
@@ -140,7 +141,11 @@ def add_type(form: Any, type_: Entity) -> None:
         add_value_type_fields(form, type_.subs)
 
 
-def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
+def add_relations(
+        form: Any,
+        entity: Entity,
+        origin: Entity | None,
+        origin_relation: str | None) -> None:
     from openatlas.forms.form import filter_entities
     entities = {}  # Collect entities per class to prevent multiple fetching
     for name, relation in entity.class_.relations.items():
@@ -184,7 +189,11 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
                     relation.property,
                     relation.classes,
                     inverse=relation.inverse)
-            elif origin and origin.class_.name in relation.classes:
+            elif selection_available(
+                    entity,
+                    origin,
+                    relation,
+                    origin_relation):
                 selection = [origin]
             setattr(
                 form,
@@ -202,7 +211,11 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
                     relation.property,
                     relation.classes,
                     relation.inverse)
-            elif origin and origin.class_.name in relation.classes:
+            elif selection_available(
+                    entity,
+                    origin,
+                    relation,
+                    origin_relation):
                 selection = origin
             if selection and selection.class_.name == 'object_location':
                 selection = selection.get_linked_entity_safe('P53', True)
@@ -221,6 +234,40 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
                     description=relation.tooltip,
                     validators=validators,
                     add_dynamic=add_dynamic))
+
+
+def selection_available(
+        entity: Entity,
+        origin: Entity | None,
+        relation: Relation,
+        origin_relation: str | None) -> bool:
+    if not origin:
+        return False
+
+    class_name = origin.class_.name
+    # Todo: fix class name and add reverse option to get_reverse_relation
+    # origin.class_.name.replace('place', 'object_location')
+
+    print(origin.name)
+    print(relation.name)
+    print(origin_relation)
+    if class_name not in relation.classes:
+        print(0)
+        print(class_name)
+        print(relation.classes)
+        return False
+    if reverse_relation := get_reverse_relation(
+            entity.class_,
+            relation,
+            g.classes[relation.classes[0]]):
+        print(1)
+        print(origin_relation)
+        print(reverse_relation.name)
+        if reverse_relation.name == origin_relation:
+            print(2)
+            return True
+    print(3)
+    return False
 
 
 def add_date_fields(
