@@ -19,6 +19,8 @@ SKELETON_PATH = FILE_PATH / '06_SE Protokollblätter' / ('Elisabethinen_SE '
 SKELETON_IMAGE_PATH = FILE_PATH / 'skelett_mannchen'
 UPLOAD = FILE_PATH / 'uploads'
 
+SCHNITTE_PATH = FILE_PATH / "17_Fotodokumentation" / "Schnitte"
+
 # pylint: skip-file
 
 DEBUG_MSG = defaultdict(list)
@@ -93,6 +95,19 @@ class StratigraphicUnit:
     age: Optional[str] = None
     extraction: Optional[str] = None
 
+def build_se_ind_map(root: Path) -> dict[str, Path]:
+    """
+    Scan 'Schnitte' recursively and return mapping
+    { 'SE_x_Ind_y': folder_path }.
+    """
+    out: dict[str, Path] = {}
+    for path in root.rglob("*"):
+        if not path.is_dir():
+            continue
+        name = path.name
+        if name.startswith("SE_") and "_Ind_" in name:
+            out[name] = path
+    return out
 
 def parse_features() -> list[Feature]:
     df = pd.read_csv(FILE_PATH / 'features.csv', delimiter=',')
@@ -236,7 +251,7 @@ def parse_individual_docx(file_path: Path) -> Optional[Individual]:
         splited_text = cells[0].text.split(':')
         label = splited_text[0].strip()
         value = splited_text[1].strip() if len(splited_text) > 1 else ""
-        if label in desc_labels and value and value is not '-':
+        if label in desc_labels and value and value != '-':
             description_parts.append(f"{label}: {value}")
 
     ind = Individual(
@@ -328,7 +343,8 @@ with app.test_request_context():
     app.preprocess_request()
     exact_match = get_exact_match()
     case_study = Entity.get_by_id(16305)
-    # Remove former data
+    folder_map = build_se_ind_map(SCHNITTE_PATH)
+
     print('Remove former data')
     for item in case_study.get_linked_entities('P2', True):
         item.delete()
@@ -478,7 +494,7 @@ with app.test_request_context():
 
         skelett_file = skelett_maenchens_files.get(f'SE_{entry.se_id}')
         if skelett_file:
-            file = Entity.insert('file', f'SE {entry.se_id} Skelettmännchen')
+            file = Entity.insert('file', f'SE {entry.se_id} Ind {entry.individual_id} Skelettmännchen')
             # Todo: License, Creator, Holder, Public viewable
             su.link('P67', file, inverse=True)
 
@@ -486,6 +502,21 @@ with app.test_request_context():
             dest = UPLOAD / f"{file.id}{ext}"
             UPLOAD.mkdir(parents=True, exist_ok=True)
             shutil.copy(skelett_file, dest)
+
+        key = f"SE_{entry.se_id}_Ind_{entry.individual_id}"
+
+        if folder := folder_map.get(key):
+            images = [
+                p for p in folder.iterdir()
+                if p.is_file() and p.suffix.lower() in {".jpg", ".jpeg"}]
+            for idx, image in enumerate(images):
+                file = Entity.insert('file', f'SE {entry.se_id} Ind {entry.individual_id} {idx}')
+                # Todo: License, Creator, Holder, Public viewable
+                su.link('P67', file, inverse=True)
+                ext = image.suffix
+                dest = UPLOAD / f"{file.id}{ext.lower()}"
+                UPLOAD.mkdir(parents=True, exist_ok=True)
+                shutil.copy(image, dest)
 
         added_stratigraphic[entry.id_] = su
 
