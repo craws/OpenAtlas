@@ -1,3 +1,4 @@
+from time import sleep
 from typing import Any, Optional
 
 import requests
@@ -57,7 +58,7 @@ def vocabs_requests(
     base = g.settings["vocabs_base_url"]
     ep = g.settings["vocabs_endpoint"]
     url = f"{base}{ep}{id_}/{endpoint}"
-
+    sleep(0.1) # fix connection abort
     try:
         resp = requests.get(
             url,
