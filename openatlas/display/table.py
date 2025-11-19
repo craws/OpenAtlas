@@ -58,7 +58,7 @@ class Table:
                     uc_first(_(name.replace('_', ' ')))
                     if name and name not in no_title else '',
                 'className':
-                    'dt-body-right' if name in ['count', 'size'] else ''}
+                    'right' if name in ['count', 'size'] else ''}
                     for name in self.columns] + [
                         {'title': '', 'className': ''} for _item in
                         range(len(self.rows[0]) - len(self.columns))],
@@ -70,6 +70,7 @@ class Table:
             data['order'] = self.order
         if self.defs:
             data['columnDefs'] = self.defs
+        data['enableSearch'] = True
         return render_template(
             'util/table.html',
             table=self,

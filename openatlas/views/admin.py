@@ -194,7 +194,7 @@ def get_user_table(users: list[User]) -> Table:
     table = Table([
         'username', 'name', 'group', 'email', 'newsletter', 'created',
         'last login', 'entities'],
-        defs=[{'className': 'dt-body-right', 'targets': 7}])
+        defs=[{'className': 'right', 'targets': 7}])
     if is_authorized('manager'):
         table.columns.append(_('info'))
     for user in users:

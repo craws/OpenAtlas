@@ -68,7 +68,7 @@ def overview() -> str:
         'overview': Table(
             [_('class'), _('count')],
             paging=False,
-            defs=[{'className': 'dt-body-right', 'targets': 1}]),
+            defs=[{'className': 'right', 'targets': 1}]),
         'latest': Table([
                 _('latest'), _('name'), _('class'), _('begin'), _('end'),
                 _('user')],

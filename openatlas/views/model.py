@@ -107,7 +107,7 @@ def cidoc_class_index() -> str:
     table = Table(
         ['code', 'name', 'count'],
         defs=[
-            {'className': 'dt-body-right', 'targets': 2},
+            {'className': 'right', 'targets': 2},
             {'orderDataType': 'cidoc-model', 'targets': [0]},
             {'sType': 'numeric', 'targets': [0]}])
     for class_ in g.cidoc_classes.values():
@@ -136,7 +136,7 @@ def property_index() -> str:
             'code', 'name', 'inverse', 'domain', 'domain name', 'range',
             'range name', 'count'],
         defs=[
-            {'className': 'dt-body-right', 'targets': 7},
+            {'className': 'right', 'targets': 7},
             {'orderDataType': 'cidoc-model', 'targets': [0, 3, 5]},
             {'sType': 'numeric', 'targets': [0, 3, 5]}])
     for property_ in properties.values():
