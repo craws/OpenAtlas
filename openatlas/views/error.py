@@ -6,7 +6,8 @@ from flask import g, jsonify, render_template, request
 from openatlas import app
 from openatlas.api.resources.error import (
     AccessDeniedError, DisplayFileNotFoundError, EntityDoesNotExistError,
-    EntityNotAnEventError, InvalidCidocClassCodeError, InvalidLimitError,
+    EntityNotAnEventError, IIIFMetadataNotFound, InvalidCidocClassCodeError,
+    InvalidLimitError,
     InvalidSearchCategoryError,
     InvalidSearchSyntax, InvalidSearchValueError, InvalidSystemClassError,
     InvalidViewClassError, LastEntityError, LogicalOperatorError,
@@ -328,6 +329,16 @@ def url_not_valid(_e: UrlNotValid) -> tuple[Any, int]:
         'message':
             f'{_e.url} is not a valid URL. Please provide a valid URL schema, '
             'e.g. https://openatlas.eu/',
+        'url': request.url,
+        'timestamp': datetime.now(),
+        'status': 400}), 400
+
+@app.errorhandler(IIIFMetadataNotFound)
+def url_not_valid(_e: IIIFMetadataNotFound) -> tuple[Any, int]:
+    return jsonify({
+        'title': 'IIIF info not found',
+        'message':
+            f'{_e.url} is not found. Please contact the system administrator.',
         'url': request.url,
         'timestamp': datetime.now(),
         'status': 400}), 400
