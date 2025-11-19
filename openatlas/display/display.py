@@ -270,14 +270,16 @@ class Display:
                             url_for(
                                 'network',
                                 dimensions=0,
-                                id_=self.entity.id)))
+                                id_=self.entity.id),
+                            icon_name="fa-project-diagram"))
                 case 'selectable' if is_authorized('editor'):
                     self.add_button_selectable()
                 case 'stratigraphic_tools' if is_authorized('editor'):
                     self.buttons.append(
                         button(
                             _('tools'),
-                            url_for('tools_index', id_=self.entity.id)))
+                            url_for('tools_index', id_=self.entity.id),
+                            icon_name="fa-tools"))
 
         self.buttons.append(
             render_template('util/api_links.html', entity=self.entity))
@@ -308,7 +310,8 @@ class Display:
                 _('delete'),
                 url_for('delete', id_=self.entity.id),
                 onclick=f"return confirm('{msg}')",
-                icon_name='fa-trash'))
+                icon_name='fa-trash',
+                variant='danger'))
 
     def add_button_update(self) -> None:
         if not is_authorized(self.entity.class_.write_access) \
