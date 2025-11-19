@@ -1,7 +1,7 @@
 from typing import Any, Optional
 
 import requests
-from flask import g
+from flask import abort, g
 
 from openatlas import app
 from openatlas.api.import_scripts.util import (
@@ -50,11 +50,19 @@ def get_existing_ids() -> list[int]:
 
 
 def fetch_exif(id_: str) -> dict[str, Any]:
-    req = requests.get(
-        'https://arche-exif.acdh.oeaw.ac.at/',
-        params={'id': id_},
-        timeout=300)
-    return req.json()
+    url = 'https://arche-exif.acdh.oeaw.ac.at/'
+    try:
+        resp = requests.get(
+            url,
+            params={'id': id_},
+            timeout=300)
+        resp.raise_for_status()
+    except requests.exceptions.RequestException as e:  # pragma: no cover
+        abort(400, f"Request failed for {url}: {e}")
+    try:
+        return resp.json()
+    except ValueError:  # pragma: no cover
+        abort(400, f"Invalid JSON from ARCHE: {url}")
 
 
 def get_single_image_of_collection(id_: int) -> str:

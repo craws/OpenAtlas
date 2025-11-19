@@ -11,7 +11,8 @@ from flask_restful import Resource
 
 from openatlas.api.endpoints.parser import Parser
 from openatlas.api.resources.api_entity import ApiEntity
-from openatlas.api.resources.error import DisplayFileNotFoundError
+from openatlas.api.resources.error import DisplayFileNotFoundError, \
+    IIIFMetadataNotFound
 from openatlas.api.resources.parser import iiif
 from openatlas.api.resources.util import get_license_name, get_license_url
 from openatlas.display.util import check_iiif_file_exist
@@ -296,9 +297,14 @@ def get_metadata(entity: Entity) -> dict[str, Any]:
         raise DisplayFileNotFoundError
     ext = '.tiff' if g.settings['iiif_conversion'] else entity.get_file_ext()
     image_url = f"{g.settings['iiif_url']}{entity.id}{ext}"
-    req = requests.get(f"{image_url}/info.json", timeout=30)
-    image_api = req.json()
-    return {'entity': entity, 'img_url': image_url, 'img_api': image_api}
+
+    try:
+        resp = requests.get(f"{image_url}/info.json", timeout=30)
+        resp.raise_for_status()
+    except requests.exceptions.RequestException:  #pragma: no cover
+        raise IIIFMetadataNotFound(image_url)
+
+    return {'entity': entity, 'img_url': image_url, 'img_api': resp.json()}
 
 
 def get_logo() -> dict[str, Any]:

@@ -1,7 +1,7 @@
 from typing import Any, Optional
 
 import requests
-from flask import g
+from flask import abort, g
 
 from openatlas import app
 from openatlas.models.entity import Entity, insert
@@ -51,23 +51,43 @@ def get_match_types() -> dict[str, Entity]:
 
 
 def vocabs_requests(
-        id_: Optional[str] = '',
-        endpoint: Optional[str] = '',
+        id_: Optional[str] = "",
+        endpoint: Optional[str] = "",
         parameter: Optional[dict[str, str]] = None) -> dict[str, Any]:
-    req = requests.get(
-        f"{g.settings['vocabs_base_url']}{g.settings['vocabs_endpoint']}{id_}/"
-        f"{endpoint}",
-        params=parameter or '',
-        timeout=60,
-        auth=(g.settings['vocabs_user'], app.config['VOCABS_PASS']))
-    return req.json()
+    base = g.settings["vocabs_base_url"]
+    ep = g.settings["vocabs_endpoint"]
+    url = f"{base}{ep}{id_}/{endpoint}"
+
+    try:
+        resp = requests.get(
+            url,
+            params=parameter or "",
+            timeout=60,
+            auth=(g.settings["vocabs_user"], app.config["VOCABS_PASS"]))
+        resp.raise_for_status()
+    except requests.exceptions.RequestException as e:  # pragma: no cover
+        abort(400, f"Request failed for {url}: {e}")
+
+    try:
+        return resp.json()
+    except ValueError:  # pragma: no cover
+        abort(400, f"Invalid JSON from {url}")
 
 
 def request_arche_metadata(id_: int) -> dict[str, Any]:
-    req = requests.get(
-        f"{app.config['ARCHE']['url']}/api/{id_}/metadata",
-        headers={
-            'Accept': 'application/ld+json',
-            'X-METADATA-READ-MODE': '1_1_0_0'},
-        timeout=60)
-    return req.json()
+    url = f"{app.config['ARCHE']['url']}/api/{id_}/metadata"
+    try:
+        resp = requests.get(
+            url,
+            headers={
+                "Accept": "application/ld+json",
+                "X-METADATA-READ-MODE": "1_1_0_0"},
+            timeout=60)
+        resp.raise_for_status()
+    except requests.exceptions.RequestException as e:  # pragma: no cover
+        abort(400, f"ARCHE request failed for {url}: {e}")
+
+    try:
+        return resp.json()
+    except ValueError:  # pragma: no cover
+        abort(400, f"Invalid JSON from ARCHE: {url}")
