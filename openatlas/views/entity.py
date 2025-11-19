@@ -21,7 +21,7 @@ from openatlas.forms.entity_form import (
     get_entity_form, process_files, process_form_data)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
-from openatlas.models.openatlas_class import Relation, get_reverse_relation
+from openatlas.models.openatlas_class import Relation
 from openatlas.models.overlay import Overlay
 
 
@@ -168,12 +168,8 @@ def deletion_possible(entity: Entity) -> bool:
     if entity.class_.group['name'] == 'type':
         return True  # Type (recursive) deletion is taken care of at delete()
     for relation in entity.class_.relations.values():
-        reverse_relation = get_reverse_relation(
-            entity.class_,
-            relation,
-            g.classes[relation.classes[0]])
-        if reverse_relation \
-                and reverse_relation.required \
+        if relation.reverse_relation \
+                and relation.reverse_relation.required \
                 and entity.get_linked_entities(
                     relation.property,
                     relation.classes,

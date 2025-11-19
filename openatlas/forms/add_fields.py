@@ -20,8 +20,7 @@ from openatlas.forms.field import (
     TreeMultiField, ValueTypeField, ValueTypeRootField)
 from openatlas.models.dates import check_if_entity_has_time
 from openatlas.models.entity import Entity, Link
-from openatlas.models.openatlas_class import (
-    OpenatlasClass, Relation, get_reverse_relation)
+from openatlas.models.openatlas_class import OpenatlasClass, Relation
 
 
 def add_name_fields(form: Any, entity: Entity) -> None:
@@ -189,11 +188,7 @@ def add_relations(
                     relation.property,
                     relation.classes,
                     inverse=relation.inverse)
-            elif selection_available(
-                    entity,
-                    origin,
-                    relation,
-                    origin_relation):
+            elif selection_available(origin, relation, origin_relation):
                 selection = [origin]
             setattr(
                 form,
@@ -211,11 +206,7 @@ def add_relations(
                     relation.property,
                     relation.classes,
                     relation.inverse)
-            elif selection_available(
-                    entity,
-                    origin,
-                    relation,
-                    origin_relation):
+            elif selection_available(origin, relation, origin_relation):
                 selection = origin
             if selection and selection.class_.name == 'object_location':
                 selection = selection.get_linked_entity_safe('P53', True)
@@ -237,36 +228,17 @@ def add_relations(
 
 
 def selection_available(
-        entity: Entity,
         origin: Entity | None,
         relation: Relation,
         origin_relation: str | None) -> bool:
     if not origin:
         return False
-
-    class_name = origin.class_.name
-    # Todo: fix class name and add reverse option to get_reverse_relation
-    # origin.class_.name.replace('place', 'object_location')
-
-    print(origin.name)
-    print(relation.name)
-    print(origin_relation)
-    if class_name not in relation.classes:
-        print(0)
-        print(class_name)
-        print(relation.classes)
+    if origin.class_.name.replace('place', 'object_location') \
+            not in relation.classes:
         return False
-    if reverse_relation := get_reverse_relation(
-            entity.class_,
-            relation,
-            g.classes[relation.classes[0]]):
-        print(1)
-        print(origin_relation)
-        print(reverse_relation.name)
-        if reverse_relation.name == origin_relation:
-            print(2)
-            return True
-    print(3)
+    if relation.reverse_relation and \
+            relation.reverse_relation.name == origin_relation:
+        return True
     return False
 
 

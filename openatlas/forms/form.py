@@ -20,7 +20,7 @@ from openatlas.forms.field import (
 from openatlas.forms.populate import populate_dates
 from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity, Link, get_entity_ids_with_links
-from openatlas.models.openatlas_class import Relation, get_reverse_relation
+from openatlas.models.openatlas_class import Relation
 
 
 def filter_entities(
@@ -35,11 +35,8 @@ def filter_entities(
                 relation.property,
                 relation.name == 'subs')]
     if is_link_form:
-        reverse_relation = get_reverse_relation(
-            entity.class_,
-            relation,
-            g.classes[relation.classes[0]])
-        if reverse_relation and not reverse_relation.multiple:
+        if relation.reverse_relation \
+                and not relation.reverse_relation.multiple:
             filter_ids += get_entity_ids_with_links(
                 relation.property,
                 relation.classes,

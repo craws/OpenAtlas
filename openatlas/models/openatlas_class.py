@@ -59,6 +59,7 @@ class Relation:
         self.additional_fields = data.get('additional_fields', [])
         self.via_location = data.get('via_location', False)
         self.type = data.get('type')
+        self.reverse_relation = None
         if self.mode == 'tab':
             self.tab = data.get('tab', {})
             self.tab['additional_columns'] = \
@@ -86,6 +87,18 @@ def get_classes() -> dict[str, OpenatlasClass]:
             new_types_allowed=row['new_types_allowed'],
             write_access=row['write_access_group_name'],
             hierarchies=row['hierarchies'])
+    for class_ in classes.values():
+        for relation in class_.relations.values():
+            if not relation.classes:
+                continue
+            related_class = classes[
+                relation.classes[0].replace('object_location', 'place')]
+            for relation2 in related_class.relations.values():
+                if class_.name in relation2.classes \
+                        and relation.property == relation2.property \
+                        and relation.inverse != relation2.inverse:
+                    relation.reverse_relation = relation2
+                    break
     return classes
 
 
@@ -107,15 +120,3 @@ def get_model(class_name: str) -> dict[str, Any]:
     data['extra'] = data.get('extra', [])
     data['relations'] = data.get('relations', {})
     return data
-
-
-def get_reverse_relation(
-        class_: OpenatlasClass,
-        relation: Relation,
-        reverse_class: OpenatlasClass) -> Relation | None:
-    for reverse_relation in reverse_class.relations.values():
-        if class_.name in reverse_relation.classes \
-                and relation.property == reverse_relation.property \
-                and relation.inverse != reverse_relation.inverse:
-            return reverse_relation
-    return None

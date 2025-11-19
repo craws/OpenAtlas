@@ -14,7 +14,7 @@ from openatlas.display.util2 import (
     display_bool, is_authorized, sanitize, uc_first)
 from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity, Link
-from openatlas.models.openatlas_class import Relation, get_reverse_relation
+from openatlas.models.openatlas_class import Relation
 from openatlas.models.overlay import Overlay
 
 # Needed for translations
@@ -84,13 +84,10 @@ def entity_table(
     item = items[0]
     if isinstance(item, Link):
         if inverse:
-            item_class = item.domain.class_
             default_columns = item.domain.class_.group['table_columns']
         else:
-            item_class = item.range.class_
             default_columns = item.range.class_.group['table_columns']
     else:
-        item_class = item.class_
         default_columns = item.class_.group['table_columns']
     order = None
     defs = None
@@ -107,11 +104,8 @@ def entity_table(
     if origin and relation and relation.mode.startswith('tab'):
         if relation.additional_fields:
             columns.append('update')
-        reverse_relation = get_reverse_relation(
-            origin.class_,
-            relation,
-            item_class)
-        if not reverse_relation or not reverse_relation.required:
+        if not relation.reverse_relation \
+                or not relation.reverse_relation.required:
             columns.append('remove')
 
     overlays = Overlay.get_by_object(origin) \
