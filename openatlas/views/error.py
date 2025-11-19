@@ -333,6 +333,7 @@ def url_not_valid(_e: UrlNotValid) -> tuple[Any, int]:
         'timestamp': datetime.now(),
         'status': 400}), 400
 
+
 @app.errorhandler(IIIFMetadataNotFound)
 def url_not_valid(_e: IIIFMetadataNotFound) -> tuple[Any, int]:
     return jsonify({
@@ -341,4 +342,4 @@ def url_not_valid(_e: IIIFMetadataNotFound) -> tuple[Any, int]:
             f'{_e.url} is not found. Please contact the system administrator.',
         'url': request.url,
         'timestamp': datetime.now(),
-        'status': 400}), 400
+        'status': 400}), 400  # pragma: no cover, Todo: test or remove todo
