@@ -5,7 +5,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Export &mdash; OpenAtlas 8.13.0 documentation</title>
+  <title>Export &mdash; OpenAtlas 8.15.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
@@ -35,7 +35,7 @@
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                8.13.0
+                8.15.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -117,7 +117,7 @@
 <ul class="simple">
 <li><p>Be aware, especially when sharing, that <strong>user data</strong>, e.g. email addresses,
 are included in the database backups</p></li>
-<li><p>SQL dumps are saved in the <strong>files/export</strong> folder</p></li>
+<li><p>SQL dumps are saved in the <strong>files/sql/export</strong> folder</p></li>
 <li><p>A warning will appear if the directory isn’t writable</p></li>
 <li><p>File names begin with date and time e.g. 2018-08-23_1533_export.sql</p></li>
 <li><p>Existing backups are shown in a list and can be downloaded or deleted</p></li>
@@ -139,6 +139,16 @@ of used operating system and if line breaks are used or not</p>
 </pre></div>
 </div>
 </section>
+</section>
+<section id="export-rdf-nt">
+<h2>Export RDF/NT<a class="headerlink" href="#export-rdf-nt" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>RDF/NT dumps are saved in the <strong>files/rdf/export</strong> folder</p></li>
+<li><p>A warning will appear if the directory isn’t writable</p></li>
+<li><p>File names begin with date and time e.g. 2018-08-23_1533_export.nt</p></li>
+<li><p>Existing backups are shown in a list and can be downloaded or deleted</p></li>
+<li><p>Only N-Triples (NT) are available, because of its efficiency</p></li>
+</ul>
 </section>
 <section id="export-csv">
 <h2>Export CSV<a class="headerlink" href="#export-csv" title="Permalink to this heading"></a></h2>
@@ -187,6 +197,122 @@ downloaded. This file contains the following tags:</p>
 </ul>
 <p>The file name starts with the current date and time, for example
 2022-10-04_1610-export.xml. This process can take some time.</p>
+</section>
+<section id="export-arche">
+<h2>Export ARCHE<a class="headerlink" href="#export-arche" title="Permalink to this heading"></a></h2>
+<p>A dedicated export is available to generate data suitable for ingestion into
+<a class="reference external" href="https://arche.acdh.oeaw.ac.at/">ARCHE</a>, the ACDH repository system.
+This feature is intended for administrative use only.</p>
+<p>See also:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://arche.acdh.oeaw.ac.at/browser/deposition-process">ARCHE Deposition Process</a></p></li>
+<li><p><a class="reference external" href="https://acdh-oeaw.github.io/arche-schema/">ARCHE Metadata Schema</a></p></li>
+<li><p>Only available for <strong>admin users</strong></p></li>
+<li><p>Generates a <strong>ZIP</strong> archive ready to be transferred to ARCHE</p></li>
+<li><p>Output includes metadata, files, RDF and SQL dumps, and debug information
+in an ARCHE-compatible structure</p></li>
+<li><p>The process may take <strong>significant time</strong> and consume <strong>large disk space</strong></p></li>
+<li><p>The ZIP file is saved in the <code class="docutils literal notranslate"><span class="pre">files/arche/export</span></code> directory</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This export is <strong>not</strong> listed among the standard user exports and is only
+available to administrators due to performance and data sensitivity concerns.</p>
+</div>
+<section id="tabs">
+<h3>Tabs<a class="headerlink" href="#tabs" title="Permalink to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Info</strong>
+Displays the data entered in <code class="docutils literal notranslate"><span class="pre">production.py</span></code>.
+Provides a button to check ARCHE files.
+Only files associated with <code class="docutils literal notranslate"><span class="pre">typeIds</span></code> (if any are defined) are checked.
+More information on the file checker can be found in
+<a class="reference internal" href="data_integrity_checks.html"><span class="doc">Data integrity checks</span></a>.</p></li>
+<li><p><strong>Export</strong>
+Shows the exported files.
+Allows administrators to start and manage the ARCHE export.</p></li>
+</ul>
+</section>
+<section id="configuration">
+<h3>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h3>
+<p>To make use of the ARCHE export functionality, specific metadata must be
+provided in the <code class="docutils literal notranslate"><span class="pre">production.py</span></code> settings file using the
+<code class="docutils literal notranslate"><span class="pre">ARCHE_METADATA</span></code> dictionary.</p>
+<p>Here is an example configuration:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ARCHE_METADATA</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;topCollection&#39;</span><span class="p">:</span> <span class="s1">&#39;OpenAtlas collection&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;language&#39;</span><span class="p">:</span> <span class="s1">&#39;en&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;depositor&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s1">&#39;Jane Doe&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;https://orcid.org/0000-0000-0000-0000&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;https://isni.org/isni/0000000121032683&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;https://d-nb.info/gnd/123456789&#39;</span>
+    <span class="p">],</span>
+    <span class="s1">&#39;acceptedDate&#39;</span><span class="p">:</span> <span class="s2">&quot;2024-01-01&quot;</span><span class="p">,</span>
+    <span class="s1">&#39;hasMetadataCreator&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s1">&#39;https://orcid.org/0000-0000-0000-1111&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;https://orcid.org/0000-0000-0000-0000&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;https://isni.org/isni/0000000121032683&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Jane Doe&#39;</span>
+    <span class="p">],</span>
+    <span class="s1">&#39;curator&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s1">&#39;https://orcid.org/0000-0000-0000-1111&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;https://d-nb.info/gnd/123456789&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Jane Doe&#39;</span>
+    <span class="p">],</span>
+    <span class="s1">&#39;principalInvestigator&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s1">&#39;Researcher A&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Researcher B&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;https://orcid.org/0000-0000-0000-1111&#39;</span>
+    <span class="p">],</span>
+    <span class="s1">&#39;relatedDiscipline&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s1">&#39;https://vocabs.acdh.oeaw.ac.at/oefosdisciplines/601003&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;https://vocabs.acdh.oeaw.ac.at/oefosdisciplines/602001&#39;</span>
+    <span class="p">],</span>
+    <span class="s1">&#39;typeIds&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="mi">1234</span><span class="p">,</span> <span class="mi">4567</span><span class="p">,</span> <span class="mi">87656</span><span class="p">,</span> <span class="mi">3252</span><span class="p">,</span> <span class="mi">234</span>
+    <span class="p">],</span>
+    <span class="s1">&#39;exclude_reference_systems&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s1">&#39;Internal catalogue&#39;</span><span class="p">,</span> <span class="s1">&#39;Inventory numbers&#39;</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="description-of-fields">
+<h3>Description of fields<a class="headerlink" href="#description-of-fields" title="Permalink to this heading"></a></h3>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For all fields that refer to people (e.g., <code class="docutils literal notranslate"><span class="pre">depositor</span></code>, <code class="docutils literal notranslate"><span class="pre">curator</span></code>,
+<code class="docutils literal notranslate"><span class="pre">hasMetadataCreator</span></code>), you can use either a <strong>persistent identifier</strong>
+(preferably <a class="reference external" href="https://orcid.org/">ORCID</a>, but also
+<a class="reference external" href="https://www.dnb.de/EN/gnd">GND</a>, <a class="reference external" href="https://isni.org/">ISNI</a>,
+<a class="reference external" href="https://viaf.org/">VIAF</a>, or <a class="reference external" href="https://www.wikidata.org/">Wikidata</a>)
+or a <strong>plain name</strong>. Use persistent identifiers whenever possible for
+better interoperability.</p>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">topCollection</span></code>: ARCHE top-level collection identifier
+(usually provided in coordination with the ARCHE team)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">language</span></code>: Language code of the metadata (e.g. <code class="docutils literal notranslate"><span class="pre">'en'</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">depositor</span></code>: List of persons responsible for the deposit</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">acceptedDate</span></code>: ISO date string of when the data was accepted for deposit</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hasMetadataCreator</span></code>: List of people responsible for the ARCHE metadata</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">curator</span></code>: List of ARCHE curators</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">principalInvestigator</span></code>: List of principal investigators for this project</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">relatedDiscipline</span></code>: URLs to vocabularies defining the
+<a class="reference external" href="https://vocabs.acdh.oeaw.ac.at/oefos/en/">related disciplines</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">typeIds</span></code> <em>(optional)</em>: Restrict exported files to those linked
+with specific type IDs</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">excludeReferenceSystems</span></code> <em>(optional)</em>: List of reference system
+labels to be excluded from the export</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">typeIds</span></code> or <code class="docutils literal notranslate"><span class="pre">exclude_reference_systems</span></code> are empty, all files
+and reference systems are considered.</p>
+</div>
+</section>
 </section>
 </section>
 

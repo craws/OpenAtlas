@@ -136,7 +136,7 @@ class Api(ApiTestCase):
                 'api_04.network_visualisation',
                 exclude_system_classes='type'))
         rv = rv.get_json()
-        assert len(rv['results']) == 70
+        assert len(rv['results']) == 71
         rv = c.get(
             url_for(
                 'api_04.network_visualisation',
@@ -145,7 +145,7 @@ class Api(ApiTestCase):
         assert len(rv['results']) == 15
         rv = c.get(url_for('api_04.network_visualisation', download=True))
         rv = rv.get_json()
-        assert len(rv['results']) == 165
+        assert len(rv['results']) == 166
 
 
         rv = c.get(
@@ -350,9 +350,14 @@ class Api(ApiTestCase):
         assert rv['relations']['feature']
         assert rv['relations']['person']
 
-        rv = c.get(url_for('api_04.entity_presentation_view', id_=place.id))
+        rv = c.get(
+            url_for(
+                'api_04.entity_presentation_view',
+                id_=feature.id,
+                place_hierarchy='true',
+                map_overlay='true'))
         rv = rv.get_json()
-        assert rv['id'] == place.id
+        assert rv['id'] == feature.id
 
         rv = c.get(url_for('api_04.entity_presentation_view', id_=actor2.id))
         rv = rv.get_json()
@@ -368,6 +373,14 @@ class Api(ApiTestCase):
         rv = rv.get_json()
         assert rv['id'] == event.id
         assert rv['title'] == event.name
+
+        rv = c.get(
+            url_for(
+                'api_04.entity_presentation_view',
+                id_=file.id))
+        rv = rv.get_json()
+        assert rv['id'] == file.id
+        assert rv['title'] == file.name
 
         for rv in [
             c.get(url_for('api_04.cidoc_class', class_='E21')),
@@ -581,12 +594,12 @@ class Api(ApiTestCase):
                     "operator": "greaterThanEqual",
                     "values": ["2019-03-01"],
                     "logicalOperator": "and"}]}, ]),
-            (2, [{
+            (3, [{
                 "beginFrom": [{
                     "operator": "lesserThan",
                     "values": ["2020-01-01"],
                     "logicalOperator": "and"}]}]),
-            (2, [{
+            (3, [{
                 "beginTo": [{
                     "operator": "lesserThanEqual",
                     "values": ["2018-03-01"],
@@ -655,12 +668,12 @@ class Api(ApiTestCase):
                 "relationToID": [{
                     "operator": "equal",
                     "values": [place.id]}]}]),
-            (170, [{
+            (171, [{
                 "typeIDWithSubs": [{
                     "operator": "notEqual",
                     "values": [boundary_mark.id],
                     "logicalOperator": "and"}]}]),
-            (172, [{
+            (173, [{
                 "typeName": [{
                     "operator": "notEqual",
                     "values": ["Boundary Mark", "Height"],
@@ -758,6 +771,10 @@ class Api(ApiTestCase):
                 filename=f'{file.id}',
                 image_size='table')) as rv:
             self.assertTrue(rv.headers['Content-Type'].startswith('image'))
+
+        with c.get(
+            url_for('api_04.files_of_entities', entities=place.id)) as rv:
+            self.assertTrue(rv.get_json()[str(place.id)])
 
         rv = c.get(url_for('api_04.search', class_='all', term='Fro'))
         assert rv.get_json()['pagination']['entities'] == 2

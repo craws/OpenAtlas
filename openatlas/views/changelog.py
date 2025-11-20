@@ -16,19 +16,26 @@ def index_changelog() -> str:
 # pylint: disable=too-many-lines
 
 versions = {
-    '8.15.0': ['TBA', {
+    '8.15.1': ['2025-11-17', {
+        'fix': {
+            '2679': 'API: Duplicated operationId in OpenAPI',
+            '2668': 'ARCHE: Solve proxy issues'}}],
+    '8.15.0': ['2025-11-15', {
         'feature': {
+            '2593': 'File checker',
             '2551': 'Admin interface for generating RDF dumps',
             '2568': 'Admin interface for generating ARCHE dumps',
             '2580': 'Report generation for ARCHE import issues',
             '2590': 'Bigger info button',
             '2626': 'API: 4.10.0',
-            '2466': 'API: Export files with ARCHE RDF metadata'},
+            '2466': 'API: Export files with ARCHE RDF metadata',
+            '2619': 'API: Presentation view get root references',
+            '2660': 'API: Presentation view adaption',
+            '2632': 'Refactor and minor improvements'},
         'fix': {
-            '2621':
-                'Irrelevant entries linked to entities in '
-                'entity_presentation_view endpoint',
-            '2625': 'Empty count in /type_tree/ endpoint'}}],
+            '2625': 'API: Empty count in /type_tree/ endpoint',
+            '2668': 'API: Wrong group start/end for LOUD',
+            '2621': 'API: Irrelevant entries at entity_presentation_view '}}],
     '8.14.0': ['2025-09-02', {
         'feature': {
             '2605': 'Display root type id',

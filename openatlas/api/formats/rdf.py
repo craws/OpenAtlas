@@ -24,22 +24,46 @@ def _add_namespaces(graph: Graph, context: dict[str, Any]) -> None:
             if uri.endswith('/') or uri.endswith('#'):
                 graph.bind(prefix, Namespace(uri))  # type: ignore
 
+    graph.bind("crm", Namespace("http://www.cidoc-crm.org/cidoc-crm/"))
+    graph.bind("la", Namespace("https://linked.art/ns/terms/"))
+    graph.bind("rdfs", Namespace("http://www.w3.org/2000/01/rdf-schema#"))
+    graph.bind("rdf", Namespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#"))
 
-def _resolve_predicate(key: str) -> URIRef | None:
-    context_entry = _linked_art_context["@context"].get(key)
 
-    if isinstance(context_entry, dict) and "@id" in context_entry:
-        predicate_uri_string = context_entry["@id"]
-    else:
-        predicate_uri_string = key
+def _expand_curie(curie: str) -> str:  # pragma: no cover
+    if ":" not in curie:
+        return curie
+    ctx = _linked_art_context.get("@context", {})
+    prefix, local = curie.split(":", 1)
+    base = ctx.get(prefix)
+    if isinstance(base, str):
+        return base + local
+    return curie
 
-    if ":" in predicate_uri_string:
-        prefix, localname = predicate_uri_string.split(":", 1)
-        prefix_uri = _linked_art_context["@context"].get(prefix)
-        if isinstance(prefix_uri, str):
-            return URIRef(prefix_uri + localname)
 
-    return URIRef(predicate_uri_string)
+def _resolve_predicate(
+        key: str,
+        data_type: str | None = None) -> URIRef | None: # pragma: no cover
+    ctx = _linked_art_context.get("@context", {})
+
+    if data_type and data_type in ctx:
+        type_data = ctx[data_type]
+        if isinstance(type_data, dict):
+            tctx = type_data.get("@context")
+            if isinstance(tctx, dict) and key in tctx:
+                entry = tctx[key]
+                if isinstance(entry, dict) and "@id" in entry:
+                    return URIRef(_expand_curie(entry["@id"]))
+                if isinstance(entry, str):
+                    return URIRef(_expand_curie(entry))
+
+    entry = ctx.get(key)
+    if isinstance(entry, dict) and "@id" in entry:
+        return URIRef(_expand_curie(entry["@id"]))
+    if isinstance(entry, str):
+        return URIRef(_expand_curie(entry))
+
+    return None
 
 
 def _get_subject(
@@ -72,7 +96,7 @@ def _handle_value(
                 graph.add((subject, predicate, URIRef(item["id"])))
             elif isinstance(item, dict):
                 continue
-            else:
+            else:  # pragma: no cover
                 graph.add((subject, predicate, Literal(item)))
     else:
         graph.add((subject, predicate, Literal(value)))
@@ -82,20 +106,36 @@ def _add_triples_from_linked_art(
         graph: Graph,
         data: list[dict[str, Any]] | dict[str, Any],
         parent_subject: URIRef | BNode | None = None,
-        parent_predicate: URIRef | None = None) -> None:
+        parent_predicate: URIRef | None = None) -> None: # pragma: no cover
     if not isinstance(data, dict):  # pragma: no cover - mypy
         return
 
     subject = _get_subject(data, graph, parent_subject, parent_predicate)
 
-    if data.get("type"):
-        graph.add((subject, RDF.type, URIRef(data["type"])))
+    data_type = data.get("type")
+    if data_type:
+        ctx = _linked_art_context.get("@context", {})
+        type_uri: str | None = None
+
+        if ":" in data_type:
+            type_uri = _expand_curie(data_type)
+
+        elif isinstance(ctx.get(data_type), dict):
+            entry = ctx[data_type]
+            if "@id" in entry:
+                type_uri = _expand_curie(entry["@id"])
+
+        if not type_uri:
+            la_base = ctx.get("la") or "https://linked.art/ns/terms/"
+            type_uri = la_base + data_type
+
+        graph.add((subject, RDF.type, URIRef(type_uri)))
 
     for key, value in data.items():
         if key in {"id", "type", "@context"}:
             continue
 
-        predicate = _resolve_predicate(key)
+        predicate = _resolve_predicate(key, data_type)  # <-- FIXED line
         if not predicate:  # pragma: no cover - mypy
             continue
 

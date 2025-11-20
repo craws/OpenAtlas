@@ -844,6 +844,8 @@ def admin_delete_orphaned_resized_images() -> Response:
 
 def get_disk_space_info() -> Optional[dict[str, Any]]:
     def upload_ident_with_iiif() -> bool:
+        if not iiif_path:  # pragma: no cover - Mypy
+            return False
         return app.config['UPLOAD_PATH'].resolve() == iiif_path.resolve()
 
     paths = {
@@ -855,9 +857,11 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
             'path': app.config['PROCESSED_IMAGE_PATH'],
             'size': 0,
             'mounted': False}}
-    iiif_path = Path(g.settings['iiif_path'])
-    if not upload_ident_with_iiif():
-        paths['iiif'] = {'path': iiif_path, 'size': 0, 'mounted': False}
+    iiif_path = None
+    if g.settings['iiif_path']:
+        iiif_path = Path(g.settings['iiif_path'])
+        if not upload_ident_with_iiif():
+            paths['iiif'] = {'path': iiif_path, 'size': 0, 'mounted': False}
     files_size = 40999999999
     if os.name == 'posix':
         keys = []
@@ -887,7 +891,7 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
         'export': math.ceil(paths['export']['size'] / (files_size / 100)),
         'upload': math.ceil(paths['upload']['size'] / (files_size / 100)),
         'iiif': 0}
-    if not upload_ident_with_iiif():
+    if iiif_path and not upload_ident_with_iiif():
         percent['iiif'] = math.ceil(paths['iiif']['size'] / (files_size / 100))
     percent['processed'] = math.ceil(
         paths['processed']['size'] / (files_size / 100))
@@ -900,7 +904,8 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
         'upload': convert_size(paths['upload']['size']),
         'processed': convert_size(paths['processed']['size']),
         'iiif': convert_size(
-            paths['iiif']['size'] if not upload_ident_with_iiif() else 0),
+            paths['iiif']['size'] \
+                if iiif_path and not upload_ident_with_iiif() else 0),
         'other_files': convert_size(other_files),
         'free': convert_size(stats.free),
         'percent': percent,

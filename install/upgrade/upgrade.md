@@ -16,9 +16,12 @@ then run the database upgrade script, then restart Apache:
     git pull origin main
     sudo python3 install/upgrade/database_upgrade.py
     sudo service apache2 restart
+    
+### 8.15.0 to 8.15.1
+A code base update (e.g. with git pull) and a webserver restart is sufficient.
 
 ### 8.14.0 to 8.15.0
-No database update is required but an additional Python package is needed:
+No database update is required but additional Python packages are needed:
 
 #### Additional package
 The unidecode package is used to transliterate URLs to ASCII.

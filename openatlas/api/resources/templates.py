@@ -227,7 +227,8 @@ def presentation_template() -> dict[str, Any]:
         'mimetype': fields.String,
         'url': fields.String,
         'IIIFManifest': fields.String,
-        'IIIFBasePath': fields.String}
+        'IIIFBasePath': fields.String,
+        'overlay': fields.String}
     relation_types = {
         'property': fields.String,
         'relationTo': fields.Integer,
