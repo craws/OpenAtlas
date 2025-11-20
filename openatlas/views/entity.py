@@ -21,7 +21,7 @@ from openatlas.forms.entity_form import (
     get_entity_form, process_files, process_form_data)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
-from openatlas.models.openatlas_class import Relation, get_reverse_relation
+from openatlas.models.openatlas_class import Relation
 from openatlas.models.overlay import Overlay
 
 
@@ -42,7 +42,7 @@ def view(id_: int) -> str | Response:
             for name in entity.classes:
                 entity.class_.relations[name] = Relation(name, {
                     'name': name,
-                    'label': _(name),
+                    'label': _(name.replace('_', ' ')),
                     'classes': [name],
                     'property': 'P67',
                     'multiple': True,
@@ -134,8 +134,6 @@ def get_overlays(entity: Entity) -> dict[int, Overlay]:
 def update(id_: int, copy: Optional[str] = None) -> str | Response:
     entity = Entity.get_by_id(id_, types=True, aliases=True)
     check_update_access(entity)
-    if entity.check_too_many_single_type_links():
-        abort(422)
     form = get_entity_form(entity)
     if form.validate_on_submit():
         if copy:
@@ -144,20 +142,11 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
             return template
         return redirect(save(entity, form))
     gis_data = None
+    entity.image_id = entity.get_profile_image_id()
     if entity.class_.attributes.get('location'):
         entity.location = entity.location \
             or entity.get_linked_entity_safe('P53')
         gis_data = Gis.get_all([entity], entity.get_structure())
-    if entity.class_.name == 'file':
-        entity.image_id = entity.id
-    elif entity.class_.relations.get('file'):
-        entity.image_id = entity.get_profile_image_id()
-        if not entity.image_id:
-            for link_ in entity.get_links('P67', ['file'], inverse=True):
-                if file_ := g.files.get(link_.domain.id):
-                    if file_.suffix in g.display_file_ext:
-                        entity.image_id = link_.domain.id
-                        break
     return render_template(
         'entity/update.html',
         form=form,
@@ -179,12 +168,8 @@ def deletion_possible(entity: Entity) -> bool:
     if entity.class_.group['name'] == 'type':
         return True  # Type (recursive) deletion is taken care of at delete()
     for relation in entity.class_.relations.values():
-        reverse_relation = get_reverse_relation(
-            entity.class_,
-            relation,
-            g.classes[relation.classes[0]])
-        if reverse_relation \
-                and reverse_relation.required \
+        if relation.reverse_relation \
+                and relation.reverse_relation.required \
                 and entity.get_linked_entities(
                     relation.property,
                     relation.classes,

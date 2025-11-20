@@ -227,10 +227,15 @@ class Endpoint:
     def sort_entities(self) -> None:
         if 'latest' in request.path:
             return
+
+        def safe_key(ent: Entity) -> str:
+            value = self.parser.get_key(ent)
+            return value or ""
+
         self.entities = sorted(
             self.entities,
-            key=self.parser.get_key,
-            reverse=bool(self.parser.sort == 'desc'))
+            key=safe_key,
+            reverse=bool(self.parser.sort == "desc"))
 
     def remove_duplicates(self) -> None:
         exists: set[int] = set()

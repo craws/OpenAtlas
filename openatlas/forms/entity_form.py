@@ -22,7 +22,6 @@ from openatlas.forms.validation import file, validate
 from openatlas.models.dates import Dates, form_to_datetime64
 from openatlas.models.entity import Entity, insert
 from openatlas.models.gis import InvalidGeomException
-from openatlas.models.openatlas_class import get_reverse_relation
 
 
 def get_entity_form(
@@ -36,7 +35,7 @@ def get_entity_form(
 
     add_name_fields(Form, entity)
     add_class_types(Form, entity.class_)
-    add_relations(Form, entity, origin)
+    add_relations(Form, entity, origin, relation)
     add_reference_systems(Form, entity.class_)
     for key, value in entity.class_.attributes.items():
         match key:
@@ -100,9 +99,7 @@ def reference_system_class_choices(entity: Entity) -> list[tuple[str, str]]:
     for class_ in g.classes.values():
         if 'reference_system' in class_.extra \
                 and class_.name not in entity.classes \
-                and not (
-                    entity.name == 'GeoNames'
-                    and class_.name not in g.class_groups['place']['classes']):
+                and not entity.name == 'GeoNames':
             choices.append((class_.name, g.classes[class_.name].label))
     return choices
 
@@ -223,11 +220,8 @@ def process_relations(
     if origin and relation_name:
         origin_relation = origin.class_.relations[relation_name]
         if not origin.class_.relations[relation_name].additional_fields:
-            reverse_relation = get_reverse_relation(
-                origin.class_,
-                origin_relation,
-                entity.class_)
-            if not reverse_relation or reverse_relation.mode != 'direct':
+            if not origin_relation.reverse_relation \
+                    or origin_relation.reverse_relation.mode != 'direct':
                 origin.link(
                     origin_relation.property,
                     entity,

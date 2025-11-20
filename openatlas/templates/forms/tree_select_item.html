@@ -13,6 +13,10 @@
       if (this.value.length >= {{ g.settings.minimum_jstree_search }}) {
         $("#{{ name }}-tree").jstree("search", $(this).val());
       }
+       else if (this.value.length == 0) {
+        $("#{{ name }}-tree").jstree("search", $(this).val());
+        $("#{{ name }}-tree").jstree(true).show_all();
+      }
     });
   });
 </script>

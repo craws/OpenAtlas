@@ -49,6 +49,7 @@ place: dict[str, Any] = {
                 'activity', 'acquisition', 'modification', 'production'],
             'property': 'P7',
             'inverse': True,
+            'via_location': True,
             'tab': {
                 'buttons': ['insert']}},
         'move_from_location': {
@@ -56,6 +57,7 @@ place: dict[str, Any] = {
             'classes': 'move',
             'property': 'P27',
             'inverse': True,
+            'via_location': True,
             'tab': {
                 'buttons': ['insert']}},
         'move_to_location': {
@@ -63,6 +65,7 @@ place: dict[str, Any] = {
             'classes': 'move',
             'property': 'P26',
             'inverse': True,
+            'via_location': True,
             'tab': {
                 'buttons': ['insert']}},
         'residence': {
@@ -70,8 +73,35 @@ place: dict[str, Any] = {
             'classes': class_groups['actor']['classes'],
             'property': 'P74',
             'inverse': True,
+            'via_location': True,
             'tab': {
                 'buttons': ['insert']}},
+        'begins_in': {
+            'label': _('begins in'),
+            'classes': class_groups['actor']['classes'],
+            'property': 'OA8',
+            'inverse': True,
+            'via_location': True,
+            'tab': {
+                'buttons': ['insert']}},
+        'ends_in': {
+            'label': _('ends in'),
+            'classes': class_groups['actor']['classes'],
+            'property': 'OA9',
+            'inverse': True,
+            'via_location': True,
+            'tab': {
+                'buttons': ['insert']}},
+        'performed_in': {
+            'label': _('performed in'),
+            'classes': class_groups['actor']['classes'],
+            'property': 'OA9',  # Todo: Link to event
+            'inverse': True},
+        'participated': {
+            'label': _('participated in'),
+            'classes': class_groups['actor']['classes'],
+            'property': 'OA9',  # Todo: Link to event
+            'inverse': True},
         'reference': standard_relations['reference'],
         'file': standard_relations['file']},
     'display': {

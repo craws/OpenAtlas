@@ -10,9 +10,9 @@ from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.table import entity_table
 from openatlas.display.util import (
-    bookmark_toggle, button, description, display_annotation_text_links,
-    format_entity_date, get_appearance, get_chart_data, get_file_path,
-    get_system_data, link, reference_systems)
+    bookmark_toggle, button, button_bar, description,
+    display_annotation_text_links, format_entity_date, get_appearance,
+    get_chart_data, get_file_path, get_system_data, link, reference_systems)
 from openatlas.display.util2 import (
     display_bool, is_authorized, manual, uc_first)
 from openatlas.models.dates import format_date
@@ -34,10 +34,7 @@ class Display:
         self.structure: dict[str, list[Entity]] = {}
         self.gis_data: dict[str, Any] = {}
         self.problematic_type = self.entity.check_too_many_single_type_links()
-        if entity.class_.attributes.get('file'):
-            entity.image_id = entity.id if get_file_path(entity.id) else None
-        else:
-            entity.image_id = entity.get_profile_image_id()
+        self.entity.image_id = entity.get_profile_image_id()
         self.add_tabs()
         self.add_buttons()
         self.add_info_tab_content()
@@ -114,10 +111,7 @@ class Display:
             if not relation.mode == 'tab':
                 continue
             entity_for_links = self.entity
-            if name in [
-                    'event_location',
-                    'move_from_location',
-                    'move_to_location']:
+            if relation.via_location and self.entity.class_.name == 'place':
                 entity_for_links = self.entity.location
             items = []
             for item in entity_for_links.get_links(
@@ -130,13 +124,6 @@ class Display:
                         inverse=True,
                         types=True)
                 items.append(item)
-                if relation.property == 'P67' \
-                        and relation.classes == ['file'] \
-                        and not self.entity.image_id \
-                        and item.domain.get_file_ext() in \
-                        g.display_file_ext:
-                    self.entity.image_id = \
-                        self.entity.image_id or item.domain.id
             buttons = [link_] if (link_ := manual(f'entity/{name}')) else []
             if is_authorized('contributor'):
                 for button_name in relation.tab['buttons']:
@@ -212,6 +199,22 @@ class Display:
             if name == 'note':
                 self.add_note_tab()
                 continue
+
+        empty_tabs = []
+        for name, tab in self.tabs.items():
+            if name != 'info' and not tab.table.rows:
+                empty_tabs.append(name)
+        if empty_tabs:
+            self.tabs['additional'] = Tab(
+                'additional',
+                '+ ' + uc_first(_('relation')),
+                '')
+            for name in empty_tabs:
+                if self.tabs[name].buttons:
+                    self.tabs['additional'].content += \
+                        f"<h2>{self.tabs[name].label}</h2>" + \
+                        button_bar(self.tabs[name].buttons)
+                del self.tabs[name]
 
     def add_note_tab(self) -> None:
         buttons = [manual('tools/notes')]

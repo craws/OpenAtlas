@@ -4,7 +4,6 @@ from flask import g, url_for
 
 from openatlas import app
 from openatlas.database import entity as db
-from openatlas.models.dates import form_to_datetime64
 from openatlas.models.logger import Logger
 from tests.base import TestBaseCase, get_hierarchy, insert
 
@@ -88,21 +87,12 @@ class AdminTests(TestBaseCase):
         with app.test_request_context():
             app.preprocess_request()
             event = insert('acquisition', 'Event Horizon')
-            event.update(
-                data={
-                    'attributes':
-                        {'begin_from': form_to_datetime64(2000, 1, 1)}})
+            event.update({'begin_from': '2000-01-011'})
             event2 = insert('activity', 'Event Impossible')
-            event2.update(
-                data={
-                    'attributes':
-                        {'begin_from': form_to_datetime64(1000, 1, 1)}})
+            event2.update({'begin_from': '1000-01-01'})
             event2.link('P134', event)
             event.link('P9', event2)
-            person.update({
-                'attributes': {
-                    'begin_from': '2018-01-31',
-                    'begin_to': '2018-01-01'}})
+            person.update({'begin_from': '2018-01-31', 'begin_to': '2018-1-1'})
             event.link(
                 'P11',
                 person,

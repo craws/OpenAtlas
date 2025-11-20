@@ -91,6 +91,7 @@ def before_request() -> Response | None:
         app.config['SQL_PATH'],
         app.config['UPLOAD_PATH'],
         app.config['TMP_PATH']]
+    g.arche_uri_rules = None
     setup_files()
     setup_api()
     return None

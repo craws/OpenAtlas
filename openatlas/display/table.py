@@ -9,13 +9,12 @@ from flask_login import current_user
 from openatlas import app
 from openatlas.display.image_processing import check_processed_image
 from openatlas.display.util import (
-    check_iiif_file_exist, edit_link, get_file_path, link,
-    profile_image_table_link, remove_link)
+    check_iiif_file_exist, edit_link, get_file_path, link, remove_link)
 from openatlas.display.util2 import (
     display_bool, is_authorized, sanitize, uc_first)
 from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity, Link
-from openatlas.models.openatlas_class import Relation, get_reverse_relation
+from openatlas.models.openatlas_class import Relation
 from openatlas.models.overlay import Overlay
 
 # Needed for translations
@@ -93,13 +92,10 @@ def entity_table(
     item = items[0]
     if isinstance(item, Link):
         if inverse:
-            item_class = item.domain.class_
             default_columns = item.domain.class_.group['table_columns']
         else:
-            item_class = item.range.class_
             default_columns = item.range.class_.group['table_columns']
     else:
-        item_class = item.class_
         default_columns = item.class_.group['table_columns']
     order = None
     defs = None
@@ -116,11 +112,8 @@ def entity_table(
     if origin and relation and relation.mode.startswith('tab'):
         if relation.additional_fields:
             columns.append('update')
-        reverse_relation = get_reverse_relation(
-            origin.class_,
-            relation,
-            item_class)
-        if not reverse_relation or not reverse_relation.required:
+        if not relation.reverse_relation \
+                or not relation.reverse_relation.required:
             columns.append('remove')
 
     overlays = Overlay.get_by_object(origin) \
@@ -193,20 +186,11 @@ def entity_table(
                     if g.file_info.get(e.id):
                         html = g.file_info[e.id]['license_holder']
                 case 'main_image' if isinstance(e, Entity):
-                    html = profile_image_table_link(
-                        origin,
-                        e,
-                        e.get_file_ext())
+                    html = profile_image_table_link(origin, e)
                 case 'name':
                     html = format_name_and_aliases(e, table_id, forms)
                 case 'page':
                     html = item.description
-                case 'precision' if isinstance(e, Link):
-                    html = item.type.name
-                case 'profile' if e and e.image_id:
-                    html = 'Profile' if e.id == origin.image_id else link(
-                        'profile',
-                        url_for('file_profile', id_=e.id, entity_id=origin.id))
                 case 'overlay':
                     html = ''
                     if is_authorized('editor') \
@@ -239,7 +223,7 @@ def entity_table(
                     html = ''
                     if not origin.root or not g.types[origin.root[0]].required:
                         html = remove_link(e.name, item, origin, tab_id)
-                case 'set logo':
+                case 'set_logo':
                     html = link(_('set'), url_for('logo', id_=e.id))
                 case 'size':
                     html = e.get_file_size()
@@ -331,3 +315,14 @@ def table_date(
             html = getattr(e.dates, mode)
         html = f'<span class="text-muted">{html}</span>' if html else ''
     return html
+
+
+def profile_image_table_link(entity: Entity, file: Entity) -> str:
+    if file.id == entity.image_id:
+        return uc_first(_('main image'))
+    elif is_authorized('contributor') \
+            and file.get_file_ext() in g.display_file_ext:
+        return link(
+                _('set'),
+                url_for('set_profile_image', id_=file.id, origin_id=entity.id))
+    return ''

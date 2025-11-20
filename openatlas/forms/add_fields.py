@@ -140,7 +140,11 @@ def add_type(form: Any, type_: Entity) -> None:
         add_value_type_fields(form, type_.subs)
 
 
-def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
+def add_relations(
+        form: Any,
+        entity: Entity,
+        origin: Entity | None,
+        origin_relation: str | None) -> None:
     from openatlas.forms.form import filter_entities
     entities = {}  # Collect entities per class to prevent multiple fetching
     for name, relation in entity.class_.relations.items():
@@ -184,7 +188,7 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
                     relation.property,
                     relation.classes,
                     inverse=relation.inverse)
-            elif origin and origin.class_.name in relation.classes:
+            elif selection_available(origin, relation, origin_relation):
                 selection = [origin]
             setattr(
                 form,
@@ -202,7 +206,7 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
                     relation.property,
                     relation.classes,
                     relation.inverse)
-            elif origin and origin.class_.name in relation.classes:
+            elif selection_available(origin, relation, origin_relation):
                 selection = origin
             if selection and selection.class_.name == 'object_location':
                 selection = selection.get_linked_entity_safe('P53', True)
@@ -221,6 +225,21 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
                     description=relation.tooltip,
                     validators=validators,
                     add_dynamic=add_dynamic))
+
+
+def selection_available(
+        origin: Entity | None,
+        relation: Relation,
+        origin_relation: str | None) -> bool:
+    if not origin:
+        return False
+    if origin.class_.name.replace('place', 'object_location') \
+            not in relation.classes:
+        return False
+    if relation.reverse_relation and \
+            relation.reverse_relation.name == origin_relation:
+        return True
+    return False
 
 
 def add_date_fields(

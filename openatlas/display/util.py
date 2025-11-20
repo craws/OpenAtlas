@@ -115,20 +115,6 @@ def get_appearance(entity: Entity) -> tuple[str, str]:
     return first_string, last_string
 
 
-def profile_image_table_link(entity: Entity, file: Entity, ext: str) -> str:
-    if is_authorized('contributor'):
-        if file.id == entity.image_id and \
-                file.id == entity.get_profile_image_id():
-            return link(
-                _('unset'),
-                url_for('remove_profile_image', entity_id=entity.id))
-        if ext in g.display_file_ext:
-            return link(
-                _('set'),
-                url_for('set_profile_image', id_=file.id, origin_id=entity.id))
-    return ''
-
-
 def get_chart_data(entity: Entity) -> Optional[dict[str, Any]]:
     if not entity.subs:
         return None

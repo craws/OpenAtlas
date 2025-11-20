@@ -51,14 +51,6 @@ def set_profile_image(id_: int, origin_id: int) -> Response:
     return redirect(url_for('view', id_=origin_id))
 
 
-@app.route('/remove_profile_image/<int:entity_id>')
-@required_group('contributor')
-def remove_profile_image(entity_id: int) -> Response:
-    entity = Entity.get_by_id(entity_id)
-    entity.remove_profile_image()
-    return redirect(url_for('view', id_=entity.id))
-
-
 @app.route('/file/convert_iiif/<int:id_>')
 @required_group('contributor')
 def make_iiif_available(id_: int) -> Response:

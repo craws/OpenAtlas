@@ -302,10 +302,17 @@ class Entity:
             Gis.insert(location, gis_data)
 
     def get_profile_image_id(self) -> Optional[int]:
-        return db.get_profile_image_id(self.id)
-
-    def remove_profile_image(self) -> None:
-        db.remove_profile_image(self.id)
+        if self.class_.name == 'file':
+            return self.id
+        if not self.class_.relations.get('file'):
+            return None
+        image_id = db.get_profile_image_id(self.id)
+        if not image_id:
+            for link_ in self.get_links('P67', ['file'], inverse=True):
+                if file_ := g.files.get(link_.domain.id):
+                    if file_.suffix in g.display_file_ext:
+                        return link_.domain.id
+        return image_id
 
     def get_name_directed(self, inverse: bool = False) -> str | None:
         """Returns name part of a directed type e.g. parent of (child of)"""
