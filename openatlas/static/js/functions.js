@@ -348,7 +348,7 @@ function fillTreeSelect(id,d,minimum_jstree_search){
   $(`#${id}-tree`).on("select_node.jstree", function (e, data) {
       selectFromTree(`${id}`, data.node.id, data.node.text);
   });
-  $(`#${id}-tree-search`).keyup(function () {
+  $(`#${id.replaceAll(" ", "")}-tree-search`).keyup(function () {
     if (this.value.length >= minimum_jstree_search) {
       $(`#${id}-tree`).jstree("search", $(this).val());
     } else if (this.value.length == 0) {

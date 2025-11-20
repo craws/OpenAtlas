@@ -5,7 +5,7 @@ from rdflib import Namespace
 
 from config.database_versions import DATABASE_VERSIONS
 
-VERSION = '8.15.0'
+VERSION = '8.15.1'
 DATABASE_VERSION = DATABASE_VERSIONS[0]
 DEMO_MODE = False  # If activated some options are disabled, login is prefilled
 DEBUG = False

@@ -13,13 +13,13 @@ CURRENT_USER = 13  # BKK
 
 
 def get_pious_data_from_db() -> list[dict[str, Any]]:
-    db = connect(
+    connection = connect(
         database='pious',
         user=app.config['DATABASE_USER'],
         password=app.config['DATABASE_PASS'],
         port=app.config['DATABASE_PORT'],
         host=app.config['DATABASE_HOST'])
-    cursor = db.cursor(cursor_factory=extras.DictCursor)
+    cursor = connection.cursor(cursor_factory=extras.DictCursor)
     cursor.execute("SELECT * FROM public.inscriptions")
     return [dict(row) for row in cursor.fetchall()]
 
@@ -190,19 +190,6 @@ def insert_artifacts_and_sources() -> None:
                 transcription_corrected.id,
                 CURRENT_USER,
                 None)
-        # Not wanted
-        # if clean_description_text(entry['transcription_simplified']):
-        #     transcription_simplified = Entity.insert(
-        #         'source_translation',
-        #         f'Simplified transcription of {entry["id_string"]}',
-        #         clean_description_text(entry['transcription_simplified']))
-        #     transcription_simplified.link('P2', original_text_normalized_type)
-        #     transcription_simplified.link('P73', source, inverse=True)
-        #     db.import_data(
-        #         PROJECT_ID,
-        #         transcription_simplified.id,
-        #         CURRENT_USER,
-        #         None)
         if clean_description_text(entry['translation']):
             translation = Entity.insert(
                 'source_translation',
