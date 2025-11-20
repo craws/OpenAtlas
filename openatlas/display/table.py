@@ -117,14 +117,10 @@ def entity_table(
         if isinstance(item, Link):
             e = item.domain if inverse else item.range
             range_ = item.range if inverse else item.domain
-            if e.class_.name == 'object_location':
-                e = e.get_linked_entity_safe('P53', inverse=False, types=True)
         data = []
         for name in columns:
             html = 'no table function'
             match name:
-                case 'activity':
-                    html = item.property.name_inverse
                 case 'begin':
                     html = table_date('first', e, range_, item)
                 case 'checkbox' if isinstance(e, Entity):
