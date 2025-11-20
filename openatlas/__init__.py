@@ -95,6 +95,7 @@ def before_request() -> Response | None:
         app.config['SQL_PATH'],
         app.config['UPLOAD_PATH'],
         app.config['TMP_PATH']]
+    g.arche_uri_rules = None
     setup_files()
     setup_api()
     return None
@@ -134,7 +135,7 @@ def setup_api() -> None:
 def count_type() -> bool:
     prefixes = [
         '/type',
-        '/admin/orphans',
+        '/orphans',
         '/api/type_tree',
         *[f'/api/{v}/type_tree' for v in app.config['API_VERSIONS']]]
     if request.path.startswith(tuple(prefixes)):

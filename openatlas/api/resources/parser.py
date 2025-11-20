@@ -188,6 +188,12 @@ presentation.add_argument(
     default='false',
     choices=('true', 'false'),
     location='args')
+presentation.add_argument(
+    'map_overlay',
+    type=str,
+    default='false',
+    choices=('true', 'false'),
+    location='args')
 
 query = entity_.copy()
 query.add_argument(

@@ -120,12 +120,6 @@ class Entity:
             types=types,
             sort=sort)
 
-    def get_linked_entity_ids_recursive(
-            self,
-            codes: list[str] | str,
-            inverse: bool = False) -> list[int]:
-        return db.get_linked_entities_recursive(self.id, codes, inverse)
-
     def get_linked_entities_recursive(
             self,
             codes: list[str] | str,
@@ -468,6 +462,12 @@ class Entity:
             if ext in app.config['DISPLAY_FILE_EXT']:
                 entities.append(Entity(row))
         return entities
+    @staticmethod
+    def get_linked_entity_ids_recursive(
+            entity_id: int,
+            codes: list[str] | str,
+            inverse: bool = False) -> list[int]:
+        return db.get_linked_entities_recursive(entity_id, codes, inverse)
 
     @staticmethod
     def insert(class_: str, name: str, desc: Optional[str] = None) -> Entity:

@@ -12,10 +12,12 @@ from openatlas.api.resources.util import (
     date_to_str, geometry_to_feature_collection, get_crm_relation_x,
     get_iiif_manifest_and_path, get_license_name, get_location_link,
     get_reference_systems, get_value_for_types, to_camel_case)
+from openatlas.database.overlay import get_by_object
 from openatlas.display.util import get_file_path
 from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
+from openatlas.models.overlay import Overlay
 
 
 def get_presentation_types(
@@ -45,32 +47,57 @@ def get_presentation_types(
     return types
 
 
+def get_file_dict(
+        link: Link,
+        overlay: Optional[Overlay] = None) -> dict[str, str]:
+    path = get_file_path(link.domain.id)
+    mime_type = None
+    if path:
+        mime_type, _ = mimetypes.guess_type(path)  # pragma: no cover
+    data = {
+        'id': link.domain.id,
+        'title': link.domain.name,
+        'license': get_license_name(link.domain),
+        'creator': link.domain.creator,
+        'licenseHolder': link.domain.license_holder,
+        'publicShareable': link.domain.public,
+        'mimetype': mime_type,
+        'url': url_for(
+            'api.display',
+            filename=path.stem,
+            _external=True) if path else 'N/A'}
+    data.update(get_iiif_manifest_and_path(link.domain.id))
+    if overlay:
+        data.update({'overlay': overlay.bounding_box})
+    return data
+
+
 def get_presentation_files(
         links_inverse: list[Link],
-        entity_id: int) -> list[dict[str, str]]:
+        entity: Entity,
+        parser: Parser,
+        root_ids: Optional[list[int]] = None) -> list[dict[str, str]]:
     files = []
-    for link in links_inverse:
-        if link.domain.class_.name != 'file' or link.range.id != entity_id:
-            continue
-        img_id = link.domain.id
-        path = get_file_path(img_id)
-        mime_type = None
-        if path:
-            mime_type, _ = mimetypes.guess_type(path)  # pragma: no cover
-        data = {
-            'id': img_id,
-            'title': link.domain.name,
-            'license': get_license_name(link.domain),
-            'creator': link.domain.creator,
-            'licenseHolder': link.domain.license_holder,
-            'publicShareable': link.domain.public,
-            'mimetype': mime_type,
-            'url': url_for(
-                'api.display',
-                filename=path.stem,
-                _external=True) if path else 'N/A'}
-        data.update(get_iiif_manifest_and_path(img_id))
-        files.append(data)
+    file_links = [
+        link_ for link_ in links_inverse if link_.domain.class_.name == 'file']
+    if not file_links:
+        return []
+    overlays = {
+        row['image_id']: Overlay(row) for row
+        in get_by_object([l.domain.id for l in file_links])}
+    for link_ in file_links:
+        if parser.place_hierarchy \
+                and parser.map_overlay \
+                and link_.range.id in root_ids:
+            if overlay := overlays.get(link_.domain.id):
+                files.append(get_file_dict(link_, overlay))
+        elif link_.range.id == entity.id:
+            files.append(
+                get_file_dict(link_, overlays.get(link_.domain.id)))
+        elif entity.class_.name == 'file' and link_.domain.id == entity.id:
+            files.append(
+                get_file_dict(link_, overlays.get(link_.domain.id)))
+            break
     return files
 
 
@@ -111,11 +138,13 @@ def get_relation_types_dict_for_locations(
 
 def get_presentation_references(
         links_inverse: list[Link],
-        entity_id: int) -> list[dict[str, Any]]:
+        entity_ids: list[int]) -> list[dict[str, Any]]:
     references = []
+    check_for_duplicates: dict[str, int] = defaultdict(int)
     for link in links_inverse:
-        if (link.domain.class_.view != 'reference'
-                or link.range.id != entity_id):
+        if link.domain.class_.view != 'reference' \
+                or link.range.id not in entity_ids \
+                or check_for_duplicates[link.domain.id] == link.description:
             continue
         ref = {
             'id': link.domain.id,
@@ -127,20 +156,26 @@ def get_presentation_references(
             ref.update({
                 'type': link.domain.standard_type.name,
                 'typeId': link.domain.standard_type.id})
+        check_for_duplicates[link.domain.id] = link.description
         references.append(ref)
     return references
 
 
 def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
     ids = [entity.id]
+    root_ids: list[int] = []
     if entity.class_.view in ['place', 'artifact']:
         entity.location = entity.get_linked_entity_safe('P53')
         ids.append(entity.location.id)
         if parser.place_hierarchy:
-            place_hierarchy = entity.get_linked_entity_ids_recursive('P46')
-            place_hierarchy.extend(entity.get_linked_entity_ids_recursive(
+            root_ids = Entity.get_linked_entity_ids_recursive(
+                entity.id,
                 'P46',
-                inverse=True))
+                inverse=True)
+            root_id = root_ids[-1] if root_ids else entity.id
+            place_hierarchy = Entity.get_linked_entity_ids_recursive(root_id,
+                                                                     'P46')
+            place_hierarchy.extend(root_ids)
             ids.extend(place_hierarchy)
 
     links = Entity.get_links_of_entities(ids)
@@ -249,8 +284,14 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         'when': get_presentation_time(entity),
         'types': get_presentation_types(entity, links),
         'externalReferenceSystems': get_reference_systems(links_inverse),
-        'references': get_presentation_references(links_inverse, entity.id),
-        'files': get_presentation_files(links_inverse, entity.id),
+        'references': get_presentation_references(
+            links_inverse,
+            [entity.id, *root_ids]),
+        'files': get_presentation_files(
+            links if entity.class_.name == 'file' else links_inverse,
+            entity,
+            parser,
+            root_ids),
         'relations': relations}
     if entity.class_.view in ['place', 'artifact']:
         data['geometries'] = geometry_to_feature_collection(
