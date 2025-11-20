@@ -57,24 +57,63 @@ def reference_systems(entity: Entity) -> str:
             inverse=True)):
         return ''
     html = '<h2 class="uc-first">' + _("external reference systems") + '</h2>'
+    html += '<ul class="list-group list-group-flush bg-none">'
     for link_ in links:
         system = g.reference_systems[link_.domain.id]
-        html += link(
-            f'{system.resolver_url}{link_.description}',
-            f'{system.resolver_url}{link_.description}',
-            external=True) if system.resolver_url else link_.description
-        html += \
-            f' ({g.types[link_.type.id].name} ' + _('at') + \
-            f' {link(link_.domain)})'
+        show_info_button = ''
+        info_div = ''
         if system.name in ['GeoNames', 'GND', 'Wikidata']:
             name = system.name.lower()
-            html += (
-                f' <span id="{name}-switch" class="uc-first '
+            show_info_button += (
+                f' <button id="{name}-switch" class="uc-first mt-1 me-1 '
                 f'{app.config["CSS"]["button"]["secondary"]}"'
                 f'onclick="ajax{uc_first(name)}Info'
-                f'(\'{link_.description}\')">' + _('show') + '</span>'
-                f'<div id="{name}-info-div" class="bg-gray"></div>')
-        html += '<br>'
+                f'(\'{link_.description}\')">' + _('show info') + '</button>')
+            info_div = f'<div id="{name}-info-div" class="bg-gray"></div>'
+
+        entry = f"""
+            <li class="list-group-item bg-transparent">
+                <div class="d-flex gap-2 align-items-start">
+                <span>
+                    <b>{link(link_.domain)}</b>{
+                        f": {link_.description}"
+                        if system.resolver_url else "" }
+                </span>
+                <span class="badge badge-pill rounded-pill
+                    badge-secondary bg-secondary">
+                    {g.types[link_.type.id].name}
+                </span>
+                </div>
+                {show_info_button}
+                {link(
+                _('show on %(system_name)s', system_name=link_.domain.name),
+                f'{system.resolver_url}{link_.description}',
+                external=True,
+                icon='fa-external-link-alt',
+                class_="btn btn-sm btn-outline-primary mt-1")
+                if system.resolver_url else link_.description}
+                {info_div}
+            </li>
+            """
+        html += entry
+        # system = g.reference_systems[link_.domain.id]
+        # html += link(
+        #     f'{system.resolver_url}{link_.description}',
+        #     f'{system.resolver_url}{link_.description}',
+        #     external=True) if system.resolver_url else link_.description
+        # html += \
+        #     f' ({g.types[link_.type.id].name} ' + _('at') + \
+        #     f' {link(link_.domain)})'
+        # if system.name in ['GeoNames', 'GND', 'Wikidata']:
+        #     name = system.name.lower()
+        #     html += (
+        #         f' <span id="{name}-switch" class="uc-first '
+        #         f'{app.config["CSS"]["button"]["secondary"]}"'
+        #         f'onclick="ajax{uc_first(name)}Info'
+        #         f'(\'{link_.description}\')">' + _('show') + '</span>'
+        #         f'<div id="{name}-info-div" class="bg-gray"></div>')
+        # html += '<br>'
+    html += '</ul>'
     return html
 
 
@@ -427,6 +466,7 @@ def link(
         uc_first_: Optional[bool] = True,
         js: Optional[str] = None,
         external: bool = False,
+        icon: Optional[str] = None,
         index: bool = False) -> str:
     html = ''
     if isinstance(object_, (str, LazyString)):
@@ -435,7 +475,9 @@ def link(
         if uc_first_ and not str(object_).startswith('http'):
             object_ = uc_first(object_)
         class_ = f' class="{class_.strip()}"' if class_ else ''
-        html = f'<a href="{url}"{class_}{js}{ext}>{object_}</a>'
+        icon_ = (f'<i class="ms-2 fas {icon}"></i>'
+                if icon else '')
+        html = f'<a href="{url}"{class_}{js}{ext}>{object_}{icon_}</a>'
     elif isinstance(object_, Entity) and index:
         html = link(
             object_.class_.group['label'] + (
