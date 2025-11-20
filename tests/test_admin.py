@@ -160,9 +160,6 @@ class AdminTests(TestBaseCase):
         rv = c.get(url_for('admin_content', item='legal_notice'))
         assert b'Save' in rv.data
 
-        rv = c.get(url_for('arche_index'))
-        assert b'https://arche-curation.acdh-dev.oeaw.ac.at/' in rv.data
-
         rv = c.post(
             url_for('admin_content', item='legal_notice'),
             data={'en': 'My legal notice', 'de': 'German notice'},

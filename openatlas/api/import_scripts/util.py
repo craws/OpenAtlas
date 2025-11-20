@@ -58,7 +58,7 @@ def vocabs_requests(
     base = g.settings["vocabs_base_url"]
     ep = g.settings["vocabs_endpoint"]
     url = f"{base}{ep}{id_}/{endpoint}"
-    sleep(0.1) # fix connection abort
+    sleep(0.1)  # fix connection abort
     try:
         resp = requests.get(
             url,
@@ -73,22 +73,3 @@ def vocabs_requests(
         return resp.json()
     except ValueError:  # pragma: no cover
         abort(400, f"Invalid JSON from {url}")
-
-
-def request_arche_metadata(id_: int) -> dict[str, Any]:
-    url = f"{app.config['ARCHE']['url']}/api/{id_}/metadata"
-    try:
-        resp = requests.get(
-            url,
-            headers={
-                "Accept": "application/ld+json",
-                "X-METADATA-READ-MODE": "1_1_0_0"},
-            timeout=60)
-        resp.raise_for_status()
-    except requests.exceptions.RequestException as e:  # pragma: no cover
-        abort(400, f"ARCHE request failed for {url}: {e}")
-
-    try:
-        return resp.json()
-    except ValueError:  # pragma: no cover
-        abort(400, f"Invalid JSON from ARCHE: {url}")
