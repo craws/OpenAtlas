@@ -1,4 +1,5 @@
 from typing import Any, Optional
+
 from flask import g, json, url_for
 
 from openatlas.api.resources.api_entity import ApiEntity
@@ -27,6 +28,7 @@ def get_license_type(entity: Entity) -> Optional[Type]:
     return license_
 
 
+
 def get_license_url(entity: Entity) -> Optional[str]:
     url = ''
     for type_ in entity.types:
@@ -37,6 +39,14 @@ def get_license_url(entity: Entity) -> Optional[str]:
             break
     return url
 
+def get_license_ids_with_links() -> dict[int, str]:
+    type_ids = Type.get_hierarchy('License').get_sub_ids_recursive()
+    license_links = Entity.get_links_of_entities(type_ids, 'P67', inverse=True)
+    url_dict = {}
+    for link_ in license_links:
+        if link_.domain.class_.name == "external_reference":
+            url_dict[link_.range.id] = link_.domain.name
+    return url_dict
 
 def to_camel_case(i: str) -> str:
     return (i[0] + i.title().translate(" ")[1:] if i else i).replace(" ", "")
@@ -218,9 +228,9 @@ def get_crm_relation_label_x(link_: Link, inverse: bool = False) -> str:
 
 
 def get_crm_relation_x(link_: Link, inverse: bool = False) -> str:
-    property_ = f"i_{link_.property.i18n_inverse['en']}" \
-        if inverse and link_.property.i18n_inverse['en'] \
-        else f"_{link_.property.i18n['en']}"
+    property_ = f"_{link_.property.i18n['en']}"
+    if inverse and link_.property.i18n_inverse['en']:
+        property_ = f"i_{link_.property.i18n_inverse['en']}"
     return f"crm:{link_.property.code}{property_.replace(' ', '_')}"
 
 
@@ -246,3 +256,15 @@ def get_value_for_types(type_: Entity, links: list[Link]) -> dict[str, str]:
             if link.range.id == type_.id and type_.description:
                 type_dict['unit'] = type_.description
     return type_dict
+
+
+def filter_by_type(
+        entities: list[Entity],
+        type_ids: list[int]) -> list[Entity]:
+    result = []
+    for entity in entities:
+        if any(
+                id_ in [type_.id for type_ in entity.types]
+                for id_ in type_ids):
+            result.append(entity)
+    return result

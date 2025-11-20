@@ -30,17 +30,17 @@
     {% include "map.html" %}
   {% endif %}
   <script>
-    bookmark_csrf_token = '{{ csrf_token() }}';
-    minimumPasswordLength = {{ g.settings.minimum_password_length }};
-    maxFileSize = {{ g.settings.file_upload_max_size }}
-    generatePassword = '{{ _('generate password')|uc_first }}';
-    const style = {
-      stringField: '{{ config.CSS.string_field }}',
-      button: {
-          primary: '{{ config.CSS.button.primary }}',
-          secondary: '{{ config.CSS.button.secondary }}'
+      bookmark_csrf_token = '{{ csrf_token() }}';
+      minimumPasswordLength = {{ g.settings.minimum_password_length }};
+      maxFileSize = {{ g.settings.file_upload_max_size }}
+      generatePassword = '{{ _('generate password')|uc_first }}';
+      const style = {
+          stringField: '{{ config.CSS.string_field }}',
+          button: {
+              primary: '{{ config.CSS.button.primary }}',
+              secondary: '{{ config.CSS.button.secondary }}'
+          }
       }
-    }
   </script>
   <script src="/static/js/functions.js"></script>
   <script src="/static/js/forms.js"></script>
@@ -53,19 +53,19 @@
 </head>
 <body>
 <script type="text/javascript">
-  if (navigator.userAgent.indexOf("Firefox") != -1) document.body.style.opacity = 0;
+    if (navigator.userAgent.indexOf("Firefox") != -1) document.body.style.opacity = 0;
 </script>
 <nav class="navbar navbar-expand-md navbar-light bg-light">
   <div class="container-fluid">
-    <a class="navbar-brand" href="/"><img src="{{ get_logo|safe }}" id="logo" alt="Logo"></a>
+    <a class="navbar-brand" href="/"><img src="{{ ''|get_logo_url }}" id="logo" alt="Logo"></a>
     <button
-        class="navbar-toggler"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navbarNavAltMarkup"
-        aria-controls="navbarNavAltMarkup"
-        aria-expanded="false"
-        aria-label="Toggle navigation">
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNavAltMarkup"
+      aria-controls="navbarNavAltMarkup"
+      aria-expanded="false"
+      aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
@@ -78,10 +78,10 @@
         {% if current_user.is_authenticated %}
           <div id="index-search" class="d-flex items-align-center my-1">
             <form
-                class="form-group has-search"
-                method="post"
-                action="{{ url_for('search_index') }}"
-                style="display:inline-flex">
+              class="form-group has-search"
+              method="post"
+              action="{{ url_for('search_index') }}"
+              style="display:inline-flex">
               {{ search_form.csrf_token }}
               {{ search_form.term(placeholder=_('search term')|uc_first, class_=config.CSS.string_field) }}
               <button class="btn btn-sm btn-link text-secondary">
@@ -90,30 +90,45 @@
             </form>
           </div>
         {% endif %}
-        <div class="btn-group btn-group-toggle my-1">
-          {% for language in config.LANGUAGES|sort %}
-            {% if 'language' in session and session.language == language %}
-              <span class="btn btn-secondary active btn-sm">{{ language|upper }}</span>
-            {% else %}
-              <a class="btn btn-secondary btn-sm" href="{{ url_for('set_locale', language=language) }}">
-                {{ language|upper }}
-              </a>
-            {% endif %}
-          {% endfor %}
+        <div class="dropdown d-flex my-1">
+          <button
+            class="btn btn-light"
+            type="button"
+            data-bs-toggle="dropdown"
+            data-bs-auto-close="true"
+            aria-expanded="false"><i
+            class="nav-link fa fa-language fs-4 h-100 text-secondary"
+            href="#"
+            style="padding: 0!important;"
+            aria-expanded="false">
+          </i></button>
+          <div class="dropdown-menu dropdown-menu-end">
+            {% for language in config.LANGUAGES|sort %}
+              {% if 'language' in session and session.language == language %}
+                <span class="dropdown-item bg-gray">{{ config.LANGUAGES[language] }}</span>
+              {% else %}
+                <a class="dropdown-item" href="{{ url_for('set_locale', language=language) }}">
+                  {{ config.LANGUAGES[language] }}
+                </a>
+              {% endif %}
+            {% endfor %}
+          </div>
         </div>
       </div>
 
       {% if current_user.is_authenticated %}
         <div class="dropdown d-flex mx-1">
-          <i
-              class="nav-link fa fa-cog fs-4 h-100 text-secondary"
-              data-bs-toggle="dropdown"
-              href="#"
-              role="button"
-              aria-haspopup="true"
-              style="padding: 0!important;"
-              aria-expanded="false">
-          </i>
+          <button
+            class="btn btn-light"
+            type="button"
+            data-bs-toggle="dropdown"
+            data-bs-auto-close="true"
+            aria-expanded="false"><i
+            class="nav-link fa fa-cog fs-4 h-100 text-secondary"
+            href="#"
+            style="padding: 0!important;"
+            aria-expanded="false">
+          </i></button>
           <div class="dropdown-menu dropdown-menu-end">
             <a class="dropdown-item" href="{{ url_for('profile_index') }}">
               <span>{{ _('profile')|uc_first }}</span>
@@ -137,11 +152,11 @@
       {% else %}
         {% if 'contact'|display_content_translation %}
           <div
-              class="iconbutton mx-1"
-              data-bs-toggle="popover"
-              data-bs-placement="bottom"
-              data-bs-content="{{ _('contact')|uc_first }}"
-              data-bs-trigger="hover">
+            class="iconbutton mx-1"
+            data-bs-toggle="popover"
+            data-bs-placement="bottom"
+            data-bs-content="{{ _('contact')|uc_first }}"
+            data-bs-trigger="hover">
             <a href="{{ url_for('index_content', item='contact') }}">
               <span><i class="fas fa-at"></i></span>
             </a>
@@ -149,11 +164,11 @@
         {% endif %}
         {% if 'legal_notice'|display_content_translation %}
           <div
-              class="iconbutton d-inline-block mx-1"
-              data-bs-toggle="popover"
-              data-bs-placement="bottom"
-              data-bs-content="{{ _('legal_notice')|uc_first }}"
-              data-bs-trigger="hover">
+            class="iconbutton d-inline-block mx-1"
+            data-bs-toggle="popover"
+            data-bs-placement="bottom"
+            data-bs-content="{{ _('legal_notice')|uc_first }}"
+            data-bs-trigger="hover">
             <a href="{{ url_for('index_content', item='legal_notice') }}">
               <span><i class="fas fa-balance-scale"></i></span>
             </a>
@@ -167,26 +182,30 @@
   </div>
 </nav>
 <nav aria-label="breadcrumb" class="d-flex justify-content-between p-3 mb-3 bg-gray">
-    <div class="breadcrumb mb-0">
-        {{ crumbs|breadcrumb|safe }}
-    </div>
-    <div>
-        {{ g.settings.site_name }}
-        {% if g.admins_available %}
-          <a href="{{ url_for('index_changelog') }}">{{ config.VERSION }}</a>
-        {% else %}
-          {{ config.VERSION }}
-        {% endif %}
-    </div>
+  <div class="breadcrumb mb-0">
+    {{ crumbs|breadcrumb|safe }}
+  </div>
+  <div>
+    {{ g.settings.site_name }}
+    {% if g.admins_available %}
+      <a href="{{ url_for('index_changelog') }}">{{ config.VERSION }}</a>
+    {% else %}
+      {{ config.VERSION }}
+    {% endif %}
+  </div>
 </nav>
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     {% for category, message in messages %}
       <div
-          class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show"
-          role="alert">
+        class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show"
+        role="alert">
         {{ message|uc_first|safe }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ _('close')|uc_first }}"></button>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="{{ _('close')|uc_first }}"></button>
       </div>
     {% endfor %}
   {% endif %}
@@ -208,7 +227,10 @@
 </script>
 
 <noscript>
-  <style>nav,main,.navbar{display:none;!important;}</style>
+  <style>nav, main, .navbar {
+    display: none;
+  !important;
+  }</style>
   <div class="vw-100 vh-100 d-flex flex-column justify-content-center align-items-center">
     <img src="/static/images/layout/logo.png" alt="OpenAtlas Logo">
     <p class="error">{{ _('warning no js') }}</p>

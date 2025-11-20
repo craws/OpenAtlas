@@ -6,6 +6,7 @@ from openatlas import app
 from openatlas.database import entity as db
 from openatlas.forms.util import form_to_datetime64
 from openatlas.models.entity import Link
+from openatlas.models.logger import Logger
 from tests.base import TestBaseCase, get_hierarchy, insert
 
 
@@ -15,10 +16,14 @@ class AdminTests(TestBaseCase):
         c = self.client
         with app.test_request_context():
             app.preprocess_request()
+            Logger.log('error', 'test', 'error log')
+            Logger.log('info', 'test', 'info log')
+            Logger.log('debug', 'test', 'debug log')
             person = insert('person', 'Oliver Twist')
             insert('person', 'Oliver Twist')
             insert('file', 'Forsaken file')
-            insert('feature', 'Forsaken subunit')
+            feature = insert('feature', 'Forsaken subunit')
+            feature.link('P2', g.types[get_hierarchy('Feature').subs[0]])
             invalid = insert('artifact', 'Invalid linked entity')
             db.link({
                 'property_code': 'P86',
@@ -27,8 +32,18 @@ class AdminTests(TestBaseCase):
                 'description': '',
                 'type_id': None})
 
-        assert b'Oliver Twist' in c.get(url_for('orphans')).data
-        assert b'Login' in c.get(url_for('log')).data
+        self.client.post(  # Login again after Logger statements above
+            url_for('login'),
+            data={'username': 'Alice', 'password': 'test'})
+
+        rv = c.get(url_for('orphans'))
+        assert b'Oliver Twist' in rv.data and b'Grave' not in rv.data
+
+        rv = c.get(url_for('log'))
+        assert b'Login' in rv.data
+        assert b'info log' in rv.data
+        assert b'error log' in rv.data
+        assert b'debug log' not in rv.data
         assert b'Login' not in c.get(url_for('log_delete')).data
 
         rv = c.get(url_for('check_dates'))

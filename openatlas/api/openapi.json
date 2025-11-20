@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.9a",
+    "version": "0.4.10e",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -150,6 +150,9 @@
           },
           {
             "$ref": "#/components/parameters/place_hierarchy"
+          },
+          {
+            "$ref": "#/components/parameters/map_overlay"
           },
           {
             "$ref": "#/components/parameters/remove_empty_values"
@@ -970,6 +973,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/download"
+          },
+          {
+            "$ref": "#/components/parameters/count"
           }
         ],
         "security": [
@@ -1389,7 +1395,7 @@
         }
       }
     },
-    "/search/{system_class}/{term}": {
+    "/search/{system_class}": {
       "get": {
         "tags": [
           "Proposal"
@@ -1403,8 +1409,7 @@
           {
             "name": "term",
             "description": "Search term",
-            "required": true,
-            "in": "path",
+            "in": "query",
             "schema": {
               "type": "string"
             }
@@ -1567,6 +1572,87 @@
                 "schema": {
                   "type": "string",
                   "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Something went wrong. Please consult the error message."
+          }
+        }
+      }
+    },
+    "/files_of_entities/": {
+      "get": {
+        "tags": [
+          "Proposal"
+        ],
+        "description": "Retrieves a json with the entity IDs as keys and a list of file information for all images.",
+        "operationId": "FilesOfEntities",
+        "parameters": [
+        ],
+        "security": [
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/ld+json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "license": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "creator": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "licenseHolder": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "publicShareable": {
+                          "nullable": true,
+                          "type": "boolean"
+                        },
+                        "mimetype": {
+                          "type": "string"
+                        },
+                        "url": {
+                          "type": "string"
+                        },
+                        "IIIFManifest": {
+                          "type": "string"
+                        },
+                        "IIIFBasePath": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "license",
+                        "mimetype",
+                        "publicShareable",
+                        "title",
+                        "url"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -1800,6 +1886,14 @@
       "place_hierarchy": {
         "name": "place_hierarchy",
         "description": "Will include the whole place hierarchy. This means that instead of only getting entities linked to the requested entity, all entities, which are connected with the property *P46* are included in the result set. This can significantly increase the load time.",
+        "in": "query",
+        "schema": {
+          "type": "boolean"
+        }
+      },
+      "map_overlay": {
+        "name": "map_overlay",
+        "description": "Will add the map overlay information for images if available.",
         "in": "query",
         "schema": {
           "type": "boolean"
@@ -3296,10 +3390,10 @@
       "TypeTreeModel": {
         "type": "object",
         "required": [
-          "type_tree"
+          "typeTree"
         ],
         "properties": {
-          "type_tree": {
+          "typeTree": {
             "type": "object",
             "required": [
               "type_ids"

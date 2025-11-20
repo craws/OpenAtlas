@@ -53,7 +53,7 @@
                       <div class="row g-1">
                         <div class="col"><input
                             class="tree-filter {{ config.CSS.string_field }}"
-                            id="{{ type_.name|sanitize }}-tree-search"
+                            id="{{ type_.name|replace(' ', '')|sanitize }}-tree-search"
                             placeholder="{{ _('type to search')|uc_first }}"
                             name="name_search"
                             type="text"></div>
@@ -88,9 +88,8 @@
                         <p>
                           <strong>{{ _('selection')|uc_first }}</strong>:
                           {{ _('multiple') if type_.multiple else _('single') }}
-                        </p>
-                        {% if category in ['custom', 'place', 'standard'] %}
-                          <p>
+                          <br>
+                          {% if category in ['custom', 'place', 'standard'] %}
                             <strong>{{ _('required')|uc_first }}</strong>:
                             {{ _('true') if type_.required else _('false') }}
                             {% if 'manager'|is_authorized %}
@@ -100,8 +99,8 @@
                                 (<a href="{{ url_for('required_risk', id_=type_.id) }}">{{ _('make required') }}</a>)
                               {% endif %}
                             {% endif %}
-                          </p>
-                        {% endif %}
+                          {% endif %}
+                        </p>
                       {% endif %}
                       {% if type_.classes %}
                         <p>
@@ -109,22 +108,22 @@
                           {% for class_ in type_.classes %}
                             {{ g.classes[class_].label|uc_first }}{{ "," if not loop.last }}
                           {% endfor %}
-                        </p>
-                        {% if type_.multiple and type_.subs %}
-                          <p>
-                            {{ _('multiple linked entities')|uc_first }}:
+                          <br>
+                          {% if type_.multiple and type_.subs %}
+                            <strong>{{ _('multiple linked entities')|uc_first }}</strong>:
                             <a href="{{ url_for('show_multiple_linked_entities', id_=type_.id) }}">{{ _('show') }}</a>
-                          </p>
-                        {% endif %}
-                        {% if type_.subs and type_.name not in config.PROPERTY_TYPES %}
-                          <p>
-                            {{ _('untyped entities')|uc_first }}:
+                            <br>
+                          {% endif %}
+                          {% if type_.subs and type_.name not in config.PROPERTY_TYPES %}
+                            <strong>{{ _('untyped entities')|uc_first }}</strong>:
                             <a href="{{ url_for('show_untyped_entities', id_=type_.id) }}">{{ _('show') }}</a>
-                          </p>
-                        {% endif %}
+                            <br>
+                          {% endif %}
+                        </p>
                       {% elif category != 'system' and type_.name not in config.PROPERTY_TYPES %}
                         <p class="error">{{ _("this type has no classes and won't show in forms")|uc_first }}.</p>
                       {% endif %}
+                      <p><strong>{{ _('ID for imports') }}</strong>: {{ type_.id }}</p>
                       {% if not type_.subs %}
                         <p class="error">{{ _("this type has no subs and won't show in forms")|uc_first }}.</p>
                       {% endif %}

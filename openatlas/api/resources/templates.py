@@ -227,7 +227,8 @@ def presentation_template() -> dict[str, Any]:
         'mimetype': fields.String,
         'url': fields.String,
         'IIIFManifest': fields.String,
-        'IIIFBasePath': fields.String}
+        'IIIFBasePath': fields.String,
+        'overlay': fields.String}
     relation_types = {
         'property': fields.String,
         'relationTo': fields.Integer,
@@ -365,7 +366,7 @@ def type_overview_template() -> dict[str, Any]:
     children = {
         'id': fields.Integer,
         'url': fields.String,
-        'label': fields.String,
+        'name': fields.String,
         'children': fields.List(fields.Raw)}
     type_details = {
         'id': fields.Integer,
@@ -385,7 +386,7 @@ def type_by_view_class_template(types: dict[str, Any]) -> dict[str, Any]:
     children = {
         'id': fields.Integer,
         'url': fields.String,
-        'label': fields.String,
+        'name': fields.String,
         'children': fields.List(fields.Raw)}
     type_details = {
         'id': fields.Integer,

@@ -2,20 +2,18 @@ from __future__ import annotations
 
 import ast
 import itertools
-import json
-import os
 from typing import Any, Optional
 
 import numpy
 import validators
 from flask import g, url_for
 from numpy import datetime64
-from rdflib import Graph
 
 from openatlas import app
 from openatlas.api.resources.error import (
     EntityDoesNotExistError, InvalidSearchSyntax, InvalidSearchValueError,
     LastEntityError, UrlNotValid)
+from openatlas.api.resources.resolve_endpoints import get_loud_context
 from openatlas.api.resources.search import get_search_values, search_entity
 from openatlas.api.resources.search_validation import (
     check_if_date_search, validate_search_parameters)
@@ -25,13 +23,15 @@ from openatlas.api.resources.util import (
     replace_empty_list_values_in_dict_with_none)
 from openatlas.models.entity import Entity, Link
 
+linked_art_context = get_loud_context()
+
 
 class Parser:
     download = None
     count = None
     locale = None
     sort = None
-    column: str = ''
+    column: str = 'name'
     search: str = ''
     search_param: list[list[dict[str, Any]]]
     limit: int = 0
@@ -58,6 +58,7 @@ class Parser:
     remove_empty_values = None
     depth: int = 1
     place_hierarchy = None
+    map_overlay = None
 
     def __init__(self, parser: dict[str, Any]):
         self.show = []
@@ -73,6 +74,8 @@ class Parser:
             self.url += '/'
         if self.centroid:
             self.centroid = parser['centroid'] == 'true'
+        if self.map_overlay:
+            self.map_overlay = parser['map_overlay'] == 'true'
         if self.place_hierarchy:
             self.place_hierarchy = parser['place_hierarchy'] == 'true'
         if self.remove_empty_values:
@@ -222,17 +225,6 @@ class Parser:
                         map(str, [g.types[root].name for root in type_.root]))}
                     for type_ in entity.types]
                 if 'types' in self.show else None}})
-
-    def rdf_output(
-            self,
-            data: list[dict[str, Any]] | dict[str, Any]) \
-            -> Any:  # pragma: nocover
-        if 'http' in app.config['PROXIES']:
-            os.environ['http_proxy'] = app.config['PROXIES']['http']
-        if 'https' in app.config['PROXIES']:
-            os.environ['https_proxy'] = app.config['PROXIES']['https']
-        graph = Graph().parse(data=json.dumps(data), format='json-ld')
-        return graph.serialize(format=self.format, encoding='utf-8')
 
     def is_valid_url(self) -> None:
         if self.url and isinstance(

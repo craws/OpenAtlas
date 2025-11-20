@@ -14,13 +14,51 @@ def index_changelog() -> str:
 
 
 # pylint: disable=too-many-lines
+
 versions = {
-    '8.13.0': ['TBA', {
-        'features': {
+    '8.15.1': ['2025-11-17', {
+        'fix': {
+            '2679': 'API: Duplicated operationId in OpenAPI',
+            '2668': 'ARCHE: Solve proxy issues'}}],
+    '8.15.0': ['2025-11-15', {
+        'feature': {
+            '2593': 'File checker',
+            '2551': 'Admin interface for generating RDF dumps',
+            '2568': 'Admin interface for generating ARCHE dumps',
+            '2580': 'Report generation for ARCHE import issues',
+            '2590': 'Bigger info button',
+            '2626': 'API: 4.10.0',
+            '2466': 'API: Export files with ARCHE RDF metadata',
+            '2619': 'API: Presentation view get root references',
+            '2660': 'API: Presentation view adaption',
+            '2632': 'Refactor and minor improvements'},
+        'fix': {
+            '2625': 'API: Empty count in /type_tree/ endpoint',
+            '2668': 'API: Wrong group start/end for LOUD',
+            '2621': 'API: Irrelevant entries at entity_presentation_view '}}],
+    '8.14.0': ['2025-09-02', {
+        'feature': {
+            '2605': 'Display root type id',
+            '2606': 'Handling unnecessary white spaces in CSV imports',
+            '2596': 'Finished Polish translation',
+            '2598': 'Refactor and minor improvements'},
+        'fix': {
+            '2575': 'Text annotation: Layout issues',
+            '2579': 'Text annotation: Display issue at update',
+            '2599': 'Broken Wikidata info function'}}],
+    '8.13.0': ['2025-08-19', {
+        'feature': {
+            '2592': 'Polish UI translations',
             '2571': 'Update Catalan and Spanish translations',
-            '2466': 'API: export files with ARCHE RDF metadata'
-        }
-    }],
+            '2574': 'Update French translations',
+            '2562': 'API: 4.9.0',
+            '2434': 'API: Text annotation for presentation view',
+            '2563': 'API: Presentation view improvements',
+            '2595': 'Security improvements',
+            '2578': 'Refactor and minor improvements'},
+        'fix': {
+            '2586': 'API: Problems with linked_to_ids at Network visualisation'
+        }}],
     '8.12.1': ['2025-06-29', {
         'feature': {
             '2569': 'New login error messages'}}],

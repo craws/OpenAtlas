@@ -5,7 +5,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Data integrity checks &mdash; OpenAtlas 8.12.0 documentation</title>
+  <title>Data integrity checks &mdash; OpenAtlas 8.15.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
@@ -35,7 +35,7 @@
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                8.12.0
+                8.15.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -251,6 +251,30 @@ means 100% identical</p></li>
 <p>The function uses the <a class="reference external" href="https://pypi.org/project/fuzzywuzzy/">fuzzywuzzy</a>
 package which uses the
 <a class="reference external" href="https://en.wikipedia.org/wiki/Levenshtein_distance">Levenshtein Distance</a>.</p>
+</section>
+<section id="check-files">
+<h2>Check files<a class="headerlink" href="#check-files" title="Permalink to this heading"></a></h2>
+<p>In this section, all files are checked for completeness and consistency.
+Further information about file entities can be found in the manual under
+<a class="reference internal" href="../entity/file.html"><span class="doc">File</span></a>.</p>
+<section id="missing-information">
+<h3>Missing information<a class="headerlink" href="#missing-information" title="Permalink to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>No creator</strong>: Files without a creator entered.</p></li>
+<li><p><strong>No license holder</strong>: Files without a license holder entered.</p></li>
+<li><p><strong>Not public</strong>: Files that are not publicly accessible.</p></li>
+<li><p><strong>No license</strong>: Files where no license was assigned.</p></li>
+</ul>
+</section>
+<section id="file-integrity">
+<h3>File integrity<a class="headerlink" href="#file-integrity" title="Permalink to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Missing files</strong>: A file entity was created but has no associated file.</p></li>
+<li><p><strong>Duplicated files</strong>: Lists all files that share the same SHA value.
+In such cases, the files themselves are duplicates, but their metadata
+entries differ.</p></li>
+</ul>
+</section>
 </section>
 </section>
 

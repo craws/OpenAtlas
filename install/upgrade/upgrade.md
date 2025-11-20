@@ -16,6 +16,42 @@ then run the database upgrade script, then restart Apache:
     git pull origin main
     sudo python3 install/upgrade/database_upgrade.py
     sudo service apache2 restart
+    
+### 8.15.0 to 8.15.1
+A code base update (e.g. with git pull) and a webserver restart is sufficient.
+
+### 8.14.0 to 8.15.0
+No database update is required but additional Python packages are needed:
+
+#### Additional package
+The unidecode package is used to transliterate URLs to ASCII.
+The lxml package is used for faster and better xml creation.
+
+    sudo apt install python3-unidecode python3-lxml
+
+python3-dicttoxml can be removed:
+
+    sudo apt remove python3-dicttoxml
+
+#### New export directory structure
+To adapt already exported SQL file paths to the new directory structure:
+
+    mv /var/www/openatlas/files/export/*7z /var/www/openatlas/files/export/sql/
+
+Be aware, that the owner of the folders might not be www-data:
+
+    cd /var/www/openatlas
+    sudo chown www-data files/export/arche/ files/export/rdf/ files/export/sql/
+
+#### Tests (Optional)
+For full test coverage, copy *ARCHE_METADATA* from 
+'instance/example_testing.py' to 'testing.py'.
+
+### 8.13.0 to 8.14.0
+A code base update (e.g. with git pull) and a webserver restart is sufficient.
+
+### 8.12.x to 8.13.0
+A code base update (e.g. with git pull) and a webserver restart is sufficient.
 
 ### 8.12.0 to 8.12.1
 A code base update (e.g. with git pull) and a webserver restart is sufficient.

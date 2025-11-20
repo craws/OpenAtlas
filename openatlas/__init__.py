@@ -90,8 +90,12 @@ def before_request() -> Response | None:
     g.writable_paths = [
         app.config['EXPORT_PATH'],
         app.config['RESIZED_IMAGES'],
+        app.config['ARCHE_PATH'],
+        app.config['RDF_PATH'],
+        app.config['SQL_PATH'],
         app.config['UPLOAD_PATH'],
         app.config['TMP_PATH']]
+    g.arche_uri_rules = None
     setup_files()
     setup_api()
     return None
@@ -123,13 +127,18 @@ def setup_api() -> None:
                 and not g.settings['api_public'] \
                 and ip not in app.config['ALLOWED_IPS'] \
                 and not verify_jwt_in_request(
-                    optional=True,
-                    locations='headers'):
+            optional=True,
+            locations='headers'):
             raise AccessDeniedError
 
 
 def count_type() -> bool:
-    if request.path.startswith(('/type', '/api/type_tree/', '/admin/orphans')):
+    prefixes = [
+        '/type',
+        '/orphans',
+        '/api/type_tree',
+        *[f'/api/{v}/type_tree' for v in app.config['API_VERSIONS']]]
+    if request.path.startswith(tuple(prefixes)):
         return True
     if request.path.startswith('/entity/') and \
             request.path.split('/entity/')[1].isdigit():
