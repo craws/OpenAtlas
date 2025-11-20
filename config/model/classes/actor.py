@@ -60,6 +60,13 @@ group: dict[str, Any] = {
                     'name', 'class', 'involvement',
                     'begin', 'end', 'description'],
                 'buttons': ['link', 'insert']}},
+        'move': {
+             'label': _('move'),
+             'classes': 'move',
+             'property': 'P25',
+             'inverse': True,
+             'tab': {
+                 'buttons': ['insert']}},
         'relative': {
             'label': _('relation'),
             'classes': class_groups['actor']['classes'],
