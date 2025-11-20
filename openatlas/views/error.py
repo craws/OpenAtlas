@@ -335,7 +335,7 @@ def url_not_valid(_e: UrlNotValid) -> tuple[Any, int]:
 
 
 @app.errorhandler(IIIFMetadataNotFound)
-def url_not_valid(_e: IIIFMetadataNotFound) -> tuple[Any, int]:
+def iiif_metadata_not_found(_e: IIIFMetadataNotFound) -> tuple[Any, int]:
     return jsonify({
         'title': 'IIIF info not found',
         'message':

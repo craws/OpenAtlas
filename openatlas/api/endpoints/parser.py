@@ -7,6 +7,7 @@ from typing import Any, Optional
 import numpy
 import validators
 from flask import g, url_for
+from flask_babel import format_number
 
 from openatlas import app
 from openatlas.api.resources.error import (
@@ -20,6 +21,9 @@ from openatlas.api.resources.util import (
     flatten_list_and_remove_duplicates, geometry_to_geojson,
     get_location_link, get_value_for_types,
     replace_empty_list_values_in_dict_with_none)
+from openatlas.display.table import file_preview
+from openatlas.display.util2 import display_bool
+from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity, Link
 
 linked_art_context = get_loud_context()
@@ -150,17 +154,61 @@ class Parser:
                 codes.append('P67')
         return codes
 
-    def get_key(self, entity: Entity) -> str:
-        if self.column == 'cidoc_class':
-            return entity.cidoc_class.name.lower()
-        if self.column == 'system_class':
-            return entity.class_.name.lower()
-        if self.column in ['begin_from', 'begin_to', 'end_from', 'end_to']:
-            if not getattr(entity.dates, self.column):
-                date = ("-" if self.sort == 'desc' else "") \
-                       + '9999999-01-01T00:00:00'
-                return str(date)
-        return str(getattr(entity, self.column)).lower()
+    def get_key(self, e: Entity) -> str:
+        key = ''
+        match self.column:
+            case 'begin_from' | 'begin_to' | 'end_from' | 'end_to':
+                if not getattr(e.dates, self.column):
+                    date = ("-" if self.sort == 'desc' else "") \
+                           + '9999999-01-01T00:00:00'
+                    key = str(date)
+            case 'group' | 'cidoc_class':
+                key = e.cidoc_class.name.lower()
+            case 'class' | 'system_class':
+                key = e.class_.label.lower()
+            case 'created':
+                key = format_date(e.created)
+            case 'count':
+                key = format_number(e.count)
+            case 'content' | 'description':
+                if e.description:
+                    key = e.description.lower()
+            case 'creator':
+                if e.class_.name == 'file':
+                    if g.file_info.get(e.id):
+                        key = g.file_info[e.id]['creator']
+            # case 'domain':
+            #    key = e.name.lower()
+            # case 'default_precision':
+            #     if default_precision := next(iter(e.types), None):
+            #         key = default_precision.name
+            # case 'example_id' if isinstance(e, Entity):
+            #         key = e.example_id or ''
+            case 'extension':
+                key = e.get_file_ext()
+            case 'icon':
+                key = file_preview(e.id)
+            case 'license_holder':
+                if e.class_.name == 'file':
+                    if g.file_info.get(e.id):
+                        key = g.file_info[e.id]['license_holder']
+            case 'name':
+                key = e.name.lower()
+            case 'public':
+                if e.class_.name == 'file':
+                    if g.file_info.get(e.id):
+                        key = display_bool(g.file_info[e.id]['public'])
+            # case 'range':
+            #     key = e.name.lower()
+            case 'size':
+                if e.class_.name == 'file':
+                    key = e.get_file_size()
+            case 'type' | 'license':
+                if e.standard_type:
+                    key = e.standard_type.name.lower()
+            case _:
+                key = str(getattr(e, self.column)).lower()
+        return key
 
     def get_by_page(
             self,
