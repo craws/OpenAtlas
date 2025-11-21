@@ -311,6 +311,6 @@ def profile_image_table_link(entity: Entity, file: Entity) -> str:
     elif is_authorized('contributor') \
             and file.get_file_ext() in g.display_file_ext:
         return link(
-                _('set'),
-                url_for('set_profile_image', id_=file.id, origin_id=entity.id))
+            _('set'),
+            url_for('set_profile_image', id_=file.id, origin_id=entity.id))
     return ''

@@ -31,8 +31,8 @@ class InvolvementTests(TestBaseCase):
                 name='participated'),
             data={
                 'participated': event.id,
-                'begin_year_from': '950',
-                'end_year_from': '1950'},
+                'begin_year_from': '',
+                'end_year_from': ''},
             follow_redirects=True)
         assert b'Event Horizon' in rv.data
 
