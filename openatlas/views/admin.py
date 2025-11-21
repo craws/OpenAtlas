@@ -37,7 +37,7 @@ from openatlas.forms.setting import (
     ApiForm, ContentForm, FileForm, FrontendForm, GeneralForm, IiifForm,
     LogForm, MailForm, MapForm, ModulesForm, SimilarForm, TestMailForm)
 from openatlas.forms.util import get_form_settings, set_form_settings
-from openatlas.models.annotation import AnnotationImage
+from openatlas.models.annotation import AnnotationImage, AnnotationText
 from openatlas.models.checks import (
     entities_linked_to_itself, invalid_cidoc_links, invalid_dates,
     orphaned_subunits, orphans as get_orphans, similar_named,
@@ -520,12 +520,18 @@ def orphans() -> str:
             'orphaned_iiif_files',
             _('orphaned iiif files'),
             table=Table(['name', 'size', 'date', 'ext'])),
-        'orphaned_annotations': Tab(
-            'orphaned_annotations',
-            _('orphaned annotations'),
+        'orphaned_image_annotations': Tab(
+            'orphaned_image_annotations',
+            _('orphaned image annotations'),
             table=Table(
                 ['image', 'entity', 'annotation', 'creation'],
-                get_orphaned_annotations())),
+                get_orphaned_image_annotations())),
+        'orphaned_text_annotations': Tab(
+            'orphaned_text_annotations',
+            _('orphaned text annotations'),
+            table=Table(
+                ['image', 'entity', 'annotation', 'creation'],
+                get_orphaned_text_annotations())),
         'orphaned_subunits': Tab(
             'orphaned_subunits',
             _('orphaned subunits'),
@@ -696,31 +702,60 @@ def admin_file_delete(filename: str) -> Response:
         f"{url_for('orphans')}#tab-orphaned-files")  # pragma: no cover
 
 
-@app.route('/admin/annotation/delete/<int:id_>')
+@app.route('/admin/annotation/image/delete/<int:id_>')
 @required_group('editor')
-def admin_annotation_delete(id_: int) -> Response:
+def admin_annotation_image_delete(id_: int) -> Response:
     annotation = AnnotationImage.get_by_id(id_)
     annotation.delete()
     flash(_('annotation deleted'), 'info')
     return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
 
 
-@app.route('/admin/annotation/relink/<int:image_id>/<int:entity_id>')
+@app.route('/admin/annotation/text/delete/<int:id_>')
 @required_group('editor')
-def admin_annotation_relink(image_id: int, entity_id: int) -> Response:
-    image = Entity.get_by_id(image_id)
+def admin_annotation_text_delete(id_: int) -> Response:
+    AnnotationText.delete_annotations_text(id_)
+    flash(_('annotation deleted'), 'info')
+    return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
+
+
+@app.route('/admin/annotation/image/relink/<int:origin_id>/<int:entity_id>')
+@required_group('editor')
+def admin_annotation_image_relink(origin_id: int, entity_id: int) -> Response:
+    image = Entity.get_by_id(origin_id)
+    image.link('P67', Entity.get_by_id(entity_id))
+    flash(_('entities relinked'), 'info')
+    return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
+
+@app.route('/admin/annotation/text/relink/<int:origin_id>/<int:entity_id>')
+@required_group('editor')
+def admin_annotation_text_relink(origin_id: int, entity_id: int) -> Response:
+    # todo: check if origin_id is really source and not translation
+    #   and link it to the source, not the translation
+    image = Entity.get_by_id(origin_id)
     image.link('P67', Entity.get_by_id(entity_id))
     flash(_('entities relinked'), 'info')
     return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
 
 
 @app.route(
-    '/admin/annotation/remove/entity/<int:annotation_id>/<int:entity_id>')
+    '/admin/annotation/image/remove/<int:annotation_id>/<int:entity_id>')
 @required_group('editor')
-def admin_annotation_remove_entity(
+def admin_annotation_image_remove_entity(
         annotation_id: int,
         entity_id: int) -> Response:
     AnnotationImage.remove_entity_from_annotation(annotation_id, entity_id)
+    flash(_('entity removed from annotation'), 'info')
+    return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
+
+@app.route(
+    '/admin/annotation/text/remove/<int:annotation_id>/<int:entity_id>')
+@required_group('editor')
+def admin_annotation_text_remove_entity(
+        annotation_id: int,
+        entity_id: int) -> Response:
+    # todo: make the function
+    AnnotationText.remove_entity_from_annotation(annotation_id, entity_id)
     flash(_('entity removed from annotation'), 'info')
     return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
 
@@ -991,7 +1026,7 @@ def get_iiif_files_without_entity(entity_file_ids: list[int]) -> list[Any]:
     return rows
 
 
-def get_orphaned_annotations() -> list[Any]:
+def get_orphaned_image_annotations() -> list[Any]:
     rows = []
     for annotation in AnnotationImage.get_orphaned_annotations():
         file = Entity.get_by_id(annotation.image_id)
@@ -1004,19 +1039,50 @@ def get_orphaned_annotations() -> list[Any]:
             link(
                 _('relink entity'),
                 url_for(
-                    'admin_annotation_relink',
-                    image_id=file.id,
+                    'admin_annotation_image_relink',
+                    origin_id=file.id,
                     entity_id=entity.id),
                 js=f"return confirm('{_('relink entity')}?')"),
             link(
                 _('remove entity'),
                 url_for(
-                    'admin_annotation_remove_entity',
+                    'admin_annotation_image_remove_entity',
                     annotation_id=annotation.id,
                     entity_id=entity.id),
                 js=f"return confirm('{_('remove entity')}?')"),
             link(
                 _('delete annotation'),
-                url_for('admin_annotation_delete', id_=annotation.id),
+                url_for('admin_annotation_image_delete', id_=annotation.id),
+                js=f"return confirm('{_('delete annotation')}?')")])
+    return rows
+
+
+def get_orphaned_text_annotations() -> list[Any]:
+    rows = []
+    for annotation in AnnotationText.get_orphaned_annotations():
+        source = Entity.get_by_id(annotation.source_id)
+        entity = Entity.get_by_id(annotation.entity_id)
+        rows.append([
+            link(source),
+            link(entity),
+            annotation.text,
+            annotation.created,
+            link(
+                _('relink entity'),
+                url_for(
+                    'admin_annotation_text_relink',
+                    origin_id=source.id,
+                    entity_id=entity.id),
+                js=f"return confirm('{_('relink entity')}?')"),
+            link(
+                _('remove entity'),
+                url_for(
+                    'admin_annotation_text_remove_entity',
+                    annotation_id=annotation.id,
+                    entity_id=entity.id),
+                js=f"return confirm('{_('remove entity')}?')"),
+            link(
+                _('delete annotation'),
+                url_for('admin_annotation_text_delete', id_=annotation.id),
                 js=f"return confirm('{_('delete annotation')}?')")])
     return rows

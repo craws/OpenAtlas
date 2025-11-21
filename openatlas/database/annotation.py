@@ -54,6 +54,25 @@ def get_annotation_text_by_source_id(id_: int) -> list[dict[str, Any]]:
     return list(g.cursor)
 
 
+def get_annotation_text_orphans() -> list[dict[str, Any]]:
+    g.cursor.execute(
+        """
+        SELECT
+            a.id,
+            a.source_id,
+            a.entity_id,
+            a.link_start,
+            a.link_end,
+            a.text,
+            a.created
+        FROM model.annotation_text a
+        LEFT JOIN model.link l ON l.domain_id = a.source_id 
+            AND l.range_id = a.entity_id 
+            AND l.property_code = 'P67'
+        WHERE l.id IS NULL AND a.entity_id IS NOT NULL
+        """)
+    return list(g.cursor)
+
 def get_annotation_image_orphans() -> list[dict[str, Any]]:
     g.cursor.execute(
         """

@@ -108,6 +108,15 @@ class AnnotationText:
         db.delete_annotations_text(source_id)
 
     @staticmethod
+    def get_orphaned_annotations() -> list[AnnotationText]:
+        # todo: currently it works only correct for Source, not translation.
+        #   Translations need to to first get the links of the source, and
+        #   then it can be compared. Or in the SQL join the translations,
+        #   but I have no idea how.
+        return [
+            AnnotationText(row) for row in db.get_annotation_text_orphans()]
+
+    @staticmethod
     def get_by_source_id(id_: int) -> list[AnnotationText]:
         return [
             AnnotationText(row) for row
