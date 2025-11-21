@@ -342,4 +342,4 @@ def iiif_metadata_not_found(_e: IIIFMetadataNotFound) -> tuple[Any, int]:
             f'{_e.url} is not found. Please contact the system administrator.',
         'url': request.url,
         'timestamp': datetime.now(),
-        'status': 400}), 400  # pragma: no cover, Todo: test or remove todo
+        'status': 400}), 400  # pragma: no cover

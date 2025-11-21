@@ -125,14 +125,10 @@ def entity_table(
         if isinstance(item, Link):
             e = item.domain if inverse else item.range
             range_ = item.range if inverse else item.domain
-            if e.class_.name == 'object_location':
-                e = e.get_linked_entity_safe('P53', inverse=False, types=True)
         data = []
         for name in columns:
             html = 'no table function'
             match name:
-                case 'activity':
-                    html = item.property.name_inverse
                 case 'begin':
                     html = table_date('first', e, range_, item)
                 case 'checkbox' if isinstance(e, Entity):
@@ -323,6 +319,6 @@ def profile_image_table_link(entity: Entity, file: Entity) -> str:
     elif is_authorized('contributor') \
             and file.get_file_ext() in g.display_file_ext:
         return link(
-                _('set'),
-                url_for('set_profile_image', id_=file.id, origin_id=entity.id))
+            _('set'),
+            url_for('set_profile_image', id_=file.id, origin_id=entity.id))
     return ''

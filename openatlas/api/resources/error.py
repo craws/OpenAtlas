@@ -109,6 +109,6 @@ class UrlNotValid(Exception):
 
 
 class IIIFMetadataNotFound(Exception):
-    def __init__(self, url: str) -> None:  # pragma: no cover, Todo: test or rm
+    def __init__(self, url: str) -> None:  # pragma: no cover
         super().__init__()
         self.url = url

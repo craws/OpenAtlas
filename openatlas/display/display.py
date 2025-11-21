@@ -124,7 +124,7 @@ class Display:
                         inverse=True,
                         types=True)
                 items.append(item)
-            buttons = [link_] if (link_ := manual(f'entity/{name}')) else []
+            buttons = []
             if is_authorized('contributor'):
                 for button_name in relation.tab['buttons']:
                     match button_name:
@@ -173,6 +173,10 @@ class Display:
                                 button(
                                     _('view all IIIF images'),
                                     url_for('view_iiif', id_=self.entity.id)))
+            if relation.classes:
+                group = g.classes[relation.classes[0]].group.get('name')
+                if buttons and group and (link_ := manual(f'entity/{group}')):
+                    buttons.insert(0, link_)
             columns = relation.tab['columns']
             if self.entity.category == 'value' and relation.name == 'entities':
                 columns = ['name', 'value', 'class', 'description']
