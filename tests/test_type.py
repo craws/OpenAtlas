@@ -170,7 +170,9 @@ class TypeTest(TestBaseCase):
             app.preprocess_request()
             actor.link('P74', location, type_id=actor_type.subs[0])
 
-        rv = c.get(url_for('type_delete_recursive', id_=actor_type.subs[0]))
+        rv = c.get(
+            url_for('delete', id_=actor_type.subs[0]),
+            follow_redirects=True)
         assert b'Warning' in rv.data
 
         rv = c.post(
