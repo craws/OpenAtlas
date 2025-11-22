@@ -10,7 +10,7 @@ from openatlas.display.util import (
     get_entities_linked_to_type_recursive, link, required_group)
 from openatlas.display.util2 import uc_first
 from openatlas.forms.display import display_form
-from openatlas.forms.entity_form import get_entity_form, process_form_data
+from openatlas.forms.entity_form import get_entity_form, process_form
 from openatlas.models.entity import Entity
 
 
@@ -26,7 +26,7 @@ def hierarchy_insert(category: str) -> str | Response:
         else:
             try:
                 Transaction.begin()
-                hierarchy = process_form_data(hierarchy, form, None, None)
+                hierarchy = process_form(hierarchy, form)
                 Entity.insert_hierarchy(
                     hierarchy,
                     category,
@@ -82,7 +82,7 @@ def hierarchy_update(id_: int) -> str | Response:
                         hierarchy.category == 'value'
                         or (hasattr(form, 'multiple') and form.multiple.data)
                         or has_multiple_links))
-                process_form_data(hierarchy, form, None, None)
+                process_form(hierarchy, form)
                 g.logger.log_user(hierarchy.id, 'update')
                 Transaction.commit()
             except Exception as e:  # pragma: no cover

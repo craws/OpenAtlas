@@ -17,8 +17,7 @@ from openatlas.display.util import (
     get_iiif_file_path, hierarchy_crumbs, link, reference_systems,
     required_group)
 from openatlas.display.util2 import is_authorized, manual, sanitize
-from openatlas.forms.entity_form import (
-    get_entity_form, process_files, process_form_data)
+from openatlas.forms.entity_form import get_entity_form, process_form
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.openatlas_class import Relation
@@ -250,10 +249,7 @@ def save(
     action = 'update' if entity.id else 'insert'
     url = url_for('index', group=entity.class_.group['name'])
     try:
-        if hasattr(form, 'file'):
-            entity = process_files(form, origin, relation)
-        else:
-            entity = process_form_data(entity, form, origin, relation)
+        entity = process_form(entity, form, origin, relation)
         g.logger.log_user(entity.id, action)
         url = redirect_url_insert(entity, form, origin, relation)
         flash(

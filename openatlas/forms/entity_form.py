@@ -283,12 +283,15 @@ def process_dates(form: Any) -> dict[str, Any]:
     return dates.to_timestamp()
 
 
-def process_files(
+def process_form(
+        entity: Entity,
         form: Any,
-        origin: Entity | None,
-        relation: str | None) -> Entity | None:
+        origin: Optional[Entity] = None,
+        relation: Optional[str] = None) -> Entity:
+    if not hasattr(form, 'file'):
+        return process_form_data(entity, form, origin, relation)
     filenames = []
-    entity = None
+    entity = Entity({'openatlas_class_name': 'file'})
     try:
         entity_name = form.name.data.strip()
         for count, file_ in enumerate(form.file.data):
