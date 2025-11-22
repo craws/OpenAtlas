@@ -235,17 +235,37 @@ class PlaceTest(TestBaseCase):
         assert b'Val-hall' in rv.data
 
         data['continue_'] = 'sub'
+
+        rv = c.post(
+            url_for(
+                'insert',
+                class_='feature',
+                origin_id=place.id,
+                relation='feature'),
+            follow_redirects=True,
+            data=data)
+        assert b'An entry has been created' in rv.data
+
         rv = c.get(
             url_for('insert', class_='stratigraphic_unit'),
-            data=data)
+            data=data,
+            follow_redirects=True)
         assert b'insert and add human remains' in rv.data
+
+        rv = c.post(
+            url_for(
+                'insert',
+                class_='stratigraphic_unit',
+                origin_id=feat_id,
+                relation='stratigraphic_unit'),
+            data=data,
+            follow_redirects=True)
+        assert b'An entry has been created' in rv.data
 
         data['name'] = "I'm a stratigraphic unit"
         data['super'] = feat_id
         del data['continue_']
-        rv = c.post(
-            url_for('insert', class_='stratigraphic_unit', origin_id=feat_id),
-            data=data)
+        rv = c.post(url_for('insert', class_='stratigraphic_unit'), data=data)
         strati_id = rv.location.split('/')[-1]
 
         rv = c.get(url_for('update', id_=strati_id))
@@ -260,7 +280,7 @@ class PlaceTest(TestBaseCase):
 
         # Create a second artifact to test siblings pager
         rv = c.post(
-            url_for('insert', class_='artifact', origin_id=strati_id),
+            url_for('insert', class_='artifact'),
             data=data,
             follow_redirects=True)
         assert b'An entry has been created' in rv.data
