@@ -308,7 +308,7 @@ def table_date(
 def profile_image_table_link(entity: Entity, file: Entity) -> str:
     if file.id == entity.image_id:
         return uc_first(_('main image'))
-    elif is_authorized('contributor') \
+    if is_authorized('contributor') \
             and file.get_file_ext() in g.display_file_ext:
         return link(
             _('set'),

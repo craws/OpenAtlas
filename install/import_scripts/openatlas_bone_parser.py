@@ -4,11 +4,13 @@ OpenAtlas Bone Vocabulary Parser (Step 1: Parse hierarchy from .docx)
 Python 3.11, uses `python-docx` (import as `docx`) at runtime.
 
 Robustly parses entries of the form:
-  Latin [may contain (...) itself] (EN, DE; Anno: ...; Wikidata: ...; Terminologia Anatomica: ...)
+  Latin [may contain (...) itself]
+  (EN, DE; Anno: ...; Wikidata: ...; Terminologia Anatomica: ...)
 
 Key fixes:
 - Keeps parentheses that belong to the Latin label.
-- Extracts only the final metadata block in trailing parentheses when it contains expected keys or the EN, DE pair.
+- Extracts only the final metadata block in trailing parentheses when it
+  contains expected keys or the EN, DE pair.
 - Works with embedded DOCX hyperlinks (expands to URLs).
 
 Outputs:
@@ -32,7 +34,8 @@ BASE_URI: str = "https://vocabs.acdh.oeaw.ac.at/openatlas-bone"
 SCHEME_TITLE: str = "OpenAtlas bone vocabulary"
 OUTPUT_JSON: Path = Path("bonevoc-parse.json")
 OUTPUT_CSV: Path = Path("bonevoc-issues.csv")
-FILE_PATH: Path = Path("/home/bkoschicek/www/openatlas/files/openatlas_bone_voc_parse.docx")
+FILE_PATH: Path = Path(
+    "/home/bkoschicek/www/openatlas/files/openatlas_bone_voc_parse.docx")
 
 _TA_STRICT_RE = re.compile(r"^A\d{2}\.\d{1,2}\.\d{2}\.\d{2,3}$")
 _TA_LOOSE_RE = re.compile(r"A\d{2}\.\d{1,2}\.\d{2}\.\d{2,3}")
@@ -40,8 +43,9 @@ _URL_RE = re.compile(r"https?://\S+")
 _QID_RE = re.compile(r"^Q\d+$")
 _NOTATION_RE = re.compile(r"^\s*([A-Za-z0-9]{1,5})\s*-\s*(.+)$")
 
-NS = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main",
-      "r": "http://schemas.openxmlformats.org/officeDocument/2006/relationships"}
+NS = {
+    "w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main",
+    "r": "http://schemas.openxmlformats.org/officeDocument/2006/relationships"}
 
 
 @dataclass
@@ -136,7 +140,7 @@ def find_trailing_metadata_block(text: str) -> Optional[Tuple[int, int, str]]:
             if depth == 0:
                 start = i
                 end = len(s) - 1
-                content = s[start + 1 : end]
+                content = s[start + 1: end]
                 if looks_like_metadata(content):
                     return start, end, content
                 return None
@@ -168,7 +172,10 @@ def split_head_and_parens(text: str) -> Tuple[str, Optional[str]]:
     return head, normalize_space(content)
 
 
-def parse_refs(field_value: str, kind: str, warn: List[str]) -> List[ExternalRef]:
+def parse_refs(
+        field_value: str,
+        kind: str,
+        warn: List[str]) -> List[ExternalRef]:
     if field_value.strip() == "-":
         return []
     tokens: List[ExternalRef] = []
@@ -185,7 +192,9 @@ def parse_refs(field_value: str, kind: str, warn: List[str]) -> List[ExternalRef
         if kind == "TA":
             if not _TA_STRICT_RE.match(val):
                 if _TA_LOOSE_RE.search(val):
-                    warn.append(f"TA: non-standard code '{val}' normalized expected like A00.0.00.000")
+                    warn.append(
+                        f"TA: non-standard code '{val}' "
+                        "normalized expected like A00.0.00.000")
                 else:
                     warn.append(f"TA: invalid code '{val}'")
         elif kind == "Wikidata":
@@ -200,7 +209,10 @@ def parse_refs(field_value: str, kind: str, warn: List[str]) -> List[ExternalRef
     return tokens
 
 
-def parse_paren_block(content: str, warn: List[str]) -> Tuple[Optional[str], Optional[str], Dict[str, List[ExternalRef]]]:
+def parse_paren_block(
+        content: str,
+        warn: List[str]) -> \
+            Tuple[Optional[str], Optional[str], Dict[str, List[ExternalRef]]]:
     parts = [normalize_space(x) for x in content.split(";")]
     if not parts:
         warn.append("missing parenthetical content")
@@ -212,7 +224,10 @@ def parse_paren_block(content: str, warn: List[str]) -> Tuple[Optional[str], Opt
         en, de = normalize_space(a), normalize_space(b)
     else:
         warn.append("missing EN, DE pair before semicolon")
-    fields: Dict[str, List[ExternalRef]] = {"Anno": [], "Wikidata": [], "TA": []}
+    fields: Dict[str, List[ExternalRef]] = {
+        "Anno": [],
+        "Wikidata": [],
+        "TA": []}
     for chunk in parts[1:]:
         if ":" not in chunk:
             warn.append(f"missing ':' in field '{chunk}'")
@@ -299,6 +314,7 @@ def build_tree(doc: Document) -> ParseResult:
 
 def flatten_issues(nodes: Sequence[Node]) -> List[Dict[str, str]]:
     rows: List[Dict[str, str]] = []
+
     def visit(n: Node, path: List[str]) -> None:
         here = " / ".join(path + [n.label_la])
         for w in n.warnings:

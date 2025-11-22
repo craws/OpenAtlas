@@ -32,4 +32,4 @@ class Tab:
         self.form = form
         self.table = table or Table()
         self.tooltip = uc_first(tooltip)
-        self.buttons: list[str] = buttons
+        self.buttons: list[str] = buttons or []

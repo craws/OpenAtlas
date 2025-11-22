@@ -70,6 +70,7 @@ def vocabs_requests(
         abort(400, f"Request failed for {url}: {e}")
 
     try:
-        return resp.json()
+        result = resp.json()
     except ValueError:  # pragma: no cover
         abort(400, f"Invalid JSON from {url}")
+    return result
