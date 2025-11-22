@@ -28,7 +28,7 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
     button, check_iiif_activation, check_iiif_file_exist, display_info,
-    get_file_path, get_update_link_for_link, link, required_group, send_mail)
+    get_file_path, link, required_group, send_mail)
 from openatlas.display.util2 import (
     convert_size, display_bool, is_authorized, manual, sanitize, uc_first)
 from openatlas.forms.display import display_form
@@ -454,8 +454,19 @@ def check_dates() -> str:
             format_date(entity.modified),
             entity.description])
     for link_ in Link.get_invalid_link_dates():
+        update_link_ = ''
+        domain = link_.domain.class_.name
+        for name, relation in g.classes[domain].relations.items():
+            if relation.property == link_.property.code \
+                    and link_.range.class_.name in relation.classes:
+                update_link_ = url_for(
+                    'link_update',
+                    id_=link_.id,
+                    origin_id=link_.domain.id,
+                    name=name)
+                break
         tabs['link_dates'].table.rows.append([
-            link(link_.property.name, get_update_link_for_link(link_)),
+            link(link_.property.name, update_link_),
             link(link_.domain),
             link(link_.range)])
     for link_ in Link.invalid_involvement_dates():
