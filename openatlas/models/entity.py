@@ -115,6 +115,7 @@ class Entity:
             classes: Optional[list[str]] = None,
             inverse: bool = False,
             types: bool = False,
+            aliases: bool = False,
             sort: bool = False) -> list[Entity]:
         return Entity.get_linked_entities_static(
             self.id,
@@ -122,6 +123,7 @@ class Entity:
             classes,
             inverse=inverse,
             types=types,
+            aliases=aliases,
             sort=sort)
 
     def get_linked_entities_recursive(
@@ -611,12 +613,14 @@ class Entity:
             classes: Optional[list[str]] = None,
             inverse: bool = False,
             types: bool = False,
+            aliases: bool = False,
             sort: bool = False) -> list[Entity]:
         codes = codes if isinstance(codes, list) else [codes]
         entities = Entity.get_by_ids(
             db.get_linked_entities_inverse(id_, codes, classes) if inverse
             else db.get_linked_entities(id_, codes, classes),
-            types=types)
+            types=types,
+            aliases=aliases)
         if sort and entities:
             entities.sort(key=lambda x: x.name)
         return entities

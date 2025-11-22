@@ -64,7 +64,10 @@ def annotate_image_form(
         Form,
         'entity',
         TableField(
-            Entity.get_by_id(image_id).get_linked_entities('P67', sort=True),
+            Entity.get_by_id(image_id).get_linked_entities(
+                'P67',
+                aliases=True,
+                sort=True),
             entity))
     setattr(Form, 'save', SubmitField(_('save')))
     return Form()
