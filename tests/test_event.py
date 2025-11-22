@@ -113,10 +113,10 @@ class EventTest(TestBaseCase):
         assert b'artifact new' in rv.data
 
         rv = c.get(url_for('view', id_=artifact.id))
-        assert b'A productive event' in rv.data
+        assert b'New production' in rv.data
 
         rv = c.get(url_for('update', id_=production_id))
-        assert b'A productive event' in rv.data
+        assert b'New production' in rv.data
 
         rv = c.get(url_for('insert', class_='production'))
         assert b'+ Production' in rv.data

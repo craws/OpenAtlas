@@ -135,13 +135,14 @@ class Entity:
             db.get_linked_entities_recursive(self.id, codes, inverse),
             types=types)
 
-    def link(self,
-             code: str,
-             range_: Entity | list[Entity],
-             description: Optional[str] = None,
-             inverse: bool = False,
-             type_id: Optional[int] = None,
-             dates: Optional[dict[str, Any]] = None) -> list[int]:
+    def link(
+            self,
+            code: str,
+            range_: Entity | list[Entity],
+            description: Optional[str] = None,
+            inverse: bool = False,
+            type_id: Optional[int] = None,
+            dates: Optional[dict[str, Any]] = None) -> list[int]:
         property_ = g.properties[code]
         entities = range_ if isinstance(range_, list) else [range_]
         new_link_ids = []
