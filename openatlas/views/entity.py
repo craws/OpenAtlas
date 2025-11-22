@@ -68,7 +68,7 @@ def reference_system_remove_class(system_id: int, name: str) -> Response:
         abort(403)  # Abort because there are linked entities
     try:
         system.remove_reference_system_class(name)
-        flash(_('info update'), 'info')
+        flash(_('info update'))
     except Exception as e:  # pragma: no cover
         g.logger.log('error', 'database', 'remove class failed', e)
         flash(_('error database'), 'error')
@@ -220,7 +220,7 @@ def delete(id_: int) -> Response:
             return redirect(url_for('view', id_=id_))
     entity.delete()
     g.logger.log_user(id_, 'delete')
-    flash(_('entity deleted'), 'info')
+    flash(_('entity deleted'))
     return redirect(url)
 
 
@@ -252,9 +252,7 @@ def save(
         entity = process_form(entity, form, origin, relation)
         g.logger.log_user(entity.id, action)
         url = redirect_url_insert(entity, form, origin, relation)
-        flash(
-            _('entity created') if action == 'insert' else _('info update'),
-            'info')
+        flash(_('entity created') if action == 'insert' else _('info update'))
     except InvalidGeomException:
         flash(_('Invalid geom entered'), 'error')
         if action == 'update' and entity.id:

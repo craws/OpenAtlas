@@ -1,4 +1,5 @@
 import importlib
+from typing import Any
 
 import bcrypt
 from flask import flash, g, render_template, session, url_for
@@ -7,7 +8,7 @@ from flask_login import current_user, login_required
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import BooleanField, PasswordField, validators
+from wtforms import BooleanField, PasswordField
 from wtforms.validators import InputRequired
 
 from openatlas import app
@@ -29,7 +30,7 @@ class PasswordForm(FlaskForm):
     show_passwords = BooleanField(_('show passwords'))
     save = SubmitField(_('save'))
 
-    def validate(self, extra_validators: validators = None) -> bool:
+    def validate(self, extra_validators: Any = None) -> bool:
         valid = FlaskForm.validate(self)
         hash_ = bcrypt.hashpw(
             self.password_old.data.encode('utf-8'),
@@ -126,7 +127,7 @@ def profile_settings(category: str) -> str | Response:
             current_user.update_settings(settings)
             Transaction.commit()
             session['language'] = current_user.settings['language']
-            flash(_('info update'), 'info')
+            flash(_('info update'))
         except Exception as e:  # pragma: no cover
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
@@ -151,7 +152,7 @@ def profile_password() -> str | Response:
             form.password.data.encode('utf-8'),
             bcrypt.gensalt()).decode('utf-8')
         current_user.update()
-        flash(_('info password updated'), 'info')
+        flash(_('info password updated'))
         return redirect(url_for('profile_index'))
     return render_template(
         'tabs.html',

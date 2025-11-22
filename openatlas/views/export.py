@@ -42,7 +42,7 @@ def delete_export(view: str, filename: str) -> Response:
     try:
         (get_export_path(view) / filename).unlink()
         g.logger.log('info', 'file', f'{view.upper()} file deleted')
-        flash(_('file deleted'), 'info')
+        flash(_('file deleted'))
     except Exception as e:
         g.logger.log(
             'error', 'file', f'{view.upper()} file deletion failed', e)
@@ -56,7 +56,7 @@ def export_execute(format_: str) -> Response:
     if os.access(app.config['SQL_PATH'], os.W_OK):
         if sql_export(format_):
             g.logger.log('info', 'database', 'SQL export')
-            flash(_('data was exported'), 'info')
+            flash(_('data was exported'))
         else:  # pragma: no cover
             g.logger.log('error', 'database', 'SQL export failed')
             flash(_('export failed'), 'error')
@@ -143,7 +143,7 @@ def arche_execute() -> Response:
     if os.access(app.config['ARCHE_PATH'], os.W_OK):
         if arche_export():
             g.logger.log('info', 'database', 'ARCHE export')
-            flash(_('data was exported'), 'info')
+            flash(_('data was exported'))
         else:  # pragma: no cover
             g.logger.log('error', 'database', 'ARCHE export failed')
             flash(_('export failed'), 'error')
@@ -179,7 +179,7 @@ def rdf_execute() -> Response:
     if os.access(app.config['RDF_PATH'], os.W_OK):
         if rdf_export():
             g.logger.log('info', 'database', 'RDF export')
-            flash(_('data was exported'), 'info')
+            flash(_('data was exported'))
         else:  # pragma: no cover
             g.logger.log('error', 'database', 'RDF export failed')
             flash(_('export failed'), 'error')

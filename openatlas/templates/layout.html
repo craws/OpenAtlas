@@ -198,7 +198,10 @@
   {% if messages %}
     {% for category, message in messages %}
       <div
-        class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show"
+        class="
+          alert
+          alert-{{ category | replace('error', 'danger') | replace('message', 'info') }}
+          alert-dismissible fade show"
         role="alert">
         {{ message|uc_first|safe }}
         <button
