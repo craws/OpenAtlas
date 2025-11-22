@@ -22,7 +22,7 @@ class FileTest(TestBaseCase):
             app.root_path) / 'static' / 'images' / 'layout' / 'logo.png'
         with open(logo, 'rb') as img_1, open(logo, 'rb') as img_2:
             rv: Any = c.post(
-                url_for('insert', class_='file', origin_id=place.id),
+                url_for('insert', class_='file'),
                 data={
                     'name': 'OpenAtlas logo',
                     'public': True,

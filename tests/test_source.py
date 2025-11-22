@@ -24,7 +24,7 @@ class SourceTest(TestBaseCase):
                     ' also referred to as the Book of the Dead')})
         source_id = rv.location.split('/')[-1]
 
-        rv = c.get(url_for('insert', class_='source', origin_id=artifact.id))
+        rv = c.get(url_for('insert', class_='source'))
         assert b'Artifact with inscription' in rv.data
 
         rv = c.get(url_for('link_insert', origin_id=source_id, name='actor'))
@@ -51,11 +51,7 @@ class SourceTest(TestBaseCase):
             follow_redirects=True)
         assert b'Source updated' in rv.data
 
-        rv = c.get(
-            url_for(
-                'insert',
-                class_='source_translation',
-                origin_id=source_id))
+        rv = c.get(url_for('insert', class_='source_translation'))
         assert b'+ Source translation' in rv.data
 
         rv = c.post(

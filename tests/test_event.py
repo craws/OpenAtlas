@@ -20,7 +20,7 @@ class EventTest(TestBaseCase):
         activity_id = rv.location.split('/')[-1]
 
         rv = c.post(
-            url_for('insert', class_='activity', origin_id=actor.id),
+            url_for('insert', class_='activity'),
             data=data,
             follow_redirects=True)
         assert b'An entry has been created' in rv.data
@@ -31,15 +31,13 @@ class EventTest(TestBaseCase):
             follow_redirects=True)
         assert b'An entry has been created' in rv.data
 
-        rv = c.get(
-            url_for('insert', class_='activity', origin_id=residence.id))
+        rv = c.get(url_for('insert', class_='activity'))
         assert b'Location' in rv.data
 
         rv = c.get(url_for('insert', class_='move', origin_id=residence.id))
         assert b'Moved object' in rv.data
 
-        rv = c.get(
-            url_for('insert', class_='acquisition', origin_id=artifact.id))
+        rv = c.get(url_for('insert', class_='acquisition'))
         assert b'+ Acquisition' in rv.data
 
         data = {
@@ -118,8 +116,7 @@ class EventTest(TestBaseCase):
         rv = c.get(url_for('update', id_=production_id))
         assert b'A productive event' in rv.data
 
-        rv = c.get(
-            url_for('insert', class_='production', origin_id=artifact.id))
+        rv = c.get(url_for('insert', class_='production'))
         assert b'+ Production' in rv.data
 
         rv = c.post(

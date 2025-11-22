@@ -26,7 +26,7 @@ class PlaceTest(TestBaseCase):
             f'reference_system_id_{g.geonames.id}':
                 ['123456', self.precision_type.subs[0]]}
         rv = c.post(
-            url_for('insert', class_='place', origin_id=reference.id),
+            url_for('insert', class_='place'),
             data=data,
             follow_redirects=True)
         assert b'Asgard' in rv.data and b'An entry has been' in rv.data
@@ -126,7 +126,7 @@ class PlaceTest(TestBaseCase):
         with open(Path(app.root_path) / 'static' / 'images' / 'layout'
                   / 'logo.png', 'rb') as img:
             rv = c.post(
-                url_for('insert', class_='file', origin_id=place.id),
+                url_for('insert', class_='file'),
                 data={'name': 'X-Files', 'file': img},
                 follow_redirects=True)
         assert b'An entry has been created' in rv.data
@@ -236,7 +236,7 @@ class PlaceTest(TestBaseCase):
 
         data['continue_'] = 'sub'
         rv = c.get(
-            url_for('insert', class_='stratigraphic_unit', origin_id=feat_id),
+            url_for('insert', class_='stratigraphic_unit'),
             data=data)
         assert b'insert and add human remains' in rv.data
 
@@ -255,9 +255,7 @@ class PlaceTest(TestBaseCase):
             'name': 'You never find me',
             'super': strati_id,
             get_hierarchy('Dimensions').subs[0]: 50}
-        rv = c.post(
-            url_for('insert', class_='artifact', origin_id=strati_id),
-            data=data)
+        rv = c.post(url_for('insert', class_='artifact'), data=data)
         find_id = rv.location.split('/')[-1]
 
         # Create a second artifact to test siblings pager
@@ -272,7 +270,7 @@ class PlaceTest(TestBaseCase):
 
         remains_type = get_hierarchy('Human remains')
         rv = c.post(
-            url_for('insert', class_='human_remains', origin_id=strati_id),
+            url_for('insert', class_='human_remains'),
             data={
                 'name': 'My human remains',
                 'actor': actor.id,

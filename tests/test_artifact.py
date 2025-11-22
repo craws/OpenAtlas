@@ -77,7 +77,7 @@ class ArtifactTest(TestBaseCase):
         assert b'A little hate' in rv.data
 
         rv = c.post(
-            url_for('insert', class_='move', origin_id=artifact_id),
+            url_for('insert', class_='move'),
             data={'name': 'Event Zero', 'moved_artifact': [artifact_id]},
             follow_redirects=True)
         assert b'Event Zero' in rv.data
