@@ -34,9 +34,9 @@ def remove_link(
         name: str,
         link_: Link,
         origin: Entity,
-        tab: Optional[str] = '') -> Optional[str]:
+        tab: Optional[str] = '') -> str:
     if not is_authorized('contributor'):
-        return None
+        return ''
     confirm = _('Remove %(name)s?', name=name.replace("'", ''))
     url = url_for('link_delete', id_=link_.id, origin_id=origin.id)
     return link(
@@ -45,8 +45,8 @@ def remove_link(
         js=f"return confirm('{confirm}')")
 
 
-def edit_link(url: str) -> Optional[str]:
-    return link(_('edit'), url) if is_authorized('contributor') else None
+def edit_link(url: str) -> str:
+    return link(_('edit'), url) if is_authorized('contributor') else ''
 
 
 def reference_systems(entity: Entity) -> str:
