@@ -165,8 +165,6 @@ def get_table_cell_content(
                 html = item.description
         case 'count':
             html = format_number(e.count)
-        case 'domain':
-            html = link(e)
         case 'default_precision':
             html = link(next(iter(e.types), None))
         case 'end':
@@ -235,7 +233,12 @@ def get_table_cell_content(
             if forms:
                 html = e.standard_type.name if e.standard_type else ''
         case 'type_link' if isinstance(item, Link):
-            html = link(item.type)
+            html = ''
+            if item.type:
+                html = link(
+                    item.type.get_name_directed(
+                        item.domain.id == item.range.id),
+                    url_for('view', id_=item.type.id))
         case 'update':
             html = ''
             if origin and relation and isinstance(item, Link):

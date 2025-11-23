@@ -72,11 +72,11 @@ group: dict[str, Any] = {
             'classes': class_groups['actor']['classes'],
             'property': 'OA7',
             'type': 'Actor relation',
-            'additional_fields': ['domain', 'dates', 'description'],
+            'additional_fields': ['actor', 'dates', 'description'],
             'tab': {
                 'buttons': ['link', 'insert'],
                 'columns':
-                    ['name', 'type_link', 'begin', 'end', 'description']}},
+                    ['type_link', 'name', 'begin', 'end', 'description']}},
         'member_of': {
             'label': _('member of'),
             'classes': 'group',
