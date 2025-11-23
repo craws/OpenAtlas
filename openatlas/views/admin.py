@@ -28,7 +28,7 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
     button, check_iiif_activation, check_iiif_file_exist, display_info,
-    get_file_path, link, required_group, get_update_link_for_link, send_mail)
+    get_file_path, link, required_group, send_mail)
 from openatlas.display.util2 import (
     convert_size, display_bool, is_authorized, manual, sanitize, uc_first)
 from openatlas.forms.display import display_form
@@ -237,7 +237,7 @@ def admin_content(item: str) -> str | Response:
                 'language': language,
                 'text': getattr(form, language).data or ''})
         update_content(data)
-        flash(_('info update'), 'info')
+        flash(_('info update'))
         return redirect(f"{url_for('admin_index')}#tab-content")
     for language in app.config['LANGUAGES']:
         getattr(form, language).data = get_content()[item][language]
@@ -281,7 +281,7 @@ def check_link_duplicates(delete: Optional[str] = None) -> str | Response:
     if delete:
         count = Link.delete_link_duplicates()
         g.logger.log('info', 'admin', f"Deleted duplicate links: {count}")
-        flash(f"{_('deleted links')}: {count}", 'info')
+        flash(f"{_('deleted links')}: {count}")
         return redirect(url_for('check_link_duplicates'))
     tab = Tab(
         'check_link_duplicates',
@@ -340,7 +340,7 @@ def check_link_duplicates(delete: Optional[str] = None) -> str | Response:
 @required_group('contributor')
 def delete_single_type_duplicate(entity_id: int, type_id: int) -> Response:
     g.types[type_id].remove_entity_links(entity_id)
-    flash(_('link removed'), 'info')
+    flash(_('link removed'))
     return redirect(url_for('check_link_duplicates'))
 
 
@@ -371,7 +371,7 @@ def settings(category: str) -> str | Response:
             Settings.update(data)
             g.logger.log('info', 'settings', 'Settings updated')
             Transaction.commit()
-            flash(_('info update'), 'info')
+            flash(_('info update'))
         except Exception as e:  # pragma: no cover
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
@@ -454,8 +454,19 @@ def check_dates() -> str:
             format_date(entity.modified),
             entity.description])
     for link_ in Link.get_invalid_link_dates():
+        update_link_ = ''
+        domain = link_.domain.class_.name
+        for name, relation in g.classes[domain].relations.items():
+            if relation.property == link_.property.code \
+                    and link_.range.class_.name in relation.classes:
+                update_link_ = url_for(
+                    'link_update',
+                    id_=link_.id,
+                    origin_id=link_.domain.id,
+                    name=name)
+                break
         tabs['link_dates'].table.rows.append([
-            link(link_.property.name, get_update_link_for_link(link_)),
+            link(link_.property.name, update_link_),
             link(link_.domain),
             link(link_.range)])
     for link_ in Link.invalid_involvement_dates():
@@ -675,7 +686,7 @@ def admin_file_delete(filename: str) -> Response:
     if filename != 'all':  # Delete one file
         try:
             (app.config['UPLOAD_PATH'] / filename).unlink()
-            flash(f"{filename} {_('was deleted')}", 'info')
+            flash(f"{filename} {_('was deleted')}")
         except Exception as e:
             g.logger.log('error', 'file', f'deletion of {filename} failed', e)
             flash(_('error file delete'), 'error')
@@ -701,7 +712,7 @@ def admin_file_delete(filename: str) -> Response:
 def admin_annotation_delete(id_: int) -> Response:
     annotation = AnnotationImage.get_by_id(id_)
     annotation.delete()
-    flash(_('annotation deleted'), 'info')
+    flash(_('annotation deleted'))
     return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
 
 
@@ -710,7 +721,7 @@ def admin_annotation_delete(id_: int) -> Response:
 def admin_annotation_relink(image_id: int, entity_id: int) -> Response:
     image = Entity.get_by_id(image_id)
     image.link('P67', Entity.get_by_id(entity_id))
-    flash(_('entities relinked'), 'info')
+    flash(_('entities relinked'))
     return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
 
 
@@ -721,7 +732,7 @@ def admin_annotation_remove_entity(
         annotation_id: int,
         entity_id: int) -> Response:
     AnnotationImage.remove_entity_from_annotation(annotation_id, entity_id)
-    flash(_('entity removed from annotation'), 'info')
+    flash(_('entity removed from annotation'))
     return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
 
 
@@ -730,7 +741,7 @@ def admin_annotation_remove_entity(
 def admin_file_iiif_delete(filename: str) -> Response:
     try:
         (Path(g.settings['iiif_path']) / filename).unlink()
-        flash(f"{filename} {_('was deleted')}", 'info')
+        flash(f"{filename} {_('was deleted')}")
     except Exception as e:
         g.logger.log('error', 'file', f'deletion of IIIF {filename} failed', e)
         flash(_('error file delete'), 'error')
@@ -781,7 +792,7 @@ def log() -> str:
 @required_group('admin')
 def log_delete() -> Response:
     g.logger.delete_all_system_logs()
-    flash(_('Logs deleted'), 'info')
+    flash(_('Logs deleted'))
     return redirect(url_for('log'))
 
 
@@ -826,7 +837,7 @@ def newsletter() -> str | Response:
                         f'{link_}',
                         user.email):
                     count += 1
-        flash(f"{_('Newsletter send')}: {count}", 'info')
+        flash(f"{_('Newsletter send')}: {count}")
         return redirect(url_for('admin_index'))
     table = Table(['username', 'email', 'receiver'])
     for user in User.get_all():
@@ -850,7 +861,7 @@ def newsletter() -> str | Response:
 @required_group('admin')
 def resize_images() -> Response:
     create_resized_images()
-    flash(_('images were created'), 'info')
+    flash(_('images were created'))
     return redirect(url_for('admin_index') + '#tab-data')
 
 
@@ -858,7 +869,7 @@ def resize_images() -> Response:
 @required_group('admin')
 def admin_delete_orphaned_resized_images() -> Response:
     delete_orphaned_resized_images()
-    flash(_('resized orphaned images were deleted'), 'info')
+    flash(_('resized orphaned images were deleted'))
     return redirect(url_for('admin_index') + '#tab-data')
 
 

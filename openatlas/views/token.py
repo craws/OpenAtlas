@@ -162,7 +162,7 @@ def generate_token() -> str | Response:
                 form.token_name.data,
                 user_)
             Transaction.commit()
-            flash(f"{_('token stored for')}: {user_.username}", 'info')
+            flash(f"{_('token stored for')}: {user_.username}")
         except Exception as e:  # pragma: no cover
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
@@ -190,7 +190,7 @@ def generate_token() -> str | Response:
 @login_required
 def revoke_token(id_: int) -> str | Response:
     Token.revoke_jwt_token(id_)
-    flash(_('token revoked'), 'info')
+    flash(_('token revoked'))
     return redirect(f"{url_for('api_token')}")
 
 
@@ -198,7 +198,7 @@ def revoke_token(id_: int) -> str | Response:
 @login_required
 def authorize_token(id_: int) -> str | Response:
     Token.authorize_jwt_token(id_)
-    flash(_('token authorized'), 'info')
+    flash(_('token authorized'))
     return redirect(f"{url_for('api_token')}")
 
 
@@ -206,7 +206,7 @@ def authorize_token(id_: int) -> str | Response:
 @login_required
 def delete_token(id_: int) -> str | Response:
     Token.delete_token(id_)
-    flash(_('token deleted'), 'info')
+    flash(_('token deleted'))
     return redirect(f"{url_for('api_token')}")
 
 
@@ -214,7 +214,7 @@ def delete_token(id_: int) -> str | Response:
 @login_required
 def delete_revoked_tokens() -> str | Response:
     Token.delete_all_revoked_tokens()
-    flash(_('tokens deleted'), 'info')
+    flash(_('tokens deleted'))
     return redirect(f"{url_for('api_token')}")
 
 
@@ -222,7 +222,7 @@ def delete_revoked_tokens() -> str | Response:
 @login_required
 def delete_invalid_tokens() -> str | Response:
     Token.delete_invalid_tokens()
-    flash(_('tokens deleted'), 'info')
+    flash(_('tokens deleted'))
     return redirect(f"{url_for('api_token')}")
 
 
@@ -230,7 +230,7 @@ def delete_invalid_tokens() -> str | Response:
 @login_required
 def revoke_all_tokens() -> str | Response:
     Token.revoke_all_tokens()
-    flash(_('all tokens revoked'), 'info')
+    flash(_('all tokens revoked'))
     return redirect(f"{url_for('api_token')}")
 
 
@@ -238,5 +238,5 @@ def revoke_all_tokens() -> str | Response:
 @login_required
 def authorize_all_tokens() -> str | Response:
     Token.authorize_all_tokens()
-    flash(_('all tokens authorized'), 'info')
+    flash(_('all tokens authorized'))
     return redirect(f"{url_for('api_token')}")

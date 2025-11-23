@@ -13,8 +13,7 @@ from openatlas.display.util import hierarchy_crumbs, link, required_group
 from openatlas.display.util2 import uc_first
 from openatlas.forms.display import display_form
 from openatlas.forms.entity_form import process_dates
-from openatlas.forms.form import (
-    link_detail_form, link_form, link_update_form)
+from openatlas.forms.form import link_detail_form, link_form, link_update_form
 from openatlas.models.entity import Entity, Link
 
 
@@ -22,7 +21,7 @@ from openatlas.models.entity import Entity, Link
 @required_group('contributor')
 def link_delete(id_: int, origin_id: int) -> Response:
     Link.delete_(id_)
-    flash(_('link removed'), 'info')
+    flash(_('link removed'))
     return redirect(url_for('view', id_=origin_id))
 
 
@@ -117,7 +116,7 @@ def link_update(id_: int, origin_id: int, name: str) -> str | Response:
         data.update(process_dates(form))
         try:
             link_.update(data)
-            flash(_('info update'), 'info')
+            flash(_('info update'))
         except Exception as e:  # pragma: no cover
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)

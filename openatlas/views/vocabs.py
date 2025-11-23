@@ -57,7 +57,7 @@ def vocabs_update() -> str | Response:
             'vocabs_base_url': form.base_url.data,
             'vocabs_endpoint': form.endpoint.data,
             'vocabs_user': form.vocabs_user.data})
-        flash(_('info update'), 'info')
+        flash(_('info update'))
         return redirect(url_for('vocabs_index'))
     if request.method != 'POST':
         form.base_url.data = g.settings['vocabs_base_url']
@@ -176,7 +176,7 @@ def vocabulary_import_view(category: str, id_: str) -> str | Response:
                         'info',
                         'import',
                         f'Did not import "{duplicate}", duplicate.')
-            flash(import_str, 'info')
+            flash(import_str)
         except Exception as e:  # pragma: no cover
             Transaction.rollback()
             g.logger.log('error', 'import', 'import failed', e)

@@ -15,5 +15,4 @@ Admin
    import
    export
    api
-   arche
    vocabs

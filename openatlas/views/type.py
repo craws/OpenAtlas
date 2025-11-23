@@ -39,7 +39,7 @@ def type_delete_recursive(id_: int) -> str | Response:
         for sub_id in type_.get_sub_ids_recursive():
             g.types[sub_id].delete()
         type_.delete()
-        flash(_('types deleted'), 'info')
+        flash(_('types deleted'))
         g.logger.log_user(id_, 'Recursive type delete')
         return redirect(
             url_for('view', id_=root.id) if root

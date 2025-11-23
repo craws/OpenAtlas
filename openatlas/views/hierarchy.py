@@ -10,7 +10,7 @@ from openatlas.display.util import (
     get_entities_linked_to_type_recursive, link, required_group)
 from openatlas.display.util2 import uc_first
 from openatlas.forms.display import display_form
-from openatlas.forms.entity_form import get_entity_form, process_form_data
+from openatlas.forms.entity_form import get_entity_form, process_form
 from openatlas.models.entity import Entity
 
 
@@ -26,7 +26,7 @@ def hierarchy_insert(category: str) -> str | Response:
         else:
             try:
                 Transaction.begin()
-                hierarchy = process_form_data(hierarchy, form, None, None)
+                hierarchy = process_form(hierarchy, form)
                 Entity.insert_hierarchy(
                     hierarchy,
                     category,
@@ -42,7 +42,7 @@ def hierarchy_insert(category: str) -> str | Response:
                 g.logger.log('error', 'database', 'transaction failed', e)
                 flash(_('error transaction'), 'error')
                 abort(418)
-            flash(_('entity created'), 'info')
+            flash(_('entity created'))
             return redirect(
                 f"{url_for('index', group='type')}#menu-tab-{category}")
     return render_template(
@@ -82,7 +82,7 @@ def hierarchy_update(id_: int) -> str | Response:
                         hierarchy.category == 'value'
                         or (hasattr(form, 'multiple') and form.multiple.data)
                         or has_multiple_links))
-                process_form_data(hierarchy, form, None, None)
+                process_form(hierarchy, form)
                 g.logger.log_user(hierarchy.id, 'update')
                 Transaction.commit()
             except Exception as e:  # pragma: no cover
@@ -90,7 +90,7 @@ def hierarchy_update(id_: int) -> str | Response:
                 g.logger.log('error', 'database', 'transaction failed', e)
                 flash(_('error transaction'), 'error')
                 abort(418)
-            flash(_('info update'), 'info')
+            flash(_('info update'))
             tab = 'value' if g.types[id_].category == 'value' else 'custom'
             return redirect(
                 f"{url_for('index', group='type')}"
@@ -128,7 +128,7 @@ def remove_class(id_: int, name: str) -> Response:
         abort(403)
     try:
         g.types[id_].remove_class(name)
-        flash(_('info update'), 'info')
+        flash(_('info update'))
     except Exception as e:  # pragma: no cover
         g.logger.log('error', 'database', 'remove hierarchy class failed', e)
         flash(_('error database'), 'error')
@@ -144,7 +144,7 @@ def hierarchy_delete(id_: int) -> Response:
     if type_.subs:
         return redirect(url_for('type_delete_recursive', id_=id_))
     type_.delete()
-    flash(_('entity deleted'), 'info')
+    flash(_('entity deleted'))
     return redirect(
         f"{url_for('index', group='type')}#menu-tab-{type_.category}")
 
@@ -169,7 +169,7 @@ def required_risk(id_: int) -> str:
 def required_add(id_: int) -> Response:
     g.types[id_].set_required()
     g.logger.log('info', 'types', f'Setting hierarchy {id_} to required')
-    flash(_('info update'), 'info')
+    flash(_('info update'))
     return redirect(url_for('view', id_=id_))
 
 
@@ -178,5 +178,5 @@ def required_add(id_: int) -> Response:
 def required_remove(id_: int) -> Response:
     g.types[id_].unset_required()
     g.logger.log('info', 'types', f'Setting hierarchy {id_} to not required')
-    flash(_('info update'), 'info')
+    flash(_('info update'))
     return redirect(url_for('view', id_=id_))

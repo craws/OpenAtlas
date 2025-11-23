@@ -96,16 +96,12 @@ place: dict[str, Any] = {
             'label': _('performed in'),
             'classes': class_groups['actor']['classes'],
             'property': 'OA9',  # Todo: Link to event
-            'inverse': True,
-            'tab': {
-                'buttons': ['insert']}},
+            'inverse': True},
         'participated': {
             'label': _('participated in'),
             'classes': class_groups['actor']['classes'],
             'property': 'OA9',  # Todo: Link to event
-            'inverse': True,
-            'tab': {
-                'buttons': ['insert']}},
+            'inverse': True},
         'reference': standard_relations['reference'],
         'file': standard_relations['file']},
     'display': {

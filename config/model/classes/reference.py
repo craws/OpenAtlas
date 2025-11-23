@@ -3,7 +3,7 @@ from typing import Any
 
 from flask_babel import lazy_gettext as _
 
-from config.model.class_groups import class_groups, standard_relations
+from config.model.class_groups import class_groups
 
 
 def get_relation(classes: str | list[str]) -> dict[str, Any]:

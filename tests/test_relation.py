@@ -20,7 +20,7 @@ class RelationTests(TestBaseCase):
         relation = get_hierarchy('Actor relation')
         sub_id = relation.subs[0]
         data = {
-            'domain': actor.id,
+            'actor': actor.id,
             'relative': related.id,
             relation.id: sub_id,
             'inverse': None,
@@ -35,6 +35,16 @@ class RelationTests(TestBaseCase):
             data=data,
             follow_redirects=True)
         assert b'The Kurgan' in rv.data
+
+        data['relative'] = actor.id
+        rv = c.post(
+            url_for(
+                'link_insert_detail',
+                origin_id=related.id,
+                name='relative'),
+            data=data,
+            follow_redirects=True)
+        assert b'Connor' in rv.data
 
         rv = c.get(url_for('view', id_=sub_id))
         assert b'Connor' in rv.data

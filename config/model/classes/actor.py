@@ -44,7 +44,7 @@ group: dict[str, Any] = {
             'additional_fields': ['dates', 'description'],
             'tab': {
                 'columns': [
-                    'name', 'class', 'involvement',
+                    'name', 'class', 'type_link',
                     'begin', 'end', 'description'],
                 'buttons': ['link', 'insert']}},
         'participated': {
@@ -57,23 +57,26 @@ group: dict[str, Any] = {
             'additional_fields': ['dates', 'description'],
             'tab': {
                 'columns': [
-                    'name', 'class', 'involvement',
+                    'name', 'class', 'type_link',
                     'begin', 'end', 'description'],
                 'buttons': ['link', 'insert']}},
+        'move': {
+             'label': _('move'),
+             'classes': 'move',
+             'property': 'P25',
+             'inverse': True,
+             'tab': {
+                 'buttons': ['insert']}},
         'relative': {
             'label': _('relation'),
             'classes': class_groups['actor']['classes'],
             'property': 'OA7',
             'type': 'Actor relation',
-            'additional_fields': ['domain', 'dates', 'description'],
+            'additional_fields': ['actor', 'dates', 'description'],
             'tab': {
                 'buttons': ['link', 'insert'],
-                'columns': [
-                    'name',
-                    'relation',
-                    'begin',
-                    'end',
-                    'description']}},
+                'columns':
+                    ['type_link', 'name', 'begin', 'end', 'description']}},
         'member_of': {
             'label': _('member of'),
             'classes': 'group',
@@ -83,12 +86,8 @@ group: dict[str, Any] = {
             'additional_fields': ['dates', 'description'],
             'tab': {
                 'buttons': ['link', 'insert'],
-                'columns': [
-                    'name',
-                    'function',
-                    'begin',
-                    'end',
-                    'description']}},
+                'columns':
+                    ['name', 'type_link', 'begin', 'end', 'description']}},
         'member': {
             'label': _('member'),
             'classes': class_groups['actor']['classes'],
@@ -97,12 +96,8 @@ group: dict[str, Any] = {
             'additional_fields': ['dates', 'description'],
             'tab': {
                 'buttons': ['link', 'insert'],
-                'columns': [
-                    'name',
-                    'function',
-                    'begin',
-                    'end',
-                    'description']}},
+                'columns':
+                    ['name', 'type_link', 'begin', 'end', 'description']}},
         'artifact': {
             'label': class_groups['artifact']['label'],
             'classes': class_groups['artifact']['classes'],
@@ -110,13 +105,8 @@ group: dict[str, Any] = {
             'inverse': True,
             'tab': {
                 'buttons': ['insert'],
-                'columns': [
-                    'name',
-                    'class',
-                    'type',
-                    'begin',
-                    'end',
-                    'description']}},
+                'columns':
+                    ['name', 'class', 'type', 'begin', 'end', 'description']}},
         'reference': standard_relations['reference'],
         'file': standard_relations['file']},
     'display': {

@@ -26,7 +26,7 @@ class PlaceTest(TestBaseCase):
             f'reference_system_id_{g.geonames.id}':
                 ['123456', self.precision_type.subs[0]]}
         rv = c.post(
-            url_for('insert', class_='place', origin_id=reference.id),
+            url_for('insert', class_='place'),
             data=data,
             follow_redirects=True)
         assert b'Asgard' in rv.data and b'An entry has been' in rv.data
@@ -126,7 +126,7 @@ class PlaceTest(TestBaseCase):
         with open(Path(app.root_path) / 'static' / 'images' / 'layout'
                   / 'logo.png', 'rb') as img:
             rv = c.post(
-                url_for('insert', class_='file', origin_id=place.id),
+                url_for('insert', class_='file'),
                 data={'name': 'X-Files', 'file': img},
                 follow_redirects=True)
         assert b'An entry has been created' in rv.data
@@ -235,17 +235,37 @@ class PlaceTest(TestBaseCase):
         assert b'Val-hall' in rv.data
 
         data['continue_'] = 'sub'
-        rv = c.get(
-            url_for('insert', class_='stratigraphic_unit', origin_id=feat_id),
+
+        rv = c.post(
+            url_for(
+                'insert',
+                class_='feature',
+                origin_id=place.id,
+                relation='feature'),
+            follow_redirects=True,
             data=data)
+        assert b'An entry has been created' in rv.data
+
+        rv = c.get(
+            url_for('insert', class_='stratigraphic_unit'),
+            data=data,
+            follow_redirects=True)
         assert b'insert and add human remains' in rv.data
+
+        rv = c.post(
+            url_for(
+                'insert',
+                class_='stratigraphic_unit',
+                origin_id=feat_id,
+                relation='stratigraphic_unit'),
+            data=data,
+            follow_redirects=True)
+        assert b'An entry has been created' in rv.data
 
         data['name'] = "I'm a stratigraphic unit"
         data['super'] = feat_id
         del data['continue_']
-        rv = c.post(
-            url_for('insert', class_='stratigraphic_unit', origin_id=feat_id),
-            data=data)
+        rv = c.post(url_for('insert', class_='stratigraphic_unit'), data=data)
         strati_id = rv.location.split('/')[-1]
 
         rv = c.get(url_for('update', id_=strati_id))
@@ -255,14 +275,12 @@ class PlaceTest(TestBaseCase):
             'name': 'You never find me',
             'super': strati_id,
             get_hierarchy('Dimensions').subs[0]: 50}
-        rv = c.post(
-            url_for('insert', class_='artifact', origin_id=strati_id),
-            data=data)
+        rv = c.post(url_for('insert', class_='artifact'), data=data)
         find_id = rv.location.split('/')[-1]
 
         # Create a second artifact to test siblings pager
         rv = c.post(
-            url_for('insert', class_='artifact', origin_id=strati_id),
+            url_for('insert', class_='artifact'),
             data=data,
             follow_redirects=True)
         assert b'An entry has been created' in rv.data
@@ -272,7 +290,7 @@ class PlaceTest(TestBaseCase):
 
         remains_type = get_hierarchy('Human remains')
         rv = c.post(
-            url_for('insert', class_='human_remains', origin_id=strati_id),
+            url_for('insert', class_='human_remains'),
             data={
                 'name': 'My human remains',
                 'actor': actor.id,

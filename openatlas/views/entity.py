@@ -17,11 +17,10 @@ from openatlas.display.util import (
     get_iiif_file_path, hierarchy_crumbs, link, reference_systems,
     required_group)
 from openatlas.display.util2 import is_authorized, manual, sanitize
-from openatlas.forms.entity_form import (
-    get_entity_form, process_files, process_form_data)
+from openatlas.forms.entity_form import get_entity_form, process_form
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
-from openatlas.models.openatlas_class import Relation, get_reverse_relation
+from openatlas.models.openatlas_class import Relation
 from openatlas.models.overlay import Overlay
 
 
@@ -69,7 +68,7 @@ def reference_system_remove_class(system_id: int, name: str) -> Response:
         abort(403)  # Abort because there are linked entities
     try:
         system.remove_reference_system_class(name)
-        flash(_('info update'), 'info')
+        flash(_('info update'))
     except Exception as e:  # pragma: no cover
         g.logger.log('error', 'database', 'remove class failed', e)
         flash(_('error database'), 'error')
@@ -165,24 +164,21 @@ def deletion_possible(entity: Entity) -> bool:
         info = g.logger.get_log_info(entity.id)
         if not info['creator'] or info['creator'].id != current_user.id:
             return False
-    if entity.class_.group['name'] == 'type':
-        return True  # Type (recursive) deletion is taken care of at delete()
+    match entity.class_.group['name']:
+        case 'reference_system' if entity.system or entity.classes:
+            return False
+        case 'type':
+            if entity.category == 'system' \
+                    or (entity.category == 'standard' and not entity.root):
+                return False
+            return True
     for relation in entity.class_.relations.values():
-        reverse_relation = get_reverse_relation(
-            entity.class_,
-            relation,
-            g.classes[relation.classes[0]])
-        if reverse_relation \
-                and reverse_relation.required \
+        if relation.reverse_relation \
+                and relation.reverse_relation.required \
                 and entity.get_linked_entities(
                     relation.property,
                     relation.classes,
                     relation.inverse):
-            return False
-    match entity.class_.group['name']:
-        case 'reference_system' if entity.system or entity.classes:
-            return False
-        case 'type' if entity.system:
             return False
     return True
 
@@ -193,39 +189,19 @@ def delete(id_: int) -> Response:
     entity = Entity.get_by_id(id_)
     if not deletion_possible(entity):
         abort(403)
-    url = url_for('index', group=entity.class_.group['name'])
-    if entity.class_.group['name'] == 'type':
-        if entity.subs or entity.count:
-            return redirect(url_for('type_delete_recursive', id_=entity.id))
-        root = g.types[entity.root[0]] if entity.root else None
-        url = url_for('view', id_=root.id) if root \
-            else url_for('index', group='type')
-    elif entity.class_.group['name'] in ['artifact', 'place']:
-        if entity.get_linked_entities('P46'):
-            flash(_('Deletion not possible if subunits exists'), 'error')
-            return redirect(url_for('view', id_=id_))
-        if entity.class_.name != 'place' \
-                and (parent := entity.get_linked_entity(
-                    'P46',
-                    g.class_groups['place']['classes'] +
-                    g.class_groups['artifact']['classes'],
-                    True)):
-            url = \
-                f"{url_for('view', id_=parent.id)}" \
-                f"#tab-{entity.class_.name.replace('_', '-')}"
-    elif entity.class_.name == 'source_translation':
-        source = entity.get_linked_entity_safe('P73', inverse=True)
-        url = f"{url_for('view', id_=source.id)}#tab-text"
-    elif entity.class_.name == 'file':
+    if entity.class_.group['name'] == 'type' and (entity.subs or entity.count):
+        return redirect(url_for('type_delete_recursive', id_=entity.id))
+    if entity.class_.name == 'file':
         try:
-            delete_files(id_)
+            delete_file(id_)
         except Exception as e:  # pragma: no cover
             g.logger.log('error', 'file', 'file deletion failed', e)
             flash(_('error file delete'), 'error')
             return redirect(url_for('view', id_=id_))
+    url = redirect_url_delete(entity)
     entity.delete()
     g.logger.log_user(id_, 'delete')
-    flash(_('entity deleted'), 'info')
+    flash(_('entity deleted'))
     return redirect(url)
 
 
@@ -254,15 +230,10 @@ def save(
     action = 'update' if entity.id else 'insert'
     url = url_for('index', group=entity.class_.group['name'])
     try:
-        if hasattr(form, 'file'):
-            entity = process_files(form, origin, relation)
-        else:
-            entity = process_form_data(entity, form, origin, relation)
+        entity = process_form(entity, form, origin, relation)
         g.logger.log_user(entity.id, action)
         url = redirect_url_insert(entity, form, origin, relation)
-        flash(
-            _('entity created') if action == 'insert' else _('info update'),
-            'info')
+        flash(_('entity created') if action == 'insert' else _('info update'))
     except InvalidGeomException:
         flash(_('Invalid geom entered'), 'error')
         if action == 'update' and entity.id:
@@ -305,9 +276,8 @@ def redirect_url_insert(
                 name=relation_name,
                 selection_id=entity.id)
         elif not hasattr(form, 'continue_') or form.continue_.data != 'yes':
-            url = url_for(
-                'view',
-                id_=origin.id) + f"#tab-{relation_name.replace('_', '-')}"
+            url = url_for('view', id_=origin.id) \
+                + f"#tab-{relation_name.replace('_', '-')}"
     if hasattr(form, 'continue_') \
             and form.continue_.data in ['sub', 'human_remains']:
         class_ = form.continue_.data
@@ -327,7 +297,28 @@ def redirect_url_insert(
     return url
 
 
-def delete_files(id_: int) -> None:
+def redirect_url_delete(entity: Entity) -> str:
+    url = url_for('index', group=entity.class_.group['name'])
+    if entity.class_.group['name'] == 'type':
+        root = g.types[entity.root[0]] if entity.root else None
+        url = url_for('view', id_=root.id) if root \
+            else url_for('index', group='type')
+    elif entity.class_.group['name'] in ['artifact', 'place']:
+        if parent := entity.get_linked_entity(
+                'P46',
+                g.class_groups['place']['classes'] +
+                g.class_groups['artifact']['classes'],
+                True):
+            url = \
+                f"{url_for('view', id_=parent.id)}" \
+                f"#tab-{entity.class_.name.replace('_', '-')}"
+    elif entity.class_.name == 'source_translation':
+        source = entity.get_linked_entity_safe('P73', inverse=True)
+        url = f"{url_for('view', id_=source.id)}#tab-text"
+    return url
+
+
+def delete_file(id_: int) -> None:
     if path := get_file_path(id_):  # Prevent missing file warning
         path.unlink()
     for resized_path in app.config['RESIZED_IMAGES'].glob(f'**/{id_}.*'):

@@ -14,7 +14,7 @@ class ActorTests(TestBaseCase):
             event = insert('acquisition', 'Event Horizon')
             group = insert('group', 'LV-426 colony')
 
-        rv = c.get(url_for('insert', class_='person', origin_id=place.id))
+        rv = c.get(url_for('insert', class_='person'))
         assert b'Vienna' in rv.data
 
         sex = get_hierarchy('Sex')
@@ -53,19 +53,19 @@ class ActorTests(TestBaseCase):
             follow_redirects=True)
         assert b'An entry has been created' in rv.data
 
-        corrupted_data = data
-        corrupted_data["name"] = '<h1 class="test">Sigourney Weaver</h1>'
+        data["name"] = '<h1 class="test">Sigourney Weaver</h1>with HTML'
         rv = c.post(
             url_for('insert', class_='person'),
-            data=corrupted_data,
+            data=data,
             follow_redirects=True)
         assert b'<h1 class="test">Sigourney Weaver</h1>' not in rv.data
         assert b'Sigourney Weaver' in rv.data
 
         rv = c.post(
-            url_for('insert', class_='person', origin_id=place.id),
+            url_for('insert', class_='person'),
             data=data,
             follow_redirects=True)
+        print(url_for('insert', class_='person', origin_id=place.id))
         assert b'An entry has been created' in rv.data
 
         rv = c.post(
@@ -81,7 +81,7 @@ class ActorTests(TestBaseCase):
         assert b'403' in rv.data
 
         rv = c.post(
-            url_for('insert', class_='person', origin_id=actor_id),
+            url_for('insert', class_='person'),
             data=data,
             follow_redirects=True)
         assert b'An entry has been created' in rv.data

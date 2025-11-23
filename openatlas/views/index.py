@@ -153,7 +153,7 @@ def index_feedback() -> str | Response:
                 form.subject.data + f" from {g.settings['site_name']}",
                 body,
                 g.settings['mail_recipients_feedback']):
-            flash(_('info feedback thanks'), 'info')
+            flash(_('info feedback thanks'))
         else:
             flash(_('error mail send'), 'error')  # pragma: no cover
         return redirect(url_for('overview'))

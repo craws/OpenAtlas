@@ -6,13 +6,12 @@ from flask import g, jsonify, render_template, request
 from openatlas import app
 from openatlas.api.resources.error import (
     AccessDeniedError, DisplayFileNotFoundError, EntityDoesNotExistError,
-    EntityNotAnEventError, InvalidCidocClassCodeError, InvalidLimitError,
-    InvalidSearchCategoryError,
-    InvalidSearchSyntax, InvalidSearchValueError, InvalidSystemClassError,
-    InvalidViewClassError, LastEntityError, LogicalOperatorError,
-    NoLicenseError, NoSearchStringError, NotAPlaceError, NotATypeError,
-    NotPublicError, OperatorError, OperatorNotSupported, QueryEmptyError,
-    UrlNotValid, ValueNotIntegerError)
+    EntityNotAnEventError, IIIFMetadataNotFound, InvalidCidocClassCodeError,
+    InvalidLimitError, InvalidSearchCategoryError, InvalidSearchSyntax,
+    InvalidSearchValueError, InvalidSystemClassError, InvalidViewClassError,
+    LastEntityError, LogicalOperatorError, NoLicenseError, NoSearchStringError,
+    NotAPlaceError, NotATypeError, NotPublicError, OperatorError,
+    OperatorNotSupported, QueryEmptyError, UrlNotValid, ValueNotIntegerError)
 
 
 @app.errorhandler(400)
@@ -331,3 +330,14 @@ def url_not_valid(_e: UrlNotValid) -> tuple[Any, int]:
         'url': request.url,
         'timestamp': datetime.now(),
         'status': 400}), 400
+
+
+@app.errorhandler(IIIFMetadataNotFound)
+def iiif_metadata_not_found(_e: IIIFMetadataNotFound) -> tuple[Any, int]:
+    return jsonify({
+        'title': 'IIIF info not found',
+        'message':
+            f'{_e.url} is not found. Please contact the system administrator.',
+        'url': request.url,
+        'timestamp': datetime.now(),
+        'status': 400}), 400  # pragma: no cover

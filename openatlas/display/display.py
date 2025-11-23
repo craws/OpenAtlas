@@ -124,7 +124,14 @@ class Display:
                         inverse=True,
                         types=True)
                 items.append(item)
-            buttons = [link_] if (link_ := manual(f'entity/{name}')) else []
+            if relation.name == 'relative':
+                for item in entity_for_links.get_links(
+                        relation.property,
+                        relation.classes,
+                        not relation.inverse):
+                    item.range = item.domain
+                    items.append(item)
+            buttons = []
             if is_authorized('contributor'):
                 for button_name in relation.tab['buttons']:
                     match button_name:
@@ -173,6 +180,10 @@ class Display:
                                 button(
                                     _('view all IIIF images'),
                                     url_for('view_iiif', id_=self.entity.id)))
+            if relation.classes:
+                group = g.classes[relation.classes[0]].group.get('name')
+                if buttons and group and (link_ := manual(f'entity/{group}')):
+                    buttons.insert(0, link_)
             columns = relation.tab['columns']
             if self.entity.category == 'value' and relation.name == 'entities':
                 columns = ['name', 'value', 'class', 'description']
@@ -210,9 +221,10 @@ class Display:
                 '+ ' + uc_first(_('relation')),
                 '')
             for name in empty_tabs:
-                self.tabs['additional'].content += \
-                    f"<h2>{self.tabs[name].label}</h2>" + \
-                    button_bar(self.tabs[name].buttons)
+                if self.tabs[name].buttons:
+                    self.tabs['additional'].content += \
+                        f"<h2>{self.tabs[name].label}</h2>" + \
+                        button_bar(self.tabs[name].buttons)
                 del self.tabs[name]
 
     def add_note_tab(self) -> None:

@@ -34,7 +34,7 @@ class ImageTest(TestBaseCase):
         assert b'An entry has been created' in rv.data
 
         with open(logo_path, 'rb') as img:
-            rv: Any = c.post(
+            rv = c.post(
                 url_for(
                     'insert',
                     class_='file',

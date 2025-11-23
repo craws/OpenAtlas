@@ -30,7 +30,7 @@ jwt = JWTManager(app)
 from openatlas.models.logger import Logger
 from openatlas.api import api
 from openatlas.views import (
-    admin, ajax, annotation, arche, changelog, entity, error, export, file,
+    admin, ajax, annotation, changelog, entity, error, export, file,
     hierarchy, index, imports, link, login, model, note, overlay, profile,
     search, token, tools, type as type_, user, vocabs)
 
@@ -90,6 +90,7 @@ def before_request() -> Response | None:
         app.config['SQL_PATH'],
         app.config['UPLOAD_PATH'],
         app.config['TMP_PATH']]
+    g.arche_uri_rules = None
     setup_files()
     setup_api()
     return None

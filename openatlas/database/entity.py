@@ -662,7 +662,7 @@ def add_classes_to_hierarchy(type_id: int, class_names: list[str]) -> None:
             {'type_id': type_id, 'class_name': class_name})
 
 
-def move_link_type(data: dict[str, int]) -> None:
+def move_link_type(data: dict[str, Any]) -> None:
     g.cursor.execute(
         """
         UPDATE model.link
@@ -672,7 +672,7 @@ def move_link_type(data: dict[str, int]) -> None:
         data)
 
 
-def move_entity_type(data: dict[str, int]) -> None:
+def move_entity_type(data: dict[str, Any]) -> None:
     g.cursor.execute(
         """
         UPDATE model.link
