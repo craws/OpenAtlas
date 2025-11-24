@@ -1082,7 +1082,7 @@ def get_orphaned_text_annotations() -> list[Any]:
                 _('relink entity'),
                 url_for(
                     'admin_annotation_text_relink',
-                    origin_id=source.id,
+                    origin_id=annotation.source_root or source.id,
                     entity_id=entity.id),
                 js=f"return confirm('{_('relink entity')}?')"),
             link(

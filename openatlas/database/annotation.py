@@ -65,7 +65,7 @@ def get_annotation_text_orphans() -> list[dict[str, Any]]:
             a.link_end,
             a.text,
             a.created,
-			l2.domain_id
+			l2.domain_id AS source_root
         FROM model.annotation_text a
         LEFT JOIN model.link l ON l.domain_id = a.source_id 
             AND l.range_id = a.entity_id 
