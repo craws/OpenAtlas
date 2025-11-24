@@ -39,6 +39,18 @@ class InvolvementTests(TestBaseCase):
         rv = c.post(
             url_for(
                 'link_insert_detail',
+                origin_id=actor.id,
+                name='participated'),
+            data={
+                'participated': event.id,
+                'begin_year_from': '948',
+                'end_year_from': '1952'},
+            follow_redirects=True)
+        assert b'Event Horizon' in rv.data
+
+        rv = c.post(
+            url_for(
+                'link_insert_detail',
                 origin_id=event.id,
                 name='recipient'),
             data={'recipient': actor.id, 'continue_': 'yes'},

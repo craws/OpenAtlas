@@ -124,6 +124,13 @@ class Display:
                         inverse=True,
                         types=True)
                 items.append(item)
+            if relation.name == 'relative':
+                for item in entity_for_links.get_links(
+                        relation.property,
+                        relation.classes,
+                        not relation.inverse):
+                    item.range = item.domain
+                    items.append(item)
             buttons = []
             if is_authorized('contributor'):
                 for button_name in relation.tab['buttons']:

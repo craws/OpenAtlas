@@ -11,16 +11,16 @@ class_groups = {
         'name': 'artifact',
         'label': _('artifact'),
         'classes': ['artifact', 'human_remains'],
-        'table_columns': [
-            'name', 'class', 'type', 'begin', 'end', 'description'],
+        'table_columns':
+            ['name', 'class', 'type', 'begin', 'end', 'description'],
         'icon': 'mdi-shapes'},
     'event': {
         'name': 'event',
         'label': _('event'),
         'classes': [
             'activity', 'acquisition', 'modification', 'move', 'production'],
-        'table_columns': [
-            'name', 'class', 'type', 'begin', 'end', 'description'],
+        'table_columns':
+            ['name', 'class', 'type', 'begin', 'end', 'description'],
         'icon': 'mdi-calendar'},
     'file': {
         'name': 'file',

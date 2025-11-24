@@ -55,7 +55,7 @@ def set_profile_image(id_: int, origin_id: int) -> Response:
 @required_group('contributor')
 def make_iiif_available(id_: int) -> Response:
     if convert_image_to_iiif(id_):
-        flash(_('IIIF converted'), 'info')
+        flash(_('IIIF converted'))
     else:
         flash(_('failed to convert image'), 'error')  # pragma: no cover
     return redirect(url_for('view', id_=id_))
@@ -93,10 +93,10 @@ def convert_iiif_files() -> Response:
 
 def convert() -> None:
     if not check_iiif_activation():  # pragma: no cover
-        flash(_('please activate IIIF'), 'info')
+        flash(_('please activate IIIF'))
         return
     if not g.settings['iiif_conversion']:  # pragma: no cover
-        flash(_('please activate IIIF conversion'), 'info')
+        flash(_('please activate IIIF conversion'))
         return
     existing_files = [entity.id for entity in Entity.get_by_class('file')]
     for id_, file_path in g.files.items():
@@ -104,14 +104,14 @@ def convert() -> None:
             continue
         if id_ in existing_files and file_path.suffix in g.display_file_ext:
             convert_image_to_iiif(id_)
-    flash(_('all image files are converted'), 'info')
+    flash(_('all image files are converted'))
 
 
 @app.route('/delete_iiif_file/<int:id_>')
 @required_group('admin')
 def delete_iiif_file(id_: int) -> Response:
     delete_iiif_image(id_)
-    flash(_('IIIF file deleted'), 'info')
+    flash(_('IIIF file deleted'))
     return redirect(url_for('view', id_=id_))
 
 
@@ -130,7 +130,7 @@ def delete_all_iiif_files() -> None:
     for id_ in g.files:
         if check_iiif_file_exist(id_):
             delete_iiif_image(id_)
-    flash(_('all IIIF files are deleted'), 'info')
+    flash(_('all IIIF files are deleted'))
 
 
 @app.route('/logo/')

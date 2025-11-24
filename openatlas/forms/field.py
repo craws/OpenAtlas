@@ -14,7 +14,8 @@ from wtforms.validators import InputRequired
 from wtforms.widgets import FileInput, HiddenInput, Input, TextInput
 
 from openatlas import app
-from openatlas.display.table import Table, entity_table
+from openatlas.display.table import (
+    Table, entity_table, format_name_and_aliases)
 from openatlas.display.util2 import is_authorized
 from openatlas.forms.util import convert
 from openatlas.models.entity import Entity
@@ -316,7 +317,7 @@ def table_annotation(entities: list[Entity]) -> Table:
     table_ = Table(['name', 'class', 'description'])
     for item in entities:
         table_.rows.append([
-            format_name_and_aliases(item, 'entity'),
+            format_name_and_aliases(item, 'entity', forms={'mode': 'single'}),
             item.class_.name,
             item.description])
     return table_
@@ -504,15 +505,3 @@ def value_type_expand_icon(type_: Entity) -> str:
             class="fa fa-chevron-right value-type-switcher input-height-sm">
             </i>
         </span>'''
-
-
-def format_name_and_aliases(entity: Entity, field_id: str) -> str:
-    link = \
-        f"""<a value="{entity.name}"  href='#' onclick="selectFromTable(this,
-        '{field_id}', {entity.id})">{entity.name}</a>"""
-    if entity.aliases:
-        html = f'<p>{link}</p>'
-        for i, alias in enumerate(entity.aliases.values()):
-            html += alias if i else f'<p>{alias}</p>'
-        return html
-    return link

@@ -7,13 +7,11 @@ from openatlas import app
 from openatlas.api.resources.error import (
     AccessDeniedError, DisplayFileNotFoundError, EntityDoesNotExistError,
     EntityNotAnEventError, IIIFMetadataNotFound, InvalidCidocClassCodeError,
-    InvalidLimitError,
-    InvalidSearchCategoryError,
-    InvalidSearchSyntax, InvalidSearchValueError, InvalidSystemClassError,
-    InvalidViewClassError, LastEntityError, LogicalOperatorError,
-    NoLicenseError, NoSearchStringError, NotAPlaceError, NotATypeError,
-    NotPublicError, OperatorError, OperatorNotSupported, QueryEmptyError,
-    UrlNotValid, ValueNotIntegerError)
+    InvalidLimitError, InvalidSearchCategoryError, InvalidSearchSyntax,
+    InvalidSearchValueError, InvalidSystemClassError, InvalidViewClassError,
+    LastEntityError, LogicalOperatorError, NoLicenseError, NoSearchStringError,
+    NotAPlaceError, NotATypeError, NotPublicError, OperatorError,
+    OperatorNotSupported, QueryEmptyError, UrlNotValid, ValueNotIntegerError)
 
 
 @app.errorhandler(400)

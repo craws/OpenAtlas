@@ -64,7 +64,10 @@ def annotate_image_form(
         Form,
         'entity',
         TableField(
-            Entity.get_by_id(image_id).get_linked_entities('P67', sort=True),
+            Entity.get_by_id(image_id).get_linked_entities(
+                'P67',
+                aliases=True,
+                sort=True),
             entity))
     setattr(Form, 'save', SubmitField(_('save')))
     return Form()
@@ -82,8 +85,6 @@ def add_additional_link_fields(
                 setattr(form, 'description', TextAreaField(_(item)))
             case 'page':
                 setattr(form, 'description', StringField(_(item)))
-            case 'Actor relation' | 'Actor function' | 'Involvement':
-                add_type(form, Entity.get_hierarchy(item))
 
 
 def link_form(origin: Entity, relation: Relation) -> Any:
@@ -110,14 +111,14 @@ def link_detail_form(
 
     selection = Entity.get_by_id(selection_id) if selection_id else None
     validators = [InputRequired()]
-    if 'domain' in relation.additional_fields:
+    if 'actor' in relation.additional_fields:
         entities = Entity.get_by_class(
             origin.class_.name,
             types=True,
             aliases=current_user.settings['table_show_aliases'])
         setattr(
             Form,
-            'domain',
+            'actor',
             TableField(entities, selection=origin, validators=validators))
     if relation.type:
         add_type(Form, Entity.get_hierarchy(relation.type))

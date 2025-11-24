@@ -150,16 +150,19 @@ class TypeTest(TestBaseCase):
 
         with app.test_request_context():
             app.preprocess_request()
-            actor.link('P2', g.types[sex.subs[1]])
+            place_type = get_hierarchy('Place')
+            place.link(
+                'P2',
+                [g.types[place_type.subs[0]], g.types[place_type.subs[1]]])
 
-        rv = c.get(url_for('update', id_=actor.id))
+        rv = c.get(url_for('update', id_=place.id))
         assert b'422' in rv.data
 
         rv = c.post(url_for('type_move_entities', id_=dimension_type.subs[0]))
         assert b'403' in rv.data
 
-        rv = c.get(url_for('show_multiple_linked_entities', id_=sex.id))
-        assert b'Connor' in rv.data
+        rv = c.get(url_for('show_multiple_linked_entities', id_=place_type.id))
+        assert b'Home' in rv.data
 
         rv = c.get(
             url_for('hierarchy_delete', id_=sex.id),
@@ -170,7 +173,9 @@ class TypeTest(TestBaseCase):
             app.preprocess_request()
             actor.link('P74', location, type_id=actor_type.subs[0])
 
-        rv = c.get(url_for('type_delete_recursive', id_=actor_type.subs[0]))
+        rv = c.get(
+            url_for('delete', id_=actor_type.subs[0]),
+            follow_redirects=True)
         assert b'Warning' in rv.data
 
         rv = c.post(

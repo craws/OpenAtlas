@@ -250,7 +250,7 @@ def carbon_update(id_: int) -> str | Response:
                 'range': form.range.data,
                 'timeScale': 'BP'},
             link_=carbon_link)
-        flash(_('info update'), 'info')
+        flash(_('info update'))
         return redirect(url_for('tools_index', id_=entity.id))
     if request.method == 'GET' and carbon_link:
         data = json.loads(carbon_link.description)

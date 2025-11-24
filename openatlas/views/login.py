@@ -133,8 +133,7 @@ def reset_password() -> str | Response:
             if send_mail(subject, body, form.email.data):
                 flash(
                     _('A password reset confirmation mail was send '
-                      'to %(email)s.', email=email),
-                    'info')
+                      'to %(email)s.', email=email))
             else:  # pragma: no cover
                 flash(
                     _('Failed to send password reset confirmation mail '
@@ -179,9 +178,7 @@ def reset_confirm(code: str) -> Response:
     body += f"{uc_first(_('username'))}: {user.username}\n"
     body += f"{uc_first(_('password'))}: {password}\n"
     if send_mail(subject, body, user.email, False):
-        flash(
-            _('A new password was sent to %(email)s.', email=user.email),
-            'info')
+        flash(_('A new password was sent to %(email)s.', email=user.email))
     else:  # pragma: no cover
         flash(
             _('Failed to send password mail to %(email)s.', email=user.email),

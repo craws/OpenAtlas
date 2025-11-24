@@ -34,9 +34,9 @@ def remove_link(
         name: str,
         link_: Link,
         origin: Entity,
-        tab: Optional[str] = '') -> Optional[str]:
+        tab: Optional[str] = '') -> str:
     if not is_authorized('contributor'):
-        return None
+        return ''
     confirm = _('Remove %(name)s?', name=name.replace("'", ''))
     url = url_for('link_delete', id_=link_.id, origin_id=origin.id)
     return link(
@@ -45,8 +45,8 @@ def remove_link(
         js=f"return confirm('{confirm}')")
 
 
-def edit_link(url: str) -> Optional[str]:
-    return link(_('edit'), url) if is_authorized('contributor') else None
+def edit_link(url: str) -> str:
+    return link(_('edit'), url) if is_authorized('contributor') else ''
 
 
 def reference_systems(entity: Entity) -> str:
@@ -645,24 +645,3 @@ def display_crumbs(crumbs: list[Any]) -> str:
         elif item:
             items.append(link(item))
     return '&nbsp;>&nbsp; '.join(items)
-
-
-def get_update_link_for_link(link_: Link) -> str:
-    domain = link_.domain.class_.name
-    range_ = link_.range.class_.name
-    property_ = link_.property.code
-    for name, relation in g.classes[domain].relations.items():
-        if relation.property == property_ and range_ in relation.classes:
-            return url_for(
-                'link_update',
-                id_=link_.id,
-                origin_id=link_.domain.id,
-                name=name)
-    for name, relation in g.classes[range_].relations.items():
-        if relation.property == property_ and domain in relation.classes:
-            return url_for(
-                'link_update',
-                id_=link_.id,
-                origin_id=link_.range.id,
-                name=name)
-    return ''

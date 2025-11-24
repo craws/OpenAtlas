@@ -59,7 +59,7 @@ class Relation:
         self.additional_fields = data.get('additional_fields', [])
         self.via_location = data.get('via_location', False)
         self.type = data.get('type')
-        self.reverse_relation = None
+        self.reverse_relation: Relation | None = None
         if self.mode == 'tab':
             self.tab = data.get('tab', {})
             self.tab['additional_columns'] = \
