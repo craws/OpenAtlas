@@ -216,7 +216,6 @@ def process_relations(
                     locations.append(place.get_linked_entity_safe('P53'))
                 entities = locations
             entity.link(relation.property, entities, inverse=relation.inverse)
-
     if origin and relation_name:
         origin_relation = origin.class_.relations[relation_name]
         if not origin.class_.relations[relation_name].additional_fields:

@@ -75,15 +75,23 @@ def link_insert_detail(
         if relation.type:
             hierarchy = Entity.get_hierarchy(relation.type)
             type_id = getattr(form, str(hierarchy.id)).data or None
-        origin.link(
-            relation.property,
-            Entity.get_by_ids(ids),
-            form.description.data if 'description' in form else None,
-            relation.inverse,
-            type_id,
-            dates=process_dates(form))
-        return redirect(
-            f"{url_for('view', id_=origin.id)}#tab-" + name.replace('_', '-'))
+        form_valid = True
+        if relation.name == 'relative':
+            origin = Entity.get_by_id(form.actor.data)
+            if ids[0] == int(form.actor.data):
+                form_valid = False
+                flash(_("Can't link to itself"), 'error')
+        if form_valid:
+            origin.link(
+                relation.property,
+                Entity.get_by_ids(ids),
+                form.description.data if 'description' in form else None,
+                relation.inverse,
+                type_id,
+                dates=process_dates(form))
+            return redirect(
+                url_for('view', id_=origin.id) +
+                "#tab-" + name.replace('_', '-'))
     return render_template(
         'content.html',
         entity=origin,
