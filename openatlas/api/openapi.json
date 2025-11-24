@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.11e",
+    "version": "0.4.11f",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -2152,7 +2152,9 @@
               "entityName": [
                 {
                   "operator": "like",
-                  "values": "A",
+                  "values": [
+                    "A"
+                  ],
                   "logicalOperator": "and"
                 }
               ]
