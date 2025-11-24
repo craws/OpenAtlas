@@ -597,7 +597,7 @@ def convert_image_to_iiif(id_: int, path: Optional[Path] = None) -> bool:
 
 def display_annotation_text_links(entity: Entity) -> str:
     offset = 0
-    text = entity.description
+    text = entity.description or ''
     for annotation in AnnotationText.get_by_source_id(entity.id):
         if not annotation.text and not annotation.entity_id:
             continue  # pragma: no cover

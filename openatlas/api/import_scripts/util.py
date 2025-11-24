@@ -56,8 +56,8 @@ def vocabs_requests(
         endpoint: Optional[str] = "",
         parameter: Optional[dict[str, str]] = None) -> dict[str, Any]:
     base = g.settings["vocabs_base_url"]
-    ep = g.settings["vocabs_endpoint"]
-    url = f"{base}{ep}{id_}/{endpoint}"
+    vocabs_endpoint = g.settings["vocabs_endpoint"]
+    url = f"{base}{vocabs_endpoint}{id_}/{endpoint}"
     sleep(0.1)  # fix connection abort
     try:
         resp = requests.get(
