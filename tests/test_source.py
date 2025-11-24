@@ -93,6 +93,20 @@ class SourceTest(TestBaseCase):
             follow_redirects=True)
         assert b'because it has been modified' in rv.data
 
+        with app.test_request_context():
+            app.preprocess_request()
+            translation_2 = insert(
+                'source_translation',
+                'new translation',
+                ('The <mark meta="{"annotationId":"c27",'
+                 '"comment":"nice"}">Bible</mark>,'
+                 ' also referred to as the Book of the living'))
+            # todo: get source as entity and link it to translation,
+            #   then remove the link and test the orphan functions.
+            # iiif_file.delete_links('P67', classes=['file', 'place'])
+
+        # assert b'+' in rv.data
+
         rv = c.get(
             url_for('delete', id_=translation_id),
             follow_redirects=True)
