@@ -86,16 +86,16 @@ acquisition: dict[str, Any] = copy.deepcopy(class_)
 acquisition['label'] = _('acquisition')
 acquisition['display']['tooltip'] = _('mapping a change of property')
 acquisition['relations'] = acquisition['relations'] | {
-    'recipient': {
-        'label': _('recipient'),
-        'classes': class_groups['actor']['classes'],
-        'property': 'P22',
-        'mode': 'direct',
-        'multiple': True},
     'donor': {
         'label': _('donor'),
         'classes': class_groups['actor']['classes'],
         'property': 'P23',
+        'mode': 'direct',
+        'multiple': True},
+    'recipient': {
+        'label': _('recipient'),
+        'classes': class_groups['actor']['classes'],
+        'property': 'P22',
         'mode': 'direct',
         'multiple': True},
     'given_place': {
