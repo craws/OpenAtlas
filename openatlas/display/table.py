@@ -9,7 +9,8 @@ from flask_login import current_user
 from openatlas import app
 from openatlas.display.image_processing import check_processed_image
 from openatlas.display.util import (
-    check_iiif_file_exist, edit_link, get_file_path, link, remove_link)
+    check_iiif_file_exist, edit_link, get_file_path, get_user_setting, link,
+    remove_link)
 from openatlas.display.util2 import (
     display_bool, is_authorized, sanitize, uc_first)
 from openatlas.models.dates import format_date
@@ -273,7 +274,7 @@ def format_name_and_aliases(
             html += alias if i else f'<p>{alias}</p>'
         return html
     name = entity.name if forms else link(entity)
-    if not entity.aliases or not current_user.settings['table_show_aliases']:
+    if not entity.aliases or not get_user_setting('table_show_aliases', False):
         return name
     return \
         f'{name}' \

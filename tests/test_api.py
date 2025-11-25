@@ -26,6 +26,7 @@ class Api(ApiTestCase):
                     'public': True},
                 follow_redirects=True)
 
+        c.get(url_for('logout'))
         with app.test_request_context():
             app.preprocess_request()
             for entity in ApiEntity.get_by_cidoc_classes(['all']):

@@ -309,9 +309,6 @@
             "$ref": "#/components/parameters/count"
           },
           {
-            "$ref": "#/components/parameters/centroid"
-          },
-          {
             "$ref": "#/components/parameters/show"
           },
           {
