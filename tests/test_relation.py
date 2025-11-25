@@ -37,6 +37,7 @@ class RelationTests(TestBaseCase):
         assert b'The Kurgan' in rv.data
 
         data['relative'] = actor.id
+        data['actor'] = related.id
         rv = c.post(
             url_for(
                 'link_insert_detail',
@@ -91,3 +92,14 @@ class RelationTests(TestBaseCase):
             data={'description': 'There can be only one', 'inverse': True},
             follow_redirects=True)
         assert b'only one' in rv.data
+
+        data['relative'] = actor.id
+        data['actor'] = actor.id
+        rv = c.post(
+            url_for(
+                'link_insert_detail',
+                origin_id=actor.id,
+                name='relative'),
+            data=data,
+            follow_redirects=True)
+        assert b'link to itself' in rv.data

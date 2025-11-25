@@ -51,6 +51,7 @@ entity_.add_argument(
         'cidoc_class',
         'system_class',
         'type',
+        'checkbox',
         'class',
         'created',
         'creator',
@@ -67,7 +68,9 @@ entity_.add_argument(
         'begin_from',
         'begin_to',
         'end_from',
-        'end_to'),
+        'end_to',
+        'end',
+        'begin'),
     location='args')
 entity_.add_argument(
     'search',
@@ -163,6 +166,12 @@ entity_.add_argument(
 entity_.add_argument(
     'table_columns',
     type=str,
+    action='append',
+    help="{error_msg}",
+    location='args')
+entity_.add_argument(
+    'checked',
+    type=int,
     action='append',
     help="{error_msg}",
     location='args')

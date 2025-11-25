@@ -56,10 +56,10 @@ group: dict[str, Any] = {
             'type': 'Involvement',
             'additional_fields': ['dates', 'description'],
             'tab': {
+                'buttons': ['link', 'insert'],
                 'columns': [
                     'name', 'class', 'type_link',
-                    'begin', 'end', 'description'],
-                'buttons': ['link', 'insert']}},
+                    'begin', 'end', 'description']}},
         'move': {
              'label': _('move'),
              'classes': 'move',
@@ -67,6 +67,22 @@ group: dict[str, Any] = {
              'inverse': True,
              'tab': {
                  'buttons': ['insert']}},
+        'donor': {
+            'label': _('donor'),
+            'classes': 'acquisition',
+            'property': 'P23',
+            'inverse': True,
+            'tab': {
+                'buttons': ['insert'],
+                'columns': ['name', 'type', 'begin', 'end', 'description']}},
+        'recipient': {
+            'label': _('recipient'),
+            'classes': 'acquisition',
+            'property': 'P22',
+            'inverse': True,
+            'tab': {
+                'buttons': ['insert'],
+                'columns': ['name', 'type', 'begin', 'end', 'description']}},
         'relative': {
             'label': _('relation'),
             'classes': class_groups['actor']['classes'],

@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.11f",
+    "version": "0.4.11g",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -309,9 +309,6 @@
             "$ref": "#/components/parameters/count"
           },
           {
-            "$ref": "#/components/parameters/centroid"
-          },
-          {
             "$ref": "#/components/parameters/show"
           },
           {
@@ -337,6 +334,12 @@
           },
           {
             "$ref": "#/components/parameters/type_id"
+          },
+          {
+            "$ref": "#/components/parameters/checked"
+          },
+          {
+            "$ref": "#/components/parameters/table_columns"
           }
         ],
         "security": [
@@ -2087,10 +2090,41 @@
             "begin_from",
             "begin_to",
             "end_from",
-            "end_to"
+            "end_to",
+            "end",
+            "begin",
+            "checkbox"
           ]
         },
         "example": "name"
+      },
+      "table_columns": {
+        "name": "table_columns",
+        "description": "Choose the columns you want to show. If nothing is entered, the most suitable template will be chosen. The order matters, so the first parameter will also be the first result in the return array.",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "begin",
+            "checkbox",
+            "class",
+            "created",
+            "creator",
+            "content",
+            "description",
+            "end",
+            "extension",
+            "icon",
+            "license_holder",
+            "name",
+            "public",
+            "size",
+            "type",
+            "license"
+          ]
+        },
+        "example": "name",
+        "explode": true
       },
       "search": {
         "name": "search",
@@ -2246,6 +2280,18 @@
       "type_id": {
         "name": "type_id",
         "description": "Filter results to include only entities with the specified type ID or those linked to it.",
+        "in": "query",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "explode": true
+      },
+      "checked": {
+        "name": "checked",
+        "description": "A list of IDs of selected entities for the table.",
         "in": "query",
         "schema": {
           "type": "array",
