@@ -533,16 +533,18 @@ class Api(ApiTestCase):
 
         # Just test if not filter not crashes. Can be more detailed.
         columns = [
-            "id", "name", "cidoc_class", "system_class", "type", "class",
-            "created", "creator", "content", "count", "description",
+            "id", "name", "cidoc_class", "system_class", "type", "checkbox",
+            "class", "created", "creator", "content", "description",
             "extension", "icon", "group", "license_holder", "license",
             "public", "size", "begin_from", "begin_to", "end_from", "end_to"]
         for column in columns:
+            checked = [place.id] if column == 'checkbox' else []
             with c.get(
                     url_for(
                         'api_04.table_rows',
                         system_classes=['file', 'place', 'person', 'group'],
-                        column=column)) as rv:
+                        column=column,
+                        checked=checked)) as rv:
                 assert '1' in str(rv.get_json()['pagination']['totalPages'])
 
         # Test entities with Linked Open Usable Data Format

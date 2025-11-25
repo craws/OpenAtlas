@@ -105,10 +105,16 @@ class Endpoint:
         self.get_pagination()
         self.reduce_entities_to_limit()
         if self.parser.format == 'table_row':
+            forms = {}
+            if self.parser.checked:
+                forms = {
+                    'checkbox': True,
+                    'selection_ids': self.parser.checked}
             return {
                 "results": entity_table(
                     items=self.entities,
-                    columns=self.parser.table_columns).rows,
+                    columns=self.parser.table_columns,
+                    forms=forms).rows,
                 "pagination": {
                     'entitiesPerPage': int(self.parser.limit),
                     'entities': self.pagination['count'],
@@ -228,9 +234,8 @@ class Endpoint:
         if 'latest' in request.path:
             return
 
-        def safe_key(ent: Entity) -> str:
-            value = self.parser.get_key(ent)
-            return value or ""
+        def safe_key(entity: Entity) -> tuple[str, str | int]:
+            return self.parser.get_key(entity)
 
         self.entities = sorted(
             self.entities,

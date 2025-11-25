@@ -62,12 +62,14 @@ class Parser:
     depth: int = 1
     place_hierarchy = None
     map_overlay = None
+    checked: list[int]
 
     def __init__(self, parser: dict[str, Any]):
         self.show = []
         self.type_id = []
         self.exclude_system_classes = []
         self.search_param = []
+        self.checked = []
         for item in parser:
             setattr(self, item, parser[item])
         if self.search:
@@ -175,10 +177,10 @@ class Parser:
                     value = str(val)
             case "checkbox":
                 tag = "checkbox"
-                value = ""
+                value = "1" if e.id in self.checked else ""
             case "cidoc_class":
                 tag = "cidoc_class"
-                value = e.cidoc_class.lower()
+                value = e.cidoc_class.name.lower()
             case "class" | "system_class":
                 tag = "class"
                 value = e.class_.label.lower()
@@ -242,6 +244,7 @@ class Parser:
                     value = str(raw).lower()
                 except Exception:
                     value = ""
+        value = '' if value is None else value
         return tag, value
 
 
