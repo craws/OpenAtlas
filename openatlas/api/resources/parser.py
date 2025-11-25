@@ -67,7 +67,9 @@ entity_.add_argument(
         'begin_from',
         'begin_to',
         'end_from',
-        'end_to'),
+        'end_to',
+        'end',
+        'begin'),
     location='args')
 entity_.add_argument(
     'search',

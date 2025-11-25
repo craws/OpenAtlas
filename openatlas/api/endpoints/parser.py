@@ -7,7 +7,6 @@ from typing import Any, Optional
 import numpy
 import validators
 from flask import g, url_for
-from flask_babel import format_number
 
 from openatlas import app
 from openatlas.api.resources.error import (
@@ -154,61 +153,97 @@ class Parser:
                 codes.append('P67')
         return codes
 
-    def get_key(self, e: Entity) -> str:
-        key = ''
-        match self.column:
-            case 'begin_from' | 'begin_to' | 'end_from' | 'end_to':
-                if not getattr(e.dates, self.column):
-                    date = ("-" if self.sort == 'desc' else "") \
-                           + '9999999-01-01T00:00:00'
-                    key = str(date)
-            case 'group' | 'cidoc_class':
-                key = e.cidoc_class.name.lower()
-            case 'class' | 'system_class':
-                key = e.class_.label.lower()
-            case 'created':
-                key = format_date(e.created)
-            case 'count':
-                key = format_number(e.count)
-            case 'content' | 'description':
-                if e.description:
-                    key = e.description.lower()
-            case 'creator':
-                if e.class_.name == 'file':
-                    if g.file_info.get(e.id):
-                        key = g.file_info[e.id]['creator']
-            # case 'domain':
-            #    key = e.name.lower()
-            # case 'default_precision':
-            #     if default_precision := next(iter(e.types), None):
-            #         key = default_precision.name
-            # case 'example_id' if isinstance(e, Entity):
-            #         key = e.example_id or ''
-            case 'extension':
-                key = e.get_file_ext()
-            case 'icon':
-                key = file_preview(e.id)
-            case 'license_holder':
-                if e.class_.name == 'file':
-                    if g.file_info.get(e.id):
-                        key = g.file_info[e.id]['license_holder']
-            case 'name':
-                key = e.name.lower()
-            case 'public':
-                if e.class_.name == 'file':
-                    if g.file_info.get(e.id):
-                        key = display_bool(g.file_info[e.id]['public'])
-            # case 'range':
-            #     key = e.name.lower()
-            case 'size':
-                if e.class_.name == 'file':
-                    key = e.get_file_size()
-            case 'type' | 'license':
+    def get_key(self, e: Entity) -> tuple[str, str | int]:
+        tag: str = ""
+        value: str | int = ""
+        col = self.column
+        match col:
+            case "begin":
+                tag = "begin"
+                value = -9999999
+                if e.dates.first:
+                    value = int(e.dates.first)
+            case "begin_from" | "begin_to" | "end_from" | "end_to":
+                tag = "date"
+                val = e.dates.to_timestamp()[col]
+                if not val:
+                    fallback = (
+                        "-" if self.sort == "desc" else ""
+                    ) + "9999999-01-01T00:00:00"
+                    value = fallback
+                else:
+                    value = str(val)
+            case "checkbox":
+                tag = "checkbox"
+                value = ""
+            case "cidoc_class":
+                tag = "cidoc_class"
+                value = e.cidoc_class.lower()
+            case "class" | "system_class":
+                tag = "class"
+                value = e.class_.label.lower()
+            case "created":
+                tag = "created"
+                value = format_date(e.created)
+            case "creator":
+                tag = "creator"
+                if e.class_.name == "file" and g.file_info.get(e.id):
+                    value = g.file_info[e.id]["creator"]
+                else:
+                    value = ""
+            case "content" | "description":
+                tag = "description"
+                value = (e.description or "").lower()
+            case "end":
+                tag = "end"
+                value = -9999999
+                if e.dates.last:
+                    value = int(e.dates.last)
+            case "extension":
+                tag = "extension"
+                value = e.get_file_ext()
+            case "group":
+                tag = "group"
+                value = e.class_.group.get("name", "")
+            case "icon":
+                tag = "icon"
+                value = file_preview(e.id)
+            case "license_holder":
+                tag = "license_holder"
+                if e.class_.name == "file" and g.file_info.get(e.id):
+                    value = g.file_info[e.id]["license_holder"]
+                else:
+                    value = ""
+            case "name":
+                tag = "name"
+                value = e.name.lower()
+            case "public":
+                tag = "public"
+                if e.class_.name == "file" and g.file_info.get(e.id):
+                    value = display_bool(g.file_info[e.id]["public"])
+                else:
+                    value = ""
+            case "size":
+                tag = "size"
+                if e.class_.name == "file" and e.id in g.files:
+                    value = g.files[e.id].stat().st_size
+                else:
+                    value = 0
+            case "type" | "license":
+                tag = "type"
                 if e.standard_type:
-                    key = e.standard_type.name.lower()
+                    value = e.standard_type.name.lower()
+                else:
+                    value = ""
             case _:
-                key = str(getattr(e, self.column)).lower()
-        return key
+                tag = "other"
+                raw = getattr(e, col, "")
+                try:
+                    value = str(raw).lower()
+                except Exception:
+                    value = ""
+        return tag, value
+
 
     def get_by_page(
             self,
