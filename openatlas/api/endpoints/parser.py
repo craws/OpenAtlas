@@ -242,7 +242,7 @@ class Parser:
                 raw = getattr(e, col, "")
                 try:
                     value = str(raw).lower()
-                except Exception:
+                except Exception:  # pragma: no cover
                     value = ""
         value = '' if value is None else value
         return tag, value

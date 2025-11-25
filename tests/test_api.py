@@ -178,8 +178,8 @@ class Api(ApiTestCase):
         assert len(rv['results']) == 16
 
         for rv in [
-            c.get(url_for('api_04.geometric_entities')),
-            c.get(url_for('api_04.geometric_entities', download=True))]:
+                c.get(url_for('api_04.geometric_entities')),
+                c.get(url_for('api_04.geometric_entities', download=True))]:
             rv = rv.get_json()
             assert rv['features'][0]['geometry']['coordinates']
             assert rv['features'][0]['properties']['id']
@@ -514,19 +514,20 @@ class Api(ApiTestCase):
             assert rv['properties']['@id']
             assert rv['properties']['systemClass']
 
-        for rv in [c.get(
-                url_for(
-                    'api_04.query',
-                    cidoc_classes='E18',
-                    view_classes='artifact',
-                    system_classes='person',
-                    format='table_row')),
-            c.get(
-                url_for(
-                    'api_04.table_rows',
-                    cidoc_classes='E18',
-                    view_classes='artifact',
-                    system_classes='person'))]:
+        for rv in [
+                c.get(
+                    url_for(
+                        'api_04.query',
+                        cidoc_classes='E18',
+                        view_classes='artifact',
+                        system_classes='person',
+                        format='table_row')),
+                c.get(
+                    url_for(
+                        'api_04.table_rows',
+                        cidoc_classes='E18',
+                        view_classes='artifact',
+                        system_classes='person'))]:
             rv = rv.get_json()['results']
             assert 'Bar' in rv[0][0]
             assert 'The One Ring' in rv[-1][0]
@@ -536,7 +537,8 @@ class Api(ApiTestCase):
             "id", "name", "cidoc_class", "system_class", "type", "checkbox",
             "class", "created", "creator", "content", "description",
             "extension", "icon", "group", "license_holder", "license",
-            "public", "size", "begin_from", "begin_to", "end_from", "end_to"]
+            "public", "size", "begin_from", "begin_to", "end_from", "end_to",
+            "begin", "end"]
         for column in columns:
             checked = [place.id] if column == 'checkbox' else []
             with c.get(
@@ -581,13 +583,13 @@ class Api(ApiTestCase):
 
         # ---Type Endpoints---
         for rv in [
-            c.get(url_for('api_04.type_overview')),
-            c.get(url_for('api_04.type_overview', download=True))]:
+                c.get(url_for('api_04.type_overview')),
+                c.get(url_for('api_04.type_overview', download=True))]:
             assert 'Austria' in str(rv.get_json())
 
         for rv in [
-            c.get(url_for('api_04.type_by_view_class')),
-            c.get(url_for('api_04.type_by_view_class', download=True))]:
+                c.get(url_for('api_04.type_by_view_class')),
+                c.get(url_for('api_04.type_by_view_class', download=True))]:
             assert 'Boundary Mark' in str(rv.get_json())
         rv = c.get(url_for('api_04.type_tree'))
         assert rv.get_json()['typeTree']
@@ -818,8 +820,8 @@ class Api(ApiTestCase):
 
         # Test Error Handling
         for rv in [
-            c.get(url_for('api_04.entity', id_=233423424)),
-            c.get(url_for('api_04.cidoc_class', class_='E18', last=1231))]:
+                c.get(url_for('api_04.entity', id_=233423424)),
+                c.get(url_for('api_04.cidoc_class', class_='E18', last=1231))]:
             rv = rv.get_json()
         assert 'Entity does not exist' in rv['title']
 
