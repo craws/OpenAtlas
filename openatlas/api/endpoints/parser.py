@@ -62,14 +62,13 @@ class Parser:
     depth: int = 1
     place_hierarchy = None
     map_overlay = None
-    checked: list[int]
+    checked: list[int] = []
 
     def __init__(self, parser: dict[str, Any]):
         self.show = []
         self.type_id = []
         self.exclude_system_classes = []
         self.search_param = []
-        self.checked = []
         for item in parser:
             setattr(self, item, parser[item])
         if self.search:
@@ -121,14 +120,16 @@ class Parser:
                                 Entity.get_links_of_entities(
                                     value[0],
                                     inverse=True))
-                    search_parameter.append({
-                        "search_values": get_search_values(category, values),
-                        "logical_operator": values['logicalOperator'],
-                        "operator": values['operator'],
-                        "category": category,
-                        "is_comparable": is_comparable,
-                        "value_type_links":
-                            flatten_list_and_remove_duplicates(links)})
+                    search_parameter.append(
+                        {
+                            "search_values": get_search_values(
+                                category, values),
+                            "logical_operator": values['logicalOperator'],
+                            "operator": values['operator'],
+                            "category": category,
+                            "is_comparable": is_comparable,
+                            "value_type_links":
+                                flatten_list_and_remove_duplicates(links)})
             self.search_param.append(search_parameter)
 
     def search_filter(self, entity: Entity) -> bool:
@@ -157,7 +158,7 @@ class Parser:
 
     def get_key(self, e: Entity) -> tuple[str, str | int]:
         tag: str = ""
-        value: str | int = ""
+        value: str | int | None = None
         col = self.column
         match col:
             case "begin":
@@ -169,15 +170,14 @@ class Parser:
                 tag = "date"
                 val = e.dates.to_timestamp()[col]
                 if not val:
-                    fallback = (
-                        "-" if self.sort == "desc" else ""
-                    ) + "9999999-01-01T00:00:00"
+                    fallback = "-" if self.sort == "desc" else "" \
+                               + "9999999-01-01T00:00:00"
                     value = fallback
                 else:
                     value = str(val)
             case "checkbox":
                 tag = "checkbox"
-                value = "1" if e.id in self.checked else ""
+                value = "1" if self.checked and e.id in self.checked else ""
             case "cidoc_class":
                 tag = "cidoc_class"
                 value = e.cidoc_class.name.lower()
@@ -191,8 +191,6 @@ class Parser:
                 tag = "creator"
                 if e.class_.name == "file" and g.file_info.get(e.id):
                     value = g.file_info[e.id]["creator"]
-                else:
-                    value = ""
             case "content" | "description":
                 tag = "description"
                 value = (e.description or "").lower()
@@ -214,8 +212,6 @@ class Parser:
                 tag = "license_holder"
                 if e.class_.name == "file" and g.file_info.get(e.id):
                     value = g.file_info[e.id]["license_holder"]
-                else:
-                    value = ""
             case "name":
                 tag = "name"
                 value = e.name.lower()
@@ -223,20 +219,16 @@ class Parser:
                 tag = "public"
                 if e.class_.name == "file" and g.file_info.get(e.id):
                     value = display_bool(g.file_info[e.id]["public"])
-                else:
-                    value = ""
             case "size":
                 tag = "size"
                 if e.class_.name == "file" and e.id in g.files:
                     value = g.files[e.id].stat().st_size
                 else:
-                    value = 0
+                    value = -1
             case "type" | "license":
                 tag = "type"
                 if e.standard_type:
                     value = e.standard_type.name.lower()
-                else:
-                    value = ""
             case _:
                 tag = "other"
                 raw = getattr(e, col, "")
@@ -244,9 +236,9 @@ class Parser:
                     value = str(raw).lower()
                 except Exception:  # pragma: no cover
                     value = ""
-        value = '' if value is None else value
+        # \uffff is last char in unicode
+        value = '\uffff' if value is None else value
         return tag, value
-
 
     def get_by_page(
             self,
@@ -268,10 +260,11 @@ class Parser:
                     None))
         if self.last and int(self.last) in total:
             if not (
-                    out := list(itertools.islice(
-                        total,
-                        total.index(int(self.last)) + 1,
-                        None))):
+                    out := list(
+                        itertools.islice(
+                            total,
+                            total.index(int(self.last)) + 1,
+                            None))):
                 raise LastEntityError
             return out
         raise EntityDoesNotExistError
@@ -282,35 +275,38 @@ class Parser:
             geometry: Optional[dict[str, Any]] = None) -> dict[str, Any]:
         entity = entity_dict['entity']
         geoms = geometry or geometry_to_geojson(entity_dict['geometry'])
-        return replace_empty_list_values_in_dict_with_none({
-            'type': 'Feature',
-            'geometry': geoms,
-            'properties': {
-                '@id': entity.id,
-                'systemClass': entity.class_.name,
-                'viewClass': entity.class_.group.get('name'),
-                'name': entity.name,
-                'description': entity.description
-                if 'description' in self.show else None,
-                'begin_earliest': entity.dates.begin_from
-                if 'when' in self.show else None,
-                'begin_latest': entity.dates.begin_to
-                if 'when' in self.show else None,
-                'begin_comment': entity.dates.begin_comment
-                if 'when' in self.show else None,
-                'end_earliest': entity.dates.end_from
-                if 'when' in self.show else None,
-                'end_latest': entity.dates.end_to
-                if 'when' in self.show else None,
-                'end_comment': entity.dates.end_comment
-                if 'when' in self.show else None,
-                'types': [{
-                    'typeName': type_.name,
-                    'typeId': type_.id,
-                    'typeHierarchy': ' > '.join(
-                        map(str, [g.types[root].name for root in type_.root]))}
-                    for type_ in entity.types]
-                if 'types' in self.show else None}})
+        return replace_empty_list_values_in_dict_with_none(
+            {
+                'type': 'Feature',
+                'geometry': geoms,
+                'properties': {
+                    '@id': entity.id,
+                    'systemClass': entity.class_.name,
+                    'viewClass': entity.class_.group.get('name'),
+                    'name': entity.name,
+                    'description': entity.description
+                    if 'description' in self.show else None,
+                    'begin_earliest': entity.dates.begin_from
+                    if 'when' in self.show else None,
+                    'begin_latest': entity.dates.begin_to
+                    if 'when' in self.show else None,
+                    'begin_comment': entity.dates.begin_comment
+                    if 'when' in self.show else None,
+                    'end_earliest': entity.dates.end_from
+                    if 'when' in self.show else None,
+                    'end_latest': entity.dates.end_to
+                    if 'when' in self.show else None,
+                    'end_comment': entity.dates.end_comment
+                    if 'when' in self.show else None,
+                    'types': [{
+                        'typeName': type_.name,
+                        'typeId': type_.id,
+                        'typeHierarchy': ' > '.join(
+                            map(
+                                str,
+                                [g.types[root].name for root in type_.root]))}
+                        for type_ in entity.types]
+                    if 'types' in self.show else None}})
 
     def is_valid_url(self) -> None:
         if self.url and isinstance(
@@ -331,9 +327,10 @@ class Parser:
                     'api.entity', id_=type_.id, _external=True),
                 'descriptions': type_.description,
                 'label': type_.name,
-                'hierarchy': ' > '.join(map(
-                    str,
-                    [g.types[root].name for root in type_.root])),
+                'hierarchy': ' > '.join(
+                    map(
+                        str,
+                        [g.types[root].name for root in type_.root])),
                 'typeHierarchy': [{
                     'label': g.types[root].name,
                     'descriptions': g.types[root].description,
