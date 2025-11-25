@@ -232,7 +232,7 @@ class Endpoint:
         if 'latest' in request.path:
             return
 
-        def safe_key(entity: Entity) -> tuple[str, str | int]:
+        def safe_key(entity: Entity) -> tuple[str, str | int, str]:
             return self.parser.get_key(entity)
 
         self.entities = sorted(

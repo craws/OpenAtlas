@@ -62,14 +62,13 @@ class Parser:
     depth: int = 1
     place_hierarchy = None
     map_overlay = None
-    checked: list[int]
+    checked: list[int] = []
 
     def __init__(self, parser: dict[str, Any]):
         self.show = []
         self.type_id = []
         self.exclude_system_classes = []
         self.search_param = []
-        self.checked = []
         for item in parser:
             setattr(self, item, parser[item])
         if self.search:
@@ -122,7 +121,8 @@ class Parser:
                                     value[0],
                                     inverse=True))
                     search_parameter.append({
-                        "search_values": get_search_values(category, values),
+                        "search_values": get_search_values(
+                            category, values),
                         "logical_operator": values['logicalOperator'],
                         "operator": values['operator'],
                         "category": category,
@@ -155,9 +155,9 @@ class Parser:
                 codes.append('P67')
         return codes
 
-    def get_key(self, e: Entity) -> tuple[str, str | int]:
+    def get_key(self, e: Entity) -> tuple[str, str | int, str]:
         tag: str = ""
-        value: str | int = ""
+        value: str | int | None = None
         col = self.column
         match col:
             case "begin":
@@ -169,15 +169,15 @@ class Parser:
                 tag = "date"
                 val = e.dates.to_timestamp()[col]
                 if not val:
-                    fallback = (
-                        "-" if self.sort == "desc" else ""
-                    ) + "9999999-01-01T00:00:00"
+                    bc = "-" if self.sort == "desc" else ""
+                    fallback = bc + "9999999-01-01T00:00:00"
                     value = fallback
                 else:
                     value = str(val)
             case "checkbox":
                 tag = "checkbox"
-                value = "1" if e.id in self.checked else ""
+                if self.checked and e.id in self.checked:
+                    value = "1"
             case "cidoc_class":
                 tag = "cidoc_class"
                 value = e.cidoc_class.name.lower()
@@ -191,8 +191,6 @@ class Parser:
                 tag = "creator"
                 if e.class_.name == "file" and g.file_info.get(e.id):
                     value = g.file_info[e.id]["creator"]
-                else:
-                    value = ""
             case "content" | "description":
                 tag = "description"
                 value = (e.description or "").lower()
@@ -214,8 +212,6 @@ class Parser:
                 tag = "license_holder"
                 if e.class_.name == "file" and g.file_info.get(e.id):
                     value = g.file_info[e.id]["license_holder"]
-                else:
-                    value = ""
             case "name":
                 tag = "name"
                 value = e.name.lower()
@@ -223,30 +219,26 @@ class Parser:
                 tag = "public"
                 if e.class_.name == "file" and g.file_info.get(e.id):
                     value = display_bool(g.file_info[e.id]["public"])
-                else:
-                    value = ""
             case "size":
                 tag = "size"
                 if e.class_.name == "file" and e.id in g.files:
                     value = g.files[e.id].stat().st_size
                 else:
-                    value = 0
+                    value = -1
             case "type" | "license":
                 tag = "type"
                 if e.standard_type:
                     value = e.standard_type.name.lower()
-                else:
-                    value = ""
             case _:
                 tag = "other"
-                raw = getattr(e, col, "")
+                raw = getattr(e, col, "\uffff")
                 try:
                     value = str(raw).lower()
                 except Exception:  # pragma: no cover
                     value = ""
-        value = '' if value is None else value
-        return tag, value
-
+        # \uffff is last char in unicode
+        value = '\uffff' if value is None else value
+        return tag, value, e.name.lower()  # name is always second order
 
     def get_by_page(
             self,
@@ -268,10 +260,11 @@ class Parser:
                     None))
         if self.last and int(self.last) in total:
             if not (
-                    out := list(itertools.islice(
-                        total,
-                        total.index(int(self.last)) + 1,
-                        None))):
+                    out := list(
+                        itertools.islice(
+                            total,
+                            total.index(int(self.last)) + 1,
+                            None))):
                 raise LastEntityError
             return out
         raise EntityDoesNotExistError
@@ -308,7 +301,9 @@ class Parser:
                     'typeName': type_.name,
                     'typeId': type_.id,
                     'typeHierarchy': ' > '.join(
-                        map(str, [g.types[root].name for root in type_.root]))}
+                        map(
+                            str,
+                            [g.types[root].name for root in type_.root]))}
                     for type_ in entity.types]
                 if 'types' in self.show else None}})
 
@@ -331,9 +326,10 @@ class Parser:
                     'api.entity', id_=type_.id, _external=True),
                 'descriptions': type_.description,
                 'label': type_.name,
-                'hierarchy': ' > '.join(map(
-                    str,
-                    [g.types[root].name for root in type_.root])),
+                'hierarchy': ' > '.join(
+                    map(
+                        str,
+                        [g.types[root].name for root in type_.root])),
                 'typeHierarchy': [{
                     'label': g.types[root].name,
                     'descriptions': g.types[root].description,

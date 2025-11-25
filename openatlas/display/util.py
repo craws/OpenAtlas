@@ -633,6 +633,12 @@ def hierarchy_crumbs(entity: Entity) -> list[str]:
     return crumbs
 
 
+def get_user_setting(key: str, default: Any = None) -> Any:
+    if current_user.is_authenticated:
+        return getattr(current_user, 'settings', {}).get(key, default)
+    return default
+
+
 @app.template_filter()
 def display_crumbs(crumbs: list[Any]) -> str:
     items = []
