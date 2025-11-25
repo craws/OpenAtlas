@@ -233,7 +233,8 @@ def selection_available(
         origin_relation: str | None) -> bool:
     if not origin:
         return False
-    if origin.class_.name.replace('place', 'object_location') \
+    if origin.class_.name not in relation.classes \
+            and origin.class_.name.replace('place', 'object_location') \
             not in relation.classes:
         return False
     if relation.reverse_relation and \

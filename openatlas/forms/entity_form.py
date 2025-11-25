@@ -216,16 +216,15 @@ def process_relations(
                     locations.append(place.get_linked_entity_safe('P53'))
                 entities = locations
             entity.link(relation.property, entities, inverse=relation.inverse)
-
     if origin and relation_name:
         origin_relation = origin.class_.relations[relation_name]
-        if not origin.class_.relations[relation_name].additional_fields:
-            if not origin_relation.reverse_relation \
-                    or origin_relation.reverse_relation.mode != 'direct':
-                origin.link(
-                    origin_relation.property,
-                    entity,
-                    inverse=origin_relation.inverse)
+        if not origin_relation.additional_fields and (
+                not origin_relation.reverse_relation
+                or origin_relation.reverse_relation.mode != 'direct'):
+            origin.link(
+                origin_relation.property,
+                entity,
+                inverse=origin_relation.inverse)
 
 
 def delete_links(entity: Entity) -> None:

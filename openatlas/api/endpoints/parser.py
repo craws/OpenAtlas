@@ -7,7 +7,6 @@ from typing import Any, Optional
 import numpy
 import validators
 from flask import g, url_for
-from flask_babel import format_number
 
 from openatlas import app
 from openatlas.api.resources.error import (
@@ -63,6 +62,7 @@ class Parser:
     depth: int = 1
     place_hierarchy = None
     map_overlay = None
+    checked: list[int] = []
 
     def __init__(self, parser: dict[str, Any]):
         self.show = []
@@ -121,7 +121,8 @@ class Parser:
                                     value[0],
                                     inverse=True))
                     search_parameter.append({
-                        "search_values": get_search_values(category, values),
+                        "search_values": get_search_values(
+                            category, values),
                         "logical_operator": values['logicalOperator'],
                         "operator": values['operator'],
                         "category": category,
@@ -154,61 +155,90 @@ class Parser:
                 codes.append('P67')
         return codes
 
-    def get_key(self, e: Entity) -> str:
-        key = ''
-        match self.column:
-            case 'begin_from' | 'begin_to' | 'end_from' | 'end_to':
-                if not getattr(e.dates, self.column):
-                    date = ("-" if self.sort == 'desc' else "") \
-                           + '9999999-01-01T00:00:00'
-                    key = str(date)
-            case 'group' | 'cidoc_class':
-                key = e.cidoc_class.name.lower()
-            case 'class' | 'system_class':
-                key = e.class_.label.lower()
-            case 'created':
-                key = format_date(e.created)
-            case 'count':
-                key = format_number(e.count)
-            case 'content' | 'description':
-                if e.description:
-                    key = e.description.lower()
-            case 'creator':
-                if e.class_.name == 'file':
-                    if g.file_info.get(e.id):
-                        key = g.file_info[e.id]['creator']
-            # case 'domain':
-            #    key = e.name.lower()
-            # case 'default_precision':
-            #     if default_precision := next(iter(e.types), None):
-            #         key = default_precision.name
-            # case 'example_id' if isinstance(e, Entity):
-            #         key = e.example_id or ''
-            case 'extension':
-                key = e.get_file_ext()
-            case 'icon':
-                key = file_preview(e.id)
-            case 'license_holder':
-                if e.class_.name == 'file':
-                    if g.file_info.get(e.id):
-                        key = g.file_info[e.id]['license_holder']
-            case 'name':
-                key = e.name.lower()
-            case 'public':
-                if e.class_.name == 'file':
-                    if g.file_info.get(e.id):
-                        key = display_bool(g.file_info[e.id]['public'])
-            # case 'range':
-            #     key = e.name.lower()
-            case 'size':
-                if e.class_.name == 'file':
-                    key = e.get_file_size()
-            case 'type' | 'license':
+    def get_key(self, e: Entity) -> tuple[str, str | int, str]:
+        tag: str = ""
+        value: str | int | None = None
+        col = self.column
+        match col:
+            case "begin":
+                tag = "begin"
+                value = -9999999
+                if e.dates.first:
+                    value = int(e.dates.first)
+            case "begin_from" | "begin_to" | "end_from" | "end_to":
+                tag = "date"
+                val = e.dates.to_timestamp()[col]
+                if not val:
+                    bc = "-" if self.sort == "desc" else ""
+                    fallback = bc + "9999999-01-01T00:00:00"
+                    value = fallback
+                else:
+                    value = str(val)
+            case "checkbox":
+                tag = "checkbox"
+                if self.checked and e.id in self.checked:
+                    value = "1"
+            case "cidoc_class":
+                tag = "cidoc_class"
+                value = e.cidoc_class.name.lower()
+            case "class" | "system_class":
+                tag = "class"
+                value = e.class_.label.lower()
+            case "created":
+                tag = "created"
+                value = format_date(e.created)
+            case "creator":
+                tag = "creator"
+                if e.class_.name == "file" and g.file_info.get(e.id):
+                    value = g.file_info[e.id]["creator"]
+            case "content" | "description":
+                tag = "description"
+                value = (e.description or "").lower()
+            case "end":
+                tag = "end"
+                value = -9999999
+                if e.dates.last:
+                    value = int(e.dates.last)
+            case "extension":
+                tag = "extension"
+                value = e.get_file_ext()
+            case "group":
+                tag = "group"
+                value = e.class_.group.get("name", "")
+            case "icon":
+                tag = "icon"
+                value = file_preview(e.id)
+            case "license_holder":
+                tag = "license_holder"
+                if e.class_.name == "file" and g.file_info.get(e.id):
+                    value = g.file_info[e.id]["license_holder"]
+            case "name":
+                tag = "name"
+                value = e.name.lower()
+            case "public":
+                tag = "public"
+                if e.class_.name == "file" and g.file_info.get(e.id):
+                    value = display_bool(g.file_info[e.id]["public"])
+            case "size":
+                tag = "size"
+                if e.class_.name == "file" and e.id in g.files:
+                    value = g.files[e.id].stat().st_size
+                else:
+                    value = -1
+            case "type" | "license":
+                tag = "type"
                 if e.standard_type:
-                    key = e.standard_type.name.lower()
+                    value = e.standard_type.name.lower()
             case _:
-                key = str(getattr(e, self.column)).lower()
-        return key
+                tag = "other"
+                raw = getattr(e, col, "\uffff")
+                try:
+                    value = str(raw).lower()
+                except Exception:  # pragma: no cover
+                    value = ""
+        # \uffff is last char in unicode
+        value = '\uffff' if value is None else value
+        return tag, value, e.name.lower()  # name is always second order
 
     def get_by_page(
             self,
@@ -230,10 +260,11 @@ class Parser:
                     None))
         if self.last and int(self.last) in total:
             if not (
-                    out := list(itertools.islice(
-                        total,
-                        total.index(int(self.last)) + 1,
-                        None))):
+                    out := list(
+                        itertools.islice(
+                            total,
+                            total.index(int(self.last)) + 1,
+                            None))):
                 raise LastEntityError
             return out
         raise EntityDoesNotExistError
@@ -270,7 +301,9 @@ class Parser:
                     'typeName': type_.name,
                     'typeId': type_.id,
                     'typeHierarchy': ' > '.join(
-                        map(str, [g.types[root].name for root in type_.root]))}
+                        map(
+                            str,
+                            [g.types[root].name for root in type_.root]))}
                     for type_ in entity.types]
                 if 'types' in self.show else None}})
 
@@ -293,9 +326,10 @@ class Parser:
                     'api.entity', id_=type_.id, _external=True),
                 'descriptions': type_.description,
                 'label': type_.name,
-                'hierarchy': ' > '.join(map(
-                    str,
-                    [g.types[root].name for root in type_.root])),
+                'hierarchy': ' > '.join(
+                    map(
+                        str,
+                        [g.types[root].name for root in type_.root])),
                 'typeHierarchy': [{
                     'label': g.types[root].name,
                     'descriptions': g.types[root].description,

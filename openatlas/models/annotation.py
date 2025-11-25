@@ -68,6 +68,7 @@ class AnnotationText:
         self.id = data['id']
         self.source_id = data['source_id']
         self.entity_id = data['entity_id']
+        self.source_root = data.get('source_root') # for orphan checks
         self.link_start = data['link_start']
         self.link_end = data['link_end']
         self.text = data['text']
@@ -106,6 +107,17 @@ class AnnotationText:
     @staticmethod
     def delete_annotations_text(source_id: int) -> None:
         db.delete_annotations_text(source_id)
+
+    @staticmethod
+    def remove_entity_from_annotation(
+            annotation_id: int,
+            entity_id: int) -> None:
+        db.remove_entity_from_annotation_text(annotation_id, entity_id)
+
+    @staticmethod
+    def get_orphaned_annotations() -> list[AnnotationText]:
+        return [
+            AnnotationText(row) for row in db.get_annotation_text_orphans()]
 
     @staticmethod
     def get_by_source_id(id_: int) -> list[AnnotationText]:

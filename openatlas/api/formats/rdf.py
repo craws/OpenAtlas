@@ -1,3 +1,4 @@
+# type: ignore
 from __future__ import annotations
 
 import os
@@ -22,7 +23,7 @@ def _add_namespaces(graph: Graph, context: dict[str, Any]) -> None:
     for prefix, uri in context["@context"].items():
         if isinstance(uri, str):
             if uri.endswith('/') or uri.endswith('#'):
-                graph.bind(prefix, Namespace(uri))  # type: ignore
+                graph.bind(prefix, Namespace(uri))
 
     graph.bind("crm", Namespace("http://www.cidoc-crm.org/cidoc-crm/"))
     graph.bind("la", Namespace("https://linked.art/ns/terms/"))
@@ -75,7 +76,7 @@ def _get_subject(
     if subject_uri:
         return URIRef(subject_uri)
 
-    subject = BNode()  # type: ignore
+    subject = BNode()
     if parent_subject is not None and parent_predicate is not None:
         graph.add((parent_subject, parent_predicate, subject))
     return subject

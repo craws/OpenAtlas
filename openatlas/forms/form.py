@@ -28,7 +28,7 @@ def filter_entities(
         items: list[Entity],
         relation: Relation,
         is_link_form: bool = False) -> list[Entity]:
-    filter_ids = [entity.id]
+    filter_ids = [entity.id] if relation.name != 'relative' else []
     if relation.name in ['subs', 'super']:
         filter_ids += [
             e.id for e in entity.get_linked_entities_recursive(
@@ -82,9 +82,15 @@ def add_additional_link_fields(
             case 'dates':
                 add_date_fields(form, link_)
             case 'description':
-                setattr(form, 'description', TextAreaField(_(item)))
+                setattr(
+                    form,
+                    'description',
+                    TextAreaField(_(item), render_kw={'rows': 8}))
             case 'page':
-                setattr(form, 'description', StringField(_(item)))
+                setattr(
+                    form,
+                    'description',
+                    StringField(_(item), render_kw={'rows': 8}))
 
 
 def link_form(origin: Entity, relation: Relation) -> Any:

@@ -1,6 +1,8 @@
 from flask import url_for
 
 from openatlas import app
+from openatlas.models.annotation import AnnotationText
+from openatlas.models.entity import Entity
 from tests.base import TestBaseCase, insert
 
 
@@ -92,6 +94,51 @@ class SourceTest(TestBaseCase):
                 'opened': '1000000000'},
             follow_redirects=True)
         assert b'because it has been modified' in rv.data
+
+        with app.test_request_context():
+            app.preprocess_request()
+            source = Entity.get_by_id(int(source_id))
+            translation_2 = insert(
+                'source_translation',
+                'new translation',
+                ('The <mark meta="{"annotationId":"c27",'
+                 f'"entityId":{artifact.id},'
+                 '"comment":"nice"}">Bible</mark>,'
+                 ' also referred to as the Book of the living'))
+            source.link('P73', translation_2)
+            source.delete_links('P67', ['artifact'])
+
+        rv = c.get(url_for('orphans'))
+        assert b'/admin/annotation/text/relink' in rv.data
+
+        rv = c.get(
+            url_for(
+                'admin_annotation_text_relink',
+                origin_id=source.id,
+                entity_id=artifact.id),
+            follow_redirects=True)
+        assert b'Entities relinked' in rv.data
+
+        with app.test_request_context():
+            app.preprocess_request()
+            annotation_id = AnnotationText.get_by_source_id(
+                translation_2.id)[0].id
+            source.delete_links('P67', ['artifact'])
+
+        rv = c.get(
+            url_for(
+                'admin_annotation_text_remove_entity',
+                annotation_id=annotation_id,
+                entity_id=artifact.id),
+            follow_redirects=True)
+        assert b'Entity removed from annotation' in rv.data
+
+        rv = c.get(
+            url_for(
+                'admin_annotation_text_delete',
+                id_=source.id),
+            follow_redirects=True)
+        assert b'Annotation deleted' in rv.data
 
         rv = c.get(
             url_for('delete', id_=translation_id),
