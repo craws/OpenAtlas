@@ -103,7 +103,7 @@ class EntityFiles(Resource):
         entity_file_dict = defaultdict(list)
         for link_ in links:
             if link_['property_code'] != 'P67' or link_[
-                'domain_system_class'] != 'file':
+                    'domain_system_class'] != 'file':
                 continue
             entity_file_dict[link_['range_id']].append(
                 files_dict.get(link_['domain_id']))

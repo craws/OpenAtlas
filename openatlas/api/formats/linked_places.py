@@ -68,7 +68,6 @@ def get_lp_links(
     return out
 
 
-
 def get_lp_time(entity: Entity | Link) -> Optional[dict[str, Any]]:
     return {
         'start': {

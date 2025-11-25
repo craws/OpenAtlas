@@ -156,7 +156,6 @@ class Parser:
         return codes
 
     def get_key(self, e: Entity) -> tuple[str, str | int, str]:
-        tag: str = ""
         value: str | int | None = None
         col = self.column
         match col:
@@ -304,7 +303,7 @@ class Parser:
                         map(
                             str,
                             [g.types[root].name for root in type_.root]))}
-                    for type_ in entity.types]
+                for type_ in entity.types]
                 if 'types' in self.show else None}})
 
     def is_valid_url(self) -> None:
