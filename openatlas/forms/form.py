@@ -82,9 +82,15 @@ def add_additional_link_fields(
             case 'dates':
                 add_date_fields(form, link_)
             case 'description':
-                setattr(form, 'description', TextAreaField(_(item)))
+                setattr(
+                    form,
+                    'description',
+                    TextAreaField(_(item), render_kw={'rows': 8}))
             case 'page':
-                setattr(form, 'description', StringField(_(item)))
+                setattr(
+                    form,
+                    'description',
+                    StringField(_(item), render_kw={'rows': 8}))
 
 
 def link_form(origin: Entity, relation: Relation) -> Any:
