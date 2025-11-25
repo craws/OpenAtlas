@@ -57,7 +57,6 @@ class Relation:
         self.add_dynamic = data.get('add_dynamic', False)
         self.tooltip = data.get('tooltip')
         self.additional_fields = data.get('additional_fields', [])
-        self.via_location = data.get('via_location', False)
         self.type = data.get('type')
         self.reverse_relation: Relation | None = None
         if self.mode == 'tab':
@@ -95,6 +94,12 @@ def get_classes() -> dict[str, OpenatlasClass]:
                 relation.classes[0].replace('object_location', 'place')]
             for relation2 in related_class.relations.values():
                 if class_.name in relation2.classes \
+                        and relation.property == relation2.property \
+                        and relation.inverse != relation2.inverse:
+                    relation.reverse_relation = relation2
+                    break
+                if class_.name == 'place' and 'object_location' \
+                        in relation2.classes \
                         and relation.property == relation2.property \
                         and relation.inverse != relation2.inverse:
                     relation.reverse_relation = relation2

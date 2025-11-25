@@ -111,7 +111,10 @@ class Display:
             if not relation.mode == 'tab':
                 continue
             entity_for_links = self.entity
-            if relation.via_location and self.entity.class_.name == 'place':
+            if self.entity.class_.name == 'place' \
+                    and relation.reverse_relation \
+                    and relation.reverse_relation.classes \
+                    == ['object_location']:
                 entity_for_links = self.entity.location
             items = []
             for item in entity_for_links.get_links(
