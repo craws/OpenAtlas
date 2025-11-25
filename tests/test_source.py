@@ -1,6 +1,7 @@
 from flask import url_for
 
 from openatlas import app
+from openatlas.models.entity import Entity
 from tests.base import TestBaseCase, insert
 
 
@@ -95,17 +96,19 @@ class SourceTest(TestBaseCase):
 
         with app.test_request_context():
             app.preprocess_request()
+            source = Entity.get_by_id(source_id)
             translation_2 = insert(
                 'source_translation',
                 'new translation',
                 ('The <mark meta="{"annotationId":"c27",'
+                 f'"entityId":{artifact.id},'
                  '"comment":"nice"}">Bible</mark>,'
                  ' also referred to as the Book of the living'))
-            # todo: get source as entity and link it to translation,
-            #   then remove the link and test the orphan functions.
-            # iiif_file.delete_links('P67', classes=['file', 'place'])
+            source.link('P73', translation_2)
+            source.delete_links('P67', ['artifact'])
 
-        # assert b'+' in rv.data
+        rv = c.get(url_for('orphans'))
+        print(rv.data)
 
         rv = c.get(
             url_for('delete', id_=translation_id),

@@ -149,6 +149,18 @@ def remove_entity_from_annotation_image(
         {'annotation_id': annotation_id, 'entity_id': entity_id})
 
 
+def remove_entity_from_annotation_text(
+        annotation_id: int,
+        entity_id: int) -> None:
+    g.cursor.execute(
+        """
+        UPDATE model.annotation_text
+        SET entity_id = NULL
+        WHERE id = %(annotation_id)s AND entity_id = %(entity_id)s;
+        """,
+        {'annotation_id': annotation_id, 'entity_id': entity_id})
+
+
 def insert_annotation_text(data: dict[str, Any]) -> None:
     g.cursor.execute(
         """

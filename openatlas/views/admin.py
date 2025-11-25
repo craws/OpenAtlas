@@ -738,13 +738,12 @@ def admin_annotation_image_relink(origin_id: int, entity_id: int) -> Response:
     flash(_('entities relinked'), 'info')
     return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
 
+
 @app.route('/admin/annotation/text/relink/<int:origin_id>/<int:entity_id>')
 @required_group('editor')
 def admin_annotation_text_relink(origin_id: int, entity_id: int) -> Response:
-    # todo: check if origin_id is really source and not translation
-    #   and link it to the source, not the translation
-    image = Entity.get_by_id(origin_id)
-    image.link('P67', Entity.get_by_id(entity_id))
+    source = Entity.get_by_id(origin_id)
+    source.link('P67', Entity.get_by_id(entity_id))
     flash(_('entities relinked'))
     return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
 
@@ -759,13 +758,13 @@ def admin_annotation_image_remove_entity(
     flash(_('entity removed from annotation'))
     return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
 
+
 @app.route(
     '/admin/annotation/text/remove/<int:annotation_id>/<int:entity_id>')
 @required_group('editor')
 def admin_annotation_text_remove_entity(
         annotation_id: int,
         entity_id: int) -> Response:
-    # todo: make the function
     AnnotationText.remove_entity_from_annotation(annotation_id, entity_id)
     flash(_('entity removed from annotation'), 'info')
     return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
@@ -1094,6 +1093,6 @@ def get_orphaned_text_annotations() -> list[Any]:
                 js=f"return confirm('{_('remove entity')}?')"),
             link(
                 _('delete annotation'),
-                url_for('admin_annotation_text_delete', id_=annotation.id),
+                url_for('admin_annotation_text_delete', id_=source.id),
                 js=f"return confirm('{_('delete annotation')}?')")])
     return rows
