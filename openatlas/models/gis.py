@@ -6,6 +6,7 @@ from typing import Any, Optional, TYPE_CHECKING
 
 from flask import g, json
 
+from openatlas import app
 from openatlas.database import gis as db
 from openatlas.display.util2 import sanitize
 
@@ -97,8 +98,14 @@ class Gis:
                     if row['name'] else '',
                     'description': description,
                     'shapeType': row['type']}}
+            color_map = app.config["MAP_TYPEID_COLOR"]
+            item["properties"]["color"] = color_map.get('default')
             if 'types' in row and row['types']:
                 type_ids = ast.literal_eval(f"[{row['types']}]")
+                for id in color_map:
+                    if (id != "default" and int(id) in type_ids):
+                        item["properties"]["color"] = color_map.get(id)
+                        break
                 for type_id in list(set(type_ids)):
                     type_ = g.types[type_id]
                     if type_.root and g.types[type_.root[0]].name == 'Place':

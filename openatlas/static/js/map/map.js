@@ -147,7 +147,11 @@ const pointLayer = new L.GeoJSON(gisAll, {
   filter: pointFilter,
   onEachFeature: setPopup(false),
   pointToLayer: function (feature, latlng) {
-    return L.circleMarker(latlng, myCircleStyle);
+    const newCircleStyle = {
+      ...myCircleStyle,
+      fillColor: feature.properties.color ?? myCircleStyle.fillColor
+    }
+    return L.circleMarker(latlng, newCircleStyle);
   },
 });
 const polygonLayer = new L.GeoJSON(gisAll, {
