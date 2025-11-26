@@ -99,3 +99,7 @@ ARCHE_METADATA = {
     'relatedDiscipline': [],
     'typeIds': [],
     'excludeReferenceSystems': []}
+
+MAP_TYPEID_COLOR = {
+    "default": "#007bd9",
+    "123": "#007bd9"}
