@@ -1,7 +1,7 @@
 from typing import Any
 
 from flask import flash, g, json, render_template, request, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import LazyString, lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
@@ -21,7 +21,7 @@ from openatlas.models.tools import (
     SexEstimation, get_carbon_link, get_sex_types, update_carbon)
 
 
-def name_result(result: float) -> str:
+def name_result(result: float) -> str | LazyString:
     # Needed for translations
     _('female')
     _('likely female')

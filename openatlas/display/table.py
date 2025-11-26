@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, Optional
 
 from flask import g, json, render_template, url_for
-from flask_babel import format_number, lazy_gettext as _
+from flask_babel import LazyString, format_number, lazy_gettext as _
 from flask_login import current_user
 
 from openatlas import app
@@ -30,7 +30,7 @@ class Table:
 
     def __init__(
             self,
-            columns: Optional[list[str]] = None,
+            columns: Optional[list[str | LazyString]] = None,
             rows: Optional[list[Any]] = None,
             order: Optional[list[list[int | str]]] = None,
             defs: Optional[list[dict[str, Any]]] = None,

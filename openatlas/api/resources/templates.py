@@ -152,7 +152,7 @@ def linked_places_template(parser: Parser) -> dict[str, Type[String]]:
         feature['links'] = fields.List(fields.Nested(links))
     if 'depictions' in show:
         feature['depictions'] = fields.List(fields.Nested(depictions))
-    feature['geometry'] = fields.Raw
+    feature['geometry'] = fields.Raw  # type: ignore
 
     return {
         '@context': fields.String,

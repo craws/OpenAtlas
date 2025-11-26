@@ -68,7 +68,7 @@ class AnnotationText:
         self.id = data['id']
         self.source_id = data['source_id']
         self.entity_id = data['entity_id']
-        self.source_root = data.get('source_root') # for orphan checks
+        self.source_root = data.get('source_root')  # for orphan checks
         self.link_start = data['link_start']
         self.link_end = data['link_end']
         self.text = data['text']

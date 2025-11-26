@@ -44,7 +44,9 @@ def get_locale() -> str:
     best_match = request.accept_languages.best_match(app.config['LANGUAGES'])
     return best_match or g.settings['default_language']
 
+
 babel = Babel(app, locale_selector=get_locale)
+
 
 @app.before_request
 def before_request() -> Response | None:

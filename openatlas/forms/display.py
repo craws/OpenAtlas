@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, Optional
 
 from flask import g, render_template
-from flask_babel import lazy_gettext as _
+from flask_babel import LazyString, lazy_gettext as _
 from wtforms import Field, FileField, IntegerField, SelectField, StringField
 from wtforms.validators import Email
 
@@ -95,7 +95,7 @@ def html_form(
 def add_row(
         field: Optional[Field] = None,
         value: Optional[str] = None,
-        label: Optional[str] = None,
+        label: Optional[str | LazyString] = None,
         form_id: Optional[str] = None,
         row_css: Optional[str] = None) -> str:
     row_css = row_css or ''

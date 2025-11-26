@@ -300,7 +300,7 @@ def required_group(group: str) -> Any:
 
 
 def send_mail(
-        subject: str,
+        subject: str | LazyString,
         text: str,
         recipients: str | list[str],
         log_body: bool = True) -> bool:
@@ -476,7 +476,7 @@ def link(
 
 @app.template_filter()
 def button(
-        label: str,
+        label: str | LazyString,
         url: Optional[str] = None,
         id_: Optional[str] = None,
         onclick: Optional[str] = None,
@@ -521,7 +521,7 @@ def citation_example(code: str) -> str:
 
 
 @app.template_filter()
-def display_info(data: dict[str, Any]) -> str:
+def display_info(data: dict[str | LazyString, Any]) -> str:
     return render_template('util/info_data.html', data=data)
 
 

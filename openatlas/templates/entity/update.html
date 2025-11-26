@@ -14,7 +14,7 @@
           {{ entity.class_.group['name']|citation_example|safe }}
         </div>
       </div>
-      {% if entity.class_.attributes.get('location'): %}
+      {% if entity.class_.attributes.get('location') %}
         <div class="col-lg-5 d-flex align-items-stretch">
           <div onclick="toggleMapWidth(this)" class="d-none btn btn-light d-lg-flex align-items-center"><i
               class="fas fa-chevron-right"></i></div>

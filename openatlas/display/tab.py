@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from typing import Optional, TYPE_CHECKING
 
-from flask_babel import lazy_gettext as _
+
+from flask_babel import LazyString, lazy_gettext as _
 from flask_wtf import FlaskForm
 
 from openatlas.display.table import Table
@@ -16,14 +17,14 @@ class Tab:
 
     def __init__(
             self,
-            name: str,
-            label: Optional[str] = None,
-            content: Optional[str] = None,
+            name: str | LazyString,
+            label: Optional[str | LazyString] = None,
+            content: Optional[str | LazyString] = None,
             table: Optional[Table] = None,
-            buttons: Optional[list[str]] = None,
+            buttons: Optional[list[str | LazyString]] = None,
             entity: Optional[Entity] = None,
             form: Optional[FlaskForm] = None,
-            tooltip: Optional[str] = None) -> None:
+            tooltip: Optional[str | LazyString] = None) -> None:
 
         self.name = name
         self.label = uc_first(label or _(name.replace('_', ' ')))
@@ -32,4 +33,4 @@ class Tab:
         self.form = form
         self.table = table or Table()
         self.tooltip = uc_first(tooltip)
-        self.buttons: list[str] = buttons or []
+        self.buttons: list[str | LazyString] = buttons or []

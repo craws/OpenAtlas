@@ -2,7 +2,7 @@ from collections import defaultdict
 from typing import Any
 
 from flask import g, render_template, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import LazyString, lazy_gettext as _
 from flask_login import current_user
 from markupsafe import escape
 
@@ -24,7 +24,7 @@ from openatlas.views.tools import carbon_result, sex_result
 
 class Display:
     buttons: list[str]
-    data: dict[str, Any]
+    data: dict[str | LazyString, Any]
     tabs: dict[str, Tab]
 
     def __init__(self, entity: Entity) -> None:
