@@ -15,7 +15,7 @@ from openatlas.api.formats.csv import (
 from openatlas.api.formats.linked_places import (
     get_lp_file, get_lp_links, get_lp_time)
 from openatlas.api.formats.loud import get_loud_entities
-from openatlas.api.formats.rdf import rdf_output  # type: ignore
+from openatlas.api.formats.rdf import rdf_output
 from openatlas.api.resources.resolve_endpoints import (
     download, parse_loud_context)
 from openatlas.api.resources.templates import (

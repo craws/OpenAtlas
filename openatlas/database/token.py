@@ -17,7 +17,7 @@ def get_tokens(
         WHERE TRUE
             {'AND user_id = %(user_id)s' if int(user_id) else ''}
             {'AND revoked = %(revoked)s' if revoked != 'all' else ''}
-            {'AND valid_until ' + valid + ' timestamp %(timestamp)s' 
+            {'AND valid_until ' + valid + ' timestamp %(timestamp)s'
             if valid != 'all' else ''};
         """, {
             'user_id': user_id,
@@ -69,7 +69,9 @@ def revoke_all_tokens() -> None:
 def delete_invalid_tokens(inactive_user_ids: list[int]) -> None:
     g.cursor.execute(f"""
         DELETE FROM web.user_tokens
-        WHERE revoked = true OR valid_until < '{str(datetime.now())}' OR user_id IN %(inactive_user_ids)s;
+        WHERE revoked = true 
+            OR valid_until < '{str(datetime.now())}' 
+            OR user_id IN %(inactive_user_ids)s;
     """, {'inactive_user_ids': tuple(inactive_user_ids)})
 
 

@@ -1,4 +1,3 @@
-# type: ignore
 from __future__ import annotations
 
 import os
@@ -130,13 +129,16 @@ def _add_triples_from_linked_art(
             la_base = ctx.get("la") or "https://linked.art/ns/terms/"
             type_uri = la_base + data_type
 
+        if not type_uri:  # pragma: no cover - mypy
+            return
+
         graph.add((subject, RDF.type, URIRef(type_uri)))
 
     for key, value in data.items():
         if key in {"id", "type", "@context"}:
             continue
 
-        predicate = _resolve_predicate(key, data_type)  # <-- FIXED line
+        predicate = _resolve_predicate(key, data_type)
         if not predicate:  # pragma: no cover - mypy
             continue
 

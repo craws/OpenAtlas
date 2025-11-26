@@ -84,7 +84,7 @@ USER_AGENT = {
 CSP_HEADER = "frame-ancestors 'self'"
 
 # ARCHE export
-ACDH = Namespace("https://vocabs.acdh.oeaw.ac.at/schema#")  # type: ignore
+ACDH = Namespace("https://vocabs.acdh.oeaw.ac.at/schema#")
 ARCHE_URI_RULES = \
     'https://raw.githubusercontent.com/acdh-oeaw/arche-assets' \
     '/refs/heads/master/AcdhArcheAssets/uriNormRules.json'
