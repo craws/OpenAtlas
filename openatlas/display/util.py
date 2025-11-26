@@ -165,7 +165,12 @@ def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
         return \
             f'<a href="#" id="bookmark{entity_id}" onclick="{onclick}">' \
             f'{uc_first(label)}</a>'
-    return button(label, id_=f'bookmark{entity_id}', onclick=onclick)
+    return button(
+        label,
+        id_=f'bookmark{entity_id}',
+        onclick=onclick,
+        icon_name='fa-bookmark',
+        css_class='ms-2')
 
 
 def format_entity_date(
@@ -480,9 +485,12 @@ def button(
         url: Optional[str] = None,
         id_: Optional[str] = None,
         onclick: Optional[str] = None,
-        tooltip_text: Optional[str] = None) -> str:
+        tooltip_text: Optional[str] = None,
+        variant: Optional[str] = None,
+        icon_name: Optional[str] = None,
+        css_class: Optional[str] = '') -> str:
     tag = 'a' if url else 'span'
-    css = 'secondary' if id_ in ['date-switcher'] else 'primary'
+    css = variant or ('secondary' if id_ in ['date-switcher'] else 'primary')
     if url and '/insert' in url and label != _('link'):
         label = f'+ <span class="uc-first d-inline-block">{label}</span>'
     tooltip_ = ''
@@ -490,15 +498,18 @@ def button(
         tooltip_ = \
             'data-bs-toggle="tooltip" data-bs-placement="top" ' \
             f'title="{uc_first(tooltip_text)}"'
+    icon_ = ''
+    if icon_name:
+        icon_ = f'<i class="fas {icon_name} ms-2"></i>'
     return f"""
         <{tag}
             {f'href="{url}"' if url else ''}
             {f'id="{id_}"' if id_ else ''}
-            class="{app.config['CSS']['button'][css]} uc-first"
+            class="{app.config['CSS']['button'][css]} uc-first {css_class}"
             {f'onclick="{onclick}"' if onclick else ''}
             tabindex="0"
             role="button"
-            {tooltip_}>{label}</{tag}>"""
+            {tooltip_}>{label}{icon_}</{tag}>"""
 
 
 @app.template_filter()
