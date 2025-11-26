@@ -101,11 +101,14 @@ def check_single_type_duplicates(type_ids: list[str]) -> list[str]:
 def import_data_(project: Project, class_: str, data: list[Any]) -> None:
     entities: dict[str | int, dict[str, Any]] = {}
     for row in data:
+
         if value := row.get('openatlas_class'):
             if value.lower().replace(' ', '_') in (
                     g.class_groups['place']['classes'] +
                     g.class_groups['artifact']['classes']):
                 class_ = value.lower().replace(' ', '_')
+        if row.get('id') == 'strati_1':
+            print('here 0')
         description = row.get('description')
         insert_data = {
             'name': row['name'],
@@ -117,15 +120,24 @@ def import_data_(project: Project, class_: str, data: list[Any]) -> None:
             'end_from': row.get('end_from', None),
             'end_to': row.get('end_to', None),
             'end_comment': row.get('end_comment', None)}
+        if row.get('id') == 'strati_1':
+            print('here 1')
         if class_ in ['place', 'person', 'group'] and row.get('alias'):
             insert_data['alias'] = row.get('alias').split(";")
+        if row.get('id') == 'strati_1':
+            print('here 2')
         if class_ in g.class_groups['place']['classes'] \
                 + g.class_groups['artifact']['classes']:
             gis_data = {'point': '[]', 'line': '[]', 'polygon': '[]'}
             if coordinates := row.get('wkt'):
                 gis_data = get_coordinates_from_wkt(coordinates)
             insert_data['gis'] = gis_data
+        if row.get('id') == 'strati_1':
+            print('here 4')
         tmp_entity = insert(insert_data)
+        if row.get('id') == 'strati_1':
+            print('here 5')
+
         # Get entity locations
         entity = Entity.get_by_id(tmp_entity.id, with_location=True)
         db.import_data(
@@ -266,12 +278,12 @@ def get_coordinates_from_wkt(coordinates: str) -> dict[str, Any]:
         wkt_ = None
     geometries = []
     if wkt_:
-        if wkt_.geom_type in [
-                'MultiPoint',
-                'MultiLineString',
-                'MultiPolygon',
-                'GeometryCollection']:
-            for poly in wkt_:
+        if wkt_.geom_type in {
+                "MultiPoint",
+                "MultiLineString",
+                "MultiPolygon",
+                "GeometryCollection"}:
+            for poly in wkt_.geoms:
                 geometries.append(convert_wkt_to_geojson(poly))
         else:
             geometries.append(convert_wkt_to_geojson(wkt_))
@@ -285,7 +297,7 @@ def get_coordinates_from_wkt(coordinates: str) -> dict[str, Any]:
 def convert_wkt_to_geojson(
         wkt_: Polygon | Point | LineString) -> dict[str, Any]:
     shape_type = ''
-    match str(wkt_.type).lower():  # wkt_.geom_type for 2.1.0
+    match wkt_.geom_type.lower():
         case 'point':
             shape_type = 'centerpoint'
         case 'linestring':
@@ -294,7 +306,7 @@ def convert_wkt_to_geojson(
             shape_type = 'shape'
     return {
         "type": "Feature",
-        "geometry": mapping(wkt_),  # wkt_.to_geojson() for 2.1.0
+        "geometry": mapping(wkt_),
         "properties": {
             "name": "",
             "description": "",

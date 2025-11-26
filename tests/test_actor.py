@@ -65,7 +65,6 @@ class ActorTests(TestBaseCase):
             url_for('insert', class_='person'),
             data=data,
             follow_redirects=True)
-        print(url_for('insert', class_='person', origin_id=place.id))
         assert b'An entry has been created' in rv.data
 
         rv = c.post(
