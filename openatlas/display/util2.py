@@ -18,7 +18,9 @@ from openatlas import app
 
 
 @app.template_filter()
-def sanitize(string: str | None, mode: Optional[str] = None) -> Optional[str]:
+def sanitize(
+        string: str | None,
+        mode: Optional[str] = None) -> Optional[str]:
     if not string:
         return None
     if mode == 'ascii':

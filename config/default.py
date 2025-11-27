@@ -100,6 +100,8 @@ ARCHE_METADATA = {
     'typeIds': [],
     'excludeReferenceSystems': []}
 
-MAP_TYPEID_COLOR = {
-    "default": "#007bd9",
-    "123": "#007bd9"}
+# Configure map point colors
+# Defined colors for type_ids override the default, top ones are prioritised
+MAP_TYPE_COLOR = {
+    'default': '#007bd9',
+    '123': '#007bd9'}
