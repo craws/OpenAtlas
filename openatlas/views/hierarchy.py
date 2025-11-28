@@ -91,10 +91,9 @@ def hierarchy_update(id_: int) -> str | Response:
                 flash(_('error transaction'), 'error')
                 abort(418)
             flash(_('info update'))
-            tab = 'value' if g.types[id_].category == 'value' else 'custom'
             return redirect(
                 f"{url_for('index', group='type')}"
-                f"#menu-tab-{tab}_collapse-{hierarchy.id}")
+                f"#menu-tab-{g.types[id_].category}_collapse-{hierarchy.id}")
     if hasattr(form, 'multiple') and has_multiple_links and hierarchy.multiple:
         form.multiple.render_kw = {'disabled': 'disabled'}
     table = Table(['class', 'count'], paging=False)

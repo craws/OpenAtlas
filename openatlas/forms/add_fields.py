@@ -65,7 +65,6 @@ def add_reference_systems(form: Any, class_: OpenatlasClass) -> None:
                     for id_ in g.reference_match_type.subs],
                 reference_system_id=system.id,
                 default={
-                    'value': '',
                     'precision': str(next(iter(system.types)).id)
                     if system.types else None}))
 
@@ -75,7 +74,10 @@ def add_description(
         entity: Entity,
         origin: Optional[Entity] = None) -> None:
     attribute_description = entity.class_.attributes['description']
-    if entity.category == 'value':
+    if (entity.category == 'value' and entity.root) or (
+            entity.class_.name == 'type'
+            and origin
+            and origin.category == 'value'):
         setattr(form, 'description', StringField(_('unit')))
         return
     if 'annotated' not in attribute_description:
