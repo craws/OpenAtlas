@@ -630,7 +630,7 @@ def display_annotation_text_links(entity: Entity) -> str:
 
 
 def hierarchy_crumbs(entity: Entity) -> list[str]:
-    crumbs = [link(entity, index=True)]
+    crumbs: list[Any] = [link(entity, index=True)]
     if entity.class_.group['name'] == 'type':
         return crumbs + [
             g.types[id_] for id_ in entity.root] if entity.root else crumbs

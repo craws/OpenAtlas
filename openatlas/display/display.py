@@ -112,6 +112,7 @@ class Display:
                 continue
             entity_for_links = self.entity
             if self.entity.class_.name == 'place' \
+                    and self.entity.location \
                     and relation.reverse_relation \
                     and relation.reverse_relation.classes \
                     == ['object_location']:
@@ -221,8 +222,8 @@ class Display:
         if empty_tabs:
             self.tabs['additional'] = Tab(
                 'additional',
-                '+ ' + uc_first(_('relation')),
-                '')
+                '+ ' + uc_first(_('relation')))
+            self.tabs['additional'].content = ''
             for name in empty_tabs:
                 if self.tabs[name].buttons:
                     self.tabs['additional'].content += \
