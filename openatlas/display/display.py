@@ -10,11 +10,13 @@ from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.table import entity_table
 from openatlas.display.util import (
-    bookmark_toggle, button, button_bar, description,
-    display_annotation_text_links, format_entity_date, get_appearance,
-    get_chart_data, get_file_path, get_system_data, link, reference_systems)
+    bookmark_toggle, button, button_bar, description, format_entity_date,
+    get_appearance, get_chart_data, get_file_path, get_system_data, link,
+    reference_systems)
 from openatlas.display.util2 import (
-    display_bool, is_authorized, manual, uc_first)
+    display_bool, is_authorized, manual, sanitize, uc_first)
+from openatlas.forms.util import deletion_possible
+from openatlas.models.annotation import AnnotationText
 from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
@@ -88,7 +90,7 @@ class Display:
                 label = self.entity.class_.attributes['description']['label']
             if 'annotated' in self.entity.class_.attributes['description'] \
                     and self.entity.class_.attributes['description']:
-                description_ = display_annotation_text_links(self.entity)
+                description_ = annotation_text_links(self.entity)
         if self.entity.category != 'value':
             text += description(description_, label)
 
@@ -314,7 +316,6 @@ class Display:
                     url_for('type_unset_selectable', id_=self.entity.id)))
 
     def add_button_delete(self) -> None:
-        from openatlas.views.entity import deletion_possible
         if not deletion_possible(self.entity):
             return
         msg = _(
@@ -421,3 +422,26 @@ class Display:
                     self.data[_('selectable')] = display_bool(
                         self.entity.selectable)
                     self.data[_('ID for imports')] = self.entity.id
+
+
+def annotation_text_links(entity: Entity) -> str:
+    offset = 0
+    text = entity.description or ''
+    for annotation in AnnotationText.get_by_source_id(entity.id):
+        if not annotation.text and not annotation.entity_id:
+            continue  # pragma: no cover
+        title = f'title="{sanitize(annotation.text)}"' \
+            if annotation.text else ''
+        if annotation.entity_id:
+            tag_open = f'<a href="/entity/{annotation.entity_id}" {title}>'
+            tag_close = '</a>'
+        else:
+            tag_open = f'<span style="color:green;" {title}>'
+            tag_close = '</span>'
+        position = annotation.link_start + offset
+        text = text[:position] + tag_open + text[position:]
+        offset += len(tag_open)
+        position = annotation.link_end + offset
+        text = text[:position] + tag_close + text[position:]
+        offset += len(tag_close)
+    return text

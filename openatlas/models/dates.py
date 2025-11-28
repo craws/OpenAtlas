@@ -5,6 +5,8 @@ from typing import Any, Optional
 
 import numpy
 
+from openatlas.display.util2 import sanitize
+
 
 class Dates:
     def __init__(self, data: dict[str, Any]) -> None:
@@ -22,7 +24,6 @@ class Dates:
             if self.end_to else None
 
     def to_timestamp(self) -> dict[str, Any]:
-        from openatlas.display.util2 import sanitize
         return {
             'begin_from': datetime64_to_timestamp(self.begin_from),
             'begin_to':  datetime64_to_timestamp(self.begin_to),

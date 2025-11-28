@@ -19,8 +19,33 @@ from openatlas.forms.field import (
     TableField, TableMultiField, TextAnnotationField, TreeField,
     TreeMultiField, ValueTypeField, ValueTypeRootField)
 from openatlas.models.dates import check_if_entity_has_time
-from openatlas.models.entity import Entity, Link
+from openatlas.models.entity import Entity, Link, get_entity_ids_with_links
 from openatlas.models.openatlas_class import OpenatlasClass, Relation
+
+
+def filter_entities(
+        entity: Entity,
+        items: list[Entity],
+        relation: Relation,
+        is_link_form: bool = False) -> list[Entity]:
+    filter_ids = [entity.id] if relation.name != 'relative' else []
+    if relation.name in ['subs', 'super']:
+        filter_ids += [
+            e.id for e in entity.get_linked_entities_recursive(
+                relation.property,
+                relation.name == 'subs')]
+    if is_link_form:
+        if relation.reverse_relation \
+                and not relation.reverse_relation.multiple:
+            filter_ids += get_entity_ids_with_links(
+                relation.property,
+                relation.classes,
+                relation.inverse)
+        filter_ids += [
+            e.id for e in entity.get_linked_entities(
+                relation.property,
+                inverse=relation.inverse)]
+    return [item for item in items if item.id not in filter_ids]
 
 
 def add_name_fields(form: Any, entity: Entity) -> None:
@@ -147,7 +172,6 @@ def add_relations(
         entity: Entity,
         origin: Entity | None,
         origin_relation: str | None) -> None:
-    from openatlas.forms.form import filter_entities
     entities = {}  # Collect entities per class to prevent multiple fetching
     for name, relation in entity.class_.relations.items():
         if relation.mode != 'direct':

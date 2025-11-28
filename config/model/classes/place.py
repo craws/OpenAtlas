@@ -86,16 +86,6 @@ place: dict[str, Any] = {
             'inverse': True,
             'tab': {
                 'buttons': ['insert']}},
-        #'performed_in': {
-        #    'label': _('performed in'),
-        #    'classes': class_groups['actor']['classes'],
-        #    'property': 'OA9',  # Todo: Link to event
-        #    'inverse': True},
-        #'participated': {
-        #    'label': _('participated in'),
-        #    'classes': class_groups['actor']['classes'],
-        #    'property': 'OA9',  # Todo: Link to event
-        #    'inverse': True},
         'reference': standard_relations['reference'],
         'file': standard_relations['file']},
     'display': {

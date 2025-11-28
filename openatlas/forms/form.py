@@ -13,39 +13,15 @@ from wtforms.validators import InputRequired, URL
 from openatlas import app
 from openatlas.display.table import entity_table
 from openatlas.display.util2 import uc_first
-from openatlas.forms.add_fields import add_date_fields, add_type
+from openatlas.forms.add_fields import (
+    add_date_fields, add_type, filter_entities)
 from openatlas.forms.field import (
     LinkTableField, SubmitField, TableCidocField, TableField, TableMultiField,
     TreeField)
 from openatlas.forms.populate import populate_dates
 from openatlas.forms.validation import validate
-from openatlas.models.entity import Entity, Link, get_entity_ids_with_links
+from openatlas.models.entity import Entity, Link
 from openatlas.models.openatlas_class import Relation
-
-
-def filter_entities(
-        entity: Entity,
-        items: list[Entity],
-        relation: Relation,
-        is_link_form: bool = False) -> list[Entity]:
-    filter_ids = [entity.id] if relation.name != 'relative' else []
-    if relation.name in ['subs', 'super']:
-        filter_ids += [
-            e.id for e in entity.get_linked_entities_recursive(
-                relation.property,
-                relation.name == 'subs')]
-    if is_link_form:
-        if relation.reverse_relation \
-                and not relation.reverse_relation.multiple:
-            filter_ids += get_entity_ids_with_links(
-                relation.property,
-                relation.classes,
-                relation.inverse)
-        filter_ids += [
-            e.id for e in entity.get_linked_entities(
-                relation.property,
-                inverse=relation.inverse)]
-    return [item for item in items if item.id not in filter_ids]
 
 
 def annotate_image_form(
