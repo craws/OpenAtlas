@@ -11,37 +11,27 @@ from config.model.model import model
 from openatlas.database import openatlas_class as db
 
 
+@dataclass
 class OpenatlasClass:
-    def __init__(
-            self,
-            name: str,
-            cidoc_class: str | None,
-            hierarchies: list[int],
-            reference_system_ids: list[int],
-            new_types_allowed: bool,
-            standard_type_id: int | None,
-            write_access: str | None,
-            model_: dict[str, Any]) -> None:
-        self.name = name
-        self.cidoc_class = g.cidoc_classes[cidoc_class] \
-            if cidoc_class else None
-        self.hierarchies = hierarchies
-        self.standard_type_id = standard_type_id
-        self.write_access = write_access or 'contributor'
-        self.reference_systems = reference_system_ids
-        self.new_types_allowed = new_types_allowed
+    name: str
+    cidoc_class: str
+    hierarchies: list[int]
+    reference_systems: list[int]
+    new_types_allowed: bool
+    standard_type_id: int | None
+    write_access: str
+    attributes: dict[str, Any]
+    relations: dict[str, Any]
+    display: dict[str, Any]
+    extra: dict[str, Any]
+
+    def __post_init__(self) -> None:
         self.group = {}
         for data in g.class_groups.values():
-            if name in data['classes']:
+            if self.name in data['classes']:
                 self.group = data
-        label = model_.get('label', _(name.replace('_', ' ')))
-        self.label = str(label)[0].upper() + str(label)[1:]
-        self.attributes = model_['attributes']
-        self.relations = {}
-        for name_, relation in model_['relations'].items():
-            self.relations[name_] = Relation(name_, **relation)
-        self.display = model_['display']
-        self.extra = model_['extra']
+        self.label = _(self.name.replace('_', ' '))
+        self.label = str(self.label)[0].upper() + str(self.label)[1:]
 
 
 @dataclass
@@ -79,16 +69,23 @@ def get_classes() -> dict[str, OpenatlasClass]:
     g.class_groups = class_groups
     classes = {}
     for row in db.get_classes():
+        model_ = get_model(row['name'])
+        relations = {}
+        for name_, relation in model_['relations'].items():
+            relations[name_] = Relation(name_, **relation)
         classes[row['name']] = OpenatlasClass(
             name=row['name'],
-            model_=get_model(row['name']),
-            cidoc_class=row['cidoc_class_code'],
+            cidoc_class=g.cidoc_classes[row['cidoc_class_code']],
             standard_type_id=row['standard_type_id'],
-            reference_system_ids=row['system_ids']
+            reference_systems=row['system_ids']
             if row['system_ids'] else [],
             new_types_allowed=row['new_types_allowed'],
             write_access=row['write_access_group_name'],
-            hierarchies=row['hierarchies'])
+            hierarchies=row['hierarchies'],
+            attributes=model_['attributes'],
+            relations=relations,
+            display=model_['display'],
+            extra=model_['extra'])
     for class_ in classes.values():
         for relation in class_.relations.values():
             if not relation.classes:
