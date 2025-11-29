@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from typing import Any
 
 from flask import g
@@ -38,29 +39,31 @@ class OpenatlasClass:
         self.attributes = model_['attributes']
         self.relations = {}
         for name_, relation in model_['relations'].items():
-            self.relations[name_] = Relation(name_, relation)
+            self.relations[name_] = Relation(name_, **relation)
         self.display = model_['display']
         self.extra = model_['extra']
 
 
+@dataclass
 class Relation:
-    def __init__(self, name: str, data: dict[str, Any]) -> None:
-        self.name = name
-        self.property = data['property']
-        self.classes = data['classes'] if isinstance(data['classes'], list) \
-            else [data['classes']]
-        self.inverse = data.get('inverse', False)
-        self.multiple = data.get('multiple', False)
-        self.required = data.get('required', False)
-        self.label = data.get('label', _(self.name.replace('_', ' ')))
-        self.mode = data.get('mode', 'tab')
-        self.add_dynamic = data.get('add_dynamic', False)
-        self.tooltip = data.get('tooltip')
-        self.additional_fields = data.get('additional_fields', [])
-        self.type = data.get('type')
-        self.reverse_relation: Relation | None = None
+    name: str
+    property: str
+    classes: list[str]
+    inverse: bool = False
+    multiple: bool = False
+    required: bool = False
+    label: str = ''
+    mode: str = 'tab'
+    add_dynamic: bool = False
+    tooltip: str | None = None
+    additional_fields: list[str] = field(default_factory=list)
+    type: str | None = None
+    reverse_relation: Relation | None = None
+    tab: dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        self.label = self.label or _(self.name.replace('_', ' '))
         if self.mode == 'tab':
-            self.tab = data.get('tab', {})
             self.tab['additional_columns'] = \
                 self.tab.get('additional_columns', [])
             self.tab['buttons'] = self.tab.get('buttons', [])

@@ -82,7 +82,7 @@ standard_relations = {
             'columns': ['name', 'class', 'type', 'page', 'description'],
             'buttons': ['link', 'insert']}},
     'source': {
-        'classes': 'source',
+        'classes': ['source'],
         'property': 'P67',
         'inverse': True,
         'multiple': True,

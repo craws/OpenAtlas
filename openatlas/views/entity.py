@@ -40,18 +40,18 @@ def view(id_: int) -> str | Response:
         case 'reference_system':
             entity.class_.relations = {}
             for name in entity.classes:
-                entity.class_.relations[name] = Relation(name, {
-                    'name': name,
-                    'label': _(name.replace('_', ' ')),
-                    'classes': [name],
-                    'property': 'P67',
-                    'multiple': True,
-                    'tab': {
+                entity.class_.relations[name] = Relation(
+                    name=name,
+                    label=_(name.replace('_', ' ')),
+                    classes=[name],
+                    property='P67',
+                    multiple=True,
+                    tab={
                         'buttons': ['remove_reference_system_class'],
                         'columns': [
                             'name',
                             'external_reference_match',
-                            'precision']}})
+                            'precision']})
     display = Display(entity)
     return render_template(
         'tabs.html',

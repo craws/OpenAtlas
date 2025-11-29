@@ -17,19 +17,19 @@ group: dict[str, Any] = {
     'relations': {
         'residence': {
             'label': _('residence'),
-            'classes': 'object_location',
+            'classes': ['object_location'],
             'property': 'P74',
             'mode': 'direct',
             'add_dynamic': True},
         'begins_in': {
             'label': _('begins in'),
-            'classes': 'object_location',
+            'classes': ['object_location'],
             'property': 'OA8',
             'mode': 'direct',
             'add_dynamic': True},
         'ends_in': {
             'label': _('ends in'),
-            'classes': 'object_location',
+            'classes': ['object_location'],
             'property': 'OA9',
             'mode': 'direct',
             'add_dynamic': True},
@@ -62,14 +62,14 @@ group: dict[str, Any] = {
                     'begin', 'end', 'description']}},
         'move': {
              'label': _('move'),
-             'classes': 'move',
+             'classes': ['move'],
              'property': 'P25',
              'inverse': True,
              'tab': {
                  'buttons': ['insert']}},
         'donor': {
             'label': _('donor'),
-            'classes': 'acquisition',
+            'classes': ['acquisition'],
             'property': 'P23',
             'inverse': True,
             'tab': {
@@ -77,7 +77,7 @@ group: dict[str, Any] = {
                 'columns': ['name', 'type', 'begin', 'end', 'description']}},
         'recipient': {
             'label': _('recipient'),
-            'classes': 'acquisition',
+            'classes': ['acquisition'],
             'property': 'P22',
             'inverse': True,
             'tab': {
@@ -95,7 +95,7 @@ group: dict[str, Any] = {
                     ['type_link', 'name', 'begin', 'end', 'description']}},
         'member_of': {
             'label': _('member of'),
-            'classes': 'group',
+            'classes': ['group'],
             'property': 'P107',
             'inverse': True,
             'type': 'Actor function',
