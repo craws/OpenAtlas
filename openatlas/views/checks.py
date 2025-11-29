@@ -131,7 +131,7 @@ def check_similar() -> str:
     form.classes.choices = [
         (class_.name, class_.label)
         for name, class_ in g.classes.items() if class_.group]
-    table = None
+    table = Table()
     if form.validate_on_submit():
         table = Table(['name', _('count')])
         for item in similar_named(form.classes.data, form.ratio.data).values():

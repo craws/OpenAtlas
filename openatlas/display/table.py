@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from typing import Any, Optional
 
 from flask import g, json, render_template, url_for
@@ -26,20 +27,13 @@ _('entries')
 _('showing %(first)s to %(last)s of %(all)s entries', first=1, last=25, all=38)
 
 
+@dataclass
 class Table:
-
-    def __init__(
-            self,
-            columns: Optional[list[str]] = None,
-            rows: Optional[list[Any]] = None,
-            order: Optional[list[list[int | str]]] = None,
-            defs: Optional[list[dict[str, Any]]] = None,
-            paging: bool = True) -> None:
-        self.columns = columns or []
-        self.rows = rows or []
-        self.paging = paging
-        self.order = order or ''
-        self.defs = defs or []
+    columns: list[str] = field(default_factory=list)
+    rows: list[Any] = field(default_factory=list)
+    order: list[Any] = field(default_factory=list)
+    defs: list[Any] = field(default_factory=list)
+    paging: bool = True
 
     def display(self, name: str = 'default') -> str:
         if not self.rows:
@@ -91,11 +85,11 @@ def entity_table(
             default_columns = item.range.class_.group['table_columns']
     else:
         default_columns = item.class_.group['table_columns']
-    defs = None
+    defs = []
     forms = forms or {}
     columns = (columns or default_columns) + (additional_columns or [])
 
-    order: Optional[list[list[int | str]]] = None
+    order = []
     if forms.get('checkbox'):
         columns.insert(0, 'checkbox')
         order = [[0, 'desc'], [1, 'asc']]

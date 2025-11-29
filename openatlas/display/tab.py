@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from typing import Optional, TYPE_CHECKING
 
 from flask_babel import lazy_gettext as _
@@ -12,24 +13,18 @@ if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
 
 
+@dataclass
 class Tab:
+    name: str
+    label: Optional[str] = None
+    content: Optional[str] = None
+    table: Table = field(
+        default_factory=lambda: Table())  # pylint: disable=unnecessary-lambda
+    buttons: list[str] = field(default_factory=list)
+    entity: Optional[Entity] = None
+    form: Optional[FlaskForm] = None
+    tooltip: Optional[str] = None
 
-    def __init__(
-            self,
-            name: str,
-            label: Optional[str] = None,
-            content: Optional[str] = None,
-            table: Optional[Table] = None,
-            buttons: Optional[list[str]] = None,
-            entity: Optional[Entity] = None,
-            form: Optional[FlaskForm] = None,
-            tooltip: Optional[str] = None) -> None:
-
-        self.name = name
-        self.label = uc_first(label or _(name.replace('_', ' ')))
-        self.content = content
-        self.entity = entity
-        self.form = form
-        self.table = table or Table()
-        self.tooltip = uc_first(tooltip)
-        self.buttons: list[str] = buttons or []
+    def __post_init__(self) -> None:
+        self.label = uc_first(self.label or _(self.name.replace('_', ' ')))
+        self.tooltip = uc_first(self.tooltip)

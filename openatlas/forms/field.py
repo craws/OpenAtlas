@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+# pylint: disable=too-few-public-methods
 import ast
 from typing import Any, Optional
 

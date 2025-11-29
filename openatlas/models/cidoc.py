@@ -14,9 +14,9 @@ class CidocClass:
     code: str
     comment: str
     count: int = 0
-    i18n: dict[str, str] = field(default_factory=lambda: {})
-    sub: list[CidocClass] = field(default_factory=lambda: [])
-    super: list[CidocClass] = field(default_factory=lambda: [])
+    i18n: dict[str, str] = field(default_factory=dict)
+    sub: list[CidocClass] = field(default_factory=list)
+    super: list[CidocClass] = field(default_factory=list)
 
 
 def cidoc_classes(
@@ -46,10 +46,10 @@ class CidocProperty:
     domain_class_code: str
     range_class_code: str
     count: int = 0
-    sub: list[int] = field(default_factory=lambda: [])
-    super: list[int] = field(default_factory=lambda: [])
-    i18n: dict[str, str] = field(default_factory=lambda: {})
-    i18n_inverse: dict[str, str] = field(default_factory=lambda: {})
+    sub: list[int] = field(default_factory=list)
+    super: list[int] = field(default_factory=list)
+    i18n: dict[str, str] = field(default_factory=dict)
+    i18n_inverse: dict[str, str] = field(default_factory=dict)
 
     def find_object(self, attr: str, class_id: int) -> bool:
         valid_domain_id = getattr(self, attr)
