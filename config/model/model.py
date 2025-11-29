@@ -6,11 +6,6 @@ from config.model.classes import (
     actor, artifact, event, file, place, reference, reference_system, source,
     type_)
 
-# Needed for translations
-_('involvement')
-_('actor function')
-_('actor relation')
-_('page')
 
 model: dict[str, Any] = {
     'acquisition': event.acquisition,

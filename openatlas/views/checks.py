@@ -173,7 +173,7 @@ def check_dates() -> str:
             'invalid_involvement_dates',
             _('invalid involvement dates'),
             table=Table(
-                ['actor', 'event', 'class', 'involvement', 'description'])),
+                ['actor', 'event', 'class', 'type', 'description'])),
         'preceding_dates': Tab(
             'invalid_preceding_dates',
             _('invalid preceding dates'),

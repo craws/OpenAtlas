@@ -24,7 +24,7 @@ class_ = {
             'tab': {
                 'buttons': ['link', 'insert'],
                 'columns': [
-                    'name', 'class', 'involvement',
+                    'name', 'class', 'type_link',
                     'begin', 'end', 'description']}},
         'participant': {
             'label': _('participant'),
@@ -36,7 +36,7 @@ class_ = {
             'tab': {
                 'buttons': ['link', 'insert'],
                 'columns': [
-                    'name', 'class', 'involvement',
+                    'name', 'class', 'type_link',
                     'begin', 'end', 'description']}},
         'subs': {
             'label': _('subs'),
