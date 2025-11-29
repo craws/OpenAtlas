@@ -49,8 +49,7 @@ def get_locale() -> str:
 
 @app.before_request
 def before_request() -> Response | None:
-    from openatlas.models.cidoc_class import get_cidoc_classes
-    from openatlas.models.cidoc_property import get_cidoc_properties
+    from openatlas.models.cidoc import cidoc_classes, cidoc_properties
     from openatlas.models.entity import Entity
     from openatlas.models.settings import Settings
 
@@ -71,10 +70,10 @@ def before_request() -> Response | None:
     if not g.admins_available \
             and request.endpoint not in ['first_admin', 'set_locale']:
         return redirect(url_for('first_admin'))
-    g.cidoc_classes = get_cidoc_classes(
+    g.cidoc_classes = cidoc_classes(
         session['language'],
         (request.path.startswith('/overview/model/cidoc_class_index')))
-    g.properties = get_cidoc_properties(
+    g.properties = cidoc_properties(
         session['language'],
         (request.path.startswith('/overview/model/property')))
     g.classes = get_classes()

@@ -21,8 +21,7 @@ from werkzeug.wrappers import Response
 from openatlas import app
 from openatlas.display.image_processing import check_processed_image
 from openatlas.display.util2 import convert_size, is_authorized, uc_first
-from openatlas.models.cidoc_class import CidocClass
-from openatlas.models.cidoc_property import CidocProperty
+from openatlas.models.cidoc import CidocClass, CidocProperty
 from openatlas.models.content import get_translation
 from openatlas.models.dates import Dates, format_date
 from openatlas.models.entity import Entity, Link
