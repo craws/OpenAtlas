@@ -254,8 +254,6 @@ class Display:
         self.buttons = []
         if manual_link := manual(f"entity/{self.entity.class_.group['name']}"):
             self.buttons.append(manual_link)
-        if self.entity.class_.name == 'source_translation':
-            self.buttons = [manual('entity/source')]
         self.add_button_update()
         for item in self.entity.class_.display['buttons']:
             match item:
@@ -269,7 +267,6 @@ class Display:
                                 copy='copy_'),
                             icon_name='fa-clone',
                             css_class='me-2'))
-
                 case 'download':
                     if path := get_file_path(self.entity.id):
                         self.buttons.append(
