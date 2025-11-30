@@ -176,6 +176,41 @@ Run tests with coverage
 
     pytest
 
+
+### OpenAPI schema tests
+OpenAtlas supports automated OpenAPI conformance tests by using Schemathesis.
+These tests run outside the production environment and require a local Python
+virtual environment with pip enabled.
+
+Create the virtual environment in the project root:
+
+    python3 -m venv .venv
+    source .venv/bin/activate
+    pip install --upgrade pip
+    pip install schemathesis
+
+Run the tests against a local OpenAtlas instance:
+
+    schemathesis run openatlas/api/openapi.json \
+        --url=http://127.0.0.1:5000/api/ \
+        --max-examples=3 \
+        --workers=1 \
+        --method=GET \
+        --exclude-path-regex="(table_rows|latest|query|cidoc_class|entities_linked_to_entity|system_class|type_entities|type_entities_all|view_class|linked_entities_by_properties_recursive)"
+
+Excluded endpoints (slow):
+
+    /table_rows/
+    /latest/
+    /query/
+    /cidoc_class/{cidoc_class}
+    /entities_linked_to_entity/{entityId}
+    /system_class/{system_class}
+    /type_entities/{entityId}
+    /type_entities_all/{entityId}
+    /view_class/{view_class}
+    /linked_entities_by_properties_recursive/{entityId}
+
 # Installing OpenAtlas with Docker (Experimental)
 
 A Docker setup is available for local development. Please follow the 
