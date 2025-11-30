@@ -20,8 +20,8 @@ class Dates:
             if self.begin_from else None
         self.last = format_date_part(self.end_from, 'year') \
             if self.end_from else None
-        self.last = format_date_part(self.end_to, 'year') \
-            if self.end_to else None
+        if self.end_from and self.end_to:
+            self.last = format_date_part(self.end_to, 'year')
 
     def to_timestamp(self) -> dict[str, Any]:
         return {

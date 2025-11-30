@@ -14,7 +14,7 @@ from openatlas import app
 from openatlas.api.resources.util import filter_by_type
 from openatlas.display.image_processing import delete_orphaned_resized_images
 from openatlas.display.tab import Tab
-from openatlas.display.table import Table
+from openatlas.display.table import Table, entity_table
 from openatlas.display.util import (
     button, check_iiif_activation, get_file_path, link, required_group)
 from openatlas.display.util2 import convert_size, is_authorized, manual
@@ -158,13 +158,7 @@ def check_dates() -> str:
         'dates': Tab(
             'invalid_dates',
             _('invalid dates'),
-            table=Table([
-                'name',
-                'class',
-                'type',
-                'created',
-                'updated',
-                'description'])),
+            table=entity_table(invalid_dates())),
         'link_dates': Tab(
             'invalid_link_dates',
             _('invalid link dates'),
@@ -172,24 +166,21 @@ def check_dates() -> str:
         'involvement_dates': Tab(
             'invalid_involvement_dates',
             _('invalid involvement dates'),
-            table=Table(
-                ['actor', 'event', 'class', 'type', 'description'])),
+            table=entity_table(
+                Link.invalid_involvement_dates(),
+                columns=['name', 'range', 'type_link', 'description'])),
         'preceding_dates': Tab(
             'invalid_preceding_dates',
             _('invalid preceding dates'),
-            table=Table(['preceding', 'succeeding'])),
+            table=entity_table(
+                Link.invalid_preceding_dates(),
+                columns=['preceding', 'succeeding'])),
         'sub_dates': Tab(
             'invalid_sub_dates',
             _('invalid sub dates'),
-            table=Table(['super', 'sub']))}
-    for entity in invalid_dates():
-        tabs['dates'].table.rows.append([
-            link(entity),
-            entity.class_.label,
-            link(entity.standard_type),
-            format_date(entity.created),
-            format_date(entity.modified),
-            entity.description])
+            table=Table(['super', 'sub'], [
+                [link(link_.range), link(link_.domain)]
+                for link_ in Link.invalid_sub_dates()]))}
     for link_ in Link.get_invalid_link_dates():
         update_link_ = ''
         domain = link_.domain.class_.name
@@ -206,24 +197,6 @@ def check_dates() -> str:
             link(link_.property.name, update_link_),
             link(link_.domain),
             link(link_.range)])
-    for link_ in Link.invalid_involvement_dates():
-        event = link_.domain
-        actor = link_.range
-        data = [
-            link(actor),
-            link(event),
-            event.class_.label,
-            link_.type.name if link_.type else '',
-            link_.description]
-        tabs['involvement_dates'].table.rows.append(data)
-    for link_ in Link.invalid_preceding_dates():
-        tabs['preceding_dates'].table.rows.append([
-            link(link_.range),
-            link(link_.domain)])
-    for link_ in Link.invalid_sub_dates():
-        tabs['sub_dates'].table.rows.append([
-            link(link_.range),
-            link(link_.domain)])
     for tab in tabs.values():
         tab.buttons = [manual('admin/data_integrity_checks')]
         if not tab.table.rows:

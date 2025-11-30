@@ -183,7 +183,7 @@ def get_table_cell_content(
             html = g.file_info.get(e.id, {}).get('license_holder')
         case 'main_image' if origin:
             html = profile_image_table_link(origin, e)
-        case 'name':
+        case 'name' | 'preceding':
             html = format_name_and_aliases(e, str(table_id), forms)
         case 'page':
             html = str(item.description)
@@ -210,7 +210,7 @@ def get_table_cell_content(
             html = ''
             if g.file_info.get(e.id):
                 html = display_bool(g.file_info[e.id]['public'], False)
-        case 'range':
+        case 'range' | 'succeeding':
             html = link(range_)
         case 'remove' if origin and isinstance(item, Link):
             html = ''
@@ -236,12 +236,13 @@ def get_table_cell_content(
                     url_for('view', id_=item.type.id))
         case 'update':
             html = ''
-            if origin and relation and isinstance(item, Link):
+            if relation and isinstance(item, Link):
+                range_ = origin or item.range
                 html = edit_link(
                     url_for(
                         'link_update',
                         id_=item.id,
-                        origin_id=origin.id,
+                        origin_id=range_.id,
                         name=relation.name))
         case 'resolver_url' | 'website_url':
             url = getattr(e, name)
