@@ -207,7 +207,10 @@ def process_relations(
         if entity.class_.group['name'] == 'type' \
                 and relation.name == 'super' \
                 and not ids:
-            ids = [entity.root[0] if entity.root else origin.id]
+            if entity.root:
+                ids.append(entity.root[0])
+            elif origin:
+                ids.append(origin.id)
         if ids:
             entities = Entity.get_by_ids(ids)
             if 'object_location' in relation.classes:

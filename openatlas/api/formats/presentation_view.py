@@ -14,7 +14,7 @@ from openatlas.api.resources.util import (
     get_reference_systems, get_value_for_types, to_camel_case)
 from openatlas.database.overlay import get_by_object
 from openatlas.display.util import get_file_path
-from openatlas.models.cidoc_property import CidocProperty
+from openatlas.models.cidoc import CidocProperty
 from openatlas.models.dates import Dates
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis

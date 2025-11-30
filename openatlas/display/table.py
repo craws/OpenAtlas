@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from typing import Any, Optional
 
 from flask import g, json, render_template, url_for
@@ -26,20 +27,13 @@ _('entries')
 _('showing %(first)s to %(last)s of %(all)s entries', first=1, last=25, all=38)
 
 
+@dataclass
 class Table:
-
-    def __init__(
-            self,
-            columns: Optional[list[str | LazyString]] = None,
-            rows: Optional[list[Any]] = None,
-            order: Optional[list[list[int | str]]] = None,
-            defs: Optional[list[dict[str, Any]]] = None,
-            paging: bool = True) -> None:
-        self.columns = columns or []
-        self.rows = rows or []
-        self.paging = paging
-        self.order = order or ''
-        self.defs = defs or []
+    columns: list[str | LazyString] = field(default_factory=list)
+    rows: list[Any] = field(default_factory=list)
+    order: list[Any] = field(default_factory=list)
+    defs: list[Any] = field(default_factory=list)
+    paging: bool = True
 
     def display(self, name: str = 'default') -> str:
         if not self.rows:
@@ -91,11 +85,11 @@ def entity_table(
             default_columns = item.range.class_.group['table_columns']
     else:
         default_columns = item.class_.group['table_columns']
-    defs = None
+    defs = []
     forms = forms or {}
     columns = (columns or default_columns) + (additional_columns or [])
 
-    order: Optional[list[list[int | str]]] = None
+    order = []
     if forms.get('checkbox'):
         columns.insert(0, 'checkbox')
         order = [[0, 'desc'], [1, 'asc']]
@@ -189,7 +183,7 @@ def get_table_cell_content(
             html = g.file_info.get(e.id, {}).get('license_holder')
         case 'main_image' if origin:
             html = profile_image_table_link(origin, e)
-        case 'name':
+        case 'name' | 'preceding':
             html = format_name_and_aliases(e, str(table_id), forms)
         case 'page':
             html = str(item.description)
@@ -216,7 +210,7 @@ def get_table_cell_content(
             html = ''
             if g.file_info.get(e.id):
                 html = display_bool(g.file_info[e.id]['public'], False)
-        case 'range':
+        case 'range' | 'succeeding':
             html = link(range_)
         case 'remove' if origin and isinstance(item, Link):
             html = ''
@@ -242,12 +236,13 @@ def get_table_cell_content(
                     url_for('view', id_=item.type.id))
         case 'update':
             html = ''
-            if origin and relation and isinstance(item, Link):
+            if relation and isinstance(item, Link):
+                range_ = origin or item.range
                 html = edit_link(
                     url_for(
                         'link_update',
                         id_=item.id,
-                        origin_id=origin.id,
+                        origin_id=range_.id,
                         name=relation.name))
         case 'resolver_url' | 'website_url':
             url = getattr(e, name)

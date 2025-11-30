@@ -7,6 +7,7 @@ from config.model.class_groups import class_groups
 
 
 def get_relation(classes: str | list[str]) -> dict[str, Any]:
+    _('page')  # Needed for translations
     return {
         'classes': classes,
         'property': 'P67',
@@ -24,10 +25,10 @@ bibliography = {
             'required': True},
         'description': {}},
     'relations': {
-        'source': get_relation('source'),
+        'source': get_relation(['source']),
         'event': get_relation(class_groups['event']['classes']),
         'actor': get_relation(class_groups['actor']['classes']),
-        'place': get_relation('place'),
+        'place': get_relation(['place']),
         'artifact': get_relation(class_groups['artifact']['classes']),
         'type': {
             'label': class_groups['type']['label'],

@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import smtplib
 import subprocess
+from datetime import datetime, timedelta
 from email.header import Header
 from email.mime.text import MIMEText
 from functools import wraps
@@ -19,10 +20,8 @@ from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.display.image_processing import check_processed_image
-from openatlas.display.util2 import is_authorized, sanitize, uc_first
-from openatlas.models.annotation import AnnotationText
-from openatlas.models.cidoc_class import CidocClass
-from openatlas.models.cidoc_property import CidocProperty
+from openatlas.display.util2 import convert_size, is_authorized, uc_first
+from openatlas.models.cidoc import CidocClass, CidocProperty
 from openatlas.models.content import get_translation
 from openatlas.models.dates import Dates, format_date
 from openatlas.models.entity import Entity, Link
@@ -606,31 +605,8 @@ def convert_image_to_iiif(id_: int, path: Optional[Path] = None) -> bool:
     return True
 
 
-def display_annotation_text_links(entity: Entity) -> str:
-    offset = 0
-    text = entity.description or ''
-    for annotation in AnnotationText.get_by_source_id(entity.id):
-        if not annotation.text and not annotation.entity_id:
-            continue  # pragma: no cover
-        title = f'title="{sanitize(annotation.text)}"' \
-            if annotation.text else ''
-        if annotation.entity_id:
-            tag_open = f'<a href="/entity/{annotation.entity_id}" {title}>'
-            tag_close = '</a>'
-        else:
-            tag_open = f'<span style="color:green;" {title}>'
-            tag_close = '</span>'
-        position = annotation.link_start + offset
-        text = text[:position] + tag_open + text[position:]
-        offset += len(tag_open)
-        position = annotation.link_end + offset
-        text = text[:position] + tag_close + text[position:]
-        offset += len(tag_close)
-    return text
-
-
 def hierarchy_crumbs(entity: Entity) -> list[str]:
-    crumbs = [link(entity, index=True)]
+    crumbs: list[Any] = [link(entity, index=True)]
     if entity.class_.group['name'] == 'type':
         return crumbs + [
             g.types[id_] for id_ in entity.root] if entity.root else crumbs
@@ -662,3 +638,25 @@ def display_crumbs(crumbs: list[Any]) -> str:
         elif item:
             items.append(link(item))
     return '&nbsp;>&nbsp; '.join(items)
+
+
+def get_backup_file_data() -> dict[str, Any]:
+    path = app.config['SQL_PATH']
+    latest_file = None
+    latest_file_date = None
+    for file in [
+            f for f in path.iterdir()
+            if (path / f).is_file() and f.name != '.gitignore']:
+        file_date = datetime.fromtimestamp((path / file).stat().st_ctime)
+        if not latest_file_date or file_date > latest_file_date:
+            latest_file = file
+            latest_file_date = file_date
+    file_data: dict[str, Any] = {'backup_too_old': True}
+    if latest_file and latest_file_date:
+        yesterday = datetime.today() - timedelta(days=1)
+        file_data['file'] = latest_file.name
+        file_data['backup_too_old'] = \
+            bool(yesterday > latest_file_date and not app.testing)
+        file_data['size'] = convert_size(latest_file.stat().st_size)
+        file_data['date'] = format_date(latest_file_date)
+    return file_data

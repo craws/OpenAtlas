@@ -23,6 +23,7 @@ versions = {
             '2675': 'New tab layout',
             '2649': 'New buttons layout',
             '2442': 'Text annotation: show orphans',
+            '2589': 'Color coding for map',
             '2657': 'API: 4.11.0'}}],
     '8.15.1': ['2025-11-17', {
         'fix': {

@@ -48,9 +48,9 @@ class Overlay:
             object_.get_linked_entities_recursive('P46', True))
         ids = []
         for place in places:
-            for reference in place.get_linked_entities('P67', inverse=True):
-                if reference.class_.name == 'file':
-                    ids.append(reference.id)
+            ids += [
+                e.id for
+                e in place.get_linked_entities('P67', ['file'], inverse=True)]
         if not ids:
             return {}
         return {row['image_id']: Overlay(row) for row in db.get_by_object(ids)}

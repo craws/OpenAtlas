@@ -16,7 +16,7 @@ SET (description, type_id, begin_from, begin_to, begin_comment, end_from, end_to
 WHERE property_code IN ('P22', 'P23');
 
 -- Remove obsolete class definitions
-DELETE FROM model.openatlas_class WHERE name IN ('actor_function', 'actor_relation', 'creation', 'event', 'involvement');
+DELETE FROM model.openatlas_class WHERE name IN ('actor_function', 'actor_relation', 'bone', 'creation', 'event', 'involvement');
 
 -- Removed table icon option
 DELETE FROM web.user_settings WHERE value = 'table_show_icons';

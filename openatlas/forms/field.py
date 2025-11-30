@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+# pylint: disable=too-few-public-methods
 import ast
 from typing import Any, Optional
 
@@ -14,8 +15,7 @@ from wtforms.validators import InputRequired
 from wtforms.widgets import FileInput, HiddenInput, Input, TextInput
 
 from openatlas import app
-from openatlas.display.table import (
-    Table, entity_table, format_name_and_aliases)
+from openatlas.display.table import Table, entity_table
 from openatlas.display.util2 import is_authorized
 from openatlas.forms.util import convert
 from openatlas.models.entity import Entity
@@ -260,13 +260,12 @@ class TableSelect(HiddenInput):
                 if request.form[field.name] else None
         field.data = field.selection.id if field.selection else ''
         field.data_string = field.selection.name if field.selection else ''
-        if field.id == 'entity':
-            field.table = table_annotation(field.entities)
-        else:
-            field.table = entity_table(
-                field.entities,
-                table_id=field.id,
-                forms={'mode': 'single'})
+        field.table = entity_table(
+            field.entities,
+            columns=['name', 'class', 'description']
+            if field.id == 'entity' else None,
+            table_id=field.id,
+            forms={'mode': 'single'})
         return super().__call__(field, **kwargs) + Markup(
             render_template('forms/table_select.html', field=field))
 
@@ -311,16 +310,6 @@ class TableCidocField(HiddenField):
         super().__init__(validators=[InputRequired()], **kwargs)
         self.items = items
         self.selection = None
-
-
-def table_annotation(entities: list[Entity]) -> Table:
-    table_ = Table(['name', 'class', 'description'])
-    for item in entities:
-        table_.rows.append([
-            format_name_and_aliases(item, 'entity', forms={'mode': 'single'}),
-            item.class_.name,
-            item.description])
-    return table_
 
 
 def table_cidoc(table_id: str, items: list[Any]) -> Table:

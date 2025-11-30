@@ -64,7 +64,7 @@ def overview() -> str:
             _('notes'),
             table=Table(
                 ['date', _('visibility'), 'entity', 'class', _('note')]))}
-    tables = {
+    tables: dict[str, Table] = {
         'overview': Table(
             [_('class'), _('count')],
             paging=False,

@@ -26,19 +26,19 @@ place: dict[str, Any] = {
         'source': standard_relations['source'],
         'artifact': artifact_relation,
         'feature': {
-            'classes': 'feature',
+            'classes': ['feature'],
             'property': 'P46',
             'multiple': True,
             'tab': {
                 'buttons': ['insert']}},
         'acquisition': {
-            'classes': 'acquisition',
+            'classes': ['acquisition'],
             'property': 'P24',
             'inverse': True,
             'tab': {
                 'buttons': ['insert']}},
         'modification': {
-            'classes': 'modification',
+            'classes': ['modification'],
             'property': 'P31',
             'inverse': True,
             'tab': {
@@ -53,14 +53,14 @@ place: dict[str, Any] = {
                 'buttons': ['insert']}},
         'move_from_location': {
             'label': _('move from location'),
-            'classes': 'move',
+            'classes': ['move'],
             'property': 'P27',
             'inverse': True,
             'tab': {
                 'buttons': ['insert']}},
         'move_to_location': {
             'label': _('move to location'),
-            'classes': 'move',
+            'classes': ['move'],
             'property': 'P26',
             'inverse': True,
             'tab': {
@@ -86,16 +86,6 @@ place: dict[str, Any] = {
             'inverse': True,
             'tab': {
                 'buttons': ['insert']}},
-        #'performed_in': {
-        #    'label': _('performed in'),
-        #    'classes': class_groups['actor']['classes'],
-        #    'property': 'OA9',  # Todo: Link to event
-        #    'inverse': True},
-        #'participated': {
-        #    'label': _('participated in'),
-        #    'classes': class_groups['actor']['classes'],
-        #    'property': 'OA9',  # Todo: Link to event
-        #    'inverse': True},
         'reference': standard_relations['reference'],
         'file': standard_relations['file']},
     'display': {
@@ -117,7 +107,7 @@ feature: dict[str, Any] = {
     'relations': {
         'super': {
             'label': _('super'),
-            'classes': 'place',
+            'classes': ['place'],
             'property': 'P46',
             'required': True,
             'inverse': True,
@@ -125,7 +115,7 @@ feature: dict[str, Any] = {
         'source': standard_relations['source'],
         'artifact': artifact_relation,
         'stratigraphic_unit': {
-            'classes': 'stratigraphic_unit',
+            'classes': ['stratigraphic_unit'],
             'property': 'P46',
             'multiple': True,
             'tab': {
@@ -149,7 +139,7 @@ stratigraphic_unit: dict[str, Any] = {
     'relations': {
         'super': {
             'label': _('super'),
-            'classes': 'feature',
+            'classes': ['feature'],
             'property': 'P46',
             'required': True,
             'inverse': True,

@@ -24,7 +24,7 @@ class_ = {
             'tab': {
                 'buttons': ['link', 'insert'],
                 'columns': [
-                    'name', 'class', 'involvement',
+                    'name', 'class', 'type_link',
                     'begin', 'end', 'description']}},
         'participant': {
             'label': _('participant'),
@@ -36,7 +36,7 @@ class_ = {
             'tab': {
                 'buttons': ['link', 'insert'],
                 'columns': [
-                    'name', 'class', 'involvement',
+                    'name', 'class', 'type_link',
                     'begin', 'end', 'description']}},
         'subs': {
             'label': _('subs'),
@@ -67,7 +67,7 @@ class_ = {
             'mode': 'display'},
         'location': {
             'label': _('location'),
-            'classes': 'object_location',
+            'classes': ['object_location'],
             'property': 'P7',
             'mode': 'direct',
             'add_dynamic': True}},
@@ -100,7 +100,7 @@ acquisition['relations'] = acquisition['relations'] | {
         'multiple': True},
     'given_place': {
         'label': _('given place'),
-        'classes': 'place',
+        'classes': ['place'],
         'property': 'P24',
         'mode': 'direct',
         'multiple': True},
@@ -123,7 +123,7 @@ modification['relations'] = modification['relations'] | {
         'mode': 'direct'},
     'modified_place': {
         'label': _('modified place'),
-        'classes': 'place',
+        'classes': ['place'],
         'property': 'P31',
         'multiple': True,
         'mode': 'direct'}}
@@ -135,19 +135,19 @@ move['display']['tooltip'] = _('movement of artifacts or persons')
 move['relations'] = move['relations'] | {
     'place_from': {
         'label': _('place from'),
-        'classes': 'object_location',
+        'classes': ['object_location'],
         'property': 'P27',
         'mode': 'direct',
         'add_dynamic': True},
     'place_to': {
         'label': _('place to'),
-        'classes': 'object_location',
+        'classes': ['object_location'],
         'property': 'P26',
         'mode': 'direct',
         'add_dynamic': True},
     'moved_person': {
         'label': _('moved person'),
-        'classes': 'person',
+        'classes': ['person'],
         'property': 'P25',
         'multiple': True,
         'mode': 'direct'},
@@ -164,7 +164,7 @@ production['display']['tooltip'] = _('creation of artifacts')
 production['relations'] = production['relations'] | {
     'produced_artifact': {
         'label': _('produced artifact'),
-        'classes': 'artifact',
+        'classes': ['artifact'],
         'property': 'P108',
         'multiple': True,
         'mode': 'direct'}}

@@ -32,34 +32,34 @@ artifact: dict[str, Any] = {
         'source': standard_relations['source'],
         'subs': {
             'label': _('subs'),
-            'classes': 'artifact',
+            'classes': ['artifact'],
             'property': 'P46',
             'multiple': True,
             'tab': {
                 'buttons': ['link', 'insert']}},
         'acquisition': {
-            'classes': 'acquisition',
+            'classes': ['acquisition'],
             'property': 'P24',
             'inverse': True,
             'multiple': True,
             'tab': {
                 'buttons': ['link', 'insert']}},
         'modification': {
-            'classes': 'modification',
+            'classes': ['modification'],
             'property': 'P31',
             'inverse': True,
             'multiple': True,
             'tab': {
                 'buttons': ['link', 'insert']}},
         'move': {
-            'classes':  'move',
+            'classes': ['move'],
             'property': 'P25',
             'inverse': True,
             'multiple': True,
             'tab': {
                 'buttons': ['link', 'insert']}},
         'production': {
-            'classes':  'production',
+            'classes': ['production'],
             'property': 'P108',
             'inverse': True,
             'multiple': True,
@@ -78,5 +78,5 @@ human_remains['label'] = _('human remains')
 human_remains['display']['network_color'] = None
 human_remains['relations']['super']['classes'] = \
     ['human_remains'] + class_groups['place']['classes']
-human_remains['relations']['subs']['classes'] = 'human_remains'
+human_remains['relations']['subs']['classes'] = ['human_remains']
 del human_remains['relations']['production']

@@ -42,3 +42,17 @@ def get_classes() -> list[dict[str, Any]]:
         ORDER BY c.name;
         """)
     return list(g.cursor)
+
+
+def get_db_relations() -> list[dict[str, Any]]:
+    g.cursor.execute(
+        """
+        SELECT DISTINCT
+            d.openatlas_class_name AS domain,
+            l.property_code,
+            r.openatlas_class_name AS range
+        FROM model.entity d
+        JOIN model.link l ON d.id = l.domain_id
+        JOIN model.entity r ON l.range_id = r.id;
+        """)
+    return list(g.cursor)

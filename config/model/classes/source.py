@@ -14,7 +14,7 @@ source = {
     'relations': {
         'text': {
             'label': _('text'),
-            'classes': 'source_translation',
+            'classes': ['source_translation'],
             'property': 'P73',
             'multiple': True,
             'tab': {
@@ -37,7 +37,7 @@ source = {
                 'tooltip': _('mentioned in the source')}},
         'information_carrier': {
             'label': _('information carrier'),
-            'classes': 'artifact',
+            'classes': ['artifact'],
             'property': 'P128',
             'inverse': True,
             'multiple': True,
@@ -78,7 +78,7 @@ source_translation = {
             'annotated': True}},
     'relations': {
         'source': {
-            'classes': 'source',
+            'classes': ['source'],
             'property': 'P73',
             'inverse': True,
             'required': True,

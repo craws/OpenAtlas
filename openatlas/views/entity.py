@@ -18,6 +18,7 @@ from openatlas.display.util import (
     required_group)
 from openatlas.display.util2 import is_authorized, manual, sanitize
 from openatlas.forms.entity_form import get_entity_form, process_form
+from openatlas.forms.util import deletion_possible
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.openatlas_class import Relation
@@ -39,18 +40,18 @@ def view(id_: int) -> str | Response:
         case 'reference_system':
             entity.class_.relations = {}
             for name in entity.classes:
-                entity.class_.relations[name] = Relation(name, {
-                    'name': name,
-                    'label': _(name.replace('_', ' ')),
-                    'classes': [name],
-                    'property': 'P67',
-                    'multiple': True,
-                    'tab': {
+                entity.class_.relations[name] = Relation(
+                    name=name,
+                    label=_(name.replace('_', ' ')),
+                    classes=[name],
+                    property='P67',
+                    multiple=True,
+                    tab={
                         'buttons': ['remove_reference_system_class'],
                         'columns': [
                             'name',
                             'external_reference_match',
-                            'precision']}})
+                            'precision']})
     display = Display(entity)
     return render_template(
         'tabs.html',
@@ -155,32 +156,6 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
         title=entity.name,
         crumbs=hierarchy_crumbs(entity) +
         [entity, _('copy') if copy else _('edit')])
-
-
-def deletion_possible(entity: Entity) -> bool:
-    if not is_authorized(entity.class_.write_access):
-        return False
-    if current_user.group == 'contributor':
-        info = g.logger.get_log_info(entity.id)
-        if not info['creator'] or info['creator'].id != current_user.id:
-            return False
-    match entity.class_.group['name']:
-        case 'reference_system' if entity.system or entity.classes:
-            return False
-        case 'type':
-            if entity.category == 'system' \
-                    or (entity.category == 'standard' and not entity.root):
-                return False
-            return True
-    for relation in entity.class_.relations.values():
-        if relation.reverse_relation \
-                and relation.reverse_relation.required \
-                and entity.get_linked_entities(
-                    relation.property,
-                    relation.classes,
-                    relation.inverse):
-            return False
-    return True
 
 
 @app.route('/delete/<int:id_>')

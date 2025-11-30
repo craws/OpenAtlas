@@ -76,6 +76,7 @@ class AnnotationText:
 
     @staticmethod
     def extract_annotations(text: str) -> dict[str, Any]:
+        current_offset = 0
         if not text:
             return {'text': None, 'data': []}
 
@@ -95,7 +96,6 @@ class AnnotationText:
             return inner_text
 
         data: list[dict[str, Any]] = []
-        current_offset = 0
         pattern = r'<mark meta="(.*?)">(.*?)</mark>'
         text = text.replace('</p><p>', '\n\n')
         for item in ['<p>', '</p>', '<br class="ProseMirror-trailingBreak">']:
