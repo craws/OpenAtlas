@@ -129,7 +129,7 @@ high-quality, attributed digital objects online at scale. Be aware that:
 
 ### Installation
 
-    sudo apt install iipimage-server libvips-tools libapache2-mod-fcgid
+    sudo apt install iipimage-server
     sudo a2enmod fcgid
     sudo service apache2 restart
 
@@ -178,4 +178,5 @@ Run tests with coverage
 
 # Installing OpenAtlas with Docker (Experimental)
 
-A Docker setup is available for local development. Please follow the [detailed Docker installation instructions here](install/docker/install.md).
+A Docker setup is available for local development. Please follow the 
+[detailed Docker installation instructions here](install/docker/install.md).
