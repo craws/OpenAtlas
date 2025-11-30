@@ -125,3 +125,23 @@ def get_model(class_name: str) -> dict[str, Any]:
     data['extra'] = data.get('extra', [])
     data['relations'] = data.get('relations', {})
     return data
+
+
+def get_db_relations() -> list[dict[str, Any]]:
+    return db.get_db_relations()
+
+
+def get_model_relations() -> dict[str, Any]:
+    relations: dict[str, Any] = {}
+    for name, data in model.items():
+        for relation in data['relations'].values():
+            for range_ in relation['classes']:
+                domain = range_ if relation.get('inverse') else name
+                range_ = name if relation.get('inverse') else range_
+                relations[domain] = relations.get(domain, {})
+                relations[domain][range_] = relations[domain].get(range_, {})
+                if relation['property'] not in relations[domain][range_]:
+                    relations[domain][range_][relation['property']] = 1
+                else:
+                    relations[domain][range_][relation['property']] += 1
+    return relations

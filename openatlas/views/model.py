@@ -17,7 +17,8 @@ from openatlas.forms.field import SubmitField
 from openatlas.forms.form import cidoc_form
 from openatlas.models.entity import Entity
 from openatlas.models.network import Network
-from openatlas.models.openatlas_class import get_class_count
+from openatlas.models.openatlas_class import (
+    get_class_count, get_db_relations, get_model_relations)
 
 
 @app.route('/overview/model', methods=['GET', 'POST'])
@@ -37,11 +38,42 @@ def model_index() -> str:
                 property_.find_object('domain_class_code', domain.code),
             'range_valid':
                 property_.find_object('range_class_code', range_.code)}
+    relations = get_model_relations()
+    invalid_relations = Table(['domain', 'property', 'range'])
+    for row in get_db_relations():
+        if row['property_code'] in ['P1'] or row['domain'] == 'type_tools' \
+                or (row['property_code'] == 'P2'
+                    and row['range'] == 'type') \
+                or (row['property_code'] == 'P67'
+                    and row['domain'] == 'reference_system') \
+                or (row['property_code'] == 'P53'
+                    and row['range'] == 'object_location'):
+            continue
+        if row['domain'] not in relations \
+                or row['range'] not in relations[row['domain']] \
+                or row['property_code'] \
+                not in relations[row['domain']][row['range']]:
+            invalid_relations.rows.append([
+                g.classes[row['domain']].label,
+                row['property_code'],
+                g.classes[row['range']].label])  # pragma: no cover
+    model_relations = Table(['domain', 'property', 'range', 'count'])
+    for domain, data in relations.items():
+        for range_, range_data in data.items():
+            for property_, count in range_data.items():
+                model_relations.rows.append([
+                    g.classes[domain].label,
+                    property_,
+                    g.classes[range_].label,
+                    count])
     return render_template(
         'model/index.html',
         form=form,
         result=result,
         title=_('model'),
+        tables={
+            'model_relations': model_relations,
+            'invalid_relations': invalid_relations},
         buttons=[manual('model/index')],
         crumbs=[_('model')])
 
