@@ -43,7 +43,7 @@ def model_index() -> str:
     for row in get_db_relations():
         if row['property_code'] in ['P1'] or row['domain'] == 'type_tools' \
                 or (row['property_code'] == 'P2'
-                    and row['range'] == 'type') \
+                    and row['range'] in ['type', 'type_tools']) \
                 or (row['property_code'] == 'P67'
                     and row['domain'] == 'reference_system') \
                 or (row['property_code'] == 'P53'
