@@ -102,6 +102,10 @@ class ValueNotIntegerError(Exception):
     pass
 
 
+class FileIdNotInteger(Exception):
+    pass
+
+
 class UrlNotValid(Exception):
     def __init__(self, url: str) -> None:
         super().__init__()
