@@ -1715,7 +1715,7 @@
           "200": {
             "description": "Success",
             "content": {
-              "application/ld+json": {
+              "application/json": {
                 "schema": {
                   "type": "object",
                   "additionalProperties": {
@@ -1813,16 +1813,13 @@
           "200": {
             "description": "Success",
             "content": {
-              "image/jpeg": {
+              "application/json": {
                 "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              },
-              "image/png": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
+                  "type": "object",
+                  "description": "IIIF Presentation API v2 manifest",
+                  "externalDocs": {
+                    "url": "http://iiif.io/api/presentation/2.1/"
+                  }
                 }
               }
             }
@@ -3497,7 +3494,6 @@
         "required": [
           "id",
           "name",
-          "viewClass",
           "children"
         ],
         "properties": {
@@ -5222,47 +5218,50 @@
       },
       "LicensedFileOverviewModel": {
         "type": "object",
-        "required": [
-          "id"
-        ],
-        "properties": {
-          "id": {
-            "type": "object",
-            "required": [
-              "display",
-              "thumbnail",
-              "extension",
-              "license",
-              "licenseHolder",
-              "creator",
-              "publicShareable",
-              "IIIFManifest"
-            ],
-            "properties": {
-              "display": {
-                "type": "string"
-              },
-              "thumbnail": {
-                "type": "string"
-              },
-              "extension": {
-                "type": "string"
-              },
-              "license": {
-                "type": "string"
-              },
-              "licenseHolder": {
-                "type": "string"
-              },
-              "creator": {
-                "type": "string"
-              },
-              "publicShareable": {
-                "type": "boolean"
-              },
-              "IIIFManifest": {
-                "type": "string"
-              }
+        "description": "Dictionary keyed by numerical file IDs",
+        "additionalProperties": {
+          "type": "object",
+          "required": [
+            "display",
+            "thumbnail",
+            "extension",
+            "license",
+            "licenseHolder",
+            "creator",
+            "publicShareable",
+            "IIIFManifest"
+          ],
+          "properties": {
+            "display": {
+              "type": "string",
+              "nullable": true
+            },
+            "thumbnail": {
+              "type": "string",
+              "nullable": true
+            },
+            "extension": {
+              "type": "string",
+              "nullable": true
+            },
+            "license": {
+              "type": "string",
+              "nullable": true
+            },
+            "licenseHolder": {
+              "type": "string",
+              "nullable": true
+            },
+            "creator": {
+              "type": "string",
+              "nullable": true
+            },
+            "publicShareable": {
+              "type": "boolean"
+            },
+            "IIIFManifest": {
+              "type": "string",
+              "nullable": true
             }
           }
         }
