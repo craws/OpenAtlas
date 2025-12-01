@@ -110,6 +110,7 @@
           }
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -162,6 +163,7 @@
           }
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -257,6 +259,7 @@
           }
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -343,6 +346,7 @@
           }
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -425,6 +429,7 @@
           }
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -507,6 +512,7 @@
           }
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -589,6 +595,7 @@
           }
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -663,6 +670,7 @@
           }
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -745,6 +753,7 @@
           }
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -827,6 +836,7 @@
           }
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -909,6 +919,7 @@
           }
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -994,6 +1005,7 @@
           }
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -1028,6 +1040,7 @@
           }
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -1065,6 +1078,7 @@
           }
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -1099,6 +1113,7 @@
           }
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -1128,6 +1143,7 @@
         "description": "Retrieves all OpenAtlas classes with their English label, CIDOC CRM mapping, view, icon and standard type ID.",
         "operationId": "Classes",
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -1198,6 +1214,7 @@
           }
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -1235,6 +1252,7 @@
           }
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -1275,6 +1293,7 @@
           }
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -1321,6 +1340,7 @@
           }
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -1355,6 +1375,7 @@
           }
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -1389,6 +1410,7 @@
           }
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -1426,6 +1448,7 @@
           }
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -1460,6 +1483,7 @@
           }
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -1508,6 +1532,7 @@
           }
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -1548,6 +1573,7 @@
           }
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -1593,6 +1619,7 @@
           }
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -1640,6 +1667,7 @@
           }
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -1678,6 +1706,7 @@
         "parameters": [
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -1775,6 +1804,7 @@
           }
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
@@ -1821,6 +1851,7 @@
           }
         ],
         "security": [
+          {},
           {
             "bearerHttpAuthentication": []
           }
