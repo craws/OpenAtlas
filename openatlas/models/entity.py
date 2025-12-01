@@ -14,12 +14,6 @@ from openatlas.models.annotation import AnnotationText
 from openatlas.models.dates import Dates
 from openatlas.models.gis import Gis
 
-app.config['PROPERTY_TYPES'] = [
-    'Actor relation',
-    'Actor function',
-    'External reference match',
-    'Involvement']
-
 
 class Entity:
     count = 0

@@ -206,6 +206,8 @@ def get_table_cell_content(
                             'overlay_insert',
                             image_id=e.id,
                             place_id=origin.id))
+        case 'property' if isinstance(item, Link):
+            html = item.property.code
         case 'public':
             html = ''
             if g.file_info.get(e.id):

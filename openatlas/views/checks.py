@@ -33,45 +33,44 @@ from openatlas.models.export import find_duplicates
 @app.route('/check_links')
 @required_group('contributor')
 def check_links() -> str:
-    table = Table(['domain', 'property', 'range'])
-    for row in invalid_cidoc_links():
-        table.rows.append([
-            f"{link(row['domain'])} ({row['domain'].cidoc_class.code})",
-            link(row['property']),
-            f"{link(row['range'])} ({row['range'].cidoc_class.code})"])
-    return render_template(
-        'tabs.html',
-        tabs={
-            'links': Tab(
-                'links',
-                content='' if table.rows
-                else _('Congratulations, everything looks fine!'),
-                table=table,
-                buttons=[manual('admin/data_integrity_checks')])},
-        title=_('admin'),
-        crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-data"],
-            _('check links')])
-
-
-@app.route('/check_link_duplicates')
-@app.route('/check_link_duplicates/<delete>')
-@required_group('contributor')
-def check_link_duplicates(delete: Optional[str] = None) -> str | Response:
-    if delete:
-        count = Link.delete_link_duplicates()
-        g.logger.log('info', 'admin', f"Deleted duplicate links: {count}")
-        flash(f"{_('deleted links')}: {count}")
-        return redirect(url_for('check_link_duplicates'))
-    tab = Tab(
-        'check_link_duplicates',
-        buttons=[manual('admin/data_integrity_checks')])
-    tab.table = Table([
-        'domain', 'range', 'property_code', 'description', 'type_id',
-        'begin_from', 'begin_to', 'begin_comment', 'end_from', 'end_to',
-        'end_comment', 'count'])
+    tabs = {
+        'cidoc': Tab(
+            'cidoc',
+            _('invalid CIDOC links'),
+            table=entity_table(
+                invalid_cidoc_links(),
+                columns=['name', 'property', 'range'])),
+        'duplicates': Tab(
+            'duplicates',
+            _('link duplicates'),
+            table=Table([
+                'domain', 'range', 'property_code', 'description', 'type_id',
+                'begin_from', 'begin_to', 'begin_comment', 'end_from',
+                'end_to',
+                'end_comment', 'count'])),
+        'type': Tab(
+            'type',
+            _('invalid multiple types'),
+            table=Table(['entity', 'class', 'base type', 'types'])),
+        'circular': Tab(
+            'circular',
+            _('circular dependencies'),
+            table=entity_table(entities_linked_to_itself(), columns=['name']))}
+    for row in single_type_duplicates():
+        remove_links = []
+        for type_ in row['offending_types']:
+            url = url_for(
+                'delete_single_type_duplicate',
+                entity_id=row['entity'].id,
+                type_id=type_.id)
+            remove_links.append(f"{link(_('remove'), url)} {type_.name}")
+        tabs['type'].table.rows.append([
+            link(row['entity']),
+            row['entity'].class_.label,
+            link(g.types[row['type'].id]),
+            '<br><br>'.join(remove_links)])
     for row in Link.check_link_duplicates():
-        tab.table.rows.append([
+        tabs['duplicates'].table.rows.append([
             link(Entity.get_by_id(row['domain_id'])),
             link(Entity.get_by_id(row['range_id'])),
             link(g.properties[row['property_code']]),
@@ -84,36 +83,22 @@ def check_link_duplicates(delete: Optional[str] = None) -> str | Response:
             format_date(row['end_to']),
             row['end_comment'],
             row['count']])
-    if tab.table.rows:
-        tab.buttons.append(
+    for tab in tabs.values():
+        tab.buttons = [manual('admin/data_integrity_checks')]
+        if not tab.table.rows:
+            tab.content = _('Congratulations, everything looks fine!')
+    if tabs['duplicates'].table.rows:
+        tabs['duplicates'].buttons.append(
             button(
                 _('delete link duplicates'),
-                url_for('check_link_duplicates', delete='delete')))
-    else:  # Check single types for multiple use
-        tab.table = Table(
-            ['entity', 'class', 'base type', 'incorrect multiple types'])
-        for row in single_type_duplicates():
-            remove_links = []
-            for type_ in row['offending_types']:
-                url = url_for(
-                    'delete_single_type_duplicate',
-                    entity_id=row['entity'].id,
-                    type_id=type_.id)
-                remove_links.append(f"{link(_('remove'), url)} {type_.name}")
-            tab.table.rows.append([
-                link(row['entity']),
-                row['entity'].class_.label,
-                link(g.types[row['type'].id]),
-                '<br><br>'.join(remove_links)])
-    if not tab.table.rows:
-        tab.content = _('Congratulations, everything looks fine!')
+                url_for('delete_link_duplicates')))
     return render_template(
         'tabs.html',
-        tabs={'tab': tab},
+        tabs=tabs,
         title=_('admin'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
-            _('check link duplicates')])
+            _('check links')])
 
 
 @app.route('/delete_single_type_duplicate/<int:entity_id>/<int:type_id>')
@@ -121,7 +106,16 @@ def check_link_duplicates(delete: Optional[str] = None) -> str | Response:
 def delete_single_type_duplicate(entity_id: int, type_id: int) -> Response:
     g.types[type_id].remove_entity_links(entity_id)
     flash(_('link removed'))
-    return redirect(url_for('check_link_duplicates'))
+    return redirect(url_for('check_links') + '#tab-type')
+
+
+@app.route('/delete_link_duplicates')
+@required_group('contributor')
+def delete_link_duplicates() -> Response:
+    count = Link.delete_link_duplicates()
+    g.logger.log('info', 'admin', f"Deleted duplicate links: {count}")
+    flash(f"{_('deleted links')}: {count}")
+    return redirect(url_for('check_links') + '#tab-duplicates')
 
 
 @app.route('/check_similar', methods=['GET', 'POST'])
@@ -264,13 +258,7 @@ def orphans() -> str:
                     e.class_.label,
                     format_date(e.created),
                     format_date(e.modified),
-                    e.description] for e in orphaned_subunits()])),
-        'circular': Tab(
-            'circular_dependencies',
-            _('circular dependencies'),
-            table=Table(
-                ['entity'],
-                [[link(e)] for e in entities_linked_to_itself()]))}
+                    e.description] for e in orphaned_subunits()]))}
     for tab in tabs.values():
         tab.buttons = [manual('admin/data_integrity_checks')]
     for entity in get_orphans():

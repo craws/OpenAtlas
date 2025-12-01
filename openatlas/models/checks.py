@@ -4,7 +4,7 @@ from flask import g
 from fuzzywuzzy import fuzz
 
 from openatlas.database import checks as db, date
-from openatlas.models.entity import Entity
+from openatlas.models.entity import Entity, Link
 
 
 def single_type_duplicates() -> list[dict[str, Any]]:
@@ -43,8 +43,8 @@ def entities_linked_to_itself() -> list[Entity]:
     return [Entity.get_by_id(row['domain_id']) for row in db.get_circular()]
 
 
-def invalid_cidoc_links() -> list[dict[str, Any]]:
-    invalid_linking = []
+def invalid_cidoc_links() -> list[Link]:
+    links = []
     for row in db.get_cidoc_links():
         valid_domain = g.properties[row['property_code']].find_object(
             'domain_class_code',
@@ -53,15 +53,8 @@ def invalid_cidoc_links() -> list[dict[str, Any]]:
             'range_class_code',
             row['range_code'])
         if not valid_domain or not valid_range:
-            invalid_linking.append(row)
-    invalid_links = []
-    for item in invalid_linking:
-        for row in db.get_invalid_links(item):
-            invalid_links.append({
-                'domain': Entity.get_by_id(row['domain_id']),
-                'property': g.properties[row['property_code']],
-                'range': Entity.get_by_id(row['range_id'])})
-    return invalid_links
+            links.append(row['id'])
+    return [Link.get_by_id(id_) for id_ in links]
 
 
 def similar_named(class_: str, ratio: int) -> dict[int, Any]:

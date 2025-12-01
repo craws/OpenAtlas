@@ -106,3 +106,10 @@ ARCHE_METADATA = {
 MAP_TYPE_COLOR = {
     'default': '#007bd9',
     '123': '#007bd9'}
+
+# These are special types because they are used for links instead of entities
+PROPERTY_TYPES = [
+    'Actor relation',
+    'Actor function',
+    'External reference match',
+    'Involvement']
