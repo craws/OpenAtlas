@@ -192,10 +192,8 @@ Create the virtual environment in the project root:
 Run the tests against a local OpenAtlas instance:
 
     schemathesis run openatlas/api/openapi.json \
-        --url=http://127.0.0.1:5000/api/ \
-        --max-examples=3 \
+        --url=https://demo-dev.openatlas.eu/api/ \
         --workers=1 \
-        --method=GET \
         --exclude-path-regex="(table_rows|latest|query|cidoc_class|entities_linked_to_entity|system_class|type_entities|type_entities_all|view_class|linked_entities_by_properties_recursive)"
 
 Excluded endpoints (slow):
