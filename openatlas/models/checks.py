@@ -4,7 +4,7 @@ from flask import g
 from fuzzywuzzy import fuzz
 
 from openatlas.database import checks as db, date
-from openatlas.models.entity import Entity
+from openatlas.models.entity import Entity, Link
 
 
 def single_type_duplicates() -> list[dict[str, Any]]:
@@ -32,19 +32,20 @@ def invalid_dates() -> list[Entity]:
 
 
 def orphans() -> list[Entity]:
-    return [Entity.get_by_id(row['id']) for row in db.get_orphans()]
+    return [
+        Entity.get_by_id(row['id'], types=True) for row in db.get_orphans()]
 
 
 def orphaned_subunits() -> list[Entity]:
     return [Entity.get_by_id(x['id']) for x in db.get_orphaned_subunits()]
 
 
-def entities_linked_to_itself() -> list[Entity]:
-    return [Entity.get_by_id(row['domain_id']) for row in db.get_circular()]
+def entities_linked_to_itself() -> list[Link]:
+    return [Link.get_by_id(id_) for id_ in db.get_circular()]
 
 
-def invalid_cidoc_links() -> list[dict[str, Any]]:
-    invalid_linking = []
+def invalid_cidoc_links() -> list[Link]:
+    links = []
     for row in db.get_cidoc_links():
         valid_domain = g.properties[row['property_code']].find_object(
             'domain_class_code',
@@ -53,26 +54,58 @@ def invalid_cidoc_links() -> list[dict[str, Any]]:
             'range_class_code',
             row['range_code'])
         if not valid_domain or not valid_range:
-            invalid_linking.append(row)
-    invalid_links = []
-    for item in invalid_linking:
-        for row in db.get_invalid_links(item):
-            invalid_links.append({
-                'domain': Entity.get_by_id(row['domain_id']),
-                'property': g.properties[row['property_code']],
-                'range': Entity.get_by_id(row['range_id'])})
-    return invalid_links
+            links.append(row['id'])
+    return [Link.get_by_id(id_) for id_ in links]
 
 
 def similar_named(class_: str, ratio: int) -> dict[int, Any]:
     similar: dict[int, Any] = {}
     already_added: set[int] = set()
     entities = Entity.get_by_class(class_)
-    for sample in [e for e in entities if e.id not in already_added]:
+    for sample in entities:
+        if sample.id in already_added:
+            continue
+        already_added.add(sample.id)
         similar[sample.id] = {'entity': sample, 'entities': []}
         for e in entities:
             if e.id != sample.id and fuzz.ratio(sample.name, e.name) >= ratio:
-                already_added.add(sample.id)
                 already_added.add(e.id)
                 similar[sample.id]['entities'].append(e)
     return {item: data for item, data in similar.items() if data['entities']}
+
+
+def link_duplicates() -> list[dict[str, Any]]:
+    return db.link_duplicates()
+
+
+def delete_link_duplicates() -> int:
+    return db.delete_link_duplicates()
+
+
+def invalid_involvement_dates() -> list[Link]:
+    return [
+        Link.get_by_id(row['id'])
+        for row in date.invalid_involvement_dates()]
+
+
+def invalid_preceding_dates() -> list[Link]:
+    return [
+        Link.get_by_id(row['id'])
+        for row in date.invalid_preceding_dates()]
+
+
+def invalid_sub_dates() -> list[Link]:
+    return [Link.get_by_id(row['id']) for row in date.invalid_sub_dates()]
+
+
+def get_invalid_link_dates() -> list[Link]:
+    return [Link.get_by_id(row['id']) for row in date.invalid_link_dates()]
+
+
+def type_orphans() -> list[Entity]:
+    return [
+        node for node in g.types.values()
+        if node.root
+        and node.category not in ['system', 'tools']
+        and node.count < 1
+        and not node.subs]

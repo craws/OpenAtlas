@@ -183,7 +183,7 @@ def get_table_cell_content(
             html = g.file_info.get(e.id, {}).get('license_holder')
         case 'main_image' if origin:
             html = profile_image_table_link(origin, e)
-        case 'name' | 'preceding':
+        case 'name' | 'preceding' | 'super':
             html = format_name_and_aliases(e, str(table_id), forms)
         case 'page':
             html = str(item.description)
@@ -206,11 +206,13 @@ def get_table_cell_content(
                             'overlay_insert',
                             image_id=e.id,
                             place_id=origin.id))
+        case 'property' if isinstance(item, Link):
+            html = item.property.code
         case 'public':
             html = ''
             if g.file_info.get(e.id):
                 html = display_bool(g.file_info[e.id]['public'], False)
-        case 'range' | 'succeeding':
+        case 'range' | 'sub' | 'succeeding':
             html = link(range_)
         case 'remove' if origin and isinstance(item, Link):
             html = ''

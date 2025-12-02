@@ -45,16 +45,16 @@ def get_orphans() -> list[dict[str, Any]]:
     return list(g.cursor)
 
 
-def get_circular() -> list[dict[str, Any]]:
-    g.cursor.execute(
-        'SELECT domain_id FROM model.link WHERE domain_id = range_id;')
-    return list(g.cursor)
+def get_circular() -> list[int]:
+    g.cursor.execute('SELECT id FROM model.link WHERE domain_id = range_id;')
+    return [row[0] for row in list(g.cursor)]
 
 
 def get_cidoc_links() -> list[dict[str, Any]]:
     g.cursor.execute(
         """
         SELECT DISTINCT
+            l.id,
             l.property_code,
             d.cidoc_class_code AS domain_code,
             r.cidoc_class_code AS range_code
@@ -62,28 +62,6 @@ def get_cidoc_links() -> list[dict[str, Any]]:
         JOIN model.entity d ON l.domain_id = d.id
         JOIN model.entity r ON l.range_id = r.id;
         """)
-    return list(g.cursor)
-
-
-def get_invalid_links(data: dict[str, Any]) -> list[dict[str, int]]:
-    g.cursor.execute(
-        """
-        SELECT
-            l.id,
-            l.property_code,
-            l.domain_id,
-            l.range_id,
-            l.description,
-            l.created,
-            l.modified
-        FROM model.link l
-        JOIN model.entity d ON l.domain_id = d.id
-        JOIN model.entity r ON l.range_id = r.id
-        WHERE l.property_code = %(property_code)s
-            AND d.cidoc_class_code = %(domain_code)s
-            AND r.cidoc_class_code = %(range_code)s;
-        """,
-        data)
     return list(g.cursor)
 
 
@@ -98,3 +76,37 @@ def check_type_count_needed(entity_id: int) -> bool:
         """,
         {'entity_id': entity_id})
     return bool(g.cursor.rowcount)
+
+def link_duplicates() -> list[dict[str, int]]:
+    g.cursor.execute(
+        """
+        SELECT COUNT(*) AS count,
+            domain_id, range_id, property_code, description, type_id,
+            begin_from, begin_to, begin_comment,
+            end_from, end_to, end_comment
+        FROM model.link
+        GROUP BY domain_id,
+            range_id, property_code, description, type_id,
+            begin_from, begin_to, begin_comment,
+            end_from, end_to, end_comment
+        HAVING COUNT(*) > 1;
+        """)
+    return list(g.cursor)
+
+
+def delete_link_duplicates() -> int:
+    g.cursor.execute(
+        """
+        DELETE
+        FROM model.link l
+        WHERE l.id NOT IN (
+            SELECT id
+            FROM (
+                SELECT DISTINCT ON (
+                   domain_id, range_id, property_code, description, type_id,
+                   begin_from, begin_to, begin_comment,
+                   end_from, end_to, end_comment) *
+                FROM model.link)
+            AS temp_table);
+        """)
+    return g.cursor.rowcount

@@ -8,17 +8,11 @@ from flask import g, request
 from werkzeug.exceptions import abort
 
 from openatlas import app
-from openatlas.database import date, entity as db, link as db_link
+from openatlas.database import entity as db, link as db_link
 from openatlas.display.util2 import convert_size, sanitize
 from openatlas.models.annotation import AnnotationText
 from openatlas.models.dates import Dates
 from openatlas.models.gis import Gis
-
-app.config['PROPERTY_TYPES'] = [
-    'Actor relation',
-    'Actor function',
-    'External reference match',
-    'Involvement']
 
 
 class Entity:
@@ -768,15 +762,6 @@ class Entity:
         db.add_classes_to_hierarchy(type_.id, classes)
 
     @staticmethod
-    def get_type_orphans() -> list[Entity]:
-        return [
-            node for key, node in g.types.items()
-            if node.root
-            and node.category not in ['system', 'tools']
-            and node.count < 1
-            and not node.subs]
-
-    @staticmethod
     def reference_system_counts() -> dict[str, int]:
         return db.reference_system_counts()
 
@@ -889,34 +874,6 @@ class Link:
     @staticmethod
     def delete_(id_: int) -> None:
         db_link.delete_(id_)
-
-    @staticmethod
-    def invalid_involvement_dates() -> list[Link]:
-        return [
-            Link.get_by_id(row['id'])
-            for row in date.invalid_involvement_dates()]
-
-    @staticmethod
-    def invalid_preceding_dates() -> list[Link]:
-        return [
-            Link.get_by_id(row['id'])
-            for row in date.invalid_preceding_dates()]
-
-    @staticmethod
-    def invalid_sub_dates() -> list[Link]:
-        return [Link.get_by_id(row['id']) for row in date.invalid_sub_dates()]
-
-    @staticmethod
-    def get_invalid_link_dates() -> list[Link]:
-        return [Link.get_by_id(row['id']) for row in date.invalid_link_dates()]
-
-    @staticmethod
-    def check_link_duplicates() -> list[dict[str, Any]]:
-        return db_link.check_link_duplicates()
-
-    @staticmethod
-    def delete_link_duplicates() -> int:
-        return db_link.delete_link_duplicates()
 
 
 def get_entity_ids_with_links(

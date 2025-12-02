@@ -29,8 +29,8 @@ class DisplayImage(Resource):
     def get(filename: str) -> Response:
         try:
             id_ = int(Pathlib_path(filename).stem)
-        except ValueError:
-            raise FileIdNotInteger
+        except ValueError as e:
+            raise FileIdNotInteger from e
         entity = ApiEntity.get_by_id(id_, types=True)
         if entity.class_.group.get('name') != 'file':
             raise EntityNotAFileError
@@ -107,8 +107,8 @@ class EntityFiles(Resource):
         links = get_links_by_id_network(set(file_ids))
         entity_file_dict = defaultdict(list)
         for link_ in links:
-            if link_['property_code'] != 'P67' or link_[
-                'domain_system_class'] != 'file':
+            if link_['property_code'] != 'P67' \
+                    or link_['domain_system_class'] != 'file':
                 continue
             entity_file_dict[link_['range_id']].append(
                 files_dict.get(link_['domain_id']))

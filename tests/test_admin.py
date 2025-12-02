@@ -53,9 +53,6 @@ class AdminTests(TestBaseCase):
         rv = c.get(url_for('check_dates'))
         assert b'Congratulations, everything looks fine!' in rv.data
 
-        rv = c.get(url_for('check_links'))
-        assert b'Invalid linked entity' in rv.data
-
         file_ = 'Test77.txt'
         file_path = Path(app.config['UPLOAD_PATH'] / file_)
         with open(file_path, 'w', encoding='utf8') as _:
@@ -114,13 +111,12 @@ class AdminTests(TestBaseCase):
         rv = c.get(url_for('check_dates'))
         assert b'tab-counter' in rv.data
 
-        rv = c.get(url_for('check_link_duplicates'))
+        rv = c.get(url_for('check_links'))
         assert b'Event Horizon' in rv.data
+        assert b'Invalid linked entity' in rv.data
 
-        rv = c.get(
-            url_for('check_link_duplicates', delete='delete'),
-            follow_redirects=True)
-        assert b'Remove' in rv.data
+        rv = c.get(url_for('delete_link_duplicates'), follow_redirects=True)
+        assert b'Deleted links' in rv.data
 
         rv = c.get(
             url_for(
